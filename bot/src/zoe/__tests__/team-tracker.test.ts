@@ -1,5 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+
+describe('buildTeamTaskRow', () => {
+  it('builds a minimal row with required fields + zoe tagging', () => {
+    const row = buildTeamTaskRow({ title: '  Ship it  ', project: ' zaodevz ' });
+    expect(row.title).toBe('Ship it');
+    expect(row.project).toBe('zaodevz');
+    expect(row.status).toBe('todo');
+    expect(row.source).toBe('zoe');
+    expect(row.legacy_source).toBe('zoe-bot');
+    expect('priority' in row).toBe(false);
+  });
+  it('includes priority when given', () => {
+    expect(buildTeamTaskRow({ title: 'x', project: 'p', priority: 'P1' }).priority).toBe('P1');
+  });
+});
 
 describe('formatTeamTasks', () => {
   it('renders an empty state when there are no tasks', () => {

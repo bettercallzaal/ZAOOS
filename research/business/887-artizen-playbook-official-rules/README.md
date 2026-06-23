@@ -152,6 +152,41 @@ must check it from his logged-in account. The playbook FAQ is the only public so
 | 844 | "Boost Score = total raised x boosts received" | Close but incomplete - it's (sales + match) x boost points / 100, and match counts too. |
 | 886 | "Fund kickstarted with $10k" (from the call) | Playbook: new Funds seeded with $1,000. ZAO pool is $10,547 now (grew). |
 
+## René "Monday Momentum" update (2026-06-22, shared via the Artizen TG group)
+
+Fresh primary-source update that confirms doc 887 and changes a few things. Transcript:
+`docs.google.com/document/d/1WuaY90dpULGdSsP7Tf3qnXdQ-S6mq_HxBNnhw_N_tbo`.
+
+- **Playbook is ~98% accurate and is René's own ground truth.** Venus (the AI) gives straight answers via
+  platform chat, **email venus@artizen.fund**, or the Telegram group. Doc 887 is canonical; ask Venus for the last 2%.
+- **Boost points are WEEKLY and capped - use-it-or-lose-it, they do NOT stack endlessly.** Earned mainly by
+  contributing to the Endowment; **holding ART recharges you up to your cap each fund drive** (live later this
+  week). REFINES the Kenny answer + crew messaging: spend boosts every drive (especially on the fund you're
+  curated for, to unlock its prize) - hoarding wastes the recharge.
+- **ART token relaunched + airdropped (2026-06-22).** The old contract was PAUSED after the security vuln (the
+  Anthropic Mythos finding); a new audited contract is live and old holders airdropped today. CAVEAT: the
+  Basescan figures above (`0x44c45...`, 237 holders) are now in flux - re-check the NEW contract after the
+  airdrop settles; do not cite the old supply/holder counts as current.
+- **Presenting Sponsor is LIVE:** top cumulative contributor to a fund is auto-listed on the fund's hero image
+  (king-of-the-hill). More sponsor placements + a sponsor message coming.
+- **Season finale = a season-wide ART competition** (not a normal drive) - balances the whale-boost concern.
+  Confirms doc 887's "final week ranks on season totals."
+- **S7 fund seeding: René is seeding NEW community funds ($10K-$50K) around deep, specific, underserved passions
+  before Season 7.** OPPORTUNITY: reopens the "should ZAO launch a 2nd fund" question with FREE seed money - if
+  ZAO has a niche music/culture angle with real heart, propose it (vs the doc-850 "don't build a 2nd fund yet").
+- **Edge City (Healdsburg) fund is live; Protocol Labs added $5K; submit creative projects by Wednesday to be
+  eligible.** (Telamon tie, doc 674 - a ZAO project could submit this week.)
+- **Weekly Fund Directors strategy meeting starts Tuesdays.** Zaal is a Fund Director - should attend.
+- Fiscal sponsorship / tax-deductible giving available via a partner nonprofit (ask Artizen for an intro).
+- **RZA (36 Cinema) + Lily Wachowski funds moved to Season 7** - NOT live in S6 (corrects any "36 Cinema is live
+  now" read from doc 844).
+- Bug tip: stuck = log out, close all tabs, fresh login.
+
+**Net new actions for ZAO:** (1) propose an S7 niche fund for the $10-50K seed; (2) Zaal joins the Tuesday
+fund-directors meeting; (3) tell the crew boosts are weekly/capped - spend every drive; (4) consider submitting a
+creative project to the Edge City fund by Wednesday for the Protocol Labs match; (5) re-scrape the NEW ART
+contract once the airdrop settles.
+
 ## Also See
 
 - [Doc 886](../886-artizen-zao-fund-manager-curator-benefit-cases/) - ZAO fund-manager strategy (needs the win-condition fix)

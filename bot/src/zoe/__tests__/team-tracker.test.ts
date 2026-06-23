@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, buildTeamTaskRow, type TeamTask } from '../team-tracker';
 
 describe('summarizeTeamForBrief', () => {
   it('returns null when empty (so the brief skips the section)', () => {
@@ -15,6 +15,21 @@ describe('summarizeTeamForBrief', () => {
     expect(out).toMatch(/1 overdue/);
     expect(out).toContain('Ship feature');
     expect(out).not.toContain('Daily standup'); // recurring excluded from "Top"
+  });
+});
+
+describe('buildTeamTaskRow', () => {
+  it('builds a minimal row with required fields + zoe tagging', () => {
+    const row = buildTeamTaskRow({ title: '  Ship it  ', project: ' zaodevz ' });
+    expect(row.title).toBe('Ship it');
+    expect(row.project).toBe('zaodevz');
+    expect(row.status).toBe('todo');
+    expect(row.source).toBe('zoe');
+    expect(row.legacy_source).toBe('zoe-bot');
+    expect('priority' in row).toBe(false);
+  });
+  it('includes priority when given', () => {
+    expect(buildTeamTaskRow({ title: 'x', project: 'p', priority: 'P1' }).priority).toBe('P1');
   });
 });
 

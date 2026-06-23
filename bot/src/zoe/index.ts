@@ -27,7 +27,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured } from './team-tracker';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -264,6 +264,27 @@ bot.command('team', async (ctx) => {
   }
   const tasks = await getOpenTeamTasks();
   await replyChunked(ctx, formatTeamTasks(tasks));
+});
+
+// Write path: add a task to the team board. Usage:
+//   /teamadd <title>                 -> project defaults to zaodevz
+//   /teamadd <project> | <title>     -> explicit project
+bot.command('teamadd', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply('Team tracker not wired up - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY.');
+    return;
+  }
+  const arg = (ctx.match ?? '').toString().trim();
+  if (!arg) {
+    await ctx.reply('Usage: /teamadd <title>   or   /teamadd <project> | <title>');
+    return;
+  }
+  const [a, b] = arg.includes('|') ? arg.split('|', 2).map((s) => s.trim()) : ['zaodevz', arg];
+  const project = b ? a : 'zaodevz';
+  const title = b ? b : a;
+  const res = await addTeamTask({ title, project });
+  await ctx.reply(res.ok ? `Added to ${project} board: ${title}` : `Could not add it - ${res.error}`);
 });
 
 bot.command('seed', async (ctx) => {

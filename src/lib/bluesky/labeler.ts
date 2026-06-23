@@ -1,4 +1,5 @@
 import { AtpAgent } from '@atproto/api';
+import { logger } from '@/lib/logger';
 
 /**
  * Apply "ZAO Member" label to a Bluesky account.
@@ -24,7 +25,7 @@ export async function applyMemberLabel(
         },
       },
     });
-    console.info(`[labeler] Applied ZAO Member label to ${targetDid}`);
+    logger.info(`[labeler] Applied ZAO Member label to ${targetDid}`);
     return true;
   } catch (err) {
     // Self-labels can only be applied to own account.

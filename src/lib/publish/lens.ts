@@ -5,6 +5,7 @@
  */
 
 import type { NormalizedContent } from '@/lib/publish/normalize';
+import { logger } from '@/lib/logger';
 
 const LENS_API = 'https://api.lens.xyz/graphql';
 
@@ -44,7 +45,7 @@ export async function publishToLens(
   const storageClient = StorageClient.create();
   const { uri: contentURI } = await storageClient.uploadAsJson(metadata);
 
-  console.info('[lens] Uploaded to Grove:', contentURI);
+  logger.info('[lens] Uploaded to Grove:', contentURI);
 
   // Post with the lens:// URI
   const postResult = await lensPost(token, contentURI);
@@ -93,7 +94,7 @@ async function lensPost(token: string, contentURI: string): Promise<{ result?: L
 
     const post = data?.data?.post;
     if (post?.hash) {
-      console.info('[lens] Post transaction hash:', post.hash);
+      logger.info('[lens] Post transaction hash:', post.hash);
       return {
         result: {
           postId: post.hash,

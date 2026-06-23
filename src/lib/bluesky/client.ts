@@ -1,4 +1,5 @@
 import { AtpAgent, RichText } from '@atproto/api';
+import { logger } from '@/lib/logger';
 
 let communityAgent: AtpAgent | null = null;
 let communitySessionExpiry = 0;
@@ -12,7 +13,7 @@ async function getCommunityAgent(): Promise<AtpAgent | null> {
   const password = process.env.BLUESKY_APP_PASSWORD;
 
   if (!handle || !password) {
-    console.warn('[bluesky] Community account not configured — set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD');
+    logger.warn('[bluesky] Community account not configured — set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD');
     return null;
   }
 

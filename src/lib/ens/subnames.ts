@@ -20,6 +20,7 @@ import {
 } from 'viem';
 import { mainnet } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
+import { logger } from '@/lib/logger';
 
 // ── Contract addresses ──
 
@@ -233,7 +234,7 @@ export async function createSubname(
           });
           await publicClient.waitForTransactionReceipt({ hash: textTx });
         } catch (err) {
-          console.warn(`[ens/subnames] Failed to set text record "${key}":`, err);
+          logger.warn(`[ens/subnames] Failed to set text record "${key}":`, err);
         }
       }
     }

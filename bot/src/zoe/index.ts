@@ -826,6 +826,25 @@ async function dispatchConcierge(
       await applyQuestOps(result.quest_ops);
     }
 
+    // Inline op summary (doc 890): tell Zaal what state changed this turn
+    // ("tasks: 2 add, 1 complete") so he sees it in the reply without /tasks.
+    // Relay/CRM/thread ops already do this; task + quest ops did not.
+    let taskPostscript = '';
+    {
+      const opLines: string[] = [];
+      if (result.task_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.task_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`tasks: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (result.quest_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.quest_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`quests: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (opLines.length > 0) taskPostscript = '\n\n' + opLines.join(' · ');
+    }
+
     // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
     // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
     // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
@@ -906,7 +925,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript + crmPostscript + threadPostscript;
+    const safeReply = result.reply.trim() + taskPostscript + relayPostscript + crmPostscript + threadPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(

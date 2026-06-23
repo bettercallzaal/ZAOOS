@@ -108,3 +108,19 @@ export function formatTeamTasks(tasks: TeamTask[]): string {
     tasks.length > MAX_SHOWN ? `\n\n+${tasks.length - MAX_SHOWN} more (full board: thezao.xyz)` : '';
   return `${header}\n\n${lines.join('\n')}${more}`;
 }
+
+/**
+ * One-line team summary for the morning brief: "5 open, 3 overdue. Top: ...".
+ * Returns null when there's nothing to report (so the brief can skip the line).
+ */
+export function summarizeTeamForBrief(tasks: TeamTask[]): string | null {
+  if (tasks.length === 0) return null;
+  const overdue = tasks.filter((t) => isOverdue(t.due)).length;
+  const top = [...tasks]
+    .filter((t) => !isRecurring(t.title))
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority))
+    .slice(0, 3)
+    .map((t) => t.title)
+    .join('; ');
+  return `${tasks.length} open${overdue ? `, ${overdue} overdue` : ''}${top ? `. Top: ${top}` : ''}`;
+}

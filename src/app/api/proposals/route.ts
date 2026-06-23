@@ -345,7 +345,7 @@ async function checkExpiredProposalsForPublish(proposals: ProposalSummary[]) {
           .eq('id', p.id)
           .eq('status', 'open');
 
-        console.info(`[proposals] Auto-approved proposal ${p.id} — deadline passed, ${forWeight}/${threshold}R threshold met`);
+        logger.info(`[proposals] Auto-approved proposal ${p.id} — deadline passed, ${forWeight}/${threshold}R threshold met`);
       } catch (err) {
         logger.error(`[proposals] Auto-approve failed for ${p.id}:`, err);
       }

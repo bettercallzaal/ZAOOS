@@ -124,7 +124,7 @@ export async function GET() {
     }
   }
 
-  console.info(`[radio] Resolved ${playlists.length} playlists with ${playlists.reduce((n, p) => n + p.tracks.length, 0)} total tracks`);
+  logger.info(`[radio] Resolved ${playlists.length} playlists with ${playlists.reduce((n, p) => n + p.tracks.length, 0)} total tracks`);
 
   return NextResponse.json({ playlists }, {
     headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },

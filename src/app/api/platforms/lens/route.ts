@@ -31,7 +31,7 @@ async function checkLensProfile(wallet: string) {
   const items = data?.data?.accountsAvailable?.items || [];
   // Log what we got to debug missing usernames
   if (items.length > 0) {
-    console.info('[lens] Found account for', wallet, ':', JSON.stringify(items[0]));
+    logger.info('[lens] Found account for', wallet, ':', JSON.stringify(items[0]));
   }
   return items;
 }
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.info('[lens] Checking wallets:', [...walletsToCheck]);
+    logger.info('[lens] Checking wallets:', [...walletsToCheck]);
 
     // Check each wallet for a Lens profile
     let handle: string | null = null;
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
               || acct?.username?.value
               || acct?.metadata?.name
               || null;
-            console.info('[lens] Direct account lookup:', JSON.stringify(acct));
+            logger.info('[lens] Direct account lookup:', JSON.stringify(acct));
           } catch { /* ignore fallback failure */ }
         }
 

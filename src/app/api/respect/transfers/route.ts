@@ -153,7 +153,7 @@ async function syncTransfersFromAlchemy(filterAddress?: string) {
           }, { onConflict: 'tx_hash,to_address,token_type' });
         }
 
-        console.info(`[transfers-sync] ${contract.type}: stored ${transfers.length} transfers (page ${pages + 1})`);
+        logger.info(`[transfers-sync] ${contract.type}: stored ${transfers.length} transfers (page ${pages + 1})`);
         pages++;
       } catch (err) {
         logger.error(`[transfers-sync] ${contract.type} page ${pages} failed:`, err);

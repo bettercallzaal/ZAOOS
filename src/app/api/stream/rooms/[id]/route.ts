@@ -102,7 +102,7 @@ async function syncStreamTitle(fid: number, title: string) {
   if (token) {
     const ok = await updateTwitchChannel(token.accessToken, token.userId, { title });
     if (ok) {
-      console.info('[twitch-sync] Title updated to:', title);
+      logger.info('[twitch-sync] Title updated to:', title);
     }
   }
   // YouTube title sync could go here in the future

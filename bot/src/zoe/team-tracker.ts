@@ -61,6 +61,65 @@ export async function getOpenTeamTasks(): Promise<TeamTask[]> {
   }
 }
 
+export interface NewTeamTask {
+  title: string;
+  project: string;
+  priority?: string;
+}
+
+/**
+ * Build the row for an INSERT into the cowork tasks table. Only project + title
+ * are required by the schema; everything else defaults. We tag source='zoe' and
+ * a legacy_source so ZOE-created team tasks are traceable on the board. Pure +
+ * exported for testing.
+ */
+export function buildTeamTaskRow(t: NewTeamTask): Record<string, unknown> {
+  const row: Record<string, unknown> = {
+    title: t.title.trim(),
+    project: t.project.trim(),
+    status: 'todo',
+    source: 'zoe',
+    legacy_source: 'zoe-bot',
+  };
+  if (t.priority) row.priority = t.priority;
+  return row;
+}
+
+export interface AddTeamTaskResult {
+  ok: boolean;
+  error?: string;
+}
+
+/**
+ * Create a team task on the cowork board. Best-effort; returns {ok:false,error}
+ * on any failure so the caller can surface it. Requires the write-capable key.
+ */
+export async function addTeamTask(t: NewTeamTask): Promise<AddTeamTaskResult> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key) return { ok: false, error: 'team tracker not configured' };
+  if (!t.title.trim() || !t.project.trim()) return { ok: false, error: 'title and project required' };
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(`${base.replace(/\/$/, '')}/rest/v1/tasks`, {
+      method: 'POST',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(buildTeamTaskRow(t)),
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return { ok: false, error: `tracker returned ${res.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'insert failed' };
+  }
+}
+
 const MAX_SHOWN = 15;
 
 function priorityRank(p: string | null): number {

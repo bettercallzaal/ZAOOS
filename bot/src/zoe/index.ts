@@ -27,6 +27,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -251,6 +252,39 @@ bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
+});
+
+bot.command('team', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply(
+      'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
+    );
+    return;
+  }
+  const tasks = await getOpenTeamTasks();
+  await replyChunked(ctx, formatTeamTasks(tasks));
+});
+
+// Write path: add a task to the team board. Usage:
+//   /teamadd <title>                 -> project defaults to zaodevz
+//   /teamadd <project> | <title>     -> explicit project
+bot.command('teamadd', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply('Team tracker not wired up - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY.');
+    return;
+  }
+  const arg = (ctx.match ?? '').toString().trim();
+  if (!arg) {
+    await ctx.reply('Usage: /teamadd <title>   or   /teamadd <project> | <title>');
+    return;
+  }
+  const [a, b] = arg.includes('|') ? arg.split('|', 2).map((s) => s.trim()) : ['zaodevz', arg];
+  const project = b ? a : 'zaodevz';
+  const title = b ? b : a;
+  const res = await addTeamTask({ title, project });
+  await ctx.reply(res.ok ? `Added to ${project} board: ${title}` : `Could not add it - ${res.error}`);
 });
 
 bot.command('seed', async (ctx) => {
@@ -826,6 +860,25 @@ async function dispatchConcierge(
       await applyQuestOps(result.quest_ops);
     }
 
+    // Inline op summary (doc 890): tell Zaal what state changed this turn
+    // ("tasks: 2 add, 1 complete") so he sees it in the reply without /tasks.
+    // Relay/CRM/thread ops already do this; task + quest ops did not.
+    let taskPostscript = '';
+    {
+      const opLines: string[] = [];
+      if (result.task_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.task_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`tasks: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (result.quest_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.quest_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`quests: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (opLines.length > 0) taskPostscript = '\n\n' + opLines.join(' · ');
+    }
+
     // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
     // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
     // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
@@ -906,7 +959,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript + crmPostscript + threadPostscript;
+    const safeReply = result.reply.trim() + taskPostscript + relayPostscript + crmPostscript + threadPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(

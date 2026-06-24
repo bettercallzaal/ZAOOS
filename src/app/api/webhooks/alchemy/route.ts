@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
               .update({ onchain_og: (Number(member.onchain_og) || 0) + mintAmount })
               .eq('id', member.id);
           }
-          console.info(`[alchemy-webhook] ${tokenType} mint: +${mintAmount} to ${toAddress.slice(0, 10)}...`);
+          logger.info(`[alchemy-webhook] ${tokenType} mint: +${mintAmount} to ${toAddress.slice(0, 10)}...`);
         }
       }
 
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
           .from('users')
           .update({ member_tier: 'respect_holder' })
           .eq('id', user.id);
-        console.info(`[alchemy-webhook] Upgraded ${toAddress.slice(0, 10)}... to respect_holder`);
+        logger.info(`[alchemy-webhook] Upgraded ${toAddress.slice(0, 10)}... to respect_holder`);
       }
     }
 

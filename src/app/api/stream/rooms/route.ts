@@ -91,7 +91,7 @@ async function syncTwitchOnCreate(fid: number, title: string) {
   });
 
   if (ok) {
-    console.info(`[room-create] Twitch channel set — title: "${title}", category: ${gameId}`);
+    logger.info(`[room-create] Twitch channel set — title: "${title}", category: ${gameId}`);
   }
 }
 

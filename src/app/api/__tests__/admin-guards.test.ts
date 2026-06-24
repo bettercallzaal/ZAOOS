@@ -48,6 +48,20 @@ vi.mock('viem/chains', () => ({
   mainnet: { id: 1 },
 }));
 
+// ens-subnames + discord-link deps - mocked so their route modules load cleanly
+// (the guard returns before any of these run; this is purely import safety).
+vi.mock('@/lib/ens/subnames', () => ({
+  createSubnameWithFallback: vi.fn(),
+  batchCreateSubnames: vi.fn(),
+  buildMemberTextRecords: vi.fn(),
+  isValidSubname: vi.fn(),
+  sanitizeSubname: vi.fn(),
+}));
+vi.mock('@/lib/db/audit-log', () => ({
+  logAuditEvent: vi.fn(),
+  getClientIp: vi.fn(() => '0.0.0.0'),
+}));
+
 // ── Route imports ────────────────────────────────────────────────────────────
 import { GET as usersGET, POST as usersPOST, PATCH as usersPATCH, DELETE as usersDELETE } from '@/app/api/admin/users/route';
 import { GET as allowlistGET, POST as allowlistPOST, DELETE as allowlistDELETE } from '@/app/api/admin/allowlist/route';
@@ -56,6 +70,10 @@ import { POST as uploadPOST } from '@/app/api/admin/upload/route';
 import { POST as backfillPOST } from '@/app/api/admin/backfill/route';
 import { GET as searchUsersGET } from '@/app/api/admin/search-users/route';
 import { POST as respectImportPOST } from '@/app/api/admin/respect-import/route';
+import { GET as quickStatsGET } from '@/app/api/admin/quick-stats/route';
+import { GET as memberHealthGET } from '@/app/api/admin/member-health/route';
+import { GET as ensSubnamesGET } from '@/app/api/admin/ens-subnames/route';
+import { GET as discordLinkGET } from '@/app/api/admin/discord-link/route';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function makeRequest(url: string, options?: RequestInit) {
@@ -77,6 +95,10 @@ interface AdminRouteEntry {
   init?: RequestInit;
   unauthStatus: number;
   unauthError: string;
+  // Non-admin (authenticated) response. Most routes share 403/"Admin access
+  // required"; some (quick-stats, member-health) return 403/"Admin required".
+  nonAdminStatus?: number;
+  nonAdminError?: string;
 }
 
 const dummyBody = JSON.stringify({ id: '550e8400-e29b-41d4-a716-446655440000' });
@@ -107,6 +129,18 @@ const adminRoutes: AdminRouteEntry[] = [
 
   // admin/search-users — uses !session?.isAdmin → 403 for both unauth and non-admin
   { label: 'GET    /api/admin/search-users', url: '/api/admin/search-users?q=test', handler: searchUsersGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin access required' },
+
+  // admin/quick-stats — !session?.isAdmin → 403 "Admin required" for both
+  { label: 'GET    /api/admin/quick-stats', url: '/api/admin/quick-stats', handler: quickStatsGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin required', nonAdminError: 'Admin required' },
+
+  // admin/member-health — !session?.isAdmin → 403 "Admin required" for both
+  { label: 'GET    /api/admin/member-health', url: '/api/admin/member-health', handler: memberHealthGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin required', nonAdminError: 'Admin required' },
+
+  // admin/ens-subnames — !session?.isAdmin → 403 "Admin access required" for both
+  { label: 'GET    /api/admin/ens-subnames', url: '/api/admin/ens-subnames', handler: ensSubnamesGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin access required' },
+
+  // admin/discord-link — split checks → 401 unauth, 403 non-admin
+  { label: 'GET    /api/admin/discord-link', url: '/api/admin/discord-link', handler: discordLinkGET as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
 ];
 
 // ── Tests: unauthenticated → 401 or 403 ─────────────────────────────────────
@@ -143,13 +177,13 @@ describe('Admin guards — non-admin authenticated users get 403', () => {
     });
   });
 
-  describe.each(adminRoutes)('$label', ({ url, handler, init }) => {
-    it('returns 403 with error "Admin access required"', async () => {
+  describe.each(adminRoutes)('$label', ({ url, handler, init, nonAdminStatus, nonAdminError }) => {
+    it('rejects non-admin', async () => {
       const req = makeRequest(url, init);
       const res = await handler(req);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(nonAdminStatus ?? 403);
       const body = await res.json();
-      expect(body.error).toBe('Admin access required');
+      expect(body.error).toBe(nonAdminError ?? 'Admin access required');
     });
   });
 });

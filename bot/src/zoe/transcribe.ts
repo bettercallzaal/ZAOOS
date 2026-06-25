@@ -62,3 +62,40 @@ export async function transcribeTelegramFile(
   const name = filePath.split('/').pop() || 'voice.ogg';
   return transcribeAudio(bytes, name);
 }
+
+/**
+ * Download a Telegram file (photo/document) by file_id into destDir and return
+ * the local path. Used for image/doc intake - ZOE's Read tool (vision) then
+ * views it. preferName lets the caller keep the original filename for documents.
+ */
+export async function downloadTelegramFile(
+  botToken: string,
+  fileId: string,
+  destDir: string,
+  preferName?: string,
+): Promise<string> {
+  const { promises: fsp } = await import('node:fs');
+  const path = await import('node:path');
+  const metaRes = await fetch(
+    `https://api.telegram.org/bot${botToken}/getFile?file_id=${encodeURIComponent(fileId)}`,
+    { signal: AbortSignal.timeout(15_000) },
+  );
+  const meta = (await metaRes.json()) as { ok: boolean; result?: { file_path?: string } };
+  const filePath = meta.result?.file_path;
+  if (!meta.ok || !filePath) throw new Error('telegram getFile failed');
+
+  const fileRes = await fetch(
+    `https://api.telegram.org/file/bot${botToken}/${filePath}`,
+    { signal: AbortSignal.timeout(60_000) },
+  );
+  if (!fileRes.ok) throw new Error(`telegram file download ${fileRes.status}`);
+  const bytes = Buffer.from(await fileRes.arrayBuffer());
+
+  await fsp.mkdir(destDir, { recursive: true });
+  const base = preferName || filePath.split('/').pop() || `file-${Date.now()}`;
+  // prefix with a short time-based token to avoid collisions (no Date.now in name body for determinism is unneeded here)
+  const safe = base.replace(/[^A-Za-z0-9._-]/g, '_');
+  const dest = path.join(destDir, safe);
+  await fsp.writeFile(dest, bytes);
+  return dest;
+}

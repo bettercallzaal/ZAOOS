@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily ZAO ecosystem digest (repo + fleet health) to ZOE Telegram
+
+[Timer]
+# 13:00 local daily; aligns with the morning brief window. Adjust to taste.
+OnCalendar=*-*-* 13:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

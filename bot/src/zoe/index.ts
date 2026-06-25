@@ -27,6 +27,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -50,6 +51,7 @@ import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
+import { transcriptionConfigured, transcribeTelegramFile } from './transcribe';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -251,6 +253,39 @@ bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
+});
+
+bot.command('team', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply(
+      'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
+    );
+    return;
+  }
+  const tasks = await getOpenTeamTasks();
+  await replyChunked(ctx, formatTeamTasks(tasks));
+});
+
+// Write path: add a task to the team board. Usage:
+//   /teamadd <title>                 -> project defaults to zaodevz
+//   /teamadd <project> | <title>     -> explicit project
+bot.command('teamadd', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply('Team tracker not wired up - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY.');
+    return;
+  }
+  const arg = (ctx.match ?? '').toString().trim();
+  if (!arg) {
+    await ctx.reply('Usage: /teamadd <title>   or   /teamadd <project> | <title>');
+    return;
+  }
+  const [a, b] = arg.includes('|') ? arg.split('|', 2).map((s) => s.trim()) : ['zaodevz', arg];
+  const project = b ? a : 'zaodevz';
+  const title = b ? b : a;
+  const res = await addTeamTask({ title, project });
+  await ctx.reply(res.ok ? `Added to ${project} board: ${title}` : `Could not add it - ${res.error}`);
 });
 
 bot.command('seed', async (ctx) => {
@@ -550,6 +585,38 @@ bot.on('message:text', async (ctx) => {
   );
 });
 
+// Voice / audio intake (Zaal DM only): transcribe via Groq Whisper, then run it
+// through the exact same turn path as a typed message. Lets Zaal voice-answer.
+bot.on(['message:voice', 'message:audio'], async (ctx) => {
+  if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
+  const chatId = ctx.chat.id;
+  const fileId = ctx.message.voice?.file_id ?? ctx.message.audio?.file_id;
+  if (!fileId) return;
+  if (!transcriptionConfigured()) {
+    await ctx
+      .reply('Voice received, but transcription is off. Add GROQ_API_KEY to bot/.env (free at console.groq.com) and restart me.')
+      .catch(() => {});
+    return;
+  }
+  let transcript: string;
+  try {
+    transcript = await transcribeTelegramFile(token, fileId);
+  } catch (err) {
+    await ctx.reply(`Could not transcribe that - ${(err as Error).message.slice(0, 160)}`).catch(() => {});
+    return;
+  }
+  if (!transcript) {
+    await ctx.reply('(that voice note came through empty)').catch(() => {});
+    return;
+  }
+  await ctx.reply(`Heard: "${transcript.slice(0, 300)}"`).catch(() => {});
+  enqueueTurn(chatId, () => handlePrivateMessage(ctx, transcript), {
+    onDeferred: () => {
+      ctx.reply("Got that - finishing what I'm on, then I'll pick it up.").catch(() => {});
+    },
+  }).catch((e) => console.error('[zoe/index] voice turn failed:', (e as Error)?.message));
+});
+
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // Track activity for inactivity detection (best-effort: never blocks the handler).
   touchLastSeen().catch(() => {});
@@ -826,6 +893,25 @@ async function dispatchConcierge(
       await applyQuestOps(result.quest_ops);
     }
 
+    // Inline op summary (doc 890): tell Zaal what state changed this turn
+    // ("tasks: 2 add, 1 complete") so he sees it in the reply without /tasks.
+    // Relay/CRM/thread ops already do this; task + quest ops did not.
+    let taskPostscript = '';
+    {
+      const opLines: string[] = [];
+      if (result.task_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.task_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`tasks: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (result.quest_ops.length > 0) {
+        const counts: Record<string, number> = {};
+        for (const op of result.quest_ops) counts[op.op] = (counts[op.op] ?? 0) + 1;
+        opLines.push(`quests: ${Object.entries(counts).map(([k, n]) => `${n} ${k}`).join(', ')}`);
+      }
+      if (opLines.length > 0) taskPostscript = '\n\n' + opLines.join(' · ');
+    }
+
     // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
     // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
     // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
@@ -906,7 +992,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript + crmPostscript + threadPostscript;
+    const safeReply = result.reply.trim() + taskPostscript + relayPostscript + crmPostscript + threadPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(

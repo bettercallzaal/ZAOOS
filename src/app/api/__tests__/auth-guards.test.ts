@@ -46,6 +46,10 @@ import { GET as chatMessagesGET } from '@/app/api/chat/messages/route';
 import { GET as musicSubmissionsGET, POST as musicSubmissionsPOST, DELETE as musicSubmissionsDELETE } from '@/app/api/music/submissions/route';
 import { GET as notificationsGET, PATCH as notificationsPATCH } from '@/app/api/notifications/route';
 import { GET as respectLeaderboardGET } from '@/app/api/respect/leaderboard/route';
+import { GET as musicPlaylistsGET } from '@/app/api/music/playlists/route';
+import { GET as musicCuratorsGET } from '@/app/api/music/curators/route';
+import { GET as musicDigestGET } from '@/app/api/music/digest/route';
+import { GET as musicLyricsGET } from '@/app/api/music/lyrics/route';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function makeRequest(url: string, options?: RequestInit) {
@@ -64,6 +68,10 @@ const unauthRoutes: [string, string, RouteHandler, RequestInit?][] = [
   ['GET  /api/notifications', '/api/notifications', notificationsGET],
   ['PATCH /api/notifications', '/api/notifications', notificationsPATCH, { method: 'PATCH', body: JSON.stringify({ all: true }) }],
   ['GET  /api/respect/leaderboard', '/api/respect/leaderboard', respectLeaderboardGET],
+  ['GET  /api/music/playlists', '/api/music/playlists', musicPlaylistsGET],
+  ['GET  /api/music/curators', '/api/music/curators', musicCuratorsGET],
+  ['GET  /api/music/digest', '/api/music/digest', musicDigestGET],
+  ['GET  /api/music/lyrics', '/api/music/lyrics?songId=1', musicLyricsGET],
 ];
 
 describe('Auth guards — unauthenticated requests return 401', () => {

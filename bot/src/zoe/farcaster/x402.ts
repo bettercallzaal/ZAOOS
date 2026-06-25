@@ -3,11 +3,12 @@
  *
  * The Neynar hub (`hub-api.neynar.com/v1/submitMessage`) is paid per call via x402: an
  * `X-PAYMENT` header carrying a base64-encoded EIP-3009 `transferWithAuthorization` signature
- * for 0.001 USDC on Base. The funds stay in the paying wallet until pulled.
+ * for 0.01 USDC on Base. The funds stay in the paying wallet until pulled.
  *
- * Verified against Neynar's autonomous-agent guide (doc 762):
+ * Verified against Neynar's autonomous-agent guide (doc 762); price re-verified
+ * live 2026-06-24 (Neynar raised it from 0.001 -> 0.01; the old value is now rejected):
  *   - payTo:  0xA6a8736f18f383f1cc2d938576933E5eA7Df01A1 (Neynar)
- *   - value:  '1000' (0.001 USDC, 6 decimals)
+ *   - value:  '10000' (0.01 USDC, 6 decimals)
  *   - network: 'base', scheme: 'exact', x402Version: 1
  *
  * Env:
@@ -15,7 +16,7 @@
  *                             Defaults to CUSTODY_PRIVATE_KEY if unset (must hold USDC on Base).
  *   X402_PAY_TO               override recipient (default Neynar address above)
  *   X402_USDC_ADDRESS         override USDC token (default Base USDC)
- *   X402_VALUE                override micro-amount string (default '1000' = 0.001 USDC)
+ *   X402_VALUE                override micro-amount string (default '10000' = 0.01 USDC)
  */
 import { privateKeyToAccount } from 'viem/accounts';
 import { toHex } from 'viem';
@@ -49,7 +50,10 @@ export async function buildX402Header(): Promise<string> {
 
   const usdc = (process.env.X402_USDC_ADDRESS ?? BASE_USDC) as `0x${string}`;
   const payTo = (process.env.X402_PAY_TO ?? NEYNAR_PAY_TO) as `0x${string}`;
-  const value = process.env.X402_VALUE ?? '1000'; // 0.001 USDC (6 decimals)
+  // Neynar raised the per-write x402 price to 0.01 USDC; paying the old 0.001
+  // gets rejected ("Failed to verify payment") since the scheme is exact. Verified
+  // live 2026-06-24 while bringing ZOL (@zolbot) online. Override via X402_VALUE.
+  const value = process.env.X402_VALUE ?? '10000'; // 0.01 USDC (6 decimals)
 
   const validAfter = '0';
   const validBefore = String(Math.floor(Date.now() / 1000) + 300); // 5 min window

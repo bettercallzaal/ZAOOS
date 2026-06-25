@@ -1,0 +1,10 @@
+[Unit]
+Description=ZAO ecosystem monitor - repo + fleet digest to ZOE Telegram
+Documentation=https://github.com/bettercallzaal/ZAOOS/tree/main/scripts/ecosystem-monitor
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/zao-os
+# token + chat id come from the existing bot env, never committed
+EnvironmentFile=%h/zao-os/bot/.env
+ExecStart=/bin/bash scripts/ecosystem-monitor/report-to-telegram.sh

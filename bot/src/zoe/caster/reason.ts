@@ -16,6 +16,8 @@
  *   OPENROUTER_REFERER     optional HTTP-Referer header (OpenRouter attribution)
  */
 
+import { recall, type RecallRequest, type RecallResult } from '../recall';
+
 const DEFAULT_BASE = 'https://openrouter.ai/api/v1';
 const DEFAULT_MODEL = 'anthropic/claude-sonnet-4.6';
 
@@ -28,6 +30,14 @@ export interface DraftCastOpts {
   model?: string;
   /** Hard cap on cast length; Farcaster casts max 320 bytes. */
   maxChars?: number;
+  /**
+   * Pull relevant knowledge from the ZABAL Bonfire graph and inject it into the
+   * draft so ZOL casts from ZAO's memory, not just the base model. Default true.
+   * Best-effort: degrades to a no-op when the bonfire is unconfigured/empty.
+   */
+  useGraphMemory?: boolean;
+  /** Injectable recall fn for tests; defaults to the real Bonfire recall(). */
+  recallFn?: (req: RecallRequest) => Promise<RecallResult>;
 }
 
 export interface DraftResult {
@@ -35,6 +45,9 @@ export interface DraftResult {
   model: string;
   promptTokens: number | null;
   completionTokens: number | null;
+  /** Whether ZABAL graph context was injected into this draft, and how many episodes. */
+  usedGraph: boolean;
+  graphHits: number;
 }
 
 export async function draftCast(opts: DraftCastOpts): Promise<DraftResult> {
@@ -44,8 +57,25 @@ export async function draftCast(opts: DraftCastOpts): Promise<DraftResult> {
   const model = opts.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL;
   const maxChars = opts.maxChars ?? 320;
 
+  // Pull relevant knowledge from the ZABAL Bonfire graph so ZOL casts from ZAO's
+  // memory, not just the base model. Best-effort: recall() never throws and
+  // degrades to a no-op when the bonfire is unconfigured or returns no hits.
+  let graphBlock = '';
+  let graphHits = 0;
+  if (opts.useGraphMemory !== false) {
+    const doRecall = opts.recallFn ?? recall;
+    const r = await doRecall({ query: opts.context, reason: 'zol cast draft', expected_kind: 'mixed' });
+    if (r.kind === 'sdk_response' && r.text && r.text.trim()) {
+      graphHits = r.hits ?? 0;
+      graphBlock = r.text.trim();
+    }
+  }
+
   const system = [
     opts.persona.trim(),
+    graphBlock
+      ? `\nKnowledge from the ZABAL Bonfire graph (treat as ground truth; do not contradict it; weave in only what is relevant):\n${graphBlock}`
+      : '',
     '',
     `You are drafting a single Farcaster cast. Hard limit: ${maxChars} characters. ` +
       `Output ONLY the cast text - no preamble, no quotes, no markdown headers, no hashtags ` +
@@ -91,5 +121,7 @@ export async function draftCast(opts: DraftCastOpts): Promise<DraftResult> {
     model,
     promptTokens: body.usage?.prompt_tokens ?? null,
     completionTokens: body.usage?.completion_tokens ?? null,
+    usedGraph: graphBlock.length > 0,
+    graphHits,
   };
 }

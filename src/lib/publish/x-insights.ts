@@ -10,6 +10,7 @@
  */
 
 import { getXClient } from '@/lib/publish/x';
+import { logger } from '@/lib/logger';
 
 export interface XMetrics {
   views: number;
@@ -41,7 +42,7 @@ export async function fetchXInsights(tweetId: string): Promise<XMetrics> {
     const pm = tweet.data.public_metrics;
 
     if (!pm) {
-      console.warn(`[x-insights] No public_metrics for tweet ${tweetId}`);
+      logger.warn(`[x-insights] No public_metrics for tweet ${tweetId}`);
       return zeroed();
     }
 

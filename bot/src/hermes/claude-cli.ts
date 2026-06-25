@@ -35,6 +35,32 @@ const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 min
  *
  * Returns the assistant's final text result + usage stats (parsed from --output-format json).
  */
+export type ClaudeErrorKind = 'auth' | 'usage_limit' | 'rate_limit' | 'timeout' | 'unknown';
+
+/**
+ * Classify a claude CLI failure from its combined stderr+stdout so callers can
+ * surface an actionable message (e.g. "auth expired -> /login") instead of a
+ * generic blob. The auth case is the one that silently broke the whole fleet
+ * (2026-06-23): the Max-plan OAuth token expired and every failure looked the
+ * same. Pure + exported for unit testing.
+ */
+export function classifyClaudeError(text: string): { kind: ClaudeErrorKind; hint: string } {
+  const t = (text || '').toLowerCase();
+  if (/\b401\b|invalid authentication|unauthorized|not logged in|please run.*\/login|oauth token (expired|revoked)|authentication_error/.test(t)) {
+    return { kind: 'auth', hint: 'claude login/OAuth expired - run `claude` then /login on the host' };
+  }
+  if (/usage limit|quota exceeded|out of credit|insufficient.*credit|plan limit reached/.test(t)) {
+    return { kind: 'usage_limit', hint: 'plan usage/quota reached - check the Claude plan' };
+  }
+  if (/\b429\b|\b529\b|rate.?limit|too many requests|overloaded/.test(t)) {
+    return { kind: 'rate_limit', hint: 'rate-limited/overloaded - retry shortly' };
+  }
+  if (/timed out|timeout|etimedout/.test(t)) {
+    return { kind: 'timeout', hint: 'model call timed out' };
+  }
+  return { kind: 'unknown', hint: 'unclassified claude CLI failure - check logs' };
+}
+
 export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
   return new Promise((resolve, reject) => {
     const outputFormat = opts.outputFormat ?? 'json';
@@ -126,9 +152,10 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
           '\n  stdout=', stdout.slice(0, 800) || '(empty)',
           '\n  args=', JSON.stringify(args).slice(0, 400),
         );
+        const cls = classifyClaudeError(`${stderr} ${stdout}`);
         reject(
           new Error(
-            `claude CLI exited ${code}. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`,
+            `claude CLI exited ${code} [${cls.kind}: ${cls.hint}]. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`,
           ),
         );
         return;
@@ -137,7 +164,8 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
       // Empty stdout means Claude exited silently - log everything we have.
       if (!stdout.trim()) {
         console.error('[hermes/claude-cli] empty stdout. exit_code=', code, 'stderr=', stderr.slice(0, 800), 'args=', JSON.stringify(args).slice(0, 800));
-        reject(new Error(`claude CLI returned empty stdout. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`));
+        const clsEmpty = classifyClaudeError(stderr);
+        reject(new Error(`claude CLI returned empty stdout [${clsEmpty.kind}: ${clsEmpty.hint}]. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`));
         return;
       }
 
@@ -157,7 +185,8 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
           };
           if (parsed.is_error) {
             console.error('[hermes/claude-cli] is_error=true full payload:', JSON.stringify(parsed).slice(0, 1200));
-            reject(new Error(`claude CLI reported is_error=true: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`));
+            const clsErr = classifyClaudeError(parsed.result ?? '');
+            reject(new Error(`claude CLI reported is_error=true [${clsErr.kind}: ${clsErr.hint}]: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`));
             return;
           }
           if (!parsed.result || !parsed.result.trim()) {

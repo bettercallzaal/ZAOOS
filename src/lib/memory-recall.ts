@@ -1,4 +1,5 @@
 import { getHindsightClient } from './hindsight';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // Types
@@ -161,7 +162,7 @@ export async function recallMemoriesByType(
     return results;
   } catch (error) {
     // Fallback to regular recall if metadataFilter not supported
-    console.warn(`Metadata filter not supported, falling back to regular recall:`, error);
+    logger.warn(`Metadata filter not supported, falling back to regular recall:`, error);
     return recallMemories(userFid, `${eventType} ${query}`, limit);
   }
 }

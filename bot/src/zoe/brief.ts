@@ -17,6 +17,7 @@
  */
 import { callClaudeCli } from '../hermes/claude-cli';
 import { listOpenTasks } from './tasks';
+import { getOpenTeamTasks, summarizeTeamForBrief } from './team-tracker';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -36,6 +37,9 @@ LAST 24H COMMITS
 OPEN PRS
 - List of open PRs by number + title.
 
+TEAM
+- One line: the team board summary (open count, overdue, top items). Skip this section entirely if team is unavailable.
+
 INBOX
 - {N} unread in zoe-zao@agentmail.to. First 3 subjects: ... (skip line entirely if inbox=null)
 - Reminder: run /inbox in any Claude session to research the queue.
@@ -51,6 +55,7 @@ interface BriefContext {
   cross_repo_24h: string[];
   open_prs: Array<{ number: number; title: string }>;
   inbox: { unreadCount: number; recentSubjects: string[] } | null;
+  team: string | null;
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -160,6 +165,14 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
 
   const inbox = await fetchInboxSnapshot();
 
+  // Team board state (cowork tracker). Best-effort; null if unconfigured/unreachable.
+  let team: string | null = null;
+  try {
+    team = summarizeTeamForBrief(await getOpenTeamTasks());
+  } catch {
+    team = null;
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -167,6 +180,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     cross_repo_24h: crossRepo24h,
     open_prs: prs,
     inbox,
+    team,
   };
 }
 
@@ -187,6 +201,7 @@ CONTEXT:
 - Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}
+- Team board: ${ctx.team ?? '(tracker unavailable - skip the TEAM section)'}
 - ${inboxLine}
 
 Output the brief now in the exact format from your system prompt.`;

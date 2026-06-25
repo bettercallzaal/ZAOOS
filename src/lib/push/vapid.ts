@@ -1,4 +1,5 @@
 import webpush from 'web-push';
+import { logger } from '@/lib/logger';
 
 // VAPID keys for Web Push — set these in .env
 // Generate with: npx web-push generate-vapid-keys
@@ -30,7 +31,7 @@ export async function sendPushNotification(
   payload: PushPayload
 ): Promise<boolean> {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('[push] VAPID keys not configured — skipping push notification');
+    logger.warn('[push] VAPID keys not configured — skipping push notification');
     return false;
   }
 
@@ -41,7 +42,7 @@ export async function sendPushNotification(
     const statusCode = (error as { statusCode?: number }).statusCode;
     // 404 or 410 means the subscription is no longer valid
     if (statusCode === 404 || statusCode === 410) {
-      console.log('[push] Subscription expired or invalid, should be removed');
+      logger.info('[push] Subscription expired or invalid, should be removed');
       return false;
     }
     console.error('[push] Failed to send notification:', error);

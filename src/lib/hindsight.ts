@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 // Hindsight client — lazy import to avoid build failure when package isn't installed
 // Install with: npm install @vectorize-io/hindsight-client
 
@@ -20,7 +21,7 @@ export async function getHindsightClient() {
     _client = new HindsightClient({ baseUrl: HINDSIGHT_BASE_URL }) as HindsightClientInterface;
     return _client;
   } catch {
-    console.warn('[hindsight] @vectorize-io/hindsight-client not installed — skipping');
+    logger.warn('[hindsight] @vectorize-io/hindsight-client not installed — skipping');
     return null;
   }
 }

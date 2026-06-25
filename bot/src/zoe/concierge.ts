@@ -121,6 +121,11 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'mcp__playwright__browser_press_key',
       'mcp__playwright__browser_wait_for',
       'mcp__playwright__browser_close',
+      // ZAOscout MCP (doc 899): keyless social reading - Reddit/X/Farcaster/GitHub
+      // by URL, full body, no API keys. Lets ZOE monitor the wider ecosystem, not
+      // just repos. Server: ~/ZAOscout/mcp/server.js (registered via `claude mcp add scout`).
+      'mcp__scout__scout_fetch',
+      'mcp__scout__scout_digest',
       // Doc 759 Gap 2 (locked Q1=GATEWAY, Q5=8 workers): subagent dispatch via
       // Task tool. Workers live in bot/src/zoe/.claude/agents/*.md and ZOE
       // routes per the persona ROUTING block. Both 'Task' and 'Agent' added

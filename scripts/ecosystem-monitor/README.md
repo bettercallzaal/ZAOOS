@@ -67,4 +67,12 @@ secret is committed.
 1. (done, this PR) Standalone read-only tool.
 2. (staged, this PR - awaiting approval) Scheduled digest -> ZOE Telegram.
 3. Deeper signals: open-PR titles, stale-PR age, failing CI.
-4. Dump each digest to the ZABAL Bonfire graph as the shared-memory ecosystem feed.
+4. (done, this PR) Dump each digest to the ZABAL Bonfire graph as the shared-memory ecosystem feed - `to-bonfire.sh`. Verified 2026-06-25: write via `/knowledge_graph/episode/create`, recall via `/delve` (both work with a non-admin key; the old "needs admin labeling" belief was wrong).
+
+## Bonfire shared-memory feed
+
+```bash
+bash scripts/ecosystem-monitor/to-bonfire.sh   # writes the digest as a graph episode
+```
+
+Needs `BONFIRE_API_KEY` + `BONFIRE_ID` in env (Pi: `~/.zao/private/bonfire.env`; fleet: `bot/.env`). Any agent can then recall ecosystem state via `POST /delve`.

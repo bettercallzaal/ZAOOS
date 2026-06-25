@@ -65,8 +65,10 @@ A message can get multiple folder labels (e.g. an X post about an event gets bot
 `AGENTMAIL_API_KEY` lives in `~/.zao/zao.env` (durable - survives repo re-clones, unlike the old `.env.local` which was wiped by the 2026-06-04 bare-clone repair). Source it from there, with `.env.local` as a legacy fallback:
 
 ```bash
-export $(grep -h '^AGENTMAIL_API_KEY=' ~/.zao/zao.env .env.local 2>/dev/null | head -1 | tr -d ' ')
+set -a; source ~/.zao/zao.env 2>/dev/null; source .env.local 2>/dev/null; set +a
 ```
+
+> Do NOT use `export $(grep ... | tr -d ' ')` - word-splitting + `tr -d ' '` truncates the ~70-char AgentMail key and every call returns `HTTP 403 {"message":"Forbidden"}`. The `set -a; source; set +a` form loads the full value intact. Confirmed 2026-05-31, re-verified 2026-06-24.
 
 If the key is missing, STOP and tell Zaal to add `AGENTMAIL_API_KEY=...` to `~/.zao/zao.env` (from the agentmail.to dashboard, inbox `zoe-zao@agentmail.to`). Do not proceed unauthenticated - an unauthenticated call returns an empty list that looks like an empty inbox (false negative).
 

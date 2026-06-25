@@ -51,6 +51,7 @@ import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
+import { transcriptionConfigured, transcribeTelegramFile } from './transcribe';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -582,6 +583,38 @@ bot.on('message:text', async (ctx) => {
   enqueueTurn(chatId, () => handleGroupMessage(ctx, text, String(chatId))).catch((e) =>
     console.error('[zoe/index] group turn failed:', (e as Error)?.message),
   );
+});
+
+// Voice / audio intake (Zaal DM only): transcribe via Groq Whisper, then run it
+// through the exact same turn path as a typed message. Lets Zaal voice-answer.
+bot.on(['message:voice', 'message:audio'], async (ctx) => {
+  if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
+  const chatId = ctx.chat.id;
+  const fileId = ctx.message.voice?.file_id ?? ctx.message.audio?.file_id;
+  if (!fileId) return;
+  if (!transcriptionConfigured()) {
+    await ctx
+      .reply('Voice received, but transcription is off. Add GROQ_API_KEY to bot/.env (free at console.groq.com) and restart me.')
+      .catch(() => {});
+    return;
+  }
+  let transcript: string;
+  try {
+    transcript = await transcribeTelegramFile(token, fileId);
+  } catch (err) {
+    await ctx.reply(`Could not transcribe that - ${(err as Error).message.slice(0, 160)}`).catch(() => {});
+    return;
+  }
+  if (!transcript) {
+    await ctx.reply('(that voice note came through empty)').catch(() => {});
+    return;
+  }
+  await ctx.reply(`Heard: "${transcript.slice(0, 300)}"`).catch(() => {});
+  enqueueTurn(chatId, () => handlePrivateMessage(ctx, transcript), {
+    onDeferred: () => {
+      ctx.reply("Got that - finishing what I'm on, then I'll pick it up.").catch(() => {});
+    },
+  }).catch((e) => console.error('[zoe/index] voice turn failed:', (e as Error)?.message));
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {

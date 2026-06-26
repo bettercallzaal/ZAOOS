@@ -52,6 +52,7 @@ import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
+import { captureResume, looksLikeResume } from './resume';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -314,6 +315,13 @@ bot.command('quests', async (ctx) => {
 // Appends to ~/.zao/zoe/voice-memos/YYYY-MM-DD.md for the personal-post drafter.
 bot.command(['voicememo', 'vm'], async (ctx) => {
   await handleVoiceMemo(ctx, isFromZaal(ctx));
+});
+
+// /resume <thing> (or /cv) - capture a resume/bio credential -> resume.md + Bonfire.
+// Voice notes that start with "add to my resume ..." route here too (see voice handler).
+bot.command(['resume', 'cv'], async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  await ctx.reply(await captureResume(ctx.message?.text ?? ''));
 });
 
 // doc 796 Decision 2 - /drafts pull. Surfaces the next silently-queued post
@@ -610,6 +618,13 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
     return;
   }
   await ctx.reply(`Heard: "${transcript.slice(0, 300)}"`).catch(() => {});
+  // Voice resume capture: "add to my resume that I am a National Ski Patroller..."
+  if (looksLikeResume(transcript)) {
+    captureResume(transcript)
+      .then((r) => ctx.reply(r))
+      .catch((e) => console.error('[zoe/index] voice resume failed:', (e as Error)?.message));
+    return;
+  }
   enqueueTurn(chatId, () => handlePrivateMessage(ctx, transcript), {
     onDeferred: () => {
       ctx.reply("Got that - finishing what I'm on, then I'll pick it up.").catch(() => {});

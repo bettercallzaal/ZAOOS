@@ -1116,18 +1116,30 @@ async function handlePlanCommand(
     const result = await decomposeGoal({ goal, context: zoeContext() });
     const { plan } = result;
     const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    // Auto-dispatch a single research-worker task (no y/n) - a plain "research
+    // this URL" shouldn't need a confirm; it's read-only + lands a doc PR.
+    const singleResearch =
+      dispatchable && plan.subtasks.length === 1 && plan.subtasks[0].worker === 'research-worker';
     let priorNote = '';
     if (dispatchable) {
       if (prior && (prior.kind === 'plan-gate' || prior.kind === 'reflexion' || prior.kind === 'learn')) {
         priorNote = `\n\n(Heads up: this replaced a pending ${prior.kind} you hadn't resolved.)`;
       }
-      await setPending({
+      const pendingPlan: PendingApproval = {
         kind: 'plan',
         chatScope: 'private',
         createdAt: new Date().toISOString(),
         goal,
         plan,
-      });
+      };
+      await setPending(pendingPlan);
+      if (singleResearch) {
+        await ctx
+          .reply('On it - researching this and saving the result to main (no confirm needed for a single research task).')
+          .catch(() => {});
+        await resolvePendingApproval(ctx, pendingPlan, { decision: 'approve-all', ids: [] });
+        return;
+      }
     }
     const autoNote =
       opts.autoDetected && dispatchable

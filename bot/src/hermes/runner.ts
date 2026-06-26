@@ -185,7 +185,11 @@ export async function dispatchHermesRun(
       totalIn += critique.inputTokens;
       totalOut += critique.outputTokens;
 
-      await narrator?.onCriticDone?.(created.id, critique.score, critique.feedback);
+      try {
+        await narrator?.onCriticDone?.(created.id, critique.score, critique.feedback);
+      } catch (e) {
+        console.error("[hermes] narrator.onCriticDone failed (continuing):", (e as Error)?.message);
+      }
 
       if (critique.score >= HERMES_PASS_THRESHOLD) {
         await commitAndPush(workdir, branchName, fixerOut.commitMessage);
@@ -195,15 +199,19 @@ export async function dispatchHermesRun(
           title: fixerOut.prTitle,
           body: `${fixerOut.prBody}\n\n**Critic score:** ${critique.score}/100\n**Critic feedback:** ${critique.feedback}`,
         });
-        await narrator?.onPrOpened?.(created.id, pr.number, pr.url, critique.score);
+        try {
+          await narrator?.onPrOpened?.(created.id, pr.number, pr.url, critique.score);
+        } catch (e) {
+          console.error("[hermes] narrator.onPrOpened failed (continuing):", (e as Error)?.message);
+        }
         // Fire-and-forget PR watcher: alerts Telegram if the PR turns DIRTY
         // or any CI check fails in the next 5 minutes. Doesn't block the run.
-        void watchPullRequest({
+        watchPullRequest({
           prNumber: pr.number,
           runId: created.id,
           branchName,
           narrator,
-        });
+        }).catch((e) => console.error("[hermes] PR watcher failed:", (e as Error)?.message));
         await updateRun(created.id, {
           status: 'ready',
           branch: branchName,

@@ -51,7 +51,7 @@ import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
-import { transcriptionConfigured, transcribeTelegramFile } from './transcribe';
+import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -615,6 +615,42 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
       ctx.reply("Got that - finishing what I'm on, then I'll pick it up.").catch(() => {});
     },
   }).catch((e) => console.error('[zoe/index] voice turn failed:', (e as Error)?.message));
+});
+
+// Image / document intake (Zaal DM only): download the file, then point ZOE at it.
+// ZOE's Read tool already views images + PDFs (vision), so no brain-input change -
+// the turn just references the saved path and ZOE Reads it.
+bot.on(['message:photo', 'message:document'], async (ctx) => {
+  if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
+  const chatId = ctx.chat.id;
+  const caption = ctx.message.caption ?? '';
+  let fileId: string | undefined;
+  let label = 'file';
+  let preferName: string | undefined;
+  if (ctx.message.photo?.length) {
+    fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id; // largest size
+    label = 'image';
+  } else if (ctx.message.document) {
+    fileId = ctx.message.document.file_id;
+    preferName = ctx.message.document.file_name;
+    label = preferName || 'document';
+  }
+  if (!fileId) return;
+  let savedPath: string;
+  try {
+    savedPath = await downloadTelegramFile(token, fileId, join(ZOE_PATHS.home, 'inbox'), preferName);
+  } catch (err) {
+    await ctx.reply(`Could not fetch that ${label} - ${(err as Error).message.slice(0, 150)}`).catch(() => {});
+    return;
+  }
+  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`} - looking at it...`).catch(() => {});
+  const note = caption ? `${caption}\n\n` : '';
+  const turnText = `${note}[Zaal sent ${label === 'image' ? 'an image' : `a file named ${label}`}, saved at ${savedPath}. Use the Read tool to view it, then respond to ${caption ? 'the message above' : 'what it contains'}.]`;
+  enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnText), {
+    onDeferred: () => {
+      ctx.reply("Got that - finishing what I'm on, then I'll pick it up.").catch(() => {});
+    },
+  }).catch((e) => console.error('[zoe/index] media turn failed:', (e as Error)?.message));
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {

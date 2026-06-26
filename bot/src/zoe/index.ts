@@ -73,6 +73,7 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { dispatchPlan } from './dispatch';
+import { commitResearchDoc } from './research-doc';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -1328,6 +1329,14 @@ async function runApprovedPlan(
         onSubtaskDone: async (st, res) => {
           const mark = res.status === 'completed' ? '✓' : res.status === 'failed' ? '✗' : '↻';
           await ctx.reply(`${mark} ${st.id} ${res.status}`.slice(0, 120)).catch(() => {});
+          // Durability: a completed research-worker subtask becomes a numbered doc
+          // + PR to main (trusted Node commit; the worker stays sandboxed).
+          if (st.worker === 'research-worker' && res.status === 'completed' && res.output) {
+            const doc = await commitResearchDoc({ question: goal, findings: res.output });
+            await ctx
+              .reply(doc.ok ? `Saved to main: doc ${doc.num} -> ${doc.prUrl}` : `(could not auto-save the research doc: ${doc.error})`)
+              .catch(() => {});
+          }
         },
       },
     });

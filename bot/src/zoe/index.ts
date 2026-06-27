@@ -1058,6 +1058,18 @@ async function dispatchConcierge(
       replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
     });
 
+    // Inline research -> durable doc on main (closes the gap where research
+    // answered inline, not via the worker dispatch, never landed a doc). A
+    // private DM that is a research request (a URL + "research") commits the
+    // answer as a numbered doc + PR, same as the dispatch path. Fire-and-forget.
+    if (scope === 'private' && /https?:\/\/\S+/i.test(text) && /res[ae]arch/i.test(text)) {
+      commitResearchDoc({ question: text, findings: result.reply })
+        .then((d) => {
+          if (d.ok) ctx.reply(`Saved to main: doc ${d.num} -> ${d.prUrl}`).catch(() => {});
+        })
+        .catch((e) => console.error('[zoe/index] inline research-doc failed:', (e as Error)?.message));
+    }
+
     console.log(
       `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
         4,

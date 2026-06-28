@@ -137,6 +137,31 @@ function chunkMessage(text: string, max = TELEGRAM_MAX): string[] {
  * any reply over 4096 chars throws "Bad Request: message is too long" and the
  * user gets nothing.
  */
+
+
+// --- Auth error tracking (doc TBD) ---
+// Track last auth alert time so we don't spam Zaal with repeated alerts.
+// Fires at most once every 30 min.
+let lastAuthAlertTime = 0;
+const AUTH_ALERT_DEBOUNCE_MS = 30 * 60 * 1000; // 30 min
+
+async function alertAuthFailure(bot: Api, zaalId: number, message: string): Promise<void> {
+  const now = Date.now();
+  if (now - lastAuthAlertTime < AUTH_ALERT_DEBOUNCE_MS) {
+    console.log('[zoe/index] auth alert debounced (recently sent)');
+    return;
+  }
+  lastAuthAlertTime = now;
+  const fullMessage = `ZOE Research Engine - Auth Failure
+
+${message}
+
+Action: ssh VPS then run 'claude' and /login.`;
+  await bot.api.sendMessage(zaalId, fullMessage).catch((err) => {
+    console.error('[zoe/index] failed to send auth alert:', err);
+  });
+}
+
 async function replyChunked(
   ctx: Context,
   text: string,
@@ -1376,6 +1401,13 @@ async function runApprovedPlan(
         completed: report.completedIds,
         gateAfterId: report.gateAfterId,
       });
+    }
+
+    // Alert if any worker hit auth errors during dispatch
+    if (report.authErrorsDetected && ctx.chat) {
+      const failedAuth = report.results.filter((r) => r.authError);
+      const detail = failedAuth.map((r) => `${r.worker} (${r.subtaskId})`).join(', ');
+      await alertAuthFailure(bot, zaalId, `Research/task workers failed with auth errors: ${detail}. Recent research may not have completed.`);
     }
 
     await replyChunked(ctx, report.summary);

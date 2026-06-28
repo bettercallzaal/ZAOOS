@@ -19,7 +19,7 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCli, CliAuthError, CliError } from '../hermes/claude-cli';
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
 import type { Subtask, WorkerKind } from './decompose';
@@ -218,6 +218,8 @@ export interface WorkerResult {
   costUsd: number;
   durationMs: number;
   error?: string;
+  /** True if the failure was due to claude CLI auth error (needs alert). */
+  authError?: boolean;
 }
 
 export interface RunWorkerArgs {
@@ -397,6 +399,10 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       durationMs: dur,
     };
   } catch (err) {
+    const isAuthError = err instanceof CliAuthError;
+    if (isAuthError) {
+      console.error(`[zoe/workers] auth error in ${worker}:`, (err as Error).message);
+    }
     return {
       ...base,
       status: 'failed',
@@ -404,6 +410,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       critique: null,
       revised: false,
       error: (err as Error).message,
+      authError: isAuthError,
     };
   }
 }

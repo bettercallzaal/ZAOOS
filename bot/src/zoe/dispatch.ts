@@ -97,6 +97,8 @@ export interface DispatchReport {
   gateAfterId?: string;
   totalCostUsd: number;
   summary: string;
+  /** True if any worker hit a CLI auth error (needs immediate alert to Zaal). */
+  authErrorsDetected?: boolean;
 }
 
 function toRunRecord(goal: string, r: WorkerResult): RunRecord {
@@ -258,12 +260,14 @@ export async function dispatchPlan(args: DispatchPlanArgs): Promise<DispatchRepo
   }
 
   const finish = (status: DispatchReport['status'], gateAfterId?: string): DispatchReport => {
+    const authErrorsDetected = results.some((r) => r.authError);
     const partial = {
       status,
       results,
       completedIds: [...completed],
       gateAfterId,
       totalCostUsd: totalCost,
+      authErrorsDetected,
     };
     return { ...partial, summary: summarize(partial) };
   };

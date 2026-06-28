@@ -179,6 +179,42 @@ async function replyChunked(
   }
 }
 
+/**
+ * Detect when a message wants link analysis/research.
+ * Returns true if: URL present AND research intent keywords.
+ *
+ * Intent keywords: research, analyze, analysis, look into, dig into,
+ * thoughts, what do you think, take on, break down, summarize, what's our,
+ * whats our, vet, due diligence.
+ *
+ * When true, the message should route to research-worker dispatch (not recall).
+ */
+function wantsLinkResearch(text: string): boolean {
+  const hasUrl = /https?:\/\/\S+/i.test(text);
+  if (!hasUrl) return false;
+
+  const intentKeywords = [
+    'research',
+    'analyze',
+    'analysis',
+    'look into',
+    'dig into',
+    'thoughts',
+    'what do you think',
+    'what do you reckon',
+    'take on',
+    'break down',
+    'summarize',
+    "what's our",
+    'whats our',
+    'vet',
+    'due diligence',
+  ];
+
+  const lowerText = text.toLowerCase();
+  return intentKeywords.some((keyword) => lowerText.includes(keyword));
+}
+
 async function appendClaudeNote(body: string): Promise<number> {
   await fs.mkdir(ZOE_PATHS.home, { recursive: true });
   const ts = new Date().toISOString();
@@ -936,8 +972,10 @@ async function dispatchConcierge(
     // recall()/delve and inject it into the turn. DMs only + substantive
     // messages (skip "y"/"ok"/short acks). Best-effort: no-op if Bonfire
     // unconfigured or delve returns nothing; never blocks the turn.
+    // EXCEPTION: skip recall if the message has a URL + research intent. Links
+    // should be fetched + analyzed by research-worker, not answered from recall.
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12) {
+    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
       try {
         const r = await recall({
           query: text,
@@ -955,6 +993,7 @@ async function dispatchConcierge(
       blocks,
       senderLabel: label,
       recallContext,
+      linkResearchIntent: wantsLinkResearch(text),
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,

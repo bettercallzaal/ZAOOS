@@ -1,0 +1,18 @@
+[Unit]
+Description=Farscout scraper - migrated from 187.77.3.104
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/migrated-cowork/farscout
+ExecStart=/usr/bin/node %h/migrated-cowork/farscout/index.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=%h/migrated-cowork/farscout/.env
+Environment=PATH=/home/zaal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

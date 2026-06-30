@@ -8,7 +8,7 @@ original-query: "https://x.com/deronin_/status/2045420155434320270 + https://x.c
 tier: STANDARD
 ---
 
-# 920 — Claude Code token-optimization toolkit (for the ZAO agent fleet)
+# 923 — Claude Code token-optimization toolkit (for the ZAO agent fleet)
 
 > **Goal:** Catalogue the token-cutting tools from two viral threads (DeRonin, DataChaz) and pick what the ZAO fleet (ZOE + researchers + web-improver, all claude-CLI) should actually adopt to cut Claude spend.
 

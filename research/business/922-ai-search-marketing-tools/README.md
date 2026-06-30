@@ -3,12 +3,12 @@ topic: business
 type: market-research
 status: research-complete
 last-validated: 2026-06-29
-related-docs: 917, 920
+related-docs: 917, 923
 original-query: "https://x.com/crowdreply_io/status/2071609826778718315 + https://x.com/askokara/status/2071602088052924767 /zao-research this (AI-search + Reddit marketing tools)"
 tier: STANDARD
 ---
 
-# 919 — AI-search visibility + AI-marketing tools (CrowdReply, Okara) for ZAO
+# 922 — AI-search visibility + AI-marketing tools (CrowdReply, Okara) for ZAO
 
 > **Goal:** Evaluate two new AI-marketing tools (CrowdReply GEO MCP + Okara "Claude for Reddit") and decide ZAO's play - DIY vs tool.
 

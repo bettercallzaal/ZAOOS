@@ -12,6 +12,8 @@ tier: DISPATCH
 
 > **Goal:** Replace the current single-threaded, time-based `/loop` with a server-side, event-driven, multi-track orchestrator that keeps the ZOE brain always running + mirrors Zaal's observed preference for ZOE to be the primary dispatcher (not a side agent). Design the loop itself as a stateful process, not a Mac session task.
 
+> **STATUS 2026-06-30 (correction):** This doc OVERSTATED the gap. On inspection the orchestrator was already built + wired: decompose -> dispatch -> workers (with a per-worker critic + revision), reflexion (nightly), learn (weekly cron), and the proactive reasoning-tick all run on the VPS. The only genuinely-missing pieces were the **watcher** (shipped, doc 918 + PR #1021) and the **autonomous work-loop** (shipped, PR #1022: `queue: <topic>` -> 2h cron -> doc PR). Treat code as ground truth over this doc.
+
 ## Headline Recommendation
 
 **Migrate from Mac `/loop` skill (reactive time-based) to VPS-resident ZOE orchestrator (event-driven multi-track).** The loop becomes a persistent `zoe-loop` systemd unit on 31.97.148.88, running continuously with sub-processes for research, fleet-health, PR-babysitting, and outreach. Watcher + Critic act as in-process supervisors (no separate agents). Human gates remain on PRs to main, outbound posts, and on-chain spend. Deploy in 3 phases over 6-8 weeks.

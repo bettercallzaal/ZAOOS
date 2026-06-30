@@ -25,6 +25,7 @@ import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from '.
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
+import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -280,6 +281,31 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       ),
     );
   }
+
+  // Watcher (doc 927) - daily dispatch-health supervisor. Reads the run
+  // telemetry dispatch.ts records and pings Zaal ONLY on a cost / failure /
+  // quality anomaly. Most days it logs 'clean' and stays silent.
+  tasks.push(
+    cron.schedule(
+      '30 8 * * *',
+      async () => {
+        if (!(await claimFire('watcher'))) return;
+        try {
+          const alerts = await runWatcherTick();
+          if (alerts.length) {
+            await opts.bot.api.sendMessage(opts.zaalTgId, renderWatcherAlerts(alerts));
+            console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');
+          } else {
+            console.log('[zoe/scheduler] watcher: clean');
+          }
+        } catch (err) {
+          await releaseFire('watcher');
+          console.error('[zoe/scheduler] watcher failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
 
   // Post slate v1 - random 7 pings/day of social-post drafts (build / ecosystem /
   // event / personal). Owns its own state at ~/.zao/zoe/posts/. See posts/README.md.

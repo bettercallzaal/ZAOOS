@@ -26,6 +26,7 @@ import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
+import { runWorkTick } from './work-loop';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -301,6 +302,28 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('watcher');
           console.error('[zoe/scheduler] watcher failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Work-loop (doc 927) - autonomous research track. Every 2h, pull one
+  // queued research topic and run it through decompose -> dispatch -> doc-PR.
+  // Empty queue = silent. Research-only, daily-capped, file-locked.
+  tasks.push(
+    cron.schedule(
+      '0 */2 * * *',
+      async () => {
+        try {
+          await runWorkTick({
+            sendToZaal: (t: string) => opts.bot.api.sendMessage(opts.zaalTgId, t),
+            zaalTgId: opts.zaalTgId,
+            repoDir: opts.repoDir,
+            currentDate: new Date().toISOString().slice(0, 10),
+          });
+        } catch (err) {
+          console.error('[zoe/scheduler] work-loop tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

@@ -87,7 +87,8 @@ import {
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
-import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
+import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
+import { enqueueWork, queueDepth } from './work-loop';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -830,6 +831,18 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       console.error('[zoe/index] note save failed:', msg);
       await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
     }
+    return;
+  }
+
+  // Work-loop enqueue: `queue: <topic>` adds a research topic ZOE works
+  // autonomously (research-only, capped) and lands as a doc PR.
+  const queueMatch = QUEUE_PREFIX.exec(text);
+  if (queueMatch) {
+    const item = await enqueueWork(queueMatch[1]);
+    const depth = await queueDepth();
+    await ctx
+      .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". ZOE will research it + open a doc PR.`)
+      .catch(() => {});
     return;
   }
 

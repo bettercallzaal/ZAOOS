@@ -38,6 +38,30 @@ const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 min
 export type ClaudeErrorKind = 'auth' | 'usage_limit' | 'rate_limit' | 'timeout' | 'unknown';
 
 /**
+ * Typed error for Claude CLI authentication failures. Callers can catch and
+ * surface an honest message like "research engine logged out - Zaal's been
+ * alerted" instead of passing off old recalled results as fresh research.
+ */
+export class CliAuthError extends Error {
+  constructor(message: string, public hint: string = 'claude login/OAuth expired - run `claude` then /login on the host') {
+    super(message);
+    this.name = 'CliAuthError';
+  }
+}
+
+/**
+ * Generic Claude CLI error (non-auth). Callers can handle differently from
+ * auth failures (which need immediate Zaal notification, while rate-limits
+ * might just need a retry).
+ */
+export class CliError extends Error {
+  constructor(message: string, public kind: ClaudeErrorKind = 'unknown', public hint: string = '') {
+    super(message);
+    this.name = 'CliError';
+  }
+}
+
+/**
  * Classify a claude CLI failure from its combined stderr+stdout so callers can
  * surface an actionable message (e.g. "auth expired -> /login") instead of a
  * generic blob. The auth case is the one that silently broke the whole fleet
@@ -123,14 +147,14 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     const timeout = setTimeout(() => {
       child.kill('SIGTERM');
       setTimeout(() => child.kill('SIGKILL'), 2000);
-      reject(new Error(`claude CLI timed out after ${opts.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms`));
+      reject(new CliError(`claude CLI timed out after ${opts.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms`, 'timeout', 'model call timed out'));
     }, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
 
     child.on('error', (err) => {
       clearTimeout(timeout);
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[hermes/claude-cli] spawn error:', msg);
-      reject(new Error(`Failed to spawn claude CLI: ${msg}. Is 'claude' in PATH? args=${JSON.stringify(args).slice(0, 200)}`));
+      reject(new CliError(`Failed to spawn claude CLI: ${msg}. Is 'claude' in PATH? args=${JSON.stringify(args).slice(0, 200)}`, 'unknown'));
     });
 
     child.stdout.on('data', (d) => {
@@ -146,18 +170,18 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
         // EMPTY stderr (the actual diagnostic — auth window expired, bad
         // flag, JSON error payload — lands on stdout). Logging stderr alone
         // made every such failure mute ("claude CLI exited 1. stderr: ").
+        const combined = `${stderr} ${stdout}`;
         console.error(
           '[hermes/claude-cli] non-zero exit. exit_code=', code,
           '\n  stderr=', stderr.slice(0, 800) || '(empty)',
           '\n  stdout=', stdout.slice(0, 800) || '(empty)',
           '\n  args=', JSON.stringify(args).slice(0, 400),
         );
-        const cls = classifyClaudeError(`${stderr} ${stdout}`);
-        reject(
-          new Error(
-            `claude CLI exited ${code} [${cls.kind}: ${cls.hint}]. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`,
-          ),
-        );
+        const cls = classifyClaudeError(combined);
+        const err = cls.kind === 'auth'
+          ? new CliAuthError(`claude CLI exited ${code}: ${combined.slice(0, 400)}`, cls.hint)
+          : new CliError(`claude CLI exited ${code} [${cls.kind}: ${cls.hint}]. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`, cls.kind, cls.hint);
+        reject(err);
         return;
       }
 
@@ -165,7 +189,10 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
       if (!stdout.trim()) {
         console.error('[hermes/claude-cli] empty stdout. exit_code=', code, 'stderr=', stderr.slice(0, 800), 'args=', JSON.stringify(args).slice(0, 800));
         const clsEmpty = classifyClaudeError(stderr);
-        reject(new Error(`claude CLI returned empty stdout [${clsEmpty.kind}: ${clsEmpty.hint}]. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`));
+        const err = clsEmpty.kind === 'auth'
+          ? new CliAuthError(`claude CLI returned empty stdout`, clsEmpty.hint)
+          : new CliError(`claude CLI returned empty stdout [${clsEmpty.kind}: ${clsEmpty.hint}]. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`, clsEmpty.kind, clsEmpty.hint);
+        reject(err);
         return;
       }
 
@@ -186,12 +213,15 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
           if (parsed.is_error) {
             console.error('[hermes/claude-cli] is_error=true full payload:', JSON.stringify(parsed).slice(0, 1200));
             const clsErr = classifyClaudeError(parsed.result ?? '');
-            reject(new Error(`claude CLI reported is_error=true [${clsErr.kind}: ${clsErr.hint}]: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`));
+            const err = clsErr.kind === 'auth'
+              ? new CliAuthError(`claude CLI reported is_error=true: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`, clsErr.hint)
+              : new CliError(`claude CLI reported is_error=true [${clsErr.kind}: ${clsErr.hint}]: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`, clsErr.kind, clsErr.hint);
+            reject(err);
             return;
           }
           if (!parsed.result || !parsed.result.trim()) {
             console.error('[hermes/claude-cli] empty result. full payload:', JSON.stringify(parsed).slice(0, 1200));
-            reject(new Error(`claude CLI returned empty result. duration=${parsed.duration_ms}ms turns=${parsed.num_turns}. session=${parsed.session_id}`));
+            reject(new CliError(`claude CLI returned empty result. duration=${parsed.duration_ms}ms turns=${parsed.num_turns}. session=${parsed.session_id}`, 'unknown'));
             return;
           }
           const usage = parsed.usage ?? { input_tokens: 0, output_tokens: 0 };
@@ -221,8 +251,9 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
         }
       } catch (err) {
         reject(
-          new Error(
+          new CliError(
             `Failed to parse claude CLI output. First 400 chars: ${stdout.slice(0, 400)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
+            'unknown',
           ),
         );
       }
@@ -251,3 +282,42 @@ export const HERMES_CRITIC_MODEL = process.env.HERMES_CRITIC_MODEL ?? 'sonnet';
 export const HERMES_FIXER_FAST_MODEL = process.env.HERMES_FIXER_FAST_MODEL ?? 'sonnet';
 export const HERMES_CRITIC_FAST_MODEL = process.env.HERMES_CRITIC_FAST_MODEL ?? 'haiku';
 export const HERMES_ROUTING_ENABLED = process.env.HERMES_ROUTING === 'on';
+/**
+ * Lightweight auth healthcheck: attempt a trivial CLI invocation to verify
+ * the Max-plan OAuth is valid. Returns true if OK, false if auth failed.
+ * Non-auth failures (timeout, rate limit, etc) also return false but with
+ * a different log flavor.
+ *
+ * Call on bot startup and periodically (e.g., hourly) to catch expiry early.
+ * Used by: bot/src/zoe/index.ts onBotStart hook.
+ */
+export async function checkClaudeAuth(cwd: string = '/home/zaal/zao-os'): Promise<{
+  ok: boolean;
+  kind?: ClaudeErrorKind;
+  hint?: string;
+}> {
+  try {
+    const result = await callClaudeCli({
+      model: 'haiku',
+      prompt: 'Respond with OK.',
+      cwd,
+      allowedTools: [],
+      disallowedTools: [],
+      timeoutMs: 10_000,
+      bare: true,
+      outputFormat: 'text',
+    });
+    return { ok: true };
+  } catch (err) {
+    if (err instanceof CliAuthError) {
+      console.warn('[hermes/claude-cli] auth healthcheck failed:', (err as Error).message);
+      return { ok: false, kind: 'auth', hint: err.hint };
+    }
+    if (err instanceof CliError) {
+      console.warn('[hermes/claude-cli] healthcheck non-auth failure:', (err as Error).message);
+      return { ok: false, kind: (err as CliError).kind, hint: (err as CliError).hint };
+    }
+    console.error('[hermes/claude-cli] healthcheck unexpected error:', err);
+    return { ok: false, kind: 'unknown' };
+  }
+}

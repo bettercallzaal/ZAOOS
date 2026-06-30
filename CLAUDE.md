@@ -17,7 +17,7 @@ The pattern: **Monorepo as Lab.**
 - Sharing model: clone, no deps. Each graduate stands alone.
 - Research stays in ZAOOS forever - it's the institutional memory across every product.
 
-**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, Hermes), music player components, ~820 active research docs. 302 API routes, 295 components, 18 hooks. (Counts verified 2026-06-11 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, ~820 active research docs. 302 API routes, 295 components, 18 hooks. (Counts verified 2026-06-11 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
 
 **Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
 
@@ -137,13 +137,12 @@ See [Doc 154](research/154-skills-commands-master-reference/) for complete refer
 
 ## Primary Surfaces (post-doc-601 cleanup, 2026-05-04)
 
-ZAO operating surfaces collapsed from 12+ systems to 5. When proposing automation or new bots, check this list first.
+ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into ZOE (its coder/critic/auto-PR brain is now ZOE's, not a separate bot). When proposing automation or new bots, check this list first.
 
 | Surface | What | Source of truth |
 |---------|------|-----------------|
-| **ZOE** (`@zaoclaw_bot`) | Single concierge — tasks, captures, brief/reflect, recall | `bot/src/zoe/` (Hermes-brain pattern) |
-| **Hermes** (`@zoe_hermes_bot`) | Autonomous fix-PR pipeline (coder + critic + auto-PR) | `bot/src/hermes/` |
-| **ZAO Devz** (`@zaodevz_bot`) | Group dispatch + hourly learning tip | `bot/src/devz/` (Phase 3 fold-in to Hermes pending) |
+| **ZOE** (`@zaoclaw_bot`) | The orchestrator. Concierge (tasks, captures, brief/reflect, recall) + the autonomous fix-PR pipeline (coder + critic + auto-PR) folded in from Hermes | `bot/src/zoe/` + reuses `bot/src/hermes/` coder/critic/pr modules |
+| **ZAO Devz** (`@zaodevz_bot`) | Group dispatch + hourly learning tip | `bot/src/devz/` (fold-in to ZOE as a group context pending) |
 | **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
 | **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
 
@@ -153,6 +152,8 @@ ZAO operating surfaces collapsed from 12+ systems to 5. When proposing automatio
 - Composio AO orchestrator
 - ZOE v2 / Agent Zero migration plan
 - 10-bot branded fleet (Magnetiq/Research/WaveWarZ/POIDH as own bots) — folds into ZOE memory blocks
+- zao-team-bots (Magnetiq + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
+- Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = persona block in `bot/src/zoe/` `human.md`, NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.

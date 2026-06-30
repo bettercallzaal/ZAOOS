@@ -1,0 +1,16 @@
+[Unit]
+Description=ZAO Devz dual-bot (Coder + Critic)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zaostock-bot
+ExecStart=%h/zaostock-bot/node_modules/.bin/tsx %h/zaostock-bot/src/devz/index.ts
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=%h/zaostock-bot/.env
+
+[Install]
+WantedBy=default.target

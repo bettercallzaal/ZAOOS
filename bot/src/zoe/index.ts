@@ -88,7 +88,7 @@ import {
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
-import { enqueueWork, queueDepth } from './work-loop';
+import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -841,8 +841,14 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     const item = await enqueueWork(queueMatch[1]);
     const depth = await queueDepth();
     await ctx
-      .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". ZOE will research it + open a doc PR.`)
+      .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". On it now.`)
       .catch(() => {});
+    void runWorkTick({
+      sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+      zaalTgId: zaalId,
+      repoDir,
+      currentDate: currentDateString(),
+    }).catch((e) => console.error('[zoe/index] work-loop kick failed:', (e as Error).message));
     return;
   }
 

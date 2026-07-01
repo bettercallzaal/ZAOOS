@@ -19,7 +19,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { decomposeGoal } from './decompose';
+import type { DecompositionPlan } from './decompose';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
 import type { ZoeContext } from './types';
@@ -129,20 +129,25 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       workspace_dir: deps.repoDir,
       current_date: deps.currentDate,
     };
-    const res = await decomposeGoal({ goal: item.input, context: ctx });
-    const plan = res.plan;
-    const isResearch =
-      plan.subtasks.length === 1 && plan.subtasks[0].worker === 'research-worker';
-
-    if (!isResearch) {
-      await deps
-        .sendToZaal(
-          `Work-loop skipped "${item.input.slice(0, 60)}" - not a single research task; dispatch it yourself when ready.`,
-        )
-        .catch(() => {});
-      await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
-      return;
-    }
+    // The work-queue is explicitly a RESEARCH queue, so force a single
+    // research-worker task rather than letting decompose reclassify a legit
+    // research topic as multi-step build and bounce it (doc 928 fix).
+    const plan: DecompositionPlan = {
+      goal_summary: item.input,
+      subtasks: [
+        {
+          id: 'st-1',
+          title: item.input.slice(0, 90),
+          worker: 'research-worker',
+          depends_on: [],
+          parallel_with: [],
+          approval_gate_before_next: false,
+          estimated_cost_class: 'medium',
+        },
+      ],
+      execution_plan: 'Single research-worker pass, committed as a numbered doc + PR.',
+      ambiguities: [],
+    };
 
     await deps
       .sendToZaal(`Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`)

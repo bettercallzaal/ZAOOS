@@ -26,7 +26,7 @@ import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
-import { checkFleetLiveness } from './fleet-health';
+import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
@@ -293,7 +293,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('watcher'))) return;
         try {
-          const alerts = [...(await runWatcherTick()), ...(await checkFleetLiveness())];
+          const alerts = [...(await runWatcherTick()), ...(await healFleet({ date: new Date().toISOString().slice(0, 10) }))];
           if (alerts.length) {
             await opts.bot.api.sendMessage(opts.zaalTgId, renderWatcherAlerts(alerts));
             console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');

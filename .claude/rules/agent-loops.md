@@ -24,6 +24,8 @@ Durable operating rules for any autonomous /loop or agent building/deploying in 
 
 10. **Learn online periodically.** Every several loop cycles, pull fresh best-practices from the web (Anthropic docs + community) and fold behavior-changing ones back into these rules. The loop should improve itself, not just the product.
 
+11. **Git hygiene on a shared clone.** The VPS clone (~/zao-os) runs the live bot AND is where loop ticks build. NEVER leave uncommitted changes across sequential commands: a later `git checkout main` silently reverts them (caused a real drift 2026-06-30 where self-heal + work-loop-fix ran live but were absent from origin/main). Commit or stash before switching branches; after merging, `git reset --hard origin/main` to keep the working tree = deployed truth; verify a fix is on origin/main (not just the working tree) before claiming it landed.
+
 ## Source
 
 Research doc: `research/agents/928-agent-loop-best-practices/` (2026-06-30). Primary: Anthropic Building Effective Agents + Effective Harnesses for Long-Running Agents.

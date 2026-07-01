@@ -10,7 +10,7 @@ import { readRuns, type RunRecord } from './runs';
 
 export interface WatcherAlert {
   level: 'info' | 'warn';
-  code: 'cost-over-cap' | 'high-fail-rate' | 'quality-decay';
+  code: 'cost-over-cap' | 'high-fail-rate' | 'quality-decay' | 'unit-down';
   message: string;
 }
 

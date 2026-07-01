@@ -88,6 +88,37 @@ ZABAL already runs the agent surface this builds on: `api/bonfire-ask.mjs` (the 
 | Define success metric: % of June attendees active in August + July project count - not cast volume | @Zaal | Decision | Before launch |
 | If experimenting with the Clanker standalone droid anyway: fund $500, human-confirm casts, monitor first 10 casts, kill-switch ready | @Zaal | Experiment | Optional |
 
+## Addendum (2026-06-30): AIRGAP, x402, and the honest partner reframe
+New input: Zaal has a founder relationship with AIRGAP (Zin0x) and wants to launch a zabaldroid
+"through AIRGAP", noting Neynar now owns both Farcaster and Clanker (one native stack). This
+updates - but does not overturn - the verdict.
+
+- **What AIRGAP actually is:** a market-intelligence agency, not a droid launcher. Its product is
+  9 monitoring agent types (X Monitor, Farcaster Intel, Launch Scanner, Wallet Watcher, Account
+  Stalker, Contract Monitor, Discord/Telegram Monitor, Custom). Wallet-native (SIWE), funded per-poll
+  in USDC via x402, signals route to Telegram/webhook/in-app, $AIRGAP holders get free usage. Its
+  docs do NOT cover "launch a droid" - **Gappy ($GAPPY) is a Clanker-rails showcase droid, in the
+  first Clanker Droid cohort, funded by a $1000 CEF grant.** So "launch through AIRGAP" is undefined -
+  confirm with Zin0x whether it grants AIRGAP's monitoring capabilities or is just his help on the
+  Clanker deploy flow.
+- **x402 (the autonomous-compute mechanic):** Coinbase's HTTP-402 protocol - an agent pays USDC
+  per API call (~200ms settle, Coinbase facilitator free tier 1,000 tx/mo then ~$0.001/tx). This is
+  how a droid funds its own compute with no human in the loop - the "autonomous revenue generator."
+- **The ZHC thesis is real but early (Galaxy, Mar 2026):** "Zero-Human Companies" - agents that
+  earn real onchain revenue; the token is "the account the agent spends from" (Zin0x's exact line).
+  Felix Craft cleared $120K in 30 days from product lines, not token fees - but that is the rare
+  exception; most agent-tokens still just extract.
+- **The Neynar point is fair:** Neynar owning Farcaster + Clanker makes this the native stack, not a
+  fringe launchpad - it softens doc 922's memecoin-optics objection for a NO-TOKEN droid.
+
+**Reframed ZABAL play (the genuinely good use, still tokenless):** the highest-value AIRGAP
+capability for a build event is not a token-droid - it is the **monitoring agents as the buildathon
+nervous system**: a Farcaster Intel + Custom agent watching the /zabal channel and #zabalgamez for
+new builders, ships, and questions, routed to the team's Telegram so no builder is ever missed. Pair
+that with the no-token zabaldroid concierge for the human-facing voice. Net: experiment freely with a
+no-token droid (low stakes, on-brand), and separately trial AIRGAP's intel agents for the real
+leverage. Also worth a shot: apply for a Clanker CEF "Fresh Clank" builder grant like AIRGAP got.
+
 ## Sources
 - Gate Wiki - What is Clanker (AI token launch on Base) - https://www.gate.com/crypto-wiki/article/what-is-clanker-clanker-and-how-does-its-ai-powered-token-launch-platform-work-on-base-20260106 [FULL]
 - The Block - Clanker $13M revenue from 200K+ tokens - https://www.theblock.co/post/349549/clanker-team-earns-13-million-in-revenue-from-over-200000-tokens-on-base-in-just-five-months [FULL]
@@ -104,3 +135,9 @@ ZABAL already runs the agent surface this builds on: `api/bonfire-ask.mjs` (the 
 - a16z - awesome-farcaster (utility bots: remindme, events, ballot, paragraph) - https://github.com/a16z/awesome-farcaster [FULL]
 - LangChain - State of Agent Engineering (95% pilots fail, ROI data) - https://www.langchain.com/state-of-agent-engineering [FULL]
 - CoinGecko - 2025 State of Memecoins report (failure rates) - https://assets.coingecko.com/reports/2025/CoinGecko-2025-State-of-Memecoins-Report.pdf [PARTIAL - summary stats]
+- AIRGAP - site + docs/user-guide (9 agent types, x402 per-poll funding, signal routing) - https://airgap.finance/docs/user-guide [FULL]
+- AIRGAP - Farcaster "CLANKER LEGION / Gappy droid" cast (Gappy fee routing, first Droid cohort) - https://farcaster.xyz/airgap/0x23125d69 [FULL]
+- Coinbase - x402 protocol (agentic pay-per-call, HTTP 402, USDC on Base) - https://www.coinbase.com/developer-platform/discover/launches/x402 [FULL]
+- Coinbase CDP - x402 facilitator (1,000 free tx/mo then $0.001/tx) - https://docs.cdp.coinbase.com/x402/welcome [FULL]
+- Galaxy Research - Zero-Human Companies: agents earning onchain revenue (Felix $120K/30d) - https://www.galaxy.com/insights/research/zero-human-companies-ai-agents-defi-crypto [FULL]
+- AInvest - Clanker $50M fee engine + CEF grants (14% CLANKER bought back) - https://www.ainvest.com/news/clanker-50m-fee-engine-recycler-price-flow-2604/ [FULL]

@@ -119,6 +119,35 @@ that with the no-token zabaldroid concierge for the human-facing voice. Net: exp
 no-token droid (low stakes, on-brand), and separately trial AIRGAP's intel agents for the real
 leverage. Also worth a shot: apply for a Clanker CEF "Fresh Clank" builder grant like AIRGAP got.
 
+## Addendum 2 (2026-06-30): deep droid mechanics + the ZABAL month-1 plan
+Decision refined: $ZABAL stays the **Empire Builder reward** (earned by building), NOT a new Clanker
+coin. So the droid is a no-token concierge whose mission is to grow the event + the Empire Builder
+rewards economy + (month 1) the POIDH #1249 pot. This keeps the tokenless brand intact.
+
+**Droid mechanics that matter (from a 2-agent deep pass):**
+- Modes: casts are Draft+Confirm (human-approved); replies are autonomous within a 30-min window,
+  up to 5-deep. Funding share options 100 / 1000 / 5000 bps (1% / 10% / 50%). Standalone = USDC
+  top-ups; wallet sandboxed (no withdraw); pauses at zero runway ("Needs attention").
+- What makes a droid WORK: a specific personality people want to TAG (care/don't-care lists, a
+  catchphrase, 3-5 example casts in the prompt), community-first (contests before tech), consistent
+  30-min replies, and funded runway. What kills them: runway depletion, a generic "helpful assistant"
+  voice, and no community buy-in (~99% of tokens hit this wall). Proof point: $LUM (Aether x Clanker)
+  hit $80M in a week on an authentic narrative, not volume-chasing.
+
+**Growth playbook that actually converts (not hype):**
+- Reply-focused split 70% useful replies / 20% curated / 10% promo. Replies beat broadcasts.
+- Thank every contributor publicly (DEGEN's proven engagement loop). Milestone posts on pot growth.
+- Open-pot growth: frame contributing as buy-in + a vote, not charity; consider quadratic/1:1
+  matching (Gitcoin QF: $60M / 3,700 projects) and cube-root anti-gaming to stop farming.
+- Cadence Mon/Wed/Fri, quality over volume (engagement-farming gets muted; DEGEN had to ban it).
+- Honest red flags: only ~32% of new tokens survive 30 days; Farcaster DAU -40% and it pivoted off
+  social-first (Neynar acquisition) - so measure retention + pot growth, not vanity reach.
+
+**ZABAL month-1 plan:** North-star = the #1249 pot grows. Standalone no-token droid, ~$500 USDC
+runway. KPIs: pot value (primary), contributors added, reply/tag rate, new builders onboarded. Voice
+v2 (mission baked in: grow the pot, earn-not-buy $ZABAL via Empire Builder, all brand rules) drafted
+and handed to Zaal.
+
 ## Sources
 - Gate Wiki - What is Clanker (AI token launch on Base) - https://www.gate.com/crypto-wiki/article/what-is-clanker-clanker-and-how-does-its-ai-powered-token-launch-platform-work-on-base-20260106 [FULL]
 - The Block - Clanker $13M revenue from 200K+ tokens - https://www.theblock.co/post/349549/clanker-team-earns-13-million-in-revenue-from-over-200000-tokens-on-base-in-just-five-months [FULL]

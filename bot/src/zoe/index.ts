@@ -146,7 +146,7 @@ function chunkMessage(text: string, max = TELEGRAM_MAX): string[] {
 let lastAuthAlertTime = 0;
 const AUTH_ALERT_DEBOUNCE_MS = 30 * 60 * 1000; // 30 min
 
-async function alertAuthFailure(bot: Api, zaalId: number, message: string): Promise<void> {
+async function alertAuthFailure(bot: Bot, zaalId: number, message: string): Promise<void> {
   const now = Date.now();
   if (now - lastAuthAlertTime < AUTH_ALERT_DEBOUNCE_MS) {
     console.log('[zoe/index] auth alert debounced (recently sent)');
@@ -158,7 +158,7 @@ async function alertAuthFailure(bot: Api, zaalId: number, message: string): Prom
 ${message}
 
 Action: ssh VPS then run 'claude' and /login.`;
-  await bot.api.sendMessage(zaalId, fullMessage).catch((err) => {
+  await bot.api.sendMessage(zaalId, fullMessage).catch((err: unknown) => {
     console.error('[zoe/index] failed to send auth alert:', err);
   });
 }

@@ -57,6 +57,19 @@ Same 11-chapter spine as 718, with the new docs folded in and the decay correcti
 | 9 | Confirm the "two wallets drive OREC" operating-core claim is still true (it drives the honesty chapter). |
 | 10 | 941's on-chain pieces (gas-free relayer submit, Snapshot-strategy bounty routing) are buildable-but-unbuilt - frame as roadmap, never as shipped. |
 
+## Verification log (2026-07-02, against current code)
+
+Four of the pre-draft gaps above are now closed by direct code check - these facts are safe to state in the whitepaper as current:
+
+| Claim | Verified location | Result |
+|---|---|---|
+| No decay / no burn today | `src/lib/respect/voteWeight.ts:58` | `weight: Math.round(ogValue + zorValue)` - raw sum. Zero decay/half-life references anywhere in `src/lib/respect/` or `src/lib/agents/`. Confirmed. |
+| Contract addresses + chain | `respect/transfers/route.ts`, `proposals/vote/route.ts`, `fractals/AboutTab.tsx` | OG `0x34cE89...216957`, ZOR `0x9885CC...E7445c`, OREC `0xcB05F9...6Be532` - all match 718c and resolve to **Optimism** (optimistic.etherscan.io). Confirmed. |
+| Vote-weight path | `voteWeight.ts` | OG (ERC-20, formatEther) + ZOR (ERC-1155 integer) via viem multicall. Matches 718c/936. Confirmed. |
+| Fibonacci scoring curve | `src/app/(auth)/fractals/AboutTab.tsx:33` | 1x: 55/34/21/13/8/5; 2x: 110/68/42/26/16/10 - matches 718b exactly. Confirmed. |
+
+Still open (need on-chain / live data, not code): the current fractal week count (718g's "90+ weeks" - re-count before Ch 8) and the "two wallets drive OREC" operating-core claim (Ch 9) - both need an on-chain/process query, not a grep.
+
 ## Decisions only Zaal can make (the brainstorm gate)
 
 These block chapter drafting. Unchanged from 718's open questions, restated so the loop can surface them:

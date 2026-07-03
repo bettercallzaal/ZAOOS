@@ -83,7 +83,7 @@ The loop is what makes it a *system* rather than a chore: distributed content at
 
 ## Also See
 
-- [Doc 836](../../agents/836-x-account-mining-agent-patterns/) - the mining that prompted this (capture in action)
+- [Doc 945](../../agents/945-x-account-mining-agent-patterns/) - the mining that prompted this (capture in action)
 - [Doc 829](../../agents/829-anthropic-agent-skills-talk/) - Thariq/Anthropic "compound knowledge base" vision
 - [Doc 824](../824-keyless-forkable-fetch-trio/) - the keyless capture layer
 

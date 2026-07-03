@@ -109,7 +109,7 @@ _5 items._ Pattern: agent-native production flips the model from 'AI-as-tool' to
 
 ## Also See
 
-- [Doc 836](../836-x-account-mining-agent-patterns/) - round 1 (3 clusters)
+- [Doc 945](../945-x-account-mining-agent-patterns/) - round 1 (3 clusters)
 - [Doc 838](../../dev-workflows/838-media-capture-distribute-pipeline/) - the capture/distribute system this feeds
 - [Doc 830](../830-ai-coding-agent-discourse-inbox-cluster/) - the original inbox cluster
 

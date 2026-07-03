@@ -107,6 +107,34 @@ Conclusion on the two top-gap surfaces:
 Net: the two ship-first surfaces are Paragraph/public-site work, not `zabalnewsletterbuilder` work. The only builder
 change worth considering is an optional welcome-email drafting mode.
 
+## G. Content-supply map - why daily is actually sustainable for ZAO (2026-07-03)
+
+The README flags daily cadence as the #1 risk (burnout, churn). But that risk assumes the writer must *create*
+content daily. ZAO's situation is the opposite: it **overproduces** content across the ecosystem. The newsletter's
+job is curation and selection, not creation - which flips daily from a burden into a highlight reel.
+
+The supply, by cadence (all real, already happening):
+
+- **Daily:** research docs (research cadence went daily in Q2, docs 900-941+), ZOE captures/briefs, WaveWarZ battles
+  run nightly (~8:30 EST), on-chain activity on the tracker.
+- **Weekly:** ZABAL Games cobuilds (Mondays), Fractal Mondays (100+ weeks), COC Concertz, the `docs/weekly/*-recap.md`
+  series (through W26), partner calls landing in the relationship ledger.
+- **Ongoing/threaded:** live partner threads (each new doc 947/951/953... is a story), events on the calendar
+  (ZAOstock Oct 3, ZAOville), the ZAO Fund, WaveWarZ tracker milestones, ZABAL Games submissions stacking.
+- **Evergreen:** the ~960-doc research library, the fractal process (doc 696), the whitepaper - all mineable for
+  "throwback"/explainer issues on a slow news day.
+
+Implication for the newsletter (recommendation): treat each issue as a *pull* from this supply, not a blank page.
+The daily-3 format (doc 930) already does this - it selects 3 wins. Extend the same discipline to the personal
+"Year of the ZABAL" journal: on any given day there is always a real shipped thing to lead with (a merged PR, a
+battle, a research doc, a partner call, a tracker number). ZOE auto-draft (already a logged open idea) can pre-stage
+the day's candidate pull from git + the research index + the tracker, and Zaal picks + humanizes. That is the
+concrete answer to "how do you sustain daily" - not more writing, better selection from what already exists.
+
+This closes the cadence tension in the README: daily is sustainable *for ZAO specifically* because supply outstrips
+one issue per day by a wide margin. The bottleneck is curation + voice, not raw material - and both are already tooled
+(`zabalnewsletterbuilder` voice grader, the daily-3 loop, ZOE).
+
 ## Open follow-ups for the loop
 
 - Draft the ACTUAL landing-page + welcome-sequence copy WITH Zaal (brainstorm first, then mirror voice) - not

@@ -85,6 +85,28 @@ Per README's prioritized list, the ship-first cluster is **A + B + funnel**:
 
 Everything else (referral loop, cross-promo, archive SEO, mints) comes after these three are live and measured.
 
+## F. Where should the landing page + welcome sequence live? (repo audit, 2026-07-03)
+
+Audited `zabalnewsletterbuilder` (github.com/bettercallzaal/zabalnewsletterbuilder). It is a **builder**,
+not a public site or a sender: it plans the daily-3 sequence, drafts issues in ZAO voice, grades the voice, and
+generates Farcaster/X variants (`app/{builder,read,socials,issues}`, `lib/{issues,voice,score,variants,assemble}.ts`).
+The newsletter is published on Paragraph; socials go out via the `/socials` skill. No subscribe/landing/welcome code exists.
+
+Conclusion on the two top-gap surfaces:
+
+- **Landing page** - does NOT belong in the builder (that tool is an internal composer, not a public front door).
+  Options, best first: (1) confirm what Paragraph's own subscribe page already offers and whether it can carry a
+  lead magnet; (2) a small standalone `/subscribe` micro-page (Vercel/Framer) linked from Farcaster/X/issue footer;
+  (3) a route on an existing public ZAO surface (e.g. thezao.xyz). Pick based on where ZAO wants the canonical front door.
+- **Welcome sequence** - SENDING/automation is a platform concern, not a builder concern. Depends on whether
+  Paragraph supports automated sequences; if not, it needs Paragraph automation or a lightweight ESP. NOT the builder's job.
+- **What the builder COULD gain (optional, natural fit)** - a "welcome-sequence drafting" mode: draft the 3 welcome
+  emails in ZAO voice with the same voice-grader the issues use. That is a content-drafting task, exactly what the
+  builder already does. Small, additive, and keeps voice consistent. Still leaves hosting/sending to Paragraph/ESP.
+
+Net: the two ship-first surfaces are Paragraph/public-site work, not `zabalnewsletterbuilder` work. The only builder
+change worth considering is an optional welcome-email drafting mode.
+
 ## Open follow-ups for the loop
 
 - Draft the ACTUAL landing-page + welcome-sequence copy WITH Zaal (brainstorm first, then mirror voice) - not

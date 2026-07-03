@@ -116,6 +116,14 @@ A document that only tells you what works is not worth trusting. Here is what is
 - **The active core is small.** Like most networks, a small group drives much of the on-chain governance today. Getting every member submitting on-chain is a stated goal, not a finished fact.
 - **Scaling is unproven.** We have proven one network, run for over a year. Whether this scales to many nested networks is the open question, and we frame it as one.
 
+**Questions people ask, answered straight:**
+
+- **Why so small, and why gated?** Depth over breadth. A real culture is set by a small core and then opened carefully, by referral. We would rather have a few hundred people who show up than a million who do not. Small is a choice, for now.
+- **What if the founder leaves?** The code is open source, the research is public, governance is distributed, and standing is earned, not appointed. The network is built to outlive any one person, the founder included. Today the founder still carries a lot, and reducing that dependence is part of the work.
+- **Why tokens you cannot sell?** Because the moment reputation can be bought, it stops measuring contribution. Soulbound Respect is the entire point: it keeps money out of governance.
+- **Multi-chain, is that scattered?** Each chain does one job. The app and home token live on Base, Respect governance on Optimism, WaveWarZ on Solana. Purpose, not sprawl.
+- **Why Farcaster, it is tiny?** It is small, and that is the point for now. It is an open protocol where a community can own its social graph instead of renting it. We build where the rails are open.
+
 None of this is a reason to look away. It is the reason to trust the rest.
 
 ---

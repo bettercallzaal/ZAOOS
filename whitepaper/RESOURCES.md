@@ -162,5 +162,22 @@ These are ZAO's real, source-linked traction numbers - the "what we built" spine
 - DONE this tick: Goldman creator-economy figure + major-label share (both VERIFIED above).
 - Reconcile HackMD Draft 3 (hackmd.io/u9jZ5Q1BR_uUwmRuksvF6Q) + WaveWarZ whitepaper (hackmd.io/2DVVvP1oTzCMIqLKRSLgRw) into the new drafts - next external read.
 
+## Prior drafts reconciled (HackMD, fetched 2026-07-02)
+
+### ZAO Whitepaper Draft 3 (hackmd.io/u9jZ5Q1BR_uUwmRuksvF6Q)
+- **Mission lineage:** "a decentralized impact network that returns power, revenue, and rights to creators." Our newer spine sharpens this to **profit, data, and IP** - note the evolution (power/revenue/rights -> profit/data/IP); the newer triad is more concrete.
+- **Anti-whale line worth reusing:** "Whale status is earned by long-term support and active contribution" - rejects speculative crypto culture. Good for the manifesto/Fractal section.
+- **Design lineage:** the Respect Game embeds Yu-kai Chou's Octalysis 8 drives (Epic Meaning, Accomplishment, Empowerment, Ownership, Social Influence, Scarcity, Unpredictability, Loss-avoidance) - a citable design rationale for why the game works.
+- **Two revenue tracks:** self-managed (100% creator retention) vs collaborative (modest shared cut) - matches our "ownership absolute, profit-sharing opt-in" nuance.
+- **Legacy platforms mentioned (do NOT carry forward):** ZVerse, Hivemind, Student Loanz Initiative - deprecated; skip.
+- Bitcoin peer-to-peer ethos cited as inspiration (matches our craft model).
+
+### WaveWarZ Whitepaper (hackmd.io/2DVVvP1oTzCMIqLKRSLgRw) - the Music-lane proof point
+- "World's first music prediction market" on **Solana** (Program ID 9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo).
+- 20-min battles, 3 per match, weekly; triple judging (human expert + X poll + SOL trading volume); bonding-curve battle tokens.
+- **The thesis, live:** ~1.5% total fees, artists earn ~1% of volume INSTANTLY (no delays), "**98.5% of every trade stays in the ecosystem**," no platform token (SOL directly). This is "return ~100% to artists, no middleman" running as a real product - the strongest concrete proof for the Music lane + the whole spine.
+- Metrics (older): $800-2,500/match, 50+ artists pipeline, break-even ~$500/battle. (Newer 051 figure: 472.71 SOL / 735 battles as of May 2026.)
+- Note: the per-battle pool split (50% losing traders / 40% winning / 5% winning artist / 3% platform / 2% losing artist) and the "1.5% fee / 1% artist" framing are two different lenses; do not conflate. For the whitepaper, lead with "98.5% stays in the ecosystem, artists paid instantly."
+
 ## External resource status: largely complete
 Creator-economy + comparables (creator/label/streaming) VERIFIED; impact-network + fractal precedents + whitepaper craft gathered; ZAO's own receipts + lanes + works-cited mined from 051. Remaining is on-chain verification (needs a chain query) and reconciling the two HackMD drafts.

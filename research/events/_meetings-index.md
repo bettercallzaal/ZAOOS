@@ -4,6 +4,13 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-03 | Empire Builder x ZABAL Gamez build sesh | ZABAL Gamez / Empire Builder | Zaal, Adrian, Person A, Jordan, Divi Fly | [948](948-empire-builder-zabal-gamez-build-sesh/) | 6 |
+| 2026-07-03 | Brandon x Zaal - WaveWarZ + ZABAL Gamez intro | ZABAL Gamez / WaveWarZ | Zaal, Brandon | [949](949-brandon-wavewarz-zabal-gamez-intro/) | 3 |
+| 2026-07-02 | Ohnahji + Zaal - strategy session | The ZAO | Zaal, Ohnahji | [950](950-ohnahji-zaal-strat-sesh/) | 8 |
+| 2026-07-01 | Greg (Autonomous) x ZAO - WaveWarZ legal structure | WaveWarZ | Zaal, Hurricane, Samantha, Greg | [951](951-greg-autonomous-wavewarz-legal/) | 5 |
+| 2026-06-29 | Viniapp brainstorm (LOW CONFIDENCE transcript) | ZABAL Gamez | Zaal, unknown | [952](952-viniapp-brainstorm/) | 2 |
+| 2026-06-29 | Deez x Zaal - Boardwalk token launcher | ZAO festivals | Zaal, Deez | [953](953-deez-boardwalk-token-launcher/) | 5 |
+| 2026-06-22 | Marie x Zaal - ZAO Fund intake | ZAO Fund | Zaal, Marie | [947](947-marie-zaal-zao-fund-intake/) | 5 |
 | 2026-06-17 | Thy Rev x Zaal - COC Concertz framing + laptop (resolves Fellenz #4) | COC Concertz / The ZAO | Zaal, Thy Revolution | [866](866-thyrev-zaal-coc-framing-laptop/) | 7 |
 | 2026-06-09 | Bayo x Zaal - MPC / Atrium / cross-collab catch-up | The ZAO / BD | Zaal, Bayo | [841](841-bayo-zaal-mpc-atrium-bd/) | 7 |
 | 2026-06-10 | WIP Meetup x ZABAL Games - co-hosted event prep (event Jun 11) | ZABAL Games / ZAO Devz | Zaal, rizzle | [840](840-wip-meetup-zabal-games-event-prep/) | 6 |

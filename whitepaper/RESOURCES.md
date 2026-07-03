@@ -116,6 +116,46 @@ Patronage is proven and transparent; web3 music is mostly **opaque, unproven, or
 
 **Craft synthesis for our 3-doc split:** ENS + Bitcoin = the "simple main doc" model; Optimism Constitution+Manual = the "living, versioned, main+technical" model; Nouns + design manifestos = the manifesto voice. All four validate the architecture we chose.
 
+## ZAO's own receipts (mined from Draft 4.5 / doc 051, each has a verify link)
+These are ZAO's real, source-linked traction numbers - the "what we built" spine for the main whitepaper and the lanes section. VERIFY each link is current before publishing (some may have moved since May 2026).
+- Ecosystem participants: **1,000+** (thezao.com/about)
+- Weekly governance meetings: **90+** (Fractal recordings archive)
+- Newsletter editions: **400+** (paragraph.com/@thezao)
+- Podcast episodes (Let's Talk About Web3): **19+** (pods.media/lets-talk-about-web3)
+- Paid supporters: **78** before launching the product
+- Artists in roster: **22** | Combined Spotify listeners: **378,000+** | Tracks: **500+**
+- WaveWarZ: **472.71 SOL (~$37,845), 735 battles** (May 2026, wavewarz.info / Solana on-chain)
+- Revenue generated: **$10,000+** (festivals + WaveWarZ)
+- IRL festivals produced: **4** (ZAO-PALOOZA, ZAO-CHELLA, ZAO-PROS, ZAO Stock)
+- COC metaverse concerts: **150+ weekly** (stilo.world)
+- Smart-contract exploits: **Zero** | GitHub repos: **65+**
+- (Research-docs count in 051 says "52" - STALE, we are past 940 now.)
+
+### Two discrepancies 051 RESOLVES (was flagged verify)
+- **Member count:** ~200 is the ACTIVE fractal-governance participant count; the WIDER ecosystem is 1,000+. The drafts should say both: "roughly 200 active governance participants within a 1,000+ ecosystem." Fixes the "200 members" flag in the technical doc.
+- **Chain / multi-chain:** ZAO is deliberately multi-chain, each chain one purpose (051 sec 16): **Base = home** (app, $ZAO), **Optimism = Respect/OREC governance** (code-verified in our technical doc), **Solana = WaveWarZ**. NOTE: 051 line 113 mislabels the OG Respect address as "on Base" - the live code (AboutTab.tsx, transfers route) uses optimistic.etherscan.io, so **Optimism is correct for Respect**; 051 has a labeling error there. Keep our technical doc's Optimism addresses; add the multi-chain framing to the main doc.
+
+## The lanes roster (from 051 sec 4 - this IS the Section 5 lanes audit seed)
+- **Music:** WaveWarZ (Solana onchain music prediction market, artists battle + earn); the 22-artist roster (378k+ listeners); ZAO OS inline players.
+- **Builders:** ZAO OS (gated Farcaster client, MIT open source, XMTP DMs); the research library; ZABAL Gamez build-a-thon.
+- **Events/Festivals:** ZAO-PALOOZA (NYC/NFT NYC), ZAO-CHELLA (Miami/Art Basel), ZAO-PROS (ETH Denver), ZAO Stock (Maine, Oct 2026); COC metaverse concerts 150+/wk.
+- **Tools/Agents/Coordination:** ZABAL (coordination engine: SongJam voice-verify, Magnetiq Proof-of-Meet, Empire Builder Farcaster rewards); the agent stack (ZOE, ZOL); the newsletter + podcast as media.
+- (Still confirm current status of each against the live repos/products before the lanes section is final.)
+
+## External sources already gathered (051 Works Cited - fold into whitepaper citations)
+- Satoshi Nakamoto, *Bitcoin Whitepaper* (2008) - craft model + the "lead with the problem" lesson.
+- David Ehrlichman, *Impact Networks* (2021) - the identity framework (already digested).
+- Daniel Larimer, *More Equal Animals* (2021) - the fractal-democracy theory root.
+- **Kevin Kelly, *1,000 True Fans* (2008)** - NEW, high-value: the direct-to-fan / artist-ownership thesis in one essay. Cite in the mission section.
+- Yu-kai Chou, *Actionable Gamification / Octalysis* (2014) - relevant to Respect Game engagement design.
+- ZAO Whitepaper Draft 3 (HackMD, 2024) + WaveWarZ Whitepaper (HackMD, 2025) - prior primary drafts to reconcile.
+
+## Distribution + honesty tooling (from 051 critique)
+- **Content Pyramid (5 formats):** Hook (cast/thread) -> Summary (scrolly landing) -> Walkthrough (5x5-8min video) -> Full doc (living whitepaper) -> Deep dive (45-60min podcast). Use this to ship the whitepaper across audiences.
+- **7 Skeptic Questions the whitepaper must answer** (feeds Section 7 honesty + an FAQ): (1) why so few people vs TikTok's billions; (2) years in and still small, why; (3) what if Zaal leaves; (4) soulbound tokens I can't sell, why; (5) multi-chain, strategic or scattered; (6) how is this funded going forward; (7) why Farcaster, it's tiny. Our honesty section already answers several; make sure all seven are addressed.
+- **Recording plan:** Zaal records it himself (authenticity > polish), 5 chapters: The Why -> The Receipts -> The System -> The Vision -> The Invitation, with a second person asking the skeptic questions.
+
 ## Open reads queued
-- community/051-zao-whitepaper-2026 (prior whitepaper - reconcile).
-- Verify on-chain: current fractal week count; who drives OREC.
+- Verify on-chain: current fractal week count; who drives OREC; the OG chain (confirm Optimism canonical).
+- Verify still-external: Goldman creator-economy figure; major-label ~70% share.
+- Reconcile HackMD Draft 3 + WaveWarZ whitepaper into the new drafts.

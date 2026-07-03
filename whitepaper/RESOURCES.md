@@ -78,6 +78,8 @@ The *lessons* are directionally sound and citable as reasoning; the *status clai
 
 ### VERIFIED (primary source, safe to cite)
 - **Spotify Loud & Clear 2025** (loudandclear.byspotify.com/takeaways) - VERIFIED via direct fetch 2026-07-02: Spotify paid the music industry **over $11 billion in 2025**; **~13,800 artists** generated **$100,000+**; **~1,500 artists** generated **$1M+**. Against the millions of artists on the platform, this is the villain stat. NOW IN THE DRAFT (Section 2). Note: uses the $100k threshold, NOT the earlier agent's unverified "$50k/0.19%."
+- **Goldman Sachs creator economy** (goldmansachs.com/insights/articles/the-creator-economy-could-approach-half-a-trillion-dollars-by-2027) - VERIFIED 2026-07-02: creator economy projected to **~$480 billion by 2027** (doubling from $250B); **50 million** global creators; **only ~4% are "professionals" earning $100k+/year.** The 4% stat pairs perfectly with the Spotify one. Safe to cite.
+- **Major-label concentration + industry size** (IFPI via musicbusinessworldwide.com; Statista; MIDiA) - VERIFIED 2026-07-02: the Big Three (UMG/Sony/Warner) control **~65-70%** of recorded music (UMG ~32%, Sony ~21%, Warner ~16%, 2023-25); global recorded-music revenue **$31.7B in 2025** (IFPI), paid streaming = 52.4% of it. Safe to cite for the "capital-concentration" villain point. Keep the main doc lean (Spotify stat carries Section 2); use these in the technical doc / an FAQ.
 
 ### Patronage comparables (the "what works" - Section 5/7) - strong, tag exact figures APPROX
 Proven, transparent, non-label models that hit high creator payouts WITHOUT speculative tokens - ZAO's economic north star:
@@ -156,6 +158,9 @@ These are ZAO's real, source-linked traction numbers - the "what we built" spine
 - **Recording plan:** Zaal records it himself (authenticity > polish), 5 chapters: The Why -> The Receipts -> The System -> The Vision -> The Invitation, with a second person asking the skeptic questions.
 
 ## Open reads queued
-- Verify on-chain: current fractal week count; who drives OREC; the OG chain (confirm Optimism canonical).
-- Verify still-external: Goldman creator-economy figure; major-label ~70% share.
-- Reconcile HackMD Draft 3 + WaveWarZ whitepaper into the new drafts.
+- Verify on-chain (needs a chain query, not a fetch): current fractal week count; who drives OREC; confirm the OG address is canonical on Optimism (vs 051's Base label).
+- DONE this tick: Goldman creator-economy figure + major-label share (both VERIFIED above).
+- Reconcile HackMD Draft 3 (hackmd.io/u9jZ5Q1BR_uUwmRuksvF6Q) + WaveWarZ whitepaper (hackmd.io/2DVVvP1oTzCMIqLKRSLgRw) into the new drafts - next external read.
+
+## External resource status: largely complete
+Creator-economy + comparables (creator/label/streaming) VERIFIED; impact-network + fractal precedents + whitepaper craft gathered; ZAO's own receipts + lanes + works-cited mined from 051. Remaining is on-chain verification (needs a chain query) and reconciling the two HackMD drafts.

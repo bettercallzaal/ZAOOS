@@ -1,0 +1,93 @@
+# 944 - Implementation specs + ZAO-grounded candidates
+
+> Companion to [README.md](./README.md). This is the "how to actually ship the top-3 gaps" file:
+> landing page, welcome sequence, and the ZAO-specific lead-magnet + cross-promotion candidates.
+>
+> **Scope guard:** these are SPECS and skeletons - structure, purpose, and what each piece must do -
+> NOT finished outbound copy. Final voice-copy is Zaal's to write/humanize per the drafting protocol
+> ([[feedback_drafting_protocol]], [[feedback_brainstorm_before_writing]]). Nothing here is meant to ship
+> as-is or auto-post.
+
+---
+
+## A. Landing page spec (gap #1)
+
+One page, one job: turn a Farcaster/X visitor into a subscriber. Sits at a stable URL (e.g. a `/subscribe`
+route or a dedicated Paragraph/Framer page), linked from Farcaster bio, X pinned, and every issue footer.
+
+Sections, top to bottom:
+
+1. **Headline** - benefit + specific time. Formula from the research ("X you'd miss in 2 minutes a day").
+   Zaal writes the actual line; keep it lowercase-casual, no hype.
+2. **Founder video (optional, high-impact)** - 20-40s of Zaal saying why he writes it daily. Adds 25-86% to
+   conversion [VERIFIED, see README]. Can defer to v2.
+3. **Real issue screenshot** - an actual "Year of the ZABAL" issue, not a mockup. Shows exactly what they get.
+4. **One lead magnet offer** - see section C. Must deliver value in under 5 minutes.
+5. **Subscribe form** - email + optional name ONLY (each extra field costs ~11% conversion). Plus the
+   wallet-subscribe option (Paragraph native) for the web3 crowd.
+6. **Proof line** - "Day N and counting" (the streak is the proof; it's already true and on-brand).
+
+Rules: mobile-first (60%+ signups are mobile, <3s load), single CTA, no nav distractions.
+
+## B. Welcome sequence spec (gap #2)
+
+3 emails, first sent IMMEDIATELY on subscribe (instant beats delayed by 50%+ open rate). This is the single
+biggest retention lever ZAO is missing. Skeletons only - Zaal writes the voice:
+
+- **Email 1 (instant) - "you're in."** ZM. One line on what "Year of the ZABAL" is and the daily promise.
+  Deliver the lead magnet here. Set the expectation: short, daily, real. One link max.
+- **Email 2 (day 1-2) - "who's writing this."** The one-paragraph why: The ZAO, build-in-public, what a year
+  of daily discipline is for. Link one flagship artifact (e.g. the WaveWarZ on-chain tracker, or the fractal
+  process) so they see the world behind the journal.
+- **Email 3 (day 3-4) - "here's the best of it."** Point to 2-3 standout past issues (the archive as a taste).
+  Soft ask: reply and tell me what you're building. Reply-driven engagement is the truest signal post-Apple-MPP.
+
+Cadence after the sequence: the normal daily issue takes over. Measure clicks + replies, not opens.
+
+## C. ZAO lead-magnet candidates (pick ONE to start)
+
+Grounded in assets ZAO already has - no new production required for most:
+
+1. **The WaveWarZ on-chain one-pager** - "how a music-battle market actually works on-chain, in 2 minutes,"
+   built from the real tracker (doc-linked, wwtracker.vercel.app). Proof + novelty. Strong fit.
+2. **The daily-3 wins format** - a "here's what a year of shipping in public looks like" sampler pulled from
+   docs 928/929/930. Low effort, on-brand.
+3. **ZABAL Games context pack** - the existing `zabal-games-context` skill repackaged as a "drop this into your
+   AI coding agent so it understands the ZAO stack" download. Targets builders specifically.
+4. **The fractal process explainer** - Zaal's magnum opus (doc 696) distilled to a 1-page primer. Higher effort.
+
+Recommendation: start with #1 or #2 - both exist, both take under 5 min to consume, both are unmistakably ZAO.
+Verify each is safe to share publicly before using.
+
+## D. Cross-promotion candidates (verify before outreach)
+
+Aligned music/web3 relationships already in the ZAO orbit that plausibly have audiences to swap with. Flagged
+[verify] because I have NOT confirmed each runs a newsletter or would swap - that check + the outreach itself is
+Zaal's call ([[feedback_dont_invent_outreach]], [[feedback_cold_outreach]] via the skill):
+
+- SongJam / Logesh (SANG, leaderboard + X Spaces audience) [verify]
+- POIDH / Kenny (bounty community) [verify]
+- Bonfires / Ryan Kagy (knowledge-graph + web3 audience) [verify]
+- Wide / Aaron Rafferty (cause-coins crossover, doc 913) [verify]
+- Magnetiq / Tyler Stambaugh (event/launch platform, ZABAL Games host) [verify]
+- Empire Builder network (Adrian, raidsharks) [verify]
+
+Approach per the research: treat a swap as a relationship start, not a transaction; 5-10 aligned partners, not a
+blast. Do NOT auto-send anything - this list is a starting point for Zaal to pick from and reach out himself.
+
+## E. Sequencing (what to build first)
+
+Per README's prioritized list, the ship-first cluster is **A + B + funnel**:
+
+1. Landing page (A) - the front door.
+2. Welcome sequence (B) - so new subs don't churn on day 1.
+3. Daily Farcaster teaser -> landing page (the funnel) - warm audience, near-zero cost.
+
+Everything else (referral loop, cross-promo, archive SEO, mints) comes after these three are live and measured.
+
+## Open follow-ups for the loop
+
+- Draft the ACTUAL landing-page + welcome-sequence copy WITH Zaal (brainstorm first, then mirror voice) - not
+  unilaterally.
+- Confirm which lead magnet is cleared for public use.
+- Check whether `zabalnewsletterbuilder` should host the landing page + a welcome-sequence module (code follow-up).

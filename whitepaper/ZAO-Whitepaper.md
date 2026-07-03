@@ -32,6 +32,8 @@ We are against gatekeeping. Not one kind of it. Four.
 - **Gatekept potential.** Most people never get the tools, the capital, or the room to bring out the one thing they are great at.
 - **Gatekept knowledge.** How things really work is kept behind closed doors, so the next person has to start from zero.
 
+You can see it in the numbers. In 2025 the biggest streaming platform paid the music industry over eleven billion dollars. Fewer than fourteen thousand artists earned a hundred thousand of it. Almost everyone else made close to nothing, and none of them own the audience they built. [Source: Spotify Loud and Clear, 2025.]
+
 The ZAO opens all four gates. Profit goes back to artists. Power comes from contribution. Resources get put in people's hands. And we build in the open so the knowledge is free.
 
 ---

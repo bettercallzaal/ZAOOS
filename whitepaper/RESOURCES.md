@@ -76,7 +76,21 @@ The *lessons* are directionally sound and citable as reasoning; the *status clai
 
 **The one-line ZAO differentiator this research earns:** contribution-governed ownership (merit, not speculative tokens) + no fees taken from artists + artist-owned data + portable IP that survives any platform. Emulate Patreon's payout + Water & Music's rigor; avoid Audius's token-dependence and Sound.xyz's platform lock-in.
 
-**Next-tick verification queue (before any number enters the whitepaper):** Spotify Loud & Clear exact figures; Goldman creator-economy figure; major-label market share; Royal + Sound.xyz current status. Prefer Water & Music + primary sources.
+### VERIFIED (primary source, safe to cite)
+- **Spotify Loud & Clear 2025** (loudandclear.byspotify.com/takeaways) - VERIFIED via direct fetch 2026-07-02: Spotify paid the music industry **over $11 billion in 2025**; **~13,800 artists** generated **$100,000+**; **~1,500 artists** generated **$1M+**. Against the millions of artists on the platform, this is the villain stat. NOW IN THE DRAFT (Section 2). Note: uses the $100k threshold, NOT the earlier agent's unverified "$50k/0.19%."
+
+### Patronage comparables (the "what works" - Section 5/7) - strong, tag exact figures APPROX
+Proven, transparent, non-label models that hit high creator payouts WITHOUT speculative tokens - ZAO's economic north star:
+- **DistroKid** - ~100% of royalties to the artist (flat annual fee, not a %). Lesson: remove the extraction incentive entirely and still run a business.
+- **Bandcamp** - ~85-90% to artists, big share from physical/direct sales. Lesson: direct-to-fan works with zero blockchain.
+- **Patreon** - ~88-90% to creators, recurring subscriptions, artist owns the audience. Lesson: recurring + audience-ownership is the proven anti-label model.
+- **OnlyFans** - ~80% to creators (cited as proof the high-payout subscription model scales; adjacent industry).
+- (Exact totals like "$25B distributed", "250K creators", "30% of new songs" are APPROX - soften or verify before citing.)
+
+### The honest web3 read (shapes ZAO's positioning)
+Patronage is proven and transparent; web3 music is mostly **opaque, unproven, or failed** (Audius/Royal publish no payout economics; Sound.xyz defunct; music NFTs carried platform fees of 72-157% - the extraction just moved from labels to NFT platforms; 3LAU's $11.7M was a one-time event, not a model). **ZAO's honest stance:** we are not claiming web3 "solves" music. We use blockchain for provable ownership, agents for leverage, and contribution-governance for fairness - and we borrow the proven economics of patronage (high payout, artist owns the audience), not speculative tokens. This candor is a strength; put it in Section 7.
+
+**Next-tick verification queue:** Goldman creator-economy figure; major-label ~70% market share; then mine prior draft 051 for its numbers + works-cited + FAQ + risks.
 - [x] Impact-network case studies + fractal precedents + whitepaper/manifesto craft models - DONE (below).
 
 ### Impact networks in practice (verify stats before citing)

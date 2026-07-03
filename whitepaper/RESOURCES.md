@@ -53,7 +53,30 @@ Last updated: 2026-07-02 (tick 1).
 
 ## External - web
 
-- [ ] Creator-economy extraction data + web3 music comparables (Sound.xyz, Royal, Audius, Songcamp, Water & Music) - agent still running.
+- [x] Creator-economy extraction data + web3 music comparables - DONE (below, with claim-status tags).
+
+### The extraction problem (villain, Section 1-2) - VERIFY key numbers vs primary source before citing
+Claim-status: USE = safe to cite after a quick primary-source confirm; APPROX = directionally true, round it or soften; HOLD = do not cite until verified.
+- **Streaming reality (strongest stat): the vast majority of artists earn very little on streaming.** Agent gave "0.19% of Spotify artists earn $50K+ / 99.81% under." USE - but cite Spotify's own **Loud & Clear** report (loudandclear.byspotify.com) as the primary source and pull the exact current figure (Spotify publishes how many artists generated $50k/$10k+). This is the single best villain stat.
+- **Per-stream payout ~$0.003 - 0.005 (no fixed rate).** APPROX - Spotify does not publish a per-stream rate; frame as "fractions of a cent per stream," not a hard number.
+- **Major-label deal: artist keeps ~15-20%, label keeps the rest; recoupment means many artists see $0 until costs are repaid.** APPROX/USE - standard industry framing; safe if stated as "roughly" and tied to recoupment. (Agent's $250K/$3M worked example is illustrative, not a cited fact.)
+- **Top 3 majors (UMG/Sony/Warner) control ~70% of recorded music.** USE - widely reported (~68-71%); confirm current figure.
+- **Creator economy ~$480-500B by 2027 (Goldman Sachs, 2023).** USE - real, widely-cited Goldman projection; confirm the exact figure/date.
+- **Masters + listener data: label/platform owns the masters and the audience data; the artist gets aggregated analytics and no direct listener relationship.** USE - structurally true, strong for the "data + IP" legs of the spine.
+- **"99.9% of creators earn below a living wage."** HOLD - agent tagged PARTIAL, figure varies 0.1-1%; do not cite a precise number.
+
+### Web3 music comparables (Section 5/7 - what to emulate/avoid) - lessons solid, statuses HOLD
+The *lessons* are directionally sound and citable as reasoning; the *status claims* need verification (agent marked most PARTIAL/INACCESSIBLE).
+- **Sound.xyz** - tokenized releases, artist keeps masters. Agent claims shut down Jan 2026 - HOLD (unverified). Lesson: NFT-only commodifies music as a collectible; platform-shutdown risk means artist IP must be portable.
+- **Royal** - fractional song ownership; fans buy revenue shares. Status HOLD (agent said active; Royal is widely reported to have wound down/pivoted - VERIFY). Lesson: fractional ownership needs real secondary-market liquidity or the tokens are worthless.
+- **Audius** - decentralized protocol, artist keeps 100% rights, token rewards. Lesson (solid): token-price-dependent rewards are not predictable artist income; peg to real revenue or avoid tokens. (AUDIO price collapse is real; exact figures APPROX.)
+- **Songcamp** - collaborative co-creation + NFT. Status INACCESSIBLE. Lesson: crystal-clear revenue splits up front or adoption collapses.
+- **Water & Music** - research collective (not a platform), rigorous creator-economy analysis. USE as a truth-teller source + transparency model. Likely a good primary source for the extraction numbers above - mine waterandmusic.com next tick.
+- **Patreon** (patronage) - recurring fan subscriptions, ~90%+ to artist, artist owns the audience relationship. Lesson (strong): the most proven non-label model; mirror the high-payout + direct-audience-ownership economics. (Exact cut varies by tier - APPROX.)
+
+**The one-line ZAO differentiator this research earns:** contribution-governed ownership (merit, not speculative tokens) + no fees taken from artists + artist-owned data + portable IP that survives any platform. Emulate Patreon's payout + Water & Music's rigor; avoid Audius's token-dependence and Sound.xyz's platform lock-in.
+
+**Next-tick verification queue (before any number enters the whitepaper):** Spotify Loud & Clear exact figures; Goldman creator-economy figure; major-label market share; Royal + Sound.xyz current status. Prefer Water & Music + primary sources.
 - [x] Impact-network case studies + fractal precedents + whitepaper/manifesto craft models - DONE (below).
 
 ### Impact networks in practice (verify stats before citing)

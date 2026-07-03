@@ -30,7 +30,7 @@ Respect comes in two forms:
 
 - **OG Respect (ERC-20)** - the historical ledger. Issued from the ZAO's founding through September 2025 (Fractals 1-73). A record of early recognition: founding contributions, content features, artist awards, and mentor acknowledgment. OG is frozen as of December 2025; no new OG is minted. It lives on Optimism at address `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. All OG balances at any point in history grant voting weight in OREC proposals.
 
-- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting September 2025 (Fractals 74+) via the OREC optimistic execution contract. One token per award, minted with session metadata (week, breakout group, rank). Living ledger means future mechanisms can read ZOR to understand current standing, but vote weight still draws from OG for historical fairness. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
+- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting September 2025 (Fractals 74+) via the OREC optimistic execution contract. One token per award, minted with session metadata (week, breakout group, rank). Vote weight is the sum of OG and ZOR balances (see the formula below, code-verified), so both the historical ledger and the living ledger count toward governance. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
 
 **Only humans can earn Respect.** Agents, bots, contracts, and organizational accounts cannot participate in the Respect Game and cannot be assigned Respect. Agents are members' tools and the network's infrastructure. Membership and governance are human-only.
 

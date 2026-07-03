@@ -51,10 +51,33 @@ Last updated: 2026-07-02 (tick 1).
 ### Section 7 (honest limitations)
 - **governance/718e-critiques-failure-modes** - the failure modes (participation collapse, visibility bias, core concentration, scaling unproven).
 
-## External - web (pending, tick 1 agents running)
+## External - web
 
-- [ ] Creator-economy extraction data + web3 music comparables (Sound.xyz, Royal, Audius, Songcamp, Water & Music) - agent running.
-- [ ] Impact-network case studies + fractal precedents + whitepaper/manifesto craft models - agent running.
+- [ ] Creator-economy extraction data + web3 music comparables (Sound.xyz, Royal, Audius, Songcamp, Water & Music) - agent still running.
+- [x] Impact-network case studies + fractal precedents + whitepaper/manifesto craft models - DONE (below).
+
+### Impact networks in practice (verify stats before citing)
+- Ehrlichman, *Impact Networks* (converge.net/book) - the framework. Already digested.
+- **Santa Cruz Mountains Stewardship Network** - 19-org network; trust-before-outcomes; emergent structure overcame regional tensions. Good "cultivate not build" case. (Converge case study.)
+- **RE-AMP Network** - large multi-state climate coalition, cited as long-run proof networks sustain systemic change on relationship infrastructure. NOTE: specific figures the agent gave (150+ coal plants, $25M+) and one source URL looked mismatched - VERIFY before citing any number.
+- **Jane Wei-Skillern's four network-leadership principles** - mission before org; manage through trust not control; promote others not yourself; build constellations not stars. Clean, quotable, matches ZAO. (Leading Learning ep. 174.)
+- **Niall Ferguson, *The Square and the Tower*** - networks-vs-hierarchies intellectual scaffolding. One-line: real power lives in decentralized networks. (Note: Ehrlichman actually pushes back on Ferguson's "networks aren't strategic" - use the tension, don't just cite Ferguson.)
+
+### Fractal governance precedents (status = verify; some may have paused)
+- **Fractally / Daniel Larimer** + *More Equal Animals* (2021) - the manifesto/blueprint for fractal democracy; non-transferable Respect via weekly collaboration mining. The lineage root. (Cross-check with our doc 696/718.)
+- **Eden Fractal** (June 2022, "Epoch 2") - pioneered the Respect Game; planning ORDAO. Status per agent: active/transitioning - VERIFY current state (718e notes decline risk).
+- **Optimism Fractal** (Oct 2023) - Respect Game at Collective scale, Sages Council. IMPORTANT: our own 718e says Optimism Fractal PAUSED (Jan 2026) - the agent said "live." TRUST 718e / re-verify; do not assert "live."
+- **Demarchy / sortition** (Kleros, Athens model) - the deeper tradition ZAO's peer-rank sits in. Good for Section 3 first-principles.
+
+### Whitepaper & manifesto craft models (solid - direct lessons)
+- **Optimism Working Constitution** - numbered framework, accessible (not legal) language, admits it's experimental (sunset clause) instead of claiming immutability. Lesson: pragmatic humility over false certainty. (Note: contrasts our "mission+creed immutable" - our immutability is values-only, which is defensible; frame it deliberately.)
+- **Optimism OPerating Manual** - pair the constitution with an implementation manual (tables for thresholds/timelines/veto), "Seasons" versioning. Maps to our Technical Whitepaper + living-version design.
+- **ENS Constitution** - scannable enumeration, concrete powers beside principles, italics + parenthetical asides for a conversational tone. Directly matches our "simple + shareable" mandate.
+- **Nouns governance philosophy** - ground governance in shared identity + iconography + narrative, not just mechanics; manifesto-style world-building beats technical docs alone. Backs our manifesto-energy voice.
+- **Bitcoin whitepaper** - lead with the problem, stay focused (9 pages, one core innovation), let elegance speak. Lesson: keep the main doc tight; push depth to the technical doc.
+- **Design manifestos** (Method "Humanifesto", Bruce Mau) - keep manifestos under ~1000 words, active voice ("we believe / we do / we refuse"), community-ownable + versioned. Directly models our signable Manifesto.
+
+**Craft synthesis for our 3-doc split:** ENS + Bitcoin = the "simple main doc" model; Optimism Constitution+Manual = the "living, versioned, main+technical" model; Nouns + design manifestos = the manifesto voice. All four validate the architecture we chose.
 
 ## Open reads queued
 - community/051-zao-whitepaper-2026 (prior whitepaper - reconcile).

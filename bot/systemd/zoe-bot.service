@@ -1,0 +1,18 @@
+[Unit]
+Description=ZOE concierge bot (bot/src/zoe Hermes-brain)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zao-os/bot
+ExecStart=%h/zao-os/bot/node_modules/.bin/tsx %h/zao-os/bot/src/zoe/index.ts
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=%h/zao-os/bot/.env
+Environment=PATH=/home/zaal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

@@ -12,6 +12,11 @@ const querySchema = z.object({
 function escapeCsvValue(value: unknown): string {
   if (value === null || value === undefined) return '';
   const str = String(value);
+  // Prevent spreadsheet formula injection: prefix cells starting with
+  // = + - @ with single quote (treated as literal text by Excel/Sheets)
+  if (str.match(/^[=+\-@]/)) {
+    return `'${str}`;
+  }
   if (str.includes(',') || str.includes('"') || str.includes('\n')) {
     return `"${str.replace(/"/g, '""')}"`;
   }

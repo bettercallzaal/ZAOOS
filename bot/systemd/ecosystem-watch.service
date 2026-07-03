@@ -1,0 +1,6 @@
+[Unit]
+Description=ZAO ecosystem watch - daily repo pulse to Telegram
+[Service]
+Type=oneshot
+Environment=PATH=/home/zaal/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /home/zaal/ecosystem-watch.py

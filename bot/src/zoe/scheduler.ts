@@ -25,6 +25,9 @@ import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from '.
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
+import { runWatcherTick, renderWatcherAlerts } from './watcher';
+import { healFleet } from './fleet-health';
+import { runWorkTick } from './work-loop';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -280,6 +283,53 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       ),
     );
   }
+
+  // Watcher (doc 927) - daily dispatch-health supervisor. Reads the run
+  // telemetry dispatch.ts records and pings Zaal ONLY on a cost / failure /
+  // quality anomaly. Most days it logs 'clean' and stays silent.
+  tasks.push(
+    cron.schedule(
+      '30 8 * * *',
+      async () => {
+        if (!(await claimFire('watcher'))) return;
+        try {
+          const alerts = [...(await runWatcherTick()), ...(await healFleet({ date: new Date().toISOString().slice(0, 10) }))];
+          if (alerts.length) {
+            await opts.bot.api.sendMessage(opts.zaalTgId, renderWatcherAlerts(alerts));
+            console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');
+          } else {
+            console.log('[zoe/scheduler] watcher: clean');
+          }
+        } catch (err) {
+          await releaseFire('watcher');
+          console.error('[zoe/scheduler] watcher failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Work-loop (doc 927) - autonomous research track. Every 2h, pull one
+  // queued research topic and run it through decompose -> dispatch -> doc-PR.
+  // Empty queue = silent. Research-only, daily-capped, file-locked.
+  tasks.push(
+    cron.schedule(
+      '0 */2 * * *',
+      async () => {
+        try {
+          await runWorkTick({
+            sendToZaal: (t: string) => opts.bot.api.sendMessage(opts.zaalTgId, t),
+            zaalTgId: opts.zaalTgId,
+            repoDir: opts.repoDir,
+            currentDate: new Date().toISOString().slice(0, 10),
+          });
+        } catch (err) {
+          console.error('[zoe/scheduler] work-loop tick failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
 
   // Post slate v1 - random 7 pings/day of social-post drafts (build / ecosystem /
   // event / personal). Owns its own state at ~/.zao/zoe/posts/. See posts/README.md.

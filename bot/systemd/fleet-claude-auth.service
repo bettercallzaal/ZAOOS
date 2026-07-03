@@ -1,0 +1,5 @@
+[Unit]
+Description=Check claude CLI auth + alert Zaal on failure
+[Service]
+Type=oneshot
+ExecStart=%h/fleet-heartbeat/claude-auth-check.sh

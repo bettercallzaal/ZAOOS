@@ -72,7 +72,10 @@ export function enqueueTurn(chatId: number, run: TurnFn, hooks?: EnqueueHooks): 
   });
   // The tail must never reject, or the next `.then(run, run)` would still run
   // (fine) but unhandled rejections would surface. Swallow here.
-  q.tail = settled.catch(() => undefined);
+  q.tail = settled.catch((e) => {
+    console.error("[zoe/turn-queue] turn failed:", (e as Error)?.message ?? e);
+    return undefined;
+  });
   return settled;
 }
 

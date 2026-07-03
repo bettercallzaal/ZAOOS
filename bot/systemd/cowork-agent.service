@@ -1,0 +1,18 @@
+[Unit]
+Description=ZAO Cowork agent (@ZAOcoworkingBot) - migrated from 187.77.3.104
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/migrated-cowork/cowork-zaodevz/agent
+ExecStart=%h/migrated-cowork/cowork-zaodevz/agent/node_modules/.bin/tsx %h/migrated-cowork/cowork-zaodevz/agent/src/index.ts
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=%h/migrated-cowork/cowork-zaodevz/agent/.env
+Environment=PATH=/home/zaal/node22/bin:/home/zaal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

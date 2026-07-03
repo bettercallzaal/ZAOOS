@@ -12,6 +12,8 @@ tier: DISPATCH (intended; sub-agents stalled, parent synthesized from code reads
 
 > **Goal:** (A) Slim 2026 agent state-of-the-art synthesis. (B) Methodology PRD for a "100 best practices" list - structure only, no items. (C) Honest gap analysis: where ZOE is today vs ZOE as task-decomposing / agent-spawning / self-reviewing / self-improving orchestrator.
 
+> **STATUS 2026-06-30 (correction):** This doc OVERSTATED the gap. On inspection the orchestrator was already built + wired: decompose -> dispatch -> workers (with a per-worker critic + revision), reflexion (nightly), learn (weekly cron), and the proactive reasoning-tick all run on the VPS. The only genuinely-missing pieces were the **watcher** (shipped, doc 918 + PR #1021) and the **autonomous work-loop** (shipped, PR #1022: `queue: <topic>` -> 2h cron -> doc PR). Treat code as ground truth over this doc.
+
 ## Note on method
 
 3 sub-agents were dispatched in parallel (agent state-of-art, 100-list methodology, Anthropic SDK deep-dive); all 3 stalled on the 600s stream watchdog and returned no synthesis. Parent (Claude Opus 4.7) wrote this doc from direct code reads of `bot/src/zoe/` + `bot/src/hermes/` + the Anthropic agent essay synthesis from training. Cited claims about external frameworks (LangGraph / AutoGen / CrewAI / Letta) are stable patterns at the time of writing and should be re-verified before any framework adoption.

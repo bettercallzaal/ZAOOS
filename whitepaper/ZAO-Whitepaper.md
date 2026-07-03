@@ -82,7 +82,7 @@ Governance is the engine. The point of the engine is what it produces. Work in T
 
 **Builders.** ZABAL Gamez is a three-month build-a-thon where a member who ships one small thing is a real contributor. It runs on the lab: an open-source monorepo where new ZAO tools get prototyped in public before they earn their own home. The bar is one small, shippable move, not a big build.
 
-**Events and festivals.** The network becomes real in a room. The ZAO has produced festivals from NYC to Miami to Denver, and ZAO Stock is the recurring annual gathering. This is where online contribution turns into people standing next to each other.
+**Events and festivals.** The network becomes real in a room. The ZAO has produced festivals from NYC to Miami to Denver, and ZAO Stock is the annual gathering, beginning this year. This is where online contribution turns into people standing next to each other.
 
 **Tools and agents.** ZAO OS is the open-source social client the whole network runs on. The agent stack, ZOE and ZOL and the rest, is the leverage layer: open tools that give one member the reach of a team. This lane is the infrastructure the other three stand on.
 

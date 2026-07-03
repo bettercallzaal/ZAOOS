@@ -9,7 +9,7 @@ original-query: "can we go through all of the x accounts of the links we have to
 tier: DEEP
 ---
 
-# 836 - X Account Mining: The Agent-Patterns the Inbox Authors Are Writing
+# 945 - X Account Mining: The Agent-Patterns the Inbox Authors Are Writing
 
 > **Goal:** Zaal asked to mine the X accounts from the inbox for more articles like the ones he saved. X gated guest-token timelines in 2026 (can't bulk-scrape feeds keyless), so this used semantic search on the high-signal authors + their themes. Three rich clusters surfaced - all directly relevant to ZAO's agent stack.
 

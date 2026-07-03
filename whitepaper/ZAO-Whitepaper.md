@@ -78,14 +78,15 @@ The exact math, the reward curve, the on-chain contracts, and the open questions
 
 Governance is the engine. The point of the engine is what it produces. Work in The ZAO grows in lanes, and a member can plug into any of them.
 
-> Draft note: this section is being finalized against a full audit of the live ecosystem (repositories and shipped products) so every project and its status is accurate. The lanes and flagships below are the shape; the audit fills in the exact roster.
+**Music.** The original lane, and the clearest proof the mission works. WaveWarZ is a music prediction market on Solana where artists battle and fans trade on the outcome. The artist is paid instantly, and roughly ninety-eight cents of every dollar traded stays in the ecosystem rather than going to a middleman. That is the whole thesis running as a real product. Around it sits a roster of independent artists, COC Concertz, and the tools that let a musician own their release, their data, and their audience.
 
-- **Music.** The original lane. WaveWarZ, where artists earn from music battles. COC Concertz. The tools that let a musician own their release, their data, and their audience.
-- **Builders.** ZABAL Gamez, a three-month build-a-thon where a member who ships one small thing is a real contributor. The lab where new ZAO tools are prototyped in the open.
-- **Events and festivals.** ZAOstock and the gatherings the community produces together, where the network becomes real in a room.
-- **Tools and agents.** ZAO OS, the social client the whole network runs on, and the open-source agent stack that gives every member leverage.
+**Builders.** ZABAL Gamez is a three-month build-a-thon where a member who ships one small thing is a real contributor. It runs on the lab: an open-source monorepo where new ZAO tools get prototyped in public before they earn their own home. The bar is one small, shippable move, not a big build.
 
-Each lane is a way to contribute, earn Respect, and move the mission forward. New lanes emerge when members start them.
+**Events and festivals.** The network becomes real in a room. The ZAO has produced festivals from NYC to Miami to Denver, and ZAO Stock is the recurring annual gathering. This is where online contribution turns into people standing next to each other.
+
+**Tools and agents.** ZAO OS is the open-source social client the whole network runs on. The agent stack, ZOE and ZOL and the rest, is the leverage layer: open tools that give one member the reach of a team. This lane is the infrastructure the other three stand on.
+
+Each lane is a way to contribute, earn Respect, and move the mission forward. New lanes emerge when members start them. That is the impact network cultivating itself: the best things here were started by members, not planned from the top.
 
 ---
 

@@ -158,9 +158,12 @@ These are ZAO's real, source-linked traction numbers - the "what we built" spine
 - **Recording plan:** Zaal records it himself (authenticity > polish), 5 chapters: The Why -> The Receipts -> The System -> The Vision -> The Invitation, with a second person asking the skeptic questions.
 
 ## Open reads queued
-- Verify on-chain (needs a chain query, not a fetch): current fractal week count; who drives OREC; confirm the OG address is canonical on Optimism (vs 051's Base label).
-- DONE this tick: Goldman creator-economy figure + major-label share (both VERIFIED above).
-- Reconcile HackMD Draft 3 (hackmd.io/u9jZ5Q1BR_uUwmRuksvF6Q) + WaveWarZ whitepaper (hackmd.io/2DVVvP1oTzCMIqLKRSLgRw) into the new drafts - next external read.
+- **RESOLVED on-chain (2026-07-02):** OG address `0x34cE89...216957` is a LIVE contract on **Optimism** - "ZAO RESPECT TOKEN" (symbol ZAO, ERC-20), created by zaal.eth, deployed ~1yr 338d ago. Confirms the Technical WP; doc 051's "Base" label is an error. Chain question CLOSED.
+- Only two facts still tagged [to verify] in the technical doc, both need a richer chain query (not a single fetch): current fractal week count; who drives OREC (operating-core claim).
+- DONE: Goldman + label share VERIFIED; HackMD Draft 3 + WaveWarZ whitepaper reconciled.
+
+## RESOURCE-GATHERING COMPLETE - pivot to applying
+The gathering phase is done: external creator/label/streaming data VERIFIED; impact-network + fractal precedents + craft models gathered; ZAO's receipts + lanes roster + works-cited mined; prior drafts (051, HackMD Draft 3, WaveWarZ) reconciled; the chain question resolved on-chain. The productive next work is APPLYING these to the drafts: fill the main whitepaper Section 5 (lanes) from the roster above, weave the verified Goldman/Kelly/patronage material into the mission section, and answer the 7 skeptic questions in the honesty section. Only remaining gather item = a live chain query for the week count + OREC operating-core.
 
 ## Prior drafts reconciled (HackMD, fetched 2026-07-02)
 

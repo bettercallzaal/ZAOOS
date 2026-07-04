@@ -18,7 +18,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
-import { startHeartbeat, reportEvent, startCommandPoller, markDone } from '../lib/cowork';
+import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
@@ -806,6 +806,45 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
         ? `Task ${doneCmd[1]} marked done.`
         : `Could not mark ${doneCmd[1]} done: ${'error' in r && r.error ? r.error : 'cowork API not configured'}`,
     );
+    return;
+  }
+
+  // Update task status from TG: "/task 123 blocked - waiting on X",
+  // "task 123 in_progress", "/task #123 todo", etc.
+  // Supports status: blocked, todo, in_progress (maps to WIP), done
+  // Optional note after dash or colon. Fails soft like doneCmd.
+  const taskStatusCmd = /^\/?task\s+#?([\w-]+)\s+(blocked|todo|in_progress|done)(?:\s*[-:]\s*(.+))?$/i.exec(text.trim());
+  if (taskStatusCmd) {
+    const [, id, statusStr, noteText] = taskStatusCmd;
+    const statusMap: Record<string, TaskStatus> = {
+      blocked: 'BLOCKED',
+      todo: 'TODO',
+      in_progress: 'WIP',
+      done: 'DONE',
+    };
+    const mappedStatus = statusMap[statusStr.toLowerCase()];
+    const notes = noteText ? noteText.trim() : undefined;
+    const r = await updateItem(id, { status: mappedStatus, notes });
+    await ctx.reply(
+      r.ok
+        ? `Task ${id} status updated to ${statusStr.toLowerCase()}.${notes ? ` Note: ${notes}` : ''}`
+        : `Could not update ${id}: ${'error' in r && r.error ? r.error : 'cowork API not configured'}`,
+    );
+    return;
+  }
+
+  // List all open team tasks: "/tasks" or "tasks"
+  const tasksCmd = /^\/?tasks\s*$/i.exec(text.trim());
+  if (tasksCmd) {
+    try {
+      const tasks = await getOpenTeamTasks();
+      const formatted = formatTeamTasks(tasks);
+      await replyChunked(ctx, formatted);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[zoe/index] tasks list failed:', msg);
+      await ctx.reply(`Could not fetch tasks: ${msg.slice(0, 100)}`);
+    }
     return;
   }
 

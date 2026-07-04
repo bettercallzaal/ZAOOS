@@ -32,8 +32,33 @@ jobs:
             esac
           done <<< "$files"
           echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
-      - name: Enable auto-merge (squash)
+      - name: Block doc-number collisions
         if: steps.check.outputs.docs_only == 'true'
+        id: collide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # A doc number must be globally unique across research/. If this PR
+          # adds research/<topic>/NNN-slug/ and main already has NNN under a
+          # different slug anywhere, hold the PR for a human instead of merging
+          # a collision (this happened: #1073 duplicated 964).
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
+          newdirs=$(echo "$files" | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u || true)
+          if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)
+          collision=false
+          while IFS= read -r d; do
+            num=$(basename "$d" | grep -oE '^[0-9]+')
+            slug=$(basename "$d")
+            hits=$(echo "$main_dirs" | grep -E "/${num}-" | grep -v "/${slug}$" || true)
+            if [ -n "$hits" ]; then
+              collision=true
+              gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"                 -f body="Auto-merge held: doc number ${num} already exists on main under a different slug: ${hits}. Renumber before merging." >/dev/null
+            fi
+          done <<< "$newdirs"
+          echo "collision=$collision" >> "$GITHUB_OUTPUT"
+      - name: Enable auto-merge (squash)
+        if: steps.check.outputs.docs_only == 'true' && steps.collide.outputs.collision != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

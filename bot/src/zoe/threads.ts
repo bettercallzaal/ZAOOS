@@ -175,7 +175,7 @@ export async function addThread(input: NewThreadInput, now: number = Date.now())
   const t: OpenThread = {
     id: newThreadId(now),
     summary: input.summary.trim(),
-    sourceTurn: input.sourceTurn.slice(0, 500),
+    sourceTurn: input.sourceTurn.slice(0, 1200),
     createdAt: new Date(now).toISOString(),
     dueAt: input.dueAt ?? null,
     status: 'open',

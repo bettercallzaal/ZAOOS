@@ -92,3 +92,4 @@
 | 914 | [research this](./914-research-this/) | DISPATCH | ZOE research: https://www.reddit.com/r/ClaudeCode/s/FmLRNnUvL0 research this |
 | 929 | [Bonfire knowledge-graph admin labeling - what unblocks agent writes (r](./929-bonfire-knowledge-graph-admin-labeling-what-unblocks/) | DISPATCH | ZOE research: Bonfire knowledge-graph admin labeling - what unblocks agent writes (recurring blocker acr |
 | 956 | [YouTube/ZAO growth: What content angle drives highest subscriber conve](./956-youtube-zao-growth-what-content-angle-drives/) | DISPATCH | ZOE research: YouTube/ZAO growth: What content angle drives highest subscriber conversion for a sub-10K  |
+| 964 | [YouTube/ZAO growth: What content funnel converts WaveWarZ Shorts viewe](./964-youtube-zao-growth-what-content-funnel-converts/) | DISPATCH | ZOE research: YouTube/ZAO growth: What content funnel converts WaveWarZ Shorts viewers into recurring li |

@@ -1,0 +1,43 @@
+name: Auto-merge doc-only PRs
+
+# Retrospective fix (2026-07-03): 27 doc PRs piled up when the daily-merge
+# habit lapsed, went stale, and all conflicted. Doc-only PRs (research/** and
+# docs/**) now auto-merge once checks pass. Code PRs still wait for Zaal.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check changed files are docs-only
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
+          echo "$files"
+          docs_only=true
+          while IFS= read -r f; do
+            case "$f" in
+              research/*|docs/*) ;;
+              *) docs_only=false; break ;;
+            esac
+          done <<< "$files"
+          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+      - name: Enable auto-merge (squash)
+        if: steps.check.outputs.docs_only == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} \
+            --repo "${{ github.repository }}" --squash --auto \
+            || gh pr merge ${{ github.event.pull_request.number }} \
+                 --repo "${{ github.repository }}" --squash

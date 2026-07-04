@@ -794,6 +794,21 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     return;
   }
 
+  // Close a cowork tracker task straight from TG: "/done 123", "done #123",
+  // optional note after a dash ("done 123 - shipped in PR #99"). Same
+  // markDone() the control plane uses; fails soft with a clear message when
+  // the cowork API creds (COWORK_API_URL + COWORK_BOT_TOKEN) are missing.
+  const doneCmd = /^\/?done\s+#?([\w-]+)(?:\s*[-:]\s*(.+))?$/i.exec(text.trim());
+  if (doneCmd) {
+    const r = await markDone(doneCmd[1], doneCmd[2] ?? 'closed by Zaal via ZOE');
+    await ctx.reply(
+      r.ok
+        ? `Task ${doneCmd[1]} marked done.`
+        : `Could not mark ${doneCmd[1]} done: ${'error' in r && r.error ? r.error : 'cowork API not configured'}`,
+    );
+    return;
+  }
+
   // doc 796 — phantom-thread undo. "untrack th-... th-..." deletes mis-extracted
   // commitment threads so ZOE never nudges on something Zaal never committed to.
   const untrackMatch = /^untrack\s+(.+)$/i.exec(text.trim());

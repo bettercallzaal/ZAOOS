@@ -9,7 +9,7 @@ original-query: "YouTube/ZAO growth: What content funnel converts WaveWarZ Short
 tier: STANDARD
 ---
 
-# 964 - YouTube/ZAO growth: What content funnel converts WaveWarZ Shorts viewe
+# 965 - YouTube/ZAO growth: What content funnel converts WaveWarZ Shorts viewe
 
 > Drafted by ZOE's research-worker from "YouTube/ZAO growth: What content funnel converts WaveWarZ Shorts viewers into recurring live-battle participants and ZAO community members, and which YouTube formats drive each step of that path most efficiently in 2026?". Auto-committed to main for durability; review + deepen as needed.
 

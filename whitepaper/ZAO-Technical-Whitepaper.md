@@ -91,11 +91,13 @@ The proposal is recorded on-chain and assigned a proposal ID. The OREC contract 
 
 The community now votes:
 
-- **Voting period (48 hours):** Any member with OG Respect can vote YES or NO. Vote weight = their OG balance at the proposal's start block (frozen; prevents double-voting). Anyone can vote, including members not in the breakout group, because anyone can evaluate the group's consensus from the contribution descriptions on-chain.
+- **Voting period (72 hours):** Any member with OG Respect can vote YES or NO. Vote weight = their OG balance at the proposal's start block (frozen; prevents double-voting). Anyone can vote, including members not in the breakout group, because anyone can evaluate the group's consensus from the contribution descriptions on-chain.
 
-- **Veto period (48 hours):** After voting closes, a 48-hour NO-only window opens. Only NO votes are accepted. This is the "challenge period" - a chance for the community to object if the group's consensus seems wrong. If a NO vote arrives during this window, the proposal is blocked and must be resubmitted.
+- **Veto period (72 hours):** After voting closes, a 72-hour NO-only window opens. Only NO votes are accepted. This is the "challenge period" - a chance for the community to object if the group's consensus seems wrong. If a NO vote arrives during this window, the proposal is blocked and must be resubmitted.
 
 This two-window design solves last-minute attacks: someone cannot wait until the final block to dump a surprise NO vote. The veto period is a fixed window, and the community knows when it is coming.
+
+> **On-chain (verified 2026-07-05):** on the Orec executor (`0xcB05F9254765CA521F7698e61E0A6CA6456Be532`, `respectContract` -> OG Respect), `voteLen` and `vetoLen` both read **259,200 seconds = 72 hours** each. Earlier drafts said 48h/48h; the deployed contract is 72h/72h. `minWeight` reads **1000e18 = 1,000 Respect** (the proposal weight threshold), and `maxLiveYesVotes` = 9.
 
 **Phase 6: Execution and Minting (After 96 hours)**
 
@@ -107,7 +109,7 @@ await orclient.execute(proposalId);
 
 The contract checks three conditions:
 
-1. Time: 48 hours of voting + 48 hours of veto have both elapsed.
+1. Time: 72 hours of voting + 72 hours of veto have both elapsed.
 2. Quorum: YES votes total at least 10% of the network's active Respect (a low threshold, by design).
 3. Supermajority: YES weight exceeds twice the NO weight (YES > 2 * NO).
 
@@ -167,7 +169,7 @@ For a breakout group's ranking to result in minted Respect, three conditions mus
 
 1. **Consensus in the room:** 2/3 of the group must agree on each member's rank. If consensus fails on anyone, the entire proposal fails.
 
-2. **Voting quorum:** Total YES votes across the community must reach a minimum weight threshold. ZAO's threshold is 1,000 Respect units (roughly 10% of the active base [to verify on-chain]). This is intentionally low to prevent a passive minority from stalling governance.
+2. **Voting quorum:** Total YES votes across the community must reach a minimum weight threshold. ZAO's threshold is **1,000 Respect units** (on-chain `minWeight` = 1000e18, verified 2026-07-05). That is about 2.6% of total OG supply (38,484); the share of the *active voting* base is higher, since not all holders vote. It is intentionally low to prevent a passive minority from stalling governance.
 
 3. **Supermajority:** YES votes must exceed twice the NO votes: `YES_weight > 2 * NO_weight`. This means:
    - If NO reaches 33% of the weight, the proposal fails (cannot get 2x NO).
@@ -189,8 +191,8 @@ This is the core defense against tyranny: the supermajority rule prevents a 51% 
 The Respect Game runs every week, currently Monday 6pm EST for The ZAO. A single cycle spans 5-6 days:
 
 - **Day 0 (Monday 6pm):** Breakout rooms, sharing, ranking, on-chain submission
-- **Days 0-2:** Voting period (48 hours)
-- **Days 2-4:** Veto period (48 hours)
+- **Days 0-3:** Voting period (72 hours)
+- **Days 3-6:** Veto period (72 hours)
 - **Days 4-5:** Execution window (open until Friday)
 
 Members can participate in multiple groups in a single week if attendance allows. A member's total Respect for the week is the sum of all their ranks across all groups they joined. This is by design: it prevents a "one-shot" mentality and rewards members who show up multiple times.
@@ -211,14 +213,14 @@ This is borrowed from optimistic rollups (L2 blockchain scaling), which assume t
 
 **The Three-Phase Cycle**
 
-1. **Voting Period (48 hours):**
+1. **Voting Period (72 hours):**
    - Proposal is live for YES and NO votes.
    - Vote weight = Respect balance at the proposal creation block (historical snapshot).
    - Any member with OG Respect can vote.
    - Proposer's wallet auto-votes YES upon submission.
    - Gas cost per vote: ~$0.02-0.05 on Optimism (low, accessible).
 
-2. **Veto Period (48 hours):**
+2. **Veto Period (72 hours):**
    - Voting closes; only NO votes are accepted.
    - This is the challenge window: a chance for the community to flag a bad proposal.
    - Prevents surprise attacks (attacker cannot wait until the final block to dump a NO vote).
@@ -337,10 +339,10 @@ Breakout Consensus (off-chain)
   ↓ proposeBreakoutResult()
   ↓ [OREC creates proposal, auto-votes YES]
   ↓
-Community Voting (on-chain, 48h YES/NO)
+Community Voting (on-chain, 72h YES/NO)
   ↓ [YES votes accumulate]
   ↓
-Veto Period (on-chain, 48h NO-only)
+Veto Period (on-chain, 72h NO-only)
   ↓ [Community challenges the result if disagreed]
   ↓
 Execution (open call to execute() function)
@@ -709,7 +711,7 @@ This whitepaper is a living document. The ZAO strives to keep it accurate and to
 |-----------|-------|---------|
 | `voting_period` | 259,200 sec (3 days) | Window for YES/NO votes |
 | `veto_period` | 259,200 sec (3 days) | Window for NO-only veto |
-| `prop_weight_threshold` | 1,000 Respect | Minimum YES weight to be eligible |
+| `prop_weight_threshold` | 1,000 Respect | Minimum YES weight to be eligible (on-chain `minWeight`, verified 2026-07-05) |
 | `supermajority_ratio` | 2x | YES must exceed 2 * NO to pass |
 | `min_quorum_percent` | ~10% | Rough minimum of active base |
 | `respect_source` | OG ERC-20 | Vote weight drawn from this |

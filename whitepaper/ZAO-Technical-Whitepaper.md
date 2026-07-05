@@ -14,7 +14,8 @@
 Two tiers of fact in this draft:
 
 - **Code-verified (2026-07-02, safe):** Respect has no decay today (`vote_weight = Math.round(OG + ZOR)`, a raw sum); the Optimism contract addresses (OG, ZOR, OREC); OG is ERC-20 and ZOR is ERC-1155; the Fibonacci curve (1x 55/34/21/13/8/5, 2x 110/68/42/26/16/10).
-- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the Gini figure (~0.23), the member count (~200), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
+- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the Gini figure (~0.23), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
+- **On-chain Respect holders (verified 2026-07-05):** 156 unique addresses hold ZAO Respect - 122 hold OG Respect (ERC-20, `0x34cE...6957`) and 55 hold ZOR Respect (ERC-1155, `0x9885...445c`), with 21 addresses holding both (122 + 55 - 21 = 156). Source: optimism.blockscout.com. This is the governance-participating count; the broader ZAO community (Discord/social) is larger. Earlier drafts said "~200 members" - that conflated community size with Respect holders. Caveat: addresses are not guaranteed 1:1 with humans, and the set may include a treasury/deployer address; a name-level headcount can refine this.
 
 The monetary-policy section (5) describes a PROPOSAL (doc 941), not current implementation.
 
@@ -473,7 +474,7 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 | Contribution-Based | No | No | No | No | No | Limited | Yes |
 | Time-Based Decay | No | No | Yes | No | No | No | Optional (proposed) |
 | Participation Friction | Low | Medium | Medium | High | Low | Medium | Medium (weekly) |
-| Scale Proven | 10,000+ | 100s-1000s | 100s-1000s | 100s | 100s-1000s | 10,000+ | ~200 (ZAO) [count to verify] |
+| Scale Proven | 10,000+ | 100s-1000s | 100s-1000s | 100s | 100s-1000s | 10,000+ | 156 holders (ZAO) |
 
 *Quadratic voting works only with external identity verification.
 
@@ -495,7 +496,7 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 1. **Participation is demanding.** Weekly synchronous governance asks a lot. Sustained participation is the central risk, not a solved problem.
 
-2. **Scaling is unproven.** ZAO's roughly 200 members [exact count to verify] is proven. Nested fractals (a fractal of fractals) are theory. Scaling past a thousand members is open research.
+2. **Scaling is unproven.** ZAO's 156 on-chain Respect holders (verified on Optimism, see Verification) is proven. Nested fractals (a fractal of fractals) are theory. Scaling past a thousand members is open research.
 
 3. **Visibility bias.** Ranking rewards visible work. Infrastructure and mentorship can be undercounted. Mitigations exist (explicit infrastructure voting criteria, rotating facilitators), but are not perfect.
 
@@ -669,7 +670,7 @@ The ZAO Technical Whitepaper specifies the mechanism, the math, and the on-chain
 
 Respect is soulbound (cannot be transferred), consensus-earned (requires 2/3 group agreement), and immutable on-chain (OG and ZOR). The Respect Game distributes Respect weekly via Fibonacci scoring, using a curve designed to encode human judgment of fairness and prevent gaming. OREC optimistic execution brings consensus to on-chain actions with low gas costs and high accessibility.
 
-The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond a couple hundred members (unproven). But it has been run continuously for over a year of unbroken weekly practice [exact week count to verify], longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
+The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond ~156 Respect holders (unproven). But it has been run continuously for over a year of unbroken weekly practice [exact week count to verify], longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
 
 The decay proposal (documented but not adopted) shows the system is designed to evolve. If the ZAO community votes to weight recent contributions more heavily, they can upgrade the mechanism and log the change as a new version.
 

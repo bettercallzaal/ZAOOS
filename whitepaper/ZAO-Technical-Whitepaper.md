@@ -14,7 +14,7 @@
 Two tiers of fact in this draft:
 
 - **Code-verified (2026-07-02, safe):** Respect has no decay today (`vote_weight = Math.round(OG + ZOR)`, a raw sum); the Optimism contract addresses (OG, ZOR, OREC); OG is ERC-20 and ZOR is ERC-1155; the Fibonacci curve (1x 55/34/21/13/8/5, 2x 110/68/42/26/16/10).
-- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the Gini figure (~0.23), the member count (~200), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
+- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the member count (~200), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
 
 The monetary-policy section (5) describes a PROPOSAL (doc 941), not current implementation.
 
@@ -157,7 +157,12 @@ The phi ratio (1.618, the golden ratio) reflects human judgment of fairness. Whe
 
 **Distribution equality (Gini)**
 
-Research (doc 718b) reports the Fibonacci reward curve produces a Gini coefficient near 0.23, far more equal than token-weighted DAOs (commonly cited at 0.97 and up, dominated by the top few percent). [Figure sourced from 718b; recompute against live on-chain balances before publishing as a headline number.] The direction is not in doubt: peer-ranked Respect distributes far more equally than capital-weighted voting.
+Doc 718b cited a Gini coefficient near 0.23 for a single-round distribution - a modeled figure from external fractal sources, not ZAO's live balances. Recomputed against live on-chain data on 2026-07-05, the honest picture is more nuanced:
+
+- **Cumulative OG Respect holdings (ERC-20, all Fractals to date): Gini approximately 0.73** (122 holders; the top 10 hold about 53% of supply; the top holder about 8%; balances range 5 to 3,094). Lifetime holdings concentrate with tenure, as in any earned-reputation system.
+- **A single Respect Game reward curve (110/68/42/26/16/10): Gini approximately 0.41.** Doc 718b's own analysis notes this drifts to 0.30-0.50 once real attendance varies.
+
+The **direction holds and is the defensible claim**: peer-ranked Respect (approximately 0.73 cumulative) is materially more equal than capital-weighted token voting (commonly 0.97 and up, dominated by the top few percent). But the specific 0.23 headline does not match ZAO's live distribution and should not be published as such - a critic can compute approximately 0.73 directly from the public contract. [Computed 2026-07-05 from optimism.blockscout.com; ZOR ERC-1155 holdings not yet folded in - a combined vote-weight Gini would refine this further.]
 
 ---
 
@@ -487,7 +492,7 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 4. **Longest-proven track record.** ZAO has run 90+ unbroken weeks of Respect Games. Eden on EOS paused in Jan 2026; Optimism Fractal paused indefinitely; ZAO continues weekly. This is the longest-running permissionless fractal anywhere.
 
-5. **Fair distribution.** Respect is distributed far more equally than capital-weighted voting (doc 718b reports a Gini near 0.23 versus 0.97 and up for token DAOs [recompute on live balances before publishing]). No whale can dominate.
+5. **Fair distribution.** Respect is distributed far more equally than capital-weighted voting: cumulative on-chain OG Respect holdings show a Gini of approximately 0.73 (computed 2026-07-05), versus 0.97 and up for token DAOs. (An earlier draft cited 0.23; that was a modeled single-round figure, not the live cumulative distribution - see the Distribution equality section.) No single holder dominates: the top holder has about 8% of supply.
 
 6. **Optional decay.** See Section 5 below. The mechanism can evolve to include reputation decay so recent contributions matter more than tenure.
 

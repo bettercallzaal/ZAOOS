@@ -14,7 +14,7 @@
 Two tiers of fact in this draft:
 
 - **Code-verified (2026-07-02, safe):** Respect has no decay today (`vote_weight = Math.round(OG + ZOR)`, a raw sum); the Optimism contract addresses (OG, ZOR, OREC); OG is ERC-20 and ZOR is ERC-1155; the Fibonacci curve (1x 55/34/21/13/8/5, 2x 110/68/42/26/16/10).
-- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the Gini figure (~0.23), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
+- **Research-sourced, VERIFY before publishing:** every other specific number is drawn from research docs 718a-g and is a lead, not a confirmed fact. This includes the exact OREC period lengths (48h/48h), the quorum threshold (~10% / 1,000 Respect), the week count, the issuance dates (Sept/Dec 2025), and the Fractal-number split (1-73 / 74+). Re-verify each against the live contracts and on-chain data before this document is published or signed.
 - **On-chain Respect holders (verified 2026-07-05):** 156 unique addresses hold ZAO Respect - 122 hold OG Respect (ERC-20, `0x34cE...6957`) and 55 hold ZOR Respect (ERC-1155, `0x9885...445c`), with 21 addresses holding both (122 + 55 - 21 = 156). Source: optimism.blockscout.com. This is the governance-participating count; the broader ZAO community (Discord/social) is larger. Earlier drafts said "~200 members" - that conflated community size with Respect holders. Caveat: addresses are not guaranteed 1:1 with humans, and the set may include a treasury/deployer address; a name-level headcount can refine this.
 
 The monetary-policy section (5) describes a PROPOSAL (doc 941), not current implementation.
@@ -29,9 +29,9 @@ It is not money. You cannot buy it, sell it, or trade it. It cannot be transferr
 
 Respect comes in two forms:
 
-- **OG Respect (ERC-20)** - the historical ledger. Issued from the ZAO's founding through September 2025 (Fractals 1-73). A record of early recognition: founding contributions, content features, artist awards, and mentor acknowledgment. OG is frozen as of December 2025; no new OG is minted. It lives on Optimism at address `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. All OG balances at any point in history grant voting weight in OREC proposals.
+- **OG Respect (ERC-20)** - the historical ledger. Minted from July 2024 through December 2025 (Fractals 1-73; first mint 2024-07-30, last mint 2025-12-09, verified on-chain). A record of early recognition: founding contributions, content features, artist awards, and mentor acknowledgment. OG is frozen; no new OG is minted. It lives on Optimism at address `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. All OG balances at any point in history grant voting weight in OREC proposals.
 
-- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting September 2025 (Fractals 74+) via the OREC optimistic execution contract. One token per award, minted with session metadata (week, breakout group, rank). Vote weight is the sum of OG and ZOR balances (see the formula below, code-verified), so both the historical ledger and the living ledger count toward governance. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
+- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting October 2025 (Fractals 74+; first mint 2025-10-16, verified on-chain) via the OREC optimistic execution contract. OG and ZOR overlapped for the roughly two-month transition (October to December 2025) before OG froze. One token per award, minted with session metadata (week, breakout group, rank). Vote weight is the sum of OG and ZOR balances (see the formula below, code-verified), so both the historical ledger and the living ledger count toward governance. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
 
 **Only humans can earn Respect.** Agents, bots, contracts, and organizational accounts cannot participate in the Respect Game and cannot be assigned Respect. Agents are members' tools and the network's infrastructure. Membership and governance are human-only.
 
@@ -92,11 +92,13 @@ The proposal is recorded on-chain and assigned a proposal ID. The OREC contract 
 
 The community now votes:
 
-- **Voting period (48 hours):** Any member with OG Respect can vote YES or NO. Vote weight = their OG balance at the proposal's start block (frozen; prevents double-voting). Anyone can vote, including members not in the breakout group, because anyone can evaluate the group's consensus from the contribution descriptions on-chain.
+- **Voting period (72 hours):** Any member with OG Respect can vote YES or NO. Vote weight = their OG balance at the proposal's start block (frozen; prevents double-voting). Anyone can vote, including members not in the breakout group, because anyone can evaluate the group's consensus from the contribution descriptions on-chain.
 
-- **Veto period (48 hours):** After voting closes, a 48-hour NO-only window opens. Only NO votes are accepted. This is the "challenge period" - a chance for the community to object if the group's consensus seems wrong. If a NO vote arrives during this window, the proposal is blocked and must be resubmitted.
+- **Veto period (72 hours):** After voting closes, a 72-hour NO-only window opens. Only NO votes are accepted. This is the "challenge period" - a chance for the community to object if the group's consensus seems wrong. If a NO vote arrives during this window, the proposal is blocked and must be resubmitted.
 
 This two-window design solves last-minute attacks: someone cannot wait until the final block to dump a surprise NO vote. The veto period is a fixed window, and the community knows when it is coming.
+
+> **On-chain (verified 2026-07-05):** on the Orec executor (`0xcB05F9254765CA521F7698e61E0A6CA6456Be532`, `respectContract` -> OG Respect), `voteLen` and `vetoLen` both read **259,200 seconds = 72 hours** each. Earlier drafts said 48h/48h; the deployed contract is 72h/72h. `minWeight` reads **1000e18 = 1,000 Respect** (the proposal weight threshold), and `maxLiveYesVotes` = 9.
 
 **Phase 6: Execution and Minting (After 96 hours)**
 
@@ -108,7 +110,7 @@ await orclient.execute(proposalId);
 
 The contract checks three conditions:
 
-1. Time: 48 hours of voting + 48 hours of veto have both elapsed.
+1. Time: 72 hours of voting + 72 hours of veto have both elapsed.
 2. Quorum: YES votes total at least 10% of the network's active Respect (a low threshold, by design).
 3. Supermajority: YES weight exceeds twice the NO weight (YES > 2 * NO).
 
@@ -158,7 +160,12 @@ The phi ratio (1.618, the golden ratio) reflects human judgment of fairness. Whe
 
 **Distribution equality (Gini)**
 
-Research (doc 718b) reports the Fibonacci reward curve produces a Gini coefficient near 0.23, far more equal than token-weighted DAOs (commonly cited at 0.97 and up, dominated by the top few percent). [Figure sourced from 718b; recompute against live on-chain balances before publishing as a headline number.] The direction is not in doubt: peer-ranked Respect distributes far more equally than capital-weighted voting.
+Doc 718b cited a Gini coefficient near 0.23 for a single-round distribution - a modeled figure from external fractal sources, not ZAO's live balances. Recomputed against live on-chain data on 2026-07-05, the honest picture is more nuanced:
+
+- **Cumulative OG Respect holdings (ERC-20, all Fractals to date): Gini approximately 0.73** (122 holders; the top 10 hold about 53% of supply; the top holder about 8%; balances range 5 to 3,094). Lifetime holdings concentrate with tenure, as in any earned-reputation system.
+- **A single Respect Game reward curve (110/68/42/26/16/10): Gini approximately 0.41.** Doc 718b's own analysis notes this drifts to 0.30-0.50 once real attendance varies.
+
+The **direction holds and is the defensible claim**: peer-ranked Respect (approximately 0.73 cumulative) is materially more equal than capital-weighted token voting (commonly 0.97 and up, dominated by the top few percent). But the specific 0.23 headline does not match ZAO's live distribution and should not be published as such - a critic can compute approximately 0.73 directly from the public contract. [Computed 2026-07-05 from optimism.blockscout.com; ZOR ERC-1155 holdings not yet folded in - a combined vote-weight Gini would refine this further.]
 
 ---
 
@@ -168,7 +175,7 @@ For a breakout group's ranking to result in minted Respect, three conditions mus
 
 1. **Consensus in the room:** 2/3 of the group must agree on each member's rank. If consensus fails on anyone, the entire proposal fails.
 
-2. **Voting quorum:** Total YES votes across the community must reach a minimum weight threshold. ZAO's threshold is 1,000 Respect units (roughly 10% of the active base [to verify on-chain]). This is intentionally low to prevent a passive minority from stalling governance.
+2. **Voting quorum:** Total YES votes across the community must reach a minimum weight threshold. ZAO's threshold is **1,000 Respect units** (on-chain `minWeight` = 1000e18, verified 2026-07-05). That is about 2.6% of total OG supply (38,484); the share of the *active voting* base is higher, since not all holders vote. It is intentionally low to prevent a passive minority from stalling governance.
 
 3. **Supermajority:** YES votes must exceed twice the NO votes: `YES_weight > 2 * NO_weight`. This means:
    - If NO reaches 33% of the weight, the proposal fails (cannot get 2x NO).
@@ -190,8 +197,8 @@ This is the core defense against tyranny: the supermajority rule prevents a 51% 
 The Respect Game runs every week, currently Monday 6pm EST for The ZAO. A single cycle spans 5-6 days:
 
 - **Day 0 (Monday 6pm):** Breakout rooms, sharing, ranking, on-chain submission
-- **Days 0-2:** Voting period (48 hours)
-- **Days 2-4:** Veto period (48 hours)
+- **Days 0-3:** Voting period (72 hours)
+- **Days 3-6:** Veto period (72 hours)
 - **Days 4-5:** Execution window (open until Friday)
 
 Members can participate in multiple groups in a single week if attendance allows. A member's total Respect for the week is the sum of all their ranks across all groups they joined. This is by design: it prevents a "one-shot" mentality and rewards members who show up multiple times.
@@ -212,14 +219,14 @@ This is borrowed from optimistic rollups (L2 blockchain scaling), which assume t
 
 **The Three-Phase Cycle**
 
-1. **Voting Period (48 hours):**
+1. **Voting Period (72 hours):**
    - Proposal is live for YES and NO votes.
    - Vote weight = Respect balance at the proposal creation block (historical snapshot).
    - Any member with OG Respect can vote.
    - Proposer's wallet auto-votes YES upon submission.
    - Gas cost per vote: ~$0.02-0.05 on Optimism (low, accessible).
 
-2. **Veto Period (48 hours):**
+2. **Veto Period (72 hours):**
    - Voting closes; only NO votes are accepted.
    - This is the challenge window: a chance for the community to flag a bad proposal.
    - Prevents surprise attacks (attacker cannot wait until the final block to dump a NO vote).
@@ -253,7 +260,7 @@ ZAO maintains two separate Respect token contracts to preserve history while ena
 | Address | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` (Optimism) |
 | Standard | ERC-20 (soulbound variant) |
 | Total Supply | ~38,484 ZAO (as of May 2026) |
-| Status | Frozen (no new mints since Dec 2025) |
+| Status | Frozen (last mint 2025-12-09, verified on-chain) |
 | Transfer | Reverts (soulbound; all transfers blocked at contract level) |
 | Use | Historical ledger (Fractals 1-73, pre-ORDAO era) |
 | Vote Weight | OG balance grants full voting power in OREC, read at proposal block |
@@ -338,10 +345,10 @@ Breakout Consensus (off-chain)
   ↓ proposeBreakoutResult()
   ↓ [OREC creates proposal, auto-votes YES]
   ↓
-Community Voting (on-chain, 48h YES/NO)
+Community Voting (on-chain, 72h YES/NO)
   ↓ [YES votes accumulate]
   ↓
-Veto Period (on-chain, 48h NO-only)
+Veto Period (on-chain, 72h NO-only)
   ↓ [Community challenges the result if disagreed]
   ↓
 Execution (open call to execute() function)
@@ -486,9 +493,9 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 3. **Small-group consensus.** 3-6 person groups with 2/3 majority rules force genuine deliberation. This is proven effective in citizens' assemblies and Dunbar-limited collaboration.
 
-4. **Longest-proven track record.** ZAO has run 90+ unbroken weeks of Respect Games. Eden on EOS paused in Jan 2026; Optimism Fractal paused indefinitely; ZAO continues weekly. This is the longest-running permissionless fractal anywhere.
+4. **Longest-proven track record.** ZAO has run 100+ unbroken weeks of Respect Games (roughly 101 weeks since the first issuance on 2024-07-30). Eden on EOS paused in Jan 2026; Optimism Fractal paused indefinitely; ZAO continues weekly. This is the longest-running permissionless fractal anywhere.
 
-5. **Fair distribution.** Respect is distributed far more equally than capital-weighted voting (doc 718b reports a Gini near 0.23 versus 0.97 and up for token DAOs [recompute on live balances before publishing]). No whale can dominate.
+5. **Fair distribution.** Respect is distributed far more equally than capital-weighted voting: cumulative on-chain OG Respect holdings show a Gini of approximately 0.73 (computed 2026-07-05), versus 0.97 and up for token DAOs. (An earlier draft cited 0.23; that was a modeled single-round figure, not the live cumulative distribution - see the Distribution equality section.) No single holder dominates: the top holder has about 8% of supply.
 
 6. **Optional decay.** See Section 5 below. The mechanism can evolve to include reputation decay so recent contributions matter more than tenure.
 
@@ -500,7 +507,25 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 3. **Visibility bias.** Ranking rewards visible work. Infrastructure and mentorship can be undercounted. Mitigations exist (explicit infrastructure voting criteria, rotating facilitators), but are not perfect.
 
-4. **Operating-core concentration.** Currently, 2-3 wallets drive most OREC proposals. "All members submit on-chain" is a goal, not a finished fact.
+4. **Operating-core concentration.** Of the 130 OREC proposals to date, only **4 wallets have ever submitted one**, and a single relayer wallet submitted **94%** (top 3 = 99%; verified on-chain 2026-07-05). "All members submit on-chain" is a goal, not a finished fact.
+
+---
+
+### 4.8 Frontier Alignments: Ethereum Research Not Yet in ZAO
+
+Sections 4.1-4.6 evaluated governance models ZAO deliberately did **not** adopt. This section records the opposite: mechanisms from Ethereum public-goods research (much of it Vitalik Buterin's) that ZAO does **not** yet use but that map cleanly onto problems the sections above already name as open. These are considered directions, not committed changes. Each is grounded in a shipped external system and cross-linked to the ZAO limitation it would address. Full analysis: research doc 967.
+
+**What ZAO already embodies from this research.** Before listing gaps, the honest accounting: Respect is a soulbound token (the DeSoc / "Decentralized Society" thesis, Weyl-Ohlhaver-Buterin 2022), earned not bought; the contribution-over-capital creed is a direct implementation of "moving beyond coin voting" (Buterin 2021); governance is human-only and consensus-driven. ZAO is already a live cultural implementation of this body of work for musicians. The items below are refinements at the edges, not a redirection.
+
+**1. Retroactive recognition (RetroPGF pattern) - addresses the visibility-bias limitation.** Section 4.7 limitation #3 and Section 6 both name the same weakness: the weekly Respect Game rewards *visible* work, so quiet infrastructure and mentorship get undercounted, and a three-minute share cannot capture a quarter of maintenance. Optimism's Retroactive Public Goods Funding answers exactly this - it is easier to agree on what *was* valuable than to predict what *will* be. A ZAO analogue: a periodic (e.g. annual) retrospective round where the community recognizes shipped projects, performances, and organizing from the past cycle, allocating a Respect bonus by ranked consensus. This is additive to the weekly game, not a replacement, and it gives async and infrastructure builders a path the synchronous call structurally misses. Precedent: Optimism RetroPGF distributed over $100M across rounds. Open risk: same recipients every cycle - mitigate with a repeat cooldown.
+
+**2. Private ranking to harden collusion defense (MACI) - extends Section 6.** Section 6 covers Sybil and collusion defense through social/consensus resistance. One tool it does not yet consider is cryptographic: MACI (Minimal Anti-Collusion Infrastructure, Buterin + Ethereum PSE) lets participants submit votes encrypted, with a zero-knowledge proof that the tally is correct, so no one can *prove to a briber* how they voted. For ZAO, weekly ranks could be submitted privately with a proof that 2/3 consensus was reached, publishing only the final result. This removes visible vote-trading and in-group social pressure while keeping the public outcome. It is heavier infrastructure; listed as a defense-in-depth option, not a near-term need at ~200 members.
+
+**3. Conviction on Respect, not capital - answers Section 4.3's objection to conviction voting.** Section 4.3 rejects conviction voting because it "still requires capital (tokens) to participate." That objection is specific to *capital-locked* conviction. A ZAO-native variant sidesteps it: weight a member's OREC vote by how long they lock **Active Respect** (earned, not bought), not tokens. Long-committed contributors outweigh transient ones without reintroducing capital. This composes with the decay proposal in Section 5 (Banked/Active), where the Active/locked distinction already exists. Considered, not adopted; depends on the decay decision (doc 941) landing first.
+
+**4. Quadratic funding for the ZAO Fund - a treasury tool, distinct from Section 4.2's governance analysis.** Section 4.2 correctly dismisses quadratic *voting* for on-chain governance (Sybil-broken without external identity). Quadratic *funding* for discretionary **treasury allocation** is a different application: many small backers outweigh one large one, so the Fund follows network taste, not only a single curator. The Section 4.2 Sybil objection is real and would have to be answered by Respect-gating contributions (only Respect-holders can back) plus per-member caps plus, optionally, the MACI layer above - identity ZAO already has internally, which the permissionless case lacks. Precedent: Gitcoin Grants, over $20M via QF. Considered for the Fund only, never for core governance.
+
+**Open questions for the community (not decided here).** Two of these - conviction-on-Respect (3) and quadratic funding (4) - are less synchronous than the weekly in-person Fractal, which is the heart of the model. Whether they fit ZAO's culture or dilute its synchronous core is a genuine open question, flagged for community deliberation, not resolved by this appendix. Retroactive recognition (1) is the most culturally aligned and lowest-risk of the four.
 
 ---
 
@@ -563,7 +588,7 @@ Gate POIDH bounty judging by Active Respect (for example, a Curator tier and up)
 
 ### 5.7 The one implementation unblock (not a vote)
 
-Today only a few wallets can submit breakout results on-chain, because of gas friction on `OREC.proposeBreakoutResult()` [current submitter count to verify on-chain]. A gas-free relayer submit button in ZAO OS would let every member submit, a prerequisite for the multi-signal model above.
+Today only a few wallets can submit breakout results on-chain, because of gas friction on `OREC.proposeBreakoutResult()`: of 130 proposals to date, exactly **4 wallets have ever submitted**, and one relayer wallet handles **94%** of them (verified on-chain 2026-07-05). A gas-free relayer submit button in ZAO OS would let every member submit, a prerequisite for the multi-signal model above.
 
 ### 5.8 Status: proposed, not adopted
 
@@ -614,7 +639,7 @@ Fake accounts cannot sell or transfer Respect to real accounts. All Respect earn
 
 **Layer 5: Two-wallet operating core concentration (current) / all-members-on-chain (goal).**
 
-Currently, most OREC proposals are submitted by 2-3 wallets. This small group can veto bad proposals (and has, informally). The goal is "all members on-chain," where hundreds of wallets are eligible to submit. This distributes power and makes coordination harder.
+Currently, **94% of the 130 OREC proposals** to date were submitted by a single relayer wallet, with just 4 wallets ever having submitted (verified on-chain 2026-07-05). This small group can veto bad proposals (and has, informally). The goal is "all members on-chain," where hundreds of wallets are eligible to submit. This distributes power and makes coordination harder.
 
 **Cost (current):** An attacker must influence 2 wallets to approve proposals; 2 humans is breakable.
 
@@ -658,7 +683,7 @@ Assume an attacker wants to get 10 fake accounts to rank 1 status (high Respect)
 
 **Visibility bias:** Obvious, loud work (social posts, events, visible shipping) is easier to rank than quiet work (database maintenance, behind-the-scenes mentorship). Mitigation: explicit criteria like "infrastructure contribution" and rotating facilitators to bring different perspectives. This is incomplete; the proposal in section 5.2 (multi-signal participation) addresses it.
 
-**Operating-core concentration (current):** Only 2-3 wallets have submitted most OREC proposals. They are not acting as dictators (proposals are genuine breakout group rankings), but they are a bottleneck. Mitigation: educating members on how to submit proposals, low-friction tools, lowering gas costs. Goal: "all members on-chain."
+**Operating-core concentration (current):** Only **4 wallets have ever submitted** OREC proposals, and one relayer accounts for **94%** of the 130 to date (verified on-chain 2026-07-05). They are not acting as dictators (proposals are genuine breakout group rankings), but the submission path is a bottleneck. Mitigation: educating members on how to submit proposals, low-friction tools, lowering gas costs. Goal: "all members on-chain."
 
 **Newcomer cold start:** A brand-new member starts with zero Respect (no voting power) and must wait weeks to accumulate. This creates an insider advantage. Mitigation: The Respect Game is weekly; after 4-5 weeks of participation, a newcomer can have 200-400 Respect (enough to participate in governance). Bootstrap programs (mentorship, initial Respect grants, "new member circle") can accelerate on-boarding.
 
@@ -670,7 +695,7 @@ The ZAO Technical Whitepaper specifies the mechanism, the math, and the on-chain
 
 Respect is soulbound (cannot be transferred), consensus-earned (requires 2/3 group agreement), and immutable on-chain (OG and ZOR). The Respect Game distributes Respect weekly via Fibonacci scoring, using a curve designed to encode human judgment of fairness and prevent gaming. OREC optimistic execution brings consensus to on-chain actions with low gas costs and high accessibility.
 
-The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond ~156 Respect holders (unproven). But it has been run continuously for over a year of unbroken weekly practice [exact week count to verify], longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
+The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond ~156 Respect holders (unproven). But it has been run continuously for roughly 101 unbroken weeks (since 2024-07-30) - about two years of weekly practice - longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
 
 The decay proposal (documented but not adopted) shows the system is designed to evolve. If the ZAO community votes to weight recent contributions more heavily, they can upgrade the mechanism and log the change as a new version.
 
@@ -692,7 +717,7 @@ This whitepaper is a living document. The ZAO strives to keep it accurate and to
 |-----------|-------|---------|
 | `voting_period` | 259,200 sec (3 days) | Window for YES/NO votes |
 | `veto_period` | 259,200 sec (3 days) | Window for NO-only veto |
-| `prop_weight_threshold` | 1,000 Respect | Minimum YES weight to be eligible |
+| `prop_weight_threshold` | 1,000 Respect | Minimum YES weight to be eligible (on-chain `minWeight`, verified 2026-07-05) |
 | `supermajority_ratio` | 2x | YES must exceed 2 * NO to pass |
 | `min_quorum_percent` | ~10% | Rough minimum of active base |
 | `respect_source` | OG ERC-20 | Vote weight drawn from this |

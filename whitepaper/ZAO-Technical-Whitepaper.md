@@ -501,7 +501,7 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 3. **Visibility bias.** Ranking rewards visible work. Infrastructure and mentorship can be undercounted. Mitigations exist (explicit infrastructure voting criteria, rotating facilitators), but are not perfect.
 
-4. **Operating-core concentration.** Currently, 2-3 wallets drive most OREC proposals. "All members submit on-chain" is a goal, not a finished fact.
+4. **Operating-core concentration.** Of the 130 OREC proposals to date, only **4 wallets have ever submitted one**, and a single relayer wallet submitted **94%** (top 3 = 99%; verified on-chain 2026-07-05). "All members submit on-chain" is a goal, not a finished fact.
 
 ---
 
@@ -582,7 +582,7 @@ Gate POIDH bounty judging by Active Respect (for example, a Curator tier and up)
 
 ### 5.7 The one implementation unblock (not a vote)
 
-Today only a few wallets can submit breakout results on-chain, because of gas friction on `OREC.proposeBreakoutResult()` [current submitter count to verify on-chain]. A gas-free relayer submit button in ZAO OS would let every member submit, a prerequisite for the multi-signal model above.
+Today only a few wallets can submit breakout results on-chain, because of gas friction on `OREC.proposeBreakoutResult()`: of 130 proposals to date, exactly **4 wallets have ever submitted**, and one relayer wallet handles **94%** of them (verified on-chain 2026-07-05). A gas-free relayer submit button in ZAO OS would let every member submit, a prerequisite for the multi-signal model above.
 
 ### 5.8 Status: proposed, not adopted
 
@@ -633,7 +633,7 @@ Fake accounts cannot sell or transfer Respect to real accounts. All Respect earn
 
 **Layer 5: Two-wallet operating core concentration (current) / all-members-on-chain (goal).**
 
-Currently, most OREC proposals are submitted by 2-3 wallets. This small group can veto bad proposals (and has, informally). The goal is "all members on-chain," where hundreds of wallets are eligible to submit. This distributes power and makes coordination harder.
+Currently, **94% of the 130 OREC proposals** to date were submitted by a single relayer wallet, with just 4 wallets ever having submitted (verified on-chain 2026-07-05). This small group can veto bad proposals (and has, informally). The goal is "all members on-chain," where hundreds of wallets are eligible to submit. This distributes power and makes coordination harder.
 
 **Cost (current):** An attacker must influence 2 wallets to approve proposals; 2 humans is breakable.
 
@@ -677,7 +677,7 @@ Assume an attacker wants to get 10 fake accounts to rank 1 status (high Respect)
 
 **Visibility bias:** Obvious, loud work (social posts, events, visible shipping) is easier to rank than quiet work (database maintenance, behind-the-scenes mentorship). Mitigation: explicit criteria like "infrastructure contribution" and rotating facilitators to bring different perspectives. This is incomplete; the proposal in section 5.2 (multi-signal participation) addresses it.
 
-**Operating-core concentration (current):** Only 2-3 wallets have submitted most OREC proposals. They are not acting as dictators (proposals are genuine breakout group rankings), but they are a bottleneck. Mitigation: educating members on how to submit proposals, low-friction tools, lowering gas costs. Goal: "all members on-chain."
+**Operating-core concentration (current):** Only **4 wallets have ever submitted** OREC proposals, and one relayer accounts for **94%** of the 130 to date (verified on-chain 2026-07-05). They are not acting as dictators (proposals are genuine breakout group rankings), but the submission path is a bottleneck. Mitigation: educating members on how to submit proposals, low-friction tools, lowering gas costs. Goal: "all members on-chain."
 
 **Newcomer cold start:** A brand-new member starts with zero Respect (no voting power) and must wait weeks to accumulate. This creates an insider advantage. Mitigation: The Respect Game is weekly; after 4-5 weeks of participation, a newcomer can have 200-400 Respect (enough to participate in governance). Bootstrap programs (mentorship, initial Respect grants, "new member circle") can accelerate on-boarding.
 

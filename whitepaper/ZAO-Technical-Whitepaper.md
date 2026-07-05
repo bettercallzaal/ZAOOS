@@ -28,9 +28,9 @@ It is not money. You cannot buy it, sell it, or trade it. It cannot be transferr
 
 Respect comes in two forms:
 
-- **OG Respect (ERC-20)** - the historical ledger. Issued from the ZAO's founding through September 2025 (Fractals 1-73). A record of early recognition: founding contributions, content features, artist awards, and mentor acknowledgment. OG is frozen as of December 2025; no new OG is minted. It lives on Optimism at address `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. All OG balances at any point in history grant voting weight in OREC proposals.
+- **OG Respect (ERC-20)** - the historical ledger. Minted from July 2024 through December 2025 (Fractals 1-73; first mint 2024-07-30, last mint 2025-12-09, verified on-chain). A record of early recognition: founding contributions, content features, artist awards, and mentor acknowledgment. OG is frozen; no new OG is minted. It lives on Optimism at address `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. All OG balances at any point in history grant voting weight in OREC proposals.
 
-- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting September 2025 (Fractals 74+) via the OREC optimistic execution contract. One token per award, minted with session metadata (week, breakout group, rank). Vote weight is the sum of OG and ZOR balances (see the formula below, code-verified), so both the historical ledger and the living ledger count toward governance. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
+- **ZOR Respect (ERC-1155)** - the living ledger. Issued weekly starting October 2025 (Fractals 74+; first mint 2025-10-16, verified on-chain) via the OREC optimistic execution contract. OG and ZOR overlapped for the roughly two-month transition (October to December 2025) before OG froze. One token per award, minted with session metadata (week, breakout group, rank). Vote weight is the sum of OG and ZOR balances (see the formula below, code-verified), so both the historical ledger and the living ledger count toward governance. ZOR lives on Optimism at address `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`.
 
 **Only humans can earn Respect.** Agents, bots, contracts, and organizational accounts cannot participate in the Respect Game and cannot be assigned Respect. Agents are members' tools and the network's infrastructure. Membership and governance are human-only.
 
@@ -252,7 +252,7 @@ ZAO maintains two separate Respect token contracts to preserve history while ena
 | Address | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` (Optimism) |
 | Standard | ERC-20 (soulbound variant) |
 | Total Supply | ~38,484 ZAO (as of May 2026) |
-| Status | Frozen (no new mints since Dec 2025) |
+| Status | Frozen (last mint 2025-12-09, verified on-chain) |
 | Transfer | Reverts (soulbound; all transfers blocked at contract level) |
 | Use | Historical ledger (Fractals 1-73, pre-ORDAO era) |
 | Vote Weight | OG balance grants full voting power in OREC, read at proposal block |
@@ -485,7 +485,7 @@ Fractal governance is not the only approach to DAO governance. It has specific t
 
 3. **Small-group consensus.** 3-6 person groups with 2/3 majority rules force genuine deliberation. This is proven effective in citizens' assemblies and Dunbar-limited collaboration.
 
-4. **Longest-proven track record.** ZAO has run 90+ unbroken weeks of Respect Games. Eden on EOS paused in Jan 2026; Optimism Fractal paused indefinitely; ZAO continues weekly. This is the longest-running permissionless fractal anywhere.
+4. **Longest-proven track record.** ZAO has run 100+ unbroken weeks of Respect Games (roughly 101 weeks since the first issuance on 2024-07-30). Eden on EOS paused in Jan 2026; Optimism Fractal paused indefinitely; ZAO continues weekly. This is the longest-running permissionless fractal anywhere.
 
 5. **Fair distribution.** Respect is distributed far more equally than capital-weighted voting (doc 718b reports a Gini near 0.23 versus 0.97 and up for token DAOs [recompute on live balances before publishing]). No whale can dominate.
 
@@ -669,7 +669,7 @@ The ZAO Technical Whitepaper specifies the mechanism, the math, and the on-chain
 
 Respect is soulbound (cannot be transferred), consensus-earned (requires 2/3 group agreement), and immutable on-chain (OG and ZOR). The Respect Game distributes Respect weekly via Fibonacci scoring, using a curve designed to encode human judgment of fairness and prevent gaming. OREC optimistic execution brings consensus to on-chain actions with low gas costs and high accessibility.
 
-The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond a couple hundred members (unproven). But it has been run continuously for over a year of unbroken weekly practice [exact week count to verify], longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
+The architecture is not perfect. It demands weekly participation (a real constraint). It has visibility bias and operating-core concentration (real limitations). It has not been scaled beyond a couple hundred members (unproven). But it has been run continuously for roughly 101 unbroken weeks (since 2024-07-30) - about two years of weekly practice - longer than any other permissionless fractal we know of. It distributes far more equally than capital-weighted voting. And it is governed by the community, not controlled by capital.
 
 The decay proposal (documented but not adopted) shows the system is designed to evolve. If the ZAO community votes to weight recent contributions more heavily, they can upgrade the mechanism and log the change as a new version.
 

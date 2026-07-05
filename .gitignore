@@ -112,3 +112,4 @@ tmp/
 # estate-control-plane generated artifacts
 tools/estate-control-plane/estate-report.json
 .estate-scan-stamp
+.env*

@@ -392,3 +392,25 @@ This doc connects to the codebase through:
 - [ZABAL on BaseScan](https://basescan.org/token/0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07)
 - [ZABAL Update 3 on Paragraph](https://paragraph.com/@thezao/zabal-update-3)
 - [Incented Docs](https://docs.incented.co)
+
+---
+
+## Engineering Wins (appended 2026-06-30)
+
+Doc 241 under-weighted the engineering shipped in Q1. Git shows 901 commits from repo start (2026-03-12) to March 31, all collapsed above into win #8 "Shipped ZAO OS". The real Q1 build, for the record:
+
+- Gated Farcaster client MVP: SIWN auth, managed signer, Mini App support, thread drawer, cast composition (Mar 12)
+- Phase 2 music player: SoundCloud / Spotify / YouTube / Sound.xyz providers, shuffle/repeat, auto-play (Mar 13)
+- XMTP encrypted DMs + group chats, wallet-first auth (SIWE + Farcaster parallel flows) (Mar 14-16)
+- Governance foundations: proposal UI, on-chain voting, Snapshot, Hats Protocol access control (Mar 14-16)
+- Admin dashboard: 8 features (audit log, CSV/JSON export, broadcast API, health snapshots, onboarding funnel, dormant alerts, quick stats, missing-FIDs) (Mar 22-25)
+- Spaces streaming infra: Twitch/Kick/Facebook OAuth, audio rooms (Stream.io + 100ms), DJ mode, scheduled rooms, reactions, hand raise (Mar 25-27)
+- Member profiles + directory + CRM + data-health reporting (Mar 25-30)
+- Community analytics: engagement heatmap, who's-online, member map, force graph, leaderboards (Mar 28-30)
+- Cross-platform publishing: Lens V3 SDK, Bluesky Phase 3, universal Share-to-Farcaster (8 templates), Hive/Mastodon/Nostr (Mar 22-30)
+- PWA: service worker, push, install prompt, Media Session, wake lock (Mar 22-24)
+- Web3: ENS subnames (NameStone), Arweave uploads (ArDrive Turbo), tipping, ZOUNZ auction widget (Mar 22-24)
+- Observability: PostHog, Sentry (client/server/edge) (Mar 22-30)
+- Quality: 248-test suite, CI green, CSP hardening, secret scrub, fixed 7 critical/high + 15 medium + 14 a11y issues (Mar 30)
+
+Total Q1 commits: 901. See sequel [Doc 928 - Q2 2026 Big Wins](../928-q2-2026-big-wins/).

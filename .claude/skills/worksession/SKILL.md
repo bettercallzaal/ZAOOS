@@ -65,7 +65,13 @@ Run these steps in order:
    - Prefix `ws/` makes session branches identifiable
    - **NEVER reuse another session's branch.** Always create a fresh one.
 
-5. **Confirm:**
+5. **Board pickup (build-dispatch consumer):** check the cowork tracker for queued build asks and offer to start one:
+   ```bash
+   ~/bin/zao-tracker search "[build]" --status todo --limit 5 2>/dev/null || true
+   ```
+   If any `[build]` or P1 rows exist, list them and ask Zaal: "Pick one up this session?" This is the pickup side of ZOE's build-dispatch - Zaal TGs ZOE a build ask, ZOE puts it on the board, the next worksession offers it. Skip silently if the tracker env is not loaded.
+
+6. **Confirm:**
    > "Session `ws/<name>` created at `../worktrees/<name>/`. Ready to work."
 
 ## End of Session (PR Workflow)

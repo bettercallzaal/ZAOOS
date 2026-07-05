@@ -73,6 +73,7 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { dispatchPlan } from './dispatch';
+import { commitResearchDoc } from './research-doc';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -1057,6 +1058,18 @@ async function dispatchConcierge(
       replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
     });
 
+    // Inline research -> durable doc on main (closes the gap where research
+    // answered inline, not via the worker dispatch, never landed a doc). A
+    // private DM that is a research request (a URL + "research") commits the
+    // answer as a numbered doc + PR, same as the dispatch path. Fire-and-forget.
+    if (scope === 'private' && /https?:\/\/\S+/i.test(text) && /res[ae]arch/i.test(text)) {
+      commitResearchDoc({ question: text, findings: result.reply })
+        .then((d) => {
+          if (d.ok) ctx.reply(`Saved to main: doc ${d.num} -> ${d.prUrl}`).catch(() => {});
+        })
+        .catch((e) => console.error('[zoe/index] inline research-doc failed:', (e as Error)?.message));
+    }
+
     console.log(
       `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
         4,
@@ -1115,18 +1128,30 @@ async function handlePlanCommand(
     const result = await decomposeGoal({ goal, context: zoeContext() });
     const { plan } = result;
     const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    // Auto-dispatch a single research-worker task (no y/n) - a plain "research
+    // this URL" shouldn't need a confirm; it's read-only + lands a doc PR.
+    const singleResearch =
+      dispatchable && plan.subtasks.length === 1 && plan.subtasks[0].worker === 'research-worker';
     let priorNote = '';
     if (dispatchable) {
       if (prior && (prior.kind === 'plan-gate' || prior.kind === 'reflexion' || prior.kind === 'learn')) {
         priorNote = `\n\n(Heads up: this replaced a pending ${prior.kind} you hadn't resolved.)`;
       }
-      await setPending({
+      const pendingPlan: PendingApproval = {
         kind: 'plan',
         chatScope: 'private',
         createdAt: new Date().toISOString(),
         goal,
         plan,
-      });
+      };
+      await setPending(pendingPlan);
+      if (singleResearch) {
+        await ctx
+          .reply('On it - researching this and saving the result to main (no confirm needed for a single research task).')
+          .catch(() => {});
+        await resolvePendingApproval(ctx, pendingPlan, { decision: 'approve-all', ids: [] });
+        return;
+      }
     }
     const autoNote =
       opts.autoDetected && dispatchable
@@ -1328,6 +1353,14 @@ async function runApprovedPlan(
         onSubtaskDone: async (st, res) => {
           const mark = res.status === 'completed' ? '✓' : res.status === 'failed' ? '✗' : '↻';
           await ctx.reply(`${mark} ${st.id} ${res.status}`.slice(0, 120)).catch(() => {});
+          // Durability: a completed research-worker subtask becomes a numbered doc
+          // + PR to main (trusted Node commit; the worker stays sandboxed).
+          if (st.worker === 'research-worker' && res.status === 'completed' && res.output) {
+            const doc = await commitResearchDoc({ question: goal, findings: res.output });
+            await ctx
+              .reply(doc.ok ? `Saved to main: doc ${doc.num} -> ${doc.prUrl}` : `(could not auto-save the research doc: ${doc.error})`)
+              .catch(() => {});
+          }
         },
       },
     });

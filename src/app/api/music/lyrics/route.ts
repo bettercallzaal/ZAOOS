@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
@@ -29,7 +29,10 @@ const querySchema = z.object({
 // ─── Lyrics fetchers ────────────────────────────────────────────────────────
 
 // LRCLIB — best free lyrics API (unlimited, no key, synced + plain lyrics)
-async function fetchLrclib(artist: string, title: string): Promise<{ lyrics: string | null; synced: string | null }> {
+async function fetchLrclib(
+  artist: string,
+  title: string,
+): Promise<{ lyrics: string | null; synced: string | null }> {
   try {
     const res = await fetch(
       `https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`,
@@ -125,7 +128,11 @@ export async function GET(req: NextRequest) {
       syncedLyrics = null;
     }
 
-    const result = { lyrics: lyrics || null, syncedLyrics: syncedLyrics || null, source: lyrics ? source : '' };
+    const result = {
+      lyrics: lyrics || null,
+      syncedLyrics: syncedLyrics || null,
+      source: lyrics ? source : '',
+    };
     cacheSet(key, result);
 
     return NextResponse.json(result);

@@ -38,7 +38,10 @@ export default function GovernanceLoading() {
           <div className="h-3 w-40 bg-gray-800 rounded animate-pulse mb-3" />
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse">
+              <div
+                key={i}
+                className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse"
+              >
                 <div className="h-3 w-16 bg-gray-800 rounded mb-2" />
                 <div className="h-6 w-12 bg-gray-700 rounded mb-1" />
                 <div className="h-2 w-20 bg-gray-800/60 rounded" />

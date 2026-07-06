@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { communityConfig } from '@/../community.config';
 import { useAuth } from '@/hooks/useAuth';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { timeAgoCompact as timeAgo } from '@/lib/format/timeAgo';
 
 interface Notification {
@@ -19,7 +19,6 @@ interface Notification {
   read: boolean;
   created_at: string;
 }
-
 
 const TYPE_ICONS: Record<string, string> = {
   message: 'M',
@@ -51,7 +50,7 @@ export function NotificationBell() {
   }, []);
 
   // Initial fetch + Supabase Realtime subscription (falls back to polling)
-   
+
   useEffect(() => {
     fetchNotifications();
 
@@ -78,7 +77,7 @@ export function NotificationBell() {
           },
           () => {
             fetchNotifications();
-          }
+          },
         )
         .subscribe();
     } catch {
@@ -91,7 +90,6 @@ export function NotificationBell() {
       if (fallbackInterval) clearInterval(fallbackInterval);
     };
   }, [fetchNotifications, user?.fid]);
-   
 
   // Close dropdown on outside click or Escape key
   useEffect(() => {
@@ -135,9 +133,7 @@ export function NotificationBell() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: [id] }),
     }).catch(() => {});
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     setUnreadCount((c) => Math.max(0, c - 1));
   };
 
@@ -151,8 +147,18 @@ export function NotificationBell() {
         className="relative flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
         aria-label="Notifications"
       >
-        <svg className="w-4 h-4 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        <svg
+          className="w-4 h-4 md:w-4 md:h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+          />
         </svg>
         {unreadCount > 0 && (
           <span

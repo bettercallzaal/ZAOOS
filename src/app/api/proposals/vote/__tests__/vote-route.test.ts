@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSession, mockFrom, mockMulticall, mockNotify } = vi.hoisted(() => ({
   mockGetSession: vi.fn(),
@@ -10,7 +10,9 @@ const { mockGetSession, mockFrom, mockMulticall, mockNotify } = vi.hoisted(() =>
 
 vi.mock('@/lib/auth/session', () => ({ getSessionData: () => mockGetSession() }));
 vi.mock('@/lib/db/supabase', () => ({ supabaseAdmin: { from: mockFrom } }));
-vi.mock('@/lib/notifications', () => ({ createInAppNotification: (...a: unknown[]) => mockNotify(...a) }));
+vi.mock('@/lib/notifications', () => ({
+  createInAppNotification: (...a: unknown[]) => mockNotify(...a),
+}));
 vi.mock('viem', async (orig) => {
   const actual = await orig<typeof import('viem')>();
   return { ...actual, createPublicClient: () => ({ multicall: mockMulticall }) };
@@ -27,7 +29,9 @@ function routeTables(tables: Record<string, { single?: unknown; upsertSingle?: u
     const cfg = tables[table] ?? {};
     const chain: Record<string, unknown> = {};
     for (const m of ['select', 'eq', 'upsert']) chain[m] = vi.fn().mockReturnValue(chain);
-    chain.single = vi.fn().mockResolvedValue(cfg.upsertSingle ?? cfg.single ?? { data: null, error: null });
+    chain.single = vi
+      .fn()
+      .mockResolvedValue(cfg.upsertSingle ?? cfg.single ?? { data: null, error: null });
     chain.maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
     return chain;
   });
@@ -41,7 +45,9 @@ const body = (b: unknown) =>
   });
 
 const openProposal = { single: { data: { status: 'open', closes_at: null }, error: null } };
-const validUser = { single: { data: { id: 'u1', primary_wallet: WALLET, respect_wallet: null }, error: null } };
+const validUser = {
+  single: { data: { id: 'u1', primary_wallet: WALLET, respect_wallet: null }, error: null },
+};
 
 describe('POST /api/proposals/vote', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -67,7 +73,10 @@ describe('POST /api/proposals/vote', () => {
 
   it('400 when the proposal is not open', async () => {
     mockGetSession.mockResolvedValue({ fid: 1 });
-    routeTables({ proposals: { single: { data: { status: 'closed', closes_at: null }, error: null } }, users: validUser });
+    routeTables({
+      proposals: { single: { data: { status: 'closed', closes_at: null }, error: null } },
+      users: validUser,
+    });
     const res = await POST(body({ proposal_id: PROPOSAL_ID, vote: 'for' }));
     expect(res.status).toBe(400);
   });
@@ -76,10 +85,7 @@ describe('POST /api/proposals/vote', () => {
     mockGetSession.mockResolvedValue({ fid: 1 });
     routeTables({ proposals: openProposal, users: validUser });
     // OG read fails -> computeRespectWeight reports incomplete -> route must NOT record the vote
-    mockMulticall.mockResolvedValue([
-      { status: 'failure' },
-      { status: 'success', result: 0n },
-    ]);
+    mockMulticall.mockResolvedValue([{ status: 'failure' }, { status: 'success', result: 0n }]);
     const res = await POST(body({ proposal_id: PROPOSAL_ID, vote: 'for' }));
     expect(res.status).toBe(503);
     const upsertCalled = mockFrom.mock.calls.some((c) => c[0] === 'proposal_votes');
@@ -91,7 +97,9 @@ describe('POST /api/proposals/vote', () => {
     routeTables({
       proposals: openProposal,
       users: validUser,
-      proposal_votes: { upsertSingle: { data: { id: 'v1', vote: 'for', respect_weight: 7 }, error: null } },
+      proposal_votes: {
+        upsertSingle: { data: { id: 'v1', vote: 'for', respect_weight: 7 }, error: null },
+      },
     });
     mockMulticall.mockResolvedValue([
       { status: 'success', result: 5n * 10n ** 18n }, // 5 OG (formatEther -> 5)

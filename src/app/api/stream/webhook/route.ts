@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
 import { logger } from '@/lib/logger';
+import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
 
 const STREAM_API_SECRET = process.env.STREAM_API_SECRET;
 
@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
         const callCid = event.call_cid as string; // e.g. "audio_room:uuid"
         const callId = callCid.split(':')[1];
         if (callId) {
-          const { error: rpcErr } = await supabaseAdmin.rpc('increment_participant_count', { room_id: callId });
+          const { error: rpcErr } = await supabaseAdmin.rpc('increment_participant_count', {
+            room_id: callId,
+          });
           if (rpcErr) logger.error('[stream-webhook] increment failed:', rpcErr);
         }
         break;
@@ -56,7 +58,9 @@ export async function POST(req: NextRequest) {
         const callCid = event.call_cid as string;
         const callId = callCid.split(':')[1];
         if (callId) {
-          const { error: rpcErr } = await supabaseAdmin.rpc('decrement_participant_count', { room_id: callId });
+          const { error: rpcErr } = await supabaseAdmin.rpc('decrement_participant_count', {
+            room_id: callId,
+          });
           if (rpcErr) logger.error('[stream-webhook] decrement failed:', rpcErr);
         }
         break;

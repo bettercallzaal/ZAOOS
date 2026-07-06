@@ -1,22 +1,22 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   HMSRoomProvider,
-  useHMSActions,
-  useHMSStore,
-  useVideo,
-  useScreenShare,
+  selectBroadcastMessages,
+  selectDominantSpeaker,
   selectIsConnectedToRoom,
-  selectPeers,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
-  selectVideoTrackByPeerID,
-  selectScreenShareByPeerID,
   selectIsPeerAudioEnabled,
-  selectDominantSpeaker,
-  selectBroadcastMessages,
+  selectPeers,
+  selectScreenShareByPeerID,
+  selectVideoTrackByPeerID,
+  useHMSActions,
+  useHMSStore,
+  useScreenShare,
+  useVideo,
 } from '@100mslive/react-sdk';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -43,31 +43,152 @@ const SPOTLIGHT_THRESHOLD = 4;
 // ---- Icons (20px, stroke = currentColor) ------------------------------------
 const iconCls = 'h-5 w-5';
 const MicIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" x2="12" y1="19" y2="22" />
+  </svg>
 );
 const MicOffIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="2" x2="22" y1="2" y2="22" /><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" /><path d="M5 10v2a7 7 0 0 0 12 5.29" /><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" /><path d="M9 9v3a3 3 0 0 0 5.12 2.12" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <line x1="2" x2="22" y1="2" y2="22" />
+    <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
+    <path d="M5 10v2a7 7 0 0 0 12 5.29" />
+    <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+    <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+    <line x1="12" x2="12" y1="19" y2="22" />
+  </svg>
 );
 const CamIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+    <rect x="2" y="6" width="14" height="12" rx="2" />
+  </svg>
 );
 const CamOffIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.34l1 1L22 8v8" /><path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M10.66 6H14a2 2 0 0 1 2 2v2.34l1 1L22 8v8" />
+    <path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2" />
+    <line x1="2" x2="22" y1="2" y2="22" />
+  </svg>
 );
 const ShareIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <line x1="8" x2="16" y1="21" y2="21" />
+    <line x1="12" x2="12" y1="17" y2="21" />
+  </svg>
 );
 const CaptionIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><line x1="8" y1="9" x2="16" y2="9" /><line x1="8" y1="13" x2="14" y2="13" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <line x1="8" y1="9" x2="16" y2="9" />
+    <line x1="8" y1="13" x2="14" y2="13" />
+  </svg>
 );
 const LeaveIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" x2="9" y1="12" y2="12" />
+  </svg>
 );
 const GridIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
 );
 const SpeakerViewIcon = () => (
-  <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="11" rx="2" /><rect x="3" y="18" width="5" height="3" rx="1" /><rect x="10" y="18" width="5" height="3" rx="1" /><rect x="17" y="18" width="4" height="3" rx="1" /></svg>
+  <svg
+    className={iconCls}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="4" width="18" height="11" rx="2" />
+    <rect x="3" y="18" width="5" height="3" rx="1" />
+    <rect x="10" y="18" width="5" height="3" rx="1" />
+    <rect x="17" y="18" width="4" height="3" rx="1" />
+  </svg>
 );
 
 // ---- Tiles ------------------------------------------------------------------
@@ -75,7 +196,13 @@ const SpeakerViewIcon = () => (
 function VideoTile({ trackId, isLocal }: { trackId: string; isLocal?: boolean }) {
   const { videoRef } = useVideo({ trackId });
   return (
-    <video ref={videoRef} autoPlay muted={isLocal} playsInline className="h-full w-full object-cover" />
+    <video
+      ref={videoRef}
+      autoPlay
+      muted={isLocal}
+      playsInline
+      className="h-full w-full object-cover"
+    />
   );
 }
 
@@ -110,7 +237,14 @@ interface PeerTileProps {
 }
 
 /** One participant: live video when their camera is on, else an avatar tile. */
-function PeerTile({ peerId, peerName, isLocal, variant = 'grid', pinned, onTogglePin }: PeerTileProps) {
+function PeerTile({
+  peerId,
+  peerName,
+  isLocal,
+  variant = 'grid',
+  pinned,
+  onTogglePin,
+}: PeerTileProps) {
   const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
   const isAudioEnabled = useHMSStore(selectIsPeerAudioEnabled(peerId));
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -129,13 +263,17 @@ function PeerTile({ peerId, peerName, isLocal, variant = 'grid', pinned, onToggl
   return (
     <div
       className={`group relative flex items-center justify-center overflow-hidden rounded-xl border bg-[#0d1b2a] transition-colors ${sizeCls} ${
-        isSpeaking ? 'border-[#f5a623] shadow-[0_0_14px_rgba(245,166,35,0.35)]' : 'border-white/[0.08]'
+        isSpeaking
+          ? 'border-[#f5a623] shadow-[0_0_14px_rgba(245,166,35,0.35)]'
+          : 'border-white/[0.08]'
       }`}
     >
       {hasVideo && videoTrack?.id ? (
         <VideoTile trackId={videoTrack.id} isLocal={isLocal} />
       ) : (
-        <div className={`flex items-center justify-center rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] font-semibold text-white ${avatarCls}`}>
+        <div
+          className={`flex items-center justify-center rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] font-semibold text-white ${avatarCls}`}
+        >
           {initial}
         </div>
       )}
@@ -158,8 +296,19 @@ function PeerTile({ peerId, peerName, isLocal, variant = 'grid', pinned, onToggl
 
       <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">
         {!isAudioEnabled && (
-          <svg className="h-3 w-3 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 5.586A2 2 0 005 7v0m1 4v1a6 6 0 006 6m0 0v3m0-3a6 6 0 003.293-.98M12 1a3 3 0 013 3v6M3 3l18 18" />
+          <svg
+            className="h-3 w-3 text-red-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.586 5.586A2 2 0 005 7v0m1 4v1a6 6 0 006 6m0 0v3m0-3a6 6 0 003.293-.98M12 1a3 3 0 013 3v6M3 3l18 18"
+            />
           </svg>
         )}
         <span className="max-w-[7rem] truncate">
@@ -172,7 +321,11 @@ function PeerTile({ peerId, peerName, isLocal, variant = 'grid', pinned, onToggl
 }
 
 /** Horizontal scroll strip of small tiles (used beside the feature/presenter view). */
-function Filmstrip({ peers, pinnedId, onTogglePin }: {
+function Filmstrip({
+  peers,
+  pinnedId,
+  onTogglePin,
+}: {
   peers: { id: string; name: string; isLocal: boolean }[];
   pinnedId: string | null;
   onTogglePin: (peerId: string) => void;
@@ -243,7 +396,12 @@ function ReactionLayer({ reactions }: { reactions: { id: string; message: string
 }
 
 // ---- Controls ---------------------------------------------------------------
-function IconButton({ tone, onClick, label, children }: {
+function IconButton({
+  tone,
+  onClick,
+  label,
+  children,
+}: {
   tone: 'neutral' | 'active' | 'danger';
   onClick: () => void;
   label: string;
@@ -295,7 +453,9 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
   const pendingTextRef = useRef('');
 
   const sendReaction = useCallback(
-    (emoji: string) => { hmsActions.sendBroadcastMessage(emoji, REACTION_TYPE).catch(() => {}); },
+    (emoji: string) => {
+      hmsActions.sendBroadcastMessage(emoji, REACTION_TYPE).catch(() => {});
+    },
     [hmsActions],
   );
 
@@ -314,7 +474,8 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognitionCtor =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -439,9 +600,8 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
       <div className="flex flex-col items-center gap-3 py-10 text-center">
         <p className="text-red-400">{errorMessage}</p>
         <p className="max-w-sm text-xs text-gray-500">
-          If this says configuration missing, the 100ms env vars
-          (NEXT_PUBLIC_100MS_ACCESS_KEY, HMS_APP_SECRET, NEXT_PUBLIC_100MS_TEMPLATE_ID)
-          are not set on this environment.
+          If this says configuration missing, the 100ms env vars (NEXT_PUBLIC_100MS_ACCESS_KEY,
+          HMS_APP_SECRET, NEXT_PUBLIC_100MS_TEMPLATE_ID) are not set on this environment.
         </p>
         <button
           type="button"
@@ -455,7 +615,9 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
   }
 
   if (status === 'joining') {
-    return <div className="flex items-center justify-center py-10 text-gray-400">Joining the room…</div>;
+    return (
+      <div className="flex items-center justify-center py-10 text-gray-400">Joining the room…</div>
+    );
   }
 
   const canPublish = role === 'speaker';
@@ -463,10 +625,14 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
   // Layout decision: screen share → presenter view; else pin/spotlight → feature
   // tile + filmstrip; else uniform grid. Spotlight defaults on above the threshold.
   const screenShareActive = Boolean(screenSharingPeerId);
-  const speakerPref = viewOverride ? viewOverride === 'speaker' : peers.length > SPOTLIGHT_THRESHOLD;
+  const speakerPref = viewOverride
+    ? viewOverride === 'speaker'
+    : peers.length > SPOTLIGHT_THRESHOLD;
   const speakerView = !screenShareActive && (Boolean(pinnedId) || speakerPref);
   const featuredPeer =
-    peers.find((p) => p.id === pinnedId) ?? peers.find((p) => p.id === dominantSpeaker?.id) ?? peers[0];
+    peers.find((p) => p.id === pinnedId) ??
+    peers.find((p) => p.id === dominantSpeaker?.id) ??
+    peers[0];
   const stripPeers = peers.filter((p) => p.id !== featuredPeer?.id);
   const canToggleView = !screenShareActive && peers.length > 1;
 
@@ -484,7 +650,10 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
         {canToggleView && (
           <IconButton
             tone={speakerView ? 'active' : 'neutral'}
-            onClick={() => { setPinnedId(null); setViewOverride(speakerView ? 'grid' : 'speaker'); }}
+            onClick={() => {
+              setPinnedId(null);
+              setViewOverride(speakerView ? 'grid' : 'speaker');
+            }}
             label={speakerView ? 'Switch to grid view' : 'Switch to speaker view'}
           >
             {speakerView ? <GridIcon /> : <SpeakerViewIcon />}
@@ -495,7 +664,10 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
       <div className="relative">
         {screenShareActive ? (
           <div className="flex flex-col gap-3">
-            <ScreenShareView peerId={screenSharingPeerId!} peerName={screenSharingPeerName || 'Someone'} />
+            <ScreenShareView
+              peerId={screenSharingPeerId!}
+              peerName={screenSharingPeerName || 'Someone'}
+            />
             <Filmstrip peers={peers} pinnedId={pinnedId} onTogglePin={togglePin} />
           </div>
         ) : speakerView && featuredPeer ? (
@@ -530,16 +702,32 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3">
         {canPublish ? (
           <>
-            <IconButton tone={isLocalAudioEnabled ? 'neutral' : 'danger'} onClick={toggleMute} label={isLocalAudioEnabled ? 'Mute' : 'Unmute'}>
+            <IconButton
+              tone={isLocalAudioEnabled ? 'neutral' : 'danger'}
+              onClick={toggleMute}
+              label={isLocalAudioEnabled ? 'Mute' : 'Unmute'}
+            >
               {isLocalAudioEnabled ? <MicIcon /> : <MicOffIcon />}
             </IconButton>
-            <IconButton tone={isLocalVideoEnabled ? 'active' : 'neutral'} onClick={toggleVideo} label={isLocalVideoEnabled ? 'Stop video' : 'Start video'}>
+            <IconButton
+              tone={isLocalVideoEnabled ? 'active' : 'neutral'}
+              onClick={toggleVideo}
+              label={isLocalVideoEnabled ? 'Stop video' : 'Start video'}
+            >
               {isLocalVideoEnabled ? <CamIcon /> : <CamOffIcon />}
             </IconButton>
-            <IconButton tone={screenShareActive ? 'active' : 'neutral'} onClick={handleScreenShare} label={screenShareActive ? 'Stop sharing' : 'Share screen'}>
+            <IconButton
+              tone={screenShareActive ? 'active' : 'neutral'}
+              onClick={handleScreenShare}
+              label={screenShareActive ? 'Stop sharing' : 'Share screen'}
+            >
               <ShareIcon />
             </IconButton>
-            <IconButton tone={transcribing ? 'active' : 'neutral'} onClick={toggleTranscription} label={transcribing ? 'Stop transcribing' : 'Transcribe'}>
+            <IconButton
+              tone={transcribing ? 'active' : 'neutral'}
+              onClick={toggleTranscription}
+              label={transcribing ? 'Stop transcribing' : 'Transcribe'}
+            >
               <CaptionIcon />
             </IconButton>
           </>
@@ -579,11 +767,16 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
               Live transcript
               {transcribing && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-400">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+                  <span
+                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"
+                    aria-hidden="true"
+                  />
                   REC
                 </span>
               )}
-              <span className="font-normal normal-case tracking-normal text-gray-600">auto-generated — may contain errors</span>
+              <span className="font-normal normal-case tracking-normal text-gray-600">
+                auto-generated — may contain errors
+              </span>
             </h3>
             <div className="flex items-center gap-3">
               {transcriptLines.length > 0 && (
@@ -613,12 +806,15 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
             </div>
           </div>
           {captionsHidden ? null : transcriptLines.length === 0 ? (
-            <p className="text-xs text-gray-500">Listening… speak and your words appear here for everyone.</p>
+            <p className="text-xs text-gray-500">
+              Listening… speak and your words appear here for everyone.
+            </p>
           ) : (
             <div className="max-h-48 space-y-1.5 overflow-y-auto text-base">
               {transcriptLines.slice(-40).map((m) => (
                 <p key={m.id} className="leading-snug text-gray-200">
-                  <span className="font-semibold text-white">{m.senderName || 'Speaker'}:</span> {m.message}
+                  <span className="font-semibold text-white">{m.senderName || 'Speaker'}:</span>{' '}
+                  {m.message}
                 </p>
               ))}
             </div>

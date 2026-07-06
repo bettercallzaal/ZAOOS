@@ -1,27 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
-import { useRadio } from '@/hooks/useRadio';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { useAutoStreamMarker } from '@/hooks/useAutoStreamMarker';
-import { startBroadcast, stopTarget, stopAll, retryTarget, type BroadcastState, type BroadcastTarget } from '@/lib/spaces/rtmpManager';
-import { DescriptionPanel } from './DescriptionPanel';
-import { ControlsPanel } from './ControlsPanel';
-import { PermissionRequests } from './PermissionRequests';
-import { RoomMusicPanel } from './RoomMusicPanel';
-import { RoomTrackQueue } from './RoomTrackQueue';
-import { SongRequests } from './SongRequests';
-import { ContentView } from './ContentView';
-import { SpeakersGrid } from './SpeakersGrid';
-import { RoomReactions } from './RoomReactions';
-import { RoomChat } from './RoomChat';
-import { ParticipantsPanel } from './ParticipantsPanel';
+import { useRadio } from '@/hooks/useRadio';
+import {
+  type BroadcastState,
+  type BroadcastTarget,
+  retryTarget,
+  startBroadcast,
+  stopAll,
+  stopTarget,
+} from '@/lib/spaces/rtmpManager';
 import { ClosedCaptions } from './ClosedCaptions';
-import { RoomFirstTimeTour } from './RoomFirstTimeTour';
-import { ShortcutsHelp } from './ShortcutsHelp';
-import { PromotionConfirm } from './PromotionConfirm';
+import { ContentView } from './ContentView';
+import { ControlsPanel } from './ControlsPanel';
+import { DescriptionPanel } from './DescriptionPanel';
 import { MicLiveToast } from './MicLiveToast';
+import { ParticipantsPanel } from './ParticipantsPanel';
+import { PermissionRequests } from './PermissionRequests';
+import { PromotionConfirm } from './PromotionConfirm';
+import { RoomChat } from './RoomChat';
+import { RoomFirstTimeTour } from './RoomFirstTimeTour';
+import { RoomMusicPanel } from './RoomMusicPanel';
+import { RoomReactions } from './RoomReactions';
+import { RoomTrackQueue } from './RoomTrackQueue';
+import { ShortcutsHelp } from './ShortcutsHelp';
+import { SongRequests } from './SongRequests';
+import { SpeakersGrid } from './SpeakersGrid';
 import { useRoomKeyboardShortcuts } from './useRoomKeyboardShortcuts';
 
 const BroadcastModal = dynamic(
@@ -87,11 +94,18 @@ export function RoomView({
   useAutoStreamMarker(isHost, !!twitchInfo);
 
   const [layout, setLayout] = useState<'content-first' | 'speakers-first'>(
-    roomType === 'voice_channel' ? 'speakers-first' : 'content-first'
+    roomType === 'voice_channel' ? 'speakers-first' : 'content-first',
   );
-  const [previousLayout, setPreviousLayout] = useState<'content-first' | 'speakers-first' | null>(null);
+  const [previousLayout, setPreviousLayout] = useState<'content-first' | 'speakers-first' | null>(
+    null,
+  );
 
-  const { useCallCustomData, useHasOngoingScreenShare, useDominantSpeaker, useIsCallRecordingInProgress } = useCallStateHooks();
+  const {
+    useCallCustomData,
+    useHasOngoingScreenShare,
+    useDominantSpeaker,
+    useIsCallRecordingInProgress,
+  } = useCallStateHooks();
   const callCustomData = useCallCustomData();
   const hasScreenShareActive = useHasOngoingScreenShare();
   const dominantSpeaker = useDominantSpeaker();
@@ -150,10 +164,14 @@ export function RoomView({
         const res = await fetch(`/api/spaces/song-request?roomId=${roomId}`);
         if (res.ok) {
           const data = await res.json();
-          const pending = (data.requests ?? []).filter((r: { status: string }) => r.status === 'pending');
+          const pending = (data.requests ?? []).filter(
+            (r: { status: string }) => r.status === 'pending',
+          );
           setRequestCount(pending.length);
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     };
     poll();
     const interval = setInterval(poll, 10_000);
@@ -252,10 +270,7 @@ export function RoomView({
               </div>
             )}
           </div>
-          <TwitchEmbed
-            channel={twitchInfo?.username ?? ''}
-            visible={!!twitchInfo?.username}
-          />
+          <TwitchEmbed channel={twitchInfo?.username ?? ''} visible={!!twitchInfo?.username} />
           {isHost && <PermissionRequests />}
 
           {/* Dual layout: content-first or speakers-first */}
@@ -293,9 +308,7 @@ export function RoomView({
             </div>
           )}
           {/* Floating emoji reactions */}
-          {roomId && userFid && (
-            <RoomReactions roomId={roomId} fid={userFid} />
-          )}
+          {roomId && userFid && <RoomReactions roomId={roomId} fid={userFid} />}
 
           <div className="border-t border-white/[0.08] bg-[#0d1b2a]">
             <ControlsPanel
@@ -318,7 +331,13 @@ export function RoomView({
               onShortcutsHelp={() => setShowShortcuts(true)}
             />
           </div>
-          {roomId && <RoomMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={() => setShowMusicSidebar(true)} />}
+          {roomId && (
+            <RoomMusicPanel
+              roomId={roomId}
+              isHost={isHost}
+              onOpenMusicBrowser={() => setShowMusicSidebar(true)}
+            />
+          )}
         </div>
 
         {/* Desktop room chat sidebar */}
@@ -404,9 +423,7 @@ export function RoomView({
                   onSwitchStation={radio.switchStation}
                 />
               )}
-              {musicSidebarTab === 'queue' && (
-                <RoomTrackQueue isHost={isHost} />
-              )}
+              {musicSidebarTab === 'queue' && <RoomTrackQueue isHost={isHost} />}
               {musicSidebarTab === 'requests' && roomId && (
                 <SongRequests roomId={roomId} isHost={isHost} />
               )}
@@ -498,9 +515,7 @@ export function RoomView({
                 onSwitchStation={radio.switchStation}
               />
             )}
-            {musicSidebarTab === 'queue' && (
-              <RoomTrackQueue isHost={isHost} />
-            )}
+            {musicSidebarTab === 'queue' && <RoomTrackQueue isHost={isHost} />}
             {musicSidebarTab === 'requests' && roomId && (
               <SongRequests roomId={roomId} isHost={isHost} />
             )}

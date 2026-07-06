@@ -25,10 +25,10 @@
 //     with 401 if missing or mismatched (timing-safe equal).
 //   - We never echo the secret. We never log raw payload bodies in errors.
 
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
-import { publishToTelegram, escapeMarkdownV2 } from '@/lib/publish/telegram';
+import { escapeMarkdownV2, publishToTelegram } from '@/lib/publish/telegram';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -195,7 +195,10 @@ export async function POST(request: NextRequest) {
         }),
         notifyTelegram(fmtPRMessage({ verb, repo, number: num, title, url, author })),
       ]);
-      return NextResponse.json({ ok: true, handled: `pull_request.closed.${merged ? 'merged' : 'closed'}` });
+      return NextResponse.json({
+        ok: true,
+        handled: `pull_request.closed.${merged ? 'merged' : 'closed'}`,
+      });
     }
 
     // Other PR actions (edited / synchronize / labeled / etc) - log silently
@@ -224,9 +227,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, skipped: 'no-commits' });
     }
     const pusher = push.pusher?.name ?? 'someone';
-    const summary = commits.length === 1
-      ? `1 commit: ${commits[0].message.split('\n')[0]}`
-      : `${commits.length} commits`;
+    const summary =
+      commits.length === 1
+        ? `1 commit: ${commits[0].message.split('\n')[0]}`
+        : `${commits.length} commits`;
 
     await logActivity({
       repoFullName: repo,

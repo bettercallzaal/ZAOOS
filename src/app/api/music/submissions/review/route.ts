@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { createInAppNotification } from '@/lib/notifications';
 import { broadcastToChannels } from '@/lib/publish/broadcast';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
 const reviewSchema = z.object({
   submission_id: z.string().uuid(),
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (submission.status !== 'pending') {
       return NextResponse.json(
         { error: `Submission already ${submission.status}` },
-        { status: 409 }
+        { status: 409 },
       );
     }
 

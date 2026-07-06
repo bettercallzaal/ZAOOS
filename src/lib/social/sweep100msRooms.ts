@@ -1,6 +1,6 @@
-import { getActiveMSRooms, endMSRoom, setMSRoomParticipantCount } from '@/lib/social/msRoomsDb';
-import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
 import { logger } from '@/lib/logger';
+import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
+import { endMSRoom, getActiveMSRooms, setMSRoomParticipantCount } from '@/lib/social/msRoomsDb';
 
 /**
  * Ghost-room sweep for 100ms rooms — ends rooms still marked `active` after a
@@ -68,9 +68,8 @@ export async function sweepStale100msRooms(): Promise<Sweep100msResult> {
     }
   }
 
-  logger.info(
-    `[sweep100ms] checked=${checked} ended=${endedIds.length} skipped=${skipped}`,
-    { endedIds },
-  );
+  logger.info(`[sweep100ms] checked=${checked} ended=${endedIds.length} skipped=${skipped}`, {
+    endedIds,
+  });
   return { checked, ended: endedIds.length, skipped, endedIds };
 }

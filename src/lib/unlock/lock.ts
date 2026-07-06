@@ -1,4 +1,4 @@
-import { createPublicClient, http, fallback, isAddress, type Address } from 'viem';
+import { type Address, createPublicClient, fallback, http, isAddress } from 'viem';
 import { base } from 'viem/chains';
 
 /**
@@ -55,13 +55,13 @@ export async function hasValidKey(lockAddress: string, wallet: string): Promise<
  */
 export async function findKeyHolder(
   lockAddress: string,
-  wallets: string[]
+  wallets: string[],
 ): Promise<string | null> {
   const candidates = wallets.filter((w) => isAddress(w));
   if (!isAddress(lockAddress) || candidates.length === 0) return null;
 
   const results = await Promise.allSettled(
-    candidates.map(async (w) => ((await hasValidKey(lockAddress, w)) ? w : null))
+    candidates.map(async (w) => ((await hasValidKey(lockAddress, w)) ? w : null)),
   );
 
   for (const r of results) {

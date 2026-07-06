@@ -31,7 +31,6 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
   const [error, setError] = useState('');
   useEscapeClose(onClose, isOpen);
 
-   
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
@@ -44,7 +43,6 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [isOpen]);
-   
 
   if (!isOpen) return null;
 
@@ -56,8 +54,18 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-[#0a1628] z-50 flex flex-col shadow-xl">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0">
-          <button onClick={onClose} className="text-gray-400 hover:text-white" aria-label="Close respect panel">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white"
+            aria-label="Close respect panel"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -71,7 +79,9 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
               <p className="text-xs text-[#f5a623] uppercase tracking-wider mb-3">Your Respect</p>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-white">{myEntry.totalRespect.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {myEntry.totalRespect.toLocaleString()}
+                  </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {myEntry.ogRespect > 0 && `${myEntry.ogRespect.toLocaleString()} OG`}
                     {myEntry.ogRespect > 0 && myEntry.zorRespect > 0 && ' + '}
@@ -102,11 +112,15 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
                 <p className="text-xs text-gray-500 mt-1">Members</p>
               </div>
               <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
-                <p className="text-xl font-bold text-white">{data.stats.totalOG.toLocaleString()}</p>
+                <p className="text-xl font-bold text-white">
+                  {data.stats.totalOG.toLocaleString()}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">OG Respect</p>
               </div>
               <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
-                <p className="text-xl font-bold text-white">{data.stats.totalZOR.toLocaleString()}</p>
+                <p className="text-xl font-bold text-white">
+                  {data.stats.totalZOR.toLocaleString()}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">ZOR Respect</p>
               </div>
             </div>
@@ -138,14 +152,27 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
                     }`}
                   >
                     <span className="text-lg font-bold w-8 text-center">
-                      {entry.rank === 1 ? '\uD83E\uDD47' : entry.rank === 2 ? '\uD83E\uDD48' : entry.rank === 3 ? '\uD83E\uDD49' : entry.rank}
+                      {entry.rank === 1
+                        ? '\uD83E\uDD47'
+                        : entry.rank === 2
+                          ? '\uD83E\uDD48'
+                          : entry.rank === 3
+                            ? '\uD83E\uDD49'
+                            : entry.rank}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
-                        {entry.name}{isMe && ' (you)'}
+                      <p
+                        className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}
+                      >
+                        {entry.name}
+                        {isMe && ' (you)'}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
-                        {entry.username ? `@${entry.username}` : entry.fid ? `FID ${entry.fid}` : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
+                        {entry.username
+                          ? `@${entry.username}`
+                          : entry.fid
+                            ? `FID ${entry.fid}`
+                            : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
                       </p>
                     </div>
                     <div className="text-right">

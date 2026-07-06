@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSession } = vi.hoisted(() => ({ mockGetSession: vi.fn() }));
 vi.mock('@/lib/auth/session', () => ({ getSessionData: () => mockGetSession() }));
@@ -11,7 +11,9 @@ vi.stubGlobal('fetch', mockFetch);
 
 const SPOTIFY = 'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC';
 const req = (u?: string) =>
-  new NextRequest(`http://localhost:3000/api/music/metadata${u ? `?url=${encodeURIComponent(u)}` : ''}`);
+  new NextRequest(
+    `http://localhost:3000/api/music/metadata${u ? `?url=${encodeURIComponent(u)}` : ''}`,
+  );
 
 describe('GET /api/music/metadata', () => {
   beforeEach(() => {

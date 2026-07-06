@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { usePlayerContext } from './PlayerProvider';
 
 declare global {
@@ -63,7 +63,8 @@ let ytContainer: HTMLDivElement | null = null;
 function ensureContainer(): HTMLDivElement {
   if (!ytContainer || !document.body.contains(ytContainer)) {
     ytContainer = document.createElement('div');
-    ytContainer.style.cssText = 'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
+    ytContainer.style.cssText =
+      'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
     ytContainer.setAttribute('aria-hidden', 'true');
     const inner = document.createElement('div');
     inner.id = 'yt-player-inner';

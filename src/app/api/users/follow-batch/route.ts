@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { followUser } from '@/lib/farcaster/neynar';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const schema = z.object({
@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.issues },
+      { status: 400 },
+    );
   }
 
   const { targetFids } = parsed.data;
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
         logger.error('[follow-batch] batch failed:', err);
         throw err;
       }
-    })
+    }),
   );
 
   for (const result of results) {

@@ -186,9 +186,7 @@ export default function AuditLog() {
                   >
                     {truncateJson(entry.details)}
                   </td>
-                  <td className="px-4 py-3 text-gray-300">
-                    {entry.actor_fid ?? '—'}
-                  </td>
+                  <td className="px-4 py-3 text-gray-300">{entry.actor_fid ?? '—'}</td>
                 </tr>
               ))
             )}

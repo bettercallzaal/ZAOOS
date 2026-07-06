@@ -7,10 +7,26 @@ export type RoomProvider = 'stream' | '100ms';
 
 const THEME_STYLES: Record<RoomTheme, { border: string; badge: string; label: string }> = {
   default: { border: 'hover:border-[#f5a623]/30', badge: '', label: '' },
-  music:   { border: 'hover:border-purple-500/30', badge: 'bg-purple-500/20 text-purple-400', label: 'Music' },
-  podcast: { border: 'hover:border-amber-500/30',  badge: 'bg-amber-500/20 text-amber-400',   label: 'Podcast' },
-  ama:     { border: 'hover:border-yellow-400/30', badge: 'bg-yellow-400/20 text-yellow-300', label: 'AMA' },
-  chill:   { border: 'hover:border-teal-500/30',   badge: 'bg-teal-500/20 text-teal-400',     label: 'Chill' },
+  music: {
+    border: 'hover:border-purple-500/30',
+    badge: 'bg-purple-500/20 text-purple-400',
+    label: 'Music',
+  },
+  podcast: {
+    border: 'hover:border-amber-500/30',
+    badge: 'bg-amber-500/20 text-amber-400',
+    label: 'Podcast',
+  },
+  ama: {
+    border: 'hover:border-yellow-400/30',
+    badge: 'bg-yellow-400/20 text-yellow-300',
+    label: 'AMA',
+  },
+  chill: {
+    border: 'hover:border-teal-500/30',
+    badge: 'bg-teal-500/20 text-teal-400',
+    label: 'Chill',
+  },
 };
 
 export interface UnifiedRoom {
@@ -38,7 +54,9 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
   const themeStyle = THEME_STYLES[themeKey] ?? THEME_STYLES.default;
 
   return (
-    <div className={`bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-5 ${themeStyle.border} transition-all duration-200 group`}>
+    <div
+      className={`bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-5 ${themeStyle.border} transition-all duration-200 group`}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
@@ -78,7 +96,13 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {room.host_pfp && (
-            <Image src={room.host_pfp} alt={`${room.host_name} profile picture`} width={24} height={24} className="w-6 h-6 rounded-full" />
+            <Image
+              src={room.host_pfp}
+              alt={`${room.host_name} profile picture`}
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full"
+            />
           )}
           <div>
             <span className="text-gray-300 text-xs">{room.host_name}</span>

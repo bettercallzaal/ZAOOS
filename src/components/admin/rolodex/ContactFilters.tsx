@@ -55,10 +55,16 @@ export function ContactFilters({
         <div className="relative flex-1">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M21 21l-4.35-4.35m0 0A7 7 0 1 0 6.65 6.65a7 7 0 0 0 10 10z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35m0 0A7 7 0 1 0 6.65 6.65a7 7 0 0 0 10 10z"
+            />
           </svg>
           <input
             ref={inputRef}
@@ -72,11 +78,11 @@ export function ContactFilters({
 
         <select
           value={sort}
-          onChange={e => onSortChange(e.target.value as SortOption)}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
           className="bg-[#1a2a4a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white/70 focus:outline-none focus:border-[#f5a623]/40 transition-colors appearance-none cursor-pointer min-w-[120px]"
           aria-label="Sort by"
         >
-          {SORT_OPTIONS.map(opt => (
+          {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value} className="bg-[#1a2a4a]">
               {opt.label}
             </option>
@@ -87,12 +93,8 @@ export function ContactFilters({
       {/* Category chips — horizontal scroll on mobile */}
       {categories.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <CategoryChip
-            label="All"
-            active={category === ''}
-            onClick={() => onCategoryChange('')}
-          />
-          {categories.map(cat => (
+          <CategoryChip label="All" active={category === ''} onClick={() => onCategoryChange('')} />
+          {categories.map((cat) => (
             <CategoryChip
               key={cat}
               label={cat}

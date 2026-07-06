@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  makeRequest,
   makePostRequest,
-  mockUnauthenticatedSession,
-  mockAuthenticatedSession,
+  makeRequest,
   mockAdminSession,
+  mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const mockEnv = vi.hoisted(() => ({
@@ -140,9 +140,7 @@ describe('POST /api/juke/space', () => {
 
   describe('request validation', () => {
     it('returns 400 when the body is not valid JSON', async () => {
-      const res = await POST(
-        makeRequest('/api/juke/space', { method: 'POST', body: '{not json' }),
-      );
+      const res = await POST(makeRequest('/api/juke/space', { method: 'POST', body: '{not json' }));
       const body = await res.json();
 
       expect(res.status).toBe(400);

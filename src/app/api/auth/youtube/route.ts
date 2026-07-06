@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 
 export async function GET(req: NextRequest) {
@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
   }
 
   const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin}/api/auth/youtube/callback`;
-  const scopes = 'https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.force-ssl';
+  const scopes =
+    'https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.force-ssl';
 
   const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   url.searchParams.set('client_id', clientId);

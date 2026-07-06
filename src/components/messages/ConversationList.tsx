@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
-import { XMTPConversation } from '@/types/xmtp';
+import { useState } from 'react';
 import { timeAgoCompact as timeAgo } from '@/lib/format/timeAgo';
-
+import type { XMTPConversation } from '@/types/xmtp';
 
 interface ConversationListProps {
   conversations: XMTPConversation[];
@@ -45,8 +44,18 @@ export function ConversationList({
               title="New DM"
               aria-label="New direct message"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                />
               </svg>
             </button>
             <button
@@ -55,8 +64,18 @@ export function ConversationList({
               title="New Group"
               aria-label="New group chat"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                />
               </svg>
             </button>
           </div>
@@ -85,8 +104,18 @@ export function ConversationList({
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-6 text-center">
             <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 016 21c-1.282 0-2.47-.402-3.445-1.087.81.22 1.668.337 2.555.337C9.97 20.25 14 16.556 14 12S9.97 3.75 5.11 3.75c-.887 0-1.745.117-2.555.337A5.972 5.972 0 016 3c1.282 0 2.47.402 3.445 1.087A9.764 9.764 0 0112 3.75c4.97 0 9 3.694 9 8.25z" />
+              <svg
+                className="w-6 h-6 text-gray-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 016 21c-1.282 0-2.47-.402-3.445-1.087.81.22 1.668.337 2.555.337C9.97 20.25 14 16.556 14 12S9.97 3.75 5.11 3.75c-.887 0-1.745.117-2.555.337A5.972 5.972 0 016 3c1.282 0 2.47.402 3.445 1.087A9.764 9.764 0 0112 3.75c4.97 0 9 3.694 9 8.25z"
+                />
               </svg>
             </div>
             <p className="text-sm text-gray-400">No conversations yet</p>
@@ -96,7 +125,10 @@ export function ConversationList({
           filtered.map((conv) => (
             <div key={conv.id} className="relative group">
               <button
-                onClick={() => { setSwipedId(null); onSelect(conv.id); }}
+                onClick={() => {
+                  setSwipedId(null);
+                  onSelect(conv.id);
+                }}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   setSwipedId(swipedId === conv.id ? null : conv.id);
@@ -110,17 +142,37 @@ export function ConversationList({
                 {/* Avatar */}
                 {conv.imageUrl ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                    <Image src={conv.imageUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" />
+                    <Image
+                      src={conv.imageUrl}
+                      alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                 ) : conv.peerPfpUrl ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                    <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" />
+                    <Image
+                      src={conv.peerPfpUrl}
+                      alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                     {conv.type === 'group' ? (
-                      <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                        />
                       </svg>
                     ) : (
                       <span className="text-sm text-gray-400 font-medium">
@@ -159,14 +211,24 @@ export function ConversationList({
               {/* Remove button — visible on hover (desktop) or context menu (mobile) */}
               {onRemove && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); setSwipedId(null); onRemove(conv.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSwipedId(null);
+                    onRemove(conv.id);
+                  }}
                   className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-all ${
                     swipedId === conv.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                   }`}
                   aria-label="Remove conversation"
                   title="Remove from list"
                 >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>

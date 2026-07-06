@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useListeningRoom, type ListenerInfo } from '@/hooks/useListeningRoom';
+import { type ListenerInfo, useListeningRoom } from '@/hooks/useListeningRoom';
 import { useRadio } from '@/hooks/useRadio';
 import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
@@ -26,7 +26,13 @@ export function RoomMusicPanel({ roomId, isHost, onOpenMusicBrowser }: RoomMusic
     return <GuestMusicPanel />;
   }
 
-  return <AuthenticatedMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={onOpenMusicBrowser} />;
+  return (
+    <AuthenticatedMusicPanel
+      roomId={roomId}
+      isHost={isHost}
+      onOpenMusicBrowser={onOpenMusicBrowser}
+    />
+  );
 }
 
 // ─── Guest Panel ───────────────────────────────────────────────────────────────
@@ -39,10 +45,7 @@ function GuestMusicPanel() {
           <MusicIcon />
           <span className="text-xs text-gray-500">Music</span>
         </div>
-        <Link
-          href="/"
-          className="text-xs text-[#f5a623]/70 hover:text-[#f5a623] transition-colors"
-        >
+        <Link href="/" className="text-xs text-[#f5a623]/70 hover:text-[#f5a623] transition-colors">
           Sign in to DJ
         </Link>
       </div>
@@ -52,11 +55,22 @@ function GuestMusicPanel() {
 
 // ─── Authenticated Panel (uses useListeningRoom which requires AudioProviders) ─
 
-function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: string; isHost: boolean; onOpenMusicBrowser?: () => void }) {
+function AuthenticatedMusicPanel({
+  roomId,
+  onOpenMusicBrowser,
+}: {
+  roomId: string;
+  isHost: boolean;
+  onOpenMusicBrowser?: () => void;
+}) {
   const { user } = useAuth();
 
   const userInfo: ListenerInfo | null = user
-    ? { fid: user.fid, displayName: user.displayName || user.username, pfpUrl: user.pfpUrl || undefined }
+    ? {
+        fid: user.fid,
+        displayName: user.displayName || user.username,
+        pfpUrl: user.pfpUrl || undefined,
+      }
     : null;
 
   const room = useListeningRoom(userInfo);
@@ -120,14 +134,10 @@ function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: strin
         </div>
         <div className="flex items-center gap-1.5">
           {listeners.length > 0 && (
-            <span className="text-[10px] text-gray-500">
-              {listeners.length} listening
-            </span>
+            <span className="text-[10px] text-gray-500">{listeners.length} listening</span>
           )}
           {djInfo && !isDJ && (
-            <span className="text-[10px] text-[#f5a623]/70">
-              DJ: {djInfo.displayName}
-            </span>
+            <span className="text-[10px] text-[#f5a623]/70">DJ: {djInfo.displayName}</span>
           )}
         </div>
       </div>
@@ -151,12 +161,8 @@ function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: strin
 
             {/* Track Info */}
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-white font-medium truncate">
-                {currentTrack.trackName}
-              </p>
-              <p className="text-xs text-gray-400 truncate">
-                {currentTrack.artistName}
-              </p>
+              <p className="text-sm text-white font-medium truncate">{currentTrack.trackName}</p>
+              <p className="text-xs text-gray-400 truncate">{currentTrack.artistName}</p>
             </div>
 
             {/* Playing indicator for listeners / Controls for DJ */}
@@ -235,9 +241,7 @@ function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: strin
               )}
             </div>
           ) : (
-            <div className="text-center py-3 text-gray-600 text-xs">
-              No music playing yet
-            </div>
+            <div className="text-center py-3 text-gray-600 text-xs">No music playing yet</div>
           )}
         </div>
       )}
@@ -341,7 +345,16 @@ function RadioIcon() {
 
 function BrowseIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="11" cy="11" r="8" />
       <path d="M21 21l-4.35-4.35" />
     </svg>

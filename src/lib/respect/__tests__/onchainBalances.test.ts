@@ -1,6 +1,7 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { parseEther } from 'viem';
+import { describe, expect, it } from 'vitest';
 import { readMemberBalances } from '../onchainBalances';
 
 describe('readMemberBalances', () => {
@@ -32,7 +33,10 @@ describe('readMemberBalances', () => {
   });
 
   it('flags incomplete when the ZOR read fails', () => {
-    const r = readMemberBalances({ status: 'success', result: parseEther('1') }, { status: 'failure' });
+    const r = readMemberBalances(
+      { status: 'success', result: parseEther('1') },
+      { status: 'failure' },
+    );
     expect(r.complete).toBe(false);
     expect(r.failed).toEqual(['zor']);
   });

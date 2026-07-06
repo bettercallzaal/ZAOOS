@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { allowlistEntrySchema, removeAllowlistSchema } from '@/lib/validation/schemas';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 import { logger } from '@/lib/logger';
+import { allowlistEntrySchema, removeAllowlistSchema } from '@/lib/validation/schemas';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -44,7 +44,7 @@ export async function GET() {
 
     const entries = (data || []).map((m) => ({
       ...m,
-      xmtp_address: m.fid ? (xmtpMap.get(m.fid) || null) : null,
+      xmtp_address: m.fid ? xmtpMap.get(m.fid) || null : null,
     }));
 
     return NextResponse.json({ entries });
@@ -64,12 +64,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = allowlistEntrySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
-    const { error } = await supabaseAdmin
-      .from('allowlist')
-      .insert(parsed.data);
+    const { error } = await supabaseAdmin.from('allowlist').insert(parsed.data);
 
     if (error) {
       if (error.code === '23505') {
@@ -106,10 +107,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('allowlist')
-      .delete()
-      .eq('id', parsed.data.id);
+    const { error } = await supabaseAdmin.from('allowlist').delete().eq('id', parsed.data.id);
 
     if (error) throw error;
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -30,16 +30,14 @@ export async function POST(request: NextRequest) {
     const fid = session.fid;
 
     // 1. Upsert activity log (unique per fid + type + date, so duplicates are safe)
-    const { error: activityError } = await supabaseAdmin
-      .from('activity_log')
-      .upsert(
-        {
-          fid,
-          activity_type,
-          metadata: metadata || {},
-        },
-        { onConflict: 'fid,activity_type,activity_date' }
-      );
+    const { error: activityError } = await supabaseAdmin.from('activity_log').upsert(
+      {
+        fid,
+        activity_type,
+        metadata: metadata || {},
+      },
+      { onConflict: 'fid,activity_type,activity_date' },
+    );
 
     if (activityError) {
       logger.error('Activity log upsert error:', activityError);
@@ -72,7 +70,9 @@ export async function POST(request: NextRequest) {
           last_activity_date: todayStr,
           total_active_days: 1,
         })
-        .select('current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available')
+        .select(
+          'current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available',
+        )
         .single();
 
       if (insertError) {
@@ -135,7 +135,9 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('fid', fid)
-      .select('current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available')
+      .select(
+        'current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available',
+      )
       .single();
 
     if (updateError) {

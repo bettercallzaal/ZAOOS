@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Member {
   fid: number;
@@ -53,8 +53,15 @@ export function SubnameManager() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
-  useEffect(() => () => { if (messageTimerRef.current) clearTimeout(messageTimerRef.current); }, []);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  useEffect(
+    () => () => {
+      if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
+    },
+    [],
+  );
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -154,8 +161,8 @@ export function SubnameManager() {
     }
   };
 
-  const withSubname = members.filter(m => m.zaoSubname);
-  const withoutSubname = members.filter(m => !m.zaoSubname);
+  const withSubname = members.filter((m) => m.zaoSubname);
+  const withoutSubname = members.filter((m) => !m.zaoSubname);
 
   return (
     <div className="space-y-6">
@@ -178,9 +185,13 @@ export function SubnameManager() {
 
       {/* Message */}
       {message && (
-        <div className={`px-4 py-2 rounded-lg text-sm ${
-          message.type === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
-        }`}>
+        <div
+          className={`px-4 py-2 rounded-lg text-sm ${
+            message.type === 'success'
+              ? 'bg-green-500/10 text-green-400'
+              : 'bg-red-500/10 text-red-400'
+          }`}
+        >
           {message.text}
         </div>
       )}
@@ -192,12 +203,17 @@ export function SubnameManager() {
             Pending Name Change Requests ({requests.length})
           </p>
           <div className="space-y-2">
-            {requests.map(r => (
-              <div key={r.id} className="flex items-center justify-between bg-[#0a1628] rounded-lg px-3 py-2">
+            {requests.map((r) => (
+              <div
+                key={r.id}
+                className="flex items-center justify-between bg-[#0a1628] rounded-lg px-3 py-2"
+              >
                 <div>
                   <span className="text-sm text-gray-300">FID {r.fid}</span>
                   <span className="text-xs text-gray-500 mx-2">wants</span>
-                  <span className="text-sm text-[#f5a623] font-mono">{r.requested_name}.thezao.eth</span>
+                  <span className="text-sm text-[#f5a623] font-mono">
+                    {r.requested_name}.thezao.eth
+                  </span>
                   {r.current_name && (
                     <span className="text-xs text-gray-600 ml-2">(from {r.current_name})</span>
                   )}
@@ -232,7 +248,7 @@ export function SubnameManager() {
             type="number"
             placeholder="FID"
             value={createFid}
-            onChange={e => setCreateFid(e.target.value)}
+            onChange={(e) => setCreateFid(e.target.value)}
             className="w-24 px-3 py-2 bg-[#0a1628] border border-white/[0.08] rounded-lg text-sm text-white placeholder-gray-600 focus:border-[#f5a623] outline-none"
           />
           <div className="flex-1 flex items-center bg-[#0a1628] border border-white/[0.08] rounded-lg overflow-hidden focus-within:border-[#f5a623]">
@@ -240,7 +256,9 @@ export function SubnameManager() {
               type="text"
               placeholder="name"
               value={createName}
-              onChange={e => setCreateName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              onChange={(e) =>
+                setCreateName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+              }
               className="flex-1 px-3 py-2 bg-transparent text-sm text-white placeholder-gray-600 outline-none"
             />
             <span className="pr-3 text-xs text-gray-500">.thezao.eth</span>
@@ -258,7 +276,7 @@ export function SubnameManager() {
       {/* Members Table */}
       {loading ? (
         <div className="space-y-2">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <div key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />
           ))}
         </div>
@@ -268,17 +286,27 @@ export function SubnameManager() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/[0.08]">
-                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">Member</th>
-                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">ZID</th>
-                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">Subname</th>
-                  <th className="text-right text-xs text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">
+                    Member
+                  </th>
+                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">
+                    ZID
+                  </th>
+                  <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">
+                    Subname
+                  </th>
+                  <th className="text-right text-xs text-gray-500 uppercase tracking-wider px-4 py-3">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {members.map(m => (
+                {members.map((m) => (
                   <tr key={m.fid} className="border-b border-white/[0.08] hover:bg-white/[0.02]">
                     <td className="px-4 py-2.5">
-                      <span className="text-white">{m.displayName || m.username || `FID ${m.fid}`}</span>
+                      <span className="text-white">
+                        {m.displayName || m.username || `FID ${m.fid}`}
+                      </span>
                       {m.username && (
                         <span className="text-gray-500 text-xs ml-2">@{m.username}</span>
                       )}

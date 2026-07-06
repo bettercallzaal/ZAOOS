@@ -4,11 +4,7 @@ import type { AgentConfig, AgentName } from './types';
 
 export async function getAgentConfig(name: AgentName): Promise<AgentConfig | null> {
   const db = getSupabaseAdmin();
-  const { data, error } = await db
-    .from('agent_config')
-    .select('*')
-    .eq('name', name)
-    .single();
+  const { data, error } = await db.from('agent_config').select('*').eq('name', name).single();
 
   if (error) {
     logger.error(`[${name}] Failed to load config: ${error.message}`);
@@ -26,10 +22,7 @@ export async function getAgentConfig(name: AgentName): Promise<AgentConfig | nul
  * spend; pass includePending=true to also count 'pending' reservations (used by
  * claimBudget so concurrent runs see each other's in-flight claims).
  */
-export async function getDailySpend(
-  name: AgentName,
-  includePending = false,
-): Promise<number> {
+export async function getDailySpend(name: AgentName, includePending = false): Promise<number> {
   const db = getSupabaseAdmin();
   const todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
@@ -80,7 +73,9 @@ export async function claimBudget(
   try {
     preSpent = await getDailySpend(name, true);
   } catch (err) {
-    logger.error(`[${name}] Budget pre-check read failed; denying trade: ${err instanceof Error ? err.message : String(err)}`);
+    logger.error(
+      `[${name}] Budget pre-check read failed; denying trade: ${err instanceof Error ? err.message : String(err)}`,
+    );
     return false;
   }
   if (preSpent + tradeUsd > maxDailySpend) return false;
@@ -103,7 +98,9 @@ export async function claimBudget(
   try {
     committed = await getDailySpend(name, true);
   } catch (err) {
-    logger.error(`[${name}] Budget re-verify read failed; rolling back reservation ${reserved.id}: ${err instanceof Error ? err.message : String(err)}`);
+    logger.error(
+      `[${name}] Budget re-verify read failed; rolling back reservation ${reserved.id}: ${err instanceof Error ? err.message : String(err)}`,
+    );
     await db.from('agent_events').delete().eq('id', reserved.id);
     return false;
   }

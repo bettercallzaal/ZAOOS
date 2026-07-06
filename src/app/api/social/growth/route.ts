@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -25,19 +25,13 @@ export async function GET(request: NextRequest) {
     if (fidParam) {
       const parsed = Number(fidParam);
       if (!Number.isInteger(parsed) || parsed <= 0) {
-        return NextResponse.json(
-          { error: 'Invalid fid parameter' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid fid parameter' }, { status: 400 });
       }
       fid = parsed;
     }
 
     if (!fid) {
-      return NextResponse.json(
-        { error: 'No Farcaster account linked' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No Farcaster account linked' }, { status: 400 });
     }
 
     // Parse days (default: 30, max: 365)
@@ -46,10 +40,7 @@ export async function GET(request: NextRequest) {
     if (daysParam) {
       const parsed = Number(daysParam);
       if (!Number.isInteger(parsed) || parsed <= 0 || parsed > 365) {
-        return NextResponse.json(
-          { error: 'Invalid days parameter (1-365)' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid days parameter (1-365)' }, { status: 400 });
       }
       days = parsed;
     }
@@ -68,10 +59,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Growth query error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch growth data' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch growth data' }, { status: 500 });
     }
 
     const history = (data || []).map((row) => ({
@@ -81,14 +69,14 @@ export async function GET(request: NextRequest) {
       engagementScore: row.engagement_score,
     }));
 
-    return NextResponse.json({ fid, days, history }, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      { fid, days, history },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
+      },
+    );
   } catch (err) {
     logger.error('Growth route error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

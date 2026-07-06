@@ -27,18 +27,37 @@ function scoreToRank(score: number): number {
 }
 
 const SKIP_FIELDS = new Set([
-  'Name', 'name', 'Member', 'Wallet', 'ETH WALLET', 'ETH WALLET (from Wallet Data 2)',
-  'Total Respect', 'Total Points', 'Total', 'On-chain Balance', 'On-chain', 'Onchain',
-  'Fractal Respect', 'ZRespect Sum', 'S.', 'Events/Contributions', 'Form/Intros Sum',
-  'Hosting', 'Fractal Host sum', 'Bonus/Festival', 'ZAO Festivals sum',
-  'id', 'createdTime', 'actual ZAO onchain',
+  'Name',
+  'name',
+  'Member',
+  'Wallet',
+  'ETH WALLET',
+  'ETH WALLET (from Wallet Data 2)',
+  'Total Respect',
+  'Total Points',
+  'Total',
+  'On-chain Balance',
+  'On-chain',
+  'Onchain',
+  'Fractal Respect',
+  'ZRespect Sum',
+  'S.',
+  'Events/Contributions',
+  'Form/Intros Sum',
+  'Hosting',
+  'Fractal Host sum',
+  'Bonus/Festival',
+  'ZAO Festivals sum',
+  'id',
+  'createdTime',
+  'actual ZAO onchain',
 ]);
 
 type AirtableRecord = { id: string; fields: Record<string, unknown> };
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
-const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function fetchAllRecords(token: string, tableName: string): Promise<AirtableRecord[]> {
   const records: AirtableRecord[] = [];
@@ -71,7 +90,8 @@ async function fetchAllRecords(token: string, tableName: string): Promise<Airtab
 
 function findField(fieldNames: Set<string>, candidates: string[]): string | null {
   for (const c of candidates) if (fieldNames.has(c)) return c;
-  for (const c of candidates) for (const f of fieldNames) if (f.toLowerCase() === c.toLowerCase()) return f;
+  for (const c of candidates)
+    for (const f of fieldNames) if (f.toLowerCase() === c.toLowerCase()) return f;
   return null;
 }
 
@@ -111,11 +131,16 @@ function buildWalletMap(
   if (walletRecords.length > 0) {
     const fields = collectFieldNames(walletRecords);
     const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
-    const walletField = findField(fields, ['ETH WALLET', 'Wallet', 'wallet_address', 'ETH WALLET (from Wallet Data 2)']);
+    const walletField = findField(fields, [
+      'ETH WALLET',
+      'Wallet',
+      'wallet_address',
+      'ETH WALLET (from Wallet Data 2)',
+    ]);
 
     for (const r of walletRecords) {
       const name = asString(r.fields[nameField]);
-      const wallet = walletField ? asString(r.fields[walletField])?.toLowerCase() ?? null : null;
+      const wallet = walletField ? (asString(r.fields[walletField])?.toLowerCase() ?? null) : null;
       if (name && wallet && wallet.startsWith('0x')) walletMap.set(name, wallet);
     }
   }
@@ -124,7 +149,11 @@ function buildWalletMap(
   if (summaryRecords.length > 0) {
     const fields = collectFieldNames(summaryRecords);
     const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
-    const walletField = findField(fields, ['ETH WALLET (from Wallet Data 2)', 'ETH WALLET', 'Wallet']);
+    const walletField = findField(fields, [
+      'ETH WALLET (from Wallet Data 2)',
+      'ETH WALLET',
+      'Wallet',
+    ]);
     if (walletField) {
       for (const r of summaryRecords) {
         const name = asString(r.fields[nameField]);
@@ -204,7 +233,7 @@ async function importSessions(
   if (sessionCols.length === 0) {
     for (const f of fields) {
       if (SKIP_FIELDS.has(f)) continue;
-      if (records.some(r => typeof r.fields[f] === 'number' && (r.fields[f] as number) > 0)) {
+      if (records.some((r) => typeof r.fields[f] === 'number' && (r.fields[f] as number) > 0)) {
         sessionCols.push({ col: f, num: sessionCols.length + 1 });
       }
     }
@@ -220,7 +249,7 @@ async function importSessions(
     .like('notes', '%synced from Airtable%');
 
   if (existingOG && existingOG.length > 0) {
-    const ids = existingOG.map(s => s.id);
+    const ids = existingOG.map((s) => s.id);
     // Delete scores first (FK constraint)
     for (let i = 0; i < ids.length; i += 50) {
       const batch = ids.slice(i, i + 50);
@@ -291,7 +320,7 @@ async function importSessions(
         session_id: sessionId,
         member_name: scores[i].name,
         wallet_address: scores[i].wallet,
-        rank: scoreToRank(scores[i].score) || (i + 1),
+        rank: scoreToRank(scores[i].score) || i + 1,
         score: scores[i].score,
       });
     }
@@ -307,7 +336,10 @@ async function importSessions(
 
   // Update participant counts
   for (const [sessionId, count] of participantCounts) {
-    await supabaseAdmin.from('fractal_sessions').update({ participant_count: count }).eq('id', sessionId);
+    await supabaseAdmin
+      .from('fractal_sessions')
+      .update({ participant_count: count })
+      .eq('id', sessionId);
   }
 }
 
@@ -361,7 +393,9 @@ async function importEvents(
       if (!name) continue;
       const amount = amountField ? asNumber(r.fields[amountField]) : 0;
       if (amount === 0) continue;
-      const desc = descField ? asString(r.fields[descField]) || 'Festival respect' : 'Festival respect';
+      const desc = descField
+        ? asString(r.fields[descField]) || 'Festival respect'
+        : 'Festival respect';
 
       eventRows.push({
         member_name: name,
@@ -388,7 +422,9 @@ async function importEvents(
       if (!name) continue;
       const amount = amountField ? asNumber(r.fields[amountField]) : 0;
       if (amount === 0) continue;
-      const eventType = typeField ? asString(r.fields[typeField])?.toLowerCase() || 'other' : 'other';
+      const eventType = typeField
+        ? asString(r.fields[typeField])?.toLowerCase() || 'other'
+        : 'other';
       const desc = descField ? asString(r.fields[descField]) : null;
 
       eventRows.push({
@@ -417,28 +453,41 @@ async function enrichAndReconcile(stats: SyncStats) {
   const [scoresRes, eventsRes, sessionsRes, membersRes] = await Promise.all([
     supabaseAdmin.from('fractal_scores').select('member_name, score, session_id'),
     supabaseAdmin.from('respect_events').select('member_name, event_type, amount'),
-    supabaseAdmin.from('fractal_sessions').select('id, session_date').order('session_date', { ascending: true }),
+    supabaseAdmin
+      .from('fractal_sessions')
+      .select('id, session_date')
+      .order('session_date', { ascending: true }),
     supabaseAdmin.from('respect_members').select('id, name, first_respect_at, onchain_og'),
   ]);
 
   // Aggregate fractal scores
   const memberAgg = new Map<string, { fractalTotal: number; sessionIds: Set<string> }>();
   for (const s of scoresRes.data || []) {
-    if (!memberAgg.has(s.member_name)) memberAgg.set(s.member_name, { fractalTotal: 0, sessionIds: new Set() });
+    if (!memberAgg.has(s.member_name))
+      memberAgg.set(s.member_name, { fractalTotal: 0, sessionIds: new Set() });
     const m = memberAgg.get(s.member_name)!;
     m.fractalTotal += Number(s.score);
     m.sessionIds.add(s.session_id);
   }
 
   // Aggregate events
-  const eventAgg = new Map<string, { hosting: number; bonus: number; events: number; hostCount: number }>();
+  const eventAgg = new Map<
+    string,
+    { hosting: number; bonus: number; events: number; hostCount: number }
+  >();
   for (const e of eventsRes.data || []) {
-    if (!eventAgg.has(e.member_name)) eventAgg.set(e.member_name, { hosting: 0, bonus: 0, events: 0, hostCount: 0 });
+    if (!eventAgg.has(e.member_name))
+      eventAgg.set(e.member_name, { hosting: 0, bonus: 0, events: 0, hostCount: 0 });
     const m = eventAgg.get(e.member_name)!;
     const amount = Number(e.amount);
-    if (e.event_type === 'hosting') { m.hosting += amount; m.hostCount++; }
-    else if (e.event_type === 'festival' || e.event_type === 'bonus') { m.bonus += amount; }
-    else { m.events += amount; }
+    if (e.event_type === 'hosting') {
+      m.hosting += amount;
+      m.hostCount++;
+    } else if (e.event_type === 'festival' || e.event_type === 'bonus') {
+      m.bonus += amount;
+    } else {
+      m.events += amount;
+    }
   }
 
   // Session date lookup
@@ -515,32 +564,67 @@ interface SyncStats {
 export async function POST() {
   const session = await getSessionData();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!session.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+  if (!session.isAdmin)
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
   const airtableToken = process.env.AIRTABLE_TOKEN;
-  if (!airtableToken) return NextResponse.json({ error: 'AIRTABLE_TOKEN not configured' }, { status: 500 });
+  if (!airtableToken)
+    return NextResponse.json({ error: 'AIRTABLE_TOKEN not configured' }, { status: 500 });
 
   const stats: SyncStats = {
-    wallets: 0, members: 0, sessions: 0, scores: 0,
-    hosts: 0, festivals: 0, misc: 0,
-    enriched: 0, firstRespectSet: 0, errors: [],
+    wallets: 0,
+    members: 0,
+    sessions: 0,
+    scores: 0,
+    hosts: 0,
+    festivals: 0,
+    misc: 0,
+    enriched: 0,
+    firstRespectSet: 0,
+    errors: [],
   };
 
   try {
     // Fetch all 6 tables (parallel — each table is independent)
     logger.info('[Airtable Sync] Fetching all tables...');
 
-    const [walletRecords, summaryRecords, respectRecords, hostRecords, festivalRecords, miscRecords] =
-      await Promise.all([
-        fetchAllRecords(airtableToken, TABLES.wallets).catch(e => { stats.errors.push(`Wallet Data: ${e.message}`); return [] as AirtableRecord[]; }),
-        fetchAllRecords(airtableToken, TABLES.summary).catch(e => { stats.errors.push(`Summary: ${e.message}`); return [] as AirtableRecord[]; }),
-        fetchAllRecords(airtableToken, TABLES.respect).catch(e => { stats.errors.push(`Respect: ${e.message}`); return [] as AirtableRecord[]; }),
-        fetchAllRecords(airtableToken, TABLES.hosts).catch(e => { stats.errors.push(`Fractal Hosts: ${e.message}`); return [] as AirtableRecord[]; }),
-        fetchAllRecords(airtableToken, TABLES.festivals).catch(e => { stats.errors.push(`ZAO Festivals: ${e.message}`); return [] as AirtableRecord[]; }),
-        fetchAllRecords(airtableToken, TABLES.misc).catch(e => { stats.errors.push(`Misc: ${e.message}`); return [] as AirtableRecord[]; }),
-      ]);
+    const [
+      walletRecords,
+      summaryRecords,
+      respectRecords,
+      hostRecords,
+      festivalRecords,
+      miscRecords,
+    ] = await Promise.all([
+      fetchAllRecords(airtableToken, TABLES.wallets).catch((e) => {
+        stats.errors.push(`Wallet Data: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+      fetchAllRecords(airtableToken, TABLES.summary).catch((e) => {
+        stats.errors.push(`Summary: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+      fetchAllRecords(airtableToken, TABLES.respect).catch((e) => {
+        stats.errors.push(`Respect: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+      fetchAllRecords(airtableToken, TABLES.hosts).catch((e) => {
+        stats.errors.push(`Fractal Hosts: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+      fetchAllRecords(airtableToken, TABLES.festivals).catch((e) => {
+        stats.errors.push(`ZAO Festivals: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+      fetchAllRecords(airtableToken, TABLES.misc).catch((e) => {
+        stats.errors.push(`Misc: ${e.message}`);
+        return [] as AirtableRecord[];
+      }),
+    ]);
 
-    logger.info(`[Airtable Sync] Fetched: ${walletRecords.length} wallets, ${summaryRecords.length} summary, ${respectRecords.length} respect, ${hostRecords.length} hosts, ${festivalRecords.length} festivals, ${miscRecords.length} misc`);
+    logger.info(
+      `[Airtable Sync] Fetched: ${walletRecords.length} wallets, ${summaryRecords.length} summary, ${respectRecords.length} respect, ${hostRecords.length} hosts, ${festivalRecords.length} festivals, ${miscRecords.length} misc`,
+    );
 
     // 1. Build wallet map (pure computation, no DB)
     const walletMap = buildWalletMap(walletRecords, summaryRecords);
@@ -567,10 +651,15 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       stats: {
-        wallets: stats.wallets, members: stats.members,
-        sessions: stats.sessions, scores: stats.scores,
-        hosts: stats.hosts, festivals: stats.festivals, misc: stats.misc,
-        enriched: stats.enriched, firstRespectSet: stats.firstRespectSet,
+        wallets: stats.wallets,
+        members: stats.members,
+        sessions: stats.sessions,
+        scores: stats.scores,
+        hosts: stats.hosts,
+        festivals: stats.festivals,
+        misc: stats.misc,
+        enriched: stats.enriched,
+        firstRespectSet: stats.firstRespectSet,
       },
       errors: stats.errors.length > 0 ? stats.errors : [],
     });

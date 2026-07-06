@@ -45,7 +45,10 @@ export async function GET() {
     logger.warn('[juke/partner-token] mint failed', result.status, result.error);
     return NextResponse.json(
       { ok: false, error: result.error },
-      { status: result.status >= 500 ? 502 : result.status, headers: { 'Cache-Control': 'no-store' } },
+      {
+        status: result.status >= 500 ? 502 : result.status,
+        headers: { 'Cache-Control': 'no-store' },
+      },
     );
   }
   return NextResponse.json(

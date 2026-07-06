@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getRoomById, endRoom, updateRoom, updateRecording } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
+import { endRoom, getRoomById, updateRecording, updateRoom } from '@/lib/spaces/roomsDb';
 import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
 import { communityConfig } from '../../../../../../community.config';
-import { logger } from '@/lib/logger';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSessionData();
     if (!session) {
@@ -37,10 +34,7 @@ const UpdateSchema = z.object({
   recording_url: z.string().url().max(500).optional(),
 });
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSessionData();
     if (!session) {
@@ -56,13 +50,19 @@ export async function PATCH(
     const isHost = room.host_fid === session.fid;
     const isAdmin = (communityConfig.adminFids as readonly number[]).includes(session.fid);
     if (!isHost && !isAdmin) {
-      return NextResponse.json({ error: 'Only the host or an admin can modify the room' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Only the host or an admin can modify the room' },
+        { status: 403 },
+      );
     }
 
     const body = await req.json();
     const parsed = UpdateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     if (parsed.data.action === 'end') {
@@ -84,8 +84,8 @@ export async function PATCH(
 
     // Sync title to connected streaming platforms (fire-and-forget)
     if (parsed.data.title) {
-      syncStreamTitle(session.fid, parsed.data.title).catch(err =>
-        logger.error('[room-update] Platform sync failed:', err)
+      syncStreamTitle(session.fid, parsed.data.title).catch((err) =>
+        logger.error('[room-update] Platform sync failed:', err),
       );
     }
 

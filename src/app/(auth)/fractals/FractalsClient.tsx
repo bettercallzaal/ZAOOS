@@ -1,20 +1,52 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-const SessionsTab = dynamic(() => import('./SessionsTab').then(m => ({ default: m.SessionsTab })), { ssr: false });
-const FractalLeaderboardTab = dynamic(() => import('./FractalLeaderboardTab').then(m => ({ default: m.FractalLeaderboardTab })), { ssr: false });
-const ProposalsTab = dynamic(() => import('./ProposalsTab').then(m => ({ default: m.ProposalsTab })), { ssr: false });
-const AboutTab = dynamic(() => import('./AboutTab').then(m => ({ default: m.AboutTab })), { ssr: false });
-const AnalyticsTab = dynamic(() => import('./AnalyticsTab').then(m => ({ default: m.AnalyticsTab })), { ssr: false });
-const EventsCalendar = dynamic(() => import('@/components/governance/EventsCalendar').then(m => ({ default: m.EventsCalendar })), { ssr: false });
-const LiveFractalDashboard = dynamic(() => import('@/components/governance/LiveFractalDashboard').then(m => ({ default: m.LiveFractalDashboard })), { ssr: false });
+const SessionsTab = dynamic(
+  () => import('./SessionsTab').then((m) => ({ default: m.SessionsTab })),
+  { ssr: false },
+);
+const FractalLeaderboardTab = dynamic(
+  () => import('./FractalLeaderboardTab').then((m) => ({ default: m.FractalLeaderboardTab })),
+  { ssr: false },
+);
+const ProposalsTab = dynamic(
+  () => import('./ProposalsTab').then((m) => ({ default: m.ProposalsTab })),
+  { ssr: false },
+);
+const AboutTab = dynamic(() => import('./AboutTab').then((m) => ({ default: m.AboutTab })), {
+  ssr: false,
+});
+const AnalyticsTab = dynamic(
+  () => import('./AnalyticsTab').then((m) => ({ default: m.AnalyticsTab })),
+  { ssr: false },
+);
+const EventsCalendar = dynamic(
+  () =>
+    import('@/components/governance/EventsCalendar').then((m) => ({ default: m.EventsCalendar })),
+  { ssr: false },
+);
+const LiveFractalDashboard = dynamic(
+  () =>
+    import('@/components/governance/LiveFractalDashboard').then((m) => ({
+      default: m.LiveFractalDashboard,
+    })),
+  { ssr: false },
+);
 
 type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'events' | 'live' | 'about';
-const VALID_TABS: Tab[] = ['sessions', 'leaderboard', 'analytics', 'proposals', 'events', 'live', 'about'];
+const VALID_TABS: Tab[] = [
+  'sessions',
+  'leaderboard',
+  'analytics',
+  'proposals',
+  'events',
+  'live',
+  'about',
+];
 
 interface Props {
   currentFid: number;
@@ -41,7 +73,13 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <header className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a]">
         <Link href="/home" className="text-gray-400 hover:text-white">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>

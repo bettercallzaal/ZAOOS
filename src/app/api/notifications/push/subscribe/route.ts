@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid subscription', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,18 +35,16 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Upsert subscription (replace if same endpoint exists)
-    const { error } = await supabase
-      .from('user_push_subscriptions')
-      .upsert(
-        {
-          fid,
-          endpoint: subscription.endpoint,
-          p256dh: subscription.keys.p256dh,
-          auth: subscription.keys.auth,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'endpoint' }
-      );
+    const { error } = await supabase.from('user_push_subscriptions').upsert(
+      {
+        fid,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'endpoint' },
+    );
 
     if (error) {
       logger.error('[push/subscribe] Supabase error:', error);

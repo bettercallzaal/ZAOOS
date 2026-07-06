@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   makePostRequest,
-  mockUnauthenticatedSession,
   mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockGetSignedConversationUrl } = vi.hoisted(() => ({
@@ -15,8 +15,7 @@ vi.mock('@/lib/auth/session', () => ({
 }));
 
 vi.mock('@/lib/agents/voice/elevenlabs', () => ({
-  getSignedConversationUrl: (agentId: string) =>
-    mockGetSignedConversationUrl(agentId),
+  getSignedConversationUrl: (agentId: string) => mockGetSignedConversationUrl(agentId),
 }));
 
 vi.mock('@/lib/logger', () => ({

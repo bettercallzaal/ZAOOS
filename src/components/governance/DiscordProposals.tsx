@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /* -- Types --------------------------------------------------------- */
 
@@ -194,7 +194,7 @@ function VoteButtons({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-2">
-        {votes.map(v => {
+        {votes.map((v) => {
           const isActive = proposal.userVote === v;
           const isLoading = submitting === v;
           const isDisabled = submitting !== null;
@@ -212,15 +212,32 @@ function VoteButtons({
               {isLoading ? (
                 <span className="inline-flex items-center gap-1">
                   <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   {v}
                 </span>
               ) : (
                 <>
                   {isActive && (
-                    <svg className="inline w-3 h-3 mr-1 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg
+                      className="inline w-3 h-3 mr-1 -ml-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -233,16 +250,21 @@ function VoteButtons({
       </div>
       {proposal.userVote && (
         <p className="text-[10px] text-gray-500">
-          You voted: <span className={
-            proposal.userVote === 'yes' ? 'text-green-400' :
-            proposal.userVote === 'no' ? 'text-red-400' :
-            'text-gray-400'
-          }>{proposal.userVote}</span>
+          You voted:{' '}
+          <span
+            className={
+              proposal.userVote === 'yes'
+                ? 'text-green-400'
+                : proposal.userVote === 'no'
+                  ? 'text-red-400'
+                  : 'text-gray-400'
+            }
+          >
+            {proposal.userVote}
+          </span>
         </p>
       )}
-      {error && (
-        <p className="text-[10px] text-red-400">{error}</p>
-      )}
+      {error && <p className="text-[10px] text-red-400">{error}</p>}
     </div>
   );
 }
@@ -270,10 +292,14 @@ function ProposalCard({
     <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-white/[0.08] transition-colors space-y-3">
       {/* Header: badges */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border capitalize ${typeColor}`}>
+        <span
+          className={`text-[10px] font-medium px-2 py-0.5 rounded-full border capitalize ${typeColor}`}
+        >
           {proposal.proposal_type}
         </span>
-        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border capitalize ${statusColor}`}>
+        <span
+          className={`text-[10px] font-medium px-2 py-0.5 rounded-full border capitalize ${statusColor}`}
+        >
           {proposal.status}
         </span>
         {proposal.funding_amount != null && (
@@ -284,15 +310,11 @@ function ProposalCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-sm font-semibold text-white leading-snug">
-        {proposal.title}
-      </h3>
+      <h3 className="text-sm font-semibold text-white leading-snug">{proposal.title}</h3>
 
       {/* Description */}
       {cleanDesc && (
-        <p className="text-xs text-gray-400 leading-relaxed">
-          {truncate(cleanDesc, 200)}
-        </p>
+        <p className="text-xs text-gray-400 leading-relaxed">{truncate(cleanDesc, 200)}</p>
       )}
 
       {/* Project link for curate type */}
@@ -303,8 +325,18 @@ function ProposalCard({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-[11px] text-[#f5a623]/80 hover:text-[#f5a623] transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
           </svg>
           View Project
         </a>
@@ -319,17 +351,22 @@ function ProposalCard({
       {/* Footer: metadata */}
       <div className="flex items-center justify-between text-[10px] text-gray-500 pt-1">
         <div className="flex items-center gap-3">
-          <span>{proposal.votes.total_votes} vote{proposal.votes.total_votes !== 1 ? 's' : ''}</span>
+          <span>
+            {proposal.votes.total_votes} vote{proposal.votes.total_votes !== 1 ? 's' : ''}
+          </span>
           <span>{proposal.votes.total_weight.toLocaleString()} Respect</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-gray-600">
-            {proposal.author_id.slice(0, 6)}...
-          </span>
+          <span className="font-mono text-gray-600">{proposal.author_id.slice(0, 6)}...</span>
           {proposal.status === 'active' ? (
             <span className="text-green-400/70">{timeRemaining(proposal.created_at)}</span>
           ) : (
-            <span>Closed {proposal.closed_at ? formatDate(proposal.closed_at) : formatDate(proposal.created_at)}</span>
+            <span>
+              Closed{' '}
+              {proposal.closed_at
+                ? formatDate(proposal.closed_at)
+                : formatDate(proposal.created_at)}
+            </span>
           )}
         </div>
       </div>
@@ -357,15 +394,15 @@ export function DiscordProposals() {
     if (statusFilter !== 'all') params.set('status', statusFilter);
 
     fetch(`/api/discord/proposals?${params}`)
-      .then(r => {
+      .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
-      .then(d => {
+      .then((d) => {
         setProposals(d.proposals ?? []);
         setUserDiscordId(d.userDiscordId ?? null);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('[DiscordProposals] fetch error:', err);
         setError('Failed to load Discord proposals');
       })
@@ -377,33 +414,40 @@ export function DiscordProposals() {
   }, [fetchProposals]);
 
   // Handle vote submission with optimistic update
-  const handleVote = useCallback(async (proposalId: number, vote: VoteValue) => {
-    // Optimistically update the UI
-    setProposals(prev => prev.map(p => {
-      if (p.id !== proposalId) return p;
-      return { ...p, userVote: vote };
-    }));
+  const handleVote = useCallback(
+    async (proposalId: number, vote: VoteValue) => {
+      // Optimistically update the UI
+      setProposals((prev) =>
+        prev.map((p) => {
+          if (p.id !== proposalId) return p;
+          return { ...p, userVote: vote };
+        }),
+      );
 
-    const res = await fetch('/api/discord/proposals/vote', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ proposalId, vote }),
-    });
+      const res = await fetch('/api/discord/proposals/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proposalId, vote }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      // Revert optimistic update
-      fetchProposals();
-      throw new Error(data.error || 'Vote failed');
-    }
+      if (!res.ok) {
+        // Revert optimistic update
+        fetchProposals();
+        throw new Error(data.error || 'Vote failed');
+      }
 
-    // Update with real vote counts from server
-    setProposals(prev => prev.map(p => {
-      if (p.id !== proposalId) return p;
-      return { ...p, votes: data.votes, userVote: vote };
-    }));
-  }, [fetchProposals]);
+      // Update with real vote counts from server
+      setProposals((prev) =>
+        prev.map((p) => {
+          if (p.id !== proposalId) return p;
+          return { ...p, votes: data.votes, userVote: vote };
+        }),
+      );
+    },
+    [fetchProposals],
+  );
 
   // Client-side sort
   const sorted = [...proposals].sort((a, b) => {
@@ -437,7 +481,9 @@ export function DiscordProposals() {
         <svg className="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
         </svg>
-        <h2 className="text-sm font-bold text-indigo-400 uppercase tracking-wide">Discord Proposals</h2>
+        <h2 className="text-sm font-bold text-indigo-400 uppercase tracking-wide">
+          Discord Proposals
+        </h2>
         <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">
           Respect-Weighted
         </span>
@@ -446,7 +492,7 @@ export function DiscordProposals() {
       {/* Filter tabs */}
       <div className="flex items-center gap-4">
         <div className="flex gap-1.5">
-          {STATUS_FILTERS.map(f => (
+          {STATUS_FILTERS.map((f) => (
             <button
               key={f.id}
               onClick={() => setStatusFilter(f.id)}
@@ -464,7 +510,7 @@ export function DiscordProposals() {
         <div className="h-3 border-l border-white/[0.08]" />
 
         <div className="flex gap-1.5">
-          {SORT_OPTIONS.map(s => (
+          {SORT_OPTIONS.map((s) => (
             <button
               key={s.id}
               onClick={() => setSortMode(s.id)}
@@ -493,10 +539,7 @@ export function DiscordProposals() {
       {error && !loading && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400">
           {error}
-          <button
-            onClick={fetchProposals}
-            className="ml-2 underline hover:no-underline"
-          >
+          <button onClick={fetchProposals} className="ml-2 underline hover:no-underline">
             Retry
           </button>
         </div>
@@ -515,7 +558,7 @@ export function DiscordProposals() {
       {/* Proposal cards */}
       {!loading && !error && sorted.length > 0 && (
         <div className="space-y-3">
-          {sorted.map(p => (
+          {sorted.map((p) => (
             <ProposalCard
               key={p.id}
               proposal={p}

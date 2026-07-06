@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { parseEther, isAddress } from 'viem';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { ZOUNZ_GOVERNOR, ZOUNZ_TREASURY, governorAbi } from '@/lib/zounz/contracts';
+import { isAddress, parseEther } from 'viem';
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { governorAbi, ZOUNZ_GOVERNOR, ZOUNZ_TREASURY } from '@/lib/zounz/contracts';
 
 interface Props {
   onClose: () => void;
@@ -134,7 +134,7 @@ export default function ZounzCreateProposal({
             <input
               type="text"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Short, descriptive proposal title"
               className={INPUT_CLASS}
               disabled={!canPropose || isPending || isConfirming}
@@ -147,7 +147,7 @@ export default function ZounzCreateProposal({
             <label className="mb-1 block text-xs font-medium text-gray-400">Description</label>
             <textarea
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Full proposal details — what, why, and how."
               rows={5}
               className={`${INPUT_CLASS} resize-none`}
@@ -159,7 +159,7 @@ export default function ZounzCreateProposal({
           <div>
             <label className="mb-2 block text-xs font-medium text-gray-400">Proposal Type</label>
             <div className="flex gap-2">
-              {(['text', 'transfer'] as ProposalType[]).map(type => (
+              {(['text', 'transfer'] as ProposalType[]).map((type) => (
                 <button
                   key={type}
                   type="button"
@@ -187,20 +187,18 @@ export default function ZounzCreateProposal({
                 <input
                   type="text"
                   value={transferTo}
-                  onChange={e => setTransferTo(e.target.value)}
+                  onChange={(e) => setTransferTo(e.target.value)}
                   placeholder="0x..."
                   className={INPUT_CLASS}
                   disabled={!canPropose || isPending || isConfirming}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-400">
-                  Amount (ETH)
-                </label>
+                <label className="mb-1 block text-xs font-medium text-gray-400">Amount (ETH)</label>
                 <input
                   type="number"
                   value={transferAmount}
-                  onChange={e => setTransferAmount(e.target.value)}
+                  onChange={(e) => setTransferAmount(e.target.value)}
                   placeholder="0.0"
                   min="0"
                   step="any"
@@ -212,29 +210,21 @@ export default function ZounzCreateProposal({
           )}
 
           {/* Validation error */}
-          {validationError && (
-            <p className="text-sm text-red-400">{validationError}</p>
-          )}
+          {validationError && <p className="text-sm text-red-400">{validationError}</p>}
 
           {/* Write contract error */}
-          {writeError && (
-            <p className="text-sm text-red-400">{getWriteErrorMessage(writeError)}</p>
-          )}
+          {writeError && <p className="text-sm text-red-400">{getWriteErrorMessage(writeError)}</p>}
 
           {/* Transaction status */}
           {isPending && (
-            <p className="text-sm text-[#f5a623]/80">
-              Waiting for wallet confirmation...
-            </p>
+            <p className="text-sm text-[#f5a623]/80">Waiting for wallet confirmation...</p>
           )}
           {isConfirming && (
             <p className="text-sm text-[#f5a623]/80">
               Transaction submitted — waiting for on-chain confirmation...
             </p>
           )}
-          {isConfirmed && (
-            <p className="text-sm text-green-400">Proposal created successfully!</p>
-          )}
+          {isConfirmed && <p className="text-sm text-green-400">Proposal created successfully!</p>}
 
           {/* Actions */}
           <div className="flex gap-3 pt-1">

@@ -1,23 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { createRoom } from '@/lib/spaces/roomsDb';
 import {
   getValidTwitchToken,
-  updateTwitchChannel,
-  TWITCH_CATEGORY_MUSIC,
   TWITCH_CATEGORY_DJS,
+  TWITCH_CATEGORY_MUSIC,
+  updateTwitchChannel,
 } from '@/lib/twitch/client';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
-import { logger } from '@/lib/logger';
 
-const GateConfigSchema = z.object({
-  type: z.enum(['erc20', 'erc721', 'erc1155']),
-  contractAddress: z.string().min(1),
-  chainId: z.number().int(),
-  minBalance: z.string().optional(),
-  tokenId: z.string().optional(),
-}).optional().nullable();
+const GateConfigSchema = z
+  .object({
+    type: z.enum(['erc20', 'erc721', 'erc1155']),
+    contractAddress: z.string().min(1),
+    chainId: z.number().int(),
+    minBalance: z.string().optional(),
+    tokenId: z.string().optional(),
+  })
+  .optional()
+  .nullable();
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
@@ -41,7 +44,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = CreateRoomSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const room = await createRoom({
@@ -60,13 +66,13 @@ export async function POST(req: NextRequest) {
     });
 
     // Fire-and-forget: set Twitch channel title + category
-    syncTwitchOnCreate(session.fid, parsed.data.title).catch(err =>
-      logger.error('[room-create] Twitch sync failed:', err)
+    syncTwitchOnCreate(session.fid, parsed.data.title).catch((err) =>
+      logger.error('[room-create] Twitch sync failed:', err),
     );
 
     // Fire-and-forget: auto-cast go-live announcement to /zao channel
-    castGoLive(parsed.data.title, room.id).catch(err =>
-      logger.error('[room-create] Go-live cast failed:', err)
+    castGoLive(parsed.data.title, room.id).catch((err) =>
+      logger.error('[room-create] Go-live cast failed:', err),
     );
 
     return NextResponse.json({ room });

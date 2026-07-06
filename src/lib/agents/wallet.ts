@@ -17,8 +17,8 @@
  */
 
 import { PrivyClient } from '@privy-io/node';
-import type { AgentName } from './types';
 import { logger } from '@/lib/logger';
+import type { AgentName } from './types';
 
 const BASE_CAIP2 = 'eip155:8453'; // Base mainnet
 
@@ -61,7 +61,7 @@ function getWalletId(agentName: AgentName): string {
  */
 export async function executeSwap(
   agentName: AgentName,
-  quoteData: { to: string; data: string; value: string; gas?: string }
+  quoteData: { to: string; data: string; value: string; gas?: string },
 ): Promise<string> {
   const privy = getPrivy();
   const walletId = getWalletId(agentName);
@@ -69,23 +69,31 @@ export async function executeSwap(
   logger.info(`[${agentName}] Sending swap tx to ${quoteData.to} via Privy`);
 
   try {
-    const response = await privy.wallets().ethereum().sendTransaction(walletId, {
-      caip2: BASE_CAIP2,
-      params: {
-        transaction: {
-          to: quoteData.to,
-          data: quoteData.data,
-          value: quoteData.value,
-          chain_id: 8453,
+    const response = await privy
+      .wallets()
+      .ethereum()
+      .sendTransaction(walletId, {
+        caip2: BASE_CAIP2,
+        params: {
+          transaction: {
+            to: quoteData.to,
+            data: quoteData.data,
+            value: quoteData.value,
+            chain_id: 8453,
+          },
         },
-      },
-    });
+      });
 
     logger.info(`[${agentName}] TX submitted: ${response.hash}`);
     return response.hash;
   } catch (err) {
     // Reset cached client on auth errors so next call retries fresh
-    if (err instanceof Error && (err.message.includes('401') || err.message.includes('auth') || err.message.includes('Unauthorized'))) {
+    if (
+      err instanceof Error &&
+      (err.message.includes('401') ||
+        err.message.includes('auth') ||
+        err.message.includes('Unauthorized'))
+    ) {
       resetPrivy();
       logger.error(`[${agentName}] Privy auth error, resetting client: ${err.message}`);
     }
@@ -101,7 +109,7 @@ export async function sendToken(
   agentName: AgentName,
   tokenAddress: string,
   to: string,
-  amount: bigint
+  amount: bigint,
 ): Promise<string> {
   const privy = getPrivy();
   const walletId = getWalletId(agentName);
@@ -112,22 +120,30 @@ export async function sendToken(
   logger.info(`[${agentName}] Token transfer to ${to} via Privy`);
 
   try {
-    const response = await privy.wallets().ethereum().sendTransaction(walletId, {
-      caip2: BASE_CAIP2,
-      params: {
-        transaction: {
-          to: tokenAddress,
-          data,
-          value: '0x0',
-          chain_id: 8453,
+    const response = await privy
+      .wallets()
+      .ethereum()
+      .sendTransaction(walletId, {
+        caip2: BASE_CAIP2,
+        params: {
+          transaction: {
+            to: tokenAddress,
+            data,
+            value: '0x0',
+            chain_id: 8453,
+          },
         },
-      },
-    });
+      });
 
     logger.info(`[${agentName}] Token transfer: ${response.hash}`);
     return response.hash;
   } catch (err) {
-    if (err instanceof Error && (err.message.includes('401') || err.message.includes('auth') || err.message.includes('Unauthorized'))) {
+    if (
+      err instanceof Error &&
+      (err.message.includes('401') ||
+        err.message.includes('auth') ||
+        err.message.includes('Unauthorized'))
+    ) {
       resetPrivy();
       logger.error(`[${agentName}] Privy auth error, resetting client: ${err.message}`);
     }

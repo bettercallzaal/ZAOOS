@@ -16,7 +16,8 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
     const handleKeyDown = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       const target = e.target as HTMLElement;
-      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+      const isInput =
+        target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
       // Cmd/Ctrl+K → open search (works even in inputs)
       if (mod && e.key === 'k') {

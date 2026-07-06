@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useState } from 'react';
 import { communityConfig } from '@/../community.config';
 
 const ZounzAuction = dynamic(() => import('@/components/zounz/ZounzAuction'), { ssr: false });
@@ -21,12 +21,13 @@ const ICON_MAP: Record<string, string> = {
 
 // Direct ZABAL-specific URLs for iframe embeds
 const EMBED_URLS: Record<string, string> = {
-  'SongJam': '/spaces',
-  'Empire Builder': 'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
-  'Incented': 'https://incented.co/organizations/zabal',
-  'MAGNETIQ': 'https://app.magnetiq.xyz',
-  'Clanker': 'https://clanker.world',
-  'ZOUNZ': 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
+  SongJam: '/spaces',
+  'Empire Builder':
+    'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
+  Incented: 'https://incented.co/organizations/zabal',
+  MAGNETIQ: 'https://app.magnetiq.xyz',
+  Clanker: 'https://clanker.world',
+  ZOUNZ: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
 };
 
 export default function EcosystemPanel() {
@@ -43,8 +44,14 @@ export default function EcosystemPanel() {
 
       <div className="mb-2 flex items-center justify-between px-1">
         <p className="text-xs text-gray-500 uppercase tracking-wider">ZABAL Partner Apps</p>
-        <ShareToFarcaster template={shareTemplates.ecosystem()} variant="compact" label="Share Ecosystem" />
-        <p className="text-xs text-gray-600 px-1 mt-1">Tap a partner to open their ZABAL integration inline.</p>
+        <ShareToFarcaster
+          template={shareTemplates.ecosystem()}
+          variant="compact"
+          label="Share Ecosystem"
+        />
+        <p className="text-xs text-gray-600 px-1 mt-1">
+          Tap a partner to open their ZABAL integration inline.
+        </p>
       </div>
 
       {partners.map((partner) => {
@@ -66,8 +73,18 @@ export default function EcosystemPanel() {
                   <h3 className="text-sm font-semibold text-white">{partner.name}</h3>
                   <p className="text-xs text-gray-400 truncate">{partner.description}</p>
                 </div>
-                <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                  />
                 </svg>
               </div>
             </Link>
@@ -112,7 +129,10 @@ export default function EcosystemPanel() {
 
             {isExpanded && (
               <div className="border-t border-white/[0.08]">
-                <div className="relative w-full bg-[#0a1628]" style={{ height: '70vh', minHeight: '400px' }}>
+                <div
+                  className="relative w-full bg-[#0a1628]"
+                  style={{ height: '70vh', minHeight: '400px' }}
+                >
                   <iframe
                     src={embedUrl}
                     title={`${partner.name} — ZABAL Integration`}
@@ -123,7 +143,9 @@ export default function EcosystemPanel() {
                   />
                 </div>
                 <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-t border-white/[0.08]">
-                  <p className="text-[10px] text-gray-600 truncate">{embedUrl.replace('https://', '')}</p>
+                  <p className="text-[10px] text-gray-600 truncate">
+                    {embedUrl.replace('https://', '')}
+                  </p>
                   <a
                     href={embedUrl}
                     target="_blank"

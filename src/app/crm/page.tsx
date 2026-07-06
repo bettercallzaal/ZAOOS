@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/db/supabase';
 import type { CrmContact } from '@/lib/crm/types';
+import { getSupabaseAdmin } from '@/lib/db/supabase';
 import CrmAddForm from './CrmAddForm';
 
 // Private CRM dashboard. Admin-only (iron-session isAdmin). Reads the full
@@ -26,9 +26,7 @@ async function getContacts(): Promise<ContactWithCount[]> {
   if (error || !contacts) return [];
 
   // Per-contact interaction counts (one grouped query).
-  const { data: counts } = await supabase
-    .from('crm_interactions')
-    .select('contact_id');
+  const { data: counts } = await supabase.from('crm_interactions').select('contact_id');
   const countMap = new Map<string, number>();
   for (const row of counts ?? []) {
     const id = (row as { contact_id: string }).contact_id;
@@ -72,18 +70,11 @@ export default async function CrmPage() {
           ) : (
             <ul className="space-y-2">
               {contacts.map((c) => (
-                <li
-                  key={c.id}
-                  className="rounded-lg border border-white/10 bg-white/[0.03] p-3"
-                >
+                <li key={c.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="font-medium">{c.name}</span>
                     <span className="flex shrink-0 items-center gap-2 text-xs">
-                      <span
-                        className={
-                          c.is_public ? 'text-[#f5a623]' : 'text-white/30'
-                        }
-                      >
+                      <span className={c.is_public ? 'text-[#f5a623]' : 'text-white/30'}>
                         {c.is_public ? 'public' : 'private'}
                       </span>
                       <span className="text-white/40">

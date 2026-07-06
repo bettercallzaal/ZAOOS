@@ -74,9 +74,7 @@ export default function ChannelSidebar({
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm">{emoji}</span>
-                <span className="text-gray-200 truncate text-[13px]">
-                  {channel.title}
-                </span>
+                <span className="text-gray-200 truncate text-[13px]">{channel.title}</span>
                 {isActive && (
                   <span className="ml-auto flex-shrink-0 bg-green-500/20 text-green-400 text-[10px] font-medium px-1.5 py-0.5 rounded-full">
                     {channel.participant_count}

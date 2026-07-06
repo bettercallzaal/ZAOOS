@@ -1,4 +1,4 @@
-import { getIronSession, IronSession } from 'iron-session';
+import { getIronSession, type IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { ENV } from '@/lib/env';
 
@@ -23,7 +23,10 @@ export async function getStockTeamSession(): Promise<IronSession<StockTeamPayloa
   return getIronSession<StockTeamPayload>(cookieStore, stockTeamSessionOptions);
 }
 
-export async function getStockTeamMember(): Promise<{ memberId: string; memberName: string } | null> {
+export async function getStockTeamMember(): Promise<{
+  memberId: string;
+  memberName: string;
+} | null> {
   const session = await getStockTeamSession();
   if (!session.memberId || !session.memberName) return null;
   return { memberId: session.memberId, memberName: session.memberName };

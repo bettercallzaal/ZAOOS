@@ -5,7 +5,7 @@
 //   npx tsx scripts/stock-reset-code.ts Shawn
 //   npx tsx scripts/stock-reset-code.ts Shawn Zaal
 
-import { scryptSync, randomBytes } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 

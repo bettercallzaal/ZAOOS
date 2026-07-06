@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getJukeIntegrationManifest } from '@/lib/spaces/jukeIntegrationManifest';
 import { buildResolutionIndex, fetchJukeChangelog } from '@/lib/spaces/jukeChangelog';
+import { getJukeIntegrationManifest } from '@/lib/spaces/jukeIntegrationManifest';
 import {
   getJukeIntegrationStats,
   listRecentJukeSpaces,

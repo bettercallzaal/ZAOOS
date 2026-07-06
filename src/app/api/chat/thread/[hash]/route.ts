@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getCastThread } from '@/lib/farcaster/neynar';
-import { castHashSchema } from '@/lib/validation/schemas';
-import { Cast } from '@/types';
 import { logger } from '@/lib/logger';
+import { castHashSchema } from '@/lib/validation/schemas';
+import type { Cast } from '@/types';
 
 function mapCast(raw: Record<string, unknown>): Cast {
   const author = raw.author as Record<string, unknown>;
@@ -42,10 +42,7 @@ function flattenThread(cast: Record<string, unknown>): Cast[] {
   return result;
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ hash: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ hash: string }> }) {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

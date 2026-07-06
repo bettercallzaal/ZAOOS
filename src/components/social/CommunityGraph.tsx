@@ -1,12 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo, Component, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
+import {
+  Component,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 // Dynamically import force graph — cast to bypass complex generic mismatches
 const ForceGraph2D = dynamic(
-  () => import('react-force-graph-2d').then((mod) => mod.default) as Promise<React.ComponentType<Record<string, unknown>>>,
-  { ssr: false, loading: () => null }
+  () =>
+    import('react-force-graph-2d').then((mod) => mod.default) as Promise<
+      React.ComponentType<Record<string, unknown>>
+    >,
+  { ssr: false, loading: () => null },
 ) as React.ComponentType<Record<string, unknown>>;
 
 /* ---------- Error Boundary ---------- */
@@ -152,7 +163,9 @@ export function CommunityGraph() {
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // Fetch engagement scores once members load
@@ -167,9 +180,9 @@ export function CommunityGraph() {
     Promise.allSettled(
       batches.map((batch) =>
         fetch(`/api/social/engagement?fids=${batch.join(',')}`).then((r) =>
-          r.ok ? r.json() : null
-        )
-      )
+          r.ok ? r.json() : null,
+        ),
+      ),
     ).then((results) => {
       const merged: Record<string, number> = {};
       for (const result of results) {
@@ -185,10 +198,7 @@ export function CommunityGraph() {
 
   // Build graph data
   const graphData = useMemo(() => {
-    const maxEngagement = Math.max(
-      1,
-      ...Object.values(engagementMap).map((v) => v || 0)
-    );
+    const maxEngagement = Math.max(1, ...Object.values(engagementMap).map((v) => v || 0));
 
     const nodes: GraphNode[] = members.map((m) => {
       const eng = engagementMap[String(m.fid)] || 0;
@@ -236,9 +246,7 @@ export function CommunityGraph() {
     }
     const q = searchQuery.toLowerCase();
     const match = graphData.nodes.find(
-      (n) =>
-        n.name.toLowerCase().includes(q) ||
-        n.username.toLowerCase().includes(q)
+      (n) => n.name.toLowerCase().includes(q) || n.username.toLowerCase().includes(q),
     );
     setHighlightedNodeId(match ? match.id : null);
   }, [searchQuery, graphData.nodes]);
@@ -252,9 +260,13 @@ export function CommunityGraph() {
 
   // Canvas node rendering with images
   const nodeCanvasObject = useCallback(
-    (node: GraphNode & { x?: number; y?: number }, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    (
+      node: GraphNode & { x?: number; y?: number },
+      ctx: CanvasRenderingContext2D,
+      globalScale: number,
+    ) => {
       const isHighlighted = highlightedNodeId === node.id;
-      const radius = isHighlighted ? (node.val || 6) * 1.5 : (node.val || 6);
+      const radius = isHighlighted ? (node.val || 6) * 1.5 : node.val || 6;
       const x = node.x ?? 0;
       const y = node.y ?? 0;
 
@@ -316,41 +328,44 @@ export function CommunityGraph() {
 
       ctx.globalAlpha = 1;
     },
-    [neighborSet, highlightedNodeId]
+    [neighborSet, highlightedNodeId],
   );
 
   const nodePointerAreaPaint = useCallback(
-    (node: GraphNode & { x?: number; y?: number }, color: string, ctx: CanvasRenderingContext2D) => {
+    (
+      node: GraphNode & { x?: number; y?: number },
+      color: string,
+      ctx: CanvasRenderingContext2D,
+    ) => {
       const radius = node.val || 6;
       ctx.beginPath();
       ctx.arc(node.x ?? 0, node.y ?? 0, radius + 2, 0, 2 * Math.PI);
       ctx.fillStyle = color;
       ctx.fill();
     },
-    []
+    [],
   );
 
   const handleNodeHover = useCallback((node: GraphNode | null) => {
     setHoveredNode(node);
   }, []);
 
-  const handleNodeClick = useCallback(
-    (node: GraphNode, event: MouseEvent) => {
-      setSelectedNode((prev) => (prev?.id === node.id ? null : node));
-      setTooltipPos({ x: event.clientX, y: event.clientY });
-    },
-    []
-  );
+  const handleNodeClick = useCallback((node: GraphNode, event: MouseEvent) => {
+    setSelectedNode((prev) => (prev?.id === node.id ? null : node));
+    setTooltipPos({ x: event.clientX, y: event.clientY });
+  }, []);
 
   const linkColor = useCallback(
     (link: Record<string, unknown>) => {
       if (!neighborSet) return 'rgba(245,166,35,0.12)';
-      const src = typeof link.source === 'object' ? (link.source as GraphNode).id : link.source as number;
-      const tgt = typeof link.target === 'object' ? (link.target as GraphNode).id : link.target as number;
+      const src =
+        typeof link.source === 'object' ? (link.source as GraphNode).id : (link.source as number);
+      const tgt =
+        typeof link.target === 'object' ? (link.target as GraphNode).id : (link.target as number);
       if (neighborSet.has(src) && neighborSet.has(tgt)) return 'rgba(245,166,35,0.5)';
       return 'rgba(245,166,35,0.04)';
     },
-    [neighborSet]
+    [neighborSet],
   );
 
   // Loading state
@@ -442,38 +457,38 @@ export function CommunityGraph() {
             </div>
           }
         >
-        {!forceGraphFailed ? (
-          <ForceGraph2D
-            ref={graphRef}
-            graphData={graphData}
-            width={dimensions.width}
-            height={dimensions.height}
-            backgroundColor="#0a1628"
-            nodeId="id"
-            nodeVal="val"
-            nodeCanvasObject={nodeCanvasObject}
-            nodePointerAreaPaint={nodePointerAreaPaint}
-            onNodeHover={handleNodeHover}
-            onNodeClick={handleNodeClick}
-            linkColor={linkColor}
-            linkWidth={0.5}
-            linkDirectionalParticles={0}
-            d3AlphaDecay={0.02}
-            d3VelocityDecay={0.3}
-            cooldownTicks={100}
-            enableZoomInteraction={true}
-            enablePanInteraction={true}
-            enableNodeDrag={true}
-            onEngineStop={() => {
-              // Zoom to fit after initial layout
-              graphRef.current?.zoomToFit?.(400, 40);
-            }}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-            Graph visualization unavailable
-          </div>
-        )}
+          {!forceGraphFailed ? (
+            <ForceGraph2D
+              ref={graphRef}
+              graphData={graphData}
+              width={dimensions.width}
+              height={dimensions.height}
+              backgroundColor="#0a1628"
+              nodeId="id"
+              nodeVal="val"
+              nodeCanvasObject={nodeCanvasObject}
+              nodePointerAreaPaint={nodePointerAreaPaint}
+              onNodeHover={handleNodeHover}
+              onNodeClick={handleNodeClick}
+              linkColor={linkColor}
+              linkWidth={0.5}
+              linkDirectionalParticles={0}
+              d3AlphaDecay={0.02}
+              d3VelocityDecay={0.3}
+              cooldownTicks={100}
+              enableZoomInteraction={true}
+              enablePanInteraction={true}
+              enableNodeDrag={true}
+              onEngineStop={() => {
+                // Zoom to fit after initial layout
+                graphRef.current?.zoomToFit?.(400, 40);
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+              Graph visualization unavailable
+            </div>
+          )}
         </GraphErrorBoundary>
 
         {/* Zoom controls */}
@@ -508,11 +523,11 @@ export function CommunityGraph() {
             style={{
               left: Math.min(
                 tooltipPos.x - (containerRef.current?.getBoundingClientRect().left ?? 0),
-                dimensions.width - 290
+                dimensions.width - 290,
               ),
               top: Math.min(
                 tooltipPos.y - (containerRef.current?.getBoundingClientRect().top ?? 0) + 10,
-                dimensions.height - 260
+                dimensions.height - 260,
               ),
             }}
           >
@@ -545,7 +560,9 @@ export function CommunityGraph() {
             </div>
             <div className="grid grid-cols-3 gap-2 text-center text-xs mb-3">
               <div className="bg-[#0a1628] rounded-lg py-1.5">
-                <p className="font-bold text-white">{selectedNode.followerCount.toLocaleString()}</p>
+                <p className="font-bold text-white">
+                  {selectedNode.followerCount.toLocaleString()}
+                </p>
                 <p className="text-gray-500">Followers</p>
               </div>
               <div className="bg-[#0a1628] rounded-lg py-1.5">

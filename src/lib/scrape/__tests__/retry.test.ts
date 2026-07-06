@@ -1,6 +1,6 @@
 // @vitest-environment node
-import { describe, it, expect, vi } from 'vitest';
-import { withRetry, isRetryableHttpError } from '../retry';
+import { describe, expect, it, vi } from 'vitest';
+import { isRetryableHttpError, withRetry } from '../retry';
 
 const noSleep = async () => {};
 
@@ -48,7 +48,14 @@ describe('withRetry', () => {
       throw new Error('500');
     });
     await expect(
-      withRetry(fn, { retries: 3, baseDelayMs: 100, factor: 2, sleep: async (ms) => { delays.push(ms); } }),
+      withRetry(fn, {
+        retries: 3,
+        baseDelayMs: 100,
+        factor: 2,
+        sleep: async (ms) => {
+          delays.push(ms);
+        },
+      }),
     ).rejects.toThrow();
     expect(delays).toEqual([100, 200, 400]);
   });

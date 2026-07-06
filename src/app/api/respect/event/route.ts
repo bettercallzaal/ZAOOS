@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -41,7 +41,11 @@ const RespectEventSchema = z.object({
   event_type: z.enum(EVENT_TYPES),
   amount: z.number().positive(),
   description: z.string().optional().nullable(),
-  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+  event_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
+    .optional()
+    .nullable(),
 });
 
 /**
@@ -61,11 +65,12 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { member_name, wallet_address, event_type, amount, description, event_date } = parsed.data;
+    const { member_name, wallet_address, event_type, amount, description, event_date } =
+      parsed.data;
 
     // 1. Insert the event
     const { data: event, error: eventError } = await supabaseAdmin
@@ -166,9 +171,7 @@ export async function POST(req: NextRequest) {
         newMember.first_respect_at = event_date;
       }
 
-      const { error: insertError } = await supabaseAdmin
-        .from('respect_members')
-        .insert(newMember);
+      const { error: insertError } = await supabaseAdmin.from('respect_members').insert(newMember);
 
       if (insertError) {
         logger.error('Failed to create member record:', insertError);
@@ -181,17 +184,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Fire-and-forget: check for respect milestones and auto-cast
-    const newTotal = memberId && memberData
-      ? Number(memberData.total_respect) + amount
-      : amount;
+    const newTotal = memberId && memberData ? Number(memberData.total_respect) + amount : amount;
     const oldTotal = memberId && memberData ? Number(memberData.total_respect) : 0;
 
     const MILESTONES = [100, 500, 1000] as const;
     for (const milestone of MILESTONES) {
       if (oldTotal < milestone && newTotal >= milestone) {
-        autoCastToZao(
-          `\u{1F3C6} ${member_name} just reached ${milestone} Respect!`,
-        ).catch((err) => logger.error('[respect-milestone-cast]', err));
+        autoCastToZao(`\u{1F3C6} ${member_name} just reached ${milestone} Respect!`).catch((err) =>
+          logger.error('[respect-milestone-cast]', err),
+        );
         break; // Only announce the highest crossed milestone
       }
     }

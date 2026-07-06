@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
 
 const nominateSchema = z.object({
   url: z.string().url().max(500),
@@ -24,11 +24,7 @@ export async function GET() {
 
     // Fetch today's selected track + today's nominations in parallel
     const [selectedResult, nominationsResult] = await Promise.allSettled([
-      supabaseAdmin
-        .from('track_of_the_day')
-        .select('*')
-        .eq('selected_date', today)
-        .maybeSingle(),
+      supabaseAdmin.from('track_of_the_day').select('*').eq('selected_date', today).maybeSingle(),
       supabaseAdmin
         .from('track_of_the_day')
         .select('*')
@@ -76,14 +72,17 @@ export async function GET() {
     const cutoffToday = new Date(`${today}T${String(cutoffHour).padStart(2, '0')}:00:00.000Z`);
     const isPastCutoff = now >= cutoffToday;
 
-    return NextResponse.json({
-      selected,
-      nominations: enrichedNominations,
-      isPastCutoff,
-      today,
-    }, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      {
+        selected,
+        nominations: enrichedNominations,
+        isPastCutoff,
+        today,
+      },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=30' },
+      },
+    );
   } catch (error) {
     logger.error('Track of the Day GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch track of the day' }, { status: 500 });

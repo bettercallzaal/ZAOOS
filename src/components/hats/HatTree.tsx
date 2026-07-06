@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface HatNode {
   id: string;
@@ -25,10 +25,30 @@ interface HatTreeResult {
 
 // Level-based accent colors
 const LEVEL_STYLES = [
-  { accent: 'text-[#f5a623]', bg: 'bg-[#f5a623]/10', border: 'border-[#f5a623]/30', dot: 'bg-[#f5a623]' },
-  { accent: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30', dot: 'bg-purple-400' },
-  { accent: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-400' },
-  { accent: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', dot: 'bg-emerald-400' },
+  {
+    accent: 'text-[#f5a623]',
+    bg: 'bg-[#f5a623]/10',
+    border: 'border-[#f5a623]/30',
+    dot: 'bg-[#f5a623]',
+  },
+  {
+    accent: 'text-purple-400',
+    bg: 'bg-purple-500/10',
+    border: 'border-purple-500/30',
+    dot: 'bg-purple-400',
+  },
+  {
+    accent: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/30',
+    dot: 'bg-blue-400',
+  },
+  {
+    accent: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    dot: 'bg-emerald-400',
+  },
 ];
 
 function getStyle(depth: number) {
@@ -106,9 +126,7 @@ function TreeNode({
   const hasVisibleChildren = visibleChildren.length > 0;
 
   // When searching, force expand nodes with matches; otherwise use manual or default
-  const expanded = searchQuery
-    ? hasVisibleChildren
-    : manualExpanded ?? depth < 2;
+  const expanded = searchQuery ? hasVisibleChildren : (manualExpanded ?? depth < 2);
 
   const toggleExpanded = () => setManualExpanded(expanded ? false : true);
 
@@ -128,7 +146,9 @@ function TreeNode({
             ))}
             <span className="w-5 flex-shrink-0 inline-flex items-start h-8 relative">
               {/* Vertical line from parent */}
-              <span className={`absolute left-2 top-0 w-px bg-gray-700/60 ${isLast ? 'h-4' : 'h-full'}`} />
+              <span
+                className={`absolute left-2 top-0 w-px bg-gray-700/60 ${isLast ? 'h-4' : 'h-full'}`}
+              />
               {/* Horizontal connector */}
               <span className="absolute left-2 top-4 w-3 h-px bg-gray-700/60" />
             </span>
@@ -144,15 +164,21 @@ function TreeNode({
         >
           {/* Expand/collapse indicator */}
           {hasVisibleChildren ? (
-            <span className={`text-[10px] w-4 flex-shrink-0 text-center ${style.accent} opacity-70`}>
+            <span
+              className={`text-[10px] w-4 flex-shrink-0 text-center ${style.accent} opacity-70`}
+            >
               {expanded ? '▼' : '▶'}
             </span>
           ) : (
-            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${style.dot} opacity-60 ml-1 mr-1`} />
+            <span
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${style.dot} opacity-60 ml-1 mr-1`}
+            />
           )}
 
           {/* Hat label */}
-          <span className={`font-medium truncate ${style.accent} ${isTopHat ? 'text-base' : 'text-sm'}`}>
+          <span
+            className={`font-medium truncate ${style.accent} ${isTopHat ? 'text-base' : 'text-sm'}`}
+          >
             {node.label}
           </span>
 
@@ -172,12 +198,17 @@ function TreeNode({
 
       {/* Wearer list (expandable) */}
       {node.wearers.length > 0 && (
-        <div className={`${isTopHat ? 'ml-6' : ''}`} style={!isTopHat ? { marginLeft: `${(parentLines.length + 1) * 20 + 36}px` } : undefined}>
+        <div
+          className={`${isTopHat ? 'ml-6' : ''}`}
+          style={!isTopHat ? { marginLeft: `${(parentLines.length + 1) * 20 + 36}px` } : undefined}
+        >
           <button
             onClick={() => setShowWearers(!showWearers)}
             className="text-[10px] text-gray-500 hover:text-gray-400 transition-colors px-1 -mt-1 mb-0.5"
           >
-            {showWearers ? 'hide wearers' : `${node.wearers.length} wearer${node.wearers.length !== 1 ? 's' : ''}`}
+            {showWearers
+              ? 'hide wearers'
+              : `${node.wearers.length} wearer${node.wearers.length !== 1 ? 's' : ''}`}
           </button>
           {showWearers && (
             <div className="flex flex-wrap gap-1 mb-1 px-1">
@@ -273,7 +304,8 @@ export default function HatTree() {
         <div>
           <p className="text-xs text-gray-500 uppercase tracking-wider">ZAO Role Tree</p>
           <p className="text-[10px] text-gray-600 mt-0.5">
-            Tree {tree.treeId} on Optimism &middot; {stats?.totalRoles} roles &middot; {stats?.totalWearers} wearers
+            Tree {tree.treeId} on Optimism &middot; {stats?.totalRoles} roles &middot;{' '}
+            {stats?.totalWearers} wearers
           </p>
         </div>
         <a
@@ -310,11 +342,7 @@ export default function HatTree() {
 
       {/* Tree */}
       <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] px-3 py-3 overflow-hidden">
-        <TreeNode
-          node={tree.root}
-          hideEmpty={hideEmpty}
-          searchQuery={searchQuery}
-        />
+        <TreeNode node={tree.root} hideEmpty={hideEmpty} searchQuery={searchQuery} />
       </div>
 
       <p className="text-[10px] text-gray-600 text-center">

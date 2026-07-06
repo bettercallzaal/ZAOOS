@@ -7,19 +7,18 @@
  * Server-side only — never import in client components.
  */
 
-import { isWearerOfHat, getWornHats } from './client';
+import { getWornHats, isWearerOfHat } from './client';
 import { HAT_IDS, PROJECT_HAT_IDS } from './constants';
 
 // ── Permission types ────────────────────────────────────────
 
 export type Permission =
-  | 'admin'           // Full admin access (settings, user management)
-  | 'moderate'        // Content moderation (hide/feature posts)
-  | 'governance'      // Governance actions (create/manage proposals)
-  | 'feature_tracks'  // Feature tracks in music section
-  | 'manage_events'   // Manage events/festivals
-  | 'manage_projects' // Manage project-level settings
-  ;
+  | 'admin' // Full admin access (settings, user management)
+  | 'moderate' // Content moderation (hide/feature posts)
+  | 'governance' // Governance actions (create/manage proposals)
+  | 'feature_tracks' // Feature tracks in music section
+  | 'manage_events' // Manage events/festivals
+  | 'manage_projects'; // Manage project-level settings
 
 export interface HatRole {
   hatId: bigint;
@@ -33,12 +32,26 @@ const HAT_PERMISSIONS: HatRole[] = [
   {
     hatId: HAT_IDS.topHat,
     label: 'ZAO',
-    permissions: ['admin', 'moderate', 'governance', 'feature_tracks', 'manage_events', 'manage_projects'],
+    permissions: [
+      'admin',
+      'moderate',
+      'governance',
+      'feature_tracks',
+      'manage_events',
+      'manage_projects',
+    ],
   },
   {
     hatId: HAT_IDS.configurator,
     label: 'Configurator',
-    permissions: ['admin', 'moderate', 'governance', 'feature_tracks', 'manage_events', 'manage_projects'],
+    permissions: [
+      'admin',
+      'moderate',
+      'governance',
+      'feature_tracks',
+      'manage_events',
+      'manage_projects',
+    ],
   },
   {
     hatId: HAT_IDS.governanceCouncil,
@@ -75,30 +88,24 @@ const HAT_PERMISSIONS: HatRole[] = [
  */
 export async function hasPermission(
   walletAddress: `0x${string}`,
-  permission: Permission
+  permission: Permission,
 ): Promise<boolean> {
-  const relevantHats = HAT_PERMISSIONS.filter((h) =>
-    h.permissions.includes(permission)
-  );
+  const relevantHats = HAT_PERMISSIONS.filter((h) => h.permissions.includes(permission));
 
   if (relevantHats.length === 0) return false;
 
   const results = await Promise.allSettled(
-    relevantHats.map((h) => isWearerOfHat(walletAddress, h.hatId))
+    relevantHats.map((h) => isWearerOfHat(walletAddress, h.hatId)),
   );
 
-  return results.some(
-    (r) => r.status === 'fulfilled' && r.value === true
-  );
+  return results.some((r) => r.status === 'fulfilled' && r.value === true);
 }
 
 /**
  * Get all permissions a wallet has based on its hats.
  * Returns a deduplicated set of permissions.
  */
-export async function getPermissions(
-  walletAddress: `0x${string}`
-): Promise<Permission[]> {
+export async function getPermissions(walletAddress: `0x${string}`): Promise<Permission[]> {
   const allHatIds = HAT_PERMISSIONS.map((h) => h.hatId);
   const wornHats = await getWornHats(walletAddress, allHatIds);
 
@@ -118,15 +125,11 @@ export async function getPermissions(
 /**
  * Get the roles (hats) a wallet currently wears, with labels and permissions.
  */
-export async function getRoles(
-  walletAddress: `0x${string}`
-): Promise<HatRole[]> {
+export async function getRoles(walletAddress: `0x${string}`): Promise<HatRole[]> {
   const allHatIds = HAT_PERMISSIONS.map((h) => h.hatId);
   const wornHats = await getWornHats(walletAddress, allHatIds);
 
-  return HAT_PERMISSIONS.filter((h) =>
-    wornHats.some((w) => w === h.hatId)
-  );
+  return HAT_PERMISSIONS.filter((h) => wornHats.some((w) => w === h.hatId));
 }
 
 /**
@@ -140,9 +143,7 @@ export async function getRoles(
  *     : false;
  *   const canAdmin = session?.isAdmin || isHatAdmin;
  */
-export async function isHatAdmin(
-  walletAddress: `0x${string}`
-): Promise<boolean> {
+export async function isHatAdmin(walletAddress: `0x${string}`): Promise<boolean> {
   return hasPermission(walletAddress, 'admin');
 }
 
@@ -156,7 +157,7 @@ export async function isHatAdmin(
  */
 export async function requirePermission(
   walletAddress: `0x${string}` | undefined | null,
-  permission: Permission
+  permission: Permission,
 ): Promise<{ error: string; required: Permission } | null> {
   if (!walletAddress) {
     return { error: 'Wallet address required for hat-based access', required: permission };

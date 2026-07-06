@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { jukeSpaceOgImageUrl } from '@/lib/spaces/juke';
 import {
-  listActiveJukeSpaces,
-  listScheduledJukeSpaces,
-  listRecordedJukeSpaces,
   type JukeSpaceRow,
+  listActiveJukeSpaces,
+  listRecordedJukeSpaces,
+  listScheduledJukeSpaces,
 } from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../community.config';
 
@@ -111,7 +111,10 @@ export default async function ListenPage() {
       <header className="border-b border-white/[0.08] bg-gradient-to-b from-[#0d1b2a] to-[#0a1628]">
         <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:py-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#855dcd]/10 border border-[#855dcd]/30 text-[#a78bfa] text-[10px] font-bold uppercase tracking-wider mb-4">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a78bfa]" aria-hidden="true" />
+            <span
+              className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a78bfa]"
+              aria-hidden="true"
+            />
             Live audio - powered by Juke
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight max-w-xl">
@@ -119,8 +122,8 @@ export default async function ListenPage() {
             <span className="block text-[#f5a623]">Come listen.</span>
           </h1>
           <p className="mt-4 max-w-lg text-sm sm:text-base text-gray-400 leading-relaxed">
-            Drop into a {communityConfig.name} room when one is on, or scroll back through
-            the recordings shelf. Built in public on{' '}
+            Drop into a {communityConfig.name} room when one is on, or scroll back through the
+            recordings shelf. Built in public on{' '}
             <a
               href="https://juke.audio"
               target="_blank"
@@ -269,9 +272,7 @@ function LiveCard({ row }: { row: JukeSpaceRow }) {
       </div>
       <div className="flex items-center justify-between text-xs text-gray-500">
         <span>
-          {row.participant_count <= 1
-            ? 'Just host'
-            : `${row.participant_count} listening`}
+          {row.participant_count <= 1 ? 'Just host' : `${row.participant_count} listening`}
         </span>
         <span className="inline-flex items-center px-3 py-1 rounded-lg bg-[#855dcd] text-white text-xs font-bold group-hover:bg-[#a78bfa] transition-colors">
           Listen
@@ -312,7 +313,7 @@ function RecordingChip({ row }: { row: JukeSpaceRow }) {
       aria-label={`Recording: ${row.title}`}
     >
       <div className="aspect-[1200/630] bg-[#0a1628] overflow-hidden">
-        { }
+        {}
         <img
           src={ogImage}
           alt=""

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
 import { Client } from '@gradio/client';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 // ACE-Step v1.5 via HuggingFace Gradio Space
 const ACESTEP_SPACE = 'ACE-Step/Ace-Step-v1.5';
@@ -64,10 +64,7 @@ export async function POST(req: NextRequest) {
     // Gradio returns data with audio file info
     const data = result.data as unknown[];
     if (!data || data.length === 0) {
-      return NextResponse.json(
-        { error: 'No audio returned from generator' },
-        { status: 502 },
-      );
+      return NextResponse.json({ error: 'No audio returned from generator' }, { status: 502 });
     }
 
     // The result contains audio file(s) — extract the first one
@@ -77,23 +74,13 @@ export async function POST(req: NextRequest) {
     let audioUrl: string | null = null;
     if (typeof audioResult === 'string') {
       audioUrl = audioResult;
-    } else if (
-      audioResult &&
-      typeof audioResult === 'object' &&
-      'url' in audioResult
-    ) {
+    } else if (audioResult && typeof audioResult === 'object' && 'url' in audioResult) {
       audioUrl = (audioResult as { url: string }).url;
     }
 
     if (!audioUrl) {
-      logger.error(
-        '[music/generate] Unexpected result format:',
-        JSON.stringify(data),
-      );
-      return NextResponse.json(
-        { error: 'Unexpected response from generator' },
-        { status: 502 },
-      );
+      logger.error('[music/generate] Unexpected result format:', JSON.stringify(data));
+      return NextResponse.json({ error: 'Unexpected response from generator' }, { status: 502 });
     }
 
     return NextResponse.json({ audioUrl });

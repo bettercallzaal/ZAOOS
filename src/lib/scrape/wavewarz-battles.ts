@@ -14,7 +14,7 @@
  */
 
 import { z } from 'zod';
-import { withRetry, isRetryableHttpError } from './retry';
+import { isRetryableHttpError, withRetry } from './retry';
 
 const INTELLIGENCE_BASE = 'https://wavewarz-intelligence.vercel.app';
 
@@ -163,7 +163,8 @@ export function httpBattlesPageFetcher(fetchImpl: typeof fetch = fetch): FetchBa
   return (page: number): Promise<string> =>
     withRetry(
       async () => {
-        const url = page <= 1 ? `${INTELLIGENCE_BASE}/battles` : `${INTELLIGENCE_BASE}/battles?page=${page}`;
+        const url =
+          page <= 1 ? `${INTELLIGENCE_BASE}/battles` : `${INTELLIGENCE_BASE}/battles?page=${page}`;
         const res = await fetchImpl(url, {
           headers: { 'User-Agent': 'ZAO-OS-Sync/1.0' },
           signal: AbortSignal.timeout(15000),

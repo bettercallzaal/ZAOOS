@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
@@ -20,7 +20,7 @@ const RetainBodySchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getSession();
@@ -39,7 +39,7 @@ export async function POST(
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,7 +50,15 @@ export async function POST(
       return NextResponse.json({ error: 'Hindsight client not available' }, { status: 503 });
     }
 
-    const result = await (hindsight as unknown as { retain: (userId: string, content: string, opts: unknown) => Promise<Record<string, unknown>> }).retain(userId, content, {
+    const result = await (
+      hindsight as unknown as {
+        retain: (
+          userId: string,
+          content: string,
+          opts: unknown,
+        ) => Promise<Record<string, unknown>>;
+      }
+    ).retain(userId, content, {
       metadata: {
         eventType,
         ...metadata,
@@ -59,13 +67,10 @@ export async function POST(
 
     return NextResponse.json(
       { success: true, memoryId: result.id || result.memoryId || result },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     logger.error('Failed to retain memory:', error);
-    return NextResponse.json(
-      { error: 'Failed to retain memory' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to retain memory' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 interface TwitchChatPanelProps {
   twitchUsername: string;
@@ -8,7 +8,11 @@ interface TwitchChatPanelProps {
   onClose?: () => void;
 }
 
-export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: TwitchChatPanelProps) {
+export function TwitchChatPanel({
+  twitchUsername,
+  canSend = false,
+  onClose,
+}: TwitchChatPanelProps) {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +86,10 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
         {sent.length > 0 && (
           <div className="absolute bottom-16 left-2 right-2 flex flex-col gap-1 pointer-events-none">
             {sent.slice(-3).map((msg, i) => (
-              <div key={i} className="text-xs bg-[#9146ff]/20 text-[#b380ff] rounded px-2 py-1 truncate">
+              <div
+                key={i}
+                className="text-xs bg-[#9146ff]/20 text-[#b380ff] rounded px-2 py-1 truncate"
+              >
                 You: {msg}
               </div>
             ))}
@@ -94,7 +101,10 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
       <div className="border-t border-white/[0.08] p-2">
         {canSend ? (
           <form
-            onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
             className="flex gap-2"
           >
             <input

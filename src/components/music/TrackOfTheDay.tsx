@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { usePlayer } from '@/providers/audio';
 import type { TrackType } from '@/types/music';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -33,16 +33,26 @@ type TrackOfDayData = {
 
 function platformLabel(type: string | null): string {
   switch (type) {
-    case 'spotify': return 'Spotify';
-    case 'applemusic': return 'Apple Music';
-    case 'soundcloud': return 'SoundCloud';
-    case 'youtube': return 'YouTube';
-    case 'tidal': return 'Tidal';
-    case 'bandcamp': return 'Bandcamp';
-    case 'audius': return 'Audius';
-    case 'soundxyz': return 'Sound.xyz';
-    case 'audio': return 'Audio';
-    default: return type || 'Link';
+    case 'spotify':
+      return 'Spotify';
+    case 'applemusic':
+      return 'Apple Music';
+    case 'soundcloud':
+      return 'SoundCloud';
+    case 'youtube':
+      return 'YouTube';
+    case 'tidal':
+      return 'Tidal';
+    case 'bandcamp':
+      return 'Bandcamp';
+    case 'audius':
+      return 'Audius';
+    case 'soundxyz':
+      return 'Sound.xyz';
+    case 'audio':
+      return 'Audio';
+    default:
+      return type || 'Link';
   }
 }
 
@@ -136,9 +146,7 @@ export function TrackOfTheDay() {
         return {
           ...prev,
           nominations: prev.nominations.map((n) =>
-            n.id === trackId
-              ? { ...n, user_voted: voted, votes_count: voteCount }
-              : n,
+            n.id === trackId ? { ...n, user_voted: voted, votes_count: voteCount } : n,
           ),
         };
       });
@@ -195,7 +203,9 @@ export function TrackOfTheDay() {
 
     try {
       // Try fetching rich metadata first
-      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(nomination.track_url)}`);
+      const res = await fetch(
+        `/api/music/metadata?url=${encodeURIComponent(nomination.track_url)}`,
+      );
       if (!res.ok) throw new Error('Metadata fetch failed');
       const metadata = await res.json();
       player.play(metadata);
@@ -257,9 +267,7 @@ export function TrackOfTheDay() {
           <span className="text-[#f5a623] text-lg">&#9733;</span>
           <h2 className="text-white font-semibold text-base sm:text-lg">Track of the Day</h2>
         </div>
-        {!selected && (
-          <span className="text-xs sm:text-sm text-white/40">{countdown}</span>
-        )}
+        {!selected && <span className="text-xs sm:text-sm text-white/40">{countdown}</span>}
       </div>
 
       {/* ── Selected Track (Hero) ──────────────────────────────────────── */}
@@ -329,9 +337,7 @@ export function TrackOfTheDay() {
             </svg>
           </div>
           <p className="text-white/70 text-sm">Voting in progress</p>
-          <p className="text-white/40 text-xs mt-1">
-            Nominate and vote for your favorite track
-          </p>
+          <p className="text-white/40 text-xs mt-1">Nominate and vote for your favorite track</p>
         </div>
       )}
 
@@ -482,9 +488,7 @@ export function TrackOfTheDay() {
               />
             </div>
 
-            {submitError && (
-              <p className="text-red-400 text-xs">{submitError}</p>
-            )}
+            {submitError && <p className="text-red-400 text-xs">{submitError}</p>}
 
             <div className="flex gap-2">
               <button

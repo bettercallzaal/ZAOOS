@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -83,9 +83,7 @@ export async function POST(req: NextRequest) {
       score: s.score,
     }));
 
-    const { error: scoresError } = await supabaseAdmin
-      .from('fractal_scores')
-      .insert(scoreRows);
+    const { error: scoresError } = await supabaseAdmin.from('fractal_scores').insert(scoreRows);
 
     if (scoresError) {
       logger.error('Failed to insert fractal scores:', scoresError);
@@ -101,17 +99,39 @@ export async function POST(req: NextRequest) {
       scoreWallets.length > 0
         ? supabaseAdmin
             .from('respect_members')
-            .select('id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at')
+            .select(
+              'id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at',
+            )
             .in('wallet_address', scoreWallets)
-        : Promise.resolve({ data: [] as { id: string; name: string; wallet_address: string | null; total_respect: number; fractal_respect: number; fractal_count: number; first_respect_at: string | null }[] }),
+        : Promise.resolve({
+            data: [] as {
+              id: string;
+              name: string;
+              wallet_address: string | null;
+              total_respect: number;
+              fractal_respect: number;
+              fractal_count: number;
+              first_respect_at: string | null;
+            }[],
+          }),
       supabaseAdmin
         .from('respect_members')
-        .select('id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at')
+        .select(
+          'id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at',
+        )
         .in('name', scoreNames),
     ]);
 
     // Build lookup maps: wallet -> member, name -> member
-    type MemberRow = { id: string; name: string; wallet_address: string | null; total_respect: number; fractal_respect: number; fractal_count: number; first_respect_at: string | null };
+    type MemberRow = {
+      id: string;
+      name: string;
+      wallet_address: string | null;
+      total_respect: number;
+      fractal_respect: number;
+      fractal_count: number;
+      first_respect_at: string | null;
+    };
     const walletMap = new Map<string, MemberRow>();
     const nameMap = new Map<string, MemberRow>();
     for (const m of (walletResult.data || []) as MemberRow[]) {
@@ -126,7 +146,8 @@ export async function POST(req: NextRequest) {
     const updateResults = await Promise.allSettled(
       scores.map(async (s) => {
         // Find existing member from pre-fetched data
-        const existing = (s.wallet_address ? walletMap.get(s.wallet_address) : null) || nameMap.get(s.member_name);
+        const existing =
+          (s.wallet_address ? walletMap.get(s.wallet_address) : null) || nameMap.get(s.member_name);
 
         if (existing) {
           const oldTotal = Number(existing.total_respect);
@@ -145,48 +166,41 @@ export async function POST(req: NextRequest) {
             updates.first_respect_at = session_date;
           }
 
-          await supabaseAdmin
-            .from('respect_members')
-            .update(updates)
-            .eq('id', existing.id);
+          await supabaseAdmin.from('respect_members').update(updates).eq('id', existing.id);
 
           // Fire-and-forget: check for respect milestones
           for (const milestone of MILESTONES) {
             if (oldTotal < milestone && newTotal >= milestone) {
-              autoCastToZao(
-                `\u{1F3C6} ${s.member_name} just reached ${milestone} Respect!`,
-              ).catch((err) => logger.error('[respect-milestone-cast]', err));
+              autoCastToZao(`\u{1F3C6} ${s.member_name} just reached ${milestone} Respect!`).catch(
+                (err) => logger.error('[respect-milestone-cast]', err),
+              );
               break;
             }
           }
         } else {
           // New member: create row
-          await supabaseAdmin
-            .from('respect_members')
-            .insert({
-              name: s.member_name,
-              wallet_address: s.wallet_address || null,
-              total_respect: s.score,
-              fractal_respect: s.score,
-              fractal_count: 1,
-              first_respect_at: session_date,
-            });
+          await supabaseAdmin.from('respect_members').insert({
+            name: s.member_name,
+            wallet_address: s.wallet_address || null,
+            total_respect: s.score,
+            fractal_respect: s.score,
+            fractal_count: 1,
+            first_respect_at: session_date,
+          });
         }
-      })
+      }),
     );
 
     // 4. If host provided, add a hosting event to respect_events
     if (host_name) {
-      const { error: hostError } = await supabaseAdmin
-        .from('respect_events')
-        .insert({
-          member_name: host_name,
-          wallet_address: host_wallet || null,
-          event_type: 'hosting',
-          amount: 0,
-          description: `Hosted ${name}`,
-          event_date: session_date,
-        });
+      const { error: hostError } = await supabaseAdmin.from('respect_events').insert({
+        member_name: host_name,
+        wallet_address: host_wallet || null,
+        event_type: 'hosting',
+        amount: 0,
+        description: `Hosted ${name}`,
+        event_date: session_date,
+      });
 
       if (!hostError) {
         // Update hosting_count for the host member

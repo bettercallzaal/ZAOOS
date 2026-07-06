@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { Room } from '@/lib/spaces/roomsDb';
 
@@ -32,22 +32,18 @@ export function MiniSpaceBanner() {
     // Realtime subscription — react to any rooms table change
     const channel = supabase
       .channel('mini-space-banner')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'rooms' },
-        () => {
-          supabase
-            .from('rooms')
-            .select('*')
-            .eq('state', 'live')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single()
-            .then(({ data }) => {
-              setLiveRoom(data ?? null);
-            });
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => {
+        supabase
+          .from('rooms')
+          .select('*')
+          .eq('state', 'live')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+          .then(({ data }) => {
+            setLiveRoom(data ?? null);
+          });
+      })
       .subscribe();
 
     return () => {

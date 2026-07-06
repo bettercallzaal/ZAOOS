@@ -119,11 +119,7 @@ export async function getActiveMSRooms(): Promise<MSRoom[]> {
 }
 
 export async function getMSRoomById(id: string): Promise<MSRoom | null> {
-  const { data, error } = await supabaseAdmin
-    .from('ms_rooms')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabaseAdmin.from('ms_rooms').select('*').eq('id', id).single();
 
   if (error) return null;
   return data;
@@ -226,10 +222,7 @@ export async function endMSRoom(id: string): Promise<void> {
     .update({ state: 'ended', ended_at: new Date().toISOString() })
     .eq('id', id);
 
-  await supabaseAdmin
-    .from('speaker_requests')
-    .delete()
-    .eq('room_id', id);
+  await supabaseAdmin.from('speaker_requests').delete().eq('room_id', id);
 
   // Close any session rows still open for this room — listeners who left without
   // firing their own leave (tab close, network drop) would otherwise strand an
@@ -263,10 +256,7 @@ export async function removeMSRoomSpeaker(roomId: string, fid: number): Promise<
   const room = await getMSRoomById(roomId);
   if (!room) throw new Error('Room not found');
   const speakers = getRoomSpeakerFids(room).filter((f) => f !== fid);
-  const { error } = await supabaseAdmin
-    .from('ms_rooms')
-    .update({ speakers })
-    .eq('id', roomId);
+  const { error } = await supabaseAdmin.from('ms_rooms').update({ speakers }).eq('id', roomId);
   if (error) throw new Error(`Failed to remove speaker: ${error.message}`);
 }
 

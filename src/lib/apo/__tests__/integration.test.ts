@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PromptConfig } from '../types';
 
 const mockCallMinimax = vi.hoisted(() => vi.fn());
@@ -16,9 +16,7 @@ describe('APO integration', () => {
       name: 'integration-test',
       description: 'Test',
       currentPrompt: 'Basic prompt v1',
-      testCases: [
-        { input: 'test input', criteria: ['Is relevant'] },
-      ],
+      testCases: [{ input: 'test input', criteria: ['Is relevant'] }],
       gradingPrompt: 'Grade it',
       maxRounds: 3,
     };

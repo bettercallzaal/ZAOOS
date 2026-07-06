@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getLeaderboard } from '@/lib/spaces/sessionsDb';
 import { getUsersByFids } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import { getLeaderboard } from '@/lib/spaces/sessionsDb';
 
 interface NeynarUser {
   fid: number;
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,11 +42,13 @@ export async function GET(request: NextRequest) {
 
     // Enrich FIDs with Farcaster profiles so the UI shows names + avatars, not
     // bare FIDs. Fault-tolerant: a Neynar failure falls back to FID-only rows.
-    let enriched: Array<(typeof leaderboard)[number] & {
-      username: string | null;
-      displayName: string | null;
-      pfpUrl: string | null;
-    }> = leaderboard.map((e) => ({ ...e, username: null, displayName: null, pfpUrl: null }));
+    let enriched: Array<
+      (typeof leaderboard)[number] & {
+        username: string | null;
+        displayName: string | null;
+        pfpUrl: string | null;
+      }
+    > = leaderboard.map((e) => ({ ...e, username: null, displayName: null, pfpUrl: null }));
     try {
       const users: NeynarUser[] = await getUsersByFids(leaderboard.map((e) => e.fid));
       const byFid = new Map(users.map((u) => [u.fid, u]));
@@ -63,10 +65,7 @@ export async function GET(request: NextRequest) {
       logger.error('[spaces/leaderboard] profile enrich failed', err);
     }
 
-    const totalCommunityMinutes = leaderboard.reduce(
-      (sum, entry) => sum + entry.totalMinutes,
-      0
-    );
+    const totalCommunityMinutes = leaderboard.reduce((sum, entry) => sum + entry.totalMinutes, 0);
 
     return NextResponse.json({
       leaderboard: enriched,
@@ -75,9 +74,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logger.error('[spaces/leaderboard] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch leaderboard' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
   }
 }

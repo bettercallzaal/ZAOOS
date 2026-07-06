@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getValidTwitchToken, createTwitchClip } from '@/lib/twitch/client';
 import { logger } from '@/lib/logger';
+import { createTwitchClip, getValidTwitchToken } from '@/lib/twitch/client';
 
 /** POST — create a Twitch clip */
 export async function POST() {
@@ -18,7 +18,10 @@ export async function POST() {
 
     const result = await createTwitchClip(creds.accessToken, creds.userId);
     if (!result) {
-      return NextResponse.json({ error: 'Failed to create clip — stream must be live' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to create clip — stream must be live' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

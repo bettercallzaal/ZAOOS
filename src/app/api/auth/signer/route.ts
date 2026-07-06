@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { createSigner, registerSignedKey } from '@/lib/farcaster/neynar';
 import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
+import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { createSigner, registerSignedKey } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 // SECURITY: This uses the APP's signer wallet (APP_SIGNER_PRIVATE_KEY),
@@ -74,7 +74,10 @@ export async function POST() {
     const registered = await registerSignedKey(signerUuid, appFid, deadline, signature);
     if (!registered?.signer_uuid || !registered?.status || !registered?.signer_approval_url) {
       logger.error('registerSignedKey returned incomplete data: missing required fields');
-      return NextResponse.json({ error: 'Key registration returned invalid data' }, { status: 502 });
+      return NextResponse.json(
+        { error: 'Key registration returned invalid data' },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json({

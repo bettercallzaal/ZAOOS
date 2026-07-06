@@ -27,7 +27,7 @@ export async function GET() {
       return NextResponse.json({ artists: [] });
     }
 
-    const fids = profiles.map(p => p.fid).filter(Boolean);
+    const fids = profiles.map((p) => p.fid).filter(Boolean);
     if (fids.length === 0) {
       return NextResponse.json({ artists: [] });
     }
@@ -39,7 +39,7 @@ export async function GET() {
       .in('fid', fids)
       .eq('is_active', true);
 
-    const userMap = new Map((users || []).map(u => [u.fid, u]));
+    const userMap = new Map((users || []).map((u) => [u.fid, u]));
 
     // Fetch song counts per FID using head: true + count to avoid fetching all rows
     const countMap = new Map<number, number>();
@@ -50,7 +50,7 @@ export async function GET() {
           .select('submitted_by_fid', { count: 'exact', head: true })
           .eq('submitted_by_fid', fid);
         return { fid, count: count || 0 };
-      })
+      }),
     );
     for (const result of countResults) {
       if (result.status === 'fulfilled') {
@@ -60,7 +60,7 @@ export async function GET() {
 
     // Build response
     const artists = profiles
-      .map(p => {
+      .map((p) => {
         const user = userMap.get(p.fid);
         if (!user) return null;
         return {
@@ -75,9 +75,12 @@ export async function GET() {
       })
       .filter(Boolean);
 
-    return NextResponse.json({ artists }, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=120' },
-    });
+    return NextResponse.json(
+      { artists },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=120' },
+      },
+    );
   } catch (err) {
     logger.error('[artists/featured] error:', err);
     return NextResponse.json({ error: 'Failed to load featured artists' }, { status: 500 });

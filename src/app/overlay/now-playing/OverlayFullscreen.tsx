@@ -1,7 +1,7 @@
 'use client';
 
-import { ProgressBar } from './ProgressBar';
 import { PlatformBadge } from './PlatformBadge';
+import { ProgressBar } from './ProgressBar';
 import type { NowPlayingData } from './page';
 
 interface Props {

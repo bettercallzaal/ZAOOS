@@ -1,9 +1,10 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parseXTimelineHtml, scrapeXUserTimeline, XTimelineError } from '../x-timeline';
+import { describe, expect, it } from 'vitest';
 import type { FetchImpl } from '../x-fetch';
+import { parseXTimelineHtml, scrapeXUserTimeline, XTimelineError } from '../x-timeline';
 
 const fixture = readFileSync(join(__dirname, 'x-timeline-fixture.html'), 'utf-8');
 
@@ -32,13 +33,19 @@ describe('parseXTimelineHtml', () => {
         pageProps: {
           timeline: {
             entries: [
-              { content: { tweet: { id_str: '1', full_text: 'hi', favorite_count: 4, created_at: 'now' } } },
+              {
+                content: {
+                  tweet: { id_str: '1', full_text: 'hi', favorite_count: 4, created_at: 'now' },
+                },
+              },
             ],
           },
         },
       },
     });
-    const tweets = parseXTimelineHtml(`<script id="__NEXT_DATA__" type="application/json">${blob}</script>`);
+    const tweets = parseXTimelineHtml(
+      `<script id="__NEXT_DATA__" type="application/json">${blob}</script>`,
+    );
     expect(tweets).toHaveLength(1);
     expect(tweets[0].text).toBe('hi');
     expect(tweets[0].likes).toBe(4);
@@ -69,7 +76,8 @@ describe('scrapeXUserTimeline', () => {
   });
 
   it('throws on an HTTP error', async () => {
-    const fetchImpl = (async () => ({ ok: false, status: 404 }) as Response) as unknown as FetchImpl;
+    const fetchImpl = (async () =>
+      ({ ok: false, status: 404 }) as Response) as unknown as FetchImpl;
     await expect(scrapeXUserTimeline('nope', { fetchImpl })).rejects.toBeInstanceOf(XTimelineError);
   });
 });

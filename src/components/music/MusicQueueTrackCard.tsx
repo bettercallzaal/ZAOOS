@@ -1,14 +1,13 @@
 'use client';
 
-import { memo, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { TrackMetadata } from '@/types/music';
-import { TrackType } from '@/types/music';
-import { usePlayer } from '@/providers/audio';
-import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { LikeButton } from '@/components/music/LikeButton';
 import { QueueActions } from '@/components/music/QueueActions';
+import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
+import { usePlayer } from '@/providers/audio';
+import type { TrackMetadata, TrackType } from '@/types/music';
 
 const PLATFORM_LABELS: Record<TrackType, string> = {
   spotify: 'Spotify',
@@ -65,16 +64,11 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
   onPlay,
 }: MusicQueueTrackCardProps) {
   const player = usePlayer();
-  const [metadata, setMetadata] = useState<TrackMetadata | null>(
-    metadataCache.get(url) ?? null,
-  );
+  const [metadata, setMetadata] = useState<TrackMetadata | null>(metadataCache.get(url) ?? null);
   const [loading, setLoading] = useState(!metadataCache.has(url));
 
   const isCurrentTrack = player.metadata?.feedId === castHash;
-  const progress =
-    isCurrentTrack && player.duration > 0
-      ? player.position / player.duration
-      : 0;
+  const progress = isCurrentTrack && player.duration > 0 ? player.position / player.duration : 0;
 
   const handleSeek = useCallback(
     (position: number) => {
@@ -125,9 +119,7 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
   if (loading) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 animate-pulse">
-        <span className="text-xs text-gray-600 w-5 text-right flex-shrink-0">
-          {index + 1}
-        </span>
+        <span className="text-xs text-gray-600 w-5 text-right flex-shrink-0">{index + 1}</span>
         <div className="w-8 h-8 rounded bg-gray-800 flex-shrink-0" />
         <div className="flex-1 space-y-1.5">
           <div className="h-2.5 bg-gray-800 rounded w-3/4" />
@@ -140,9 +132,7 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
   if (!metadata) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 opacity-50">
-        <span className="text-xs text-gray-600 w-5 text-right flex-shrink-0">
-          {index + 1}
-        </span>
+        <span className="text-xs text-gray-600 w-5 text-right flex-shrink-0">{index + 1}</span>
         <div className="w-8 h-8 rounded bg-gray-800 flex-shrink-0 flex items-center justify-center">
           <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -150,9 +140,7 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs text-gray-500 truncate">Unknown track</p>
-          <p className={`text-xs ${PLATFORM_COLORS[type]}`}>
-            {PLATFORM_LABELS[type]}
-          </p>
+          <p className={`text-xs ${PLATFORM_COLORS[type]}`}>{PLATFORM_LABELS[type]}</p>
         </div>
       </div>
     );
@@ -168,10 +156,7 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
       }`}
     >
       <div className="flex items-center gap-2 px-3 py-2">
-        <button
-          onClick={handleClick}
-          className="flex items-center gap-2 flex-1 min-w-0 text-left"
-        >
+        <button onClick={handleClick} className="flex items-center gap-2 flex-1 min-w-0 text-left">
           {/* Track number / playing indicator */}
           <div className="w-5 flex-shrink-0 flex items-center justify-center">
             {isCurrentTrack && player.isPlaying ? (
@@ -231,7 +216,13 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
 
         {/* Add to queue */}
-        {metadata && <QueueActions metadata={{ ...metadata, feedId: castHash }} compact className="flex-shrink-0" />}
+        {metadata && (
+          <QueueActions
+            metadata={{ ...metadata, feedId: castHash }}
+            compact
+            className="flex-shrink-0"
+          />
+        )}
       </div>
 
       {/* Waveform for Audius tracks */}

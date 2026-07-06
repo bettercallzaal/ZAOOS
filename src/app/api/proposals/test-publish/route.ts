@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
@@ -49,7 +49,10 @@ export async function GET(req: NextRequest) {
 
   const totalRespectFor = (votes || [])
     .filter((v: { vote: string }) => v.vote === 'for')
-    .reduce((sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0), 0);
+    .reduce(
+      (sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0),
+      0,
+    );
 
   const threshold = proposal.respect_threshold || 1000;
 

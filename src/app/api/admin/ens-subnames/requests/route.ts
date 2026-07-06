@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import {
-  createSubname,
   buildMemberTextRecords,
+  createSubname,
   isValidSubname,
   sanitizeSubname,
 } from '@/lib/ens/subnames';
@@ -51,7 +51,10 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const parsed = reviewSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { requestId, action } = parsed.data;
@@ -71,7 +74,11 @@ export async function PATCH(req: NextRequest) {
     if (action === 'deny') {
       await supabaseAdmin
         .from('subname_requests')
-        .update({ status: 'denied', reviewed_at: new Date().toISOString(), reviewed_by: session.fid })
+        .update({
+          status: 'denied',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: session.fid,
+        })
         .eq('id', requestId);
 
       return NextResponse.json({ success: true, message: 'Request denied' });
@@ -80,7 +87,10 @@ export async function PATCH(req: NextRequest) {
     // Approve: validate + update NameStone + update DB
     const newName = sanitizeSubname(request.requested_name);
     if (!isValidSubname(newName)) {
-      return NextResponse.json({ error: `Invalid name: "${request.requested_name}"` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Invalid name: "${request.requested_name}"` },
+        { status: 400 },
+      );
     }
 
     // Get member data for text records
@@ -94,7 +104,11 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
 
-    const textRecords = buildMemberTextRecords({ username: user.username, pfpUrl: user.pfp_url, bio: user.bio });
+    const textRecords = buildMemberTextRecords({
+      username: user.username,
+      pfpUrl: user.pfp_url,
+      bio: user.bio,
+    });
 
     // Create new on-chain subname (old one stays with the member — it's their NFT)
     const result = await createSubname(newName, user.primary_wallet, textRecords);
@@ -105,13 +119,14 @@ export async function PATCH(req: NextRequest) {
 
     // Update DB
     await Promise.all([
-      supabaseAdmin
-        .from('users')
-        .update({ zao_subname: result.fullName })
-        .eq('fid', request.fid),
+      supabaseAdmin.from('users').update({ zao_subname: result.fullName }).eq('fid', request.fid),
       supabaseAdmin
         .from('subname_requests')
-        .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: session.fid })
+        .update({
+          status: 'approved',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: session.fid,
+        })
         .eq('id', requestId),
     ]);
 

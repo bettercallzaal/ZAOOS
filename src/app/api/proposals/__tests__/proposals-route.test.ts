@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('@/lib/notifications', () => ({
   sendNotification: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { GET, POST, PATCH } from '@/app/api/proposals/route';
+import { GET, PATCH, POST } from '@/app/api/proposals/route';
 
 function makeRequest(url: string, options?: RequestInit) {
   return new NextRequest(new URL(url, 'http://localhost:3000'), options);
@@ -98,7 +98,9 @@ describe('GET /api/proposals', () => {
     mockGetSessionData.mockResolvedValue({ fid: 123, isAdmin: false });
 
     const { chain } = chainMock({ data: null, error: { message: 'db error' }, count: 0 });
-    chain.range = vi.fn().mockResolvedValue({ data: null, error: { message: 'db error' }, count: 0 });
+    chain.range = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: { message: 'db error' }, count: 0 });
     mockFrom.mockReturnValue(chain);
 
     const req = makeRequest('/api/proposals');
@@ -244,9 +246,7 @@ describe('PATCH /api/proposals', () => {
     // Second call: UPDATE .from().update().eq() — returns success
     const updateChain = chainMock({ data: null, error: null });
 
-    mockFrom
-      .mockReturnValueOnce(selectChain.chain)
-      .mockReturnValueOnce(updateChain.chain);
+    mockFrom.mockReturnValueOnce(selectChain.chain).mockReturnValueOnce(updateChain.chain);
 
     const req = makeRequest('/api/proposals', {
       method: 'PATCH',

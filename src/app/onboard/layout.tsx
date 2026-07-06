@@ -6,22 +6,16 @@ export const metadata: Metadata = {
     'Check your wallet eligibility and join ZAO OS — the gated Farcaster community for music artists building onchain.',
   openGraph: {
     title: 'Join ZAO OS',
-    description:
-      'Check your wallet eligibility and join the ZAO community.',
+    description: 'Check your wallet eligibility and join the ZAO community.',
     url: 'https://zaoos.com/onboard',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Join ZAO OS',
-    description:
-      'Check your wallet eligibility and join the ZAO community.',
+    description: 'Check your wallet eligibility and join the ZAO community.',
   },
 };
 
-export default function OnboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function OnboardLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

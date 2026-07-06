@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
 
 interface NFTItem {
   name: string;
@@ -32,25 +32,26 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
     if (!walletAddress) return;
     setLoading(true);
     fetch(`/api/members/nfts?address=${walletAddress}`)
-      .then(r => {
+      .then((r) => {
         if (!r.ok) throw new Error('Failed to load NFTs');
         return r.json();
       })
-      .then(data => setNfts(data.nfts || []))
-      .catch(e => setError(e.message))
+      .then((data) => setNfts(data.nfts || []))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [walletAddress]);
 
   const collections = useMemo(() => {
-    const names = [...new Set(nfts.map(n => n.collection))].sort();
+    const names = [...new Set(nfts.map((n) => n.collection))].sort();
     return names;
   }, [nfts]);
 
   const filtered = useMemo(() => {
     let result = nfts;
-    if (chainFilter !== 'all') result = result.filter(n => n.chain === chainFilter);
-    if (collectionFilter !== 'all') result = result.filter(n => n.collection === collectionFilter);
-    if (zounzOnly) result = result.filter(n => n.isZounz);
+    if (chainFilter !== 'all') result = result.filter((n) => n.chain === chainFilter);
+    if (collectionFilter !== 'all')
+      result = result.filter((n) => n.collection === collectionFilter);
+    if (zounzOnly) result = result.filter((n) => n.isZounz);
     return result;
   }, [nfts, chainFilter, collectionFilter, zounzOnly]);
 
@@ -69,12 +70,12 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
 
   if (error || nfts.length === 0) return null;
 
-  const hasZounz = nfts.some(n => n.isZounz);
+  const hasZounz = nfts.some((n) => n.isZounz);
   const chainCounts = {
     all: nfts.length,
-    eth: nfts.filter(n => n.chain === 'eth').length,
-    base: nfts.filter(n => n.chain === 'base').length,
-    optimism: nfts.filter(n => n.chain === 'optimism').length,
+    eth: nfts.filter((n) => n.chain === 'eth').length,
+    base: nfts.filter((n) => n.chain === 'base').length,
+    optimism: nfts.filter((n) => n.chain === 'optimism').length,
   };
 
   return (
@@ -101,7 +102,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
       <div className="flex flex-wrap gap-2 mb-3">
         {/* Chain pills */}
         <div className="flex gap-1">
-          {(['all', 'eth', 'base', 'optimism'] as const).map(chain => {
+          {(['all', 'eth', 'base', 'optimism'] as const).map((chain) => {
             const count = chainCounts[chain];
             if (chain !== 'all' && count === 0) return null;
             return (
@@ -124,12 +125,14 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
         {collections.length > 1 && (
           <select
             value={collectionFilter}
-            onChange={e => setCollectionFilter(e.target.value)}
+            onChange={(e) => setCollectionFilter(e.target.value)}
             className="text-[10px] px-2 py-1 rounded-lg bg-[#0a1628] text-gray-400 border border-white/[0.08] focus:outline-none focus:border-[#f5a623]/30 max-w-[180px] truncate"
           >
             <option value="all">All Collections ({collections.length})</option>
-            {collections.map(c => (
-              <option key={c} value={c}>{c}</option>
+            {collections.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         )}
@@ -172,7 +175,9 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
               </div>
 
               {/* Chain badge */}
-              <span className={`absolute top-1 right-1 text-[7px] px-1 py-0.5 rounded ${CHAIN_LABELS[nft.chain].color}`}>
+              <span
+                className={`absolute top-1 right-1 text-[7px] px-1 py-0.5 rounded ${CHAIN_LABELS[nft.chain].color}`}
+              >
                 {CHAIN_LABELS[nft.chain].label}
               </span>
 

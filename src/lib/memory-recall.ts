@@ -1,5 +1,5 @@
-import { getHindsightClient } from './hindsight';
 import { logger } from '@/lib/logger';
+import { getHindsightClient } from './hindsight';
 
 // ============================================================================
 // Types
@@ -21,7 +21,7 @@ export interface RecallResult {
 export async function recallMemories(
   userFid: string,
   query: string,
-  limit = 10
+  limit = 10,
 ): Promise<RecallResult[]> {
   try {
     const hindsight = await getHindsightClient();
@@ -43,13 +43,9 @@ export async function buildPromptWithMemory(
   userFid: string,
   currentMessage: string,
   systemPrompt: string,
-  limit = 10
+  limit = 10,
 ): Promise<string> {
-  const memories = await recallMemories(
-    userFid,
-    currentMessage,
-    limit
-  );
+  const memories = await recallMemories(userFid, currentMessage, limit);
 
   if (memories.length === 0) {
     return `${systemPrompt}\n\n${currentMessage}`;
@@ -58,7 +54,7 @@ export async function buildPromptWithMemory(
   const reminiscence = [
     `SYSTEM_REMINISCENCE (last updated: ${new Date().toISOString()}, ${memories.length} memories recalled)`,
     '---',
-    ...memories.map(m => m.content),
+    ...memories.map((m) => m.content),
     '---',
     'END_REMINISCENCE',
     '',
@@ -77,7 +73,7 @@ export async function buildPromptWithMemory(
 export async function getUserMemoryContext(
   userFid: string,
   query?: string,
-  limit = 10
+  limit = 10,
 ): Promise<string> {
   const searchQuery = query || 'recent activity preferences interactions';
   const memories = await recallMemories(userFid, searchQuery, limit);
@@ -89,7 +85,7 @@ export async function getUserMemoryContext(
   return [
     `SYSTEM_REMINISCENCE (${memories.length} memories)`,
     '---',
-    ...memories.map(m => m.content),
+    ...memories.map((m) => m.content),
     '---',
     'END_REMINISCENCE',
   ].join('\n');
@@ -117,10 +113,7 @@ Keep it concise: 3–5 sentences per section.
  * Run a reflection query to synthesize insights from memories.
  * Used weekly to update the user's taste profile.
  */
-export async function reflectOnMemories(
-  userFid: string,
-  prompt: string
-): Promise<string> {
+export async function reflectOnMemories(userFid: string, prompt: string): Promise<string> {
   try {
     const hindsight = await getHindsightClient();
     if (!hindsight) return '';
@@ -148,7 +141,7 @@ export async function recallMemoriesByType(
   userFid: string,
   eventType: string,
   query: string,
-  limit = 5
+  limit = 5,
 ): Promise<RecallResult[]> {
   try {
     const hindsight = await getHindsightClient();

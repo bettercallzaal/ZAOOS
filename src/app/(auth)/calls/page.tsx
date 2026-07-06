@@ -1,13 +1,20 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useCallback, useState } from 'react';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
 const JitsiRoom = dynamic(
   () => import('@/components/calls/JitsiRoom').then((mod) => mod.JitsiRoom),
-  { ssr: false, loading: () => <div className="flex items-center justify-center h-64 text-gray-400">Loading call room...</div> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-64 text-gray-400">
+        Loading call room...
+      </div>
+    ),
+  },
 );
 
 interface Room {
@@ -18,8 +25,18 @@ interface Room {
 }
 
 const PRESET_ROOMS: Room[] = [
-  { id: 'fractal-call', label: 'Fractal Call', description: 'Weekly governance and coordination call', audioOnly: true },
-  { id: 'open-hangout', label: 'Open Hangout', description: 'Casual voice chat — drop in anytime', audioOnly: false },
+  {
+    id: 'fractal-call',
+    label: 'Fractal Call',
+    description: 'Weekly governance and coordination call',
+    audioOnly: true,
+  },
+  {
+    id: 'open-hangout',
+    label: 'Open Hangout',
+    description: 'Casual voice chat — drop in anytime',
+    audioOnly: false,
+  },
 ];
 
 function generateRoomName(slug: string): string {
@@ -41,7 +58,10 @@ export default function CallsPage() {
   const joinCustomRoom = useCallback(() => {
     const name = customName.trim();
     if (!name) return;
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
     setActiveRoom({
       mode: 'jitsi',
       jitsiName: generateRoomName(slug),
@@ -96,8 +116,18 @@ export default function CallsPage() {
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+              <svg
+                className="w-5 h-5 text-purple-400"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                />
               </svg>
             </div>
             <div>
@@ -105,7 +135,13 @@ export default function CallsPage() {
               <p className="text-xs text-gray-400">DJ mode, broadcasting, room themes, and more</p>
             </div>
           </div>
-          <svg className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
         </Link>
@@ -122,11 +158,25 @@ export default function CallsPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <svg
+                    className="w-5 h-5 text-[#f5a623]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
                     {room.audioOnly ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                      />
                     ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+                      />
                     )}
                   </svg>
                   <div>
@@ -150,7 +200,9 @@ export default function CallsPage() {
               type="text"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') joinCustomRoom(); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') joinCustomRoom();
+              }}
               placeholder="Room name..."
               maxLength={60}
               className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"

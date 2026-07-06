@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
-import { supabaseAdmin } from '@/lib/db/supabase';
+import type { Metadata } from 'next';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import CommunityMembersClient from './CommunityMembersClient';
 
 const miniAppEmbed = JSON.stringify({
@@ -18,7 +18,8 @@ const miniAppEmbed = JSON.stringify({
 
 export const metadata: Metadata = {
   title: 'Community Members | ZAO OS',
-  description: 'Join the ZAO community — artists, producers, and creators taking ownership of their profit margin, data, and IP rights.',
+  description:
+    'Join the ZAO community — artists, producers, and creators taking ownership of their profit margin, data, and IP rights.',
   other: { 'fc:miniapp': miniAppEmbed },
 };
 
@@ -40,7 +41,7 @@ async function fetchCommunityMembers() {
     if (error || !users) return [];
 
     // Fetch artist profiles for category/role info
-    const fids = users.map(u => u.fid).filter(Boolean) as number[];
+    const fids = users.map((u) => u.fid).filter(Boolean) as number[];
     const profileMap: Record<number, { category: string; biography: string | null }> = {};
 
     if (fids.length > 0) {
@@ -54,7 +55,7 @@ async function fetchCommunityMembers() {
       }
     }
 
-    return users.map(u => {
+    return users.map((u) => {
       const profile = u.fid ? profileMap[u.fid] || null : null;
       return {
         id: u.id,
@@ -85,7 +86,11 @@ export default async function CommunityPage() {
       <PageHeader
         title="Artist"
         subtitle="Community members"
-        rightAction={<div className="md:hidden"><NotificationBell /></div>}
+        rightAction={
+          <div className="md:hidden">
+            <NotificationBell />
+          </div>
+        }
       />
 
       {/* Hero CTA */}

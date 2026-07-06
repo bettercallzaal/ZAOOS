@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
 import { communityConfig } from '@/../community.config';
+import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 // Disable Next.js fetch cache — Audius data should be fresh
@@ -48,7 +48,9 @@ export async function GET() {
         { signal: AbortSignal.timeout(10000), redirect: 'follow' },
       );
       if (!resolveRes.ok) {
-        logger.error(`[radio] Audius resolve failed for ${config.url}: ${resolveRes.status} ${resolveRes.statusText}`);
+        logger.error(
+          `[radio] Audius resolve failed for ${config.url}: ${resolveRes.status} ${resolveRes.statusText}`,
+        );
         continue;
       }
 
@@ -60,18 +62,24 @@ export async function GET() {
 
       // Audius albums resolve as playlists with is_album=true
       const playlistTracks = data.tracks || data.playlist_contents?.track_ids || [];
-      const artworkUrl =
-        data.artwork?.['480x480'] ?? data.artwork?.['150x150'] ?? '';
+      const artworkUrl = data.artwork?.['480x480'] ?? data.artwork?.['150x150'] ?? '';
 
       // If resolved data includes full track objects
       if (data.tracks && Array.isArray(data.tracks)) {
         const tracks: RadioTrack[] = data.tracks.map((t: Record<string, unknown>) => ({
           id: String(t.id ?? ''),
           title: String((t as Record<string, unknown>).title ?? 'Untitled'),
-          artist: String(((t as Record<string, Record<string, unknown>>).user as Record<string, unknown>)?.name ?? config.artist),
+          artist: String(
+            ((t as Record<string, Record<string, unknown>>).user as Record<string, unknown>)
+              ?.name ?? config.artist,
+          ),
           artworkUrl:
-            ((t as Record<string, Record<string, string>>).artwork as Record<string, string>)?.['480x480'] ??
-            ((t as Record<string, Record<string, string>>).artwork as Record<string, string>)?.['150x150'] ??
+            ((t as Record<string, Record<string, string>>).artwork as Record<string, string>)?.[
+              '480x480'
+            ] ??
+            ((t as Record<string, Record<string, string>>).artwork as Record<string, string>)?.[
+              '150x150'
+            ] ??
             artworkUrl,
           streamUrl: `${AUDIUS_API}/tracks/${t.id}/stream?app_name=${APP_NAME}`,
           url: `https://audius.co${((t as Record<string, Record<string, unknown>>).user as Record<string, unknown>)?.handle ? `/${((t as Record<string, Record<string, unknown>>).user as Record<string, unknown>).handle}/${(t as Record<string, unknown>).permalink ?? t.id}` : ''}`,
@@ -103,8 +111,7 @@ export async function GET() {
               id: t.id,
               title: t.title ?? 'Untitled',
               artist: t.user?.name ?? config.artist,
-              artworkUrl:
-                t.artwork?.['480x480'] ?? t.artwork?.['150x150'] ?? artworkUrl,
+              artworkUrl: t.artwork?.['480x480'] ?? t.artwork?.['150x150'] ?? artworkUrl,
               streamUrl: `${AUDIUS_API}/tracks/${t.id}/stream?app_name=${APP_NAME}`,
               url: `https://audius.co/${t.user?.handle ?? 'track'}/${t.permalink ?? t.id}`,
               duration: t.duration ?? 0,
@@ -124,9 +131,14 @@ export async function GET() {
     }
   }
 
-  logger.info(`[radio] Resolved ${playlists.length} playlists with ${playlists.reduce((n, p) => n + p.tracks.length, 0)} total tracks`);
+  logger.info(
+    `[radio] Resolved ${playlists.length} playlists with ${playlists.reduce((n, p) => n + p.tracks.length, 0)} total tracks`,
+  );
 
-  return NextResponse.json({ playlists }, {
-    headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
-  });
+  return NextResponse.json(
+    { playlists },
+    {
+      headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
+    },
+  );
 }

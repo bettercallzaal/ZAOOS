@@ -4,11 +4,11 @@ import { headers } from 'next/headers';
 import { cookieToInitialState } from 'wagmi';
 import { getWagmiConfig } from '@/lib/wagmi/config';
 import './globals.css';
-import { Providers } from './providers';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
-import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { MiniAppReady } from '@/components/miniapp/MiniAppReady';
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
+import { Providers } from './providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -61,17 +61,10 @@ export const viewport: Viewport = {
   themeColor: '#0a1628',
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
   const nonce = headersList.get('x-nonce') ?? '';
-  const initialState = cookieToInitialState(
-    getWagmiConfig(),
-    headersList.get('cookie')
-  );
+  const initialState = cookieToInitialState(getWagmiConfig(), headersList.get('cookie'));
 
   return (
     <html lang="en">

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 /**
  * GET /api/cron/daily-digest
@@ -58,19 +58,12 @@ export async function GET(request: NextRequest) {
     ]);
 
     const activeMembers =
-      activeUsersResult.status === 'fulfilled'
-        ? (activeUsersResult.value.count ?? 0)
-        : 0;
+      activeUsersResult.status === 'fulfilled' ? (activeUsersResult.value.count ?? 0) : 0;
 
     const tracksPlayed =
-      playCountResult.status === 'fulfilled'
-        ? (playCountResult.value.count ?? 0)
-        : 0;
+      playCountResult.status === 'fulfilled' ? (playCountResult.value.count ?? 0) : 0;
 
-    const roomsHosted =
-      roomsResult.status === 'fulfilled'
-        ? (roomsResult.value.count ?? 0)
-        : 0;
+    const roomsHosted = roomsResult.status === 'fulfilled' ? (roomsResult.value.count ?? 0) : 0;
 
     // Only post if there was some activity
     if (activeMembers === 0 && tracksPlayed === 0 && roomsHosted === 0) {

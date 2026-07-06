@@ -1,9 +1,9 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { BczHistory } from '../bcz-history';
 import { scrapeBettercallzaalProfile } from '../bcz-profile';
 import type { BczSite } from '../bcz-site';
 import type { XTimeline } from '../x-timeline';
-import type { BczHistory } from '../bcz-history';
 
 const fakeSite: BczSite = { title: 'BCZ', description: null, links: [], socials: [], projects: [] };
 const fakeTimeline: XTimeline = { handle: 'bettercallzaal', total: 1, tweets: [] };

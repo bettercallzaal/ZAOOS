@@ -7,8 +7,8 @@
  * the required env var is set.
  */
 
+import { buildZaoEmbed, publishToDiscord } from '@/lib/publish/discord';
 import { publishToTelegram } from '@/lib/publish/telegram';
-import { publishToDiscord, buildZaoEmbed } from '@/lib/publish/discord';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -45,9 +45,7 @@ export interface BroadcastResult {
  * - Only attempts Discord if DISCORD_WEBHOOK_URL is set.
  * - Never throws — returns results for both platforms.
  */
-export async function broadcastToChannels(
-  options: BroadcastOptions,
-): Promise<BroadcastResult> {
+export async function broadcastToChannels(options: BroadcastOptions): Promise<BroadcastResult> {
   const hasTelegram = !!process.env.TELEGRAM_BOT_TOKEN;
   const hasDiscord = !!process.env.DISCORD_WEBHOOK_URL;
 

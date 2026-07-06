@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import type { AgentEvent } from './constants';
-import { getAgent, EVENT_TYPES } from './constants';
 import AgentFilters from './AgentFilters';
+import type { AgentEvent } from './constants';
+import { EVENT_TYPES, getAgent } from './constants';
 
 interface TaskChain {
   id: string;
@@ -16,7 +16,11 @@ function buildChains(events: AgentEvent[]): TaskChain[] {
 
   for (const event of events) {
     if (event.event_type === 'heartbeat') continue;
-    const key = event.summary?.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30) || event.id;
+    const key =
+      event.summary
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+        .slice(0, 30) || event.id;
     const existing = chains.get(key) || [];
     existing.push(event);
     chains.set(key, existing);
@@ -26,7 +30,9 @@ function buildChains(events: AgentEvent[]): TaskChain[] {
     .map(([key, steps]) => ({
       id: key,
       task: steps[0]?.summary || 'Unknown task',
-      steps: steps.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+      steps: steps.sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      ),
     }))
     .filter((chain) => chain.steps.length > 0)
     .sort((a, b) => {
@@ -67,13 +73,8 @@ export default function PipelineFlow({ events }: { events: AgentEvent[] }) {
           </div>
         ) : (
           chains.map((chain) => (
-            <div
-              key={chain.id}
-              className="rounded-xl border border-white/10 bg-[#1a2a4a] p-4"
-            >
-              <h3 className="text-sm font-semibold mb-3 text-gray-200 truncate">
-                {chain.task}
-              </h3>
+            <div key={chain.id} className="rounded-xl border border-white/10 bg-[#1a2a4a] p-4">
+              <h3 className="text-sm font-semibold mb-3 text-gray-200 truncate">{chain.task}</h3>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
                 {chain.steps.map((step, i) => {

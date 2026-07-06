@@ -53,6 +53,6 @@ export const SPOTLIGHT_TIERS = [
   { tier: 'legend', label: 'Battle Legend', minWins: 25 },
 ] as const;
 
-export type SpotlightTier = typeof SPOTLIGHT_TIERS[number]['tier'];
+export type SpotlightTier = (typeof SPOTLIGHT_TIERS)[number]['tier'];
 
 export const RESPECT_THRESHOLD = 1000;

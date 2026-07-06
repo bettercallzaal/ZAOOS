@@ -1,15 +1,11 @@
 import { createHash, timingSafeEqual } from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { deriveContactSlug, hasStableContactKey, type InteractionType } from '@/lib/crm/types';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
-import {
-  deriveContactSlug,
-  hasStableContactKey,
-  type InteractionType,
-} from '@/lib/crm/types';
 
 /**
  * Constant-time secret comparison (C-H2). Hashing both sides to a fixed-length
@@ -52,9 +48,7 @@ const contactSchema = z.object({
 });
 
 const interactionSchema = z.object({
-  type: z
-    .enum(['meeting', 'call', 'email', 'message', 'gcal', 'github', 'note'])
-    .default('note'),
+  type: z.enum(['meeting', 'call', 'email', 'message', 'gcal', 'github', 'note']).default('note'),
   title: z.string().max(300).optional(),
   public_summary: z.string().max(4000).optional(),
   private_notes: z.string().max(8000).optional(),
@@ -88,9 +82,7 @@ async function authenticate(req: NextRequest): Promise<Caller | null> {
 
 /** Strip undefined so an upsert never overwrites existing columns with null. */
 function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== undefined),
-  ) as Partial<T>;
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>;
 }
 
 /**
@@ -103,13 +95,8 @@ async function uniqueNameSlug(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   base: string,
 ): Promise<string> {
-  const { data } = await supabase
-    .from('crm_contacts')
-    .select('slug')
-    .like('slug', `${base}%`);
-  const taken = new Set(
-    (data ?? []).map((r) => (r as { slug: string | null }).slug),
-  );
+  const { data } = await supabase.from('crm_contacts').select('slug').like('slug', `${base}%`);
+  const taken = new Set((data ?? []).map((r) => (r as { slug: string | null }).slug));
   if (!taken.has(base)) return base;
   for (let i = 2; i < 1000; i++) {
     const candidate = `${base}-${i}`;
@@ -152,9 +139,7 @@ export async function POST(req: NextRequest) {
     // fresh row with a uniquified slug instead.
     const stableKey = hasStableContactKey(contact);
     const baseSlug = deriveContactSlug(contact);
-    const slug = stableKey
-      ? baseSlug
-      : await uniqueNameSlug(supabase, baseSlug);
+    const slug = stableKey ? baseSlug : await uniqueNameSlug(supabase, baseSlug);
 
     // Only provided fields are written, so a re-upsert never nulls out columns
     // set on a prior touch.
@@ -165,9 +150,7 @@ export async function POST(req: NextRequest) {
     });
 
     const contactQuery = stableKey
-      ? supabase
-          .from('crm_contacts')
-          .upsert(contactRow, { onConflict: 'slug' })
+      ? supabase.from('crm_contacts').upsert(contactRow, { onConflict: 'slug' })
       : supabase.from('crm_contacts').insert(contactRow);
 
     const { data: upserted, error: contactErr } = await contactQuery
@@ -176,10 +159,7 @@ export async function POST(req: NextRequest) {
 
     if (contactErr || !upserted) {
       logger.error('[crm/interactions] contact upsert failed:', contactErr);
-      return NextResponse.json(
-        { error: 'Failed to upsert contact' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Failed to upsert contact' }, { status: 500 });
     }
 
     // 2. Insert the interaction linked to the contact.
@@ -195,8 +175,7 @@ export async function POST(req: NextRequest) {
           visibility: interaction.visibility,
           occurred_at: interaction.occurred_at,
           source: interaction.source ?? (caller.kind === 'bot' ? 'zoe' : 'manual'),
-          created_by:
-            caller.kind === 'bot' ? 'zoe' : `admin:${caller.fid}`,
+          created_by: caller.kind === 'bot' ? 'zoe' : `admin:${caller.fid}`,
         }),
       )
       .select('id')

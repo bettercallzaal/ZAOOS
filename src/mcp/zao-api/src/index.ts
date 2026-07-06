@@ -1,13 +1,10 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { tools, toolHandlers } from "./tools/index.js";
-import { handleError } from "./lib/errors.js";
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { handleError } from './lib/errors.js';
+import { toolHandlers, tools } from './tools/index.js';
 
-const server = new Server(
-  { name: "zao-api", version: "1.0.0" },
-  { capabilities: { tools: {} } }
-);
+const server = new Server({ name: 'zao-api', version: '1.0.0' }, { capabilities: { tools: {} } });
 
 server.setRequestHandler(ListToolsRequestSchema, () => ({ tools }));
 
@@ -17,15 +14,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const handler = toolHandlers[name];
 
   if (!handler) {
-    return { content: [{ type: "text", text: JSON.stringify({ error: `Unknown tool: ${name}` }) }] };
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ error: `Unknown tool: ${name}` }) }],
+    };
   }
 
   try {
     const result = await handler(args);
-    return { content: [{ type: "text", text: JSON.stringify(result) }] };
+    return { content: [{ type: 'text', text: JSON.stringify(result) }] };
   } catch (err: unknown) {
     const { error, code } = handleError(err);
-    return { content: [{ type: "text", text: JSON.stringify({ error, code }) }], isError: true };
+    return { content: [{ type: 'text', text: JSON.stringify({ error, code }) }], isError: true };
   }
 });
 

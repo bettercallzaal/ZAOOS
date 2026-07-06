@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { WAVEWARZ_WALLETS } from '@/lib/wavewarz/constants';
-import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 import {
-  createSpotlightProposal,
   createLeaderboardProposal,
   createSessionReminderProposal,
+  createSpotlightProposal,
   getNewSpotlightTier,
 } from '@/lib/wavewarz/proposals';
-import { logger } from '@/lib/logger';
+import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 
 export async function POST(req: NextRequest) {
   // Verify cron secret
@@ -53,9 +53,8 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       // Upsert artist
-      const { error: upsertError } = await supabaseAdmin
-        .from('wavewarz_artists')
-        .upsert({
+      const { error: upsertError } = await supabaseAdmin.from('wavewarz_artists').upsert(
+        {
           solana_wallet: wallet,
           name: stats.name !== 'Unknown' ? stats.name : fallbackName,
           battles_count: stats.battlesCount,
@@ -64,7 +63,9 @@ export async function POST(req: NextRequest) {
           total_volume_sol: stats.totalVolumeSol,
           career_earnings_sol: stats.careerEarningsSol,
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'solana_wallet' });
+        },
+        { onConflict: 'solana_wallet' },
+      );
 
       if (upsertError) {
         logger.error(`[wavewarz-sync] Upsert failed for ${fallbackName}:`, upsertError);
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Small delay to avoid rate limiting the Intelligence dashboard
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 200));
     } catch (err) {
       logger.error(`[wavewarz-sync] Error processing ${wallet}:`, err);
       results.failed++;

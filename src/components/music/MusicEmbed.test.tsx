@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
-import { MusicEmbed } from './MusicEmbed';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import type React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PlayerProvider } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
-import React from 'react';
+import { MusicEmbed } from './MusicEmbed';
 
 // ─── Test data ────────────────────────────────────────────────────────────────
 const testUrl = 'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC';
@@ -37,16 +37,26 @@ vi.stubGlobal('navigator', {
   wakeLock: { request: vi.fn().mockResolvedValue({ release: vi.fn() }) },
 });
 
-vi.stubGlobal('MediaMetadata', class MediaMetadata {
-  title: string; artist: string; album: string; artwork: unknown[];
-  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
-    this.title = init.title ?? ''; this.artist = init.artist ?? '';
-    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
-  }
-});
+vi.stubGlobal(
+  'MediaMetadata',
+  class MediaMetadata {
+    title: string;
+    artist: string;
+    album: string;
+    artwork: unknown[];
+    constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+      this.title = init.title ?? '';
+      this.artist = init.artist ?? '';
+      this.album = init.album ?? '';
+      this.artwork = init.artwork ?? [];
+    }
+  },
+);
 
 // ─── Mock child components ─────────────────────────────────────────────────────
-vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" alt="" /> }));
+vi.mock('./ArtworkImage', () => ({
+  ArtworkImage: () => <img data-testid="embed-artwork" alt="" />,
+}));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
 vi.mock('./AddToPlaylistButton', () => ({ AddToPlaylistButton: () => <button>Add</button> }));
 vi.mock('./QueueActions', () => ({ QueueActions: () => <button>Queue</button> }));

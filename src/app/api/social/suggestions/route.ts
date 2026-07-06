@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
-import { logger } from '@/lib/logger';
 import { getFollowSuggestions } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -20,9 +20,12 @@ export async function GET() {
   try {
     // Fetch suggestions from Neynar and community members in parallel
     const [suggestionsRes, membersResult] = await Promise.all([
-      fetch(`${NEYNAR_BASE}/user/suggestions?fid=${session.fid}&limit=20&viewer_fid=${session.fid}`, {
-        headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
-      }),
+      fetch(
+        `${NEYNAR_BASE}/user/suggestions?fid=${session.fid}&limit=20&viewer_fid=${session.fid}`,
+        {
+          headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+        },
+      ),
       supabaseAdmin
         .from('users')
         .select('fid, display_name, username, pfp_url, zid')
@@ -75,28 +78,30 @@ export async function GET() {
     if (enriched.length < 10) {
       try {
         const neynarData = await getFollowSuggestions(session.fid, 15);
-        const neynarUsers: typeof enriched = (neynarData.users || []).map((u: {
-          fid: number;
-          username: string;
-          display_name: string;
-          pfp_url: string;
-          follower_count: number;
-          following_count: number;
-          power_badge: boolean;
-          profile?: { bio?: { text?: string } };
-          viewer_context?: { following: boolean; followed_by: boolean };
-        }) => ({
-          fid: u.fid,
-          username: u.username,
-          displayName: u.display_name,
-          pfpUrl: u.pfp_url,
-          bio: u.profile?.bio?.text || null,
-          followerCount: u.follower_count || 0,
-          followingCount: u.following_count || 0,
-          powerBadge: u.power_badge || false,
-          isZaoMember: memberFids.has(u.fid),
-          followsYou: u.viewer_context?.followed_by || false,
-        }));
+        const neynarUsers: typeof enriched = (neynarData.users || []).map(
+          (u: {
+            fid: number;
+            username: string;
+            display_name: string;
+            pfp_url: string;
+            follower_count: number;
+            following_count: number;
+            power_badge: boolean;
+            profile?: { bio?: { text?: string } };
+            viewer_context?: { following: boolean; followed_by: boolean };
+          }) => ({
+            fid: u.fid,
+            username: u.username,
+            displayName: u.display_name,
+            pfpUrl: u.pfp_url,
+            bio: u.profile?.bio?.text || null,
+            followerCount: u.follower_count || 0,
+            followingCount: u.following_count || 0,
+            powerBadge: u.power_badge || false,
+            isZaoMember: memberFids.has(u.fid),
+            followsYou: u.viewer_context?.followed_by || false,
+          }),
+        );
 
         // Deduplicate by FID — existing suggestions take priority
         const existingFids = new Set(enriched.map((s) => s.fid));
@@ -127,7 +132,7 @@ export async function GET() {
       for (const chunk of fidChunks) {
         const res = await fetch(
           `${NEYNAR_BASE}/user/bulk?fids=${chunk.join(',')}&viewer_fid=${session.fid}`,
-          { headers: { 'x-api-key': ENV.NEYNAR_API_KEY } }
+          { headers: { 'x-api-key': ENV.NEYNAR_API_KEY } },
         );
         if (res.ok) {
           const data = await res.json();

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { libraryDeleteSchema } from '@/lib/validation/library-schemas';
 import { logger } from '@/lib/logger';
+import { libraryDeleteSchema } from '@/lib/validation/library-schemas';
 
 export async function DELETE(req: NextRequest) {
   const session = await getSessionData();
@@ -26,10 +26,7 @@ export async function DELETE(req: NextRequest) {
 
     const { entry_id } = parsed.data;
 
-    const { error } = await supabaseAdmin
-      .from('research_entries')
-      .delete()
-      .eq('id', entry_id);
+    const { error } = await supabaseAdmin.from('research_entries').delete().eq('id', entry_id);
 
     if (error) throw error;
 

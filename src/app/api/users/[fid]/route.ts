@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getUserByFid } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ fid: string }> }) {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -31,7 +28,9 @@ export async function GET(
         .maybeSingle(),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url, hidden_wallets')
+        .select(
+          'zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url, hidden_wallets',
+        )
         .eq('fid', targetFid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -73,11 +72,13 @@ export async function GET(
     const ethAddresses = user.verified_addresses?.eth_addresses ?? [];
 
     return NextResponse.json({
-      user: usersRow ? {
-        ...usersRow,
-        hidden_wallets: undefined,
-        fid: user.fid,
-      } : null,
+      user: usersRow
+        ? {
+            ...usersRow,
+            hidden_wallets: undefined,
+            fid: user.fid,
+          }
+        : null,
       fid: user.fid,
       username: user.username,
       display_name: user.display_name,
@@ -89,11 +90,15 @@ export async function GET(
       followerCount: user.follower_count ?? 0,
       followingCount: user.following_count ?? 0,
       powerBadge: user.power_badge ?? false,
-      custody_address: (!isOwner && hiddenWallets.includes('custody_address')) ? null : (user.custody_address ?? null),
+      custody_address:
+        !isOwner && hiddenWallets.includes('custody_address')
+          ? null
+          : (user.custody_address ?? null),
       verified_addresses: {
-        eth_addresses: (!isOwner && hiddenWallets.includes('verified_addresses')) ? [] : ethAddresses,
+        eth_addresses: !isOwner && hiddenWallets.includes('verified_addresses') ? [] : ethAddresses,
       },
-      verifiedAddresses: (!isOwner && hiddenWallets.includes('verified_addresses')) ? [] : ethAddresses,
+      verifiedAddresses:
+        !isOwner && hiddenWallets.includes('verified_addresses') ? [] : ethAddresses,
       viewerContext: user.viewer_context ?? null,
       isZaoMember: !!allowlistRow,
       zaoName: allowlistRow?.real_name || null,

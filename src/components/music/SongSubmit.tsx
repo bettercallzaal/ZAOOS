@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { usePlayer } from '@/providers/audio';
-import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface Submission {
   id: string;
@@ -25,7 +25,16 @@ interface SongSubmitProps {
   onClose: () => void;
 }
 
-const GENRE_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
+const GENRE_TAGS = [
+  'Hip-Hop',
+  'R&B',
+  'Electronic',
+  'Lo-Fi',
+  'Jazz',
+  'Afrobeats',
+  'Soul',
+  'Experimental',
+] as const;
 
 export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   const [url, setUrl] = useState('');
@@ -37,11 +46,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
 
   const toggleTag = (tag: string) => {
     setTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : prev.length < 3
-        ? [...prev, tag]
-        : prev
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : prev.length < 3 ? [...prev, tag] : prev,
     );
   };
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -52,7 +57,12 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   useEscapeClose(onClose, isOpen);
   const player = usePlayer();
 
-  useEffect(() => () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    },
+    [],
+  );
 
   const fetchSubmissions = useCallback(async () => {
     try {
@@ -185,8 +195,18 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] flex-shrink-0">
           <h2 className="text-sm font-semibold text-[#f5a623]">Submit a Song</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close song submit">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white p-1"
+            aria-label="Close song submit"
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -194,11 +214,13 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
 
         {/* Feedback toast */}
         {feedback && (
-          <div className={`mx-4 mt-3 px-3 py-2 rounded-lg text-sm ${
-            feedback.type === 'success'
-              ? 'bg-green-500/20 text-green-400'
-              : 'bg-red-500/20 text-red-400'
-          }`}>
+          <div
+            className={`mx-4 mt-3 px-3 py-2 rounded-lg text-sm ${
+              feedback.type === 'success'
+                ? 'bg-green-500/20 text-green-400'
+                : 'bg-red-500/20 text-red-400'
+            }`}
+          >
             {feedback.msg}
           </div>
         )}
@@ -216,14 +238,16 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                   urlValid === false
                     ? 'focus:ring-red-400 ring-1 ring-red-400/50'
                     : urlValid === true
-                    ? 'focus:ring-green-400 ring-1 ring-green-400/50'
-                    : 'focus:ring-[#f5a623]'
+                      ? 'focus:ring-green-400 ring-1 ring-green-400/50'
+                      : 'focus:ring-[#f5a623]'
                 }`}
               />
               {urlValid !== null && (
-                <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${
-                  urlValid ? 'text-green-400' : 'text-red-400'
-                }`}>
+                <span
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${
+                    urlValid ? 'text-green-400' : 'text-red-400'
+                  }`}
+                >
                   {urlValid ? '✓' : '✗'}
                 </span>
               )}
@@ -246,9 +270,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                 </button>
               ))}
               {tags.length > 0 && (
-                <span className="text-[10px] text-gray-500 self-center ml-1">
-                  {tags.length}/3
-                </span>
+                <span className="text-[10px] text-gray-500 self-center ml-1">{tags.length}/3</span>
               )}
             </div>
 
@@ -285,7 +307,8 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
           </div>
 
           <p className="text-xs text-gray-500 mt-2">
-            Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, direct audio
+            Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius,
+            Sound.xyz, direct audio
           </p>
         </div>
 
@@ -316,10 +339,17 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                       onClick={() => {
                         player.play({
                           id: sub.id,
-                          type: sub.track_type as 'spotify' | 'soundcloud' | 'youtube' | 'audius' | 'soundxyz' | 'audio',
+                          type: sub.track_type as
+                            | 'spotify'
+                            | 'soundcloud'
+                            | 'youtube'
+                            | 'audius'
+                            | 'soundxyz'
+                            | 'audio',
                           url: sub.url,
                           trackName: sub.title || 'Unknown',
-                          artistName: sub.artist || sub.submitted_by_display || sub.submitted_by_username,
+                          artistName:
+                            sub.artist || sub.submitted_by_display || sub.submitted_by_username,
                           artworkUrl: '',
                           feedId: sub.id,
                         });
@@ -338,18 +368,21 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                         <p className="text-sm text-white font-medium truncate">
                           {sub.title || 'Untitled'}
                         </p>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${platformColor(sub.track_type)}`}>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${platformColor(sub.track_type)}`}
+                        >
                           {platformLabel(sub.track_type)}
                         </span>
                       </div>
-                      {sub.artist && (
-                        <p className="text-xs text-gray-400 truncate">{sub.artist}</p>
-                      )}
+                      {sub.artist && <p className="text-xs text-gray-400 truncate">{sub.artist}</p>}
                       {sub.note && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">&ldquo;{sub.note}&rdquo;</p>
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                          &ldquo;{sub.note}&rdquo;
+                        </p>
                       )}
                       <p className="text-[10px] text-gray-500 mt-1">
-                        by @{sub.submitted_by_username} &middot; {new Date(sub.created_at).toLocaleDateString()}
+                        by @{sub.submitted_by_username} &middot;{' '}
+                        {new Date(sub.created_at).toLocaleDateString()}
                       </p>
                     </div>
 
@@ -360,8 +393,18 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                       title="Remove"
                       aria-label="Remove submission"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>

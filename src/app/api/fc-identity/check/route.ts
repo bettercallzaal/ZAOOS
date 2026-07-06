@@ -1,11 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkGatingEligibility, getFcQualityScoreByFid } from '@/lib/fc-identity';
 import { logger } from '@/lib/logger';
 
 const checkQuerySchema = z
   .object({
-    address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'invalid address').optional(),
+    address: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/, 'invalid address')
+      .optional(),
     fid: z.coerce.number().int().positive().optional(),
     minScore: z.coerce.number().int().min(0).default(0),
   })

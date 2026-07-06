@@ -34,7 +34,7 @@ export async function GET() {
     for (let page = 0; page < MAX_PAGES; page++) {
       const data = await getFollowing(session.fid, session.fid, 'desc_chron', cursor, 100);
       const users = (data.users || []).map(
-        (item: { user?: NeynarUser } & NeynarUser) => item.user || item
+        (item: { user?: NeynarUser } & NeynarUser) => item.user || item,
       );
       allUsers.push(...users);
 
@@ -60,7 +60,10 @@ export async function GET() {
         };
       });
 
-    return NextResponse.json({ members, currentFid: session.fid }, { headers: { 'Cache-Control': 'private, max-age=15' } });
+    return NextResponse.json(
+      { members, currentFid: session.fid },
+      { headers: { 'Cache-Control': 'private, max-age=15' } },
+    );
   } catch (err) {
     logger.error('Following online error:', err);
     return NextResponse.json({ error: 'Failed to fetch following' }, { status: 500 });

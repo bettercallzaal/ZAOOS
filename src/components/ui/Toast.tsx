@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -43,9 +43,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const dismiss = useCallback((id: string) => {
     // Trigger the exit animation first
-    setToasts((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, dismissing: true } : t))
-    );
+    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, dismissing: true } : t)));
     // Remove from DOM after animation completes (0.2s)
     const removeTimer = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -66,7 +64,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       }, duration);
       timersRef.current.set(`dismiss-${id}`, dismissTimer);
     },
-    [dismiss]
+    [dismiss],
   );
 
   return (
@@ -105,23 +103,17 @@ function ToastList({
 
 const VARIANT_STYLES: Record<ToastType, string> = {
   success: 'bg-green-700/90 border-green-500/50 text-green-50',
-  error:   'bg-red-700/90 border-red-500/50 text-red-50',
-  info:    'bg-blue-700/90 border-blue-500/50 text-blue-50',
+  error: 'bg-red-700/90 border-red-500/50 text-red-50',
+  info: 'bg-blue-700/90 border-blue-500/50 text-blue-50',
 };
 
 const VARIANT_ICONS: Record<ToastType, string> = {
   success: '✓',
-  error:   '✕',
-  info:    'ℹ',
+  error: '✕',
+  info: 'ℹ',
 };
 
-function ToastCard({
-  toast,
-  onDismiss,
-}: {
-  toast: ToastItem;
-  onDismiss: (id: string) => void;
-}) {
+function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: string) => void }) {
   return (
     <div
       role="alert"

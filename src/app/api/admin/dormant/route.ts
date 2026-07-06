@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -52,9 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Collect respect_member_ids to look up
-    const respectIds = users
-      .map((u) => u.respect_member_id)
-      .filter((id): id is string => !!id);
+    const respectIds = users.map((u) => u.respect_member_id).filter((id): id is string => !!id);
 
     // Fetch respect data in one query
     const respectMap = new Map<string, { total_respect: number; fractal_count: number }>();
@@ -78,9 +76,7 @@ export async function GET(request: NextRequest) {
 
     // Enrich users
     const dormant = users.map((u) => {
-      const respect = u.respect_member_id
-        ? respectMap.get(u.respect_member_id)
-        : null;
+      const respect = u.respect_member_id ? respectMap.get(u.respect_member_id) : null;
       const lastActiveMs = new Date(u.last_active_at).getTime();
       const daysSinceActive = Math.floor((now - lastActiveMs) / (1000 * 60 * 60 * 24));
 

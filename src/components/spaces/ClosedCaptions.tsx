@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCall } from '@stream-io/video-react-sdk';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface CaptionEntry {
   id: string;

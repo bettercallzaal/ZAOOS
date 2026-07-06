@@ -10,11 +10,7 @@ export function RoomTrackQueue({ isHost }: RoomTrackQueueProps) {
   const { queue, currentIndex, removeFromQueue, moveTrack } = useQueue();
 
   if (queue.length === 0) {
-    return (
-      <div className="px-4 py-6 text-center text-gray-500 text-xs">
-        No tracks in queue
-      </div>
-    );
+    return <div className="px-4 py-6 text-center text-gray-500 text-xs">No tracks in queue</div>;
   }
 
   const handleMoveUp = (idx: number) => {
@@ -53,12 +49,12 @@ export function RoomTrackQueue({ isHost }: RoomTrackQueueProps) {
 
             {/* Info */}
             <div className="min-w-0 flex-1">
-              <p className={`text-xs font-medium truncate ${isCurrent ? 'text-[#f5a623]' : 'text-white'}`}>
+              <p
+                className={`text-xs font-medium truncate ${isCurrent ? 'text-[#f5a623]' : 'text-white'}`}
+              >
                 {track.metadata.trackName}
               </p>
-              <p className="text-[10px] text-gray-400 truncate">
-                {track.metadata.artistName}
-              </p>
+              <p className="text-[10px] text-gray-400 truncate">{track.metadata.artistName}</p>
             </div>
 
             {/* Position label */}
@@ -118,7 +114,14 @@ function NoteIcon() {
 
 function ChevronUpIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M18 15l-6-6-6 6" />
     </svg>
   );
@@ -126,7 +129,14 @@ function ChevronUpIcon() {
 
 function ChevronDownIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M6 9l6 6 6-6" />
     </svg>
   );
@@ -134,7 +144,14 @@ function ChevronDownIcon() {
 
 function XIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M18 6L6 18M6 6l12 12" />
     </svg>
   );

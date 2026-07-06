@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'proposalId must be an integer' }, { status: 400 });
     }
     if (!['yes', 'no', 'abstain'].includes(vote as string)) {
-      return NextResponse.json({ error: 'vote must be "yes", "no", or "abstain"' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'vote must be "yes", "no", or "abstain"' },
+        { status: 400 },
+      );
     }
 
     // Get user's discord_id from the users table
@@ -89,17 +92,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert vote into discord_proposal_votes
-    const { error: upsertErr } = await supabase
-      .from('discord_proposal_votes')
-      .upsert(
-        {
-          proposal_id: proposalId,
-          voter_id: discordId,
-          vote_value: vote as string,
-          weight: respectWeight,
-        },
-        { onConflict: 'proposal_id,voter_id' },
-      );
+    const { error: upsertErr } = await supabase.from('discord_proposal_votes').upsert(
+      {
+        proposal_id: proposalId,
+        voter_id: discordId,
+        vote_value: vote as string,
+        weight: respectWeight,
+      },
+      { onConflict: 'proposal_id,voter_id' },
+    );
 
     if (upsertErr) {
       logger.error('[discord/proposals/vote] upsert error:', upsertErr);
@@ -113,9 +114,14 @@ export async function POST(req: NextRequest) {
       .eq('proposal_id', proposalId);
 
     const agg = {
-      yes_count: 0, no_count: 0, abstain_count: 0,
-      yes_weight: 0, no_weight: 0, abstain_weight: 0,
-      total_votes: 0, total_weight: 0,
+      yes_count: 0,
+      no_count: 0,
+      abstain_count: 0,
+      yes_weight: 0,
+      no_weight: 0,
+      abstain_weight: 0,
+      total_votes: 0,
+      total_weight: 0,
     };
 
     for (const v of allVotes ?? []) {

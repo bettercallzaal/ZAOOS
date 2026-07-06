@@ -14,16 +14,9 @@ export interface ModerationResult {
   action: 'allow' | 'flag' | 'hide';
 }
 
-const PERSPECTIVE_URL =
-  'https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze';
+const PERSPECTIVE_URL = 'https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze';
 
-const ATTRIBUTES = [
-  'TOXICITY',
-  'SEVERE_TOXICITY',
-  'IDENTITY_ATTACK',
-  'INSULT',
-  'THREAT',
-] as const;
+const ATTRIBUTES = ['TOXICITY', 'SEVERE_TOXICITY', 'IDENTITY_ATTACK', 'INSULT', 'THREAT'] as const;
 
 /** Threshold above which a category is considered flagged */
 const FLAG_THRESHOLD = 0.8;
@@ -34,9 +27,7 @@ const HIDE_THRESHOLD = 0.9;
  * Analyse text with Perspective API.
  * Returns a passthrough result when the API key is missing or text is empty.
  */
-export async function moderateContent(
-  text: string,
-): Promise<ModerationResult> {
+export async function moderateContent(text: string): Promise<ModerationResult> {
   const apiKey = process.env.PERSPECTIVE_API_KEY;
 
   // Graceful passthrough when disabled
@@ -70,18 +61,14 @@ export async function moderateContent(
     }
 
     const data = (await res.json()) as {
-      attributeScores: Record<
-        string,
-        { summaryScore: { value: number } }
-      >;
+      attributeScores: Record<string, { summaryScore: { value: number } }>;
     };
 
     const scores: Record<string, number> = {};
     const flaggedCategories: string[] = [];
 
     for (const attr of ATTRIBUTES) {
-      const score =
-        data.attributeScores?.[attr]?.summaryScore?.value ?? 0;
+      const score = data.attributeScores?.[attr]?.summaryScore?.value ?? 0;
       scores[attr] = Math.round(score * 1000) / 1000; // 3 decimal places
       if (score > FLAG_THRESHOLD) {
         flaggedCategories.push(attr);
@@ -90,10 +77,7 @@ export async function moderateContent(
 
     // Determine action
     let action: ModerationResult['action'] = 'allow';
-    if (
-      scores.SEVERE_TOXICITY !== undefined &&
-      scores.SEVERE_TOXICITY > HIDE_THRESHOLD
-    ) {
+    if (scores.SEVERE_TOXICITY !== undefined && scores.SEVERE_TOXICITY > HIDE_THRESHOLD) {
       action = 'hide';
     } else if (flaggedCategories.length > 0) {
       action = 'flag';

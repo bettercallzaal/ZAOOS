@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface SharedUser {
   fid: number;
@@ -52,7 +52,9 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
         if (!controller.signal.aborted) setLoading(false);
       });
 
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, [targetFid]);
 
   // Loading skeleton
@@ -68,11 +70,12 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
     );
   }
 
-  if (error) return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
-      <p className="text-red-400 text-sm text-center">{error}</p>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
+        <p className="text-red-400 text-sm text-center">{error}</p>
+      </div>
+    );
   if (!data) return null;
 
   const { sharedFollowers, sharedFollowing, totalYours, totalTheirs, topShared } = data;
@@ -95,16 +98,17 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
 
   return (
     <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
-      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
-        Network Overlap
-      </p>
+      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Network Overlap</p>
 
       {/* Headline stat */}
       <p className="text-sm text-white mb-4 text-center">
         You and <span className="text-[#f5a623] font-medium">@{targetUsername}</span> share{' '}
-        <span className="font-bold text-[#f5a623]">{sharedFollowers}</span> follower{sharedFollowers !== 1 ? 's' : ''}
+        <span className="font-bold text-[#f5a623]">{sharedFollowers}</span> follower
+        {sharedFollowers !== 1 ? 's' : ''}
         {sharedFollowing > 0 && (
-          <>, <span className="font-bold text-[#f5a623]">{sharedFollowing}</span> following</>
+          <>
+            , <span className="font-bold text-[#f5a623]">{sharedFollowing}</span> following
+          </>
         )}
       </p>
 
@@ -170,7 +174,14 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                   {u.pfpUrl ? (
-                    <Image src={u.pfpUrl || '/logo.png'} alt={u.username} width={20} height={20} className="w-full h-full object-cover" unoptimized />
+                    <Image
+                      src={u.pfpUrl || '/logo.png'}
+                      alt={u.username}
+                      width={20}
+                      height={20}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
                   ) : (
                     <div className="w-full h-full bg-gray-600" />
                   )}

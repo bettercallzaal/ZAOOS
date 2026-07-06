@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getEventBySlug } from '@/lib/unlock/events';
-import { findKeyHolder } from '@/lib/unlock/lock';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import { getEventBySlug } from '@/lib/unlock/events';
+import { findKeyHolder } from '@/lib/unlock/lock';
 
 /**
  * Verify whether a person holds the Unlock ticket (key) for an event.
@@ -19,7 +19,10 @@ const verifySchema = z
   .object({
     eventSlug: z.string().min(1).max(100),
     fid: z.number().int().positive().optional(),
-    wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+    wallet: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/)
+      .optional(),
   })
   .refine((d) => d.fid !== undefined || d.wallet !== undefined, {
     message: 'Provide a fid or a wallet',
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (!event.lock_address) {
       return NextResponse.json(
         { error: 'Event has no ticket lock yet', holdsTicket: false },
-        { status: 409 }
+        { status: 409 },
       );
     }
 

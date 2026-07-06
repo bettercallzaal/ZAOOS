@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import { Suspense, useCallback, useState } from 'react';
 import { getApp } from '@/lib/os/app-manifest';
-import { AppIcon } from './AppIcon';
+import type { AppManifest, ShellId } from '@/lib/os/types';
 import { AppDrawer } from './AppDrawer';
+import { AppIcon } from './AppIcon';
 import { Dock } from './Dock';
 import { ShellPicker } from './ShellPicker';
-import type { AppManifest, ShellId } from '@/lib/os/types';
+import AgentStatusWidget from './widgets/AgentStatusWidget';
 import NowPlayingWidget from './widgets/NowPlayingWidget';
 import UnreadWidget from './widgets/UnreadWidget';
-import AgentStatusWidget from './widgets/AgentStatusWidget';
 
 interface PhoneShellProps {
   pinnedApps: string[];
@@ -66,7 +66,9 @@ export function PhoneShell({
             📱 Shell
           </button>
           <div className="text-center">
-            <div className="text-3xl font-light tracking-tight text-white sm:text-4xl">{timeStr}</div>
+            <div className="text-3xl font-light tracking-tight text-white sm:text-4xl">
+              {timeStr}
+            </div>
             <div className="text-xs text-white/40">{dateStr}</div>
           </div>
           <button
@@ -80,9 +82,7 @@ export function PhoneShell({
         </div>
 
         {userName && (
-          <div className="px-4 pb-2 text-center text-xs text-[#f5a623]/70">
-            {userName}
-          </div>
+          <div className="px-4 pb-2 text-center text-xs text-[#f5a623]/70">{userName}</div>
         )}
 
         {/* Widgets */}

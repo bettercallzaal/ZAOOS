@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { usePlayer } from '@/providers/audio';
+import { useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { usePlayer } from '@/providers/audio';
 import type { TrackType } from '@/types/music';
 
 interface WeightedTrack {
@@ -54,7 +54,9 @@ export function RespectTrending() {
         player.play({ ...metadata, feedId: `respect-trending-${track.song.id}` });
         return;
       }
-    } catch { /* fallback below */ }
+    } catch {
+      /* fallback below */
+    }
     player.play({
       id: track.song.id,
       trackName: track.song.title,
@@ -209,9 +211,7 @@ export function RespectTrending() {
                       d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
                     />
                   </svg>
-                  <span className="text-xs font-bold text-[#f5a623]">
-                    {track.weightedScore}
-                  </span>
+                  <span className="text-xs font-bold text-[#f5a623]">{track.weightedScore}</span>
                 </span>
                 <span className="text-[10px] text-gray-600">
                   {track.likeCount} {track.likeCount === 1 ? 'like' : 'likes'}

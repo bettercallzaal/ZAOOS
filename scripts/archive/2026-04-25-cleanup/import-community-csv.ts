@@ -3,13 +3,19 @@ import * as fs from 'fs';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
-const CSV_PATH = '/Users/zaalpanthaki/Downloads/The ZAO - Community Members - 649692e084fd981c08d16c42.csv';
+const CSV_PATH =
+  '/Users/zaalpanthaki/Downloads/The ZAO - Community Members - 649692e084fd981c08d16c42.csv';
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function parseCSVLine(line: string): string[] {
@@ -39,7 +45,7 @@ function parseCSVLine(line: string): string[] {
 
 async function main() {
   const raw = fs.readFileSync(CSV_PATH, 'utf-8');
-  const lines = raw.split('\n').filter(l => l.trim());
+  const lines = raw.split('\n').filter((l) => l.trim());
 
   // Skip header
   let imported = 0;
@@ -50,7 +56,13 @@ async function main() {
     const name = fields[0]?.trim();
 
     // Skip empty names, HTML fragments, draft rows
-    if (!name || name.startsWith('<') || name.startsWith('src=') || name.startsWith('>') || name.includes('iframe')) {
+    if (
+      !name ||
+      name.startsWith('<') ||
+      name.startsWith('src=') ||
+      name.startsWith('>') ||
+      name.includes('iframe')
+    ) {
       skipped++;
       continue;
     }
@@ -60,7 +72,9 @@ async function main() {
       continue;
     }
 
-    const slug = (fields[1]?.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
+    const slug = (
+      fields[1]?.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    ).toLowerCase();
     const biography = fields[11] ? stripHtml(fields[11]) : null;
     const category = (fields[12]?.trim() || 'musician').toLowerCase();
     const isNotable = fields[13]?.trim().toLowerCase() === 'true';
@@ -93,8 +107,15 @@ async function main() {
       console.error(`  Failed: ${name} — ${error.message}`);
     } else {
       imported++;
-      const socials = [profile.twitter && 'X', profile.instagram && 'IG', profile.spotify && 'SP', profile.soundcloud && 'SC'].filter(Boolean);
-      console.log(`  Imported: ${name} (${category})${socials.length ? ' [' + socials.join(', ') + ']' : ''}`);
+      const socials = [
+        profile.twitter && 'X',
+        profile.instagram && 'IG',
+        profile.spotify && 'SP',
+        profile.soundcloud && 'SC',
+      ].filter(Boolean);
+      console.log(
+        `  Imported: ${name} (${category})${socials.length ? ' [' + socials.join(', ') + ']' : ''}`,
+      );
     }
   }
 

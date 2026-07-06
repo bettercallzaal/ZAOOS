@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { AppManifest } from '@/lib/os/types';
 
 interface AppIconProps {
@@ -44,7 +44,10 @@ export function AppIcon({ app, isPinned, onOpen, onPin, onUnpin }: AppIconProps)
         type="button"
         aria-label={`Open ${app.name}`}
         onClick={handleTap}
-        onContextMenu={(e) => { e.preventDefault(); setShowMenu(true); }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setShowMenu(true);
+        }}
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handlePressEnd}

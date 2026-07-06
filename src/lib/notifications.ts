@@ -51,7 +51,7 @@ export async function sendNotification(
   body: string,
   targetUrl: string,
   notificationId: string,
-  excludeFid?: number
+  excludeFid?: number,
 ) {
   try {
     // Get all enabled notification tokens

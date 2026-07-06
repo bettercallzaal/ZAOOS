@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { upsertSong } from '@/lib/music/library';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { logger } from '@/lib/logger';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { upsertSong } from '@/lib/music/library';
 
 const likeSchema = z.object({
   url: z.string().url().max(500),
@@ -69,7 +69,12 @@ export async function GET(req: NextRequest) {
 
       if (users) {
         // Preserve the order from likerRows (most recent first)
-        const userMap = new Map(users.map((u: { fid: number; username: string; display_name: string | null }) => [u.fid, u]));
+        const userMap = new Map(
+          users.map((u: { fid: number; username: string; display_name: string | null }) => [
+            u.fid,
+            u,
+          ]),
+        );
         likers = fids
           .map((fid: number) => {
             const u = userMap.get(fid);
@@ -99,7 +104,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = likeSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { url } = parsed.data;
@@ -125,10 +133,7 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       // Unlike — remove the row
-      await supabaseAdmin
-        .from('user_song_likes')
-        .delete()
-        .eq('id', existing.id);
+      await supabaseAdmin.from('user_song_likes').delete().eq('id', existing.id);
       liked = false;
     } else {
       // Like — insert new row

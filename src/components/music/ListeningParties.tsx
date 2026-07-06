@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Party {
   id: string;
@@ -41,14 +41,20 @@ export function ListeningParties() {
     fetch('/api/music/listening-party', { signal })
       .then((r) => (r.ok ? r.json() : { parties: [] }))
       .then((d) => setParties(d.parties || []))
-      .catch((err) => { if (err?.name !== 'AbortError') { /* ignore */ } })
+      .catch((err) => {
+        if (err?.name !== 'AbortError') {
+          /* ignore */
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     fetchParties(controller.signal);
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, [fetchParties]);
 
   const handleCreate = async () => {
@@ -58,7 +64,10 @@ export function ListeningParties() {
       .split('\n')
       .map((u) => u.trim())
       .filter((u) => u.startsWith('http'));
-    if (trackUrls.length === 0) { setCreating(false); return; }
+    if (trackUrls.length === 0) {
+      setCreating(false);
+      return;
+    }
 
     setCreateError('');
     try {
@@ -124,9 +133,7 @@ export function ListeningParties() {
         </div>
       )}
 
-      {loading && (
-        <div className="text-gray-500 text-sm py-6 text-center">Loading parties...</div>
-      )}
+      {loading && <div className="text-gray-500 text-sm py-6 text-center">Loading parties...</div>}
 
       {!loading && parties.length === 0 && !showForm && (
         <div className="text-gray-500 text-sm py-6 text-center">

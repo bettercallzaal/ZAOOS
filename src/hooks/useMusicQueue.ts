@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Cast } from '@/types';
-import { TrackType } from '@/types/music';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import type { Cast } from '@/types';
+import type { TrackType } from '@/types/music';
 
 export type QueueEntry = {
   url: string;
@@ -26,12 +26,9 @@ export function useMusicQueue(messages: Cast[], submissions?: SubmissionEntry[])
 
     // Feed-extracted tracks (oldest first)
     for (const msg of [...messages].reverse()) {
-      const embedUrls = (msg.embeds ?? [])
-        .filter((e) => e.url)
-        .map((e) => e.url!);
+      const embedUrls = (msg.embeds ?? []).filter((e) => e.url).map((e) => e.url!);
 
-      const textUrls =
-        msg.text.match(/https?:\/\/[^\s<>"{}|\\^`[\]]+/g) ?? [];
+      const textUrls = msg.text.match(/https?:\/\/[^\s<>"{}|\\^`[\]]+/g) ?? [];
 
       const allUrls = [...new Set([...embedUrls, ...textUrls])];
 
@@ -39,9 +36,7 @@ export function useMusicQueue(messages: Cast[], submissions?: SubmissionEntry[])
         const embed = msg.embeds?.find((e) => e.url === url);
         const contentType = embed?.metadata?.content_type ?? '';
 
-        const type = contentType.startsWith('audio/')
-          ? 'audio'
-          : isMusicUrl(url);
+        const type = contentType.startsWith('audio/') ? 'audio' : isMusicUrl(url);
 
         if (type && !seen.has(url)) {
           seen.add(url);

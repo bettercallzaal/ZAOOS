@@ -1,7 +1,7 @@
 // Generate a fresh login code for Zaal. Prints plaintext + SQL UPDATE.
 // Usage: npx tsx scripts/stock-zaal-new-code.ts
 
-import { scryptSync, randomBytes } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 

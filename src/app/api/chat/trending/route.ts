@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getTrendingFeed } from '@/lib/farcaster/neynar';
-import { fetchSophaFeed, SophaCast } from '@/lib/sopha/client';
-import { Cast } from '@/types';
 import { logger } from '@/lib/logger';
+import { fetchSophaFeed, type SophaCast } from '@/lib/sopha/client';
+import type { Cast } from '@/types';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(25),
@@ -67,14 +67,17 @@ export async function GET(req: NextRequest) {
 
   const parsed = querySchema.safeParse(raw);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid parameters', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid parameters', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { limit, time_window } = parsed.data;
 
   try {
     const now = Date.now();
-    if (cachedData && (now - cachedData.fetchedAt) < CACHE_TTL) {
+    if (cachedData && now - cachedData.fetchedAt < CACHE_TTL) {
       return NextResponse.json(
         { casts: cachedData.casts.slice(0, limit), source: 'mixed' },
         { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
@@ -103,8 +106,8 @@ export async function GET(req: NextRequest) {
     // Add Neynar trending casts (always recent, high engagement)
     if (neynarResult.status === 'fulfilled' && neynarResult.value?.casts) {
       const neynarCasts = (neynarResult.value.casts as Record<string, unknown>[])
-        .map(c => neynarToCast(c))
-        .filter(c => c.reactions.likes_count >= 5 || c.reactions.recasts_count >= 2);
+        .map((c) => neynarToCast(c))
+        .filter((c) => c.reactions.likes_count >= 5 || c.reactions.recasts_count >= 2);
 
       for (const cast of neynarCasts) {
         if (!seenHashes.has(cast.hash)) {

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { OGBadge } from '@/components/badges/OGBadge';
+import HatBadge from '@/components/hats/HatBadge';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import HatBadge from '@/components/hats/HatBadge';
-import { OGBadge } from '@/components/badges/OGBadge';
-import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface ProfileData {
   fid: number;
@@ -32,7 +32,13 @@ interface ProfileData {
 interface ProfileDrawerProps {
   fid: number | null;
   onClose: () => void;
-  onStartDm?: (fid: number, username: string, displayName: string, pfpUrl: string, address: string) => void;
+  onStartDm?: (
+    fid: number,
+    username: string,
+    displayName: string,
+    pfpUrl: string,
+    address: string,
+  ) => void;
 }
 
 function formatCount(n: number): string {
@@ -141,7 +147,11 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
         if (data.error) throw new Error(data.error);
         setEnriched({
           activeChannels: data.activeChannels || [],
-          communityStats: data.communityStats || { songsSubmitted: 0, proposalsCreated: 0, votesCast: 0 },
+          communityStats: data.communityStats || {
+            songsSubmitted: 0,
+            proposalsCreated: 0,
+            votesCast: 0,
+          },
           blueskyHandle: data.blueskyHandle || null,
           zid: data.zid || null,
           reputation: null,
@@ -159,12 +169,14 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
     }
 
     fetch(`/api/members/${encodeURIComponent(profile.username)}`)
-      .then((res) => res.ok ? res.json() : null)
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.reputation) setReputation(data.reputation);
         if (data?.zaoSubname) setZaoSubname(data.zaoSubname);
       })
-      .catch(() => { /* non-critical */ });
+      .catch(() => {
+        /* non-critical */
+      });
   }, [profile?.username]);
 
   const handleFollow = useCallback(async () => {
@@ -193,18 +205,28 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-50"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
 
       {/* Drawer */}
-      <div ref={drawerRef} className="fixed top-0 right-0 h-full w-full max-w-sm bg-[#0d1b2a] border-l border-white/[0.08] z-50 flex flex-col animate-slide-in-right overflow-y-auto">
+      <div
+        ref={drawerRef}
+        className="fixed top-0 right-0 h-full w-full max-w-sm bg-[#0d1b2a] border-l border-white/[0.08] z-50 flex flex-col animate-slide-in-right overflow-y-auto"
+      >
         {/* Close button */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] flex-shrink-0">
           <h3 className="text-sm font-medium text-gray-400">Profile</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-2" aria-label="Close profile">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-white transition-colors p-2"
+            aria-label="Close profile"
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -306,11 +328,15 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               {/* Farcaster stats */}
               <div className="flex gap-6 mt-5">
                 <div className="text-center">
-                  <p className="text-base font-bold text-white">{formatCount(profile.followerCount)}</p>
+                  <p className="text-base font-bold text-white">
+                    {formatCount(profile.followerCount)}
+                  </p>
                   <p className="text-xs text-gray-500">Followers</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-bold text-white">{formatCount(profile.followingCount)}</p>
+                  <p className="text-base font-bold text-white">
+                    {formatCount(profile.followingCount)}
+                  </p>
                   <p className="text-xs text-gray-500">Following</p>
                 </div>
                 <div className="text-center">
@@ -322,22 +348,32 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               {/* Channel activity stats */}
               {profile.activity && profile.activity.casts > 0 && (
                 <div className="mt-5 w-full max-w-xs">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider text-center mb-3">ZAO Channel Activity</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider text-center mb-3">
+                    ZAO Channel Activity
+                  </p>
                   <div className="grid grid-cols-4 gap-2">
                     <div className="text-center px-2 py-2 rounded-lg bg-white/5">
-                      <p className="text-sm font-bold text-white">{formatCount(profile.activity.casts)}</p>
+                      <p className="text-sm font-bold text-white">
+                        {formatCount(profile.activity.casts)}
+                      </p>
                       <p className="text-[10px] text-gray-500">Casts</p>
                     </div>
                     <div className="text-center px-2 py-2 rounded-lg bg-white/5">
-                      <p className="text-sm font-bold text-red-400">{formatCount(profile.activity.likes)}</p>
+                      <p className="text-sm font-bold text-red-400">
+                        {formatCount(profile.activity.likes)}
+                      </p>
                       <p className="text-[10px] text-gray-500">Likes</p>
                     </div>
                     <div className="text-center px-2 py-2 rounded-lg bg-white/5">
-                      <p className="text-sm font-bold text-green-400">{formatCount(profile.activity.recasts)}</p>
+                      <p className="text-sm font-bold text-green-400">
+                        {formatCount(profile.activity.recasts)}
+                      </p>
                       <p className="text-[10px] text-gray-500">Recasts</p>
                     </div>
                     <div className="text-center px-2 py-2 rounded-lg bg-white/5">
-                      <p className="text-sm font-bold text-[#f5a623]">{formatCount(profile.activity.replies)}</p>
+                      <p className="text-sm font-bold text-[#f5a623]">
+                        {formatCount(profile.activity.replies)}
+                      </p>
                       <p className="text-[10px] text-gray-500">Replies</p>
                     </div>
                   </div>
@@ -370,7 +406,9 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               </div>
             ) : enriched && enriched.activeChannels.length > 0 ? (
               <div className="px-6 py-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Active Channels</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+                  Active Channels
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {enriched.activeChannels.map((ch) => (
                     <a
@@ -407,20 +445,31 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                   ))}
                 </div>
               </div>
-            ) : enriched && (enriched.communityStats.songsSubmitted > 0 || enriched.communityStats.proposalsCreated > 0 || enriched.communityStats.votesCast > 0) ? (
+            ) : enriched &&
+              (enriched.communityStats.songsSubmitted > 0 ||
+                enriched.communityStats.proposalsCreated > 0 ||
+                enriched.communityStats.votesCast > 0) ? (
               <div className="px-6 py-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Community Stats</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+                  Community Stats
+                </p>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
-                    <p className="text-sm font-bold text-[#f5a623]">{enriched.communityStats.songsSubmitted}</p>
+                    <p className="text-sm font-bold text-[#f5a623]">
+                      {enriched.communityStats.songsSubmitted}
+                    </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Songs</p>
                   </div>
                   <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
-                    <p className="text-sm font-bold text-purple-400">{enriched.communityStats.proposalsCreated}</p>
+                    <p className="text-sm font-bold text-purple-400">
+                      {enriched.communityStats.proposalsCreated}
+                    </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Proposals</p>
                   </div>
                   <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
-                    <p className="text-sm font-bold text-green-400">{enriched.communityStats.votesCast}</p>
+                    <p className="text-sm font-bold text-green-400">
+                      {enriched.communityStats.votesCast}
+                    </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Votes</p>
                   </div>
                 </div>
@@ -428,60 +477,80 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
             ) : null}
 
             {/* Reputation Signals */}
-            {reputation && (reputation.neynarScore || reputation.coinbaseVerified || reputation.easAttestationCount > 0 || reputation.github || reputation.snapshot || reputation.audius || reputation.efp) && (
-              <div className="px-6 py-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Reputation</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {reputation.neynarScore !== null && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className={`text-sm font-bold ${
-                        reputation.neynarScore >= 0.7 ? 'text-green-400' :
-                        reputation.neynarScore >= 0.4 ? 'text-yellow-400' : 'text-gray-400'
-                      }`}>
-                        {(reputation.neynarScore * 100).toFixed(0)}
-                      </p>
-                      <p className="text-[9px] text-gray-500">Farcaster Score</p>
-                    </div>
-                  )}
-                  {reputation.coinbaseVerified && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-blue-400">Verified</p>
-                      <p className="text-[9px] text-gray-500">Coinbase ID</p>
-                    </div>
-                  )}
-                  {reputation.easAttestationCount > 0 && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-[#f5a623]">{reputation.easAttestationCount}</p>
-                      <p className="text-[9px] text-gray-500">Attestations</p>
-                    </div>
-                  )}
-                  {reputation.github && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-white">{reputation.github.repos}</p>
-                      <p className="text-[9px] text-gray-500">GitHub repos</p>
-                    </div>
-                  )}
-                  {reputation.snapshot && reputation.snapshot.totalVotes > 0 && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-orange-400">{reputation.snapshot.totalVotes}</p>
-                      <p className="text-[9px] text-gray-500">DAO votes</p>
-                    </div>
-                  )}
-                  {reputation.audius && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-purple-300">{reputation.audius.tracks}</p>
-                      <p className="text-[9px] text-gray-500">Audius tracks</p>
-                    </div>
-                  )}
-                  {reputation.efp && reputation.efp.followers > 0 && (
-                    <div className="bg-white/5 rounded-lg px-3 py-2">
-                      <p className="text-sm font-bold text-cyan-400">{reputation.efp.followers}</p>
-                      <p className="text-[9px] text-gray-500">On-chain followers</p>
-                    </div>
-                  )}
+            {reputation &&
+              (reputation.neynarScore ||
+                reputation.coinbaseVerified ||
+                reputation.easAttestationCount > 0 ||
+                reputation.github ||
+                reputation.snapshot ||
+                reputation.audius ||
+                reputation.efp) && (
+                <div className="px-6 py-4">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Reputation</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {reputation.neynarScore !== null && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p
+                          className={`text-sm font-bold ${
+                            reputation.neynarScore >= 0.7
+                              ? 'text-green-400'
+                              : reputation.neynarScore >= 0.4
+                                ? 'text-yellow-400'
+                                : 'text-gray-400'
+                          }`}
+                        >
+                          {(reputation.neynarScore * 100).toFixed(0)}
+                        </p>
+                        <p className="text-[9px] text-gray-500">Farcaster Score</p>
+                      </div>
+                    )}
+                    {reputation.coinbaseVerified && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-blue-400">Verified</p>
+                        <p className="text-[9px] text-gray-500">Coinbase ID</p>
+                      </div>
+                    )}
+                    {reputation.easAttestationCount > 0 && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-[#f5a623]">
+                          {reputation.easAttestationCount}
+                        </p>
+                        <p className="text-[9px] text-gray-500">Attestations</p>
+                      </div>
+                    )}
+                    {reputation.github && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-white">{reputation.github.repos}</p>
+                        <p className="text-[9px] text-gray-500">GitHub repos</p>
+                      </div>
+                    )}
+                    {reputation.snapshot && reputation.snapshot.totalVotes > 0 && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-orange-400">
+                          {reputation.snapshot.totalVotes}
+                        </p>
+                        <p className="text-[9px] text-gray-500">DAO votes</p>
+                      </div>
+                    )}
+                    {reputation.audius && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-purple-300">
+                          {reputation.audius.tracks}
+                        </p>
+                        <p className="text-[9px] text-gray-500">Audius tracks</p>
+                      </div>
+                    )}
+                    {reputation.efp && reputation.efp.followers > 0 && (
+                      <div className="bg-white/5 rounded-lg px-3 py-2">
+                        <p className="text-sm font-bold text-cyan-400">
+                          {reputation.efp.followers}
+                        </p>
+                        <p className="text-[9px] text-gray-500">On-chain followers</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Divider */}
             <div className="border-t border-white/[0.08] mx-4" />
@@ -495,8 +564,18 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
               >
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                  />
                 </svg>
                 View on Farcaster
               </a>
@@ -526,8 +605,18 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 disabled={profile.verifiedAddresses.length === 0}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors w-full text-left disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                  />
                 </svg>
                 {profile.verifiedAddresses.length > 0
                   ? 'Send Private Message'
@@ -537,7 +626,9 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               {/* Verified addresses */}
               {profile.verifiedAddresses.length > 0 && (
                 <div className="px-3 pt-3">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Verified Wallets</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                    Verified Wallets
+                  </p>
                   {profile.verifiedAddresses.map((addr) => (
                     <p key={addr} className="text-xs text-gray-500 font-mono truncate mb-1">
                       {addr}
@@ -587,7 +678,11 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                             </div>
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
+                              <svg
+                                className="w-5 h-5 text-gray-500"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
                                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                               </svg>
                             </div>
@@ -598,24 +693,38 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-xs text-gray-500 truncate">{track.artist}</span>
-                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
-                                track.platform === 'Sound.xyz'
-                                  ? 'bg-purple-500/10 text-purple-400'
-                                  : 'bg-blue-500/10 text-blue-400'
-                              }`}>
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
+                                  track.platform === 'Sound.xyz'
+                                    ? 'bg-purple-500/10 text-purple-400'
+                                    : 'bg-blue-500/10 text-blue-400'
+                                }`}
+                              >
                                 {track.platform}
                               </span>
-                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                                track.role === 'creator'
-                                  ? 'bg-[#f5a623]/10 text-[#f5a623]'
-                                  : 'bg-white/5 text-gray-500'
-                              }`}>
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                                  track.role === 'creator'
+                                    ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                                    : 'bg-white/5 text-gray-500'
+                                }`}
+                              >
                                 {track.role === 'creator' ? 'Creator' : 'Collected'}
                               </span>
                             </div>
                           </div>
-                          <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          <svg
+                            className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400 flex-shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                            />
                           </svg>
                         </a>
                       ))}

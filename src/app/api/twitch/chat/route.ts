@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -55,7 +55,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = sendSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { message, channel } = parsed.data;
@@ -74,10 +77,13 @@ export async function POST(req: NextRequest) {
 
     const scopes = platform.scopes?.split(' ') ?? [];
     if (!scopes.includes('chat:edit')) {
-      return NextResponse.json({
-        error: 'Missing chat:edit scope. Reconnect Twitch with chat send permissions.',
-        needsReauth: true,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Missing chat:edit scope. Reconnect Twitch with chat send permissions.',
+          needsReauth: true,
+        },
+        { status: 400 },
+      );
     }
 
     // Resolve broadcaster ID from channel username
@@ -93,7 +99,7 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${platform.access_token}`,
           'Client-Id': clientId,
         },
-      }
+      },
     );
     const userData = await userRes.json();
     const broadcasterId = userData.data?.[0]?.id;
@@ -120,7 +126,10 @@ export async function POST(req: NextRequest) {
     if (!chatRes.ok) {
       const err = await chatRes.json().catch(() => ({}));
       logger.error('Twitch send chat error:', err);
-      return NextResponse.json({ error: 'Failed to send message to Twitch' }, { status: chatRes.status });
+      return NextResponse.json(
+        { error: 'Failed to send message to Twitch' },
+        { status: chatRes.status },
+      );
     }
 
     return NextResponse.json({ sent: true });

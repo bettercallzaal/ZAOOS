@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, memo } from 'react';
 import Image from 'next/image';
+import { memo, useCallback } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
-import { usePlayer } from '@/providers/audio';
 import type { QueueTrack } from '@/hooks/usePlayerQueue';
+import { usePlayer } from '@/providers/audio';
 
 interface QueuePanelProps {
   onClose?: () => void;
@@ -41,8 +41,18 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+          <svg
+            className="w-4 h-4 text-[#f5a623]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"
+            />
           </svg>
           <span className="text-sm font-semibold text-white">Up Next</span>
           {queue.length > 0 && (
@@ -66,7 +76,13 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
               className="p-1 text-gray-400 hover:text-white transition-colors"
               aria-label="Close queue"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -116,8 +132,18 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
       {/* Queue list */}
       {queue.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
-          <svg className="w-8 h-8 text-gray-600 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+          <svg
+            className="w-8 h-8 text-gray-600 mb-2"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"
+            />
           </svg>
           <p className="text-sm text-gray-400 font-medium">Queue empty</p>
           <p className="text-xs text-gray-500 mt-1">
@@ -214,7 +240,9 @@ const QueueItem = memo(function QueueItem({
 
       {/* Track info */}
       <button onClick={onPlay} className="flex-1 min-w-0 text-left">
-        <p className={`text-xs font-medium truncate ${isCurrent ? 'text-[#f5a623]' : 'text-white'}`}>
+        <p
+          className={`text-xs font-medium truncate ${isCurrent ? 'text-[#f5a623]' : 'text-white'}`}
+        >
           {entry.metadata.trackName}
         </p>
         <p className="text-[11px] text-gray-500 truncate">
@@ -225,22 +253,40 @@ const QueueItem = memo(function QueueItem({
       {/* Reorder buttons */}
       <div className="flex flex-col gap-0.5 flex-shrink-0">
         <button
-          onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveUp();
+          }}
           disabled={isFirst}
           className="p-0.5 text-gray-500 hover:text-white disabled:opacity-20 transition-colors"
           aria-label="Move up"
         >
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+          <svg
+            className="w-3 h-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
         <button
-          onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveDown();
+          }}
           disabled={isLast}
           className="p-0.5 text-gray-500 hover:text-white disabled:opacity-20 transition-colors"
           aria-label="Move down"
         >
-          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+          <svg
+            className="w-3 h-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
           </svg>
         </button>
@@ -248,11 +294,20 @@ const QueueItem = memo(function QueueItem({
 
       {/* Remove button */}
       <button
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
         className="p-1 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
         aria-label="Remove from queue"
       >
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
@@ -273,9 +328,18 @@ function MusicNoteIcon({ className }: { className?: string }) {
 function PlayingBars() {
   return (
     <div className="flex items-end gap-[2px] h-3">
-      <div className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" style={{ height: '50%' }} />
-      <div className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.15s]" style={{ height: '100%' }} />
-      <div className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" style={{ height: '40%' }} />
+      <div
+        className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite]"
+        style={{ height: '50%' }}
+      />
+      <div
+        className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.15s]"
+        style={{ height: '100%' }}
+      />
+      <div
+        className="w-[2px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]"
+        style={{ height: '40%' }}
+      />
     </div>
   );
 }

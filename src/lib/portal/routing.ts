@@ -1,8 +1,32 @@
 import { PORTALS, type Portal } from './destinations';
 
 const INTEREST_KEYWORDS: Record<string, string[]> = {
-  music: ['music', 'listen', 'song', 'beat', 'artist', 'producer', 'dj', 'rap', 'hip hop', 'electronic', 'battle', 'stream'],
-  social: ['chat', 'talk', 'community', 'friends', 'connect', 'social', 'discord', 'telegram', 'hang out', 'meet'],
+  music: [
+    'music',
+    'listen',
+    'song',
+    'beat',
+    'artist',
+    'producer',
+    'dj',
+    'rap',
+    'hip hop',
+    'electronic',
+    'battle',
+    'stream',
+  ],
+  social: [
+    'chat',
+    'talk',
+    'community',
+    'friends',
+    'connect',
+    'social',
+    'discord',
+    'telegram',
+    'hang out',
+    'meet',
+  ],
   build: ['build', 'code', 'develop', 'agent', 'ai', 'tool', 'hack', 'create', 'tech', 'engineer'],
   earn: ['earn', 'money', 'token', 'stake', 'bounty', 'reward', 'profit', 'income', 'crypto'],
   govern: ['vote', 'govern', 'proposal', 'dao', 'decision', 'democracy', 'policy'],
@@ -16,7 +40,7 @@ export function matchInterest(input: string): Portal | null {
   let bestScore = 0;
 
   for (const [portalId, keywords] of Object.entries(INTEREST_KEYWORDS)) {
-    const score = keywords.filter(kw => lower.includes(kw)).length;
+    const score = keywords.filter((kw) => lower.includes(kw)).length;
     if (score > bestScore) {
       bestScore = score;
       bestMatch = portalId;
@@ -24,13 +48,13 @@ export function matchInterest(input: string): Portal | null {
   }
 
   if (!bestMatch) return null;
-  return PORTALS.find(p => p.id === bestMatch) ?? null;
+  return PORTALS.find((p) => p.id === bestMatch) ?? null;
 }
 
 export const CONCIERGE_PROMPTS = [
-  "What are you into?",
-  "Music, social, building, or earning?",
-  "I can point you to the right door.",
+  'What are you into?',
+  'Music, social, building, or earning?',
+  'I can point you to the right door.',
 ] as const;
 
 export const QUICK_OPTIONS = [

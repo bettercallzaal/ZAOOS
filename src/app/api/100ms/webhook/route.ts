@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
+import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
 import {
-  getMSRoomByHmsRoomId,
   endMSRoom,
+  getMSRoomByHmsRoomId,
   setMSRoomParticipantCount,
   setMSRoomRecording,
 } from '@/lib/social/msRoomsDb';
-import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
-import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
-import { logger } from '@/lib/logger';
 
 /**
  * POST /api/100ms/webhook

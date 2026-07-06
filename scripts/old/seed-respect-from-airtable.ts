@@ -73,10 +73,17 @@ function isSessionColumn(fieldName: string): boolean {
   // They contain numeric scores (5, 8, 10, 13, 21, 26, 34, 42, 55, 68, 110)
   // Skip known summary columns
   const skipFields = new Set([
-    'Name', 'Wallet', 'Total Respect', 'On-chain Balance',
-    'Fractal Respect', 'Events/Contributions', 'Hosting', 'Bonus/Festival',
+    'Name',
+    'Wallet',
+    'Total Respect',
+    'On-chain Balance',
+    'Fractal Respect',
+    'Events/Contributions',
+    'Hosting',
+    'Bonus/Festival',
     // Common Airtable field names
-    'id', 'createdTime',
+    'id',
+    'createdTime',
   ]);
   if (skipFields.has(fieldName)) return false;
 
@@ -149,7 +156,8 @@ async function main() {
   };
 
   const nameField = findField(['Name', 'name', 'Member', 'member']) || 'Name';
-  const walletField = findField(['Wallet', 'wallet', 'Wallet Address', 'wallet_address']) || 'Wallet';
+  const walletField =
+    findField(['Wallet', 'wallet', 'Wallet Address', 'wallet_address']) || 'Wallet';
   const totalField = findField(['Total Respect', 'Total', 'total_respect']);
   const fractalField = findField(['Fractal Respect', 'Fractal', 'fractal_respect', 'S.']);
   const eventField = findField(['Events/Contributions', 'Events', 'Contributions']);
@@ -168,11 +176,20 @@ async function main() {
   console.log(`  On-chain: ${onchainField || '(not found)'}`);
 
   // Step 4: Identify session columns (everything that's not a summary column)
-  const summaryFields = new Set([
-    nameField, walletField, totalField, fractalField,
-    eventField, hostingField, bonusField, onchainField,
-    'id', 'createdTime',
-  ].filter(Boolean) as string[]);
+  const summaryFields = new Set(
+    [
+      nameField,
+      walletField,
+      totalField,
+      fractalField,
+      eventField,
+      hostingField,
+      bonusField,
+      onchainField,
+      'id',
+      'createdTime',
+    ].filter(Boolean) as string[],
+  );
 
   const sessionColumns: string[] = [];
   for (const f of fieldNames) {
@@ -186,7 +203,7 @@ async function main() {
   for (const f of fieldNames) {
     if (summaryFields.has(f)) continue;
     // Check if any record has a numeric value for this field
-    const hasNumeric = respectRecords.some(r => typeof r[f] === 'number' && (r[f] as number) > 0);
+    const hasNumeric = respectRecords.some((r) => typeof r[f] === 'number' && (r[f] as number) > 0);
     if (hasNumeric) numericColumns.push(f);
   }
 
@@ -202,12 +219,12 @@ async function main() {
     if (!name) continue;
 
     const wallet = (record[walletField] as string)?.trim() || null;
-    const total = (totalField ? record[totalField] as number : 0) || 0;
-    const fractal = (fractalField ? record[fractalField] as number : 0) || 0;
-    const events = (eventField ? record[eventField] as number : 0) || 0;
-    const hosting = (hostingField ? record[hostingField] as number : 0) || 0;
-    const bonus = (bonusField ? record[bonusField] as number : 0) || 0;
-    const onchain = (onchainField ? record[onchainField] as number : 0) || 0;
+    const total = (totalField ? (record[totalField] as number) : 0) || 0;
+    const fractal = (fractalField ? (record[fractalField] as number) : 0) || 0;
+    const events = (eventField ? (record[eventField] as number) : 0) || 0;
+    const hosting = (hostingField ? (record[hostingField] as number) : 0) || 0;
+    const bonus = (bonusField ? (record[bonusField] as number) : 0) || 0;
+    const onchain = (onchainField ? (record[onchainField] as number) : 0) || 0;
 
     // Count fractals attended (count non-zero session columns)
     let fractalCount = 0;
@@ -216,17 +233,20 @@ async function main() {
       if (val && val > 0) fractalCount++;
     }
 
-    const { error } = await supabase.from('respect_members').upsert({
-      name,
-      wallet_address: wallet?.toLowerCase() || null,
-      total_respect: total,
-      fractal_respect: fractal,
-      event_respect: events,
-      hosting_respect: hosting,
-      bonus_respect: bonus,
-      onchain_og: onchain,
-      fractal_count: fractalCount,
-    }, { onConflict: 'wallet_address' });
+    const { error } = await supabase.from('respect_members').upsert(
+      {
+        name,
+        wallet_address: wallet?.toLowerCase() || null,
+        total_respect: total,
+        fractal_respect: fractal,
+        event_respect: events,
+        hosting_respect: hosting,
+        bonus_respect: bonus,
+        onchain_og: onchain,
+        fractal_count: fractalCount,
+      },
+      { onConflict: 'wallet_address' },
+    );
 
     if (error) {
       // Try insert without upsert (might not have wallet)
@@ -268,7 +288,7 @@ async function main() {
         if (val && val > 0) {
           scores.push({
             name: record[nameField] as string,
-            wallet: ((record[walletField] as string)?.trim()?.toLowerCase()) || null,
+            wallet: (record[walletField] as string)?.trim()?.toLowerCase() || null,
             score: val,
           });
         }
@@ -299,7 +319,7 @@ async function main() {
       sessionsCreated++;
 
       // Insert scores
-      const scoreRows = scores.map(s => ({
+      const scoreRows = scores.map((s) => ({
         session_id: session.id,
         member_name: s.name,
         wallet_address: s.wallet,

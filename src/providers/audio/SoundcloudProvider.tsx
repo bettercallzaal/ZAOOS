@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { usePlayerContext } from './PlayerProvider';
 
 interface SCWidget {
@@ -71,7 +71,9 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
       pause: () => widgetRef.current?.pause(),
       seek: (ms) => widgetRef.current?.seekTo(ms),
       setVolume: (v) =>
-        (widgetRef.current as unknown as { setVolume?: (v: number) => void } | null)?.setVolume?.(v * 100),
+        (widgetRef.current as unknown as { setVolume?: (v: number) => void } | null)?.setVolume?.(
+          v * 100,
+        ),
       load: (url) => {
         if (!widgetReadyRef.current || !widgetRef.current) {
           pendingUrlRef.current = url;

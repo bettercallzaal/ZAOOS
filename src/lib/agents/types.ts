@@ -57,4 +57,5 @@ export const BURN_ADDRESS = '0x000000000000000000000000000000000000dEaD';
 export const BURN_PCT = 0.01; // 1% of every buy
 
 // Server-side only -- do NOT use NEXT_PUBLIC_ prefix (leaks to client bundle)
-export const ZABAL_STAKING_CONTRACT = process.env.ZABAL_STAKING_CONTRACT || process.env.NEXT_PUBLIC_ZABAL_STAKING_CONTRACT || '';
+export const ZABAL_STAKING_CONTRACT =
+  process.env.ZABAL_STAKING_CONTRACT || process.env.NEXT_PUBLIC_ZABAL_STAKING_CONTRACT || '';

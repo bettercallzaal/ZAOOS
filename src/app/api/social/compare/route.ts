@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
@@ -27,7 +27,10 @@ export async function GET(req: NextRequest) {
   const params = Object.fromEntries(req.nextUrl.searchParams);
   const parsed = QuerySchema.safeParse(params);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid targetFid', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid targetFid', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { targetFid } = parsed.data;
@@ -74,10 +77,10 @@ export async function GET(req: NextRequest) {
     let topShared: { fid: number; username: string; pfpUrl: string | null }[] = [];
 
     if (topSharedFids.length > 0) {
-      const res = await fetch(
-        `${NEYNAR_BASE}/user/bulk?fids=${topSharedFids.join(',')}`,
-        { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(10000) }
-      );
+      const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${topSharedFids.join(',')}`, {
+        headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+        signal: AbortSignal.timeout(10000),
+      });
       if (res.ok) {
         const data = await res.json();
         topShared = (data.users || []).slice(0, 5).map((u: Record<string, unknown>) => ({
@@ -131,7 +134,9 @@ async function fetchAllFollowing(fid: number, maxCount: number) {
     });
     if (!res.ok) break;
     const data = await res.json();
-    const batch = (data.users || []).map((u: Record<string, unknown>) => ({ fid: u.fid as number }));
+    const batch = (data.users || []).map((u: Record<string, unknown>) => ({
+      fid: u.fid as number,
+    }));
     users.push(...batch);
     cursor = data.next?.cursor;
     if (!cursor || batch.length < limit) break;

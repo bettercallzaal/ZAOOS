@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import type { TrackType } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 

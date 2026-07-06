@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { libraryVoteSchema } from '@/lib/validation/library-schemas';
 import { logger } from '@/lib/logger';
+import { libraryVoteSchema } from '@/lib/validation/library-schemas';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();

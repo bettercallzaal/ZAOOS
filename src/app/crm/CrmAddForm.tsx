@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import type { InteractionType, Visibility } from '@/lib/crm/types';
 
 const INTERACTION_TYPES: InteractionType[] = [
@@ -125,10 +125,7 @@ export default function CrmAddForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-white/10 bg-white/[0.02] p-4"
-    >
+    <form onSubmit={handleSubmit} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Add contact + log interaction</h2>
         <button
@@ -143,11 +140,21 @@ export default function CrmAddForm() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className={labelCls}>Name *</label>
-          <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} placeholder="Ryan Kagy" />
+          <input
+            className={inputCls}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ryan Kagy"
+          />
         </div>
         <div>
           <label className={labelCls}>Farcaster handle</label>
-          <input className={inputCls} value={farcaster} onChange={(e) => setFarcaster(e.target.value)} placeholder="rskagy" />
+          <input
+            className={inputCls}
+            value={farcaster}
+            onChange={(e) => setFarcaster(e.target.value)}
+            placeholder="rskagy"
+          />
         </div>
         <div>
           <label className={labelCls}>X handle</label>
@@ -155,30 +162,62 @@ export default function CrmAddForm() {
         </div>
         <div>
           <label className={labelCls}>Role</label>
-          <input className={inputCls} value={role} onChange={(e) => setRole(e.target.value)} placeholder="Founder" />
+          <input
+            className={inputCls}
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Founder"
+          />
         </div>
         <div>
           <label className={labelCls}>Org</label>
-          <input className={inputCls} value={org} onChange={(e) => setOrg(e.target.value)} placeholder="Bonfires" />
+          <input
+            className={inputCls}
+            value={org}
+            onChange={(e) => setOrg(e.target.value)}
+            placeholder="Bonfires"
+          />
         </div>
         <div className="sm:col-span-2">
           <label className={labelCls}>How we met</label>
-          <input className={inputCls} value={howWeMet} onChange={(e) => setHowWeMet(e.target.value)} />
+          <input
+            className={inputCls}
+            value={howWeMet}
+            onChange={(e) => setHowWeMet(e.target.value)}
+          />
         </div>
         <div className="sm:col-span-2">
           <label className={labelCls}>Public summary (shows on /network)</label>
-          <input className={inputCls} value={contactPublicSummary} onChange={(e) => setContactPublicSummary(e.target.value)} />
+          <input
+            className={inputCls}
+            value={contactPublicSummary}
+            onChange={(e) => setContactPublicSummary(e.target.value)}
+          />
         </div>
         <div>
           <label className={labelCls}>Email (private)</label>
-          <input className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
+          <input
+            className={inputCls}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+          />
         </div>
         <div>
           <label className={labelCls}>Location (private)</label>
-          <input className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} />
+          <input
+            className={inputCls}
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
         </div>
         <label className="flex items-center gap-2 text-sm text-white/70 sm:col-span-2">
-          <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="accent-[#f5a623]" />
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+            className="accent-[#f5a623]"
+          />
           Show this contact publicly on /network
         </label>
       </div>
@@ -188,7 +227,11 @@ export default function CrmAddForm() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className={labelCls}>Interaction type</label>
-          <select className={inputCls} value={type} onChange={(e) => setType(e.target.value as InteractionType)}>
+          <select
+            className={inputCls}
+            value={type}
+            onChange={(e) => setType(e.target.value as InteractionType)}
+          >
             {INTERACTION_TYPES.map((t) => (
               <option key={t} value={t} className="bg-[#0a1628]">
                 {t}
@@ -198,22 +241,46 @@ export default function CrmAddForm() {
         </div>
         <div>
           <label className={labelCls}>Visibility</label>
-          <select className={inputCls} value={visibility} onChange={(e) => setVisibility(e.target.value as Visibility)}>
-            <option value="private" className="bg-[#0a1628]">private</option>
-            <option value="public" className="bg-[#0a1628]">public</option>
+          <select
+            className={inputCls}
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as Visibility)}
+          >
+            <option value="private" className="bg-[#0a1628]">
+              private
+            </option>
+            <option value="public" className="bg-[#0a1628]">
+              public
+            </option>
           </select>
         </div>
         <div className="sm:col-span-2">
           <label className={labelCls}>Title</label>
-          <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Intro call" />
+          <input
+            className={inputCls}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Intro call"
+          />
         </div>
         <div className="sm:col-span-2">
-          <label className={labelCls}>Public summary (shows on /network if interaction is public)</label>
-          <input className={inputCls} value={intPublicSummary} onChange={(e) => setIntPublicSummary(e.target.value)} />
+          <label className={labelCls}>
+            Public summary (shows on /network if interaction is public)
+          </label>
+          <input
+            className={inputCls}
+            value={intPublicSummary}
+            onChange={(e) => setIntPublicSummary(e.target.value)}
+          />
         </div>
         <div className="sm:col-span-2">
           <label className={labelCls}>Private notes</label>
-          <textarea className={inputCls} value={privateNotes} onChange={(e) => setPrivateNotes(e.target.value)} rows={3} />
+          <textarea
+            className={inputCls}
+            value={privateNotes}
+            onChange={(e) => setPrivateNotes(e.target.value)}
+            rows={3}
+          />
         </div>
       </div>
 

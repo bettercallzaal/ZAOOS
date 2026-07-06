@@ -34,9 +34,7 @@ export default function ConnectedBanner({
         <button
           onClick={onToggleMute}
           className={`text-xs px-2 py-1 rounded font-medium transition-colors ${
-            isMuted
-              ? 'bg-red-500/20 text-red-400'
-              : 'bg-green-500/20 text-green-400'
+            isMuted ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'
           }`}
         >
           {isMuted ? '🔇' : '🎤'}

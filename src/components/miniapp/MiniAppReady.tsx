@@ -34,11 +34,9 @@ export function MiniAppReady() {
         const { sdk } = await import('@farcaster/miniapp-sdk');
         await sdk.actions.ready();
         if (reason === 'fallback') {
-           
           console.warn('[miniapp-ready] dismissed via fallback timer');
         }
       } catch (err) {
-         
         console.warn('[miniapp-ready] sdk.actions.ready() failed', err);
       }
     };

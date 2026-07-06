@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { encryptPostingKey, getHiveClient } from '@/lib/publish/hive';
 import { logger } from '@/lib/logger';
+import { encryptPostingKey, getHiveClient } from '@/lib/publish/hive';
 
 const connectSchema = z.object({
   username: z.string().min(1).max(16),
@@ -66,10 +66,7 @@ export async function POST(req: NextRequest) {
 
     if (updateError) {
       logger.error('[platforms/hive] Update error:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to save Hive credentials' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Failed to save Hive credentials' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -78,10 +75,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     logger.error('[platforms/hive] Connect error:', err);
-    return NextResponse.json(
-      { error: 'Failed to connect Hive account' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to connect Hive account' }, { status: 500 });
   }
 }
 
@@ -107,18 +101,12 @@ export async function DELETE() {
 
     if (updateError) {
       logger.error('[platforms/hive] Delete error:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to disconnect Hive account' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Failed to disconnect Hive account' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
     logger.error('[platforms/hive] Disconnect error:', err);
-    return NextResponse.json(
-      { error: 'Failed to disconnect Hive account' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to disconnect Hive account' }, { status: 500 });
   }
 }

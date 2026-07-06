@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { LensConnect } from '@/components/settings/LensConnect';
 
@@ -29,7 +29,6 @@ function BlueskyIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 
 function HiveIcon({ className }: { className?: string }) {
   return (
@@ -128,16 +127,21 @@ function PlatformCard({
       {/* Card header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${accentColor}15` }}>
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: `${accentColor}15` }}
+          >
             {icon}
           </div>
           <div>
             <p className="text-sm font-medium text-white">{name}</p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-400' : 'bg-gray-600'}`} />
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-400' : 'bg-gray-600'}`}
+              />
               <span className={`text-xs ${isConnected ? 'text-gray-400' : 'text-gray-600'}`}>
                 {statusOnly
-                  ? (statusText || 'Not configured')
+                  ? statusText || 'Not configured'
                   : isConnected
                     ? `Connected as @${connectedAs}`
                     : 'Not connected'}
@@ -158,7 +162,11 @@ function PlatformCard({
               </button>
             ) : (
               <button
-                onClick={() => { setShowForm(!showForm); setError(''); setSuccess(''); }}
+                onClick={() => {
+                  setShowForm(!showForm);
+                  setError('');
+                  setSuccess('');
+                }}
                 className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
                 style={{
                   borderColor: `${accentColor}40`,
@@ -196,9 +204,7 @@ function PlatformCard({
                 className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-white/[0.08] focus:outline-none focus:ring-1 focus:border-transparent transition-colors"
                 style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
               />
-              {field.helpText && (
-                <p className="text-[10px] text-gray-600 mt-1">{field.helpText}</p>
-              )}
+              {field.helpText && <p className="text-[10px] text-gray-600 mt-1">{field.helpText}</p>}
             </div>
           ))}
           <button
@@ -287,7 +293,12 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
   }, []);
 
   // Don't render until we've attempted to load fresh status
-  if (!loaded && !initialStatus.bluesky_handle && !initialStatus.lens_profile_id && !initialStatus.hive_username) {
+  if (
+    !loaded &&
+    !initialStatus.bluesky_handle &&
+    !initialStatus.lens_profile_id &&
+    !initialStatus.hive_username
+  ) {
     return null;
   }
 
@@ -295,9 +306,7 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     <section>
       <div className="flex items-center justify-between px-1 mb-3">
         <p className="text-xs text-gray-500 uppercase tracking-wider">Connected Platforms</p>
-        <span className="text-[10px] text-gray-600">
-          Cross-post to other networks
-        </span>
+        <span className="text-[10px] text-gray-600">Cross-post to other networks</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -366,7 +375,11 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
             accentColor="#ffffff"
             connectedAs={null}
             statusOnly
-            statusText={status.x_handle ? `Configured by ZAO (@${status.x_handle})` : 'Configured via environment'}
+            statusText={
+              status.x_handle
+                ? `Configured by ZAO (@${status.x_handle})`
+                : 'Configured via environment'
+            }
           />
         )}
       </div>

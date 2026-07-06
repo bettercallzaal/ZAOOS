@@ -24,8 +24,7 @@ export const SONGJAM_SPACE_DESCRIPTION =
 // iframe attributes required for Songjam's 100ms audio room to function inside
 // the embed (mic for speaking, autoplay for incoming audio). Mirrors the Juke
 // embed + the recommendation in research doc 119.
-export const SONGJAM_IFRAME_ALLOW =
-  'clipboard-write; microphone; camera; autoplay; fullscreen';
+export const SONGJAM_IFRAME_ALLOW = 'clipboard-write; microphone; camera; autoplay; fullscreen';
 
 export const SONGJAM_IFRAME_SANDBOX =
   'allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation allow-modals';

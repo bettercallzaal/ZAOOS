@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { useAuth } from '@/hooks/useAuth';
+import { useCallback, useEffect, useState } from 'react';
 import { ScheduleRoomModal } from '@/components/spaces/ScheduleRoomModal';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ScheduledRoom {
   id: string;
@@ -38,7 +38,11 @@ function formatCountdown(scheduledAt: string): string {
 
 function formatDate(dt: string): string {
   return new Date(dt).toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 }
 
@@ -69,7 +73,9 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
     }
   }, []);
 
-  useEffect(() => { fetchRooms(); }, [fetchRooms]);
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   const filtered = category === 'all' ? rooms : rooms.filter((r) => r.category === category);
 
@@ -81,16 +87,18 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
     if (res.ok) {
       setRsvpSet((prev) => {
         const next = new Set(prev);
-        if (isRsvped) { next.delete(roomId); } else { next.add(roomId); }
+        if (isRsvped) {
+          next.delete(roomId);
+        } else {
+          next.add(roomId);
+        }
         return next;
       });
       // Optimistic update count
       setRooms((prev) =>
         prev.map((r) =>
-          r.id === roomId
-            ? { ...r, rsvp_count: r.rsvp_count + (isRsvped ? -1 : 1) }
-            : r
-        )
+          r.id === roomId ? { ...r, rsvp_count: r.rsvp_count + (isRsvped ? -1 : 1) } : r,
+        ),
       );
     }
   };
@@ -99,7 +107,10 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
     return (
       <div className="space-y-3">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-28" />
+          <div
+            key={i}
+            className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-28"
+          />
         ))}
       </div>
     );
@@ -122,19 +133,22 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 text-sm">
-          No upcoming spaces scheduled
-        </div>
+        <div className="text-center py-10 text-gray-500 text-sm">No upcoming spaces scheduled</div>
       ) : (
         <div className="space-y-3">
           {filtered.map((room) => {
             const catColor = CATEGORY_COLORS[room.category] || CATEGORY_COLORS.general;
             return (
-              <div key={room.id} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors">
+              <div
+                key={room.id}
+                className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium border ${catColor}`}>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium border ${catColor}`}
+                      >
                         {room.category}
                       </span>
                       <span className="text-[10px] text-[#f5a623] font-medium">
@@ -147,7 +161,14 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
                     )}
                     <div className="flex items-center gap-2">
                       {room.host_pfp ? (
-                        <Image src={room.host_pfp} alt="" width={18} height={18} className="rounded-full" unoptimized />
+                        <Image
+                          src={room.host_pfp}
+                          alt=""
+                          width={18}
+                          height={18}
+                          className="rounded-full"
+                          unoptimized
+                        />
                       ) : (
                         <div className="w-[18px] h-[18px] rounded-full bg-gray-700 text-[8px] flex items-center justify-center text-gray-400">
                           {room.host_name?.charAt(0)?.toUpperCase() || '?'}

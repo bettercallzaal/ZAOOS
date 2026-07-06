@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
-import { communityConfig } from '@/../community.config';
 import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
@@ -15,7 +15,7 @@ function escapeWildcards(str: string): string {
 
 // Channel URL format used by Neynar search
 const CHANNEL_URLS: Record<string, string> = Object.fromEntries(
-  ALLOWED_CHANNELS.map((ch) => [ch, `https://farcaster.group/${ch}`])
+  ALLOWED_CHANNELS.map((ch) => [ch, `https://farcaster.group/${ch}`]),
 );
 
 export async function GET(req: NextRequest) {

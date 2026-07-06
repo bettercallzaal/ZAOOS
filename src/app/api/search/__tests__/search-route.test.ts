@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSession, mockFrom } = vi.hoisted(() => ({
   mockGetSession: vi.fn(),
@@ -45,13 +45,22 @@ describe('GET /api/search', () => {
   it('returns member results for type=members', async () => {
     mockFrom.mockReturnValue(
       profilesChain([
-        { id: 7, name: 'Alice', biography: 'singer', category: 'artist', username: 'alice', created_at: '2026-01-01' },
+        {
+          id: 7,
+          name: 'Alice',
+          biography: 'singer',
+          category: 'artist',
+          username: 'alice',
+          created_at: '2026-01-01',
+        },
       ]),
     );
     const res = await GET(req('q=uniquequery3&type=members'));
     expect(res.status).toBe(200);
     const body = await res.json();
-    const member = (body.results as Array<{ type: string; title: string }>).find((r) => r.type === 'member');
+    const member = (body.results as Array<{ type: string; title: string }>).find(
+      (r) => r.type === 'member',
+    );
     expect(member?.title).toBe('Alice');
     expect(mockFrom).toHaveBeenCalledWith('community_profiles');
   });

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { AtpAgent } from '@atproto/api';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';

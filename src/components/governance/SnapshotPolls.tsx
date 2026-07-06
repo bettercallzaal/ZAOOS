@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { communityConfig } from '@/../community.config';
 
 /* ── Types ─────────────────────────────────────────────────────── */
@@ -53,8 +53,8 @@ export function SnapshotPolls() {
 
   useEffect(() => {
     fetch('/api/snapshot/polls')
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         setActive(data.active ?? []);
         setRecent(data.recent ?? []);
       })
@@ -63,13 +63,13 @@ export function SnapshotPolls() {
   }, []);
 
   const toggleExpand = (id: string) => {
-    setExpandedId(prev => (prev === id ? null : id));
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   if (loading) {
     return (
       <div className="space-y-2">
-        {[1, 2].map(i => (
+        {[1, 2].map((i) => (
           <div key={i} className="h-28 bg-[#0d1b2a] rounded-xl animate-pulse" />
         ))}
       </div>
@@ -77,13 +77,15 @@ export function SnapshotPolls() {
   }
 
   const allPolls = active.length > 0 ? active : [];
-  const closedPolls = recent.filter(p => p.state !== 'active');
+  const closedPolls = recent.filter((p) => p.state !== 'active');
 
   if (allPolls.length === 0 && closedPolls.length === 0) {
     return (
       <div className="text-center py-6 bg-[#0d1b2a] rounded-xl border border-white/[0.08]">
         <p className="text-gray-400 text-sm">No Snapshot polls yet.</p>
-        <p className="text-xs text-gray-600 mt-1">Polls will appear here once created on Snapshot.</p>
+        <p className="text-xs text-gray-600 mt-1">
+          Polls will appear here once created on Snapshot.
+        </p>
       </div>
     );
   }
@@ -96,7 +98,7 @@ export function SnapshotPolls() {
           <p className="text-xs text-green-400 uppercase tracking-wider px-1">
             Active ({allPolls.length})
           </p>
-          {allPolls.map(p => (
+          {allPolls.map((p) => (
             <PollCard
               key={p.id}
               poll={p}
@@ -114,7 +116,7 @@ export function SnapshotPolls() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mt-2">
             Recent ({closedPolls.length})
           </p>
-          {closedPolls.slice(0, 5).map(p => (
+          {closedPolls.slice(0, 5).map((p) => (
             <PollCard
               key={p.id}
               poll={p}
@@ -182,7 +184,9 @@ function PollCard({
                 poll.state === 'active' ? 'bg-green-400' : 'bg-gray-500'
               }`}
             />
-            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${badge.classes}`}>
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${badge.classes}`}
+            >
               {badge.label}
             </span>
             <svg
@@ -241,9 +245,7 @@ function PollCard({
 
           {/* Body preview */}
           {poll.body && (
-            <p className="text-xs text-gray-500 line-clamp-3 whitespace-pre-line">
-              {poll.body}
-            </p>
+            <p className="text-xs text-gray-500 line-clamp-3 whitespace-pre-line">{poll.body}</p>
           )}
 
           {/* Total votes + Vote button */}

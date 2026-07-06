@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ListenBrainzConnect() {
   const [token, setToken] = useState('');
@@ -9,9 +9,12 @@ export function ListenBrainzConnect() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/auth/listenbrainz/status').then(r => r.json()).then(data => {
-      if (data.connected) setConnected(true);
-    }).catch(() => {});
+    fetch('/api/auth/listenbrainz/status')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.connected) setConnected(true);
+      })
+      .catch(() => {});
   }, []);
 
   const handleSave = async () => {
@@ -44,7 +47,9 @@ export function ListenBrainzConnect() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-white">ListenBrainz</p>
-          <p className="text-xs text-gray-500">Open-source scrobbling — get your token from listenbrainz.org/profile</p>
+          <p className="text-xs text-gray-500">
+            Open-source scrobbling — get your token from listenbrainz.org/profile
+          </p>
         </div>
         {connected && (
           <button
@@ -56,13 +61,15 @@ export function ListenBrainzConnect() {
         )}
       </div>
       {connected ? (
-        <p className="text-[10px] text-green-400 mt-2">Connected — your plays are being scrobbled</p>
+        <p className="text-[10px] text-green-400 mt-2">
+          Connected — your plays are being scrobbled
+        </p>
       ) : (
         <div className="flex gap-2 mt-3">
           <input
             type="text"
             value={token}
-            onChange={e => setToken(e.target.value)}
+            onChange={(e) => setToken(e.target.value)}
             placeholder="Paste your ListenBrainz user token"
             className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50"
           />

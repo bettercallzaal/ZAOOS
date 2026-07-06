@@ -1,18 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import { encodeFunctionData, formatUnits, parseUnits } from 'viem';
 import { useAccount, useReadContract, useSendCalls } from 'wagmi';
-import { parseUnits, formatUnits, encodeFunctionData } from 'viem';
-import { ZABAL_STAKING_CONTRACT, STAKING_ABI } from '@/lib/staking/contract';
 import { TOKENS } from '@/lib/agents/types';
+import { STAKING_ABI, ZABAL_STAKING_CONTRACT } from '@/lib/staking/contract';
 
-const ERC20_APPROVE_ABI = [{
-  inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }],
-  name: 'approve',
-  outputs: [{ name: '', type: 'bool' }],
-  stateMutability: 'nonpayable',
-  type: 'function',
-}] as const;
+const ERC20_APPROVE_ABI = [
+  {
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
 
 const PRESETS = [
   { label: '100M', value: '100000000' },
@@ -86,7 +91,9 @@ export default function StakeClient() {
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Your Conviction</div>
           <div className="text-[#f5a623] text-lg font-bold font-mono">
-            {conviction ? (Number(conviction) / 1e18).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+            {conviction
+              ? (Number(conviction) / 1e18).toLocaleString(undefined, { maximumFractionDigits: 0 })
+              : '0'}
           </div>
         </div>
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
@@ -134,7 +141,8 @@ export default function StakeClient() {
         <h3 className="text-white text-sm font-bold mb-2">How Conviction Works</h3>
         <p className="text-gray-400 text-xs leading-relaxed">
           Conviction = tokens staked x seconds held. Stake 100M ZABAL for 30 days = 259T conviction.
-          Higher conviction = higher reward multiplier from the ZAO Oracle. Unstake anytime -- conviction earned stays.
+          Higher conviction = higher reward multiplier from the ZAO Oracle. Unstake anytime --
+          conviction earned stays.
         </p>
       </div>
     </div>

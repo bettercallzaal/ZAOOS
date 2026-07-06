@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { Livepeer } from 'livepeer';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { Livepeer } from 'livepeer';
 import { logger } from '@/lib/logger';
 
 const ClipSchema = z.object({
@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = ClipSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const livepeer = getLivepeerClient();

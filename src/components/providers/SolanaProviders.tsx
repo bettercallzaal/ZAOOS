@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { SOLANA_ENDPOINT, getSolanaWallets } from '@/lib/solana/config';
+import { useMemo } from 'react';
+import { getSolanaWallets, SOLANA_ENDPOINT } from '@/lib/solana/config';
 
 export function SolanaProviders({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(() => getSolanaWallets(), []);

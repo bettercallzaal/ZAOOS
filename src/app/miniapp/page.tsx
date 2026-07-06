@@ -13,9 +13,9 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 type AuthState = 'checking' | 'allowed' | 'denied' | 'error';
 
@@ -94,7 +94,9 @@ export default function MiniAppPage() {
     }
 
     init();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Splash screen / loading state — shown while sdk.actions.ready() dismisses the native splash
@@ -122,7 +124,13 @@ export default function MiniAppPage() {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
         <div className="text-center max-w-sm">
-          <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" />
+          <Image
+            src="/logo.png"
+            alt="THE ZAO"
+            width={96}
+            height={96}
+            className="mx-auto mb-4 rounded-2xl"
+          />
           <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
             THE ZAO
           </h1>
@@ -150,19 +158,23 @@ export default function MiniAppPage() {
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center max-w-sm">
-        <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" />
+        <Image
+          src="/logo.png"
+          alt="THE ZAO"
+          width={96}
+          height={96}
+          className="mx-auto mb-4 rounded-2xl"
+        />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>
         <p className="text-gray-400 text-sm mb-6">Community on Farcaster</p>
 
         <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] mb-6">
-          <p className="text-white text-sm mb-1">
-            Hey {username || 'there'}!
-          </p>
+          <p className="text-white text-sm mb-1">Hey {username || 'there'}!</p>
           <p className="text-gray-400 text-sm">
-            ZAO OS is currently invite-only. Post in <span className="text-white">#zao</span> and tag{' '}
-            <span className="text-[#f5a623]">@zaal</span> to request access.
+            ZAO OS is currently invite-only. Post in <span className="text-white">#zao</span> and
+            tag <span className="text-[#f5a623]">@zaal</span> to request access.
           </p>
         </div>
 

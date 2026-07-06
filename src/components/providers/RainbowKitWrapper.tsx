@@ -1,6 +1,6 @@
 'use client';
 
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 
 export function RainbowKitWrapper({ children }: { children: React.ReactNode }) {

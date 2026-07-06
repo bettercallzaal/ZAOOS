@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import { communityConfig } from '@/../community.config';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import { GeneratePostButton } from '@/components/wavewarz/GeneratePostButton';
-import { communityConfig } from '@/../community.config';
 
 const Leaderboard = dynamic(() => import('@/components/wavewarz/Leaderboard'), { ssr: false });
 const BattleLog = dynamic(() => import('@/components/wavewarz/BattleLog'), { ssr: false });
@@ -36,7 +36,9 @@ export default function WaveWarzPage() {
                 Open in tab
               </a>
             )}
-            <div className="md:hidden"><NotificationBell /></div>
+            <div className="md:hidden">
+              <NotificationBell />
+            </div>
           </div>
         }
       />
@@ -48,7 +50,7 @@ export default function WaveWarzPage() {
 
       {/* Tab switcher */}
       <div className="flex items-center gap-1 px-3 py-2 bg-[#0d1b2a] border-b border-white/[0.08] flex-shrink-0">
-        {(['leaderboard', 'battles', 'arena'] as const).map(t => (
+        {(['leaderboard', 'battles', 'arena'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -68,7 +70,10 @@ export default function WaveWarzPage() {
         {tab === 'leaderboard' && <Leaderboard />}
         {tab === 'battles' && <BattleLog />}
         {tab === 'arena' && (
-          <div className="rounded-xl overflow-hidden border border-white/[0.08] m-3" style={{ height: 'calc(100vh - 200px)' }}>
+          <div
+            className="rounded-xl overflow-hidden border border-white/[0.08] m-3"
+            style={{ height: 'calc(100vh - 200px)' }}
+          >
             <iframe
               src={wavewarz.mainApp}
               className="w-full h-full border-0"

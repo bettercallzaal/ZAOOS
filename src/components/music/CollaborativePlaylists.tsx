@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PlaylistDetail } from '@/components/music/CollaborativePlaylistDetail';
 
 export type Playlist = {
@@ -35,7 +35,13 @@ export type PlaylistMember = {
 };
 
 // ── Create Playlist Modal ──────────────────────────────────────────────
-function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+function CreatePlaylistModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
@@ -47,7 +53,11 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
       const res = await fetch('/api/music/playlists/collaborative', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), description: description.trim() || undefined, is_collaborative: true }),
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          is_collaborative: true,
+        }),
       });
       if (res.ok) {
         onCreated();
@@ -59,8 +69,14 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="text-lg font-bold text-white mb-4">Create Collaborative Playlist</h3>
         <input
           className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
@@ -78,8 +94,17 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
           maxLength={500}
         />
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors">Cancel</button>
-          <button onClick={handleCreate} disabled={!name.trim() || saving} className="flex-1 px-4 py-2.5 rounded-lg bg-[#f5a623] text-[#0a1628] font-medium hover:bg-[#f5a623]/90 transition-colors disabled:opacity-50">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreate}
+            disabled={!name.trim() || saving}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-[#f5a623] text-[#0a1628] font-medium hover:bg-[#f5a623]/90 transition-colors disabled:opacity-50"
+          >
             {saving ? 'Creating...' : 'Create'}
           </button>
         </div>
@@ -91,22 +116,48 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
 // ── Playlist Card ──────────────────────────────────────────────────────
 function PlaylistCard({ playlist, onClick }: { playlist: Playlist; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="w-full text-left bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-4 hover:border-[#f5a623]/30 transition-all group">
+    <button
+      onClick={onClick}
+      className="w-full text-left bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-4 hover:border-[#f5a623]/30 transition-all group"
+    >
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#f5a623"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-white group-hover:text-[#f5a623] transition-colors truncate">{playlist.name}</p>
-          {playlist.description && <p className="text-xs text-gray-500 truncate mt-0.5">{playlist.description}</p>}
+          <p className="font-medium text-white group-hover:text-[#f5a623] transition-colors truncate">
+            {playlist.name}
+          </p>
+          {playlist.description && (
+            <p className="text-xs text-gray-500 truncate mt-0.5">{playlist.description}</p>
+          )}
           <div className="flex items-center gap-3 mt-2">
             <span className="text-xs text-gray-500">{playlist.track_count} tracks</span>
             <span className="text-xs text-gray-500">{playlist.member_count} members</span>
           </div>
         </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600 group-hover:text-[#f5a623] transition-colors mt-1 flex-shrink-0">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-gray-600 group-hover:text-[#f5a623] transition-colors mt-1 flex-shrink-0"
+        >
           <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
@@ -136,7 +187,9 @@ export function CollaborativePlaylists() {
     }
   }, []);
 
-  useEffect(() => { fetchPlaylists(); }, [fetchPlaylists]);
+  useEffect(() => {
+    fetchPlaylists();
+  }, [fetchPlaylists]);
 
   return (
     <div>
@@ -150,7 +203,17 @@ export function CollaborativePlaylists() {
             onClick={() => setShowCreate(true)}
             className="px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-medium hover:bg-[#f5a623]/90 transition-colors flex items-center gap-1.5"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
             New
           </button>
         )}
@@ -159,10 +222,18 @@ export function CollaborativePlaylists() {
       {error ? (
         <div className="text-center py-8">
           <p className="text-red-400 text-sm">{error}</p>
-          <button onClick={fetchPlaylists} className="mt-2 text-xs text-[#f5a623] hover:underline">Retry</button>
+          <button onClick={fetchPlaylists} className="mt-2 text-xs text-[#f5a623] hover:underline">
+            Retry
+          </button>
         </div>
       ) : selectedPlaylist ? (
-        <PlaylistDetail playlist={selectedPlaylist} onBack={() => { setSelectedPlaylist(null); fetchPlaylists(); }} />
+        <PlaylistDetail
+          playlist={selectedPlaylist}
+          onBack={() => {
+            setSelectedPlaylist(null);
+            fetchPlaylists();
+          }}
+        />
       ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -172,12 +243,26 @@ export function CollaborativePlaylists() {
       ) : playlists.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mx-auto mb-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#f5a623"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
             </svg>
           </div>
           <p className="text-gray-400 text-sm mb-3">No collaborative playlists yet</p>
-          <button onClick={() => setShowCreate(true)} className="px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-medium">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-medium"
+          >
             Create the first one
           </button>
         </div>
@@ -189,7 +274,9 @@ export function CollaborativePlaylists() {
         </div>
       )}
 
-      {showCreate && <CreatePlaylistModal onClose={() => setShowCreate(false)} onCreated={fetchPlaylists} />}
+      {showCreate && (
+        <CreatePlaylistModal onClose={() => setShowCreate(false)} onCreated={fetchPlaylists} />
+      )}
     </div>
   );
 }

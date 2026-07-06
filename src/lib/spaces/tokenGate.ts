@@ -1,4 +1,4 @@
-import { createPublicClient, http, type Address } from 'viem';
+import { type Address, createPublicClient, http } from 'viem';
 import { base, mainnet, optimism } from 'viem/chains';
 
 export interface TokenGateConfig {

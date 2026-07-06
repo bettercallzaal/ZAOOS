@@ -16,8 +16,9 @@
  * useCall() and dispatches to call.microphone / call.camera / call.screenShare.
  * Hand-raise lives in our own Supabase table - the caller passes the toggle.
  */
-import { useEffect, useRef } from 'react';
+
 import { useCall } from '@stream-io/video-react-sdk';
+import { useEffect, useRef } from 'react';
 
 const PUSH_TO_TALK_HOLD_MS = 250;
 
@@ -43,7 +44,13 @@ function isTypingTarget(target: EventTarget | null): boolean {
 
 export function useRoomKeyboardShortcuts(options: UseRoomKeyboardShortcutsOptions = {}) {
   const call = useCall();
-  const { onToggleHand, onToggleHelp, enableMic = true, enableCamera = true, enableScreen = true } = options;
+  const {
+    onToggleHand,
+    onToggleHelp,
+    enableMic = true,
+    enableCamera = true,
+    enableScreen = true,
+  } = options;
 
   // Space-held push-to-talk: remember the press time so a short tap toggles
   // and a long hold unmutes only while held.

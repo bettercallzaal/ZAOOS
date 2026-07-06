@@ -15,7 +15,7 @@
  */
 
 import { z } from 'zod';
-import { withRetry, isRetryableHttpError } from './retry';
+import { isRetryableHttpError, withRetry } from './retry';
 
 /** A single Farcaster cast in a Neynar feed page (subset we read). */
 const RawCastSchema = z
@@ -130,7 +130,10 @@ export async function resolveFarcasterFid(
     async () => {
       const res = await fetchImpl(
         `${NEYNAR_BASE}/user/by_username?username=${encodeURIComponent(handle)}`,
-        { headers: { 'x-api-key': apiKey, Accept: 'application/json' }, signal: AbortSignal.timeout(10000) },
+        {
+          headers: { 'x-api-key': apiKey, Accept: 'application/json' },
+          signal: AbortSignal.timeout(10000),
+        },
       );
       if (res.status === 404) return null;
       if (!res.ok) {
@@ -175,18 +178,23 @@ export function neynarCastPageFetcher(
  */
 export async function scrapeBczFarcasterHistory(
   fid: number,
-  opts: { apiKey?: string; fetchImpl?: typeof fetch; fetchPage?: FetchCastPage; maxPages?: number } = {},
+  opts: {
+    apiKey?: string;
+    fetchImpl?: typeof fetch;
+    fetchPage?: FetchCastPage;
+    maxPages?: number;
+  } = {},
 ): Promise<BczHistory> {
   if (!Number.isInteger(fid) || fid <= 0) {
     throw new BczScrapeError(`Invalid fid: ${fid}`);
   }
   const fetchPage =
     opts.fetchPage ??
-    (opts.apiKey
-      ? neynarCastPageFetcher(fid, opts.apiKey, opts.fetchImpl)
-      : null);
+    (opts.apiKey ? neynarCastPageFetcher(fid, opts.apiKey, opts.fetchImpl) : null);
   if (!fetchPage) {
-    throw new BczScrapeError('scrapeBczFarcasterHistory requires either opts.fetchPage or opts.apiKey');
+    throw new BczScrapeError(
+      'scrapeBczFarcasterHistory requires either opts.fetchPage or opts.apiKey',
+    );
   }
   const { casts, truncated } = await paginateCasts(fetchPage, { maxPages: opts.maxPages });
   return { fid, total: casts.length, casts, truncated };

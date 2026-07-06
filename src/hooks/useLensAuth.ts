@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 
 interface LensAuthState {
@@ -25,7 +25,10 @@ export function useLensAuth() {
 
   const connect = useCallback(async () => {
     if (!address || !walletClient) {
-      setState(s => ({ ...s, error: 'Connect your wallet first (use the wallet button at top)' }));
+      setState((s) => ({
+        ...s,
+        error: 'Connect your wallet first (use the wallet button at top)',
+      }));
       return;
     }
 
@@ -36,15 +39,19 @@ export function useLensAuth() {
       const { fetchAccountsAvailable } = await import('@lens-protocol/client/actions');
       const { signMessageWith } = await import('@lens-protocol/client/viem');
 
-      const appAddress = process.env.NEXT_PUBLIC_LENS_APP_ADDRESS
-        || '0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE';
+      const appAddress =
+        process.env.NEXT_PUBLIC_LENS_APP_ADDRESS || '0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE';
 
       // Custom storage to capture tokens
       const tokenStore: Record<string, string> = {};
       const storage = {
         getItem: (key: string) => tokenStore[key] || null,
-        setItem: (key: string, value: string) => { tokenStore[key] = value; },
-        removeItem: (key: string) => { delete tokenStore[key]; },
+        setItem: (key: string, value: string) => {
+          tokenStore[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete tokenStore[key];
+        },
       };
 
       const client = PublicClient.create({
@@ -125,7 +132,10 @@ export function useLensAuth() {
 
       // Log what we captured for debugging
       console.info('[lens-auth] Storage keys:', storedKeys);
-      console.info('[lens-auth] Got tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
+      console.info('[lens-auth] Got tokens:', {
+        accessToken: !!accessToken,
+        refreshToken: !!refreshToken,
+      });
 
       // If we still don't have tokens, dump all storage for debugging
       if (!accessToken) {

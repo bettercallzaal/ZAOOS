@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let body: Record<string, string>;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
 
   try {
     // Get ALL wallets associated with this user (primary + verified from Farcaster)
@@ -81,10 +85,11 @@ export async function POST(req: NextRequest) {
       if (items.length > 0) {
         const account = items[0].account;
         accountAddress = account?.address;
-        handle = account?.username?.localName
-          || account?.username?.value
-          || account?.metadata?.name
-          || null;
+        handle =
+          account?.username?.localName ||
+          account?.username?.value ||
+          account?.metadata?.name ||
+          null;
 
         // If we got an address but no username, try fetching the account directly.
         // accountAddress comes from the Lens API, but validate before interpolating.
@@ -99,12 +104,12 @@ export async function POST(req: NextRequest) {
             });
             const accountData = await accountRes.json();
             const acct = accountData?.data?.account;
-            handle = acct?.username?.localName
-              || acct?.username?.value
-              || acct?.metadata?.name
-              || null;
+            handle =
+              acct?.username?.localName || acct?.username?.value || acct?.metadata?.name || null;
             logger.info('[lens] Direct account lookup:', JSON.stringify(acct));
-          } catch { /* ignore fallback failure */ }
+          } catch {
+            /* ignore fallback failure */
+          }
         }
 
         // Final fallback: use short address
@@ -128,10 +133,7 @@ export async function POST(req: NextRequest) {
     if (isToken(body.accessToken)) updateData.lens_access_token = body.accessToken;
     if (isToken(body.refreshToken)) updateData.lens_refresh_token = body.refreshToken;
 
-    await supabaseAdmin
-      .from('users')
-      .update(updateData)
-      .eq('fid', session.fid);
+    await supabaseAdmin.from('users').update(updateData).eq('fid', session.fid);
 
     return NextResponse.json({
       success: true,

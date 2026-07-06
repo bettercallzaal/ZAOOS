@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { searchUsers, getUserByFid, getUsersByFids } from '@/lib/farcaster/neynar';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
+import { getSessionData } from '@/lib/auth/session';
+import { getUserByFid, getUsersByFids, searchUsers } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const ensClient = createPublicClient({
@@ -71,21 +71,23 @@ export async function GET(req: NextRequest) {
       }
 
       return NextResponse.json({
-        users: [{
-          fid: user.fid,
-          username: user.username,
-          display_name: user.display_name,
-          pfp_url: user.pfp_url,
-          custody_address: custodyAddress,
-          verified_addresses: verifiedAddresses,
-          ens: ensMap,
-        }],
+        users: [
+          {
+            fid: user.fid,
+            username: user.username,
+            display_name: user.display_name,
+            pfp_url: user.pfp_url,
+            custody_address: custodyAddress,
+            verified_addresses: verifiedAddresses,
+            ens: ensMap,
+          },
+        ],
       });
     } catch (error) {
       logger.error('[search-users] FID lookup failed:', fid, error);
       return NextResponse.json(
         { error: `Failed to look up FID ${fid} - Farcaster API may be down` },
-        { status: 502 }
+        { status: 502 },
       );
     }
   }
@@ -103,7 +105,7 @@ export async function GET(req: NextRequest) {
     logger.error('[search-users] Neynar search failed for query:', query, error);
     return NextResponse.json(
       { error: `Farcaster search failed for "${query}" - API may be rate-limited or down` },
-      { status: 502 }
+      { status: 502 },
     );
   }
 
@@ -135,7 +137,8 @@ export async function GET(req: NextRequest) {
       if (!full) return basicUser(u);
 
       const custodyAddress = (full.custody_address as string) || '';
-      const verifiedAddresses: string[] = (full.verified_addresses as Record<string, unknown>)?.eth_addresses as string[] || [];
+      const verifiedAddresses: string[] =
+        ((full.verified_addresses as Record<string, unknown>)?.eth_addresses as string[]) || [];
       const allAddresses = [custodyAddress, ...verifiedAddresses].filter(Boolean);
 
       // ENS is nice-to-have
@@ -158,7 +161,7 @@ export async function GET(req: NextRequest) {
         verified_addresses: verifiedAddresses,
         ens: ensMap,
       };
-    })
+    }),
   );
 
   return NextResponse.json({ users: enriched.filter(Boolean) });

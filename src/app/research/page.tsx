@@ -1,6 +1,6 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
 import { readdir } from 'fs/promises';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { join } from 'path';
 
 export const dynamic = 'force-static';
@@ -8,7 +8,8 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Research Library · ZAO OS',
-  description: 'ZAO ecosystem research documents — architecture, integrations, and technical decisions.',
+  description:
+    'ZAO ecosystem research documents — architecture, integrations, and technical decisions.',
 };
 
 const RESEARCH_ROOT = join(process.cwd(), 'research');
@@ -70,7 +71,8 @@ export default async function ResearchIndex() {
           Research Library
         </h1>
         <p className="text-gray-400 text-sm mb-8">
-          {docs.length} research documents covering architecture, integrations, and technical decisions.
+          {docs.length} research documents covering architecture, integrations, and technical
+          decisions.
         </p>
 
         {docs.length === 0 ? (

@@ -10,7 +10,7 @@
  * Resolves ETH address → linked Far caster FID on Base
  */
 
-import { createPublicClient, http, getAddress } from 'viem';
+import { createPublicClient, getAddress, http } from 'viem';
 import { base } from 'viem/chains';
 
 const client = createPublicClient({ chain: base, transport: http('https://base.publicnode.com') });
@@ -112,15 +112,17 @@ export async function resolveEthToFid(address: `0x${string}`): Promise<number | 
  */
 export async function checkGatingEligibility(
   address: `0x${string}`,
-  minScore: number = 0
+  minScore: number = 0,
 ): Promise<{ eligible: boolean; score: bigint | null; fid: number | null; reason?: string }> {
-  const [score, fid] = await Promise.all([
-    getFcQualityScore(address),
-    resolveEthToFid(address),
-  ]);
+  const [score, fid] = await Promise.all([getFcQualityScore(address), resolveEthToFid(address)]);
 
   if (fid === null) {
-    return { eligible: false, score: null, fid: null, reason: 'No Far caster account linked to this address' };
+    return {
+      eligible: false,
+      score: null,
+      fid: null,
+      reason: 'No Far caster account linked to this address',
+    };
   }
 
   if (score === null) {
@@ -129,7 +131,12 @@ export async function checkGatingEligibility(
   }
 
   if (score < BigInt(minScore)) {
-    return { eligible: false, score, fid, reason: `Quality score ${score} below minimum ${minScore}` };
+    return {
+      eligible: false,
+      score,
+      fid,
+      reason: `Quality score ${score} below minimum ${minScore}`,
+    };
   }
 
   return { eligible: true, score, fid };

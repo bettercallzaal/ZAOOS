@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest';
 import { NextRequest } from 'next/server';
+import { describe, expect, it } from 'vitest';
 import {
-  makeRequest,
-  makeGetRequest,
-  makePostRequest,
   chainMock,
-  mockAuthenticatedSession,
-  mockUnauthenticatedSession,
-  mockAdminSession,
   createHoistedMocks,
   createNotificationsMock,
+  makeGetRequest,
+  makePostRequest,
+  makeRequest,
+  mockAdminSession,
+  mockAuthenticatedSession,
+  mockUnauthenticatedSession,
   VALID_UUID,
   VALID_WALLET,
 } from '@/test-utils';
@@ -177,8 +177,7 @@ describe('mockAdminSession', () => {
 
 describe('constants', () => {
   it('VALID_UUID is a valid UUID v4', () => {
-    const uuidPattern =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
     expect(VALID_UUID).toMatch(uuidPattern);
   });
 

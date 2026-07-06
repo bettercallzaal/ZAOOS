@@ -1,17 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { z } from 'zod';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
-import { checkAllowlist } from '@/lib/gates/allowlist';
-import { saveSession } from '@/lib/auth/session';
-import { getUserByFid } from '@/lib/farcaster/neynar';
-import { supabaseAdmin } from '@/lib/db/supabase';
-import { createInAppNotification } from '@/lib/notifications';
+import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { communityConfig } from '@/../community.config';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { saveSession } from '@/lib/auth/session';
+import { supabaseAdmin } from '@/lib/db/supabase';
+import { getUserByFid } from '@/lib/farcaster/neynar';
+import { checkAllowlist } from '@/lib/gates/allowlist';
 import { logger } from '@/lib/logger';
+import { createInAppNotification } from '@/lib/notifications';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
-const OPTIMISM_RPC_URL = process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism-rpc.publicnode.com';
+const OPTIMISM_RPC_URL =
+  process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism-rpc.publicnode.com';
 
 // Lazy-init: defer heavy viem/crypto setup to first request instead of module load.
 // This prevents cold-start timeouts on Vercel Hobby (10s limit).
@@ -37,16 +38,17 @@ export async function GET() {
   const nonce = crypto.randomBytes(16).toString('hex');
   const expiresAt = new Date(Date.now() + NONCE_TTL).toISOString();
 
-  await supabaseAdmin
-    .from('auth_nonces')
-    .insert({ nonce, expires_at: expiresAt });
+  await supabaseAdmin.from('auth_nonces').insert({ nonce, expires_at: expiresAt });
 
   // Prune expired nonces (fire and forget)
   supabaseAdmin
     .from('auth_nonces')
     .delete()
     .lt('expires_at', new Date().toISOString())
-    .then(() => {}, () => {});
+    .then(
+      () => {},
+      () => {},
+    );
 
   return NextResponse.json({ nonce });
 }
@@ -66,7 +68,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = verifySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { message, signature, nonce, domain } = parsed.data;
@@ -82,7 +87,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (!nonceRow) {
-      return NextResponse.json({ error: 'Invalid or expired nonce. Please try signing in again.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid or expired nonce. Please try signing in again.' },
+        { status: 400 },
+      );
     }
 
     // Verify SIWF signature
@@ -98,7 +106,7 @@ export async function POST(req: NextRequest) {
       logger.error('[Auth] SIWF verification RPC/network error:', verifyError);
       return NextResponse.json(
         { error: 'Verification service temporarily unavailable. Please try again.' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -110,7 +118,10 @@ export async function POST(req: NextRequest) {
     const fid = result.fid;
     if (!fid || typeof fid !== 'number') {
       logger.error('[Auth] SIWF verified but no FID returned:', { fid, success: result.success });
-      return NextResponse.json({ error: 'Verification succeeded but no Farcaster ID found. Please try again.' }, { status: 502 });
+      return NextResponse.json(
+        { error: 'Verification succeeded but no Farcaster ID found. Please try again.' },
+        { status: 502 },
+      );
     }
 
     // Nonce already consumed atomically above. Fetch user + check allowlist in parallel.
@@ -123,7 +134,7 @@ export async function POST(req: NextRequest) {
       logger.error('[Auth] Neynar getUserByFid failed for FID', fid, userResult.reason);
       return NextResponse.json(
         { error: 'Could not fetch your Farcaster profile. Please try again.' },
-        { status: 502 }
+        { status: 502 },
       );
     }
     const user = userResult.value;
@@ -149,12 +160,15 @@ export async function POST(req: NextRequest) {
       logger.error('[Auth] Allowlist check failed for FID', fid, allowlistErr);
       return NextResponse.json(
         { error: 'Could not verify membership. Please try again.' },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
     if (!gateResult?.allowed) {
-      return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Not on allowlist', redirect: '/not-allowed' },
+        { status: 403 },
+      );
     }
 
     // Create session — store wallet address from Farcaster profile for consistency
@@ -173,7 +187,7 @@ export async function POST(req: NextRequest) {
       logger.error('[Auth] Failed to save session for FID', fid, sessionErr);
       return NextResponse.json(
         { error: 'Could not create session. Please try again.' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -188,11 +202,13 @@ export async function POST(req: NextRequest) {
             .eq('fid', fid)
             .maybeSingle();
 
-          const { data: existingByWallet } = !existingByFid ? await supabaseAdmin
-            .from('users')
-            .select('last_login_at')
-            .eq('primary_wallet', wallet)
-            .maybeSingle() : { data: existingByFid };
+          const { data: existingByWallet } = !existingByFid
+            ? await supabaseAdmin
+                .from('users')
+                .select('last_login_at')
+                .eq('primary_wallet', wallet)
+                .maybeSingle()
+            : { data: existingByFid };
 
           const existingUser = existingByFid || existingByWallet;
           const isFirstLogin = !existingUser?.last_login_at;
@@ -210,7 +226,7 @@ export async function POST(req: NextRequest) {
               role: 'member',
               last_login_at: new Date().toISOString(),
             },
-            { onConflict: 'primary_wallet', ignoreDuplicates: false }
+            { onConflict: 'primary_wallet', ignoreDuplicates: false },
           );
 
           if (isFirstLogin) {
@@ -228,10 +244,12 @@ export async function POST(req: NextRequest) {
               }).catch((err) => logger.error('[notify]', err));
             }
 
-            const handle = user.username ? `@${user.username}` : (user.display_name || 'a new member');
-            autoCastToZao(
-              `Welcome ${handle} to The ZAO! \u{1F3B6}`,
-            ).catch((err) => logger.error('[welcome-cast]', err));
+            const handle = user.username
+              ? `@${user.username}`
+              : user.display_name || 'a new member';
+            autoCastToZao(`Welcome ${handle} to The ZAO! \u{1F3B6}`).catch((err) =>
+              logger.error('[welcome-cast]', err),
+            );
           }
         } catch (err) {
           logger.error('[Auth] Failed to upsert user record:', err);

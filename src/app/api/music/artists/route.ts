@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
 
 const artistsQuerySchema = z.object({ artist: z.string().trim().min(1).max(120) });
 
@@ -9,7 +9,9 @@ const artistsQuerySchema = z.object({ artist: z.string().trim().min(1).max(120) 
  * GET /api/music/artists?artist=... — get aggregated data for an artist
  */
 export async function GET(req: NextRequest) {
-  const parsed = artistsQuerySchema.safeParse({ artist: req.nextUrl.searchParams.get('artist') ?? '' });
+  const parsed = artistsQuerySchema.safeParse({
+    artist: req.nextUrl.searchParams.get('artist') ?? '',
+  });
   if (!parsed.success) {
     return NextResponse.json({ error: 'Missing or invalid artist parameter' }, { status: 400 });
   }
@@ -19,7 +21,9 @@ export async function GET(req: NextRequest) {
     // Query songs where artist matches (case-insensitive partial match)
     const { data: songs, error } = await supabaseAdmin
       .from('songs')
-      .select('id, url, title, artist, artwork_url, stream_url, platform, duration, play_count, created_at')
+      .select(
+        'id, url, title, artist, artwork_url, stream_url, platform, duration, play_count, created_at',
+      )
       .ilike('artist', `%${artist.trim()}%`)
       .order('play_count', { ascending: false })
       .limit(50);

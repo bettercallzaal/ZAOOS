@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 /**
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch aggregated votes for all returned proposals
-    const proposalIds = proposals.map(p => p.id);
+    const proposalIds = proposals.map((p) => p.id);
 
     const { data: votes, error: votesErr } = await supabase
       .from('discord_proposal_votes')
@@ -59,22 +59,30 @@ export async function GET(req: NextRequest) {
     }
 
     // Aggregate votes per proposal
-    const voteMap = new Map<number, {
-      yes_count: number;
-      no_count: number;
-      abstain_count: number;
-      yes_weight: number;
-      no_weight: number;
-      abstain_weight: number;
-      total_votes: number;
-      total_weight: number;
-    }>();
+    const voteMap = new Map<
+      number,
+      {
+        yes_count: number;
+        no_count: number;
+        abstain_count: number;
+        yes_weight: number;
+        no_weight: number;
+        abstain_weight: number;
+        total_votes: number;
+        total_weight: number;
+      }
+    >();
 
     for (const v of votes ?? []) {
       const agg = voteMap.get(v.proposal_id) ?? {
-        yes_count: 0, no_count: 0, abstain_count: 0,
-        yes_weight: 0, no_weight: 0, abstain_weight: 0,
-        total_votes: 0, total_weight: 0,
+        yes_count: 0,
+        no_count: 0,
+        abstain_count: 0,
+        yes_weight: 0,
+        no_weight: 0,
+        abstain_weight: 0,
+        total_votes: 0,
+        total_weight: 0,
       };
 
       const w = Number(v.weight) || 0;
@@ -125,23 +133,31 @@ export async function GET(req: NextRequest) {
     }
 
     // Merge proposals with vote data and user's vote
-    const enriched = proposals.map(p => ({
+    const enriched = proposals.map((p) => ({
       ...p,
       votes: voteMap.get(p.id) ?? {
-        yes_count: 0, no_count: 0, abstain_count: 0,
-        yes_weight: 0, no_weight: 0, abstain_weight: 0,
-        total_votes: 0, total_weight: 0,
+        yes_count: 0,
+        no_count: 0,
+        abstain_count: 0,
+        yes_weight: 0,
+        no_weight: 0,
+        abstain_weight: 0,
+        total_votes: 0,
+        total_weight: 0,
       },
       userVote: userVoteMap.get(p.id) ?? null,
     }));
 
-    return NextResponse.json({
-      proposals: enriched,
-      total: enriched.length,
-      userDiscordId,
-    }, {
-      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      {
+        proposals: enriched,
+        total: enriched.length,
+        userDiscordId,
+      },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
+      },
+    );
   } catch (err) {
     logger.error('[discord/proposals] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

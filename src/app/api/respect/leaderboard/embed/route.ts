@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { fetchLeaderboard, type RespectEntry } from '@/lib/respect/leaderboard';
 import { logger } from '@/lib/logger';
+import { fetchLeaderboard, type RespectEntry } from '@/lib/respect/leaderboard';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: parsed.error.flatten().fieldErrors },
-        { status: 400, headers: CORS_HEADERS }
+        { status: 400, headers: CORS_HEADERS },
       );
     }
 
@@ -47,13 +47,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { leaderboard: entries, stats: result.stats },
-      { headers: CORS_HEADERS }
+      { headers: CORS_HEADERS },
     );
   } catch (err) {
     logger.error('Embed leaderboard error:', err);
     return NextResponse.json(
       { error: 'Failed to load leaderboard data' },
-      { status: 500, headers: CORS_HEADERS }
+      { status: 500, headers: CORS_HEADERS },
     );
   }
 }
@@ -82,7 +82,7 @@ function renderHTML(entries: EmbedEntry[], totalMembers: number): string {
         <td style="padding:8px 12px;border-bottom:1px solid #1a2a44;text-align:right;color:#e2e8f0;">${e.ogRespect.toLocaleString()}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #1a2a44;text-align:right;color:#e2e8f0;">${e.zorRespect.toLocaleString()}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #1a2a44;text-align:right;color:#f5a623;font-weight:600;">${e.totalRespect.toLocaleString()}</td>
-      </tr>`
+      </tr>`,
     )
     .join('');
 

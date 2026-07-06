@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       agentName,
       juke: jukeBody,
       action_required:
-        "Capture session_token from juke.session_token. Pass it as X-Session-Token on subsequent calls (token refresh, leave). Do not persist long-term; it dies with the room.",
+        'Capture session_token from juke.session_token. Pass it as X-Session-Token on subsequent calls (token refresh, leave). Do not persist long-term; it dies with the room.',
     },
     { status: 201 },
   );

@@ -1,11 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 const actionSchema = z.object({
-  action: z.enum(['link-fids', 'enrich-profiles', 'import-socials', 'sync-tiers', 'link-profiles', 'backfill-dates', 'all']),
+  action: z.enum([
+    'link-fids',
+    'enrich-profiles',
+    'import-socials',
+    'sync-tiers',
+    'link-profiles',
+    'backfill-dates',
+    'all',
+  ]),
 });
 
 /**
@@ -50,7 +58,7 @@ export async function POST(req: NextRequest) {
           // Search Neynar for this wallet address
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${user.primary_wallet}`,
-            { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' } }
+            { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },
           );
           if (!response.ok) continue;
 
@@ -72,7 +80,9 @@ export async function POST(req: NextRequest) {
               })
               .eq('id', user.id);
 
-            details.push(`${user.display_name || user.primary_wallet} → FID ${fcUser.fid} (@${fcUser.username})`);
+            details.push(
+              `${user.display_name || user.primary_wallet} → FID ${fcUser.fid} (@${fcUser.username})`,
+            );
             linked++;
           }
         } catch {
@@ -80,7 +90,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Rate limit: 100ms between Neynar calls
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 100));
       }
 
       results.push({ action: 'link-fids', fixed: linked, errors, details });
@@ -90,7 +100,9 @@ export async function POST(req: NextRequest) {
     if (action === 'enrich-profiles' || action === 'all') {
       const { data: allUsersWithFid } = await supabaseAdmin
         .from('users')
-        .select('id, fid, display_name, pfp_url, bio, username, custody_address, verified_addresses, real_name, x_handle, solana_wallet')
+        .select(
+          'id, fid, display_name, pfp_url, bio, username, custody_address, verified_addresses, real_name, x_handle, solana_wallet',
+        )
         .not('fid', 'is', null)
         .eq('is_active', true);
 
@@ -101,31 +113,36 @@ export async function POST(req: NextRequest) {
       // Batch ALL users with FIDs in groups of 100
       for (let i = 0; i < (allUsersWithFid || []).length; i += 100) {
         const batch = (allUsersWithFid || []).slice(i, i + 100);
-        const fids = batch.map(u => u.fid).filter(Boolean);
+        const fids = batch.map((u) => u.fid).filter(Boolean);
         if (fids.length === 0) continue;
 
         try {
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`,
-            { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' } }
+            { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },
           );
           if (!response.ok) continue;
 
           const data = await response.json();
 
           for (const fcUser of data.users || []) {
-            const dbUser = batch.find(u => u.fid === fcUser.fid);
+            const dbUser = batch.find((u) => u.fid === fcUser.fid);
             if (!dbUser) continue;
 
             const updates: Record<string, unknown> = {};
 
             // Basic fields (only fill if missing)
-            if (!dbUser.display_name && fcUser.display_name) updates.display_name = fcUser.display_name;
+            if (!dbUser.display_name && fcUser.display_name)
+              updates.display_name = fcUser.display_name;
             if (!dbUser.pfp_url && fcUser.pfp_url) updates.pfp_url = fcUser.pfp_url;
             if (!dbUser.bio && fcUser.profile?.bio?.text) updates.bio = fcUser.profile.bio.text;
             if (!dbUser.username && fcUser.username) updates.username = fcUser.username;
-            if (!dbUser.custody_address && fcUser.custody_address) updates.custody_address = fcUser.custody_address;
-            if ((!dbUser.verified_addresses || dbUser.verified_addresses.length === 0) && fcUser.verified_addresses?.eth_addresses?.length > 0) {
+            if (!dbUser.custody_address && fcUser.custody_address)
+              updates.custody_address = fcUser.custody_address;
+            if (
+              (!dbUser.verified_addresses || dbUser.verified_addresses.length === 0) &&
+              fcUser.verified_addresses?.eth_addresses?.length > 0
+            ) {
               updates.verified_addresses = fcUser.verified_addresses.eth_addresses;
             }
 
@@ -156,8 +173,9 @@ export async function POST(req: NextRequest) {
             // (has a space, no special chars, not all caps)
             if (!dbUser.real_name && fcUser.display_name) {
               const name = fcUser.display_name.trim();
-              const looksLikeRealName = /^[A-Z][a-z]+ [A-Z][a-z]+/.test(name) // "First Last"
-                || /^[A-Z][a-z]+ [A-Z]\.?$/.test(name); // "First L."
+              const looksLikeRealName =
+                /^[A-Z][a-z]+ [A-Z][a-z]+/.test(name) || // "First Last"
+                /^[A-Z][a-z]+ [A-Z]\.?$/.test(name); // "First L."
               if (looksLikeRealName) {
                 updates.real_name = name;
               }
@@ -175,7 +193,9 @@ export async function POST(req: NextRequest) {
 
             if (Object.keys(updates).length > 0) {
               await supabaseAdmin.from('users').update(updates).eq('id', dbUser.id);
-              details.push(`${fcUser.display_name || fcUser.username}: +${Object.keys(updates).join(', ')}`);
+              details.push(
+                `${fcUser.display_name || fcUser.username}: +${Object.keys(updates).join(', ')}`,
+              );
               enriched++;
             }
           }
@@ -202,19 +222,19 @@ export async function POST(req: NextRequest) {
       // Batch in groups of 100
       for (let i = 0; i < (usersWithFid || []).length; i += 100) {
         const batch = (usersWithFid || []).slice(i, i + 100);
-        const fids = batch.map(u => u.fid).filter(Boolean);
+        const fids = batch.map((u) => u.fid).filter(Boolean);
         if (fids.length === 0) continue;
 
         try {
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`,
-            { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' } }
+            { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },
           );
           if (!response.ok) continue;
           const data = await response.json();
 
           for (const fcUser of data.users || []) {
-            const dbUser = batch.find(u => u.fid === fcUser.fid);
+            const dbUser = batch.find((u) => u.fid === fcUser.fid);
             if (!dbUser) continue;
 
             const updates: Record<string, unknown> = {};
@@ -239,13 +259,17 @@ export async function POST(req: NextRequest) {
             // Also check profile bio for common patterns
             const bioText = fcUser.profile?.bio?.text || '';
             if (!dbUser.x_handle && !updates.x_handle) {
-              const xMatch = bioText.match(/(?:twitter|x)\.com\/(@?\w+)/i) || bioText.match(/(?:^|\s)@(\w{1,15})(?:\s|$)/);
+              const xMatch =
+                bioText.match(/(?:twitter|x)\.com\/(@?\w+)/i) ||
+                bioText.match(/(?:^|\s)@(\w{1,15})(?:\s|$)/);
               if (xMatch) updates.x_handle = xMatch[1].replace('@', '');
             }
 
             if (Object.keys(updates).length > 0) {
               await supabaseAdmin.from('users').update(updates).eq('id', dbUser.id);
-              details.push(`${fcUser.display_name || fcUser.username}: +${Object.keys(updates).join(', ')}`);
+              details.push(
+                `${fcUser.display_name || fcUser.username}: +${Object.keys(updates).join(', ')}`,
+              );
               imported++;
             }
           }
@@ -278,7 +302,10 @@ export async function POST(req: NextRequest) {
           .maybeSingle();
 
         if (profile) {
-          await supabaseAdmin.from('users').update({ community_profile_id: profile.id }).eq('id', user.id);
+          await supabaseAdmin
+            .from('users')
+            .update({ community_profile_id: profile.id })
+            .eq('id', user.id);
           details.push(`${user.display_name}: linked to profile "${profile.name}"`);
           linked++;
         }
@@ -302,7 +329,10 @@ export async function POST(req: NextRequest) {
           .maybeSingle();
 
         if (profile) {
-          await supabaseAdmin.from('users').update({ community_profile_id: profile.id }).eq('id', user.id);
+          await supabaseAdmin
+            .from('users')
+            .update({ community_profile_id: profile.id })
+            .eq('id', user.id);
           details.push(`${name}: linked to profile "${profile.name}" (name match)`);
           linked++;
         }
@@ -327,7 +357,9 @@ export async function POST(req: NextRequest) {
         const { data: earliest } = await supabaseAdmin
           .from('fractal_scores')
           .select('fractal_sessions(session_date)')
-          .or(`member_name.eq.${member.name}${member.wallet_address ? `,wallet_address.ilike.${member.wallet_address}` : ''}`)
+          .or(
+            `member_name.eq.${member.name}${member.wallet_address ? `,wallet_address.ilike.${member.wallet_address}` : ''}`,
+          )
           .order('created_at', { ascending: true })
           .limit(1);
 
@@ -371,15 +403,17 @@ export async function POST(req: NextRequest) {
       const details: string[] = [];
 
       for (const user of users || []) {
-        const respect = (respectMembers || []).find(r =>
-          (user.fid && r.fid === user.fid) ||
-          (user.primary_wallet && r.wallet_address === user.primary_wallet.toLowerCase())
+        const respect = (respectMembers || []).find(
+          (r) =>
+            (user.fid && r.fid === user.fid) ||
+            (user.primary_wallet && r.wallet_address === user.primary_wallet.toLowerCase()),
         );
 
         if (respect) {
-          const hasRespect = (Number(respect.total_respect) > 0) ||
-            (Number(respect.onchain_og) > 0) ||
-            (Number(respect.onchain_zor) > 0);
+          const hasRespect =
+            Number(respect.total_respect) > 0 ||
+            Number(respect.onchain_og) > 0 ||
+            Number(respect.onchain_zor) > 0;
 
           const updates: Record<string, unknown> = {};
 
@@ -401,7 +435,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      results.push({ action: 'sync-tiers', fixed: upgraded, errors: 0, details: [...details, `${linked} respect records linked`] });
+      results.push({
+        action: 'sync-tiers',
+        fixed: upgraded,
+        errors: 0,
+        details: [...details, `${linked} respect records linked`],
+      });
     }
 
     return NextResponse.json({ results });

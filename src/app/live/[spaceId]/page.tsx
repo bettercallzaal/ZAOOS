@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSessionData } from '@/lib/auth/session';
 import { EndJukeSpaceButton } from '@/components/spaces/EndJukeSpaceButton';
 import { JukeEmbed } from '@/components/spaces/JukeEmbed';
 import { JukeListenerBadge } from '@/components/spaces/JukeListenerBadge';
+import { getSessionData } from '@/lib/auth/session';
 import {
   isValidJukeSpaceId,
   jukeAppDeeplinkUrl,
@@ -38,7 +38,9 @@ export async function generateMetadata({ params }: LivePageProps): Promise<Metad
     return { title: `Live Audio - ${communityConfig.name}` };
   }
   const row = await safeGetJukeSpace(spaceId);
-  const title = row?.title ? `${row.title} - Live on ${communityConfig.name}` : `Live Audio - ${communityConfig.name}`;
+  const title = row?.title
+    ? `${row.title} - Live on ${communityConfig.name}`
+    : `Live Audio - ${communityConfig.name}`;
   const ogImage = jukeSpaceOgImageUrl(spaceId);
   return {
     title,
@@ -103,7 +105,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             aria-label="Back home"
             className="rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-800 hover:text-[#f5a623]"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>

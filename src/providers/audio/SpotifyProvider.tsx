@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { usePlayerContext } from './PlayerProvider';
 
 interface SpotifyController {
@@ -40,7 +40,8 @@ let spotifyContainer: HTMLDivElement | null = null;
 function ensureContainer(): HTMLDivElement {
   if (!spotifyContainer || !document.body.contains(spotifyContainer)) {
     spotifyContainer = document.createElement('div');
-    spotifyContainer.style.cssText = 'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
+    spotifyContainer.style.cssText =
+      'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
     spotifyContainer.setAttribute('aria-hidden', 'true');
     document.body.appendChild(spotifyContainer);
   }
@@ -64,36 +65,32 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
       controllerRef.current = null;
     }
 
-    api.createController(
-      container,
-      { uri, width: 1, height: 1 },
-      (controller) => {
-        controllerRef.current = controller;
+    api.createController(container, { uri, width: 1, height: 1 }, (controller) => {
+      controllerRef.current = controller;
 
-        controller.addListener('playback_update', (data: unknown) => {
-          const d = data as { data: { position: number; duration: number; isPaused: boolean } };
-          if (d?.data) {
-            dispatch({ type: 'PROGRESS', payload: d.data.position });
-            if (d.data.duration) {
-              dispatch({ type: 'SET_DURATION', payload: d.data.duration });
-            }
-            // Detect track end: position within 1s of duration and paused
-            if (d.data.duration > 0 && d.data.isPaused && d.data.position >= d.data.duration - 1000) {
-              if (onEndedRef.current) {
-                onEndedRef.current();
-              } else {
-                dispatch({ type: 'STOP' });
-              }
+      controller.addListener('playback_update', (data: unknown) => {
+        const d = data as { data: { position: number; duration: number; isPaused: boolean } };
+        if (d?.data) {
+          dispatch({ type: 'PROGRESS', payload: d.data.position });
+          if (d.data.duration) {
+            dispatch({ type: 'SET_DURATION', payload: d.data.duration });
+          }
+          // Detect track end: position within 1s of duration and paused
+          if (d.data.duration > 0 && d.data.isPaused && d.data.position >= d.data.duration - 1000) {
+            if (onEndedRef.current) {
+              onEndedRef.current();
+            } else {
+              dispatch({ type: 'STOP' });
             }
           }
-        });
+        }
+      });
 
-        controller.addListener('ready', () => {
-          dispatch({ type: 'LOADED' });
-          controller.play();
-        });
-      },
-    );
+      controller.addListener('ready', () => {
+        dispatch({ type: 'LOADED' });
+        controller.play();
+      });
+    });
   };
 
   // Load Spotify IFrame API — deferred until the first Spotify track plays.

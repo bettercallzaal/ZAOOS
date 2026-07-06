@@ -1,12 +1,13 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import {
+  type FetchBattlesPage,
+  httpBattlesPageFetcher,
   parseWaveWarzBattlesPage,
   scrapeWaveWarzBattles,
-  httpBattlesPageFetcher,
-  type FetchBattlesPage,
 } from '../wavewarz-battles';
 import type { FetchImpl } from '../x-fetch';
 
@@ -36,7 +37,8 @@ describe('parseWaveWarzBattlesPage', () => {
   });
 
   it('parses a minimal synthetic battle object', () => {
-    const html = '{"battle_id":42,"dateFormatted":"Jan 1, 2026","song1Title":"A","song2Title":"B","totalVolSol":3.5,"winnerTitle":"A"}';
+    const html =
+      '{"battle_id":42,"dateFormatted":"Jan 1, 2026","song1Title":"A","song2Title":"B","totalVolSol":3.5,"winnerTitle":"A"}';
     const battles = parseWaveWarzBattlesPage(html);
     expect(battles).toHaveLength(1);
     expect(battles[0].battleId).toBe(42);

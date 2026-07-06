@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { getValidTwitchToken, createTwitchPrediction, endTwitchPrediction } from '@/lib/twitch/client';
 import { logger } from '@/lib/logger';
+import {
+  createTwitchPrediction,
+  endTwitchPrediction,
+  getValidTwitchToken,
+} from '@/lib/twitch/client';
 
 const createSchema = z.object({
   title: z.string().min(1).max(45),
@@ -44,7 +48,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result) {
-      return NextResponse.json({ error: 'Failed to create prediction — stream must be live' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to create prediction — stream must be live' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

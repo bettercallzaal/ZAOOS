@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback } from 'react';
 import Link from 'next/link';
+import { useCallback } from 'react';
 
 const PLATFORMS = [
   { id: 'farcaster', name: 'Farcaster', color: '#8A63D2', alwaysOn: true },
@@ -35,12 +35,10 @@ export function PlatformToggles({
       }
       onToggle(platformId);
     },
-    [onToggle, onNotConnected]
+    [onToggle, onNotConnected],
   );
 
-  const visiblePlatforms = PLATFORMS.filter(
-    (p) => !('adminOnly' in p && p.adminOnly) || isAdmin
-  );
+  const visiblePlatforms = PLATFORMS.filter((p) => !('adminOnly' in p && p.adminOnly) || isAdmin);
 
   return (
     <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 -mb-1">
@@ -135,7 +133,12 @@ function PlatformPill({
       {!connected && (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus-within:block z-10 pointer-events-none">
           <div className="bg-[#1a2a3a] border border-white/[0.08] rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg">
-            <p className="text-gray-400">Connect in <Link href="/settings" className="text-[#f5a623] hover:underline pointer-events-auto">Settings</Link></p>
+            <p className="text-gray-400">
+              Connect in{' '}
+              <Link href="/settings" className="text-[#f5a623] hover:underline pointer-events-auto">
+                Settings
+              </Link>
+            </p>
           </div>
         </div>
       )}
@@ -145,18 +148,8 @@ function PlatformPill({
 
 function CheckIcon() {
   return (
-    <svg
-      className="w-3 h-3"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={3}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4.5 12.75l6 6 9-13.5"
-      />
+    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
     </svg>
   );
 }

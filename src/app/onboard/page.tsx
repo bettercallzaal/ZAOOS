@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function OnboardPage() {
   const [wallet, setWallet] = useState('');
@@ -49,7 +49,8 @@ export default function OnboardPage() {
       <div className="text-center max-w-sm w-full">
         <h1 className="text-3xl font-bold text-white mb-2">Join ZAO</h1>
         <p className="text-gray-400 text-sm mb-8">
-          Enter your wallet address to check if you&apos;re on the allowlist and create a Farcaster account.
+          Enter your wallet address to check if you&apos;re on the allowlist and create a Farcaster
+          account.
         </p>
 
         <div className="space-y-4">
@@ -78,10 +79,7 @@ export default function OnboardPage() {
         </div>
 
         <div className="mt-8">
-          <Link
-            href="/"
-            className="text-sm text-gray-400 hover:text-[#f5a623] transition-colors"
-          >
+          <Link href="/" className="text-sm text-gray-400 hover:text-[#f5a623] transition-colors">
             &larr; Already have Farcaster? Sign in
           </Link>
         </div>

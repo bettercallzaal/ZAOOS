@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -24,7 +24,10 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = voteSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { trackId, vote } = parsed.data;
@@ -58,10 +61,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
         voteDelta = vote === 1 ? -1 : 1; // Reverse the previous vote
       } else {
         // Different vote — update
-        await supabaseAdmin
-          .from('playlist_votes')
-          .update({ vote })
-          .eq('id', existingVote.id);
+        await supabaseAdmin.from('playlist_votes').update({ vote }).eq('id', existingVote.id);
         voteDelta = vote === 1 ? 2 : -2; // Swing from -1 to +1 or vice versa
       }
     } else {
@@ -75,10 +75,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
 
     // Update vote count on track
     const newVotes = (track.votes || 0) + voteDelta;
-    await supabaseAdmin
-      .from('playlist_tracks')
-      .update({ votes: newVotes })
-      .eq('id', trackId);
+    await supabaseAdmin.from('playlist_tracks').update({ votes: newVotes }).eq('id', trackId);
 
     return NextResponse.json({
       votes: newVotes,

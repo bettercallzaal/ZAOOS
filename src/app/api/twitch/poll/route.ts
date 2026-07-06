@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { getValidTwitchToken, createTwitchPoll, endTwitchPoll } from '@/lib/twitch/client';
 import { logger } from '@/lib/logger';
+import { createTwitchPoll, endTwitchPoll, getValidTwitchToken } from '@/lib/twitch/client';
 
 const createSchema = z.object({
   title: z.string().min(1).max(60),
@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result) {
-      return NextResponse.json({ error: 'Failed to create poll — stream must be live' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to create poll — stream must be live' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true, pollId: result.id });
@@ -76,7 +79,12 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Twitch not connected' }, { status: 400 });
     }
 
-    const ok = await endTwitchPoll(creds.accessToken, creds.userId, parsed.data.pollId, parsed.data.status);
+    const ok = await endTwitchPoll(
+      creds.accessToken,
+      creds.userId,
+      parsed.data.pollId,
+      parsed.data.status,
+    );
     if (!ok) {
       return NextResponse.json({ error: 'Failed to end poll' }, { status: 500 });
     }

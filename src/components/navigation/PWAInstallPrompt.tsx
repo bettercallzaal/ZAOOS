@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
@@ -83,9 +83,7 @@ export default function PWAInstallPrompt() {
   return (
     <div
       className={`fixed bottom-20 left-4 right-4 z-50 sm:left-auto sm:right-4 sm:w-80 transition-all duration-300 ${
-        isExiting
-          ? 'opacity-0 translate-y-4'
-          : 'opacity-100 translate-y-0 animate-slide-up'
+        isExiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-slide-up'
       }`}
     >
       {/* Gold accent top bar */}
@@ -95,8 +93,18 @@ export default function PWAInstallPrompt() {
         <div className="flex items-start gap-3">
           {/* App icon */}
           <div className="w-10 h-10 rounded-lg bg-[#f5a623]/10 border border-[#f5a623]/20 flex items-center justify-center flex-shrink-0">
-            <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+            <svg
+              className="w-5 h-5 text-[#f5a623]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
+              />
             </svg>
           </div>
 
@@ -116,7 +124,13 @@ export default function PWAInstallPrompt() {
             aria-label="Dismiss install prompt"
             className="text-gray-600 hover:text-gray-400 transition-colors p-1 flex-shrink-0 -mt-1 -mr-1"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

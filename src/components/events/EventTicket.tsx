@@ -79,12 +79,8 @@ export function EventTicket({ event }: EventTicketProps) {
     <div className="mx-auto w-full max-w-lg space-y-6 p-4">
       <header className="space-y-2">
         <h1 className="text-2xl font-bold text-[#f5a623]">{event.title}</h1>
-        {event.description ? (
-          <p className="text-sm text-gray-300">{event.description}</p>
-        ) : null}
-        {event.location ? (
-          <p className="text-xs text-gray-400">{event.location}</p>
-        ) : null}
+        {event.description ? <p className="text-sm text-gray-300">{event.description}</p> : null}
+        {event.location ? <p className="text-xs text-gray-400">{event.location}</p> : null}
       </header>
 
       {/* Get the ticket - hosted Unlock event page */}
@@ -158,11 +154,7 @@ export function EventTicket({ event }: EventTicketProps) {
             <p className="text-xs text-gray-400">Connect your wallet to check.</p>
           )}
           {checkMsg ? (
-            <p
-              className={`mt-2 text-xs ${
-                check === 'holds' ? 'text-[#f5a623]' : 'text-gray-400'
-              }`}
-            >
+            <p className={`mt-2 text-xs ${check === 'holds' ? 'text-[#f5a623]' : 'text-gray-400'}`}>
               {checkMsg}
             </p>
           ) : null}

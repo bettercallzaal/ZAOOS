@@ -23,7 +23,9 @@ export async function GET() {
 
   // Return cached graph if fresh
   if (graphCache && Date.now() - graphCache.timestamp < GRAPH_CACHE_TTL) {
-    return NextResponse.json(graphCache.data, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
+    return NextResponse.json(graphCache.data, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    });
   }
 
   try {
@@ -58,7 +60,7 @@ export async function GET() {
       try {
         const res = await fetch(
           `${NEYNAR_BASE}/user/bulk?fids=${chunk.join(',')}&viewer_fid=${session.fid}`,
-          { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(10000) }
+          { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(10000) },
         );
         if (res.ok) {
           const data = await res.json();
@@ -87,7 +89,10 @@ export async function GET() {
             try {
               const res = await fetch(
                 `${NEYNAR_BASE}/user/bulk?fids=${otherFids.join(',')}&viewer_fid=${viewerFid}`,
-                { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(10000) }
+                {
+                  headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+                  signal: AbortSignal.timeout(10000),
+                },
               );
               if (res.ok) {
                 const data = await res.json();
@@ -101,7 +106,7 @@ export async function GET() {
               logger.error(`Graph fetch error for viewer ${viewerFid}:`, err);
             }
           }
-        })
+        }),
       );
     }
 
@@ -113,7 +118,7 @@ export async function GET() {
         const inbound = connections.filter((c) => c.to === m.fid).length;
         const outbound = connections.filter((c) => c.from === m.fid).length;
         const mutuals = connections.filter(
-          (c) => c.from === m.fid && connectionSet.has(`${c.to}→${m.fid}`)
+          (c) => c.from === m.fid && connectionSet.has(`${c.to}→${m.fid}`),
         ).length;
 
         return {
@@ -136,7 +141,9 @@ export async function GET() {
     const density = maxPossible > 0 ? Math.round((totalConnections / maxPossible) * 100) : 0;
 
     const sorted = [...nodes].sort((a, b) => b.mutuals - a.mutuals);
-    const disconnected = nodes.filter((n) => n.communityFollowers === 0 && n.communityFollowing === 0);
+    const disconnected = nodes.filter(
+      (n) => n.communityFollowers === 0 && n.communityFollowing === 0,
+    );
 
     const responseData = {
       members: nodes,
@@ -145,7 +152,9 @@ export async function GET() {
         totalMembers: nodes.length,
         totalConnections,
         density,
-        mostConnected: sorted.slice(0, 5).map((n) => ({ fid: n.fid, displayName: n.displayName, mutuals: n.mutuals })),
+        mostConnected: sorted
+          .slice(0, 5)
+          .map((n) => ({ fid: n.fid, displayName: n.displayName, mutuals: n.mutuals })),
         disconnectedCount: disconnected.length,
       },
       currentFid: session.fid,
@@ -154,7 +163,9 @@ export async function GET() {
     // Cache the result
     graphCache = { data: responseData, timestamp: Date.now() };
 
-    return NextResponse.json(responseData, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
+    return NextResponse.json(responseData, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    });
   } catch (err) {
     logger.error('Community graph error:', err);
     return NextResponse.json({ error: 'Failed to build community graph' }, { status: 500 });

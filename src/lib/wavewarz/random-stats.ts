@@ -172,9 +172,7 @@ export async function getRandomStat(): Promise<RandomStat | null> {
     try {
       const stat = await gen();
       if (stat) return stat;
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return null;
 }

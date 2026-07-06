@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getValidTwitchToken, getTwitchStreamInfo } from '@/lib/twitch/client';
 import { logger } from '@/lib/logger';
+import { getTwitchStreamInfo, getValidTwitchToken } from '@/lib/twitch/client';
 
 export async function GET() {
   try {

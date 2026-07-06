@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 interface Contact {
   id: string;
@@ -51,7 +51,11 @@ function relativeTime(dateStr: string | null): string {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 const EDITABLE_FIELDS = [
@@ -119,7 +123,7 @@ export function ContactRow({ contact, onUpdate }: ContactRowProps) {
         const j = await res.json().catch(() => ({}));
         throw new Error((j as { error?: string }).error ?? 'Save failed');
       }
-      const j = await res.json() as { contact: Contact };
+      const j = (await res.json()) as { contact: Contact };
       onUpdate(j.contact);
       setEditing(false);
     } catch (err) {
@@ -130,11 +134,11 @@ export function ContactRow({ contact, onUpdate }: ContactRowProps) {
   }, [contact.id, form, onUpdate]);
 
   const handleFieldChange = useCallback((key: string, value: string) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+    setForm((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   const toggleExpanded = useCallback(() => {
-    if (!editing) setExpanded(prev => !prev);
+    if (!editing) setExpanded((prev) => !prev);
   }, [editing]);
 
   return (
@@ -162,19 +166,25 @@ export function ContactRow({ contact, onUpdate }: ContactRowProps) {
         {/* Right-side pills */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {contact.first_met && (
-            <span className="hidden sm:inline text-xs text-white/30">{relativeTime(contact.first_met)}</span>
+            <span className="hidden sm:inline text-xs text-white/30">
+              {relativeTime(contact.first_met)}
+            </span>
           )}
           {contact.category && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-[#0a1628] border border-white/10 text-white/50">
               {contact.category}
             </span>
           )}
-          <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${scoreColor(contact.score)}`}>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full border font-medium ${scoreColor(contact.score)}`}
+          >
             {contact.score.toFixed(1)}
           </span>
           <svg
             className={`w-4 h-4 text-white/30 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
@@ -194,24 +204,24 @@ export function ContactRow({ contact, onUpdate }: ContactRowProps) {
             /* Edit mode */
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {EDITABLE_FIELDS.filter(f => f.type === 'input').map(f => (
+                {EDITABLE_FIELDS.filter((f) => f.type === 'input').map((f) => (
                   <div key={f.key}>
                     <label className="block text-xs text-white/40 mb-1">{f.label}</label>
                     <input
                       type="text"
                       value={form[f.key] ?? ''}
-                      onChange={e => handleFieldChange(f.key, e.target.value)}
+                      onChange={(e) => handleFieldChange(f.key, e.target.value)}
                       className="w-full bg-[#0a1628] border border-white/15 rounded px-3 py-1.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#f5a623]/50"
                     />
                   </div>
                 ))}
               </div>
-              {EDITABLE_FIELDS.filter(f => f.type === 'textarea').map(f => (
+              {EDITABLE_FIELDS.filter((f) => f.type === 'textarea').map((f) => (
                 <div key={f.key}>
                   <label className="block text-xs text-white/40 mb-1">{f.label}</label>
                   <textarea
                     value={form[f.key] ?? ''}
-                    onChange={e => handleFieldChange(f.key, e.target.value)}
+                    onChange={(e) => handleFieldChange(f.key, e.target.value)}
                     rows={3}
                     className="w-full bg-[#0a1628] border border-white/15 rounded px-3 py-1.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#f5a623]/50 resize-y"
                   />
@@ -244,24 +254,22 @@ export function ContactRow({ contact, onUpdate }: ContactRowProps) {
                 {contact.organization && (
                   <DetailItem label="Organization" value={contact.organization} />
                 )}
-                {contact.source && (
-                  <DetailItem label="Source" value={contact.source} />
-                )}
-                {contact.fid && (
-                  <DetailItem label="FID" value={String(contact.fid)} />
-                )}
+                {contact.source && <DetailItem label="Source" value={contact.source} />}
+                {contact.fid && <DetailItem label="FID" value={String(contact.fid)} />}
                 {contact.first_met && (
-                  <DetailItem label="First Met" value={`${formatDate(contact.first_met)} (${relativeTime(contact.first_met)})`} />
+                  <DetailItem
+                    label="First Met"
+                    value={`${formatDate(contact.first_met)} (${relativeTime(contact.first_met)})`}
+                  />
                 )}
                 {contact.last_interaction && (
-                  <DetailItem label="Last Interaction" value={`${formatDate(contact.last_interaction)} (${relativeTime(contact.last_interaction)})`} />
+                  <DetailItem
+                    label="Last Interaction"
+                    value={`${formatDate(contact.last_interaction)} (${relativeTime(contact.last_interaction)})`}
+                  />
                 )}
-                {contact.location && (
-                  <DetailItem label="Location" value={contact.location} />
-                )}
-                {contact.location_2 && (
-                  <DetailItem label="Location 2" value={contact.location_2} />
-                )}
+                {contact.location && <DetailItem label="Location" value={contact.location} />}
+                {contact.location_2 && <DetailItem label="Location 2" value={contact.location_2} />}
                 <DetailItem label="Checked" value={contact.checked ? 'Yes' : 'No'} />
               </div>
 

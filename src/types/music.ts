@@ -6,7 +6,16 @@ export type AudioController = {
   setVolume?: (volume: number) => void; // 0–1
 };
 
-export type TrackType = 'spotify' | 'soundcloud' | 'soundxyz' | 'youtube' | 'audio' | 'audius' | 'applemusic' | 'tidal' | 'bandcamp';
+export type TrackType =
+  | 'spotify'
+  | 'soundcloud'
+  | 'soundxyz'
+  | 'youtube'
+  | 'audio'
+  | 'audius'
+  | 'applemusic'
+  | 'tidal'
+  | 'bandcamp';
 
 export type TrackMetadata = {
   id: string;

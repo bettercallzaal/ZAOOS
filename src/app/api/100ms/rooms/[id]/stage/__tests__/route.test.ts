@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   makeGetRequest,
   makePostRequest,
-  mockUnauthenticatedSession,
   mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const {
@@ -32,7 +32,8 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/social/msRoomsDb', () => ({
   getMSRoomById: mockGetMSRoomById,
-  isStageRoom: (room: { settings?: Record<string, unknown> }) => room.settings?.room_type === 'stage',
+  isStageRoom: (room: { settings?: Record<string, unknown> }) =>
+    room.settings?.room_type === 'stage',
   getRoomSpeakerFids: (room: { speakers?: unknown[] }) =>
     Array.isArray(room.speakers) ? room.speakers.filter((s) => typeof s === 'number') : [],
   getSpeakerRequests: mockGetSpeakerRequests,
@@ -79,7 +80,9 @@ describe('POST /api/100ms/rooms/[id]/stage', () => {
   });
 
   it('lets a listener raise their hand', async () => {
-    mockGetSessionData.mockResolvedValue(mockAuthenticatedSession({ fid: 555, displayName: 'Lou' }));
+    mockGetSessionData.mockResolvedValue(
+      mockAuthenticatedSession({ fid: 555, displayName: 'Lou' }),
+    );
     const res = await POST(makePostRequest('/x', { action: 'raise_hand' }), ctx);
     expect(res.status).toBe(200);
     expect(mockCreateSpeakerRequest).toHaveBeenCalledWith('room-1', 555, 'Lou');

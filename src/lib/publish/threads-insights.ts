@@ -28,9 +28,7 @@ export interface ThreadsMetrics {
  * Returns zeroed metrics if the API call fails (e.g. post deleted,
  * insufficient permissions) so the caller can handle gracefully.
  */
-export async function fetchThreadsInsights(
-  threadId: string,
-): Promise<ThreadsMetrics> {
+export async function fetchThreadsInsights(threadId: string): Promise<ThreadsMetrics> {
   const { THREADS_ACCESS_TOKEN } = ENV;
 
   if (!THREADS_ACCESS_TOKEN) {
@@ -42,9 +40,7 @@ export async function fetchThreadsInsights(
     access_token: THREADS_ACCESS_TOKEN,
   });
 
-  const res = await fetch(
-    `${THREADS_API_BASE}/${threadId}/insights?${params.toString()}`,
-  );
+  const res = await fetch(`${THREADS_API_BASE}/${threadId}/insights?${params.toString()}`);
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

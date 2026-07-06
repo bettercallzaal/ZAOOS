@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 
 interface PendingSubmission {
@@ -17,7 +17,6 @@ interface PendingSubmission {
   created_at: string;
   status: string;
 }
-
 
 export function SubmissionReviewQueue() {
   const [submissions, setSubmissions] = useState<PendingSubmission[]>([]);
@@ -121,18 +120,13 @@ export function SubmissionReviewQueue() {
         {submissions.map((sub) => {
           const isReviewing = reviewingId === sub.id;
           return (
-            <div
-              key={sub.id}
-              className="rounded-lg border border-white/5 bg-[#1a2a3a] p-4"
-            >
+            <div key={sub.id} className="rounded-lg border border-white/5 bg-[#1a2a3a] p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 {/* Track info */}
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-white">
                     {sub.title || 'Untitled'}
-                    {sub.artist && (
-                      <span className="ml-1 text-gray-400">by {sub.artist}</span>
-                    )}
+                    {sub.artist && <span className="ml-1 text-gray-400">by {sub.artist}</span>}
                   </p>
                   <a
                     href={sub.url}

@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePlayer } from '@/providers/audio';
-import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
+import type { usePlayer } from '@/providers/audio';
+import type { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { MusicIcon, PlayingBars } from './MusicPageUtils';
 
 export function RadioHero({
@@ -69,9 +69,7 @@ export function RadioHero({
                 </p>
               )}
               {radio.radioPlaylist && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {communityConfig.music.radioName}
-                </p>
+                <p className="text-xs text-gray-500 mt-1">{communityConfig.music.radioName}</p>
               )}
             </div>
           </div>
@@ -124,11 +122,31 @@ export function RadioHero({
               href="/calls"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white border border-white/[0.08] hover:border-gray-500 rounded-full transition-colors"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              <svg
+                className="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"
+                />
               </svg>
-              <svg className="w-3.5 h-3.5 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+              <svg
+                className="w-3.5 h-3.5 -ml-0.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                />
               </svg>
               Listen Together
             </Link>
@@ -164,12 +182,8 @@ export function RadioHero({
             </div>
           </div>
 
-          <h2 className="text-xl font-bold text-white mb-1">
-            {communityConfig.music.radioName}
-          </h2>
-          <p className="text-sm text-gray-400 mb-5">
-            Community radio powered by Audius
-          </p>
+          <h2 className="text-xl font-bold text-white mb-1">{communityConfig.music.radioName}</h2>
+          <p className="text-sm text-gray-400 mb-5">Community radio powered by Audius</p>
 
           {/* Station picker pills */}
           {communityConfig.music.radioPlaylists.length > 0 && (

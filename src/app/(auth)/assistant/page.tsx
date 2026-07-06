@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface Message {
@@ -13,7 +13,7 @@ const SUGGESTED_QUESTIONS = [
   'How does the Respect system work?',
   'What platforms can we broadcast to?',
   'Tell me about the music player',
-  'What\'s the governance structure?',
+  "What's the governance structure?",
 ];
 
 export default function AssistantPage() {
@@ -42,19 +42,25 @@ export default function AssistantPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
       const data = await res.json();
-      const raw = data?.choices?.[0]?.message?.content || data?.reply || 'Sorry, I couldn\'t generate a response.';
+      const raw =
+        data?.choices?.[0]?.message?.content ||
+        data?.reply ||
+        "Sorry, I couldn't generate a response.";
 
       // Strip <think> tags emitted by MiniMax-M2.7 reasoning traces
       const cleaned = raw.replace(/<think>[\s\S]*?<\/think>\s*/g, '').trim();
 
       setMessages([...newMessages, { role: 'assistant', content: cleaned }]);
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
+      setMessages([
+        ...newMessages,
+        { role: 'assistant', content: 'Something went wrong. Please try again.' },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -72,7 +78,16 @@ export default function AssistantPage() {
       {/* Header */}
       <header className="px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex items-center gap-3 shrink-0">
         <div className="w-8 h-8 rounded-full bg-[#f5a623]/20 flex items-center justify-center shrink-0">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#f5a623"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M12 2a7 7 0 0 1 7 7c0 4-3 6-3 8H8c0-2-3-4-3-8a7 7 0 0 1 7-7z" />
             <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
           </svg>
@@ -110,10 +125,7 @@ export default function AssistantPage() {
         )}
 
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed ${
                 msg.role === 'user'
@@ -130,9 +142,18 @@ export default function AssistantPage() {
           <div className="flex justify-start">
             <div className="bg-[#1a2a3a] rounded-2xl rounded-bl-md px-4 py-3 border border-white/[0.08]">
               <div className="flex gap-1 items-center">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div
+                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  style={{ animationDelay: '0ms' }}
+                />
+                <div
+                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  style={{ animationDelay: '150ms' }}
+                />
+                <div
+                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  style={{ animationDelay: '300ms' }}
+                />
               </div>
             </div>
           </div>
@@ -140,7 +161,10 @@ export default function AssistantPage() {
       </div>
 
       {/* Input bar — sits above mobile nav (bottom-14) + player (~60px) */}
-      <div className="fixed bottom-[120px] md:bottom-[64px] left-0 right-0 bg-[#0d1b2a] border-t border-white/[0.08] px-4 py-3 z-20" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div
+        className="fixed bottom-[120px] md:bottom-[64px] left-0 right-0 bg-[#0d1b2a] border-t border-white/[0.08] px-4 py-3 z-20"
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
         <div className="max-w-3xl mx-auto flex gap-2">
           <textarea
             value={input}

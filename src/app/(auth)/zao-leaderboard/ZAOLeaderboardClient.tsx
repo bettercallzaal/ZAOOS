@@ -50,15 +50,12 @@ export default function ZAOLeaderboardClient({ entries }: Props) {
           >
             {/* Rank */}
             <div className="w-7 flex-shrink-0 text-center">
-              <span className="text-sm font-medium text-gray-500">
-                {entry.rank}
-              </span>
+              <span className="text-sm font-medium text-gray-500">{entry.rank}</span>
             </div>
 
             {/* Avatar */}
             <div className="flex-shrink-0">
               {entry.pfp_url ? (
-                 
                 <img
                   src={entry.pfp_url}
                   alt={entry.name}

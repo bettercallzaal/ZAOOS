@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   makeRequest,
-  mockUnauthenticatedSession,
   mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const {
@@ -92,7 +92,10 @@ describe('PATCH /api/100ms/rooms/[id]', () => {
   });
 
   it('rejects more than 10 links', async () => {
-    const links = Array.from({ length: 11 }, (_, i) => ({ label: `l${i}`, url: `https://e.com/${i}` }));
+    const links = Array.from({ length: 11 }, (_, i) => ({
+      label: `l${i}`,
+      url: `https://e.com/${i}`,
+    }));
     const res = await PATCH(makePatch({ pinnedLinks: links }), ctx);
     expect(res.status).toBe(400);
     expect(mockSetMSRoomPinnedLinks).not.toHaveBeenCalled();

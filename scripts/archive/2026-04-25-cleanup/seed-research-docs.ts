@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import { config } from 'dotenv';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { config } from 'dotenv';
 
 // Load .env.local (Next.js doesn't auto-load env outside of next dev/build)
 config({ path: resolve(__dirname, '../.env.local') });
@@ -40,7 +40,7 @@ async function main() {
     // Table row format: | [NN](./NN-slug/) | **Title** | Summary |
     // Match: | [number](./path/) | **title** |
     const tableMatch = line.match(
-      /\|\s*\[(\d+)\]\(\.\/(\d+-[^)/]+)\/?[^)]*\)\s*\|\s*\*?\*?([^|*]+)\*?\*?\s*\|/
+      /\|\s*\[(\d+)\]\(\.\/(\d+-[^)/]+)\/?[^)]*\)\s*\|\s*\*?\*?([^|*]+)\*?\*?\s*\|/,
     );
     if (tableMatch) {
       const num = parseInt(tableMatch[1], 10);
@@ -83,8 +83,13 @@ async function main() {
   console.log(`Parsed ${unique.length} research docs from ${lines.length} lines`);
 
   if (unique.length > 0) {
-    console.log(`Categories found: ${[...new Set(unique.map(e => e.category))].join(', ')}`);
-    console.log(`First 5: ${unique.slice(0, 5).map(e => `${e.id}: ${e.title}`).join(', ')}`);
+    console.log(`Categories found: ${[...new Set(unique.map((e) => e.category))].join(', ')}`);
+    console.log(
+      `First 5: ${unique
+        .slice(0, 5)
+        .map((e) => `${e.id}: ${e.title}`)
+        .join(', ')}`,
+    );
   }
 
   if (unique.length === 0) {
@@ -93,9 +98,7 @@ async function main() {
   }
 
   // Upsert into research_docs
-  const { error } = await supabase
-    .from('research_docs')
-    .upsert(unique, { onConflict: 'id' });
+  const { error } = await supabase.from('research_docs').upsert(unique, { onConflict: 'id' });
 
   if (error) {
     console.error('Failed to seed:', error);

@@ -7,12 +7,7 @@ interface StatsBarProps {
   leaderName: string;
 }
 
-export function StatsBar({
-  contributors,
-  totalRespect,
-  topShare,
-  leaderName,
-}: StatsBarProps) {
+export function StatsBar({ contributors, totalRespect, topShare, leaderName }: StatsBarProps) {
   const stats = [
     {
       label: 'Contributors',
@@ -39,9 +34,7 @@ export function StatsBar({
           key={s.label}
           className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center"
         >
-          <p className="text-base sm:text-lg font-bold text-white truncate">
-            {s.value}
-          </p>
+          <p className="text-base sm:text-lg font-bold text-white truncate">{s.value}</p>
           <p className="text-[10px] sm:text-xs text-gray-500 mt-1">{s.label}</p>
         </div>
       ))}

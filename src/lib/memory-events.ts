@@ -117,10 +117,7 @@ export async function onProfileUpdate(profile: ProfileUpdate): Promise<void> {
  * Store a memory event in the user's bank.
  * bank_id = user's FID (as string) for per-user isolation.
  */
-export async function retainEvent(
-  userFid: string,
-  event: MemoryEvent
-): Promise<void> {
+export async function retainEvent(userFid: string, event: MemoryEvent): Promise<void> {
   try {
     const content = serializeEventToText(event);
     const hindsight = await getHindsightClient();
@@ -142,7 +139,7 @@ export async function retainEvent(
 function serializeEventToText(event: MemoryEvent): string {
   switch (event.type) {
     case 'cast':
-      return `${event.authorUsername} cast: "${event.content}" — ${event.reactions.map(r => `${r.count} ${r.type}`).join(', ')} reactions, ${event.recasts} recasts`;
+      return `${event.authorUsername} cast: "${event.content}" — ${event.reactions.map((r) => `${r.count} ${r.type}`).join(', ')} reactions, ${event.recasts} recasts`;
     case 'track_share':
       return `${event.sharerUsername} shared "${event.trackName}" by ${event.artist} on ${event.platform}${event.note ? ` — "${event.note}"` : ''}`;
     case 'respect':

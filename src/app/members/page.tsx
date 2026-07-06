@@ -1,10 +1,11 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import MembersDirectoryClient from './MembersDirectoryClient';
 
 export const metadata: Metadata = {
   title: 'Members | ZAO OS',
-  description: 'Browse the ZAO community — a decentralized music organization of artists, producers, and creators.',
+  description:
+    'Browse the ZAO community — a decentralized music organization of artists, producers, and creators.',
 };
 
 // Revalidate every 5 minutes so the directory stays fresh without always hitting DB
@@ -39,14 +40,17 @@ async function fetchInitialMembers() {
     }
 
     // Fetch artist profiles
-    const fids = users.map(u => u.fid).filter(Boolean) as number[];
-    const profileMap: Record<number, {
-      category: string;
-      thumbnailUrl: string | null;
-      coverImageUrl: string | null;
-      biography: string | null;
-      isFeatured: boolean;
-    }> = {};
+    const fids = users.map((u) => u.fid).filter(Boolean) as number[];
+    const profileMap: Record<
+      number,
+      {
+        category: string;
+        thumbnailUrl: string | null;
+        coverImageUrl: string | null;
+        biography: string | null;
+        isFeatured: boolean;
+      }
+    > = {};
 
     if (fids.length > 0) {
       const { data: profiles } = await supabaseAdmin
@@ -55,20 +59,22 @@ async function fetchInitialMembers() {
         .in('fid', fids);
 
       for (const p of profiles || []) {
-        if (p.fid) profileMap[p.fid] = {
-          category: p.category,
-          thumbnailUrl: p.thumbnail_url,
-          coverImageUrl: p.cover_image_url,
-          biography: p.biography,
-          isFeatured: p.is_featured,
-        };
+        if (p.fid)
+          profileMap[p.fid] = {
+            category: p.category,
+            thumbnailUrl: p.thumbnail_url,
+            coverImageUrl: p.cover_image_url,
+            biography: p.biography,
+            isFeatured: p.is_featured,
+          };
       }
     }
 
-    const members = users.map(u => {
-      const respect = (u.fid ? respectMap[`fid:${u.fid}`] : null)
-        || (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null)
-        || null;
+    const members = users.map((u) => {
+      const respect =
+        (u.fid ? respectMap[`fid:${u.fid}`] : null) ||
+        (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null) ||
+        null;
 
       const artistProfile = u.fid ? profileMap[u.fid] || null : null;
 
@@ -102,8 +108,10 @@ async function fetchInitialMembers() {
     // Sort by respect total (default view)
     members.sort((a, b) => (b.respect?.total ?? 0) - (a.respect?.total ?? 0));
 
-    const categories = [...new Set(members.map(m => m.artistProfile?.category).filter(Boolean))] as string[];
-    const locations = [...new Set(members.map(m => m.location).filter(Boolean))] as string[];
+    const categories = [
+      ...new Set(members.map((m) => m.artistProfile?.category).filter(Boolean)),
+    ] as string[];
+    const locations = [...new Set(members.map((m) => m.location).filter(Boolean))] as string[];
 
     return { members, filterOptions: { categories, locations } };
   } catch {
@@ -114,10 +122,5 @@ async function fetchInitialMembers() {
 export default async function MembersDirectoryPage() {
   const { members, filterOptions } = await fetchInitialMembers();
 
-  return (
-    <MembersDirectoryClient
-      initialMembers={members}
-      initialFilterOptions={filterOptions}
-    />
-  );
+  return <MembersDirectoryClient initialMembers={members} initialFilterOptions={filterOptions} />;
 }

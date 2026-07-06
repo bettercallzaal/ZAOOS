@@ -2,7 +2,7 @@
 // Direct on-chain OREC contract reader — fallback for when ornode (frapps.xyz) is down.
 // Uses viem to read proposals and respect balances from the OREC contract on Optimism.
 
-import { createPublicClient, http, fallback, parseAbi, type Address } from 'viem';
+import { type Address, createPublicClient, fallback, http, parseAbi } from 'viem';
 import { optimism } from 'viem/chains';
 
 // ── Contract Addresses (Optimism) ────────────────────────────────
@@ -99,7 +99,10 @@ export async function fetchProposalsOnChain(limit = 20): Promise<OnChainProposal
   }
 
   // Dedupe and take most recent first
-  const uniqueProps = new Map<string, { propId: `0x${string}`; proposer: string; blockNumber: bigint }>();
+  const uniqueProps = new Map<
+    string,
+    { propId: `0x${string}`; proposer: string; blockNumber: bigint }
+  >();
   for (const log of logs) {
     const propId = log.args.propId;
     const proposer = log.args.proposer;

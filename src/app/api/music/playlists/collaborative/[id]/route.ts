@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -30,10 +30,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext) {
         .order('votes', { ascending: false })
         .order('position', { ascending: true }),
       supabaseAdmin.from('playlist_members').select('*').eq('playlist_id', id),
-      supabaseAdmin
-        .from('playlist_votes')
-        .select('playlist_track_id, vote')
-        .eq('fid', session.fid),
+      supabaseAdmin.from('playlist_votes').select('playlist_track_id, vote').eq('fid', session.fid),
     ]);
 
     if (playlistRes.status === 'rejected' || playlistRes.value.error) {
@@ -84,7 +81,10 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     // Check ownership
@@ -95,7 +95,10 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
       .single();
 
     if (!playlist || playlist.created_by_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the owner can update this playlist' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Only the owner can update this playlist' },
+        { status: 403 },
+      );
     }
 
     const { data: updated, error } = await supabaseAdmin
@@ -131,7 +134,10 @@ export async function DELETE(_req: NextRequest, ctx: RouteContext) {
       .single();
 
     if (!playlist || playlist.created_by_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the owner can delete this playlist' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Only the owner can delete this playlist' },
+        { status: 403 },
+      );
     }
 
     const { error } = await supabaseAdmin.from('playlists').delete().eq('id', id);

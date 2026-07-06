@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/db/supabase';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { supabaseAdmin } from '@/lib/db/supabase';
 
 const nexusLinksQuerySchema = z.object({
   portal_group: z.string().max(100).nullish(),
@@ -53,14 +53,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch links' }, { status: 500 });
     }
 
-    return NextResponse.json({
-      links: data || [],
-      count: data?.length || 0,
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    return NextResponse.json(
+      {
+        links: data || [],
+        count: data?.length || 0,
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      },
+    );
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

@@ -8,7 +8,7 @@
 import '@testing-library/jest-dom/vitest';
 
 // --- TextEncoder / TextDecoder (needed by Next.js internals) ----------------
-import { TextEncoder, TextDecoder } from 'util';
+import { TextDecoder, TextEncoder } from 'util';
 
 if (typeof globalThis.TextEncoder === 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +28,9 @@ if (typeof globalThis.structuredClone === 'undefined') {
 if (typeof globalThis.BroadcastChannel === 'undefined') {
   class BroadcastChannelStub {
     name: string;
-    constructor(name: string) { this.name = name; }
+    constructor(name: string) {
+      this.name = name;
+    }
     postMessage() {}
     close() {}
     addEventListener() {}

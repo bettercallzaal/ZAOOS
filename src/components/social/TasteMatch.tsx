@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SharedTrack {
   id: string;
@@ -41,13 +41,19 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
     setError('');
     fetch(`/api/social/taste-match?targetFid=${targetFid}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!controller.signal.aborted) setData(d); })
+      .then((d) => {
+        if (!controller.signal.aborted) setData(d);
+      })
       .catch(() => {
         if (controller.signal.aborted) return;
-        setError('Couldn\'t calculate taste match');
+        setError("Couldn't calculate taste match");
       })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => { controller.abort(); };
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => {
+      controller.abort();
+    };
   }, [targetFid]);
 
   if (loading) {
@@ -58,11 +64,12 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
     );
   }
 
-  if (error) return (
-    <div className="p-3 rounded-xl bg-white/5 border border-white/[0.08]">
-      <p className="text-red-400 text-sm">{error}</p>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="p-3 rounded-xl bg-white/5 border border-white/[0.08]">
+        <p className="text-red-400 text-sm">{error}</p>
+      </div>
+    );
   if (!data || (data.totalYours === 0 && data.totalTheirs === 0)) return null;
 
   return (
@@ -74,12 +81,10 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
           </span>
         </div>
         <div>
-          <p className="text-white text-sm font-medium">
-            Music taste match with @{targetUsername}
-          </p>
+          <p className="text-white text-sm font-medium">Music taste match with @{targetUsername}</p>
           <p className="text-gray-500 text-xs">
-            {data.sharedCount} shared {data.sharedCount === 1 ? 'track' : 'tracks'}
-            {' '}&middot; {data.totalYours} yours &middot; {data.totalTheirs} theirs
+            {data.sharedCount} shared {data.sharedCount === 1 ? 'track' : 'tracks'} &middot;{' '}
+            {data.totalYours} yours &middot; {data.totalTheirs} theirs
           </p>
         </div>
       </div>
@@ -98,11 +103,7 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors group"
             >
               {track.artworkUrl ? (
-                <img
-                  src={track.artworkUrl}
-                  alt=""
-                  className="w-8 h-8 rounded object-cover"
-                />
+                <img src={track.artworkUrl} alt="" className="w-8 h-8 rounded object-cover" />
               ) : (
                 <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-gray-500">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -114,9 +115,7 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
                 <p className="text-white text-sm truncate group-hover:text-[#f5a623] transition-colors">
                   {track.title}
                 </p>
-                {track.artist && (
-                  <p className="text-gray-500 text-xs truncate">{track.artist}</p>
-                )}
+                {track.artist && <p className="text-gray-500 text-xs truncate">{track.artist}</p>}
               </div>
             </a>
           ))}

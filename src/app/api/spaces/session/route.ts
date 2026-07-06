@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { startSession, endSessionByFid } from '@/lib/spaces/sessionsDb';
-import { updateLastActive } from '@/lib/spaces/roomsDb';
 import { logger } from '@/lib/logger';
+import { updateLastActive } from '@/lib/spaces/roomsDb';
+import { endSessionByFid, startSession } from '@/lib/spaces/sessionsDb';
 
 const joinSchema = z.object({
   roomId: z.string().uuid(),
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -68,16 +68,13 @@ export async function PATCH(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const { roomId } = parsed.data;
 
-    await Promise.allSettled([
-      endSessionByFid(session.fid, roomId),
-      updateLastActive(roomId),
-    ]);
+    await Promise.allSettled([endSessionByFid(session.fid, roomId), updateLastActive(roomId)]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {

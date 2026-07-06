@@ -1,8 +1,8 @@
 'use client';
 
+import { type PermissionRequestEvent, useCall } from '@stream-io/video-react-sdk';
 import Image from 'next/image';
-import { useState, useEffect, useCallback } from 'react';
-import { useCall, type PermissionRequestEvent } from '@stream-io/video-react-sdk';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * Host-only banner that surfaces inbound capability requests from listeners.
@@ -93,7 +93,14 @@ export function PermissionRequests() {
                 aria-label={`Allow ${request.user.name || request.user.id}`}
                 className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-green-600/15 border border-green-600/30 text-green-400 rounded-lg hover:bg-green-600/25 transition-colors font-semibold"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
                 Allow
@@ -104,7 +111,14 @@ export function PermissionRequests() {
                 aria-label={`Deny ${request.user.name || request.user.id}`}
                 className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-red-600/15 border border-red-600/30 text-red-400 rounded-lg hover:bg-red-600/25 transition-colors font-semibold"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 Deny
@@ -124,8 +138,7 @@ export function PermissionRequests() {
  */
 function humanizePermissions(permissions: string[]): string {
   const parts: string[] = [];
-  const has = (needle: string) =>
-    permissions.some((p) => p.toLowerCase().includes(needle));
+  const has = (needle: string) => permissions.some((p) => p.toLowerCase().includes(needle));
   if (has('audio') || has('mic')) parts.push('mic');
   if (has('video') || has('cam')) parts.push('camera');
   if (has('screen')) parts.push('screen share');

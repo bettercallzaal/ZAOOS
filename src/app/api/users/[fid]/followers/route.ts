@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getFollowers, getRelevantFollowers } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getFollowers, getRelevantFollowers } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fid: string }> }) {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -24,7 +21,7 @@ export async function GET(
   const sort = searchParams.get('sort') || 'recent';
 
   // Map sort tab to Neynar sort_type
-  const sortType = sort === 'trending' ? 'algorithmic' as const : 'desc_chron' as const;
+  const sortType = sort === 'trending' ? ('algorithmic' as const) : ('desc_chron' as const);
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,12 +34,16 @@ export async function GET(
       // The relevant endpoint returns { top_relevant_followers_hydrated: [...] }
       // Each entry has { user, ... } — extract the user objects
       const topRelevant = relevantData.top_relevant_followers_hydrated || [];
-      users = topRelevant.map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+      users = topRelevant.map(
+        (item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item,
+      );
       // Relevant followers endpoint returns a fixed list — no pagination
     } else {
       const data = await getFollowers(targetFid, session.fid, sortType, cursor, 100);
       // Extract user objects from the response
-      users = (data.users || []).map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+      users = (data.users || []).map(
+        (item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item,
+      );
       nextCursor = data.next || null;
     }
 
@@ -80,19 +81,26 @@ export async function GET(
 
     // Client-side sorting for non-API sorts
     if (sort === 'inactive') {
-      users.sort((a: { active_status?: string; follower_count?: number }, b: { active_status?: string; follower_count?: number }) => {
-        const aInactive = a.active_status === 'inactive' ? 0 : 1;
-        const bInactive = b.active_status === 'inactive' ? 0 : 1;
-        if (aInactive !== bInactive) return aInactive - bInactive;
-        return (a.follower_count ?? 0) - (b.follower_count ?? 0);
-      });
+      users.sort(
+        (
+          a: { active_status?: string; follower_count?: number },
+          b: { active_status?: string; follower_count?: number },
+        ) => {
+          const aInactive = a.active_status === 'inactive' ? 0 : 1;
+          const bInactive = b.active_status === 'inactive' ? 0 : 1;
+          if (aInactive !== bInactive) return aInactive - bInactive;
+          return (a.follower_count ?? 0) - (b.follower_count ?? 0);
+        },
+      );
     } else if (sort === 'popular') {
-      users.sort((a: { follower_count?: number }, b: { follower_count?: number }) =>
-        (b.follower_count ?? 0) - (a.follower_count ?? 0)
+      users.sort(
+        (a: { follower_count?: number }, b: { follower_count?: number }) =>
+          (b.follower_count ?? 0) - (a.follower_count ?? 0),
       );
     } else if (sort === 'mutual') {
-      users = users.filter((u: { viewer_context?: { following?: boolean; followed_by?: boolean } }) =>
-        u.viewer_context?.following && u.viewer_context?.followed_by
+      users = users.filter(
+        (u: { viewer_context?: { following?: boolean; followed_by?: boolean } }) =>
+          u.viewer_context?.following && u.viewer_context?.followed_by,
       );
     } else if (sort === 'zao') {
       users = users.filter((u: { isZaoMember?: boolean }) => u.isZaoMember);

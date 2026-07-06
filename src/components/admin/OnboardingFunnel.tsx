@@ -33,21 +33,14 @@ export default function OnboardingFunnel() {
     return (
       <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-16 rounded-lg bg-[#0d1b2a] animate-pulse"
-          />
+          <div key={i} className="h-16 rounded-lg bg-[#0d1b2a] animate-pulse" />
         ))}
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="rounded-lg bg-[#0d1b2a] p-4 text-red-400">
-        {error}
-      </div>
-    );
+    return <div className="rounded-lg bg-[#0d1b2a] p-4 text-red-400">{error}</div>;
   }
 
   const maxCount = Math.max(...stages.map((s) => s.count), 1);
@@ -55,17 +48,14 @@ export default function OnboardingFunnel() {
   return (
     <div className="space-y-1">
       <p className="text-sm text-gray-400 mb-4">
-        Member journey from invite to active contributor. Drop-offs show where
-        people get stuck.
+        Member journey from invite to active contributor. Drop-offs show where people get stuck.
       </p>
 
       {stages.map((stage, i) => {
         const prev = i > 0 ? stages[i - 1] : null;
         const dropCount = prev ? prev.count - stage.count : 0;
         const dropPct =
-          prev && prev.count > 0
-            ? ((prev.count - stage.count) / prev.count) * 100
-            : 0;
+          prev && prev.count > 0 ? ((prev.count - stage.count) / prev.count) * 100 : 0;
 
         return (
           <div key={stage.stage}>
@@ -81,16 +71,10 @@ export default function OnboardingFunnel() {
             <div className="rounded-lg bg-[#0d1b2a] p-3">
               <div className="flex items-center justify-between mb-1">
                 <div>
-                  <span className="text-sm font-medium text-white">
-                    {stage.stage}
-                  </span>
-                  <span className="ml-2 text-xs text-gray-500">
-                    {stage.description}
-                  </span>
+                  <span className="text-sm font-medium text-white">{stage.stage}</span>
+                  <span className="ml-2 text-xs text-gray-500">{stage.description}</span>
                 </div>
-                <span className="text-sm font-bold text-[#f5a623]">
-                  {stage.count}
-                </span>
+                <span className="text-sm font-bold text-[#f5a623]">{stage.count}</span>
               </div>
               <div className="h-2 rounded-full bg-[#0a1628] overflow-hidden">
                 <div

@@ -1,7 +1,7 @@
 'use client';
 
-import { usePlayerContext } from '@/providers/audio/PlayerProvider';
 import type { WidgetProps } from '@/lib/os/types';
+import { usePlayerContext } from '@/providers/audio/PlayerProvider';
 
 export default function NowPlayingWidget({ onExpand }: WidgetProps) {
   const { state } = usePlayerContext();
@@ -24,7 +24,7 @@ export default function NowPlayingWidget({ onExpand }: WidgetProps) {
           {hasTrack ? metadata.trackName : 'Now Playing'}
         </div>
         <div className="truncate text-xs text-white/50">
-          {hasTrack ? (metadata.artistName || 'Unknown artist') : 'Open music to start listening'}
+          {hasTrack ? metadata.artistName || 'Unknown artist' : 'Open music to start listening'}
         </div>
       </div>
     </button>

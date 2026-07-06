@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { getSupabaseBrowser } from '@/lib/db/supabase';
+import { useCallback, useEffect, useState } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { TrackMetadata } from '@/types/music';
 
 interface SongRequest {
@@ -38,7 +38,9 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
         const data = await res.json();
         setRequests(data.requests ?? []);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [roomId]);
 
   // Initial fetch on mount
@@ -58,7 +60,9 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [roomId, fetchRequests]);
 
   const handleSubmit = async () => {
@@ -79,11 +83,17 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
         setTitle('');
         await fetchRequests();
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setSubmitting(false);
   };
 
-  const handleAction = async (requestId: string, status: 'accepted' | 'rejected', req?: SongRequest) => {
+  const handleAction = async (
+    requestId: string,
+    status: 'accepted' | 'rejected',
+    req?: SongRequest,
+  ) => {
     try {
       const res = await fetch('/api/spaces/song-request', {
         method: 'PATCH',
@@ -103,7 +113,9 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
         addToQueue(track);
       }
       await fetchRequests();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
   const pendingRequests = requests.filter((r) => r.status === 'pending');
@@ -150,7 +162,14 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
               className="flex items-center gap-2.5 p-2 bg-white/5 rounded-lg border border-transparent"
             >
               {req.song_artwork ? (
-                <Image src={req.song_artwork || '/default-track.png'} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover flex-shrink-0" unoptimized />
+                <Image
+                  src={req.song_artwork || '/default-track.png'}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 rounded object-cover flex-shrink-0"
+                  unoptimized
+                />
               ) : (
                 <div className="w-8 h-8 rounded bg-[#f5a623]/10 flex items-center justify-center flex-shrink-0">
                   <RequestIcon />

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Hoisted mocks ────────────────────────────────────────────────────────────
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({
@@ -40,16 +40,23 @@ vi.mock('@/lib/music/isMusicUrl', () => ({
   isMusicUrl: vi.fn().mockReturnValue('spotify'),
 }));
 
+import { GET as chatMessagesGET } from '@/app/api/chat/messages/route';
 // ── Route imports ────────────────────────────────────────────────────────────
 import { POST as chatSendPOST } from '@/app/api/chat/send/route';
-import { GET as chatMessagesGET } from '@/app/api/chat/messages/route';
-import { GET as musicSubmissionsGET, POST as musicSubmissionsPOST, DELETE as musicSubmissionsDELETE } from '@/app/api/music/submissions/route';
-import { GET as notificationsGET, PATCH as notificationsPATCH } from '@/app/api/notifications/route';
-import { GET as respectLeaderboardGET } from '@/app/api/respect/leaderboard/route';
-import { GET as musicPlaylistsGET } from '@/app/api/music/playlists/route';
 import { GET as musicCuratorsGET } from '@/app/api/music/curators/route';
 import { GET as musicDigestGET } from '@/app/api/music/digest/route';
 import { GET as musicLyricsGET } from '@/app/api/music/lyrics/route';
+import { GET as musicPlaylistsGET } from '@/app/api/music/playlists/route';
+import {
+  DELETE as musicSubmissionsDELETE,
+  GET as musicSubmissionsGET,
+  POST as musicSubmissionsPOST,
+} from '@/app/api/music/submissions/route';
+import {
+  GET as notificationsGET,
+  PATCH as notificationsPATCH,
+} from '@/app/api/notifications/route';
+import { GET as respectLeaderboardGET } from '@/app/api/respect/leaderboard/route';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function makeRequest(url: string, options?: RequestInit) {
@@ -60,13 +67,33 @@ function makeRequest(url: string, options?: RequestInit) {
 type RouteHandler = (req: NextRequest) => Promise<Response>;
 
 const unauthRoutes: [string, string, RouteHandler, RequestInit?][] = [
-  ['POST /api/chat/send', '/api/chat/send', chatSendPOST, { method: 'POST', body: JSON.stringify({ text: 'hi' }) }],
+  [
+    'POST /api/chat/send',
+    '/api/chat/send',
+    chatSendPOST,
+    { method: 'POST', body: JSON.stringify({ text: 'hi' }) },
+  ],
   ['GET  /api/chat/messages', '/api/chat/messages?channel=zao', chatMessagesGET],
   ['GET  /api/music/submissions', '/api/music/submissions', musicSubmissionsGET],
-  ['POST /api/music/submissions', '/api/music/submissions', musicSubmissionsPOST, { method: 'POST', body: JSON.stringify({ url: 'https://open.spotify.com/track/123' }) }],
-  ['DELETE /api/music/submissions', '/api/music/submissions', musicSubmissionsDELETE, { method: 'DELETE', body: JSON.stringify({ id: 'abc' }) }],
+  [
+    'POST /api/music/submissions',
+    '/api/music/submissions',
+    musicSubmissionsPOST,
+    { method: 'POST', body: JSON.stringify({ url: 'https://open.spotify.com/track/123' }) },
+  ],
+  [
+    'DELETE /api/music/submissions',
+    '/api/music/submissions',
+    musicSubmissionsDELETE,
+    { method: 'DELETE', body: JSON.stringify({ id: 'abc' }) },
+  ],
   ['GET  /api/notifications', '/api/notifications', notificationsGET],
-  ['PATCH /api/notifications', '/api/notifications', notificationsPATCH, { method: 'PATCH', body: JSON.stringify({ all: true }) }],
+  [
+    'PATCH /api/notifications',
+    '/api/notifications',
+    notificationsPATCH,
+    { method: 'PATCH', body: JSON.stringify({ all: true }) },
+  ],
   ['GET  /api/respect/leaderboard', '/api/respect/leaderboard', respectLeaderboardGET],
   ['GET  /api/music/playlists', '/api/music/playlists', musicPlaylistsGET],
   ['GET  /api/music/curators', '/api/music/curators', musicCuratorsGET],

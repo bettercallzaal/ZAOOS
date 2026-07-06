@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { BroadcastTarget } from '@/lib/spaces/rtmpManager';
 
 interface ModalBroadcastTarget {
@@ -36,7 +36,14 @@ const PLATFORM_META: Record<string, { icon: string; color: string; label: string
   custom: { icon: '📡', color: 'text-gray-400', label: 'Custom RTMP' },
 };
 
-export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadcast, isBroadcasting, roomTitle }: BroadcastModalProps) {
+export function BroadcastModal({
+  isOpen,
+  onClose,
+  onStartBroadcast,
+  onStopBroadcast,
+  isBroadcasting,
+  roomTitle,
+}: BroadcastModalProps) {
   const [connectedPlatforms, setConnectedPlatforms] = useState<ConnectedPlatform[]>([]);
   const [customTargets, setCustomTargets] = useState<ModalBroadcastTarget[]>([]);
   const [mode, setMode] = useState<'direct' | 'relay'>('direct');
@@ -80,7 +87,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
 
   const togglePlatform = (id: string) => {
     setConnectedPlatforms((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p))
+      prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)),
     );
   };
 
@@ -102,7 +109,11 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
     setCustomTargets(customTargets.filter((t) => t.id !== id));
   };
 
-  const updateCustomTarget = (id: string, field: 'rtmpUrl' | 'streamKey' | 'name', value: string) => {
+  const updateCustomTarget = (
+    id: string,
+    field: 'rtmpUrl' | 'streamKey' | 'name',
+    value: string,
+  ) => {
     setCustomTargets((prev) => prev.map((t) => (t.id === id ? { ...t, [field]: value } : t)));
   };
 
@@ -237,9 +248,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                             <span className={`text-sm font-medium ${meta.color}`}>
                               {meta.label}
                             </span>
-                            <p className="text-gray-500 text-xs">
-                              Connected as {platform.name}
-                            </p>
+                            <p className="text-gray-500 text-xs">Connected as {platform.name}</p>
                           </div>
                         </div>
                         {/* Toggle switch */}
@@ -271,7 +280,10 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
             {/* Custom RTMP Section */}
             <div className="mb-2">
               {customTargets.map((target) => (
-                <div key={target.id} className="bg-[#0a1628] border border-white/[0.08] rounded-lg p-4 mb-3">
+                <div
+                  key={target.id}
+                  className="bg-[#0a1628] border border-white/[0.08] rounded-lg p-4 mb-3"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-medium text-sm text-gray-400">
                       {PLATFORM_META.custom.icon} Custom RTMP
@@ -317,13 +329,17 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
             </div>
 
             {/* Empty state when nothing is selected */}
-            {connectedPlatforms.length === 0 && customTargets.length === 0 && !fetchingPlatforms && (
-              <div className="text-center py-4 text-gray-500">
-                <p className="text-2xl mb-2">📡</p>
-                <p className="text-sm">Add a destination to start broadcasting</p>
-                <p className="text-xs mt-1">Your room audio will stream to connected platforms or any RTMP endpoint</p>
-              </div>
-            )}
+            {connectedPlatforms.length === 0 &&
+              customTargets.length === 0 &&
+              !fetchingPlatforms && (
+                <div className="text-center py-4 text-gray-500">
+                  <p className="text-2xl mb-2">📡</p>
+                  <p className="text-sm">Add a destination to start broadcasting</p>
+                  <p className="text-xs mt-1">
+                    Your room audio will stream to connected platforms or any RTMP endpoint
+                  </p>
+                </div>
+              )}
 
             {/* Mode toggle */}
             <div className="flex gap-2 mt-4 mb-1">
@@ -336,7 +352,11 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                 }`}
               >
                 <span>Direct</span>
-                <span className={`text-[10px] font-normal ${mode === 'direct' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}>Lower latency</span>
+                <span
+                  className={`text-[10px] font-normal ${mode === 'direct' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}
+                >
+                  Lower latency
+                </span>
               </button>
               <button
                 onClick={() => setMode('relay')}
@@ -347,11 +367,17 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                 }`}
               >
                 <span>Relay</span>
-                <span className={`text-[10px] font-normal ${mode === 'relay' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}>Stable for 3+</span>
+                <span
+                  className={`text-[10px] font-normal ${mode === 'relay' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}
+                >
+                  Stable for 3+
+                </span>
               </button>
             </div>
             {mode === 'direct' && enabledPlatformCount >= 3 && (
-              <p className="text-[10px] text-amber-400 mb-3">Relay mode recommended for 3+ platforms</p>
+              <p className="text-[10px] text-amber-400 mb-3">
+                Relay mode recommended for 3+ platforms
+              </p>
             )}
           </>
         )}
@@ -359,13 +385,18 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
         {isBroadcasting && (
           <div className="text-center py-4">
             <p className="text-green-400 text-sm mb-2">
-              Broadcasting to {allActivePlatforms.length} destination{allActivePlatforms.length !== 1 ? 's' : ''}
+              Broadcasting to {allActivePlatforms.length} destination
+              {allActivePlatforms.length !== 1 ? 's' : ''}
             </p>
             {allActivePlatforms.map((p) => {
-              const meta = PLATFORM_META[('platform' in p && typeof p.platform === 'string') ? p.platform : 'custom'];
+              const meta =
+                PLATFORM_META[
+                  'platform' in p && typeof p.platform === 'string' ? p.platform : 'custom'
+                ];
               return (
                 <div key={p.id} className="text-gray-400 text-xs">
-                  {meta.icon} {meta.label}{p.name ? ` — ${p.name}` : ''}
+                  {meta.icon} {meta.label}
+                  {p.name ? ` — ${p.name}` : ''}
                 </div>
               );
             })}

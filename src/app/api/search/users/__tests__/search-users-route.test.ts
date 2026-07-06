@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeGetRequest } from '@/test-utils/api-helpers';
 
 // ---------------------------------------------------------------------------
@@ -94,7 +94,12 @@ describe('GET /api/search/users', () => {
 
     expect(res.status).toBe(200);
     expect(body.users).toEqual([
-      { fid: 1, username: 'alice', display_name: 'Alice', pfp_url: 'https://example.com/alice.png' },
+      {
+        fid: 1,
+        username: 'alice',
+        display_name: 'Alice',
+        pfp_url: 'https://example.com/alice.png',
+      },
       { fid: 2, username: 'bob', display_name: 'Bob', pfp_url: 'https://example.com/bob.png' },
     ]);
     expect(mockSearchUsers).toHaveBeenCalledWith('al', 6);

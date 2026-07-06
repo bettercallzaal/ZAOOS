@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 interface BottomSheetProps {
   open: boolean;
@@ -56,7 +56,7 @@ export function BottomSheet({
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const handleClose = useCallback(() => {
@@ -78,17 +78,20 @@ export function BottomSheet({
     setIsDragging(true);
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging) return;
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isDragging) return;
 
-    const diff = e.touches[0].clientY - dragStartY.current;
-    // Only allow dragging down
-    if (diff < 0) {
-      setDragOffset(0);
-      return;
-    }
-    setDragOffset(diff);
-  }, [isDragging]);
+      const diff = e.touches[0].clientY - dragStartY.current;
+      // Only allow dragging down
+      if (diff < 0) {
+        setDragOffset(0);
+        return;
+      }
+      setDragOffset(diff);
+    },
+    [isDragging],
+  );
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
@@ -147,7 +150,13 @@ export function BottomSheet({
               aria-label="Close"
               className="text-gray-500 hover:text-gray-300 transition-colors p-1"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -155,9 +164,7 @@ export function BottomSheet({
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto overscroll-contain">{children}</div>
       </div>
     </>
   );

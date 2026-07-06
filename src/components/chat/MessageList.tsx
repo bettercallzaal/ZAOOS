@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useLayoutEffect } from 'react';
-import { Cast, QuotedCastData } from '@/types';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import type { Cast, QuotedCastData } from '@/types';
 import { Message } from './Message';
 
 interface MessageListProps {
@@ -22,7 +22,23 @@ interface MessageListProps {
   loadingMore?: boolean;
 }
 
-export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply, loading, channelId = 'zao', sortMode = 'newest', onLoadMore, hasMore = false, loadingMore = false }: MessageListProps) {
+export function MessageList({
+  messages,
+  isAdmin,
+  currentFid,
+  hasSigner,
+  onHide,
+  onOpenThread,
+  onQuote,
+  onOpenProfile,
+  onReply,
+  loading,
+  channelId = 'zao',
+  sortMode = 'newest',
+  onLoadMore,
+  hasMore = false,
+  loadingMore = false,
+}: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
@@ -80,8 +96,10 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
   useEffect(() => {
     if (!onLoadMore || !hasMore) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) onLoadMore(); },
-      { threshold: 0.1 }
+      ([entry]) => {
+        if (entry.isIntersecting) onLoadMore();
+      },
+      { threshold: 0.1 },
     );
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
@@ -103,8 +121,18 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center px-6">
           <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[#f5a623]/10 flex items-center justify-center">
-            <svg className="w-7 h-7 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+            <svg
+              className="w-7 h-7 text-[#f5a623]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+              />
             </svg>
           </div>
           <p className="text-white font-semibold text-base mb-1">No posts yet</p>

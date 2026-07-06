@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -24,12 +24,20 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const sanitized = sanitizeSubname(parsed.data.requestedName);
     if (!isValidSubname(sanitized)) {
-      return NextResponse.json({ error: `Invalid name: "${parsed.data.requestedName}". Use lowercase letters, numbers, and hyphens only.` }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Invalid name: "${parsed.data.requestedName}". Use lowercase letters, numbers, and hyphens only.`,
+        },
+        { status: 400 },
+      );
     }
 
     // Check for existing pending request
@@ -41,7 +49,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json({ error: 'You already have a pending name change request' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'You already have a pending name change request' },
+        { status: 409 },
+      );
     }
 
     // Get current subname
@@ -52,14 +63,12 @@ export async function POST(req: NextRequest) {
       .single();
 
     // Create request
-    const { error: insertError } = await supabaseAdmin
-      .from('subname_requests')
-      .insert({
-        fid: session.fid,
-        current_name: user?.zao_subname || null,
-        requested_name: sanitized,
-        status: 'pending',
-      });
+    const { error: insertError } = await supabaseAdmin.from('subname_requests').insert({
+      fid: session.fid,
+      current_name: user?.zao_subname || null,
+      requested_name: sanitized,
+      status: 'pending',
+    });
 
     if (insertError) {
       logger.error('[ens/subname-request] insert error:', insertError);

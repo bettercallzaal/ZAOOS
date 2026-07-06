@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     });
 
     if (!parsed.success) {
-      return new Response('Bad request: ' + parsed.error.issues.map(i => i.message).join(', '), {
+      return new Response('Bad request: ' + parsed.error.issues.map((i) => i.message).join(', '), {
         status: 400,
         headers: { 'Content-Type': 'text/plain' },
       });
@@ -79,9 +79,10 @@ export async function GET(request: Request) {
   <rect x="1" y="1" width="${W - 2}" height="${H - 2}" rx="0" fill="none" stroke="#f5a623" stroke-opacity="0.08" stroke-width="2"/>
 
   <!-- Artwork -->
-  ${artwork
-    ? `<image href="${escapeXml(artwork)}" x="${artX}" y="${artY}" width="${artSize}" height="${artSize}" clip-path="url(#artClip)" preserveAspectRatio="xMidYMid slice"/>`
-    : `<rect x="${artX}" y="${artY}" width="${artSize}" height="${artSize}" rx="24" fill="#1a2a3a"/>
+  ${
+    artwork
+      ? `<image href="${escapeXml(artwork)}" x="${artX}" y="${artY}" width="${artSize}" height="${artSize}" clip-path="url(#artClip)" preserveAspectRatio="xMidYMid slice"/>`
+      : `<rect x="${artX}" y="${artY}" width="${artSize}" height="${artSize}" rx="24" fill="#1a2a3a"/>
        <text x="${artX + artSize / 2}" y="${artY + artSize / 2 + 20}" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="64" fill="#f5a623" opacity="0.4">&#9835;</text>`
   }
 
@@ -102,10 +103,12 @@ export async function GET(request: Request) {
 
   <!-- Playback bars (decorative) -->
   <g transform="translate(${textX}, 400)" opacity="0.5">
-    ${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
-      const barH = 12 + ((i * 7 + 3) % 20);
-      return `<rect x="${i * 10}" y="${30 - barH}" width="5" height="${barH}" rx="2.5" fill="#f5a623"/>`;
-    }).join('\n    ')}
+    ${[0, 1, 2, 3, 4, 5, 6, 7]
+      .map((i) => {
+        const barH = 12 + ((i * 7 + 3) % 20);
+        return `<rect x="${i * 10}" y="${30 - barH}" width="5" height="${barH}" rx="2.5" fill="#f5a623"/>`;
+      })
+      .join('\n    ')}
   </g>
 
   <!-- Footer -->

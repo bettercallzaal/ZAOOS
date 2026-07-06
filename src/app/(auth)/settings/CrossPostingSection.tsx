@@ -8,7 +8,6 @@ export function CrossPostingSection() {
         <span className="text-[10px] text-gray-600">Community broadcasts</span>
       </div>
       <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
-
         {/* Telegram */}
         <div className="flex items-center gap-3 px-5 py-4">
           <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center flex-shrink-0">
@@ -19,9 +18,13 @@ export function CrossPostingSection() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-white">Telegram</p>
-              <span className="px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 text-[10px] font-medium">Channel</span>
+              <span className="px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 text-[10px] font-medium">
+                Channel
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">Community posts are automatically shared to the ZAO Telegram channel</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Community posts are automatically shared to the ZAO Telegram channel
+            </p>
           </div>
           <a
             href="https://t.me/thezao"
@@ -43,9 +46,13 @@ export function CrossPostingSection() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-white">Discord</p>
-              <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-medium">Server</span>
+              <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-medium">
+                Server
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">Community posts are automatically shared to the ZAO Discord</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Community posts are automatically shared to the ZAO Discord
+            </p>
           </div>
           <a
             href="https://discord.gg/thezao"
@@ -67,17 +74,24 @@ export function CrossPostingSection() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-white">Farcaster</p>
-              <span className="px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-medium">Connected</span>
+              <span className="px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-medium">
+                Connected
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">All approved proposals auto-publish to Farcaster</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              All approved proposals auto-publish to Farcaster
+            </p>
           </div>
         </div>
 
         {/* Admin hint */}
         <div className="px-5 py-3">
           <p className="text-[10px] text-gray-600">
-            Approved community proposals with 1000+ Respect automatically cross-post to all connected platforms.
-            Admins: configure <span className="font-mono text-gray-500">TELEGRAM_BOT_TOKEN</span>, <span className="font-mono text-gray-500">TELEGRAM_CHAT_ID</span>, and <span className="font-mono text-gray-500">DISCORD_WEBHOOK_URL</span> in env vars.
+            Approved community proposals with 1000+ Respect automatically cross-post to all
+            connected platforms. Admins: configure{' '}
+            <span className="font-mono text-gray-500">TELEGRAM_BOT_TOKEN</span>,{' '}
+            <span className="font-mono text-gray-500">TELEGRAM_CHAT_ID</span>, and{' '}
+            <span className="font-mono text-gray-500">DISCORD_WEBHOOK_URL</span> in env vars.
           </p>
         </div>
       </div>

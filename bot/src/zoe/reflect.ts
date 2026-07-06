@@ -10,6 +10,7 @@
  * captures them as Bonfire-eligible notes (status + priorities update).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
+import { recordCall } from './cost-ledger';
 import { listOpenTasks } from './tasks';
 import { listLiveThreads, isOverdue, type OpenThread } from './threads';
 
@@ -124,6 +125,8 @@ ${
     permissionMode: 'default',
     bare: false,
   });
+
+  recordCall('reflect', result);
 
   const trimmed = result.text.trim();
   if (trimmed.length < 60) {

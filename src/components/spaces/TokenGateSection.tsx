@@ -73,9 +73,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
 
       {enabled && (
         <div className="space-y-3 p-3 bg-[#0a1628] border border-white/[0.08] rounded-xl">
-          <p className="text-gray-500 text-xs">
-            Require a token to join this room
-          </p>
+          <p className="text-gray-500 text-xs">Require a token to join this room</p>
 
           {/* Token type */}
           <div className="grid grid-cols-3 gap-1.5">
@@ -108,7 +106,9 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
               className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-xs focus:border-[#f5a623] focus:outline-none"
             >
               {CHAINS.map((c) => (
-                <option key={c.id} value={c.id}>{c.label}</option>
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
               ))}
             </select>
           </div>

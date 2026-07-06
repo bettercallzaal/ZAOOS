@@ -1,16 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 import { logger } from '@/lib/logger';
 
 /**
  * DELETE — Permanently delete a room (admin only)
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSessionData();
     if (!session) {
@@ -22,10 +19,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const { error } = await supabaseAdmin
-      .from('rooms')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('rooms').delete().eq('id', id);
 
     if (error) {
       logger.error('Admin delete space error:', error);

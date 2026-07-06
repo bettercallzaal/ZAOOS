@@ -37,7 +37,7 @@ const REFRESH_BUFFER_MS = 10 * 60 * 1000; // refresh if within 10 min of expiry
  * Automatically refreshes the token if it is within 10 minutes of expiry.
  */
 export async function getValidTwitchToken(
-  fid: number
+  fid: number,
 ): Promise<{ accessToken: string; userId: string } | null> {
   const { data: row, error } = await supabaseAdmin
     .from('connected_platforms')
@@ -66,7 +66,7 @@ export async function getValidTwitchToken(
 
 async function refreshTwitchToken(
   fid: number,
-  refreshToken: string
+  refreshToken: string,
 ): Promise<{ accessToken: string; refreshToken: string } | null> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   const clientSecret = process.env.TWITCH_CLIENT_SECRET;
@@ -134,7 +134,7 @@ async function refreshTwitchToken(
 export async function updateTwitchChannel(
   accessToken: string,
   userId: string,
-  opts: { title?: string; gameId?: string }
+  opts: { title?: string; gameId?: string },
 ): Promise<boolean> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) {
@@ -180,7 +180,7 @@ export async function updateTwitchChannel(
  */
 export async function getTwitchStreamInfo(
   accessToken: string,
-  userId: string
+  userId: string,
 ): Promise<StreamInfo | null> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return null;
@@ -193,7 +193,7 @@ export async function getTwitchStreamInfo(
           Authorization: `Bearer ${accessToken}`,
           'Client-Id': clientId,
         },
-      }
+      },
     );
 
     if (!res.ok) {
@@ -233,7 +233,7 @@ export async function getTwitchStreamInfo(
 export async function createTwitchMarker(
   accessToken: string,
   userId: string,
-  description?: string
+  description?: string,
 ): Promise<boolean> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return false;
@@ -275,7 +275,7 @@ export async function createTwitchMarker(
 export async function createTwitchPoll(
   accessToken: string,
   userId: string,
-  opts: { title: string; choices: string[]; duration?: number }
+  opts: { title: string; choices: string[]; duration?: number },
 ): Promise<{ id: string } | null> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return null;
@@ -319,7 +319,7 @@ export async function endTwitchPoll(
   accessToken: string,
   userId: string,
   pollId: string,
-  status: 'TERMINATED' | 'ARCHIVED'
+  status: 'TERMINATED' | 'ARCHIVED',
 ): Promise<boolean> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return false;
@@ -361,7 +361,7 @@ export async function endTwitchPoll(
 export async function createTwitchPrediction(
   accessToken: string,
   userId: string,
-  opts: { title: string; outcomes: string[]; duration?: number }
+  opts: { title: string; outcomes: string[]; duration?: number },
 ): Promise<{ id: string; outcomes: { id: string; title: string }[] } | null> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return null;
@@ -411,7 +411,7 @@ export async function endTwitchPrediction(
   accessToken: string,
   userId: string,
   predictionId: string,
-  winningOutcomeId: string
+  winningOutcomeId: string,
 ): Promise<boolean> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return false;
@@ -454,7 +454,7 @@ export async function endTwitchPrediction(
  */
 export async function createTwitchClip(
   accessToken: string,
-  userId: string
+  userId: string,
 ): Promise<{ id: string; editUrl: string } | null> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) return null;
@@ -468,7 +468,7 @@ export async function createTwitchClip(
           Authorization: `Bearer ${accessToken}`,
           'Client-Id': clientId,
         },
-      }
+      },
     );
 
     if (!res.ok) {

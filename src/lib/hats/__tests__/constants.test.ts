@@ -1,5 +1,12 @@
-import { describe, it, expect } from 'vitest';
-import { HAT_IDS, PROJECT_HAT_IDS, HAT_LABELS, formatHatId, TREE_ID, HATS_CHAIN_ID } from '@/lib/hats/constants';
+import { describe, expect, it } from 'vitest';
+import {
+  formatHatId,
+  HAT_IDS,
+  HAT_LABELS,
+  HATS_CHAIN_ID,
+  PROJECT_HAT_IDS,
+  TREE_ID,
+} from '@/lib/hats/constants';
 
 describe('Hats constants', () => {
   it('has correct tree ID and chain', () => {

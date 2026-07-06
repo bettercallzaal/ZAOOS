@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { usePlayer } from '@/providers/audio';
-import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
+import { usePlayer } from '@/providers/audio';
 
 export interface NowPlayingEntry {
   fid: number;
@@ -60,9 +60,7 @@ export function useNowPlaying(user: { fid: number; username: string } | null) {
       config: { presence: { key: String(user.fid) } },
     });
 
-    channel
-      .on('presence', { event: 'sync' }, syncPresence)
-      .subscribe();
+    channel.on('presence', { event: 'sync' }, syncPresence).subscribe();
 
     channelRef.current = channel;
 

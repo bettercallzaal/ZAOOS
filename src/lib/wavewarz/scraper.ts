@@ -1,6 +1,6 @@
-import { INTELLIGENCE_BASE } from './constants';
-import { parseWaveWarzArtistPage } from '@/lib/scrape/wavewarz';
 import { logger } from '@/lib/logger';
+import { parseWaveWarzArtistPage } from '@/lib/scrape/wavewarz';
+import { INTELLIGENCE_BASE } from './constants';
 
 export interface ArtistStats {
   name: string;

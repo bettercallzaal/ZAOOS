@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { ENV } from '@/lib/env';
-import { castHashSchema } from '@/lib/validation/schemas';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { createInAppNotification } from '@/lib/notifications';
+import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { createInAppNotification } from '@/lib/notifications';
+import { castHashSchema } from '@/lib/validation/schemas';
 
 const reactSchema = z.object({
   type: z.enum(['like', 'recast']),
@@ -53,11 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Fire-and-forget notification to cast author
     Promise.resolve(
-      supabaseAdmin
-        .from('channel_casts')
-        .select('fid, author_display')
-        .eq('hash', hash)
-        .single()
+      supabaseAdmin.from('channel_casts').select('fid, author_display').eq('hash', hash).single(),
     )
       .then(({ data: castData }) => {
         if (castData && castData.fid !== session.fid) {

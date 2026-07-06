@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function LastfmConnect() {
-  const [status, setStatus] = useState<{ connected: boolean; connectUrl: string | null } | null>(null);
+  const [status, setStatus] = useState<{ connected: boolean; connectUrl: string | null } | null>(
+    null,
+  );
   const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
-    fetch('/api/auth/lastfm').then(r => r.json()).then(setStatus).catch(() => {});
+    fetch('/api/auth/lastfm')
+      .then((r) => r.json())
+      .then(setStatus)
+      .catch(() => {});
   }, []);
 
   if (!status) return null;
@@ -42,7 +47,9 @@ export function LastfmConnect() {
         )}
       </div>
       {status.connected && (
-        <p className="text-[10px] text-green-400 mt-2">Connected — your plays are being scrobbled</p>
+        <p className="text-[10px] text-green-400 mt-2">
+          Connected — your plays are being scrobbled
+        </p>
       )}
     </div>
   );

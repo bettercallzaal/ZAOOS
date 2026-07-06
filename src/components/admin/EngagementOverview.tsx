@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface PublishLogRef {
   cast_hash: string | null;
@@ -50,9 +50,8 @@ function computeStats(metrics: MetricRow[]): AggregateStats {
   const totalReplies = posts.reduce((s, p) => s + p.replies, 0);
   const totalReposts = posts.reduce((s, p) => s + p.reposts, 0);
   const totalEngagement = totalLikes + totalReplies + totalReposts;
-  const avgEngagement = posts.length > 0
-    ? Math.round((totalEngagement / posts.length) * 10) / 10
-    : 0;
+  const avgEngagement =
+    posts.length > 0 ? Math.round((totalEngagement / posts.length) * 10) / 10 : 0;
 
   return {
     totalPosts: posts.length,
@@ -124,11 +123,7 @@ export function EngagementOverview() {
   }
 
   if (error) {
-    return (
-      <div className="flex items-center justify-center py-16 text-red-400">
-        {error}
-      </div>
-    );
+    return <div className="flex items-center justify-center py-16 text-red-400">{error}</div>;
   }
 
   const stats = computeStats(metrics);
@@ -149,9 +144,7 @@ export function EngagementOverview() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">
-          Threads Engagement
-        </h2>
+        <h2 className="text-lg font-semibold text-white">Threads Engagement</h2>
         <button
           onClick={handleCollect}
           disabled={collecting}
@@ -222,21 +215,15 @@ export function EngagementOverview() {
                       </span>
                     )}
                   </td>
-                  <td className="py-2 px-3 text-right text-gray-300">
-                    {formatNumber(row.views)}
-                  </td>
-                  <td className="py-2 px-3 text-right text-gray-300">
-                    {formatNumber(row.likes)}
-                  </td>
+                  <td className="py-2 px-3 text-right text-gray-300">{formatNumber(row.views)}</td>
+                  <td className="py-2 px-3 text-right text-gray-300">{formatNumber(row.likes)}</td>
                   <td className="py-2 px-3 text-right text-gray-300">
                     {formatNumber(row.replies)}
                   </td>
                   <td className="py-2 px-3 text-right text-gray-300">
                     {formatNumber(row.reposts)}
                   </td>
-                  <td className="py-2 px-3 text-right text-gray-300">
-                    {formatNumber(row.quotes)}
-                  </td>
+                  <td className="py-2 px-3 text-right text-gray-300">{formatNumber(row.quotes)}</td>
                   <td className="py-2 pl-3 text-right text-gray-400 text-xs">
                     {new Date(row.fetched_at).toLocaleDateString()}
                   </td>

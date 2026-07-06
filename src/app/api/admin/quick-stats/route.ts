@@ -28,9 +28,7 @@ export async function GET() {
       dormantUsers,
     ] = await Promise.all([
       // Total respect_members count
-      supabaseAdmin
-        .from('respect_members')
-        .select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('respect_members').select('*', { count: 'exact', head: true }),
 
       // Active members (fractal_count > 0)
       supabaseAdmin
@@ -45,9 +43,7 @@ export async function GET() {
         .not('fid', 'is', null),
 
       // Total fractal_sessions
-      supabaseAdmin
-        .from('fractal_sessions')
-        .select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('fractal_sessions').select('*', { count: 'exact', head: true }),
 
       // Sessions this week
       supabaseAdmin
@@ -56,9 +52,7 @@ export async function GET() {
         .gte('session_date', sevenDaysAgo),
 
       // Sum of all total_respect
-      supabaseAdmin
-        .from('respect_members')
-        .select('total_respect'),
+      supabaseAdmin.from('respect_members').select('total_respect'),
 
       // Audit log actions this week
       supabaseAdmin
@@ -76,7 +70,7 @@ export async function GET() {
 
     const totalRespect = (respectSum.data || []).reduce(
       (sum: number, r: { total_respect: number | null }) => sum + (r.total_respect || 0),
-      0
+      0,
     );
 
     const totalMembersCount = totalMembers.count || 0;

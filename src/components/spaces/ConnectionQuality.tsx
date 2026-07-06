@@ -32,32 +32,11 @@ export function ConnectionQuality() {
         className="block"
       >
         {/* Bar 1 (shortest, left) */}
-        <rect
-          x="1"
-          y="10"
-          width="3"
-          height="5"
-          rx="0.5"
-          fill={bars >= 1 ? color : '#374151'}
-        />
+        <rect x="1" y="10" width="3" height="5" rx="0.5" fill={bars >= 1 ? color : '#374151'} />
         {/* Bar 2 (medium, center) */}
-        <rect
-          x="6"
-          y="6"
-          width="3"
-          height="9"
-          rx="0.5"
-          fill={bars >= 2 ? color : '#374151'}
-        />
+        <rect x="6" y="6" width="3" height="9" rx="0.5" fill={bars >= 2 ? color : '#374151'} />
         {/* Bar 3 (tallest, right) */}
-        <rect
-          x="11"
-          y="2"
-          width="3"
-          height="13"
-          rx="0.5"
-          fill={bars >= 3 ? color : '#374151'}
-        />
+        <rect x="11" y="2" width="3" height="13" rx="0.5" fill={bars >= 3 ? color : '#374151'} />
       </svg>
 
       {/* Tooltip */}

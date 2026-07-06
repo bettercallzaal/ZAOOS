@@ -1,12 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { uploadToArweave, buildMusicTags, isArweaveConfigured } from '@/lib/music/arweave';
-import type { LicensePreset } from '@/lib/music/arweave';
 import { logger } from '@/lib/logger';
+import type { LicensePreset } from '@/lib/music/arweave';
+import { buildMusicTags, isArweaveConfigured, uploadToArweave } from '@/lib/music/arweave';
 
-const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/flac', 'audio/ogg', 'audio/aac'];
+const ALLOWED_AUDIO_TYPES = [
+  'audio/mpeg',
+  'audio/mp4',
+  'audio/wav',
+  'audio/flac',
+  'audio/ogg',
+  'audio/aac',
+];
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_AUDIO_SIZE = 50 * 1024 * 1024;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -39,7 +46,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Audio file required' }, { status: 400 });
     }
     if (!ALLOWED_AUDIO_TYPES.includes(audioFile.type)) {
-      return NextResponse.json({ error: `Invalid audio type: ${audioFile.type}. Allowed: MP3, MP4, WAV, FLAC, OGG, AAC` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Invalid audio type: ${audioFile.type}. Allowed: MP3, MP4, WAV, FLAC, OGG, AAC` },
+        { status: 400 },
+      );
     }
     if (audioFile.size > MAX_AUDIO_SIZE) {
       return NextResponse.json({ error: 'Audio file too large (max 50MB)' }, { status: 400 });
@@ -47,7 +57,10 @@ export async function POST(req: NextRequest) {
 
     if (coverFile) {
       if (!ALLOWED_IMAGE_TYPES.includes(coverFile.type)) {
-        return NextResponse.json({ error: `Invalid image type: ${coverFile.type}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Invalid image type: ${coverFile.type}` },
+          { status: 400 },
+        );
       }
       if (coverFile.size > MAX_IMAGE_SIZE) {
         return NextResponse.json({ error: 'Cover image too large (max 5MB)' }, { status: 400 });
@@ -67,7 +80,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = MetadataSchema.safeParse(metadataJson);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid metadata', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid metadata', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const metadata = parsed.data;

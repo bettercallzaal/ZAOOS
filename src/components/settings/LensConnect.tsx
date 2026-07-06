@@ -101,7 +101,7 @@ export function LensConnect({ initialHandle, onStatusChange }: LensConnectProps)
       </div>
 
       {/* Help text, errors, success */}
-      {(!walletAddress && !displayHandle) && (
+      {!walletAddress && !displayHandle && (
         <div className="px-4 pb-3">
           <p className="text-xs text-gray-500">Connect your wallet above to link Lens</p>
         </div>

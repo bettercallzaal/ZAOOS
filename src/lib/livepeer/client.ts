@@ -7,7 +7,7 @@ export interface LivepeerStream {
 
 export async function createLivepeerStream(
   name: string,
-  targets: Array<{ platform: string; rtmpUrl: string; streamKey: string }>
+  targets: Array<{ platform: string; rtmpUrl: string; streamKey: string }>,
 ): Promise<LivepeerStream> {
   const res = await fetch('/api/livepeer/stream', {
     method: 'POST',
@@ -35,7 +35,7 @@ export async function createClip(
   playbackId: string,
   startTime: number,
   endTime: number,
-  name?: string
+  name?: string,
 ) {
   const res = await fetch('/api/livepeer/clip', {
     method: 'POST',

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { searchUsers } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';

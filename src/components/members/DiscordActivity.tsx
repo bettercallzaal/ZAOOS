@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface DiscordStats {
   fractal: {
@@ -26,8 +26,10 @@ export default function DiscordActivity({ discordId }: { discordId: string | nul
       return;
     }
     fetch(`/api/discord/member-stats?discord_id=${encodeURIComponent(discordId)}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setStats(data); })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setStats(data);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [discordId]);
@@ -38,9 +40,7 @@ export default function DiscordActivity({ discordId }: { discordId: string | nul
 
   // Don't render if there's no meaningful activity
   const hasActivity =
-    fractal.participationCount > 0 ||
-    governance.proposalsCreated > 0 ||
-    governance.votesCast > 0;
+    fractal.participationCount > 0 || governance.proposalsCreated > 0 || governance.votesCast > 0;
 
   if (!hasActivity) return null;
 
@@ -76,20 +76,10 @@ export default function DiscordActivity({ discordId }: { discordId: string | nul
 
         {/* Governance Stats */}
         {governance.proposalsCreated > 0 && (
-          <StatCard
-            icon="📝"
-            label="Proposals"
-            value={governance.proposalsCreated}
-            sub="created"
-          />
+          <StatCard icon="📝" label="Proposals" value={governance.proposalsCreated} sub="created" />
         )}
         {governance.votesCast > 0 && (
-          <StatCard
-            icon="🗳"
-            label="Votes Cast"
-            value={governance.votesCast}
-            sub="on proposals"
-          />
+          <StatCard icon="🗳" label="Votes Cast" value={governance.votesCast} sub="on proposals" />
         )}
         {governance.totalRespectWeight > 0 && (
           <StatCard

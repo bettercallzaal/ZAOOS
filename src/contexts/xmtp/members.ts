@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback } from 'react';
-import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 import type { Dm, Group } from '@xmtp/browser-sdk';
-import type { XMTPSharedRefs, XMTPSharedState, ZaoMember, AnyClient } from '@/contexts/xmtp/types';
+import { useCallback } from 'react';
+import type { AnyClient, XMTPSharedRefs, XMTPSharedState, ZaoMember } from '@/contexts/xmtp/types';
+import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 
 /**
  * Hook for ZAO member discovery, DM creation, and inbox resolution.
@@ -14,12 +14,8 @@ export function useMembers(
   loadAllConversations: () => Promise<void>,
   selectConversation: (id: string | null) => void,
 ) {
-  const {
-    walletsRef, messagingPrefsRef, zaoMembersRef,
-  } = refs;
-  const {
-    setZaoMembers, setLoadingMembers, showActionError,
-  } = state;
+  const { walletsRef, messagingPrefsRef, zaoMembersRef } = refs;
+  const { setZaoMembers, setLoadingMembers, showActionError } = state;
 
   /**
    * Get the first connected XMTP client.
@@ -122,7 +118,9 @@ export function useMembers(
       console.debug(`[XMTP] ${reachable.length} reachable peers found`);
 
       // Resolve XMTP inbox IDs BEFORE starting streams (prevents "Unknown sender")
-      const reachableMembersForInbox = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
+      const reachableMembersForInbox = mapped.filter(
+        (m: ZaoMember) => m.reachable && m.addresses.length > 0,
+      );
       if (reachableMembersForInbox.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
@@ -130,22 +128,26 @@ export function useMembers(
           const PARALLEL = 10;
           for (let i = 0; i < reachableMembersForInbox.length; i += PARALLEL) {
             const batch = reachableMembersForInbox.slice(i, i + PARALLEL);
-            await Promise.allSettled(batch.map(async (m) => {
-              const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
-                identifierKind: IdentifierKind.Ethereum,
-                identifier: m.xmtpAddress || m.addresses[0] || '',
-              });
-              if (inboxId) {
-                saveMemberProfile(inboxId, {
-                  fid: m.fid ?? 0,
-                  username: m.username ?? m.displayName,
-                  displayName: m.displayName,
-                  pfpUrl: m.pfpUrl ?? '',
+            await Promise.allSettled(
+              batch.map(async (m) => {
+                const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
+                  identifierKind: IdentifierKind.Ethereum,
+                  identifier: m.xmtpAddress || m.addresses[0] || '',
                 });
-              }
-            }));
+                if (inboxId) {
+                  saveMemberProfile(inboxId, {
+                    fid: m.fid ?? 0,
+                    username: m.username ?? m.displayName,
+                    displayName: m.displayName,
+                    pfpUrl: m.pfpUrl ?? '',
+                  });
+                }
+              }),
+            );
           }
-          console.debug(`[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`);
+          console.debug(
+            `[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`,
+          );
         } catch (err) {
           console.error('[XMTP] Inbox ID resolution failed:', err);
         }
@@ -154,7 +156,9 @@ export function useMembers(
       await loadAllConversations();
 
       // Auto-create ZAO General for reachable ZAO members (if user has autoJoinGroup enabled)
-      const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
+      const reachableMembers = mapped.filter(
+        (m: ZaoMember) => m.reachable && m.addresses.length > 0,
+      );
       if (reachableMembers.length > 0 && messagingPrefsRef.current.autoJoinGroup) {
         const ZAO_GROUP_KEY = 'zaoos-xmtp-zao-general';
         let groupExists = false;
@@ -173,10 +177,12 @@ export function useMembers(
         if (!groupExists) {
           try {
             const { IdentifierKind } = await import('@xmtp/browser-sdk');
-            const identifiers = reachableMembers.filter((m: ZaoMember) => m.addresses.length > 0).map((m: ZaoMember) => ({
-              identifierKind: IdentifierKind.Ethereum,
-              identifier: m.xmtpAddress || m.addresses[0],
-            }));
+            const identifiers = reachableMembers
+              .filter((m: ZaoMember) => m.addresses.length > 0)
+              .map((m: ZaoMember) => ({
+                identifierKind: IdentifierKind.Ethereum,
+                identifier: m.xmtpAddress || m.addresses[0],
+              }));
             const conv = await xmtpClient.conversations.createGroupWithIdentifiers(identifiers, {
               groupName: 'ZAO General',
               groupDescription: 'General chat for all ZAO members',
@@ -193,74 +199,89 @@ export function useMembers(
     } finally {
       setLoadingMembers(false);
     }
-  }, [walletsRef, messagingPrefsRef, zaoMembersRef, setZaoMembers, setLoadingMembers, loadAllConversations]);
+  }, [
+    walletsRef,
+    messagingPrefsRef,
+    zaoMembersRef,
+    setZaoMembers,
+    setLoadingMembers,
+    loadAllConversations,
+  ]);
 
   /**
    * Create or find existing DM. Uses getDmByInboxId to avoid duplicates.
    */
-  const createDm = useCallback(async (peerAddress: `0x${string}`, peerProfile?: XMTPPeerProfile) => {
-    const client = getFirstClient();
-    if (!client) return null;
+  const createDm = useCallback(
+    async (peerAddress: `0x${string}`, peerProfile?: XMTPPeerProfile) => {
+      const client = getFirstClient();
+      if (!client) return null;
 
-    try {
-      const { IdentifierKind } = await import('@xmtp/browser-sdk');
+      try {
+        const { IdentifierKind } = await import('@xmtp/browser-sdk');
 
-      const inboxId = await client.fetchInboxIdByIdentifier({
-        identifierKind: IdentifierKind.Ethereum,
-        identifier: peerAddress,
-      });
-      if (inboxId) {
-        const existing = await client.conversations.getDmByInboxId(inboxId);
-        if (existing) {
-          if (peerProfile) {
-            const { savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
-            savePeerProfile(existing.id, peerProfile);
-            saveMemberProfile(inboxId, peerProfile);
+        const inboxId = await client.fetchInboxIdByIdentifier({
+          identifierKind: IdentifierKind.Ethereum,
+          identifier: peerAddress,
+        });
+        if (inboxId) {
+          const existing = await client.conversations.getDmByInboxId(inboxId);
+          if (existing) {
+            if (peerProfile) {
+              const { savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
+              savePeerProfile(existing.id, peerProfile);
+              saveMemberProfile(inboxId, peerProfile);
+            }
+            await loadAllConversations();
+            return existing.id;
           }
-          await loadAllConversations();
-          return existing.id;
         }
+
+        const conv = await client.conversations.createDmWithIdentifier({
+          identifierKind: IdentifierKind.Ethereum,
+          identifier: peerAddress,
+        });
+
+        if (peerProfile) {
+          const { savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
+          savePeerProfile(conv.id, peerProfile);
+          try {
+            const peerInboxId = await (conv as Dm).peerInboxId();
+            if (peerInboxId) saveMemberProfile(peerInboxId, peerProfile);
+          } catch {
+            /* non-critical */
+          }
+        }
+
+        await loadAllConversations();
+        return conv.id;
+      } catch (err) {
+        console.error('[XMTP] Failed to create DM:', err);
+        showActionError('Failed to start conversation. The recipient may not have XMTP enabled.');
+        return null;
       }
-
-      const conv = await client.conversations.createDmWithIdentifier({
-        identifierKind: IdentifierKind.Ethereum,
-        identifier: peerAddress,
-      });
-
-      if (peerProfile) {
-        const { savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
-        savePeerProfile(conv.id, peerProfile);
-        try {
-          const peerInboxId = await (conv as Dm).peerInboxId();
-          if (peerInboxId) saveMemberProfile(peerInboxId, peerProfile);
-        } catch { /* non-critical */ }
-      }
-
-      await loadAllConversations();
-      return conv.id;
-    } catch (err) {
-      console.error('[XMTP] Failed to create DM:', err);
-      showActionError('Failed to start conversation. The recipient may not have XMTP enabled.');
-      return null;
-    }
-  }, [getFirstClient, loadAllConversations, showActionError]);
+    },
+    [getFirstClient, loadAllConversations, showActionError],
+  );
 
   /**
    * Start a DM with a ZAO member (convenience wrapper).
    */
-  const startDmWithMember = useCallback(async (member: ZaoMember) => {
-    if (member.addresses.length === 0) return;
-    // Use the address that passed canMessage, fall back to first address
-    const addr = (member.xmtpAddress || member.addresses[0]) as `0x${string}`;
-    const profile: XMTPPeerProfile = {
-      fid: member.fid ?? 0,
-      username: member.username ?? member.displayName,
-      displayName: member.displayName,
-      pfpUrl: member.pfpUrl ?? '',
-    };
-    const convId = await createDm(addr, profile);
-    if (convId) selectConversation(convId);
-  }, [createDm, selectConversation]);
+  const startDmWithMember = useCallback(
+    async (member: ZaoMember) => {
+      if (member.addresses.length === 0) return;
+      // Use the address that passed canMessage, fall back to first address
+      const addr = (member.xmtpAddress || member.addresses[0]) as `0x${string}`;
+      const profile: XMTPPeerProfile = {
+        fid: member.fid ?? 0,
+        username: member.username ?? member.displayName,
+        displayName: member.displayName,
+        pfpUrl: member.pfpUrl ?? '',
+      };
+      const convId = await createDm(addr, profile);
+      if (convId) selectConversation(convId);
+    },
+    [createDm, selectConversation],
+  );
 
   return {
     getFirstClient,

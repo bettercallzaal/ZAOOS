@@ -39,7 +39,9 @@ export interface UpsertSongParams {
  * Add a song to the library or update play count if it already exists.
  * Deduplicates on URL. Called from chat send, submissions, quick-add, radio, TOTD.
  */
-export async function upsertSong(params: UpsertSongParams): Promise<{ id: string; isNew: boolean }> {
+export async function upsertSong(
+  params: UpsertSongParams,
+): Promise<{ id: string; isNew: boolean }> {
   const platform = params.platform || isMusicUrl(params.url) || 'audio';
 
   // Check if song already exists
@@ -101,12 +103,12 @@ export interface QuerySongsParams {
   offset?: number;
 }
 
-export async function querySongs(params: QuerySongsParams = {}): Promise<{ songs: Song[]; total: number }> {
+export async function querySongs(
+  params: QuerySongsParams = {},
+): Promise<{ songs: Song[]; total: number }> {
   const { search, platform, sort = 'recent', limit = 50, offset = 0 } = params;
 
-  let query = supabaseAdmin
-    .from('songs')
-    .select('*', { count: 'exact' });
+  let query = supabaseAdmin.from('songs').select('*', { count: 'exact' });
 
   if (search) {
     query = query.textSearch('search_vector', search, { type: 'websearch' });
@@ -136,11 +138,7 @@ export async function querySongs(params: QuerySongsParams = {}): Promise<{ songs
 
 export async function incrementPlayCount(songId: string): Promise<void> {
   // Non-atomic increment — read current count, add 1, write back
-  const { data } = await supabaseAdmin
-    .from('songs')
-    .select('play_count')
-    .eq('id', songId)
-    .single();
+  const { data } = await supabaseAdmin.from('songs').select('play_count').eq('id', songId).single();
 
   await supabaseAdmin
     .from('songs')
@@ -153,7 +151,11 @@ export async function incrementPlayCount(songId: string): Promise<void> {
 
 // ─── Playlist helpers ───────────────────────────────────────────────
 
-export async function addToPlaylist(playlistId: string, songId: string, addedByFid: number): Promise<void> {
+export async function addToPlaylist(
+  playlistId: string,
+  songId: string,
+  addedByFid: number,
+): Promise<void> {
   // Get next position
   const { data: lastTrack } = await supabaseAdmin
     .from('playlist_tracks')
@@ -165,12 +167,15 @@ export async function addToPlaylist(playlistId: string, songId: string, addedByF
 
   const nextPosition = (lastTrack?.position ?? -1) + 1;
 
-  await supabaseAdmin.from('playlist_tracks').upsert({
-    playlist_id: playlistId,
-    song_id: songId,
-    position: nextPosition,
-    added_by_fid: addedByFid,
-  }, { onConflict: 'playlist_id,song_id' });
+  await supabaseAdmin.from('playlist_tracks').upsert(
+    {
+      playlist_id: playlistId,
+      song_id: songId,
+      position: nextPosition,
+      added_by_fid: addedByFid,
+    },
+    { onConflict: 'playlist_id,song_id' },
+  );
 }
 
 /**
@@ -194,9 +199,10 @@ export async function extractAndSaveSongs(
 
     try {
       // Fetch metadata — try multiple base URL options for server-side fetch
-      const baseUrl = process.env.NEXT_PUBLIC_URL
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
-        || 'http://localhost:3000';
+      const baseUrl =
+        process.env.NEXT_PUBLIC_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+        'http://localhost:3000';
 
       let meta: Record<string, unknown> | null = null;
       try {

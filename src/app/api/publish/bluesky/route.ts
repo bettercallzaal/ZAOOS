@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { normalizeForBluesky } from '@/lib/publish/normalize';
-import { publishToBluesky, isBlueskyConfigured } from '@/lib/publish/bluesky';
 import { logger } from '@/lib/logger';
+import { isBlueskyConfigured, publishToBluesky } from '@/lib/publish/bluesky';
+import { normalizeForBluesky } from '@/lib/publish/normalize';
 
 const publishBlueskySchema = z.object({
   castHash: z.string().min(1),
@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = publishBlueskySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { castHash, text, embedUrls, imageUrls, channel } = parsed.data;
@@ -47,17 +50,15 @@ export async function POST(req: NextRequest) {
 
     const result = await publishToBluesky(normalized);
 
-    await supabaseAdmin
-      .from('publish_log')
-      .insert({
-        platform: 'bluesky',
-        cast_hash: castHash,
-        platform_post_id: result.uri,
-        platform_url: result.postUrl,
-        published_by_fid: session.fid,
-        text: normalized.text,
-        status: 'published',
-      });
+    await supabaseAdmin.from('publish_log').insert({
+      platform: 'bluesky',
+      cast_hash: castHash,
+      platform_post_id: result.uri,
+      platform_url: result.postUrl,
+      published_by_fid: session.fid,
+      text: normalized.text,
+      status: 'published',
+    });
 
     return NextResponse.json({ success: true, platformUrl: result.postUrl });
   } catch (err) {

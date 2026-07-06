@@ -53,9 +53,7 @@ function updateTarget(
   platform: string,
   patch: Partial<BroadcastTarget>,
 ): BroadcastTarget[] {
-  return targets.map((t) =>
-    t.platform === platform ? { ...t, ...patch } : t,
-  );
+  return targets.map((t) => (t.platform === platform ? { ...t, ...patch } : t));
 }
 
 // ---------------------------------------------------------------------------
@@ -204,10 +202,7 @@ export async function stopTarget(
 // Stop all
 // ---------------------------------------------------------------------------
 
-export async function stopAll(
-  call: RTMPCall,
-  state: BroadcastState,
-): Promise<BroadcastState> {
+export async function stopAll(call: RTMPCall, state: BroadcastState): Promise<BroadcastState> {
   if (state.mode === 'relay') {
     // Delete Livepeer stream (stops all multistream targets)
     if (state.livepeerStreamId) {
@@ -248,7 +243,9 @@ export async function retryTarget(
   let patch: Partial<BroadcastTarget>;
   try {
     await call.startRTMPBroadcasts({
-      broadcasts: [{ name: broadcastName(target), stream_url: target.rtmpUrl, stream_key: target.streamKey }],
+      broadcasts: [
+        { name: broadcastName(target), stream_url: target.rtmpUrl, stream_key: target.streamKey },
+      ],
     });
     patch = { status: 'connected', startedAt: new Date().toISOString(), error: undefined };
   } catch (err) {

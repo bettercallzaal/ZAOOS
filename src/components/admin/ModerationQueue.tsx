@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 interface ModerationItem {
   id: string;
@@ -15,32 +15,24 @@ interface ModerationItem {
 }
 
 const SCORE_COLORS: Record<string, { bg: string; fill: string }> = {
-  TOXICITY: { bg: "bg-yellow-900/30", fill: "bg-yellow-500" },
-  SEVERE_TOXICITY: { bg: "bg-red-900/30", fill: "bg-red-500" },
-  IDENTITY_ATTACK: { bg: "bg-purple-900/30", fill: "bg-purple-500" },
-  INSULT: { bg: "bg-orange-900/30", fill: "bg-orange-500" },
-  THREAT: { bg: "bg-rose-900/30", fill: "bg-rose-500" },
+  TOXICITY: { bg: 'bg-yellow-900/30', fill: 'bg-yellow-500' },
+  SEVERE_TOXICITY: { bg: 'bg-red-900/30', fill: 'bg-red-500' },
+  IDENTITY_ATTACK: { bg: 'bg-purple-900/30', fill: 'bg-purple-500' },
+  INSULT: { bg: 'bg-orange-900/30', fill: 'bg-orange-500' },
+  THREAT: { bg: 'bg-rose-900/30', fill: 'bg-rose-500' },
 };
 
-function ScoreBar({
-  label,
-  score,
-}: {
-  label: string;
-  score: number;
-}) {
+function ScoreBar({ label, score }: { label: string; score: number }) {
   const colors = SCORE_COLORS[label] ?? {
-    bg: "bg-gray-700",
-    fill: "bg-gray-400",
+    bg: 'bg-gray-700',
+    fill: 'bg-gray-400',
   };
   const pct = Math.round(score * 100);
   const isHigh = score > 0.8;
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="w-32 truncate text-gray-400">
-        {label.replace(/_/g, " ")}
-      </span>
+      <span className="w-32 truncate text-gray-400">{label.replace(/_/g, ' ')}</span>
       <div className={`h-2 flex-1 rounded-full ${colors.bg}`}>
         <div
           className={`h-2 rounded-full transition-all ${colors.fill}`}
@@ -49,7 +41,7 @@ function ScoreBar({
       </div>
       <span
         className={`w-10 text-right font-mono ${
-          isHigh ? "text-red-400 font-bold" : "text-gray-500"
+          isHigh ? 'text-red-400 font-bold' : 'text-gray-500'
         }`}
       >
         {pct}%
@@ -67,17 +59,15 @@ export default function ModerationQueue() {
   const fetchQueue = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch("/api/moderation/queue");
+      const res = await fetch('/api/moderation/queue');
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(
-          (data as { error?: string }).error || "Failed to fetch"
-        );
+        throw new Error((data as { error?: string }).error || 'Failed to fetch');
       }
       const data = (await res.json()) as { items: ModerationItem[] };
       setItems(data.items);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load queue");
+      setError(err instanceof Error ? err.message : 'Failed to load queue');
     } finally {
       setLoading(false);
     }
@@ -87,26 +77,24 @@ export default function ModerationQueue() {
     fetchQueue();
   }, [fetchQueue]);
 
-  const handleReview = async (id: string, action: "allow" | "hide") => {
+  const handleReview = async (id: string, action: 'allow' | 'hide') => {
     setReviewing(id);
     try {
-      const res = await fetch("/api/moderation/queue", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/moderation/queue', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, action }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(
-          (data as { error?: string }).error || "Review failed"
-        );
+        throw new Error((data as { error?: string }).error || 'Review failed');
       }
 
       // Remove reviewed item from list
       setItems((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Review failed");
+      setError(err instanceof Error ? err.message : 'Review failed');
     } finally {
       setReviewing(null);
     }
@@ -143,11 +131,7 @@ export default function ModerationQueue() {
         </button>
       </div>
 
-      {error && (
-        <div className="rounded-lg bg-red-900/20 p-3 text-sm text-red-400">
-          {error}
-        </div>
-      )}
+      {error && <div className="rounded-lg bg-red-900/20 p-3 text-sm text-red-400">{error}</div>}
 
       {items.length === 0 && !error && (
         <div className="rounded-lg bg-[#0d1b2a] p-8 text-center text-gray-500">
@@ -167,12 +151,10 @@ export default function ModerationQueue() {
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span>FID: {item.fid}</span>
                 <span className="text-gray-700">|</span>
-                <span>
-                  {new Date(item.created_at).toLocaleString()}
-                </span>
+                <span>{new Date(item.created_at).toLocaleString()}</span>
               </div>
               <p className="mt-1 text-sm text-gray-200 break-words">
-                {item.text_preview || "[no text]"}
+                {item.text_preview || '[no text]'}
               </p>
             </div>
           </div>
@@ -185,7 +167,7 @@ export default function ModerationQueue() {
                   key={cat}
                   className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400"
                 >
-                  {cat.replace(/_/g, " ")}
+                  {cat.replace(/_/g, ' ')}
                 </span>
               ))}
             </div>
@@ -201,18 +183,18 @@ export default function ModerationQueue() {
           {/* Actions */}
           <div className="flex gap-2 pt-1">
             <button
-              onClick={() => handleReview(item.id, "allow")}
+              onClick={() => handleReview(item.id, 'allow')}
               disabled={reviewing === item.id}
               className="rounded-lg bg-green-600/20 px-4 py-1.5 text-sm font-medium text-green-400 transition-colors hover:bg-green-600/30 disabled:opacity-50"
             >
-              {reviewing === item.id ? "..." : "Allow"}
+              {reviewing === item.id ? '...' : 'Allow'}
             </button>
             <button
-              onClick={() => handleReview(item.id, "hide")}
+              onClick={() => handleReview(item.id, 'hide')}
               disabled={reviewing === item.id}
               className="rounded-lg bg-red-600/20 px-4 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-600/30 disabled:opacity-50"
             >
-              {reviewing === item.id ? "..." : "Hide"}
+              {reviewing === item.id ? '...' : 'Hide'}
             </button>
           </div>
         </div>

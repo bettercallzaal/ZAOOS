@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -32,7 +32,10 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = addTrackSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     // Check membership
@@ -44,7 +47,10 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
       .single();
 
     if (!member || member.role === 'viewer') {
-      return NextResponse.json({ error: 'You must be a contributor to add tracks' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'You must be a contributor to add tracks' },
+        { status: 403 },
+      );
     }
 
     // Get current max position
@@ -101,7 +107,10 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = removeTrackSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     // Fetch track and playlist to check permissions
@@ -112,11 +121,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
         .eq('id', parsed.data.track_id)
         .eq('playlist_id', id)
         .single(),
-      supabaseAdmin
-        .from('playlists')
-        .select('created_by_fid')
-        .eq('id', id)
-        .single(),
+      supabaseAdmin.from('playlists').select('created_by_fid').eq('id', id).single(),
     ]);
 
     const track = trackRes.status === 'fulfilled' ? trackRes.value.data : null;
@@ -130,7 +135,10 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
     const isAdder = track.added_by_fid === session.fid;
 
     if (!isOwner && !isAdder) {
-      return NextResponse.json({ error: 'Only the playlist owner or the person who added the track can remove it' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Only the playlist owner or the person who added the track can remove it' },
+        { status: 403 },
+      );
     }
 
     const { error } = await supabaseAdmin

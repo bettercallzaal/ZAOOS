@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { makeRequest, chainMock } from '@/test-utils/api-helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { chainMock, makeRequest } from '@/test-utils/api-helpers';
 
 // Admin contacts write-path validation (doc 841 security-authz HIGH:
 // "Missing Input Validation (Zod) in Admin Contacts POST/PATCH").
@@ -19,7 +19,7 @@ vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
 
-import { POST, PATCH } from '../route';
+import { PATCH, POST } from '../route';
 
 function adminReq(method: 'POST' | 'PATCH', body: unknown) {
   return makeRequest('/api/admin/contacts', {

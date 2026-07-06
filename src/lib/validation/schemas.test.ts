@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  sendMessageSchema,
-  proposalCategorySchema,
   createProposalSchema,
+  proposalCategorySchema,
   proposalVoteSchema,
+  sendMessageSchema,
 } from './schemas';
 
 describe('sendMessageSchema', () => {
@@ -24,13 +24,18 @@ describe('sendMessageSchema', () => {
 });
 
 describe('proposalCategorySchema', () => {
-  it.each(['general', 'technical', 'community', 'governance', 'treasury', 'wavewarz', 'social'])(
-    'accepts valid category: %s',
-    (category) => {
-      const result = proposalCategorySchema.safeParse(category);
-      expect(result.success).toBe(true);
-    },
-  );
+  it.each([
+    'general',
+    'technical',
+    'community',
+    'governance',
+    'treasury',
+    'wavewarz',
+    'social',
+  ])('accepts valid category: %s', (category) => {
+    const result = proposalCategorySchema.safeParse(category);
+    expect(result.success).toBe(true);
+  });
 
   it('rejects invalid category', () => {
     const result = proposalCategorySchema.safeParse('invalid');

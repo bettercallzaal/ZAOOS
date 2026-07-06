@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = BroadcastSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     // Get YouTube connection
@@ -50,12 +53,18 @@ export async function POST(req: NextRequest) {
     let accessToken = platform.access_token;
     if (platform.expires_at && new Date(platform.expires_at) < new Date()) {
       if (!platform.refresh_token) {
-        return NextResponse.json({ error: 'YouTube token expired — please reconnect' }, { status: 401 });
+        return NextResponse.json(
+          { error: 'YouTube token expired — please reconnect' },
+          { status: 401 },
+        );
       }
       const refreshed = await refreshYouTubeToken(platform.refresh_token);
       if (!refreshed.access_token) {
         logger.error('YouTube token refresh failed:', refreshed);
-        return NextResponse.json({ error: 'YouTube token refresh failed — please reconnect' }, { status: 401 });
+        return NextResponse.json(
+          { error: 'YouTube token refresh failed — please reconnect' },
+          { status: 401 },
+        );
       }
       accessToken = refreshed.access_token;
       await supabaseAdmin
@@ -91,7 +100,7 @@ export async function POST(req: NextRequest) {
             enableAutoStop: true,
           },
         }),
-      }
+      },
     );
     const broadcast = await broadcastRes.json();
 
@@ -114,7 +123,7 @@ export async function POST(req: NextRequest) {
             resolution: 'variable',
           },
         }),
-      }
+      },
     );
     const stream = await streamRes.json();
 
@@ -126,13 +135,16 @@ export async function POST(req: NextRequest) {
     // 3. Bind stream to broadcast
     const bindRes = await fetch(
       `https://www.googleapis.com/youtube/v3/liveBroadcasts/bind?id=${broadcast.id}&part=id&streamId=${stream.id}`,
-      { method: 'POST', headers }
+      { method: 'POST', headers },
     );
     const bindData = await bindRes.json();
 
     if (!bindData.id) {
       logger.error('YouTube bind stream failed:', bindData);
-      return NextResponse.json({ error: 'Failed to bind YouTube stream to broadcast' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to bind YouTube stream to broadcast' },
+        { status: 500 },
+      );
     }
 
     const ingestUrl = stream.cdn?.ingestionInfo?.ingestionAddress;

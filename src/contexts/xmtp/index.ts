@@ -1,4 +1,4 @@
 // Barrel export — re-exports everything from the split XMTP context modules.
 
-export { XMTPProvider, useXMTPContext, useXMTPContextSafe } from '@/contexts/xmtp/XMTPProvider';
-export type { ZaoMember, XMTPContextValue } from '@/contexts/xmtp/types';
+export type { XMTPContextValue, ZaoMember } from '@/contexts/xmtp/types';
+export { useXMTPContext, useXMTPContextSafe, XMTPProvider } from '@/contexts/xmtp/XMTPProvider';

@@ -15,16 +15,14 @@ interface AuditLogEntry {
  */
 export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
   try {
-    await supabaseAdmin
-      .from('security_audit_log')
-      .insert({
-        actor_fid: entry.actorFid,
-        action: entry.action,
-        target_type: entry.targetType,
-        target_id: entry.targetId ?? null,
-        details: entry.details ?? {},
-        ip_address: entry.ipAddress ?? null,
-      });
+    await supabaseAdmin.from('security_audit_log').insert({
+      actor_fid: entry.actorFid,
+      action: entry.action,
+      target_type: entry.targetType,
+      target_id: entry.targetId ?? null,
+      details: entry.details ?? {},
+      ip_address: entry.ipAddress ?? null,
+    });
   } catch (err) {
     console.error('[audit-log] Failed to write audit entry:', err);
   }
@@ -34,8 +32,6 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
 export function getClientIp(req: Request): string | undefined {
   const headers = new Headers(req.headers);
   return (
-    headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    headers.get('x-real-ip') ||
-    undefined
+    headers.get('x-forwarded-for')?.split(',')[0]?.trim() || headers.get('x-real-ip') || undefined
   );
 }

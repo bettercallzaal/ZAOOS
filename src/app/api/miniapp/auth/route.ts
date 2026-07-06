@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@farcaster/quick-auth';
-import { checkAllowlist } from '@/lib/gates/allowlist';
-import { getUserByFid } from '@/lib/farcaster/neynar';
+import { type NextRequest, NextResponse } from 'next/server';
 import { saveSession } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { getUserByFid } from '@/lib/farcaster/neynar';
+import { checkAllowlist } from '@/lib/gates/allowlist';
 import { logger } from '@/lib/logger';
 
 const quickAuthClient = createClient();

@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-const REACTION_EMOJIS = ['\uD83D\uDD25', '\u2764\uFE0F', '\uD83C\uDFB5', '\uD83D\uDC8E', '\uD83D\uDC4F', '\uD83E\uDD2F'];
+const REACTION_EMOJIS = [
+  '\uD83D\uDD25',
+  '\u2764\uFE0F',
+  '\uD83C\uDFB5',
+  '\uD83D\uDC8E',
+  '\uD83D\uDC4F',
+  '\uD83E\uDD2F',
+];
 
 interface TrackReactionsProps {
   songUrl: string;
@@ -36,70 +43,74 @@ export function TrackReactions({ songUrl, compact = false, className = '' }: Tra
         if (!cancelled) setLoading(false);
       });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [songUrl]);
 
-  const toggleReaction = useCallback(async (emoji: string) => {
-    if (toggling) return;
-    setToggling(emoji);
+  const toggleReaction = useCallback(
+    async (emoji: string) => {
+      if (toggling) return;
+      setToggling(emoji);
 
-    // Optimistic update
-    const wasReacted = userReactions.includes(emoji);
-    const prevReactions = { ...reactions };
-    const prevUserReactions = [...userReactions];
+      // Optimistic update
+      const wasReacted = userReactions.includes(emoji);
+      const prevReactions = { ...reactions };
+      const prevUserReactions = [...userReactions];
 
-    if (wasReacted) {
-      setUserReactions((prev) => prev.filter((e) => e !== emoji));
-      setReactions((prev) => {
-        const next = { ...prev };
-        next[emoji] = Math.max((next[emoji] || 1) - 1, 0);
-        if (next[emoji] === 0) delete next[emoji];
-        return next;
-      });
-    } else {
-      setUserReactions((prev) => [...prev, emoji]);
-      setReactions((prev) => ({
-        ...prev,
-        [emoji]: (prev[emoji] || 0) + 1,
-      }));
-    }
-
-    try {
-      const res = await fetch('/api/music/library/react', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: songUrl, emoji }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setReactions(data.reactions || {});
-        // Update user reactions based on server response
-        if (data.reacted) {
-          setUserReactions((prev) => prev.includes(emoji) ? prev : [...prev, emoji]);
-        } else {
-          setUserReactions((prev) => prev.filter((e) => e !== emoji));
-        }
+      if (wasReacted) {
+        setUserReactions((prev) => prev.filter((e) => e !== emoji));
+        setReactions((prev) => {
+          const next = { ...prev };
+          next[emoji] = Math.max((next[emoji] || 1) - 1, 0);
+          if (next[emoji] === 0) delete next[emoji];
+          return next;
+        });
       } else {
+        setUserReactions((prev) => [...prev, emoji]);
+        setReactions((prev) => ({
+          ...prev,
+          [emoji]: (prev[emoji] || 0) + 1,
+        }));
+      }
+
+      try {
+        const res = await fetch('/api/music/library/react', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: songUrl, emoji }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setReactions(data.reactions || {});
+          // Update user reactions based on server response
+          if (data.reacted) {
+            setUserReactions((prev) => (prev.includes(emoji) ? prev : [...prev, emoji]));
+          } else {
+            setUserReactions((prev) => prev.filter((e) => e !== emoji));
+          }
+        } else {
+          // Revert on failure
+          setReactions(prevReactions);
+          setUserReactions(prevUserReactions);
+        }
+      } catch {
         // Revert on failure
         setReactions(prevReactions);
         setUserReactions(prevUserReactions);
+      } finally {
+        setToggling(null);
       }
-    } catch {
-      // Revert on failure
-      setReactions(prevReactions);
-      setUserReactions(prevUserReactions);
-    } finally {
-      setToggling(null);
-    }
-  }, [toggling, userReactions, reactions, songUrl]);
+    },
+    [toggling, userReactions, reactions, songUrl],
+  );
 
   if (loading) return null;
 
   // In compact mode, only show emojis with > 0 reactions
-  const visibleEmojis = compact && !showAll
-    ? REACTION_EMOJIS.filter((e) => (reactions[e] || 0) > 0)
-    : REACTION_EMOJIS;
+  const visibleEmojis =
+    compact && !showAll ? REACTION_EMOJIS.filter((e) => (reactions[e] || 0) > 0) : REACTION_EMOJIS;
 
   const hasHiddenEmojis = compact && !showAll && visibleEmojis.length < REACTION_EMOJIS.length;
 
@@ -123,9 +134,7 @@ export function TrackReactions({ songUrl, compact = false, className = '' }: Tra
             aria-label={`React with ${emoji}`}
           >
             <span className="text-sm leading-none">{emoji}</span>
-            {count > 0 && (
-              <span className="text-[10px] tabular-nums leading-none">{count}</span>
-            )}
+            {count > 0 && <span className="text-[10px] tabular-nums leading-none">{count}</span>}
           </button>
         );
       })}

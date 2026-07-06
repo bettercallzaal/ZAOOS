@@ -41,9 +41,7 @@ export interface ThreadsPublishResult {
  *
  * For posts with images, creates an IMAGE container first.
  */
-export async function publishToThreads(
-  content: NormalizedContent,
-): Promise<ThreadsPublishResult> {
+export async function publishToThreads(content: NormalizedContent): Promise<ThreadsPublishResult> {
   const { THREADS_ACCESS_TOKEN, THREADS_USER_ID } = ENV;
 
   if (!THREADS_ACCESS_TOKEN || !THREADS_USER_ID) {
@@ -64,13 +62,10 @@ export async function publishToThreads(
     containerParams.set('text', content.text);
   }
 
-  const containerRes = await fetch(
-    `${THREADS_API_BASE}/${THREADS_USER_ID}/threads`,
-    {
-      method: 'POST',
-      body: containerParams,
-    },
-  );
+  const containerRes = await fetch(`${THREADS_API_BASE}/${THREADS_USER_ID}/threads`, {
+    method: 'POST',
+    body: containerParams,
+  });
 
   if (!containerRes.ok) {
     const err = await containerRes.json().catch(() => ({}));
@@ -86,13 +81,10 @@ export async function publishToThreads(
     access_token: THREADS_ACCESS_TOKEN,
   });
 
-  const publishRes = await fetch(
-    `${THREADS_API_BASE}/${THREADS_USER_ID}/threads_publish`,
-    {
-      method: 'POST',
-      body: publishParams,
-    },
-  );
+  const publishRes = await fetch(`${THREADS_API_BASE}/${THREADS_USER_ID}/threads_publish`, {
+    method: 'POST',
+    body: publishParams,
+  });
 
   if (!publishRes.ok) {
     const err = await publishRes.json().catch(() => ({}));
@@ -127,9 +119,7 @@ export async function refreshThreadsToken(): Promise<string> {
     access_token: THREADS_ACCESS_TOKEN,
   });
 
-  const res = await fetch(
-    `${THREADS_API_BASE}/oauth/access_token?${params.toString()}`,
-  );
+  const res = await fetch(`${THREADS_API_BASE}/oauth/access_token?${params.toString()}`);
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

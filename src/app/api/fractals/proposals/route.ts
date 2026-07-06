@@ -1,8 +1,8 @@
 // src/app/api/fractals/proposals/route.ts
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { fetchProposalsOnChain } from '@/lib/ordao/client';
 import { logger } from '@/lib/logger';
+import { fetchProposalsOnChain } from '@/lib/ordao/client';
 
 const ORNODE_URL = 'https://ornode2.frapps.xyz';
 
@@ -33,7 +33,10 @@ export async function GET() {
     logger.info(`[proposals] Served ${proposals.length} proposals from ornode`);
     return NextResponse.json({ proposals, total: proposals.length, source: 'ornode' });
   } catch (ornodeErr) {
-    logger.warn('[proposals] ornode unavailable, falling back to on-chain read:', ornodeErr instanceof Error ? ornodeErr.message : ornodeErr);
+    logger.warn(
+      '[proposals] ornode unavailable, falling back to on-chain read:',
+      ornodeErr instanceof Error ? ornodeErr.message : ornodeErr,
+    );
   }
 
   // ── Fallback: read directly from OREC contract on Optimism ─────
@@ -47,7 +50,10 @@ export async function GET() {
       source: 'onchain',
     });
   } catch (onChainErr) {
-    logger.error('[proposals] On-chain fallback also failed:', onChainErr instanceof Error ? onChainErr.message : onChainErr);
+    logger.error(
+      '[proposals] On-chain fallback also failed:',
+      onChainErr instanceof Error ? onChainErr.message : onChainErr,
+    );
     return NextResponse.json({ proposals: [], total: 0, source: 'unavailable' });
   }
 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
@@ -42,7 +42,9 @@ export async function GET(req: NextRequest) {
       // New submissions this period
       supabase
         .from('song_submissions')
-        .select('id, url, title, artist, track_type, submitted_by_fid, submitted_by_username, created_at')
+        .select(
+          'id, url, title, artist, track_type, submitted_by_fid, submitted_by_username, created_at',
+        )
         .eq('status', 'approved')
         .gte('created_at', since)
         .order('created_at', { ascending: false })
@@ -51,7 +53,9 @@ export async function GET(req: NextRequest) {
       // Track of the Day winners this period
       supabase
         .from('track_of_the_day')
-        .select('id, track_url, track_title, track_artist, artwork_url, selected_date, nominated_by_username, votes_count')
+        .select(
+          'id, track_url, track_title, track_artist, artwork_url, selected_date, nominated_by_username, votes_count',
+        )
         .not('selected_date', 'is', null)
         .gte('selected_date', since.slice(0, 10))
         .order('selected_date', { ascending: false })
@@ -69,9 +73,7 @@ export async function GET(req: NextRequest) {
         : [];
 
     const trackOfDayWinners =
-      totdRes.status === 'fulfilled' && !totdRes.value.error
-        ? (totdRes.value.data ?? [])
-        : [];
+      totdRes.status === 'fulfilled' && !totdRes.value.error ? (totdRes.value.data ?? []) : [];
 
     // Derive most active contributors from submission counts in the period
     const listenerMap = new Map<number, { fid: number; username: string; plays: number }>();

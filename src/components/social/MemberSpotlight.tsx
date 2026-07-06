@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface SpotlightMember {
   fid: number;
@@ -22,12 +22,14 @@ export function MemberSpotlight() {
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/social/spotlight', { signal: controller.signal })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
         if (!controller.signal.aborted && data?.member) setMember(data.member);
       })
       .catch(() => {})
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
   }, []);
 
@@ -54,14 +56,23 @@ export function MemberSpotlight() {
   return (
     <div className="mx-4 my-3 rounded-xl bg-white/[0.03] border border-[#f5a623]/20 p-4">
       <div className="flex items-center gap-1.5 mb-3">
-        <span className="text-[#f5a623] text-xs font-semibold uppercase tracking-wider">Member of the Day</span>
+        <span className="text-[#f5a623] text-xs font-semibold uppercase tracking-wider">
+          Member of the Day
+        </span>
         <svg className="w-3.5 h-3.5 text-[#f5a623]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
       </div>
       <div className="flex items-center gap-3">
         {member.pfpUrl ? (
-          <Image src={member.pfpUrl || '/logo.png'} alt="" width={48} height={48} className="w-12 h-12 rounded-full object-cover ring-2 ring-[#f5a623]/30" unoptimized />
+          <Image
+            src={member.pfpUrl || '/logo.png'}
+            alt=""
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-[#f5a623]/30"
+            unoptimized
+          />
         ) : (
           <div className="w-12 h-12 rounded-full bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623] font-bold">
             {member.displayName?.[0] || '?'}
@@ -74,10 +85,17 @@ export function MemberSpotlight() {
         </div>
       </div>
       <div className="flex items-center gap-3 mt-3 text-[10px] text-gray-500 uppercase tracking-wider">
-        {member.respect && <span className="text-[#f5a623]">{member.respect.total.toLocaleString()} Respect</span>}
+        {member.respect && (
+          <span className="text-[#f5a623]">{member.respect.total.toLocaleString()} Respect</span>
+        )}
         {member.location && <span>{member.location}</span>}
-        {daysAgo !== null && daysAgo <= 7 && <span className="text-green-500">Active recently</span>}
-        <Link href={`/members/${member.username || member.fid}`} className="ml-auto text-[#f5a623] hover:underline text-xs normal-case">
+        {daysAgo !== null && daysAgo <= 7 && (
+          <span className="text-green-500">Active recently</span>
+        )}
+        <Link
+          href={`/members/${member.username || member.fid}`}
+          className="ml-auto text-[#f5a623] hover:underline text-xs normal-case"
+        >
           View Profile
         </Link>
       </div>

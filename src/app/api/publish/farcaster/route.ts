@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { postCast } from '@/lib/farcaster/neynar';
 import { ENV } from '@/lib/env';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { postCast } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const publishSchema = z.object({
@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
 
   const parsed = publishSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { proposalId } = parsed.data;
@@ -57,7 +60,10 @@ export async function POST(req: NextRequest) {
 
   // Check if already published
   if (proposal.published_cast_hash) {
-    return NextResponse.json({ error: 'Already published', cast_hash: proposal.published_cast_hash }, { status: 409 });
+    return NextResponse.json(
+      { error: 'Already published', cast_hash: proposal.published_cast_hash },
+      { status: 409 },
+    );
   }
 
   // Check Respect vote threshold
@@ -68,16 +74,22 @@ export async function POST(req: NextRequest) {
 
   const totalRespectFor = (votes || [])
     .filter((v: { vote: string }) => v.vote === 'for')
-    .reduce((sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0), 0);
+    .reduce(
+      (sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0),
+      0,
+    );
 
   const threshold = proposal.respect_threshold || 1000;
 
   if (totalRespectFor < threshold) {
-    return NextResponse.json({
-      error: 'Threshold not met',
-      current: totalRespectFor,
-      threshold,
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: 'Threshold not met',
+        current: totalRespectFor,
+        threshold,
+      },
+      { status: 400 },
+    );
   }
 
   // Build the cast text
@@ -87,9 +99,10 @@ export async function POST(req: NextRequest) {
   // Truncate to Farcaster's 1024 char limit, leaving room for attribution
   const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
   const maxTextLength = 1024 - attribution.length;
-  const castText = publishText.length > maxTextLength
-    ? publishText.slice(0, maxTextLength - 3) + '...' + attribution
-    : publishText + attribution;
+  const castText =
+    publishText.length > maxTextLength
+      ? publishText.slice(0, maxTextLength - 3) + '...' + attribution
+      : publishText + attribution;
 
   try {
     // Publish to @thezao Farcaster account using @thezao's Neynar API key

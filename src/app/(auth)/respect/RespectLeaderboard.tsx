@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // ---------- Types ----------
 
@@ -90,29 +90,32 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
   }, []);
 
   // Fetch member detail when a member is selected
-  const handleMemberClick = useCallback(async (wallet: string) => {
-    if (selectedWallet === wallet) {
-      // Toggle off
-      setSelectedWallet(null);
-      setMemberDetail(null);
-      return;
-    }
+  const handleMemberClick = useCallback(
+    async (wallet: string) => {
+      if (selectedWallet === wallet) {
+        // Toggle off
+        setSelectedWallet(null);
+        setMemberDetail(null);
+        return;
+      }
 
-    setSelectedWallet(wallet);
-    setMemberDetail(null);
-    setMemberLoading(true);
-
-    try {
-      const res = await fetch(`/api/respect/member?wallet=${encodeURIComponent(wallet)}`);
-      if (!res.ok) throw new Error('Failed to fetch member');
-      const data = await res.json();
-      setMemberDetail(data);
-    } catch {
+      setSelectedWallet(wallet);
       setMemberDetail(null);
-    } finally {
-      setMemberLoading(false);
-    }
-  }, [selectedWallet]);
+      setMemberLoading(true);
+
+      try {
+        const res = await fetch(`/api/respect/member?wallet=${encodeURIComponent(wallet)}`);
+        if (!res.ok) throw new Error('Failed to fetch member');
+        const data = await res.json();
+        setMemberDetail(data);
+      } catch {
+        setMemberDetail(null);
+      } finally {
+        setMemberLoading(false);
+      }
+    },
+    [selectedWallet],
+  );
 
   if (loading) {
     return (
@@ -131,9 +134,10 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
     );
   }
 
-  const myEntry = leaderboard.find((e) =>
-    (e.fid && e.fid === currentFid) ||
-    (e.wallet && currentWallet && e.wallet.toLowerCase() === currentWallet.toLowerCase())
+  const myEntry = leaderboard.find(
+    (e) =>
+      (e.fid && e.fid === currentFid) ||
+      (e.wallet && currentWallet && e.wallet.toLowerCase() === currentWallet.toLowerCase()),
   );
 
   return (
@@ -146,12 +150,16 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-3xl font-bold text-white">{myEntry.totalRespect.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-white">
+                {myEntry.totalRespect.toLocaleString()}
+              </p>
               <p className="text-xs text-gray-400 mt-1">
                 {myEntry.fractalRespect > 0 && `${myEntry.fractalRespect.toLocaleString()} fractal`}
                 {myEntry.fractalRespect > 0 && myEntry.onchainOG > 0 && ' + '}
                 {myEntry.onchainOG > 0 && `${myEntry.onchainOG.toLocaleString()} OG`}
-                {(myEntry.fractalRespect > 0 || myEntry.onchainOG > 0) && myEntry.onchainZOR > 0 && ' + '}
+                {(myEntry.fractalRespect > 0 || myEntry.onchainOG > 0) &&
+                  myEntry.onchainZOR > 0 &&
+                  ' + '}
                 {myEntry.onchainZOR > 0 && `${myEntry.onchainZOR.toLocaleString()} ZOR`}
                 {myEntry.totalRespect === 0 && 'No respect earned yet'}
               </p>
@@ -174,7 +182,8 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
       {!myEntry && (
         <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] text-center">
           <p className="text-sm text-gray-400">
-            Your wallet isn&apos;t linked yet. Ask an admin to add your FID to the allowlist to see your Respect here.
+            Your wallet isn&apos;t linked yet. Ask an admin to add your FID to the allowlist to see
+            your Respect here.
           </p>
         </div>
       )}
@@ -220,20 +229,33 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                   } ${entry.wallet ? 'cursor-pointer hover:bg-[#f5a623]/10' : 'cursor-default'}`}
                 >
                   <span className="text-lg font-bold w-8 text-center flex-shrink-0">
-                    {entry.rank === 1 ? '\uD83E\uDD47' : entry.rank === 2 ? '\uD83E\uDD48' : entry.rank === 3 ? '\uD83E\uDD49' : entry.rank}
+                    {entry.rank === 1
+                      ? '\uD83E\uDD47'
+                      : entry.rank === 2
+                        ? '\uD83E\uDD48'
+                        : entry.rank === 3
+                          ? '\uD83E\uDD49'
+                          : entry.rank}
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
-                        {entry.name}{isMe && ' (you)'}
+                      <p
+                        className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}
+                      >
+                        {entry.name}
+                        {isMe && ' (you)'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       {entry.fractalCount > 0 && (
-                        <span>{entry.fractalCount} fractal{entry.fractalCount !== 1 ? 's' : ''}</span>
+                        <span>
+                          {entry.fractalCount} fractal{entry.fractalCount !== 1 ? 's' : ''}
+                        </span>
                       )}
                       {entry.firstRespectAt && (
-                        <span className="text-[10px] text-gray-600">since {entry.firstRespectAt}</span>
+                        <span className="text-[10px] text-gray-600">
+                          since {entry.firstRespectAt}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -242,7 +264,9 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                       {entry.totalRespect.toLocaleString()}
                     </p>
                     <div className="text-[10px] text-gray-500 space-x-1">
-                      {entry.fractalRespect > 0 && <span>{entry.fractalRespect.toLocaleString()} frac</span>}
+                      {entry.fractalRespect > 0 && (
+                        <span>{entry.fractalRespect.toLocaleString()} frac</span>
+                      )}
                       {entry.onchainOG > 0 && <span>{entry.onchainOG.toLocaleString()} OG</span>}
                       {entry.onchainZOR > 0 && <span>{entry.onchainZOR.toLocaleString()} ZOR</span>}
                     </div>
@@ -263,30 +287,42 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">Fractal</p>
-                            <p className="text-white font-medium">{memberDetail.member.fractal_respect.toLocaleString()}</p>
+                            <p className="text-white font-medium">
+                              {memberDetail.member.fractal_respect.toLocaleString()}
+                            </p>
                           </div>
                           <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">On-chain OG</p>
-                            <p className="text-white font-medium">{memberDetail.member.onchain_og.toLocaleString()}</p>
+                            <p className="text-white font-medium">
+                              {memberDetail.member.onchain_og.toLocaleString()}
+                            </p>
                           </div>
                           <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">On-chain ZOR</p>
-                            <p className="text-white font-medium">{memberDetail.member.onchain_zor.toLocaleString()}</p>
+                            <p className="text-white font-medium">
+                              {memberDetail.member.onchain_zor.toLocaleString()}
+                            </p>
                           </div>
                           <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">Fractals</p>
-                            <p className="text-white font-medium">{memberDetail.member.fractal_count}</p>
+                            <p className="text-white font-medium">
+                              {memberDetail.member.fractal_count}
+                            </p>
                           </div>
                           {memberDetail.member.hosting_count > 0 && (
                             <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                               <p className="text-gray-500">Hosted</p>
-                              <p className="text-white font-medium">{memberDetail.member.hosting_count}</p>
+                              <p className="text-white font-medium">
+                                {memberDetail.member.hosting_count}
+                              </p>
                             </div>
                           )}
                           {memberDetail.member.first_respect_at && (
                             <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                               <p className="text-gray-500">First Respect</p>
-                              <p className="text-white font-medium">{memberDetail.member.first_respect_at}</p>
+                              <p className="text-white font-medium">
+                                {memberDetail.member.first_respect_at}
+                              </p>
                             </div>
                           )}
                         </div>
@@ -294,7 +330,9 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                         {/* Fractal history */}
                         {memberDetail.fractalHistory.length > 0 && (
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Fractal History</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                              Fractal History
+                            </p>
                             <div className="space-y-1 max-h-48 overflow-y-auto">
                               {memberDetail.fractalHistory.map((fh, i) => (
                                 <div
@@ -306,7 +344,9 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                                       {fh.session_date ?? 'Unknown'}
                                     </span>
                                     {fh.session_name && (
-                                      <span className="text-gray-400 truncate">{fh.session_name}</span>
+                                      <span className="text-gray-400 truncate">
+                                        {fh.session_name}
+                                      </span>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -322,11 +362,15 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                         )}
 
                         {memberDetail.fractalHistory.length === 0 && (
-                          <p className="text-xs text-gray-500 text-center py-2">No fractal history recorded yet.</p>
+                          <p className="text-xs text-gray-500 text-center py-2">
+                            No fractal history recorded yet.
+                          </p>
                         )}
                       </>
                     ) : (
-                      <p className="text-xs text-gray-500 text-center py-2">Could not load member details.</p>
+                      <p className="text-xs text-gray-500 text-center py-2">
+                        Could not load member details.
+                      </p>
                     )}
                   </div>
                 )}

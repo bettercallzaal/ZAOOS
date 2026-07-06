@@ -87,10 +87,7 @@ function apiUrl(path: string, params: Record<string, string> = {}): string {
 }
 
 /** Fetch JSON from the Audius API with a timeout. */
-async function audiusFetch<T>(
-  url: string,
-  options: RequestInit = {},
-): Promise<T | null> {
+async function audiusFetch<T>(url: string, options: RequestInit = {}): Promise<T | null> {
   try {
     const res = await fetch(url, {
       ...options,
@@ -120,9 +117,7 @@ async function audiusFetch<T>(
  * - `https://audius.co/artist/playlist/playlist-slug`
  * - `https://audius.co/artist` (user profile)
  */
-export async function resolveAudiusUrl(
-  url: string,
-): Promise<AudiusResolveResult | null> {
+export async function resolveAudiusUrl(url: string): Promise<AudiusResolveResult | null> {
   try {
     const resolveEndpoint = apiUrl('/resolve', { url });
     const res = await fetch(resolveEndpoint, {
@@ -153,22 +148,16 @@ export async function resolveAudiusUrl(
       if (location.includes('/users/')) {
         const userId = location.split('/users/')[1]?.split('?')[0];
         if (!userId) return null;
-        const user = await audiusFetch<AudiusUser>(
-          apiUrl(`/users/${userId}`),
-        );
+        const user = await audiusFetch<AudiusUser>(apiUrl(`/users/${userId}`));
         return user ? { type: 'user', data: user } : null;
       }
 
       // Fallback: follow the redirect and try to determine type from the data
       const followData = await audiusFetch<Record<string, unknown>>(
-        location.startsWith('http')
-          ? location
-          : `${AUDIUS_API}${location}`,
+        location.startsWith('http') ? location : `${AUDIUS_API}${location}`,
       );
       if (!followData) return null;
-      const normalized = Array.isArray(followData)
-        ? followData[0]
-        : followData;
+      const normalized = Array.isArray(followData) ? followData[0] : followData;
       if (!normalized) return null;
 
       // Detect type from shape of the data
@@ -204,10 +193,7 @@ export async function resolveAudiusUrl(
  * Search Audius tracks by query string.
  * Returns an array of tracks, or an empty array on failure.
  */
-export async function searchAudiusTracks(
-  query: string,
-  limit = 10,
-): Promise<AudiusTrack[]> {
+export async function searchAudiusTracks(query: string, limit = 10): Promise<AudiusTrack[]> {
   try {
     const url = apiUrl('/tracks/search', {
       query,
@@ -232,9 +218,7 @@ export function getAudiusStreamUrl(trackId: string): string {
  * Fetch metadata for a single Audius track by ID.
  * Returns null if the track is not found or the request fails.
  */
-export async function getAudiusTrack(
-  trackId: string,
-): Promise<AudiusTrack | null> {
+export async function getAudiusTrack(trackId: string): Promise<AudiusTrack | null> {
   const url = apiUrl(`/tracks/${trackId}`);
   return audiusFetch<AudiusTrack>(url);
 }
@@ -243,9 +227,7 @@ export async function getAudiusTrack(
  * Fetch an Audius playlist (or album) by ID, including its tracks.
  * Returns null if the playlist is not found or the request fails.
  */
-export async function getAudiusPlaylist(
-  playlistId: string,
-): Promise<AudiusPlaylist | null> {
+export async function getAudiusPlaylist(playlistId: string): Promise<AudiusPlaylist | null> {
   const url = apiUrl(`/playlists/${playlistId}`);
   const data = await audiusFetch<AudiusPlaylist | AudiusPlaylist[]>(url);
   // API sometimes returns an array; extract first element

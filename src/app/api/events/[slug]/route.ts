@@ -1,14 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getEventBySlug } from '@/lib/unlock/events';
 import { logger } from '@/lib/logger';
+import { getEventBySlug } from '@/lib/unlock/events';
 
 const slugSchema = z.string().min(1).max(100);
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const parsed = slugSchema.safeParse(slug);

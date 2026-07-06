@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSession, mockFrom, mockFetchLb } = vi.hoisted(() => ({
   mockGetSession: vi.fn(),
@@ -20,9 +20,21 @@ function membersChain(data: unknown[]) {
 }
 
 const member = (over: Record<string, unknown>) => ({
-  name: 'X', wallet_address: '0x0', fid: 1, username: 'x', zid: null,
-  total_respect: 0, onchain_og: 0, onchain_zor: 0, fractal_respect: 0, fractal_count: 0,
-  first_respect_at: null, event_respect: 0, hosting_respect: 0, bonus_respect: 0, hosting_count: 0,
+  name: 'X',
+  wallet_address: '0x0',
+  fid: 1,
+  username: 'x',
+  zid: null,
+  total_respect: 0,
+  onchain_og: 0,
+  onchain_zor: 0,
+  fractal_respect: 0,
+  fractal_count: 0,
+  first_respect_at: null,
+  event_respect: 0,
+  hosting_respect: 0,
+  bonus_respect: 0,
+  hosting_count: 0,
   ...over,
 });
 
@@ -60,10 +72,7 @@ describe('GET /api/respect/leaderboard', () => {
 
   it('counts only holders with respect > 0', async () => {
     mockFrom.mockReturnValue(
-      membersChain([
-        member({ total_respect: 10 }),
-        member({ total_respect: 0 }),
-      ]),
+      membersChain([member({ total_respect: 10 }), member({ total_respect: 0 })]),
     );
     const { stats } = await (await GET()).json();
     expect(stats.holdersWithRespect).toBe(1);

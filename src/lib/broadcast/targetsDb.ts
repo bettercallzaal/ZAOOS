@@ -60,11 +60,15 @@ export async function deleteTarget(id: string, fid: number): Promise<void> {
   if (error) throw new Error(`Failed to delete target: ${error.message}`);
 }
 
-export async function updateTarget(id: string, fid: number, data: {
-  name?: string;
-  rtmpUrl?: string;
-  streamKey?: string;
-}): Promise<void> {
+export async function updateTarget(
+  id: string,
+  fid: number,
+  data: {
+    name?: string;
+    rtmpUrl?: string;
+    streamKey?: string;
+  },
+): Promise<void> {
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (data.name) update.name = data.name;
   if (data.rtmpUrl) update.rtmp_url = data.rtmpUrl;

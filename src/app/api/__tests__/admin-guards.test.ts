@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Hoisted mocks ────────────────────────────────────────────────────────────
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({
@@ -62,18 +62,27 @@ vi.mock('@/lib/db/audit-log', () => ({
   getClientIp: vi.fn(() => '0.0.0.0'),
 }));
 
-// ── Route imports ────────────────────────────────────────────────────────────
-import { GET as usersGET, POST as usersPOST, PATCH as usersPATCH, DELETE as usersDELETE } from '@/app/api/admin/users/route';
-import { GET as allowlistGET, POST as allowlistPOST, DELETE as allowlistDELETE } from '@/app/api/admin/allowlist/route';
-import { GET as hiddenGET } from '@/app/api/admin/hidden/route';
-import { POST as uploadPOST } from '@/app/api/admin/upload/route';
+import {
+  DELETE as allowlistDELETE,
+  GET as allowlistGET,
+  POST as allowlistPOST,
+} from '@/app/api/admin/allowlist/route';
 import { POST as backfillPOST } from '@/app/api/admin/backfill/route';
-import { GET as searchUsersGET } from '@/app/api/admin/search-users/route';
-import { POST as respectImportPOST } from '@/app/api/admin/respect-import/route';
-import { GET as quickStatsGET } from '@/app/api/admin/quick-stats/route';
-import { GET as memberHealthGET } from '@/app/api/admin/member-health/route';
-import { GET as ensSubnamesGET } from '@/app/api/admin/ens-subnames/route';
 import { GET as discordLinkGET } from '@/app/api/admin/discord-link/route';
+import { GET as ensSubnamesGET } from '@/app/api/admin/ens-subnames/route';
+import { GET as hiddenGET } from '@/app/api/admin/hidden/route';
+import { GET as memberHealthGET } from '@/app/api/admin/member-health/route';
+import { GET as quickStatsGET } from '@/app/api/admin/quick-stats/route';
+import { POST as respectImportPOST } from '@/app/api/admin/respect-import/route';
+import { GET as searchUsersGET } from '@/app/api/admin/search-users/route';
+import { POST as uploadPOST } from '@/app/api/admin/upload/route';
+// ── Route imports ────────────────────────────────────────────────────────────
+import {
+  DELETE as usersDELETE,
+  GET as usersGET,
+  PATCH as usersPATCH,
+  POST as usersPOST,
+} from '@/app/api/admin/users/route';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function makeRequest(url: string, options?: RequestInit) {
@@ -105,42 +114,149 @@ const dummyBody = JSON.stringify({ id: '550e8400-e29b-41d4-a716-446655440000' })
 
 const adminRoutes: AdminRouteEntry[] = [
   // admin/users — uses requireAdmin() helper → 401 unauth, 403 non-admin
-  { label: 'GET    /api/admin/users', url: '/api/admin/users', handler: usersGET as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
-  { label: 'POST   /api/admin/users', url: '/api/admin/users', handler: usersPOST as HandlerFn, init: { method: 'POST', body: JSON.stringify({ fid: 1 }) }, unauthStatus: 401, unauthError: 'Unauthorized' },
-  { label: 'PATCH  /api/admin/users', url: '/api/admin/users', handler: usersPATCH as HandlerFn, init: { method: 'PATCH', body: JSON.stringify({ id: '550e8400-e29b-41d4-a716-446655440000', role: 'member' }) }, unauthStatus: 401, unauthError: 'Unauthorized' },
-  { label: 'DELETE /api/admin/users', url: '/api/admin/users', handler: usersDELETE as HandlerFn, init: { method: 'DELETE', body: dummyBody }, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'GET    /api/admin/users',
+    url: '/api/admin/users',
+    handler: usersGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'POST   /api/admin/users',
+    url: '/api/admin/users',
+    handler: usersPOST as HandlerFn,
+    init: { method: 'POST', body: JSON.stringify({ fid: 1 }) },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'PATCH  /api/admin/users',
+    url: '/api/admin/users',
+    handler: usersPATCH as HandlerFn,
+    init: {
+      method: 'PATCH',
+      body: JSON.stringify({ id: '550e8400-e29b-41d4-a716-446655440000', role: 'member' }),
+    },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'DELETE /api/admin/users',
+    url: '/api/admin/users',
+    handler: usersDELETE as HandlerFn,
+    init: { method: 'DELETE', body: dummyBody },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 
   // admin/allowlist — uses requireAdmin() helper → 401 unauth, 403 non-admin
-  { label: 'GET    /api/admin/allowlist', url: '/api/admin/allowlist', handler: allowlistGET as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
-  { label: 'POST   /api/admin/allowlist', url: '/api/admin/allowlist', handler: allowlistPOST as HandlerFn, init: { method: 'POST', body: JSON.stringify({ wallet: '0x1234' }) }, unauthStatus: 401, unauthError: 'Unauthorized' },
-  { label: 'DELETE /api/admin/allowlist', url: '/api/admin/allowlist', handler: allowlistDELETE as HandlerFn, init: { method: 'DELETE', body: dummyBody }, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'GET    /api/admin/allowlist',
+    url: '/api/admin/allowlist',
+    handler: allowlistGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'POST   /api/admin/allowlist',
+    url: '/api/admin/allowlist',
+    handler: allowlistPOST as HandlerFn,
+    init: { method: 'POST', body: JSON.stringify({ wallet: '0x1234' }) },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'DELETE /api/admin/allowlist',
+    url: '/api/admin/allowlist',
+    handler: allowlistDELETE as HandlerFn,
+    init: { method: 'DELETE', body: dummyBody },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 
   // admin/hidden — inline checks → 401 unauth, 403 non-admin
-  { label: 'GET    /api/admin/hidden', url: '/api/admin/hidden', handler: hiddenGET as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'GET    /api/admin/hidden',
+    url: '/api/admin/hidden',
+    handler: hiddenGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 
   // admin/upload — inline checks → 401 unauth, 403 non-admin
-  { label: 'POST   /api/admin/upload', url: '/api/admin/upload', handler: uploadPOST as HandlerFn, init: { method: 'POST', body: JSON.stringify({}) }, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'POST   /api/admin/upload',
+    url: '/api/admin/upload',
+    handler: uploadPOST as HandlerFn,
+    init: { method: 'POST', body: JSON.stringify({}) },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 
   // admin/respect-import — inline checks → 401 unauth, 403 non-admin
-  { label: 'POST   /api/admin/respect-import', url: '/api/admin/respect-import', handler: respectImportPOST as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'POST   /api/admin/respect-import',
+    url: '/api/admin/respect-import',
+    handler: respectImportPOST as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 
   // admin/backfill — uses !session?.isAdmin → 403 for both unauth and non-admin
-  { label: 'POST   /api/admin/backfill', url: '/api/admin/backfill', handler: backfillPOST as HandlerFn, unauthStatus: 403, unauthError: 'Admin access required' },
+  {
+    label: 'POST   /api/admin/backfill',
+    url: '/api/admin/backfill',
+    handler: backfillPOST as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin access required',
+  },
 
   // admin/search-users — uses !session?.isAdmin → 403 for both unauth and non-admin
-  { label: 'GET    /api/admin/search-users', url: '/api/admin/search-users?q=test', handler: searchUsersGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin access required' },
+  {
+    label: 'GET    /api/admin/search-users',
+    url: '/api/admin/search-users?q=test',
+    handler: searchUsersGET as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin access required',
+  },
 
   // admin/quick-stats — !session?.isAdmin → 403 "Admin required" for both
-  { label: 'GET    /api/admin/quick-stats', url: '/api/admin/quick-stats', handler: quickStatsGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin required', nonAdminError: 'Admin required' },
+  {
+    label: 'GET    /api/admin/quick-stats',
+    url: '/api/admin/quick-stats',
+    handler: quickStatsGET as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin required',
+    nonAdminError: 'Admin required',
+  },
 
   // admin/member-health — !session?.isAdmin → 403 "Admin required" for both
-  { label: 'GET    /api/admin/member-health', url: '/api/admin/member-health', handler: memberHealthGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin required', nonAdminError: 'Admin required' },
+  {
+    label: 'GET    /api/admin/member-health',
+    url: '/api/admin/member-health',
+    handler: memberHealthGET as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin required',
+    nonAdminError: 'Admin required',
+  },
 
   // admin/ens-subnames — !session?.isAdmin → 403 "Admin access required" for both
-  { label: 'GET    /api/admin/ens-subnames', url: '/api/admin/ens-subnames', handler: ensSubnamesGET as HandlerFn, unauthStatus: 403, unauthError: 'Admin access required' },
+  {
+    label: 'GET    /api/admin/ens-subnames',
+    url: '/api/admin/ens-subnames',
+    handler: ensSubnamesGET as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin access required',
+  },
 
   // admin/discord-link — split checks → 401 unauth, 403 non-admin
-  { label: 'GET    /api/admin/discord-link', url: '/api/admin/discord-link', handler: discordLinkGET as HandlerFn, unauthStatus: 401, unauthError: 'Unauthorized' },
+  {
+    label: 'GET    /api/admin/discord-link',
+    url: '/api/admin/discord-link',
+    handler: discordLinkGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
 ];
 
 // ── Tests: unauthenticated → 401 or 403 ─────────────────────────────────────

@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { normalizeForDiscord } from '@/lib/publish/normalize';
-import { publishToDiscord, buildZaoEmbed } from '@/lib/publish/discord';
 import { logger } from '@/lib/logger';
+import { buildZaoEmbed, publishToDiscord } from '@/lib/publish/discord';
+import { normalizeForDiscord } from '@/lib/publish/normalize';
 
 const publishDiscordSchema = z.object({
   text: z.string().min(1).max(2000),
@@ -76,11 +76,13 @@ export async function POST(req: NextRequest) {
 
     // Build ZAO-branded embed if title is provided
     const embeds = title
-      ? [buildZaoEmbed({
-          title,
-          description: normalizedText,
-          imageUrl,
-        })]
+      ? [
+          buildZaoEmbed({
+            title,
+            description: normalizedText,
+            imageUrl,
+          }),
+        ]
       : undefined;
 
     // Publish
@@ -91,23 +93,18 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 502 },
-      );
+      return NextResponse.json({ success: false, error: result.error }, { status: 502 });
     }
 
     // Log to publish_log table
-    await supabaseAdmin
-      .from('publish_log')
-      .insert({
-        platform: 'discord',
-        cast_hash: castHash || null,
-        platform_post_id: result.messageId || null,
-        published_by_fid: session.fid,
-        text: normalizedText,
-        status: 'published',
-      });
+    await supabaseAdmin.from('publish_log').insert({
+      platform: 'discord',
+      cast_hash: castHash || null,
+      platform_post_id: result.messageId || null,
+      published_by_fid: session.fid,
+      text: normalizedText,
+      status: 'published',
+    });
 
     return NextResponse.json({
       success: true,
@@ -116,12 +113,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     logger.error('[publish/discord] Error:', err);
 
-    const message =
-      err instanceof Error ? err.message : 'Failed to publish to Discord';
+    const message = err instanceof Error ? err.message : 'Failed to publish to Discord';
 
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

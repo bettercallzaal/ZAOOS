@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -116,7 +116,9 @@ export async function GET(req: NextRequest) {
         (async () => {
           const { data } = await supabaseAdmin
             .from('channel_casts')
-            .select('hash, text, channel_id, author_display, author_username, author_pfp, timestamp')
+            .select(
+              'hash, text, channel_id, author_display, author_username, author_pfp, timestamp',
+            )
             .textSearch('search_vector', query, { type: 'websearch' })
             .order('timestamp', { ascending: false })
             .limit(limit);
@@ -190,9 +192,7 @@ export async function GET(req: NextRequest) {
                 type: 'music',
                 id: String(row.id),
                 title: row.title || 'Untitled Track',
-                snippet: snippet(
-                  [row.artist, row.note].filter(Boolean).join(' - '),
-                ),
+                snippet: snippet([row.artist, row.note].filter(Boolean).join(' - ')),
                 href: '/music',
                 timestamp: row.submitted_at || '',
                 metadata: {
@@ -224,9 +224,7 @@ export async function GET(req: NextRequest) {
                 type: 'member',
                 id: String(row.id),
                 title: row.name || row.username || 'Member',
-                snippet: snippet(
-                  [row.category, row.biography].filter(Boolean).join(' - '),
-                ),
+                snippet: snippet([row.category, row.biography].filter(Boolean).join(' - ')),
                 href: `/social/profile/${row.username || row.id}`,
                 timestamp: row.created_at || '',
                 metadata: {

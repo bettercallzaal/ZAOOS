@@ -30,14 +30,14 @@ function isPrivateUrl(urlStr: string): boolean {
 
     // Block private IP ranges
     const parts = hostname.split('.');
-    if (parts.length === 4 && parts.every(p => /^\d+$/.test(p))) {
+    if (parts.length === 4 && parts.every((p) => /^\d+$/.test(p))) {
       const [a, b] = parts.map(Number);
-      if (a === 10) return true;                          // 10.0.0.0/8
-      if (a === 172 && b >= 16 && b <= 31) return true;   // 172.16.0.0/12
-      if (a === 192 && b === 168) return true;             // 192.168.0.0/16
-      if (a === 127) return true;                          // 127.0.0.0/8
-      if (a === 169 && b === 254) return true;             // 169.254.0.0/16
-      if (a === 0) return true;                            // 0.0.0.0/8
+      if (a === 10) return true; // 10.0.0.0/8
+      if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+      if (a === 192 && b === 168) return true; // 192.168.0.0/16
+      if (a === 127) return true; // 127.0.0.0/8
+      if (a === 169 && b === 254) return true; // 169.254.0.0/16
+      if (a === 0) return true; // 0.0.0.0/8
     }
 
     // Block IPv6 localhost
@@ -78,14 +78,16 @@ export async function extractOGMetadata(url: string): Promise<OGMetadata> {
     // Only parse the first 50KB to avoid memory issues on large pages
     const head = html.slice(0, 50_000);
 
-    const ogTitle = extractMetaContent(head, 'og:title')
-      ?? extractMetaContent(head, 'twitter:title')
-      ?? extractTitle(head);
-    const ogDescription = extractMetaContent(head, 'og:description')
-      ?? extractMetaContent(head, 'twitter:description')
-      ?? extractMetaContent(head, 'description');
-    const ogImage = extractMetaContent(head, 'og:image')
-      ?? extractMetaContent(head, 'twitter:image');
+    const ogTitle =
+      extractMetaContent(head, 'og:title') ??
+      extractMetaContent(head, 'twitter:title') ??
+      extractTitle(head);
+    const ogDescription =
+      extractMetaContent(head, 'og:description') ??
+      extractMetaContent(head, 'twitter:description') ??
+      extractMetaContent(head, 'description');
+    const ogImage =
+      extractMetaContent(head, 'og:image') ?? extractMetaContent(head, 'twitter:image');
 
     return { ogTitle, ogDescription, ogImage };
   } catch {
@@ -97,8 +99,8 @@ function extractMetaContent(html: string, property: string): string | null {
   // Match both property="..." and name="..." attributes
   const regex = new RegExp(
     `<meta[^>]*(?:property|name)=["']${escapeRegex(property)}["'][^>]*content=["']([^"']*)["']` +
-    `|<meta[^>]*content=["']([^"']*)["'][^>]*(?:property|name)=["']${escapeRegex(property)}["']`,
-    'i'
+      `|<meta[^>]*content=["']([^"']*)["'][^>]*(?:property|name)=["']${escapeRegex(property)}["']`,
+    'i',
   );
   const match = html.match(regex);
   const value = match?.[1] ?? match?.[2] ?? null;

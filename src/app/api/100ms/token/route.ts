@@ -1,11 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import jwt from 'jsonwebtoken';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
-import { getMSRoomById, isStageRoom, getRoomSpeakerFids, setMSRoom100msId } from '@/lib/social/msRoomsDb';
-import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import {
+  getMSRoomById,
+  getRoomSpeakerFids,
+  isStageRoom,
+  setMSRoom100msId,
+} from '@/lib/social/msRoomsDb';
+import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
 
 /**
  * Collect every on-chain address we can attribute to a FID — the session's
@@ -57,27 +62,35 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = TokenSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { userId, role, roomId, roomName } = parsed.data;
 
     // Verify requested userId matches session user's FID
     if (userId !== String(session.fid)) {
-      return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Forbidden: cannot generate token for another user' },
+        { status: 403 },
+      );
     }
 
     // Resolve the managed room once (roomName carries the ms_rooms UUID; the
     // shared default uses 'zao-live-room' and has no row). Reused below for
     // role checks, stage-speaker auth, and token-gate enforcement.
-    const msRoom =
-      roomName && roomName !== 'zao-live-room' ? await getMSRoomById(roomName) : null;
+    const msRoom = roomName && roomName !== 'zao-live-room' ? await getMSRoomById(roomName) : null;
     const isRoomHost = !!msRoom && session.fid === msRoom.host_fid;
 
     // Role validation — host/moderator (100ms moderation powers) is limited to
     // global admins and the room's own host.
     if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isRoomHost) {
-      return NextResponse.json({ error: 'Forbidden: only admins can request moderator role' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Forbidden: only admins can request moderator role' },
+        { status: 403 },
+      );
     }
 
     // Stage rooms (100ms): only the host or an approved speaker may publish.
@@ -86,10 +99,7 @@ export async function POST(req: NextRequest) {
       const authorized =
         session.fid === msRoom.host_fid || getRoomSpeakerFids(msRoom).includes(session.fid);
       if (!authorized) {
-        return NextResponse.json(
-          { error: 'Not approved to speak in this room' },
-          { status: 403 },
-        );
+        return NextResponse.json({ error: 'Not approved to speak in this room' }, { status: 403 });
       }
     }
 
@@ -126,7 +136,7 @@ export async function POST(req: NextRequest) {
         nbf: Math.floor(Date.now() / 1000),
       },
       appSecret,
-      { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() }
+      { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() },
     );
 
     // Find or create room — use roomName for per-room IDs, fallback to default
@@ -163,7 +173,9 @@ export async function POST(req: NextRequest) {
       // Persist the resolved 100ms room id back onto its ms_rooms row so future
       // joins skip this list/create round-trip. Best-effort, non-blocking.
       if (hmsRoomId && msRoom) {
-        setMSRoom100msId(msRoom.id, hmsRoomId).catch((e) => logger.error('persist room_id_100ms failed', e));
+        setMSRoom100msId(msRoom.id, hmsRoomId).catch((e) =>
+          logger.error('persist room_id_100ms failed', e),
+        );
       }
     }
 
@@ -180,7 +192,7 @@ export async function POST(req: NextRequest) {
         nbf: Math.floor(Date.now() / 1000),
       },
       appSecret,
-      { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() }
+      { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() },
     );
 
     // Audit log token generation

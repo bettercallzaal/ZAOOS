@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 export async function GET() {
@@ -32,10 +32,7 @@ export async function GET() {
     }
 
     // Total minutes and session count
-    const totalSeconds = sessions.reduce(
-      (sum, s) => sum + (s.duration_seconds || 0),
-      0
-    );
+    const totalSeconds = sessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0);
     const totalMinutes = Math.round(totalSeconds / 60);
     const totalSessions = sessions.length;
 
@@ -102,9 +99,6 @@ export async function GET() {
     });
   } catch (error) {
     logger.error('[spaces/stats] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch stats' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }

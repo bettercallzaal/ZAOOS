@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { getValidTwitchToken, createTwitchMarker } from '@/lib/twitch/client';
 import { logger } from '@/lib/logger';
+import { createTwitchMarker, getValidTwitchToken } from '@/lib/twitch/client';
 
 const markerSchema = z.object({
   description: z.string().max(140).optional().default(''),
@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
     const creds = await getValidTwitchToken(session.fid);
 
     if (!creds) {
-      return NextResponse.json({ error: 'Twitch not connected or token expired, please reconnect' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Twitch not connected or token expired, please reconnect' },
+        { status: 401 },
+      );
     }
 
     // Create stream marker via shared client

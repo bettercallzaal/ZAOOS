@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 // Type-only imports — the msRoomsDb module itself is server-only (service role).
-import type { MSRoom, SpeakerRequest, PinnedLink } from '@/lib/social/msRoomsDb';
+import type { MSRoom, PinnedLink, SpeakerRequest } from '@/lib/social/msRoomsDb';
 import type { TokenGateConfig } from '@/lib/spaces/tokenGate';
 
 const HMSVideoRoom = dynamic(() => import('@/components/spaces/HMSVideoRoom'), { ssr: false });
@@ -87,7 +87,10 @@ export default function HMSRoomPage() {
         const gateConfig = (roomData.settings?.gate_config ?? null) as TokenGateConfig | null;
         if (gateConfig) {
           if (!walletAddress) {
-            if (mounted) { setGateBlocked(true); setLoading(false); }
+            if (mounted) {
+              setGateBlocked(true);
+              setLoading(false);
+            }
             return;
           }
           const gateRes = await fetch('/api/spaces/gate-check', {
@@ -97,7 +100,10 @@ export default function HMSRoomPage() {
           });
           const gateData = await gateRes.json();
           if (!gateData.allowed) {
-            if (mounted) { setGateBlocked(true); setLoading(false); }
+            if (mounted) {
+              setGateBlocked(true);
+              setLoading(false);
+            }
             return;
           }
         }
@@ -126,11 +132,26 @@ export default function HMSRoomPage() {
     const supabase = getSupabaseBrowser();
     const channel = supabase
       .channel(`hms-stage-${room.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'speaker_requests', filter: `room_id=eq.${room.id}` }, () => refreshStage())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ms_rooms', filter: `id=eq.${room.id}` }, () => refreshStage())
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'speaker_requests',
+          filter: `room_id=eq.${room.id}`,
+        },
+        () => refreshStage(),
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'ms_rooms', filter: `id=eq.${room.id}` },
+        () => refreshStage(),
+      )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [isStage, room, refreshStage]);
 
   // Clear the local "hand raised" flag once the host acts (we're now a speaker)
@@ -272,7 +293,10 @@ export default function HMSRoomPage() {
   }
 
   if (gateBlocked) {
-    const gate = (room?.settings?.gate_config ?? null) as { type?: string; contractAddress?: string } | null;
+    const gate = (room?.settings?.gate_config ?? null) as {
+      type?: string;
+      contractAddress?: string;
+    } | null;
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col items-center justify-center gap-4 px-4">
         <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full text-center">
@@ -308,9 +332,13 @@ export default function HMSRoomPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-white font-bold">{room.title}</h1>
-            <span className="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">100ms</span>
+            <span className="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
+              100ms
+            </span>
             {isStage && (
-              <span className="text-[10px] bg-[#f5a623]/20 text-[#f5a623] px-2 py-0.5 rounded-full">STAGE</span>
+              <span className="text-[10px] bg-[#f5a623]/20 text-[#f5a623] px-2 py-0.5 rounded-full">
+                STAGE
+              </span>
             )}
           </div>
           <p className="text-gray-400 text-xs">
@@ -377,7 +405,9 @@ export default function HMSRoomPage() {
                 .filter((f) => f !== room.host_fid)
                 .map((fid) => (
                   <li key={fid} className="flex items-center justify-between gap-3">
-                    <span className="text-white text-sm truncate">🎙️ {speakerNames[fid] || `fid-${fid}`}</span>
+                    <span className="text-white text-sm truncate">
+                      🎙️ {speakerNames[fid] || `fid-${fid}`}
+                    </span>
                     <button
                       type="button"
                       onClick={() => hostAction('demote', fid)}
@@ -395,7 +425,9 @@ export default function HMSRoomPage() {
         {isStage && !canSpeak && user && (
           <div className="mb-4 flex items-center justify-center">
             {handRaised ? (
-              <p className="text-sm text-[#f5a623]">✋ Hand raised — waiting for the host to add you.</p>
+              <p className="text-sm text-[#f5a623]">
+                ✋ Hand raised — waiting for the host to add you.
+              </p>
             ) : (
               <button
                 type="button"
@@ -412,7 +444,9 @@ export default function HMSRoomPage() {
         {(pinnedLinks.length > 0 || isHost) && (
           <div className="mb-4 rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4">
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400">Pinned links</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Pinned links
+              </h2>
               {isHost && (
                 <button
                   type="button"
@@ -426,7 +460,9 @@ export default function HMSRoomPage() {
 
             {pinnedLinks.length === 0 ? (
               <p className="text-gray-500 text-sm">
-                {isHost ? 'Add links for everyone in the room — agenda, docs, mints.' : 'No links pinned.'}
+                {isHost
+                  ? 'Add links for everyone in the room — agenda, docs, mints.'
+                  : 'No links pinned.'}
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">

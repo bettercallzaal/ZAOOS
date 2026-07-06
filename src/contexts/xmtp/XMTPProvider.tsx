@@ -1,22 +1,30 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useConnection } from '@/contexts/xmtp/connection';
+import { useConversations } from '@/contexts/xmtp/conversations';
+import { useGroups } from '@/contexts/xmtp/groups';
+import { useMembers } from '@/contexts/xmtp/members';
+import { useMessages } from '@/contexts/xmtp/messages';
 import type {
-  XMTPContextValue,
-  WalletClient,
   AnyClient,
-  ZaoMember,
   MessagingPrefs,
+  WalletClient,
+  XMTPContextValue,
   XMTPSharedRefs,
   XMTPSharedState,
+  ZaoMember,
 } from '@/contexts/xmtp/types';
 import { PREFS_DEFAULTS } from '@/contexts/xmtp/types';
-import { useConversations } from '@/contexts/xmtp/conversations';
-import { useMessages } from '@/contexts/xmtp/messages';
-import { useMembers } from '@/contexts/xmtp/members';
-import { useGroups } from '@/contexts/xmtp/groups';
-import { useConnection } from '@/contexts/xmtp/connection';
+import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
 
 // ── Context ─────────────────────────────────────────────────────────
 
@@ -29,7 +37,10 @@ export function useXMTPContext() {
 }
 
 /** Safe version that returns disconnected defaults when outside XMTPProvider. */
-export function useXMTPContextSafe(): Pick<XMTPContextValue, 'isConnected' | 'activeXMTPAddress' | 'switchWallet'> {
+export function useXMTPContextSafe(): Pick<
+  XMTPContextValue,
+  'isConnected' | 'activeXMTPAddress' | 'switchWallet'
+> {
   const ctx = useContext(XMTPContext);
   if (!ctx) return { isConnected: false, activeXMTPAddress: null, switchWallet: () => {} };
   return ctx;
@@ -115,48 +126,93 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Shared Refs & State ────────────────────────────────────────────
-  const sharedRefs: XMTPSharedRefs = useMemo(() => ({
-    walletsRef, primaryClientRef, activeConvIdRef, activeConvWalletRef,
-    isLoadingConvRef, messageIdSetRef, convStreamCleanupRef, msgStreamCleanupRef,
-    streamsActiveRef, reconnectTimerRef, reconnectAttemptsRef, convSelectGenRef,
-    lastMessagesRef, unreadCountsRef, messagingPrefsRef, actionErrorTimerRef,
-    zaoMembersRef,
-  }), []);
+  const sharedRefs: XMTPSharedRefs = useMemo(
+    () => ({
+      walletsRef,
+      primaryClientRef,
+      activeConvIdRef,
+      activeConvWalletRef,
+      isLoadingConvRef,
+      messageIdSetRef,
+      convStreamCleanupRef,
+      msgStreamCleanupRef,
+      streamsActiveRef,
+      reconnectTimerRef,
+      reconnectAttemptsRef,
+      convSelectGenRef,
+      lastMessagesRef,
+      unreadCountsRef,
+      messagingPrefsRef,
+      actionErrorTimerRef,
+      zaoMembersRef,
+    }),
+    [],
+  );
 
-  const sharedState: XMTPSharedState = useMemo(() => ({
-    setConnectedWallets, setIsConnecting, setConnectingWallet, setError, setActionError,
-    setStreamConnected, setConversations, setActiveConversationId, setMessages,
-    setLoadingMessages, setZaoMembers, setLoadingMembers, setReconnecting,
-    tabLocked, activeConversationId, zaoMembers, showActionError,
-  }), [tabLocked, activeConversationId, zaoMembers, showActionError]);
+  const sharedState: XMTPSharedState = useMemo(
+    () => ({
+      setConnectedWallets,
+      setIsConnecting,
+      setConnectingWallet,
+      setError,
+      setActionError,
+      setStreamConnected,
+      setConversations,
+      setActiveConversationId,
+      setMessages,
+      setLoadingMessages,
+      setZaoMembers,
+      setLoadingMembers,
+      setReconnecting,
+      tabLocked,
+      activeConversationId,
+      zaoMembers,
+      showActionError,
+    }),
+    [tabLocked, activeConversationId, zaoMembers, showActionError],
+  );
 
   // ── Compose Hooks ──────────────────────────────────────────────────
   const {
-    findClientForConversation, loadAllConversations, seedLastMessages,
-    selectConversation, refreshConversations, removeConversation,
+    findClientForConversation,
+    loadAllConversations,
+    seedLastMessages,
+    selectConversation,
+    refreshConversations,
+    removeConversation,
   } = useConversations(sharedRefs, sharedState);
 
-  const {
-    startGlobalStreams, sendMessage, reconnectStreams,
-  } = useMessages(sharedRefs, sharedState, loadAllConversations);
-
-  const {
-    getFirstClient, checkZaoMembers, createDm, startDmWithMember,
-  } = useMembers(sharedRefs, sharedState, loadAllConversations, selectConversation);
-
-  const {
-    createGroup, leaveGroup, getGroupMembers,
-  } = useGroups(
-    sharedRefs, sharedState, getFirstClient, findClientForConversation,
-    loadAllConversations, removeConversation,
+  const { startGlobalStreams, sendMessage, reconnectStreams } = useMessages(
+    sharedRefs,
+    sharedState,
+    loadAllConversations,
   );
 
-  const {
-    autoConnect, connectWallet, disconnectWallet, disconnectAll, switchWallet,
-  } = useConnection(
-    sharedRefs, sharedState, seedLastMessages, loadAllConversations,
-    checkZaoMembers, startGlobalStreams,
+  const { getFirstClient, checkZaoMembers, createDm, startDmWithMember } = useMembers(
+    sharedRefs,
+    sharedState,
+    loadAllConversations,
+    selectConversation,
   );
+
+  const { createGroup, leaveGroup, getGroupMembers } = useGroups(
+    sharedRefs,
+    sharedState,
+    getFirstClient,
+    findClientForConversation,
+    loadAllConversations,
+    removeConversation,
+  );
+
+  const { autoConnect, connectWallet, disconnectWallet, disconnectAll, switchWallet } =
+    useConnection(
+      sharedRefs,
+      sharedState,
+      seedLastMessages,
+      loadAllConversations,
+      checkZaoMembers,
+      startGlobalStreams,
+    );
 
   // ── Cleanup on unmount ─────────────────────────────────────────────
   useEffect(() => {
@@ -183,54 +239,79 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Context Value ──────────────────────────────────────────────────
-  const contextValue = useMemo(() => ({
-    connectedWallets,
-    activeWalletCount: connectedWallets.length,
-    isConnecting,
-    connectingWallet,
-    isConnected: connectedWallets.length > 0,
-    error,
-    actionError,
-    streamConnected,
-    tabLocked,
-    reconnecting,
-    activeXMTPAddress: connectedWallets[0] ?? null,
-    conversations,
-    activeConversationId,
-    messages,
-    loadingMessages,
-    zaoMembers,
-    loadingMembers,
-    autoConnect,
-    connectWallet,
-    disconnectWallet,
-    disconnectAll,
-    switchWallet,
-    selectConversation,
-    sendMessage,
-    createDm,
-    createGroup,
-    refreshConversations,
-    startDmWithMember,
-    clearError,
-    clearActionError,
-    reconnectStreams,
-    removeConversation,
-    leaveGroup,
-    refreshMembers: checkZaoMembers,
-    getGroupMembers,
-  }), [
-    connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
-    tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
-    zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
-    disconnectAll, switchWallet, selectConversation, sendMessage, createDm, createGroup,
-    refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
-    removeConversation, leaveGroup, checkZaoMembers, getGroupMembers,
-  ]);
-
-  return (
-    <XMTPContext.Provider value={contextValue}>
-      {children}
-    </XMTPContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      connectedWallets,
+      activeWalletCount: connectedWallets.length,
+      isConnecting,
+      connectingWallet,
+      isConnected: connectedWallets.length > 0,
+      error,
+      actionError,
+      streamConnected,
+      tabLocked,
+      reconnecting,
+      activeXMTPAddress: connectedWallets[0] ?? null,
+      conversations,
+      activeConversationId,
+      messages,
+      loadingMessages,
+      zaoMembers,
+      loadingMembers,
+      autoConnect,
+      connectWallet,
+      disconnectWallet,
+      disconnectAll,
+      switchWallet,
+      selectConversation,
+      sendMessage,
+      createDm,
+      createGroup,
+      refreshConversations,
+      startDmWithMember,
+      clearError,
+      clearActionError,
+      reconnectStreams,
+      removeConversation,
+      leaveGroup,
+      refreshMembers: checkZaoMembers,
+      getGroupMembers,
+    }),
+    [
+      connectedWallets,
+      isConnecting,
+      connectingWallet,
+      error,
+      actionError,
+      streamConnected,
+      tabLocked,
+      reconnecting,
+      conversations,
+      activeConversationId,
+      messages,
+      loadingMessages,
+      zaoMembers,
+      loadingMembers,
+      autoConnect,
+      connectWallet,
+      disconnectWallet,
+      disconnectAll,
+      switchWallet,
+      selectConversation,
+      sendMessage,
+      createDm,
+      createGroup,
+      refreshConversations,
+      startDmWithMember,
+      clearError,
+      clearActionError,
+      reconnectStreams,
+      removeConversation,
+      leaveGroup,
+      checkZaoMembers,
+      getGroupMembers,
+    ],
   );
+
+  return <XMTPContext.Provider value={contextValue}>{children}</XMTPContext.Provider>;
 }

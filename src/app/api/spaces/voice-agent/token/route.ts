@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getSessionData } from '@/lib/auth/session';
 import { getSignedConversationUrl } from '@/lib/agents/voice/elevenlabs';
+import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 /**
@@ -43,10 +43,7 @@ export async function POST(req: NextRequest) {
 
     const agentId = resolveAgentId(parsed.data.agent);
     if (!agentId) {
-      return NextResponse.json(
-        { error: 'Voice agent not configured' },
-        { status: 503 },
-      );
+      return NextResponse.json({ error: 'Voice agent not configured' }, { status: 503 });
     }
 
     const { signedUrl } = await getSignedConversationUrl(agentId);
@@ -54,9 +51,6 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error('[voice-agent/token] failed:', message);
-    return NextResponse.json(
-      { error: 'Failed to start voice session' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to start voice session' }, { status: 500 });
   }
 }

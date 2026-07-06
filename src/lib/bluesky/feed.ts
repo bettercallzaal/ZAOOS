@@ -5,10 +5,12 @@ import { supabaseAdmin } from '@/lib/db/supabase';
  * Sync recent posts from all ZAO Bluesky members into the feed index.
  * Fetches the last 20 posts from each member, stores new ones.
  */
-export async function syncMemberPosts(): Promise<{ synced: number; members: number; errors: string[] }> {
-  const { data: members } = await supabaseAdmin
-    .from('bluesky_members')
-    .select('did, handle');
+export async function syncMemberPosts(): Promise<{
+  synced: number;
+  members: number;
+  errors: string[];
+}> {
+  const { data: members } = await supabaseAdmin.from('bluesky_members').select('did, handle');
 
   if (!members?.length) return { synced: 0, members: 0, errors: [] };
 
@@ -44,7 +46,7 @@ export async function syncMemberPosts(): Promise<{ synced: number; members: numb
         errors.push(`${member.handle}: ${err instanceof Error ? err.message : 'Unknown error'}`);
         return 0;
       }
-    })
+    }),
   );
 
   for (const result of results) {

@@ -18,7 +18,7 @@
  * Run: node --import tsx scripts/first-cast.ts --text "gm from ZOE"
  * Requires: npm i @farcaster/hub-nodejs
  */
-import { makeCastAdd, FarcasterNetwork, Message, CastType } from '@farcaster/hub-nodejs';
+import { CastType, FarcasterNetwork, Message, makeCastAdd } from '@farcaster/hub-nodejs';
 import { makeSigner } from '../bot/src/zoe/farcaster/signer';
 import { buildX402Header, useX402 } from '../bot/src/zoe/farcaster/x402';
 
@@ -41,12 +41,21 @@ async function main() {
   const fid = Number(requireEnv('FARCASTER_BOT_FID'));
   const writeBase = requireEnv('FARCASTER_WRITE_API_BASE').replace(/\/$/, '');
   const network =
-    (process.env.FC_NETWORK_ID ?? '1') === '1' ? FarcasterNetwork.MAINNET : FarcasterNetwork.TESTNET;
+    (process.env.FC_NETWORK_ID ?? '1') === '1'
+      ? FarcasterNetwork.MAINNET
+      : FarcasterNetwork.TESTNET;
 
   const signer = makeSigner();
 
   const castResult = await makeCastAdd(
-    { text, embeds: [], embedsDeprecated: [], mentions: [], mentionsPositions: [], type: CastType.CAST },
+    {
+      text,
+      embeds: [],
+      embedsDeprecated: [],
+      mentions: [],
+      mentionsPositions: [],
+      type: CastType.CAST,
+    },
     { fid, network },
     signer,
   );

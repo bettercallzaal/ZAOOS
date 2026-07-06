@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
+import { communityConfig } from '@/../community.config';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
-import { communityConfig } from '@/../community.config';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
-import { moderateContent } from '@/lib/moderation/moderate';
 import { logger } from '@/lib/logger';
+import { moderateContent } from '@/lib/moderation/moderate';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
 
 const WATCHED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -62,7 +62,10 @@ export async function POST(req: NextRequest) {
   const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
   const sigBuffer = Buffer.from(sig, 'hex');
   const expectedBuffer = Buffer.from(expected, 'hex');
-  if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+  if (
+    sigBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(sigBuffer, expectedBuffer)
+  ) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
@@ -92,9 +95,7 @@ export async function POST(req: NextRequest) {
   let castRow: ReturnType<typeof castToRow>;
   try {
     castRow = castToRow(cast, channelId);
-    await supabaseAdmin
-      .from('channel_casts')
-      .upsert(castRow, { onConflict: 'hash' });
+    await supabaseAdmin.from('channel_casts').upsert(castRow, { onConflict: 'hash' });
   } catch (err) {
     logger.error('[webhook/neynar] DB insert error:', err);
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
@@ -119,16 +120,14 @@ export async function POST(req: NextRequest) {
 
       // Auto-hide severely toxic content
       if (result.action === 'hide') {
-        await supabaseAdmin
-          .from('hidden_messages')
-          .upsert(
-            {
-              cast_hash: castRow.hash,
-              hidden_by_fid: 0, // System / AI moderation
-              reason: `Auto-hidden: ${result.categories.join(', ')}`,
-            },
-            { onConflict: 'cast_hash' },
-          );
+        await supabaseAdmin.from('hidden_messages').upsert(
+          {
+            cast_hash: castRow.hash,
+            hidden_by_fid: 0, // System / AI moderation
+            reason: `Auto-hidden: ${result.categories.join(', ')}`,
+          },
+          { onConflict: 'cast_hash' },
+        );
         logger.info(`[moderation] Auto-hid cast ${castRow.hash}: ${result.categories.join(', ')}`);
       } else if (result.action === 'flag') {
         logger.info(`[moderation] Flagged cast ${castRow.hash}: ${result.categories.join(', ')}`);
@@ -165,10 +164,11 @@ export async function POST(req: NextRequest) {
       if (existing && existing.length > 0) continue;
 
       // Extract a title from the cast text (first line or truncated)
-      const titleFromText = castText
-        .replace(/https?:\/\/[^\s)]+/g, '')
-        .trim()
-        .slice(0, 200) || 'Shared track';
+      const titleFromText =
+        castText
+          .replace(/https?:\/\/[^\s)]+/g, '')
+          .trim()
+          .slice(0, 200) || 'Shared track';
 
       const insertRow: Record<string, unknown> = {
         url,
@@ -183,15 +183,11 @@ export async function POST(req: NextRequest) {
       };
 
       // Try with source column, fall back without if column doesn't exist
-      let result = await supabaseAdmin
-        .from('song_submissions')
-        .insert(insertRow);
+      let result = await supabaseAdmin.from('song_submissions').insert(insertRow);
 
       if (result.error && result.error.message?.includes('source')) {
         delete insertRow.source;
-        result = await supabaseAdmin
-          .from('song_submissions')
-          .insert(insertRow);
+        result = await supabaseAdmin.from('song_submissions').insert(insertRow);
       }
 
       if (result.error) {

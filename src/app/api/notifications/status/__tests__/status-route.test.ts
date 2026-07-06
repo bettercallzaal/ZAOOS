@@ -1,8 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  chainMock,
-  mockAuthenticatedSession,
-} from '@/test-utils/api-helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { chainMock, mockAuthenticatedSession } from '@/test-utils/api-helpers';
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks

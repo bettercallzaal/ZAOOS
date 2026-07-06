@@ -1,27 +1,27 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { JukeStatusTabs } from './JukeStatusTabs';
-import {
-  getJukeIntegrationManifest,
-  INTEGRATION_ARCHITECTURE_ASCII,
-  type IntegrationManifest,
-  type ShippedFeature,
-  type OpenAsk,
-} from '@/lib/spaces/jukeIntegrationManifest';
 import {
   buildResolutionIndex,
   fetchJukeChangelog,
   type JukeChangelogEntry,
 } from '@/lib/spaces/jukeChangelog';
 import {
+  getJukeIntegrationManifest,
+  INTEGRATION_ARCHITECTURE_ASCII,
+  type IntegrationManifest,
+  type OpenAsk,
+  type ShippedFeature,
+} from '@/lib/spaces/jukeIntegrationManifest';
+import {
   getJukeIntegrationStats,
+  type JukeIntegrationStats,
   listRecentJukeSpaces,
   listRecentWebhookEvents,
-  type JukeIntegrationStats,
   type RecentJukeSpaceRow,
   type RecentWebhookEventRow,
 } from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../community.config';
+import { JukeStatusTabs } from './JukeStatusTabs';
 
 export const metadata: Metadata = {
   title: `ZAO + Juke - Integration Status`,
@@ -29,14 +29,16 @@ export const metadata: Metadata = {
     'Public dashboard of what The ZAO has built using Juke, live integration stats, recent webhook deliveries, and open asks for the Juke team. Machine-readable mirror at /api/juke/status.',
   openGraph: {
     title: 'ZAO + Juke - Integration Status',
-    description: "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks. Refreshes the moment we ship.",
+    description:
+      "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks. Refreshes the moment we ship.",
     siteName: communityConfig.name,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ZAO + Juke - Integration Status',
-    description: "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks.",
+    description:
+      "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks.",
   },
 };
 
@@ -58,11 +60,19 @@ async function safeStats(): Promise<JukeIntegrationStats> {
 }
 
 async function safeRecentSpaces(): Promise<RecentJukeSpaceRow[]> {
-  try { return await listRecentJukeSpaces(10); } catch { return []; }
+  try {
+    return await listRecentJukeSpaces(10);
+  } catch {
+    return [];
+  }
 }
 
 async function safeRecentEvents(): Promise<RecentWebhookEventRow[]> {
-  try { return await listRecentWebhookEvents(15); } catch { return []; }
+  try {
+    return await listRecentWebhookEvents(15);
+  } catch {
+    return [];
+  }
 }
 
 /** Friendly relative time - "2m ago" / "3h ago" / "May 22". */
@@ -246,11 +256,15 @@ function WebhookTimelineSection({ events }: { events: RecentWebhookEventRow[] })
                 >
                   {ok ? 'OK' : ev.error ? '!' : '...'}
                 </span>
-                <code className="text-xs text-gray-200 font-mono w-44 truncate">{ev.event_type}</code>
+                <code className="text-xs text-gray-200 font-mono w-44 truncate">
+                  {ev.event_type}
+                </code>
                 <code className="text-[11px] text-gray-500 font-mono flex-1 truncate">
                   {ev.space_id ?? 'no space_id'}
                 </code>
-                <span className="text-[11px] text-gray-500 flex-shrink-0">{ago(ev.received_at)}</span>
+                <span className="text-[11px] text-gray-500 flex-shrink-0">
+                  {ago(ev.received_at)}
+                </span>
                 {ev.error && (
                   <span
                     className="text-[10px] text-red-400 truncate max-w-[200px]"
@@ -277,8 +291,14 @@ function RecentSpacesSection({ rows }: { rows: RecentJukeSpaceRow[] }) {
         </h2>
         <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 text-xs text-gray-500">
           No Juke spaces minted yet through this integration. Create one via{' '}
-          <Link href="/spaces" className="text-[#f5a623] hover:underline">/spaces (Go Live - Juke)</Link>{' '}
-          or <Link href="/live/create" className="text-[#f5a623] hover:underline">/live/create</Link>.
+          <Link href="/spaces" className="text-[#f5a623] hover:underline">
+            /spaces (Go Live - Juke)
+          </Link>{' '}
+          or{' '}
+          <Link href="/live/create" className="text-[#f5a623] hover:underline">
+            /live/create
+          </Link>
+          .
         </div>
       </section>
     );
@@ -297,11 +317,12 @@ function RecentSpacesSection({ rows }: { rows: RecentJukeSpaceRow[] }) {
                 : r.status === 'scheduled'
                   ? 'text-[#f5a623] border-[#f5a623]/30 bg-[#f5a623]/10'
                   : 'text-gray-400 border-white/[0.08] bg-white/[0.02]';
-            const timeLabel = r.status === 'scheduled'
-              ? `starts ${ago(r.scheduled_at)}`
-              : r.status === 'ended'
-                ? `ended ${ago(r.ended_at)}`
-                : `started ${ago(r.started_at)}`;
+            const timeLabel =
+              r.status === 'scheduled'
+                ? `starts ${ago(r.scheduled_at)}`
+                : r.status === 'ended'
+                  ? `ended ${ago(r.ended_at)}`
+                  : `started ${ago(r.started_at)}`;
             return (
               <li key={r.id} className="flex items-center gap-3 px-4 py-2.5">
                 <span
@@ -347,8 +368,8 @@ function CodeExamplesSection() {
         How ZAO calls Juke
       </h2>
       <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-        Reference snippets so Nicky&apos;s agent can see ZAO&apos;s actual integration patterns. Every line
-        matches the live production code paths.
+        Reference snippets so Nicky&apos;s agent can see ZAO&apos;s actual integration patterns.
+        Every line matches the live production code paths.
       </p>
       <div className="space-y-3">
         <CodeBlock
@@ -423,7 +444,7 @@ function CodeBlock({ title, body }: { title: string; body: string }) {
         </span>
       </div>
       <pre className="text-[11px] sm:text-xs leading-snug text-gray-300 font-mono whitespace-pre-wrap px-4 py-3 overflow-x-auto">
-{body}
+        {body}
       </pre>
     </div>
   );
@@ -437,14 +458,15 @@ function ArchitectureSection() {
       </h2>
       <div className="bg-[#0a1628] border border-white/[0.08] rounded-xl p-4 overflow-x-auto">
         <pre className="text-[11px] sm:text-xs leading-snug text-gray-300 font-mono whitespace-pre">
-{INTEGRATION_ARCHITECTURE_ASCII}
+          {INTEGRATION_ARCHITECTURE_ASCII}
         </pre>
       </div>
       <p className="text-xs text-gray-500 mt-3 leading-relaxed">
-        ZAO holds two persisted tables: <code className="text-gray-300">juke_spaces</code> (one row per
-        Juke-minted space, publicly readable) + <code className="text-gray-300">juke_webhook_events</code>{' '}
-        (audit + idempotency, service-role only). Every other surface is a read against those two
-        tables or against juke.audio directly.
+        ZAO holds two persisted tables: <code className="text-gray-300">juke_spaces</code> (one row
+        per Juke-minted space, publicly readable) +{' '}
+        <code className="text-gray-300">juke_webhook_events</code> (audit + idempotency,
+        service-role only). Every other surface is a read against those two tables or against
+        juke.audio directly.
       </p>
     </section>
   );
@@ -541,22 +563,23 @@ function AsksSection({
 }
 
 function AskRow({ ask, resolved }: { ask: OpenAsk; resolved: JukeChangelogEntry | null }) {
-  const priorityStyles: Record<OpenAsk['priority'], { bg: string; text: string; border: string }> = {
-    p0: { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30' },
-    p1: { bg: 'bg-[#f5a623]/15', text: 'text-[#f5a623]', border: 'border-[#f5a623]/30' },
-    p2: { bg: 'bg-blue-500/15', text: 'text-blue-300', border: 'border-blue-500/30' },
-  };
+  const priorityStyles: Record<OpenAsk['priority'], { bg: string; text: string; border: string }> =
+    {
+      p0: { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30' },
+      p1: { bg: 'bg-[#f5a623]/15', text: 'text-[#f5a623]', border: 'border-[#f5a623]/30' },
+      p2: { bg: 'bg-blue-500/15', text: 'text-blue-300', border: 'border-blue-500/30' },
+    };
   const ps = priorityStyles[ask.priority];
   return (
     <li
       className={`border rounded-xl p-4 ${
-        resolved
-          ? 'bg-green-500/[0.04] border-green-500/30'
-          : 'bg-[#111d2e] border-white/[0.08]'
+        resolved ? 'bg-green-500/[0.04] border-green-500/30' : 'bg-[#111d2e] border-white/[0.08]'
       }`}
     >
       <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${ps.bg} ${ps.text} ${ps.border}`}>
+        <span
+          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${ps.bg} ${ps.text} ${ps.border}`}
+        >
           {ask.priority}
         </span>
         {resolved && (
@@ -619,7 +642,9 @@ function ConventionsSection({ manifest }: { manifest: IntegrationManifest }) {
       <ul className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 space-y-2">
         {manifest.conventions.map((c) => (
           <li key={c} className="text-xs text-gray-400 leading-relaxed flex gap-2">
-            <span className="text-[#f5a623]" aria-hidden="true">-</span>
+            <span className="text-[#f5a623]" aria-hidden="true">
+              -
+            </span>
             <span>{c}</span>
           </li>
         ))}

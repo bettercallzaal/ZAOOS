@@ -36,7 +36,9 @@ console.log('    2. More → Send to manager (set as approved operator)');
 console.log(`    3. Enter: ${account.address}`);
 console.log('');
 console.log('  Option B (Etherscan):');
-console.log('    1. Go to https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401#writeContract');
+console.log(
+  '    1. Go to https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401#writeContract',
+);
 console.log('    2. Connect your thezao.eth owner wallet');
 console.log('    3. Call setApprovalForAll:');
 console.log(`       operator: ${account.address}`);
@@ -47,4 +49,6 @@ console.log('  - Transfer thezao.eth');
 console.log('  - Change thezao.eth ownership');
 console.log('  - Access any funds in the owner wallet');
 console.log('');
-console.log('IMPORTANT: Never commit .env.local. Add ENS_OPERATOR_PRIVATE_KEY to Vercel env vars too.');
+console.log(
+  'IMPORTANT: Never commit .env.local. Add ENS_OPERATOR_PRIVATE_KEY to Vercel env vars too.',
+);

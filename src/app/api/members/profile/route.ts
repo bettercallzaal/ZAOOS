@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: 'Invalid FID', details: parsed.error.flatten().fieldErrors },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -38,60 +38,69 @@ export async function GET(req: NextRequest) {
 
   try {
     // Fetch all data sources in parallel
-    const [neynarRes, userResult, allowlistResult, channelsRes, submissionsResult, proposalsResult, votesResult] =
-      await Promise.allSettled([
-        // 1. Neynar user data
-        fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}&viewer_fid=${session.fid}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': ENV.NEYNAR_API_KEY,
-          },
-          signal: AbortSignal.timeout(10000),
-        }),
+    const [
+      neynarRes,
+      userResult,
+      allowlistResult,
+      channelsRes,
+      submissionsResult,
+      proposalsResult,
+      votesResult,
+    ] = await Promise.allSettled([
+      // 1. Neynar user data
+      fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}&viewer_fid=${session.fid}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ENV.NEYNAR_API_KEY,
+        },
+        signal: AbortSignal.timeout(10000),
+      }),
 
-        // 2. ZAO users table
-        supabaseAdmin
-          .from('users')
-          .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url, bluesky_handle')
-          .eq('fid', fid)
-          .eq('is_active', true)
-          .maybeSingle(),
+      // 2. ZAO users table
+      supabaseAdmin
+        .from('users')
+        .select(
+          'zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url, bluesky_handle',
+        )
+        .eq('fid', fid)
+        .eq('is_active', true)
+        .maybeSingle(),
 
-        // 3. Allowlist / membership info
-        supabaseAdmin
-          .from('allowlist')
-          .select('fid, real_name, ign, wallet_address')
-          .eq('fid', fid)
-          .eq('is_active', true)
-          .maybeSingle(),
+      // 3. Allowlist / membership info
+      supabaseAdmin
+        .from('allowlist')
+        .select('fid, real_name, ign, wallet_address')
+        .eq('fid', fid)
+        .eq('is_active', true)
+        .maybeSingle(),
 
-        // 4. Active Farcaster channels
-        fetch(`${NEYNAR_BASE}/user/channels?fid=${fid}&limit=20`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': ENV.NEYNAR_API_KEY,
-          },
-          signal: AbortSignal.timeout(10000),
-        }),
+      // 4. Active Farcaster channels
+      fetch(`${NEYNAR_BASE}/user/channels?fid=${fid}&limit=20`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ENV.NEYNAR_API_KEY,
+        },
+        signal: AbortSignal.timeout(10000),
+      }),
 
-        // 5. Song submissions count
-        supabaseAdmin
-          .from('song_submissions')
-          .select('id', { count: 'exact', head: true })
-          .eq('submitted_by_fid', fid),
+      // 5. Song submissions count
+      supabaseAdmin
+        .from('song_submissions')
+        .select('id', { count: 'exact', head: true })
+        .eq('submitted_by_fid', fid),
 
-        // 6. Proposals created count
-        supabaseAdmin
-          .from('proposals')
-          .select('id', { count: 'exact', head: true })
-          .eq('author_fid', fid),
+      // 6. Proposals created count
+      supabaseAdmin
+        .from('proposals')
+        .select('id', { count: 'exact', head: true })
+        .eq('author_fid', fid),
 
-        // 7. Votes cast count
-        supabaseAdmin
-          .from('proposal_votes')
-          .select('id', { count: 'exact', head: true })
-          .eq('voter_fid', fid),
-      ]);
+      // 7. Votes cast count
+      supabaseAdmin
+        .from('proposal_votes')
+        .select('id', { count: 'exact', head: true })
+        .eq('voter_fid', fid),
+    ]);
 
     // ---- Parse Neynar user data ----
     let neynarUser: Record<string, unknown> | null = null;
@@ -109,35 +118,31 @@ export async function GET(req: NextRequest) {
     if (channelsRes.status === 'fulfilled' && channelsRes.value.ok) {
       const json = await channelsRes.value.json();
       activeChannels = (json.channels || []).map(
-        (ch: { channel?: { id: string; name: string; image_url?: string }; id?: string; name?: string; image_url?: string }) => {
+        (ch: {
+          channel?: { id: string; name: string; image_url?: string };
+          id?: string;
+          name?: string;
+          image_url?: string;
+        }) => {
           const c = ch.channel || ch;
           return {
             id: c.id,
             name: c.name || c.id,
             imageUrl: c.image_url || null,
           };
-        }
+        },
       );
     }
 
     // ---- Supabase data (gracefully degrade) ----
-    const usersRow =
-      userResult.status === 'fulfilled' ? userResult.value.data : null;
-    const allowlistRow =
-      allowlistResult.status === 'fulfilled' ? allowlistResult.value.data : null;
+    const usersRow = userResult.status === 'fulfilled' ? userResult.value.data : null;
+    const allowlistRow = allowlistResult.status === 'fulfilled' ? allowlistResult.value.data : null;
 
     const songsSubmitted =
-      submissionsResult.status === 'fulfilled'
-        ? submissionsResult.value.count ?? 0
-        : 0;
+      submissionsResult.status === 'fulfilled' ? (submissionsResult.value.count ?? 0) : 0;
     const proposalsCreated =
-      proposalsResult.status === 'fulfilled'
-        ? proposalsResult.value.count ?? 0
-        : 0;
-    const votesCast =
-      votesResult.status === 'fulfilled'
-        ? votesResult.value.count ?? 0
-        : 0;
+      proposalsResult.status === 'fulfilled' ? (proposalsResult.value.count ?? 0) : 0;
+    const votesCast = votesResult.status === 'fulfilled' ? (votesResult.value.count ?? 0) : 0;
 
     // ---- Build enriched profile ----
     const user = neynarUser as Record<string, unknown>;
@@ -179,9 +184,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     logger.error('Member profile enrichment error:', err);
-    return NextResponse.json(
-      { error: 'Failed to fetch enriched profile' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch enriched profile' }, { status: 500 });
   }
 }

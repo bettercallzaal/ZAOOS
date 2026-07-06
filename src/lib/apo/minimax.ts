@@ -2,18 +2,13 @@
  * Thin Minimax LLM caller for APO engine.
  * Mirrors the pattern in src/lib/library/minimax.ts but returns raw string.
  */
-export async function callMinimax(
-  system: string,
-  user: string,
-): Promise<string> {
+export async function callMinimax(system: string, user: string): Promise<string> {
   const apiKey = process.env.MINIMAX_API_KEY;
   if (!apiKey) {
     throw new Error('MINIMAX_API_KEY is required for APO optimization');
   }
 
-  const endpoint =
-    process.env.MINIMAX_API_URL ||
-    'https://api.minimax.io/v1/chat/completions';
+  const endpoint = process.env.MINIMAX_API_URL || 'https://api.minimax.io/v1/chat/completions';
   const model = process.env.MINIMAX_MODEL || 'MiniMax-M2.7';
 
   const res = await fetch(endpoint, {
@@ -39,8 +34,7 @@ export async function callMinimax(
   }
 
   const data = JSON.parse(text);
-  let content: string =
-    data?.choices?.[0]?.message?.content ?? data?.reply ?? '';
+  let content: string = data?.choices?.[0]?.message?.content ?? data?.reply ?? '';
 
   // Strip <think> reasoning tags from M2.7
   content = content.replace(/<think>[\s\S]*?<\/think>\s*/g, '').trim();

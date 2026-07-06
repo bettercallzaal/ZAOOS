@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
@@ -25,7 +25,8 @@ const RECURRING_EVENTS = [
   {
     id: 'fractal-weekly',
     title: 'Fractal Session',
-    description: 'Weekly fractal governance circle. Discuss, decide, and align on community priorities.',
+    description:
+      'Weekly fractal governance circle. Discuss, decide, and align on community priorities.',
     day: 'Monday',
     time: '6:00 PM EST',
     recurrence: 'Every Monday',
@@ -54,15 +55,17 @@ export default function CalendarPage() {
       <PageHeader
         title="ZAO Calendar"
         subtitle="Events, releases & community activations"
-        rightAction={<div className="md:hidden"><NotificationBell /></div>}
+        rightAction={
+          <div className="md:hidden">
+            <NotificationBell />
+          </div>
+        }
       />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Upcoming Events */}
         <section>
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
-            Upcoming
-          </p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">Upcoming</p>
           <div className="space-y-3">
             {RECURRING_EVENTS.map((event) => (
               <div
@@ -127,8 +130,18 @@ export default function CalendarPage() {
                 <p className="text-sm font-medium text-white">Google Calendar</p>
                 <p className="text-xs text-gray-500">Add fractal sessions to your calendar</p>
               </div>
-              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              <svg
+                className="w-4 h-4 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
               </svg>
             </a>
 
@@ -145,8 +158,18 @@ export default function CalendarPage() {
                 <p className="text-sm font-medium text-white">Apple Calendar</p>
                 <p className="text-xs text-gray-500">Sync with your iCloud calendar</p>
               </div>
-              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              <svg
+                className="w-4 h-4 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
               </svg>
             </a>
           </div>
@@ -154,19 +177,17 @@ export default function CalendarPage() {
 
         {/* Subscribe */}
         <section>
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
-            Subscribe
-          </p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">Subscribe</p>
           <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
-            <p className="text-xs text-gray-400 mb-3">
-              Get iCal URL for any calendar app
-            </p>
+            <p className="text-xs text-gray-400 mb-3">Get iCal URL for any calendar app</p>
             <div className="flex items-center gap-2">
               <code className="flex-1 text-xs text-[#f5a623] bg-[#1a2a3a] rounded-lg px-3 py-2 truncate">
                 webcal://thezao.com/api/calendar/feed
               </code>
               <button
-                onClick={() => navigator.clipboard?.writeText('webcal://thezao.com/api/calendar/feed')}
+                onClick={() =>
+                  navigator.clipboard?.writeText('webcal://thezao.com/api/calendar/feed')
+                }
                 className="flex-shrink-0 px-3 py-2 bg-[#1a2a3a] rounded-lg text-xs text-gray-400 hover:text-white transition-colors"
               >
                 Copy

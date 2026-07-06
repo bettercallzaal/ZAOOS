@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, type ReactNode, useContext } from 'react';
 import { usePlayerQueue } from '@/hooks/usePlayerQueue';
 
 type QueueContextValue = ReturnType<typeof usePlayerQueue>;

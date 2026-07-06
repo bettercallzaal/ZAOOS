@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Only JPEG, PNG, GIF, and WebP images are allowed' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Only JPEG, PNG, GIF, and WebP images are allowed' },
+        { status: 400 },
+      );
     }
 
     if (file.size > MAX_SIZE) {
@@ -30,8 +33,10 @@ export async function POST(req: NextRequest) {
 
     // Generate unique filename
     const mimeToExt: Record<string, string> = {
-      'image/jpeg': 'jpg', 'image/png': 'png',
-      'image/gif': 'gif', 'image/webp': 'webp',
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
     };
     const ext = mimeToExt[file.type] || 'jpg';
     const filename = `${session.fid}/${Date.now()}.${ext}`;
@@ -50,9 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
-    const { data: urlData } = supabaseAdmin.storage
-      .from('uploads')
-      .getPublicUrl(filename);
+    const { data: urlData } = supabaseAdmin.storage.from('uploads').getPublicUrl(filename);
 
     return NextResponse.json({
       url: urlData.publicUrl,

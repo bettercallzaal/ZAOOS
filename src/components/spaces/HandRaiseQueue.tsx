@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 interface HandRaise {
@@ -52,7 +52,9 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [roomId, fetchRaises]);
 
   const doAction = async (action: string, targetFid?: number) => {
@@ -102,8 +104,19 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
           }`}
           title={isRaised ? 'Lower hand' : 'Raise hand'}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0"
+            />
           </svg>
           {isRaised && (
             <span
@@ -117,7 +130,10 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
             className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] text-xs font-semibold"
             aria-live="polite"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse" aria-hidden="true" />
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse"
+              aria-hidden="true"
+            />
             {label}
           </span>
         )}
@@ -130,18 +146,25 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
 
   return (
     <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-3 mx-4 mb-2">
-      <p className="text-xs font-medium text-gray-400 mb-2">
-        Raised Hands ({raisedHands.length})
-      </p>
+      <p className="text-xs font-medium text-gray-400 mb-2">Raised Hands ({raisedHands.length})</p>
       <div className="space-y-2 max-h-40 overflow-y-auto">
         {raisedHands.map((r) => (
           <div key={r.id} className="flex items-center gap-2">
             {r.pfp_url ? (
-              <Image src={r.pfp_url || '/logo.png'} alt="" width={24} height={24} className="w-6 h-6 rounded-full" unoptimized />
+              <Image
+                src={r.pfp_url || '/logo.png'}
+                alt=""
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-full"
+                unoptimized
+              />
             ) : (
               <div className="w-6 h-6 rounded-full bg-gray-700" />
             )}
-            <span className="text-sm text-white flex-1 truncate">{r.username || `FID ${r.fid}`}</span>
+            <span className="text-sm text-white flex-1 truncate">
+              {r.username || `FID ${r.fid}`}
+            </span>
             <button
               onClick={() => doAction('invite', r.fid)}
               disabled={loading}

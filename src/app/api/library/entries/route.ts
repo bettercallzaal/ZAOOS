@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -17,16 +17,14 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
 
-    let query = supabaseAdmin
-      .from('research_entries')
-      .select('*');
+    let query = supabaseAdmin.from('research_entries').select('*');
 
     // Sanitize search for PostgREST filter safety
     if (search) {
       const safeSearch = search.replace(/[,().\\%]/g, '');
       if (safeSearch) {
         query = query.or(
-          `topic.ilike.%${safeSearch}%,ai_summary.ilike.%${safeSearch}%,note.ilike.%${safeSearch}%`
+          `topic.ilike.%${safeSearch}%,ai_summary.ilike.%${safeSearch}%,note.ilike.%${safeSearch}%`,
         );
       }
     }

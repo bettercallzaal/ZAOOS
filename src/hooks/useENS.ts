@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Resolve ENS names for a list of ETH addresses via server-side API.
@@ -10,19 +10,21 @@ export function useENSNames(addresses: string[]): Record<string, string> {
   const [names, setNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const ethAddresses = addresses.filter(a => a && a.startsWith('0x') && a.length === 42);
+    const ethAddresses = addresses.filter((a) => a && a.startsWith('0x') && a.length === 42);
     if (ethAddresses.length === 0) return;
 
     let cancelled = false;
 
     fetch(`/api/ens?addresses=${ethAddresses.join(',')}`)
-      .then(r => r.ok ? r.json() : { names: {} })
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : { names: {} }))
+      .then((data) => {
         if (!cancelled) setNames(data.names || {});
       })
       .catch(() => {});
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [addresses.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return names;
@@ -45,13 +47,15 @@ export function useENSProfile(ensName: string | null): {
     let cancelled = false;
 
     fetch(`/api/ens?name=${encodeURIComponent(ensName)}`)
-      .then(r => r.ok ? r.json() : { records: {}, avatar: null })
-      .then(d => {
+      .then((r) => (r.ok ? r.json() : { records: {}, avatar: null }))
+      .then((d) => {
         if (!cancelled) setData({ records: d.records || {}, avatar: d.avatar || null });
       })
       .catch(() => {});
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [ensName]);
 
   return data;

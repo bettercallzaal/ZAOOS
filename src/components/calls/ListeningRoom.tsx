@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useListeningRoom } from '@/hooks/useListeningRoom';
-import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
-import { usePlayer } from '@/providers/audio';
 import type { ListenerInfo } from '@/hooks/useListeningRoom';
+import { useListeningRoom } from '@/hooks/useListeningRoom';
+import { usePlayer } from '@/providers/audio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 
 const JitsiRoom = dynamic(
   () => import('@/components/calls/JitsiRoom').then((mod) => mod.JitsiRoom),
@@ -18,7 +18,7 @@ const JitsiRoom = dynamic(
         Loading voice chat...
       </div>
     ),
-  }
+  },
 );
 
 interface ListeningRoomProps {
@@ -104,18 +104,24 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
     await radio.startRadio();
   }, [radio]);
 
-  const handleSwitchStation = useCallback((index: number) => {
-    radio.switchStation(index);
-    setShowStationPicker(false);
-  }, [radio]);
+  const handleSwitchStation = useCallback(
+    (index: number) => {
+      radio.switchStation(index);
+      setShowStationPicker(false);
+    },
+    [radio],
+  );
 
-  const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!room.isDJ || !player.duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const position = pct * player.duration;
-    room.broadcastSeek(position);
-  }, [room, player.duration]);
+  const handleSeek = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!room.isDJ || !player.duration) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const position = pct * player.duration;
+      room.broadcastSeek(position);
+    },
+    [room, player.duration],
+  );
 
   const formatTime = (ms: number) => {
     const totalSec = Math.floor(ms / 1000);
@@ -133,9 +139,7 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
           <h2 className="font-semibold text-sm text-white truncate">{roomLabel}</h2>
-          <span className="text-xs text-gray-500 shrink-0">
-            {room.listeners.length} listening
-          </span>
+          <span className="text-xs text-gray-500 shrink-0">{room.listeners.length} listening</span>
           {room.isDJ && (
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#0a1628] bg-[#f5a623] px-2 py-0.5 rounded-full shrink-0">
               DJ
@@ -171,11 +175,25 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
             className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-[#0d1b2a]/80 border border-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white transition-colors md:hidden"
             title={voiceMuted ? 'Unmute mic' : 'Mute mic'}
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
               {voiceMuted ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 19 5 5m12 7V4a3 3 0 0 0-6 0v4m-3.42 3.58A3 3 0 0 0 12 15a3 3 0 0 0 3-3m3 0a6 6 0 0 1-9.33 5M12 19v3m-3 0h6" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 19 5 5m12 7V4a3 3 0 0 0-6 0v4m-3.42 3.58A3 3 0 0 0 12 15a3 3 0 0 0 3-3m3 0a6 6 0 0 1-9.33 5M12 19v3m-3 0h6"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3z"
+                />
               )}
             </svg>
           </button>
@@ -197,7 +215,11 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <svg className="w-16 h-16 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        className="w-16 h-16 text-gray-700"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                       </svg>
                     </div>
@@ -206,10 +228,22 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                   {room.isPlaying && (
                     <div className="absolute bottom-3 left-3 flex items-center gap-1">
                       <div className="flex gap-0.5 items-end h-4">
-                        <div className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite]" style={{ height: '60%' }} />
-                        <div className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.2s]" style={{ height: '100%' }} />
-                        <div className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.4s]" style={{ height: '40%' }} />
-                        <div className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.6s]" style={{ height: '80%' }} />
+                        <div
+                          className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite]"
+                          style={{ height: '60%' }}
+                        />
+                        <div
+                          className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.2s]"
+                          style={{ height: '100%' }}
+                        />
+                        <div
+                          className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.4s]"
+                          style={{ height: '40%' }}
+                        />
+                        <div
+                          className="w-0.5 bg-[#f5a623] rounded-full animate-[barBounce_0.8s_ease-in-out_infinite_0.6s]"
+                          style={{ height: '80%' }}
+                        />
                       </div>
                     </div>
                   )}
@@ -220,9 +254,7 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                   <p className="text-lg font-semibold text-white truncate">
                     {player.metadata.trackName}
                   </p>
-                  <p className="text-sm text-gray-400 truncate">
-                    {player.metadata.artistName}
-                  </p>
+                  <p className="text-sm text-gray-400 truncate">{player.metadata.artistName}</p>
                 </div>
 
                 {/* Progress Bar */}
@@ -288,15 +320,35 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                         className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#0d1b2a] border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors"
                       >
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A47.865 47.865 0 0012 6.75z" />
+                          <svg
+                            className="w-4 h-4 text-[#f5a623]"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={1.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A47.865 47.865 0 0012 6.75z"
+                            />
                           </svg>
                           <span className="text-sm text-white">
                             {radio.radioPlaylist?.name ?? 'Select Station'}
                           </span>
                         </div>
-                        <svg className={`w-4 h-4 text-gray-500 transition-transform ${showStationPicker ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        <svg
+                          className={`w-4 h-4 text-gray-500 transition-transform ${showStationPicker ? 'rotate-180' : ''}`}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                          />
                         </svg>
                       </button>
                       {showStationPicker && (
@@ -343,7 +395,7 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                 </div>
                 <div>
                   <p className="text-gray-300 font-medium">
-                    {room.isDJ ? 'You\'re the DJ' : 'Waiting for DJ'}
+                    {room.isDJ ? "You're the DJ" : 'Waiting for DJ'}
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
                     {room.isDJ
@@ -376,9 +428,18 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                       key={`${track.id}-${i}`}
                       className="flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-[#1a2a3a]/50 transition-colors"
                     >
-                      <span className="text-[10px] text-gray-700 w-4 text-right shrink-0">{i + 1}</span>
+                      <span className="text-[10px] text-gray-700 w-4 text-right shrink-0">
+                        {i + 1}
+                      </span>
                       {track.artworkUrl ? (
-                        <Image src={track.artworkUrl} alt={`${track.title} artwork`} width={28} height={28} className="w-7 h-7 rounded object-cover shrink-0" unoptimized />
+                        <Image
+                          src={track.artworkUrl}
+                          alt={`${track.title} artwork`}
+                          width={28}
+                          height={28}
+                          className="w-7 h-7 rounded object-cover shrink-0"
+                          unoptimized
+                        />
                       ) : (
                         <div className="w-7 h-7 rounded bg-gray-800 shrink-0" />
                       )}
@@ -424,7 +485,8 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                 )}
               </div>
               <span className="text-xs text-gray-500">
-                {room.listeners.length} {room.listeners.length === 1 ? 'person' : 'people'} listening
+                {room.listeners.length} {room.listeners.length === 1 ? 'person' : 'people'}{' '}
+                listening
               </span>
               {!room.isConnected && (
                 <span className="text-[10px] text-yellow-500 ml-auto">Connecting...</span>

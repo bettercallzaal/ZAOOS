@@ -1,19 +1,20 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbi } from 'viem';
 import { optimism } from 'viem/chains';
+import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { communityConfig } from '@/../community.config';
-import { readMemberBalances } from '@/lib/respect/onchainBalances';
 import { logger } from '@/lib/logger';
+import { readMemberBalances } from '@/lib/respect/onchainBalances';
 
-const { ogContract: OG_RESPECT, zorContract: ZOR_RESPECT, zorTokenId: ZOR_TOKEN_ID } =
-  communityConfig.respect;
+const {
+  ogContract: OG_RESPECT,
+  zorContract: ZOR_RESPECT,
+  zorTokenId: ZOR_TOKEN_ID,
+} = communityConfig.respect;
 
 const ogAbi = parseAbi(['function balanceOf(address) view returns (uint256)']);
-const zorAbi = parseAbi([
-  'function balanceOf(address, uint256) view returns (uint256)',
-]);
+const zorAbi = parseAbi(['function balanceOf(address, uint256) view returns (uint256)']);
 
 /**
  * POST /api/respect/sync
@@ -47,7 +48,7 @@ export async function POST() {
 
     // Filter out members with empty/invalid wallet addresses
     const walletsToSync = members.filter(
-      (m) => m.wallet_address && m.wallet_address.startsWith('0x')
+      (m) => m.wallet_address && m.wallet_address.startsWith('0x'),
     );
 
     if (walletsToSync.length === 0) {

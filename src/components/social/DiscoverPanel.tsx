@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Suggestion {
   fid: number;
@@ -51,29 +51,38 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       .catch(() => {
         if (!controller.signal.aborted) setError('Failed to load suggestions');
       })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => { controller.abort(); };
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // Search Farcaster users
   const searchUsers = useCallback(async (query: string) => {
-    if (!query.trim()) { setSearchResults([]); return; }
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
     setSearchLoading(true);
     try {
       const res = await fetch(`/api/search/users?q=${encodeURIComponent(query)}&limit=20`);
       if (res.ok) {
         const data = await res.json();
-        setSearchResults((data.users || []).map((u: Record<string, unknown>) => ({
-          fid: u.fid as number,
-          username: u.username as string,
-          displayName: (u.display_name as string) || '',
-          pfpUrl: (u.pfp_url as string) || '',
-          bio: (u.profile as { bio?: { text?: string } })?.bio?.text || null,
-          followerCount: (u.follower_count as number) || 0,
-          powerBadge: (u.power_badge as boolean) || false,
-          isZaoMember: false,
-          followsYou: (u.viewer_context as { followed_by?: boolean })?.followed_by || false,
-        })));
+        setSearchResults(
+          (data.users || []).map((u: Record<string, unknown>) => ({
+            fid: u.fid as number,
+            username: u.username as string,
+            displayName: (u.display_name as string) || '',
+            pfpUrl: (u.pfp_url as string) || '',
+            bio: (u.profile as { bio?: { text?: string } })?.bio?.text || null,
+            followerCount: (u.follower_count as number) || 0,
+            powerBadge: (u.power_badge as boolean) || false,
+            isZaoMember: false,
+            followsYou: (u.viewer_context as { followed_by?: boolean })?.followed_by || false,
+          })),
+        );
       }
     } catch {
       // ignore
@@ -115,27 +124,43 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       >
         {user.pfpUrl ? (
           <div className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} flex-shrink-0 relative`}>
-            <Image src={user.pfpUrl} alt="" fill className="rounded-full object-cover" unoptimized />
+            <Image
+              src={user.pfpUrl}
+              alt=""
+              fill
+              className="rounded-full object-cover"
+              unoptimized
+            />
           </div>
         ) : (
-          <div className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} rounded-full bg-gray-700 flex-shrink-0`} />
+          <div
+            className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} rounded-full bg-gray-700 flex-shrink-0`}
+          />
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-medium text-white truncate">{user.displayName}</span>
             {user.powerBadge && (
-              <svg className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                className="w-3.5 h-3.5 text-purple-400 flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z" />
               </svg>
             )}
             {user.isZaoMember && (
-              <span className="text-[10px] font-bold bg-[#f5a623]/20 text-[#f5a623] px-1.5 py-0.5 rounded-full flex-shrink-0">ZAO</span>
+              <span className="text-[10px] font-bold bg-[#f5a623]/20 text-[#f5a623] px-1.5 py-0.5 rounded-full flex-shrink-0">
+                ZAO
+              </span>
             )}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">@{user.username}</span>
             {user.followsYou && (
-              <span className="text-[10px] text-green-400/70 bg-green-400/10 px-1.5 py-0.5 rounded">Follows you</span>
+              <span className="text-[10px] text-green-400/70 bg-green-400/10 px-1.5 py-0.5 rounded">
+                Follows you
+              </span>
             )}
             <span className="text-[10px] text-gray-600">{formatCount(user.followerCount)}</span>
           </div>
@@ -190,8 +215,18 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       {tab === 'search' && (
         <div className="px-4 pt-2 pb-3">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
             </svg>
             <input
               type="text"
@@ -208,7 +243,9 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
             </div>
           )}
           {!searchLoading && searchQuery && searchResults.length === 0 && (
-            <p className="text-xs text-gray-500 text-center py-6">No users found for &ldquo;{searchQuery}&rdquo;</p>
+            <p className="text-xs text-gray-500 text-center py-6">
+              No users found for &ldquo;{searchQuery}&rdquo;
+            </p>
           )}
           {!searchLoading && searchResults.map((u) => renderCard(u))}
           {!searchQuery && (
@@ -237,20 +274,33 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
               {/* Quick follow: unfollowed ZAO members as horizontal scroll */}
               {unfollowedMembers.length > 0 && (
                 <div className="px-4 pt-3 pb-2">
-                  <p className="text-[11px] text-[#f5a623] uppercase tracking-wider font-medium mb-2">ZAO Members to Follow</p>
+                  <p className="text-[11px] text-[#f5a623] uppercase tracking-wider font-medium mb-2">
+                    ZAO Members to Follow
+                  </p>
                   <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                     {unfollowedMembers.slice(0, 10).map((u) => {
                       const isFollowed = followingSet.has(u.fid);
                       return (
-                        <div key={u.fid} className="flex flex-col items-center gap-1.5 min-w-[72px]">
+                        <div
+                          key={u.fid}
+                          className="flex flex-col items-center gap-1.5 min-w-[72px]"
+                        >
                           <div className="w-12 h-12 relative">
                             {u.pfpUrl ? (
-                              <Image src={u.pfpUrl} alt="" fill className="rounded-full object-cover" unoptimized />
+                              <Image
+                                src={u.pfpUrl}
+                                alt=""
+                                fill
+                                className="rounded-full object-cover"
+                                unoptimized
+                              />
                             ) : (
                               <div className="w-12 h-12 rounded-full bg-gray-700" />
                             )}
                           </div>
-                          <span className="text-[10px] text-gray-300 text-center truncate w-full">{u.displayName?.split(' ')[0]}</span>
+                          <span className="text-[10px] text-gray-300 text-center truncate w-full">
+                            {u.displayName?.split(' ')[0]}
+                          </span>
                           <button
                             onClick={() => handleFollow(u.fid)}
                             disabled={isFollowed || loadingFollow === u.fid}
@@ -273,7 +323,9 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
               {suggestions.length > 0 && (
                 <div>
                   <div className="px-4 pt-3 pb-1">
-                    <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Suggested For You</p>
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium">
+                      Suggested For You
+                    </p>
                   </div>
                   {suggestions.map((u) => renderCard(u))}
                 </div>

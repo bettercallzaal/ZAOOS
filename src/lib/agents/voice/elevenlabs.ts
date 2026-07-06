@@ -28,9 +28,7 @@ interface SignedUrlResponse {
  *
  * @throws if `ELEVENLABS_API_KEY` is unset or the upstream request fails.
  */
-export async function getSignedConversationUrl(
-  agentId: string,
-): Promise<SignedConversationUrl> {
+export async function getSignedConversationUrl(agentId: string): Promise<SignedConversationUrl> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) throw new Error('ELEVENLABS_API_KEY not configured');
 

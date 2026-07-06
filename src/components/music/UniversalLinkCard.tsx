@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import type { UniversalMusicCard, PlatformLink } from '@/lib/music/songlink';
+import { useEffect, useState } from 'react';
+import type { PlatformLink, UniversalMusicCard } from '@/lib/music/songlink';
 
 interface UniversalLinkCardProps {
   url: string;
@@ -150,12 +150,8 @@ export function UniversalLinkCard({ url, castHash }: UniversalLinkCardProps) {
 
         {/* Title / Artist */}
         <div className="flex-1 min-w-0">
-          {card.title && (
-            <p className="text-sm font-semibold text-white truncate">{card.title}</p>
-          )}
-          {card.artist && (
-            <p className="text-xs text-gray-400 truncate mt-0.5">{card.artist}</p>
-          )}
+          {card.title && <p className="text-sm font-semibold text-white truncate">{card.title}</p>}
+          {card.artist && <p className="text-xs text-gray-400 truncate mt-0.5">{card.artist}</p>}
           {card.pageUrl && (
             <a
               href={card.pageUrl}

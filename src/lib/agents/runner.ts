@@ -4,15 +4,15 @@
  * Individual agents just pass their name and any custom overrides.
  */
 
-import { getAgentConfig, claimBudget } from './config';
-import { logAgentEvent } from './events';
-import { getSwapQuote, getZabalPrice } from './swap';
-import { executeSwap } from './wallet';
+import { logger } from '@/lib/logger';
+import { maybeAutoStake } from './autostake';
 import { burnZabal } from './burn';
 import { postTradeUpdate } from './cast';
-import { maybeAutoStake } from './autostake';
-import { TOKENS, type AgentName, type AgentAction } from './types';
-import { logger } from '@/lib/logger';
+import { claimBudget, getAgentConfig } from './config';
+import { logAgentEvent } from './events';
+import { getSwapQuote, getZabalPrice } from './swap';
+import { type AgentAction, type AgentName, TOKENS } from './types';
+import { executeSwap } from './wallet';
 
 export interface AgentRunResult {
   action: AgentAction;
@@ -28,7 +28,7 @@ async function getEthPrice(): Promise<number> {
 
     const res = await fetch(
       `https://api.0x.org/swap/v1/price?chainId=8453&sellToken=0x4200000000000000000000000000000000000006&buyToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&sellAmount=1000000000000000000`,
-      { headers: { '0x-api-key': apiKey } }
+      { headers: { '0x-api-key': apiKey } },
     );
     if (!res.ok) {
       logger.warn('[getEthPrice] 0x API non-OK, using $2500 fallback');
@@ -37,7 +37,9 @@ async function getEthPrice(): Promise<number> {
     const data = await res.json();
     return parseFloat(data.price) || 2500;
   } catch (err) {
-    logger.warn(`[getEthPrice] Failed, using $2500 fallback: ${err instanceof Error ? err.message : err}`);
+    logger.warn(
+      `[getEthPrice] Failed, using $2500 fallback: ${err instanceof Error ? err.message : err}`,
+    );
     return 2500;
   }
 }
@@ -47,7 +49,9 @@ async function withRetry<T>(fn: () => Promise<T>, delayMs = 5000): Promise<T> {
   try {
     return await fn();
   } catch (firstErr) {
-    logger.warn(`Retrying after ${delayMs}ms: ${firstErr instanceof Error ? firstErr.message : firstErr}`);
+    logger.warn(
+      `Retrying after ${delayMs}ms: ${firstErr instanceof Error ? firstErr.message : firstErr}`,
+    );
     await new Promise((r) => setTimeout(r, delayMs));
     return fn();
   }
@@ -78,8 +82,8 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
   }
 
   // Trade amount with random noise ($0.30-$0.70)
-  const baseAmount = 0.50;
-  const noise = (Math.random() - 0.5) * 0.40;
+  const baseAmount = 0.5;
+  const noise = (Math.random() - 0.5) * 0.4;
   const tradeUsd = Math.min(baseAmount + noise, config.max_single_trade_usd);
 
   // Atomic budget claim - prevents race condition with concurrent cron runs
@@ -121,7 +125,7 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
         buyToken: TOKENS.ZABAL,
         sellAmount: String(ethAmount),
         takerAddress: config.wallet_address,
-      })
+      }),
     );
 
     const hash = await executeSwap(agentName, quote);
@@ -142,7 +146,9 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
     const details = `Bought ${quote.buyAmount} ZABAL for ~$${tradeUsd.toFixed(2)} (ETH@$${ethPrice.toFixed(0)})`;
     await postTradeUpdate({ agentName, action: 'buy_zabal', details, txHash: hash });
 
-    logger.info(`[${agentName}] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL (ETH@$${ethPrice.toFixed(0)})`);
+    logger.info(
+      `[${agentName}] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL (ETH@$${ethPrice.toFixed(0)})`,
+    );
     return { action: 'buy_zabal', status: 'success', details };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

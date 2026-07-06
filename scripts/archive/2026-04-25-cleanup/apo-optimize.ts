@@ -12,15 +12,16 @@ async function main() {
   const promptName = args[0];
   const roundsFlag = args.indexOf('--rounds');
   const evaluateOnly = args.includes('--evaluate-only');
-  const customRounds =
-    roundsFlag !== -1 ? parseInt(args[roundsFlag + 1], 10) : undefined;
+  const customRounds = roundsFlag !== -1 ? parseInt(args[roundsFlag + 1], 10) : undefined;
 
   if (!promptName) {
     const available = fs
       .readdirSync(PROMPTS_DIR)
       .filter((f) => f.endsWith('.json'))
       .map((f) => f.replace('.json', ''));
-    console.error('Usage: npx tsx scripts/apo-optimize.ts <prompt-name> [--rounds N] [--evaluate-only]');
+    console.error(
+      'Usage: npx tsx scripts/apo-optimize.ts <prompt-name> [--rounds N] [--evaluate-only]',
+    );
     console.error(`\nAvailable prompts: ${available.join(', ')}`);
     process.exit(1);
   }
@@ -70,8 +71,12 @@ async function main() {
 
   // Summary
   console.log('===========================');
-  console.log(`Best: Round ${result.rounds.findIndex((r) => r.prompt === result.bestPrompt) + 1} (${result.bestScore.toFixed(3)})`);
-  console.log(`Improvement: ${result.baselineScore.toFixed(3)} → ${result.bestScore.toFixed(3)} (${result.improvement >= 0 ? '+' : ''}${result.improvement.toFixed(1)}%)`);
+  console.log(
+    `Best: Round ${result.rounds.findIndex((r) => r.prompt === result.bestPrompt) + 1} (${result.bestScore.toFixed(3)})`,
+  );
+  console.log(
+    `Improvement: ${result.baselineScore.toFixed(3)} → ${result.bestScore.toFixed(3)} (${result.improvement >= 0 ? '+' : ''}${result.improvement.toFixed(1)}%)`,
+  );
   console.log('');
   console.log('=== OPTIMIZED PROMPT ===');
   console.log(result.bestPrompt);

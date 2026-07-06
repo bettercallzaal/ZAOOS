@@ -25,40 +25,249 @@
  */
 export const STOP_WORDS: Set<string> = new Set([
   // Articles, prepositions, conjunctions, pronouns
-  "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
-  "have", "has", "had", "do", "does", "did", "will", "would", "could",
-  "should", "may", "might", "shall", "can", "need", "to", "of", "in",
-  "for", "on", "with", "at", "by", "from", "as", "into", "through",
-  "during", "before", "after", "above", "below", "between", "out",
-  "off", "over", "under", "again", "further", "then", "once", "here",
-  "there", "when", "where", "why", "how", "all", "both", "each", "few",
-  "more", "most", "other", "some", "such", "no", "nor", "not", "only",
-  "own", "same", "so", "than", "too", "very", "just", "because", "but",
-  "and", "or", "if", "while", "about", "up", "it", "its", "i", "me",
-  "my", "we", "our", "you", "your", "he", "him", "his", "she", "her",
-  "they", "them", "their", "this", "that", "these", "those", "what",
-  "which", "who", "whom",
+  'the',
+  'a',
+  'an',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'could',
+  'should',
+  'may',
+  'might',
+  'shall',
+  'can',
+  'need',
+  'to',
+  'of',
+  'in',
+  'for',
+  'on',
+  'with',
+  'at',
+  'by',
+  'from',
+  'as',
+  'into',
+  'through',
+  'during',
+  'before',
+  'after',
+  'above',
+  'below',
+  'between',
+  'out',
+  'off',
+  'over',
+  'under',
+  'again',
+  'further',
+  'then',
+  'once',
+  'here',
+  'there',
+  'when',
+  'where',
+  'why',
+  'how',
+  'all',
+  'both',
+  'each',
+  'few',
+  'more',
+  'most',
+  'other',
+  'some',
+  'such',
+  'no',
+  'nor',
+  'not',
+  'only',
+  'own',
+  'same',
+  'so',
+  'than',
+  'too',
+  'very',
+  'just',
+  'because',
+  'but',
+  'and',
+  'or',
+  'if',
+  'while',
+  'about',
+  'up',
+  'it',
+  'its',
+  'i',
+  'me',
+  'my',
+  'we',
+  'our',
+  'you',
+  'your',
+  'he',
+  'him',
+  'his',
+  'she',
+  'her',
+  'they',
+  'them',
+  'their',
+  'this',
+  'that',
+  'these',
+  'those',
+  'what',
+  'which',
+  'who',
+  'whom',
   // Conversational fillers and generic modifiers
-  "also", "back", "still", "even", "much", "many", "like", "really",
-  "actually", "basically", "literally", "kind", "sort", "something",
-  "stuff", "things", "thing", "gonna", "people", "think", "know",
-  "right", "yeah", "okay", "well", "want", "need", "make", "take",
-  "come", "look", "give", "tell", "talk", "get", "got", "said", "say",
-  "going", "went", "done", "doing", "been", "made", "let", "put",
-  "way", "time", "now", "good", "lot", "bit", "whole", "part",
-  "called", "first", "last", "next", "new", "one", "two", "three",
-  "long", "big", "little", "start", "started", "work", "worked",
-  "working", "built", "build", "building", "cool", "awesome", "amazing",
-  "great", "love", "pretty", "super", "feel", "feeling", "guess",
-  "maybe", "probably", "able",
+  'also',
+  'back',
+  'still',
+  'even',
+  'much',
+  'many',
+  'like',
+  'really',
+  'actually',
+  'basically',
+  'literally',
+  'kind',
+  'sort',
+  'something',
+  'stuff',
+  'things',
+  'thing',
+  'gonna',
+  'people',
+  'think',
+  'know',
+  'right',
+  'yeah',
+  'okay',
+  'well',
+  'want',
+  'need',
+  'make',
+  'take',
+  'come',
+  'look',
+  'give',
+  'tell',
+  'talk',
+  'get',
+  'got',
+  'said',
+  'say',
+  'going',
+  'went',
+  'done',
+  'doing',
+  'been',
+  'made',
+  'let',
+  'put',
+  'way',
+  'time',
+  'now',
+  'good',
+  'lot',
+  'bit',
+  'whole',
+  'part',
+  'called',
+  'first',
+  'last',
+  'next',
+  'new',
+  'one',
+  'two',
+  'three',
+  'long',
+  'big',
+  'little',
+  'start',
+  'started',
+  'work',
+  'worked',
+  'working',
+  'built',
+  'build',
+  'building',
+  'cool',
+  'awesome',
+  'amazing',
+  'great',
+  'love',
+  'pretty',
+  'super',
+  'feel',
+  'feeling',
+  'guess',
+  'maybe',
+  'probably',
+  'able',
   // Contractions
-  "don't", "doesn't", "didn't", "won't", "wouldn't", "couldn't",
-  "shouldn't", "can't", "isn't", "aren't", "wasn't", "weren't",
-  "i'm", "you're", "he's", "she's", "it's", "we're", "they're",
-  "i've", "you've", "we've", "they've", "i'd", "you'd", "he'd",
-  "she'd", "we'd", "they'd", "i'll", "you'll", "he'll", "she'll",
-  "we'll", "they'll", "let's", "that's", "who's", "what's",
-  "here's", "there's", "person", "guys", "everybody", "everyone",
+  "don't",
+  "doesn't",
+  "didn't",
+  "won't",
+  "wouldn't",
+  "couldn't",
+  "shouldn't",
+  "can't",
+  "isn't",
+  "aren't",
+  "wasn't",
+  "weren't",
+  "i'm",
+  "you're",
+  "he's",
+  "she's",
+  "it's",
+  "we're",
+  "they're",
+  "i've",
+  "you've",
+  "we've",
+  "they've",
+  "i'd",
+  "you'd",
+  "he'd",
+  "she'd",
+  "we'd",
+  "they'd",
+  "i'll",
+  "you'll",
+  "he'll",
+  "she'll",
+  "we'll",
+  "they'll",
+  "let's",
+  "that's",
+  "who's",
+  "what's",
+  "here's",
+  "there's",
+  'person',
+  'guys',
+  'everybody',
+  'everyone',
 ]);
 
 // ---------------------------------------------------------------------------
@@ -84,9 +293,7 @@ function tokenize(text: string): string[] {
 function splitSentences(text: string): string[] {
   // Split on sentence-ending punctuation followed by whitespace or end-of-string
   const raw = text.split(/(?<=[.!?])\s+/);
-  const sentences = raw
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+  const sentences = raw.map((s) => s.trim()).filter((s) => s.length > 0);
   if (sentences.length <= 1) {
     // Fallback: split on double newlines or single newlines
     return text
@@ -124,9 +331,7 @@ export function extractKeywords(text: string, topN = 10): string[] {
   if (sentences.length === 0) return [];
 
   // Build per-sentence word sets for IDF
-  const sentenceWordSets: Set<string>[] = sentences.map(
-    (s) => new Set(tokenize(s)),
-  );
+  const sentenceWordSets: Set<string>[] = sentences.map((s) => new Set(tokenize(s)));
 
   // Document frequency: how many sentences contain each word
   const df = new Map<string, number>();
@@ -170,36 +375,113 @@ export function extractKeywords(text: string, topN = 10): string[] {
  * Used to avoid false positives when detecting capitalised sequences.
  */
 const SKIP_WORDS: Set<string> = new Set([
-  "I", "So", "And", "But", "The", "This", "That", "Yeah", "Yes",
-  "No", "Like", "Well", "Just", "Also", "Very", "Oh", "Really",
-  "Actually", "Basically", "Because", "Right", "Okay", "Hey",
-  "What", "How", "Why", "When", "Where", "Who", "Which",
-  "If", "Or", "Not", "My", "We", "He", "She", "It", "They",
-  "His", "Her", "Our", "Your", "Their", "There", "Here",
-  "Some", "Any", "All", "Each", "Every", "Been", "Have",
-  "Has", "Had", "Was", "Were", "Are", "Will", "Would", "Could",
-  "Should", "Do", "Does", "Did", "Can", "May", "Might",
-  "Thank", "Thanks", "Cool", "Nice", "Awesome", "Amazing",
-  "Great", "Good", "Exactly", "Absolutely", "Definitely",
-  "Another", "First", "Last", "Next", "New", "Old",
+  'I',
+  'So',
+  'And',
+  'But',
+  'The',
+  'This',
+  'That',
+  'Yeah',
+  'Yes',
+  'No',
+  'Like',
+  'Well',
+  'Just',
+  'Also',
+  'Very',
+  'Oh',
+  'Really',
+  'Actually',
+  'Basically',
+  'Because',
+  'Right',
+  'Okay',
+  'Hey',
+  'What',
+  'How',
+  'Why',
+  'When',
+  'Where',
+  'Who',
+  'Which',
+  'If',
+  'Or',
+  'Not',
+  'My',
+  'We',
+  'He',
+  'She',
+  'It',
+  'They',
+  'His',
+  'Her',
+  'Our',
+  'Your',
+  'Their',
+  'There',
+  'Here',
+  'Some',
+  'Any',
+  'All',
+  'Each',
+  'Every',
+  'Been',
+  'Have',
+  'Has',
+  'Had',
+  'Was',
+  'Were',
+  'Are',
+  'Will',
+  'Would',
+  'Could',
+  'Should',
+  'Do',
+  'Does',
+  'Did',
+  'Can',
+  'May',
+  'Might',
+  'Thank',
+  'Thanks',
+  'Cool',
+  'Nice',
+  'Awesome',
+  'Amazing',
+  'Great',
+  'Good',
+  'Exactly',
+  'Absolutely',
+  'Definitely',
+  'Another',
+  'First',
+  'Last',
+  'Next',
+  'New',
+  'Old',
 ]);
 
 /** Connecting words that can appear between proper-noun parts. */
-const CONNECTORS: Set<string> = new Set([
-  "and", "of", "the", "for", "in", "on", "at", "de",
-]);
+const CONNECTORS: Set<string> = new Set(['and', 'of', 'the', 'for', 'in', 'on', 'at', 'de']);
 
 /** Phrases that look like entities but are not. */
 const SKIP_PHRASES: Set<string> = new Set([
-  "with fiat", "the time", "the moment", "the game",
-  "the idea", "the plan", "at the", "on the",
+  'with fiat',
+  'the time',
+  'the moment',
+  'the game',
+  'the idea',
+  'the plan',
+  'at the',
+  'on the',
 ]);
 
 /**
  * Strip non-alphanumeric characters (except hyphens/apostrophes) from a word.
  */
 function cleanWord(w: string): string {
-  return w.replace(/[^A-Za-z0-9'-]/g, "");
+  return w.replace(/[^A-Za-z0-9'-]/g, '');
 }
 
 /**
@@ -246,10 +528,7 @@ export function extractEntities(text: string): string[] {
         if (isUpperFirst(nextW) && !SKIP_WORDS.has(nextW)) {
           phraseParts.push(nextW);
           j++;
-        } else if (
-          CONNECTORS.has(nextW.toLowerCase()) &&
-          j + 1 < words.length
-        ) {
+        } else if (CONNECTORS.has(nextW.toLowerCase()) && j + 1 < words.length) {
           const after = cleanWord(words[j + 1]);
           if (after && isUpperFirst(after) && !SKIP_WORDS.has(after)) {
             phraseParts.push(nextW.toLowerCase());
@@ -264,7 +543,7 @@ export function extractEntities(text: string): string[] {
       }
 
       if (phraseParts.length >= 2) {
-        const entity = phraseParts.join(" ");
+        const entity = phraseParts.join(' ');
         if (!SKIP_PHRASES.has(entity.toLowerCase())) {
           entityCounts.set(entity, (entityCounts.get(entity) ?? 0) + 1);
         }
@@ -289,7 +568,7 @@ export function extractEntities(text: string): string[] {
 
 /** Check whether the first character of a string is uppercase. */
 function isUpperFirst(s: string): boolean {
-  return s.length > 0 && s[0] >= "A" && s[0] <= "Z";
+  return s.length > 0 && s[0] >= 'A' && s[0] <= 'Z';
 }
 
 // ---------------------------------------------------------------------------
@@ -327,7 +606,7 @@ export function segmentTopics(
 
   if (sentences.length < minSegmentLength * 2) {
     // Too short to segment meaningfully
-    const title = extractKeywords(text, 3).join(", ") || "Discussion";
+    const title = extractKeywords(text, 3).join(', ') || 'Discussion';
     return [{ title, text }];
   }
 
@@ -337,22 +616,33 @@ export function segmentTopics(
   const vocabWindows: Set<string>[] = sentences.map((_, i) => {
     const start = Math.max(0, i - windowSize);
     const end = Math.min(sentences.length, i + windowSize);
-    const windowText = sentences.slice(start, end).join(" ").toLowerCase();
+    const windowText = sentences.slice(start, end).join(' ').toLowerCase();
     const words = new Set(
-      (windowText.match(/\b[a-z]{5,}\b/g) ?? []).filter(
-        (w) => !STOP_WORDS.has(w),
-      ),
+      (windowText.match(/\b[a-z]{5,}\b/g) ?? []).filter((w) => !STOP_WORDS.has(w)),
     );
     return words;
   });
 
   // Transition phrases that signal topic changes
   const transitionPhrases = [
-    "let's talk", "moving on", "another thing", "next topic",
-    "speaking of", "switching to", "i also want", "tell us",
-    "i'd love to", "let me tell", "the idea for", "the plan",
-    "so basically", "from there", "and then from",
-    "what about", "how did you", "can you tell",
+    "let's talk",
+    'moving on',
+    'another thing',
+    'next topic',
+    'speaking of',
+    'switching to',
+    'i also want',
+    'tell us',
+    "i'd love to",
+    'let me tell',
+    'the idea for',
+    'the plan',
+    'so basically',
+    'from there',
+    'and then from',
+    'what about',
+    'how did you',
+    'can you tell',
   ];
 
   // Score each sentence boundary
@@ -386,7 +676,7 @@ export function segmentTopics(
     }
 
     // Question detection
-    if (sentenceLower.trimEnd().endsWith("?")) {
+    if (sentenceLower.trimEnd().endsWith('?')) {
       score += 0.8;
     }
 
@@ -397,19 +687,14 @@ export function segmentTopics(
   boundaryScores.sort((a, b) => b[1] - a[1]);
 
   // Select boundaries with minimum spacing
-  const targetSegments = Math.max(
-    2,
-    Math.min(8, Math.floor(sentences.length / minSegmentLength)),
-  );
+  const targetSegments = Math.max(2, Math.min(8, Math.floor(sentences.length / minSegmentLength)));
   const selectedBoundaries: number[] = [0];
   const usedIndices = new Set<number>([0]);
 
   for (const [idx] of boundaryScores) {
     if (selectedBoundaries.length >= targetSegments) break;
     // Ensure minimum spacing
-    const tooClose = [...usedIndices].some(
-      (used) => Math.abs(idx - used) < minSegmentLength,
-    );
+    const tooClose = [...usedIndices].some((used) => Math.abs(idx - used) < minSegmentLength);
     if (tooClose) continue;
     selectedBoundaries.push(idx);
     usedIndices.add(idx);
@@ -423,17 +708,14 @@ export function segmentTopics(
 
   for (let i = 0; i < selectedBoundaries.length; i++) {
     const start = selectedBoundaries[i];
-    const end =
-      i + 1 < selectedBoundaries.length
-        ? selectedBoundaries[i + 1]
-        : sentences.length;
+    const end = i + 1 < selectedBoundaries.length ? selectedBoundaries[i + 1] : sentences.length;
 
-    const segmentText = sentences.slice(start, end).join(" ");
+    const segmentText = sentences.slice(start, end).join(' ');
     const keywords = extractKeywords(segmentText, 3);
     const title =
       keywords.length > 0
-        ? keywords.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(", ")
-        : "Discussion";
+        ? keywords.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(', ')
+        : 'Discussion';
 
     segments.push({ title, text: segmentText });
   }
@@ -496,19 +778,15 @@ export function generateHashtags(text: string, maxTags = 10): string[] {
  * - "blockchain"       -> "#blockchain"
  */
 function toCamelCaseTag(phrase: string): string {
-  const parts = phrase
-    .split(/[\s_-]+/)
-    .filter((p) => p.length > 0);
+  const parts = phrase.split(/[\s_-]+/).filter((p) => p.length > 0);
 
-  if (parts.length === 0) return "#";
+  if (parts.length === 0) return '#';
 
   const camel = parts
     .map((p, i) =>
-      i === 0
-        ? p.toLowerCase()
-        : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(),
+      i === 0 ? p.toLowerCase() : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(),
     )
-    .join("");
+    .join('');
 
   return `#${camel}`;
 }

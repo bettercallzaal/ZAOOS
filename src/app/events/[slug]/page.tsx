@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getEventBySlug } from '@/lib/unlock/events';
+import { notFound } from 'next/navigation';
 import { EventTicket } from '@/components/events/EventTicket';
+import { getEventBySlug } from '@/lib/unlock/events';
 
 export async function generateMetadata({
   params,
@@ -17,11 +17,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function EventPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const event = await getEventBySlug(slug);
 

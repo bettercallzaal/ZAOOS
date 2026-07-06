@@ -1,26 +1,40 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { FollowerCard, type FollowerUser } from './FollowerCard';
 import { FollowerSkeletonList } from './FollowerSkeleton';
-import dynamic from 'next/dynamic';
-const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
-const ConversationClusters = dynamic(() => import('./ConversationClusters').then(m => m.ConversationClusters), { ssr: false });
-const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
-const SocialAnalytics = dynamic(() => import('./SocialAnalytics').then(m => m.SocialAnalytics), { ssr: false });
-const EngagementHeatmap = dynamic(() => import('./EngagementHeatmap').then(m => m.EngagementHeatmap), { ssr: false });
-import { CommunityStats } from './CommunityStats';
-import { CommunityMilestones } from './CommunityMilestones';
-import { CommunityLeaderboards } from './CommunityLeaderboards';
-import { WhosOnline } from './WhosOnline';
-import { CommunityActivityFeed } from './CommunityActivityFeed';
-import { MemberSpotlight } from './MemberSpotlight';
-import { MemberMap } from './MemberMap';
+
+const CommunityGraph = dynamic(() => import('./CommunityGraph').then((m) => m.CommunityGraph), {
+  ssr: false,
+});
+const ConversationClusters = dynamic(
+  () => import('./ConversationClusters').then((m) => m.ConversationClusters),
+  { ssr: false },
+);
+const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then((m) => m.DiscoverPanel), {
+  ssr: false,
+});
+const SocialAnalytics = dynamic(() => import('./SocialAnalytics').then((m) => m.SocialAnalytics), {
+  ssr: false,
+});
+const EngagementHeatmap = dynamic(
+  () => import('./EngagementHeatmap').then((m) => m.EngagementHeatmap),
+  { ssr: false },
+);
+
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
+import { CommunityActivityFeed } from './CommunityActivityFeed';
+import { CommunityLeaderboards } from './CommunityLeaderboards';
+import { CommunityMilestones } from './CommunityMilestones';
+import { CommunityStats } from './CommunityStats';
+import { MemberMap } from './MemberMap';
+import { MemberSpotlight } from './MemberSpotlight';
 import { MiniSpaceBanner } from './MiniSpaceBanner';
+import { WhosOnline } from './WhosOnline';
 
 type View = 'followers' | 'following' | 'community' | 'discover' | 'analytics';
 type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao' | 'trending' | 'inactive';
@@ -61,42 +75,45 @@ export function SocialPage() {
 
   const fetchAbortRef = useRef<AbortController | null>(null);
 
-  const fetchUsers = useCallback(async (fid: number, type: 'followers' | 'following', sortKey: SortKey, nextCursor?: string) => {
-    const isMore = !!nextCursor;
-    if (isMore) setLoadingMore(true);
-    else setLoading(true);
+  const fetchUsers = useCallback(
+    async (fid: number, type: 'followers' | 'following', sortKey: SortKey, nextCursor?: string) => {
+      const isMore = !!nextCursor;
+      if (isMore) setLoadingMore(true);
+      else setLoading(true);
 
-    // Abort previous non-pagination request
-    if (!isMore) {
-      fetchAbortRef.current?.abort();
-    }
-    const controller = new AbortController();
-    if (!isMore) fetchAbortRef.current = controller;
-
-    try {
-      const url = `/api/users/${fid}/${type}?sort=${sortKey}${nextCursor ? `&cursor=${nextCursor}` : ''}`;
-      const res = await fetch(url, { signal: controller.signal });
-      if (!res.ok) throw new Error('Fetch failed');
-      const data = await res.json();
-
-      if (controller.signal.aborted) return;
-
-      if (isMore) {
-        setUsers((prev) => [...prev, ...data.users]);
-      } else {
-        setUsers(data.users);
+      // Abort previous non-pagination request
+      if (!isMore) {
+        fetchAbortRef.current?.abort();
       }
-      setCursor(data.next?.cursor || null);
-    } catch (err) {
-      if (controller.signal.aborted) return;
-      console.error('Failed to fetch:', err);
-    } finally {
-      if (!controller.signal.aborted) {
-        setLoading(false);
-        setLoadingMore(false);
+      const controller = new AbortController();
+      if (!isMore) fetchAbortRef.current = controller;
+
+      try {
+        const url = `/api/users/${fid}/${type}?sort=${sortKey}${nextCursor ? `&cursor=${nextCursor}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error('Fetch failed');
+        const data = await res.json();
+
+        if (controller.signal.aborted) return;
+
+        if (isMore) {
+          setUsers((prev) => [...prev, ...data.users]);
+        } else {
+          setUsers(data.users);
+        }
+        setCursor(data.next?.cursor || null);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        console.error('Failed to fetch:', err);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Fetch when tab/sort changes
   useEffect(() => {
@@ -121,12 +138,14 @@ export function SocialPage() {
           setTotalLabel(
             view === 'followers'
               ? `${(u.follower_count ?? 0).toLocaleString()} followers`
-              : `${(u.following_count ?? 0).toLocaleString()} following`
+              : `${(u.following_count ?? 0).toLocaleString()} following`,
           );
         }
       })
       .catch(() => {});
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, [user, view, isListView]);
 
   // Apply client-side filters
@@ -136,9 +155,7 @@ export function SocialPage() {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (u) =>
-          u.username?.toLowerCase().includes(q) ||
-          u.display_name?.toLowerCase().includes(q)
+        (u) => u.username?.toLowerCase().includes(q) || u.display_name?.toLowerCase().includes(q),
       );
     }
 
@@ -147,9 +164,7 @@ export function SocialPage() {
     }
 
     if (hideSpam) {
-      result = result.filter(
-        (u) => (u.experimental?.neynar_user_score ?? 1) >= 0.55
-      );
+      result = result.filter((u) => (u.experimental?.neynar_user_score ?? 1) >= 0.55);
     }
 
     if (minFollowers > 0) {
@@ -182,7 +197,14 @@ export function SocialPage() {
     return result;
   }, [users, search, powerBadgeOnly, hideSpam, minFollowers, zaoOnly, mutualOnly, hasBio, sort]);
 
-  const activeFilterCount = [powerBadgeOnly, hideSpam, minFollowers > 0, zaoOnly, mutualOnly, hasBio].filter(Boolean).length;
+  const activeFilterCount = [
+    powerBadgeOnly,
+    hideSpam,
+    minFollowers > 0,
+    zaoOnly,
+    mutualOnly,
+    hasBio,
+  ].filter(Boolean).length;
 
   // Virtual scrolling
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -213,7 +235,11 @@ export function SocialPage() {
         <PageHeader
           title="Social Graph"
           subtitle={isListView && totalLabel ? totalLabel : 'Your Farcaster network'}
-          rightAction={<div className="md:hidden"><NotificationBell /></div>}
+          rightAction={
+            <div className="md:hidden">
+              <NotificationBell />
+            </div>
+          }
         />
 
         {/* Live room banner — only renders when a room is active */}
@@ -221,13 +247,13 @@ export function SocialPage() {
 
         {/* Main view tabs */}
         <div className="flex border-b border-white/[0.08] bg-[#0d1b2a]">
-          {([
+          {[
             { key: 'followers' as View, label: 'Followers' },
             { key: 'following' as View, label: 'Following' },
             { key: 'community' as View, label: 'Community' },
             { key: 'analytics' as View, label: 'Analytics' },
             { key: 'discover' as View, label: 'Discover' },
-          ]).map((t) => (
+          ].map((t) => (
             <button
               key={t.key}
               onClick={() => setView(t.key)}
@@ -278,8 +304,18 @@ export function SocialPage() {
             {/* Search */}
             <div className="px-4 pt-3 pb-2">
               <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
                 </svg>
                 <input
                   type="text"
@@ -318,12 +354,24 @@ export function SocialPage() {
                     : 'border-white/[0.08] text-gray-400 hover:text-white'
                 }`}
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
+                  />
                 </svg>
                 Filters
                 {activeFilterCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-[#f5a623] text-[#0a1628] text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
+                  <span className="w-4 h-4 rounded-full bg-[#f5a623] text-[#0a1628] text-[10px] font-bold flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
                 )}
               </button>
               {/* Quick toggles */}
@@ -331,7 +379,11 @@ export function SocialPage() {
                 { label: 'ZAO', active: zaoOnly, toggle: () => setZaoOnly(!zaoOnly) },
                 { label: 'Mutual', active: mutualOnly, toggle: () => setMutualOnly(!mutualOnly) },
                 { label: 'No spam', active: hideSpam, toggle: () => setHideSpam(!hideSpam) },
-                { label: 'Inactive', active: sort === 'inactive', toggle: () => setSort(sort === 'inactive' ? 'recent' : 'inactive') },
+                {
+                  label: 'Inactive',
+                  active: sort === 'inactive',
+                  toggle: () => setSort(sort === 'inactive' ? 'recent' : 'inactive'),
+                },
               ].map((t) => (
                 <button
                   key={t.label}
@@ -357,16 +409,28 @@ export function SocialPage() {
               <div className="mx-4 mb-2 p-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] space-y-3">
                 <div className="flex flex-wrap gap-3">
                   <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input type="checkbox" checked={powerBadgeOnly} onChange={(e) => setPowerBadgeOnly(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50" />
+                    <input
+                      type="checkbox"
+                      checked={powerBadgeOnly}
+                      onChange={(e) => setPowerBadgeOnly(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50"
+                    />
                     <span className="text-xs text-gray-400">Power badge only</span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input type="checkbox" checked={hasBio} onChange={(e) => setHasBio(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50" />
+                    <input
+                      type="checkbox"
+                      checked={hasBio}
+                      onChange={(e) => setHasBio(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50"
+                    />
                     <span className="text-xs text-gray-400">Has bio</span>
                   </label>
                 </div>
                 <div>
-                  <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Min followers</label>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                    Min followers
+                  </label>
                   <div className="flex gap-1.5">
                     {[0, 10, 100, 1000, 10000].map((n) => (
                       <button
@@ -385,7 +449,14 @@ export function SocialPage() {
                 </div>
                 {activeFilterCount > 0 && (
                   <button
-                    onClick={() => { setPowerBadgeOnly(false); setHideSpam(false); setMinFollowers(0); setZaoOnly(false); setMutualOnly(false); setHasBio(false); }}
+                    onClick={() => {
+                      setPowerBadgeOnly(false);
+                      setHideSpam(false);
+                      setMinFollowers(0);
+                      setZaoOnly(false);
+                      setMutualOnly(false);
+                      setHasBio(false);
+                    }}
                     className="text-[11px] text-red-400 hover:text-red-300"
                   >
                     Clear all filters
@@ -406,7 +477,11 @@ export function SocialPage() {
                 </div>
               ) : (
                 <div
-                  style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative', width: '100%' }}
+                  style={{
+                    height: `${virtualizer.getTotalSize()}px`,
+                    position: 'relative',
+                    width: '100%',
+                  }}
                 >
                   {virtualizer.getVirtualItems().map((virtualRow) => {
                     const u = filtered[virtualRow.index];
@@ -443,11 +518,7 @@ export function SocialPage() {
                           transform: `translateY(${virtualRow.start}px)`,
                         }}
                       >
-                        <FollowerCard
-                          user={u}
-                          hasSigner={hasSigner}
-                          currentFid={user.fid}
-                        />
+                        <FollowerCard user={u} hasSigner={hasSigner} currentFid={user.fid} />
                       </div>
                     );
                   })}

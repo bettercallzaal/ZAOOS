@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
@@ -90,11 +90,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Only the room host can invite or dismiss
-      const { data: room } = await db
-        .from('rooms')
-        .select('host_fid')
-        .eq('id', roomId)
-        .single();
+      const { data: room } = await db.from('rooms').select('host_fid').eq('id', roomId).single();
 
       if (!room || room.host_fid !== session.fid) {
         return NextResponse.json({ error: 'Only the host can invite or dismiss' }, { status: 403 });

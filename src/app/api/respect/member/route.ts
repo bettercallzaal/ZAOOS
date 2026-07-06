@@ -1,13 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
-const querySchema = z.object({
-  wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
-  fid: z.coerce.number().int().positive().optional(),
-}).refine(d => d.wallet || d.fid, { message: 'Missing wallet or fid parameter' });
+const querySchema = z
+  .object({
+    wallet: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/)
+      .optional(),
+    fid: z.coerce.number().int().positive().optional(),
+  })
+  .refine((d) => d.wallet || d.fid, { message: 'Missing wallet or fid parameter' });
 
 export async function GET(request: NextRequest) {
   const session = await getSessionData();
@@ -20,15 +25,16 @@ export async function GET(request: NextRequest) {
     fid: request.nextUrl.searchParams.get('fid') ?? undefined,
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message || 'Invalid parameters' }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message || 'Invalid parameters' },
+      { status: 400 },
+    );
   }
   const { wallet, fid } = parsed.data;
 
   try {
     // Fetch the member
-    let memberQuery = supabaseAdmin
-      .from('respect_members')
-      .select('*');
+    let memberQuery = supabaseAdmin.from('respect_members').select('*');
 
     if (wallet) {
       memberQuery = memberQuery.ilike('wallet_address', wallet);
@@ -61,7 +67,7 @@ export async function GET(request: NextRequest) {
       .filter(
         wallet ? 'wallet_address' : 'member_name',
         wallet ? 'ilike' : 'eq',
-        wallet || member.name
+        wallet || member.name,
       )
       .order('created_at', { ascending: false });
 
@@ -178,7 +184,7 @@ export async function GET(request: NextRequest) {
         hosting_count: member.hosting_count,
       },
       fractalHistory,
-      events: (events || []).map(e => ({
+      events: (events || []).map((e) => ({
         event_type: e.event_type,
         amount: Number(e.amount),
         description: e.description,

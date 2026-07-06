@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSession, getSessionData } from '@/lib/auth/session';
 import { getSignerStatus } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
@@ -19,10 +19,7 @@ export async function GET(req: NextRequest) {
 
     // Verify the signer belongs to the current user whenever FID is available
     if (status.fid && status.fid !== sessionData.fid) {
-      return NextResponse.json(
-        { error: 'Signer does not belong to this user' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Signer does not belong to this user' }, { status: 403 });
     }
 
     // Save signer UUID to session once approved

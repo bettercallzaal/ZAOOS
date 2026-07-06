@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { communityConfig } from '@/../community.config';
 import { logger } from '@/lib/logger';
 
 const POLL_CONFIG_ID = 'weekly-priority';
@@ -67,7 +67,7 @@ export async function PUT(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
           updated_at: new Date().toISOString(),
           updated_by_fid: session.fid,
         },
-        { onConflict: 'id' }
+        { onConflict: 'id' },
       )
       .select()
       .single();

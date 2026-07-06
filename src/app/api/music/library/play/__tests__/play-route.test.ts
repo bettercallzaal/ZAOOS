@@ -1,9 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  makePostRequest,
-  mockAuthenticatedSession,
-  VALID_UUID,
-} from '@/test-utils/api-helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { makePostRequest, mockAuthenticatedSession, VALID_UUID } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockIncrementPlayCount } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),

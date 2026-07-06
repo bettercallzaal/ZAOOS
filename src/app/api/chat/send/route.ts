@@ -1,14 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { postCast } from '@/lib/farcaster/neynar';
-import { supabaseAdmin } from '@/lib/db/supabase';
-import { sendMessageSchema } from '@/lib/validation/schemas';
-import { sendNotification, createInAppNotification } from '@/lib/notifications';
-
-import { extractAndSaveSongs } from '@/lib/music/library';
-import { touchActivity } from '@/lib/db/activity';
+import { type NextRequest, NextResponse } from 'next/server';
 import { communityConfig } from '@/../community.config';
+import { getSessionData } from '@/lib/auth/session';
+import { touchActivity } from '@/lib/db/activity';
+import { supabaseAdmin } from '@/lib/db/supabase';
+import { postCast } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import { extractAndSaveSongs } from '@/lib/music/library';
+import { createInAppNotification, sendNotification } from '@/lib/notifications';
+import { sendMessageSchema } from '@/lib/validation/schemas';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -19,17 +18,24 @@ export async function POST(req: NextRequest) {
   }
 
   if (!session.signerUuid) {
-    return NextResponse.json({ error: 'No signer configured. Please approve a signer first.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'No signer configured. Please approve a signer first.' },
+      { status: 400 },
+    );
   }
 
   try {
     const body = await req.json();
     const parsed = sendMessageSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
-    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels } = parsed.data;
+    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels } =
+      parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -41,7 +47,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Post to primary channel first
-    const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash, embedUrls, embedFid);
+    const result = await postCast(
+      session.signerUuid,
+      text,
+      primaryChannel,
+      parentHash,
+      embedHash,
+      embedUrls,
+      embedFid,
+    );
 
     // Write the new cast to our DB immediately so it shows up on next fetch
     const castData = result.cast;
@@ -69,34 +83,47 @@ export async function POST(req: NextRequest) {
 
     // Track member activity + save music links (fire and forget)
     touchActivity(session.fid);
-    extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch((err) => logger.error('[chat/send] song extraction failed:', err));
+    extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch((err) =>
+      logger.error('[chat/send] song extraction failed:', err),
+    );
 
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);
     if (additionalChannels.length > 0) {
       await Promise.allSettled(
         additionalChannels.map(async (ch) => {
-          const crossResult = await postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls, embedFid);
+          const crossResult = await postCast(
+            session.signerUuid!,
+            text,
+            ch,
+            undefined,
+            embedHash,
+            embedUrls,
+            embedFid,
+          );
           // Also write cross-posts to DB
           if (crossResult.cast?.hash) {
-            await supabaseAdmin
-              .from('channel_casts')
-              .upsert([{
-                hash: crossResult.cast.hash,
-                channel_id: ch,
-                fid: session.fid,
-                author_username: session.username,
-                author_display: session.displayName,
-                author_pfp: session.pfpUrl,
-                text,
-                timestamp: new Date().toISOString(),
-                embeds: crossResult.cast.embeds ?? [],
-                reactions: { likes_count: 0, recasts_count: 0, likes: [], recasts: [] },
-                replies_count: 0,
-                parent_hash: null,
-              }], { onConflict: 'hash' });
+            await supabaseAdmin.from('channel_casts').upsert(
+              [
+                {
+                  hash: crossResult.cast.hash,
+                  channel_id: ch,
+                  fid: session.fid,
+                  author_username: session.username,
+                  author_display: session.displayName,
+                  author_pfp: session.pfpUrl,
+                  text,
+                  timestamp: new Date().toISOString(),
+                  embeds: crossResult.cast.embeds ?? [],
+                  reactions: { likes_count: 0, recasts_count: 0, likes: [], recasts: [] },
+                  replies_count: 0,
+                  parent_hash: null,
+                },
+              ],
+              { onConflict: 'hash' },
+            );
           }
-        })
+        }),
       ).catch((err) => logger.error('[notify]', err));
     }
 
@@ -157,30 +184,28 @@ export async function POST(req: NextRequest) {
       preview,
       `https://zaoos.com/chat`,
       `msg-${Date.now()}-${session.fid}`,
-      session.fid // exclude sender
+      session.fid, // exclude sender
     ).catch((err) => logger.error('[notify]', err));
 
     // In-app notification for all other active members
     Promise.resolve(
-      supabaseAdmin
-        .from('users')
-        .select('fid')
-        .eq('is_active', true)
-        .neq('fid', session.fid)
-    ).then(({ data: members }) => {
-      if (members?.length) {
-        createInAppNotification({
-          recipientFids: members.map((m) => m.fid).filter(Boolean),
-          type: 'message',
-          title: `${session.displayName} in ${channelList}`,
-          body: preview,
-          href: '/chat',
-          actorFid: session.fid,
-          actorDisplayName: session.displayName,
-          actorPfpUrl: session.pfpUrl,
-        }).catch((err) => logger.error('[notify]', err));
-      }
-    }).catch((err) => logger.error('[notify]', err));
+      supabaseAdmin.from('users').select('fid').eq('is_active', true).neq('fid', session.fid),
+    )
+      .then(({ data: members }) => {
+        if (members?.length) {
+          createInAppNotification({
+            recipientFids: members.map((m) => m.fid).filter(Boolean),
+            type: 'message',
+            title: `${session.displayName} in ${channelList}`,
+            body: preview,
+            href: '/chat',
+            actorFid: session.fid,
+            actorDisplayName: session.displayName,
+            actorPfpUrl: session.pfpUrl,
+          }).catch((err) => logger.error('[notify]', err));
+        }
+      })
+      .catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({
       success: true,

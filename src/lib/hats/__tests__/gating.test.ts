@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockIsWearerOfHat = vi.hoisted(() => vi.fn());
 const mockGetWornHats = vi.hoisted(() => vi.fn());
@@ -8,8 +8,14 @@ vi.mock('@/lib/hats/client', () => ({
   getWornHats: (...args: unknown[]) => mockGetWornHats(...args),
 }));
 
-import { hasPermission, getPermissions, getRoles, isHatAdmin, requirePermission } from '@/lib/hats/gating';
 import { HAT_IDS } from '@/lib/hats/constants';
+import {
+  getPermissions,
+  getRoles,
+  hasPermission,
+  isHatAdmin,
+  requirePermission,
+} from '@/lib/hats/gating';
 
 const TEST_WALLET = '0x1234567890abcdef1234567890abcdef12345678' as `0x${string}`;
 
@@ -79,8 +85,8 @@ describe('Hat-based gating', () => {
 
   describe('isHatAdmin', () => {
     it('returns true for configurator wearer', async () => {
-      mockIsWearerOfHat.mockImplementation(
-        (_wallet: string, hatId: bigint) => Promise.resolve(hatId === HAT_IDS.configurator)
+      mockIsWearerOfHat.mockImplementation((_wallet: string, hatId: bigint) =>
+        Promise.resolve(hatId === HAT_IDS.configurator),
       );
       const result = await isHatAdmin(TEST_WALLET);
       expect(result).toBe(true);

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { logger } from '@/lib/logger';
 
 const broadcastSchema = z.object({
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,10 +32,7 @@ export async function POST(req: NextRequest) {
 
     const signerUuid = process.env.NEYNAR_SIGNER_UUID;
     if (!signerUuid) {
-      return NextResponse.json(
-        { error: 'Signer not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Signer not configured' }, { status: 500 });
     }
 
     const res = await fetch('https://api.neynar.com/v2/farcaster/cast', {
@@ -54,10 +51,7 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       const errorBody = await res.text();
       logger.error('[broadcast] Neynar error:', res.status, errorBody);
-      return NextResponse.json(
-        { error: 'Failed to broadcast cast' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to broadcast cast' }, { status: 500 });
     }
 
     const data = await res.json();
@@ -82,9 +76,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, hash: data.cast?.hash });
   } catch (error) {
     logger.error('[broadcast] Unexpected error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

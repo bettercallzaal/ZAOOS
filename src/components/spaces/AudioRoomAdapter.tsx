@@ -7,8 +7,8 @@
 
 'use client';
 
-import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useCallback } from 'react';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 // Each provider drags in a different ~150KB video SDK (@100mslive/react-sdk
@@ -65,11 +65,5 @@ export function AudioRoomAdapter({ room, user, onLeave }: AudioRoomAdapterProps)
     return <HMSVideoRoom roomName={room.id} role={role} onLeave={handleLeave} />;
   }
 
-  return (
-    <StreamRoomAdapter
-      room={room}
-      user={user}
-      onLeave={handleLeave}
-    />
-  );
+  return <StreamRoomAdapter room={room} user={user} onLeave={handleLeave} />;
 }

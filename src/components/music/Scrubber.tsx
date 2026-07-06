@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { formatDuration } from '@/lib/music/formatDuration';
 
 interface ScrubberProps {
@@ -37,17 +37,19 @@ export function Scrubber({ position, duration, feedId, onSeek }: ScrubberProps) 
     return Array.from({ length: BAR_COUNT }, () => 30 + Math.floor(rand() * 70));
   }, [feedId]);
 
-  const filledCount =
-    duration > 0 ? Math.round((position / duration) * BAR_COUNT) : 0;
+  const filledCount = duration > 0 ? Math.round((position / duration) * BAR_COUNT) : 0;
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!containerRef.current || duration <= 0) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    setPreviewMs(fraction * duration);
-    setPreviewX(e.clientX - rect.left);
-    setScrubbing(true);
-  }, [duration]);
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!containerRef.current || duration <= 0) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      setPreviewMs(fraction * duration);
+      setPreviewX(e.clientX - rect.left);
+      setScrubbing(true);
+    },
+    [duration],
+  );
 
   return (
     <div className="flex items-center gap-2 w-full min-w-0">

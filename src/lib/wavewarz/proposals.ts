@@ -1,5 +1,10 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { SPOTLIGHT_TIERS, RESPECT_THRESHOLD, INTELLIGENCE_BASE, type SpotlightTier } from './constants';
+import {
+  INTELLIGENCE_BASE,
+  RESPECT_THRESHOLD,
+  SPOTLIGHT_TIERS,
+  type SpotlightTier,
+} from './constants';
 
 interface ProposalInput {
   title: string;
@@ -61,7 +66,7 @@ export async function createSpotlightProposal(
   tier: SpotlightTier,
   authorId: string,
 ) {
-  const tierConfig = SPOTLIGHT_TIERS.find(t => t.tier === tier);
+  const tierConfig = SPOTLIGHT_TIERS.find((t) => t.tier === tier);
   if (!tierConfig) return null;
 
   const title = `${tierConfig.label}: ${artistName}`;
@@ -144,10 +149,11 @@ export async function createSessionReminderProposal(authorId: string) {
  * Tier ordering is derived from SPOTLIGHT_TIERS directly (single source of
  * truth) so reordering or renaming a tier there cannot silently break this.
  */
-export function getNewSpotlightTier(wins: number, currentTier: string | null): SpotlightTier | null {
-  const currentIdx = currentTier
-    ? SPOTLIGHT_TIERS.findIndex((t) => t.tier === currentTier)
-    : -1;
+export function getNewSpotlightTier(
+  wins: number,
+  currentTier: string | null,
+): SpotlightTier | null {
+  const currentIdx = currentTier ? SPOTLIGHT_TIERS.findIndex((t) => t.tier === currentTier) : -1;
 
   for (let i = SPOTLIGHT_TIERS.length - 1; i >= 0; i--) {
     const t = SPOTLIGHT_TIERS[i];

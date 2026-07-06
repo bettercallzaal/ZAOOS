@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
 
 const introsQuerySchema = z.object({
-  discord_id: z.string().regex(/^\d{1,32}$/, 'invalid discord_id').nullish(),
+  discord_id: z
+    .string()
+    .regex(/^\d{1,32}$/, 'invalid discord_id')
+    .nullish(),
   all: z.string().nullish(),
 });
 
@@ -26,10 +29,7 @@ export async function GET(req: NextRequest) {
   const all = parsed.data.all === 'true';
 
   if (!discordId && !all) {
-    return NextResponse.json(
-      { error: 'Provide discord_id or all=true' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Provide discord_id or all=true' }, { status: 400 });
   }
 
   try {

@@ -18,7 +18,9 @@ export async function GET() {
     // Fetch members with respect data, sorted by total respect desc
     const { data: users, error } = await supabaseAdmin
       .from('users')
-      .select('fid, username, display_name, pfp_url, bio, location, last_active_at, respect_member_id')
+      .select(
+        'fid, username, display_name, pfp_url, bio, location, last_active_at, respect_member_id',
+      )
       .eq('is_active', true)
       .not('username', 'is', null)
       .order('zid', { ascending: true, nullsFirst: false })
@@ -30,10 +32,11 @@ export async function GET() {
     }
 
     // Fetch respect for all
-    const fids = users.map(u => u.fid).filter(Boolean) as number[];
-    const { data: respectData } = fids.length > 0
-      ? await supabaseAdmin.from('respect_members').select('fid, total_respect').in('fid', fids)
-      : { data: [] };
+    const fids = users.map((u) => u.fid).filter(Boolean) as number[];
+    const { data: respectData } =
+      fids.length > 0
+        ? await supabaseAdmin.from('respect_members').select('fid, total_respect').in('fid', fids)
+        : { data: [] };
 
     const respectMap: Record<number, number> = {};
     for (const r of respectData || []) {
@@ -43,7 +46,9 @@ export async function GET() {
     // Sort by respect descending, then pick by day-of-year
     const sorted = [...users].sort((a, b) => (respectMap[b.fid] ?? 0) - (respectMap[a.fid] ?? 0));
     const now = new Date();
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000,
+    );
     const pick = sorted[dayOfYear % sorted.length];
 
     const member = {
@@ -57,9 +62,12 @@ export async function GET() {
       lastActiveAt: pick.last_active_at,
     };
 
-    return NextResponse.json({ member }, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800' },
-    });
+    return NextResponse.json(
+      { member },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800' },
+      },
+    );
   } catch (err) {
     logger.error('[spotlight] error:', err);
     return NextResponse.json({ error: 'Failed to load spotlight' }, { status: 500 });

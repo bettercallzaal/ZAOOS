@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const DEFAULTS = { autoJoinGroup: true, allowNonZaoDms: false };
@@ -48,7 +48,10 @@ export async function PATCH(req: Request) {
   const body = await req.json().catch(() => null);
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid preferences', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid preferences', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   // Merge with existing prefs

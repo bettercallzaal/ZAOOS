@@ -58,7 +58,7 @@ export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 
       ? { status: 'done', roles: initialCached }
       : needsFetch
         ? { status: 'loading', roles: [] }
-        : { status: 'idle', roles: [] }
+        : { status: 'idle', roles: [] },
   );
 
   useEffect(() => {
@@ -77,18 +77,20 @@ export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 
         setCache(walletAddress, r);
         setState({ status: 'done', roles: r });
       })
-      .catch(() => { if (!cancelled) setState({ status: 'done', roles: [] }); });
+      .catch(() => {
+        if (!cancelled) setState({ status: 'done', roles: [] });
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [walletAddress, isValid]);
 
   const loading = state.status === 'loading';
   const roles = state.roles;
 
   if (loading) {
-    return (
-      <span className="inline-block w-12 h-4 bg-white/5 rounded animate-pulse" />
-    );
+    return <span className="inline-block w-12 h-4 bg-white/5 rounded animate-pulse" />;
   }
 
   if (roles.length === 0) return null;
@@ -108,9 +110,7 @@ export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 
             {role.label}
           </span>
         ))}
-        {remaining > 0 && (
-          <span className="text-[10px] text-gray-500">+{remaining}</span>
-        )}
+        {remaining > 0 && <span className="text-[10px] text-gray-500">+{remaining}</span>}
       </span>
     );
   }

@@ -25,9 +25,7 @@ export default function AgentEventRow({ event }: { event: AgentEvent }) {
       onClick={() => setExpanded(!expanded)}
     >
       <div className="flex items-center gap-3">
-        <span className="shrink-0 w-16 text-gray-500 text-xs">
-          {timeAgo(event.created_at)}
-        </span>
+        <span className="shrink-0 w-16 text-gray-500 text-xs">{timeAgo(event.created_at)}</span>
         <span
           className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm"
           style={{ backgroundColor: agent ? `${agent.color}20` : '#333' }}

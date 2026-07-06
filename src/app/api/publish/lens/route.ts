@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { normalizeForLens } from '@/lib/publish/normalize';
-import { publishToLens } from '@/lib/publish/lens';
 import { logger } from '@/lib/logger';
+import { publishToLens } from '@/lib/publish/lens';
+import { normalizeForLens } from '@/lib/publish/normalize';
 
 const publishSchema = z.object({
   castHash: z.string().min(1),
@@ -23,11 +23,18 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let body: unknown;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
 
   const parsed = publishSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { castHash, text, embedUrls, imageUrls, channel } = parsed.data;
@@ -41,11 +48,17 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!user?.lens_profile_id) {
-      return NextResponse.json({ error: 'Lens not connected — connect in Settings' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Lens not connected — connect in Settings' },
+        { status: 400 },
+      );
     }
 
     if (!user?.lens_access_token) {
-      return NextResponse.json({ error: 'Lens auth tokens missing — reconnect with wallet in Settings' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Lens auth tokens missing — reconnect with wallet in Settings' },
+        { status: 400 },
+      );
     }
 
     // Normalize content for Lens

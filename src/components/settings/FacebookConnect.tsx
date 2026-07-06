@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FacebookPage {
   id: string;
@@ -28,7 +28,13 @@ function FacebookIcon({ className }: { className?: string }) {
 
 function CopyIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2}>
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
       <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
     </svg>
@@ -96,7 +102,9 @@ export function FacebookConnect() {
                   connection.connected ? 'bg-green-400' : 'bg-gray-600'
                 }`}
               />
-              <span className={`text-xs ${connection.connected ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span
+                className={`text-xs ${connection.connected ? 'text-gray-400' : 'text-gray-600'}`}
+              >
                 {connection.connected
                   ? `Connected as ${connection.displayName || connection.username}`
                   : 'Not connected'}
@@ -126,9 +134,7 @@ export function FacebookConnect() {
       {/* Page info (only when connected) */}
       {connection.connected && (
         <div className="px-4 pb-4 space-y-2 border-t border-white/[0.08] pt-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-            Streaming Page
-          </p>
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Streaming Page</p>
 
           {connection.primaryPageName ? (
             <div className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-white/[0.08]">

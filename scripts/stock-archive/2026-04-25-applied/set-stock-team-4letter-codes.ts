@@ -7,7 +7,7 @@
 //
 // Copy the printed SQL block into Supabase SQL Editor and run.
 
-import { scryptSync, randomBytes } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 
 // role/scope for new members (existing members won't be re-roled by this script;
 // the upsert only sets password_hash, role, and scope on INSERT)
@@ -66,8 +66,8 @@ for (const { name, code: c, role, scope } of entries) {
   // Role/scope only set on INSERT - does not overwrite existing role/scope.
   console.log(
     `INSERT INTO stock_team_members (name, role, scope, password_hash) ` +
-    `VALUES ('${safeName}', '${role}', '${scope}', '${hash}') ` +
-    `ON CONFLICT (name) DO UPDATE SET password_hash = EXCLUDED.password_hash;`,
+      `VALUES ('${safeName}', '${role}', '${scope}', '${hash}') ` +
+      `ON CONFLICT (name) DO UPDATE SET password_hash = EXCLUDED.password_hash;`,
   );
 }
 console.log('COMMIT;');

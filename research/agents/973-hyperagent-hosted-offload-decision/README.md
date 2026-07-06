@@ -19,6 +19,28 @@ tier: STANDARD
 
 This is deliberately narrow: Hyperagent is architecturally a hosted mirror of ZOE (system-prompt agents + per-agent tools + memory + budget + self-improvement + MCP). ZAO already has that self-hosted, and doc 972 named **self-hosted independence** as part of the moat. So the value of Hyperagent is NOT the architecture - it is the **integrations already wired** (Airtable, Gmail, Slack, GitHub, Notion, Google Calendar, Hunter.io, etc.) for tasks ZAO has not built connectors for.
 
+## Update 2026-07-06: Hyperagent as a tap-in surface (resource mesh)
+
+Refined after wiring the MCP + a multi-agent deep dive. Hyperagent is not a bounded one-off offload - it is another **tap-in surface** in ZAO's agent mesh, alongside the Pi, Claude Code mobile/cloud, and the VPS ZOE fleet. Zaal taps whichever fits the job:
+
+| Surface | What it is | Tap for |
+|---|---|---|
+| Claude Code (Mac) | Full-toolset orchestrator brain | Anything: code, research, driving the others |
+| Claude Code cloud/mobile | Remote, repo-scoped sessions | On-the-go PR work + drafting away from the Mac |
+| Pi (ansuz) | Persistent local node, full network + brain | ZOL/Farcaster posting, watchers, durable loops |
+| VPS (ZOE fleet) | Always-on Telegram/Farcaster bots | ZOE concierge, Devz, ZAOstock - the sovereign public/team presence |
+| Hyperagent | Hosted agent TEAM + integrations + real browser | Integration work (Gmail/Drive/Airtable/Slack), background research/reports, per-brand agents, Superagent multi-agent, operating web apps |
+
+**Two capabilities confirmed this session:**
+- **MCP delegation (proven live):** Hyperagent exposes an MCP server (https://hyperagent.com/api/mcp) with list_agents, create_thread, send_message, get_thread, list_threads, create_attachment_upload. This Claude Code session authenticated it and delegated real work (a Chief-of-Staff week brief, a Gmail audit, 6 brand reports). Claude Code (and any interactive Claude) orchestrates; Hyperagent executes with its integrations + VM browser.
+- **Superagent (multi-agent):** a coordinator plans, deploys specialists in parallel, then synthesizes a finished deliverable - structurally the same shape as ZOE (orchestrator -> workers -> synthesis), which is why "Hyperagent as ZOE" felt right.
+
+**Verdict: Hyperagent is ZOE's body and staff, not a replacement.** ZOE's defining job - a Farcaster-native, key-holding, always-on sovereign presence - is exactly what a hosted platform cannot and should not do. ZOE stays the sovereign brain (Farcaster/Telegram, keys, Bonfire, always-on); Hyperagent becomes the operations + intelligence layer (per-brand agents, Chief of Staff, Superagent research), tapped via MCP. This upgrades the original "6th layer: hosted offload" from a bounded trial to a standing tap-in surface.
+
+**Standing limits:** pay-per-credit (bound each agent's budget); headless ZOE crons cannot hold Hyperagent's OAuth, so autonomous ZOE->Hyperagent is not clean yet (interactive Claude/Claude Code is the orchestrator); platform lock-in argues for keeping the core portable (doc 972 moat); keys + sensitive PII stay on ZOE, never on the hosted platform.
+
+**Per-brand agents (2026-07-05):** paste-ready configs for one agent per brand (The ZAO, WaveWarZ, ZABAL Gamez, COC Concertz, BetterCallZaal, ZAOstock), each loaded with brand context, read-only + propose-only - ZOE's brand-expert staff, delegated to via MCP.
+
 ## What Hyperagent is (verified 2026-07-05)
 
 By **Airtable**, launched April 2026. Hosted autonomous agents, each with its own system prompt, **per-agent** integrations (OAuth, not global), memory, and budget cap. Runs frontier models incl. Claude Opus 4.8. Each agent runs in a dedicated VM with a real browser - it executes (reads/writes Airtable, browses, sends), not just chats. It self-improves (auto-suggests skills + memories to review or auto-accept). Anything not native: bring your own MCP server or build a Skill (with its own stored creds).

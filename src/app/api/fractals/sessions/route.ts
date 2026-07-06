@@ -1,5 +1,5 @@
 // src/app/api/fractals/sessions/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -22,14 +22,22 @@ export async function GET(req: NextRequest) {
     offset: searchParams.get('offset') ?? undefined,
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query params', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid query params', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
   const { limit, offset } = parsed.data;
 
   try {
-    const { data: sessions, error, count } = await supabaseAdmin
+    const {
+      data: sessions,
+      error,
+      count,
+    } = await supabaseAdmin
       .from('fractal_sessions')
-      .select(`
+      .select(
+        `
         id,
         session_date,
         name,
@@ -45,15 +53,20 @@ export async function GET(req: NextRequest) {
           rank,
           score
         )
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' },
+      )
       .order('session_date', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) throw error;
 
-    return NextResponse.json({ sessions: sessions ?? [], total: count ?? 0 }, {
-      headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      { sessions: sessions ?? [], total: count ?? 0 },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=30' },
+      },
+    );
   } catch (err) {
     logger.error('Fractal sessions error:', err);
     return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 });

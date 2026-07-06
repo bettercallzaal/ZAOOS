@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { formatEther, parseEther, createPublicClient, http } from 'viem';
+import { useCallback, useEffect, useState } from 'react';
+import { createPublicClient, formatEther, http, parseEther } from 'viem';
 import { base } from 'viem/chains';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { ZOUNZ_TOKEN, ZOUNZ_AUCTION, tokenAbi, auctionAbi } from '@/lib/zounz/contracts';
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { auctionAbi, tokenAbi, ZOUNZ_AUCTION, ZOUNZ_TOKEN } from '@/lib/zounz/contracts';
 
 interface AuctionState {
   tokenId: bigint;
@@ -66,7 +66,9 @@ export default function ZounzAuction() {
   const [reservePrice, setReservePrice] = useState(BigInt(0));
 
   const { writeContract, data: txHash, isPending: isBidding, error: bidError } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   // Fetch current auction state
   const fetchAuction = useCallback(async () => {
@@ -79,19 +81,30 @@ export default function ZounzAuction() {
           abi: auctionAbi,
           functionName: 'auction',
         }),
-        client.readContract({
-          address: addr,
-          abi: auctionAbi,
-          functionName: 'minBidIncrement',
-        }).catch(() => BigInt(10)),
-        client.readContract({
-          address: addr,
-          abi: auctionAbi,
-          functionName: 'reservePrice',
-        }).catch(() => BigInt(0)),
+        client
+          .readContract({
+            address: addr,
+            abi: auctionAbi,
+            functionName: 'minBidIncrement',
+          })
+          .catch(() => BigInt(10)),
+        client
+          .readContract({
+            address: addr,
+            abi: auctionAbi,
+            functionName: 'reservePrice',
+          })
+          .catch(() => BigInt(0)),
       ]);
 
-      const [tokenId, highestBid, highestBidder, startTime, endTime, settled] = auctionData as [bigint, bigint, string, number, number, boolean];
+      const [tokenId, highestBid, highestBidder, startTime, endTime, settled] = auctionData as [
+        bigint,
+        bigint,
+        string,
+        number,
+        number,
+        boolean,
+      ];
 
       setAuction({ tokenId, highestBid, highestBidder, startTime, endTime, settled });
       setMinBidIncrement(minIncrement as bigint);
@@ -109,11 +122,19 @@ export default function ZounzAuction() {
         const uriStr = uri as string;
         if (uriStr.startsWith('data:application/json;base64,')) {
           const json = JSON.parse(atob(uriStr.replace('data:application/json;base64,', '')));
-          setTokenMeta({ name: json.name || `ZOUNZ #${tokenId}`, image: json.image || '', description: json.description || '' });
+          setTokenMeta({
+            name: json.name || `ZOUNZ #${tokenId}`,
+            image: json.image || '',
+            description: json.description || '',
+          });
         } else if (uriStr.startsWith('http')) {
           const res = await fetch(uriStr);
           const json = await res.json();
-          setTokenMeta({ name: json.name || `ZOUNZ #${tokenId}`, image: json.image || '', description: json.description || '' });
+          setTokenMeta({
+            name: json.name || `ZOUNZ #${tokenId}`,
+            image: json.image || '',
+            description: json.description || '',
+          });
         } else {
           setTokenMeta({ name: `ZOUNZ #${tokenId}`, image: '', description: '' });
         }
@@ -155,7 +176,9 @@ export default function ZounzAuction() {
   const minNextBid = auction
     ? auction.highestBid > BigInt(0)
       ? auction.highestBid + (auction.highestBid * minBidIncrement) / BigInt(100)
-      : reservePrice > BigInt(0) ? reservePrice : parseEther('0.001')
+      : reservePrice > BigInt(0)
+        ? reservePrice
+        : parseEther('0.001')
     : BigInt(0);
 
   const handleBid = () => {
@@ -200,7 +223,7 @@ export default function ZounzAuction() {
       {/* NFT Image */}
       {tokenMeta?.image && (
         <div className="aspect-square bg-[#0a1628] flex items-center justify-center overflow-hidden">
-          { }
+          {}
           <img
             src={tokenMeta.image}
             alt={tokenMeta.name}
@@ -232,14 +255,15 @@ export default function ZounzAuction() {
             <p className="text-lg font-bold text-white">
               {auction?.highestBid ? `${formatEther(auction.highestBid)} ETH` : 'No bids'}
             </p>
-            {auction?.highestBidder && auction.highestBidder !== '0x0000000000000000000000000000000000000000' && (
-              <p className="text-[10px] text-gray-500 mt-0.5">
-                by {shortAddr(auction.highestBidder)}
-                {auction.highestBidder.toLowerCase() === address?.toLowerCase() && (
-                  <span className="text-[#f5a623] ml-1">(you)</span>
-                )}
-              </p>
-            )}
+            {auction?.highestBidder &&
+              auction.highestBidder !== '0x0000000000000000000000000000000000000000' && (
+                <p className="text-[10px] text-gray-500 mt-0.5">
+                  by {shortAddr(auction.highestBidder)}
+                  {auction.highestBidder.toLowerCase() === address?.toLowerCase() && (
+                    <span className="text-[#f5a623] ml-1">(you)</span>
+                  )}
+                </p>
+              )}
           </div>
           <div className="bg-[#0a1628] rounded-lg p-3">
             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Time Left</p>
@@ -264,11 +288,19 @@ export default function ZounzAuction() {
                   className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 pr-12 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
                   disabled={isBidding || isConfirming}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">ETH</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                  ETH
+                </span>
               </div>
               <button
                 onClick={handleBid}
-                disabled={!isConnected || !bidAmount || isBidding || isConfirming || parseEther(bidAmount || '0') < minNextBid}
+                disabled={
+                  !isConnected ||
+                  !bidAmount ||
+                  isBidding ||
+                  isConfirming ||
+                  parseEther(bidAmount || '0') < minNextBid
+                }
                 className="bg-[#f5a623] text-[#0a1628] font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-[#ffd700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isBidding ? 'Bidding...' : isConfirming ? 'Confirming...' : 'Bid'}
@@ -278,11 +310,11 @@ export default function ZounzAuction() {
               <p className="text-[10px] text-gray-500">Connect your wallet to bid</p>
             )}
             {bidError && (
-              <p className="text-[10px] text-red-400">{bidError.message?.split('\n')[0] || 'Bid failed'}</p>
+              <p className="text-[10px] text-red-400">
+                {bidError.message?.split('\n')[0] || 'Bid failed'}
+              </p>
             )}
-            {isConfirmed && (
-              <p className="text-[10px] text-green-400">Bid placed successfully!</p>
-            )}
+            {isConfirmed && <p className="text-[10px] text-green-400">Bid placed successfully!</p>}
           </div>
         )}
 
@@ -302,7 +334,7 @@ export default function ZounzAuction() {
             <ShareToFarcaster
               template={shareTemplates.zounzAuction(
                 auction?.tokenId?.toString() || '1',
-                auction?.highestBid ? formatEther(auction.highestBid) : '0'
+                auction?.highestBid ? formatEther(auction.highestBid) : '0',
               )}
               variant="compact"
               label="Share"

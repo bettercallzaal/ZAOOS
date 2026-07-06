@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSession, mockFrom } = vi.hoisted(() => ({
   mockGetSession: vi.fn(),
@@ -21,7 +21,12 @@ function songsChain(data: unknown[]) {
 
 const req = (qs = '') => new NextRequest(`http://localhost:3000/api/activity/feed?${qs}`);
 const song = (id: string, created_at: string, title: string) => ({
-  id, title, artist: 'A', submitted_by_fid: 1, created_at, users: null,
+  id,
+  title,
+  artist: 'A',
+  submitted_by_fid: 1,
+  created_at,
+  users: null,
 });
 
 describe('GET /api/activity/feed', () => {

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = BroadcastSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     // Get Facebook connection
@@ -46,7 +49,7 @@ export async function POST(req: NextRequest) {
         {
           error: 'No Facebook Page found. You must manage at least one Facebook Page to go live.',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -65,7 +68,7 @@ export async function POST(req: NextRequest) {
           status: 'LIVE_NOW',
           access_token: pageAccessToken,
         }),
-      }
+      },
     );
 
     const liveVideoData = await liveVideoRes.json();
@@ -74,7 +77,7 @@ export async function POST(req: NextRequest) {
       logger.error('Facebook create live video failed:', liveVideoData);
       return NextResponse.json(
         { error: 'Failed to create Facebook live video', details: liveVideoData.error?.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 

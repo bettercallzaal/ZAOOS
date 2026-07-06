@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { AtpAgent } from '@atproto/api';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { AtpAgent } from '@atproto/api';
 import { logger } from '@/lib/logger';
 
 /**
@@ -48,10 +48,7 @@ export async function POST(req: NextRequest) {
     const { handle, appPassword } = body;
 
     if (!handle || !appPassword) {
-      return NextResponse.json(
-        { error: 'Handle and app password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Handle and app password are required' }, { status: 400 });
     }
 
     // Verify credentials by logging in
@@ -60,8 +57,11 @@ export async function POST(req: NextRequest) {
       await agent.login({ identifier: handle, password: appPassword });
     } catch {
       return NextResponse.json(
-        { error: 'Invalid Bluesky credentials. Make sure you use an App Password, not your account password.' },
-        { status: 400 }
+        {
+          error:
+            'Invalid Bluesky credentials. Make sure you use an App Password, not your account password.',
+        },
+        { status: 400 },
       );
     }
 
@@ -91,10 +91,7 @@ export async function POST(req: NextRequest) {
 
     const { error: memberErr } = await supabaseAdmin
       .from('bluesky_members')
-      .upsert(
-        { did, handle, user_id: user?.id || null, added_by: 'self' },
-        { onConflict: 'did' }
-      );
+      .upsert({ did, handle, user_id: user?.id || null, added_by: 'self' }, { onConflict: 'did' });
     if (memberErr) logger.error('[bluesky] Auto-register member:', memberErr);
 
     return NextResponse.json({ success: true, handle, did });

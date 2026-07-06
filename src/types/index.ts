@@ -90,4 +90,3 @@ export interface Cast {
   parent_hash: string | null;
   embeds?: CastEmbed[];
 }
-

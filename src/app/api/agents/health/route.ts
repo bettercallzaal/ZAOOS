@@ -45,7 +45,10 @@ export async function GET() {
     if (error) {
       checks.supabase = { ok: false, detail: `Query failed: ${error.message}` };
     } else if (!data || data.length === 0) {
-      checks.supabase = { ok: false, detail: 'agent_config table empty. Run seed-agent-config.sql' };
+      checks.supabase = {
+        ok: false,
+        detail: 'agent_config table empty. Run seed-agent-config.sql',
+      };
     } else {
       checks.supabase = { ok: true, detail: `${data.length} agents configured` };
       for (const row of data) {
@@ -71,7 +74,9 @@ export async function GET() {
   // 6. Farcaster posting?
   checks.farcaster = {
     ok: !!(process.env.ZAO_OFFICIAL_SIGNER_UUID && process.env.ZAO_OFFICIAL_NEYNAR_API_KEY),
-    detail: process.env.ZAO_OFFICIAL_SIGNER_UUID ? 'Signer configured' : 'ZAO_OFFICIAL_SIGNER_UUID missing (posts will silently fail)',
+    detail: process.env.ZAO_OFFICIAL_SIGNER_UUID
+      ? 'Signer configured'
+      : 'ZAO_OFFICIAL_SIGNER_UUID missing (posts will silently fail)',
   };
 
   // Summary

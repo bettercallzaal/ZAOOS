@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 interface MiniAppGateProps {
   children: React.ReactNode;
@@ -95,7 +95,9 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
 
     init();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   if (state === 'checking' || state === 'web') {
@@ -109,7 +111,14 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
   if (state === 'authing') {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628]">
-        <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" priority />
+        <Image
+          src="/logo.png"
+          alt="THE ZAO"
+          width={96}
+          height={96}
+          className="mx-auto mb-4 rounded-2xl"
+          priority
+        />
         <h1 className="text-3xl font-bold text-[#f5a623] mb-4">THE ZAO</h1>
         <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
         <p className="text-gray-500 text-xs mt-3">Signing you in...</p>
@@ -135,16 +144,20 @@ function NoAccessScreen({ username }: { username: string }) {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center max-w-sm">
-        <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" />
+        <Image
+          src="/logo.png"
+          alt="THE ZAO"
+          width={96}
+          height={96}
+          className="mx-auto mb-4 rounded-2xl"
+        />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>
         <p className="text-gray-400 text-sm mb-6">Community on Farcaster</p>
 
         <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] mb-6">
-          <p className="text-white text-sm mb-1">
-            Hey {username || 'there'}!
-          </p>
+          <p className="text-white text-sm mb-1">Hey {username || 'there'}!</p>
           <p className="text-gray-400 text-sm">
             ZAO OS is currently invite-only. Post in /zao and tag @zaal to request access.
           </p>

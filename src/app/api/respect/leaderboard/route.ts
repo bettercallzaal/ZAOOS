@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { fetchLeaderboard } from '@/lib/respect/leaderboard';
 import { logger } from '@/lib/logger';
+import { fetchLeaderboard } from '@/lib/respect/leaderboard';
 
 export async function GET() {
   const session = await getSessionData();
@@ -49,20 +49,23 @@ export async function GET() {
         zorPct: zorTotalSupply > 0 ? Math.round((e.zorRespect / zorTotalSupply) * 1000) / 10 : 0,
       }));
 
-      return NextResponse.json({
-        leaderboard,
-        stats: {
-          totalMembers: leaderboard.length,
-          totalRespect: leaderboard.reduce((sum, e) => sum + e.totalRespect, 0),
-          totalOG: ogTotalSupply,
-          totalZOR: zorTotalSupply,
-          ogTotalSupply,
-          zorTotalSupply,
-          holdersWithRespect: leaderboard.filter((e) => e.totalRespect > 0).length,
+      return NextResponse.json(
+        {
+          leaderboard,
+          stats: {
+            totalMembers: leaderboard.length,
+            totalRespect: leaderboard.reduce((sum, e) => sum + e.totalRespect, 0),
+            totalOG: ogTotalSupply,
+            totalZOR: zorTotalSupply,
+            ogTotalSupply,
+            zorTotalSupply,
+            holdersWithRespect: leaderboard.filter((e) => e.totalRespect > 0).length,
+          },
+          currentFid: session.fid,
+          currentWallet: session.walletAddress || null,
         },
-        currentFid: session.fid,
-        currentWallet: session.walletAddress || null,
-      }, { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } });
+        { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } },
+      );
     }
 
     // Fallback: read directly from on-chain
@@ -77,8 +80,14 @@ export async function GET() {
       totalRespect: e.totalRespect,
       ogRespect: e.ogRespect,
       zorRespect: e.zorRespect,
-      ogPct: onchain.stats.ogTotalSupply > 0 ? Math.round((e.ogRespect / onchain.stats.ogTotalSupply) * 1000) / 10 : 0,
-      zorPct: onchain.stats.zorTotalSupply > 0 ? Math.round((e.zorRespect / onchain.stats.zorTotalSupply) * 1000) / 10 : 0,
+      ogPct:
+        onchain.stats.ogTotalSupply > 0
+          ? Math.round((e.ogRespect / onchain.stats.ogTotalSupply) * 1000) / 10
+          : 0,
+      zorPct:
+        onchain.stats.zorTotalSupply > 0
+          ? Math.round((e.zorRespect / onchain.stats.zorTotalSupply) * 1000) / 10
+          : 0,
       fractalRespect: 0,
       fractalCount: 0,
       onchainOG: e.ogRespect,
@@ -90,12 +99,15 @@ export async function GET() {
       hostingCount: 0,
     }));
 
-    return NextResponse.json({
-      leaderboard,
-      stats: onchain.stats,
-      currentFid: session.fid,
-      currentWallet: session.walletAddress || null,
-    }, { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } });
+    return NextResponse.json(
+      {
+        leaderboard,
+        stats: onchain.stats,
+        currentFid: session.fid,
+        currentWallet: session.walletAddress || null,
+      },
+      { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } },
+    );
   } catch (err) {
     logger.error('Respect leaderboard error:', err);
     return NextResponse.json({ error: 'Failed to load respect data' }, { status: 500 });

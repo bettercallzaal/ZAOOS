@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { detectScrapeSource, scrapeContent } from '../index';
 import type { FetchImpl } from '../x-fetch';
 
@@ -32,7 +32,8 @@ describe('detectScrapeSource', () => {
 
 describe('scrapeContent', () => {
   const fakeFetch = (json: unknown): FetchImpl =>
-    (async () => ({ ok: true, status: 200, json: async () => json }) as Response) as unknown as FetchImpl;
+    (async () =>
+      ({ ok: true, status: 200, json: async () => json }) as Response) as unknown as FetchImpl;
 
   it('resolves an X tweet through the dispatcher', async () => {
     const fetchImpl = fakeFetch({

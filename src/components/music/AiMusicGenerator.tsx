@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -179,7 +179,9 @@ export function AiMusicGenerator() {
 
       {/* Genre Pills */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Genre suggestions</p>
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          Genre suggestions
+        </p>
         <div className="flex flex-wrap gap-2">
           {GENRES.map((genre) => {
             const isActive = prompt.toLowerCase().includes(genre.toLowerCase());
@@ -208,7 +210,13 @@ export function AiMusicGenerator() {
           disabled={isGenerating}
           className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors disabled:opacity-50"
         >
-          <svg className={`w-4 h-4 transition-transform ${showLyrics ? 'rotate-90' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className={`w-4 h-4 transition-transform ${showLyrics ? 'rotate-90' : ''}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <polyline points="9 18 15 12 9 6" />
           </svg>
           Add lyrics <span className="text-gray-600 font-normal">(optional — enables vocals)</span>
@@ -218,7 +226,9 @@ export function AiMusicGenerator() {
             id="ai-lyrics"
             value={lyrics}
             onChange={(e) => setLyrics(e.target.value)}
-            placeholder={"[Verse 1]\nWalking through the city lights tonight\nEvery sound becomes a melody\n\n[Chorus]\nWe are the music makers..."}
+            placeholder={
+              '[Verse 1]\nWalking through the city lights tonight\nEvery sound becomes a melody\n\n[Chorus]\nWe are the music makers...'
+            }
             maxLength={2000}
             rows={5}
             disabled={isGenerating}
@@ -355,9 +365,7 @@ export function AiMusicGenerator() {
             <InfoIcon className="w-5 h-5 text-blue-400" />
             <p className="text-sm font-medium text-blue-400">Development Mode</p>
           </div>
-          <p className="text-xs text-gray-400">
-            {mockMessage}
-          </p>
+          <p className="text-xs text-gray-400">{mockMessage}</p>
         </div>
       )}
 
@@ -387,7 +395,15 @@ export function AiMusicGenerator() {
 
 function SparklesIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z" />
     </svg>
   );
@@ -395,7 +411,15 @@ function SparklesIcon({ className }: { className?: string }) {
 
 function CheckCircleIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
     </svg>
@@ -404,7 +428,15 @@ function CheckCircleIcon({ className }: { className?: string }) {
 
 function DownloadIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />
       <line x1="12" y1="15" x2="12" y2="3" />
@@ -414,7 +446,15 @@ function DownloadIcon({ className }: { className?: string }) {
 
 function InfoIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="16" x2="12" y2="12" />
       <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -424,7 +464,15 @@ function InfoIcon({ className }: { className?: string }) {
 
 function ErrorIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="12" cy="12" r="10" />
       <line x1="15" y1="9" x2="9" y2="15" />
       <line x1="9" y1="9" x2="15" y2="15" />

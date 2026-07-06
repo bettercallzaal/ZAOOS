@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Governance — The ZAO',
@@ -13,10 +13,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function GovernanceLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function GovernanceLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

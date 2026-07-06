@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Stats {
   totalMembers: number;
@@ -87,17 +87,11 @@ export default function QuickStats() {
               key={card.label}
               className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08]"
             >
-              <div
-                className={`text-lg font-bold ${
-                  card.alert ? 'text-red-400' : 'text-white'
-                }`}
-              >
+              <div className={`text-lg font-bold ${card.alert ? 'text-red-400' : 'text-white'}`}>
                 {card.value}
               </div>
               <div className="text-[10px] text-gray-400">{card.label}</div>
-              {card.sub && (
-                <div className="text-[10px] text-gray-500">{card.sub}</div>
-              )}
+              {card.sub && <div className="text-[10px] text-gray-500">{card.sub}</div>}
             </div>
           ))}
         </div>

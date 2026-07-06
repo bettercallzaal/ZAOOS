@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function AboutTab() {
   const [stats, setStats] = useState<{
@@ -23,9 +23,13 @@ export function AboutTab() {
           totalSessions: analytics?.overview?.totalSessions ?? 0,
           totalMembers: analytics?.overview?.totalMembers ?? 0,
           ogTotalSupply: Math.round(leaderboard?.stats?.ogTotalSupply ?? 0),
-          ogHolders: leaderboard?.leaderboard?.filter((e: { ogRespect: number }) => e.ogRespect > 0).length ?? 0,
+          ogHolders:
+            leaderboard?.leaderboard?.filter((e: { ogRespect: number }) => e.ogRespect > 0)
+              .length ?? 0,
         });
-      } catch { /* non-critical — falls back to null and shows dashes */ }
+      } catch {
+        /* non-critical — falls back to null and shows dashes */
+      }
     }
     fetchStats();
   }, []);
@@ -40,13 +44,41 @@ export function AboutTab() {
   ];
 
   const LINKS = [
-    { label: 'zao.frapps.xyz', href: 'https://zao.frapps.xyz', desc: 'Submit fractal results on-chain' },
-    { label: 'Eden Fractal', href: 'https://edenfractal.com', desc: 'The fractal governance community ZAO participates in' },
-    { label: 'thezao.com/zao-token', href: 'https://www.thezao.com/zao-token', desc: 'ZAO Respect token info' },
-    { label: 'Optimystics', href: 'https://optimystics.io', desc: 'Builders of ORDAO, Fractalgram, and the fractal toolkit' },
-    { label: 'ORDAO Docs', href: 'https://optimystics.io/ordao', desc: 'How ORDAO works — consent-based governance' },
-    { label: 'The Respect Game', href: 'https://optimystics.io/introducing-the-respect-game', desc: 'Learn the fundamentals' },
-    { label: 'Optimism Etherscan', href: 'https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532', desc: 'OREC contract — verify all on-chain results' },
+    {
+      label: 'zao.frapps.xyz',
+      href: 'https://zao.frapps.xyz',
+      desc: 'Submit fractal results on-chain',
+    },
+    {
+      label: 'Eden Fractal',
+      href: 'https://edenfractal.com',
+      desc: 'The fractal governance community ZAO participates in',
+    },
+    {
+      label: 'thezao.com/zao-token',
+      href: 'https://www.thezao.com/zao-token',
+      desc: 'ZAO Respect token info',
+    },
+    {
+      label: 'Optimystics',
+      href: 'https://optimystics.io',
+      desc: 'Builders of ORDAO, Fractalgram, and the fractal toolkit',
+    },
+    {
+      label: 'ORDAO Docs',
+      href: 'https://optimystics.io/ordao',
+      desc: 'How ORDAO works — consent-based governance',
+    },
+    {
+      label: 'The Respect Game',
+      href: 'https://optimystics.io/introducing-the-respect-game',
+      desc: 'Learn the fundamentals',
+    },
+    {
+      label: 'Optimism Etherscan',
+      href: 'https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532',
+      desc: 'OREC contract — verify all on-chain results',
+    },
   ];
 
   return (
@@ -55,9 +87,10 @@ export function AboutTab() {
       <div className="bg-[#0d1b2a] rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-semibold text-white">What is the Respect Game?</h3>
         <p className="text-xs text-gray-400 leading-relaxed">
-          ZAO runs weekly fractal governance sessions where members split into groups of 3-6. Each person
-          shares recent contributions for ~4 minutes. The group then ranks contributions by consensus (2/3+
-          agreement required). Rankings earn Respect tokens on Optimism — permanently on-chain.
+          ZAO runs weekly fractal governance sessions where members split into groups of 3-6. Each
+          person shares recent contributions for ~4 minutes. The group then ranks contributions by
+          consensus (2/3+ agreement required). Rankings earn Respect tokens on Optimism —
+          permanently on-chain.
         </p>
         <p className="text-xs text-gray-400 leading-relaxed">
           Respect is non-transferable. It reflects real community contribution over time, and gates
@@ -70,14 +103,36 @@ export function AboutTab() {
         <h3 className="text-sm font-semibold text-white">How to Play</h3>
         <div className="space-y-2">
           {[
-            { step: '1', title: 'Join', desc: 'Show up to a ZAO Fractal session (Mondays 6pm EST or anytime with 4+ people)' },
-            { step: '2', title: 'Present', desc: 'Share what you did this week to advance music, art, and technology (~4 min)' },
-            { step: '3', title: 'Rank', desc: 'Group discusses and votes on who contributed most (2/3 consensus needed)' },
-            { step: '4', title: 'Earn', desc: 'Top-ranked members earn more Respect via Fibonacci scoring (110 for 1st, 10 for 6th)' },
-            { step: '5', title: 'Submit', desc: 'Results are submitted on-chain to OREC on Optimism via zao.frapps.xyz' },
-          ].map(item => (
+            {
+              step: '1',
+              title: 'Join',
+              desc: 'Show up to a ZAO Fractal session (Mondays 6pm EST or anytime with 4+ people)',
+            },
+            {
+              step: '2',
+              title: 'Present',
+              desc: 'Share what you did this week to advance music, art, and technology (~4 min)',
+            },
+            {
+              step: '3',
+              title: 'Rank',
+              desc: 'Group discusses and votes on who contributed most (2/3 consensus needed)',
+            },
+            {
+              step: '4',
+              title: 'Earn',
+              desc: 'Top-ranked members earn more Respect via Fibonacci scoring (110 for 1st, 10 for 6th)',
+            },
+            {
+              step: '5',
+              title: 'Submit',
+              desc: 'Results are submitted on-chain to OREC on Optimism via zao.frapps.xyz',
+            },
+          ].map((item) => (
             <div key={item.step} className="flex gap-3">
-              <span className="w-5 h-5 rounded-full bg-[#f5a623]/20 text-[#f5a623] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{item.step}</span>
+              <span className="w-5 h-5 rounded-full bg-[#f5a623]/20 text-[#f5a623] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                {item.step}
+              </span>
               <div>
                 <p className="text-xs font-medium text-white">{item.title}</p>
                 <p className="text-[10px] text-gray-500">{item.desc}</p>
@@ -90,15 +145,23 @@ export function AboutTab() {
       {/* Voting Criteria */}
       <div className="bg-[#0d1b2a] rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-semibold text-white">Voting Criteria</h3>
-        <p className="text-[10px] text-gray-500 mb-2">When ranking, consider who best demonstrated:</p>
+        <p className="text-[10px] text-gray-500 mb-2">
+          When ranking, consider who best demonstrated:
+        </p>
         {[
           { title: 'The ZAO Vision', desc: 'Advancing music, art, and technology' },
-          { title: 'Contribution', desc: 'Impactful work that pushes the collective vision forward' },
+          {
+            title: 'Contribution',
+            desc: 'Impactful work that pushes the collective vision forward',
+          },
           { title: 'Collaboration', desc: 'Teamwork, uplifting others, supporting the group' },
           { title: 'Innovation', desc: 'Creative thinking, groundbreaking ideas' },
           { title: 'Onboarding', desc: 'Helping newcomers join ZAO and Web3' },
-          { title: 'Supporting ZAO Community Members', desc: 'Amplifying work on socials, attending shows, buying merch, or supporting them beyond the group' },
-        ].map(c => (
+          {
+            title: 'Supporting ZAO Community Members',
+            desc: 'Amplifying work on socials, attending shows, buying merch, or supporting them beyond the group',
+          },
+        ].map((c) => (
           <div key={c.title} className="flex gap-2">
             <span className="text-[#f5a623] text-xs mt-0.5">-</span>
             <div>
@@ -115,13 +178,36 @@ export function AboutTab() {
         <div className="space-y-2">
           <div className="bg-[#0a1628] rounded-lg p-3 border border-white/[0.08]">
             <p className="text-xs font-medium text-white">OG ZAO Respect (ERC-20)</p>
-            <p className="text-[10px] text-gray-500 mt-1">One-time distributions for intros, articles, hosting, festivals. {stats ? `${stats.ogTotalSupply.toLocaleString()} total supply, ${stats.ogHolders} holders` : 'Loading...'}.</p>
-            <a href="https://optimistic.etherscan.io/token/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block">View on Etherscan</a>
+            <p className="text-[10px] text-gray-500 mt-1">
+              One-time distributions for intros, articles, hosting, festivals.{' '}
+              {stats
+                ? `${stats.ogTotalSupply.toLocaleString()} total supply, ${stats.ogHolders} holders`
+                : 'Loading...'}
+              .
+            </p>
+            <a
+              href="https://optimistic.etherscan.io/token/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block"
+            >
+              View on Etherscan
+            </a>
           </div>
           <div className="bg-[#0a1628] rounded-lg p-3 border border-[#f5a623]/20">
             <p className="text-xs font-medium text-[#f5a623]">ZOR Respect (ERC-1155 via ORDAO)</p>
-            <p className="text-[10px] text-gray-500 mt-1">Weekly consensus results from the Respect Game. Submitted via OREC on Optimism. Soulbound (non-transferable).</p>
-            <a href="https://optimistic.etherscan.io/address/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block">View on Etherscan</a>
+            <p className="text-[10px] text-gray-500 mt-1">
+              Weekly consensus results from the Respect Game. Submitted via OREC on Optimism.
+              Soulbound (non-transferable).
+            </p>
+            <a
+              href="https://optimistic.etherscan.io/address/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block"
+            >
+              View on Etherscan
+            </a>
           </div>
         </div>
       </div>
@@ -140,7 +226,9 @@ export function AboutTab() {
           </div>
         </div>
         <p className="text-[10px] text-gray-500">
-          Founded by Zaal, who started at Optimism Fractal (week 6), then joined Eden Fractal, and launched ZAO Fractals. ZAO is the only music-focused fractal community in the ecosystem. Active in Eden Fractal on Base alongside 25+ fractal communities worldwide.
+          Founded by Zaal, who started at Optimism Fractal (week 6), then joined Eden Fractal, and
+          launched ZAO Fractals. ZAO is the only music-focused fractal community in the ecosystem.
+          Active in Eden Fractal on Base alongside 25+ fractal communities worldwide.
         </p>
       </div>
 
@@ -148,7 +236,10 @@ export function AboutTab() {
       <div className="bg-[#0d1b2a] rounded-xl p-4 space-y-2">
         <h3 className="text-sm font-semibold text-white">ORDAO Governance</h3>
         <p className="text-xs text-gray-400 leading-relaxed">
-          ORDAO uses optimistic consent — proposals pass unless enough Respect-weighted opposition blocks them. No-votes carry 2x weight to protect against bad proposals. This enables active members to govern efficiently while ensuring the community can veto harmful actions.
+          ORDAO uses optimistic consent — proposals pass unless enough Respect-weighted opposition
+          blocks them. No-votes carry 2x weight to protect against bad proposals. This enables
+          active members to govern efficiently while ensuring the community can veto harmful
+          actions.
         </p>
         <div className="flex gap-2 mt-2">
           <div className="flex-1 bg-[#0a1628] rounded-lg p-2 text-center">
@@ -206,8 +297,18 @@ export function AboutTab() {
               <p className="text-sm text-white">{link.label}</p>
               <p className="text-xs text-gray-500">{link.desc}</p>
             </div>
-            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <svg
+              className="w-4 h-4 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
             </svg>
           </a>
         ))}

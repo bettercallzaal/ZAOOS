@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useEffect, useState } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
+import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 
 interface TopTrack {
@@ -55,26 +55,37 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
     setLoading(true);
     setError('');
     fetch(`/api/artists/${encodeURIComponent(username)}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (!cancelled && data) setArtist(data); })
-      .catch(() => { if (!cancelled) setError('Failed to load artist'); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setArtist(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError('Failed to load artist');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [username, initialData]);
 
-  const playTrack = useCallback((track: TopTrack) => {
-    const metadata: TrackMetadata = {
-      id: track.id,
-      type: (track.platform as TrackMetadata['type']) || 'audio',
-      trackName: track.title,
-      artistName: track.artist,
-      artworkUrl: track.artworkUrl || '',
-      url: track.url,
-      streamUrl: track.streamUrl || undefined,
-      feedId: track.id,
-    };
-    player.play(metadata);
-  }, [player]);
+  const playTrack = useCallback(
+    (track: TopTrack) => {
+      const metadata: TrackMetadata = {
+        id: track.id,
+        type: (track.platform as TrackMetadata['type']) || 'audio',
+        trackName: track.title,
+        artistName: track.artist,
+        artworkUrl: track.artworkUrl || '',
+        url: track.url,
+        streamUrl: track.streamUrl || undefined,
+        feedId: track.id,
+      };
+      player.play(metadata);
+    },
+    [player],
+  );
 
   const playAll = useCallback(() => {
     if (!artist?.topTracks.length) return;
@@ -97,11 +108,12 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
   }, [artist, playTrack, addToQueue]);
 
   if (loading) return <ArtistSpotlightSkeleton />;
-  if (error) return (
-    <div className="rounded-2xl bg-[#0d1b2a] border border-white/10 p-6 text-center">
-      <p className="text-red-400 text-sm">{error}</p>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="rounded-2xl bg-[#0d1b2a] border border-white/10 p-6 text-center">
+        <p className="text-red-400 text-sm">{error}</p>
+      </div>
+    );
   if (!artist) return null;
 
   return (
@@ -118,8 +130,20 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
           />
         )}
         {onClose && (
-          <button onClick={onClose} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white/70 hover:text-white">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white/70 hover:text-white"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
           </button>
         )}
       </div>
@@ -129,7 +153,14 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
         <div className="flex items-end gap-3 mb-3">
           <div className="w-20 h-20 rounded-full border-4 border-[#0d1b2a] overflow-hidden bg-gray-800 flex-shrink-0">
             {artist.pfpUrl ? (
-              <Image src={artist.pfpUrl} alt={artist.displayName} width={80} height={80} className="object-cover" unoptimized />
+              <Image
+                src={artist.pfpUrl}
+                alt={artist.displayName}
+                width={80}
+                height={80}
+                className="object-cover"
+                unoptimized
+              />
             ) : (
               <div className="w-full h-full bg-[#f5a623]/20 flex items-center justify-center text-2xl text-[#f5a623]">
                 {artist.displayName?.[0] || '?'}
@@ -151,7 +182,9 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
           )}
           {artist.totalRespect > 0 && (
             <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f5a623]/20 text-[#f5a623] flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
               {artist.totalRespect.toLocaleString()}R
             </span>
           )}
@@ -173,7 +206,9 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
         {/* Top Tracks */}
         {artist.topTracks.length > 0 && (
           <div className="mb-3">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Top Tracks</h4>
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Top Tracks
+            </h4>
             <div className="space-y-1">
               {artist.topTracks.map((track, i) => (
                 <button
@@ -184,20 +219,33 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
                   <span className="text-xs text-gray-500 w-4 text-right">{i + 1}</span>
                   <div className="w-8 h-8 rounded bg-gray-800 overflow-hidden flex-shrink-0 relative">
                     {track.artworkUrl ? (
-                      <Image src={track.artworkUrl} alt="" width={32} height={32} className="object-cover" unoptimized />
+                      <Image
+                        src={track.artworkUrl}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="object-cover"
+                        unoptimized
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-600">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" /></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                        </svg>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-white truncate">{track.title}</p>
                   </div>
-                  <span className="text-xs text-gray-500">{(track.playCount || 0).toLocaleString()} plays</span>
+                  <span className="text-xs text-gray-500">
+                    {(track.playCount || 0).toLocaleString()} plays
+                  </span>
                 </button>
               ))}
             </div>
@@ -211,7 +259,9 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
               onClick={playAll}
               className="flex-1 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-semibold hover:bg-[#f5a623]/90 transition-colors flex items-center justify-center gap-1.5"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
               Listen to all
             </button>
           )}

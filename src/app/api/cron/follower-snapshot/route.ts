@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getFollowers, getUsersByFids } from '@/lib/farcaster/neynar';
-import { getEngagementScores } from '@/lib/openrank/client';
 import { logger } from '@/lib/logger';
+import { getEngagementScores } from '@/lib/openrank/client';
 
 /**
  * GET /api/cron/follower-snapshot
@@ -36,10 +36,7 @@ export async function GET(request: NextRequest) {
 
     if (membersError) {
       logger.error('Failed to fetch members:', membersError);
-      return NextResponse.json(
-        { error: 'Failed to fetch members' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
     }
 
     if (!members || members.length === 0) {
@@ -113,35 +110,31 @@ export async function GET(request: NextRequest) {
       const followerCount = allFollowerFids.length;
 
       // Upsert today's snapshot
-      const { error: snapshotError } = await supabaseAdmin
-        .from('follower_snapshots')
-        .upsert(
-          {
-            fid,
-            follower_fids: allFollowerFids,
-            follower_count: followerCount,
-            following_count: followingCount,
-            snapshot_date: today,
-          },
-          { onConflict: 'fid,snapshot_date' }
-        );
+      const { error: snapshotError } = await supabaseAdmin.from('follower_snapshots').upsert(
+        {
+          fid,
+          follower_fids: allFollowerFids,
+          follower_count: followerCount,
+          following_count: followingCount,
+          snapshot_date: today,
+        },
+        { onConflict: 'fid,snapshot_date' },
+      );
 
       if (snapshotError) {
         throw new Error(`Snapshot upsert failed: ${snapshotError.message}`);
       }
 
       // Upsert stats history
-      await supabaseAdmin
-        .from('member_stats_history')
-        .upsert(
-          {
-            fid,
-            follower_count: followerCount,
-            following_count: followingCount,
-            snapshot_date: today,
-          },
-          { onConflict: 'fid,snapshot_date' }
-        );
+      await supabaseAdmin.from('member_stats_history').upsert(
+        {
+          fid,
+          follower_count: followerCount,
+          following_count: followingCount,
+          snapshot_date: today,
+        },
+        { onConflict: 'fid,snapshot_date' },
+      );
 
       // Compare with yesterday's snapshot to detect unfollows
       const yesterday = new Date();
@@ -160,18 +153,13 @@ export async function GET(request: NextRequest) {
         const currentSet = new Set<number>(allFollowerFids);
 
         // Unfollowers = in yesterday's snapshot but not in today's
-        const unfollowerFids = [...previousSet].filter(
-          (f) => !currentSet.has(f)
-        );
+        const unfollowerFids = [...previousSet].filter((f) => !currentSet.has(f));
 
         if (unfollowerFids.length > 0) {
           totalUnfollows += unfollowerFids.length;
 
           // Fetch unfollower user details in parallel batches of 100
-          const unfollowerDetails = new Map<
-            number,
-            { username: string; displayName: string }
-          >();
+          const unfollowerDetails = new Map<number, { username: string; displayName: string }>();
 
           const batches: number[][] = [];
           for (let i = 0; i < unfollowerFids.length; i += 100) {
@@ -179,7 +167,7 @@ export async function GET(request: NextRequest) {
           }
 
           const batchResults = await Promise.allSettled(
-            batches.map(batch => getUsersByFids(batch))
+            batches.map((batch) => getUsersByFids(batch)),
           );
 
           for (const result of batchResults) {
@@ -197,10 +185,8 @@ export async function GET(request: NextRequest) {
           const unfollowRows = unfollowerFids.map((unfollowerFid) => ({
             member_fid: fid,
             unfollower_fid: unfollowerFid,
-            unfollower_username:
-              unfollowerDetails.get(unfollowerFid)?.username || null,
-            unfollower_display_name:
-              unfollowerDetails.get(unfollowerFid)?.displayName || null,
+            unfollower_username: unfollowerDetails.get(unfollowerFid)?.username || null,
+            unfollower_display_name: unfollowerDetails.get(unfollowerFid)?.displayName || null,
           }));
 
           const { error: unfollowError } = await supabaseAdmin
@@ -208,20 +194,14 @@ export async function GET(request: NextRequest) {
             .insert(unfollowRows);
 
           if (unfollowError) {
-            logger.error(
-              `Failed to insert unfollow events for FID ${fid}:`,
-              unfollowError
-            );
+            logger.error(`Failed to insert unfollow events for FID ${fid}:`, unfollowError);
           }
         }
       }
     }
   } catch (err) {
     logger.error('Follower snapshot cron error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

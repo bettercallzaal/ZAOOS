@@ -13,7 +13,9 @@ export function getPlatform(): Platform {
   if (typeof window === 'undefined') return 'web';
 
   // Capacitor injects this on the window object
-  const win = window as unknown as { Capacitor?: { getPlatform(): string; isNativePlatform(): boolean } };
+  const win = window as unknown as {
+    Capacitor?: { getPlatform(): string; isNativePlatform(): boolean };
+  };
 
   if (win.Capacitor?.isNativePlatform()) {
     const p = win.Capacitor.getPlatform();

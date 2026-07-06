@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { sweepStale100msRooms } from '@/lib/social/sweep100msRooms';
+import { type NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { sweepStale100msRooms } from '@/lib/social/sweep100msRooms';
 
 /**
  * GET /api/cron/100ms-stale-rooms

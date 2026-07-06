@@ -10,9 +10,9 @@
  * handling, error collection) can be unit tested without network.
  */
 
-import { scrapeBczSite, type BczSite } from './bcz-site';
+import { type BczHistory, scrapeFarcasterHistoryByUsername } from './bcz-history';
+import { type BczSite, scrapeBczSite } from './bcz-site';
 import { scrapeXUserTimeline, type XTimeline } from './x-timeline';
-import { scrapeFarcasterHistoryByUsername, type BczHistory } from './bcz-history';
 
 const DEFAULT_HANDLE = 'bettercallzaal';
 
@@ -45,13 +45,16 @@ function errMessage(e: unknown): string {
  * source yields null plus an entry in `errors`. The Farcaster source is skipped
  * (null, no error) when no Neynar key is available.
  */
-export async function scrapeBettercallzaalProfile(opts: BczProfileOptions = {}): Promise<BczProfile> {
+export async function scrapeBettercallzaalProfile(
+  opts: BczProfileOptions = {},
+): Promise<BczProfile> {
   const handle = (opts.handle ?? DEFAULT_HANDLE).trim().replace(/^@/, '');
   const site = opts.siteScraper ?? (() => scrapeBczSite());
   const timeline = opts.timelineScraper ?? ((h: string) => scrapeXUserTimeline(h));
   const farcaster =
     opts.farcasterScraper ??
-    ((h: string, key: string) => scrapeFarcasterHistoryByUsername(h, { apiKey: key, maxPages: opts.maxFarcasterPages }));
+    ((h: string, key: string) =>
+      scrapeFarcasterHistoryByUsername(h, { apiKey: key, maxPages: opts.maxFarcasterPages }));
 
   const apiKey = opts.neynarApiKey;
   const errors: BczProfile['errors'] = [];

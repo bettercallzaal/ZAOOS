@@ -36,10 +36,7 @@ export function makeRequest(path: string, options?: RequestInit): NextRequest {
  * @param path   - URL path, e.g. '/api/proposals/comment'
  * @param params - Key-value search params
  */
-export function makeGetRequest(
-  path: string,
-  params?: Record<string, string>,
-): NextRequest {
+export function makeGetRequest(path: string, params?: Record<string, string>): NextRequest {
   const url = new URL(path, 'http://localhost:3000');
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
@@ -146,9 +143,7 @@ export interface SessionData {
 /**
  * Return a default authenticated session, merged with any overrides.
  */
-export function mockAuthenticatedSession(
-  overrides?: Partial<SessionData>,
-): SessionData {
+export function mockAuthenticatedSession(overrides?: Partial<SessionData>): SessionData {
   return {
     fid: 123,
     username: 'testuser',
@@ -168,9 +163,7 @@ export function mockUnauthenticatedSession(): null {
 /**
  * Return an admin session, merged with any overrides.
  */
-export function mockAdminSession(
-  overrides?: Partial<SessionData>,
-): SessionData {
+export function mockAdminSession(overrides?: Partial<SessionData>): SessionData {
   return {
     fid: 123,
     username: 'admin',

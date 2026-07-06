@@ -1,6 +1,7 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { parseEther } from 'viem';
+import { describe, expect, it } from 'vitest';
 import { computeRespectWeight } from '../voteWeight';
 
 describe('computeRespectWeight', () => {

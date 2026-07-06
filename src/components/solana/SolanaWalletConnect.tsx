@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { useWallet } from '@solana/wallet-adapter-react';
 import type { WalletName } from '@solana/wallet-adapter-base';
+import { useWallet } from '@solana/wallet-adapter-react';
 import bs58 from 'bs58';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface SolanaWalletConnectProps {
   savedWallet: string | null;
@@ -41,21 +41,24 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     return () => clearTimeout(timeout);
   }, [connecting]);
 
-  const handleConnect = useCallback(async (walletName: string) => {
-    setError('');
-    setShowWalletPicker(false);
-    setConnecting(true);
-    try {
-      // Select and connect in same user gesture context so popup isn't blocked
-      select(walletName as WalletName);
-      // Small delay for adapter to register, then connect
-      await new Promise(r => setTimeout(r, 150));
-      await connect();
-    } catch {
-      setError('Failed to connect — check your wallet extension');
-      setConnecting(false);
-    }
-  }, [select, connect]);
+  const handleConnect = useCallback(
+    async (walletName: string) => {
+      setError('');
+      setShowWalletPicker(false);
+      setConnecting(true);
+      try {
+        // Select and connect in same user gesture context so popup isn't blocked
+        select(walletName as WalletName);
+        // Small delay for adapter to register, then connect
+        await new Promise((r) => setTimeout(r, 150));
+        await connect();
+      } catch {
+        setError('Failed to connect — check your wallet extension');
+        setConnecting(false);
+      }
+    },
+    [select, connect],
+  );
 
   const handleVerifyAndSave = useCallback(async () => {
     if (!publicKey || !signMessage) return;
@@ -63,7 +66,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     setError('');
     try {
       const message = new TextEncoder().encode(
-        `Verify Solana wallet for ZAO OS\nAddress: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
+        `Verify Solana wallet for ZAO OS\nAddress: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`,
       );
       const signature = await signMessage(message);
 
@@ -149,7 +152,9 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
             <span className="text-sm text-white">Solana</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 font-mono">{shortAddr(publicKey.toBase58())}</span>
+            <span className="text-xs text-gray-400 font-mono">
+              {shortAddr(publicKey.toBase58())}
+            </span>
             <button
               onClick={handleVerifyAndSave}
               disabled={saving}
@@ -165,7 +170,9 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
   }
 
   // Not connected — show connect options
-  const availableWallets = wallets.filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable');
+  const availableWallets = wallets.filter(
+    (w) => w.readyState === 'Installed' || w.readyState === 'Loadable',
+  );
 
   return (
     <div>
@@ -198,14 +205,21 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
               </a>
             </div>
           ) : (
-            availableWallets.map(w => (
+            availableWallets.map((w) => (
               <button
                 key={w.adapter.name}
                 onClick={() => handleConnect(w.adapter.name)}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-colors text-left"
               >
                 {w.adapter.icon && (
-                  <Image src={w.adapter.icon} alt={`${w.adapter.name} wallet icon`} width={20} height={20} className="w-5 h-5 rounded" unoptimized />
+                  <Image
+                    src={w.adapter.icon}
+                    alt={`${w.adapter.name} wallet icon`}
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 rounded"
+                    unoptimized
+                  />
                 )}
                 <span className="text-sm text-white">{w.adapter.name}</span>
               </button>

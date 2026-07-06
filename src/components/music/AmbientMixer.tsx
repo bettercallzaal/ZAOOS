@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -25,9 +25,21 @@ interface AmbientMixerProps {
 // ─── Sound definitions ───────────────────────────────────────────────
 
 const AMBIENT_SOUNDS: AmbientLayer[] = [
-  { id: 'whitenoise', label: 'White Noise', icon: '\u{1F4FB}', type: 'generated', generator: 'white' },
+  {
+    id: 'whitenoise',
+    label: 'White Noise',
+    icon: '\u{1F4FB}',
+    type: 'generated',
+    generator: 'white',
+  },
   { id: 'pinknoise', label: 'Pink Noise', icon: '\u{1F338}', type: 'generated', generator: 'pink' },
-  { id: 'brownnoise', label: 'Brown Noise', icon: '\u{1F33F}', type: 'generated', generator: 'brown' },
+  {
+    id: 'brownnoise',
+    label: 'Brown Noise',
+    icon: '\u{1F33F}',
+    type: 'generated',
+    generator: 'brown',
+  },
   { id: 'rain', label: 'Rain', icon: '\u{1F327}\uFE0F', type: 'file', url: '/audio/rain.mp3' },
   { id: 'ocean', label: 'Ocean', icon: '\u{1F30A}', type: 'file', url: '/audio/ocean.mp3' },
   { id: 'forest', label: 'Forest', icon: '\u{1F332}', type: 'file', url: '/audio/forest.mp3' },
@@ -56,15 +68,21 @@ function createPinkNoiseBuffer(ctx: AudioContext): AudioBuffer {
   const buffer = ctx.createBuffer(1, length, sampleRate);
   const data = buffer.getChannelData(0);
 
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  let b0 = 0,
+    b1 = 0,
+    b2 = 0,
+    b3 = 0,
+    b4 = 0,
+    b5 = 0,
+    b6 = 0;
   for (let i = 0; i < length; i++) {
     const white = Math.random() * 2 - 1;
     b0 = 0.99886 * b0 + white * 0.0555179;
     b1 = 0.99332 * b1 + white * 0.0750759;
-    b2 = 0.96900 * b2 + white * 0.1538520;
-    b3 = 0.86650 * b3 + white * 0.3104856;
-    b4 = 0.55000 * b4 + white * 0.5329522;
-    b5 = -0.7616 * b5 - white * 0.0168980;
+    b2 = 0.969 * b2 + white * 0.153852;
+    b3 = 0.8665 * b3 + white * 0.3104856;
+    b4 = 0.55 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.016898;
     data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
     b6 = white * 0.115926;
   }
@@ -99,10 +117,15 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
   });
 
   // Refs for audio nodes per layer
-  const nodesRef = useRef<Record<string, {
-    source: AudioBufferSourceNode;
-    gain: GainNode;
-  }>>({});
+  const nodesRef = useRef<
+    Record<
+      string,
+      {
+        source: AudioBufferSourceNode;
+        gain: GainNode;
+      }
+    >
+  >({});
   const masterGainRef = useRef<GainNode | null>(null);
 
   // Get or create master gain connected to the shared AudioContext
@@ -118,69 +141,79 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
   }, [getAudioCtx]);
 
   // Start a generated noise layer
-  const startLayer = useCallback((sound: AmbientLayer, vol: number) => {
-    if (sound.type !== 'generated' || !sound.generator) return;
+  const startLayer = useCallback(
+    (sound: AmbientLayer, vol: number) => {
+      if (sound.type !== 'generated' || !sound.generator) return;
 
-    const ctx = getAudioCtx();
-    if (ctx.state === 'suspended') ctx.resume();
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') ctx.resume();
 
-    const master = getMasterGain();
-    if (!master) return;
+      const master = getMasterGain();
+      if (!master) return;
 
-    // Create buffer
-    let buffer: AudioBuffer;
-    switch (sound.generator) {
-      case 'pink':
-        buffer = createPinkNoiseBuffer(ctx);
-        break;
-      case 'brown':
-        buffer = createBrownNoiseBuffer(ctx);
-        break;
-      default:
-        buffer = createWhiteNoiseBuffer(ctx);
-    }
+      // Create buffer
+      let buffer: AudioBuffer;
+      switch (sound.generator) {
+        case 'pink':
+          buffer = createPinkNoiseBuffer(ctx);
+          break;
+        case 'brown':
+          buffer = createBrownNoiseBuffer(ctx);
+          break;
+        default:
+          buffer = createWhiteNoiseBuffer(ctx);
+      }
 
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
 
-    const gain = ctx.createGain();
-    gain.gain.value = vol / 100;
+      const gain = ctx.createGain();
+      gain.gain.value = vol / 100;
 
-    source.connect(gain);
-    gain.connect(master);
-    source.start();
+      source.connect(gain);
+      gain.connect(master);
+      source.start();
 
-    nodesRef.current[sound.id] = { source, gain };
-  }, [getAudioCtx, getMasterGain]);
+      nodesRef.current[sound.id] = { source, gain };
+    },
+    [getAudioCtx, getMasterGain],
+  );
 
   // Stop a layer
   const stopLayer = useCallback((id: string) => {
     const node = nodesRef.current[id];
     if (node) {
-      try { node.source.stop(); } catch { /* already stopped */ }
+      try {
+        node.source.stop();
+      } catch {
+        /* already stopped */
+      }
       node.gain.disconnect();
       delete nodesRef.current[id];
     }
   }, []);
 
   // Toggle a layer on/off
-  const toggleLayer = useCallback((sound: AmbientLayer) => {
-    setLayers((prev) => {
-      const current = prev[sound.id];
-      const next = { ...current, active: !current.active };
+  const toggleLayer = useCallback(
+    (sound: AmbientLayer) => {
+      setLayers((prev) => {
+        const current = prev[sound.id];
+        const next = { ...current, active: !current.active };
 
-      if (next.active) {
-        if (sound.type === 'generated') {
-          startLayer(sound, current.volume);
+        if (next.active) {
+          if (sound.type === 'generated') {
+            startLayer(sound, current.volume);
+          }
+        } else {
+          stopLayer(sound.id);
         }
-      } else {
-        stopLayer(sound.id);
-      }
 
-      return { ...prev, [sound.id]: next };
-    });
-  }, [startLayer, stopLayer]);
+        return { ...prev, [sound.id]: next };
+      });
+    },
+    [startLayer, stopLayer],
+  );
 
   // Update volume for a layer
   const setLayerVolume = useCallback((id: string, vol: number) => {
@@ -199,7 +232,11 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
   useEffect(() => {
     return () => {
       for (const id of Object.keys(nodesRef.current)) {
-        try { nodesRef.current[id].source.stop(); } catch { /* ok */ }
+        try {
+          nodesRef.current[id].source.stop();
+        } catch {
+          /* ok */
+        }
       }
       nodesRef.current = {};
       if (masterGainRef.current) {
@@ -219,8 +256,18 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
         className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#0d1b2a] border border-white/[0.08] hover:border-white/[0.08] transition-colors"
       >
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+          <svg
+            className="w-4 h-4 text-gray-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"
+            />
           </svg>
           <span className="text-sm font-medium text-gray-300">Ambient Mixer</span>
           {activeCount > 0 && (
@@ -278,7 +325,9 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
                 {/* Label + slider */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`text-xs font-medium ${isActive ? 'text-[#f5a623]' : isFile ? 'text-gray-600' : 'text-gray-300'}`}>
+                    <span
+                      className={`text-xs font-medium ${isActive ? 'text-[#f5a623]' : isFile ? 'text-gray-600' : 'text-gray-300'}`}
+                    >
                       {sound.label}
                     </span>
                     {isFile && (
@@ -314,11 +363,22 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
 
           {/* Info note */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.08]/30">
-            <svg className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            <svg
+              className="w-3.5 h-3.5 text-gray-600 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+              />
             </svg>
             <p className="text-[10px] text-gray-600">
-              Noise layers are generated in real-time. Nature sounds will be available in a future update.
+              Noise layers are generated in real-time. Nature sounds will be available in a future
+              update.
             </p>
           </div>
         </div>

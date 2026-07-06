@@ -1,18 +1,30 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
-const patchSchema = z.object({
-  x_handle: z.string().max(50).trim().optional().nullable(),
-  instagram_handle: z.string().max(50).trim().optional().nullable(),
-  soundcloud_url: z.string().url().max(200).optional().nullable()
-    .or(z.literal('').transform(() => null)),
-  spotify_url: z.string().url().max(200).optional().nullable()
-    .or(z.literal('').transform(() => null)),
-  audius_handle: z.string().max(50).trim().optional().nullable(),
-}).refine(d => Object.keys(d).length > 0, { message: 'No fields to update' });
+const patchSchema = z
+  .object({
+    x_handle: z.string().max(50).trim().optional().nullable(),
+    instagram_handle: z.string().max(50).trim().optional().nullable(),
+    soundcloud_url: z
+      .string()
+      .url()
+      .max(200)
+      .optional()
+      .nullable()
+      .or(z.literal('').transform(() => null)),
+    spotify_url: z
+      .string()
+      .url()
+      .max(200)
+      .optional()
+      .nullable()
+      .or(z.literal('').transform(() => null)),
+    audius_handle: z.string().max(50).trim().optional().nullable(),
+  })
+  .refine((d) => Object.keys(d).length > 0, { message: 'No fields to update' });
 
 /**
  * GET — return social connections for the current user.
@@ -65,10 +77,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const { error } = await supabaseAdmin
-      .from('users')
-      .update(parsed.data)
-      .eq('fid', session.fid);
+    const { error } = await supabaseAdmin.from('users').update(parsed.data).eq('fid', session.fid);
 
     if (error) throw error;
 

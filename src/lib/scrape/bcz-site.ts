@@ -12,9 +12,22 @@
 const BCZ_URL = 'https://bettercallzaal.com';
 
 /** Hosts treated as social profiles. */
-const SOCIAL_HOSTS = ['x.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'github.com', 'farcaster.xyz'];
+const SOCIAL_HOSTS = [
+  'x.com',
+  'twitter.com',
+  'instagram.com',
+  'linkedin.com',
+  'github.com',
+  'farcaster.xyz',
+];
 /** Hosts treated as ZAO ecosystem projects. */
-const PROJECT_HOSTS = ['wavewarz.com', 'clanker.world', 'empirebuilder.world', 'zaofestivals.com', 'thezao.com'];
+const PROJECT_HOSTS = [
+  'wavewarz.com',
+  'clanker.world',
+  'empirebuilder.world',
+  'zaofestivals.com',
+  'thezao.com',
+];
 /** Asset/infra hosts to ignore. */
 const IGNORE_HOSTS = ['googleapis.com', 'gstatic.com', 'auth.farcaster.xyz'];
 
@@ -50,7 +63,8 @@ function hostOf(url: string): string | null {
 }
 
 function categorize(host: string): LinkCategory {
-  if (SOCIAL_HOSTS.some((h) => host === h || host.endsWith(`.${h}`) || host.includes(h))) return 'social';
+  if (SOCIAL_HOSTS.some((h) => host === h || host.endsWith(`.${h}`) || host.includes(h)))
+    return 'social';
   if (PROJECT_HOSTS.some((h) => host === h || host.endsWith(`.${h}`))) return 'project';
   return 'other';
 }
@@ -81,7 +95,8 @@ export function parseBczSite(html: string): BczSite {
     const url = m[1];
     const host = hostOf(url);
     if (!host) continue;
-    if (IGNORE_HOSTS.some((h) => host === h || host.endsWith(`.${h}`) || host.includes(h))) continue;
+    if (IGNORE_HOSTS.some((h) => host === h || host.endsWith(`.${h}`) || host.includes(h)))
+      continue;
     if (host === 'bettercallzaal.com') continue; // self-links
     if (seen.has(url)) continue;
     seen.add(url);

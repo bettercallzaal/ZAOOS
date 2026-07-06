@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
-import { TrackMetadata, TrackType } from '@/types/music';
 import { logger } from '@/lib/logger';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import type { TrackMetadata, TrackType } from '@/types/music';
 
 function makeId(url: string): string {
   let hash = 0;
@@ -148,10 +148,7 @@ async function fetchAudius(url: string): Promise<TrackMetadata | null> {
   const track = resolved?.data;
   if (!track?.id) return null;
 
-  const artworkUrl =
-    track.artwork?.['480x480'] ??
-    track.artwork?.['150x150'] ??
-    '';
+  const artworkUrl = track.artwork?.['480x480'] ?? track.artwork?.['150x150'] ?? '';
 
   return {
     id: track.id,
@@ -167,10 +164,10 @@ async function fetchAudius(url: string): Promise<TrackMetadata | null> {
 
 async function fetchAppleMusic(url: string): Promise<TrackMetadata | null> {
   // Apple Music oEmbed API
-  const res = await fetch(
-    `https://music.apple.com/api/v1/oembed?url=${encodeURIComponent(url)}`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
-  );
+  const res = await fetch(`https://music.apple.com/api/v1/oembed?url=${encodeURIComponent(url)}`, {
+    headers: { 'User-Agent': 'ZAO-OS/1.0' },
+    signal: AbortSignal.timeout(10000),
+  });
   if (!res.ok) {
     // Fallback: parse from URL structure
     // URL format: music.apple.com/{country}/album/{album-name}/{id}?i={trackId}
@@ -200,10 +197,10 @@ async function fetchAppleMusic(url: string): Promise<TrackMetadata | null> {
 
 async function fetchTidal(url: string): Promise<TrackMetadata | null> {
   // Tidal oEmbed API
-  const res = await fetch(
-    `https://oembed.tidal.com/?url=${encodeURIComponent(url)}`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
-  );
+  const res = await fetch(`https://oembed.tidal.com/?url=${encodeURIComponent(url)}`, {
+    headers: { 'User-Agent': 'ZAO-OS/1.0' },
+    signal: AbortSignal.timeout(10000),
+  });
   if (!res.ok) {
     // Fallback: extract track ID from URL
     const match = url.match(/track\/(\d+)/);

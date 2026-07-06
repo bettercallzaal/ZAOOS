@@ -23,10 +23,7 @@ export default function OnboardError({
           >
             Try again
           </button>
-          <Link
-            href="/"
-            className="text-gray-400 text-sm hover:text-white transition-colors"
-          >
+          <Link href="/" className="text-gray-400 text-sm hover:text-white transition-colors">
             Go home
           </Link>
         </div>

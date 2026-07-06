@@ -1,12 +1,12 @@
 // src/app/api/admin/apo/run/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth/session';
+import * as fs from 'fs';
+import { type NextRequest, NextResponse } from 'next/server';
+import * as path from 'path';
+import { z } from 'zod';
 import { runAPO } from '@/lib/apo/engine';
 import type { PromptConfig } from '@/lib/apo/types';
-import { z } from 'zod';
-import * as fs from 'fs';
-import * as path from 'path';
+import { getSession } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 const RequestSchema = z.object({
@@ -32,12 +32,7 @@ export async function POST(req: NextRequest) {
   const { promptName, rounds } = parsed.data;
 
   try {
-    const configPath = path.join(
-      process.cwd(),
-      'scripts',
-      'apo-prompts',
-      `${promptName}.json`,
-    );
+    const configPath = path.join(process.cwd(), 'scripts', 'apo-prompts', `${promptName}.json`);
 
     if (!fs.existsSync(configPath)) {
       return NextResponse.json(
@@ -46,18 +41,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const config: PromptConfig = JSON.parse(
-      fs.readFileSync(configPath, 'utf-8'),
-    );
+    const config: PromptConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
     if (rounds) config.maxRounds = rounds;
 
     const result = await runAPO(config);
     return NextResponse.json(result);
   } catch (err) {
     logger.error('[apo/run] Error:', err);
-    return NextResponse.json(
-      { error: 'APO optimization failed' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'APO optimization failed' }, { status: 500 });
   }
 }

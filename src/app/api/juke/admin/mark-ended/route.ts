@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
-import { getJukeSpace, updateJukeSpace } from '@/lib/spaces/jukeSpacesDb';
 import { isValidJukeSpaceId } from '@/lib/spaces/juke';
+import { getJukeSpace, updateJukeSpace } from '@/lib/spaces/jukeSpacesDb';
 
 /**
  * POST /api/juke/admin/mark-ended
@@ -86,7 +86,4 @@ export async function POST(request: NextRequest) {
 }
 
 export const GET = () =>
-  NextResponse.json(
-    { ok: false, error: 'POST only - send { spaceId } as JSON' },
-    { status: 405 },
-  );
+  NextResponse.json({ ok: false, error: 'POST only - send { spaceId } as JSON' }, { status: 405 });

@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { PlayerProvider, usePlayer } from './PlayerProvider';
-import { HTMLAudioProvider } from './HTMLAudioProvider';
+import { act, renderHook } from '@testing-library/react';
+import type React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TrackMetadata } from '@/types/music';
-import React from 'react';
+import { HTMLAudioProvider } from './HTMLAudioProvider';
+import { PlayerProvider, usePlayer } from './PlayerProvider';
 
 // ─── Test helpers ─────────────────────────────────────────────────────────────
 const audioTrack: TrackMetadata = {
@@ -41,19 +41,34 @@ const stableMockAudio = {
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   crossOrigin: '',
-  get currentTime() { return 0; },
-  set currentTime(v: number) { mockAudioSeek(v); },
-  get duration() { return 30; },
-  get paused() { return true; },
-  get volume() { return 1; },
+  get currentTime() {
+    return 0;
+  },
+  set currentTime(v: number) {
+    mockAudioSeek(v);
+  },
+  get duration() {
+    return 30;
+  },
+  get paused() {
+    return true;
+  },
+  get volume() {
+    return 1;
+  },
   set volume(v: number) {},
-  get src() { return ''; },
+  get src() {
+    return '';
+  },
   set src(s: string) {},
   error: null,
   removeAttribute: vi.fn(),
 };
 
-vi.stubGlobal('Audio', vi.fn(() => stableMockAudio));
+vi.stubGlobal(
+  'Audio',
+  vi.fn(() => stableMockAudio),
+);
 
 // ─── Mock getEqualizer ────────────────────────────────────────────────────────
 vi.mock('@/lib/music/equalizer', () => ({
@@ -73,13 +88,21 @@ vi.stubGlobal('localStorage', {
 
 vi.stubGlobal('fetch', vi.fn());
 
-vi.stubGlobal('MediaMetadata', class MediaMetadata {
-  title: string; artist: string; album: string; artwork: unknown[];
-  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
-    this.title = init.title ?? ''; this.artist = init.artist ?? '';
-    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
-  }
-});
+vi.stubGlobal(
+  'MediaMetadata',
+  class MediaMetadata {
+    title: string;
+    artist: string;
+    album: string;
+    artwork: unknown[];
+    constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+      this.title = init.title ?? '';
+      this.artist = init.artist ?? '';
+      this.album = init.album ?? '';
+      this.artwork = init.artwork ?? [];
+    }
+  },
+);
 
 vi.stubGlobal('navigator', {
   vibrate: vi.fn(),

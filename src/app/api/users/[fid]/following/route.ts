@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getFollowing } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getFollowing } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fid: string }> }) {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,12 +20,14 @@ export async function GET(
   const cursor = searchParams.get('cursor') || undefined;
   const sort = searchParams.get('sort') || 'recent';
 
-  const sortType = sort === 'relevant' ? 'algorithmic' as const : 'desc_chron' as const;
+  const sortType = sort === 'relevant' ? ('algorithmic' as const) : ('desc_chron' as const);
 
   try {
     const data = await getFollowing(targetFid, session.fid, sortType, cursor, 100);
 
-    let users = (data.users || []).map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+    let users = (data.users || []).map(
+      (item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item,
+    );
 
     // Batch check allowlist
     const fids = users.map((u: { fid: number }) => u.fid).filter(Boolean);
@@ -64,21 +63,28 @@ export async function GET(
 
     // "inactive" sort — surface inactive accounts first for churn management
     if (sort === 'inactive') {
-      users.sort((a: { active_status?: string; follower_count?: number }, b: { active_status?: string; follower_count?: number }) => {
-        const aInactive = a.active_status === 'inactive' ? 0 : 1;
-        const bInactive = b.active_status === 'inactive' ? 0 : 1;
-        if (aInactive !== bInactive) return aInactive - bInactive;
-        return (a.follower_count ?? 0) - (b.follower_count ?? 0);
-      });
+      users.sort(
+        (
+          a: { active_status?: string; follower_count?: number },
+          b: { active_status?: string; follower_count?: number },
+        ) => {
+          const aInactive = a.active_status === 'inactive' ? 0 : 1;
+          const bInactive = b.active_status === 'inactive' ? 0 : 1;
+          if (aInactive !== bInactive) return aInactive - bInactive;
+          return (a.follower_count ?? 0) - (b.follower_count ?? 0);
+        },
+      );
     }
 
     if (sort === 'popular') {
-      users.sort((a: { follower_count?: number }, b: { follower_count?: number }) =>
-        (b.follower_count ?? 0) - (a.follower_count ?? 0)
+      users.sort(
+        (a: { follower_count?: number }, b: { follower_count?: number }) =>
+          (b.follower_count ?? 0) - (a.follower_count ?? 0),
       );
     } else if (sort === 'mutual') {
-      users = users.filter((u: { viewer_context?: { following?: boolean; followed_by?: boolean } }) =>
-        u.viewer_context?.following && u.viewer_context?.followed_by
+      users = users.filter(
+        (u: { viewer_context?: { following?: boolean; followed_by?: boolean } }) =>
+          u.viewer_context?.following && u.viewer_context?.followed_by,
       );
     } else if (sort === 'zao') {
       users = users.filter((u: { isZaoMember?: boolean }) => u.isZaoMember);

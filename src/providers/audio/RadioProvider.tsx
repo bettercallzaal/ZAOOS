@@ -1,8 +1,16 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type { RadioPlaylist, RadioTrack } from '@/app/api/music/radio/route';
 import { usePlayer, usePlayerContext } from '@/providers/audio';
-import type { RadioTrack, RadioPlaylist } from '@/app/api/music/radio/route';
 import type { TrackMetadata } from '@/types/music';
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -53,7 +61,9 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (typeof window === 'undefined') return false;
     try {
       return JSON.parse(localStorage.getItem(RADIO_STORAGE_KEY) || 'false');
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   });
   const [radioLoading, setRadioLoading] = useState(false);
   const [allStations, setAllStations] = useState<RadioPlaylist[]>([]);
@@ -66,11 +76,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
 
   // Persist radio mode
   useEffect(() => {
-    try { localStorage.setItem(RADIO_STORAGE_KEY, JSON.stringify(isRadioMode)); } catch {}
+    try {
+      localStorage.setItem(RADIO_STORAGE_KEY, JSON.stringify(isRadioMode));
+    } catch {}
   }, [isRadioMode]);
 
   useEffect(() => {
-    return () => { abortRef.current?.abort(); };
+    return () => {
+      abortRef.current?.abort();
+    };
   }, []);
 
   // Pre-fetch stations on mount so radio starts instantly
@@ -78,7 +92,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (cachedStationsRef.current) return;
     const controller = new AbortController();
     fetch('/api/music/radio', { signal: controller.signal })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.playlists?.length) {
           cachedStationsRef.current = data.playlists;
@@ -98,36 +112,42 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     return playlists;
   }, []);
 
-  const playStation = useCallback((playlist: RadioPlaylist) => {
-    if (playlist.tracks.length === 0) return;
-    const shuffled = shuffleArray(playlist.tracks);
-    radioQueueRef.current = shuffled;
-    radioIndexRef.current = 0;
-    const first = shuffled[0];
-    player.play(radioTrackToMetadata(first, `radio-${first.id}`));
-    setIsRadioMode(true);
-    if (!player.shuffle) player.toggleShuffle();
-  }, [player]);
+  const playStation = useCallback(
+    (playlist: RadioPlaylist) => {
+      if (playlist.tracks.length === 0) return;
+      const shuffled = shuffleArray(playlist.tracks);
+      radioQueueRef.current = shuffled;
+      radioIndexRef.current = 0;
+      const first = shuffled[0];
+      player.play(radioTrackToMetadata(first, `radio-${first.id}`));
+      setIsRadioMode(true);
+      if (!player.shuffle) player.toggleShuffle();
+    },
+    [player],
+  );
 
-  const startRadio = useCallback(async (startIndex = 0) => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    setRadioLoading(true);
-    try {
-      const playlists = await fetchStations(controller.signal);
-      if (playlists.length === 0) throw new Error('No stations');
-      setAllStations(playlists);
-      const idx = Math.min(startIndex, playlists.length - 1);
-      setCurrentStationIndex(idx);
-      playStation(playlists[idx]);
-    } catch (err) {
-      if (controller.signal.aborted) return;
-      console.error('Radio start failed:', err);
-    } finally {
-      setRadioLoading(false);
-    }
-  }, [fetchStations, playStation]);
+  const startRadio = useCallback(
+    async (startIndex = 0) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setRadioLoading(true);
+      try {
+        const playlists = await fetchStations(controller.signal);
+        if (playlists.length === 0) throw new Error('No stations');
+        setAllStations(playlists);
+        const idx = Math.min(startIndex, playlists.length - 1);
+        setCurrentStationIndex(idx);
+        playStation(playlists[idx]);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        console.error('Radio start failed:', err);
+      } finally {
+        setRadioLoading(false);
+      }
+    },
+    [fetchStations, playStation],
+  );
 
   const stopRadio = useCallback(() => {
     setIsRadioMode(false);
@@ -136,11 +156,14 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     player.stop();
   }, [player]);
 
-  const switchStation = useCallback((index: number) => {
-    if (index < 0 || index >= allStations.length) return;
-    setCurrentStationIndex(index);
-    playStation(allStations[index]);
-  }, [allStations, playStation]);
+  const switchStation = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= allStations.length) return;
+      setCurrentStationIndex(index);
+      playStation(allStations[index]);
+    },
+    [allStations, playStation],
+  );
 
   const nextRadioTrack = useCallback(() => {
     const queue = radioQueueRef.current;
@@ -156,9 +179,8 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const prevRadioTrack = useCallback(() => {
     const queue = radioQueueRef.current;
     if (queue.length === 0) return;
-    radioIndexRef.current = radioIndexRef.current > 0
-      ? radioIndexRef.current - 1
-      : queue.length - 1;
+    radioIndexRef.current =
+      radioIndexRef.current > 0 ? radioIndexRef.current - 1 : queue.length - 1;
     const track = radioQueueRef.current[radioIndexRef.current];
     player.play(radioTrackToMetadata(track, `radio-${track.id}`));
   }, [player]);
@@ -171,27 +193,31 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isRadioMode) {
       onEndedRef.current = () => nextRef.current();
-      return () => { onEndedRef.current = null; };
+      return () => {
+        onEndedRef.current = null;
+      };
     }
   }, [isRadioMode, onEndedRef]);
 
   const currentStation = allStations[currentStationIndex] ?? null;
 
   return (
-    <RadioContext.Provider value={{
-      isRadioMode,
-      radioLoading,
-      radioPlaylist: currentStation,
-      radioQueue: radioQueueRef.current,
-      radioIndex: radioIndexRef.current,
-      startRadio,
-      stopRadio,
-      nextRadioTrack,
-      prevRadioTrack,
-      availableStations: allStations.map((s) => s.name),
-      currentStationIndex,
-      switchStation,
-    }}>
+    <RadioContext.Provider
+      value={{
+        isRadioMode,
+        radioLoading,
+        radioPlaylist: currentStation,
+        radioQueue: radioQueueRef.current,
+        radioIndex: radioIndexRef.current,
+        startRadio,
+        stopRadio,
+        nextRadioTrack,
+        prevRadioTrack,
+        availableStations: allStations.map((s) => s.name),
+        currentStationIndex,
+        switchStation,
+      }}
+    >
       {children}
     </RadioContext.Provider>
   );

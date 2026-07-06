@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { communityConfig } from '@/../community.config';
 import { usePlayer } from '@/providers/audio';
 import { NotificationBell } from './NotificationBell';
@@ -15,8 +15,18 @@ const PRIMARY_TABS = [
     href: '/home',
     matchPaths: ['/home'],
     icon: (
-      <svg className="w-5 h-5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      <svg
+        className="w-5 h-5 md:w-4 md:h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+        />
       </svg>
     ),
   },
@@ -26,8 +36,18 @@ const PRIMARY_TABS = [
     href: '/chat',
     matchPaths: ['/chat', '/messages'],
     icon: (
-      <svg className="w-5 h-5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+      <svg
+        className="w-5 h-5 md:w-4 md:h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
+        />
       </svg>
     ),
   },
@@ -37,8 +57,18 @@ const PRIMARY_TABS = [
     href: '/music',
     matchPaths: ['/music'],
     icon: (
-      <svg className="w-5 h-5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V4.5A2.25 2.25 0 0016.5 2.25h0A2.25 2.25 0 0019.5 4.5v0M9 9v10.114" />
+      <svg
+        className="w-5 h-5 md:w-4 md:h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V4.5A2.25 2.25 0 0016.5 2.25h0A2.25 2.25 0 0019.5 4.5v0M9 9v10.114"
+        />
       </svg>
     ),
   },
@@ -48,8 +78,18 @@ const PRIMARY_TABS = [
     href: '/fractals',
     matchPaths: ['/fractals', '/governance', '/respect'],
     icon: (
-      <svg className="w-5 h-5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+      <svg
+        className="w-5 h-5 md:w-4 md:h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+        />
       </svg>
     ),
   },
@@ -72,7 +112,21 @@ const MORE_ITEMS = [
   { label: 'Settings', href: '/settings', icon: '⚙️' },
 ] as const;
 
-const MORE_MATCH_PATHS = ['/overview', '/ecosystem', '/tools', '/contribute', '/settings', '/social', '/spaces', '/wavewarz', '/members', '/assistant', '/notifications', '/calls', '/library'];
+const MORE_MATCH_PATHS = [
+  '/overview',
+  '/ecosystem',
+  '/tools',
+  '/contribute',
+  '/settings',
+  '/social',
+  '/spaces',
+  '/wavewarz',
+  '/members',
+  '/assistant',
+  '/notifications',
+  '/calls',
+  '/library',
+];
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -80,14 +134,17 @@ export function BottomNav() {
   const isPlaying = player.isPlaying || player.isLoading;
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const activeTab = PRIMARY_TABS.find((tab) =>
-    tab.matchPaths.some((p) => pathname.startsWith(p))
-  )?.id || (MORE_MATCH_PATHS.some((p) => pathname.startsWith(p)) ? 'more' : 'home');
+  const activeTab =
+    PRIMARY_TABS.find((tab) => tab.matchPaths.some((p) => pathname.startsWith(p)))?.id ||
+    (MORE_MATCH_PATHS.some((p) => pathname.startsWith(p)) ? 'more' : 'home');
 
   return (
     <>
       {/* Desktop: top tab bar with all items visible */}
-      <nav aria-label="Main navigation" className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-white/[0.08]">
+      <nav
+        aria-label="Main navigation"
+        className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-white/[0.08]"
+      >
         <div className="flex items-center h-10 px-4 max-w-6xl mx-auto">
           <span
             className="text-sm font-bold mr-6 tracking-wide"
@@ -104,9 +161,7 @@ export function BottomNav() {
                   href={tab.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                    isActive
-                      ? 'bg-white/10'
-                      : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                    isActive ? 'bg-white/10' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                   }`}
                   style={isActive ? { color: communityConfig.colors.primary } : undefined}
                 >
@@ -124,9 +179,7 @@ export function BottomNav() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                    isActive
-                      ? 'bg-white/10'
-                      : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                    isActive ? 'bg-white/10' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                   }`}
                   style={isActive ? { color: communityConfig.colors.primary } : undefined}
                 >
@@ -143,7 +196,9 @@ export function BottomNav() {
                 aria-expanded={moreOpen}
                 aria-haspopup="menu"
                 className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  moreOpen ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                  moreOpen
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                 }`}
               >
                 <span aria-hidden="true">···</span>
@@ -198,7 +253,11 @@ export function BottomNav() {
       </nav>
 
       {/* Mobile: bottom tab bar with More menu */}
-      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-white/[0.08]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav
+        aria-label="Main navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-white/[0.08]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         {/* More menu (slides up from bottom) */}
         {moreOpen && (
           <>
@@ -255,10 +314,24 @@ export function BottomNav() {
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors ${
               activeTab === 'more' || moreOpen ? '' : 'text-gray-500 active:text-gray-300'
             }`}
-            style={activeTab === 'more' || moreOpen ? { color: communityConfig.colors.primary } : undefined}
+            style={
+              activeTab === 'more' || moreOpen
+                ? { color: communityConfig.colors.primary }
+                : undefined
+            }
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25h2.25A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25h2.25A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+              />
             </svg>
             <span className="text-[10px] font-medium">More</span>
           </button>

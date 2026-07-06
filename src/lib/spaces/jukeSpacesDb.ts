@@ -93,7 +93,9 @@ export interface RecentJukeSpaceRow {
 export async function listRecentJukeSpaces(limit: number = 10): Promise<RecentJukeSpaceRow[]> {
   const { data, error } = await supabaseAdmin
     .from('juke_spaces')
-    .select('id, title, status, participant_count, scheduled_at, started_at, ended_at, recording_url, updated_at')
+    .select(
+      'id, title, status, participant_count, scheduled_at, started_at, ended_at, recording_url, updated_at',
+    )
     .order('updated_at', { ascending: false })
     .limit(Math.min(Math.max(1, limit), 50));
   if (error) throw new Error(`listRecentJukeSpaces failed: ${error.message}`);
@@ -113,7 +115,9 @@ export interface RecentWebhookEventRow {
   error: string | null;
 }
 
-export async function listRecentWebhookEvents(limit: number = 25): Promise<RecentWebhookEventRow[]> {
+export async function listRecentWebhookEvents(
+  limit: number = 25,
+): Promise<RecentWebhookEventRow[]> {
   const { data, error } = await supabaseAdmin
     .from('juke_webhook_events')
     .select('id, event_type, space_id, received_at, processed_at, error')
@@ -175,10 +179,22 @@ export async function getJukeIntegrationStats(): Promise<JukeIntegrationStats> {
   try {
     const counts = await Promise.all([
       supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'scheduled'),
-      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'ended'),
-      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).not('recording_url', 'is', null),
+      supabaseAdmin
+        .from('juke_spaces')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active'),
+      supabaseAdmin
+        .from('juke_spaces')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'scheduled'),
+      supabaseAdmin
+        .from('juke_spaces')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'ended'),
+      supabaseAdmin
+        .from('juke_spaces')
+        .select('*', { count: 'exact', head: true })
+        .not('recording_url', 'is', null),
       supabaseAdmin.from('juke_webhook_events').select('*', { count: 'exact', head: true }),
     ]);
     stats.total_spaces = counts[0].count ?? 0;
@@ -194,7 +210,8 @@ export async function getJukeIntegrationStats(): Promise<JukeIntegrationStats> {
       .order('received_at', { ascending: false })
       .limit(50);
     for (const row of (recent ?? []) as Array<{ event_type: string; received_at: string }>) {
-      stats.recent_event_types[row.event_type] = (stats.recent_event_types[row.event_type] ?? 0) + 1;
+      stats.recent_event_types[row.event_type] =
+        (stats.recent_event_types[row.event_type] ?? 0) + 1;
       if (!stats.last_event_at) stats.last_event_at = row.received_at;
     }
   } catch {

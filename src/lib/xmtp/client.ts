@@ -37,7 +37,7 @@ const XMTP_ENV = 'production' as const;
  */
 export async function createWalletSigner(
   address: `0x${string}`,
-  signMessage: (message: string) => Promise<string>
+  signMessage: (message: string) => Promise<string>,
 ): Promise<Signer> {
   const { IdentifierKind } = await import('@xmtp/browser-sdk');
   return {
@@ -122,7 +122,7 @@ export async function createXMTPClient(signer: Signer, address: string): Promise
   const client = await Client.create(signer, {
     env: XMTP_ENV,
     dbEncryptionKey: getDbEncryptionKey(address),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
   return client;
 }
@@ -154,7 +154,9 @@ export function getOrCreateLocalKey(fid: number): `0x${string}` {
 
   // Generate a random 32-byte XMTP-only signing key (not a wallet key)
   const bytes = crypto.getRandomValues(new Uint8Array(32));
-  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
   const key = `0x${hex}` as `0x${string}`;
   localStorage.setItem(storageKey, key);
   return key;
@@ -203,9 +205,7 @@ export function saveConnectedWallet(address: string): void {
  */
 export function removeConnectedWallet(address: string): void {
   if (typeof window === 'undefined') return;
-  const wallets = getConnectedWallets().filter(
-    (w) => w !== address.toLowerCase()
-  );
+  const wallets = getConnectedWallets().filter((w) => w !== address.toLowerCase());
   localStorage.setItem('zaoos-xmtp-wallets', JSON.stringify(wallets));
 }
 

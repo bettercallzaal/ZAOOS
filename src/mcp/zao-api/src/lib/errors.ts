@@ -2,10 +2,10 @@ export class MCPError extends Error {
   constructor(
     message: string,
     public code: string,
-    public status: number = 500
+    public status: number = 500,
   ) {
     super(message);
-    this.name = "MCPError";
+    this.name = 'MCPError';
   }
 }
 
@@ -14,5 +14,5 @@ export function handleError(err: unknown): { error: string; code: string } {
     return { error: err.message, code: err.code };
   }
   console.error(err);
-  return { error: "Internal server error", code: "INTERNAL_ERROR" };
+  return { error: 'Internal server error', code: 'INTERNAL_ERROR' };
 }

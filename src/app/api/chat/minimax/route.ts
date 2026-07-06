@@ -1,13 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ENV } from '@/lib/env';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
 const minimaxSchema = z.object({
-  messages: z.array(z.object({
-    role: z.enum(['user', 'assistant', 'system']),
-    content: z.string(),
-  })),
+  messages: z.array(
+    z.object({
+      role: z.enum(['user', 'assistant', 'system']),
+      content: z.string(),
+    }),
+  ),
   model: z.string().optional(),
   temperature: z.number().optional(),
   max_tokens: z.number().optional(),
@@ -29,7 +31,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = minimaxSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     const { messages, model, temperature, max_tokens } = parsed.data;
@@ -46,14 +51,19 @@ export async function POST(req: NextRequest) {
         model: selectedModel,
         messages,
         ...(typeof temperature === 'number' && Number.isFinite(temperature) ? { temperature } : {}),
-        ...(typeof max_tokens === 'number' && Number.isFinite(max_tokens) ? { max_tokens: max_tokens } : {}),
+        ...(typeof max_tokens === 'number' && Number.isFinite(max_tokens)
+          ? { max_tokens: max_tokens }
+          : {}),
       }),
     });
 
     const text = await res.text();
     if (!res.ok) {
       logger.error('[minimax] API error:', res.status, text);
-      return NextResponse.json({ error: 'Minimax request failed', details: text }, { status: res.status });
+      return NextResponse.json(
+        { error: 'Minimax request failed', details: text },
+        { status: res.status },
+      );
     }
 
     let data: unknown;

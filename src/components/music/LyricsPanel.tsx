@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface LyricsPanelProps {
   trackName: string;
@@ -93,9 +93,7 @@ export function LyricsPanel({ trackName, artistName, className = '' }: LyricsPan
       {/* Attribution */}
       {!loading && lyrics && source && (
         <div className="px-6 py-2 border-t border-white/5">
-          <p className="text-[10px] text-gray-600 text-center">
-            Powered by {source}
-          </p>
+          <p className="text-[10px] text-gray-600 text-center">Powered by {source}</p>
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/db/supabase';
 import { parseWebhookEvent, verifyAppKeyWithNeynar } from '@farcaster/miniapp-node';
+import { type NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
@@ -11,9 +11,8 @@ export async function POST(req: NextRequest) {
     const { fid, event: parsedEvent } = await parseWebhookEvent(raw, verifyAppKeyWithNeynar);
 
     const event = parsedEvent.event;
-    const notificationDetails = 'notificationDetails' in parsedEvent
-      ? parsedEvent.notificationDetails
-      : undefined;
+    const notificationDetails =
+      'notificationDetails' in parsedEvent ? parsedEvent.notificationDetails : undefined;
 
     // Verify the FID exists in our allowlist before processing
     const { data: member } = await supabaseAdmin
@@ -32,18 +31,16 @@ export async function POST(req: NextRequest) {
       case 'miniapp_added':
       case 'notifications_enabled': {
         if (notificationDetails) {
-          await supabaseAdmin
-            .from('notification_tokens')
-            .upsert(
-              {
-                fid,
-                token: notificationDetails.token,
-                url: notificationDetails.url,
-                enabled: true,
-                updated_at: new Date().toISOString(),
-              },
-              { onConflict: 'fid' }
-            );
+          await supabaseAdmin.from('notification_tokens').upsert(
+            {
+              fid,
+              token: notificationDetails.token,
+              url: notificationDetails.url,
+              enabled: true,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'fid' },
+          );
         }
         break;
       }

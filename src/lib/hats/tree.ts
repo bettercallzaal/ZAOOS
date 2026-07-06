@@ -6,7 +6,7 @@
  */
 
 import { getHatsClient } from './client';
-import { TREE_ID, HAT_LABELS, formatHatId } from './constants';
+import { formatHatId, HAT_LABELS, TREE_ID } from './constants';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -57,9 +57,7 @@ async function resolveIpfsDetails(uri: string): Promise<string> {
       if (!res.ok) continue;
       const json = await res.json();
       return json.name || json.description || uri;
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return uri;
 }
@@ -87,7 +85,10 @@ export async function fetchHatTree(): Promise<HatTreeResult> {
 
       // Resolve IPFS details to human-readable name
       const details = typeof hat.details === 'string' ? hat.details : '';
-      const resolvedLabel = HAT_LABELS[hatId.toString()] || await resolveIpfsDetails(details) || `Hat ${formatHatId(hatId).slice(0, 10)}...`;
+      const resolvedLabel =
+        HAT_LABELS[hatId.toString()] ||
+        (await resolveIpfsDetails(details)) ||
+        `Hat ${formatHatId(hatId).slice(0, 10)}...`;
 
       // Recursively fetch children
       const numChildren = Number(hat.numChildren || 0);

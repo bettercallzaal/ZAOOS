@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
@@ -14,7 +14,7 @@ const UPCOMING = [
     date: 'October 3, 2026',
     location: 'Franklin Street Parklet, Ellsworth, Maine',
     description:
-      'The ZAO\'s flagship outdoor music festival. 10 artists, one stage, all day. Part of the 9th Annual Art of Ellsworth.',
+      "The ZAO's flagship outdoor music festival. 10 artists, one stage, all day. Part of the 9th Annual Art of Ellsworth.",
     href: '/stock',
     highlight: true,
   },
@@ -34,7 +34,7 @@ const PAST = [
     name: 'ZAO-PALOOZA',
     date: '2024',
     description:
-      'The ZAO\'s first virtual music festival — a celebration of independent artists in the Farcaster ecosystem.',
+      "The ZAO's first virtual music festival — a celebration of independent artists in the Farcaster ecosystem.",
   },
   {
     name: 'ZAO-CHELLA',
@@ -106,7 +106,10 @@ export default function FestivalsPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Past Events</p>
           <div className="space-y-3">
             {PAST.map((event) => (
-              <div key={event.name} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
+              <div
+                key={event.name}
+                className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]"
+              >
                 <div className="flex items-center gap-3">
                   <div>
                     <p className="font-bold text-white">{event.name}</p>

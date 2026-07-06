@@ -24,28 +24,24 @@
  * Run: node --import tsx scripts/register-signer.ts [--gen-key]
  * Requires: npm i @farcaster/hub-nodejs   (viem already in deps)
  */
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-} from 'viem';
+import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 import {
+  generateNobleKeypair,
+  getSignerBackend,
+  getSignerPublicKeyHex,
+} from '../bot/src/zoe/farcaster/signer';
+import {
   FARCASTER_CONTRACTS,
+  ID_GATEWAY_ABI,
+  ID_REGISTRY_ABI,
+  KEY_GATEWAY_ABI,
   OP_CHAIN_ID,
   SIGNED_KEY_REQUEST_DOMAIN,
   SIGNED_KEY_REQUEST_TYPES,
   SIGNED_KEY_REQUEST_VALIDATOR_ABI,
-  ID_GATEWAY_ABI,
-  ID_REGISTRY_ABI,
-  KEY_GATEWAY_ABI,
 } from './lib/farcaster-contracts';
-import {
-  getSignerBackend,
-  getSignerPublicKeyHex,
-  generateNobleKeypair,
-} from '../bot/src/zoe/farcaster/signer';
 
 const SIGNED_KEY_REQUEST_TYPE = 1; // metadataType for SignedKeyRequestValidator
 const ED25519_KEY_TYPE = 1; // keyType

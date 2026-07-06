@@ -1,6 +1,6 @@
 import { getSessionData } from '@/lib/auth/session';
-import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getUserByFid } from '@/lib/farcaster/neynar';
 import { SettingsClientLoader } from './SettingsClientLoader';
 
 async function fetchProfile(fid: number) {
@@ -9,7 +9,9 @@ async function fetchProfile(fid: number) {
       getUserByFid(fid),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle, lens_profile_id, lens_access_token, hive_username')
+        .select(
+          'zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle, lens_profile_id, lens_access_token, hive_username',
+        )
         .eq('fid', fid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -53,13 +55,12 @@ async function fetchProfile(fid: number) {
 
     // Auto-import X handle from Farcaster verified_accounts if not already saved
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const verifiedAccounts = (neynarUser as any)?.verified_accounts as Array<{ platform: string; username: string }> | undefined;
+    const verifiedAccounts = (neynarUser as any)?.verified_accounts as
+      | Array<{ platform: string; username: string }>
+      | undefined;
     const xUsername = verifiedAccounts?.find((a) => a.platform === 'x')?.username;
     if (xUsername && !result.x_handle) {
-      await supabaseAdmin
-        .from('users')
-        .update({ x_handle: xUsername })
-        .eq('fid', fid);
+      await supabaseAdmin.from('users').update({ x_handle: xUsername }).eq('fid', fid);
       result.x_handle = xUsername;
     }
 
@@ -74,10 +75,5 @@ export default async function SettingsPage() {
   const session = await getSessionData();
   const profile = session?.fid ? await fetchProfile(session.fid) : null;
 
-  return (
-    <SettingsClientLoader
-      session={session}
-      profile={profile}
-    />
-  );
+  return <SettingsClientLoader session={session} profile={profile} />;
 }

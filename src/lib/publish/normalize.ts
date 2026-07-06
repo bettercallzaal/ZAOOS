@@ -171,7 +171,10 @@ export function normalizeForThreads(input: NormalizeInput): NormalizedContent {
 
   const maxTextLen = 500 - footer.length;
   // Strip hashtags for conversational tone
-  const cleaned = input.text.replace(/#\w+/g, '').replace(/\s{2,}/g, ' ').trim();
+  const cleaned = input.text
+    .replace(/#\w+/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
   const truncatedText = truncate(cleaned, maxTextLen);
   const text = `${truncatedText}${footer}`;
 

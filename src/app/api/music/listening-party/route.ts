@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -32,10 +32,7 @@ export async function GET() {
     return NextResponse.json({ parties: parties || [] });
   } catch (err) {
     logger.error('[listening-party] GET failed:', err);
-    return NextResponse.json(
-      { error: 'Failed to load listening parties' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to load listening parties' }, { status: 500 });
   }
 }
 
@@ -80,9 +77,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ party }, { status: 201 });
   } catch (err) {
     logger.error('[listening-party] POST failed:', err);
-    return NextResponse.json(
-      { error: 'Failed to create listening party' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to create listening party' }, { status: 500 });
   }
 }

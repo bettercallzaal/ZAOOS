@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
 import { Livepeer } from 'livepeer';
+import { type NextRequest, NextResponse } from 'next/server';
+import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 function getLivepeerClient() {

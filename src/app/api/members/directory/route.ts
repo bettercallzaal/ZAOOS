@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -31,13 +31,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid params' }, { status: 400 });
   }
 
-  const { search, tier, category, location, active_since, has_ens, platform, min_respect, featured, sort = 'respect', limit, offset } = parsed.data;
+  const {
+    search,
+    tier,
+    category,
+    location,
+    active_since,
+    has_ens,
+    platform,
+    min_respect,
+    featured,
+    sort = 'respect',
+    limit,
+    offset,
+  } = parsed.data;
 
   try {
     // ── Step 1: Fetch base user list ─────────────────────────────────────────
     let query = supabaseAdmin
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         fid,
         username,
@@ -67,7 +81,9 @@ export async function GET(req: NextRequest) {
         last_active_at,
         created_at,
         respect_member_id
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' },
+      )
       .eq('is_active', true);
 
     // Filters
@@ -77,7 +93,7 @@ export async function GET(req: NextRequest) {
 
     if (search) {
       query = query.or(
-        `display_name.ilike.%${search}%,username.ilike.%${search}%,real_name.ilike.%${search}%,ens_name.ilike.%${search}%`
+        `display_name.ilike.%${search}%,username.ilike.%${search}%,real_name.ilike.%${search}%,ens_name.ilike.%${search}%`,
       );
     }
 
@@ -97,8 +113,12 @@ export async function GET(req: NextRequest) {
 
     if (platform) {
       const platformCol: Record<string, string> = {
-        audius: 'audius_handle', spotify: 'spotify_url', soundcloud: 'soundcloud_url',
-        bluesky: 'bluesky_handle', x: 'x_handle', instagram: 'instagram_handle',
+        audius: 'audius_handle',
+        spotify: 'spotify_url',
+        soundcloud: 'soundcloud_url',
+        bluesky: 'bluesky_handle',
+        x: 'x_handle',
+        instagram: 'instagram_handle',
       };
       const col = platformCol[platform];
       if (col) query = query.not(col, 'is', null);
@@ -125,8 +145,10 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     const userList = users || [];
-    const fids = userList.map(u => u.fid).filter(Boolean) as number[];
-    const wallets = userList.map(u => u.primary_wallet?.toLowerCase()).filter(Boolean) as string[];
+    const fids = userList.map((u) => u.fid).filter(Boolean) as number[];
+    const wallets = userList
+      .map((u) => u.primary_wallet?.toLowerCase())
+      .filter(Boolean) as string[];
 
     // ── Step 2: Parallel fetch respect + profiles ────────────────────────────
     const [respectResult, profilesResult] = await Promise.all([
@@ -134,10 +156,13 @@ export async function GET(req: NextRequest) {
         if (fids.length === 0 && wallets.length === 0) return { data: [] };
         // Build OR clause — Supabase .or() takes comma-separated filter strings; empty string = no-op
         const fidClause = fids.length > 0 ? `fid.in.(${fids.join(',')})` : '';
-        const walletClause = wallets.length > 0 ? `wallet_address.in.(${wallets.map(w => `"${w}"`).join(',')})` : '';
+        const walletClause =
+          wallets.length > 0 ? `wallet_address.in.(${wallets.map((w) => `"${w}"`).join(',')})` : '';
         return supabaseAdmin
           .from('respect_members')
-          .select('fid, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, first_respect_at')
+          .select(
+            'fid, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, first_respect_at',
+          )
           .or(`${fidClause}${fidClause && walletClause ? ',' : ''}${walletClause}`);
       })(),
       (async () => {
@@ -152,44 +177,60 @@ export async function GET(req: NextRequest) {
     const respectData = respectResult.data || [];
     const profileData = profilesResult.data || [];
 
-    const respectMap: Record<string, {
-      total_respect: number;
-      fractal_respect: number;
-      onchain_og: number;
-      onchain_zor: number;
-      fractal_count: number;
-      first_respect_at: string | null;
-    }> = {};
+    const respectMap: Record<
+      string,
+      {
+        total_respect: number;
+        fractal_respect: number;
+        onchain_og: number;
+        onchain_zor: number;
+        fractal_count: number;
+        first_respect_at: string | null;
+      }
+    > = {};
 
     for (const r of respectData) {
-      if (r.fid) respectMap[`fid:${r.fid}`] = {
-        total_respect: Number(r.total_respect),
-        fractal_respect: Number(r.fractal_respect),
-        onchain_og: Number(r.onchain_og),
-        onchain_zor: Number(r.onchain_zor),
-        fractal_count: r.fractal_count || 0,
-        first_respect_at: r.first_respect_at,
-      };
-      if (r.wallet_address) respectMap[`wallet:${r.wallet_address.toLowerCase()}`] = {
-        total_respect: Number(r.total_respect),
-        fractal_respect: Number(r.fractal_respect),
-        onchain_og: Number(r.onchain_og),
-        onchain_zor: Number(r.onchain_zor),
-        fractal_count: r.fractal_count || 0,
-        first_respect_at: r.first_respect_at,
-      };
+      if (r.fid)
+        respectMap[`fid:${r.fid}`] = {
+          total_respect: Number(r.total_respect),
+          fractal_respect: Number(r.fractal_respect),
+          onchain_og: Number(r.onchain_og),
+          onchain_zor: Number(r.onchain_zor),
+          fractal_count: r.fractal_count || 0,
+          first_respect_at: r.first_respect_at,
+        };
+      if (r.wallet_address)
+        respectMap[`wallet:${r.wallet_address.toLowerCase()}`] = {
+          total_respect: Number(r.total_respect),
+          fractal_respect: Number(r.fractal_respect),
+          onchain_og: Number(r.onchain_og),
+          onchain_zor: Number(r.onchain_zor),
+          fractal_count: r.fractal_count || 0,
+          first_respect_at: r.first_respect_at,
+        };
     }
 
-    const profileMap: Record<number, { category: string; thumbnail_url: string | null; cover_image_url: string | null; biography: string | null; is_featured: boolean; slug: string }> = {};
+    const profileMap: Record<
+      number,
+      {
+        category: string;
+        thumbnail_url: string | null;
+        cover_image_url: string | null;
+        biography: string | null;
+        is_featured: boolean;
+        slug: string;
+      }
+    > = {};
     for (const p of profileData) {
       if (p.fid) profileMap[p.fid] = p;
     }
 
     // ── Step 3: Build unified records with DB-level filters applied ───────────
-    let members = userList.map(u => {
-      const respect = (u.fid ? respectMap[`fid:${u.fid}`] : null)
-        || (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null)
-        || null;
+    let members = userList.map((u) => {
+      const respect =
+        (u.fid ? respectMap[`fid:${u.fid}`] : null) ||
+        (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null) ||
+        null;
 
       const artistProfile = u.fid ? profileMap[u.fid] || null : null;
 
@@ -220,22 +261,26 @@ export async function GET(req: NextRequest) {
           audius: u.audius_handle || null,
           discord: u.discord_id || null,
         },
-        respect: respect ? {
-          total: respect.total_respect,
-          fractal: respect.fractal_respect,
-          onchainOG: respect.onchain_og,
-          onchainZOR: respect.onchain_zor,
-          fractalCount: respect.fractal_count,
-          firstRespectAt: respect.first_respect_at,
-        } : null,
-        artistProfile: artistProfile ? {
-          category: artistProfile.category,
-          thumbnailUrl: artistProfile.thumbnail_url,
-          coverImageUrl: artistProfile.cover_image_url,
-          biography: artistProfile.biography,
-          isFeatured: artistProfile.is_featured,
-          slug: artistProfile.slug,
-        } : null,
+        respect: respect
+          ? {
+              total: respect.total_respect,
+              fractal: respect.fractal_respect,
+              onchainOG: respect.onchain_og,
+              onchainZOR: respect.onchain_zor,
+              fractalCount: respect.fractal_count,
+              firstRespectAt: respect.first_respect_at,
+            }
+          : null,
+        artistProfile: artistProfile
+          ? {
+              category: artistProfile.category,
+              thumbnailUrl: artistProfile.thumbnail_url,
+              coverImageUrl: artistProfile.cover_image_url,
+              biography: artistProfile.biography,
+              isFeatured: artistProfile.is_featured,
+              slug: artistProfile.slug,
+            }
+          : null,
         location: u.location || null,
         lastLoginAt: u.last_login_at,
         lastActiveAt: u.last_active_at,
@@ -245,15 +290,17 @@ export async function GET(req: NextRequest) {
 
     // ── Step 4: Post-query filters (category, featured, min_respect) ───────
     if (category) {
-      members = members.filter(m => m.artistProfile?.category?.toLowerCase() === category.toLowerCase());
+      members = members.filter(
+        (m) => m.artistProfile?.category?.toLowerCase() === category.toLowerCase(),
+      );
     }
 
     if (featured === 'true') {
-      members = members.filter(m => m.artistProfile?.isFeatured);
+      members = members.filter((m) => m.artistProfile?.isFeatured);
     }
 
     if (min_respect !== undefined) {
-      members = members.filter(m => (m.respect?.total ?? 0) >= min_respect);
+      members = members.filter((m) => (m.respect?.total ?? 0) >= min_respect);
     }
 
     // Respect sort (needs joined data not in SQL)
@@ -262,18 +309,24 @@ export async function GET(req: NextRequest) {
     }
 
     // ── Step 5: Build filter options from current page ───────────────────────
-    const categories = [...new Set(members.map(m => m.artistProfile?.category).filter(Boolean))] as string[];
-    const locations = [...new Set(members.map(m => m.location).filter(Boolean))] as string[];
+    const categories = [
+      ...new Set(members.map((m) => m.artistProfile?.category).filter(Boolean)),
+    ] as string[];
+    const locations = [...new Set(members.map((m) => m.location).filter(Boolean))] as string[];
 
     return NextResponse.json({
       members,
       total: count ?? members.length,
       tiers: {
-        respectHolders: members.filter(m => m.tier === 'respect_holder').length,
-        community: members.filter(m => m.tier === 'community').length,
+        respectHolders: members.filter((m) => m.tier === 'respect_holder').length,
+        community: members.filter((m) => m.tier === 'community').length,
       },
       filterOptions: { categories, locations },
-      pagination: { limit: parseInt(limit), offset, hasMore: (count ?? 0) > offset + members.length },
+      pagination: {
+        limit: parseInt(limit),
+        offset,
+        hasMore: (count ?? 0) > offset + members.length,
+      },
     });
   } catch (err) {
     logger.error('[directory] error:', err);

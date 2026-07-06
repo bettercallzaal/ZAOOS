@@ -28,7 +28,9 @@ export function PublishButton({
             ? 'text-[#f5a623] bg-[#f5a623]/10'
             : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
         }`}
-        title={crossPostEnabled ? 'Switch to single-platform send' : 'Enable cross-platform publishing'}
+        title={
+          crossPostEnabled ? 'Switch to single-platform send' : 'Enable cross-platform publishing'
+        }
         aria-label={crossPostEnabled ? 'Disable cross-posting' : 'Enable cross-posting'}
         aria-pressed={crossPostEnabled}
       >

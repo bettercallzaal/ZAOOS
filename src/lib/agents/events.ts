@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
-import type { AgentName, AgentAction } from './types';
+import type { AgentAction, AgentName } from './types';
 
 export interface AgentEventParams {
   agent_name: AgentName;
@@ -32,7 +32,11 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * have nothing left but the CRITICAL log line below.
  */
 async function deadLetter(params: AgentEventParams, dbError: string): Promise<void> {
-  const record = JSON.stringify({ ...params, _dlq_at: new Date().toISOString(), _db_error: dbError });
+  const record = JSON.stringify({
+    ...params,
+    _dlq_at: new Date().toISOString(),
+    _db_error: dbError,
+  });
   try {
     await appendFile(DLQ_PATH, record + '\n', 'utf8');
   } catch (fsErr) {

@@ -12,7 +12,9 @@ export async function GET() {
   try {
     const { data: streak, error } = await supabaseAdmin
       .from('user_streaks')
-      .select('current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available')
+      .select(
+        'current_streak, longest_streak, last_activity_date, total_active_days, streak_freezes_available',
+      )
       .eq('fid', session.fid)
       .maybeSingle();
 
@@ -47,13 +49,9 @@ export async function GET() {
       ? new Date(streak.last_activity_date + 'T00:00:00')
       : null;
 
-    const isActiveToday = lastActivity
-      ? lastActivity.getTime() === today.getTime()
-      : false;
+    const isActiveToday = lastActivity ? lastActivity.getTime() === today.getTime() : false;
 
-    const isAtRisk = lastActivity
-      ? lastActivity.getTime() === yesterday.getTime()
-      : false;
+    const isAtRisk = lastActivity ? lastActivity.getTime() === yesterday.getTime() : false;
 
     // Calculate effective current streak (may have lapsed since last visit)
     let currentStreak = streak.current_streak;

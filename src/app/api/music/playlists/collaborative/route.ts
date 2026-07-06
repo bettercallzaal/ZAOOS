@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
@@ -36,10 +36,7 @@ export async function GET() {
 
     // Fetch track counts and member counts in parallel
     const [trackCounts, memberCounts] = await Promise.allSettled([
-      supabaseAdmin
-        .from('playlist_tracks')
-        .select('playlist_id')
-        .in('playlist_id', playlistIds),
+      supabaseAdmin.from('playlist_tracks').select('playlist_id').in('playlist_id', playlistIds),
       supabaseAdmin
         .from('playlist_members')
         .select('playlist_id, fid')
@@ -89,7 +86,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { name, description, is_collaborative } = parsed.data;

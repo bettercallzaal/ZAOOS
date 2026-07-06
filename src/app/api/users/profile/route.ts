@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
-const patchSchema = z.object({
-  display_name: z.string().max(50).trim().optional(),
-  bio: z.string().max(300).trim().optional(),
-  ign: z.string().max(30).trim().optional(),
-  real_name: z.string().max(80).trim().optional(),
-}).refine(d => Object.keys(d).length > 0, { message: 'No fields to update' });
+const patchSchema = z
+  .object({
+    display_name: z.string().max(50).trim().optional(),
+    bio: z.string().max(300).trim().optional(),
+    ign: z.string().max(30).trim().optional(),
+    real_name: z.string().max(80).trim().optional(),
+  })
+  .refine((d) => Object.keys(d).length > 0, { message: 'No fields to update' });
 
 /**
  * GET — return ZAO-specific profile fields for the current user.
@@ -23,7 +25,9 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select('display_name, bio, ign, real_name, bluesky_handle, lens_profile_id, hive_username, publishing_prefs')
+      .select(
+        'display_name, bio, ign, real_name, bluesky_handle, lens_profile_id, hive_username, publishing_prefs',
+      )
       .eq('fid', session.fid)
       .eq('is_active', true)
       .maybeSingle();

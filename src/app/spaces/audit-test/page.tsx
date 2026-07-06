@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -12,10 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
  * involved here. See research/dev-workflows/815-songjam-site-fork-audit/.
  */
 
-const AuditTestRoom = dynamic(
-  () => import('@/components/spaces/AuditTestRoom'),
-  { ssr: false },
-);
+const AuditTestRoom = dynamic(() => import('@/components/spaces/AuditTestRoom'), { ssr: false });
 
 type Role = 'speaker' | 'listener';
 
@@ -64,13 +61,12 @@ export default function AuditTestPage() {
               <ol className="list-decimal space-y-1 pl-5 text-gray-400">
                 <li>Join as a speaker below.</li>
                 <li>
-                  Open <code className="text-[#f5a623]">/spaces/audit-test</code>{' '}
-                  in a second browser, an incognito window, or send it to a
-                  teammate.
+                  Open <code className="text-[#f5a623]">/spaces/audit-test</code> in a second
+                  browser, an incognito window, or send it to a teammate.
                 </li>
                 <li>
-                  Both join the same room — talk, watch the speaking indicator
-                  light up, and check the participant count.
+                  Both join the same room — talk, watch the speaking indicator light up, and check
+                  the participant count.
                 </li>
               </ol>
             </div>
@@ -96,8 +92,7 @@ export default function AuditTestPage() {
                 ))}
               </div>
               <p className="text-xs text-gray-500">
-                Speakers can talk; listeners can only hear. Use two speakers to
-                test two-way audio.
+                Speakers can talk; listeners can only hear. Use two speakers to test two-way audio.
               </p>
             </div>
 

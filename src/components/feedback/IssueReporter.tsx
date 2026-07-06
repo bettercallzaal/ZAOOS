@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 type FeedbackType = 'bug' | 'feature' | 'feedback';
@@ -98,7 +98,9 @@ export function IssueReporter() {
           <div className="bg-[#1a2a4a] rounded-t-xl sm:rounded-xl p-5 w-full sm:max-w-md border border-white/10 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-white">Report an Issue</h2>
-              <button onClick={reset} className="text-gray-400 hover:text-white">✕</button>
+              <button onClick={reset} className="text-gray-400 hover:text-white">
+                ✕
+              </button>
             </div>
 
             {/* Type selector */}
@@ -159,7 +161,11 @@ export function IssueReporter() {
               />
               {screenshot ? (
                 <div className="relative">
-                  <img src={screenshot} alt="Screenshot preview" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                  <img
+                    src={screenshot}
+                    alt="Screenshot preview"
+                    className="w-full h-32 object-cover rounded-lg border border-white/10"
+                  />
                   <button
                     onClick={() => setScreenshot(null)}
                     className="absolute top-1 right-1 bg-black/60 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center"
@@ -179,7 +185,9 @@ export function IssueReporter() {
 
             {/* Result message */}
             {result && (
-              <div className={`text-xs mb-3 px-3 py-2 rounded-lg ${result.success ? 'bg-green-900/20 text-green-400' : 'bg-red-900/20 text-red-400'}`}>
+              <div
+                className={`text-xs mb-3 px-3 py-2 rounded-lg ${result.success ? 'bg-green-900/20 text-green-400' : 'bg-red-900/20 text-red-400'}`}
+              >
                 {result.message}
               </div>
             )}
@@ -193,9 +201,7 @@ export function IssueReporter() {
               {submitting ? 'Submitting...' : 'Submit'}
             </button>
 
-            <p className="text-[10px] text-gray-600 text-center mt-2">
-              1 report per 5 minutes
-            </p>
+            <p className="text-[10px] text-gray-600 text-center mt-2">1 report per 5 minutes</p>
           </div>
         </div>
       )}

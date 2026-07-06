@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -44,13 +44,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Already collected' }, { status: 409 });
     }
 
-    await supabaseAdmin
-      .from('arweave_collections')
-      .insert({
-        asset_id: asset.id,
-        collector_fid: session.fid,
-        collector_address: '',
-      });
+    await supabaseAdmin.from('arweave_collections').insert({
+      asset_id: asset.id,
+      collector_fid: session.fid,
+      collector_address: '',
+    });
 
     await supabaseAdmin
       .from('arweave_assets')

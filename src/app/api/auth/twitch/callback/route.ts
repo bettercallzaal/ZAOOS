@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
           Authorization: `Bearer ${tokenData.access_token}`,
           'Client-Id': clientId,
         },
-      }
+      },
     );
     const keyData = await keyRes.json();
     const streamKey = keyData.data?.[0]?.stream_key || '';
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
           ? new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
           : null,
       },
-      { onConflict: 'user_fid,platform' }
+      { onConflict: 'user_fid,platform' },
     );
 
     if (dbError) {

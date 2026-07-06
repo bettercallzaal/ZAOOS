@@ -18,8 +18,8 @@ export interface ZaoMember {
   pfpUrl: string | null;
   addresses: string[];
   reachable: boolean;
-  xmtpAddress: string | null;  // The specific address that passed canMessage
-  lastLoginAt: string | null;  // ISO timestamp
+  xmtpAddress: string | null; // The specific address that passed canMessage
+  lastLoginAt: string | null; // ISO timestamp
 }
 
 export interface MessagingPrefs {
@@ -29,8 +29,8 @@ export interface MessagingPrefs {
 
 // ── Context Value ───────────────────────────────────────────────────
 
-import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
 import type { XMTPPeerProfile } from '@/lib/xmtp/client';
+import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
 
 export interface XMTPContextValue {
   connectedWallets: string[];
@@ -55,14 +55,20 @@ export interface XMTPContextValue {
   activeXMTPAddress: string | null;
 
   autoConnect: (fid: number) => Promise<void>;
-  connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
+  connectWallet: (
+    address: `0x${string}`,
+    signMessage: (msg: string) => Promise<string>,
+  ) => Promise<void>;
   disconnectWallet: (address: string) => void;
   disconnectAll: () => void;
   switchWallet: () => void;
   selectConversation: (id: string | null) => void;
   sendMessage: (text: string) => Promise<void>;
   createDm: (peerAddress: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<string | null>;
-  createGroup: (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => Promise<string | null>;
+  createGroup: (
+    name: string,
+    members: { address: `0x${string}`; profile?: XMTPPeerProfile }[],
+  ) => Promise<string | null>;
   refreshConversations: () => Promise<void>;
   startDmWithMember: (member: ZaoMember) => Promise<void>;
   clearError: () => void;
@@ -71,12 +77,14 @@ export interface XMTPContextValue {
   removeConversation: (id: string) => void;
   leaveGroup: (id: string) => Promise<void>;
   refreshMembers: () => Promise<void>;
-  getGroupMembers: (conversationId: string) => Promise<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>;
+  getGroupMembers: (
+    conversationId: string,
+  ) => Promise<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>;
 }
 
 // ── Shared Refs (passed between hooks) ──────────────────────────────
 
-import type { MutableRefObject, Dispatch, SetStateAction } from 'react';
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
 export interface XMTPSharedRefs {
   walletsRef: MutableRefObject<Map<string, WalletClient>>;

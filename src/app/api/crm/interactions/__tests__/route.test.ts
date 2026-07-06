@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { makeRequest, chainMock } from '@/test-utils/api-helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { chainMock, makeRequest } from '@/test-utils/api-helpers';
 
 // CRM write-path security regressions (doc audit C-H1 / C-H2 / C-M2).
 
@@ -55,7 +55,10 @@ describe('POST /api/crm/interactions — auth (C-H2)', () => {
 
 describe('POST /api/crm/interactions — bot cannot publish (C-H1)', () => {
   it('strips is_public and forces visibility=private for a bot caller', async () => {
-    const contactChain = chainMock({ data: { id: 'c1', slug: 'zaal', is_public: false }, error: null });
+    const contactChain = chainMock({
+      data: { id: 'c1', slug: 'zaal', is_public: false },
+      error: null,
+    });
     const interactionChain = chainMock({ data: { id: 'i1' }, error: null });
     mockFrom.mockReturnValueOnce(contactChain.chain).mockReturnValueOnce(interactionChain.chain);
 
@@ -81,7 +84,10 @@ describe('POST /api/crm/interactions — bot cannot publish (C-H1)', () => {
 describe('POST /api/crm/interactions — admin can publish (C-H1 inverse)', () => {
   it('keeps is_public=true and visibility=public for an admin session', async () => {
     mockGetSessionData.mockResolvedValue({ fid: 123, isAdmin: true });
-    const contactChain = chainMock({ data: { id: 'c1', slug: 'zaal', is_public: true }, error: null });
+    const contactChain = chainMock({
+      data: { id: 'c1', slug: 'zaal', is_public: true },
+      error: null,
+    });
     const interactionChain = chainMock({ data: { id: 'i1' }, error: null });
     mockFrom.mockReturnValueOnce(contactChain.chain).mockReturnValueOnce(interactionChain.chain);
 
@@ -109,7 +115,10 @@ describe('POST /api/crm/interactions — slug collision (C-M2)', () => {
     // 1st from(): uniqueNameSlug lookup finds "john-smith" already taken.
     const lookupChain = chainMock({ data: [{ slug: 'john-smith' }], error: null });
     // 2nd from(): the contact insert.
-    const contactChain = chainMock({ data: { id: 'c2', slug: 'john-smith-2', is_public: false }, error: null });
+    const contactChain = chainMock({
+      data: { id: 'c2', slug: 'john-smith-2', is_public: false },
+      error: null,
+    });
     // 3rd from(): the interaction insert.
     const interactionChain = chainMock({ data: { id: 'i2' }, error: null });
     mockFrom
@@ -132,7 +141,10 @@ describe('POST /api/crm/interactions — slug collision (C-M2)', () => {
   });
 
   it('contact WITH a handle still upserts (stable key, idempotent)', async () => {
-    const contactChain = chainMock({ data: { id: 'c1', slug: 'zaal', is_public: false }, error: null });
+    const contactChain = chainMock({
+      data: { id: 'c1', slug: 'zaal', is_public: false },
+      error: null,
+    });
     const interactionChain = chainMock({ data: { id: 'i1' }, error: null });
     mockFrom.mockReturnValueOnce(contactChain.chain).mockReturnValueOnce(interactionChain.chain);
 

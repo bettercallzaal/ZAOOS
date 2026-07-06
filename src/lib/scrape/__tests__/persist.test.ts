@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock state the supabase mock reads from.
 const state: { upsertError: unknown; selectData: unknown; selectError: unknown } = {
@@ -36,7 +36,10 @@ describe('cacheScrape', () => {
     const res = await cacheScrape('x', '123', { text: 'hi' });
     expect(res.ok).toBe(true);
     expect(upsertSpy).toHaveBeenCalledTimes(1);
-    const [row, opts] = upsertSpy.mock.calls[0] as [Record<string, unknown>, Record<string, unknown>];
+    const [row, opts] = upsertSpy.mock.calls[0] as [
+      Record<string, unknown>,
+      Record<string, unknown>,
+    ];
     expect(row.source).toBe('x');
     expect(row.key).toBe('123');
     expect(row.data).toEqual({ text: 'hi' });

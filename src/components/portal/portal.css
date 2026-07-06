@@ -30,7 +30,7 @@
 
 /* Grid lines on the floor for depth */
 .portal-floor::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background:
@@ -75,18 +75,31 @@
 .portal-door {
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-              box-shadow 0.6s ease;
+  transition:
+    transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.6s ease;
   will-change: transform;
 }
 
 /* Each door tilts slightly differently for depth variety */
-.portal-door:nth-child(1) { transform: rotateY(-2deg) rotateX(1deg); }
-.portal-door:nth-child(2) { transform: rotateY(0deg) rotateX(0.5deg); }
-.portal-door:nth-child(3) { transform: rotateY(2deg) rotateX(1deg); }
-.portal-door:nth-child(4) { transform: rotateY(-1.5deg) rotateX(0.5deg); }
-.portal-door:nth-child(5) { transform: rotateY(0.5deg) rotateX(0.5deg); }
-.portal-door:nth-child(6) { transform: rotateY(1.5deg) rotateX(1deg); }
+.portal-door:nth-child(1) {
+  transform: rotateY(-2deg) rotateX(1deg);
+}
+.portal-door:nth-child(2) {
+  transform: rotateY(0deg) rotateX(0.5deg);
+}
+.portal-door:nth-child(3) {
+  transform: rotateY(2deg) rotateX(1deg);
+}
+.portal-door:nth-child(4) {
+  transform: rotateY(-1.5deg) rotateX(0.5deg);
+}
+.portal-door:nth-child(5) {
+  transform: rotateY(0.5deg) rotateX(0.5deg);
+}
+.portal-door:nth-child(6) {
+  transform: rotateY(1.5deg) rotateX(1deg);
+}
 
 .portal-door:hover {
   transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.04);
@@ -108,7 +121,7 @@
 
 /* Top edge light beam */
 .portal-inner-glow::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 10%;
@@ -122,7 +135,7 @@
 
 /* Bottom reflection */
 .portal-inner-glow::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 20%;
@@ -153,11 +166,7 @@
   left: 10%;
   right: 10%;
   height: 16px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.4) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
   filter: blur(4px);
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -176,12 +185,7 @@
   right: -2px;
   height: 6px;
   border-radius: 16px 16px 0 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--glow-color, #f5a623),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--glow-color, #f5a623), transparent);
   opacity: 0.4;
   transition: opacity 0.4s ease;
 }
@@ -204,16 +208,24 @@
 }
 
 @keyframes lockPulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
 }
 
 /* ── Destination list ── */
 .portal-destinations {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-              opacity 0.3s ease;
+  transition:
+    max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 0.3s ease;
   opacity: 0;
 }
 
@@ -223,7 +235,9 @@
 }
 
 .portal-dest-link {
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .portal-dest-link:hover {
@@ -240,7 +254,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0);
     opacity: 0.2;
   }
@@ -273,23 +288,44 @@
 }
 
 @keyframes bubbleIn {
-  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ── Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .portal-door { transition-duration: 0.01ms !important; }
-  .portal-particle, .lock-pulse { animation: none !important; }
-  .portal-grid { transform: none; }
+  .portal-door {
+    transition-duration: 0.01ms !important;
+  }
+  .portal-particle,
+  .lock-pulse {
+    animation: none !important;
+  }
+  .portal-grid {
+    transform: none;
+  }
 }
 
 /* ── Mobile ── */
 @media (max-width: 640px) {
-  .portal-room { perspective: 800px; }
-  .portal-grid { transform: rotateX(2deg); }
-  .portal-floor { height: 40%; }
-  .portal-door:nth-child(n) { transform: rotateY(0deg) rotateX(0.5deg); }
+  .portal-room {
+    perspective: 800px;
+  }
+  .portal-grid {
+    transform: rotateX(2deg);
+  }
+  .portal-floor {
+    height: 40%;
+  }
+  .portal-door:nth-child(n) {
+    transform: rotateY(0deg) rotateX(0.5deg);
+  }
   .portal-door:active {
     transform: translateZ(10px) scale(0.97);
   }

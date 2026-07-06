@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SONGJAM_SPACE_LABEL, SONGJAM_SPACE_DESCRIPTION } from '@/lib/spaces/songjam';
+import { SONGJAM_SPACE_DESCRIPTION, SONGJAM_SPACE_LABEL } from '@/lib/spaces/songjam';
 
 /**
  * Persistent entry point to the Songjam-hosted $ZABAL live audio space, shown

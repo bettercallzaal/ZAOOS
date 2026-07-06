@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 // ---------------------------------------------------------------------------
@@ -41,22 +41,38 @@ const TYPE_FILTERS: { value: ContentType; label: string }[] = [
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   cast: (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+      />
     </svg>
   ),
   proposal: (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+      />
     </svg>
   ),
   music: (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
+      />
     </svg>
   ),
   member: (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
     </svg>
   ),
 };
@@ -108,41 +124,38 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     selected?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
 
-  const search = useCallback(
-    async (q: string, type: ContentType) => {
-      if (q.length < 2) {
-        setResults([]);
-        return;
-      }
+  const search = useCallback(async (q: string, type: ContentType) => {
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
 
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          q,
-          type,
-          limit: '20',
-        });
-        const res = await fetch(`/api/search?${params}`, {
-          signal: controller.signal,
-        });
-        if (controller.signal.aborted) return;
-        if (res.ok) {
-          const data = await res.json();
-          setResults(data.results || []);
-          setSelectedIndex(0);
-        }
-      } catch {
-        // Silently handle aborted requests
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        q,
+        type,
+        limit: '20',
+      });
+      const res = await fetch(`/api/search?${params}`, {
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted) return;
+      if (res.ok) {
+        const data = await res.json();
+        setResults(data.results || []);
+        setSelectedIndex(0);
       }
-    },
-    [],
-  );
+    } catch {
+      // Silently handle aborted requests
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  }, []);
 
   const handleChange = (val: string) => {
     setQuery(val);
@@ -320,9 +333,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   />
                 </svg>
                 <p className="text-gray-400 text-sm font-medium mb-1">No results found</p>
-                <p className="text-gray-600 text-xs">
-                  Try different keywords or change the filter
-                </p>
+                <p className="text-gray-600 text-xs">Try different keywords or change the filter</p>
               </div>
             )}
 
@@ -376,26 +387,18 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             {!loading && query.length < 2 && (
               <div className="px-4 py-10 text-center">
                 <p className="text-gray-400 text-sm mb-1">Search across all content</p>
-                <p className="text-gray-600 text-xs mb-4">
-                  Casts, proposals, music, and members
-                </p>
+                <p className="text-gray-600 text-xs mb-4">Casts, proposals, music, and members</p>
                 <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600">
                   <span>
-                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
-                      ↑↓
-                    </kbd>{' '}
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">↑↓</kbd>{' '}
                     navigate
                   </span>
                   <span>
-                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
-                      ↵
-                    </kbd>{' '}
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">↵</kbd>{' '}
                     open
                   </span>
                   <span>
-                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
-                      esc
-                    </kbd>{' '}
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">esc</kbd>{' '}
                     close
                   </span>
                 </div>
@@ -467,9 +470,7 @@ function ResultItem({
 
         {/* Timestamp */}
         {result.timestamp && (
-          <span className="text-[10px] text-gray-600 ml-1">
-            {formatTime(result.timestamp)}
-          </span>
+          <span className="text-[10px] text-gray-600 ml-1">{formatTime(result.timestamp)}</span>
         )}
       </div>
 

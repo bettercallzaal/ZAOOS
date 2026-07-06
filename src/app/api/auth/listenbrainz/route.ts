@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -30,10 +30,7 @@ export async function POST(req: NextRequest) {
 
     await supabaseAdmin
       .from('user_settings')
-      .upsert(
-        { fid: session.fid, listenbrainz_token: parsed.data.token },
-        { onConflict: 'fid' }
-      );
+      .upsert({ fid: session.fid, listenbrainz_token: parsed.data.token }, { onConflict: 'fid' });
 
     return NextResponse.json({ success: true, username: verifyData.user_name });
   } catch (error) {

@@ -824,7 +824,5 @@ export function searchNexus(query: string): NexusLink[] {
 /** Return all links that include the given tag (case-insensitive). */
 export function getNexusByTag(tag: string): NexusLink[] {
   const t = tag.toLowerCase();
-  return flattenLinks().filter((link) =>
-    link.tags?.some((lt) => lt.toLowerCase() === t),
-  );
+  return flattenLinks().filter((link) => link.tags?.some((lt) => lt.toLowerCase() === t));
 }

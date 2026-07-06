@@ -49,10 +49,7 @@ async function main(): Promise<void> {
   const title = `ZAO smoke test ${new Date().toISOString()}`;
   console.log('Creating Juke space:', title);
 
-  const result = await createJukeSpace(
-    { title, allowAgents: true },
-    { apiKey },
-  );
+  const result = await createJukeSpace({ title, allowAgents: true }, { apiKey });
 
   if (!result.ok) {
     console.error(`FAILED — status ${result.status} — ${result.error}`);

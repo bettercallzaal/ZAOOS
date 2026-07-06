@@ -9,7 +9,12 @@ interface CollectButtonProps {
   compact?: boolean;
 }
 
-export default function CollectButton({ assetTxId, collectedCount, bazarUrl, compact }: CollectButtonProps) {
+export default function CollectButton({
+  assetTxId,
+  collectedCount,
+  bazarUrl,
+  compact,
+}: CollectButtonProps) {
   const [collected, setCollected] = useState(false);
   const [count, setCount] = useState(collectedCount);
   const [collecting, setCollecting] = useState(false);

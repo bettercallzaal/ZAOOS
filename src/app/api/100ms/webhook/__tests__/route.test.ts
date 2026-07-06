@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeRequest } from '@/test-utils/api-helpers';
 
 const {
@@ -76,14 +76,18 @@ describe('POST /api/100ms/webhook', () => {
 
   it('no-ops on an unknown room', async () => {
     mockGetMSRoomByHmsRoomId.mockResolvedValue(null);
-    const res = await POST(makeWebhook({ type: 'peer.join.success', data: { room_id: 'hms-x' } }, SECRET));
+    const res = await POST(
+      makeWebhook({ type: 'peer.join.success', data: { room_id: 'hms-x' } }, SECRET),
+    );
     expect(res.status).toBe(200);
     expect(mockSetMSRoomParticipantCount).not.toHaveBeenCalled();
   });
 
   it('refreshes participant_count on peer.join', async () => {
     mockGet100msPeerCount.mockResolvedValue(4);
-    const res = await POST(makeWebhook({ type: 'peer.join.success', data: { room_id: 'hms-1' } }, SECRET));
+    const res = await POST(
+      makeWebhook({ type: 'peer.join.success', data: { room_id: 'hms-1' } }, SECRET),
+    );
     expect(res.status).toBe(200);
     expect(mockSetMSRoomParticipantCount).toHaveBeenCalledWith('room-1', 4);
   });
@@ -95,7 +99,9 @@ describe('POST /api/100ms/webhook', () => {
   });
 
   it('ends the room on session.close', async () => {
-    const res = await POST(makeWebhook({ type: 'session.close.success', data: { room_id: 'hms-1' } }, SECRET));
+    const res = await POST(
+      makeWebhook({ type: 'session.close.success', data: { room_id: 'hms-1' } }, SECRET),
+    );
     expect(res.status).toBe(200);
     expect(mockEndMSRoom).toHaveBeenCalledWith('room-1');
   });
@@ -103,7 +109,10 @@ describe('POST /api/100ms/webhook', () => {
   it('stores a recording url on recording success', async () => {
     const res = await POST(
       makeWebhook(
-        { type: 'beam.recording.success', data: { room_id: 'hms-1', recording_path: 's3://clip.mp4' } },
+        {
+          type: 'beam.recording.success',
+          data: { room_id: 'hms-1', recording_path: 's3://clip.mp4' },
+        },
         SECRET,
       ),
     );

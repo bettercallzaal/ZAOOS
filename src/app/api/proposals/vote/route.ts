@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbi } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { createInAppNotification } from '@/lib/notifications';
-import { proposalVoteSchema } from '@/lib/validation/schemas';
-import { computeRespectWeight } from '@/lib/respect/voteWeight';
 import { logger } from '@/lib/logger';
+import { createInAppNotification } from '@/lib/notifications';
+import { computeRespectWeight } from '@/lib/respect/voteWeight';
+import { proposalVoteSchema } from '@/lib/validation/schemas';
 
 const OG_RESPECT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as const;
 const ZOR_RESPECT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as const;
@@ -32,18 +32,14 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { proposal_id, vote } = parsed.data;
 
     // Fetch proposal and user in parallel (independent queries)
     const [proposalResult, userResult] = await Promise.all([
-      supabaseAdmin
-        .from('proposals')
-        .select('status, closes_at')
-        .eq('id', proposal_id)
-        .single(),
+      supabaseAdmin.from('proposals').select('status, closes_at').eq('id', proposal_id).single(),
       supabaseAdmin
         .from('users')
         .select('id, primary_wallet, respect_wallet')
@@ -83,7 +79,12 @@ export async function POST(req: NextRequest) {
       const [ogBalance, zorBalance] = await client.multicall({
         contracts: [
           { address: OG_RESPECT, abi: ogAbi, functionName: 'balanceOf', args: [wallet] },
-          { address: ZOR_RESPECT, abi: zorAbi, functionName: 'balanceOf', args: [wallet, ZOR_TOKEN_ID] },
+          {
+            address: ZOR_RESPECT,
+            abi: zorAbi,
+            functionName: 'balanceOf',
+            args: [wallet, ZOR_TOKEN_ID],
+          },
         ],
       });
 
@@ -92,7 +93,9 @@ export async function POST(req: NextRequest) {
       // vote. Refuse to record a vote with an incomplete balance read - ask the
       // voter to retry rather than store a corrupted weight.
       if (!computed.complete) {
-        logger.error(`[vote] respect balance read failed (${computed.failed.join(',')}) for ${wallet}`);
+        logger.error(
+          `[vote] respect balance read failed (${computed.failed.join(',')}) for ${wallet}`,
+        );
         return NextResponse.json(
           { error: 'Could not read your on-chain Respect balance. Please try again.' },
           { status: 503 },
@@ -111,7 +114,7 @@ export async function POST(req: NextRequest) {
           vote,
           respect_weight: respectWeight,
         },
-        { onConflict: 'proposal_id,voter_id' }
+        { onConflict: 'proposal_id,voter_id' },
       )
       .select()
       .single();
@@ -151,22 +154,24 @@ export async function POST(req: NextRequest) {
         .from('proposals')
         .select('author_id, title, users!proposals_author_id_fkey(fid)')
         .eq('id', proposal_id)
-        .single()
-    ).then(({ data: p }) => {
-      const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
-      if (authorFid && authorFid !== session.fid) {
-        createInAppNotification({
-          recipientFids: [authorFid],
-          type: 'vote',
-          title: `Vote: ${vote}`,
-          body: `${session.displayName} voted ${vote} on "${(p?.title as string || '').slice(0, 60)}"`,
-          href: '/governance',
-          actorFid: session.fid,
-          actorDisplayName: session.displayName,
-          actorPfpUrl: session.pfpUrl,
-        }).catch((err) => logger.error('[notify]', err));
-      }
-    }).catch((err) => logger.error('[notify]', err));
+        .single(),
+    )
+      .then(({ data: p }) => {
+        const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
+        if (authorFid && authorFid !== session.fid) {
+          createInAppNotification({
+            recipientFids: [authorFid],
+            type: 'vote',
+            title: `Vote: ${vote}`,
+            body: `${session.displayName} voted ${vote} on "${((p?.title as string) || '').slice(0, 60)}"`,
+            href: '/governance',
+            actorFid: session.fid,
+            actorDisplayName: session.displayName,
+            actorPfpUrl: session.pfpUrl,
+          }).catch((err) => logger.error('[notify]', err));
+        }
+      })
+      .catch((err) => logger.error('[notify]', err));
 
     // Check if this vote pushed the proposal over the publish threshold
     // Must await — fire-and-forget gets killed by Vercel function timeout
@@ -181,7 +186,8 @@ export async function POST(req: NextRequest) {
 
     const response: Record<string, unknown> = { vote: voteData, respectWeight, published };
     if (respectWeight === 0) {
-      response.warning = 'Your vote was recorded but has zero weight. Earn Respect through fractal participation to increase your voting power.';
+      response.warning =
+        'Your vote was recorded but has zero weight. Earn Respect through fractal participation to increase your voting power.';
     }
     return NextResponse.json(response);
   } catch (err) {
@@ -225,12 +231,17 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
   const totalRespectFor = (votes || [])
     .filter((v: { vote: string }) => v.vote === 'for')
-    .reduce((sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0), 0);
+    .reduce(
+      (sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0),
+      0,
+    );
 
   const threshold = proposal.respect_threshold || 1000;
 
   if (totalRespectFor >= threshold) {
-    logger.info(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
+    logger.info(
+      `[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`,
+    );
 
     const { data: fullProposal } = await supabaseAdmin
       .from('proposals')
@@ -240,10 +251,12 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
     if (!fullProposal) return false;
 
-    const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
+    const authorName =
+      fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
     // Use publish_text if set, otherwise title only (avoid duplicating if title === description)
-    const publishText = fullProposal.publish_text
-      || (fullProposal.title === fullProposal.description
+    const publishText =
+      fullProposal.publish_text ||
+      (fullProposal.title === fullProposal.description
         ? fullProposal.title
         : `${fullProposal.title}\n\n${fullProposal.description}`);
     const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
@@ -256,8 +269,12 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     // Publish to Farcaster + Bluesky in parallel (independent of each other)
     const ENV = await import('@/lib/env').then((m) => m.ENV);
     const isWavewarz = fullProposal.category === 'wavewarz';
-    const signerUuid = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_SIGNER_UUID : ENV.ZAO_OFFICIAL_SIGNER_UUID;
-    const neynarApiKey = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY : ENV.ZAO_OFFICIAL_NEYNAR_API_KEY;
+    const signerUuid = isWavewarz
+      ? ENV.WAVEWARZ_OFFICIAL_SIGNER_UUID
+      : ENV.ZAO_OFFICIAL_SIGNER_UUID;
+    const neynarApiKey = isWavewarz
+      ? ENV.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY
+      : ENV.ZAO_OFFICIAL_NEYNAR_API_KEY;
     const publishChannel = isWavewarz ? 'wavewarz' : 'zao';
 
     const [fcResult, bskyResult] = await Promise.allSettled([
@@ -268,11 +285,14 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         }
         const { postCast } = await import('@/lib/farcaster/neynar');
         const maxLen = 1024 - attribution.length;
-        const castText = publishText.length > maxLen
-          ? publishText.slice(0, maxLen - 3) + '...' + attribution
-          : publishText + attribution;
+        const castText =
+          publishText.length > maxLen
+            ? publishText.slice(0, maxLen - 3) + '...' + attribution
+            : publishText + attribution;
 
-        const embedUrls = fullProposal.publish_image_url ? [fullProposal.publish_image_url] : undefined;
+        const embedUrls = fullProposal.publish_image_url
+          ? [fullProposal.publish_image_url]
+          : undefined;
 
         const result = await postCast(
           signerUuid,
@@ -290,10 +310,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       // Bluesky
       (async () => {
         const { postToBluesky } = await import('@/lib/bluesky/client');
-        return postToBluesky(
-          publishText + attribution,
-          'https://zaoos.com/governance',
-        );
+        return postToBluesky(publishText + attribution, 'https://zaoos.com/governance');
       })(),
     ]);
 
@@ -302,7 +319,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       castHash = fcResult.value;
       logger.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
     } else {
-      fcError = fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
+      fcError =
+        fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
       if (fcError.includes('Signer not configured')) {
         logger.warn(`[publish-threshold] ${fcError}`);
       } else {
@@ -317,7 +335,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         logger.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
       }
     } else {
-      bskyError = bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
+      bskyError =
+        bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
       logger.error('[publish-threshold] Bluesky publish failed:', bskyError);
     }
 
@@ -342,7 +361,14 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         const xAttribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
         const xText = publishText + xAttribution;
         const truncated = xText.length > 280 ? xText.slice(0, 277) + '...' : xText;
-        const content = { text: truncated, images: [] as string[], embeds: [], attribution: '', castHash: castHash || '', castUrl: '' };
+        const content = {
+          text: truncated,
+          images: [] as string[],
+          embeds: [],
+          attribution: '',
+          castHash: castHash || '',
+          castUrl: '',
+        };
         const xResult = await publishToX(content);
         return { platform: 'x' as const, url: xResult.tweetUrl };
       })(),
@@ -410,7 +436,10 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           const result = await publishToThreads(normalized);
           return { platform: 'threads' as const, url: result.postUrl };
         } catch (e) {
-          return { platform: 'threads' as const, error: e instanceof Error ? e.message : 'Threads publish failed' };
+          return {
+            platform: 'threads' as const,
+            error: e instanceof Error ? e.message : 'Threads publish failed',
+          };
         }
       })(),
     ]);
@@ -422,8 +451,10 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       if (val.platform === 'x') {
         if ('error' in val) {
           xError = val.error || 'Unknown X error';
-          if (xError.includes('CreditsDepleted')) xError = 'X credits depleted — add credits at developer.x.com';
-          else if (xError.includes('403')) xError = 'X permissions error — check app has Read+Write';
+          if (xError.includes('CreditsDepleted'))
+            xError = 'X credits depleted — add credits at developer.x.com';
+          else if (xError.includes('403'))
+            xError = 'X permissions error — check app has Read+Write';
           else if (xError.includes('401')) xError = 'X auth failed — check API keys';
           logger.error('[publish-threshold] X publish failed:', xError);
         } else if ('url' in val) {

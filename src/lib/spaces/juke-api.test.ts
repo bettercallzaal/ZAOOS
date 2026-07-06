@@ -1,10 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  createJukeSpace,
-  extractSpaceId,
-  JUKE_API_ORIGIN,
-  type JukeCredentials,
-} from './juke-api';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createJukeSpace, extractSpaceId, JUKE_API_ORIGIN, type JukeCredentials } from './juke-api';
 
 /** Credentials for tests that do not assert on the values. */
 const CREDS: JukeCredentials = { apiKey: 'jk_sec_live_test' };
@@ -75,10 +70,7 @@ describe('createJukeSpace', () => {
   it('posts to the developer endpoint with the api key header only', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ id: 'abc123' }) });
 
-    await createJukeSpace(
-      { title: 'ZAO Standup' },
-      { apiKey: 'jk_sec_live_test' },
-    );
+    await createJukeSpace({ title: 'ZAO Standup' }, { apiKey: 'jk_sec_live_test' });
 
     expect(fetch).toHaveBeenCalledTimes(1);
     const [url, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
@@ -155,10 +147,7 @@ describe('createJukeSpace', () => {
   it('surfaces a non-2xx Juke response with its status', async () => {
     mockFetchOnce({ ok: false, status: 401, json: () => ({}) });
 
-    const result = await createJukeSpace(
-      { title: 'ZAO Live' },
-      { apiKey: 'bad-key' },
-    );
+    const result = await createJukeSpace({ title: 'ZAO Live' }, { apiKey: 'bad-key' });
 
     expect(result.ok).toBe(false);
     if (!result.ok) {

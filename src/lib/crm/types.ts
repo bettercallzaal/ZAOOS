@@ -1,14 +1,7 @@
 // Shared CRM types + helpers. Doc 772. Backed by crm_contacts / crm_interactions
 // (see scripts/20260529_crm.sql). Public reads go through the *_public views.
 
-export type InteractionType =
-  | 'meeting'
-  | 'call'
-  | 'email'
-  | 'message'
-  | 'gcal'
-  | 'github'
-  | 'note';
+export type InteractionType = 'meeting' | 'call' | 'email' | 'message' | 'gcal' | 'github' | 'note';
 
 export type Visibility = 'public' | 'private';
 
@@ -103,11 +96,7 @@ export function deriveContactSlug(input: {
   name: string;
 }): string {
   const raw =
-    input.slug ||
-    input.farcaster_handle ||
-    input.x_handle ||
-    input.github_handle ||
-    input.name;
+    input.slug || input.farcaster_handle || input.x_handle || input.github_handle || input.name;
   return slugify(raw);
 }
 
@@ -123,12 +112,7 @@ export function hasStableContactKey(input: {
   x_handle?: string | null;
   github_handle?: string | null;
 }): boolean {
-  return Boolean(
-    input.slug ||
-      input.farcaster_handle ||
-      input.x_handle ||
-      input.github_handle,
-  );
+  return Boolean(input.slug || input.farcaster_handle || input.x_handle || input.github_handle);
 }
 
 export function slugify(value: string): string {

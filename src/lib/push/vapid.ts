@@ -28,7 +28,7 @@ export interface PushPayload {
  */
 export async function sendPushNotification(
   subscription: webpush.PushSubscription,
-  payload: PushPayload
+  payload: PushPayload,
 ): Promise<boolean> {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
     logger.warn('[push] VAPID keys not configured — skipping push notification');

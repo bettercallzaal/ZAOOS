@@ -34,7 +34,8 @@ async function readStdin(): Promise<string> {
 
 async function main() {
   const apiKey = requireEnv('MINIMAX_API_KEY');
-  const endpoint = process.env.MINIMAX_API_URL || 'https://api.minimaxi.com/v1/text/chatcompletion_v2';
+  const endpoint =
+    process.env.MINIMAX_API_URL || 'https://api.minimaxi.com/v1/text/chatcompletion_v2';
   const model = process.env.MINIMAX_MODEL || 'MiniMax-M2.7';
 
   const promptFromFlag = getArgValue('--prompt') || getArgValue('-p');
@@ -64,7 +65,9 @@ async function main() {
       model,
       messages,
       ...(typeof temperature === 'number' && Number.isFinite(temperature) ? { temperature } : {}),
-      ...(typeof maxTokens === 'number' && Number.isFinite(maxTokens) ? { max_tokens: maxTokens } : {}),
+      ...(typeof maxTokens === 'number' && Number.isFinite(maxTokens)
+        ? { max_tokens: maxTokens }
+        : {}),
     }),
   });
 

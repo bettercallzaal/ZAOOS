@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { makeRequest, chainMock } from '@/test-utils/api-helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { chainMock, makeRequest } from '@/test-utils/api-helpers';
 
 // Playlist track DELETE ownership (doc 841 round-2 security-authz HIGH:
 // "IDOR: Unauthorized playlist track deletion without ownership verification").
@@ -46,7 +46,10 @@ describe('DELETE /api/music/playlists/[id]/tracks — ownership (IDOR)', () => {
 
   it('returns 403 when caller does not own a non-collaborative playlist (the IDOR fix)', async () => {
     // Playlist owned by a DIFFERENT fid, not collaborative.
-    const playlistChain = chainMock({ data: { created_by_fid: 999, collaborative: false }, error: null });
+    const playlistChain = chainMock({
+      data: { created_by_fid: 999, collaborative: false },
+      error: null,
+    });
     const deleteChain = chainMock({ error: null });
     mockFrom.mockReturnValueOnce(playlistChain.chain).mockReturnValueOnce(deleteChain.chain);
 
@@ -64,7 +67,10 @@ describe('DELETE /api/music/playlists/[id]/tracks — ownership (IDOR)', () => {
   });
 
   it('allows the owner to delete a track (200)', async () => {
-    const playlistChain = chainMock({ data: { created_by_fid: 100, collaborative: false }, error: null });
+    const playlistChain = chainMock({
+      data: { created_by_fid: 100, collaborative: false },
+      error: null,
+    });
     const deleteChain = chainMock({ error: null });
     mockFrom.mockReturnValueOnce(playlistChain.chain).mockReturnValueOnce(deleteChain.chain);
 
@@ -74,7 +80,10 @@ describe('DELETE /api/music/playlists/[id]/tracks — ownership (IDOR)', () => {
   });
 
   it('allows deletion on a collaborative playlist owned by another user (200)', async () => {
-    const playlistChain = chainMock({ data: { created_by_fid: 999, collaborative: true }, error: null });
+    const playlistChain = chainMock({
+      data: { created_by_fid: 999, collaborative: true },
+      error: null,
+    });
     const deleteChain = chainMock({ error: null });
     mockFrom.mockReturnValueOnce(playlistChain.chain).mockReturnValueOnce(deleteChain.chain);
 

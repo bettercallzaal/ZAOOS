@@ -1,6 +1,11 @@
 'use client';
 
-import { useCallStateHooks, ParticipantView, hasScreenShare, hasAudio } from '@stream-io/video-react-sdk';
+import {
+  hasAudio,
+  hasScreenShare,
+  ParticipantView,
+  useCallStateHooks,
+} from '@stream-io/video-react-sdk';
 import Image from 'next/image';
 
 interface ContentViewProps {

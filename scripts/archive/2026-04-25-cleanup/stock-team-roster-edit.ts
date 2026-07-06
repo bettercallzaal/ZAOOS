@@ -9,9 +9,10 @@
 //   - DM Iman his code from the plaintext list
 
 import { config } from 'dotenv';
+
 config({ path: '.env.local' });
 
-import { scryptSync, randomBytes } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -49,9 +50,7 @@ console.log('BEGIN;');
 console.log('');
 
 console.log('-- 1. Ensure `active` column exists (idempotent)');
-console.log(
-  `ALTER TABLE stock_team_members ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT true;`,
-);
+console.log(`ALTER TABLE stock_team_members ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT true;`);
 console.log('');
 
 console.log('-- 2. Deactivate (bandwidth constraints - rejoin later)');

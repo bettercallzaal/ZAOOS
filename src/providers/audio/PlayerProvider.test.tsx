@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
-import type { PlayerAction } from './PlayerProvider';
+import { act, renderHook } from '@testing-library/react';
+import type React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TrackMetadata } from '@/types/music';
-import React from 'react';
+import type { PlayerAction } from './PlayerProvider';
+import { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
 
 // ─── Test helpers ─────────────────────────────────────────────────────────────
 const spotifyTrack: TrackMetadata = {
@@ -25,13 +25,21 @@ vi.stubGlobal('localStorage', {
 
 vi.stubGlobal('fetch', vi.fn());
 
-vi.stubGlobal('MediaMetadata', class MediaMetadata {
-  title: string; artist: string; album: string; artwork: unknown[];
-  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
-    this.title = init.title ?? ''; this.artist = init.artist ?? '';
-    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
-  }
-});
+vi.stubGlobal(
+  'MediaMetadata',
+  class MediaMetadata {
+    title: string;
+    artist: string;
+    album: string;
+    artwork: unknown[];
+    constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+      this.title = init.title ?? '';
+      this.artist = init.artist ?? '';
+      this.album = init.album ?? '';
+      this.artwork = init.artwork ?? [];
+    }
+  },
+);
 
 // Mock navigator.mediaSession
 const mockSetActionHandler = vi.fn();
@@ -124,10 +132,9 @@ describe('usePlayer actions', () => {
   });
 
   it('pause() dispatches PAUSE when playing', () => {
-    const { result } = renderHook(
-      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
-      { wrapper: Wrapper },
-    );
+    const { result } = renderHook(() => ({ player: usePlayer(), ctx: usePlayerContext() }), {
+      wrapper: Wrapper,
+    });
 
     act(() => {
       result.current.player.play(spotifyTrack);
@@ -293,10 +300,9 @@ describe('PlayerProvider reducer', () => {
   });
 
   it('RESUME transitions paused to playing', () => {
-    const { result } = renderHook(
-      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
-      { wrapper: Wrapper },
-    );
+    const { result } = renderHook(() => ({ player: usePlayer(), ctx: usePlayerContext() }), {
+      wrapper: Wrapper,
+    });
 
     act(() => result.current.player.play(spotifyTrack));
     // Simulate controller firing LOADED (loading → playing)

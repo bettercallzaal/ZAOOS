@@ -16,7 +16,6 @@ import type { NormalizedContent } from '@/lib/publish/normalize';
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 
-
 /**
  * Derive a 32-byte key from SESSION_SECRET (which may be any length).
  */
@@ -66,10 +65,7 @@ export function decryptPostingKey(encrypted: string): string {
 // Hive client
 // ---------------------------------------------------------------------------
 
-const HIVE_NODES = [
-  'https://api.hive.blog',
-  'https://api.deathwing.me',
-];
+const HIVE_NODES = ['https://api.hive.blog', 'https://api.deathwing.me'];
 
 /**
  * Get a configured dhive Client connected to public Hive API nodes.

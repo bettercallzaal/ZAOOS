@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { usePlayer } from '@/providers/audio';
+import { useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { usePlayer } from '@/providers/audio';
 import { MusicIcon } from './MusicPageUtils';
 
 type AudiusTrendingTrack = {
@@ -93,11 +93,13 @@ export function TrendingSection() {
                 className="flex-shrink-0 w-[140px] group text-left"
               >
                 {/* Album art */}
-                <div className={`w-[140px] h-[140px] rounded-xl border mb-2 overflow-hidden relative transition-colors ${
-                  isThisTrack
-                    ? 'border-[#f5a623]/40 shadow-lg shadow-[#f5a623]/10'
-                    : 'border-white/[0.08] group-hover:border-white/[0.08]'
-                }`}>
+                <div
+                  className={`w-[140px] h-[140px] rounded-xl border mb-2 overflow-hidden relative transition-colors ${
+                    isThisTrack
+                      ? 'border-[#f5a623]/40 shadow-lg shadow-[#f5a623]/10'
+                      : 'border-white/[0.08] group-hover:border-white/[0.08]'
+                  }`}
+                >
                   <ArtworkImage
                     src={track.artwork?.['480x480'] || track.artwork?.['150x150'] || null}
                     alt={track.title}
@@ -105,9 +107,13 @@ export function TrendingSection() {
                     className="object-cover"
                     sizes="140px"
                   />
-                  <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${
-                    isThisPlaying ? 'opacity-100 bg-black/40' : 'opacity-0 group-hover:opacity-100 bg-black/30'
-                  }`}>
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center transition-opacity ${
+                      isThisPlaying
+                        ? 'opacity-100 bg-black/40'
+                        : 'opacity-0 group-hover:opacity-100 bg-black/30'
+                    }`}
+                  >
                     {isThisPlaying ? (
                       <div className="flex items-end gap-px">
                         {[1, 2, 3].map((i) => (
@@ -124,14 +130,20 @@ export function TrendingSection() {
                       </div>
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-[#f5a623]/90 flex items-center justify-center">
-                        <svg className="w-5 h-5 ml-0.5 text-[#0a1628]" viewBox="0 0 24 24" fill="currentColor">
+                        <svg
+                          className="w-5 h-5 ml-0.5 text-[#0a1628]"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
                     )}
                   </div>
                 </div>
-                <p className={`text-sm font-medium truncate ${isThisTrack ? 'text-[#f5a623]' : 'text-white'}`}>
+                <p
+                  className={`text-sm font-medium truncate ${isThisTrack ? 'text-[#f5a623]' : 'text-white'}`}
+                >
                   {track.title}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{track.user.name}</p>

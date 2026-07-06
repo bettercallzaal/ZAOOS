@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockFrom } = vi.hoisted(() => ({ mockFrom: vi.fn() }));
 
@@ -23,7 +23,12 @@ function listChain(result: { data?: unknown; error?: unknown }) {
   return chain;
 }
 const req = (q = '') => new NextRequest(`http://localhost:3000/api/discord/intros${q}`);
-const intro = { discord_id: '123', discord_username: 'bob', intro_text: 'hi', posted_at: '2026-01-01' };
+const intro = {
+  discord_id: '123',
+  discord_username: 'bob',
+  intro_text: 'hi',
+  posted_at: '2026-01-01',
+};
 
 describe('GET /api/discord/intros', () => {
   beforeEach(() => vi.clearAllMocks());

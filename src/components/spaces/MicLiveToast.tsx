@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { useCallStateHooks } from '@stream-io/video-react-sdk';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * One-time confirmation toast that fires the first time the user unmutes in

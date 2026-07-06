@@ -34,9 +34,7 @@ export interface AgentJoinInput {
 
 const ENDPOINT_BASE = 'https://api.juke.audio/v1/developer/rooms';
 
-export async function joinAgentInJukeRoom(
-  input: AgentJoinInput,
-): Promise<AgentJoinResult> {
+export async function joinAgentInJukeRoom(input: AgentJoinInput): Promise<AgentJoinResult> {
   const apiKey = ENV.JUKE_API_KEY;
   if (!apiKey) {
     return { ok: false, error: 'JUKE_API_KEY not configured' };

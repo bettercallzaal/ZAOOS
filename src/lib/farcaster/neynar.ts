@@ -241,7 +241,7 @@ export async function registerSignedKey(
   signerUuid: string,
   appFid: number,
   deadline: number,
-  signature: string
+  signature: string,
 ) {
   const res = await fetch(`${NEYNAR_BASE}/signer/signed_key`, {
     method: 'POST',
@@ -280,7 +280,13 @@ export async function searchUsers(query: string, limit = 5) {
   return res.json();
 }
 
-export async function getFollowers(fid: number, viewerFid?: number, sortType: 'desc_chron' | 'algorithmic' = 'desc_chron', cursor?: string, limit = 100) {
+export async function getFollowers(
+  fid: number,
+  viewerFid?: number,
+  sortType: 'desc_chron' | 'algorithmic' = 'desc_chron',
+  cursor?: string,
+  limit = 100,
+) {
   const params = new URLSearchParams({
     fid: String(fid),
     sort_type: sortType,
@@ -298,7 +304,13 @@ export async function getFollowers(fid: number, viewerFid?: number, sortType: 'd
   return res.json();
 }
 
-export async function getFollowing(fid: number, viewerFid?: number, sortType: 'desc_chron' | 'algorithmic' = 'desc_chron', cursor?: string, limit = 100) {
+export async function getFollowing(
+  fid: number,
+  viewerFid?: number,
+  sortType: 'desc_chron' | 'algorithmic' = 'desc_chron',
+  cursor?: string,
+  limit = 100,
+) {
   const params = new URLSearchParams({
     fid: String(fid),
     sort_type: sortType,
@@ -361,7 +373,7 @@ export async function registerUser(
   signature: string,
   custodyAddress: string,
   deadline: number,
-  fname?: string
+  fname?: string,
 ) {
   const body: Record<string, unknown> = {
     signature,

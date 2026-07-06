@@ -24,8 +24,13 @@ export function JitsiRoom({ roomName, displayName, audioOnly = true, onClose }: 
         }}
         interfaceConfigOverwrite={{
           TOOLBAR_BUTTONS: [
-            'microphone', 'camera', 'chat', 'raisehand',
-            'participants-pane', 'hangup', 'tileview',
+            'microphone',
+            'camera',
+            'chat',
+            'raisehand',
+            'participants-pane',
+            'hangup',
+            'tileview',
           ],
           SHOW_JITSI_WATERMARK: false,
           SHOW_WATERMARK_FOR_GUESTS: false,

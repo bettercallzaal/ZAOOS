@@ -16,47 +16,130 @@ export const repoMap: { group: string; areas: RepoArea[] }[] = [
   {
     group: 'App & API',
     areas: [
-      { area: 'API routes', path: 'src/app/api/', desc: 'Route handlers across 56 domains', count: '336 files' },
-      { area: 'Gated pages', path: 'src/app/(auth)/', desc: 'Logged-in surfaces — home, chat, music, governance, admin, this page', count: '28 pages' },
-      { area: 'Public pages', path: 'src/app/', desc: 'Landing, research, members, network, spaces, live, juke, stake', count: '18 pages' },
+      {
+        area: 'API routes',
+        path: 'src/app/api/',
+        desc: 'Route handlers across 56 domains',
+        count: '336 files',
+      },
+      {
+        area: 'Gated pages',
+        path: 'src/app/(auth)/',
+        desc: 'Logged-in surfaces — home, chat, music, governance, admin, this page',
+        count: '28 pages',
+      },
+      {
+        area: 'Public pages',
+        path: 'src/app/',
+        desc: 'Landing, research, members, network, spaces, live, juke, stake',
+        count: '18 pages',
+      },
     ],
   },
   {
     group: 'UI',
     areas: [
-      { area: 'Components', path: 'src/components/', desc: 'React components by feature', count: '304 files / 37 domains' },
-      { area: 'Hooks', path: 'src/hooks/', desc: 'useAuth, useChat, useRadio, …', count: '19 hooks' },
+      {
+        area: 'Components',
+        path: 'src/components/',
+        desc: 'React components by feature',
+        count: '304 files / 37 domains',
+      },
+      {
+        area: 'Hooks',
+        path: 'src/hooks/',
+        desc: 'useAuth, useChat, useRadio, …',
+        count: '19 hooks',
+      },
       { area: 'Providers', path: 'src/providers/', desc: 'Audio player + context providers' },
     ],
   },
   {
     group: 'Business logic — src/lib (42 domains)',
     areas: [
-      { area: 'auth / db', path: 'src/lib/{auth,db}', desc: 'iron-session (FID + wallet + admin) + Supabase RLS (service-role server-only)' },
-      { area: 'social', path: 'src/lib/{farcaster,bluesky,social,publish}', desc: 'Neynar, Bluesky, cross-platform posting (Farcaster / X / Bluesky)' },
-      { area: 'on-chain', path: 'src/lib/{respect,hats,zounz,staking,wagmi,solana,ens}', desc: 'Respect tokens, Hats roles, Nouns DAO, staking, wallets' },
-      { area: 'media', path: 'src/lib/{music,livepeer,jina}', desc: 'Audius radio, video streaming, content extraction' },
-      { area: 'governance', path: 'src/lib/{snapshot,ordao}', desc: 'Snapshot gasless voting, DAO governance' },
-      { area: 'agents', path: 'src/lib/agents/', desc: 'VAULT / BANKER / DEALER autonomous trading bots' },
+      {
+        area: 'auth / db',
+        path: 'src/lib/{auth,db}',
+        desc: 'iron-session (FID + wallet + admin) + Supabase RLS (service-role server-only)',
+      },
+      {
+        area: 'social',
+        path: 'src/lib/{farcaster,bluesky,social,publish}',
+        desc: 'Neynar, Bluesky, cross-platform posting (Farcaster / X / Bluesky)',
+      },
+      {
+        area: 'on-chain',
+        path: 'src/lib/{respect,hats,zounz,staking,wagmi,solana,ens}',
+        desc: 'Respect tokens, Hats roles, Nouns DAO, staking, wallets',
+      },
+      {
+        area: 'media',
+        path: 'src/lib/{music,livepeer,jina}',
+        desc: 'Audius radio, video streaming, content extraction',
+      },
+      {
+        area: 'governance',
+        path: 'src/lib/{snapshot,ordao}',
+        desc: 'Snapshot gasless voting, DAO governance',
+      },
+      {
+        area: 'agents',
+        path: 'src/lib/agents/',
+        desc: 'VAULT / BANKER / DEALER autonomous trading bots',
+      },
     ],
   },
   {
     group: 'Bot fleet — bot/',
     areas: [
-      { area: 'ZOE', path: 'bot/src/zoe/', desc: 'Concierge — tasks, captures, brief/reflect, recall' },
-      { area: 'Hermes', path: 'bot/src/hermes/', desc: 'Autonomous fix-PR pipeline (coder Opus + critic Sonnet)' },
+      {
+        area: 'ZOE',
+        path: 'bot/src/zoe/',
+        desc: 'Concierge — tasks, captures, brief/reflect, recall',
+      },
+      {
+        area: 'Hermes',
+        path: 'bot/src/hermes/',
+        desc: 'Autonomous fix-PR pipeline (coder Opus + critic Sonnet)',
+      },
       { area: 'ZAO Devz', path: 'bot/src/devz/', desc: 'Group /fix dispatch + dual-bot narration' },
-      { area: 'Control plane', path: 'bot/src/lib/cowork.ts · bot/src/fleet-agent/', desc: 'Heartbeats, activity events, command queue, host supervisor' },
-      { area: 'ZAOstock', path: 'bot/src/index.ts', desc: 'Festival team coordination (graduating spinout)' },
+      {
+        area: 'Control plane',
+        path: 'bot/src/lib/cowork.ts · bot/src/fleet-agent/',
+        desc: 'Heartbeats, activity events, command queue, host supervisor',
+      },
+      {
+        area: 'ZAOstock',
+        path: 'bot/src/index.ts',
+        desc: 'Festival team coordination (graduating spinout)',
+      },
     ],
   },
   {
     group: 'Knowledge & infra',
     areas: [
-      { area: 'Research', path: 'research/', desc: 'Institutional memory across every product', count: '1,183 docs / 30 categories' },
-      { area: 'Skills', path: '.claude/skills/', desc: 'Custom Claude Code tooling (see Tooling tab)', count: '28 skills' },
-      { area: 'Scripts', path: 'scripts/', desc: 'SQL migrations, wallet generation, webhooks, bonfire ingest' },
-      { area: 'Config', path: 'community.config.ts', desc: 'Branding, channels, contracts, admin FIDs, theme' },
+      {
+        area: 'Research',
+        path: 'research/',
+        desc: 'Institutional memory across every product',
+        count: '1,183 docs / 30 categories',
+      },
+      {
+        area: 'Skills',
+        path: '.claude/skills/',
+        desc: 'Custom Claude Code tooling (see Tooling tab)',
+        count: '28 skills',
+      },
+      {
+        area: 'Scripts',
+        path: 'scripts/',
+        desc: 'SQL migrations, wallet generation, webhooks, bonfire ingest',
+      },
+      {
+        area: 'Config',
+        path: 'community.config.ts',
+        desc: 'Branding, channels, contracts, admin FIDs, theme',
+      },
     ],
   },
 ];
@@ -76,13 +159,60 @@ export interface BotRow {
 }
 
 export const botFleet: BotRow[] = [
-  { name: 'ZOE', handle: '@zaoclaw_bot', source: 'bot/src/zoe/', status: 'live', board: 'On board — full ask / run_task / lifecycle', coworkId: 'zoe' },
-  { name: 'ZAO Devz', handle: '@zaodevz_bot', source: 'bot/src/devz/', status: 'live', board: 'On board — lifecycle', coworkId: 'zao-devz' },
-  { name: 'Hermes', handle: '@zoe_hermes_bot', source: 'bot/src/hermes/ (in zao-devz-stack)', status: 'pending', board: 'Wired — needs token + Vercel redeploy', coworkId: 'hermes' },
-  { name: 'ZAOstock', handle: '@ZAOstockTeamBot', source: 'bot/src/index.ts', status: 'live', board: 'On board — lifecycle (graduating). Digests/alerts now DM Zaal, not the group', coworkId: 'zaostock' },
-  { name: 'Bonfire', handle: '@zabal_bonfire', source: 'bonfires.ai', status: 'external', board: 'Off-VPS (Bonfires platform)' },
-  { name: 'DeepMeeting', handle: '@zdeepmeeting_bot', source: 'bonfires.ai', status: 'external', board: 'Off-VPS — group routing broken' },
-  { name: 'farscout', handle: 'Discord (DM + slash cmds)', source: 'github.com/bettercallzaal/farscout (cowork VPS 187.77.3.104)', status: 'live', board: 'Farcaster research scout — grounds findings in real sources, writes to ZABAL Bonfire (ZOE recalls via delve)' },
+  {
+    name: 'ZOE',
+    handle: '@zaoclaw_bot',
+    source: 'bot/src/zoe/',
+    status: 'live',
+    board: 'On board — full ask / run_task / lifecycle',
+    coworkId: 'zoe',
+  },
+  {
+    name: 'ZAO Devz',
+    handle: '@zaodevz_bot',
+    source: 'bot/src/devz/',
+    status: 'live',
+    board: 'On board — lifecycle',
+    coworkId: 'zao-devz',
+  },
+  {
+    name: 'Hermes',
+    handle: '@zoe_hermes_bot',
+    source: 'bot/src/hermes/ (in zao-devz-stack)',
+    status: 'pending',
+    board: 'Wired — needs token + Vercel redeploy',
+    coworkId: 'hermes',
+  },
+  {
+    name: 'ZAOstock',
+    handle: '@ZAOstockTeamBot',
+    source: 'bot/src/index.ts',
+    status: 'live',
+    board: 'On board — lifecycle (graduating). Digests/alerts now DM Zaal, not the group',
+    coworkId: 'zaostock',
+  },
+  {
+    name: 'Bonfire',
+    handle: '@zabal_bonfire',
+    source: 'bonfires.ai',
+    status: 'external',
+    board: 'Off-VPS (Bonfires platform)',
+  },
+  {
+    name: 'DeepMeeting',
+    handle: '@zdeepmeeting_bot',
+    source: 'bonfires.ai',
+    status: 'external',
+    board: 'Off-VPS — group routing broken',
+  },
+  {
+    name: 'farscout',
+    handle: 'Discord (DM + slash cmds)',
+    source: 'github.com/bettercallzaal/farscout (cowork VPS 187.77.3.104)',
+    status: 'live',
+    board:
+      'Farcaster research scout — grounds findings in real sources, writes to ZABAL Bonfire (ZOE recalls via delve)',
+  },
 ];
 
 export const controlPlane = {
@@ -118,7 +248,10 @@ export const tooling: { group: string; skills: SkillItem[] }[] = [
   {
     group: 'Research & knowledge',
     skills: [
-      { name: '/zao-research', desc: 'Search 1,183 research docs + code + web, save a numbered doc' },
+      {
+        name: '/zao-research',
+        desc: 'Search 1,183 research docs + code + web, save a numbered doc',
+      },
       { name: '/autoresearch', desc: 'Autonomous modify→verify→keep/discard loop on any metric' },
       { name: '/deep-research', desc: 'Fan-out web search, verify claims, cited report' },
       { name: '/bonfire', desc: 'Post episodes to the ZABAL knowledge graph (via VPS)' },

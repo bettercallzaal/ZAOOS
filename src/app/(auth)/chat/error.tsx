@@ -21,10 +21,7 @@ export default function ChatError({
           >
             Reload Chat
           </button>
-          <a
-            href="/chat"
-            className="text-gray-400 text-sm hover:text-white transition-colors"
-          >
+          <a href="/chat" className="text-gray-400 text-sm hover:text-white transition-colors">
             Go home
           </a>
         </div>

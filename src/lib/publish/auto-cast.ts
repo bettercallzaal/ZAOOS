@@ -19,10 +19,7 @@ const MAX_CAST_LENGTH = 320;
  * @param embedUrl Optional URL to embed (Farcaster will unfurl it)
  * @returns        Cast hash string on success, or null on failure / missing config
  */
-export async function autoCastToZao(
-  text: string,
-  embedUrl?: string,
-): Promise<string | null> {
+export async function autoCastToZao(text: string, embedUrl?: string): Promise<string | null> {
   const signerUuid = process.env.ZAO_OFFICIAL_SIGNER_UUID;
   const apiKey = process.env.ZAO_OFFICIAL_NEYNAR_API_KEY;
 
@@ -33,9 +30,7 @@ export async function autoCastToZao(
   try {
     // Truncate to Farcaster's character limit
     const safeText =
-      text.length > MAX_CAST_LENGTH
-        ? text.slice(0, MAX_CAST_LENGTH - 1) + '\u2026'
-        : text;
+      text.length > MAX_CAST_LENGTH ? text.slice(0, MAX_CAST_LENGTH - 1) + '\u2026' : text;
 
     const embedUrls = embedUrl ? [embedUrl] : undefined;
 

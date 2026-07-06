@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
-import { renderHook } from '@testing-library/react';
-import { GlobalPlayer } from './GlobalPlayer';
+import { act, render, renderHook, screen } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PlayerProvider, usePlayer, usePlayerContext } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
-import React from 'react';
+import { GlobalPlayer } from './GlobalPlayer';
 
 // ─── Test data ────────────────────────────────────────────────────────────────
 const spotifyTrack: TrackMetadata = {
@@ -48,13 +47,21 @@ vi.stubGlobal('navigator', {
 
 vi.stubGlobal('fetch', vi.fn());
 
-vi.stubGlobal('MediaMetadata', class MediaMetadata {
-  title: string; artist: string; album: string; artwork: unknown[];
-  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
-    this.title = init.title ?? ''; this.artist = init.artist ?? '';
-    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
-  }
-});
+vi.stubGlobal(
+  'MediaMetadata',
+  class MediaMetadata {
+    title: string;
+    artist: string;
+    album: string;
+    artwork: unknown[];
+    constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+      this.title = init.title ?? '';
+      this.artist = init.artist ?? '';
+      this.album = init.album ?? '';
+      this.artwork = init.artwork ?? [];
+    }
+  },
+);
 
 // ─── Mock child components ─────────────────────────────────────────────────────
 vi.mock('./Scrubber', () => ({ Scrubber: () => <div data-testid="scrubber" /> }));
@@ -260,10 +267,9 @@ describe('GlobalPlayer — usePlayer integration', () => {
   });
 
   it('pause() transitions status to paused', async () => {
-    const { result } = renderHook(
-      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
-      { wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider> },
-    );
+    const { result } = renderHook(() => ({ player: usePlayer(), ctx: usePlayerContext() }), {
+      wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider>,
+    });
 
     await act(async () => {
       result.current.player.play(spotifyTrack);

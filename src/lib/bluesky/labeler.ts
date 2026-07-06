@@ -1,4 +1,4 @@
-import { AtpAgent } from '@atproto/api';
+import type { AtpAgent } from '@atproto/api';
 import { logger } from '@/lib/logger';
 
 /**
@@ -7,10 +7,7 @@ import { logger } from '@/lib/logger';
  * This is a self-label approach — the community account declares
  * that a DID is a ZAO member.
  */
-export async function applyMemberLabel(
-  agent: AtpAgent,
-  targetDid: string,
-): Promise<boolean> {
+export async function applyMemberLabel(agent: AtpAgent, targetDid: string): Promise<boolean> {
   try {
     // Create a label record on the community account's repo
     await agent.api.com.atproto.repo.createRecord({
@@ -31,7 +28,10 @@ export async function applyMemberLabel(
     // Self-labels can only be applied to own account.
     // For labeling OTHER accounts, we'd need a full labeler service.
     // For MVP, we note the member in our DB and the feed handles discovery.
-    console.error(`[labeler] Cannot label ${targetDid} (labeler service needed for cross-account labels):`, err);
+    console.error(
+      `[labeler] Cannot label ${targetDid} (labeler service needed for cross-account labels):`,
+      err,
+    );
     return false;
   }
 }

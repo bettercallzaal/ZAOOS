@@ -1,16 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { Livepeer } from 'livepeer';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { Livepeer } from 'livepeer';
 import { logger } from '@/lib/logger';
 
 const CreateStreamSchema = z.object({
   name: z.string().min(1).max(100),
-  targets: z.array(z.object({
-    platform: z.string(),
-    rtmpUrl: z.string(),
-    streamKey: z.string(),
-  })).min(1).max(10),
+  targets: z
+    .array(
+      z.object({
+        platform: z.string(),
+        rtmpUrl: z.string(),
+        streamKey: z.string(),
+      }),
+    )
+    .min(1)
+    .max(10),
 });
 
 function getLivepeerClient() {
@@ -29,7 +34,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = CreateStreamSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const livepeer = getLivepeerClient();

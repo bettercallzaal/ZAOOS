@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -8,7 +8,10 @@ const OG_CONTRACT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957';
 const ZOR_CONTRACT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c';
 
 const querySchema = z.object({
-  address: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  address: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/)
+    .optional(),
   sync: z.enum(['true', 'false']).optional(),
   limit: z.coerce.number().int().min(1).max(500).default(100),
 });
@@ -53,7 +56,7 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({
-      transfers: (data || []).map(t => ({
+      transfers: (data || []).map((t) => ({
         txHash: t.tx_hash,
         from: t.from_address,
         to: t.to_address,
@@ -98,17 +101,19 @@ async function syncTransfersFromAlchemy(filterAddress?: string) {
           jsonrpc: '2.0',
           id: 1,
           method: 'alchemy_getAssetTransfers',
-          params: [{
-            fromBlock: '0x0',
-            toBlock: 'latest',
-            contractAddresses: [contract.address],
-            category: [contract.category],
-            withMetadata: true,
-            maxCount: '0x3E8', // 1000
-            order: 'desc',
-            ...(filterAddress ? { toAddress: filterAddress.toLowerCase() } : {}),
-            ...(pageKey ? { pageKey } : {}),
-          }],
+          params: [
+            {
+              fromBlock: '0x0',
+              toBlock: 'latest',
+              contractAddresses: [contract.address],
+              category: [contract.category],
+              withMetadata: true,
+              maxCount: '0x3E8', // 1000
+              order: 'desc',
+              ...(filterAddress ? { toAddress: filterAddress.toLowerCase() } : {}),
+              ...(pageKey ? { pageKey } : {}),
+            },
+          ],
         };
 
         const res = await fetch(url, {
@@ -142,18 +147,23 @@ async function syncTransfersFromAlchemy(filterAddress?: string) {
             amount = t.value?.toString() || t.rawContract?.value || '0';
           }
 
-          await supabaseAdmin.from('respect_transfers').upsert({
-            tx_hash: txHash,
-            from_address: fromAddr,
-            to_address: toAddr,
-            token_type: contract.type,
-            amount,
-            block_number: t.blockNum ? parseInt(t.blockNum, 16) : null,
-            block_timestamp: t.metadata?.blockTimestamp || null,
-          }, { onConflict: 'tx_hash,to_address,token_type' });
+          await supabaseAdmin.from('respect_transfers').upsert(
+            {
+              tx_hash: txHash,
+              from_address: fromAddr,
+              to_address: toAddr,
+              token_type: contract.type,
+              amount,
+              block_number: t.blockNum ? parseInt(t.blockNum, 16) : null,
+              block_timestamp: t.metadata?.blockTimestamp || null,
+            },
+            { onConflict: 'tx_hash,to_address,token_type' },
+          );
         }
 
-        logger.info(`[transfers-sync] ${contract.type}: stored ${transfers.length} transfers (page ${pages + 1})`);
+        logger.info(
+          `[transfers-sync] ${contract.type}: stored ${transfers.length} transfers (page ${pages + 1})`,
+        );
         pages++;
       } catch (err) {
         logger.error(`[transfers-sync] ${contract.type} page ${pages} failed:`, err);

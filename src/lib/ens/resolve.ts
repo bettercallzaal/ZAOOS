@@ -3,7 +3,7 @@
  * Uses Cloudflare ETH RPC with fallback chain for reliability.
  */
 
-import { createPublicClient, http, fallback, type Address } from 'viem';
+import { type Address, createPublicClient, fallback, http } from 'viem';
 import { mainnet } from 'viem/chains';
 import { normalize } from 'viem/ens';
 
@@ -57,9 +57,13 @@ export async function resolveENSName(address: string): Promise<string | null> {
  * Resolve ENS names for multiple addresses. Returns a map of address → name.
  */
 export async function resolveENSNames(addresses: string[]): Promise<Record<string, string>> {
-  const unique = [...new Set(
-    addresses.filter(a => a && a.startsWith('0x') && a.length === 42).map(a => a.toLowerCase())
-  )];
+  const unique = [
+    ...new Set(
+      addresses
+        .filter((a) => a && a.startsWith('0x') && a.length === 42)
+        .map((a) => a.toLowerCase()),
+    ),
+  ];
 
   const results: Record<string, string> = {};
 
@@ -75,7 +79,16 @@ export async function resolveENSNames(addresses: string[]): Promise<Record<strin
  * Read ENS text records for a name (avatar, description, socials, etc.)
  */
 export async function getENSTextRecords(name: string): Promise<Record<string, string>> {
-  const keys = ['avatar', 'description', 'url', 'com.twitter', 'com.github', 'com.discord', 'org.telegram', 'email'];
+  const keys = [
+    'avatar',
+    'description',
+    'url',
+    'com.twitter',
+    'com.github',
+    'com.discord',
+    'org.telegram',
+    'email',
+  ];
   const records: Record<string, string> = {};
 
   const normalizedName = normalize(name);
@@ -123,10 +136,7 @@ export async function getFullENSProfile(address: string): Promise<{
   const name = await resolveENSName(address);
   if (!name) return null;
 
-  const [records, avatar] = await Promise.all([
-    getENSTextRecords(name),
-    getENSAvatar(name),
-  ]);
+  const [records, avatar] = await Promise.all([getENSTextRecords(name), getENSAvatar(name)]);
 
   return { name, avatar, records };
 }
@@ -182,9 +192,13 @@ export async function resolveBasename(address: string): Promise<string | null> {
  * Resolve Basenames for multiple addresses. Returns a map of address → name.
  */
 export async function resolveBasenames(addresses: string[]): Promise<Record<string, string>> {
-  const unique = [...new Set(
-    addresses.filter(a => a && a.startsWith('0x') && a.length === 42).map(a => a.toLowerCase())
-  )];
+  const unique = [
+    ...new Set(
+      addresses
+        .filter((a) => a && a.startsWith('0x') && a.length === 42)
+        .map((a) => a.toLowerCase()),
+    ),
+  ];
 
   const results: Record<string, string> = {};
 

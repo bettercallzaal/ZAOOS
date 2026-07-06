@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { TokenGateSection, type GateConfig } from './TokenGateSection';
-import { communityConfig } from '../../../community.config';
 import type { AudioProvider } from '@/lib/spaces/roomsDb';
+import { communityConfig } from '../../../community.config';
+import { type GateConfig, TokenGateSection } from './TokenGateSection';
 
 export type RoomTheme = 'default' | 'music' | 'podcast' | 'ama' | 'chill';
 export type RoomMode = 'stage' | 'voice_channel';
@@ -28,7 +28,8 @@ const PROVIDERS: { id: AudioProvider; label: string; description: string; badge:
   {
     id: 'juke',
     label: 'Juke',
-    description: 'Farcaster-native audio. Anyone with the link listens, SIWF to speak. Best for public ZAO events.',
+    description:
+      'Farcaster-native audio. Anyone with the link listens, SIWF to speak. Best for public ZAO events.',
     badge: 'FC',
   },
   {
@@ -196,7 +197,13 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
             className="p-1.5 text-gray-500 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
             aria-label="Close"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -204,8 +211,18 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
 
         {error && (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-3 py-2.5 rounded-lg mb-4">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+              />
             </svg>
             {error}
           </div>
@@ -214,58 +231,62 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         <form onSubmit={handleSubmit}>
           {/* Room mode selector — hidden for Juke (Juke is audio-only Clubhouse). */}
           {provider !== 'juke' && (
-          <div className="mb-5">
-            <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
-              Mode
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {ROOM_MODES.map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setRoomMode(m.id)}
-                  disabled={loading}
-                  className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
-                    roomMode === m.id
-                      ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
-                      : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
-                  }`}
-                >
-                  <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">{m.badge}</span>
-                  <span className="font-semibold text-white">{m.label}</span>
-                  <span className="text-xs text-gray-500 leading-tight">{m.description}</span>
-                </button>
-              ))}
+            <div className="mb-5">
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                Mode
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {ROOM_MODES.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setRoomMode(m.id)}
+                    disabled={loading}
+                    className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
+                      roomMode === m.id
+                        ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
+                        : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
+                    }`}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">
+                      {m.badge}
+                    </span>
+                    <span className="font-semibold text-white">{m.label}</span>
+                    <span className="text-xs text-gray-500 leading-tight">{m.description}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
           )}
 
           {/* Theme selector — hidden for Juke (theme is a ZAO-side rendering concept). */}
           {provider !== 'juke' && (
-          <div className="mb-5">
-            <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
-              Theme
-            </label>
-            <div className="grid grid-cols-5 gap-2">
-              {THEMES.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTheme(t.id)}
-                  disabled={loading}
-                  title={t.description}
-                  className={`flex flex-col items-center gap-2 px-1.5 py-3 rounded-xl border text-xs font-medium transition-all ${
-                    theme === t.id
-                      ? `${t.active} shadow-sm`
-                      : 'bg-[#0a1628] border-white/[0.08] text-gray-500 hover:border-gray-600 hover:text-gray-400'
-                  }`}
-                >
-                  <span className={`w-4 h-4 rounded-full ${t.dot} ${theme === t.id ? 'ring-2 ring-offset-1 ring-offset-[#0a1628] ring-current' : ''}`} />
-                  {t.label}
-                </button>
-              ))}
+            <div className="mb-5">
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                Theme
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {THEMES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTheme(t.id)}
+                    disabled={loading}
+                    title={t.description}
+                    className={`flex flex-col items-center gap-2 px-1.5 py-3 rounded-xl border text-xs font-medium transition-all ${
+                      theme === t.id
+                        ? `${t.active} shadow-sm`
+                        : 'bg-[#0a1628] border-white/[0.08] text-gray-500 hover:border-gray-600 hover:text-gray-400'
+                    }`}
+                  >
+                    <span
+                      className={`w-4 h-4 rounded-full ${t.dot} ${theme === t.id ? 'ring-2 ring-offset-1 ring-offset-[#0a1628] ring-current' : ''}`}
+                    />
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
           )}
 
           {/* Title */}
@@ -288,11 +309,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               disabled={loading}
             />
             <div className="flex items-center justify-between mt-1.5">
-              {titleError ? (
-                <span className="text-red-400 text-xs">{titleError}</span>
-              ) : (
-                <span />
-              )}
+              {titleError ? <span className="text-red-400 text-xs">{titleError}</span> : <span />}
               <span className="text-gray-600 text-xs">{title.length}/100</span>
             </div>
           </div>
@@ -339,7 +356,9 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                       : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
                   }`}
                 >
-                  <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">{p.badge}</span>
+                  <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">
+                    {p.badge}
+                  </span>
                   <span className="font-semibold text-white">{p.label}</span>
                   <span className="text-xs text-gray-500 leading-tight">{p.description}</span>
                 </button>
@@ -362,7 +381,9 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                 Multistream
               </label>
               <p className="text-gray-500 text-xs leading-relaxed">
-                After creating, use the <span className="text-[#f5a623]">Broadcast</span> button in the room controls to stream to Twitch, YouTube, Kick, or Facebook. Connect your accounts in Settings first.
+                After creating, use the <span className="text-[#f5a623]">Broadcast</span> button in
+                the room controls to stream to Twitch, YouTube, Kick, or Facebook. Connect your
+                accounts in Settings first.
               </p>
             </div>
           ) : (
@@ -431,8 +452,19 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Creating...
                 </span>

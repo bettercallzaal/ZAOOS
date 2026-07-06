@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { XMTPProvider } from '@/contexts/XMTPContext';
 import { ChatRoom } from '@/components/chat/ChatRoom';
+import { XMTPProvider } from '@/contexts/XMTPContext';
 
 export const metadata: Metadata = { title: 'Chat - ZAO OS' };
 

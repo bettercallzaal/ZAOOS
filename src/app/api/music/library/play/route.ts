@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { incrementPlayCount } from '@/lib/music/library';
 import { logger } from '@/lib/logger';
+import { incrementPlayCount } from '@/lib/music/library';
 
 const schema = z.object({ songId: z.string().uuid() });
 

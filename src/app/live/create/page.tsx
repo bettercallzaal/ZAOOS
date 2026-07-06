@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 /**
  * /live/create — create a Juke live audio space from the web (doc 695, Path B).
@@ -43,9 +43,7 @@ export default function CreateLiveSpacePage() {
       const body = await res.json();
       if (!res.ok || !body.success) {
         setError(
-          res.status === 401
-            ? 'Wrong password.'
-            : (body.error ?? 'Could not create the space.'),
+          res.status === 401 ? 'Wrong password.' : (body.error ?? 'Could not create the space.'),
         );
         setStatus('error');
         return;
@@ -84,7 +82,13 @@ export default function CreateLiveSpacePage() {
             aria-label="Back to ZAO Live"
             className="rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-800 hover:text-[#f5a623]"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
@@ -98,8 +102,8 @@ export default function CreateLiveSpacePage() {
             <div>
               <h2 className="text-2xl font-bold text-white">Space created</h2>
               <p className="mt-2 text-sm text-gray-400">
-                Share this link - anyone can listen in. To speak, they sign in
-                with Farcaster inside the space.
+                Share this link - anyone can listen in. To speak, they sign in with Farcaster inside
+                the space.
               </p>
               <div className="mt-6 rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4">
                 <p className="break-all font-mono text-sm text-[#f5a623]">{liveUrl}</p>
@@ -131,8 +135,8 @@ export default function CreateLiveSpacePage() {
             <>
               <h2 className="text-2xl font-bold text-white">Create a ZAO Live space</h2>
               <p className="mt-2 text-sm text-gray-400">
-                Spin up a Farcaster-native live audio space on Juke. Enter the
-                team password and a title.
+                Spin up a Farcaster-native live audio space on Juke. Enter the team password and a
+                title.
               </p>
 
               <form
@@ -157,7 +161,10 @@ export default function CreateLiveSpacePage() {
                   className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
                 />
 
-                <label htmlFor="create-title" className="mt-4 block text-xs font-medium text-gray-400">
+                <label
+                  htmlFor="create-title"
+                  className="mt-4 block text-xs font-medium text-gray-400"
+                >
                   Space title
                 </label>
                 <input

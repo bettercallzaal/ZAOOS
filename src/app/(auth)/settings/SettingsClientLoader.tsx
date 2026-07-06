@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 import type { SessionData } from '@/types';
 
 const SettingsClient = dynamic(
-  () => import('./SettingsClient').then(m => ({ default: m.SettingsClient })),
-  { ssr: false }
+  () => import('./SettingsClient').then((m) => ({ default: m.SettingsClient })),
+  { ssr: false },
 );
 
 interface Profile {

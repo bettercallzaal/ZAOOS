@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import {
-  getEngagementScores,
-  getPersonalizedScores,
-} from '@/lib/openrank/client';
 import { logger } from '@/lib/logger';
+import { getEngagementScores, getPersonalizedScores } from '@/lib/openrank/client';
 
 /**
  * GET /api/social/engagement?fids=123,456,789
@@ -24,7 +21,7 @@ export async function GET(request: NextRequest) {
     if (!fidsParam || fidsParam.trim() === '') {
       return NextResponse.json(
         { error: 'Missing required query parameter: fids' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,19 +31,13 @@ export async function GET(request: NextRequest) {
     for (const part of parts) {
       const n = Number(part);
       if (!Number.isInteger(n) || n <= 0) {
-        return NextResponse.json(
-          { error: `Invalid FID: ${part}` },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: `Invalid FID: ${part}` }, { status: 400 });
       }
       fids.push(n);
     }
 
     if (fids.length > 100) {
-      return NextResponse.json(
-        { error: 'Maximum 100 FIDs per request' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Maximum 100 FIDs per request' }, { status: 400 });
     }
 
     // Fetch global and personalized scores in parallel
@@ -55,12 +46,9 @@ export async function GET(request: NextRequest) {
       getPersonalizedScores(session.fid, fids),
     ]);
 
-    const globalMap =
-      globalScores.status === 'fulfilled' ? globalScores.value : new Map();
+    const globalMap = globalScores.status === 'fulfilled' ? globalScores.value : new Map();
     const personalizedMap =
-      personalizedScores.status === 'fulfilled'
-        ? personalizedScores.value
-        : new Map();
+      personalizedScores.status === 'fulfilled' ? personalizedScores.value : new Map();
 
     // Merge into a single object keyed by FID
     const scores: Record<string, { global: number; personalized: number }> = {};
@@ -73,16 +61,10 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json({ scores });
     // Cache for 1 hour, allow stale for 5 min while revalidating
-    response.headers.set(
-      'Cache-Control',
-      'public, s-maxage=3600, stale-while-revalidate=300'
-    );
+    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=300');
     return response;
   } catch (err) {
     logger.error('Engagement scores error:', err);
-    return NextResponse.json(
-      { error: 'Failed to fetch engagement scores' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch engagement scores' }, { status: 500 });
   }
 }

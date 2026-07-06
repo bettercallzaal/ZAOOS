@@ -96,7 +96,10 @@ export function IssueSubmitForm() {
 
       {/* Title */}
       <div>
-        <label htmlFor="issue-title" className="text-xs text-gray-500 uppercase tracking-wider block mb-1">
+        <label
+          htmlFor="issue-title"
+          className="text-xs text-gray-500 uppercase tracking-wider block mb-1"
+        >
           Title
         </label>
         <input
@@ -114,7 +117,10 @@ export function IssueSubmitForm() {
 
       {/* Description */}
       <div>
-        <label htmlFor="issue-desc" className="text-xs text-gray-500 uppercase tracking-wider block mb-1">
+        <label
+          htmlFor="issue-desc"
+          className="text-xs text-gray-500 uppercase tracking-wider block mb-1"
+        >
           Description
         </label>
         <textarea
@@ -132,7 +138,9 @@ export function IssueSubmitForm() {
 
       {/* Priority */}
       <div>
-        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">Priority</label>
+        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">
+          Priority
+        </label>
         <div className="flex gap-2">
           {PRIORITIES.map((p) => (
             <button
@@ -151,9 +159,7 @@ export function IssueSubmitForm() {
         </div>
       </div>
 
-      {error && (
-        <p className="text-red-400 text-xs">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-xs">{error}</p>}
 
       {/* Submit */}
       <button

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import EntryCard from './EntryCard';
+import { useCallback, useEffect, useState } from 'react';
 import { LIBRARY_TAGS } from '@/lib/validation/library-schemas';
+import EntryCard from './EntryCard';
 
 interface Entry {
   id: string;
@@ -49,37 +49,40 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchEntries = useCallback(async (reset = false) => {
-    const offset = reset ? 0 : entries.length;
-    const params = new URLSearchParams({
-      offset: String(offset),
-      limit: '50',
-      sort,
-      ...(debouncedSearch && { search: debouncedSearch }),
-      ...(activeTag && { tag: activeTag }),
-    });
+  const fetchEntries = useCallback(
+    async (reset = false) => {
+      const offset = reset ? 0 : entries.length;
+      const params = new URLSearchParams({
+        offset: String(offset),
+        limit: '50',
+        sort,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(activeTag && { tag: activeTag }),
+      });
 
-    try {
-      const res = await fetch(`/api/library/entries?${params}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (reset) {
-          setEntries(data.entries ?? []);
-          setUserVotes(data.userVotes ?? {});
-          setEntryVoters(data.entryVoters ?? {});
-        } else {
-          setEntries((prev) => [...prev, ...(data.entries ?? [])]);
-          setUserVotes((prev) => ({ ...prev, ...(data.userVotes ?? {}) }));
-          setEntryVoters((prev) => ({ ...prev, ...(data.entryVoters ?? {}) }));
+      try {
+        const res = await fetch(`/api/library/entries?${params}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (reset) {
+            setEntries(data.entries ?? []);
+            setUserVotes(data.userVotes ?? {});
+            setEntryVoters(data.entryVoters ?? {});
+          } else {
+            setEntries((prev) => [...prev, ...(data.entries ?? [])]);
+            setUserVotes((prev) => ({ ...prev, ...(data.userVotes ?? {}) }));
+            setEntryVoters((prev) => ({ ...prev, ...(data.entryVoters ?? {}) }));
+          }
+          setHasMore((data.entries ?? []).length === 50);
         }
-        setHasMore((data.entries ?? []).length === 50);
+      } catch {
+        // silent fail
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      // silent fail
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, activeTag, sort, entries.length]);
+    },
+    [debouncedSearch, activeTag, sort, entries.length],
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -153,7 +156,9 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
         <button
           onClick={() => setActiveTag('')}
           className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${
-            !activeTag ? 'bg-[#f5a623] text-[#0a1628]' : 'bg-[#1a2a3a] text-gray-400 hover:bg-[#243447]'
+            !activeTag
+              ? 'bg-[#f5a623] text-[#0a1628]'
+              : 'bg-[#1a2a3a] text-gray-400 hover:bg-[#243447]'
           }`}
         >
           All
@@ -163,7 +168,9 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
             key={tag}
             onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
             className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${
-              activeTag === tag ? 'bg-[#f5a623] text-[#0a1628]' : 'bg-[#1a2a3a] text-gray-400 hover:bg-[#243447]'
+              activeTag === tag
+                ? 'bg-[#f5a623] text-[#0a1628]'
+                : 'bg-[#1a2a3a] text-gray-400 hover:bg-[#243447]'
             }`}
           >
             {tag}

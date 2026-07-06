@@ -85,7 +85,11 @@ const FxArticleSchema = z
   .object({
     title: z.string().optional(),
     preview_text: z.string().optional(),
-    content: z.object({ blocks: z.array(FxBlockSchema).optional() }).partial().passthrough().optional(),
+    content: z
+      .object({ blocks: z.array(FxBlockSchema).optional() })
+      .partial()
+      .passthrough()
+      .optional(),
   })
   .passthrough();
 const FxResponseSchema = z
@@ -162,7 +166,11 @@ function buildArticleFromFx(article: z.infer<typeof FxArticleSchema>): XArticle 
   };
 }
 
-async function tryFxTwitter(id: string, fetchImpl: FetchImpl, timeoutMs: number): Promise<XContent | null> {
+async function tryFxTwitter(
+  id: string,
+  fetchImpl: FetchImpl,
+  timeoutMs: number,
+): Promise<XContent | null> {
   const raw = await fetchJson(`${FXTWITTER_BASE}${id}`, fetchImpl, timeoutMs);
   const parsed = FxResponseSchema.safeParse(raw);
   if (!parsed.success || !parsed.data.tweet) return null;
@@ -181,7 +189,11 @@ async function tryFxTwitter(id: string, fetchImpl: FetchImpl, timeoutMs: number)
   };
 }
 
-async function trySyndication(id: string, fetchImpl: FetchImpl, timeoutMs: number): Promise<XContent | null> {
+async function trySyndication(
+  id: string,
+  fetchImpl: FetchImpl,
+  timeoutMs: number,
+): Promise<XContent | null> {
   const raw = await fetchJson(`${SYNDICATION_BASE}?id=${id}&token=4`, fetchImpl, timeoutMs);
   const parsed = SyndicationSchema.safeParse(raw);
   if (!parsed.success) return null;
@@ -234,7 +246,9 @@ export async function fetchXContent(input: string, opts: XFetchOptions = {}): Pr
   } catch (error: unknown) {
     const fxMsg = fxError instanceof Error ? fxError.message : 'unknown';
     const sMsg = error instanceof Error ? error.message : 'unknown';
-    throw new XFetchError(`All tiers failed for id ${id} (fxtwitter: ${fxMsg}; syndication: ${sMsg})`);
+    throw new XFetchError(
+      `All tiers failed for id ${id} (fxtwitter: ${fxMsg}; syndication: ${sMsg})`,
+    );
   }
 
   throw new XFetchError(`No content returned for id ${id} (tweet may be deleted or protected)`);

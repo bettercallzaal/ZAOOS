@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useCall } from '@stream-io/video-react-sdk';
+import { useState } from 'react';
 
 interface TranscriptionButtonProps {
   isHost: boolean;
@@ -20,16 +20,10 @@ export function TranscriptionButton({ isHost }: TranscriptionButtonProps) {
 
     try {
       if (isActive) {
-        await Promise.allSettled([
-          call.stopTranscription(),
-          call.stopClosedCaptions(),
-        ]);
+        await Promise.allSettled([call.stopTranscription(), call.stopClosedCaptions()]);
         setIsActive(false);
       } else {
-        await Promise.allSettled([
-          call.startTranscription(),
-          call.startClosedCaptions(),
-        ]);
+        await Promise.allSettled([call.startTranscription(), call.startClosedCaptions()]);
         setIsActive(true);
       }
     } catch {
@@ -50,8 +44,18 @@ export function TranscriptionButton({ isHost }: TranscriptionButtonProps) {
       } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
       title={isActive ? 'Stop captions & transcription' : 'Start captions & transcription'}
     >
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+        />
       </svg>
     </button>
   );

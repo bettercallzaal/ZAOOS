@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -13,10 +13,7 @@ const paramsSchema = z.object({
  * GET /api/artists/[username] — Rich artist profile for spotlight
  * Session-authenticated. Returns combined profile, songs, respect, social data.
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ username: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -34,7 +31,9 @@ export async function GET(
     // Find user by username
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('fid, username, display_name, pfp_url, bio, primary_wallet, farcaster_banner_url, community_profile_id, respect_member_id')
+      .select(
+        'fid, username, display_name, pfp_url, bio, primary_wallet, farcaster_banner_url, community_profile_id, respect_member_id',
+      )
       .ilike('username', lookup)
       .eq('is_active', true)
       .maybeSingle();
@@ -47,21 +46,44 @@ export async function GET(
     const [profileResult, songsResult, respectResult, neynarResult] = await Promise.allSettled([
       // Community profile
       user.community_profile_id
-        ? supabaseAdmin.from('community_profiles').select('category, cover_image_url, thumbnail_url, biography, is_featured, slug').eq('id', user.community_profile_id).single()
+        ? supabaseAdmin
+            .from('community_profiles')
+            .select('category, cover_image_url, thumbnail_url, biography, is_featured, slug')
+            .eq('id', user.community_profile_id)
+            .single()
         : user.fid
-          ? supabaseAdmin.from('community_profiles').select('category, cover_image_url, thumbnail_url, biography, is_featured, slug').eq('fid', user.fid).maybeSingle()
+          ? supabaseAdmin
+              .from('community_profiles')
+              .select('category, cover_image_url, thumbnail_url, biography, is_featured, slug')
+              .eq('fid', user.fid)
+              .maybeSingle()
           : Promise.resolve({ data: null, error: null }),
 
       // Songs by this artist (by FID)
       user.fid
-        ? supabaseAdmin.from('songs').select('id, url, title, artist, artwork_url, stream_url, platform, play_count, duration').eq('submitted_by_fid', user.fid).order('play_count', { ascending: false }).limit(20)
+        ? supabaseAdmin
+            .from('songs')
+            .select(
+              'id, url, title, artist, artwork_url, stream_url, platform, play_count, duration',
+            )
+            .eq('submitted_by_fid', user.fid)
+            .order('play_count', { ascending: false })
+            .limit(20)
         : Promise.resolve({ data: [], error: null }),
 
       // Respect score
       user.respect_member_id
-        ? supabaseAdmin.from('respect_members').select('total_respect, fractal_count').eq('id', user.respect_member_id).single()
+        ? supabaseAdmin
+            .from('respect_members')
+            .select('total_respect, fractal_count')
+            .eq('id', user.respect_member_id)
+            .single()
         : user.fid
-          ? supabaseAdmin.from('respect_members').select('total_respect, fractal_count').eq('fid', user.fid).maybeSingle()
+          ? supabaseAdmin
+              .from('respect_members')
+              .select('total_respect, fractal_count')
+              .eq('fid', user.fid)
+              .maybeSingle()
           : Promise.resolve({ data: null, error: null }),
 
       // Neynar follower count
@@ -69,7 +91,7 @@ export async function GET(
         ? fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${user.fid}`, {
             headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
             signal: AbortSignal.timeout(5000),
-          }).then(r => r.ok ? r.json() : null)
+          }).then((r) => (r.ok ? r.json() : null))
         : Promise.resolve(null),
     ]);
 
@@ -77,9 +99,12 @@ export async function GET(
     const cp = profileResult.status === 'fulfilled' ? profileResult.value?.data : null;
 
     // Extract songs
-    const songs = songsResult.status === 'fulfilled' ? (songsResult.value?.data || []) : [];
+    const songs = songsResult.status === 'fulfilled' ? songsResult.value?.data || [] : [];
     const trackCount = songs.length;
-    const totalPlays = songs.reduce((sum: number, s: { play_count: number | null }) => sum + (s.play_count || 0), 0);
+    const totalPlays = songs.reduce(
+      (sum: number, s: { play_count: number | null }) => sum + (s.play_count || 0),
+      0,
+    );
 
     // Extract respect
     const respect = respectResult.status === 'fulfilled' ? respectResult.value?.data : null;
@@ -92,21 +117,31 @@ export async function GET(
     }
 
     // Top tracks (limit 5 for spotlight)
-    const topTracks = songs.slice(0, 5).map((s: {
-      id: string; url: string; title: string; artist: string;
-      artwork_url: string | null; stream_url: string | null;
-      platform: string; play_count: number | null; duration: number | null;
-    }) => ({
-      id: s.id,
-      url: s.url,
-      title: s.title,
-      artist: s.artist,
-      artworkUrl: s.artwork_url,
-      streamUrl: s.stream_url,
-      platform: s.platform,
-      playCount: s.play_count || 0,
-      duration: s.duration,
-    }));
+    const topTracks = songs
+      .slice(0, 5)
+      .map(
+        (s: {
+          id: string;
+          url: string;
+          title: string;
+          artist: string;
+          artwork_url: string | null;
+          stream_url: string | null;
+          platform: string;
+          play_count: number | null;
+          duration: number | null;
+        }) => ({
+          id: s.id,
+          url: s.url,
+          title: s.title,
+          artist: s.artist,
+          artworkUrl: s.artwork_url,
+          streamUrl: s.stream_url,
+          platform: s.platform,
+          playCount: s.play_count || 0,
+          duration: s.duration,
+        }),
+      );
 
     const artist = {
       fid: user.fid,

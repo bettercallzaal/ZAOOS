@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 import { logger } from '@/lib/logger';
 
 async function requireAdmin() {
@@ -25,7 +25,9 @@ export async function GET() {
     // Fetch all active users
     const { data: users, error: usersErr } = await supabaseAdmin
       .from('users')
-      .select('id, primary_wallet, fid, username, display_name, pfp_url, discord_id, role, is_active, created_at')
+      .select(
+        'id, primary_wallet, fid, username, display_name, pfp_url, discord_id, role, is_active, created_at',
+      )
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
@@ -62,7 +64,7 @@ export async function GET() {
     }
 
     // Build lookup maps
-    const introSet = new Set((intros || []).map(i => i.discord_id));
+    const introSet = new Set((intros || []).map((i) => i.discord_id));
 
     const proposalCounts: Record<string, number> = {};
     for (const p of proposals || []) {
@@ -75,16 +77,16 @@ export async function GET() {
     }
 
     // Enrich users with discord data
-    const enriched = (users || []).map(u => ({
+    const enriched = (users || []).map((u) => ({
       ...u,
       has_intro: u.discord_id ? introSet.has(u.discord_id) : false,
-      proposal_count: u.discord_id ? (proposalCounts[u.discord_id] || 0) : 0,
-      vote_count: u.discord_id ? (voteCounts[u.discord_id] || 0) : 0,
+      proposal_count: u.discord_id ? proposalCounts[u.discord_id] || 0 : 0,
+      vote_count: u.discord_id ? voteCounts[u.discord_id] || 0 : 0,
     }));
 
     // Summary stats
-    const linked = enriched.filter(u => u.discord_id).length;
-    const unlinked = enriched.filter(u => !u.discord_id).length;
+    const linked = enriched.filter((u) => u.discord_id).length;
+    const unlinked = enriched.filter((u) => !u.discord_id).length;
     const introCount = introSet.size;
 
     return NextResponse.json({
@@ -120,7 +122,10 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { userId, discordId } = parsed.data;
@@ -135,9 +140,12 @@ export async function PATCH(req: NextRequest) {
         .maybeSingle();
 
       if (existing) {
-        return NextResponse.json({
-          error: `Discord ID already linked to ${existing.display_name || existing.id}`,
-        }, { status: 409 });
+        return NextResponse.json(
+          {
+            error: `Discord ID already linked to ${existing.display_name || existing.id}`,
+          },
+          { status: 409 },
+        );
       }
     }
 
@@ -199,7 +207,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = postSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { preview } = parsed.data;
@@ -211,9 +222,13 @@ export async function POST(req: NextRequest) {
       // Try to get wallets from discord_intros (which have discord_id)
       // and cross-reference with any known wallet sources
       // For now, require the client to provide the wallet map from the bot data
-      return NextResponse.json({
-        error: 'walletMap is required. Provide a mapping of discord_id -> wallet_address from the bot.',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'walletMap is required. Provide a mapping of discord_id -> wallet_address from the bot.',
+        },
+        { status: 400 },
+      );
     }
 
     // Normalize all wallet addresses to lowercase
@@ -231,7 +246,9 @@ export async function POST(req: NextRequest) {
     // Fetch all active users
     const { data: users, error: usersErr } = await supabaseAdmin
       .from('users')
-      .select('id, primary_wallet, discord_id, display_name, username, verified_addresses, custody_address')
+      .select(
+        'id, primary_wallet, discord_id, display_name, username, verified_addresses, custody_address',
+      )
       .eq('is_active', true);
 
     if (usersErr) {
@@ -239,7 +256,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
-    const matches: { userId: string; displayName: string; wallet: string; discordId: string }[] = [];
+    const matches: { userId: string; displayName: string; wallet: string; discordId: string }[] =
+      [];
     const alreadyLinked: { userId: string; displayName: string; discordId: string }[] = [];
     const noMatch: string[] = [];
 
@@ -329,7 +347,12 @@ export async function POST(req: NextRequest) {
       actorFid: auth.session.fid!,
       action: 'discord.bulk_link',
       targetType: 'system',
-      details: { linked, alreadyLinked: alreadyLinked.length, noMatch: noMatch.length, errors: errors.length },
+      details: {
+        linked,
+        alreadyLinked: alreadyLinked.length,
+        noMatch: noMatch.length,
+        errors: errors.length,
+      },
       ipAddress: getClientIp(req),
     });
 

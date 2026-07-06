@@ -1,12 +1,20 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
-import { parseTweetId, fetchXContent, XFetchError, type FetchImpl } from '../x-fetch';
+import { describe, expect, it } from 'vitest';
+import { type FetchImpl, fetchXContent, parseTweetId, XFetchError } from '../x-fetch';
 
 /**
  * Build a fake fetch that returns the given JSON for hosts matched by `routes`.
  * Each route maps a host substring to a { ok, status, json } response.
  */
-function fakeFetch(routes: Array<{ host: string; ok?: boolean; status?: number; json?: unknown; throwName?: string }>): FetchImpl {
+function fakeFetch(
+  routes: Array<{
+    host: string;
+    ok?: boolean;
+    status?: number;
+    json?: unknown;
+    throwName?: string;
+  }>,
+): FetchImpl {
   return (async (url: string | URL | Request) => {
     const href = typeof url === 'string' ? url : url.toString();
     const route = routes.find((r) => href.includes(r.host));
@@ -37,7 +45,9 @@ describe('parseTweetId', () => {
 
   it('extracts id from twitter.com and mobile variants', () => {
     expect(parseTweetId('https://twitter.com/foo/status/123456789012')).toBe('123456789012');
-    expect(parseTweetId('https://mobile.twitter.com/foo/statuses/987654321098')).toBe('987654321098');
+    expect(parseTweetId('https://mobile.twitter.com/foo/statuses/987654321098')).toBe(
+      '987654321098',
+    );
   });
 
   it('returns null for non-tweet input', () => {
@@ -84,7 +94,11 @@ describe('fetchXContent', () => {
             article: {
               title: 'The Stanford STORM Method',
               content: {
-                blocks: [{ text: 'Most people use Claude like a search box.' }, { text: '' }, { text: 'Save this :)' }],
+                blocks: [
+                  { text: 'Most people use Claude like a search box.' },
+                  { text: '' },
+                  { text: 'Save this :)' },
+                ],
               },
             },
           },
@@ -94,7 +108,10 @@ describe('fetchXContent', () => {
     const c = await fetchXContent('123456789012', { fetchImpl });
     expect(c.isArticle).toBe(true);
     expect(c.article?.title).toBe('The Stanford STORM Method');
-    expect(c.article?.blocks).toEqual(['Most people use Claude like a search box.', 'Save this :)']);
+    expect(c.article?.blocks).toEqual([
+      'Most people use Claude like a search box.',
+      'Save this :)',
+    ]);
     expect(c.article?.body).toContain('Save this');
     expect(c.article?.partial).toBe(false);
   });
@@ -129,7 +146,10 @@ describe('fetchXContent', () => {
   });
 
   it('surfaces a timeout as XFetchError', async () => {
-    const fetchImpl = fakeFetch([{ host: 'fxtwitter.com', throwName: 'AbortError' }, { host: 'syndication.twimg.com', throwName: 'AbortError' }]);
+    const fetchImpl = fakeFetch([
+      { host: 'fxtwitter.com', throwName: 'AbortError' },
+      { host: 'syndication.twimg.com', throwName: 'AbortError' },
+    ]);
     await expect(fetchXContent('123456789012', { fetchImpl, timeoutMs: 5 })).rejects.toBeInstanceOf(
       XFetchError,
     );

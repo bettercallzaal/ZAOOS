@@ -1,6 +1,6 @@
-import { createConfig, http, cookieStorage, createStorage } from 'wagmi';
-import { mainnet, base, optimism } from 'wagmi/chains';
-import { injected, coinbaseWallet, walletConnect } from 'wagmi/connectors';
+import { cookieStorage, createConfig, createStorage, http } from 'wagmi';
+import { base, mainnet, optimism } from 'wagmi/chains';
+import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || '';
 

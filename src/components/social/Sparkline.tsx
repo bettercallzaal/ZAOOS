@@ -8,7 +8,13 @@ interface SparklineProps {
   showArea?: boolean;
 }
 
-export function Sparkline({ data, width = 120, height = 32, color = '#f5a623', showArea = true }: SparklineProps) {
+export function Sparkline({
+  data,
+  width = 120,
+  height = 32,
+  color = '#f5a623',
+  showArea = true,
+}: SparklineProps) {
   if (!data.length) return <svg width={width} height={height} />;
   if (data.length === 1) {
     return (
@@ -46,7 +52,14 @@ export function Sparkline({ data, width = 120, height = 32, color = '#f5a623', s
         </linearGradient>
       </defs>
       {showArea && <path d={areaPath} fill={`url(#${gradId})`} />}
-      <polyline points={line} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <polyline
+        points={line}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <circle cx={minPt.x} cy={minPt.y} r={1.5} fill={color} opacity={0.6} />
       <circle cx={maxPt.x} cy={maxPt.y} r={1.5} fill={color} opacity={0.6} />
     </svg>

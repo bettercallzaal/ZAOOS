@@ -65,7 +65,9 @@ export default function SpacesLeaderboard() {
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Leaderboard</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+          Leaderboard
+        </h2>
         <div className="flex gap-1 rounded-lg border border-white/[0.08] bg-[#0d1b2a] p-0.5">
           {PERIODS.map((p) => (
             <button
@@ -84,7 +86,8 @@ export default function SpacesLeaderboard() {
 
       {totalMinutes > 0 && (
         <p className="text-xs text-gray-500">
-          {formatMinutes(totalMinutes)} of community time logged {period === 'all' ? 'all time' : `this ${period}`}.
+          {formatMinutes(totalMinutes)} of community time logged{' '}
+          {period === 'all' ? 'all time' : `this ${period}`}.
         </p>
       )}
 

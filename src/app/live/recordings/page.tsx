@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { jukeSpaceOgImageUrl } from '@/lib/spaces/juke';
-import { listRecordedJukeSpaces, type JukeSpaceRow } from '@/lib/spaces/jukeSpacesDb';
+import { type JukeSpaceRow, listRecordedJukeSpaces } from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../../community.config';
 
 export const metadata: Metadata = {
@@ -58,13 +58,22 @@ export default async function LiveRecordingsPage() {
             aria-label="Back to Spaces"
             className="rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-800 hover:text-[#f5a623]"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div className="min-w-0 flex-1">
             <h1 className="text-base sm:text-lg font-bold">Juke recordings</h1>
-            <p className="text-xs text-gray-500">Past audio spaces hosted by {communityConfig.name}.</p>
+            <p className="text-xs text-gray-500">
+              Past audio spaces hosted by {communityConfig.name}.
+            </p>
           </div>
           <span
             className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] text-[11px] font-bold"
@@ -94,8 +103,19 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5">
-        <svg className="w-8 h-8 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8m-7-15a3 3 0 016 0v6a3 3 0 11-6 0V5z" />
+        <svg
+          className="w-8 h-8 text-[#f5a623]"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8m-7-15a3 3 0 016 0v6a3 3 0 11-6 0V5z"
+          />
         </svg>
       </div>
       <h2 className="text-lg font-semibold mb-1">No recordings yet</h2>
@@ -127,7 +147,7 @@ function RecordingCard({ row, endedLabel }: { row: JukeSpaceRow; endedLabel: str
         aria-label={`Open recording: ${row.title}`}
       >
         <div className="aspect-[1200/630] bg-[#0a1628] relative overflow-hidden">
-          { }
+          {}
           <img
             src={ogImage}
             alt=""

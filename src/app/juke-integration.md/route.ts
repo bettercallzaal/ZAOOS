@@ -1,8 +1,8 @@
+import { buildResolutionIndex, fetchJukeChangelog } from '@/lib/spaces/jukeChangelog';
 import {
   getJukeIntegrationManifest,
   renderIntegrationMarkdown,
 } from '@/lib/spaces/jukeIntegrationManifest';
-import { buildResolutionIndex, fetchJukeChangelog } from '@/lib/spaces/jukeChangelog';
 import {
   getJukeIntegrationStats,
   listRecentJukeSpaces,
@@ -66,7 +66,6 @@ export async function GET() {
       lines.push('');
     }
   }
-
 
   if (recentEvents.length > 0) {
     lines.push('## Recent webhooks');

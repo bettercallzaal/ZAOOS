@@ -11,23 +11,25 @@ const client = createPublicClient({
 const TREE_DOMAIN = 226;
 const topHatId = BigInt(TREE_DOMAIN) << BigInt(224);
 
-const viewHatAbi = [{
-  name: 'viewHat',
-  type: 'function',
-  stateMutability: 'view',
-  inputs: [{ name: '_hatId', type: 'uint256' }],
-  outputs: [
-    { name: 'details', type: 'string' },
-    { name: 'maxSupply', type: 'uint32' },
-    { name: 'supply', type: 'uint32' },
-    { name: 'eligibility', type: 'address' },
-    { name: 'toggle', type: 'address' },
-    { name: 'imageUri', type: 'string' },
-    { name: 'numChildren', type: 'uint16' },
-    { name: 'mutable_', type: 'bool' },
-    { name: 'active', type: 'bool' },
-  ],
-}] as const;
+const viewHatAbi = [
+  {
+    name: 'viewHat',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: '_hatId', type: 'uint256' }],
+    outputs: [
+      { name: 'details', type: 'string' },
+      { name: 'maxSupply', type: 'uint32' },
+      { name: 'supply', type: 'uint32' },
+      { name: 'eligibility', type: 'address' },
+      { name: 'toggle', type: 'address' },
+      { name: 'imageUri', type: 'string' },
+      { name: 'numChildren', type: 'uint16' },
+      { name: 'mutable_', type: 'bool' },
+      { name: 'active', type: 'bool' },
+    ],
+  },
+] as const;
 
 async function main() {
   console.log('Reading ZAO Hat Tree (Tree 226) from Optimism...\n');
@@ -102,13 +104,19 @@ async function main() {
                     console.log('      Details:', ggc[0]);
                     console.log('      Supply:', ggc[2], '/', ggc[1]);
                     console.log('      Active:', ggc[8]);
-                  } catch { /* empty */ }
+                  } catch {
+                    /* empty */
+                  }
                 }
               }
-            } catch { /* empty */ }
+            } catch {
+              /* empty */
+            }
           }
         }
-      } catch { /* empty */ }
+      } catch {
+        /* empty */
+      }
     }
   }
 }

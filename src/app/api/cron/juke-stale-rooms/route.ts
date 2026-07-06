@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
-import { getJukeRoomDetail } from '@/lib/spaces/juke-api-reads';
 import { sweepStale100msRooms } from '@/lib/social/sweep100msRooms';
+import { getJukeRoomDetail } from '@/lib/spaces/juke-api-reads';
 
 /**
  * GET /api/cron/juke-stale-rooms
@@ -34,19 +34,14 @@ const STALE_THRESHOLD_MINUTES = 120;
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
-    return NextResponse.json(
-      { ok: false, error: 'CRON_SECRET not configured' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'CRON_SECRET not configured' }, { status: 500 });
   }
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const thresholdIso = new Date(
-    Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000,
-  ).toISOString();
+  const thresholdIso = new Date(Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000).toISOString();
 
   let candidates: Array<{ id: string; title: string | null; started_at: string | null }>;
   try {
@@ -61,10 +56,7 @@ export async function GET(request: NextRequest) {
     candidates = data ?? [];
   } catch (err: unknown) {
     logger.error('[cron/juke-stale-rooms] candidate query failed', err);
-    return NextResponse.json(
-      { ok: false, error: 'Candidate query failed' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Candidate query failed' }, { status: 500 });
   }
 
   if (candidates.length === 0) {
@@ -201,6 +193,11 @@ export async function GET(request: NextRequest) {
     heuristic_only: heuristicOnly,
     threshold_minutes: STALE_THRESHOLD_MINUTES,
     ended_ids: endedIds,
-    hms_rooms: { checked: hms.checked, ended: hms.ended, skipped: hms.skipped, ended_ids: hms.endedIds },
+    hms_rooms: {
+      checked: hms.checked,
+      ended: hms.ended,
+      skipped: hms.skipped,
+      ended_ids: hms.endedIds,
+    },
   });
 }

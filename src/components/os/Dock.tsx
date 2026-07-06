@@ -27,7 +27,9 @@ export function Dock({ onOpenDrawer }: DockProps) {
             onClick={() => router.push(item.route)}
             className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#f5a623] active:bg-white/10"
           >
-            <span className="text-xl" aria-hidden="true">{item.icon}</span>
+            <span className="text-xl" aria-hidden="true">
+              {item.icon}
+            </span>
             <span className="text-[10px] text-white/60">{item.label}</span>
           </button>
         ))}
@@ -37,7 +39,9 @@ export function Dock({ onOpenDrawer }: DockProps) {
           onClick={onOpenDrawer}
           className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#f5a623] active:bg-white/10"
         >
-          <span className="text-xl" aria-hidden="true">⊞</span>
+          <span className="text-xl" aria-hidden="true">
+            ⊞
+          </span>
           <span className="text-[10px] text-white/60">Apps</span>
         </button>
       </div>

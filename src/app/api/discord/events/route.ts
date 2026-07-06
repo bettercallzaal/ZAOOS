@@ -105,7 +105,7 @@ export async function GET() {
       const nextOccurrence = getNextOccurrence(
         evt.day_of_week || 'monday',
         evt.time || '12:00',
-        evt.timezone || 'America/New_York'
+        evt.timezone || 'America/New_York',
       );
       const msUntil = nextOccurrence.getTime() - now.getTime();
       const isToday = msUntil >= 0 && msUntil < 24 * 60 * 60 * 1000;

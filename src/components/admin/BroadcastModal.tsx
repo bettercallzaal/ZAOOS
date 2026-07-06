@@ -12,7 +12,7 @@ export function BroadcastModal({ onClose }: { onClose: () => void }) {
         <h3 className="text-sm font-semibold text-white mb-3">Cast to /zao channel</h3>
         <textarea
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           placeholder="Write your announcement..."
           className="w-full bg-[#0a1628] border border-white/[0.15] rounded-lg p-3 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none h-32"
           maxLength={1024}
@@ -34,7 +34,9 @@ export function BroadcastModal({ onClose }: { onClose: () => void }) {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ text }),
                 });
-              } catch { /* ignore */ }
+              } catch {
+                /* ignore */
+              }
               setSending(false);
               onClose();
             }}

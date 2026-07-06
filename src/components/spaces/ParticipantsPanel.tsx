@@ -1,6 +1,11 @@
 'use client';
 
-import { useCallStateHooks, useCall, hasAudio, type StreamVideoParticipant } from '@stream-io/video-react-sdk';
+import {
+  hasAudio,
+  type StreamVideoParticipant,
+  useCall,
+  useCallStateHooks,
+} from '@stream-io/video-react-sdk';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -23,13 +28,9 @@ export function ParticipantsPanel({ isHost, hostFid, onClose }: ParticipantsPane
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
         <h3 className="text-white text-sm font-semibold">
-          Participants{' '}
-          <span className="text-[#f5a623] ml-1">({participants.length})</span>
+          Participants <span className="text-[#f5a623] ml-1">({participants.length})</span>
         </h3>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-white transition-colors"
-        >
+        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
           &#10005;
         </button>
       </div>
@@ -170,9 +171,23 @@ function ParticipantRow({
               className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               title="Mute"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+                />
               </svg>
             </button>
           )}
@@ -184,8 +199,18 @@ function ParticipantRow({
               className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               title="Remove from room"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                />
               </svg>
             </button>
           ) : (

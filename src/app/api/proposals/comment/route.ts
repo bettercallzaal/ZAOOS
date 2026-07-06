@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { createInAppNotification } from '@/lib/notifications';
 import { proposalCommentSchema } from '@/lib/validation/schemas';
-import { logger } from '@/lib/logger';
 
 /**
  * GET — Get comments for a proposal
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { proposal_id, body: commentBody } = parsed.data;
@@ -88,22 +88,24 @@ export async function POST(req: NextRequest) {
         .from('proposals')
         .select('author_id, title, users!proposals_author_id_fkey(fid)')
         .eq('id', proposal_id)
-        .single()
-    ).then(({ data: p }) => {
-      const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
-      if (authorFid && authorFid !== session.fid) {
-        createInAppNotification({
-          recipientFids: [authorFid],
-          type: 'comment',
-          title: 'New Comment',
-          body: `${session.displayName} commented on "${(p?.title as string || '').slice(0, 60)}"`,
-          href: '/governance',
-          actorFid: session.fid,
-          actorDisplayName: session.displayName,
-          actorPfpUrl: session.pfpUrl,
-        }).catch((err) => logger.error('[notify]', err));
-      }
-    }).catch((err) => logger.error('[notify]', err));
+        .single(),
+    )
+      .then(({ data: p }) => {
+        const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
+        if (authorFid && authorFid !== session.fid) {
+          createInAppNotification({
+            recipientFids: [authorFid],
+            type: 'comment',
+            title: 'New Comment',
+            body: `${session.displayName} commented on "${((p?.title as string) || '').slice(0, 60)}"`,
+            href: '/governance',
+            actorFid: session.fid,
+            actorDisplayName: session.displayName,
+            actorPfpUrl: session.pfpUrl,
+          }).catch((err) => logger.error('[notify]', err));
+        }
+      })
+      .catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({ comment });
   } catch (err) {

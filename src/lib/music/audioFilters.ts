@@ -40,32 +40,64 @@ export const FILTER_CATEGORIES: FilterCategory[] = [
     label: 'Speed & Pitch',
     icon: '⚡',
     keys: [
-      'nightcore', 'vaporwave', 'chipmunk', 'slowed', 'daycore',
-      'speedUp', 'doubleTime', 'halfSpeed', 'subtleFast', 'subtleSlow',
+      'nightcore',
+      'vaporwave',
+      'chipmunk',
+      'slowed',
+      'daycore',
+      'speedUp',
+      'doubleTime',
+      'halfSpeed',
+      'subtleFast',
+      'subtleSlow',
     ],
   },
   {
     label: 'Vibes',
     icon: '🎭',
     keys: [
-      'lofi', 'choppedScrewed', 'dreamy', 'underwater', 'oldRadio',
-      'vinyl', 'telephone', 'concert', 'cave', 'whisper',
+      'lofi',
+      'choppedScrewed',
+      'dreamy',
+      'underwater',
+      'oldRadio',
+      'vinyl',
+      'telephone',
+      'concert',
+      'cave',
+      'whisper',
     ],
   },
   {
     label: 'Genres',
     icon: '🎵',
     keys: [
-      'trap', 'phonk', 'synthwave', 'reggae', 'punk',
-      'jazz', 'classical', 'edm', 'rnb', 'latin',
+      'trap',
+      'phonk',
+      'synthwave',
+      'reggae',
+      'punk',
+      'jazz',
+      'classical',
+      'edm',
+      'rnb',
+      'latin',
     ],
   },
   {
     label: 'Fun',
     icon: '🎉',
     keys: [
-      'demon', 'angel', 'robot', 'giant', 'tiny',
-      'drunk', 'reverse', 'echo', 'alien', 'godMode',
+      'demon',
+      'angel',
+      'robot',
+      'giant',
+      'tiny',
+      'drunk',
+      'reverse',
+      'echo',
+      'alien',
+      'godMode',
     ],
   },
 ];
@@ -73,7 +105,6 @@ export const FILTER_CATEGORIES: FilterCategory[] = [
 // ── Presets ─────────────────────────────────────────────────────────────
 
 export const AUDIO_FILTERS: Record<string, AudioFilterPreset> = {
-
   // ═══════════════════════════════════════════════════════════════════════
   // SPEED & PITCH — playbackRate only, works with ALL sources
   // ═══════════════════════════════════════════════════════════════════════

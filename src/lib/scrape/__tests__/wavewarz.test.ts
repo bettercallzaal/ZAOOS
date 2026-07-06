@@ -1,7 +1,8 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import { parseWaveWarzArtistPage } from '../wavewarz';
 
 const fixture = readFileSync(join(__dirname, 'wavewarz-fixture.html'), 'utf-8');
@@ -31,7 +32,9 @@ describe('parseWaveWarzArtistPage', () => {
   it('fails loudly (does not return zeros) when no stats are present', () => {
     const longNoStatsHtml =
       '<html><head><title>Nope - WaveWarZ Player Card</title></head><body>' +
-      'this page has navigation and footer text but absolutely no rendered stat blocks anywhere in it. '.repeat(3) +
+      'this page has navigation and footer text but absolutely no rendered stat blocks anywhere in it. '.repeat(
+        3,
+      ) +
       '</body></html>';
     const res = parseWaveWarzArtistPage(longNoStatsHtml, WALLET);
     expect(res.ok).toBe(false);

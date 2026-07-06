@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 // ============================================================
 // ZABAL Live Hub -> ZAO OS Supabase backfill
 // Date: 2026-05-18
@@ -32,8 +33,8 @@
 //   node scripts/zabal-rollup-backfill.mjs --verify         # row-count parity after commit
 // ============================================================
 
-import { createClient } from '@supabase/supabase-js';
 import process from 'node:process';
+import { createClient } from '@supabase/supabase-js';
 
 const ARGV = new Set(process.argv.slice(2));
 const COMMIT = ARGV.has('--commit');
@@ -208,9 +209,7 @@ async function runOne(m) {
     written += rows.length;
   }
 
-  console.log(
-    `  [${m.name}] read=${read} written=${written} skipped=${skipped} errors=${errors}`,
-  );
+  console.log(`  [${m.name}] read=${read} written=${written} skipped=${skipped} errors=${errors}`);
   return { read, written, skipped, errors };
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Battle {
   battle_id: string;
@@ -59,9 +59,7 @@ function BattleCard({ battle }: { battle: Battle }) {
           >
             {battle.artist_a}
           </p>
-          {aWon && (
-            <p className="text-xs text-green-400/70 mt-0.5">Winner</p>
-          )}
+          {aWon && <p className="text-xs text-green-400/70 mt-0.5">Winner</p>}
         </div>
 
         {/* VS divider */}
@@ -74,25 +72,19 @@ function BattleCard({ battle }: { battle: Battle }) {
           >
             {battle.artist_b}
           </p>
-          {bWon && (
-            <p className="text-xs text-green-400/70 mt-0.5">Winner</p>
-          )}
+          {bWon && <p className="text-xs text-green-400/70 mt-0.5">Winner</p>}
         </div>
       </div>
 
       {/* Meta row */}
       <div className="mt-2 flex items-center justify-between gap-2 text-xs">
         {/* Volume */}
-        <span className="text-purple-400 font-medium">
-          ◎ {battle.volume_sol.toFixed(2)} SOL
-        </span>
+        <span className="text-purple-400 font-medium">◎ {battle.volume_sol.toFixed(2)} SOL</span>
 
         {/* Margin + date */}
         <div className="flex items-center gap-2 text-gray-600">
           {battle.winner_margin != null && (
-            <span className="text-gray-500">
-              +{battle.winner_margin.toFixed(1)}%
-            </span>
+            <span className="text-gray-500">+{battle.winner_margin.toFixed(1)}%</span>
           )}
           <span>{timeAgo(battle.settled_at)}</span>
         </div>
@@ -150,9 +142,7 @@ export default function BattleLog() {
       </div>
 
       {/* Error */}
-      {error && (
-        <p className="text-xs text-red-400 px-1">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-400 px-1">{error}</p>}
 
       {/* Battle list */}
       <div className="space-y-2">
@@ -163,9 +153,7 @@ export default function BattleLog() {
             <p className="text-sm text-gray-500">No battles recorded yet</p>
           </div>
         ) : (
-          battles.map((battle) => (
-            <BattleCard key={battle.battle_id} battle={battle} />
-          ))
+          battles.map((battle) => <BattleCard key={battle.battle_id} battle={battle} />)
         )}
       </div>
     </div>

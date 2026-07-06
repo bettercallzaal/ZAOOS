@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import type { XMTPPeerProfile } from '@/lib/xmtp/client';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { ZaoMember } from '@/contexts/XMTPContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 
 interface SearchUser {
   fid: number;
@@ -21,7 +21,10 @@ interface NewConversationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateDm: (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<void>;
-  onCreateGroup: (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => Promise<void>;
+  onCreateGroup: (
+    name: string,
+    members: { address: `0x${string}`; profile?: XMTPPeerProfile }[],
+  ) => Promise<void>;
   zaoMembers?: ZaoMember[];
   onStartDmWithMember?: (member: ZaoMember) => void;
 }
@@ -63,65 +66,71 @@ export function NewConversationDialog({
   const filteredZaoMembers = useMemo(() => {
     if (type !== 'dm' || !zaoMembers.length) return [];
     const q = search.toLowerCase().trim();
-    const filtered = q.length === 0
-      ? zaoMembers
-      : zaoMembers.filter(
-          (m) =>
-            m.displayName.toLowerCase().includes(q) ||
-            (m.username && m.username.toLowerCase().includes(q))
-        );
+    const filtered =
+      q.length === 0
+        ? zaoMembers
+        : zaoMembers.filter(
+            (m) =>
+              m.displayName.toLowerCase().includes(q) ||
+              (m.username && m.username.toLowerCase().includes(q)),
+          );
     // Reachable first, then alphabetical
     return filtered.slice(0, 8);
   }, [type, zaoMembers, search]);
 
-  const searchUsers = useCallback(async (q: string, setRes: (u: SearchUser[]) => void, setLoading: (b: boolean) => void) => {
-    if (q.length < 1) {
-      setRes([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`);
-      if (res.ok) {
-        const data = await res.json();
-        const users = data.users || [];
-        // Enrich with wallet data via the user endpoint
-        const enriched = await Promise.all(
-          users.slice(0, 6).map(async (u: Record<string, unknown>) => {
-            try {
-              const profileRes = await fetch(`/api/users/${u.fid}`);
-              if (profileRes.ok) {
-                const profile = await profileRes.json();
-                return {
-                  fid: profile.fid,
-                  username: profile.username,
-                  display_name: profile.display_name,
-                  pfp_url: profile.pfp_url,
-                  custody_address: profile.custody_address || '',
-                  verified_addresses: profile.verified_addresses?.eth_addresses || [],
-                  ens: {},
-                };
-              }
-            } catch { /* fall through */ }
-            return {
-              fid: u.fid as number,
-              username: (u.username as string) || '',
-              display_name: (u.display_name as string) || '',
-              pfp_url: (u.pfp_url as string) || '',
-              custody_address: '',
-              verified_addresses: [],
-              ens: {},
-            };
-          })
-        );
-        setRes(enriched);
+  const searchUsers = useCallback(
+    async (q: string, setRes: (u: SearchUser[]) => void, setLoading: (b: boolean) => void) => {
+      if (q.length < 1) {
+        setRes([]);
+        return;
       }
-    } catch (err) {
-      console.error('[NewConversationDialog] search failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const users = data.users || [];
+          // Enrich with wallet data via the user endpoint
+          const enriched = await Promise.all(
+            users.slice(0, 6).map(async (u: Record<string, unknown>) => {
+              try {
+                const profileRes = await fetch(`/api/users/${u.fid}`);
+                if (profileRes.ok) {
+                  const profile = await profileRes.json();
+                  return {
+                    fid: profile.fid,
+                    username: profile.username,
+                    display_name: profile.display_name,
+                    pfp_url: profile.pfp_url,
+                    custody_address: profile.custody_address || '',
+                    verified_addresses: profile.verified_addresses?.eth_addresses || [],
+                    ens: {},
+                  };
+                }
+              } catch {
+                /* fall through */
+              }
+              return {
+                fid: u.fid as number,
+                username: (u.username as string) || '',
+                display_name: (u.display_name as string) || '',
+                pfp_url: (u.pfp_url as string) || '',
+                custody_address: '',
+                verified_addresses: [],
+                ens: {},
+              };
+            }),
+          );
+          setRes(enriched);
+        }
+      } catch (err) {
+        console.error('[NewConversationDialog] search failed:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -134,7 +143,10 @@ export function NewConversationDialog({
   const handleGroupSearchChange = (val: string) => {
     setGroupSearch(val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => searchUsers(val, setGroupResults, setGroupSearching), 400);
+    debounceRef.current = setTimeout(
+      () => searchUsers(val, setGroupResults, setGroupSearching),
+      400,
+    );
   };
 
   const selectUser = (user: SearchUser) => {
@@ -223,8 +235,14 @@ export function NewConversationDialog({
 
   const allAddresses = selectedUser
     ? [
-        ...(selectedUser.custody_address ? [{ addr: selectedUser.custody_address, label: 'Farcaster', color: 'blue' }] : []),
-        ...selectedUser.verified_addresses.map((a) => ({ addr: a, label: 'Verified', color: 'green' })),
+        ...(selectedUser.custody_address
+          ? [{ addr: selectedUser.custody_address, label: 'Farcaster', color: 'blue' }]
+          : []),
+        ...selectedUser.verified_addresses.map((a) => ({
+          addr: a,
+          label: 'Verified',
+          color: 'green',
+        })),
       ]
     : [];
 
@@ -232,14 +250,31 @@ export function NewConversationDialog({
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div ref={dialogRef} className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div
+          ref={dialogRef}
+          className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/[0.08] flex-shrink-0">
             <h3 className="text-base font-semibold text-white">
               {type === 'dm' ? 'New Message' : 'New Group'}
             </h3>
-            <button onClick={() => { resetState(); onClose(); }} className="text-gray-400 hover:text-white" aria-label="Close dialog">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <button
+              onClick={() => {
+                resetState();
+                onClose();
+              }}
+              className="text-gray-400 hover:text-white"
+              aria-label="Close dialog"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -254,22 +289,45 @@ export function NewConversationDialog({
                   <div className="rounded-lg bg-[#1a2a3a] border border-white/[0.08] p-3">
                     <div className="flex items-center gap-3">
                       {selectedUser.pfp_url ? (
-                        <Image src={selectedUser.pfp_url} alt={`${selectedUser.display_name || selectedUser.username || 'User'} avatar`} width={40} height={40} className="rounded-full flex-shrink-0" />
+                        <Image
+                          src={selectedUser.pfp_url}
+                          alt={`${selectedUser.display_name || selectedUser.username || 'User'} avatar`}
+                          width={40}
+                          height={40}
+                          className="rounded-full flex-shrink-0"
+                        />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-medium text-white">{selectedUser.display_name || selectedUser.username}</span>
+                        <span className="text-sm font-medium text-white">
+                          {selectedUser.display_name || selectedUser.username}
+                        </span>
                         <span className="text-xs text-gray-500 ml-2">@{selectedUser.username}</span>
-                        <p className="text-[10px] text-gray-600 font-mono mt-0.5">FID:{selectedUser.fid}</p>
+                        <p className="text-[10px] text-gray-600 font-mono mt-0.5">
+                          FID:{selectedUser.fid}
+                        </p>
                       </div>
                       <button
-                        onClick={() => { setSelectedUser(null); setSelectedAddress(''); }}
+                        onClick={() => {
+                          setSelectedUser(null);
+                          setSelectedAddress('');
+                        }}
                         className="text-gray-500 hover:text-white"
                         aria-label="Remove selected user"
                       >
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="w-4 h-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -277,7 +335,9 @@ export function NewConversationDialog({
                     {/* Wallet picker */}
                     {allAddresses.length > 0 && (
                       <div className="mt-3 space-y-1.5">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Send to wallet</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                          Send to wallet
+                        </p>
                         {allAddresses.map(({ addr, label, color }) => (
                           <button
                             key={addr}
@@ -288,15 +348,31 @@ export function NewConversationDialog({
                                 : 'bg-[#0a1628] border border-white/[0.08] hover:border-white/[0.08]'
                             }`}
                           >
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                              color === 'blue' ? 'bg-blue-500/10 text-blue-400' : 'bg-green-500/10 text-green-400'
-                            }`}>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                color === 'blue'
+                                  ? 'bg-blue-500/10 text-blue-400'
+                                  : 'bg-green-500/10 text-green-400'
+                              }`}
+                            >
                               {label}
                             </span>
-                            <span className="text-xs text-gray-300 font-mono flex-1">{shortAddr(addr)}</span>
+                            <span className="text-xs text-gray-300 font-mono flex-1">
+                              {shortAddr(addr)}
+                            </span>
                             {selectedAddress === addr && (
-                              <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              <svg
+                                className="w-4 h-4 text-[#f5a623]"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M4.5 12.75l6 6 9-13.5"
+                                />
                               </svg>
                             )}
                           </button>
@@ -305,17 +381,31 @@ export function NewConversationDialog({
                     )}
 
                     {allAddresses.length === 0 && (
-                      <p className="text-xs text-red-400 mt-2">No wallet addresses found for this user</p>
+                      <p className="text-xs text-red-400 mt-2">
+                        No wallet addresses found for this user
+                      </p>
                     )}
                   </div>
                 ) : (
                   <>
                     {/* Search input */}
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1.5">Search Farcaster user</label>
+                      <label className="block text-xs text-gray-400 mb-1.5">
+                        Search Farcaster user
+                      </label>
                       <div className="relative">
-                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
                         </svg>
                         <input
                           type="text"
@@ -367,10 +457,18 @@ export function NewConversationDialog({
                             >
                               <div className="relative flex-shrink-0">
                                 {member.pfpUrl ? (
-                                  <Image src={member.pfpUrl} alt={`${member.displayName} avatar`} width={32} height={32} className="rounded-full" />
+                                  <Image
+                                    src={member.pfpUrl}
+                                    alt={`${member.displayName} avatar`}
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full"
+                                  />
                                 ) : (
                                   <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                                    <span className="text-xs text-gray-400 font-medium">{member.displayName[0]?.toUpperCase()}</span>
+                                    <span className="text-xs text-gray-400 font-medium">
+                                      {member.displayName[0]?.toUpperCase()}
+                                    </span>
                                   </div>
                                 )}
                                 {member.reachable && (
@@ -379,16 +477,24 @@ export function NewConversationDialog({
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-medium text-white truncate">{member.displayName}</span>
+                                  <span className="text-sm font-medium text-white truncate">
+                                    {member.displayName}
+                                  </span>
                                   {member.username && (
-                                    <span className="text-xs text-gray-500">@{member.username}</span>
+                                    <span className="text-xs text-gray-500">
+                                      @{member.username}
+                                    </span>
                                   )}
                                 </div>
                               </div>
                               {member.reachable ? (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium flex-shrink-0">XMTP</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium flex-shrink-0">
+                                  XMTP
+                                </span>
                               ) : (
-                                <span className="text-[10px] text-gray-600 flex-shrink-0">Not on XMTP</span>
+                                <span className="text-[10px] text-gray-600 flex-shrink-0">
+                                  Not on XMTP
+                                </span>
                               )}
                             </button>
                           ))}
@@ -412,33 +518,58 @@ export function NewConversationDialog({
                             className="flex items-center gap-3 w-full p-2.5 rounded-lg bg-[#1a2a3a] hover:bg-white/5 transition-colors text-left"
                           >
                             {user.pfp_url ? (
-                              <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
+                              <Image
+                                src={user.pfp_url}
+                                alt={`${user.display_name || user.username || 'User'} avatar`}
+                                width={32}
+                                height={32}
+                                className="rounded-full flex-shrink-0"
+                              />
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-sm font-medium text-white truncate">{user.display_name || user.username}</span>
+                                <span className="text-sm font-medium text-white truncate">
+                                  {user.display_name || user.username}
+                                </span>
                                 <span className="text-xs text-gray-500">@{user.username}</span>
                               </div>
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-[10px] text-gray-600 font-mono">FID:{user.fid}</span>
+                                <span className="text-[10px] text-gray-600 font-mono">
+                                  FID:{user.fid}
+                                </span>
                                 {user.custody_address && (
-                                  <span className="text-[10px] text-gray-600 font-mono">{shortAddr(user.custody_address)}</span>
+                                  <span className="text-[10px] text-gray-600 font-mono">
+                                    {shortAddr(user.custody_address)}
+                                  </span>
                                 )}
                               </div>
                             </div>
-                            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            <svg
+                              className="w-4 h-4 text-gray-600"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                              />
                             </svg>
                           </button>
                         ))}
                       </div>
                     )}
 
-                    {!searching && search.length >= 1 && results.length === 0 && filteredZaoMembers.length === 0 && (
-                      <p className="text-sm text-gray-500 text-center py-3">No users found</p>
-                    )}
+                    {!searching &&
+                      search.length >= 1 &&
+                      results.length === 0 &&
+                      filteredZaoMembers.length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-3">No users found</p>
+                      )}
                   </>
                 )}
               </>
@@ -459,7 +590,9 @@ export function NewConversationDialog({
                 {/* Added members */}
                 {groupMembers.length > 0 && (
                   <div>
-                    <p className="text-xs text-gray-400 mb-1.5">{groupMembers.length} member{groupMembers.length !== 1 ? 's' : ''}</p>
+                    <p className="text-xs text-gray-400 mb-1.5">
+                      {groupMembers.length} member{groupMembers.length !== 1 ? 's' : ''}
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {groupMembers.map((m) => (
                         <span
@@ -467,12 +600,34 @@ export function NewConversationDialog({
                           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1a2a3a] border border-white/[0.08] text-xs"
                         >
                           {m.user.pfp_url && (
-                            <Image src={m.user.pfp_url} alt={`${m.user.display_name || m.user.username || 'User'} avatar`} width={16} height={16} className="rounded-full" />
+                            <Image
+                              src={m.user.pfp_url}
+                              alt={`${m.user.display_name || m.user.username || 'User'} avatar`}
+                              width={16}
+                              height={16}
+                              className="rounded-full"
+                            />
                           )}
-                          <span className="text-white">{m.user.display_name || m.user.username}</span>
-                          <button onClick={() => removeGroupMember(m.user.fid)} className="text-gray-500 hover:text-red-400" aria-label={`Remove ${m.user.display_name || m.user.username}`}>
-                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          <span className="text-white">
+                            {m.user.display_name || m.user.username}
+                          </span>
+                          <button
+                            onClick={() => removeGroupMember(m.user.fid)}
+                            className="text-gray-500 hover:text-red-400"
+                            aria-label={`Remove ${m.user.display_name || m.user.username}`}
+                          >
+                            <svg
+                              className="w-3 h-3"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </span>
@@ -485,8 +640,18 @@ export function NewConversationDialog({
                 <div>
                   <label className="block text-xs text-gray-400 mb-1.5">Add members</label>
                   <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
                     </svg>
                     <input
                       type="text"
@@ -517,15 +682,25 @@ export function NewConversationDialog({
                           className="flex items-center gap-3 w-full p-2.5 rounded-lg bg-[#1a2a3a] hover:bg-white/5 transition-colors text-left disabled:opacity-40"
                         >
                           {user.pfp_url ? (
-                            <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
+                            <Image
+                              src={user.pfp_url}
+                              alt={`${user.display_name || user.username || 'User'} avatar`}
+                              width={32}
+                              height={32}
+                              className="rounded-full flex-shrink-0"
+                            />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
                           )}
                           <div className="flex-1 min-w-0">
-                            <span className="text-sm font-medium text-white truncate">{user.display_name || user.username}</span>
+                            <span className="text-sm font-medium text-white truncate">
+                              {user.display_name || user.username}
+                            </span>
                             <span className="text-xs text-gray-500 ml-1.5">@{user.username}</span>
                           </div>
-                          <span className={`text-xs ${alreadyAdded ? 'text-green-400' : 'text-gray-500'}`}>
+                          <span
+                            className={`text-xs ${alreadyAdded ? 'text-green-400' : 'text-gray-500'}`}
+                          >
                             {alreadyAdded ? 'Added' : hasAddr ? '+ Add' : 'No wallet'}
                           </span>
                         </button>
@@ -536,22 +711,26 @@ export function NewConversationDialog({
               </>
             )}
 
-            {error && (
-              <p className="text-xs text-red-400">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-400">{error}</p>}
           </div>
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-2 p-4 border-t border-white/[0.08] flex-shrink-0">
             <button
-              onClick={() => { resetState(); onClose(); }}
+              onClick={() => {
+                resetState();
+                onClose();
+              }}
               className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
-              disabled={creating || (type === 'dm' ? !selectedAddress : groupMembers.length === 0 || !groupName.trim())}
+              disabled={
+                creating ||
+                (type === 'dm' ? !selectedAddress : groupMembers.length === 0 || !groupName.trim())
+              }
               className="px-4 py-2 text-sm font-medium bg-[#f5a623] text-black rounded-lg hover:bg-[#ffd700] transition-colors disabled:opacity-50"
             >
               {creating ? 'Creating...' : type === 'dm' ? 'Start Chat' : 'Create Group'}

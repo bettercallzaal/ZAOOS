@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import StakeClient from './StakeClient';
 
 const miniAppEmbed = JSON.stringify({

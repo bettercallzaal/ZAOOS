@@ -1,14 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 const updateSchema = z.object({
-  updates: z.array(z.object({
-    memberId: z.string().uuid(),
-    fid: z.number().int().positive(),
-  })).min(1).max(100),
+  updates: z
+    .array(
+      z.object({
+        memberId: z.string().uuid(),
+        fid: z.number().int().positive(),
+      }),
+    )
+    .min(1)
+    .max(100),
 });
 
 /**
@@ -18,7 +23,8 @@ const updateSchema = z.object({
 export async function GET() {
   const session = await getSessionData();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!session.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+  if (!session.isAdmin)
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
   try {
     const { data: members } = await supabaseAdmin
@@ -37,9 +43,13 @@ export async function GET() {
       .select('id', { count: 'exact' });
 
     // Group by priority
-    const active = (members || []).filter(m => Number(m.fractal_count) > 0);
-    const onchainOnly = (members || []).filter(m => Number(m.fractal_count) === 0 && Number(m.onchain_og) > 0);
-    const inactive = (members || []).filter(m => Number(m.fractal_count) === 0 && Number(m.onchain_og) === 0);
+    const active = (members || []).filter((m) => Number(m.fractal_count) > 0);
+    const onchainOnly = (members || []).filter(
+      (m) => Number(m.fractal_count) === 0 && Number(m.onchain_og) > 0,
+    );
+    const inactive = (members || []).filter(
+      (m) => Number(m.fractal_count) === 0 && Number(m.onchain_og) === 0,
+    );
 
     return NextResponse.json({
       active,
@@ -64,13 +74,17 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   const session = await getSessionData();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!session.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+  if (!session.isAdmin)
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
   try {
     const body = await req.json();
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     let updated = 0;

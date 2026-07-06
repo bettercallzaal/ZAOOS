@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockCheckGating, mockScoreByFid } = vi.hoisted(() => ({
   mockCheckGating: vi.fn(),

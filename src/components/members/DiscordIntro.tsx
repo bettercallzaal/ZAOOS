@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface DiscordIntroData {
   discordId: string;
@@ -92,9 +92,7 @@ export default function DiscordIntro({ discordId }: { discordId: string }) {
 
       {/* Footer with date */}
       <div className="mt-3 pt-2 border-t border-white/[0.08]">
-        <p className="text-[10px] text-gray-600">
-          Introduced on {postedDate}
-        </p>
+        <p className="text-[10px] text-gray-600">Introduced on {postedDate}</p>
       </div>
     </div>
   );

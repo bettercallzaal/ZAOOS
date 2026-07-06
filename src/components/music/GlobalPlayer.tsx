@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-
+import { useEffect, useRef, useState } from 'react';
+import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { LikeButton } from '@/components/music/LikeButton';
+import { SleepTimerButton } from '@/components/music/SleepTimerButton';
+import { formatDuration } from '@/lib/music/formatDuration';
 import { usePlayer } from '@/providers/audio';
 import type { RepeatMode } from '@/providers/audio/PlayerProvider';
 import { Scrubber } from './Scrubber';
-import { formatDuration } from '@/lib/music/formatDuration';
-import { ArtworkImage } from '@/components/music/ArtworkImage';
-import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { LikeButton } from '@/components/music/LikeButton';
-import { SleepTimerButton } from '@/components/music/SleepTimerButton';
 
 interface GlobalPlayerProps {
   onPrev?: () => void;
@@ -51,7 +50,15 @@ export function GlobalPlayer({
 
   if (!player.metadata) return null;
 
-  const { metadata, isPlaying, isLoading, isError, error: playerError, position, duration } = player;
+  const {
+    metadata,
+    isPlaying,
+    isLoading,
+    isError,
+    error: playerError,
+    position,
+    duration,
+  } = player;
 
   const handlePlayPause = () => {
     if (isPlaying) player.pause();
@@ -80,7 +87,12 @@ export function GlobalPlayer({
       {isError && playerError && (
         <div className="px-4 py-1.5 bg-red-900/40 border-b border-red-800/30 flex items-center justify-between relative z-10">
           <p className="text-xs text-red-300">{playerError}</p>
-          <button onClick={() => player.pause()} className="text-red-400 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
+          <button
+            onClick={() => player.pause()}
+            className="text-red-400 hover:text-white text-xs ml-3 flex-shrink-0"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -88,7 +100,9 @@ export function GlobalPlayer({
       <div className="hidden sm:flex items-center gap-4 px-4 py-2.5 relative z-10">
         {/* Left: Artwork + Track info */}
         <div className="flex items-center gap-3 w-56 flex-shrink-0">
-          <div className={`relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 shadow-lg ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}>
+          <div
+            className={`relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 shadow-lg ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
+          >
             <ArtworkImage
               src={metadata.artworkUrl}
               alt={metadata.trackName}
@@ -147,9 +161,19 @@ export function GlobalPlayer({
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isLoading ? (
-                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
                   <circle cx="12" cy="12" r="10" strokeWidth="3" className="opacity-25" />
-                  <path d="M12 2a10 10 0 0110 10" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
+                  <path
+                    d="M12 2a10 10 0 0110 10"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    className="opacity-75"
+                  />
                 </svg>
               ) : isPlaying ? (
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -233,14 +257,28 @@ export function GlobalPlayer({
 
           {isRadioMode && (
             <span className="text-[10px] font-semibold text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75z" />
+              <svg
+                className="w-3 h-3"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75z"
+                />
               </svg>
               RADIO
             </span>
           )}
           <span className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded capitalize">
-            {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
+            {metadata.type === 'applemusic'
+              ? 'Apple Music'
+              : metadata.type === 'soundxyz'
+                ? 'Sound.xyz'
+                : metadata.type}
           </span>
 
           {onToggleQueue && (
@@ -252,8 +290,18 @@ export function GlobalPlayer({
               aria-label="Toggle queue"
               title={`Queue (${queueLength})`}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5"
+                />
               </svg>
               {queueLength > 0 && !queueOpen && (
                 <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#f5a623] text-[7px] font-bold text-black flex items-center justify-center">
@@ -264,11 +312,20 @@ export function GlobalPlayer({
           )}
 
           <button
-            onClick={(e) => { e.stopPropagation(); player.pause(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              player.pause();
+            }}
             className="text-gray-500 hover:text-gray-300 transition-colors p-1"
             aria-label="Dismiss player"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -295,7 +352,9 @@ export function GlobalPlayer({
 
         <div className="flex items-center gap-3 px-3 py-2">
           {/* Artwork */}
-          <div className={`relative w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}>
+          <div
+            className={`relative w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
+          >
             <ArtworkImage
               src={metadata.artworkUrl}
               alt={metadata.trackName}
@@ -385,10 +444,22 @@ function ShuffleButton({ active, onClick }: { active: boolean; onClick: () => vo
       aria-label={active ? 'Disable shuffle' : 'Enable shuffle'}
       title="Shuffle"
     >
-      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+      <svg
+        className="w-3.5 h-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"
+        />
       </svg>
-      {active && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />}
+      {active && (
+        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />
+      )}
     </button>
   );
 }
@@ -463,17 +534,35 @@ function RepeatButton({ mode, onClick }: { mode: RepeatMode; onClick: () => void
     <button
       onClick={onClick}
       className={`relative p-1 rounded transition-colors ${active ? 'text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'}`}
-      aria-label={mode === 'off' ? 'Enable repeat' : mode === 'all' ? 'Repeat one' : 'Disable repeat'}
+      aria-label={
+        mode === 'off' ? 'Enable repeat' : mode === 'all' ? 'Repeat one' : 'Disable repeat'
+      }
       title={mode === 'off' ? 'Repeat' : mode === 'all' ? 'Repeat all' : 'Repeat one'}
     >
-      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M4.5 12c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 7.5l4.5-3-4.5-3M9.75 16.5l-4.5 3 4.5 3" />
+      <svg
+        className="w-3.5 h-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M4.5 12c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M14.25 7.5l4.5-3-4.5-3M9.75 16.5l-4.5 3 4.5 3"
+        />
       </svg>
       {mode === 'one' && (
         <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-[#f5a623]">1</span>
       )}
-      {active && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />}
+      {active && (
+        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />
+      )}
     </button>
   );
 }

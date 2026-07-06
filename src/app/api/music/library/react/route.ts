@@ -1,12 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { upsertSong } from '@/lib/music/library';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { logger } from '@/lib/logger';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { upsertSong } from '@/lib/music/library';
 
-const ALLOWED_EMOJIS = ['\uD83D\uDD25', '\u2764\uFE0F', '\uD83C\uDFB5', '\uD83D\uDC8E', '\uD83D\uDC4F', '\uD83E\uDD2F'] as const;
+const ALLOWED_EMOJIS = [
+  '\uD83D\uDD25',
+  '\u2764\uFE0F',
+  '\uD83C\uDFB5',
+  '\uD83D\uDC8E',
+  '\uD83D\uDC4F',
+  '\uD83E\uDD2F',
+] as const;
 
 const reactSchema = z.object({
   url: z.string().url().max(500),
@@ -19,10 +26,7 @@ const reactSchema = z.object({
  * Helper to get emoji->count map for a song
  */
 async function getReactionCounts(songId: string): Promise<Record<string, number>> {
-  const { data } = await supabaseAdmin
-    .from('song_reactions')
-    .select('emoji')
-    .eq('song_id', songId);
+  const { data } = await supabaseAdmin.from('song_reactions').select('emoji').eq('song_id', songId);
 
   const counts: Record<string, number> = {};
   for (const row of data || []) {
@@ -66,9 +70,10 @@ export async function GET(req: NextRequest) {
     ]);
 
     const reactionCounts = reactions.status === 'fulfilled' ? reactions.value : {};
-    const userReactions = userResult.status === 'fulfilled'
-      ? (userResult.value.data || []).map((r: { emoji: string }) => r.emoji)
-      : [];
+    const userReactions =
+      userResult.status === 'fulfilled'
+        ? (userResult.value.data || []).map((r: { emoji: string }) => r.emoji)
+        : [];
 
     return NextResponse.json({ reactions: reactionCounts, userReactions });
   } catch (err) {
@@ -88,7 +93,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = reactSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { url, emoji } = parsed.data;
@@ -115,10 +123,7 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       // Remove reaction (toggle off)
-      await supabaseAdmin
-        .from('song_reactions')
-        .delete()
-        .eq('id', existing.id);
+      await supabaseAdmin.from('song_reactions').delete().eq('id', existing.id);
       reacted = false;
     } else {
       // Add reaction (toggle on)

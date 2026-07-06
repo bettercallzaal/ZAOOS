@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface NexusLink {
   id: string;
@@ -67,26 +67,32 @@ export function NexusLinksManager() {
     }
   }, []);
 
-  useEffect(() => { fetchLinks(); }, [fetchLinks]);
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks]);
 
-  const filteredLinks = links.filter(link => {
+  const filteredLinks = links.filter((link) => {
     if (filterCategory && link.category !== filterCategory) return false;
     if (filterSubcategory && link.subcategory !== filterSubcategory) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return link.title.toLowerCase().includes(q) ||
+      return (
+        link.title.toLowerCase().includes(q) ||
         link.url.toLowerCase().includes(q) ||
         (link.description || '').toLowerCase().includes(q) ||
-        link.tags.some(t => t.toLowerCase().includes(q));
+        link.tags.some((t) => t.toLowerCase().includes(q))
+      );
     }
     return true;
   });
 
-  const subcategories = [...new Set(
-    links
-      .filter(l => !filterCategory || l.category === filterCategory)
-      .map(l => l.subcategory)
-  )].sort();
+  const subcategories = [
+    ...new Set(
+      links
+        .filter((l) => !filterCategory || l.category === filterCategory)
+        .map((l) => l.subcategory),
+    ),
+  ].sort();
 
   const handleAdd = async () => {
     if (!newLink.title || !newLink.url || !newLink.category || !newLink.subcategory) {
@@ -154,7 +160,11 @@ export function NexusLinksManager() {
     }
   };
 
-  const handleToggle = async (id: string, field: 'is_active' | 'is_featured' | 'is_gated', value: boolean) => {
+  const handleToggle = async (
+    id: string,
+    field: 'is_active' | 'is_featured' | 'is_gated',
+    value: boolean,
+  ) => {
     try {
       const res = await fetch('/api/admin/nexus', {
         method: 'PUT',
@@ -192,7 +202,8 @@ export function NexusLinksManager() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-400">
-            {links.length} total links | {links.filter(l => l.is_active).length} active | {links.filter(l => l.is_featured).length} featured
+            {links.length} total links | {links.filter((l) => l.is_active).length} active |{' '}
+            {links.filter((l) => l.is_featured).length} featured
           </span>
         </div>
         <button
@@ -206,7 +217,9 @@ export function NexusLinksManager() {
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-lg text-sm">
           {error}
-          <button onClick={() => setError('')} className="ml-2 text-red-300 hover:text-white">x</button>
+          <button onClick={() => setError('')} className="ml-2 text-red-300 hover:text-white">
+            x
+          </button>
         </div>
       )}
 
@@ -218,57 +231,77 @@ export function NexusLinksManager() {
             <input
               placeholder="Title *"
               value={newLink.title}
-              onChange={e => setNewLink({ ...newLink, title: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
             />
             <input
               placeholder="URL *"
               value={newLink.url}
-              onChange={e => setNewLink({ ...newLink, url: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
             />
             <input
               placeholder="Category *"
               value={newLink.category}
-              onChange={e => setNewLink({ ...newLink, category: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, category: e.target.value })}
               list="categories-list"
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
             />
             <input
               placeholder="Subcategory *"
               value={newLink.subcategory}
-              onChange={e => setNewLink({ ...newLink, subcategory: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, subcategory: e.target.value })}
               list="subcategories-list"
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
             />
             <select
               value={newLink.portal_group}
-              onChange={e => setNewLink({ ...newLink, portal_group: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, portal_group: e.target.value })}
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white"
             >
               <option value="">Portal Group (optional)</option>
-              {PORTAL_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+              {PORTAL_GROUPS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
             </select>
             <input
               placeholder="Tags (comma separated)"
               value={newLink.tags.join(', ')}
-              onChange={e => setNewLink({ ...newLink, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+              onChange={(e) =>
+                setNewLink({
+                  ...newLink,
+                  tags: e.target.value
+                    .split(',')
+                    .map((t) => t.trim())
+                    .filter(Boolean),
+                })
+              }
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
             />
             <input
               placeholder="Description"
               value={newLink.description}
-              onChange={e => setNewLink({ ...newLink, description: e.target.value })}
+              onChange={(e) => setNewLink({ ...newLink, description: e.target.value })}
               className="bg-[#0a1628] border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 sm:col-span-2"
             />
           </div>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-sm text-gray-400">
-              <input type="checkbox" checked={newLink.is_featured} onChange={e => setNewLink({ ...newLink, is_featured: e.target.checked })} />
+              <input
+                type="checkbox"
+                checked={newLink.is_featured}
+                onChange={(e) => setNewLink({ ...newLink, is_featured: e.target.checked })}
+              />
               Featured
             </label>
             <label className="flex items-center gap-2 text-sm text-gray-400">
-              <input type="checkbox" checked={newLink.is_gated} onChange={e => setNewLink({ ...newLink, is_gated: e.target.checked })} />
+              <input
+                type="checkbox"
+                checked={newLink.is_gated}
+                onChange={(e) => setNewLink({ ...newLink, is_gated: e.target.checked })}
+              />
               Token-gated
             </label>
             <button
@@ -280,10 +313,14 @@ export function NexusLinksManager() {
             </button>
           </div>
           <datalist id="categories-list">
-            {categories.map(c => <option key={c} value={c} />)}
+            {categories.map((c) => (
+              <option key={c} value={c} />
+            ))}
           </datalist>
           <datalist id="subcategories-list">
-            {subcategories.map(s => <option key={s} value={s} />)}
+            {subcategories.map((s) => (
+              <option key={s} value={s} />
+            ))}
           </datalist>
         </div>
       )}
@@ -293,24 +330,35 @@ export function NexusLinksManager() {
         <input
           placeholder="Search links..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-[#0a1628] border border-white/10 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 flex-1 min-w-[200px]"
         />
         <select
           value={filterCategory}
-          onChange={e => { setFilterCategory(e.target.value); setFilterSubcategory(''); }}
+          onChange={(e) => {
+            setFilterCategory(e.target.value);
+            setFilterSubcategory('');
+          }}
           className="bg-[#0a1628] border border-white/10 rounded px-3 py-1.5 text-sm text-white"
         >
           <option value="">All Categories</option>
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          {categories.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </select>
         <select
           value={filterSubcategory}
-          onChange={e => setFilterSubcategory(e.target.value)}
+          onChange={(e) => setFilterSubcategory(e.target.value)}
           className="bg-[#0a1628] border border-white/10 rounded px-3 py-1.5 text-sm text-white"
         >
           <option value="">All Subcategories</option>
-          {subcategories.map(s => <option key={s} value={s}>{s}</option>)}
+          {subcategories.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -329,8 +377,11 @@ export function NexusLinksManager() {
             </tr>
           </thead>
           <tbody>
-            {filteredLinks.map(link => (
-              <tr key={link.id} className={`border-t border-white/5 hover:bg-white/5 transition-colors ${!link.is_active ? 'opacity-50' : ''}`}>
+            {filteredLinks.map((link) => (
+              <tr
+                key={link.id}
+                className={`border-t border-white/5 hover:bg-white/5 transition-colors ${!link.is_active ? 'opacity-50' : ''}`}
+              >
                 {editingId === link.id ? (
                   <>
                     <td className="px-3 py-2" colSpan={7}>
@@ -338,39 +389,55 @@ export function NexusLinksManager() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <input
                             value={editForm.title || ''}
-                            onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                            onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder="Title"
                           />
                           <input
                             value={editForm.url || ''}
-                            onChange={e => setEditForm({ ...editForm, url: e.target.value })}
+                            onChange={(e) => setEditForm({ ...editForm, url: e.target.value })}
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder="URL"
                           />
                           <input
                             value={editForm.category || ''}
-                            onChange={e => setEditForm({ ...editForm, category: e.target.value })}
+                            onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder="Category"
                           />
                           <input
                             value={editForm.subcategory || ''}
-                            onChange={e => setEditForm({ ...editForm, subcategory: e.target.value })}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, subcategory: e.target.value })
+                            }
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder="Subcategory"
                           />
                           <select
                             value={editForm.portal_group || ''}
-                            onChange={e => setEditForm({ ...editForm, portal_group: e.target.value || null })}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, portal_group: e.target.value || null })
+                            }
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                           >
                             <option value="">No portal group</option>
-                            {PORTAL_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+                            {PORTAL_GROUPS.map((g) => (
+                              <option key={g} value={g}>
+                                {g}
+                              </option>
+                            ))}
                           </select>
                           <input
                             value={(editForm.tags || []).join(', ')}
-                            onChange={e => setEditForm({ ...editForm, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                            onChange={(e) =>
+                              setEditForm({
+                                ...editForm,
+                                tags: e.target.value
+                                  .split(',')
+                                  .map((t) => t.trim())
+                                  .filter(Boolean),
+                              })
+                            }
                             className="bg-[#0a1628] border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder="Tags (comma separated)"
                           />
@@ -384,7 +451,10 @@ export function NexusLinksManager() {
                             {saving ? 'Saving...' : 'Save'}
                           </button>
                           <button
-                            onClick={() => { setEditingId(null); setEditForm({}); }}
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditForm({});
+                            }}
                             className="px-3 py-1 text-xs bg-gray-700 text-white rounded hover:bg-gray-600"
                           >
                             Cancel
@@ -397,16 +467,32 @@ export function NexusLinksManager() {
                   <>
                     <td className="px-3 py-2">
                       <div>
-                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#f5a623] transition-colors">
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white hover:text-[#f5a623] transition-colors"
+                        >
                           {link.title}
                         </a>
-                        <div className="text-xs text-gray-500 truncate max-w-[250px]">{link.url}</div>
+                        <div className="text-xs text-gray-500 truncate max-w-[250px]">
+                          {link.url}
+                        </div>
                         {link.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {link.tags.slice(0, 3).map(t => (
-                              <span key={t} className="text-[10px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded">{t}</span>
+                            {link.tags.slice(0, 3).map((t) => (
+                              <span
+                                key={t}
+                                className="text-[10px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded"
+                              >
+                                {t}
+                              </span>
                             ))}
-                            {link.tags.length > 3 && <span className="text-[10px] text-gray-500">+{link.tags.length - 3}</span>}
+                            {link.tags.length > 3 && (
+                              <span className="text-[10px] text-gray-500">
+                                +{link.tags.length - 3}
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>
@@ -417,21 +503,32 @@ export function NexusLinksManager() {
                     </td>
                     <td className="px-3 py-2 hidden md:table-cell">
                       {link.portal_group && (
-                        <span className="text-xs bg-[#f5a623]/10 text-[#f5a623] px-2 py-0.5 rounded">{link.portal_group}</span>
+                        <span className="text-xs bg-[#f5a623]/10 text-[#f5a623] px-2 py-0.5 rounded">
+                          {link.portal_group}
+                        </span>
                       )}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <button onClick={() => handleToggle(link.id, 'is_active', link.is_active)} className="text-lg">
+                      <button
+                        onClick={() => handleToggle(link.id, 'is_active', link.is_active)}
+                        className="text-lg"
+                      >
                         {link.is_active ? '✅' : '❌'}
                       </button>
                     </td>
                     <td className="px-3 py-2 text-center hidden sm:table-cell">
-                      <button onClick={() => handleToggle(link.id, 'is_featured', link.is_featured)} className="text-lg">
+                      <button
+                        onClick={() => handleToggle(link.id, 'is_featured', link.is_featured)}
+                        className="text-lg"
+                      >
                         {link.is_featured ? '⭐' : '☆'}
                       </button>
                     </td>
                     <td className="px-3 py-2 text-center hidden sm:table-cell">
-                      <button onClick={() => handleToggle(link.id, 'is_gated', link.is_gated)} className="text-lg">
+                      <button
+                        onClick={() => handleToggle(link.id, 'is_gated', link.is_gated)}
+                        className="text-lg"
+                      >
                         {link.is_gated ? '🔒' : '🔓'}
                       </button>
                     </td>
@@ -459,7 +556,9 @@ export function NexusLinksManager() {
         </table>
         {filteredLinks.length === 0 && (
           <div className="text-center py-8 text-gray-500 text-sm">
-            {searchQuery || filterCategory ? 'No links match your filters' : 'No links yet. Add one above!'}
+            {searchQuery || filterCategory
+              ? 'No links match your filters'
+              : 'No links yet. Add one above!'}
           </div>
         )}
       </div>

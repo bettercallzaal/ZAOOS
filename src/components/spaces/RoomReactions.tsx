@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 interface FloatingEmoji {
@@ -37,7 +37,9 @@ export function RoomReactions({ roomId, fid }: RoomReactionsProps) {
     }, ANIMATION_MS);
   }, []);
 
-  const channelRef = useRef<ReturnType<ReturnType<typeof getSupabaseBrowser>['channel']> | null>(null);
+  const channelRef = useRef<ReturnType<ReturnType<typeof getSupabaseBrowser>['channel']> | null>(
+    null,
+  );
 
   // Store the channel created in the useEffect so handleReact can reuse it
   useEffect(() => {

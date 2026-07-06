@@ -23,11 +23,15 @@ export async function GET() {
 
     // Fetch up to 50 followers
     const fRes = await fetch(`${NEYNAR_BASE}/followers?fid=${fid}&limit=50`, {
-      headers: headers(), signal: AbortSignal.timeout(10000),
+      headers: headers(),
+      signal: AbortSignal.timeout(10000),
     });
     if (!fRes.ok) throw new Error(`Followers fetch failed: ${fRes.status}`);
     const fData = await fRes.json();
-    const followerFids: number[] = (fData.users || []).map((u: { user: { fid: number } }) => u.user?.fid).filter(Boolean).slice(0, 50);
+    const followerFids: number[] = (fData.users || [])
+      .map((u: { user: { fid: number } }) => u.user?.fid)
+      .filter(Boolean)
+      .slice(0, 50);
 
     // Fetch recent casts for each follower (batched, max 25 casts each)
     const heatmap: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
@@ -41,12 +45,12 @@ export async function GET() {
         batch.map(async (followerFid) => {
           const res = await fetch(
             `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${followerFid}&limit=25`,
-            { headers: headers(), signal: AbortSignal.timeout(8000) }
+            { headers: headers(), signal: AbortSignal.timeout(8000) },
           );
           if (!res.ok) return [];
           const data = await res.json();
           return (data.casts || []).map((c: { timestamp: string }) => c.timestamp);
-        })
+        }),
       );
       for (const r of results) {
         if (r.status !== 'fulfilled') continue;

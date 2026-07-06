@@ -2,6 +2,7 @@
 // Usage: npx tsx scripts/check-stock-team-codes.ts
 
 import { config } from 'dotenv';
+
 config({ path: '.env.local' });
 
 import { createClient } from '@supabase/supabase-js';

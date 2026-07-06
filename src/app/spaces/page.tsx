@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PageHeader } from '@/components/navigation/PageHeader';
+import CategoryFilter from '@/components/spaces/CategoryFilter';
+import { HostRoomModal, type RoomMode, type RoomTheme } from '@/components/spaces/HostRoomModal';
+import PastRooms from '@/components/spaces/PastRooms';
+import ScheduledRooms from '@/components/spaces/ScheduledRooms';
+import { SongjamSpaceCard } from '@/components/spaces/SongjamSpaceCard';
+import SpacesLeaderboard from '@/components/spaces/SpacesLeaderboard';
+import SpacesTabs from '@/components/spaces/SpacesTabs';
+import StageCard from '@/components/spaces/StageCard';
+import type { GateConfig } from '@/components/spaces/TokenGateSection';
 import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
-import { PageHeader } from '@/components/navigation/PageHeader';
-import StageCard from '@/components/spaces/StageCard';
-import { HostRoomModal, type RoomTheme, type RoomMode } from '@/components/spaces/HostRoomModal';
-import type { GateConfig } from '@/components/spaces/TokenGateSection';
+import type { AudioProvider, Room } from '@/lib/spaces/roomsDb';
 import { generateCallId, generateSlug } from '@/lib/spaces/streamHelpers';
-import SpacesTabs from '@/components/spaces/SpacesTabs';
-import CategoryFilter from '@/components/spaces/CategoryFilter';
-import ScheduledRooms from '@/components/spaces/ScheduledRooms';
-import PastRooms from '@/components/spaces/PastRooms';
-import SpacesLeaderboard from '@/components/spaces/SpacesLeaderboard';
-import { SongjamSpaceCard } from '@/components/spaces/SongjamSpaceCard';
-import type { Room, AudioProvider } from '@/lib/spaces/roomsDb';
 
 export default function PublicSpacesPage() {
   const router = useRouter();
@@ -81,10 +81,14 @@ export default function PublicSpacesPage() {
     const channel = supabase
       .channel('live-spaces-mixed')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => fetchStages())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'juke_spaces' }, () => fetchJuke())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'juke_spaces' }, () =>
+        fetchJuke(),
+      )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchStages, fetchJuke, fetchHms]);
 
   const handleCreateRoom = async (
@@ -121,9 +125,7 @@ export default function PublicSpacesPage() {
         );
       }
       if (res.status === 503) {
-        throw new Error(
-          'Juke is not configured on this environment yet (missing JUKE_API_KEY).',
-        );
+        throw new Error('Juke is not configured on this environment yet (missing JUKE_API_KEY).');
       }
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -143,7 +145,16 @@ export default function PublicSpacesPage() {
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, streamCallId, theme, room_type: roomMode, gate_config: gateConfig || null, provider, slug }),
+      body: JSON.stringify({
+        title,
+        description,
+        streamCallId,
+        theme,
+        room_type: roomMode,
+        gate_config: gateConfig || null,
+        provider,
+        slug,
+      }),
     });
     if (!res.ok) throw new Error('Failed to create room');
     const { room } = await res.json();
@@ -154,7 +165,9 @@ export default function PublicSpacesPage() {
     router.push(path);
   };
 
-  const handleJoinStage = (room: Room) => { router.push(`/spaces/${room.slug || room.id}`); };
+  const handleJoinStage = (room: Room) => {
+    router.push(`/spaces/${room.slug || room.id}`);
+  };
 
   const filteredStages = useMemo(() => {
     if (category === 'all') return stages;
@@ -184,14 +197,27 @@ export default function PublicSpacesPage() {
               Recordings
             </Link>
             {user ? (
-              <button onClick={() => setShowHostModal(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] text-sm font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+              <button
+                onClick={() => setShowHostModal(true)}
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] text-sm font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 Go Live
               </button>
             ) : (
-              <Link href="/" className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors">
+              <Link
+                href="/"
+                className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
+              >
                 Sign in to host
               </Link>
             )}
@@ -212,7 +238,17 @@ export default function PublicSpacesPage() {
         {activeTab === 'live' && (
           <>
             <SongjamSpaceCard />
-            <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} hmsRooms={hmsRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
+            <LiveTab
+              loading={loading}
+              stages={filteredStages}
+              jukeRooms={jukeRooms}
+              hmsRooms={hmsRooms}
+              myRooms={myRooms}
+              otherRooms={otherRooms}
+              user={user}
+              onHost={() => setShowHostModal(true)}
+              onJoin={handleJoinStage}
+            />
           </>
         )}
         {activeTab === 'upcoming' && <ScheduledRooms category={category} />}
@@ -220,7 +256,13 @@ export default function PublicSpacesPage() {
         {activeTab === 'leaderboard' && <SpacesLeaderboard />}
       </div>
 
-      {user && <HostRoomModal isOpen={showHostModal} onClose={() => setShowHostModal(false)} onCreateRoom={handleCreateRoom} />}
+      {user && (
+        <HostRoomModal
+          isOpen={showHostModal}
+          onClose={() => setShowHostModal(false)}
+          onCreateRoom={handleCreateRoom}
+        />
+      )}
     </div>
   );
 }
@@ -246,15 +288,35 @@ interface HmsRoomCard {
   slug?: string | null;
 }
 
-function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, user, onHost, onJoin }: {
-  loading: boolean; stages: Room[]; jukeRooms: JukeRoomCard[]; hmsRooms: HmsRoomCard[]; myRooms: Room[]; otherRooms: Room[];
-  user: { fid: number } | null; onHost: () => void; onJoin: (room: Room) => void;
+function LiveTab({
+  loading,
+  stages,
+  jukeRooms,
+  hmsRooms,
+  myRooms,
+  otherRooms,
+  user,
+  onHost,
+  onJoin,
+}: {
+  loading: boolean;
+  stages: Room[];
+  jukeRooms: JukeRoomCard[];
+  hmsRooms: HmsRoomCard[];
+  myRooms: Room[];
+  otherRooms: Room[];
+  user: { fid: number } | null;
+  onHost: () => void;
+  onJoin: (room: Room) => void;
 }) {
   if (loading) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-5 animate-pulse h-44" />
+          <div
+            key={i}
+            className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-5 animate-pulse h-44"
+          />
         ))}
       </div>
     );
@@ -264,8 +326,18 @@ function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, us
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5">
-          <svg className="w-8 h-8 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+          <svg
+            className="w-8 h-8 text-[#f5a623]"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+            />
           </svg>
         </div>
         <h3 className="text-white text-lg font-semibold mb-1">No live stages yet</h3>
@@ -273,8 +345,17 @@ function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, us
           Start a stage to go live with your community. Listeners can join and request to speak.
         </p>
         {user && (
-          <button onClick={onHost} className="flex items-center gap-2 px-6 py-2.5 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <button
+            onClick={onHost}
+            className="flex items-center gap-2 px-6 py-2.5 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             Create a Stage
@@ -304,7 +385,9 @@ function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, us
       )}
       <section>
         {myRooms.length > 0 && (
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">All Live Stages</h3>
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            All Live Stages
+          </h3>
         )}
         <div className="grid gap-4 md:grid-cols-2">
           {(myRooms.length > 0 ? otherRooms : stages).map((stage) => (
@@ -393,7 +476,10 @@ function JukeLiveSection({ rooms }: { rooms: JukeRoomCard[] }) {
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"
+                        aria-hidden="true"
+                      />
                       Live
                     </span>
                   )}
@@ -448,14 +534,20 @@ function HmsLiveSection({ rooms }: { rooms: HmsRoomCard[] }) {
             aria-label={`Join video room: ${r.title}`}
             className="group block border rounded-xl p-4 transition-all bg-[#111d2e] border-white/[0.08] hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
           >
-            <div className="w-8 h-1 rounded-full mb-3 bg-orange-400 opacity-60" aria-hidden="true" />
+            <div
+              className="w-8 h-1 rounded-full mb-3 bg-orange-400 opacity-60"
+              aria-hidden="true"
+            />
             <div className="flex items-start justify-between gap-2 mb-3">
               <h4 className="font-bold text-sm leading-tight line-clamp-2 text-white group-hover:text-orange-300 transition-colors">
                 {r.title || 'Untitled room'}
               </h4>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"
+                    aria-hidden="true"
+                  />
                   Live
                 </span>
                 <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border border-orange-400/40 bg-orange-400/10 text-orange-300">

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
@@ -11,7 +11,7 @@ const RecallQuerySchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getSession();
@@ -33,7 +33,7 @@ export async function GET(
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -45,17 +45,16 @@ export async function GET(
     const results = await hindsight.recall(userId, query, { limit });
 
     return NextResponse.json({
-      memories: results.map((r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({
-        content: r.content,
-        score: r.score,
-        metadata: r.metadata,
-      })),
+      memories: results.map(
+        (r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({
+          content: r.content,
+          score: r.score,
+          metadata: r.metadata,
+        }),
+      ),
     });
   } catch (error) {
     logger.error('Failed to recall memories:', error);
-    return NextResponse.json(
-      { error: 'Failed to recall memories' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to recall memories' }, { status: 500 });
   }
 }

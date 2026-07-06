@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockExecuteSwap = vi.hoisted(() => vi.fn());
 const mockLogAgentEvent = vi.hoisted(() => vi.fn());
@@ -44,9 +44,7 @@ describe('maybeAutoStake', () => {
   });
 
   it('success path: logs add_lp success after approve + stake', async () => {
-    mockExecuteSwap
-      .mockResolvedValueOnce('0xapprovehash')
-      .mockResolvedValueOnce('0xstakehash');
+    mockExecuteSwap.mockResolvedValueOnce('0xapprovehash').mockResolvedValueOnce('0xstakehash');
 
     await maybeAutoStake('VAULT');
 

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAccountVerifications } from '@/lib/farcaster/neynar';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getAccountVerifications } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const schema = z.object({ fid: z.coerce.number().int().positive() });

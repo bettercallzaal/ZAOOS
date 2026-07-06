@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { searchFrames } from '@/lib/farcaster/neynar';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const schema = z.object({ q: z.string().min(1).max(100) });

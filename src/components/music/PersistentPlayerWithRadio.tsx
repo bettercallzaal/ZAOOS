@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
-import { usePlayer } from '@/providers/audio';
 import { useMobile } from '@/hooks/useMobile';
+import { usePlayer } from '@/providers/audio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { PersistentPlayer } from './PersistentPlayer';
 
 const MusicSidebar = dynamic(
@@ -41,7 +41,9 @@ export function PersistentPlayerWithRadio() {
   useEffect(() => {
     if (!radio.isRadioMode && queue.hasNext) {
       player.setOnEnded(handleQueueNext);
-      return () => { player.setOnEnded(null); };
+      return () => {
+        player.setOnEnded(null);
+      };
     }
   }, [radio.isRadioMode, queue.hasNext, player, handleQueueNext]);
 
@@ -52,8 +54,19 @@ export function PersistentPlayerWithRadio() {
   return (
     <>
       <PersistentPlayer
-        onPrev={radio.isRadioMode ? radio.prevRadioTrack : (queue.hasPrev ? () => { const m = queue.playPrev(); if (m) player.play(m); } : undefined)}
-        onNext={radio.isRadioMode ? radio.nextRadioTrack : (queue.hasNext ? handleQueueNext : undefined)}
+        onPrev={
+          radio.isRadioMode
+            ? radio.prevRadioTrack
+            : queue.hasPrev
+              ? () => {
+                  const m = queue.playPrev();
+                  if (m) player.play(m);
+                }
+              : undefined
+        }
+        onNext={
+          radio.isRadioMode ? radio.nextRadioTrack : queue.hasNext ? handleQueueNext : undefined
+        }
         isRadioMode={radio.isRadioMode}
         radioLoading={radio.radioLoading}
         onRadioStart={radio.startRadio}

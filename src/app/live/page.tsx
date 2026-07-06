@@ -2,17 +2,18 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { jukeSpaceOgImageUrl } from '@/lib/spaces/juke';
 import {
+  type JukeSpaceRow,
   listActiveJukeSpaces,
   listRecordedJukeSpaces,
   listScheduledJukeSpaces,
-  type JukeSpaceRow,
 } from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../community.config';
 import { JukeLinkOpener } from './JukeLinkOpener';
 
 export const metadata: Metadata = {
   title: `Live on Juke - ${communityConfig.name}`,
-  description: 'Live, scheduled, and recorded Juke audio spaces hosted by The ZAO. Anyone can listen.',
+  description:
+    'Live, scheduled, and recorded Juke audio spaces hosted by The ZAO. Anyone can listen.',
 };
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
@@ -33,7 +34,11 @@ function formatScheduled(value: string | null): string {
   if (minutes < 60) return `In ${Math.max(1, minutes)}m`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `In ${hours}h`;
-  return new Date(value).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+  return new Date(value).toLocaleString('en-US', {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 }
 
 /**
@@ -62,7 +67,14 @@ export default async function LiveIndexPage() {
               aria-label="Back home"
               className="rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-800 hover:text-[#f5a623]"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
@@ -120,7 +132,9 @@ export default async function LiveIndexPage() {
               <SpaceCard
                 key={row.id}
                 row={row}
-                subtitle={row.ended_at ? `Ended ${new Date(row.ended_at).toLocaleDateString()}` : 'Ended'}
+                subtitle={
+                  row.ended_at ? `Ended ${new Date(row.ended_at).toLocaleDateString()}` : 'Ended'
+                }
                 cta="Listen back"
               />
             ))}
@@ -130,12 +144,21 @@ export default async function LiveIndexPage() {
         <section className="border-t border-white/[0.06] pt-8">
           <h2 className="text-sm font-bold text-white mb-1">Open any Juke space</h2>
           <p className="text-xs text-gray-500 mb-4">
-            Paste a juke.audio link and we will open it inside ZAO OS - works for spaces ZAO does not
-            host.
+            Paste a juke.audio link and we will open it inside ZAO OS - works for spaces ZAO does
+            not host.
           </p>
           <JukeLinkOpener />
           <p className="mt-3 text-xs text-gray-600">
-            Built on Juke - <a href="https://juke.audio" className="text-gray-400 hover:text-[#f5a623]" target="_blank" rel="noreferrer noopener">juke.audio</a>.
+            Built on Juke -{' '}
+            <a
+              href="https://juke.audio"
+              className="text-gray-400 hover:text-[#f5a623]"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              juke.audio
+            </a>
+            .
           </p>
         </section>
       </main>
@@ -146,16 +169,32 @@ export default async function LiveIndexPage() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5" aria-hidden="true">
-        <svg className="w-8 h-8 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+      <div
+        className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5"
+        aria-hidden="true"
+      >
+        <svg
+          className="w-8 h-8 text-[#f5a623]"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+          />
         </svg>
       </div>
       <h2 className="text-lg font-semibold mb-1">Nothing live right now</h2>
       <p className="text-gray-500 text-sm max-w-sm">
         ZAO hosts on Juke - check back during a fractal call, a ZAOstock standup, or a COC Concertz
         night. Recordings live at{' '}
-        <Link href="/live/recordings" className="text-[#f5a623] hover:underline">/live/recordings</Link>.
+        <Link href="/live/recordings" className="text-[#f5a623] hover:underline">
+          /live/recordings
+        </Link>
+        .
       </p>
     </div>
   );
@@ -177,8 +216,15 @@ function SectionRow({
   return (
     <section>
       <div className="flex items-center gap-2 mb-3">
-        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border border-current/30 ${accent}`}>
-          {pulse && <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" aria-hidden="true" />}
+        <span
+          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border border-current/30 ${accent}`}
+        >
+          {pulse && (
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
+              aria-hidden="true"
+            />
+          )}
           {badge}
         </span>
         <h2 className="text-sm font-bold text-white">{title}</h2>
@@ -207,7 +253,7 @@ function SpaceCard({
         aria-label={`${cta}: ${row.title}`}
       >
         <div className="aspect-[1200/630] bg-[#0a1628] relative overflow-hidden">
-          { }
+          {}
           <img
             src={jukeSpaceOgImageUrl(row.id)}
             alt=""
@@ -216,7 +262,9 @@ function SpaceCard({
           />
         </div>
         <div className="p-4">
-          <h3 className="text-sm font-bold leading-tight line-clamp-2">{row.title || 'Untitled space'}</h3>
+          <h3 className="text-sm font-bold leading-tight line-clamp-2">
+            {row.title || 'Untitled space'}
+          </h3>
           <p className="text-gray-500 text-xs mt-1">{subtitle}</p>
         </div>
       </Link>

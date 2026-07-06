@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Topic {
   topic: string;
@@ -13,7 +13,7 @@ export function TrendingTopics() {
 
   useEffect(() => {
     fetch('/api/social/trending-topics?limit=8')
-      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => setTopics(data.topics || []))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -31,7 +31,9 @@ export function TrendingTopics() {
 
   return (
     <div className="px-4 py-3">
-      <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium mb-2">Trending Topics</p>
+      <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium mb-2">
+        Trending Topics
+      </p>
       <div className="flex flex-wrap gap-1.5">
         {topics.map((t) => (
           <span

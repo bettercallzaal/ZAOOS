@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AmbientMixer } from '@/components/music/AmbientMixer';
 
 // ─── Presets ──────────────────────────────────────────────────────────
@@ -38,7 +38,9 @@ function loadSavedPresets(): SavedCustomPreset[] {
 function savePresetsToStorage(presets: SavedCustomPreset[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
-  } catch { /* storage full or unavailable */ }
+  } catch {
+    /* storage full or unavailable */
+  }
 }
 
 const PRESETS: BinauralPreset[] = [
@@ -136,7 +138,9 @@ export function BinauralBeats() {
     try {
       leftOscRef.current?.stop();
       rightOscRef.current?.stop();
-    } catch { /* already stopped */ }
+    } catch {
+      /* already stopped */
+    }
     leftOscRef.current = null;
     rightOscRef.current = null;
     if (timerRef.current) {
@@ -147,66 +151,69 @@ export function BinauralBeats() {
     setRemaining(0);
   }, []);
 
-  const startAudio = useCallback((preset: BinauralPreset) => {
-    // Stop any existing playback
-    stopAudio();
+  const startAudio = useCallback(
+    (preset: BinauralPreset) => {
+      // Stop any existing playback
+      stopAudio();
 
-    const ctx = getOrCreateAudioCtx();
+      const ctx = getOrCreateAudioCtx();
 
-    if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') ctx.resume();
 
-    // Create stereo merger for left/right channel separation
-    const merger = ctx.createChannelMerger(2);
-    const gain = ctx.createGain();
-    gain.gain.value = volume;
-    gainRef.current = gain;
+      // Create stereo merger for left/right channel separation
+      const merger = ctx.createChannelMerger(2);
+      const gain = ctx.createGain();
+      gain.gain.value = volume;
+      gainRef.current = gain;
 
-    // Left ear: carrier frequency
-    const leftOsc = ctx.createOscillator();
-    leftOsc.type = 'sine';
-    leftOsc.frequency.value = preset.carrierFrequency;
-    const leftGain = ctx.createGain();
-    leftGain.gain.value = 1;
-    leftOsc.connect(leftGain);
-    leftGain.connect(merger, 0, 0); // left channel
+      // Left ear: carrier frequency
+      const leftOsc = ctx.createOscillator();
+      leftOsc.type = 'sine';
+      leftOsc.frequency.value = preset.carrierFrequency;
+      const leftGain = ctx.createGain();
+      leftGain.gain.value = 1;
+      leftOsc.connect(leftGain);
+      leftGain.connect(merger, 0, 0); // left channel
 
-    // Right ear: carrier + beat frequency
-    const rightOsc = ctx.createOscillator();
-    rightOsc.type = 'sine';
-    rightOsc.frequency.value = preset.carrierFrequency + preset.beatFrequency;
-    const rightGain = ctx.createGain();
-    rightGain.gain.value = 1;
-    rightOsc.connect(rightGain);
-    rightGain.connect(merger, 0, 1); // right channel
+      // Right ear: carrier + beat frequency
+      const rightOsc = ctx.createOscillator();
+      rightOsc.type = 'sine';
+      rightOsc.frequency.value = preset.carrierFrequency + preset.beatFrequency;
+      const rightGain = ctx.createGain();
+      rightGain.gain.value = 1;
+      rightOsc.connect(rightGain);
+      rightGain.connect(merger, 0, 1); // right channel
 
-    merger.connect(gain);
-    gain.connect(ctx.destination);
+      merger.connect(gain);
+      gain.connect(ctx.destination);
 
-    leftOsc.start();
-    rightOsc.start();
+      leftOsc.start();
+      rightOsc.start();
 
-    leftOscRef.current = leftOsc;
-    rightOscRef.current = rightOsc;
+      leftOscRef.current = leftOsc;
+      rightOscRef.current = rightOsc;
 
-    setActivePreset(preset);
-    setPlaying(true);
+      setActivePreset(preset);
+      setPlaying(true);
 
-    // Timer
-    if (timerSeconds > 0) {
-      setRemaining(timerSeconds);
-      timerRef.current = setInterval(() => {
-        setRemaining((prev) => {
-          if (prev <= 1) {
-            stopAudio();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
+      // Timer
+      if (timerSeconds > 0) {
+        setRemaining(timerSeconds);
+        timerRef.current = setInterval(() => {
+          setRemaining((prev) => {
+            if (prev <= 1) {
+              stopAudio();
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      }
 
-    navigator.vibrate?.(10);
-  }, [volume, timerSeconds, stopAudio, getOrCreateAudioCtx]);
+      navigator.vibrate?.(10);
+    },
+    [volume, timerSeconds, stopAudio, getOrCreateAudioCtx],
+  );
 
   // Update volume on the fly
   useEffect(() => {
@@ -259,27 +266,33 @@ export function BinauralBeats() {
   }, [saveName, customCarrier, customBeat, savedPresets]);
 
   // Delete a saved custom preset
-  const handleDeleteSaved = useCallback((index: number) => {
-    const updated = savedPresets.filter((_, i) => i !== index);
-    setSavedPresets(updated);
-    savePresetsToStorage(updated);
-  }, [savedPresets]);
+  const handleDeleteSaved = useCallback(
+    (index: number) => {
+      const updated = savedPresets.filter((_, i) => i !== index);
+      setSavedPresets(updated);
+      savePresetsToStorage(updated);
+    },
+    [savedPresets],
+  );
 
   // Play a saved custom preset
-  const handlePlaySaved = useCallback((saved: SavedCustomPreset) => {
-    setCustomCarrier(saved.carrier);
-    setCustomBeat(saved.beat);
-    const preset: BinauralPreset = {
-      name: saved.name,
-      description: `${saved.carrier} Hz carrier + ${saved.beat} Hz beat`,
-      beatFrequency: saved.beat,
-      carrierFrequency: saved.carrier,
-      wave: 'custom',
-      icon: '\u{2699}\uFE0F',
-      color: 'from-[#f5a623]/20 to-amber-900/20',
-    };
-    startAudio(preset);
-  }, [startAudio]);
+  const handlePlaySaved = useCallback(
+    (saved: SavedCustomPreset) => {
+      setCustomCarrier(saved.carrier);
+      setCustomBeat(saved.beat);
+      const preset: BinauralPreset = {
+        name: saved.name,
+        description: `${saved.carrier} Hz carrier + ${saved.beat} Hz beat`,
+        beatFrequency: saved.beat,
+        carrierFrequency: saved.carrier,
+        wave: 'custom',
+        icon: '\u{2699}\uFE0F',
+        color: 'from-[#f5a623]/20 to-amber-900/20',
+      };
+      startAudio(preset);
+    },
+    [startAudio],
+  );
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -312,14 +325,17 @@ export function BinauralBeats() {
               onClick={() => handlePresetClick(preset)}
               className={`w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left ${
                 isActive
-                  ? 'bg-gradient-to-r border-[#f5a623]/30 shadow-lg shadow-[#f5a623]/5 ' + preset.color
+                  ? 'bg-gradient-to-r border-[#f5a623]/30 shadow-lg shadow-[#f5a623]/5 ' +
+                    preset.color
                   : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
               }`}
             >
               {/* Icon */}
-              <div className={`w-11 h-11 flex-shrink-0 rounded-lg flex items-center justify-center text-lg ${
-                isActive ? 'bg-[#f5a623]/20' : 'bg-white/5'
-              }`}>
+              <div
+                className={`w-11 h-11 flex-shrink-0 rounded-lg flex items-center justify-center text-lg ${
+                  isActive ? 'bg-[#f5a623]/20' : 'bg-white/5'
+                }`}
+              >
                 {isActive ? (
                   <div className="flex items-end gap-px">
                     {[1, 2, 3].map((i) => (
@@ -341,7 +357,9 @@ export function BinauralBeats() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold ${isActive ? 'text-[#f5a623]' : 'text-white'}`}>
+                <p
+                  className={`text-sm font-semibold ${isActive ? 'text-[#f5a623]' : 'text-white'}`}
+                >
                   {preset.name}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">{preset.description}</p>
@@ -349,9 +367,11 @@ export function BinauralBeats() {
 
               {/* Frequency badge */}
               <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                  isActive ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'bg-white/5 text-gray-500'
-                }`}>
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                    isActive ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'bg-white/5 text-gray-500'
+                  }`}
+                >
                   {preset.beatFrequency} Hz
                 </span>
                 <span className="text-[9px] text-gray-600 capitalize">{preset.wave}</span>
@@ -371,9 +391,11 @@ export function BinauralBeats() {
               : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
           }`}
         >
-          <div className={`w-11 h-11 flex-shrink-0 rounded-lg flex items-center justify-center text-lg ${
-            playing && activePreset?.wave === 'custom' ? 'bg-[#f5a623]/20' : 'bg-white/5'
-          }`}>
+          <div
+            className={`w-11 h-11 flex-shrink-0 rounded-lg flex items-center justify-center text-lg ${
+              playing && activePreset?.wave === 'custom' ? 'bg-[#f5a623]/20' : 'bg-white/5'
+            }`}
+          >
             {playing && activePreset?.wave === 'custom' ? (
               <div className="flex items-end gap-px">
                 {[1, 2, 3].map((i) => (
@@ -393,12 +415,16 @@ export function BinauralBeats() {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-semibold ${
-              playing && activePreset?.wave === 'custom' ? 'text-[#f5a623]' : 'text-white'
-            }`}>
+            <p
+              className={`text-sm font-semibold ${
+                playing && activePreset?.wave === 'custom' ? 'text-[#f5a623]' : 'text-white'
+              }`}
+            >
               Custom Frequency
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">Set your own carrier and beat frequencies</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Set your own carrier and beat frequencies
+            </p>
           </div>
           <svg
             className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform ${customExpanded ? 'rotate-180' : ''}`}
@@ -463,8 +489,18 @@ export function BinauralBeats() {
 
             {/* Live preview */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08]">
-              <svg className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              <svg
+                className="w-3.5 h-3.5 text-gray-500 flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"
+                />
               </svg>
               <p className="text-[10px] text-gray-400 font-mono tabular-nums">
                 Left: {customCarrier} Hz | Right: {customCarrier + customBeat} Hz
@@ -503,16 +539,15 @@ export function BinauralBeats() {
             {/* Saved presets list */}
             {savedPresets.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Saved Presets</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">
+                  Saved Presets
+                </p>
                 {savedPresets.map((sp, idx) => (
                   <div
                     key={`${sp.name}-${idx}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.08] group"
                   >
-                    <button
-                      onClick={() => handlePlaySaved(sp)}
-                      className="flex-1 text-left"
-                    >
+                    <button onClick={() => handlePlaySaved(sp)} className="flex-1 text-left">
                       <p className="text-xs font-medium text-gray-300">{sp.name}</p>
                       <p className="text-[10px] text-gray-600 font-mono">
                         {sp.carrier} Hz + {sp.beat} Hz beat
@@ -523,8 +558,18 @@ export function BinauralBeats() {
                       className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-600 hover:text-red-400 transition-all"
                       aria-label={`Delete ${sp.name}`}
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -542,7 +587,11 @@ export function BinauralBeats() {
       <div className="mt-4 space-y-3">
         {/* Volume */}
         <div className="flex items-center gap-3 px-1">
-          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+          <svg
+            className="w-4 h-4 text-gray-500 flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
           </svg>
           <input
@@ -579,11 +628,22 @@ export function BinauralBeats() {
 
         {/* Headphone notice */}
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08]">
-          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+          <svg
+            className="w-4 h-4 text-gray-500 flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+            />
           </svg>
           <p className="text-[10px] text-gray-500">
-            Binaural beats require stereo headphones. Each ear receives a slightly different frequency — the brain perceives the difference as a rhythmic pulse.
+            Binaural beats require stereo headphones. Each ear receives a slightly different
+            frequency — the brain perceives the difference as a rhythmic pulse.
           </p>
         </div>
       </div>

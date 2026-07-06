@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { RadioPlaylist, RadioTrack } from '@/app/api/music/radio/route';
 import { usePlayer } from '@/providers/audio';
-import type { RadioTrack, RadioPlaylist } from '@/app/api/music/radio/route';
 import type { TrackMetadata } from '@/types/music';
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -51,41 +51,47 @@ export function useRadio() {
     return data.playlists ?? [];
   }, []);
 
-  const playStation = useCallback((playlist: RadioPlaylist) => {
-    if (playlist.tracks.length === 0) return;
-    const shuffled = shuffleArray(playlist.tracks);
-    radioQueueRef.current = shuffled;
-    radioIndexRef.current = 0;
+  const playStation = useCallback(
+    (playlist: RadioPlaylist) => {
+      if (playlist.tracks.length === 0) return;
+      const shuffled = shuffleArray(playlist.tracks);
+      radioQueueRef.current = shuffled;
+      radioIndexRef.current = 0;
 
-    const first = shuffled[0];
-    const metadata = radioTrackToMetadata(first, `radio-${first.id}`);
-    player.play(metadata);
-    setIsRadioMode(true);
+      const first = shuffled[0];
+      const metadata = radioTrackToMetadata(first, `radio-${first.id}`);
+      player.play(metadata);
+      setIsRadioMode(true);
 
-    if (!player.shuffle) player.toggleShuffle();
-  }, [player]);
+      if (!player.shuffle) player.toggleShuffle();
+    },
+    [player],
+  );
 
-  const startRadio = useCallback(async (startIndex = 0) => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
+  const startRadio = useCallback(
+    async (startIndex = 0) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
-    setRadioLoading(true);
-    try {
-      const playlists = await fetchStations(controller.signal);
-      if (playlists.length === 0) throw new Error('No stations');
+      setRadioLoading(true);
+      try {
+        const playlists = await fetchStations(controller.signal);
+        if (playlists.length === 0) throw new Error('No stations');
 
-      setAllStations(playlists);
-      const idx = Math.min(startIndex, playlists.length - 1);
-      setCurrentStationIndex(idx);
-      playStation(playlists[idx]);
-    } catch (err) {
-      if (controller.signal.aborted) return;
-      console.error('Radio start failed:', err);
-    } finally {
-      setRadioLoading(false);
-    }
-  }, [fetchStations, playStation]);
+        setAllStations(playlists);
+        const idx = Math.min(startIndex, playlists.length - 1);
+        setCurrentStationIndex(idx);
+        playStation(playlists[idx]);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        console.error('Radio start failed:', err);
+      } finally {
+        setRadioLoading(false);
+      }
+    },
+    [fetchStations, playStation],
+  );
 
   const stopRadio = useCallback(() => {
     setIsRadioMode(false);
@@ -94,11 +100,14 @@ export function useRadio() {
     player.stop();
   }, [player]);
 
-  const switchStation = useCallback((index: number) => {
-    if (index < 0 || index >= allStations.length) return;
-    setCurrentStationIndex(index);
-    playStation(allStations[index]);
-  }, [allStations, playStation]);
+  const switchStation = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= allStations.length) return;
+      setCurrentStationIndex(index);
+      playStation(allStations[index]);
+    },
+    [allStations, playStation],
+  );
 
   const nextRadioTrack = useCallback(() => {
     const queue = radioQueueRef.current;
@@ -118,9 +127,8 @@ export function useRadio() {
     const queue = radioQueueRef.current;
     if (queue.length === 0) return;
 
-    radioIndexRef.current = radioIndexRef.current > 0
-      ? radioIndexRef.current - 1
-      : queue.length - 1;
+    radioIndexRef.current =
+      radioIndexRef.current > 0 ? radioIndexRef.current - 1 : queue.length - 1;
     const track = radioQueueRef.current[radioIndexRef.current];
     const metadata = radioTrackToMetadata(track, `radio-${track.id}`);
     player.play(metadata);

@@ -8,12 +8,12 @@
  *   npx tsx scripts/register-caster-fid.ts --continue
  */
 
-import { privateKeyToAccount } from 'viem/accounts';
-import { createWalletClient, http } from 'viem';
-import { base } from 'viem/chains';
-import { config } from 'dotenv';
 import * as crypto from 'crypto';
+import { config } from 'dotenv';
 import * as fs from 'fs';
+import { createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { base } from 'viem/chains';
 
 config({ path: '.env.local' });
 
@@ -25,7 +25,8 @@ const PROFILE = {
   bio: "ZAO's voice on Farcaster. Music community, built in public.",
   pfpUrl: 'https://zaoos.com/logo.png',
   url: 'https://zaoos.com',
-  welcomeCast: "hi, i'm here to start sharing more of what the ZAO is building. feel free to tell me suggestions and help me along the way",
+  welcomeCast:
+    "hi, i'm here to start sharing more of what the ZAO is building. feel free to tell me suggestions and help me along the way",
 };
 
 async function main() {
@@ -160,14 +161,19 @@ async function main() {
   };
   fs.writeFileSync('.caster-registration.json', JSON.stringify(state, null, 2));
 
-  await completeRegistration(regResult.registrationId, custodyAccount, signerPrivateKeyHex, signerPubKeyHex);
+  await completeRegistration(
+    regResult.registrationId,
+    custodyAccount,
+    signerPrivateKeyHex,
+    signerPubKeyHex,
+  );
 }
 
 async function completeRegistration(
   registrationId: string,
   custodyAccount: ReturnType<typeof privateKeyToAccount>,
   signerPrivateKeyHex: string,
-  signerPubKeyHex: string
+  signerPubKeyHex: string,
 ) {
   // Check current status
   console.log('\nChecking registration status...');
@@ -198,7 +204,9 @@ async function completeRegistration(
 
   // Get signing instructions
   console.log('\nFetching EIP-712 signing instructions...');
-  const instrResponse = await fetch(`${FIDFORGE_BASE}/registrations/${registrationId}/instructions`);
+  const instrResponse = await fetch(
+    `${FIDFORGE_BASE}/registrations/${registrationId}/instructions`,
+  );
   const instrResult = await instrResponse.json();
 
   if (!instrResult.typedData) {
@@ -239,12 +247,16 @@ async function completeRegistration(
   await pollForCompletion(registrationId, signerPrivateKeyHex, signerPubKeyHex);
 }
 
-async function pollForCompletion(registrationId: string, signerPrivateKeyHex: string, signerPubKeyHex: string) {
+async function pollForCompletion(
+  registrationId: string,
+  signerPrivateKeyHex: string,
+  signerPubKeyHex: string,
+) {
   console.log('\nPolling for on-chain confirmation...');
   let attempts = 0;
 
   while (attempts < 60) {
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise((r) => setTimeout(r, 3000));
     const pollResponse = await fetch(`${FIDFORGE_BASE}/registrations/${registrationId}`);
     const result = await pollResponse.json();
     process.stdout.write('.');
@@ -299,7 +311,12 @@ if (process.argv.includes('--continue')) {
     process.exit(1);
   }
   const custodyAccount = privateKeyToAccount(privateKey as `0x${string}`);
-  completeRegistration(state.registrationId, custodyAccount, state.signerPrivateKey, state.signerPubKey);
+  completeRegistration(
+    state.registrationId,
+    custodyAccount,
+    state.signerPrivateKey,
+    state.signerPubKey,
+  );
 } else {
   main().catch(console.error);
 }

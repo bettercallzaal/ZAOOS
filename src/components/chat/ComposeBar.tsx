@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { QuotedCastData } from '@/types';
-import { MentionAutocomplete } from './MentionAutocomplete';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { communityConfig } from '@/../community.config';
 import { generateHashtags } from '@/lib/ai/textAnalysis';
+import type { QuotedCastData } from '@/types';
+import { MentionAutocomplete } from './MentionAutocomplete';
 
 const ALL_CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `#${id}` }));
 
@@ -24,7 +24,14 @@ export interface ReplyContext {
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number) => Promise<void>;
+  onSend: (
+    text: string,
+    parentHash?: string,
+    embedHash?: string,
+    crossPostChannels?: string[],
+    embedUrls?: string[],
+    embedFid?: number,
+  ) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
@@ -38,17 +45,20 @@ export interface ComposeBarHandle {
   focus: () => void;
 }
 
-export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function ComposeBar({
-  hasSigner,
-  onSend,
-  sending,
-  channel = 'zao',
-  quotedCast,
-  onClearQuote,
-  onSchedule,
-  replyTo,
-  onClearReply,
-}, ref) {
+export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function ComposeBar(
+  {
+    hasSigner,
+    onSend,
+    sending,
+    channel = 'zao',
+    quotedCast,
+    onClearQuote,
+    onSchedule,
+    replyTo,
+    onClearReply,
+  },
+  ref,
+) {
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
   const [crossPostChannels, setCrossPostChannels] = useState<Set<string>>(new Set());
@@ -140,9 +150,10 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
         const parentHash = replyTo?.hash || undefined;
         const baseText = msg || ' ';
-        const outgoing = quotedCast?._source === 'sopha'
-          ? `${baseText}${buildSophaAttribution(quotedCast)}`
-          : baseText;
+        const outgoing =
+          quotedCast?._source === 'sopha'
+            ? `${baseText}${buildSophaAttribution(quotedCast)}`
+            : baseText;
         await onSend(
           outgoing,
           parentHash,
@@ -219,21 +230,24 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
     }
   };
 
-  const handleMentionSelect = useCallback((username: string) => {
-    // Replace the @query with @username
-    const before = text.slice(0, mentionStart);
-    const after = text.slice(mentionStart + (mentionQuery?.length || 0));
-    const newText = `${before}${username} ${after}`;
-    setText(newText);
-    setMentionQuery(null);
+  const handleMentionSelect = useCallback(
+    (username: string) => {
+      // Replace the @query with @username
+      const before = text.slice(0, mentionStart);
+      const after = text.slice(mentionStart + (mentionQuery?.length || 0));
+      const newText = `${before}${username} ${after}`;
+      setText(newText);
+      setMentionQuery(null);
 
-    // Refocus textarea
-    setTimeout(() => {
-      const pos = mentionStart + username.length + 1;
-      textareaRef.current?.focus();
-      textareaRef.current?.setSelectionRange(pos, pos);
-    }, 0);
-  }, [text, mentionStart, mentionQuery]);
+      // Refocus textarea
+      setTimeout(() => {
+        const pos = mentionStart + username.length + 1;
+        textareaRef.current?.focus();
+        textareaRef.current?.setSelectionRange(pos, pos);
+      }, 0);
+    },
+    [text, mentionStart, mentionQuery],
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // If mention dropdown is open, let it handle arrow/enter/tab/esc
@@ -341,8 +355,18 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {replyTo && (
         <div className="px-3 pt-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0a1628] border border-[#f5a623]/30">
-            <svg className="w-3.5 h-3.5 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            <svg
+              className="w-3.5 h-3.5 text-[#f5a623] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+              />
             </svg>
             <div className="flex-1 min-w-0">
               <span className="text-xs font-medium text-[#f5a623]">
@@ -355,7 +379,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               className="text-gray-500 hover:text-white flex-shrink-0"
               aria-label="Cancel reply"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -383,7 +413,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               className="text-gray-500 hover:text-white flex-shrink-0 mt-0.5"
               aria-label="Remove quote"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -395,7 +431,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {imagePreview && (
         <div className="px-3 pt-2">
           <div className="relative inline-block">
-            { }
+            {}
             <img
               src={imagePreview.url}
               alt="Upload preview"
@@ -406,7 +442,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-400"
               aria-label="Remove image"
             >
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+              <svg
+                className="w-3 h-3"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -430,12 +472,17 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {showSchedule && hasSigner && (
         <div className="px-3 pt-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Schedule ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop()}):</span>
+            <span className="text-xs text-gray-500">
+              Schedule ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop()}):
+            </span>
             <input
               type="datetime-local"
               value={scheduleTime}
               onChange={(e) => setScheduleTime(e.target.value)}
-              min={(() => { const d = new Date(Date.now() + 60_000); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; })()}
+              min={(() => {
+                const d = new Date(Date.now() + 60_000);
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+              })()}
               className="bg-[#1a2a3a] text-white text-xs rounded-lg px-2 py-1.5 border border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
             />
             <button
@@ -446,7 +493,10 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               Schedule
             </button>
             <button
-              onClick={() => { setShowSchedule(false); setScheduleTime(''); }}
+              onClick={() => {
+                setShowSchedule(false);
+                setScheduleTime('');
+              }}
               className="text-xs text-gray-500 hover:text-white"
             >
               Cancel
@@ -528,8 +578,18 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               aria-label="Attach image"
               disabled={uploading}
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+              <svg
+                className="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                />
               </svg>
             </button>
 
@@ -544,8 +604,18 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               title="Schedule post"
               aria-label="Schedule post"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </button>
           </div>
@@ -590,7 +660,9 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                       : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                   }`}
                   title={showCrossPost ? 'Hide channel cross-post' : 'Post to multiple channels'}
-                  aria-label={showCrossPost ? 'Hide channel cross-post' : 'Post to multiple channels'}
+                  aria-label={
+                    showCrossPost ? 'Hide channel cross-post' : 'Post to multiple channels'
+                  }
                   aria-pressed={showCrossPost}
                 >
                   <svg
@@ -612,10 +684,10 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={(!text.trim() && !imagePreview) || (sending || false)}
+                disabled={(!text.trim() && !imagePreview) || sending || false}
                 className="font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]"
               >
-                {(sending || false) ? (
+                {sending || false ? (
                   <>
                     <span className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin" />
                     Sending
@@ -646,15 +718,27 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               disabled={!text.trim() && !imagePreview}
               className="bg-[#f5a623] text-[#0a1628] font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-[#ffd700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
               </svg>
               Post
             </button>
           )}
         </div>
         {!hasSigner && (
-          <p className="text-xs text-gray-600 mt-1.5">Opens in Farcaster to post to /{channel} channel</p>
+          <p className="text-xs text-gray-600 mt-1.5">
+            Opens in Farcaster to post to /{channel} channel
+          </p>
         )}
       </div>
     </div>

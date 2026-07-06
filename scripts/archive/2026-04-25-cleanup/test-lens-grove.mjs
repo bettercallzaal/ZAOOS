@@ -26,7 +26,10 @@ async function testFullFlow() {
   console.log('\n=== Step 4: Verify content is accessible ===');
   const verify = await fetch(result.gatewayUrl);
   const stored = await verify.json();
-  console.log('Stored content matches:', stored.lens?.content === metadata.lens.content ? 'YES' : 'NO');
+  console.log(
+    'Stored content matches:',
+    stored.lens?.content === metadata.lens.content ? 'YES' : 'NO',
+  );
   console.log('Stored appId:', stored.lens?.appId);
 
   console.log('\n=== Step 5: URI format check ===');

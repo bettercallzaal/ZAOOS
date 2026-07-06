@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
-import { communityConfig } from '@/../community.config';
 import { logger } from '@/lib/logger';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -12,7 +12,10 @@ const scheduleSchema = z.object({
   text: z.string().min(1).max(1024),
   channel: z.string().min(1),
   scheduledFor: z.string().datetime(),
-  embedHash: z.string().regex(/^0x[a-f0-9]{40}$/).optional(),
+  embedHash: z
+    .string()
+    .regex(/^0x[a-f0-9]{40}$/)
+    .optional(),
   embedUrls: z.array(z.string().url()).max(2).optional(),
   crossPostChannels: z.array(z.string()).optional(),
 });
@@ -49,7 +52,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = scheduleSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { text, channel, scheduledFor, embedHash, embedUrls, crossPostChannels } = parsed.data;
@@ -71,7 +77,8 @@ export async function POST(req: NextRequest) {
         scheduled_for: scheduleDate.toISOString(),
         embed_hash: embedHash || null,
         embed_urls: embedUrls || [],
-        cross_post_channels: crossPostChannels?.filter((ch: string) => ALLOWED_CHANNELS.includes(ch)) || [],
+        cross_post_channels:
+          crossPostChannels?.filter((ch: string) => ALLOWED_CHANNELS.includes(ch)) || [],
       })
       .select()
       .single();
@@ -146,15 +153,22 @@ export async function PATCH() {
           cast.channel_id,
           undefined,
           cast.embed_hash || undefined,
-          cast.embed_urls?.length > 0 ? cast.embed_urls : undefined
+          cast.embed_urls?.length > 0 ? cast.embed_urls : undefined,
         );
 
         // Cross-post
         if (cast.cross_post_channels?.length > 0) {
           await Promise.allSettled(
             cast.cross_post_channels.map((ch: string) =>
-              postCast(session.signerUuid!, cast.text, ch, undefined, cast.embed_hash || undefined, cast.embed_urls?.length > 0 ? cast.embed_urls : undefined)
-            )
+              postCast(
+                session.signerUuid!,
+                cast.text,
+                ch,
+                undefined,
+                cast.embed_hash || undefined,
+                cast.embed_urls?.length > 0 ? cast.embed_urls : undefined,
+              ),
+            ),
           );
         }
 
@@ -167,7 +181,10 @@ export async function PATCH() {
       } catch (err) {
         await supabaseAdmin
           .from('scheduled_casts')
-          .update({ status: 'failed', error_message: err instanceof Error ? err.message : 'Unknown error' })
+          .update({
+            status: 'failed',
+            error_message: err instanceof Error ? err.message : 'Unknown error',
+          })
           .eq('id', cast.id);
       }
     }

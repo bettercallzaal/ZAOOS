@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const voteSchema = z.object({
@@ -71,12 +71,10 @@ export async function POST(req: NextRequest) {
       voted = false;
     } else {
       // Add vote (toggle on)
-      const { error: insertError } = await supabaseAdmin
-        .from('track_of_day_votes')
-        .insert({
-          track_id: trackId,
-          voter_fid: voterFid,
-        });
+      const { error: insertError } = await supabaseAdmin.from('track_of_day_votes').insert({
+        track_id: trackId,
+        voter_fid: voterFid,
+      });
 
       if (insertError) throw insertError;
       voted = true;

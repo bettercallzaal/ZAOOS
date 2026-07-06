@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { librarySubmitSchema } from '@/lib/validation/library-schemas';
-import { isUrl, extractOGMetadata } from '@/lib/library/og-extract';
 import { generateResearchSummary } from '@/lib/library/minimax';
-import { moderateContent } from '@/lib/moderation/moderate';
+import { extractOGMetadata, isUrl } from '@/lib/library/og-extract';
 import { logger } from '@/lib/logger';
+import { moderateContent } from '@/lib/moderation/moderate';
+import { librarySubmitSchema } from '@/lib/validation/library-schemas';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -53,10 +53,7 @@ export async function POST(req: NextRequest) {
     const textToModerate = [topic, note].filter(Boolean).join(' ');
     const modResult = await moderateContent(textToModerate);
     if (modResult.action === 'hide') {
-      return NextResponse.json(
-        { error: 'Content flagged by moderation' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Content flagged by moderation' }, { status: 400 });
     }
 
     // Insert entry with pending AI status
@@ -84,7 +81,9 @@ export async function POST(req: NextRequest) {
       ogDescription && `Description: ${ogDescription}`,
       note && `Submitter note: ${note}`,
       url && `URL: ${url}`,
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     const aiResult = await generateResearchSummary(summaryContent);
 

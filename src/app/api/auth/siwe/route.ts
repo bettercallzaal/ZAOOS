@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { z } from 'zod';
-import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
-import { checkAllowlist } from '@/lib/gates/allowlist';
+import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
+import { z } from 'zod';
 import { saveWalletSession } from '@/lib/auth/session';
-import { getUserByAddress } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getUserByAddress } from '@/lib/farcaster/neynar';
+import { checkAllowlist } from '@/lib/gates/allowlist';
 import { logger } from '@/lib/logger';
 
 const publicClient = createPublicClient({
@@ -25,15 +25,16 @@ export async function GET() {
   const nonce = crypto.randomUUID().replace(/-/g, '');
   const expiresAt = new Date(Date.now() + NONCE_TTL).toISOString();
 
-  await supabaseAdmin
-    .from('auth_nonces')
-    .insert({ nonce, expires_at: expiresAt });
+  await supabaseAdmin.from('auth_nonces').insert({ nonce, expires_at: expiresAt });
 
   supabaseAdmin
     .from('auth_nonces')
     .delete()
     .lt('expires_at', new Date().toISOString())
-    .then(() => {}, () => {});
+    .then(
+      () => {},
+      () => {},
+    );
 
   return NextResponse.json({ nonce });
 }
@@ -51,7 +52,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = siweSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { message, signature } = parsed.data;
@@ -76,7 +80,10 @@ export async function POST(req: NextRequest) {
       .select('nonce');
 
     if (!deletedNonces || deletedNonces.length === 0) {
-      return NextResponse.json({ error: 'Invalid or expired nonce. Please try again.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid or expired nonce. Please try again.' },
+        { status: 400 },
+      );
     }
 
     // Validate domain matches
@@ -109,7 +116,10 @@ export async function POST(req: NextRequest) {
     // Check allowlist by wallet address
     const gateResult = await checkAllowlist(undefined, walletAddress);
     if (!gateResult.allowed) {
-      return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Not on allowlist', redirect: '/not-allowed' },
+        { status: 403 },
+      );
     }
 
     // Try to resolve Farcaster identity from wallet address
@@ -151,7 +161,7 @@ export async function POST(req: NextRequest) {
           role: fid ? 'member' : 'beta',
           last_login_at: new Date().toISOString(),
         },
-        { onConflict: 'primary_wallet' }
+        { onConflict: 'primary_wallet' },
       );
     } catch (err) {
       // Non-critical — session is still valid

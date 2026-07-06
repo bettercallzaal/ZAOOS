@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   chainMock,
-  mockUnauthenticatedSession,
-  mockAuthenticatedSession,
   mockAdminSession,
+  mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({

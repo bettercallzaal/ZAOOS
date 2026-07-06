@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 
 export interface NFTItem {
@@ -16,8 +16,14 @@ const ZOUNZ_TOKEN = '0xcb80ef04da68667c9a4450013bdd69269842c883';
 
 const CHAINS = [
   { name: 'eth' as const, url: (key: string) => `https://eth-mainnet.g.alchemy.com/nft/v3/${key}` },
-  { name: 'base' as const, url: (key: string) => `https://base-mainnet.g.alchemy.com/nft/v3/${key}` },
-  { name: 'optimism' as const, url: (key: string) => `https://opt-mainnet.g.alchemy.com/nft/v3/${key}` },
+  {
+    name: 'base' as const,
+    url: (key: string) => `https://base-mainnet.g.alchemy.com/nft/v3/${key}`,
+  },
+  {
+    name: 'optimism' as const,
+    url: (key: string) => `https://opt-mainnet.g.alchemy.com/nft/v3/${key}`,
+  },
 ];
 
 export async function GET(req: NextRequest) {
@@ -37,7 +43,7 @@ export async function GET(req: NextRequest) {
   }
 
   const results = await Promise.allSettled(
-    CHAINS.map(chain => fetchNFTsForChain(address, chain.name, chain.url(apiKey)))
+    CHAINS.map((chain) => fetchNFTsForChain(address, chain.name, chain.url(apiKey))),
   );
 
   const nfts: NFTItem[] = [];
@@ -53,15 +59,18 @@ export async function GET(req: NextRequest) {
     return a.collection.localeCompare(b.collection);
   });
 
-  return NextResponse.json({ nfts, address, count: nfts.length }, {
-    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
-  });
+  return NextResponse.json(
+    { nfts, address, count: nfts.length },
+    {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    },
+  );
 }
 
 async function fetchNFTsForChain(
   address: string,
   chain: 'eth' | 'base' | 'optimism',
-  baseUrl: string
+  baseUrl: string,
 ): Promise<NFTItem[]> {
   const url = `${baseUrl}/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=50&excludeFilters[]=SPAM`;
   const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
@@ -79,7 +88,8 @@ async function fetchNFTsForChain(
     if (!imageUrl) continue;
 
     const name = meta.name || nft.name || nft.title || `#${nft.tokenId || '?'}`;
-    const collection = nft.contract?.name || nft.contract?.openSeaMetadata?.collectionName || 'Unknown';
+    const collection =
+      nft.contract?.name || nft.contract?.openSeaMetadata?.collectionName || 'Unknown';
     const isZounz = contractAddr === ZOUNZ_TOKEN;
 
     // Build marketplace URL

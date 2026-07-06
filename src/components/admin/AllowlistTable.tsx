@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import Image from 'next/image';
-import { AllowlistEntry } from '@/types';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import type { AllowlistEntry } from '@/types';
 
 interface SearchUser {
   fid: number;
@@ -261,8 +261,18 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
       {/* Search + Add */}
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             value={search}
@@ -313,7 +323,13 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                   >
                     {/* Avatar */}
                     {user.pfp_url ? (
-                      <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={40} height={40} className="rounded-full flex-shrink-0" />
+                      <Image
+                        src={user.pfp_url}
+                        alt={`${user.display_name || user.username || 'User'} avatar`}
+                        width={40}
+                        height={40}
+                        className="rounded-full flex-shrink-0"
+                      />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />
                     )}
@@ -332,25 +348,39 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       <div className="mt-1.5 space-y-1">
                         {user.custody_address && (
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">Farcaster</span>
-                            <span className="text-xs text-gray-400 font-mono">{shortAddr(user.custody_address)}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">
+                              Farcaster
+                            </span>
+                            <span className="text-xs text-gray-400 font-mono">
+                              {shortAddr(user.custody_address)}
+                            </span>
                             {user.ens[user.custody_address.toLowerCase()] && (
-                              <span className="text-[10px] text-purple-400">{user.ens[user.custody_address.toLowerCase()]}</span>
+                              <span className="text-[10px] text-purple-400">
+                                {user.ens[user.custody_address.toLowerCase()]}
+                              </span>
                             )}
                           </div>
                         )}
                         {user.verified_addresses.map((addr) => (
                           <div key={addr} className="flex items-center gap-1.5">
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium">Verified</span>
-                            <span className="text-xs text-gray-400 font-mono">{shortAddr(addr)}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium">
+                              Verified
+                            </span>
+                            <span className="text-xs text-gray-400 font-mono">
+                              {shortAddr(addr)}
+                            </span>
                             {user.ens[addr.toLowerCase()] && (
-                              <span className="text-[10px] text-purple-400">{user.ens[addr.toLowerCase()]}</span>
+                              <span className="text-[10px] text-purple-400">
+                                {user.ens[addr.toLowerCase()]}
+                              </span>
                             )}
                           </div>
                         ))}
                         {primaryEns && !user.custody_address && (
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-medium">ENS</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-medium">
+                              ENS
+                            </span>
                             <span className="text-xs text-purple-300">{primaryEns}</span>
                           </div>
                         )}
@@ -365,8 +395,8 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                         isAdded
                           ? 'bg-green-500/10 text-green-400 cursor-default'
                           : addingFid === user.fid
-                          ? 'bg-gray-700 text-gray-400'
-                          : 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
+                            ? 'bg-gray-700 text-gray-400'
+                            : 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
                       }`}
                     >
                       {isAdded ? 'Added' : addingFid === user.fid ? '...' : 'Add'}
@@ -389,7 +419,8 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
               )}
               {!fcError && (
                 <p className="text-xs text-gray-600 mt-1">
-                  Try the full username (e.g. &quot;dwr.eth&quot; not &quot;Dan&quot;) or search by FID
+                  Try the full username (e.g. &quot;dwr.eth&quot; not &quot;Dan&quot;) or search by
+                  FID
                 </p>
               )}
             </div>
@@ -419,7 +450,8 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
         ) : (
           filtered.map((entry) => {
             const isExpanded = expandedEntry === entry.id;
-            const name = entry.display_name || entry.ign || entry.real_name || entry.username || '-';
+            const name =
+              entry.display_name || entry.ign || entry.real_name || entry.username || '-';
             return (
               <div
                 key={entry.id}
@@ -432,7 +464,13 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                 >
                   {/* Avatar */}
                   {entry.pfp_url ? (
-                    <Image src={entry.pfp_url} alt={`${name} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
+                    <Image
+                      src={entry.pfp_url}
+                      alt={`${name} avatar`}
+                      width={32}
+                      height={32}
+                      className="rounded-full flex-shrink-0"
+                    />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400">
                       {name.charAt(0).toUpperCase()}
@@ -455,7 +493,9 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                         <span className="text-[10px] text-purple-400">{entry.ens_name}</span>
                       )}
                       {entry.wallet_address && !entry.ens_name && (
-                        <span className="text-[10px] text-gray-600 font-mono">{shortAddr(entry.wallet_address)}</span>
+                        <span className="text-[10px] text-gray-600 font-mono">
+                          {shortAddr(entry.wallet_address)}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -468,7 +508,11 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                     stroke="currentColor"
                     strokeWidth={2}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                    />
                   </svg>
                 </button>
 
@@ -479,15 +523,29 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       {/* Farcaster wallet (custody) */}
                       {entry.custody_address && (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium w-16 text-center">Farcaster</span>
-                          <span className="text-xs text-gray-300 font-mono flex-1">{entry.custody_address}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium w-16 text-center">
+                            Farcaster
+                          </span>
+                          <span className="text-xs text-gray-300 font-mono flex-1">
+                            {entry.custody_address}
+                          </span>
                           <button
                             onClick={() => navigator.clipboard.writeText(entry.custody_address!)}
                             className="text-gray-500 hover:text-white text-xs"
                             title="Copy"
                           >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -496,15 +554,29 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       {/* Primary wallet */}
                       {entry.wallet_address && entry.wallet_address !== entry.custody_address && (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">Primary</span>
-                          <span className="text-xs text-gray-300 font-mono flex-1">{entry.wallet_address}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">
+                            Primary
+                          </span>
+                          <span className="text-xs text-gray-300 font-mono flex-1">
+                            {entry.wallet_address}
+                          </span>
                           <button
                             onClick={() => navigator.clipboard.writeText(entry.wallet_address!)}
                             className="text-gray-500 hover:text-white text-xs"
                             title="Copy"
                           >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -514,18 +586,34 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       {entry.verified_addresses && entry.verified_addresses.length > 0 && (
                         <>
                           {entry.verified_addresses
-                            .filter((a) => a !== entry.custody_address && a !== entry.wallet_address)
+                            .filter(
+                              (a) => a !== entry.custody_address && a !== entry.wallet_address,
+                            )
                             .map((addr) => (
                               <div key={addr} className="flex items-center gap-2">
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium w-16 text-center">Verified</span>
-                                <span className="text-xs text-gray-300 font-mono flex-1">{addr}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium w-16 text-center">
+                                  Verified
+                                </span>
+                                <span className="text-xs text-gray-300 font-mono flex-1">
+                                  {addr}
+                                </span>
                                 <button
                                   onClick={() => navigator.clipboard.writeText(addr)}
                                   className="text-gray-500 hover:text-white text-xs"
                                   title="Copy"
                                 >
-                                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                  <svg
+                                    className="w-3.5 h-3.5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                                    />
                                   </svg>
                                 </button>
                               </div>
@@ -536,15 +624,29 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       {/* ZAO XMTP wallet */}
                       {entry.xmtp_address && (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">ZAO</span>
-                          <span className="text-xs text-gray-300 font-mono flex-1">{entry.xmtp_address}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">
+                            ZAO
+                          </span>
+                          <span className="text-xs text-gray-300 font-mono flex-1">
+                            {entry.xmtp_address}
+                          </span>
                           <button
                             onClick={() => navigator.clipboard.writeText(entry.xmtp_address!)}
                             className="text-gray-500 hover:text-white text-xs"
                             title="Copy"
                           >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -553,15 +655,21 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                       {/* ENS */}
                       {entry.ens_name && (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-medium w-16 text-center">ENS</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-medium w-16 text-center">
+                            ENS
+                          </span>
                           <span className="text-xs text-purple-300">{entry.ens_name}</span>
                         </div>
                       )}
 
                       {/* No wallet data */}
-                      {!entry.custody_address && !entry.wallet_address && !(entry.verified_addresses && entry.verified_addresses.length > 0) && (
-                        <p className="text-xs text-gray-600">No wallet data — add via Farcaster search to auto-populate</p>
-                      )}
+                      {!entry.custody_address &&
+                        !entry.wallet_address &&
+                        !(entry.verified_addresses && entry.verified_addresses.length > 0) && (
+                          <p className="text-xs text-gray-600">
+                            No wallet data — add via Farcaster search to auto-populate
+                          </p>
+                        )}
                     </div>
 
                     {/* Actions */}

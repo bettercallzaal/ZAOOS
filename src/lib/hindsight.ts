@@ -4,8 +4,16 @@ import { logger } from '@/lib/logger';
 
 /** Minimal interface for the Hindsight client methods we use. */
 export interface HindsightClientInterface {
-  retain(userId: string, content: string, options: { metadata: Record<string, unknown> }): Promise<void>;
-  recall(userId: string, query: string, options: { limit: number; metadataFilter?: Record<string, string> }): Promise<{ content: string; score: number; metadata?: Record<string, unknown> }[]>;
+  retain(
+    userId: string,
+    content: string,
+    options: { metadata: Record<string, unknown> },
+  ): Promise<void>;
+  recall(
+    userId: string,
+    query: string,
+    options: { limit: number; metadataFilter?: Record<string, string> },
+  ): Promise<{ content: string; score: number; metadata?: Record<string, unknown> }[]>;
   reflect(userId: string, prompt: string): Promise<string>;
 }
 

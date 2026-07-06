@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -43,7 +43,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = linkSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { discord_id, fid } = parsed.data;
@@ -80,17 +83,15 @@ export async function POST(req: NextRequest) {
       const updates: Record<string, unknown> = {};
       if (!keepRow.discord_id && mergeRow.discord_id) updates.discord_id = mergeRow.discord_id;
       if (!keepRow.fid && mergeRow.fid) updates.fid = mergeRow.fid;
-      if (!keepRow.primary_wallet && mergeRow.primary_wallet) updates.primary_wallet = mergeRow.primary_wallet;
+      if (!keepRow.primary_wallet && mergeRow.primary_wallet)
+        updates.primary_wallet = mergeRow.primary_wallet;
 
       // Ensure both fields are set
       if (!keepRow.discord_id) updates.discord_id = discord_id;
       if (!keepRow.fid) updates.fid = fid;
 
       if (Object.keys(updates).length > 0) {
-        await supabaseAdmin
-          .from('users')
-          .update(updates)
-          .eq('id', keepRow.id);
+        await supabaseAdmin.from('users').update(updates).eq('id', keepRow.id);
       }
 
       // Clear discord_id and fid from the merge row to avoid conflicts,
@@ -110,10 +111,7 @@ export async function POST(req: NextRequest) {
 
     // Case 3: Only discord row exists — add fid to it
     if (byDiscord) {
-      await supabaseAdmin
-        .from('users')
-        .update({ fid })
-        .eq('id', byDiscord.id);
+      await supabaseAdmin.from('users').update({ fid }).eq('id', byDiscord.id);
 
       return NextResponse.json({
         ok: true,
@@ -124,10 +122,7 @@ export async function POST(req: NextRequest) {
 
     // Case 4: Only fid row exists — add discord_id to it
     if (byFid) {
-      await supabaseAdmin
-        .from('users')
-        .update({ discord_id })
-        .eq('id', byFid.id);
+      await supabaseAdmin.from('users').update({ discord_id }).eq('id', byFid.id);
 
       return NextResponse.json({
         ok: true,
@@ -137,10 +132,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Case 5: Neither exists — this shouldn't normally happen but handle gracefully
-    return NextResponse.json({
-      error: 'Neither discord_id nor fid found in users table. Register on at least one platform first.',
-    }, { status: 404 });
-
+    return NextResponse.json(
+      {
+        error:
+          'Neither discord_id nor fid found in users table. Register on at least one platform first.',
+      },
+      { status: 404 },
+    );
   } catch (err) {
     logger.error('[Discord link] POST error:', err);
     return NextResponse.json({ error: 'Link failed' }, { status: 500 });

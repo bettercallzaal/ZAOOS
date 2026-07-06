@@ -1,5 +1,5 @@
+import type { $Typed, AppBskyEmbedExternal, AppBskyEmbedImages } from '@atproto/api';
 import { AtpAgent, RichText } from '@atproto/api';
-import type { AppBskyEmbedImages, AppBskyEmbedExternal, $Typed } from '@atproto/api';
 import type { NormalizedContent } from './normalize';
 
 let agentCache: AtpAgent | null = null;

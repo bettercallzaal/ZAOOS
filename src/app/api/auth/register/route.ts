@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { createSigner, registerUser } from '@/lib/farcaster/neynar';
 import { checkAllowlist } from '@/lib/gates/allowlist';
-import { registerUser, createSigner } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const registerSchema = z.object({
@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = registerSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { signature, deadline, fname } = parsed.data;
@@ -27,7 +30,10 @@ export async function POST(req: NextRequest) {
     // Check allowlist by wallet
     const gateResult = await checkAllowlist(undefined, normalizedWallet);
     if (!gateResult.allowed) {
-      return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Not on allowlist', redirect: '/not-allowed' },
+        { status: 403 },
+      );
     }
 
     // Register new FID via Neynar

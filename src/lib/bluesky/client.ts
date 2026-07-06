@@ -13,7 +13,9 @@ async function getCommunityAgent(): Promise<AtpAgent | null> {
   const password = process.env.BLUESKY_APP_PASSWORD;
 
   if (!handle || !password) {
-    logger.warn('[bluesky] Community account not configured — set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD');
+    logger.warn(
+      '[bluesky] Community account not configured — set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD',
+    );
     return null;
   }
 
@@ -50,9 +52,7 @@ async function getUserAgent(handle: string, appPassword: string): Promise<AtpAge
  */
 function formatBlueskyText(text: string, linkUrl?: string): string {
   const maxLen = linkUrl ? 270 : 300;
-  const truncated = text.length > maxLen
-    ? text.slice(0, maxLen - 3) + '...'
-    : text;
+  const truncated = text.length > maxLen ? text.slice(0, maxLen - 3) + '...' : text;
   return linkUrl ? `${truncated}\n\n${linkUrl}` : truncated;
 }
 
@@ -84,10 +84,7 @@ export function splitIntoThread(text: string, maxLen = 300): string[] {
  * Each reply references the root (first post) and its immediate parent.
  * Returns an array of post URIs.
  */
-export async function postBlueskyThread(
-  texts: string[],
-  agent: AtpAgent,
-): Promise<string[]> {
+export async function postBlueskyThread(texts: string[], agent: AtpAgent): Promise<string[]> {
   const uris: string[] = [];
   let parentRef: { uri: string; cid: string } | undefined;
   let rootRef: { uri: string; cid: string } | undefined;
@@ -176,8 +173,9 @@ export async function postToBluesky(
         options.imageUrls.slice(0, 4).map((url) => uploadBlueskyImage(agent!, url)),
       );
       const images = imageResults
-        .filter((r): r is PromiseFulfilledResult<{ blob: unknown; mimeType: string } | null> =>
-          r.status === 'fulfilled' && r.value !== null,
+        .filter(
+          (r): r is PromiseFulfilledResult<{ blob: unknown; mimeType: string } | null> =>
+            r.status === 'fulfilled' && r.value !== null,
         )
         .map((r) => ({
           alt: '',
@@ -209,9 +207,7 @@ export async function postToBluesky(
     }
 
     // Thread splitting for long text
-    const fullText = linkUrl && !options?.embedUrl
-      ? `${text}\n\n${linkUrl}`
-      : text;
+    const fullText = linkUrl && !options?.embedUrl ? `${text}\n\n${linkUrl}` : text;
 
     if (fullText.length > 300) {
       const chunks = splitIntoThread(fullText);
@@ -253,9 +249,7 @@ export async function postToBluesky(
     }
 
     // Single post (short text)
-    const formattedText = linkUrl && !options?.embedUrl
-      ? formatBlueskyText(text, linkUrl)
-      : text;
+    const formattedText = linkUrl && !options?.embedUrl ? formatBlueskyText(text, linkUrl) : text;
     const rt = new RichText({ text: formattedText });
     await rt.detectFacets(agent);
 

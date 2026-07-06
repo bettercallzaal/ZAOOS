@@ -84,8 +84,8 @@ export function parseXTimelineHtml(html: string): XTimelineTweet[] {
   } catch {
     return [];
   }
-  const entries = (data as { props?: { pageProps?: { timeline?: { entries?: unknown[] } } } })?.props
-    ?.pageProps?.timeline?.entries;
+  const entries = (data as { props?: { pageProps?: { timeline?: { entries?: unknown[] } } } })
+    ?.props?.pageProps?.timeline?.entries;
   if (!Array.isArray(entries)) return [];
 
   const tweets: XTimelineTweet[] = [];

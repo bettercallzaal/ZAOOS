@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGetSessionData = vi.hoisted(() => vi.fn());
 const mockGetUserByFid = vi.hoisted(() => vi.fn());

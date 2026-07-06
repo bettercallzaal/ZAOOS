@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
-import {
-  markWebhookProcessed,
-  recordWebhookEvent,
-} from '@/lib/spaces/jukeSpacesDb';
+import { markWebhookProcessed, recordWebhookEvent } from '@/lib/spaces/jukeSpacesDb';
 import { applyWebhookEvent, parseWebhookEvent } from '@/lib/spaces/jukeWebhookHandlers';
 import { verifyJukeWebhook } from '@/lib/spaces/jukeWebhookVerify';
 

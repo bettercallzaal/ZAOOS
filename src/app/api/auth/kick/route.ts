@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
+import { getSessionData } from '@/lib/auth/session';
 
 function generatePKCE() {
   const verifier = crypto.randomBytes(32).toString('base64url');

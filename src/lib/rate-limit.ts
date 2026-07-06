@@ -34,7 +34,7 @@ function getOrCreateLimiter(limit: number, windowMs: number): Ratelimit | null {
 export async function rateLimit(
   key: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
 ): Promise<{ success: boolean; remaining: number }> {
   try {
     const limiter = getOrCreateLimiter(limit, windowMs);

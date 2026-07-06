@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePlayer } from '@/providers/audio';
-import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
+import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -50,153 +50,168 @@ export function useListeningRoom(userInfo: ListenerInfo | null) {
 
   // Track whether we're the DJ to avoid reacting to our own commands
   const isDJRef = useRef(false);
-  useEffect(() => { isDJRef.current = isDJ; }, [isDJ]);
+  useEffect(() => {
+    isDJRef.current = isDJ;
+  }, [isDJ]);
 
   // ── Presence sync ──────────────────────────────────────────────────────────
 
-  const syncPresence = useCallback((channel: RealtimeChannel) => {
-    const state = channel.presenceState<{ user: ListenerInfo; isDJ: boolean }>();
-    const all: ListenerInfo[] = [];
-    let foundDJ: ListenerInfo | null = null;
+  const syncPresence = useCallback(
+    (channel: RealtimeChannel) => {
+      const state = channel.presenceState<{ user: ListenerInfo; isDJ: boolean }>();
+      const all: ListenerInfo[] = [];
+      let foundDJ: ListenerInfo | null = null;
 
-    for (const key of Object.keys(state)) {
-      for (const presence of state[key]) {
-        all.push(presence.user);
-        if (presence.isDJ) {
-          foundDJ = presence.user;
+      for (const key of Object.keys(state)) {
+        for (const presence of state[key]) {
+          all.push(presence.user);
+          if (presence.isDJ) {
+            foundDJ = presence.user;
+          }
         }
       }
-    }
 
-    setListeners(all);
-    setDjInfo(foundDJ);
+      setListeners(all);
+      setDjInfo(foundDJ);
 
-    // If the DJ left and we're the first remaining listener, become DJ
-    if (!foundDJ && all.length > 0 && userInfo) {
-      const sorted = [...all].sort((a, b) => a.fid - b.fid);
-      if (sorted[0].fid === userInfo.fid) {
-        setIsDJ(true);
-        // Re-track presence with DJ flag
-        channel.track({ user: userInfo, isDJ: true });
+      // If the DJ left and we're the first remaining listener, become DJ
+      if (!foundDJ && all.length > 0 && userInfo) {
+        const sorted = [...all].sort((a, b) => a.fid - b.fid);
+        if (sorted[0].fid === userInfo.fid) {
+          setIsDJ(true);
+          // Re-track presence with DJ flag
+          channel.track({ user: userInfo, isDJ: true });
+        }
       }
-    }
-  }, [userInfo]);
+    },
+    [userInfo],
+  );
 
   // ── Handle incoming DJ commands (listeners only) ───────────────────────────
 
-  const handleDJCommand = useCallback((command: DJCommand) => {
-    if (isDJRef.current) return; // DJ ignores own broadcasts
+  const handleDJCommand = useCallback(
+    (command: DJCommand) => {
+      if (isDJRef.current) return; // DJ ignores own broadcasts
 
-    switch (command.type) {
-      case 'play':
-      case 'skip':
-        setCurrentTrack(command.track);
-        setIsPlaying(true);
-        player.play(command.track);
-        break;
-      case 'pause':
-        setIsPlaying(false);
-        player.pause();
-        break;
-      case 'resume':
-        setIsPlaying(true);
-        player.resume();
-        break;
-      case 'seek':
-        player.seek(command.position);
-        break;
-    }
-  }, [player]);
+      switch (command.type) {
+        case 'play':
+        case 'skip':
+          setCurrentTrack(command.track);
+          setIsPlaying(true);
+          player.play(command.track);
+          break;
+        case 'pause':
+          setIsPlaying(false);
+          player.pause();
+          break;
+        case 'resume':
+          setIsPlaying(true);
+          player.resume();
+          break;
+        case 'seek':
+          player.seek(command.position);
+          break;
+      }
+    },
+    [player],
+  );
 
   // ── Join room ──────────────────────────────────────────────────────────────
 
-  const joinRoom = useCallback((id: string) => {
-    if (!userInfo) return;
-    if (channelRef.current) {
-      channelRef.current.unsubscribe();
-    }
-
-    const supabase = getSupabaseBrowser();
-    const channel = supabase.channel(`listening-room:${id}`, {
-      config: { presence: { key: String(userInfo.fid) } },
-    });
-
-    // Listen for DJ commands
-    channel.on('broadcast', { event: BROADCAST_EVENT }, ({ payload }) => {
-      handleDJCommand(payload as DJCommand);
-    });
-
-    // Listen for sync requests (when new listeners join)
-    channel.on('broadcast', { event: SYNC_REQUEST_EVENT }, () => {
-      if (!isDJRef.current) return;
-      // DJ responds with current state
-      const meta = player.metadata;
-      if (meta) {
-        channel.send({
-          type: 'broadcast',
-          event: SYNC_RESPONSE_EVENT,
-          payload: {
-            track: meta,
-            isPlaying: player.isPlaying,
-            position: player.position,
-          },
-        });
+  const joinRoom = useCallback(
+    (id: string) => {
+      if (!userInfo) return;
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
       }
-    });
 
-    // Listen for sync responses (for new listeners)
-    channel.on('broadcast', { event: SYNC_RESPONSE_EVENT }, ({ payload }) => {
-      if (isDJRef.current) return;
-      const { track, isPlaying: playing, position } = payload as {
-        track: TrackMetadata;
-        isPlaying: boolean;
-        position: number;
-      };
-      setCurrentTrack(track);
-      setIsPlaying(playing);
-      player.play(track);
-      // Seek to approximate position after a brief delay for loading
-      setTimeout(() => {
-        player.seek(position);
-        if (!playing) player.pause();
-      }, 500);
-    });
+      const supabase = getSupabaseBrowser();
+      const channel = supabase.channel(`listening-room:${id}`, {
+        config: { presence: { key: String(userInfo.fid) } },
+      });
 
-    // Presence tracking
-    channel.on('presence', { event: 'sync' }, () => {
-      syncPresence(channel);
-    });
+      // Listen for DJ commands
+      channel.on('broadcast', { event: BROADCAST_EVENT }, ({ payload }) => {
+        handleDJCommand(payload as DJCommand);
+      });
 
-    channel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        setIsConnected(true);
-
-        // Check if anyone else is in the room
-        const existing = channel.presenceState();
-        const hasOthers = Object.keys(existing).length > 0;
-
-        // First person becomes DJ
-        const willBeDJ = !hasOthers;
-        setIsDJ(willBeDJ);
-
-        await channel.track({ user: userInfo, isDJ: willBeDJ });
-
-        // If not DJ, request sync from current DJ
-        if (!willBeDJ) {
-          setTimeout(() => {
-            channel.send({
-              type: 'broadcast',
-              event: SYNC_REQUEST_EVENT,
-              payload: {},
-            });
-          }, 300);
+      // Listen for sync requests (when new listeners join)
+      channel.on('broadcast', { event: SYNC_REQUEST_EVENT }, () => {
+        if (!isDJRef.current) return;
+        // DJ responds with current state
+        const meta = player.metadata;
+        if (meta) {
+          channel.send({
+            type: 'broadcast',
+            event: SYNC_RESPONSE_EVENT,
+            payload: {
+              track: meta,
+              isPlaying: player.isPlaying,
+              position: player.position,
+            },
+          });
         }
-      }
-    });
+      });
 
-    channelRef.current = channel;
-    setRoomId(id);
-  }, [userInfo, handleDJCommand, syncPresence, player]);
+      // Listen for sync responses (for new listeners)
+      channel.on('broadcast', { event: SYNC_RESPONSE_EVENT }, ({ payload }) => {
+        if (isDJRef.current) return;
+        const {
+          track,
+          isPlaying: playing,
+          position,
+        } = payload as {
+          track: TrackMetadata;
+          isPlaying: boolean;
+          position: number;
+        };
+        setCurrentTrack(track);
+        setIsPlaying(playing);
+        player.play(track);
+        // Seek to approximate position after a brief delay for loading
+        setTimeout(() => {
+          player.seek(position);
+          if (!playing) player.pause();
+        }, 500);
+      });
+
+      // Presence tracking
+      channel.on('presence', { event: 'sync' }, () => {
+        syncPresence(channel);
+      });
+
+      channel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          setIsConnected(true);
+
+          // Check if anyone else is in the room
+          const existing = channel.presenceState();
+          const hasOthers = Object.keys(existing).length > 0;
+
+          // First person becomes DJ
+          const willBeDJ = !hasOthers;
+          setIsDJ(willBeDJ);
+
+          await channel.track({ user: userInfo, isDJ: willBeDJ });
+
+          // If not DJ, request sync from current DJ
+          if (!willBeDJ) {
+            setTimeout(() => {
+              channel.send({
+                type: 'broadcast',
+                event: SYNC_REQUEST_EVENT,
+                payload: {},
+              });
+            }, 300);
+          }
+        }
+      });
+
+      channelRef.current = channel;
+      setRoomId(id);
+    },
+    [userInfo, handleDJCommand, syncPresence, player],
+  );
 
   // ── Leave room ─────────────────────────────────────────────────────────────
 
@@ -225,17 +240,20 @@ export function useListeningRoom(userInfo: ListenerInfo | null) {
 
   // ── DJ broadcast helpers ───────────────────────────────────────────────────
 
-  const broadcastPlay = useCallback((track: TrackMetadata) => {
-    if (!channelRef.current || !isDJRef.current) return;
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    player.play(track);
-    channelRef.current.send({
-      type: 'broadcast',
-      event: BROADCAST_EVENT,
-      payload: { type: 'play', track, timestamp: Date.now() } satisfies DJCommand,
-    });
-  }, [player]);
+  const broadcastPlay = useCallback(
+    (track: TrackMetadata) => {
+      if (!channelRef.current || !isDJRef.current) return;
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      player.play(track);
+      channelRef.current.send({
+        type: 'broadcast',
+        event: BROADCAST_EVENT,
+        payload: { type: 'play', track, timestamp: Date.now() } satisfies DJCommand,
+      });
+    },
+    [player],
+  );
 
   const broadcastPause = useCallback(() => {
     if (!channelRef.current || !isDJRef.current) return;
@@ -259,27 +277,33 @@ export function useListeningRoom(userInfo: ListenerInfo | null) {
     });
   }, [player]);
 
-  const broadcastSeek = useCallback((position: number) => {
-    if (!channelRef.current || !isDJRef.current) return;
-    player.seek(position);
-    channelRef.current.send({
-      type: 'broadcast',
-      event: BROADCAST_EVENT,
-      payload: { type: 'seek', position, timestamp: Date.now() } satisfies DJCommand,
-    });
-  }, [player]);
+  const broadcastSeek = useCallback(
+    (position: number) => {
+      if (!channelRef.current || !isDJRef.current) return;
+      player.seek(position);
+      channelRef.current.send({
+        type: 'broadcast',
+        event: BROADCAST_EVENT,
+        payload: { type: 'seek', position, timestamp: Date.now() } satisfies DJCommand,
+      });
+    },
+    [player],
+  );
 
-  const broadcastSkip = useCallback((track: TrackMetadata) => {
-    if (!channelRef.current || !isDJRef.current) return;
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    player.play(track);
-    channelRef.current.send({
-      type: 'broadcast',
-      event: BROADCAST_EVENT,
-      payload: { type: 'skip', track, timestamp: Date.now() } satisfies DJCommand,
-    });
-  }, [player]);
+  const broadcastSkip = useCallback(
+    (track: TrackMetadata) => {
+      if (!channelRef.current || !isDJRef.current) return;
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      player.play(track);
+      channelRef.current.send({
+        type: 'broadcast',
+        event: BROADCAST_EVENT,
+        payload: { type: 'skip', track, timestamp: Date.now() } satisfies DJCommand,
+      });
+    },
+    [player],
+  );
 
   // ── Cleanup on unmount ─────────────────────────────────────────────────────
 

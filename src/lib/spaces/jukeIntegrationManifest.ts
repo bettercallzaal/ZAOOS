@@ -217,7 +217,7 @@ const SHIPPED: ShippedFeature[] = [
     id: 'juke-status-richer',
     title: 'Richer /juke-status: recent webhooks + recent spaces + code examples',
     description:
-      "Three new sections on the public dashboard. (1) Recent webhooks - last 15 events with type / space_id / age / processed-vs-failed pill. (2) Recent spaces - last 10 juke_spaces rows with status pill + time marker + participant count + recording link. (3) Code examples - 4 reference snippets matching production (create-space, embed, webhook verify, subscribe). Plus OG + Twitter card meta on the page itself, and recent_spaces + recent_events arrays added to /api/juke/status and /juke-integration.md.",
+      'Three new sections on the public dashboard. (1) Recent webhooks - last 15 events with type / space_id / age / processed-vs-failed pill. (2) Recent spaces - last 10 juke_spaces rows with status pill + time marker + participant count + recording link. (3) Code examples - 4 reference snippets matching production (create-space, embed, webhook verify, subscribe). Plus OG + Twitter card meta on the page itself, and recent_spaces + recent_events arrays added to /api/juke/status and /juke-integration.md.',
     shippedAt: '2026-05-24',
     pr: 'https://github.com/bettercallzaal/ZAOOS/pull/668',
     files: [
@@ -265,7 +265,8 @@ const SHIPPED: ShippedFeature[] = [
       'src/app/api/juke/admin/delete-webhook/route.ts',
       'src/app/api/cron/juke-stale-rooms/route.ts',
     ],
-    reference: "Nicky 2026-05-25 ship: GET reads + X-Juke-Rate-Limit-* + X-Juke-Idempotency-Key headers (PR #175).",
+    reference:
+      'Nicky 2026-05-25 ship: GET reads + X-Juke-Rate-Limit-* + X-Juke-Idempotency-Key headers (PR #175).',
   },
   {
     id: 'host-end-space-button',
@@ -279,7 +280,8 @@ const SHIPPED: ShippedFeature[] = [
       'src/components/spaces/EndJukeSpaceButton.tsx',
       'src/app/live/[spaceId]/page.tsx',
     ],
-    reference: "Nicky 2026-05-24 confirmation: POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished synchronously with ended_via: 'host'|'api' payload.",
+    reference:
+      "Nicky 2026-05-24 confirmation: POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished synchronously with ended_via: 'host'|'api' payload.",
   },
 ];
 
@@ -321,7 +323,8 @@ const OPEN_ASKS: OpenAsk[] = [
     title: 'Developer API to end a space (host-end + immediate webhook dispatch)',
     reason:
       "Surfaced 2026-05-24 while debugging the missing room.finished webhook. Iframe Leave is a pure LiveKit room.disconnect() with anon: participant identity — no API call to api.juke.audio, so the room stays alive on Juke's side until LiveKit's empty-room 300s timeout. Additionally Juke's own end_room handler was flipping Room.status to 'ended' before livekit teardown, so the room_finished dispatcher's WHERE status='active' filter excluded the row and the outbound webhook silently never fired (same blind spot for iOS host-end). We need either a developer POST /v1/developer/spaces/{id}/end (we'd wire it to a host 'End space' button on /live/{id}), OR room.finished firing synchronously when end_room flips status (not after a 5min wait). Confirmed by Nicky 2026-05-24: both ship in their PR #174 (POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished inline with ended_via: 'host'|'api' on the payload).",
-    blocks: '/spaces showing dead rooms as Live + recap-cast trigger never firing for host-ended rooms',
+    blocks:
+      '/spaces showing dead rooms as Live + recap-cast trigger never firing for host-ended rooms',
     priority: 'p0',
   },
   {

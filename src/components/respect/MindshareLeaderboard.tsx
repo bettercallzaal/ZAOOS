@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Treemap } from './Treemap';
-import type { TreemapEntry } from './Treemap';
-import { StatsBar } from './StatsBar';
+import { useMemo, useState } from 'react';
 import { MobileLeaderboard } from './MobileLeaderboard';
+import { StatsBar } from './StatsBar';
+import type { TreemapEntry } from './Treemap';
+import { Treemap } from './Treemap';
 
 interface LeaderboardEntry {
   rank: number;
@@ -31,10 +31,7 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
 
   // Compute total and mindshare %
-  const totalRespect = useMemo(
-    () => entries.reduce((s, e) => s + e.totalRespect, 0),
-    [entries],
-  );
+  const totalRespect = useMemo(() => entries.reduce((s, e) => s + e.totalRespect, 0), [entries]);
 
   const treemapEntries: TreemapEntry[] = useMemo(
     () =>
@@ -44,8 +41,7 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
         wallet: e.wallet,
         fid: e.fid,
         totalRespect: e.totalRespect,
-        mindshare:
-          totalRespect > 0 ? (e.totalRespect / totalRespect) * 100 : 0,
+        mindshare: totalRespect > 0 ? (e.totalRespect / totalRespect) * 100 : 0,
       })),
     [entries, totalRespect],
   );
@@ -54,7 +50,7 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
   const topShare = leader?.mindshare ?? 0;
 
   const selectedEntry = selectedWallet
-    ? treemapEntries.find((e) => e.wallet === selectedWallet) ?? null
+    ? (treemapEntries.find((e) => e.wallet === selectedWallet) ?? null)
     : null;
 
   const handleSelect = (entry: TreemapEntry | null) => {
@@ -73,21 +69,13 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
 
       {/* Desktop treemap (hidden on mobile) */}
       <div className="hidden sm:block bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden p-3">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
-          Mindshare Map
-        </p>
-        <Treemap
-          entries={treemapEntries}
-          onSelect={handleSelect}
-          selected={selectedWallet}
-        />
+        <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">Mindshare Map</p>
+        <Treemap entries={treemapEntries} onSelect={handleSelect} selected={selectedWallet} />
       </div>
 
       {/* Mobile cascade (hidden on desktop) */}
       <div className="sm:hidden">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
-          Mindshare
-        </p>
+        <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">Mindshare</p>
         <MobileLeaderboard
           entries={treemapEntries}
           onSelect={handleSelect}
@@ -100,12 +88,9 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
         <div className="bg-[#f5a623]/10 rounded-xl border border-[#f5a623]/30 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#f5a623]">
-                {selectedEntry.name}
-              </p>
+              <p className="text-sm font-semibold text-[#f5a623]">{selectedEntry.name}</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                #{selectedEntry.rank} &middot;{' '}
-                {selectedEntry.totalRespect.toLocaleString()} R
+                #{selectedEntry.rank} &middot; {selectedEntry.totalRespect.toLocaleString()} R
               </p>
             </div>
             <div className="text-right">
@@ -128,9 +113,7 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
       {/* Full member table */}
       <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
         <div className="px-4 py-3 border-b border-white/[0.08]">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">
-            All Members
-          </p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider">All Members</p>
         </div>
         <div className="divide-y divide-gray-800/60">
           {treemapEntries.map((e) => {

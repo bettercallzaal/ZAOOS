@@ -12,13 +12,13 @@
  *  - Farcaster post history (by fid)  -> Neynar cursor paginator
  */
 
-export * from './x-fetch';
-export * from './x-timeline';
 export * from './bcz-history';
-export * from './bcz-site';
 export * from './bcz-profile';
+export * from './bcz-site';
 export * from './wavewarz';
 export * from './wavewarz-battles';
+export * from './x-fetch';
+export * from './x-timeline';
 
 import { fetchXContent, parseTweetId, type XContent, type XFetchOptions } from './x-fetch';
 
@@ -60,16 +60,25 @@ export type ScrapeResult =
  * dedicated paginating functions, exported above; this dispatcher points callers
  * at them rather than guessing a wallet or fid from a URL.
  */
-export async function scrapeContent(input: string, opts: XFetchOptions = {}): Promise<ScrapeResult> {
+export async function scrapeContent(
+  input: string,
+  opts: XFetchOptions = {},
+): Promise<ScrapeResult> {
   const source = detectScrapeSource(input);
   if (source === 'x') {
     return { source: 'x', data: await fetchXContent(input, opts) };
   }
   if (source === 'wavewarz-artist') {
-    return { source: 'unsupported', reason: 'use scrapeArtistStats(wallet) for WaveWarZ artist pages' };
+    return {
+      source: 'unsupported',
+      reason: 'use scrapeArtistStats(wallet) for WaveWarZ artist pages',
+    };
   }
   if (source === 'wavewarz-battles') {
-    return { source: 'unsupported', reason: 'use scrapeWaveWarzBattles() for WaveWarZ battle history' };
+    return {
+      source: 'unsupported',
+      reason: 'use scrapeWaveWarzBattles() for WaveWarZ battle history',
+    };
   }
   return { source: 'unsupported', reason: `no scraper for input: ${input.slice(0, 80)}` };
 }

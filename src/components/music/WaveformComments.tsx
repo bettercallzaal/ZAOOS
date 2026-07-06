@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Comment {
   id: string;
@@ -21,7 +21,13 @@ interface WaveformCommentsProps {
 /** Threshold in ms — comments within this range of the playhead are highlighted */
 const HIGHLIGHT_THRESHOLD_MS = 3000;
 
-export function WaveformComments({ songUrl, duration, position, onSeek, className = '' }: WaveformCommentsProps) {
+export function WaveformComments({
+  songUrl,
+  duration,
+  position,
+  onSeek,
+  className = '',
+}: WaveformCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [hoveredComment, setHoveredComment] = useState<Comment | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -37,9 +43,15 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
     const controller = new AbortController();
     fetch(`/api/music/comments?url=${encodeURIComponent(songUrl)}`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : { comments: [] }))
-      .then((data) => { if (!controller.signal.aborted) setComments(data.comments || []); })
-      .catch((err) => { if (err?.name !== 'AbortError') setError('Failed to load comments'); });
-    return () => { controller.abort(); };
+      .then((data) => {
+        if (!controller.signal.aborted) setComments(data.comments || []);
+      })
+      .catch((err) => {
+        if (err?.name !== 'AbortError') setError('Failed to load comments');
+      });
+    return () => {
+      controller.abort();
+    };
   }, [songUrl]);
 
   // Focus input when adding
@@ -66,7 +78,9 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
 
       if (res.ok) {
         const data = await res.json();
-        setComments((prev) => [...prev, data.comment].sort((a, b) => a.timestampMs - b.timestampMs));
+        setComments((prev) =>
+          [...prev, data.comment].sort((a, b) => a.timestampMs - b.timestampMs),
+        );
         setNewComment('');
         setIsAdding(false);
         setError('');
@@ -132,11 +146,13 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
               onTouchStart={() => setHoveredComment(c)}
             >
               {/* Marker dot — highlighted when near playhead */}
-              <div className={`w-2.5 h-2.5 rounded-full border shadow-sm hover:scale-150 transition-all mb-[-2px] ${
-                isNear
-                  ? 'bg-[#ffd700] border-[#f5a623] scale-125 ring-2 ring-[#f5a623]/40'
-                  : 'bg-[#f5a623] border-[#0a1628]'
-              }`} />
+              <div
+                className={`w-2.5 h-2.5 rounded-full border shadow-sm hover:scale-150 transition-all mb-[-2px] ${
+                  isNear
+                    ? 'bg-[#ffd700] border-[#f5a623] scale-125 ring-2 ring-[#f5a623]/40'
+                    : 'bg-[#f5a623] border-[#0a1628]'
+                }`}
+              />
 
               {/* Floating bubble on hover */}
               {hoveredComment?.id === c.id && (
@@ -150,12 +166,13 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
                         {formatTime(c.timestampMs)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-200 break-words leading-relaxed">
-                      {c.comment}
-                    </p>
+                    <p className="text-xs text-gray-200 break-words leading-relaxed">{c.comment}</p>
                     {/* Delete button — shows for all (API enforces ownership) */}
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleDeleteComment(c.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteComment(c.id);
+                      }}
                       className="mt-1.5 text-[9px] text-gray-500 hover:text-red-400 transition-colors"
                     >
                       Delete
@@ -187,7 +204,10 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleAddComment();
-                if (e.key === 'Escape') { setIsAdding(false); setNewComment(''); }
+                if (e.key === 'Escape') {
+                  setIsAdding(false);
+                  setNewComment('');
+                }
               }}
               maxLength={280}
               placeholder="Add a comment..."
@@ -201,7 +221,10 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
               {isSubmitting ? '...' : 'Post'}
             </button>
             <button
-              onClick={() => { setIsAdding(false); setNewComment(''); }}
+              onClick={() => {
+                setIsAdding(false);
+                setNewComment('');
+              }}
               className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
             >
               Cancel
@@ -212,7 +235,13 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
             onClick={() => setIsAdding(true)}
             className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#f5a623] transition-colors"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             Comment at {formatTime(position)}

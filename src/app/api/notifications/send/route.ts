@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { supabaseAdmin } from '@/lib/db/supabase';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 /**
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid request', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -163,7 +163,10 @@ export async function POST(req: NextRequest) {
           } else {
             const errText = await response.text().catch(() => 'Unknown error');
             for (const t of groupTokens) {
-              errors.push({ fid: t.fid, error: `HTTP ${response.status}: ${errText.slice(0, 100)}` });
+              errors.push({
+                fid: t.fid,
+                error: `HTTP ${response.status}: ${errText.slice(0, 100)}`,
+              });
             }
           }
         } catch (err) {
@@ -174,7 +177,7 @@ export async function POST(req: NextRequest) {
             });
           }
         }
-      }
+      },
     );
 
     await Promise.allSettled(sendPromises);

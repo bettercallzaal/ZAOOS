@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { createSiweMessage } from 'viem/siwe';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { createSiweMessage } from 'viem/siwe';
+import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 
 type Step = 'idle' | 'connecting' | 'signing' | 'verifying' | 'error';
 
@@ -76,14 +76,13 @@ export function WalletLoginButton() {
   }, [address, signMessageAsync, router, disconnect]);
 
   // When wallet connects, auto-trigger SIWE signing
-   
+
   useEffect(() => {
     if (isConnected && address && !signingStarted && step === 'connecting') {
       setSigningStarted(true);
       handleSignIn();
     }
   }, [isConnected, address, signingStarted, step, handleSignIn]);
-   
 
   const handleClick = () => {
     setError(null);
@@ -143,14 +142,14 @@ export function WalletLoginButton() {
       {/* Hint text */}
       {step === 'idle' && (
         <p className="text-xs text-gray-600 text-center mt-2">
-          {hasInjected ? 'MetaMask, Coinbase, WalletConnect & more' : 'WalletConnect, Coinbase & more'}
+          {hasInjected
+            ? 'MetaMask, Coinbase, WalletConnect & more'
+            : 'WalletConnect, Coinbase & more'}
         </p>
       )}
 
       {/* Error */}
-      {error && (
-        <p className="text-xs text-red-400 text-center mt-2">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-400 text-center mt-2">{error}</p>}
     </div>
   );
 }
@@ -164,7 +163,11 @@ function Spinner() {
 function WalletIcon() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 110-6h.008A2.25 2.25 0 0018 2.25h-1.5a6 6 0 00-6 6v.75H4.5A2.25 2.25 0 002.25 11.25v7.5A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25v-6.75z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 110-6h.008A2.25 2.25 0 0018 2.25h-1.5a6 6 0 00-6 6v.75H4.5A2.25 2.25 0 002.25 11.25v7.5A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25v-6.75z"
+      />
     </svg>
   );
 }

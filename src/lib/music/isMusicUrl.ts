@@ -1,4 +1,4 @@
-import { TrackType } from '@/types/music';
+import type { TrackType } from '@/types/music';
 
 // Regex patterns — more specific than plain string includes to avoid false positives
 // (e.g. bare "soundcloud.com/" homepage, "audius.co/" profile-only URLs)

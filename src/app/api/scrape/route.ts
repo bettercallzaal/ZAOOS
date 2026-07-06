@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 import {
-  scrapeContent,
-  scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
   scrapeBczSite,
-  scrapeXUserTimeline,
+  scrapeContent,
   scrapeFarcasterHistoryByUsername,
+  scrapeWaveWarzBattles,
+  scrapeXUserTimeline,
 } from '@/lib/scrape';
 import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
@@ -75,7 +75,11 @@ export async function GET(req: NextRequest) {
 
   // Best-effort persistence (only when ?cache=1 and the scrape_cache table
   // exists). Never fails the request; returns whether the write succeeded.
-  const persist = async (source: ScrapeCacheSource, key: string, data: unknown): Promise<boolean> => {
+  const persist = async (
+    source: ScrapeCacheSource,
+    key: string,
+    data: unknown,
+  ): Promise<boolean> => {
     if (!wantCache) return false;
     const r = await cacheScrape(source, key, data);
     return r.ok;
@@ -135,7 +139,12 @@ export async function GET(req: NextRequest) {
         maxPages: q.maxPages,
       });
       const cached = await persist('farcaster', String(history.fid), history);
-      return NextResponse.json({ source: 'farcaster', cached, username: q.farcasterUser, ...history });
+      return NextResponse.json({
+        source: 'farcaster',
+        cached,
+        username: q.farcasterUser,
+        ...history,
+      });
     }
 
     if (q.bczSite) {

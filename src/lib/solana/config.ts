@@ -5,8 +5,5 @@ export const SOLANA_NETWORK = 'mainnet-beta' as const;
 export const SOLANA_ENDPOINT = clusterApiUrl(SOLANA_NETWORK);
 
 export function getSolanaWallets() {
-  return [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ];
+  return [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
 }

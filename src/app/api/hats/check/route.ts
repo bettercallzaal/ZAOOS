@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { isWearerOfHat, getWornHats } from '@/lib/hats/client';
-import { HAT_IDS, PROJECT_HAT_IDS, HAT_LABELS } from '@/lib/hats/constants';
+import { getWornHats, isWearerOfHat } from '@/lib/hats/client';
+import { HAT_IDS, HAT_LABELS, PROJECT_HAT_IDS } from '@/lib/hats/constants';
 import { logger } from '@/lib/logger';
 
 const CheckSchema = z.object({
@@ -11,10 +11,7 @@ const CheckSchema = z.object({
 });
 
 /** All known hat IDs for checking all roles at once */
-const ALL_HAT_IDS = [
-  ...Object.values(HAT_IDS),
-  ...Object.values(PROJECT_HAT_IDS),
-];
+const ALL_HAT_IDS = [...Object.values(HAT_IDS), ...Object.values(PROJECT_HAT_IDS)];
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -32,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

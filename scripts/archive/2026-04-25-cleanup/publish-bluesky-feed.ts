@@ -47,7 +47,8 @@ async function main() {
     record: {
       did: feedDid,
       displayName: 'ZAO Music',
-      description: 'Posts from ZAO community members — music artists building onchain. Curated by The ZAO.',
+      description:
+        'Posts from ZAO community members — music artists building onchain. Curated by The ZAO.',
       createdAt: new Date().toISOString(),
     },
   });

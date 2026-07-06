@@ -1,16 +1,16 @@
 'use client';
 
-import { Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { AuthAudioProviders } from '@/app/(auth)/providers';
-import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
+import { BottomNav } from '@/components/navigation/BottomNav';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 import ChannelSidebar from '@/components/spaces/ChannelSidebar';
 import ChannelStrip from '@/components/spaces/ChannelStrip';
 import ConnectedBanner from '@/components/spaces/ConnectedBanner';
+import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { Room } from '@/lib/spaces/roomsDb';
 
@@ -68,11 +68,7 @@ export function SpacesLayoutClient({ children }: { children: React.ReactNode }) 
 
     const channel = supabase
       .channel('spaces-rooms')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'rooms' },
-        () => fetchRooms()
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => fetchRooms())
       .subscribe();
 
     return () => {
@@ -103,7 +99,7 @@ export function SpacesLayoutClient({ children }: { children: React.ReactNode }) 
     (room: Room) => {
       router.push(`/spaces/${room.id}`);
     },
-    [router]
+    [router],
   );
 
   const handleLeaveChannel = useCallback(() => {
@@ -178,12 +174,10 @@ export function SpacesLayoutClient({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628]">
       <ChannelStrip channels={channels} onJoinChannel={handleJoinChannel} />
-      <main className="pb-16">
-        {children}
-      </main>
+      <main className="pb-16">{children}</main>
     </div>
   );
 }
 
 // Export context for page to consume layout data
-export { type Room };
+export type { Room };

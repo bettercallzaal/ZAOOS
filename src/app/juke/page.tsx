@@ -4,10 +4,7 @@ import {
   getJukeIntegrationManifest,
   type ShippedFeature,
 } from '@/lib/spaces/jukeIntegrationManifest';
-import {
-  getJukeIntegrationStats,
-  type JukeIntegrationStats,
-} from '@/lib/spaces/jukeSpacesDb';
+import { getJukeIntegrationStats, type JukeIntegrationStats } from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../community.config';
 
 export const metadata: Metadata = {
@@ -93,8 +90,8 @@ export default async function JukeCaseStudyPage() {
             >
               nickysap
             </a>
-            . Below: what we shipped, the build journey, and the wires for
-            anyone who wants to build with Juke themselves.
+            . Below: what we shipped, the build journey, and the wires for anyone who wants to build
+            with Juke themselves.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Link
@@ -126,24 +123,22 @@ export default async function JukeCaseStudyPage() {
 
         <Section title="Why we built this">
           <p className="text-sm text-gray-300 leading-relaxed">
-            {communityConfig.name} runs weekly fractal calls, ZAOstock standups,
-            and ad-hoc rooms - all live audio with Farcaster identity as the
-            ticket. The legacy stack (Stream.io + 100ms) gave us the rooms but
-            not the social graph. Juke gave us both: real-time audio + FID-aware
-            identity in the same handshake.
+            {communityConfig.name} runs weekly fractal calls, ZAOstock standups, and ad-hoc rooms -
+            all live audio with Farcaster identity as the ticket. The legacy stack (Stream.io +
+            100ms) gave us the rooms but not the social graph. Juke gave us both: real-time audio +
+            FID-aware identity in the same handshake.
           </p>
           <p className="mt-3 text-sm text-gray-400 leading-relaxed">
-            Five days from first read to full integration. Path A iframe + Path
-            B developer API + outbound webhooks + recap-cast wired into the
-            same /zao channel that runs the community. Build-in-public from
-            line one.
+            Five days from first read to full integration. Path A iframe + Path B developer API +
+            outbound webhooks + recap-cast wired into the same /zao channel that runs the community.
+            Build-in-public from line one.
           </p>
         </Section>
 
         <Section title="The build">
           <p className="text-xs text-gray-500 mb-4">
-            Every shipped feature, newest first. Each row links to the PR or the
-            files that landed it.
+            Every shipped feature, newest first. Each row links to the PR or the files that landed
+            it.
           </p>
           <ol className="space-y-3">
             {shippedFeatures
@@ -157,8 +152,8 @@ export default async function JukeCaseStudyPage() {
 
         <Section title="Screenshots">
           <p className="text-xs text-gray-500 mb-4">
-            Live tour - drop screenshots in as we go. Today this section is a
-            placeholder; Zaal grabs shots on the next run-through.
+            Live tour - drop screenshots in as we go. Today this section is a placeholder; Zaal
+            grabs shots on the next run-through.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
@@ -267,13 +262,7 @@ function StatsStrip({
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
       <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">{title}</h2>

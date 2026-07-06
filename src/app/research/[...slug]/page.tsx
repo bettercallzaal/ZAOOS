@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { readFile } from 'fs/promises';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { join } from 'path';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -46,7 +46,9 @@ export default async function ResearchDoc({ params }: Props) {
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
       <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/stock/team" className="text-xs text-gray-400 hover:text-[#f5a623]">← Back to Dashboard</Link>
+          <Link href="/stock/team" className="text-xs text-gray-400 hover:text-[#f5a623]">
+            ← Back to Dashboard
+          </Link>
           <a
             href={`https://github.com/bettercallzaal/ZAOOS/tree/main/research/${slug.join('/')}`}
             target="_blank"

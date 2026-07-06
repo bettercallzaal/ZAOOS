@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
       {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
-      }
+      },
     );
     const channelData = await channelRes.json();
     const channel = channelData.items?.[0];
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
           ? new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
           : null,
       },
-      { onConflict: 'user_fid,platform' }
+      { onConflict: 'user_fid,platform' },
     );
 
     if (dbError) {

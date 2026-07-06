@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -78,9 +78,7 @@ export async function GET(req: NextRequest) {
     const safeQ = q ? q.slice(0, 100).replace(/[%_\\]/g, '\\$&') : null;
 
     // Count query (no range)
-    let countQuery = supabaseAdmin
-      .from('contacts')
-      .select('*', { count: 'exact', head: true });
+    let countQuery = supabaseAdmin.from('contacts').select('*', { count: 'exact', head: true });
 
     if (safeQ) {
       countQuery = countQuery.or(

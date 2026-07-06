@@ -22,10 +22,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import * as fs from 'fs';
-import * as path from 'path';
-import Papa from 'papaparse';
 import dotenv from 'dotenv';
+import * as fs from 'fs';
+import Papa from 'papaparse';
+import * as path from 'path';
 
 // ─── Configuration ───────────────────────────────────────────────────
 
@@ -43,15 +43,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Parse --dir flag or default to ./data/
 const dirFlagIndex = process.argv.indexOf('--dir');
-const CSV_DIR = dirFlagIndex >= 0 && process.argv[dirFlagIndex + 1]
-  ? path.resolve(process.argv[dirFlagIndex + 1])
-  : path.resolve(__dirname, '../data');
+const CSV_DIR =
+  dirFlagIndex >= 0 && process.argv[dirFlagIndex + 1]
+    ? path.resolve(process.argv[dirFlagIndex + 1])
+    : path.resolve(__dirname, '../data');
 
 // ─── Fibonacci score constants ───────────────────────────────────────
 
 const RANK_MAP_2X: Record<number, number> = { 110: 1, 68: 2, 42: 3, 26: 4, 16: 5, 10: 6 };
 const RANK_MAP_1X: Record<number, number> = { 55: 1, 34: 2, 21: 3, 13: 4, 8: 5, 5: 6 };
-
 
 function scoreToRank(score: number): number {
   return RANK_MAP_2X[score] || RANK_MAP_1X[score] || 0;
@@ -114,7 +114,10 @@ async function importMembers() {
   // Auto-detect field names (Airtable exports vary)
   const nameField = findField(headers, ['Name', 'name', 'Member']) || 'Name';
   const walletField = findField(headers, [
-    'ETH WALLET (from Wallet Data 2)', 'ETH WALLET', 'Wallet', 'wallet_address',
+    'ETH WALLET (from Wallet Data 2)',
+    'ETH WALLET',
+    'Wallet',
+    'wallet_address',
   ]);
   const totalField = findField(headers, ['Total Points', 'Total Respect', 'Total']);
   const fractalField = findField(headers, ['ZRespect Sum', 'Fractal Respect', 'Fractal', 'S.']);
@@ -123,7 +126,9 @@ async function importMembers() {
   const bonusField = findField(headers, ['ZAO Festivals sum', 'Bonus/Festival', 'Bonus']);
   const onchainField = findField(headers, ['actual ZAO onchain', 'On-chain Balance', 'On-chain']);
 
-  console.log(`  Found ${rows.length} rows. Fields: name=${nameField}, wallet=${walletField || '(none)'}`);
+  console.log(
+    `  Found ${rows.length} rows. Fields: name=${nameField}, wallet=${walletField || '(none)'}`,
+  );
 
   for (const row of rows) {
     const name = row[nameField]?.trim();
@@ -159,14 +164,9 @@ async function importMembers() {
 
     let error;
     if (existing) {
-      ({ error } = await supabase
-        .from('respect_members')
-        .update(memberData)
-        .eq('id', existing.id));
+      ({ error } = await supabase.from('respect_members').update(memberData).eq('id', existing.id));
     } else {
-      ({ error } = await supabase
-        .from('respect_members')
-        .insert(memberData));
+      ({ error } = await supabase.from('respect_members').insert(memberData));
     }
 
     if (error) {
@@ -219,7 +219,7 @@ async function importOGSessions(walletMap: Map<string, string>) {
   const fractalCols: { col: string; num: number }[] = [];
   for (const h of headers) {
     const match = h.match(
-      /^ZAO\s+(?:Fractal|Fractactal|Fractctal|FRACTAL|Respect)\s+#?(\d+\.?\d*)\s*(?:Respect)?$/i
+      /^ZAO\s+(?:Fractal|Fractactal|Fractctal|FRACTAL|Respect)\s+#?(\d+\.?\d*)\s*(?:Respect)?$/i,
     );
     if (match) {
       fractalCols.push({ col: h, num: parseFloat(match[1]) });
@@ -230,9 +230,7 @@ async function importOGSessions(walletMap: Map<string, string>) {
   console.log(`  Found ${fractalCols.length} fractal columns in CSV`);
 
   // Pre-fetch existing sessions by name to enable idempotent upserts
-  const { data: existingSessions } = await supabase
-    .from('fractal_sessions')
-    .select('id, name');
+  const { data: existingSessions } = await supabase.from('fractal_sessions').select('id, name');
   const sessionsByName = new Map<string, string>();
   for (const s of existingSessions || []) {
     sessionsByName.set(s.name, s.id);
@@ -285,10 +283,7 @@ async function importOGSessions(walletMap: Map<string, string>) {
         .eq('id', sessionId);
 
       // Delete old scores for this session so we can re-insert cleanly
-      await supabase
-        .from('fractal_scores')
-        .delete()
-        .eq('session_id', sessionId);
+      await supabase.from('fractal_scores').delete().eq('session_id', sessionId);
 
       stats.sessionsDuplicate++;
     } else {
@@ -318,7 +313,7 @@ async function importOGSessions(walletMap: Map<string, string>) {
       session_id: sessionId,
       member_name: s.name,
       wallet_address: s.wallet,
-      rank: scoreToRank(s.score) || (i + 1),
+      rank: scoreToRank(s.score) || i + 1,
       score: s.score,
     }));
 
@@ -374,9 +369,7 @@ async function importOrdaoAwards(walletMap: Map<string, string>) {
   }
 
   // Pre-fetch existing sessions
-  const { data: existingSessions } = await supabase
-    .from('fractal_sessions')
-    .select('id, name');
+  const { data: existingSessions } = await supabase.from('fractal_sessions').select('id, name');
   const sessionsByName = new Map<string, string>();
   for (const s of existingSessions || []) {
     sessionsByName.set(s.name, s.id);
@@ -489,9 +482,11 @@ async function importRespectEvents() {
   const headers = new Set(Object.keys(rows[0] || {}));
 
   const nameField = findField(headers, ['Name', 'name', 'Member', 'Recipient']) || 'Name';
-  const typeField = findField(headers, ['Event Type', 'Type', 'Category', 'event_type']) || 'Event Type';
+  const typeField =
+    findField(headers, ['Event Type', 'Type', 'Category', 'event_type']) || 'Event Type';
   const amountField = findField(headers, ['Amount', 'Points', 'Score', 'amount']) || 'Amount';
-  const descField = findField(headers, ['Description', 'Notes', 'Reason', 'description']) || 'Description';
+  const descField =
+    findField(headers, ['Description', 'Notes', 'Reason', 'description']) || 'Description';
   const dateField = findField(headers, ['Date', 'Event Date', 'date', 'event_date']) || 'Date';
 
   console.log(`  Found ${rows.length} event rows`);
@@ -617,10 +612,7 @@ async function recalculateMemberTotals() {
       stats.firstRespectSet++;
     }
 
-    const { error } = await supabase
-      .from('respect_members')
-      .update(updates)
-      .eq('id', member.id);
+    const { error } = await supabase.from('respect_members').update(updates).eq('id', member.id);
 
     if (!error) updated++;
   }
@@ -657,13 +649,21 @@ async function main() {
   console.log('\n╔════════════════════════════════════════════╗');
   console.log('║  Import Summary                            ║');
   console.log('╠════════════════════════════════════════════╣');
-  console.log(`║  Members imported:    ${String(stats.membersImported).padStart(6)}              ║`);
+  console.log(
+    `║  Members imported:    ${String(stats.membersImported).padStart(6)}              ║`,
+  );
   console.log(`║  Members failed:      ${String(stats.membersFailed).padStart(6)}              ║`);
-  console.log(`║  Sessions imported:   ${String(stats.sessionsImported).padStart(6)}              ║`);
-  console.log(`║  Sessions updated:    ${String(stats.sessionsDuplicate).padStart(6)}              ║`);
+  console.log(
+    `║  Sessions imported:   ${String(stats.sessionsImported).padStart(6)}              ║`,
+  );
+  console.log(
+    `║  Sessions updated:    ${String(stats.sessionsDuplicate).padStart(6)}              ║`,
+  );
   console.log(`║  Scores imported:     ${String(stats.scoresImported).padStart(6)}              ║`);
   console.log(`║  Events imported:     ${String(stats.eventsImported).padStart(6)}              ║`);
-  console.log(`║  first_respect_at set:${String(stats.firstRespectSet).padStart(6)}              ║`);
+  console.log(
+    `║  first_respect_at set:${String(stats.firstRespectSet).padStart(6)}              ║`,
+  );
   console.log('╚════════════════════════════════════════════╝');
   console.log('\nDone. Visit /fractals > Analytics tab to verify.');
 }

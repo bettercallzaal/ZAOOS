@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import { type NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { logger } from '@/lib/logger';
 
 const AssistantSchema = z.object({
-  messages: z.array(z.object({
-    role: z.enum(['user', 'assistant', 'system']),
-    content: z.string(),
-  })).min(1),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant', 'system']),
+        content: z.string(),
+      }),
+    )
+    .min(1),
 });
 
 interface KnowledgeDoc {
@@ -46,11 +50,11 @@ function findRelevantDocs(query: string, knowledge: KnowledgeGraph): string {
   if (!knowledge.docs?.length) return '';
 
   const queryLower = query.toLowerCase();
-  const words = queryLower.split(/\s+/).filter(w => w.length > 3);
+  const words = queryLower.split(/\s+/).filter((w) => w.length > 3);
   if (words.length === 0) return '';
 
   const scored = knowledge.docs
-    .map(doc => {
+    .map((doc) => {
       let score = 0;
       const searchable = `${doc.title} ${doc.tags.join(' ')} ${doc.summary}`.toLowerCase();
       for (const word of words) {
@@ -60,14 +64,16 @@ function findRelevantDocs(query: string, knowledge: KnowledgeGraph): string {
       if (doc.tags.includes('canonical')) score += 2;
       return { doc, score };
     })
-    .filter(s => s.score > 0)
+    .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 8);
 
   if (scored.length === 0) return '';
 
   return scored
-    .map(s => `[Doc ${s.doc.id}: ${s.doc.title}] ${s.doc.summary} (Tags: ${s.doc.tags.join(', ')})`)
+    .map(
+      (s) => `[Doc ${s.doc.id}: ${s.doc.title}] ${s.doc.summary} (Tags: ${s.doc.tags.join(', ')})`,
+    )
     .join('\n');
 }
 
@@ -98,7 +104,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = AssistantSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     if (!ENV.MINIMAX_API_KEY) {
@@ -107,7 +116,8 @@ export async function POST(req: NextRequest) {
 
     // Load knowledge graph and find relevant docs for last user message
     const knowledge = await loadKnowledge();
-    const lastUserMessage = parsed.data.messages.filter(m => m.role === 'user').pop()?.content || '';
+    const lastUserMessage =
+      parsed.data.messages.filter((m) => m.role === 'user').pop()?.content || '';
     const relevantDocs = knowledge ? findRelevantDocs(lastUserMessage, knowledge) : '';
 
     // Build system prompt, injecting relevant doc context when available
@@ -119,10 +129,7 @@ export async function POST(req: NextRequest) {
     const apiUrl = ENV.MINIMAX_API_URL || 'https://api.minimax.io/v1/chat/completions';
     const model = ENV.MINIMAX_MODEL || 'MiniMax-M2.7';
 
-    const messages = [
-      { role: 'system', content: systemContent },
-      ...parsed.data.messages,
-    ];
+    const messages = [{ role: 'system', content: systemContent }, ...parsed.data.messages];
 
     const res = await fetch(apiUrl, {
       method: 'POST',

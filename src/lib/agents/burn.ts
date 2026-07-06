@@ -1,12 +1,9 @@
-import { sendToken } from './wallet';
-import { logAgentEvent } from './events';
-import { TOKENS, BURN_ADDRESS, BURN_PCT, type AgentName } from './types';
 import { logger } from '@/lib/logger';
+import { logAgentEvent } from './events';
+import { type AgentName, BURN_ADDRESS, BURN_PCT, TOKENS } from './types';
+import { sendToken } from './wallet';
 
-export async function burnZabal(
-  agentName: AgentName,
-  totalAmount: bigint
-): Promise<string | null> {
+export async function burnZabal(agentName: AgentName, totalAmount: bigint): Promise<string | null> {
   const burnAmount = (totalAmount * BigInt(Math.floor(BURN_PCT * 10000))) / BigInt(10000);
   if (burnAmount === BigInt(0)) return null;
   if (totalAmount <= BigInt(0)) {

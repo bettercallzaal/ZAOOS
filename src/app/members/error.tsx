@@ -29,10 +29,7 @@ export default function MembersError({
           >
             Back to Members
           </Link>
-          <Link
-            href="/chat"
-            className="text-gray-400 text-sm hover:text-white transition-colors"
-          >
+          <Link href="/chat" className="text-gray-400 text-sm hover:text-white transition-colors">
             Go home
           </Link>
         </div>

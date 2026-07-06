@@ -15,16 +15,17 @@
  * consume the fields we recognise. Extra fields are stored verbatim in
  * `juke_webhook_events.body`.
  */
-import { autoCastToZao } from '@/lib/publish/auto-cast';
+
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { isAutoAgentJoinEnabled, joinAgentInJukeRoom } from './jukeAgentJoin';
 import {
   addParticipant,
   bumpParticipantCount,
   getJukeSpace,
+  type JukeParticipantEntry,
   removeParticipant,
   updateJukeSpace,
-  type JukeParticipantEntry,
 } from './jukeSpacesDb';
 
 interface JukeWebhookBody {
@@ -64,9 +65,16 @@ export interface ParsedWebhookEvent {
 export function parseWebhookEvent(body: unknown): ParsedWebhookEvent {
   const b = (body ?? {}) as JukeWebhookBody;
   const eventType = (b.event_type ?? b.event ?? b.type ?? '').toString();
-  const data = (typeof b.data === 'object' && b.data !== null
-    ? (b.data as { space_id?: string; spaceId?: string; id?: string; room_id?: string; roomId?: string })
-    : null);
+  const data =
+    typeof b.data === 'object' && b.data !== null
+      ? (b.data as {
+          space_id?: string;
+          spaceId?: string;
+          id?: string;
+          room_id?: string;
+          roomId?: string;
+        })
+      : null;
   const spaceId =
     b.space_id ??
     b.spaceId ??
@@ -142,7 +150,8 @@ function readParticipant(body: unknown, occurredAt: string): JukeParticipantEntr
   // Juke's 2026-05-23 room.started used `host_fid`; participant events likely
   // use `participant_fid` or `fid`. Be defensive across aliases.
   const fidRaw = d.fid ?? d.participant_fid ?? d.user_fid ?? d.host_fid;
-  const fid = typeof fidRaw === 'number' ? fidRaw : typeof fidRaw === 'string' ? Number(fidRaw) : null;
+  const fid =
+    typeof fidRaw === 'number' ? fidRaw : typeof fidRaw === 'string' ? Number(fidRaw) : null;
   if (fid === null || !Number.isFinite(fid)) return null;
   const display_name =
     typeof d.display_name === 'string'
@@ -225,14 +234,10 @@ export async function applyWebhookEvent(
           const row = await getJukeSpace(spaceId);
           const title = row?.title ?? 'A ZAO space';
           const liveUrl = `https://zaoos.com/live/${spaceId}`;
-          const participants = Array.isArray(row?.participants)
-            ? row.participants.length
-            : 0;
+          const participants = Array.isArray(row?.participants) ? row.participants.length : 0;
           const lines = [`Just wrapped: ${title}`];
           if (participants > 0) {
-            lines.push(
-              `${participants} ZAO ${participants === 1 ? 'member' : 'members'} joined.`,
-            );
+            lines.push(`${participants} ZAO ${participants === 1 ? 'member' : 'members'} joined.`);
           }
           lines.push(liveUrl);
           await autoCastToZao(lines.join('\n\n'), liveUrl);
@@ -264,10 +269,7 @@ export async function applyWebhookEvent(
         const row = await getJukeSpace(spaceId);
         const title = row?.title ?? 'A ZAO space';
         const liveUrl = `https://zaoos.com/live/${spaceId}`;
-        await autoCastToZao(
-          `Recording up: ${title}\n\nListen back: ${liveUrl}`,
-          liveUrl,
-        );
+        await autoCastToZao(`Recording up: ${title}\n\nListen back: ${liveUrl}`, liveUrl);
       } catch (err: unknown) {
         logger.warn('[juke/webhooks] recap cast failed (non-fatal):', err);
       }

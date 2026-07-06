@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BroadcastState } from '@/lib/spaces/rtmpManager';
 
 interface BroadcastPanelProps {
@@ -89,7 +89,7 @@ export function BroadcastPanel({
 
   const targets = state.targets || [];
   const activeCount = targets.filter(
-    (t) => t.status === 'connected' || t.status === 'connecting'
+    (t) => t.status === 'connected' || t.status === 'connecting',
   ).length;
   const isRelay = state.mode === 'relay';
 
@@ -104,9 +104,7 @@ export function BroadcastPanel({
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
         </span>
-        <span className="font-medium">
-          LIVE
-        </span>
+        <span className="font-medium">LIVE</span>
         <span className="text-red-400/70">&middot;</span>
         <span className="text-red-400/70">
           {activeCount} platform{activeCount !== 1 ? 's' : ''}
@@ -170,10 +168,7 @@ export function BroadcastPanel({
           const isStopped = target.status === 'stopped';
 
           return (
-            <div
-              key={target.platform}
-              className="flex items-center justify-between px-4 py-2.5"
-            >
+            <div key={target.platform} className="flex items-center justify-between px-4 py-2.5">
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-base flex-shrink-0">{icon}</span>
                 <div className="min-w-0">

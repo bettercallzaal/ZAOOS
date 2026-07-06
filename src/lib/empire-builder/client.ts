@@ -10,21 +10,21 @@ import {
   ZABAL_TOKEN_ADDRESS,
 } from './config';
 import {
-  addressStatsResponseSchema,
   type AddressStatsResponse,
+  addressStatsResponseSchema,
   type Booster,
   boosterSchema,
   type EmpireSummary,
   empireSummarySchema,
-  leaderboardListResponseSchema,
   type LeaderboardResponse,
+  type LeaderboardSlot,
+  leaderboardListResponseSchema,
   leaderboardResponseSchema,
   leaderboardSlotSchema,
-  type LeaderboardSlot,
-  rewardsByTypeResponseSchema,
   type RewardsByTypeResponse,
-  rewardsSummaryResponseSchema,
   type RewardsSummaryResponse,
+  rewardsByTypeResponseSchema,
+  rewardsSummaryResponseSchema,
 } from './types';
 
 const apiKey = process.env.EMPIRE_BUILDER_API_KEY;
@@ -58,7 +58,9 @@ async function ebFetch<T>(path: string, schema: z.ZodType<T>, opts: FetchOptions
   }
 }
 
-export async function getTopEmpires(params: { page?: number; limit?: number } = {}): Promise<EmpireSummary[]> {
+export async function getTopEmpires(
+  params: { page?: number; limit?: number } = {},
+): Promise<EmpireSummary[]> {
   const page = params.page ?? 1;
   const limit = params.limit ?? 20;
   const responseSchema = z
@@ -80,7 +82,9 @@ export async function getEmpire(empireId: string): Promise<EmpireSummary | null>
     .passthrough();
   try {
     const data = await ebFetch(`/empires/${empireId}`, responseSchema);
-    return data.empire ?? (empireSummarySchema.safeParse(data).success ? (data as EmpireSummary) : null);
+    return (
+      data.empire ?? (empireSummarySchema.safeParse(data).success ? (data as EmpireSummary) : null)
+    );
   } catch {
     return null;
   }

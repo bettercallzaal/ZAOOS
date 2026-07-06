@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { blockUser, unblockUser } from '@/lib/farcaster/neynar';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const blockSchema = z.object({
@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = blockSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.issues },
+      { status: 400 },
+    );
   }
 
   try {
@@ -38,7 +41,10 @@ export async function DELETE(request: NextRequest) {
   const body = await request.json();
   const parsed = blockSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.issues },
+      { status: 400 },
+    );
   }
 
   try {

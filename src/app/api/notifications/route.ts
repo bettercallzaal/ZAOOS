@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -76,7 +76,10 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const parsed = markReadSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Provide ids (uuid[]) or all: true', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Provide ids (uuid[]) or all: true', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     if ('all' in parsed.data) {

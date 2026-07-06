@@ -2,9 +2,9 @@
 topic: events
 type: recap
 status: research-complete
-last-validated: 2026-07-03
+last-validated: 2026-07-05
 original-query: "meeting recap: Ohnahji + Zaal strategy session (2026-07-02)"
-tier: STANDARD
+tier: DEEP
 meeting-date: 2026-07-02
 platform: recording (mp4, local mlx-whisper transcription)
 ---
@@ -101,6 +101,63 @@ Zaal demonstrated Zao.xyz, a Kanban-based project management system serving as t
 7. **Zaal's day job impact:** Wants to pitch at work to help with automation using Claude. Currently tied to job (3k/month income needed to consider leaving). Interested in showing 20k raise target (via Artisan fund) to parents/partner as proof before full transition.
 
 8. **Samantha (candytoybox):** Building Wave Wars clipping agent on Instagram. Charging other people for service. Ohnahji should coordinate for replication. Note: Zaal says "she's going to charge other people" suggesting emerging service model in ZAO ecosystem.
+
+---
+
+## Deep Dive (added 2026-07-05, tier upgraded STANDARD -> DEEP)
+
+Full-transcript re-analysis (isolated-subagent read of the 72KB transcript, line-anchored, cross-checked against the recap above). This layer adds what the STANDARD pass compressed.
+
+### Correction to the recap above
+
+- **"Buy side volume: 383,364 SOL" is WRONG.** Transcript line 514: Zaal reads a Dune dashboard and says the buy side "is three, eight, three 64." A buy-side of 383,364 SOL is impossible against 500 SOL lifetime volume (line 507). The real figure is ambiguous from the audio (likely ~383.64 SOL, or a different unit/dollar figure). Treat lifetime volume = ~500 SOL as the reliable number; do NOT publish 383,364 SOL anywhere.
+- **Artisan figure, stated precisely:** Zaal put in **$400**, got a **3x match**, and said "we raised **$600**" - though the platform display showed **$1,600 total** and Zaal's own math was loose (lines 559-573). Report as Zaal said it, not as a clean 3x.
+
+### New decisions/commitments (not in the table above)
+
+- **Open-source the bounty board** and get people building on top of it (line 373-374).
+- **Make Zao.xyz public** once the private testing phase is solid (lines 284-286).
+- **Bounty board as education, not just bug-fixing** - "teach people how to be real open source developers"; media clips + PRs count as Zabal Games submissions; Season 2 rules pending (lines 1069-1070, 1072-1084).
+- **CRM + calendar inside Zao.xyz** to track "standby people" for the connector model (lines 1024-1028).
+- **Test Meta glasses AR for Twitch IRL streaming** (+ wants Claude Code on the glasses) (lines 923-925).
+
+### New action items
+
+- Deep-study the **Artisan** reputation/matching model to replicate for ZAO artists - between seasons (lines 586-587).
+- Pitch **automation at the maintenance job** + use it as proof-of-viability to parents/partner (lines 1141-1145).
+- Test the **Base<->SOL bridge** with a Reddit-converted "homie" before public release (lines 1170-1175).
+- Send Ohnahji the **Vercel + GitHub links** to prep the next-day build session (lines 1043-1048).
+
+### Strategic through-lines
+
+1. **Job as leverage, not exit.** Zaal automates his maintenance role with Claude Code to (a) prove value at work and (b) show parents/partner he's viable. The ~$20k Artisan target is the runway threshold vs a $3k/month burn. He's building optionality, not fleeing (lines 97-150, 1141-1150).
+2. **AI-first, first-principles architecture.** He's noticed context complexity - not technical skill - is now the limiter, and is building Zao.xyz as a Claude-queryable system. The 5-min loop reaching "equilibrium then awaiting input" excited him as a pattern (lines 65-79, 203-223). (Note: this session's own overnight-loop token waste is the flip side - loops past the 5-min cache window are expensive; see doc 969.)
+3. **Connector model over broadcast.** Shift from pushing content to being the node who makes warm intros that convert; the Argentina-lawyer no-ask exchange is his blueprint; the CRM operationalizes it (lines 618-636, 1123-1139).
+4. **WaveWarZ as incubator proof.** ~500 SOL lifetime, ~14,000 tx over 230 days, 4 straight profitable weeks, 3.5 SOL floor hit - all bootstrapped, no employees, peer contributors. The 50/50 community-partner program extends it. This is the whitepaper's proof point (lines 491-539, 1159-1166).
+5. **Farcaster as execution surface, not just distribution.** The bet is composability + fractal energy + the best place to get the first 100 feedback-giving testers - not follower count. ZOL on Neynar clankers is the live example (lines 883-920).
+6. **Fan-page IP monetization = the next product.** Fan creators get an approval "stamp" (not a staff role) + NFT royalty splits; Samantha/candytoybox's WaveWarZ clipping agent is the first live test (lines 1152-1159, 1209-1243).
+
+### People + external projects surfaced (beyond the recap)
+
+Renee (Artisan lead, weekly fund-manager mtgs), Gabe Covington / Hip Hop Crypto Watch (on-chain music wearable, capstone lecture offer), Samantha/candytoybox (WaveWarZ clipping agent, charging others), Chris Dolinsky (Vinny app - composable context/ICM), an Argentina lawyer (WaveWarZ legal structure, 7pm call), Clay Johns (declined the 365 call), JV/Jaden Violet (fan-page model example), Neynar team (clankers/droids). Tools named: Zao.xyz, Juke, Remotion (mp3->mp4, ~1hr/video), Flow Stage (Cal Web Two, TikTok extraction), Dune MCP, N8N, Twitch API, Magnetiq.
+
+### Top opportunities / open loops (ranked by strategic weight)
+
+1. Replicate the Artisan matching-fund model for ZAO artists (with ZAO's reputation/gamification layer). HIGH.
+2. Ship Zao.xyz public + the CRM/calendar - the connector-model infrastructure. HIGH.
+3. Open-source the bounty board as community learning infra. HIGH.
+4. Pitch job automation as the transition-proof lever. HIGH (personal).
+5. WaveWarZ community-partner program (50/50) + finish the Base<->SOL bridge. MEDIUM.
+6. Fan-page IP model live test with Samantha. MEDIUM.
+7. 24h stream w/ Ohnahji for his 365 anniversary (~first week Aug, day 318 now) as a Zabal Games entry. MEDIUM.
+
+## Next Actions (deep-dive)
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Correct the "383,364 SOL" figure anywhere it was propagated (shipped = no doc/post states it) | Zaal/Claude | Edit | 2026-07-05 |
+| Study Artisan model + draft a ZAO-artist matching-fund concept (shipped = concept note committed) | Zaal | Doc | 2026-08-01 |
+| Ship Zao.xyz public + CRM tab (shipped = public URL live) | Zaal | PR | 2026-08-15 |
 
 ## Sources
 

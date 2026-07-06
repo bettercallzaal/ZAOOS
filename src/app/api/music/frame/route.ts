@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     });
 
     if (!parsed.success) {
-      return new Response('Bad request: ' + parsed.error.issues.map(i => i.message).join(', '), {
+      return new Response('Bad request: ' + parsed.error.issues.map((i) => i.message).join(', '), {
         status: 400,
         headers: { 'Content-Type': 'text/plain' },
       });

@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Cast } from '@/types';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useEffect, useState } from 'react';
+import { TrackCardSkeleton } from '@/components/music/MusicSkeletons';
+import { useQueue } from '@/contexts/QueueContext';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
+import type { QueueTrack } from '@/hooks/usePlayerQueue';
+import { formatDuration } from '@/lib/music/formatDuration';
+import type { Song } from '@/lib/music/library';
+import { usePlayer } from '@/providers/audio';
+import type { Cast } from '@/types';
 import { MusicQueueTrackCard } from './MusicQueueTrackCard';
 import { RadioButton } from './RadioButton';
 import { Scrubber } from './Scrubber';
-import { formatDuration } from '@/lib/music/formatDuration';
-import { TrackCardSkeleton } from '@/components/music/MusicSkeletons';
-import type { Song } from '@/lib/music/library';
-import { useQueue } from '@/contexts/QueueContext';
-import type { QueueTrack } from '@/hooks/usePlayerQueue';
 
 interface MusicSidebarProps {
   messages?: Cast[];
@@ -75,15 +75,23 @@ export function MusicSidebar({
               <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
               </svg>
-              <h3 className="text-sm font-semibold text-white">
-                #{activeChannel} Music
-              </h3>
+              <h3 className="text-sm font-semibold text-white">#{activeChannel} Music</h3>
               <span className="text-xs text-gray-500">
                 {queue.length} track{queue.length !== 1 ? 's' : ''}
               </span>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close music sidebar">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white p-1"
+              aria-label="Close music sidebar"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -129,67 +137,71 @@ export function MusicSidebar({
   // ─── Desktop: fixed right drawer ────────────────────────────────────────────
   return (
     <>
-    <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
-    <div className="fixed top-0 right-0 bottom-0 z-50 flex flex-col w-[340px] border-l border-white/[0.08] bg-[#0d1b2a] shadow-2xl shadow-black/50 animate-slide-in-left overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628] flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-          </svg>
-          <h3 className="text-sm font-semibold text-white">
-            #{activeChannel}
-          </h3>
-          <span className="text-xs text-gray-500">
-            {queue.length} track{queue.length !== 1 ? 's' : ''}
-          </span>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 flex flex-col w-[340px] border-l border-white/[0.08] bg-[#0d1b2a] shadow-2xl shadow-black/50 animate-slide-in-left overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628] flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+            <h3 className="text-sm font-semibold text-white">#{activeChannel}</h3>
+            <span className="text-xs text-gray-500">
+              {queue.length} track{queue.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white p-1"
+            aria-label="Close music sidebar"
+          >
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-white p-1"
-          aria-label="Close music sidebar"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
 
-      {/* Radio button */}
-      {onRadioStart && onRadioStop && (
-        <RadioButton
-          isRadioMode={isRadioMode}
+        {/* Radio button */}
+        {onRadioStart && onRadioStop && (
+          <RadioButton
+            isRadioMode={isRadioMode}
+            radioLoading={radioLoading}
+            onStart={onRadioStart}
+            onStop={onRadioStop}
+            variant="full"
+            playlistName={radioPlaylistName}
+          />
+        )}
+
+        {/* Station picker */}
+        {isRadioMode && availableStations.length > 1 && onSwitchStation && (
+          <StationPicker
+            stations={availableStations}
+            currentIndex={currentStationIndex}
+            onSwitch={onSwitchStation}
+          />
+        )}
+
+        {/* Quick add song */}
+        <QuickAddInput player={player} />
+
+        {/* Now Playing — prominent card */}
+        {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
+
+        {/* Tabs: Library | Queue | Playlists */}
+        <SidebarTabs
+          queue={queue}
+          currentIndex={currentIndex}
           radioLoading={radioLoading}
-          onStart={onRadioStart}
-          onStop={onRadioStop}
-          variant="full"
-          playlistName={radioPlaylistName}
+          player={player}
         />
-      )}
-
-      {/* Station picker */}
-      {isRadioMode && availableStations.length > 1 && onSwitchStation && (
-        <StationPicker
-          stations={availableStations}
-          currentIndex={currentStationIndex}
-          onSwitch={onSwitchStation}
-        />
-      )}
-
-      {/* Quick add song */}
-      <QuickAddInput player={player} />
-
-      {/* Now Playing — prominent card */}
-      {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
-
-      {/* Tabs: Library | Queue | Playlists */}
-      <SidebarTabs
-        queue={queue}
-        currentIndex={currentIndex}
-        radioLoading={radioLoading}
-        player={player}
-      />
-    </div>
+      </div>
     </>
   );
 }
@@ -208,11 +220,15 @@ function NowPlayingCard({
   return (
     <div className="flex-shrink-0 border-b border-white/[0.08] bg-gradient-to-b from-[#0a1628] to-[#0d1b2a]">
       <div className="px-4 pt-4 pb-3">
-        <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold mb-3">Now Playing</p>
+        <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold mb-3">
+          Now Playing
+        </p>
 
         <div className="flex items-center gap-3 mb-3">
           {/* Large artwork */}
-          <div className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 shadow-lg ${player.isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}>
+          <div
+            className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 shadow-lg ${player.isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
+          >
             {player.metadata.artworkUrl ? (
               <Image
                 src={player.metadata.artworkUrl}
@@ -249,16 +265,16 @@ function NowPlayingCard({
 
           {/* Track info */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">
-              {player.metadata.trackName}
-            </p>
+            <p className="text-sm font-semibold text-white truncate">{player.metadata.trackName}</p>
             {player.metadata.artistName && (
-              <p className="text-xs text-gray-400 truncate">
-                {player.metadata.artistName}
-              </p>
+              <p className="text-xs text-gray-400 truncate">{player.metadata.artistName}</p>
             )}
             <span className="inline-block text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded mt-1 capitalize">
-              {player.metadata.type === 'applemusic' ? 'Apple Music' : player.metadata.type === 'soundxyz' ? 'Sound.xyz' : player.metadata.type}
+              {player.metadata.type === 'applemusic'
+                ? 'Apple Music'
+                : player.metadata.type === 'soundxyz'
+                  ? 'Sound.xyz'
+                  : player.metadata.type}
             </span>
           </div>
 
@@ -318,9 +334,7 @@ function QueueContent({
 }) {
   if (queue.length === 0) {
     return (
-      <p className="px-4 py-6 text-center text-sm text-gray-500">
-        No tracks in this channel yet
-      </p>
+      <p className="px-4 py-6 text-center text-sm text-gray-500">No tracks in this channel yet</p>
     );
   }
 
@@ -438,7 +452,9 @@ function SidebarTabs({
             ) : (
               <div className="py-2">
                 <p className="px-4 pb-2 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                  {currentIndex >= 0 ? `Up next · ${queue.length - currentIndex - 1} remaining` : `Channel · ${queue.length} tracks`}
+                  {currentIndex >= 0
+                    ? `Up next · ${queue.length - currentIndex - 1} remaining`
+                    : `Channel · ${queue.length} tracks`}
                 </p>
                 <QueueContent queue={queue} currentIndex={currentIndex} />
               </div>
@@ -470,8 +486,11 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
       const data = await res.json();
       setSongs(data.songs || []);
       setTotal(data.total || 0);
-    } catch { /* ignore */ }
-    finally { setLoading(false); }
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
   }, [search, sort]);
 
   useEffect(() => {
@@ -493,7 +512,11 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
       artistName: song.artist || '',
       artworkUrl: song.artwork_url || '',
       url: song.url,
-      streamUrl: song.stream_url || (song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS` : undefined),
+      streamUrl:
+        song.stream_url ||
+        (song.platform === 'audius'
+          ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS`
+          : undefined),
       feedId: `library-${song.id}`,
     });
     // Increment play count (fire and forget)
@@ -521,7 +544,9 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
               key={s}
               onClick={() => setSort(s)}
               className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                sort === s ? 'bg-[#f5a623] text-[#0a1628]' : 'bg-white/5 text-gray-400 hover:text-white'
+                sort === s
+                  ? 'bg-[#f5a623] text-[#0a1628]'
+                  : 'bg-white/5 text-gray-400 hover:text-white'
               }`}
             >
               {s === 'recent' ? 'Recent' : s === 'popular' ? 'Most Played' : 'Last Played'}
@@ -533,7 +558,9 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
       {/* Song list */}
       {loading ? (
         <div className="py-2">
-          {Array.from({ length: 5 }).map((_, i) => <TrackCardSkeleton key={i} />)}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <TrackCardSkeleton key={i} />
+          ))}
         </div>
       ) : songs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
@@ -541,7 +568,9 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
             {search ? 'No songs found' : 'Library is empty'}
           </p>
           <p className="text-xs text-gray-600 mt-1">
-            {search ? 'Try a different search' : 'Share music in chat to start building the library'}
+            {search
+              ? 'Try a different search'
+              : 'Share music in chat to start building the library'}
           </p>
         </div>
       ) : (
@@ -558,7 +587,13 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
               {/* Artwork */}
               <div className="relative w-9 h-9 flex-shrink-0 rounded-md overflow-hidden bg-gray-800">
                 {song.artwork_url ? (
-                  <Image src={song.artwork_url} alt={song.title} fill className="object-cover" sizes="36px" />
+                  <Image
+                    src={song.artwork_url}
+                    alt={song.title}
+                    fill
+                    className="object-cover"
+                    sizes="36px"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
@@ -572,7 +607,9 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{song.title}</p>
                 <div className="flex items-center gap-1.5">
-                  {song.artist && <p className="text-[11px] text-gray-500 truncate">{song.artist}</p>}
+                  {song.artist && (
+                    <p className="text-[11px] text-gray-500 truncate">{song.artist}</p>
+                  )}
                   <span className="text-[9px] text-gray-600 bg-white/5 px-1 py-0.5 rounded capitalize flex-shrink-0">
                     {song.platform === 'soundxyz' ? 'Sound' : song.platform}
                   </span>
@@ -594,19 +631,27 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
 // ─── Playlists Tab ────────────────────────────────────────────────────────────
 
 function PlaylistsTab() {
-  const [playlists, setPlaylists] = useState<{ id: string; name: string; type: string; trackCount: number }[]>([]);
+  const [playlists, setPlaylists] = useState<
+    { id: string; name: string; type: string; trackCount: number }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/music/playlists')
-      .then((r) => r.ok ? r.json() : { playlists: [] })
+      .then((r) => (r.ok ? r.json() : { playlists: [] }))
       .then((data) => setPlaylists(data.playlists || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <div className="py-2">{Array.from({ length: 3 }).map((_, i) => <TrackCardSkeleton key={i} />)}</div>;
+    return (
+      <div className="py-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <TrackCardSkeleton key={i} />
+        ))}
+      </div>
+    );
   }
 
   if (playlists.length === 0) {
@@ -621,7 +666,10 @@ function PlaylistsTab() {
   return (
     <div className="py-1">
       {playlists.map((pl) => (
-        <div key={pl.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors">
+        <div
+          key={pl.id}
+          className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors"
+        >
           <div className="w-9 h-9 rounded-md bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0">
             <svg className="w-4 h-4 text-[#f5a623]/60" viewBox="0 0 24 24" fill="currentColor">
               <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
@@ -630,7 +678,8 @@ function PlaylistsTab() {
           <div className="flex-1 min-w-0">
             <p className="text-sm text-white truncate">{pl.name}</p>
             <p className="text-[11px] text-gray-500">
-              {pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''} · {pl.type === 'totd_archive' ? 'TOTD' : pl.type}
+              {pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''} ·{' '}
+              {pl.type === 'totd_archive' ? 'TOTD' : pl.type}
             </p>
           </div>
         </div>
@@ -701,10 +750,7 @@ function UserQueueTrackRow({
         isCurrent ? 'bg-[#f5a623]/10' : ''
       }`}
     >
-      <button
-        onClick={onPlay}
-        className="flex items-center gap-2 flex-1 min-w-0 text-left"
-      >
+      <button onClick={onPlay} className="flex items-center gap-2 flex-1 min-w-0 text-left">
         {/* Index / playing indicator */}
         <div className="w-5 flex-shrink-0 flex items-center justify-center">
           {isPlaying ? (
@@ -737,11 +783,20 @@ function UserQueueTrackRow({
 
       {/* Remove button */}
       <button
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
         className="p-1 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
         aria-label="Remove from queue"
       >
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
@@ -775,7 +830,10 @@ function QuickAddInput({ player }: { player: ReturnType<typeof usePlayer> }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.08]">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.08]"
+    >
       <input
         type="url"
         value={url}

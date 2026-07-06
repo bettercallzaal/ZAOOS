@@ -1,19 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { addToPlaylist } from '@/lib/music/library';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+import { addToPlaylist } from '@/lib/music/library';
 
 const addSchema = z.object({ songId: z.string().uuid() });
 
 /**
  * POST /api/music/playlists/[id]/tracks — add a song to a playlist
  */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSessionData();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -54,10 +51,7 @@ const removeSchema = z.object({ songId: z.string().uuid() });
 /**
  * DELETE /api/music/playlists/[id]/tracks — remove a song from a playlist
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSessionData();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

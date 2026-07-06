@@ -1,9 +1,9 @@
 // src/lib/agents/autostake.ts
 import { getSupabaseAdmin } from '@/lib/db/supabase';
-import { executeSwap } from './wallet';
-import { logAgentEvent } from './events';
-import { TOKENS, ZABAL_STAKING_CONTRACT, type AgentName } from './types';
 import { logger } from '@/lib/logger';
+import { logAgentEvent } from './events';
+import { type AgentName, TOKENS, ZABAL_STAKING_CONTRACT } from './types';
+import { executeSwap } from './wallet';
 
 const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
 const MIN_STAKE = BigInt('100000000000000000000000000'); // 100M * 1e18
@@ -34,7 +34,9 @@ export async function maybeAutoStake(agentName: AgentName): Promise<void> {
   if (lastStake && lastStake.length > 0) {
     const daysSince = Date.now() - new Date(lastStake[0].created_at).getTime();
     if (daysSince < FOURTEEN_DAYS_MS) {
-      logger.info(`[${agentName}] Auto-stake: ${Math.floor(daysSince / (24 * 60 * 60 * 1000))} days since last stake, waiting for 14`);
+      logger.info(
+        `[${agentName}] Auto-stake: ${Math.floor(daysSince / (24 * 60 * 60 * 1000))} days since last stake, waiting for 14`,
+      );
       return;
     }
   }

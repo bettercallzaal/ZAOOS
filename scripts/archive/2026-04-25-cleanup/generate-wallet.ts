@@ -1,6 +1,6 @@
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 
 // Generate a new Ethereum keypair for the app signer
 const privateKey = generatePrivateKey();
@@ -18,7 +18,11 @@ console.log('');
 // Create encrypted backup
 const password = crypto.randomBytes(16).toString('hex');
 const iv = crypto.randomBytes(16);
-const cipher = crypto.createCipheriv('aes-256-cbc', crypto.createHash('sha256').update(password).digest(), iv);
+const cipher = crypto.createCipheriv(
+  'aes-256-cbc',
+  crypto.createHash('sha256').update(password).digest(),
+  iv,
+);
 let encrypted = cipher.update(privateKey, 'utf8', 'hex');
 encrypted += cipher.final('hex');
 
@@ -34,4 +38,6 @@ fs.writeFileSync('.wallet-backup.enc', backup);
 console.log('Encrypted backup saved to .wallet-backup.enc');
 console.log('Backup password (save this somewhere safe):', password);
 console.log('');
-console.log('IMPORTANT: Never share the private key. Never commit .env.local or .wallet-backup.enc');
+console.log(
+  'IMPORTANT: Never share the private key. Never commit .env.local or .wallet-backup.enc',
+);

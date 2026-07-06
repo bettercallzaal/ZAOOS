@@ -71,9 +71,7 @@ function EntryCard({
             {entry.mindshare.toFixed(1)}%
           </p>
           {large && (
-            <p className="text-xs text-gray-400 mt-1">
-              {entry.totalRespect.toLocaleString()} R
-            </p>
+            <p className="text-xs text-gray-400 mt-1">{entry.totalRespect.toLocaleString()} R</p>
           )}
         </div>
       </div>
@@ -81,11 +79,7 @@ function EntryCard({
   );
 }
 
-export function MobileLeaderboard({
-  entries,
-  onSelect,
-  selected,
-}: MobileLeaderboardProps) {
+export function MobileLeaderboard({ entries, onSelect, selected }: MobileLeaderboardProps) {
   const top10 = entries.slice(0, 10);
   const rest = entries.slice(10);
 
@@ -107,22 +101,13 @@ export function MobileLeaderboard({
         {/* #2–3 — half */}
         {top10.slice(1, 3).map((e) => (
           <div key={e.wallet || e.name} className={getGridClass(top10.indexOf(e))}>
-            <EntryCard
-              entry={e}
-              large
-              onSelect={onSelect}
-              selected={selected === e.wallet}
-            />
+            <EntryCard entry={e} large onSelect={onSelect} selected={selected === e.wallet} />
           </div>
         ))}
         {/* #4–5 — half */}
         {top10.slice(3, 5).map((e) => (
           <div key={e.wallet || e.name} className="col-span-1">
-            <EntryCard
-              entry={e}
-              onSelect={onSelect}
-              selected={selected === e.wallet}
-            />
+            <EntryCard entry={e} onSelect={onSelect} selected={selected === e.wallet} />
           </div>
         ))}
       </div>
@@ -132,11 +117,7 @@ export function MobileLeaderboard({
         <div className="grid grid-cols-3 gap-2">
           {top10.slice(5, 8).map((e) => (
             <div key={e.wallet || e.name}>
-              <EntryCard
-                entry={e}
-                onSelect={onSelect}
-                selected={selected === e.wallet}
-              />
+              <EntryCard entry={e} onSelect={onSelect} selected={selected === e.wallet} />
             </div>
           ))}
         </div>
@@ -147,11 +128,7 @@ export function MobileLeaderboard({
         <div className="grid grid-cols-2 gap-2">
           {top10.slice(8, 10).map((e) => (
             <div key={e.wallet || e.name}>
-              <EntryCard
-                entry={e}
-                onSelect={onSelect}
-                selected={selected === e.wallet}
-              />
+              <EntryCard entry={e} onSelect={onSelect} selected={selected === e.wallet} />
             </div>
           ))}
         </div>
@@ -162,11 +139,7 @@ export function MobileLeaderboard({
         <div className="grid grid-cols-2 gap-2 pt-1">
           {rest.map((e) => (
             <div key={e.wallet || e.name}>
-              <EntryCard
-                entry={e}
-                onSelect={onSelect}
-                selected={selected === e.wallet}
-              />
+              <EntryCard entry={e} onSelect={onSelect} selected={selected === e.wallet} />
             </div>
           ))}
         </div>

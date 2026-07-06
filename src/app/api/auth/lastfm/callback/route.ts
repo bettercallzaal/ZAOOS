@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getSession as getLastfmSession } from '@/lib/music/lastfm';
 import { logger } from '@/lib/logger';
+import { getSession as getLastfmSession } from '@/lib/music/lastfm';
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,10 +20,7 @@ export async function GET(req: NextRequest) {
 
     await supabaseAdmin
       .from('user_settings')
-      .upsert(
-        { fid: session.fid, lastfm_session_key: sk },
-        { onConflict: 'fid' }
-      );
+      .upsert({ fid: session.fid, lastfm_session_key: sk }, { onConflict: 'fid' });
 
     return NextResponse.redirect(new URL('/settings?lastfm=connected', req.url));
   } catch (error) {

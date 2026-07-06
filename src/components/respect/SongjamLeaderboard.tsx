@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SongjamEntry {
   username: string;
@@ -65,7 +65,9 @@ export function SongjamLeaderboard() {
         </div>
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Total Points</div>
-          <div className="text-white text-xl font-bold">{Math.round(totalPoints).toLocaleString()}</div>
+          <div className="text-white text-xl font-bold">
+            {Math.round(totalPoints).toLocaleString()}
+          </div>
         </div>
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Leader</div>
@@ -76,7 +78,10 @@ export function SongjamLeaderboard() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-white/[0.08]" />
+            <div
+              key={i}
+              className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-white/[0.08]"
+            />
           ))}
         </div>
       ) : entries.length === 0 ? (
@@ -90,9 +95,15 @@ export function SongjamLeaderboard() {
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3 w-12">#</th>
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3">Singer</th>
                   <th className="text-right text-gray-500 text-xs uppercase px-4 py-3">Points</th>
-                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden sm:table-cell">FC Points</th>
-                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden sm:table-cell">Space Pts</th>
-                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden md:table-cell">Multiplier</th>
+                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden sm:table-cell">
+                    FC Points
+                  </th>
+                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden sm:table-cell">
+                    Space Pts
+                  </th>
+                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3 hidden md:table-cell">
+                    Multiplier
+                  </th>
                   <th className="text-right text-gray-500 text-xs uppercase px-4 py-3">Share</th>
                 </tr>
               </thead>
@@ -100,7 +111,10 @@ export function SongjamLeaderboard() {
                 {entries.map((entry, i) => {
                   const share = totalPoints > 0 ? (entry.totalPoints / totalPoints) * 100 : 0;
                   return (
-                    <tr key={entry.userId} className="border-b border-white/[0.08] hover:bg-[#1a2a3a]/50 transition-colors">
+                    <tr
+                      key={entry.userId}
+                      className="border-b border-white/[0.08] hover:bg-[#1a2a3a]/50 transition-colors"
+                    >
                       <td className="px-4 py-3 text-gray-400 font-mono">{i + 1}</td>
                       <td className="px-4 py-3">
                         <div className="text-white font-medium">{entry.name}</div>
@@ -117,8 +131,12 @@ export function SongjamLeaderboard() {
                       </td>
                       <td className="px-4 py-3 text-right hidden md:table-cell">
                         {entry.empireMultiplier ? (
-                          <span className="text-[#f5a623] font-mono">{entry.empireMultiplier}x</span>
-                        ) : '—'}
+                          <span className="text-[#f5a623] font-mono">
+                            {entry.empireMultiplier}x
+                          </span>
+                        ) : (
+                          '—'
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right text-[#f5a623] font-mono">
                         {share.toFixed(1)}%

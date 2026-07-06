@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import LicensePicker from './LicensePicker';
 import MintSuccess from './MintSuccess';
@@ -10,7 +10,16 @@ interface MintTrackProps {
   onClose: () => void;
 }
 
-const GENRES = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'];
+const GENRES = [
+  'Hip-Hop',
+  'R&B',
+  'Electronic',
+  'Lo-Fi',
+  'Jazz',
+  'Afrobeats',
+  'Soul',
+  'Experimental',
+];
 
 const PRICE_OPTIONS = [
   { value: 'free', label: 'Free' },
@@ -46,7 +55,11 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
   const [customPrice, setCustomPrice] = useState('');
   const [minting, setMinting] = useState(false);
   const [mintProgress, setMintProgress] = useState('');
-  const [result, setResult] = useState<{ txId: string; coverUrl: string | null; bazarUrl: string } | null>(null);
+  const [result, setResult] = useState<{
+    txId: string;
+    coverUrl: string | null;
+    bazarUrl: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Auto-fill artist from session
@@ -91,13 +104,16 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
       const formData = new FormData();
       formData.append('audio', audioFile!);
       if (coverFile) formData.append('cover', coverFile);
-      formData.append('metadata', JSON.stringify({
-        title,
-        artist,
-        genre: genre || undefined,
-        description: description || undefined,
-        licensePreset,
-      }));
+      formData.append(
+        'metadata',
+        JSON.stringify({
+          title,
+          artist,
+          genre: genre || undefined,
+          description: description || undefined,
+          licensePreset,
+        }),
+      );
 
       const res = await fetch('/api/music/mint', {
         method: 'POST',
@@ -146,14 +162,17 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
 
   const canAdvanceStep1 = audioFile !== null && title.trim().length > 0;
 
-  const displayPrice = price === 'custom' ? `${customPrice || '0'} $U` : price === 'free' ? 'Free' : `${price} $U`;
+  const displayPrice =
+    price === 'custom' ? `${customPrice || '0'} $U` : price === 'free' ? 'Free' : `${price} $U`;
 
   // ---------- Render MintSuccess ----------
   if (result) {
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-        onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) handleClose();
+        }}
       >
         <div className="w-full max-w-lg rounded-2xl border border-[#f5a623]/20 bg-[#0d1b2a] p-6 shadow-xl">
           <MintSuccess
@@ -193,10 +212,13 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          {[1, 2, 3].map(s => (
-            <div key={s} className={`w-2 h-2 rounded-full transition-colors ${
-              s === step ? 'bg-[#f5a623]' : s < step ? 'bg-[#f5a623]/40' : 'bg-gray-700'
-            }`} />
+          {[1, 2, 3].map((s) => (
+            <div
+              key={s}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                s === step ? 'bg-[#f5a623]' : s < step ? 'bg-[#f5a623]/40' : 'bg-gray-700'
+              }`}
+            />
           ))}
         </div>
 
@@ -257,7 +279,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               <input
                 type="text"
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Track title"
                 className={INPUT_CLASS}
                 maxLength={120}
@@ -270,7 +292,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               <input
                 type="text"
                 value={artist}
-                onChange={e => setArtist(e.target.value)}
+                onChange={(e) => setArtist(e.target.value)}
                 placeholder="Artist name"
                 className={INPUT_CLASS}
                 maxLength={80}
@@ -281,7 +303,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
             <div>
               <label className="mb-1 block text-xs font-medium text-gray-500">Genre</label>
               <div className="flex flex-wrap gap-2">
-                {GENRES.map(g => (
+                {GENRES.map((g) => (
                   <button
                     key={g}
                     type="button"
@@ -303,7 +325,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               <label className="mb-1 block text-xs font-medium text-gray-500">Description</label>
               <textarea
                 value={description}
-                onChange={e => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description or liner notes"
                 rows={3}
                 className={`${INPUT_CLASS} resize-none`}
@@ -326,7 +348,9 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
         {/* ========== Step 2: License & Price ========== */}
         {step === 2 && (
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">License &amp; Price</h3>
+            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">
+              License &amp; Price
+            </h3>
 
             {/* License picker */}
             <LicensePicker value={licensePreset} onChange={setLicensePreset} />
@@ -335,7 +359,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
             <div>
               <label className="mb-2 block text-xs font-medium text-gray-500">Price</label>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {PRICE_OPTIONS.map(opt => (
+                {PRICE_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -356,7 +380,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
                   <input
                     type="number"
                     value={customPrice}
-                    onChange={e => setCustomPrice(e.target.value)}
+                    onChange={(e) => setCustomPrice(e.target.value)}
                     placeholder="0"
                     min="0"
                     step="any"
@@ -388,7 +412,9 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
         {/* ========== Step 3: Confirm & Mint ========== */}
         {step === 3 && (
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Confirm &amp; Mint</h3>
+            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">
+              Confirm &amp; Mint
+            </h3>
 
             {/* Preview */}
             <div className="rounded-lg border border-white/[0.08] bg-[#0a1628] p-4 space-y-3">
@@ -396,7 +422,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
                 {/* Cover preview */}
                 {coverFile ? (
                   <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
-                    { }
+                    {}
                     <img
                       src={URL.createObjectURL(coverFile)}
                       alt="Cover preview"
@@ -417,7 +443,9 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               </div>
 
               {description && (
-                <p className="text-xs text-gray-500 border-t border-white/[0.08] pt-2">{description}</p>
+                <p className="text-xs text-gray-500 border-t border-white/[0.08] pt-2">
+                  {description}
+                </p>
               )}
 
               <div className="flex items-center justify-between border-t border-white/[0.08] pt-2 text-xs">

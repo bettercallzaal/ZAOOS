@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { getChannelFeed } from '@/lib/farcaster/neynar';
-import { supabaseAdmin } from '@/lib/db/supabase';
-import { Cast } from '@/types';
+import { type NextRequest, NextResponse } from 'next/server';
 import { communityConfig } from '@/../community.config';
+import { getSessionData } from '@/lib/auth/session';
+import { supabaseAdmin } from '@/lib/db/supabase';
+import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import type { Cast } from '@/types';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 const FEED_LIMIT = 20;
@@ -62,7 +62,10 @@ async function refreshFromNeynar(channel: string): Promise<Cast[]> {
       timestamp: c.timestamp,
       embeds: c.embeds ?? [],
       reactions: c.reactions ?? {
-        likes_count: 0, recasts_count: 0, likes: [], recasts: [],
+        likes_count: 0,
+        recasts_count: 0,
+        likes: [],
+        recasts: [],
       },
       replies_count: c.replies?.count ?? 0,
       parent_hash: c.parent_hash ?? null,
@@ -94,7 +97,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const now = Date.now();
-    const needsRefresh = !cursor && (now - (lastRefresh[channel] || 0)) > REFRESH_TTL;
+    const needsRefresh = !cursor && now - (lastRefresh[channel] || 0) > REFRESH_TTL;
 
     let casts: Cast[];
     let hasMore = false;
@@ -191,7 +194,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const hiddenHashes = new Set(
-      (hiddenResult.data || []).map((h: { cast_hash: string }) => h.cast_hash)
+      (hiddenResult.data || []).map((h: { cast_hash: string }) => h.cast_hash),
     );
 
     const visibleCasts = casts.filter((c) => !hiddenHashes.has(c.hash));

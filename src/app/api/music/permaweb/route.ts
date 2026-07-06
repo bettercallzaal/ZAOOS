@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
     }
 
-    const assetIds = (assets || []).map(a => a.id);
+    const assetIds = (assets || []).map((a) => a.id);
     let collectedIds = new Set<string>();
     if (assetIds.length > 0) {
       const { data: collections } = await supabaseAdmin
@@ -44,10 +44,10 @@ export async function GET(req: NextRequest) {
         .select('asset_id')
         .eq('collector_fid', session.fid)
         .in('asset_id', assetIds);
-      collectedIds = new Set((collections || []).map(c => c.asset_id));
+      collectedIds = new Set((collections || []).map((c) => c.asset_id));
     }
 
-    const enriched = (assets || []).map(a => ({
+    const enriched = (assets || []).map((a) => ({
       ...a,
       coverUrl: a.cover_tx_id ? `https://arweave.net/${a.cover_tx_id}` : null,
       audioUrl: `https://arweave.net/${a.arweave_tx_id}`,
@@ -55,9 +55,12 @@ export async function GET(req: NextRequest) {
       collected: collectedIds.has(a.id),
     }));
 
-    return NextResponse.json({ assets: enriched, total: enriched.length }, {
-      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      { assets: enriched, total: enriched.length },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
+      },
+    );
   } catch (error) {
     logger.error('[music/permaweb] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });

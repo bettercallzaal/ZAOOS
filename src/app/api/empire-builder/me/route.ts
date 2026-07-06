@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import {
-  discoverLeaderboards,
-  getLeaderboardForAddress,
-} from '@/lib/empire-builder/client';
 import { DEFAULT_TTL_MS, withCache } from '@/lib/empire-builder/cache';
+import { discoverLeaderboards, getLeaderboardForAddress } from '@/lib/empire-builder/client';
 import { ZABAL_TOKEN_ADDRESS } from '@/lib/empire-builder/config';
 
 export const dynamic = 'force-dynamic';
@@ -30,27 +27,27 @@ export async function GET(req: Request) {
 
     const wallet = (parsed.data.wallet ?? session.walletAddress ?? '').trim();
     if (!wallet) {
-      return NextResponse.json({ success: true, data: { wallet: null, entry: null, boosters: [] } });
+      return NextResponse.json({
+        success: true,
+        data: { wallet: null, entry: null, boosters: [] },
+      });
     }
 
-    const slots = await withCache(
-      `eb:slots:${ZABAL_TOKEN_ADDRESS}`,
-      DEFAULT_TTL_MS * 5,
-      () => discoverLeaderboards(ZABAL_TOKEN_ADDRESS),
+    const slots = await withCache(`eb:slots:${ZABAL_TOKEN_ADDRESS}`, DEFAULT_TTL_MS * 5, () =>
+      discoverLeaderboards(ZABAL_TOKEN_ADDRESS),
     );
     if (slots.length === 0) {
       return NextResponse.json({ success: true, data: { wallet, entry: null, boosters: [] } });
     }
 
     const slotIndex = parsed.data.slot ? Number(parsed.data.slot) : 0;
-    const slot = Number.isFinite(slotIndex) && slotIndex >= 0 && slotIndex < slots.length
-      ? slots[slotIndex]
-      : slots[0];
+    const slot =
+      Number.isFinite(slotIndex) && slotIndex >= 0 && slotIndex < slots.length
+        ? slots[slotIndex]
+        : slots[0];
 
-    const stats = await withCache(
-      `eb:me:${slot.id}:${wallet.toLowerCase()}`,
-      DEFAULT_TTL_MS,
-      () => getLeaderboardForAddress(slot.id, wallet),
+    const stats = await withCache(`eb:me:${slot.id}:${wallet.toLowerCase()}`, DEFAULT_TTL_MS, () =>
+      getLeaderboardForAddress(slot.id, wallet),
     );
 
     if (!stats) {

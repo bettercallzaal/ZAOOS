@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
@@ -39,10 +39,7 @@ export async function POST(request: NextRequest) {
 
   const apiKey = ENV.JUKE_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { ok: false, error: 'JUKE_API_KEY not configured' },
-      { status: 503 },
-    );
+    return NextResponse.json({ ok: false, error: 'JUKE_API_KEY not configured' }, { status: 503 });
   }
 
   let raw: unknown;

@@ -33,21 +33,29 @@ export const communityIssueSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
 });
 
-export const allowlistEntrySchema = z.object({
-  fid: z.number().int().positive().optional(),
-  wallet_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
-  real_name: z.string().max(100).optional(),
-  ign: z.string().max(100).optional(),
-  notes: z.string().max(500).optional(),
-  display_name: z.string().max(100).optional(),
-  pfp_url: z.string().url().optional(),
-  username: z.string().max(100).optional(),
-  custody_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
-  verified_addresses: z.array(z.string()).optional(),
-  ens_name: z.string().max(200).optional(),
-}).refine(data => data.fid || data.wallet_address, {
-  message: 'Either fid or wallet_address is required',
-});
+export const allowlistEntrySchema = z
+  .object({
+    fid: z.number().int().positive().optional(),
+    wallet_address: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/)
+      .optional(),
+    real_name: z.string().max(100).optional(),
+    ign: z.string().max(100).optional(),
+    notes: z.string().max(500).optional(),
+    display_name: z.string().max(100).optional(),
+    pfp_url: z.string().url().optional(),
+    username: z.string().max(100).optional(),
+    custody_address: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/)
+      .optional(),
+    verified_addresses: z.array(z.string()).optional(),
+    ens_name: z.string().max(200).optional(),
+  })
+  .refine((data) => data.fid || data.wallet_address, {
+    message: 'Either fid or wallet_address is required',
+  });
 
 export const removeAllowlistSchema = z.object({
   id: z.string().uuid(),
@@ -80,8 +88,16 @@ export const PROPOSAL_CATEGORY_LABELS: Record<ProposalCategory, string> = {
 export const proposalCategorySchema = z.enum(PROPOSAL_CATEGORIES);
 
 export const createProposalSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),
-  description: z.string().trim().min(1, 'Description is required').max(5000, 'Description must be 5000 characters or less'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Title is required')
+    .max(200, 'Title must be 200 characters or less'),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'Description is required')
+    .max(5000, 'Description must be 5000 characters or less'),
   category: proposalCategorySchema.optional().default('general'),
   closes_at: z
     .string()
@@ -90,14 +106,22 @@ export const createProposalSchema = z.object({
       message: 'closes_at must be in the future',
     })
     .optional(),
-  publish_text: z.string().trim().max(1024, 'Publish text must be 1024 characters or less').optional(),
+  publish_text: z
+    .string()
+    .trim()
+    .max(1024, 'Publish text must be 1024 characters or less')
+    .optional(),
   publish_image_url: z.string().url().optional(),
   respect_threshold: z.number().int().min(0).optional(),
 });
 
 export const proposalCommentSchema = z.object({
   proposal_id: z.string().uuid('proposal_id must be a valid UUID'),
-  body: z.string().trim().min(1, 'Comment body is required').max(2000, 'Comment must be 2000 characters or less'),
+  body: z
+    .string()
+    .trim()
+    .min(1, 'Comment body is required')
+    .max(2000, 'Comment must be 2000 characters or less'),
 });
 
 export const proposalVoteSchema = z.object({

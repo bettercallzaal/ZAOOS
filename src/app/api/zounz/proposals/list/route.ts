@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbiItem } from 'viem';
 import { base } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
-import { ZOUNZ_GOVERNOR, ZOUNZ_TOKEN } from '@/lib/zounz/contracts';
 import { logger } from '@/lib/logger';
+import { ZOUNZ_GOVERNOR, ZOUNZ_TOKEN } from '@/lib/zounz/contracts';
 
 // Nouns Builder Goldsky subgraph (may be 404 — falls back to getLogs)
 const SUBGRAPH_URL =
@@ -17,7 +17,7 @@ const client = createPublicClient({
 
 // ProposalCreated(bytes32,address,address[],uint256[],bytes[],string,uint256,uint256,uint256)
 const PROPOSAL_CREATED_ABI = parseAbiItem(
-  'event ProposalCreated(bytes32 proposalId, address proposer, address[] targets, uint256[] values, bytes[] calldatas, string description, uint256 voteStart, uint256 voteEnd, uint256 proposalThreshold, uint256 quorumVotes)'
+  'event ProposalCreated(bytes32 proposalId, address proposer, address[] targets, uint256[] values, bytes[] calldatas, string description, uint256 voteStart, uint256 voteEnd, uint256 proposalThreshold, uint256 quorumVotes)',
 );
 
 // ProposalCanceled, ProposalVetoed, ProposalExecuted events
@@ -75,7 +75,7 @@ export async function GET() {
     if (subgraphResult !== null) {
       return NextResponse.json(
         { proposals: subgraphResult, total: subgraphResult.length },
-        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } }
+        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } },
       );
     }
 
@@ -84,14 +84,14 @@ export async function GET() {
     if (logsResult !== null) {
       return NextResponse.json(
         { proposals: logsResult, total: logsResult.length, source: 'onchain' },
-        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } }
+        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } },
       );
     }
 
     // Both sources failed — graceful degradation
     return NextResponse.json(
       { proposals: [], error: 'Proposal data temporarily unavailable', total: 0 },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     logger.error('[zounz/proposals/list] Unhandled error:', error);
@@ -232,18 +232,18 @@ async function tryGetLogs(): Promise<ZounzProposal[] | null> {
     // Build sets of terminal-state proposal IDs
     const canceledIds = new Set<string>(
       canceledLogs.status === 'fulfilled'
-        ? canceledLogs.value.map(l => (l.args as { proposalId: string }).proposalId)
-        : []
+        ? canceledLogs.value.map((l) => (l.args as { proposalId: string }).proposalId)
+        : [],
     );
     const vetoedIds = new Set<string>(
       vetoedLogs.status === 'fulfilled'
-        ? vetoedLogs.value.map(l => (l.args as { proposalId: string }).proposalId)
-        : []
+        ? vetoedLogs.value.map((l) => (l.args as { proposalId: string }).proposalId)
+        : [],
     );
     const executedIds = new Set<string>(
       executedLogs.status === 'fulfilled'
-        ? executedLogs.value.map(l => (l.args as { proposalId: string }).proposalId)
-        : []
+        ? executedLogs.value.map((l) => (l.args as { proposalId: string }).proposalId)
+        : [],
     );
 
     // Sort created logs newest-first, take 30

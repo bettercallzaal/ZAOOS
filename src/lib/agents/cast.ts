@@ -1,6 +1,6 @@
-import { autoCastToZao } from '@/lib/publish/auto-cast';
-import type { AgentName, AgentAction } from './types';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
+import type { AgentAction, AgentName } from './types';
 
 export async function postTradeUpdate(params: {
   agentName: AgentName;

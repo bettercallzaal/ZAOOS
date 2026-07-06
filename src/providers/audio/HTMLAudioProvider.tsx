@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
-import { usePlayerContext } from './PlayerProvider';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { getEqualizer } from '@/lib/music/equalizer';
+import { usePlayerContext } from './PlayerProvider';
 
 // Module-level audio elements — survive component re-mounts and React strict mode
 let audioA: HTMLAudioElement | null = null;
@@ -70,7 +70,14 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     const onCanPlay = (e: Event) => {
       if (!isActive(e)) return;
       const a = getActive();
-      console.log('[Audio] canplay fired, src:', a.src?.substring(0, 60), 'duration:', a.duration, 'volume:', a.volume);
+      console.log(
+        '[Audio] canplay fired, src:',
+        a.src?.substring(0, 60),
+        'duration:',
+        a.duration,
+        'volume:',
+        a.volume,
+      );
       a.play().catch((err: unknown) => {
         console.error('[Audio] play blocked:', err);
         dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
@@ -92,7 +99,13 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     const onError = (e: Event) => {
       if (!isActive(e)) return;
       const a = getActive();
-      console.error('[Audio] error event:', a.error?.code, a.error?.message, 'src:', a.src?.substring(0, 60));
+      console.error(
+        '[Audio] error event:',
+        a.error?.code,
+        a.error?.message,
+        'src:',
+        a.src?.substring(0, 60),
+      );
       const code = a.error?.code;
       const messages: Record<number, string> = {
         1: 'Playback aborted',
@@ -144,7 +157,9 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
           // capturing audio output, which breaks background playback
           const eq = getEqualizer();
           if (eq.isActive()) {
-            try { eq.connect(inactive); } catch {}
+            try {
+              eq.connect(inactive);
+            } catch {}
           }
 
           // Fade: ramp new up, old down
@@ -164,14 +179,19 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         // capturing audio output, which breaks background playback
         const eq = getEqualizer();
         if (eq.isActive()) {
-          try { eq.connect(active); } catch {}
+          try {
+            eq.connect(active);
+          } catch {}
         }
-        active.play().then(() => {
-          console.log('[Audio] Play started, volume:', active.volume, 'paused:', active.paused);
-        }).catch((err) => {
-          console.error('[Audio] Play failed:', err);
-          dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
-        });
+        active
+          .play()
+          .then(() => {
+            console.log('[Audio] Play started, volume:', active.volume, 'paused:', active.paused);
+          })
+          .catch((err) => {
+            console.error('[Audio] Play failed:', err);
+            dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
+          });
       },
       setVolume: (v: number) => {
         getActive().volume = v;
@@ -258,7 +278,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);  
+  }, []);
 
   // React to new audio/soundxyz tracks
   useEffect(() => {

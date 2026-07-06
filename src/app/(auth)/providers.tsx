@@ -1,8 +1,8 @@
 'use client';
 
+import { QueueProvider } from '@/contexts/QueueContext';
 import { AudioProviders } from '@/providers/audio';
 import { RadioProvider } from '@/providers/audio/RadioProvider';
-import { QueueProvider } from '@/contexts/QueueContext';
 
 /**
  * Audio + Radio providers — only loaded for authenticated routes.

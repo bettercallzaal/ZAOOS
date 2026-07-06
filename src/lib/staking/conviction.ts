@@ -1,7 +1,7 @@
 // src/lib/staking/conviction.ts
-import { createPublicClient, http, formatUnits } from 'viem';
+import { createPublicClient, formatUnits, http } from 'viem';
 import { base } from 'viem/chains';
-import { ZABAL_STAKING_CONTRACT, STAKING_ABI } from './contract';
+import { STAKING_ABI, ZABAL_STAKING_CONTRACT } from './contract';
 
 const client = createPublicClient({ chain: base, transport: http() });
 
@@ -43,7 +43,7 @@ export async function getConvictionBatch(addresses: string[]): Promise<Convictio
         stakedFormatted: formatUnits(staked, 18).split('.')[0],
         convictionFormatted: (Number(conviction) / 1e30).toFixed(1) + 'T',
       };
-    })
+    }),
   );
 
   return results

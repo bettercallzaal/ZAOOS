@@ -1,17 +1,26 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
-import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 /**
  * Floating "+" button + bottom sheet for quick song submission from any page.
  * Auto-fetches metadata when a valid music URL is pasted.
  */
-const GENRE_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
+const GENRE_TAGS = [
+  'Hip-Hop',
+  'R&B',
+  'Electronic',
+  'Lo-Fi',
+  'Jazz',
+  'Afrobeats',
+  'Soul',
+  'Experimental',
+] as const;
 
 export function QuickAddSong() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,11 +35,7 @@ export function QuickAddSong() {
 
   const toggleTag = (tag: string) => {
     setTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : prev.length < 3
-        ? [...prev, tag]
-        : prev
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : prev.length < 3 ? [...prev, tag] : prev,
     );
   };
 
@@ -129,7 +134,13 @@ export function QuickAddSong() {
           aria-label="Add a song"
           title="Add a song"
         >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+          <svg
+            className="w-6 h-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
         </button>
@@ -154,8 +165,17 @@ export function QuickAddSong() {
                 </svg>
                 <h3 className="text-sm font-semibold text-white">Add a Song</h3>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white p-1">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white p-1"
+              >
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -164,9 +184,13 @@ export function QuickAddSong() {
             <div className="px-4 py-4 space-y-3">
               {/* Feedback */}
               {feedback && (
-                <div className={`px-3 py-2 rounded-lg text-sm ${
-                  feedback.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                }`}>
+                <div
+                  className={`px-3 py-2 rounded-lg text-sm ${
+                    feedback.type === 'success'
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-red-500/20 text-red-400'
+                  }`}
+                >
                   {feedback.msg}
                 </div>
               )}
@@ -179,9 +203,11 @@ export function QuickAddSong() {
                   placeholder="Paste any music link..."
                   autoFocus
                   className={`w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-3 pr-8 placeholder-gray-500 focus:outline-none focus:ring-1 ${
-                    urlType ? 'focus:ring-green-400 ring-1 ring-green-400/50' :
-                    url.trim() && !urlType ? 'focus:ring-red-400 ring-1 ring-red-400/50' :
-                    'focus:ring-[#f5a623]'
+                    urlType
+                      ? 'focus:ring-green-400 ring-1 ring-green-400/50'
+                      : url.trim() && !urlType
+                        ? 'focus:ring-red-400 ring-1 ring-red-400/50'
+                        : 'focus:ring-[#f5a623]'
                   }`}
                 />
                 {loadingMeta && (
@@ -191,8 +217,18 @@ export function QuickAddSong() {
                 )}
                 {!loadingMeta && urlType && (
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
                     </svg>
                   </span>
                 )}
@@ -226,11 +262,20 @@ export function QuickAddSong() {
                 <div className="flex items-center gap-3 bg-[#1a2a3a] rounded-lg p-3">
                   {metadata.artworkUrl ? (
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                      <Image src={metadata.artworkUrl} alt={metadata.trackName} fill className="object-cover" />
+                      <Image
+                        src={metadata.artworkUrl}
+                        alt={metadata.trackName}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="w-12 h-12 rounded-lg bg-[#0a1628] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-[#f5a623]/40" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        className="w-6 h-6 text-[#f5a623]/40"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                       </svg>
                     </div>
@@ -241,7 +286,11 @@ export function QuickAddSong() {
                       <p className="text-xs text-gray-400 truncate">{metadata.artistName}</p>
                     )}
                     <span className="text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded capitalize mt-1 inline-block">
-                      {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
+                      {metadata.type === 'applemusic'
+                        ? 'Apple Music'
+                        : metadata.type === 'soundxyz'
+                          ? 'Sound.xyz'
+                          : metadata.type}
                     </span>
                   </div>
                   <button

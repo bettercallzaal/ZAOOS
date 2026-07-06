@@ -20,10 +20,6 @@ export async function generateMetadata({
   };
 }
 
-export default function SpacesRoomLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SpacesRoomLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

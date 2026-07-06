@@ -105,7 +105,12 @@ export async function createOnePager(input: OnePagerCreateInput): Promise<OnePag
     .select(`${META_COLUMNS}, body`)
     .single();
   if (error) throw error;
-  await logActivity(data.id as string, input.last_edited_by ?? null, 'created', `Created "${input.title}"`);
+  await logActivity(
+    data.id as string,
+    input.last_edited_by ?? null,
+    'created',
+    `Created "${input.title}"`,
+  );
   return data as OnePager;
 }
 
@@ -124,7 +129,10 @@ export interface OnePagerUpdateInput {
   last_edited_by?: string | null;
 }
 
-export async function updateOnePager(slug: string, patch: OnePagerUpdateInput): Promise<OnePager | null> {
+export async function updateOnePager(
+  slug: string,
+  patch: OnePagerUpdateInput,
+): Promise<OnePager | null> {
   const current = await getOnePager(slug);
   if (!current) return null;
 
@@ -199,7 +207,9 @@ export async function listActivity(slug: string, limit = 50): Promise<OnePagerAc
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_onepager_activity')
-    .select('id, onepager_id, member_id, type, content, metadata, created_at, stock_team_members:member_id (name)')
+    .select(
+      'id, onepager_id, member_id, type, content, metadata, created_at, stock_team_members:member_id (name)',
+    )
     .eq('onepager_id', current.id)
     .order('created_at', { ascending: false })
     .limit(limit);

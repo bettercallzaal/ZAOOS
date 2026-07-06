@@ -9,8 +9,8 @@
  * @see https://developer.x.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
  */
 
-import { getXClient } from '@/lib/publish/x';
 import { logger } from '@/lib/logger';
+import { getXClient } from '@/lib/publish/x';
 
 export interface XMetrics {
   views: number;

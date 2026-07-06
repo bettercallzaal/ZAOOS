@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { getSessionData } from '@/lib/auth/session';
-import { ZOUNZ_GOVERNOR, governorAbi } from '@/lib/zounz/contracts';
 import { communityConfig } from '@/../community.config';
+import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
+import { governorAbi, ZOUNZ_GOVERNOR } from '@/lib/zounz/contracts';
 
 const client = createPublicClient({
   chain: base,
@@ -41,7 +41,8 @@ export async function GET() {
 
     return NextResponse.json({
       proposalCount: proposalCount.status === 'fulfilled' ? Number(proposalCount.value) : 0,
-      proposalThreshold: proposalThreshold.status === 'fulfilled' ? Number(proposalThreshold.value) : null,
+      proposalThreshold:
+        proposalThreshold.status === 'fulfilled' ? Number(proposalThreshold.value) : null,
       quorum: quorum.status === 'fulfilled' ? Number(quorum.value) : null,
       governorAddress: ZOUNZ_GOVERNOR,
       nounsBuilderUrl: communityConfig.zounz.nounsBuilderUrl,
@@ -50,9 +51,6 @@ export async function GET() {
     });
   } catch (err) {
     logger.error('[zounz/proposals] Error reading governor contract:', err);
-    return NextResponse.json(
-      { error: 'Failed to read governor contract' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to read governor contract' }, { status: 500 });
   }
 }

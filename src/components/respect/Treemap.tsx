@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface TreemapEntry {
   rank: number;
@@ -145,17 +145,10 @@ export function Treemap({ entries, onSelect, selected }: TreemapProps) {
   }, []);
 
   const total = entries.reduce((s, e) => s + e.totalRespect, 0);
-  const rects =
-    total > 0
-      ? squarify(entries, 0, 0, dims.width, dims.height, total)
-      : [];
+  const rects = total > 0 ? squarify(entries, 0, 0, dims.width, dims.height, total) : [];
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full relative"
-      style={{ height: '380px' }}
-    >
+    <div ref={containerRef} className="w-full relative" style={{ height: '380px' }}>
       <svg
         width={dims.width}
         height={dims.height}
@@ -208,9 +201,7 @@ export function Treemap({ entries, onSelect, selected }: TreemapProps) {
                     fontWeight="600"
                     style={{ userSelect: 'none', pointerEvents: 'none' }}
                   >
-                    {r.entry.name.length > 14
-                      ? r.entry.name.slice(0, 12) + '…'
-                      : r.entry.name}
+                    {r.entry.name.length > 14 ? r.entry.name.slice(0, 12) + '…' : r.entry.name}
                   </text>
                   {showPct && (
                     <text

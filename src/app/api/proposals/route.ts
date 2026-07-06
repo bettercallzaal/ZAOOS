@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
 import { createProposalSchema } from '@/lib/validation/schemas';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
-import { logger } from '@/lib/logger';
 
 /**
  * GET — List proposals with vote tallies
@@ -32,12 +32,15 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from('proposals')
-    .select(`
+    .select(
+      `
       *,
       author:users!proposals_author_id_fkey(display_name, username, pfp_url, fid, zid),
       votes:proposal_votes(vote, respect_weight, voter_id),
       comment_count:proposal_comments(count)
-    `, { count: 'exact' })
+    `,
+      { count: 'exact' },
+    )
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -72,11 +75,32 @@ export async function GET(req: NextRequest) {
       created_at: p.created_at,
       closes_at: p.closes_at,
       tally: {
-        for: { count: forVotes.length, weight: forVotes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0) },
-        against: { count: againstVotes.length, weight: againstVotes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0) },
-        abstain: { count: abstainVotes.length, weight: abstainVotes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0) },
+        for: {
+          count: forVotes.length,
+          weight: forVotes.reduce(
+            (s: number, v: { respect_weight: number }) => s + v.respect_weight,
+            0,
+          ),
+        },
+        against: {
+          count: againstVotes.length,
+          weight: againstVotes.reduce(
+            (s: number, v: { respect_weight: number }) => s + v.respect_weight,
+            0,
+          ),
+        },
+        abstain: {
+          count: abstainVotes.length,
+          weight: abstainVotes.reduce(
+            (s: number, v: { respect_weight: number }) => s + v.respect_weight,
+            0,
+          ),
+        },
         totalVoters: votes.length,
-        totalWeight: votes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0),
+        totalWeight: votes.reduce(
+          (s: number, v: { respect_weight: number }) => s + v.respect_weight,
+          0,
+        ),
       },
       commentCount: p.comment_count?.[0]?.count || 0,
       user_vote: currentUserId
@@ -97,10 +121,13 @@ export async function GET(req: NextRequest) {
   // This handles the case where threshold was reached during the voting period but
   // publishing was deferred until the deadline passed.
   checkExpiredProposalsForPublish(proposals).catch((err) =>
-    logger.error('[proposals] expired-publish check failed:', err)
+    logger.error('[proposals] expired-publish check failed:', err),
   );
 
-  return NextResponse.json({ proposals, total: totalCount ?? proposals.length, limit, offset }, { headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json(
+    { proposals, total: totalCount ?? proposals.length, limit, offset },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 }
 
 /**
@@ -119,10 +146,18 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    const { title, description, category, closes_at, publish_text, publish_image_url, respect_threshold } = parsed.data;
+    const {
+      title,
+      description,
+      category,
+      closes_at,
+      publish_text,
+      publish_image_url,
+      respect_threshold,
+    } = parsed.data;
 
     // Get user row
     const { data: user } = await supabaseAdmin
@@ -158,7 +193,8 @@ export async function POST(req: NextRequest) {
       (async () => {
         if (!process.env.TELEGRAM_BOT_TOKEN) return;
         const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
-        const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
+        const descTruncated =
+          description.length > 200 ? description.slice(0, 200) + '...' : description;
         const msgText = `📋 New Proposal: ${title}\n\nBy ${session.displayName}\n\n${descTruncated}\n\n🗳️ Vote on ZAO OS: https://zaoos.com/governance\n🌐 Join the community: https://zaoos.com`;
         const result = await publishToTelegram({
           text: escapeMarkdownV2(msgText),
@@ -171,7 +207,8 @@ export async function POST(req: NextRequest) {
       (async () => {
         if (!process.env.DISCORD_WEBHOOK_URL) return;
         const { publishToDiscord, buildZaoEmbed } = await import('@/lib/publish/discord');
-        const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
+        const descTruncated =
+          description.length > 200 ? description.slice(0, 200) + '...' : description;
         const embed = buildZaoEmbed({
           title: `📋 New Proposal: ${title}`,
           description: `${descTruncated}\n\n[Vote on ZAO OS](https://zaoos.com/governance) · [Join the community](https://zaoos.com)`,
@@ -191,33 +228,31 @@ export async function POST(req: NextRequest) {
 
     // Notify all active members about the new proposal (fire and forget)
     Promise.resolve(
-      supabaseAdmin
-        .from('users')
-        .select('fid')
-        .eq('is_active', true)
-        .neq('fid', session.fid)
-    ).then(({ data: members }) => {
-      if (members?.length) {
-        const fids = members.map((m) => m.fid).filter(Boolean);
-        createInAppNotification({
-          recipientFids: fids,
-          type: 'proposal',
-          title: 'New Proposal',
-          body: title.trim().slice(0, 100),
-          href: '/governance',
-          actorFid: session.fid,
-          actorDisplayName: session.displayName,
-          actorPfpUrl: session.pfpUrl,
-        }).catch((err) => logger.error('[notify]', err));
-        sendNotification(
-          'New Proposal',
-          `${session.displayName}: ${title.trim().slice(0, 80)}`,
-          'https://zaoos.com/governance',
-          `proposal-${proposal.id}`,
-          session.fid
-        ).catch((err) => logger.error('[notify]', err));
-      }
-    }).catch((err) => logger.error('[notify]', err));
+      supabaseAdmin.from('users').select('fid').eq('is_active', true).neq('fid', session.fid),
+    )
+      .then(({ data: members }) => {
+        if (members?.length) {
+          const fids = members.map((m) => m.fid).filter(Boolean);
+          createInAppNotification({
+            recipientFids: fids,
+            type: 'proposal',
+            title: 'New Proposal',
+            body: title.trim().slice(0, 100),
+            href: '/governance',
+            actorFid: session.fid,
+            actorDisplayName: session.displayName,
+            actorPfpUrl: session.pfpUrl,
+          }).catch((err) => logger.error('[notify]', err));
+          sendNotification(
+            'New Proposal',
+            `${session.displayName}: ${title.trim().slice(0, 80)}`,
+            'https://zaoos.com/governance',
+            `proposal-${proposal.id}`,
+            session.fid,
+          ).catch((err) => logger.error('[notify]', err));
+        }
+      })
+      .catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({ proposal });
   } catch (err) {
@@ -258,7 +293,7 @@ export async function PATCH(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -277,7 +312,7 @@ export async function PATCH(req: NextRequest) {
     if (!allowed.includes(parsed.data.status)) {
       return NextResponse.json(
         { error: `Cannot transition from "${current.status}" to "${parsed.data.status}"` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -345,7 +380,9 @@ async function checkExpiredProposalsForPublish(proposals: ProposalSummary[]) {
           .eq('id', p.id)
           .eq('status', 'open');
 
-        logger.info(`[proposals] Auto-approved proposal ${p.id} — deadline passed, ${forWeight}/${threshold}R threshold met`);
+        logger.info(
+          `[proposals] Auto-approved proposal ${p.id} — deadline passed, ${forWeight}/${threshold}R threshold met`,
+        );
       } catch (err) {
         logger.error(`[proposals] Auto-approve failed for ${p.id}:`, err);
       }

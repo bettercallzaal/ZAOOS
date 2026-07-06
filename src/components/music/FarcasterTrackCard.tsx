@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { ArtworkImage } from '@/components/music/ArtworkImage';
 import type { FeedTrack } from '@/app/api/music/feed/route';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
 
 export type ResolvedMeta = { title: string; artist: string; artwork: string; streamUrl?: string };
 
@@ -75,16 +75,14 @@ export function FarcasterTrackCard({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-medium text-white truncate">
-            {title || 'Untitled Track'}
-          </p>
-          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${platformInfo.color}`}>
+          <p className="text-sm font-medium text-white truncate">{title || 'Untitled Track'}</p>
+          <span
+            className={`px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${platformInfo.color}`}
+          >
             {platformInfo.label}
           </span>
         </div>
-        {artist && (
-          <p className="text-xs text-gray-400 truncate">{artist}</p>
-        )}
+        {artist && <p className="text-xs text-gray-400 truncate">{artist}</p>}
 
         {/* Shared by */}
         <div className="flex items-center gap-1.5 mt-1.5">
@@ -124,7 +122,15 @@ export function FarcasterTrackCard({
         className="flex-shrink-0 p-1.5 text-gray-600 hover:text-[#f5a623] transition-colors"
         aria-label="View cast on Farcaster"
       >
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
           <polyline points="15 3 21 3 21 9" />
           <line x1="10" y1="14" x2="21" y2="3" />

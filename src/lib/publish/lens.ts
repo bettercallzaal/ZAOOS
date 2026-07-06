@@ -4,8 +4,8 @@
  * then posts via the V3 GraphQL API.
  */
 
-import type { NormalizedContent } from '@/lib/publish/normalize';
 import { logger } from '@/lib/logger';
+import type { NormalizedContent } from '@/lib/publish/normalize';
 
 const LENS_API = 'https://api.lens.xyz/graphql';
 
@@ -73,13 +73,16 @@ export async function publishToLens(
   return postResult.result!;
 }
 
-async function lensPost(token: string, contentURI: string): Promise<{ result?: LensPublishResult; error?: string }> {
+async function lensPost(
+  token: string,
+  contentURI: string,
+): Promise<{ result?: LensPublishResult; error?: string }> {
   try {
     const res = await fetch(LENS_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `mutation { post(request: { contentUri: "${contentURI}" }) { ... on PostResponse { hash } ... on SponsoredTransactionRequest { reason } ... on SelfFundedTransactionRequest { reason } ... on TransactionWillFail { reason } } }`,
@@ -113,7 +116,9 @@ async function lensPost(token: string, contentURI: string): Promise<{ result?: L
   }
 }
 
-async function refreshLensToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> {
+async function refreshLensToken(
+  refreshToken: string,
+): Promise<{ accessToken: string; refreshToken: string } | null> {
   try {
     const res = await fetch(LENS_API, {
       method: 'POST',

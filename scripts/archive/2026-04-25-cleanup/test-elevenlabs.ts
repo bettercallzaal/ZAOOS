@@ -27,7 +27,9 @@ async function testConnection() {
   }
   const user = await res.json();
   console.log(`Connected! Account: ${user.subscription?.tier || 'unknown'}`);
-  console.log(`Characters used: ${user.subscription?.character_count || 0} / ${user.subscription?.character_limit || 0}`);
+  console.log(
+    `Characters used: ${user.subscription?.character_count || 0} / ${user.subscription?.character_limit || 0}`,
+  );
   return true;
 }
 
@@ -52,7 +54,9 @@ async function listVoices() {
   }
 
   // Group by category
-  const premade = data.voices.filter((v: any) => v.category === 'premade' || v.category === 'professional');
+  const premade = data.voices.filter(
+    (v: any) => v.category === 'premade' || v.category === 'professional',
+  );
   const cloned = data.voices.filter((v: any) => v.category === 'cloned');
 
   console.log('--- Your Cloned Voices ---');
@@ -92,7 +96,7 @@ async function searchFemaleVoices() {
   const data = await res.json();
   console.log(`\nTop ${data.voices?.length || 0} trending female entertainment voices:\n`);
 
-  for (const v of (data.voices || [])) {
+  for (const v of data.voices || []) {
     const accent = v.accent || '';
     const desc = v.description || '';
     const age = v.age || '';
@@ -153,7 +157,8 @@ async function testMusicPlan() {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt: 'An upbeat summer hip-hop anthem about coming to Maine for a music festival called ZAO Stock, 118 BPM, male rap vocals with catchy chorus hook',
+      prompt:
+        'An upbeat summer hip-hop anthem about coming to Maine for a music festival called ZAO Stock, 118 BPM, male rap vocals with catchy chorus hook',
     }),
   });
 

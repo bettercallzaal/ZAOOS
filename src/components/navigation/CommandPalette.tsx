@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface CommandPaletteProps {
@@ -40,10 +40,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [value, setValue] = useState('');
 
-  useFocusTrap(
-    { current: document.querySelector('[role="dialog"]') },
-    isOpen,
-  );
+  useFocusTrap({ current: document.querySelector('[role="dialog"]') }, isOpen);
 
   useEffect(() => {
     if (!isOpen) {
@@ -79,19 +76,13 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         switch (selected.action) {
           case 'new-post':
             // Dispatch event or use context to open compose
-            window.dispatchEvent(
-              new CustomEvent('command-palette:new-post'),
-            );
+            window.dispatchEvent(new CustomEvent('command-palette:new-post'));
             break;
           case 'search-members':
-            window.dispatchEvent(
-              new CustomEvent('command-palette:search-members'),
-            );
+            window.dispatchEvent(new CustomEvent('command-palette:search-members'));
             break;
           case 'toggle-music':
-            window.dispatchEvent(
-              new CustomEvent('command-palette:toggle-music'),
-            );
+            window.dispatchEvent(new CustomEvent('command-palette:toggle-music'));
             break;
         }
       }
@@ -146,11 +137,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             </Command.Empty>
 
             {Object.entries(COMMAND_GROUPS).map(([groupKey, group]) => (
-              <Command.Group
-                key={groupKey}
-                heading={group.label}
-                className="overflow-hidden"
-              >
+              <Command.Group key={groupKey} heading={group.label} className="overflow-hidden">
                 {group.commands.map((cmd) => (
                   <Command.Item
                     key={cmd.key}
@@ -166,7 +153,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           </Command.List>
 
           <div className="border-t border-white/[0.08] px-3 py-2 text-xs text-white/40">
-            <p>Press <kbd className="rounded bg-white/10 px-1 py-0.5">Esc</kbd> to close</p>
+            <p>
+              Press <kbd className="rounded bg-white/10 px-1 py-0.5">Esc</kbd> to close
+            </p>
           </div>
         </Command>
       </div>

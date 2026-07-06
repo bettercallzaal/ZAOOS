@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useState } from 'react';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
-import { MusicIcon } from './MusicPageUtils';
+import type { usePlayer } from '@/providers/audio';
 import type { TrackType } from '@/types/music';
+import { MusicIcon } from './MusicPageUtils';
 
 export type Submission = {
   id: string;
@@ -36,98 +36,100 @@ export function SubmissionsSection({
   const [votingId, setVotingId] = useState<string | null>(null);
   const [artworkCache, setArtworkCache] = useState<Record<string, string>>({});
 
-  const handlePlay = useCallback(async (sub: Submission) => {
-    // If already playing this track, toggle pause/resume
-    if (player.metadata?.url === sub.url) {
-      if (player.isPlaying) {
-        player.pause();
-      } else {
-        player.resume();
-      }
-      return;
-    }
-
-    setLoadingTrackId(sub.id);
-    try {
-      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(sub.url)}`);
-      if (!res.ok) throw new Error('Metadata fetch failed');
-      const metadata = await res.json();
-
-      // Cache artwork for this submission
-      if (metadata.artworkUrl) {
-        setArtworkCache((prev) => ({ ...prev, [sub.id]: metadata.artworkUrl }));
+  const handlePlay = useCallback(
+    async (sub: Submission) => {
+      // If already playing this track, toggle pause/resume
+      if (player.metadata?.url === sub.url) {
+        if (player.isPlaying) {
+          player.pause();
+        } else {
+          player.resume();
+        }
+        return;
       }
 
-      player.play(metadata);
-    } catch {
-      // Fallback: play with basic metadata
-      player.play({
-        id: sub.id,
-        type: sub.track_type as TrackType,
-        trackName: sub.title || 'Untitled Track',
-        artistName: sub.artist || '',
-        artworkUrl: '',
-        url: sub.url,
-        feedId: `submission-${sub.id}`,
-      });
-    } finally {
-      setLoadingTrackId(null);
-    }
-  }, [player]);
+      setLoadingTrackId(sub.id);
+      try {
+        const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(sub.url)}`);
+        if (!res.ok) throw new Error('Metadata fetch failed');
+        const metadata = await res.json();
 
-  const handleVote = useCallback(async (sub: Submission) => {
-    if (votingId) return;
-    setVotingId(sub.id);
+        // Cache artwork for this submission
+        if (metadata.artworkUrl) {
+          setArtworkCache((prev) => ({ ...prev, [sub.id]: metadata.artworkUrl }));
+        }
 
-    // Capture previous state for rollback
-    const prevVoted = sub.user_voted;
-    const prevCount = sub.vote_count;
+        player.play(metadata);
+      } catch {
+        // Fallback: play with basic metadata
+        player.play({
+          id: sub.id,
+          type: sub.track_type as TrackType,
+          trackName: sub.title || 'Untitled Track',
+          artistName: sub.artist || '',
+          artworkUrl: '',
+          url: sub.url,
+          feedId: `submission-${sub.id}`,
+        });
+      } finally {
+        setLoadingTrackId(null);
+      }
+    },
+    [player],
+  );
 
-    // Optimistic update
-    setSubmissions((prev) =>
-      prev.map((s) =>
-        s.id === sub.id
-          ? {
-              ...s,
-              user_voted: !s.user_voted,
-              vote_count: s.user_voted ? s.vote_count - 1 : s.vote_count + 1,
-            }
-          : s,
-      ),
-    );
+  const handleVote = useCallback(
+    async (sub: Submission) => {
+      if (votingId) return;
+      setVotingId(sub.id);
 
-    try {
-      const res = await fetch('/api/music/submissions/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ submissionId: sub.id }),
-      });
+      // Capture previous state for rollback
+      const prevVoted = sub.user_voted;
+      const prevCount = sub.vote_count;
 
-      if (!res.ok) throw new Error('Vote failed');
-
-      const { voted, voteCount } = await res.json();
-
-      // Reconcile with server truth
+      // Optimistic update
       setSubmissions((prev) =>
         prev.map((s) =>
           s.id === sub.id
-            ? { ...s, user_voted: voted, vote_count: voteCount }
+            ? {
+                ...s,
+                user_voted: !s.user_voted,
+                vote_count: s.user_voted ? s.vote_count - 1 : s.vote_count + 1,
+              }
             : s,
         ),
       );
-    } catch {
-      // Revert optimistic update on error
-      setSubmissions((prev) =>
-        prev.map((s) =>
-          s.id === sub.id
-            ? { ...s, user_voted: prevVoted, vote_count: prevCount }
-            : s,
-        ),
-      );
-    } finally {
-      setVotingId(null);
-    }
-  }, [votingId, setSubmissions]);
+
+      try {
+        const res = await fetch('/api/music/submissions/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionId: sub.id }),
+        });
+
+        if (!res.ok) throw new Error('Vote failed');
+
+        const { voted, voteCount } = await res.json();
+
+        // Reconcile with server truth
+        setSubmissions((prev) =>
+          prev.map((s) =>
+            s.id === sub.id ? { ...s, user_voted: voted, vote_count: voteCount } : s,
+          ),
+        );
+      } catch {
+        // Revert optimistic update on error
+        setSubmissions((prev) =>
+          prev.map((s) =>
+            s.id === sub.id ? { ...s, user_voted: prevVoted, vote_count: prevCount } : s,
+          ),
+        );
+      } finally {
+        setVotingId(null);
+      }
+    },
+    [votingId, setSubmissions],
+  );
 
   return (
     <div>
@@ -144,7 +146,10 @@ export function SubmissionsSection({
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse">
+            <div
+              key={i}
+              className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse"
+            >
               <div className="w-10 h-10 rounded-full bg-gray-800" />
               <div className="w-10 h-10 rounded-lg bg-gray-800" />
               <div className="flex-1 space-y-2">
@@ -221,9 +226,11 @@ export function SubmissionsSection({
 
                 {/* Track info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold truncate ${
-                    isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
-                  }`}>
+                  <p
+                    className={`text-sm font-semibold truncate ${
+                      isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+                    }`}
+                  >
                     {sub.title || 'Untitled Track'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -250,9 +257,7 @@ export function SubmissionsSection({
                   aria-label={sub.user_voted ? 'Remove vote' : 'Upvote'}
                 >
                   <span className="text-sm">{'\uD83D\uDD25'}</span>
-                  {sub.vote_count > 0 && (
-                    <span>{sub.vote_count}</span>
-                  )}
+                  {sub.vote_count > 0 && <span>{sub.vote_count}</span>}
                 </button>
 
                 {/* Time ago */}

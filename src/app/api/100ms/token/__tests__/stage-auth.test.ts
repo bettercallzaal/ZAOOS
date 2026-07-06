@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makePostRequest, mockAuthenticatedSession } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockGetMSRoomById } = vi.hoisted(() => ({
@@ -12,7 +12,8 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/social/msRoomsDb', () => ({
   getMSRoomById: mockGetMSRoomById,
-  isStageRoom: (room: { settings?: Record<string, unknown> }) => room.settings?.room_type === 'stage',
+  isStageRoom: (room: { settings?: Record<string, unknown> }) =>
+    room.settings?.room_type === 'stage',
   getRoomSpeakerFids: (room: { speakers?: unknown[] }) =>
     Array.isArray(room.speakers) ? room.speakers.filter((s) => typeof s === 'number') : [],
 }));

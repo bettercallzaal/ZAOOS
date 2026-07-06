@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import type { TrackMetadata } from '@/types/music';
+import { useEffect, useRef, useState } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
+import type { TrackMetadata } from '@/types/music';
 
 interface QueueActionsProps {
   metadata: TrackMetadata;
@@ -51,7 +51,7 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setOpen(prev => !prev);
+    setOpen((prev) => !prev);
   };
 
   return (
@@ -67,8 +67,18 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
         aria-label="Queue actions"
         title="Add to queue"
       >
-        <svg className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+        <svg
+          className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"
+          />
         </svg>
       </button>
 
@@ -82,8 +92,18 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
             onClick={handlePlayNext}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
           >
-            <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
+            <svg
+              className="w-4 h-4 text-[#f5a623] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"
+              />
             </svg>
             <span className="text-xs text-white">Play Next</span>
           </button>
@@ -91,7 +111,13 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
             onClick={handleAddToQueue}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left border-t border-white/[0.08]"
           >
-            <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-4 h-4 text-gray-400 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             <span className="text-xs text-white">Add to Queue</span>

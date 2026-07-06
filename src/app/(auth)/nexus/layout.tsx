@@ -14,7 +14,8 @@ const miniAppEmbed = JSON.stringify({
 
 export const metadata: Metadata = {
   title: 'ZAO Nexus | ZAO OS',
-  description: 'Community resources — ZAO Nexus links to the member directory, calendar, and Respect leaderboard.',
+  description:
+    'Community resources — ZAO Nexus links to the member directory, calendar, and Respect leaderboard.',
   other: { 'fc:miniapp': miniAppEmbed },
 };
 

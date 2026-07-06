@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Stats {
   totalMembers: number;
@@ -31,7 +31,9 @@ export function CommunityStats() {
           activeThisWeek = data.total ?? data.members?.length ?? 0;
         }
         // Fetch total count separately (no active_since filter)
-        const totalRes = await fetch('/api/members/directory?limit=10', { signal: controller.signal });
+        const totalRes = await fetch('/api/members/directory?limit=10', {
+          signal: controller.signal,
+        });
         if (totalRes.ok) {
           const totalData = await totalRes.json();
           totalMembers = totalData.total ?? totalData.members?.length ?? 0;
@@ -67,7 +69,10 @@ export function CommunityStats() {
     return (
       <div className="grid grid-cols-2 gap-2 px-4 py-3">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-xl bg-white/[0.03] border border-white/[0.05] p-3 animate-pulse">
+          <div
+            key={i}
+            className="rounded-xl bg-white/[0.03] border border-white/[0.05] p-3 animate-pulse"
+          >
             <div className="h-5 bg-gray-800 rounded w-12 mb-1" />
             <div className="h-3 bg-gray-800 rounded w-20" />
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { type ReactNode, useCallback, useRef, useState } from 'react';
 
 const THRESHOLD = 80; // px to pull before triggering refresh
 const MAX_PULL = 120; // max pull distance
@@ -27,22 +27,25 @@ export function PullToRefresh({ children, onRefresh }: PullToRefreshProps) {
     isPulling.current = true;
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current || isRefreshing) return;
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isPulling.current || isRefreshing) return;
 
-    const currentY = e.touches[0].clientY;
-    const diff = currentY - touchStartY.current;
+      const currentY = e.touches[0].clientY;
+      const diff = currentY - touchStartY.current;
 
-    // Only pull down, not up
-    if (diff < 0) {
-      setPullDistance(0);
-      return;
-    }
+      // Only pull down, not up
+      if (diff < 0) {
+        setPullDistance(0);
+        return;
+      }
 
-    // Apply resistance (diminishing returns as you pull further)
-    const distance = Math.min(diff * 0.5, MAX_PULL);
-    setPullDistance(distance);
-  }, [isRefreshing]);
+      // Apply resistance (diminishing returns as you pull further)
+      const distance = Math.min(diff * 0.5, MAX_PULL);
+      setPullDistance(distance);
+    },
+    [isRefreshing],
+  );
 
   const handleTouchEnd = useCallback(async () => {
     if (!isPulling.current) return;

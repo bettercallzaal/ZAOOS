@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -9,7 +9,15 @@ const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-export type ActivityType = 'cast' | 'song' | 'vote' | 'member' | 'proposal' | 'respect' | 'fractal' | 'battle';
+export type ActivityType =
+  | 'cast'
+  | 'song'
+  | 'vote'
+  | 'member'
+  | 'proposal'
+  | 'respect'
+  | 'fractal'
+  | 'battle';
 
 export type ActivityItem = {
   id: string;
@@ -36,7 +44,10 @@ export async function GET(req: NextRequest) {
     limit: req.nextUrl.searchParams.get('limit') ?? undefined,
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid params', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid params', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { filter, limit } = parsed.data;
@@ -51,7 +62,9 @@ export async function GET(req: NextRequest) {
       fetches.push(
         supabaseAdmin
           .from('song_submissions')
-          .select('id, title, artist, submitted_by_fid, created_at, users!song_submissions_submitted_by_fid_fkey(display_name, pfp_url)')
+          .select(
+            'id, title, artist, submitted_by_fid, created_at, users!song_submissions_submitted_by_fid_fkey(display_name, pfp_url)',
+          )
           .order('created_at', { ascending: false })
           .limit(perSource)
           .then(({ data: songs }) => {
@@ -70,7 +83,7 @@ export async function GET(req: NextRequest) {
                 link: '/chat',
               });
             }
-          })
+          }),
       );
     }
 
@@ -79,7 +92,9 @@ export async function GET(req: NextRequest) {
       fetches.push(
         supabaseAdmin
           .from('proposals')
-          .select('id, title, status, created_at, author:users!proposals_author_id_fkey(fid, display_name, pfp_url)')
+          .select(
+            'id, title, status, created_at, author:users!proposals_author_id_fkey(fid, display_name, pfp_url)',
+          )
           .order('created_at', { ascending: false })
           .limit(perSource)
           .then(({ data: proposals }) => {
@@ -98,7 +113,7 @@ export async function GET(req: NextRequest) {
                 link: '/governance',
               });
             }
-          })
+          }),
       );
     }
 
@@ -129,7 +144,7 @@ export async function GET(req: NextRequest) {
                 });
               }
             }
-          })
+          }),
       );
     }
 
@@ -138,7 +153,9 @@ export async function GET(req: NextRequest) {
       fetches.push(
         supabaseAdmin
           .from('proposal_votes')
-          .select('id, vote, created_at, proposal_id, voter_fid, proposals(title), users!proposal_votes_voter_fid_fkey(display_name, pfp_url)')
+          .select(
+            'id, vote, created_at, proposal_id, voter_fid, proposals(title), users!proposal_votes_voter_fid_fkey(display_name, pfp_url)',
+          )
           .order('created_at', { ascending: false })
           .limit(perSource)
           .then(({ data: votes }) => {
@@ -158,7 +175,7 @@ export async function GET(req: NextRequest) {
                 link: '/governance',
               });
             }
-          })
+          }),
       );
     }
 
@@ -167,12 +184,15 @@ export async function GET(req: NextRequest) {
       fetches.push(
         supabaseAdmin
           .from('channel_casts')
-          .select('hash, text, author_fid, author_username, author_display_name, author_pfp_url, timestamp')
+          .select(
+            'hash, text, author_fid, author_username, author_display_name, author_pfp_url, timestamp',
+          )
           .order('timestamp', { ascending: false })
           .limit(perSource)
           .then(({ data: casts }) => {
             for (const c of casts || []) {
-              const preview = (c.text || '').slice(0, 80) + ((c.text || '').length > 80 ? '...' : '');
+              const preview =
+                (c.text || '').slice(0, 80) + ((c.text || '').length > 80 ? '...' : '');
               activities.push({
                 id: `cast-${c.hash}`,
                 type: 'cast',
@@ -186,7 +206,7 @@ export async function GET(req: NextRequest) {
                 link: '/chat',
               });
             }
-          })
+          }),
       );
     }
 
@@ -213,7 +233,7 @@ export async function GET(req: NextRequest) {
                 link: '/governance/fractals',
               });
             }
-          })
+          }),
       );
     }
 
@@ -222,7 +242,9 @@ export async function GET(req: NextRequest) {
       fetches.push(
         supabaseAdmin
           .from('wavewarz_battle_log')
-          .select('id, battle_id, artist_a, artist_b, winner, winner_margin, volume_sol, settled_at')
+          .select(
+            'id, battle_id, artist_a, artist_b, winner, winner_margin, volume_sol, settled_at',
+          )
           .not('settled_at', 'is', null)
           .order('settled_at', { ascending: false })
           .limit(perSource)
@@ -245,7 +267,7 @@ export async function GET(req: NextRequest) {
                 link: '/social/wavewarz',
               });
             }
-          })
+          }),
       );
     }
 

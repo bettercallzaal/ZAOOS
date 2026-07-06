@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { normalizeForTelegram } from '@/lib/publish/normalize';
 import { publishToTelegram } from '@/lib/publish/telegram';
-import { logger } from '@/lib/logger';
 
 const publishTelegramSchema = z.object({
   text: z.string().min(1).max(4096),
@@ -33,10 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Check Telegram is configured
     if (!process.env.TELEGRAM_BOT_TOKEN) {
-      return NextResponse.json(
-        { error: 'Telegram not configured' },
-        { status: 503 },
-      );
+      return NextResponse.json({ error: 'Telegram not configured' }, { status: 503 });
     }
 
     // Parse body
@@ -77,23 +74,18 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 502 },
-      );
+      return NextResponse.json({ success: false, error: result.error }, { status: 502 });
     }
 
     // Log to publish_log table
-    await supabaseAdmin
-      .from('publish_log')
-      .insert({
-        platform: 'telegram',
-        cast_hash: castHash || null,
-        platform_post_id: result.messageId ? String(result.messageId) : null,
-        published_by_fid: session.fid,
-        text: normalizedText,
-        status: 'published',
-      });
+    await supabaseAdmin.from('publish_log').insert({
+      platform: 'telegram',
+      cast_hash: castHash || null,
+      platform_post_id: result.messageId ? String(result.messageId) : null,
+      published_by_fid: session.fid,
+      text: normalizedText,
+      status: 'published',
+    });
 
     return NextResponse.json({
       success: true,
@@ -102,12 +94,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     logger.error('[publish/telegram] Error:', err);
 
-    const message =
-      err instanceof Error ? err.message : 'Failed to publish to Telegram';
+    const message = err instanceof Error ? err.message : 'Failed to publish to Telegram';
 
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import Papa from 'papaparse';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import Papa from 'papaparse';
-import { csvRowSchema } from '@/lib/validation/schemas';
 import { logger } from '@/lib/logger';
+import { csvRowSchema } from '@/lib/validation/schemas';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();

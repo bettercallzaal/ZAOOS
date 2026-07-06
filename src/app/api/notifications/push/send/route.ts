@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
-import { sendPushNotification } from '@/lib/push/vapid';
 import { logger } from '@/lib/logger';
+import { sendPushNotification } from '@/lib/push/vapid';
 
 const sendSchema = z.object({
   fid: z.number().int().positive(),
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,24 +60,19 @@ export async function POST(request: NextRequest) {
             endpoint: sub.endpoint,
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
-          { title, body: notifBody, url, tag }
+          { title, body: notifBody, url, tag },
         );
 
         // Remove expired subscriptions
         if (!success) {
-          await supabase
-            .from('user_push_subscriptions')
-            .delete()
-            .eq('endpoint', sub.endpoint);
+          await supabase.from('user_push_subscriptions').delete().eq('endpoint', sub.endpoint);
         }
 
         return success;
-      })
+      }),
     );
 
-    const sent = results.filter(
-      (r) => r.status === 'fulfilled' && r.value === true
-    ).length;
+    const sent = results.filter((r) => r.status === 'fulfilled' && r.value === true).length;
 
     return NextResponse.json({ success: true, sent, total: subscriptions.length });
   } catch (error) {

@@ -1,45 +1,54 @@
 'use client';
 
-import { useCallback } from 'react';
 import type { Dm, Group } from '@xmtp/browser-sdk';
-import type { XMTPConversation } from '@/types/xmtp';
-import type { XMTPSharedRefs, XMTPSharedState, AnyClient } from '@/contexts/xmtp/types';
+import { useCallback } from 'react';
+import type { AnyClient, XMTPSharedRefs, XMTPSharedState } from '@/contexts/xmtp/types';
 import { isTextMessage } from '@/contexts/xmtp/types';
+import type { XMTPConversation } from '@/types/xmtp';
 
 /**
  * Hook for conversation list management: load, seed, select, refresh, remove.
  */
 export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
   const {
-    walletsRef, activeConvIdRef, activeConvWalletRef, isLoadingConvRef,
-    messageIdSetRef, lastMessagesRef, unreadCountsRef, convSelectGenRef,
+    walletsRef,
+    activeConvIdRef,
+    activeConvWalletRef,
+    isLoadingConvRef,
+    messageIdSetRef,
+    lastMessagesRef,
+    unreadCountsRef,
+    convSelectGenRef,
   } = refs;
-  const {
-    setConversations, setActiveConversationId, setMessages, setLoadingMessages,
-    setError,
-  } = state;
+  const { setConversations, setActiveConversationId, setMessages, setLoadingMessages, setError } =
+    state;
 
   /**
    * Find which wallet client owns a conversation
    */
-  const findClientForConversation = useCallback(async (convId: string): Promise<{ client: AnyClient; address: string } | null> => {
-    for (const [address, wc] of walletsRef.current.entries()) {
-      try {
-        const conv = await wc.client.conversations.getConversationById(convId);
-        if (conv) return { client: wc.client, address };
-      } catch {
-        // Client may not have this conversation
+  const findClientForConversation = useCallback(
+    async (convId: string): Promise<{ client: AnyClient; address: string } | null> => {
+      for (const [address, wc] of walletsRef.current.entries()) {
+        try {
+          const conv = await wc.client.conversations.getConversationById(convId);
+          if (conv) return { client: wc.client, address };
+        } catch {
+          // Client may not have this conversation
+        }
       }
-    }
-    return null;
-  }, [walletsRef]);
+      return null;
+    },
+    [walletsRef],
+  );
 
   /**
    * Load conversations from all connected clients.
    * Does NOT call lastMessage() — uses in-memory cache instead.
    */
   const loadAllConversations = useCallback(async () => {
-    const { getPeerProfiles, getMemberProfiles, savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
+    const { getPeerProfiles, getMemberProfiles, savePeerProfile, saveMemberProfile } = await import(
+      '@/lib/xmtp/client'
+    );
     const peerProfiles = getPeerProfiles();
     const memberProfiles = getMemberProfiles();
     const allMapped: XMTPConversation[] = [];
@@ -61,7 +70,9 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
             if (isDm) {
               try {
                 peerInboxId = await (conv as Dm).peerInboxId();
-              } catch { /* non-critical */ }
+              } catch {
+                /* non-critical */
+              }
             }
 
             if (isDm && !peer && peerInboxId) {
@@ -76,9 +87,11 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
                   const peerMembers = await dm.members();
                   const peerMember = peerMembers.find((m) => m.inboxId === peerInboxId);
                   if (peerMember) {
-                    const peerAddresses = (peerMember.accountIdentifiers ?? []).map((id: { identifier: string }) => id.identifier.toLowerCase());
+                    const peerAddresses = (peerMember.accountIdentifiers ?? []).map(
+                      (id: { identifier: string }) => id.identifier.toLowerCase(),
+                    );
                     const matched = refs.zaoMembersRef.current.find((zm) =>
-                      zm.addresses.some((a) => peerAddresses.includes(a.toLowerCase()))
+                      zm.addresses.some((a) => peerAddresses.includes(a.toLowerCase())),
                     );
                     if (matched) {
                       const resolvedProfile = {
@@ -92,7 +105,9 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
                       saveMemberProfile(peerInboxId, resolvedProfile);
                     }
                   }
-                } catch { /* non-critical */ }
+                } catch {
+                  /* non-critical */
+                }
               }
             }
 
@@ -100,19 +115,26 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
 
             return {
               id: conv.id,
-              type: isDm ? 'dm' as const : 'group' as const,
-              name: (!isDm && group.name) ? group.name : (isDm && peer ? peer.displayName || `@${peer.username}` : isDm ? 'Direct Message' : 'Group'),
-              imageUrl: (!isDm && group.imageUrl) ? group.imageUrl : undefined,
-              description: (!isDm && group.description) ? group.description : undefined,
+              type: isDm ? ('dm' as const) : ('group' as const),
+              name:
+                !isDm && group.name
+                  ? group.name
+                  : isDm && peer
+                    ? peer.displayName || `@${peer.username}`
+                    : isDm
+                      ? 'Direct Message'
+                      : 'Group',
+              imageUrl: !isDm && group.imageUrl ? group.imageUrl : undefined,
+              description: !isDm && group.description ? group.description : undefined,
               peerInboxId,
-              peerDisplayName: peer ? (peer.displayName || `@${peer.username}`) : undefined,
+              peerDisplayName: peer ? peer.displayName || `@${peer.username}` : undefined,
               peerPfpUrl: peer?.pfpUrl || undefined,
               lastMessage: cached?.content,
               lastMessageAt: cached?.sentAt,
               unreadCount: unreadCountsRef.current.get(conv.id) || 0,
               walletAddress: address,
             } as XMTPConversation;
-          })
+          }),
         );
         allMapped.push(...mapped);
       } catch (err) {
@@ -139,17 +161,21 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
         const BATCH = 20;
         for (let i = 0; i < convos.length; i += BATCH) {
           const batch = convos.slice(i, i + BATCH);
-          await Promise.allSettled(batch.map(async (conv: Dm | Group) => {
-            const msg = await conv.lastMessage();
-            if (msg && isTextMessage(msg)) {
-              lastMessagesRef.current.set(conv.id, {
-                content: msg.content as string,
-                sentAt: msg.sentAt,
-              });
-            }
-          }));
+          await Promise.allSettled(
+            batch.map(async (conv: Dm | Group) => {
+              const msg = await conv.lastMessage();
+              if (msg && isTextMessage(msg)) {
+                lastMessagesRef.current.set(conv.id, {
+                  content: msg.content as string,
+                  sentAt: msg.sentAt,
+                });
+              }
+            }),
+          );
         }
-      } catch { /* non-critical */ }
+      } catch {
+        /* non-critical */
+      }
     }
   }, [walletsRef, lastMessagesRef]);
 
@@ -157,68 +183,69 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
    * Select a conversation and load its messages.
    * Uses isLoadingConvRef to prevent race conditions with the global stream.
    */
-  const selectConversation = useCallback(async (id: string | null) => {
-    // Increment generation to cancel any in-flight selectConversation calls
-    const gen = ++convSelectGenRef.current;
+  const selectConversation = useCallback(
+    async (id: string | null) => {
+      // Increment generation to cancel any in-flight selectConversation calls
+      const gen = ++convSelectGenRef.current;
 
-    setActiveConversationId(id);
-    activeConvIdRef.current = id;
+      setActiveConversationId(id);
+      activeConvIdRef.current = id;
 
-    if (!id) {
-      setMessages([]);
-      messageIdSetRef.current.clear();
-      activeConvWalletRef.current = null;
-      isLoadingConvRef.current = false;
-      return;
-    }
-
-    // Mark as loading — prevents stream from writing messages during load
-    isLoadingConvRef.current = true;
-    setLoadingMessages(true);
-
-    try {
-      const result = await findClientForConversation(id);
-      if (gen !== convSelectGenRef.current) return; // stale — user switched conversations
-      if (!result) {
-        console.warn('[XMTP] Conversation not found:', id);
+      if (!id) {
         setMessages([]);
-        setError('This conversation is no longer available');
+        messageIdSetRef.current.clear();
+        activeConvWalletRef.current = null;
+        isLoadingConvRef.current = false;
         return;
       }
 
-      const { client } = result;
-      activeConvWalletRef.current = result.address;
+      // Mark as loading — prevents stream from writing messages during load
+      isLoadingConvRef.current = true;
+      setLoadingMessages(true);
 
-      const conv = await client.conversations.getConversationById(id);
-      if (gen !== convSelectGenRef.current) return; // stale
-      if (!conv) {
-        console.warn('[XMTP] Could not load conversation:', id);
-        setMessages([]);
-        setError('This conversation is no longer available');
-        return;
-      }
+      try {
+        const result = await findClientForConversation(id);
+        if (gen !== convSelectGenRef.current) return; // stale — user switched conversations
+        if (!result) {
+          console.warn('[XMTP] Conversation not found:', id);
+          setMessages([]);
+          setError('This conversation is no longer available');
+          return;
+        }
 
-      // Sync this specific conversation to get latest messages
-      await conv.sync();
-      if (gen !== convSelectGenRef.current) return; // stale
-      const rawMessages = await conv.messages({ limit: BigInt(50) });
-      if (gen !== convSelectGenRef.current) return; // stale
-      const myInboxId = client.inboxId;
+        const { client } = result;
+        activeConvWalletRef.current = result.address;
 
-      const { getPeerProfiles, getMemberProfiles } = await import('@/lib/xmtp/client');
-      const peerProfiles = getPeerProfiles();
-      const memberProfiles = getMemberProfiles();
-      const peer = peerProfiles[id];
+        const conv = await client.conversations.getConversationById(id);
+        if (gen !== convSelectGenRef.current) return; // stale
+        if (!conv) {
+          console.warn('[XMTP] Could not load conversation:', id);
+          setMessages([]);
+          setError('This conversation is no longer available');
+          return;
+        }
 
-      const decoded = rawMessages
-        .filter(isTextMessage)
-        .map((msg) => {
+        // Sync this specific conversation to get latest messages
+        await conv.sync();
+        if (gen !== convSelectGenRef.current) return; // stale
+        const rawMessages = await conv.messages({ limit: BigInt(50) });
+        if (gen !== convSelectGenRef.current) return; // stale
+        const myInboxId = client.inboxId;
+
+        const { getPeerProfiles, getMemberProfiles } = await import('@/lib/xmtp/client');
+        const peerProfiles = getPeerProfiles();
+        const memberProfiles = getMemberProfiles();
+        const peer = peerProfiles[id];
+
+        const decoded = rawMessages.filter(isTextMessage).map((msg) => {
           const isFromMe = msg.senderInboxId === myInboxId;
           const memberProfile = memberProfiles[msg.senderInboxId];
           const senderName = isFromMe
             ? undefined
-            : memberProfile?.displayName || (memberProfile?.username ? `@${memberProfile.username}` : undefined)
-              || peer?.displayName || (peer?.username ? `@${peer.username}` : undefined);
+            : memberProfile?.displayName ||
+              (memberProfile?.username ? `@${memberProfile.username}` : undefined) ||
+              peer?.displayName ||
+              (peer?.username ? `@${peer.username}` : undefined);
 
           return {
             id: msg.id,
@@ -232,40 +259,49 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
           };
         });
 
-      if (gen !== convSelectGenRef.current) return; // stale — don't apply results
+        if (gen !== convSelectGenRef.current) return; // stale — don't apply results
 
-      // Rebuild message ID set for dedup
-      messageIdSetRef.current = new Set(decoded.map((m) => m.id));
-      setMessages(decoded);
+        // Rebuild message ID set for dedup
+        messageIdSetRef.current = new Set(decoded.map((m) => m.id));
+        setMessages(decoded);
 
-      // Clear unread count AFTER messages are loaded (not before)
-      unreadCountsRef.current.set(id, 0);
-      setConversations((prev) =>
-        prev.map((c) => c.id === id ? { ...c, unreadCount: 0 } : c)
-      );
+        // Clear unread count AFTER messages are loaded (not before)
+        unreadCountsRef.current.set(id, 0);
+        setConversations((prev) => prev.map((c) => (c.id === id ? { ...c, unreadCount: 0 } : c)));
 
-      // Update last message cache from what we loaded
-      if (decoded.length > 0) {
-        const last = decoded[decoded.length - 1];
-        lastMessagesRef.current.set(id, { content: last.content, sentAt: last.sentAt });
+        // Update last message cache from what we loaded
+        if (decoded.length > 0) {
+          const last = decoded[decoded.length - 1];
+          lastMessagesRef.current.set(id, { content: last.content, sentAt: last.sentAt });
+        }
+      } catch (err) {
+        if (gen !== convSelectGenRef.current) return; // stale — suppress error for cancelled load
+        console.error('[XMTP] Failed to load messages:', err);
+        setError('Failed to load messages. Try again.');
+      } finally {
+        // Only update loading state if this is still the current generation
+        if (gen === convSelectGenRef.current) {
+          setLoadingMessages(false);
+          isLoadingConvRef.current = false;
+        }
       }
-    } catch (err) {
-      if (gen !== convSelectGenRef.current) return; // stale — suppress error for cancelled load
-      console.error('[XMTP] Failed to load messages:', err);
-      setError('Failed to load messages. Try again.');
-    } finally {
-      // Only update loading state if this is still the current generation
-      if (gen === convSelectGenRef.current) {
-        setLoadingMessages(false);
-        isLoadingConvRef.current = false;
-      }
-    }
-  }, [
-    convSelectGenRef, activeConvIdRef, activeConvWalletRef, isLoadingConvRef,
-    messageIdSetRef, lastMessagesRef, unreadCountsRef,
-    setActiveConversationId, setMessages, setLoadingMessages, setError, setConversations,
-    findClientForConversation,
-  ]);
+    },
+    [
+      convSelectGenRef,
+      activeConvIdRef,
+      activeConvWalletRef,
+      isLoadingConvRef,
+      messageIdSetRef,
+      lastMessagesRef,
+      unreadCountsRef,
+      setActiveConversationId,
+      setMessages,
+      setLoadingMessages,
+      setError,
+      setConversations,
+      findClientForConversation,
+    ],
+  );
 
   /**
    * Refresh conversations by syncing all clients and reloading.
@@ -283,18 +319,30 @@ export function useConversations(refs: XMTPSharedRefs, state: XMTPSharedState) {
    * Remove a conversation from the local list (hide it).
    * Does not delete on the XMTP network — just removes from UI.
    */
-  const removeConversation = useCallback((id: string) => {
-    setConversations((prev) => prev.filter((c) => c.id !== id));
-    if (activeConvIdRef.current === id) {
-      setActiveConversationId(null);
-      activeConvIdRef.current = null;
-      activeConvWalletRef.current = null;
-      setMessages([]);
-      messageIdSetRef.current.clear();
-    }
-    lastMessagesRef.current.delete(id);
-    unreadCountsRef.current.delete(id);
-  }, [activeConvIdRef, activeConvWalletRef, messageIdSetRef, lastMessagesRef, unreadCountsRef, setConversations, setActiveConversationId, setMessages]);
+  const removeConversation = useCallback(
+    (id: string) => {
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      if (activeConvIdRef.current === id) {
+        setActiveConversationId(null);
+        activeConvIdRef.current = null;
+        activeConvWalletRef.current = null;
+        setMessages([]);
+        messageIdSetRef.current.clear();
+      }
+      lastMessagesRef.current.delete(id);
+      unreadCountsRef.current.delete(id);
+    },
+    [
+      activeConvIdRef,
+      activeConvWalletRef,
+      messageIdSetRef,
+      lastMessagesRef,
+      unreadCountsRef,
+      setConversations,
+      setActiveConversationId,
+      setMessages,
+    ],
+  );
 
   return {
     findClientForConversation,

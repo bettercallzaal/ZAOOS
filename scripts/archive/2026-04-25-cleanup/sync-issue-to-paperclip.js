@@ -28,15 +28,15 @@ async function makeRequest(url, method, body) {
       path: urlObj.pathname + urlObj.search,
       method,
       headers: {
-        'Authorization': `Bearer ${PAPERCLIP_API_KEY}`,
+        Authorization: `Bearer ${PAPERCLIP_API_KEY}`,
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     };
 
     const req = https.request(options, (res) => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', (chunk) => (data += chunk));
       res.on('end', () => {
         try {
           resolve({ status: res.statusCode, body: JSON.parse(data) });
@@ -53,7 +53,7 @@ async function makeRequest(url, method, body) {
 }
 
 function mapPriority(labels) {
-  const labelNames = labels.map(l => l.name.toLowerCase());
+  const labelNames = labels.map((l) => l.name.toLowerCase());
   if (labelNames.includes('critical')) return 'critical';
   if (labelNames.includes('high') || labelNames.includes('priority:high')) return 'high';
   if (labelNames.includes('medium') || labelNames.includes('priority:medium')) return 'medium';
@@ -62,7 +62,7 @@ function mapPriority(labels) {
 }
 
 function buildDescription(issue) {
-  return `${issue.body || ''}\n\n---\n**Source:** GitHub Issue #${issue.number}\n**Labels:** ${issue.labels.map(l => l.name).join(', ') || 'none'}\n**Author:** ${issue.user.login}\n**URL:** ${issue.html_url}`;
+  return `${issue.body || ''}\n\n---\n**Source:** GitHub Issue #${issue.number}\n**Labels:** ${issue.labels.map((l) => l.name).join(', ') || 'none'}\n**Author:** ${issue.user.login}\n**URL:** ${issue.html_url}`;
 }
 
 async function findPaperclipIssue(githubNumber) {
@@ -76,12 +76,12 @@ async function findPaperclipIssue(githubNumber) {
     const fallbackUrl = `${PAPERCLIP_API_URL}/api/companies/${PAPERCLIP_COMPANY_ID}/issues?status=todo,in_progress,blocked,backlog`;
     const fallback = await makeRequest(fallbackUrl, 'GET');
     if (fallback.status === 200 && Array.isArray(fallback.body)) {
-      return fallback.body.find(i => i.title.includes(searchTitle));
+      return fallback.body.find((i) => i.title.includes(searchTitle));
     }
     return null;
   }
 
-  return result.body.find(i => i.title.includes(searchTitle));
+  return result.body.find((i) => i.title.includes(searchTitle));
 }
 
 async function addGitHubComment(issueNumber, body) {
@@ -93,18 +93,18 @@ async function addGitHubComment(issueNumber, body) {
     path: urlObj.pathname,
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${GITHUB_TOKEN}`,
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.github+json',
+      Accept: 'application/vnd.github+json',
       'User-Agent': 'ZAO-Orchestrator-GitHubAction/1.0',
-      'X-GitHub-Api-Version': '2022-11-28'
-    }
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
   };
 
   return new Promise((resolve) => {
     const req = https.request(options, (res) => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', (chunk) => (data += chunk));
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           console.log('Added comment to GitHub issue');
@@ -125,7 +125,7 @@ async function syncIssue() {
   const title = `[GitHub #${issueNumber}] ${issue.title}`;
   const description = buildDescription(issue);
   const priority = mapPriority(issue.labels);
-  const labelNames = issue.labels.map(l => l.name);
+  const labelNames = issue.labels.map((l) => l.name);
 
   console.log(`Syncing GitHub Issue #${issueNumber}: ${issue.title}`);
   console.log(`  Action: ${action}`);
@@ -138,11 +138,10 @@ async function syncIssue() {
 
     if (existing) {
       console.log(`  Found ${existing.identifier} (${existing.id}) — closing...`);
-      const result = await makeRequest(
-        `${PAPERCLIP_API_URL}/api/issues/${existing.id}`,
-        'PATCH',
-        { status: 'done', comment: `Closed via GitHub issue #${issueNumber} close event.` }
-      );
+      const result = await makeRequest(`${PAPERCLIP_API_URL}/api/issues/${existing.id}`, 'PATCH', {
+        status: 'done',
+        comment: `Closed via GitHub issue #${issueNumber} close event.`,
+      });
       if (result.status === 200) {
         console.log(`  Closed ${existing.identifier}`);
         await addGitHubComment(issueNumber, `Paperclip issue ${existing.identifier} closed.`);
@@ -150,7 +149,9 @@ async function syncIssue() {
         console.log(`  Failed to close: HTTP ${result.status}`, result.body);
       }
     } else {
-      console.log(`  No matching Paperclip issue found for GitHub #${issueNumber} — nothing to close.`);
+      console.log(
+        `  No matching Paperclip issue found for GitHub #${issueNumber} — nothing to close.`,
+      );
     }
     return;
   }
@@ -160,7 +161,7 @@ async function syncIssue() {
     const result = await makeRequest(
       `${PAPERCLIP_API_URL}/api/companies/${PAPERCLIP_COMPANY_ID}/issues`,
       'POST',
-      { title, description, priority, status: 'todo', labels: labelNames }
+      { title, description, priority, status: 'todo', labels: labelNames },
     );
 
     if (result.status >= 200 && result.status < 300 && result.body && result.body.id) {
@@ -177,18 +178,18 @@ async function syncIssue() {
     const existing = await findPaperclipIssue(issueNumber);
     if (existing) {
       console.log(`  Found ${existing.identifier} — updating priority to ${priority}...`);
-      const result = await makeRequest(
-        `${PAPERCLIP_API_URL}/api/issues/${existing.id}`,
-        'PATCH',
-        { priority }
-      );
+      const result = await makeRequest(`${PAPERCLIP_API_URL}/api/issues/${existing.id}`, 'PATCH', {
+        priority,
+      });
       if (result.status === 200) {
         console.log(`  Updated ${existing.identifier} priority to ${priority}`);
       } else {
         console.log(`  Failed to update: HTTP ${result.status}`, result.body);
       }
     } else {
-      console.log(`  No matching Paperclip issue for GitHub #${issueNumber} — skipping label update.`);
+      console.log(
+        `  No matching Paperclip issue for GitHub #${issueNumber} — skipping label update.`,
+      );
     }
     return;
   }
@@ -196,7 +197,7 @@ async function syncIssue() {
   console.log(`  Unhandled action "${action}" — skipping.`);
 }
 
-syncIssue().catch(err => {
+syncIssue().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

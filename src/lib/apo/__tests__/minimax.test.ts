@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockFetch = vi.hoisted(() => vi.fn());
 
@@ -13,9 +13,12 @@ describe('callMinimax', () => {
   it('returns LLM response text', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: () => Promise.resolve(JSON.stringify({
-        choices: [{ message: { content: 'Hello world' } }],
-      })),
+      text: () =>
+        Promise.resolve(
+          JSON.stringify({
+            choices: [{ message: { content: 'Hello world' } }],
+          }),
+        ),
     });
 
     const { callMinimax } = await import('../minimax');
@@ -26,9 +29,12 @@ describe('callMinimax', () => {
   it('strips think tags from M2.7 responses', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: () => Promise.resolve(JSON.stringify({
-        choices: [{ message: { content: '<think>reasoning here</think>\nActual answer' } }],
-      })),
+      text: () =>
+        Promise.resolve(
+          JSON.stringify({
+            choices: [{ message: { content: '<think>reasoning here</think>\nActual answer' } }],
+          }),
+        ),
     });
 
     const { callMinimax } = await import('../minimax');

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { getPastRooms } from '@/lib/spaces/roomsDb';
 import { logger } from '@/lib/logger';
+import { getPastRooms } from '@/lib/spaces/roomsDb';
 
 const QuerySchema = z.object({
   days: z.coerce.number().min(1).max(90).default(7),

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Cast } from '@/types';
-import { Message } from './Message';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useEffect, useRef, useState } from 'react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import type { Cast } from '@/types';
+import { Message } from './Message';
 
 interface ThreadDrawerProps {
   threadHash: string;
@@ -16,7 +16,15 @@ interface ThreadDrawerProps {
   onClose: () => void;
 }
 
-export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHide, onSend, onClose }: ThreadDrawerProps) {
+export function ThreadDrawer({
+  threadHash,
+  isAdmin,
+  hasSigner,
+  currentFid,
+  onHide,
+  onSend,
+  onClose,
+}: ThreadDrawerProps) {
   const [thread, setThread] = useState<Cast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,11 +44,13 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/chat/thread/${threadHash}`, { signal: abortController.signal });
+        const res = await fetch(`/api/chat/thread/${threadHash}`, {
+          signal: abortController.signal,
+        });
         if (!res.ok) throw new Error('Failed to load thread');
         const data = await res.json();
         if (!cancelled) {
-          const casts: Cast[] = Array.isArray(data) ? data : data.casts ?? [];
+          const casts: Cast[] = Array.isArray(data) ? data : (data.casts ?? []);
           setThread(casts);
         }
       } catch (err) {
@@ -57,7 +67,9 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
     const interval = setInterval(() => {
       if (!document.hidden) fetchThread();
     }, 30_000);
-    const handleVisibility = () => { if (!document.hidden) fetchThread(); };
+    const handleVisibility = () => {
+      if (!document.hidden) fetchThread();
+    };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       cancelled = true;
@@ -99,10 +111,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 md:bg-black/30"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 z-40 md:bg-black/30" onClick={onClose} />
 
       {/* Drawer */}
       <div
@@ -114,14 +123,21 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628]">
-          <h3 id="thread-drawer-title" className="text-sm font-semibold text-gray-300">Thread</h3>
+          <h3 id="thread-drawer-title" className="text-sm font-semibold text-gray-300">
+            Thread
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white p-2"
             aria-label="Close thread"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -135,9 +151,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
             </div>
           )}
 
-          {error && (
-            <div className="px-4 py-3 text-red-400 text-sm">{error}</div>
-          )}
+          {error && <div className="px-4 py-3 text-red-400 text-sm">{error}</div>}
 
           {!loading && !error && (
             <div className="py-2">
@@ -173,9 +187,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
               ))}
 
               {!loading && replies.length === 0 && parent && (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  No replies yet
-                </div>
+                <div className="px-4 py-8 text-center text-gray-500 text-sm">No replies yet</div>
               )}
 
               <div ref={bottomRef} />
@@ -210,8 +222,18 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
               {sending ? (
                 <span className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                  />
                 </svg>
               )}
             </button>

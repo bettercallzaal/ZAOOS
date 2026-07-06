@@ -1,8 +1,12 @@
 'use client';
 
-import { memo } from 'react';
-import { useCallStateHooks, hasAudio, StreamVideoParticipant } from '@stream-io/video-react-sdk';
+import {
+  hasAudio,
+  type StreamVideoParticipant,
+  useCallStateHooks,
+} from '@stream-io/video-react-sdk';
 import Image from 'next/image';
+import { memo } from 'react';
 
 interface SpeakersGridProps {
   hostFid?: number;
@@ -47,9 +51,7 @@ const SpeakerCircle = memo(function SpeakerCircle({
       <div className="relative">
         <div
           className={`w-[60px] h-[60px] rounded-full overflow-hidden border-2 transition-all ${
-            isSpeaking
-              ? 'border-green-400 animate-pulse scale-105'
-              : 'border-gray-600'
+            isSpeaking ? 'border-green-400 animate-pulse scale-105' : 'border-gray-600'
           }`}
         >
           {p.image ? (
@@ -76,11 +78,7 @@ const SpeakerCircle = memo(function SpeakerCircle({
       <span className="text-white text-[11px] mt-1.5 truncate max-w-[72px] text-center">
         {p.name || 'Anonymous'}
       </span>
-      <span
-        className={`text-[9px] ${
-          isSpeaking ? 'text-green-400' : 'text-gray-500'
-        }`}
-      >
+      <span className={`text-[9px] ${isSpeaking ? 'text-green-400' : 'text-gray-500'}`}>
         {isListening ? 'Listening' : isSpeaking ? 'Speaking' : 'Listening'}
       </span>
     </div>

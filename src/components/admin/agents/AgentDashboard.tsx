@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { AgentStatus, AgentEvent } from './constants';
+import { useCallback, useEffect, useState } from 'react';
+import type { AgentEvent, AgentStatus } from './constants';
+import PipelineFlow from './PipelineFlow';
 import SquadCircle from './SquadCircle';
 import WarRoomFeed from './WarRoomFeed';
-import PipelineFlow from './PipelineFlow';
 
 type View = 'squad' | 'pipeline' | 'warroom';
 
@@ -54,10 +54,7 @@ export default function AgentDashboard() {
     return (
       <div className="space-y-4">
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="h-20 rounded-xl bg-white/5 animate-pulse"
-          />
+          <div key={i} className="h-20 rounded-xl bg-white/5 animate-pulse" />
         ))}
       </div>
     );
@@ -73,9 +70,7 @@ export default function AgentDashboard() {
               key={v.id}
               onClick={() => setView(v.id)}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                view === v.id
-                  ? 'bg-[#f5a623] text-[#0a1628]'
-                  : 'text-gray-400 hover:text-white'
+                view === v.id ? 'bg-[#f5a623] text-[#0a1628]' : 'text-gray-400 hover:text-white'
               }`}
             >
               <span className="mr-1">{v.icon}</span>
@@ -84,9 +79,7 @@ export default function AgentDashboard() {
           ))}
         </div>
         {lastUpdated && (
-          <span className="text-xs text-gray-500">
-            Updated {lastUpdated.toLocaleTimeString()}
-          </span>
+          <span className="text-xs text-gray-500">Updated {lastUpdated.toLocaleTimeString()}</span>
         )}
       </div>
 

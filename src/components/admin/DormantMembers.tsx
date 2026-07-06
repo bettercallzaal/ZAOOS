@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface DormantMember {
   id: string;
@@ -48,7 +48,9 @@ export function DormantMembers() {
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [days]);
 
   function daysBadgeClass(d: number): string {
@@ -64,7 +66,8 @@ export function DormantMembers() {
         <div>
           <h2 className="text-lg font-semibold text-white">Dormant Members</h2>
           <p className="text-sm text-gray-400 mt-0.5">
-            Members who haven&apos;t been active — highest respect first (most valuable to re-engage).
+            Members who haven&apos;t been active — highest respect first (most valuable to
+            re-engage).
           </p>
         </div>
         <div className="flex gap-1.5">
@@ -104,9 +107,7 @@ export function DormantMembers() {
       )}
 
       {/* Error */}
-      {!loading && error && (
-        <div className="text-red-400 text-sm text-center py-8">{error}</div>
-      )}
+      {!loading && error && <div className="text-red-400 text-sm text-center py-8">{error}</div>}
 
       {/* Empty state */}
       {!loading && !error && data && data.dormant.length === 0 && (
@@ -118,7 +119,9 @@ export function DormantMembers() {
       {/* Member list */}
       {!loading && !error && data && data.dormant.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-gray-500">{data.total} dormant member{data.total !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-500">
+            {data.total} dormant member{data.total !== 1 ? 's' : ''}
+          </p>
           {data.dormant.map((member) => (
             <div
               key={member.id}

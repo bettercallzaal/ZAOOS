@@ -30,7 +30,11 @@ export function useAutoStreamMarker(isHost: boolean, twitchConnected: boolean) {
     if (now - lastMarkerRef.current < DEBOUNCE_MS) return;
     lastMarkerRef.current = now;
 
-    const description = `Now playing: ${metadata.trackName}${metadata.artistName ? ` by ${metadata.artistName}` : ''}`.slice(0, 140);
+    const description =
+      `Now playing: ${metadata.trackName}${metadata.artistName ? ` by ${metadata.artistName}` : ''}`.slice(
+        0,
+        140,
+      );
 
     fetch('/api/twitch/marker', {
       method: 'POST',

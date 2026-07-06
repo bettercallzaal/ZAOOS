@@ -90,10 +90,7 @@ export function SyncRespectButton() {
       {error && (
         <div className="absolute right-0 top-full mt-2 z-50 bg-red-900/90 border border-red-700 text-red-200 text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg flex items-center gap-2">
           {error}
-          <button
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-200"
-          >
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200">
             ✕
           </button>
         </div>

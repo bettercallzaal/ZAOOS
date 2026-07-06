@@ -1,11 +1,15 @@
-const TIDAL_API = 'https://openapi.tidal.com/v2'
+const TIDAL_API = 'https://openapi.tidal.com/v2';
 
-function getClientId() { return process.env.TIDAL_CLIENT_ID! }
-function getClientSecret() { return process.env.TIDAL_CLIENT_SECRET! }
+function getClientId() {
+  return process.env.TIDAL_CLIENT_ID!;
+}
+function getClientSecret() {
+  return process.env.TIDAL_CLIENT_SECRET!;
+}
 
 export async function searchTidal(query: string, limit = 10): Promise<TidalTrack[]> {
-  const token = await getClientToken()
-  if (!token) return []
+  const token = await getClientToken();
+  if (!token) return [];
 
   try {
     const res = await fetch(
@@ -16,19 +20,19 @@ export async function searchTidal(query: string, limit = 10): Promise<TidalTrack
           'Content-Type': 'application/vnd.api+json',
         },
         signal: AbortSignal.timeout(10000),
-      }
-    )
-    if (!res.ok) return []
-    const data = await res.json()
-    return (data.tracks ?? []).map(mapTrack)
+      },
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.tracks ?? []).map(mapTrack);
   } catch {
-    return []
+    return [];
   }
 }
 
 export async function getTidalTrack(id: string): Promise<TidalTrack | null> {
-  const token = await getClientToken()
-  if (!token) return null
+  const token = await getClientToken();
+  if (!token) return null;
 
   try {
     const res = await fetch(`${TIDAL_API}/tracks/${id}?countryCode=US`, {
@@ -37,21 +41,21 @@ export async function getTidalTrack(id: string): Promise<TidalTrack | null> {
         'Content-Type': 'application/vnd.api+json',
       },
       signal: AbortSignal.timeout(10000),
-    })
-    if (!res.ok) return null
-    return mapTrack(await res.json())
+    });
+    if (!res.ok) return null;
+    return mapTrack(await res.json());
   } catch {
-    return null
+    return null;
   }
 }
 
-let cachedToken: { token: string; expiresAt: number } | null = null
+let cachedToken: { token: string; expiresAt: number } | null = null;
 
 async function getClientToken(): Promise<string | null> {
-  if (!process.env.TIDAL_CLIENT_ID || !process.env.TIDAL_CLIENT_SECRET) return null
+  if (!process.env.TIDAL_CLIENT_ID || !process.env.TIDAL_CLIENT_SECRET) return null;
 
   if (cachedToken && cachedToken.expiresAt > Date.now()) {
-    return cachedToken.token
+    return cachedToken.token;
   }
 
   try {
@@ -64,18 +68,18 @@ async function getClientToken(): Promise<string | null> {
         client_secret: getClientSecret(),
       }),
       signal: AbortSignal.timeout(10000),
-    })
+    });
 
-    if (!res.ok) return null
-    const data = await res.json()
+    if (!res.ok) return null;
+    const data = await res.json();
 
     cachedToken = {
       token: data.access_token,
       expiresAt: Date.now() + (data.expires_in - 60) * 1000,
-    }
-    return cachedToken.token
+    };
+    return cachedToken.token;
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -89,15 +93,15 @@ function mapTrack(raw: any): TidalTrack {
     artworkUrl: raw.album?.imageCover?.[0]?.url ?? '',
     duration: raw.duration ?? raw.attributes?.duration ?? 0,
     url: `https://tidal.com/browse/track/${raw.id ?? raw.data?.id}`,
-  }
+  };
 }
 
 export interface TidalTrack {
-  id: string
-  title: string
-  artist: string
-  album: string
-  artworkUrl: string
-  duration: number
-  url: string
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  artworkUrl: string;
+  duration: number;
+  url: string;
 }

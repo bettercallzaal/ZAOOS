@@ -1,4 +1,4 @@
-import { createPublicClient, http, parseAbi, formatEther, parseAbiItem } from 'viem';
+import { createPublicClient, formatEther, http, parseAbi, parseAbiItem } from 'viem';
 import { optimism } from 'viem/chains';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
@@ -71,7 +71,7 @@ export interface LeaderboardResult {
  */
 async function getFirstTokenDate(
   client: OptimismPublicClient,
-  wallet: string
+  wallet: string,
 ): Promise<string | null> {
   const lowerWallet = wallet.toLowerCase();
 
@@ -81,26 +81,34 @@ async function getFirstTokenDate(
 
   try {
     const [ogLogs, zorLogs] = await Promise.all([
-      client.getLogs({
-        address: OG_RESPECT,
-        event: parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)'),
-        args: { to: wallet as `0x${string}` },
-        fromBlock: DEPLOYMENT_BLOCK,
-        toBlock: 'latest',
-      }).catch((err: unknown) => {
-        console.error(`OG getLogs failed for ${wallet}:`, err);
-        return [];
-      }),
-      client.getLogs({
-        address: ZOR_RESPECT,
-        event: parseAbiItem('event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)'),
-        args: { to: wallet as `0x${string}` },
-        fromBlock: DEPLOYMENT_BLOCK,
-        toBlock: 'latest',
-      }).catch((err: unknown) => {
-        console.error(`ZOR getLogs failed for ${wallet}:`, err);
-        return [];
-      }),
+      client
+        .getLogs({
+          address: OG_RESPECT,
+          event: parseAbiItem(
+            'event Transfer(address indexed from, address indexed to, uint256 value)',
+          ),
+          args: { to: wallet as `0x${string}` },
+          fromBlock: DEPLOYMENT_BLOCK,
+          toBlock: 'latest',
+        })
+        .catch((err: unknown) => {
+          console.error(`OG getLogs failed for ${wallet}:`, err);
+          return [];
+        }),
+      client
+        .getLogs({
+          address: ZOR_RESPECT,
+          event: parseAbiItem(
+            'event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)',
+          ),
+          args: { to: wallet as `0x${string}` },
+          fromBlock: DEPLOYMENT_BLOCK,
+          toBlock: 'latest',
+        })
+        .catch((err: unknown) => {
+          console.error(`ZOR getLogs failed for ${wallet}:`, err);
+          return [];
+        }),
     ]);
 
     const allBlocks: bigint[] = [];
@@ -162,7 +170,17 @@ export async function fetchLeaderboard(): Promise<LeaderboardResult> {
     }));
 
   if (walletsToCheck.length === 0) {
-    return { leaderboard: [], stats: { totalOG: 0, totalZOR: 0, totalMembers: 0, ogTotalSupply: 0, zorTotalSupply: 0, holdersWithRespect: 0 } };
+    return {
+      leaderboard: [],
+      stats: {
+        totalOG: 0,
+        totalZOR: 0,
+        totalMembers: 0,
+        ogTotalSupply: 0,
+        zorTotalSupply: 0,
+        holdersWithRespect: 0,
+      },
+    };
   }
 
   const client = optimismClient;
@@ -236,7 +254,7 @@ export async function fetchLeaderboard(): Promise<LeaderboardResult> {
   // Fetch first token dates for users with respect
   const withRespect = leaderboard.filter((e) => e.totalRespect > 0);
   const dateResults = await Promise.all(
-    withRespect.map((e) => getFirstTokenDate(client, e.wallet))
+    withRespect.map((e) => getFirstTokenDate(client, e.wallet)),
   );
   withRespect.forEach((entry, i) => {
     entry.firstTokenDate = dateResults[i];

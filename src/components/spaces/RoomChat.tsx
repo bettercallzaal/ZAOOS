@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 interface ChatMessage {
@@ -49,17 +49,26 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
       .channel(`room-chat:${roomId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'room_messages', filter: `room_id=eq.${roomId}` },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'room_messages',
+          filter: `room_id=eq.${roomId}`,
+        },
         (payload) => {
           setMessages((prev) => [...prev.slice(-199), payload.new as ChatMessage]);
         },
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [roomId]);
 
-  useEffect(() => { scrollToBottom(); }, [messages]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -88,7 +97,11 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.08]">
         <span className="text-sm font-medium">Room Chat</span>
         {onClose && (
-          <button onClick={onClose} aria-label="Close chat" className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onClose}
+            aria-label="Close chat"
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             &#10005;
           </button>
         )}
@@ -102,13 +115,22 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
         {messages.map((msg) => (
           <div key={msg.id} className="flex gap-2 group">
             {msg.pfp_url ? (
-              <Image src={msg.pfp_url || '/logo.png'} alt="" width={24} height={24} className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" unoptimized />
+              <Image
+                src={msg.pfp_url || '/logo.png'}
+                alt=""
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5"
+                unoptimized
+              />
             ) : (
               <div className="w-6 h-6 rounded-full bg-gray-700 flex-shrink-0 mt-0.5" />
             )}
             <div className="min-w-0">
               <div className="flex items-baseline gap-1.5">
-                <span className={`text-xs font-semibold ${msg.fid === fid ? 'text-[#f5a623]' : 'text-gray-300'}`}>
+                <span
+                  className={`text-xs font-semibold ${msg.fid === fid ? 'text-[#f5a623]' : 'text-gray-300'}`}
+                >
                   {msg.username || `FID ${msg.fid}`}
                 </span>
                 <span className="text-[10px] text-gray-600">{formatTime(msg.created_at)}</span>
@@ -122,7 +144,10 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
 
       {/* Input */}
       <form
-        onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
         className="border-t border-white/[0.08] p-2 flex gap-2"
       >
         <input

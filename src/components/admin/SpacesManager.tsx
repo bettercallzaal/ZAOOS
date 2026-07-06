@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Room {
   id: string;
@@ -28,12 +28,16 @@ export function SpacesManager() {
       if (!res.ok) return;
       const data = await res.json();
       setRooms(data.rooms ?? []);
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchRooms(); }, [fetchRooms]);
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   const handleEnd = async (roomId: string) => {
     if (!confirm('End this space? All participants will be disconnected.')) return;
@@ -45,9 +49,17 @@ export function SpacesManager() {
         body: JSON.stringify({ action: 'end' }),
       });
       if (res.ok) {
-        setRooms(prev => prev.map(r => r.id === roomId ? { ...r, state: 'ended' as const, ended_at: new Date().toISOString() } : r));
+        setRooms((prev) =>
+          prev.map((r) =>
+            r.id === roomId
+              ? { ...r, state: 'ended' as const, ended_at: new Date().toISOString() }
+              : r,
+          ),
+        );
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setEnding(null);
     }
   };
@@ -58,19 +70,21 @@ export function SpacesManager() {
     try {
       const res = await fetch(`/api/admin/spaces/${roomId}`, { method: 'DELETE' });
       if (res.ok) {
-        setRooms(prev => prev.filter(r => r.id !== roomId));
+        setRooms((prev) => prev.filter((r) => r.id !== roomId));
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setDeleting(null);
     }
   };
 
-  const filtered = rooms.filter(r => filter === 'all' || r.state === filter);
+  const filtered = rooms.filter((r) => filter === 'all' || r.state === filter);
 
   if (loading) {
     return (
       <div className="space-y-3 mt-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="h-16 bg-[#111d2e] rounded-lg animate-pulse" />
         ))}
       </div>
@@ -81,7 +95,7 @@ export function SpacesManager() {
     <div className="mt-4">
       {/* Filter */}
       <div className="flex items-center gap-2 mb-4">
-        {(['all', 'live', 'ended'] as const).map(f => (
+        {(['all', 'live', 'ended'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -91,35 +105,47 @@ export function SpacesManager() {
                 : 'text-gray-400 hover:text-white bg-white/5'
             }`}
           >
-            {f === 'all' ? `All (${rooms.length})` : f === 'live' ? `Live (${rooms.filter(r => r.state === 'live').length})` : `Ended (${rooms.filter(r => r.state === 'ended').length})`}
+            {f === 'all'
+              ? `All (${rooms.length})`
+              : f === 'live'
+                ? `Live (${rooms.filter((r) => r.state === 'live').length})`
+                : `Ended (${rooms.filter((r) => r.state === 'ended').length})`}
           </button>
         ))}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 text-sm">
-          No spaces found
-        </div>
+        <div className="text-center py-12 text-gray-500 text-sm">No spaces found</div>
       ) : (
         <div className="space-y-2">
-          {filtered.map(room => (
-            <div key={room.id} className="flex items-center gap-3 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-4 py-3">
+          {filtered.map((room) => (
+            <div
+              key={room.id}
+              className="flex items-center gap-3 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-4 py-3"
+            >
               {/* Status dot */}
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${room.state === 'live' ? 'bg-green-500' : 'bg-gray-600'}`} />
+              <span
+                className={`w-2 h-2 rounded-full flex-shrink-0 ${room.state === 'live' ? 'bg-green-500' : 'bg-gray-600'}`}
+              />
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-white text-sm font-medium truncate">{room.title}</span>
                   {room.provider && room.provider !== 'stream' && (
-                    <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full">{room.provider}</span>
+                    <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full">
+                      {room.provider}
+                    </span>
                   )}
                   {room.theme && room.theme !== 'default' && (
-                    <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">{room.theme}</span>
+                    <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">
+                      {room.theme}
+                    </span>
                   )}
                 </div>
                 <div className="text-gray-500 text-xs">
-                  @{room.host_username} &middot; {room.participant_count} listeners &middot; {new Date(room.created_at).toLocaleDateString()}
+                  @{room.host_username} &middot; {room.participant_count} listeners &middot;{' '}
+                  {new Date(room.created_at).toLocaleDateString()}
                 </div>
               </div>
 

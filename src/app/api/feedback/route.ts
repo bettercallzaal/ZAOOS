@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { z } from 'zod';
 import { Octokit } from '@octokit/rest';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 const feedbackSchema = z.object({
@@ -24,7 +24,16 @@ const rateLimitMap = new Map<number, number>();
 
 function getPageLabel(path: string): string {
   const segment = path.split('/').filter(Boolean)[0] || 'general';
-  const known = ['music', 'spaces', 'governance', 'social', 'chat', 'messages', 'settings', 'members'];
+  const known = [
+    'music',
+    'spaces',
+    'governance',
+    'social',
+    'chat',
+    'messages',
+    'settings',
+    'members',
+  ];
   return known.includes(segment) ? segment : 'general';
 }
 
@@ -39,13 +48,19 @@ export async function POST(req: NextRequest) {
     const lastSubmit = rateLimitMap.get(session.fid);
     if (lastSubmit && Date.now() - lastSubmit < 5 * 60 * 1000) {
       const waitSec = Math.ceil((5 * 60 * 1000 - (Date.now() - lastSubmit)) / 1000);
-      return NextResponse.json({ error: `Please wait ${waitSec}s before submitting again` }, { status: 429 });
+      return NextResponse.json(
+        { error: `Please wait ${waitSec}s before submitting again` },
+        { status: 429 },
+      );
     }
 
     const body = await req.json();
     const parsed = feedbackSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     const { type, title, description, page, browser, screenshot } = parsed.data;
@@ -90,7 +105,11 @@ export async function POST(req: NextRequest) {
 
     rateLimitMap.set(session.fid, Date.now());
 
-    return NextResponse.json({ success: true, issueUrl: issue.html_url, issueNumber: issue.number });
+    return NextResponse.json({
+      success: true,
+      issueUrl: issue.html_url,
+      issueNumber: issue.number,
+    });
   } catch (err) {
     logger.error('Feedback submission error:', err);
     return NextResponse.json({ error: 'Failed to submit feedback' }, { status: 500 });

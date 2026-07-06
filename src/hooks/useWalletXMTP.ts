@@ -14,9 +14,7 @@ export function useWalletXMTP() {
   const { data: walletClient } = useWalletClient();
   const xmtp = useXMTPContext();
 
-  const isAlreadyLinked = address
-    ? xmtp.connectedWallets.includes(address.toLowerCase())
-    : false;
+  const isAlreadyLinked = address ? xmtp.connectedWallets.includes(address.toLowerCase()) : false;
 
   const canConnect = isWalletConnected && !!walletClient && !isAlreadyLinked && !xmtp.isConnecting;
 

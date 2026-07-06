@@ -16,15 +16,24 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body style={{ backgroundColor: '#0a1628', margin: 0 }}>
-        <main style={{
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '1.5rem',
-        }}>
+        <main
+          style={{
+            minHeight: '100dvh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1.5rem',
+          }}
+        >
           <div style={{ textAlign: 'center', maxWidth: '24rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' }}>
+            <h2
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: 'white',
+                marginBottom: '0.5rem',
+              }}
+            >
               Something went wrong
             </h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>

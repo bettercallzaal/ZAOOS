@@ -29,7 +29,10 @@ export default function RespectLoading() {
         {/* Stats row skeleton */}
         <div className="grid grid-cols-3 gap-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] animate-pulse">
+            <div
+              key={i}
+              className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] animate-pulse"
+            >
               <div className="h-6 w-10 bg-gray-700 rounded mx-auto mb-2" />
               <div className="h-3 w-14 bg-gray-800 rounded mx-auto" />
             </div>

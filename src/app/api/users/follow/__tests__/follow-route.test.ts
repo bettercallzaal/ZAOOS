@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeRequest } from '@/test-utils/api-helpers';
 
 const mockGetSessionData = vi.hoisted(() => vi.fn());
@@ -14,7 +14,7 @@ vi.mock('@/lib/farcaster/neynar', () => ({
   unfollowUser: (...args: unknown[]) => mockUnfollowUser(...args),
 }));
 
-import { POST, DELETE } from '@/app/api/users/follow/route';
+import { DELETE, POST } from '@/app/api/users/follow/route';
 
 const API_PATH = '/api/users/follow';
 

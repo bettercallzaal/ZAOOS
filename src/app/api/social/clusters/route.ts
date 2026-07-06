@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
+import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
-import { communityConfig } from '@/../community.config';
 import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
@@ -52,7 +52,7 @@ export async function GET() {
     // Fetch recent casts from ALL members to discover channels they post in
     // Also track per-member channel activity for "Your Channels"
     const memberChannelMap = new Map<number, Set<string>>(); // fid → channels
-    const allFids = members.map(m => m.fid).filter(Boolean) as number[];
+    const allFids = members.map((m) => m.fid).filter(Boolean) as number[];
 
     // Process in batches of 5 to respect Neynar rate limits
     for (let i = 0; i < allFids.length; i += 5) {
@@ -61,7 +61,7 @@ export async function GET() {
         batch.map(async (fid) => {
           const res = await fetch(
             `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${fid}&limit=50`,
-            { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(5000) }
+            { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(5000) },
           );
           if (!res.ok) return { fid, channels: [] as string[] };
           const data = await res.json();
@@ -73,7 +73,7 @@ export async function GET() {
             })
             .filter(Boolean) as string[];
           return { fid, channels: [...new Set(channels)] };
-        })
+        }),
       );
       for (const r of results) {
         if (r.status === 'fulfilled' && r.value) {
@@ -82,18 +82,21 @@ export async function GET() {
           for (const ch of channels) discoveredChannels.add(ch);
         }
       }
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 150));
     }
 
     const allChannels = [...discoveredChannels];
 
     // Build a FID-to-profile map
     const profileMap = new Map(
-      members.map((m) => [m.fid, {
-        fid: m.fid as number,
-        username: m.username || '',
-        pfpUrl: m.pfp_url || null,
-      }])
+      members.map((m) => [
+        m.fid,
+        {
+          fid: m.fid as number,
+          username: m.username || '',
+          pfpUrl: m.pfp_url || null,
+        },
+      ]),
     );
 
     // Build clusters from the member channel data we already collected (no extra API calls!)
@@ -109,7 +112,7 @@ export async function GET() {
     const channelActivities: ChannelActivity[] = [];
     for (const [channelId, fids] of channelMembersMap) {
       const channelMembers = [...fids]
-        .map(fid => profileMap.get(fid))
+        .map((fid) => profileMap.get(fid))
         .filter(Boolean) as ChannelActivity['members'];
       if (channelMembers.length > 0) {
         channelActivities.push({
@@ -131,21 +134,31 @@ export async function GET() {
 
     // Separate into shared clusters (2+) and solo channels (1 member)
     const sharedClusters = channelActivities
-      .filter(ca => ca.members.length >= 2)
-      .map(ca => ({ name: ca.channelName, channelId: ca.channelId, members: ca.members.slice(0, 20), size: ca.members.length }));
+      .filter((ca) => ca.members.length >= 2)
+      .map((ca) => ({
+        name: ca.channelName,
+        channelId: ca.channelId,
+        members: ca.members.slice(0, 20),
+        size: ca.members.length,
+      }));
 
     // Current user's channels (all channels they post in)
     const currentUserChannels = memberChannelMap.get(session.fid);
     const yourChannels = currentUserChannels
-      ? [...currentUserChannels].map(ch => ({
-          channelId: ch,
-          name: formatChannelName(ch),
-          memberCount: channelMembersMap.get(ch)?.size || 0,
-        }))
-        .sort((a, b) => b.memberCount - a.memberCount)
+      ? [...currentUserChannels]
+          .map((ch) => ({
+            channelId: ch,
+            name: formatChannelName(ch),
+            memberCount: channelMembersMap.get(ch)?.size || 0,
+          }))
+          .sort((a, b) => b.memberCount - a.memberCount)
       : [];
 
-    const responseData = { clusters: sharedClusters, yourChannels, totalChannelsScanned: allChannels.length };
+    const responseData = {
+      clusters: sharedClusters,
+      yourChannels,
+      totalChannelsScanned: allChannels.length,
+    };
     clusterCache = { data: responseData, timestamp: Date.now() };
 
     return NextResponse.json(responseData, {

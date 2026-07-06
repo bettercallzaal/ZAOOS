@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { OGBadge } from '@/components/badges/OGBadge';
-import { muteUserAction, blockUserAction } from '@/lib/farcaster/neynarActions';
+import { blockUserAction, muteUserAction } from '@/lib/farcaster/neynarActions';
 
 export interface FollowerUser {
   fid: number;
@@ -119,7 +119,9 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
       {/* PFP with relationship ring */}
       <div className="relative flex-shrink-0">
         {user.pfp_url ? (
-          <div className={`w-10 h-10 relative rounded-full ${isMutual ? 'ring-2 ring-green-500/50' : ''}`}>
+          <div
+            className={`w-10 h-10 relative rounded-full ${isMutual ? 'ring-2 ring-green-500/50' : ''}`}
+          >
             <Image
               src={user.pfp_url}
               alt={user.display_name}
@@ -143,7 +145,11 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-sm font-medium text-white truncate">{user.display_name}</span>
           {user.power_badge && (
-            <svg className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <svg
+              className="w-3.5 h-3.5 text-purple-400 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
               <path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z" />
             </svg>
           )}
@@ -157,17 +163,23 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-gray-500">@{user.username}</span>
           {followsYou && (
-            <span className="text-[10px] text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded">Follows you</span>
+            <span className="text-[10px] text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded">
+              Follows you
+            </span>
           )}
         </div>
-        {bio && (
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{bio}</p>
-        )}
+        {bio && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{bio}</p>}
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-[11px] text-gray-600">{formatCount(user.follower_count)} followers</span>
-          <span className="text-[11px] text-gray-600">{formatCount(user.following_count)} following</span>
+          <span className="text-[11px] text-gray-600">
+            {formatCount(user.follower_count)} followers
+          </span>
+          <span className="text-[11px] text-gray-600">
+            {formatCount(user.following_count)} following
+          </span>
           {user.active_status === 'inactive' && (
-            <span className="text-[10px] text-red-400/70 bg-red-400/10 px-1.5 py-0.5 rounded">Inactive</span>
+            <span className="text-[10px] text-red-400/70 bg-red-400/10 px-1.5 py-0.5 rounded">
+              Inactive
+            </span>
           )}
         </div>
       </div>
@@ -184,7 +196,15 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
             className="p-1.5 text-gray-500 hover:text-[#f5a623] transition-colors rounded-lg hover:bg-white/[0.05]"
             title="Direct Cast"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </a>
@@ -207,7 +227,10 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
           {/* Three-dot menu */}
           <div className="relative" ref={menuRef}>
             <button
-              onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen((o) => !o);
+              }}
               className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors rounded-lg hover:bg-white/[0.05]"
               title="More options"
             >
@@ -232,7 +255,11 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
                   disabled={blockState !== 'idle'}
                   className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-900/20 transition-colors disabled:opacity-60"
                 >
-                  {blockState === 'loading' ? 'Blocking...' : blockState === 'done' ? 'Blocked' : 'Block'}
+                  {blockState === 'loading'
+                    ? 'Blocking...'
+                    : blockState === 'done'
+                      ? 'Blocked'
+                      : 'Block'}
                 </button>
               </div>
             )}

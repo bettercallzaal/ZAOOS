@@ -1,28 +1,25 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FeaturedArtists } from '@/components/music/FeaturedArtists';
+import { HistorySection, LikedSongsSection } from '@/components/music/MusicLibrarySections';
+import type { OmnibarResult } from '@/components/music/MusicOmnibar';
+import { TrackOfTheDayBanner, TrackOfTheDayTabSkeleton } from '@/components/music/MusicPageUtils';
+import { PlaylistsSection } from '@/components/music/MusicPlaylists';
+import { RadioHero } from '@/components/music/MusicRadioHero';
+import type { Submission } from '@/components/music/MusicSubmissions';
+import { SubmissionsSection } from '@/components/music/MusicSubmissions';
+import { TrendingSection } from '@/components/music/MusicTrending';
+import { NowPlayingBar } from '@/components/music/NowPlayingBar';
+import { RespectTrending } from '@/components/music/RespectTrending';
+import { PageHeader } from '@/components/navigation/PageHeader';
+import { useQueue } from '@/contexts/QueueContext';
 import { usePlayer } from '@/providers/audio';
 import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
-import { useQueue } from '@/contexts/QueueContext';
-import { PageHeader } from '@/components/navigation/PageHeader';
-import type { OmnibarResult } from '@/components/music/MusicOmnibar';
 import type { TrackMetadata } from '@/types/music';
-import { RespectTrending } from '@/components/music/RespectTrending';
-import { NowPlayingBar } from '@/components/music/NowPlayingBar';
-import { RadioHero } from '@/components/music/MusicRadioHero';
-import { SubmissionsSection } from '@/components/music/MusicSubmissions';
-import type { Submission } from '@/components/music/MusicSubmissions';
-import { TrendingSection } from '@/components/music/MusicTrending';
-import { PlaylistsSection } from '@/components/music/MusicPlaylists';
-import { LikedSongsSection, HistorySection } from '@/components/music/MusicLibrarySections';
-import { TrackOfTheDayBanner, TrackOfTheDayTabSkeleton } from '@/components/music/MusicPageUtils';
-import { FeaturedArtists } from '@/components/music/FeaturedArtists';
 
-const MusicOmnibar = dynamic(
-  () => import('@/components/music/MusicOmnibar'),
-  { ssr: false },
-);
+const MusicOmnibar = dynamic(() => import('@/components/music/MusicOmnibar'), { ssr: false });
 
 const AudiusDiscover = dynamic(
   () => import('@/components/music/AudiusDiscover').then((m) => m.AudiusDiscover),
@@ -49,15 +46,9 @@ const AiMusicGenerator = dynamic(
   { ssr: false },
 );
 
-const MintTrack = dynamic(
-  () => import('@/components/music/MintTrack'),
-  { ssr: false },
-);
+const MintTrack = dynamic(() => import('@/components/music/MintTrack'), { ssr: false });
 
-const PermawebLibrary = dynamic(
-  () => import('@/components/music/PermawebLibrary'),
-  { ssr: false },
-);
+const PermawebLibrary = dynamic(() => import('@/components/music/PermawebLibrary'), { ssr: false });
 
 const ListeningParties = dynamic(
   () => import('@/components/music/ListeningParties').then((m) => m.ListeningParties),
@@ -79,7 +70,24 @@ const WeeklyDigest = dynamic(
   { ssr: false },
 );
 
-const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Digest', 'Farcaster', 'Playlists', 'Collab', 'Parties', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
+const TABS = [
+  'Radio',
+  'Discover',
+  'Track of the Day',
+  'Submissions',
+  'Trending',
+  'Digest',
+  'Farcaster',
+  'Playlists',
+  'Collab',
+  'Parties',
+  'Create',
+  'Binaural',
+  'Liked',
+  'History',
+  'Curators',
+  'Permaweb',
+] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -167,7 +175,9 @@ export function MusicPage() {
     const el = document.getElementById(SECTION_IDS[tab]);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => { isScrollingRef.current = false; }, 800);
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 800);
     }
   }, []);
 
@@ -204,7 +214,15 @@ export function MusicPage() {
             onClick={() => setShowMint(true)}
             className="px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-medium hover:bg-[#f5a623]/90 transition-colors flex items-center gap-1.5"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
               <path d="M12 5v14M5 12h14" />
             </svg>
             Mint Track
@@ -217,16 +235,21 @@ export function MusicPage() {
 
       {/* ── Smart Omnibar ────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4">
-        <MusicOmnibar onPlay={handleOmnibarPlay} onQueue={(track) => queue.addToQueue({
-          id: track.id,
-          type: (track.platform as TrackMetadata['type']) || 'audio',
-          trackName: track.title,
-          artistName: track.artist,
-          artworkUrl: track.artworkUrl,
-          url: track.url,
-          streamUrl: track.streamUrl,
-          feedId: track.id,
-        })} />
+        <MusicOmnibar
+          onPlay={handleOmnibarPlay}
+          onQueue={(track) =>
+            queue.addToQueue({
+              id: track.id,
+              type: (track.platform as TrackMetadata['type']) || 'audio',
+              trackName: track.title,
+              artistName: track.artist,
+              artworkUrl: track.artworkUrl,
+              url: track.url,
+              streamUrl: track.streamUrl,
+              feedId: track.id,
+            })
+          }
+        />
       </div>
 
       {/* ── Track of the Day Hero Banner ─────────────────────────── */}
@@ -261,11 +284,7 @@ export function MusicPage() {
       <div className="max-w-2xl mx-auto px-4 space-y-8 mt-6">
         {/* ── Section 1: Community Radio (Hero) ────────────────────── */}
         <section id={SECTION_IDS.Radio}>
-          <RadioHero
-            player={player}
-            radio={radio}
-            onPlayPause={handlePlayPause}
-          />
+          <RadioHero player={player} radio={radio} onPlayPause={handlePlayPause} />
         </section>
 
         {/* ── Featured Artists ────────────────────────────────────── */}

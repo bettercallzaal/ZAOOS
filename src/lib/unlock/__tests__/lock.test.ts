@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { hasValidKey, findKeyHolder } from '../lock';
+import { describe, expect, it } from 'vitest';
+import { findKeyHolder, hasValidKey } from '../lock';
 
 // These cover the input-guard paths only - they short-circuit before any RPC
 // call, so they are deterministic and never touch the network.

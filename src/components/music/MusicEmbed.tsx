@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-
-import { TrackMetadata, TrackType } from '@/types/music';
-import { usePlayer } from '@/providers/audio';
+import { useEffect, useState } from 'react';
+import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { LikeButton } from '@/components/music/LikeButton';
+import { QueueActions } from '@/components/music/QueueActions';
+import { ShareToChatButton } from '@/components/music/ShareToChatButton';
+import { TrackReactions } from '@/components/music/TrackReactions';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { formatDuration } from '@/lib/music/formatDuration';
 import type { PlatformLink } from '@/lib/music/songlink';
-import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
-import { ArtworkImage } from '@/components/music/ArtworkImage';
-import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { LikeButton } from '@/components/music/LikeButton';
-import { ShareToChatButton } from '@/components/music/ShareToChatButton';
-import { QueueActions } from '@/components/music/QueueActions';
-import { TrackReactions } from '@/components/music/TrackReactions';
+import { usePlayer } from '@/providers/audio';
+import type { TrackMetadata, TrackType } from '@/types/music';
 
 interface MusicEmbedProps {
   url: string;
@@ -84,7 +83,6 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   const isThisPlaying = isThisTrack && player.isPlaying;
   const isThisLoading = isThisTrack && player.isLoading;
 
-   
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -116,7 +114,6 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
       cancelled = true;
     };
   }, [url, castHash]);
-   
 
   // Fetch universal links (Songlink) for cross-platform "Also on:" row
   useEffect(() => {
@@ -128,9 +125,12 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
       .then((data) => {
         if (!cancelled && data?.platforms) {
           // Filter out the current platform so we only show *other* platforms
-          const currentKey = metadata.type === 'applemusic' ? 'appleMusic'
-            : metadata.type === 'youtube' ? 'youtubeMusic'
-            : metadata.type;
+          const currentKey =
+            metadata.type === 'applemusic'
+              ? 'appleMusic'
+              : metadata.type === 'youtube'
+                ? 'youtubeMusic'
+                : metadata.type;
           const others = (data.platforms as PlatformLink[]).filter(
             (p) => p.platform !== currentKey,
           );
@@ -141,10 +141,13 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
         // Non-critical — silently ignore
       });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [metadata, url]);
 
-  const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal' || metadata?.type === 'bandcamp';
+  const externalOnly =
+    metadata?.type === 'applemusic' || metadata?.type === 'tidal' || metadata?.type === 'bandcamp';
 
   const handlePlayPause = () => {
     if (!metadata) return;
@@ -182,15 +185,23 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   // Error / missing metadata fallback
   if (fetchFailed || !metadata) {
     // Detect platform from URL for fallback display
-    const fallbackPlatform = url.includes('spotify') ? 'Spotify'
-      : url.includes('soundcloud') ? 'SoundCloud'
-      : url.includes('audius') ? 'Audius'
-      : url.includes('youtu') ? 'YouTube'
-      : url.includes('sound.xyz') ? 'Sound.xyz'
-      : url.includes('apple') ? 'Apple Music'
-      : url.includes('tidal') ? 'Tidal'
-      : url.includes('bandcamp') ? 'Bandcamp'
-      : 'Source';
+    const fallbackPlatform = url.includes('spotify')
+      ? 'Spotify'
+      : url.includes('soundcloud')
+        ? 'SoundCloud'
+        : url.includes('audius')
+          ? 'Audius'
+          : url.includes('youtu')
+            ? 'YouTube'
+            : url.includes('sound.xyz')
+              ? 'Sound.xyz'
+              : url.includes('apple')
+                ? 'Apple Music'
+                : url.includes('tidal')
+                  ? 'Tidal'
+                  : url.includes('bandcamp')
+                    ? 'Bandcamp'
+                    : 'Source';
 
     return (
       <div className="relative rounded-xl overflow-hidden border border-white/[0.08] bg-[#0d1b2a] mt-2">
@@ -212,8 +223,18 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
             <p className="text-sm font-medium text-gray-300">Listen on {fallbackPlatform}</p>
             <p className="text-xs text-gray-500 truncate mt-0.5">{url}</p>
           </div>
-          <svg className="w-5 h-5 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          <svg
+            className="w-5 h-5 text-gray-500 flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+            />
           </svg>
         </a>
       </div>
@@ -249,9 +270,13 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
           />
 
           {/* Play/pause overlay on hover */}
-          <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${
-            isThisTrack ? 'bg-black/40 opacity-100' : 'bg-black/50 opacity-0 group-hover:opacity-100'
-          }`}>
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-opacity ${
+              isThisTrack
+                ? 'bg-black/40 opacity-100'
+                : 'bg-black/50 opacity-0 group-hover:opacity-100'
+            }`}
+          >
             {isThisLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : isThisPlaying ? (
@@ -268,14 +293,18 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
 
         {/* Track info */}
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-semibold truncate ${isThisTrack ? 'text-[#f5a623]' : 'text-white'}`}>
+          <p
+            className={`text-sm font-semibold truncate ${isThisTrack ? 'text-[#f5a623]' : 'text-white'}`}
+          >
             {metadata.trackName}
           </p>
           {metadata.artistName && (
             <p className="text-xs text-gray-400 truncate mt-0.5">{metadata.artistName}</p>
           )}
           <div className="flex items-center gap-2 mt-1.5">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md ${colors.bg} ${colors.text}`}>
+            <span
+              className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md ${colors.bg} ${colors.text}`}
+            >
               <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
               {PLATFORM_LABELS[metadata.type]}
             </span>
@@ -294,18 +323,25 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
 
         {/* Add to queue */}
-        {metadata && <QueueActions metadata={{ ...metadata, feedId: castHash }} compact className="flex-shrink-0" />}
+        {metadata && (
+          <QueueActions
+            metadata={{ ...metadata, feedId: castHash }}
+            compact
+            className="flex-shrink-0"
+          />
+        )}
 
         {/* Share to chat */}
-        <ShareToChatButton songUrl={url} trackName={metadata.trackName} compact className="flex-shrink-0" />
+        <ShareToChatButton
+          songUrl={url}
+          trackName={metadata.trackName}
+          compact
+          className="flex-shrink-0"
+        />
 
         {/* Share to Farcaster */}
         <ShareToFarcaster
-          template={shareTemplates.song(
-            metadata.trackName,
-            metadata.artistName || 'Unknown',
-            url,
-          )}
+          template={shareTemplates.song(metadata.trackName, metadata.artistName || 'Unknown', url)}
           variant="icon"
           className="flex-shrink-0"
         />
@@ -317,14 +353,24 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
             isThisTrack
               ? 'bg-[#f5a623] text-[#0d1b2a] shadow-md shadow-[#f5a623]/20'
               : externalOnly
-              ? 'bg-white/10 text-white hover:bg-white/15'
-              : 'bg-[#f5a623] text-[#0d1b2a] hover:bg-[#ffd700]'
+                ? 'bg-white/10 text-white hover:bg-white/15'
+                : 'bg-[#f5a623] text-[#0d1b2a] hover:bg-[#ffd700]'
           }`}
           aria-label={externalOnly ? 'Open' : isThisPlaying ? 'Pause' : 'Play'}
         >
           {externalOnly ? (
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+              />
             </svg>
           ) : isThisLoading ? (
             <div className="w-4 h-4 border-2 border-[#0d1b2a] border-t-transparent rounded-full animate-spin" />

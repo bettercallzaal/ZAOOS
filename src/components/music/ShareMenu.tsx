@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getActiveFilterKey } from '@/components/music/AudioFiltersPanel';
 
 interface ShareMenuProps {
@@ -11,13 +11,24 @@ interface ShareMenuProps {
   className?: string;
 }
 
-export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, className = '' }: ShareMenuProps) {
+export function ShareMenu({
+  trackName,
+  artistName,
+  artworkUrl,
+  trackUrl,
+  className = '',
+}: ShareMenuProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    },
+    [],
+  );
 
   // Close on outside click
   useEffect(() => {
@@ -94,7 +105,7 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
     window.open(
       `https://warpcast.com/~/compose?text=${text}&embeds[]=${embedUrl}`,
       '_blank',
-      'noopener,noreferrer'
+      'noopener,noreferrer',
     );
     setOpen(false);
   };
@@ -105,7 +116,7 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
     window.open(
       `https://x.com/intent/tweet?text=${text}&url=${url}`,
       '_blank',
-      'noopener,noreferrer'
+      'noopener,noreferrer',
     );
     setOpen(false);
   };
@@ -141,8 +152,18 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
         aria-label="Share track"
         title="Share"
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+        <svg
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+          />
         </svg>
       </button>
 
@@ -162,12 +183,28 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
               className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-200 hover:bg-white/5 transition-colors"
             >
               {copied ? (
-                <svg className="w-4 h-4 text-green-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="w-4 h-4 text-green-400 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               ) : (
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.071a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L5.25 9.879" />
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.071a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L5.25 9.879"
+                  />
                 </svg>
               )}
               <span>{copied ? 'Copied!' : 'Copy link'}</span>
@@ -178,7 +215,11 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
               onClick={handleShareFarcaster}
               className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-200 hover:bg-white/5 transition-colors"
             >
-              <svg className="w-4 h-4 flex-shrink-0 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                className="w-4 h-4 flex-shrink-0 text-purple-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M5.24 3h13.52l2.64 4.36v1.28h-1.12l-.24 8.72c-.04 1.4-1.2 2.52-2.6 2.52h-1.2c-1.4 0-2.56-1.12-2.6-2.52l-.12-4.44h-3.04l-.12 4.44c-.04 1.4-1.2 2.52-2.6 2.52h-1.2c-1.4 0-2.56-1.12-2.6-2.52L3.72 8.64H2.6V7.36L5.24 3z" />
               </svg>
               <span>Share to Farcaster</span>
@@ -202,8 +243,18 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
               onClick={handleDownloadCard}
               className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-200 hover:bg-white/5 transition-colors"
             >
-              <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              <svg
+                className="w-4 h-4 flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
               </svg>
               <span>Download share card</span>
             </button>

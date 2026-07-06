@@ -11,7 +11,7 @@
 // Copy the printed SQL block into Supabase SQL Editor and run.
 // Then DM each teammate their code from the plaintext list at the top.
 
-import { scryptSync, randomBytes } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 
 const TEAM: Array<{ name: string; role: string; scope: string }> = [
   { name: 'Zaal', role: 'lead', scope: 'ops' },
@@ -75,8 +75,8 @@ for (const { name, code, role, scope } of entries) {
   const safeName = name.replace(/'/g, "''");
   console.log(
     `INSERT INTO stock_team_members (name, role, scope, password_hash) ` +
-    `VALUES ('${safeName}', '${role}', '${scope}', '${hash}') ` +
-    `ON CONFLICT (name) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role;`,
+      `VALUES ('${safeName}', '${role}', '${scope}', '${hash}') ` +
+      `ON CONFLICT (name) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role;`,
   );
 }
 console.log('COMMIT;');

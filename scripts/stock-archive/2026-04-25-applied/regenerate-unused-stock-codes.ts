@@ -14,12 +14,13 @@
 //   npx tsx scripts/regenerate-unused-stock-codes.ts
 
 import { config } from 'dotenv';
+
 config({ path: '.env.local' });
 
-import { scryptSync, randomBytes } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import { randomBytes, scryptSync } from 'crypto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
-import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -99,9 +100,7 @@ async function main() {
     'scripts',
     `.stock-codes-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`,
   );
-  const plaintextBody = entries
-    .map(({ name, code }) => `${name.padEnd(20)} -> ${code}`)
-    .join('\n');
+  const plaintextBody = entries.map(({ name, code }) => `${name.padEnd(20)} -> ${code}`).join('\n');
   writeFileSync(
     plaintextPath,
     `ZAOstock team codes - regenerated ${new Date().toISOString()}\nSkipped (already logged in): ${skipList.join(', ') || '(none)'}\n\n${plaintextBody}\n`,
@@ -113,9 +112,7 @@ async function main() {
   console.log('BEGIN;');
   for (const { id, code } of entries) {
     const hash = hashPassword(code);
-    console.log(
-      `UPDATE stock_team_members SET password_hash = '${hash}' WHERE id = '${id}';`,
-    );
+    console.log(`UPDATE stock_team_members SET password_hash = '${hash}' WHERE id = '${id}';`);
   }
   console.log('COMMIT;');
   console.log('');

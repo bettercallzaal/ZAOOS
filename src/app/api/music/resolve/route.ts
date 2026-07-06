@@ -1,20 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import {
-  resolveMusicLinks,
   buildUniversalCard,
   RateLimitError,
+  resolveMusicLinks,
   type UniversalMusicCard,
 } from '@/lib/music/songlink';
-import { logger } from '@/lib/logger';
 
 const QuerySchema = z.object({
-  url: z.string().url('Must be a valid URL').max(2048).refine(
-    (u) => u.startsWith('http://') || u.startsWith('https://'),
-    'Only http/https URLs allowed'
-  ),
+  url: z
+    .string()
+    .url('Must be a valid URL')
+    .max(2048)
+    .refine(
+      (u) => u.startsWith('http://') || u.startsWith('https://'),
+      'Only http/https URLs allowed',
+    ),
 });
 
 /** Cache TTL: 7 days in seconds. */
@@ -72,10 +76,7 @@ export async function GET(request: NextRequest) {
     }
 
     logger.error('[music/resolve] error:', err);
-    return NextResponse.json(
-      { error: 'Failed to resolve music links' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to resolve music links' }, { status: 500 });
   }
 }
 
@@ -125,17 +126,15 @@ async function storeInCache(url: string, card: UniversalMusicCard): Promise<void
     const supabase = getSupabaseAdmin();
     const expiresAt = new Date(Date.now() + CACHE_TTL_SECONDS * 1000).toISOString();
 
-    const { error } = await supabase
-      .from('music_link_cache')
-      .upsert(
-        {
-          url,
-          card_data: card,
-          expires_at: expiresAt,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'url' },
-      );
+    const { error } = await supabase.from('music_link_cache').upsert(
+      {
+        url,
+        card_data: card,
+        expires_at: expiresAt,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'url' },
+    );
 
     if (error && error.code !== '42P01' && !error.message?.includes('does not exist')) {
       logger.warn('[music/resolve] cache write error:', error.message);

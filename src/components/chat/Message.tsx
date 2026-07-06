@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, memo } from 'react';
 import Image from 'next/image';
-import { Cast, CastEmbed, QuotedCastData } from '@/types';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { memo, useState } from 'react';
+import { OGBadge } from '@/components/badges/OGBadge';
 import { MusicEmbed } from '@/components/music/MusicEmbed';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
-import { OGBadge } from '@/components/badges/OGBadge';
 import { timeAgo } from '@/lib/format/timeAgo';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import type { Cast, CastEmbed, QuotedCastData } from '@/types';
 
 interface MessageProps {
   cast: Cast;
@@ -21,9 +21,12 @@ interface MessageProps {
   onReply?: (hash: string, authorName: string, text: string) => void;
 }
 
-
 function safeHostname(url: string): string {
-  try { return new URL(url).hostname; } catch { return url.slice(0, 40); }
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url.slice(0, 40);
+  }
 }
 
 function isImageUrl(url: string, embed?: CastEmbed): boolean {
@@ -50,8 +53,11 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
   if (isImageUrl(embed.url, embed)) {
     return (
       <a href={embed.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
-        <div className="rounded-lg overflow-hidden max-w-sm bg-gray-800/50" style={{ minHeight: '120px' }}>
-          { }
+        <div
+          className="rounded-lg overflow-hidden max-w-sm bg-gray-800/50"
+          style={{ minHeight: '120px' }}
+        >
+          {}
           <img
             src={embed.url}
             alt="Embedded image"
@@ -90,7 +96,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
       >
         {og.ogImage?.[0]?.url && (
           <div className="w-full bg-gray-800/30" style={{ minHeight: '80px' }}>
-            { }
+            {}
             <img
               src={og.ogImage[0].url}
               alt={og.ogTitle || 'Link preview image'}
@@ -107,7 +113,9 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
         {(og.ogTitle || og.ogDescription) && (
           <div className="px-3.5 py-2.5 bg-[#0d1b2a]/80">
             {og.ogTitle && (
-              <p className="text-sm font-medium text-gray-200 truncate group-hover/link:text-white transition-colors">{og.ogTitle}</p>
+              <p className="text-sm font-medium text-gray-200 truncate group-hover/link:text-white transition-colors">
+                {og.ogTitle}
+              </p>
             )}
             {og.ogDescription && (
               <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{og.ogDescription}</p>
@@ -161,7 +169,17 @@ async function toggleReaction(type: 'like' | 'recast', hash: string, isActive: b
   return res.ok;
 }
 
-export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply }: MessageProps) {
+export const Message = memo(function Message({
+  cast,
+  isAdmin,
+  currentFid,
+  hasSigner,
+  onHide,
+  onOpenThread,
+  onQuote,
+  onOpenProfile,
+  onReply,
+}: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const initialLiked = cast.reactions?.likes?.some((l) => l.fid === currentFid) ?? false;
@@ -246,8 +264,18 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
       <div className="flex-1 min-w-0">
         {cast.parent_hash && (
           <div className="flex items-center gap-1 mb-0.5">
-            <svg className="w-3 h-3 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15l-3 3m0 0l-3-3m3 3V4a1 1 0 011-1h10a1 1 0 011 1v3" />
+            <svg
+              className="w-3 h-3 text-gray-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15l-3 3m0 0l-3-3m3 3V4a1 1 0 011-1h10a1 1 0 011 1v3"
+              />
             </svg>
             <span className="text-[10px] text-gray-600">reply</span>
           </div>
@@ -294,12 +322,24 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             onClick={handleLike}
             disabled={!hasSigner}
             className={`flex items-center gap-1.5 text-xs min-w-[44px] min-h-[36px] px-2.5 py-1.5 rounded-lg transition-colors ${
-              liked ? 'text-red-400 bg-red-400/10' : 'text-gray-500 hover:text-red-400 hover:bg-white/5'
+              liked
+                ? 'text-red-400 bg-red-400/10'
+                : 'text-gray-500 hover:text-red-400 hover:bg-white/5'
             } disabled:opacity-40 disabled:cursor-default`}
             aria-label={liked ? 'Unlike' : 'Like'}
           >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+            <svg
+              className="w-[18px] h-[18px]"
+              viewBox="0 0 24 24"
+              fill={liked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+              />
             </svg>
             {likeCount > 0 && <span>{likeCount}</span>}
           </button>
@@ -309,25 +349,49 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             onClick={handleRecast}
             disabled={!hasSigner}
             className={`flex items-center gap-1.5 text-xs min-w-[44px] min-h-[36px] px-2.5 py-1.5 rounded-lg transition-colors ${
-              recasted ? 'text-green-400 bg-green-400/10' : 'text-gray-500 hover:text-green-400 hover:bg-white/5'
+              recasted
+                ? 'text-green-400 bg-green-400/10'
+                : 'text-gray-500 hover:text-green-400 hover:bg-white/5'
             } disabled:opacity-40 disabled:cursor-default`}
             aria-label={recasted ? 'Undo recast' : 'Recast'}
           >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+            <svg
+              className="w-[18px] h-[18px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
+              />
             </svg>
             {recastCount > 0 && <span>{recastCount}</span>}
           </button>
 
           {/* Reply */}
           <button
-            onClick={() => onReply?.(cast.hash, cast.author.display_name || cast.author.username, cast.text)}
+            onClick={() =>
+              onReply?.(cast.hash, cast.author.display_name || cast.author.username, cast.text)
+            }
             className="flex items-center gap-1.5 text-xs min-w-[44px] min-h-[36px] px-2.5 py-1.5 rounded-lg transition-colors text-gray-500 hover:text-[#f5a623] hover:bg-white/5"
             title="Reply"
             aria-label="Reply"
           >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            <svg
+              className="w-[18px] h-[18px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+              />
             </svg>
           </button>
 
@@ -338,8 +402,18 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
               className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#f5a623] hover:bg-white/5 min-w-[44px] min-h-[36px] px-2.5 py-1.5 rounded-lg transition-colors"
               aria-label="Quote cast"
             >
-              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              <svg
+                className="w-[18px] h-[18px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+                />
               </svg>
             </button>
           )}
@@ -349,7 +423,8 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             variant="icon"
             className="min-w-[44px] min-h-[36px] !p-1.5 rounded-lg hover:bg-white/5"
             template={shareTemplates.custom(
-              (cast.text.length > 200 ? cast.text.slice(0, 200) + '...' : cast.text) + '\n\nvia The ZAO',
+              (cast.text.length > 200 ? cast.text.slice(0, 200) + '...' : cast.text) +
+                '\n\nvia The ZAO',
               ['https://zaoos.com'],
               'zao',
             )}
@@ -362,8 +437,18 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             onClick={() => onOpenThread?.(cast.hash)}
             className="flex items-center gap-2 mt-1.5 px-3 py-2 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/15 hover:bg-[#f5a623]/10 hover:border-[#f5a623]/30 transition-colors w-full text-left group/thread"
           >
-            <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+            <svg
+              className="w-4 h-4 text-[#f5a623] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
+              />
             </svg>
             <span className="text-xs font-medium text-[#f5a623]">
               {cast.replies.count} {cast.replies.count === 1 ? 'reply' : 'replies'}

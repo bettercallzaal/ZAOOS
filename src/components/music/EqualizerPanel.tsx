@@ -1,34 +1,34 @@
-'use client'
+'use client';
 
-import { useEffect, useState, useCallback } from 'react'
-import { getEqualizer, EQ_PRESETS } from '@/lib/music/equalizer'
+import { useCallback, useEffect, useState } from 'react';
+import { EQ_PRESETS, getEqualizer } from '@/lib/music/equalizer';
 
-const BAND_LABELS = ['60', '230', '910', '3.6k', '14k']
+const BAND_LABELS = ['60', '230', '910', '3.6k', '14k'];
 
 export default function EqualizerPanel() {
-  const [gains, setGains] = useState<number[]>([0, 0, 0, 0, 0])
-  const [activePreset, setActivePreset] = useState<string | null>('Flat')
+  const [gains, setGains] = useState<number[]>([0, 0, 0, 0, 0]);
+  const [activePreset, setActivePreset] = useState<string | null>('Flat');
 
   useEffect(() => {
-    const eq = getEqualizer()
-    setGains(eq.getGains())
-  }, [])
+    const eq = getEqualizer();
+    setGains(eq.getGains());
+  }, []);
 
   const handleGainChange = useCallback((index: number, value: number) => {
-    const eq = getEqualizer()
-    eq.setGain(index, value)
-    eq.connectIfActive()
-    setGains(eq.getGains())
-    setActivePreset(null)
-  }, [])
+    const eq = getEqualizer();
+    eq.setGain(index, value);
+    eq.connectIfActive();
+    setGains(eq.getGains());
+    setActivePreset(null);
+  }, []);
 
   const handlePreset = useCallback((name: string) => {
-    const eq = getEqualizer()
-    eq.applyPreset(name)
-    eq.connectIfActive()
-    setGains(eq.getGains())
-    setActivePreset(name)
-  }, [])
+    const eq = getEqualizer();
+    eq.applyPreset(name);
+    eq.connectIfActive();
+    setGains(eq.getGains());
+    setActivePreset(name);
+  }, []);
 
   return (
     <div className="px-4 py-3">
@@ -53,7 +53,10 @@ export default function EqualizerPanel() {
       <div className="flex justify-between items-end gap-2 mt-2" style={{ height: 160 }}>
         {gains.map((gain, i) => (
           <div key={i} className="flex flex-col items-center gap-1 flex-1">
-            <span className="text-[10px] text-gray-500">{gain > 0 ? '+' : ''}{gain}</span>
+            <span className="text-[10px] text-gray-500">
+              {gain > 0 ? '+' : ''}
+              {gain}
+            </span>
             <input
               type="range"
               min={-12}
@@ -74,5 +77,5 @@ export default function EqualizerPanel() {
         ))}
       </div>
     </div>
-  )
+  );
 }

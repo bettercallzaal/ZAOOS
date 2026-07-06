@@ -19,10 +19,7 @@ export interface OpenRankScore {
 }
 
 /** Fetch with a hard timeout so OpenRank latency never stalls the app. */
-async function fetchWithTimeout(
-  url: string,
-  init?: RequestInit
-): Promise<Response> {
+async function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -36,9 +33,7 @@ async function fetchWithTimeout(
  * Get global engagement scores for a list of FIDs.
  * Returns a Map<fid, score> for easy lookup.
  */
-export async function getEngagementScores(
-  fids: number[]
-): Promise<Map<number, number>> {
+export async function getEngagementScores(fids: number[]): Promise<Map<number, number>> {
   if (fids.length === 0) return new Map();
 
   try {
@@ -76,19 +71,16 @@ export async function getEngagementScores(
  */
 export async function getPersonalizedScores(
   fid: number,
-  targetFids: number[]
+  targetFids: number[],
 ): Promise<Map<number, number>> {
   if (targetFids.length === 0) return new Map();
 
   try {
-    const res = await fetchWithTimeout(
-      `${OPENRANK_BASE}/scores/personalized/${fid}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(targetFids),
-      }
-    );
+    const res = await fetchWithTimeout(`${OPENRANK_BASE}/scores/personalized/${fid}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(targetFids),
+    });
 
     if (!res.ok) {
       console.error(`OpenRank personalized scores failed: ${res.status}`);
@@ -118,7 +110,7 @@ export async function getPersonalizedScores(
  */
 export async function getChannelRankings(
   channelId: string,
-  limit: number = 25
+  limit: number = 25,
 ): Promise<OpenRankScore[]> {
   try {
     const url = `${OPENRANK_BASE}/channels/rankings/${channelId}?limit=${limit}`;

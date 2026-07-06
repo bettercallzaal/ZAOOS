@@ -11,13 +11,22 @@ export default async function RespectPage() {
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a]">
         <Link href="/home" className="text-gray-400 hover:text-white">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <h2 className="font-semibold text-sm text-gray-300">Fractal Respect</h2>
         <div className="flex-1" />
-        <Link href="/fractals" className="text-[10px] text-[#f5a623]/70 hover:text-[#f5a623] transition-colors">
+        <Link
+          href="/fractals"
+          className="text-[10px] text-[#f5a623]/70 hover:text-[#f5a623] transition-colors"
+        >
           Fractals Hub
         </Link>
       </header>

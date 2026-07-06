@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 
 interface CommentAuthor {
@@ -24,7 +24,6 @@ interface ProposalCommentsProps {
   currentFid: number;
 }
 
-
 export function ProposalComments({ proposalId, currentFid }: ProposalCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +39,9 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
     setLoading(false);
   }, [proposalId]);
 
-   
-  useEffect(() => { fetchComments(); }, [fetchComments]);
-   
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleSubmit = async () => {
     if (!text.trim() || sending) return;
@@ -57,7 +56,9 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
         setText('');
         await fetchComments();
       }
-    } catch (err) { console.error('[ProposalComments] send failed:', err); }
+    } catch (err) {
+      console.error('[ProposalComments] send failed:', err);
+    }
     setSending(false);
   };
 
@@ -87,16 +88,26 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
             <div key={c.id} className="flex gap-2">
               {c.author?.pfp_url ? (
                 <div className="w-6 h-6 relative flex-shrink-0">
-                  <Image src={c.author.pfp_url} alt="" fill className="rounded-full object-cover" unoptimized />
+                  <Image
+                    src={c.author.pfp_url}
+                    alt=""
+                    fill
+                    className="rounded-full object-cover"
+                    unoptimized
+                  />
                 </div>
               ) : (
                 <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  <span className="text-[8px] text-gray-400">{c.author?.display_name?.[0]?.toUpperCase()}</span>
+                  <span className="text-[8px] text-gray-400">
+                    {c.author?.display_name?.[0]?.toUpperCase()}
+                  </span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs font-medium text-white">{c.author?.display_name || c.author?.username}</span>
+                  <span className="text-xs font-medium text-white">
+                    {c.author?.display_name || c.author?.username}
+                  </span>
                   <span className="text-[10px] text-gray-600">{timeAgo(c.created_at)}</span>
                 </div>
                 <p className="text-xs text-gray-300 mt-0.5 break-words">{c.body}</p>
@@ -111,7 +122,12 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
           placeholder="Add a comment..."
           maxLength={2000}
           className="flex-1 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"

@@ -41,14 +41,34 @@ function markSeen(mode: 'stage' | 'voice_channel'): void {
 
 const STAGE_TOUR = [
   { icon: 'MIC', title: 'Listen first', body: 'Audio plays automatically. Reactions are silent.' },
-  { icon: 'HAND', title: 'Raise hand to speak', body: 'The host sees your queue position. They tap Invite to bring you up.' },
-  { icon: 'LEAVE', title: 'Leave anytime', body: 'Tapping Leave drops you out. The room keeps going.' },
+  {
+    icon: 'HAND',
+    title: 'Raise hand to speak',
+    body: 'The host sees your queue position. They tap Invite to bring you up.',
+  },
+  {
+    icon: 'LEAVE',
+    title: 'Leave anytime',
+    body: 'Tapping Leave drops you out. The room keeps going.',
+  },
 ];
 
 const VIDEO_TOUR = [
-  { icon: 'CAM', title: 'Mic, camera, screen', body: 'All three are open to everyone. The lobby let you choose defaults.' },
-  { icon: 'SHARE', title: 'Share the link', body: 'When you are alone, an invite card appears - copy, cast, or QR.' },
-  { icon: 'LEAVE', title: 'Host ends the room', body: 'A confirm dialog protects against fat-thumb End. Leaving alone is safe.' },
+  {
+    icon: 'CAM',
+    title: 'Mic, camera, screen',
+    body: 'All three are open to everyone. The lobby let you choose defaults.',
+  },
+  {
+    icon: 'SHARE',
+    title: 'Share the link',
+    body: 'When you are alone, an invite card appears - copy, cast, or QR.',
+  },
+  {
+    icon: 'LEAVE',
+    title: 'Host ends the room',
+    body: 'A confirm dialog protects against fat-thumb End. Leaving alone is safe.',
+  },
 ];
 
 /**

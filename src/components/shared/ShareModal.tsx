@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
 
 interface ShareModalProps {
   url: string;
@@ -59,10 +59,16 @@ export function ShareModal({ url, title, description, isOpen, onClose }: ShareMo
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div role="dialog" aria-modal="true" className="bg-[#1a2a4a] rounded-t-xl sm:rounded-xl p-5 w-full sm:max-w-sm border border-white/10">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="bg-[#1a2a4a] rounded-t-xl sm:rounded-xl p-5 w-full sm:max-w-sm border border-white/10"
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white">Share</h2>
-          <button onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-white">✕</button>
+          <button onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-white">
+            ✕
+          </button>
         </div>
 
         {/* Native share — mobile primary */}

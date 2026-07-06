@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
@@ -40,12 +40,16 @@ export async function POST(req: NextRequest) {
           const hmac = crypto.createHmac('sha256', key);
           hmac.update(rawBody, 'utf8');
           const expectedSig = hmac.digest('hex');
-          if (signature.length === expectedSig.length &&
-              crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+          if (
+            signature.length === expectedSig.length &&
+            crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))
+          ) {
             valid = true;
             break;
           }
-        } catch { /* try next key */ }
+        } catch {
+          /* try next key */
+        }
       }
 
       if (!valid) {
@@ -90,15 +94,18 @@ export async function POST(req: NextRequest) {
           ? parseInt(activity.blockNum, 16)
           : null;
 
-      await supabaseAdmin.from('respect_transfers').upsert({
-        tx_hash: txHash,
-        from_address: fromAddress,
-        to_address: toAddress,
-        token_type: tokenType,
-        amount,
-        block_number: blockNumber,
-        block_timestamp: payload?.createdAt || new Date().toISOString(),
-      }, { onConflict: 'tx_hash,to_address,token_type' });
+      await supabaseAdmin.from('respect_transfers').upsert(
+        {
+          tx_hash: txHash,
+          from_address: fromAddress,
+          to_address: toAddress,
+          token_type: tokenType,
+          amount,
+          block_number: blockNumber,
+          block_timestamp: payload?.createdAt || new Date().toISOString(),
+        },
+        { onConflict: 'tx_hash,to_address,token_type' },
+      );
 
       // Update respect_members on-chain balance for the recipient
       const { data: member } = await supabaseAdmin
@@ -112,15 +119,19 @@ export async function POST(req: NextRequest) {
         if (isMint) {
           const mintAmount = Number(amount) || 0;
           if (tokenType === 'zor_erc1155') {
-            await supabaseAdmin.from('respect_members')
+            await supabaseAdmin
+              .from('respect_members')
               .update({ onchain_zor: (Number(member.onchain_zor) || 0) + mintAmount })
               .eq('id', member.id);
           } else {
-            await supabaseAdmin.from('respect_members')
+            await supabaseAdmin
+              .from('respect_members')
               .update({ onchain_og: (Number(member.onchain_og) || 0) + mintAmount })
               .eq('id', member.id);
           }
-          logger.info(`[alchemy-webhook] ${tokenType} mint: +${mintAmount} to ${toAddress.slice(0, 10)}...`);
+          logger.info(
+            `[alchemy-webhook] ${tokenType} mint: +${mintAmount} to ${toAddress.slice(0, 10)}...`,
+          );
         }
       }
 

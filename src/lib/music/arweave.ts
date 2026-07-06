@@ -19,20 +19,20 @@ const UDL_LICENSE_TX = 'yRj4a5KMctX_uOmKWCFJIjmY8DeJcusVk6-HzLiM_t8';
 export const LICENSE_PRESETS = {
   community: {
     'Commercial-Use': 'Allowed-With-Credit',
-    'Derivation': 'Allowed-With-Credit',
+    Derivation: 'Allowed-With-Credit',
   },
   collectible: {
     'Commercial-Use': 'Allowed-With-Credit',
-    'Derivation': 'Allowed-With-RevenueShare-25%',
+    Derivation: 'Allowed-With-RevenueShare-25%',
   },
   premium: {
     'Commercial-Use': 'Disallowed',
-    'Derivation': 'Disallowed',
+    Derivation: 'Disallowed',
     'Access-Fee': 'One-Time-0.001',
   },
   open: {
     'Commercial-Use': 'Allowed',
-    'Derivation': 'Allowed',
+    Derivation: 'Allowed',
   },
 } as const;
 
@@ -61,7 +61,7 @@ export interface UploadResult {
 export async function uploadToArweave(
   buffer: Buffer,
   contentType: string,
-  tags: { name: string; value: string }[]
+  tags: { name: string; value: string }[],
 ): Promise<UploadResult> {
   const turbo = getTurboClient();
 
@@ -69,10 +69,7 @@ export async function uploadToArweave(
     fileStreamFactory: () => Readable.from(buffer),
     fileSizeFactory: () => buffer.length,
     dataItemOpts: {
-      tags: [
-        { name: 'Content-Type', value: contentType },
-        ...tags,
-      ],
+      tags: [{ name: 'Content-Type', value: contentType }, ...tags],
     },
   });
 

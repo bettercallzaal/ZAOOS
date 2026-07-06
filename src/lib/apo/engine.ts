@@ -1,11 +1,5 @@
 import { callMinimax } from './minimax';
-import type {
-  PromptConfig,
-  TestCase,
-  TestScore,
-  RoundResult,
-  APOResult,
-} from './types';
+import type { APOResult, PromptConfig, RoundResult, TestCase, TestScore } from './types';
 
 /**
  * Parse a grading response from the LLM into {score, feedback}.
@@ -75,10 +69,7 @@ async function evaluate(
  * Build a critique of the prompt based on test results.
  * Uses failures (<0.7) if any exist, otherwise uses all test cases.
  */
-async function critiquePrompt(
-  prompt: string,
-  testScores: TestScore[],
-): Promise<string> {
+async function critiquePrompt(prompt: string, testScores: TestScore[]): Promise<string> {
   const failures = testScores.filter((ts) => ts.score < 0.7);
   const casesToReview = failures.length > 0 ? failures : testScores;
 
@@ -101,10 +92,7 @@ async function critiquePrompt(
 /**
  * Rewrite the prompt based on critique feedback.
  */
-async function rewritePrompt(
-  currentPrompt: string,
-  critique: string,
-): Promise<string> {
+async function rewritePrompt(currentPrompt: string, critique: string): Promise<string> {
   const systemPrompt =
     'You are a prompt engineering expert. Rewrite the given prompt to address the identified issues. Return ONLY the rewritten prompt text — no explanation, no commentary, no labels. Keep the same role and purpose.';
 
@@ -137,8 +125,7 @@ export async function runAPO(config: PromptConfig): Promise<APOResult> {
 
     // Step 1 — Evaluate
     const testScores = await evaluate(currentPrompt, testCases, gradingPrompt);
-    const avgScore =
-      testScores.reduce((sum, ts) => sum + ts.score, 0) / testScores.length;
+    const avgScore = testScores.reduce((sum, ts) => sum + ts.score, 0) / testScores.length;
 
     // Track baseline from round 1
     if (round === 1) {
@@ -187,10 +174,7 @@ export async function runAPO(config: PromptConfig): Promise<APOResult> {
     }
   }
 
-  const improvement =
-    baselineScore > 0
-      ? ((bestScore - baselineScore) / baselineScore) * 100
-      : 0;
+  const improvement = baselineScore > 0 ? ((bestScore - baselineScore) / baselineScore) * 100 : 0;
 
   return {
     promptName: name,

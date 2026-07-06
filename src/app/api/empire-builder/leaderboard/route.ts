@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import {
-  discoverLeaderboards,
-  getLeaderboard,
-} from '@/lib/empire-builder/client';
 import { DEFAULT_TTL_MS, withCache } from '@/lib/empire-builder/cache';
+import { discoverLeaderboards, getLeaderboard } from '@/lib/empire-builder/client';
 import { ZABAL_TOKEN_ADDRESS } from '@/lib/empire-builder/config';
 
 export const dynamic = 'force-dynamic';
@@ -29,30 +26,32 @@ export async function GET(req: Request) {
     }
 
     const tokenAddress = parsed.data.tokenAddress ?? ZABAL_TOKEN_ADDRESS;
-    const slots = await withCache(
-      `eb:slots:${tokenAddress}`,
-      DEFAULT_TTL_MS * 5,
-      () => discoverLeaderboards(tokenAddress),
+    const slots = await withCache(`eb:slots:${tokenAddress}`, DEFAULT_TTL_MS * 5, () =>
+      discoverLeaderboards(tokenAddress),
     );
     if (slots.length === 0) {
       return NextResponse.json({ success: true, data: { slots: [], leaderboard: null } });
     }
 
     const slotIndex = parsed.data.slot ? Number(parsed.data.slot) : 0;
-    const slot = Number.isFinite(slotIndex) && slotIndex >= 0 && slotIndex < slots.length
-      ? slots[slotIndex]
-      : slots[0];
+    const slot =
+      Number.isFinite(slotIndex) && slotIndex >= 0 && slotIndex < slots.length
+        ? slots[slotIndex]
+        : slots[0];
 
-    const leaderboard = await withCache(
-      `eb:leaderboard:${slot.id}`,
-      DEFAULT_TTL_MS,
-      () => getLeaderboard(slot.id),
+    const leaderboard = await withCache(`eb:leaderboard:${slot.id}`, DEFAULT_TTL_MS, () =>
+      getLeaderboard(slot.id),
     );
 
     return NextResponse.json({
       success: true,
       data: {
-        slots: slots.map((s, i) => ({ index: i, id: s.id, name: s.name, type: s.leaderboard_type })),
+        slots: slots.map((s, i) => ({
+          index: i,
+          id: s.id,
+          name: s.name,
+          type: s.leaderboard_type,
+        })),
         active: { index: slots.findIndex((s) => s.id === slot.id), id: slot.id },
         leaderboard,
       },

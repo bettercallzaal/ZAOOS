@@ -41,10 +41,7 @@ export default function ExportButton() {
       {open && (
         <>
           {/* Backdrop to close on click outside */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
           <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-white/[0.08] bg-[#0d1b2a] py-1 shadow-xl">
             <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">

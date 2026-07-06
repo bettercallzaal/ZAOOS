@@ -30,7 +30,7 @@ export async function startSession(
   fid: number,
   roomId: string,
   roomName: string,
-  roomType: 'voice_channel' | 'stage'
+  roomType: 'voice_channel' | 'stage',
 ): Promise<string> {
   await endSessionByFid(fid, roomId);
 
@@ -72,7 +72,7 @@ export async function endSessionByFid(fid: number, roomId: string): Promise<void
   const results = await Promise.allSettled(
     sessions.map((session) => {
       const durationSeconds = Math.floor(
-        (Date.now() - new Date(session.joined_at).getTime()) / 1000
+        (Date.now() - new Date(session.joined_at).getTime()) / 1000,
       );
       return supabaseAdmin
         .from('space_sessions')
@@ -81,7 +81,7 @@ export async function endSessionByFid(fid: number, roomId: string): Promise<void
         .then(({ error }) => {
           if (error) throw new Error(error.message);
         });
-    })
+    }),
   );
 
   const failed = results.find((r) => r.status === 'rejected');
@@ -111,13 +111,13 @@ export async function endRoomSessions(roomId: string): Promise<void> {
   await Promise.allSettled(
     sessions.map((session) => {
       const durationSeconds = Math.floor(
-        (Date.now() - new Date(session.joined_at).getTime()) / 1000
+        (Date.now() - new Date(session.joined_at).getTime()) / 1000,
       );
       return supabaseAdmin
         .from('space_sessions')
         .update({ left_at: leftAt, duration_seconds: durationSeconds })
         .eq('id', session.id);
-    })
+    }),
   );
 }
 
@@ -127,7 +127,7 @@ export async function endRoomSessions(roomId: string): Promise<void> {
  */
 export async function getLeaderboard(
   period: 'week' | 'month' | 'all' = 'all',
-  limit: number = 20
+  limit: number = 20,
 ): Promise<LeaderboardEntry[]> {
   let query = supabaseAdmin
     .from('space_sessions')
@@ -149,7 +149,10 @@ export async function getLeaderboard(
   if (!data || data.length === 0) return [];
 
   // Aggregate in JS since Supabase REST API doesn't support GROUP BY
-  const byFid = new Map<number, { totalSeconds: number; sessionCount: number; roomCounts: Map<string, number> }>();
+  const byFid = new Map<
+    number,
+    { totalSeconds: number; sessionCount: number; roomCounts: Map<string, number> }
+  >();
 
   for (const row of data) {
     const entry = byFid.get(row.fid) || { totalSeconds: 0, sessionCount: 0, roomCounts: new Map() };

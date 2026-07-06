@@ -17,27 +17,19 @@ export async function GET() {
     }
 
     if (!session.fid) {
-      return NextResponse.json(
-        { error: 'No Farcaster account linked' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No Farcaster account linked' }, { status: 400 });
     }
 
     const { data, error } = await supabaseAdmin
       .from('unfollow_events')
-      .select(
-        'id, unfollower_fid, unfollower_username, unfollower_display_name, detected_at'
-      )
+      .select('id, unfollower_fid, unfollower_username, unfollower_display_name, detected_at')
       .eq('member_fid', session.fid)
       .order('detected_at', { ascending: false })
       .limit(50);
 
     if (error) {
       logger.error('Unfollowers query error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch unfollowers' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch unfollowers' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -46,9 +38,6 @@ export async function GET() {
     });
   } catch (err) {
     logger.error('Unfollowers route error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

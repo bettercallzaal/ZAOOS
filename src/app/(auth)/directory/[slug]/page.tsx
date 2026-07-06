@@ -1,7 +1,11 @@
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const name = slug.replace(/-/g, ' ');
   return {
@@ -12,11 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 // Individual directory profiles now live at /members/[username]
 // Try to redirect by slug → username mapping
-export default async function DirectorySlugPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function DirectorySlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   redirect(`/members/${slug}`);
 }

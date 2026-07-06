@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface SafeAreaInsets {
   top: number;
@@ -31,7 +31,11 @@ interface MiniAppResult {
   sdkReady: boolean;
   sdkAvailable: boolean;
   context: MiniAppContext;
-  composeCast: (options: { text?: string; embeds?: string[]; channelKey?: string }) => Promise<boolean>;
+  composeCast: (options: {
+    text?: string;
+    embeds?: string[];
+    channelKey?: string;
+  }) => Promise<boolean>;
   hapticImpact: (style: HapticImpact) => Promise<void>;
   hapticNotification: (type: HapticNotification) => Promise<void>;
   hapticSelection: () => Promise<void>;
@@ -108,7 +112,11 @@ export function useMiniApp(): MiniAppResult {
   }, []);
 
   const composeCast = useCallback(
-    async (options: { text?: string; embeds?: string[]; channelKey?: string }): Promise<boolean> => {
+    async (options: {
+      text?: string;
+      embeds?: string[];
+      channelKey?: string;
+    }): Promise<boolean> => {
       if (!sdkRef.current || !isMiniApp || !sdkReady) return false;
       try {
         await sdkRef.current.actions.composeCast({
@@ -131,7 +139,9 @@ export function useMiniApp(): MiniAppResult {
       if (!capabilitiesRef.current.includes('haptics.impactOccurred')) return;
       try {
         await sdkRef.current.haptics.impactOccurred(style);
-      } catch { /* not supported */ }
+      } catch {
+        /* not supported */
+      }
     },
     [isMiniApp],
   );
@@ -142,7 +152,9 @@ export function useMiniApp(): MiniAppResult {
       if (!capabilitiesRef.current.includes('haptics.notificationOccurred')) return;
       try {
         await sdkRef.current.haptics.notificationOccurred(type);
-      } catch { /* not supported */ }
+      } catch {
+        /* not supported */
+      }
     },
     [isMiniApp],
   );
@@ -152,7 +164,9 @@ export function useMiniApp(): MiniAppResult {
     if (!capabilitiesRef.current.includes('haptics.selectionChanged')) return;
     try {
       await sdkRef.current.haptics.selectionChanged();
-    } catch { /* not supported */ }
+    } catch {
+      /* not supported */
+    }
   }, [isMiniApp]);
 
   const viewProfile = useCallback(
@@ -160,7 +174,9 @@ export function useMiniApp(): MiniAppResult {
       if (!sdkRef.current || !isMiniApp) return;
       try {
         await sdkRef.current.actions.viewProfile({ fid });
-      } catch { /* not supported */ }
+      } catch {
+        /* not supported */
+      }
     },
     [isMiniApp],
   );
@@ -170,7 +186,9 @@ export function useMiniApp(): MiniAppResult {
       if (!sdkRef.current || !isMiniApp) return;
       try {
         await sdkRef.current.actions.viewCast({ hash });
-      } catch { /* not supported */ }
+      } catch {
+        /* not supported */
+      }
     },
     [isMiniApp],
   );

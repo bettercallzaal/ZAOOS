@@ -14,10 +14,10 @@
  * close the unsigned-FID account-impersonation surface — needs a real
  * miniapp-launch test before flipping the client.
  */
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkAllowlist } from '@/lib/gates/allowlist';
 import { getUserByFid } from '@/lib/farcaster/neynar';
+import { checkAllowlist } from '@/lib/gates/allowlist';
 import { logger } from '@/lib/logger';
 
 const BodySchema = z.object({

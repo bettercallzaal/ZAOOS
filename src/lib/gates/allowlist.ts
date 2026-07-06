@@ -1,9 +1,9 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { AllowlistEntry } from '@/types';
+import type { AllowlistEntry } from '@/types';
 
 export async function checkAllowlist(
   fid?: number,
-  walletAddress?: string
+  walletAddress?: string,
 ): Promise<{ allowed: boolean; entry?: AllowlistEntry }> {
   if (!fid && !walletAddress) {
     return { allowed: false };

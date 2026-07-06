@@ -9,6 +9,7 @@
  * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
+import { recordCall } from './cost-ledger';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
@@ -161,6 +162,8 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     // a session.
     bare: false,
   });
+
+  recordCall('concierge', result);
 
   const { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps } = splitReplyAndOps(result.text);
 

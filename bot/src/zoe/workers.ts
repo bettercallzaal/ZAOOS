@@ -20,6 +20,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { callClaudeCli, CliAuthError, CliError } from '../hermes/claude-cli';
+import { recordCall } from './cost-ledger';
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
 import type { Subtask, WorkerKind } from './decompose';
@@ -336,8 +337,8 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     };
   }
 
-  const call = async (criticFeedback?: string, budgetUsd: number = cfg.maxBudgetUsd) =>
-    callClaudeCli({
+  const call = async (criticFeedback?: string, budgetUsd: number = cfg.maxBudgetUsd) => {
+    const r = await callClaudeCli({
       model: cfg.model,
       prompt: buildWorkerPrompt(args, criticFeedback),
       cwd: args.context.workspace_dir,
@@ -349,6 +350,9 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       maxBudgetUsd: budgetUsd,
       bare: false,
     });
+    recordCall('worker:' + worker, r);
+    return r;
+  };
 
   try {
     const first = await call();

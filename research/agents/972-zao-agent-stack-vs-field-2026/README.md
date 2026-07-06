@@ -17,6 +17,14 @@ tier: DISPATCH
 
 Two parallel research agents ran (July 2026): one on the web3/Farcaster agent landscape, one on dev/personal agent-tooling SOTA. The **patterns** below are corroborated across sources. Specific vendor market stats the agents reported (daily volumes, GitHub-star counts, "$Xb market cap", "1B agents by EOY") are **agent-reported and NOT independently verified** - they are directionally indicative only and are deliberately kept out of the load-bearing claims. Verify before quoting any figure externally.
 
+## Correction (verified in ZOE code, 2026-07-05)
+
+After this doc was drafted from the two research agents (no code access), the actual ZOE code was read. **Two of the three "top-3" already exist and are NOT gaps:**
+- **Multi-model routing EXISTS** - `concierge.ts` uses `selectModel()` routing haiku (quick) / sonnet (default) / opus (hard). Default is **sonnet**, so ZOE is already cost-conscious. The "~91% Opus" figure was THIS terminal's Claude Code usage, not ZOE's.
+- **Self-improvement EXISTS** - `reflexion.ts` is scheduled (evening reflection -> memory patches).
+
+The one **real** gap was cost/token observability (`call-budget` counted calls, not spend). **Shipped in PR #1097** (`cost-ledger`). The remaining items (shared cross-surface state, evals, omnichain, agent-token economics) stand.
+
 ## Verdict
 
 ZAO's agent **architecture** is top-decile - ahead of nearly every solo builder. The gaps are not architectural; they are **operational** (observability, cost control, self-improvement) plus a few deliberate **strategic forks** (agent-token economics, omnichain) that collide with ZAO's stated ethos and are Zaal's call, not defaults.

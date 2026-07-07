@@ -9,7 +9,7 @@ original-query: "Synthesize everything about the ZAO Fractal into the Discord bo
 tier: STANDARD
 ---
 
-# 978 - ZAO Fractal x Discord Bot: Full Synthesis
+# 981 - ZAO Fractal x Discord Bot: Full Synthesis
 
 > **Goal:** One document that a future engineer opens instead of six bot repos and twenty research docs. Covers what the Fractal is, how the weekly game is supposed to run, how `fractalbotapril2026` (the live bot, cloned 2026-07-06) actually implements it, where the two diverge, and what to build next. Every number is grounded in [Doc 975](../975-zao-respect-live-numbers/) / [Doc 977](../977-fix-fractals-documentation/) - do not reuse older modeled figures from 718c/696/705.
 

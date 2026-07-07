@@ -22,6 +22,10 @@ export interface TeamTask {
   due: string | null;
   project: string | null;
   legacy_id: string | null;
+  // Doc 983: metadata jsonb carries next_owner (me/agent/review/blocked) for the
+  // judgment-routing focus line in the morning brief. Optional - null when the
+  // row predates the auto-tagger.
+  metadata?: Record<string, unknown> | null;
 }
 
 const MAX_TASKS = 30;
@@ -42,7 +46,7 @@ export async function getOpenTeamTasks(): Promise<TeamTask[]> {
   const url =
     `${base.replace(/\/$/, '')}/rest/v1/tasks` +
     `?status=neq.done&archived_at=is.null` +
-    `&select=title,status,priority,due,project,legacy_id` +
+    `&select=title,status,priority,due,project,legacy_id,metadata` +
     `&order=due.asc.nullslast&limit=${MAX_TASKS}`;
 
   try {
@@ -182,4 +186,23 @@ export function summarizeTeamForBrief(tasks: TeamTask[]): string | null {
     .map((t) => t.title)
     .join('; ');
   return `${tasks.length} open${overdue ? `, ${overdue} overdue` : ''}${top ? `. Top: ${top}` : ''}`;
+}
+
+/**
+ * Doc 983: the judgment-routing focus for the morning brief - the top 3 tasks by
+ * DEADLINE (not priority) plus a count of items whose next move belongs to Zaal
+ * (metadata.next_owner === 'me'). This answers "what needs me next" rather than
+ * "what is the whole board". Pure; returns null when there is nothing dated.
+ */
+export function zaalFocusForBrief(tasks: TeamTask[]): string | null {
+  const dated = tasks
+    .filter((t) => typeof t.due === 'string' && /^\d{4}-\d{2}-\d{2}/.test(t.due))
+    .sort((a, b) => String(a.due).localeCompare(String(b.due)));
+  const top3 = dated.slice(0, 3).map((t) => `${t.title} (due ${String(t.due).slice(0, 10)})`);
+  const needsMe = tasks.filter((t) => (t.metadata?.next_owner ?? '') === 'me').length;
+  if (top3.length === 0 && needsMe === 0) return null;
+  const parts: string[] = [];
+  if (top3.length) parts.push(`TOP 3 BY DEADLINE: ${top3.join(' | ')}`);
+  if (needsMe) parts.push(`${needsMe} task${needsMe === 1 ? '' : 's'} waiting on your call`);
+  return parts.join('. ');
 }

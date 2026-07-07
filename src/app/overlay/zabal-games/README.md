@@ -15,7 +15,7 @@ brand-generic on purpose.
 
 ## URL
 
-Base: `https://www.thezao.xyz/overlay/zabal-games`
+Base: `https://zaoos.com/overlay/zabal-games`
 
 | Param | Values | Default | Notes |
 |-------|--------|---------|-------|

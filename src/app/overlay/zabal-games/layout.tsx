@@ -14,6 +14,9 @@ export const metadata: Metadata = {
 export default function ZabalGamesOverlayLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ background: 'transparent', minHeight: '100vh', overflow: 'hidden' }}>
+      {/* Force the app's global navy body/html to transparent so this route is a
+          true transparent browser source (in-browser too, not only via OBS custom CSS). */}
+      <style>{'html,body{background:transparent !important;}'}</style>
       {children}
     </div>
   );

@@ -15,6 +15,8 @@
  * Read-only for now; a write path (ZOE assigns team tasks) is a follow-up.
  */
 
+import { classifyTask, applyClassification, planReconciliation, type TrackerRow } from './task-classifier';
+
 export interface TeamTask {
   title: string;
   status: string;
@@ -86,12 +88,56 @@ export function buildTeamTaskRow(t: NewTeamTask): Record<string, unknown> {
     legacy_source: 'zoe-bot',
   };
   if (t.priority) row.priority = t.priority;
-  return row;
+  // Doc 983 Rec #4: auto-tag on the write-path so every ZOE-created task lands
+  // pre-classified (brand / category / themes / next_owner) instead of naked.
+  const c = classifyTask({ title: t.title });
+  return applyClassification(row, c, new Date().toISOString().slice(0, 10));
 }
 
 export interface AddTeamTaskResult {
   ok: boolean;
   error?: string;
+}
+
+export interface ReconcileResult {
+  ok: boolean;
+  scanned: number;
+  tagged: number;
+  error?: string;
+}
+
+/**
+ * Doc 983 Rec #4 backfill: find open tasks that were created without tags (any
+ * writer other than the ZOE write-path) and classify them in place. Best-effort;
+ * never throws. Catches board quick-adds, meeting captures, external-api rows.
+ */
+export async function reconcileUntaggedTasks(limit = 100): Promise<ReconcileResult> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key) return { ok: false, scanned: 0, tagged: 0, error: 'team tracker not configured' };
+  const root = base.replace(/\/$/, '');
+  const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+  try {
+    const getUrl =
+      `${root}/rest/v1/tasks?status=neq.done&archived_at=is.null` +
+      `&select=id,title,notes,status,brands,category,metadata&limit=${limit}`;
+    const res = await fetch(getUrl, { headers, cache: 'no-store' });
+    if (!res.ok) return { ok: false, scanned: 0, tagged: 0, error: `read ${res.status}` };
+    const rows = (await res.json()) as TrackerRow[];
+    const patches = planReconciliation(rows, new Date().toISOString().slice(0, 10));
+    let tagged = 0;
+    for (const p of patches) {
+      const patchRes = await fetch(`${root}/rest/v1/tasks?id=eq.${p.id}`, {
+        method: 'PATCH',
+        headers: { ...headers, Prefer: 'return=minimal' },
+        body: JSON.stringify(p.patch),
+      });
+      if (patchRes.ok) tagged += 1;
+    }
+    return { ok: true, scanned: rows.length, tagged };
+  } catch (e) {
+    return { ok: false, scanned: 0, tagged: 0, error: e instanceof Error ? e.message : 'reconcile failed' };
+  }
 }
 
 /**

@@ -18,7 +18,7 @@ import { SceneCard } from './SceneCard';
  *   style    lower-third (default) | banner | scene
  *   title    main text                          (default "ZABAL GAMES")
  *   subtitle secondary line / topic             (default "")
- *   live     1|true shows a pulsing LIVE badge  (default on for lower-third/banner)
+ *   live     1|true shows a steady on-air dot     (default OFF - a stream is already live)
  *   theme    dark (default) | light
  *   accent   hex WITHOUT the # (default f5a623) — brand accent for badges/rules
  *   logo     image URL for a logo mark          (default: text wordmark)
@@ -58,7 +58,7 @@ function parseConfig(params: URLSearchParams): OverlayConfig {
   return {
     title: params.get('title') || 'ZABAL GAMES',
     subtitle: params.get('subtitle') || '',
-    live: truthy(params.get('live'), true),
+    live: truthy(params.get('live'), false),
     theme,
     accent,
     logo: params.get('logo') || '',

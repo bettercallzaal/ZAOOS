@@ -32,6 +32,7 @@ import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
+import { reconcileUntaggedTasks } from './team-tracker';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -159,6 +160,18 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await flushEmitQueue();
         } catch (err) {
           console.warn('[zoe/scheduler] emit-queue flush failed (nbd):', (err as Error).message);
+        }
+
+        // Doc 983 Rec #4: hourly backfill of any task created untagged by a
+        // writer other than ZOE's write-path (board quick-add, meeting capture).
+        // Best-effort - a no-op when the tracker is unconfigured.
+        try {
+          const r = await reconcileUntaggedTasks();
+          if (r.ok && r.tagged > 0) {
+            console.log(`[zoe/scheduler] auto-tag reconcile: tagged ${r.tagged}/${r.scanned}`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] auto-tag reconcile failed (nbd):', (err as Error).message);
         }
 
         // Build the task-queue nudge as a gate candidate (folded in). Only when

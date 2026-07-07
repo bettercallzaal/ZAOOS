@@ -17,7 +17,7 @@
  */
 import { callClaudeCli } from '../hermes/claude-cli';
 import { listOpenTasks } from './tasks';
-import { getOpenTeamTasks, summarizeTeamForBrief } from './team-tracker';
+import { getOpenTeamTasks, summarizeTeamForBrief, zaalFocusForBrief } from './team-tracker';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -36,6 +36,9 @@ LAST 24H COMMITS
 
 OPEN PRS
 - List of open PRs by number + title.
+
+FOCUS
+- Lead with this. The top 3 tasks by deadline and how many need Zaal's call. This is the "what needs me today" answer. Skip entirely if focus is (none dated).
 
 TEAM
 - One line: the team board summary (open count, overdue, top items). Skip this section entirely if team is unavailable.
@@ -56,6 +59,7 @@ interface BriefContext {
   open_prs: Array<{ number: number; title: string }>;
   inbox: { unreadCount: number; recentSubjects: string[] } | null;
   team: string | null;
+  focus: string | null;
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -166,11 +170,17 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
   const inbox = await fetchInboxSnapshot();
 
   // Team board state (cowork tracker). Best-effort; null if unconfigured/unreachable.
+  // Doc 983: also compute the judgment-routing focus (top-3 by deadline + how many
+  // tasks are waiting on Zaal's call) from the same fetch.
   let team: string | null = null;
+  let focus: string | null = null;
   try {
-    team = summarizeTeamForBrief(await getOpenTeamTasks());
+    const teamTasks = await getOpenTeamTasks();
+    team = summarizeTeamForBrief(teamTasks);
+    focus = zaalFocusForBrief(teamTasks);
   } catch {
     team = null;
+    focus = null;
   }
 
   return {
@@ -181,6 +191,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     open_prs: prs,
     inbox,
     team,
+    focus,
   };
 }
 
@@ -202,6 +213,7 @@ CONTEXT:
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}
 - Team board: ${ctx.team ?? '(tracker unavailable - skip the TEAM section)'}
+- Focus (top-3 by deadline + what needs your call): ${ctx.focus ?? '(none dated)'}
 - ${inboxLine}
 
 Output the brief now in the exact format from your system prompt.`;

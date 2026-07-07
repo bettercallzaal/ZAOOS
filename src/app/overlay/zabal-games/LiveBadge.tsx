@@ -5,7 +5,7 @@ interface Props {
   scale: number;
 }
 
-/** Pulsing LIVE pill. Pauses animation under prefers-reduced-motion (see brand KEYFRAMES). */
+/** Steady on-air pill - a lit dot, no blink. A stream is always live, so this reads as ambient, not a toggled status. */
 export function LiveBadge({ accent, scale }: Props) {
   return (
     <span
@@ -25,13 +25,11 @@ export function LiveBadge({ accent, scale }: Props) {
       }}
     >
       <span
-        className="zg-animated"
         style={{
           width: 8 * scale,
           height: 8 * scale,
           borderRadius: 999,
           background: '#0a1628',
-          animation: 'zg-pulse 1.4s ease-in-out infinite',
         }}
       />
       Live

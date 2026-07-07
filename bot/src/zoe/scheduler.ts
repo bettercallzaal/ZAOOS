@@ -32,6 +32,7 @@ import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
+import { checkAndResend, readLastUserReplyAt } from './escalation';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -94,6 +95,28 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Doc 989 (backlog #2): escalation resend. Every 30 min, re-ping any
+  // super-important message Zaal hasn't acknowledged past the window. Standalone
+  // so it stays independent of the reasoning tick. Defensive - never spams.
+  tasks.push(
+    cron.schedule(
+      '*/30 * * * *',
+      async () => {
+        try {
+          const lastReply = await readLastUserReplyAt(opts.zaalTgId);
+          const n = await checkAndResend(
+            (chatId, text) => opts.bot.api.sendMessage(chatId, text).then(() => undefined),
+            lastReply,
+          );
+          if (n > 0) console.log(`[zoe/scheduler] escalated ${n} unacked critical ping(s)`);
+        } catch (err) {
+          console.warn('[zoe/scheduler] escalation check failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

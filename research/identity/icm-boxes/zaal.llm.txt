@@ -4,7 +4,7 @@ Identifier: zaal (aka bettercallzaal)
 Role: Founder of The ZAO. Builder, connector, and operator across web3, music, and community.
 
 ## Who
-Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO, a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds in public.
+Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO (ZAO = ZTalent Artist Organization), a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds in public.
 
 ## What he runs
 - The ZAO - the impact network (music first, community second, technology third)

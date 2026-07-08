@@ -16,8 +16,9 @@ useicm.com to mint each box. Cousin of our GEO / llms.txt work (own the AI answe
 | `wavewarz.llm.txt` | wavewarz | WaveWarZ live-traded music battles |
 
 ## Rules for these boxes
-- Use the canonical ZAO framing (decentralized impact network returning profit/data/IP to
-  artists). Do NOT use the stale "ZTalent Artist Organization" wording.
+- ZAO = ZTalent Artist Organization (the acronym / etymology). Describe what it IS as a
+  decentralized impact network returning profit/data/IP to artists. Use both correctly;
+  do NOT describe it as merely "a music community."
 - Facts only - no invented numbers or dates. On-chain Respect figures verified 2026-07-05.
 - Keep each box tight and composable; link related boxes at the bottom.
 

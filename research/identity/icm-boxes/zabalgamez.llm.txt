@@ -1,21 +1,29 @@
 # ICM: ZABAL Games (ZABAL Gamez)
 
-ZABAL Games is The ZAO's 3-month build-a-thon. Free to join, anyone welcome, three tracks: artist, builder, creator. The real audience is the 100+ member ZAO community - build for a real community, not a weekend you forget.
+ZABAL Games is The ZAO's 3-month build-a-thon. Free to join, anyone welcome. It is a Farcaster-native onboarding event: ship something real in public, with a ZAO mentor in your corner, and earn Respect plus an on-chain credential. Build for a real 100+ member community, not a weekend you forget.
 
-## The arc
-- June: workshops
-- July: open-build month (goal: 200 distinct builders, multiple submissions each)
-- August: Finals, with WaveWarZ-Base integration and on-chain settlement
+## Three tracks
+- Artist - musical / visual builds
+- Builder - developer / aspiring-coder builds
+- Creator - media / distribution / content builds
+
+## The arc (2026)
+- June: recorded workshops (ZAO teachers + ecosystem partners on governance, Respect, tools like Claude Code, Empire Builder, POIDH, Juke, SongJam). Watchable live or async at zabalgamez.com/recordings.
+- July: open build month. Goal set by Zaal (2026-07-04): 200 distinct builders, multiple submissions each. Ship a live URL + open-source repo + short demo + a cast to /zabal. Every build that clears the bar earns Respect. Partial and WIP drafts count.
+- August: Finals. Mentor-and-builder pairs lock; a 24h build + promote + Respect-weighted vote + live reveal stream. Finalists paid in USDC (tiered).
 
 ## How it works
-- Submit in any format. Partial and work-in-progress drafts count.
-- Submissions land on the board at zabalgamez.com/submissions.
-- August mentors pair with open-submission builders and share evaluation criteria.
-- A generic stream overlay is available for workshop and Finals streams: zaoos.com/overlay/zabal-games (Restream or OBS browser source).
+- Entry: register on the site (/enter) with a wallet + GitHub repo; signups + collectibles run through Magnetiq (app.magnetiq.xyz).
+- Mentors: open roster (not a fixed panel) - each mentor defines the builder archetype they want and pairs with an open-submission builder; they get a Hats Protocol "ZAO Mentor" role.
+- Submissions: a public GitHub-backed board; Bonfire (knowledge graph) is the system of record.
+- Empire Builder + Clanker are optional tools (leaderboards, token launch), not requirements.
+- What you walk away with: a live artifact + open repo; Respect for July finishers; a Hats Protocol collectible NFT on Base as a universal "I shipped at ZABAL Games" credential.
 
 ## Find it
-- zabalgamez.com
-- Farcaster: the /zabal channel; tag posts with "zabal gamez"
+- Site: zabalgamez.com (with a Z; old zabalgames.com redirects here)
+- Signup + collectibles: app.magnetiq.xyz (ZABAL brand)
+- Farcaster: the /zabal channel; tag posts "zabal gamez"
+- Stream overlay for workshops/finals: zaoos.com/overlay/zabal-games
 
 ## Related boxes
 - The ZAO (thezao)

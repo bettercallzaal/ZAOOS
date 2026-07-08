@@ -1,20 +1,38 @@
 # ICM: WaveWarZ
 
-WaveWarZ is live-traded music battles: artists battle, fans trade and earn. Part of The ZAO ecosystem.
+WaveWarZ is live-traded music battles: two artists battle, fans trade predictions on the outcome and earn in real time. Part of The ZAO ecosystem.
 
 ## What it is
-- A prediction-market-style music battle platform on Solana (mainnet), with a Base testnet and a Base-to-Solana bridge (via Mayan and Wormhole).
-- Quick battles run on weekdays; main events run on Sundays.
-- Artists compete; fans trade positions on the outcome and earn.
+- A prediction-market-style music battle platform on Solana mainnet, with a Base testnet (Base Sepolia, live Feb 2026) and a Base-to-Solana bridge so Base users can join.
+- Two artists go head-to-head; fans buy into the outcome on a bonding curve.
+- Settlement: a 2-of-3 judging system (human judge + X poll + on-chain SOL vote). Quick battles use poll + charts + an AI judge.
+- Artists earn ~1% per trade, paid instantly; the platform keeps a small fee and most value stays in the ecosystem.
 
-## In the ZAO ecosystem
-- One of the ZAO production lanes alongside ZABAL Games and the festivals.
-- August ZABAL Games Finals integrate WaveWarZ-Base for on-chain settlement.
+## Cadence
+- Main events: artist vs artist, multi-round, streamed (X Spaces + YouTube + Retake).
+- Quick battles: song vs song, weekdays (Mon-Fri ~8:30pm EST); special events + tournaments on Sundays.
+
+## Team
+- Hurric4n3ike - founder / dev / MC
+- Candytoybox (Samantha) - design / marketing / CC0 art
+- Zaal (BetterCallZaal) - ecosystem strategy + partnerships
+
+## Role in The ZAO
+- WaveWarZ is the always-on "front door / gravity well" for fans and players: outsiders (often founders with their own ecosystems) come to The ZAO and discover WaveWarZ. It is a top-of-funnel magnet, not a deal-closer or rails product.
+- ZABAL Games is the parallel front door for builders; both feed the ZAO community.
+- Distribution partners include Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM/SongChain, and Privy.
+
+## Traction (as of May 2026, snapshot)
+- ~980 battles run; ~458 SOL cumulative volume; artist payouts flowing. Figures are a point-in-time snapshot - verify current numbers on the dashboards.
+
+## In design: the 24h protocol
+An always-on model: a ~23-hour entry queue plus a short live settlement each cycle, enterable by a person or an AI agent (via x402 on Base). Not yet live.
 
 ## Find it
-- wavewarz.com
+- wavewarz.com; intelligence + analytics dashboards linked from there
 - X: @WaveWarZ
 - Farcaster: the /wavewarz channel
+- Embedded in ZAO OS at /wavewarz
 
 ## Related boxes
 - The ZAO (thezao)

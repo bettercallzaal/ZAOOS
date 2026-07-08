@@ -1,0 +1,29 @@
+# ICM: The ZAO
+
+ZAO stands for ZTalent Artist Organization. The ZAO is a decentralized impact network focused on bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Founded by Zaal Panthaki (BetterCallZaal). Priority stack: music first, community second, technology third.
+
+Name note: the acronym ZAO = ZTalent Artist Organization; the descriptor for what it is today is a decentralized impact network. Both are correct - use the acronym for etymology, the impact-network framing for what it does.
+
+## What it is
+Not a record label or a "music community" - an impact network whose first artist domain is music. It returns three things to artists: profit margin, data, and IP rights. Technology is the means, not the headline.
+
+## Governance - the Fractal and Respect
+- Respect is the on-chain contribution currency: a soulbound OG ERC-20 plus a ZOR ERC-1155, on Optimism.
+- A weekly Respect Game ranks contributions; OREC optimistic execution settles outcomes; a Fibonacci curve shapes rewards.
+- Verified on-chain (2026-07-05): 156 Respect holders, OG Gini roughly 0.73.
+
+## Production lanes
+- WaveWarZ - live-traded music battles
+- ZABAL Games - the 3-month build-a-thon
+- The ZAO festivals - ZAOstock, ZAOville, ZAO-PALOOZA, ZAO-CHELLA
+- ZAO OS - the lab and monorepo where new ZAO things get prototyped before they graduate
+
+## Find it
+- thezao.xyz and zaoos.com
+- Papers: thezao.xyz/papers (whitepaper, technical whitepaper, manifesto)
+- Farcaster: the /zao and /zabal channels
+
+## Related boxes
+- Zaal (zaal)
+- ZABAL Games (zabalgamez)
+- WaveWarZ (wavewarz)

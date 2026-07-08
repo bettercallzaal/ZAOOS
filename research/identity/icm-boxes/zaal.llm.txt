@@ -1,26 +1,30 @@
 # ICM: Zaal Panthaki (BetterCallZaal)
 
 Identifier: zaal (aka bettercallzaal)
-Role: Founder of The ZAO. Builder, connector, and operator across web3, music, and community.
+Role: Founder of The ZAO. Builder, connector, and ecosystem operator across web3, music, and community.
 
 ## Who
-Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO (ZAO = ZTalent Artist Organization), a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds in public.
+Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO (ZAO = ZTalent Artist Organization), a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds relentlessly in public.
 
-## What he runs
-- The ZAO - the impact network (music first, community second, technology third)
-- BetterCallZaal Strategies LLC - his operating and consulting entity
-- COC Concertz - live concert series
-- ZABAL Games - a 3-month build-a-thon for artists, builders, and creators
-- The ZAO festivals - ZAOstock and ZAOville
-- WaveWarZ - live-traded music battles, part of the ZAO ecosystem
+## How he operates
+- MVP-first and iterative. Ships simple, layers complexity, abandons cleanly when a pain point proves a path wrong. Iteration is the R&D cadence, not failure.
+- Distribution-first: every surface is wired for audience capture and owned distribution over rented platforms.
+- Builds for hand-off - repos and systems shaped so a team can own them, not just him.
+- Monorepo-as-lab: ZAO OS is the prototyping ground; when a thing is ready it graduates to its own repo + domain and is deleted from the lab to avoid drift.
+- Mobile-first, dark theme, Farcaster-native. Heavy Claude Code user.
 
-## How he works
-- Ships MVP-first and iterates. Builds in public and documents the journey.
-- Mobile-first, dark theme. Farcaster-native. Uses Claude Code heavily.
-- Prefers open-source and owned distribution over rented platforms.
+## What he runs / the ZABAL umbrella
+ZABAL is the personal umbrella over everything he builds:
+- BetterCallZaal / BCZ - his consulting + operating work (BetterCallZaal Strategies LLC)
+- The ZAO - the decentralized impact network (music first, community second, technology third)
+- ZAO OS (ZAOOS) - the monorepo lab
+- ZABAL Games - the 3-month build-a-thon for artists, builders, creators
+- WaveWarZ - live-traded music battles (incubated in the ecosystem)
+- COC Concertz - live concert series (graduated to its own repo)
+- The ZAO festivals - ZAOstock (Oct 3 2026, Ellsworth Maine) and ZAOville
 
 ## Find him
-- Farcaster: @zaal (also posts as @bettercallzaal)
+- Farcaster: @zaal
 - X and YouTube: @bettercallzaal
 - GitHub: github.com/bettercallzaal
 - Sites: bettercallzaal.com, thezao.xyz, zaoos.com

@@ -2,23 +2,28 @@
 
 ZAO stands for ZTalent Artist Organization. The ZAO is a decentralized impact network focused on bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Founded by Zaal Panthaki (BetterCallZaal). Priority stack: music first, community second, technology third.
 
-Name note: the acronym ZAO = ZTalent Artist Organization; the descriptor for what it is today is a decentralized impact network. Both are correct - use the acronym for etymology, the impact-network framing for what it does.
+Name note: the acronym ZAO = ZTalent Artist Organization (etymology); the descriptor for what it is today is a decentralized impact network. Both are correct.
 
 ## What it is
 Not a record label or a "music community" - an impact network whose first artist domain is music. It returns three things to artists: profit margin, data, and IP rights. Technology is the means, not the headline.
 
 ## Governance - the Fractal and Respect
-- Respect is the on-chain contribution currency: a soulbound OG ERC-20 plus a ZOR ERC-1155, on Optimism.
-- A weekly Respect Game ranks contributions; OREC optimistic execution settles outcomes; a Fibonacci curve shapes rewards.
-- Verified on-chain (2026-07-05): 156 Respect holders, OG Gini roughly 0.73.
+- Respect is the on-chain contribution currency: a soulbound OG ERC-20 plus a ZOR ERC-1155, both on Optimism.
+- A weekly Respect Game ranks contributions; rewards follow a Fibonacci curve. It has run ~100+ unbroken weeks (since 2024-07-30).
+- On-chain execution via OREC (Optimistic Respect Execution Contract): 72-hour voting window + 72-hour veto window.
+- Verified on-chain (2026-07-05): 156 unique Respect holders (122 OG + 55 ZOR, 21 hold both); OG distribution Gini roughly 0.73.
+
+## Legal / entity architecture
+- The ZAO has no formal legal entity yet; the operating umbrella is BetterCallZaal Strategies LLC.
+- It runs as a decentralized impact network. Some lanes spin out their own entities as they mature.
 
 ## Production lanes
-- WaveWarZ - live-traded music battles
+- WaveWarZ - live-traded music battles (Solana mainnet + Base testnet)
 - ZABAL Games - the 3-month build-a-thon
 - The ZAO festivals - ZAOstock, ZAOville, ZAO-PALOOZA, ZAO-CHELLA
-- ZAO OS - the lab and monorepo where new ZAO things get prototyped before they graduate
+- ZAO OS - the lab/monorepo where new ZAO things prototype before they graduate to their own repo + domain
 
-## Find it
+## Find it / how to explore
 - thezao.xyz and zaoos.com
 - Papers: thezao.xyz/papers (whitepaper, technical whitepaper, manifesto)
 - Farcaster: the /zao and /zabal channels

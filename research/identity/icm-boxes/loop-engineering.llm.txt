@@ -1,0 +1,27 @@
+# ICM: Loop Engineering (knowledge)
+
+Reference knowledge on "loop engineering" - the mid-2026 way of building autonomous AI agents - and how The ZAO applies it. Full analysis: ZAOOS research doc 994. Core idea: you don't prompt agents, you design the loops that run them.
+
+## The 5 loops (name which one you mean before arguing about autonomy)
+- Execution loop - one task: call tool, read result, decide, repeat; ends on env feedback (tests, API).
+- Task loop (the "Ralph loop", Geoffrey Huntley) - restart a fresh-context agent on the SAME spec over and over; re-feeding the spec each time prevents context rot. Ends on spec + tests.
+- Product loop (the "software factory": Factory, Warp Oz, Anthropic internal) - iterates a whole codebase + backlog: triage, spec, implement, review, verify, ship, monitor. Signals come from outside (issues, logs, feedback).
+- System loop (autoresearch: Karpathy, Meta) - the outer loop improves the system itself: prompts, harnesses, model, and the evals. "The loop is the product."
+- Oversight loop - set goals, allocate budget, cull work. Exit condition = a human. "Inner loop is capability; outer loop is agency."
+
+## Core principles
+- Autonomy is a separate dial on EVERY loop, not on/off. The real question is "what signal sets this dial," not "auto or not."
+- A loop without a wired-in stop signal does not converge - it runs until money, rate limit, or a human stops it. Every loop needs a nameable exit + a hard cap.
+- Fan-out (dispatch -> gather -> validate) is a PIPELINE, not a loop - no feedback = "just a for statement."
+- The bottleneck is human REVIEW, not agent capability (even Anthropic is review-bound).
+
+## The Karpathy method
+- A loop = a goal the AI works toward until met: discover, plan, do, check, feed back, repeat. Three parts: clear goal, a feedback signal, a hard stop (goal met OR after N tries). Origin: Karpathy's AutoResearch (Mar 2026).
+- When a loop is a mistake: it earns its cost only when the task is real, repeatable, checkable, and worth the tokens. On limited-token plans a heavy loop hits the wallet before the payoff.
+
+## How The ZAO maps
+- Claude Code session = execution loop. ZOE fix-PR pipeline = task/Ralph loop. ZOE orchestrator = product loop. /loop = system loop. Zaal on the board = oversight loop.
+
+## Related boxes
+- ZAO Assistant (zao-assistant)
+- The ZAO (thezao)

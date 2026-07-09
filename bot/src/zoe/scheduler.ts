@@ -19,6 +19,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
+import { runCockpit } from '../cockpit/cockpit';
 import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
@@ -90,9 +91,21 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('morning-brief'))) return;
         try {
-          const brief = await generateMorningBrief({ repoDir: opts.repoDir });
+          // Cockpit is the primary morning brief (doc 997 harness). Falls back to
+          // the legacy brief if the cockpit read fails. Note: cockpit is task-
+          // focused; commits/PRs/inbox from the legacy brief are a follow-up adapter.
+          let brief: string;
+          try {
+            brief = (await runCockpit('brief')).message;
+          } catch (cockpitErr) {
+            console.warn(
+              '[zoe/scheduler] cockpit brief failed, using legacy brief:',
+              (cockpitErr as Error).message,
+            );
+            brief = await generateMorningBrief({ repoDir: opts.repoDir });
+          }
           await opts.bot.api.sendMessage(opts.zaalTgId, brief);
-          console.log('[zoe/scheduler] morning brief sent');
+          console.log('[zoe/scheduler] morning brief sent (cockpit)');
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);

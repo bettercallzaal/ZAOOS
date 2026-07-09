@@ -1,0 +1,22 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: zao-n8n
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5678:5678" # localhost only - reach via SSH tunnel, no public exposure
+    env_file:
+      - .env # real secrets on the host only (chmod 600); see .env.example. NOT committed.
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=America/New_York
+      - TZ=America/New_York
+      - N8N_SECURE_COOKIE=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_RUNNERS_ENABLED=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+volumes:
+  n8n_data:

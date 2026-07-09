@@ -1,0 +1,20 @@
+# ICM: COC Concertz
+
+COC Concertz is The ZAO's live concert series - shows that put ZAO/independent artists in front of real audiences. (Spelling: "COC Concertz" - space, and a z.)
+
+## What it is
+- A recurring concert/showcase series run by Zaal (BetterCallZaal) under the ZAO umbrella; a live-culture surface alongside the ZAO Festivals.
+- Runs numbered editions (e.g. COC #7, mid-July 2026). Recent editions pilot dropping wallet gates to capture broader numbers.
+- Has graduated toward its own repo/ops (the pattern: a ZAO thing graduates to its own repo + domain once production-ready).
+
+## Why it matters
+- Direct artist exposure + community IRL energy; a proving ground that feeds the wider ZAO ecosystem (clips, bounties, festival pipeline).
+
+## Find it
+- Farcaster: /cocconcertz
+- Under The ZAO (thezao)
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- ZAO Festivals (zao-festivals)

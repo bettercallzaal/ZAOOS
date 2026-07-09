@@ -219,6 +219,14 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
             reject(err);
             return;
           }
+          // Doc 1006 fix: a cut-off run (max-turns / execution error) can come
+          // back with is_error=false + a PARTIAL result. subtype!=='success' is
+          // the finish_reason-equivalent - never treat a truncated run as done.
+          if (parsed.subtype && parsed.subtype !== 'success') {
+            console.error('[hermes/claude-cli] non-success subtype:', parsed.subtype, JSON.stringify(parsed).slice(0, 800));
+            reject(new CliError(`claude CLI did not finish cleanly (subtype=${parsed.subtype}) - output may be truncated, not treating as done. turns=${parsed.num_turns}`, 'unknown'));
+            return;
+          }
           if (!parsed.result || !parsed.result.trim()) {
             console.error('[hermes/claude-cli] empty result. full payload:', JSON.stringify(parsed).slice(0, 1200));
             reject(new CliError(`claude CLI returned empty result. duration=${parsed.duration_ms}ms turns=${parsed.num_turns}. session=${parsed.session_id}`, 'unknown'));

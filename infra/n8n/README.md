@@ -19,15 +19,19 @@ NEYNAR_ZAAL_FID=19640        # optional, workflow 1 defaults to 19640 if unset
 NEYNAR_WATCH_KEYWORDS=thezao,zabal   # optional, comma-separated brand watchlist for workflow 1 - add words here, no JSON edits needed
 TELEGRAM_BOT_TOKEN=...       # ZOE bot or a dedicated n8n-alerts bot
 TELEGRAM_CHAT_ID=1447437687
-COWORK_TRACKER_URL=...       # Supabase PostgREST
+COWORK_TRACKER_URL=...       # Supabase REST base, e.g. https://<ref>.supabase.co/rest/v1
 COWORK_TRACKER_KEY=...
 GITHUB_TOKEN=...             # read-only, watched repos
+GITHUB_REPO=bettercallzaal/ZAOOS   # optional, workflow 3 defaults to this if unset
+PARAGRAPH_API_KEY=...        # workflow 2, from publication settings
 ```
 
 ## Workflow build queue (doc 1002 top-3, built in a loop)
-1. **Farcaster mention -> Telegram** - scheduled poll of Neynar mentions for @zaal + a keyword watchlist (`NEYNAR_WATCH_KEYWORDS` env, default `thezao,zabal` - add more brand terms there, no workflow edit needed) -> Telegram alert. Poll-based (no inbound webhook = no public exposure needed). `workflows/01-farcaster-mentions.json`.
-2. **Newsletter publish -> auto cross-post** - Paragraph/RSS new-post -> draft cross-posts. `workflows/02-newsletter-crosspost.json`.
-3. **GitHub PR merged -> tracker row + announce** - PR merge -> cowork tracker row + Telegram. `workflows/03-github-pr-tracker.json`.
+1. **DONE (built, imported inactive, PR #1159).** Farcaster mention -> Telegram - Schedule Trigger (10min) polls Neynar notifications (mentions, @zaal fid) + a cast search across the `NEYNAR_WATCH_KEYWORDS` brand watchlist (default `thezao,zabal`, add terms via env - no workflow edit) -> dedupes against seen cast hashes -> Telegram alert. Poll-based (no inbound webhook = no public exposure needed). `workflows/01-farcaster-mentions.json`.
+2. **DONE (built, imported inactive, PR #1160).** Newsletter publish -> cross-post drafts - hourly poll of the Paragraph API -> dedupes against seen post ids -> templates per-platform draft copy (X, Farcaster, Discord, Telegram, LinkedIn, Facebook) -> Telegram message with the bundled drafts for Zaal to review + post manually. Drafts only, no auto-posting. `workflows/02-newsletter-crosspost.json`.
+3. **DONE (built, imported inactive, PR #1161).** GitHub PR merged -> tracker row + Telegram - 15min poll of the GitHub search API (also localhost-bound, so poll not webhook) -> dedupes against seen PR numbers -> inserts a `public.tasks` row (cowork tracker) + posts a Telegram merge notice. Always creates a new row (auto-capture path only - no fuzzy title-matching against existing rows). `workflows/03-github-pr-tracker.json`.
+
+All three are imported on the VPS and **inactive**. Blocked on `~/n8n/.env` secrets for manual test runs - see above.
 
 Workflows are git-committed JSON (portable, no lock-in) and imported headlessly:
 `docker exec zao-n8n n8n import:workflow --input=/path/to/workflow.json`.

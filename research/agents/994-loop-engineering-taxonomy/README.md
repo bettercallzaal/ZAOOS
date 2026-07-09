@@ -5,7 +5,7 @@ status: research-complete
 last-validated: 2026-07-08
 related-docs: 928, 989
 original-query: "research https://x.com/aparnadhinak/status/2073492320159510869 and https://x.com/0xCodila/status/2072329149520232639"
-tier: STANDARD
+tier: DEEP
 ---
 
 # 994 - Loop engineering: the 4-loop taxonomy + Karpathy method, mapped to ZAO
@@ -57,6 +57,31 @@ tier: STANDARD
 | Keep fan-out (subagent dispatch) labeled as a pipeline, not a loop. | It has no feedback; don't over-trust it. Matches feedback_no_sub_agent_context_fabrication. |
 | The bottleneck to watch is human REVIEW, not agent capability (Anthropic's own constraint). | As ZAO ratchets ZOE autonomy, review throughput is the limit - budget for it. |
 | The Karpathy "when a loop is a mistake" test is the cap-awareness rule Zaal already hit. | ZAO is on Claude Max/limited tokens; reserve heavy loops for real+repeatable+checkable+worth-it work. |
+
+## DEEP expansion (primary-source pass, 2026-07-08)
+
+A follow-up research pass pulled the primary sources the seed essays cite. Nine source clusters:
+
+1. **The Karpathy Loop (AutoResearch)** - propose -> execute -> evaluate -> commit/rollback. ~700 experiments over two days, ~11% improvement. The model cannot override the stop; git is ground truth.
+2. **The Ralph Loop (Geoffrey Huntley)** - spawn a clean agent per iteration against the spec; prevents context degradation. Higher token cost, lower error accumulation.
+3. **Inner vs outer loop (Addy Osmani)** - inner = execution (model capability), outer = strategy (human agency). Most teams only invest in the inner.
+4. **Loopcraft (swyx)** - the game is stacking loops well; early phases need reliability (step DOWN on failure), later phases need leverage (step UP as models improve).
+5. **LangChain four-loop** - L1 agent work, L2 verification, L3 event-driven analysis, L4 improvement. Value compounds in L3-L4; most teams only ship L1.
+6. **Software factories (Warp Oz / Factory)** - continuous issue -> spec -> code -> review -> merge; ratchet auto-merge as trust grows (e.g. 20% -> 60%); one team reports ~35k LOC/week ~50% self-written.
+7. **Introspection / self-improving systems (Roland Gavrilescu)** - design outer loops that compel improvement without a human bottleneck; humans as factory components, not replaced.
+8. **The critique camp** - Geoffrey Litt (Notion): understanding is the bottleneck, delegate understanding and you get replaced. Paul Bakaus: "there is no auto" - agents do the 80% grunt, humans the 20% creative. Dex Horthy (HumanLayer): step DOWN an abstraction; determinism + selective automation beats pure agentic loops; the middle of the context window is the "dumb zone."
+9. **Practical patterns** - stop conditions (verification pass / iteration cap / cost ceiling / no-progress detection), context strategy (Ralph fresh-context vs compaction), rubric-based eval before loop design, token budgets + hard cost caps. The real failure mode is "loopmaxxing" - adding loops to vague goals.
+
+### Loop-engineering checklist (build a good loop)
+- Pre: a clear goal, a rubric/eval that defines done, a context strategy (fresh vs compacted), a token/cost budget.
+- During: an exit signal the model cannot fake (tests, eval pass, git state), an iteration cap, a cost ceiling, no-progress detection, a per-iteration timeout.
+- Post: a human checkpoint sized to the risk, a log/audit of what changed, and a review-throughput plan (review is the real bottleneck).
+
+### Contradictions / open debates (unresolved)
+- Autonomy camp (ratchet the dial up) vs human-agency camp (the dial has a stop). Understanding-lag: does delegating understanding compound leverage or erode ownership. Determinism vs abstraction: go down a level or up. There is no settled answer - set each loop's dial deliberately.
+
+### Source status (deep pass)
+FULL: Karpathy/AutoResearch, Huntley/Ralph, Osmani inner-outer, LangChain four-loop, Warp Oz + Factory, Gavrilescu/Introspection, Litt, Horthy, Bakaus, context/compaction + LLM-as-judge + cost-management writeups. PARTIAL: swyx Loopcraft (X post not full essay), arXiv (titles only). NOTE: the two seed essays remain cited FULL - both were fetched in full via fxtwitter in the original pass (the deep-pass subagent could not re-find them and mislabeled them; that is a search artifact, not a provenance problem).
 
 ## Also See
 - [Doc 928](../928-agent-loop-best-practices/) - agent loop operating rules (the behavior-changing rules in .claude/rules/agent-loops.md).

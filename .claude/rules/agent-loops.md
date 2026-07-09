@@ -26,6 +26,8 @@ Durable operating rules for any autonomous /loop or agent building/deploying in 
 
 11. **Git hygiene on a shared clone.** The VPS clone (~/zao-os) runs the live bot AND is where loop ticks build. NEVER leave uncommitted changes across sequential commands: a later `git checkout main` silently reverts them (caused a real drift 2026-06-30 where self-heal + work-loop-fix ran live but were absent from origin/main). Commit or stash before switching branches; after merging, `git reset --hard origin/main` to keep the working tree = deployed truth; verify a fix is on origin/main (not just the working tree) before claiming it landed.
 
+18. **Multi-line content edits go through a python-script FILE, never inline shell; read the diff before trusting it.** Even inline shell (rule 12) breaks when the content carries CSS/HTML special chars - interpolated `{`, `}`, `$`, backticks clobbered `PATH` mid-command ("command not found: tr/base64"). Write a `.py` file that fetches with `urllib` + `gh auth token`, builds the body in a triple-quoted string, base64-encodes, and `PUT`s. Two guards: (a) abort the file if the pre-edit GET returns empty/`content` missing - do not write a from-scratch file over a fetch failure (that caused false "no CLAUDE.md" PRs that had to be closed). (b) A GitHub PR diff showing "N additions, 0 deletions" on an append is NORMAL, not corruption - only a non-zero deletion count on an intended append is the alarm.
+
 ## Source
 
 Research doc: `research/agents/928-agent-loop-best-practices/` (2026-06-30). Primary: Anthropic Building Effective Agents + Effective Harnesses for Long-Running Agents.

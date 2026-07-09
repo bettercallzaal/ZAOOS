@@ -10,6 +10,7 @@ export interface PreFlightResult {
     forbiddenPaths: 'pass' | 'fail';
     typecheck: 'pass' | 'fail' | 'skipped';
     tests: 'pass' | 'fail' | 'skipped';
+    boot: 'pass' | 'fail' | 'skipped';
   };
 }
 
@@ -40,6 +41,7 @@ export async function runPreFlightGate(input: {
     forbiddenPaths: 'pass',
     typecheck: 'skipped',
     tests: 'skipped',
+    boot: 'skipped',
   };
   const scope = detectScope(input.filesChanged);
 
@@ -87,6 +89,26 @@ export async function runPreFlightGate(input: {
         checks,
       };
     }
+    // Doc 1006 fix: tsc passing != the bot boots. esbuild-bundle the entry to
+    // catch import/bundle crashes tsc misses (feedback_validate_bot_changes_with_boot).
+    const boot = await runCmd(
+      'npx',
+      ['esbuild', 'src/index.ts', '--bundle', '--platform=node', '--format=esm', '--outfile=/dev/null', '--packages=external'],
+      `${input.workTreePath}/bot`,
+      heapEnv,
+    );
+    if (boot.exitCode !== 0) {
+      checks.boot = 'fail';
+      const out = (boot.stdout + '\n' + boot.stderr).slice(0, 1500);
+      return {
+        ok: false,
+        error: `Bot boot-verify (esbuild bundle) failed - tsc passed but the bundle is broken. Fix before retrying:\n\n${out}`,
+        durationMs: Date.now() - start,
+        scope,
+        checks,
+      };
+    }
+    checks.boot = 'pass';
   }
   if (scope === 'app-only' || scope === 'mixed') {
     const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], input.workTreePath, heapEnv);

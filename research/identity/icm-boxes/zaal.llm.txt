@@ -1,0 +1,31 @@
+# ICM: Zaal Panthaki (BetterCallZaal)
+
+Identifier: zaal (aka bettercallzaal)
+Role: Founder of The ZAO. Builder, connector, and operator across web3, music, and community.
+
+## Who
+Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO (ZAO = ZTalent Artist Organization), a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds in public.
+
+## What he runs
+- The ZAO - the impact network (music first, community second, technology third)
+- BetterCallZaal Strategies LLC - his operating and consulting entity
+- COC Concertz - live concert series
+- ZABAL Games - a 3-month build-a-thon for artists, builders, and creators
+- The ZAO festivals - ZAOstock and ZAOville
+- WaveWarZ - live-traded music battles, part of the ZAO ecosystem
+
+## How he works
+- Ships MVP-first and iterates. Builds in public and documents the journey.
+- Mobile-first, dark theme. Farcaster-native. Uses Claude Code heavily.
+- Prefers open-source and owned distribution over rented platforms.
+
+## Find him
+- Farcaster: @zaal (also posts as @bettercallzaal)
+- X and YouTube: @bettercallzaal
+- GitHub: github.com/bettercallzaal
+- Sites: bettercallzaal.com, thezao.xyz, zaoos.com
+
+## Related boxes
+- The ZAO (thezao)
+- ZABAL Games (zabalgamez)
+- WaveWarZ (wavewarz)

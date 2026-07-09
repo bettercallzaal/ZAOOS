@@ -157,3 +157,12 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = persona block in `bot/src/zoe/` `human.md`, NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
+
+## ICM Context Boxes (AI-readable ZAO context)
+
+The ZAO ecosystem has permanent AI-readable context boxes on useicm.com - fetch one to load grounded context on any project or person:
+
+- Fetch: `curl -s https://useicm.com/api/objects/<id>/llm.txt`
+- Human directory: https://thezao.xyz/list
+- Start here: **zao-assistant** (`icm_-hsPHePpqX01RovoB_SEqA`) - the operator layer; it links to the rest (thezao, bettercallzaal, zabalgamez, wavewarz, farcaster, fractal, poidh, zuke, zao-festivals, coc-concertz, zao-newsletter, loop-engineering, milk-road).
+- Source of truth for box content: `research/identity/icm-boxes/`. Owner keys live at `~/.zao/private/icm-keys.json` (never commit).

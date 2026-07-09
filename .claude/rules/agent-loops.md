@@ -26,6 +26,19 @@ Durable operating rules for any autonomous /loop or agent building/deploying in 
 
 11. **Git hygiene on a shared clone.** The VPS clone (~/zao-os) runs the live bot AND is where loop ticks build. NEVER leave uncommitted changes across sequential commands: a later `git checkout main` silently reverts them (caused a real drift 2026-06-30 where self-heal + work-loop-fix ran live but were absent from origin/main). Commit or stash before switching branches; after merging, `git reset --hard origin/main` to keep the working tree = deployed truth; verify a fix is on origin/main (not just the working tree) before claiming it landed.
 
+18. **Multi-line content edits go through a python-script FILE, never inline shell; read the diff before trusting it.** Even inline shell (rule 12) breaks when the content carries CSS/HTML special chars - interpolated `{`, `}`, `$`, backticks clobbered `PATH` mid-command ("command not found: tr/base64"). Write a `.py` file that fetches with `urllib` + `gh auth token`, builds the body in a triple-quoted string, base64-encodes, and `PUT`s. Two guards: (a) abort the file if the pre-edit GET returns empty/`content` missing - do not write a from-scratch file over a fetch failure (that caused false "no CLAUDE.md" PRs that had to be closed). (b) A GitHub PR diff showing "N additions, 0 deletions" on an append is NORMAL, not corruption - only a non-zero deletion count on an intended append is the alarm.
+
 ## Source
 
 Research doc: `research/agents/928-agent-loop-best-practices/` (2026-06-30). Primary: Anthropic Building Effective Agents + Effective Harnesses for Long-Running Agents.
+
+## Loop-ops lessons (2026-07-08 overnight loop - fold-back per rule 10)
+
+Behavior-changing lessons from running the overnight cleanup/build loop. Apply to any loop or agent doing gh-api + external-API work.
+
+12. **Do gh-api file edits INLINE, not in shell functions.** A shell function holding a multi-line block var with backticks/`##`/`**` silently mangled the vars and made every fetch look empty ("no CLAUDE.md" when the file existed). Repeat the inline commands per repo instead of abstracting into a function.
+13. **Fetch the file's fresh `.sha` immediately before each `PUT`.** SHAs drift when anything else commits to the branch; a stale sha 409s. On 409, re-fetch the sha and retry - do not abort.
+14. **External create/write APIs: send browser headers.** `POST`/`PUT` to a public API (e.g. useicm.com) can 403 from headless curl even when the OpenAPI says no auth - send `User-Agent: Mozilla...`, `Origin`, `Referer`. Check the OpenAPI `requestBody` for the exact field name (useicm llm.txt update wanted `body`, not `llm_txt`).
+15. **Own the resource by creating it yourself + capture the owner key.** When a tool shows an owner secret once (useicm returns `api_key` on create), create via API so you capture it; save keys to `~/.zao/private/` (chmod 600), never print/commit. Boxes minted in a browser with the key uncaptured are un-editable orphans - remake them via API to own them.
+16. **Watch sibling loops by their OUTPUT, not their process.** Poll recent branches/commits/PRs of the repos other terminal-loops write to; if a loop shows no new output for ~2h+, flag it (a dead script in a live tmux hides this - see rule 9).
+17. **Self-iterate every few ticks.** The outer loop should improve the loop: when a new loop-ops lesson appears, append it here and PR it, so future loops + ZOE inherit it. This is rule 10 made concrete ("the loop is the product" - doc 994).

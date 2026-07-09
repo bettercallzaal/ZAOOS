@@ -1,0 +1,34 @@
+# ICM: Farcaster (knowledge)
+
+General knowledge about Farcaster - the open social protocol - that any assistant can use, plus how The ZAO builds on it. Style note: always say "Farcaster," never "Warpcast."
+
+## What it is
+- A public, open, "sufficiently onchain" social protocol. Accounts are FIDs; posts are casts; there are channels and follows; identity is portable across apps, not owned by any single client.
+- Onchain identity on Optimism/Base; social data lives off-chain on Snapchain (the hub/data layer).
+- The official app was called Warpcast; it is now just "the Farcaster app."
+
+## Who runs it (2026)
+- Neynar acquired Farcaster from Merkle (founders Dan Romero + Varun Srinivasan) on Jan 21 2026 - the protocol contracts, code repos, official app, and Clanker moved to Neynar. Neynar already powered ~90% of Farcaster infrastructure through its API. Leadership: Rish Mukherji + Manan Patel (Coinbase alums).
+- Merkle returned ~$180M to investors (Paradigm, a16z, USV) - roughly an 82% markdown from the 2024 $1B valuation, acknowledging the social-first strategy stalled. No shutdown: the protocol stays public, free, and open, and product stability was maintained under Neynar.
+
+## The primitives
+- Casts, channels, follows, and SIWF (Sign In With Farcaster) auth.
+- Mini Apps (formerly Frames) - interactive apps that render inside a cast. Snaps - the newer primitive, the biggest feature launch since Frames.
+- Snapchain - the data/hub layer. XMTP - encrypted direct messaging.
+- Neynar API - powers most apps (reads, writes, feeds, webhooks, notifications). Reputation/discovery signals: Neynar score, OpenRank, ERC-8004.
+- Clanker - the AI token launchpad on Farcaster/Base (now under Neynar); fees flow to creators.
+
+## State of the network (2026)
+- Post-hype, utility phase. Daily actives came off the 2024 peak; the audience skews web3-insider (a churn risk for mainstream users). Neynar's stewardship is builder-focused and stable. FarCon is the annual gathering (Rome, May 2026).
+
+## The ZAO on Farcaster
+- Channels: /zao, /zabal, /wavewarz, /cocconcertz. Zaal is @zaal on Farcaster (@bettercallzaal on X).
+- ZOL (@zolbot) is The ZAO's Farcaster agent - a music scout and the ZAO's build-in-public voice on Farcaster (X is handled separately by the Paragraph agent).
+- The ZAO ships Snaps and mini apps and runs mini-app discovery inside ZAO OS.
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- ZABAL Games (zabalgamez)
+- WaveWarZ (wavewarz)
+- ZAO Assistant (zao-assistant)

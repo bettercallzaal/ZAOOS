@@ -1,0 +1,274 @@
+{
+  "id": "b8e1d4f6-3c2a-4f9b-8e7d-1a6c5b9e0d3f",
+  "name": "03 - GitHub PR Merged to Tracker + Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/search/issues",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=repo:{{ $env.GITHUB_REPO || 'bettercallzaal/ZAOOS' }}+is:pr+is:merged"
+            },
+            {
+              "name": "sort",
+              "value": "updated"
+            },
+            {
+              "name": "order",
+              "value": "desc"
+            },
+            {
+              "name": "per_page",
+              "value": "20"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.GITHUB_TOKEN }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-search-merged-prs",
+      "name": "Search Merged PRs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// GitHub search doesn't offer a \"since last poll\" cursor, so track PR\n// numbers we've already announced in this node's workflow static data.\n// First-ever run seeds the seen-set from the current merged backlog\n// instead of blasting Telegram with every historical merge.\nconst staticData = $getWorkflowStaticData('node');\nconst body = $input.first().json || {};\nconst items = body.items || [];\n\nconst merged = items.filter((it) => it.pull_request && it.pull_request.merged_at);\n\nif (!staticData.seenNumbers) {\n  staticData.seenNumbers = merged.map((it) => it.number);\n  return [];\n}\n\nconst seen = new Set(staticData.seenNumbers);\nconst fresh = merged.filter((it) => !seen.has(it.number));\nfresh.forEach((it) => seen.add(it.number));\nstaticData.seenNumbers = Array.from(seen).slice(-500);\n\nreturn fresh.map((it) => ({ json: { number: it.number } }));"
+      },
+      "id": "filter-new-merges",
+      "name": "Filter New Merges",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $env.GITHUB_REPO || 'bettercallzaal/ZAOOS' }}/pulls/{{ $json.number }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.GITHUB_TOKEN }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-get-pr-details",
+      "name": "Get PR Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  const p = item.json;\n  return {\n    json: {\n      number: p.number,\n      title: p.title,\n      author: p.user ? p.user.login : 'unknown',\n      url: p.html_url,\n      additions: p.additions,\n      deletions: p.deletions,\n      mergedAt: p.merged_at,\n      repo: p.base && p.base.repo ? `${p.base.repo.owner.login}/${p.base.repo.name}` : ($env.GITHUB_REPO || 'bettercallzaal/ZAOOS')\n    }\n  };\n});"
+      },
+      "id": "build-pr-record",
+      "name": "Build PR Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COWORK_TRACKER_URL }}/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.COWORK_TRACKER_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.COWORK_TRACKER_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"project\": \"zaodevz\",\n  \"kind\": \"task\",\n  \"title\": \"PR merged: {{ $json.title.replace(/\"/g, '\\\\\"') }}\",\n  \"status\": \"done\",\n  \"notes\": \"{{ $json.url }}\\n+{{ $json.additions }} -{{ $json.deletions }}\",\n  \"legacy_source\": \"github-pr\",\n  \"legacy_id\": \"{{ $json.repo }}#{{ $json.number }}\",\n  \"source\": \"external-api\",\n  \"completed_at\": \"{{ $json.mergedAt }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-insert-tracker-row",
+      "name": "Insert Cowork Tracker Row",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+            },
+            {
+              "name": "text",
+              "value": "=PR merged: {{ $json.title }} by @{{ $json.author }}\n+{{ $json.additions }} -{{ $json.deletions }}\n{{ $json.url }}"
+            },
+            {
+              "name": "disable_web_page_preview",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-telegram",
+      "name": "Telegram sendMessage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        380
+      ]
+    }
+  ],
+  "connections": {
+    "Every 15 min": {
+      "main": [
+        [
+          {
+            "node": "Search Merged PRs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Merged PRs": {
+      "main": [
+        [
+          {
+            "node": "Filter New Merges",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Merges": {
+      "main": [
+        [
+          {
+            "node": "Get PR Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PR Details": {
+      "main": [
+        [
+          {
+            "node": "Build PR Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build PR Record": {
+      "main": [
+        [
+          {
+            "node": "Insert Cowork Tracker Row",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram sendMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

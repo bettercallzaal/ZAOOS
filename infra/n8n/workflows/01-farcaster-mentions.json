@@ -67,6 +67,19 @@
     },
     {
       "parameters": {
+        "jsCode": "// Comma-separated brand/keyword watchlist, editable in ~/n8n/.env without\n// touching this workflow - e.g. NEYNAR_WATCH_KEYWORDS=thezao,zabal,zabalgames\nconst raw = $env.NEYNAR_WATCH_KEYWORDS || 'thezao,zabal';\nconst keywords = raw.split(',').map((k) => k.trim()).filter(Boolean);\n\nreturn keywords.map((keyword) => ({ json: { keyword } }));"
+      },
+      "id": "get-watch-keywords",
+      "name": "Get Watch Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        420
+      ]
+    },
+    {
+      "parameters": {
         "method": "GET",
         "url": "https://api.neynar.com/v2/farcaster/cast/search",
         "sendQuery": true,
@@ -74,7 +87,7 @@
           "parameters": [
             {
               "name": "q",
-              "value": "thezao"
+              "value": "={{ $json.keyword }}"
             },
             {
               "name": "limit",
@@ -95,12 +108,12 @@
           "timeout": 10000
         }
       },
-      "id": "http-neynar-thezao",
-      "name": "Search TheZAO Mentions",
+      "id": "http-neynar-keywords",
+      "name": "Search Keyword Mentions",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        460,
+        680,
         420
       ]
     },
@@ -113,7 +126,7 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        700,
+        920,
         300
       ]
     },
@@ -126,7 +139,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        920,
+        1140,
         300
       ]
     },
@@ -160,7 +173,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1140,
+        1360,
         300
       ]
     }
@@ -175,7 +188,7 @@
             "index": 0
           },
           {
-            "node": "Search TheZAO Mentions",
+            "node": "Get Watch Keywords",
             "type": "main",
             "index": 0
           }
@@ -193,7 +206,18 @@
         ]
       ]
     },
-    "Search TheZAO Mentions": {
+    "Get Watch Keywords": {
+      "main": [
+        [
+          {
+            "node": "Search Keyword Mentions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Keyword Mentions": {
       "main": [
         [
           {

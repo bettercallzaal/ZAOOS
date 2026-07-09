@@ -1,0 +1,23 @@
+# ICM: POIDH @ ZAO
+
+POIDH ("pics or it didn't happen") is an on-chain bounty platform on Base, founded by Kenny. The ZAO runs clip-up and creative bounties on it. (Style: lowercase "poidh".)
+
+## What it is (for ZAO)
+- The ZAO posts bounties on poidh.xyz: people do a task (clip a video, make an ad), post it publicly, and submit the link to claim the reward on Base.
+- Format ZAO uses: We-Them-Media (WTM) audition style - a clear "the bar" + a scoring rubric, a single judge, an explicit deadline, an open pot anyone can top up. Run every bounty past Kenny first.
+- Ops home: the zpoidh repo (github.com/bettercallzaal/zpoidh) - round pages, brand kits, judging records.
+
+## Live threads (2026)
+- "Best ad for ZABAL Gamez" bounty (bounty 1180) - clip-up + creative promo.
+- A POIDH x Unlock Protocol clipping bounty (with Kenny + Unlock DAO); Zaal sparks it small, open pot.
+- The ZABAL Gamez x POIDH fireside collectible (Unlock event).
+- Feeds the clipper pipeline (research doc 992): recordings -> clip candidates -> POIDH bounties.
+
+## Find it
+- poidh.xyz, the zpoidh repo
+- Farcaster: /poidh
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- ZABAL Games (zabalgamez)

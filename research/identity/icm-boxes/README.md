@@ -6,7 +6,20 @@ These are the ZAO ecosystem's context boxes - source of truth kept here, pasted 
 useicm.com to mint each box. Cousin of our GEO / llms.txt work (own the AI answer for
 "what is The ZAO").
 
-## Boxes
+## Boxes (ALL LIVE 2026-07-08) - public directory at thezao.xyz/list
+
+| Box | id | Live URL | llm.txt endpoint |
+|-----|----|----------|------------------|
+| The ZAO | thezao | https://useicm.com/icm/icm_wkJvcyrDUl999kJdqUB_dg | /api/objects/icm_wkJvcyrDUl999kJdqUB_dg/llm.txt |
+| Zaal | bettercallzaal | https://useicm.com/icm/icm_07XkRrWam3vO9u5nbJEahg | /api/objects/icm_07XkRrWam3vO9u5nbJEahg/llm.txt |
+| ZABAL Games | zabalgamez | https://useicm.com/icm/icm_PiCDHNNZ3WZpNoF59OA8Dw | /api/objects/icm_PiCDHNNZ3WZpNoF59OA8Dw/llm.txt |
+| WaveWarZ | wavewarz | https://useicm.com/icm/icm_dMc9jOsP91lAjxkGFhoxDg | /api/objects/icm_dMc9jOsP91lAjxkGFhoxDg/llm.txt |
+| ZAO Assistant | zao-assistant | https://useicm.com/icm/icm_3_kBodVZqijpMtjXSqGBXw | /api/objects/icm_3_kBodVZqijpMtjXSqGBXw/llm.txt |
+| Farcaster | farcaster | https://useicm.com/icm/icm_bnMUjrLlbSpcYLiuZ-V_NQ | /api/objects/icm_bnMUjrLlbSpcYLiuZ-V_NQ/llm.txt |
+
+Fetch pattern: `curl -s https://useicm.com/api/objects/<id>/llm.txt`. Human directory: thezao.xyz/list.
+
+## Boxes (files)
 
 | File | Box | Covers |
 |------|-----|--------|

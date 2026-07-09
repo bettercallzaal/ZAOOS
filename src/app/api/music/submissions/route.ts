@@ -1,12 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { upsertSong } from '@/lib/music/library';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
-const VALID_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
+const VALID_TAGS = [
+  'Hip-Hop',
+  'R&B',
+  'Electronic',
+  'Lo-Fi',
+  'Jazz',
+  'Afrobeats',
+  'Soul',
+  'Experimental',
+] as const;
 
 const submitSchema = z.object({
   url: z.string().url().max(500),
@@ -59,10 +68,7 @@ export async function GET(req: NextRequest) {
     const submissionIds = submissions.map((s: { id: string }) => s.id);
 
     const [voteCounts, userVotes] = await Promise.allSettled([
-      supabaseAdmin
-        .from('song_votes')
-        .select('submission_id')
-        .in('submission_id', submissionIds),
+      supabaseAdmin.from('song_votes').select('submission_id').in('submission_id', submissionIds),
       supabaseAdmin
         .from('song_votes')
         .select('submission_id')
@@ -111,7 +117,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = submitSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     const { url, title, artist, note, tags } = parsed.data;
@@ -122,9 +131,13 @@ export async function POST(req: NextRequest) {
     // Validate it's a music URL
     const trackType = isMusicUrl(url);
     if (!trackType) {
-      return NextResponse.json({
-        error: 'Not a recognized music URL. Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, or direct audio files.',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'Not a recognized music URL. Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, or direct audio files.',
+        },
+        { status: 400 },
+      );
     }
 
     // Check for duplicate URL in same channel
@@ -136,7 +149,10 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (existing && existing.length > 0) {
-      return NextResponse.json({ error: 'This song has already been submitted to this channel' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'This song has already been submitted to this channel' },
+        { status: 409 },
+      );
     }
 
     // Auto-approve if submitter is admin, otherwise pending
@@ -154,26 +170,20 @@ export async function POST(req: NextRequest) {
       submitted_by_username: session.username,
       submitted_by_display: session.displayName,
       status: submissionStatus,
-      ...(session.isAdmin ? { reviewed_by_fid: session.fid, reviewed_at: new Date().toISOString() } : {}),
+      ...(session.isAdmin
+        ? { reviewed_by_fid: session.fid, reviewed_at: new Date().toISOString() }
+        : {}),
     };
     if (tags && tags.length > 0) {
       insertRow.tags = tags;
     }
 
     // Try insert with tags — if column doesn't exist, retry without
-    let result = await supabaseAdmin
-      .from('song_submissions')
-      .insert(insertRow)
-      .select()
-      .single();
+    let result = await supabaseAdmin.from('song_submissions').insert(insertRow).select().single();
 
     if (result.error && result.error.message?.includes('tags')) {
       delete insertRow.tags;
-      result = await supabaseAdmin
-        .from('song_submissions')
-        .insert(insertRow)
-        .select()
-        .single();
+      result = await supabaseAdmin.from('song_submissions').insert(insertRow).select().single();
     }
 
     if (result.error) throw result.error;
@@ -210,7 +220,10 @@ export async function DELETE(req: NextRequest) {
     });
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
     const { id } = parsed.data;
 
@@ -229,10 +242,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('song_submissions')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('song_submissions').delete().eq('id', id);
 
     if (error) throw error;
     return NextResponse.json({ success: true });

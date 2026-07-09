@@ -1,11 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { timeAgo } from '@/lib/format/timeAgo';
 
-type ActivityType = 'cast' | 'song' | 'vote' | 'member' | 'proposal' | 'respect' | 'fractal' | 'battle';
+type ActivityType =
+  | 'cast'
+  | 'song'
+  | 'vote'
+  | 'member'
+  | 'proposal'
+  | 'respect'
+  | 'fractal'
+  | 'battle';
 
 interface ActivityItem {
   id: string;
@@ -181,13 +189,15 @@ export function ActivityFeed() {
     });
 
     const filterParam = FILTER_TO_PARAM[activeFilter];
-    const url = filterParam === 'all'
-      ? '/api/activity/feed'
-      : `/api/activity/feed?filter=${filterParam}`;
+    const url =
+      filterParam === 'all' ? '/api/activity/feed' : `/api/activity/feed?filter=${filterParam}`;
 
     fetch(url, { signal: controller.signal })
       .then((res) => {
-        if (!res.ok) { setItems([]); return; }
+        if (!res.ok) {
+          setItems([]);
+          return;
+        }
         return res.json();
       })
       .then((data) => {

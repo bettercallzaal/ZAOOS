@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -12,6 +12,11 @@ const querySchema = z.object({
 function escapeCsvValue(value: unknown): string {
   if (value === null || value === undefined) return '';
   const str = String(value);
+  // Prevent spreadsheet formula injection: prefix cells starting with
+  // = + - @ with single quote (treated as literal text by Excel/Sheets)
+  if (str.match(/^[=+\-@]/)) {
+    return `'${str}`;
+  }
   if (str.includes(',') || str.includes('"') || str.includes('\n')) {
     return `"${str.replace(/"/g, '""')}"`;
   }
@@ -23,9 +28,7 @@ function buildCsv(rows: Record<string, unknown>[]): string {
   const headers = Object.keys(rows[0]);
   const lines = [
     headers.join(','),
-    ...rows.map((row) =>
-      headers.map((h) => escapeCsvValue(row[h])).join(',')
-    ),
+    ...rows.map((row) => headers.map((h) => escapeCsvValue(row[h])).join(',')),
   ];
   return lines.join('\n');
 }
@@ -45,7 +48,7 @@ export async function GET(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid parameters', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -56,7 +59,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabaseAdmin
         .from('respect_members')
         .select(
-          'name, wallet_address, fid, total_respect, fractal_respect, fractal_count, onchain_og, onchain_zor, hosting_respect, bonus_respect, event_respect, first_respect_at'
+          'name, wallet_address, fid, total_respect, fractal_respect, fractal_count, onchain_og, onchain_zor, hosting_respect, bonus_respect, event_respect, first_respect_at',
         )
         .order('total_respect', { ascending: false });
       if (error) throw error;
@@ -65,7 +68,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabaseAdmin
         .from('fractal_scores')
         .select(
-          'member_name, wallet_address, rank, score, session_id, fractal_sessions(name, session_date)'
+          'member_name, wallet_address, rank, score, session_id, fractal_sessions(name, session_date)',
         )
         .limit(5000);
       if (error) throw error;
@@ -113,9 +116,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     logger.error('[admin/export] Error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
-import { getSessionData } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
+import { getSessionData } from '@/lib/auth/session';
 import { FractalsClient } from './FractalsClient';
 
 export const metadata = { title: 'Fractals — ZAO OS' };

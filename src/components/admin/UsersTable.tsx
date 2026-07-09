@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface User {
   id: string;
@@ -46,7 +46,12 @@ export function UsersTable() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    },
+    [],
+  );
 
   // Add user state
   const [showAdd, setShowAdd] = useState(false);
@@ -64,14 +69,20 @@ export function UsersTable() {
   // Bulk selection
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulking, setBulking] = useState(false);
-  const toggleSelect = (id: string) => setSelected(prev => {
-    const next = new Set(prev);
-    if (next.has(id)) { next.delete(id); } else { next.add(id); }
-    return next;
-  });
-  const toggleAll = () => setSelected(prev =>
-    prev.size === filtered.length ? new Set() : new Set(filtered.map(u => u.id))
-  );
+  const toggleSelect = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  const toggleAll = () =>
+    setSelected((prev) =>
+      prev.size === filtered.length ? new Set() : new Set(filtered.map((u) => u.id)),
+    );
 
   const showFeedback = (type: 'success' | 'error', msg: string) => {
     setFeedback({ type, msg });
@@ -239,13 +250,17 @@ export function UsersTable() {
     try {
       const updates: Record<string, unknown> = { id: editingUser.id };
 
-      if (editForm.display_name !== (editingUser.display_name || '')) updates.display_name = editForm.display_name || null;
-      if (editForm.username !== (editingUser.username || '')) updates.username = editForm.username || null;
-      if (editForm.real_name !== (editingUser.real_name || '')) updates.real_name = editForm.real_name || null;
+      if (editForm.display_name !== (editingUser.display_name || ''))
+        updates.display_name = editForm.display_name || null;
+      if (editForm.username !== (editingUser.username || ''))
+        updates.username = editForm.username || null;
+      if (editForm.real_name !== (editingUser.real_name || ''))
+        updates.real_name = editForm.real_name || null;
       if (editForm.ign !== (editingUser.ign || '')) updates.ign = editForm.ign || null;
       if (editForm.bio !== (editingUser.bio || '')) updates.bio = editForm.bio || null;
       if (editForm.role !== editingUser.role) updates.role = editForm.role;
-      if (editForm.respect_wallet !== (editingUser.respect_wallet || '')) updates.respect_wallet = editForm.respect_wallet || null;
+      if (editForm.respect_wallet !== (editingUser.respect_wallet || ''))
+        updates.respect_wallet = editForm.respect_wallet || null;
       if (editForm.notes !== (editingUser.notes || '')) updates.notes = editForm.notes || null;
 
       // FID linking/unlinking
@@ -307,9 +322,13 @@ export function UsersTable() {
     <div>
       {/* Feedback */}
       {feedback && (
-        <div className={`fixed top-4 right-4 z-[70] px-4 py-2 rounded-lg text-sm font-medium shadow-lg ${
-          feedback.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
-        }`}>
+        <div
+          className={`fixed top-4 right-4 z-[70] px-4 py-2 rounded-lg text-sm font-medium shadow-lg ${
+            feedback.type === 'success'
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+          }`}
+        >
           {feedback.msg}
         </div>
       )}
@@ -351,7 +370,9 @@ export function UsersTable() {
           </>
         ) : (
           <>
-            {users.length === 0 ? 'Import existing allowlist members into Users table' : 'Sync from allowlist (imports new entries)'}
+            {users.length === 0
+              ? 'Import existing allowlist members into Users table'
+              : 'Sync from allowlist (imports new entries)'}
           </>
         )}
       </button>
@@ -359,8 +380,18 @@ export function UsersTable() {
       {/* Search + Filters + Add */}
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             value={search}
@@ -400,7 +431,9 @@ export function UsersTable() {
               placeholder="@username, FID, or 0x wallet"
               autoFocus
               className="bg-[#0a1628] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
-              onKeyDown={(e) => { if (e.key === 'Enter' && addInput.trim()) handleAdd(); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && addInput.trim()) handleAdd();
+              }}
             />
             <input
               value={addName}
@@ -410,7 +443,8 @@ export function UsersTable() {
             />
           </div>
           <p className="text-xs text-gray-500 mb-3">
-            Type a Farcaster @username, FID number, or 0x wallet. Username/FID auto-populates profile + wallet.
+            Type a Farcaster @username, FID number, or 0x wallet. Username/FID auto-populates
+            profile + wallet.
           </p>
           <button
             onClick={handleAdd}
@@ -487,9 +521,16 @@ export function UsersTable() {
             onClick={async () => {
               setBulking(true);
               for (const id of selected) {
-                await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, role: 'member' }) });
+                await fetch('/api/admin/users', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id, role: 'member' }),
+                });
               }
-              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Set ${selected.size} users to Member`);
+              setBulking(false);
+              setSelected(new Set());
+              fetchUsers();
+              showFeedback('success', `Set ${selected.size} users to Member`);
             }}
             disabled={bulking}
             className="text-xs px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 disabled:opacity-50 transition-colors"
@@ -500,9 +541,16 @@ export function UsersTable() {
             onClick={async () => {
               setBulking(true);
               for (const id of selected) {
-                await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, assign_zid: true }) });
+                await fetch('/api/admin/users', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id, assign_zid: true }),
+                });
               }
-              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Assigned ZIDs to ${selected.size} users`);
+              setBulking(false);
+              setSelected(new Set());
+              fetchUsers();
+              showFeedback('success', `Assigned ZIDs to ${selected.size} users`);
             }}
             disabled={bulking}
             className="text-xs px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 hover:bg-[#f5a623]/20 disabled:opacity-50 transition-colors"
@@ -514,17 +562,31 @@ export function UsersTable() {
               if (!confirm(`Deactivate ${selected.size} users?`)) return;
               setBulking(true);
               for (const id of selected) {
-                await fetch('/api/admin/users', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+                await fetch('/api/admin/users', {
+                  method: 'DELETE',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id }),
+                });
               }
-              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Deactivated ${selected.size} users`);
+              setBulking(false);
+              setSelected(new Set());
+              fetchUsers();
+              showFeedback('success', `Deactivated ${selected.size} users`);
             }}
             disabled={bulking}
             className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 disabled:opacity-50 transition-colors"
           >
             Deactivate
           </button>
-          {bulking && <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />}
-          <button onClick={() => setSelected(new Set())} className="text-xs text-gray-500 ml-auto hover:text-white transition-colors">Clear</button>
+          {bulking && (
+            <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+          )}
+          <button
+            onClick={() => setSelected(new Set())}
+            className="text-xs text-gray-500 ml-auto hover:text-white transition-colors"
+          >
+            Clear
+          </button>
         </div>
       )}
 
@@ -567,10 +629,19 @@ function UserCard({
   return (
     <div className="bg-[#1a2a3a] rounded-xl overflow-hidden border border-white/[0.08]">
       {/* Main row */}
-      <button onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+      >
         {/* Avatar */}
         {user.pfp_url ? (
-          <Image src={user.pfp_url} alt={`${name} avatar`} width={36} height={36} className="rounded-full flex-shrink-0" />
+          <Image
+            src={user.pfp_url}
+            alt={`${name} avatar`}
+            width={36}
+            height={36}
+            className="rounded-full flex-shrink-0"
+          />
         ) : (
           <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
             {user.primary_wallet.slice(2, 4)}
@@ -587,12 +658,16 @@ function UserCard({
                 ZID #{user.zid}
               </span>
             )}
-            <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${ROLE_COLORS[user.role]}`}>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${ROLE_COLORS[user.role]}`}
+            >
               {ROLE_LABELS[user.role]}
             </span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[10px] text-gray-600 font-mono">{shortAddr(user.primary_wallet)}</span>
+            <span className="text-[10px] text-gray-600 font-mono">
+              {shortAddr(user.primary_wallet)}
+            </span>
             {user.fid && <span className="text-[10px] text-gray-600">FID:{user.fid}</span>}
             {user.ens_name && <span className="text-[10px] text-purple-400">{user.ens_name}</span>}
             {!user.fid && <span className="text-[10px] text-yellow-500/60">No FID</span>}
@@ -600,7 +675,13 @@ function UserCard({
         </div>
 
         {/* Chevron */}
-        <svg className={`w-4 h-4 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className={`w-4 h-4 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
       </button>
@@ -611,44 +692,56 @@ function UserCard({
           <div className="mt-3 space-y-2 text-xs">
             {/* Wallets */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">Primary</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">
+                Primary
+              </span>
               <span className="text-gray-300 font-mono flex-1 truncate">{user.primary_wallet}</span>
             </div>
             {user.custody_address && user.custody_address !== user.primary_wallet && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium w-16 text-center">Custody</span>
-                <span className="text-gray-300 font-mono flex-1 truncate">{user.custody_address}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium w-16 text-center">
+                  Custody
+                </span>
+                <span className="text-gray-300 font-mono flex-1 truncate">
+                  {user.custody_address}
+                </span>
               </div>
             )}
-            {user.verified_addresses && user.verified_addresses.length > 0 && user.verified_addresses.map((addr) => (
-              <div key={addr} className="flex items-center gap-2">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium w-16 text-center">Verified</span>
-                <span className="text-gray-300 font-mono flex-1 truncate">{addr}</span>
-              </div>
-            ))}
+            {user.verified_addresses &&
+              user.verified_addresses.length > 0 &&
+              user.verified_addresses.map((addr) => (
+                <div key={addr} className="flex items-center gap-2">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium w-16 text-center">
+                    Verified
+                  </span>
+                  <span className="text-gray-300 font-mono flex-1 truncate">{addr}</span>
+                </div>
+              ))}
 
             {/* Respect Wallet */}
             {user.respect_wallet && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">Respect</span>
-                <span className="text-gray-300 font-mono flex-1 truncate">{user.respect_wallet}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">
+                  Respect
+                </span>
+                <span className="text-gray-300 font-mono flex-1 truncate">
+                  {user.respect_wallet}
+                </span>
               </div>
             )}
 
             {/* Bio */}
-            {user.bio && (
-              <p className="text-gray-400 mt-2 italic">&ldquo;{user.bio}&rdquo;</p>
-            )}
+            {user.bio && <p className="text-gray-400 mt-2 italic">&ldquo;{user.bio}&rdquo;</p>}
 
             {/* Notes */}
-            {user.notes && (
-              <p className="text-gray-500 mt-1">Notes: {user.notes}</p>
-            )}
+            {user.notes && <p className="text-gray-500 mt-1">Notes: {user.notes}</p>}
 
             {/* Metadata */}
             <div className="flex items-center gap-4 text-[10px] text-gray-600 mt-2">
               <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
-              {user.last_login_at && <span>Last login {new Date(user.last_login_at).toLocaleDateString()}</span>}
+              {user.last_login_at && (
+                <span>Last login {new Date(user.last_login_at).toLocaleDateString()}</span>
+              )}
               {user.signer_uuid && <span className="text-green-500/60">Has signer</span>}
             </div>
           </div>
@@ -710,13 +803,25 @@ function EditUserModal({
   const update = (key: string, val: string) => setForm({ ...form, [key]: val });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="bg-[#0f1d2e] rounded-2xl w-full max-w-lg max-h-[90dvh] overflow-y-auto border border-white/[0.08]" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-[#0f1d2e] rounded-2xl w-full max-w-lg max-h-[90dvh] overflow-y-auto border border-white/[0.08]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Edit User</h3>
             <button onClick={onClose} className="text-gray-400 hover:text-white">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -724,7 +829,9 @@ function EditUserModal({
 
           {/* Wallet (read-only) */}
           <label className="block text-xs text-gray-500 mb-1">Primary Wallet</label>
-          <p className="text-sm text-gray-300 font-mono mb-4 bg-[#1a2a3a] rounded-lg px-3 py-2">{user.primary_wallet}</p>
+          <p className="text-sm text-gray-300 font-mono mb-4 bg-[#1a2a3a] rounded-lg px-3 py-2">
+            {user.primary_wallet}
+          </p>
 
           {/* FID */}
           <label className="block text-xs text-gray-500 mb-1">

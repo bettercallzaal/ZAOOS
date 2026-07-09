@@ -1,17 +1,17 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { PlayerProvider } from './PlayerProvider';
+import type { ReactNode } from 'react';
+import { AppleMusicProvider } from './AppleMusicProvider';
+import { BandcampProvider } from './BandcampProvider';
 import { HTMLAudioProvider } from './HTMLAudioProvider';
+import { PlayerProvider } from './PlayerProvider';
 import { SoundcloudProvider } from './SoundcloudProvider';
-import { YoutubeProvider } from './YoutubeProvider';
 import { SpotifyProvider } from './SpotifyProvider';
 import { TidalProvider } from './TidalProvider';
-import { BandcampProvider } from './BandcampProvider';
-import { AppleMusicProvider } from './AppleMusicProvider';
+import { YoutubeProvider } from './YoutubeProvider';
 
-export { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
 export type { RepeatMode } from './PlayerProvider';
+export { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
 
 export function AudioProviders({ children }: { children: ReactNode }) {
   return (

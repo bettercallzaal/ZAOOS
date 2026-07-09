@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       case 'members': {
         const members = await getGuildMembers(100);
         return NextResponse.json({
-          members: members.map(m => ({
+          members: members.map((m) => ({
             id: m.user?.id,
             username: m.user?.username,
             displayName: m.nick || m.user?.global_name || m.user?.username,
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       case 'intros': {
         const messages = await getChannelMessages(INTROS_CHANNEL_ID, 100);
         return NextResponse.json({
-          intros: messages.map(m => ({
+          intros: messages.map((m) => ({
             id: m.id,
             authorId: m.author.id,
             authorName: m.author.username,
@@ -94,7 +94,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = syncSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { type, data } = parsed.data;
@@ -104,8 +107,8 @@ export async function POST(req: NextRequest) {
         // Bot sends wallet registry: [{ discord_id, discord_name, wallet_address }]
         let synced = 0;
         for (const entry of data) {
-          const wallet = (entry.wallet_address as string || '').toLowerCase();
-          const name = entry.discord_name as string || '';
+          const wallet = ((entry.wallet_address as string) || '').toLowerCase();
+          const name = (entry.discord_name as string) || '';
           if (!wallet || !name) continue;
 
           // Update respect_members if wallet matches
@@ -122,12 +125,20 @@ export async function POST(req: NextRequest) {
         // Bot sends fractal history entries from history.json
         let imported = 0;
         for (const entry of data) {
-          const rankings = entry.rankings as { user_id: string; display_name: string; level: number; respect: number }[] || [];
+          const rankings =
+            (entry.rankings as {
+              user_id: string;
+              display_name: string;
+              level: number;
+              respect: number;
+            }[]) || [];
           if (rankings.length === 0) continue;
 
-          const sessionName = entry.group_name as string || `Fractal ${entry.fractal_number}`;
+          const sessionName = (entry.group_name as string) || `Fractal ${entry.fractal_number}`;
           const completedAt = entry.completed_at as string;
-          const sessionDate = completedAt ? completedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+          const sessionDate = completedAt
+            ? completedAt.split('T')[0]
+            : new Date().toISOString().split('T')[0];
 
           const { data: session, error: sessionErr } = await supabaseAdmin
             .from('fractal_sessions')

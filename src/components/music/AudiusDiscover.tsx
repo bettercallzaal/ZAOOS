@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueue } from '@/contexts/QueueContext';
 import {
+  type AudiusTrack,
+  getStreamUrl,
+  useAudiusSearch,
   useAudiusTrending,
   useAudiusUnderground,
-  useAudiusSearch,
-  getStreamUrl,
-  type AudiusTrack,
 } from '@/hooks/useAudius';
+import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 
 // ---------------------------------------------------------------------------
@@ -70,7 +70,12 @@ export function AudiusDiscover() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const queueToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (queueToastTimerRef.current) clearTimeout(queueToastTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (queueToastTimerRef.current) clearTimeout(queueToastTimerRef.current);
+    },
+    [],
+  );
 
   const player = usePlayer();
   const { addToQueue } = useQueue();
@@ -290,12 +295,8 @@ function TrackCard({
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">
-            {track.title}
-          </p>
-          <p className="text-xs text-gray-400 truncate mt-0.5">
-            {track.user.name}
-          </p>
+          <p className="text-sm font-semibold text-white truncate">{track.title}</p>
+          <p className="text-xs text-gray-400 truncate mt-0.5">{track.user.name}</p>
           <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-500">
             <span className="flex items-center gap-0.5">
               <PlayCountIcon className="w-3 h-3" />
@@ -312,12 +313,21 @@ function TrackCard({
 
       {/* Add to queue button */}
       <button
-        onClick={(e) => { e.stopPropagation(); onAddToQueue(track); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onAddToQueue(track);
+        }}
         className="flex-shrink-0 p-2 text-gray-500 hover:text-[#f5a623] hover:bg-[#f5a623]/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
         aria-label={`Add ${track.title} to queue`}
         title="Add to queue"
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </button>
@@ -377,12 +387,21 @@ function UndergroundCard({
         </div>
         {/* Add to queue overlay button */}
         <button
-          onClick={(e) => { e.stopPropagation(); onAddToQueue(track); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToQueue(track);
+          }}
           className="absolute top-1.5 right-1.5 p-1.5 bg-black/60 hover:bg-[#f5a623] text-white hover:text-[#0a1628] rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all z-10"
           aria-label={`Add ${track.title} to queue`}
           title="Add to queue"
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+          <svg
+            className="w-3.5 h-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
         </button>
@@ -390,12 +409,8 @@ function UndergroundCard({
 
       {/* Info */}
       <button onClick={() => onPlay(track)} className="w-full text-left">
-        <p className="text-sm font-semibold text-white truncate mt-2">
-          {track.title}
-        </p>
-        <p className="text-xs text-gray-400 truncate">
-          {track.user.name}
-        </p>
+        <p className="text-sm font-semibold text-white truncate mt-2">{track.title}</p>
+        <p className="text-xs text-gray-400 truncate">{track.user.name}</p>
         <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
           <span>{formatCount(track.play_count)} plays</span>
           <span>{formatDuration(track.duration)}</span>
@@ -459,8 +474,18 @@ function EmptyState({ message }: { message: string }) {
 
 function SearchIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
     </svg>
   );
 }
@@ -500,9 +525,18 @@ function HeartIcon({ className }: { className?: string }) {
 function PlayingBars() {
   return (
     <div className="flex items-end gap-[2px] h-4">
-      <div className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite]" style={{ height: '60%' }} />
-      <div className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.15s]" style={{ height: '100%' }} />
-      <div className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]" style={{ height: '40%' }} />
+      <div
+        className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite]"
+        style={{ height: '60%' }}
+      />
+      <div
+        className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.15s]"
+        style={{ height: '100%' }}
+      />
+      <div
+        className="w-[3px] bg-[#f5a623] rounded-full animate-[bounce_0.6s_ease-in-out_infinite_0.3s]"
+        style={{ height: '40%' }}
+      />
     </div>
   );
 }

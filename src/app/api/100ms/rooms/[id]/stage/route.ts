@@ -1,18 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 import {
+  addMSRoomSpeaker,
+  createSpeakerRequest,
+  getApprovedSpeakerNames,
   getMSRoomById,
-  isStageRoom,
   getRoomSpeakerFids,
   getSpeakerRequests,
-  createSpeakerRequest,
-  setSpeakerRequestStatus,
-  addMSRoomSpeaker,
+  isStageRoom,
   removeMSRoomSpeaker,
-  getApprovedSpeakerNames,
+  setSpeakerRequestStatus,
 } from '@/lib/social/msRoomsDb';
-import { logger } from '@/lib/logger';
 
 const ActionSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('raise_hand') }),
@@ -45,13 +45,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
     const room = await getMSRoomById(id);
     if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-    if (room.state === 'ended') return NextResponse.json({ error: 'Room has ended' }, { status: 409 });
-    if (!isStageRoom(room)) return NextResponse.json({ error: 'Not a stage room' }, { status: 400 });
+    if (room.state === 'ended')
+      return NextResponse.json({ error: 'Room has ended' }, { status: 409 });
+    if (!isStageRoom(room))
+      return NextResponse.json({ error: 'Not a stage room' }, { status: 400 });
 
     const body = await req.json();
     const parsed = ActionSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const isHost = session.fid === room.host_fid;
@@ -62,7 +67,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // approve / deny / demote are host-only moderation actions.
-    if (!isHost) return NextResponse.json({ error: 'Only the host can manage the stage' }, { status: 403 });
+    if (!isHost)
+      return NextResponse.json({ error: 'Only the host can manage the stage' }, { status: 403 });
 
     if (parsed.data.action === 'approve') {
       await setSpeakerRequestStatus(id, parsed.data.fid, 'approved');

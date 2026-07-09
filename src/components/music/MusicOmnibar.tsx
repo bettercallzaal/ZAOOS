@@ -1,87 +1,87 @@
-'use client'
+'use client';
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { isMusicUrl } from '@/lib/music/isMusicUrl'
-import { ArtworkImage } from '@/components/music/ArtworkImage'
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
 
 interface MusicOmnibarProps {
-  variant?: 'full' | 'compact'
-  onPlay?: (track: OmnibarResult) => void
-  onQueue?: (track: OmnibarResult) => void
+  variant?: 'full' | 'compact';
+  onPlay?: (track: OmnibarResult) => void;
+  onQueue?: (track: OmnibarResult) => void;
 }
 
 export interface OmnibarResult {
-  id: string
-  title: string
-  artist: string
-  artworkUrl: string
-  platform: string
-  url: string
-  streamUrl: string
+  id: string;
+  title: string;
+  artist: string;
+  artworkUrl: string;
+  platform: string;
+  url: string;
+  streamUrl: string;
 }
 
-const GENRES = ['All', 'Trending', 'Hip-Hop', 'Electronic', 'Lo-Fi', 'R&B']
+const GENRES = ['All', 'Trending', 'Hip-Hop', 'Electronic', 'Lo-Fi', 'R&B'];
 
 export default function MusicOmnibar({ variant = 'full', onPlay, onQueue }: MusicOmnibarProps) {
-  const [query, setQuery] = useState('')
-  const [activeGenre, setActiveGenre] = useState('All')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const [query, setQuery] = useState('');
+  const [activeGenre, setActiveGenre] = useState('All');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const inputType = query ? (isMusicUrl(query) ? 'url' : 'search') : 'browse'
+  const inputType = query ? (isMusicUrl(query) ? 'url' : 'search') : 'browse';
 
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current)
+    if (timerRef.current) clearTimeout(timerRef.current);
     if (inputType === 'search') {
-      timerRef.current = setTimeout(() => setDebouncedQuery(query), 300)
+      timerRef.current = setTimeout(() => setDebouncedQuery(query), 300);
     } else if (inputType === 'url') {
-      setDebouncedQuery(query)
+      setDebouncedQuery(query);
     }
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
-  }, [query, inputType])
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [query, inputType]);
 
   const { data: searchResults, isLoading: searchLoading } = useQuery({
     queryKey: ['music-search', debouncedQuery],
     queryFn: async () => {
-      if (!debouncedQuery || inputType === 'browse') return null
-      const res = await fetch(`/api/music/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`)
-      if (!res.ok) return null
-      const data = await res.json()
-      return data.results as OmnibarResult[]
+      if (!debouncedQuery || inputType === 'browse') return null;
+      const res = await fetch(`/api/music/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.results as OmnibarResult[];
     },
     enabled: !!debouncedQuery && inputType === 'search',
     staleTime: 60_000,
-  })
+  });
 
   const { data: urlResult, isLoading: urlLoading } = useQuery({
     queryKey: ['music-resolve', debouncedQuery],
     queryFn: async () => {
-      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(debouncedQuery)}`)
-      if (!res.ok) return null
-      return (await res.json()) as OmnibarResult
+      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(debouncedQuery)}`);
+      if (!res.ok) return null;
+      return (await res.json()) as OmnibarResult;
     },
     enabled: !!debouncedQuery && inputType === 'url',
     staleTime: 300_000,
-  })
+  });
 
   const { data: browseResults } = useQuery({
     queryKey: ['music-browse', activeGenre],
     queryFn: async () => {
-      const genre = activeGenre === 'All' || activeGenre === 'Trending' ? '' : activeGenre
-      const res = await fetch(`/api/music/search?q=trending&genre=${genre}&limit=20`)
-      if (!res.ok) return null
-      const data = await res.json()
-      return data.results as OmnibarResult[]
+      const genre = activeGenre === 'All' || activeGenre === 'Trending' ? '' : activeGenre;
+      const res = await fetch(`/api/music/search?q=trending&genre=${genre}&limit=20`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.results as OmnibarResult[];
     },
     enabled: inputType === 'browse',
     staleTime: 300_000,
-  })
+  });
 
-  const isLoading = searchLoading || urlLoading
+  const isLoading = searchLoading || urlLoading;
   const results = useMemo(() => {
     if (inputType === 'url' && urlResult) return [urlResult];
     if (inputType === 'search') return searchResults ?? [];
@@ -91,12 +91,12 @@ export default function MusicOmnibar({ variant = 'full', onPlay, onQueue }: Musi
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && results && results.length > 0) {
-        e.preventDefault()
-        onPlay?.(results[0])
+        e.preventDefault();
+        onPlay?.(results[0]);
       }
     },
     [results, onPlay],
-  )
+  );
 
   return (
     <div className="w-full">
@@ -118,8 +118,8 @@ export default function MusicOmnibar({ variant = 'full', onPlay, onQueue }: Musi
           {query && (
             <button
               onClick={() => {
-                setQuery('')
-                setDebouncedQuery('')
+                setQuery('');
+                setDebouncedQuery('');
               }}
               className="text-gray-500 hover:text-gray-300 text-sm"
             >
@@ -191,5 +191,5 @@ export default function MusicOmnibar({ variant = 'full', onPlay, onQueue }: Musi
         </div>
       )}
     </div>
-  )
+  );
 }

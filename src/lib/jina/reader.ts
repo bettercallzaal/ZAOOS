@@ -49,7 +49,7 @@ export async function jinaFetch(url: string): Promise<string> {
     const response = await fetch(jinaUrl, {
       method: 'GET',
       headers: {
-        'Accept': 'text/plain',
+        Accept: 'text/plain',
         'User-Agent': 'Mozilla/5.0 (compatible; ZAO Reader/1.0)',
       },
       signal: controller.signal,
@@ -252,7 +252,7 @@ function extractDescriptionFromText(text: string): string | undefined {
 function extractLinksFromText(text: string): string[] {
   if (!text) return [];
 
-  const urlPattern = /https?:\/\/[^\s\)]+/g;
+  const urlPattern = /https?:\/\/[^\s)]+/g;
   const matches = text.match(urlPattern) || [];
 
   // Deduplicate and return unique links

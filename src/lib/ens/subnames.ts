@@ -10,16 +10,16 @@
  */
 
 import {
-  createWalletClient,
-  createPublicClient,
-  http,
-  fallback,
-  namehash,
   type Address,
+  createPublicClient,
+  createWalletClient,
+  fallback,
   type Hex,
+  http,
+  namehash,
 } from 'viem';
-import { mainnet } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
+import { mainnet } from 'viem/chains';
 import { logger } from '@/lib/logger';
 
 // ── Contract addresses ──
@@ -40,7 +40,7 @@ export const FUSES = {
   CANNOT_CREATE_SUBDOMAIN: 32,
   CANNOT_APPROVE: 64,
   PARENT_CANNOT_CONTROL: 1 << 16, // 65536 — emancipates the subname
-  CAN_EXTEND_EXPIRY: 1 << 18,     // 262144 — owner can extend
+  CAN_EXTEND_EXPIRY: 1 << 18, // 262144 — owner can extend
 } as const;
 
 // ── ABI fragments ──
@@ -133,7 +133,10 @@ const publicClient = createPublicClient({
 
 function getWalletClient() {
   const key = process.env.ENS_OPERATOR_PRIVATE_KEY;
-  if (!key) throw new Error('ENS_OPERATOR_PRIVATE_KEY not configured — run: npx tsx scripts/generate-ens-operator.ts');
+  if (!key)
+    throw new Error(
+      'ENS_OPERATOR_PRIVATE_KEY not configured — run: npx tsx scripts/generate-ens-operator.ts',
+    );
   const account = privateKeyToAccount(key as Hex);
   return createWalletClient({
     account,
@@ -193,7 +196,11 @@ export async function createSubname(
         args: [BigInt(subnameNode)],
       });
       if (existing[0] !== '0x0000000000000000000000000000000000000000') {
-        return { success: false, fullName, error: `Subname "${sanitized}" already exists (owner: ${existing[0]})` };
+        return {
+          success: false,
+          fullName,
+          error: `Subname "${sanitized}" already exists (owner: ${existing[0]})`,
+        };
       }
     } catch {
       // getData may revert if name doesn't exist — that's fine
@@ -214,7 +221,7 @@ export async function createSubname(
         ownerAddress as Address,
         PUBLIC_RESOLVER,
         BigInt(0), // ttl
-        0,         // fuses — none burned, parent retains control
+        0, // fuses — none burned, parent retains control
         expiry,
       ],
     });
@@ -242,7 +249,11 @@ export async function createSubname(
     return { success: true, fullName, txHash };
   } catch (err) {
     const message = (err as Error).message;
-    return { success: false, fullName, error: `On-chain creation failed: ${message.slice(0, 200)}` };
+    return {
+      success: false,
+      fullName,
+      error: `On-chain creation failed: ${message.slice(0, 200)}`,
+    };
   }
 }
 
@@ -269,8 +280,16 @@ export async function createSubnameWithFallback(
 // ── Batch Create ──
 
 export async function batchCreateSubnames(
-  names: { name: string; address: string; zid: number | null; textRecords?: Record<string, string> }[],
-): Promise<{ created: { name: string; txHash?: string }[]; failed: { name: string; error: string }[] }> {
+  names: {
+    name: string;
+    address: string;
+    zid: number | null;
+    textRecords?: Record<string, string>;
+  }[],
+): Promise<{
+  created: { name: string; txHash?: string }[];
+  failed: { name: string; error: string }[];
+}> {
   const created: { name: string; txHash?: string }[] = [];
   const failed: { name: string; error: string }[] = [];
 

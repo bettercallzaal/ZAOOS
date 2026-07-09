@@ -12,8 +12,8 @@
 // by /api/fractals/sessions and /api/fractals/analytics), plus a
 // fractal_events audit log table.
 
-import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -126,10 +126,7 @@ function validateWebhookAuth(req: NextRequest, rawBody: string): boolean {
   // Fallback: HMAC signature in x-webhook-signature header
   const hmacHeader = req.headers.get('x-webhook-signature');
   if (hmacHeader) {
-    const expected = crypto
-      .createHmac('sha256', secret)
-      .update(rawBody)
-      .digest('hex');
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
     return timingSafeCompare(hmacHeader, expected);
   }
 
@@ -250,26 +247,24 @@ async function handleFractalStarted(
   fractalId: string,
   data: z.infer<typeof fractalStartedDataSchema>,
 ) {
-  const { error } = await supabaseAdmin
-    .from('fractal_sessions')
-    .upsert(
-      {
-        discord_thread_id: fractalId,
-        name: data.name,
-        session_date: new Date().toISOString().split('T')[0],
-        host_name: data.facilitatorDiscordId,
-        participant_count: data.participantDiscordIds.length,
-        scoring_era: 'ORDAO',
-        status: 'active',
-        notes: JSON.stringify({
-          guildId: data.guildId,
-          participantDiscordIds: data.participantDiscordIds,
-          currentLevel: data.currentLevel,
-          source: 'webhook',
-        }),
-      },
-      { onConflict: 'discord_thread_id', ignoreDuplicates: false },
-    );
+  const { error } = await supabaseAdmin.from('fractal_sessions').upsert(
+    {
+      discord_thread_id: fractalId,
+      name: data.name,
+      session_date: new Date().toISOString().split('T')[0],
+      host_name: data.facilitatorDiscordId,
+      participant_count: data.participantDiscordIds.length,
+      scoring_era: 'ORDAO',
+      status: 'active',
+      notes: JSON.stringify({
+        guildId: data.guildId,
+        participantDiscordIds: data.participantDiscordIds,
+        currentLevel: data.currentLevel,
+        source: 'webhook',
+      }),
+    },
+    { onConflict: 'discord_thread_id', ignoreDuplicates: false },
+  );
 
   if (error) {
     logger.error('[fractal-webhook] fractal_started upsert error:', error);
@@ -282,10 +277,7 @@ async function handleFractalStarted(
  * Individual votes are captured in the audit log (logEvent) for the
  * real-time feed; the session row just tracks current level + vote count.
  */
-async function handleVoteCast(
-  fractalId: string,
-  data: z.infer<typeof voteCastDataSchema>,
-) {
+async function handleVoteCast(fractalId: string, data: z.infer<typeof voteCastDataSchema>) {
   const { error } = await supabaseAdmin
     .from('fractal_sessions')
     .update({
@@ -379,9 +371,7 @@ async function handleFractalComplete(
     // wallet_address will be null — can be resolved later via Discord ID lookup
   }));
 
-  const { error: scoresError } = await supabaseAdmin
-    .from('fractal_scores')
-    .insert(scoreRows);
+  const { error: scoresError } = await supabaseAdmin.from('fractal_scores').insert(scoreRows);
 
   if (scoresError) {
     logger.error('[fractal-webhook] fractal_complete scores insert error:', scoresError);

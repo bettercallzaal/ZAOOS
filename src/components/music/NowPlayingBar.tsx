@@ -1,9 +1,9 @@
 'use client';
 
-import { useNowPlaying, NowPlayingEntry } from '@/hooks/useNowPlaying';
-import { usePlayer } from '@/providers/audio';
 import { useAuth } from '@/hooks/useAuth';
+import { type NowPlayingEntry, useNowPlaying } from '@/hooks/useNowPlaying';
 import { useOverlaySync } from '@/hooks/useOverlaySync';
+import { usePlayer } from '@/providers/audio';
 import type { TrackType } from '@/types/music';
 
 /**
@@ -14,9 +14,7 @@ import type { TrackType } from '@/types/music';
 export function NowPlayingBar() {
   const { user } = useAuth();
   useOverlaySync(user?.fid);
-  const { presenceState } = useNowPlaying(
-    user ? { fid: user.fid, username: user.username } : null,
-  );
+  const { presenceState } = useNowPlaying(user ? { fid: user.fid, username: user.username } : null);
   const player = usePlayer();
 
   if (presenceState.length === 0) return null;
@@ -37,9 +35,7 @@ export function NowPlayingBar() {
   return (
     <div className="border-b border-white/[0.08] bg-[#0d1b2a]/80 backdrop-blur-sm">
       <div className="flex items-center gap-1 px-3 py-1.5 overflow-x-auto scrollbar-hide">
-        <span className="text-[10px] text-gray-500 flex-shrink-0 mr-1">
-          Listening now
-        </span>
+        <span className="text-[10px] text-gray-500 flex-shrink-0 mr-1">Listening now</span>
         {presenceState.map((entry) => (
           <button
             key={entry.fid}
@@ -54,12 +50,8 @@ export function NowPlayingBar() {
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-gray-400 truncate leading-tight">
-                {entry.username}
-              </p>
-              <p className="text-[10px] text-white truncate leading-tight">
-                {entry.trackName}
-              </p>
+              <p className="text-[10px] text-gray-400 truncate leading-tight">{entry.username}</p>
+              <p className="text-[10px] text-white truncate leading-tight">{entry.trackName}</p>
             </div>
             {/* Playing indicator */}
             <div className="flex items-end gap-px flex-shrink-0">

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, ReactNode } from 'react'
-import { usePlayerContext } from './PlayerProvider'
+import { type ReactNode, useEffect, useRef } from 'react';
+import { usePlayerContext } from './PlayerProvider';
 
 /**
  * TidalProvider — registers a TIDAL controller with PlayerProvider.
@@ -10,23 +10,23 @@ import { usePlayerContext } from './PlayerProvider'
  * server-side via the TIDAL Open API client (src/lib/music/tidal.ts).
  */
 export function TidalProvider({ children }: { children: ReactNode }) {
-  const { registerController } = usePlayerContext()
-  const registered = useRef(false)
+  const { registerController } = usePlayerContext();
+  const registered = useRef(false);
 
   useEffect(() => {
-    if (registered.current) return
-    registered.current = true
+    if (registered.current) return;
+    registered.current = true;
 
     registerController('tidal', {
       play: () => {},
       pause: () => {},
       seek: () => {},
       load: (url: string) => {
-        window.open(url, '_blank', 'noopener')
+        window.open(url, '_blank', 'noopener');
       },
       setVolume: () => {},
-    })
-  }, [registerController])
+    });
+  }, [registerController]);
 
-  return <>{children}</>
+  return <>{children}</>;
 }

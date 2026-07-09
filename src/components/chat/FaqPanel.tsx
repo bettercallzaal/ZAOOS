@@ -6,11 +6,11 @@ import { useEscapeClose } from '@/hooks/useEscapeClose';
 const FAQ_ITEMS = [
   {
     q: 'What is THE ZAO?',
-    a: 'THE ZAO is a gated music community on Farcaster. It\'s a private space for music lovers, producers, DJs, and curators to share and discover music together.',
+    a: "THE ZAO is a gated music community on Farcaster. It's a private space for music lovers, producers, DJs, and curators to share and discover music together.",
   },
   {
     q: 'How do I get access?',
-    a: 'Access is by invite only. If you\'re seeing this, you\'re already on the allowlist. You need a Farcaster account and to sign in with your connected wallet.',
+    a: "Access is by invite only. If you're seeing this, you're already on the allowlist. You need a Farcaster account and to sign in with your connected wallet.",
   },
   {
     q: 'What are the channels?',
@@ -34,7 +34,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'What is Respect?',
-    a: 'Respect is the community\'s reputation system. You earn Respect by sharing great music, being active, and contributing to the community. Check the Respect page for the leaderboard.',
+    a: "Respect is the community's reputation system. You earn Respect by sharing great music, being active, and contributing to the community. Check the Respect page for the leaderboard.",
   },
   {
     q: 'Can I schedule posts?',
@@ -68,8 +68,18 @@ export function FaqPanel({ isOpen, onClose }: FaqPanelProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/[0.08] flex-shrink-0">
           <h2 className="text-lg font-bold text-white">FAQ</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Close FAQ">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Close FAQ"
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -91,7 +101,11 @@ export function FaqPanel({ isOpen, onClose }: FaqPanelProps) {
                   stroke="currentColor"
                   strokeWidth={2}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
                 </svg>
               </button>
               {expandedIndex === i && (

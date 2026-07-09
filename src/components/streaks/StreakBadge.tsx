@@ -80,11 +80,7 @@ export default function StreakBadge() {
       {/* Count */}
       <span
         className={`text-xs font-bold tabular-nums ${
-          isActive
-            ? 'text-[#f5a623]'
-            : isAtRisk
-              ? 'text-[#f5a623] animate-pulse'
-              : 'text-gray-500'
+          isActive ? 'text-[#f5a623]' : isAtRisk ? 'text-[#f5a623] animate-pulse' : 'text-gray-500'
         }`}
       >
         {displayCount}

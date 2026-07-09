@@ -1,12 +1,11 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { OverlayCard } from './OverlayCard';
-import { OverlayMinimal } from './OverlayMinimal';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { OverlayBar } from './OverlayBar';
+import { OverlayCard } from './OverlayCard';
 import { OverlayFullscreen } from './OverlayFullscreen';
+import { OverlayMinimal } from './OverlayMinimal';
 
 export interface NowPlayingData {
   playing: boolean;

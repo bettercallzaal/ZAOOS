@@ -1,7 +1,7 @@
 'use client';
 
+import { OwnCapability, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useEffect, useRef, useState } from 'react';
-import { useCall, useCallStateHooks, OwnCapability } from '@stream-io/video-react-sdk';
 
 /**
  * Listener-side promotion confirm. Fires when the host grants SEND_AUDIO (or
@@ -80,7 +80,6 @@ export function PromotionConfirm() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-     
   }, [open]);
 
   async function handleAccept() {
@@ -108,14 +107,18 @@ export function PromotionConfirm() {
     >
       <div className="bg-[#0d1b2a] border border-[#f5a623]/30 rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-md shadow-xl shadow-[#f5a623]/10">
         <div className="mb-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] text-[10px] font-bold tracking-wider uppercase">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse" aria-hidden="true" />
+          <span
+            className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse"
+            aria-hidden="true"
+          />
           Host promoted you
         </div>
         <h2 id="promotion-title" className="text-white text-lg font-bold mt-2 mb-1">
           You can speak now
         </h2>
         <p className="text-gray-400 text-sm leading-relaxed mb-5">
-          Tap <span className="text-white font-semibold">Go on stage</span> to unmute, or stay as a listener. Auto-accepts in {countdown}s.
+          Tap <span className="text-white font-semibold">Go on stage</span> to unmute, or stay as a
+          listener. Auto-accepts in {countdown}s.
         </p>
 
         <div className="grid grid-cols-2 gap-2">

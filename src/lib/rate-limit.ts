@@ -34,18 +34,27 @@ function getOrCreateLimiter(limit: number, windowMs: number): Ratelimit | null {
 export async function rateLimit(
   key: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
 ): Promise<{ success: boolean; remaining: number }> {
   try {
     const limiter = getOrCreateLimiter(limit, windowMs);
     if (!limiter) {
-      // No Redis configured (local dev) — allow all requests
+      // Production: no Redis configured — fail CLOSED (deny) to protect auth/admin/upload routes.
+      // Dev/local: allow requests without Redis for developer experience.
+      if (process.env.NODE_ENV === 'production') {
+        return { success: false, remaining: 0 };
+      }
       return { success: true, remaining: limit };
     }
     const result = await limiter.limit(key);
     return { success: result.success, remaining: result.remaining };
-  } catch {
-    // If Redis is down, allow the request through rather than blocking users
+  } catch (error) {
+    // Production: Redis error — fail CLOSED to protect sensitive routes (auth/admin/upload/publish).
+    // Dev: allow requests to preserve developer experience during debugging.
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Rate limit Redis error, denying request for safety:', error);
+      return { success: false, remaining: 0 };
+    }
     return { success: true, remaining: limit };
   }
 }

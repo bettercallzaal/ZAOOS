@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),
@@ -133,7 +133,10 @@ describe('POST /api/proposals/vote', () => {
       }
       if (callCount === 2) {
         // user query
-        return Promise.resolve({ data: { id: 'u1', primary_wallet: '0xabc', respect_wallet: null }, error: null });
+        return Promise.resolve({
+          data: { id: 'u1', primary_wallet: '0xabc', respect_wallet: null },
+          error: null,
+        });
       }
       // upsert vote
       return Promise.resolve({ data: { id: 'v1', vote: 'for', respect_weight: 0 }, error: null });

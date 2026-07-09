@@ -40,7 +40,7 @@ Rules: stay factual, do not invent specifics not in the note. If the note only a
 
   let line = `- ${text}`;
   try {
-    const r = await callClaudeCli({ model: 'haiku', prompt, outputFormat: 'text' });
+    const r = await callClaudeCli({ model: 'haiku', prompt, cwd: ZOE_PATHS.home, allowedTools: [], outputFormat: 'text', bare: true, timeoutMs: 30000 });
     const t = (r.text || '').trim();
     if (t.startsWith('-')) line = t;
     else if (t) line = `- ${t}`;

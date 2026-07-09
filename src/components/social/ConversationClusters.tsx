@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ClusterMember {
   fid: number;
@@ -51,7 +51,9 @@ export function ConversationClusters({ onFilterMembers }: Props) {
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   function handleClusterClick(cluster: Cluster) {
@@ -69,18 +71,22 @@ export function ConversationClusters({ onFilterMembers }: Props) {
       <div className="px-4 py-3">
         <div className="flex gap-3 overflow-x-auto scrollbar-hide">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex-shrink-0 w-40 h-24 bg-[#1a2a3a] rounded-xl animate-pulse" />
+            <div
+              key={i}
+              className="flex-shrink-0 w-40 h-24 bg-[#1a2a3a] rounded-xl animate-pulse"
+            />
           ))}
         </div>
       </div>
     );
   }
 
-  if (error) return (
-    <div className="px-4 py-3">
-      <p className="text-red-400 text-sm">{error}</p>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="px-4 py-3">
+        <p className="text-red-400 text-sm">{error}</p>
+      </div>
+    );
   if (clusters.length === 0 && yourChannels.length === 0) return null;
 
   return (
@@ -109,67 +115,65 @@ export function ConversationClusters({ onFilterMembers }: Props) {
 
       {/* Shared Clusters (2+ members) */}
       {clusters.length > 0 && (
-      <div>
-      <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-        Shared Channels ({clusters.length})
-      </p>
-      <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
-        {clusters.map((cluster) => {
-          const isActive = activeCluster === cluster.channelId;
-          return (
-            <button
-              key={cluster.channelId}
-              onClick={() => handleClusterClick(cluster)}
-              className={`flex-shrink-0 rounded-xl border p-3 text-left transition-all min-w-[140px] max-w-[180px] ${
-                isActive
-                  ? 'bg-[#f5a623]/10 border-[#f5a623]/40'
-                  : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-xs font-medium truncate ${isActive ? 'text-[#f5a623]' : 'text-white'}`}>
-                  {cluster.name}
-                </span>
-                <span className="text-[10px] text-gray-500 ml-1.5">
-                  {cluster.size}
-                </span>
-              </div>
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
+            Shared Channels ({clusters.length})
+          </p>
+          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
+            {clusters.map((cluster) => {
+              const isActive = activeCluster === cluster.channelId;
+              return (
+                <button
+                  key={cluster.channelId}
+                  onClick={() => handleClusterClick(cluster)}
+                  className={`flex-shrink-0 rounded-xl border p-3 text-left transition-all min-w-[140px] max-w-[180px] ${
+                    isActive
+                      ? 'bg-[#f5a623]/10 border-[#f5a623]/40'
+                      : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className={`text-xs font-medium truncate ${isActive ? 'text-[#f5a623]' : 'text-white'}`}
+                    >
+                      {cluster.name}
+                    </span>
+                    <span className="text-[10px] text-gray-500 ml-1.5">{cluster.size}</span>
+                  </div>
 
-              {/* Avatar row */}
-              <div className="flex -space-x-2">
-                {cluster.members.slice(0, 6).map((m) => (
-                  <div
-                    key={m.fid}
-                    className="w-6 h-6 rounded-full border-2 border-[#0d1b2a] overflow-hidden bg-gray-700 flex-shrink-0"
-                  >
-                    {m.pfpUrl ? (
-                      <img
-                        src={m.pfpUrl}
-                        alt={m.username}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-600" />
+                  {/* Avatar row */}
+                  <div className="flex -space-x-2">
+                    {cluster.members.slice(0, 6).map((m) => (
+                      <div
+                        key={m.fid}
+                        className="w-6 h-6 rounded-full border-2 border-[#0d1b2a] overflow-hidden bg-gray-700 flex-shrink-0"
+                      >
+                        {m.pfpUrl ? (
+                          <img
+                            src={m.pfpUrl}
+                            alt={m.username}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-600" />
+                        )}
+                      </div>
+                    ))}
+                    {cluster.size > 6 && (
+                      <div className="w-6 h-6 rounded-full border-2 border-[#0d1b2a] bg-[#1a2a3a] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[8px] text-gray-400">+{cluster.size - 6}</span>
+                      </div>
                     )}
                   </div>
-                ))}
-                {cluster.size > 6 && (
-                  <div className="w-6 h-6 rounded-full border-2 border-[#0d1b2a] bg-[#1a2a3a] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[8px] text-gray-400">+{cluster.size - 6}</span>
-                  </div>
-                )}
-              </div>
 
-              {/* Channel tag */}
-              <p className="text-[9px] text-gray-600 mt-1.5 truncate">
-                /{cluster.channelId}
-              </p>
-            </button>
-          );
-        })}
-      </div>
-      </div>
+                  {/* Channel tag */}
+                  <p className="text-[9px] text-gray-600 mt-1.5 truncate">/{cluster.channelId}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );

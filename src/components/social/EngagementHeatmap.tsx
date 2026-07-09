@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -21,8 +21,10 @@ export function EngagementHeatmap() {
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/social/engagement-heatmap', { signal: controller.signal })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data?.heatmap) setHeatmap(data.heatmap); })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.heatmap) setHeatmap(data.heatmap);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
     return () => controller.abort();
@@ -72,7 +74,13 @@ export function EngagementHeatmap() {
           {/* Legend */}
           <div className="flex items-center justify-end gap-1 mt-2">
             <span className="text-[8px] text-gray-600">Less</span>
-            {['bg-white/[0.03]', 'bg-[#f5a623]/10', 'bg-[#f5a623]/25', 'bg-[#f5a623]/50', 'bg-[#f5a623]/80'].map((c) => (
+            {[
+              'bg-white/[0.03]',
+              'bg-[#f5a623]/10',
+              'bg-[#f5a623]/25',
+              'bg-[#f5a623]/50',
+              'bg-[#f5a623]/80',
+            ].map((c) => (
               <div key={c} className={`w-3 h-3 rounded-sm ${c}`} />
             ))}
             <span className="text-[8px] text-gray-600">More</span>

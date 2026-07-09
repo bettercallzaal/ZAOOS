@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import type { AgentEvent } from './constants';
 import AgentEventRow from './AgentEventRow';
 import AgentFilters from './AgentFilters';
+import type { AgentEvent } from './constants';
 
 export default function WarRoomFeed({ events }: { events: AgentEvent[] }) {
   const [agentFilter, setAgentFilter] = useState('');
@@ -32,9 +32,7 @@ export default function WarRoomFeed({ events }: { events: AgentEvent[] }) {
             No events yet. Agents will appear here when they start logging.
           </div>
         ) : (
-          filtered.map((event) => (
-            <AgentEventRow key={event.id} event={event} />
-          ))
+          filtered.map((event) => <AgentEventRow key={event.id} event={event} />)
         )}
       </div>
     </div>

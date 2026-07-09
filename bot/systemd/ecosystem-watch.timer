@@ -1,0 +1,7 @@
+[Unit]
+Description=Daily ZAO ecosystem watch
+[Timer]
+OnCalendar=*-*-* 13:00:00 UTC
+Persistent=true
+[Install]
+WantedBy=timers.target

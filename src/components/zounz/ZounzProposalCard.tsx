@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
-import { ZOUNZ_GOVERNOR, governorAbi } from '@/lib/zounz/contracts';
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { governorAbi, ZOUNZ_GOVERNOR } from '@/lib/zounz/contracts';
 
 interface Proposal {
   proposalId: string;
@@ -45,7 +45,6 @@ export default function ZounzProposalCard({
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash: txHash,
   });
-
 
   const totalVotes = proposal.forVotes + proposal.againstVotes + proposal.abstainVotes;
   const forPct = totalVotes > 0 ? (proposal.forVotes / totalVotes) * 100 : 0;
@@ -124,9 +123,7 @@ export default function ZounzProposalCard({
       {/* Time remaining for active proposals */}
       {isActive && (
         <p className="text-[10px] text-yellow-400 mb-2">
-          {timeLeftHrs > 0
-            ? `${timeLeftHrs}h ${timeLeftMins}m left`
-            : `${timeLeftMins}m left`}
+          {timeLeftHrs > 0 ? `${timeLeftHrs}h ${timeLeftMins}m left` : `${timeLeftMins}m left`}
         </p>
       )}
 

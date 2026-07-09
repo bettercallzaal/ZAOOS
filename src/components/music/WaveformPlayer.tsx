@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
 import { useWavesurfer } from '@wavesurfer/react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WaveformPlayerProps {
   url: string;
@@ -14,7 +14,14 @@ interface WaveformPlayerProps {
 }
 
 export default function WaveformPlayer(props: WaveformPlayerProps) {
-  const { url, progress, height = 32, waveColor = '#4a5568', progressColor = '#f5a623', onSeek } = props;
+  const {
+    url,
+    progress,
+    height = 32,
+    waveColor = '#4a5568',
+    progressColor = '#f5a623',
+    onSeek,
+  } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
   const seekingRef = useRef(false);
@@ -100,10 +107,7 @@ export default function WaveformPlayer(props: WaveformPlayerProps) {
     <div className="relative w-full">
       {/* Loading placeholder */}
       {!isReady && (
-        <div
-          className="absolute inset-0 flex items-center"
-          style={{ height }}
-        >
+        <div className="absolute inset-0 flex items-center" style={{ height }}>
           <div className="w-full h-1 bg-gray-700 rounded animate-pulse" />
         </div>
       )}

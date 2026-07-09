@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface StakingEntry {
   address: string;
@@ -36,7 +36,9 @@ export function StakingLeaderboard() {
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Total Staked</div>
           <div className="text-white text-xl font-bold">
-            {entries.reduce((sum, e) => sum + Number(e.stakedFormatted.replace(/,/g, '')), 0).toLocaleString()}
+            {entries
+              .reduce((sum, e) => sum + Number(e.stakedFormatted.replace(/,/g, '')), 0)
+              .toLocaleString()}
           </div>
         </div>
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
@@ -50,7 +52,10 @@ export function StakingLeaderboard() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-white/[0.08]" />
+            <div
+              key={i}
+              className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-white/[0.08]"
+            />
           ))}
         </div>
       ) : entries.length === 0 ? (
@@ -69,12 +74,17 @@ export function StakingLeaderboard() {
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3 w-12">#</th>
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3">Staker</th>
                   <th className="text-right text-gray-500 text-xs uppercase px-4 py-3">Staked</th>
-                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3">Conviction</th>
+                  <th className="text-right text-gray-500 text-xs uppercase px-4 py-3">
+                    Conviction
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {entries.map((entry, i) => (
-                  <tr key={entry.address} className="border-b border-white/[0.08] hover:bg-[#1a2a3a]/50 transition-colors">
+                  <tr
+                    key={entry.address}
+                    className="border-b border-white/[0.08] hover:bg-[#1a2a3a]/50 transition-colors"
+                  >
                     <td className="px-4 py-3 text-gray-400 font-mono">{i + 1}</td>
                     <td className="px-4 py-3">
                       <div className="text-white font-medium">
@@ -84,7 +94,9 @@ export function StakingLeaderboard() {
                     <td className="px-4 py-3 text-right text-white font-mono">
                       {Number(entry.stakedFormatted).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-right text-[#f5a623] font-mono">{entry.convictionFormatted}</td>
+                    <td className="px-4 py-3 text-right text-[#f5a623] font-mono">
+                      {entry.convictionFormatted}
+                    </td>
                   </tr>
                 ))}
               </tbody>

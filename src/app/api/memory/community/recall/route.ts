@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -40,17 +40,16 @@ export async function GET(request: NextRequest) {
     const results = await hindsight.recall(COMMUNITY_BANK_ID, query, { limit });
 
     return NextResponse.json({
-      memories: results.map((r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({
-        content: r.content,
-        score: r.score,
-        metadata: r.metadata,
-      })),
+      memories: results.map(
+        (r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({
+          content: r.content,
+          score: r.score,
+          metadata: r.metadata,
+        }),
+      ),
     });
   } catch (error) {
     logger.error('Failed to recall community memories:', error);
-    return NextResponse.json(
-      { error: 'Failed to recall community memories' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to recall community memories' }, { status: 500 });
   }
 }

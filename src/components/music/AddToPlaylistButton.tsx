@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Playlist {
   id: string;
@@ -18,7 +18,11 @@ interface AddToPlaylistButtonProps {
   className?: string;
 }
 
-export function AddToPlaylistButton({ songUrl, compact = false, className = '' }: AddToPlaylistButtonProps) {
+export function AddToPlaylistButton({
+  songUrl,
+  compact = false,
+  className = '',
+}: AddToPlaylistButtonProps) {
   const [open, setOpen] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(false);
@@ -66,7 +70,9 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
         const data = await res.json();
         setPlaylists(data.playlists || []);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setLoading(false);
   }, []);
 
@@ -145,7 +151,13 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
         aria-label="Add to playlist"
         title="Add to playlist"
       >
-        <svg className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </button>
@@ -177,8 +189,18 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                   disabled={adding !== null}
                   className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/5 transition-colors text-left disabled:opacity-50"
                 >
-                  <svg className="w-4 h-4 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                  <svg
+                    className="w-4 h-4 text-gray-500 flex-shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
+                    />
                   </svg>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-white truncate flex items-center gap-1">
@@ -189,13 +211,25 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                         </span>
                       )}
                     </p>
-                    <p className="text-[10px] text-gray-500">{pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''}</p>
+                    <p className="text-[10px] text-gray-500">
+                      {pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''}
+                    </p>
                   </div>
                   {adding === pl.id ? (
                     <div className="w-3.5 h-3.5 border-2 border-gray-600 border-t-[#f5a623] rounded-full animate-spin flex-shrink-0" />
                   ) : success === pl.id ? (
-                    <svg className="w-4 h-4 text-green-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    <svg
+                      className="w-4 h-4 text-green-400 flex-shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
                     </svg>
                   ) : null}
                 </button>
@@ -214,7 +248,10 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') createAndAdd();
-                    if (e.key === 'Escape') { setCreating(false); setNewName(''); }
+                    if (e.key === 'Escape') {
+                      setCreating(false);
+                      setNewName('');
+                    }
                   }}
                   placeholder="Playlist name..."
                   maxLength={100}
@@ -228,8 +265,18 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                   {adding === 'new' ? (
                     <div className="w-4 h-4 border-2 border-gray-600 border-t-[#f5a623] rounded-full animate-spin" />
                   ) : (
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
                     </svg>
                   )}
                 </button>
@@ -239,7 +286,13 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                 onClick={() => setCreating(true)}
                 className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/5 transition-colors text-left"
               >
-                <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="w-4 h-4 text-[#f5a623] flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 <span className="text-xs text-[#f5a623]">New playlist</span>

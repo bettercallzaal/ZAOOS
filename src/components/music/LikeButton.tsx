@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Liker {
   fid: number;
@@ -15,7 +15,12 @@ interface LikeButtonProps {
   currentUserFid?: number;
 }
 
-export function LikeButton({ songUrl, compact = false, className = '', currentUserFid }: LikeButtonProps) {
+export function LikeButton({
+  songUrl,
+  compact = false,
+  className = '',
+  currentUserFid,
+}: LikeButtonProps) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [likers, setLikers] = useState<Liker[]>([]);
@@ -132,9 +137,7 @@ export function LikeButton({ songUrl, compact = false, className = '', currentUs
         className={`inline-flex items-center gap-1 transition-colors disabled:opacity-60 ${
           compact ? 'p-1.5' : 'p-2'
         } ${
-          liked
-            ? 'text-[#f5a623] hover:text-[#ffd700]'
-            : 'text-gray-500 hover:text-gray-300'
+          liked ? 'text-[#f5a623] hover:text-[#ffd700]' : 'text-gray-500 hover:text-gray-300'
         } ${className}`}
         aria-label={liked ? 'Unlike song' : 'Like song'}
         title={liked ? 'Unlike' : 'Like'}
@@ -155,9 +158,7 @@ export function LikeButton({ songUrl, compact = false, className = '', currentUs
         </svg>
 
         {/* Like count — hidden in compact mode */}
-        {!compact && likeCount > 0 && (
-          <span className="text-xs tabular-nums">{likeCount}</span>
-        )}
+        {!compact && likeCount > 0 && <span className="text-xs tabular-nums">{likeCount}</span>}
       </button>
 
       {/* Social proof text — only in non-compact mode */}

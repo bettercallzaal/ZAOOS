@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -25,7 +25,9 @@ export async function GET(req: NextRequest) {
       query = query.in('type', ['community', 'totd_archive', 'auto']);
     } else {
       // All visible: community + auto + own personal
-      query = query.or(`type.in.(community,totd_archive,auto),and(type.eq.personal,created_by_fid.eq.${session.fid})`);
+      query = query.or(
+        `type.in.(community,totd_archive,auto),and(type.eq.personal,created_by_fid.eq.${session.fid})`,
+      );
     }
 
     const { data, error } = await query;
@@ -33,11 +35,14 @@ export async function GET(req: NextRequest) {
 
     const playlists = (data || []).map((p) => ({
       ...p,
-      trackCount: Array.isArray(p.playlist_tracks) ? p.playlist_tracks[0]?.count ?? 0 : 0,
+      trackCount: Array.isArray(p.playlist_tracks) ? (p.playlist_tracks[0]?.count ?? 0) : 0,
       playlist_tracks: undefined,
     }));
 
-    return NextResponse.json({ playlists }, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } });
+    return NextResponse.json(
+      { playlists },
+      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } },
+    );
   } catch (err) {
     logger.error('[playlists] list failed:', err);
     return NextResponse.json({ error: 'Failed to load playlists' }, { status: 500 });
@@ -62,7 +67,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { data: playlist, error } = await supabaseAdmin

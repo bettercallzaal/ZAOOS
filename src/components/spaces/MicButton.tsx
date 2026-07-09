@@ -1,7 +1,7 @@
 'use client';
 
+import { OwnCapability, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useState } from 'react';
-import { useCallStateHooks, useCall, OwnCapability } from '@stream-io/video-react-sdk';
 
 export function MicButton() {
   const call = useCall();

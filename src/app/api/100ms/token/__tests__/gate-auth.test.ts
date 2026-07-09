@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makePostRequest, mockAuthenticatedSession } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockGetMSRoomById, mockCheckTokenGate, mockGetUserByFid } = vi.hoisted(
@@ -16,7 +16,8 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/social/msRoomsDb', () => ({
   getMSRoomById: mockGetMSRoomById,
-  isStageRoom: (room: { settings?: Record<string, unknown> }) => room.settings?.room_type === 'stage',
+  isStageRoom: (room: { settings?: Record<string, unknown> }) =>
+    room.settings?.room_type === 'stage',
   getRoomSpeakerFids: (room: { speakers?: unknown[] }) =>
     Array.isArray(room.speakers) ? room.speakers.filter((s) => typeof s === 'number') : [],
   setMSRoom100msId: vi.fn(),
@@ -70,7 +71,9 @@ describe('100ms token route — token gate enforcement', () => {
   });
 
   it('blocks a listener who does not hold the gate token', async () => {
-    mockGetSessionData.mockResolvedValue(mockAuthenticatedSession({ fid: 999, walletAddress: '0xWALLET' }));
+    mockGetSessionData.mockResolvedValue(
+      mockAuthenticatedSession({ fid: 999, walletAddress: '0xWALLET' }),
+    );
     mockCheckTokenGate.mockResolvedValue({ allowed: false, balance: '0' });
     const res = await POST(listenerReq(999));
     expect(res.status).toBe(403);
@@ -78,7 +81,9 @@ describe('100ms token route — token gate enforcement', () => {
   });
 
   it('allows a listener who holds the gate token in any wallet', async () => {
-    mockGetSessionData.mockResolvedValue(mockAuthenticatedSession({ fid: 999, walletAddress: '0xWALLET' }));
+    mockGetSessionData.mockResolvedValue(
+      mockAuthenticatedSession({ fid: 999, walletAddress: '0xWALLET' }),
+    );
     mockCheckTokenGate.mockResolvedValue({ allowed: true, balance: '1' });
     const res = await POST(listenerReq(999));
     expect(res.status).toBe(200);
@@ -99,7 +104,9 @@ describe('100ms token route — token gate enforcement', () => {
   });
 
   it('blocks a gated listener with no resolvable wallet', async () => {
-    mockGetSessionData.mockResolvedValue(mockAuthenticatedSession({ fid: 999, walletAddress: null }));
+    mockGetSessionData.mockResolvedValue(
+      mockAuthenticatedSession({ fid: 999, walletAddress: null }),
+    );
     mockGetUserByFid.mockResolvedValue({ verified_addresses: { eth_addresses: [] } });
     const res = await POST(listenerReq(999));
     expect(res.status).toBe(403);

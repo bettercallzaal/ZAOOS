@@ -7,8 +7,8 @@
  * and creates them in Paperclip assigned to CEO Main.
  */
 
-import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { config } from 'dotenv';
 
 // Load .env.local (Next.js convention)
 config({ path: '.env.local' });
@@ -63,14 +63,17 @@ async function sync() {
           title: `[Community] ${issue.title}`,
           description,
           status: 'todo',
-          priority: issue.priority === 'high' ? 'high' : issue.priority === 'low' ? 'low' : 'medium',
+          priority:
+            issue.priority === 'high' ? 'high' : issue.priority === 'low' ? 'low' : 'medium',
           assigneeAgentId: CEO_AGENT_ID,
         }),
       });
 
       if (!res.ok) {
         const text = await res.text();
-        console.error(`  Failed to create Paperclip issue for "${issue.title}": ${res.status} ${text}`);
+        console.error(
+          `  Failed to create Paperclip issue for "${issue.title}": ${res.status} ${text}`,
+        );
         continue;
       }
 

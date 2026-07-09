@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     // Get user info
     const userRes = await fetch(
-      `https://graph.facebook.com/v19.0/me?fields=id,name,picture&access_token=${accessToken}`
+      `https://graph.facebook.com/v19.0/me?fields=id,name,picture&access_token=${accessToken}`,
     );
     const userData = await userRes.json();
 
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 
     // Get pages the user manages (for live streaming)
     const pagesRes = await fetch(
-      `https://graph.facebook.com/v19.0/me/accounts?access_token=${accessToken}`
+      `https://graph.facebook.com/v19.0/me/accounts?access_token=${accessToken}`,
     );
     const pagesData = await pagesRes.json();
     const pages = pagesData.data || [];
@@ -83,9 +83,7 @@ export async function GET(req: NextRequest) {
         access_token: accessToken,
         refresh_token: null, // Facebook long-lived tokens don't have refresh tokens
         scopes: 'publish_video,pages_manage_posts,pages_read_engagement',
-        expires_at: expiresIn
-          ? new Date(Date.now() + expiresIn * 1000).toISOString()
-          : null,
+        expires_at: expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null,
         // Store pages list and primary page in metadata
         metadata: {
           pages,
@@ -94,7 +92,7 @@ export async function GET(req: NextRequest) {
           primary_page_access_token: primaryPage?.access_token || null,
         },
       },
-      { onConflict: 'user_fid,platform' }
+      { onConflict: 'user_fid,platform' },
     );
 
     if (dbError) {

@@ -543,7 +543,7 @@ export async function buildMemoryBlocks(
       : recentTurns
           .map((t) => {
             const label = t.from === 'zaal' ? 'Zaal' : t.from === 'zoe' ? 'ZOE' : t.sender ?? 'Other';
-            return `[${t.ts.slice(11, 16)}] ${label}: ${t.text.slice(0, 280)}`;
+            return `[${t.ts.slice(11, 16)}] ${label}: ${t.text.slice(0, 800)}`;
           })
           .join('\n');
 

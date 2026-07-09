@@ -1,9 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { createMSRoom, getActiveMSRooms, setMSRoomParticipantCount, roomSlug } from '@/lib/social/msRoomsDb';
-import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
 import { logger } from '@/lib/logger';
+import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
+import {
+  createMSRoom,
+  getActiveMSRooms,
+  roomSlug,
+  setMSRoomParticipantCount,
+} from '@/lib/social/msRoomsDb';
 
 // Mirrors the Stream room create schema so a token gate set in HostRoomModal is
 // actually persisted (previously the 100ms route accepted only `title` and
@@ -74,7 +79,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = CreateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const room = await createMSRoom({

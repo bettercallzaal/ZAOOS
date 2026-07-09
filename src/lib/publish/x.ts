@@ -5,10 +5,10 @@
  * Admin-only — the calling route must enforce access control.
  */
 
-import { TwitterApi } from 'twitter-api-v2';
 import type { SendTweetV2Params } from 'twitter-api-v2';
+import { TwitterApi } from 'twitter-api-v2';
 import { ENV } from '@/lib/env';
-import { NormalizedContent } from '@/lib/publish/normalize';
+import type { NormalizedContent } from '@/lib/publish/normalize';
 
 // ---------------------------------------------------------------------------
 // Client
@@ -61,10 +61,7 @@ export interface XPublishOptions {
 /**
  * Upload images via v1.1 media endpoint and return media IDs.
  */
-async function uploadImages(
-  client: TwitterApi,
-  imageUrls: string[],
-): Promise<string[]> {
+async function uploadImages(client: TwitterApi, imageUrls: string[]): Promise<string[]> {
   const mediaIds: string[] = [];
   const imagesToUpload = imageUrls.slice(0, 4);
 
@@ -96,16 +93,16 @@ export async function publishToX(
   }
 
   try {
-    const mediaIds = content.images.length > 0
-      ? await uploadImages(client, content.images)
-      : [];
+    const mediaIds = content.images.length > 0 ? await uploadImages(client, content.images) : [];
 
     // Build tweet payload
     const tweetPayload: SendTweetV2Params = { text: content.text };
 
     if (mediaIds.length > 0) {
       tweetPayload.media = {
-        media_ids: mediaIds as SendTweetV2Params['media'] extends { media_ids?: infer T } ? NonNullable<T> : never,
+        media_ids: mediaIds as SendTweetV2Params['media'] extends { media_ids?: infer T }
+          ? NonNullable<T>
+          : never,
       };
     }
 
@@ -137,18 +134,11 @@ export async function publishToX(
     return { tweetId, tweetUrl };
   } catch (err: unknown) {
     // Handle rate limit errors gracefully
-    if (
-      err &&
-      typeof err === 'object' &&
-      'code' in err &&
-      (err as { code: number }).code === 429
-    ) {
+    if (err && typeof err === 'object' && 'code' in err && (err as { code: number }).code === 429) {
       const rateLimitErr = err as { rateLimit?: { reset?: number } };
       const resetAt = rateLimitErr.rateLimit?.reset;
       const resetDate = resetAt ? new Date(resetAt * 1000).toISOString() : 'unknown';
-      throw new Error(
-        `X API rate limit exceeded. Resets at ${resetDate}`,
-      );
+      throw new Error(`X API rate limit exceeded. Resets at ${resetDate}`);
     }
 
     throw err;
@@ -167,10 +157,7 @@ const TCO_LENGTH = 23;
  * Breaks at word boundaries. First chunk reserves space for a t.co URL.
  * Subsequent chunks are standalone 280-char segments.
  */
-export function splitIntoThread(
-  text: string,
-  castUrl: string,
-): string[] {
+export function splitIntoThread(text: string, castUrl: string): string[] {
   // First tweet reserves space for cast URL
   const firstMaxLen = TWEET_MAX_LEN - TCO_LENGTH - 1; // -1 for space before URL
   const subsequentMaxLen = TWEET_MAX_LEN;
@@ -224,10 +211,7 @@ export async function publishThreadToX(
 
   // If it fits in one tweet, just publish normally
   if (chunks.length === 1) {
-    const result = await publishToX(
-      { ...content, text: chunks[0] },
-      options,
-    );
+    const result = await publishToX({ ...content, text: chunks[0] }, options);
     return {
       tweetIds: [result.tweetId],
       tweetUrls: [result.tweetUrl],
@@ -240,9 +224,7 @@ export async function publishThreadToX(
   const tweetUrls: string[] = [];
 
   // Upload images once, attach to first tweet only
-  const mediaIds = content.images.length > 0
-    ? await uploadImages(client, content.images)
-    : [];
+  const mediaIds = content.images.length > 0 ? await uploadImages(client, content.images) : [];
 
   for (let i = 0; i < chunks.length; i++) {
     const isFirst = i === 0;
@@ -250,7 +232,9 @@ export async function publishThreadToX(
 
     if (isFirst && mediaIds.length > 0) {
       tweetPayload.media = {
-        media_ids: mediaIds as SendTweetV2Params['media'] extends { media_ids?: infer T } ? NonNullable<T> : never,
+        media_ids: mediaIds as SendTweetV2Params['media'] extends { media_ids?: infer T }
+          ? NonNullable<T>
+          : never,
       };
     }
 

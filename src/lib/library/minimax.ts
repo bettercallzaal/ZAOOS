@@ -55,16 +55,19 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
     }
     if (data?.error) {
       console.error('[library/minimax] API error:', data.error);
-      return { summary: null, error: `Minimax: ${data.error.message || data.error.type || 'unknown error'}` };
+      return {
+        summary: null,
+        error: `Minimax: ${data.error.message || data.error.type || 'unknown error'}`,
+      };
     }
 
-    let summary =
-      data?.choices?.[0]?.message?.content ??
-      data?.reply ??
-      null;
+    let summary = data?.choices?.[0]?.message?.content ?? data?.reply ?? null;
 
     if (!summary) {
-      console.error('[library/minimax] No summary in response:', JSON.stringify(data).slice(0, 200));
+      console.error(
+        '[library/minimax] No summary in response:',
+        JSON.stringify(data).slice(0, 200),
+      );
       return { summary: null, error: 'No summary in Minimax response' };
     }
 

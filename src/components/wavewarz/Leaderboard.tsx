@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface WaveWarZArtist {
   solana_wallet: string;
@@ -46,7 +46,9 @@ function SpotlightBadge({ tier }: { tier: string | null }) {
   if (!badge) return null;
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badge.className}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badge.className}`}
+    >
       {badge.label}
     </span>
   );
@@ -102,12 +104,7 @@ function LoadingSkeleton() {
 function WinRate({ wins, battles }: { wins: number; battles: number }) {
   if (battles === 0) return <span className="text-gray-500">—</span>;
   const pct = Math.round((wins / battles) * 100);
-  const color =
-    pct >= 70
-      ? 'text-green-400'
-      : pct >= 50
-      ? 'text-[#f5a623]'
-      : 'text-red-400';
+  const color = pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-[#f5a623]' : 'text-red-400';
   return <span className={color}>{pct}%</span>;
 }
 
@@ -121,7 +118,9 @@ function ArtistCard({ artist, rank }: { artist: WaveWarZArtist; rank: number }) 
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-sm font-medium text-white truncate">{artist.name || 'Unknown'}</span>
+          <span className="text-sm font-medium text-white truncate">
+            {artist.name || 'Unknown'}
+          </span>
           {artist.zao_fid && <ZAOBadge />}
         </div>
         {tier && (
@@ -258,9 +257,7 @@ export default function WaveWarZLeaderboard() {
                       </td>
                       <td className="py-3 pr-4">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-white font-medium">
-                            {artist.name || 'Unknown'}
-                          </span>
+                          <span className="text-white font-medium">{artist.name || 'Unknown'}</span>
                           {artist.zao_fid && <ZAOBadge />}
                           <span className="hidden lg:inline">
                             <SpotlightBadge tier={tier} />

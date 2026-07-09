@@ -1,8 +1,8 @@
 // src/app/api/staking/leaderboard/route.ts
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getConvictionBatch } from '@/lib/staking/conviction';
 import { logger } from '@/lib/logger';
+import { getConvictionBatch } from '@/lib/staking/conviction';
 
 /**
  * GET /api/staking/leaderboard
@@ -17,9 +17,7 @@ export async function GET() {
         .from('users')
         .select('wallet_address, display_name')
         .not('wallet_address', 'is', null),
-      supabaseAdmin
-        .from('agent_config')
-        .select('wallet_address, name'),
+      supabaseAdmin.from('agent_config').select('wallet_address, name'),
     ]);
 
     const addresses: { address: string; name: string }[] = [];

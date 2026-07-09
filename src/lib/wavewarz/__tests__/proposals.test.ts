@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { getNewSpotlightTier } from '../proposals';
 
 // SPOTLIGHT_TIERS thresholds: rising_star >= 3, veteran >= 10, legend >= 25.

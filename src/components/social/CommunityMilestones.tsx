@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Milestone {
   icon: string;
@@ -48,22 +48,33 @@ export function CommunityMilestones() {
           vals.tracks = d.total ?? d.tracks?.length ?? 0;
         }
         if (!controller.signal.aborted) {
-          setMilestones(MILESTONES_CONFIG.map((m) => ({
-            icon: m.icon, label: m.label, target: m.target, current: vals[m.key],
-          })));
+          setMilestones(
+            MILESTONES_CONFIG.map((m) => ({
+              icon: m.icon,
+              label: m.label,
+              target: m.target,
+              current: vals[m.key],
+            })),
+          );
         }
-      } catch { /* silent */ }
-      finally { if (!controller.signal.aborted) setLoading(false); }
+      } catch {
+        /* silent */
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
     }
     load();
     return () => controller.abort();
   }, []);
 
-  if (loading) return (
-    <div className="px-4 py-3 space-y-2">
-      {[1, 2, 3, 4].map((i) => <div key={i} className="h-12 rounded-xl bg-white/[0.03] animate-pulse" />)}
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="px-4 py-3 space-y-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-12 rounded-xl bg-white/[0.03] animate-pulse" />
+        ))}
+      </div>
+    );
   if (!milestones.length) return null;
 
   return (
@@ -74,13 +85,25 @@ export function CommunityMilestones() {
           const pct = Math.min(100, Math.round((m.current / m.target) * 100));
           const done = m.current >= m.target;
           return (
-            <div key={m.label} className={`rounded-xl border p-3 ${done ? 'border-[#f5a623]/40 bg-[#f5a623]/5 shadow-[0_0_12px_rgba(245,166,35,0.15)]' : 'border-white/[0.05] bg-white/[0.03]'}`}>
+            <div
+              key={m.label}
+              className={`rounded-xl border p-3 ${done ? 'border-[#f5a623]/40 bg-[#f5a623]/5 shadow-[0_0_12px_rgba(245,166,35,0.15)]' : 'border-white/[0.05] bg-white/[0.03]'}`}
+            >
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm">{m.icon} {m.label}</span>
-                <span className={`text-xs font-medium ${done ? 'text-[#f5a623]' : 'text-gray-400'}`}>{m.current}/{m.target}</span>
+                <span className="text-sm">
+                  {m.icon} {m.label}
+                </span>
+                <span
+                  className={`text-xs font-medium ${done ? 'text-[#f5a623]' : 'text-gray-400'}`}
+                >
+                  {m.current}/{m.target}
+                </span>
               </div>
               <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                <div className={`h-full rounded-full transition-all ${done ? 'bg-[#f5a623]' : 'bg-[#f5a623]/50'}`} style={{ width: `${pct}%` }} />
+                <div
+                  className={`h-full rounded-full transition-all ${done ? 'bg-[#f5a623]' : 'bg-[#f5a623]/50'}`}
+                  style={{ width: `${pct}%` }}
+                />
               </div>
             </div>
           );

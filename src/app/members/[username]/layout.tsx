@@ -19,10 +19,6 @@ export async function generateMetadata({
   };
 }
 
-export default function MemberProfileLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MemberProfileLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

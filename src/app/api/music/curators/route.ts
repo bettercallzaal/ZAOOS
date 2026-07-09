@@ -70,7 +70,14 @@ export async function GET() {
       .in('fid', fids);
 
     const userMap = new Map(
-      (users || []).map((u: { fid: number; username: string; display_name: string | null; pfp_url: string | null }) => [u.fid, u]),
+      (users || []).map(
+        (u: {
+          fid: number;
+          username: string;
+          display_name: string | null;
+          pfp_url: string | null;
+        }) => [u.fid, u],
+      ),
     );
 
     const curators = ranked.map(([fid, stats]) => {

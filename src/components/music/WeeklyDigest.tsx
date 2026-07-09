@@ -1,12 +1,29 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
 import Image from 'next/image';
+import { type ReactNode, useEffect, useState } from 'react';
 
-type Track = { id: string; title: string; artist: string | null; artwork_url: string | null; play_count: number | null };
-type Submission = { id: string; title: string | null; artist: string | null; submitted_by_username: string | null };
+type Track = {
+  id: string;
+  title: string;
+  artist: string | null;
+  artwork_url: string | null;
+  play_count: number | null;
+};
+type Submission = {
+  id: string;
+  title: string | null;
+  artist: string | null;
+  submitted_by_username: string | null;
+};
 type Listener = { fid: number; username: string; plays: number };
-type TotdWinner = { id: string; track_title: string; track_artist: string; artwork_url: string | null; selected_date: string };
+type TotdWinner = {
+  id: string;
+  track_title: string;
+  track_artist: string;
+  artwork_url: string | null;
+  selected_date: string;
+};
 
 type DigestData = {
   topTracks: Track[];
@@ -18,13 +35,32 @@ type DigestData = {
 
 function Thumb({ src, fallback }: { src: string | null; fallback: string }) {
   return src ? (
-    <Image src={src || '/default-track.png'} alt="" width={40} height={40} className="w-10 h-10 rounded object-cover" unoptimized />
+    <Image
+      src={src || '/default-track.png'}
+      alt=""
+      width={40}
+      height={40}
+      className="w-10 h-10 rounded object-cover"
+      unoptimized
+    />
   ) : (
-    <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center text-gray-500 text-xs">{fallback}</div>
+    <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center text-gray-500 text-xs">
+      {fallback}
+    </div>
   );
 }
 
-function Row({ left, title, subtitle, right }: { left: ReactNode; title: string; subtitle: string; right?: ReactNode }) {
+function Row({
+  left,
+  title,
+  subtitle,
+  right,
+}: {
+  left: ReactNode;
+  title: string;
+  subtitle: string;
+  right?: ReactNode;
+}) {
   return (
     <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
       {left}
@@ -65,10 +101,16 @@ export function WeeklyDigest() {
     const lines = [`This ${period} in ZAO music:\n`];
     if (data.topTracks.length > 0) {
       lines.push('Top tracks:');
-      data.topTracks.slice(0, 5).forEach((t, i) => lines.push(`${i + 1}. ${t.title} — ${t.artist || 'Unknown'}`));
+      data.topTracks
+        .slice(0, 5)
+        .forEach((t, i) => lines.push(`${i + 1}. ${t.title} — ${t.artist || 'Unknown'}`));
     }
-    if (data.trackOfDayWinners.length > 0) lines.push(`\nTrack of the Day winners: ${data.trackOfDayWinners.length}`);
-    window.open(`https://farcaster.xyz/~/compose?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+    if (data.trackOfDayWinners.length > 0)
+      lines.push(`\nTrack of the Day winners: ${data.trackOfDayWinners.length}`);
+    window.open(
+      `https://farcaster.xyz/~/compose?text=${encodeURIComponent(lines.join('\n'))}`,
+      '_blank',
+    );
   };
 
   return (
@@ -123,7 +165,12 @@ export function WeeklyDigest() {
                 {data.topTracks.map((t, i) => (
                   <Row
                     key={t.id}
-                    left={<><span className="text-xs text-gray-500 w-5 text-right">{i + 1}</span><Thumb src={t.artwork_url} fallback="&#9835;" /></>}
+                    left={
+                      <>
+                        <span className="text-xs text-gray-500 w-5 text-right">{i + 1}</span>
+                        <Thumb src={t.artwork_url} fallback="&#9835;" />
+                      </>
+                    }
                     title={t.title}
                     subtitle={t.artist || 'Unknown'}
                     right={<span className="text-xs text-gray-500">{t.play_count ?? 0} plays</span>}
@@ -139,7 +186,11 @@ export function WeeklyDigest() {
                 {data.newSubmissions.slice(0, 8).map((s) => (
                   <Row
                     key={s.id}
-                    left={<div className="w-8 h-8 rounded bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] text-xs font-bold">NEW</div>}
+                    left={
+                      <div className="w-8 h-8 rounded bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] text-xs font-bold">
+                        NEW
+                      </div>
+                    }
                     title={s.title || 'Untitled'}
                     subtitle={`${s.artist || 'Unknown'} \u00b7 by @${s.submitted_by_username || 'anon'}`}
                   />
@@ -179,7 +230,9 @@ export function WeeklyDigest() {
           )}
 
           {data.topTracks.length === 0 && data.newSubmissions.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">No music activity this {period} yet. Start listening!</p>
+            <p className="text-gray-500 text-sm text-center py-8">
+              No music activity this {period} yet. Start listening!
+            </p>
           )}
         </div>
       )}

@@ -1,6 +1,6 @@
-import { communityConfig } from '../../../community.config';
-import { Cast } from '@/types';
 import { logger } from '@/lib/logger';
+import type { Cast } from '@/types';
+import { communityConfig } from '../../../community.config';
 
 export interface SophaCurator {
   fid: number;
@@ -27,9 +27,10 @@ interface SophaFeedResponse {
 const { sopha } = communityConfig;
 
 // Build auth header once at module load
-const SOPHA_AUTH = process.env.SOPHA_API_USERNAME && process.env.SOPHA_API_PASSWORD
-  ? `Basic ${Buffer.from(`${process.env.SOPHA_API_USERNAME}:${process.env.SOPHA_API_PASSWORD}`).toString('base64')}`
-  : null;
+const SOPHA_AUTH =
+  process.env.SOPHA_API_USERNAME && process.env.SOPHA_API_PASSWORD
+    ? `Basic ${Buffer.from(`${process.env.SOPHA_API_USERNAME}:${process.env.SOPHA_API_PASSWORD}`).toString('base64')}`
+    : null;
 
 function rawToSophaCast(c: Record<string, unknown>): SophaCast {
   const author = c.author as Record<string, unknown> | undefined;
@@ -76,8 +77,8 @@ export async function fetchSophaFeed(): Promise<SophaCast[] | null> {
   try {
     const res = await fetch(sopha.apiUrl, {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': SOPHA_AUTH,
+        Accept: 'application/json',
+        Authorization: SOPHA_AUTH,
       },
     });
 
@@ -94,9 +95,12 @@ export async function fetchSophaFeed(): Promise<SophaCast[] | null> {
 
     return data.casts
       .map(rawToSophaCast)
-      .filter(c => {
+      .filter((c) => {
         const ts = new Date(c.timestamp);
-        return ts >= maxAge && (!sopha.minQualityScore || (c._qualityScore ?? 0) >= sopha.minQualityScore);
+        return (
+          ts >= maxAge &&
+          (!sopha.minQualityScore || (c._qualityScore ?? 0) >= sopha.minQualityScore)
+        );
       })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   } catch (err) {

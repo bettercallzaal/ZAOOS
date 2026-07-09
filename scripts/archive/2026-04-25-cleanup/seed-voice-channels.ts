@@ -2,15 +2,23 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
 const VOICE_CHANNELS = [
   { channel_id: 'general-hangout', title: 'General Hangout', description: 'Casual conversation' },
-  { channel_id: 'fractal-call', title: 'Fractal Call', description: 'Monday 6pm EST weekly fractal' },
+  {
+    channel_id: 'fractal-call',
+    title: 'Fractal Call',
+    description: 'Monday 6pm EST weekly fractal',
+  },
   { channel_id: 'music-lounge', title: 'Music Lounge', description: 'Always-on listening room' },
   { channel_id: 'tech-talk', title: 'Tech Talk', description: 'Technical discussions' },
-  { channel_id: 'coworking', title: 'Coworking', description: 'Silent cowork with ambient presence' },
+  {
+    channel_id: 'coworking',
+    title: 'Coworking',
+    description: 'Silent cowork with ambient presence',
+  },
 ];
 
 async function seed() {

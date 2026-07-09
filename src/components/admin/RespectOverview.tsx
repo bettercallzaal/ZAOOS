@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
+import { useEffect, useState } from 'react';
 import { ImportRespectButton } from '@/components/admin/ImportRespectButton';
+import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
 
 // ---------- Types ----------
 
@@ -33,8 +33,7 @@ interface LeaderboardStats {
 
 // ---------- Helpers ----------
 
-const shortAddr = (addr: string) =>
-  addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '-';
+const shortAddr = (addr: string) => (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '-');
 
 // ---------- Component ----------
 
@@ -112,7 +111,9 @@ export function RespectOverview() {
           <p className="text-xs text-gray-400 mt-1">Fractal Sessions Recorded</p>
         </div>
         <div className="bg-[#1a2a3a] rounded-xl p-4">
-          <p className="text-2xl font-bold text-[#ffd700]">{stats?.totalRespect.toLocaleString() ?? 0}</p>
+          <p className="text-2xl font-bold text-[#ffd700]">
+            {stats?.totalRespect.toLocaleString() ?? 0}
+          </p>
           <p className="text-xs text-gray-400 mt-1">Total Respect Distributed</p>
         </div>
         <div className="bg-[#1a2a3a] rounded-xl p-4">
@@ -124,8 +125,18 @@ export function RespectOverview() {
       {/* Search */}
       <div className="mb-4">
         <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             value={search}
@@ -154,15 +165,33 @@ export function RespectOverview() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/[0.08]">
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">#</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Name</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Wallet</th>
-                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Total</th>
-                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Fractal</th>
-                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">OG</th>
-                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">ZOR</th>
-                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Fractals</th>
-                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">First Respect</th>
+                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    #
+                  </th>
+                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    Name
+                  </th>
+                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    Wallet
+                  </th>
+                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    Total
+                  </th>
+                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    Fractal
+                  </th>
+                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    OG
+                  </th>
+                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    ZOR
+                  </th>
+                  <th className="text-right text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    Fractals
+                  </th>
+                  <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">
+                    First Respect
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -174,7 +203,9 @@ export function RespectOverview() {
                     } hover:bg-white/5 transition-colors`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`font-bold ${entry.rank <= 3 ? 'text-[#f5a623]' : 'text-gray-400'}`}>
+                      <span
+                        className={`font-bold ${entry.rank <= 3 ? 'text-[#f5a623]' : 'text-gray-400'}`}
+                      >
                         {entry.rank}
                       </span>
                     </td>
@@ -182,22 +213,34 @@ export function RespectOverview() {
                       <span className="text-white font-medium">{entry.name || '-'}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="text-gray-400 font-mono text-xs">{shortAddr(entry.wallet)}</span>
+                      <span className="text-gray-400 font-mono text-xs">
+                        {shortAddr(entry.wallet)}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <span className="text-white font-bold">{entry.totalRespect.toLocaleString()}</span>
+                      <span className="text-white font-bold">
+                        {entry.totalRespect.toLocaleString()}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <span className="text-gray-300">{entry.fractalRespect > 0 ? entry.fractalRespect.toLocaleString() : '-'}</span>
+                      <span className="text-gray-300">
+                        {entry.fractalRespect > 0 ? entry.fractalRespect.toLocaleString() : '-'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <span className="text-gray-300">{entry.onchainOG > 0 ? entry.onchainOG.toLocaleString() : '-'}</span>
+                      <span className="text-gray-300">
+                        {entry.onchainOG > 0 ? entry.onchainOG.toLocaleString() : '-'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <span className="text-gray-300">{entry.onchainZOR > 0 ? entry.onchainZOR.toLocaleString() : '-'}</span>
+                      <span className="text-gray-300">
+                        {entry.onchainZOR > 0 ? entry.onchainZOR.toLocaleString() : '-'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <span className="text-gray-300">{entry.fractalCount > 0 ? entry.fractalCount : '-'}</span>
+                      <span className="text-gray-300">
+                        {entry.fractalCount > 0 ? entry.fractalCount : '-'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-gray-500 text-xs">{entry.firstRespectAt ?? '-'}</span>

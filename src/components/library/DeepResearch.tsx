@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ResearchDoc {
   id: number;
@@ -57,9 +57,7 @@ export default function DeepResearch() {
     return acc;
   }, {});
 
-  const uncategorized = filtered.filter(
-    (d) => !CATEGORIES.includes(d.category),
-  );
+  const uncategorized = filtered.filter((d) => !CATEGORIES.includes(d.category));
   if (uncategorized.length > 0) grouped['Other'] = uncategorized;
 
   if (loading) {
@@ -89,8 +87,8 @@ export default function DeepResearch() {
               >
                 <span className="text-sm font-medium text-white">{category}</span>
                 <span className="text-xs text-gray-400">
-                  {categoryDocs.length} doc{categoryDocs.length !== 1 ? 's' : ''}
-                  {' '}{openCategory === category ? '▼' : '▶'}
+                  {categoryDocs.length} doc{categoryDocs.length !== 1 ? 's' : ''}{' '}
+                  {openCategory === category ? '▼' : '▶'}
                 </span>
               </button>
               {openCategory === category && (

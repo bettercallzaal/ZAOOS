@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import {
-  repoMap,
-  botFleet,
-  controlPlane,
-  tooling,
-  toolingNote,
-  improvements,
   type BotRow,
   type BotStatus,
+  botFleet,
+  controlPlane,
+  improvements,
   type Priority,
+  repoMap,
+  tooling,
+  toolingNote,
 } from './data';
 
 interface LiveBot {
@@ -65,7 +65,9 @@ const PRIORITY_STYLE: Record<Priority, string> = {
 
 function Badge({ label, className }: { label: string; className: string }) {
   return (
-    <span className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ring-1 ${className}`}>
+    <span
+      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ring-1 ${className}`}
+    >
       {label}
     </span>
   );
@@ -123,7 +125,10 @@ function RepoMap() {
           <Card>
             <ul className="divide-y divide-white/5">
               {group.areas.map((a) => (
-                <li key={a.path} className="flex flex-col gap-1 py-2 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between">
+                <li
+                  key={a.path}
+                  className="flex flex-col gap-1 py-2 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between"
+                >
                   <div className="min-w-0">
                     <span className="text-sm font-medium">{a.area}</span>
                     <code className="ml-2 break-all text-xs text-white/40">{a.path}</code>
@@ -206,7 +211,9 @@ function Bots() {
           <p className="text-xs text-white/60">{controlPlane.summary}</p>
           <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
             {controlPlane.capabilities.map((c) => (
-              <li key={c} className="text-xs text-white/80">• {c}</li>
+              <li key={c} className="text-xs text-white/80">
+                • {c}
+              </li>
             ))}
           </ul>
           <a
@@ -232,7 +239,10 @@ function Bots() {
               const task = l?.meta?.current_task;
               const uptime = l?.meta?.uptime;
               return (
-                <li key={b.name} className="flex items-start justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                <li
+                  key={b.name}
+                  className="flex items-start justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       {l && <LiveDot online={l.online} />}
@@ -243,7 +253,9 @@ function Bots() {
                     {l && (
                       <p className="mt-0.5 text-[11px] text-white/50">
                         {l.online ? 'online' : 'offline'} · seen {formatAge(l.ageSeconds)}
-                        {typeof uptime === 'string' || typeof uptime === 'number' ? ` · up ${uptime}` : ''}
+                        {typeof uptime === 'string' || typeof uptime === 'number'
+                          ? ` · up ${uptime}`
+                          : ''}
                         {typeof task === 'string' && task ? ` · ${task}` : ''}
                       </p>
                     )}
@@ -269,7 +281,10 @@ function Tooling() {
           <Card>
             <ul className="space-y-2">
               {group.skills.map((s) => (
-                <li key={s.name} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                <li
+                  key={s.name}
+                  className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3"
+                >
                   <code className="shrink-0 text-sm font-medium text-white">{s.name}</code>
                   <span className="text-xs text-white/60">{s.desc}</span>
                 </li>

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -45,11 +45,7 @@ export async function GET(req: NextRequest) {
         .select('song_id')
         .eq('user_fid', session.fid)
         .limit(1000),
-      supabaseAdmin
-        .from('user_song_likes')
-        .select('song_id')
-        .eq('user_fid', targetFid)
-        .limit(1000),
+      supabaseAdmin.from('user_song_likes').select('song_id').eq('user_fid', targetFid).limit(1000),
     ]);
 
     const myLikes =
@@ -66,8 +62,7 @@ export async function GET(req: NextRequest) {
 
     // Jaccard similarity: shared / union
     const unionSize = new Set([...myLikes, ...theirLikes]).size;
-    const matchPercent =
-      unionSize > 0 ? Math.round((sharedIds.length / unionSize) * 100) : 0;
+    const matchPercent = unionSize > 0 ? Math.round((sharedIds.length / unionSize) * 100) : 0;
 
     // Fetch track details for shared songs (limit 10)
     let sharedTracks: Array<{
@@ -102,9 +97,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     logger.error('[taste-match] GET failed:', err);
-    return NextResponse.json(
-      { error: 'Failed to compute taste match' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to compute taste match' }, { status: 500 });
   }
 }

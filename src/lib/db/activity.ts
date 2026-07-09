@@ -8,5 +8,8 @@ export function touchActivity(fid: number): void {
     .from('users')
     .update({ last_active_at: new Date().toISOString() })
     .eq('fid', fid)
-    .then(() => {}, () => {});
+    .then(
+      () => {},
+      () => {},
+    );
 }

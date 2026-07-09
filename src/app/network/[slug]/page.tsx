@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSupabaseAnon } from '@/lib/db/supabase';
 import type { CrmContactPublic, CrmInteractionPublic } from '@/lib/crm/types';
+import { getSupabaseAnon } from '@/lib/db/supabase';
 
 // Public per-contact detail page. Reads only the *_public views (safe columns,
 // is_public=true) via the ANON client (C-H3) so RLS + the granted view is the
@@ -42,11 +42,7 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
     .map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const contact = await getContact(slug);
   if (!contact) return { title: 'Not found - The ZAO Network' };
@@ -76,17 +72,21 @@ interface HandleLink {
 
 function handleLinks(c: CrmContactPublic): HandleLink[] {
   const links: HandleLink[] = [];
-  if (c.farcaster_handle) links.push({ label: `@${c.farcaster_handle}`, href: `https://farcaster.xyz/${c.farcaster_handle}` });
+  if (c.farcaster_handle)
+    links.push({
+      label: `@${c.farcaster_handle}`,
+      href: `https://farcaster.xyz/${c.farcaster_handle}`,
+    });
   if (c.x_handle) links.push({ label: `@${c.x_handle} (X)`, href: `https://x.com/${c.x_handle}` });
-  if (c.github_handle) links.push({ label: `${c.github_handle} (GitHub)`, href: `https://github.com/${c.github_handle}` });
+  if (c.github_handle)
+    links.push({
+      label: `${c.github_handle} (GitHub)`,
+      href: `https://github.com/${c.github_handle}`,
+    });
   return links;
 }
 
-export default async function ContactPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ContactPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const contact = await getContact(slug);
   if (!contact) notFound();
@@ -128,9 +128,7 @@ export default async function ContactPage({
               <span className="text-white/40">How we met:</span> {contact.how_we_met}
             </p>
           )}
-          {contact.public_summary && (
-            <p className="mt-3 text-white/80">{contact.public_summary}</p>
-          )}
+          {contact.public_summary && <p className="mt-3 text-white/80">{contact.public_summary}</p>}
         </header>
 
         <section className="mt-6">
@@ -140,17 +138,10 @@ export default async function ContactPage({
           ) : (
             <ul className="space-y-3">
               {interactions.map((i) => (
-                <li
-                  key={i.id}
-                  className="rounded-lg border border-white/10 bg-white/[0.03] p-3"
-                >
+                <li key={i.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                   <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-sm font-medium text-white">
-                      {i.title || i.type}
-                    </span>
-                    <span className="shrink-0 text-xs text-white/40">
-                      {fmtDate(i.occurred_at)}
-                    </span>
+                    <span className="text-sm font-medium text-white">{i.title || i.type}</span>
+                    <span className="shrink-0 text-xs text-white/40">{fmtDate(i.occurred_at)}</span>
                   </div>
                   {i.public_summary && (
                     <p className="mt-1 text-sm text-white/70">{i.public_summary}</p>

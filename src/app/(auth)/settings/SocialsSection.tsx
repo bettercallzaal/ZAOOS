@@ -35,36 +35,82 @@ export function SocialsSection({ profile }: { profile: Profile }) {
         }),
       });
       if (res.ok) setSaved(true);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setSaving(false);
   };
 
   const fields = [
-    { label: 'X (Twitter)', value: xHandle, set: setXHandle, placeholder: 'username (no @)', prefix: '@', link: xHandle ? `https://x.com/${xHandle}` : null },
-    { label: 'Instagram', value: instagram, set: setInstagram, placeholder: 'username', prefix: '@', link: instagram ? `https://instagram.com/${instagram}` : null },
-    { label: 'SoundCloud', value: soundcloud, set: setSoundcloud, placeholder: 'https://soundcloud.com/...', prefix: null, link: soundcloud || null },
-    { label: 'Spotify', value: spotify, set: setSpotify, placeholder: 'https://open.spotify.com/artist/...', prefix: null, link: spotify || null },
-    { label: 'Audius', value: audius, set: setAudius, placeholder: 'username', prefix: '@', link: audius ? `https://audius.co/${audius}` : null },
+    {
+      label: 'X (Twitter)',
+      value: xHandle,
+      set: setXHandle,
+      placeholder: 'username (no @)',
+      prefix: '@',
+      link: xHandle ? `https://x.com/${xHandle}` : null,
+    },
+    {
+      label: 'Instagram',
+      value: instagram,
+      set: setInstagram,
+      placeholder: 'username',
+      prefix: '@',
+      link: instagram ? `https://instagram.com/${instagram}` : null,
+    },
+    {
+      label: 'SoundCloud',
+      value: soundcloud,
+      set: setSoundcloud,
+      placeholder: 'https://soundcloud.com/...',
+      prefix: null,
+      link: soundcloud || null,
+    },
+    {
+      label: 'Spotify',
+      value: spotify,
+      set: setSpotify,
+      placeholder: 'https://open.spotify.com/artist/...',
+      prefix: null,
+      link: spotify || null,
+    },
+    {
+      label: 'Audius',
+      value: audius,
+      set: setAudius,
+      placeholder: 'username',
+      prefix: '@',
+      link: audius ? `https://audius.co/${audius}` : null,
+    },
   ];
 
-  const connectedCount = fields.filter(f => !!f.value).length;
+  const connectedCount = fields.filter((f) => !!f.value).length;
 
   return (
     <section>
       <div className="flex items-center justify-between px-1 mb-3">
         <p className="text-xs text-gray-500 uppercase tracking-wider">Socials</p>
-        <span className="text-[10px] text-gray-600">{connectedCount} of {fields.length} linked</span>
+        <span className="text-[10px] text-gray-600">
+          {connectedCount} of {fields.length} linked
+        </span>
       </div>
       <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
         {profile.x_handle && (
-          <p className="text-[10px] text-emerald-400">X handle auto-imported from your Farcaster profile</p>
+          <p className="text-[10px] text-emerald-400">
+            X handle auto-imported from your Farcaster profile
+          </p>
         )}
         {fields.map((f) => (
           <div key={f.label} className="space-y-1">
             <div className="flex items-center justify-between">
               <label className="text-xs text-gray-400">{f.label}</label>
               {f.link && (
-                <a href={f.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#f5a623] hover:text-[#ffd700]">
+                <a
+                  href={f.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-[#f5a623] hover:text-[#ffd700]"
+                >
                   View
                 </a>
               )}

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetSessionData, mockFrom } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),
@@ -61,9 +61,7 @@ describe('GET /api/proposals/comment', () => {
   it('returns comments when authenticated with valid proposal_id', async () => {
     mockGetSessionData.mockResolvedValue({ fid: 123 });
 
-    const mockComments = [
-      { id: 'c1', body: 'Great idea!', author: { display_name: 'User1' } },
-    ];
+    const mockComments = [{ id: 'c1', body: 'Great idea!', author: { display_name: 'User1' } }];
     const chain: Record<string, unknown> = {};
     chain.select = vi.fn().mockReturnValue(chain);
     chain.eq = vi.fn().mockReturnValue(chain);

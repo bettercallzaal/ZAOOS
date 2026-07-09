@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import type { Call, StreamVideoClient } from '@stream-io/video-react-sdk';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { useAuth } from '@/hooks/useAuth';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
+import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
+import { EndRoomConfirm } from '@/components/spaces/EndRoomConfirm';
+import { useAuth } from '@/hooks/useAuth';
+import type { Room } from '@/lib/spaces/roomsDb';
 import { createStreamUser } from '@/lib/spaces/streamHelpers';
 import { communityConfig } from '../../../../community.config';
-import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
-import type { Room } from '@/lib/spaces/roomsDb';
-import type { StreamVideoClient, Call } from '@stream-io/video-react-sdk';
-
-import { EndRoomConfirm } from '@/components/spaces/EndRoomConfirm';
 
 // Lazy-load heavy SDKs — Stream.io is ~150KB, only load when entering a room
 const StreamWrapper = dynamic(
@@ -28,7 +27,8 @@ const EditRoomModal = dynamic(
   { ssr: false },
 );
 const TwitchStreamInfo = dynamic(
-  () => import('@/components/spaces/TwitchStreamInfo').then((m) => ({ default: m.TwitchStreamInfo })),
+  () =>
+    import('@/components/spaces/TwitchStreamInfo').then((m) => ({ default: m.TwitchStreamInfo })),
   { ssr: false },
 );
 
@@ -70,7 +70,9 @@ export default function PublicRoomPage() {
   const [gateBlocked, setGateBlocked] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
-  const isAdmin = user ? (communityConfig.adminFids as readonly number[]).includes(user.fid) : false;
+  const isAdmin = user
+    ? (communityConfig.adminFids as readonly number[]).includes(user.fid)
+    : false;
   const canEndRoom = isHost || isAdmin;
 
   useEffect(() => {
@@ -103,11 +105,17 @@ export default function PublicRoomPage() {
           });
           const gateData = await gateRes.json();
           if (!gateData.allowed) {
-            if (mounted) { setGateBlocked(true); setLoading(false); }
+            if (mounted) {
+              setGateBlocked(true);
+              setLoading(false);
+            }
             return;
           }
         } else if (roomData.gate_config && !walletAddress) {
-          if (mounted) { setGateBlocked(true); setLoading(false); }
+          if (mounted) {
+            setGateBlocked(true);
+            setLoading(false);
+          }
           return;
         }
 
@@ -301,11 +309,7 @@ export default function PublicRoomPage() {
   if (room?.provider === '100ms') {
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col">
-        <AudioRoomAdapter
-          room={room}
-          user={user}
-          onLeave={handleLeave}
-        />
+        <AudioRoomAdapter room={room} user={user} onLeave={handleLeave} />
       </div>
     );
   }
@@ -330,7 +334,7 @@ export default function PublicRoomPage() {
           currentDescription={room.description || ''}
           currentTheme={room.theme || 'default'}
           onClose={() => setShowEdit(false)}
-          onSaved={(updated) => setRoom(prev => prev ? { ...prev, ...updated } : prev)}
+          onSaved={(updated) => setRoom((prev) => (prev ? { ...prev, ...updated } : prev))}
         />
       )}
       {confirmingEnd && room && (
@@ -353,7 +357,10 @@ export default function PublicRoomPage() {
       )}
       <header className="border-b border-white/[0.08] bg-[#0d1b2a] relative">
         {/* Theme accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: themeAccent, opacity: 0.5 }} />
+        <div
+          className="absolute top-0 left-0 right-0 h-0.5"
+          style={{ backgroundColor: themeAccent, opacity: 0.5 }}
+        />
 
         <div className="px-4 py-3">
           {/* Top row: title + actions */}
@@ -361,15 +368,27 @@ export default function PublicRoomPage() {
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-white font-bold text-sm sm:text-base truncate">{room.title}</h1>
+                  <h1 className="text-white font-bold text-sm sm:text-base truncate">
+                    {room.title}
+                  </h1>
                   {canEndRoom && (
                     <button
                       onClick={() => setShowEdit(true)}
                       className="p-1 text-gray-500 hover:text-[#f5a623] transition-colors flex-shrink-0 rounded-md hover:bg-gray-800"
                       aria-label="Edit room"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                        />
                       </svg>
                     </button>
                   )}
@@ -403,8 +422,18 @@ export default function PublicRoomPage() {
           <div className="flex items-center gap-2.5 mt-2.5 flex-wrap">
             {/* Participant count */}
             <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128H5.228A2 2 0 013 17.16v-.088c0-2.517 1.813-4.607 4.2-5.032a8.153 8.153 0 011.6-.16c.549 0 1.085.055 1.6.16 2.387.425 4.2 2.515 4.2 5.032v.088c0 .465-.171.89-.453 1.217" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128H5.228A2 2 0 013 17.16v-.088c0-2.517 1.813-4.607 4.2-5.032a8.153 8.153 0 011.6-.16c.549 0 1.085.055 1.6.16 2.387.425 4.2 2.515 4.2 5.032v.088c0 .465-.171.89-.453 1.217"
+                />
               </svg>
               {room.participant_count} {room.participant_count === 1 ? 'listener' : 'listeners'}
             </span>
@@ -416,16 +445,16 @@ export default function PublicRoomPage() {
       </header>
       <div className="flex-1">
         <StreamWrapper client={client} call={call}>
-            <RoomView
-              isHost={isHost}
-              isAuthenticated={!!user}
-              roomId={room.id}
-              roomType={room.room_type}
-              hostFid={room.host_fid}
-              userFid={user?.fid}
-              username={user?.username}
-              pfpUrl={user?.pfpUrl}
-            />
+          <RoomView
+            isHost={isHost}
+            isAuthenticated={!!user}
+            roomId={room.id}
+            roomType={room.room_type}
+            hostFid={room.host_fid}
+            userFid={user?.fid}
+            username={user?.username}
+            pfpUrl={user?.pfpUrl}
+          />
         </StreamWrapper>
       </div>
     </div>

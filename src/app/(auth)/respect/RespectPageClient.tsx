@@ -1,30 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { RespectLeaderboard } from './RespectLeaderboard';
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import { RespectLeaderboard } from './RespectLeaderboard';
 
 const MindshareLeaderboard = dynamic(
-  () =>
-    import('@/components/respect/MindshareLeaderboard').then(
-      (m) => m.MindshareLeaderboard,
-    ),
+  () => import('@/components/respect/MindshareLeaderboard').then((m) => m.MindshareLeaderboard),
   { ssr: false },
 );
 
 const SongjamLeaderboard = dynamic(
-  () =>
-    import('@/components/respect/SongjamLeaderboard').then(
-      (m) => m.SongjamLeaderboard,
-    ),
+  () => import('@/components/respect/SongjamLeaderboard').then((m) => m.SongjamLeaderboard),
   { ssr: false },
 );
 
 const StakingLeaderboard = dynamic(
-  () =>
-    import('@/components/respect/StakingLeaderboard').then(
-      (m) => m.StakingLeaderboard,
-    ),
+  () => import('@/components/respect/StakingLeaderboard').then((m) => m.StakingLeaderboard),
   { ssr: false },
 );
 
@@ -100,9 +91,7 @@ export function RespectPageClient({ currentFid }: RespectPageClientProps) {
       </div>
 
       {/* Tab content */}
-      {activeTab === 'leaderboard' && (
-        <RespectLeaderboard currentFid={currentFid} />
-      )}
+      {activeTab === 'leaderboard' && <RespectLeaderboard currentFid={currentFid} />}
 
       {activeTab === 'mindshare' && (
         <>

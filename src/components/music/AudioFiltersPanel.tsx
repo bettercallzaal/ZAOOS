@@ -1,8 +1,11 @@
 'use client';
 
-import { useCallback, useState, useRef } from 'react';
-import { AUDIO_FILTERS, FILTER_CATEGORIES, type AudioFilterPreset } from '@/lib/music/audioFilters';
-import { getActiveFilterKey as readSharedKey, setActiveFilterKey } from '@/lib/music/audioFilterState';
+import { useCallback, useRef, useState } from 'react';
+import {
+  getActiveFilterKey as readSharedKey,
+  setActiveFilterKey,
+} from '@/lib/music/audioFilterState';
+import { AUDIO_FILTERS, type AudioFilterPreset, FILTER_CATEGORIES } from '@/lib/music/audioFilters';
 
 // Re-export for any legacy callers that imported the helper from here.
 // New code should import directly from '@/lib/music/audioFilterState'.
@@ -116,9 +119,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
           <button
             onClick={clearFilter}
             className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
-              !activeKey
-                ? 'bg-white/10 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              !activeKey ? 'bg-white/10 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
             Off
@@ -142,12 +143,8 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
         {/* Active filter info */}
         {activeKey === 'custom' ? (
           <div className="flex items-center justify-center gap-2">
-            <span className="text-[10px] text-[#f5a623] font-medium">
-              🎛️ Custom
-            </span>
-            <span className="text-[10px] text-gray-500">
-              {customSpeed.toFixed(2)}x
-            </span>
+            <span className="text-[10px] text-[#f5a623] font-medium">🎛️ Custom</span>
+            <span className="text-[10px] text-gray-500">{customSpeed.toFixed(2)}x</span>
           </div>
         ) : activePreset ? (
           <div className="flex items-center justify-center gap-2">
@@ -155,14 +152,9 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
               {activePreset.icon} {activePreset.name}
             </span>
             <span className="text-[10px] text-gray-500">
-              {activePreset.playbackRate !== 1.0
-                ? `${activePreset.playbackRate}x`
-                : ''
-              }
+              {activePreset.playbackRate !== 1.0 ? `${activePreset.playbackRate}x` : ''}
             </span>
-            <span className="text-[10px] text-gray-600">
-              {activePreset.description}
-            </span>
+            <span className="text-[10px] text-gray-600">{activePreset.description}</span>
           </div>
         ) : null}
 

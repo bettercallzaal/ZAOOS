@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { curationWeight } from '@/lib/music/curationWeight';
 import { logger } from '@/lib/logger';
+import { curationWeight } from '@/lib/music/curationWeight';
 
 interface LikeRow {
   user_fid: number;
@@ -106,12 +106,15 @@ export async function GET() {
     }
 
     // 3. Aggregate: for each song, sum weighted scores and collect curators
-    const songMap = new Map<string, {
-      song: WeightedTrack['song'];
-      weightedScore: number;
-      likeCount: number;
-      curators: { name: string; weight: number }[];
-    }>();
+    const songMap = new Map<
+      string,
+      {
+        song: WeightedTrack['song'];
+        weightedScore: number;
+        likeCount: number;
+        curators: { name: string; weight: number }[];
+      }
+    >();
 
     for (const like of likes as unknown as LikeRow[]) {
       const song = like.songs;
@@ -160,9 +163,12 @@ export async function GET() {
         .map((c) => c.name),
     }));
 
-    return NextResponse.json({ tracks }, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
-    });
+    return NextResponse.json(
+      { tracks },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
+      },
+    );
   } catch (err) {
     logger.error('[trending-weighted] unexpected error:', err);
     return NextResponse.json({ error: 'Failed to load trending tracks' }, { status: 500 });

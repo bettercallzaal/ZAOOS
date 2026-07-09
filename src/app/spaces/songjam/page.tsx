@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { communityConfig } from '@/../community.config';
 import {
-  SONGJAM_SPACE_URL,
-  SONGJAM_SPACE_LABEL,
-  SONGJAM_SPACE_DESCRIPTION,
   SONGJAM_IFRAME_ALLOW,
   SONGJAM_IFRAME_SANDBOX,
+  SONGJAM_SPACE_DESCRIPTION,
+  SONGJAM_SPACE_LABEL,
+  SONGJAM_SPACE_URL,
 } from '@/lib/spaces/songjam';
-import { communityConfig } from '@/../community.config';
 
 export const metadata: Metadata = {
   title: `${SONGJAM_SPACE_LABEL} - ${communityConfig.name}`,
@@ -31,7 +31,13 @@ export default function SongjamSpacePage() {
             aria-label="Back to Spaces"
             className="rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-800 hover:text-[#f5a623]"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>

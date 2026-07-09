@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface SearchUser {
   fid: number;
@@ -17,7 +17,12 @@ interface MentionAutocompleteProps {
   position: { bottom: number; left: number };
 }
 
-export function MentionAutocomplete({ query, onSelect, onClose, position }: MentionAutocompleteProps) {
+export function MentionAutocomplete({
+  query,
+  onSelect,
+  onClose,
+  position,
+}: MentionAutocompleteProps) {
   const [users, setUsers] = useState<SearchUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,7 +42,9 @@ export function MentionAutocomplete({ query, onSelect, onClose, position }: Ment
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`, { signal: controller.signal });
+      const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`, {
+        signal: controller.signal,
+      });
       if (controller.signal.aborted) return;
       if (res.ok) {
         const data = await res.json();

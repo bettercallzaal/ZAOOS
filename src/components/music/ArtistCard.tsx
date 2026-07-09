@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ArtistTrack {
   id: string;
@@ -36,7 +36,9 @@ export function ArtistCard({ artistName, className = '' }: ArtistCardProps) {
     setLoading(true);
     fetch(`/api/music/artists?artist=${encodeURIComponent(artistName)}`)
       .then((res) => (res.ok ? res.json() : null))
-      .then((d) => { if (d) setData(d); })
+      .then((d) => {
+        if (d) setData(d);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [artistName]);
@@ -75,7 +77,9 @@ export function ArtistCard({ artistName, className = '' }: ArtistCardProps) {
           <div className="text-left min-w-0">
             <p className="text-sm font-semibold text-white truncate">{data.artist}</p>
             <div className="flex items-center gap-3 text-[11px] text-gray-400">
-              <span>{data.trackCount} track{data.trackCount !== 1 ? 's' : ''}</span>
+              <span>
+                {data.trackCount} track{data.trackCount !== 1 ? 's' : ''}
+              </span>
               <span className="flex items-center gap-0.5">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -134,7 +138,9 @@ export function ArtistCard({ artistName, className = '' }: ArtistCardProps) {
                 <div className="flex items-center gap-2 text-[10px] text-gray-500">
                   <span>{track.playCount.toLocaleString()} plays</span>
                   {track.duration > 0 && <span>{formatDuration(track.duration)}</span>}
-                  <span className="capitalize">{track.platform === 'soundxyz' ? 'Sound.xyz' : track.platform}</span>
+                  <span className="capitalize">
+                    {track.platform === 'soundxyz' ? 'Sound.xyz' : track.platform}
+                  </span>
                 </div>
               </div>
             </a>

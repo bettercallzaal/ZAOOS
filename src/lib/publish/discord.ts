@@ -130,9 +130,7 @@ export async function publishToDiscord(
     }
 
     // Append ?wait=true to get the message object back (includes ID)
-    const url = webhookUrl.includes('?')
-      ? `${webhookUrl}&wait=true`
-      : `${webhookUrl}?wait=true`;
+    const url = webhookUrl.includes('?') ? `${webhookUrl}&wait=true` : `${webhookUrl}?wait=true`;
 
     const res = await fetch(url, {
       method: 'POST',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import EntryComments from './EntryComments';
 
 interface Entry {
@@ -35,7 +35,14 @@ interface EntryCardProps {
   onDelete?: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin, onDelete }: EntryCardProps) {
+export default function EntryCard({
+  entry,
+  userVoteType,
+  voters,
+  onVote,
+  isAdmin,
+  onDelete,
+}: EntryCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [showVoters, setShowVoters] = useState(false);
   const [upCount, setUpCount] = useState(entry.upvote_count);
@@ -128,9 +135,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
         )}
       </h3>
 
-      {entry.url && (
-        <p className="text-xs text-gray-500 mb-2 truncate">{entry.url}</p>
-      )}
+      {entry.url && <p className="text-xs text-gray-500 mb-2 truncate">{entry.url}</p>}
 
       {entry.og_image && !imgError && (
         <div className="mb-3 overflow-hidden rounded-lg">
@@ -145,9 +150,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
       )}
 
       {entry.note && (
-        <p className="text-sm text-gray-300 mb-3 italic">
-          &ldquo;{entry.note}&rdquo;
-        </p>
+        <p className="text-sm text-gray-300 mb-3 italic">&ldquo;{entry.note}&rdquo;</p>
       )}
 
       {entry.tags.length > 0 && (
@@ -265,10 +268,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
       {/* Comments */}
       {showComments && (
         <div className="mt-3 pt-3 border-t border-white/[0.08]">
-          <EntryComments
-            entryId={entry.id}
-            onCommentAdded={() => setCommentCount((c) => c + 1)}
-          />
+          <EntryComments entryId={entry.id} onCommentAdded={() => setCommentCount((c) => c + 1)} />
         </div>
       )}
     </div>

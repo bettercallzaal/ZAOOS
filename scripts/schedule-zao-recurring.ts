@@ -79,12 +79,24 @@ function loadEnv(): Record<string, string> {
 /** Minutes east of UTC for `tz` at `d`. */
 function tzOffsetMinutes(d: Date, tz: string): number {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: tz, hourCycle: 'h23',
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    timeZone: tz,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   }).formatToParts(d);
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
-  const tzDate = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+  const tzDate = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  );
   return Math.round((tzDate - d.getTime()) / 60_000);
 }
 
@@ -98,12 +110,22 @@ function computeOccurrences(event: EventConfig, tz: string, days: number, now: D
   }
   const targetWeekday = WEEKDAY_INDEX[event.weekday];
   const weekdayShortIndex: Record<string, number> = {
-    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
   };
   for (let dayOffset = 0; dayOffset <= days; dayOffset++) {
     const candidate = new Date(now.getTime() + dayOffset * 24 * 60 * 60 * 1000);
     const localParts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short',
     }).formatToParts(candidate);
     const localYear = Number(localParts.find((p) => p.type === 'year')?.value);
     const localMonth = Number(localParts.find((p) => p.type === 'month')?.value);
@@ -134,13 +156,20 @@ interface PlanItem {
   existingId?: string;
 }
 
-function buildPlan(config: RecurringConfig, existing: JukeSpaceRow[], days: number, now: Date): PlanItem[] {
+function buildPlan(
+  config: RecurringConfig,
+  existing: JukeSpaceRow[],
+  days: number,
+  now: Date,
+): PlanItem[] {
   const out: PlanItem[] = [];
   for (const ev of config.events) {
     for (const occ of computeOccurrences(ev, config.timezone, days, now)) {
       const occTs = new Date(occ).getTime();
       const match = existing.find(
-        (r) => r.title === ev.title && r.scheduled_at !== null &&
+        (r) =>
+          r.title === ev.title &&
+          r.scheduled_at !== null &&
           Math.abs(new Date(r.scheduled_at).getTime() - occTs) <= DEDUPE_WINDOW_MS,
       );
       out.push({
@@ -164,7 +193,9 @@ async function createSpace(
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (cookie) headers.Cookie = cookie;
   const res = await fetch(`${baseUrl}/api/juke/space`, {
-    method: 'POST', headers, body: JSON.stringify(body),
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok || !(json as { success?: boolean }).success) {
@@ -194,28 +225,40 @@ async function main(): Promise<void> {
   }
 
   const config = loadConfig();
-  console.log(`Loaded ${config.events.length} event(s). Window: ${days}d from ${new Date().toISOString()}.`);
+  console.log(
+    `Loaded ${config.events.length} event(s). Window: ${days}d from ${new Date().toISOString()}.`,
+  );
   console.log(`Target: ${baseUrl}.${dryRun ? ' DRY RUN.' : ''}`);
 
   const existing = await fetchExistingScheduled(supabaseUrl, anon);
   console.log(`Existing scheduled rows: ${existing.length}.`);
 
   const plan = buildPlan(config, existing, days, new Date());
-  let created = 0, skipped = 0, failed = 0;
+  let created = 0,
+    skipped = 0,
+    failed = 0;
 
   for (const item of plan) {
     const when = new Date(item.scheduledAt).toLocaleString('en-US', { timeZone: config.timezone });
     if (item.exists) {
       console.log(`[SKIP]   ${item.title} @ ${when} - exists ${item.existingId}`);
-      skipped++; continue;
+      skipped++;
+      continue;
     }
     if (dryRun) {
       console.log(`[PLAN]   ${item.title} @ ${when}`);
       continue;
     }
-    const res = await createSpace(baseUrl, {
-      title: item.title, scheduledAt: item.scheduledAt, announceCast: item.announceCast, password,
-    }, cookie);
+    const res = await createSpace(
+      baseUrl,
+      {
+        title: item.title,
+        scheduledAt: item.scheduledAt,
+        announceCast: item.announceCast,
+        password,
+      },
+      cookie,
+    );
     if (res.ok) {
       console.log(`[CREATE] ${item.title} @ ${when} -> ${res.id}`);
       created++;

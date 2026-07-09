@@ -33,10 +33,7 @@ export function getHatsClient(): HatsClient {
  * Check if a wallet address wears a specific hat.
  * Returns true if the address is an active wearer.
  */
-export async function isWearerOfHat(
-  walletAddress: `0x${string}`,
-  hatId: bigint
-): Promise<boolean> {
+export async function isWearerOfHat(walletAddress: `0x${string}`, hatId: bigint): Promise<boolean> {
   const client = getHatsClient();
   return client.isWearerOfHat({
     wearer: walletAddress,
@@ -50,15 +47,14 @@ export async function isWearerOfHat(
  */
 export async function getWornHats(
   walletAddress: `0x${string}`,
-  hatIds: bigint[]
+  hatIds: bigint[],
 ): Promise<bigint[]> {
   const client = getHatsClient();
   const results = await Promise.allSettled(
-    hatIds.map((hatId) =>
-      client.isWearerOfHat({ wearer: walletAddress, hatId })
-    )
+    hatIds.map((hatId) => client.isWearerOfHat({ wearer: walletAddress, hatId })),
   );
   return hatIds.filter(
-    (_, i) => results[i].status === 'fulfilled' && (results[i] as PromiseFulfilledResult<boolean>).value
+    (_, i) =>
+      results[i].status === 'fulfilled' && (results[i] as PromiseFulfilledResult<boolean>).value,
   );
 }

@@ -1,5 +1,36 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+
+describe('zaalFocusForBrief', () => {
+  it('returns null when nothing is dated and nothing needs Zaal', () => {
+    const tasks: TeamTask[] = [
+      { title: 'no date', status: 'todo', priority: 'P3', due: null, project: null, legacy_id: '1' },
+    ];
+    expect(zaalFocusForBrief(tasks)).toBeNull();
+  });
+  it('lists the top 3 by deadline, soonest first, and counts next_owner=me', () => {
+    const tasks: TeamTask[] = [
+      { title: 'C', status: 'todo', priority: 'P2', due: '2026-07-10', project: null, legacy_id: '3', metadata: { next_owner: 'me' } },
+      { title: 'A', status: 'todo', priority: 'P1', due: '2026-07-07', project: null, legacy_id: '1', metadata: { next_owner: 'me' } },
+      { title: 'B', status: 'todo', priority: 'P1', due: '2026-07-08', project: null, legacy_id: '2', metadata: { next_owner: 'agent' } },
+      { title: 'D', status: 'todo', priority: 'P3', due: '2026-07-20', project: null, legacy_id: '4' },
+    ];
+    const out = zaalFocusForBrief(tasks)!;
+    // soonest-first ordering, asserted on the unambiguous due-date strings
+    expect(out.indexOf('2026-07-07')).toBeLessThan(out.indexOf('2026-07-08'));
+    expect(out.indexOf('2026-07-08')).toBeLessThan(out.indexOf('2026-07-10'));
+    expect(out).not.toContain('2026-07-20'); // D is beyond the top-3
+    expect(out).toMatch(/2 tasks waiting on your call/);
+  });
+  it('ignores rows with a malformed due and still surfaces the needs-me count', () => {
+    const tasks: TeamTask[] = [
+      { title: 'bad', status: 'todo', priority: 'P1', due: 'someday', project: null, legacy_id: '1', metadata: { next_owner: 'me' } },
+    ];
+    const out = zaalFocusForBrief(tasks)!;
+    expect(out).toMatch(/1 task waiting on your call/);
+    expect(out).not.toContain('TOP 3');
+  });
+});
 
 describe('summarizeTeamForBrief', () => {
   it('returns null when empty (so the brief skips the section)', () => {

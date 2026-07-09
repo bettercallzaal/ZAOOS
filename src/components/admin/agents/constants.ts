@@ -50,20 +50,29 @@ export function getAgent(name: string) {
 
 export function getStatusDot(status: AgentStatus['status']): string {
   switch (status) {
-    case 'active': return 'bg-green-500';
-    case 'error': return 'bg-red-500';
-    case 'approval_needed': return 'bg-[#f5a623]';
-    default: return 'bg-gray-500';
+    case 'active':
+      return 'bg-green-500';
+    case 'error':
+      return 'bg-red-500';
+    case 'approval_needed':
+      return 'bg-[#f5a623]';
+    default:
+      return 'bg-gray-500';
   }
 }
 
 export function deriveStatus(lastEvent: AgentEvent | null): AgentStatus['status'] {
   if (!lastEvent) return 'idle';
   switch (lastEvent.event_type) {
-    case 'task_started': return 'active';
-    case 'task_failed': return 'error';
-    case 'blocked': return 'error';
-    case 'approval_needed': return 'approval_needed';
-    default: return 'idle';
+    case 'task_started':
+      return 'active';
+    case 'task_failed':
+      return 'error';
+    case 'blocked':
+      return 'error';
+    case 'approval_needed':
+      return 'approval_needed';
+    default:
+      return 'idle';
   }
 }

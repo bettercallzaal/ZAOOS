@@ -32,12 +32,7 @@ export function NowPlayingHeroSkeleton() {
           <div className="flex-1 min-w-0">
             <Skeleton width="60%" height={14} />
             <Skeleton width="40%" height={12} className="mt-1.5" />
-            <Skeleton
-              width="100%"
-              height={4}
-              borderRadius={2}
-              className="mt-3"
-            />
+            <Skeleton width="100%" height={4} borderRadius={2} className="mt-3" />
           </div>
         </div>
       </div>

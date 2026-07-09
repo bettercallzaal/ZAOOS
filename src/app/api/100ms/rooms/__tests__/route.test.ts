@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   makePostRequest,
-  mockUnauthenticatedSession,
   mockAuthenticatedSession,
+  mockUnauthenticatedSession,
 } from '@/test-utils/api-helpers';
 
 const { mockGetSessionData, mockCreateMSRoom, mockGetActiveMSRooms } = vi.hoisted(() => ({
@@ -65,9 +65,7 @@ describe('POST /api/100ms/rooms', () => {
 
   it('persists the token gate so gated rooms are actually gated', async () => {
     await POST(makePostRequest('/api/100ms/rooms', { title: 'Gated', gate_config: GATE }));
-    expect(mockCreateMSRoom).toHaveBeenCalledWith(
-      expect.objectContaining({ gateConfig: GATE }),
-    );
+    expect(mockCreateMSRoom).toHaveBeenCalledWith(expect.objectContaining({ gateConfig: GATE }));
   });
 
   it('ignores extra fields the client sends (slug, theme, provider)', async () => {

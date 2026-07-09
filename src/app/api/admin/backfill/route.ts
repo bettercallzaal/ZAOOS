@@ -45,7 +45,7 @@ export async function POST() {
 
   // Find entries that need backfill: missing FID or missing profile data
   const needsBackfill = (entries || []).filter(
-    (e) => e.wallet_address && (!e.fid || !e.pfp_url || !e.username)
+    (e) => e.wallet_address && (!e.fid || !e.pfp_url || !e.username),
   );
 
   if (needsBackfill.length === 0) {
@@ -63,7 +63,7 @@ export async function POST() {
     try {
       const res = await fetch(
         `${NEYNAR_BASE}/user/bulk-by-address?addresses=${addresses.join(',')}`,
-        { headers: headers(), signal: AbortSignal.timeout(10000) }
+        { headers: headers(), signal: AbortSignal.timeout(10000) },
       );
 
       if (!res.ok) {
@@ -107,7 +107,11 @@ export async function POST() {
           .eq('id', entry.id);
 
         if (updateError) {
-          results.push({ id: entry.id, ign: entry.ign, status: `db_error: ${updateError.message}` });
+          results.push({
+            id: entry.id,
+            ign: entry.ign,
+            status: `db_error: ${updateError.message}`,
+          });
         } else {
           results.push({ id: entry.id, ign: entry.ign, status: 'updated', fid: user.fid });
         }
@@ -122,7 +126,9 @@ export async function POST() {
 
   const updated = results.filter((r) => r.status === 'updated').length;
   const noAccount = results.filter((r) => r.status === 'no_farcaster_account').length;
-  const errors = results.filter((r) => r.status !== 'updated' && r.status !== 'no_farcaster_account').length;
+  const errors = results.filter(
+    (r) => r.status !== 'updated' && r.status !== 'no_farcaster_account',
+  ).length;
 
   return NextResponse.json({
     message: `Backfill complete: ${updated} updated, ${noAccount} no Farcaster account, ${errors} errors`,

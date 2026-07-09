@@ -26,9 +26,15 @@ export async function POST() {
 
     if (fetchErr) throw fetchErr;
     if (!entries || entries.length === 0) {
-      return NextResponse.json({ imported: 0, skipped: 0, message: 'No allowlist entries to import' });
+      return NextResponse.json({
+        imported: 0,
+        skipped: 0,
+        message: 'No allowlist entries to import',
+      });
     }
-    const existingWallets = new Set((existingUsers || []).map((u) => u.primary_wallet?.toLowerCase()).filter(Boolean));
+    const existingWallets = new Set(
+      (existingUsers || []).map((u) => u.primary_wallet?.toLowerCase()).filter(Boolean),
+    );
     const existingFids = new Set((existingUsers || []).map((u) => u.fid).filter(Boolean));
 
     // Batch-fetch all Farcaster profiles in one API call (instead of N+1 per entry)
@@ -56,7 +62,11 @@ export async function POST() {
 
         // If no wallet but have Farcaster data, use it
         if (!primaryWallet && fcUser) {
-          primaryWallet = ((fcUser.custody_address as string) || (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses?.[0] || '').toLowerCase();
+          primaryWallet = (
+            (fcUser.custody_address as string) ||
+            (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses?.[0] ||
+            ''
+          ).toLowerCase();
         }
 
         // If still no wallet, use a placeholder keyed on FID
@@ -88,7 +98,9 @@ export async function POST() {
           freshPfpUrl = (fcUser.pfp_url as string) || freshPfpUrl;
           freshUsername = (fcUser.username as string) || freshUsername;
           custodyAddress = (fcUser.custody_address as string) || custodyAddress;
-          freshVerified = (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses || freshVerified;
+          freshVerified =
+            (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses ||
+            freshVerified;
           bio = (fcUser.profile as { bio?: { text?: string } })?.bio?.text || null;
 
           // Update primary wallet if we got a real one
@@ -101,7 +113,8 @@ export async function POST() {
           primary_wallet: primaryWallet,
           fid: entry.fid || null,
           username: freshUsername || null,
-          display_name: freshDisplayName || entry.ign || entry.real_name || primaryWallet.slice(0, 10),
+          display_name:
+            freshDisplayName || entry.ign || entry.real_name || primaryWallet.slice(0, 10),
           pfp_url: freshPfpUrl || null,
           bio,
           custody_address: custodyAddress || null,
@@ -128,7 +141,9 @@ export async function POST() {
           if (entry.fid) existingFids.add(entry.fid);
         }
       } catch (err) {
-        errors.push(`${entry.ign || entry.fid}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        errors.push(
+          `${entry.ign || entry.fid}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     }
 

@@ -23,7 +23,7 @@ export async function transcribeAudio(
   const model = process.env.GROQ_WHISPER_MODEL || 'whisper-large-v3-turbo';
 
   const form = new FormData();
-  form.append('file', new Blob([bytes]), filename);
+  form.append('file', new Blob([bytes as BlobPart]), filename);
   form.append('model', model);
   form.append('response_format', 'text');
 

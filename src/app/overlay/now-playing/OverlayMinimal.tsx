@@ -35,12 +35,8 @@ export function OverlayMinimal({ data, transitioning }: Props) {
           animation: 'pulse 1.5s ease-in-out infinite',
         }}
       />
-      <span style={{ color: '#fff', fontWeight: 600, fontSize: 14 }}>
-        {data.trackName}
-      </span>
-      <span style={{ color: '#6b7280', fontSize: 14 }}>
-        {data.artistName}
-      </span>
+      <span style={{ color: '#fff', fontWeight: 600, fontSize: 14 }}>{data.trackName}</span>
+      <span style={{ color: '#6b7280', fontSize: 14 }}>{data.artistName}</span>
       {data.platform && <PlatformBadge platform={data.platform} />}
       <style>{`
         @keyframes pulse {

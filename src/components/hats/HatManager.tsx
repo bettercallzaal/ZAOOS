@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useEffect, useState } from 'react';
 import { optimism } from 'viem/chains';
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
 const HATS_CONTRACT = '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137' as const;
 
@@ -53,8 +53,15 @@ export default function HatManager() {
   const [mintSuccess, setMintSuccess] = useState('');
 
   // Wagmi write contract
-  const { data: txHash, writeContract, isPending: isMinting, error: writeError } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const {
+    data: txHash,
+    writeContract,
+    isPending: isMinting,
+    error: writeError,
+  } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   // Load tree data
   useEffect(() => {
@@ -78,9 +85,7 @@ export default function HatManager() {
       .then((res) => res.json())
       .then((data) => {
         const roles: { label: string }[] = data.roles || [];
-        setIsAdmin(roles.some((r) =>
-          r.label === 'Configurator' || r.label === 'ZAO'
-        ));
+        setIsAdmin(roles.some((r) => r.label === 'Configurator' || r.label === 'ZAO'));
       })
       .catch(() => setIsAdmin(false));
   }, [address]);
@@ -131,7 +136,9 @@ export default function HatManager() {
     return (
       <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] text-center">
         <p className="text-sm text-gray-400 mb-2">Connect your wallet to manage hats</p>
-        <p className="text-xs text-gray-600">Only Configurator hat wearers can mint and manage hats.</p>
+        <p className="text-xs text-gray-600">
+          Only Configurator hat wearers can mint and manage hats.
+        </p>
       </div>
     );
   }
@@ -164,7 +171,9 @@ export default function HatManager() {
       <div className="bg-[#f5a623]/10 rounded-xl p-4 border border-[#f5a623]/30">
         <div className="flex items-center gap-2">
           <span className="text-[#f5a623] text-sm font-medium">Configurator Access</span>
-          <span className="px-1.5 py-0.5 bg-green-500/10 text-green-400 text-[10px] rounded-full">Active</span>
+          <span className="px-1.5 py-0.5 bg-green-500/10 text-green-400 text-[10px] rounded-full">
+            Active
+          </span>
         </div>
         <p className="text-xs text-gray-400 mt-1">
           Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
@@ -200,8 +209,13 @@ export default function HatManager() {
             {(() => {
               const hat = allHats.find((h) => h.id === selectedHat);
               if (!hat) return null;
-              if (hat.supply >= hat.maxSupply) return <span className="text-red-400">Hat is at max supply ({hat.maxSupply})</span>;
-              return <span>Supply: {hat.supply}/{hat.maxSupply} — {hat.maxSupply - hat.supply} remaining</span>;
+              if (hat.supply >= hat.maxSupply)
+                return <span className="text-red-400">Hat is at max supply ({hat.maxSupply})</span>;
+              return (
+                <span>
+                  Supply: {hat.supply}/{hat.maxSupply} — {hat.maxSupply - hat.supply} remaining
+                </span>
+              );
             })()}
           </div>
         )}
@@ -234,12 +248,20 @@ export default function HatManager() {
             >
               <div>
                 <p className="text-sm text-white font-medium">{hat.label}</p>
-                <p className="text-[10px] text-gray-600 font-mono">{hat.prettyId.slice(0, 18)}...</p>
+                <p className="text-[10px] text-gray-600 font-mono">
+                  {hat.prettyId.slice(0, 18)}...
+                </p>
               </div>
               <div className="text-right">
-                <span className={`text-sm font-bold ${
-                  hat.supply >= hat.maxSupply ? 'text-red-400' : hat.supply > 0 ? 'text-[#f5a623]' : 'text-gray-500'
-                }`}>
+                <span
+                  className={`text-sm font-bold ${
+                    hat.supply >= hat.maxSupply
+                      ? 'text-red-400'
+                      : hat.supply > 0
+                        ? 'text-[#f5a623]'
+                        : 'text-gray-500'
+                  }`}
+                >
                   {hat.supply}/{hat.maxSupply}
                 </span>
                 <p className="text-[10px] text-gray-600">wearers</p>

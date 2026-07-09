@@ -1,13 +1,13 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  paginateCasts,
-  scrapeBczFarcasterHistory,
-  resolveFarcasterFid,
-  scrapeFarcasterHistoryByUsername,
   BczScrapeError,
-  type FetchCastPage,
   type CastPage,
+  type FetchCastPage,
+  paginateCasts,
+  resolveFarcasterFid,
+  scrapeBczFarcasterHistory,
+  scrapeFarcasterHistoryByUsername,
 } from '../bcz-history';
 import type { FetchImpl } from '../x-fetch';
 
@@ -17,7 +17,11 @@ function routedFetch(routes: Array<{ match: string; status?: number; json?: unkn
     const href = typeof url === 'string' ? url : url.toString();
     const r = routes.find((x) => href.includes(x.match));
     if (!r) throw new Error(`no route for ${href}`);
-    return { ok: (r.status ?? 200) < 400, status: r.status ?? 200, json: async () => r.json } as Response;
+    return {
+      ok: (r.status ?? 200) < 400,
+      status: r.status ?? 200,
+      json: async () => r.json,
+    } as Response;
   }) as unknown as FetchImpl;
 }
 
@@ -96,9 +100,9 @@ describe('scrapeBczFarcasterHistory', () => {
   });
 
   it('throws on invalid fid', async () => {
-    await expect(scrapeBczFarcasterHistory(0, { fetchPage: pagedFetcher([]) })).rejects.toBeInstanceOf(
-      BczScrapeError,
-    );
+    await expect(
+      scrapeBczFarcasterHistory(0, { fetchPage: pagedFetcher([]) }),
+    ).rejects.toBeInstanceOf(BczScrapeError);
   });
 
   it('throws when neither fetchPage nor apiKey is provided', async () => {
@@ -139,7 +143,10 @@ describe('scrapeFarcasterHistoryByUsername', () => {
       { match: 'by_username', json: { user: { fid: 8513 } } },
       { match: 'feed/user/casts', json: { casts: [rawCast('0xa', 'gm')], next: { cursor: null } } },
     ]);
-    const history = await scrapeFarcasterHistoryByUsername('bettercallzaal', { apiKey: 'key', fetchImpl });
+    const history = await scrapeFarcasterHistoryByUsername('bettercallzaal', {
+      apiKey: 'key',
+      fetchImpl,
+    });
     expect(history.fid).toBe(8513);
     expect(history.total).toBe(1);
   });

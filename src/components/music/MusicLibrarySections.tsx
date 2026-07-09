@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { usePlayer } from '@/providers/audio';
+import { useCallback, useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
-import { PlayingBars } from './MusicPageUtils';
+import { usePlayer } from '@/providers/audio';
 import type { TrackType } from '@/types/music';
+import { PlayingBars } from './MusicPageUtils';
 
 // ── Liked Songs Section ─────────────────────────────────────────────────
 
@@ -46,34 +46,41 @@ export function LikedSongsSection() {
     return () => controller.abort();
   }, []);
 
-  const handlePlay = useCallback(async (song: LikedSong) => {
-    if (player.metadata?.url === song.url) {
-      if (player.isPlaying) player.pause();
-      else player.resume();
-      return;
-    }
+  const handlePlay = useCallback(
+    async (song: LikedSong) => {
+      if (player.metadata?.url === song.url) {
+        if (player.isPlaying) player.pause();
+        else player.resume();
+        return;
+      }
 
-    setLoadingTrackId(song.id);
-    try {
-      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(song.url)}`);
-      if (!res.ok) throw new Error('Metadata fetch failed');
-      const metadata = await res.json();
-      player.play(metadata);
-    } catch {
-      player.play({
-        id: song.id,
-        type: (song.platform || 'audio') as TrackType,
-        trackName: song.title || 'Untitled Track',
-        artistName: song.artist || '',
-        artworkUrl: song.artwork_url || '',
-        url: song.url,
-        streamUrl: song.stream_url || (song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS` : undefined),
-        feedId: `liked-${song.id}`,
-      });
-    } finally {
-      setLoadingTrackId(null);
-    }
-  }, [player]);
+      setLoadingTrackId(song.id);
+      try {
+        const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(song.url)}`);
+        if (!res.ok) throw new Error('Metadata fetch failed');
+        const metadata = await res.json();
+        player.play(metadata);
+      } catch {
+        player.play({
+          id: song.id,
+          type: (song.platform || 'audio') as TrackType,
+          trackName: song.title || 'Untitled Track',
+          artistName: song.artist || '',
+          artworkUrl: song.artwork_url || '',
+          url: song.url,
+          streamUrl:
+            song.stream_url ||
+            (song.platform === 'audius'
+              ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS`
+              : undefined),
+          feedId: `liked-${song.id}`,
+        });
+      } finally {
+        setLoadingTrackId(null);
+      }
+    },
+    [player],
+  );
 
   return (
     <div>
@@ -87,7 +94,10 @@ export function LikedSongsSection() {
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse">
+            <div
+              key={i}
+              className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse"
+            >
               <div className="w-10 h-10 rounded-lg bg-gray-800" />
               <div className="flex-1 space-y-2">
                 <div className="h-3.5 bg-gray-800 rounded w-3/4" />
@@ -147,9 +157,11 @@ export function LikedSongsSection() {
 
                 {/* Track info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold truncate ${
-                    isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
-                  }`}>
+                  <p
+                    className={`text-sm font-semibold truncate ${
+                      isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+                    }`}
+                  >
                     {song.title || 'Untitled Track'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -159,13 +171,21 @@ export function LikedSongsSection() {
                       </span>
                     )}
                     <span className="text-[10px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded capitalize flex-shrink-0">
-                      {song.platform === 'applemusic' ? 'Apple Music' : song.platform === 'soundxyz' ? 'Sound.xyz' : song.platform}
+                      {song.platform === 'applemusic'
+                        ? 'Apple Music'
+                        : song.platform === 'soundxyz'
+                          ? 'Sound.xyz'
+                          : song.platform}
                     </span>
                   </div>
                 </div>
 
                 {/* Heart icon (filled) */}
-                <svg className="w-4 h-4 text-red-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <svg
+                  className="w-4 h-4 text-red-400 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </button>
@@ -220,40 +240,53 @@ export function HistorySection() {
     return () => controller.abort();
   }, []);
 
-  const handlePlay = useCallback(async (song: HistorySong) => {
-    if (player.metadata?.url === song.url) {
-      if (player.isPlaying) player.pause();
-      else player.resume();
-      return;
-    }
+  const handlePlay = useCallback(
+    async (song: HistorySong) => {
+      if (player.metadata?.url === song.url) {
+        if (player.isPlaying) player.pause();
+        else player.resume();
+        return;
+      }
 
-    setLoadingTrackId(song.id);
-    try {
-      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(song.url)}`);
-      if (!res.ok) throw new Error('Metadata fetch failed');
-      const metadata = await res.json();
-      player.play(metadata);
-    } catch {
-      player.play({
-        id: song.id,
-        type: (song.platform || 'audio') as TrackType,
-        trackName: song.title || 'Untitled Track',
-        artistName: song.artist || '',
-        artworkUrl: song.artwork_url || '',
-        url: song.url,
-        streamUrl: song.stream_url || undefined,
-        feedId: `history-${song.id}`,
-      });
-    } finally {
-      setLoadingTrackId(null);
-    }
-  }, [player]);
+      setLoadingTrackId(song.id);
+      try {
+        const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(song.url)}`);
+        if (!res.ok) throw new Error('Metadata fetch failed');
+        const metadata = await res.json();
+        player.play(metadata);
+      } catch {
+        player.play({
+          id: song.id,
+          type: (song.platform || 'audio') as TrackType,
+          trackName: song.title || 'Untitled Track',
+          artistName: song.artist || '',
+          artworkUrl: song.artwork_url || '',
+          url: song.url,
+          streamUrl: song.stream_url || undefined,
+          feedId: `history-${song.id}`,
+        });
+      } finally {
+        setLoadingTrackId(null);
+      }
+    },
+    [player],
+  );
 
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-5 h-5 text-[#f5a623]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
         <h2 className="text-lg font-bold text-white">Listening History</h2>
       </div>
@@ -261,7 +294,10 @@ export function HistorySection() {
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse">
+            <div
+              key={i}
+              className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse"
+            >
               <div className="w-10 h-10 rounded-lg bg-gray-800" />
               <div className="flex-1 space-y-2">
                 <div className="h-3.5 bg-gray-800 rounded w-3/4" />
@@ -273,8 +309,18 @@ export function HistorySection() {
       ) : error || songs.length === 0 ? (
         <div className="text-center py-12 rounded-xl bg-[#0d1b2a] border border-white/[0.08]">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f5a623]/10 to-[#f5a623]/5 flex items-center justify-center mx-auto mb-3">
-            <svg className="w-7 h-7 text-[#f5a623]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-7 h-7 text-[#f5a623]/40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <p className="text-sm font-medium text-gray-400">No listening history yet</p>
@@ -321,9 +367,11 @@ export function HistorySection() {
 
                 {/* Track info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold truncate ${
-                    isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
-                  }`}>
+                  <p
+                    className={`text-sm font-semibold truncate ${
+                      isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+                    }`}
+                  >
                     {song.title || 'Untitled Track'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -333,7 +381,11 @@ export function HistorySection() {
                       </span>
                     )}
                     <span className="text-[10px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded capitalize flex-shrink-0">
-                      {song.platform === 'applemusic' ? 'Apple Music' : song.platform === 'soundxyz' ? 'Sound.xyz' : song.platform}
+                      {song.platform === 'applemusic'
+                        ? 'Apple Music'
+                        : song.platform === 'soundxyz'
+                          ? 'Sound.xyz'
+                          : song.platform}
                     </span>
                   </div>
                 </div>

@@ -155,7 +155,7 @@ export function EmpireZabalHero() {
               <p className="text-xs text-gray-400">
                 {entry.points
                   ? entry.points.toLocaleString()
-                  : entry.score?.toLocaleString() ?? '-'}
+                  : (entry.score?.toLocaleString() ?? '-')}
               </p>
             </div>
           ))}

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -60,10 +60,7 @@ export async function PATCH(req: NextRequest) {
     if (admin_notes !== undefined) updates.admin_notes = admin_notes;
     if (is_featured !== undefined) updates.is_featured = is_featured;
 
-    const { error } = await supabaseAdmin
-      .from('community_profiles')
-      .update(updates)
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('community_profiles').update(updates).eq('id', id);
 
     if (error) throw error;
     return NextResponse.json({ success: true });

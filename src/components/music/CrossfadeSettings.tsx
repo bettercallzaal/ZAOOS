@@ -20,9 +20,7 @@ export function CrossfadeSettings() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-white">Crossfade</p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Smooth transition between tracks
-          </p>
+          <p className="text-xs text-gray-500 mt-0.5">Smooth transition between tracks</p>
         </div>
         <span className="text-xs text-gray-400 tabular-nums">
           {player.crossfade === 0 ? 'Off' : `${player.crossfade}s`}

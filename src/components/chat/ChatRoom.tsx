@@ -1,43 +1,81 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { useAuth } from '@/hooks/useAuth';
-import { useChat } from '@/hooks/useChat';
-import { useMobile } from '@/hooks/useMobile';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { QuotedCastData } from '@/types';
-import { useXMTPContext, ZaoMember } from '@/contexts/XMTPContext';
-import { useWalletXMTP } from '@/hooks/useWalletXMTP';
-import { Sidebar } from './Sidebar';
-import { MessageList } from './MessageList';
-import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
-import { ThreadDrawer } from './ThreadDrawer';
-import { SignerConnect } from './SignerConnect';
-import { MessageThread } from '@/components/messages/MessageThread';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { communityConfig } from '@/../community.config';
 import { GroupInfoDrawer } from '@/components/messages/GroupInfoDrawer';
 import { MessageCompose } from '@/components/messages/MessageCompose';
+import { MessageThread } from '@/components/messages/MessageThread';
 import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
-import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
-import { communityConfig } from '@/../community.config';
+import { useXMTPContext, type ZaoMember } from '@/contexts/XMTPContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useChat } from '@/hooks/useChat';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useMobile } from '@/hooks/useMobile';
+import { useWalletXMTP } from '@/hooks/useWalletXMTP';
+import type { QuotedCastData } from '@/types';
+import { ComposeBar, type ComposeBarHandle, type ReplyContext } from './ComposeBar';
+import { type ContentFilter, FeedFilters, filterAndSortCasts, type SortMode } from './FeedFilters';
+import { MessageList } from './MessageList';
+import { Sidebar } from './Sidebar';
+import { SignerConnect } from './SignerConnect';
+import { ThreadDrawer } from './ThreadDrawer';
 
-const TrendingFeed = dynamic(() => import('./TrendingFeed').then(m => ({ default: m.TrendingFeed })), { ssr: false });
-const SearchDialog = dynamic(() => import('./SearchDialog').then(m => ({ default: m.SearchDialog })), { ssr: false });
-const SongSubmit = dynamic(() => import('@/components/music/SongSubmit').then(m => ({ default: m.SongSubmit })), { ssr: false });
-const SchedulePanel = dynamic(() => import('./SchedulePanel').then(m => ({ default: m.SchedulePanel })), { ssr: false });
-const FaqPanel = dynamic(() => import('./FaqPanel').then(m => ({ default: m.FaqPanel })), { ssr: false });
-const TutorialPanel = dynamic(() => import('./TutorialPanel').then(m => ({ default: m.TutorialPanel })), { ssr: false });
-const RespectPanel = dynamic(() => import('./RespectPanel').then(m => ({ default: m.RespectPanel })), { ssr: false });
-const EmpirePanel = dynamic(() => import('./EmpirePanel').then(m => ({ default: m.EmpirePanel })), { ssr: false });
-const ProfileDrawer = dynamic(() => import('./ProfileDrawer').then(m => ({ default: m.ProfileDrawer })), { ssr: false });
+const TrendingFeed = dynamic(
+  () => import('./TrendingFeed').then((m) => ({ default: m.TrendingFeed })),
+  { ssr: false },
+);
+const SearchDialog = dynamic(
+  () => import('./SearchDialog').then((m) => ({ default: m.SearchDialog })),
+  { ssr: false },
+);
+const SongSubmit = dynamic(
+  () => import('@/components/music/SongSubmit').then((m) => ({ default: m.SongSubmit })),
+  { ssr: false },
+);
+const SchedulePanel = dynamic(
+  () => import('./SchedulePanel').then((m) => ({ default: m.SchedulePanel })),
+  { ssr: false },
+);
+const FaqPanel = dynamic(() => import('./FaqPanel').then((m) => ({ default: m.FaqPanel })), {
+  ssr: false,
+});
+const TutorialPanel = dynamic(
+  () => import('./TutorialPanel').then((m) => ({ default: m.TutorialPanel })),
+  { ssr: false },
+);
+const RespectPanel = dynamic(
+  () => import('./RespectPanel').then((m) => ({ default: m.RespectPanel })),
+  { ssr: false },
+);
+const EmpirePanel = dynamic(
+  () => import('./EmpirePanel').then((m) => ({ default: m.EmpirePanel })),
+  { ssr: false },
+);
+const ProfileDrawer = dynamic(
+  () => import('./ProfileDrawer').then((m) => ({ default: m.ProfileDrawer })),
+  { ssr: false },
+);
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
   const [isTrending, setIsTrending] = useState(false);
-  const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, loadMore, hasMore, loadingMore } = useChat(activeChannel);
+  const {
+    messages,
+    loading,
+    sending,
+    error,
+    sendError,
+    clearSendError,
+    sendMessage,
+    hideMessage,
+    loadMore,
+    hasMore,
+    loadingMore,
+  } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
@@ -53,7 +91,9 @@ export function ChatRoom() {
   const [profileFid, setProfileFid] = useState<number | null>(null);
   const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
   const [groupInfoId, setGroupInfoId] = useState<string | null>(null);
-  const [groupMembers, setGroupMembers] = useState<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>([]);
+  const [groupMembers, setGroupMembers] = useState<
+    { inboxId: string; displayName: string; pfpUrl: string; username?: string }[]
+  >([]);
   const [loadingGroupMembers, setLoadingGroupMembers] = useState(false);
   const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('newest');
@@ -63,7 +103,8 @@ export function ChatRoom() {
   const xmtp = useXMTPContext();
   const walletXmtp = useWalletXMTP();
   const viewMode = xmtp.activeConversationId ? 'xmtp' : isTrending ? 'trending' : 'channel';
-  const activeXmtpConversation = xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
+  const activeXmtpConversation =
+    xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
 
   const handleXmtpConnect = useCallback(async () => {
     if (walletXmtp.canConnect) {
@@ -72,23 +113,32 @@ export function ChatRoom() {
     // Fallback: if no wallet connected, the sidebar will show RainbowKit connect
   }, [walletXmtp]);
 
-  const handleConversationSelect = useCallback((id: string) => {
-    xmtp.selectConversation(id);
-    setSidebarOpen(false);
-  }, [xmtp]);
+  const handleConversationSelect = useCallback(
+    (id: string) => {
+      xmtp.selectConversation(id);
+      setSidebarOpen(false);
+    },
+    [xmtp],
+  );
 
-  const handleStartDmWithMember = useCallback(async (member: ZaoMember) => {
-    await xmtp.startDmWithMember(member);
-    setSidebarOpen(false);
-  }, [xmtp]);
+  const handleStartDmWithMember = useCallback(
+    async (member: ZaoMember) => {
+      await xmtp.startDmWithMember(member);
+      setSidebarOpen(false);
+    },
+    [xmtp],
+  );
 
-  const handleChannelSelect = useCallback((ch: string) => {
-    setActiveChannel(ch);
-    setIsTrending(false);
-    xmtp.selectConversation(null);
-    setSelectedThreadHash(null);
-    setSidebarOpen(false);
-  }, [xmtp]);
+  const handleChannelSelect = useCallback(
+    (ch: string) => {
+      setActiveChannel(ch);
+      setIsTrending(false);
+      xmtp.selectConversation(null);
+      setSelectedThreadHash(null);
+      setSidebarOpen(false);
+    },
+    [xmtp],
+  );
 
   const handleTrendingSelect = useCallback(() => {
     setIsTrending(true);
@@ -97,23 +147,35 @@ export function ChatRoom() {
     setSidebarOpen(false);
   }, [xmtp]);
 
-  const handleCreateDm = useCallback(async (address: `0x${string}`, peerProfile?: import('@/lib/xmtp/client').XMTPPeerProfile) => {
-    const convId = await xmtp.createDm(address, peerProfile);
-    if (convId) xmtp.selectConversation(convId);
-  }, [xmtp]);
+  const handleCreateDm = useCallback(
+    async (address: `0x${string}`, peerProfile?: import('@/lib/xmtp/client').XMTPPeerProfile) => {
+      const convId = await xmtp.createDm(address, peerProfile);
+      if (convId) xmtp.selectConversation(convId);
+    },
+    [xmtp],
+  );
 
-  const handleCreateGroup = useCallback(async (name: string, members: { address: `0x${string}`; profile?: import('@/lib/xmtp/client').XMTPPeerProfile }[]) => {
-    const convId = await xmtp.createGroup(name, members);
-    if (convId) xmtp.selectConversation(convId);
-  }, [xmtp]);
+  const handleCreateGroup = useCallback(
+    async (
+      name: string,
+      members: { address: `0x${string}`; profile?: import('@/lib/xmtp/client').XMTPPeerProfile }[],
+    ) => {
+      const convId = await xmtp.createGroup(name, members);
+      if (convId) xmtp.selectConversation(convId);
+    },
+    [xmtp],
+  );
 
-  const handleOpenGroupInfo = useCallback(async (convId: string) => {
-    setGroupInfoId(convId);
-    setLoadingGroupMembers(true);
-    const members = await xmtp.getGroupMembers(convId);
-    setGroupMembers(members);
-    setLoadingGroupMembers(false);
-  }, [xmtp]);
+  const handleOpenGroupInfo = useCallback(
+    async (convId: string) => {
+      setGroupInfoId(convId);
+      setLoadingGroupMembers(true);
+      const members = await xmtp.getGroupMembers(convId);
+      setGroupMembers(members);
+      setLoadingGroupMembers(false);
+    },
+    [xmtp],
+  );
 
   // Filtered + sorted messages
   const filteredMessages = useMemo(
@@ -130,30 +192,69 @@ export function ChatRoom() {
   }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset filters on channel switch + fetch submissions for queue
-   
+
   useEffect(() => {
     setContentFilter('all');
     setSortMode('newest');
   }, [activeChannel]);
-   
 
   // Keyboard shortcuts
-  const shortcutHandlers = useMemo(() => ({
-    onSearch: () => setSearchOpen(true),
-    onFocusCompose: () => composeRef.current?.focus(),
-    onClosePanels: () => {
-      if (profileFid) { setProfileFid(null); return; }
-      if (respectOpen) { setRespectOpen(false); return; }
-      if (faqOpen) { setFaqOpen(false); return; }
-      if (tutorialOpen) { setTutorialOpen(false); return; }
-      if (searchOpen) { setSearchOpen(false); return; }
-      if (selectedThreadHash) { setSelectedThreadHash(null); return; }
-      if (songSubmitOpen) { setSongSubmitOpen(false); return; }
-      if (scheduleOpen) { setScheduleOpen(false); return; }
-      if (sidebarOpen) { setSidebarOpen(false); return; }
-    },
-    onToggleSidebar: () => setSidebarOpen((o) => !o),
-  }), [profileFid, respectOpen, faqOpen, tutorialOpen, searchOpen, selectedThreadHash, songSubmitOpen, scheduleOpen, sidebarOpen]);
+  const shortcutHandlers = useMemo(
+    () => ({
+      onSearch: () => setSearchOpen(true),
+      onFocusCompose: () => composeRef.current?.focus(),
+      onClosePanels: () => {
+        if (profileFid) {
+          setProfileFid(null);
+          return;
+        }
+        if (respectOpen) {
+          setRespectOpen(false);
+          return;
+        }
+        if (faqOpen) {
+          setFaqOpen(false);
+          return;
+        }
+        if (tutorialOpen) {
+          setTutorialOpen(false);
+          return;
+        }
+        if (searchOpen) {
+          setSearchOpen(false);
+          return;
+        }
+        if (selectedThreadHash) {
+          setSelectedThreadHash(null);
+          return;
+        }
+        if (songSubmitOpen) {
+          setSongSubmitOpen(false);
+          return;
+        }
+        if (scheduleOpen) {
+          setScheduleOpen(false);
+          return;
+        }
+        if (sidebarOpen) {
+          setSidebarOpen(false);
+          return;
+        }
+      },
+      onToggleSidebar: () => setSidebarOpen((o) => !o),
+    }),
+    [
+      profileFid,
+      respectOpen,
+      faqOpen,
+      tutorialOpen,
+      searchOpen,
+      selectedThreadHash,
+      songSubmitOpen,
+      scheduleOpen,
+      sidebarOpen,
+    ],
+  );
 
   useKeyboardShortcuts(shortcutHandlers);
 
@@ -169,12 +270,32 @@ export function ChatRoom() {
       {xmtp.actionError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] max-w-sm w-full mx-4">
           <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/15 border border-red-500/30 shadow-lg backdrop-blur-sm">
-            <svg className="w-4 h-4 text-red-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+            <svg
+              className="w-4 h-4 text-red-400 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"
+              />
             </svg>
             <span className="text-sm text-red-300 flex-1">{xmtp.actionError}</span>
-            <button onClick={xmtp.clearActionError} className="text-red-400/60 hover:text-red-400" aria-label="Dismiss">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <button
+              onClick={xmtp.clearActionError}
+              className="text-red-400/60 hover:text-red-400"
+              aria-label="Dismiss"
+            >
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -189,11 +310,26 @@ export function ChatRoom() {
         activeChannel={activeChannel}
         onChannelSelect={handleChannelSelect}
         isTrending={isTrending}
-        onTrendingSelect={() => { handleTrendingSelect(); setSidebarOpen(false); }}
-        onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
-        onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
-        onOpenRespect={() => { setRespectOpen(true); setSidebarOpen(false); }}
-        onOpenEmpire={() => { setEmpireOpen(true); setSidebarOpen(false); }}
+        onTrendingSelect={() => {
+          handleTrendingSelect();
+          setSidebarOpen(false);
+        }}
+        onOpenFaq={() => {
+          setFaqOpen(true);
+          setSidebarOpen(false);
+        }}
+        onOpenTutorial={() => {
+          setTutorialOpen(true);
+          setSidebarOpen(false);
+        }}
+        onOpenRespect={() => {
+          setRespectOpen(true);
+          setSidebarOpen(false);
+        }}
+        onOpenEmpire={() => {
+          setEmpireOpen(true);
+          setSidebarOpen(false);
+        }}
         xmtpConnected={xmtp.isConnected}
         xmtpConnecting={xmtp.isConnecting}
         xmtpError={xmtp.error}
@@ -214,20 +350,21 @@ export function ChatRoom() {
       />
 
       {/* Group Info Drawer */}
-      {groupInfoId && (() => {
-        const conv = xmtp.conversations.find((c) => c.id === groupInfoId);
-        if (!conv) return null;
-        return (
-          <GroupInfoDrawer
-            conversation={conv}
-            members={groupMembers}
-            loading={loadingGroupMembers}
-            onClose={() => setGroupInfoId(null)}
-            onRemove={() => xmtp.removeConversation(groupInfoId)}
-            onLeave={() => xmtp.leaveGroup(groupInfoId)}
-          />
-        );
-      })()}
+      {groupInfoId &&
+        (() => {
+          const conv = xmtp.conversations.find((c) => c.id === groupInfoId);
+          if (!conv) return null;
+          return (
+            <GroupInfoDrawer
+              conversation={conv}
+              members={groupMembers}
+              loading={loadingGroupMembers}
+              onClose={() => setGroupInfoId(null)}
+              onRemove={() => xmtp.removeConversation(groupInfoId)}
+              onLeave={() => xmtp.leaveGroup(groupInfoId)}
+            />
+          );
+        })()}
 
       {/* Main chat + music sidebar in a shared flex row */}
       <div className="flex flex-1 min-w-0">
@@ -242,7 +379,12 @@ export function ChatRoom() {
                 aria-label="Open sidebar"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </button>
             )}
@@ -255,8 +397,18 @@ export function ChatRoom() {
                   title="Back to channel"
                   aria-label="Back to channel"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 19.5L8.25 12l7.5-7.5"
+                    />
                   </svg>
                 </button>
                 {activeXmtpConversation?.peerPfpUrl ? (
@@ -270,20 +422,34 @@ export function ChatRoom() {
                   </div>
                 ) : activeXmtpConversation?.type === 'group' ? (
                   <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                    <svg
+                      className="w-4 h-4 text-[#f5a623]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772"
+                      />
                     </svg>
                   </div>
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
                     <span className="text-xs text-[#f5a623]/80 font-semibold">
-                      {(activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || '?')[0]?.toUpperCase()}
+                      {(activeXmtpConversation?.peerDisplayName ||
+                        activeXmtpConversation?.name ||
+                        '?')[0]?.toUpperCase()}
                     </span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <h2 className="font-semibold text-sm text-white truncate">
-                    {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
+                    {activeXmtpConversation?.peerDisplayName ||
+                      activeXmtpConversation?.name ||
+                      'Message'}
                   </h2>
                   <div className="flex items-center gap-1.5">
                     <div className="flex items-center gap-1">
@@ -294,7 +460,8 @@ export function ChatRoom() {
                     </div>
                     {xmtp.connectedWallets.length > 0 && (
                       <span className="text-[10px] text-gray-600">
-                        · {xmtp.connectedWallets.length} wallet{xmtp.connectedWallets.length > 1 ? 's' : ''}
+                        · {xmtp.connectedWallets.length} wallet
+                        {xmtp.connectedWallets.length > 1 ? 's' : ''}
                       </span>
                     )}
                   </div>
@@ -323,8 +490,18 @@ export function ChatRoom() {
                   aria-label="Search messages"
                   title="Search (Cmd+K)"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
                   </svg>
                 </button>
 
@@ -335,8 +512,18 @@ export function ChatRoom() {
                   aria-label="Scheduled posts"
                   title="Scheduled posts"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </button>
 
@@ -347,7 +534,13 @@ export function ChatRoom() {
                   aria-label="Submit a song"
                   title="Submit a song"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
@@ -365,7 +558,15 @@ export function ChatRoom() {
                 conversation={activeXmtpConversation}
                 messages={xmtp.messages}
                 loading={xmtp.loadingMessages}
-                xmtpState={xmtp.isConnecting ? 'connecting' : xmtp.error ? 'error' : xmtp.isConnected ? 'connected' : 'idle'}
+                xmtpState={
+                  xmtp.isConnecting
+                    ? 'connecting'
+                    : xmtp.error
+                      ? 'error'
+                      : xmtp.isConnected
+                        ? 'connected'
+                        : 'idle'
+                }
                 xmtpError={xmtp.error}
                 onNewDm={() => setDmDialogType('dm')}
                 onNewGroup={() => setDmDialogType('group')}
@@ -385,7 +586,11 @@ export function ChatRoom() {
           ) : (
             <>
               {/* Channel / Trending tab bar */}
-              <div role="tablist" aria-label="Channels" className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0">
+              <div
+                role="tablist"
+                aria-label="Channels"
+                className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0"
+              >
                 {communityConfig.farcaster.channels.map((ch) => (
                   <button
                     key={ch}
@@ -411,7 +616,10 @@ export function ChatRoom() {
                       : 'text-gray-500 hover:text-amber-400 hover:bg-amber-500/5'
                   }`}
                 >
-                  Trending <span className="text-[10px]" aria-hidden="true">🔥</span>
+                  Trending{' '}
+                  <span className="text-[10px]" aria-hidden="true">
+                    🔥
+                  </span>
                 </button>
               </div>
 
@@ -456,7 +664,12 @@ export function ChatRoom() {
                   {sendError && (
                     <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0 flex items-center justify-between">
                       <span>Message failed: {sendError}</span>
-                      <button onClick={clearSendError} className="text-red-300 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
+                      <button
+                        onClick={clearSendError}
+                        className="text-red-300 hover:text-white text-xs ml-3 flex-shrink-0"
+                      >
+                        Dismiss
+                      </button>
                     </div>
                   )}
 
@@ -490,7 +703,12 @@ export function ChatRoom() {
                   {!hasSigner ? (
                     <div>
                       <SignerConnect onSuccess={refetch} />
-                      <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
+                      <ComposeBar
+                        ref={composeRef}
+                        hasSigner={false}
+                        onSend={sendMessage}
+                        channel={activeChannel}
+                      />
                     </div>
                   ) : (
                     <ComposeBar
@@ -511,7 +729,6 @@ export function ChatRoom() {
             </>
           )}
         </div>
-
       </div>
 
       {/* Song Submit Panel */}

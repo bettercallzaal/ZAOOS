@@ -71,7 +71,7 @@ function truncate(text: string, maxLen: number): string {
  * See: https://core.telegram.org/bots/api#markdownv2-style
  */
 export function escapeMarkdownV2(text: string): string {
-  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+  return text.replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 }
 
 // ---------------------------------------------------------------------------

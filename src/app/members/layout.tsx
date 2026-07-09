@@ -18,10 +18,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MembersLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MembersLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

@@ -18,7 +18,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
-import { startHeartbeat, reportEvent, startCommandPoller, markDone } from '../lib/cowork';
+import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
@@ -73,6 +73,7 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { dispatchPlan } from './dispatch';
+import { commitResearchDoc } from './research-doc';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -86,7 +87,8 @@ import {
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
-import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
+import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
+import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -136,6 +138,31 @@ function chunkMessage(text: string, max = TELEGRAM_MAX): string[] {
  * any reply over 4096 chars throws "Bad Request: message is too long" and the
  * user gets nothing.
  */
+
+
+// --- Auth error tracking (doc TBD) ---
+// Track last auth alert time so we don't spam Zaal with repeated alerts.
+// Fires at most once every 30 min.
+let lastAuthAlertTime = 0;
+const AUTH_ALERT_DEBOUNCE_MS = 30 * 60 * 1000; // 30 min
+
+async function alertAuthFailure(bot: Bot, zaalId: number, message: string): Promise<void> {
+  const now = Date.now();
+  if (now - lastAuthAlertTime < AUTH_ALERT_DEBOUNCE_MS) {
+    console.log('[zoe/index] auth alert debounced (recently sent)');
+    return;
+  }
+  lastAuthAlertTime = now;
+  const fullMessage = `ZOE Research Engine - Auth Failure
+
+${message}
+
+Action: ssh VPS then run 'claude' and /login.`;
+  await bot.api.sendMessage(zaalId, fullMessage).catch((err: unknown) => {
+    console.error('[zoe/index] failed to send auth alert:', err);
+  });
+}
+
 async function replyChunked(
   ctx: Context,
   text: string,
@@ -151,6 +178,42 @@ async function replyChunked(
           : undefined,
     });
   }
+}
+
+/**
+ * Detect when a message wants link analysis/research.
+ * Returns true if: URL present AND research intent keywords.
+ *
+ * Intent keywords: research, analyze, analysis, look into, dig into,
+ * thoughts, what do you think, take on, break down, summarize, what's our,
+ * whats our, vet, due diligence.
+ *
+ * When true, the message should route to research-worker dispatch (not recall).
+ */
+function wantsLinkResearch(text: string): boolean {
+  const hasUrl = /https?:\/\/\S+/i.test(text);
+  if (!hasUrl) return false;
+
+  const intentKeywords = [
+    'research',
+    'analyze',
+    'analysis',
+    'look into',
+    'dig into',
+    'thoughts',
+    'what do you think',
+    'what do you reckon',
+    'take on',
+    'break down',
+    'summarize',
+    "what's our",
+    'whats our',
+    'vet',
+    'due diligence',
+  ];
+
+  const lowerText = text.toLowerCase();
+  return intentKeywords.some((keyword) => lowerText.includes(keyword));
 }
 
 async function appendClaudeNote(body: string): Promise<number> {
@@ -731,6 +794,60 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     return;
   }
 
+  // Close a cowork tracker task straight from TG: "/done 123", "done #123",
+  // optional note after a dash ("done 123 - shipped in PR #99"). Same
+  // markDone() the control plane uses; fails soft with a clear message when
+  // the cowork API creds (COWORK_API_URL + COWORK_BOT_TOKEN) are missing.
+  const doneCmd = /^\/?done\s+#?([\w-]+)(?:\s*[-:]\s*(.+))?$/i.exec(text.trim());
+  if (doneCmd) {
+    const r = await markDone(doneCmd[1], doneCmd[2] ?? 'closed by Zaal via ZOE');
+    await ctx.reply(
+      r.ok
+        ? `Task ${doneCmd[1]} marked done.`
+        : `Could not mark ${doneCmd[1]} done: ${'error' in r && r.error ? r.error : 'cowork API not configured'}`,
+    );
+    return;
+  }
+
+  // Update task status from TG: "/task 123 blocked - waiting on X",
+  // "task 123 in_progress", "/task #123 todo", etc.
+  // Supports status: blocked, todo, in_progress (maps to WIP), done
+  // Optional note after dash or colon. Fails soft like doneCmd.
+  const taskStatusCmd = /^\/?task\s+#?([\w-]+)\s+(blocked|todo|in_progress|done)(?:\s*[-:]\s*(.+))?$/i.exec(text.trim());
+  if (taskStatusCmd) {
+    const [, id, statusStr, noteText] = taskStatusCmd;
+    const statusMap: Record<string, TaskStatus> = {
+      blocked: 'BLOCKED',
+      todo: 'TODO',
+      in_progress: 'WIP',
+      done: 'DONE',
+    };
+    const mappedStatus = statusMap[statusStr.toLowerCase()];
+    const notes = noteText ? noteText.trim() : undefined;
+    const r = await updateItem(id, { status: mappedStatus, notes });
+    await ctx.reply(
+      r.ok
+        ? `Task ${id} status updated to ${statusStr.toLowerCase()}.${notes ? ` Note: ${notes}` : ''}`
+        : `Could not update ${id}: ${'error' in r && r.error ? r.error : 'cowork API not configured'}`,
+    );
+    return;
+  }
+
+  // List all open team tasks: "/tasks" or "tasks"
+  const tasksCmd = /^\/?tasks\s*$/i.exec(text.trim());
+  if (tasksCmd) {
+    try {
+      const tasks = await getOpenTeamTasks();
+      const formatted = formatTeamTasks(tasks);
+      await replyChunked(ctx, formatted);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[zoe/index] tasks list failed:', msg);
+      await ctx.reply(`Could not fetch tasks: ${msg.slice(0, 100)}`);
+    }
+    return;
+  }
+
   // doc 796 — phantom-thread undo. "untrack th-... th-..." deletes mis-extracted
   // commitment threads so ZOE never nudges on something Zaal never committed to.
   const untrackMatch = /^untrack\s+(.+)$/i.exec(text.trim());
@@ -768,6 +885,24 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       console.error('[zoe/index] note save failed:', msg);
       await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
     }
+    return;
+  }
+
+  // Work-loop enqueue: `queue: <topic>` adds a research topic ZOE works
+  // autonomously (research-only, capped) and lands as a doc PR.
+  const queueMatch = QUEUE_PREFIX.exec(text);
+  if (queueMatch) {
+    const item = await enqueueWork(queueMatch[1]);
+    const depth = await queueDepth();
+    await ctx
+      .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". On it now.`)
+      .catch(() => {});
+    void runWorkTick({
+      sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+      zaalTgId: zaalId,
+      repoDir,
+      currentDate: currentDateString(),
+    }).catch((e) => console.error('[zoe/index] work-loop kick failed:', (e as Error).message));
     return;
   }
 
@@ -910,8 +1045,10 @@ async function dispatchConcierge(
     // recall()/delve and inject it into the turn. DMs only + substantive
     // messages (skip "y"/"ok"/short acks). Best-effort: no-op if Bonfire
     // unconfigured or delve returns nothing; never blocks the turn.
+    // EXCEPTION: skip recall if the message has a URL + research intent. Links
+    // should be fetched + analyzed by research-worker, not answered from recall.
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12) {
+    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
       try {
         const r = await recall({
           query: text,
@@ -929,6 +1066,7 @@ async function dispatchConcierge(
       blocks,
       senderLabel: label,
       recallContext,
+      linkResearchIntent: wantsLinkResearch(text),
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
@@ -1057,6 +1195,18 @@ async function dispatchConcierge(
       replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
     });
 
+    // Inline research -> durable doc on main (closes the gap where research
+    // answered inline, not via the worker dispatch, never landed a doc). A
+    // private DM that is a research request (a URL + "research") commits the
+    // answer as a numbered doc + PR, same as the dispatch path. Fire-and-forget.
+    if (scope === 'private' && /https?:\/\/\S+/i.test(text) && /res[ae]arch/i.test(text)) {
+      commitResearchDoc({ question: text, findings: result.reply })
+        .then((d) => {
+          if (d.ok) ctx.reply(`Saved to main: doc ${d.num} -> ${d.prUrl}`).catch(() => {});
+        })
+        .catch((e) => console.error('[zoe/index] inline research-doc failed:', (e as Error)?.message));
+    }
+
     console.log(
       `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
         4,
@@ -1115,18 +1265,30 @@ async function handlePlanCommand(
     const result = await decomposeGoal({ goal, context: zoeContext() });
     const { plan } = result;
     const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    // Auto-dispatch a single research-worker task (no y/n) - a plain "research
+    // this URL" shouldn't need a confirm; it's read-only + lands a doc PR.
+    const singleResearch =
+      dispatchable && plan.subtasks.length === 1 && plan.subtasks[0].worker === 'research-worker';
     let priorNote = '';
     if (dispatchable) {
       if (prior && (prior.kind === 'plan-gate' || prior.kind === 'reflexion' || prior.kind === 'learn')) {
         priorNote = `\n\n(Heads up: this replaced a pending ${prior.kind} you hadn't resolved.)`;
       }
-      await setPending({
+      const pendingPlan: PendingApproval = {
         kind: 'plan',
         chatScope: 'private',
         createdAt: new Date().toISOString(),
         goal,
         plan,
-      });
+      };
+      await setPending(pendingPlan);
+      if (singleResearch) {
+        await ctx
+          .reply('On it - researching this and saving the result to main (no confirm needed for a single research task).')
+          .catch(() => {});
+        await resolvePendingApproval(ctx, pendingPlan, { decision: 'approve-all', ids: [] });
+        return;
+      }
     }
     const autoNote =
       opts.autoDetected && dispatchable
@@ -1328,6 +1490,14 @@ async function runApprovedPlan(
         onSubtaskDone: async (st, res) => {
           const mark = res.status === 'completed' ? '✓' : res.status === 'failed' ? '✗' : '↻';
           await ctx.reply(`${mark} ${st.id} ${res.status}`.slice(0, 120)).catch(() => {});
+          // Durability: a completed research-worker subtask becomes a numbered doc
+          // + PR to main (trusted Node commit; the worker stays sandboxed).
+          if (st.worker === 'research-worker' && res.status === 'completed' && res.output) {
+            const doc = await commitResearchDoc({ question: goal, findings: res.output });
+            await ctx
+              .reply(doc.ok ? `Saved to main: doc ${doc.num} -> ${doc.prUrl}` : `(could not auto-save the research doc: ${doc.error})`)
+              .catch(() => {});
+          }
         },
       },
     });
@@ -1343,6 +1513,13 @@ async function runApprovedPlan(
         completed: report.completedIds,
         gateAfterId: report.gateAfterId,
       });
+    }
+
+    // Alert if any worker hit auth errors during dispatch
+    if (report.authErrorsDetected && ctx.chat) {
+      const failedAuth = report.results.filter((r) => r.authError);
+      const detail = failedAuth.map((r) => `${r.worker} (${r.subtaskId})`).join(', ');
+      await alertAuthFailure(bot, zaalId, `Research/task workers failed with auth errors: ${detail}. Recent research may not have completed.`);
     }
 
     await replyChunked(ctx, report.summary);

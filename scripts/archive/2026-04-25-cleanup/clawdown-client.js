@@ -61,8 +61,12 @@ function evaluatePokerAction(rawState) {
   const maxRaise = state.max_raise;
 
   const ranks = '23456789TJQKA';
-  function cardRank(c) { return ranks.indexOf((c[0] || '').toUpperCase()); }
-  function cardSuit(c) { return (c[1] || '').toLowerCase(); }
+  function cardRank(c) {
+    return ranks.indexOf((c[0] || '').toUpperCase());
+  }
+  function cardSuit(c) {
+    return (c[1] || '').toLowerCase();
+  }
 
   const r1 = cardRank(hole[0] || '');
   const r2 = cardRank(hole[1] || '');
@@ -75,22 +79,25 @@ function evaluatePokerAction(rawState) {
   // Preflop hand strength (0-100)
   let handStrength = 0;
   if (paired) {
-    if (highRank >= 12) handStrength = 95;      // AA, KK
-    else if (highRank >= 10) handStrength = 85;  // QQ, JJ
-    else if (highRank >= 8) handStrength = 70;   // TT, 99
-    else handStrength = 55;                       // low pairs
+    if (highRank >= 12)
+      handStrength = 95; // AA, KK
+    else if (highRank >= 10)
+      handStrength = 85; // QQ, JJ
+    else if (highRank >= 8)
+      handStrength = 70; // TT, 99
+    else handStrength = 55; // low pairs
   } else if (highRank >= 12 && lowRank >= 11) {
-    handStrength = suited ? 88 : 82;             // AK, AQ
+    handStrength = suited ? 88 : 82; // AK, AQ
   } else if (highRank >= 12 && lowRank >= 9) {
-    handStrength = suited ? 75 : 68;             // AT+
+    handStrength = suited ? 75 : 68; // AT+
   } else if (highRank >= 11 && lowRank >= 9) {
-    handStrength = suited ? 65 : 58;             // KQ, KJ, QJ
+    handStrength = suited ? 65 : 58; // KQ, KJ, QJ
   } else if (suited && connected && highRank >= 7) {
-    handStrength = 55;                            // suited connectors
+    handStrength = 55; // suited connectors
   } else if (suited && highRank >= 10) {
     handStrength = 50;
   } else if (highRank >= 12) {
-    handStrength = 42;                            // Ax offsuit
+    handStrength = 42; // Ax offsuit
   } else {
     handStrength = 25;
   }
@@ -98,25 +105,29 @@ function evaluatePokerAction(rawState) {
   // Post-flop adjustments
   if (community.length > 0) {
     const allCards = [...hole, ...community];
-    const allRanks = allCards.map(c => cardRank(c));
-    const allSuits = allCards.map(c => cardSuit(c));
-    const boardRanks = community.map(c => cardRank(c));
+    const allRanks = allCards.map((c) => cardRank(c));
+    const allSuits = allCards.map((c) => cardSuit(c));
+    const boardRanks = community.map((c) => cardRank(c));
     const holeRanks = [r1, r2];
     let madeHand = 0;
 
     // Pairs/trips with board
     for (const hr of holeRanks) {
-      const matches = boardRanks.filter(br => br === hr).length;
-      if (matches >= 2) madeHand = Math.max(madeHand, 80);       // trips
+      const matches = boardRanks.filter((br) => br === hr).length;
+      if (matches >= 2)
+        madeHand = Math.max(madeHand, 80); // trips
       else if (matches === 1) {
-        if (hr >= 10) madeHand = Math.max(madeHand, 65);         // top pair high kicker
+        if (hr >= 10)
+          madeHand = Math.max(madeHand, 65); // top pair high kicker
         else madeHand = Math.max(madeHand, 50);
       }
     }
 
     // Flush / flush draw
     const suitCounts = {};
-    allSuits.forEach(s => { suitCounts[s] = (suitCounts[s] || 0) + 1; });
+    allSuits.forEach((s) => {
+      suitCounts[s] = (suitCounts[s] || 0) + 1;
+    });
     const maxSuitCount = Math.max(...Object.values(suitCounts));
     if (maxSuitCount >= 5) madeHand = Math.max(madeHand, 85);
     else if (maxSuitCount === 4) madeHand = Math.max(madeHand, 45);
@@ -128,7 +139,7 @@ function evaluatePokerAction(rawState) {
     }
 
     // Two pair
-    if (paired && boardRanks.some(br => holeRanks.includes(br))) {
+    if (paired && boardRanks.some((br) => holeRanks.includes(br))) {
       madeHand = Math.max(madeHand, 72);
     }
 
@@ -144,9 +155,8 @@ function evaluatePokerAction(rawState) {
   if (toCall === 0) {
     if (handStrength >= 70 && legal.includes('raise') && minRaise > 0) {
       action = 'raise';
-      const raiseSize = handStrength >= 85
-        ? Math.min(Math.round(pot * 0.8 + minRaise), maxRaise)
-        : minRaise;
+      const raiseSize =
+        handStrength >= 85 ? Math.min(Math.round(pot * 0.8 + minRaise), maxRaise) : minRaise;
       amount = Math.max(minRaise, Math.min(raiseSize, maxRaise));
     } else {
       action = 'check';
@@ -154,9 +164,8 @@ function evaluatePokerAction(rawState) {
   } else {
     if (handStrength >= 80 && legal.includes('raise') && minRaise > 0) {
       action = 'raise';
-      const raiseSize = handStrength >= 90
-        ? Math.min(Math.round(pot * 1.0 + minRaise), maxRaise)
-        : minRaise;
+      const raiseSize =
+        handStrength >= 90 ? Math.min(Math.round(pot * 1.0 + minRaise), maxRaise) : minRaise;
       amount = Math.max(minRaise, Math.min(raiseSize, maxRaise));
       if (handStrength >= 90) chat = "Let's go.";
     } else if (handStrength >= 45 || (handStrength >= 35 && potOdds < 0.25)) {
@@ -206,7 +215,10 @@ function connect() {
             if (ch.test_state) {
               const ns = normalizeState(ch.test_state);
               const decision = evaluatePokerAction(ch.test_state);
-              readyMsg.readiness_response = { action: decision.action, parsed_cards: ns.hole_cards };
+              readyMsg.readiness_response = {
+                action: decision.action,
+                parsed_cards: ns.hole_cards,
+              };
             }
             ws.send(JSON.stringify(readyMsg));
           }
@@ -241,15 +253,21 @@ function connect() {
       case 'your_turn': {
         const ns = normalizeState(msg.state);
         log(`MY TURN - Session: ${msg.session_id}, Phase: ${ns.phase}`);
-        log(`Cards: ${JSON.stringify(ns.hole_cards)}, Community: ${JSON.stringify(ns.community_cards)}`);
-        log(`Pot: ${ns.pot}, To call: ${ns.to_call}, Stack: ${ns.your_stack}, Opp: ${ns.opponent_stack}`);
-        log(`Legal: ${JSON.stringify(ns.legal_actions)}, Raise: [${ns.min_raise}, ${ns.max_raise}]`);
+        log(
+          `Cards: ${JSON.stringify(ns.hole_cards)}, Community: ${JSON.stringify(ns.community_cards)}`,
+        );
+        log(
+          `Pot: ${ns.pot}, To call: ${ns.to_call}, Stack: ${ns.your_stack}, Opp: ${ns.opponent_stack}`,
+        );
+        log(
+          `Legal: ${JSON.stringify(ns.legal_actions)}, Raise: [${ns.min_raise}, ${ns.max_raise}]`,
+        );
 
         const decision = evaluatePokerAction(msg.state);
         const actionMsg = {
           type: 'action',
           session_id: msg.session_id,
-          action: decision.action
+          action: decision.action,
         };
         if (decision.amount !== null) actionMsg.amount = decision.amount;
         if (decision.chat) actionMsg.chat = decision.chat;
@@ -260,23 +278,32 @@ function connect() {
       }
 
       case 'action_result':
-        log(`Action accepted: ${msg.canonical_action || msg.action}${msg.normalized ? ' (normalized)' : ''}`);
+        log(
+          `Action accepted: ${msg.canonical_action || msg.action}${msg.normalized ? ' (normalized)' : ''}`,
+        );
         break;
 
       case 'round_result':
         log(`ROUND RESULT: winner=${msg.winner}, pot=${msg.pot}, showdown=${msg.showdown}`);
-        if (msg.showdown) log(`Cards: ${msg.your_cards} vs ${msg.opponent_cards}, Board: ${msg.final_board}`);
+        if (msg.showdown)
+          log(`Cards: ${msg.your_cards} vs ${msg.opponent_cards}, Board: ${msg.final_board}`);
         break;
 
       case 'session_result':
-        log(`SESSION RESULT: winner=${msg.winner}, stack=${msg.your_final_stack}, hands=${msg.hands_played}`);
+        log(
+          `SESSION RESULT: winner=${msg.winner}, stack=${msg.your_final_stack}, hands=${msg.hands_played}`,
+        );
         try {
           fs.writeFileSync(path.join(CONFIG_DIR, 'last_result.json'), JSON.stringify(msg, null, 2));
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
         break;
 
       case 'tournament_update':
-        log(`TOURNAMENT: placement=${msg.placement}, elo=${msg.elo_change > 0 ? '+' : ''}${msg.elo_change}, prize=${msg.prize_usdc} USDC`);
+        log(
+          `TOURNAMENT: placement=${msg.placement}, elo=${msg.elo_change > 0 ? '+' : ''}${msg.elo_change}, prize=${msg.prize_usdc} USDC`,
+        );
         break;
 
       case 'blind_increase':
@@ -304,7 +331,7 @@ function connect() {
       process.exit(0);
     }
     if (reconnectAttempts < MAX_RECONNECT) {
-      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+      const delay = Math.min(1000 * 2 ** reconnectAttempts, 30000);
       reconnectAttempts++;
       log(`Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})...`);
       setTimeout(connect, delay);

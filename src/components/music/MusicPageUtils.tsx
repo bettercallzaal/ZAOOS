@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // ── Shared small components ────────────────────────────────────────────
 
@@ -91,7 +91,11 @@ export function TrackOfTheDayBanner() {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <svg className="w-3 h-3 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <svg
+              className="w-3 h-3 text-[#f5a623] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg>
             <span className="text-[10px] font-semibold text-[#f5a623] uppercase tracking-wider">
@@ -102,9 +106,7 @@ export function TrackOfTheDayBanner() {
             {featured.track_title || 'Untitled Track'}
           </p>
           {featured.track_artist && (
-            <p className="text-xs text-gray-400 truncate">
-              {featured.track_artist}
-            </p>
+            <p className="text-xs text-gray-400 truncate">{featured.track_artist}</p>
           )}
         </div>
 
@@ -117,7 +119,13 @@ export function TrackOfTheDayBanner() {
           className="w-8 h-8 flex-shrink-0 rounded-full bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors"
           aria-label="View Track of the Day"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
         </button>

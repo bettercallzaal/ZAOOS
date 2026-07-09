@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import {
-  createSubnameWithFallback,
   batchCreateSubnames,
   buildMemberTextRecords,
+  createSubnameWithFallback,
   isValidSubname,
   sanitizeSubname,
 } from '@/lib/ens/subnames';
@@ -43,7 +43,7 @@ export async function GET() {
       .order('zid', { ascending: true, nullsFirst: false });
 
     return NextResponse.json({
-      members: (users || []).map(u => ({
+      members: (users || []).map((u) => ({
         fid: u.fid,
         username: u.username,
         displayName: u.display_name,
@@ -84,14 +84,22 @@ export async function POST(req: NextRequest) {
         .is('zao_subname', null);
 
       if (!members || members.length === 0) {
-        return NextResponse.json({ message: 'All members already have subnames', created: [], failed: [] });
+        return NextResponse.json({
+          message: 'All members already have subnames',
+          created: [],
+          failed: [],
+        });
       }
 
-      const toCreate = members.map(m => ({
+      const toCreate = members.map((m) => ({
         name: sanitizeSubname(m.username || m.display_name || `member-${m.fid}`),
         address: m.primary_wallet!,
         zid: m.zid ? Number(m.zid) : null,
-        textRecords: buildMemberTextRecords({ username: m.username, pfpUrl: m.pfp_url, bio: m.bio }),
+        textRecords: buildMemberTextRecords({
+          username: m.username,
+          pfpUrl: m.pfp_url,
+          bio: m.bio,
+        }),
       }));
 
       const result = await batchCreateSubnames(toCreate);
@@ -99,9 +107,8 @@ export async function POST(req: NextRequest) {
       // Update DB for successfully created names
       for (let i = 0; i < members.length; i++) {
         const sanitized = sanitizeSubname(toCreate[i].name);
-        const entry = result.created.find(c =>
-          c.name.startsWith(sanitized) ||
-          c.name.startsWith(`${sanitized}-`)
+        const entry = result.created.find(
+          (c) => c.name.startsWith(sanitized) || c.name.startsWith(`${sanitized}-`),
         );
         if (entry) {
           await supabaseAdmin
@@ -121,7 +128,10 @@ export async function POST(req: NextRequest) {
     // Single create
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { fid, name } = parsed.data;
@@ -142,18 +152,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Member not found or no wallet' }, { status: 404 });
     }
 
-    const textRecords = buildMemberTextRecords({ username: user.username, pfpUrl: user.pfp_url, bio: user.bio });
-    const result = await createSubnameWithFallback(sanitized, user.primary_wallet, user.zid ? Number(user.zid) : null, textRecords);
+    const textRecords = buildMemberTextRecords({
+      username: user.username,
+      pfpUrl: user.pfp_url,
+      bio: user.bio,
+    });
+    const result = await createSubnameWithFallback(
+      sanitized,
+      user.primary_wallet,
+      user.zid ? Number(user.zid) : null,
+      textRecords,
+    );
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     // Store in DB
-    await supabaseAdmin
-      .from('users')
-      .update({ zao_subname: result.fullName })
-      .eq('fid', fid);
+    await supabaseAdmin.from('users').update({ zao_subname: result.fullName }).eq('fid', fid);
 
     return NextResponse.json({ success: true, subname: result.fullName });
   } catch (err) {
@@ -182,10 +198,7 @@ export async function DELETE(req: NextRequest) {
 
     // On-chain subnames can't be deleted, but we clear the DB association
     // The subname still exists on-chain but ZAO OS stops displaying it
-    await supabaseAdmin
-      .from('users')
-      .update({ zao_subname: null })
-      .eq('fid', fid);
+    await supabaseAdmin.from('users').update({ zao_subname: null }).eq('fid', fid);
 
     return NextResponse.json({ success: true, message: 'Subname unlinked from member profile' });
   } catch (err) {

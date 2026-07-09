@@ -1,5 +1,5 @@
-import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { randomBytes } from 'crypto';
+import { getSupabaseAdmin } from '@/lib/db/supabase';
 
 export interface PublicArtist {
   id: string;
@@ -34,7 +34,9 @@ export async function getPublicArtists(): Promise<PublicArtist[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_artists')
-    .select('id, name, genre, city, status, socials, bio, photo_url, logo_url, cypher_interested, cypher_role, points_earned, volunteer_eligible')
+    .select(
+      'id, name, genre, city, status, socials, bio, photo_url, logo_url, cypher_interested, cypher_role, points_earned, volunteer_eligible',
+    )
     .neq('status', 'declined')
     .order('status')
     .order('name');

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
 interface Member {
@@ -43,9 +43,16 @@ interface Filters {
 }
 
 const defaultFilters: Filters = {
-  search: '', tier: 'all', category: '', location: '',
-  active_since: '', has_ens: false, platform: '', min_respect: 0,
-  featured: false, sort: 'respect',
+  search: '',
+  tier: 'all',
+  category: '',
+  location: '',
+  active_since: '',
+  has_ens: false,
+  platform: '',
+  min_respect: 0,
+  featured: false,
+  sort: 'respect',
 };
 
 interface Preset {
@@ -97,7 +104,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
   // Debounced search
   const [searchInput, setSearchInput] = useState('');
   useEffect(() => {
-    const timer = setTimeout(() => setFilters(f => ({ ...f, search: searchInput })), 300);
+    const timer = setTimeout(() => setFilters((f) => ({ ...f, search: searchInput })), 300);
     return () => clearTimeout(timer);
   }, [searchInput]);
 
@@ -106,7 +113,11 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
 
   const fetchMembers = useCallback(() => {
     setLoading(true);
-    const params = new URLSearchParams({ sort: filters.sort, limit: String(pageSize), offset: String(offset) });
+    const params = new URLSearchParams({
+      sort: filters.sort,
+      limit: String(pageSize),
+      offset: String(offset),
+    });
     if (filters.tier !== 'all') params.set('tier', filters.tier);
     if (filters.search) params.set('search', filters.search);
     if (filters.category) params.set('category', filters.category);
@@ -118,8 +129,8 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
     if (filters.featured) params.set('featured', 'true');
 
     fetch(`/api/members/directory?${params}`)
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         setMembers(d.members || []);
         if (d.filterOptions) setFilterOptions(d.filterOptions);
         if (d.total !== undefined) setTotal(d.total);
@@ -165,13 +176,15 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
     setIsDefaultFilters(false);
   };
 
-  const respectHolders = members.filter(m => m.tier === 'respect_holder');
-  const community = members.filter(m => m.tier === 'community');
+  const respectHolders = members.filter((m) => m.tier === 'respect_holder');
+  const community = members.filter((m) => m.tier === 'community');
 
   const platformBadges = (m: Member) => {
     const badges: { key: string; label: string; color: string }[] = [];
-    if (m.platforms.audius) badges.push({ key: 'audius', label: 'Audius', color: 'text-purple-300' });
-    if (m.platforms.spotify) badges.push({ key: 'spotify', label: 'Spotify', color: 'text-green-400' });
+    if (m.platforms.audius)
+      badges.push({ key: 'audius', label: 'Audius', color: 'text-purple-300' });
+    if (m.platforms.spotify)
+      badges.push({ key: 'spotify', label: 'Spotify', color: 'text-green-400' });
     if (m.platforms.soundcloud) badges.push({ key: 'sc', label: 'SC', color: 'text-orange-400' });
     return badges;
   };
@@ -186,10 +199,9 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
       />
 
       <div className="max-w-3xl mx-auto px-4 py-4">
-
         {/* Quick presets */}
         <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none">
-          {presets.map(p => (
+          {presets.map((p) => (
             <button
               key={p.label}
               onClick={() => applyPreset(p)}
@@ -205,7 +217,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
           <input
             type="text"
             value={searchInput}
-            onChange={e => {
+            onChange={(e) => {
               setSearchInput(e.target.value);
               setIsDefaultFilters(false);
             }}
@@ -235,14 +247,18 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             {/* Row 1: Tier + Sort */}
             <div className="flex gap-3 flex-wrap">
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Tier</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Tier
+                </label>
                 <div className="flex rounded-lg overflow-hidden border border-white/[0.08]">
-                  {(['all', 'respect_holder', 'community'] as const).map(t => (
+                  {(['all', 'respect_holder', 'community'] as const).map((t) => (
                     <button
                       key={t}
-                      onClick={() => handleFilterChange(f => ({ ...f, tier: t }))}
+                      onClick={() => handleFilterChange((f) => ({ ...f, tier: t }))}
                       className={`flex-1 px-2 py-1.5 text-[11px] transition-colors ${
-                        filters.tier === t ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
+                        filters.tier === t
+                          ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                          : 'text-gray-500 hover:text-white'
                       }`}
                     >
                       {t === 'all' ? 'All' : t === 'respect_holder' ? 'Respect' : 'Community'}
@@ -251,10 +267,14 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 </div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Sort</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Sort
+                </label>
                 <select
                   value={filters.sort}
-                  onChange={e => handleFilterChange(f => ({ ...f, sort: e.target.value as Filters['sort'] }))}
+                  onChange={(e) =>
+                    handleFilterChange((f) => ({ ...f, sort: e.target.value as Filters['sort'] }))
+                  }
                   className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="respect">Most Respect</option>
@@ -268,23 +288,29 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             {/* Row 2: Category + Platform */}
             <div className="flex gap-3 flex-wrap">
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Category</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Category
+                </label>
                 <select
                   value={filters.category}
-                  onChange={e => handleFilterChange(f => ({ ...f, category: e.target.value }))}
+                  onChange={(e) => handleFilterChange((f) => ({ ...f, category: e.target.value }))}
                   className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Any</option>
-                  {filterOptions.categories.map(c => (
-                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                  {filterOptions.categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c.charAt(0).toUpperCase() + c.slice(1)}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Platform</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Platform
+                </label>
                 <select
                   value={filters.platform}
-                  onChange={e => handleFilterChange(f => ({ ...f, platform: e.target.value }))}
+                  onChange={(e) => handleFilterChange((f) => ({ ...f, platform: e.target.value }))}
                   className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Any</option>
@@ -301,10 +327,17 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             {/* Row 3: Activity + Respect range */}
             <div className="flex gap-3 flex-wrap">
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Active</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Active
+                </label>
                 <select
                   value={filters.active_since}
-                  onChange={e => handleFilterChange(f => ({ ...f, active_since: e.target.value as Filters['active_since'] }))}
+                  onChange={(e) =>
+                    handleFilterChange((f) => ({
+                      ...f,
+                      active_since: e.target.value as Filters['active_since'],
+                    }))
+                  }
                   className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Anytime</option>
@@ -314,10 +347,14 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 </select>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Min Respect</label>
+                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">
+                  Min Respect
+                </label>
                 <select
                   value={filters.min_respect}
-                  onChange={e => handleFilterChange(f => ({ ...f, min_respect: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    handleFilterChange((f) => ({ ...f, min_respect: Number(e.target.value) }))
+                  }
                   className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value={0}>Any</option>
@@ -336,7 +373,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <input
                   type="checkbox"
                   checked={filters.has_ens}
-                  onChange={e => handleFilterChange(f => ({ ...f, has_ens: e.target.checked }))}
+                  onChange={(e) => handleFilterChange((f) => ({ ...f, has_ens: e.target.checked }))}
                   className="rounded border-white/[0.08] bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
                 />
                 Has ENS
@@ -345,7 +382,9 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <input
                   type="checkbox"
                   checked={filters.featured}
-                  onChange={e => handleFilterChange(f => ({ ...f, featured: e.target.checked }))}
+                  onChange={(e) =>
+                    handleFilterChange((f) => ({ ...f, featured: e.target.checked }))
+                  }
                   className="rounded border-white/[0.08] bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
                 />
                 Featured
@@ -354,7 +393,10 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
               <div className="flex-1" />
 
               {activeFilterCount > 0 && (
-                <button onClick={clearFilters} className="text-[11px] text-red-400 hover:text-red-300 transition-colors">
+                <button
+                  onClick={clearFilters}
+                  className="text-[11px] text-red-400 hover:text-red-300 transition-colors"
+                >
                   Clear all filters
                 </button>
               )}
@@ -368,46 +410,84 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             {filters.tier !== 'all' && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px]">
                 {filters.tier === 'respect_holder' ? 'Respect Holders' : 'Community'}
-                <button onClick={() => handleFilterChange(f => ({ ...f, tier: 'all' }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, tier: 'all' }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.category && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px] capitalize">
                 {filters.category}
-                <button onClick={() => handleFilterChange(f => ({ ...f, category: '' }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, category: '' }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.platform && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] capitalize">
                 On {filters.platform}
-                <button onClick={() => handleFilterChange(f => ({ ...f, platform: '' }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, platform: '' }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.active_since && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px]">
                 Active {filters.active_since}
-                <button onClick={() => handleFilterChange(f => ({ ...f, active_since: '' }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, active_since: '' }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.min_respect > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px]">
                 {filters.min_respect}+ Respect
-                <button onClick={() => handleFilterChange(f => ({ ...f, min_respect: 0 }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, min_respect: 0 }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.has_ens && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px]">
                 Has ENS
-                <button onClick={() => handleFilterChange(f => ({ ...f, has_ens: false }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, has_ens: false }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
             {filters.featured && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px]">
                 Featured
-                <button onClick={() => handleFilterChange(f => ({ ...f, featured: false }))} className="hover:text-white">&times;</button>
+                <button
+                  onClick={() => handleFilterChange((f) => ({ ...f, featured: false }))}
+                  className="hover:text-white"
+                >
+                  &times;
+                </button>
               </span>
             )}
-            <button onClick={clearFilters} className="text-[10px] text-gray-600 hover:text-red-400 transition-colors">
+            <button
+              onClick={clearFilters}
+              className="text-[10px] text-gray-600 hover:text-red-400 transition-colors"
+            >
               Clear all
             </button>
           </div>
@@ -418,34 +498,38 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
           <div className="flex gap-4 text-xs text-gray-500">
             <span>{respectHolders.length} respect holders</span>
             <span>{community.length} community</span>
-            {filters.sort !== 'respect' && <span className="text-gray-600">Sorted by {filters.sort}</span>}
+            {filters.sort !== 'respect' && (
+              <span className="text-gray-600">Sorted by {filters.sort}</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-600">Show</span>
             <select
               value={pageSize}
-              onChange={e => {
+              onChange={(e) => {
                 setPageSize(Number(e.target.value));
                 setOffset(0);
               }}
               className="bg-[#0d1b2a] border border-white/[0.08] rounded px-2 py-1 text-xs text-white"
             >
-              {[10, 25, 50, 100, 200, 300].map(s => (
-                <option key={s} value={s}>{s}</option>
+              {[10, 25, 50, 100, 200, 300].map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
             <span className="text-xs text-gray-600">
               {offset + 1}–{Math.min(offset + pageSize, total)} of {total}
             </span>
             <button
-              onClick={() => setOffset(o => Math.max(0, o - pageSize))}
+              onClick={() => setOffset((o) => Math.max(0, o - pageSize))}
               disabled={offset === 0}
               className="px-2 py-1 rounded border border-white/[0.08] text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
             >
               ‹
             </button>
             <button
-              onClick={() => setOffset(o => o + pageSize)}
+              onClick={() => setOffset((o) => o + pageSize)}
               disabled={!hasMore}
               className="px-2 py-1 rounded border border-white/[0.08] text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
             >
@@ -457,7 +541,9 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
         {/* Member grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-20 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-20 bg-[#0d1b2a] rounded-xl animate-pulse" />
+            ))}
           </div>
         ) : members.length === 0 ? (
           <div className="text-center py-12">
@@ -468,7 +554,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {members.map(m => (
+            {members.map((m) => (
               <Link
                 key={m.id}
                 href={`/members/${m.username || m.fid || m.id}`}
@@ -477,21 +563,36 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 {/* Cover image background */}
                 {m.artistProfile?.coverImageUrl && (
                   <div className="absolute inset-0 opacity-[0.08] group-hover:opacity-[0.12] transition-opacity">
-                    <Image src={m.artistProfile.coverImageUrl} alt="" fill className="object-cover" sizes="400px" />
+                    <Image
+                      src={m.artistProfile.coverImageUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="400px"
+                    />
                   </div>
                 )}
 
                 {/* PFP */}
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
-                  {(m.artistProfile?.thumbnailUrl || m.pfpUrl) ? (
-                    <Image src={m.artistProfile?.thumbnailUrl || m.pfpUrl || ''} alt="" fill className="object-cover" sizes="48px" />
+                  {m.artistProfile?.thumbnailUrl || m.pfpUrl ? (
+                    <Image
+                      src={m.artistProfile?.thumbnailUrl || m.pfpUrl || ''}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
                       {(m.displayName || m.username || '?')[0]?.toUpperCase()}
                     </div>
                   )}
                   {m.artistProfile?.isFeatured && (
-                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#f5a623] rounded-full border border-[#0d1b2a]" title="Featured" />
+                    <div
+                      className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#f5a623] rounded-full border border-[#0d1b2a]"
+                      title="Featured"
+                    />
                   )}
                 </div>
 
@@ -526,8 +627,10 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                     {/* Platform badges */}
                     {platformBadges(m).length > 0 && (
                       <div className="flex gap-0.5 flex-shrink-0">
-                        {platformBadges(m).map(b => (
-                          <span key={b.key} className={`text-[8px] ${b.color}`}>{b.label}</span>
+                        {platformBadges(m).map((b) => (
+                          <span key={b.key} className={`text-[8px] ${b.color}`}>
+                            {b.label}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -556,7 +659,11 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
         {/* Footer */}
         <div className="text-center pt-8 border-t border-white/[0.08] mt-8">
           <p className="text-[10px] text-gray-600">
-            ZAO OS · <Link href="/" className="text-[#f5a623] hover:underline">zaoos.com</Link> · Powered by Farcaster
+            ZAO OS ·{' '}
+            <Link href="/" className="text-[#f5a623] hover:underline">
+              zaoos.com
+            </Link>{' '}
+            · Powered by Farcaster
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
+import * as fs from 'fs';
 
 const CSV_PATH = '/Users/zaalpanthaki/Downloads/ZAOOS.csv';
 
@@ -28,12 +28,14 @@ async function seed() {
   const csv = fs.readFileSync(CSV_PATH, 'utf8');
   const lines = csv.split('\n').filter((l) => l.trim());
 
-  const entries = lines.map((line) => {
-    const parts = line.split(',');
-    const ign = parts[0]?.trim();
-    const wallet = parts[1]?.trim().replace(/,+$/, '');
-    return { ign, wallet_address: wallet };
-  }).filter((e) => e.ign && e.wallet_address);
+  const entries = lines
+    .map((line) => {
+      const parts = line.split(',');
+      const ign = parts[0]?.trim();
+      const wallet = parts[1]?.trim().replace(/,+$/, '');
+      return { ign, wallet_address: wallet };
+    })
+    .filter((e) => e.ign && e.wallet_address);
 
   console.log(`Found ${entries.length} entries`);
 

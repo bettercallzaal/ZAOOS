@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { createInAppNotification } from '@/lib/notifications';
-import { ZOUNZ_GOVERNOR, ZOUNZ_AUCTION } from '@/lib/zounz/contracts';
 import { logger } from '@/lib/logger';
+import { createInAppNotification } from '@/lib/notifications';
+import { ZOUNZ_AUCTION, ZOUNZ_GOVERNOR } from '@/lib/zounz/contracts';
 
 const client = createPublicClient({
   chain: base,
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
         .not('fid', 'is', null)
         .eq('is_active', true);
 
-      const fids = (members || []).map(m => m.fid).filter(Boolean) as number[];
+      const fids = (members || []).map((m) => m.fid).filter(Boolean) as number[];
 
       await createInAppNotification({
         recipientFids: fids,
@@ -89,7 +89,10 @@ export async function GET(request: NextRequest) {
 
       await supabaseAdmin
         .from('system_state')
-        .upsert({ key: 'zounz_proposal_count', value: String(currentCount) }, { onConflict: 'key' });
+        .upsert(
+          { key: 'zounz_proposal_count', value: String(currentCount) },
+          { onConflict: 'key' },
+        );
     }
 
     // --- Check auction state ---
@@ -120,7 +123,7 @@ export async function GET(request: NextRequest) {
           .not('fid', 'is', null)
           .eq('is_active', true);
 
-        const fids = (members || []).map(m => m.fid).filter(Boolean) as number[];
+        const fids = (members || []).map((m) => m.fid).filter(Boolean) as number[];
 
         const bidEth = Number(highestBid) / 1e18;
         await createInAppNotification({

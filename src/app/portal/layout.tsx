@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Portal | THE ZAO',
-  description: 'Explore The ZAO ecosystem. Music, social, governance, building, earning - find your portal.',
+  description:
+    'Explore The ZAO ecosystem. Music, social, governance, building, earning - find your portal.',
   openGraph: {
     title: 'Portal | THE ZAO',
     description: 'Explore The ZAO ecosystem. Find your portal into music, community, and web3.',
@@ -15,10 +16,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PortalLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

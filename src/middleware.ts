@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
 
 const MINUTE = 60_000;
@@ -12,70 +12,70 @@ interface RateLimitConfig {
 // The first matching prefix wins, so sub-routes must appear before their parent.
 const RATE_LIMITS: [string, RateLimitConfig][] = [
   // Chat sub-routes (before /api/chat catch-all paths)
-  ['/api/chat/send',      { limit: 10, windowMs: MINUTE }],
-  ['/api/chat/hide',      { limit: 10, windowMs: MINUTE }],
-  ['/api/chat/react',     { limit: 30, windowMs: MINUTE }],
-  ['/api/chat/messages',  { limit: 30, windowMs: MINUTE }],
-  ['/api/chat/thread',    { limit: 30, windowMs: MINUTE }],
-  ['/api/chat/search',    { limit: 30, windowMs: MINUTE }],
-  ['/api/chat/schedule',  { limit: 20, windowMs: MINUTE }],
+  ['/api/chat/send', { limit: 10, windowMs: MINUTE }],
+  ['/api/chat/hide', { limit: 10, windowMs: MINUTE }],
+  ['/api/chat/react', { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/messages', { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/thread', { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/search', { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/schedule', { limit: 20, windowMs: MINUTE }],
   ['/api/chat/assistant', { limit: 20, windowMs: MINUTE }],
 
   // Fractals sub-routes
   ['/api/fractals/webhook', { limit: 30, windowMs: MINUTE }],
-  ['/api/fractals',         { limit: 20, windowMs: MINUTE }],
+  ['/api/fractals', { limit: 20, windowMs: MINUTE }],
 
   // Inbound webhooks (signed, but cap to blunt replay/DoS — see Alchemy hardening)
-  ['/api/webhooks',      { limit: 100, windowMs: MINUTE }],
+  ['/api/webhooks', { limit: 100, windowMs: MINUTE }],
   ['/api/juke/webhooks', { limit: 100, windowMs: MINUTE }],
 
   // Users sub-routes
   ['/api/users/follow', { limit: 15, windowMs: MINUTE }],
-  ['/api/users',        { limit: 20, windowMs: MINUTE }],
+  ['/api/users', { limit: 20, windowMs: MINUTE }],
 
   // Proposals sub-routes
-  ['/api/proposals/vote',    { limit: 3,  windowMs: MINUTE }],
+  ['/api/proposals/vote', { limit: 3, windowMs: MINUTE }],
   ['/api/proposals/comment', { limit: 10, windowMs: MINUTE }],
-  ['/api/proposals',         { limit: 5,  windowMs: MINUTE }],
+  ['/api/proposals', { limit: 5, windowMs: MINUTE }],
 
   // Music sub-routes
-  ['/api/music/generate',    { limit: 5,  windowMs: 60 * MINUTE }], // expensive paid AI inference
-  ['/api/music/submissions', { limit: 2,  windowMs: MINUTE }],
-  ['/api/music/metadata',    { limit: 20, windowMs: MINUTE }],
-  ['/api/music/radio',       { limit: 10, windowMs: MINUTE }],
+  ['/api/music/generate', { limit: 5, windowMs: 60 * MINUTE }], // expensive paid AI inference
+  ['/api/music/submissions', { limit: 2, windowMs: MINUTE }],
+  ['/api/music/metadata', { limit: 20, windowMs: MINUTE }],
+  ['/api/music/radio', { limit: 10, windowMs: MINUTE }],
 
   // Library sub-routes
-  ['/api/library/submit',   { limit: 3,  windowMs: MINUTE }],
-  ['/api/library/vote',     { limit: 15, windowMs: MINUTE }],
+  ['/api/library/submit', { limit: 3, windowMs: MINUTE }],
+  ['/api/library/vote', { limit: 15, windowMs: MINUTE }],
   ['/api/library/comments', { limit: 10, windowMs: MINUTE }],
-  ['/api/library/delete',   { limit: 10, windowMs: MINUTE }],
-  ['/api/library',          { limit: 30, windowMs: MINUTE }],
+  ['/api/library/delete', { limit: 10, windowMs: MINUTE }],
+  ['/api/library', { limit: 30, windowMs: MINUTE }],
 
   // Top-level routes (no sub-route ordering concerns)
-  ['/api/admin',         { limit: 5,  windowMs: MINUTE }],
-  ['/api/auth',          { limit: 10, windowMs: MINUTE }],
-  ['/api/search',        { limit: 30, windowMs: MINUTE }],
-  ['/api/upload',        { limit: 10, windowMs: MINUTE }],
-  ['/api/discord',       { limit: 5,  windowMs: MINUTE }],
-  ['/api/messages',      { limit: 30, windowMs: MINUTE }],
+  ['/api/admin', { limit: 5, windowMs: MINUTE }],
+  ['/api/auth', { limit: 10, windowMs: MINUTE }],
+  ['/api/search', { limit: 30, windowMs: MINUTE }],
+  ['/api/upload', { limit: 10, windowMs: MINUTE }],
+  ['/api/discord', { limit: 5, windowMs: MINUTE }],
+  ['/api/messages', { limit: 30, windowMs: MINUTE }],
   ['/api/notifications', { limit: 20, windowMs: MINUTE }],
-  ['/api/respect',       { limit: 20, windowMs: MINUTE }],
-  ['/api/social',        { limit: 20, windowMs: MINUTE }],
-  ['/api/members',       { limit: 10, windowMs: MINUTE }],
-  ['/api/following',     { limit: 20, windowMs: MINUTE }],
-  ['/api/miniapp',       { limit: 10, windowMs: MINUTE }],
-  ['/api/wavewarz',      { limit: 20, windowMs: MINUTE }],
-  ['/api/directory',     { limit: 20, windowMs: MINUTE }],
-  ['/api/bluesky',       { limit: 5,  windowMs: MINUTE }],
-  ['/api/publish',       { limit: 5,  windowMs: MINUTE }],
-  ['/api/platforms',     { limit: 10, windowMs: MINUTE }],
-  ['/api/neynar',        { limit: 15, windowMs: MINUTE }],
+  ['/api/respect', { limit: 20, windowMs: MINUTE }],
+  ['/api/social', { limit: 20, windowMs: MINUTE }],
+  ['/api/members', { limit: 10, windowMs: MINUTE }],
+  ['/api/following', { limit: 20, windowMs: MINUTE }],
+  ['/api/miniapp', { limit: 10, windowMs: MINUTE }],
+  ['/api/wavewarz', { limit: 20, windowMs: MINUTE }],
+  ['/api/directory', { limit: 20, windowMs: MINUTE }],
+  ['/api/bluesky', { limit: 5, windowMs: MINUTE }],
+  ['/api/publish', { limit: 5, windowMs: MINUTE }],
+  ['/api/platforms', { limit: 10, windowMs: MINUTE }],
+  ['/api/neynar', { limit: 15, windowMs: MINUTE }],
   ['/api/stream/webhook', { limit: 100, windowMs: MINUTE }],
-  ['/api/stream',        { limit: 20, windowMs: MINUTE }],
-  ['/api/100ms',         { limit: 20, windowMs: MINUTE }],
-  ['/api/songjam',       { limit: 20, windowMs: MINUTE }],
-  ['/api/livepeer',      { limit: 10, windowMs: MINUTE }],
-  ['/api/broadcast',     { limit: 15, windowMs: MINUTE }],
+  ['/api/stream', { limit: 20, windowMs: MINUTE }],
+  ['/api/100ms', { limit: 20, windowMs: MINUTE }],
+  ['/api/songjam', { limit: 20, windowMs: MINUTE }],
+  ['/api/livepeer', { limit: 10, windowMs: MINUTE }],
+  ['/api/broadcast', { limit: 15, windowMs: MINUTE }],
 ];
 
 function getRateLimitConfig(pathname: string): RateLimitConfig | null {
@@ -114,7 +114,11 @@ function buildCspHeader(nonce: string): string {
   return directives.join('; ');
 }
 
-function addSecurityHeaders(response: NextResponse, nonce?: string, _pathname?: string): NextResponse {
+function addSecurityHeaders(
+  response: NextResponse,
+  nonce?: string,
+  _pathname?: string,
+): NextResponse {
   // Intentionally NOT setting X-Frame-Options. Modern browsers honor the CSP
   // `frame-ancestors *` directive above, which allows the miniapp to be
   // embedded by any Farcaster client iframe. Setting XFO would override the
@@ -124,7 +128,10 @@ function addSecurityHeaders(response: NextResponse, nonce?: string, _pathname?: 
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   // microphone delegated to juke.audio so speakers can publish audio inside
   // the Juke embed iframe (/live/[spaceId]); the iframe also needs allow="microphone".
-  response.headers.set('Permissions-Policy', 'camera=(self "https://www.songjam.space"), microphone=(self "https://www.songjam.space" "https://juke.audio"), geolocation=()');
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(self "https://www.songjam.space"), microphone=(self "https://www.songjam.space" "https://juke.audio"), geolocation=()',
+  );
   if (nonce) {
     response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
   }
@@ -136,10 +143,12 @@ export async function middleware(request: NextRequest) {
 
   // ZAOstock spinout: redirect /stock/* and /api/stock/* to zaostock.com
   // Project graduated 2026-04-29. Live at https://zaostock.com.
-  if (pathname === '/stock' || pathname.startsWith('/stock/') || pathname.startsWith('/api/stock/')) {
-    const newPath = pathname
-      .replace(/^\/api\/stock/, '/api')
-      .replace(/^\/stock/, '');
+  if (
+    pathname === '/stock' ||
+    pathname.startsWith('/stock/') ||
+    pathname.startsWith('/api/stock/')
+  ) {
+    const newPath = pathname.replace(/^\/api\/stock/, '/api').replace(/^\/stock/, '');
     const target = `https://zaostock.com${newPath || '/'}${request.nextUrl.search}`;
     return NextResponse.redirect(target, 301);
   }
@@ -162,17 +171,15 @@ export async function middleware(request: NextRequest) {
   if (config) {
     // Vercel strips user-supplied X-Forwarded-For and sets trusted values.
     // On non-Vercel deployments, ensure a trusted reverse proxy sets these headers.
-    const ip = request.headers.get('x-real-ip')
-      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || 'unknown';
+    const ip =
+      request.headers.get('x-real-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      'unknown';
     const key = `${ip}:${pathname}`;
     const result = await rateLimit(key, config.limit, config.windowMs);
 
     if (!result.success) {
-      const errorResponse = NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      );
+      const errorResponse = NextResponse.json({ error: 'Too many requests' }, { status: 429 });
       errorResponse.headers.set('Retry-After', String(Math.ceil(config.windowMs / 1000)));
       return addSecurityHeaders(errorResponse, undefined, pathname);
     }

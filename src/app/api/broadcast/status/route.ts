@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -16,7 +16,7 @@ interface ConnectedPlatform {
 
 async function fetchTwitchViewers(
   accessToken: string,
-  metadata: Record<string, unknown> | null
+  metadata: Record<string, unknown> | null,
 ): Promise<number | null> {
   const login = metadata?.login as string | undefined;
   if (!login) return null;
@@ -31,7 +31,7 @@ async function fetchTwitchViewers(
         Authorization: `Bearer ${accessToken}`,
         'Client-Id': clientId,
       },
-    }
+    },
   );
 
   if (!res.ok) return null;
@@ -41,16 +41,14 @@ async function fetchTwitchViewers(
   return stream ? (stream.viewer_count as number) : null;
 }
 
-async function fetchYouTubeViewers(
-  accessToken: string
-): Promise<number | null> {
+async function fetchYouTubeViewers(accessToken: string): Promise<number | null> {
   const res = await fetch(
     'https://www.googleapis.com/youtube/v3/liveBroadcasts?part=statistics&broadcastStatus=active',
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
 
   if (!res.ok) return null;
@@ -73,7 +71,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -84,10 +82,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       logger.error('[broadcast/status] Supabase error:', error.message);
-      return NextResponse.json(
-        { error: 'Failed to fetch connected platforms' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch connected platforms' }, { status: 500 });
     }
 
     if (!platforms || platforms.length === 0) {
@@ -114,7 +109,7 @@ export async function GET(req: NextRequest) {
         }
 
         return { platform: p.platform, count };
-      })
+      }),
     );
 
     const viewerCounts: Record<string, number | null> = {};
@@ -127,9 +122,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ viewerCounts });
   } catch (err) {
     logger.error('[broadcast/status] Unexpected error:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

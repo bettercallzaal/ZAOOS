@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
-import { supabaseAdmin } from '@/lib/db/supabase';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
-import { logger } from '@/lib/logger';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
+import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const nexusLinkSchema = z.object({
   title: z.string().min(1).max(200),
@@ -29,10 +29,12 @@ const deleteSchema = z.object({
 });
 
 const reorderSchema = z.object({
-  updates: z.array(z.object({
-    id: z.string().uuid(),
-    sort_order: z.number().int().min(0),
-  })),
+  updates: z.array(
+    z.object({
+      id: z.string().uuid(),
+      sort_order: z.number().int().min(0),
+    }),
+  ),
 });
 
 async function requireAdmin() {
@@ -60,8 +62,8 @@ export async function GET() {
     if (error) throw error;
 
     // Get unique categories and subcategories for the UI
-    const categories = [...new Set((data || []).map(l => l.category))];
-    const subcategories = [...new Set((data || []).map(l => l.subcategory))];
+    const categories = [...new Set((data || []).map((l) => l.category))];
+    const subcategories = [...new Set((data || []).map((l) => l.subcategory))];
 
     return NextResponse.json({
       links: data || [],
@@ -86,7 +88,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = nexusLinkSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     const { data, error } = await supabaseAdmin
@@ -127,16 +132,22 @@ export async function PUT(req: NextRequest) {
     if (body.updates) {
       const parsed = reorderSchema.safeParse(body);
       if (!parsed.success) {
-        return NextResponse.json({ error: 'Invalid reorder input', details: parsed.error.issues }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Invalid reorder input', details: parsed.error.issues },
+          { status: 400 },
+        );
       }
 
       const results = await Promise.allSettled(
         parsed.data.updates.map(({ id, sort_order }) =>
-          supabaseAdmin.from('nexus_links').update({ sort_order, updated_at: new Date().toISOString() }).eq('id', id)
-        )
+          supabaseAdmin
+            .from('nexus_links')
+            .update({ sort_order, updated_at: new Date().toISOString() })
+            .eq('id', id),
+        ),
       );
 
-      const failures = results.filter(r => r.status === 'rejected');
+      const failures = results.filter((r) => r.status === 'rejected');
       if (failures.length > 0) {
         return NextResponse.json({ error: `${failures.length} updates failed` }, { status: 500 });
       }
@@ -147,7 +158,10 @@ export async function PUT(req: NextRequest) {
     // Single link update
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 },
+      );
     }
 
     const { id, ...updates } = parsed.data;
@@ -190,10 +204,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('nexus_links')
-      .delete()
-      .eq('id', parsed.data.id);
+    const { error } = await supabaseAdmin.from('nexus_links').delete().eq('id', parsed.data.id);
 
     if (error) throw error;
 

@@ -1,15 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import dynamic from 'next/dynamic';
 
 const DiscordIntro = dynamic(() => import('@/components/members/DiscordIntro'), { ssr: false });
-const DiscordActivity = dynamic(() => import('@/components/members/DiscordActivity'), { ssr: false });
-const NetworkComparison = dynamic(() => import('@/components/social/NetworkComparison'), { ssr: false });
+const DiscordActivity = dynamic(() => import('@/components/members/DiscordActivity'), {
+  ssr: false,
+});
+const NetworkComparison = dynamic(() => import('@/components/social/NetworkComparison'), {
+  ssr: false,
+});
 
 interface MemberProfile {
   fid: number | null;
@@ -63,7 +67,15 @@ interface MemberProfile {
     audius: { followers: number; tracks: number; playlists: number } | null;
     efp: { followers: number; following: number } | null;
   } | null;
-  fractalHistory: { sessionName: string; sessionDate: string | null; era: string; rank: number; score: number; participants: number; source: string }[];
+  fractalHistory: {
+    sessionName: string;
+    sessionDate: string | null;
+    era: string;
+    rank: number;
+    score: number;
+    participants: number;
+    source: string;
+  }[];
   events: { type: string; amount: number; description: string | null; date: string | null }[];
   location: string | null;
   website: string | null;
@@ -103,7 +115,11 @@ interface EditableFields {
   tags: string;
 }
 
-function EditProfilePanel({ profile, onSave, onCancel }: {
+function EditProfilePanel({
+  profile,
+  onSave,
+  onCancel,
+}: {
   profile: MemberProfile;
   onSave: () => void;
   onCancel: () => void;
@@ -139,7 +155,10 @@ function EditProfilePanel({ profile, onSave, onCancel }: {
         spotify_url: fields.spotify_url,
         audius_handle: fields.audius_handle,
         discord_id: fields.discord_id,
-        tags: fields.tags.split(',').map(t => t.trim()).filter(Boolean),
+        tags: fields.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
       };
 
       const res = await fetch('/api/members/me', {
@@ -161,7 +180,8 @@ function EditProfilePanel({ profile, onSave, onCancel }: {
     }
   };
 
-  const inputClass = 'w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
+  const inputClass =
+    'w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
   const labelClass = 'text-[10px] text-gray-500 uppercase tracking-wider block mb-1';
 
   return (
@@ -169,7 +189,10 @@ function EditProfilePanel({ profile, onSave, onCancel }: {
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm font-medium text-[#f5a623]">Edit Profile</p>
         <div className="flex gap-2">
-          <button onClick={onCancel} className="px-3 py-1 rounded-lg text-xs text-gray-400 hover:text-white border border-white/[0.08] transition-colors">
+          <button
+            onClick={onCancel}
+            className="px-3 py-1 rounded-lg text-xs text-gray-400 hover:text-white border border-white/[0.08] transition-colors"
+          >
             Cancel
           </button>
           <button
@@ -191,7 +214,7 @@ function EditProfilePanel({ profile, onSave, onCancel }: {
           <label className={labelClass}>Bio</label>
           <textarea
             value={fields.bio}
-            onChange={e => setFields(f => ({ ...f, bio: e.target.value }))}
+            onChange={(e) => setFields((f) => ({ ...f, bio: e.target.value }))}
             placeholder="Tell the community about yourself..."
             maxLength={500}
             rows={3}
@@ -203,48 +226,108 @@ function EditProfilePanel({ profile, onSave, onCancel }: {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>Location</label>
-            <input type="text" value={fields.location} onChange={e => setFields(f => ({ ...f, location: e.target.value }))} placeholder="NYC, Berlin, Lagos..." className={inputClass} />
+            <input
+              type="text"
+              value={fields.location}
+              onChange={(e) => setFields((f) => ({ ...f, location: e.target.value }))}
+              placeholder="NYC, Berlin, Lagos..."
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Website</label>
-            <input type="text" value={fields.website_url} onChange={e => setFields(f => ({ ...f, website_url: e.target.value }))} placeholder="https://yoursite.com" className={inputClass} />
+            <input
+              type="text"
+              value={fields.website_url}
+              onChange={(e) => setFields((f) => ({ ...f, website_url: e.target.value }))}
+              placeholder="https://yoursite.com"
+              className={inputClass}
+            />
           </div>
         </div>
 
         <div>
           <label className={labelClass}>Tags (comma-separated)</label>
-          <input type="text" value={fields.tags} onChange={e => setFields(f => ({ ...f, tags: e.target.value }))} placeholder="producer, vocalist, web3..." className={inputClass} />
+          <input
+            type="text"
+            value={fields.tags}
+            onChange={(e) => setFields((f) => ({ ...f, tags: e.target.value }))}
+            placeholder="producer, vocalist, web3..."
+            className={inputClass}
+          />
         </div>
 
         <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-2">Platforms</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>Bluesky</label>
-            <input type="text" value={fields.bluesky_handle} onChange={e => setFields(f => ({ ...f, bluesky_handle: e.target.value }))} placeholder="handle.bsky.social" className={inputClass} />
+            <input
+              type="text"
+              value={fields.bluesky_handle}
+              onChange={(e) => setFields((f) => ({ ...f, bluesky_handle: e.target.value }))}
+              placeholder="handle.bsky.social"
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>X (Twitter)</label>
-            <input type="text" value={fields.x_handle} onChange={e => setFields(f => ({ ...f, x_handle: e.target.value }))} placeholder="@handle" className={inputClass} />
+            <input
+              type="text"
+              value={fields.x_handle}
+              onChange={(e) => setFields((f) => ({ ...f, x_handle: e.target.value }))}
+              placeholder="@handle"
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Instagram</label>
-            <input type="text" value={fields.instagram_handle} onChange={e => setFields(f => ({ ...f, instagram_handle: e.target.value }))} placeholder="@handle" className={inputClass} />
+            <input
+              type="text"
+              value={fields.instagram_handle}
+              onChange={(e) => setFields((f) => ({ ...f, instagram_handle: e.target.value }))}
+              placeholder="@handle"
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Discord</label>
-            <input type="text" value={fields.discord_id} onChange={e => setFields(f => ({ ...f, discord_id: e.target.value }))} placeholder="username#1234" className={inputClass} />
+            <input
+              type="text"
+              value={fields.discord_id}
+              onChange={(e) => setFields((f) => ({ ...f, discord_id: e.target.value }))}
+              placeholder="username#1234"
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Audius</label>
-            <input type="text" value={fields.audius_handle} onChange={e => setFields(f => ({ ...f, audius_handle: e.target.value }))} placeholder="handle" className={inputClass} />
+            <input
+              type="text"
+              value={fields.audius_handle}
+              onChange={(e) => setFields((f) => ({ ...f, audius_handle: e.target.value }))}
+              placeholder="handle"
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Spotify</label>
-            <input type="text" value={fields.spotify_url} onChange={e => setFields(f => ({ ...f, spotify_url: e.target.value }))} placeholder="https://open.spotify.com/artist/..." className={inputClass} />
+            <input
+              type="text"
+              value={fields.spotify_url}
+              onChange={(e) => setFields((f) => ({ ...f, spotify_url: e.target.value }))}
+              placeholder="https://open.spotify.com/artist/..."
+              className={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>SoundCloud</label>
-            <input type="text" value={fields.soundcloud_url} onChange={e => setFields(f => ({ ...f, soundcloud_url: e.target.value }))} placeholder="https://soundcloud.com/..." className={inputClass} />
+            <input
+              type="text"
+              value={fields.soundcloud_url}
+              onChange={(e) => setFields((f) => ({ ...f, soundcloud_url: e.target.value }))}
+              placeholder="https://soundcloud.com/..."
+              className={inputClass}
+            />
           </div>
         </div>
       </div>
@@ -262,29 +345,35 @@ export default function MemberProfilePage() {
   const { user } = useAuth();
 
   const [verifications, setVerifications] = useState<{ platform: string; username?: string }[]>([]);
-  const [popularCasts, setPopularCasts] = useState<{ hash: string; text: string; likes: number; recasts: number }[]>([]);
-  const [bestFriends, setBestFriends] = useState<{ fid: number; username: string; displayName: string; pfpUrl: string | null }[]>([]);
+  const [popularCasts, setPopularCasts] = useState<
+    { hash: string; text: string; likes: number; recasts: number }[]
+  >([]);
+  const [bestFriends, setBestFriends] = useState<
+    { fid: number; username: string; displayName: string; pfpUrl: string | null }[]
+  >([]);
   const [castsOpen, setCastsOpen] = useState(true);
 
   const fetchProfile = () => {
     setLoading(true);
     fetch(`/api/members/${encodeURIComponent(username)}`)
-      .then(r => {
+      .then((r) => {
         if (!r.ok) throw new Error(r.status === 404 ? 'Member not found' : 'Failed to load');
         return r.json();
       })
       .then(setProfile)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchProfile(); }, [username]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchProfile();
+  }, [username]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!profile?.fid) return;
     fetch(`/api/social/verifications?fid=${profile.fid}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
         if (data?.result?.verifications) {
           setVerifications(data.result.verifications);
         }
@@ -295,8 +384,8 @@ export default function MemberProfilePage() {
   useEffect(() => {
     if (!username) return;
     fetch(`/api/members/${encodeURIComponent(username)}/popular`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
         if (Array.isArray(data)) setPopularCasts(data);
         else if (Array.isArray(data?.casts)) setPopularCasts(data.casts);
       })
@@ -306,8 +395,8 @@ export default function MemberProfilePage() {
   useEffect(() => {
     if (!username) return;
     fetch(`/api/members/${encodeURIComponent(username)}/friends`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
         if (Array.isArray(data)) setBestFriends(data);
         else if (Array.isArray(data?.friends)) setBestFriends(data.friends);
       })
@@ -328,7 +417,9 @@ export default function MemberProfilePage() {
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col items-center justify-center gap-4">
         <p className="text-gray-400">{error || 'Member not found'}</p>
-        <Link href="/" className="text-[#f5a623] text-sm hover:underline">Back to ZAO OS</Link>
+        <Link href="/" className="text-[#f5a623] text-sm hover:underline">
+          Back to ZAO OS
+        </Link>
       </div>
     );
   }
@@ -340,24 +431,42 @@ export default function MemberProfilePage() {
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
       {/* Header bar */}
       <nav className="border-b border-white/[0.08] px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="text-[#f5a623] font-bold text-sm">THE ZAO</Link>
-        <Link href="/members" className="text-xs text-gray-500 hover:text-white">All Members</Link>
+        <Link href="/" className="text-[#f5a623] font-bold text-sm">
+          THE ZAO
+        </Link>
+        <Link href="/members" className="text-xs text-gray-500 hover:text-white">
+          All Members
+        </Link>
       </nav>
 
       {/* Cover image hero — from artist profile or Farcaster banner */}
       {(p.coverImageUrl || p.artistProfile?.coverImageUrl) && (
         <div className="relative h-40 sm:h-52 overflow-hidden">
-          <Image src={p.coverImageUrl || p.artistProfile?.coverImageUrl || ''} alt="" fill className="object-cover" sizes="100vw" />
+          <Image
+            src={p.coverImageUrl || p.artistProfile?.coverImageUrl || ''}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628]/60 via-transparent to-[#0a1628]" />
         </div>
       )}
 
-      <div className={`max-w-2xl mx-auto px-4 ${(p.coverImageUrl || p.artistProfile?.coverImageUrl) ? '-mt-16 relative z-10' : 'pt-8'}`}>
+      <div
+        className={`max-w-2xl mx-auto px-4 ${p.coverImageUrl || p.artistProfile?.coverImageUrl ? '-mt-16 relative z-10' : 'pt-8'}`}
+      >
         {/* Hero */}
         <div className="flex items-start gap-4 mb-6">
           <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0 ring-2 ring-[#0a1628]">
-            {(p.pfpUrl || p.ensAvatar) ? (
-              <Image src={p.pfpUrl || p.ensAvatar || ''} alt="" fill className="object-cover" sizes="80px" />
+            {p.pfpUrl || p.ensAvatar ? (
+              <Image
+                src={p.pfpUrl || p.ensAvatar || ''}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="80px"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-600">
                 {(p.displayName || p.username || '?')[0]?.toUpperCase()}
@@ -398,11 +507,19 @@ export default function MemberProfilePage() {
                 </span>
               )}
               {p.social?.powerBadge && (
-                <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623]">Power Badge</span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623]">
+                  Power Badge
+                </span>
               )}
               {p.platforms.discord && (
                 <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#5865F2]/10 text-[#5865F2] border border-[#5865F2]/20 flex items-center gap-1">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="flex-shrink-0"
+                  >
                     <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
                   </svg>
                   Discord
@@ -411,25 +528,34 @@ export default function MemberProfilePage() {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 flex-wrap">
               {p.username && <span>@{p.username}</span>}
-              {p.zaoSubname && (
-                <span className="text-[#f5a623] font-medium">{p.zaoSubname}</span>
-              )}
+              {p.zaoSubname && <span className="text-[#f5a623] font-medium">{p.zaoSubname}</span>}
               {p.realName && p.realName !== p.displayName && (
                 <span className="text-gray-600">({p.realName})</span>
               )}
               {/* Show all ENS names */}
               {p.ensNames && Object.values(p.ensNames).filter(Boolean).length > 0 ? (
-                Object.values(p.ensNames).filter(Boolean).map((name, i) => (
-                  <span key={`ens-${i}`} className="text-[#f5a623]">{name}</span>
-                ))
+                Object.values(p.ensNames)
+                  .filter(Boolean)
+                  .map((name, i) => (
+                    <span key={`ens-${i}`} className="text-[#f5a623]">
+                      {name}
+                    </span>
+                  ))
               ) : p.ensName ? (
                 <span className="text-[#f5a623]">{p.ensName}</span>
               ) : null}
               {/* Show Basenames */}
-              {p.basenames && Object.values(p.basenames).filter(Boolean).map((name, i) => (
-                <span key={`base-${i}`} className="text-blue-400">{name}</span>
-              ))}
-              {displayWallet && <span className="font-mono text-xs">{shortAddr(displayWallet)}</span>}
+              {p.basenames &&
+                Object.values(p.basenames)
+                  .filter(Boolean)
+                  .map((name, i) => (
+                    <span key={`base-${i}`} className="text-blue-400">
+                      {name}
+                    </span>
+                  ))}
+              {displayWallet && (
+                <span className="font-mono text-xs">{shortAddr(displayWallet)}</span>
+              )}
             </div>
             {p.bio && <p className="text-sm text-gray-400 mt-2 line-clamp-3">{p.bio}</p>}
             {p.artistProfile?.biography && !p.bio && (
@@ -437,20 +563,26 @@ export default function MemberProfilePage() {
             )}
             {/* Location + dates */}
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-              {p.location && (
-                <span className="text-[10px] text-gray-600">📍 {p.location}</span>
-              )}
+              {p.location && <span className="text-[10px] text-gray-600">📍 {p.location}</span>}
               {p.farcasterRegisteredAt && (
                 <span className="text-[10px] text-gray-600">
-                  On Farcaster since {new Date(p.farcasterRegisteredAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                  On Farcaster since{' '}
+                  {new Date(p.farcasterRegisteredAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    year: 'numeric',
+                  })}
                 </span>
               )}
               {p.lastActiveAt && (
                 <span className="text-[10px] text-gray-600">Active {timeAgo(p.lastActiveAt)}</span>
               )}
               {p.website && (
-                <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noopener noreferrer"
-                  className="text-[10px] text-[#f5a623] hover:underline">
+                <a
+                  href={p.website.startsWith('http') ? p.website : `https://${p.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-[#f5a623] hover:underline"
+                >
                   {p.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                 </a>
               )}
@@ -481,15 +613,19 @@ export default function MemberProfilePage() {
         )}
 
         {/* Discord Intro */}
-        {p.platforms.discord && (
-          <DiscordIntro discordId={p.platforms.discord} />
-        )}
+        {p.platforms.discord && <DiscordIntro discordId={p.platforms.discord} />}
 
         {/* Social stats */}
         {p.social && (
           <div className="flex gap-4 mb-6 text-sm">
-            <span><strong className="text-white">{p.social.followerCount.toLocaleString()}</strong> <span className="text-gray-500">followers</span></span>
-            <span><strong className="text-white">{p.social.followingCount.toLocaleString()}</strong> <span className="text-gray-500">following</span></span>
+            <span>
+              <strong className="text-white">{p.social.followerCount.toLocaleString()}</strong>{' '}
+              <span className="text-gray-500">followers</span>
+            </span>
+            <span>
+              <strong className="text-white">{p.social.followingCount.toLocaleString()}</strong>{' '}
+              <span className="text-gray-500">following</span>
+            </span>
           </div>
         )}
 
@@ -512,19 +648,19 @@ export default function MemberProfilePage() {
                     v.platform === 'x' || v.platform === 'twitter'
                       ? 'bg-white/5 text-gray-300 border-white/10'
                       : v.platform === 'github'
-                      ? 'bg-gray-500/10 text-gray-300 border-gray-500/20'
-                      : v.platform === 'discord'
-                      ? 'bg-[#5865F2]/10 text-[#818cf8] border-[#5865F2]/20'
-                      : 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/20'
+                        ? 'bg-gray-500/10 text-gray-300 border-gray-500/20'
+                        : v.platform === 'discord'
+                          ? 'bg-[#5865F2]/10 text-[#818cf8] border-[#5865F2]/20'
+                          : 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/20'
                   }`}
                 >
                   {v.platform === 'x' || v.platform === 'twitter'
                     ? `X${v.username ? `: @${v.username}` : ' Verified'}`
                     : v.platform === 'github'
-                    ? `GitHub${v.username ? `: ${v.username}` : ''}`
-                    : v.platform === 'discord'
-                    ? `Discord${v.username ? `: ${v.username}` : ''}`
-                    : `${v.platform.charAt(0).toUpperCase() + v.platform.slice(1)}${v.username ? `: ${v.username}` : ' Verified'}`}
+                      ? `GitHub${v.username ? `: ${v.username}` : ''}`
+                      : v.platform === 'discord'
+                        ? `Discord${v.username ? `: ${v.username}` : ''}`
+                        : `${v.platform.charAt(0).toUpperCase() + v.platform.slice(1)}${v.username ? `: ${v.username}` : ' Verified'}`}
                 </span>
               ))}
             </div>
@@ -569,9 +705,7 @@ export default function MemberProfilePage() {
         )}
 
         {/* Discord Activity (cross-platform stats) */}
-        {p.platforms.discord && (
-          <DiscordActivity discordId={p.platforms.discord} />
-        )}
+        {p.platforms.discord && <DiscordActivity discordId={p.platforms.discord} />}
 
         {/* Platforms */}
         {Object.values(p.platforms).some(Boolean) && (
@@ -579,44 +713,72 @@ export default function MemberProfilePage() {
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Platforms</p>
             <div className="flex flex-wrap gap-2">
               {p.fid && (
-                <a href={`https://warpcast.com/${p.username}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                <a
+                  href={`https://warpcast.com/${p.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors"
+                >
                   Farcaster
                 </a>
               )}
               {p.platforms.bluesky && (
-                <a href={`https://bsky.app/profile/${p.platforms.bluesky}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs hover:bg-blue-500/20 transition-colors">
+                <a
+                  href={`https://bsky.app/profile/${p.platforms.bluesky}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+                >
                   Bluesky
                 </a>
               )}
               {p.platforms.x && (
-                <a href={`https://x.com/${p.platforms.x}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 text-xs hover:bg-white/20 transition-colors">
+                <a
+                  href={`https://x.com/${p.platforms.x}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 text-xs hover:bg-white/20 transition-colors"
+                >
                   X
                 </a>
               )}
               {p.platforms.instagram && (
-                <a href={`https://instagram.com/${p.platforms.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-pink-500/10 text-pink-400 text-xs hover:bg-pink-500/20 transition-colors">
+                <a
+                  href={`https://instagram.com/${p.platforms.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-pink-500/10 text-pink-400 text-xs hover:bg-pink-500/20 transition-colors"
+                >
                   Instagram
                 </a>
               )}
               {p.platforms.spotify && (
-                <a href={p.platforms.spotify} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/15 text-[#ffd700] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                <a
+                  href={p.platforms.spotify}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/15 text-[#ffd700] text-xs hover:bg-[#f5a623]/20 transition-colors"
+                >
                   Spotify
                 </a>
               )}
               {p.platforms.soundcloud && (
-                <a href={p.platforms.soundcloud} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-400 text-xs hover:bg-orange-500/20 transition-colors">
+                <a
+                  href={p.platforms.soundcloud}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-400 text-xs hover:bg-orange-500/20 transition-colors"
+                >
                   SoundCloud
                 </a>
               )}
               {p.platforms.audius && (
-                <a href={`https://audius.co/${p.platforms.audius}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                <a
+                  href={`https://audius.co/${p.platforms.audius}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors"
+                >
                   Audius
                 </a>
               )}
@@ -626,8 +788,12 @@ export default function MemberProfilePage() {
                 </span>
               )}
               {p.artistProfile?.website && (
-                <a href={p.artistProfile.website} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                <a
+                  href={p.artistProfile.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors"
+                >
                   Website
                 </a>
               )}
@@ -639,12 +805,17 @@ export default function MemberProfilePage() {
         {popularCasts.length > 0 && (
           <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
             <button
-              onClick={() => setCastsOpen(o => !o)}
+              onClick={() => setCastsOpen((o) => !o)}
               className="w-full flex items-center justify-between text-left"
             >
               <p className="text-xs text-gray-500 uppercase tracking-wider">Best Casts</p>
               <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
                 className={`text-gray-500 transition-transform ${castsOpen ? 'rotate-180' : ''}`}
               >
                 <path d="M6 9l6 6 6-6" />
@@ -665,15 +836,31 @@ export default function MemberProfilePage() {
                     </p>
                     <div className="flex items-center gap-3 text-[10px] text-gray-600">
                       <span className="flex items-center gap-1">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                         {cast.likes.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-1">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                          <path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M17 1l4 4-4 4" />
+                          <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                          <path d="M7 23l-4-4 4-4" />
+                          <path d="M21 13v2a4 4 0 0 1-4 4H3" />
                         </svg>
                         {cast.recasts.toLocaleString()}
                       </span>
@@ -688,7 +875,9 @@ export default function MemberProfilePage() {
         {/* Best Friends */}
         {bestFriends.length > 0 && (
           <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Close Friends on Farcaster</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+              Close Friends on Farcaster
+            </p>
             <div className="flex flex-wrap gap-2">
               {bestFriends.slice(0, 5).map((friend) => (
                 <Link
@@ -698,7 +887,13 @@ export default function MemberProfilePage() {
                 >
                   <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                     {friend.pfpUrl ? (
-                      <Image src={friend.pfpUrl} alt="" fill className="object-cover" sizes="20px" />
+                      <Image
+                        src={friend.pfpUrl}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="20px"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-gray-400">
                         {(friend.displayName || friend.username || '?')[0]?.toUpperCase()}
@@ -713,110 +908,141 @@ export default function MemberProfilePage() {
         )}
 
         {/* Reputation Signals */}
-        {p.reputation && (p.reputation.neynarScore || p.reputation.openRank || p.reputation.coinbaseVerified || p.reputation.easAttestationCount > 0 || p.reputation.github) && (
-          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Reputation Signals</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {/* Neynar Score */}
-              {p.reputation.neynarScore !== null && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">Farcaster Score</p>
-                  <p className={`text-lg font-bold ${
-                    p.reputation.neynarScore >= 0.7 ? 'text-[#ffd700]' :
-                    p.reputation.neynarScore >= 0.4 ? 'text-[#f5a623]' : 'text-gray-400'
-                  }`}>
-                    {(p.reputation.neynarScore * 100).toFixed(0)}
-                  </p>
-                  <p className="text-[9px] text-gray-600">Neynar quality</p>
-                </div>
-              )}
+        {p.reputation &&
+          (p.reputation.neynarScore ||
+            p.reputation.openRank ||
+            p.reputation.coinbaseVerified ||
+            p.reputation.easAttestationCount > 0 ||
+            p.reputation.github) && (
+            <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+                Reputation Signals
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {/* Neynar Score */}
+                {p.reputation.neynarScore !== null && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">Farcaster Score</p>
+                    <p
+                      className={`text-lg font-bold ${
+                        p.reputation.neynarScore >= 0.7
+                          ? 'text-[#ffd700]'
+                          : p.reputation.neynarScore >= 0.4
+                            ? 'text-[#f5a623]'
+                            : 'text-gray-400'
+                      }`}
+                    >
+                      {(p.reputation.neynarScore * 100).toFixed(0)}
+                    </p>
+                    <p className="text-[9px] text-gray-600">Neynar quality</p>
+                  </div>
+                )}
 
-              {/* OpenRank */}
-              {p.reputation.openRank && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">OpenRank</p>
-                  <p className="text-lg font-bold text-[#ededed]">
-                    #{p.reputation.openRank.rank.toLocaleString()}
-                  </p>
-                  <p className="text-[9px] text-gray-600">Engagement rank</p>
-                </div>
-              )}
+                {/* OpenRank */}
+                {p.reputation.openRank && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">OpenRank</p>
+                    <p className="text-lg font-bold text-[#ededed]">
+                      #{p.reputation.openRank.rank.toLocaleString()}
+                    </p>
+                    <p className="text-[9px] text-gray-600">Engagement rank</p>
+                  </div>
+                )}
 
-              {/* Coinbase Verified */}
-              {p.reputation.coinbaseVerified && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">Coinbase</p>
-                  <p className="text-lg font-bold text-blue-400">Verified</p>
-                  <p className="text-[9px] text-gray-600">On-chain ID (Base)</p>
-                </div>
-              )}
+                {/* Coinbase Verified */}
+                {p.reputation.coinbaseVerified && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">Coinbase</p>
+                    <p className="text-lg font-bold text-blue-400">Verified</p>
+                    <p className="text-[9px] text-gray-600">On-chain ID (Base)</p>
+                  </div>
+                )}
 
-              {/* EAS Attestations */}
-              {p.reputation.easAttestationCount > 0 && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">Attestations</p>
-                  <p className="text-lg font-bold text-[#f5a623]">{p.reputation.easAttestationCount}</p>
-                  <p className="text-[9px] text-gray-600">EAS on Optimism</p>
-                </div>
-              )}
+                {/* EAS Attestations */}
+                {p.reputation.easAttestationCount > 0 && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">Attestations</p>
+                    <p className="text-lg font-bold text-[#f5a623]">
+                      {p.reputation.easAttestationCount}
+                    </p>
+                    <p className="text-[9px] text-gray-600">EAS on Optimism</p>
+                  </div>
+                )}
 
-              {/* GitHub */}
-              {p.reputation.github && (
-                <a
-                  href={`https://github.com/${p.reputation.github.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
-                >
-                  <p className="text-[10px] text-gray-500 mb-1">GitHub</p>
-                  <p className="text-sm font-bold text-white">{p.reputation.github.repos} repos</p>
-                  <p className="text-[9px] text-gray-600">{p.reputation.github.followers} followers · @{p.reputation.github.username}</p>
-                </a>
-              )}
+                {/* GitHub */}
+                {p.reputation.github && (
+                  <a
+                    href={`https://github.com/${p.reputation.github.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
+                  >
+                    <p className="text-[10px] text-gray-500 mb-1">GitHub</p>
+                    <p className="text-sm font-bold text-white">
+                      {p.reputation.github.repos} repos
+                    </p>
+                    <p className="text-[9px] text-gray-600">
+                      {p.reputation.github.followers} followers · @{p.reputation.github.username}
+                    </p>
+                  </a>
+                )}
 
-              {/* Snapshot DAO Voting */}
-              {p.reputation.snapshot && p.reputation.snapshot.totalVotes > 0 && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">Governance</p>
-                  <p className="text-lg font-bold text-orange-400">{p.reputation.snapshot.totalVotes}</p>
-                  <p className="text-[9px] text-gray-600">Snapshot votes · {p.reputation.snapshot.daoCount} DAOs</p>
-                </div>
-              )}
+                {/* Snapshot DAO Voting */}
+                {p.reputation.snapshot && p.reputation.snapshot.totalVotes > 0 && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">Governance</p>
+                    <p className="text-lg font-bold text-orange-400">
+                      {p.reputation.snapshot.totalVotes}
+                    </p>
+                    <p className="text-[9px] text-gray-600">
+                      Snapshot votes · {p.reputation.snapshot.daoCount} DAOs
+                    </p>
+                  </div>
+                )}
 
-              {/* Audius */}
-              {p.reputation.audius && (
-                <a
-                  href={`https://audius.co/${p.platforms.audius || ''}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
-                >
-                  <p className="text-[10px] text-gray-500 mb-1">Audius</p>
-                  <p className="text-sm font-bold text-[#f5a623]">{p.reputation.audius.tracks} tracks</p>
-                  <p className="text-[9px] text-gray-600">{p.reputation.audius.followers} followers · {p.reputation.audius.playlists} playlists</p>
-                </a>
-              )}
+                {/* Audius */}
+                {p.reputation.audius && (
+                  <a
+                    href={`https://audius.co/${p.platforms.audius || ''}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
+                  >
+                    <p className="text-[10px] text-gray-500 mb-1">Audius</p>
+                    <p className="text-sm font-bold text-[#f5a623]">
+                      {p.reputation.audius.tracks} tracks
+                    </p>
+                    <p className="text-[9px] text-gray-600">
+                      {p.reputation.audius.followers} followers · {p.reputation.audius.playlists}{' '}
+                      playlists
+                    </p>
+                  </a>
+                )}
 
-              {/* EFP On-Chain Followers */}
-              {p.reputation.efp && p.reputation.efp.followers > 0 && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">On-Chain Social</p>
-                  <p className="text-lg font-bold text-cyan-400">{p.reputation.efp.followers}</p>
-                  <p className="text-[9px] text-gray-600">EFP followers · {p.reputation.efp.following} following</p>
-                </div>
-              )}
+                {/* EFP On-Chain Followers */}
+                {p.reputation.efp && p.reputation.efp.followers > 0 && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">On-Chain Social</p>
+                    <p className="text-lg font-bold text-cyan-400">{p.reputation.efp.followers}</p>
+                    <p className="text-[9px] text-gray-600">
+                      EFP followers · {p.reputation.efp.following} following
+                    </p>
+                  </div>
+                )}
 
-              {/* Basename */}
-              {p.basenames && Object.values(p.basenames).filter(Boolean).length > 0 && (
-                <div className="bg-[#0a1628] rounded-lg p-3">
-                  <p className="text-[10px] text-gray-500 mb-1">Basename</p>
-                  <p className="text-sm font-bold text-blue-400">{Object.values(p.basenames)[0]}</p>
-                  <p className="text-[9px] text-gray-600">Base chain identity</p>
-                </div>
-              )}
+                {/* Basename */}
+                {p.basenames && Object.values(p.basenames).filter(Boolean).length > 0 && (
+                  <div className="bg-[#0a1628] rounded-lg p-3">
+                    <p className="text-[10px] text-gray-500 mb-1">Basename</p>
+                    <p className="text-sm font-bold text-blue-400">
+                      {Object.values(p.basenames)[0]}
+                    </p>
+                    <p className="text-[9px] text-gray-600">Base chain identity</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* ENS On-Chain Profile */}
         {p.ensProfile && Object.keys(p.ensProfile).length > 0 && (
@@ -830,14 +1056,22 @@ export default function MemberProfilePage() {
             )}
             <div className="flex flex-wrap gap-2">
               {p.ensProfile['com.twitter'] && (
-                <a href={`https://x.com/${p.ensProfile['com.twitter']}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 text-xs hover:bg-white/20 transition-colors">
+                <a
+                  href={`https://x.com/${p.ensProfile['com.twitter']}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 text-xs hover:bg-white/20 transition-colors"
+                >
                   X: @{p.ensProfile['com.twitter']}
                 </a>
               )}
               {p.ensProfile['com.github'] && (
-                <a href={`https://github.com/${p.ensProfile['com.github']}`} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-300 text-xs hover:bg-gray-500/20 transition-colors">
+                <a
+                  href={`https://github.com/${p.ensProfile['com.github']}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-300 text-xs hover:bg-gray-500/20 transition-colors"
+                >
                   GitHub: {p.ensProfile['com.github']}
                 </a>
               )}
@@ -847,14 +1081,20 @@ export default function MemberProfilePage() {
                 </span>
               )}
               {p.ensProfile.url && (
-                <a href={p.ensProfile.url} target="_blank" rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                <a
+                  href={p.ensProfile.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors"
+                >
                   {p.ensProfile.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                 </a>
               )}
               {p.ensProfile.email && (
-                <a href={`mailto:${p.ensProfile.email}`}
-                  className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs hover:bg-blue-500/20 transition-colors">
+                <a
+                  href={`mailto:${p.ensProfile.email}`}
+                  className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+                >
                   {p.ensProfile.email}
                 </a>
               )}
@@ -870,23 +1110,35 @@ export default function MemberProfilePage() {
             </p>
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {p.fractalHistory.map((h, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded">
-                  <span className={`w-6 font-bold flex-shrink-0 ${
-                    h.rank === 1 ? 'text-[#f5a623]' :
-                    h.rank === 2 ? 'text-gray-300' :
-                    h.rank === 3 ? 'text-amber-600' : 'text-gray-500'
-                  }`}>
+                <div
+                  key={i}
+                  className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded"
+                >
+                  <span
+                    className={`w-6 font-bold flex-shrink-0 ${
+                      h.rank === 1
+                        ? 'text-[#f5a623]'
+                        : h.rank === 2
+                          ? 'text-gray-300'
+                          : h.rank === 3
+                            ? 'text-amber-600'
+                            : 'text-gray-500'
+                    }`}
+                  >
                     #{h.rank}
                   </span>
                   <div className="flex-1 min-w-0">
                     <span className="text-gray-300 truncate block">{h.sessionName}</span>
                     <span className="text-[10px] text-gray-600">
-                      {h.sessionDate || ''}{h.participants ? ` · ${h.participants}p` : ''}
+                      {h.sessionDate || ''}
+                      {h.participants ? ` · ${h.participants}p` : ''}
                     </span>
                   </div>
                   <span className="font-mono text-[#f5a623] flex-shrink-0">{h.score}</span>
                   {h.source === 'ordao' && (
-                    <span className="text-[10px] px-1 rounded bg-[#f5a623]/10 text-[#f5a623] flex-shrink-0">on-chain</span>
+                    <span className="text-[10px] px-1 rounded bg-[#f5a623]/10 text-[#f5a623] flex-shrink-0">
+                      on-chain
+                    </span>
                   )}
                 </div>
               ))}
@@ -900,9 +1152,16 @@ export default function MemberProfilePage() {
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Contributions</p>
             <div className="space-y-1">
               {p.events.map((e, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded">
-                  <span className="text-[10px] text-gray-600 w-16 flex-shrink-0">{e.date || '—'}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/10 text-blue-400 capitalize flex-shrink-0">{e.type}</span>
+                <div
+                  key={i}
+                  className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded"
+                >
+                  <span className="text-[10px] text-gray-600 w-16 flex-shrink-0">
+                    {e.date || '—'}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/10 text-blue-400 capitalize flex-shrink-0">
+                    {e.type}
+                  </span>
                   <span className="flex-1 text-gray-400 truncate">{e.description || e.type}</span>
                   <span className="font-mono text-[#ffd700] flex-shrink-0">+{e.amount}</span>
                 </div>
@@ -914,8 +1173,13 @@ export default function MemberProfilePage() {
         {/* Tags */}
         {p.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-4">
-            {p.tags.map(tag => (
-              <span key={tag} className="px-2 py-0.5 rounded-full bg-white/5 text-gray-500 text-[10px]">{tag}</span>
+            {p.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 rounded-full bg-white/5 text-gray-500 text-[10px]"
+              >
+                {tag}
+              </span>
             ))}
           </div>
         )}
@@ -937,8 +1201,12 @@ export default function MemberProfilePage() {
           return (
             <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-gray-500 uppercase tracking-wider">Profile Completeness</p>
-                <span className={`text-xs font-bold ${completeness >= 80 ? 'text-[#ffd700]' : completeness >= 50 ? 'text-[#f5a623]' : 'text-[#ef4444]'}`}>
+                <p className="text-xs text-gray-500 uppercase tracking-wider">
+                  Profile Completeness
+                </p>
+                <span
+                  className={`text-xs font-bold ${completeness >= 80 ? 'text-[#ffd700]' : completeness >= 50 ? 'text-[#f5a623]' : 'text-[#ef4444]'}`}
+                >
                   {completeness}%
                 </span>
               </div>
@@ -949,8 +1217,11 @@ export default function MemberProfilePage() {
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {missing.map(m => (
-                  <span key={m} className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                {missing.map((m) => (
+                  <span
+                    key={m}
+                    className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
                     Missing: {m}
                   </span>
                 ))}
@@ -962,7 +1233,11 @@ export default function MemberProfilePage() {
         {/* Footer */}
         <div className="text-center pt-4 border-t border-white/[0.08]">
           <p className="text-[10px] text-gray-600">
-            ZAO OS · <Link href="/" className="text-[#f5a623] hover:underline">zaoos.com</Link> · Powered by Farcaster
+            ZAO OS ·{' '}
+            <Link href="/" className="text-[#f5a623] hover:underline">
+              zaoos.com
+            </Link>{' '}
+            · Powered by Farcaster
           </p>
         </div>
       </div>

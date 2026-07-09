@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { fetchThreadsInsights } from '@/lib/publish/threads-insights';
-import { isThreadsConfigured } from '@/lib/publish/threads';
-import { fetchXInsights } from '@/lib/publish/x-insights';
-import { getXClient } from '@/lib/publish/x';
 import { logger } from '@/lib/logger';
+import { isThreadsConfigured } from '@/lib/publish/threads';
+import { fetchThreadsInsights } from '@/lib/publish/threads-insights';
+import { getXClient } from '@/lib/publish/x';
+import { fetchXInsights } from '@/lib/publish/x-insights';
 
 interface CollectResult {
   platform: string;
@@ -18,11 +18,11 @@ interface CollectResult {
  */
 async function collectPlatform(
   platform: string,
-  fetcher: (postId: string) => Promise<{ views: number; likes: number; replies: number; reposts: number; quotes: number }>,
+  fetcher: (
+    postId: string,
+  ) => Promise<{ views: number; likes: number; replies: number; reposts: number; quotes: number }>,
 ): Promise<CollectResult> {
-  const thirtyDaysAgo = new Date(
-    Date.now() - 30 * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data: posts, error: postsError } = await supabaseAdmin
     .from('publish_log')
@@ -45,20 +45,18 @@ async function collectPlatform(
     posts.map(async (post) => {
       const metrics = await fetcher(post.platform_post_id);
 
-      const { error: insertError } = await supabaseAdmin
-        .from('engagement_metrics')
-        .insert({
-          publish_log_id: post.id,
-          platform,
-          platform_post_id: post.platform_post_id,
-          views: metrics.views,
-          likes: metrics.likes,
-          replies: metrics.replies,
-          reposts: metrics.reposts,
-          quotes: metrics.quotes,
-          clicks: 0,
-          fetched_at: new Date().toISOString(),
-        });
+      const { error: insertError } = await supabaseAdmin.from('engagement_metrics').insert({
+        publish_log_id: post.id,
+        platform,
+        platform_post_id: post.platform_post_id,
+        views: metrics.views,
+        likes: metrics.likes,
+        replies: metrics.replies,
+        reposts: metrics.reposts,
+        quotes: metrics.quotes,
+        clicks: 0,
+        fetched_at: new Date().toISOString(),
+      });
 
       if (insertError) {
         logger.error(
@@ -121,10 +119,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (platformResults.length === 0) {
-      return NextResponse.json(
-        { error: 'No platforms configured', collected: 0 },
-        { status: 503 },
-      );
+      return NextResponse.json({ error: 'No platforms configured', collected: 0 }, { status: 503 });
     }
 
     const totalCollected = platformResults.reduce((sum, r) => sum + r.collected, 0);

@@ -8,6 +8,7 @@
  */
 
 import * as dotenv from 'dotenv';
+
 dotenv.config({ path: '.env.local' });
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePlayer } from '@/providers/audio';
 
 // ─── Module-level state (persists across mount/unmount) ──────────────────────
@@ -100,7 +100,9 @@ export function SleepTimer() {
   const endOfTrackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    return () => { if (endOfTrackTimerRef.current) clearTimeout(endOfTrackTimerRef.current); };
+    return () => {
+      if (endOfTrackTimerRef.current) clearTimeout(endOfTrackTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -176,9 +178,7 @@ export function SleepTimer() {
       <button
         onClick={() => setOpen((v) => !v)}
         className={`p-1.5 rounded-lg transition-colors ${
-          isActive
-            ? 'text-[#f5a623] bg-[#f5a623]/10'
-            : 'text-gray-400 hover:text-white'
+          isActive ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
         }`}
         aria-label={isActive ? 'Sleep timer active' : 'Set sleep timer'}
         title={
@@ -197,7 +197,13 @@ export function SleepTimer() {
           <span className="text-[11px] font-semibold leading-none">EoT</span>
         ) : (
           /* Moon icon */
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

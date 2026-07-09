@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSendToken = vi.hoisted(() => vi.fn());
 const mockLogAgentEvent = vi.hoisted(() => vi.fn());

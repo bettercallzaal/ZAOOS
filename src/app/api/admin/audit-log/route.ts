@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -94,9 +94,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     logger.error('[admin/audit-log] Error fetching audit log:', err);
-    return NextResponse.json(
-      { error: 'Failed to fetch audit log' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to fetch audit log' }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { JUKE_EMBED_ORIGIN, isValidJukeSpaceId, jukeEmbedUrl, parseJukeSpaceId } from './juke';
+import { describe, expect, it } from 'vitest';
+import { isValidJukeSpaceId, JUKE_EMBED_ORIGIN, jukeEmbedUrl, parseJukeSpaceId } from './juke';
 
 describe('isValidJukeSpaceId', () => {
   it('accepts plain alphanumeric ids', () => {

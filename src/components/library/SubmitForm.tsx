@@ -12,15 +12,13 @@ export default function SubmitForm({ onSubmitted }: SubmitFormProps) {
   const [note, setNote] = useState('');
   const [tags, setTags] = useState<LibraryTag[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null,
+  );
 
   const toggleTag = (tag: LibraryTag) => {
     setTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : prev.length < 3
-          ? [...prev, tag]
-          : prev,
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : prev.length < 3 ? [...prev, tag] : prev,
     );
   };
 
@@ -103,9 +101,7 @@ export default function SubmitForm({ onSubmitted }: SubmitFormProps) {
             {tag}
           </button>
         ))}
-        {tags.length >= 3 && (
-          <span className="text-xs text-gray-500 self-center">Max 3 tags</span>
-        )}
+        {tags.length >= 3 && <span className="text-xs text-gray-500 self-center">Max 3 tags</span>}
       </div>
 
       <div className="flex items-center gap-3">
@@ -119,9 +115,7 @@ export default function SubmitForm({ onSubmitted }: SubmitFormProps) {
 
         {feedback && (
           <span
-            className={`text-sm ${
-              feedback.type === 'success' ? 'text-green-400' : 'text-red-400'
-            }`}
+            className={`text-sm ${feedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}
           >
             {feedback.message}
           </span>

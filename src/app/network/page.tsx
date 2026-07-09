@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { getSupabaseAnon } from '@/lib/db/supabase';
 import type { CrmContactPublic } from '@/lib/crm/types';
+import { getSupabaseAnon } from '@/lib/db/supabase';
 
 // Public "who I've met" feed. Reads only the crm_contacts_public view (safe
 // columns, is_public=true) via the ANON client (C-H3) so RLS + the granted view
@@ -52,9 +52,7 @@ export default async function NetworkPage() {
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-[#f5a623]/40">
                   <div className="flex items-baseline justify-between gap-3">
                     <h2 className="font-semibold text-white">{c.name}</h2>
-                    {handle && (
-                      <span className="shrink-0 text-xs text-[#f5a623]">{handle}</span>
-                    )}
+                    {handle && <span className="shrink-0 text-xs text-[#f5a623]">{handle}</span>}
                   </div>
                   {(c.role || c.org) && (
                     <p className="mt-1 text-sm text-white/70">

@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
@@ -87,10 +87,7 @@ export async function POST(request: NextRequest) {
     !!password &&
     constantTimeEqual(password, ENV.JUKE_CREATE_PASSWORD);
   if (!session?.isAdmin && !passwordOk) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 },
-    );
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   // Juke's create-space endpoint is key-only per llms.txt; room owner is the
@@ -114,10 +111,7 @@ export async function POST(request: NextRequest) {
       // single 502 to the client — a Juke 401/400 is an integration problem,
       // not a signal the ZAO caller is unauthenticated or sent a bad body.
       logger.error('[juke/space] Juke API failed:', result.status, result.error);
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 502 },
-      );
+      return NextResponse.json({ success: false, error: result.error }, { status: 502 });
     }
     // Persist the room so /live/{id} can render server-side + webhooks can
     // update its lifecycle. Best-effort: if Supabase is down we still
@@ -134,10 +128,7 @@ export async function POST(request: NextRequest) {
     } catch (dbErr: unknown) {
       logger.error('[juke/space] insertJukeSpace failed (non-fatal):', dbErr);
     }
-    return NextResponse.json(
-      { success: true, data: result.space },
-      { status: 201 },
-    );
+    return NextResponse.json({ success: true, data: result.space }, { status: 201 });
   } catch (error: unknown) {
     logger.error('[juke/space] Unexpected error:', error);
     return NextResponse.json(

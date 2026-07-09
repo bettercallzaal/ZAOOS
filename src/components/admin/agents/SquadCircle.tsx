@@ -1,7 +1,7 @@
 'use client';
 
 import AgentCard from './AgentCard';
-import type { AgentStatus, AgentEvent } from './constants';
+import type { AgentEvent, AgentStatus } from './constants';
 
 export default function SquadCircle({
   agents,
@@ -16,14 +16,14 @@ export default function SquadCircle({
   return (
     <div>
       {/* Desktop: circular layout */}
-      <div className="hidden md:block relative w-full max-w-3xl mx-auto" style={{ height: '600px' }}>
+      <div
+        className="hidden md:block relative w-full max-w-3xl mx-auto"
+        style={{ height: '600px' }}
+      >
         {/* ZOE center */}
         {zoe && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56">
-            <AgentCard
-              agent={zoe}
-              recentEvents={allEvents.filter((e) => e.agent_name === 'zoe')}
-            />
+            <AgentCard agent={zoe} recentEvents={allEvents.filter((e) => e.agent_name === 'zoe')} />
           </div>
         )}
 

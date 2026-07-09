@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface Member {
   displayName: string;
@@ -15,12 +15,14 @@ export function MemberMap() {
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/members/directory?limit=200', { signal: controller.signal })
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         if (!controller.signal.aborted) setMembers(data.members || []);
       })
       .catch(() => {})
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
   }, []);
 
@@ -54,14 +56,29 @@ export function MemberMap() {
     <div className="mx-4 my-3 rounded-xl bg-white/[0.03] border border-white/[0.05] p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+          <svg
+            className="w-4 h-4 text-[#f5a623]"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+            />
           </svg>
           Member Map
         </h3>
         <span className="text-[10px] text-gray-500 uppercase tracking-wider">
-          {totalLocations} location{totalLocations !== 1 ? 's' : ''} &middot; {withLocation} member{withLocation !== 1 ? 's' : ''}
+          {totalLocations} location{totalLocations !== 1 ? 's' : ''} &middot; {withLocation} member
+          {withLocation !== 1 ? 's' : ''}
         </span>
       </div>
 

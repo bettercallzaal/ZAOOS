@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   createProposalSchema,
-  proposalVoteSchema,
-  proposalCommentSchema,
   proposalCategorySchema,
+  proposalCommentSchema,
+  proposalVoteSchema,
 } from '@/lib/validation/schemas';
 
 describe('createProposalSchema', () => {
@@ -207,7 +207,15 @@ describe('proposalCommentSchema', () => {
 });
 
 describe('proposalCategorySchema', () => {
-  const validCategories = ['general', 'technical', 'community', 'governance', 'treasury', 'wavewarz', 'social'];
+  const validCategories = [
+    'general',
+    'technical',
+    'community',
+    'governance',
+    'treasury',
+    'wavewarz',
+    'social',
+  ];
 
   it.each(validCategories)('accepts "%s"', (cat) => {
     const result = proposalCategorySchema.safeParse(cat);

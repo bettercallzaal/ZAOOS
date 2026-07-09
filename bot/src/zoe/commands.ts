@@ -18,6 +18,9 @@ export const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
  */
 export const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 
+/** `queue:` - add a research topic to ZOE's autonomous work-loop. Group 1 is the topic. */
+export const QUEUE_PREFIX = /^queue:\s*(.+)/is;
+
 /** Hourly-nudge on/off toggle (both phrasings handled in index.ts). */
 export const NUDGE_TOGGLE_RE = /^(stop|pause|disable|start|resume|enable)\s+(nudges?|tips?)$/i;
 
@@ -28,5 +31,5 @@ export const NUDGE_TOGGLE_RE = /^(stop|pause|disable|start|resume|enable)\s+(nud
  * would otherwise be swallowed as the reflection answer and never dispatched.
  */
 export function isZoeCommand(text: string): boolean {
-  return NUDGE_TOGGLE_RE.test(text.trim()) || NOTE_PREFIX.test(text) || PLAN_PREFIX.test(text);
+  return NUDGE_TOGGLE_RE.test(text.trim()) || NOTE_PREFIX.test(text) || PLAN_PREFIX.test(text) || QUEUE_PREFIX.test(text);
 }

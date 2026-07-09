@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { matchInterest, QUICK_OPTIONS, CONCIERGE_PROMPTS } from '@/lib/portal/routing';
+import { useEffect, useState } from 'react';
+import { CONCIERGE_PROMPTS, matchInterest, QUICK_OPTIONS } from '@/lib/portal/routing';
 
 interface PortalConciergeProps {
   onRecommend: (portalId: string) => void;
@@ -48,7 +48,7 @@ export function PortalConcierge({ onRecommend }: PortalConciergeProps) {
       onRecommend(match.id);
       localStorage.setItem('zao-portal-preference', match.id);
     } else {
-      setMessage("Try checking out MUSIC or SOCIAL to start!");
+      setMessage('Try checking out MUSIC or SOCIAL to start!');
       onRecommend('music');
     }
     setInput('');
@@ -85,7 +85,13 @@ export function PortalConcierge({ onRecommend }: PortalConciergeProps) {
             className="text-gray-500 hover:text-gray-300 transition-colors p-1"
             aria-label="Minimize"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
             </svg>
           </button>
@@ -94,9 +100,7 @@ export function PortalConcierge({ onRecommend }: PortalConciergeProps) {
         {/* Chat body */}
         <div className="px-4 py-3">
           {/* ZOE's prompt */}
-          <p className="text-sm text-gray-300 mb-3">
-            {message || CONCIERGE_PROMPTS[0]}
-          </p>
+          <p className="text-sm text-gray-300 mb-3">{message || CONCIERGE_PROMPTS[0]}</p>
 
           {/* Quick pick buttons */}
           {!hasInteracted && (

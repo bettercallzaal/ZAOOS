@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
@@ -56,13 +56,17 @@ export async function GET(req: NextRequest) {
   // Sort: creators first, then by date
   tracks.sort((a, b) => {
     if (a.role !== b.role) return a.role === 'creator' ? -1 : 1;
-    if (a.mintedAt && b.mintedAt) return new Date(b.mintedAt).getTime() - new Date(a.mintedAt).getTime();
+    if (a.mintedAt && b.mintedAt)
+      return new Date(b.mintedAt).getTime() - new Date(a.mintedAt).getTime();
     return 0;
   });
 
-  return NextResponse.json({ tracks, address, source }, {
-    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
-  });
+  return NextResponse.json(
+    { tracks, address, source },
+    {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    },
+  );
 }
 
 // ── Alchemy NFT API ─────────────────────────────────────────────
@@ -95,12 +99,17 @@ async function fetchAlchemyNFTs(address: string, apiKey: string): Promise<MusicN
         const contractAddr = (nft.contract?.address || '').toLowerCase();
 
         // Filter for music/audio NFTs
-        const isAudio = meta.animation_url && AUDIO_MIME_TYPES.some(m =>
-          (nft.raw?.metadata?.mimeType || '').startsWith(m) ||
-          (meta.animation_url || '').match(/\.(mp3|wav|flac|ogg|aac|m4a)(\?|$)/i)
-        );
+        const isAudio =
+          meta.animation_url &&
+          AUDIO_MIME_TYPES.some(
+            (m) =>
+              (nft.raw?.metadata?.mimeType || '').startsWith(m) ||
+              (meta.animation_url || '').match(/\.(mp3|wav|flac|ogg|aac|m4a)(\?|$)/i),
+          );
         const isMusicContract = MUSIC_CONTRACTS.includes(contractAddr);
-        const hasMusicTag = (meta.tags || []).some((t: string) => ['music', 'audio', 'song'].includes(t?.toLowerCase()));
+        const hasMusicTag = (meta.tags || []).some((t: string) =>
+          ['music', 'audio', 'song'].includes(t?.toLowerCase()),
+        );
         const hasAudioProp = !!meta.audio_url || !!meta.losslessAudio;
 
         if (!isAudio && !isMusicContract && !hasMusicTag && !hasAudioProp) continue;
@@ -113,7 +122,11 @@ async function fetchAlchemyNFTs(address: string, apiKey: string): Promise<MusicN
         // Determine platform from contract
         let platform = 'NFT';
         if (isMusicContract || contractAddr.includes('sound')) platform = 'Sound.xyz';
-        else if (nft.contract?.name?.toLowerCase().includes('zora') || contractAddr.includes('zora')) platform = 'Zora';
+        else if (
+          nft.contract?.name?.toLowerCase().includes('zora') ||
+          contractAddr.includes('zora')
+        )
+          platform = 'Zora';
 
         // Build URL
         let nftUrl = '';
@@ -162,7 +175,8 @@ async function fetchZora(address: string): Promise<MusicNFT[]> {
       ownerAddresses: [address.toLowerCase()],
       chains: ['ETHEREUM', 'OPTIMISM', 'BASE', 'ZORA'],
       mediaType: 'AUDIO',
-      limit: 20, offset: 0,
+      limit: 20,
+      offset: 0,
     }),
     signal: AbortSignal.timeout(10000),
   });
@@ -178,9 +192,12 @@ async function fetchZora(address: string): Promise<MusicNFT[]> {
       artworkUrl: token.image?.url || token.metadata?.image || null,
       audioUrl: token.metadata?.animation_url || null,
       platform: 'Zora',
-      url: token.marketUrl || `https://zora.co/collect/${token.chain?.toLowerCase() || 'eth'}:${token.address}/${token.tokenId}`,
+      url:
+        token.marketUrl ||
+        `https://zora.co/collect/${token.chain?.toLowerCase() || 'eth'}:${token.address}/${token.tokenId}`,
       mintedAt: token.mintedAt || null,
-      role: token.creator?.address?.toLowerCase() === address.toLowerCase() ? 'creator' : 'collector',
+      role:
+        token.creator?.address?.toLowerCase() === address.toLowerCase() ? 'creator' : 'collector',
       chain: token.chain?.toLowerCase() || null,
       contractAddress: token.address || null,
       tokenId: token.tokenId || null,

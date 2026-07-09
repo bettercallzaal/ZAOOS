@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 // POST — select today's Track of the Day
 // Admin-only manual selection, OR auto-select if past cutoff (6pm EST)
@@ -57,10 +57,7 @@ export async function POST() {
     if (fetchError) throw fetchError;
 
     if (!topNomination) {
-      return NextResponse.json(
-        { error: 'No nominations to select from today' },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'No nominations to select from today' }, { status: 404 });
     }
 
     // Set selected_date to today

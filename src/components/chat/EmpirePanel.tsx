@@ -54,7 +54,9 @@ function shortAddress(addr: string): string {
 
 export function EmpirePanel({ isOpen, onClose }: EmpirePanelProps) {
   const [tab, setTab] = useState<Tab>('leaderboard');
-  const [slots, setSlots] = useState<Array<{ index: number; id: string; name?: string; type?: string }>>([]);
+  const [slots, setSlots] = useState<
+    Array<{ index: number; id: string; name?: string; type?: string }>
+  >([]);
   const [activeSlot, setActiveSlot] = useState<number>(0);
   const [board, setBoard] = useState<LeaderboardResponse | null>(null);
   const [me, setMe] = useState<MeApiResponse['data'] | null>(null);
@@ -114,7 +116,13 @@ export function EmpirePanel({ isOpen, onClose }: EmpirePanelProps) {
             className="text-gray-400 hover:text-white"
             aria-label="Close empire panel"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -136,13 +144,11 @@ export function EmpirePanel({ isOpen, onClose }: EmpirePanelProps) {
 
         {/* Tabs */}
         <div className="flex gap-1 px-3 py-2 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0">
-          {(
-            [
-              { id: 'leaderboard' as const, label: 'Leaderboard' },
-              { id: 'you' as const, label: 'You' },
-              { id: 'boosters' as const, label: 'Boosters' },
-            ]
-          ).map((t) => (
+          {[
+            { id: 'leaderboard' as const, label: 'Leaderboard' },
+            { id: 'you' as const, label: 'You' },
+            { id: 'boosters' as const, label: 'Boosters' },
+          ].map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
@@ -247,16 +253,14 @@ function LeaderboardTab({
               isMe
                 ? 'bg-[#f5a623]/10 border-[#f5a623]/30'
                 : entry.rank <= 3
-                ? 'bg-[#f5a623]/5 border-[#f5a623]/20'
-                : 'bg-[#0d1b2a] border-white/[0.08]'
+                  ? 'bg-[#f5a623]/5 border-[#f5a623]/20'
+                  : 'bg-[#0d1b2a] border-white/[0.08]'
             }`}
           >
             <span className="text-sm font-bold w-8 text-center text-gray-300">#{entry.rank}</span>
             <div className="flex-1 min-w-0">
               <p
-                className={`text-sm font-medium truncate ${
-                  isMe ? 'text-[#f5a623]' : 'text-white'
-                }`}
+                className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}
               >
                 {entry.farcaster_username
                   ? `@${entry.farcaster_username}`
@@ -273,8 +277,8 @@ function LeaderboardTab({
                 {entry.totalRewards
                   ? formatUsd(entry.totalRewards)
                   : entry.score && entry.points
-                  ? `${(entry.points / Math.max(entry.score, 1)).toFixed(2)}x boost`
-                  : 'no rewards yet'}
+                    ? `${(entry.points / Math.max(entry.score, 1)).toFixed(2)}x boost`
+                    : 'no rewards yet'}
               </p>
             </div>
           </div>
@@ -338,9 +342,13 @@ function YouTab({ data }: { data: MeApiResponse['data'] | null }) {
 
       {entry.totalRewards !== undefined && entry.totalRewards > 0 && (
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Lifetime Rewards</p>
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
+            Lifetime Rewards
+          </p>
           <p className="text-2xl font-bold text-white">{formatUsd(entry.totalRewards)}</p>
-          <p className="text-[10px] text-gray-500 mt-1">USD across all distributions to this address</p>
+          <p className="text-[10px] text-gray-500 mt-1">
+            USD across all distributions to this address
+          </p>
         </div>
       )}
     </div>
@@ -365,9 +373,7 @@ function BoostersTab({ boosters }: { boosters: Booster[] }) {
         <div
           key={`${b.contractAddress ?? 'booster'}-${i}`}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
-            b.qualified
-              ? 'bg-[#f5a623]/5 border-[#f5a623]/30'
-              : 'bg-[#0d1b2a] border-white/[0.08]'
+            b.qualified ? 'bg-[#f5a623]/5 border-[#f5a623]/30' : 'bg-[#0d1b2a] border-white/[0.08]'
           }`}
         >
           <div className="w-9 h-9 rounded-lg bg-[#1a2a3a] flex items-center justify-center flex-shrink-0">
@@ -381,14 +387,14 @@ function BoostersTab({ boosters }: { boosters: Booster[] }) {
               <span className="ml-2 text-[10px] text-gray-500 uppercase">{b.type}</span>
             </p>
             {b.contractAddress && (
-              <p className="text-[10px] text-gray-500 truncate">{shortAddress(b.contractAddress)}</p>
+              <p className="text-[10px] text-gray-500 truncate">
+                {shortAddress(b.contractAddress)}
+              </p>
             )}
           </div>
           <span
             className={`text-[10px] font-medium px-2 py-1 rounded-full ${
-              b.qualified
-                ? 'bg-[#f5a623]/15 text-[#f5a623]'
-                : 'bg-white/5 text-gray-500'
+              b.qualified ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'bg-white/5 text-gray-500'
             }`}
           >
             {b.qualified ? 'qualified' : 'locked'}

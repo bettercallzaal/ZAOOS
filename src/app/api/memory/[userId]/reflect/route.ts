@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
@@ -10,7 +10,7 @@ const ReflectBodySchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getSession();
@@ -29,7 +29,7 @@ export async function POST(
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,9 +43,6 @@ export async function POST(
     return NextResponse.json({ reflection });
   } catch (error) {
     logger.error('Failed to reflect on memories:', error);
-    return NextResponse.json(
-      { error: 'Failed to reflect on memories' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to reflect on memories' }, { status: 500 });
   }
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 import { timeAgo } from '@/lib/format/timeAgo';
 
 interface ActivityItem {
@@ -61,7 +61,9 @@ export function CommunityActivityFeed() {
   if (loading) {
     return (
       <div className="px-4 py-3 space-y-2">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Activity</h3>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          Activity
+        </h3>
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-2.5 animate-pulse">
             <div className="w-7 h-7 rounded-full bg-gray-800 flex-shrink-0" />
@@ -79,7 +81,9 @@ export function CommunityActivityFeed() {
 
   return (
     <div className="px-4 py-3">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Activity</h3>
+      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        Activity
+      </h3>
       <div className="space-y-2.5">
         {items.map((item) => {
           const color = TYPE_COLORS[item.type] || 'text-gray-400';
@@ -87,7 +91,14 @@ export function CommunityActivityFeed() {
             <div className="flex items-start gap-2.5 group">
               <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5">
                 {item.actor.pfpUrl ? (
-                  <Image src={item.actor.pfpUrl} alt="" width={28} height={28} className="rounded-full" unoptimized />
+                  <Image
+                    src={item.actor.pfpUrl}
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="rounded-full"
+                    unoptimized
+                  />
                 ) : (
                   <div className="w-full h-full bg-gray-800 flex items-center justify-center text-[9px] font-bold text-gray-500">
                     {item.actor.displayName?.charAt(0)?.toUpperCase() || '?'}
@@ -96,7 +107,9 @@ export function CommunityActivityFeed() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-300 leading-snug">
-                  <span className={`font-semibold ${color} group-hover:text-[#f5a623] transition-colors`}>
+                  <span
+                    className={`font-semibold ${color} group-hover:text-[#f5a623] transition-colors`}
+                  >
                     {item.actor.displayName}
                   </span>{' '}
                   <span className="text-gray-400">{item.description}</span>
@@ -107,11 +120,17 @@ export function CommunityActivityFeed() {
           );
 
           return item.link ? (
-            <Link key={item.id} href={item.link} className="block hover:bg-white/[0.02] rounded-lg -mx-2 px-2 py-1 transition-colors">
+            <Link
+              key={item.id}
+              href={item.link}
+              className="block hover:bg-white/[0.02] rounded-lg -mx-2 px-2 py-1 transition-colors"
+            >
               {content}
             </Link>
           ) : (
-            <div key={item.id} className="py-1">{content}</div>
+            <div key={item.id} className="py-1">
+              {content}
+            </div>
           );
         })}
       </div>

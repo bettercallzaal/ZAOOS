@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { SessionData } from '@/types';
-import { XMTPConversation } from '@/types/xmtp';
-import type { ZaoMember } from '@/contexts/XMTPContext';
+import { type ReactNode, useState } from 'react';
 import { communityConfig } from '@/../community.config';
+import type { ZaoMember } from '@/contexts/XMTPContext';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { timeAgoCompact as timeAgo } from '@/lib/format/timeAgo';
+import type { SessionData } from '@/types';
+import type { XMTPConversation } from '@/types/xmtp';
 
 const CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `# ${id}` }));
-
 
 function lastSeen(isoDate: string | null): string {
   if (!isoDate) return '';
@@ -109,10 +108,34 @@ interface SidebarProps {
 }
 
 export function Sidebar({
-  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, isTrending, onTrendingSelect, onOpenFaq, onOpenTutorial, onOpenRespect, onOpenEmpire,
-  xmtpConnected, xmtpConnecting, xmtpError, xmtpConversations, activeConversationId,
-  onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
-  zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo, onRemoveConversation, onRefreshMembers, onResetXmtp,
+  user,
+  isOpen,
+  onClose,
+  onLogout,
+  activeChannel,
+  onChannelSelect,
+  isTrending,
+  onTrendingSelect,
+  onOpenFaq,
+  onOpenTutorial,
+  onOpenRespect,
+  onOpenEmpire,
+  xmtpConnected,
+  xmtpConnecting,
+  xmtpError,
+  xmtpConversations,
+  activeConversationId,
+  onXmtpConnect,
+  onConversationSelect,
+  onNewDm,
+  onNewGroup,
+  zaoMembers,
+  loadingMembers,
+  onStartDmWithMember,
+  onGroupInfo,
+  onRemoveConversation,
+  onRefreshMembers,
+  onResetXmtp,
   walletConnected,
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable && m.lastLoginAt);
@@ -127,9 +150,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={onClose} />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={onClose} />}
 
       <aside
         className={`
@@ -147,7 +168,6 @@ export function Sidebar({
 
         {/* Scrollable sections */}
         <div className="flex-1 overflow-y-auto py-1">
-
           {/* ── Channels ──────────────────────────────────────────────── */}
           <SidebarSection title="Farcaster Channels">
             {CHANNELS.map((ch) => (
@@ -184,8 +204,18 @@ export function Sidebar({
               {xmtpError && (
                 <div className="px-3 py-2 mb-1">
                   <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/5 border border-red-500/15">
-                    <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    <svg
+                      className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                      />
                     </svg>
                     <div>
                       <p className="text-xs text-red-400 font-medium">Connection failed</p>
@@ -199,11 +229,23 @@ export function Sidebar({
                   onClick={onXmtpConnect}
                   className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
                 >
-                  <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  <svg
+                    className="w-4 h-4 text-[#f5a623] flex-shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                    />
                   </svg>
                   <div className="text-left">
-                    <p className="text-xs text-[#f5a623] font-medium">{xmtpError ? 'Retry Connection' : 'Enable Messaging'}</p>
+                    <p className="text-xs text-[#f5a623] font-medium">
+                      {xmtpError ? 'Retry Connection' : 'Enable Messaging'}
+                    </p>
                     <p className="text-[10px] text-gray-500">Sign with your wallet to activate</p>
                   </div>
                 </button>
@@ -214,12 +256,24 @@ export function Sidebar({
                       onClick={openConnectModal}
                       className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
                     >
-                      <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                      <svg
+                        className="w-4 h-4 text-[#f5a623] flex-shrink-0"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"
+                        />
                       </svg>
                       <div className="text-left">
                         <p className="text-xs text-[#f5a623] font-medium">Connect Wallet</p>
-                        <p className="text-[10px] text-gray-500">Required for encrypted messaging</p>
+                        <p className="text-[10px] text-gray-500">
+                          Required for encrypted messaging
+                        </p>
                       </div>
                     </button>
                   )}
@@ -235,7 +289,10 @@ export function Sidebar({
                     <div className="w-8 h-8 rounded-full bg-gray-800/60 flex-shrink-0" />
                     <div className="flex-1 min-w-0 space-y-1.5">
                       <div className="h-3 bg-gray-800/50 rounded w-24" />
-                      <div className="h-2.5 bg-gray-800/30 rounded" style={{ width: `${50 + i * 12}%` }} />
+                      <div
+                        className="h-2.5 bg-gray-800/30 rounded"
+                        style={{ width: `${50 + i * 12}%` }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -250,18 +307,34 @@ export function Sidebar({
             <SidebarSection title="Messages">
               <div className="px-3 py-2">
                 <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/5 border border-red-500/15">
-                  <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  <svg
+                    className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                    />
                   </svg>
                   <div>
                     <p className="text-xs text-red-400 font-medium">Connection issue</p>
                     <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{xmtpError}</p>
                     <div className="flex items-center gap-3 mt-1.5">
-                      <button onClick={onXmtpConnect} className="text-[10px] text-[#f5a623] font-medium hover:text-[#ffd700]">
+                      <button
+                        onClick={onXmtpConnect}
+                        className="text-[10px] text-[#f5a623] font-medium hover:text-[#ffd700]"
+                      >
                         Retry
                       </button>
                       {onResetXmtp && (
-                        <button onClick={onResetXmtp} className="text-[10px] text-red-400/70 font-medium hover:text-red-400">
+                        <button
+                          onClick={onResetXmtp}
+                          className="text-[10px] text-red-400/70 font-medium hover:text-red-400"
+                        >
                           Reset
                         </button>
                       )}
@@ -276,11 +349,13 @@ export function Sidebar({
           {xmtpConnected && !xmtpError && (
             <SidebarSection
               title="Direct Messages"
-              badge={dmUnread > 0 ? (
-                <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
-                  {dmUnread > 99 ? '99+' : dmUnread}
-                </span>
-              ) : undefined}
+              badge={
+                dmUnread > 0 ? (
+                  <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
+                    {dmUnread > 99 ? '99+' : dmUnread}
+                  </span>
+                ) : undefined
+              }
               actions={
                 <button
                   onClick={onNewDm}
@@ -288,7 +363,13 @@ export function Sidebar({
                   title="New DM"
                   aria-label="New direct message"
                 >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
@@ -312,22 +393,31 @@ export function Sidebar({
                             isActive
                               ? 'bg-[#f5a623]/10 text-[#f5a623]'
                               : hasUnread
-                              ? 'text-white hover:bg-white/5'
-                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                ? 'text-white hover:bg-white/5'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-white'
                           }`}
                         >
                           {conv.peerPfpUrl ? (
                             <div className="w-8 h-8 relative flex-shrink-0">
-                              <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || 'DM'} avatar`} fill className="rounded-full object-cover" />
+                              <Image
+                                src={conv.peerPfpUrl}
+                                alt={`${conv.peerDisplayName || 'DM'} avatar`}
+                                fill
+                                className="rounded-full object-cover"
+                              />
                             </div>
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
-                              <span className="text-xs text-[#f5a623]/80 font-semibold">{initial}</span>
+                              <span className="text-xs text-[#f5a623]/80 font-semibold">
+                                {initial}
+                              </span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-1">
-                              <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
+                              <p
+                                className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}
+                              >
                                 {conv.peerDisplayName || 'Unknown'}
                               </p>
                               <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -337,12 +427,16 @@ export function Sidebar({
                                   </span>
                                 )}
                                 {conv.lastMessageAt && (
-                                  <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                                  <span className="text-[10px] text-gray-600">
+                                    {timeAgo(conv.lastMessageAt)}
+                                  </span>
                                 )}
                               </div>
                             </div>
                             {conv.lastMessage && (
-                              <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <p
+                                className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}
+                              >
                                 {conv.lastMessage}
                               </p>
                             )}
@@ -350,13 +444,26 @@ export function Sidebar({
                         </button>
                         {onRemoveConversation && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); onRemoveConversation(conv.id); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRemoveConversation(conv.id);
+                            }}
                             className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-red-400 transition-all"
                             aria-label="Remove conversation"
                             title="Remove from list"
                           >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         )}
@@ -372,11 +479,13 @@ export function Sidebar({
           {xmtpConnected && !xmtpError && (
             <SidebarSection
               title="Groups"
-              badge={groupUnread > 0 ? (
-                <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
-                  {groupUnread > 99 ? '99+' : groupUnread}
-                </span>
-              ) : undefined}
+              badge={
+                groupUnread > 0 ? (
+                  <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
+                    {groupUnread > 99 ? '99+' : groupUnread}
+                  </span>
+                ) : undefined
+              }
               actions={
                 <button
                   onClick={onNewGroup}
@@ -384,7 +493,13 @@ export function Sidebar({
                   title="New Group"
                   aria-label="New group chat"
                 >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
@@ -407,18 +522,30 @@ export function Sidebar({
                             isActive
                               ? 'bg-[#f5a623]/10 text-[#f5a623]'
                               : hasUnread
-                              ? 'text-white hover:bg-white/5'
-                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                ? 'text-white hover:bg-white/5'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-white'
                           }`}
                         >
                           <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                            <svg
+                              className="w-4 h-4 text-[#f5a623]"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={1.5}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772"
+                              />
                             </svg>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-1">
-                              <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
+                              <p
+                                className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}
+                              >
                                 {conv.name || 'Group'}
                                 {conv.memberCount && (
                                   <span className="ml-1.5 text-[10px] text-gray-500 font-normal">
@@ -433,12 +560,16 @@ export function Sidebar({
                                   </span>
                                 )}
                                 {conv.lastMessageAt && (
-                                  <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                                  <span className="text-[10px] text-gray-600">
+                                    {timeAgo(conv.lastMessageAt)}
+                                  </span>
                                 )}
                               </div>
                             </div>
                             {conv.lastMessage && (
-                              <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <p
+                                className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}
+                              >
                                 {conv.lastMessage}
                               </p>
                             )}
@@ -446,12 +577,25 @@ export function Sidebar({
                         </button>
                         {onGroupInfo && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); onGroupInfo(conv.id); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onGroupInfo(conv.id);
+                            }}
                             className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-white transition-all"
                             aria-label="Group info"
                           >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                              />
                             </svg>
                           </button>
                         )}
@@ -469,15 +613,24 @@ export function Sidebar({
                       onClick={openConnectModal}
                       className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors mt-1"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"
+                        />
                       </svg>
                       <span className="text-xs">Connect Wallet</span>
                     </button>
                   )}
                 </ConnectButton.Custom>
               )}
-
             </SidebarSection>
           )}
 
@@ -488,8 +641,18 @@ export function Sidebar({
                 onClick={onResetXmtp}
                 className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-600 hover:bg-red-500/5 hover:text-red-400 transition-colors text-xs"
               >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992"
+                  />
                 </svg>
                 Reset Messaging
               </button>
@@ -500,21 +663,37 @@ export function Sidebar({
           {xmtpConnected && (
             <SidebarSection
               title="Messageable"
-              badge={onlineMembers.length > 0 ? (
-                <span className="text-[10px] text-green-400 font-medium ml-1">{onlineMembers.length}</span>
-              ) : undefined}
-              actions={onRefreshMembers ? (
-                <button
-                  onClick={() => onRefreshMembers()}
-                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
-                  title="Refresh member list"
-                  aria-label="Refresh members"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992" />
-                  </svg>
-                </button>
-              ) : undefined}
+              badge={
+                onlineMembers.length > 0 ? (
+                  <span className="text-[10px] text-green-400 font-medium ml-1">
+                    {onlineMembers.length}
+                  </span>
+                ) : undefined
+              }
+              actions={
+                onRefreshMembers ? (
+                  <button
+                    onClick={() => onRefreshMembers()}
+                    className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                    title="Refresh member list"
+                    aria-label="Refresh members"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992"
+                      />
+                    </svg>
+                  </button>
+                ) : undefined
+              }
               defaultOpen={true}
             >
               {loadingMembers ? (
@@ -523,7 +702,10 @@ export function Sidebar({
                     <div key={i} className="flex items-center gap-2.5 px-3 py-1.5">
                       <div className="w-6 h-6 rounded-full bg-gray-800/60 flex-shrink-0" />
                       <div className="flex-1 space-y-1">
-                        <div className="h-2.5 bg-gray-800/50 rounded" style={{ width: `${40 + i * 10}%` }} />
+                        <div
+                          className="h-2.5 bg-gray-800/50 rounded"
+                          style={{ width: `${40 + i * 10}%` }}
+                        />
                         <div className="h-2 bg-gray-800/30 rounded w-16" />
                       </div>
                     </div>
@@ -542,11 +724,19 @@ export function Sidebar({
                       <div className="relative flex-shrink-0">
                         {member.pfpUrl ? (
                           <div className="w-6 h-6 relative">
-                            <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
+                            <Image
+                              src={member.pfpUrl}
+                              alt={member.displayName}
+                              fill
+                              className="rounded-full object-cover"
+                              unoptimized
+                            />
                           </div>
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
-                            <span className="text-[9px] text-gray-400 font-medium">{member.displayName[0]?.toUpperCase()}</span>
+                            <span className="text-[9px] text-gray-400 font-medium">
+                              {member.displayName[0]?.toUpperCase()}
+                            </span>
                           </div>
                         )}
                         <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0d1b2a] bg-green-400" />
@@ -554,7 +744,11 @@ export function Sidebar({
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">{member.displayName}</p>
                         <p className="text-[10px] text-gray-500 truncate">
-                          {member.lastLoginAt ? lastSeen(member.lastLoginAt) : (member.username ? `@${member.username}` : '')}
+                          {member.lastLoginAt
+                            ? lastSeen(member.lastLoginAt)
+                            : member.username
+                              ? `@${member.username}`
+                              : ''}
                         </p>
                       </div>
                     </button>
@@ -568,7 +762,11 @@ export function Sidebar({
           {xmtpConnected && offlineMembers.length > 0 && (
             <SidebarSection
               title="Not on XMTP"
-              badge={<span className="text-[10px] text-gray-500 font-medium ml-1">{offlineMembers.length}</span>}
+              badge={
+                <span className="text-[10px] text-gray-500 font-medium ml-1">
+                  {offlineMembers.length}
+                </span>
+              }
               defaultOpen={false}
             >
               <div className="space-y-0.5 max-h-48 overflow-y-auto">
@@ -580,16 +778,26 @@ export function Sidebar({
                     <div className="relative flex-shrink-0">
                       {member.pfpUrl ? (
                         <div className="w-6 h-6 relative opacity-50">
-                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
+                          <Image
+                            src={member.pfpUrl}
+                            alt={member.displayName}
+                            fill
+                            className="rounded-full object-cover"
+                            unoptimized
+                          />
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
-                          <span className="text-[9px] text-gray-600 font-medium">{member.displayName[0]?.toUpperCase()}</span>
+                          <span className="text-[9px] text-gray-600 font-medium">
+                            {member.displayName[0]?.toUpperCase()}
+                          </span>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate text-gray-500">{member.displayName}</p>
+                      <p className="text-xs font-medium truncate text-gray-500">
+                        {member.displayName}
+                      </p>
                       {member.username && (
                         <a
                           href={`https://farcaster.xyz/${member.username}`}
@@ -609,8 +817,18 @@ export function Sidebar({
                       className="p-1 rounded text-gray-600 hover:text-[#f5a623] hover:bg-[#f5a623]/10 transition-colors flex-shrink-0"
                       title={`Cast to @${member.username} in /zao`}
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46"
+                        />
                       </svg>
                     </a>
                   </div>
@@ -621,36 +839,77 @@ export function Sidebar({
 
           {/* ── Pages ──────────────────────────────────────────────────── */}
           <SidebarSection title="Pages">
-            <Link href="/social" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            <Link
+              href="/social"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
+            >
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                />
               </svg>
               Followers & Following
             </Link>
             <button
-              onClick={() => { onOpenRespect?.(); onClose(); }}
+              onClick={() => {
+                onOpenRespect?.();
+                onClose();
+              }}
               className="flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                />
               </svg>
               Respect
             </button>
             {onOpenEmpire && (
               <button
-                onClick={() => { onOpenEmpire(); onClose(); }}
+                onClick={() => {
+                  onOpenEmpire();
+                  onClose();
+                }}
                 className={`flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
                   activeChannel === 'zabal'
                     ? 'bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/15'
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 21V8.25l9-5.25 9 5.25V21M9 21V12h6v9M3 21h18" />
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 21V8.25l9-5.25 9 5.25V21M9 21V12h6v9M3 21h18"
+                  />
                 </svg>
                 ZABAL Empire
                 {activeChannel === 'zabal' && (
-                  <span className="ml-auto text-[9px] uppercase tracking-wider text-[#f5a623]/70">live</span>
+                  <span className="ml-auto text-[9px] uppercase tracking-wider text-[#f5a623]/70">
+                    live
+                  </span>
                 )}
               </button>
             )}
@@ -659,9 +918,23 @@ export function Sidebar({
                 href="/admin"
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md text-[#f5a623] hover:bg-[#f5a623]/10 text-sm font-medium transition-colors"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
                 Admin Dashboard
               </a>
@@ -674,8 +947,18 @@ export function Sidebar({
               onClick={onOpenTutorial}
               className="flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+                />
               </svg>
               Getting Started
             </button>
@@ -683,13 +966,22 @@ export function Sidebar({
               onClick={onOpenFaq}
               className="flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                />
               </svg>
               FAQ
             </button>
           </SidebarSection>
-
         </div>
 
         {/* ── User footer ──────────────────────────────────────────────── */}
@@ -697,11 +989,19 @@ export function Sidebar({
           <div className="flex items-center gap-3">
             {user.pfpUrl ? (
               <div className="w-8 h-8 relative flex-shrink-0">
-                <Image src={user.pfpUrl} alt={user.displayName} fill className="rounded-full object-cover" unoptimized />
+                <Image
+                  src={user.pfpUrl}
+                  alt={user.displayName}
+                  fill
+                  className="rounded-full object-cover"
+                  unoptimized
+                />
               </div>
             ) : (
               <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs text-gray-400 font-medium">{user.displayName?.[0]?.toUpperCase()}</span>
+                <span className="text-xs text-gray-400 font-medium">
+                  {user.displayName?.[0]?.toUpperCase()}
+                </span>
               </div>
             )}
             <div className="flex-1 min-w-0">

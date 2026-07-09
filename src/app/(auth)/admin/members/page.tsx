@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface HealthStats {
@@ -40,7 +40,13 @@ interface Member {
   primaryWallet: string | null;
   preferredWallet: string | null;
   platforms: Record<string, string | null>;
-  respect: { total: number; fractal: number; onchainOG: number; onchainZOR: number; fractalCount: number } | null;
+  respect: {
+    total: number;
+    fractal: number;
+    onchainOG: number;
+    onchainZOR: number;
+    fractalCount: number;
+  } | null;
   lastLoginAt: string | null;
   lastActiveAt: string | null;
   createdAt: string;
@@ -79,7 +85,9 @@ export default function MemberCRMPage() {
   const [sortBy, setSortBy] = useState<'respect' | 'name' | 'recent' | 'active'>('respect');
   const [issueFilter, setIssueFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [fixing, setFixing] = useState<string | null>(null);
-  const [fixResults, setFixResults] = useState<{ action: string; fixed: number; errors: number; details: string[] }[] | null>(null);
+  const [fixResults, setFixResults] = useState<
+    { action: string; fixed: number; errors: number; details: string[] }[] | null
+  >(null);
 
   // FID tab state
   const [fidActive, setFidActive] = useState<MissingFidMember[]>([]);
@@ -88,12 +96,23 @@ export default function MemberCRMPage() {
   const [fidStats, setFidStats] = useState<FidStats | null>(null);
   const [fidInputs, setFidInputs] = useState<Record<string, string>>({});
   const [fidSaving, setFidSaving] = useState(false);
-  const [fidSaveResult, setFidSaveResult] = useState<{ updated: number; errors: string[] } | null>(null);
+  const [fidSaveResult, setFidSaveResult] = useState<{ updated: number; errors: string[] } | null>(
+    null,
+  );
   const [fidLoading, setFidLoading] = useState(false);
   const [fidSearch, setFidSearch] = useState('');
   const [fidSection, setFidSection] = useState<'active' | 'onchain' | 'inactive'>('active');
 
-  const runFix = async (action: 'link-fids' | 'enrich-profiles' | 'import-socials' | 'sync-tiers' | 'link-profiles' | 'backfill-dates' | 'all') => {
+  const runFix = async (
+    action:
+      | 'link-fids'
+      | 'enrich-profiles'
+      | 'import-socials'
+      | 'sync-tiers'
+      | 'link-profiles'
+      | 'backfill-dates'
+      | 'all',
+  ) => {
     setFixing(action);
     setFixResults(null);
     try {
@@ -105,8 +124,15 @@ export default function MemberCRMPage() {
       const data = await res.json();
       setFixResults(data.results || []);
       // Reload health data
-      fetch('/api/admin/member-health').then(r => r.json()).then(d => { setStats(d.stats); setIssues(d.issues || []); });
-    } catch { /* ignore */ }
+      fetch('/api/admin/member-health')
+        .then((r) => r.json())
+        .then((d) => {
+          setStats(d.stats);
+          setIssues(d.issues || []);
+        });
+    } catch {
+      /* ignore */
+    }
     setFixing(null);
   };
 
@@ -115,8 +141,8 @@ export default function MemberCRMPage() {
     if (tab !== 'fids') return;
     setFidLoading(true);
     fetch('/api/admin/member-fid')
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         setFidActive(d.active || []);
         setFidOnchain(d.onchainOnly || []);
         setFidInactive(d.inactive || []);
@@ -126,7 +152,7 @@ export default function MemberCRMPage() {
       .finally(() => setFidLoading(false));
   }, [tab]);
 
-  const fidPendingCount = Object.values(fidInputs).filter(v => v.trim() !== '').length;
+  const fidPendingCount = Object.values(fidInputs).filter((v) => v.trim() !== '').length;
 
   const saveFids = async () => {
     const updates = Object.entries(fidInputs)
@@ -148,8 +174,8 @@ export default function MemberCRMPage() {
 
       // Clear saved inputs and reload
       if (data.updated > 0) {
-        const savedIds = new Set(updates.map(u => u.memberId));
-        setFidInputs(prev => {
+        const savedIds = new Set(updates.map((u) => u.memberId));
+        setFidInputs((prev) => {
           const next = { ...prev };
           for (const id of savedIds) delete next[id];
           return next;
@@ -162,15 +188,20 @@ export default function MemberCRMPage() {
         setFidInactive(d.inactive || []);
         setFidStats(d.stats || null);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setFidSaving(false);
   };
 
   // Load health data
   useEffect(() => {
     fetch('/api/admin/member-health')
-      .then(r => r.json())
-      .then(d => { setStats(d.stats); setIssues(d.issues || []); })
+      .then((r) => r.json())
+      .then((d) => {
+        setStats(d.stats);
+        setIssues(d.issues || []);
+      })
       .catch(console.error);
   }, []);
 
@@ -182,19 +213,28 @@ export default function MemberCRMPage() {
     if (search) params.set('search', search);
 
     fetch(`/api/members/directory?${params}`, { signal: controller.signal })
-      .then(r => r.json())
-      .then(d => { if (!controller.signal.aborted) setMembers(d.members || []); })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!controller.signal.aborted) setMembers(d.members || []);
+      })
       .catch(() => {})
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
 
     return () => controller.abort();
   }, [search, tierFilter, sortBy]);
 
   if (!user?.isAdmin) {
-    return <div className="flex items-center justify-center h-[60vh] text-gray-500">Admin access required</div>;
+    return (
+      <div className="flex items-center justify-center h-[60vh] text-gray-500">
+        Admin access required
+      </div>
+    );
   }
 
-  const filteredIssues = issueFilter === 'all' ? issues : issues.filter(i => i.severity === issueFilter);
+  const filteredIssues =
+    issueFilter === 'all' ? issues : issues.filter((i) => i.severity === issueFilter);
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
@@ -210,7 +250,9 @@ export default function MemberCRMPage() {
           <button
             onClick={() => setTab('directory')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === 'directory' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
+              tab === 'directory'
+                ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                : 'text-gray-500 hover:text-white'
             }`}
           >
             Members ({members.length})
@@ -241,13 +283,13 @@ export default function MemberCRMPage() {
               <input
                 type="text"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search members..."
                 className="flex-1 min-w-[200px] bg-white/5 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
               />
               <select
                 value={tierFilter}
-                onChange={e => setTierFilter(e.target.value as typeof tierFilter)}
+                onChange={(e) => setTierFilter(e.target.value as typeof tierFilter)}
                 className="bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white"
               >
                 <option value="all">All Tiers</option>
@@ -256,7 +298,7 @@ export default function MemberCRMPage() {
               </select>
               <select
                 value={sortBy}
-                onChange={e => setSortBy(e.target.value as typeof sortBy)}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 className="bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white"
               >
                 <option value="respect">Sort: Respect</option>
@@ -269,12 +311,17 @@ export default function MemberCRMPage() {
             {/* Member list */}
             {loading ? (
               <div className="space-y-2">
-                {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-16 bg-[#0d1b2a] rounded-xl animate-pulse" />
+                ))}
               </div>
             ) : (
               <div className="space-y-1">
-                {members.map(m => (
-                  <div key={m.id} className="flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] hover:border-white/[0.08] transition-colors">
+                {members.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] hover:border-white/[0.08] transition-colors"
+                  >
                     {/* PFP */}
                     <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                       {m.pfpUrl ? (
@@ -297,11 +344,13 @@ export default function MemberCRMPage() {
                             ZID #{m.zid}
                           </span>
                         )}
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                          m.tier === 'respect_holder'
-                            ? 'bg-green-500/10 text-green-400'
-                            : 'bg-gray-500/10 text-gray-500'
-                        }`}>
+                        <span
+                          className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                            m.tier === 'respect_holder'
+                              ? 'bg-green-500/10 text-green-400'
+                              : 'bg-gray-500/10 text-gray-500'
+                          }`}
+                        >
                           {m.tier === 'respect_holder' ? 'Respect' : 'Community'}
                         </span>
                       </div>
@@ -317,7 +366,9 @@ export default function MemberCRMPage() {
                       {m.respect ? (
                         <>
                           <p className="text-sm font-mono text-[#f5a623]">{m.respect.total}R</p>
-                          <p className="text-[10px] text-gray-600">{m.respect.fractalCount} fractals</p>
+                          <p className="text-[10px] text-gray-600">
+                            {m.respect.fractalCount} fractals
+                          </p>
                         </>
                       ) : (
                         <p className="text-[10px] text-gray-600">No respect</p>
@@ -326,10 +377,38 @@ export default function MemberCRMPage() {
 
                     {/* Platforms */}
                     <div className="flex gap-1 flex-shrink-0">
-                      {m.fid && <span className="w-5 h-5 rounded bg-[#f5a623]/10 flex items-center justify-center text-[8px] text-[#f5a623]" title="Farcaster">FC</span>}
-                      {m.platforms.bluesky && <span className="w-5 h-5 rounded bg-blue-500/10 flex items-center justify-center text-[8px] text-blue-400" title="Bluesky">BS</span>}
-                      {m.platforms.discord && <span className="w-5 h-5 rounded bg-indigo-500/10 flex items-center justify-center text-[8px] text-indigo-400" title="Discord">DC</span>}
-                      {m.platforms.x && <span className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-[8px] text-gray-300" title="X">X</span>}
+                      {m.fid && (
+                        <span
+                          className="w-5 h-5 rounded bg-[#f5a623]/10 flex items-center justify-center text-[8px] text-[#f5a623]"
+                          title="Farcaster"
+                        >
+                          FC
+                        </span>
+                      )}
+                      {m.platforms.bluesky && (
+                        <span
+                          className="w-5 h-5 rounded bg-blue-500/10 flex items-center justify-center text-[8px] text-blue-400"
+                          title="Bluesky"
+                        >
+                          BS
+                        </span>
+                      )}
+                      {m.platforms.discord && (
+                        <span
+                          className="w-5 h-5 rounded bg-indigo-500/10 flex items-center justify-center text-[8px] text-indigo-400"
+                          title="Discord"
+                        >
+                          DC
+                        </span>
+                      )}
+                      {m.platforms.x && (
+                        <span
+                          className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-[8px] text-gray-300"
+                          title="X"
+                        >
+                          X
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -344,9 +423,17 @@ export default function MemberCRMPage() {
             {/* Stats cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
               <StatCard label="Total Users" value={stats.totalUsers} />
-              <StatCard label="Respect Holders" value={stats.respectHolders} color="text-[#ffd700]" />
+              <StatCard
+                label="Respect Holders"
+                value={stats.respectHolders}
+                color="text-[#ffd700]"
+              />
               <StatCard label="Community" value={stats.communityMembers} />
-              <StatCard label="Unlinked Respect" value={stats.unlinkedRespect} color="text-[#f5a623]" />
+              <StatCard
+                label="Unlinked Respect"
+                value={stats.unlinkedRespect}
+                color="text-[#f5a623]"
+              />
               <StatCard label="Missing ZID" value={stats.missingZid} color="text-red-400" />
               <StatCard label="Missing Discord" value={stats.missingDiscord} />
               <StatCard label="Missing Real Name" value={stats.missingRealName} />
@@ -355,7 +442,9 @@ export default function MemberCRMPage() {
 
             {/* Auto-fix actions */}
             <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] mb-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Auto-Fix Actions</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+                Auto-Fix Actions
+              </p>
               <div className="flex flex-wrap gap-2 mb-3">
                 <button
                   onClick={() => runFix('link-fids')}
@@ -421,13 +510,17 @@ export default function MemberCRMPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium text-white">{r.action}</span>
                           <span className="text-xs text-green-400">{r.fixed} fixed</span>
-                          {r.errors > 0 && <span className="text-xs text-red-400">{r.errors} errors</span>}
+                          {r.errors > 0 && (
+                            <span className="text-xs text-red-400">{r.errors} errors</span>
+                          )}
                         </div>
                         {r.details.length > 0 && (
                           <button
                             onClick={() => {
                               const text = `${r.action}: ${r.fixed} fixed\n${r.details.join('\n')}`;
-                              navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+                              navigator.clipboard
+                                .writeText(text)
+                                .then(() => alert('Copied to clipboard!'));
                             }}
                             className="text-[10px] text-gray-500 hover:text-[#f5a623] transition-colors"
                           >
@@ -438,7 +531,9 @@ export default function MemberCRMPage() {
                       {r.details.length > 0 && (
                         <div className="max-h-48 overflow-y-auto">
                           {r.details.map((d, j) => (
-                            <p key={j} className="text-[10px] text-gray-500">{d}</p>
+                            <p key={j} className="text-[10px] text-gray-500">
+                              {d}
+                            </p>
                           ))}
                         </div>
                       )}
@@ -450,21 +545,25 @@ export default function MemberCRMPage() {
 
             {/* Issue severity filter */}
             <div className="flex gap-2 mb-3">
-              {(['all', 'high', 'medium', 'low'] as const).map(s => (
+              {(['all', 'high', 'medium', 'low'] as const).map((s) => (
                 <button
                   key={s}
                   onClick={() => setIssueFilter(s)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                     issueFilter === s
-                      ? s === 'high' ? 'bg-red-500 text-white' :
-                        s === 'medium' ? 'bg-yellow-500 text-black' :
-                        s === 'low' ? 'bg-gray-500 text-white' :
-                        'bg-[#f5a623] text-black'
+                      ? s === 'high'
+                        ? 'bg-red-500 text-white'
+                        : s === 'medium'
+                          ? 'bg-yellow-500 text-black'
+                          : s === 'low'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-[#f5a623] text-black'
                       : 'bg-white/5 text-gray-400 hover:text-white'
                   }`}
                 >
-                  {s === 'all' ? `All (${issues.length})` :
-                   `${s.charAt(0).toUpperCase() + s.slice(1)} (${issues.filter(i => i.severity === s).length})`}
+                  {s === 'all'
+                    ? `All (${issues.length})`
+                    : `${s.charAt(0).toUpperCase() + s.slice(1)} (${issues.filter((i) => i.severity === s).length})`}
                 </button>
               ))}
             </div>
@@ -472,17 +571,27 @@ export default function MemberCRMPage() {
             {/* Issues list */}
             <div className="space-y-1 max-h-[60vh] overflow-y-auto">
               {filteredIssues.map((issue, i) => (
-                <div key={i} className={`flex items-start gap-3 px-4 py-2.5 rounded-lg border ${SEVERITY_COLORS[issue.severity]}`}>
-                  <span className={`text-[10px] font-bold uppercase mt-0.5 flex-shrink-0 ${
-                    issue.severity === 'high' ? 'text-red-400' :
-                    issue.severity === 'medium' ? 'text-[#f5a623]' : 'text-gray-500'
-                  }`}>
+                <div
+                  key={i}
+                  className={`flex items-start gap-3 px-4 py-2.5 rounded-lg border ${SEVERITY_COLORS[issue.severity]}`}
+                >
+                  <span
+                    className={`text-[10px] font-bold uppercase mt-0.5 flex-shrink-0 ${
+                      issue.severity === 'high'
+                        ? 'text-red-400'
+                        : issue.severity === 'medium'
+                          ? 'text-[#f5a623]'
+                          : 'text-gray-500'
+                    }`}
+                  >
                     {issue.severity}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white">{issue.member}</p>
                     <p className="text-xs text-gray-400">{issue.issue}</p>
-                    {issue.fix && <p className="text-[10px] text-gray-600 mt-0.5">Fix: {issue.fix}</p>}
+                    {issue.fix && (
+                      <p className="text-[10px] text-gray-600 mt-0.5">Fix: {issue.fix}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -515,7 +624,7 @@ export default function MemberCRMPage() {
               <input
                 type="text"
                 value={fidSearch}
-                onChange={e => setFidSearch(e.target.value)}
+                onChange={(e) => setFidSearch(e.target.value)}
                 placeholder="Search members..."
                 className="flex-1 bg-white/5 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
               />
@@ -535,11 +644,13 @@ export default function MemberCRMPage() {
 
             {/* Save result */}
             {fidSaveResult && (
-              <div className={`mb-3 px-3 py-2 rounded-lg text-xs ${
-                fidSaveResult.errors.length > 0
-                  ? 'bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20'
-                  : 'bg-[#f5a623]/15 text-[#ffd700] border border-[#ffd700]/20'
-              }`}>
+              <div
+                className={`mb-3 px-3 py-2 rounded-lg text-xs ${
+                  fidSaveResult.errors.length > 0
+                    ? 'bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20'
+                    : 'bg-[#f5a623]/15 text-[#ffd700] border border-[#ffd700]/20'
+                }`}
+              >
                 Updated {fidSaveResult.updated} FID{fidSaveResult.updated !== 1 ? 's' : ''}
                 {fidSaveResult.errors.length > 0 && ` (${fidSaveResult.errors.length} errors)`}
               </div>
@@ -547,11 +658,26 @@ export default function MemberCRMPage() {
 
             {/* Section tabs */}
             <div className="flex gap-1 mb-3">
-              {([
-                { key: 'active' as const, label: 'Active', count: fidActive.length, color: 'text-[#f5a623]' },
-                { key: 'onchain' as const, label: 'On-Chain Only', count: fidOnchain.length, color: 'text-blue-400' },
-                { key: 'inactive' as const, label: 'Inactive', count: fidInactive.length, color: 'text-gray-500' },
-              ]).map(s => (
+              {[
+                {
+                  key: 'active' as const,
+                  label: 'Active',
+                  count: fidActive.length,
+                  color: 'text-[#f5a623]',
+                },
+                {
+                  key: 'onchain' as const,
+                  label: 'On-Chain Only',
+                  count: fidOnchain.length,
+                  color: 'text-blue-400',
+                },
+                {
+                  key: 'inactive' as const,
+                  label: 'Inactive',
+                  count: fidInactive.length,
+                  color: 'text-gray-500',
+                },
+              ].map((s) => (
                 <button
                   key={s.key}
                   onClick={() => setFidSection(s.key)}
@@ -568,22 +694,36 @@ export default function MemberCRMPage() {
 
             {fidLoading ? (
               <div className="space-y-2">
-                {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-14 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-14 bg-[#0d1b2a] rounded-xl animate-pulse" />
+                ))}
               </div>
             ) : (
               <FidMemberList
                 members={
-                  fidSection === 'active' ? fidActive :
-                  fidSection === 'onchain' ? fidOnchain : fidInactive
+                  fidSection === 'active'
+                    ? fidActive
+                    : fidSection === 'onchain'
+                      ? fidOnchain
+                      : fidInactive
                 }
                 search={fidSearch}
                 inputs={fidInputs}
-                onInputChange={(id, val) => setFidInputs(prev => ({ ...prev, [id]: val }))}
+                onInputChange={(id, val) => setFidInputs((prev) => ({ ...prev, [id]: val }))}
               />
             )}
 
             <p className="text-[10px] text-gray-600 text-center mt-4">
-              Tip: Open <a href="https://farcaster.xyz" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">farcaster.xyz</a>, search for the member, click the ... menu to see their FID, then paste it here.
+              Tip: Open{' '}
+              <a
+                href="https://farcaster.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-400 hover:text-purple-300"
+              >
+                farcaster.xyz
+              </a>
+              , search for the member, click the ... menu to see their FID, then paste it here.
             </p>
           </>
         )}
@@ -604,11 +744,19 @@ function FidMemberList({
   onInputChange: (id: string, val: string) => void;
 }) {
   const filtered = search
-    ? members.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.wallet_address?.toLowerCase().includes(search.toLowerCase()))
+    ? members.filter(
+        (m) =>
+          m.name.toLowerCase().includes(search.toLowerCase()) ||
+          m.wallet_address?.toLowerCase().includes(search.toLowerCase()),
+      )
     : members;
 
   if (filtered.length === 0) {
-    return <p className="text-gray-500 text-sm text-center py-8">{search ? 'No matches.' : 'All members in this group have FIDs.'}</p>;
+    return (
+      <p className="text-gray-500 text-sm text-center py-8">
+        {search ? 'No matches.' : 'All members in this group have FIDs.'}
+      </p>
+    );
   }
 
   return (
@@ -630,7 +778,10 @@ function FidMemberList({
           : `https://farcaster.xyz/${searchName}`;
 
         return (
-          <div key={m.id} className="flex items-center gap-2 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-white/[0.08] hover:border-white/[0.08] transition-colors">
+          <div
+            key={m.id}
+            className="flex items-center gap-2 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-white/[0.08] hover:border-white/[0.08] transition-colors"
+          >
             <span className="w-8 text-right text-[10px] text-gray-600">{i + 1}</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white truncate">{m.name}</p>
@@ -639,13 +790,15 @@ function FidMemberList({
               )}
             </div>
             <span className="w-16 text-right text-xs text-gray-400">{m.fractal_count || 0}</span>
-            <span className="w-16 text-right text-xs font-mono text-[#f5a623]">{Number(m.total_respect) || Number(m.onchain_og) || 0}</span>
+            <span className="w-16 text-right text-xs font-mono text-[#f5a623]">
+              {Number(m.total_respect) || Number(m.onchain_og) || 0}
+            </span>
             <input
               type="text"
               inputMode="numeric"
               placeholder="FID"
               value={inputs[m.id] || ''}
-              onChange={e => onInputChange(m.id, e.target.value.replace(/\D/g, ''))}
+              onChange={(e) => onInputChange(m.id, e.target.value.replace(/\D/g, ''))}
               className={`w-28 bg-[#0a1628] border rounded px-2 py-1 text-xs text-white placeholder-gray-700 focus:outline-none transition-colors ${
                 inputs[m.id]?.trim()
                   ? 'border-[#f5a623]/50 bg-[#f5a623]/5'
@@ -659,8 +812,18 @@ function FidMemberList({
               className="w-8 h-8 rounded-lg bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors flex-shrink-0"
               title="Look up on Farcaster"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              <svg
+                className="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
               </svg>
             </a>
           </div>
@@ -670,7 +833,15 @@ function FidMemberList({
   );
 }
 
-function StatCard({ label, value, color = 'text-white' }: { label: string; value: number; color?: string }) {
+function StatCard({
+  label,
+  value,
+  color = 'text-white',
+}: {
+  label: string;
+  value: number;
+  color?: string;
+}) {
   return (
     <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08]">
       <p className={`text-lg font-bold ${color}`}>{value}</p>

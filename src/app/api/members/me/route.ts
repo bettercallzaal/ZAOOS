@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -16,7 +16,11 @@ const updateSchema = z.object({
   audius_handle: z.string().max(100).optional(),
   discord_id: z.string().max(100).optional(),
   tags: z.array(z.string().max(30)).max(10).optional(),
-  preferred_wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional().nullable(),
+  preferred_wallet: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/)
+    .optional()
+    .nullable(),
 });
 
 /**
@@ -31,7 +35,9 @@ export async function GET() {
   try {
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('bio, location, website_url, bluesky_handle, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle, discord_id, tags, preferred_wallet, primary_wallet, verified_addresses')
+      .select(
+        'bio, location, website_url, bluesky_handle, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle, discord_id, tags, preferred_wallet, primary_wallet, verified_addresses',
+      )
       .eq('fid', session.fid)
       .eq('is_active', true)
       .maybeSingle();
@@ -61,7 +67,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const updates: Record<string, unknown> = {};
@@ -72,7 +81,8 @@ export async function POST(req: NextRequest) {
     if (data.website_url !== undefined) updates.website_url = data.website_url || null;
     if (data.bluesky_handle !== undefined) updates.bluesky_handle = data.bluesky_handle || null;
     if (data.x_handle !== undefined) updates.x_handle = data.x_handle || null;
-    if (data.instagram_handle !== undefined) updates.instagram_handle = data.instagram_handle || null;
+    if (data.instagram_handle !== undefined)
+      updates.instagram_handle = data.instagram_handle || null;
     if (data.soundcloud_url !== undefined) updates.soundcloud_url = data.soundcloud_url || null;
     if (data.spotify_url !== undefined) updates.spotify_url = data.spotify_url || null;
     if (data.audius_handle !== undefined) updates.audius_handle = data.audius_handle || null;

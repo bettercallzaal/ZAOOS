@@ -1,39 +1,39 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { getSession } from '@/lib/auth/session'
-import { searchAudiusTracks } from '@/lib/music/audius'
-import { searchTidal } from '@/lib/music/tidal'
-import { getSupabaseAdmin } from '@/lib/db/supabase'
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { getSession } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+import { searchAudiusTracks } from '@/lib/music/audius';
+import { searchTidal } from '@/lib/music/tidal';
 
 const SearchSchema = z.object({
   q: z.string().min(1).max(200),
   genre: z.string().optional(),
   limit: z.coerce.number().min(1).max(50).default(20),
-})
+});
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSession()
+    const session = await getSession();
     if (!session?.fid && !session?.walletAddress) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const params = Object.fromEntries(req.nextUrl.searchParams)
-    const parsed = SearchSchema.safeParse(params)
+    const params = Object.fromEntries(req.nextUrl.searchParams);
+    const parsed = SearchSchema.safeParse(params);
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { q, genre, limit } = parsed.data
+    const { q, genre, limit } = parsed.data;
 
     const [audiusResult, libraryResult, tidalResult] = await Promise.allSettled([
       searchAudiusTracks(q, limit),
       searchLibrary(q, limit),
       process.env.TIDAL_CLIENT_ID ? searchTidal(q, Math.min(limit, 5)) : Promise.resolve([]),
-    ])
+    ]);
 
-    const results: SearchResult[] = []
+    const results: SearchResult[] = [];
 
     if (audiusResult.status === 'fulfilled' && audiusResult.value) {
       for (const track of audiusResult.value) {
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
           url: `https://audius.co${track.permalink}`,
           streamUrl: `https://api.audius.co/v1/tracks/${track.id}/stream?app_name=ZAO-OS`,
           playCount: track.play_count ?? 0,
-        })
+        });
       }
     }
 
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
           (r) =>
             r.title.toLowerCase() === song.title?.toLowerCase() &&
             r.artist.toLowerCase() === song.artist?.toLowerCase(),
-        )
+        );
         if (!isDupe) {
           results.push({
             id: `library-${song.id}`,
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
             url: song.url ?? '',
             streamUrl: song.stream_url ?? song.url ?? '',
             playCount: song.play_count ?? 0,
-          })
+          });
         }
       }
     }
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
           (r) =>
             r.title.toLowerCase() === track.title.toLowerCase() &&
             r.artist.toLowerCase() === track.artist.toLowerCase(),
-        )
+        );
         if (!isDupe) {
           results.push({
             id: `tidal-${track.id}`,
@@ -89,51 +89,51 @@ export async function GET(req: NextRequest) {
             url: track.url,
             streamUrl: track.url,
             playCount: 0,
-          })
+          });
         }
       }
     }
 
     // Suppress unused genre variable lint warning — reserved for future filtering
-    void genre
+    void genre;
 
-    const sources = ['audius', 'library', ...(process.env.TIDAL_CLIENT_ID ? ['tidal'] : [])]
-    return NextResponse.json({ results, sources })
+    const sources = ['audius', 'library', ...(process.env.TIDAL_CLIENT_ID ? ['tidal'] : [])];
+    return NextResponse.json({ results, sources });
   } catch (error) {
-    logger.error('Music search error:', error)
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+    logger.error('Music search error:', error);
+    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }
 
 interface SearchResult {
-  id: string
-  title: string
-  artist: string
-  artworkUrl: string
-  platform: string
-  url: string
-  streamUrl: string
-  playCount: number
+  id: string;
+  title: string;
+  artist: string;
+  artworkUrl: string;
+  platform: string;
+  url: string;
+  streamUrl: string;
+  playCount: number;
 }
 
 interface LibrarySong {
-  id: string
-  title: string | null
-  artist: string | null
-  artwork_url: string | null
-  url: string | null
-  stream_url: string | null
-  platform: string | null
-  play_count: number | null
+  id: string;
+  title: string | null;
+  artist: string | null;
+  artwork_url: string | null;
+  url: string | null;
+  stream_url: string | null;
+  platform: string | null;
+  play_count: number | null;
 }
 
 async function searchLibrary(query: string, limit: number): Promise<LibrarySong[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin();
   const { data } = await supabase
     .from('songs')
     .select('id, title, artist, artwork_url, url, stream_url, platform, play_count')
     .or(`title.ilike.%${query}%,artist.ilike.%${query}%`)
     .order('play_count', { ascending: false })
-    .limit(limit)
-  return (data as LibrarySong[] | null) ?? []
+    .limit(limit);
+  return (data as LibrarySong[] | null) ?? [];
 }

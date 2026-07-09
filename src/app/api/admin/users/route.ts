@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { getClientIp, logAuditEvent } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getUserByFid, getUserByAddress, searchUsers } from '@/lib/farcaster/neynar';
-import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { getUserByAddress, getUserByFid, searchUsers } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const ethAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
@@ -68,7 +68,10 @@ export async function GET(req: NextRequest) {
     offset: req.nextUrl.searchParams.get('offset') ?? undefined,
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query parameters', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid query parameters', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
   const { role, q: search, limit, offset } = parsed.data;
 
@@ -85,9 +88,14 @@ export async function GET(req: NextRequest) {
 
   if (search) {
     // Escape PostgREST wildcards and metacharacters for safe .ilike() usage
-    const safe = search.slice(0, 100).replace(/[%_\\]/g, '\\$&').replace(/[,().*'"]/g, '');
+    const safe = search
+      .slice(0, 100)
+      .replace(/[%_\\]/g, '\\$&')
+      .replace(/[,().*'"]/g, '');
     if (safe) {
-      query = query.or(`display_name.ilike.%${safe}%,username.ilike.%${safe}%,primary_wallet.ilike.%${safe}%,real_name.ilike.%${safe}%,ign.ilike.%${safe}%,ens_name.ilike.%${safe}%`);
+      query = query.or(
+        `display_name.ilike.%${safe}%,username.ilike.%${safe}%,primary_wallet.ilike.%${safe}%,real_name.ilike.%${safe}%,ign.ilike.%${safe}%,ens_name.ilike.%${safe}%`,
+      );
     }
   }
 
@@ -116,7 +124,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = createUserSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
     const { primary_wallet, role, real_name, ign, notes } = parsed.data;
     let { fid } = parsed.data;
@@ -128,7 +139,8 @@ export async function POST(req: NextRequest) {
         const clean = usernameInput.replace(/^@/, '').trim();
         const searchData = await searchUsers(clean, 1);
         const match = (searchData.result?.users || []).find(
-          (u: Record<string, unknown>) => (u.username as string)?.toLowerCase() === clean.toLowerCase()
+          (u: Record<string, unknown>) =>
+            (u.username as string)?.toLowerCase() === clean.toLowerCase(),
         );
         if (match) {
           fid = match.fid as number;
@@ -138,16 +150,25 @@ export async function POST(req: NextRequest) {
           if (first) {
             fid = first.fid as number;
           } else {
-            return NextResponse.json({ error: `No Farcaster user found for "${clean}"` }, { status: 404 });
+            return NextResponse.json(
+              { error: `No Farcaster user found for "${clean}"` },
+              { status: 404 },
+            );
           }
         }
       } catch {
-        return NextResponse.json({ error: `Failed to look up username "${usernameInput}"` }, { status: 500 });
+        return NextResponse.json(
+          { error: `Failed to look up username "${usernameInput}"` },
+          { status: 500 },
+        );
       }
     }
 
     if (!primary_wallet && !fid) {
-      return NextResponse.json({ error: 'Wallet address, FID, or username is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Wallet address, FID, or username is required' },
+        { status: 400 },
+      );
     }
 
     let wallet = primary_wallet ? primary_wallet.toLowerCase() : '';
@@ -174,7 +195,11 @@ export async function POST(req: NextRequest) {
           userData.bio = fcUser.profile?.bio?.text || null;
           // Auto-resolve wallet from Farcaster if not provided
           if (!wallet) {
-            wallet = (fcUser.custody_address || fcUser.verified_addresses?.eth_addresses?.[0] || '').toLowerCase();
+            wallet = (
+              fcUser.custody_address ||
+              fcUser.verified_addresses?.eth_addresses?.[0] ||
+              ''
+            ).toLowerCase();
           }
         }
       } catch {
@@ -216,11 +241,7 @@ export async function POST(req: NextRequest) {
       userData.display_name = real_name || ign || wallet.slice(0, 6) + '...' + wallet.slice(-4);
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .insert(userData)
-      .select()
-      .single();
+    const { data, error } = await supabaseAdmin.from('users').insert(userData).select().single();
 
     if (error) {
       if (error.code === '23505') {
@@ -258,14 +279,16 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const parsed = updateUserSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
     const { id, assign_zid, ...updates } = parsed.data;
 
     // Admin-assigned ZID via sequence
     if (assign_zid) {
-      const { error: zidErr } = await supabaseAdmin
-        .rpc('assign_next_zid', { target_user_id: id });
+      const { error: zidErr } = await supabaseAdmin.rpc('assign_next_zid', { target_user_id: id });
       if (zidErr) {
         logger.error('ZID assignment error:', zidErr);
         return NextResponse.json({ error: 'Failed to assign ZID' }, { status: 500 });
@@ -321,7 +344,10 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       if (error.code === '23505') {
-        return NextResponse.json({ error: 'FID or wallet already linked to another user' }, { status: 409 });
+        return NextResponse.json(
+          { error: 'FID or wallet already linked to another user' },
+          { status: 409 },
+        );
       }
       throw error;
     }
@@ -355,14 +381,14 @@ export async function DELETE(req: NextRequest) {
     const body = await req.json();
     const parsed = deleteUserSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
     const { id } = parsed.data;
 
-    const { error } = await supabaseAdmin
-      .from('users')
-      .update({ is_active: false })
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('users').update({ is_active: false }).eq('id', id);
 
     if (error) throw error;
 

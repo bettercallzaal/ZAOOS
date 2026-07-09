@@ -48,17 +48,9 @@ async function configureGrants() {
           'update-call-settings',
         ],
         // Regular users: can join, listen, react, request to speak
-        user: [
-          'join-call',
-          'read-call',
-          'create-reaction',
-        ],
+        user: ['join-call', 'read-call', 'create-reaction'],
         // Call members (invited): same as user + can request audio
-        'call_member': [
-          'join-call',
-          'read-call',
-          'create-reaction',
-        ],
+        call_member: ['join-call', 'read-call', 'create-reaction'],
       },
       // Only update grants — settings already configured in dashboard
     });

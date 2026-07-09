@@ -1,9 +1,9 @@
-import { cache } from 'react';
-import { getIronSession, IronSession } from 'iron-session';
+import { getIronSession, type IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
-import { SessionData } from '@/types';
-import { ENV } from '@/lib/env';
+import { cache } from 'react';
 import { communityConfig } from '@/../community.config';
+import { ENV } from '@/lib/env';
+import type { SessionData } from '@/types';
 
 const ADMIN_FIDS: readonly number[] = communityConfig.adminFids;
 const ADMIN_WALLETS: readonly string[] = communityConfig.adminWallets;
@@ -84,8 +84,10 @@ export async function saveSession(
   session.displayName = data.displayName;
   session.pfpUrl = data.pfpUrl;
   session.signerUuid = data.signerUuid || null;
-  session.isAdmin = allowAdmin && (ADMIN_FIDS.includes(data.fid) ||
-    (data.walletAddress ? ADMIN_WALLETS.includes(data.walletAddress.toLowerCase()) : false));
+  session.isAdmin =
+    allowAdmin &&
+    (ADMIN_FIDS.includes(data.fid) ||
+      (data.walletAddress ? ADMIN_WALLETS.includes(data.walletAddress.toLowerCase()) : false));
   await session.save();
 }
 
@@ -101,10 +103,12 @@ export async function saveWalletSession(data: {
   session.authMethod = 'wallet';
   session.fid = data.fid || 0;
   session.username = data.username || '';
-  session.displayName = data.displayName || data.walletAddress.slice(0, 6) + '...' + data.walletAddress.slice(-4);
+  session.displayName =
+    data.displayName || data.walletAddress.slice(0, 6) + '...' + data.walletAddress.slice(-4);
   session.pfpUrl = data.pfpUrl || '';
   session.signerUuid = null;
-  session.isAdmin = (data.fid ? ADMIN_FIDS.includes(data.fid) : false) ||
+  session.isAdmin =
+    (data.fid ? ADMIN_FIDS.includes(data.fid) : false) ||
     ADMIN_WALLETS.includes(data.walletAddress.toLowerCase());
   await session.save();
 }

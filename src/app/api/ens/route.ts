@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { resolveENSNames, getENSTextRecords, getENSAvatar } from '@/lib/ens/resolve';
+import { getENSAvatar, getENSTextRecords, resolveENSNames } from '@/lib/ens/resolve';
 import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
@@ -27,22 +27,28 @@ export async function GET(req: NextRequest) {
   try {
     // Resolve addresses → names
     if (addresses) {
-      const addrList = addresses.split(',').map(a => a.trim()).filter(Boolean);
+      const addrList = addresses
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean);
       const names = await resolveENSNames(addrList);
-      return NextResponse.json({ names }, {
-        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600' },
-      });
+      return NextResponse.json(
+        { names },
+        {
+          headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600' },
+        },
+      );
     }
 
     // Get text records for a name
     if (name) {
-      const [records, avatar] = await Promise.all([
-        getENSTextRecords(name),
-        getENSAvatar(name),
-      ]);
-      return NextResponse.json({ name, records, avatar }, {
-        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600' },
-      });
+      const [records, avatar] = await Promise.all([getENSTextRecords(name), getENSAvatar(name)]);
+      return NextResponse.json(
+        { name, records, avatar },
+        {
+          headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600' },
+        },
+      );
     }
 
     return NextResponse.json({ error: 'Provide addresses or name param' }, { status: 400 });

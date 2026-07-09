@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { SessionData } from '@/types';
+import { useCallback, useEffect, useState } from 'react';
+import type { SessionData } from '@/types';
 
 export function useAuth() {
   const [user, setUser] = useState<SessionData | null>(null);

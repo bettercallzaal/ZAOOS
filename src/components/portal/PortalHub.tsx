@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PORTALS } from '@/lib/portal/destinations';
-import { PortalDoor } from './PortalDoor';
 import { PortalConcierge } from './PortalConcierge';
+import { PortalDoor } from './PortalDoor';
 import { checkAllowlistGate } from './PortalGate';
 import './portal.css';
 
@@ -25,7 +25,7 @@ export function PortalHub() {
     }
   };
 
-  const getGateCheck = (portal: typeof PORTALS[number]) => {
+  const getGateCheck = (portal: (typeof PORTALS)[number]) => {
     if (!portal.locked) return undefined;
     return checkAllowlistGate;
   };
@@ -67,16 +67,18 @@ export function PortalHub() {
             <div
               key={i}
               className="portal-particle"
-              style={{
-                left: `${p.left}%`,
-                top: `${p.top}%`,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                '--duration': `${p.dur}s`,
-                '--delay': `${p.delay}s`,
-                '--dx': `${p.dx}px`,
-                '--dy': `${p.dy}px`,
-              } as React.CSSProperties}
+              style={
+                {
+                  left: `${p.left}%`,
+                  top: `${p.top}%`,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  '--duration': `${p.dur}s`,
+                  '--delay': `${p.delay}s`,
+                  '--dx': `${p.dx}px`,
+                  '--dy': `${p.dy}px`,
+                } as React.CSSProperties
+              }
             />
           ))}
         </div>
@@ -105,11 +107,7 @@ export function PortalHub() {
       <main className="relative z-10 px-4 sm:px-8 pb-32 max-w-5xl mx-auto">
         <div className="portal-grid grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
           {PORTALS.map((portal) => (
-            <div
-              key={portal.id}
-              id={`portal-${portal.id}`}
-              className="portal-door"
-            >
+            <div key={portal.id} id={`portal-${portal.id}`} className="portal-door">
               <PortalDoor
                 portal={portal}
                 highlighted={highlightedPortal === portal.id}
@@ -123,7 +121,9 @@ export function PortalHub() {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/90 to-transparent pt-10 pb-4 px-4">
         <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600">
-          <a href="https://zaoos.com" className="hover:text-gray-400 transition-colors">zaoos.com</a>
+          <a href="https://zaoos.com" className="hover:text-gray-400 transition-colors">
+            zaoos.com
+          </a>
           <span className="text-[#f5a623]/20">◆</span>
           <span>Powered by THE ZAO</span>
         </div>

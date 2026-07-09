@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Participant {
   user_id?: string;
@@ -49,7 +49,7 @@ const LEVEL_COLORS = [
   'text-yellow-400',
   'text-green-400',
   'text-blue-400',
-  'text-gray-400',  // Level 1 (lowest)
+  'text-gray-400', // Level 1 (lowest)
 ];
 
 function LevelIndicator({ currentLevel }: { currentLevel: number }) {
@@ -62,8 +62,8 @@ function LevelIndicator({ currentLevel }: { currentLevel: number }) {
             level === currentLevel
               ? `${LEVEL_COLORS[6 - level]} bg-white/10 ring-1 ring-current`
               : level > currentLevel
-              ? 'text-gray-700 bg-gray-800/50'
-              : 'text-gray-500 bg-gray-800/30'
+                ? 'text-gray-700 bg-gray-800/50'
+                : 'text-gray-500 bg-gray-800/30'
           }`}
         >
           {level}
@@ -80,9 +80,11 @@ function SessionCard({ session }: { session: LiveSession }) {
   const startedAt = session.started_at ? new Date(session.started_at) : null;
 
   return (
-    <div className={`bg-[#0d1b2a] rounded-xl border overflow-hidden ${
-      session.status === 'active' ? 'border-green-500/30' : 'border-white/[0.08]'
-    }`}>
+    <div
+      className={`bg-[#0d1b2a] rounded-xl border overflow-hidden ${
+        session.status === 'active' ? 'border-green-500/30' : 'border-white/[0.08]'
+      }`}
+    >
       <div className="px-4 py-3">
         {/* Header */}
         <div className="flex items-center justify-between gap-2">
@@ -90,7 +92,9 @@ function SessionCard({ session }: { session: LiveSession }) {
             <h3 className="text-sm font-medium text-white truncate">
               {session.name || session.group_name || 'Fractal Session'}
             </h3>
-            <span className={`shrink-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${status.bg} ${status.text}`}>
+            <span
+              className={`shrink-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${status.bg} ${status.text}`}
+            >
               {status.label}
             </span>
           </div>
@@ -103,13 +107,12 @@ function SessionCard({ session }: { session: LiveSession }) {
 
         {/* Facilitator + time */}
         <p className="text-xs text-gray-500 mt-1">
-          {session.facilitator_name && (
-            <span>Facilitated by {session.facilitator_name}</span>
-          )}
+          {session.facilitator_name && <span>Facilitated by {session.facilitator_name}</span>}
           {startedAt && (
             <span className="text-gray-600">
               {session.facilitator_name ? ' · ' : ''}
-              Started {startedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+              Started{' '}
+              {startedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
             </span>
           )}
         </p>
@@ -135,9 +138,7 @@ function SessionCard({ session }: { session: LiveSession }) {
                   className="text-[10px] text-gray-300 bg-white/5 px-2 py-0.5 rounded-full"
                 >
                   {p.display_name}
-                  {p.level != null && (
-                    <span className="text-[#f5a623] ml-1">L{p.level}</span>
-                  )}
+                  {p.level != null && <span className="text-[#f5a623] ml-1">L{p.level}</span>}
                 </span>
               ))}
             </div>
@@ -271,8 +272,18 @@ export function LiveFractalDashboard() {
       {!hasLive && (
         <div className="text-center py-10">
           <div className="mb-3">
-            <svg className="w-10 h-10 mx-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+            <svg
+              className="w-10 h-10 mx-auto text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+              />
             </svg>
           </div>
           <p className="text-gray-400 text-sm font-medium">No active fractals</p>

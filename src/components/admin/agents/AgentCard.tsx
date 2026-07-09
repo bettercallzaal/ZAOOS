@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { AgentStatus, AgentEvent } from './constants';
-import { getStatusDot, EVENT_TYPES } from './constants';
+import type { AgentEvent, AgentStatus } from './constants';
+import { EVENT_TYPES, getStatusDot } from './constants';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { runWeeklyReflection } from '@/lib/memory-recall';
 import { logger } from '@/lib/logger';
+import { runWeeklyReflection } from '@/lib/memory-recall';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -10,10 +10,7 @@ export async function POST(request: NextRequest) {
     // Require CRON_SECRET to be configured
     if (!CRON_SECRET) {
       logger.error('CRON_SECRET not configured');
-      return NextResponse.json(
-        { error: 'CRON_SECRET not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
     }
 
     // Verify cron secret
@@ -30,10 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (membersError) {
       logger.error('Failed to fetch members:', membersError);
-      return NextResponse.json(
-        { error: 'Failed to fetch members' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
     }
 
     const results = {
@@ -47,13 +41,11 @@ export async function POST(request: NextRequest) {
         const reflection = await runWeeklyReflection(String(member.fid));
 
         // Store in Supabase taste_profiles table
-        const { error: insertError } = await supabaseAdmin
-          .from('taste_profiles')
-          .insert({
-            user_fid: member.fid,
-            reflection_text: reflection,
-            reflected_at: new Date().toISOString(),
-          });
+        const { error: insertError } = await supabaseAdmin.from('taste_profiles').insert({
+          user_fid: member.fid,
+          reflection_text: reflection,
+          reflected_at: new Date().toISOString(),
+        });
 
         if (insertError) {
           logger.error(`Failed to store reflection for ${member.fid}:`, insertError);
@@ -64,7 +56,9 @@ export async function POST(request: NextRequest) {
         }
       } catch (err) {
         logger.error(`Reflection failed for ${member.fid}:`, err);
-        results.errors.push(`User ${member.fid}: ${err instanceof Error ? err.message : 'unknown error'}`);
+        results.errors.push(
+          `User ${member.fid}: ${err instanceof Error ? err.message : 'unknown error'}`,
+        );
         results.failed++;
       }
     }
@@ -72,20 +66,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(results);
   } catch (error) {
     logger.error('Weekly reflection cron failed:', error);
-    return NextResponse.json(
-      { error: 'Weekly reflection cron failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Weekly reflection cron failed' }, { status: 500 });
   }
 }
 
 // Also support GET for simple cron health checks
 export async function GET(request: NextRequest) {
   if (!CRON_SECRET) {
-    return NextResponse.json(
-      { error: 'CRON_SECRET not configured' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
   }
 
   const authHeader = request.headers.get('authorization');

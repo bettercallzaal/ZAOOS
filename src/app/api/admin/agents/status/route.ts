@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import type { AgentEvent, AgentStatus } from '@/components/admin/agents/constants';
+import { AGENTS, deriveStatus } from '@/components/admin/agents/constants';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { AGENTS } from '@/components/admin/agents/constants';
-import type { AgentEvent, AgentStatus } from '@/components/admin/agents/constants';
-import { deriveStatus } from '@/components/admin/agents/constants';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
@@ -33,10 +32,7 @@ export async function GET(req: NextRequest) {
           .select('*')
           .order('created_at', { ascending: false })
           .limit(50),
-        supabaseAdmin
-          .from('agent_events')
-          .select('agent_name')
-          .gte('created_at', dayAgo),
+        supabaseAdmin.from('agent_events').select('agent_name').gte('created_at', dayAgo),
       ]);
 
       const latestEvents = (latestResult.data || []) as AgentEvent[];

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
@@ -14,10 +14,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
 
-    let query = supabaseAdmin
-      .from('research_docs')
-      .select('*')
-      .order('id', { ascending: true });
+    let query = supabaseAdmin.from('research_docs').select('*').order('id', { ascending: true });
 
     if (search) {
       const safeSearch = search.replace(/[%_,().\\]/g, '');

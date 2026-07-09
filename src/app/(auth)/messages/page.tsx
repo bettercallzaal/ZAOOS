@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { XMTPProvider } from '@/contexts/XMTPContext';
 import { MessagesRoom } from '@/components/messages/MessagesRoom';
+import { XMTPProvider } from '@/contexts/XMTPContext';
 
 export const metadata: Metadata = { title: 'Messages - ZAO OS' };
 

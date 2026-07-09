@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   chainMock,
   mockAuthenticatedSession,
@@ -34,7 +34,9 @@ describe('POST /api/users/xmtp-address', () => {
     mockGetSessionData.mockResolvedValue(mockUnauthenticatedSession());
 
     const { POST } = await import('../route');
-    const res = await POST(makePostRequest({ xmtpAddress: '0x1234567890abcdef1234567890abcdef12345678' }));
+    const res = await POST(
+      makePostRequest({ xmtpAddress: '0x1234567890abcdef1234567890abcdef12345678' }),
+    );
     const json = await res.json();
 
     expect(res.status).toBe(401);

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { communityIssueSchema } from '@/lib/validation/schemas';
 import { logger } from '@/lib/logger';
+import { communityIssueSchema } from '@/lib/validation/schemas';
 
 const PAPERCLIP_API_URL = process.env.PAPERCLIP_API_URL || 'http://localhost:3100';
 const PAPERCLIP_API_KEY = process.env.PAPERCLIP_API_KEY || '';
@@ -54,7 +54,10 @@ export async function POST(req: NextRequest) {
 
   const parsed = communityIssueSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Validation failed', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { title, description, type, priority } = parsed.data;
@@ -112,10 +115,10 @@ export async function POST(req: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(PAPERCLIP_API_KEY ? { 'Authorization': `Bearer ${PAPERCLIP_API_KEY}` } : {}),
+            ...(PAPERCLIP_API_KEY ? { Authorization: `Bearer ${PAPERCLIP_API_KEY}` } : {}),
           },
           body: JSON.stringify(paperclipBody),
-        }
+        },
       );
 
       if (paperclipRes.ok) {

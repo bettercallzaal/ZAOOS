@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 interface PastRoomsProps {
@@ -19,7 +19,10 @@ function formatDuration(created: string, ended: string | null): string {
 
 function formatDate(dt: string): string {
   return new Date(dt).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 }
 
@@ -41,11 +44,11 @@ export default function PastRooms({ category }: PastRoomsProps) {
     }
   }, [days]);
 
-  useEffect(() => { fetchRooms(); }, [fetchRooms]);
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
-  const filtered = category === 'all'
-    ? rooms
-    : rooms.filter((r) => r.theme === category);
+  const filtered = category === 'all' ? rooms : rooms.filter((r) => r.theme === category);
 
   return (
     <div className="space-y-4">
@@ -73,7 +76,10 @@ export default function PastRooms({ category }: PastRoomsProps) {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-20" />
+            <div
+              key={i}
+              className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-20"
+            />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -83,23 +89,45 @@ export default function PastRooms({ category }: PastRoomsProps) {
       ) : (
         <div className="space-y-3">
           {filtered.map((room) => (
-            <div key={room.id} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors">
+            <div
+              key={room.id}
+              className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white text-sm font-bold mb-1 line-clamp-1">{room.title}</h4>
                   <div className="flex items-center gap-2 flex-wrap">
                     {room.host_pfp ? (
-                      <Image src={room.host_pfp} alt="" width={16} height={16} className="rounded-full" unoptimized />
+                      <Image
+                        src={room.host_pfp}
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="rounded-full"
+                        unoptimized
+                      />
                     ) : (
                       <div className="w-4 h-4 rounded-full bg-gray-700 text-[8px] flex items-center justify-center text-gray-400">
                         {room.host_name?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                     )}
                     <span className="text-gray-400 text-xs">{room.host_name}</span>
-                    <span className="text-gray-600 text-xs">{formatDate(room.ended_at || room.created_at)}</span>
+                    <span className="text-gray-600 text-xs">
+                      {formatDate(room.ended_at || room.created_at)}
+                    </span>
                     <span className="text-gray-600 text-xs flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       {formatDuration(room.created_at, room.ended_at)}
                     </span>
@@ -110,11 +138,25 @@ export default function PastRooms({ category }: PastRoomsProps) {
                     onClick={() => setPlayingRoomId(playingRoomId === room.id ? null : room.id)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/30 hover:bg-[#f5a623]/20 transition-colors"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
                       {playingRoomId === room.id ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+                        />
                       )}
                     </svg>
                     {playingRoomId === room.id ? 'Close' : 'Play Recording'}
@@ -127,7 +169,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
               </div>
               {playingRoomId === room.id && room.recording_url && (
                 <div className="mt-3 pt-3 border-t border-white/[0.08]">
-                  { }
+                  {}
                   <audio
                     controls
                     src={room.recording_url}

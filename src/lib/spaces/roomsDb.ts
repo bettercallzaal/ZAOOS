@@ -40,7 +40,13 @@ export async function createRoom(data: {
   roomType?: 'voice_channel' | 'stage';
   theme?: string;
   layoutPreference?: 'content-first' | 'speakers-first';
-  gateConfig?: { type: string; contractAddress: string; chainId: number; minBalance?: string; tokenId?: string };
+  gateConfig?: {
+    type: string;
+    contractAddress: string;
+    chainId: number;
+    minBalance?: string;
+    tokenId?: string;
+  };
   provider?: AudioProvider;
   slug?: string;
 }): Promise<Room> {
@@ -142,19 +148,22 @@ export async function updateLastActive(roomId: string): Promise<void> {
     .eq('id', roomId);
 }
 
-export async function updateLayoutPreference(roomId: string, layout: 'content-first' | 'speakers-first'): Promise<void> {
-  await supabaseAdmin
-    .from('rooms')
-    .update({ layout_preference: layout })
-    .eq('id', roomId);
+export async function updateLayoutPreference(
+  roomId: string,
+  layout: 'content-first' | 'speakers-first',
+): Promise<void> {
+  await supabaseAdmin.from('rooms').update({ layout_preference: layout }).eq('id', roomId);
 }
 
-export async function updateRoom(id: string, data: {
-  title?: string;
-  description?: string;
-  theme?: string;
-  thumbnail_url?: string;
-}): Promise<Room> {
+export async function updateRoom(
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    theme?: string;
+    thumbnail_url?: string;
+  },
+): Promise<Room> {
   const updates: Record<string, unknown> = {};
   if (data.title !== undefined) updates.title = data.title;
   if (data.description !== undefined) updates.description = data.description;

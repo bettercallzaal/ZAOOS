@@ -1,8 +1,9 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parseBczSite, scrapeBczSite, BczSiteError } from '../bcz-site';
+import { describe, expect, it } from 'vitest';
+import { BczSiteError, parseBczSite, scrapeBczSite } from '../bcz-site';
 import type { FetchImpl } from '../x-fetch';
 
 const fixture = readFileSync(join(__dirname, 'bcz-site-fixture.html'), 'utf-8');
@@ -55,14 +56,16 @@ describe('parseBczSite', () => {
 
 describe('scrapeBczSite', () => {
   it('fetches and parses the site', async () => {
-    const fetchImpl = (async () => ({ ok: true, status: 200, text: async () => fixture }) as Response) as unknown as FetchImpl;
+    const fetchImpl = (async () =>
+      ({ ok: true, status: 200, text: async () => fixture }) as Response) as unknown as FetchImpl;
     const site = await scrapeBczSite({ fetchImpl });
     expect(site.title).toMatch(/BetterCallZaal/);
     expect(site.projects.length).toBeGreaterThan(0);
   });
 
   it('throws on an HTTP error', async () => {
-    const fetchImpl = (async () => ({ ok: false, status: 503 }) as Response) as unknown as FetchImpl;
+    const fetchImpl = (async () =>
+      ({ ok: false, status: 503 }) as Response) as unknown as FetchImpl;
     await expect(scrapeBczSite({ fetchImpl })).rejects.toBeInstanceOf(BczSiteError);
   });
 });

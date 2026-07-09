@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface User {
   id: string;
@@ -34,7 +34,12 @@ export function ZidManager() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    },
+    [],
+  );
 
   const showFeedback = (type: 'success' | 'error', msg: string) => {
     setFeedback({ type, msg });
@@ -49,7 +54,9 @@ export function ZidManager() {
         const data = await res.json();
         setUsers(data.users || []);
       }
-    } catch (err) { console.error('[ZidManager] fetch users:', err); } finally {
+    } catch (err) {
+      console.error('[ZidManager] fetch users:', err);
+    } finally {
       setLoading(false);
     }
   }, []);
@@ -66,7 +73,9 @@ export function ZidManager() {
         }
         setRespectMap(map);
       }
-    } catch (err) { console.error('[ZidManager] fetch respect:', err); } finally {
+    } catch (err) {
+      console.error('[ZidManager] fetch respect:', err);
+    } finally {
       setRespectLoading(false);
     }
   }, []);
@@ -95,7 +104,10 @@ export function ZidManager() {
       });
       const data = await res.json();
       if (res.ok) {
-        showFeedback('success', `${user.display_name || user.username || 'User'} → ZID #${data.user?.zid}`);
+        showFeedback(
+          'success',
+          `${user.display_name || user.username || 'User'} → ZID #${data.user?.zid}`,
+        );
         fetchUsers();
       } else {
         showFeedback('error', data.error || 'Failed to assign');
@@ -142,9 +154,13 @@ export function ZidManager() {
     <div>
       {/* Feedback */}
       {feedback && (
-        <div className={`fixed top-4 right-4 z-[70] px-4 py-2 rounded-lg text-sm font-medium shadow-lg ${
-          feedback.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
-        }`}>
+        <div
+          className={`fixed top-4 right-4 z-[70] px-4 py-2 rounded-lg text-sm font-medium shadow-lg ${
+            feedback.type === 'success'
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+          }`}
+        >
           {feedback.msg}
         </div>
       )}
@@ -164,7 +180,9 @@ export function ZidManager() {
           <p className="text-xs text-gray-400 mt-1">No Respect Yet</p>
         </div>
         <div className="bg-[#1a2a3a] rounded-xl p-4">
-          <p className="text-2xl font-bold text-white">{withZid.length > 0 ? Math.max(...withZid.map((u) => u.zid || 0)) : 0}</p>
+          <p className="text-2xl font-bold text-white">
+            {withZid.length > 0 ? Math.max(...withZid.map((u) => u.zid || 0)) : 0}
+          </p>
           <p className="text-xs text-gray-400 mt-1">Highest ZID</p>
         </div>
       </div>
@@ -180,7 +198,8 @@ export function ZidManager() {
           <li>Once assigned, a ZID never changes</li>
         </ul>
         <p className="text-[10px] text-gray-600 mt-2">
-          After assigning all early testers, run in Supabase: SELECT setval(&apos;zid_seq&apos;, 99);
+          After assigning all early testers, run in Supabase: SELECT setval(&apos;zid_seq&apos;,
+          99);
         </p>
       </div>
 
@@ -196,9 +215,18 @@ export function ZidManager() {
             {eligibleNoZid.map((user) => {
               const respect = getRespect(user);
               return (
-                <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-3 border border-green-500/20">
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-3 border border-green-500/20"
+                >
                   {user.pfp_url ? (
-                    <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={36} height={36} className="rounded-full flex-shrink-0" />
+                    <Image
+                      src={user.pfp_url}
+                      alt={`${user.display_name || user.username || 'User'} avatar`}
+                      width={36}
+                      height={36}
+                      className="rounded-full flex-shrink-0"
+                    />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -214,7 +242,9 @@ export function ZidManager() {
                     </div>
                   </div>
                   <div className="text-right mr-3">
-                    <p className="text-sm font-bold text-white">{respect?.totalRespect.toLocaleString()}</p>
+                    <p className="text-sm font-bold text-white">
+                      {respect?.totalRespect.toLocaleString()}
+                    </p>
                     <p className="text-[10px] text-gray-500">
                       {respect?.ogRespect ? `${respect.ogRespect} OG` : ''}
                       {respect?.ogRespect && respect?.zorRespect ? ' + ' : ''}
@@ -252,12 +282,21 @@ export function ZidManager() {
             {withZid.map((user) => {
               const respect = getRespect(user);
               return (
-                <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-2.5">
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-2.5"
+                >
                   <span className="text-lg font-bold text-[#f5a623] w-12 text-center flex-shrink-0">
                     #{user.zid}
                   </span>
                   {user.pfp_url ? (
-                    <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
+                    <Image
+                      src={user.pfp_url}
+                      alt={`${user.display_name || user.username || 'User'} avatar`}
+                      width={32}
+                      height={32}
+                      className="rounded-full flex-shrink-0"
+                    />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -273,7 +312,9 @@ export function ZidManager() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-white">{respect?.totalRespect.toLocaleString() || '0'}</p>
+                    <p className="text-sm font-bold text-white">
+                      {respect?.totalRespect.toLocaleString() || '0'}
+                    </p>
                     <p className="text-[10px] text-gray-500">
                       {respect?.firstTokenDate ? `since ${respect.firstTokenDate}` : 'respect'}
                     </p>
@@ -293,9 +334,18 @@ export function ZidManager() {
           </p>
           <div className="space-y-1">
             {noRespectNoZid.map((user) => (
-              <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a]/50 rounded-xl px-4 py-2.5 opacity-60">
+              <div
+                key={user.id}
+                className="flex items-center gap-3 bg-[#1a2a3a]/50 rounded-xl px-4 py-2.5 opacity-60"
+              >
                 {user.pfp_url ? (
-                  <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
+                  <Image
+                    src={user.pfp_url}
+                    alt={`${user.display_name || user.username || 'User'} avatar`}
+                    width={32}
+                    height={32}
+                    className="rounded-full flex-shrink-0"
+                  />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                     {user.primary_wallet.slice(2, 4)}

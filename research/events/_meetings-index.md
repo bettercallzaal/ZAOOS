@@ -4,6 +4,16 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-08 | ZABAL Gamez x POIDH fireside - Kenny, Thy Revolution, Mauro | ZABAL Games / POIDH | Zaal, Kenny, Thy Revolution, Mauro | [994](994-zabal-gamez-poidh-fireside-unlock-jul8/) | 11 |
+| 2026-06-29 | Deez x Zaal - Boardwalk token launcher | ZABAL Games / Tokenization | Zaal, Deez | [953](953-deez-boardwalk-token-launcher/) | n/a |
+| 2026-06-28 | ViniApp x Zaal - brainstorm session | ZABAL Games | Zaal, ViniApp team | [952](952-viniapp-brainstorm/) | n/a |
+| 2026-06-27 | Greg (Autonomous) x Zaal - WaveWarZ legal structure | WaveWarZ | Zaal, Greg | [951](951-greg-autonomous-wavewarz-legal/) | n/a |
+| 2026-06-26 | Ohnahji x Zaal - strategic session | The ZAO | Zaal, Ohnahji | [950](950-ohnahji-zaal-strat-sesh/) | n/a |
+| 2026-06-25 | Brandon (WaveWarZ) x Zaal - ZABAL Gamez intro | WaveWarZ / ZABAL Games | Zaal, Brandon | [949](949-brandon-wavewarz-zabal-gamez-intro/) | n/a |
+| 2026-06-25 | Sistla x Zaal - Creator Studio partnership call | BCZ / partnership | Zaal, Sistla | [940](940-sistla-creator-studio-partnership/) | n/a |
+| 2026-06-24 | Empire Builder x Zaal - ZABAL Gamez build session | ZABAL Games | Zaal, Jordan, Iman | [948](948-empire-builder-zabal-gamez-build-sesh/) | n/a |
+| 2026-06-22 | Marie x Zaal - ZAO Fund intake | The ZAO / Fund | Zaal, Marie | [947](947-marie-zaal-zao-fund-intake/) | n/a |
+| 2026-06-27 | X Space: Wide cause-coins + WaveWarZ x ZAO crossover | The ZAO / WaveWarZ / BD | Zaal, Aaron Rafferty, Candy, Moses, +7 | [913](913-wide-cause-coins-wavewarz-zao-space/) | 4 |
 | 2026-06-17 | Thy Rev x Zaal - COC Concertz framing + laptop (resolves Fellenz #4) | COC Concertz / The ZAO | Zaal, Thy Revolution | [866](866-thyrev-zaal-coc-framing-laptop/) | 7 |
 | 2026-06-09 | Bayo x Zaal - MPC / Atrium / cross-collab catch-up | The ZAO / BD | Zaal, Bayo | [841](841-bayo-zaal-mpc-atrium-bd/) | 7 |
 | 2026-06-10 | WIP Meetup x ZABAL Games - co-hosted event prep (event Jun 11) | ZABAL Games / ZAO Devz | Zaal, rizzle | [840](840-wip-meetup-zabal-games-event-prep/) | 6 |

@@ -14,11 +14,10 @@
  * close the unsigned-FID account-impersonation surface — needs a real
  * miniapp-launch test before flipping the client.
  */
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkAllowlist } from '@/lib/gates/allowlist';
 import { getUserByFid } from '@/lib/farcaster/neynar';
-import { saveSession } from '@/lib/auth/session';
+import { checkAllowlist } from '@/lib/gates/allowlist';
 import { logger } from '@/lib/logger';
 
 const BodySchema = z.object({
@@ -52,24 +51,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (hasAccess) {
-      // SECURITY: the FID here is UNSIGNED (client-supplied). Never grant admin
-      // from this path — otherwise POSTing the public admin FID would mint an
-      // admin session. Admin requires the JWT-verified /api/miniapp/auth path.
-      await saveSession(
-        {
-          fid,
-          username: neynarUser.username || '',
-          displayName: neynarUser.display_name || '',
-          pfpUrl: neynarUser.pfp_url || '',
-        },
-        { allowAdmin: false },
-      );
-    }
-
+    // SECURITY: FID is UNSIGNED (client-supplied). Do NOT persist a session
+    // from this path — this would allow account impersonation. Return only
+    // a read-only context flag for UI purposes. Sensitive operations must use
+    // the JWT-verified /api/miniapp/auth path (QuickAuth). See GitHub issue.
     return NextResponse.json({
+      allowlisted: hasAccess,
       fid,
-      hasAccess,
       username: neynarUser.username || '',
       displayName: neynarUser.display_name || '',
       pfpUrl: neynarUser.pfp_url || '',

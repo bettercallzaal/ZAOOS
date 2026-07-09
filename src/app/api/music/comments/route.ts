@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { upsertSong } from '@/lib/music/library';
-import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { logger } from '@/lib/logger';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { upsertSong } from '@/lib/music/library';
 
 const commentSchema = z.object({
   url: z.string().url().max(500),
@@ -68,7 +68,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = commentSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { url, comment, timestampMs } = parsed.data;
@@ -151,10 +154,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('song_comments')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('song_comments').delete().eq('id', id);
 
     if (error) throw error;
 

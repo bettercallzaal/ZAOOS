@@ -23,10 +23,7 @@ export default function Error({
           >
             Try again
           </button>
-          <Link
-            href="/chat"
-            className="text-gray-400 text-sm hover:text-white transition-colors"
-          >
+          <Link href="/chat" className="text-gray-400 text-sm hover:text-white transition-colors">
             Go home
           </Link>
         </div>

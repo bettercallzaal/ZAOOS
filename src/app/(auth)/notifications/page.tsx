@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
 interface Notification {
@@ -51,9 +51,10 @@ export default function NotificationsPage() {
     setLoading(false);
   }, [filter]);
 
-   
-  useEffect(() => { setLoading(true); fetchNotifications(); }, [fetchNotifications]);
-   
+  useEffect(() => {
+    setLoading(true);
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const markAllRead = async () => {
     await fetch('/api/notifications', {
@@ -70,10 +71,10 @@ export default function NotificationsPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: [id] }),
     });
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] pb-36 text-white">
@@ -81,16 +82,20 @@ export default function NotificationsPage() {
         title="Notifications"
         backHref="/home"
         count={unreadCount > 0 ? unreadCount : undefined}
-        rightAction={unreadCount > 0 ? (
-          <button onClick={markAllRead} className="text-xs text-[#f5a623] hover:text-[#ffd700] font-medium">
-            Mark all read
-          </button>
-        ) : undefined}
+        rightAction={
+          unreadCount > 0 ? (
+            <button
+              onClick={markAllRead}
+              className="text-xs text-[#f5a623] hover:text-[#ffd700] font-medium"
+            >
+              Mark all read
+            </button>
+          ) : undefined
+        }
       />
       <div className="max-w-2xl mx-auto px-4 py-6">
-
         <div className="flex gap-2 mb-4">
-          {(['all', 'unread'] as const).map(f => (
+          {(['all', 'unread'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -134,7 +139,7 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <div className="space-y-1">
-            {notifications.map(n => (
+            {notifications.map((n) => (
               <NotificationItem key={n.id} notification={n} onMarkRead={markRead} />
             ))}
           </div>
@@ -163,17 +168,35 @@ const NotificationItem = memo(function NotificationItem({
     >
       {n.actor_pfp_url ? (
         <div className="w-8 h-8 relative flex-shrink-0">
-          <Image src={n.actor_pfp_url} alt="" fill className="rounded-full object-cover" unoptimized />
+          <Image
+            src={n.actor_pfp_url}
+            alt=""
+            fill
+            className="rounded-full object-cover"
+            unoptimized
+          />
         </div>
       ) : (
         <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={typeIcons[n.type] || typeIcons.system} />
+          <svg
+            className="w-4 h-4 text-gray-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={typeIcons[n.type] || typeIcons.system}
+            />
           </svg>
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm ${n.read ? 'text-gray-300' : 'text-white font-medium'}`}>{n.title}</p>
+        <p className={`text-sm ${n.read ? 'text-gray-300' : 'text-white font-medium'}`}>
+          {n.title}
+        </p>
         {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{n.body}</p>}
         <p className="text-[10px] text-gray-600 mt-1">{timeAgo(n.created_at)}</p>
       </div>

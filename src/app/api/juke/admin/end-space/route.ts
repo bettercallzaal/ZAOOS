@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
@@ -167,7 +167,4 @@ export async function POST(request: NextRequest) {
 }
 
 export const GET = () =>
-  NextResponse.json(
-    { ok: false, error: 'POST only - send { spaceId } as JSON' },
-    { status: 405 },
-  );
+  NextResponse.json({ ok: false, error: 'POST only - send { spaceId } as JSON' }, { status: 405 });

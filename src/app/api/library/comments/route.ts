@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { libraryCommentSchema } from '@/lib/validation/library-schemas';
-import { moderateContent } from '@/lib/moderation/moderate';
 import { logger } from '@/lib/logger';
+import { moderateContent } from '@/lib/moderation/moderate';
+import { libraryCommentSchema } from '@/lib/validation/library-schemas';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -60,10 +60,7 @@ export async function POST(req: NextRequest) {
 
     const modResult = await moderateContent(commentBody);
     if (modResult.action === 'hide') {
-      return NextResponse.json(
-        { error: 'Comment flagged by moderation' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Comment flagged by moderation' }, { status: 400 });
     }
 
     const { data: comment, error: insertError } = await supabaseAdmin

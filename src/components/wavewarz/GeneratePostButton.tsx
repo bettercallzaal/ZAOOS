@@ -93,7 +93,9 @@ export function GeneratePostButton() {
       )}
 
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
-      {success && <p className="mt-2 text-xs text-emerald-400">Proposal created! Check the governance tab.</p>}
+      {success && (
+        <p className="mt-2 text-xs text-emerald-400">Proposal created! Check the governance tab.</p>
+      )}
     </div>
   );
 }

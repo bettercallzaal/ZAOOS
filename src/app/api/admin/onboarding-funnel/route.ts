@@ -13,42 +13,34 @@ export async function GET() {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const [
-      allowlisted,
-      walletConnected,
-      fidLinked,
-      inRespectDb,
-      attendedFractal,
-      earnedRespect,
-    ] = await Promise.allSettled([
-      supabaseAdmin
-        .from('allowlist')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true),
-      supabaseAdmin
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true),
-      supabaseAdmin
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .not('fid', 'is', null)
-        .eq('is_active', true),
-      supabaseAdmin
-        .from('respect_members')
-        .select('*', { count: 'exact', head: true }),
-      supabaseAdmin
-        .from('respect_members')
-        .select('*', { count: 'exact', head: true })
-        .gt('fractal_count', 0),
-      supabaseAdmin
-        .from('respect_members')
-        .select('*', { count: 'exact', head: true })
-        .gt('total_respect', 0),
-    ]);
+    const [allowlisted, walletConnected, fidLinked, inRespectDb, attendedFractal, earnedRespect] =
+      await Promise.allSettled([
+        supabaseAdmin
+          .from('allowlist')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true),
+        supabaseAdmin
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true),
+        supabaseAdmin
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+          .not('fid', 'is', null)
+          .eq('is_active', true),
+        supabaseAdmin.from('respect_members').select('*', { count: 'exact', head: true }),
+        supabaseAdmin
+          .from('respect_members')
+          .select('*', { count: 'exact', head: true })
+          .gt('fractal_count', 0),
+        supabaseAdmin
+          .from('respect_members')
+          .select('*', { count: 'exact', head: true })
+          .gt('total_respect', 0),
+      ]);
 
     function extractCount(
-      result: PromiseSettledResult<{ count: number | null; error: unknown }>
+      result: PromiseSettledResult<{ count: number | null; error: unknown }>,
     ): number {
       if (result.status === 'fulfilled' && !result.value.error) {
         return result.value.count ?? 0;
@@ -92,9 +84,6 @@ export async function GET() {
     return NextResponse.json({ stages });
   } catch (error) {
     logger.error('[onboarding-funnel] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to load onboarding funnel data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load onboarding funnel data' }, { status: 500 });
   }
 }

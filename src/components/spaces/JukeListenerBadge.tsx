@@ -43,9 +43,7 @@ export function JukeListenerBadge({
         <ul className="mt-2 flex flex-wrap items-center gap-1.5">
           {visible.map((p) => {
             const label =
-              p.display_name && p.display_name.trim().length > 0
-                ? p.display_name
-                : `fid ${p.fid}`;
+              p.display_name && p.display_name.trim().length > 0 ? p.display_name : `fid ${p.fid}`;
             return (
               <li key={p.fid}>
                 <a
@@ -56,11 +54,7 @@ export function JukeListenerBadge({
                   title={`FID ${p.fid}`}
                 >
                   {p.role === 'host' && (
-                    <span
-                      className="text-[#f5a623]"
-                      aria-label="host"
-                      title="host"
-                    >
+                    <span className="text-[#f5a623]" aria-label="host" title="host">
                       *
                     </span>
                   )}

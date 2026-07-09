@@ -32,9 +32,7 @@ export const WaveWarzStatsSchema = z.object({
 
 export type WaveWarzStats = z.infer<typeof WaveWarzStatsSchema>;
 
-export type WaveWarzParseResult =
-  | { ok: true; data: WaveWarzStats }
-  | { ok: false; reason: string };
+export type WaveWarzParseResult = { ok: true; data: WaveWarzStats } | { ok: false; reason: string };
 
 /** Flight data escapes quotes as \". Normalize so the extractors can match plain JSON. */
 function unescapeFlight(html: string): string {
@@ -122,7 +120,10 @@ export function parseWaveWarzArtistPage(html: string, wallet: string): WaveWarzP
 
   const parsed = WaveWarzStatsSchema.safeParse(candidate);
   if (!parsed.success) {
-    return { ok: false, reason: `validation failed: ${parsed.error.issues[0]?.message ?? 'unknown'}` };
+    return {
+      ok: false,
+      reason: `validation failed: ${parsed.error.issues[0]?.message ?? 'unknown'}`,
+    };
   }
   return { ok: true, data: parsed.data };
 }

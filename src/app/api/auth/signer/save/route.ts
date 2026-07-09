@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSession, getSessionData } from '@/lib/auth/session';
 import { getSignerStatus } from '@/lib/farcaster/neynar';
-import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const saveSignerSchema = z.object({
@@ -30,10 +30,7 @@ export async function POST(req: NextRequest) {
     // Verify with Neynar that the signer actually belongs to this user's FID
     const signerStatus = await getSignerStatus(parsed.data.signerUuid);
     if (!signerStatus.fid || signerStatus.fid !== sessionData.fid) {
-      return NextResponse.json(
-        { error: 'Signer does not belong to this user' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Signer does not belong to this user' }, { status: 403 });
     }
 
     // Save signer_uuid to session

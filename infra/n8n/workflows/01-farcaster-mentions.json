@@ -1,0 +1,258 @@
+{
+  "id": "da785c1c-00ad-4a99-a61e-44d62dbc0772",
+  "name": "01 - Farcaster Mentions to Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 10 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.neynar.com/v2/farcaster/notifications",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fid",
+              "value": "={{ $env.NEYNAR_ZAAL_FID || 19640 }}"
+            },
+            {
+              "name": "type",
+              "value": "mentions"
+            },
+            {
+              "name": "limit",
+              "value": "25"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.NEYNAR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-neynar-zaal",
+      "name": "Get Zaal Mentions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Comma-separated brand/keyword watchlist, editable in ~/n8n/.env without\n// touching this workflow - e.g. NEYNAR_WATCH_KEYWORDS=thezao,zabal,zabalgames\nconst raw = $env.NEYNAR_WATCH_KEYWORDS || 'thezao,zabal';\nconst keywords = raw.split(',').map((k) => k.trim()).filter(Boolean);\n\nreturn keywords.map((keyword) => ({ json: { keyword } }));"
+      },
+      "id": "get-watch-keywords",
+      "name": "Get Watch Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.neynar.com/v2/farcaster/cast/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "limit",
+              "value": "25"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.NEYNAR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-neynar-keywords",
+      "name": "Search Keyword Mentions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-results",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Flatten Neynar notifications + cast-search responses into one list,\n// then drop anything already alerted on a previous poll (tracked in\n// this node's workflow static data so it survives across executions).\nconst staticData = $getWorkflowStaticData('node');\nif (!staticData.seenHashes) staticData.seenHashes = [];\nconst seen = new Set(staticData.seenHashes);\n\nconst out = [];\n\nfor (const item of $input.all()) {\n  const j = item.json || {};\n  const list = j.notifications || (j.result && j.result.casts) || j.casts || [];\n\n  for (const entry of list) {\n    const cast = entry.cast || entry;\n    const hash = cast && cast.hash;\n    if (!hash || seen.has(hash)) continue;\n    seen.add(hash);\n\n    const username = (cast.author && cast.author.username) || 'unknown';\n    out.push({\n      json: {\n        hash,\n        author: username,\n        text: cast.text || '',\n        url: `https://warpcast.com/${username}/${hash.slice(0, 10)}`,\n        type: entry.type || 'search',\n        timestamp: entry.most_recent_timestamp || cast.timestamp || null\n      }\n    });\n  }\n}\n\n// Cap growth of the seen-set so static data doesn't grow unbounded.\nstaticData.seenHashes = Array.from(seen).slice(-500);\n\nreturn out;"
+      },
+      "id": "filter-new",
+      "name": "Filter New",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+            },
+            {
+              "name": "text",
+              "value": "=New Farcaster mention from @{{ $json.author }}:\n\n{{ $json.text }}\n\n{{ $json.url }}"
+            },
+            {
+              "name": "disable_web_page_preview",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-telegram",
+      "name": "Telegram sendMessage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Every 10 min": {
+      "main": [
+        [
+          {
+            "node": "Get Zaal Mentions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Watch Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Zaal Mentions": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Watch Keywords": {
+      "main": [
+        [
+          {
+            "node": "Search Keyword Mentions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Keyword Mentions": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New": {
+      "main": [
+        [
+          {
+            "node": "Telegram sendMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

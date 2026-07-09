@@ -15,6 +15,8 @@ reference them as `{{$env.VAR}}` so no key lands in a workflow JSON. Host `.env`
 
 ```
 NEYNAR_API_KEY=...          # Farcaster reads (from bot/.env)
+NEYNAR_ZAAL_FID=19640        # optional, workflow 1 defaults to 19640 if unset
+NEYNAR_WATCH_KEYWORDS=thezao,zabal   # optional, comma-separated brand watchlist for workflow 1 - add words here, no JSON edits needed
 TELEGRAM_BOT_TOKEN=...       # ZOE bot or a dedicated n8n-alerts bot
 TELEGRAM_CHAT_ID=1447437687
 COWORK_TRACKER_URL=...       # Supabase PostgREST
@@ -23,7 +25,7 @@ GITHUB_TOKEN=...             # read-only, watched repos
 ```
 
 ## Workflow build queue (doc 1002 top-3, built in a loop)
-1. **Farcaster mention -> Telegram** - scheduled poll of Neynar mentions for @zaal / @thezao -> Telegram alert. Poll-based (no inbound webhook = no public exposure needed). `workflows/01-farcaster-mentions.json`.
+1. **Farcaster mention -> Telegram** - scheduled poll of Neynar mentions for @zaal + a keyword watchlist (`NEYNAR_WATCH_KEYWORDS` env, default `thezao,zabal` - add more brand terms there, no workflow edit needed) -> Telegram alert. Poll-based (no inbound webhook = no public exposure needed). `workflows/01-farcaster-mentions.json`.
 2. **Newsletter publish -> auto cross-post** - Paragraph/RSS new-post -> draft cross-posts. `workflows/02-newsletter-crosspost.json`.
 3. **GitHub PR merged -> tracker row + announce** - PR merge -> cowork tracker row + Telegram. `workflows/03-github-pr-tracker.json`.
 

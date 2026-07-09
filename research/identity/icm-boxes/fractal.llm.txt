@@ -1,0 +1,23 @@
+# ICM: The Fractal + Respect (ZAO governance)
+
+The Fractal is The ZAO's governance process; Respect is its on-chain contribution currency. This is how The ZAO makes decisions and rewards contribution.
+
+## Respect (the currency)
+- A soulbound OG ERC-20 plus a ZOR ERC-1155, both on Optimism. Soulbound = non-transferable; it measures contribution, not capital.
+- Verified on-chain (2026-07-05): 156 unique Respect holders (122 OG + 55 ZOR, 21 hold both); OG distribution Gini roughly 0.73.
+
+## The Respect Game (weekly)
+- A weekly meeting where contributors rank each other's contributions; rewards follow a Fibonacci curve. It has run ~100+ unbroken weeks (since 2024-07-30).
+
+## OREC (execution)
+- OREC = Optimistic Respect Execution Contract - on-chain proposal execution with a 72-hour voting window plus a 72-hour veto window. Respect-weighted, optimistic (passes unless vetoed).
+
+## Why it matters
+- This is the mechanism behind "return profit, data, and IP to artists" - contribution, not speculation, drives governance and rewards. It is the heart of The ZAO as an impact network.
+
+## Find it
+- thezao.xyz/papers (whitepaper + technical whitepaper describe the Fractal + Respect)
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)

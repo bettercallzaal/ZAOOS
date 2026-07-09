@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-08 | ZABAL Gamez x POIDH fireside - Kenny, Thy Revolution, Mauro | ZABAL Games / POIDH | Zaal, Kenny, Thy Revolution, Mauro | [994](994-zabal-gamez-poidh-fireside-unlock-jul8/) | 11 |
 | 2026-06-29 | Deez x Zaal - Boardwalk token launcher | ZABAL Games / Tokenization | Zaal, Deez | [953](953-deez-boardwalk-token-launcher/) | n/a |
 | 2026-06-28 | ViniApp x Zaal - brainstorm session | ZABAL Games | Zaal, ViniApp team | [952](952-viniapp-brainstorm/) | n/a |
 | 2026-06-27 | Greg (Autonomous) x Zaal - WaveWarZ legal structure | WaveWarZ | Zaal, Greg | [951](951-greg-autonomous-wavewarz-legal/) | n/a |

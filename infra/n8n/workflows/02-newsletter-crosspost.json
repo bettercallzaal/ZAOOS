@@ -1,0 +1,162 @@
+{
+  "id": "f3a9c1e2-6b4d-4e8a-9c1f-2d7e5a8b3c4f",
+  "name": "02 - Newsletter Publish to Cross-Post Drafts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://public.api.paragraph.com/api/v1/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.PARAGRAPH_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-paragraph-posts",
+      "name": "Get Paragraph Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Neither n8n's cron history nor Paragraph give us a \"since\" filter,\n// so track the newest post id we've already alerted on in this node's\n// workflow static data and only emit posts published after it.\n// First-ever run seeds the seen-list from the current post set instead\n// of firing a backlog blast for every historical newsletter issue.\nconst staticData = $getWorkflowStaticData('node');\n\nconst body = $input.first().json || {};\nconst posts = body.posts || body.data || (Array.isArray(body) ? body : []);\n\nconst normalized = posts.map((p) => ({\n  id: p.id || p.postId || p.slug,\n  title: p.title || '(untitled)',\n  subtitle: p.subtitle || p.excerpt || '',\n  url: p.url || p.postUrl || (p.slug ? `https://paragraph.com/@thezao/${p.slug}` : ''),\n  publishedAt: p.publishedAt || p.createdAt || p.updatedAt || null\n})).filter((p) => p.id);\n\nnormalized.sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));\n\nif (!staticData.seenIds) {\n  // First run: seed with everything currently published, emit nothing.\n  staticData.seenIds = normalized.map((p) => p.id);\n  return [];\n}\n\nconst seen = new Set(staticData.seenIds);\nconst fresh = normalized.filter((p) => !seen.has(p.id));\n\nfresh.forEach((p) => seen.add(p.id));\nstaticData.seenIds = Array.from(seen).slice(-200);\n\nreturn fresh.map((p) => ({ json: p }));"
+      },
+      "id": "filter-new-post",
+      "name": "Filter New Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n stays plumbing here: template-based per-platform draft copy,\n// no AI generation (that reasoning step belongs to ZOE, not this workflow).\nreturn $input.all().map((item) => {\n  const { title, subtitle, url } = item.json;\n\n  const x = `New from The ZAO: ${title}\\n\\nRead -> ${url}`;\n  const farcaster = `${title} just dropped\\n\\n${url}`;\n  const discord = `**${title}**\\n${subtitle}\\n\\n${url}`;\n  const telegram = `${title}\\n\\n${url}`;\n  const linkedin = `Excited to share our latest newsletter: ${title}.\\n\\n${subtitle}\\n\\nRead the full issue: ${url}`;\n  const facebook = `New issue is live: ${title}\\n\\n${url}`;\n\n  const draftMessage = [\n    `Draft cross-posts for: ${title}`,\n    '',\n    `[X]\\n${x}`,\n    '',\n    `[Farcaster]\\n${farcaster}`,\n    '',\n    `[Discord]\\n${discord}`,\n    '',\n    `[Telegram]\\n${telegram}`,\n    '',\n    `[LinkedIn]\\n${linkedin}`,\n    '',\n    `[Facebook]\\n${facebook}`\n  ].join('\\n');\n\n  return { json: { title, url, draftMessage } };\n});"
+      },
+      "id": "generate-drafts",
+      "name": "Generate Cross-Post Drafts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.draftMessage }}"
+            },
+            {
+              "name": "disable_web_page_preview",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-telegram",
+      "name": "Telegram sendMessage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1140,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Get Paragraph Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Paragraph Posts": {
+      "main": [
+        [
+          {
+            "node": "Filter New Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Post": {
+      "main": [
+        [
+          {
+            "node": "Generate Cross-Post Drafts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cross-Post Drafts": {
+      "main": [
+        [
+          {
+            "node": "Telegram sendMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

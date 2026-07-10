@@ -90,6 +90,7 @@ import {
 import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
+import { activeFleet } from './fleet';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -745,7 +746,11 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
   }).catch((e) => console.error('[zoe/index] media turn failed:', (e as Error)?.message));
 });
 
-async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
+async function handlePrivateMessage(
+  ctx: Context,
+  text: string,
+  brain?: { icmBoxId: string | null },
+): Promise<void> {
   // Track activity for inactivity detection (best-effort: never blocks the handler).
   touchLastSeen().catch(() => {});
   // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
@@ -1050,7 +1055,7 @@ async function dispatchConcierge(
       ctx.chat && 'title' in ctx.chat ? ctx.chat.title : undefined;
     await pushRecent({ from: label === 'Zaal' ? 'zaal' : 'other', text, sender: label }, scope);
 
-    const blocks = await buildMemoryBlocks(scope, chatTitle);
+    const blocks = await buildMemoryBlocks(scope, chatTitle, brain);
     // doc 796 Move 2: surface live commitment threads so the concierge can
     // resolve/snooze/drop them by id (DMs with Zaal only).
     if (scope === 'private') blocks.open_threads = renderOpenThreadsBlock();
@@ -1838,6 +1843,33 @@ async function main(): Promise<void> {
       return { reply: result.reply, todo_marked: todoMarked };
     },
   });
+
+  // Bot-factory (doc 1021): run the rest of the fleet from THIS same process.
+  // Each non-ZOE bot gets a lean, Zaal-gated DM handler that answers with its
+  // ICM box as its brain (via handlePrivateMessage's brain param). ZOE's own
+  // handlers above are untouched. Started non-awaited so they poll alongside
+  // ZOE's blocking bot.start below.
+  for (const self of activeFleet()) {
+    if (self.tokenEnvVar === 'ZOE_BOT_TOKEN') continue; // ZOE is `bot`, already wired
+    const childToken = process.env[self.tokenEnvVar];
+    if (!childToken) continue;
+    const child = new Bot(childToken);
+    child.on('message:text', async (ctx) => {
+      const text = ctx.message.text;
+      if (text.startsWith('/')) return;
+      if (ctx.chat.type !== 'private') return; // MVP: DMs only
+      if (!isFromZaal(ctx)) return; // internal audience: Zaal-gated
+      enqueueTurn(ctx.chat.id, () =>
+        handlePrivateMessage(ctx, text, { icmBoxId: self.icmBoxId }),
+      ).catch((e) => console.error(`[zoe/fleet] ${self.name} turn failed:`, (e as Error)?.message));
+    });
+    void child
+      .start({
+        onStart: () =>
+          console.log(`[zoe/fleet] ${self.name} polling (brain: ${self.icmBoxId ?? 'default'})`),
+      })
+      .catch((e) => console.error(`[zoe/fleet] ${self.name} failed to start:`, (e as Error)?.message));
+  }
 
   await bot.start({
     onStart: (info) => {

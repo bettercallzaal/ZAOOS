@@ -4,12 +4,12 @@ type: decision
 status: research-complete
 last-validated: 2026-07-09
 superseded-by:
-related-docs: "610, 692, 766, 955, 1007"
+related-docs: "610, 692, 766, 816, 825, 826, 955, 1007"
 original-query: "can we just improve our whole database solution for all of the projects across the zao"
 tier: DISPATCH
 ---
 
-# 1008 — ZAO Ecosystem Database Architecture: Cross-Project Audit + Consolidation Decision
+# 1009 — ZAO Ecosystem Database Architecture: Cross-Project Audit + Consolidation Decision
 
 > **Goal:** Triggered by today's ZAOcowork `team_members.primary_team does not exist` bug. Map every known ZAO Supabase project, find the actual root cause behind this class of bug (it has now happened at least three times), and give a real recommendation - not just "should we consolidate."
 
@@ -22,6 +22,8 @@ tier: DISPATCH
 | **Run Supabase's free built-in Database Advisor (Security Advisor rule 0013, RLS-disabled-in-public) against every known ZAO project this week** | A real RLS gap already happened once in ZAOcowork - `team_members.password_hash` was exposed to the public anon key until migration 013 fixed it. Nobody has checked whether the same gap exists in ZAOstock, the ZAOOS cowork tracker, or the legacy bot project. This is a 10-minute-per-project check with a free built-in tool |
 | **Confirm the pricing tier and backup/PITR status of every known project** | Free tier has zero automated backups. Nobody checked this session which of the 4+ known projects (`efsxtoxvigqowjhgcbiz`, `etwvzrmlxeobinrlytza`, `yjrlaxpjusmrfylumban`, ZAOcowork's own) are actually on Free vs. Pro, so nobody knows which ones have zero backup coverage right now |
 | **Fix the citation gap in migration 013 itself** | The migration's own header attributes the RLS discovery to "Audit doc-766 / the role_table_grants check," but doc 766 as it exists in the research library explicitly claims the opposite ("Security/RLS/payment/signing surfaces all ship with full implementation - no TODOs in critical paths") and never mentions RLS or password hashes anywhere in its text. Either the citation is wrong, or the real audit that caught this was never written up as a doc - either way, the trail is currently broken |
+| **Close out doc 826's two most relevant overdue actions NOW, not as new work** | Doc 826 (2026-06-09) already flagged "collapse the cowork-tracker 4-repos-to-1" and "provide read-only Vercel + Supabase tokens" as this-week/next actions, owner Zaal. Both are still open 30+ days later. These are the same access and consolidation gaps this doc independently rediscovered - fixing them isn't new scope, it's finishing month-old, already-scoped work |
+| **Treat this doc as Supabase-only, not "the whole database solution"** | Doc 826 confirms Firebase is a second, fully separate platform (CoC Concertz, wavewarzapp) with its own console, backups, and security model. Nothing in this doc's findings or Next Actions covers it. A real answer to "improve our whole database solution" needs a Firebase-side pass too - scoped as its own follow-up, not silently ignored |
 
 ## Findings
 
@@ -36,7 +38,7 @@ Confirmed project refs found directly in local env files and prior research (not
 | `yjrlaxpjusmrfylumban` | ZAOstock (canonical since 2026-05-04 per doc 609/610) | Doc 610 |
 | (ref not captured locally) | ZAOcowork's own project (`team_members`, `tasks`, `sponsors`, etc.) | `ZAOcowork/.env.example` confirms a distinct `SUPABASE_URL` var, not one of the three above - this repo was cloned fresh this session and had never been checked out locally before |
 
-FISHBOWLZ is documented elsewhere in the skill's own project table as Supabase-backed but its project ref was not checked this session. **COC Concertz also has a live-but-dormant Supabase project** (`src/lib/supabase.ts` + `/api/archive/*` routes, per doc 955, 2026-07-03) wired for an archive feature that hasn't activated yet - a 5th project. **This list is a floor, not a ceiling** - no session has ever inventoried every ZAO Supabase project in one place before this doc. [FULL - direct env file reads + live MCP call + doc 955 cross-reference, not inferred]
+FISHBOWLZ is documented elsewhere in the skill's own project table as Supabase-backed but its project ref was not checked this session. **COC Concertz also has a live-but-dormant Supabase project** (`src/lib/supabase.ts` + `/api/archive/*` routes, per doc 955, 2026-07-03) wired for an archive feature that hasn't activated yet - a 5th project. Doc 826 (2026-06-09) independently put the honest estimate at **"5-10 projects, true count needs the Supabase dashboard"** - so 5 is a confirmed floor, not the real ceiling. **This list is a floor, not a ceiling** - no session has ever fully inventoried every ZAO Supabase project (it would need read-only dashboard access, which doc 826 requested over a month ago and still doesn't have - see Finding 5.6). [FULL - direct env file reads + live MCP call + doc 955/826 cross-reference, not inferred]
 
 ### 2. The team-routing bug (today) is a structural pattern, not a one-off mistake
 
@@ -60,13 +62,24 @@ Three independent incidents, three different root symptoms (credential exposure,
 
 Migration 013's header attributes the RLS discovery to "Audit doc-766 / the role_table_grants check." Direct read of `research/dev-workflows/766-midway-work-audit-2026-05-27/README.md` (a 2026-05-27 DISPATCH-tier audit) shows it explicitly claims **the opposite**: *"Security/RLS/payment/signing surfaces all ship with full implementation - no TODOs in critical paths."* A full-text grep of that doc for "RLS," "role_table_grants," "anon key," and "password_hash" returns zero matches outside that one summary line. Either the citation in migration 013 points to the wrong doc number, or whatever audit actually caught the RLS gap was never itself written up as a research doc. This is a small thing on its own, but it's exactly the kind of broken paper trail that makes it hard to know, six weeks later, whether a given class of bug has actually been checked for across the rest of the ecosystem. [FULL - doc read + grep executed this session, zero matches confirmed]
 
-### 5.5. A prior, well-reasoned unification decision did not stick - direct evidence for Key Decision #1
+### 5.5. A prior, well-reasoned unification decision did not stick - now confirmed, not just suspected
 
 Doc 692 (2026-05-20, DISPATCH tier) already did the exact analysis this doc might otherwise have proposed: it audited ZAOstock's live 12-table Supabase (`yjrlaxpjusmrfylumban`) against ZAOcoworking's non-existent database (a flat `data/actions.json` file plus an unexecuted `schema.sql`), and made an explicit, well-argued call - make ZAOstock's Supabase the one canonical "ZAO operational database," migrate ZAOcoworking's 18 rows into it, retire the JSON file.
 
-**That did not happen as decided.** The cowork tracker this session actually writes to (`~/bin/zao-tracker`, used dozens of times this session, confirmed live via `mcp__supabase-cowork__get_project_url`) runs on project ref **`etwvzrmlxeobinrlytza`** - a third, distinct project that matches neither `yjrlaxpjusmrfylumban` (ZAOstock, the doc 692 target) nor `efsxtoxvigqowjhgcbiz` (the old ZAO OS bot project). Project refs are immutable once created - this is not the same project renamed, it is a fourth database that came into existence sometime after a documented decision to consolidate down to fewer databases.
+**That did not happen as decided - and doc 826 (2026-06-09, DEEP tier, "ZAO Infrastructure Estate Map") confirms exactly what happened instead.** Doc 826 states plainly: "@ZAOcoworkingBot (`cowork-zaodevz/agent`) - ACTIVE -> cowork DB `etwvz…`." Rather than migrating into ZAOstock's existing Supabase per doc 692's recommendation, @ZAOcoworkingBot was given **its own brand-new Supabase project** (`etwvzrmlxeobinrlytza`) sometime between 2026-05-20 and 2026-06-06 (the earliest commit referencing this project ref is a 2026-06-06 "cowork board buildout" session handoff). This is not ambiguous or merely suspicious anymore - two independent research docs (692's plan, 826's later ground-truth map) directly contradict each other, and the ground truth won.
 
-This is direct, first-hand evidence for Key Decision #1's core claim: **a topology decision alone does not stay fixed.** Six weeks after an explicit, reasoned unification call, the ecosystem has more Supabase projects, not fewer. Whatever process gap let that drift happen unnoticed is the same gap (Finding 2) that lets migration files go unapplied - nothing enforces that a documented architecture decision is actually the thing running in production, six weeks later. [FULL - doc 692 read directly this session, live project ref confirmed via MCP call this session, cross-checked against doc 610's two project refs]
+This is now confirmed, first-hand evidence for Key Decision #1's core claim: **a topology decision alone does not stay fixed.** Two and a half weeks after an explicit, reasoned unification call, the ecosystem built a *new* database rather than following the plan - and nothing in the process caught or corrected that divergence for the six weeks between then and this audit. Whatever process gap let that happen unnoticed is the same gap (Finding 2) that lets migration files go unapplied - nothing enforces that a documented architecture decision is actually the thing running in production, weeks later. [FULL - doc 692 and doc 826 both read directly this session, `git log -S` on the project ref confirms the 2026-06-06 introduction date, cross-checked against doc 610's two project refs]
+
+### 5.6. Doc 826 already mapped this exact estate three weeks before this session - and its own consolidation actions are now over a month overdue
+
+Doc 826 is a DEEP-tier, same-topic predecessor to this doc that this session should have found in Step 2 and did not (the dedup grep for "supabase" + "architecture|consolidat|migration|database|schema" in doc titles missed it because its title doesn't contain those exact words - a real dedup-process gap, noted for future sessions). It already established several facts this doc re-derived independently:
+
+- **"Supabase (5+ projects)"** - doc 826 puts the honest count at "5-10... true count needs the Supabase dashboard," which sets Finding 1's "at least 4-5" as a confirmed floor, not a ceiling - the real number could be double.
+- **A second, entirely separate database platform: Firebase**, used by CoC Concertz and wavewarzapp - two consoles, not one, and completely outside this doc's Supabase-only scope. Any claim to have improved "our whole database solution" that only touches Supabase is addressing roughly half the actual footprint.
+- **"The cowork tracker exists as 4 repos"** (`ontask`/`imanprojects` → `cowork-zaodevz` → `ZAOcowork`) - doc 826's own Next Actions table already said to archive the first three and keep only `ZAOcowork`, owner Zaal, due **"This week"** as of 2026-06-09. That's now **31 days overdue** as of this audit (2026-07-09).
+- **"Provide read-only Vercel + Supabase tokens -> costed kill-list"** - doc 826 flagged this exact access gap (owner Zaal, "Next") over a month before this session independently rediscovered the same gap in Finding 4 (this session's Supabase MCP being scoped to one project only). The gap has been open, named, and unaddressed for 30+ days.
+
+Doc 826's own health-check bot (posted automatically on this doc's PR) reported the estate at **"48/100"** with 4 failing drift checks, 3 zombie warnings, and 1 estate warning - an independent, automated confirmation that the fragmentation described throughout this doc is an already-tracked, ongoing condition, not a one-off surprise from today's bug. [FULL - doc 826 read directly this session; overdue-action dates computed from doc 826's own last-validated date vs. today]
 
 ### 6. Industry context: this is not a ZAO-specific mistake, it's the default failure mode
 
@@ -100,7 +113,10 @@ Critically: consolidating to one project with per-app Postgres schemas does not,
 - [Doc 766 — Midway-work audit](../../dev-workflows/766-midway-work-audit-2026-05-27/) — the doc migration 013 cites for the RLS discovery; per Finding 5, the citation does not actually check out
 - [Doc 1007 — ZAOstock T-86 Days Readiness Audit](../../events/1007-zaostock-t86-readiness-audit/) — this session's other audit, which separately found this session's Supabase MCP access was scoped to the wrong project (same root issue as Finding 4 here)
 - [Doc 955 — COC Concertz Database Options](../955-coc-concertz-database-options/) — the prior, single-app version of the consolidation question; source of the free-tier 7-day auto-pause risk in Finding 8, and the 5th Supabase project (COC's dormant archive feature) in Finding 1
-- [Doc 692 — Unifying ZAOstock + ZAOcoworking onto One Operational Database](../692-cowork-zaostock-unified-db/) — the prior unification decision that, per Finding 5.5, apparently did not survive - the strongest single piece of evidence in this doc for why Key Decision #1 (enforcement, not topology) is the right first move
+- [Doc 692 — Unifying ZAOstock + ZAOcoworking onto One Operational Database](../692-cowork-zaostock-unified-db/) — the prior unification decision that, per Finding 5.5, is now confirmed not to have survived - the strongest single piece of evidence in this doc for why Key Decision #1 (enforcement, not topology) is the right first move
+- [Doc 826 — ZAO Infrastructure Estate Map](../826-zao-infrastructure-estate-map/) — DEEP-tier predecessor this session should have found via dedup search and didn't (Finding 5.6); confirms the 5-10 project estimate, the Firebase gap, and two already-scoped, now 30+-day-overdue actions this doc's Next Actions absorb rather than duplicate
+- [Doc 825 — ZAOcowork Architecture Audit](../../agents/825-zaocowork-architecture-audit/) — checked for RLS/backup/tier detail on the cowork Supabase project; confirms that information genuinely doesn't exist anywhere in the research library yet (Next Actions item 3)
+- [Doc 816 — Cowork Control Plane + Project Audit](../../agents/816-cowork-control-plane-and-project-audit/) — companion audit to 825/826, not independently re-read in full this session
 
 ## Next Actions
 
@@ -112,7 +128,10 @@ Critically: consolidating to one project with per-app Postgres schemas does not,
 | Confirm the pricing tier (Free/Pro/Team) and backup/PITR status of every known ZAO Supabase project - shipped when a one-line status per project is recorded in a memory file | Zaal | Task | 2026-07-14 |
 | Fix or resolve the migration-013 citation gap (Finding 5) - shipped when the citation in the migration comment is corrected, or the actual audit that found the RLS gap is written up properly | Zaal | Todo | 2026-07-18 |
 | Decide go/no-go on schema-based consolidation as a separate, non-urgent ops project - shipped when Zaal makes an explicit call, independent of the CI-gate work above | Zaal | Task | 2026-07-25 |
-| Reconcile what `etwvzrmlxeobinrlytza` (the live cowork-tracker project) actually is and how it relates to doc 692's decision - shipped when a memory file or doc addendum explains whether doc 692 was implemented differently than written, abandoned, or superseded | Zaal | Todo | 2026-07-16 |
+| ~~Reconcile what `etwvzrmlxeobinrlytza` actually is~~ - **RESOLVED this session, Finding 5.5**: it's @ZAOcoworkingBot's own fresh project, built instead of following doc 692's merge-into-ZAOstock plan | Zaal | — | done |
+| Collapse the cowork-tracker "4 repos → 1" per doc 826 (archive `ontask`/`imanprojects`/`cowork-zaodevz`, keep `ZAOcowork`) - already 31 days overdue - shipped when the 3 repos are archived on GitHub | Zaal | Cleanup | 2026-07-11 |
+| Get read-only Vercel + Supabase tokens set up (doc 826's request, 30+ days open) - shipped when a session can query every known project's tier/backup/RLS status without per-project manual reconfiguration | Zaal | Access | 2026-07-11 |
+| Scope a Firebase-side pass (CoC Concertz, wavewarzapp) as a real follow-up, not silent scope-drop - shipped when a doc or tracker task exists specifically for the Firebase half of "the whole database solution" | Zaal | Task | 2026-07-18 |
 
 ## Sources
 
@@ -121,6 +140,10 @@ Critically: consolidating to one project with per-app Postgres schemas does not,
 - `gh search code "Supabase SQL editor" --owner=bettercallzaal` — [FULL, 16 results enumerated this session]
 - [Doc 610 — ZAOstock Database Consolidation](../../infrastructure/610-zaostock-database-consolidation-may4-5/) — [FULL, internal, read this session]
 - [Doc 766 — Midway-work audit](../../dev-workflows/766-midway-work-audit-2026-05-27/) — [FULL, internal, read + grepped this session]
+- [Doc 826 — ZAO Infrastructure Estate Map](../826-zao-infrastructure-estate-map/) — [FULL, internal, read this session]
+- [Doc 692 — Unifying ZAOstock + ZAOcoworking onto One Operational Database](../692-cowork-zaostock-unified-db/) — [FULL, internal, read this session]
+- [Doc 825 — ZAOcowork Architecture Audit](../../agents/825-zaocowork-architecture-audit/) — [FULL, internal, grepped this session]
+- `git log --all -S "etwvzrmlxeobinrlytza"` — [FULL, run directly this session, confirms 2026-06-06 introduction date]
 - `mcp__supabase-cowork__get_project_url` call — [FULL, directly observed this session]
 - [Supabase RLS documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) — [FULL, per subagent research]
 - [Supabase Database Advisor / lint rule 0013](https://supabase.com/docs/guides/database/database-advisors?lint=0013_rls_disabled_in_public) — [FULL, per subagent research]

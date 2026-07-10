@@ -609,11 +609,18 @@ bot.on('message:text', async (ctx) => {
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
     if (!isFromZaal(ctx)) return;
+    // Thread context: when Zaal QUOTE-REPLIES a message, fold what he replied to
+    // into the turn so a short reply ("zol yes") anchors to the right draft
+    // instead of arriving context-free. Telegram only gives us the quoted text.
+    const quoted = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
+    const turnText = quoted
+      ? `[Zaal is replying to your earlier message:\n"${quoted.slice(0, 1200)}"]\n\nHis reply: ${text}`
+      : text;
     // doc 872 (live steering / "finish then apply"): run the turn OFF the poll
     // loop so a new message is received mid-turn instead of blocking the bot.
     // Same-chat turns are serialized in turn-queue; a deferred turn gets a quick
     // ack so Zaal knows it landed and will run after the current one.
-    enqueueTurn(chatId, () => handlePrivateMessage(ctx, text), {
+    enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnText), {
       onDeferred: () => {
         ctx
           .reply("Got that - finishing what I'm on, then I'll pick it up.")

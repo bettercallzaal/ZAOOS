@@ -107,6 +107,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     out.push({
       kind: 'github-event',
       score: 0.65, // actionable: clears the 0.6 bar, but a due commitment still outranks
+      tier: 'standard',
       message: `[STALE PR] ${repoName(pr)} #${pr.number} has sat ${days}d with no movement: "${pr.title}". Merge it, close it, or want me to look?`,
     });
   }
@@ -124,6 +125,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     out.push({
       kind: 'github-event',
       score: 0.82, // a broken build outranks a stale PR + most nudges
+      tier: 'critical',
       message: `[CI FAIL] ${repoName(pr)} #${pr.number} has failing checks: "${pr.title}". Want me to look at what broke?`,
     });
   }
@@ -195,6 +197,7 @@ export async function gatherGraphCandidates(now: number = Date.now()): Promise<C
     {
       kind: 'graph-event',
       score: 0.62, // clears the 0.6 bar but a due commitment/CI-fail outranks
+      tier: 'signal',
       message: `[GRAPH] Nothing new on "${coldest.topic}" in the graph for ${coldest.days}d. Still active, or want to log an update?`,
     },
   ];
@@ -249,6 +252,7 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
     {
       kind: 'inactivity',
       score: 0.62, // just clears the 0.6 bar — lowest interrupt priority
+      tier: 'signal',
       message: `You've been quiet for ${hrs}h. Everything on track, or anything stuck?`,
     },
   ];
@@ -317,6 +321,7 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
     out.push({
       kind: 'calendar',
       score: 0.72,
+      tier: 'standard',
       message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
     });
   }

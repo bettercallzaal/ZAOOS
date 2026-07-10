@@ -56,6 +56,7 @@ test('overdue thread scores high and is a thread-nudge', () => {
   assert.ok(c);
   assert.equal(c.kind, 'thread-nudge');
   assert.ok(c.score >= 0.75, `expected >=0.75, got ${c.score}`);
+  assert.equal(c.tier, 'standard');
   assert.match(c.message, /did it land/);
 });
 
@@ -66,12 +67,15 @@ test('overdue score climbs with how late it is, capped at 0.95', () => {
   assert.ok(a && b && c);
   assert.ok(b.score > a.score);
   assert.ok(c.score <= 0.95);
+  assert.equal(a.tier, 'standard');
+  assert.equal(c.tier, 'critical'); // >24h overdue = critical
 });
 
 test('due-soon thread is a 0.6 baseline nudge', () => {
   const c = scoreThreadCandidate(thread({ dueAt: new Date(NOW + 3600_000).toISOString() }), NOW);
   assert.ok(c);
   assert.equal(c.score, 0.6);
+  assert.equal(c.tier, 'standard');
   assert.match(c.message, /still on track/);
 });
 
@@ -80,6 +84,7 @@ test('two-snooze thread is a thread-decision at 0.8', () => {
   assert.ok(c);
   assert.equal(c.kind, 'thread-decision');
   assert.equal(c.score, 0.8);
+  assert.equal(c.tier, 'critical');
   assert.match(c.message, /reschedule it, drop it/);
 });
 
@@ -87,9 +92,9 @@ test('two-snooze thread is a thread-decision at 0.8', () => {
 
 test('pickBest returns the single highest-scoring candidate', () => {
   const cands: Candidate[] = [
-    { kind: 'thread-nudge', score: 0.6, message: 'a' },
-    { kind: 'thread-decision', score: 0.8, message: 'b' },
-    { kind: 'inactivity', score: 0.5, message: 'c' },
+    { kind: 'thread-nudge', score: 0.6, tier: 'standard', message: 'a' },
+    { kind: 'thread-decision', score: 0.8, tier: 'critical', message: 'b' },
+    { kind: 'inactivity', score: 0.5, tier: 'signal', message: 'c' },
   ];
   assert.equal(pickBest(cands)?.message, 'b');
 });

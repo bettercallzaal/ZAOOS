@@ -49,11 +49,14 @@ export const UNACKED_WINDOW_MS = 24 * 60 * 60 * 1000;
 const THRESHOLD_STEP = 0.1;
 
 export type CandidateKind = 'thread-nudge' | 'thread-decision' | 'task-nudge' | 'inactivity' | 'calendar' | 'github-event' | 'graph-event';
+export type CandidateTier = 'critical' | 'standard' | 'signal';
 
 export interface Candidate {
   kind: CandidateKind;
   /** 0..1 relevance. Compared against the threshold. */
   score: number;
+  /** Interrupt tier: critical (P0/blocker), standard (due/overdue), signal (inactivity). */
+  tier: CandidateTier;
   /** The message ZOE would send (already in voice). */
   message: string;
   /** Linked open thread, when the candidate came from one. */
@@ -102,6 +105,7 @@ export function scoreThreadCandidate(t: OpenThread, now: number = Date.now()): C
     return {
       kind: 'thread-decision',
       score: 0.8,
+      tier: 'critical',
       threadId: t.id,
       message:
         `You've pushed "${t.summary}" twice now. Rather than ping again — ` +
@@ -111,15 +115,20 @@ export function scoreThreadCandidate(t: OpenThread, now: number = Date.now()): C
 
   // nudge
   let score = 0.6; // due-soon baseline
+  let tier: CandidateTier = 'standard';
   if (action.overdue && t.dueAt) {
     const overdueHrs = (now - Date.parse(t.dueAt)) / 3_600_000;
     score = Math.min(0.75 + overdueHrs * 0.02, 0.95);
+    if (overdueHrs > 24) {
+      tier = 'critical'; // significantly overdue
+    }
   }
   const when = action.overdue ? 'You said' : "You're on the hook for";
   const tail = action.overdue ? '— did it land?' : '— still on track?';
   return {
     kind: 'thread-nudge',
     score,
+    tier,
     threadId: t.id,
     message: `${when} "${t.summary}" ${tail}`,
   };
@@ -335,6 +344,7 @@ export async function runReasoningTick(deps: ReasoningTickDeps = {}): Promise<Pr
     threshold,
     best: round2(best.score),
     kind: best.kind,
+    tier: best.tier,
     threadId: best.threadId,
     considered: candidates.length,
     unacked,

@@ -394,6 +394,34 @@ export async function readPersona(): Promise<string> {
   return fs.readFile(PERSONA_PATH, 'utf8');
 }
 
+// ---- ICM box as a bot brain (doc 1021: one engine, N ICM-box brains) ----
+
+const ICM_TTL_MS = 600_000; // 10 min
+const icmCache = new Map<string, { body: string; at: number }>();
+
+/** Test-only: clear the ICM brain cache. */
+export function _resetIcmCache(): void {
+  icmCache.clear();
+}
+
+/** Fetch an ICM box's llm.txt as a bot brain. Best-effort: null on any failure. */
+export async function fetchIcmBrain(boxId: string, now: number = Date.now()): Promise<string | null> {
+  const hit = icmCache.get(boxId);
+  if (hit && now - hit.at < ICM_TTL_MS) return hit.body;
+  try {
+    const res = await fetch(`https://useicm.com/api/objects/${encodeURIComponent(boxId)}/llm.txt`, {
+      headers: { 'User-Agent': 'ZAO-ZOE-fleet/1.0' },
+    });
+    if (!res.ok) return null;
+    const body = (await res.text()).trim();
+    if (!body) return null;
+    icmCache.set(boxId, { body, at: now });
+    return body;
+  } catch {
+    return null;
+  }
+}
+
 export async function readHuman(): Promise<string> {
   await ensureZoeHome();
   return fs.readFile(HUMAN_PATH, 'utf8');

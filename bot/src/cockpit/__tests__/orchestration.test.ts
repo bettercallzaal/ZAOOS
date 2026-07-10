@@ -5,10 +5,10 @@ vi.hoisted(() => {
   process.env.COCKPIT_HOME = '/tmp/cockpit-test-artifacts';
 });
 
-// mock only the network read; keep the pure adapter logic real
+// mock only the network reads (tracker + gh PR search); keep the pure adapter logic real
 vi.mock('../adapters', async (importActual) => {
   const actual = await importActual<typeof import('../adapters')>();
-  return { ...actual, fetchCockpitTasks: vi.fn() };
+  return { ...actual, fetchCockpitTasks: vi.fn(), fetchReviewPRs: vi.fn() };
 });
 vi.mock('../../hermes/claude-cli', () => ({
   callClaudeCli: vi.fn(),
@@ -17,12 +17,13 @@ vi.mock('../../hermes/claude-cli', () => ({
 }));
 
 import { runCockpit } from '../cockpit';
-import { fetchCockpitTasks } from '../adapters';
+import { fetchCockpitTasks, fetchReviewPRs } from '../adapters';
 import { callClaudeCli, CliError } from '../../hermes/claude-cli';
 import type { CockpitTask } from '../types';
 
 const NOW = Date.parse('2026-07-09T12:00:00Z');
 const fetchMock = fetchCockpitTasks as unknown as ReturnType<typeof vi.fn>;
+const reviewMock = fetchReviewPRs as unknown as ReturnType<typeof vi.fn>;
 const cliMock = callClaudeCli as unknown as ReturnType<typeof vi.fn>;
 
 function task(o: Partial<CockpitTask> & { id: string; title: string }): CockpitTask {
@@ -34,6 +35,8 @@ function task(o: Partial<CockpitTask> & { id: string; title: string }): CockpitT
 
 beforeEach(() => {
   fetchMock.mockReset();
+  reviewMock.mockReset();
+  reviewMock.mockResolvedValue([]); // no PR network in unit tests by default
   cliMock.mockReset();
 });
 

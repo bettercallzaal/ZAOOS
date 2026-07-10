@@ -117,11 +117,24 @@ export function filterReviewPRs(rows: RawPR[]): ReviewPR[] {
  */
 export async function fetchReviewPRs(): Promise<ReviewPR[]> {
   const q = `is:pr is:open ${REVIEW_OWNERS.map((o) => `user:${o}`).join(' ')}`;
+  // gh is installed at ~/.local/bin on the VPS, which is NOT on the zoe-bot
+  // systemd service PATH - so bare 'gh' fails with ENOENT. Prepend ~/.local/bin
+  // (and the common user-local bins) so execFile resolves it regardless of the
+  // service PATH. Override with GH_BIN_PATH if gh lives elsewhere.
+  const home = process.env.HOME ?? '';
+  const ghPath = [
+    process.env.GH_BIN_PATH,
+    home && `${home}/.local/bin`,
+    '/usr/local/bin',
+    process.env.PATH,
+  ]
+    .filter(Boolean)
+    .join(':');
   try {
     const { stdout } = await execFileAsync(
       'gh',
       ['api', '-X', 'GET', 'search/issues', '-f', `q=${q}`, '-F', 'per_page=40', '--jq', '.items'],
-      { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 1_000_000 },
+      { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 1_000_000, env: { ...process.env, PATH: ghPath } },
     );
     const rows = JSON.parse(stdout || '[]') as RawPR[];
     return Array.isArray(rows) ? filterReviewPRs(rows) : [];

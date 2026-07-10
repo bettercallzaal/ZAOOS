@@ -3,10 +3,12 @@
 > **topic:** community
 > **type:** research-profiles
 > **status:** research-complete
-> **last-validated:** 2026-05-21
+> **last-validated:** 2026-07-10
 > **original-query:** Deep profiles of active ZAO community members for context in agent interactions and community planning (reconstructed)
-> **tier:** solid
-> **Date:** March 2026 (consolidated April 5, 2026)
+> **tier:** DEEP (2026-07-10 refresh pass, loop-until-dry per person)
+> **Date:** March 2026 (consolidated April 5, 2026); refreshed 2026-07-10
+
+> **2026-07-10 refresh note:** Cross-referenced against the `team_members` cowork-tracker roster (11 people, for a planned team-profile blog series). Four existing profiles (Candy, Tyler, DCoop, Ohnahji) were re-verified with fresh external research this pass - each section below is marked with what's NEW since May, STILL TRUE, and STALE. Seven people with no prior profile were researched from scratch: Iman, Jose Cabrera, ThyRev (Thy Revolution), Metamu, Nemesis, Shawn, and JANGOUU (Django). Anti-hallucination discipline held throughout: for common/generic names (Metamu, Nemesis, Shawn), research was instructed to report "no public ZAO-context presence found" rather than substitute an unrelated same-named person - see each section for confidence level.
 
 ---
 
@@ -22,7 +24,14 @@
 | **Tyler Stambaugh** | Magnetiq Co-Founder & COO | New York, NY | ZABAL Connector / Proof of Meet, Flow blockchain, $500K grant |
 | **Candy** (Samantha Denton-Kinney) | ZAO Co-Founder, WaveWarZ Co-Founder | New York, NY | ZID 2, Impact3/Milk Road sponsorship, 16 GitHub repos |
 | **Swarthy Hatter** (Timothy) | Fractal Bridge, Product Design | — | Bridges Eden/Optimism/ZAO fractals, Nouns Builder contributor |
-| **DCoop** | Hip-Hop Artist, ZAOVille Organizer | Falls Church, VA | DMV emcee, WaveWarZ battler, ZAOVille festival (Jul 2026) |
+| **DCoop** | Hip-Hop Artist, ZAOVille Organizer | Falls Church, VA | DMV emcee, WaveWarZ battler, founder of The VEC + DropDedGorgez NFT (Apr 2026) |
+| **Iman** | ZAO Devz Lead, VPS Owner | Zambia | Owns cowork-zaodevz bot + full VPS infra (ZOE, Farscout, all ecosystem bots), zero public social presence |
+| **Jose Cabrera** (Joseph Goats) | Paid ZAO Contributor, Musician | Caracas, Venezuela | Onboarded Jun 2026, $100/mo USDC; Giveth fundraiser ($8,259/178 backers) for earthquake relief; COC Concertz performer |
+| **ThyRev** (Thy Revolution) | COC Concertz Founder | UK | Owns COC Concertz as his ZAO contribution; locked ZABAL Games S1 mentor; active 2026-07-08 |
+| **Metamu** | ZABAL Opinion Leader | — | Top 3 SongJam leaderboard (Mar 2026), top 5-6 Empire Builder/ZABAL holders; no public socials found |
+| **Nemesis** | — | — | One documented mention: prepping a cross-Africa X-Spaces show with Ram, May 2026; thin |
+| **Shawn** | Admin-tier, unconfirmed identity | — | Possibly Shawn Porter (Web3 Metal founder) - NOT independently confirmed, flag before publishing |
+| **JANGOUU** (Django) | ZAO origin figure, musician | NYC | Musician Zaal met in college (2018/19) - "the seed of The ZAO origin story"; active as musician (EP Dec 2025), no 2026 ZAO activity found |
 
 ---
 
@@ -173,6 +182,8 @@ Services: Animation, music production, digital art, music composition, graphic d
 ---
 
 ### Ohnahji B / Ohnahji University
+
+> **2026-07-10 refresh:** Genuinely active - Twitch, X, and Instagram (3,525 followers) all show 2026 posts (Feb 27 and Apr 12 confirmed). Two things quietly dead: ohnahjiu.com/ohnahji.com both throw SSL errors, broken since at least May 2026 (2+ months) - flag before linking it publicly. Ohnahji U Radio (Spotify) and The Alphite Gazette (Medium) haven't posted since 2024/2023 respectively. Also: "Let's Talk About Ethereum" (the Maceo-cohosted successor show cited in the original profile) has zero public trace anywhere - not indexed on any podcast platform. Worth confirming directly whether it ever launched.
 
 #### Personal Profile
 
@@ -360,6 +371,8 @@ GitHub repo "ZoundZ 1/1 marketplace x mini-app" written in Solidity. Appears to 
 
 ### Tyler Stambaugh / Magnetiq
 
+> **2026-07-10 refresh - important correction:** Magnetiq's real, current site is **magnetiq.xyz** (New York, Flow blockchain, Tyler's actual company), not magnetiq.io - that domain belongs to an unrelated Bologna, Italy event-software company (founded 2016, clients like Dolce & Gabbana). This corrects a standing assumption elsewhere that Magnetiq is at magnetiq.io. Tyler's current title per the official site is "Chief Connection Officer," not COO. Also: no evidence found anywhere that ZABAL Games' workshop library actually runs on Magnetiq - that claim is unconfirmed, flag it before repeating. Blog is actively posting (Jul 7 and Jul 9, 2026 posts found) - company is alive and shipping.
+
 #### Identity
 
 | Field | Detail |
@@ -411,6 +424,8 @@ $500,000 across 5 phases. Submitted October 28, 2022. Closed as completed July 3
 ---
 
 ### Candy — Samantha Denton-Kinney
+
+> **2026-07-10 refresh:** candytoybox.com is now live (May's SSL issue resolved). WaveWarZ Intelligence dashboard confirms the ecosystem itself is active (499.21 SOL volume, 1,205 battles as of fetch). But her own output is stale - Medium's last post is 2024, and GitHub/X/LinkedIn were all blocked to research (auth/paywall), so no fresh personal-activity signal either way. Honest result: can't confirm current involvement, can't deny it - the platform is alive, her public trail is quiet.
 
 #### Identity
 
@@ -504,6 +519,8 @@ Media + Production Support — video, photography, content capture, social media
 
 ### DCoop / ZAOVille
 
+> **2026-07-10 refresh:** New since May - DCoop is founder/CEO of **The VEC**, a DMV hip-hop collective/platform, and launched an NFT project **DropDedGorgez** in April 2026 (8,888-item PFP collection on OpenSea). ZAO Stock (Oct 3, 2026, Ellsworth Maine) confirmed with DCoop as a returning performer. ZAOVille still has no confirmed date or venue as of today - status unchanged from "planned." The Coop Records/Coopahtroopa connection was checked directly and found to be unrelated (separate $10M onchain label, no link to DCoop) - drop that thread, it was coincidental name similarity.
+
 #### Identity
 
 | Field | Detail |
@@ -540,6 +557,209 @@ Doc 101 notes a possible connection: "DCoopOfficial — Linked to Coop Records o
 | **Relationship** | ZAO Stock = Ellsworth, Maine (October 2026). ZAOVille = DMV (July 2026). Same brand, two locations |
 
 DCoop's ZAO Stock role: Performing Artist + Parallel Event Organizer + production support alongside AttaBotty.
+
+---
+
+### Iman
+
+> **New profile, 2026-07-10.** High internal context, zero public-facing presence - see confidence note below.
+
+#### Identity
+
+| Field | Value |
+|-------|-------|
+| **Cowork tracker role** | Admin |
+| **Telegram ID** | 7955994215 (confirmed, doc 672 bot audit) |
+| **GitHub org** | songchaindao-dot |
+| **Primary repo** | github.com/songchaindao-dot/cowork-zaodevz |
+| **VPS** | imanagent @ 187.77.3.104 (Hostinger KVM 2, Ubuntu 24.04) - sole owner |
+| **Location** | Zambia (per "WaveWarZ Zambia regional lead" designation) |
+| **Full name** | Unknown - not found in any doc |
+
+#### Role & What He's Building (as of last touch, 2026-06-08)
+
+- **cowork-zaodevz Telegram bot** - built and owns the action tracker the whole ZAO Devz team runs on (docs 650, 662, 672, 819). v2.13+ live, 6 open bugs noted, needs a user-mode migration per doc 672.
+- **VPS infrastructure** - runs the ecosystem's bots: ZAOcoworkingBot, ZOE concierge + dispatcher, ZAOstockTeamBot, Farscout (24/7 Farcaster research scout). Planned: a Lavalink Discord radio bot (doc 722h).
+- **ZABAL Games recordings pages** - shipping an in-page video viewer + workshop navigation, replacing YouTube redirects (doc 819, 2026-06-08).
+- **WaveWarZ Zambia regional lead** - onboarding the first WaveWarZ Zambia artist to the ZAO Music entity (doc 475); coordinated a PizzaDAO Zambia event (May 23, 2026, 40 attendees) and ran a 45-builder Lovable hackathon (May 22, 2026).
+- **Cipher (ZAO Music first release)** - composer credit, alongside DCoop (lead) and GodCloud (A&R) (doc 475).
+
+#### Collaboration with Zaal
+
+Zaal on watching Iman build imanagent live: "iman watching me build imanagent on a video call was the best dev-handoff i've ever done" (doc 659). Zaal has floated crowdfunding to bring Iman (Zambia) and ThyRev (UK) to DevCon India for a music stage (doc 827).
+
+#### Confidence note
+
+Every fact above traces to an internal ZAO OS doc (list below) or the GitHub org - there is **no external public profile found**: no X/Twitter, Farcaster, LinkedIn, personal GitHub, or music-platform presence turned up after 6+ search angles. This is a real finding, not a research gap: Iman appears to operate entirely inside the ecosystem, with no outward-facing identity. A profile page for him should be built from the internal record, not linked social accounts.
+
+#### Sources
+- Doc 722f (Network map, 2026-05-23) - `research/dev-workflows/722-zao-claude-code-3-month-synthesis/722f-people-network/README.md`
+- Doc 670 (Iman call, 2026-05-18), Doc 819 (Iman x Zaal, 2026-06-08), Doc 475 (ZAO Music entity), Doc 662 (cowork architecture), Doc 650 (imanagent VPS build), Doc 672 (ZAOcoworkingBot audit), Doc 725 (hackathon recap), Doc 827 (DevCon India crowdfunding)
+
+---
+
+### Jose Cabrera (Joseph Goats)
+
+> **New profile, 2026-07-10.**
+
+#### Identity
+
+| Field | Value |
+|-------|-------|
+| **Real name** | Jose Cabrera |
+| **Stage name** | Joseph Goats (rebranded from "Jose" for English-language audiences) |
+| **Nationality / base** | Venezuelan, based in Caracas |
+| **Background** | Sound engineer, singer-songwriter; son of musician parents, grandson of Romelia Agüero (actress, Radio Rochela) |
+| **X/Twitter** | [@joseacabreav](https://x.com/joseacabreav) - bio "joseacabreav.tgn \| Cyborg Amish Balance" |
+| **Farcaster** | joseacabreav |
+| **Giveth** | Active fundraiser profile |
+
+#### Role in ZAO (current, as of 2026-07-10)
+
+Paid contributor and ops team member. Onboarded 2026-06-03 (doc 795), started at $100/month USDC via Farcaster with a plan to grow toward his stated $500/month income need - he was transitioning off an ASOS job at the time, stacking the ZAO stipend with a $150/mo call-center job. Zaal funded a $20/mo Claude Code plan for him (doc 800, 2026-06-05) so he could build a Farcaster hackathon mini-app. Ops + community role on the ZAOstock team (doc 722f). Currently reviewing all 12 ZAO whitepaper drafts (cowork tracker task, due 2026-07-13) - the same review this session set up.
+
+Credited as an editor on The ZAO Whitepaper (section 05, "The lanes") - this session's own paper.html carries that credit; independent external verification beyond that wasn't found, which is expected since it's ZAO's own primary source.
+
+#### Music & Impact Work
+
+- **Giveth:** "DIGITAL Street Musician Doing Free Live Concerts" - $8,259.30 raised from 178 contributors, verified/GIVbacks-eligible. Primary focus: the Huöttöja indigenous community (Venezuelan Amazon) and June 2026 earthquake relief for displaced Venezuelans.
+- **Philosophy:** calls it a "Music Onboarding Machine" - using live music to unite communities and channel energy into causes. Tunes in 432Hz; treats certain songs as medicine. ~1 decade of "digital street performing," publishing on Hive before livestreamed concerts were mainstream.
+- **Original songs:** No Winter Slam, Kama, Compass (Brujula).
+- **COC Concertz:** performed at #3 (March 7, 2026, StiloWorld/Spatial.io) and #4 (~April 2026).
+
+#### Confidence note
+
+GitHub presence not found in any ZAO org. A same-named "jose-cabrera" GitHub developer exists in Guatemala - confirmed unrelated, do not conflate.
+
+#### Sources
+- Diario Bitcoin: [Música Web3 suena en apoyo a los afectados por terremotos en Venezuela](https://www.diariobitcoin.com/venezuela/musica-web3-suena-en-apoyo-a-los-afectados-por-terremotos-en-venezuela/)
+- Docs 795, 800, 745 (referenced), 352, 722f, 816, 950; X/Farcaster: joseacabreav
+
+---
+
+### ThyRev (Thy Revolution)
+
+> **New profile, 2026-07-10.**
+
+#### Identity
+
+| Field | Value |
+|-------|-------|
+| **Name** | Thy Revolution (handle: ThyRev) |
+| **X/Twitter** | [@thyrevolution](https://twitter.com/thyrevolution) - 4,606 followers (baseline 2026-04-11) |
+| **ENS** | thyrevolution.eth |
+| **Location** | UK-based |
+
+#### Role in ZAO (current, active as of 2026-07-08)
+
+**Founder and lead of COC Concertz** - owns it as his ZAO contribution (docs 839, 842). This is the same COC Concertz this session deep-researched and citation-formatted as a paper. Confirmed in a 2026-06-17 call with Zaal that the ownership model is a 50/50 joint venture between The ZAO and COC, with Thy Revolution leading (doc 866; on the naming question, his quote: "I'm indifferent, I don't give a shit who calls what").
+
+Also: ZAOstock operations team member (doc 722f, last touch 2026-05-12 standup); ZAO Devz coworking allowlist member alongside Zaal, Iman, Samantha (docs 650, 744, 789); locked ZABAL Games Season 1 mentor with an onchain Hats Protocol role (docs 695, 701).
+
+**Most recent activity:** 2026-07-08, spoke on a 58-minute X Space / Farcaster fireside with Zaal, Kenny (POIDH founder), and Mauro (Zao Poker), about COC's social-impact work - quote: "The utilisation of the Wave Wars technology helps the communities come together and generate enough funds to fund a water pump in Nigeria, helping 500 homes have access to clean water" (doc 994).
+
+#### Personal context
+
+UK-based; owns/manages Decentraland environments. As of 2026-06-17 needed a laptop (~$600) - Zaal was planning a giver.io crowdfund, with a US-laptop backup option via Christopher & Honey (doc 866). Not verified as completed in later docs.
+
+#### Corrections found in the existing record
+
+Doc 847 contains an error: it describes "Thy Revolution (Iman's band)" - this is wrong. He is unrelated to Iman; he's the COC Concertz founder. Worth fixing at the source if that doc gets touched again.
+
+#### Sources
+- Docs 839, 842, 866, 695, 701, 650, 744, 789, 721, 722f, 753, 994, 319, 847 (error noted)
+
+---
+
+### Metamu
+
+> **New profile, 2026-07-10. Confidence: real ZAO-context activity confirmed, but no linked public identity.**
+
+Active on two internal ZAO leaderboards, no public social presence found under this handle:
+
+- **ZABAL Opinion Leader (March 2026):** ranked top 3 on the SongJam leaderboard, earning ZOL status alongside jason alder (#1) and collinsxweb3 (#2).
+- **Empire Builder leaderboard:** rank 6 in the ZABAL Empire top 10 (188,684,925 score, 5.8x multiplier, $4.12 lifetime earned) as of early Q1 2026; rank 5 in the ZABAL holders leaderboard as of 2026-05-01 (233M score, $6.26 lifetime ZABAL distribution).
+
+Six-plus external search angles ("Metamu ZAO", "Metamu ZABAL", "Metamu Farcaster", "Metamu Empire Builder", site-specific searches) found no connected public profile. Two unrelated same-named accounts turned up (@MetaM00, a Portland NFT/anime collector, and @metamu_nyatopia, a Japanese anime account) - confirmed unrelated, not included.
+
+#### Sources
+- Doc 241 (Q1 2026 big wins) - `research/events/241-q1-2026-big-wins/README.md`
+- Doc 584 (Empire Builder Farcaster creator playbooks) - `research/business/584-empire-builder-farcaster-creator-playbooks/README.md`
+
+---
+
+### Nemesis
+
+> **New profile, 2026-07-10. Confidence: thin - one real mention, nothing since.**
+
+Single documented ZAO-context reference: doc 608 (2026-05-04, Discord coworking call transcript) - "Friend Nemesis prepping cross-Africa onchain X-space show. Plans Zou Devs sessions," in the context of Ram (a Zambia-based developer who builds Songchain for African artists, active in WaveWarZ Africa). No follow-up mentions found in any later doc, and no public Farcaster/X/Web3 presence found under this handle after 6+ search angles - all results were either unrelated same-named entities (a Web3 gaming platform, board-game references) or nothing.
+
+This is a valid "not found" result, not a research gap - "Nemesis" is a generic enough handle that absence of a public trail is expected; likely operates in closed channels (Discord/DMs) rather than public profiles.
+
+#### Sources
+- Doc 608 - `research/events/608-wavewarz-africa-ram-songchain-may4/README.md`
+
+---
+
+### Shawn
+
+> **New profile, 2026-07-10. Confidence: LOW - flag before publishing. See note.**
+
+A cowork-tracker admin-tier account (same tier as Zaal, Iman, Jose, Samantha, Tyler) with no full name recorded in any internal doc found. Internal mentions place a "Shawn" in several real ZAO contexts:
+
+- ZAOstock team (Oct 2026 festival) - Design + Music team, t-shirt design (doc 363)
+- Admin-tier access alongside Zaal and Iman for `/admin/triage`, `/admin/cleanup`, `/admin/proposals`, `/admin/feed` (doc 767)
+- ZABAL Games build session (2026-05-27) with Tyler Stambaugh, Zaal, and Samantha (doc 778)
+- ZAOstock team recap (2026-04-21) - Music team member (doc 476)
+
+**External research proposed a match to Shawn Porter, founder of Web3 Metal** (AI-generated metal music + blockchain, Cyber Metal Radio, Suno AI contest winner, also CEO/co-founder of OCG Esports) - but this connection is **inferred, not documented**. No ZAO doc anywhere pairs a full name with the "Shawn" account; the match came from external search on the bare first name, which is exactly the false-positive risk this research pass was warned to avoid. **Do not publish this identification without Zaal confirming it directly.**
+
+#### Sources
+- Docs 363, 767, 778, 476 (internal, first-name-only)
+- External (unconfirmed match): [Web3 Metal](https://web3metal.beehiiv.com/), [Shawn Porter LinkedIn](https://www.linkedin.com/in/shawn-porter-2a537336/), [OCG Esports](https://www.ocgesports.club/)
+
+---
+
+### JANGOUU (Django)
+
+> **New profile, 2026-07-10. This is Zaal's origin story figure - see confidence note on current ZAO status.**
+
+#### Identity
+
+| Field | Value |
+|-------|-------|
+| **Handle** | jangouuforever (consistent across all platforms) |
+| **Also known as** | Django, JANGO (cowork tracker), JANGO UU |
+| **Base** | New York City |
+| **X/Twitter** | [@jangouuforever](https://x.com/jangouuforever) - bio "JANGO UU // THE SYNTHROCK CONCEPT V2 SOON" |
+| **SoundCloud** | [soundcloud.com/jangouuforever](https://soundcloud.com/jangouuforever) |
+| **Apple Music** | [JANGO UU](https://music.apple.com/gb/artist/jango-uu/1726641175) |
+| **YouTube** | [@jangouuforever](https://www.youtube.com/@jangouuforever) |
+| **Instagram** | [@jangouuforever](https://www.instagram.com/jangouuforever/) |
+
+#### The origin story
+
+Per Zaal's own memory file (`project_jangouu_forever.md`, 2026-05-07): "Musician Zaal met in college, 2018 or 2019. Working with him is what shifted Zaal toward thinking entrepreneurially about how to support independent artists. The seed of The ZAO origin story." Zaal, in doc 659 (2026-05-21): "ZM. JANGOUU FOREVER. been thinking about how every project i build now traces back to him."
+
+#### Music - concrete and current
+
+DIY producer/artist - raps, sings, writes, produces, engineers, and mixes his own work. Genre-blends synthrock/trap/synth rock/folk-pop/ambient R&B. Also produces music NFTs (Thirdweb, Base).
+
+Latest release: **TSRCV2 EP, December 31, 2025** (5 tracks, incl. "ASHES 2 ASHES," "FUCK IT BET," "BEFORE I BLITZ // HIGH OFF A FEELIN'"). Earlier: THE SYNTHROCK CONCEPT V1 (2024), SHATTERPOINT and WHEN I'M HIGH (singles, 2025), a feature on "Stuck" (Even Summer Ends, 2024).
+
+#### ZAO ecosystem history
+
+- 2024-04-03: performed at ZAO-PALOOZA (NYC), featured on an official ZAO Card (Manifold collectible)
+- 2024-12: WaveWarZ LIVE Rematch vs. Hurric4n3Ike at ZAO-CHELLA Miami (Art Basel week)
+- No ZAO-context activity found for 2025 or 2026.
+
+#### Confidence note - direct conflict, needs Zaal's call
+
+Doc 722f (the 2026-05-23 collaborator network audit) explicitly classifies JANGOUU under "Incubator Alumni" with status **Historical** - not core team, not active. This directly conflicts with treating him as a currently-active teammate. The evidence supports: musically active as recently as Dec 2025, but **zero documented ZAO-ecosystem activity in 2026**. His current "activity out of 10" in the ZAO specifically (as opposed to as a musician generally) is genuinely unclear from any external or internal record - this is the one profile in this batch that needs Zaal's direct, current answer rather than more research; external search is exhausted (two consecutive angles turned up nothing new).
+
+#### Sources
+- [Apple Music](https://music.apple.com/gb/artist/jango-uu/1726641175), [X](https://x.com/jangouuforever), [SoundCloud](https://soundcloud.com/jangouuforever), [official site](https://jango-s-website-38gb.vercel.app/), [ZAO Card on Manifold](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza)
+- Doc 722f (2026-05-23), Doc 659 (2026-05-21), `project_jangouu_forever.md` memory file (2026-05-07)
 
 ---
 
@@ -621,6 +841,8 @@ ZAO Core
 ---
 
 ## Sources
+
+> Sources for the seven 2026-07-10 additions (Iman, Jose Cabrera, ThyRev, Metamu, Nemesis, Shawn, JANGOUU) are listed inline at the end of each person's section above, not repeated here.
 
 ### AttaBotty & DaNici
 - [AttaBotty — About](https://www.attabotty.com/about)

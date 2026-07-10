@@ -22,6 +22,30 @@ import { dirname, join } from 'node:path';
 import type { ZoeTask } from './types';
 import { buildQuestsBlock } from './sidequests';
 
+// Doc 1023 Key Decision 2 (research/security/1023-prompt-injection-threat-
+// landscape-2026): fetchIcmBrain's body becomes a fleet bot's entire persona
+// verbatim - the trust boundary itself, not just reviewed downstream content -
+// so a flagged body must fail closed (fall back to ZOE's own persona), unlike
+// the flag-and-continue treatment used for less-privileged surfaces.
+//
+// Inlined rather than imported from bot/src/lib/injection-guard.ts because
+// that module lands via PR #1212 on a separate branch off main; this branch
+// (ws/zoe-bot-factory-mvp, PR #1208) predates it. Dedupe into the shared
+// module once both branches are merged to main.
+const PERSONA_INJECTION_PATTERNS: RegExp[] = [
+  /ignore\s+(all\s+)?(the\s+)?(previous|prior|above)\s+instructions?/i,
+  /disregard\s+(all\s+)?(the\s+)?(previous|prior|above)\s+instructions?/i,
+  /forget\s+(everything|all)\s+(above|before)/i,
+  /you\s+are\s+now\s+(a|an)?\s*\w+/i,
+  /new\s+(system\s+)?instructions?\s*:/i,
+  /system\s+prompt\s*:/i,
+  /<!--[\s\S]*?(ignore|instruction|system\s*prompt)[\s\S]*?-->/i,
+];
+
+function detectPersonaInjection(text: string): string[] {
+  return PERSONA_INJECTION_PATTERNS.filter((re) => re.test(text)).map((re) => re.source);
+}
+
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
 const HUMAN_PATH = join(ZOE_HOME, 'human.md');
@@ -415,6 +439,13 @@ export async function fetchIcmBrain(boxId: string, now: number = Date.now()): Pr
     if (!res.ok) return null;
     const body = (await res.text()).trim();
     if (!body) return null;
+    const injectionHits = detectPersonaInjection(body);
+    if (injectionHits.length > 0) {
+      console.warn(
+        `[zoe/memory] ICM box ${boxId} body flagged for possible prompt injection - refusing to use as persona: ${injectionHits.join(', ')}`,
+      );
+      return null;
+    }
     icmCache.set(boxId, { body, at: now });
     return body;
   } catch {

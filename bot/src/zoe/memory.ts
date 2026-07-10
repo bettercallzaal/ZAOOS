@@ -556,14 +556,23 @@ export async function writeTasks(tasks: ZoeTask[]): Promise<void> {
 export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
+  brain?: { icmBoxId: string | null },
 ): Promise<MemoryBlocks> {
-  const [persona, human, recentTurns, tasks, quests] = await Promise.all([
+  const [basePersona, human, recentTurns, tasks, quests] = await Promise.all([
     readPersona(),
     readHuman(),
     readRecent(scope),
     readTasks(),
     buildQuestsBlock(),
   ]);
+
+  // Bot-factory (doc 1021): when a fleet bot carries an ICM box, its box body
+  // is the persona; on any fetch failure we fall back to ZOE's own persona.
+  let persona = basePersona;
+  if (brain?.icmBoxId) {
+    const icm = await fetchIcmBrain(brain.icmBoxId);
+    if (icm) persona = icm;
+  }
 
   const working =
     recentTurns.length === 0

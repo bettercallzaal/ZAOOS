@@ -199,3 +199,4 @@
 | 1008 | [Learn AI Is Bad Advice - What To Learn](./1008-learn-ai-is-bad-advice-what-to-learn/) | STANDALONE | Foundational knowledge priorities for AI-first engineering |
 | 1009 | [The Only Morning Routine That Actually Changed My Life](./1009-morning-routine-that-changed-my-life/) | STANDALONE | Flow proneness, hypnopompic window, and Zaal's dawn flow protocol |
 | 1014 | [Six Durable Skills for the AI Era - Zaal's Course](./1014-six-skills-course-ai-era/) | COURSE | Self-paced bootcamp on distribution, curation, agents, builder-distributor loop, IRL community, robotics |
+| 1013 | [The morning routine that changed my life](./1013-morning-routine-that-changed-my-life/) | RESEARCH | Ep2: wake into your highest-priority task for the peak-flow window right after waking; rituals AFTER not before. Zaal's real-schedule morning flow. |

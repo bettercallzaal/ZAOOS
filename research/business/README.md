@@ -104,3 +104,4 @@
 | 1001 | [YouTube/ZAO growth: What is the full network of active Solana-native m](./1001-youtube-zao-growth-what-is-the-full/) | DISPATCH | ZOE research: YouTube/ZAO growth: What is the full network of active Solana-native music creator YouTube |
 | 1010 | [Repo/web improvement: Nexus hosting](./1010-repo-web-improvement-nexus-hosting/) | RESEARCH | ZOE research on hosting the Nexus (renumbered from a colliding 1005). |
 | 1009 | [ZAO Festivals brand audit](./1009-zaofestivals-brand-audit/) | AUDIT | ZAO Festivals brand/SEO audit (renumbered from a colliding 1004). |
+| 1012 | [YouTube/ZAO growth: clip cadence](./1012-youtube-zao-growth-clip-cadence/) | RESEARCH | ZOE research on YouTube clip cadence for ZAO growth (renumbered from a colliding 1007). |

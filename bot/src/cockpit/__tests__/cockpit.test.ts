@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs } from '../adapters';
+import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs, isHandoff, partitionHandoffs, toHandoff } from '../adapters';
 import { formatCockpitBrief } from '../brief';
 import type { CockpitTask, CockpitBrief } from '../types';
 
@@ -13,6 +13,8 @@ function task(o: Partial<CockpitTask> & { id: string; title: string }): CockpitT
     due: null,
     project: null,
     legacy_id: null,
+    legacy_source: null,
+    notes: null,
     next_owner: null,
     updated_at: new Date(NOW).toISOString(),
     created_at: new Date(NOW).toISOString(),
@@ -113,9 +115,12 @@ describe('formatCockpitBrief', () => {
           createdAt: '2026-07-10T05:00:00Z',
         },
       ],
+      handoffs: [
+        { taskId: 'h1', slug: 'zao-whitepapers', title: 'Papers terminal', note: '12 drafts live, needs ZABAL call', createdAt: '2026-07-10T06:00:00Z' },
+      ],
       stale: [],
       blocked: [],
-      counts: { open: 2, needsYou: 1, needsReview: 1, stale: 0, blocked: 0 },
+      counts: { open: 2, needsYou: 1, needsReview: 1, handoffs: 1, stale: 0, blocked: 0 },
       proposedWrites: [],
     };
     const out = formatCockpitBrief(b);
@@ -125,7 +130,31 @@ describe('formatCockpitBrief', () => {
     expect(out).toContain('NEEDS YOUR REVIEW');
     expect(out).toContain('ZAODEVZ/ZAOcowork #174');
     expect(out).toContain('1 PRs to review');
+    expect(out).toContain('HANDOFFS (from other terminals)');
+    expect(out).toContain('zao-whitepapers: Papers terminal');
+    expect(out).toContain('1 handoffs');
     expect(out).not.toMatch(/[—\u{1F300}-\u{1FAFF}]/u); // no em dash, no emoji
+  });
+});
+
+describe('handoff helpers', () => {
+  it('isHandoff detects the legacy_source marker', () => {
+    expect(isHandoff(task({ id: '1', title: 'x', legacy_source: 'handoff:papers' }))).toBe(true);
+    expect(isHandoff(task({ id: '2', title: 'y', legacy_source: 'meeting:foo' }))).toBe(false);
+    expect(isHandoff(task({ id: '3', title: 'z' }))).toBe(false);
+  });
+  it('partitionHandoffs splits handoffs from regular tasks', () => {
+    const tasks = [
+      task({ id: 'a', title: 'real task' }),
+      task({ id: 'b', title: 'handed off', legacy_source: 'handoff:papers' }),
+    ];
+    const { handoffs, rest } = partitionHandoffs(tasks);
+    expect(handoffs.map((t) => t.id)).toEqual(['b']);
+    expect(rest.map((t) => t.id)).toEqual(['a']);
+  });
+  it('toHandoff parses slug + carries note', () => {
+    const h = toHandoff(task({ id: 'b', title: 'Papers', legacy_source: 'handoff:zao-whitepapers', notes: 'open items' }));
+    expect(h).toMatchObject({ taskId: 'b', slug: 'zao-whitepapers', title: 'Papers', note: 'open items' });
   });
 });
 

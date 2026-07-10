@@ -21,9 +21,22 @@ export interface CockpitTask {
   due: string | null;
   project: string | null;
   legacy_id: string | null;
+  /** e.g. "handoff:zao-whitepapers" - marks a task written by /handoff. */
+  legacy_source: string | null;
+  /** free-text body (open items / context, used for handoffs). */
+  notes: string | null;
   next_owner: NextOwner | null;
   updated_at: string | null;
   created_at: string | null;
+}
+
+/** A handoff from another terminal, surfaced in the cockpit (the durable home). */
+export interface Handoff {
+  taskId: string;
+  slug: string; // parsed from legacy_source "handoff:<slug>"
+  title: string;
+  note: string | null; // open items / context
+  createdAt: string | null;
 }
 
 /** Cockpit run modes = the constraint flags (episode: "investigate-only" enforced by the harness, not the prompt). */
@@ -64,12 +77,14 @@ export interface CockpitBrief {
   needsYou: CockpitTask[];
   /** Open PRs across Zaal's repos awaiting his review/merge - "this stuff to see". */
   needsReview: ReviewPR[];
+  /** Handoffs from other terminals - the durable home for cross-terminal work. */
+  handoffs: Handoff[];
   /** Stale: undated P0/P1s, or no update in >= STALE_DAYS. */
   stale: CockpitTask[];
   /** Blocked (next_owner = 'blocked'). */
   blocked: CockpitTask[];
   /** Counts for the one-line summary. */
-  counts: { open: number; needsYou: number; needsReview: number; stale: number; blocked: number };
+  counts: { open: number; needsYou: number; needsReview: number; handoffs: number; stale: number; blocked: number };
   /** Gated write proposals (empty in 'brief' mode; populated in 'triage'). */
   proposedWrites: WriteProposal[];
 }

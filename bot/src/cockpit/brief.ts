@@ -13,6 +13,8 @@ import { homedir } from 'node:os';
 import {
   fetchCockpitTasks,
   fetchReviewPRs,
+  partitionHandoffs,
+  toHandoff,
   topThree,
   needsYou,
   blocked,
@@ -27,21 +29,29 @@ export const COCKPIT_HOME = process.env.COCKPIT_HOME || join(homedir(), '.zao', 
 /** Build the cockpit brief. `now` is injectable for tests. */
 export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.now()): Promise<CockpitBrief> {
   // Tracker tasks + open PRs run in parallel; either failing degrades to [].
-  const [tasks, reviewPRs] = await Promise.all([fetchCockpitTasks(), fetchReviewPRs()]);
+  const [allTasks, reviewPRs] = await Promise.all([fetchCockpitTasks(), fetchReviewPRs()]);
+  // Handoffs (legacy_source "handoff:*") get their own lane, not the task lanes.
+  const { handoffs: handoffTasks, rest: tasks } = partitionHandoffs(allTasks);
   const you = needsYou(tasks);
   const stale = findStale(tasks, now);
   const blk = blocked(tasks);
+  const handoffs = handoffTasks
+    .slice()
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    .map(toHandoff);
   return {
     date: new Date(now).toISOString().slice(0, 10),
     top3: topThree(tasks),
     needsYou: you,
     needsReview: reviewPRs,
+    handoffs,
     stale,
     blocked: blk,
     counts: {
       open: tasks.length,
       needsYou: you.length,
       needsReview: reviewPRs.length,
+      handoffs: handoffs.length,
       stale: stale.length,
       blocked: blk.length,
     },
@@ -60,9 +70,17 @@ export function formatCockpitBrief(b: CockpitBrief): string {
   const parts: string[] = [];
   parts.push(`Cockpit - ${b.date}`);
   parts.push(
-    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
+    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.handoffs} handoffs | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
   );
   if (b.top3.length) parts.push('\nDO FIRST\n' + b.top3.map(line).join('\n'));
+  if (b.handoffs.length)
+    parts.push(
+      '\nHANDOFFS (from other terminals)\n' +
+        b.handoffs
+          .slice(0, 8)
+          .map((h) => `- ${h.slug}: ${h.title}${h.note ? `\n  ${h.note.split('\n')[0].slice(0, 120)}` : ''}`)
+          .join('\n'),
+    );
   if (b.needsReview.length)
     parts.push(
       '\nNEEDS YOUR REVIEW (open PRs)\n' +

@@ -153,32 +153,41 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       .sendToZaal(`Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`)
       .catch(() => {});
 
-    await dispatchPlan({
-      goal: item.input,
-      plan,
-      context: ctx,
-      chatId: deps.zaalTgId,
-      zaalTgId: deps.zaalTgId,
-      hooks: {
-        onSubtaskDone: async (st, r) => {
-          if (st.worker === 'research-worker' && r.status === 'completed' && r.output) {
-            const doc = await commitResearchDoc({ question: item.input, findings: r.output });
-            await deps
-              .sendToZaal(
-                doc.ok
-                  ? `Work-loop done: doc ${doc.num} -> ${doc.prUrl}`
-                  : `Work-loop: doc save failed - ${doc.error}`,
-              )
-              .catch(() => {});
-          }
+    try {
+      await dispatchPlan({
+        goal: item.input,
+        plan,
+        context: ctx,
+        chatId: deps.zaalTgId,
+        zaalTgId: deps.zaalTgId,
+        hooks: {
+          onSubtaskDone: async (st, r) => {
+            if (st.worker === 'research-worker' && r.status === 'completed' && r.output) {
+              const doc = await commitResearchDoc({ question: item.input, findings: r.output });
+              await deps
+                .sendToZaal(
+                  doc.ok
+                    ? `Work-loop done: doc ${doc.num} -> ${doc.prUrl}`
+                    : `Work-loop: doc save failed - ${doc.error}`,
+                )
+                .catch(() => {});
+            }
+          },
         },
-      },
-    });
-
-    await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
-    await bumpToday(deps.currentDate);
-  } catch (e) {
-    console.error('[zoe/work-loop] tick failed:', (e as Error).message);
+      });
+      await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
+      await bumpToday(deps.currentDate);
+    } catch (e) {
+      const errMsg = (e as Error)?.message ?? String(e);
+      console.error('[zoe/work-loop] tick failed:', errMsg);
+      await deps
+        .sendToZaal(
+          `Work-loop error: failed to process "${item.input.slice(0, 60)}..." - ${errMsg.slice(0, 120)}`,
+        )
+        .catch(() => {});
+      // Remove from queue even on error to avoid infinite retry loop
+      await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
+    }
   } finally {
     await releaseLock();
   }

@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import {
   fetchCockpitTasks,
+  fetchReviewPRs,
   topThree,
   needsYou,
   blocked,
@@ -25,7 +26,8 @@ export const COCKPIT_HOME = process.env.COCKPIT_HOME || join(homedir(), '.zao', 
 
 /** Build the cockpit brief. `now` is injectable for tests. */
 export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.now()): Promise<CockpitBrief> {
-  const tasks = await fetchCockpitTasks();
+  // Tracker tasks + open PRs run in parallel; either failing degrades to [].
+  const [tasks, reviewPRs] = await Promise.all([fetchCockpitTasks(), fetchReviewPRs()]);
   const you = needsYou(tasks);
   const stale = findStale(tasks, now);
   const blk = blocked(tasks);
@@ -33,9 +35,16 @@ export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.
     date: new Date(now).toISOString().slice(0, 10),
     top3: topThree(tasks),
     needsYou: you,
+    needsReview: reviewPRs,
     stale,
     blocked: blk,
-    counts: { open: tasks.length, needsYou: you.length, stale: stale.length, blocked: blk.length },
+    counts: {
+      open: tasks.length,
+      needsYou: you.length,
+      needsReview: reviewPRs.length,
+      stale: stale.length,
+      blocked: blk.length,
+    },
     proposedWrites: mode === 'brief' ? [] : buildProposals(tasks, now),
   };
 }
@@ -50,8 +59,18 @@ function line(t: { title: string; due: string | null; priority: string | null })
 export function formatCockpitBrief(b: CockpitBrief): string {
   const parts: string[] = [];
   parts.push(`Cockpit - ${b.date}`);
-  parts.push(`${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.stale} stale | ${b.counts.blocked} blocked`);
+  parts.push(
+    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
+  );
   if (b.top3.length) parts.push('\nDO FIRST\n' + b.top3.map(line).join('\n'));
+  if (b.needsReview.length)
+    parts.push(
+      '\nNEEDS YOUR REVIEW (open PRs)\n' +
+        b.needsReview
+          .slice(0, 10)
+          .map((p) => `- ${p.repo} #${p.number}: ${p.title}\n  ${p.url}`)
+          .join('\n'),
+    );
   if (b.needsYou.length) parts.push('\nNEEDS YOU\n' + b.needsYou.slice(0, 8).map(line).join('\n'));
   if (b.stale.length) parts.push('\nSTALE (review)\n' + b.stale.slice(0, 8).map(line).join('\n'));
   if (b.blocked.length) parts.push('\nBLOCKED\n' + b.blocked.slice(0, 6).map(line).join('\n'));

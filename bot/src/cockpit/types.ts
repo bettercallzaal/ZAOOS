@@ -45,6 +45,16 @@ export interface WriteProposal {
   reason: string;
 }
 
+/** An open PR across Zaal's repos that is waiting on his review/merge. */
+export interface ReviewPR {
+  repo: string; // "owner/name"
+  number: number;
+  title: string;
+  url: string;
+  draft: boolean;
+  createdAt: string | null;
+}
+
 /** The fixed cockpit brief shape. */
 export interface CockpitBrief {
   date: string; // ISO date the brief was built for
@@ -52,12 +62,14 @@ export interface CockpitBrief {
   top3: CockpitTask[];
   /** Tasks routed to Zaal (next_owner = 'me', or undated P0/P1) - "what needs YOU". */
   needsYou: CockpitTask[];
+  /** Open PRs across Zaal's repos awaiting his review/merge - "this stuff to see". */
+  needsReview: ReviewPR[];
   /** Stale: undated P0/P1s, or no update in >= STALE_DAYS. */
   stale: CockpitTask[];
   /** Blocked (next_owner = 'blocked'). */
   blocked: CockpitTask[];
   /** Counts for the one-line summary. */
-  counts: { open: number; needsYou: number; stale: number; blocked: number };
+  counts: { open: number; needsYou: number; needsReview: number; stale: number; blocked: number };
   /** Gated write proposals (empty in 'brief' mode; populated in 'triage'). */
   proposedWrites: WriteProposal[];
 }

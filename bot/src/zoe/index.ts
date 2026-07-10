@@ -23,6 +23,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { checkAndRecordZoeCall } from './call-budget';
+import { runCockpit } from '../cockpit/cockpit';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
@@ -317,6 +318,19 @@ bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
+});
+
+// On-demand operator cockpit: the same brief the 5am cron sends, triggerable
+// any time (e.g. from the car). Read-only. /cockpit
+bot.command('cockpit', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  await ctx.reply('Building your cockpit...');
+  try {
+    const run = await runCockpit('brief');
+    await replyChunked(ctx, run.message);
+  } catch (e) {
+    await ctx.reply(`Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`);
+  }
 });
 
 bot.command('team', async (ctx) => {

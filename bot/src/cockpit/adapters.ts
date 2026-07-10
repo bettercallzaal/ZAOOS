@@ -8,11 +8,18 @@
  * without the network.
  */
 
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { classifyTask, type NextOwner } from '../zoe/task-classifier';
-import type { CockpitTask, WriteProposal } from './types';
+import type { CockpitTask, ReviewPR, WriteProposal } from './types';
+
+const execFileAsync = promisify(execFile);
 
 /** A task with no update in this many days (and not recurring) is stale. Doc 983. */
 export const STALE_DAYS = 14;
+
+/** GitHub users/orgs whose open PRs land in Zaal's review lane. */
+const REVIEW_OWNERS = ['bettercallzaal', 'ZAODEVZ'];
 
 const MAX_TASKS = 200;
 const REQUEST_TIMEOUT_MS = 8000;
@@ -73,6 +80,51 @@ export async function fetchCockpitTasks(): Promise<CockpitTask[]> {
     if (!res.ok) return [];
     const rows = (await res.json()) as RawRow[];
     return rows.map(toCockpitTask);
+  } catch {
+    return [];
+  }
+}
+
+interface RawPR {
+  repository_url?: string;
+  number?: number;
+  title?: string;
+  html_url?: string;
+  draft?: boolean;
+  created_at?: string;
+}
+
+/** Pure: turn raw gh search rows into review PRs, dropping drafts + 'do not merge', newest first. */
+export function filterReviewPRs(rows: RawPR[]): ReviewPR[] {
+  return rows
+    .filter((r) => r && !r.draft && typeof r.number === 'number')
+    .filter((r) => !/\b(do not merge|wip|draft)\b/i.test(r.title ?? ''))
+    .map((r) => ({
+      repo: (r.repository_url ?? '').replace(/^https:\/\/api\.github\.com\/repos\//, '') || 'unknown',
+      number: r.number as number,
+      title: (r.title ?? '').trim(),
+      url: r.html_url ?? '',
+      draft: false,
+      createdAt: r.created_at ?? null,
+    }))
+    .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
+}
+
+/**
+ * Open PRs across Zaal's repos awaiting his review/merge. Uses the gh CLI
+ * (authenticated on the VPS - the bot has no GITHUB_TOKEN env; git.ts relies on
+ * gh auth). One search call across the review owners. Best-effort: [] on failure.
+ */
+export async function fetchReviewPRs(): Promise<ReviewPR[]> {
+  const q = `is:pr is:open ${REVIEW_OWNERS.map((o) => `user:${o}`).join(' ')}`;
+  try {
+    const { stdout } = await execFileAsync(
+      'gh',
+      ['api', '-X', 'GET', 'search/issues', '-f', `q=${q}`, '-F', 'per_page=40', '--jq', '.items'],
+      { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 1_000_000 },
+    );
+    const rows = JSON.parse(stdout || '[]') as RawPR[];
+    return Array.isArray(rows) ? filterReviewPRs(rows) : [];
   } catch {
     return [];
   }

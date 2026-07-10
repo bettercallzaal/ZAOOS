@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS } from '../adapters';
+import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs } from '../adapters';
 import { formatCockpitBrief } from '../brief';
 import type { CockpitTask, CockpitBrief } from '../types';
 
@@ -103,15 +103,70 @@ describe('formatCockpitBrief', () => {
       date: '2026-07-09',
       top3: [task({ id: '1', title: 'do this', due: '2026-07-09', priority: 'P0' })],
       needsYou: [task({ id: '2', title: 'your call', next_owner: 'me' })],
+      needsReview: [
+        {
+          repo: 'ZAODEVZ/ZAOcowork',
+          number: 174,
+          title: 'GEO FAQ page',
+          url: 'https://github.com/ZAODEVZ/ZAOcowork/pull/174',
+          draft: false,
+          createdAt: '2026-07-10T05:00:00Z',
+        },
+      ],
       stale: [],
       blocked: [],
-      counts: { open: 2, needsYou: 1, stale: 0, blocked: 0 },
+      counts: { open: 2, needsYou: 1, needsReview: 1, stale: 0, blocked: 0 },
       proposedWrites: [],
     };
     const out = formatCockpitBrief(b);
     expect(out).toContain('Cockpit - 2026-07-09');
     expect(out).toContain('DO FIRST');
     expect(out).toContain('NEEDS YOU');
+    expect(out).toContain('NEEDS YOUR REVIEW');
+    expect(out).toContain('ZAODEVZ/ZAOcowork #174');
+    expect(out).toContain('1 PRs to review');
     expect(out).not.toMatch(/[—\u{1F300}-\u{1FAFF}]/u); // no em dash, no emoji
+  });
+});
+
+describe('filterReviewPRs', () => {
+  it('drops drafts + do-not-merge, parses repo, sorts newest first', () => {
+    const rows = [
+      {
+        repository_url: 'https://api.github.com/repos/bettercallzaal/ZAOOS',
+        number: 10,
+        title: 'old fix',
+        html_url: 'u10',
+        draft: false,
+        created_at: '2026-07-01T00:00:00Z',
+      },
+      {
+        repository_url: 'https://api.github.com/repos/ZAODEVZ/ZAOcowork',
+        number: 20,
+        title: 'new feature',
+        html_url: 'u20',
+        draft: false,
+        created_at: '2026-07-10T00:00:00Z',
+      },
+      {
+        repository_url: 'https://api.github.com/repos/x/y',
+        number: 30,
+        title: 'WIP do not touch',
+        html_url: 'u30',
+        draft: false,
+        created_at: '2026-07-11T00:00:00Z',
+      },
+      {
+        repository_url: 'https://api.github.com/repos/x/y',
+        number: 40,
+        title: 'a draft one',
+        html_url: 'u40',
+        draft: true,
+        created_at: '2026-07-12T00:00:00Z',
+      },
+    ];
+    const out = filterReviewPRs(rows);
+    expect(out.map((p) => p.number)).toEqual([20, 10]); // draft + WIP dropped, newest first
+    expect(out[0].repo).toBe('ZAODEVZ/ZAOcowork');
   });
 });

@@ -2,11 +2,13 @@
 topic: community
 type: guide
 status: research-complete
-last_validated: 2026-05-21
-related_docs: 432, 547, 614, 615, 621
-tier: STANDARD
+last_validated: 2026-07-10
+related_docs: 432, 547, 614, 615, 621, 229
+tier: DEEP (2026-07-10 addendum: international/under-resourced-region expansion, for The ZAO Protocol capstone paper)
 original-query: How should The ZAO apply David Ehrlichman's impact networks framework to scale beyond 188 members? (reconstructed)
 ---
+
+> **2026-07-10 addendum:** Zaal set a 2040 goal for The ZAO: "everyone in the world knows about us in the creator economy... support other artists with all the resources they could need, then go around the world to places that don't have resources and help build them - I want to build an impact network." That's a new dimension this doc didn't cover in May - the original pass was entirely about ZAO's internal structure (hub-to-federation). See the new "International Expansion" section below for what Converge's own real-world international work says about the operational model for the second half of that goal. This doc is direct input for The ZAO Protocol, the planned capstone paper synthesizing the Whitepaper, Technical Whitepaper, Manifesto, what-is-the-zao, and the ecosystem papers.
 
 # 622 - Impact Networks (David Ehrlichman framework) applied to The ZAO
 
@@ -169,6 +171,26 @@ Key insight from Ehrlichman's work with Hats:
     - As new projects pitch (e.g., AI Taste, Respect, ZID - from future-repos.md), apply the charter + federation template.
     - Make it easy for founders to join as nodes, hard to stay as spokes.
     - Goal: By Dec 2026, 5-7 projects operating as coordinated federation, not Zaal-led org.
+
+---
+
+## International Expansion - Operationalizing the 2040 Goal's Second Half
+
+The May 2026 pass of this doc scored ZAO's internal readiness (2.4/5) but never addressed the international, capacity-building half of Zaal's 2040 goal. Fresh research (2026-07-10) into Converge's own client history shows this isn't speculative - Ehrlichman's organization has done exactly this kind of work, repeatedly, in under-resourced and cross-border contexts:
+
+| Network | Region | What Converge Actually Did |
+|---------|--------|----------------------------|
+| Puerto Rico Impact Investment Network | Puerto Rico | Lead partner from concept through year one - network cultivation, convening design/facilitation, interim coordination, catalyzing investors + business leaders + philanthropies + community orgs around a resilient local economy |
+| Asia Pacific Refugee Rights Network (APRRN) | Asia-Pacific | Advised the Secretary General/Secretariat, facilitated team learning sessions, wrote the governance plan, ran network-health assessment + social network analysis training - a 7+ year live network (independently corroborated: [ReliefWeb](https://reliefweb.int/organization/aprrn), [Devex](https://www.devex.com/organizations/asia-pacific-refugee-rights-network-73693), a [ResearchGate case study "Growing Pains: APRRN at Seven Years"](https://www.researchgate.net/publication/305648186_Growing_Pains_The_Asia_Pacific_Refugee_Rights_Network_at_Seven_Years)) |
+| Women in Africa Investment Network | Africa | Advised the network catalyst/coordinator on the network's health and evolution |
+| International Trade Centre's Alliances for Action | Multi-regional (SDG/trade-focused) | Introduced network concepts, co-created theory of change, designed coordination-hub org structures, launched pilot networks, built assessment tools |
+| Partners Network | Latin America, Middle East, Africa, Eastern Europe, US | Internal-learning network among country offices of global civil-society peacebuilding orgs |
+
+**What this means operationally for The ZAO:** none of these were "Converge opens an office in the region." Every single case is the same pattern - go find people/orgs already doing the work locally, then provide convening design, interim coordination, governance-plan co-design, and network-health tooling until a local coordinator can run it themselves. That maps directly onto Ehrlichman's "node, not hub" principle (already scored 2/5 for ZAO's *internal* structure above) - the international expansion should follow the identical logic, not a separate playbook. For a "place that doesn't have resources," the ZAO's actual export isn't capital or a branch office - it's the network-cultivation methodology itself, plus access to the existing ZAO node network (WaveWarZ artist pipeline, ZABAL Games mentorship structure, Respect/Hats permissioning) as the connective tissue.
+
+**One claim flagged, not confirmed:** an initial web search characterized Ehrlichman's approach as "scale out, not scale up" (cooperation vs. centralized growth). A direct fetch of the primary SSIR excerpt could not verify this as an actual Ehrlichman quote or phrase from that source - it may be a secondary-source paraphrase. The underlying pattern (network cultivation + interim coordination + local handoff, evidenced by the 5 case studies above) is independently confirmed regardless of whether this specific phrase is authentically Ehrlichman's; don't cite "scale out not scale up" as a direct quote without finding it in the actual book text.
+
+**Concrete implication for The ZAO Protocol capstone paper:** the 2040 goal's global-expansion half should be framed as "export the network-cultivation methodology + connect local creator networks into the ZAO graph," not "ZAO opens chapters." This is a materially different (and more credible) claim than an unstructured "help build them" - it has 5 real precedents to cite.
 
 ---
 

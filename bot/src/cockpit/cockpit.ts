@@ -37,7 +37,7 @@ export async function runCockpit(mode: CockpitMode = 'brief', now = Date.now()):
   let operatorRead: string | null = null;
   let costUsd = 0;
 
-  if (brief.counts.open > 0) {
+  if (brief.counts.open > 0 || brief.counts.needsReview > 0) {
     try {
       const res = await callClaudeCli({
         model: COCKPIT_MODEL,

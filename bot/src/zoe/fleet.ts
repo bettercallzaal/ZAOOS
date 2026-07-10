@@ -17,7 +17,7 @@ export const FLEET: FleetBot[] = [
   {
     name: 'ZAO Devz',
     tokenEnvVar: 'ZAODEVZ_BOT_TOKEN',
-    icmBoxId: 'ICM_BOX_ID_PLACEHOLDER', // set to the real box id in Task 5
+    icmBoxId: 'icm_ohb0F_XOYDz9Tw_w4yX3PA', // The ZAO box (verified resolves); swap to a dedicated zaodevz box later
     role: 'zao-devz brand + inbox',
     audience: 'internal',
   },

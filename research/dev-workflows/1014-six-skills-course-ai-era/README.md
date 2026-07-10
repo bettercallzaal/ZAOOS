@@ -69,6 +69,35 @@ You will have shipped it three times over.
 
 ---
 
+## How This Runs On Your Actual Morning
+
+Your real morning is not one long build block. It is three different environments back to back, each good for a different kind of work. The course fails if it fights that; it works if it maps onto it. Here is the split and what each block is for.
+
+**Wake 4:20 -> 30 minutes at the desk. This is the deep-work slot.** It is the sharpest cognitive window of your day, right after waking, before the world loads in. Spend it on the ONE hardest thinking task of the module, not on email or triage. The rule that makes this work: prep the task the night before, so at 4:20 you open one file and start cold, zero warmup, zero deciding-what-to-do. Writing, deciding, designing, the hard 20 hooks, the pain sentence - this is where they go.
+
+**Shower / get ready. Reset, no work.** Let the desk task keep cooking in the background. Do not check a screen.
+
+**45-minute car ride to work. This is AUDIO / VOICE mode - no coding, hands and eyes are driving.** This block is worth as much as the desk block, but only for the right kind of work: listening and talking. Listen to the module read aloud or a research doc; voice-draft casts and hooks into a memo; talk through a decision out loud and let the recording be the artifact; take the course itself by audio. You cannot type here, so never plan a typing task for the car. The car is where you consume the input and rehearse the output; the desk is where you produce it.
+
+**Gym 6-7. Physical recovery. Rituals go AFTER, not before.** Do not stack a cognitive ritual on top of the workout. If a module has a "reflect / measure" step, do it post-gym or fold it into the next morning's desk slot.
+
+### The daily loop, mapped
+
+The pattern every day: **car = input + rehearse, desk = produce, gym = recover.** You take in the module and voice-draft the raw material on today's drive; you sit down the next morning and ship the polished version in 30 focused minutes. Input and production are one day offset - that offset is a feature, it means you always sit down with raw material already in hand.
+
+### Per-module fit
+
+- **Week 1 (Distribution):** Desk = write the pain sentence + the 20 hooks (hardest thinking). Car = read the 20 hooks out loud, feel which ones land, voice-memo the rewrites. Ship the daily 60-second take from the desk; script it by voice on the drive first.
+- **Week 2 (Curation):** Car = consume the niche (listen to the feeds/podcasts, voice-note what actually mattered). Desk = write the day's one-line point-of-view take. This module is almost made for the car.
+- **Week 3 (Agents):** Desk only - this is build/config work that needs a keyboard. Car = listen to the module + talk through the agent's ONE job out loud so you sit down knowing exactly what to build.
+- **Week 4 (48-hour ship loop):** Desk = build + read the DM feedback. Car = voice-draft the outreach DMs and the "what surprised me" note. Gym-after = the honest reflection on what to cut.
+- **Week 5 (Events / recaps):** Car = voice-draft the recap and the follow-up messages (talking is the right medium for a recap anyway). Desk = turn the voice draft into the shipped recap doc + network asset.
+- **Week 6 (Physical / atoms):** Car = observe + voice-note the physical-integration insights on the drive. Desk = write them into the product spec.
+
+The through-line: **never plan a keyboard task for the car, never waste the 4:20 desk window on something you could have done by voice.** Match the task to the environment and the same 30+45 minutes does double the work.
+
+---
+
 ## Module 1: Distribution Marketers (Week 1)
 
 ### The Skill in Two Sentences

@@ -11,7 +11,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { classifyTask, type NextOwner } from '../zoe/task-classifier';
-import type { CockpitTask, ReviewPR, WriteProposal } from './types';
+import type { CockpitTask, Handoff, ReviewPR, WriteProposal } from './types';
 
 const execFileAsync = promisify(execFile);
 
@@ -32,6 +32,8 @@ interface RawRow {
   due: string | null;
   project: string | null;
   legacy_id: string | null;
+  legacy_source: string | null;
+  notes: string | null;
   updated_at: string | null;
   created_at: string | null;
   metadata: Record<string, unknown> | null;
@@ -51,6 +53,8 @@ function toCockpitTask(r: RawRow): CockpitTask {
     due: r.due,
     project: r.project,
     legacy_id: r.legacy_id,
+    legacy_source: r.legacy_source,
+    notes: r.notes,
     next_owner: nextOwnerOf(r.metadata),
     updated_at: r.updated_at,
     created_at: r.created_at,
@@ -66,7 +70,7 @@ export async function fetchCockpitTasks(): Promise<CockpitTask[]> {
   const url =
     `${base.replace(/\/$/, '')}/rest/v1/tasks` +
     `?status=neq.done&archived_at=is.null` +
-    `&select=id,title,status,priority,due,project,legacy_id,updated_at,created_at,metadata` +
+    `&select=id,title,status,priority,due,project,legacy_id,legacy_source,notes,updated_at,created_at,metadata` +
     `&order=due.asc.nullslast&limit=${MAX_TASKS}`;
 
   try {
@@ -144,6 +148,30 @@ export async function fetchReviewPRs(): Promise<ReviewPR[]> {
 }
 
 // ---- pure logic (unit-testable, no network) ----
+
+/** A task written by /handoff carries legacy_source "handoff:<slug>". */
+export function isHandoff(t: CockpitTask): boolean {
+  return (t.legacy_source ?? '').startsWith('handoff:');
+}
+
+/** Split handoff tasks out of the regular task set so they only show in their own lane. */
+export function partitionHandoffs(tasks: CockpitTask[]): { handoffs: CockpitTask[]; rest: CockpitTask[] } {
+  const handoffs: CockpitTask[] = [];
+  const rest: CockpitTask[] = [];
+  for (const t of tasks) (isHandoff(t) ? handoffs : rest).push(t);
+  return { handoffs, rest };
+}
+
+/** Shape a handoff task into the cockpit Handoff view, newest first when mapped over a sorted list. */
+export function toHandoff(t: CockpitTask): Handoff {
+  return {
+    taskId: t.id,
+    slug: (t.legacy_source ?? '').replace(/^handoff:/, '') || 'unknown',
+    title: t.title,
+    note: t.notes,
+    createdAt: t.created_at,
+  };
+}
 
 export function priorityRank(p: string | null): number {
   const m = (p ?? '').toUpperCase().match(/P([0-9])/);

@@ -28,7 +28,7 @@ const cliMock = callClaudeCli as unknown as ReturnType<typeof vi.fn>;
 
 function task(o: Partial<CockpitTask> & { id: string; title: string }): CockpitTask {
   return {
-    status: 'todo', priority: null, due: null, project: null, legacy_id: null,
+    status: 'todo', priority: null, due: null, project: null, legacy_id: null, legacy_source: null, notes: null,
     next_owner: null, updated_at: new Date(NOW).toISOString(), created_at: new Date(NOW).toISOString(), ...o,
   };
 }

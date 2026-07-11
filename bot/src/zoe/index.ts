@@ -314,6 +314,21 @@ bot.command('start', async (ctx) => {
   );
 });
 
+// /chatid - report this chat's id + (in a forum topic) its topic thread id, so
+// Zaal can wire a group + topics without a third-party id bot. Works in DMs,
+// groups, and topics; commands reach the bot even in privacy mode.
+bot.command('chatid', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const chatId = ctx.chat.id;
+  const title = 'title' in ctx.chat ? ctx.chat.title : '(dm)';
+  const threadId = ctx.message?.message_thread_id;
+  const line = threadId
+    ? `chat: ${chatId} ("${title}")\ntopic thread id: ${threadId}`
+    : `chat: ${chatId} ("${title}")`;
+  console.log(`[zoe/chatid] ${line.replace(/\n/g, ' | ')}`);
+  await ctx.reply(line, threadId ? { message_thread_id: threadId } : {});
+});
+
 bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');

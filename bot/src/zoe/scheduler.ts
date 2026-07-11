@@ -29,6 +29,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
+import { surfaceNewHandoffs } from './handoffs-surface';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -379,6 +380,29 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           });
         } catch (err) {
           console.error('[zoe/scheduler] work-loop tick failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Handoffs topic surfacer - every 10 min, post any NEW handoff-inbox items
+  // (/handoff tracker rows) into the ZAAL BOTZ Handoffs topic. De-duped by a
+  // last-seen marker. Silent when nothing new + when the topic is not configured.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const thread = Number(process.env.ZAAL_BOTZ_HANDOFFS_THREAD ?? 0);
+        if (!gid || !thread) return; // not configured
+        try {
+          const n = await surfaceNewHandoffs((text: string) =>
+            opts.bot.api.sendMessage(gid, text, { message_thread_id: thread }),
+          );
+          if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} handoff(s) to the Handoffs topic`);
+        } catch (err) {
+          console.warn('[zoe/scheduler] handoff surface failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

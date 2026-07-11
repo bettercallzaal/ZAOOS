@@ -1,0 +1,41 @@
+#!/bin/bash
+# zao-ask <qid> "<question>" [opt1] [opt2] ...
+# Post a button-question to the ZAAL BOTZ General topic so Zaal can batch-click
+# answers from one place. ANY terminal/session calls this; the answer is logged
+# by ZOE to recent/<groupid>.json (the inbox bridge), and the asking terminal
+# reads it back by its <qid> namespace (convention: "<terminal>-<slug>", e.g.
+# "zaostock-publish"). Buttons wait until tapped; a "Type my own" button is
+# always added for freetext. No options = a freetext-only ask.
+#
+# Usage:
+#   zao-ask oss4ai "Speak yourself or recruit a speaker?" "Speak" "Recruit"
+#   zao-ask pub192 "Publish newsletter Day 192 now?" "Publish now" "Hold"
+set -e
+QID="$1"; Q="$2"; shift 2 2>/dev/null || true
+[ -z "$QID" ] || [ -z "$Q" ] && { echo 'usage: zao-ask <qid> "<question>" [opt1] [opt2] ...'; exit 1; }
+TGENV="$HOME/.zao/private/tg.env"
+TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
+GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
+[ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing ZOE_BOT_TOKEN or ZAAL_BOTZ_GROUP_ID in $TGENV"; exit 1; }
+python3 - "$TOKEN" "$GID" "$QID" "$Q" "$@" <<'PY'
+import sys, json, base64, re, urllib.request, urllib.parse
+token, gid, qid, q = sys.argv[1:5]
+opts = sys.argv[5:]
+def enc(qid, v): return f"q:{qid}:" + base64.urlsafe_b64encode(v.encode()).decode().rstrip("=")
+def slug(o): return (re.sub(r'[^a-z0-9]', '', o.lower())[:14] or "opt")
+rows = [[{"text": o, "callback_data": enc(qid, slug(o))}] for o in opts]
+rows.append([{"text": "Type my own", "callback_data": enc(qid, "__type__")}])
+# guard the 64-byte callback_data cap
+for r in rows:
+    if len(r[0]["callback_data"].encode()) > 64:
+        print("option too long for a button code:", r[0]["text"]); sys.exit(1)
+body = {"chat_id": gid, "text": f"[{qid}] {q}", "reply_markup": json.dumps({"inline_keyboard": rows})}
+# omit message_thread_id -> lands in the General topic
+data = urllib.parse.urlencode(body).encode()
+try:
+    r = json.load(urllib.request.urlopen(urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage", data=data), timeout=15))
+    print("asked:", qid) if r.get("ok") else print("FAIL:", r.get("description"))
+except Exception as e:
+    print("ERR:", e); sys.exit(1)
+PY

@@ -1,0 +1,6 @@
+#!/bin/bash
+# zao-cockpit - the operator cockpit from your desktop.
+# Same brief ZOE's /cockpit shows, run on the VPS (where tracker creds + gh live).
+# Usage: zao-cockpit
+ssh -o ConnectTimeout=25 ${ZAO_VPS_HOST:-zaal@31.97.148.88} \
+  'cd ~/zao-os/bot && set -a && . ./.env 2>/dev/null && set +a && PATH="$HOME/.local/bin:$PATH" npx tsx src/cockpit/cli.ts'

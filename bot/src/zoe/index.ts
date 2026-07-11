@@ -91,6 +91,8 @@ import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
+import { routeTopic, topicNameForThread } from './topic-router';
+import { dispatchHermesRun } from '../hermes/runner';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
@@ -774,11 +776,14 @@ bot.on('message:text', async (ctx) => {
   const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
   if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
     const threadId = ctx.message.message_thread_id;
-    // Per-topic behavior: the Research topic turns any message into a research
-    // request (the work-loop researches it + commits a doc + PR). Other topics
-    // are normal ZOE chat. Thread ids are env config (private-instance).
-    const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
-    if (researchThread && threadId === researchThread) {
+    // Per-topic behavior (topic = intent, Zaal 2026-07-11): dropping a plain
+    // message into a topic auto-acts per that topic. Internal actions fire now;
+    // outbound casts are drafted with an Approve button (money/public gate).
+    const topicName = await topicNameForThread(threadId).catch(() => undefined);
+    const action = routeTopic(topicName);
+    const threadOpt = threadId ? { message_thread_id: threadId } : {};
+
+    if (action.kind === 'research') {
       await enqueueWork(text, { chatId, threadId }).catch((e) =>
         console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),
       );
@@ -797,6 +802,56 @@ bot.on('message:text', async (ctx) => {
       }).catch((e) => console.error('[zoe/index] research kick failed:', (e as Error).message));
       return;
     }
+
+    if (action.kind === 'coding') {
+      // Full auto-PR: the coder+critic pipeline (PR-only, own daily-cap guard).
+      // A human still merges. Progress + the PR link report back into the topic.
+      await ctx.reply('On it - running the coder+critic pipeline. PR link lands here.').catch(() => {});
+      const say = (t: string) => bot.api.sendMessage(chatId, t, threadOpt).catch(() => {});
+      void dispatchHermesRun(
+        { triggered_by_telegram_id: zaalId, triggered_in_chat_id: chatId, issue_text: text },
+        {
+          onPrOpened: async (_id, prNumber, prUrl, score) => {
+            await say(`Coding done: PR #${prNumber} (critic ${score}/10)\n${prUrl}`);
+          },
+          onEscalated: async (_id, reason) => {
+            await say(`Coding escalated - needs your eyes: ${reason.slice(0, 200)}`);
+          },
+          onFailed: async (_id, reason) => {
+            await say(`Coding failed: ${reason.slice(0, 200)}`);
+          },
+        },
+      ).catch((e) => say(`Coding pipeline error: ${(e as Error).message.slice(0, 160)}`));
+      return;
+    }
+
+    if (action.kind === 'capture') {
+      const res = await addTeamTask({ title: text.slice(0, 300), project: action.project }).catch(
+        (e) => ({ ok: false as const, error: (e as Error).message }),
+      );
+      await ctx
+        .reply(res.ok ? `Filed under ${action.project}.` : `Could not file it - ${res.error}`)
+        .catch(() => {});
+      return;
+    }
+
+    if (action.kind === 'draft') {
+      // Also file a tagged note for brand topics (WaveWarZ / ZABAL Games).
+      if (action.alsoCapture) {
+        await addTeamTask({ title: text.slice(0, 300), project: action.alsoCapture }).catch(() => {});
+      }
+      const id = `${action.draftKind}-${Date.now().toString(36)}`;
+      putDraft(action.draftKind, text, id);
+      await bot.api
+        .sendMessage(chatId, `${action.label}:\n${text}`, {
+          ...threadOpt,
+          reply_markup: draftKeyboard(id),
+        })
+        .catch(() => {});
+      return;
+    }
+
+    // action.kind === 'chat': normal ZOE conversation (Handoffs, Claude Code, etc).
     const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
     const turnTextG = quotedG
       ? `[Zaal is replying to your earlier message:\n"${quotedG.slice(0, 1200)}"]\n\nHis reply: ${text}`

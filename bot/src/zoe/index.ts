@@ -309,6 +309,14 @@ async function replyAdminOnly(ctx: Context): Promise<void> {
   await ctx.reply('Group admin commands are Zaal-only. DM me if you need access.');
 }
 
+/** The ZAAL BOTZ Research topic as a work-loop reply target (env config), or
+ * undefined if not configured - then research falls back to Zaal's DM. */
+function researchTopicTarget(): { chatId: number; threadId: number } | undefined {
+  const g = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const t = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+  return g && t ? { chatId: g, threadId: t } : undefined;
+}
+
 bot.command('start', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await ctx.reply(
@@ -755,6 +763,7 @@ bot.on('message:text', async (ctx) => {
         sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
         sendToChat: (cid: number, tid: number | undefined, t: string) =>
           bot.api.sendMessage(cid, t, tid ? { message_thread_id: tid } : {}),
+        defaultResearchTarget: researchTopicTarget(),
         zaalTgId: zaalId,
         repoDir,
         currentDate: currentDateString(),
@@ -1063,6 +1072,7 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
       sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
         bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
+      defaultResearchTarget: researchTopicTarget(),
       zaalTgId: zaalId,
       repoDir,
       currentDate: currentDateString(),

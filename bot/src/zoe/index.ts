@@ -1001,7 +1001,12 @@ bot.on('message:text', async (ctx) => {
 // Voice / audio intake (Zaal DM only): transcribe via Groq Whisper, then run it
 // through the exact same turn path as a typed message. Lets Zaal voice-answer.
 bot.on(['message:voice', 'message:audio'], async (ctx) => {
-  if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
+  if (!isFromZaal(ctx)) return;
+  const zaalBotzGroupIdV = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const isZaalBotzV = zaalBotzGroupIdV !== 0 && ctx.chat.id === zaalBotzGroupIdV;
+  // Voice is handled in Zaal's DM and in the ZAAL BOTZ group (voice-answer a
+  // question / voice-drop into a topic). Ignore any other chat.
+  if (ctx.chat.type !== 'private' && !isZaalBotzV) return;
   const chatId = ctx.chat.id;
   const fileId = ctx.message.voice?.file_id ?? ctx.message.audio?.file_id;
   if (!fileId) return;
@@ -1020,6 +1025,32 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
   }
   if (!transcript) {
     await ctx.reply('(that voice note came through empty)').catch(() => {});
+    return;
+  }
+  // ZAAL BOTZ group voice: a spoken answer to a pending "Type my own" question
+  // becomes [answer:<qid>]; otherwise it's bridge-logged under its topic so the
+  // open session reads it. (Voice-answer any button-question, hands-free.)
+  if (isZaalBotzV) {
+    const threadId = ctx.message.message_thread_id;
+    const awaitingQid = pendingTypeAnswers.get(chatId);
+    const replyOpt = threadId ? { message_thread_id: threadId } : {};
+    if (awaitingQid) {
+      pendingTypeAnswers.delete(chatId);
+      await pushRecent(
+        { from: 'zaal', text: `[answer:${awaitingQid}] ${transcript}`, sender: 'zaalbotz-voice' },
+        String(zaalBotzGroupIdV),
+      ).catch((e) => console.error('[zoe/index] voice-answer log failed:', (e as Error)?.message));
+      await ctx
+        .reply(`Got your voice answer for "${awaitingQid}": "${transcript.slice(0, 200)}"`, replyOpt)
+        .catch(() => {});
+    } else {
+      const topicName = await topicNameForThread(threadId).catch(() => undefined);
+      await pushRecent(
+        { from: 'zaal', text: `[${topicName ?? 'General'}] ${transcript}`, sender: 'zaalbotz-voice' },
+        String(zaalBotzGroupIdV),
+      ).catch((e) => console.error('[zoe/index] voice bridge-log failed:', (e as Error)?.message));
+      await ctx.reply(`Heard: "${transcript.slice(0, 300)}"`, replyOpt).catch(() => {});
+    }
     return;
   }
   await ctx.reply(`Heard: "${transcript.slice(0, 300)}"`).catch(() => {});

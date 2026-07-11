@@ -11,12 +11,16 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { classifyTask, type NextOwner } from '../zoe/task-classifier';
-import type { CockpitTask, Handoff, ReviewPR, WriteProposal } from './types';
+import type { Capture, CockpitTask, Handoff, ReviewPR, WriteProposal } from './types';
 
 const execFileAsync = promisify(execFile);
 
 /** A task with no update in this many days (and not recurring) is stale. Doc 983. */
 export const STALE_DAYS = 14;
+
+/** An idea capture older than this (with no ship) trips the collector's-fallacy
+ * flag - hoarding an idea without acting is procrastination (doc 1031). */
+export const CAPTURE_STALE_DAYS = 7;
 
 /** GitHub users/orgs whose open PRs land in Zaal's review lane. */
 const REVIEW_OWNERS = ['bettercallzaal', 'ZAODEVZ'];
@@ -170,6 +174,34 @@ export function toHandoff(t: CockpitTask): Handoff {
     title: t.title,
     note: t.notes,
     createdAt: t.created_at,
+  };
+}
+
+/** An idea capture (the "one door") carries legacy_source "inbox:<slug>". This
+ * is the second-brain resurface lane (doc 1031). */
+export function isCapture(t: CockpitTask): boolean {
+  return (t.legacy_source ?? '').startsWith('inbox:');
+}
+
+/** Split idea captures out of the regular task set so they show in their own lane. */
+export function partitionCaptures(tasks: CockpitTask[]): { captures: CockpitTask[]; rest: CockpitTask[] } {
+  const captures: CockpitTask[] = [];
+  const rest: CockpitTask[] = [];
+  for (const t of tasks) (isCapture(t) ? captures : rest).push(t);
+  return { captures, rest };
+}
+
+/** Shape a capture into the cockpit Capture view. `stale` trips the
+ * collector's-fallacy flag: captured but not shipped in CAPTURE_STALE_DAYS. */
+export function toCapture(t: CockpitTask, now: number): Capture {
+  const ageDays = daysSince(t.created_at, now);
+  return {
+    taskId: t.id,
+    slug: (t.legacy_source ?? '').replace(/^inbox:/, '') || 'unknown',
+    title: t.title,
+    createdAt: t.created_at,
+    ageDays: Number.isFinite(ageDays) ? Math.floor(ageDays) : 0,
+    stale: ageDays >= CAPTURE_STALE_DAYS,
   };
 }
 

@@ -14,7 +14,9 @@ import {
   fetchCockpitTasks,
   fetchReviewPRs,
   partitionHandoffs,
+  partitionCaptures,
   toHandoff,
+  toCapture,
   topThree,
   needsYou,
   blocked,
@@ -30,8 +32,9 @@ export const COCKPIT_HOME = process.env.COCKPIT_HOME || join(homedir(), '.zao', 
 export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.now()): Promise<CockpitBrief> {
   // Tracker tasks + open PRs run in parallel; either failing degrades to [].
   const [allTasks, reviewPRs] = await Promise.all([fetchCockpitTasks(), fetchReviewPRs()]);
-  // Handoffs (legacy_source "handoff:*") get their own lane, not the task lanes.
-  const { handoffs: handoffTasks, rest: tasks } = partitionHandoffs(allTasks);
+  // Handoffs ("handoff:*") + idea captures ("inbox:*") each get their own lane.
+  const { handoffs: handoffTasks, rest: afterHandoffs } = partitionHandoffs(allTasks);
+  const { captures: captureTasks, rest: tasks } = partitionCaptures(afterHandoffs);
   const you = needsYou(tasks);
   const stale = findStale(tasks, now);
   const blk = blocked(tasks);
@@ -39,12 +42,17 @@ export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.
     .slice()
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
     .map(toHandoff);
+  const captures = captureTasks
+    .slice()
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    .map((t) => toCapture(t, now));
   return {
     date: new Date(now).toISOString().slice(0, 10),
     top3: topThree(tasks),
     needsYou: you,
     needsReview: reviewPRs,
     handoffs,
+    captures,
     stale,
     blocked: blk,
     counts: {
@@ -52,6 +60,7 @@ export async function buildCockpitBrief(mode: CockpitMode = 'brief', now = Date.
       needsYou: you.length,
       needsReview: reviewPRs.length,
       handoffs: handoffs.length,
+      captures: captures.length,
       stale: stale.length,
       blocked: blk.length,
     },
@@ -70,9 +79,23 @@ export function formatCockpitBrief(b: CockpitBrief): string {
   const parts: string[] = [];
   parts.push(`Cockpit - ${b.date}`);
   parts.push(
-    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.handoffs} handoffs | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
+    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.handoffs} handoffs | ${b.counts.captures} captures | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
   );
   if (b.top3.length) parts.push('\nDO FIRST\n' + b.top3.map(line).join('\n'));
+  if (b.captures?.length) {
+    const staleCount = b.captures.filter((c) => c.stale).length;
+    const header = staleCount
+      ? `\nIDEA INBOX (captures) - ${staleCount} stale, ship or drop`
+      : '\nIDEA INBOX (captures)';
+    parts.push(
+      header +
+        '\n' +
+        b.captures
+          .slice(0, 10)
+          .map((c) => `- ${c.title}${c.stale ? ` (STALE ${c.ageDays}d)` : ''}`)
+          .join('\n'),
+    );
+  }
   if (b.handoffs.length)
     parts.push(
       '\nHANDOFFS (from other terminals)\n' +

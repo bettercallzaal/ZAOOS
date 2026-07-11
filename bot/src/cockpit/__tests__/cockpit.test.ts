@@ -118,9 +118,13 @@ describe('formatCockpitBrief', () => {
       handoffs: [
         { taskId: 'h1', slug: 'zao-whitepapers', title: 'Papers terminal', note: '12 drafts live, needs ZABAL call', createdAt: '2026-07-10T06:00:00Z' },
       ],
+      captures: [
+        { taskId: 'c1', slug: 'flow-app', title: 'Flow energy meter app', createdAt: '2026-07-11T00:00:00Z', ageDays: 1, stale: false },
+        { taskId: 'c2', slug: 'old-idea', title: 'An idea I hoarded', createdAt: '2026-06-25T00:00:00Z', ageDays: 16, stale: true },
+      ],
       stale: [],
       blocked: [],
-      counts: { open: 2, needsYou: 1, needsReview: 1, handoffs: 1, stale: 0, blocked: 0 },
+      counts: { open: 2, needsYou: 1, needsReview: 1, handoffs: 1, captures: 2, stale: 0, blocked: 0 },
       proposedWrites: [],
     };
     const out = formatCockpitBrief(b);
@@ -133,6 +137,11 @@ describe('formatCockpitBrief', () => {
     expect(out).toContain('HANDOFFS (from other terminals)');
     expect(out).toContain('zao-whitepapers: Papers terminal');
     expect(out).toContain('1 handoffs');
+    expect(out).toContain('IDEA INBOX (captures)');
+    expect(out).toContain('Flow energy meter app');
+    expect(out).toContain('STALE 16d'); // collector's-fallacy flag
+    expect(out).toContain('1 stale, ship or drop');
+    expect(out).toContain('2 captures');
     expect(out).not.toMatch(/[—\u{1F300}-\u{1FAFF}]/u); // no em dash, no emoji
   });
 });

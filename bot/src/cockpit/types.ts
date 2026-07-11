@@ -39,6 +39,17 @@ export interface Handoff {
   createdAt: string | null;
 }
 
+/** An idea capture (the "one door" second brain), surfaced in the cockpit. */
+export interface Capture {
+  taskId: string;
+  slug: string; // parsed from legacy_source "inbox:<slug>"
+  title: string;
+  createdAt: string | null;
+  ageDays: number;
+  /** collector's-fallacy flag: captured but not shipped in CAPTURE_STALE_DAYS. */
+  stale: boolean;
+}
+
 /** Cockpit run modes = the constraint flags (episode: "investigate-only" enforced by the harness, not the prompt). */
 export type CockpitMode =
   | 'brief' // read-only: assemble + emit the cockpit brief, no writes
@@ -79,12 +90,14 @@ export interface CockpitBrief {
   needsReview: ReviewPR[];
   /** Handoffs from other terminals - the durable home for cross-terminal work. */
   handoffs: Handoff[];
+  /** Idea captures (the "one door" second brain), newest first; stale ones flagged. */
+  captures: Capture[];
   /** Stale: undated P0/P1s, or no update in >= STALE_DAYS. */
   stale: CockpitTask[];
   /** Blocked (next_owner = 'blocked'). */
   blocked: CockpitTask[];
   /** Counts for the one-line summary. */
-  counts: { open: number; needsYou: number; needsReview: number; handoffs: number; stale: number; blocked: number };
+  counts: { open: number; needsYou: number; needsReview: number; handoffs: number; captures: number; stale: number; blocked: number };
   /** Gated write proposals (empty in 'brief' mode; populated in 'triage'). */
   proposedWrites: WriteProposal[];
 }

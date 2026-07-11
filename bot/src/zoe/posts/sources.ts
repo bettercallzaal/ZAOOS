@@ -6,6 +6,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
 import type { PostSourceSnapshot } from './types';
+import { getTodaysZaostockPromoLine } from './zaostock-promo-calendar';
 
 const VOICE_MEMOS_DIR = join(ZOE_PATHS.home, 'voice-memos');
 
@@ -52,7 +53,7 @@ export async function gatherEcosystemSignals(repoDir: string): Promise<PostSourc
   return { repoActivity };
 }
 
-export async function gatherEventSignals(): Promise<PostSourceSnapshot['event']> {
+export async function gatherEventSignals(now: number = Date.now()): Promise<PostSourceSnapshot['event']> {
   // v1 stub: drop a file at ~/.zao/zoe/events/today.txt + tomorrow.txt with one event per
   // line. Cron or manual seeding writes it. v2: wire Google Calendar MCP via Claude CLI
   // subprocess (Hermes pattern) once the MCP is authenticated on VPS.
@@ -71,6 +72,15 @@ export async function gatherEventSignals(): Promise<PostSourceSnapshot['event']>
   } catch {
     tomorrowsEvents = [];
   }
+
+  // Doc 1033's 12-week ZAOstock promo calendar folds into this SAME event
+  // category by design (doc 1033: "run inside that same 12-week frame rather
+  // than compete with it"), not a separate category. Mon/Wed/Fri only, Jul 13
+  // - Oct 3, 2026; silent (adds nothing) every other day.
+  const todayIso = new Date(now).toISOString().slice(0, 10);
+  const promoLine = getTodaysZaostockPromoLine(todayIso);
+  if (promoLine) todaysEvents = [...todaysEvents, promoLine];
+
   return { todaysEvents, tomorrowsEvents };
 }
 

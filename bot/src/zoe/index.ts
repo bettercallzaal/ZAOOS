@@ -425,6 +425,12 @@ bot.command('zoldraft', async (ctx) => {
 // marks the draft posted (real per-kind routing is a follow-up), Skip drops it,
 // Edit prompts for a revision. Always answerCallbackQuery so the button spinner
 // clears.
+// When Zaal taps a question's "Type my own" button, we remember the qid keyed by
+// chat id; his NEXT free-text message in that chat is then logged as the answer
+// ("[answer:<qid>]"), so a typed answer reaches the orchestrator the same way a
+// tapped one does (Fable audit fix - without this, typed answers were untagged).
+const pendingTypeAnswers = new Map<number, string>();
+
 bot.on('callback_query:data', async (ctx) => {
   if (!isFromZaal(ctx)) {
     await ctx.answerCallbackQuery();
@@ -437,6 +443,8 @@ bot.on('callback_query:data', async (ctx) => {
   if (q) {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     if (q.isType) {
+      const cbChat = ctx.callbackQuery.message?.chat?.id;
+      if (cbChat) pendingTypeAnswers.set(cbChat, q.qid);
       await ctx.answerCallbackQuery({ text: 'Reply with your answer.' });
       await ctx
         .reply(`Reply to this thread with your answer for "${q.qid}".`, {
@@ -479,7 +487,10 @@ bot.on('callback_query:data', async (ctx) => {
     // is Pi-only; the newsletter builder is a separate Supabase project). Rather
     // than fake "Posted", append to the durable outbox and say so honestly - a
     // future Pi/builder drainer sends from there. Other kinds keep the old path.
-    const channel = await appendApproved(draft.kind, draft.text).catch(() => null);
+    const channel = await appendApproved(draft.kind, draft.text).catch((e) => {
+      console.error('[zoe/index] outbox append failed:', (e as Error)?.message);
+      return null;
+    });
     if (channel === 'cast') {
       await ctx.answerCallbackQuery({ text: 'Approved - queued to cast.' });
       await ctx
@@ -832,6 +843,22 @@ bot.on('message:text', async (ctx) => {
     // Per-topic behavior (topic = intent, Zaal 2026-07-11): dropping a plain
     // message into a topic auto-acts per that topic. Internal actions fire now;
     // outbound casts are drafted with an Approve button (money/public gate).
+    // If Zaal just tapped a question's "Type my own" button, this message is his
+    // typed answer - log it as "[answer:<qid>]" (matching the tapped-button path)
+    // and stop, so the orchestrator reads it as the answer, not a topic action.
+    const awaitingQid = pendingTypeAnswers.get(chatId);
+    if (awaitingQid) {
+      pendingTypeAnswers.delete(chatId);
+      await pushRecent(
+        { from: 'zaal', text: `[answer:${awaitingQid}] ${text}`, sender: 'zaalbotz-type' },
+        String(zaalBotzGroupId),
+      ).catch((e) => console.error('[zoe/index] type-answer log failed:', (e as Error)?.message));
+      await ctx
+        .reply(`Got your answer for "${awaitingQid}".`, threadId ? { message_thread_id: threadId } : {})
+        .catch(() => {});
+      return;
+    }
+
     const topicName = await topicNameForThread(threadId).catch(() => undefined);
     const action = routeTopic(topicName);
     const threadOpt = threadId ? { message_thread_id: threadId } : {};

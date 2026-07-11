@@ -10,9 +10,11 @@ TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
 GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
 [ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing token/gid in $TGENV"; exit 1; }
 # Build the brief on the VPS (where tracker creds + gh live), reuse the cockpit CLI.
+ERRF=$(mktemp)
 BRIEF=$(ssh -o ConnectTimeout=25 ${ZAO_VPS_HOST:-zaal@31.97.148.88} \
-  'cd ~/zao-os/bot && set -a && . ./.env 2>/dev/null && set +a && PATH="$HOME/.local/bin:$PATH" npx tsx src/cockpit/cli.ts' 2>/dev/null)
-[ -z "$BRIEF" ] && { echo "no brief returned from cockpit"; exit 1; }
+  'cd ~/zao-os/bot && set -a && . ./.env 2>/dev/null && set +a && PATH="$HOME/.local/bin:$PATH" npx tsx src/cockpit/cli.ts' 2>"$ERRF")
+if [ -z "$BRIEF" ]; then echo "no brief returned from cockpit. stderr:"; cat "$ERRF"; rm -f "$ERRF"; exit 1; fi
+rm -f "$ERRF"
 python3 - "$TOKEN" "$GID" "$BRIEF" <<'PY'
 import sys, urllib.request, urllib.parse
 token, gid, brief = sys.argv[1:4]

@@ -95,6 +95,7 @@ import { routeTopic, topicNameForThread } from './topic-router';
 import { appendApproved } from './outbox';
 import { dispatchHermesRun } from '../hermes/runner';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
+import { parseQuestionCallback } from './questions';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -429,6 +430,34 @@ bot.on('callback_query:data', async (ctx) => {
     await ctx.answerCallbackQuery();
     return;
   }
+  // Orchestrator question buttons ("q:<qid>:<b64>") - the one-question-at-a-time
+  // loop. A tap (or the Type button) logs the answer to recent/ so the open
+  // Claude Code session reads it via the bridge and posts the next question.
+  const q = parseQuestionCallback(ctx.callbackQuery.data);
+  if (q) {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    if (q.isType) {
+      await ctx.answerCallbackQuery({ text: 'Reply with your answer.' });
+      await ctx
+        .reply(`Reply to this thread with your answer for "${q.qid}".`, {
+          ...(ctx.callbackQuery.message?.message_thread_id
+            ? { message_thread_id: ctx.callbackQuery.message.message_thread_id }
+            : {}),
+        })
+        .catch(() => {});
+    } else {
+      await ctx.answerCallbackQuery({ text: 'Got it.' });
+      await ctx
+        .editMessageText(`Answered (${q.qid}): ${q.value}`, { reply_markup: { inline_keyboard: [] } })
+        .catch(() => {});
+      await pushRecent(
+        { from: 'zaal', text: `[answer:${q.qid}] ${q.value}`, sender: 'zaalbotz-btn' },
+        String(gid),
+      ).catch((e) => console.error('[zoe/index] q-answer log failed:', (e as Error)?.message));
+    }
+    return;
+  }
+
   const parsed = parseDraftCallback(ctx.callbackQuery.data);
   if (!parsed) {
     await ctx.answerCallbackQuery();

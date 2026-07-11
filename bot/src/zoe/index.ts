@@ -390,6 +390,33 @@ bot.command('draftdemo', async (ctx) => {
   });
 });
 
+// /zoldraft <text> - stage a ZOL/Farcaster cast in the ZOL topic with the
+// approve-buttons. This is the ZOE-side receiver: Zaal can use it directly, and
+// the ZOL agent on the Pi can relay drafts to it later. NOTE: [Post] currently
+// marks the draft posted - wiring it to actually cast (ZOL identity on the Pi,
+// or ZOE's caster) is a follow-up that needs Zaal's call on the posting identity.
+bot.command('zoldraft', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const text = (ctx.match ?? '').toString().trim();
+  if (!text) {
+    await ctx.reply('Usage: /zoldraft <cast text>');
+    return;
+  }
+  const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const zolThread = Number(process.env.ZOL_THREAD ?? 0);
+  if (!gid || !zolThread) {
+    await ctx.reply('ZOL topic not configured (need ZAAL_BOTZ_GROUP_ID + ZOL_THREAD).');
+    return;
+  }
+  const id = 'zol-' + Date.now().toString(36);
+  putDraft('zol-cast', text, id);
+  await bot.api.sendMessage(gid, `ZOL draft:\n${text}`, {
+    message_thread_id: zolThread,
+    reply_markup: draftKeyboard(id),
+  });
+  await ctx.reply('Staged in the ZOL topic with Post/Skip/Edit.');
+});
+
 // Approve-button taps. Callback data is "<action>:<id>" (see drafts.ts). Post
 // marks the draft posted (real per-kind routing is a follow-up), Skip drops it,
 // Edit prompts for a revision. Always answerCallbackQuery so the button spinner

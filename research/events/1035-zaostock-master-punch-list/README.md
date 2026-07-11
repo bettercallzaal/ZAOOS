@@ -17,7 +17,7 @@ tier: STANDARD
 
 The real optimization at this point in the project isn't more research - it's stopping research sprawl and making everything already found executable. This doc does that: 27 distinct actions across 9 docs collapse into 19 real items once duplicates are merged, sorted into four urgency tiers instead of nine separate By-When columns.
 
-**Update 2026-07-11:** the Tier 1 "confirm ZAOville venue private vs. public" item is RESOLVED - private (DCoop's house), no permit needed. Removed from the table below; see doc 1013 for the updated budget number ($450-$1,100).
+**Update 2026-07-11:** two more Tier 1 items are RESOLVED and removed below. (1) ZAOville venue confirmed private (DCoop's house), no permit needed - see doc 1013 for the updated budget ($450-$1,100). (2) The "$391K in grants" HoE figure is confirmed accurate against HoE's own 2025 Annual Report - see doc 1031. Also shipped this session: the new `/acadia` page and the `/ellsworth` additions (doc 1034) are live.
 
 ## Tier 1 - This week (by Jul 18) - blocking or time-sensitive
 
@@ -26,7 +26,6 @@ The real optimization at this point in the project isn't more research - it's st
 | **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | Time-sensitive and easy to forget - the 90-day booking window opened around July 5, reservations required through Oct 25 |
 | **Name a livestream/broadcast lead** | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji, 871's June reorg has no broadcast workstream at all). Blocks doc 1030's entire media plan from having an owner |
 | **Name a Site Lead and a First Aid Lead for Oct 3** | 1032 | Doc 1032's entire safety plan and staffing matrix has no named decision-maker yet - these are the two roles everything else depends on |
-| **Verify the "$391K in grants" Heart of Ellsworth figure before it's repeated again** | 1031 | Currently on the live `/sponsor` page; HoE's own FY2023 filings show ~$161-166K, a 2.4x gap. Don't let this go to press or a sponsor conversation unverified |
 | **Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`** | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
 
 ## Tier 2 - Next 2 weeks (by Aug 1)
@@ -38,9 +37,9 @@ The real optimization at this point in the project isn't more research - it's st
 | **Get a current-owner confirmation for lineup (Dcoop), venue+ops, and volunteers workstreams** | 1007 | Only the sponsors workstream (Jay/Duh) is confirmed active; the rest haven't been checked since doc 871 (June 17) |
 | **Buy the ATEM Mini Pro switcher ($325) and the audio DI/interface bundle (~$250-300)** | 1030 | The two genuinely new purchases the media plan needs - everything else comes from owned gear |
 | **Reach out to one of HoE's 4 Downtown Grants Program bank partners for a warm co-sponsor conversation** | 1031 | Concrete, named list (Franklin Savings, Bangor Federal Credit Union, First National Bank, Machias Savings) via the Zaal builder-profile onepager already drafted |
-| **Build the new `/acadia` page and add the 2 restaurant/shuttle/sculpture-trail items to the live `/ellsworth` page** | 1034 | Real content is written and ready; this is now an implementation task, not a research gap |
+| ~~Build the new `/acadia` page and add the 2 restaurant/shuttle/sculpture-trail items to the live `/ellsworth` page~~ - SHIPPED 2026-07-11 | 1034 | Both pages are live and linked from the homepage footer |
 | **Confirm mutual-aid EMS availability/response time with local fire/ambulance for Oct 3** | 1032 | The one safety-plan item that needs an external confirmation, not just an internal decision |
-| **Update `/sponsor` page with the Route 1/Route 3 traffic numbers and Main Street America framing** | 1031 | Real numbers exist now (30,000+ vehicles/day, Acadia's 2025 record 4.08M visits) - the page currently uses soft "gateway to Acadia" language instead |
+| ~~Update `/sponsor` page with the Route 1/Route 3 traffic numbers and Main Street America framing~~ - SHIPPED 2026-07-11 | 1031 | Also added the $20K budget target line the page previously lacked entirely |
 
 ## Tier 3 - By mid-August
 

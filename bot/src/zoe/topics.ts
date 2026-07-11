@@ -11,8 +11,20 @@ import { homedir } from 'node:os';
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const TOPICS_PATH = join(ZOE_HOME, 'topics.json');
 
-/** The standard ZAAL BOTZ topics ZOE manages. Order is the create order. */
-export const STANDARD_TOPICS = ['Research', 'ZOL', 'Handoffs', 'Claude Code'] as const;
+/** The standard ZAAL BOTZ topics ZOE manages. Order is the create order.
+ * Each has a behavior in topic-router.ts (topic = intent). */
+export const STANDARD_TOPICS = [
+  'Research',
+  'ZOL',
+  'Handoffs',
+  'Claude Code',
+  'Farcaster',
+  'Coding',
+  'Ideas',
+  'Newsletter',
+  'WaveWarZ',
+  'ZABAL Games',
+] as const;
 
 /** name -> message_thread_id */
 export type TopicMap = Record<string, number>;

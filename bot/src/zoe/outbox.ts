@@ -18,8 +18,10 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
-const OUTBOX_DIR = join(ZOE_HOME, 'outbox');
+/** Outbox dir, resolved at call-time so ZOE_HOME can be overridden (e.g. tests). */
+function outboxDir(): string {
+  return join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'), 'outbox');
+}
 
 export interface OutboxEntry {
   kind: string;
@@ -52,7 +54,7 @@ export function outboxLine(kind: string, text: string, now: number): string {
 
 /** The file an entry of this channel lands in. */
 export function outboxPathFor(channel: OutboxChannel): string {
-  return join(OUTBOX_DIR, `${channel}.jsonl`);
+  return join(outboxDir(), `${channel}.jsonl`);
 }
 
 /**
@@ -67,7 +69,7 @@ export async function appendApproved(
 ): Promise<OutboxChannel | null> {
   const channel = outboxChannelFor(kind);
   if (!channel) return null;
-  await fs.mkdir(OUTBOX_DIR, { recursive: true });
+  await fs.mkdir(outboxDir(), { recursive: true });
   await fs.appendFile(outboxPathFor(channel), outboxLine(kind, text, now) + '\n');
   return channel;
 }

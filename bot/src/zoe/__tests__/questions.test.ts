@@ -23,6 +23,10 @@ describe('encode/parse round-trip', () => {
     expect(p?.isType).toBe(true);
   });
 
+  it('throws when callback_data would exceed the 64-byte cap', () => {
+    expect(() => encodeQuestion('longqid', 'x'.repeat(60))).toThrow(/too long/);
+  });
+
   it('returns null for non-question callbacks', () => {
     expect(parseQuestionCallback('post:abc123')).toBeNull();
     expect(parseQuestionCallback('skip:xyz')).toBeNull();

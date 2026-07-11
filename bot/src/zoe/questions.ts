@@ -25,9 +25,14 @@ function b64urlEncode(s: string): string {
   return Buffer.from(s, 'utf8').toString('base64url');
 }
 
-/** Build the callback_data for one answer. */
+/** Build the callback_data for one answer. Throws if it would exceed Telegram's
+ *  64-byte callback_data cap (keep qids short + values as slug codes). */
 export function encodeQuestion(qid: string, value: string): string {
-  return `q:${qid}:${b64urlEncode(value)}`;
+  const data = `q:${qid}:${b64urlEncode(value)}`;
+  if (Buffer.byteLength(data, 'utf8') > 64) {
+    throw new Error(`callback_data too long (${Buffer.byteLength(data)}B > 64): shorten qid/value for "${value}"`);
+  }
+  return data;
 }
 
 /** Inline keyboard: one button per option (one per row for tap-safety on mobile),

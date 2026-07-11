@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs, isHandoff, partitionHandoffs, toHandoff } from '../adapters';
+import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs, isHandoff, partitionHandoffs, toHandoff, isCapture, partitionCaptures, toCapture, CAPTURE_STALE_DAYS } from '../adapters';
 import { formatCockpitBrief } from '../brief';
 import type { CockpitTask, CockpitBrief } from '../types';
 
@@ -164,6 +164,34 @@ describe('handoff helpers', () => {
   it('toHandoff parses slug + carries note', () => {
     const h = toHandoff(task({ id: 'b', title: 'Papers', legacy_source: 'handoff:zao-whitepapers', notes: 'open items' }));
     expect(h).toMatchObject({ taskId: 'b', slug: 'zao-whitepapers', title: 'Papers', note: 'open items' });
+  });
+});
+
+describe('capture helpers', () => {
+  const now = Date.parse('2026-07-11T00:00:00Z');
+  it('isCapture detects the inbox: marker', () => {
+    expect(isCapture(task({ id: '1', title: 'x', legacy_source: 'inbox:flow-app' }))).toBe(true);
+    expect(isCapture(task({ id: '2', title: 'y', legacy_source: 'handoff:foo' }))).toBe(false);
+    expect(isCapture(task({ id: '3', title: 'z' }))).toBe(false);
+  });
+  it('partitionCaptures splits captures from regular tasks', () => {
+    const tasks = [
+      task({ id: 'a', title: 'real task' }),
+      task({ id: 'b', title: 'an idea', legacy_source: 'inbox:idea' }),
+    ];
+    const { captures, rest } = partitionCaptures(tasks);
+    expect(captures.map((t) => t.id)).toEqual(['b']);
+    expect(rest.map((t) => t.id)).toEqual(['a']);
+  });
+  it('toCapture flags the collector-fallacy stale threshold', () => {
+    const fresh = toCapture(task({ id: 'c', title: 'new', legacy_source: 'inbox:new', created_at: '2026-07-10T00:00:00Z' }), now);
+    expect(fresh).toMatchObject({ slug: 'new', ageDays: 1, stale: false });
+    const old = toCapture(
+      task({ id: 'd', title: 'old', legacy_source: 'inbox:old', created_at: '2026-06-25T00:00:00Z' }),
+      now,
+    );
+    expect(old.stale).toBe(true);
+    expect(old.ageDays).toBeGreaterThanOrEqual(CAPTURE_STALE_DAYS);
   });
 });
 

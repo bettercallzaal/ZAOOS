@@ -36,10 +36,16 @@ export interface WorkItem {
   kind: 'research';
   input: string;
   addedTs: string;
+  /** Where to report the result. When set (e.g. a request from the Research
+   * topic), the completion lands there instead of Zaal's DM. */
+  replyTarget?: { chatId: number; threadId?: number };
 }
 
 export interface WorkTickDeps {
   sendToZaal: (text: string) => Promise<unknown>;
+  /** Send to a specific chat/topic (used to report a research result back to
+   * the topic it was requested from). Falls back to sendToZaal if absent. */
+  sendToChat?: (chatId: number, threadId: number | undefined, text: string) => Promise<unknown>;
   zaalTgId: number;
   repoDir: string;
   currentDate: string;
@@ -58,17 +64,30 @@ async function writeQueue(q: WorkItem[]): Promise<void> {
   await fs.writeFile(QUEUE(), JSON.stringify(q, null, 2));
 }
 
-export async function enqueueWork(input: string): Promise<WorkItem> {
+export async function enqueueWork(
+  input: string,
+  replyTarget?: { chatId: number; threadId?: number },
+): Promise<WorkItem> {
   const q = await readQueue();
   const item: WorkItem = {
     id: 'wk-' + Date.now().toString(36),
     kind: 'research',
     input: input.trim(),
     addedTs: new Date().toISOString(),
+    ...(replyTarget ? { replyTarget } : {}),
   };
   q.push(item);
   await writeQueue(q);
   return item;
+}
+
+/** Report a work item's result to its topic if it has a reply target, else DM. */
+function reportFor(item: WorkItem, deps: WorkTickDeps): (text: string) => Promise<unknown> {
+  if (item.replyTarget && deps.sendToChat) {
+    const { chatId, threadId } = item.replyTarget;
+    return (text: string) => deps.sendToChat!(chatId, threadId, text);
+  }
+  return deps.sendToZaal;
 }
 
 export async function queueDepth(): Promise<number> {
@@ -164,13 +183,12 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
           onSubtaskDone: async (st, r) => {
             if (st.worker === 'research-worker' && r.status === 'completed' && r.output) {
               const doc = await commitResearchDoc({ question: item.input, findings: r.output });
-              await deps
-                .sendToZaal(
-                  doc.ok
-                    ? `Work-loop done: doc ${doc.num} -> ${doc.prUrl}`
-                    : `Work-loop: doc save failed - ${doc.error}`,
-                )
-                .catch(() => {});
+              // Report the result to the topic it was requested from (else DM).
+              await reportFor(item, deps)(
+                doc.ok
+                  ? `Work-loop done: doc ${doc.num} -> ${doc.prUrl}`
+                  : `Work-loop: doc save failed - ${doc.error}`,
+              ).catch(() => {});
             }
           },
         },

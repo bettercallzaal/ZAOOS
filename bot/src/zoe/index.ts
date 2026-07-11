@@ -92,6 +92,7 @@ import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
+import { appendApproved } from './outbox';
 import { dispatchHermesRun } from '../hermes/runner';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
@@ -445,8 +446,31 @@ bot.on('callback_query:data', async (ctx) => {
     await ctx.editMessageText(`[SKIPPED] ${draft.text}`, { reply_markup: { inline_keyboard: [] } }).catch(() => {});
   } else if (parsed.action === 'post') {
     removeDraft(parsed.id);
-    await ctx.answerCallbackQuery({ text: 'Posted.' });
-    await ctx.editMessageText(`[POSTED] ${draft.text}`, { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    // Cast + newsletter drafts can't actually send from the VPS yet (ZOL signer
+    // is Pi-only; the newsletter builder is a separate Supabase project). Rather
+    // than fake "Posted", append to the durable outbox and say so honestly - a
+    // future Pi/builder drainer sends from there. Other kinds keep the old path.
+    const channel = await appendApproved(draft.kind, draft.text).catch(() => null);
+    if (channel === 'cast') {
+      await ctx.answerCallbackQuery({ text: 'Approved - queued to cast.' });
+      await ctx
+        .editMessageText(`[APPROVED to cast - queued, not yet sent] ${draft.text}`, {
+          reply_markup: { inline_keyboard: [] },
+        })
+        .catch(() => {});
+    } else if (channel === 'newsletter') {
+      await ctx.answerCallbackQuery({ text: 'Approved for the newsletter.' });
+      await ctx
+        .editMessageText(`[APPROVED for newsletter - queued] ${draft.text}`, {
+          reply_markup: { inline_keyboard: [] },
+        })
+        .catch(() => {});
+    } else {
+      await ctx.answerCallbackQuery({ text: 'Posted.' });
+      await ctx
+        .editMessageText(`[POSTED] ${draft.text}`, { reply_markup: { inline_keyboard: [] } })
+        .catch(() => {});
+    }
   } else {
     await ctx.answerCallbackQuery({ text: 'Reply with the revised text.' });
     await ctx.reply(`Send the revised text for: "${draft.text.slice(0, 80)}"`).catch(() => {});

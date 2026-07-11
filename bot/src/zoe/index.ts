@@ -645,6 +645,22 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
+  // ZAAL BOTZ ops group: Zaal's own private bot group with forum topics. Treat
+  // his messages here like a DM (ZOE responds), and grammy auto-threads the
+  // reply back into the same topic. The group id is env config (private-instance
+  // per doc 1025) so it stays out of the repo. No @-tag needed.
+  const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
+    const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
+    const turnTextG = quotedG
+      ? `[Zaal is replying to your earlier message:\n"${quotedG.slice(0, 1200)}"]\n\nHis reply: ${text}`
+      : text;
+    enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnTextG)).catch((e) =>
+      console.error('[zoe/index] zaalbotz turn failed:', (e as Error)?.message),
+    );
+    return;
+  }
+
   // Group path: gate by per-group config.
   const fromId = ctx.from?.id;
   if (!fromId) return;

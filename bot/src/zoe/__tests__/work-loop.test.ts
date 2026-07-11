@@ -31,6 +31,14 @@ describe('work-loop queue', () => {
     expect(await queueDepth()).toBe(1);
   });
 
+  it('stores a reply target when given (research-from-topic routing)', async () => {
+    const { enqueueWork } = await import('../work-loop');
+    const item = await enqueueWork('from the research topic', { chatId: -100123, threadId: 8 });
+    expect(item.replyTarget).toEqual({ chatId: -100123, threadId: 8 });
+    const plain = await enqueueWork('from a DM');
+    expect(plain.replyTarget).toBeUndefined();
+  });
+
   it('preserves FIFO order across multiple enqueues', async () => {
     const { enqueueWork, queueDepth } = await import('../work-loop');
     await enqueueWork('first');

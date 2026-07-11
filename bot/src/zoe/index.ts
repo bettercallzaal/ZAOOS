@@ -744,12 +744,21 @@ bot.on('message:text', async (ctx) => {
     // are normal ZOE chat. Thread ids are env config (private-instance).
     const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
     if (researchThread && threadId === researchThread) {
-      await enqueueWork(text).catch((e) =>
+      await enqueueWork(text, { chatId, threadId }).catch((e) =>
         console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),
       );
       await ctx
-        .reply("On it - researching this. I'll post the doc + PR when it lands.")
+        .reply("On it - researching this. I'll post the doc + PR here when it lands.")
         .catch(() => {});
+      // Kick the work-loop now so it starts immediately (else waits for the 2h cron).
+      void runWorkTick({
+        sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+        sendToChat: (cid: number, tid: number | undefined, t: string) =>
+          bot.api.sendMessage(cid, t, tid ? { message_thread_id: tid } : {}),
+        zaalTgId: zaalId,
+        repoDir,
+        currentDate: currentDateString(),
+      }).catch((e) => console.error('[zoe/index] research kick failed:', (e as Error).message));
       return;
     }
     const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
@@ -1052,6 +1061,8 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       .catch(() => {});
     void runWorkTick({
       sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+      sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
+        bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
       zaalTgId: zaalId,
       repoDir,
       currentDate: currentDateString(),

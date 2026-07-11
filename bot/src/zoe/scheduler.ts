@@ -368,6 +368,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         try {
           await runWorkTick({
             sendToZaal: (t: string) => opts.bot.api.sendMessage(opts.zaalTgId, t),
+            sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
+              opts.bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
             zaalTgId: opts.zaalTgId,
             repoDir: opts.repoDir,
             currentDate: new Date().toISOString().slice(0, 10),

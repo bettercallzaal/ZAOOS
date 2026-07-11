@@ -90,6 +90,7 @@ import {
 import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
+import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -327,6 +328,43 @@ bot.command('chatid', async (ctx) => {
     : `chat: ${chatId} ("${title}")`;
   console.log(`[zoe/chatid] ${line.replace(/\n/g, ' | ')}`);
   await ctx.reply(line, threadId ? { message_thread_id: threadId } : {});
+});
+
+// /inittopics - ZOE creates the standard ZAAL BOTZ topics itself (it is a group
+// admin) and stores each name -> thread id in topics.json. Run it inside the
+// group. Skips topics already known (e.g. Research), so it is safe to re-run.
+bot.command('inittopics', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const chatId = ctx.chat.id;
+  const groupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  if (!groupId || chatId !== groupId) {
+    await ctx.reply('Run /inittopics inside the ZAAL BOTZ group.');
+    return;
+  }
+  const topics = await readTopics();
+  // Seed Research from env so ZOE does not create a duplicate of the manual one.
+  const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+  if (researchThread && !topics.Research) topics.Research = researchThread;
+
+  const results: string[] = [];
+  for (const name of STANDARD_TOPICS) {
+    if (topics[name]) {
+      results.push(`${name}: ${topics[name]} (exists)`);
+      continue;
+    }
+    try {
+      const t = await ctx.api.createForumTopic(chatId, name);
+      topics[name] = t.message_thread_id;
+      results.push(`${name}: ${t.message_thread_id} (created)`);
+    } catch (e) {
+      results.push(
+        `${name}: FAILED - ${e instanceof Error ? e.message : 'error'} (does ZOE have the Manage Topics admin right?)`,
+      );
+    }
+  }
+  await writeTopics(topics);
+  console.log(`[zoe/inittopics] ${JSON.stringify(topics)}`);
+  await ctx.reply('Topics:\n' + results.join('\n'));
 });
 
 bot.command('tasks', async (ctx) => {

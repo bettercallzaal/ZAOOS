@@ -1,0 +1,27 @@
+#!/bin/bash
+# zao-sweep - post the operator cockpit brief into the ZAAL BOTZ General topic.
+# Your morning (or anytime) = one command -> open General -> read the digest ->
+# click the waiting button-questions. Pairs with zao-ask (questions) + the
+# cockpit (state). Team-donatable: generic, reads the shared tracker.
+# Cron it on the VPS for an auto-morning-sweep (cheap: no LLM, just reads+posts).
+set -e
+TGENV="$HOME/.zao/private/tg.env"
+TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
+GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
+[ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing token/gid in $TGENV"; exit 1; }
+# Build the brief on the VPS (where tracker creds + gh live), reuse the cockpit CLI.
+BRIEF=$(ssh -o ConnectTimeout=25 ${ZAO_VPS_HOST:-zaal@31.97.148.88} \
+  'cd ~/zao-os/bot && set -a && . ./.env 2>/dev/null && set +a && PATH="$HOME/.local/bin:$PATH" npx tsx src/cockpit/cli.ts' 2>/dev/null)
+[ -z "$BRIEF" ] && { echo "no brief returned from cockpit"; exit 1; }
+python3 - "$TOKEN" "$GID" "$BRIEF" <<'PY'
+import sys, urllib.request, urllib.parse
+token, gid, brief = sys.argv[1:4]
+text = "MORNING SWEEP\n\n" + brief + "\n\nClick the waiting button-questions below to clear your input queue."
+data = urllib.parse.urlencode({"chat_id": gid, "text": text[:4000]}).encode()
+try:
+    urllib.request.urlopen(urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage", data=data), timeout=15)
+    print("swept -> General")
+except Exception as e:
+    print("ERR:", e); sys.exit(1)
+PY

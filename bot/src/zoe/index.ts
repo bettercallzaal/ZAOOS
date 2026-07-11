@@ -91,6 +91,7 @@ import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
+import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -365,6 +366,54 @@ bot.command('inittopics', async (ctx) => {
   await writeTopics(topics);
   console.log(`[zoe/inittopics] ${JSON.stringify(topics)}`);
   await ctx.reply('Topics:\n' + results.join('\n'));
+});
+
+// /draftdemo - send a sample draft with the [Post] [Skip] [Edit] buttons so
+// Zaal can tap-test the approve flow. Real drafts (ZOL casts etc.) reuse the
+// same putDraft + draftKeyboard + callback handler below.
+bot.command('draftdemo', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const id = 'demo-' + Date.now().toString(36);
+  const body = 'Demo draft. Tap Post to confirm, Skip to drop, Edit to revise.';
+  putDraft('demo', body, id);
+  await ctx.reply(`DRAFT (demo):\n${body}`, {
+    reply_markup: draftKeyboard(id),
+    ...(ctx.message?.message_thread_id ? { message_thread_id: ctx.message.message_thread_id } : {}),
+  });
+});
+
+// Approve-button taps. Callback data is "<action>:<id>" (see drafts.ts). Post
+// marks the draft posted (real per-kind routing is a follow-up), Skip drops it,
+// Edit prompts for a revision. Always answerCallbackQuery so the button spinner
+// clears.
+bot.on('callback_query:data', async (ctx) => {
+  if (!isFromZaal(ctx)) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  const parsed = parseDraftCallback(ctx.callbackQuery.data);
+  if (!parsed) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  const draft = getDraft(parsed.id);
+  if (!draft) {
+    await ctx.answerCallbackQuery({ text: 'That draft expired.' });
+    await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    return;
+  }
+  if (parsed.action === 'skip') {
+    removeDraft(parsed.id);
+    await ctx.answerCallbackQuery({ text: 'Skipped.' });
+    await ctx.editMessageText(`[SKIPPED] ${draft.text}`, { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  } else if (parsed.action === 'post') {
+    removeDraft(parsed.id);
+    await ctx.answerCallbackQuery({ text: 'Posted.' });
+    await ctx.editMessageText(`[POSTED] ${draft.text}`, { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  } else {
+    await ctx.answerCallbackQuery({ text: 'Reply with the revised text.' });
+    await ctx.reply(`Send the revised text for: "${draft.text.slice(0, 80)}"`).catch(() => {});
+  }
 });
 
 bot.command('tasks', async (ctx) => {

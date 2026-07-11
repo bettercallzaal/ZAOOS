@@ -17,8 +17,19 @@ ZOE drafts 4 categories of social posts and DMs Zaal random suggestions througho
 |---|---|---|
 | `build` | Last 24h commits + open PRs (`gh pr list`) | Vercel deploy status, test runs |
 | `ecosystem` | Last 7d commits to ZAOOS as proxy for ZAO momentum | Farcaster /thezao channel, ZABAL Base contract activity, member roster diffs |
-| `event` | `~/.zao/zoe/events/{today,tomorrow}.txt` (manually seeded) | Google Calendar MCP via Claude CLI subprocess |
+| `event` | `~/.zao/zoe/events/{today,tomorrow}.txt` (manually seeded) + `zaostock-promo-calendar.ts` (see below) | Google Calendar MCP via Claude CLI subprocess |
 | `personal` | `~/.zao/zoe/voice-memos/YYYY-MM-DD.md` (one-liner captures via `/voicememo`) | Lunch stream transcripts via `zao-transcribe`, persona + recent Telegram messages |
+
+### ZAOstock promo calendar (folded into `event`, not a separate category)
+
+`zaostock-promo-calendar.ts` is a pure, hardcoded lookup of research doc 1033's 12-week
+Mon/Wed/Fri photo + artist-track calendar (Jul 13 - Oct 3, 2026). `gatherEventSignals()`
+appends today's line to `todaysEvents` automatically when today is a scheduled slot -
+silent every other day, and after Oct 3 (the festival itself hands off to doc 1030's
+live-event media plan instead). This folds into the same event-category drafter by
+design - doc 1033 explicitly calls for one content slate, not a competing parallel
+campaign. To retire it after the 2026 run, remove the `zaostock-promo-calendar` import
++ call in `sources.ts`.
 
 ## Cadence
 

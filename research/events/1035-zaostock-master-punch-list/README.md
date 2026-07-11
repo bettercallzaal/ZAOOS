@@ -17,6 +17,8 @@ tier: STANDARD
 
 The real optimization at this point in the project isn't more research - it's stopping research sprawl and making everything already found executable. This doc does that: 27 distinct actions across 9 docs collapse into 19 real items once duplicates are merged, sorted into four urgency tiers instead of nine separate By-When columns.
 
+**Update 2026-07-11:** the Tier 1 "confirm ZAOville venue private vs. public" item is RESOLVED - private (DCoop's house), no permit needed. Removed from the table below; see doc 1013 for the updated budget number ($450-$1,100).
+
 ## Tier 1 - This week (by Jul 18) - blocking or time-sensitive
 
 | Action | Source doc(s) | Why it's Tier 1 |
@@ -24,7 +26,6 @@ The real optimization at this point in the project isn't more research - it's st
 | **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | Time-sensitive and easy to forget - the 90-day booking window opened around July 5, reservations required through Oct 25 |
 | **Name a livestream/broadcast lead** | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji, 871's June reorg has no broadcast workstream at all). Blocks doc 1030's entire media plan from having an owner |
 | **Name a Site Lead and a First Aid Lead for Oct 3** | 1032 | Doc 1032's entire safety plan and staffing matrix has no named decision-maker yet - these are the two roles everything else depends on |
-| **Confirm whether the ZAOville venue is private (no permit) or public (permit needed)** | 1013 | Swings ZAOville's entire budget number and whether a permit application needs to start now |
 | **Verify the "$391K in grants" Heart of Ellsworth figure before it's repeated again** | 1031 | Currently on the live `/sponsor` page; HoE's own FY2023 filings show ~$161-166K, a 2.4x gap. Don't let this go to press or a sponsor conversation unverified |
 | **Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`** | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
 

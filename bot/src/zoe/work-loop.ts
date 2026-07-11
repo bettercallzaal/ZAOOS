@@ -46,6 +46,9 @@ export interface WorkTickDeps {
   /** Send to a specific chat/topic (used to report a research result back to
    * the topic it was requested from). Falls back to sendToZaal if absent. */
   sendToChat?: (chatId: number, threadId: number | undefined, text: string) => Promise<unknown>;
+  /** Where autonomous research (no explicit reply target) reports - the Research
+   * topic. When set + sendToChat present, all research lands there not the DM. */
+  defaultResearchTarget?: { chatId: number; threadId: number };
   zaalTgId: number;
   repoDir: string;
   currentDate: string;
@@ -81,10 +84,15 @@ export async function enqueueWork(
   return item;
 }
 
-/** Report a work item's result to its topic if it has a reply target, else DM. */
+/** Report a work item's result: its own reply target > the default Research
+ * topic > Zaal's DM. */
 function reportFor(item: WorkItem, deps: WorkTickDeps): (text: string) => Promise<unknown> {
   if (item.replyTarget && deps.sendToChat) {
     const { chatId, threadId } = item.replyTarget;
+    return (text: string) => deps.sendToChat!(chatId, threadId, text);
+  }
+  if (deps.defaultResearchTarget && deps.sendToChat) {
+    const { chatId, threadId } = deps.defaultResearchTarget;
     return (text: string) => deps.sendToChat!(chatId, threadId, text);
   }
   return deps.sendToZaal;
@@ -168,9 +176,9 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       ambiguities: [],
     };
 
-    await deps
-      .sendToZaal(`Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`)
-      .catch(() => {});
+    await reportFor(item, deps)(
+      `Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`,
+    ).catch(() => {});
 
     try {
       await dispatchPlan({
@@ -198,11 +206,9 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
     } catch (e) {
       const errMsg = (e as Error)?.message ?? String(e);
       console.error('[zoe/work-loop] tick failed:', errMsg);
-      await deps
-        .sendToZaal(
-          `Work-loop error: failed to process "${item.input.slice(0, 60)}..." - ${errMsg.slice(0, 120)}`,
-        )
-        .catch(() => {});
+      await reportFor(item, deps)(
+        `Work-loop error: failed to process "${item.input.slice(0, 60)}..." - ${errMsg.slice(0, 120)}`,
+      ).catch(() => {});
       // Remove from queue even on error to avoid infinite retry loop
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
     }

@@ -366,10 +366,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       '0 */2 * * *',
       async () => {
         try {
+          const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+          const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
           await runWorkTick({
             sendToZaal: (t: string) => opts.bot.api.sendMessage(opts.zaalTgId, t),
             sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
               opts.bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
+            defaultResearchTarget: rGid && rThread ? { chatId: rGid, threadId: rThread } : undefined,
             zaalTgId: opts.zaalTgId,
             repoDir: opts.repoDir,
             currentDate: new Date().toISOString().slice(0, 10),

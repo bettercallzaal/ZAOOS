@@ -1,0 +1,54 @@
+#!/bin/bash
+# zao-api-audit - map every API key / provider env var to its call sites in the
+# codebase, so you can see which features burn which key (e.g. why Alchemy ate
+# its credits). Read-only code analysis - it shows WHERE a key is used in code;
+# runtime call volume lives in each provider's own dashboard (noted per key).
+# Team-donatable: run it in any repo.
+#
+# Usage: zao-api-audit            (scans ./src and ./bot/src by default)
+#        zao-api-audit <dir> ...  (scan specific dirs)
+set -euo pipefail
+ROOT="${ZAO_REPO:-$(pwd)}"
+DIRS=("$@")
+[ ${#DIRS[@]} -eq 0 ] && DIRS=("$ROOT/src" "$ROOT/bot/src")
+
+# Providers to look for (env-var stem -> friendly name). Extend freely.
+PROVIDERS=(
+  "ALCHEMY:Alchemy (RPC/Data APIs - check dashboard for credit burn)"
+  "NEYNAR:Neynar (Farcaster)"
+  "SUPABASE:Supabase"
+  "OPENAI:OpenAI"
+  "ANTHROPIC:Anthropic / Claude"
+  "OPENROUTER:OpenRouter"
+  "GROQ:Groq"
+  "STREAM:Stream.io"
+  "XMTP:XMTP"
+  "PARAGRAPH:Paragraph"
+  "PODCASTINDEX:Podcast Index"
+  "COWORK_TRACKER:Cowork tracker (Supabase)"
+  "TELEGRAM:Telegram bot"
+  "ZOE_BOT:ZOE bot token"
+)
+
+echo "API / ENV USAGE AUDIT"
+echo "root: $ROOT"
+echo "scanned: ${DIRS[*]}"
+echo "======================================================"
+for entry in "${PROVIDERS[@]}"; do
+  stem="${entry%%:*}"; name="${entry#*:}"
+  # match process.env.<STEM...> occurrences
+  hits=$(grep -rhoE "process\.env\.[A-Z0-9_]*${stem}[A-Z0-9_]*" "${DIRS[@]}" 2>/dev/null | sort -u || true)
+  [ -z "$hits" ] && continue
+  count=$(grep -rlE "process\.env\.[A-Z0-9_]*${stem}[A-Z0-9_]*" "${DIRS[@]}" 2>/dev/null | wc -l | tr -d ' ')
+  echo ""
+  echo "### $name"
+  echo "  vars:  $(echo "$hits" | sed 's/process.env.//' | paste -sd', ' -)"
+  echo "  used in $count file(s):"
+  grep -rlE "process\.env\.[A-Z0-9_]*${stem}[A-Z0-9_]*" "${DIRS[@]}" 2>/dev/null \
+    | sed "s#$ROOT/##" | sort | head -30 | sed 's/^/    - /'
+done
+echo ""
+echo "======================================================"
+echo "Note: this is code presence, not runtime call volume."
+echo "For the Alchemy credit burn, cross-ref these files with the"
+echo "Alchemy dashboard's per-app usage to find the hot path."

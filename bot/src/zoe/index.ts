@@ -807,6 +807,15 @@ bot.on('message:text', async (ctx) => {
     const action = routeTopic(topicName);
     const threadOpt = threadId ? { message_thread_id: threadId } : {};
 
+    // Bridge log: record EVERY ZAAL BOTZ turn (all topics, incl auto-act ones)
+    // under the group scope so an open Claude Code session can SSH-read Zaal's
+    // topic replies and route them to the right worker (the inbox-bridge loop).
+    // Text is prefixed with the topic so the reader knows which lane he replied in.
+    void pushRecent(
+      { from: 'zaal', text: `[${topicName ?? 'General'}] ${text}`, sender: 'zaalbotz' },
+      String(zaalBotzGroupId),
+    ).catch((e) => console.error('[zoe/index] zaalbotz bridge-log failed:', (e as Error)?.message));
+
     if (action.kind === 'research') {
       await enqueueWork(text, { chatId, threadId }).catch((e) =>
         console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),

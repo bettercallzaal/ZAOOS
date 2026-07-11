@@ -651,6 +651,20 @@ bot.on('message:text', async (ctx) => {
   // per doc 1025) so it stays out of the repo. No @-tag needed.
   const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
   if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
+    const threadId = ctx.message.message_thread_id;
+    // Per-topic behavior: the Research topic turns any message into a research
+    // request (the work-loop researches it + commits a doc + PR). Other topics
+    // are normal ZOE chat. Thread ids are env config (private-instance).
+    const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+    if (researchThread && threadId === researchThread) {
+      await enqueueWork(text).catch((e) =>
+        console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),
+      );
+      await ctx
+        .reply("On it - researching this. I'll post the doc + PR when it lands.")
+        .catch(() => {});
+      return;
+    }
     const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
     const turnTextG = quotedG
       ? `[Zaal is replying to your earlier message:\n"${quotedG.slice(0, 1200)}"]\n\nHis reply: ${text}`

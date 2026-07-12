@@ -446,6 +446,13 @@ bot.on('callback_query:data', async (ctx) => {
       const cbChat = ctx.callbackQuery.message?.chat?.id;
       if (cbChat) pendingTypeAnswers.set(cbChat, q.qid);
       await ctx.answerCallbackQuery({ text: 'Reply with your answer.' });
+      // Clear the buttons (like Post/Skip) so the question can't be re-tapped,
+      // and show it's awaiting a typed reply.
+      await ctx
+        .editMessageText(`Answering (${q.qid}) - reply with your text.`, {
+          reply_markup: { inline_keyboard: [] },
+        })
+        .catch(() => {});
       await ctx
         .reply(`Reply to this thread with your answer for "${q.qid}".`, {
           ...(ctx.callbackQuery.message?.message_thread_id

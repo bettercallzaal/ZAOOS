@@ -79,6 +79,42 @@ export interface CrmOp {
   };
 }
 
+/** Deeper memory: decision records that ZOE logs + recalls */
+export interface DecisionRecord {
+  id: string;
+  decision: string; // Zaal's decision (his words)
+  rationale: string; // Why (reasoning)
+  context?: string; // Optional context (who, what triggered it)
+  created_at: string;
+}
+
+export type DecisionOp = {
+  op: "log_decision";
+  decision: string;
+  rationale: string;
+  context?: string;
+};
+
+/** Deeper memory: build-state records tracking features/PRs across sessions */
+export interface BuildStateRecord {
+  id: string;
+  feature: string; // Feature name (e.g. "WaveWarZ-v2")
+  status: "open" | "in-review" | "blocked" | "shipped" | "paused" | "planning";
+  pr?: string; // PR number/URL
+  branch?: string; // Git branch name
+  reason?: string; // Why this status (e.g. "waiting for review")
+  created_at: string;
+}
+
+export type BuildStateOp = {
+  op: "log_build_state";
+  feature: string;
+  status: "open" | "in-review" | "blocked" | "shipped" | "paused" | "planning";
+  pr?: string;
+  branch?: string;
+  reason?: string;
+};
+
 export interface ConciergeOptions {
   /** User message text */
   message: string;
@@ -113,6 +149,10 @@ export interface ConciergeResult {
   crm_ops: CrmOp[];
   /** Open-thread ops - track/advance commitments Zaal makes (doc 796 Move 2). */
   thread_ops: ThreadOp[];
+  /** Decision ops - log Zaal's decisions + rationale for recall (deeper memory increment 1). */
+  decision_ops: DecisionOp[];
+  /** Build-state ops - track feature/PR status across sessions (deeper memory increment 1). */
+  build_state_ops: BuildStateOp[];
   /** Cost stats from Claude CLI call */
   inputTokens: number;
   outputTokens: number;

@@ -39,8 +39,14 @@ const THRESHOLD_FILE = join(ZOE_PATHS.home, 'proactive-threshold.txt');
 const PUSHES_FILE = join(ZOE_PATHS.home, 'proactive-pushes.json');
 const LOG_FILE = join(ZOE_PATHS.home, 'proactive-log.jsonl');
 
-/** Default interrupt bar. due-soon (0.6) just clears; idle chatter does not. */
-export const DEFAULT_THRESHOLD = 0.6;
+/**
+ * Default interrupt bar (tuned 2026-07-12). Lowered from 0.6 to allow due-soon
+ * threads (score 0.6) and inactivity checks (0.62) to clear the base threshold.
+ * The self-throttle (unacked pushes) still escalates aggressively: at 3+ unacked
+ * it raises to 0.6, 6+ raises to 0.7, etc., so the bot doesn't spam even if the
+ * base bar is lower. Tunable via ZOE_PROACTIVE_THRESHOLD env var.
+ */
+export const DEFAULT_THRESHOLD = Number.parseFloat(process.env.ZOE_PROACTIVE_THRESHOLD ?? '0.5');
 export const MIN_THRESHOLD = 0.3;
 export const MAX_THRESHOLD = 0.95;
 /** Self-throttle: this many unacked pushes in the window raises the bar. */

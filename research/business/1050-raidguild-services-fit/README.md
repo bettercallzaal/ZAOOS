@@ -9,7 +9,7 @@ original-query: "https://www.raidguild.org/#hire-us let's research on raidguild 
 tier: STANDARD
 ---
 
-# 1000 - let's research on raidguild too
+# 1050 - let's research on raidguild too
 
 > Drafted by ZOE's research-worker from "https://www.raidguild.org/#hire-us let's research on raidguild too". Auto-committed to main for durability; review + deepen as needed.
 

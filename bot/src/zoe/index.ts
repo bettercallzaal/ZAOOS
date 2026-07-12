@@ -94,6 +94,7 @@ import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
 import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
+import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback } from './questions';
@@ -500,9 +501,14 @@ bot.on('callback_query:data', async (ctx) => {
       return null;
     });
     if (channel === 'cast') {
-      await ctx.answerCallbackQuery({ text: 'Approved - queued to cast.' });
+      // Enqueue the cast for @zolbot to pick up from the cowork tracker.
+      // Best-effort - if this fails, the cast is still in the outbox.jsonl.
+      await enqueueZolCast(draft.text).catch((e) => {
+        console.error('[zoe/index] zol queue enqueue failed:', (e as Error)?.message);
+      });
+      await ctx.answerCallbackQuery({ text: 'Approved - queued for @zolbot.' });
       await ctx
-        .editMessageText(`[APPROVED to cast - queued, not yet sent] ${draft.text}`, {
+        .editMessageText(`[APPROVED to cast - queued for @zolbot] ${draft.text}`, {
           reply_markup: { inline_keyboard: [] },
         })
         .catch(() => {});

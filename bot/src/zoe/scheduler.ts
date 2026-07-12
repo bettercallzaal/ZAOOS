@@ -31,6 +31,7 @@ import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { surfaceNewHandoffs } from './handoffs-surface';
+import { runOrchestratorTick } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
@@ -405,6 +406,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} handoff(s) to the Handoffs topic`);
         } catch (err) {
           console.warn('[zoe/scheduler] handoff surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Orchestrator tick (doc TBD) - every 5 min, check for new button-question
+  // answers in the ZAAL BOTZ Claude Code topic and post the next question
+  // based on simple decision rules. DISABLED by default (ZOE_ORCHESTRATOR_ENABLED
+  // env flag) so it never runs while a Claude Code terminal orchestrator is
+  // active. Empty queue = silent. File-locked, daily-capped.
+  tasks.push(
+    cron.schedule(
+      '*/5 * * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        if (!gid) return; // not configured
+        try {
+          await runOrchestratorTick({
+            bot: opts.bot,
+            groupId: gid,
+            zaalTgId: opts.zaalTgId,
+            now: new Date(),
+          });
+        } catch (err) {
+          console.error('[zoe/scheduler] orchestrator tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

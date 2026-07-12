@@ -1,15 +1,10 @@
 #!/bin/bash
 # zao-ask <qid> "<question>" [opt1] [opt2] ...
-# Post a button-question to the ZAAL BOTZ General topic so Zaal can batch-click
-# answers from one place. ANY terminal/session calls this; the answer is logged
-# by ZOE to recent/<groupid>.json (the inbox bridge), and the asking terminal
-# reads it back by its <qid> namespace (convention: "<terminal>-<slug>", e.g.
-# "zaostock-publish"). Buttons wait until tapped; a "Type my own" button is
-# always added for freetext. No options = a freetext-only ask.
-#
-# Usage:
-#   zao-ask oss4ai "Speak yourself or recruit a speaker?" "Speak" "Recruit"
-#   zao-ask pub192 "Publish newsletter Day 192 now?" "Publish now" "Hold"
+# Post a button-question to the ZAAL BOTZ General topic so Zaal can batch-click.
+# The FULL question + numbered options go in the message (always readable, never
+# truncated); the buttons are compact numbers (1,2,3...) + "Type my own". A tap
+# logs the chosen option's slug to recent/ (the bridge); the asking terminal
+# reads it back by <qid>. No options = a freetext-only ask.
 set -e
 QID="$1"; Q="$2"; shift 2 2>/dev/null || true
 [ -z "$QID" ] || [ -z "$Q" ] && { echo 'usage: zao-ask <qid> "<question>" [opt1] [opt2] ...'; exit 1; }
@@ -22,19 +17,28 @@ import sys, json, base64, re, urllib.request, urllib.parse
 token, gid, qid, q = sys.argv[1:5]
 opts = sys.argv[5:]
 def enc(qid, v): return f"q:{qid}:" + base64.urlsafe_b64encode(v.encode()).decode().rstrip("=")
-def slug(o): return (re.sub(r'[^a-z0-9]', '', o.lower())[:14] or "opt")
-rows = [[{"text": o, "callback_data": enc(qid, slug(o))}] for o in opts]
+def slug(o): return (re.sub(r'[^a-z0-9]', '', o.lower())[:16] or "opt")
+# Compact number buttons (1..N) in rows of up to 4, then a Type row. The button
+# carries the option's slug so the logged answer is readable, not just a number.
+numbtns = [{"text": str(i + 1), "callback_data": enc(qid, slug(o))} for i, o in enumerate(opts)]
+rows = [numbtns[i:i + 4] for i in range(0, len(numbtns), 4)]
 rows.append([{"text": "Type my own", "callback_data": enc(qid, "__type__")}])
-# guard the 64-byte callback_data cap
 for r in rows:
-    if len(r[0]["callback_data"].encode()) > 64:
-        print("option too long for a button code:", r[0]["text"]); sys.exit(1)
-body = {"chat_id": gid, "text": f"[{qid}] {q}", "reply_markup": json.dumps({"inline_keyboard": rows})}
-# omit message_thread_id -> lands in the General topic
-data = urllib.parse.urlencode(body).encode()
+    for b in r:
+        if len(b["callback_data"].encode()) > 64:
+            print("option slug too long:", b["text"]); sys.exit(1)
+# Full, readable message: question + numbered options.
+lines = [f"Q: {q}", ""]
+for i, o in enumerate(opts):
+    lines.append(f"{i + 1}. {o}")
+if opts:
+    lines.append("")
+    lines.append("Tap a number below, or Type my own.")
+text = "\n".join(lines)
+body = {"chat_id": gid, "text": text, "reply_markup": json.dumps({"inline_keyboard": rows})}
 try:
     r = json.load(urllib.request.urlopen(urllib.request.Request(
-        f"https://api.telegram.org/bot{token}/sendMessage", data=data), timeout=15))
+        f"https://api.telegram.org/bot{token}/sendMessage", data=urllib.parse.urlencode(body).encode()), timeout=15))
     print("asked:", qid) if r.get("ok") else print("FAIL:", r.get("description"))
 except Exception as e:
     print("ERR:", e); sys.exit(1)

@@ -1328,7 +1328,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
     }
   }
 
-  await dispatchConcierge(ctx, text, 'private', 'Zaal');
+  await dispatchConcierge(ctx, text, 'private', 'Zaal', brandContext);
 }
 
 async function handleGroupMessage(
@@ -1351,7 +1351,7 @@ async function handleGroupMessage(
     }
     return;
   }
-  await dispatchConcierge(ctx, text, scope, label);
+  await dispatchConcierge(ctx, text, scope, label, brandContext);
 }
 
 // A concierge turn can take 60s+ on Opus. Telegram clears the typing
@@ -1405,6 +1405,7 @@ async function dispatchConcierge(
   text: string,
   scope: ChatScope,
   label: string,
+  brandContext?: string,
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;

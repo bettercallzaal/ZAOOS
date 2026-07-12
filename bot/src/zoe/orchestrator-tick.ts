@@ -1,16 +1,22 @@
 /**
- * orchestrator-tick.ts - VPS cron tick for the durable orchestrator (Stage 1).
+ * orchestrator-tick.ts - VPS cron tick for the durable orchestrator.
+ *
+ * Stage 1 (shipped): detects Zaal's tapped answers + posts next questions.
+ * Stage 2 (this file): ACTS on answers - enqueues research, marks tasks done, or asks next question.
  *
  * When ZOE_ORCHESTRATOR_ENABLED === 'true', this runs every 5 min via cron
  * to drive a one-question-at-a-time loop autonomously. Zaal taps answers to
  * button questions in ZAAL BOTZ Claude Code topic; the tick detects those
- * answers and posts the next question based on simple rules.
+ * answers and classifies them into ACTIONS (research, board_done, ask_next).
  *
- * Design (from scout):
+ * Design:
  *  - Read recent/<group_id>.json for Zaal's tapped answers ([answer:qid] format)
  *  - Detect NEW answers since the last stored pointer (lastSeenTs)
- *  - Decide the next question via a simple rule table (v1, no LLM)
- *  - Post the next question with tappable buttons (reusing questions.ts)
+ *  - Classify each answer via classifyAnswer() -> AnswerAction
+ *  - Execute the action:
+ *    * research: call enqueueWork(topic) to queue research for the work loop
+ *    * board_done: PATCH the team tracker task to status 'done'
+ *    * ask_next: post the next question with buttons (Stage 1 behavior)
  *  - Update state pointer
  *
  * Safe by design:
@@ -19,7 +25,8 @@
  *  - Empty queue = no messages
  *  - File-locked (one-instance only, mirrors work-loop.ts pattern)
  *  - Daily cap (ZOE_ORCHESTRATOR_DAILY, default 20)
- *  - Never posts/DMs/casts/spends/on-chain — only posts button questions
+ *  - Best-effort: one action failure doesn't kill the tick
+ *  - Never: LLM calls, posts to Farcaster/X, DMs outside General, casts, spends, on-chain, merges PRs, builds/writes code
  */
 
 import { promises as fs } from 'node:fs';
@@ -27,6 +34,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQuestion } from './questions';
 import { pushRecent, ZOE_PATHS } from './memory';
+import { enqueueWork } from './work-loop';
 
 const ORCHESTRATOR_STATE_PATH = (): string =>
   join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'), 'orchestrator-state.json');
@@ -136,6 +144,69 @@ const DECISION_TABLE: Array<{
     options: ['Intro call', 'Deep discussion', 'Deal stage'],
   },
 ];
+
+/**
+ * Stage 2: ACTION classification. Maps (qid, value) -> action (research, board_done, ask_next, skip).
+ * Each action carries what's needed to execute it.
+ */
+export interface AnswerAction {
+  kind: 'research' | 'board_done' | 'ask_next' | 'skip';
+  topic?: string; // for research: the topic to enqueue
+  taskId?: string; // for board_done: the task uuid
+  nextQuestion?: { qid: string; options: string[] }; // for ask_next
+}
+
+/**
+ * Check if a string looks like a valid UUID (8-4-4-4-12 hex).
+ */
+function isValidUuid(s: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+}
+
+/**
+ * Parse a qid that encodes a task id (format: 'task-<uuid>').
+ * Returns the uuid or null if not a task qid.
+ */
+function parseTaskQid(qid: string): string | null {
+  if (!qid.startsWith('task-')) return null;
+  const uuid = qid.slice(5);
+  return isValidUuid(uuid) ? uuid : null;
+}
+
+/**
+ * Classify an answer into an ACTION: research, board_done, ask_next, or skip.
+ * Pure function (no I/O), unit-testable.
+ *
+ * Rules:
+ *  - If qid = 'task-<uuid>' and value in {done, complete, ship}, return board_done
+ *  - If qid starts with 'research-' or value looks like a research topic, return research
+ *  - Else if decideNextQuestion returns a match, return ask_next
+ *  - Else return skip
+ */
+export function classifyAnswer(qid: string, value: string): AnswerAction {
+  // Check for board_done first: task-<uuid> with disposition value
+  const taskId = parseTaskQid(qid);
+  if (taskId) {
+    const disposition = value.toLowerCase().trim();
+    if (['done', 'complete', 'ship'].includes(disposition)) {
+      return { kind: 'board_done', taskId };
+    }
+  }
+
+  // Check for research: qid starts with 'research-' or value is non-empty
+  if (qid.startsWith('research-')) {
+    return { kind: 'research', topic: value || 'General research' };
+  }
+
+  // Try to match a next-question rule (Stage 1 behavior)
+  const nextQuestion = decideNextQuestion(qid, value);
+  if (nextQuestion) {
+    return { kind: 'ask_next', nextQuestion };
+  }
+
+  // No rule matched; skip silently
+  return { kind: 'skip' };
+}
 
 export interface OrchestratorState {
   lastSeenTs: string;
@@ -259,6 +330,97 @@ export function decideNextQuestion(
 }
 
 /**
+ * Stage 2: Enqueue research via the work-loop's existing pipeline.
+ * Best-effort; logs on failure but doesn't throw.
+ */
+async function actionEnqueueResearch(topic: string): Promise<boolean> {
+  try {
+    const item = await enqueueWork(topic);
+    console.log(`[zoe/orchestrator] enqueued research: "${topic}" (${item.id})`);
+    return true;
+  } catch (err) {
+    console.error('[zoe/orchestrator] failed to enqueue research:', (err as Error)?.message);
+    return false;
+  }
+}
+
+/**
+ * Stage 2: Mark a team tracker task as done via PATCH.
+ * Requires COWORK_TRACKER_URL and COWORK_TRACKER_KEY env vars.
+ * Best-effort; returns false on any error.
+ */
+async function actionMarkTaskDone(taskId: string): Promise<boolean> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key) {
+    console.log(`[zoe/orchestrator] tracker not configured, skip board update for ${taskId}`);
+    return false;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const url = `${base.replace(/\/$/, '')}/rest/v1/tasks?id=eq.${taskId}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({ status: 'done' }),
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timer));
+
+    if (res.ok) {
+      console.log(`[zoe/orchestrator] marked task ${taskId} as done`);
+      return true;
+    }
+
+    console.error(`[zoe/orchestrator] tracker PATCH ${taskId} returned ${res.status}`);
+    return false;
+  } catch (err) {
+    console.error(
+      '[zoe/orchestrator] failed to mark task done:',
+      (err as Error)?.message,
+    );
+    return false;
+  }
+}
+
+/**
+ * Stage 2: Post a brief confirmation message to the group after executing an action.
+ * Best-effort; doesn't throw.
+ */
+async function postActionConfirmation(
+  deps: OrchestratorTickDeps,
+  action: AnswerAction,
+  answer: { qid: string; value: string },
+): Promise<void> {
+  let msg = '';
+  switch (action.kind) {
+    case 'research':
+      msg = `Queued research: ${action.topic}`;
+      break;
+    case 'board_done':
+      msg = `Marked task done.`;
+      break;
+    case 'ask_next':
+      // No confirmation for ask_next; the question itself is the confirmation
+      return;
+    case 'skip':
+      return;
+  }
+
+  try {
+    await deps.bot.api.sendMessage(deps.groupId, msg);
+  } catch (err) {
+    console.error('[zoe/orchestrator] failed to post confirmation:', (err as Error)?.message);
+  }
+}
+
+/**
  * Build the button question text for a given qid (simple labels, not LLM).
  */
 function questionTextFor(qid: string): string | null {
@@ -309,45 +471,77 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       return;
     }
 
-    // Process each new answer: decide next question, post it
-    let posted = 0;
+    // Stage 2: Process each new answer via action classification
+    let actioned = 0;
     for (const answer of answers) {
-      const next = decideNextQuestion(answer.qid, answer.value);
-      if (!next) {
-        console.log(
-          `[zoe/orchestrator] no rule for (${answer.qid}, "${answer.value}"), silent`,
-        );
-        continue;
-      }
+      const action = classifyAnswer(answer.qid, answer.value);
 
-      const qText = questionTextFor(next.qid);
-      if (!qText) {
-        console.log(`[zoe/orchestrator] no text for qid ${next.qid}, skip`);
-        continue;
-      }
+      switch (action.kind) {
+        case 'research':
+          // Enqueue research via work-loop pipeline
+          if (await actionEnqueueResearch(action.topic!)) {
+            actioned++;
+            await postActionConfirmation(deps, action, answer);
+          }
+          break;
 
-      try {
-        await deps.bot.api.sendMessage(deps.groupId, qText, {
-          reply_markup: questionKeyboard(next.qid, next.options),
-        });
-        posted++;
-        console.log(
-          `[zoe/orchestrator] posted ${next.qid} after answer (${answer.qid}, "${answer.value}")`,
-        );
-      } catch (err) {
-        console.error(
-          '[zoe/orchestrator] failed to post next question:',
-          (err as Error)?.message,
-        );
+        case 'board_done':
+          // Mark task as done on team tracker
+          if (await actionMarkTaskDone(action.taskId!)) {
+            actioned++;
+            await postActionConfirmation(deps, action, answer);
+          }
+          break;
+
+        case 'ask_next':
+          // Stage 1: Post the next question with buttons
+          if (!action.nextQuestion) {
+            console.log(
+              `[zoe/orchestrator] ask_next but no nextQuestion for (${answer.qid}, "${answer.value}")`,
+            );
+            break;
+          }
+
+          const qText = questionTextFor(action.nextQuestion.qid);
+          if (!qText) {
+            console.log(
+              `[zoe/orchestrator] no text for qid ${action.nextQuestion.qid}, skip`,
+            );
+            break;
+          }
+
+          try {
+            await deps.bot.api.sendMessage(deps.groupId, qText, {
+              reply_markup: questionKeyboard(action.nextQuestion.qid, action.nextQuestion.options),
+            });
+            actioned++;
+            console.log(
+              `[zoe/orchestrator] posted ${action.nextQuestion.qid} after answer (${answer.qid}, "${answer.value}")`,
+            );
+          } catch (err) {
+            console.error(
+              '[zoe/orchestrator] failed to post next question:',
+              (err as Error)?.message,
+            );
+          }
+          break;
+
+        case 'skip':
+          console.log(
+            `[zoe/orchestrator] no rule for (${answer.qid}, "${answer.value}"), silent`,
+          );
+          break;
       }
     }
+
+    const posted = actioned;
 
     if (posted > 0) {
       // Advance pointer to latest answer's timestamp
       const latestTs = answers[answers.length - 1].ts;
       await writeState({ lastSeenTs: latestTs });
       await bumpToday(dateStr);
-      console.log(`[zoe/orchestrator] tick: ${answers.length} answer(s), ${posted} question(s) posted`);
+      console.log(`[zoe/orchestrator] tick: ${answers.length} answer(s), ${posted} action(s) executed`);
     }
   } finally {
     await releaseLock();

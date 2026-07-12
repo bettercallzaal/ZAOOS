@@ -92,6 +92,8 @@ export interface ConciergeOptions {
   model?: string;
   /** Prior context retrieved from the Bonfire graph (via recall/delve), injected as a <bonfire_recall> block. */
   recallContext?: string;
+  /** Brand context (ICM box text) for brand-masked responses, injected as a <brand_context> block. */
+  brandContext?: string;
   /** True if the message contains a URL + research intent keywords. Routes toward research-worker dispatch. */
   linkResearchIntent?: boolean;
 }

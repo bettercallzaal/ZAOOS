@@ -250,7 +250,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             if (!nudge) return cands;
             // Score at the default threshold: it can fire when nothing outranks
             // it, but any due/overdue commitment thread (>=0.75) wins the tick.
-            cands.push({ kind: 'task-nudge', score: 0.6, message: nudge });
+            cands.push({ kind: 'task-nudge', tier: 'standard', score: 0.6, message: nudge });
           } catch {
             // ignore - return whatever events we gathered
           }

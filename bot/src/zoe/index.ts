@@ -1351,7 +1351,7 @@ async function handleGroupMessage(
     }
     return;
   }
-  await dispatchConcierge(ctx, text, scope, label, brandContext);
+  await dispatchConcierge(ctx, text, scope, label);
 }
 
 // A concierge turn can take 60s+ on Opus. Telegram clears the typing

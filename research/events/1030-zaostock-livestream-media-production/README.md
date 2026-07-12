@@ -23,7 +23,7 @@ tier: DISPATCH
 | **Use the Meta Ray-Ban glasses for POV/social moments, not as a switched camera angle** | Confirmed via direct research: native recording is capped around 5 minutes per clip and the glasses need battery swaps roughly every 30-60 minutes of active use - not viable for continuous 6-hour coverage. Their real value is backstage POV, artist-eye-view during a set, or a roaming crowd walk - content for the highlight reel and socials, not the live switched feed |
 | **Use the extra phones as the connectivity backbone, not just cameras** | The external connectivity research (below) independently landed on "two phones as bonded hotspots" as the cheapest reliable internet solution for this exact venue - which the org already owns. This is likely the biggest line-item savings in the whole plan |
 | **Budget audio separately and buy real gear for it (~$250-300)** | Unlike cameras/connectivity, there's no "we probably already have this" answer for a DI box and audio interface - this is specialized gear almost nobody owns already. Don't try to improvise it with a phone mic |
-| **Assign ONE named livestream/broadcast lead now** | This role has been unresolved since May - doc 609 (May 5) named Thy Revolution as livestream lead, doc 720 (May 19) separately named Onaji ("Ohnahji") into media/livestream, and doc 871 (June 17) doesn't list a broadcast workstream at all. Nobody has been the clear owner of this exact plan. Pick one person before Oct 3, not after |
+| **Livestream/broadcast lead: RESOLVED 2026-07-12 - Ohnahji** | Confirmed directly by Zaal. This settles the ambiguity between doc 609 (May 5, named Thy Revolution) and doc 720 (May 19, named Onaji/Ohnahji instead) in Ohnahji's favor - doc 720 was the more recent call and it stuck. Doc 950's independent corroboration (Ohnahji x Zaal session already discussing Meta-glasses streaming ideas) lines up with this |
 
 ## Findings
 
@@ -71,7 +71,7 @@ Unlike cameras and connectivity, there's no "maybe we already own this" answer f
 - **The most common failure modes, per real practitioner accounts**: ground-loop hum (fixed by the DI box's ground-lift switch and keeping all gear on the same power circuit), audio/video sync drift over a multi-hour show (fixed by setting every device to the same 48kHz sample rate before the event and using OBS's sync-offset control if it still drifts), and simple gain-staging mistakes that cause clipping (fixed by a 15-minute test stream before doors open and continuous headphone monitoring during the show).
 - **Is this realistic for one untrained volunteer?** Yes, but only if someone with real audio knowledge does the pre-event setup and gain-staging (about 2 hours) and gives the volunteer 30-45 minutes of specific training beforehand. The volunteer's actual job during the 6-hour show is narrow and learnable: wear headphones, watch the OBS level meter, don't touch anything unless it drifts into the red, and know how to flip to a backup input if the primary channel dies. [FULL - 30+ sources checked, including direct signal-chain and gain-staging guidance from Sweetwater, Whirlwind, and multiple live-sound practitioner forums]
 
-### 5. The livestream/broadcast lead role has been unresolved since May
+### 5. RESOLVED - the livestream/broadcast lead role, unowned since May, is Ohnahji
 
 Cross-checking this session's own prior research against the new streaming plan surfaced a real gap that predates this doc:
 
@@ -79,7 +79,7 @@ Cross-checking this session's own prior research against the new streaming plan 
 - Doc 720 (2026-05-19), two weeks later: "Team reorg - remove Maseo from ops, **add Onaji to media / livestream**."
 - Doc 871 (2026-06-17), the most recent workstream reorg found in this session's research: lists 5 workstreams (lineup, venue+ops, sponsors, volunteers, site+media) with **no explicit broadcast/livestream workstream at all** - it may be folded into "site + media" (owned by Zaal), but that's not stated.
 
-Nobody checked this session confirms which of these is current, or whether the role has simply gone unowned since May. Given this doc now has a real, specific technical plan to execute, someone needs to own running it. [FULL - cross-referenced against docs 609, 720, and 871, all read in full earlier this session]
+**Confirmed directly by Zaal 2026-07-12: Ohnahji.** Doc 720's May 19 call is the one that stuck - Thy Revolution's earlier May 5 assignment is superseded. Ohnahji now owns this doc's entire technical plan (ATEM Mini Pro switcher, audio DI chain, connectivity setup, the whole gear stack) and doc 1036's ZAOville dry run. [FULL - cross-referenced against docs 609, 720, and 871, all read in full earlier this session; owner confirmed by Zaal 2026-07-12]
 
 One corroborating data point: doc 950 (Ohnahji x Zaal strategic session, deep-dive added 2026-07-05) already lists "test Meta glasses AR for Twitch IRL streaming" as a noted idea - independent validation, from before this doc existed, that Meta glasses were already on someone's radar as a streaming tool. That session didn't resolve who owns ZAOstock's broadcast plan specifically, but it confirms the glasses-for-streaming direction in Key Decisions above isn't a new idea invented by this doc's research. [FULL - doc 950 read this session]
 
@@ -96,7 +96,8 @@ One corroborating data point: doc 950 (Ohnahji x Zaal strategic session, deep-di
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Confirm the owned cameras have clean HDMI output (check make/model) - shipped when the answer is recorded and this doc's camera-budget line is finalized | Zaal | Todo | 2026-07-14 |
-| Name ONE person as the livestream/broadcast lead for Oct 3, resolving the Thy Revolution vs. Onaji vs. unowned ambiguity from Finding 5 - shipped when a name is recorded against this workstream | Zaal | Task | 2026-07-14 |
+| ~~Name ONE person as the livestream/broadcast lead for Oct 3~~ - ANSWERED 2026-07-12: Ohnahji | Zaal | Done | 2026-07-12 |
+| Loop Ohnahji in on this doc's gear stack and doc 1036's ZAOville dry run - shipped when Ohnahji has actually seen both docs, not just been named | Zaal | Todo | 2026-07-18 |
 | Buy the ATEM Mini Pro ($325) and the audio DI/interface bundle ($250-300) - shipped when both are purchased and in hand | Zaal | Task | 2026-08-01 |
 | Run a live speed test at the actual Franklin Street Parklet venue to confirm the dual-phone-hotspot connectivity plan (Finding 2) - shipped when the test is run and recorded, ideally on more than one day/time | Zaal | Task | 2026-09-01 |
 | Update doc 1013's $8,000 Production budget line to reflect this doc's ~$900-1,500 real estimate, and reallocate the difference - shipped when doc 1013 or the live sponsor page is updated | Zaal | Todo | 2026-07-18 |

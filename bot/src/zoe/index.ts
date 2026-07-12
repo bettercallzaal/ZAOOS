@@ -444,6 +444,12 @@ bot.on('callback_query:data', async (ctx) => {
   const q = parseQuestionCallback(ctx.callbackQuery.data);
   if (q) {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    // Unpin the question once Zaal engages with it (zao-ask pins each question so
+    // open ones stay easy to find; answering clears it from the pin list).
+    const pinnedMid = ctx.callbackQuery.message?.message_id;
+    if (pinnedMid) {
+      await ctx.api.unpinChatMessage(gid, pinnedMid).catch(() => {});
+    }
     if (q.isType) {
       const cbChat = ctx.callbackQuery.message?.chat?.id;
       if (cbChat) pendingTypeAnswers.set(cbChat, q.qid);

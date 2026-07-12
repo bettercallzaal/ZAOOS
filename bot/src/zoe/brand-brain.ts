@@ -22,6 +22,9 @@
 const BRAND_BRAINS: Record<string, string> = {
   'ZABAL Games': 'icm_6EcindcuwxlkMO7-lT83cQ', // owned (was the orphan icm_PiCD..)
   WaveWarZ: 'icm_RxT9r-_IjG1U9kxOniSzFQ', // owned
+  'The ZAO': 'icm_ohb0F_XOYDz9Tw_w4yX3PA', // owned, verified live
+  // BetterCallZaal: 'icm_r1ZHKeAdS9UNt4oz7n6HRA' - owned box is EMPTY (no content
+  // on useicm yet). Topic 235 exists; wire this once Zaal fills the box.
 };
 
 /**

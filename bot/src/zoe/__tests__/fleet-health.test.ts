@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { checkFleetLiveness, healFleet } from '../fleet-health';
+import { checkFleetLiveness, healFleet, fleetConsensus } from '../fleet-health';
 
 let tmp: string;
 beforeEach(async () => {
@@ -82,5 +82,39 @@ describe('healFleet', () => {
     const capped = await run(); // 4th - over cap (default 3)
     expect(restart).toHaveBeenCalledTimes(3);
     expect(capped[0].message).toContain('restart cap');
+  });
+});
+
+describe('fleetConsensus', () => {
+  it('returns all-up consensus when all units active', async () => {
+    const consensus = await fleetConsensus(['zoe-bot', 'farscout', 'zaostock-bot'], async () => true);
+    expect(consensus).toBe('FLEET: 3/3 up (zoe-bot, farscout, zaostock-bot)');
+  });
+
+  it('reports down units in consensus', async () => {
+    const checker = async (u: string) => u !== 'farscout';
+    const consensus = await fleetConsensus(['zoe-bot', 'farscout', 'zaostock-bot'], checker);
+    expect(consensus).toContain('FLEET: 2/3 up');
+    expect(consensus).toContain('DOWN: farscout');
+  });
+
+  it('reports empty units gracefully', async () => {
+    const consensus = await fleetConsensus([], async () => true);
+    expect(consensus).toBe('FLEET: 0/0 up ()');
+  });
+
+  it('handles checker errors as down', async () => {
+    const checker = async () => {
+      throw new Error('check failed');
+    };
+    const consensus = await fleetConsensus(['worker'], checker);
+    expect(consensus).toContain('DOWN: worker');
+  });
+
+  it('reports multiple down units', async () => {
+    const checker = async (u: string) => !u.includes('down');
+    const consensus = await fleetConsensus(['up-a', 'down-b', 'down-c', 'up-d'], checker);
+    expect(consensus).toContain('FLEET: 2/4 up');
+    expect(consensus).toContain('DOWN: down-b, down-c');
   });
 });

@@ -1,0 +1,43 @@
+#!/bin/bash
+# zao-usage-proxy - a ROUGH proxy for token/usage burn via build activity.
+#
+# HONEST CAVEAT: Claude Code does not expose per-session token counts to a
+# script, so this is NOT real usage telemetry. It's a heuristic - heavy build
+# days (lots of merged PRs + commits) correlate with heavy token spend. It warns
+# in the ZAAL BOTZ General topic when a day looks unusually heavy, so you get a
+# nudge to ease off if you're near your weekly cap. Treat it as a smoke alarm,
+# not a fuel gauge.
+#
+# Usage: zao-usage-proxy            (report + warn if over threshold)
+#        zao-usage-proxy --quiet    (only output/warn if over threshold)
+# Cron it on the VPS for a daily check. Env: ZAO_REPO_SLUG, ZAO_USAGE_PR_THRESHOLD.
+set -e
+REPO="${ZAO_REPO_SLUG:-bettercallzaal/ZAOOS}"
+THRESHOLD="${ZAO_USAGE_PR_THRESHOLD:-12}"
+TODAY=$(date -u +%Y-%m-%d)
+QUIET=0; [ "$1" = "--quiet" ] && QUIET=1
+
+PRS=$(gh api "search/issues?q=repo:$REPO+is:pr+is:merged+merged:$TODAY" --jq '.total_count' 2>/dev/null || echo 0)
+COMMITS=$(gh api "repos/$REPO/commits?since=${TODAY}T00:00:00Z&per_page=100" --jq 'length' 2>/dev/null || echo 0)
+LINE="usage proxy ($TODAY): $PRS PRs merged, $COMMITS commits on $REPO. (proxy, not real token telemetry)"
+[ "$QUIET" = "0" ] && echo "$LINE"
+
+if [ "$PRS" -ge "$THRESHOLD" ]; then
+  MSG="Heads up - heavy build day: $PRS PRs merged, $COMMITS commits on $REPO today. This is a rough proxy for token burn (Claude Code hides real counts), so if you're near your weekly cap, consider easing off the autonomous builds."
+  TGENV="$HOME/.zao/private/tg.env"
+  TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
+  GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
+  if [ -n "$TOKEN" ] && [ -n "$GID" ]; then
+    python3 - "$TOKEN" "$GID" "$MSG" <<'PY'
+import sys, urllib.request, urllib.parse
+token, gid, msg = sys.argv[1:4]
+data = urllib.parse.urlencode({"chat_id": gid, "text": msg}).encode()
+try:
+    urllib.request.urlopen(urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage", data=data), timeout=15)
+    print("warned in General")
+except Exception as e:
+    print("warn send failed:", e)
+PY
+  fi
+fi

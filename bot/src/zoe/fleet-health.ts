@@ -149,3 +149,32 @@ export async function healFleet(opts: {
   if (mutated) await writeHealCount(opts.date, counts);
   return alerts;
 }
+
+/**
+ * Proactive fleet consensus: one-line summary of fleet state.
+ * Returns "FLEET: N/M up (names)" or "FLEET: N/M up - [DOWN: names]" with counts.
+ * Used in morning brief for at-a-glance fleet health.
+ */
+export async function fleetConsensus(
+  units: string[] = FLEET_UNITS,
+  isActive: UnitChecker = defaultIsActive,
+): Promise<string> {
+  const total = units.length;
+  const down: string[] = [];
+
+  for (const u of units) {
+    let active = false;
+    try {
+      active = await isActive(u);
+    } catch {
+      active = false;
+    }
+    if (!active) down.push(u);
+  }
+
+  const up = total - down.length;
+  if (down.length === 0) {
+    return `FLEET: ${up}/${total} up (${units.join(', ')})`;
+  }
+  return `FLEET: ${up}/${total} up - DOWN: ${down.join(', ')}`;
+}

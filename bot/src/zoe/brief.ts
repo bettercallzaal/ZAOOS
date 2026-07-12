@@ -18,6 +18,8 @@
 import { callClaudeCli } from '../hermes/claude-cli';
 import { listOpenTasks } from './tasks';
 import { getOpenTeamTasks, summarizeTeamForBrief, zaalFocusForBrief } from './team-tracker';
+import { fleetConsensus } from './fleet-health';
+import { graphTopicAgeDays } from './recall';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -43,6 +45,9 @@ FOCUS
 TEAM
 - One line: the team board summary (open count, overdue, top items). Skip this section entirely if team is unavailable.
 
+FLEET
+- One line: fleet consensus (count of active units, names of any down). Also include ZOL status (last cast freshness). Skip this section entirely if fleet is unavailable.
+
 INBOX
 - {N} unread in zoe-zao@agentmail.to. First 3 subjects: ... (skip line entirely if inbox=null)
 - Reminder: run /inbox in any Claude session to research the queue.
@@ -60,6 +65,8 @@ interface BriefContext {
   inbox: { unreadCount: number; recentSubjects: string[] } | null;
   team: string | null;
   focus: string | null;
+  fleet: string | null;
+  zol: string | null;
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -73,6 +80,36 @@ interface AgentMailMessage {
 interface AgentMailFetchResult {
   unreadCount: number;
   recentSubjects: string[];
+}
+
+/**
+ * Check ZOL's liveness by querying Bonfire for recent "zol-cast" episodes.
+ * Returns a one-line status like "ZOL: last cast 2h ago" or "ZOL: no recent cast (check it)".
+ * Best-effort; returns null if Bonfire is unconfigured or query fails gracefully.
+ */
+async function checkZOLStatus(): Promise<string | null> {
+  try {
+    const ageDays = await graphTopicAgeDays('zol-cast', Date.now());
+    if (ageDays === null) {
+      // Unconfigured or no hits
+      return 'ZOL: (out of band - check separately)';
+    }
+    if (ageDays === 0) {
+      return 'ZOL: cast today';
+    }
+    if (ageDays < 1) {
+      const hours = Math.round(ageDays * 24);
+      return `ZOL: last cast ${hours}h ago`;
+    }
+    if (ageDays === 1) {
+      return 'ZOL: last cast 1 day ago';
+    }
+    // More than 1 day stale - flag it
+    return `ZOL: no cast in ${ageDays} days (check it)`;
+  } catch {
+    // Silent failure - Bonfire query errors don't break the brief
+    return null;
+  }
 }
 
 async function fetchInboxSnapshot(): Promise<AgentMailFetchResult | null> {
@@ -183,6 +220,20 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     focus = null;
   }
 
+  // Fleet health — proactive consensus + ZOL liveness. Best-effort; gracefully degrade.
+  let fleet: string | null = null;
+  let zol: string | null = null;
+  try {
+    fleet = await fleetConsensus();
+  } catch {
+    fleet = null;
+  }
+  try {
+    zol = await checkZOLStatus();
+  } catch {
+    zol = null;
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -192,6 +243,8 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     inbox,
     team,
     focus,
+    fleet,
+    zol,
   };
 }
 
@@ -214,6 +267,8 @@ CONTEXT:
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}
 - Team board: ${ctx.team ?? '(tracker unavailable - skip the TEAM section)'}
 - Focus (top-3 by deadline + what needs your call): ${ctx.focus ?? '(none dated)'}
+- Fleet health: ${ctx.fleet ?? '(unavailable - skip the FLEET section)'}
+- ZOL status: ${ctx.zol ?? '(unavailable)'}
 - ${inboxLine}
 
 Output the brief now in the exact format from your system prompt.`;

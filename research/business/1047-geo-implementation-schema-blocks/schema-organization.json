@@ -1,0 +1,40 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "The ZAO",
+  "alternateName": "ZTalent Artist Organization",
+  "url": "https://thezao.xyz",
+  "logo": "https://thezao.xyz/logo.png",
+  "description": "A decentralized impact network bringing profit margin, data, and IP rights back to artists through blockchain and AI. Founded by Zaal Panthaki.",
+  "foundingDate": "2022",
+  "founder": {
+    "@type": "Person",
+    "name": "Zaal Panthaki",
+    "sameAs": ["https://warpcast.com/zaal", "https://x.com/bettercallzaal"]
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "General",
+    "url": "https://thezao.xyz",
+    "email": "hello@thezao.com"
+  },
+  "sameAs": [
+    "https://warpcast.com/~/channel/zao",
+    "https://warpcast.com/~/channel/zabal",
+    "https://github.com/bettercallzaal/ZAOOS",
+    "https://x.com/bettercallzaal",
+    "https://useicm.com/api/objects/icm_ohb0F_XOYDz9Tw_w4yX3PA/llm.txt"
+  ],
+  "areaServed": "Global",
+  "knowsAbout": [
+    "Music",
+    "Blockchain",
+    "Artist Rights",
+    "Web3",
+    "Decentralized Governance",
+    "NFTs",
+    "Impact Networks"
+  ],
+  "award": "156 on-chain Respect holders (verified 2026-07-05)",
+  "alternateName": ["ZAO", "ZTalent", "ZAO Impact Network"]
+}

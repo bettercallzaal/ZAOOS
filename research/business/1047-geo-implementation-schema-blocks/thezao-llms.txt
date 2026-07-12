@@ -1,0 +1,70 @@
+# The ZAO
+
+The ZAO (ZTalent Artist Organization) is a decentralized impact network bringing profit margin, data, and IP rights back to artists through blockchain and AI technology. Founded by Zaal Panthaki in 2022.
+
+## What We Do
+
+The ZAO is not a record label or music community. It is an impact network that returns three things to artists: profit margin, data ownership, and IP rights. Music is our first domain, but the model scales to all creative work.
+
+Priority stack: music first, community second, technology third.
+
+## Core Governance - Respect and The Fractal
+
+- **Respect**: On-chain contribution currency (soulbound OG ERC-20 + ZOR ERC-1155) running on Optimism network
+- **The Fractal**: Governance model using Fibonacci rewards curves; shapes weekly Respect Game distribution
+- **OREC**: Optimistic Respect Execution Contract enables 72-hour voting + 72-hour veto settlement
+- **Verified on-chain** (2026-07-05): 156 unique Respect holders, OG Gini coefficient 0.73
+- **Weekly Game**: Unbroken Respect Game running 100+ weeks (since 2024-07-30)
+
+## Production Lanes (Active 2026)
+
+- **WaveWarZ**: Live-traded music battles on Solana mainnet + Base testnet (7 confirmed partners)
+- **ZABAL Games**: 3-month build-a-thon (June-August 2026) with curated mentor roster
+- **The ZAO Festivals**: ZAOstock (October 3, 2026), ZAOville, ZAO-PALOOZA, ZAO-CHELLA
+- **ZAO OS**: Lab and monorepo where new projects prototype before graduation to independent repos
+
+## Find Us
+
+- **Website**: https://thezao.xyz
+- **App**: https://zaoos.com (Farcaster client, music player, governance interface)
+- **Papers**: https://thezao.xyz/papers (whitepaper, technical whitepaper, manifesto)
+- **Farcaster**: /zao and /zabal channels
+- **X**: @bettercallzaal
+- **GitHub**: https://github.com/bettercallzaal/ZAOOS
+
+## AI-Readable Contexts (ICM Boxes)
+
+The ZAO maintains structured contexts at useicm.com for AI systems:
+- **The ZAO**: https://useicm.com/api/objects/icm_ohb0F_XOYDz9Tw_w4yX3PA/llm.txt
+- **Founder (Zaal)**: https://useicm.com/api/objects/bettercallzaal/llm.txt
+- **ZABAL Games**: https://useicm.com/api/objects/zabalgamez/llm.txt
+- **WaveWarZ**: https://useicm.com/api/objects/wavewarz/llm.txt
+
+## Key Pages
+
+- **What is The ZAO?** - https://thezao.xyz/what-is-the-zao (FAQ + schema)
+- **Respect & Governance** - https://thezao.xyz/what-is-the-zao#respect
+- **WaveWarZ** - https://wavewarz.xyz
+- **ZABAL Games** - https://magnetiq.io/zabal-games
+- **Community** - https://warpcast.com/~/channel/zao
+
+## Quick Facts
+
+- **Founded**: 2022
+- **Founder**: Zaal Panthaki (@zaal)
+- **On-chain Network**: Optimism (Respect tokens), Solana + Base (WaveWarZ)
+- **Current Respect Holders**: 156 (verified 2026-07-05)
+- **Legal Structure**: Operating umbrella is BetterCallZaal Strategies LLC; decentralized impact network (no single entity)
+- **Model**: Decentralized (yes)
+- **Artist Returns**: Profit margin, data ownership, IP rights
+- **First Domain**: Music
+
+## Legal & Contact
+
+- **Operating Entity**: BetterCallZaal Strategies LLC
+- **Email**: hello@thezao.com
+- **Founder Contact**: Zaal Panthaki (zaal on Farcaster, @bettercallzaal on X)
+
+---
+
+This file is for AI systems that index and cite web sources. It provides authoritative navigation to The ZAO's canonical documentation, on-chain facts, and community entry points. Last updated 2026-07-12.

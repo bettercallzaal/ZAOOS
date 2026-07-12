@@ -19,14 +19,14 @@ The real optimization at this point in the project isn't more research - it's st
 
 **Update 2026-07-11:** two more Tier 1 items are RESOLVED and removed below. (1) ZAOville venue confirmed private (DCoop's house), no permit needed - see doc 1013 for the updated budget ($450-$1,100). (2) The "$391K in grants" HoE figure is confirmed accurate against HoE's own 2025 Annual Report - see doc 1031. Also shipped this session: the new `/acadia` page and the `/ellsworth` additions (doc 1034) are live.
 
-**Update 2026-07-12:** Zaal answered a batch of Tier 1/2 questions directly. Site Lead + First Aid Lead: both Zaal (see the caveat under that row - worth a second look, not a clean resolution). Cadillac Mountain reservation: confirmed NOT yet booked. Sound-system booking: confirmed NOT yet booked. ZAOville's pool-coverage plan and pre-event content owner are resolved in doc 1036. Livestream/broadcast lead answer was lost to a Telegram ring-buffer eviction before it could be read - re-asked, still genuinely open.
+**Update 2026-07-12:** Zaal answered a batch of Tier 1/2 questions directly. Site Lead + First Aid Lead: both Zaal (see the caveat under that row - worth a second look, not a clean resolution). Cadillac Mountain reservation: confirmed NOT yet booked. Sound-system booking: confirmed NOT yet booked. ZAOville's pool-coverage plan and pre-event content owner are resolved in doc 1036. Livestream/broadcast lead: re-asked after a ring-buffer eviction lost the first answer - now confirmed **Ohnahji** (see doc 1030 Finding 5). Every Tier 1 item is now either resolved or confirmed-still-open, none are silently stale.
 
 ## Tier 1 - This week (by Jul 18) - blocking or time-sensitive
 
 | Action | Source doc(s) | Why it's Tier 1 |
 |---|---|---|
 | **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | CONFIRMED 2026-07-12: not yet booked. Still time-sensitive - the 90-day booking window opened around July 5, reservations required through Oct 25 |
-| **Name a livestream/broadcast lead** | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji, 871's June reorg has no broadcast workstream at all). Blocks doc 1030's entire media plan from having an owner. Zaal's 2026-07-12 answer was lost to a ring-buffer eviction - re-asked (qid `zsklive3`), still open |
+| ~~Name a livestream/broadcast lead~~ - ANSWERED 2026-07-12: Ohnahji | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji). Doc 720's call is the one that stuck. Ohnahji still needs to actually be looped in on doc 1030's gear stack and doc 1036's ZAOville dry run |
 | ~~Name a Site Lead and a First Aid Lead for Oct 3~~ - ANSWERED 2026-07-12: both Zaal | 1032 | Worth a second look, not a clean resolution: doc 1032 explicitly called for a First Aid Lead with current certification, not "whoever's around," and both roles are described as running full-day in parallel during the 12pm-6pm show. One person holding both needs either a real plan for how that works simultaneously, or a second name for one of the two roles |
 | **Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`** | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
 

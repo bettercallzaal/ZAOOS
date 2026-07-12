@@ -39,6 +39,8 @@ import {
   writeHuman,
   writePersona,
   ZOE_PATHS,
+  appendDecision,
+  appendBuildState,
   type ChatScope,
 } from './memory';
 import {
@@ -1493,6 +1495,34 @@ async function dispatchConcierge(
 
     if (result.quest_ops.length > 0) {
       await applyQuestOps(result.quest_ops);
+    }
+
+    // Deeper memory: persist decision ops (increment 1)
+    for (const op of result.decision_ops) {
+      try {
+        await appendDecision({
+          decision: op.decision,
+          rationale: op.rationale,
+          context: op.context,
+        });
+      } catch (err) {
+        console.error('[zoe/index] decision op failed:', (err as Error).message);
+      }
+    }
+
+    // Deeper memory: persist build-state ops (increment 1)
+    for (const op of result.build_state_ops) {
+      try {
+        await appendBuildState({
+          feature: op.feature,
+          status: op.status,
+          pr: op.pr,
+          branch: op.branch,
+          reason: op.reason,
+        });
+      } catch (err) {
+        console.error('[zoe/index] build-state op failed:', (err as Error).message);
+      }
     }
 
     // Inline op summary (doc 890): tell Zaal what state changed this turn

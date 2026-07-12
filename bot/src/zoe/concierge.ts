@@ -173,7 +173,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
 
   recordCall('concierge', result);
 
-  const { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps } = splitReplyAndOps(result.text);
+  const { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps, decisionOps, buildStateOps } = splitReplyAndOps(result.text);
 
   return {
     reply,
@@ -183,6 +183,8 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     bot_relay_ops: botRelayOps,
     crm_ops: crmOps,
     thread_ops: threadOps,
+    decision_ops: decisionOps,
+    build_state_ops: buildStateOps,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
@@ -201,10 +203,12 @@ function splitReplyAndOps(text: string): {
   botRelayOps: BotRelayOp[];
   crmOps: CrmOp[];
   threadOps: ThreadOp[];
+  decisionOps: import('./types').DecisionOp[];
+  buildStateOps: import('./types').BuildStateOp[];
 } {
   const match = text.match(OPS_FENCE_RE);
   if (!match) {
-    return { reply: text.trim(), taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [] };
+    return { reply: text.trim(), taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [], decisionOps: [], buildStateOps: [] };
   }
   const jsonStr = match[1];
   const reply = text.replace(OPS_FENCE_RE, '').trim();
@@ -216,6 +220,8 @@ function splitReplyAndOps(text: string): {
       bot_relay_ops?: BotRelayOp[];
       crm_ops?: CrmOp[];
       thread_ops?: ThreadOp[];
+      decision_ops?: import('./types').DecisionOp[];
+      build_state_ops?: import('./types').BuildStateOp[];
     };
     const captures: ZoeCaptureNote[] = (parsed.captures ?? []).map((c) => ({
       id: `cap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -232,10 +238,12 @@ function splitReplyAndOps(text: string): {
       botRelayOps: parsed.bot_relay_ops ?? [],
       crmOps: parsed.crm_ops ?? [],
       threadOps: parsed.thread_ops ?? [],
+      decisionOps: parsed.decision_ops ?? [],
+      buildStateOps: parsed.build_state_ops ?? [],
     };
   } catch (err) {
     console.error('[zoe/concierge] failed to parse ops JSON:', (err as Error).message, 'raw:', jsonStr.slice(0, 200));
-    return { reply, taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [] };
+    return { reply, taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [], decisionOps: [], buildStateOps: [] };
   }
 }
 

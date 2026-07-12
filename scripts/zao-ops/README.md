@@ -7,6 +7,8 @@ you as a button in one place.
 Donated to the ZAO team 2026-07-11 (built in the ZAOOS lab). Generic + config-
 driven - point them at your own bot + group and they work.
 
+**New to the team?** Start with [ONBOARDING.md](./ONBOARDING.md) - it walks you through setup and your first 5 minutes.
+
 ## The tools
 
 | Tool | What it does |

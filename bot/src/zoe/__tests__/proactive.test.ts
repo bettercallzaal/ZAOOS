@@ -139,3 +139,42 @@ test('threshold rises by a step at/above the unacked limit', () => {
 test('threshold never exceeds MAX', () => {
   assert.equal(nextThreshold(MAX_THRESHOLD, UNACKED_LIMIT + 10), MAX_THRESHOLD);
 });
+
+// --- Tuning tests (2026-07-12) -----------------------------------------------
+
+test('due-soon thread (0.6) clears the lowered default threshold (0.5)', () => {
+  const c = scoreThreadCandidate(thread({ dueAt: new Date(NOW + 3600_000).toISOString() }), NOW);
+  assert.ok(c);
+  assert.equal(c.score, 0.6);
+  // The new default threshold is 0.5, so 0.6 clears it
+  assert.equal(passesThreshold(c.score, 0.5), true);
+});
+
+test('inactivity (0.62) clears the lowered default threshold but still loses to overdue', () => {
+  const inactivity: Candidate = {
+    kind: 'inactivity',
+    score: 0.62,
+    tier: 'signal',
+    message: 'You have been quiet',
+  };
+  const dueSoon: Candidate = {
+    kind: 'thread-nudge',
+    score: 0.6,
+    tier: 'standard',
+    message: 'Still on track',
+  };
+  // Both clear the new 0.5 threshold
+  assert.equal(passesThreshold(inactivity.score, 0.5), true);
+  assert.equal(passesThreshold(dueSoon.score, 0.5), true);
+  // Inactivity wins the pick
+  assert.equal(pickBest([dueSoon, inactivity])?.message, 'You have been quiet');
+});
+
+test('self-throttle at 3+ unacked still prevents low-signal spam', () => {
+  // With 3+ unacked, threshold raises from 0.5 to 0.6
+  const afterThrottle = nextThreshold(0.5, UNACKED_LIMIT);
+  assert.equal(afterThrottle, 0.6);
+  // At 0.6, inactivity (0.62) still passes, but signal-tier stuff (e.g., 0.55) fails
+  assert.equal(passesThreshold(0.62, afterThrottle), true);
+  assert.equal(passesThreshold(0.55, afterThrottle), false);
+});

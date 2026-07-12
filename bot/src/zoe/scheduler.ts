@@ -4,6 +4,7 @@
  * No quiet hours per Zaal feedback 2026-05-04 ("rather get pinged than ignored").
  *
  * Triggers:
+ *   02:30 EST (06:30 UTC daily)  — stale capture + overdue task nudge (General topic)
  *   05:00 EST (09:00 UTC daily)  — morning brief
  *   21:00 EST (01:00 UTC daily)  — evening reflection
  *   hourly                        — forward nudge: the real next move from the task queue
@@ -30,6 +31,7 @@ import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { surfaceNewHandoffs } from './handoffs-surface';
+import { surfaceNudges } from './nudge';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -403,6 +405,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} handoff(s) to the Handoffs topic`);
         } catch (err) {
           console.warn('[zoe/scheduler] handoff surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Nudge surfacer - daily check for stale captures and overdue tasks. Posts
+  // to ZAAL BOTZ General topic when items are nudge-worthy. De-duped via
+  // last-seen date so Zaal gets nudged at most once per day. Silent when
+  // nothing to nudge or when the group is not configured.
+  tasks.push(
+    cron.schedule(
+      '30 6 * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        if (!gid) return; // not configured
+        try {
+          await surfaceNudges((text: string) => opts.bot.api.sendMessage(gid, text));
+        } catch (err) {
+          console.warn('[zoe/scheduler] nudge surface failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

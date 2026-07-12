@@ -19,13 +19,15 @@ The real optimization at this point in the project isn't more research - it's st
 
 **Update 2026-07-11:** two more Tier 1 items are RESOLVED and removed below. (1) ZAOville venue confirmed private (DCoop's house), no permit needed - see doc 1013 for the updated budget ($450-$1,100). (2) The "$391K in grants" HoE figure is confirmed accurate against HoE's own 2025 Annual Report - see doc 1031. Also shipped this session: the new `/acadia` page and the `/ellsworth` additions (doc 1034) are live.
 
+**Update 2026-07-12:** Zaal answered a batch of Tier 1/2 questions directly. Site Lead + First Aid Lead: both Zaal (see the caveat under that row - worth a second look, not a clean resolution). Cadillac Mountain reservation: confirmed NOT yet booked. Sound-system booking: confirmed NOT yet booked. ZAOville's pool-coverage plan and pre-event content owner are resolved in doc 1036. Livestream/broadcast lead answer was lost to a Telegram ring-buffer eviction before it could be read - re-asked, still genuinely open.
+
 ## Tier 1 - This week (by Jul 18) - blocking or time-sensitive
 
 | Action | Source doc(s) | Why it's Tier 1 |
 |---|---|---|
-| **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | Time-sensitive and easy to forget - the 90-day booking window opened around July 5, reservations required through Oct 25 |
-| **Name a livestream/broadcast lead** | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji, 871's June reorg has no broadcast workstream at all). Blocks doc 1030's entire media plan from having an owner |
-| **Name a Site Lead and a First Aid Lead for Oct 3** | 1032 | Doc 1032's entire safety plan and staffing matrix has no named decision-maker yet - these are the two roles everything else depends on |
+| **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | CONFIRMED 2026-07-12: not yet booked. Still time-sensitive - the 90-day booking window opened around July 5, reservations required through Oct 25 |
+| **Name a livestream/broadcast lead** | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji, 871's June reorg has no broadcast workstream at all). Blocks doc 1030's entire media plan from having an owner. Zaal's 2026-07-12 answer was lost to a ring-buffer eviction - re-asked (qid `zsklive3`), still open |
+| ~~Name a Site Lead and a First Aid Lead for Oct 3~~ - ANSWERED 2026-07-12: both Zaal | 1032 | Worth a second look, not a clean resolution: doc 1032 explicitly called for a First Aid Lead with current certification, not "whoever's around," and both roles are described as running full-day in parallel during the 12pm-6pm show. One person holding both needs either a real plan for how that works simultaneously, or a second name for one of the two roles |
 | **Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`** | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
 
 ## Tier 2 - Next 2 weeks (by Aug 1)
@@ -33,7 +35,7 @@ The real optimization at this point in the project isn't more research - it's st
 | Action | Source doc(s) | Why it matters |
 |---|---|---|
 | **Confirm the city-sponsored permit exemption path with Ellsworth PD/City Hall** | 1031, 1032 (duplicate, merged) | Ordinance Chapter 14 requires 45 days' notice (Aug 19 deadline) + a surety bond unless ZAOstock qualifies for exemption via the Art of Ellsworth umbrella - this determines which path to file, not just when |
-| **Confirm sound-system booking status** | 1007 | Flagged "book by June 1" in April; zero confirmation found anywhere this session, 6+ weeks past its own internal deadline |
+| **Confirm sound-system booking status** | 1007 | CONFIRMED 2026-07-12: not yet booked. Flagged "book by June 1" in April - this is now 6+ weeks past its own internal deadline with a confirmed-not-done status, not just silence |
 | **Get a current-owner confirmation for lineup (Dcoop), venue+ops, and volunteers workstreams** | 1007 | Only the sponsors workstream (Jay/Duh) is confirmed active; the rest haven't been checked since doc 871 (June 17) |
 | **Buy the ATEM Mini Pro switcher ($325) and the audio DI/interface bundle (~$250-300)** | 1030 | The two genuinely new purchases the media plan needs - everything else comes from owned gear |
 | **Reach out to one of HoE's 4 Downtown Grants Program bank partners for a warm co-sponsor conversation** | 1031 | Concrete, named list (Franklin Savings, Bangor Federal Credit Union, First National Bank, Machias Savings) via the Zaal builder-profile onepager already drafted |

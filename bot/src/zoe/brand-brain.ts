@@ -16,9 +16,12 @@
  * To add a brand: useicm.com/api/objects?type=box&q=<brandName>, create a box,
  * capture the returned box_id (icm_...), add an entry here.
  */
+// Topic name -> OWNED useicm.com box id (the editable ones Zaal owns; the
+// homepage-minted originals are orphans - do not use them). Source of truth:
+// memory project_icm_boxes + research/identity/icm-boxes/.
 const BRAND_BRAINS: Record<string, string> = {
-  'ZABAL Games': 'icm_PiCDHNNZ3WZpNoF59OA8Dw',
-  // 'WaveWarZ': 'icm_...' (TODO: confirm ICM box id),
+  'ZABAL Games': 'icm_6EcindcuwxlkMO7-lT83cQ', // owned (was the orphan icm_PiCD..)
+  WaveWarZ: 'icm_RxT9r-_IjG1U9kxOniSzFQ', // owned
 };
 
 /**

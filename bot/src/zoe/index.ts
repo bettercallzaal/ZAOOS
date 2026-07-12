@@ -92,6 +92,7 @@ import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
+import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
 import { dispatchHermesRun } from '../hermes/runner';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
@@ -867,8 +868,22 @@ bot.on('message:text', async (ctx) => {
     }
 
     const topicName = await topicNameForThread(threadId).catch(() => undefined);
-    const action = routeTopic(topicName);
+    let action = routeTopic(topicName);
     const threadOpt = threadId ? { message_thread_id: threadId } : {};
+
+    // Brand masks (doc 1021): detect brand topics and fetch ICM context to respond
+    // in-character. If brain fetch succeeds, treat as chat action with brand context.
+    // If no brain or fetch fails, fall back to default routing (draft for brand topics).
+    let brandContext: string | undefined;
+    const brandBoxId = brandBoxFor(topicName);
+    if (brandBoxId) {
+      const brainText = await fetchIcmBrain(brandBoxId).catch(() => null);
+      if (brainText) {
+        brandContext = brandSystemPreamble(brainText, topicName ?? 'Brand');
+        // Override the draft routing to chat routing when we have brand context.
+        action = { kind: 'chat' };
+      }
+    }
 
     // Bridge log: record EVERY ZAAL BOTZ turn (all topics, incl auto-act ones)
     // under the group scope so an open Claude Code session can SSH-read Zaal's
@@ -948,11 +963,12 @@ bot.on('message:text', async (ctx) => {
     }
 
     // action.kind === 'chat': normal ZOE conversation (Handoffs, Claude Code, etc).
+    // May include brand-masked responses with ICM context injected.
     const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
     const turnTextG = quotedG
       ? `[Zaal is replying to your earlier message:\n"${quotedG.slice(0, 1200)}"]\n\nHis reply: ${text}`
       : text;
-    enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnTextG)).catch((e) =>
+    enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnTextG, brandContext)).catch((e) =>
       console.error('[zoe/index] zaalbotz turn failed:', (e as Error)?.message),
     );
     return;
@@ -1111,7 +1127,7 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
   }).catch((e) => console.error('[zoe/index] media turn failed:', (e as Error)?.message));
 });
 
-async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
+async function handlePrivateMessage(ctx: Context, text: string, brandContext?: string): Promise<void> {
   // Track activity for inactivity detection (best-effort: never blocks the handler).
   touchLastSeen().catch(() => {});
   // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
@@ -1449,6 +1465,7 @@ async function dispatchConcierge(
       blocks,
       senderLabel: label,
       recallContext,
+      brandContext,
       linkResearchIntent: wantsLinkResearch(text),
       context: {
         zaal_tg_id: zaalId,

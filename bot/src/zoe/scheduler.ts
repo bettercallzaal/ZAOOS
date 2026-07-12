@@ -7,6 +7,7 @@
  *   02:30 EST (06:30 UTC daily)  — stale capture + overdue task nudge (General topic)
  *   05:00 EST (09:00 UTC daily)  — morning brief
  *   21:00 EST (01:00 UTC daily)  — evening reflection
+ *   21:00 EST (02:00 UTC daily)  — nightly recap (silent if nothing shipped)
  *   hourly                        — forward nudge: the real next move from the task queue
  *
  * Posting target: Zaal's DM via @zaoclaw_bot (chat_id from ZAAL_TELEGRAM_ID env).
@@ -22,6 +23,7 @@ import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
 import { runCockpit } from '../cockpit/cockpit';
 import { generateEveningReflection } from './reflect';
+import { generateNightlyRecap } from './recap';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
@@ -171,6 +173,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('evening-reflect');
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Nightly recap — 02:00 UTC = 22:00 EDT, 21:00 EST (9pm EST, 8pm EDT).
+  // Silent when nothing shipped (no send, no sentinel claim).
+  tasks.push(
+    cron.schedule(
+      '0 2 * * *',
+      async () => {
+        if (!(await claimFire('nightly-recap'))) return;
+        try {
+          const recap = await generateNightlyRecap({ repoDir: opts.repoDir });
+          if (!recap) {
+            // Silent when nothing shipped — release the claim so logging is clean
+            await releaseFire('nightly-recap');
+            console.log('[zoe/scheduler] nightly recap: nothing shipped (silent)');
+            return;
+          }
+          await opts.bot.api.sendMessage(opts.zaalTgId, recap);
+          console.log('[zoe/scheduler] nightly recap sent');
+        } catch (err) {
+          await releaseFire('nightly-recap');
+          console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

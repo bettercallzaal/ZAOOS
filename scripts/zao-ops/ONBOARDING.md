@@ -38,7 +38,7 @@ All in one terminal command or one tap on the web app.
 ### 1. Get a Telegram bot token (5 minutes)
 
 - If the team already has a ZOE bot, use that token. Ask Zaal or check Slack.
-- If you're setting up a new bot (e.g., for your team): open Telegram, search for @BotFather, say `/newbot`, follow the prompts. BotFather gives you a token. Keep it safe - it is a secret.
+- If you are setting up a new bot (e.g., for your team): open Telegram, search for @BotFather, say `/newbot`, follow the prompts. BotFather gives you a token. Keep it safe - it is a secret.
 
 ### 2. Add your bot to your Telegram group (1 minute)
 

@@ -21,7 +21,7 @@ tier: STANDARD
 | **Set honest expectations on the VOD/highlight-reel timeline: 2-3 weeks, not days** | Doc 1030's livestream plan produces raw footage; turning that into a published VOD, a highlight reel, and social clips realistically takes 2-3 weeks with a volunteer crew, not the same week. Promising a fast turnaround and missing it is worse than stating the real timeline up front |
 | **Build the "post-event metrics report" now as a template, not from scratch after Oct 3** | The site already promises this to Virtual Partners. It should contain: livestream view counts (YouTube + Twitch analytics), social reach (hashtag impressions/tag mentions), content views from the recap post, attendance figure, and sponsor visibility confirmation (logo placement documented with photos). All of this is realistic to gather for a first-year 500-person festival - the gap is that no one has built the template yet |
 | **Clarify what "quarterly reports" for Ecosystem Partners actually means before a sponsor asks** | This promise only makes sense if ZAOstock is a recurring annual event with an ongoing partnership, which is the actual plan (doc 1031: "Year 1 of a multi-year festival"). Make that explicit to Ecosystem Partners directly - "quarterly" should mean quarterly updates on the year-round ZAO Festivals relationship, not quarterly reports on one October afternoon |
-| **A financial close-out and a written retrospective are both real, standard steps - neither currently has an owner** | Every sourced small-nonprofit-event post-mortem process includes reconciling final costs against the budget (doc 1013's $20K target) and writing down what worked/didn't while it's still fresh. Both are cheap to do and expensive to skip - a retrospective not written within a few weeks of the event basically never gets written |
+| **A financial close-out and a written retrospective are both real, standard steps - neither currently has an owner** | Every sourced small-nonprofit-event post-mortem process includes reconciling final costs against the real budget (~$5K target, ~$1.5K on hand per Zaal's 2026-07-12 correction - doc 1013's original $20K figure was retracted) and writing down what worked/didn't while it's still fresh. Both are cheap to do and expensive to skip - a retrospective not written within a few weeks of the event basically never gets written |
 
 ## Findings
 
@@ -62,7 +62,7 @@ Real published post-event recaps from comparable community festivals lead with s
 - [Doc 1030 — ZAOstock Live Media Production](../1030-zaostock-livestream-media-production/) — source of the livestream/recording setup that produces the raw footage this doc's VOD timeline is built on
 - [Doc 1032 — ZAOstock Day-of Operations Plan](../1032-zaostock-day-of-operations-plan/) — where load-out (ending 10:30pm) hands off to this doc's post-event window
 - [Doc 1033 — ZAOstock Photo + Promo Calendar](../1033-zaostock-photo-promo-calendar/) — Week 12 currently ends at Oct 3; this doc's recap/VOD timeline is the natural Week 13+ extension
-- [Doc 1013 — ZAO Festivals Budgets](../../business/1013-zaofestivals-budgets-zaostock-zaoville/) — the $20K target this doc's financial close-out reconciles against
+- [Doc 1013 — ZAO Festivals Budgets](../../business/1013-zaofestivals-budgets-zaostock-zaoville/) — its original $20K target is retracted (2026-07-12); the real ~$5K/~$1.5K-on-hand figure lives in `project_zao_stock_confirmed.md` (memory) instead
 - `zaostock/src/app/sponsor/page.tsx` — source of the "post-event metrics report" and "quarterly reports" promises this doc is built to fulfill
 
 ## Next Actions
@@ -73,7 +73,7 @@ Real published post-event recaps from comparable community festivals lead with s
 | Build the post-event metrics report template (Finding 3's 5 line items) as a real document/page, not just a promise on the sponsor page | Zaal | Task | 2026-09-15 |
 | Clarify the "quarterly reports" Ecosystem Partner promise (Finding 4) with any active or prospective Ecosystem Partner directly | Zaal | Todo | 2026-08-15 |
 | Confirm Fractured Atlas's actual close-out reporting requirement and timeline for ZAOstock specifically (Finding 5) - shipped when the real terms are on record, not the general pattern this doc assumed | Zaal | Todo | 2026-08-15 |
-| Assign a real owner for the financial reconciliation against doc 1013's $20K target and the eventual written retrospective - both currently unowned | Zaal | Task | 2026-10-17 |
+| Assign a real owner for the financial reconciliation against the real ~$5K budget (not doc 1013's retracted $20K figure) and the eventual written retrospective - both currently unowned | Zaal | Task | 2026-10-17 |
 
 ## Sources
 

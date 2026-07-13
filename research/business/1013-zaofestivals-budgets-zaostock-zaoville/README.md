@@ -1,9 +1,9 @@
 ---
 topic: business
 type: decision
-status: research-complete
+status: superseded
 last-validated: 2026-07-10
-superseded-by:
+superseded-by: "project_zao_stock_confirmed.md memory, corrected 2026-07-12"
 related-docs: "418, 1007, 1009"
 original-query: "prep zaostock and zaoville for zaofestivals and start to put budgets and other things together - loop on what other events do and model after the best"
 tier: STANDARD
@@ -11,13 +11,15 @@ tier: STANDARD
 
 # 1013 — ZAO Festivals Budgets: Reconciling ZAOstock, Building ZAOville From Scratch
 
-> **Goal:** ZAOstock's budget number has drifted across at least 4 different figures with no reconciliation. ZAOville has never had one. Fix both, grounded in real comparable-event benchmarks - not made up.
+> **SUPERSEDED 2026-07-12 - the $20K/$25K/$7K figures below are WRONG. Do not cite them anywhere, public or internal.** Zaal's direct correction: the real ZAOstock budget target is ~$5K at most, with only ~$1.5K actually on hand as of 2026-07-12. The "production audit" figures this doc adopted as canonical were audit-inflated, not real. See `project_zao_stock_confirmed.md` (memory) for the current authoritative figure. Everything below this notice is kept for the historical record of how the $20K figure entered circulation - not as current guidance. ZAOville's separate $450-$1,100 estimate (Finding 4 below) is NOT affected by this correction and remains accurate.
 
-## Key Decisions
+> **Original Goal (superseded):** ZAOstock's budget number has drifted across at least 4 different figures with no reconciliation. ZAOville has never had one. Fix both, grounded in real comparable-event benchmarks - not made up.
+
+## Key Decisions (SUPERSEDED - see notice above)
 
 | Recommendation | Why |
 |---|---|
-| **Adopt the production-audit memory's $7K minimum / $20K target / $25K stretch as ZAOstock's ONE canonical budget going forward** | It's the most detailed, itemized figure that exists, and it sits inside the external benchmark range for comparable events (see Findings). The other three numbers in circulation (memory's $5K/$25K, doc 418's $15.75K/$19.3K, the live sponsor page's zero stated figure) should stop being cited |
+| ~~**Adopt the production-audit memory's $7K minimum / $20K target / $25K stretch as ZAOstock's ONE canonical budget going forward**~~ - WRONG, retracted 2026-07-12. The production-audit figures were audit-inflated, not real. Real target: ~$5K at most, ~$1.5K on hand | It's the most detailed, itemized figure that exists, and it sits inside the external benchmark range for comparable events (see Findings). The other three numbers in circulation (memory's $5K/$25K, doc 418's $15.75K/$19.3K, the live sponsor page's zero stated figure) should stop being cited |
 | **Apply a 40/20/15/15/10 cost-allocation template to the $20K target** - Production 40% ($8,000) / Marketing+ticketing 20% ($4,000) / Staffing+volunteer logistics 15% ($3,000) / Community+artist honoraria 15% ($3,000) / Contingency 10% ($2,000) | Sourced from a real fundraiser-budget framework built specifically for first-time/budget-focused community festivals (see Sources). Gives ZAOstock's finance circle an actual spending plan, not just a total |
 | **Build ZAOville's first-ever budget at $450-$1,100 (narrowed from $500-$1,200 now that the permit line is resolved to $0)** | ZAOville's real costs are almost entirely already covered in-kind (VEC provides all sound equipment free per the live `/zaoville` page). Venue confirmed private (DCoop's own house), so the $50-$300 permit line drops out entirely. Remaining cash line items are insurance and minor promotion/incidentals - comparable open-mic/showcase events in this exact cost bracket run $500-$2,000 total |
 | **Venue/permit status for ZAOville: RESOLVED - private property, no permit needed** | Confirmed directly by Zaal 2026-07-11: ZAOville is at DCoop's house, not a public/rented space. Retires the single biggest open swing factor flagged in the prior version of this doc |
@@ -90,10 +92,10 @@ Every open-mic cost source checked treats "is a permit required" as the single b
 |--------|-------|------|---------|
 | ~~Confirm whether the ZAOville venue is private or public~~ - RESOLVED 2026-07-11: private (DCoop's house), no permit needed | Zaal | Done | 2026-07-11 |
 | Add ZAOville's first-ever budget line ($450-$1,100, permit line resolved to $0) to whatever budget-tracking surface ZAOstock's finance circle uses - shipped when the number exists somewhere other than this doc | Zaal | Task | 2026-07-16 |
-| Update `project_zao_stock_confirmed.md` to replace the stale March 31 "$5K/$25K" figure with the production audit's $7K/$20K/$25K - shipped when the memory file is edited | Zaal | Todo | 2026-07-11 |
+| ~~Update `project_zao_stock_confirmed.md`~~ - DONE, but with the CORRECT figure (~$5K/~$1.5K on hand), not this doc's wrong $7K/$20K/$25K conclusion. See the superseded notice at the top of this doc | Zaal | Done | 2026-07-12 |
 | Add a one-line budget-reconciliation note to doc 418 pointing at this doc, so the unsourced $15.75K/$19.3K figure stops circulating unlinked - shipped when doc 418 is edited | Zaal | Todo | 2026-07-14 |
 | Get ZAOstock's finance circle (currently coordinator "(open)" per the last-known roster) to review and either confirm or adjust the 40/20/15/15/10 spending-plan breakdown in Finding 3 - shipped when a named person signs off on the category splits | Zaal | Task | 2026-07-18 |
-| Add a stated budget figure back to the live `/sponsor` page (it currently states none at all) - shipped when a PR merges adding either the $20K target or a range to the public page copy | Zaal | PR | 2026-07-21 |
+| ~~Add a stated budget figure back to the live `/sponsor` page~~ - REVERSED 2026-07-12: a $20K figure was briefly added, then removed per Zaal's explicit instruction to keep dollar figures off public content entirely, not just correct the number | Zaal | Done | 2026-07-12 |
 
 ## Sources
 

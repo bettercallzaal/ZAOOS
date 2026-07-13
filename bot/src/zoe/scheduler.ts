@@ -33,6 +33,7 @@ import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { surfaceNewHandoffs } from './handoffs-surface';
+import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
@@ -434,6 +435,30 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} handoff(s) to the Handoffs topic`);
         } catch (err) {
           console.warn('[zoe/scheduler] handoff surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // ZAOstock cloud-loop approvals surfacer - every 10 min, post any NEW entries
+  // from research/_meta/zaostock-pending-approvals.md (bettercallzaal/ZAOOS)
+  // into the ZAAL BOTZ General topic. That file is the ZAOstock autonomous
+  // research routine's approval queue - it runs in an isolated cloud sandbox
+  // with no Telegram credentials, so it can only commit drafts/decisions to
+  // the file, not push them. This is the other half of that bridge. Silent
+  // when nothing new; the file itself won't exist until the loop's first run.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        if (!gid) return; // not configured
+        try {
+          const n = await surfaceZaostockApprovals((text: string) => opts.bot.api.sendMessage(gid, text));
+          if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} ZAOstock approval-queue item(s)`);
+        } catch (err) {
+          console.warn('[zoe/scheduler] ZAOstock approvals surface failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

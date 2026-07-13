@@ -23,6 +23,8 @@
  *   BONFIRE_API_URL  default https://tnt-v2.api.bonfires.ai
  */
 
+import { detectPromptInjection } from '../lib/injection-guard';
+
 const API_URL = process.env.BONFIRE_API_URL ?? 'https://tnt-v2.api.bonfires.ai';
 const API_KEY = process.env.BONFIRE_API_KEY ?? '';
 const BONFIRE_ID = process.env.BONFIRE_ID ?? '';
@@ -168,10 +170,19 @@ async function delveBonfire(
   }
 }
 
+// Doc 1023 Key Decision 4: /delve returns any graph writer's episode content,
+// which flows straight into ZOE's synthesis context. containsSecret (above)
+// only guards the WRITE side; this guards the READ side. Flag, don't strip -
+// the episode may still be useful context, just not trusted instructions.
 function formatHit(hit: DelveEpisode): string {
-  const body = hit.summary || hit.content || hit.name || JSON.stringify(hit);
+  const body = String(hit.summary || hit.content || hit.name || JSON.stringify(hit));
   const src = hit.source_description ? ` [src: ${hit.source_description}]` : '';
-  return `- ${String(body).slice(0, 500)}${src}`;
+  const injectionHits = detectPromptInjection(body);
+  if (injectionHits.length > 0) {
+    console.warn(`[zoe/recall] delve hit flagged for possible prompt injection: ${injectionHits.join(', ')}`);
+  }
+  const flag = injectionHits.length > 0 ? '[UNVERIFIED - matched injection pattern] ' : '';
+  return `- ${flag}${body.slice(0, 500)}${src}`;
 }
 
 /**

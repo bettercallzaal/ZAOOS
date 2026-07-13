@@ -106,6 +106,21 @@ export interface BuildStateRecord {
   created_at: string;
 }
 
+/**
+ * Deeper memory: a synthesized, PII-scrubbed line distilled from a message Zaal
+ * forwarded into the zoe-zao@agentmail.to inbox. Raw bodies never land here -
+ * only a one-line summary that survives the pii.ts redaction pass (per
+ * .claude/rules/pii-hygiene.md). Injected into the concierge prompt so ZOE has
+ * standing context on what Zaal routed to it.
+ */
+export interface InboxContextRecord {
+  id: string;
+  source_id: string; // AgentMail message id (dedup key so each mail ingests once)
+  summary: string; // Synthesized, PII-scrubbed one-liner (from + subject + snippet)
+  received_at?: string; // Original message timestamp when available
+  created_at: string; // When ZOE ingested it
+}
+
 export type BuildStateOp = {
   op: "log_build_state";
   feature: string;

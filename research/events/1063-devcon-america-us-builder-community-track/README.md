@@ -62,12 +62,25 @@ Searched the ZAOOS research library (`research/community/`, `research/events/`) 
 
 This is a genuine gap, not a research failure to push past - the actual names have to come from Zaal or from the ZABAL Games submission data directly (Empire Builder / Clanker / POIDH tracker), which this research pass does not have access to. Fabricating names here would violate the no-invented-names constraint on this work.
 
+## Open question 2 - live status of the three individual ticket levers (checked 2026-07-13)
+
+Fetched each program's actual page directly, per the lesson in "What was wrong" above.
+
+| Lever | Live status (2026-07-13) | Geographic gate | Source |
+|---|---|---|---|
+| Devcon Scholars | Applications for the current cycle are CLOSED. The page's "next event" pointer still reads Devconnect 2025 (Buenos Aires, already past) - the page has not yet been updated for Devcon 8, so treat the Aug 2026 opening estimate (Doc 945) as unconfirmed until the page itself updates. Covers full ticket, round-trip flight, and room/board across three tiers (Access / Transport / Room-board) | None stated - "Everyone may apply," prioritized by "credible and earnest need" | nxbn.ethereum.foundation/scholars [FULL] |
+| Builder Discount | Not yet open. Confirmed via search: opens July 2026, part of the same application wave as Student Discounts and Youth tickets. tickets.devcon.org itself returned HTTP 403 to a direct fetch (bot-blocked) - escalated to WebSearch per the fetch-quality ladder, which corroborated the July-open date already in Doc 945 | None stated in any source checked | WebSearch [PARTIAL - direct page 403, corroborated via search] |
+| Creative Crew | STILL not documented anywhere for Devcon 8, confirmed again this pass (two separate searches, zero hits). This is the same "watch devcon.org" status Doc 945/954 already carried - no new information, not a new finding | Unknown - no program page exists yet | WebSearch (2 queries) [FAILED - no live page found; genuinely not published yet, not a fetch failure] |
+
+**A fourth lever surfaced and was checked, then discounted:** buidlguidl.com/devcon offers BuidlGuidl members 50%-off or $49 Devcon tickets - real, global, no geographic gate - but the page's own text ties it to **Devcon 2024** (Bangkok/SEA), not Devcon 8. No evidence found that this specific offer refreshes for Devcon 8. Do not rely on it until BuidlGuidl publishes a Devcon-8-specific version. Similarly, the EF/BuidlGuidl "Ethereum University Tour" (tour.ethereum.org) is a real, ongoing, global program, but its only confirmed conference tie-in found was Devconnect 2025 (Buenos Aires) - no Devcon 8 Mumbai connection is documented on the live page. Both are logged as watch items, not usable levers today.
+
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Supply (or point to the live tracker for) actual named US-based builders who'd attend Devcon 8 if travel were covered - no roster exists yet in this library | @Zaal | Todo | 2026-07-20 |
-| Check Scholars / Builder Discount / Creative Crew individual eligibility per named person, once the list exists | @Zaal | Todo | 2026-07-27 |
+| Re-check nxbn.ethereum.foundation/scholars monthly - it still shows Devconnect 2025 as "next event," meaning it has not been updated for Devcon 8 yet | @Zaal | Watch | Monthly through Aug 2026 |
+| Watch for Builder Discount applications opening (July 2026, per EF's own statement) and apply immediately per person once open | @Zaal | Todo | July 2026 (rolling) |
 | Decide shared vs. individual crowdfund structure | @Zaal | Decision | 2026-08-01 |
 | Run the Build Camp x ZABAL Games roundtable as content, independent of any grant | @Zaal + Claude | Deliverable | 2026-08-10 |
 | If a standing US-cohort presence is wanted, draft a DIP post for forum.devcon.org | @Zaal + Claude | Doc | 2026-08-01 |
@@ -84,3 +97,9 @@ This is a genuine gap, not a research failure to push past - the actual names ha
 - [Doc 954](../954-devcon-history-community-mumbai-guide/README.md) [FULL] - internal, first identified the Ecosystem Program + Community Hub levers
 - [Doc 700](../700-devcon-mumbai-music-stage-coprogramming/README.md) [FULL] - internal, DIP/Fellowship of Ethereum Musicians precedent
 - Web search: "esp.ethereum.foundation RFP Devcon 8 global community event grant non-India" [FULL] - surfaced the BuidlGuidl global University Tour as a separate global lever, not yet verified FULL
+- [Devcon Scholars](https://nxbn.ethereum.foundation/scholars) [FULL] - fetched 2026-07-13; current cycle closed, page not yet updated past Devconnect 2025, no geographic gate
+- [Devcon tickets](https://tickets.devcon.org/) [FAILED - HTTP 403 on direct fetch, escalated to WebSearch per the fetch ladder]
+- WebSearch: "Devcon 8 tickets.devcon.org Builder Discount Creative Crew 2026" [FULL] - corroborated July 2026 Builder Discount open date; zero Creative Crew hits
+- [BuidlGuidl x Devcon discount tickets](https://buidlguidl.com/devcon) [FULL] - fetched 2026-07-13; real and global but tied to Devcon 2024, not confirmed for Devcon 8
+- [Ethereum on Tour / University Tour](https://tour.ethereum.org/) [PARTIAL - "coming soon" messaging, no Devcon 8 tie confirmed]
+- WebSearch: "BuidlGuidl Ethereum Foundation global University Tour Devconnect 2026 campus workshops" [FULL] - confirmed only tie found is Devconnect 2025, not Devcon 8

@@ -44,7 +44,25 @@ body = {"chat_id": gid, "text": text, "reply_markup": json.dumps({"inline_keyboa
 try:
     r = json.load(urllib.request.urlopen(urllib.request.Request(
         f"https://api.telegram.org/bot{token}/sendMessage", data=urllib.parse.urlencode(body).encode()), timeout=15))
-    print("asked:", qid) if r.get("ok") else print("FAIL:", r.get("description"))
+    if not r.get("ok"):
+        print("FAIL:", r.get("description")); sys.exit(1)
+    mid = r.get("result", {}).get("message_id")
+    # PIN EVERY OPEN QUESTION + auto-unpin on answer (Zaal 2026-07-13). The prior
+    # single-rolling-pin left a gap: after answering the pinned question, the next
+    # open one was never re-pinned, so the topic looked empty while questions were
+    # still open. Pinning every question is gapless - all open ones stay visible in
+    # the pin list and each clears itself when tapped (ZOE unpins on answer). The
+    # smarter per-topic single rolling pin lives in the always-open engine.
+    if mid:
+        try:
+            pin = {"chat_id": gid, "message_id": mid, "disable_notification": True}
+            pr = json.load(urllib.request.urlopen(urllib.request.Request(
+                f"https://api.telegram.org/bot{token}/pinChatMessage", data=urllib.parse.urlencode(pin).encode()), timeout=15))
+            print("asked+pinned:", qid) if pr.get("ok") else print("asked (pin failed:", pr.get("description"), "):", qid)
+        except Exception as pe:
+            print("asked (pin err:", pe, "):", qid)
+    else:
+        print("asked:", qid)
 except Exception as e:
     print("ERR:", e); sys.exit(1)
 PY

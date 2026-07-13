@@ -82,6 +82,12 @@ function allMatches(text: string, rules: Rule[], cap: number): string[] {
 
 /**
  * Classify a task. Deterministic - same input always yields the same tags.
+ * Routing logic (nextOwner):
+ * - delegated_to set -> 'agent' (offloaded task)
+ * - needs_zaal set -> 'me' (explicit human judgment needed)
+ * - status=blocked -> 'blocked'
+ * - code-verifiable tasks (build/test/deploy/ci) -> 'agent' (ZOE can verify)
+ * - unclear/unmapped tasks -> 'review' (human routes; never auto-dump on one person)
  */
 export function classifyTask(input: ClassifyInput): Classification {
   const text = `${input.title} ${input.notes ?? ''}`.toLowerCase();
@@ -91,10 +97,24 @@ export function classifyTask(input: ClassifyInput): Classification {
   if (themes.length === 0) themes.push('ops');
 
   let nextOwner: NextOwner;
-  if (input.delegatedTo) nextOwner = 'agent';
-  else if (input.needsZaal) nextOwner = 'me';
-  else if ((input.status ?? '').toLowerCase() === 'blocked') nextOwner = 'blocked';
-  else nextOwner = 'me';
+  if (input.delegatedTo) {
+    nextOwner = 'agent';
+  } else if (input.needsZaal) {
+    nextOwner = 'me';
+  } else if ((input.status ?? '').toLowerCase() === 'blocked') {
+    nextOwner = 'blocked';
+  } else if (
+    // Code-verifiable checks that ZOE/agents can handle (no human judgment needed).
+    /build|test|deploy|ci|smoke|typecheck|lint|coverage|esbuild|vitest|tsc/i.test(text)
+  ) {
+    // These are automated verification tasks; route to agent for post-deploy checks.
+    nextOwner = 'agent';
+  } else {
+    // Unclear/unmapped tasks: route to 'review' for human routing, not auto-assigned.
+    // This prevents auto-dumping on a single person (e.g. Iman) and ensures Zaal sees
+    // all unclassified work for intentional routing.
+    nextOwner = 'review';
+  }
 
   return { brands: [brand], category, themes, nextOwner };
 }

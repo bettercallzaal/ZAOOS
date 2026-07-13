@@ -21,6 +21,8 @@ The real optimization at this point in the project isn't more research - it's st
 
 **Update 2026-07-12:** Zaal answered a batch of Tier 1/2 questions directly. Site Lead + First Aid Lead: both Zaal (see the caveat under that row - worth a second look, not a clean resolution). Cadillac Mountain reservation: confirmed NOT yet booked. Sound-system booking: confirmed NOT yet booked. ZAOville's pool-coverage plan and pre-event content owner are resolved in doc 1036. Livestream/broadcast lead: re-asked after a ring-buffer eviction lost the first answer - now confirmed **Ohnahji** (see doc 1030 Finding 5). Every Tier 1 item is now either resolved or confirmed-still-open, none are silently stale.
 
+**Correction 2026-07-12:** doc 1013's $20K/$25K/$7K budget figures were WRONG - audit-inflated, per Zaal's direct correction. Real ZAOstock target: ~$5K at most, ~$1.5K on hand. Doc 1013, doc 1030, and this doc's Tier 2 gear-purchase item have all been corrected. The $325 ATEM Mini Pro + $250-300 audio bundle (Tier 2 below) now needs to be weighed against a real ~$5K budget with ~$1.5K on hand - not the comfortable $20K margin this doc originally assumed.
+
 ## Tier 1 - This week (by Jul 18) - blocking or time-sensitive
 
 | Action | Source doc(s) | Why it's Tier 1 |
@@ -28,7 +30,7 @@ The real optimization at this point in the project isn't more research - it's st
 | **Book the Cadillac Mountain vehicle reservation for Oct 3** | 1034 | CONFIRMED 2026-07-12: not yet booked. Still time-sensitive - the 90-day booking window opened around July 5, reservations required through Oct 25 |
 | ~~Name a livestream/broadcast lead~~ - ANSWERED 2026-07-12: Ohnahji | 1030, 1031 (duplicate, merged) | Unowned since May across 3 different docs (609 said Thy Revolution, 720 said Onaji). Doc 720's call is the one that stuck. Ohnahji still needs to actually be looped in on doc 1030's gear stack and doc 1036's ZAOville dry run |
 | ~~Name a Site Lead and a First Aid Lead for Oct 3~~ - ANSWERED 2026-07-12: both Zaal | 1032 | Worth a second look, not a clean resolution: doc 1032 explicitly called for a First Aid Lead with current certification, not "whoever's around," and both roles are described as running full-day in parallel during the 12pm-6pm show. One person holding both needs either a real plan for how that works simultaneously, or a second name for one of the two roles |
-| **Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`** | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
+| ~~Update the stale $5K/$25K ZAOstock budget figure in `project_zao_stock_confirmed.md`~~ - DONE 2026-07-12, but with the correct figure (~$5K/~$1.5K on hand), not doc 1013's retracted $7K/$20K/$25K conclusion | 1013 | The file most likely to get quoted by a future session if not fixed - cheap to fix, keeps compounding if not |
 
 ## Tier 2 - Next 2 weeks (by Aug 1)
 
@@ -41,7 +43,7 @@ The real optimization at this point in the project isn't more research - it's st
 | **Reach out to one of HoE's 4 Downtown Grants Program bank partners for a warm co-sponsor conversation** | 1031 | Concrete, named list (Franklin Savings, Bangor Federal Credit Union, First National Bank, Machias Savings) via the Zaal builder-profile onepager already drafted |
 | ~~Build the new `/acadia` page and add the 2 restaurant/shuttle/sculpture-trail items to the live `/ellsworth` page~~ - SHIPPED 2026-07-11 | 1034 | Both pages are live and linked from the homepage footer |
 | **Confirm mutual-aid EMS availability/response time with local fire/ambulance for Oct 3** | 1032 | The one safety-plan item that needs an external confirmation, not just an internal decision |
-| ~~Update `/sponsor` page with the Route 1/Route 3 traffic numbers and Main Street America framing~~ - SHIPPED 2026-07-11 | 1031 | Also added the $20K budget target line the page previously lacked entirely |
+| ~~Update `/sponsor` page with the Route 1/Route 3 traffic numbers and Main Street America framing~~ - SHIPPED 2026-07-11 | 1031 | The $20K budget target line added at the same time was REMOVED 2026-07-12 per Zaal's correction - dollar figures now stay off public content entirely |
 
 ## Tier 3 - By mid-August
 

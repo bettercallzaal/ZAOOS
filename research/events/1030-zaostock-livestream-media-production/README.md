@@ -40,7 +40,7 @@ tier: DISPATCH
 | Power for 6 hours outdoor (switcher has no battery, cameras need AC not batteries) | No | Small spend: dummy batteries/AC adapters + a UPS backup, ~$150-300 |
 | Weatherproofing (switcher/cameras are not outdoor-rated) | No | Small spend: a canopy/EZ-Up for the control point + rain covers, ~$150-300 |
 
-**Realistic total new spend: roughly $900-1,500** - a fraction of the $8,000 "Production" line doc 1013 allocated (40% of the $20K ZAOstock budget target). This is a real, material finding: owning gear already changes the budget math significantly, and doc 1013's production allocation should be revisited once this is confirmed. [FULL - synthesized from three STANDARD-tier subagent research passes this session, cross-checked against the owned-gear facts given directly by Zaal]
+**Realistic total new spend: roughly $900-1,500.** Doc 1013's original comparison against a $20K budget target has been retracted (see doc 1013's superseded notice, 2026-07-12) - the real ZAOstock budget is ~$5K at most, ~$1.5K on hand. Against that real number, this $900-1,500 gear spend is a genuinely significant chunk of the total budget, not a small fraction of a larger one - this is now a real budget-pressure finding, not a "good news, under budget" one. [FULL - synthesized from three STANDARD-tier subagent research passes this session, cross-checked against the owned-gear facts given directly by Zaal; budget comparison corrected 2026-07-12]
 
 ### 2. Connectivity: the extra phones are likely the answer, not new hardware
 
@@ -88,7 +88,7 @@ One corroborating data point: doc 950 (Ohnahji x Zaal strategic session, deep-di
 - [Doc 912 — Restream vs StreamYard vs OBS](../912-restream-vs-streamyard-vs-obs-workflow/) — already answers the distribution-platform question (multistreaming to YouTube+Twitch); this doc is about the field-production side that feeds into that choice, not a replacement for it
 - [Doc 629 — Streaming as Main Media Source Flywheel](../../infrastructure/629-streaming-as-main-media-source-flywheel/) — already answers what happens to the recording AFTER the event (VOD, clips, cross-posting); this doc stops at "how do we get a clean live signal out of the venue"
 - [Doc 217 — AV Quality Optimization](../../infrastructure/217-av-quality-optimization-live-streaming/) — covers ZAO OS's own online audio-room platform, a different technical problem than field-producing an in-person outdoor event
-- [Doc 1013 — ZAO Festivals Budgets](../../business/1013-zaofestivals-budgets-zaostock-zaoville/) — this doc's ~$900-1,500 real spend estimate is well under doc 1013's $8,000 Production allocation (40% of the $20K target); that line item should be revisited
+- [Doc 1013 — ZAO Festivals Budgets](../../business/1013-zaofestivals-budgets-zaostock-zaoville/) — doc 1013's $20K/$8,000-Production framing is retracted (2026-07-12); this doc's $900-1,500 gear spend needs to be weighed against the real ~$5K budget instead, where it's a real pressure point, not a comfortable margin
 - [Doc 1007 — ZAOstock T-86 Days Readiness Audit](../1007-zaostock-t86-readiness-audit/) — this session's prior status check; didn't touch livestream production specifically, this doc fills that gap
 
 ## Next Actions
@@ -100,7 +100,7 @@ One corroborating data point: doc 950 (Ohnahji x Zaal strategic session, deep-di
 | Loop Ohnahji in on this doc's gear stack and doc 1036's ZAOville dry run - shipped when Ohnahji has actually seen both docs, not just been named | Zaal | Todo | 2026-07-18 |
 | Buy the ATEM Mini Pro ($325) and the audio DI/interface bundle ($250-300) - shipped when both are purchased and in hand | Zaal | Task | 2026-08-01 |
 | Run a live speed test at the actual Franklin Street Parklet venue to confirm the dual-phone-hotspot connectivity plan (Finding 2) - shipped when the test is run and recorded, ideally on more than one day/time | Zaal | Task | 2026-09-01 |
-| Update doc 1013's $8,000 Production budget line to reflect this doc's ~$900-1,500 real estimate, and reallocate the difference - shipped when doc 1013 or the live sponsor page is updated | Zaal | Todo | 2026-07-18 |
+| ~~Update doc 1013's $8,000 Production budget line~~ - MOOT, doc 1013's whole $20K framework is retracted (2026-07-12). Real open question now: whether the real ~$5K/~$1.5K-on-hand budget can actually absorb this $900-1,500 gear spend at all | Zaal | Todo | 2026-07-18 |
 | Run a full end-to-end test stream (all gear, real venue if possible) at least 2 weeks before Oct 3 - shipped when a complete dry run happens and issues are logged, not on the day itself | Zaal | Task | 2026-09-19 |
 
 ## Sources

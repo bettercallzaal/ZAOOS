@@ -81,9 +81,20 @@ Fetched each program's actual page directly, per the lesson in "What was wrong" 
 | Supply (or point to the live tracker for) actual named US-based builders who'd attend Devcon 8 if travel were covered - no roster exists yet in this library | @Zaal | Todo | 2026-07-20 |
 | Re-check nxbn.ethereum.foundation/scholars monthly - it still shows Devconnect 2025 as "next event," meaning it has not been updated for Devcon 8 yet | @Zaal | Watch | Monthly through Aug 2026 |
 | Watch for Builder Discount applications opening (July 2026, per EF's own statement) and apply immediately per person once open | @Zaal | Todo | July 2026 (rolling) |
-| Decide shared vs. individual crowdfund structure | @Zaal | Decision | 2026-08-01 |
+| Decide shared vs. individual crowdfund structure using the Juicebox-splits option below once the builder list exists | @Zaal | Decision | 2026-08-01 |
 | Run the Build Camp x ZABAL Games roundtable as content, independent of any grant | @Zaal + Claude | Deliverable | 2026-08-10 |
 | If a standing US-cohort presence is wanted, draft a DIP post for forum.devcon.org | @Zaal + Claude | Doc | 2026-08-01 |
+
+## Open question 3 - pooled multi-beneficiary crowdfund precedent (checked 2026-07-13)
+
+Searched for a documented case of a web3 community running one crowdfund that pays out to multiple named travelers for a single conference (the shape a "DevCon America" campaign would need, versus Doc 945's single-beneficiary Seed Club campaign for Zaal alone). Result: **no case study of a "squad ticket fund" for a conference was found.** What was found instead is a real, usable mechanism, not a case study:
+
+- **Juicebox "splits"** - a documented, live feature of the same crowdfunding protocol Doc 945 already lists as ZAO's fallback (juicebox.money). Splits let a single project pre-program payouts to multiple named wallet addresses by percentage or fixed amount. This is a real, working mechanism for "one campaign, N people paid out" - it is not a hypothetical.
+- **Seed Club** (Doc 945's primary pick) was not confirmed to support multi-recipient payout splits in the same way - it was researched there as a single-creator campaign tool. This is a genuine open sub-question, not resolved here: whether Seed Club can do a split payout, or whether a pooled US-cohort campaign would need to move to Juicebox specifically to get that feature.
+- **ConstitutionDAO** is the best-known precedent for many contributors pooling toward one shared goal (19,000 members, Nov 2021) - but it was a single-purpose acquisition (one NFT, one outcome), not a multi-beneficiary travel disbursement. Cited as a scale precedent for pooled contribution, not as a structural precedent for payout splitting.
+- **Trips Community / "Web3 in Travel Conference DAO"** ties DAO membership to conference participation (contribution or work equals a ticket) - directionally similar to a "contribute and get a seat" model, but it is a standing travel-industry DAO, not a one-off crowdfund, and was not verified as an active, repeatable template.
+
+**Honest conclusion:** the mechanism (Juicebox splits) is real and available today; the case-study precedent for using it specifically to send a cohort of builders to one conference is not. Treat this as a build-your-own structure using an existing tool, not as copying a proven playbook.
 
 ## Sources
 
@@ -95,6 +106,9 @@ Fetched each program's actual page directly, per the lesson in "What was wrong" 
 - [Devcon Forum](https://forum.devcon.org/) [FULL] - DIP submission venue, confirmed live via web search 2026-07-13
 - [Doc 945](../945-devcon8-mumbai-buildcamp-sponsorship/README.md) [FULL] - internal, funding stack + proof numbers reused here
 - [Doc 954](../954-devcon-history-community-mumbai-guide/README.md) [FULL] - internal, first identified the Ecosystem Program + Community Hub levers
+- WebSearch: "Juicebox multi-recipient payout split travel fund crypto community conference" [FULL] - confirmed the splits feature; no conference-travel case study found
+- WebSearch: "DAO travel fund pooled crowdfund multiple people conference tickets precedent" [FULL] - surfaced ConstitutionDAO and Trips Community as adjacent, non-matching precedents
+- [Juicebox](https://juicebox.money/) [FULL] - splits feature confirmed via docs.juicebox.money/v4/learn/overview/
 - [Doc 700](../700-devcon-mumbai-music-stage-coprogramming/README.md) [FULL] - internal, DIP/Fellowship of Ethereum Musicians precedent
 - Web search: "esp.ethereum.foundation RFP Devcon 8 global community event grant non-India" [FULL] - surfaced the BuidlGuidl global University Tour as a separate global lever, not yet verified FULL
 - [Devcon Scholars](https://nxbn.ethereum.foundation/scholars) [FULL] - fetched 2026-07-13; current cycle closed, page not yet updated past Devconnect 2025, no geographic gate

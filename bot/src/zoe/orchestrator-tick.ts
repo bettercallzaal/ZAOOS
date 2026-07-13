@@ -35,6 +35,8 @@ import { homedir } from 'node:os';
 import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQuestion } from './questions';
 import { pushRecent, ZOE_PATHS } from './memory';
 import { enqueueWork } from './work-loop';
+import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
+import { topicNameForThread } from './topic-router';
 
 const ORCHESTRATOR_STATE_PATH = (): string =>
   join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'), 'orchestrator-state.json');
@@ -474,6 +476,14 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
     // Stage 2: Process each new answer via action classification
     let actioned = 0;
     for (const answer of answers) {
+      // Check if this is a topic-based open-thing answer (e.g., "coding-pr-...", "research-...")
+      // If so, clear that topic so refillOpenThings will post a new one.
+      const topicForAnswer = topicFromQid(answer.qid);
+      if (topicForAnswer) {
+        await clearOpenThing(topicForAnswer);
+        console.log(`[zoe/orchestrator] cleared open item for topic "${topicForAnswer}" after answer`);
+      }
+
       const action = classifyAnswer(answer.qid, answer.value);
 
       switch (action.kind) {
@@ -542,6 +552,22 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       await writeState({ lastSeenTs: latestTs });
       await bumpToday(dateStr);
       console.log(`[zoe/orchestrator] tick: ${answers.length} answer(s), ${posted} action(s) executed`);
+    }
+
+    // Refill any topics that lost their open items (after processing answers)
+    try {
+      const refillResult = await refillOpenThings({
+        bot: deps.bot,
+        groupId: deps.groupId,
+        now: deps.now,
+      });
+      if (refillResult.refilled > 0) {
+        console.log(
+          `[zoe/orchestrator] always-open refilled ${refillResult.refilled} topic(s), skipped ${refillResult.skipped}`,
+        );
+      }
+    } catch (err) {
+      console.error('[zoe/orchestrator] refillOpenThings failed:', (err as Error)?.message);
     }
   } finally {
     await releaseLock();

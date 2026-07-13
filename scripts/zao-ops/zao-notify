@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# zao-notify <person-name> "<message>"
+# Try to DM a specific team member directly via Telegram; if there's no
+# telegram_id on file for them (or the DM fails - bot blocked, they've never
+# started a chat with ZOE), fall back to a clearly-flagged note in the ZAAL
+# BOTZ General topic so Zaal can relay it himself. Never silently drops a
+# message - one of the two always happens, and the fallback always says why.
+#
+# Looks up <person-name> (case-insensitive, matches team_members.name) via the
+# cowork tracker (Supabase project etwvzrmlxeobinrlytza, public.team_members -
+# same source zao-tracker reads). Reads SUPABASE_URL + SUPABASE_SERVICE_KEY
+# from ~/.zao/zao.env, and ZOE_BOT_TOKEN + ZAAL_BOTZ_GROUP_ID from
+# ~/.zao/private/tg.env.
+#
+# Usage:
+#   zao-notify Ohnahji "Confirmed as ZAOstock livestream lead - loop in on doc 1030/1036 when you get a sec"
+set -euo pipefail
+
+PERSON="$1"; MSG="${2:-}"
+[ -z "$PERSON" ] || [ -z "$MSG" ] && { echo 'usage: zao-notify <person-name> "<message>"'; exit 1; }
+
+ZAOENV="$HOME/.zao/zao.env"
+TGENV="$HOME/.zao/private/tg.env"
+[ -f "$ZAOENV" ] && set -a && source "$ZAOENV" && set +a
+[ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_KEY:-}" ] && { echo "missing SUPABASE_URL/SUPABASE_SERVICE_KEY in $ZAOENV"; exit 1; }
+TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
+GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
+[ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing ZOE_BOT_TOKEN or ZAAL_BOTZ_GROUP_ID in $TGENV"; exit 1; }
+
+python3 - "$SUPABASE_URL" "$SUPABASE_SERVICE_KEY" "$TOKEN" "$GID" "$PERSON" "$MSG" <<'PY'
+import sys, json, urllib.request, urllib.parse
+
+supabase_url, supabase_key, token, gid, person, msg = sys.argv[1:7]
+
+def lookup_member(name):
+    url = (f"{supabase_url.rstrip('/')}/rest/v1/team_members"
+           f"?select=name,telegram_id,telegram_username"
+           f"&name=ilike.{urllib.parse.quote(name)}&limit=1")
+    req = urllib.request.Request(url, headers={
+        "apikey": supabase_key, "Authorization": f"Bearer {supabase_key}",
+    })
+    with urllib.request.urlopen(req, timeout=10) as r:
+        rows = json.load(r)
+    return rows[0] if rows else None
+
+def send(chat_id, text):
+    body = {"chat_id": chat_id, "text": text}
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        data=urllib.parse.urlencode(body).encode(),
+    )
+    with urllib.request.urlopen(req, timeout=15) as r:
+        return json.load(r)
+
+member = lookup_member(person)
+tg_id = member.get("telegram_id") if member else None
+tg_user = member.get("telegram_username") if member else None
+real_name = member.get("name") if member else person
+
+if tg_id:
+    try:
+        r = send(tg_id, msg)
+        if r.get("ok"):
+            print(f"DMed {real_name} directly (telegram_id {tg_id}).")
+            sys.exit(0)
+        else:
+            fail_reason = r.get("description", "unknown error")
+    except Exception as e:
+        fail_reason = str(e)
+else:
+    fail_reason = "no telegram_id on file" if member else f'"{person}" not found in team_members'
+
+# Fallback: flagged note in ZAAL BOTZ General so Zaal can relay manually.
+who = f"{real_name}" + (f" (@{tg_user})" if tg_user else "")
+fallback_text = (
+    f"[notify-fallback] Couldn't DM {who} directly ({fail_reason}).\n"
+    f"Please relay to them yourself:\n\n{msg}"
+)
+r = send(gid, fallback_text)
+if r.get("ok"):
+    print(f"Could not DM {who} ({fail_reason}) - posted to ZAAL BOTZ for Zaal to relay.")
+else:
+    print(f"FAIL: could not DM {who} AND could not post fallback to ZAAL BOTZ: {r.get('description')}")
+    sys.exit(1)
+PY

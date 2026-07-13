@@ -1,6 +1,6 @@
 # zao-ops - phone-first operator toolkit for the ZAO team
 
-Three small CLIs that turn ZOE (your Telegram bot) into a control surface: you
+Four small CLIs that turn ZOE (your Telegram bot) into a control surface: you
 conduct from your phone, terminals do the work, and every decision comes back to
 you as a button in one place.
 
@@ -16,6 +16,7 @@ driven - point them at your own bot + group and they work.
 | `zao-ask` | Fire a button-question into your Telegram General topic. Any terminal/worker calls it when it needs a decision; the answer routes back by question id. |
 | `zao-cockpit` | Print your operator brief in the terminal (do-first, needs-you, PRs to review, idea inbox, stale items) - reads the shared cowork tracker. |
 | `zao-sweep` | Post that same brief into General so your morning is one place: read the digest, click the waiting buttons. Cron it for an auto-morning sweep. |
+| `zao-notify` | DM a specific team member by name (looked up in `team_members`). No Telegram contact on file, or the DM fails? Falls back to a clearly-flagged note in General so you can relay it yourself - never silently drops the message. |
 
 ## The loop they create
 
@@ -39,7 +40,10 @@ Work fans **out** (many terminals in parallel). Your input fans **in** (one butt
 3. `ZAO_VPS_HOST` env var pointing at the host that runs the cockpit brief
    (defaults to the ZAO ops box). `zao-cockpit`/`zao-sweep` ssh there to build
    the brief where the tracker creds live.
-4. Put the scripts on your PATH: `ln -s "$PWD"/scripts/zao-ops/zao-* ~/bin/`.
+4. For `zao-notify`: `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` in `~/.zao/zao.env`
+   (same cowork-tracker credentials `zao-tracker` already uses) so it can look
+   up a team member's `telegram_id`.
+5. Put the scripts on your PATH: `ln -s "$PWD"/scripts/zao-ops/zao-* ~/bin/`.
 
 ## Usage
 
@@ -52,7 +56,17 @@ zao-cockpit
 
 # push the cockpit digest into General
 zao-sweep
+
+# DM a specific person - falls back to a flagged General note if it can't reach them
+zao-notify Ohnahji "Confirmed as ZAOstock livestream lead - loop in on doc 1030/1036 when you get a sec"
 ```
+
+`zao-notify` looks up `team_members.telegram_id` for the name you give it. Most
+team members don't have one on file yet (they've never started a chat with
+ZOE) - until they do, every `zao-notify` call for them lands as a flagged note
+in General instead, and you relay it yourself. Once someone DMs ZOE for the
+first time, their `telegram_id` can be recorded and `zao-notify` starts
+reaching them directly, no code change needed.
 
 Question ids should be namespaced per terminal/task, e.g. `zaostock-publish`, so
 each terminal reads back its own answers. Answers are logged by the bot to its

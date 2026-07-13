@@ -35,11 +35,11 @@ describe('planReconciliation', () => {
 });
 
 describe('classifyTask', () => {
-  it('tags a WaveWarZ task by brand/theme and defaults next_owner to me', () => {
+  it('routes a generic unmapped task to review, not auto-assigned', () => {
     const c = classifyTask({ title: 'Fill 6 WaveWarZ profiles' });
     expect(c.brands).toEqual(['WaveWarZ']);
     expect(c.themes).toContain('music');
-    expect(c.nextOwner).toBe('me');
+    expect(c.nextOwner).toBe('review'); // unmapped -> review, not auto-assigned to a person
   });
 
   it('routes a fractal/onchain task to web3 + governance themes and The ZAO brand', () => {
@@ -69,11 +69,26 @@ describe('classifyTask', () => {
     expect(c.nextOwner).toBe('blocked');
   });
 
-  it('falls back to The ZAO / Other / ops for unmatched text', () => {
+  it('routes code-verifiable tasks (build/test/deploy) to agent for ZOE post-deploy checks', () => {
+    const testCases = [
+      { title: 'test this PR', expectedOwner: 'agent' as const },
+      { title: 'build verification', expectedOwner: 'agent' as const },
+      { title: 'run esbuild smoke test', expectedOwner: 'agent' as const },
+      { title: 'check TypeScript coverage', expectedOwner: 'agent' as const },
+      { title: 'Deploy and run CI smoke', expectedOwner: 'agent' as const },
+    ];
+    for (const tc of testCases) {
+      const c = classifyTask({ title: tc.title });
+      expect(c.nextOwner).toBe(tc.expectedOwner);
+    }
+  });
+
+  it('falls back to The ZAO / Other / ops / review for unmatched text', () => {
     const c = classifyTask({ title: 'xyzzy plugh frobnicate' });
     expect(c.brands).toEqual(['The ZAO']);
     expect(c.category).toBe('Other');
     expect(c.themes).toEqual(['ops']);
+    expect(c.nextOwner).toBe('review'); // unmatched -> review for human routing
   });
 
   it('is deterministic', () => {
@@ -84,7 +99,8 @@ describe('classifyTask', () => {
 });
 
 describe('applyClassification', () => {
-  const c = classifyTask({ title: 'WaveWarZ Solana bridge test' });
+  // Use a title that doesn't match code-verifiable patterns
+  const c = classifyTask({ title: 'WaveWarZ Solana bridge partnerships' });
 
   it('fills brands/category when absent and always sets metadata themes/next_owner', () => {
     const out = applyClassification({ title: 'x' }, c, '2026-07-06');
@@ -92,7 +108,7 @@ describe('applyClassification', () => {
     expect(out.category).toBe('Site / Tech');
     const meta = out.metadata as Record<string, unknown>;
     expect(meta.themes).toEqual(c.themes);
-    expect(meta.next_owner).toBe('me');
+    expect(meta.next_owner).toBe('review'); // generic task -> review, not auto-assigned
     expect(meta.autotagged).toBe('2026-07-06');
   });
 
@@ -115,7 +131,7 @@ describe('applyClassification', () => {
     const meta = out.metadata as Record<string, unknown>;
     expect(meta.list).toBe('zaal-master');
     expect(meta.tier).toBe('P1');
-    expect(meta.next_owner).toBe('me');
+    expect(meta.next_owner).toBe('review'); // generic task -> review
   });
 
   it('does not mutate the input row', () => {

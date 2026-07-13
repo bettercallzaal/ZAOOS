@@ -58,6 +58,20 @@ Question ids should be namespaced per terminal/task, e.g. `zaostock-publish`, so
 each terminal reads back its own answers. Answers are logged by the bot to its
 `recent/` store; an open session reads them via the inbox bridge.
 
+### Targeting a different chat
+
+If your bot (ZOE) is a member of more than one group - e.g. a project-specific
+team chat alongside your main ops group - redirect a batch of asks without a
+second copy of the script:
+
+```bash
+ZAO_ASK_TARGET_GID=-1009876543210 zao-ask siteleadconfirm "Confirmed for Site Lead?" "Yes" "No"
+```
+
+Falls back to `ZAAL_BOTZ_GROUP_ID` from `tg.env` when unset, so existing calls
+are unaffected. `/chatid` (in the bot's other repo, `bot/src/zoe/index.ts`)
+gives you the target group's id from inside that chat.
+
 ## Notes
 
 - No secrets in these scripts - the bot token lives only in `tg.env` (gitignored).

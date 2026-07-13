@@ -1,17 +1,18 @@
 /**
  * Surface new entries from the ZAOstock cloud research loop's pending-approvals
- * queue into the ZAAL BOTZ General topic. The cloud research loop (a claude.ai
- * routine, not this bot) has no safe way to hold Telegram credentials - it runs
- * in an isolated sandbox and can only commit files. So instead of pushing
- * Telegram messages directly, it APPENDS drafts/decisions it can't act on
- * itself (spending money, contacting a third party, a judgment call) to
- * research/_meta/zaostock-pending-approvals.md in bettercallzaal/ZAOOS. This
- * module is the other half of that bridge: it reads the raw file over HTTPS
- * (public repo, no auth needed), diffs against what's already been surfaced,
- * and posts only the new content as plain text - same "no buttons, lowest
- * blast radius" pattern as posts/README.md v1. Best-effort + de-duped via a
- * last-seen file length, mirroring handoffs-surface.ts's last-seen-timestamp
- * approach for the same class of problem.
+ * queue into a Telegram group (whichever chat the caller targets - see
+ * scheduler.ts's ZAOSTOCK_TEAM_GROUP_ID / ZAAL_BOTZ_GROUP_ID fallback). The
+ * cloud research loop (a claude.ai routine, not this bot) has no safe way to
+ * hold Telegram credentials - it runs in an isolated sandbox and can only
+ * commit files. So instead of pushing Telegram messages directly, it APPENDS
+ * drafts/decisions it can't act on itself (spending money, contacting a third
+ * party, a judgment call) to research/_meta/zaostock-pending-approvals.md in
+ * bettercallzaal/ZAOOS. This module is the other half of that bridge: it reads
+ * the raw file over HTTPS (public repo, no auth needed), diffs against what's
+ * already been surfaced, and posts only the new content as plain text - same
+ * "no buttons, lowest blast radius" pattern as posts/README.md v1. Best-effort
+ * + de-duped via a last-seen file length, mirroring handoffs-surface.ts's
+ * last-seen-timestamp approach for the same class of problem.
  */
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
@@ -74,13 +75,13 @@ function chunkText(text: string, maxChars: number): string[] {
 }
 
 /**
- * Post any pending-approvals content added since the last check to the
- * General topic. `postToGeneral` sends one message (no thread id - lands in
- * General same as zao-ask). Returns how many chunks were surfaced. Best-effort:
- * never throws into the scheduler tick.
+ * Post any pending-approvals content added since the last check to the target
+ * chat. `postToTarget` sends one message (no thread id - lands in the chat's
+ * General/default stream, same as zao-ask). Returns how many chunks were
+ * surfaced. Best-effort: never throws into the scheduler tick.
  */
 export async function surfaceZaostockApprovals(
-  postToGeneral: (text: string) => Promise<unknown>,
+  postToTarget: (text: string) => Promise<unknown>,
 ): Promise<number> {
   const content = await fetchPendingApprovals();
   if (content === null) return 0;
@@ -97,7 +98,7 @@ export async function surfaceZaostockApprovals(
 
   for (let i = 0; i < chunks.length; i++) {
     const label = chunks.length > 1 ? `ZAOstock loop [${i + 1}/${chunks.length}]:\n\n` : 'ZAOstock loop - new item(s) need a look:\n\n';
-    await postToGeneral(`${label}${chunks[i]}`).catch(() => {});
+    await postToTarget(`${label}${chunks[i]}`).catch(() => {});
   }
   await setLastSeenLength(content.length);
   return chunks.length;

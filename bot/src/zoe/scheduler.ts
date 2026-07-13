@@ -443,16 +443,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
 
   // ZAOstock cloud-loop approvals surfacer - every 10 min, post any NEW entries
   // from research/_meta/zaostock-pending-approvals.md (bettercallzaal/ZAOOS)
-  // into the ZAAL BOTZ General topic. That file is the ZAOstock autonomous
-  // research routine's approval queue - it runs in an isolated cloud sandbox
-  // with no Telegram credentials, so it can only commit drafts/decisions to
-  // the file, not push them. This is the other half of that bridge. Silent
-  // when nothing new; the file itself won't exist until the loop's first run.
+  // into a Telegram group. That file is the ZAOstock autonomous research
+  // routine's approval queue - it runs in an isolated cloud sandbox with no
+  // Telegram credentials, so it can only commit drafts/decisions to the file,
+  // not push them. This is the other half of that bridge. Prefers a dedicated
+  // ZAOSTOCK_TEAM_GROUP_ID (e.g. the actual ZAOstock team's own Telegram group,
+  // once ZOE is added there) so this content lands where the team already is,
+  // rather than mixed into the general ZAAL BOTZ ops firehose; falls back to
+  // ZAAL_BOTZ_GROUP_ID if that's not configured yet. Silent when nothing new;
+  // the file itself won't exist until the loop's first run.
   tasks.push(
     cron.schedule(
       '*/10 * * * *',
       async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = Number(process.env.ZAOSTOCK_TEAM_GROUP_ID ?? process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
         try {
           const n = await surfaceZaostockApprovals((text: string) => opts.bot.api.sendMessage(gid, text));

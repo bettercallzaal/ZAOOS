@@ -43,6 +43,7 @@ import { flushEmitQueue } from './thread-memory';
 import { checkAndResend, readLastUserReplyAt } from './escalation';
 import { reconcileUntaggedTasks } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
+import { runTaskCommentReplies } from './task-comment-replies';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -242,6 +243,17 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
         } catch (err) {
           console.warn('[zoe/scheduler] inbox-ingest failed (nbd):', (err as Error).message);
+        }
+
+        // Reply to any @zoe comments left on board tasks (thezao.xyz/board).
+        // Best-effort - a no-op when COWORK_TRACKER_URL/KEY are unset.
+        try {
+          const rep = await runTaskCommentReplies();
+          if (rep.answered > 0) {
+            console.log(`[zoe/scheduler] task-comment-replies: answered ${rep.answered}`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] task-comment-replies failed (nbd):', (err as Error).message);
         }
 
         // Doc 983 Rec #4: hourly backfill of any task created untagged by a

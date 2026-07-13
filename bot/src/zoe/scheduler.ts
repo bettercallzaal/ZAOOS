@@ -44,6 +44,7 @@ import { checkAndResend, readLastUserReplyAt } from './escalation';
 import { reconcileUntaggedTasks } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
 import { runTaskCommentReplies } from './task-comment-replies';
+import { runMentionNotify } from './task-mention-notify';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -254,6 +255,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
         } catch (err) {
           console.warn('[zoe/scheduler] task-comment-replies failed (nbd):', (err as Error).message);
+        }
+
+        // Ping people on Telegram when they're @mentioned in a board task
+        // comment (thezao.xyz/board), so they see it without opening the board.
+        // Best-effort - a no-op when the board or MENTION_NOTIFY_MAP is unset.
+        try {
+          const send = (chatId: number, text: string, o?: { threadId?: number }) =>
+            opts.bot.api
+              .sendMessage(chatId, text, o?.threadId ? { message_thread_id: o.threadId } : undefined)
+              .then(() => undefined);
+          const mn = await runMentionNotify(send, opts.zaalTgId);
+          if (mn.notified > 0) {
+            console.log(`[zoe/scheduler] mention-notify: pinged ${mn.notified}`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] mention-notify failed (nbd):', (err as Error).message);
         }
 
         // Doc 983 Rec #4: hourly backfill of any task created untagged by a

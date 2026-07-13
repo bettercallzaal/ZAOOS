@@ -52,12 +52,22 @@ The original Key Decision #1 read the general devcon.org/en/ecosystem-program/ o
 - [Doc 700](../700-devcon-mumbai-music-stage-coprogramming/) - DIP/forum precedent via the Devcon Music Stage
 - Codebase grounding: `/Users/zaalpanthaki/Documents/zdevcon/README.md`, `/Users/zaalpanthaki/Documents/zdevcon/CONTEXT.md`, `/Users/zaalpanthaki/Documents/zdevcon/partners-tracker.md` - the India trip is already fully staffed as a campaign; this doc is the missing US-side counterpart
 
+## Open question 1 - named US-based builder roster (checked 2026-07-13, negative result)
+
+Searched the ZAOOS research library (`research/community/`, `research/events/`) for an existing roster of US-based ZAO/WaveWarZ/ZABAL Games builders with location data, and grepped `/Users/zaalpanthaki/Documents/zdevcon/partners-tracker.md`. Result: **no such roster exists.** What does exist:
+
+- `zdevcon/CONTEXT.md`'s "Event-circuit people" section lists US-based names (Telamon Ardavanis, Aaron Rafferty, Bayo, Tom Fellenz) - but these are event/business/festival contacts, not developers who'd be applying for a Builder Discount or Scholars ticket.
+- ZABAL Games has an active Builder track (build-a-thon through end of August) with real submitters, but no research doc or tracker file in this library records submitters' locations.
+- No doc combines "is a builder" AND "is US-based" AND "would want to go to Devcon 8."
+
+This is a genuine gap, not a research failure to push past - the actual names have to come from Zaal or from the ZABAL Games submission data directly (Empire Builder / Clanker / POIDH tracker), which this research pass does not have access to. Fabricating names here would violate the no-invented-names constraint on this work.
+
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Identify the actual US-based ZAO builders who'd attend Devcon 8 if travel/ticket were covered | @Zaal | Todo | 2026-07-20 |
-| Check Scholars / Builder Discount / Creative Crew individual eligibility per named person | @Zaal | Todo | 2026-07-27 |
+| Supply (or point to the live tracker for) actual named US-based builders who'd attend Devcon 8 if travel were covered - no roster exists yet in this library | @Zaal | Todo | 2026-07-20 |
+| Check Scholars / Builder Discount / Creative Crew individual eligibility per named person, once the list exists | @Zaal | Todo | 2026-07-27 |
 | Decide shared vs. individual crowdfund structure | @Zaal | Decision | 2026-08-01 |
 | Run the Build Camp x ZABAL Games roundtable as content, independent of any grant | @Zaal + Claude | Deliverable | 2026-08-10 |
 | If a standing US-cohort presence is wanted, draft a DIP post for forum.devcon.org | @Zaal + Claude | Doc | 2026-08-01 |

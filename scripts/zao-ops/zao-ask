@@ -5,13 +5,18 @@
 # truncated); the buttons are compact numbers (1,2,3...) + "Type my own". A tap
 # logs the chosen option's slug to recent/ (the bridge); the asking terminal
 # reads it back by <qid>. No options = a freetext-only ask.
+#
+# Target override: set ZAO_ASK_TARGET_GID to redirect a batch of asks to a
+# different chat Zoe is also in (e.g. a dedicated ZAOstock team group) without
+# needing a second copy of this script. Falls back to ZAAL_BOTZ_GROUP_ID from
+# tg.env when unset - existing calls are unaffected.
 set -e
 QID="$1"; Q="$2"; shift 2 2>/dev/null || true
 [ -z "$QID" ] || [ -z "$Q" ] && { echo 'usage: zao-ask <qid> "<question>" [opt1] [opt2] ...'; exit 1; }
 TGENV="$HOME/.zao/private/tg.env"
 TOKEN=$(grep -m1 '^ZOE_BOT_TOKEN=' "$TGENV" | cut -d= -f2- | tr -d '"')
-GID=$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')
-[ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing ZOE_BOT_TOKEN or ZAAL_BOTZ_GROUP_ID in $TGENV"; exit 1; }
+GID="${ZAO_ASK_TARGET_GID:-$(grep -m1 '^ZAAL_BOTZ_GROUP_ID=' "$TGENV" | cut -d= -f2- | tr -d '"')}"
+[ -z "$TOKEN" ] || [ -z "$GID" ] && { echo "missing ZOE_BOT_TOKEN in $TGENV, or no group id (set ZAAL_BOTZ_GROUP_ID in tg.env or export ZAO_ASK_TARGET_GID)"; exit 1; }
 python3 - "$TOKEN" "$GID" "$QID" "$Q" "$@" <<'PY'
 import sys, json, base64, re, urllib.request, urllib.parse
 token, gid, qid, q = sys.argv[1:5]

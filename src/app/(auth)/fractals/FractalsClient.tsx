@@ -24,6 +24,10 @@ const AnalyticsTab = dynamic(
   () => import('./AnalyticsTab').then((m) => ({ default: m.AnalyticsTab })),
   { ssr: false },
 );
+const WeeksTab = dynamic(
+  () => import('./WeeksTab').then((m) => ({ default: m.WeeksTab })),
+  { ssr: false },
+);
 const EventsCalendar = dynamic(
   () =>
     import('@/components/governance/EventsCalendar').then((m) => ({ default: m.EventsCalendar })),
@@ -37,11 +41,12 @@ const LiveFractalDashboard = dynamic(
   { ssr: false },
 );
 
-type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'events' | 'live' | 'about';
+type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'weeks' | 'proposals' | 'events' | 'live' | 'about';
 const VALID_TABS: Tab[] = [
   'sessions',
   'leaderboard',
   'analytics',
+  'weeks',
   'proposals',
   'events',
   'live',
@@ -66,6 +71,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
     { id: 'sessions', label: 'Sessions' },
     { id: 'leaderboard', label: 'Leaderboard' },
     { id: 'analytics', label: 'Analytics' },
+    { id: 'weeks', label: 'Weeks' },
     { id: 'about', label: 'About' },
   ];
 
@@ -117,6 +123,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
         {activeTab === 'sessions' && <SessionsTab isAdmin={isAdmin} />}
         {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
         {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'weeks' && <WeeksTab />}
         {activeTab === 'proposals' && <ProposalsTab isAdmin={isAdmin} currentFid={currentFid} />}
         {activeTab === 'events' && <EventsCalendar />}
         {activeTab === 'live' && <LiveFractalDashboard />}

@@ -33,6 +33,7 @@ const BOOTLOADER_PATH = join(ZOE_HOME, 'bootloader-template.md');
 const DECISIONS_PATH = join(ZOE_HOME, 'decisions.jsonl');
 const BUILD_STATE_PATH = join(ZOE_HOME, 'build_state.jsonl');
 const INBOX_CONTEXT_PATH = join(ZOE_HOME, 'inbox_context.jsonl');
+const TRIAGE_CONTEXT_PATH = join(ZOE_HOME, 'triage_context.jsonl');
 
 const RECENT_MAX = 8;
 
@@ -656,6 +657,73 @@ export async function appendInboxContext(record: Omit<InboxContextRecord, 'id' |
     created_at: new Date().toISOString(),
   };
   await fs.appendFile(INBOX_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
+}
+
+/**
+ * Read triage context (last N records) for display in memory blocks.
+ * Returns a formatted string for the <triage_context> block.
+ */
+export async function readTriageContext(limit = 5): Promise<string> {
+  await ensureZoeHome();
+  try {
+    const raw = await fs.readFile(TRIAGE_CONTEXT_PATH, 'utf8');
+    const records = raw
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line) as import('./types').TriageRecord)
+      .slice(-limit);
+
+    if (records.length === 0) return '';
+
+    const grouped: Record<import('./types').TriageBucket, import('./types').TriageRecord[]> = {
+      BUILD: [],
+      RESEARCH: [],
+      REFERENCE: [],
+      'ACT-NOW': [],
+      SOMEDAY: [],
+    };
+
+    for (const r of records) {
+      grouped[r.bucket].push(r);
+    }
+
+    const lines: string[] = [];
+    for (const bucket of ['ACT-NOW', 'BUILD', 'RESEARCH', 'REFERENCE', 'SOMEDAY'] as const) {
+      const items = grouped[bucket];
+      if (items.length > 0) {
+        lines.push(`${bucket}:`);
+        for (const item of items) {
+          const proj = item.connected_project ? ` [${item.connected_project}]` : '';
+          lines.push(`  - ${item.summary}${proj}`);
+        }
+      }
+    }
+
+    return lines.join('\n');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Append a triage record to triage_context.jsonl.
+ */
+export async function appendTriageContext(
+  record: Omit<import('./types').TriageRecord, 'id' | 'created_at'>,
+): Promise<void> {
+  await ensureZoeHome();
+  const doc: import('./types').TriageRecord = {
+    id: `triage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    source_id: record.source_id,
+    summary: record.summary,
+    bucket: record.bucket,
+    connected_project: record.connected_project,
+    next_step: record.next_step,
+    capture_id: record.capture_id,
+    created_at: new Date().toISOString(),
+  };
+  await fs.appendFile(TRIAGE_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
 }
 
 /**

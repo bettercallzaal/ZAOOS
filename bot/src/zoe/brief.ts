@@ -22,6 +22,7 @@ import { fleetConsensus } from './fleet-health';
 import { graphTopicAgeDays } from './recall';
 import { getCalendarEvents, formatEventForBrief, formatTodayTomorrowEvents } from './calendar';
 import { gatherPendingDecisions } from './pending-decisions';
+import { readTriageContext } from './memory';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -60,6 +61,10 @@ INBOX
 - {N} unread in zoe-zao@agentmail.to. First 3 subjects: ... (skip line entirely if inbox=null)
 - Reminder: run /inbox in any Claude session to research the queue.
 
+INBOX TRIAGE (new ideas, grouped by bucket)
+- If triage_context is empty, skip this section entirely.
+- Format the triage summary as provided; one bucket per line, items nested. Keep it brief.
+
 portal.zaoos.com/todos - brain dump
 
 Output the brief in plaintext. NO markdown headers, NO emojis, NO pleasantries.`;
@@ -78,6 +83,7 @@ interface BriefContext {
   upcomingEvents: Array<{ title: string; start: string; location?: string }>;
   pendingDecisions: string | null;
   todayTomorrowEvents: string | null;
+  triageContext: string; // Formatted triage summary (grouped by bucket)
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -281,6 +287,14 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     pendingDecisions = null;
   }
 
+  // Triage context — ideas forwarded to inbox, grouped by bucket. Best-effort.
+  let triageContext = '';
+  try {
+    triageContext = await readTriageContext(5);
+  } catch {
+    triageContext = '';
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -295,6 +309,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     upcomingEvents,
     pendingDecisions,
     todayTomorrowEvents,
+    triageContext,
   };
 }
 
@@ -316,6 +331,10 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
     ? `CALENDAR:\n${ctx.todayTomorrowEvents}`
     : 'CALENDAR: (no events today/tomorrow - skip the CALENDAR section)';
 
+  const triageLine = ctx.triageContext
+    ? `INBOX TRIAGE:\n${ctx.triageContext}`
+    : 'INBOX TRIAGE: (none - skip the INBOX TRIAGE section)';
+
   const userPrompt = `Generate the morning brief for ${day} ${date}.
 
 CONTEXT:
@@ -330,6 +349,7 @@ CONTEXT:
 - Fleet health: ${ctx.fleet ?? '(unavailable - skip the FLEET section)'}
 - ZOL status: ${ctx.zol ?? '(unavailable)'}
 - ${inboxLine}
+- ${triageLine}
 
 Output the brief now in the exact format from your system prompt.`;
 

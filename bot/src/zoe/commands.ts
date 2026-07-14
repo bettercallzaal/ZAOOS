@@ -36,6 +36,9 @@ export const CHECKPOINT_PREFIX = /^\/checkpoint\s+(.+)/is;
 /** `/audit` - run trust audit (scan for fallen tasks/captures). */
 export const AUDIT_COMMAND_RE = /^\/audit$/i;
 
+/** `/budget` - check ZOE daily spend and remaining budget. */
+export const BUDGET_COMMAND_RE = /^\/budget(?:\s+detailed)?$/i;
+
 /**
  * True if a DM is a recognized ZOE command. Such messages must bypass the
  * await-reflection pending capture (doc 770 H1): the evening reflection arms
@@ -52,6 +55,7 @@ export function isZoeCommand(text: string): boolean {
     FOCUS_ON_RE.test(trimmed) ||
     FOCUS_OFF_RE.test(trimmed) ||
     CHECKPOINT_PREFIX.test(trimmed) ||
-    AUDIT_COMMAND_RE.test(trimmed)
+    AUDIT_COMMAND_RE.test(trimmed) ||
+    BUDGET_COMMAND_RE.test(trimmed)
   );
 }

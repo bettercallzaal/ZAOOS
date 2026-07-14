@@ -46,6 +46,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+import { execSync } from 'node:child_process';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const TOPIC_THREAD_MAP_PATH = join(ZOE_HOME, 'topic_thread_map.json');
@@ -154,37 +155,93 @@ export async function postToTopic(
  * Example output:
  *   Today's ships (Jul 14):
  *
- *   PRs merged:
+ *   Merged PRs across ZAO repos:
  *   #1344: docs: research doc 1078 - individual operating system
  *   #1343: fix: insurance vendors sourcing
  *   #1342: fix: sound-system backup vendors
  *
- *   Commits landed:
- *   57f28c4 - docs: farcaster research doc
- *   8b3e1ad - docs: doc 1063 question 3
+ *   Today: 2 docs, 1 fix across the ecosystem.
  *
- * Stub implementation for MVP. Future: fetch from GitHub API + Bonfire recall.
+ * Fetches merged PRs from key repos (ZAOOS, ZAOcowork) in the last 24h.
+ * Gracefully no-ops if GitHub token is missing (runs without Telegram ping).
  */
 export async function generateGithubDigest(): Promise<{ text: string; timestamp: string } | null> {
   try {
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Stub: for MVP, return placeholder. Real impl would:
-    // - fetch recent merged PRs from GitHub API
-    // - fetch recent commits from git log
-    // - batch into prose narrative
-    // Disabled by default (curator OFF) so this won't fire until enabled.
+    // Fetch merged PRs from key repos
+    const repos = [
+      'bettercallzaal/ZAOOS',
+      'ZAODEVZ/ZAOcowork',
+    ];
 
-    const digestText = `Today's ships (${dateStr}):
+    interface PullRequest {
+      number: number;
+      title: string;
+      repository?: string;
+    }
 
-PRs merged:
-(fetching from GitHub API - not yet wired)
+    const allPrs: PullRequest[] = [];
 
-Commits landed:
-(fetching from git log - not yet wired)
+    for (const repo of repos) {
+      try {
+        const json = execSync(
+          `gh pr list --repo ${repo} --state merged --limit 8 --json number,title --search "merged:>24-hours-ago"`,
+          {
+            encoding: 'utf8',
+            timeout: 8000,
+          },
+        );
+        const prs = JSON.parse(json) as Array<{ number: number; title: string }>;
+        allPrs.push(...prs.map((pr) => ({ ...pr, repository: repo })));
+      } catch (err) {
+        // Graceful no-op: if a repo fetch fails, continue with others
+        console.warn(`[zoe/curator] failed to fetch merged PRs from ${repo}:`, (err as Error).message);
+      }
+    }
 
-If this appears, curator is enabled. Wire the GitHub API fetcher in curator.ts.`;
+    // If no PRs were found across all repos, return null (nothing to report)
+    if (allPrs.length === 0) {
+      return null;
+    }
+
+    // Sort by PR number (newest first) and cap at 8 items total
+    allPrs.sort((a, b) => b.number - a.number);
+    const topPrs = allPrs.slice(0, 8);
+
+    // Format as clean prose (not a raw list)
+    let digestText = `Today's ships (${dateStr}):\n\nMerged PRs across ZAO repos:`;
+
+    for (const pr of topPrs) {
+      const repoLabel = pr.repository?.includes('ZAOcowork') ? '[ZAOcowork]' : '';
+      digestText += `\n#${pr.number}: ${pr.title}${repoLabel ? ` ${repoLabel}` : ''}`;
+    }
+
+    // Add a closing note summarizing what shipped (keeps it high-signal, not spammy)
+    const categories = topPrs
+      .map((pr) => {
+        const title = pr.title.toLowerCase();
+        if (title.includes('docs')) return 'docs';
+        if (title.includes('fix')) return 'fix';
+        if (title.includes('feat')) return 'feature';
+        if (title.includes('refactor')) return 'refactor';
+        return null;
+      })
+      .filter(Boolean);
+
+    const categoryCount: { [key: string]: number } = {};
+    for (const cat of categories) {
+      if (cat) categoryCount[cat] = (categoryCount[cat] ?? 0) + 1;
+    }
+
+    const categorySummary = Object.entries(categoryCount)
+      .map(([cat, count]) => `${count} ${cat}${count > 1 ? 's' : ''}`)
+      .join(', ');
+
+    if (categorySummary) {
+      digestText += `\n\nToday: ${categorySummary} across the ecosystem.`;
+    }
 
     return {
       text: digestText,

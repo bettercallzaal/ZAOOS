@@ -128,4 +128,9 @@ export const ENV = {
   // env (CRM_BOT_SECRET). Unset = the bot write path is disabled (an admin
   // iron-session still works on the same route). Must be >=32 chars if set (C-H2).
   CRM_BOT_SECRET: optionalSecretEnv('CRM_BOT_SECRET', 32),
+
+  // Public CRM capture endpoint token (optional). If set, POST /api/crm/capture
+  // requires ?token=<this value> or an Authorization header. Generate with:
+  // openssl rand -hex 16. Unset = open to all origins (use CORS to gate).
+  CRM_CAPTURE_TOKEN: optionalSecretEnv('CRM_CAPTURE_TOKEN', 16),
 } as const;

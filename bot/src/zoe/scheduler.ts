@@ -32,6 +32,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
+import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick } from './orchestrator-tick';
@@ -503,6 +504,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       '0 */2 * * *',
       async () => {
         try {
+          if (shouldPauseAutonomousWork()) {
+            console.log('[zoe/scheduler] work-loop tick skipped (cost hard-stop at 95%+)');
+            return;
+          }
           const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
           const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
           await runWorkTick({
@@ -585,6 +590,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
         try {
+          if (shouldPauseAutonomousWork()) {
+            console.log('[zoe/scheduler] orchestrator tick skipped (cost hard-stop at 95%+)');
+            return;
+          }
           await runOrchestratorTick({
             bot: opts.bot,
             groupId: gid,
@@ -613,6 +622,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await surfaceNudges((text: string) => opts.bot.api.sendMessage(gid, text));
         } catch (err) {
           console.warn('[zoe/scheduler] nudge surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Cost governance monitor - every 10 min, check spend thresholds (60/75/85/95%)
+  // and fire alerts to Zaal when crossed. De-duped per day so each threshold fires
+  // at most once per day. At 95%, autonomous work is already hard-stopped by the
+  // wraps around runWorkTick + runOrchestratorTick.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        try {
+          for (const level of [60, 75, 85, 95]) {
+            if (shouldFireAlert(level)) {
+              const status = formatSpendStatus(false);
+              const alert = `COST ALERT: Spend reached ${level}% of daily cap\n\n${status}`;
+              await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
+                console.warn('[zoe/scheduler] cost alert send failed:', err);
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] cost monitoring failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

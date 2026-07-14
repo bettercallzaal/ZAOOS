@@ -100,8 +100,10 @@ import {
   FOCUS_OFF_RE,
   CHECKPOINT_PREFIX,
   AUDIT_COMMAND_RE,
+  BUDGET_COMMAND_RE,
   isZoeCommand,
 } from './commands';
+import { formatSpendStatus } from './cost-governance';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
@@ -1415,6 +1417,19 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       progress.stop();
       const msg = err instanceof Error ? err.message : String(err);
       await ctx.reply(`Audit failed: ${msg.slice(0, 200)}`);
+    }
+    return;
+  }
+
+  // Budget status: `/budget` shows today's spend and remaining headroom.
+  if (BUDGET_COMMAND_RE.test(text.trim())) {
+    const detailed = text.toLowerCase().includes('detailed');
+    try {
+      const budgetText = formatSpendStatus(detailed);
+      await ctx.reply(budgetText);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      await ctx.reply(`Budget lookup failed: ${msg.slice(0, 100)}`);
     }
     return;
   }

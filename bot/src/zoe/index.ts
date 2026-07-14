@@ -18,6 +18,8 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
+import type { Client } from 'discord.js';
+import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
@@ -2281,6 +2283,15 @@ async function main(): Promise<void> {
       return { reply: result.reply, todo_marked: todoMarked };
     },
   });
+
+  // Boot Discord client (optional, no-op if DISCORD_BOT_TOKEN unset).
+  let discordClient: Client | null = null;
+  try {
+    discordClient = await bootDiscordClient();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] Discord client boot failed (Telegram still active):', msg);
+  }
 
   await bot.start({
     onStart: (info) => {

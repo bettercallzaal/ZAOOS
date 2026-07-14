@@ -293,3 +293,48 @@ export function formatEventForBrief(event: CalendarEvent): string {
   const loc = event.location ? ` @ ${event.location}` : '';
   return `${date}: ${event.title}${loc}`;
 }
+
+/**
+ * Format Today and Tomorrow events separately for the morning brief.
+ * Returns null if no events in the next 2 days.
+ */
+export function formatTodayTomorrowEvents(events: CalendarEvent[]): string | null {
+  const now = new Date();
+  const tz = 'America/New_York';
+
+  // Get today and tomorrow midnight in the user's timezone
+  const getDateOnly = (d: Date): string => d.toLocaleDateString('en-US', { timeZone: tz }).split('/').reverse().join('-');
+  const todayStr = getDateOnly(now);
+  const tomorrowDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = getDateOnly(tomorrowDate);
+
+  const todayEvents = events.filter((e) => getDateOnly(e.start) === todayStr);
+  const tomorrowEvents = events.filter((e) => getDateOnly(e.start) === tomorrowStr);
+
+  if (todayEvents.length === 0 && tomorrowEvents.length === 0) {
+    return null;
+  }
+
+  const lines: string[] = [];
+
+  if (todayEvents.length > 0) {
+    lines.push('TODAY:');
+    for (const event of todayEvents) {
+      const time = event.start.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
+      const loc = event.location ? ` @ ${event.location}` : '';
+      lines.push(`- ${time}: ${event.title}${loc}`);
+    }
+  }
+
+  if (tomorrowEvents.length > 0) {
+    if (lines.length > 0) lines.push('');
+    lines.push('TOMORROW:');
+    for (const event of tomorrowEvents) {
+      const time = event.start.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
+      const loc = event.location ? ` @ ${event.location}` : '';
+      lines.push(`- ${time}: ${event.title}${loc}`);
+    }
+  }
+
+  return lines.length > 0 ? lines.join('\n') : null;
+}

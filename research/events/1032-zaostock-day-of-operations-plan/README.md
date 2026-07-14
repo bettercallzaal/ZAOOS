@@ -49,6 +49,19 @@ Doors are locked at 12:00pm-6:00pm (per doc 428/the live `/program` page). Every
 
 Total: ~5.5 hours load-in, ~4.5 hours load-out. [FULL - sourced from festival load-in/strike planning guides, cross-checked against this event's specific 12pm-6pm window]
 
+**NEW 2026-07-14 - the "generator" in the timeline above was never actually confirmed as necessary, or sourced:**
+Whether the Franklin Street Parklet has accessible electrical outlets or needs a generator has never been
+directly confirmed - this doc's own timeline above assumed a generator without ever checking. Strong
+indirect evidence it's solvable either way: the City of Ellsworth runs its own weekly Downtown Summer
+Concert Series (Thursdays, July 23-Oct 1, 2026) at this exact parklet with amplified live bands, so the
+power question has already been solved by someone - just not documented publicly. If a generator IS
+needed, **Wallace Events (207-667-6000)** - already ZAOstock's tent/stage vendor per doc 809 - also rents
+generators (15-45kW range), making it a real one-stop-vendor option worth asking about in the same
+conversation as the tent extension, rather than a separate search. Backup if Wallace can't cover it: Prime
+Power Rentals (statewide, specializes in quiet/sound-attenuated generators - relevant for a downtown
+venue). Realistic one-day cost for a mid-size unit: $220-480 all-in (unit + delivery + fuel). [FULL - this
+session's research, cross-referenced against doc 809's existing Wallace Events relationship]
+
 ### 2. Staffing matrix - who's where, when
 
 | Crew | Window | Headcount | Core roles |

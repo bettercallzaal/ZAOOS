@@ -3,6 +3,21 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
+
+// Mock execSync before importing curator
+let mockExecSyncImpl = (cmd: string) => {
+  throw new Error('execSync not mocked');
+};
+
+vi.mock('node:child_process', () => ({
+  execSync: (cmd: string, opts: Record<string, unknown>) => {
+    return mockExecSyncImpl(cmd);
+  },
+}));
+
 import {
   readTopicThreadMap,
   writeTopicThreadMap,
@@ -16,9 +31,6 @@ import {
   type CuratorTickResult,
   runCuratorTick,
 } from '../curator';
-import { promises as fs } from 'node:fs';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
 
 const TEST_ZOE_HOME = join(homedir(), '.zao', 'zoe-test-curator');
 const TEST_TOPIC_MAP_PATH = join(TEST_ZOE_HOME, 'topic_thread_map.json');
@@ -43,6 +55,12 @@ describe('curator', () => {
       // OK
     }
     delete process.env.ZOE_HOME;
+    // Clean up all TG_TOPIC_* env vars
+    delete process.env.TG_TOPIC_NEWSLETTER;
+    delete process.env.TG_TOPIC_GITHUB;
+    delete process.env.TG_TOPIC_ARTIZEN;
+    delete process.env.TG_TOPIC_RECOMMENDATIONS;
+    delete process.env.TG_TOPIC_GENERAL;
   });
 
   describe('readTopicThreadMap / writeTopicThreadMap', () => {
@@ -180,11 +198,45 @@ describe('curator', () => {
   });
 
   describe('generateGithubDigest', () => {
-    it('returns a stub digest with timestamp', async () => {
+    it('returns a digest with timestamp when PRs are found', async () => {
+      // Mock execSync to return sample merged PRs
+      mockExecSyncImpl = (cmd: string) => {
+        if (cmd.includes('bettercallzaal/ZAOOS')) {
+          return JSON.stringify([
+            { number: 100, title: 'docs: research doc 1078' },
+            { number: 99, title: 'fix: bug in curator' },
+          ]);
+        }
+        if (cmd.includes('ZAODEVZ/ZAOcowork')) {
+          return JSON.stringify([{ number: 50, title: 'feat: new feature' }]);
+        }
+        throw new Error('Unexpected command');
+      };
+
       const digest = await generateGithubDigest();
       expect(digest).not.toBeNull();
       expect(digest?.text).toContain("Today's ships");
       expect(digest?.timestamp).toBeDefined();
+      expect(digest?.text).toContain('#100');
+      expect(digest?.text).toContain('#99');
+    });
+
+    it('returns null when no PRs are found', async () => {
+      // Mock execSync to return empty arrays
+      mockExecSyncImpl = () => JSON.stringify([]);
+
+      const digest = await generateGithubDigest();
+      expect(digest).toBeNull();
+    });
+
+    it('gracefully handles gh command failures', async () => {
+      // Mock execSync to throw an error
+      mockExecSyncImpl = () => {
+        throw new Error('gh: not found');
+      };
+
+      const digest = await generateGithubDigest();
+      expect(digest).toBeNull();
     });
   });
 

@@ -24,12 +24,34 @@ export const QUEUE_PREFIX = /^queue:\s*(.+)/is;
 /** Hourly-nudge on/off toggle (both phrasings handled in index.ts). */
 export const NUDGE_TOGGLE_RE = /^(stop|pause|disable|start|resume|enable)\s+(nudges?|tips?)$/i;
 
+/** `/focus` or `/focus on` - enable hyperfocus mode (suppress non-urgent pings). */
+export const FOCUS_ON_RE = /^\/focus(?:\s+on)?$/i;
+
+/** `/focus off` - disable hyperfocus mode, surface queued pings as digest. */
+export const FOCUS_OFF_RE = /^\/focus\s+off$/i;
+
+/** `/checkpoint <note>` - save a checkpoint for this thread. Group 1 is the note. */
+export const CHECKPOINT_PREFIX = /^\/checkpoint\s+(.+)/is;
+
+/** `/audit` - run trust audit (scan for fallen tasks/captures). */
+export const AUDIT_COMMAND_RE = /^\/audit$/i;
+
 /**
- * True if a DM is a recognized ZOE command (plan:/note:/nudge toggle). Such
- * messages must bypass the await-reflection pending capture (doc 770 H1): the
- * evening reflection arms a long-TTL pending, and a `plan:` sent in that window
- * would otherwise be swallowed as the reflection answer and never dispatched.
+ * True if a DM is a recognized ZOE command. Such messages must bypass the
+ * await-reflection pending capture (doc 770 H1): the evening reflection arms
+ * a long-TTL pending, and a `plan:` sent in that window would otherwise be
+ * swallowed as the reflection answer and never dispatched.
  */
 export function isZoeCommand(text: string): boolean {
-  return NUDGE_TOGGLE_RE.test(text.trim()) || NOTE_PREFIX.test(text) || PLAN_PREFIX.test(text) || QUEUE_PREFIX.test(text);
+  const trimmed = text.trim();
+  return (
+    NUDGE_TOGGLE_RE.test(trimmed) ||
+    NOTE_PREFIX.test(trimmed) ||
+    PLAN_PREFIX.test(trimmed) ||
+    QUEUE_PREFIX.test(trimmed) ||
+    FOCUS_ON_RE.test(trimmed) ||
+    FOCUS_OFF_RE.test(trimmed) ||
+    CHECKPOINT_PREFIX.test(trimmed) ||
+    AUDIT_COMMAND_RE.test(trimmed)
+  );
 }

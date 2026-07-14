@@ -20,6 +20,7 @@ import { listOpenTasks } from './tasks';
 import { getOpenTeamTasks, summarizeTeamForBrief, zaalFocusForBrief } from './team-tracker';
 import { fleetConsensus } from './fleet-health';
 import { graphTopicAgeDays } from './recall';
+import { getCalendarEvents, formatEventForBrief } from './calendar';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -32,6 +33,9 @@ Morning brief - {Day} {Mon DD} 5am
 
 TOP PRIORITIES ({P0 count} P0, {P1 count} P1)
 - P0/P1 priority items, one per line. Group by priority.
+
+UPCOMING EVENTS
+- ZAO calendar events for the next week. Skip this section entirely if no upcoming events.
 
 LAST 24H COMMITS
 - List of commit subjects from last 24h. (none) if nothing.
@@ -67,6 +71,7 @@ interface BriefContext {
   focus: string | null;
   fleet: string | null;
   zol: string | null;
+  upcomingEvents: Array<{ title: string; start: string; location?: string }>;
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -234,6 +239,19 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     zol = null;
   }
 
+  // Upcoming calendar events — next 7 days. Best-effort; gracefully degrade.
+  let upcomingEvents: Array<{ title: string; start: string; location?: string }> = [];
+  try {
+    const events = await getCalendarEvents(7); // 7-day lookahead for the brief
+    upcomingEvents = events.map((e) => ({
+      title: e.title,
+      start: e.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      location: e.location,
+    }));
+  } catch {
+    upcomingEvents = [];
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -245,6 +263,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     focus,
     fleet,
     zol,
+    upcomingEvents,
   };
 }
 
@@ -258,10 +277,15 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
       : `INBOX: ${ctx.inbox.unreadCount} unread. Recent subjects: ${ctx.inbox.recentSubjects.join(' | ')}`
     : 'INBOX: (api unavailable - skip the INBOX section)';
 
+  const eventsLine = ctx.upcomingEvents.length === 0
+    ? 'UPCOMING EVENTS: none in the next week'
+    : `UPCOMING EVENTS: ${ctx.upcomingEvents.map((e) => `${e.title} (${e.start}${e.location ? ' @ ' + e.location : ''})`).join(' | ')}`;
+
   const userPrompt = `Generate the morning brief for ${day} ${date}.
 
 CONTEXT:
 - Open tasks: ${JSON.stringify(ctx.open_tasks, null, 2)}
+- Upcoming events (next 7 days): ${eventsLine}
 - Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}

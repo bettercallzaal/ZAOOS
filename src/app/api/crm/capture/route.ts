@@ -277,3 +277,14 @@ export async function OPTIONS(req: NextRequest) {
     },
   });
 }
+
+/**
+ * CRM export is intentionally locked (C-E1). Contact data is private.
+ * GET requests are rejected to prevent data dumps.
+ */
+export async function GET(_req: NextRequest) {
+  return NextResponse.json(
+    { error: 'CRM export is not available - contact data is private' },
+    { status: 405 },
+  );
+}

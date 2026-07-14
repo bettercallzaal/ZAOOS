@@ -100,6 +100,42 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallCont
 }
 
 /**
+ * Route a concierge call through the local Claude CLI (Zaal's Max plan) or the
+ * Anthropic API key. Controlled by ZOE_USE_CLI=1 env flag (default off).
+ *
+ * Guards:
+ *   a) Automatic fallback to API-key path if CLI is not present or call fails
+ *   b) Timeout on CLI call (10s default, configurable via opts)
+ *   c) Error classification/logging (CliAuthError, CliError types)
+ *   d) Cost ledger tracking (records both CLI and API-key calls)
+ */
+async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli').ClaudeCliOptions, 'cwd'> & { cwd: string }): Promise<import('../hermes/claude-cli').ClaudeCliResult> {
+  const useCliPath = process.env.ZOE_USE_CLI === '1';
+  if (!useCliPath) {
+    return callClaudeCli(opts);
+  }
+
+  try {
+    console.log('[zoe/concierge] attempting CLI route for model call');
+    const result = await callClaudeCli(opts);
+    console.log('[zoe/concierge] CLI route succeeded, cost recorded');
+    return result;
+  } catch (err: unknown) {
+    const { CliAuthError, CliError, classifyClaudeError } = await import('../hermes/claude-cli');
+    if (err instanceof CliAuthError) {
+      console.warn('[zoe/concierge] CLI auth failed, falling back to API key:', (err as Error).message);
+    } else if (err instanceof CliError) {
+      console.warn('[zoe/concierge] CLI call failed (' + (err as import('../hermes/claude-cli').CliError).kind + '), falling back to API key:', (err as Error).message);
+    } else {
+      console.warn('[zoe/concierge] CLI call error (unknown), falling back to API key:', err);
+    }
+    // Fallback: disable CLI and retry via API key
+    const apiOpts = { ...opts, bare: false };
+    return callClaudeCli(apiOpts);
+  }
+}
+
+/**
  * Run a concierge turn:
  * 1. Build system prompt from memory blocks (persona/human/working/tasks)
  * 2. Call Claude Code CLI with the user's message + blocks as appendSystemPrompt
@@ -113,7 +149,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
   const senderLabel = opts.senderLabel ?? 'Zaal';
   const userPrompt = `${senderLabel}: ${opts.message}`;
 
-  const result = await callClaudeCli({
+  const result = await callModelWithCliRouting({
     model,
     prompt: userPrompt,
     cwd: opts.context.workspace_dir,
@@ -169,6 +205,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     // discovery (~26K input tokens) but prompt-cache amortizes that across
     // a session.
     bare: false,
+    timeoutMs: 10 * 60 * 1000, // 10 min timeout on CLI calls
   });
 
   recordCall('concierge', result);

@@ -203,3 +203,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * CRM export is intentionally locked (C-E1). Contact data is private.
+ * GET requests are rejected to prevent data dumps. Supabase RLS ensures only
+ * admins can read the raw tables; there is no bulk export path and none will be added.
+ */
+export async function GET(_req: NextRequest) {
+  return NextResponse.json(
+    { error: 'CRM export is not available - contact data is private' },
+    { status: 405 },
+  );
+}

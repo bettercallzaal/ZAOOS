@@ -98,6 +98,7 @@ import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
+import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback } from './questions';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
@@ -862,6 +863,19 @@ bot.on('message:text', async (ctx) => {
   const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
   if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
     const threadId = ctx.message.message_thread_id;
+
+    // THREAD ID LOGGER: when a message arrives in a forum topic, log the topic
+    // name + thread_id so Zaal can discover all topic IDs by just sending a
+    // message in each one. This is how the curator learns the topic mapping.
+    if (threadId && ctx.chat.is_forum) {
+      const topicNameForLog = await topicNameForThread(threadId).catch(() => undefined);
+      if (topicNameForLog) {
+        void logTopicThreadId(topicNameForLog, threadId).catch((e) =>
+          console.warn('[zoe/index] thread_id logging failed (nbd):', (e as Error)?.message),
+        );
+      }
+    }
+
     // Per-topic behavior (topic = intent, Zaal 2026-07-11): dropping a plain
     // message into a topic auto-acts per that topic. Internal actions fire now;
     // outbound casts are drafted with an Approve button (money/public gate).

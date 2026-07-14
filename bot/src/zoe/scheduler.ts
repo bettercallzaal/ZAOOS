@@ -45,6 +45,7 @@ import { reconcileUntaggedTasks } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
+import { runCuratorTick } from './curator';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -203,6 +204,50 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('nightly-recap');
           console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Clean-curator Telegram topic posting — 08:00 UTC daily (one hour before
+  // morning brief). Posts curated digests to the ZAO group forum topics
+  // (newsletter, github, artizen, recommendations, general). Disabled by default
+  // (safe no-op) until all 5 topic thread IDs are configured.
+  tasks.push(
+    cron.schedule(
+      '0 8 * * *',
+      async () => {
+        if (!(await claimFire('curator-tick'))) return;
+        try {
+          const zaoGroupId = Number(process.env.ZAO_GROUP_ID ?? 0);
+          if (!zaoGroupId) {
+            console.log('[zoe/scheduler] curator: ZAO_GROUP_ID not configured, skipping');
+            await releaseFire('curator-tick');
+            return;
+          }
+
+          const result = await runCuratorTick(
+            (chatId, text, sendOpts) => sendOpts?.message_thread_id
+              ? opts.bot.api.sendMessage(chatId, text, { message_thread_id: sendOpts.message_thread_id })
+              : opts.bot.api.sendMessage(chatId, text),
+            zaoGroupId,
+          );
+
+          if (result.posted > 0) {
+            console.log(`[zoe/scheduler] curator: ${result.posted} posted, ${result.skipped} skipped`);
+          } else if (!result.enabled) {
+            await releaseFire('curator-tick');
+            console.log('[zoe/scheduler] curator: disabled (thread_ids not fully set)');
+            return;
+          }
+
+          if (result.errors.length > 0) {
+            console.warn('[zoe/scheduler] curator: errors:', result.errors);
+          }
+        } catch (err) {
+          await releaseFire('curator-tick');
+          console.error('[zoe/scheduler] curator tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

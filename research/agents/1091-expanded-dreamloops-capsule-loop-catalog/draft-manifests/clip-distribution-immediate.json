@@ -1,0 +1,136 @@
+{
+  "name": "clip-distribution-immediate",
+  "version": "1.0.0",
+  "hash": "sha256:draft-clip-1",
+  "description": "Multi-platform publishing on WaveWarZ clip completion via Postiz",
+  "author": "ZAO Assistant / Claude",
+  "created": "2026-07-14",
+  "handlers": [
+    "wavewarz.clip-complete-event",
+    "postiz.upload-video",
+    "postiz.post-to-platforms",
+    "farcaster.read-account",
+    "log.receipt-write"
+  ],
+  "loops": [
+    {
+      "name": "clip-distribute-immediate",
+      "description": "On WaveWarZ clip completion, upload to Postiz and post to all platforms",
+      "entry": "trigger.clip-complete-event",
+      "steps": [
+        "extract-clip-metadata",
+        "validate-video-url",
+        "generate-farcaster-caption",
+        "upload-to-postiz",
+        "post-to-all-platforms",
+        "log-distribution-receipt"
+      ],
+      "terminal": [
+        "posted-all-platforms",
+        "failed-postiz-after-retry",
+        "validation-error"
+      ],
+      "timeout": "120s",
+      "retryPolicy": {
+        "maxRetries": 2,
+        "backoffMs": 30000,
+        "retryableErrors": ["NetworkError", "ServiceUnavailable"]
+      }
+    }
+  ],
+  "permissions": {
+    "wavewarz.clip-complete-event": {
+      "blocked": false,
+      "approval": false,
+      "description": "Subscribe to clip completion events"
+    },
+    "postiz.upload-video": {
+      "blocked": false,
+      "approval": false,
+      "description": "Upload videos to Postiz CDN"
+    },
+    "postiz.post-to-platforms": {
+      "blocked": false,
+      "approval": false,
+      "description": "Post to Farcaster, X, Bluesky, Discord atomically"
+    },
+    "farcaster.read-account": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read ZAO Farcaster account status"
+    },
+    "log.receipt-write": {
+      "blocked": false,
+      "approval": false,
+      "description": "Write immutable receipt logs"
+    },
+    "wallet.sign": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no signing"
+    },
+    "exec.shell": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no shell execution"
+    },
+    "env.read-postiz-secret": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: env vars accessed via host, not Capsule manifest"
+    }
+  },
+  "config": {
+    "postiz": {
+      "apiKeySource": "env.POSTIZ_API_KEY",
+      "baseUrl": "https://api.postiz.com/public/v1",
+      "platforms": [
+        "warpcast",
+        "x",
+        "bluesky",
+        "discord"
+      ],
+      "platformsCanOmit": true,
+      "description": "Postiz API key must be set in host .env; never commit in manifest"
+    },
+    "rateLimits": {
+      "clipsPerDay": 100,
+      "videoUploadsPerDay": 10,
+      "postizPostsPerHour": 90,
+      "description": "Postiz free tier: 90 POST /posts/hour. ZAO ceiling: 100 clips/day"
+    },
+    "validation": {
+      "videoUrlMustBeHttps": true,
+      "videoMaxSizeMB": 500,
+      "captionMaxChars": 300,
+      "captionMustMentionChannel": "/wavewarz"
+    },
+    "fallback": {
+      "description": "If Postiz fails, clip is preserved in WaveWarZ; human posts via Firefly later"
+    }
+  },
+  "state": {
+    "schema": {
+      "clipsDistributed": { "type": "number" },
+      "lastDistributionTime": { "type": "string" },
+      "recentErrors": { "type": "array" },
+      "postizHealthStatus": { "type": "string" }
+    },
+    "ephemeral": ["postizHealthStatus"],
+    "persistent": ["clipsDistributed", "lastDistributionTime", "recentErrors"]
+  },
+  "resourceLimits": {
+    "maxSimultaneousLoops": 1,
+    "maxStateSize": "10MB",
+    "maxLogSize": "100MB",
+    "timeoutMs": 120000
+  },
+  "securityProfile": {
+    "signerAccess": false,
+    "shellExec": false,
+    "fundMovement": false,
+    "environmentVariableExposure": false,
+    "thirdPartySecretStorage": "env.POSTIZ_API_KEY only; never logged or returned in receipts"
+  },
+  "notes": "This Capsule is production-ready pending L1 loop testing on WaveWarZ staging. No secrets in manifest. Postiz authentication is via env var on host."
+}

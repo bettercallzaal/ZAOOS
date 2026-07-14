@@ -1,0 +1,170 @@
+{
+  "name": "community-crm-relationships",
+  "version": "1.0.0",
+  "hash": "sha256:draft-community-crm-1",
+  "description": "Community relationship lifecycle: discovery, engagement, coordination, escalation, nurture",
+  "author": "ZAO Assistant / Claude",
+  "created": "2026-07-14",
+  "handlers": [
+    "circle.member-event-stream",
+    "circle.relationship-status-read",
+    "circle.relationship-status-write",
+    "cowork.fetch-projects",
+    "farcaster.activity-read",
+    "farcaster.dm-send",
+    "log.relationship-events-write"
+  ],
+  "loops": [
+    {
+      "name": "relationship-lifecycle-update",
+      "description": "L6: On member state change, classify stage and send appropriate nurture action",
+      "entry": "trigger.circle-relationship-state-change",
+      "steps": [
+        "log-state-change-event",
+        "read-member-profile",
+        "read-activity-history",
+        "classify-relationship-stage",
+        "propose-nurture-action",
+        "compose-action-message",
+        "determine-approval-gate",
+        "send-action-or-stage",
+        "update-relationship-status",
+        "log-completion"
+      ],
+      "terminal": [
+        "status-updated",
+        "action-sent",
+        "action-staged-for-approval",
+        "no-action-needed",
+        "dm-send-failed"
+      ],
+      "timeout": "30s",
+      "approvalGates": {
+        "bulkDmSend": {
+          "description": "Bulk DM sends (>10 at once) require human approval",
+          "approvalRequired": true,
+          "maxPerBatch": 10
+        }
+      }
+    }
+  ],
+  "permissions": {
+    "circle.member-event-stream": {
+      "blocked": false,
+      "approval": false,
+      "description": "Subscribe to circle membership events"
+    },
+    "circle.relationship-status-read": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read member and relationship data"
+    },
+    "circle.relationship-status-write": {
+      "blocked": false,
+      "approval": false,
+      "description": "Write relationship status and history (immutable log)"
+    },
+    "cowork.fetch-projects": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read project membership and contributions"
+    },
+    "farcaster.activity-read": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read member Farcaster activity (public data)"
+    },
+    "farcaster.dm-send": {
+      "blocked": false,
+      "approval": true,
+      "description": "Send DMs; single DMs auto-send, bulk sends require approval"
+    },
+    "log.relationship-events-write": {
+      "blocked": false,
+      "approval": false,
+      "description": "Write immutable event logs"
+    },
+    "circle.member-remove": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no membership changes without explicit admin action"
+    },
+    "circle.role-grant": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no role assignment (admin-only)"
+    },
+    "wallet.transfer": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no fund movement"
+    }
+  },
+  "config": {
+    "relationshipStages": {
+      "discover": {
+        "criteria": "Joined <7d ago OR <5 casts in community channels",
+        "action": "welcome-dm-and-intro-link"
+      },
+      "engage": {
+        "criteria": ">1 cast/week in community OR viewed >3 projects",
+        "action": "invite-to-next-sync-or-workshop"
+      },
+      "coordinate": {
+        "criteria": "Active in a ZAO project (cowork board)",
+        "action": "surface-related-projects"
+      },
+      "escalate": {
+        "criteria": "Leadership role (mentor, core team, moderator)",
+        "action": "flag-for-zaal-strategic-call"
+      },
+      "nurture": {
+        "criteria": "Was active, now inactive >30d",
+        "action": "gentle-reengagement-dm"
+      }
+    },
+    "rateLimits": {
+      "dmsPerDay": 500,
+      "bulkSendMaxPerBatch": 10,
+      "relationshipUpdatesPerDay": 100,
+      "description": "ZAO has ~188 members; these limits are safe for all use cases"
+    },
+    "dataRetention": {
+      "relationshipHistoryRetention": "indefinite",
+      "description": "Relationship logs are immutable and persisted forever"
+    }
+  },
+  "state": {
+    "schema": {
+      "relationships": {
+        "type": "object",
+        "keyPattern": "[member-id]",
+        "valueSchema": {
+          "stage": "string",
+          "lastActionDate": "string",
+          "lastAction": "string",
+          "history": "array",
+          "flaggedForEscalation": "boolean"
+        }
+      },
+      "memberCount": { "type": "number" },
+      "stageDistribution": { "type": "object" }
+    },
+    "persistent": ["relationships", "memberCount", "stageDistribution"]
+  },
+  "resourceLimits": {
+    "maxSimultaneousLoops": 10,
+    "maxStateSize": "200MB",
+    "maxDmsPerBatch": 10,
+    "timeoutMs": 30000
+  },
+  "securityProfile": {
+    "signerAccess": false,
+    "fundMovement": false,
+    "membershipChanges": false,
+    "roleGrants": false,
+    "piiHandling": "Never log member email, phone, or private data. Only public Farcaster handles and project contributions.",
+    "approvalGatesRequired": ["farcaster.dm-send (bulk >10)"]
+  },
+  "notes": "Loop L6 is bundled here. Relationship status is source of truth only in Capsule state. No external DB writes. Single DMs auto-send (low risk); bulk sends require human approval to prevent spam."
+}

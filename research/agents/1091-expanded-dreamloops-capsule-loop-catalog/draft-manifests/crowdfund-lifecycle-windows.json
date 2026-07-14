@@ -1,0 +1,199 @@
+{
+  "name": "crowdfund-lifecycle-windows",
+  "version": "1.0.0",
+  "hash": "sha256:draft-crowdfund-1",
+  "description": "Crowdfund campaign lifecycle: window-open nudge, 7-day progress check, outcome tracking",
+  "author": "ZAO Assistant / Claude",
+  "created": "2026-07-14",
+  "handlers": [
+    "sparkz.crowdfund-window-opened-event",
+    "sparkz.crowdfund-window-timer-7d",
+    "sparkz.crowdfund-window-closed-timer",
+    "empire-builder.read-leaderboard",
+    "clanker.trade-volume-read",
+    "farcaster.post-cast",
+    "farcaster.send-dm",
+    "empire-builder.activate-booster",
+    "schedule.set-reminder",
+    "log.campaign-state-write"
+  ],
+  "loops": [
+    {
+      "name": "crowdfund-announce-window-open",
+      "description": "L2: On window-open event, announce on Farcaster and activate booster",
+      "entry": "trigger.sparkz-window-opened-event",
+      "steps": [
+        "fetch-campaign-details",
+        "validate-campaign-fields",
+        "compose-announcement-cast",
+        "post-announcement-farcaster",
+        "activate-booster-rules",
+        "set-7d-reminder",
+        "track-initial-buys-24h",
+        "write-campaign-state"
+      ],
+      "terminal": [
+        "window-open-announced",
+        "farcaster-post-failed",
+        "no-human-approval"
+      ],
+      "timeout": "30s",
+      "approvalGates": {
+        "farcasterPost": {
+          "description": "Announcement cast requires human approval before posting",
+          "approvalRequired": true
+        }
+      }
+    },
+    {
+      "name": "crowdfund-nudge-7d-progress",
+      "description": "L3: At 7 days, check progress and nudge if stalled; send buyer thanks",
+      "entry": "trigger.sparkz-7d-timer",
+      "steps": [
+        "fetch-campaign-state",
+        "check-trade-volume",
+        "calculate-progress-percent",
+        "decide-nudge-needed",
+        "compose-nudge-message",
+        "stage-nudge-for-approval",
+        "list-top-50-buyers",
+        "compose-thanks-casts",
+        "send-thanks-auto"
+      ],
+      "terminal": [
+        "nudge-sent-or-on-track",
+        "nudge-rejected-by-human",
+        "thanks-sent"
+      ],
+      "timeout": "60s",
+      "approvalGates": {
+        "nudgeCast": {
+          "description": "Nudge cast (if progress <40%) requires approval",
+          "approvalRequired": true,
+          "riskLevel": "medium"
+        }
+      }
+    },
+    {
+      "name": "crowdfund-finalize-outcome",
+      "description": "L4: On window close, document success/miss outcome and announce",
+      "entry": "trigger.sparkz-window-closed-timer",
+      "steps": [
+        "fetch-final-campaign-state",
+        "query-final-trade-volume",
+        "determine-success-or-miss",
+        "document-outcome",
+        "compose-outcome-announcement",
+        "stage-outcome-announcement",
+        "archive-campaign-state"
+      ],
+      "terminal": [
+        "success-documented",
+        "miss-documented",
+        "outcome-announcement-failed"
+      ],
+      "timeout": "120s",
+      "approvalGates": {
+        "outcomeAnnouncement": {
+          "description": "Outcome cast requires approval",
+          "approvalRequired": true
+        }
+      }
+    }
+  ],
+  "permissions": {
+    "sparkz.crowdfund-events": {
+      "blocked": false,
+      "approval": false,
+      "description": "Subscribe to crowdfund window events"
+    },
+    "clanker.trade-volume-read": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read-only: query trade volume and leaderboard"
+    },
+    "empire-builder.read-leaderboard": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read-only: leaderboard data and booster status"
+    },
+    "empire-builder.activate-booster": {
+      "blocked": false,
+      "approval": false,
+      "description": "Activate booster rules for campaign channel"
+    },
+    "farcaster.post-cast": {
+      "blocked": false,
+      "approval": true,
+      "description": "Post announcement/nudge/outcome casts (approval-gated)"
+    },
+    "farcaster.send-dm": {
+      "blocked": false,
+      "approval": false,
+      "description": "Send thanks DMs (auto-send for gratitude)"
+    },
+    "schedule.set-reminder": {
+      "blocked": false,
+      "approval": false,
+      "description": "Schedule 7-day and window-close timers"
+    },
+    "log.campaign-state-write": {
+      "blocked": false,
+      "approval": false,
+      "description": "Write immutable campaign state"
+    },
+    "wallet.transfer": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no fund movement"
+    },
+    "clanker.launch": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no token launch"
+    },
+    "contract.write": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no on-chain writes"
+    }
+  },
+  "config": {
+    "nudgeThreshold": {
+      "progressPercent": 40,
+      "description": "If progress < 40% at 7d, send nudge"
+    },
+    "rateLimits": {
+      "campaignsPerDay": 50,
+      "nudgesPerDay": 50,
+      "thanksCastsPerDay": 500,
+      "boosterRulesActive": 50
+    },
+    "timing": {
+      "reminderAt7Days": true,
+      "reminderAt1DayBeforeClose": false,
+      "description": "Timers are set by window-open handler"
+    }
+  },
+  "state": {
+    "schema": {
+      "activeCampaigns": { "type": "object" },
+      "campaignHistory": { "type": "array" },
+      "nudgesSent": { "type": "number" },
+      "successfulCampaigns": { "type": "number" }
+    },
+    "persistent": ["activeCampaigns", "campaignHistory", "nudgesSent", "successfulCampaigns"]
+  },
+  "resourceLimits": {
+    "maxSimultaneousCampaigns": 10,
+    "maxStateSize": "50MB",
+    "timeoutMs": 120000
+  },
+  "securityProfile": {
+    "signerAccess": false,
+    "fundMovement": false,
+    "tokenLaunch": false,
+    "approvalGatesRequired": ["farcaster.post-cast"]
+  },
+  "notes": "Loops L2, L3, L4 are bundled here. Each loop is triggered by Sparkz timer events or human gate. No secrets in manifest. Outcome is read-only (queries Clanker, does not reconcile funds)."
+}

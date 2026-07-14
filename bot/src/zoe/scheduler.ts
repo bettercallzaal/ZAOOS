@@ -45,6 +45,7 @@ import { reconcileUntaggedTasks } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
+import { runTaskTeammateAck } from './task-teammate-ack';
 import { runCuratorTick } from './curator';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
@@ -316,6 +317,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
         } catch (err) {
           console.warn('[zoe/scheduler] mention-notify failed (nbd):', (err as Error).message);
+        }
+
+        // When a team member comments on a board task, ZOE posts "noted" + asks
+        // Zaal on Telegram what to reply. The reply-bridge in index.ts posts his
+        // answer back to the task. Best-effort - a no-op when board is unconfigured.
+        try {
+          const sendTg = async (chatId: number, text: string, o?: { replyToMessageId?: number }) => {
+            const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
+            return res.message_id ?? null;
+          };
+          const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId);
+          if (ta.asked > 0) {
+            console.log(`[zoe/scheduler] teammate-ack: asked ${ta.asked}`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] teammate-ack failed (nbd):', (err as Error).message);
         }
 
         // Doc 983 Rec #4: hourly backfill of any task created untagged by a

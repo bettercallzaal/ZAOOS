@@ -1,0 +1,161 @@
+{
+  "name": "newsletter-redistribute-weekly",
+  "version": "1.0.0",
+  "hash": "sha256:draft-newsletter-1",
+  "description": "Detect published newsletter posts, auto-schedule cross-platform reruns via Postiz, track engagement",
+  "author": "ZAO Assistant / Claude",
+  "created": "2026-07-14",
+  "handlers": [
+    "paragraph.rss-webhook",
+    "postiz.upload-text",
+    "postiz.post-to-platforms",
+    "borker.engagement-tracker-read",
+    "farcaster.read-account",
+    "log.redistribution-write"
+  ],
+  "loops": [
+    {
+      "name": "newsletter-redistribute-weekly",
+      "description": "L8: On newsletter published (Paragraph RSS), generate teaser and schedule to all platforms",
+      "entry": "trigger.paragraph-rss-webhook",
+      "steps": [
+        "validate-webhook-signature",
+        "parse-rss-item",
+        "fetch-full-post-content",
+        "extract-title-and-excerpt",
+        "extract-media-urls",
+        "generate-teaser-text",
+        "generate-farcaster-caption",
+        "upload-media-to-postiz",
+        "schedule-to-all-platforms",
+        "set-rerun-timer-7d",
+        "track-initial-views"
+      ],
+      "terminal": [
+        "scheduled-all-platforms",
+        "postiz-upload-failed",
+        "webhook-validation-failed"
+      ],
+      "timeout": "120s",
+      "retryPolicy": {
+        "maxRetries": 1,
+        "backoffMs": 30000
+      }
+    },
+    {
+      "name": "newsletter-engagement-tracker",
+      "description": "Track post engagement over 7 days; propose rerun if engagement is high",
+      "entry": "trigger.daily-1pm",
+      "steps": [
+        "list-recent-reruns",
+        "fetch-engagement-per-post",
+        "calculate-engagement-decay",
+        "decide-rerun-needed",
+        "propose-rerun-cast",
+        "stage-rerun-for-approval"
+      ],
+      "terminal": [
+        "rerun-staged",
+        "no-rerun-needed",
+        "engagement-data-unavailable"
+      ],
+      "timeout": "60s"
+    }
+  ],
+  "permissions": {
+    "paragraph.rss-webhook": {
+      "blocked": false,
+      "approval": false,
+      "description": "Receive webhook from Paragraph RSS on post publish"
+    },
+    "paragraph.fetch-full-post": {
+      "blocked": false,
+      "approval": false,
+      "description": "Fetch full post content from Paragraph API"
+    },
+    "postiz.upload-text": {
+      "blocked": false,
+      "approval": false,
+      "description": "Upload text/teaser to Postiz"
+    },
+    "postiz.post-to-platforms": {
+      "blocked": false,
+      "approval": false,
+      "description": "Schedule posts to Farcaster, X, Bluesky, Discord"
+    },
+    "borker.engagement-tracker-read": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read-only: query engagement metrics from Borker"
+    },
+    "farcaster.read-account": {
+      "blocked": false,
+      "approval": false,
+      "description": "Read ZAO Farcaster account status"
+    },
+    "log.redistribution-write": {
+      "blocked": false,
+      "approval": false,
+      "description": "Write immutable redistribution logs"
+    },
+    "wallet.sign": {
+      "blocked": true,
+      "approval": false,
+      "description": "Blocked: no signing"
+    }
+  },
+  "config": {
+    "postiz": {
+      "apiKeySource": "env.POSTIZ_API_KEY",
+      "platforms": [
+        "warpcast",
+        "x",
+        "bluesky",
+        "discord"
+      ],
+      "description": "Same Postiz integration as clip-distribution"
+    },
+    "teaseGeneration": {
+      "model": "claude-3-haiku",
+      "maxTokens": 150,
+      "temperature": 0.7,
+      "rateLimitPerDay": 5,
+      "costPerGeneration": "~$0.001",
+      "description": "LLM-generated teasers to vary copy; cost-gated at 5/day"
+    },
+    "engagementTracking": {
+      "trackingDays": 7,
+      "rereuUnitThreshold": 0.7,
+      "description": "If engagement is >70% of peak by day 7, propose rerun"
+    },
+    "rateLimits": {
+      "postsPerDay": 50,
+      "teasersPerDay": 5,
+      "rerunnablePosts": 20,
+      "engagementQueriesPerDay": 100
+    }
+  },
+  "state": {
+    "schema": {
+      "publishedPosts": { "type": "array" },
+      "scheduledPostIds": { "type": "array" },
+      "engagementSnapshots": { "type": "object" },
+      "reruns": { "type": "number" }
+    },
+    "ephemeral": ["engagementSnapshots"],
+    "persistent": ["publishedPosts", "scheduledPostIds", "reruns"]
+  },
+  "resourceLimits": {
+    "maxSimultaneousLoops": 2,
+    "maxStateSize": "50MB",
+    "maxDailyTeasers": 5,
+    "timeoutMs": 120000
+  },
+  "securityProfile": {
+    "signerAccess": false,
+    "fundMovement": false,
+    "postizApiKeyNotInManifest": true,
+    "webhookValidation": "Paragraph signature verified before processing"
+  },
+  "notes": "Loops L8 + engagement-tracker are bundled. Teaser generation is LLM-based and cost-gated (5/day). Postiz handles multi-platform scheduling atomically. Engagement tracking is read-only from Borker."
+}

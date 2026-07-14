@@ -117,6 +117,7 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
+import { getPendingReply, clearPendingReply, postZaalReplyToTask } from './task-teammate-ack';
 
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
@@ -833,6 +834,30 @@ bot.on('message:text', async (ctx) => {
 
   const chatType = ctx.chat.type;
   const chatId = ctx.chat.id;
+
+  // Reply-bridge for teammate ack: when Zaal replies to one of our "what should
+  // I reply?" messages, post his answer back to the board task and clear the pending.
+  if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
+    const replyToId = ctx.message.reply_to_message.message_id;
+    try {
+      const pending = await getPendingReply(replyToId);
+      if (pending) {
+        const success = await postZaalReplyToTask(pending, text);
+        if (success) {
+          await clearPendingReply(replyToId);
+          await ctx.reply(`Posted your reply to "${pending.taskTitle}". Done.`);
+          console.log(`[zoe/index] teammate-ack reply-bridge: posted to task ${pending.taskId}`);
+          return; // Exit early - don't process as a normal turn
+        } else {
+          await ctx.reply('Failed to post reply to the task. Check the board API.');
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('[zoe/index] reply-bridge handler failed (nbd):', (err as Error)?.message);
+      // Fall through to normal message handling if the bridge fails
+    }
+  }
 
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {

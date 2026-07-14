@@ -92,7 +92,16 @@ import {
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
-import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
+import {
+  NOTE_PREFIX,
+  PLAN_PREFIX,
+  QUEUE_PREFIX,
+  FOCUS_ON_RE,
+  FOCUS_OFF_RE,
+  CHECKPOINT_PREFIX,
+  AUDIT_COMMAND_RE,
+  isZoeCommand,
+} from './commands';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
@@ -118,6 +127,16 @@ import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
 import { getPendingReply, clearPendingReply, postZaalReplyToTask } from './task-teammate-ack';
+import {
+  isFocusMode,
+  startFocus,
+  endFocus,
+  decideQueueOrSend,
+  buildFocusDigest,
+  queuePing,
+} from './focus-guard';
+import { saveCheckpoint, getCheckpoint, offerCheckpoint } from './session-checkpoint';
+import { runAudit, formatAuditForTelegram } from './trust-audit';
 
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
@@ -1357,6 +1376,46 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       repoDir,
       currentDate: currentDateString(),
     }).catch((e) => console.error('[zoe/index] work-loop kick failed:', (e as Error).message));
+    return;
+  }
+
+  // Hyperfocus guard: `/focus` or `/focus on` enables focus mode.
+  if (FOCUS_ON_RE.test(text.trim())) {
+    await startFocus();
+    await ctx.reply('Focus mode ON. Non-urgent pings will queue until you send /focus off.');
+    return;
+  }
+
+  // Hyperfocus guard: `/focus off` disables focus mode and sends queued digest.
+  if (FOCUS_OFF_RE.test(text.trim())) {
+    const queuedPings = await endFocus();
+    const digest = buildFocusDigest(queuedPings);
+    await ctx.reply('Focus mode OFF.\n\n' + digest);
+    return;
+  }
+
+  // Session checkpoint: `/checkpoint <note>` saves a breadcrumb.
+  const checkpointMatch = CHECKPOINT_PREFIX.exec(text);
+  if (checkpointMatch) {
+    const chatId = ctx.chatId.toString();
+    await saveCheckpoint(chatId, checkpointMatch[1]);
+    await ctx.reply(`Checkpoint saved: "${checkpointMatch[1].slice(0, 60)}${checkpointMatch[1].length > 60 ? '...' : ''}"`);
+    return;
+  }
+
+  // Trust audit: `/audit` scans for fallen tasks/captures.
+  if (AUDIT_COMMAND_RE.test(text.trim())) {
+    const progress = startProgressNarration(ctx, ctx.chatId, { first: 'Running audit...' });
+    try {
+      const report = await runAudit([], Date.now());
+      const formatted = formatAuditForTelegram(report);
+      progress.stop();
+      await sendLongMessage(ctx, formatted);
+    } catch (err) {
+      progress.stop();
+      const msg = err instanceof Error ? err.message : String(err);
+      await ctx.reply(`Audit failed: ${msg.slice(0, 200)}`);
+    }
     return;
   }
 

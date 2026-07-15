@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1094 | [Empire Builder write API + Clanker v5 + Farcaster protocol deep dive](./1094-empire-builder-clanker-farcaster-deep-dive-jul14/) | DISPATCH | Hub: Empire Builder's full 15-endpoint write API catalog (1094a), Clanker v5 status/audit (1094b), Farcaster protocol updates on channels/agent-FIDs/SIWN (1094c) |
 | 002 | [Farcaster Hub API](./002-farcaster-hub-api/) | STANDALONE | Hub monorepo packages and API reference |
 | 017 | [Neynar FID Registration & Managed Signers](./017-neynar-onboarding/) | STANDALONE | How to onboard wallet-only users and post casts on their behalf |
 | 020 | [Followers / Following Feed](./020-followers-following-feed/) | STANDALONE | Best-in-class sortable, filterable followers experience — a genuine Farcaster differentiator |

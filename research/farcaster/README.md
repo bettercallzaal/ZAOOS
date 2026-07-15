@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1095 | [Farcaster Dead, Revival, and Sparkz Timing](./1095-farcaster-dead-revival-sparkz-timing/) | STANDALONE | Farcaster "is dead" cycles (Frames Apr 2024, revenue collapse Sept 2024, social-first failed Oct 2025) vs Clanker/Degen revivals; Sparkz hybrid strategy (Clanker UX + Degen economics), AI-gated launch, Q3 timing, GTM (soft launch Aug 1-7, peak Aug 22). |
 | 1094 | [Empire Builder write API + Clanker v5 + Farcaster protocol deep dive](./1094-empire-builder-clanker-farcaster-deep-dive-jul14/) | DISPATCH | Hub: Empire Builder's full 15-endpoint write API catalog (1094a), Clanker v5 status/audit (1094b), Farcaster protocol updates on channels/agent-FIDs/SIWN (1094c) |
 | 002 | [Farcaster Hub API](./002-farcaster-hub-api/) | STANDALONE | Hub monorepo packages and API reference |
 | 017 | [Neynar FID Registration & Managed Signers](./017-neynar-onboarding/) | STANDALONE | How to onboard wallet-only users and post casts on their behalf |

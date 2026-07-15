@@ -118,6 +118,7 @@ import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
 import { touchLastSeen } from './events';
+import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 import {
   fetchPending,
   removeFromQueue,
@@ -287,6 +288,12 @@ const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 const bot = new Bot(token);
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
+
+// Telegram routing: construct deps for sendToZaal (DM vs group routing).
+// This centralizes where messages go based on kind (question vs status).
+const routingDeps = constructRoutingDeps((chatId: number, text: string, opts?: any) =>
+  bot.api.sendMessage(chatId, text, opts),
+);
 
 // Cowork control-plane (Phase 1 Observe): live detail surfaced to the board.
 const COWORK_BOOT_TS = Date.now();
@@ -979,7 +986,7 @@ bot.on('message:text', async (ctx) => {
         .catch(() => {});
       // Kick the work-loop now so it starts immediately (else waits for the 2h cron).
       void runWorkTick({
-        sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+        sendToZaal: (t: string) => sendToZaalRouted(routingDeps, t, { kind: 'status' }),
         sendToChat: (cid: number, tid: number | undefined, t: string) =>
           bot.api.sendMessage(cid, t, tid ? { message_thread_id: tid } : {}),
         defaultResearchTarget: researchTopicTarget(),
@@ -1370,7 +1377,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". On it now.`)
       .catch(() => {});
     void runWorkTick({
-      sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+      sendToZaal: (t: string) => sendToZaalRouted(routingDeps, t, { kind: 'status' }),
       sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
         bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
       defaultResearchTarget: researchTopicTarget(),
@@ -2284,7 +2291,7 @@ async function main(): Promise<void> {
     console.error('[zoe/index] getMe failed:', (err as Error).message);
   }
 
-  startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId });
+  startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });
 
   // Caster (doc 761, Phase 2). Approval callback always attached; the event-stream subscriber
   // only starts when a node gRPC is configured. Single-agent persona via CASTER_PERSONA.

@@ -66,6 +66,8 @@ export interface PendingReply {
   commentId: string;
   taskTitle: string;
   createdAt: string;
+  originalAskerId?: string;
+  originalAskerName?: string;
 }
 
 export type SendTgFn = (chatId: number, text: string, opts?: { replyToMessageId?: number }) => Promise<number | null>;
@@ -201,15 +203,21 @@ async function fetchCandidateTasks(fetchImpl: typeof fetch): Promise<BoardTask[]
 }
 
 /** Append a "noted" ack to the task's metadata.comments. */
-async function postNotedAck(task: BoardTask, fetchImpl: typeof fetch): Promise<boolean> {
+async function postNotedAck(
+  task: BoardTask,
+  comment: BoardComment,
+  fetchImpl: typeof fetch,
+): Promise<boolean> {
   const base = process.env.COWORK_TRACKER_URL;
   const key = process.env.COWORK_TRACKER_KEY;
   if (!base || !key) return false;
+  const taskLabel = task.legacy_id ? `#${task.legacy_id}` : task.id;
+  const snippet = comment.content.replace(/\s+/g, ' ').trim().slice(0, 60);
   const ack: BoardComment = {
     id: `zoe-ack-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     userId: ZOE_USER_ID,
     displayName: ZOE_DISPLAY,
-    content: 'Noted - looping Zaal in.',
+    content: `Noted on ${taskLabel} - flagged to Zaal: "${snippet}". He will reply here.`,
     createdAt: new Date().toISOString(),
   };
   const metadata = { ...(task.metadata ?? {}) };
@@ -277,7 +285,7 @@ export async function runTaskTeammateAck(
     const comment = pend.comment;
 
     // Post the "noted" ack to the task.
-    const ackPosted = await postNotedAck(task, fetchImpl);
+    const ackPosted = await postNotedAck(task, comment, fetchImpl);
     if (!ackPosted) {
       console.warn('[zoe/teammate-ack] ack post failed, skipping telegram ask for', task.id);
       continue;
@@ -300,6 +308,8 @@ export async function runTaskTeammateAck(
         commentId: comment.id,
         taskTitle: task.title,
         createdAt: new Date().toISOString(),
+        originalAskerId: comment.userId,
+        originalAskerName: comment.displayName,
       };
       try {
         await writePendingReply(pending_);
@@ -308,6 +318,13 @@ export async function runTaskTeammateAck(
       } catch (err) {
         console.warn('[zoe/teammate-ack] failed to store pending reply (nbd):', (err as Error).message);
       }
+    } else {
+      // Log the TG send failure clearly (P3 reliability)
+      console.error(
+        '[zoe/teammate-ack] telegram send failed for',
+        task.id,
+        '- will retry next cycle',
+      );
     }
   }
 
@@ -359,11 +376,15 @@ export async function postZaalReplyToTask(
   if (!task) return false;
 
   // Append Zaal's reply as a comment (attributed to Zaal, not ZOE).
+  // Prefix with @mention of the original asker so they get notified.
+  const askerHandle = pending.originalAskerId ? `@${pending.originalAskerId}` : '';
+  const contentWithMention = askerHandle ? `${askerHandle} ${replyText.trim()}` : replyText.trim();
+
   const reply: BoardComment = {
     id: `zaal-reply-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     userId: 'zaal',
     displayName: 'Zaal',
-    content: replyText.trim(),
+    content: contentWithMention,
     createdAt: new Date().toISOString(),
   };
   const metadata = { ...(task.metadata ?? {}) };

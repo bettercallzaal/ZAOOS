@@ -1,23 +1,19 @@
 /**
  * task-teammate-ack.ts - when a team member (e.g. Iman) comments on a cowork
- * task, ZOE posts a brief "noted" acknowledgment AND pings Zaal on Telegram
- * asking what to reply. When Zaal replies to that TG message, his reply gets
- * posted back to the task comment thread.
+ * task, ZOE acknowledges and pings Zaal on Telegram.
  *
- * This bridges the cowork board into Zaal's Telegram workflow: teammates see
- * their comments acknowledged, Zaal gets pulled into the loop, and his reply
+ * Two flows (controlled by ZOE_DRAFT_ANSWERS flag, default OFF):
+ *
+ * 1. Draft-first (flag ON): ZOE drafts a proposed answer using Claude and asks
+ *    Zaal to approve, edit, or skip. Only posts to the task on Zaal's approval.
+ *    Approve -> post draft as Zaal. Edit -> await Zaal's version. Skip -> post ack.
+ *
+ * 2. Ask-first (flag OFF, legacy): ZOE posts "Noted" and asks Zaal "What should
+ *    I reply?" His TG reply gets posted back to the task as-is.
+ *
+ * Both routes bridge the cowork board into Zaal's Telegram workflow: teammates
+ * see their comments acknowledged, Zaal gets pulled into the loop, and the result
  * lands back on the board.
- *
- * Flow each tick:
- *   1. Fetch recent non-archived tasks with comments.
- *   2. Find new comments from team members (not @zoe, not from Zaal, not from ZOE).
- *   3. Post a brief "noted" acknowledgment as ZOE.
- *   4. Send Zaal a Telegram message with task/comment details, asking what to reply.
- *   5. Store the mapping: TG message_id -> (task_id, comment_id) for the reply bridge.
- *
- * The reply bridge is wired in index.ts: when Zaal replies to one of these asks,
- * the handler checks if it's a reply_to_message_id in our pending map, then
- * posts Zaal's reply back to the task.
  *
  * Config: reuses COWORK_TRACKER_URL + COWORK_TRACKER_KEY; the key needs PATCH
  * access to public.tasks. Team members are read from TEAM_MEMBER_IDS env var
@@ -29,10 +25,13 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { callClaudeCli } from '../hermes/claude-cli';
+import { ZOE_DEFAULT_MODEL } from './types';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const SEEN_PATH = join(ZOE_HOME, 'teammate_ack_seen.jsonl');
 const PENDING_REPLIES_PATH = join(ZOE_HOME, 'teammate_ack_pending.jsonl');
+const PENDING_DRAFTS_PATH = join(ZOE_HOME, 'teammate_ack_drafts.jsonl');
 const CANDIDATE_LIMIT = 200;
 const MAX_ACKS_PER_TICK = 10;
 
@@ -65,6 +64,18 @@ export interface PendingReply {
   taskId: string;
   commentId: string;
   taskTitle: string;
+  createdAt: string;
+}
+
+/** Pending draft answer awaiting Zaal's approval/edit/skip. */
+export interface PendingDraftAnswer {
+  messageId: number;
+  taskId: string;
+  commentId: string;
+  commentText: string;
+  taskTitle: string;
+  askerName: string;
+  draftAnswer: string;
   createdAt: string;
 }
 
@@ -145,6 +156,93 @@ async function removePendingReply(messageId: number): Promise<void> {
   // Rewrite the whole file with remaining entries.
   const lines = Array.from(map.values()).map((p) => JSON.stringify(p));
   await fs.writeFile(PENDING_REPLIES_PATH, lines.length > 0 ? lines.join('\n') + '\n' : '', 'utf8');
+}
+
+async function readPendingDrafts(): Promise<Map<number, PendingDraftAnswer>> {
+  const map = new Map<number, PendingDraftAnswer>();
+  try {
+    const raw = await fs.readFile(PENDING_DRAFTS_PATH, 'utf8');
+    for (const line of raw.trim().split('\n').filter(Boolean)) {
+      try {
+        const entry = JSON.parse(line) as PendingDraftAnswer;
+        map.set(entry.messageId, entry);
+      } catch {
+        // Skip malformed lines.
+      }
+    }
+  } catch {
+    // File doesn't exist yet.
+  }
+  return map;
+}
+
+async function writePendingDraft(pending: PendingDraftAnswer): Promise<void> {
+  await fs.mkdir(ZOE_HOME, { recursive: true });
+  await fs.appendFile(PENDING_DRAFTS_PATH, JSON.stringify(pending) + '\n', 'utf8');
+}
+
+async function removePendingDraft(messageId: number): Promise<void> {
+  const map = await readPendingDrafts();
+  map.delete(messageId);
+  await fs.mkdir(ZOE_HOME, { recursive: true });
+  // Rewrite the whole file with remaining entries.
+  const lines = Array.from(map.values()).map((p) => JSON.stringify(p));
+  await fs.writeFile(PENDING_DRAFTS_PATH, lines.length > 0 ? lines.join('\n') + '\n' : '', 'utf8');
+}
+
+/** Helper to gather task context for drafting. */
+function buildTaskContext(task: BoardTask): string {
+  const lines: string[] = [];
+  lines.push(`Task: "${task.title}"`);
+  if (task.legacy_id) lines.push(`ID: #${task.legacy_id}`);
+  if (task.notes) lines.push(`Notes: ${task.notes}`);
+  const comments = Array.isArray(task.metadata?.comments) ? (task.metadata.comments as BoardComment[]) : [];
+  if (comments.length > 0) {
+    lines.push('Recent comments:');
+    const recent = comments.slice(-5); // Last 5 comments for context
+    for (const c of recent) {
+      const who = c.displayName || c.userId || 'Unknown';
+      const text = c.content.replace(/\s+/g, ' ').trim().slice(0, 150);
+      lines.push(`  - ${who}: ${text}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+/** Draft a proposed answer to a team member's question. Best-effort; returns empty string on failure. */
+async function draftAnswerForQuestion(task: BoardTask, question: string, workspace_dir: string): Promise<string> {
+  try {
+    const context = buildTaskContext(task);
+    const systemPrompt = `You are ZOE, a cowork assistant. Your job is to draft concise, helpful answers to team member questions about tasks.
+
+Keep responses short (2-3 sentences max, under 150 chars). Ground answers ONLY in the task context provided - if you don't have enough info, say "need more context from Zaal" rather than inventing details.
+
+Respond as if Zaal would: direct, practical, no fluff.`;
+
+    const prompt = `Task context:
+${context}
+
+Team member's question: "${question}"
+
+Draft a brief answer (as Zaal would respond). Keep it short and grounded in the context above.`;
+
+    const result = await callClaudeCli({
+      model: ZOE_DEFAULT_MODEL,
+      prompt,
+      cwd: workspace_dir,
+      appendSystemPrompt: systemPrompt,
+      allowedTools: [],
+      disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task', 'Agent'],
+      permissionMode: 'default',
+      outputFormat: 'text',
+      timeoutMs: 15 * 1000, // 15 sec timeout
+    });
+
+    return result.text.trim();
+  } catch (err) {
+    console.warn('[zoe/teammate-ack] draft answer failed (nbd):', (err as Error).message);
+    return '';
+  }
 }
 
 export interface TeamCommentPending {
@@ -246,6 +344,16 @@ function buildTeammateAskMessage(pending: TeamCommentPending): string {
   );
 }
 
+function buildDraftApprovalMessage(draft: PendingDraftAnswer): string {
+  const taskLink = `thezao.xyz/board?task=draft_${draft.taskId}`;
+  return (
+    `[${draft.askerName}] on "${draft.taskTitle}":\n"${draft.commentText.replace(/\s+/g, ' ').trim().slice(0, 100)}"\n\n` +
+    `DRAFT ANSWER:\n"${draft.draftAnswer}"\n\n` +
+    `Reply 1: APPROVE | 2: EDIT | 3: SKIP\n\n` +
+    `Task: ${taskLink}`
+  );
+}
+
 export interface TeammateAckResult {
   asked: number;
   scanned: number;
@@ -262,6 +370,7 @@ export async function runTaskTeammateAck(
   sendTg: SendTgFn,
   zaalChatId: number,
   fetchImpl: typeof fetch = fetch,
+  workspaceDir: string = process.cwd(),
 ): Promise<TeammateAckResult> {
   if (!boardConfigured()) return { asked: 0, scanned: 0 };
   const teamMembers = getTeamMembers();
@@ -271,11 +380,64 @@ export async function runTaskTeammateAck(
 
   const done: string[] = [];
   let asked = 0;
+  const draftAnswersEnabled = process.env.ZOE_DRAFT_ANSWERS === '1';
 
   for (const pend of pending) {
     const task = pend.task;
     const comment = pend.comment;
 
+    if (draftAnswersEnabled) {
+      // Draft-first flow: draft answer, ask Zaal for approval
+      const askerName = comment.displayName || comment.userId || 'Someone';
+      const draft = await draftAnswerForQuestion(task, comment.content, workspaceDir);
+
+      if (!draft) {
+        // Draft failed; fall back to ask-first flow
+        console.warn('[zoe/teammate-ack] draft failed for', task.id, 'falling back to ask-first');
+        // Continue to ask-first flow below
+      } else {
+        // Post acknowledgment to the task
+        const ackPosted = await postNotedAck(task, fetchImpl);
+        if (!ackPosted) {
+          console.warn('[zoe/teammate-ack] ack post failed, skipping telegram ask for', task.id);
+          continue;
+        }
+
+        // Send Zaal the draft for approval
+        const draftPending: PendingDraftAnswer = {
+          messageId: 0, // Will be set after sending
+          taskId: task.id,
+          commentId: comment.id,
+          commentText: comment.content,
+          taskTitle: task.title,
+          askerName,
+          draftAnswer: draft,
+          createdAt: new Date().toISOString(),
+        };
+
+        const message = buildDraftApprovalMessage(draftPending);
+        let messageId: number | null = null;
+        try {
+          messageId = await sendTg(zaalChatId, message);
+        } catch (err) {
+          console.warn('[zoe/teammate-ack] draft telegram send failed (nbd):', (err as Error).message);
+        }
+
+        if (messageId !== null) {
+          draftPending.messageId = messageId;
+          try {
+            await writePendingDraft(draftPending);
+            asked++;
+            done.push(seenKey(task.id, comment.id));
+          } catch (err) {
+            console.warn('[zoe/teammate-ack] failed to store pending draft (nbd):', (err as Error).message);
+          }
+        }
+        continue; // Don't fall through to ask-first for this comment
+      }
+    }
+
+    // Ask-first flow (legacy or fallback from draft)
     // Post the "noted" ack to the task.
     const ackPosted = await postNotedAck(task, fetchImpl);
     if (!ackPosted) {
@@ -385,6 +547,76 @@ export async function postZaalReplyToTask(
     return res.ok;
   } catch (err) {
     console.warn('[zoe/teammate-ack] post zaal reply failed (nbd):', (err as Error).message);
+    return false;
+  }
+}
+
+/** For index.ts reply-bridge handler: get the pending draft answer. */
+export async function getPendingDraft(messageId: number): Promise<PendingDraftAnswer | null> {
+  const map = await readPendingDrafts();
+  return map.get(messageId) ?? null;
+}
+
+/** For index.ts reply-bridge handler: remove draft after posting. */
+export async function clearPendingDraft(messageId: number): Promise<void> {
+  await removePendingDraft(messageId);
+}
+
+/** For index.ts reply-bridge handler: post approved/edited draft to the task. */
+export async function postDraftAnswerToTask(
+  draft: PendingDraftAnswer,
+  answerText: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<boolean> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key) return false;
+
+  const SELECT_FOR_REPLY = 'select=id,legacy_id,title,notes,status,metadata';
+  const url = `${base.replace(/\/$/, '')}/rest/v1/tasks?id=eq.${draft.taskId}&${SELECT_FOR_REPLY}&limit=1`;
+  let task: BoardTask | null = null;
+  try {
+    const res = await fetchImpl(url, {
+      headers: trackerHeaders(key),
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store',
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as BoardTask[];
+    task = Array.isArray(data) && data[0] ? data[0] : null;
+  } catch {
+    return false;
+  }
+
+  if (!task) return false;
+
+  // Append the answer as a comment attributed to Zaal.
+  const reply: BoardComment = {
+    id: `zaal-reply-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    userId: 'zaal',
+    displayName: 'Zaal',
+    content: answerText.trim(),
+    createdAt: new Date().toISOString(),
+  };
+  const metadata = { ...(task.metadata ?? {}) };
+  const existing = Array.isArray(metadata.comments) ? (metadata.comments as BoardComment[]) : [];
+  metadata.comments = [...existing, reply];
+
+  const patchUrl = `${base.replace(/\/$/, '')}/rest/v1/tasks?id=eq.${task.id}`;
+  try {
+    const res = await fetchImpl(patchUrl, {
+      method: 'PATCH',
+      headers: {
+        ...trackerHeaders(key),
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({ metadata }),
+      signal: AbortSignal.timeout(8000),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('[zoe/teammate-ack] post draft answer failed (nbd):', (err as Error).message);
     return false;
   }
 }

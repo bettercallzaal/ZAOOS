@@ -328,7 +328,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
             return res.message_id ?? null;
           };
-          const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId);
+          const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId, fetch, opts.repoDir);
           if (ta.asked > 0) {
             console.log(`[zoe/scheduler] teammate-ack: asked ${ta.asked}`);
           }

@@ -9,14 +9,15 @@
  *
  * Usage: npx tsx scripts/live-clipper/detect-candidates.ts <recorded-file>
  */
-import { execFile } from "node:child_process";
-import { readFile } from "node:fs/promises";
-import { promisify } from "node:util";
+import { execFile } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
 const TRANSCRIBE_SH =
-  process.env.ZAO_TRANSCRIBE_SH ?? "/Users/zaalpanthaki/.claude/skills/meeting/scripts/transcribe.sh";
+  process.env.ZAO_TRANSCRIBE_SH ??
+  '/Users/zaalpanthaki/.claude/skills/meeting/scripts/transcribe.sh';
 
 export interface TranscriptSegment {
   start: number;
@@ -36,41 +37,44 @@ export interface ClipCandidate {
 // streams score on hook/energy language, not chat velocity (doc 992: chat is
 // too sparse on ZAO streams to be a reliable trigger).
 export const ENERGY_KEYWORDS = [
-  "insane",
-  "crazy",
-  "wow",
-  "amazing",
-  "no way",
-  "huge",
-  "unbelievable",
-  "secret",
-  "never",
-  "worst",
-  "best",
-  "biggest",
+  'insane',
+  'crazy',
+  'wow',
+  'amazing',
+  'no way',
+  'huge',
+  'unbelievable',
+  'secret',
+  'never',
+  'worst',
+  'best',
+  'biggest',
   "let's go",
-  "wtf",
-  "literally",
-  "game changer",
+  'wtf',
+  'literally',
+  'game changer',
   "here's why",
-  "did you know",
-  "the reason",
+  'did you know',
+  'the reason',
 ];
 
 function lastNonEmptyLine(stdout: string): string {
-  const lines = stdout.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = stdout
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   const last = lines.at(-1);
-  if (!last) throw new Error("transcribe.sh produced no output path");
+  if (!last) throw new Error('transcribe.sh produced no output path');
   return last;
 }
 
 export async function transcribe(mediaPath: string): Promise<TranscriptSegment[]> {
-  const { stdout } = await execFileAsync("bash", [TRANSCRIBE_SH, mediaPath], {
+  const { stdout } = await execFileAsync('bash', [TRANSCRIBE_SH, mediaPath], {
     maxBuffer: 1024 * 1024 * 16,
   });
   const txtPath = lastNonEmptyLine(stdout);
-  const jsonPath = txtPath.replace(/\.txt$/, ".json");
-  const raw = JSON.parse(await readFile(jsonPath, "utf-8")) as {
+  const jsonPath = txtPath.replace(/\.txt$/, '.json');
+  const raw = JSON.parse(await readFile(jsonPath, 'utf-8')) as {
     segments: Array<{ start: number; end: number; text: string }>;
   };
   return raw.segments.map((s) => ({ start: s.start, end: s.end, text: s.text.trim() }));
@@ -81,7 +85,10 @@ function matchedKeywords(text: string, keywords: string[]): string[] {
   return keywords.filter((k) => lower.includes(k.toLowerCase()));
 }
 
-function scoreSegment(segment: TranscriptSegment, keywords: string[]): { score: number; hits: string[] } {
+function scoreSegment(
+  segment: TranscriptSegment,
+  keywords: string[],
+): { score: number; hits: string[] } {
   const hits = matchedKeywords(segment.text, keywords);
   let score = hits.length * 2;
   if (/\d+%|\$\d+/.test(segment.text)) score += 1;
@@ -140,8 +147,9 @@ export function detectCandidates(
       start,
       end,
       score,
-      reason: hits.length > 0 ? `keywords: ${[...new Set(hits)].join(", ")}` : "punctuation/stat cue",
-      text: texts.join(" ").trim(),
+      reason:
+        hits.length > 0 ? `keywords: ${[...new Set(hits)].join(', ')}` : 'punctuation/stat cue',
+      text: texts.join(' ').trim(),
     });
   }
 
@@ -161,12 +169,16 @@ export function detectCandidates(
 async function main() {
   const mediaPath = process.argv[2];
   if (!mediaPath) {
-    console.error("usage: npx tsx scripts/live-clipper/detect-candidates.ts <recorded-stream-file>");
+    console.error(
+      'usage: npx tsx scripts/live-clipper/detect-candidates.ts <recorded-stream-file>',
+    );
     process.exit(1);
   }
   const segments = await transcribe(mediaPath);
   const candidates = detectCandidates(segments);
-  process.stdout.write(JSON.stringify({ mediaPath, segmentCount: segments.length, candidates }, null, 2) + "\n");
+  process.stdout.write(
+    JSON.stringify({ mediaPath, segmentCount: segments.length, candidates }, null, 2) + '\n',
+  );
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

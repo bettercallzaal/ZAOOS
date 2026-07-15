@@ -12,6 +12,14 @@ tier: DEEP
 
 > **Goal:** One place to review Sparkz. Consolidates the brainstorm decisions, the timing read (doc 1095), the design (doc 1096), and the competitive landscape (doc 1097), with errors corrected and every big number flagged for verification. Read this instead of the four scattered docs.
 
+## THE BET (defined 2026-07-15)
+
+WIN (90 days): 10 creators launch through Sparkz - making some money, crowdfunding, getting distribution, growing. The 50/50 PROCEEDS rule: each creator splits their earnings 50% back INTO the project (forced reinvestment = durability) and 50% to themselves. (Distinct from the token SUPPLY allocation in the tokenomics doc.)
+
+KILL (90 days): stop or hard-pivot if - zero coins survived AND nobody would be sad if Sparkz vanished AND even Zaal's own dogfood coin got no traction after he pushed it.
+
+SUSTAINABILITY RISK (doc 1100 white-space): the max-artist-profit + social-capital corner is EMPTY because it is a proven trap - Ampled + Nina Protocol died in it (near-zero extraction = near-zero revenue). Bandcamp survives at 15-18%, not 1%. ZAO is at the EDGE (1% + Respect + patronage, not VC). MUST prove 1% + patronage funds ops 2+ years BEFORE launch, and tie OREC governance to value.
+
 ## Key Decisions (locked in the 2026-07-14 brainstorm)
 
 | Decision | Value |

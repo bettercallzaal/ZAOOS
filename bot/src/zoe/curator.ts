@@ -216,6 +216,10 @@ export async function generateGithubDigest(): Promise<{ text: string; timestamp:
     for (const pr of topPrs) {
       const repoLabel = pr.repository?.includes('ZAOcowork') ? '[ZAOcowork]' : '';
       digestText += `\n#${pr.number}: ${pr.title}${repoLabel ? ` ${repoLabel}` : ''}`;
+    let digestText = `Today's ships (${dateStr}):
+Merged PRs across ZAO repos:`;
+      digestText += `
+#${pr.number}: ${pr.title}${repoLabel ? ` ${repoLabel}` : ''}`;
     }
 
     // Add a closing note summarizing what shipped (keeps it high-signal, not spammy)
@@ -241,6 +245,9 @@ export async function generateGithubDigest(): Promise<{ text: string; timestamp:
 
     if (categorySummary) {
       digestText += `\n\nToday: ${categorySummary} across the ecosystem.`;
+      digestText += `
+
+Today: ${categorySummary} across the ecosystem.`;
     }
 
     return {
@@ -263,7 +270,8 @@ export async function generateGithubDigest(): Promise<{ text: string; timestamp:
  */
 export function generateNewsletterPost(issueUrl: string, frameText: string): { text: string } {
   return {
-    text: `Daily newsletter published: ${issueUrl}\n${frameText}`,
+    text: `Daily newsletter published: ${issueUrl}
+${frameText}`,
   };
 }
 

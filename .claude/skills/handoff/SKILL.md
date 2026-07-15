@@ -117,6 +117,9 @@ Output path rule:
 ## Phase 1 - Gather state (mechanical, runs scripts)
 
 ### 1a. Git state
+**SKIP this step if Phase 0 detected `no-repo`** - there is no git state to
+gather, and `handoff-build.sh git` will hard-exit with an error outside a git
+repo. Leave the bundle's git-state fields blank/omitted for a no-repo session.
 ```bash
 bash ${CLAUDE_SKILL_DIR}/scripts/handoff-build.sh git
 ```

@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1087 | [Restream setup + web3-musician strategy jam](./1087-restream-strategy-jam-jul14/) | STANDALONE | Recap of the 2026-07-14 Restream + strategy call (Zaal, Dcoop, Sam): Restream setup, ZAO Festivals tour shirt, the web3-musician workflow vision, Sam musician decision tree. Confidential detail + raw transcript kept private. |
 | 1064 | [Iman Sync: ZaoZone refocus + board cleanup](./1064-iman-sync-zaozone-focus-2026-07-13/) | STANDALONE | Iman refocused to owning the ZAO Zone as the co-working front-end; board cleanup of auto-assigned tasks. |
 | 201 | [AI, Creator Economy & Web3 Landscape (March 2026)](./201-ai-creator-economy-landscape-march-2026/) | STANDALONE | 11 external signals — AI art DAOs, Suno 5.5, creator credentialing, NVIDIA agent tooling, AI filmmaking, Ethereum infra |
 | 207 | [ZAO VPS Agent Stack Session Log](./207-zao-vps-agent-stack-session-log/) | EVENT/LOG | Everything deployed on the ZAO VPS, how systems connect, roadmap to community-managed agent infra |

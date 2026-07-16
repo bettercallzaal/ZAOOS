@@ -39,8 +39,11 @@ PENDING DECISIONS
 CALENDAR
 - Today and Tomorrow events. Skip entire section if no events in next 2 days.
 
+WAITING-ON-YOU
+- Tasks that are blocked on Zaal's decision/action. Highest interrupt priority. One per line, sorted by due date. Skip entirely if none.
+
 TOP PRIORITIES ({P0 count} P0, {P1 count} P1)
-- P0/P1 priority items, one per line. Group by priority.
+- P0/P1 priority items ranked by urgency×importance×deadline. One per line. Group by priority.
 
 LAST 24H COMMITS
 - List of commit subjects from last 24h. (none) if nothing.

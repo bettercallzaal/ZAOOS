@@ -31,13 +31,36 @@ const miniAppEmbed = JSON.stringify({
   },
 });
 
+const SITE_DESCRIPTION =
+  'The ZAO on Farcaster — a decentralized music community on Base with channel chat, encrypted XMTP DMs, shared listening, on-chain governance, reputation, and ZABAL tokens.';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://zaoos.com'),
-  title: 'ZAO OS',
-  description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
+  title: { default: 'ZAO OS', template: '%s · ZAO OS' },
+  description: SITE_DESCRIPTION,
+  applicationName: 'ZAO OS',
+  authors: [{ name: 'The ZAO', url: 'https://thezao.xyz' }],
+  creator: 'The ZAO',
+  publisher: 'The ZAO',
+  category: 'social',
+  keywords: [
+    'The ZAO',
+    'ZAO OS',
+    'Farcaster',
+    'Base chain',
+    'decentralized music',
+    'music community',
+    'music DAO',
+    'XMTP',
+    'ZABAL token',
+    'onchain governance',
+    'Farcaster mini app',
+    'Web3 community',
+  ],
+  alternates: { canonical: '/' },
   openGraph: {
     title: 'ZAO OS',
-    description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
+    description: SITE_DESCRIPTION,
     url: 'https://zaoos.com',
     siteName: 'ZAO OS',
     type: 'website',
@@ -45,7 +68,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'ZAO OS',
-    description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
+    description: SITE_DESCRIPTION,
   },
   other: {
     'fc:miniapp': miniAppEmbed,

@@ -669,6 +669,9 @@ bot.on('message_reaction', async (ctx) => {
           console.error('[zoe/index] getTaskForMessage failed:', err);
           return null;
         }
+        // TODO: if you track message ID -> task ID mappings, look it up here
+        // For now, return null (reactions won't mark tasks done without this mapping)
+        return null;
       },
       ping: async (queueName, reason) => {
         console.log(`[zoe/tg-interactions] reaction ping: ${queueName} - ${reason}`);

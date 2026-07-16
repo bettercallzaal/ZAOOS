@@ -14,6 +14,8 @@ useicm.com to mint each box. Cousin of our GEO / llms.txt work (own the AI answe
 | `thezao.llm.txt` | thezao | The ZAO impact network - canonical framing, Respect/Fractal, lanes |
 | `zabalgamez.llm.txt` | zabalgamez | ZABAL Games 3-month build-a-thon - arc, how to enter |
 | `wavewarz.llm.txt` | wavewarz | WaveWarZ live-traded music battles |
+| `fractal.llm.txt` | fractal | ZAO Fractal - the weekly Respect Game, OREC/ORDAO, OG+ZOR on Optimism |
+| `zao-assistant.llm.txt` | zao-assistant | The operator layer - links to every other box |
 
 ## Rules for these boxes
 - ZAO = ZTalent Artist Organization (the acronym / etymology). Describe what it IS as a

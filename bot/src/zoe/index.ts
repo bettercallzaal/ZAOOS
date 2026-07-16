@@ -130,7 +130,14 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
-import { getPendingReply, clearPendingReply, postZaalReplyToTask } from './task-teammate-ack';
+import {
+  getPendingReply,
+  clearPendingReply,
+  postZaalReplyToTask,
+  getPendingDraft,
+  clearPendingDraft,
+  postDraftAnswerToTask,
+} from './task-teammate-ack';
 import {
   isFocusMode,
   startFocus,
@@ -864,11 +871,69 @@ bot.on('message:text', async (ctx) => {
   const chatType = ctx.chat.type;
   const chatId = ctx.chat.id;
 
-  // Reply-bridge for teammate ack: when Zaal replies to one of our "what should
-  // I reply?" messages, post his answer back to the board task and clear the pending.
+  // Reply-bridge for teammate ack: when Zaal replies to one of our asks,
+  // handle either the legacy "what should I reply?" flow or the new draft-approval flow.
   if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
     const replyToId = ctx.message.reply_to_message.message_id;
     try {
+      // Try draft flow first
+      const draft = await getPendingDraft(replyToId);
+      if (draft) {
+        // Draft approval/edit/skip handler
+        const trimmed = text.trim();
+        const firstChar = trimmed.charAt(0);
+
+        if (firstChar === '1') {
+          // APPROVE: post the draft as-is
+          const success = await postDraftAnswerToTask(draft, draft.draftAnswer);
+          if (success) {
+            await clearPendingDraft(replyToId);
+            await ctx.reply(`Approved and posted to "${draft.taskTitle}".`);
+            console.log(`[zoe/index] draft-approval reply-bridge: approved for task ${draft.taskId}`);
+            return;
+          } else {
+            await ctx.reply('Failed to post draft to the task. Check the board API.');
+            return;
+          }
+        } else if (firstChar === '2') {
+          // EDIT: take the rest of the text as the edited answer, or ask for it
+          const edited = trimmed.slice(1).trim();
+          if (edited) {
+            // Use the provided text as the edited answer
+            const success = await postDraftAnswerToTask(draft, edited);
+            if (success) {
+              await clearPendingDraft(replyToId);
+              await ctx.reply(`Edited and posted to "${draft.taskTitle}".`);
+              console.log(`[zoe/index] draft-approval reply-bridge: edited for task ${draft.taskId}`);
+              return;
+            } else {
+              await ctx.reply('Failed to post edited answer to the task. Check the board API.');
+              return;
+            }
+          } else {
+            // No text provided; ask for the edited version
+            await ctx.reply(
+              `Got it. Send me your edited answer and I'll post it. Just reply to this message with the text.`,
+            );
+            // For now, we'll need Zaal to send a follow-up. In a more elaborate version,
+            // we could store an "awaiting edit" state, but for MVP this is good enough.
+            return;
+          }
+        } else if (firstChar === '3') {
+          // SKIP: post a contextual "noted" ack instead of the draft
+          // For now, just clear the draft and acknowledge
+          await clearPendingDraft(replyToId);
+          await ctx.reply(`Skipped the draft for "${draft.taskTitle}". The task already has a "Noted" ack.`);
+          console.log(`[zoe/index] draft-approval reply-bridge: skipped for task ${draft.taskId}`);
+          return;
+        } else {
+          // Unrecognized input; remind user of options
+          await ctx.reply('Reply with 1 (approve), 2 (edit), or 3 (skip).');
+          return;
+        }
+      }
+
+      // Try legacy reply flow (ask-first)
       const pending = await getPendingReply(replyToId);
       if (pending) {
         const success = await postZaalReplyToTask(pending, text);

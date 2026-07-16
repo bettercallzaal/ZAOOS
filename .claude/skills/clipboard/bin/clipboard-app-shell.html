@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clipboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a1628; color: #e2e8f0; padding: 20px; line-height: 1.55; }
+  .container { max-width: 760px; margin: 0 auto; }
+  .navbar { display: flex; gap: 10px; align-items: center; font-size: 11px;
+    color: rgba(255,255,255,0.45); margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+  .navbar a { color: #f5a623; text-decoration: none; }
+  .navbar a:hover { color: #ffd700; }
+  .nav-btn { background: rgba(255,255,255,0.06); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .nav-btn:hover:not(:disabled) { border-color: rgba(245,166,35,0.4); color: #f5a623; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-pos { font-variant-numeric: tabular-nums; }
+  .live-banner { display: none; align-items: center; justify-content: space-between; gap: 10px;
+    background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #4ade80;
+    border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; margin-bottom: 12px; }
+  .live-banner.show { display: flex; }
+  .live-banner button { background: #22c55e; color: #06240f; border: none; border-radius: 6px;
+    padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .header { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); gap: 12px; }
+  .header h1 { font-size: 16px; color: #f5a623; flex: 1; padding-right: 12px; }
+  .copy-btn { background: #f5a623; color: #000; border: none; padding: 9px 20px;
+    border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;
+    white-space: nowrap; }
+  .copy-btn:hover { background: #ffd700; }
+  .copy-btn.copied { background: #22c55e; color: #fff; }
+  .content { background: #0d1b2a; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 22px; white-space: pre-wrap; font-size: 14px;
+    cursor: text; user-select: text; min-height: 60px; }
+  .content h2 { color: #f5a623; margin: 16px 0 6px; font-size: 14.5px;
+    display: flex; align-items: center; gap: 8px; }
+  .content h2:first-child { margin-top: 0; }
+  .content strong { color: #fff; }
+  .jump-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .jump-nav a { font-size: 11px; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 10px;
+    text-decoration: none; }
+  .jump-nav a:hover { color: #f5a623; border-color: rgba(245,166,35,0.35); }
+  .step-section { transition: opacity 0.15s ease; }
+  .step-section.done { opacity: 0.42; }
+  .step-section.done h2 { text-decoration: line-through; }
+  .step-check { appearance: none; -webkit-appearance: none; width: 16px; height: 16px;
+    flex: 0 0 auto; border: 1.5px solid rgba(245,166,35,0.5); border-radius: 4px;
+    cursor: pointer; position: relative; background: transparent; }
+  .step-check:checked { background: #f5a623; border-color: #f5a623; }
+  .step-check:checked::after { content: "\2713"; position: absolute; left: 2px; top: -2px;
+    color: #000; font-size: 12px; font-weight: 700; }
+  .content .note { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25);
+    border-left: 3px solid #3b82f6; border-radius: 8px; padding: 10px 14px 12px;
+    margin: 10px 0 14px; font-size: 13px; }
+  .content .note::before { content: "Note"; display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #60a5fa; margin-bottom: 4px; }
+  .content .warn { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+    border-left: 3px solid #ef4444; border-radius: 8px; padding: 10px 14px 12px;
+    margin: 10px 0 14px; font-size: 13px; }
+  .content .warn::before { content: "Heads up"; display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #f87171; margin-bottom: 4px; }
+  .content pre, .content .snippet { background: #050d18;
+    border: 1px solid rgba(245,166,35,0.18); border-radius: 8px; padding: 14px 16px;
+    margin: 10px 0 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px; line-height: 1.5; overflow-x: auto; position: relative;
+    white-space: pre-wrap; word-break: break-word; }
+  .snippet-wrap { position: relative; margin: 10px 0 14px; }
+  .snippet-wrap pre, .snippet-wrap .snippet { margin: 0; padding-right: 86px; }
+  .snippet-copy { position: absolute; top: 8px; right: 8px; background: rgba(245,166,35,0.15);
+    color: #f5a623; border: 1px solid rgba(245,166,35,0.35); padding: 4px 10px;
+    border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: -apple-system, sans-serif; }
+  .snippet-copy:hover { background: rgba(245,166,35,0.25); }
+  .snippet-copy.copied { background: #22c55e; color: #fff; border-color: #22c55e; }
+  .empty { color: rgba(255,255,255,0.4); font-size: 13px; padding: 20px 0; text-align: center; }
+  .toast { position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px); background: #22c55e; color: #fff;
+    padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;
+    transition: transform 0.3s ease; z-index: 100; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <button class="nav-btn" id="prevBtn" onclick="goPrev()">&larr; Prev</button>
+    <span class="nav-pos" id="navPos">-</span>
+    <button class="nav-btn" id="nextBtn" onclick="goNext()">Next &rarr;</button>
+    <span style="flex:1"></span>
+    <a href="file://CLIP_DIR_PLACEHOLDER/index.html">all clips (classic index)</a>
+  </div>
+  <div class="live-banner" id="liveBanner">
+    <span>New clip came in</span>
+    <button onclick="jumpToLatest()">View it</button>
+  </div>
+  <div class="header">
+    <h1 id="clipTitle">Loading...</h1>
+    <button class="copy-btn" onclick="copyAll()">Copy All</button>
+  </div>
+  <div class="content" id="content"><div class="empty">Waiting for a clip...</div></div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+<script>
+let clips = [];          // newest-first list of {id, mtime}
+let currentIndex = 0;    // index into clips currently displayed
+let knownNewestId = null;
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Copied!';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+function copyText(text, btn, originalLabel) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) {
+      btn.textContent = 'Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = originalLabel; btn.classList.remove('copied'); }, 2000);
+    }
+    showToast('Copied!');
+  }).catch(() => {
+    showToast('Copy blocked - select + Cmd+C');
+  });
+}
+function copyAll() {
+  const el = document.getElementById('content');
+  const btn = document.querySelector('.copy-btn');
+  copyText(el.innerText, btn, 'Copy All');
+}
+
+// Wrap every <pre> (or .snippet) with its own Copy button. Callable
+// repeatedly - each render swaps innerHTML fresh so there's nothing to
+// dedupe against.
+function attachSnippetCopyButtons() {
+  const content = document.getElementById('content');
+  const targets = content.querySelectorAll('pre, .snippet');
+  targets.forEach((node) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'snippet-wrap';
+    node.parentNode.insertBefore(wrap, node);
+    wrap.appendChild(node);
+    const btn = document.createElement('button');
+    btn.className = 'snippet-copy';
+    btn.type = 'button';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', () => copyText(node.innerText, btn, 'Copy'));
+    wrap.appendChild(btn);
+  });
+}
+
+// Turn each top-level <h2> section into a checkable step, persisted in
+// localStorage keyed by clip id (not path - it's all one page now).
+function makeStepsCheckable(clipId) {
+  const content = document.getElementById('content');
+  const children = Array.from(content.childNodes);
+  const h2Indices = [];
+  children.forEach((n, i) => { if (n.nodeType === 1 && n.tagName === 'H2') h2Indices.push(i); });
+  if (h2Indices.length < 2) return;
+
+  const storeKey = 'clip-steps:' + clipId;
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(storeKey) || '{}'); } catch (e) {}
+
+  const preamble = children.slice(0, h2Indices[0]);
+  const groups = h2Indices.map((start, g) => {
+    const end = g + 1 < h2Indices.length ? h2Indices[g + 1] : children.length;
+    return children.slice(start, end);
+  });
+
+  content.innerHTML = '';
+  preamble.forEach((n) => content.appendChild(n));
+
+  const headingEls = [];
+  groups.forEach((group, i) => {
+    const section = document.createElement('div');
+    section.className = 'step-section';
+    group.forEach((n) => section.appendChild(n));
+    const h2 = section.querySelector('h2');
+    headingEls.push(h2);
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'step-check';
+    cb.checked = !!state[i];
+    if (cb.checked) section.classList.add('done');
+    cb.addEventListener('change', () => {
+      section.classList.toggle('done', cb.checked);
+      state[i] = cb.checked;
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    });
+    if (h2) h2.insertBefore(cb, h2.firstChild);
+    content.appendChild(section);
+  });
+
+  if (headingEls.length >= 3) {
+    const nav = document.createElement('div');
+    nav.className = 'jump-nav';
+    headingEls.forEach((h2, i) => {
+      if (!h2) return;
+      const id = 'step-' + i;
+      h2.id = id;
+      const a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = h2.textContent.trim();
+      nav.appendChild(a);
+    });
+    content.parentNode.insertBefore(nav, content);
+    // Cleaned up on next render since content.parentNode's extra child
+    // gets removed in renderClip() before re-adding.
+    nav.dataset.transient = '1';
+  }
+}
+
+function renderClip(clip) {
+  document.title = clip.title;
+  document.getElementById('clipTitle').textContent = clip.title;
+  // Remove any jump-nav injected by a previous render.
+  document.querySelectorAll('.jump-nav[data-transient="1"]').forEach((n) => n.remove());
+  const content = document.getElementById('content');
+  content.innerHTML = clip.body_html;
+  makeStepsCheckable(clip.id);
+  attachSnippetCopyButtons();
+  history.replaceState(null, '', '#' + clip.id);
+}
+
+function updateNavControls() {
+  document.getElementById('navPos').textContent =
+    clips.length ? (currentIndex + 1) + ' / ' + clips.length : '-';
+  document.getElementById('prevBtn').disabled = currentIndex >= clips.length - 1;
+  document.getElementById('nextBtn').disabled = currentIndex <= 0;
+}
+
+async function showIndex(i) {
+  if (i < 0 || i >= clips.length) return;
+  currentIndex = i;
+  const full = await fetch('/api/clips/' + clips[i].id).then((r) => r.json());
+  renderClip(full);
+  updateNavControls();
+}
+
+function goPrev() { showIndex(currentIndex + 1); } // older
+function goNext() { showIndex(currentIndex - 1); } // newer
+function jumpToLatest() {
+  document.getElementById('liveBanner').classList.remove('show');
+  showIndex(0);
+}
+
+async function pollClips() {
+  let data;
+  try {
+    data = await fetch('/api/clips').then((r) => r.json());
+  } catch (e) {
+    return; // server not reachable this tick, try again next interval
+  }
+  clips = data.clips || [];
+  if (!clips.length) return;
+  const newest = clips[0].id;
+  if (knownNewestId === null) {
+    knownNewestId = newest;
+    return; // first load handled by init(), not here
+  }
+  if (newest !== knownNewestId) {
+    knownNewestId = newest;
+    if (currentIndex === 0) {
+      // Was already viewing "latest" - just seamlessly move to the new one.
+      showIndex(0);
+    } else {
+      // User navigated back in history - don't yank them, just flag it.
+      document.getElementById('liveBanner').classList.add('show');
+    }
+  }
+}
+
+async function init() {
+  const data = await fetch('/api/clips').then((r) => r.json());
+  clips = data.clips || [];
+  if (!clips.length) {
+    document.getElementById('clipTitle').textContent = 'Clipboard';
+    updateNavControls();
+    return;
+  }
+  knownNewestId = clips[0].id;
+  const hashId = location.hash.slice(1);
+  const hashIdx = hashId ? clips.findIndex((c) => c.id === hashId) : -1;
+  await showIndex(hashIdx >= 0 ? hashIdx : 0);
+
+  setInterval(pollClips, 2000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollClips(); });
+  window.addEventListener('focus', pollClips);
+}
+
+init();
+</script>
+</body>
+</html>

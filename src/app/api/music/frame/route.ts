@@ -23,11 +23,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const parsed = querySchema.safeParse({
-      track: searchParams.get('track'),
-      artist: searchParams.get('artist'),
-      artwork: searchParams.get('artwork'),
-      url: searchParams.get('url'),
-      filter: searchParams.get('filter'),
+      track: searchParams.get('track') ?? undefined,
+      artist: searchParams.get('artist') ?? undefined,
+      artwork: searchParams.get('artwork') ?? undefined,
+      url: searchParams.get('url') ?? undefined,
+      filter: searchParams.get('filter') ?? undefined,
     });
 
     if (!parsed.success) {

@@ -110,6 +110,32 @@ duplicate-copy skill files if `/team-setup` is run twice).
 - The 6 copied skills themselves: no new tests needed, they're unchanged
   copies of already-working skills.
 
+## Addendum (2026-07-14, during implementation planning)
+
+The original "6 clean copies" framing for `qa`/`ship`/`review`/`plan-eng-review`
+was wrong. Those 4 are symlinks into `~/.claude/skills/gstack/` - a public
+MIT-licensed third-party skill pack ("Garry's Stack",
+github.com/garrytan/gstack), not Zaal's own files. Hand-copying just the 4
+SKILL.md files would vendor a fragment of someone else's package and lose its
+upgrade path.
+
+Decision (Zaal, 2026-07-14): vendor all of gstack via its own official
+"add to repo so teammates get it" install path (MIT, explicitly designed for
+this, real files not a submodule), and adopt its recommendation to use
+`/browse` instead of `mcp__claude-in-chrome__*` tools for web browsing.
+
+Revised Batch 1:
+- All of gstack (`.claude/skills/gstack/` + its self-registered top-level
+  skill symlinks: `qa`, `ship`, `review`, `plan-eng-review`, and whichever
+  others `./setup` finds - `office-hours`, `browse`, `retro`, `investigate`,
+  `careful`, `freeze`, `guard`, `unfreeze`, `codex`, `document-release`,
+  `qa-only`, `design-consultation`, `design-review`, `plan-ceo-review`,
+  `plan-design-review`, `setup-browser-cookies`, `gstack-upgrade`).
+- `clipboard`, `handoff` - still plain copies, genuinely Zaal's own, no
+  upstream.
+
+See `docs/superpowers/plans/2026-07-14-team-skill-sharing.md` for the build.
+
 ## Open questions (deferred, not blocking this build)
 
 - Batch 2 reconciliation (meeting/socials/zao-research/newsletter) - separate

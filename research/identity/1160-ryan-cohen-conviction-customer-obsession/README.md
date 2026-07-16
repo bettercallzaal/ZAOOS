@@ -71,41 +71,53 @@ Cohen reframed customers as "pet parents" — emotionally investing the relation
 
 **On customer obsession:**
 > *"If you're in the business of delighting your customers, you can be very successful. I don't know too many businesses that ended up not being successful when they did a really good job at delighting their customers."*
-> — Multiple interviews (Forbes profile, antoinebuteau.com)
+> — Ryan Cohen, [Authority Magazine / Medium interview](https://medium.com/authority-magazine/chewy-founder-ryan-cohen-we-put-together-a-team-that-was-obsessed-with-delighting-our-customers-e8cacbd0477b)
 
 **On conviction investing (concentrated bets):**
 > *"I like to go all in. When I find something I believe in, I make concentrated bets."*
-> — GMEdd interview (cited in *Lessons from Ryan Cohen*)
+> — [GMEdd interview transcript](https://www.gmedd.com/rc/)
+
+> *"Talk is cheap, it takes money to buy whiskey."*
+> — Ryan Cohen, [X/Twitter, September 26, 2021](https://x.com/ryancohen)
 
 **On owner mentality and skin in the game:**
 > *"The Owner-Operator — the risk-taker — [has been replaced by] a new, parasitic class of corporate bureaucrat: The Risk-Free Insider. By 'Insider,' I am not referring to a specific title. I am referring to the entire [class of] Directors who exist solely to collect fees, the Executives who exist solely to collect bonuses, and the Managers who exist solely to hire consultants."*
-> — Ryan Cohen, X/Twitter (February 2026); also "The Hollow Men" essay
+> — Ryan Cohen, "The Hollow Men" essay, [X/Twitter March 2026](https://x.com/ryancohen/status/2024203261830447185)
 
 > *"Risking your own bottom line is the only thing that keeps a business honest."*
-> — Related statement (same period)
+> — Related statement (same essay)
 
 **On corporate dysfunction:**
 > *"I don't understand what's going on in Corporate America. It's a whole other world. It's like 'Looney Tunes', it's some kind of Fantasyland or sick dream. It doesn't make any sense to me."*
-> — Personal interview (referenced in media profiles)
+> — Ryan Cohen, [Authority Magazine interview](https://medium.com/authority-magazine/chewy-founder-ryan-cohen-we-put-together-a-team-that-was-obsessed-with-delighting-our-customers-e8cacbd0477b)
 
 **On strategic silence:**
 > *"You won't find us talking a big game, making a bunch of lofty promises, or telegraphing our strategy to the competition. That's the philosophy we adopted at Chewy."*
-> — June 9, 2021 Annual Shareholder Meeting speech
+> — Ryan Cohen, [June 9, 2021 Annual Shareholder Meeting](https://www.gmedd.com/transformation/ryan-cohen-at-agm-we-ushered-in-a-whole-new-era-of-gamestop/)
 
 > *"We're trying to do something that nobody in the retail space has ever done but we believe we're putting the right pieces in place and we have clear goals: delighting customers and driving shareholder value for the long term."*
-> — June 2021 Annual Meeting
+> — June 2021 Annual Meeting ([Bloomberg coverage](https://www.bloomberg.com/news/articles/2021-06-09/ryan-cohen-rallies-gamestop-reddit-crowd-at-annual-meeting))
 
 **On judging by actions, not words:**
 > *"Judge GameStop based on their actions, not their words."*
-> — June 2021 shareholder meeting
+> — June 2021 shareholder meeting ([Fox Business](https://www.foxbusiness.com/markets/gamestop-elevates-ryan-cohen-cementing-turnaround-hopes))
 
 **The original GameStop letter (November 2020) — core thesis statement:**
 > *"GameStop needs to evolve into a technology company that delights gamers and delivers exceptional digital experiences — not remain a video game retailer that overprioritizes its brick-and-mortar footprint."*
-> — RC Ventures open letter to GameStop Board, November 16, 2020
+> — RC Ventures open letter to GameStop Board, November 16, 2020 ([SEC filing — primary source](https://www.sec.gov/Archives/edgar/data/1326380/000101359420000821/rc13da3-111620.pdf))
 
 **On capital discipline:**
 > *"We believe any decision to reenter new businesses or acquire companies should be evaluated with the same rigor and exactitude that a private equity firm would bring to bear."*
-> — RC Ventures letter to GameStop Board (2020)
+> — RC Ventures letter to GameStop Board, November 2020 ([SEC filing](https://www.sec.gov/Archives/edgar/data/1326380/000101359420000821/rc13da3-111620.pdf))
+
+**Sources index:**
+- [RC Ventures Nov 2020 letter — SEC primary source](https://www.sec.gov/Archives/edgar/data/1326380/000101359420000821/rc13da3-111620.pdf)
+- [June 2021 AGM transcript — GMEdd](https://www.gmedd.com/transformation/ryan-cohen-at-agm-we-ushered-in-a-whole-new-era-of-gamestop/)
+- ["The Hollow Men" essay — X/Twitter](https://x.com/ryancohen/status/2024203261830447185)
+- [Chewy customer obsession — Authority Magazine/Medium](https://medium.com/authority-magazine/chewy-founder-ryan-cohen-we-put-together-a-team-that-was-obsessed-with-delighting-our-customers-e8cacbd0477b)
+- [Forbes: "The Man Who Found Gold In Dog Food" (2017)](https://www.forbes.com/sites/susanadams/2017/01/10/the-man-who-found-gold-in-dog-food/)
+- [Fortune: GameStop acquisition goals (Jan 2026)](https://fortune.com/2026/01/30/who-is-ryan-cohen-gamestop-ceo-acquisition-meme-stock-investing/)
+- [GMEdd RC Ventures research library](https://www.gmedd.com/rc/)
 
 ---
 

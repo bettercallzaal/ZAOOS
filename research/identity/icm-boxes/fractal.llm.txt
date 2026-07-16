@@ -1,0 +1,42 @@
+# ICM: ZAO Fractal
+
+The ZAO Fractal is the ZAO's weekly Respect Game - the governance and contribution-ranking engine at the center of the network. Each week, contributors meet, break into small groups ("fractals"), and rank each other's contributions from the prior week. Those rankings mint on-chain Respect, which is the ZAO's soulbound reputation currency. It has run for 100+ consecutive weeks. Not a token sale and not a popularity contest - a repeating, peer-ranked, on-chain record of who actually contributed.
+
+## What it is
+A synchronous weekly meeting (Fractal Call, Mondays 6pm EST) plus an on-chain settlement layer. The meeting produces consensus rankings; the chain records them as Respect. It is the ZAO's answer to "how do you reward contribution without a token pre-sale or a boss deciding" - contribution is measured by peers, recorded on-chain, and compounds over time.
+
+## How the game works
+- Contributors gather weekly and split into small groups (fractals).
+- Each group discusses what everyone did that week and ranks members by contribution.
+- Rankings map onto levels; a Fibonacci-shaped curve turns rank into Respect awarded (higher levels earn disproportionately, mirroring outsized contribution).
+- From Level 6 up, the format uses elimination voting to resolve the top ranks.
+- Results settle on-chain through OREC (see below), not by a central admin.
+
+## Governance - Respect, OREC, ORDAO
+- **Respect** is the on-chain contribution currency, issued in two forms on **Optimism**:
+  - **OG Respect** - soulbound ERC-20 (`0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`), the pre-ORDAO era. ~38,484 supply.
+  - **ZOR Respect** - ERC-1155 (`0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`, token id 0), the post-ORDAO era.
+  - **Fractal 74** was the dividing line: OG issuance before it, ZOR after.
+- **OREC** (Optimistic Respect-based Executive Contract, `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`) settles outcomes optimistically - a proposal executes unless contested inside the challenge window (72h propose + 72h veto). Respect-weighted, not one-wallet-one-vote.
+- **ORDAO** is the DAO framework wrapping OREC + Respect1155 into the executable governance layer.
+- Verified on-chain (2026-07-05): ~156 Respect holders, OG Gini roughly 0.73 (contribution is concentrated among the core, as expected for a 6-core-builder era down from 1000+ early participants).
+
+## Current state
+- **Live and running** - 100+ weeks as of mid-2026, Monday 6pm EST weekly.
+- Discord bot drives submissions + Farcaster linking; the `/fractals` surface in ZAO OS (zaoos.com) exposes sessions, analytics, proposals, and member/event endpoints.
+- Known bottlenecks (from internal audit, doc 703): OREC submission still runs through a narrow signer set; non-technical onboarding docs are the structural gap; the standalone dashboard is being rebuilt inside ZAO OS.
+
+## Why it matters
+The Fractal is how the ZAO stays tokenless-first and still rewards work: no coin to buy your way in, Respect can only be earned by showing up and being ranked by peers. It is the trust spine that WaveWarZ, ZABAL Games, and the festivals plug into.
+
+## Find it
+- thezao.xyz and zaoos.com/fractals
+- Papers: thezao.xyz/papers (whitepaper covers Respect + the Fractal)
+- Farcaster: the /zao channel; Fractal Call weekly on Mondays
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- ZABAL Games (zabalgamez)
+- WaveWarZ (wavewarz)
+- ZAO Assistant (zao-assistant)

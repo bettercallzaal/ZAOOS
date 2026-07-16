@@ -245,15 +245,14 @@ describe('GET /api/notifications/farcaster', () => {
       expect(mockGetNotifications).toHaveBeenCalledWith(123, undefined, 25);
     });
 
-    it('handles non-numeric limit (parseInt returns NaN without guard)', async () => {
-      // NOTE: The route does NOT guard against NaN. parseInt('abc', 10) = NaN
-      // Math.min(NaN, anything) = NaN. This is a potential bug.
+    it('falls back to undefined limit for a non-numeric value (NaN-guarded)', async () => {
+      // Regression guard: a non-numeric limit clamps to undefined so getNotifications
+      // applies its own default, rather than NaN flowing downstream to Neynar.
       mockGetNotifications.mockResolvedValue(mockNotificationsResponse([]));
 
       await GET(makeGetRequest('/api/notifications/farcaster', { limit: 'not-a-number' }));
 
-      // The route passes NaN directly to getNotifications
-      expect(mockGetNotifications).toHaveBeenCalledWith(123, undefined, Number.NaN);
+      expect(mockGetNotifications).toHaveBeenCalledWith(123, undefined, undefined);
     });
   });
 

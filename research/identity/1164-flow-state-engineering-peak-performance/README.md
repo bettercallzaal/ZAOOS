@@ -264,3 +264,9 @@ This principle prevents "creative block" becoming an excuse for inaction. It als
 - [1156 — Jesse Cole / Fans First Entertainment](../1156-jesse-cole-fans-first-entertainment/) — showmanship layer
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/) — capital + focus layer
 - [1168 — Synthesis: The Operating Ideology Zaal Aspires To](../1168-operating-ideology-synthesis/) — composite doc
+
+**ZAO evidence base (principles in action):**
+- [102 — Fractals, Frapps, and ORDAO](../../governance/102-fractals-frapps-ordao/) — the group flow machine in its governance context: challenge, trust, clear goals all structural
+- [188 — Fractal Bot](../../agents/188-fractal-bot/) — automated facilitation that enforces the flow triggers (timer, turn equality, immediate scoring)
+- [718 — ZAO Fractal Whitepaper Foundations](../../governance/718-zao-fractal-whitepaper-foundations/) — formal grounding: Respect Game Fibonacci mechanics as challenge-skill calibration engine
+- [1142 — Fractal Error-Recovery Framework](../../governance/1142-fractal-error-recovery-framework/) — the immediate feedback loop made structural: how the Fractal self-corrects when flow breaks

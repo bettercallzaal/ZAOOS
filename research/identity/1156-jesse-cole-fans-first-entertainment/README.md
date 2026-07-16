@@ -231,3 +231,8 @@ Cole inverted who the Bananas serve — fans over baseball tradition. The ZAO in
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/) — capital + focus layer
 - [1164 — Flow State](../1164-flow-state-engineering-peak-performance/) — performance layer
 - [1168 — Synthesis: The Operating Ideology Zaal Aspires To](../1168-operating-ideology-synthesis/) — composite doc
+
+**ZAO evidence base (principles in action):**
+- [050 — The ZAO Complete Guide](../../community/050-the-zao-complete-guide/) — ZAO as "Fans First" community: gated 188 members, Fractal as engagement engine
+- [103 — Fractal Governance Ecosystem](../../governance/103-fractal-governance-ecosystem/) — the Fractal's structural equivalent of Cole's "eliminate friction + entertain always"
+- [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — the "fan is the member" thesis stated formally

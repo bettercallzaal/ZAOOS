@@ -155,6 +155,13 @@ For ZAO, this doc validates:
 
 ---
 
+## Related Docs
+
+- [1168 — Operating Ideology Synthesis](../identity/1168-operating-ideology-synthesis/) — composite operating paper (Reich × Cole × Cohen × Flow State); service-first and conviction-investing principles from Cohen parallel Nightingale's service-first wealth law
+- [1164 — Flow State / Engineering Peak Performance](../identity/1164-flow-state-engineering-peak-performance/) — the 30-day test is a proto-flow trigger: goal clarity, immediate feedback, sustained focus all hit Kotler's psychological triggers
+
+---
+
 ## Sources & References
 
 - [FULL] Earl Nightingale - How To Apply 10 Rules That Will Change Your Future Forever (Spotify episode - https://open.spotify.com/episode/7zXEu4gJ3UEMwyjBOigWpj, transcribed via mlx-whisper 2026-07-16)

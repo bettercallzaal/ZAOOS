@@ -248,6 +248,9 @@ Build that. Everything else follows.
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/)
 - [1164 — Flow State / Engineering Peak Performance](../1164-flow-state-engineering-peak-performance/)
 
+**Adjacent inspiration (same vein):**
+- [1129 — Earl Nightingale: 30-Day Test](../../inspiration/1129-earl-nightingale-30day-test.md) — service-first wealth law; goal-card discipline; maps to Cohen's conviction and Kotler's flow triggers; ZAO team ritual template
+
 **ZAO DAO case study docs (North Star cross-links):**
 The 12 principles above are not aspirational — they describe what The ZAO already does. These docs are the evidence base:
 - [050 — The ZAO Complete Guide](../../community/050-the-zao-complete-guide/) — community structure, membership, Fractal mechanics

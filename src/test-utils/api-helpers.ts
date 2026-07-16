@@ -108,6 +108,7 @@ export function chainMock(result: ChainMockResult): ChainMock {
     'lte',
     'like',
     'ilike',
+    'or',
     'order',
     'range',
     'limit',

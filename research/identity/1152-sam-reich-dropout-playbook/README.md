@@ -58,9 +58,17 @@ The format cannot be mass-produced cheaply. Each game requires genuine design ef
 **On creator ownership and the buyout:**
 Reich has framed the employee acquisition as reclaiming creative agency — avoiding the typical "divested by a holding company" path that ends in layoffs. The structural choice (employees as owners, not freelancers for a corporate parent) is the ideology made operational.
 
+> *"All we are is just uncomplicated and decent."*
+— Sam Reich, TheWrap, May 2026 (on management philosophy shaped by his father Robert Reich's labor-focused values)
+
+The acquisition was at zero dollars — IAC retained a minority stake; the core creative team purchased the rest. (~100 layoffs occurred at acquisition; ~5-10 person skeleton crew remained, rebuilt from there.) Sources: [TechCrunch Jan 2020](https://techcrunch.com/2020/01/08/iac-sells-collegehumor/), [Variety Jan 2020](https://variety.com/2020/tv/news/collegehumor-sold-layoffs-1203461014/).
+
 **On small, profitable audience:**
-> "We're not trying to be Netflix. We're trying to be the thing our audience actually wants."
-*(Paraphrase of repeated positioning in creator economy interviews, 2021-2024.)*
+> *"When you're paying seven bucks a month for Dropout, you're probably hardcore about us."*
+— Sam Reich, NPR "It's Been a Minute," February 2024
+
+> *"We're not trying to be Netflix. We're trying to be the thing our audience actually wants."*
+*(Paraphrase of repeated positioning; see Fast Company June 2024 profile.)*
 
 Dropout explicitly rejects growth-at-all-costs. The model demonstrates that a dedicated audience willing to pay sustains a profitable operation — without millions of views or algorithm dependence.
 
@@ -70,10 +78,14 @@ Game Changer's hand-crafted-per-episode format is a deliberate bet that quality 
 **On direct creator-audience relationship:**
 The membership model removes intermediaries (YouTube, advertisers). Revenue relationship is direct. Platform decisions (what to make, who to cast, what to cut) are not subject to advertiser sensitivity or YouTube's content policies.
 
-**Known sources for deeper quote mining:**
-- Podcasts: "Business Casual," "How I Built This," creator economy focused interviews (2020-2024 window).
-- Written profiles: Variety, Hollywood Reporter, Digiday (post-buyout period).
-- Dropout's own behind-the-scenes content and Discord AMAs.
+**Verified sources (cited):**
+- [TechCrunch, Jan 2020 — IAC sells CollegeHumor to Sam Reich, 100+ layoffs](https://techcrunch.com/2020/01/08/iac-sells-collegehumor/) — acquisition at zero dollars; skeleton crew remained
+- [Fast Company, Jun 2024 — "How CEO Sam Reich built Dropout from CollegeHumor's ashes"](https://www.fastcompany.com/91136741/dropout-rebrand-collegehumor-sam-reich) — 2023 profit-sharing rollout; 11 active series; low-cost/high-engagement model
+- [NPR "It's Been a Minute", Feb 2024](https://www.npr.org/2024/02/06/1197954697/game-changer-sam-reich-dropout) — *"When you're paying seven bucks a month for Dropout, you're probably hardcore about us"* — on small-audience philosophy
+- [TheWrap, May 2026 — Sam Reich on 'Game Changer' and empowering artists](https://www.thewrap.com/media-platforms/tv/dropout-sam-reich-interview-game-changer-season-8/) — *"all we are is just uncomplicated and decent"* — creator empowerment philosophy shaped by his father Robert Reich's labor focus
+- [IndieWire, 2025 — Game Changer Season 7 interview](https://www.indiewire.com/features/interviews/game-changer-season-7-sam-reich-interview-1235114134/) — live audience evolution; format innovation
+- [Variety, Jun 2026 — Sam Reich on Game Changer Emmys and Dimension 20](https://variety.com/2026/tv/awards/sam-reich-game-changer-emmys-dimension-20-animation-1236764342/) — Emmy push; creator movement perspective
+- [Substack: Dropout streaming model ($30M+ ARR analysis)](https://markrmason.substack.com/p/dropout-a-streaming-model-delivering) — subscriber pricing ($6.99/month); retention data
 
 ---
 

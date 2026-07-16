@@ -89,6 +89,7 @@ import {
   parseBatchAnswer,
   classifyIntent,
 } from './tg-interactions';
+import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
@@ -501,6 +502,11 @@ bot.on('callback_query:data', async (ctx) => {
     // open ones stay easy to find; answering clears it from the pin list).
     const pinnedMid = ctx.callbackQuery.message?.message_id;
     if (pinnedMid) {
+      // Feature 1: Record message context for this question
+      // So when Zaal replies to this message, we can route it with the correct qid context.
+      await recordMessageContext(pinnedMid, { qid: q.qid }).catch((err) => {
+        console.error('[zoe/index] failed to record question message context:', err);
+      });
       await ctx.api.unpinChatMessage(gid, pinnedMid).catch(() => {});
     }
     if (q.isType) {
@@ -514,13 +520,19 @@ bot.on('callback_query:data', async (ctx) => {
           reply_markup: { inline_keyboard: [] },
         })
         .catch(() => {});
-      await ctx
+      const replyMsg = await ctx
         .reply(`Reply to this thread with your answer for "${q.qid}".`, {
           ...(ctx.callbackQuery.message?.message_thread_id
             ? { message_thread_id: ctx.callbackQuery.message.message_thread_id }
             : {}),
         })
-        .catch(() => {});
+        .catch(() => undefined);
+      // Also record the reply message ID so if Zaal replies to this message, we know the context
+      if (replyMsg?.message_id) {
+        await recordMessageContext(replyMsg.message_id, { qid: q.qid }).catch((err) => {
+          console.error('[zoe/index] failed to record reply message context:', err);
+        });
+      }
     } else {
       await ctx.answerCallbackQuery({ text: 'Got it.' });
       await ctx
@@ -649,6 +661,14 @@ bot.on('message_reaction', async (ctx) => {
         }
       },
       getTaskForMessage: async (messageId) => {
+        // Feature 3: Look up task ID from persistent message context store
+        try {
+          const context = await getMessageContext(messageId);
+          return context?.taskId ?? null;
+        } catch (err) {
+          console.error('[zoe/index] getTaskForMessage failed:', err);
+          return null;
+        }
         // TODO: if you track message ID -> task ID mappings, look it up here
         // For now, return null (reactions won't mark tasks done without this mapping)
         return null;
@@ -1129,6 +1149,21 @@ bot.on('message:text', async (ctx) => {
       console.warn('[zoe/index] reply-bridge handler failed (nbd):', (err as Error)?.message);
       // Fall through to normal message handling if the bridge fails
     }
+
+    // FEATURE 1: REPLY-TO-ROUTE + QUESTION-CONTEXT
+    // If Zaal replies to a ZOE question message (without matching draft/pending flows),
+    // look up the message ID and route as [answer:qid]
+    if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
+      const result = await handleReplyRoute(ctx, { isFromZaal: true });
+      if (result.handled) {
+        if (result.contextType === 'question') {
+          await ctx.reply(`Got your answer for ${result.id}. Processing...`);
+        } else if (result.contextType === 'task') {
+          await ctx.reply(`Got your reply to task ${result.id}. Processing...`);
+        }
+        return;
+      }
+    }
   }
 
   // DM path: Zaal-only allowlist preserved.
@@ -1459,7 +1494,28 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     await ctx.reply(`Could not fetch that ${label} - ${(err as Error).message.slice(0, 150)}`).catch(() => {});
     return;
   }
-  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`} - looking at it...`).catch(() => {});
+  // FEATURE 2: FILE/PHOTO/LINK AUTO-ROUTE
+  // Classify the intent based on caption + media type, then log and reply
+  const hasPhoto = !!ctx.message.photo;
+  const hasFile = !!ctx.message.document;
+  const hasUrl = /https?:\/\/\S+/i.test(caption);
+
+  let autoRouteGuess = '';
+  if (hasPhoto || hasFile || hasUrl) {
+    const intent = await classifyIntent(caption, hasFile, hasPhoto, hasUrl);
+    autoRouteGuess = `auto-routed: ${intent} - `;
+    try {
+      const guess = `[classify:${intent}] ${caption || label}`;
+      await pushRecent(
+        { from: 'zaal', text: guess, sender: 'auto-classify-media' },
+        String(chatId),
+      ).catch((e) => console.error('[zoe/index] auto-classify log failed:', (e as Error)?.message));
+    } catch {
+      // best-effort
+    }
+  }
+
+  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`} - ${autoRouteGuess}looking at it...`).catch(() => {});
   const note = caption ? `${caption}\n\n` : '';
   const turnText = `${note}[Zaal sent ${label === 'image' ? 'an image' : `a file named ${label}`}, saved at ${savedPath}. Use the Read tool to view it, then respond to ${caption ? 'the message above' : 'what it contains'}.]`;
   enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnText), {

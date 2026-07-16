@@ -49,6 +49,8 @@ import { runMentionNotify } from './task-mention-notify';
 import { runTaskTeammateAck } from './task-teammate-ack';
 import { runCuratorTick } from './curator';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
+import { getOpenTeamTasks } from './team-tracker';
+import { buildVetoKeyboard, type VetoTask } from './brief-veto';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -119,13 +121,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             );
             brief = await generateMorningBrief({ repoDir: opts.repoDir });
           }
-          // Route the morning brief as a status message
+
+          // Build veto keyboard from top open tasks (best-effort, gracefully degrade)
+          let vetoKeyboard: { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> } | undefined;
+          try {
+            const tasks = await getOpenTeamTasks();
+            const vetoTasks: VetoTask[] = tasks.slice(0, 5).map((t) => ({ id: t.legacy_id || '', title: t.title }));
+            vetoKeyboard = buildVetoKeyboard(vetoTasks, 5);
+          } catch (err) {
+            console.warn('[zoe/scheduler] veto keyboard build failed (nbd):', (err as Error).message);
+            vetoKeyboard = undefined;
+          }
+
+          // Route the morning brief as a status message (with veto keyboard if available)
           if (opts.routingDeps) {
             await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status' });
           } else {
-            await opts.bot.api.sendMessage(opts.zaalTgId, brief);
+            const sendOpts = vetoKeyboard ? { reply_markup: vetoKeyboard } : {};
+            await opts.bot.api.sendMessage(opts.zaalTgId, brief, sendOpts);
           }
-          console.log('[zoe/scheduler] morning brief sent (cockpit)');
+          console.log('[zoe/scheduler] morning brief sent (cockpit)' + (vetoKeyboard?.inline_keyboard.length ? ' + veto keyboard' : ''));
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);

@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-07-15
 original-query: "NFT gallery display on member profiles using Alchemy NFT v3 API with chain/collection filtering and ZOUNZ highlighting (reconstructed)"
 tier: STANDARD
 related-docs: [135, 271]
@@ -13,6 +13,16 @@ related-docs: [135, 271]
 > **Status:** Implemented
 > **Date:** March 28, 2026
 > **Goal:** Display all NFTs a member holds on their ZAO OS profile page with chain/collection filtering
+
+## Updated 2026-07-15
+
+Three material changes since last validation (2026-05-21):
+
+1. **Alchemy SDK JS deprecated and archived (July 13, 2026).** The repo was archived on July 13, 2026 (announced for Jan 2026, slipped). Migration path per Alchemy: use Viem for Ethereum dev, Alchemy Smart Wallets SDK for transacting apps. **Non-breaking for this doc** — ZAO OS uses the REST API directly (not the SDK), so no code changes needed.
+2. **NFT API now supports 30+ chains** (vs. ~13 listed below at time of writing). New additions include Solana, StarkNet, Abstract, Monad, MegaETH, Aptos, Bitcoin, Sui, Sonic, Hyperliquid. ZAO's three core chains (ETH, Base, OP) are unaffected — opportunity to expand coverage to Polygon, Arbitrum, Zora chain as noted in Future Enhancements.
+3. **Typo corrected in Key Numbers section below:** "300M compute units/month" was wrong; the Alchemy free tier is **30M CU/month** (the "300M" threshold is a paid-plan pricing tier). The body text on line 21 was already correct at 30M.
+
+Sources: [Alchemy SDK JS GitHub (archived)](https://github.com/alchemyplatform/alchemy-sdk-js) · [Alchemy NFT API landing](https://www.alchemy.com/nft-api) · [Alchemy Pricing FAQ](https://www.alchemy.com/docs/reference/pricing-plans)
 
 ## Key Decisions / Recommendations
 
@@ -91,7 +101,7 @@ Alchemy wins because it's already configured, has the most generous free tier, a
 
 - **3 chains** scanned: Ethereum, Base, Optimism
 - **150 NFTs** max displayed (50 per chain)
-- **300M compute units/month** — Alchemy free tier
+- **30M compute units/month** — Alchemy free tier (corrected 2026-07-15; prior "300M" figure was the paid-plan pricing threshold)
 - **5-minute cache** — reduces API calls for repeat views
 - **0 new dependencies** — uses existing Alchemy API key, `next/image`, standard React
 - **v3** — Alchemy NFT API version used

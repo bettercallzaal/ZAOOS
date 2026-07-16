@@ -67,6 +67,42 @@ export async function getOpenTeamTasks(): Promise<TeamTask[]> {
   }
 }
 
+export interface TaskStatusRow {
+  id: string;
+  status: string;
+  archived_at: string | null;
+}
+
+/**
+ * Fetch task status (id, status, archived_at) for the given task IDs.
+ * Used by ping-lifecycle to check if tasks are closed.
+ * Returns [] if unconfigured or on any error (best-effort - never throws).
+ */
+export async function getTaskStatusByIds(taskIds: string[]): Promise<TaskStatusRow[]> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key || taskIds.length === 0) return [];
+
+  // PostgREST IN clause: id=in.(<id1>,<id2>,...)
+  const idList = taskIds.map((id) => `"${id}"`).join(',');
+  const url = `${base.replace(/\/$/, '')}/rest/v1/tasks?id=in.(${idList})&select=id,status,archived_at`;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      signal: controller.signal,
+      cache: 'no-store',
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return [];
+    const data = (await res.json()) as TaskStatusRow[];
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
 export interface NewTeamTask {
   title: string;
   project: string;

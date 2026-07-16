@@ -42,12 +42,13 @@ import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidate
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { checkAndResend, readLastUserReplyAt } from './escalation';
-import { reconcileUntaggedTasks } from './team-tracker';
+import { reconcileUntaggedTasks, getTaskStatusByIds } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
-import { runTaskTeammateAck } from './task-teammate-ack';
+import { runTaskTeammateAck, readPendingReplies, removePendingReply } from './task-teammate-ack';
 import { runCuratorTick } from './curator';
+import { runPingLifecycleTick } from './ping-lifecycle';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
@@ -363,6 +364,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
         } catch (err) {
           console.warn('[zoe/scheduler] auto-tag reconcile failed (nbd):', (err as Error).message);
+        }
+
+        // Task #930: ping-lifecycle resolution. Hourly check for any teammate-ack
+        // pings (pending replies) tied to board tasks and resolve (unpin + remove
+        // the PendingReply) them when their task closes. Best-effort - a no-op
+        // when the tracker is unconfigured.
+        try {
+          const result = await runPingLifecycleTick({
+            readPending: readPendingReplies,
+            removePending: removePendingReply,
+            getTaskStatuses: getTaskStatusByIds,
+            unpin: async (chatId, messageId) => {
+              // Unpin via grammY API. Best-effort - swallowed by resolution routine.
+              try {
+                await opts.bot.api.unpinChatMessage(chatId, messageId);
+              } catch {
+                // silent best-effort
+              }
+            },
+            chatId: opts.zaalTgId,
+          });
+          if (result.resolved > 0) {
+            console.log(`[zoe/scheduler] ping-lifecycle: resolved ${result.resolved} ping(s)`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] ping-lifecycle tick failed (nbd):', (err as Error).message);
         }
 
         // Build the task-queue nudge as a gate candidate (folded in). Only when

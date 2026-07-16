@@ -11,7 +11,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const mode = req.nextUrl.searchParams.get('mode') || 'catalog';
-    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '20', 10), 50);
+    // Defensively clamp: a non-numeric/negative limit falls back to the default
+    // 20 (not NaN/negative passed downstream to Neynar), capped at 50.
+    const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '20', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 20 : rawLimit, 50);
     const cursor = req.nextUrl.searchParams.get('cursor') || undefined;
 
     if (mode === 'relevant') {

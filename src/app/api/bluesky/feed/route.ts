@@ -16,7 +16,10 @@ export async function GET(req: NextRequest) {
     // clamp/ignore bad input so the feed keeps rendering. Ignore an over-long cursor.
     const rawCursor = req.nextUrl.searchParams.get('cursor') || undefined;
     const cursor = rawCursor && rawCursor.length <= 200 ? rawCursor : undefined;
-    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '30', 10), 100);
+    // Defensively clamp: a non-numeric/negative limit must fall back to the
+    // default 30 (not pass NaN/0 downstream into the DB .limit()), and cap at 100.
+    const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '30', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 30 : rawLimit, 100);
 
     const result = await getFeedSkeleton(cursor, limit);
 

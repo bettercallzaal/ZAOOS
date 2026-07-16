@@ -68,13 +68,20 @@ import {
   POST as allowlistPOST,
 } from '@/app/api/admin/allowlist/route';
 import { POST as backfillPOST } from '@/app/api/admin/backfill/route';
+import { POST as broadcastPOST } from '@/app/api/admin/broadcast/route';
 import { GET as discordLinkGET } from '@/app/api/admin/discord-link/route';
+import { GET as dormantGET } from '@/app/api/admin/dormant/route';
 import { GET as ensSubnamesGET } from '@/app/api/admin/ens-subnames/route';
+import { GET as exportGET } from '@/app/api/admin/export/route';
 import { GET as hiddenGET } from '@/app/api/admin/hidden/route';
+import { GET as memberFidGET, PATCH as memberFidPATCH } from '@/app/api/admin/member-fid/route';
 import { GET as memberHealthGET } from '@/app/api/admin/member-health/route';
+import { GET as onboardingFunnelGET } from '@/app/api/admin/onboarding-funnel/route';
 import { GET as quickStatsGET } from '@/app/api/admin/quick-stats/route';
 import { POST as respectImportPOST } from '@/app/api/admin/respect-import/route';
 import { GET as searchUsersGET } from '@/app/api/admin/search-users/route';
+import { DELETE as spacesIdDELETE } from '@/app/api/admin/spaces/[id]/route';
+import { GET as spacesGET } from '@/app/api/admin/spaces/route';
 import { POST as uploadPOST } from '@/app/api/admin/upload/route';
 // ── Route imports ────────────────────────────────────────────────────────────
 import {
@@ -256,6 +263,84 @@ const adminRoutes: AdminRouteEntry[] = [
     handler: discordLinkGET as HandlerFn,
     unauthStatus: 401,
     unauthError: 'Unauthorized',
+  },
+
+  // admin/spaces — split checks → 401 unauth, 403 non-admin
+  {
+    label: 'GET    /api/admin/spaces',
+    url: '/api/admin/spaces',
+    handler: spacesGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+
+  // admin/spaces/[id] — split checks; handler takes a params promise
+  {
+    label: 'DELETE /api/admin/spaces/[id]',
+    url: '/api/admin/spaces/550e8400-e29b-41d4-a716-446655440000',
+    handler: ((req?: NextRequest) =>
+      spacesIdDELETE(req as NextRequest, {
+        params: Promise.resolve({ id: '550e8400-e29b-41d4-a716-446655440000' }),
+      })) as HandlerFn,
+    init: { method: 'DELETE' },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+
+  // admin/onboarding-funnel — split checks → 401 unauth, 403 non-admin
+  {
+    label: 'GET    /api/admin/onboarding-funnel',
+    url: '/api/admin/onboarding-funnel',
+    handler: onboardingFunnelGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+
+  // admin/broadcast — split checks → 401 unauth, 403 non-admin
+  {
+    label: 'POST   /api/admin/broadcast',
+    url: '/api/admin/broadcast',
+    handler: broadcastPOST as HandlerFn,
+    init: { method: 'POST', body: JSON.stringify({ message: 'hi' }) },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+
+  // admin/export — split checks; non-admin error is "Forbidden"
+  {
+    label: 'GET    /api/admin/export',
+    url: '/api/admin/export?type=members',
+    handler: exportGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+    nonAdminError: 'Forbidden',
+  },
+
+  // admin/member-fid — split checks → 401 unauth, 403 non-admin
+  {
+    label: 'GET    /api/admin/member-fid',
+    url: '/api/admin/member-fid',
+    handler: memberFidGET as HandlerFn,
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+  {
+    label: 'PATCH  /api/admin/member-fid',
+    url: '/api/admin/member-fid',
+    handler: memberFidPATCH as HandlerFn,
+    init: { method: 'PATCH', body: JSON.stringify({ updates: [] }) },
+    unauthStatus: 401,
+    unauthError: 'Unauthorized',
+  },
+
+  // admin/dormant — !session?.isAdmin → 403 "Admin required" for both
+  {
+    label: 'GET    /api/admin/dormant',
+    url: '/api/admin/dormant',
+    handler: dormantGET as HandlerFn,
+    unauthStatus: 403,
+    unauthError: 'Admin required',
+    nonAdminError: 'Admin required',
   },
 ];
 

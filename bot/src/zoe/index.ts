@@ -18,6 +18,8 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
+import type { Client } from 'discord.js';
+import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
@@ -77,6 +79,7 @@ import {
 } from './posts';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
+import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -90,7 +93,18 @@ import {
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
-import { NOTE_PREFIX, PLAN_PREFIX, QUEUE_PREFIX, isZoeCommand } from './commands';
+import {
+  NOTE_PREFIX,
+  PLAN_PREFIX,
+  QUEUE_PREFIX,
+  FOCUS_ON_RE,
+  FOCUS_OFF_RE,
+  CHECKPOINT_PREFIX,
+  AUDIT_COMMAND_RE,
+  BUDGET_COMMAND_RE,
+  isZoeCommand,
+} from './commands';
+import { formatSpendStatus } from './cost-governance';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
 import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
@@ -98,12 +112,14 @@ import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
+import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback } from './questions';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
 import { touchLastSeen } from './events';
+import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 import {
   fetchPending,
   removeFromQueue,
@@ -114,6 +130,24 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
+import {
+  getPendingReply,
+  clearPendingReply,
+  postZaalReplyToTask,
+  getPendingDraft,
+  clearPendingDraft,
+  postDraftAnswerToTask,
+} from './task-teammate-ack';
+import {
+  isFocusMode,
+  startFocus,
+  endFocus,
+  decideQueueOrSend,
+  buildFocusDigest,
+  queuePing,
+} from './focus-guard';
+import { saveCheckpoint, getCheckpoint, offerCheckpoint } from './session-checkpoint';
+import { runAudit, formatAuditForTelegram } from './trust-audit';
 
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
@@ -262,6 +296,12 @@ const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 const bot = new Bot(token);
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
+
+// Telegram routing: construct deps for sendToZaal (DM vs group routing).
+// This centralizes where messages go based on kind (question vs status).
+const routingDeps = constructRoutingDeps((chatId: number, text: string, opts?: any) =>
+  bot.api.sendMessage(chatId, text, opts),
+);
 
 // Cowork control-plane (Phase 1 Observe): live detail surfaced to the board.
 const COWORK_BOOT_TS = Date.now();
@@ -831,6 +871,88 @@ bot.on('message:text', async (ctx) => {
   const chatType = ctx.chat.type;
   const chatId = ctx.chat.id;
 
+  // Reply-bridge for teammate ack: when Zaal replies to one of our asks,
+  // handle either the legacy "what should I reply?" flow or the new draft-approval flow.
+  if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
+    const replyToId = ctx.message.reply_to_message.message_id;
+    try {
+      // Try draft flow first
+      const draft = await getPendingDraft(replyToId);
+      if (draft) {
+        // Draft approval/edit/skip handler
+        const trimmed = text.trim();
+        const firstChar = trimmed.charAt(0);
+
+        if (firstChar === '1') {
+          // APPROVE: post the draft as-is
+          const success = await postDraftAnswerToTask(draft, draft.draftAnswer);
+          if (success) {
+            await clearPendingDraft(replyToId);
+            await ctx.reply(`Approved and posted to "${draft.taskTitle}".`);
+            console.log(`[zoe/index] draft-approval reply-bridge: approved for task ${draft.taskId}`);
+            return;
+          } else {
+            await ctx.reply('Failed to post draft to the task. Check the board API.');
+            return;
+          }
+        } else if (firstChar === '2') {
+          // EDIT: take the rest of the text as the edited answer, or ask for it
+          const edited = trimmed.slice(1).trim();
+          if (edited) {
+            // Use the provided text as the edited answer
+            const success = await postDraftAnswerToTask(draft, edited);
+            if (success) {
+              await clearPendingDraft(replyToId);
+              await ctx.reply(`Edited and posted to "${draft.taskTitle}".`);
+              console.log(`[zoe/index] draft-approval reply-bridge: edited for task ${draft.taskId}`);
+              return;
+            } else {
+              await ctx.reply('Failed to post edited answer to the task. Check the board API.');
+              return;
+            }
+          } else {
+            // No text provided; ask for the edited version
+            await ctx.reply(
+              `Got it. Send me your edited answer and I'll post it. Just reply to this message with the text.`,
+            );
+            // For now, we'll need Zaal to send a follow-up. In a more elaborate version,
+            // we could store an "awaiting edit" state, but for MVP this is good enough.
+            return;
+          }
+        } else if (firstChar === '3') {
+          // SKIP: post a contextual "noted" ack instead of the draft
+          // For now, just clear the draft and acknowledge
+          await clearPendingDraft(replyToId);
+          await ctx.reply(`Skipped the draft for "${draft.taskTitle}". The task already has a "Noted" ack.`);
+          console.log(`[zoe/index] draft-approval reply-bridge: skipped for task ${draft.taskId}`);
+          return;
+        } else {
+          // Unrecognized input; remind user of options
+          await ctx.reply('Reply with 1 (approve), 2 (edit), or 3 (skip).');
+          return;
+        }
+      }
+
+      // Try legacy reply flow (ask-first)
+      const pending = await getPendingReply(replyToId);
+      if (pending) {
+        const success = await postZaalReplyToTask(pending, text);
+        if (success) {
+          await clearPendingReply(replyToId);
+          await ctx.reply(`Posted your reply to "${pending.taskTitle}". Done.`);
+          console.log(`[zoe/index] teammate-ack reply-bridge: posted to task ${pending.taskId}`);
+          return; // Exit early - don't process as a normal turn
+        } else {
+          await ctx.reply('Failed to post reply to the task. Check the board API.');
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('[zoe/index] reply-bridge handler failed (nbd):', (err as Error)?.message);
+      // Fall through to normal message handling if the bridge fails
+    }
+  }
+
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
     if (!isFromZaal(ctx)) return;
@@ -862,6 +984,19 @@ bot.on('message:text', async (ctx) => {
   const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
   if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
     const threadId = ctx.message.message_thread_id;
+
+    // THREAD ID LOGGER: when a message arrives in a forum topic, log the topic
+    // name + thread_id so Zaal can discover all topic IDs by just sending a
+    // message in each one. This is how the curator learns the topic mapping.
+    if (threadId && ctx.chat.is_forum) {
+      const topicNameForLog = await topicNameForThread(threadId).catch(() => undefined);
+      if (topicNameForLog) {
+        void logTopicThreadId(topicNameForLog, threadId).catch((e) =>
+          console.warn('[zoe/index] thread_id logging failed (nbd):', (e as Error)?.message),
+        );
+      }
+    }
+
     // Per-topic behavior (topic = intent, Zaal 2026-07-11): dropping a plain
     // message into a topic auto-acts per that topic. Internal actions fire now;
     // outbound casts are drafted with an Approve button (money/public gate).
@@ -909,6 +1044,21 @@ bot.on('message:text', async (ctx) => {
     ).catch((e) => console.error('[zoe/index] zaalbotz bridge-log failed:', (e as Error)?.message));
 
     if (action.kind === 'research') {
+      // Dedupe guard: check if this URL was already researched
+      const url = extractFirstUrl(text);
+      if (url) {
+        const researched = await wasResearched(url, join(repoDir, 'research')).catch((e) => {
+          console.error('[zoe/index] dedupe check failed (fail-open):', (e as Error)?.message);
+          return false;
+        });
+        if (researched) {
+          await ctx
+            .reply('Already researched that link — see the Research topic.')
+            .catch(() => {});
+          return;
+        }
+      }
+
       await enqueueWork(text, { chatId, threadId }).catch((e) =>
         console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),
       );
@@ -917,7 +1067,7 @@ bot.on('message:text', async (ctx) => {
         .catch(() => {});
       // Kick the work-loop now so it starts immediately (else waits for the 2h cron).
       void runWorkTick({
-        sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+        sendToZaal: (t: string) => sendToZaalRouted(routingDeps, t, { kind: 'status' }),
         sendToChat: (cid: number, tid: number | undefined, t: string) =>
           bot.api.sendMessage(cid, t, tid ? { message_thread_id: tid } : {}),
         defaultResearchTarget: researchTopicTarget(),
@@ -1308,7 +1458,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       .reply(`Queued #${depth} for the work-loop: "${item.input.slice(0, 80)}". On it now.`)
       .catch(() => {});
     void runWorkTick({
-      sendToZaal: (t: string) => bot.api.sendMessage(zaalId, t),
+      sendToZaal: (t: string) => sendToZaalRouted(routingDeps, t, { kind: 'status' }),
       sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
         bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
       defaultResearchTarget: researchTopicTarget(),
@@ -1316,6 +1466,59 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       repoDir,
       currentDate: currentDateString(),
     }).catch((e) => console.error('[zoe/index] work-loop kick failed:', (e as Error).message));
+    return;
+  }
+
+  // Hyperfocus guard: `/focus` or `/focus on` enables focus mode.
+  if (FOCUS_ON_RE.test(text.trim())) {
+    await startFocus();
+    await ctx.reply('Focus mode ON. Non-urgent pings will queue until you send /focus off.');
+    return;
+  }
+
+  // Hyperfocus guard: `/focus off` disables focus mode and sends queued digest.
+  if (FOCUS_OFF_RE.test(text.trim())) {
+    const queuedPings = await endFocus();
+    const digest = buildFocusDigest(queuedPings);
+    await ctx.reply('Focus mode OFF.\n\n' + digest);
+    return;
+  }
+
+  // Session checkpoint: `/checkpoint <note>` saves a breadcrumb.
+  const checkpointMatch = CHECKPOINT_PREFIX.exec(text);
+  if (checkpointMatch) {
+    const chatId = ctx.chatId.toString();
+    await saveCheckpoint(chatId, checkpointMatch[1]);
+    await ctx.reply(`Checkpoint saved: "${checkpointMatch[1].slice(0, 60)}${checkpointMatch[1].length > 60 ? '...' : ''}"`);
+    return;
+  }
+
+  // Trust audit: `/audit` scans for fallen tasks/captures.
+  if (AUDIT_COMMAND_RE.test(text.trim())) {
+    const progress = startProgressNarration(ctx, ctx.chatId, { first: 'Running audit...' });
+    try {
+      const report = await runAudit([], Date.now());
+      const formatted = formatAuditForTelegram(report);
+      progress.stop();
+      await sendLongMessage(ctx, formatted);
+    } catch (err) {
+      progress.stop();
+      const msg = err instanceof Error ? err.message : String(err);
+      await ctx.reply(`Audit failed: ${msg.slice(0, 200)}`);
+    }
+    return;
+  }
+
+  // Budget status: `/budget` shows today's spend and remaining headroom.
+  if (BUDGET_COMMAND_RE.test(text.trim())) {
+    const detailed = text.toLowerCase().includes('detailed');
+    try {
+      const budgetText = formatSpendStatus(detailed);
+      await ctx.reply(budgetText);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      await ctx.reply(`Budget lookup failed: ${msg.slice(0, 100)}`);
+    }
     return;
   }
 
@@ -2169,7 +2372,7 @@ async function main(): Promise<void> {
     console.error('[zoe/index] getMe failed:', (err as Error).message);
   }
 
-  startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId });
+  startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });
 
   // Caster (doc 761, Phase 2). Approval callback always attached; the event-stream subscriber
   // only starts when a node gRPC is configured. Single-agent persona via CASTER_PERSONA.
@@ -2267,6 +2470,15 @@ async function main(): Promise<void> {
       return { reply: result.reply, todo_marked: todoMarked };
     },
   });
+
+  // Boot Discord client (optional, no-op if DISCORD_BOT_TOKEN unset).
+  let discordClient: Client | null = null;
+  try {
+    discordClient = await bootDiscordClient();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] Discord client boot failed (Telegram still active):', msg);
+  }
 
   await bot.start({
     onStart: (info) => {

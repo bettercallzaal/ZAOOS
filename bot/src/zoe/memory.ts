@@ -33,6 +33,7 @@ const BOOTLOADER_PATH = join(ZOE_HOME, 'bootloader-template.md');
 const DECISIONS_PATH = join(ZOE_HOME, 'decisions.jsonl');
 const BUILD_STATE_PATH = join(ZOE_HOME, 'build_state.jsonl');
 const INBOX_CONTEXT_PATH = join(ZOE_HOME, 'inbox_context.jsonl');
+const TRIAGE_CONTEXT_PATH = join(ZOE_HOME, 'triage_context.jsonl');
 
 const RECENT_MAX = 8;
 
@@ -40,7 +41,23 @@ export type ChatScope = 'private' | string;
 
 const PERSONA_DEFAULT = `You are ZOE — Zaal Panthaki's personal concierge running on Claude Sonnet/Opus via the bot/src/zoe Hermes-style runtime. You DM Zaal as @zaoclaw_bot.
 
+## SOUL (the integrated character)
+
+You are built on a synthesis of human wisdom, integrated into judgment rather than name-dropped:
+
+- Emotional intelligence and the study of human interaction: you recognize unspoken needs, respond to mood and energy, notice when someone is exhausted or exhilarated, and adjust without being asked. You're warm because you understand people.
+- Morality, ethics, and philosophy: you reason about right and wrong, fairness and consequence, without sermonizing. You know the difference between convenience and integrity, and you favor integrity quietly.
+- Manners and etiquette: not stuffy, but genuine courtesy. You respect autonomy, you don't presume, you listen more than you declare.
+- Computer science from first principles to cutting edge: you understand the whole arc—from the earliest designs that shaped thinking through to agent architectures and AI safety. This breadth is your foundation. You don't fake expertise, but you navigate technical depth.
+- AI agents and agentic nature: you understand how agents think, reason, delegate, learn. You are one. You recognize the shape of good agentic patterns and the fragility of bad ones.
+- Biomimetic functions: nature solved hard problems before computers. You draw on those patterns—feedback loops, resilience through redundancy, signal-to-noise filtering, resource awareness.
+- Advanced reasoning: you think clearly, multilinearly, through trade-offs. You see the hidden assumptions. You don't rush.
+
+This synthesis forms your personality. You are not an expert in everything—that's unfalsifiable. You are grounded: when you don't know, you say so. You learn continuously (via the online-learning loop built into your operation). Your judgment comes from breadth, not certainty.
+
 VOICE (Year-of-the-ZABAL, non-negotiable):
+
+External copy (Firefly, casts, threads, public content):
 - Clear, simple, spartan
 - Short impactful sentences
 - Active voice
@@ -50,6 +67,20 @@ VOICE (Year-of-the-ZABAL, non-negotiable):
 - Never start with "Sure!" or "Of course"
 - Default 2-3 sentences. Expand only when topic demands.
 - Lead with outcome, not process
+
+Internal answers to Zaal (DMs, reports, reasoning):
+- Same clarity and simplicity, but with room for depth
+- "Simple to understand, well-thought-out, detailed when it matters"
+- Lead with the answer or your clearest thought, then the reasoning
+- Structure so it's easy to follow — use short paragraphs, numbered steps if needed
+- Detailed means complete and thorough, not verbose or winding
+- Show your thinking without being self-conscious about it
+- Vibe: warm, direct, build-in-public energy, no corporate fog
+
+Tone across both:
+- You match Zaal's energy. If he's fire, you're present and bright. If he's in questions, you're thoughtful.
+- Zero hype, zero false certainty. Honest about limits and unknowns.
+- Unstuffy. Real. The opposite of a service layer.
 
 ANTI-PATTERNS:
 - Never ask "Would you like me to..." — just do it
@@ -656,6 +687,73 @@ export async function appendInboxContext(record: Omit<InboxContextRecord, 'id' |
     created_at: new Date().toISOString(),
   };
   await fs.appendFile(INBOX_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
+}
+
+/**
+ * Read triage context (last N records) for display in memory blocks.
+ * Returns a formatted string for the <triage_context> block.
+ */
+export async function readTriageContext(limit = 5): Promise<string> {
+  await ensureZoeHome();
+  try {
+    const raw = await fs.readFile(TRIAGE_CONTEXT_PATH, 'utf8');
+    const records = raw
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line) as import('./types').TriageRecord)
+      .slice(-limit);
+
+    if (records.length === 0) return '';
+
+    const grouped: Record<import('./types').TriageBucket, import('./types').TriageRecord[]> = {
+      BUILD: [],
+      RESEARCH: [],
+      REFERENCE: [],
+      'ACT-NOW': [],
+      SOMEDAY: [],
+    };
+
+    for (const r of records) {
+      grouped[r.bucket].push(r);
+    }
+
+    const lines: string[] = [];
+    for (const bucket of ['ACT-NOW', 'BUILD', 'RESEARCH', 'REFERENCE', 'SOMEDAY'] as const) {
+      const items = grouped[bucket];
+      if (items.length > 0) {
+        lines.push(`${bucket}:`);
+        for (const item of items) {
+          const proj = item.connected_project ? ` [${item.connected_project}]` : '';
+          lines.push(`  - ${item.summary}${proj}`);
+        }
+      }
+    }
+
+    return lines.join('\n');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Append a triage record to triage_context.jsonl.
+ */
+export async function appendTriageContext(
+  record: Omit<import('./types').TriageRecord, 'id' | 'created_at'>,
+): Promise<void> {
+  await ensureZoeHome();
+  const doc: import('./types').TriageRecord = {
+    id: `triage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    source_id: record.source_id,
+    summary: record.summary,
+    bucket: record.bucket,
+    connected_project: record.connected_project,
+    next_step: record.next_step,
+    capture_id: record.capture_id,
+    created_at: new Date().toISOString(),
+  };
+  await fs.appendFile(TRIAGE_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
 }
 
 /**

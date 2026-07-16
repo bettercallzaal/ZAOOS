@@ -37,6 +37,20 @@ Multiple event-insurance providers quote entry-level one-day festival policies i
 
 ZAOstock's public/tax-deductible funding path runs through Fractured Atlas and New Media Commons (per the live `/sponsor` page). Fractured Atlas's own insurance program for sponsored projects ended December 31, 2019, and isn't part of current fiscal-sponsorship terms - liability responsibility sits with the sponsored project under their standard model. No public documentation was found on whether New Media Commons or ENTERACT (the commercial-sponsor path) include any event-liability coverage. **This is the one finding in this doc that needs a direct confirmation, not just research** - the safe assumption is that ZAOstock needs to arrange its own policy, but the actual answer should come from a direct question to those organizations, not from this doc's general research. [PARTIAL - Fractured Atlas's own published insurance-program end date is FULL; New Media Commons/ENTERACT's specific terms were not found and need direct confirmation]
 
+### 3.5 NEW 2026-07-14 - real vendors and pricing found, this is buyable in minutes, not a research gap anymore
+
+This doc originally budgeted $300-600 without naming a single actual insurance provider. Real options now
+confirmed: **Brown, Holmes & Milliken Agency**, a full-service insurance agency based directly in
+Ellsworth (67 Foster St, since 1864, 207-667-2516) - worth calling first given the local relationship
+potential, though their event-specific offerings aren't listed online. If a faster/more predictable
+national online option is needed, **GatherGuard** (844-747-6240, gatherguard.com/festivals-cultural-events)
+offers instant online quotes starting at $75 for under 100 people, likely $150-250 for ZAOstock's size,
+$1-2M general liability with host liquor liability already included, insured in minutes. **RVNA**
+(specialeventinsurance.com/event-insurance/maine, 800-364-2433) is a second national option with a
+Maine-specific page, starting at $199. All three can plausibly bind coverage with only a few weeks' notice
+- this is no longer a "find a vendor" problem, just a "make the call" one. [FULL - this session's research,
+3 real vendors with confirmed pricing and contact info]
+
 ### 4. Vendors and performers typically carry their own coverage - worth requiring proof, not assuming
 
 Standard event practice is that food vendors and performers carry their own liability insurance and provide a certificate of insurance naming the event organizer as additional insured. This connects directly to doc 1044's food-vendor plan - the vendor confirmation checklist that doc recommends should include an insurance-status question, not just permit status. [FULL - per subagent research, cross-referenced against doc 1044's vendor sourcing plan]

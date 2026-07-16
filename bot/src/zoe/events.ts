@@ -271,59 +271,88 @@ interface GCalEvent {
 }
 
 /**
- * Surface calendar events starting within 2 hours, read from the most recent
- * gcal-*.json dump in ~/.zao/private/. Skips stale files (>24h). Scores at
- * 0.72 (time-sensitive: outranks stale PR, beaten by overdue commitment thread).
- * Best-effort: never throws.
+ * Surface calendar events starting within 2 hours. Reads from:
+ * 1. Most recent gcal-*.json dump in ~/.zao/private/ (Google Calendar exports)
+ * 2. ZOE's calendar reader (ZAO Luma ICS feed via calendar.ts)
+ *
+ * Skips stale files (>24h). Scores at 0.72 (time-sensitive: outranks stale PR,
+ * beaten by overdue commitment thread). Best-effort: never throws.
  */
 export async function gatherCalendarCandidates(now: number = Date.now()): Promise<Candidate[]> {
-  let files: string[] = [];
-  try {
-    const entries = await fs.readdir(ZAO_PRIVATE_DIR);
-    files = entries.filter((f) => f.startsWith('gcal-') && f.endsWith('.json')).sort();
-  } catch {
-    return []; // no private dir yet
-  }
-  if (files.length === 0) return [];
-
-  const latestPath = join(ZAO_PRIVATE_DIR, files[files.length - 1]);
-  try {
-    const stat = await fs.stat(latestPath);
-    if (now - stat.mtimeMs > GCAL_FILE_MAX_AGE_MS) return []; // stale
-  } catch {
-    return [];
-  }
-
-  let events: GCalEvent[] = [];
-  try {
-    const raw = await fs.readFile(latestPath, 'utf8');
-    const data = JSON.parse(raw) as GCalEvent[] | { items?: GCalEvent[]; events?: GCalEvent[] };
-    events = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
-  } catch {
-    return [];
-  }
-
   const seen = await readSeen();
   const windowEnd = now + CALENDAR_LOOKAHEAD_MS;
   const out: Candidate[] = [];
 
-  for (const ev of events) {
-    const startStr = ev.start?.dateTime ?? ev.start?.date;
-    if (!startStr) continue;
-    const start = Date.parse(startStr);
-    if (!Number.isFinite(start) || start < now || start > windowEnd) continue;
+  // Check Google Calendar exports (from ~/.zao/private/gcal-*.json)
+  let gcalFiles: string[] = [];
+  try {
+    const entries = await fs.readdir(ZAO_PRIVATE_DIR);
+    gcalFiles = entries.filter((f) => f.startsWith('gcal-') && f.endsWith('.json')).sort();
+  } catch {
+    // no private dir yet — continue with ZOE calendar
+  }
 
-    const key = `calendar:${ev.id ?? ev.summary}:${new Date(start).toISOString().slice(0, 10)}`;
-    if (seen[key]) continue;
-    seen[key] = now;
+  if (gcalFiles.length > 0) {
+    const latestPath = join(ZAO_PRIVATE_DIR, gcalFiles[gcalFiles.length - 1]);
+    try {
+      const stat = await fs.stat(latestPath);
+      if (now - stat.mtimeMs <= GCAL_FILE_MAX_AGE_MS) {
+        // not stale — process it
+        let events: GCalEvent[] = [];
+        try {
+          const raw = await fs.readFile(latestPath, 'utf8');
+          const data = JSON.parse(raw) as GCalEvent[] | { items?: GCalEvent[]; events?: GCalEvent[] };
+          events = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
+        } catch {
+          // parse error — continue to ZOE calendar
+        }
 
-    const minsAway = Math.round((start - now) / 60_000);
-    out.push({
-      kind: 'calendar',
-      score: 0.72,
-      tier: 'standard',
-      message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
-    });
+        for (const ev of events) {
+          const startStr = ev.start?.dateTime ?? ev.start?.date;
+          if (!startStr) continue;
+          const start = Date.parse(startStr);
+          if (!Number.isFinite(start) || start < now || start > windowEnd) continue;
+
+          const key = `calendar:${ev.id ?? ev.summary}:${new Date(start).toISOString().slice(0, 10)}`;
+          if (seen[key]) continue;
+          seen[key] = now;
+
+          const minsAway = Math.round((start - now) / 60_000);
+          out.push({
+            kind: 'calendar',
+            score: 0.72,
+            tier: 'standard',
+            message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
+          });
+        }
+      }
+    } catch {
+      // stat failed — continue to ZOE calendar
+    }
+  }
+
+  // Check ZOE's calendar (ZAO Luma ICS feed via calendar.ts)
+  try {
+    const { getCalendarEvents } = await import('./calendar');
+    const zoeEvents = await getCalendarEvents(1); // 1-day lookahead for reminders
+    for (const ev of zoeEvents) {
+      if (ev.start.getTime() < now || ev.start.getTime() > windowEnd) continue;
+
+      const key = `calendar-zoe:${ev.id}:${ev.start.toISOString().slice(0, 10)}`;
+      if (seen[key]) continue;
+      seen[key] = now;
+
+      const minsAway = Math.round((ev.start.getTime() - now) / 60_000);
+      out.push({
+        kind: 'calendar',
+        score: 0.72,
+        tier: 'standard',
+        message: `[CALENDAR] "${ev.title}" in ${minsAway}m${ev.location ? ` @ ${ev.location}` : ''}. Anything to prep?`,
+      });
+    }
+  } catch (err) {
+    // calendar.ts import or fetch failed — best-effort, continue anyway
+    console.warn('[zoe/events] ZOE calendar check failed (nbd):', (err as Error).message);
   }
 
   if (out.length > 0) await writeSeen(seen);

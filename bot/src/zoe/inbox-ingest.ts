@@ -19,7 +19,13 @@
  */
 
 import { redactPii } from './pii';
-import { appendInboxContext, readIngestedSourceIds } from './memory';
+import { appendInboxContext, readIngestedSourceIds, appendTriageContext } from './memory';
+import {
+  classifyBucket,
+  connectToProject,
+  suggestNextStep,
+  buildTriageSummary,
+} from './inbox-triage';
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
 const FETCH_LIMIT = 50;
@@ -29,7 +35,7 @@ const MAX_PER_TICK = 15;
 const SNIPPET_LEN = 220;
 
 /** Loose shape - AgentMail v0 fields vary; every field is optional + defended. */
-interface RawAgentMailMessage {
+export interface RawAgentMailMessage {
   id?: string;
   message_id?: string;
   from?: string;
@@ -120,11 +126,27 @@ export async function ingestInbox(
       continue;
     }
     try {
+      const sourceId_ = sourceId(m);
       await appendInboxContext({
-        source_id: sourceId(m),
+        source_id: sourceId_,
         summary,
         received_at: m.timestamp ?? m.created_at ?? m.date,
       });
+
+      // Triage the item
+      const bucket = classifyBucket(m, summary);
+      const connectedProject = connectToProject(m, summary);
+      const nextStep = suggestNextStep(bucket, m, connectedProject);
+      const triageSummary = buildTriageSummary(m, summary);
+
+      await appendTriageContext({
+        source_id: sourceId_,
+        summary: triageSummary,
+        bucket,
+        connected_project: connectedProject,
+        next_step: nextStep,
+      });
+
       ingested++;
     } catch (err) {
       console.warn('[zoe/inbox-ingest] append failed (nbd):', (err as Error).message);

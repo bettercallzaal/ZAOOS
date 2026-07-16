@@ -32,6 +32,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
+import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick } from './orchestrator-tick';
@@ -45,6 +46,9 @@ import { reconcileUntaggedTasks } from './team-tracker';
 import { ingestInbox } from './inbox-ingest';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
+import { runTaskTeammateAck } from './task-teammate-ack';
+import { runCuratorTick } from './curator';
+import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -88,6 +92,7 @@ export interface SchedulerOptions {
   repoDir: string;
   devzChatId?: number;
   devzTopicId?: number;
+  routingDeps?: ReturnType<typeof constructRoutingDeps>; // for message routing
 }
 
 export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
@@ -114,7 +119,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             );
             brief = await generateMorningBrief({ repoDir: opts.repoDir });
           }
-          await opts.bot.api.sendMessage(opts.zaalTgId, brief);
+          // Route the morning brief as a status message
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, brief);
+          }
           console.log('[zoe/scheduler] morning brief sent (cockpit)');
         } catch (err) {
           await releaseFire('morning-brief');
@@ -155,7 +165,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         if (!(await claimFire('evening-reflect'))) return;
         try {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
-          await opts.bot.api.sendMessage(opts.zaalTgId, prompt);
+          // Evening reflection is a question for Zaal - route as 'question'
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, prompt, { kind: 'question' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, prompt);
+          }
           // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
           // reflection answer and fed to the reflexion layer for memory patches.
           const armed = await setPending({
@@ -198,11 +213,60 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             console.log('[zoe/scheduler] nightly recap: nothing shipped (silent)');
             return;
           }
-          await opts.bot.api.sendMessage(opts.zaalTgId, recap);
+          // Nightly recap is a status message
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, recap, { kind: 'status' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, recap);
+          }
           console.log('[zoe/scheduler] nightly recap sent');
         } catch (err) {
           await releaseFire('nightly-recap');
           console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Clean-curator Telegram topic posting — 08:00 UTC daily (one hour before
+  // morning brief). Posts curated digests to the ZAO group forum topics
+  // (newsletter, github, artizen, recommendations, general). Disabled by default
+  // (safe no-op) until all 5 topic thread IDs are configured.
+  tasks.push(
+    cron.schedule(
+      '0 8 * * *',
+      async () => {
+        if (!(await claimFire('curator-tick'))) return;
+        try {
+          const zaoGroupId = Number(process.env.ZAO_GROUP_ID ?? 0);
+          if (!zaoGroupId) {
+            console.log('[zoe/scheduler] curator: ZAO_GROUP_ID not configured, skipping');
+            await releaseFire('curator-tick');
+            return;
+          }
+
+          const result = await runCuratorTick(
+            (chatId, text, sendOpts) => sendOpts?.message_thread_id
+              ? opts.bot.api.sendMessage(chatId, text, { message_thread_id: sendOpts.message_thread_id })
+              : opts.bot.api.sendMessage(chatId, text),
+            zaoGroupId,
+          );
+
+          if (result.posted > 0) {
+            console.log(`[zoe/scheduler] curator: ${result.posted} posted, ${result.skipped} skipped`);
+          } else if (!result.enabled) {
+            await releaseFire('curator-tick');
+            console.log('[zoe/scheduler] curator: disabled (thread_ids not fully set)');
+            return;
+          }
+
+          if (result.errors.length > 0) {
+            console.warn('[zoe/scheduler] curator: errors:', result.errors);
+          }
+        } catch (err) {
+          await releaseFire('curator-tick');
+          console.error('[zoe/scheduler] curator tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },
@@ -273,6 +337,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.warn('[zoe/scheduler] mention-notify failed (nbd):', (err as Error).message);
         }
 
+        // When a team member comments on a board task, ZOE posts "noted" + asks
+        // Zaal on Telegram what to reply. The reply-bridge in index.ts posts his
+        // answer back to the task. Best-effort - a no-op when board is unconfigured.
+        try {
+          const sendTg = async (chatId: number, text: string, o?: { replyToMessageId?: number }) => {
+            const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
+            return res.message_id ?? null;
+          };
+          const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId, fetch, opts.repoDir);
+          if (ta.asked > 0) {
+            console.log(`[zoe/scheduler] teammate-ack: asked ${ta.asked}`);
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] teammate-ack failed (nbd):', (err as Error).message);
+        }
+
         // Doc 983 Rec #4: hourly backfill of any task created untagged by a
         // writer other than ZOE's write-path (board quick-add, meeting capture).
         // Best-effort - a no-op when the tracker is unconfigured.
@@ -332,7 +412,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         try {
           const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
-          await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          // Nudges and reasoning decisions are status messages
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          }
           if (decision.candidate) {
             await recordPush(decision.candidate);
             if (decision.threadId) await markNudged(decision.threadId);
@@ -383,7 +468,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             );
             return;
           }
-          await opts.bot.api.sendMessage(opts.zaalTgId, renderLearnProposals(result.proposals));
+          // Learning proposals are approval questions
+          const proposalsMsg = renderLearnProposals(result.proposals);
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, proposalsMsg, { kind: 'question' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, proposalsMsg);
+          }
           console.log(`[zoe/scheduler] learn cycle: ${result.proposals.length} proposals sent`);
         } catch (err) {
           await releaseFire('learn-cycle');
@@ -419,7 +510,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         try {
           const alerts = [...(await runWatcherTick()), ...(await healFleet({ date: new Date().toISOString().slice(0, 10) }))];
           if (alerts.length) {
-            await opts.bot.api.sendMessage(opts.zaalTgId, renderWatcherAlerts(alerts));
+            // Watcher alerts are status messages
+            const alertsMsg = renderWatcherAlerts(alerts);
+            if (opts.routingDeps) {
+              await sendToZaalRouted(opts.routingDeps, alertsMsg, { kind: 'status' });
+            } else {
+              await opts.bot.api.sendMessage(opts.zaalTgId, alertsMsg);
+            }
             console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');
           } else {
             console.log('[zoe/scheduler] watcher: clean');
@@ -441,10 +538,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       '0 */2 * * *',
       async () => {
         try {
+          if (shouldPauseAutonomousWork()) {
+            console.log('[zoe/scheduler] work-loop tick skipped (cost hard-stop at 95%+)');
+            return;
+          }
           const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
           const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
           await runWorkTick({
-            sendToZaal: (t: string) => opts.bot.api.sendMessage(opts.zaalTgId, t),
+            sendToZaal: (t: string) => {
+              // Work-loop messages are status messages
+              if (opts.routingDeps) {
+                return sendToZaalRouted(opts.routingDeps, t, { kind: 'status' });
+              }
+              return opts.bot.api.sendMessage(opts.zaalTgId, t);
+            },
             sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
               opts.bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
             defaultResearchTarget: rGid && rThread ? { chatId: rGid, threadId: rThread } : undefined,
@@ -523,6 +630,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
         try {
+          if (shouldPauseAutonomousWork()) {
+            console.log('[zoe/scheduler] orchestrator tick skipped (cost hard-stop at 95%+)');
+            return;
+          }
           await runOrchestratorTick({
             bot: opts.bot,
             groupId: gid,
@@ -551,6 +662,39 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await surfaceNudges((text: string) => opts.bot.api.sendMessage(gid, text));
         } catch (err) {
           console.warn('[zoe/scheduler] nudge surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Cost governance monitor - every 10 min, check spend thresholds (60/75/85/95%)
+  // and fire alerts to Zaal when crossed. De-duped per day so each threshold fires
+  // at most once per day. At 95%, autonomous work is already hard-stopped by the
+  // wraps around runWorkTick + runOrchestratorTick.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        try {
+          for (const level of [60, 75, 85, 95]) {
+            if (shouldFireAlert(level)) {
+              const status = formatSpendStatus(false);
+              const alert = `COST ALERT: Spend reached ${level}% of daily cap\n\n${status}`;
+              // Cost alerts are status messages
+              if (opts.routingDeps) {
+                await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
+                  console.warn('[zoe/scheduler] cost alert send failed:', err);
+                });
+              } else {
+                await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
+                  console.warn('[zoe/scheduler] cost alert send failed:', err);
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] cost monitoring failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

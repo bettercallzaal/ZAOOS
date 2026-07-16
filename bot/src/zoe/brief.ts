@@ -20,6 +20,9 @@ import { listOpenTasks } from './tasks';
 import { getOpenTeamTasks, summarizeTeamForBrief, zaalFocusForBrief } from './team-tracker';
 import { fleetConsensus } from './fleet-health';
 import { graphTopicAgeDays } from './recall';
+import { getCalendarEvents, formatEventForBrief, formatTodayTomorrowEvents } from './calendar';
+import { gatherPendingDecisions } from './pending-decisions';
+import { readTriageContext } from './memory';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -29,6 +32,12 @@ VOICE: Year-of-the-ZABAL — clear, simple, spartan, active voice. No emojis, no
 OUTPUT FORMAT (exact structure):
 
 Morning brief - {Day} {Mon DD} 5am
+
+PENDING DECISIONS
+- PRs awaiting merge, tasks in review/blocked, ranked by urgency. Critical (due/overdue) first. Skip entirely if none.
+
+CALENDAR
+- Today and Tomorrow events. Skip entire section if no events in next 2 days.
 
 TOP PRIORITIES ({P0 count} P0, {P1 count} P1)
 - P0/P1 priority items, one per line. Group by priority.
@@ -52,6 +61,10 @@ INBOX
 - {N} unread in zoe-zao@agentmail.to. First 3 subjects: ... (skip line entirely if inbox=null)
 - Reminder: run /inbox in any Claude session to research the queue.
 
+INBOX TRIAGE (new ideas, grouped by bucket)
+- If triage_context is empty, skip this section entirely.
+- Format the triage summary as provided; one bucket per line, items nested. Keep it brief.
+
 portal.zaoos.com/todos - brain dump
 
 Output the brief in plaintext. NO markdown headers, NO emojis, NO pleasantries.`;
@@ -67,6 +80,10 @@ interface BriefContext {
   focus: string | null;
   fleet: string | null;
   zol: string | null;
+  upcomingEvents: Array<{ title: string; start: string; location?: string }>;
+  pendingDecisions: string | null;
+  todayTomorrowEvents: string | null;
+  triageContext: string; // Formatted triage summary (grouped by bucket)
 }
 
 const AGENTMAIL_INBOX = 'zoe-zao@agentmail.to';
@@ -234,6 +251,50 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     zol = null;
   }
 
+  // Upcoming calendar events — next 7 days. Best-effort; gracefully degrade.
+  let upcomingEvents: Array<{ title: string; start: string; location?: string }> = [];
+  let todayTomorrowEvents: string | null = null;
+  try {
+    const events = await getCalendarEvents(7); // 7-day lookahead for the brief
+    upcomingEvents = events.map((e) => ({
+      title: e.title,
+      start: e.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      location: e.location,
+    }));
+    // Format Today/Tomorrow separately for the brief
+    todayTomorrowEvents = formatTodayTomorrowEvents(events);
+  } catch {
+    upcomingEvents = [];
+    todayTomorrowEvents = null;
+  }
+
+  // Pending decisions — PRs awaiting merge, tasks in review/blocked. Best-effort.
+  let pendingDecisions: string | null = null;
+  try {
+    const teamTasks = await getOpenTeamTasks();
+    // Convert team tasks to the shape expected by gatherPendingDecisions
+    const taskData = teamTasks.map((t) => ({
+      title: t.title,
+      status: t.status,
+      due: t.due,
+      metadata: t.metadata,
+    }));
+    pendingDecisions = gatherPendingDecisions({
+      openPrs: prs,
+      teamTasks: taskData,
+    });
+  } catch {
+    pendingDecisions = null;
+  }
+
+  // Triage context — ideas forwarded to inbox, grouped by bucket. Best-effort.
+  let triageContext = '';
+  try {
+    triageContext = await readTriageContext(5);
+  } catch {
+    triageContext = '';
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -245,6 +306,10 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     focus,
     fleet,
     zol,
+    upcomingEvents,
+    pendingDecisions,
+    todayTomorrowEvents,
+    triageContext,
   };
 }
 
@@ -258,9 +323,23 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
       : `INBOX: ${ctx.inbox.unreadCount} unread. Recent subjects: ${ctx.inbox.recentSubjects.join(' | ')}`
     : 'INBOX: (api unavailable - skip the INBOX section)';
 
+  const pendingDecisionsLine = ctx.pendingDecisions
+    ? `PENDING DECISIONS:\n${ctx.pendingDecisions}`
+    : 'PENDING DECISIONS: (none - skip the PENDING DECISIONS section)';
+
+  const calendarLine = ctx.todayTomorrowEvents
+    ? `CALENDAR:\n${ctx.todayTomorrowEvents}`
+    : 'CALENDAR: (no events today/tomorrow - skip the CALENDAR section)';
+
+  const triageLine = ctx.triageContext
+    ? `INBOX TRIAGE:\n${ctx.triageContext}`
+    : 'INBOX TRIAGE: (none - skip the INBOX TRIAGE section)';
+
   const userPrompt = `Generate the morning brief for ${day} ${date}.
 
 CONTEXT:
+- Pending decisions (PRs, blocked/review tasks): ${pendingDecisionsLine}
+- Calendar (today + tomorrow): ${calendarLine}
 - Open tasks: ${JSON.stringify(ctx.open_tasks, null, 2)}
 - Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
@@ -270,6 +349,7 @@ CONTEXT:
 - Fleet health: ${ctx.fleet ?? '(unavailable - skip the FLEET section)'}
 - ZOL status: ${ctx.zol ?? '(unavailable)'}
 - ${inboxLine}
+- ${triageLine}
 
 Output the brief now in the exact format from your system prompt.`;
 

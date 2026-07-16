@@ -93,6 +93,45 @@ Zaal flagged that cash is too tight (~$1.5K on hand across both events) to spend
 - **Fallback if renting isn't crypto-payable in time**: OBS Studio (free) plus the same $30-50 USB interface can run a single-camera or planned-cut livestream without a hardware switcher at all - a real downgrade in production quality (no live multi-camera mixing, a laptop becomes a single point of failure) but a genuine zero-hardware-cost option if the Jul 25 date arrives before a rental or purchase lands.
 - **Bottom line: total new cash-equivalent spend for Jul 25 can realistically be $90 or less** (rental + cheap interface) instead of the full $575-625, with the full ATEM purchase deferred to August when the real budget pressure eases slightly and lead time isn't a factor. [FULL - dedicated research pass this session, 10 sources including retailer payment-method pages, Coinbase/BitPay/Bitrefill/Moon fee structures, and AV rental pricing]
 
+### 7. NEW 2026-07-14 - a real Ellsworth-based livestream production company exists, worth a quote before buying anything
+
+Ellsworth-scene research surfaced Beverly Boy Productions (888-462-7808,
+beverlyboy.com/ellsworth-me-videographer-services), a full-service videography and livestream production
+company based directly in Ellsworth - 4K cameras, drones, gimbals, lighting, multi-camera livestream,
+20+ years experience, scales from a single videographer to a full crew. This changes the shape of the
+whole gear question above: instead of buying/renting an ATEM Mini Pro and audio interface and finding
+crew to run it, a single local production company could potentially cover the entire livestream need for
+ZAOstock (Oct 3, not necessarily ZAOville which is out of state) as a service, possibly cheaper than
+piecing together gear + volunteer crew + a dry run. Not yet priced or contacted - this is a lead, not a
+confirmed plan, and doesn't replace the ZAOville-specific rent/buy sequencing above since Beverly Boy is
+Ellsworth-based, not Maryland-based. [FULL - found during this session's broader Ellsworth-scene research,
+not yet contacted]
+
+### 8. RESOLVED 2026-07-14 - real ZAOville-specific (Laurel, MD) switcher rental found, closes Finding 6's rent-vs-buy gap for the actual near-term deadline
+
+Finding 6's rental recommendation was generic/national - never actually checked against Laurel, MD
+specifically, which matters given ZAOville is ~11 days out as of this update. Real, verified vendors now
+found:
+
+- **Breasia Productions** - 301 Compton Avenue, **in Laurel, MD itself** (zero travel), 301-490-3155,
+  Events@BreasiaProductions.com, 14+ years in Maryland AV rentals, offers video/switching equipment for
+  live streaming. Exact ATEM inventory not confirmed - call to check, but the only vendor found that's
+  actually IN Laurel, not just "serves the DC metro." Call this one first.
+- **AVALive** (DC Metro, VA/MD, 703-531-8406) - real, confirmed pricing: ATEM Mini Pro ISO (4-input
+  switcher with multiview) **$125/week**, in business since 2012 specializing specifically in ATEM
+  rentals. A week-long rental covers the event with margin either side for setup/testing, and $125 is
+  well inside the crypto-card-payable range already established in Finding 6.
+- **Red Star Pictures** - Lanham, MD location (~25 miles from Laurel), 301-779-8185, confirmed ATEM Mini
+  Pro ISO and ATEM Television Studio HD in stock, 40+ technicians available if crew support is needed
+  beyond just the gear rental.
+
+**Updated recommendation for ZAOville specifically**: call Breasia Productions first given zero travel
+distance, with AVALive's $125/week ATEM Mini Pro ISO as a confirmed-pricing fallback if Breasia doesn't
+have the right gear in stock. Either path is well under the $575-625 buy-outright cost Finding 6 was
+built around, and all are standard card-accepting rental businesses (Coinbase/BitPay card spending USDC
+works the same way established in Finding 6). [FULL - dedicated DC/Maryland-area research this session,
+7 vendors checked, 3 with confirmed real inventory/pricing]
+
 ## Also See
 
 - [Doc 912 — Restream vs StreamYard vs OBS](../912-restream-vs-streamyard-vs-obs-workflow/) — already answers the distribution-platform question (multistreaming to YouTube+Twitch); this doc is about the field-production side that feeds into that choice, not a replacement for it

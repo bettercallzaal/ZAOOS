@@ -121,6 +121,19 @@ export interface InboxContextRecord {
   created_at: string; // When ZOE ingested it
 }
 
+export type TriageBucket = 'BUILD' | 'RESEARCH' | 'REFERENCE' | 'ACT-NOW' | 'SOMEDAY';
+
+export interface TriageRecord {
+  id: string;
+  source_id: string; // AgentMail message id (dedup key, same as inbox_context)
+  summary: string; // 1-2 line summary + key takeaway (from inbox-ingest)
+  bucket: TriageBucket; // Classified bucket (BUILD/RESEARCH/REFERENCE/ACT-NOW/SOMEDAY)
+  connected_project?: string; // ZAO project match (The ZAO, WaveWarZ, ZABAL, etc) or none
+  next_step?: string; // One concrete action for BUILD/ACT-NOW, or none
+  capture_id?: string; // Cowork board capture ID if created, or none for REFERENCE/SOMEDAY
+  created_at: string; // When ZOE triaged it
+}
+
 export type BuildStateOp = {
   op: "log_build_state";
   feature: string;

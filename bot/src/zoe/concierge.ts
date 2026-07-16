@@ -7,12 +7,16 @@
  *
  * Single source of truth for ZOE identity = ~/.zao/zoe/persona.md (seeded
  * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
+ *
+ * Multi-model routing (doc 1113): when MODEL_ROUTING_ENABLED=1, selects between
+ * Claude, Grok, and GPT based on task type. Shows Zaal the model choice + rationale.
  */
 import { callClaudeCli } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
+import { shouldUseRouting, selectBestModel, routeAndCall } from './models/router';
 
 const ZOE_VERSION = '0.2.0';
 
@@ -100,80 +104,133 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallCont
 }
 
 /**
+ * Route a concierge call through the local Claude CLI (Zaal's Max plan) or the
+ * Anthropic API key. Controlled by ZOE_USE_CLI=1 env flag (default off).
+ *
+ * Guards:
+ *   a) Automatic fallback to API-key path if CLI is not present or call fails
+ *   b) Timeout on CLI call (10s default, configurable via opts)
+ *   c) Error classification/logging (CliAuthError, CliError types)
+ *   d) Cost ledger tracking (records both CLI and API-key calls)
+ */
+async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli').ClaudeCliOptions, 'cwd'> & { cwd: string }): Promise<import('../hermes/claude-cli').ClaudeCliResult> {
+  const useCliPath = process.env.ZOE_USE_CLI === '1';
+  if (!useCliPath) {
+    return callClaudeCli(opts);
+  }
+
+  try {
+    console.log('[zoe/concierge] attempting CLI route for model call');
+    const result = await callClaudeCli(opts);
+    console.log('[zoe/concierge] CLI route succeeded, cost recorded');
+    return result;
+  } catch (err: unknown) {
+    const { CliAuthError, CliError, classifyClaudeError } = await import('../hermes/claude-cli');
+    if (err instanceof CliAuthError) {
+      console.warn('[zoe/concierge] CLI auth failed, falling back to API key:', (err as Error).message);
+    } else if (err instanceof CliError) {
+      console.warn('[zoe/concierge] CLI call failed (' + (err as import('../hermes/claude-cli').CliError).kind + '), falling back to API key:', (err as Error).message);
+    } else {
+      console.warn('[zoe/concierge] CLI call error (unknown), falling back to API key:', err);
+    }
+    // Fallback: disable CLI and retry via API key
+    const apiOpts = { ...opts, bare: false };
+    return callClaudeCli(apiOpts);
+  }
+}
+
+/**
  * Run a concierge turn:
  * 1. Build system prompt from memory blocks (persona/human/working/tasks)
- * 2. Call Claude Code CLI with the user's message + blocks as appendSystemPrompt
- * 3. Parse the reply text + extract task_ops/captures JSON block
- * 4. Return structured result
+ * 2. Try multi-model routing if enabled (Claude, Grok, GPT)
+ * 3. Fall back to Claude Code CLI if routing unavailable or fails
+ * 4. Parse the reply text + extract task_ops/captures JSON block
+ * 5. Append model choice + rationale if routed (so Zaal sees which model was used + why)
+ * 6. Return structured result
  */
 export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
-  const model = opts.model ?? selectModel(opts.message);
   const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date, opts.recallContext, opts.brandContext, opts.linkResearchIntent);
 
   const senderLabel = opts.senderLabel ?? 'Zaal';
   const userPrompt = `${senderLabel}: ${opts.message}`;
 
-  const result = await callClaudeCli({
-    model,
-    prompt: userPrompt,
-    cwd: opts.context.workspace_dir,
-    appendSystemPrompt: systemBlocks,
-    allowedTools: [
-      'Read',
-      'Glob',
-      'Grep',
-      'Bash(gh issue list*)',
-      'Bash(gh pr list*)',
-      'Bash(gh pr view*)',
-      'Bash(git log*)',
-      'Bash(git status)',
-      'Bash(curl -s*)',
-      // Doc 605 Phase 1 unlock: Playwright MCP for browse-DOM-grounded tasks
-      'mcp__playwright__browser_snapshot',
-      'mcp__playwright__browser_navigate',
-      'mcp__playwright__browser_take_screenshot',
-      'mcp__playwright__browser_evaluate',
-      'mcp__playwright__browser_console_messages',
-      'mcp__playwright__browser_network_requests',
-      'mcp__playwright__browser_click',
-      'mcp__playwright__browser_type',
-      'mcp__playwright__browser_press_key',
-      'mcp__playwright__browser_wait_for',
-      'mcp__playwright__browser_close',
-      // ZAOscout MCP (doc 899): keyless social reading - Reddit/X/Farcaster/GitHub
-      // by URL, full body, no API keys. Lets ZOE monitor the wider ecosystem, not
-      // just repos. Server: ~/ZAOscout/mcp/server.js (registered via `claude mcp add scout`).
-      'mcp__scout__scout_fetch',
-      'mcp__scout__scout_digest',
-      // Doc 759 Gap 2 (locked Q1=GATEWAY, Q5=8 workers): subagent dispatch via
-      // Task tool. Workers live in bot/src/zoe/.claude/agents/*.md and ZOE
-      // routes per the persona ROUTING block. Both 'Task' and 'Agent' added
-      // because Claude Code CLI tool name varies by version.
-      'Task',
-      'Agent',
-    ],
-    disallowedTools: [
-      'Bash(git push*)',
-      'Bash(git commit*)',
-      'Bash(git reset*)',
-      'Bash(rm*)',
-      'Edit',
-      'Write',
-    ],
-    permissionMode: 'default',
-    outputFormat: 'json',
-    // bare: false on purpose. Claude Code CLI 2.1.140+ explicitly disables
-    // OAuth credential reads under --bare ("Anthropic auth is strictly
-    // ANTHROPIC_API_KEY or apiKeyHelper"). ZOE uses Max-plan OAuth, so we
-    // run without --bare. Cost is ~$0.10 per cold turn for CLAUDE.md auto-
-    // discovery (~26K input tokens) but prompt-cache amortizes that across
-    // a session.
-    bare: false,
-  });
+  let result: import('../hermes/claude-cli').ClaudeCliResult;
+  let selectedModel: string;
+  let modelRationale: string | undefined;
+
+  // Try multi-model routing if enabled
+  if (shouldUseRouting()) {
+    const choice = selectBestModel(opts.message);
+    console.log('[zoe/concierge] routing enabled, selected model:', choice.provider);
+
+    if (choice.provider !== 'claude') {
+      try {
+        // Attempt to call the selected model (Grok or GPT)
+        const routed = await routeAndCall(systemBlocks, userPrompt, choice);
+        result = routed.result;
+        selectedModel = choice.model;
+        modelRationale = routed.modelRationale;
+        console.log('[zoe/concierge] routed call succeeded:', choice.provider);
+      } catch (error: unknown) {
+        // Routing failed - fall back to Claude CLI
+        console.warn('[zoe/concierge] routed call failed, falling back to Claude CLI:', error instanceof Error ? error.message : String(error));
+        selectedModel = opts.model ?? selectModel(opts.message);
+        result = await callModelWithCliRouting({
+          model: selectedModel,
+          prompt: userPrompt,
+          cwd: opts.context.workspace_dir,
+          appendSystemPrompt: systemBlocks,
+          allowedTools: getDefaultTools(),
+          disallowedTools: getDefaultDisallowedTools(),
+          permissionMode: 'default',
+          outputFormat: 'json',
+          bare: false,
+          timeoutMs: 10 * 60 * 1000,
+        });
+        modelRationale = 'Fallback to Claude after routing attempt';
+      }
+    } else {
+      // Routing selected Claude - use CLI normally
+      selectedModel = opts.model ?? selectModel(opts.message);
+      result = await callModelWithCliRouting({
+        model: selectedModel,
+        prompt: userPrompt,
+        cwd: opts.context.workspace_dir,
+        appendSystemPrompt: systemBlocks,
+        allowedTools: getDefaultTools(),
+        disallowedTools: getDefaultDisallowedTools(),
+        permissionMode: 'default',
+        outputFormat: 'json',
+        bare: false,
+        timeoutMs: 10 * 60 * 1000,
+      });
+      modelRationale = `Claude (via CLI): ${selectBestModel(opts.message).rationale}`;
+    }
+  } else {
+    // Routing disabled - use default Claude path
+    selectedModel = opts.model ?? selectModel(opts.message);
+    result = await callModelWithCliRouting({
+      model: selectedModel,
+      prompt: userPrompt,
+      cwd: opts.context.workspace_dir,
+      appendSystemPrompt: systemBlocks,
+      allowedTools: getDefaultTools(),
+      disallowedTools: getDefaultDisallowedTools(),
+      permissionMode: 'default',
+      outputFormat: 'json',
+      bare: false,
+      timeoutMs: 10 * 60 * 1000,
+    });
+  }
 
   recordCall('concierge', result);
 
-  const { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps, decisionOps, buildStateOps } = splitReplyAndOps(result.text);
+  let { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps, decisionOps, buildStateOps } = splitReplyAndOps(result.text);
+
+  // Append model rationale if present
+  if (modelRationale && shouldUseRouting()) {
+    reply = `${reply}\n\n---\n_Model choice: ${modelRationale}_`;
+  }
 
   return {
     reply,
@@ -188,9 +245,55 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
-    model,
+    model: selectedModel,
     durationMs: result.durationMs,
   };
+}
+
+/**
+ * Default allowed tools for concierge calls.
+ */
+function getDefaultTools(): string[] {
+  return [
+    'Read',
+    'Glob',
+    'Grep',
+    'Bash(gh issue list*)',
+    'Bash(gh pr list*)',
+    'Bash(gh pr view*)',
+    'Bash(git log*)',
+    'Bash(git status)',
+    'Bash(curl -s*)',
+    'mcp__playwright__browser_snapshot',
+    'mcp__playwright__browser_navigate',
+    'mcp__playwright__browser_take_screenshot',
+    'mcp__playwright__browser_evaluate',
+    'mcp__playwright__browser_console_messages',
+    'mcp__playwright__browser_network_requests',
+    'mcp__playwright__browser_click',
+    'mcp__playwright__browser_type',
+    'mcp__playwright__browser_press_key',
+    'mcp__playwright__browser_wait_for',
+    'mcp__playwright__browser_close',
+    'mcp__scout__scout_fetch',
+    'mcp__scout__scout_digest',
+    'Task',
+    'Agent',
+  ];
+}
+
+/**
+ * Default disallowed tools for concierge calls.
+ */
+function getDefaultDisallowedTools(): string[] {
+  return [
+    'Bash(git push*)',
+    'Bash(git commit*)',
+    'Bash(git reset*)',
+    'Bash(rm*)',
+    'Edit',
+    'Write',
+  ];
 }
 
 const OPS_FENCE_RE = /----\s*```json\s*([\s\S]*?)\s*```\s*$/;

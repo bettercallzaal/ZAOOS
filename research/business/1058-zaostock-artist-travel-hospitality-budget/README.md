@@ -39,6 +39,15 @@ A shared rental car for the visit (3 days) runs roughly $192-$243 at October pea
 
 Using the 4 real Ellsworth hotels already listed on the live `/ellsworth` page: Hampton Inn rates start around $308/night, Comfort Inn runs $177-267/night, both reflecting the 30-70% fall-foliage premium over off-season rates. **For 2 artists over 2 nights: $300-$620,** with the wide range driven entirely by which hotel and how close to the date it's booked - foliage-season demand in this specific corridor is a real, sourced constraint, not a generic "book early" platitude. [FULL - per subagent research, cross-referenced against the hotels already on the live `/ellsworth` page]
 
+**RESOLVED-ish 2026-07-14 - a real in-kind path exists:** Witham Family Hotels (64 Birch Ave, Ellsworth,
+207-667-1641) runs a Charitable Fund that has distributed over $1M to nonprofits since 2017, including
+explicit past support for Heart of Ellsworth - and it offers in-kind room-night donations via gift
+certificates on a limited basis. Apply through wfhcharitablefund.com's Gift Certificates page (not by
+contacting the board directly). This could eliminate most or all of the $300-620 lodging line above, not
+just discount it - genuinely the strongest single resource lead found for this specific budget-risk
+finding. Not yet applied for - a real lead, not a confirmed win. [FULL - found during this session's
+broader Ellsworth-scene research]
+
 ### 4. Hospitality: real practice for small volunteer festivals is minimal, if pooled
 
 Sourced small-festival hospitality-rider guidance converges on a shared green room (not per-artist riders) as standard practice at this scale: water, towels, basic snacks, coffee/tea, one shared meal, a quiet rest space. **For 2 artists sharing one green room: $80-150.** This is genuinely achievable within ZAOstock's existing no-frills model and doesn't require anything ZAOstock isn't already planning to have on hand (per doc 1032's existing volunteer/hospitality infrastructure). [FULL - per subagent research]

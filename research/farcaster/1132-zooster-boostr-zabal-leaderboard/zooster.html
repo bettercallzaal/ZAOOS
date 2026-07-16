@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zooster - ZABAL Auto-Like Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --zabal-dark: #0a1628;
+            --zabal-gold: #f5a623;
+            --zabal-light: #1a2e4f;
+            --border-color: #2a4070;
+            --text-light: #e0e8f0;
+            --text-muted: #a0a8b8;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --zabal-dark: #f5f5f5;
+                --zabal-gold: #d97706;
+                --zabal-light: #ffffff;
+                --border-color: #e5e7eb;
+                --text-light: #1f2937;
+                --text-muted: #6b7280;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--zabal-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding: 24px 0;
+            border-bottom: 2px solid var(--zabal-gold);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--zabal-gold);
+            margin-bottom: 8px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--zabal-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--zabal-gold);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--zabal-gold);
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--zabal-light);
+        }
+
+        thead {
+            background: var(--zabal-dark);
+            border-bottom: 2px solid var(--zabal-gold);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--zabal-gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: var(--zabal-dark);
+        }
+
+        .rank {
+            font-weight: 700;
+            color: var(--zabal-gold);
+            min-width: 40px;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--zabal-gold);
+            background: var(--border-color);
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .user-info {
+            min-width: 0;
+        }
+
+        .username {
+            font-weight: 600;
+            color: var(--text-light);
+            word-break: break-word;
+        }
+
+        .followers {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .likes-count {
+            font-weight: 700;
+            color: var(--zabal-gold);
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .error {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            color: #fca5a5;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .disclosure {
+            background: var(--zabal-light);
+            border-left: 4px solid var(--zabal-gold);
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .disclosure strong {
+            color: var(--zabal-gold);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .leaderboard-title {
+                font-size: 1.4rem;
+            }
+
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.9rem;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .user-cell {
+                gap: 8px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .refresh-time {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ZOOSTER</h1>
+            <p class="subtitle">ZABAL Auto-Like Leaderboard</p>
+            <p class="subtitle" style="color: var(--zabal-gold); font-size: 1rem;">The crew that boosts every builder</p>
+        </header>
+
+        <div class="disclosure">
+            <strong>What's happening:</strong> ZABAL Auto-Like is an opt-in Boostr integration where members boost every builder's cast and earn USDC. This leaderboard shows who showed up. Powered by <a href="https://boostr.itscashless.com" style="color: var(--zabal-gold);">Boostr</a> (Farcaster Mini App) + <a href="https://cashlessman.eth" style="color: var(--zabal-gold);">cashlessman.eth</a>.
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-contributors">-</div>
+                <div class="stat-label">Contributors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-likes">-</div>
+                <div class="stat-label">Likes Generated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-casts">-</div>
+                <div class="stat-label">Casts Boosted</div>
+            </div>
+        </div>
+
+        <div class="leaderboard-title">Leaderboard</div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Rank</th>
+                        <th>Creator</th>
+                        <th style="width: 120px;">Followers</th>
+                        <th style="width: 120px;">Likes</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard">
+                    <tr>
+                        <td colspan="4" class="loading">Loading leaderboard...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="refresh-time">
+            Last updated: <span id="refresh-time">-</span>
+        </div>
+
+        <div class="footer">
+            <p>Built for ZABAL Games. Data from Boostr Public API. Auto-refresh every 30 seconds.</p>
+        </div>
+    </div>
+
+    <script>
+        const CACHE_DURATION = 30000;
+        let lastFetch = 0;
+        let cachedData = null;
+
+        async function fetchLeaderboard() {
+            const now = Date.now();
+            if (cachedData && (now - lastFetch) < CACHE_DURATION) {
+                renderLeaderboard(cachedData);
+                return;
+            }
+
+            try {
+                const response = await fetch('https://boostr.itscashless.com/api/zabaal/stats');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                if (!data.success) throw new Error('API returned success: false');
+
+                cachedData = data;
+                lastFetch = now;
+                renderLeaderboard(data);
+            } catch (err) {
+                console.error('Failed to fetch leaderboard:', err);
+                document.getElementById('leaderboard').innerHTML =
+                    `<tr><td colspan="4" class="error">Failed to load leaderboard. ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderLeaderboard(data) {
+            const stats = data.stats;
+
+            document.getElementById('stat-contributors').textContent = stats.activeContributorsCount;
+            document.getElementById('stat-likes').textContent = stats.totalLikesGenerated;
+            document.getElementById('stat-casts').textContent = stats.totalCastsLiked;
+
+            const tbody = document.getElementById('leaderboard');
+            tbody.innerHTML = '';
+
+            if (!stats.zabalUsers || stats.zabalUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="loading">No data available</td></tr>';
+                return;
+            }
+
+            stats.zabalUsers.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>
+                        <div class="user-cell">
+                            <img src="${user.pfp_url}" alt="${user.username}" class="avatar" onerror="this.style.display='none'">
+                            <div class="user-info">
+                                <div class="username">@${user.username}</div>
+                                <div class="followers">${user.followers_count.toLocaleString()} followers</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.followers_count.toLocaleString()}</td>
+                    <td><span class="likes-count">${user.zabalLikesCount}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const updateTime = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('refresh-time').textContent = updateTime;
+        }
+
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, CACHE_DURATION);
+    </script>
+</body>
+</html>

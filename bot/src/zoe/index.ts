@@ -79,6 +79,7 @@ import {
 } from './posts';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
+import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -971,6 +972,21 @@ bot.on('message:text', async (ctx) => {
     ).catch((e) => console.error('[zoe/index] zaalbotz bridge-log failed:', (e as Error)?.message));
 
     if (action.kind === 'research') {
+      // Dedupe guard: check if this URL was already researched
+      const url = extractFirstUrl(text);
+      if (url) {
+        const researched = await wasResearched(url, join(repoDir, 'research')).catch((e) => {
+          console.error('[zoe/index] dedupe check failed (fail-open):', (e as Error)?.message);
+          return false;
+        });
+        if (researched) {
+          await ctx
+            .reply('Already researched that link — see the Research topic.')
+            .catch(() => {});
+          return;
+        }
+      }
+
       await enqueueWork(text, { chatId, threadId }).catch((e) =>
         console.error('[zoe/index] research enqueue failed:', (e as Error)?.message),
       );

@@ -2,8 +2,8 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-07-01
-related-docs: 837, 931
+last-validated: 2026-07-15
+related-docs: 837, 931, 544, 992
 original-query: "https://livepeer.org/ deep research, part of the first things we do to upgrade our capabilities"
 tier: DEEP
 ---
@@ -17,6 +17,8 @@ ZAO is evaluating Livepeer as a decentralized video infrastructure layer to powe
 ## Recommendation
 
 **Pilot Q3 2026** with COC Concertz livestream-to-clips workflow as first test case. Livepeer is production-capable for livestreaming and transcoding (60+ Q1 2026 AI workload spike), but orchestrator reliability and zero-downtime deployment remain gaps. Start with Livepeer Studio API for immediate 2-hour concert stream + 5 automated clip exports, measure cost and latency side-by-side with Mux, then decide on deeper integration. Do NOT adopt Livepeer full protocol node operation yet (operator complexity too high for ZAO's team).
+
+**Updated 2026-07-15**: Still correct short-term - `LIVEPEER_API_KEY` is now set, Studio pilot is unblocked, free Sandbox tier ($0, 1,000 min/mo transcoding) covers the whole 2-hour pilot. But do not deepen investment in Studio beyond this free tier: Livepeer Inc's own 2026-05-05 product update states Studio "continues to support existing customers, but is not primarily focused on growing further demand generation through transcoding or streaming," and that "orchestrators will likely see transcoding volumes from Studio ramping down in the coming months." Studio isn't being killed, just deprioritized - treat it as a "coast," not a strategic bet. The company's growth energy has moved to Daydream/"Livepeer Agent" (realtime AI, MCP-native, usable directly inside Claude Code) - see new subsection below. That angle is a better long-term fit for ZAO's actual need (transcription/vision-driven highlight detection for doc 992's live clipper) than Studio's plain transcoding ever was, but it's closed alpha with subsidized/unknown future pricing - trial it cheaply, don't build critical-path infra on it yet.
 
 ## Key Findings
 
@@ -122,6 +124,20 @@ Assume: 10-hour livestream per week, 1080p/5Mbps, transcode to 3 output renditio
 
 Source: [Livepeer Studio Pricing](https://livepeer.studio/pricing), [Livepeer Forum - Pricing](https://forum.livepeer.org/t/questions-about-livepeer-studio-pricing-transcoding-and-delivery-costs/2802), [Mux Pricing](https://www.mux.com/pricing), [Mux Docs - Understanding Pricing](https://www.mux.com/docs/pricing/video), [Cloudflare Stream Pricing](https://developers.cloudflare.com/stream/pricing/), [AWS MediaLive Pricing](https://aws.amazon.com/medialive/pricing/)
 
+### Update 2026-07-15: Studio Deprioritization + Livepeer Agent Alpha
+
+Two material facts surfaced since last validation, neither contradicts the pilot plan above but both change the medium-term picture:
+
+**1. Livepeer Studio is being deprioritized company-side.** From Livepeer Inc's own 2026-05-05 forum product update: *"Livepeer Studio continues to support existing customers, but is not primarily focused on growing further demand generation through transcoding or streaming... Orchestrators will likely see transcoding volumes from Studio ramping down in the coming months."* This predates doc 932's 2026-07-01 validation but wasn't captured then. Practical read: Studio still works, the free Sandbox tier is still real and still the right call for the pilot, but don't expect new Studio features or plan multi-year infra around it.
+
+**2. "Livepeer Agent" launched in closed alpha (2026-07-14), a different product entirely.** Branded as part of a broader "Livepeer 2.0" pivot (tokenomics update to better align LPT value capture with network usage, announced same week). Livepeer Agent is an MCP server (`storyboard.daydream.monster/api/mcp`) exposing 60+ AI capabilities - video/image generation, and notably a diarized/streaming audio transcription runner and a Florence-2 vision runner - callable directly from Claude Code, Cursor, or any MCP client via one Daydream API key (`sk_...`). Real, working code: `github.com/livepeer/storyboard` has a full architecture doc and install script (`curl -fsSL https://storyboard.daydream.monster/install.sh | bash`, or `claude mcp add livepeer-agent https://storyboard.daydream.monster/api/mcp --transport http --header "Authorization: Bearer sk_..."`).
+
+Status: **private alpha, "expect shaky performance"** per Livepeer Foundation's own Discord announcement. Pricing is explicitly "subsidized for a limited time... update on pricing in the future" - i.e. free now, unknown later. The diarized-transcription + vision runners are a closer technical fit to doc 992's live-clipper (rolling transcript + moment-scoring) than Studio's plain transcoding ever was - worth a hands-on trial (see Next Actions), not worth architecting around yet given alpha status and unproven pricing.
+
+**Context on Livepeer's overall trajectory**: this is the project's fourth strategic reframe in about a year (Advisory Boards, mid-2025 -> Workstreams, Aug 2025 -> Transformation SPE, Aug 2025 -> "Livepeer 2.0" agentic pivot, Jul 2026). Read as a project still actively searching for product-market-fit rather than one in terminal decline - Daydream/Agent is explicitly framed internally as "trying its hardest to find PMF... many GTM efforts are experiments" (2026-05-05 update, same source as the Studio note above). Network itself is not at risk in the near term (LPT emissions-reduction proposal from Jan 2026 is normal DAO tokenomics tuning, not a distress signal); the risk is specifically about which Livepeer *product* ZAO should lean on, not whether Livepeer survives.
+
+Source: [Livepeer Inc Daydream Product Update](https://forum.livepeer.org/t/livepeer-inc-daydream-product-update/3247), [A Path to Livepeer 2.0](https://forum.livepeer.org/), [livepeer/storyboard - Agent v1 Summary](https://github.com/livepeer/storyboard/blob/main/livpeer-agent-v1-summary.md), [livepeer/storyboard - Full Architecture](https://github.com/livepeer/storyboard/blob/main/full-architecture.md), [Livepeer Agent Alpha Landing](https://website-git-agent-alpha-landing-livepeer-foundation.vercel.app/agent-alpha), [Daydream Quickstart](https://dd.mintlify.app/api/quickstart)
+
 ### Concrete ZAO First Pilot
 
 **Use Case**: Stream COC Concertz Wednesday concert (e.g., July 2, 2026, 2-hour event) via Livepeer Studio, auto-transcode to 3 output renditions, export 5 clips (30 sec highlights) for Twitter/Farcaster.
@@ -176,7 +192,9 @@ Source: [Livepeer Studio - Real-Time Interactive Streaming](https://livepeer.stu
 
 6. **AI/Real-Time Hype**: Daydream and real-time AI pipelines are cutting-edge but ecosystem stage. Examples are mostly proof-of-concept (creative installations), not production music streaming. ZAO should NOT depend on Daydream for COC Concertz Phase 1 (stick to standard HLS transcoding); AI pipelines are Phase 2 exploration.
 
-Source: [GitHub - Reliability and Performance Dashboard](https://github.com/livepeer/Grant-Program/issues/82), [GitHub - Zero-Downtime Deployment Issue](https://github.com/livepeer/go-livepeer/issues/2129), [GitHub - Transcoding Issues](https://github.com/livepeer/lpms/issues)
+7. **Studio de-prioritization (confirmed 2026-07-15)**: Livepeer Inc has explicitly redirected growth investment away from Studio toward Daydream/Agent (see Update above). Studio remains supported for existing customers but new-feature velocity should be expected to slow. Mitigation: same as vendor lock-in mitigation (risk 2) - keep clip export format-agnostic, keep Mux as a known fallback, don't build anything ZAO can't walk away from cheaply. Re-evaluate if Studio support noticeably degrades (dropped streams, unanswered support tickets) rather than waiting for an announcement.
+
+Source: [GitHub - Reliability and Performance Dashboard](https://github.com/livepeer/Grant-Program/issues/82), [GitHub - Zero-Downtime Deployment Issue](https://github.com/livepeer/go-livepeer/issues/2129), [GitHub - Transcoding Issues](https://github.com/livepeer/lpms/issues), [Livepeer Inc Daydream Product Update](https://forum.livepeer.org/t/livepeer-inc-daydream-product-update/3247)
 
 ## Next Actions
 
@@ -194,6 +212,8 @@ Source: [GitHub - Reliability and Performance Dashboard](https://github.com/live
    - If cost > $50 or quality issues: pivot to Mux (known quantity) or Cloudflare (cheap delivery). Archive Livepeer for Q4 2026 re-evaluation when orchestrator stability improves.
 
 6. **Parallel: Research Catalyst Self-Hosting** (lower priority): If ZAO decides to build a proprietary livestream platform (e.g., on-chain concert ticketing + exclusive stream), evaluate self-hosted Catalyst + Livepeer Network (supply-side) vs. renting Livepeer Studio. This is Phase 3+ work (post-pilot).
+
+7. **[Added 2026-07-15] Trial Livepeer Agent (Daydream MCP) inside Claude Code**: Get a Daydream API key (app.daydream.live -> Keys -> New API Key), `claude mcp add livepeer-agent https://storyboard.daydream.monster/api/mcp --transport http --header "Authorization: Bearer sk_..."`, confirm with `/mcp`, run one test generation. Specifically evaluate the diarized-transcription and Florence-2 vision runners against doc 992's live-clipper need (rolling transcript + moment scoring) - if usable, that's a stronger long-term fit than Studio for the clip-candidate pipeline. Owner: Zaal. By: 2026-07-22. Shipped = MCP tools listed via `/mcp` + one completed test render/transcription, findings noted back in this doc.
 
 ## Sources
 
@@ -226,3 +246,9 @@ Source: [GitHub - Reliability and Performance Dashboard](https://github.com/live
 | [Livepeer Studio - Live](https://livepeer.studio/live) | FULL | WebRTC and real-time streaming solutions |
 | [Livestream-to-Clips Tools 2026](https://chatcut.io/blog/gaming-video-editing-software-2026) | FULL | OBS 32.1.2, CapCut, Eklipse, OpusClip for automated clip creation |
 | [Video Streaming Cost Comparison](https://www.buildmvpfast.com/api-costs/video) | FULL | Normalized Q2 2026 costs: Cloudflare ~$150, Mux ~$170, AWS $80-200 depending on reservations |
+| [Livepeer Inc Daydream Product Update (2026-05-05)](https://forum.livepeer.org/t/livepeer-inc-daydream-product-update/3247) | FULL | Confirms Studio deprioritization ("not primarily focused on growing further demand generation... transcoding volumes ramping down"), Daydream/Scope as the growth focus, "trying its hardest to find PMF" |
+| [livepeer/storyboard - Agent v1 Summary](https://github.com/livepeer/storyboard/blob/main/livpeer-agent-v1-summary.md) | FULL | Livepeer Agent CLI + MCP install/config details, 9 curated MCP tools, Daydream key auth model |
+| [livepeer/storyboard - Full Architecture](https://github.com/livepeer/storyboard/blob/main/full-architecture.md) | FULL | Three consumer paths (CLI, MCP client, partner app), auth flow (Bearer sk_ Daydream key -> Clerk ID -> BYOC orch -> Arbitrum payment ticket), full endpoint list |
+| [Livepeer Agent Alpha Landing](https://website-git-agent-alpha-landing-livepeer-foundation.vercel.app/agent-alpha) | PARTIAL - page too large to fetch directly (>10MB), read via screenshot + exa search results instead | 3-step setup (Daydream key -> connect AI tool -> prompt), capability list (kontext-edit, seedream, veo-i2v, topaz-upscale, music, get_cost_report) |
+| [Daydream Quickstart Docs](https://dd.mintlify.app/api/quickstart) | FULL | Confirms API key is "currently subsidized for a limited time," dashboard at app.daydream.live/dashboard/api-keys |
+| [Livepeer Workflow Kit retro grant](https://forum.livepeer.org/t/livepeer-workflow-kit/3271) | FULL | Independent confirmation of diarized-transcription + Florence-2 vision as live, paid-usage-verified network capabilities (not just alpha marketing) |

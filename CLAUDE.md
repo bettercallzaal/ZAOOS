@@ -135,6 +135,22 @@ See [Doc 154](research/154-skills-commands-master-reference/) for complete refer
 - **Serena for code edits:** Use Serena's symbol tools (`find_symbol`, `replace_symbol_body`, `find_referencing_symbols`, `rename_symbol`) for editing/refactoring ZAOOS code instead of whole-file Read/Edit - 60-80% fewer tokens, reference-safe renames. Use native Read/Grep only for quick read-only lookups.
 - **Disabled (do not propose):** gitnexus, ECC memory, sequential-thinking - 0 use, pure context cost.
 
+## gstack (Claude Code skill pack, vendored)
+
+`.claude/skills/gstack/` is Garry Tan's open-source gstack toolkit (MIT,
+github.com/garrytan/gstack), vendored so any teammate cloning ZAOOS gets it.
+For web browsing, use the `/browse` skill from gstack - never
+`mcp__claude-in-chrome__*` tools.
+
+Available gstack skills: `/office-hours`, `/plan-ceo-review`,
+`/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`,
+`/ship`, `/browse`, `/qa`, `/qa-only`, `/design-review`,
+`/setup-browser-cookies`, `/retro`, `/investigate`, `/document-release`,
+`/codex`, `/careful`, `/freeze`, `/guard`, `/unfreeze`, `/gstack-upgrade`.
+
+If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup`
+to build the binary and register skills (requires `bun`).
+
 ## Primary Surfaces (post-doc-601 cleanup, 2026-05-04)
 
 ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into ZOE (its coder/critic/auto-PR brain is now ZOE's, not a separate bot). When proposing automation or new bots, check this list first.

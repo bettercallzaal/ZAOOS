@@ -30,6 +30,39 @@ tier: STANDARD-DEEP
 
 ---
 
+## ZAO Social Identities (source of truth)
+
+| Platform | Primary Account | Handle / ID | Notes |
+|----------|----------------|-------------|-------|
+| Farcaster | Zaal personal | **@zaal** (FID 19640) | Posted via Firefly or zaalcaster CLI |
+| Farcaster | Brand | **@bettercallzaal** | Alternate brand account |
+| Farcaster | ZOL bot | **@zolbot** (FID 3338501) | Posts in /zabal as itself — NEVER as Zaal |
+| X | Brand | **@bettercallzaal** | Display name fix needed (see doc 1107) |
+| YouTube | Brand | **@bettercallzaal** | Same handle as X; SEO fix needed |
+| Instagram | Brand | **@bettercallzaal** | (verify active) |
+| TikTok | Brand | TBD | No confirmed handle yet |
+| Discord | Community | ZAO server (discord.thezao.com) | App-driven via `src/lib/publish/discord.ts` |
+| Telegram | Bots + community | @zaoclaw_bot, @zaodevz_bot | ZOE orchestrates |
+| LinkedIn | Zaal personal | Zaal Panthaki | BCZ consulting angle |
+| Facebook | Brand page | The ZAO | Events/COC Concertz (verify page exists) |
+
+**Platform profiles** (per-platform campaigns, best examples, voice): `~/.claude/skills/platform/profiles/` — farcaster.md, x.md, telegram.md, discord.md, linkedin.md, youtube.md. Fill "TO FILL" fields (Current goals, Best-performing examples) so the `/socials` skill drafts match what actually lands.
+
+---
+
+## Voice Standard (from `/socials` skill)
+
+Every ZAO post on every platform:
+- Opens with **"ZM"** (ZAO Morning) — the ecosystem greeting
+- No emojis, no hashtags, no em dashes (hyphens only)
+- Lead with what was built/shipped — contribution over celebration
+- Never reference work-day times ("this morning", "just got out of standup")
+- Each platform sounds native, not copy-pasted
+
+Full voice rules: `~/.claude/skills/socials/skill.md`
+
+---
+
 ## The One-System Design
 
 ```
@@ -61,7 +94,7 @@ ROUTING LAYER
 
 PER-PLATFORM ACCOUNTS
 ├── X: @bettercallzaal (personal/brand) + @zaoclipz (clip account, TO CREATE)
-├── Farcaster: @zaalcaster (primary) — /zabal channel
+├── Farcaster: @zaal (FID 19640) + @bettercallzaal — /zabal channel
 ├── Instagram: @bettercallzaal (existing) + @zaoclipz (clip account, TO CREATE)
 ├── TikTok: @bettercallzaal (TO VERIFY/CREATE) + @zaoclipz (TO CREATE)
 ├── YouTube: @bettercallzaal (existing) + ZNN channel (TO CREATE - doc 1128)
@@ -94,7 +127,7 @@ PER-PLATFORM ACCOUNTS
 
 | Platform | Primary Account | Content | Cadence | Post Method | Priority |
 |----------|----------------|---------|---------|-------------|----------|
-| **Farcaster** | @zaalcaster | Governance, build-in-public, ZABAL, short takes | 1-3x/day | Firefly (manual) | P1 |
+| **Farcaster** | @zaal / @bettercallzaal | Governance, build-in-public, ZABAL, short takes | 1-3x/day | Firefly (manual) or zaalcaster CLI | P1 |
 | **X** | @bettercallzaal | Same as FC + link-in-reply for events | 1-3x/day | Firefly (manual) | P1 |
 | **YouTube** | @bettercallzaal | Long-form streams, WaveWarZ VODs, Shorts | 1x/week min | OBS recording → upload | P1 |
 | **Discord** | ZAO server | WaveWarZ clips, bot posts, community | Per-event | src/lib/publish / webhook | P2 |
@@ -226,6 +259,8 @@ Before doing anything else on X, fix the display name on @bettercallzaal:
 
 ## Sources
 
+- [FULL] `/socials` skill (`~/.claude/skills/socials/skill.md`) - platform order, voice rules, Firefly workflow, ZM greeting
+- [FULL] Platform profiles (`~/.claude/skills/platform/profiles/`) - farcaster.md (@zaal FID 19640, zaalcaster CLI), x.md, discord.md, youtube.md, linkedin.md, telegram.md
 - [FULL] Doc 354 - ZAO Cross-Posting Infrastructure Audit (`research/cross-platform/354-cross-posting-infrastructure-audit/`)
 - [FULL] Doc 355 - Autonomous Social Distribution 2026 (`research/cross-platform/355-autonomous-social-distribution-2026/`)
 - [FULL] Doc 897 - ZAO Social Posting Playbook (`research/community/897-zao-social-posting-playbook/`)

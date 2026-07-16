@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-14 | Zaal x Adrian (Empire Builder) - zaalcaster + creator coins | Empire Builder | Zaal, Adrian | [1118](1118-empire-builder-zaal-adrian-jul14/) | 6 |
 | 2026-07-14 | Zaal x Adrian (Empire Builder): zaalcaster deep dive | ZAO Devz | Zaal, Adrian (DiviFlyy) | [1092](1092-zaal-adrian-empire-builder-deep-dive-jul14/) | 7 |
 | 2026-07-14 | Restream setup + web3-musician strategy jam | ZAO | Zaal, Dcoop, Sam | [1087](1087-restream-strategy-jam-jul14/) | 7 |
 | 2026-07-13 | Iman Sync: ZaoZone refocus + board cleanup | ZAO Devz | Zaal, Iman | [1064](1064-iman-sync-zaozone-focus-2026-07-13/) | 8 |

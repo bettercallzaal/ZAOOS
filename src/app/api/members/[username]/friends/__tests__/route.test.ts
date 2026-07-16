@@ -262,7 +262,7 @@ describe('GET /api/members/[username]/friends', () => {
       expect(mockGetBestFriends).toHaveBeenCalledWith(SAMPLE_USER.fid, 25);
     });
 
-    it('treats non-numeric limit as NaN (parseInt returns NaN)', async () => {
+    it('treats non-numeric limit as default (parseInt returns NaN)', async () => {
       const mock = chainMock({ data: SAMPLE_USER });
       mockFrom.mockImplementation(mock.handler);
       mockGetBestFriends.mockResolvedValue(SAMPLE_FRIENDS);
@@ -271,8 +271,20 @@ describe('GET /api/members/[username]/friends', () => {
         params: Promise.resolve({ username: 'testuser' }),
       });
 
-      // parseInt('abc', 10) returns NaN, Math.min(NaN, 25) returns NaN
-      expect(mockGetBestFriends).toHaveBeenCalledWith(SAMPLE_USER.fid, expect.any(Number));
+      // parseInt('abc', 10) returns NaN, should use default 10
+      expect(mockGetBestFriends).toHaveBeenCalledWith(SAMPLE_USER.fid, 10);
+    });
+
+    it('handles negative limit by using default', async () => {
+      const mock = chainMock({ data: SAMPLE_USER });
+      mockFrom.mockImplementation(mock.handler);
+      mockGetBestFriends.mockResolvedValue(SAMPLE_FRIENDS);
+
+      await GET(makeGetRequest('/api/members/testuser/friends', { limit: '-5' }), {
+        params: Promise.resolve({ username: 'testuser' }),
+      });
+
+      expect(mockGetBestFriends).toHaveBeenCalledWith(SAMPLE_USER.fid, 10);
     });
 
     it('accepts limit at boundary (25)', async () => {

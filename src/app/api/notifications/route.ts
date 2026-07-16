@@ -21,7 +21,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const unreadOnly = req.nextUrl.searchParams.get('unread_only') === 'true';
-    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
+    // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+    const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '50', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : rawLimit, 100);
     const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
     let query = supabaseAdmin

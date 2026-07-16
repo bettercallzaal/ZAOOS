@@ -18,7 +18,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '20', 10), 50);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '20', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 20 : rawLimit, 50);
   const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
   const { data, error, count } = await supabaseAdmin

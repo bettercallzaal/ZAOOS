@@ -113,13 +113,11 @@ describe('GET /api/wavewarz/artists', () => {
     expect(chain.limit).toHaveBeenCalledWith(50);
   });
 
-  it('handles non-numeric limit gracefully', async () => {
+  it('handles non-numeric limit gracefully by using default', async () => {
     const chain = artistsChain({ data: [], error: null });
     mockFrom.mockReturnValue(chain);
     await GET(makeGetRequest('/api/wavewarz/artists', { limit: 'abc' }));
-    // NaN coerced to 0, Math.min(0, 50) = 0, but parseInt('abc', 10) = NaN, Math.min(NaN, 50) = NaN
-    // Actually, Math.min(NaN, 50) returns NaN, so the test should reflect actual behavior
-    expect(chain.limit).toHaveBeenCalled();
+    expect(chain.limit).toHaveBeenCalledWith(20); // default, not NaN
   });
 
   it('does not apply linked_only filter when not provided', async () => {

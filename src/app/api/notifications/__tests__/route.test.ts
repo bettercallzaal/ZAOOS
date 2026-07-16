@@ -188,6 +188,52 @@ describe('GET /api/notifications', () => {
       expect(body.offset).toBe(0);
     });
 
+    it('handles non-numeric limit gracefully by using default', async () => {
+      const mainMock = chainMock({
+        data: [SAMPLE_NOTIFICATION],
+        count: 1,
+      });
+
+      const unreadMock = chainMock({
+        count: 0,
+      });
+
+      let callCount = 0;
+      mockFrom.mockImplementation(() => {
+        callCount += 1;
+        return callCount === 1 ? mainMock.handler() : unreadMock.handler();
+      });
+
+      const res = await GET(makeGetRequest('/api/notifications', { limit: 'notanumber' }));
+      const body = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(body.limit).toBe(50); // default, not NaN
+    });
+
+    it('handles negative limit by using default', async () => {
+      const mainMock = chainMock({
+        data: [SAMPLE_NOTIFICATION],
+        count: 1,
+      });
+
+      const unreadMock = chainMock({
+        count: 0,
+      });
+
+      let callCount = 0;
+      mockFrom.mockImplementation(() => {
+        callCount += 1;
+        return callCount === 1 ? mainMock.handler() : unreadMock.handler();
+      });
+
+      const res = await GET(makeGetRequest('/api/notifications', { limit: '-10' }));
+      const body = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(body.limit).toBe(50); // default, not negative
+    });
+
     it('returns empty notifications when user has none', async () => {
       const mock = chainMock({
         data: [],

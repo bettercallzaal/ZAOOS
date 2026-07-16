@@ -33,7 +33,9 @@ export async function GET(req: NextRequest) {
   }
 
   const channel = req.nextUrl.searchParams.get('channel') || 'zao';
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50'), 100);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '50', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : rawLimit, 100);
   const statusParam = req.nextUrl.searchParams.get('status'); // 'pending' | 'all' | null
 
   try {

@@ -79,6 +79,16 @@ import {
 } from './posts';
 import { parseVetoCallback, applyVeto } from './brief-veto';
 import { dispatchPlan } from './dispatch';
+import {
+  handleVoiceAnswer,
+  handleMessageReaction,
+  handleAutoRoute,
+  handleReplyRoute,
+  formatPulse,
+  formatAgenda,
+  parseBatchAnswer,
+  classifyIntent,
+} from './tg-interactions';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
@@ -614,6 +624,45 @@ bot.on('callback_query:data', async (ctx) => {
   }
 });
 
+
+// FEATURE 2: REACTIONS AS ACTIONS (message reactions)
+// Emoji reactions on ZOE status messages: thumbs-up/+1 = approve/ack,
+// checkmark = mark done, fire = mark urgent.
+bot.on('message_reaction', async (ctx) => {
+  if (!isFromZaal(ctx)) {
+    await ctx.answerCallbackQuery().catch(() => {});
+    return;
+  }
+
+  const result = await handleMessageReaction(ctx, {
+    isFromZaal: true,
+    zaalId: Number(process.env.ZAAL_TELEGRAM_ID ?? 0),
+    reactions: {
+      unpin: async (chatId, messageId) => {
+        await ctx.api.unpinChatMessage(chatId, messageId).catch(() => {});
+      },
+      markDone: async (taskId, status) => {
+        if (taskId) {
+          await updateItem(taskId, { status }).catch((e) => {
+            console.error('[zoe/tg-interactions] mark-done failed:', e);
+          });
+        }
+      },
+      getTaskForMessage: async (messageId) => {
+        // TODO: if you track message ID -> task ID mappings, look it up here
+        // For now, return null (reactions won't mark tasks done without this mapping)
+        return null;
+      },
+      ping: async (queueName, reason) => {
+        console.log(`[zoe/tg-interactions] reaction ping: ${queueName} - ${reason}`);
+      },
+    },
+  });
+
+  if (result.error) {
+    console.error('[zoe/tg-interactions] reaction handler error:', result.error);
+  }
+});
 bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
@@ -899,12 +948,106 @@ bot.command('zg', async (ctx) => {
   }
 });
 
+
+// FEATURE 5: BOT COMMANDS (/pulse /agenda /list)
+// Mirror board state via REST API (Supabase or cowork tracker).
+bot.command('pulse', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  try {
+    const supaUrl = process.env.SUPABASE_URL;
+    const supaKey = process.env.SUPABASE_ANON_KEY;
+
+    if (!supaUrl || !supaKey) {
+      await ctx.reply('Board integration not configured (missing SUPABASE_URL + SUPABASE_ANON_KEY)');
+      return;
+    }
+
+    // Fetch open board items (this is a simplified version - adapt to your actual board schema)
+    const res = await fetch(`${supaUrl}/rest/v1/board_items?status=neq.archived&select=*`, {
+      headers: {
+        Authorization: `Bearer ${supaKey}`,
+        apikey: supaKey,
+      },
+    }).catch(() => null);
+
+    if (!res || !res.ok) {
+      await ctx.reply('Could not fetch board state');
+      return;
+    }
+
+    const items: any[] = await res.json();
+    const output = await formatPulse(items);
+    await replyChunked(ctx, output);
+  } catch (e) {
+    console.error('[zoe/index] pulse command failed:', e);
+    await ctx.reply(`Pulse failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+  }
+});
+
+bot.command('agenda', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  try {
+    const supaUrl = process.env.SUPABASE_URL;
+    const supaKey = process.env.SUPABASE_ANON_KEY;
+
+    if (!supaUrl || !supaKey) {
+      await ctx.reply('Board integration not configured (missing SUPABASE_URL + SUPABASE_ANON_KEY)');
+      return;
+    }
+
+    const res = await fetch(`${supaUrl}/rest/v1/board_items?status=neq.archived&select=*`, {
+      headers: {
+        Authorization: `Bearer ${supaKey}`,
+        apikey: supaKey,
+      },
+    }).catch(() => null);
+
+    if (!res || !res.ok) {
+      await ctx.reply('Could not fetch board state');
+      return;
+    }
+
+    const items: any[] = await res.json();
+    const output = await formatAgenda(items);
+    await replyChunked(ctx, output);
+  } catch (e) {
+    console.error('[zoe/index] agenda command failed:', e);
+    await ctx.reply(`Agenda failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+  }
+});
+
+bot.command('list', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  // /list is an alias for /agenda (show all items)
+  await ctx.api.sendMessage(ctx.chat.id, '/agenda');
+});
+
+
 bot.on('message:text', async (ctx) => {
   const text = ctx.message.text;
   if (text.startsWith('/')) return; // commands handled above
 
   const chatType = ctx.chat.type;
   const chatId = ctx.chat.id;
+
+  // FEATURE 6: BATCH-ANSWER parsing
+  // Parse "1:A 2:best 3:skip" format for multi-question answers
+  if (chatType === 'private' && isFromZaal(ctx) && text.includes(':') && /^\d+:|^[a-z]+:/i.test(text.trim())) {
+    const answers = parseBatchAnswer(text);
+    if (answers.length > 0) {
+      // Log each batch answer
+      for (const ans of answers) {
+        const logText = `[batch-answer] ${ans.choice}: ${ans.value}`;
+        await pushRecent(
+          { from: 'zaal', text: logText, sender: 'batch-answer' },
+          String(chatId),
+        ).catch((e) => console.error('[zoe/index] batch-answer log failed:', (e as Error)?.message));
+      }
+      await ctx.reply(`Logged ${answers.length} answer${answers.length !== 1 ? 's' : ''} from batch.`);
+      return;
+    }
+  }
+
 
   // Reply-bridge for teammate ack: when Zaal replies to one of our asks,
   // handle either the legacy "what should I reply?" flow or the new draft-approval flow.

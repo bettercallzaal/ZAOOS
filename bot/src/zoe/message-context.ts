@@ -1,17 +1,12 @@
 /**
- * message-context.ts - Track message_id -> {qid, taskId, questionText}
+ * message-context.ts - Persistent store for mapping Telegram message IDs to ZOE contexts.
  *
- * When ZOE sends a question to Telegram, we track the message ID so that when
- * Zaal replies to that message, we know which question he's answering.
+ * When ZOE posts a question message (or a task status), we record the message ID
+ * so that when Zaal replies to that specific message, we can route his reply with
+ * the correct context (qid for questions, taskId for tasks).
  *
- * Storage at ~/.zao/zoe/.zoe-msg-context.json:
- *  {
- *    "<message_id>": { qid?: string, taskId?: string, questionText?: string },
- *    ...
- *  }
- *
- * This solves Feature 1: REPLY-TO-ROUTE + QUESTION-CONTEXT.
- * When Zaal replies to a message, look it up here and route as [answer:qid].
+ * Storage: ~/.zao/zoe/.zoe-msg-context.json
+ * Format: { [messageId]: { qid?: string; taskId?: string; questionText?: string; ts: string } }
  */
 
 import { promises as fs } from 'node:fs';
@@ -19,103 +14,111 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
-const MESSAGE_CONTEXT_PATH = join(ZOE_HOME, '.zoe-msg-context.json');
+const CONTEXT_PATH = join(ZOE_HOME, '.zoe-msg-context.json');
 
 export interface MessageContext {
   qid?: string;
   taskId?: string;
   questionText?: string;
-  timestamp?: number;
+  ts: string;
 }
-
-interface MessageContextMap {
-  [messageId: string]: MessageContext;
-}
-
-let cachedMap: MessageContextMap | null = null;
 
 /**
- * Load the message context map from disk. Caches in memory for the lifetime
- * of the process.
+ * Ensure the context store exists and is writable.
  */
-export async function readMessageContext(): Promise<MessageContextMap> {
-  if (cachedMap) {
-    return cachedMap;
+async function ensureContextStore(): Promise<void> {
+  try {
+    await fs.stat(ZOE_HOME);
+  } catch {
+    await fs.mkdir(ZOE_HOME, { recursive: true });
   }
 
   try {
-    const raw = await fs.readFile(MESSAGE_CONTEXT_PATH, 'utf8');
-    cachedMap = JSON.parse(raw);
-    return cachedMap;
+    await fs.stat(CONTEXT_PATH);
   } catch {
-    // File doesn't exist yet, return empty map
-    cachedMap = {};
-    return cachedMap;
+    // File doesn't exist, create it empty
+    await fs.writeFile(CONTEXT_PATH, JSON.stringify({}, null, 2), 'utf8');
   }
 }
 
 /**
- * Write the message context map to disk and update cache.
+ * Read the entire context map.
  */
-export async function writeMessageContext(map: MessageContextMap): Promise<void> {
-  cachedMap = map;
-  await fs.mkdir(ZOE_HOME, { recursive: true });
-  await fs.writeFile(MESSAGE_CONTEXT_PATH, JSON.stringify(map, null, 2), 'utf8');
+async function readContextMap(): Promise<Record<string, MessageContext>> {
+  await ensureContextStore();
+  try {
+    const raw = await fs.readFile(CONTEXT_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
 }
 
 /**
- * Get the context for a specific message ID. Returns null if not found.
+ * Write the context map (overwrites the file).
  */
-export async function getContextForMessage(messageId: number): Promise<MessageContext | null> {
-  const map = await readMessageContext();
-  return map[String(messageId)] ?? null;
+async function writeContextMap(map: Record<string, MessageContext>): Promise<void> {
+  await ensureContextStore();
+  await fs.writeFile(CONTEXT_PATH, JSON.stringify(map, null, 2), 'utf8');
 }
 
 /**
- * Track a question that was sent (map message ID to question context).
- * Call this when ZOE sends a question message so we can route replies to it.
+ * Record a message context when ZOE sends a question or task message.
+ * Call this after bot.api.sendMessage() succeeds.
  */
-export async function trackQuestion(
+export async function recordMessageContext(
   messageId: number,
-  qid: string,
-  questionText: string,
+  context: Omit<MessageContext, 'ts'>,
 ): Promise<void> {
-  const map = await readMessageContext();
+  const map = await readContextMap();
   map[String(messageId)] = {
-    qid,
-    questionText,
-    timestamp: Date.now(),
+    ...context,
+    ts: new Date().toISOString(),
   };
-  await writeMessageContext(map);
+  await writeContextMap(map);
 }
 
 /**
- * Track a task that was referenced in a message.
- * Call this when ZOE posts a task status message so reactions can mark it done.
+ * Get the context for a message ID, or undefined if not found.
  */
-export async function trackTask(messageId: number, taskId: string): Promise<void> {
-  const map = await readMessageContext();
-  map[String(messageId)] = {
-    taskId,
-    timestamp: Date.now(),
-  };
-  await writeMessageContext(map);
+export async function getMessageContext(messageId: number): Promise<MessageContext | undefined> {
+  const map = await readContextMap();
+  return map[String(messageId)];
 }
 
 /**
- * Clean up old entries (older than retentionMs, default 7 days).
- * Run periodically to keep the map from growing unbounded.
+ * Remove a context entry (called after it's been used).
  */
-export async function cleanOldEntries(retentionMs: number = 7 * 24 * 60 * 60 * 1000): Promise<void> {
-  const map = await readMessageContext();
+export async function clearMessageContext(messageId: number): Promise<void> {
+  const map = await readContextMap();
+  delete map[String(messageId)];
+  await writeContextMap(map);
+}
+
+/**
+ * Cleanup: remove stale entries older than maxAgeMs (default 24h).
+ * Called periodically to prevent unbounded growth.
+ */
+export async function cleanupStaleContexts(maxAgeMs = 24 * 60 * 60 * 1000): Promise<number> {
+  const map = await readContextMap();
   const now = Date.now();
-  const filtered: MessageContextMap = {};
+  const before = Object.keys(map).length;
 
-  for (const [mid, ctx] of Object.entries(map)) {
-    if (!ctx.timestamp || now - ctx.timestamp < retentionMs) {
-      filtered[mid] = ctx;
+  for (const [msgId, ctx] of Object.entries(map)) {
+    try {
+      const age = now - new Date(ctx.ts).getTime();
+      if (age > maxAgeMs) {
+        delete map[msgId];
+      }
+    } catch {
+      // Invalid timestamp, remove it
+      delete map[msgId];
     }
   }
 
-  await writeMessageContext(filtered);
+  const after = Object.keys(map).length;
+  if (after < before) {
+    await writeContextMap(map);
+  }
+  return before - after;
 }

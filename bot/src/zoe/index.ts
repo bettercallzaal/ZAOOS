@@ -89,7 +89,7 @@ import {
   parseBatchAnswer,
   classifyIntent,
 } from './tg-interactions';
-import { trackQuestion, trackTask, getContextForMessage } from './message-context';
+import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
@@ -502,6 +502,11 @@ bot.on('callback_query:data', async (ctx) => {
     // open ones stay easy to find; answering clears it from the pin list).
     const pinnedMid = ctx.callbackQuery.message?.message_id;
     if (pinnedMid) {
+      // Feature 1: Record message context for this question
+      // So when Zaal replies to this message, we can route it with the correct qid context.
+      await recordMessageContext(pinnedMid, { qid: q.qid }).catch((err) => {
+        console.error('[zoe/index] failed to record question message context:', err);
+      });
       await ctx.api.unpinChatMessage(gid, pinnedMid).catch(() => {});
     }
     if (q.isType) {
@@ -515,13 +520,19 @@ bot.on('callback_query:data', async (ctx) => {
           reply_markup: { inline_keyboard: [] },
         })
         .catch(() => {});
-      await ctx
+      const replyMsg = await ctx
         .reply(`Reply to this thread with your answer for "${q.qid}".`, {
           ...(ctx.callbackQuery.message?.message_thread_id
             ? { message_thread_id: ctx.callbackQuery.message.message_thread_id }
             : {}),
         })
-        .catch(() => {});
+        .catch(() => undefined);
+      // Also record the reply message ID so if Zaal replies to this message, we know the context
+      if (replyMsg?.message_id) {
+        await recordMessageContext(replyMsg.message_id, { qid: q.qid }).catch((err) => {
+          console.error('[zoe/index] failed to record reply message context:', err);
+        });
+      }
     } else {
       await ctx.answerCallbackQuery({ text: 'Got it.' });
       await ctx
@@ -652,7 +663,7 @@ bot.on('message_reaction', async (ctx) => {
       getTaskForMessage: async (messageId) => {
         // Feature 3: Look up task ID from persistent message context store
         try {
-          const context = await getContextForMessage(messageId);
+          const context = await getMessageContext(messageId);
           return context?.taskId ?? null;
         } catch (err) {
           console.error('[zoe/index] getTaskForMessage failed:', err);

@@ -19,7 +19,7 @@ import { pushRecent, readHuman, type ChatScope } from './memory';
 import { transcribeTelegramFile } from './transcribe';
 import { parseQuestionCallback, TYPE_SENTINEL, encodeQuestion } from './questions';
 import type { ParsedQuestion } from './questions';
-import { getContextForMessage } from './message-context';
+import { getMessageContext } from './message-context';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 
@@ -302,7 +302,7 @@ export async function handleReplyRoute(
   }
 
   try {
-    const context = await getContextForMessage(replyToId);
+    const context = await getMessageContext(replyToId);
     if (!context) {
       return { handled: false };
     }

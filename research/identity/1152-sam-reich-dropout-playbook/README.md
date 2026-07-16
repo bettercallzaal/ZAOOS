@@ -130,3 +130,8 @@ Reich's bet was that **10,000 people who love you deeply beat 10 million who sor
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/) — the capital + focus layer
 - [1164 — Flow State](../1164-flow-state-engineering-peak-performance/) — the performance layer
 - [1168 — Synthesis: The Operating Ideology Zaal Aspires To](../1168-operating-ideology-synthesis/) — composite doc
+
+**ZAO evidence base (principles in action):**
+- [050 — The ZAO Complete Guide](../../community/050-the-zao-complete-guide/) — ZAO's 188-member gate is Reich's "10K who love you beats 10M who sort of know you" made structural
+- [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — formal statement of the creator-ownership model; the Dropout buyout thesis in DAO form
+- [155 — Sparkz Music NFT](../../music/155-sparkz-music-nft/) — the creator economics layer Reich proves works: direct creator-audience revenue, no intermediary extraction

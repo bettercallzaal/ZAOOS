@@ -174,3 +174,8 @@ Cohen proved that **obsessive care at small scale beats efficient service at lar
 - [1156 — Jesse Cole / Fans First Entertainment](../1156-jesse-cole-fans-first-entertainment/) — showmanship layer
 - [1164 — Flow State](../1164-flow-state-engineering-peak-performance/) — performance layer
 - [1168 — Synthesis: The Operating Ideology Zaal Aspires To](../1168-operating-ideology-synthesis/) — composite doc
+
+**ZAO evidence base (principles in action):**
+- [056 — ORDAO Respect System](../../governance/056-ordao-respect-system/) — soulbound reputation = ZAO's structural equivalent of Cohen's zero-salary/skin-in-the-game model
+- [058 — Respect Deep Dive](../../governance/058-respect-deep-dive/) — the mechanics of earned (not purchased) influence; Cohen's "risking your own bottom line" in governance form
+- [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — the customer-obsession thesis: artists as the customers ZAO obsesses over

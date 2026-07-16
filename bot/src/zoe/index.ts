@@ -77,6 +77,7 @@ import {
   sendDraftWithKeyboard,
   loadPending as loadPostsPending,
 } from './posts';
+import { parseVetoCallback, applyVeto } from './brief-veto';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
@@ -519,6 +520,40 @@ bot.on('callback_query:data', async (ctx) => {
         { from: 'zaal', text: `[answer:${q.qid}] ${q.value}`, sender: 'zaalbotz-btn' },
         String(gid),
       ).catch((e) => console.error('[zoe/index] q-answer log failed:', (e as Error)?.message));
+    }
+    return;
+  }
+
+  // Morning brief veto — "veto:<taskId>" callback. Minimal, reversible veto:
+  // set metadata.morning_veto = now.
+  const vetoTaskId = parseVetoCallback(ctx.callbackQuery.data);
+  if (vetoTaskId) {
+    const patchImpl = async (taskId: string, metadata: Record<string, unknown>) => {
+      const base = process.env.COWORK_TRACKER_URL;
+      const key = process.env.COWORK_TRACKER_KEY;
+      if (!base || !key) throw new Error('Tracker not configured');
+
+      const url = `${base.replace(/\/$/, '')}/rest/v1/tasks?legacy_id=eq.${taskId}`;
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ metadata }),
+      });
+      if (!res.ok) throw new Error(`Tracker PATCH failed (${res.status})`);
+    };
+
+    const ok = await applyVeto(vetoTaskId, patchImpl, new Date().toISOString());
+    if (ok) {
+      await ctx.answerCallbackQuery({ text: 'Vetoed — I\'ll deprioritize it.' });
+      await ctx
+        .editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+        .catch(() => {});
+    } else {
+      await ctx.answerCallbackQuery({ text: 'Veto failed — check logs.' });
     }
     return;
   }

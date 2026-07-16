@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-07-16
 original-query: Evaluate Hindsight as a memory layer for ZAO OS AI agents (reconstructed)
 tier: reference
 ---
@@ -101,13 +101,13 @@ const insights = await client.reflect({
 
 | Metric | Value |
 |--------|-------|
-| **Stars** | 13,745 (as of May 15, 2026) |
-| **Forks** | 786 |
+| **Stars** | ~18,500 (as of July 16, 2026) |
+| **Forks** | ~1,100 |
 | **License** | MIT |
 | **Created** | October 2025 |
-| **Current Version** | v0.6.2 (May 14, 2026) |
+| **Current Version** | v0.8.4 (July 1, 2026) |
 | **Activity** | Multiple commits daily, 100+ contributors |
-| **Latest Release** | May 14, 2026 |
+| **Latest Release** | July 1, 2026 |
 | **Paper** | arXiv:2512.12818 |
 
 ---
@@ -344,3 +344,5 @@ Keep Supabase/pgvector for application data. Use Hindsight exclusively for agent
 - [Vectorize.io](https://vectorize.io/) - Company homepage
 
 Updated 2026-05-21: Stars 3.6K → 13.7K in 2 months. v0.6.0 adds enterprise Oracle backend, 4 new framework integrations (Dify, n8n, SmolAgents, AWS Bedrock), and reliability fixes for multi-agent deployments. Hindsight is now production-grade for enterprise multi-agent teams.
+
+Updated 2026-07-16: Version jumped v0.6.2 → v0.8.4 (July 1, 2026); stars grew 13.7K → ~18.5K; forks 786 → ~1,100. v0.8.0 (June 8) added direct **Claude Agent SDK integration** (critical for ZAO: no custom glue needed), LangGraph + OpenAI Agents support, semantic deduplication of near-duplicate observations (0.97 threshold default), LLM prompt-prefix caching across all providers, and bank-to-bank document export/import for cross-instance migration. v0.8.4 (July 1) added **GitHub Copilot + Devin Desktop (formerly Windsurf) via MCP**, Aider session-bracketing memory, Eve agent-framework MCP helper, multi-LLM failover/round-robin config, configurable recency decay (linear/exponential/none), and cron-scheduled mental-model refresh. The 91.4% LongMemEval score (Gemini-3) is still accurate overall; Hindsight now also claims 94.6% on the single-session assistant category of LongMemEval-S. Competitor ByteRover entered the benchmark at 92.8% (LongMemEval-S) but with self-reported scores. No breaking changes in v0.8.x. Sources: https://github.com/vectorize-io/hindsight/releases — verified via full GitHub fetch July 16, 2026.

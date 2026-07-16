@@ -29,8 +29,10 @@ export async function GET(request: Request) {
     const parsed = querySchema.safeParse({
       track: searchParams.get('track'),
       artist: searchParams.get('artist'),
-      artwork: searchParams.get('artwork'),
-      filter: searchParams.get('filter'),
+      // searchParams.get() returns null for absent params; .optional() only
+      // accepts undefined, so coalesce to undefined for the optional fields.
+      artwork: searchParams.get('artwork') ?? undefined,
+      filter: searchParams.get('filter') ?? undefined,
     });
 
     if (!parsed.success) {

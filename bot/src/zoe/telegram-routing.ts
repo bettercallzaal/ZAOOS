@@ -23,6 +23,11 @@ export type MessageKind = 'question' | 'status';
 
 export interface SendToZaalOptions {
   kind?: MessageKind; // defaults to 'status'
+  /**
+   * Inline keyboard to attach (Telegram reply_markup). Used by the morning
+   * brief to surface tap-to-veto buttons. Passed through to sendMessage.
+   */
+  replyMarkup?: { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> };
 }
 
 export interface TelegramRoutingDeps {
@@ -48,10 +53,11 @@ export async function sendToZaal(
   opts: SendToZaalOptions = {},
 ): Promise<any> {
   const kind = opts.kind ?? 'status';
+  const markupOpts = opts.replyMarkup ? { reply_markup: opts.replyMarkup } : {};
 
   // question -> always DM
   if (kind === 'question') {
-    return deps.sendMessage(deps.zaalId, text);
+    return deps.sendMessage(deps.zaalId, text, markupOpts);
   }
 
   // status -> group (if configured), else fallback to DM
@@ -61,10 +67,13 @@ export async function sendToZaal(
     console.log(
       '[zoe/telegram-routing] ZAALBOTS_GROUP_CHAT_ID not set, routing status to DM (fallback)',
     );
-    return deps.sendMessage(deps.zaalId, text);
+    return deps.sendMessage(deps.zaalId, text, markupOpts);
   }
 
-  const messageOpts = deps.groupThreadId ? { message_thread_id: deps.groupThreadId } : {};
+  const messageOpts = {
+    ...(deps.groupThreadId ? { message_thread_id: deps.groupThreadId } : {}),
+    ...markupOpts,
+  };
   return deps.sendMessage(groupId, text, messageOpts);
 }
 

@@ -3,7 +3,7 @@ topic: identity
 type: research
 status: research-complete
 last-validated: 2026-07-16
-related-docs: 1156, 1160, 1164, 1168
+related-docs: 1156, 1160, 1164, 1168, 51, 56, 155
 original-query: "Personal development research: Sam Reich + Game Changer / Dropout TV - creator-first economics, format invention, small-audience profitability, cast-as-family"
 tier: STANDARD-DEEP
 ---
@@ -130,3 +130,8 @@ Reich's bet was that **10,000 people who love you deeply beat 10 million who sor
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/) — the capital + focus layer
 - [1164 — Flow State](../1164-flow-state-engineering-peak-performance/) — the performance layer
 - [1168 — Synthesis: The Operating Ideology Zaal Aspires To](../1168-operating-ideology-synthesis/) — composite doc
+
+**ZAO evidence base (principles in action):**
+- [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — creator-ownership model; artist keeps 100% of masters; 0xSplits 80/10/10 split
+- [056 — ORDAO Respect System](../../governance/056-ordao-respect-system/) — soulbound reputation = ZAO's structural equivalent of Dropout's employee-ownership
+- [155 — Music NFT End-to-End Plan](../../music/155-music-nft-end-to-end-implementation/) — Sparkz as "creator-owned distribution infrastructure" made concrete

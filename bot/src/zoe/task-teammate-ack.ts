@@ -115,7 +115,7 @@ function seenKey(taskId: string, commentId: string): string {
   return `${taskId}:${commentId}`;
 }
 
-async function readPendingReplies(): Promise<Map<number, PendingReply>> {
+export async function readPendingReplies(): Promise<Map<number, PendingReply>> {
   const map = new Map<number, PendingReply>();
   try {
     const raw = await fs.readFile(PENDING_REPLIES_PATH, 'utf8');
@@ -138,7 +138,7 @@ async function writePendingReply(pending: PendingReply): Promise<void> {
   await fs.appendFile(PENDING_REPLIES_PATH, JSON.stringify(pending) + '\n', 'utf8');
 }
 
-async function removePendingReply(messageId: number): Promise<void> {
+export async function removePendingReply(messageId: number): Promise<void> {
   const map = await readPendingReplies();
   map.delete(messageId);
   await fs.mkdir(ZOE_HOME, { recursive: true });

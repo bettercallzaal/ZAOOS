@@ -19,6 +19,7 @@ import { pushRecent, readHuman, type ChatScope } from './memory';
 import { transcribeTelegramFile } from './transcribe';
 import { parseQuestionCallback, TYPE_SENTINEL, encodeQuestion } from './questions';
 import type { ParsedQuestion } from './questions';
+import { getMessageContext } from './message-context';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 
@@ -281,6 +282,7 @@ export async function handleAutoRoute(
 
 // Feature 4: REPLY-TO-ROUTE
 // When Zaal REPLIES to a specific ZOE message, thread his text to that message's item.
+// Use replied-to message id to look up which qid/task it belongs to from persistent storage.
 // Use replied-to message id to look up which qid/task it belongs to.
 
 export async function handleReplyRoute(
@@ -301,11 +303,35 @@ export async function handleReplyRoute(
     return { handled: false };
   }
 
+  try {
+    const context = await getMessageContext(replyToId);
+    if (!context) {
+      return { handled: false };
+    }
+
+    if (context.qid) {
+      // Thread to question
+      const logText = `[answer:${context.qid}] ${text}`;
+      try {
+        await pushRecent(
+          { from: 'zaal', text: logText, sender: 'reply-thread' },
+          String(ctx.chat.id),
+        );
+      } catch {
+        // continue
+      }
+      return { handled: true, contextType: 'question', id: context.qid };
+    if (context.taskId) {
+      // Thread to task
+      const logText = `[task-reply:${context.taskId}] ${text}`;
+      return { handled: true, contextType: 'task', id: context.taskId };
+    return { handled: false };
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    return { handled: false, error: errMsg };
+  }
   const context = deps.messageIdToContext.get(replyToId);
   if (!context) {
-    return { handled: false };
-  }
-
   if (context.qid) {
     // Thread to question
     const logText = `[answer:${context.qid}] ${text}`;
@@ -316,24 +342,11 @@ export async function handleReplyRoute(
       );
     } catch {
       // continue
-    }
     return { handled: true, contextType: 'question', id: context.qid };
-  }
-
   if (context.taskId) {
     // Thread to task
     const logText = `[task-reply:${context.taskId}] ${text}`;
-    try {
-      await pushRecent(
-        { from: 'zaal', text: logText, sender: 'reply-thread' },
-        String(ctx.chat.id),
-      );
-    } catch {
-      // continue
-    }
     return { handled: true, contextType: 'task', id: context.taskId };
-  }
-
   return { handled: false };
 }
 

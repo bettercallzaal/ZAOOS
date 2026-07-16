@@ -24,6 +24,7 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
+import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
 import { checkAndRecordZoeCall } from './call-budget';
 import { runCockpit } from '../cockpit/cockpit';
 import { applyTaskOps, seedInitialTasks } from './tasks';
@@ -1629,15 +1630,20 @@ interface ProgressHandle {
 function startProgressNarration(
   ctx: Context,
   chatId: number,
-  messages: { first: string; second?: string },
+  messages: { first: string | null; second?: string },
 ): ProgressHandle {
   ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
   const typingInterval = setInterval(() => {
     ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
   }, TYPING_REFRESH_MS);
-  const firstAck = setTimeout(() => {
-    ctx.reply(messages.first).catch(() => {});
-  }, ACK_THRESHOLD_MS);
+  // Conversational turns pass first=null: no "working on it" filler (ack-theater).
+  // The native typing indicator still runs; a genuinely long turn can still emit
+  // the honest `second` ping. Work turns keep both. (zoe-conversational spec).
+  const firstAck = messages.first
+    ? setTimeout(() => {
+        ctx.reply(messages.first as string).catch(() => {});
+      }, ACK_THRESHOLD_MS)
+    : null;
   const secondAck = messages.second
     ? setTimeout(() => {
         ctx.reply(messages.second as string).catch(() => {});
@@ -1646,7 +1652,7 @@ function startProgressNarration(
   return {
     stop: () => {
       clearInterval(typingInterval);
-      clearTimeout(firstAck);
+      if (firstAck) clearTimeout(firstAck);
       if (secondAck) clearTimeout(secondAck);
     },
   };
@@ -1661,8 +1667,12 @@ async function dispatchConcierge(
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
+  // Conversational turns (short chat, no link/plan/build) answer directly on the
+  // quick model with NO "working on it" ack. Real work keeps the honest progress
+  // narration + default/hard model. (zoe-conversational spec, 2026-07-16).
+  const conversational = isConversationalTurn(text);
   const progress = startProgressNarration(ctx, chatId, {
-    first: 'Got it. Working on this one - reply incoming.',
+    first: conversational ? null : 'Got it. Working on this one - reply incoming.',
     second: "Still on it - bigger one than it looked. Hang tight.",
   });
 
@@ -1717,6 +1727,9 @@ async function dispatchConcierge(
       message: text,
       blocks,
       senderLabel: label,
+      // Chat -> quick model for instant replies; real work -> selectModel picks
+      // default/hard. (zoe-conversational spec).
+      model: conversational ? ZOE_QUICK_MODEL : undefined,
       recallContext,
       brandContext,
       linkResearchIntent: wantsLinkResearch(text),

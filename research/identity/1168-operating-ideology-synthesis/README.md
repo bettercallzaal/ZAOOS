@@ -3,7 +3,7 @@ topic: identity
 type: synthesis
 status: research-complete
 last-validated: 2026-07-16
-related-docs: 1152, 1156, 1160, 1164
+related-docs: 1152, 1156, 1160, 1164, 50, 51, 306, 718, 1142
 original-query: "Personal development research: synthesis doc - the operating ideology Zaal aspires to. Reich creator-economics x Cole fans-first x Cohen conviction x flow engineering"
 tier: STANDARD-DEEP
 ---
@@ -242,7 +242,16 @@ Build that. Everything else follows.
 
 ## Related Docs
 
+**This roster (figure docs):**
 - [1152 — Sam Reich / Dropout TV Playbook](../1152-sam-reich-dropout-playbook/)
 - [1156 — Jesse Cole / Fans First Entertainment](../1156-jesse-cole-fans-first-entertainment/)
 - [1160 — Ryan Cohen / Conviction + Customer Obsession](../1160-ryan-cohen-conviction-customer-obsession/)
 - [1164 — Flow State / Engineering Peak Performance](../1164-flow-state-engineering-peak-performance/)
+
+**ZAO DAO case study docs (North Star cross-links):**
+The 12 principles above are not aspirational — they describe what The ZAO already does. These docs are the evidence base:
+- [050 — The ZAO Complete Guide](../../community/050-the-zao-complete-guide/) — community structure, membership, Fractal mechanics
+- [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — the formal articulation of ZAO's model
+- [306 — Eden Fractal / Op Fractal Deep History](../../governance/306-eden-fractal-op-fractal-deep-history/) — the governance lineage that grounds "Fractal is sacred" (100+ weeks)
+- [718 — ZAO Fractal Whitepaper Foundations](../../governance/718-zao-fractal-whitepaper-foundations/) — Respect Game mechanics, Fibonacci scoring
+- [1142 — Fractal Error-Recovery Framework](../../governance/1142-fractal-error-recovery-framework/) — how the Fractal self-corrects (feedback loops are structural)

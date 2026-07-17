@@ -38,14 +38,15 @@ Same 11-chapter spine as 718, with the new docs folded in and the decay correcti
 | 6 | On-Chain Architecture (ORDAO, OREC, soulbound contracts) | Precision | 718c, **936 (verified vote-weight path)** |
 | 7 | Why Fractal (vs token-voting, quadratic, Nouns, Moloch) | Argument | 718d |
 | 8 | The ZAO Fractal (90+ weeks, music, OG/ZOR, the social client) | Manifesto / narrative | 718g, **703 (current state)** |
-| 9 | Limitations and Open Problems | Plain honesty | 718e, **936 + 941 (the decay-gap as a named open problem)** |
-| 10 | Roadmap (ledger reconciliation, all-members-on-chain, scaling) | Plain | 718g, 696, **935 + 941 (monetary policy: banked/active split, decay adoption path)** |
+| 9 | Limitations and Open Problems | Plain honesty | 718e, **936 + 941 (the decay-gap as a named open problem)**, **1142 (error-recovery / failure-modes framework, grounded in 1139)** |
+| 10 | Roadmap (ledger reconciliation, all-members-on-chain, scaling) | Plain | 718g, 696, **935 + 941 (monetary policy: banked/active split, decay adoption path)**, **1142 (error-recovery experiments: decision taxonomy + amendment process)** |
 | 11 | Conclusion (the "new governance culture" close) | Manifesto | 718g |
 
-### What the three new docs contribute
+### What the new docs contribute
 - **935 (Monetary Policy for Merit):** the framing that Respect is an inflationary, decaying *flow* that measures current relevance and routes money - not money itself, not buyable/sellable. Feeds Ch 4 (what Respect is/is not) and the Ch 10 roadmap case for decay. Precedent set: Gitcoin 90-day expiry, Coordinape epoch reset, Colony 50%/90-day, SourceCred cred/grain split.
 - **936 (Fractal Governance Design, verified):** the code-checked ground truth for Ch 5 + Ch 6, and the honest no-decay gap for Ch 9.
 - **941 (Burn/Decay votable proposal):** the six-vote ballot (banked/active split, 180-day half-life, multi-signal participation, earned grace, Y3 legacy migration, bounty routing). This is Ch 10 roadmap material - the *proposed* future, explicitly not current architecture.
+- **1142 (Error Recovery & Failure Modes Framework):** grounded in Rachmany's DAO-failure analysis (doc 1139), it names the failure modes that threaten ZAO Fractal and gives a detection -> containment -> recovery -> prevention pattern for each. Three pieces feed the whitepaper directly: (a) a **reversible-vs-irreversible decision taxonomy** - mark which governance calls can be undone *before* making them - for Ch 9; (b) an **amendment process** - Snapshot poll if reversible, else a new Fractal consensus vote, never a unilateral undo, with the "post-execution amendments > 15%/quarter = crisis" tripwire - for Ch 9 + Ch 10; (c) the **failure feedback loop** Rachmany says most DAOs lack - a required pre-impact "if this goes wrong, here's what breaks and how we fix it" note before major OREC proposals, plus a public post-mortem when an irreversible call goes bad. This is ZAO's biggest DAO-fail exposure (irreversible money/culture/governance decisions with no recovery path) stated honestly, which is exactly Ch 9's job.
 
 ## Gaps to close before drafting (per chapter)
 
@@ -55,6 +56,7 @@ Same 11-chapter spine as 718, with the new docs folded in and the decay correcti
 | 5 | Confirm the live Fibonacci curve + consensus threshold against current code/process, not just 718b's description. |
 | 8 | Refresh the "90+ weeks" count and the OG/ZOR ledger split numbers to the current week (703 is the anchor; re-date it). |
 | 9 | Confirm the "two wallets drive OREC" operating-core claim is still true (it drives the honesty chapter). |
+| 9 | Weave in doc 1142's error-recovery framework: the reversible/irreversible decision taxonomy, the amendment process, and the failure feedback loop. State the "irreversible decisions with no recovery path" exposure (doc 1139) as a named open problem, not hidden. |
 | 10 | 941's on-chain pieces (gas-free relayer submit, Snapshot-strategy bounty routing) are buildable-but-unbuilt - frame as roadmap, never as shipped. |
 
 ## Verification log (2026-07-02, against current code)

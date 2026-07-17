@@ -269,3 +269,11 @@ Before doing anything else on X, fix the display name on @bettercallzaal:
 - [FULL] Doc 1107 - SEO + GEO Strategy for ZAO Social Profiles (`research/identity/1107-seo-social-profiles/`)
 - [FULL] Doc 1112 - Platform Profile Content: FC + X drafts (`research/community/1112-platform-profile-content/`)
 - [FULL] Doc 1128 - ZNN 24/7 Livepeer Channel (`research/infrastructure/1128-znn-24-7-livepeer-channel/`)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO platform management strategy — no ZOL code impact.**
+
+One-system design covering 9 platforms (Farcaster, X, LinkedIn, YouTube, TikTok, IG, Twitch, Discord, Telegram). Tool lock: Firefly (read), Postiz (schedule/post), Restream (live). ZAO dashboard routes cross-post and monitor through these. ZOL's `post-cast` DreamLoop depends on Postiz being the write layer; confirms the ZOL design is aligned with the wider ZAO platform strategy. No ZOL code changes.

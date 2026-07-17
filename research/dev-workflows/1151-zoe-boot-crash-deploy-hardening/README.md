@@ -80,3 +80,17 @@ The directive was "many solutions and try them all." Each candidate below was ev
 - FULL - the live incident: `bot/src/zoe/tg-interactions.ts` on the VPS, the `fix-tg.py` repair, PR #1544, journalctl for zoe-bot (2026-07-16, this session).
 - FULL - `.claude/rules/agent-loops.md` (rules 1, 11, 18) - prior loop-ops lessons this incident extends.
 - FULL - `~/bin/zoe-autodeploy.sh` v2 (deployed this session) - the hardened pipeline.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZOE deploy hardening — adds rules 26-28 to agent-loops.md. ZOL-adjacent patterns.**
+
+Three-failure stack: (1) union-merge on code file, (2) boot-verify passed vacuously (missing binary exits 0), (3) verified the live clone in place. All three fixed in `zoe-autodeploy.sh` v2.
+
+**ZOL relevance:** ZOL's restart-recovery DreamLoop (PR #26, bootstrap-state + restart-recovery loops) handles the ZOL equivalent of this — the loop resumes from durable state (SQLite WAL), not from a potentially broken in-memory state. ZOL's deploy model is "Zaal applies to Pi manually" not a cron autodeploy, so the union-merge risk is lower. But rule 27 (never use exit-0 from a missing binary as "green") is universally applicable.
+
+Key rule added to agent-loops.md: **#26** never union-merge code; **#27** boot-verify hard-fails if verifier is missing; **#28** verify on a fresh checkout, never in-place. ZOL's test gate (`dl:test` green + secret-scan) is the equivalent gate.
+
+No ZOL code changes.

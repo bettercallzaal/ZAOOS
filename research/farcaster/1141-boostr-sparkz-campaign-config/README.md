@@ -426,3 +426,15 @@ Nothing here deploys, funds, or moves on-chain value; those remain Zaal's hand.
 - [Doc 1132 - Zooster Leaderboard](../1132-zooster-boostr-zabal-leaderboard/) - The proof-of-concept this campaign drives
 - [Doc 1098 - Sparkz Master Brief](../../../business/1098-sparkz-master-brief/) - The broader Sparkz thesis
 - [Doc 1097 - Sparkz Competitive Landscape](../../../business/1097-sparkz-competitive-landscape/) - Why this design wins vs Clanker/Zora
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Validates PR #36's mutable-split path.**
+
+Pilot ZERO (Part 7): the 25% Zaal / 25% cashlessman / 50% leaderboard contract is a **mutable** 0xSplits contract — the controller (Zaal's wallet or a multisig) updates the flattened recipient list each settlement period as the board grows. PR #36's `launch-rail.decision` handler correctly routes to `zero_x_splits` for adjustable/growing splits. The "mutable controller" mechanic described here is precisely the "adjustable" flag in the handler's decision matrix.
+
+5 open decisions for Zaal (D1 founder double-dip exclusion, chain = Arbitrum matching Boostr USDC settlement, controller multisig, weighting model, reallocation cadence). All Zaal's hand. Nothing deploys without explicit approval.
+
+No ZOL code changes. Design-only. The `legalNote` guardrail in PR #36's output applies here: any Sparkz campaign launch-rail output includes the required legal note before presenting split options.

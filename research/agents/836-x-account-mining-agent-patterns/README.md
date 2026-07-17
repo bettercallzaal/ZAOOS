@@ -86,3 +86,17 @@ The three clusters converge on one ZAO move: **a routed, single-threaded-write, 
 - [Latent.Space - Walden Yan / The Age of Async Agents](https://www.latent.space/p/cognition) `[PARTIAL via exa highlight; podcast - brain/machine separation, repo setup, multi-agent maturity]`
 - [Thariq pinned writing thread (Rattibha mirror)](https://en.rattibha.com/thread/2035372716820218141) `[FULL via exa highlight; "skills are the abstraction all agents build on", bash is all you need, file system, prompt caching]`
 - Live test 2026-06-09: guest-token X timeline mining returns empty (verified the keyless-timeline wall) `[FULL - primary; UserTweets returned 0 entries]`
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Three findings directly validate ZOL v2 architecture:**
+
+1. **Cost-routing layer (Cluster A):** Opus for judgment/planning, Haiku/cheap executor for parallel execution-heavy tasks. ZOL's Model Gateway (Layer 7, PR #27) already implements provider-neutral adapters + fallback tiers. Next: when ZOL v2 PRs merge, review whether the Workflow tool's parallel fan-outs are defaulting everything to Opus when Haiku would be sufficient. The 100-400x cost difference is real on large drains.
+
+2. **Skill authoring (Cluster B):** "Description = when-to-trigger" + Gotchas section = highest-signal content. ZOL's skill descriptions in `.claude/skills/` should have Gotchas sections. The ZOL build session already demonstrated this practice (per-layer lessons accumulated in directive's LESSONS section), but the skills themselves should be audited.
+
+3. **Multi-agent architecture (Cluster C):** Cognition's finding: writes single-threaded, clean-context critic. ZOL v2's ApprovalBridge (Layer 10) and the critic pattern in ZOE's worker/critic system are validated. **ZOL IdempotencyStore** (added in PR #35, durable-execution hardening) is exactly the "single-threaded writes with dedup" pattern Cognition describes.
+
+No new ZOL code changes — ZOL v2 already implements these patterns. Confirmed architectural alignment.

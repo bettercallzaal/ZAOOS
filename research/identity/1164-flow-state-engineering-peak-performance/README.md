@@ -270,3 +270,11 @@ This principle prevents "creative block" becoming an excuse for inaction. It als
 - [188 — Fractal Bot](../../agents/188-fractal-bot/) — automated facilitation that enforces the flow triggers (timer, turn equality, immediate scoring)
 - [718 — ZAO Fractal Whitepaper Foundations](../../governance/718-zao-fractal-whitepaper-foundations/) — formal grounding: Respect Game Fibonacci mechanics as challenge-skill calibration engine
 - [1142 — Fractal Error-Recovery Framework](../../governance/1142-fractal-error-recovery-framework/) — the immediate feedback loop made structural: how the Fractal self-corrects when flow breaks
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Identity/personal development research — no ZOL code impact.**
+
+Flow state engineering: Csikszentmihalyi origins, Steven Kotler flow triggers, group flow conditions. ZAO Fractal as a group-flow machine (challenge-skill calibration via Fibonacci Respect tiers). Feeds whitepaper Ch 4 (Fractal mechanism). No ZOL code impact.

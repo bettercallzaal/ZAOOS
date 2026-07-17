@@ -234,3 +234,11 @@ Sparkz is positioned as **the energy-first creator coin platform on Farcaster**.
 - Farcaster protocol docs + ecosystem context (docs 304, 309, 587)
 - Web search for @morals + "Farcaster" + "save" (null results)
 - Google Slides access attempt (403 Forbidden)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Farcaster strategy context — no ZOL code impact.**
+
+@morals cast flagging Farcaster's risk (source: Google Slides, 403 restricted). Farcaster remains ZAO's primary distribution channel (Sparkz, ZNN, artist-spotlight casts). The "save Farcaster" framing aligns with Sparkz energy-first positioning: if Farcaster health depends on monetization, Sparkz is part of the solution, not just a user. No ZOL code changes. Relevant to cast-gated ZOL flows when live.

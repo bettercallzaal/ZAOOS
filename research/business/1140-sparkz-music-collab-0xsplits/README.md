@@ -770,3 +770,15 @@ Key decisions (immutable vs mutable, auto-distribution, revenue sources) are lef
 | Zaal | Approve first collab for mainnet deploy | Gate | 2026-08-12 | Split lives on Base mainnet; revenue flows |
 | Zaal | Launch first collab token (if applicable) | Ship | 2026-08-20 | Trading begins; fees route to split |
 | Zaal | Distribute first split earnings to members | Ops | 2026-08-25 | All members receive their share; verify on Etherscan |
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Directly relevant to PR #36 (launch-rail.decision handler).**
+
+The collab split architecture here confirms the PR #36 decision boundary: when a Sparkz collab has ≤7 musicians, `clanker_native` works — the recipient list is flat wallet addresses passed to Clanker at deploy time. When >7 musicians, or when the split needs to be adjustable (dynamic contribution scoring, Phase 2), `zero_x_splits` creates the 0xSplits contract first and passes that single split address as the Clanker fee recipient. PR #36's handler already implements this fork correctly.
+
+This doc designs Sparkz-side infrastructure (Supabase tables `sparkz_collabs`, `sparkz_collab_members`, `sparkz_split_contracts`, `sparkz_split_distributions`; backend API routes; daily cron for `distributeERC20`). That's all Sparkz-repo work, not ZOL v2. ZOL's role is providing the `launch-rail.decision` output that tells Sparkz which path to take.
+
+The 9 open decisions (immutable vs mutable, gas cost owner, per-track vs per-collab, dispute handling, tax CSV) are all Zaal's decisions. No ZOL code changes needed.

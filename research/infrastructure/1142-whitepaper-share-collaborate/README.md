@@ -172,3 +172,15 @@ LOOP-BUILD (development):
 ZAAL-GATED (launch):
 - [ ] Create first GitHub Discussion for ZIP-0001 (test workflow) - due 2026-08-03
 - [ ] Share public link to thezao.xyz/papers (or deployed URL) with team - after deploy complete
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **zao-papers publishing stack — not ZOL v2.**
+
+Two-layer recommendation: (1) Astro Starlight (public read surface, mobile-first, thezao.xyz/papers or standalone Vercel deploy); (2) GitHub native (PRs + Discussions for contributors). Bridge: "Comment/Collaborate on GitHub" link at bottom of each paper.
+
+zao-papers repo (`bettercallzaal/zao-papers`, private) currently has README, PROCESS.md, CLAUDE.md, and ZIP-0001 (The ZAO Framework). No GitHub Pages yet.
+
+No ZOL code changes. Zaal's action: deploy to GitHub Pages/Vercel + create first GitHub Discussion for ZIP-0001 (test workflow). Due 2026-08-03 per doc.

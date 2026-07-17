@@ -115,3 +115,17 @@ Build `buildArtistContext(fid)` using what ZOE already has:
 - `getQualityScore(walletAddress)` from fc-identity → `communityScore`
 
 This gives ZOE a meaningful artist context builder before any new API integrations. Estimated: 1 PR, ~200 lines including tests.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Artist-context builder pattern — relevant to ZOL music-curator capsule.**
+
+The core lesson from Recoupable (doc 1133): never dump raw API JSON to the agent. Transform to artist-centric context structures first. The proposed `ArtistContext` interface (engagementRate, communityScore, recentCastVelocity, topPerformingCasts, zaoConcertHistory, respectReceived, genreTags) is directly mappable to ZOL's `artist-context` DreamLoop.
+
+**ZOL implication:** ZOL's `zol-music-curator-v1` capsule and `artist-context` loop should build a lean ArtistContext struct as the first step before any draft generation. The loop currently queries Neynar raw; adding a `buildArtistContext(fid)` transform (200 lines, 1 PR estimate) would close this gap. This is a post-merge enhancement for ZOL v2.1.
+
+The approval queue pattern (generate → queue → human edits → auto-schedule) is exactly ZOL's ApprovalBridge + deliver-and-receipt loop chain.
+
+No ZOL code changes needed in the current PR stack. Post-merge enhancement.

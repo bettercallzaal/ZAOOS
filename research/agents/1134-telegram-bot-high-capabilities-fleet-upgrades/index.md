@@ -379,3 +379,15 @@ The Telegram Bot API has evolved dramatically through 2026 (v10.2 as of July 14)
 ---
 
 **Doc status:** Research complete. Ready for planning + implementation. No merge until Zaal approves.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZOE fleet upgrade roadmap, not a ZOL v2 dependency.**
+
+Top 5 upgrades ranked by impact/effort: Mini Apps [1] (cowork board in Telegram — highest impact), Ephemeral Messages [2] (low lift, quick win), Inline Mode [3], Reactions API [4], Forum Topics [5] (auto-create per loop). All are `zao-os/bot` work on the VPS, not `zol-upgrade`.
+
+Stage 0 for each upgrade is Zaal setting env vars + restarting ZOE. Stage 0 for the dormant Discord client (doc 1135) is the same pattern — runbook only.
+
+No ZOL code changes. All implementations go in `zao-os/bot/src/zoe/`. Doc confirms that grammy 1.29.0 → 1.31.x is a no-breaking-changes upgrade when this work begins. Unblocked only after ZOL v2 PRs merge and VPS attention frees up.

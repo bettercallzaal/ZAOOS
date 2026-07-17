@@ -267,3 +267,11 @@ When researchers, builders, or partners ask "how does ZAO make governance decisi
 - **Doc 696** — Fractal lineage summary (founding and transition history) `[FULL]`
 - **Doc 115** — ZAO Respect data reconciliation (OG/ZOR ledger plan) `[FULL]`
 - **Doc 1206** — Comparative DAO state July 2026 (ZIPs and case study context) `[FULL]`
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+ZIP framework: BIP/EIP-style numbered governance proposals for ZAO. Retroactive registry maps known governance decisions to ZIP numbers. Format: Status + Author + Summary + Specification + Rationale + Implementation. Target: zao-papers repo. No ZOL code impact.

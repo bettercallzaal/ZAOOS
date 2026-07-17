@@ -211,3 +211,11 @@ All claims in this document are sourced from existing ZAO OS research library do
 - **WaveWarZ live API** — wavewarz.info/api/public/stats (1,245 battles, 522 SOL) `[FULL]`
 
 No new external web research required. All comparative claims about Nouns, MakerDAO, Compound, Uniswap are inherited from Doc 718d (which carried `[FULL]` / `[PARTIAL]` source classifications with 58 sources across 9 governance model categories). Claims about Optimism Fractal's January 2026 pause are confirmed in Doc 306, 718g, 696, and 718e independently.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+Comparative DAO state July 2026: ZAO vs Nouns/MakerDAO/Compound/Uniswap/Optimism Fractal. ZAO is among a very small set of DAOs with 100+ weeks of unbroken governance. Optimism Fractal paused Jan 2026 (confirmed). Strong case-study differentiator. No ZOL code impact.

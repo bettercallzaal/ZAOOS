@@ -622,3 +622,17 @@ These require Zaal's judgment. Framework is designed, but thresholds and authori
 - **Tested against:** No implementation yet; this is design-stage. Framework is theory until Zaal's brainstorm + decisions + deployment.
 - **Staleness risk:** Fractal state changes weekly. If this doc is read >3 months after 2026-07-16, re-verify against current doc 703 / 981 data and current OREC transaction count.
 
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Pure governance design — no ZOL code impact.**
+
+7 failure classes (Forking Code, Dispensable People, Invisible Onboarding Costs, OREC Signer Centralization, Respect Gini Drift, Low Participation, Veto Gridlock), each with detection → containment → recovery → prevention. 5 circuit breakers (Emergency Veto, Signer Rotation, Fractal Pause, Respect Rebalancing, Participation Floor).
+
+Highest-urgency item: OREC signer centralization (only zaal.eth + civilmonkey.eth, no rotation in 101+ weeks). Gini target decision (rec: B, <0.75). Both Zaal decisions.
+
+Detection dashboard spec (weekly/monthly/quarterly) is design-ready. Q3 2026 targets: signer committee, onboarding KPI dashboard, ZABAL ZABAL budget KPI. These feed doc 942 (Fractal whitepaper) Ch 9 "Limitations" + Ch 10 "Roadmap".
+
+No ZOL code changes. Blocked on Zaal brainstorming the 6 open decisions (Part 6) before whitepaper integration.
+

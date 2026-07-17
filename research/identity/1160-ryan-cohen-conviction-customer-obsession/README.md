@@ -179,3 +179,11 @@ Cohen proved that **obsessive care at small scale beats efficient service at lar
 - [056 — ORDAO Respect System](../../governance/056-ordao-respect-system/) — soulbound reputation = ZAO's structural equivalent of Cohen's zero-salary/skin-in-the-game model
 - [058 — Respect Deep Dive](../../governance/058-respect-deep-dive/) — the mechanics of earned (not purchased) influence; Cohen's "risking your own bottom line" in governance form
 - [051 — ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) — the customer-obsession thesis: artists as the customers ZAO obsesses over
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Identity/personal development research — no ZOL code impact.**
+
+Ryan Cohen: conviction investing, customer-obsession (Chewy), GameStop turnaround discipline, skin-in-the-game leadership. ZAO equivalent: artists are the customers ZAO obsesses over; Respect = skin-in-the-game. No ZOL code impact.

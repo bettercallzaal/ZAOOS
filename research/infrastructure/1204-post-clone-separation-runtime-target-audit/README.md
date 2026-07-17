@@ -54,3 +54,15 @@ None are done here (they touch the live VPS / operator units = gated). Boarded a
 
 - `scripts/zoe-autodeploy.sh` (v3) — the canonical deploy path to `~/zao-bot-live`
 - [Doc 1151](../../dev-workflows/1151-zoe-boot-crash-deploy-hardening/) + agent-loops rules 9/25/31/32 — clone-separation + deploy hardening lineage
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Deploy architecture audit — ZOL is not affected (separate repo).**
+
+Post-clone-separation rule: `~/zao-bot-live` = runtime/deploy target; `~/zao-os` = builder clone. Nothing that deploys the bot may target the builder clone. Three findings: (1) `zoe-deploy.sh` still points at ~/zao-os (HIGH risk, should be deprecated), (2) `zao-fleet-agent.service` disabled but still points at builder clone (LOW, mitigated by disabled state), (3) `web-improve.service` in failed state (unrelated).
+
+**ZOL relevance:** ZOL's equivalent is `/home/zaal/zol-upgrade` (the only ZOL repo). ZOL runs from the Pi directly via cron/pm2, not via an autodeploy script. When Zaal deploys ZOL v2, the activation steps (from `docs/pi-activation-runbook-v1.md`) are the equivalent of autodeploy v3 — manual copy/checkout to the Pi target directory. ZOL does not have a `~/zol-live` vs `~/zol-upgrade` split. That's acceptable for ZOL's current scale (Pi-only, single cron).
+
+No ZOL code changes. Blocked: Zaal to deprecate `scripts/zoe-deploy.sh` and investigate `web-improve.service` failure.

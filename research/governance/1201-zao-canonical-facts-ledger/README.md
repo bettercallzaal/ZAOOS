@@ -86,3 +86,11 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 - [ICM boxes](../../identity/icm-boxes/) — the AI-readable surface that should cite this ledger
 - [Doc 942 - Fractal whitepaper outline](../942-zao-fractal-whitepaper-outline-v2/)
 - [Doc 1107 - GEO/SEO](../../identity/1107-seo-social-profiles/) — citable, consistent facts are a GEO asset
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+Living ledger: verified vs needs-source ZAO facts. Splits facts into traceable (source link exists) and unverified (cited but not traceable from public data). Key: WaveWarZ 1,245 battles + 522 SOL verified from live API. Fractal 102+ weeks verified. North Star case-study deliverable — every headline number must cite a source. No ZOL code impact.

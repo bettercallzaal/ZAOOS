@@ -56,3 +56,11 @@ python3 verify-contracts.py
 - [Doc 1202 - Fractal on-chain settlement history](../1202-fractal-onchain-settlement-history/)
 - [Doc 1201 - ZAO canonical facts ledger](../1201-zao-canonical-facts-ledger/)
 - [ICM boxes](../../identity/icm-boxes/) (fractal box carries OG/ZOR/OREC addresses)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+ZAO on-chain contract registry. Canonical addresses for OG Respect, ZOR ERC-1155, OREC, ZAOstock contract. Feeds ICM boxes + whitepaper. No ZOL code impact.

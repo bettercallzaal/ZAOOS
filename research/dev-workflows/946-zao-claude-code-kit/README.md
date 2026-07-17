@@ -95,3 +95,15 @@ zao-claude-kit/
 - `.claude/rules/` (secret-hygiene, pii-hygiene, api-routes, components, tests, typescript-hygiene) [FULL - this repo]
 - Doc 154 (skills/commands master reference), Doc 441 (ECC integration) [FULL - internal]
 - `opensource-pipeline` skill (fork/sanitize/package, 20+ secret patterns) [FULL - installed]
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Directly applicable to ZOL v2 build practices.**
+
+The KEEP list is the signal: research-doc workflow, handoff, clipboard, plan/review/qa/ship discipline, and `.claude/rules/` as the most portable part. ZOL v2 fully applies this — the directive's LESSONS section is the ZOL-specific KEEP list, and `.claude/rules/` (secret-hygiene, pii-hygiene, api-routes, tests) are active in the ZOL build session.
+
+**One action worth taking on the ZOL skill set:** per doc 836's Cluster B (Thariq's playbook), each ZOL skill's description should be rewritten as "when to trigger," not a summary, and each should get a Gotchas section. The LESSONS section in `zol-directive.md` already captures the gotchas in prose — they should migrate to the individual skill files. Not a PR blocker; a future polish task.
+
+No ZOL code changes. Build discipline confirmed as applied.

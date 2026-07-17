@@ -83,3 +83,11 @@ python3 measure-pr-velocity.py
 - [Doc 1201 - ZAO canonical facts ledger](../1201-zao-canonical-facts-ledger/) (this feeds the "34 PRs/week" row)
 - [Doc 1074 - Agent leverage: reduce founder subsidy](../../agents/1074-agent-leverage-reduce-founder-subsidy/)
 - [Doc 1200](../1200-respect-onchain-facts-verified/) / [1202](../1202-fractal-onchain-settlement-history/) — sibling verified-facts docs
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+ZAO OS build velocity: agent-fleet inflection verified. 34 PRs/week is the cited rate (verified from GitHub). Feeds canonical facts ledger (doc 1201). No ZOL code impact.

@@ -840,3 +840,17 @@ const activityButton = new ActionRowBuilder<ButtonBuilder>()
 - **Activity** - Embedded web app in Discord (like Telegram Mini App)
 - **Webhook** - ZAOOS sends POST to Discord to mirror status (one-way inbound)
 - **Mini App / WebApp** - Full React component embedded in Discord/Telegram client
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZOE Discord activation roadmap, not a ZOL v2 dependency.**
+
+ZOE's Discord client (`bot/src/zoe/discord.ts`, 169 lines) is production-ready and already merged — it just needs `DISCORD_BOT_TOKEN` set on the VPS. Stage 0 is a 5-minute runbook for Zaal: create bot app, add `DISCORD_BOT_TOKEN` + `DISCORD_ZAAL_ID` to `/home/zaal/.env`, `pm2 restart zoe`. No code changes needed for Stage 0.
+
+Stage 1 (webhooks + button components, ~4h) and Stage 2 (linked roles + Activities, ~8-10h) are future `zao-os/bot` PRs. Not ZOL v2 work.
+
+Key gotcha: Activities require HTTPS + valid cert on the VPS; can't test on localhost. The Discord interaction 3-second deadline requires `deferReply` for slow ZOE responses. Both are implementation-phase constraints, not blockers now.
+
+No ZOL code changes. Confirm with doc 1134 (Telegram): the Mini Apps pattern is parallel on both platforms.

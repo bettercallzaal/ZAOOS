@@ -119,3 +119,13 @@ Before submitting to atlas.optimism.io, verify:
 - doc 1205: ZAO on-chain contract registry (OREC + Respect addresses)
 - doc 1206: ZAO comparative DAO state July 2026
 - doc 1208: ZAO external citation footprint July 2026
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Optimism Retro Funding application draft — Zaal action, no ZOL code impact.**
+
+Copy-paste-ready Atlas application grounded in Blockscout-verified on-chain facts (doc 1200-1202/1205). Strong eligibility: 63 settlement weeks on Optimism Mainnet, 157 unique Respect holders, only active fractal DAO on Optimism. ZAO's main challenge is zero external citations (doc 1208) — a Mirror.xyz publication before submission would strengthen the case.
+
+ZOL relevance: none directly. The `component-watch` DreamLoop could monitor `atlas.optimism.io` for active funding rounds (flagged as a future target in doc 1208 Priority 3). No ZOL code changes. Zaal to submit when Atlas opens a new round.

@@ -115,3 +115,17 @@ This is 4 lines instead of 3 but survives compaction with full fidelity.
 | Ask Zaal to run Bonfire /labeling/hybrid | coc-loop | ping |
 | Each loop adopts the structured `## STATE` block | All loops | convention |
 | Each loop uses the recommended episode body structure | All loops | convention |
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Directly applies to ZOL directive compact protocol.**
+
+Key finding: Bonfire read side is still write-only (awaiting PRs #1559/#1560). Until those merge, `## STATE` + `## LESSONS` in the directive file IS the complete memory bridge across compaction. ZOL's directive already applies this — every session writes STATE and LESSONS before clearing.
+
+The 3-line STATE limit in the original compact protocol is too compressed. The proposed 4-field structured block (`DONE / PENDING / BLOCKERS / NEXT`) is the right format. ZOL's STATE already exceeds 3 lines and covers these fields implicitly. **Recommendation for Zaal:** adopt the structured block as the canonical STATE format across all loops to make it machine-parseable when loop-recall goes live.
+
+Episode body anti-patterns apply to ZOL: "PR #36 opened" alone is not a useful episode — needs `Decision:` (why clanker_native vs zero_x_splits) and `Risk if missing:` (launch-rail requests fail without the legal guardrail). Apply the body format retroactively when writing new episodes.
+
+No ZOL code changes. Board: Zaal to merge loop-recall PRs (#1559/#1560) to unlock read side.

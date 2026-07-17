@@ -554,3 +554,11 @@ Given tight coupling, do NOT extract. Instead:
 - [Doc 836](../836-zaoos-repo-estate-census/) — the internal code census (routes, components, hot-spots)
 - [Doc 826](../826-zao-infrastructure-estate-map/) — VPS/DB/domain/cost map
 - [Doc 1064](../../events/session-2026-07-13-onchain-q2-win-handoff/) — meeting notes from Iman sync (context on XMTP, priorities)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAOOS dashboard audit — no ZOL code impact.**
+
+60 active routes, 11 feature families, 5 duplicate-cluster candidates. ZAOstock not graduated (still dev-only). Key ZOL-relevant finding: the dashboard is the human-facing control panel for the same features ZOL automates (post, cast, board tasks). ZOL DreamLoops should remain non-destructive (PR-only) precisely because a human operator uses the dashboard to do the same actions. No ZOL code changes.

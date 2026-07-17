@@ -246,3 +246,17 @@ Skip a public take for now. Flag it in ZOE's research feed as a strategic update
 **Status:** COMPLETE - Ready for Zaal review and decision on public engagement.
 
 *Compiled 2026-07-16 via parallel fetch (milob Haatz hub + web search Jesse announcement + ecosystem coverage).*
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Validates Sparkz positioning; no ZOL code impact.**
+
+Jesse Pollak (@jesse) publicly admitted 2026-07-15 that Base's two-year bet on onchain social and creator coins was a strategic failure. Base pivoting to trading, payments, AI agents. milob's counter: the model wasn't broken — only the monetization layer (ad/subscription funding the creator coin) was missing.
+
+**ZAO implication:** Platform-level noise on creator coins has lifted. Sparkz + ZABAL Games can own this space authentically while Base resets. Jesse's pivot is a competitive opportunity, not a threat.
+
+Directly reinforces Sparkz's energy-first positioning (doc 1098): validate energy before coin launch, pair energy with Boostr-style paid amplification. milob's advertising-as-the-funding-model observation is exactly what Sparkz's 25/25/50 Boostr campaign (doc 1141) implements.
+
+No ZOL code changes. Confirm: ZOL launch-rail.decision output should include a note about energy validation thresholds being met (pre-launch gate) — already in PR #36 via `legalNote` field.

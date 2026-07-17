@@ -79,3 +79,11 @@ keeps every citing surface fresh without re-deriving.
 - ZOR ERC-1155 `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` (Optimism) — [explorer](https://explorer.optimism.io/token/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c)
 - Method: Blockscout `/api/v2/tokens/{addr}/holders`, full pagination, enumerated 2026-07-17
 - Cross-refs: [ICM boxes](../../identity/icm-boxes/), whitepaper [942](../942-zao-fractal-whitepaper-outline-v2/), [doc 1107 GEO](../../identity/1107-seo-social-profiles/)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+Verified Respect holder count from chain: OG = 156 holders (soulbound, Optimism). The '122' figure was a different metric. North Star deliverable: cited numbers must trace to chain state. Feeds ICM boxes + whitepaper 942. No ZOL code impact. Zaal: verify whitepaper 942 now cites 156 OG holders.

@@ -265,3 +265,11 @@ Would be interested to see where this goes. If you're ever building on Farcaster
 - If ZAO decides to build music generation (artist studio, remix, etc.): reference SmartVibe's queue middleware + API patterns.
 - If bartosz shows interest in ZAO: explore potential collaboration on music tooling (he has strong async/queue chops + web3 background).
 
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **External AI music architecture reference — not a current ZOL fit.**
+
+SmartVibe (bartosz) demonstrates queue middleware pattern for AI music generation: async job queue, polling endpoints, provider-agnostic adapter layer. ZAO does not build music generation today. If a ZOL `music-gen` DreamLoop is ever added, SmartVibe's adapter + polling pattern is the reference architecture. Bartosz has relevant async/queue + web3 background for potential future collaboration. No ZOL code changes.

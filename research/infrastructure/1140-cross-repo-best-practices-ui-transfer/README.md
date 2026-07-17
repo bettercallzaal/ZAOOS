@@ -448,3 +448,17 @@ Each action is one board-ready task:
 - Live examination of: package.json, .claude/CLAUDE.md, .claude/rules/*.md, sample API routes, component patterns, test patterns, README files.
 - Related docs: 1115 (repo estate audit), 998 (GitHub repo estate), 836 (ZAOOS census).
 - Observations: zaalcaster CLAUDE.md detailed overnight-build docs (PRs #107-#113); ZAOcowork README + apply-facts pattern; ZAOOS .claude/rules/* comprehensive.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Infrastructure audit — partially relevant to ZOL v2.**
+
+Directory named `1140` but doc internally says `1145` — numbering collision to note.
+
+zaalcaster = UI/UX gold standard: keyboard-driven navigation (keys 1-9 + cmd+K), confirm-before-irreversible flows, live API fallback chains, detailed error distinction. **ZOL relevance:** ZOL's ApprovalBridge (Layer 10, PR #35) implements the confirm-before-irreversible pattern independently. The `{ok, error, ...data}` response shape in ZAOcowork is aligned with ZOL's handler response format.
+
+3 cowork inconsistencies to fix in the estate: (1) task data model shape (ZAOcowork `{ok, error}` vs others bare error), (2) status/priority vocab, (3) keyboard shortcuts only in zaalcaster. These are future zaalcaster + ZAOcowork PRs, not ZOL v2 blockers.
+
+No ZOL code changes. Transfer plan executes after ZOL PRs merge.

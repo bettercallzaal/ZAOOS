@@ -117,3 +117,15 @@ This is both a risk (single point of documentation) and an opportunity: whoever 
 - doc 1202: Fractal on-chain settlement history (OG:33 + ZOR:31 weeks)
 - doc 1206: ZAO comparative DAO state July 2026
 - doc 1207: ZAO Improvement Proposals framework
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO citation audit — minor ZOL loop relevance.**
+
+Key finding: ZAO has zero discoverable external citations as of July 2026. Eden Fractal's SSL has expired, making ZAO the only confirmed active fractal DAO on Optimism Mainnet. The ZAOOS research corpus (docs 1200–1207) is the sole authoritative external record of ZAO's governance history.
+
+ZOL relevance: Priority 3 (Fractally ecosystem listing) lists owner as "Loop (monitor)." This is a natural `component-watch` or `curiosity-scan` DreamLoop trigger — when Fractally.com adds a community directory feature, ZOL should surface it for Zaal. No code change needed; add to future `component-watch` target list when loop-recall (#1559/#1560) is live.
+
+All 5 action items (Optimism Retro Funding, Mirror.xyz publication, Fractally listing, FAQ holder count fix, paper provenance links) are Zaal/Iman decisions — no ZOL code changes. This is the citation baseline; all future ZAO external citations can be measured against it.

@@ -434,3 +434,17 @@ If ZAO ever shifts to financialization, or if membership becomes "job opportunit
 - **Book staleness:** Grace Rachmany's 2024 edition is current. First edition (2018) predates most current DAO evolution; 2024 edition reflects 6 years of additional DAO failures.
 - **ZAO facts:** Respect governance, Fractal process, ZABAL Games all verified against live docs (703, 942, 981) as of 2026-06-11 census.
 - **URL verification:** All source URLs checked for liveness. No 404s.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **Source doc for doc 1142 (Fractal error recovery framework).**
+
+Rachmany's core thesis: DAO tooling is fundamentally broken because it was built on wrong assumptions about decision-making and human organization. Technology is ahead; human prerequisites (mindset, management tools, consequence-thinking) lag.
+
+Key failure modes scored against ZAO: Code vs. River Thinking, Dispensable People, Invisible Onboarding Costs, Code Thinking, Financialization Drift. All 5 apply to ZAO Fractal at scale.
+
+This doc is the foundation; doc 1142 translates it into ZAO-specific detection → recovery patterns + circuit breakers. No overlap between this source and 1142 — read 1142 for the actionable framework.
+
+No ZOL code changes. Zaal's action: brainstorm Part 6 decisions in doc 1142 before whitepaper (doc 942) integration.

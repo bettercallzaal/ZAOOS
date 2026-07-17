@@ -79,3 +79,11 @@ off-chain Discord record)*.
 - [Doc 1201 - ZAO canonical facts ledger](../1201-zao-canonical-facts-ledger/)
 - [Doc 1069 - Fractal Discord bot voting (the off-chain game record)](../1069-fractal-discord-bot-voting-mechanism/)
 - [Doc 942 - Fractal whitepaper outline](../942-zao-fractal-whitepaper-outline-v2/)
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZAO governance/facts docs — no ZOL code impact.**
+
+On-chain Respect settlement history: two-phase OG→ZOR timeline. Useful for whitepaper Ch 5-6 mechanism description. No ZOL code impact.

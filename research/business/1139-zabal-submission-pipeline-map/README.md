@@ -77,3 +77,15 @@ The only bridge from "submission" → "leaderboard" is the **manual Python scrip
 
 ## Method note
 Map produced 2026-07-16 by read-only clone + inspection of `zabalartsubmission` + `zpoidh` (into /tmp), cross-referenced with docs 1120/1093/1096–1098/961. No writes to those repos. The follow-on PRs live in `zpoidh`, not ZAOOS.
+
+---
+
+## Review (2026-07-17, builder loop)
+
+Reviewed per batch task. **ZABAL Gamez ops, not ZOL v2.**
+
+Key naming fix: `zabalartsubmission` is a Farcaster **voting** miniapp, not the submission front door. Actual submissions happen on poidh.xyz (external). Ops live in `zpoidh` (Python scripts, JSON).
+
+The pipeline is durable but fully manual. No cross-repo integration exists. Fable evaluation pipeline (doc 1120) is scaffolding only — no runtime. First two PRs recommended: (1) auto-refresh cron for `zpoidh` (removes operational drag), (2) Fable eval wire-up (makes feedback loop real). Both `zpoidh`-only, no gated flows.
+
+No ZOL code changes. Blocked on Zaal approving the two PRs in `zpoidh`.

@@ -204,7 +204,7 @@ parent-doc: 718
 - Tested empirically (3 elections on EOS, 2021)
 - Natural incentive alignment (leaders earn Respect by serving, not by seizing power)
 
-**Relevant to ZAO:** ZAO's 90-week fractal cycles likely borrow heavily from Eden. Whitepaper should cite Eden as proof of concept. Explain how ZAO adapts Eden's 3x3 circles to music community (e.g., curator circles, artist circles, listener circles).
+**Relevant to ZAO:** ZAO's 100+ week fractal history borrows heavily from Eden. Whitepaper should cite Eden as proof of concept. Explain how ZAO adapts Eden's 3x3 circles to music community (e.g., curator circles, artist circles, listener circles).
 
 ---
 
@@ -223,7 +223,7 @@ parent-doc: 718
 
 **You need:**
 
-1. **Whitepaper** (this is your magnum opus): 25-35 pages. Vision + Problem + Solution + Respect Mechanics + 90-Week Cycles + Roadmap + Risk Analysis.
+1. **Whitepaper** (this is your magnum opus): 25-35 pages. Vision + Problem + Solution + Respect Mechanics + Fractal Governance History (100+ weeks) + Roadmap + Risk Analysis.
 
 2. **Constitution** (operational subset): 8-12 pages. Extracted from Whitepaper Section 6-7. Voting thresholds, proposal types, amendment rules, enforcement.
 
@@ -273,7 +273,7 @@ parent-doc: 718
 **Content:**
 - Fractal governance: Decision-making scales without losing personal agency. Borrowed from Daniel Larimer's "More Equal Animals" and tested in Eden (EOS, 2021).
 - Soulbound Respect: Non-transferable, earned through peer evaluation, decays if you stop contributing. Aligns incentives: your voting power is your reputation.
-- 90-week cycles: Long enough for projects to mature, short enough to course-correct. Fractal structure repeats at each level (individual, curator circle, community council, federation).
+- Ongoing weekly cycles (100+ weeks): Long enough for projects to mature, short enough to course-correct. Fractal structure repeats at each level (individual, curator circle, community council, federation).
 - Culture first: ZAO governance prioritizes artist sovereignty + fan participation over asset speculation.
 
 **Cite:** Larimer (Fractally), Vitalik (Proof of Participation), Buterin (Concave/Convex), Eden DAO.
@@ -282,7 +282,7 @@ parent-doc: 718
 1. Respect = Reputation = Voting Power (no wealth transfer required)
 2. Contribution is the primary good (not speculation)
 3. Peer evaluation prevents single-point-of-failure (no founder cult)
-4. Cycles create rhythm (90 weeks, then introspection + renewal)
+4. Cycles create rhythm (100+ weeks of continuous weekly sessions, with periodic introspection + renewal)
 5. Fractal structure scales to any size without centralization
 6. Transparency: All Respect scores, votes, decisions are on-chain (auditable)
 
@@ -349,15 +349,16 @@ parent-doc: 718
 
 ---
 
-### Section 6: 90-Week Governance Cycles & Fractal Structure (5-7 pages)
+### Section 6: Ongoing Weekly Governance & Fractal Structure (5-7 pages)
 
 **Goal:** Explain how decisions actually happen. This is the "how."
 
 **Content:**
 
-**6.1 The 90-Week Cycle:**
-- 90 weeks = ~21 months = long enough for multi-project maturity, short enough to reset
-- Divided into 13 weekly phases (7-day blocks)
+**6.1 The Weekly Fractal Cadence (100+ weeks continuous):**
+- ZAO has run weekly Respect Games every Monday since 2024-07-30 — 100+ consecutive weeks as of 2026-07-17
+- Divided into rolling phases: proposals, voting, implementation, retrospective
+- Each week is self-contained; the cumulative history (now 100+ sessions) is the governance ledger
 - Each phase has specific governance activity (weeks 1-4 = proposals, weeks 5-8 = voting, weeks 9-11 = implementation, weeks 12-13 = retrospective)
 
 **6.2 Fractal Structure:**

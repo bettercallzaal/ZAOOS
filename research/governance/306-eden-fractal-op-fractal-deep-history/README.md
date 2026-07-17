@@ -363,7 +363,7 @@ ZAO is:
 2. The **only active fractal on Optimism** (since OF paused)
 3. One of only **2 communities on Superchain** (with Eden Fractal on Base)
 4. The only fractal with a **full social client** (ZAO OS on Farcaster)
-5. Running for **90+ weeks** with weekly sessions
+5. Running for **100+ weeks** with weekly sessions
 6. The only fractal integrated with a **social protocol** (Farcaster)
 
 ---
@@ -378,7 +378,7 @@ ZAO is:
 4. **Built the Discord bot** - 7 major iterations (fractalbotv1old through fractalbotmarch2026), 52 slash commands
 5. **Deployed ORDAO** - Tadas deployed zao.frapps.xyz, live for 20+ weeks
 6. **Built ZAO OS** - full Farcaster social client with 7-tab /fractals page, analytics dashboard, webhook integration
-7. **90+ weeks running** - weekly Mondays 6pm EST, the longest-running music fractal
+7. **100+ weeks running** - weekly Mondays 6pm EST, the longest-running music fractal
 
 **The ZAO voting criteria:**
 1. The ZAO Vision - advancing music, art, and technology
@@ -413,7 +413,7 @@ Every music DAO uses token-weighted voting (buy tokens = buy power). ZAO is the 
 
 3. **"What happens when 6 people sit in a room and rank each other's music"** - The Respect Game explained through the lens of music curation.
 
-4. **"ZAO is 90 weeks into an experiment no one else is running"** - The only music fractal in existence. What we've learned.
+4. **"ZAO is 100+ weeks into an experiment no one else is running"** - The only music fractal in existence. What we've learned.
 
 5. **"Soulbound reputation: the antidote to governance capture"** - Why non-transferable tokens change everything about DAOs.
 

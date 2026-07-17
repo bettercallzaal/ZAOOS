@@ -37,7 +37,7 @@ tier: DEEP
 1. **Stage 1 (Week 1, May 2026):** Validate YapZ Ep 1 via Bonfire bot; test deeplink round-trip (critical blocker). If pass -> Stage 2. If fail -> switch to SDK direct ingest.
 2. **Stage 2 (Weeks 2-4):** Ingest YapZ archive (18 episodes), Q1 2026 decision memos, top-20 cited research docs. Target: 500-1000 entities (threshold for agent integration).
 3. **Stage 3 (Weeks 5-8):** Add secondary corpora (Farcaster casts 200 recent, Telegram exports, ChatGPT history Q4-Mar).
-4. **Stage 4 (Weeks 9+):** Fractals history (90+ weeks), ZAO Festivals archive, people relationships (188 members + 100 web3 contacts).
+4. **Stage 4 (Weeks 9+):** Fractals history (100+ weeks), ZAO Festivals archive, people relationships (188 members + 100 web3 contacts).
 5. **Agent Integration (defer to Stage 2 completion + ERC-8004 verification):** Wire Hermes/ZOE recall against graph; use `authored_by: agent_id` + `confidence: 0.0-1.0` for write governance.
 6. **Durability:** Monthly OWL exports to git from day 1. Assume Bonfire migration in year 5; build for portability.
 
@@ -86,7 +86,7 @@ The graph works as a **composition of episodes + semantic entities**, following 
 |--------|------|----------|-------------|----------|------------|
 | **1. BCZ YapZ** | Podcast | P0 | youtube.com/watch?v=ID&t=SEC | Episode, Speaker, Quote, Topic | Diarization via transcript, deeplink preservation, 45min chunks |
 | **2. ZAO Festivals** | Event archive | P0 | docs, Notion, email threads | Festival, Lineup, Timeline, Decision, Budget | Multi-source stitching (Roddy emails, Cassie notes, Notion) |
-| **3. Fractals History** | Discord + Airtable | P1 | Discord export, Airtable | FractalWeek, Proposal, Ranking, Faciliator | 90+ weeks of data, OG vs ZOR ledger reconciliation |
+| **3. Fractals History** | Discord + Airtable | P1 | Discord export, Airtable | FractalWeek, Proposal, Ranking, Faciliator | 100+ weeks of data, OG vs ZOR ledger reconciliation |
 | **4. Research Docs** | Text + structured | P0 | `/research/**/README.md` (540+ docs) | Topic, ProducedContent, Citation, Decision | High volume, overlapping scope, versioning (v1/v2 of same topic) |
 | **5. Farcaster Casts** | Social microblog | P1 | Farcaster API (Neynar) | Cast, Reply, Mention, Topic, TimestampedThought | Volume (188-member feed), low persistence of replies |
 | **6. X / Twitter Posts** | Social macroblog | P1 | X API (bearer token) | Tweet, Quote, Thread, Engagement, Trend | 280-char constraint limits context, but threads recoverable |
@@ -476,7 +476,7 @@ predicate evolved_into(Concept, Concept)  // Zaal's thinking evolved from X to Y
 - **ChatGPT history** (Q4 2025 - Mar 2026 most recent, Jan 2024 oldest interesting)
 
 ### Stage 4: Operational Closure (Weeks 9+)
-- **Fractals history** (90+ weeks reconciled from Discord + Airtable)
+- **Fractals history** (100+ weeks reconciled from Discord + Airtable)
 - **ZAO Festivals archive** (all emails, Notion, decisions)
 - **People & relationships** (188 ZAO members + top 100 web3 contacts)
 - **Music releases** (Cipher metadata + future releases as they ship)

@@ -10,7 +10,7 @@ parent-doc: 676
 
 # 676e — Bonfires KG for ZAO Governance: Weekly Fractal + Respect Reconciliation
 
-> **Goal:** The ZABAL Bonfires instance has auto-extracted 780+ episodes with COMPLETED_BY, CREATED_BY, ASSIGNED_TO edges. The ZAO Fractal runs weekly Mondays 6pm EST with peer-ranked contribution voting (90+ weeks). Research: can Bonfires KG provide an objective contribution-fact layer underneath the Respect Game's subjective ranking, unifying OG/ZOR Respect ledgers and surfacing transparent contribution provenance?
+> **Goal:** The ZABAL Bonfires instance has auto-extracted 780+ episodes with COMPLETED_BY, CREATED_BY, ASSIGNED_TO edges. The ZAO Fractal runs weekly Mondays 6pm EST with peer-ranked contribution voting (100+ weeks). Research: can Bonfires KG provide an objective contribution-fact layer underneath the Respect Game's subjective ranking, unifying OG/ZOR Respect ledgers and surfacing transparent contribution provenance?
 
 ## Key Decisions
 
@@ -130,7 +130,7 @@ OG Respect: 150 pts
 ZOR Respect (weekly consensus):
   - Week 1 (2024-08-19): Ranked 5th (68 pts) — [Fractal 1, Group 3, 7 participants]
   - Week 2 (2024-08-26): Ranked 3rd (42 pts) — [Fractal 2, Group 1, 5 participants]
-  - ... (90+ weeks)
+  - ... (100+ weeks)
 
 TOTAL: 150 OG + sum(ZOR weekly) = X pts. Full history. Every receipt links to on-chain tx.
 ```

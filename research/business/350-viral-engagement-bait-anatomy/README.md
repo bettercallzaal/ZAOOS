@@ -103,7 +103,7 @@ Despite being fabricated, the post hit 553K views. The structure is worth analyz
 
 | Mechanic | How It Works | ZAO Adaptation |
 |----------|-------------|----------------|
-| Forbidden knowledge frame | Creates urgency + exclusivity | "Here's what 90 weeks of fractal meetings taught us about governance" |
+| Forbidden knowledge frame | Creates urgency + exclusivity | "Here's what 100+ weeks of fractal meetings taught us about governance" |
 | Real tool as anchor | Links to verifiable repo = credibility | Link to actual ZAO OS GitHub, real contracts |
 | Precise numbers | "86%" feels more true than "most" | Use real on-chain data from Respect contracts |
 | Accessibility contrast | "$25/month vs $800M" | "188 members vs Spotify's 600M - here's why small wins" |

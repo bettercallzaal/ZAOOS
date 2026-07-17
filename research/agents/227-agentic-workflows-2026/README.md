@@ -172,7 +172,7 @@ Part of the Artificial Superintelligence Alliance (merged Fetch.ai + Singularity
 ZAO already has the building blocks:
 - **Community proposals** with Respect-weighted voting (`src/components/governance/`)
 - **Cross-platform publishing** (Farcaster/Bluesky/X) for approved proposals
-- **Fractal process** running 90+ weeks with OG + ZOR Respect ledgers
+- **Fractal process** running 100+ weeks with OG + ZOR Respect ledgers
 - **Paperclip** agent infrastructure at paperclip.zaoos.com
 
 **Agent opportunities for ZAO:**

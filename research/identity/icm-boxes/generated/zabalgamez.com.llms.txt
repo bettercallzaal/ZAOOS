@@ -1,0 +1,29 @@
+# ZABAL Games (ZABAL Gamez)
+
+<!-- GENERATED from research/identity/icm-boxes/zabalgamez.llm.txt — single source of truth. Do not edit directly; edit the box and re-run build-llms-txt.py. -->
+
+> ZABAL Games is The ZAO's 3-month build-a-thon. Free to join, anyone welcome, three tracks: artist, builder, creator. The real audience is the 100+ member ZAO community - build for a real community, not a weekend you forget.
+
+## The arc
+- June: workshops
+- July: open-build month (goal: 200 distinct builders, multiple submissions each)
+- August: Finals, with WaveWarZ-Base integration and on-chain settlement
+
+## How it works
+- Submit in any format. Partial and work-in-progress drafts count.
+- Submissions land on the board at zabalgamez.com/submissions.
+- August mentors pair with open-submission builders and share evaluation criteria.
+- A generic stream overlay is available for workshop and Finals streams: zaoos.com/overlay/zabal-games (Restream or OBS browser source).
+
+## Find it
+- zabalgamez.com
+- Farcaster: the /zabal channel; tag posts with "zabal gamez"
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- WaveWarZ (wavewarz)
+
+## Canonical identity
+- Name: ZABAL Games
+- URL: https://zabalgamez.com

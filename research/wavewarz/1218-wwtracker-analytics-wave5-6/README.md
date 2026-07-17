@@ -162,7 +162,7 @@ After all 82 open PRs merge:
 1. **Growth rate:** WaveWarZ battles grew +12% in the rolling 30-day window ending Jul 14, 2026 (141 vs. 126 prior 30 days).
 2. **IP catalog:** 921 unique songs from 34 Audius-rostered artists have competed in WaveWarZ battles.
 3. **Rivalry record:** 17 artist pairs have fought 2+ battles; GodclouD is the headliner (8-0 undefeated).
-4. **Platform longevity:** 15 consecutive months of on-chain music battles (May 2025 – Jul 2026), 1,089 total.
+4. **Platform longevity:** 12+ consecutive months of on-chain battles (Aug 2025 – Jul 2026), 1,245 total (live API).
 5. **Charity record:** $1,497 raised across 2 benefit-battle rounds — the platform waives fees and redirects settlement SOL to named causes.
 6. **Verifiable on-chain:** All data derived from Program `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` on Solana. Cross-referencing via Solscan or the wwtracker open-source repo.
 

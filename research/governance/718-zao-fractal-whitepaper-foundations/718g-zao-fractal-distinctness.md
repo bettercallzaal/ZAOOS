@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-22
+last-validated: 2026-07-17
 related-docs: 56, 114, 115, 188, 498, 696, 718
 original-query: "Keep studying [what makes ZAO's fractal distinct, for the ZAO Fractal Whitepaper]"
 tier: DEEP
@@ -21,12 +21,12 @@ parent-doc: 718
 |---------|--------|-------------------------|
 | **Only active fractal on Optimism** | Doc 696 line 93, Doc 114 contract audit | ZAO is the sole fractal keeping governance alive on the OP Mainnet after Optimism Fractal paused Jan 2026. Strategic L2 position. |
 | **Only music-focused fractal, ecosystem-wide** | Doc 696 lines 45-97, Doc 188 voting criteria | Every other fractal (Eden, Roy, Alien Worlds, Fractal Hispano) focuses on governance/DAO/gaming/personal dev. ZAO is music-first. |
-| **Longest unbroken streak: 90+ weeks** | Doc 696 line 33, Doc 114 line 99, Doc 188 line 22 | Started Aug 2024, still running May 2026. All other fractals have had pauses or low participation. Proof of retention. |
+| **Longest unbroken streak: 100+ weeks** | Doc 696 line 33, Doc 114 line 99, Doc 188 line 22 | Started Aug 2024, still running July 2026. All other fractals have had pauses or low participation. Proof of retention. |
 | **Embedded in a full social client** | Doc 696 line 169, Doc 114 sessions page | ZAO OS on Farcaster is the only fractal deployed inside a complete social application. Governance + communication = unified UX. |
 | **Two-ledger system (OG/ZOR transition)** | Doc 696 lines 103-116, Doc 115 entire doc | Fractals 1-73 (Airtable, ERC-20) transitioned to 74+ (on-chain ORDAO/OREC, ERC-1155). Unique historical + live data model. |
 | **2x Fibonacci scoring (Year 2 escalation)** | Doc 188 line 116, Doc 696 line 116 | Uses 110/68/42/26/16/10 instead of standard 55/34/21/13/8/5. More aggressive differentiation for longer-running community. |
 | **Voting on music community values** | Doc 188 lines 137-145 | Five explicit criteria: ZAO Vision (music/art/tech), Contribution, Collaboration, Innovation, Onboarding. Operationalizes "music-first." |
-| **Mondays 6pm EST, 90+ weeks solid** | Doc 188 line 99, Doc 696 line 99 | Consistent global schedule. Every other fractal has variable cadence or lower frequency. Ritual cadence = cultural anchor. |
+| **Mondays 6pm EST, 100+ weeks solid** | Doc 188 line 99, Doc 696 line 99 | Consistent global schedule. Every other fractal has variable cadence or lower frequency. Ritual cadence = cultural anchor. |
 | **Founder path: OP Fractal -> Eden -> ZAO** | Doc 696 lines 175-180 | Zaal's journey: joined Optimism Fractal early, became Eden Fractal council member, then founded ZAO Fractal. Personal expertise. |
 | **OREC bottleneck (feature not bug)** | Doc 114 lines 115-116, Doc 696 line 205 | Only zaal.eth + civilmonkey.eth submit to OREC. Intentional central coordination point during growth phase; planned decentralization. |
 
@@ -38,7 +38,7 @@ These are the hard numbers the whitepaper cites:
 
 ### Fact 1: Longest-Running Fractal
 - Started August 2024
-- Running continuously 90+ weeks as of May 2026
+- Running continuously 100+ weeks as of July 2026
 - No pauses (unlike Optimism Fractal, which paused Jan 2026)
 - 188 members, ~40 active per session
 - Mondays 6pm EST is the canonical time slot
@@ -53,7 +53,7 @@ These are the hard numbers the whitepaper cites:
 ### Fact 3: Fibonacci Scoring Escalation (2x Year 2)
 - Ranks 1-6: 110, 68, 42, 26, 16, 10 Respect points
 - Standard fractal (Eden/Optimism): 55, 34, 21, 13, 8, 5
-- Rationale: ZAO's longer runway (90+ weeks) and stable cohort (188 members, slower rotation) sustain higher differentiation
+- Rationale: ZAO's longer runway (100+ weeks) and stable cohort (188 members, slower rotation) sustain higher differentiation
 - Total per session: 272 Respect distributed
 - Source: Doc 188 line 116, Doc 696 line 116
 
@@ -138,7 +138,7 @@ The whitepaper must also clarify what is *not* distinctive, to avoid overclaimin
 | **Soulbound tokens** | OG ERC-20 + ZOR ERC-1155, soulbound by contract | Eden has soulbound Respect on Base | The soulbound constraint is from Larimer's original theory, not ZAO innovation |
 | **Two-ledger transition** | OG (Airtable) -> ZOR (on-chain) | Eden did similar (EOS -> Base migration) | ZAO's transition is unique in *reason* (growth phase), not in *structure* |
 | **Discord bot orchestration** | fractalbotmarch2026 (Python, 52 commands) | Other fractals use Discord bots too | ZAO's bot is well-engineered (v2.1), but the bot-for-fractals pattern is shared |
-| **Weekly cadence** | Mondays 6pm EST, 90+ weeks | Eden had weekly (EOS era), Optimism had bi-weekly | ZAO's *sustained* weekly cadence is distinctive, not the cadence itself |
+| **Weekly cadence** | Mondays 6pm EST, 100+ weeks | Eden had weekly (EOS era), Optimism had bi-weekly | ZAO's *sustained* weekly cadence is distinctive, not the cadence itself |
 
 The whitepaper must say: "ZAO Fractal inherits the Fractally protocol and ORDAO tooling. What is distinctive is not the primitives, but the community - music first, consistent, growing, strategic."
 
@@ -152,7 +152,7 @@ Combining all 8 facts + contrasts, here is what the whitepaper says about distin
 ZAO Fractal is the only fractal in the ecosystem where the community's core work (music, art, artist coordination) is inseparable from the governance mechanism (the weekly Respect Game). Other fractals *could* do this, but don't. ZAO does. The five voting criteria operationalize this.
 
 ### 2. **Institutional Longevity at Scale**
-90+ weeks of unbroken weekly governance with 40+ active members per session. Eden Fractal has been running longer (since May 2022, Epoch 1), but with lower active participation and pauses. Optimism Fractal is paused. ZAO has the longest *continuous stretch* with a *music-based* community at consistent size.
+100+ weeks of unbroken weekly governance with 40+ active members per session. Eden Fractal has been running longer (since May 2022, Epoch 1), but with lower active participation and pauses. Optimism Fractal is paused. ZAO has the longest *continuous stretch* with a *music-based* community at consistent size.
 
 ### 3. **Strategic Position on Optimism**
 After Optimism Fractal paused (Jan 2026), ZAO became the only active fractal on OP Mainnet. This is not a coincidence - ZAO earned this position through consistency. The whitepaper can claim: "ZAO Fractal is the incumbent governance layer for the Optimism blockchain's music ecosystem."
@@ -170,7 +170,7 @@ Zaal's path (Optimism Fractal -> Eden Council -> ZAO Founder) is documented and 
 The five voting criteria (Vision/Contribution/Collaboration/Innovation/Onboarding) are music-specific, not generic. They are written down, used in every session, and drive every ranking decision.
 
 ### 8. **Sustained Ritual: Monday 6pm EST**
-90+ weeks of the same time, same cadence, same place. This creates cultural density. The Respect Game is not an event; it is a weekly ceremony that defines what ZAO is.
+100+ weeks of the same time, same cadence, same place. This creates cultural density. The Respect Game is not an event; it is a weekly ceremony that defines what ZAO is.
 
 ---
 
@@ -211,7 +211,7 @@ Here is how the whitepaper should organize the "ZAO Fractal" chapter:
 **Quote to use:** "In 73 weeks, ZAO Fractal scaled from Airtable to ORDAO without losing a week of governance. This is institutional maturity." (Doc 115 entire doc)
 
 ### Section 5: Longevity and Cultural Anchor
-- 90+ weeks unbroken (Aug 2024 - May 2026)
+- 100+ weeks unbroken (Aug 2024 - July 2026)
 - Monday 6pm EST is the ritual time slot
 - ~40 active members per session, consistent
 - Contrast: Optimism Fractal paused (Jan 2026), Eden Fractal has lower active participation
@@ -220,7 +220,7 @@ Here is how the whitepaper should organize the "ZAO Fractal" chapter:
 
 ### Section 6: Strategic Position on Optimism
 - After Optimism Fractal paused (Jan 2026), ZAO became the sole governance fractal on OP Mainnet
-- OREC contract (0xcB05F92...) holds 90+ weeks of on-chain governance history
+- OREC contract (0xcB05F92...) holds 100+ weeks of on-chain governance history
 - Implication: ZAO is the default "Optimism music governance" layer
 
 **Quote to use:** "ZAO Fractal is the incumbent governance layer for music on Optimism. When the ecosystem consolidated, ZAO stood." (Doc 696 lines 84-93)
@@ -243,11 +243,11 @@ Here is how the whitepaper should organize the "ZAO Fractal" chapter:
 
 ## Specific Numbers to Include in the Whitepaper
 
-- **90+ weeks** - unbroken duration (Aug 2024 - May 2026)
+- **100+ weeks** - unbroken duration (Aug 2024 - July 2026)
 - **188 members** - ZAO community size
 - **40** - average active participants per weekly session
 - **6 people** - ideal fractal group size
-- **Monday 6pm EST** - ritual time slot, 90+ weeks consistent
+- **Monday 6pm EST** - ritual time slot, 100+ weeks consistent
 - **0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957** - OG Respect ERC-20 contract
 - **0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c** - ZOR Respect ERC-1155 contract
 - **0xcB05F9254765CA521F7698e61E0A6CA6456Be532** - OREC executor contract (Optimism)
@@ -302,5 +302,5 @@ All sources verified in research/ library 2026-05-22. No external web verificati
 
 ## Closing Statement for the Whitepaper
 
-> ZAO Fractal is not a new governance technology; it is a new governance culture. By placing music at the center, ritualizing governance (Monday 6pm EST, 90+ weeks), embedding it in social infrastructure, and maintaining it through growth (188 members, 90+ fractals), ZAO has proven that fractal governance scales for creative communities. The whitepaper documents how.
+> ZAO Fractal is not a new governance technology; it is a new governance culture. By placing music at the center, ritualizing governance (Monday 6pm EST, 100+ weeks), embedding it in social infrastructure, and maintaining it through growth (188 members, 100+ fractals), ZAO has proven that fractal governance scales for creative communities. The whitepaper documents how.
 

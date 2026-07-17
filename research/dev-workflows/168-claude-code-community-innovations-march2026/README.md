@@ -184,7 +184,7 @@ A full 11-member council consumes significant context and API cost. For a solo f
 
 **Low-medium relevance.** Not music or artist-specific. Connections:
 
-1. **Cohort model** — ZAO's fractal process (90+ weeks, Monday 6pm EST) already has a recurring community structure. A "build with AI" track could fit as an educational add-on for ZAO members who want to learn to ship their own tools.
+1. **Cohort model** — ZAO's fractal process (100+ weeks, Monday 6pm EST) already has a recurring community structure. A "build with AI" track could fit as an educational add-on for ZAO members who want to learn to ship their own tools.
 
 2. **AI for creators** — Most AI education targets developers or entrepreneurs. There's an unoccupied niche: AI for independent musicians (music curation, cross-platform publishing, community governance). ZAO could eventually run a music-specific version.
 

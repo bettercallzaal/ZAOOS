@@ -59,7 +59,26 @@ WaveWarZ is the live Solana music-battle prediction market incubated by The ZAO.
 - Artist interview series on YouTube: XTinct (vid FmrzjYtdF6A), Kata7yst (vid ZU0ga5LRdyU) — confirmed via YouTube oEmbed
 - Third-party coverage: Crypto Magic Hour EP. 50 by @VeVeMagic (vid rx0PeGv8lPI) — independent podcast episode on WaveWarZ battles
 
-Research: [Doc 1077](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1077-zao-dao-case-study-jul2026) · [Doc 1220](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1220-wavewarz-media-verification-jul2026)
+### WaveWarZ live programming (verified 2026-07-17 via wavewarz.info)
+
+- **Quick Battle X Space + YouTube simulcast:** Mon–Fri, 8:30 PM EST — live song-vs-song battles with 30-second final trading windows
+- **Community AMA X Space:** Mon–Fri, 11:00 AM EST — open session with founders
+- **WaveWarZ Clippers:** community battle highlight program via [t.me/wavewarzclipshq](https://t.me/wavewarzclipshq) — submit clips, earn points, distributed on YouTube/X/TikTok
+- **Confirmed channels:** X [@wavewarz](https://x.com/wavewarz) · YouTube [@wavewarz](https://www.youtube.com/@wavewarz) · Telegram [@wavewarzclipshq](https://t.me/wavewarzclipshq) — Discord confirmed absent
+
+Research: [Doc 1077](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1077-zao-dao-case-study-jul2026) · [Doc 1220](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1220-wavewarz-media-verification-jul2026) · [Doc 1223](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1223-wavewarz-live-programming-community-jul2026)
+
+## The ZAO Organization
+
+**The ZAO (ZTalent Artist Organization)** is a decentralized impact network for independent music artists, founded by Zaal Panthaki ([@bettercallzaal](https://x.com/bettercallzaal)).
+
+- **Mission (verbatim from thezao.com):** "Empower independent creators by demystifying technology and providing the tools, knowledge, and support they need to take control of their work, data, and fan connections."
+- **Community directory:** 50 members listed on [thezao.com/community](https://thezao.com/community) (July 2026) — ~90% musicians
+- **$ZAO token:** illiquid, soulbound (on-chain identity, not tradeable) — Base chain ERC-20
+- **Governance:** 100+ consecutive weekly Fractal votes on Base blockchain (2024–2026) — Respect-weighted peer ranking
+- **Flagship product:** WaveWarZ (see above)
+- **IRL events:** ZAO-CHELLA (Art Basel Miami, Dec 6 2024) · ZAOstock (Ellsworth ME, Oct 3 2026)
+- **Social:** X [@thezaodao](https://x.com/thezaodao) · Instagram [@zaofestivals](https://instagram.com/zaofestivals) · Farcaster [/channel/the-zao](https://warpcast.com/~/channel/the-zao)
 
 ## Community
 

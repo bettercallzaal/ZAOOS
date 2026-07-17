@@ -45,7 +45,7 @@ The ZAO began in 2022 as ZTalent Agency. In 2023, the team pivoted to focus full
 
 *(Add founding story here — what sparked the pivot, who was in the room, what the first conversation looked like.)*
 
-The team built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years, with 90+ meetings completed.
+The team built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years, with 100+ meetings completed (63 weeks with verified on-chain Respect settlement on Optimism).
 
 *(Add a story about a specific fractal meeting moment that captures the culture — what made someone stay, what surprised a newcomer.)*
 
@@ -89,14 +89,14 @@ The team is supported by a roster of independent artists, a network of mutual co
 | What | How Much | Verify |
 |------|----------|--------|
 | Ecosystem participants | 1,000+ | [thezao.com](https://www.thezao.com/about) |
-| Weekly governance meetings | 90+ | Fractal recordings archive |
+| Weekly governance meetings | 100+ | Fractal recordings archive (doc 1201/1202) |
 | Newsletter editions | [400+](https://paragraph.com/@thezao) | Paragraph archive |
 | Podcast episodes | [19+](https://pods.media/lets-talk-about-web3/) | Pods.media |
 | Paid supporters | 78 before launching the product | Paragraph dashboard |
 | Artists in roster | 22 | [thezao.com](https://www.thezao.com) |
 | Combined Spotify listeners | 378,000+ | Individual artist profiles |
 | Tracks across roster | 500+ | Streaming platforms |
-| WaveWarZ volume | [472.71 SOL (~$37,845 USD)](https://wavewarz.info/) across 735 battles | Solana on-chain (May 2026) |
+| WaveWarZ volume | [522 SOL (~$39K)](https://wavewarz.info/) across 1,245 battles | Solana on-chain (2026-07-17) |
 | Revenue generated | $10,000+ | Festivals + WaveWarZ |
 | IRL festivals produced | 4 | [@zaofestivals](https://www.instagram.com/zaofestivals/) |
 | Metaverse concerts (COC) | 150+ weekly | [stilo.world](https://www.stilo.world/) |
@@ -110,7 +110,7 @@ The team is supported by a roster of independent artists, a network of mutual co
 
 **[ZAO OS](https://github.com/bettercallzaal/ZAOOS)** — A gated Farcaster client where the community lives. Music-first. Inline players for Spotify, SoundCloud, Audius, YouTube, Sound.xyz, and direct audio. Encrypted DMs via XMTP. Push notifications via Farcaster Mini App. Followers/following with sorting and filtering. Open source ([MIT license](https://github.com/bettercallzaal/ZAOOS/blob/main/LICENSE)).
 
-**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 90+ meetings. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
+**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 100+ meetings. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
 
 **ZAO Festivals** — Four IRL events bridging onchain culture to physical space:
 - [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA) (NYC, NFT NYC 2024) — 12 artists, ZAO Cards on Manifold

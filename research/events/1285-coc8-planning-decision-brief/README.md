@@ -1,7 +1,7 @@
 ---
 topic: events/coc-concertz
 type: decision-brief
-status: needs-pilot-data (run Saturday morning, then apply this framework)
+status: needs-pilot-data (run generate-pilot-report.ts Saturday morning, then apply framework)
 created: 2026-07-17
 board-task: f622ee24
 related-docs: 1210, 1256, 1274, 964

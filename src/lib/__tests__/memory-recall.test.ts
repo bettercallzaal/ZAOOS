@@ -112,7 +112,7 @@ describe('getUserMemoryContext', () => {
     expect(mockRecall).toHaveBeenCalledWith(
       '42',
       'recent activity preferences interactions',
-      expect.any(Number),
+      expect.objectContaining({ limit: expect.any(Number) }),
     );
   });
 });

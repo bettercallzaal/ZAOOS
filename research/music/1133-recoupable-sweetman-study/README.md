@@ -181,6 +181,15 @@ Sweetman's background + Recoupable's design suggest **genuine interest in artist
 
 **Most stealable pattern:** MCP-based compound-task architecture for specialized domains. Recoupable's "data transformation layer" (raw API → artist-centric concepts) is exactly what ZOE agents need for music, governance, and events operations.
 
+## Review (2026-07-17)
+
+Reviewed per board task `research-doc:1133`. Assessment: the doc is sound and well-sourced; the LEARN + INTEGRATE-SELECTIVELY + PARTNER verdict is well-reasoned and consistent with the artist-first ZAO philosophy. Two things a future reader should hold in mind:
+
+- **The Recoupable MCP tool names are hypothesized, not verified.** The Architecture section lists `get_fan_demographics`, `get_top_performing_posts`, etc. as *believed* tools. Treat them as illustrative; verify the real tool list against Recoupable's published MCP server before building any integration against it.
+- **The stealable pattern is the actionable takeaway, not the product.** The value here for ZAO is the *architecture pattern* (artist-centric data-transformation behind an MCP server + fetch→analyze→generate with a human approval queue), not adopting Recoupable itself. Recoupable-the-product stays a non-critical recommendation for ZAO Music artists, not a dependency.
+
+Follow-up boarded (`legacy_source=research-doc:1133`, P3): adopt that MCP compound-task + artist-centric data-transformation pattern in a future ZOE music-ops agent. Partnership outreach to sweetman is Zaal-gated (outbound) and not boarded here.
+
 ## Sources
 
 - [Recoupable Dev Platform](https://recoupable.dev/) - [FULL]

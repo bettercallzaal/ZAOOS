@@ -102,6 +102,21 @@ A local Node/TypeScript MCP server authenticates via Zaal's OWN browser session 
 
 ---
 
+## Review (2026-07-17, builder loop)
+
+Reviewed per board task `research-doc:1067`. The doc is **sound and unusually disciplined on the ToS/legal boundary** — single-tenant, personal-use-only, cookies in `~/.zao/private`, and a hard "never redistribute paywalled research to the community/Bonfire/Telegram" line. That boundary is the load-bearing part and it is correct. No corrections.
+
+**Net-new insight — this is a reusable *pattern*, not a one-off.** Nothing in the auth/boundary design is Milk-Road-specific:
+- **Auth:** browser session cookie → `~/.zao/private/<source>-session.json` (chmod 600, gitignored) → sent as the `Cookie` header at runtime; ~30-day manual re-retrieve.
+- **Tenancy:** single-tenant (Zaal's session only); the value is personal decision-support, never a shared "ZOE knows X" product.
+- **Integration boundary:** feeds the **personal morning-brief console only**; never surfaces raw paywalled content to Telegram/Bonfire/community.
+
+Any *other* paywalled or session-gated source Zaal wants ZOE to read (a paid Substack, a gated analytics dashboard, a members-only feed) can inherit this **exact template** — it should be a config, not a re-derivation of the ToS reasoning each time. **Boarded (`fleet-improvement`):** extract a reusable "personal-use session-MCP pattern" (auth + `~/.zao/private` storage + single-tenant + brief-only boundary) so Milk Road is the first *instance* of a template, with the ToS/PII discipline inherited (pairs with `.claude/rules/pii-hygiene.md` + `secret-hygiene.md`, which already own the `~/.zao/private` convention).
+
+**One robustness gap to fix in the build (not the design):** the auth is a **manual 30-day cookie refresh whose only failure handling is "log a warning if stale."** When the cookie expires, every tool call 401s and ZOE's morning brief **silently loses its Milk Road section** — the worst failure mode (looks fine, quietly blind). The MCP should degrade *loudly*: on a 401/expired-session, return a structured `{ error: "milkroad_session_expired", action: "Zaal re-auth needed" }` that ZOE surfaces as a one-line nudge in the brief ("⚠️ Milk Road session expired — re-save cookie"), never a silent drop or a crash. Add this to the implementation checklist's "Shipped Criteria."
+
+**On the Next Actions:** all are correctly **@Zaal-owned** (retrieve cookie, build `milkroad.mcp.ts`, wire ZOE) — session credentials + the MCP wiring are his; a loop must not retrieve or store his session cookie. Not builder-lane beyond this review + the boarded pattern extraction.
+
 ## Also See
 
 - [Doc 739](../739-zoe-orchestrator-memory-blocks/) — ZOE soul architecture; how to add MCP tools to ZOE's startup config.

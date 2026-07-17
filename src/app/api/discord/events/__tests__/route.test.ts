@@ -32,6 +32,16 @@ function eventsChain(result: { data?: unknown; error?: unknown }) {
 describe('GET /api/discord/events', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Freeze time to Wednesday 02:00 UTC so getNextOccurrence always computes
+    // a positive countdown_ms for every day-of-week used in this test suite.
+    // Without freezing, countdown_ms can go slightly negative when CI runs
+    // within a minute or two of the event's scheduled UTC time.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-22T02:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('returns empty list when no events exist', async () => {

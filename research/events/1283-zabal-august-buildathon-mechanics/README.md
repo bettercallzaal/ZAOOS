@@ -9,7 +9,7 @@ owner: Zaal (to confirm mechanics before Aug 1)
 deadline: 2026-07-28 (7 days before August opens)
 ---
 
-# 1276 -- ZABAL Games August Build-a-Thon: Complete Mechanics Brief
+# 1283 -- ZABAL Games August Build-a-Thon: Complete Mechanics Brief
 
 > **How to use:** July closes July 31. August is the FINAL month of ZABAL Games 2026 — the code build-a-thon and product finals. This doc proposes the mechanics Zaal needs to lock by July 28 so builders can plan. Three decisions needed: (1) mentor metrics, (2) post criteria, (3) board setup.
 

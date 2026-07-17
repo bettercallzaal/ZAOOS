@@ -138,7 +138,7 @@ Per doc 644, all bots use Hermes pattern (Claude CLI subprocess) + Telegraf + pe
 | @thezao | Telegram public | Main ZAO community | LIVE | Zaal | 188 members on Base |
 | ZAO Devz GC | Telegram private | Engineering team standup | LIVE | Iman | Zaal + Iman + ThyRev + Samantha |
 | ZAOstock team GC | Telegram private | Festival production team | LIVE | Cassie | Production coordination |
-| Fractal Circle Discord | Discord private | ZAO Fractal (Mondays 6pm EST) | LIVE | Zaal | 90+ weeks; OG vs ZOR Respect tracking |
+| Fractal Circle Discord | Discord private | ZAO Fractal (Mondays 6pm EST) | LIVE | Zaal | 100+ weeks; OG vs ZOR Respect tracking |
 
 ---
 
@@ -182,7 +182,7 @@ Per doc 644, all bots use Hermes pattern (Claude CLI subprocess) + Telegraf + pe
 | ZAO Cell allowlist | CSV (wallet-only) | 40 members | LIVE | Location: ~/Downloads/ZAOOS.csv; no FIDs |
 | Farcaster /zao channel | Direct membership | 188 members | LIVE | https://farcaster.xyz/~/channel/zao |
 | $ZOE Soulbound attestation | Token balance | TBD | STAGING | Respect ledger + ZOR reconciliation |
-| Fractal Circle Respect | Off-chain ledger | 90+ weeks | LIVE | Discord bot + OREC tracking; Dan/Tadas maintain |
+| Fractal Circle Respect | Off-chain ledger | 100+ weeks | LIVE | Discord bot + OREC tracking; Dan/Tadas maintain |
 
 ---
 

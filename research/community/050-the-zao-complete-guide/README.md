@@ -435,7 +435,7 @@ The fractal governance model traces to Daniel Larimer ("More Equal Animals," 202
 
 - **Schedule:** Weekly (typically Mondays), but any group of 4+ can run the game at any time
 - **Tool:** Fractalgram
-- **Meetings completed:** 90+
+- **Meetings completed:** 100+
 - **Running consistently for:** nearly two years
 
 Fractals remain the primary governance mechanism. Governance proposals and tools may be implemented inside ZAO OS, but governance weight derives from Respect tokens earned through fractals.

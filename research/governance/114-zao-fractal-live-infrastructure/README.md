@@ -89,7 +89,7 @@ tier: STANDARD
 
 | Table | Rows | Columns | Updated By |
 |-------|------|---------|-----------|
-| `fractal_sessions` | 90+ (one per weekly session) | id, discord_thread_id, session_date, name, host_name, participant_count, status (active/completed/paused), notes (JSON), created_at | webhook handler + admin import |
+| `fractal_sessions` | 100+ (one per weekly session) | id, discord_thread_id, session_date, name, host_name, participant_count, status (active/completed/paused), notes (JSON), created_at | webhook handler + admin import |
 | `fractal_scores` | 500+ (6 per session) | id, session_id, member_name, wallet_address, rank, score | webhook handler (fractal_complete event) |
 | `fractal_events` | 5000+ (audit log, all events) | fractal_id, event_type, payload, created_at | webhook handler (fire-and-forget, non-fatal) |
 | `respect_members` | 122+ | name, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, event_respect, hosting_respect, bonus_respect, first_respect_at | `/api/respect/sync` (on-chain reader), import scripts |
@@ -347,6 +347,6 @@ respect: {
 - **Community Config:** `community.config.ts` lines 105-116 (respect contracts) [FULL]
 - **OREC Contract on Etherscan:** https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532 (242 txns, last activity May 19 2026) [FULL]
 - **Doc 102:** Fractals Page design (ZAO OS integration paths) [FULL]
-- **Doc 109:** ZAO Fractal history (90+ weeks, Mondays 6pm EST) [FULL]
+- **Doc 109:** ZAO Fractal history (100+ weeks, Mondays 6pm EST) [FULL]
 - **Doc 188:** Fractal bot process + Discord commands [FULL]
 

@@ -85,7 +85,7 @@ Assumes departing from US East Coast (BOS/NYC area); returns via similar hub.
 
 **Supporting Facts (verified, traceable to docs):**
 - WaveWarZ (Hurricane's project): 735 battles, $50-60K+ volume, 472.71 SOL traded (Doc 742/051)
-- The ZAO: 188 members on Base, 22-artist roster, 378K+ combined Spotify listeners, 400-edition newsletter, 90+ weeks of Respect Game governance (Doc 742/050/051)
+- The ZAO: 188 members on Base, 22-artist roster, 378K+ combined Spotify listeners, 400-edition newsletter, 100+ weeks of Respect Game governance (Doc 742/050/051)
 - Zaal's Build Camp 2026 shipped project (Demo Day July 11) as fresh credential for Devcon sponsorship track
 - India proof-leg: Devcon 8 is "Real World Ethereum" track language matches ZAO's independent-artist economics exactly. Shariyash Soni (Apna Coding, 50K+ Indian devs) is ZABAL Games presenter. WaveWarZ India artist conversation logged (Jun 9 cowork tracker).
 
@@ -201,7 +201,7 @@ Assumes departing from US East Coast (BOS/NYC area); returns via similar hub.
 - [Doc 945: Devcon 8 Mumbai Trip + Sponsorship Pitch](../945-devcon8-mumbai-buildcamp-sponsorship/) [FULL - internal, Zaal's crowdfund precedent, Seed Club single-person campaign]
 - [Doc 1063: DevCon America - US Builder Track](../1063-devcon-america-us-builder-community-track/) [FULL - internal, Juicebox splits as pooled mechanism, multi-beneficiary structure]
 - [Doc 742: Zaal Panthaki Profile Dossier](../../community/742-zaal-panthaki-profile-dossier/) [FULL - internal, verified builder numbers (88 repos, 5,114 FC followers, 400-edition newsletter)]
-- [Doc 051: ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) [FULL - internal, verified ecosystem numbers (22 artists, 378K Spotify, 90+ weeks governance)]
+- [Doc 051: ZAO Whitepaper 2026](../../community/051-zao-whitepaper-2026/) [FULL - internal, verified ecosystem numbers (22 artists, 378K Spotify, 100+ weeks governance)]
 - [Doc 696: ZAO Deep Audit](../../community/696-zaal-zao-deep-audit/) [FULL - internal, ecosystem credibility baseline]
 - [Hurricane / Hurric4n3ike context (research/community/)](./../../community/621-zao-context-canon-may7/) [FULL - internal, canonical spelling, WaveWarZ founder confirmation]
 

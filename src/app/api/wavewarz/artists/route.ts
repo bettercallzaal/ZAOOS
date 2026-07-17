@@ -11,7 +11,9 @@ export async function GET(req: NextRequest) {
 
   const url = new URL(req.url);
   const sort = url.searchParams.get('sort') || 'wins';
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 50);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(url.searchParams.get('limit') || '20', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 20 : rawLimit, 50);
   const linkedOnly = url.searchParams.get('linked_only') === 'true';
 
   const validSorts = ['wins', 'total_volume_sol'];

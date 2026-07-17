@@ -125,4 +125,23 @@ describe('GET /api/library/entries', () => {
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe('Failed to fetch entries');
   });
+
+  it('handles non-numeric limit gracefully by using default', async () => {
+    const chain = queuedChain([{ data: [], error: null }]);
+    mockFrom.mockReturnValue(chain);
+    const res = await GET(makeGetRequest('/api/library/entries', { limit: 'notanumber' }));
+    expect(res.status).toBe(200);
+    // Verify that range was called with default 50
+    const rangeCalls = chain.range.mock.calls;
+    expect(rangeCalls).toContainEqual([0, 49]); // default 50 means range(0, 49)
+  });
+
+  it('handles negative limit by using default', async () => {
+    const chain = queuedChain([{ data: [], error: null }]);
+    mockFrom.mockReturnValue(chain);
+    const res = await GET(makeGetRequest('/api/library/entries', { limit: '-5' }));
+    expect(res.status).toBe(200);
+    const rangeCalls = chain.range.mock.calls;
+    expect(rangeCalls).toContainEqual([0, 49]); // default 50 means range(0, 49)
+  });
 });

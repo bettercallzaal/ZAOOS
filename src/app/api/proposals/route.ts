@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
 
   const status = req.nextUrl.searchParams.get('status');
   const category = req.nextUrl.searchParams.get('category');
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '50', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : rawLimit, 100);
   const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
   // Look up current user's internal ID for matching their votes

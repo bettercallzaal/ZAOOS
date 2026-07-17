@@ -181,6 +181,34 @@ describe('GET /api/community-issues', () => {
       expect(rangeCalls).toContainEqual([30, 39]);
     });
 
+    it('handles non-numeric limit gracefully by using default', async () => {
+      const mock = chainMock({
+        data: [SAMPLE_ISSUE],
+        count: 1,
+      });
+      mockFrom.mockImplementation(mock.handler);
+
+      const res = await GET(makeGetRequest('/api/community-issues', { limit: 'notanumber' }));
+
+      expect(res.status).toBe(200);
+      const rangeCalls = mock.chain.range.mock.calls;
+      expect(rangeCalls).toContainEqual([0, 19]); // default 20 means range(0, 19)
+    });
+
+    it('handles negative limit by using default', async () => {
+      const mock = chainMock({
+        data: [SAMPLE_ISSUE],
+        count: 1,
+      });
+      mockFrom.mockImplementation(mock.handler);
+
+      const res = await GET(makeGetRequest('/api/community-issues', { limit: '-5' }));
+
+      expect(res.status).toBe(200);
+      const rangeCalls = mock.chain.range.mock.calls;
+      expect(rangeCalls).toContainEqual([0, 19]); // default 20 means range(0, 19)
+    });
+
     it('orders by created_at descending', async () => {
       const mock = chainMock({
         data: [SAMPLE_ISSUE],

@@ -24,7 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '10', 10), 25);
+    // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+    const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '10', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : rawLimit, 25);
     const data = await getBestFriends(user.fid, limit);
     return NextResponse.json(data);
   } catch (err) {

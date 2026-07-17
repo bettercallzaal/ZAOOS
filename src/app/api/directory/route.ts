@@ -12,7 +12,9 @@ export async function GET(req: NextRequest) {
   const search = url.searchParams.get('search');
   const social = url.searchParams.get('social');
   const tag = url.searchParams.get('tag');
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '50', 10), 100);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(url.searchParams.get('limit') || '50', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : rawLimit, 100);
   const offset = Math.max(parseInt(url.searchParams.get('offset') || '0', 10), 0);
 
   try {

@@ -9,7 +9,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
-    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '10', 10), 25);
+    // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+    const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '10', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : rawLimit, 25);
     const data = await getTrendingTopics(limit);
     return NextResponse.json(data);
   } catch (err) {

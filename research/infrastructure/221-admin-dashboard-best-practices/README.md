@@ -175,7 +175,7 @@ Plus a dedicated **Member CRM** at `/admin/members` with 3 sub-tabs: directory (
 |---------|----------|
 | **Hats Protocol integration** | 188 members, 3 roles — Hats adds ERC-1155 on-chain complexity for a problem that `role: 'beta' \| 'member' \| 'admin'` already solves. Revisit at 500+ members or when role delegation is needed. |
 | **Guild.xyz integration** | Guild's value is cross-platform gating at scale (100+ integrations). ZAO's allowlist + NFT gate in `src/lib/gates/` covers the single-community use case. |
-| **Coordinape GIVE circles** | ZAO's weekly fractal process (90+ weeks running) already distributes respect peer-to-peer. Adding GIVE would create a parallel, confusing system. |
+| **Coordinape GIVE circles** | ZAO's weekly fractal process (100+ weeks running) already distributes respect peer-to-peer. Adding GIVE would create a parallel, confusing system. |
 | **Full analytics platform** | Tools like Helika or Formo are designed for 10K+ user projects. At 188 members, Supabase queries + simple Tailwind charts are sufficient. |
 | **Token-gated role automation** | Collab.Land's background balance checks make sense for Discord bots checking NFT holdings. ZAO's auth flow already checks wallet + allowlist on login. |
 

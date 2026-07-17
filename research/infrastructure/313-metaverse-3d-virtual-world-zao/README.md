@@ -200,7 +200,7 @@ Lacoste's Emperia store (launched Dec 2022, updated summer 2023):
 | **Studio** | Open to all members | Shared jukebox, spatial audio (louder near speakers), playlist curation, binaural beats zone |
 | **VIP Lounge** | NFT holder OR 500+ Respect | Exclusive drops, artist meetups, governance proposals preview, loot box access |
 | **Governance Hall** | 100+ Respect | 3D visualization of active proposals, vote from within the space, Respect leaderboard |
-| **Archive** | Open to all members | Interactive ZAO timeline (90+ fractal weeks), historical moments, founding story |
+| **Archive** | Open to all members | Interactive ZAO timeline (100+ fractal weeks), historical moments, founding story |
 
 ---
 

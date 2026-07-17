@@ -21,7 +21,7 @@ tier: DEEP
 | Steal Farcaster's "EigenTrust seeded on FID ≤ 50K" pattern as "OG-seeded trust" in ZAO | INVESTIGATE | Could seed a ZAO trust graph from early Respect holders. Useful if ZAO needs sybil-resistance for an external-facing fractal experience (e.g., GitHub-native version where any GitHub user can join). |
 | Adopt Farcaster's "work markets" mental model (DA / Growth / Application) for ZAO contribution categories | PARTIAL | ZAO already has 5 voting criteria (ZAO Vision / Contribution / Collaboration / Innovation / Onboarding). The Farcaster "split incentives by market" framing is cleaner than 5 overlapping criteria. Consider mapping. |
 | Build an async GitHub-native fractal tool | YES, wedge exists | Optimystics's Respect Games App is async (beta) but not GitHub-native. GitHub Discussions + PRs + Reactions are an untapped substrate. Concrete wedge: weekly async cycle, contributions surface as PRs / Issues, ranking happens via a custom GitHub Action + a small web UI, results post to ORDAO. |
-| Use Discussion #19 itself as a parable for "share about fractals" content | YES | The FIP discussion shows what async governance debate looks like at scale. A ZAO blog post titled "We've been doing async governance for 90+ weeks. Here's what we learned." can ride the wave of Farcaster's PoW tokenization discussion. |
+| Use Discussion #19 itself as a parable for "share about fractals" content | YES | The FIP discussion shows what async governance debate looks like at scale. A ZAO blog post titled "We've been doing async governance for 100+ weeks. Here's what we learned." can ride the wave of Farcaster's PoW tokenization discussion. |
 
 ## Part 1: Farcaster Discussion #19 — Verbatim Capture + Review
 
@@ -96,7 +96,7 @@ For Growth market: proposes 90-day delayed vesting with churn-clawback to preven
 
 | Tool | What | Status | URL |
 |---|---|---|---|
-| Respect Game | The core social game: peer-rank contributions in 4-6 person breakouts | Live 90+ weeks at ZAO | optimystics.io/respect |
+| Respect Game | The core social game: peer-rank contributions in 4-6 person breakouts | Live 100+ weeks at ZAO | optimystics.io/respect |
 | ORDAO | Optimistic Respect-Based DAO smart contracts | Live, Tadas-built | optimystics.io/ordao |
 | frapps (toolkit) | Open-source toolkit for fractal apps on Ethereum | Live | github.com/Optimystics/frapps |
 | Fractalgram | Live-event tool for synchronous fractal sessions | Live | optimystics.io/tools |
@@ -236,7 +236,7 @@ Total: ~2-3 sprint-weeks for the full thing.
 
 | Piece | Format | Target | Effort |
 |---|---|---|---|
-| **"90+ weeks of fractal: what we learned"** | Long-form blog post on aroussi-style (~2k words) | Generalist crypto audience | 3-4 hours of writing + Zaal's voice |
+| **"100+ weeks of fractal: what we learned"** | Long-form blog post on aroussi-style (~2k words) | Generalist crypto audience | 3-4 hours of writing + Zaal's voice |
 | **"Async governance as code review"** | Medium-length post (~1k words) | Developer audience, posted on bettercallzaal/bcz-journal | 2 hours |
 | **"Respect Game: explainer for music people"** | Short post + 1 image (~500 words) | The ZAO + ZABAL members | 1 hour |
 | **"Frapp-GH demo"** | Video walkthrough of the tool, plus README | Both audiences | 1 day total (build screencast + write README) |
@@ -247,10 +247,10 @@ Total: ~2-3 sprint-weeks for the full thing.
 
 ### The Big Frame
 
-ZAO has been running fractal governance for 90+ weeks. Most people don't know fractal governance is a thing. The "share" play isn't about explaining Respect Game from scratch — it's about **using the unfolding Farcaster #19 debate as a hook** to show ZAO has a working answer.
+ZAO has been running fractal governance for 100+ weeks. Most people don't know fractal governance is a thing. The "share" play isn't about explaining Respect Game from scratch — it's about **using the unfolding Farcaster #19 debate as a hook** to show ZAO has a working answer.
 
-**Hook:** "Farcaster is debating how to tokenize work. We've been distributing tokens for work every Monday for 90+ weeks. Here's what works."
-**Substance:** Doc this 90-week experience + ship Frapp-GH + invite the Farcaster + Eth governance crowd to fork the repo.
+**Hook:** "Farcaster is debating how to tokenize work. We've been distributing tokens for work every Monday for 100+ weeks. Here's what works."
+**Substance:** Doc this 100+ week experience + ship Frapp-GH + invite the Farcaster + Eth governance crowd to fork the repo.
 
 ## Hard Numbers
 
@@ -260,7 +260,7 @@ ZAO has been running fractal governance for 90+ weeks. Most people don't know fr
 - EigenTrust seed: `fid ≤ 50,000`.
 - 36-epoch linear vest for retroactive genesis distribution.
 - 60% burn / 40% to proposer on fees.
-- 90+ weeks of fractal sessions at ZAO since ~August 2024.
+- 100+ weeks of fractal sessions at ZAO since August 2024 (2026-07-17).
 - ZAO Respect scoring: 2x Fibonacci (110, 68, 42, 26, 16, 10 per rank).
 - 5 voting criteria currently used: ZAO Vision / Contribution / Collaboration / Innovation / Onboarding.
 - 7 iterations of the fractal Discord bot at ZAO (current: fractalbotapril2026, 52 commands).
@@ -296,8 +296,8 @@ ZAO has been running fractal governance for 90+ weeks. Most people don't know fr
 |---|---|---|---|
 | DM Tadas — share this doc + ask if Frapp-GH lands as `Optimystics/frapps/gh-integration/` subpackage or as a separate ZAO repo | @Zaal | DM | This week |
 | DM Dan Singjoy — co-author "async fractal as code review" post on optimystics.io | @Zaal | DM | This week |
-| Cast on Farcaster — short thread on the 90+ weeks of fractal + Frapp-GH teaser, tag CassOnMars + Optimystics | @Zaal | Farcaster cast | After Tadas/Dan ack |
-| Write blog post: "90+ weeks of fractal: what we learned" (bcz-journal repo) | @Zaal | Long-form post | After 1 cycle of Frapp-GH alpha runs |
+| Cast on Farcaster — short thread on the 100+ weeks of fractal + Frapp-GH teaser, tag CassOnMars + Optimystics | @Zaal | Farcaster cast | After Tadas/Dan ack |
+| Write blog post: "100+ weeks of fractal: what we learned" (bcz-journal repo) | @Zaal | Long-form post | After 1 cycle of Frapp-GH alpha runs |
 | Sprint 1 — Build Frapp-GH Phase 1 (async ranking, no on-chain) | @Zaal + Hermes | Build sprint | Next available 3-5 day window |
 | Run a single-cycle alpha at ZAO on Frapp-GH (1 week, parallel to existing Discord bot) | @Zaal + fractal community | Trial | After Phase 1 ships |
 | Sprint 2 — ORDAO bridge (Phase 2) | @Zaal + Hermes + Tadas | Build sprint | After alpha validates |

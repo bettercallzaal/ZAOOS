@@ -44,7 +44,7 @@ The skeptical chapter, and the most important one for credibility. Weekly synchr
 What makes a governance document canonical, drawn from the Fractally whitepaper, the Optimism Collective Working Constitution, the ENS Constitution, Nouns, MakerDAO, and Vitalik's DAO writings. The recommendation: a hybrid document - manifesto voice for the vision sections, cold precision for the mechanics, plain honesty for the risks. The full proposed section list is synthesized below. *Feeds the whitepaper's structure.* *See `718f-whitepaper-craft.md`.*
 
 ### 718g - What makes ZAO's fractal distinct
-The ZAO-specific story the whitepaper must tell: 90+ unbroken weeks (the longest-running fractal anywhere), the only music-focused fractal, the only active fractal on Optimism, the only fractal embedded inside a full social client (ZAO OS on Farcaster), the two-ledger OG/ZOR history (Fractals 1-73 off-chain, 74+ on-chain), the 2x-Fibonacci scoring, and five music-community voting criteria (vision, contribution, collaboration, innovation, onboarding). The framing line: ZAO Fractal is not new governance technology - it is new governance culture. *Feeds whitepaper Ch. 8 (ZAO Fractal).* *See `718g-zao-fractal-distinctness.md`.*
+The ZAO-specific story the whitepaper must tell: 100+ unbroken weeks (the longest-running fractal anywhere), the only music-focused fractal, the only active fractal on Optimism, the only fractal embedded inside a full social client (ZAO OS on Farcaster), the two-ledger OG/ZOR history (Fractals 1-73 off-chain, 74+ on-chain), the 2x-Fibonacci scoring, and five music-community voting criteria (vision, contribution, collaboration, innovation, onboarding). The framing line: ZAO Fractal is not new governance technology - it is new governance culture. *Feeds whitepaper Ch. 8 (ZAO Fractal).* *See `718g-zao-fractal-distinctness.md`.*
 
 ## Proposed whitepaper outline
 
@@ -59,7 +59,7 @@ Synthesized from 718f (craft) and 718g (the ZAO chapter). Eleven sections; each 
 | 5 | The Respect Game - the weekly mechanism, the Fibonacci curve, decay, consensus thresholds | Precision | 718b |
 | 6 | On-Chain Architecture - ORDAO, OREC optimistic execution, the soulbound contracts | Precision | 718c |
 | 7 | Why Fractal - the comparative case against token-voting, quadratic, Nouns, Moloch | Argument | 718d |
-| 8 | The ZAO Fractal - the specific story: 90+ weeks, music, OG/ZOR, the social client | Manifesto / narrative | 718g |
+| 8 | The ZAO Fractal - the specific story: 100+ weeks, music, OG/ZOR, the social client | Manifesto / narrative | 718g |
 | 9 | Limitations and Open Problems - the honest failure-mode chapter | Plain honesty | 718e |
 | 10 | Roadmap - ledger reconciliation, all-members-on-chain, scaling, the dual-mode future | Plain | 718g, 696 |
 | 11 | Conclusion - the "new governance culture" close | Manifesto | 718g |
@@ -70,10 +70,10 @@ A note on form (718f): ZAO likely wants the whitepaper to read as a manifesto-pl
 
 A magnum-opus governance document earns its authority by being honest. From 718e, the whitepaper should name and answer, not bury:
 
-- **Participation durability.** Weekly synchronous governance is demanding. ZAO's 90+ weeks is real evidence it can last - but the whitepaper should say plainly that sustained participation is the model's central risk and describe how ZAO defends it.
+- **Participation durability.** Weekly synchronous governance is demanding. ZAO's 100+ weeks is real evidence it can last - but the whitepaper should say plainly that sustained participation is the model's central risk and describe how ZAO defends it.
 - **Visibility bias.** Ranking rewards visible work. The whitepaper should acknowledge this and describe ZAO's mitigations (e.g. the explicit infrastructure-contribution framing from the ZAOstock sprint-fractal adaptation, Doc 498).
 - **Operating-core concentration.** Only two wallets have driven ZAO's OREC. The whitepaper should be honest that fractal governance has an active core, and present "all members submit on-chain" as a stated goal, not a solved fact.
-- **Scaling is unproven.** The nested-fractal scaling story is theory past a few dozen people. Claim what is proven (one fractal, 90+ weeks); frame the rest as the open problem it is.
+- **Scaling is unproven.** The nested-fractal scaling story is theory past a few dozen people. Claim what is proven (one fractal, 100+ weeks); frame the rest as the open problem it is.
 
 ## The core positioning
 

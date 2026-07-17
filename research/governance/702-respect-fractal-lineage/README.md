@@ -32,7 +32,7 @@ The ZAO governance story is documented across ~16 separate research docs (56, 58
         |
    Optimism Fractal (Oct 2023, OP Mainnet) - brought it to Ethereum L2; PAUSED Jan 2026
         |
-   ZAO Fractal (Aug 2024, Optimism) - the music fractal; 90+ weeks, still running
+   ZAO Fractal (Aug 2024, Optimism) - the music fractal; 100+ weeks, still running
 ```
 
 Every fractal in this chain shares the same DNA: a weekly small-group consensus meeting (the Respect Game) that distributes a soulbound reputation token (Respect) on a Fibonacci curve, with on-chain governance (ORDAO/OREC) executing decisions weighted by that Respect. The differences are chain, community focus, and maturity.
@@ -117,7 +117,7 @@ Updated 2026-05-21: Pause announcement confirmed on optimismfractal.com homepage
 
 ZAO's own weekly fractal - the only music-focused fractal in the entire ecosystem.
 
-**Origin & cadence.** Started Q2/Q3 2024 (around August 2024). Running 90+ continuous weeks as of May 2026 - the longest unbroken streak of any fractal. Meets **Mondays 6pm EST**; can also run any time with 4+ members who have not yet played that week.
+**Origin & cadence.** Started Q2/Q3 2024 (around August 2024). Running 100+ continuous weeks as of 2026-07-17 - the longest unbroken streak of any fractal. Meets **Mondays 6pm EST**; can also run any time with 4+ members who have not yet played that week.
 
 **Where it runs.** Today the primary surface is a **Discord bot** (`fractalbotmarch2026` - Python, 52 slash commands, hosted on bot-hosting.net). The ZAO OS app (`/src/components/fractals/` - see codebase path below) has a `/fractals` page intended to become the long-term hub ("one place for all data"), with both Discord and app working in dual mode. ZAO OS community config at `/Users/zaalpanthaki/Documents/ZAO OS V1/community.config.ts` lines 65-93 defines the fractal call voice channel with emoji and description.
 
@@ -188,7 +188,7 @@ Dormant or paused: Fractally (since ~2023), Eden on EOS (declining), Genesis Fra
 
 Related inter-DAO work: **Fractal Nouns** (a cross-chain governance bridge experiment using the Open Intents Framework / ERC-7683) and **IYKYK DAO** (a Nouns Builder DAO on Base with a multi-DAO dashboard template).
 
-**ZAO's unique position:** the only music-focused fractal, the only active fractal on Optimism (as of Jan 2026), one of only two on the Superchain, the longest continuous streak (90+ weeks), and the only fractal embedded inside a full social client (ZAO OS on Farcaster). *See Doc 104, Doc 346, Doc 306.*
+**ZAO's unique position:** the only music-focused fractal, the only active fractal on Optimism (as of Jan 2026), one of only two on the Superchain, the longest continuous streak (100+ weeks), and the only fractal embedded inside a full social client (ZAO OS on Farcaster). *See Doc 104, Doc 346, Doc 306.*
 
 ## 8. Key people
 

@@ -123,6 +123,15 @@ If the display names are inconsistent ("+Zaal (on farcaster)" on X, no YouTube p
 | Add JSON-LD Person/Organization schema to all profile + about pages (bettercallzaal.com, thezao.com, wavewarz.com YouTube) with canonical name + sameAs links | @Iman | PR (code) | 2026-08-10 | Schema validated via Google Rich Result Test (https://search.google.com/test/rich-results); Google Search Console shows 0 errors for `Person` or `Organization` schema |
 | Verify all X/YouTube/IG/Farcaster bios link back to canonical domain + canonical domain links out to all social profiles (cross-linking audit) | @Team | Audit + manual update | 2026-08-15 | All profile bios contain live link to canonical domain; audit doc (CSV or checklist) confirms 100% coverage; spot-check 2-3 profiles |
 
+## Review (2026-07-17)
+
+Reviewed per board task `research-doc:1107`. Sound and already actionable (owners + dates + shipped-criteria per fix). One review insight and a routing note:
+
+- **Reconcile `llms.txt` with the ICM context boxes - do not create a second, drifting GEO surface.** The doc's core GEO move is publishing `.well-known/llms.txt` on the canonical domains. But the ZAO **already has an AI-readable surface**: the ICM context boxes on useicm.com (14 live boxes; source of truth in `research/identity/icm-boxes/`). Two AI-readable surfaces that state *different* facts is the worst GEO outcome - an LLM that finds inconsistent ZAO facts across llms.txt and the ICM boxes trusts neither. So the `llms.txt` files should be **generated from (or kept strictly consistent with) the ICM box content**, not written fresh. Single source of truth -> both surfaces. (This is the same drift-avoidance principle as the whitepaper symlinks and the cowork-enum reconciliation.)
+- **Routing by lane** (so the fixes land with the right owner, not duplicated): X/YouTube/IG display-names + the canonical-domain decision -> **Zaal** (personal/brand calls); `llms.txt` + JSON-LD deploy -> **Iman** (the GEO lane, doc 1122 gap 4); ZAOstock Google Business Profile + Schema.org Event markup -> the **ZAOstock/social** lane. None of these is a loop-safe build for this (builder) loop - they are gated deploys or other loops' lanes - which is why this is a review + a boarded reconciliation follow-up, not a PR that builds the llms.txt.
+
+Follow-up boarded (`research-doc:1107`): when the `llms.txt` files are authored, generate them from `research/identity/icm-boxes/` so the domain llms.txt and the ICM boxes never diverge.
+
 ## Sources
 
 - **thezao.com** [FULL] - Fetched 2026-07-15. The ZAO community platform landing page with artist directory and governance mission statement. https://thezao.com

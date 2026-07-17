@@ -9,7 +9,7 @@
  */
 
 import { callClaudeCli, CliAuthError, CliError } from '../hermes/claude-cli';
-import { buildCockpitBrief, formatCockpitBrief, saveBriefArtifact } from './brief';
+import { buildCockpitBrief, formatCockpitBrief, formatCockpitBriefCli, saveBriefArtifact } from './brief';
 import type { CockpitBrief, CockpitMode } from './types';
 
 const COCKPIT_MODEL = 'sonnet'; // episode: Sonnet is the operational harness model - fast, capable, cheap
@@ -33,6 +33,9 @@ export interface CockpitRun {
 export async function runCockpit(mode: CockpitMode = 'brief', now = Date.now()): Promise<CockpitRun> {
   const brief = await buildCockpitBrief(mode, now);
   const briefText = formatCockpitBrief(brief);
+  // Concise form for the Claude CLI prompt: counts + top-3 per section.
+  // Keeps the operator-read API call well under COCKPIT_BUDGET_USD.
+  const briefTextCli = formatCockpitBriefCli(brief);
 
   let operatorRead: string | null = null;
   let costUsd = 0;
@@ -48,7 +51,7 @@ export async function runCockpit(mode: CockpitMode = 'brief', now = Date.now()):
         outputFormat: 'json',
         maxBudgetUsd: COCKPIT_BUDGET_USD,
         timeoutMs: COCKPIT_TIMEOUT_MS,
-        prompt: `Here is Zaal's cockpit brief for ${brief.date}:\n\n${briefText}\n\nWrite his operator read.`,
+        prompt: `Here is Zaal's cockpit brief for ${brief.date}:\n\n${briefTextCli}\n\nWrite his operator read.`,
       });
       if (!res.isError && res.text.trim()) {
         operatorRead = res.text.trim();

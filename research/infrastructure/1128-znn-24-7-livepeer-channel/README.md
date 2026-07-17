@@ -258,6 +258,16 @@ ZAO **already produces** the content that ZNN needs:
 | **Why Now?** | Zaal has Livepeer key already (zaalclip infrastructure live). Content pipeline exists (zaoscribe → spacetovideo → clips). Only missing piece: scheduler + encoder automation. |
 | **Key Risk** | VPS uptime + FFmpeg crash-restart. Mitigated with systemd services + monitoring. |
 
+## Review (2026-07-17)
+
+Reviewed per board task `research-doc:1128`. The feasibility study is solid and well-costed. One decision-level update every reader needs:
+
+- **The cost path has moved. Zaal picked the $0 zero-cost lane.** After this doc, the decision recorded on the board (`legacy_source=znn`, "ZNN $0 MVP - Zaal picked zero-cost lane") is an **ffmpeg playlist looper on the existing VPS pushing straight to YouTube Live** - no Livepeer Studio subscription for the MVP. So this doc's headline recommendation (Livepeer Growth tier, ~$299/mo) is now the **upgrade path, not the MVP**. Read the Livepeer stack here as "what we graduate to when the $0 YouTube-RTMP MVP proves the format," not "what to build first."
+- **What still applies from this doc even in the $0 lane:** the encoding layer (VPS + ffmpeg, ~$24/mo or free on the existing box), the OBS/HTML5 branding overlays (reusing the WaveWarZ components), and the content pipeline (zaoscribe -> spacetovideo -> clips). Only the *distribution* layer changes (direct YouTube RTMP instead of Livepeer multistream).
+- **If/when upgrading to Livepeer:** re-verify the Growth-tier price and the 720p transcoding cost before committing - streaming-platform pricing drifts.
+
+No new follow-up boarded: the actionable MVP is already tracked as the `znn` $0-lane task. The Zaal-gated deploy steps in the One-Week MVP Path (Livepeer ingest test, thezao.xyz/tv embed) apply only to the upgrade path.
+
 ## Also See
 
 - [Doc 932](../../research/infrastructure/932-zaalclip-livepeer-onchain-clips/) - Zaal's existing Livepeer clip API setup

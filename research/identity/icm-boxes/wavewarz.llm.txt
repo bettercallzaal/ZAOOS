@@ -11,9 +11,9 @@ WaveWarZ is live-traded music battles on Solana: artists battle, fans trade posi
 
 ## Live traction (verified 2026-07-16 · wavewarz.info/api/public/stats)
 - **1,245 total battles** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community)
-- **522 SOL lifetime volume** (~$39K at $75/SOL)
-- **9.05 SOL paid to artists** (automatic, on-chain)
-- **17.43 SOL platform revenue**
+- **524.15 SOL lifetime volume** (~$39K at $75.29/SOL, 2026-07-17)
+- **9.07 SOL paid to artists** (automatic, on-chain)
+- **17.44 SOL platform revenue**
 - **127.34 SOL paid to winning traders**
 
 ## Community and charity impact

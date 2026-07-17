@@ -287,15 +287,24 @@ describe('GET /api/chat/messages', () => {
       expect(selectChain.limit).toHaveBeenCalledWith(25);
     });
 
-    it('handles non-numeric limit gracefully (parseInt returns NaN)', async () => {
+    it('handles non-numeric limit gracefully by using default', async () => {
       const selectChain = chainMock({ data: [], error: null });
       mockFrom.mockReturnValue(selectChain);
 
       await GET(makeGetRequest('/api/chat/messages?channel=zao&limit=not-a-number'));
 
-      // parseInt('not-a-number') = NaN, and Math.min(NaN, 50) = NaN
-      // The route still calls limit(NaN), which Supabase/DB ignores or treats as no-op
-      expect(selectChain.limit).toHaveBeenCalledWith(Number.NaN);
+      // parseInt('not-a-number') = NaN, should use default 20
+      expect(selectChain.limit).toHaveBeenCalledWith(20);
+    });
+
+    it('handles negative limit by using default', async () => {
+      const selectChain = chainMock({ data: [], error: null });
+      mockFrom.mockReturnValue(selectChain);
+
+      await GET(makeGetRequest('/api/chat/messages?channel=zao&limit=-5'));
+
+      // Negative limits should use default 20
+      expect(selectChain.limit).toHaveBeenCalledWith(20);
     });
   });
 

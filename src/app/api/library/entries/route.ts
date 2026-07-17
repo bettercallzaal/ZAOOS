@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
     const tag = searchParams.get('tag') || '';
     const sort = searchParams.get('sort') || 'newest';
     const offset = parseInt(searchParams.get('offset') || '0', 10);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
+    // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+    const rawLimit = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : rawLimit, 100);
 
     let query = supabaseAdmin.from('research_entries').select('*');
 

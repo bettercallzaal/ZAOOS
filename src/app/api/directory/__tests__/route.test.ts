@@ -141,6 +141,20 @@ describe('GET /api/directory', () => {
     expect(chain.range).toHaveBeenCalledWith(0, 49);
   });
 
+  it('handles non-numeric limit gracefully by using default', async () => {
+    const chain = queuedChain([{ data: [], error: null, count: 0 }]);
+    mockFrom.mockReturnValue(chain);
+    await GET(makeGetRequest('/api/directory', { limit: 'notanumber' }));
+    expect(chain.range).toHaveBeenCalledWith(0, 49); // default 50 means range(0, 49)
+  });
+
+  it('handles negative limit by using default', async () => {
+    const chain = queuedChain([{ data: [], error: null, count: 0 }]);
+    mockFrom.mockReturnValue(chain);
+    await GET(makeGetRequest('/api/directory', { limit: '-5' }));
+    expect(chain.range).toHaveBeenCalledWith(0, 49); // default 50 means range(0, 49)
+  });
+
   it('orders by is_featured desc then name asc', async () => {
     const chain = queuedChain([{ data: [], error: null, count: 0 }]);
     mockFrom.mockReturnValue(chain);

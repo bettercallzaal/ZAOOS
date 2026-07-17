@@ -93,7 +93,9 @@ export async function GET(req: NextRequest) {
   }
 
   const cursor = req.nextUrl.searchParams.get('cursor'); // ISO timestamp
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '20', 10), 50);
+  // Clamp a non-numeric/negative limit to the default (never pass NaN downstream).
+  const rawLimit = parseInt(req.nextUrl.searchParams.get('limit') || '20', 10);
+  const limit = Math.min(Number.isNaN(rawLimit) || rawLimit < 1 ? 20 : rawLimit, 50);
 
   try {
     const now = Date.now();

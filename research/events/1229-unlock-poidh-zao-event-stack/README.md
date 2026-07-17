@@ -3,7 +3,7 @@ topic: events
 type: design-spec
 status: design-complete
 last-validated: 2026-07-17
-related-docs: 863 (Unlock Protocol research), 625 (POIDH playbook), 626 (POIDH ZABAL airdrop), 814 (Dcoop/Zaoville), 547 (ZAOstock strategy), 1228 (ZAOville Jul 25 runbook)
+related-docs: 863 (Unlock Protocol research), 625 (POIDH playbook), 626 (POIDH ZABAL airdrop), 994 (ZABAL x POIDH fireside with Kenny Jul 8), 814 (Dcoop/Zaoville), 547 (ZAOstock strategy), 1228 (ZAOville Jul 25 runbook)
 original-query: "Propose the full ZAO event stack combining Unlock Protocol NFT ticketing + POIDH bounty engagement. Redo from board task c9edbd9b (prior write did not persist)."
 ---
 
@@ -134,9 +134,40 @@ For a monthly cadence (COC + weekly concerts), reduce to capture-only (0.03 ETH)
 
 ---
 
+---
+
+## Additional Engagement Paths (from doc 994 fireside with Kenny, Jul 8)
+
+These are three paths beyond the event-ticketing stack. All validated by POIDH founder Kenny in the Jul 8 fireside (doc 994):
+
+### Path A: POIDH bounties for Unlock onboarding
+
+Post a POIDH bounty: "Get your Unlock key to [event] and post proof." The bounty proof = a screenshot of the Unlock key in your wallet. This drives lock adoption (attendees who previously wouldn't bother with crypto now have incentive) and creates an onchain proof-of-onboarding that compounds into the ZAO bounty album.
+
+- Bounty amount: Tier A (0.005–0.01 ETH), since the effort is just claiming a free key
+- Proof criteria: wallet screenshot showing the Unlock key NFT + Farcaster post tagging /zao
+
+### Path B: Unlock-gated POIDH bounty access
+
+For premium or competitive POIDH bounty rounds, gate entry to holders of a specific Unlock key. Pattern: deploy an Unlock lock (price = 0, limited keys = N) → only key holders can submit POIDH claims in that round. Creates an access hierarchy: casual = public bounties; committed = Unlock-gated rounds.
+
+- Use case: ZABAL Gamez builder rounds (only registered builders with ZAO member key can claim)
+- Use case: zpoidh R6+ (ZAO member NFT = entry token for exclusive rounds)
+- How: POIDH does not natively check Unlock keys; enforcement is social + Warpcast channel restriction (only key holders follow the channel with Unlock-gated access via Warpcast's token-gated channels feature)
+
+### Path C: Unlock crowdfunds POIDH bounties
+
+Zaal's R5 pitch (from doc 994, decision 6): post a small POIDH bounty ($5–10) and let the Unlock community rally contributions to grow the prize pool. Unlock Protocol stewards Danny Toms + Cecilia are actively looking for music-creator + proof-of-work integrations — pitching this as a co-marketing opportunity (Unlock promotes the bounty to their community, ZAO provides the bounty content).
+
+- Action needed: Zaal to complete the pitch DM to Kenny + trigs (board task 4e9a8a93 "Lock R5" — separate from this doc)
+- Expected outcome: 3–5 external contributors add ETH to the bounty pool, prize grows from $5 to $25–50
+
+---
+
 ## Sources
 
 - Doc 863 — Unlock Protocol for ZAO Event Ticketing (research + decisions)
+- Doc 994 — ZABAL Gamez x POIDH Fireside with Kenny (Jul 8) — validation of Paths A/B/C above
 - Doc 625 — POIDH x ZAO Bounty Playbook (operational templates + prize curves)
 - Doc 626 — Empire Builder ZABAL POIDH Airdrop Architecture
 - Doc 1228 — ZAOville Jul 25 Day-of Operational Runbook

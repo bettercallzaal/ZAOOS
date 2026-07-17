@@ -9,7 +9,7 @@ owner: Zaal + Iman
 deadline: 2026-07-21 (lock August plan by Monday)
 ---
 
-# 1304 — ZABAL Games + WaveWarZ: August Strategy + 3-Track Framework
+# 1312 — ZABAL Games + WaveWarZ: August Strategy + 3-Track Framework
 
 > **For:** Zaal + Iman planning call (target: week of Jul 21).
 > **Stakes:** August is the final month of ZABAL Games Cohort 1 and a pivotal window for WaveWarZ monetization. The decisions made this week set the trajectory for ZAOstock (permit pending) and COC #8 (date to be locked Jul 21).

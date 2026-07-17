@@ -1,0 +1,382 @@
+# ZAO Agent Registry (Machine-Readable)
+# Source: research/agents/1182-zao-agent-registry
+# Last updated: 2026-07-16
+# Purpose: Query-able agent fleet state for automation + monitoring
+
+version: "1.0"
+audit_date: "2026-07-16"
+
+agents:
+  zoe:
+    name: "ZOE"
+    handle: "@zaoclaw_bot"
+    type: "orchestrator"
+    repo: "bettercallzaal/ZAOOS"
+    code_path: "bot/src/zoe/"
+    runtime:
+      host: "VPS 31.97.148.88"
+      path: "~/zao-bot-live"
+      process_type: "long-poll-bot"
+    purpose: "Personal concierge, task orchestration, research drafts, auto-PR pipeline"
+    status: "LIVE"
+    owner: "Zaal"
+    cost_model:
+      daily_cap_usd: 50
+      attribution:
+        hermes: 20
+        zoe_concierge: 10
+        workers: 20
+    human_gates:
+      - "Hermes auto-PR requires Zaal Y/N approval"
+      - "High-spend alerts (>$10/task)"
+      - "3-strike escalation for worker failures"
+    dependencies:
+      services:
+        - "Claude Max (Hermes)"
+        - "Neynar"
+        - "XMTP"
+        - "Supabase RLS"
+        - "Bonfire"
+        - "GitHub API"
+      models:
+        - name: "Sonnet"
+          role: "core orchestrator"
+        - name: "Haiku"
+          role: "workers"
+        - name: "Opus"
+          role: "escalation"
+    memory:
+      location: "~/.zao/zoe/"
+      blocks:
+        - "persona.md"
+        - "human.md"
+        - "recent.md"
+        - "tasks.md"
+        - "facts.md"
+        - "captures.md"
+    last_updated: "2026-06-30"
+    next_milestone: "Unblock Bonfire labeling -> enable memory writes"
+
+  hermes:
+    name: "Hermes"
+    handle: "N/A (library, reused by ZOE)"
+    type: "pattern-library"
+    repo: "bettercallzaal/ZAOOS"
+    code_path: "bot/src/hermes/"
+    runtime:
+      host: "VPS 31.97.148.88"
+      path: "spawned as subprocess from ZOE"
+      process_type: "claude-cli-subprocess"
+    purpose: "Autonomous fix-PR pipeline (coder + critic + auto-PR). Reused by ZOE and any worker."
+    status: "LIVE (reused)"
+    owner: "Zaal"
+    human_gates:
+      - "All patches require Zaal Y/N Telegram approval before auto-apply"
+    dependencies:
+      services:
+        - "Claude Max OAuth"
+        - "GitHub CLI"
+        - "iron-session"
+    last_updated: "2026-06-29"
+
+  zao_devz:
+    name: "ZAO Devz"
+    handle: "@zaodevz_bot"
+    type: "team-dispatcher"
+    repo: "bettercallzaal/ZAOOS"
+    code_path: "bot/src/devz/"
+    runtime:
+      host: "VPS 31.97.148.88"
+      path: "~/migrated-cowork/cowork-zaodevz/agent"
+      process_type: "long-poll-bot"
+      note: "DRIFT: runs from cowork-zaodevz clone, not ZAOOS clone"
+    purpose: "Group dispatch (Zaal + Iman + team), hourly learning tip"
+    status: "LIVE"
+    owner: "Iman (ops), Zaal (decisions)"
+    human_gates:
+      - "No auto-execute; human review before action"
+    dependencies:
+      services:
+        - "Claude via Hermes"
+        - "cowork-zaodevz repo bridge"
+    last_updated: "2026-07-16"
+    cleanup_flag: "Clarify if intentional (Iman-owned) or should integrate into ZAOOS fleet"
+
+  zaostock_team:
+    name: "ZAOstock Team"
+    handle: "@ZAOstockTeamBot"
+    type: "festival-coordinator"
+    repo: "bettercallzaal/ZAOOS (graduating to bettercallzaal/zao-festivals)"
+    code_path: "bot/ (root)"
+    runtime:
+      host: "VPS 31.97.148.88"
+      path: "~/zaostock-bot"
+      process_type: "systemd-user-unit"
+      systemd_name: "zaostock-bot.service"
+    purpose: "Festival team coordination: digests, todos, contributions, ideas, gemba notes"
+    status: "LIVE + SPINNING OUT"
+    owner: "Zaal"
+    human_gates:
+      - "Public mode (Telegram @username auth)"
+      - "Admin commands Zaal only"
+    dependencies:
+      services:
+        - "Minimax LLM"
+        - "Supabase (stock_team_members table)"
+      models:
+        - name: "Minimax"
+          role: "LLM core"
+    crons:
+      - schedule: "06:00 daily"
+        event: "morning digest"
+        timezone: "America/New_York"
+      - schedule: "18:00 daily"
+        event: "evening digest"
+        timezone: "America/New_York"
+      - schedule: "09:00 Monday"
+        event: "week-ahead"
+        timezone: "America/New_York"
+      - schedule: "17:00 Friday"
+        event: "retro"
+        timezone: "America/New_York"
+    last_updated: "2026-04-24"
+    next_milestone: "Graduation to own repo (bettercallzaal/zao-festivals)"
+
+  zol:
+    name: "ZOL"
+    handle: "@zolbot"
+    fid: "3338501"
+    type: "farcaster-scout"
+    repo: "bettercallzaal/zol"
+    code_path: "zol-daily.js, zol-reply.js"
+    runtime:
+      host: "Pi ansuz (Tailscale 100.117.191.11)"
+      path: "~/zol/farcaster-agent/"
+      process_type: "cron + tmux daemon"
+      tmux_session: "zol"
+    purpose: "Farcaster scout: autonomous hourly posts (recall-gated), reply daemon"
+    status: "LIVE + FULLY AUTONOMOUS (2026-07-12)"
+    owner: "Zaal"
+    autonomy:
+      posts:
+        frequency: "hourly (5am-10pm ET, cron 0 0-2,9-23 * * * UTC)"
+        approval_gate: "load-bearing code guards (bot blocklist, double-tag skip, mention array check, @ strip)"
+        self_limit: "recent-casts.json guard + tooSimilar() overlap filter"
+        test_mode: "ZOL_DRY=1 node zol-daily.js"
+      replies:
+        approval_gate: "approval-gated drafts (not auto-posting)"
+        daemon: "zol-reply.js (polls haatz for mentions)"
+    human_gates:
+      - "Hourly cadence auto-gated in code (no prompt rules)"
+      - "Pings Zaal on each post"
+      - "Dry-run mode for testing"
+    dependencies:
+      services:
+        - "OpenRouter (with Bonfire local fallback)"
+        - "Bonfire (memory/recall)"
+        - "x402 (keyless Farcaster writes)"
+        - "Haatz (keyless reads)"
+        - "Neynar API"
+      wallet: "0x5A3F9a4f20e602eeaa03019F863fcA249f452D22 (~2 USDC on Base, burner)"
+      keys_location: "~/.zao/private/{bonfire.env, openrouter.key}, ~/zol/ (wallet backup)"
+      signer: "~/.openclaw/farcaster-credentials.json"
+    memory:
+      recent_casts: "~/zol/recent-casts.json (last 24h, guard against duplicates)"
+    last_updated: "2026-07-12"
+    parallel_work:
+      v2_build: "~/zol-upgrade (VPS, branch ws/v2-core-layers) - in review"
+    next_milestone: "Merge v2 from ws/v2-core-layers -> ship -> replace v1"
+
+  bonfire:
+    name: "Bonfire"
+    handle: "@zabal_bonfire"
+    type: "knowledge-graph"
+    repo: "N/A (external SaaS)"
+    runtime:
+      host: "bonfires.ai"
+      process_type: "external API"
+    purpose: "Knowledge graph ingest + agent-agentic recall across multimodal corpus"
+    status: "LIVE (underutilized)"
+    owner: "Zaal (Genesis tier)"
+    tier: "Genesis (wallet-gated)"
+    human_gates:
+      - "Ingest rate-limited (no daily burst)"
+      - "Curated episodes only (recap.ts output)"
+      - "Team-readable (shared corpus)"
+      - "No auto-delete"
+    integration: "ZOE memory block, Bonfire episodes as curated lessons"
+    blocker: "Labeling step (admin task) - blocks memory writes"
+    last_updated: "2026-06-30"
+    next_milestone: "Unblock labeling -> enable ZOE recap.ts -> Bonfire writes"
+
+build_loops:
+  zoe_loop:
+    name: "zoe"
+    repo: "bettercallzaal/ZAOOS"
+    vps_dir: "~/zao-os"
+    directive: "Research doc generation + auto-PR"
+    entry_point: "work-loop.ts (cron 2h, daily-capped 6 items)"
+    interval: "daily (6 items max)"
+    cost_control: "ZOE_WORKLOOP_DAILY=6, file-locked, empty-queue=zero-spend"
+    scope: "docs-only (no live code changes)"
+    state: "ACTIVE (PRs staged for Zaal merge)"
+    owner: "Zaal"
+
+  human_loop:
+    name: "human"
+    repo: "bettercallzaal/ZAOOS"
+    vps_dir: "~/zao-os"
+    directive: "Personal dev work, ad-hoc builds"
+    entry_point: "manual tmux sessions"
+    interval: "on-demand"
+    cost_control: "none (personal branch)"
+    state: "ACTIVE (development mode)"
+    owner: "Zaal"
+
+  zol_loop:
+    name: "zol"
+    repo: "bettercallzaal/zol"
+    vps_dir: "~/zol-upgrade"
+    directive: "ZOL v2 core architecture (design/review)"
+    entry_point: "branch ws/v2-core-layers"
+    interval: "on-demand / review cycle"
+    cost_control: "none (upstream, no spend until ship)"
+    state: "PAUSED (v2 in review, v1 LIVE in ~/zol/)"
+    owner: "Zaal"
+
+  ww_loop:
+    name: "ww"
+    repo: "bettercallzaal/wwtracker"
+    vps_dir: "~/wwtracker"
+    directive: "WaveWarZ event coordination"
+    interval: "on-demand"
+    state: "INACTIVE"
+    note: "WaveWarZ spinout; not part of ZAO core fleet"
+
+  coc_loop:
+    name: "coc"
+    repo: "bettercallzaal/CoCConcertZ"
+    vps_dir: "~/coc"
+    directive: "COC Concertz event coordination"
+    interval: "on-demand"
+    state: "INACTIVE"
+    note: "COC Concertz graduated 2026-04-29; retained for cross-brand ops"
+
+supervisor:
+  loops_keepalive:
+    name: "loops-keepalive.sh"
+    location: "~/bin/"
+    frequency: "every 3 minutes"
+    function: "Monitor tmux sessions, restart dead loops, file-lock to prevent duplicates"
+    restart_check: "systemctl --user status loops-keepalive"
+
+  zoe_autodeploy:
+    name: "zoe-autodeploy.sh"
+    location: "~/bin/"
+    frequency: "every 10 minutes"
+    function: "Poll origin/main in ~/zao-os, deploy to ~/zao-bot-live, restart ZOE if new commits"
+    restart_check: "systemctl --user status zoe-autodeploy (if wired) or manual run"
+
+  zaostock_bot_systemd:
+    name: "zaostock-bot.service"
+    location: "~/.config/systemd/user/zaostock-bot.service"
+    frequency: "long-poll (grammy)"
+    process: "Telegram @ZAOstockTeamBot polling"
+    restart_cmd: "systemctl --user restart zaostock-bot"
+    health_check: "journalctl --user -u zaostock-bot -n 15 --no-pager"
+
+  zol_crons_pi:
+    name: "ZOL crons on Pi"
+    location: "~/zol/ on Pi ansuz"
+    processes:
+      - "zol-daily.js (hourly posts, 5am-10pm ET)"
+      - "zol-reply.js (reply daemon, continuous)"
+      - "zol-zabal-watch.js (every 5 min)"
+      - "zol-drain.js (every 5 min)"
+    liveness_check: "ssh zaal@ansuz 'tmux list-sessions | grep zol'"
+
+decommissioned:
+  openclaw_squad:
+    name: "openclaw squad"
+    systems: ["ZOEY", "BUILDER", "SCOUT", "WALLET", "FISHBOWLZ", "CASTER"]
+    killed: "2026-05-05"
+    reason: "Complexity, no Zaal adoption, Hermes pattern simpler"
+    archival: "Workspace nuked; code in git history"
+
+  composio_ao:
+    name: "Composio AO"
+    killed: "2026-05-05"
+    reason: "Hermes pattern more reliable"
+    archival: "No code in repo"
+
+  zoe_v2_agent_zero:
+    name: "ZOE v2 / Agent Zero migration plan"
+    killed: "2026-05-05"
+    reason: "Decision: stick with Hermes + Claude CLI"
+    archival: "Doc 759 v2 deltas address gaps"
+
+  ten_bot_fleet:
+    name: "10-bot branded fleet"
+    bots: ["Magnetiq", "Research", "WaveWarZ", "POIDH"]
+    killed: "2026-05-04"
+    reason: "Complexity; brand voices fold into ZOE memory blocks"
+    archival: "No code in repo"
+
+  zao_team_bots:
+    name: "zao-team-bots"
+    bots: ["Magnetiq brand bot", "AttaBotty brand bot"]
+    killed: "2026-06-29"
+    reason: "Brand voices live as ZOE persona blocks"
+    archival: "No code in repo"
+
+  hermes_standalone:
+    name: "Hermes as separate bot"
+    handle: "@zoe_hermes_bot"
+    killed: "2026-06-29"
+    reason: "Adapted into ZOE; code in bot/src/hermes/ reused as library"
+    archival: "Code retained for reuse, not run as standalone bot"
+
+  fishbowlz:
+    name: "FISHBOWLZ"
+    killed: "Paused 2026-04-16, killed 2026-05-04"
+    reason: "Zaal decision post-grill; Juke partnership stands separately"
+    archival: "Docs in research/ only"
+
+drift_targets:
+  - id: "zao-devz-runtime-mismatch"
+    severity: "MEDIUM"
+    issue: "Code in ZAOOS (bot/src/devz/), runs from cowork-zaodevz clone (~/migrated-cowork/...)"
+    implication: "Updates to bot/src/devz/ not auto-deployed"
+    question: "Intentional (Iman-owned, standalone)? Or integrate into ZAOOS fleet?"
+    recommendation: "Clarify ownership + decide integrate-or-standalone"
+
+  - id: "zol-dual-codebases"
+    severity: "MEDIUM"
+    issue: "v1 LIVE (~/zol/), v2 in review (~/zol-upgrade on VPS)"
+    implication: "Two parallel codebases; unclear promotion path"
+    question: "When does v2 replace v1? Where does v2 ship?"
+    recommendation: "Document v2 ship date + promotion plan in memory"
+
+  - id: "build-deploy-separation"
+    severity: "LOW"
+    issue: "Code in ~/zao-os (build branch), ZOE runs from ~/zao-bot-live (main branch only)"
+    implication: "Feature branches do NOT auto-run; only merged main"
+    recommendation: "Document this as intentional design choice (working as intended)"
+
+  - id: "research-doc-decommission"
+    severity: "LOW"
+    issue: "Doc 601 + agent-design docs still reference openclaw/Composio/ZOE v2"
+    implication: "Future readers may try to reopen closed decisions"
+    recommendation: "Mark docs ARCHIVED, point to CLAUDE.md decommissioned list"
+
+  - id: "bonfire-underutilized"
+    severity: "LOW"
+    issue: "Integrated into ZOE but described as DORMANT (blocked on labeling)"
+    implication: "Knowledge doesn't persist to shared graph"
+    recommendation: "Unblock labeling step, enable recap.ts -> Bonfire writes"
+
+  - id: "imanagent-planned"
+    severity: "LOW"
+    issue: "cowork-zaodevz bot is slash-commands-only; imanagent (doc 650) still planned"
+    implication: "ZAO Devz is not yet fully autonomous"
+    recommendation: "Priority low; reference doc 650, Iman owns"

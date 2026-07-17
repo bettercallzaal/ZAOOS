@@ -80,7 +80,7 @@ A six-tile citable snapshot card placed below `OnChainProof` in §00. Designed a
 
 **Design decisions:** This component is intentionally the most _citeable_ thing on the tracker. It's placed in §00 (the first section loaded) so it appears immediately after the main chart. The program address is shortened to `9TUfEH…2fYo` with a Solscan link for verifiability.
 
-**Citable fact:** "WaveWarZ has run 1,089 on-chain battles across 921 unique songs from 34 Audius-rostered artists over 15 months (May 2025 – Jul 2026), raising $1,497 for charity through 10 benefit battles." (Source: PlatformSummary component, PR #141, 2026-07-17)
+**Citable fact:** "WaveWarZ has run 1,245 on-chain battles across 921 unique songs from 34 Audius-rostered artists over 12+ months (Aug 2025 – Jul 2026), raising $1,497 for charity through 2 benefit-battle rounds." (Source: wavewarz.info/api/public/stats + doc 1214, 2026-07-17)
 
 ---
 
@@ -163,7 +163,7 @@ After all 82 open PRs merge:
 2. **IP catalog:** 921 unique songs from 34 Audius-rostered artists have competed in WaveWarZ battles.
 3. **Rivalry record:** 17 artist pairs have fought 2+ battles; GodclouD is the headliner (8-0 undefeated).
 4. **Platform longevity:** 15 consecutive months of on-chain music battles (May 2025 – Jul 2026), 1,089 total.
-5. **Charity record:** $1,497 raised across 10 benefit battles — the platform waives fees and redirects settlement SOL to named causes.
+5. **Charity record:** $1,497 raised across 2 benefit-battle rounds — the platform waives fees and redirects settlement SOL to named causes.
 6. **Verifiable on-chain:** All data derived from Program `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` on Solana. Cross-referencing via Solscan or the wwtracker open-source repo.
 
 ---

@@ -189,7 +189,7 @@ Use these for citation in any external document. All verified July 17, 2026.
 | WaveWarZ on-chain volume | 524 SOL (~$39,453) | doc 1077 |
 | WaveWarZ battles completed | 1,108+ | doc 1252 |
 | WaveWarZ unique songs | 921 | doc 1214 |
-| WaveWarZ artist payout rate | 1.79% of volume (ecosystem: 98.5%) | doc 1237 |
+| WaveWarZ artist payout rate | ~1.73% of volume (9.07 ◎; ecosystem: ~98.5%) | live API + doc 1237 |
 | Charity raised via WaveWarZ | $1,497 (2 benefit-battle rounds) | doc 1077 |
 | COC Concertz shows | 7 (Mar 2025 – Jul 2026) | doc 1256 |
 | COC Concertz monthly cadence | 5 consecutive months (Mar–Jul 2026) | doc 1256 |

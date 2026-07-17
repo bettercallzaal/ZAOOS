@@ -161,6 +161,7 @@ import {
 } from './focus-guard';
 import { saveCheckpoint, getCheckpoint, offerCheckpoint } from './session-checkpoint';
 import { runAudit, formatAuditForTelegram } from './trust-audit';
+import { fetchLoopStatuses, formatLoopsAll, formatLoop, KNOWN_LOOPS } from './fleet-loops';
 
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
@@ -701,6 +702,36 @@ bot.command('cockpit', async (ctx) => {
   } catch (e) {
     await ctx.reply(`Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`);
   }
+});
+
+// /loops — show all 5 loop states from Supabase fleet_status
+bot.command('loops', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const loops = await fetchLoopStatuses();
+  await replyChunked(ctx, formatLoopsAll(loops));
+});
+
+// /loop <name> — show one loop's state. /loop with no arg = same as /loops
+bot.command('loop', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const arg = (ctx.match ?? '').toString().trim().toLowerCase();
+  if (!arg) {
+    const loops = await fetchLoopStatuses();
+    await replyChunked(ctx, formatLoopsAll(loops));
+    return;
+  }
+  if (!(KNOWN_LOOPS as readonly string[]).includes(arg)) {
+    await ctx.reply(
+      `Unknown loop "${arg}". Valid: ${[...KNOWN_LOOPS].join(', ')}`,
+    );
+    return;
+  }
+  const loops = await fetchLoopStatuses([arg]);
+  if (loops.length === 0) {
+    await ctx.reply(`No status for "${arg}" in fleet_status table.`);
+    return;
+  }
+  await ctx.reply(formatLoop(loops[0]));
 });
 
 bot.command('team', async (ctx) => {

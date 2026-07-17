@@ -10,7 +10,7 @@
 
 ## Overview
 
-Wave 3 adds three components focused on **artist-level intelligence** derived from the handle-tagged battle record. All data comes from `public/ww-battles.json` (1,089 battles as of 2026-07-17; 140 handle-tagged). No external API calls — purely computed from the battle history.
+Wave 3 adds four components focused on **artist-level intelligence** derived from the handle-tagged battle record. All data comes from `public/ww-battles.json` (1,089 battles as of 2026-07-17; 140 handle-tagged). No external API calls — purely computed from the battle history.
 
 These components serve the NORTH STAR: WaveWarZ as the ZAO's live, citable proof that onchain music competition works. Artist streaks and rivalries are the social layer that makes the data shareable and memorable.
 
@@ -91,15 +91,31 @@ Rivalry narrative is covered by `RivalryBoard.tsx` in PR #119 (§06 battles sect
 
 ---
 
+### 4. ArtistVolume — PR #135 (added to wave 3 consolidation)
+
+**File:** `components/ArtistVolume.tsx`  
+**Location:** AppShell section 07 (traders), after HotStreaks
+
+**What it shows:**
+Top 15 artists by total SOL traded in cross-artist battles. Self-battles excluded. Proportional bar, amber top 3, each handle links to x.com. Shows the **economic weight** dimension of artist activity — complementing win rate (WinRateLeaderboard) and momentum (HotStreaks).
+
+**Why it matters for the NORTH STAR:**
+"GodclouD has had X SOL traded in battles featuring their music" — a verifiable, on-chain economic claim about ZAO artists, not just a social metric.
+
+**Algorithm:** For each battle where `aHandle ≠ bHandle` and both are set, add `vol` to both handles' totals. Min 2 cross-artist battles to qualify.
+
+---
+
 ## NORTH STAR Alignment
 
 These three components make WaveWarZ battle data **shareable and citable as a proof layer for ZAO's onchain art/music culture thesis:**
 
 1. **HotStreaks** → real-time social signal ("GodclouD is on a 5-win streak right now")
 2. **WinRateLeaderboard** → merit-based ranking that can be cited externally ("71.4% win rate across 21 battles")
-3. **RivalryBoard** (PR #119) → rivalry narrative ("8-0 head-to-head — the most lopsided record in WaveWarZ history"); HeadToHead closed as superseded
+3. **ArtistVolume** → economic proof ("ZAO artists have driven X SOL in cross-artist WaveWarZ battles")
+4. **RivalryBoard** (PR #119) → rivalry narrative ("8-0 head-to-head — the most lopsided record in WaveWarZ history")
 
-All are derived from the on-chain battle record, making them verifiable claims, not platform assertions.
+All derived from the on-chain battle record — verifiable claims, not platform assertions.
 
 ---
 
@@ -107,8 +123,8 @@ All are derived from the on-chain battle record, making them verifiable claims, 
 
 - **Handle coverage:** Handles were added to battles Jun 2026+. 140/1,089 battles are handle-tagged. This number grows with every new tagged battle.
 - **Data source:** `public/ww-battles.json` — baked into the Next.js build, no runtime API call
-- **Sorting:** Both components sort by numeric `id` (not date string) to avoid mixed date format issues
-- **Threshold design:** HotStreaks uses min 3 total battles; WinRateLeaderboard uses min 5 decided battles
+- **Sorting:** HotStreaks and WinRateLeaderboard sort by numeric `id` (not date string) to avoid mixed date format issues; ArtistVolume sorts by total SOL desc
+- **Threshold design:** HotStreaks uses min 3 total battles; WinRateLeaderboard uses min 5 decided battles; ArtistVolume uses min 2 cross-artist battles
 
 ---
 
@@ -116,5 +132,5 @@ All are derived from the on-chain battle record, making them verifiable claims, 
 
 | PR | Component | Branch | Status |
 |----|-----------|--------|--------|
-| #135 | HotStreaks + WinRateLeaderboard | feat/traders-analytics-wave3 | Open, 111/111 tests green (consolidated from #131 + #132) |
+| #135 | HotStreaks + WinRateLeaderboard + ArtistVolume | feat/traders-analytics-wave3 | Open, 111/111 tests green (consolidated from #131 + #132; ArtistVolume added) |
 | #133 | HeadToHead | feat/head-to-head | CLOSED — superseded by RivalryBoard in PR #119 |

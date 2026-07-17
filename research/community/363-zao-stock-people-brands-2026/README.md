@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-profiles
 > **status:** research-complete
-> **last-validated:** 2026-05-21
+> **last-validated:** 2026-07-17
 > **original-query:** Comprehensive profile index for ZAOstock 2026 team members and ZAO brands with verified data points (reconstructed)
 > **tier:** medium
 > **Date:** 2026-04-15
@@ -16,7 +16,7 @@
 |----------|----------------|
 | **Profile gaps** | Tom Fellenz profile COMPLETE. Shawn, DFresh, Craig G need bios from them directly - no public web presence found. |
 | **Brand profiles** | WaveWarZ and COC Concertz have strong public data. FISHBOWLZ, Songjam, ZAOVille are internal/early-stage. |
-| **For pitch page** | USE WaveWarZ stats (795 battles, 435 SOL), COC Concertz (5 events), newsletter (400+ editions), fractals (90+ weeks) as credibility proof |
+| **For pitch page** | USE WaveWarZ stats (1,245 battles, 522 SOL), COC Concertz (5 events), newsletter (400+ editions), fractals (100+ weeks) as credibility proof |
 | **Missing data** | NEED photos/video from ZAO-CHELLA, Maine Craft Weekend attendance numbers, Fractured Atlas exact wording |
 
 ---
@@ -110,9 +110,9 @@
 | **Founded** | 2024 |
 | **Platform** | zaoos.com (Next.js 16 + Supabase + Neynar) |
 | **Governance** | 3-tier: ZOUNZ Nouns Builder on-chain, Snapshot polls, Community proposals |
-| **Fractals** | 90+ consecutive weekly governance sessions (Mondays 6pm EST) |
+| **Fractals** | 100+ consecutive weekly governance sessions (Mondays 6pm EST) |
 | **Newsletter** | 400+ editions of Year of the ZABAL |
-| **Key stat for sponsors** | 90+ weeks of unbroken weekly community governance - this is the consistency metric |
+| **Key stat for sponsors** | 100+ weeks of unbroken weekly community governance - this is the consistency metric |
 
 ### WaveWarZ
 
@@ -120,14 +120,14 @@
 |-------|--------|
 | **What** | Live-traded music battle platform on Solana |
 | **Website** | [wavewarz.com](https://www.wavewarz.com), [wavewarz.info](https://wavewarz.info) (analytics) |
-| **Total battles** | 795 (132 main events + 632 quick battles) |
-| **Total volume** | 435.33 SOL ($37,155) |
-| **Total artist payouts** | 7.5 SOL ($640) |
+| **Total battles** | 1,245 (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) |
+| **Total volume** | 522 SOL (~$39K at $75/SOL, 2026-07-17) |
+| **Total artist payouts** | 9.05 SOL |
 | **Artist economics** | 1% trading volume + 5-7% settlement bonus, instant onchain |
 | **Legal entity** | Delaware C-Corp |
 | **Founders** | Hurric4n3Ike + Candy |
 | **Smart contracts** | Base L2 (Candy's wavewarz-base, 8/8 tests, A+ audit) |
-| **Key stat for sponsors** | 795 battles, real money flowing, real artists getting paid |
+| **Key stat for sponsors** | 1,245 battles, 522 SOL volume, real artists getting paid |
 
 ### ZAOstock
 
@@ -198,10 +198,10 @@
 
 | Metric | Number | Source |
 |--------|--------|--------|
-| Weekly governance sessions | 90+ consecutive | ZAO Fractals (Mondays 6pm EST) |
+| Weekly governance sessions | 100+ consecutive | ZAO Fractals (Mondays 6pm EST) |
 | Newsletter editions | 400+ | Year of the ZABAL on Paragraph |
-| WaveWarZ battles | 795 | wavewarz.info |
-| WaveWarZ volume | 435 SOL ($37K+) | wavewarz.info |
+| WaveWarZ battles | 1,245 | wavewarz.info/api/public/stats (2026-07-17) |
+| WaveWarZ volume | 522 SOL (~$39K) | wavewarz.info/api/public/stats (2026-07-17) |
 | COC Concertz events | 5 (monthly recurring) | cocconcertz.com |
 | Team members | 14 active + 4 advisors | Dashboard |
 | ZAO members | ~188 gated | ZAO OS |

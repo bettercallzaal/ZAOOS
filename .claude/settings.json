@@ -205,7 +205,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/bin/zao-notify.sh"'\"$NOTIFICATION_MESSAGE\"'\" with title \"Claude Code\" sound name \"Glass\"'"
+            "command": "$HOME/bin/zao-notify.sh \"$NOTIFICATION_MESSAGE\" with title \"Claude Code\" sound name \"Glass\""
           }
         ]
       }

@@ -138,7 +138,7 @@
 ## Research Stats
 
 - **Active documents:** ~820 across 14 topic folders (+9 daily inspiration logs; all docs filed in topic folders)
-- **Highest doc number:** 841
+- **Doc numbering:** the sequential set runs into the ~1170s; do NOT just pick "max+1" (that races when agents work in parallel). NEW docs draw from your reserved band (base 1200) - see [COLLISION_TOLERANCE.md](./COLLISION_TOLERANCE.md#ranges-per-agent-the-real-fix-for-parallel-agents-2026-07-17).
 - **Archived (superseded/merged):** 77 (in `_archive/`)
 - **Time span:** January — June 2026
 - **Topic folders:** dev-workflows, agents, music, events, business, infrastructure, community, farcaster, governance, identity, cross-platform, security, wavewarz

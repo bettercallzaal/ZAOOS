@@ -1,11 +1,20 @@
 name: Auto-merge safe PRs
 
 # Safe categories self-merge once CI is green:
-#   docs  — research/** and docs/** only (with doc-number collision guard)
-#   tests — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
+#   docs    — research/** and docs/** only (with doc-number collision guard)
+#   tests   — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
+#   scripts — NEWLY-ADDED standalone tools under scripts/**/*.py|*.sh (may ride
+#             alongside docs). Safe because: (a) additive only — a *modified*
+#             script drops the PR to unsafe, so nothing already-wired changes;
+#             (b) standalone — scripts/** is not imported by the app or the bot
+#             runtime, so merging one cannot break the build or boot; (c) it
+#             cannot be auto-invoked by the merge — only .husky/** and
+#             .github/** run automatically, both outside scripts/. Convention:
+#             the author runs the script's --selftest before opening the PR.
 # All other PRs (runtime code, config, CI changes) wait for Zaal.
 # --auto requires all required status checks to pass before merging.
 # No fallback merge without CI receipt — the || bypass is intentionally removed.
+# Conservative mix rule: tests must be alone; docs+scripts may combine.
 
 on:
   pull_request:
@@ -25,26 +34,46 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
-          echo "$files"
-          category=""
-          while IFS= read -r f; do
+          # Read "status<TAB>filename" pairs so we can require additive-only scripts.
+          pairs=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | "\(.status)\t\(.filename)"')
+          echo "$pairs"
+          has_docs=0; has_tests=0; has_scripts=0; has_unsafe=0
+          while IFS=$'\t' read -r status f; do
+            [ -z "$f" ] && continue
             case "$f" in
               research/*|docs/*)
-                [ "$category" = "tests" ] && { category="unsafe"; break; }
-                category="docs"
+                has_docs=1
                 ;;
               *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx|*/__tests__/*)
-                [ "$category" = "docs" ] && { category="unsafe"; break; }
-                category="tests"
+                has_tests=1
+                ;;
+              scripts/*.py|scripts/*.sh)
+                # additive standalone tools only — a modified script may be wired
+                # into something, so it is NOT auto-safe.
+                if [ "$status" = "added" ]; then has_scripts=1; else has_unsafe=1; fi
                 ;;
               *)
-                category="unsafe"
-                break
+                has_unsafe=1
                 ;;
             esac
-          done <<< "$files"
-          echo "category=${category:-unsafe}" >> "$GITHUB_OUTPUT"
+          done <<< "$pairs"
+
+          # Conservative combination rules:
+          #   unsafe wins; tests must be pure; docs and scripts may combine.
+          if [ "$has_unsafe" = "1" ]; then
+            category="unsafe"
+          elif [ "$has_tests" = "1" ] && { [ "$has_docs" = "1" ] || [ "$has_scripts" = "1" ]; }; then
+            category="unsafe"
+          elif [ "$has_tests" = "1" ]; then
+            category="tests"
+          elif [ "$has_docs" = "1" ]; then
+            category="docs"        # covers docs-only and docs+scripts; collision guard runs
+          elif [ "$has_scripts" = "1" ]; then
+            category="scripts"
+          else
+            category="unsafe"
+          fi
+          echo "category=${category}" >> "$GITHUB_OUTPUT"
 
       - name: Block doc-number collisions
         if: steps.classify.outputs.category == 'docs'
@@ -76,7 +105,8 @@ jobs:
       - name: Enable auto-merge (squash)
         if: |
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||
-          steps.classify.outputs.category == 'tests'
+          steps.classify.outputs.category == 'tests' ||
+          steps.classify.outputs.category == 'scripts'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

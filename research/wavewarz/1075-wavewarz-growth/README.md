@@ -30,7 +30,7 @@ WaveWarZ is the ZAO's only working revenue product (98.5% of every dollar stays 
 2. **Tournament engagement** - the weekly bracket + leaderboard is registered but not live/promoted
 3. **Artist supply chain** - onboarding friction (Solana wallet, claims flow) limits artist participation to 48 songs; competitors do 100+ artist events/month
 
-The financials show a healthy unit economics story: artists earned 9.05 SOL (~$680 USD) cumulatively, platform earned 17.42 SOL (~$1,308 USD), proving the revenue model works. The tension: **platform revenue (1.93x artist revenue) is driven by launch/queue fees**, not trading volume fees. As volume grows, trading fees (0.5% per trade) become the dominant line item, and this ratio should flip toward artists. The growth plays below address volume growth first, then unit economics optimization.
+The financials show a healthy unit economics story: artists earned 9.07 SOL (~$683 USD) cumulatively, platform earned 17.44 SOL (~$1,313 USD), proving the revenue model works. The tension: **platform revenue (1.93x artist revenue) is driven by launch/queue fees**, not trading volume fees. As volume grows, trading fees (0.5% per trade) become the dominant line item, and this ratio should flip toward artists. The growth plays below address volume growth first, then unit economics optimization.
 
 ## Current State (Deep Dive)
 
@@ -39,9 +39,9 @@ The financials show a healthy unit economics story: artists earned 9.05 SOL (~$6
 | Metric | Value | Benchmark | Status |
 |--------|-------|-----------|--------|
 | Total Volume | 524.15 SOL (~$39K USD) | — | Early but real. Spotify pays $0.003-0.005/play; 1M plays = $3-5K. WaveWarZ doing that in 1,245 battles. |
-| Battles | 1,244 (1,046 Quick + 162 Main Battles + 50 Main Events + 36 Community) | - | Consistent flow. |
-| Artist Payouts | 9.05 SOL | ~$680 USD (at $75.13/SOL) | Real artist income. Foundation.app / Sound.xyz artist cohorts earn $5-50/month early-stage. WaveWarZ is competitive. |
-| Platform Revenue | 17.42 SOL | ~$1,308 USD (at $75.13/SOL) | 1.93× artist payouts — driven by per-trade fee + 3% settlement cut. Ratio expected to improve as volume grows. |
+| Battles | 1,245 (1,047 Quick + 162 Main Events + 36 Community) | - | Consistent flow. |
+| Artist Payouts | 9.07 SOL | ~$683 USD (at $75.29/SOL) | Real artist income. Foundation.app / Sound.xyz artist cohorts earn $5-50/month early-stage. WaveWarZ is competitive. |
+| Platform Revenue | 17.44 SOL | ~$1,314 USD (at $75.29/SOL) | 1.93× artist payouts — driven by per-trade fee + 3% settlement cut. Ratio expected to improve as volume grows. |
 | Trader Claims | 127.34 SOL | ~$9,570 USD | Winnings distributed to winning traders. Largest single payout line. |
 | Fee Structure | 1.5% total (1% artist, 0.5% platform) | Uniswap 0.3-1%, Polymarket 2%, traditional markets 50%+ | Extremely cheap. Artists keep 98.5%. |
 | Daily Active Traders | Unknown | Prediction market benchmark: 10-50 DAU for indie markets, 1000+ DAU for mature ones | MISSING DATA - need Intelligence pull |
@@ -235,7 +235,7 @@ The financials show a healthy unit economics story: artists earned 9.05 SOL (~$6
 | **Daily Active Artists** | 20-30 estimated | 40 | 100 | Artist supply bottleneck |
 | **Weekly Tournament Attendance** | N/A (not live) | 30 traders | 100 traders | Retention + virality flywheel |
 | **Total Volume (SOL)** | 524.15 SOL (live Jul 16) | 700 SOL (+34%) | 1500 SOL (+187%) | Revenue proxy |
-| **Artist Payouts (SOL)** | 9.05 SOL cumulative | 20 SOL / week | 50 SOL / week | Product-market-fit for artists |
+| **Artist Payouts (SOL)** | 9.07 SOL cumulative | 20 SOL / week | 50 SOL / week | Product-market-fit for artists |
 | **Daily X Space Concurrent Viewers** | ~50-100 estimated | 200 | 500 | Virality + community event |
 | **Partner Co-Marketing Volume (%)** | 0% (not tracked) | 20% of daily volume | 40% of daily volume | Partnership activation ROI |
 | **Artist Conversion Rate (signup → battle entry)** | Unknown (no data) | 50% | 70% | Onboarding funnel health |
@@ -247,8 +247,8 @@ The financials show a healthy unit economics story: artists earned 9.05 SOL (~$6
 **The Claim:** "98.5% of every dollar stays in the ecosystem; only 1.5% platform fee"
 
 **The Reality (doc 974, live Jul 16):**
-- Platform revenue: 17.42 SOL (~$1,308 USD cumulative)
-- Artist revenue: 9.05 SOL (~$680 USD cumulative)
+- Platform revenue: 17.44 SOL (~$1,314 USD cumulative)
+- Artist revenue: 9.07 SOL (~$683 USD cumulative)
 - Platform is 1.93x artist revenue (should be 0.2-0.5x if the product is artist-first)
 - Trader claims: 127.34 SOL (~$9,570 USD) — the largest redistribution, to winning traders
 

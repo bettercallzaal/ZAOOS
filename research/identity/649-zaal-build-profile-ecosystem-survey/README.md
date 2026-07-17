@@ -46,7 +46,7 @@ ZABAL  (Zaal's personal umbrella brand + token, launched Jan 1 2026 on Base)
   |     +-- ZAOOS  (the monorepo lab - everything prototypes here first)
   |     +-- ZAOstock 2026  (flagship event, Oct 3, Ellsworth ME - graduating to own repo)
   |     +-- ZAONEXUS  (14-brand ecosystem directory)
-  |     +-- ZOUNZ, zao-101, CoC Concertz, ZAO Fractals  (governance, 90+ wks)
+  |     +-- ZOUNZ, zao-101, CoC Concertz, ZAO Fractals  (governance, 100+ wks)
   |
   +-- Incubated projects  (community cofounders, ZAO backs)
         +-- WaveWarZ  (Solana music battles - cofounders Samantha + Hurric4n3ike)

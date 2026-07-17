@@ -684,7 +684,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | Ecosystem participants | 1,000+ (events, livestreams, online community, broader engagement) |
 | Newsletter editions | 400+ |
 | Paid newsletter supporters | 78 |
-| Fractal meetings completed | 90+ |
+| Fractal meetings completed | 100+ |
 | Founding members | 40 |
 | Active community members | 100+ |
 | LTAW3 seasons completed | 3 |

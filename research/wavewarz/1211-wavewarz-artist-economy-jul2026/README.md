@@ -31,40 +31,41 @@ Artists receive an automatic, on-chain payout when a battle settles.
 | Battle settled — winner side | ~3% of battle volume (0.5% trade fee + settlement bonus) |
 | Battle settled — loser side | ~1.5% of battle volume (0.5% trade fee only) |
 
-All-time platform artist payouts (wavewarz.info/api/public/stats, 2026-07-17):
-**9.07 SOL** (~$677 at $74.64/SOL) across 1,245 battles.
+All-time platform artist payouts (wavewarz.info/api/public/stats, 2026-07-17T17:15Z):
+**9.07 SOL** (~$683 at $75.29/SOL) across 1,245 battles.
 
 ---
 
 ## Estimated Earnings by Artist — Top 15
 
-Derived from `public/ww-battles.json`: 140 handle-tagged battles (of 1,245 total).
+Derived from `public/ww-battles.json` (1,108 battles, PR #175 branch): handle-tagged cross-artist battles.
 Formula: winner battles × vol × 0.03 + loser battles × vol × 0.015.
-Self-battles (same artist on both sides) excluded.
-Min 2 cross-artist battles to qualify.
+Self-battles (same artist on both sides) excluded. Min 2 cross-artist battles to qualify.
+Dataset refresh: 2026-07-17 (parser fix added 19 battles including the 1.87 SOL Luchador battle).
 
 | Rank | Artist (X handle) | W | L | Win% | Vol in (◎) | Est. Earnings (◎) |
 |------|-------------------|---|---|------|------------|-------------------|
-| 1 | GodclouD | 15 | 6 | 71.4% | 7.964 | 0.2069 |
-| 2 | CannonJones973 | 13 | 15 | 46.4% | 4.638 | 0.1207 |
-| 3 | BennyJ504WaveWarz | 14 | 13 | 51.9% | 3.960 | 0.0930 |
-| 4 | RoCkY2GriMeY | 9 | 27 | 25.0% | 4.918 | 0.0832 |
-| 5 | _0xQuan | 14 | 6 | 70.0% | 3.208 | 0.0695 |
-| 6 | luiwrites | 10 | 9 | 52.6% | 1.853 | 0.0493 |
-| 7 | Stormbourne | 14 | 15 | 48.3% | 1.788 | 0.0377 |
-| 8 | dopestilo | 11 | 8 | 57.9% | 1.588 | 0.0322 |
-| 9 | shawnsporter | 8 | 6 | 57.1% | 1.626 | 0.0318 |
-| 10 | Kata7yst | 2 | 3 | 40.0% | 1.403 | 0.0256 |
-| 11 | frameworkfortune | 1 | 3 | 25.0% | 1.402 | 0.0232 |
-| 12 | AporkALYPSE78 | 6 | 7 | 46.2% | 0.908 | 0.0210 |
-| 13 | srchappell | 3 | 5 | 37.5% | 0.710 | 0.0154 |
-| 14 | Hurric4n3Ike | 3 | 2 | 60.0% | 0.792 | 0.0133 |
-| 15 | PKMNCTO | 4 | 5 | 44.4% | 0.600 | 0.0126 |
+| 1 | GodclouD | 16 | 6 | 72.7% | 10.436 | 0.2579 |
+| 2 | CannonJones973 | 8 | 12 | 40.0% | 5.204 | 0.1241 |
+| 3 | RoCkY2GriMeY | 6 | 25 | 19.4% | 4.943 | 0.0813 |
+| 4 | geekmyth | 4 | 0 | 100.0% | 2.422 | 0.0727 |
+| 5 | _0xQuan | 13 | 5 | 72.2% | 2.880 | 0.0621 |
+| 6 | luiwrites | 4 | 3 | 57.1% | 1.309 | 0.0371 |
+| 7 | dopestilo | 9 | 5 | 64.3% | 1.561 | 0.0317 |
+| 8 | frameworkfortune | 2 | 3 | 40.0% | 1.584 | 0.0287 |
+| 9 | shawnsporter | 4 | 2 | 66.7% | 1.264 | 0.0236 |
+| 10 | Kata7yst | 1 | 4 | 20.0% | 1.286 | 0.0216 |
+| 11 | srchappell | 4 | 5 | 44.4% | 0.860 | 0.0199 |
+| 12 | Stormbourne | 6 | 7 | 46.2% | 0.969 | 0.0193 |
+| 13 | Hurric4n3Ike | 4 | 2 | 66.7% | 0.805 | 0.0137 |
+| 14 | PKMNCTO | 3 | 2 | 60.0% | 0.472 | 0.0101 |
+| 15 | AporkALYPSE78 | 1 | 4 | 20.0% | 0.278 | 0.0065 |
 
-**Total (handle-tagged battles only):** 0.886 ◎ estimated across 15 qualifying artists.
+**Total estimated earnings (qualifying artists):** ~0.83 ◎ from handle-tagged battles.
 
-**Note on coverage:** These 140 tagged battles are ~11% of all 1,245 WaveWarZ battles.
-The remaining 89% of battles have artists who have not been handle-matched yet.
+**Note on GodclouD:** 24 total appearances in the feed (including 2 self-battles excluded from this table). Cross-artist record: 22 battles (16W/6L). Volume figure (10.436 SOL) excludes self-battle volume. GodclouD's earnings lead is 2.1× the second-place artist.
+
+**Note on coverage:** Handle-tagged cross-artist battles are ~12% of all 1,245 WaveWarZ battles (live API).
 Total platform payouts = 9.07 ◎ (all battles). As handle tagging expands, per-artist
 earnings estimates will become more complete.
 
@@ -75,11 +76,11 @@ earnings estimates will become more complete.
 ### GodclouD: economic leader, not just win-rate leader
 
 GodclouD leads on *all three* economic dimensions:
-- **Highest estimated earnings:** 0.2069 ◎ (~$15.44 at Jul 2026 SOL price)
-- **Most volume in cross-artist battles:** 7.964 ◎ total SOL
-- **Highest win rate (15+ battles):** 71.4% (15W 6L)
+- **Highest estimated earnings:** 0.2579 ◎ (~$19.42 at $75.29/SOL)
+- **Most volume in cross-artist battles:** 10.436 ◎ total SOL (across 22 cross-artist battles)
+- **Highest win rate (5+ battles):** 72.7% (16W 6L, cross-artist; 24 total tagged appearances)
 
-GodclouD's earnings are roughly 1.7× the second-place artist (CannonJones973 at 0.1207 ◎).
+GodclouD's earnings are roughly 2.1× the second-place artist (CannonJones973 at 0.1241 ◎).
 This is the single most citable "WaveWarZ artist economic data point" for external use.
 
 ### Win rate and earnings diverge — volume is the real driver
@@ -115,9 +116,9 @@ All components derive from `public/ww-battles.json` — no runtime API calls.
 
 These statements can be verified directly from the on-chain battle record:
 
-1. **"GodclouD has earned an estimated 0.207 SOL from WaveWarZ battle participation — the most of any artist in the tagged battle record."**
-2. **"ZAO artists have received 9.07 SOL ($677) in automatic, on-chain payouts from WaveWarZ battles (all-time as of Jul 2026)."**
-3. **"WaveWarZ has run 1,245 on-chain battles across 15 months (May 2025 – Jul 2026), generating 524.37 SOL in total trading volume."**
+1. **"GodclouD has earned an estimated 0.258 SOL (~$19) from WaveWarZ battle participation — the most of any artist in the tagged battle record (22 cross-artist battles, 72.7% win rate, 10.44 SOL volume)."**
+2. **"ZAO artists have received 9.07 SOL ($683) in automatic, on-chain payouts from WaveWarZ battles (all-time as of Jul 2026)."**
+3. **"WaveWarZ has run 1,245 on-chain battles across 26 months (May 2025 – Jul 2026), generating 524.15 SOL in total trading volume."**
 4. **"Artists earn automatically at settlement — no claim required. The platform has issued 939 trader withdrawals (127.34 SOL) alongside artist payouts."**
 
 ---

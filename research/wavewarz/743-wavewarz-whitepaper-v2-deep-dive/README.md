@@ -26,7 +26,7 @@ tier: DISPATCH
 
 ## Executive Summary
 
-WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,245 production battles, 522 SOL of cumulative volume (July 2026), and live integration into seven external rails (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
+WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,245 production battles, 524.15 SOL of cumulative volume (July 2026), and live integration into seven external rails (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
 
 | Field | Value |
 |---|---|

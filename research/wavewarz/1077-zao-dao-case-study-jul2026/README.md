@@ -3,7 +3,7 @@ topic: wavewarz
 type: market-research
 status: research-complete
 last-validated: 2026-07-17
-related-docs: 974, 1075, 1076, 1211, 050, 051
+related-docs: 974, 1075, 1076, 1211, 1214, 050, 051
 original-query: "Synthesize The ZAO's DAO case study evidence into one citeable document: governance record + WaveWarZ traction + community impact (July 2026)"
 tier: STANDARD
 ---
@@ -122,6 +122,7 @@ Those gaps are growth targets, not disqualifiers. A case study is honest about b
 - `thezao.com` — governance record
 - `zaostock.com` — upcoming festival
 - `wavewarz.info/events` — charity + IRL event details
+- [Doc 1214](../1214-wavewarz-creative-ecosystem-jul2026/) — ZAO IP catalog: 921 songs, 34 artists, 17 rivalries, artist interviews (Jul 2026)
 - [Doc 974](../974-wavewarz-financials-snapshot-2026-07/) — WaveWarZ financials reconciliation (2026-07-16)
 - [Doc 1075](../1075-wavewarz-growth/) — growth plays and current state (2026-07-13)
 - [Doc 1076](../1076-wavewarz-estate-audit/) — estate audit (2026-07-16)

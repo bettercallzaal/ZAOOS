@@ -52,6 +52,7 @@ import { runPingLifecycleTick } from './ping-lifecycle';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 import { getOpenTeamTasks } from './team-tracker';
 import { buildVetoKeyboard, type VetoTask } from './brief-veto';
+import { postBriefToDiscord } from './discord-webhook';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -142,6 +143,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             await opts.bot.api.sendMessage(opts.zaalTgId, brief, sendOpts);
           }
           console.log('[zoe/scheduler] morning brief sent (cockpit)' + (vetoKeyboard?.inline_keyboard.length ? ' + veto keyboard' : ''));
+          // Mirror to Discord #zao-status if DISCORD_WEBHOOK_STATUS is set (doc 1135 Stage 1a).
+          postBriefToDiscord(brief).catch((err) =>
+            console.warn('[zoe/scheduler] discord webhook failed (non-fatal):', (err as Error).message),
+          );
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);

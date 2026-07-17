@@ -2,6 +2,7 @@
 
 **Tier:** STANDARD
 **Date:** 2026-07-17
+**Last-updated:** 2026-07-17 (ww loop: added Fractal count calculation, WaveWarZ live stats, PolyRaiders dates + HuRya beneficiary count — all verified from public sources)
 **Status:** Living ledger (verified facts + open provenance gaps)
 **Owner:** builder loop (verified rows), Zaal (pin the canonical membership definition)
 
@@ -32,6 +33,18 @@ it's a claim that they are **currently un-citable**, which is a fixable liabilit
 | `/zao` Farcaster channel followers | **93** | Warpcast public API `channel?channelId=zao` | this doc |
 | `/zao` Farcaster channel members (role) | **4** | same | this doc |
 | `/zao` channel created | **2024-09-03** | same (`createdAt` 1725405513) | this doc |
+| Fractal start date | **2024-07-30** | ZAOOS public record (community.config.ts, doc 622, dossier 742) | 1077 |
+| Fractal weeks elapsed (as of 2026-07-16) | **≥102** (calculation) | (2026-07-16 − 2024-07-30) = 716 days ÷ 7 = 102.3 complete weeks | this doc |
+| Fractal weeks — conservative public claim | **"100+"** | date-calculation lower bound; no skipped-week proof available from public data | this doc |
+| WaveWarZ lifetime volume | **522 SOL (~$39K)** | `wavewarz.info/api/public/stats`, live 2026-07-16 | [974](../974-wavewarz-financials-snapshot-2026-07/), [1077](../1077-zao-dao-case-study-jul2026/) |
+| WaveWarZ total battles | **1,245** | same live API | 974, 1077 |
+| WaveWarZ artist payouts | **9.05 SOL** | same | 974 |
+| WaveWarZ platform revenue | **17.42 SOL** | same | 974 |
+| WaveWarZ trader claims | **127.34 SOL** | same | 974 |
+| PolyRaiders Holiday Heat (benefit battle) | **Dec 12, 2024 · ~$270** | wavewarz.info/events (canonical) + tweet 1999858390567117201 snowflake → 2025-12-13 (anniversary recap, not the event date) | [1077](../1077-zao-dao-case-study-jul2026/) |
+| Love Song Benefit battle | **Feb 13, 2025 · ~$1,221** | wavewarz.info/events | 1077 |
+| Charity total (2 rounds) | **~$1,497 to HuRya Empowerment Foundation** | wavewarz.info/events | 1077 |
+| HuRya beneficiaries | **8,500+** (4,000+ girls sanitary pads + 4,500+ children school supplies) | wavewarz.info/events | 1077 |
 
 Verify the Farcaster row:
 
@@ -45,9 +58,9 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 | Cited number | Where it appears | Why it's currently un-citable |
 |--------------|------------------|-------------------------------|
 | **"188 members on Base"** | `CLAUDE.md`, docs 625, 449, 530, 622, 1078, 742 (7+) | The nearest **public** proxy — the `/zao` channel — shows **93 followers / 4 members**, nowhere near 188. So "188" measures something else (most likely the gated Farcaster client's registered users in Supabase, which is not publicly verifiable). Its **definition** ("member" = app-registered? Respect-holder? channel-follower? Discord?) and **as-of date** are unpinned. This is THE most-repeated ZAO headline number and the least traceable. |
-| Fractal weeks: "90+" / "100+" / "ninety consecutive" | whitepaper 942, ICM box, dossier 742, doc 622 | Varies by doc (90 vs 100+). Needs the canonical meeting count — the Fractal/Respect Game record (Optimystics respectgame or the on-chain OREC history). |
-| WaveWarZ battles: "735" / "958" / "416" | dossier 742 (735), COC lesson (958), old scraper (416) | Known scraper drift (COC lesson: scraper was 5× off). The **ww loop owns reconciliation** (ref PRs #1609 / doc 974) — this ledger defers to it; do not re-derive here. |
-| "$60K+ traded" (WaveWarZ) | dossier 742 | Needs the settlement/volume source; ww-loop lane. |
+| ~~Fractal weeks: "90+" / "100+"~~ → **PARTIALLY RESOLVED** | whitepaper 942, ICM box, dossier 742, doc 622 | Date calculation: start 2024-07-30, as of 2026-07-16 = 102 weeks. Use "100+" as the conservative verified claim. Remaining gap: no public on-chain proof that zero weeks were skipped (OREC/ZOR public RPC queries are block-range-limited; Supabase fractals table is gated). Until the OREC transaction count is verified, treat "100+" as math-backed but not chain-verified. |
+| ~~WaveWarZ battles: "735" / "958" / "416"~~ → **RESOLVED** | dossier 742 (735), COC lesson (958), old scraper (416) | **Canonical: 1,245 battles** (live API 2026-07-16). Scraper-era numbers are obsolete. Source: doc 974. |
+| ~~"$60K+ traded"~~ → **PARTIALLY RESOLVED** | dossier 742 | Live volume: 522 SOL (~$39K at $75/SOL, 2026-07-16). The "$60K+" claim was likely from a higher SOL price period (SOL was ~$120–150 in early 2025). Doc 974 reconciles this: the claim is plausible historically but shouldn't be cited at current prices without qualification. |
 | ~~"34 PRs/week"~~ → **resolved** | doc 449 one-pager | **VERIFIED, see [doc 1203](../1203-zaoos-build-velocity/):** "34/week" was the human-era baseline (W12–W15, ~30/week product code). Now 60–175+/week total but **50–73% is agent docs/tests automation**; product (feat/fix) velocity is stable ~30/week. Quote total only with the automation caveat. |
 
 ## Recommendation (single source, same discipline as GEO llms.txt + Respect facts)

@@ -357,6 +357,62 @@ This campaign config operationalizes that:
 
 ---
 
+## Part 7: Pilot ZERO - the on-chain 0xSplits recipient config + dynamic leaderboard reallocation
+
+> Added 2026-07-17 for the `boostr-sparkz-campaign` board task: "split 25% Zaal wallet / 25% cashlessman wallet / 50% to the leaderboard people (currently Zaal + cashlessman). Prep the 0xSplits config + how leaderboard-share updates as the board grows." **Design-only - nothing deploys without Zaal, and the exact split awaits the m-boostr confirmation.**
+
+### Two different 25/25/50s - do not confuse them
+
+- **The reward model** (Parts 1-4 above): how *campaign participants* earn - 25% booster / 25% builder / 50% shared pool. This governs payouts to the people who boost and build.
+- **Pilot ZERO's revenue split** (this Part): where the *pilot's own proceeds/fees* route on-chain, via one 0xSplits contract - 25% Zaal / 25% cashlessman / 50% to the current leaderboard members. This is the "founders + the crew that showed up" split for the very first live run.
+
+They are two layers of the same campaign; this Part specifies only the second (the on-chain contract), which the board task asks for and which Parts 1-6 do not cover.
+
+### The recipient config
+
+One 0xSplits v2 contract on the campaign's chain (Boostr settles USDC on Arbitrum - confirm the Split lives on the same chain as settlement). Wallets are placeholders here; the real addresses are filled at deploy time (gated), never invented in this doc:
+
+| Recipient | Share | Notes |
+|-----------|-------|-------|
+| `<ZAAL_WALLET>` | 25% (fixed) | founder |
+| `<CASHLESSMAN_WALLET>` | 25% (fixed) | Boostr operator / co-founder |
+| Leaderboard pool | 50% | sub-divided among the *current* leaderboard members (see below) |
+
+### How the 50% leaderboard bucket sub-divides (the dynamic part)
+
+0xSplits has no notion of "a bucket" - every recipient is a flat address+percentage row summing to 100. So the 50% is *materialized* into per-member rows at config time:
+
+- **N leaderboard members** -> each gets `50 / N` percent, then those rows are concatenated with the two fixed 25% rows.
+- **Today (N = 2, Zaal + cashlessman):** the 50% splits 25/25, so the flattened Split is Zaal `25 + 25 = 50%`, cashlessman `25 + 25 = 50%`. (Decision D1 below: whether founders who are *also* on the leaderboard double-dip or are excluded from the 50% bucket.)
+- **As the board grows (N = 5):** each leaderboard member gets `50 / 5 = 10%`; the flattened Split becomes Zaal 25 + share, cashlessman 25 + share, plus the three new members at 10% each. Precision: 0xSplits v2 allows up to 4 decimals, so `50 / 3 = 16.6667%` is representable; assign the rounding remainder deterministically to row 1 so the rows always sum to exactly 100.
+- **Equal vs energy-weighted:** equal (`50/N`) is the simple default. The Sparkz-aligned option is to weight the 50% by each member's `energy_score` (the same leaderboard metric defined in Part 2), so the crew that generated the most energy earns proportionally more. Recommend shipping equal for pilot ZERO (legible, uncontroversial) and moving to energy-weighted once the leaderboard has real spread.
+
+### Updating on-chain as the board grows
+
+This is exactly the mutable-controller mechanic from the [Sparkz Music Collabs draft](../../../papers/drafts/sparkz-music-collabs.md) - a growing recipient set requires a **mutable** Split:
+
+- Deploy the Split with a **controller** (NOT the zero address, which would make it immutable). Controller = Zaal's wallet or a ZAO-operated multisig.
+- On each **reallocation trigger** (recommend: once per settlement period, aligned to the campaign's `daily-settlement` / weekly cadence in Part 2), recompute the flattened recipient list from the current leaderboard and, if it changed, the controller updates the Split - no redeploy, no new token, the same contract address keeps receiving.
+- Between updates the Split is static; membership changes take effect at the next scheduled update, not instantly - which is the desired behavior (a stable per-period payout, not a per-block churn).
+
+### Guardrails specific to this split
+
+- **Every recipient must have a resolvable wallet** before an update; a leaderboard member with no wallet is held out of that period's Split (surfaced, not silently dropped), same rule as the collab draft.
+- **Min share floor:** as N grows, `50/N` shrinks; below a floor (e.g. a member's slice < 0.5%) either cap N per period (top-K leaderboard members share the 50%) or raise the floor - decide before dust-sized rows appear. Cap-to-top-K is the cleaner answer and reinforces "leaderboard = the crew that showed up most."
+- **Double-dip decision (D1):** Zaal and cashlessman are both fixed 25% recipients AND currently the entire leaderboard. Decide whether founders are *excluded* from the 50% bucket (so the 50% only ever rewards non-founder crew) or *included* (they double-dip until others climb the board). Excluding founders from the 50% is the more defensible "crew framing" choice and avoids the optics of founders taking 100% at N = 2.
+
+### Open decisions for Zaal (this Part)
+
+1. **Confirm the split** via the m-boostr TG question (per the board task) - is it 25/25/50, and does the 50% exclude the two founders?
+2. **Chain** - same chain as Boostr USDC settlement (Arbitrum) for the Split?
+3. **Controller** - Zaal's wallet or a ZAO multisig (the multisig is safer; a lost controller key freezes future reallocations)?
+4. **Weighting + cap** - equal `50/N` with a top-K cap for pilot ZERO, energy-weighted later?
+5. **Reallocation cadence** - per settlement period (recommended) vs on-demand.
+
+Nothing here deploys, funds, or moves on-chain value; those remain Zaal's hand.
+
+---
+
 ## Sources
 
 - [Doc 1132 - Zooster: Boostr/ZABAL Auto-Like Leaderboard](../1132-zooster-boostr-zabal-leaderboard/) [FULL] - guardrails, promo drafts, Clawdchat incident, 31-contributor live data

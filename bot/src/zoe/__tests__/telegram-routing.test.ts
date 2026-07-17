@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { sendToZaal, constructRoutingDeps, type TelegramRoutingDeps } from '../telegram-routing';
+import { sendToZaal, constructRoutingDeps, decideSendKind, type TelegramRoutingDeps } from '../telegram-routing';
 
 describe('telegram-routing', () => {
   describe('sendToZaal routing', () => {
@@ -83,6 +83,42 @@ describe('telegram-routing', () => {
       await sendToZaal(deps, 'What do you think?', { kind: 'question' });
 
       expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?');
+    });
+  });
+
+  describe('decideSendKind', () => {
+    it('routes task-nudge to group status', () => {
+      expect(decideSendKind('task-nudge')).toBe('status');
+    });
+
+    it('routes thread-nudge to DM question', () => {
+      expect(decideSendKind('thread-nudge')).toBe('question');
+    });
+
+    it('routes thread-decision to DM question', () => {
+      expect(decideSendKind('thread-decision')).toBe('question');
+    });
+
+    it('routes inactivity to DM question', () => {
+      expect(decideSendKind('inactivity')).toBe('question');
+    });
+
+    it('routes calendar to DM question', () => {
+      expect(decideSendKind('calendar')).toBe('question');
+    });
+
+    it('routes github-event to DM question', () => {
+      expect(decideSendKind('github-event')).toBe('question');
+    });
+
+    it('routes graph-event to DM question', () => {
+      expect(decideSendKind('graph-event')).toBe('question');
+    });
+
+    it('defaults unknown kinds to DM question', () => {
+      expect(decideSendKind('unknown-kind')).toBe('question');
+      expect(decideSendKind(null)).toBe('question');
+      expect(decideSendKind(undefined)).toBe('question');
     });
   });
 

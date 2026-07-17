@@ -49,7 +49,7 @@ import { runMentionNotify } from './task-mention-notify';
 import { runTaskTeammateAck, readPendingReplies, removePendingReply } from './task-teammate-ack';
 import { runCuratorTick } from './curator';
 import { runPingLifecycleTick } from './ping-lifecycle';
-import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
+import { sendToZaal as sendToZaalRouted, constructRoutingDeps, decideSendKind, type SendToZaalOptions } from './telegram-routing';
 import { getOpenTeamTasks } from './team-tracker';
 import { buildVetoKeyboard, type VetoTask } from './brief-veto';
 
@@ -454,9 +454,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         try {
           const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
-          // Nudges and reasoning decisions are status messages
+          // Route based on whether the decision needs Zaal's reply (DM) or is informational (group).
+          // task-nudge is a forward-looking status; everything else (thread-nudge, thread-decision,
+          // inactivity, calendar, self-throttle) is an interactive question that belongs in DM.
+          const decisionKind =
+            decision.reason === 'self-throttle-notice'
+              ? ('question' as const)
+              : decideSendKind(decision.candidate?.kind);
           if (opts.routingDeps) {
-            await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' });
+            await sendToZaalRouted(opts.routingDeps, decision.message, { kind: decisionKind });
           } else {
             await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
           }

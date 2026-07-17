@@ -1,10 +1,15 @@
 /**
  * telegram-routing.ts - centralized routing rule for ZOE Telegram messages.
  *
- * THE RULE (Zaal 2026-07-15): ZOE should DM Zaal ONLY for QUESTIONS
- * that need his answer/decision. EVERYTHING ELSE (status updates,
+ * THE RULE (Zaal 2026-07-15, reinforced 2026-07-16): ZOE should DM Zaal ONLY
+ * for QUESTIONS that need his answer/decision. EVERYTHING ELSE (status updates,
  * comment-acks, digests, morning brief, PR-landed pings, board changes,
  * general info) goes to the ZAALBOTS GROUP, not a DM.
+ *
+ * NO CROSS-CHANNEL REFERENCES: group messages must never say "check your DM"
+ * or "N questions in your DM". Each channel is self-contained. Use decideSendKind()
+ * when classifying proactive/scheduler messages — it encodes the routing intent
+ * so the rule doesn't drift across callers.
  *
  * This centralizes the decision: sendToZaal(text, {kind}) routes based
  * on kind. All message sends flow through this helper.
@@ -69,6 +74,17 @@ export async function sendToZaal(
 }
 
 /**
+ * Map a proactive candidate kind (from proactive.ts) to the correct channel kind.
+ *
+ * task-nudge is forward-looking and informational → group status.
+ * Everything else (thread-nudge, thread-decision, inactivity, calendar, github-event,
+ * graph-event) is an interactive question that needs Zaal's reply → DM question.
+ */
+export function decideSendKind(candidateKind: string | null | undefined): MessageKind {
+  return candidateKind === 'task-nudge' ? 'status' : 'question';
+}
+
+/**
  * Construct routing dependencies from environment + bot instance.
  * Reads: ZAAL_TELEGRAM_ID, ZAALBOTS_GROUP_CHAT_ID, ZAALBOTS_STATUS_THREAD_ID.
  *
@@ -86,8 +102,9 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
   }
 
   const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
-  const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
-  if (groupIdRaw && Number.isNaN(groupId)) {
+  const groupIdParsed = groupIdRaw ? Number(groupIdRaw) : undefined;
+  const groupId = groupIdParsed !== undefined && Number.isNaN(groupIdParsed) ? undefined : groupIdParsed;
+  if (groupIdRaw && Number.isNaN(groupIdParsed)) {
     console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
   }
 

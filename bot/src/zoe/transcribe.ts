@@ -7,7 +7,32 @@
 // Setup: add GROQ_API_KEY to bot/.env (free key from console.groq.com).
 // Optional GROQ_WHISPER_MODEL (default whisper-large-v3-turbo).
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+
+interface VoiceGlossary {
+  whisperPrompt: string;
+  corrections: Record<string, string>;
+}
+
+function loadGlossary(): VoiceGlossary | null {
+  try {
+    const p = join(__dirname, '../../../../research/reference/zao-voice-glossary.json');
+    return JSON.parse(readFileSync(p, 'utf8')) as VoiceGlossary;
+  } catch {
+    return null;
+  }
+}
+
+function applyCorrections(text: string, corrections: Record<string, string>): string {
+  let out = text;
+  for (const [wrong, right] of Object.entries(corrections)) {
+    out = out.replace(new RegExp(wrong, 'gi'), right);
+  }
+  return out;
+}
 
 export function transcriptionConfigured(): boolean {
   return !!process.env.GROQ_API_KEY;
@@ -21,11 +46,15 @@ export async function transcribeAudio(
   const key = process.env.GROQ_API_KEY;
   if (!key) throw new Error('GROQ_API_KEY not configured');
   const model = process.env.GROQ_WHISPER_MODEL || 'whisper-large-v3-turbo';
+  const glossary = loadGlossary();
 
   const form = new FormData();
   form.append('file', new Blob([bytes as BlobPart]), filename);
   form.append('model', model);
   form.append('response_format', 'text');
+  if (glossary?.whisperPrompt) {
+    form.append('prompt', glossary.whisperPrompt);
+  }
 
   const res = await fetch(GROQ_URL, {
     method: 'POST',
@@ -37,7 +66,8 @@ export async function transcribeAudio(
     const detail = await res.text().catch(() => '');
     throw new Error(`groq transcription ${res.status}: ${detail.slice(0, 200)}`);
   }
-  return (await res.text()).trim();
+  const raw = (await res.text()).trim();
+  return glossary?.corrections ? applyCorrections(raw, glossary.corrections) : raw;
 }
 
 /** Download a Telegram file (voice/audio) by file_id and transcribe it. */

@@ -304,50 +304,33 @@ export async function handleReplyRoute(
   }
 
   try {
-    const context = await getMessageContext(replyToId);
+    const context = (await getMessageContext(replyToId)) || deps.messageIdToContext.get(replyToId);
     if (!context) {
       return { handled: false };
     }
 
     if (context.qid) {
-      // Thread to question
       const logText = `[answer:${context.qid}] ${text}`;
       try {
         await pushRecent(
           { from: 'zaal', text: logText, sender: 'reply-thread' },
-          String(ctx.chat.id),
+          String(ctx.chat?.id),
         );
       } catch {
-        // continue
+        // best effort
       }
       return { handled: true, contextType: 'question', id: context.qid };
+    }
+
     if (context.taskId) {
-      // Thread to task
-      const logText = `[task-reply:${context.taskId}] ${text}`;
       return { handled: true, contextType: 'task', id: context.taskId };
+    }
+
     return { handled: false };
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
     return { handled: false, error: errMsg };
   }
-  const context = deps.messageIdToContext.get(replyToId);
-  if (!context) {
-  if (context.qid) {
-    // Thread to question
-    const logText = `[answer:${context.qid}] ${text}`;
-    try {
-      await pushRecent(
-        { from: 'zaal', text: logText, sender: 'reply-thread' },
-        String(ctx.chat.id),
-      );
-    } catch {
-      // continue
-    return { handled: true, contextType: 'question', id: context.qid };
-  if (context.taskId) {
-    // Thread to task
-    const logText = `[task-reply:${context.taskId}] ${text}`;
-    return { handled: true, contextType: 'task', id: context.taskId };
-  return { handled: false };
 }
 
 // Feature 5: BOT COMMANDS (/pulse /agenda /list)

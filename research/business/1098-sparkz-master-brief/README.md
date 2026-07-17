@@ -35,7 +35,14 @@ tier: DEEP
 2. **Launch the Clanker token with that Splits contract as the SOLE fee recipient** (`rewardBps` -> 100% to the Splits address).
 3. Clanker's immutable `rewardBps` now points at a **mutable** Splits contract, so the creator re-balances the real split anytime via the Splits controller - add a collaborator, shift the treasury cut, fix an error - with no token redeploy and no lost adjustability.
 
-So 0xSplits is **non-optional**: with immutable Clanker rewardBps, routing through Splits is the *only* way to keep the split configurable, which is the product.
+So 0xSplits is **non-optional** *when the split must change*: with immutable Clanker rewardBps, routing through Splits is the only way to keep the split re-balanceable, which is the product.
+
+**Refinement (from the doc 1094b Clanker v4 review, 2026-07-17) - make it a decision, not a blanket rule.** Clanker v4 natively supports **up to 7 reward recipients** at deploy, and each recipient's admin can change *its own wallet* later - but the **percentages are immutable** (they are fixed at deploy and must sum to 100%). So:
+
+- **Fixed split, <= 7 recipients, only wallet swaps expected** -> use Clanker's **native** recipients. Simpler, one contract, no Splits. You can still repoint a recipient's wallet.
+- **The split must change** - re-balance %, add/remove a collaborator, or a *growing* recipient set (the leaderboard/boostr case, or a band that gains members) -> **0xSplits-first**, because Clanker cannot change the % or the recipient count after deploy.
+
+Default the Sparkz wizard to 0xSplits-first (it is always safe and the product is *configurable* coins), but let a creator who knows their split is fixed and small pick the lighter native path. Note: **Clanker v5 is not live yet** (in audit; expected to adopt Base's B20 token standard) - re-verify these mechanics when it ships (doc 988's zaalcaster launch is gated on v5 timing).
 
 **What this changes:**
 - The MVP's "Clanker launch flow" becomes a **Splits-first Clanker launch flow** - deploy Splits (step 1), then launch the token pointing at it. Not an afterthought.

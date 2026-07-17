@@ -130,7 +130,7 @@ tier: DEEP
 | Community | Chain | Est. Members | Cadence | Status | Highlights |
 |-----------|-------|--------------|---------|--------|------------|
 | **Eden Fractal** | Base | 40-80 | Bi-weekly (Thu 17 UTC) | ACTIVE | Epoch 2 full deployment; 133+ events |
-| **ZAO Fractal** | Optimism | ~40 | Weekly (Mon 6pm EST) | ACTIVE | Only music-focused fractal; 90+ sessions |
+| **ZAO Fractal** | Optimism | ~40 | Weekly (Mon 6pm EST) | ACTIVE | Only music-focused fractal; 100+ sessions |
 | **Roy Fractal** | EOS | 700+ | Regular | ACTIVE | Largest by participant count; governance |
 | **Fractal Hispano** | EOS | 30+ | Regular | ACTIVE | Spanish-speaking governance |
 | **Alien Worlds Fractal** | WAX/EOS | ~10 avg | Weekly | ACTIVE | Gaming/metaverse use case |
@@ -325,7 +325,7 @@ Explicitly designed for "ranking speeches and musical performances" - this is th
 
 - **No music-specific fractal app UI** - only generic Fractalgram available
 - **No audio playback integration** in breakout room UI
-- **No fractal community focused on music** - ZAO is the first (40 members, 90+ sessions)
+- **No fractal community focused on music** - ZAO is the first (40 members, 100+ sessions)
 - **No "taste model" + fractal consensus hybrid** - Botto has AI taste ranking (non-fractal); fractal communities use peer voting (non-AI)
 - **No Competition App public launch yet** - in development; expected 2026-2027
 - **No cross-chain Respect aggregation** - ZAO (OP Mainnet) + Eden (Base) earn separate Respect tokens; merger possible via Higher-Order Fractals (roadmap)
@@ -370,7 +370,7 @@ Explicitly designed for "ranking speeches and musical performances" - this is th
 |--------|-----------|--------------|--------------------------|
 | **Age** | ~1 year (2024-) | 4 years (2022-) | 1.5 years (2023-2026) |
 | **Member Count** | ~40 | 40-80 | ~65 (peaked) |
-| **Events Held** | 90+ | 133+ | 60 |
+| **Events Held** | 100+ | 133+ | 60 |
 | **Chain** | OP Mainnet | Base | OP Mainnet |
 | **ORDAO Status** | Ready (not yet used) | Active (Epoch 2) | Active (300+ proposals executed) |
 | **Primary Focus** | Music + artist reputation | Governance innovation + education | Public goods funding (Optimism ecosystem) |

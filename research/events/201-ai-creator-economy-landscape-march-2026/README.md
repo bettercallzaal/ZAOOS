@@ -29,7 +29,7 @@
 
 | Dimension | Botto (AI Art DAO) | ZAO OS (Music Community) | Audius (Music Streaming) | Sound.xyz (Music NFTs) |
 |-----------|-------------------|-------------------------|------------------------|----------------------|
-| **Governance** | BottoDAO, 28,000 members vote weekly on 350 AI-generated works | Respect-weighted voting, 100 members, fractal process (90+ weeks running) | $AUDIO token governance, 7M+ users | Artist-controlled drops, collector governance |
+| **Governance** | BottoDAO, 28,000 members vote weekly on 350 AI-generated works | Respect-weighted voting, 100 members, fractal process (100+ weeks running) | $AUDIO token governance, 7M+ users | Artist-controlled drops, collector governance |
 | **AI Role** | AI generates all art, humans curate via voting | AI moderation (`src/lib/moderation/`), curation weights, planned AI agent | Recommendation algorithms | None significant |
 | **Revenue Model** | NFT sales ($6M+ total), minimum $12,000/piece at Art Basel HK | Community-funded, no token yet | Streaming + $AUDIO token | Primary sales + secondary royalties |
 | **Identity** | Ethereum wallet + DAO token | Farcaster + wallet + Respect score | Ethereum wallet + $AUDIO | Ethereum wallet + collector badges |

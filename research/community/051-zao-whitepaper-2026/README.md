@@ -526,7 +526,7 @@ Live on-chain data, embedded music players, real-time member count, "join" CTA â
 ### Universal Strengths
 
 1. Graveyard section is the strongest part (all four praised it)
-2. 90+ meetings / 400+ newsletters = real credibility
+2. 100+ meetings / 400+ newsletters = real credibility
 3. Founder story is authentic
 4. "Your First Week" section is the best-written part
 5. WaveWarZ is genuinely interesting to every audience

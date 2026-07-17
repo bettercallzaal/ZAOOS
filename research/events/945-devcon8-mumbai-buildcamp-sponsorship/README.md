@@ -77,8 +77,8 @@ Lead with these; every one traces to a doc or live fetch:
 | Public GitHub repos, all top projects pushed within last 7 days | 88 | gh api users/bettercallzaal (FULL) |
 | ZAO members onchain (Base) | 188 | Doc 742 |
 | Broader ecosystem participants | 1,000+ | Doc 050/051 |
-| Consecutive weekly Respect Game governance | 90+ weeks | Doc 742/050 |
-| WaveWarZ live battles / volume | 735 battles, $50-60K+, 472.71 SOL | Doc 742/051 |
+| Consecutive weekly Respect Game governance | 100+ weeks | Doc 742/050 |
+| WaveWarZ live battles / volume | 1,245 battles, ~$39K, 522 SOL | Doc 742/051 (2026-07-17) |
 | COC Concertz consecutive weekly shows | 150+ | Doc 050/352 |
 | IRL festivals produced | ZAO-PALOOZA (12 artists, NFT NYC), ZAO-CHELLA (10 artists, Art Basel), ZAO-PROS (ETH Denver), ZAOstock Oct 3 2026 | Doc 742/270 |
 | Newsletter editions / paid supporters | 400+ / 78 | Doc 742/051 |

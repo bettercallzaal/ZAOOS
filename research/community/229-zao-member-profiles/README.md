@@ -503,7 +503,7 @@ Swarthy Hatter's defining role is **bridging multiple fractal communities**:
 |-----------|---------|--------|-----------|
 | **Eden Fractal** | 2022 (by Dan Singjoy) | 110+ events | Original fractal model |
 | **Optimism Fractal** | 2023 | Weekly events | Shared Respect Game tooling |
-| **ZAO Fractal** | 2023 (by Zaal) | 90+ events | Music/artist focus; Monday 6 PM EST |
+| **ZAO Fractal** | 2024 (by Zaal) | 100+ events | Music/artist focus; Monday 6 PM EST |
 
 Honored as a builder in the Optimism Fractal community alongside Tadas, Vlad, and Zaal.
 

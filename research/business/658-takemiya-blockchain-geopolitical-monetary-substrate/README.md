@@ -84,7 +84,7 @@ The frame to steal for ZAO pitches: **"Infrastructure becomes valuable when the 
 
 Takemiya's "yesterday's piece" (also paywalled) was about **building while invisible**. The case Soramitsu makes: they built Iroha + shipped Bakong before "CBDC" was a press category. By the time the press caught up, they were the default vendor.
 
-**ZAO parallel:** the long-running fractal process (90+ weeks Mondays 6pm EST), the 656-doc research library, ZOE on VPS, Hermes pipeline, ZAOstock infrastructure — these are all stealth-building moves. The Cassie validation (Doc 547) was the moment the outside started catching up.
+**ZAO parallel:** the long-running fractal process (100+ weeks Mondays 6pm EST), the 656-doc research library, ZOE on VPS, Hermes pipeline, ZAOstock infrastructure — these are all stealth-building moves. The Cassie validation (Doc 547) was the moment the outside started catching up.
 
 **Action implication:** don't pivot to chase visibility (the "ship and use, not meta" feedback from May 5). Keep building infrastructure, let the world catch up.
 

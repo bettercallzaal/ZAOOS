@@ -26,7 +26,7 @@ tier: STANDARD
 | **Drop /founders + /art generic channels** | SKIP foundercheck's channel picks. Doc 432: "music first, don't lead with crypto." Target **/music, /sounds, /base, /rcrdshp, /spinamp** + artist-led casters, not founder hangouts. |
 | **Rewire the validation experiment** | REPLACE "post 5x in /founders asking about distribution struggle" with **10 structured 1:1 convos in a week**: 5 existing ZAO members (supply-side validation) + 5 Maine indie artists via ZAO Stock pipeline (demand-side validation). Target: pattern on **one** distribution bottleneck, not generic pain. |
 | **Re-score against correct ICP** | Re-run foundercheck in session 2 with ICP = "independent musician releasing monthly, no label, 100-10,000 monthly listeners." Predicted lift: pain_severity 4->7, customer_clarity 4->8, channel 5->7 (music channels + Maine events + fractal already accessible), conversion 4->6 (crypto skepticism persists). Target viability >5.5 to unblock. |
-| **Willingness-to-pay evidence** | INVESTIGATE actual ZAO Respect + ZABAL activity + fractal attendance as revealed-preference evidence. 90+ fractal meetings, 188 members already paid in time. Foundercheck flagged WTP as "inferred" — we have real data, we just haven't used it. |
+| **Willingness-to-pay evidence** | INVESTIGATE actual ZAO Respect + ZABAL activity + fractal attendance as revealed-preference evidence. 100+ fractal meetings, 188 members already paid in time. Foundercheck flagged WTP as "inferred" — we have real data, we just haven't used it. |
 | **Re-anchor the 48h/week/month plan** | REPLACE foundercheck's generic 48h list with the 10-convo script below + doc 470's default-flip ships + ZAO Stock artist pipeline work already in-flight. |
 
 ---

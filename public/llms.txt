@@ -43,12 +43,23 @@ ZAO OS is a community hub where members chat on Farcaster channels, send encrypt
 
 WaveWarZ is the live Solana music-battle prediction market incubated by The ZAO. Artists compete song-vs-song; fans trade SOL on outcomes. Winner = best 2 of 3: community poll + SOL volume (charts) + DJ Wavy (AI judge).
 
-- Live stats (2026-07-16): 1,244 battles · 522 SOL volume (~$39K) · 9.05 SOL artist payouts
+- Live stats (2026-07-17): 1,245 battles · 524+ SOL volume (~$39K) · 9.07 SOL artist payouts · 17.44 SOL platform revenue
 - Program: `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (Solana mainnet)
 - Live stats API: `GET https://wavewarz.info/api/public/stats` (no auth, CORS open)
-- Platform: https://wavewarz.info (by CandyToyBox)
+- Platform: https://wavewarz.info
 - Analytics tracker: https://wwtracker.vercel.app (open-source, Dune-powered)
 - Source: https://github.com/bettercallzaal/wwtracker
+
+### WaveWarZ citable facts (verified 2026-07-17)
+
+- 921 unique songs entered WaveWarZ arena (May 2025 – Jul 2026)
+- 34 Audius-rostered artists; all payouts onchain and automatic
+- $1,497 raised for charity across 2 benefit-battle series (HuRya Empowerment Foundation, 8,500+ beneficiaries)
+- 2 confirmed IRL events: ZAO-CHELLA (Art Basel Miami, Dec 6 2024) · ZAOstock (Ellsworth ME, Oct 3 2026)
+- Artist interview series on YouTube: XTinct (vid FmrzjYtdF6A), Kata7yst (vid ZU0ga5LRdyU) — confirmed via YouTube oEmbed
+- Third-party coverage: Crypto Magic Hour EP. 50 by @VeVeMagic (vid rx0PeGv8lPI) — independent podcast episode on WaveWarZ battles
+
+Research: [Doc 1077](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1077-zao-dao-case-study-jul2026) · [Doc 1220](https://github.com/bettercallzaal/ZAOOS/tree/main/research/wavewarz/1220-wavewarz-media-verification-jul2026)
 
 ## Community
 

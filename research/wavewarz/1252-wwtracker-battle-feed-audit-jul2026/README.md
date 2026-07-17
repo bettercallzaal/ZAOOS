@@ -37,6 +37,8 @@ The 19 new battles span Jul 15–17, 2026. One (the Luchador battle) was due to 
 
 ## July 2026 Weekly Peak: Jul 10–17
 
+> **Correction (added 2026-07-17):** The original version of this doc described Jul 10–17 as "the highest-recorded weekly battle volume in WaveWarZ history." That claim was incorrect. A full weekly trend analysis (see [doc 1253](../1253-wavewarz-weekly-battle-trend-2025-2026/)) shows the all-time battle count peak was the ISO week of **Mar 9–15, 2026 (55 battles)** and the all-time SOL volume peak was **Mar 2–8, 2026 (52.96 SOL)**. Jul 10–17 is correctly described as the **most active 7-day period in Q3 2026** and the highest since mid-April 2026.
+
 | Metric | Value |
 |---|---|
 | Battles | 42 |
@@ -48,7 +50,7 @@ The 19 new battles span Jul 15–17, 2026. One (the Luchador battle) was due to 
 | Closest battle | Easy To Love vs Hypnotic — 4% margin (Jul 17) |
 | Most active artist | GodclouD (9 battles), _0xQuan (8), BennyJ504WaveWarz (7) |
 
-**Significance:** 42 battles / 9.45 SOL in 7 days = average of 6 battles per day and 1.35 SOL/day. At $75.29/SOL, this translates to ~$102/day in trading volume during the week.
+**Significance:** 42 battles / 9.45 SOL in 7 days = average of 6 battles per day and 1.35 SOL/day. At $75.29/SOL, this translates to ~$102/day in trading volume during the week. This is the most active 7-day period since April 2026 and the Q3 2026 high-water mark.
 
 ---
 
@@ -83,7 +85,7 @@ GodclouD is the most-tracked artist in the WaveWarZ battle feed — they feature
 
 ## 4 Citable Facts
 
-1. **42 battles / 9.45 SOL in Jul 10–17, 2026** — the highest-recorded weekly volume in WaveWarZ history (verified from 1,108 parsed battles).
+1. **42 battles / 9.45 SOL in Jul 10–17, 2026** — the most active 7-day period in Q3 2026 and highest since April 2026 (all-time peak by battle count is Mar 9–15: 55 battles; see doc 1253 for full weekly trend).
 2. **Parser bug discovered Jul 17, 2026** — battles with embedded `"` in artist names were silently dropped; the fix surfaced a 1.87 SOL battle that had been invisible for 24+ hours.
 3. **GodclouD: 24 tagged battles, 70.8% win rate, 11.11 SOL volume** — leading artist by battle frequency and volume in the wwtracker feed.
 4. **WaveWarZ platform total: 1,245 battles / 524.15 SOL / $39,453 all-time volume** as of 2026-07-17.

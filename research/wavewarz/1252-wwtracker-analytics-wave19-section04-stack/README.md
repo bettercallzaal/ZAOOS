@@ -8,9 +8,9 @@ original-query: "wave 19: §04 full economics stack — EconomicsBreakdown + Rev
 tier: STANDALONE
 ---
 
-# 1237 — wwtracker Analytics Wave 19: §04 Full Economics Stack (Jul 2026)
+# 1252 — wwtracker Analytics Wave 19: §04 Full Economics Stack (Jul 2026)
 
-**Doc:** 1237
+**Doc:** 1252
 **Type:** STANDALONE
 **Status:** PR open (wwtracker PR #157)
 **Written:** 2026-07-17 (ww build loop)

@@ -152,41 +152,6 @@ const zoeDashboard: AppManifest = {
   requiresGate: 'allowlist',
 };
 
-const pixelAgents: AppManifest = {
-  id: 'pixel-agents',
-  name: 'Pixels',
-  icon: '🎨',
-  category: 'tools',
-  type: 'full-app',
-  description: 'Pixel agent office',
-  externalUrl: 'https://pixels.zaoos.com',
-  requiresAuth: true,
-  requiresGate: 'allowlist',
-};
-
-const paperclip: AppManifest = {
-  id: 'paperclip',
-  name: 'Paperclip',
-  icon: '📎',
-  category: 'tools',
-  type: 'full-app',
-  description: 'Paperclip agent dashboard',
-  externalUrl: 'https://paperclip.zaoos.com',
-  requiresAuth: true,
-  requiresGate: 'allowlist',
-};
-
-const agentOrchestrator: AppManifest = {
-  id: 'ao-dashboard',
-  name: 'AO',
-  icon: '🤖',
-  category: 'tools',
-  type: 'full-app',
-  description: 'Parallel agent orchestrator',
-  externalUrl: 'https://ao.zaoos.com',
-  requiresAuth: true,
-  requiresGate: 'allowlist',
-};
 
 // ─── Micro-Apps ───────────────────────────────────────────────────
 
@@ -280,9 +245,6 @@ export const APP_REGISTRY: AppManifest[] = [
   admin,
   // External apps
   zoeDashboard,
-  pixelAgents,
-  paperclip,
-  agentOrchestrator,
   // Micro-apps
   binauralBeats,
   notifications,

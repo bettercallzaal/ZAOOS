@@ -101,7 +101,7 @@ function buildCspHeader(nonce: string): string {
     "media-src 'self' blob: https:",
     "connect-src 'self' https: wss:",
     "font-src 'self' https:",
-    "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com https://embed.tidal.com https://*.bandcamp.com https://embed.music.apple.com https://meet.jit.si https://nouns.build https://songjam.space https://www.songjam.space https://empirebuilder.world https://incented.co https://app.magnetiq.xyz https://clanker.world https://www.wavewarz.com https://wavewarz.com https://wavewarz-intelligence.vercel.app https://analytics-wave-warz.vercel.app https://player.twitch.tv https://embed.twitch.tv https://www.twitch.tv https://clips.twitch.tv https://juke.audio",
+    "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com https://embed.tidal.com https://*.bandcamp.com https://embed.music.apple.com https://meet.jit.si https://nouns.build https://songjam.space https://www.songjam.space https://empirebuilder.world https://incented.co https://app.magnetiq.xyz https://clanker.world https://www.wavewarz.com https://wavewarz.com https://wavewarz-intelligence.vercel.app https://player.twitch.tv https://embed.twitch.tv https://www.twitch.tv https://clips.twitch.tv https://juke.audio",
     // Allow any origin to embed our pages — the app is a Farcaster miniapp
     // and we don't know every client iframe origin (Warpcast, Base App,
     // Coinbase Wallet, third-party Farcaster clients). Replaces the legacy

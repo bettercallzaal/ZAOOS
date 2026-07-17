@@ -219,7 +219,6 @@ export const communityConfig = {
   wavewarz: {
     mainApp: 'https://www.wavewarz.com',
     intelligence: 'https://wavewarz-intelligence.vercel.app',
-    analytics: 'https://analytics-wave-warz.vercel.app',
     channel: 'wavewarz',
   },
 
@@ -315,9 +314,6 @@ export const communityConfig = {
     /** External agent dashboards */
     agentDashboards: {
       zoe: 'https://zoe.zaoos.com',
-      pixels: 'https://pixels.zaoos.com',
-      paperclip: 'https://paperclip.zaoos.com',
-      ao: 'https://ao.zaoos.com',
     },
   },
 } as const;

@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1263 | [ZAO Papers Program: Whitepaper Status + Publishing Roadmap (July 2026)](./1263-zao-papers-program-roadmap-july2026/) | ROADMAP | ZAO Papers status tracker: 4 papers drafted (2 PRs open in zao-papers repo), 12 total needed. Publishing path via Arweave + Hats Protocol (Approach C). Action sequence for permaweb publish + Hat mint (GATED). |
 | 030 | [bettercallzaal GitHub Projects Inventory](./030-bettercallzaal-github/) | STANDALONE | Map all 65 public repos, identify reusable code and patterns for ZAO OS |
 | 038 | [AI Code Audit & Cleanup Agents](./038-ai-code-audit-cleanup/) | STANDALONE | Best practices for auditing AI-written code and using agents for cleanup |
 | 039 | [GitHub Documentation & Presentation](./039-github-documentation-presentation/) | STANDALONE | Best practices for showcasing ZAO OS and research docs on GitHub |

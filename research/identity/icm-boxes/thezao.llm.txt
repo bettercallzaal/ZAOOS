@@ -14,8 +14,8 @@ Not a record label or a "music community" - an impact network whose first artist
 - Verified on-chain (2026-07-05): **157 unique Respect holders** (122 OG + 56 ZOR; 21 hold both), OG Gini roughly 0.73.
 
 ## WaveWarZ — live traction (2026-07-16)
-- **1,245 battles** on Solana mainnet, **522 SOL (~$39K) lifetime volume**
-- Artists have earned 9.05 SOL automatically on-chain; traders have claimed 127.34 SOL in winnings
+- **1,245 battles** on Solana mainnet, **524.15 SOL (~$39K) lifetime volume**
+- Artists have earned 9.07 SOL automatically on-chain; traders have claimed 127.34 SOL in winnings
 - Two charity benefit battles raised ~$1,497 for HuRya Empowerment Foundation (8,500+ beneficiaries)
 - Source: wavewarz.info/api/public/stats (public API) + Doc 1077 (ZAO DAO case study)
 

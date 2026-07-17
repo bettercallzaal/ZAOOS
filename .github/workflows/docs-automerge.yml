@@ -87,10 +87,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # A doc number must be globally unique across research/. If this PR
-          # adds research/<topic>/NNN-slug/ and main already has NNN under a
+          # ADDS research/<topic>/NNN-slug/ and main already has NNN under a
           # different slug anywhere, hold the PR for a human instead of merging
           # a collision (this happened: #1073 duplicated 964).
-          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
+          #
+          # Only ADDED doc dirs can introduce a NEW collision. Filtering to
+          # status=added is load-bearing: a PR that merely EDITS an existing doc
+          # whose number was historically collided (30+ such pre-band dups on main,
+          # e.g. 363 exists as both community/363-... and agents/363-...) would
+          # otherwise be falsely held forever - which blocked real green docs PRs
+          # (#1650/#1654/#1661/#1613) on edits they did not author. (Fixed 2026-07-17.)
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | select(.status=="added") | .filename')
           newdirs=$(echo "$files" | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u || true)
           if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)

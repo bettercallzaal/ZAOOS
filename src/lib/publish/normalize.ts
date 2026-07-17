@@ -38,7 +38,8 @@ function castUrl(hash: string): string {
  */
 function truncate(text: string, maxLen: number): string {
   if (text.length <= maxLen) return text;
-  const trimmed = text.slice(0, maxLen);
+  // Reserve 3 chars for "..." so the result is always ≤ maxLen.
+  const trimmed = text.slice(0, maxLen - 3);
   const lastSpace = trimmed.lastIndexOf(' ');
   return (lastSpace > 0 ? trimmed.slice(0, lastSpace) : trimmed) + '...';
 }

@@ -18,10 +18,10 @@ A synchronous weekly meeting (Fractal Call, Mondays 6pm EST) plus an on-chain se
 - **Respect** is the on-chain contribution currency, issued in two forms on **Optimism**:
   - **OG Respect** - soulbound ERC-20 (`0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`), the pre-ORDAO era. ~38,484 supply.
   - **ZOR Respect** - ERC-1155 (`0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`, token id 0), the post-ORDAO era.
-  - **Fractal 74** was the dividing line: OG issuance before it, ZOR after.
+  - **Fractal 74** was the dividing line: OG issuance before it, ZOR after. On-chain, OG settled across 33 distinct weeks (2024-07 to 2025-12) and ZOR across 31 weeks (2025-09 to present) - **63 distinct weeks of on-chain Respect settlement** so far (verified 2026-07-17). The weekly game itself (100+ weeks) predates and exceeds on-chain settlement.
 - **OREC** (Optimistic Respect-based Executive Contract, `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`) settles outcomes optimistically - a proposal executes unless contested inside the challenge window (72h propose + 72h veto). Respect-weighted, not one-wallet-one-vote.
 - **ORDAO** is the DAO framework wrapping OREC + Respect1155 into the executable governance layer.
-- Verified on-chain (2026-07-05): ~156 Respect holders, OG Gini roughly 0.73 (contribution is concentrated among the core, as expected for a 6-core-builder era down from 1000+ early participants).
+- Verified on-chain (2026-07-17): **157 unique Respect holders** (122 hold OG + 56 hold ZOR; 21 hold both), OG Gini roughly 0.73 (contribution is concentrated among the core, as expected for a 6-core-builder era down from 1000+ early participants).
 
 ## Current state
 - **Live and running** - 100+ weeks as of mid-2026, Monday 6pm EST weekly.

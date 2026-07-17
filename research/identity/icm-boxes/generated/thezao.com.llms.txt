@@ -10,7 +10,14 @@ Not a record label or a "music community" - an impact network whose first artist
 ## Governance - the Fractal and Respect
 - Respect is the on-chain contribution currency: a soulbound OG ERC-20 plus a ZOR ERC-1155, on Optimism.
 - A weekly Respect Game ranks contributions; OREC optimistic execution settles outcomes; a Fibonacci curve shapes rewards.
-- Verified on-chain (2026-07-05): 156 Respect holders, OG Gini roughly 0.73.
+- **100+ consecutive Fractal governance weeks** since 2024-07-30 (verified by date calculation, 2026-07-16: 716 days ÷ 7 = 102 complete weeks).
+- Verified on-chain (2026-07-05): **157 unique Respect holders** (122 OG + 56 ZOR; 21 hold both), OG Gini roughly 0.73.
+
+## WaveWarZ — live traction (2026-07-16)
+- **1,245 battles** on Solana mainnet, **522 SOL (~$39K) lifetime volume**
+- Artists have earned 9.05 SOL automatically on-chain; traders have claimed 127.34 SOL in winnings
+- Two charity benefit battles raised ~$1,497 for HuRya Empowerment Foundation (8,500+ beneficiaries)
+- Source: wavewarz.info/api/public/stats (public API) + Doc 1077 (ZAO DAO case study)
 
 ## Production lanes
 - WaveWarZ - live-traded music battles

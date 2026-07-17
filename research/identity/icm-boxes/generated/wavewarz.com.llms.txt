@@ -2,21 +2,43 @@
 
 <!-- GENERATED from research/identity/icm-boxes/wavewarz.llm.txt — single source of truth. Do not edit directly; edit the box and re-run build-llms-txt.py. -->
 
-> WaveWarZ is live-traded music battles: artists battle, fans trade and earn. Part of The ZAO ecosystem.
+> WaveWarZ is live-traded music battles on Solana: artists battle, fans trade positions and earn. Part of The ZAO (ZTalent Artist Organization) ecosystem. A proof that a DAO can build and ship a revenue-generating product.
 
 ## What it is
-- A prediction-market-style music battle platform on Solana (mainnet), with a Base testnet and a Base-to-Solana bridge (via Mayan and Wormhole).
-- Quick battles run on weekdays; main events run on Sundays.
-- Artists compete; fans trade positions on the outcome and earn.
+- A prediction-market-style music battle platform on Solana mainnet
+- Quick battles run on weekdays; main events run on Sundays; community battles run as booked
+- Artists compete; fans trade positions on outcomes and earn SOL on correct picks
+- 100% of artist payouts settle automatically on-chain — no intermediaries
+- On-chain program ID: 9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo (Solana mainnet)
+
+## Live traction (verified 2026-07-16 · wavewarz.info/api/public/stats)
+- **1,245 total battles** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community)
+- **522 SOL lifetime volume** (~$39K at $75/SOL)
+- **9.05 SOL paid to artists** (automatic, on-chain)
+- **17.43 SOL platform revenue**
+- **127.34 SOL paid to winning traders**
+
+## Community and charity impact
+- Two PolyRaiders charity benefit battles raised **~$1,497 total for HuRya Empowerment Foundation**:
+  - Holiday Heat (Dec 12 2024): ~$270
+  - Love Song Benefit (Feb 13 2025): ~$1,221
+- 8,500+ beneficiaries globally (4,000+ girls received sanitary pads; 4,500+ children received school supplies)
+- Platform fees waived for both charity rounds — 100% went to the cause
+
+## IRL events featuring WaveWarZ
+- ZAO-CHELLA (Art Basel, Wynwood, Miami — December 6 2024): first IRL WaveWarZ event
+- ZAOstock (Franklin St Parklet, Ellsworth ME — October 3 2026): ZAO flagship annual festival
 
 ## In the ZAO ecosystem
-- One of the ZAO production lanes alongside ZABAL Games and the festivals.
-- August ZABAL Games Finals integrate WaveWarZ-Base for on-chain settlement.
+- Built and governed by The ZAO (ZTalent Artist Organization), 100+ consecutive Fractal governance weeks
+- One of the ZAO production lanes alongside ZABAL Games and the festivals
+- Analytics tracked publicly at wwtracker.vercel.app (open-source fan dashboard)
 
 ## Find it
 - wavewarz.com
+- API: wavewarz.info/api/public/stats (public, no auth, 60s cache)
 - X: @WaveWarZ
-- Farcaster: the /wavewarz channel
+- Farcaster: /wavewarz channel on Warpcast
 
 ## Related boxes
 - The ZAO (thezao)

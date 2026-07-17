@@ -17,9 +17,15 @@
  *
  * Fallback: if group chat id is unset, all messages fall back to Zaal's DM
  * so nothing breaks pre-config.
+ *
+ * Message kinds:
+ * - 'question': DM Zaal — needs his answer/decision.
+ * - 'whisper':  DM Zaal — private notification, no answer required (approval
+ *   prompts, private alerts). Group stays silent; only Zaal sees it.
+ * - 'status':   ZAALBOTS group — informational, visible to all group members.
  */
 
-export type MessageKind = 'question' | 'status';
+export type MessageKind = 'question' | 'status' | 'whisper';
 
 export interface SendToZaalOptions {
   kind?: MessageKind; // defaults to 'status'
@@ -38,11 +44,13 @@ export interface TelegramRoutingDeps {
 }
 
 /**
- * Route a message to either Zaal's DM (questions) or the ZAALBOTS group (status).
+ * Route a message to either Zaal's DM (questions/whispers) or the ZAALBOTS group (status).
  * Centralizes ALL message routing so the decision is in one place.
  *
  * kind='question': DM Zaal directly (personal chat). These need his answer/decision.
- * kind='status': ZAALBOTS group (+ thread if configured). Informational.
+ * kind='whisper':  DM Zaal directly. Private notification with zero group noise.
+ *                  Use for approval prompts that should not be visible in the group.
+ * kind='status':   ZAALBOTS group (+ thread if configured). Informational.
  *
  * Fallback: if groupId is not set, all messages go to Zaal's DM to avoid
  * silent drops before config is complete.
@@ -55,8 +63,8 @@ export async function sendToZaal(
   const kind = opts.kind ?? 'status';
   const markupOpts = opts.replyMarkup ? { reply_markup: opts.replyMarkup } : {};
 
-  // question -> always DM
-  if (kind === 'question') {
+  // question + whisper -> always DM (questions need a reply; whispers stay private)
+  if (kind === 'question' || kind === 'whisper') {
     return deps.sendMessage(deps.zaalId, text, markupOpts);
   }
 
@@ -95,8 +103,9 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
   }
 
   const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
-  const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
-  if (groupIdRaw && Number.isNaN(groupId)) {
+  const groupIdParsed = groupIdRaw ? Number(groupIdRaw) : undefined;
+  const groupId = groupIdParsed !== undefined && Number.isNaN(groupIdParsed) ? undefined : groupIdParsed;
+  if (groupIdRaw && Number.isNaN(groupIdParsed)) {
     console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
   }
 

@@ -14,7 +14,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What should I do?', { kind: 'question' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'What should I do?');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'What should I do?', {});
       expect(sendMessage).toHaveBeenCalledTimes(1);
     });
 
@@ -69,7 +69,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'Status message', { kind: 'status' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'Status message');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'Status message', {});
     });
 
     it('questions always go to DM even if group is configured', async () => {
@@ -82,7 +82,50 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What do you think?', { kind: 'question' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?', {});
+    });
+
+    it('routes whispers to DM (private approval without group noise)', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = {
+        sendMessage,
+        zaalId: 123,
+        groupId: 456,
+      };
+
+      await sendToZaal(deps, 'Approve PR #123?', { kind: 'whisper' });
+
+      expect(sendMessage).toHaveBeenCalledWith(123, 'Approve PR #123?', {});
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it('whispers go to DM even when group is configured with thread', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = {
+        sendMessage,
+        zaalId: 123,
+        groupId: 456,
+        groupThreadId: 789,
+      };
+
+      await sendToZaal(deps, 'Private approval', { kind: 'whisper' });
+
+      expect(sendMessage).toHaveBeenCalledWith(123, 'Private approval', {});
+      expect(sendMessage).not.toHaveBeenCalledWith(456, expect.anything(), expect.anything());
+    });
+
+    it('whispers pass inline keyboard markup to DM', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = {
+        sendMessage,
+        zaalId: 123,
+        groupId: 456,
+      };
+      const replyMarkup = { inline_keyboard: [[{ text: 'Yes', callback_data: 'y' }]] };
+
+      await sendToZaal(deps, 'Approve?', { kind: 'whisper', replyMarkup });
+
+      expect(sendMessage).toHaveBeenCalledWith(123, 'Approve?', { reply_markup: replyMarkup });
     });
   });
 

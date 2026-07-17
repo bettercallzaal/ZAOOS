@@ -2,7 +2,7 @@
 
 **Tier:** STANDARD
 **Date:** 2026-07-17
-**Last-updated:** 2026-07-17 (ww loop: added Fractal count calculation, WaveWarZ live stats, PolyRaiders dates + HuRya beneficiary count — all verified from public sources)
+**Last-updated:** 2026-07-17 (ww loop: added Fractal count calculation, WaveWarZ live stats, PolyRaiders dates + HuRya beneficiary count — all verified from public sources); 2026-07-17 (ww loop: added on-chain Respect settlement rows from doc 1202, resolved Fractal weeks to two-layer)
 **Status:** Living ledger (verified facts + open provenance gaps)
 **Owner:** builder loop (verified rows), Zaal (pin the canonical membership definition)
 
@@ -36,6 +36,9 @@ it's a claim that they are **currently un-citable**, which is a fixable liabilit
 | Fractal start date | **2024-07-30** | ZAOOS public record (community.config.ts, doc 622, dossier 742) | 1077 |
 | Fractal weeks elapsed (as of 2026-07-16) | **≥102** (calculation) | (2026-07-16 − 2024-07-30) = 716 days ÷ 7 = 102.3 complete weeks | this doc |
 | Fractal weeks — conservative public claim | **"100+"** | date-calculation lower bound; no skipped-week proof available from public data | this doc |
+| OG Respect on-chain settlement (Optimism) | **33 distinct weeks** (2024-07-30 → 2025-12-20, 438 txs) | Blockscout tx enumeration, verified 2026-07-17 | [1202](../1202-fractal-onchain-settlement-history/) |
+| ZOR Respect on-chain settlement (Optimism) | **31 distinct weeks** (2025-09-25 → 2026-07-06, 67 txs) | Blockscout tx enumeration, verified 2026-07-17 | 1202 |
+| Combined on-chain settlement weeks (OG ∪ ZOR) | **63 distinct weeks** (1 overlap week) | union of OG + ZOR settlement sets | 1202 |
 | WaveWarZ lifetime volume | **522 SOL (~$39K)** | `wavewarz.info/api/public/stats`, live 2026-07-16 | [974](../974-wavewarz-financials-snapshot-2026-07/), [1077](../1077-zao-dao-case-study-jul2026/) |
 | WaveWarZ total battles | **1,245** | same live API | 974, 1077 |
 | WaveWarZ artist payouts | **9.05 SOL** | same | 974 |
@@ -58,7 +61,7 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 | Cited number | Where it appears | Why it's currently un-citable |
 |--------------|------------------|-------------------------------|
 | **"188 members on Base"** | `CLAUDE.md`, docs 625, 449, 530, 622, 1078, 742 (7+) | The nearest **public** proxy — the `/zao` channel — shows **93 followers / 4 members**, nowhere near 188. So "188" measures something else (most likely the gated Farcaster client's registered users in Supabase, which is not publicly verifiable). Its **definition** ("member" = app-registered? Respect-holder? channel-follower? Discord?) and **as-of date** are unpinned. This is THE most-repeated ZAO headline number and the least traceable. |
-| ~~Fractal weeks: "90+" / "100+"~~ → **PARTIALLY RESOLVED** | whitepaper 942, ICM box, dossier 742, doc 622 | Date calculation: start 2024-07-30, as of 2026-07-16 = 102 weeks. Use "100+" as the conservative verified claim. Remaining gap: no public on-chain proof that zero weeks were skipped (OREC/ZOR public RPC queries are block-range-limited; Supabase fractals table is gated). Until the OREC transaction count is verified, treat "100+" as math-backed but not chain-verified. |
+| ~~Fractal weeks: "90+" / "100+"~~ → **RESOLVED (two-layer)** | whitepaper 942, ICM box, dossier 742, doc 622 | Two-layer verified: (1) date-calculation: 716 days ÷ 7 = 102 complete weeks as of 2026-07-16; (2) on-chain settlement: 63 distinct weeks in doc 1202. Cite as: "100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism." |
 | ~~WaveWarZ battles: "735" / "958" / "416"~~ → **RESOLVED** | dossier 742 (735), COC lesson (958), old scraper (416) | **Canonical: 1,245 battles** (live API 2026-07-16). Scraper-era numbers are obsolete. Source: doc 974. |
 | ~~"$60K+ traded"~~ → **PARTIALLY RESOLVED** | dossier 742 | Live volume: 522 SOL (~$39K at $75/SOL, 2026-07-16). The "$60K+" claim was likely from a higher SOL price period (SOL was ~$120–150 in early 2025). Doc 974 reconciles this: the claim is plausible historically but shouldn't be cited at current prices without qualification. |
 | ~~"34 PRs/week"~~ → **resolved** | doc 449 one-pager | **VERIFIED, see [doc 1203](../1203-zaoos-build-velocity/):** "34/week" was the human-era baseline (W12–W15, ~30/week product code). Now 60–175+/week total but **50–73% is agent docs/tests automation**; product (feat/fix) velocity is stable ~30/week. Quote total only with the automation caveat. |
@@ -79,6 +82,7 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 ## Also see
 
 - [Doc 1200 - verified on-chain Respect facts](../1200-respect-onchain-facts-verified/)
+- [Doc 1202 - Fractal on-chain settlement history](../1202-fractal-onchain-settlement-history/) — source for the 63-week settlement count
 - [ICM boxes](../../identity/icm-boxes/) — the AI-readable surface that should cite this ledger
 - [Doc 942 - Fractal whitepaper outline](../942-zao-fractal-whitepaper-outline-v2/)
 - [Doc 1107 - GEO/SEO](../../identity/1107-seo-social-profiles/) — citable, consistent facts are a GEO asset

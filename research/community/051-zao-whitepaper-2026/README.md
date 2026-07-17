@@ -110,7 +110,7 @@ The team is supported by a roster of independent artists, a network of mutual co
 
 **[ZAO OS](https://github.com/bettercallzaal/ZAOOS)** — A gated Farcaster client where the community lives. Music-first. Inline players for Spotify, SoundCloud, Audius, YouTube, Sound.xyz, and direct audio. Encrypted DMs via XMTP. Push notifications via Farcaster Mini App. Followers/following with sorting and filtering. Open source ([MIT license](https://github.com/bettercallzaal/ZAOOS/blob/main/LICENSE)).
 
-**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 100+ meetings. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
+**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 100+ meetings. [$ZAO Respect token on Optimism](https://optimistic.etherscan.io/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
 
 **ZAO Festivals** — Four IRL events bridging onchain culture to physical space:
 - [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA) (NYC, NFT NYC 2024) — 12 artists, ZAO Cards on Manifold
@@ -247,7 +247,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ### Community Governance
 - ZAO Fractal — weekly [Respect Game](https://optimystics.io/respectgame)
-- [$ZAO Respect](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957) — soulbound reputation on Base
+- [$ZAO Respect](https://optimistic.etherscan.io/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957) — soulbound reputation on Optimism
 - [Hats Protocol](https://www.hatsprotocol.xyz/) roles — planned on Base
 
 ### Media + Education
@@ -303,10 +303,10 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 | Chain | What | Why |
 |-------|------|-----|
-| **[Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957)** | $ZAO Respect, Hats roles | Farcaster-aligned, low gas |
+| **[Base](https://basescan.org/)** | Hats roles | Farcaster-aligned, low gas |
 | **[Solana](https://solscan.io/account/9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo)** | WaveWarZ battles | Speed for real-time trading |
 | **[Flow](https://www.magnetiq.xyz/)** | Magnetiq memberships | Consumer-friendly onboarding |
-| **[Optimism](https://optimismfractal.com/)** | Fractal governance (ORDAO) | Superchain alignment |
+| **[Optimism](https://optimistic.etherscan.io/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957)** | $ZAO Respect, Fractal governance (ORDAO) | Superchain alignment |
 
 **The challenge ahead:** Unified identity (ZID) across all chains. One membership number that resolves your Base wallet, Solana wallet, and Farcaster FID to a single ZAO identity. This is the problem ZAO OS is built to solve.
 

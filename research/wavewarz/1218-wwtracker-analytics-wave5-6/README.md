@@ -8,7 +8,7 @@ original-query: "Document wwtracker analytics wave 5-6 — GrowthMomentum, ZaoIP
 tier: STANDARD
 ---
 
-# 1217 — wwtracker Analytics Wave 5-6: Growth Momentum, ZAO IP Summary, Platform Snapshot (Jul 2026)
+# 1218 — wwtracker Analytics Wave 5-6: Growth Momentum, ZAO IP Summary, Platform Snapshot (Jul 2026)
 
 > **Purpose:** Document the fifth and sixth waves of wwtracker analytics components built in July 2026, following waves 1-4 (Docs 1079, 1080, 1081, 1216). Wave 5 adds growth momentum and the ZAO IP creative catalog to the public tracker. Wave 6 adds a citable platform snapshot card at the top of the dashboard. Also documents the full AppShell merge-conflict audit and resolution performed across all 82 open PRs.
 

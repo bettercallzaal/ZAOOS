@@ -1,6 +1,6 @@
 {
   "_comment": "ZAO proper-noun glossary for Groq Whisper transcription. Used by bot/src/zoe/transcribe.ts to bias transcription at the source (whisperPrompt) and post-correct common mangling (corrections).",
-  "whisperPrompt": "ZAO, ZABAL, WaveWarZ, COC Concertz, Zaalcaster, thezao, ZAOstock, ZAOville, ZAOcowork, Farcaster, Sparkz, POIDH, Bonfire, ZOE, ZAL, Zaal, Iman, Fractal Monday, onchain, FlowStage, Boostr, Artizen, GEO, DreamLoop, Neynar, Clanker, Base, Warpcast, 0xSplits, Supabase, ZABAL Gamez, WaveWarZ battles, Creator Studio, Fractal governance, WaveWarZ season, ZAO Fund, ZAO membership, ZAO member NFT, ZABAL submission, QR coin",
+  "whisperPrompt": "ZAO, ZABAL, WaveWarZ, COC Concertz, Zaalcaster, Zuke, thezao, ZAOstock, ZAOville, ZAOcowork, Farcaster, Sparkz, POIDH, Bonfire, ZOE, ZAL, Zaal, Iman, Fractal Monday, onchain, FlowStage, Boostr, Artizen, GEO, DreamLoop, Neynar, Clanker, Base, Warpcast, 0xSplits, Supabase, ZABAL Gamez, WaveWarZ battles, Creator Studio, Fractal governance, WaveWarZ season, ZAO Fund, ZAO membership, ZAO member NFT, ZABAL submission, QR coin",
   "corrections": {
     "z a o": "ZAO",
     "zao ": "ZAO ",

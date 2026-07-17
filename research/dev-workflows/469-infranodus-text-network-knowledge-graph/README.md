@@ -91,7 +91,7 @@ PDF, markdown, TXT, CSV, Google Search, Google Scholar, YouTube transcripts, Ama
 
 ZAO has massive text corpora growing fast:
 - **240+ research docs** in `research/` (indexed by Graphify, but no gap detection)
-- **90+ weekly fractal meeting transcripts** (Fractal Bot archive, `data/history.json` on VPS)
+- **100+ weekly fractal meeting transcripts** (Fractal Bot archive, `data/history.json` on VPS)
 - **100+ member bios + community profiles** (`Supabase community_profiles`)
 - **ZAO cast archive** (Neynar) — thousands of casts across governance, music, Spaces
 - **Newsletter backlog** (`docs/daily/*.md`)
@@ -105,7 +105,7 @@ Right now nothing surfaces "what hasn't been discussed." InfraNodus does exactly
 |----------|--------|--------|------------|
 | **Newsletter gap** | `docs/daily/*.md` + recent ZAO casts | Topics clustered + 3-5 structural gaps | Feed gaps to `/newsletter` skill as draft prompts |
 | **Socials angle discovery** | Last 30d ZAO casts + trending Farcaster topics | Unclaimed intersection clusters | Feed to `/socials` skill for angle selection |
-| **Fractal theme evolution** | 90+ weeks fractal transcripts | Theme drift + emergent topics over time | Doc 273 (fractal vision) updates, OREC seed |
+| **Fractal theme evolution** | 100+ weeks fractal transcripts | Theme drift + emergent topics over time | Doc 273 (fractal vision) updates, OREC seed |
 | **ZAO Stock positioning** | Competitor festival content (Burning Man, SXSW, AFROPUNK) vs ZAO messaging | Positioning gaps | Doc 448 (ZAO Stock pitch) angles |
 | **Artist discovery** | `community_profiles` bios + onboarding surveys | Underrepresented genre/style clusters | Magnetiq connection suggestions |
 | **Research roadmap** | `research/_graph/KNOWLEDGE.json` + `research/newfiles/` | Missing research areas | Seed `/zao-research` + `/autoresearch` queries |

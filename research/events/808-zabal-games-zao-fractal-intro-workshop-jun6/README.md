@@ -49,7 +49,7 @@ This is the canonical short-form ZAO Fractal explainer - usable as: (1) the ZABA
 
 ## Also See
 
-- [[project_fractal_process]] - Fractal mechanics (90+ weeks, Mondays 6pm EST, OG vs ZOR Respect)
+- [[project_fractal_process]] - Fractal mechanics (100+ weeks, Mondays 6pm EST, OG vs ZOR Respect)
 - [[project_fractal_vision]] - Fractal goals (OREC submissions, reconciling OG + ZOR ledgers)
 - [[project_zabal_games]] - the workshop series this belongs to
 - [Doc 807](../807-zabal-games-fireside-carlos-bonfires-jun6/) - the same-day ZABAL Games fireside

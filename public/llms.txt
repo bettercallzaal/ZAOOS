@@ -75,7 +75,7 @@ Research: [Doc 1077](https://github.com/bettercallzaal/ZAOOS/tree/main/research/
 - **Mission (verbatim from thezao.com):** "Empower independent creators by demystifying technology and providing the tools, knowledge, and support they need to take control of their work, data, and fan connections."
 - **Community directory:** 50 members listed on [thezao.com/community](https://thezao.com/community) (July 2026) — ~90% musicians
 - **$ZAO token:** illiquid, soulbound (on-chain identity, not tradeable) — Base chain ERC-20
-- **Governance:** 100+ consecutive weekly Fractal votes on Base blockchain (2024–2026) — Respect-weighted peer ranking
+- **Governance:** 100+ consecutive weekly Fractal votes (2024–2026) — Respect tokens settled on Optimism mainnet (not Base; $ZAO identity token is Base)
 - **Flagship product:** WaveWarZ (see above)
 - **IRL events:** ZAO-CHELLA (Art Basel Miami, Dec 6 2024) · ZAOstock (Ellsworth ME, Oct 3 2026)
 - **Social:** X [@thezaodao](https://x.com/thezaodao) · Instagram [@zaofestivals](https://instagram.com/zaofestivals) · Farcaster [/channel/the-zao](https://warpcast.com/~/channel/zao)

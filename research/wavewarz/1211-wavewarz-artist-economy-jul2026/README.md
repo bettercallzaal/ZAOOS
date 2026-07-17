@@ -118,7 +118,7 @@ These statements can be verified directly from the on-chain battle record:
 
 1. **"GodclouD has earned an estimated 0.258 SOL (~$19) from WaveWarZ battle participation — the most of any artist in the tagged battle record (22 cross-artist battles, 72.7% win rate, 10.44 SOL volume)."**
 2. **"ZAO artists have received 9.07 SOL ($683) in automatic, on-chain payouts from WaveWarZ battles (all-time as of Jul 2026)."**
-3. **"WaveWarZ has run 1,245 on-chain battles across 26 months (May 2025 – Jul 2026), generating 524.15 SOL in total trading volume."**
+3. **"WaveWarZ has run 1,245 on-chain battles across 12+ months (Aug 2025 – Jul 2026), generating 524.15 SOL in total trading volume."**
 4. **"Artists earn automatically at settlement — no claim required. The platform has issued 939 trader withdrawals (127.34 SOL) alongside artist payouts."**
 
 ---

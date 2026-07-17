@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1210 | [COC Concertz #7 — WaveWarZ Takeover: Virtual Concert as ZAO IP](./1210-coc7-wavewarz-pilot/) | DOC | Architecture and pilot design for COC #7 (2026-07-18 4PM EST). Covers the Arweave archive model, ZABAL wallet gate (dropped for pilot), real-time WaveWarZ battle voting, wallet-vs-gateless metrics capture, and North Star alignment. |
 | 1092 | [Zaal x Adrian (Empire Builder): zaalcaster deep dive](./1092-zaal-adrian-empire-builder-deep-dive-jul14/) | STANDALONE | Recap of a 2026-07-14 call (Zaal, Adrian/DiviFlyy): zaalcaster's Empire Builder integration live-demoed, Clanker fee-split mechanics, tokenless empire deploy/attach endpoints, Sign In With Farcaster. |
 | 1087 | [Restream setup + web3-musician strategy jam](./1087-restream-strategy-jam-jul14/) | STANDALONE | Recap of the 2026-07-14 Restream + strategy call (Zaal, Dcoop, Sam): Restream setup, ZAO Festivals tour shirt, the web3-musician workflow vision, Sam musician decision tree. Confidential detail + raw transcript kept private. |
 | 1064 | [Iman Sync: ZaoZone refocus + board cleanup](./1064-iman-sync-zaozone-focus-2026-07-13/) | STANDALONE | Iman refocused to owning the ZAO Zone as the co-working front-end; board cleanup of auto-assigned tasks. |

@@ -19,11 +19,30 @@ tier: DEEP
 | What Sparkz is | An energy-first creator-coin product on Farcaster |
 | Sequencing | Tokenless first - build a following, THEN launch the coin |
 | Launch trigger | An AI agent decides WHEN there is enough energy (this is the differentiator) |
-| Launch rail | Clanker (on Base) |
+| Launch rail | Clanker (on Base), routed **0xSplits-first** (see "The launch rail" below) |
 | Fee | 1%; creator keeps ~99% |
 | Starter kit | An AI agent + a Farcaster channel + two miniapps to try (tortoise, fotocaster) |
 | Model | Modeled on how QR coin grew on Farcaster |
 | Principle | The token ADDS to what is built, it does not extract |
+
+## The launch rail: 0xSplits-first (Iman dogfood catch, 2026-07-16)
+
+**The catch.** Clanker v4's `rewardBps` - the on-token fee split - is **immutable once the token launches**. A Sparkz token that bakes its creator/treasury split directly into Clanker can never change it: no adding a collaborator, no adjusting the treasury cut, no fixing a mistake. For a product whose whole pitch is *configurable* creator coins, that is fatal.
+
+**The fix - make 0xSplits the default rail, not an option.** Every Sparkz launch routes fees through a 0xSplits contract:
+
+1. **Deploy a 0xSplits contract first** - mutable (a controller is set, not the zero address), holding the initial recipient split.
+2. **Launch the Clanker token with that Splits contract as the SOLE fee recipient** (`rewardBps` -> 100% to the Splits address).
+3. Clanker's immutable `rewardBps` now points at a **mutable** Splits contract, so the creator re-balances the real split anytime via the Splits controller - add a collaborator, shift the treasury cut, fix an error - with no token redeploy and no lost adjustability.
+
+So 0xSplits is **non-optional**: with immutable Clanker rewardBps, routing through Splits is the *only* way to keep the split configurable, which is the product.
+
+**What this changes:**
+- The MVP's "Clanker launch flow" becomes a **Splits-first Clanker launch flow** - deploy Splits (step 1), then launch the token pointing at it. Not an afterthought.
+- The Stage 1 wizard's "add collaborators" step (design: `papers/drafts/sparkz-music-collabs.md`) writes into the Splits contract that is then set as Clanker's sole recipient.
+- This is the same mutable-controller Splits mechanic already used in the collab-split and Boostr pilot designs (doc 1141 Part 7) - now the canonical launch rail for *every* Sparkz token, not just band/collab tokens.
+
+**Gated (not done here):** the wizard build (zaalcaster, owned separately), Jango's launch plan, and any on-chain deploy remain Zaal's hand. This is the design/rail update only.
 
 ## The positioning verdict (from doc 1097 - the honest read)
 

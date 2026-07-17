@@ -16,7 +16,7 @@
 |----------|----------------|
 | **Profile gaps** | Tom Fellenz profile COMPLETE. Shawn, DFresh, Craig G need bios from them directly - no public web presence found. |
 | **Brand profiles** | WaveWarZ and COC Concertz have strong public data. FISHBOWLZ, Songjam, ZAOVille are internal/early-stage. |
-| **For pitch page** | USE WaveWarZ stats (1,245 battles, 522 SOL), COC Concertz (5 events), newsletter (400+ editions), fractals (100+ weeks) as credibility proof |
+| **For pitch page** | USE WaveWarZ stats (1,245 battles, 524.15 SOL), COC Concertz (5 events), newsletter (400+ editions), fractals (100+ weeks) as credibility proof |
 | **Missing data** | NEED photos/video from ZAO-CHELLA, Maine Craft Weekend attendance numbers, Fractured Atlas exact wording |
 
 ---
@@ -121,13 +121,13 @@
 | **What** | Live-traded music battle platform on Solana |
 | **Website** | [wavewarz.com](https://www.wavewarz.com), [wavewarz.info](https://wavewarz.info) (analytics) |
 | **Total battles** | 1,245 (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) |
-| **Total volume** | 522 SOL (~$39K at $75/SOL, 2026-07-17) |
+| **Total volume** | 524.15 SOL (~$39K at $75/SOL, 2026-07-17) |
 | **Total artist payouts** | 9.05 SOL |
 | **Artist economics** | 1% trading volume + 5-7% settlement bonus, instant onchain |
 | **Legal entity** | Delaware C-Corp |
 | **Founders** | Hurric4n3Ike + Candy |
 | **Smart contracts** | Base L2 (Candy's wavewarz-base, 8/8 tests, A+ audit) |
-| **Key stat for sponsors** | 1,245 battles, 522 SOL volume, real artists getting paid |
+| **Key stat for sponsors** | 1,245 battles, 524.15 SOL volume, real artists getting paid |
 
 ### ZAOstock
 
@@ -201,7 +201,7 @@
 | Weekly governance sessions | 100+ consecutive | ZAO Fractals (Mondays 6pm EST) |
 | Newsletter editions | 400+ | Year of the ZABAL on Paragraph |
 | WaveWarZ battles | 1,245 | wavewarz.info/api/public/stats (2026-07-17) |
-| WaveWarZ volume | 522 SOL (~$39K) | wavewarz.info/api/public/stats (2026-07-17) |
+| WaveWarZ volume | 524.15 SOL (~$39K) | wavewarz.info/api/public/stats (2026-07-17) |
 | COC Concertz events | 5 (monthly recurring) | cocconcertz.com |
 | Team members | 14 active + 4 advisors | Dashboard |
 | ZAO members | ~188 gated | ZAO OS |

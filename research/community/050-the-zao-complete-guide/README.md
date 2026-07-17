@@ -227,7 +227,7 @@ A music competition and discovery platform originally incubated within the ZAO e
 | **What** | Onchain music prediction market on Solana |
 | **Legal** | Delaware C-Corporation |
 | **Smart contract** | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (Solana Mainnet, Anchor/Rust) |
-| **Volume** | 522 SOL (~$39K USD, July 2026) across 1,245 total battles |
+| **Volume** | 524.15 SOL (~$39K USD, July 2026) across 1,245 total battles |
 | **Website** | [wavewarz.com](https://www.wavewarz.com/) |
 
 **How it works:** Artists battle in 3 consecutive 20-minute rounds. Fans trade using ephemeral bonding curve tokens that exist only during each round. Triple judging combines a human judge, X poll, and SOL trading activity. Artists earn 1% of all trading volume immediately. Losing traders get 50% partial recovery.

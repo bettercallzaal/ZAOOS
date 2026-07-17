@@ -274,6 +274,13 @@ interface CoworkTask {
 
 **Sources:** Merge ZAOcowork's current `tasks` table schema + hermes learner format + zol dispatch shape.
 
+> **Reconciliation note (2026-07-17): the enums above do NOT match the live ZAOcowork `tasks` table - fix before enforcing.**
+> The interface labels `status` and `priority` as "ZAOcowork enum", but the actual Supabase `tasks` table (the real source of truth, which the fleet board tools `scripts/fleet/zao-board.py` and `triage.py` read/write) uses:
+> - **status:** `todo` | `in_progress` | `done` | `archived`  (not `open`/`in-progress`/`blocked`; note the underscore in `in_progress`, and there is no `blocked` status column - "blocked" lives in `notes`/`metadata`, not the status enum)
+> - **priority:** `P0` | `P1` | `P2` | `P3`  (not `high`/`medium`/`low`)
+>
+> If the five repos enforce the idealized enums above, they will **diverge** from the DB the board tools already use - the opposite of consistency. **Canonical = the live table's values** (`todo|in_progress|done|archived`, `P0-P3`), because that is what actually persists. If a UI wants friendly labels, map them in the **display layer only**; the data vocab must stay the live table's or every board write/read breaks. Suggested display map: `todo->Open, in_progress->In Progress, done->Done, archived->Archived`; `P0->Critical, P1->High, P2->Medium, P3->Low`.
+
 ---
 
 ### Unified Cowork UI Components

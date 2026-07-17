@@ -218,6 +218,20 @@ Key finding: ZAO's current architecture assumes LLM-as-backbone (Claude in ZOE, 
 
 ---
 
+## Review (2026-07-17, builder loop — fleet lens)
+
+Reviewed per board task `research-doc:1111`. The doc is **sound and well-sourced** — the eight architectures are defined against primary sources, and the ZAO Stack Mapping is the load-bearing table (it turns an infographic into concrete per-layer decisions). No corrections.
+
+**Net-new insight the review adds — the SLM/MoE findings apply to the LOOP FLEET itself, not only ZOE/ZOL.** The doc frames "cheap architecture-optimized model for classify-only" against ZOE/ZOL surfaces, but the same lever sits unused one level up: the tmux **loop fleet** (this builder loop, coc/ww/zol/human) currently runs a single frontier model (Opus) for *every* sub-step, including cheap **deterministic classification** tasks that don't need frontier reasoning:
+
+- board triage classification (`scripts/fleet/triage.py` rerank/dedup/close-shipped decisions),
+- PR file-category classification (docs/tests/scripts/runtime — now partly done by the CI classifier in `docs-automerge.yml`, but the *loops* still reason about it in-context),
+- intent detection / "is this task gated?" checks before acting.
+
+These are exactly the SLM/MoE "route-and-classify" shape (doc §4 MoE, §6 SLM): high volume, low reasoning-depth, cost-sensitive. Running them on a **cheap-model tier** (Haiku, or a Pi/Ollama SLM per this doc's Mistral-7B eval) would cut fleet token spend on the highest-frequency, lowest-value calls — the same "reduce founder subsidy" thesis as [doc 1074](../1074-agent-leverage-reduce-founder-subsidy/). **Boarded as `fleet-improvement`:** a cheap-model tier for deterministic loop sub-tasks (classify/route/gate-check), frontier model reserved for build/reason/verify. This is rule 10 (learn online → fold back) made concrete; see `.claude/rules/agent-loops.md`.
+
+**On the doc's Next Actions:** all five are correctly **@Zaal-owned Q3 evals/pilots** (Mistral-7B benchmark, LAM spike, E5/Bonfire dense-retrieval, Qwen3-MoE routing eval, VLM meeting frames) — each needs model deploys, benchmark infra, or the meeting pipeline, so they are **gated, not builder-lane**. No loop action beyond the boarded fleet-improvement above. The MLM/E5 Bonfire dense-retrieval action is the highest-leverage of the five for the "documented, cited DAO" north star (better recall on the knowledge graph the loops write to).
+
 ## Also See
 
 - [Doc 1020: Agent Benchmarks - How ZOE Does](../1020-agent-benchmarks-how-zoe-does/)

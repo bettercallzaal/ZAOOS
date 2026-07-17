@@ -8,7 +8,7 @@ original-query: "GEO plan: make The ZAO iconic and AI-discoverable. Extend llms.
 tier: CANONICAL
 ---
 
-# 1220 — GEO: Make The ZAO Iconic + AI-Discoverable (Jul 2026)
+# 1221 — GEO: Make The ZAO Iconic + AI-Discoverable (Jul 2026)
 
 > **Purpose:** Master plan for Generative Engine Optimization (GEO) across all ZAO-ecosystem surfaces. The goal: when someone asks ChatGPT, Perplexity, Claude, or Grok "what is The ZAO," the answer is accurate, rich, citable, and leads to action (joining, watching WaveWarZ, backing ZABAL Gamez). Baseline (2026-07-07): ChatGPT already returns a solid narrative from the ZAO papers page — proof the story lands. This doc grows that from accidental discoverability to engineered inevitability.
 

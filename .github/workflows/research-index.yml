@@ -1,0 +1,21 @@
+name: Research index guard
+
+# The pre-commit hook checks a committer's OWN staged docs, so a research doc can
+# still land on main missing its folder-index row (e.g. when a branch's index-row
+# edit is dropped in a merge conflict) and then linger unindexed with nothing at
+# merge time to catch it - happened with docs 1076, 1174, and 1176, each found and
+# repaired only later by a manual `--all` audit. This runs that full --all audit on
+# every PR that touches research/, so an unindexed doc fails CI before it can merge.
+on:
+  pull_request:
+    paths:
+      - 'research/**'
+      - 'scripts/check-research-index.sh'
+
+jobs:
+  research-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every research doc must be listed in its folder index
+        run: bash scripts/check-research-index.sh --all

@@ -29,8 +29,8 @@ The ZAO is a decentralized impact network for independent music artists, founded
 | Unique songs battled | 921 | doc 1214 |
 | Artists with tagged handles | 34 Audius-rostered | doc 1214 |
 | Charity raised | $1,497 across 2 benefit-battle rounds | doc 1077 |
-| Platform take rate | 3.16% | doc 1219 |
-| Artist payouts | 1.79% of volume (9.07 ◎ total) | doc 1211 |
+| Platform take rate | ~3.3% (Jul 2026) | wavewarz.info/api/public/stats |
+| Artist payouts | ~1.73% of volume (9.07 ◎ total) | doc 1211 + live API |
 | Top rival pair | GodclouD 8-0 all-time | doc 1214 |
 | Live cadence | Mon–Fri 8:30 PM EST quick-battle X Space + YouTube | doc 1223 |
 | Launch date | May 2025 | doc 1252 |

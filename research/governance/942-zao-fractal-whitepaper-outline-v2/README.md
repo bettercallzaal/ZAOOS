@@ -37,7 +37,7 @@ Same 11-chapter spine as 718, with the new docs folded in and the decay correcti
 | 5 | The Respect Game (weekly mechanism, Fibonacci curve, consensus thresholds) | Precision | 718b, **936 (verified live mechanism)** - **state clearly: no decay today** |
 | 6 | On-Chain Architecture (ORDAO, OREC, soulbound contracts) | Precision | 718c, **936 (verified vote-weight path)** |
 | 7 | Why Fractal (vs token-voting, quadratic, Nouns, Moloch) | Argument | 718d |
-| 8 | The ZAO Fractal (90+ weeks, music, OG/ZOR, the social client) | Manifesto / narrative | 718g, **703 (current state)** |
+| 8 | The ZAO Fractal (100+ weeks, music, OG/ZOR, the social client) | Manifesto / narrative | 718g, **703 (current state)** |
 | 9 | Limitations and Open Problems | Plain honesty | 718e, **936 + 941 (the decay-gap as a named open problem)**, **1142 (error-recovery / failure-modes framework, grounded in 1139)** |
 | 10 | Roadmap (ledger reconciliation, all-members-on-chain, scaling) | Plain | 718g, 696, **935 + 941 (monetary policy: banked/active split, decay adoption path)**, **1142 (error-recovery experiments: decision taxonomy + amendment process)** |
 | 11 | Conclusion (the "new governance culture" close) | Manifesto | 718g |

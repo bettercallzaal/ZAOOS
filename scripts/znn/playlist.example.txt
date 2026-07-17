@@ -1,0 +1,8 @@
+# ZNN playlist - ffmpeg concat demuxer format.
+# One line per clip, in play order. Paths absolute (or relative to this file).
+# The looper plays top-to-bottom then repeats forever (-stream_loop -1).
+# Copy this to playlist.txt and point it at real content.
+file '/home/zaal/znn-content/zao-intro.mp4'
+file '/home/zaal/znn-content/coc-concertz-highlights.mp4'
+file '/home/zaal/znn-content/fractal-explainer.mp4'
+file '/home/zaal/znn-content/wavewarz-recap.mp4'

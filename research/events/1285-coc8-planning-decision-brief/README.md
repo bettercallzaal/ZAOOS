@@ -8,7 +8,7 @@ related-docs: 1210, 1256, 1274, 964
 owner: Zaal (to approve #8 date + format after reading pilot report)
 ---
 
-# 1282 -- COC Concertz #8: Planning Brief + Pilot Decision Framework
+# 1285 -- COC Concertz #8: Planning Brief + Pilot Decision Framework
 
 > **How to use:** Run `npx tsx scripts/generate-pilot-report.ts` Saturday morning after COC #7. Then read the numbers into the decision matrix below. The matrix outputs a recommended #8 format in 5 minutes. Target: lock COC #8 date + format by Monday July 21 to maintain monthly cadence (Aug 9 or Aug 16).
 

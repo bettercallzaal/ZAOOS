@@ -8,9 +8,23 @@
 # of failure impossible: it deploys the WHOLE branch by fast-forward, restarts,
 # and VERIFIES the boot, aborting loudly if anything is off.
 #
-# Usage:  bash scripts/zoe-deploy.sh
+# DEPRECATED: The canonical deploy is now scripts/zoe-autodeploy.sh (#1636).
+# Post clone-separation the bot runs from ~/zao-bot-live (not ~/zao-os).
+# Running THIS script on ~/zao-os dirties loops' working trees without
+# actually deploying, because the bot service now reads ~/zao-bot-live.
+# Set ZOE_DEPLOY_FORCE=1 to bypass this guard if you know what you're doing.
+#
+# Usage:  bash scripts/zoe-autodeploy.sh   (use this instead)
 # Env:    ZOE_VPS (default zaal@31.97.148.88), ZOE_BRANCH (default the ZOE branch)
 set -euo pipefail
+
+if [[ "${ZOE_DEPLOY_FORCE:-}" != "1" ]]; then
+  echo "[zoe-deploy] DEPRECATED — use 'bash scripts/zoe-autodeploy.sh' instead."
+  echo "  Reason: the bot now runs from ~/zao-bot-live (not ~/zao-os)."
+  echo "  Deploying to ~/zao-os dirties builder loops without updating the bot."
+  echo "  Set ZOE_DEPLOY_FORCE=1 to force this script anyway (expert use only)."
+  exit 1
+fi
 
 VPS="${ZOE_VPS:-zaal@31.97.148.88}"
 BRANCH="${ZOE_BRANCH:-ws/zoe-bonfire-proactive-relay}"

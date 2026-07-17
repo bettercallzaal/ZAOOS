@@ -14,7 +14,7 @@ tier: STANDARD
 
 ## One-Paragraph Summary
 
-The ZAO (ZTalent Artist Organization) is a decentralized autonomous organization with a three-year public governance record (100+ consecutive Fractal weeks), a live Solana music-battle product generating real on-chain revenue (WaveWarZ: 522 SOL / ~$39K lifetime volume, 1,244 battles), and verified community impact ($1,497 raised across two charity benefit-battle series for HuRya Empowerment Foundation). It operates the BCZ → The ZAO → WaveWarZ product stack, with 188 active members, governance on Optimism (Respect tokens), ZAO Improvement Proposals (ZIPs), and two IRL events (ZAO-CHELLA at Art Basel Miami, Dec 2024; ZAOstock, Oct 3 2026, Ellsworth ME).
+The ZAO (ZTalent Artist Organization) is a decentralized autonomous organization with a three-year public governance record (100+ consecutive Fractal weeks), a live Solana music-battle product generating real on-chain revenue (WaveWarZ: 524.15 SOL / ~$39,453 lifetime volume, 1,245 battles), and verified community impact ($1,497 raised across two charity benefit-battle series for HuRya Empowerment Foundation). It operates the BCZ → The ZAO → WaveWarZ product stack, with 188 active members, governance on Optimism (Respect tokens), ZAO Improvement Proposals (ZIPs), and two IRL events (ZAO-CHELLA at Art Basel Miami, Dec 2024; ZAOstock, Oct 3 2026, Ellsworth ME).
 
 ---
 
@@ -33,22 +33,22 @@ The ZAO (ZTalent Artist Organization) is a decentralized autonomous organization
 
 ---
 
-## 2. Product traction (WaveWarZ, live 2026-07-16)
+## 2. Product traction (WaveWarZ, live 2026-07-17)
 
-All figures below are from `GET https://wavewarz.info/api/public/stats` (public API, no auth, 60 s cache), pulled live on 2026-07-17. Full reconciliation in [Doc 974](../974-wavewarz-financials-snapshot-2026-07/).
+All figures below are from `GET https://wavewarz.info/api/public/stats` (public API, no auth, 60 s cache), pulled live on 2026-07-17T17:15Z. Full reconciliation in [Doc 974](../974-wavewarz-financials-snapshot-2026-07/).
 
-| Metric | Live figure (2026-07-17) | USD equiv at $74.64/SOL |
+| Metric | Live figure (2026-07-17) | USD equiv at $75.29/SOL |
 |---|---|---|
-| Lifetime volume | **524.37 SOL** | ~$39,139 |
+| Lifetime volume | **524.15 SOL** | ~$39,453 |
 | Total battles | **1,245** (1,047 quick + 162 main-event + 36 community) | — |
 | Main events held | 50 | — |
-| Artist payouts | **9.07 SOL** (automatic, onchain) | ~$677 |
-| Platform revenue | **17.44 SOL** | ~$1,301 |
-| Trader claims paid | **127.34 SOL** (manual claimShares, 939 withdrawals) | ~$9,505 |
+| Artist payouts | **9.07 SOL** (automatic, onchain) | ~$683 |
+| Platform revenue | **17.44 SOL** | ~$1,313 |
+| Trader claims paid | **127.34 SOL** (manual claimShares, 939 withdrawals) | ~$9,588 |
 | On-chain program active since | August 2025 | — |
 | Program ID | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` | Solana mainnet |
 
-Per-artist breakdown: GodclouD leads with an estimated 0.207 ◎ earned across 21 battles (71.4% win rate). Full table in [Doc 1211](../1211-wavewarz-artist-economy-jul2026/).
+Per-artist breakdown: GodclouD leads with an estimated 0.207 ◎ earned across **24 battles (70.8% win rate, 11.11 SOL total volume)**. Full table in [Doc 1211](../1211-wavewarz-artist-economy-jul2026/).
 
 **What this means:** WaveWarZ is one of the few music DAOs with a live, revenue-generating product — not a whitepaper, not a testnet. Artists earn automatically on every battle and automatically again on settlement. Traders have claimed 127+ SOL in winnings. All of this settles in native SOL, no platform token.
 
@@ -103,8 +103,8 @@ Also in the ZAO stack:
 
 Other music DAOs often claim decentralization but fail on one or more of:
 1. **Active governance** — most DAO governance proposals get 2-5% participation; The ZAO's Fractal ritual has 100%+ consecutive-week participation
-2. **Working product** — most music DAOs are "coming soon"; WaveWarZ has 1,244 battles and 522 SOL volume on mainnet
-3. **Artist income** — platforms claim "artist-first" but artists see pennies; WaveWarZ artists have earned 9.07 SOL cumulatively, with GodclouD alone at an estimated 0.207 ◎ from 21 battles ([Doc 1211](../1211-wavewarz-artist-economy-jul2026/))
+2. **Working product** — most music DAOs are "coming soon"; WaveWarZ has 1,245 battles and 524.15 SOL volume on mainnet
+3. **Artist income** — platforms claim "artist-first" but artists see pennies; WaveWarZ artists have earned 9.07 SOL cumulatively, with GodclouD alone at an estimated 0.207 ◎ from 24 battles ([Doc 1211](../1211-wavewarz-artist-economy-jul2026/))
 4. **Community governance driving product** — ZAO Improvement Proposals (ZIPs) inform WaveWarZ feature roadmap; DAO = the owner, not the customer
 
 The ZAO is NOT yet:
@@ -127,4 +127,5 @@ Those gaps are growth targets, not disqualifiers. A case study is honest about b
 - [Doc 1075](../1075-wavewarz-growth/) — growth plays and current state (2026-07-13)
 - [Doc 1076](../1076-wavewarz-estate-audit/) — estate audit (2026-07-16)
 - [Doc 050](../../community/050-the-zao-complete-guide/) — ZAO complete guide
+- [Doc 1253](../1253-wavewarz-weekly-battle-trend-2025-2026/) — WaveWarZ weekly battle trend Dec 2025–Jul 2026 (all-time peak: Mar 9 week, 55 battles)
 - ZAOOS public record, thezao.com/about

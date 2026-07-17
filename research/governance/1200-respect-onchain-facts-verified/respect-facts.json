@@ -1,0 +1,25 @@
+{
+  "verified_at_block": 154329202,
+  "verified_at_timestamp": "2026-07-17T02:59:41.000000Z",
+  "source": "explorer.optimism.io (Blockscout) /api/v2 \u2014 holder lists enumerated",
+  "chain": "Optimism",
+  "og_respect": {
+    "address": "0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957",
+    "name": "ZAO RESPECT TOKEN",
+    "type": "ERC-20",
+    "holders_reported": "122",
+    "holders_enumerated": 122,
+    "total_respect_points": 38484.0
+  },
+  "zor_respect": {
+    "address": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+    "name": "ZAO Fractal Respect",
+    "type": "ERC-1155",
+    "holders_reported": "56",
+    "holders_enumerated": 56
+  },
+  "unique_holders_across_og_or_zor": 157,
+  "holders_of_both_og_and_zor": 21,
+  "naive_sum_og_plus_zor": 178,
+  "note": "The '122' figure = OG holders alone. The '~156' figure = unique holders across OG or ZOR (de-duplicated). Both are correct; cite which one you mean."
+}

@@ -21,7 +21,7 @@
 | [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
 | [Inspiration](./inspiration/) | 9 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
 | [Security](./security/) | 8 | Audits, API verification, testing |
-| [WaveWarZ](./wavewarz/) | 6 | Prediction markets, artist pipeline, Solana PDAs |
+| [WaveWarZ](./wavewarz/) | 7 | Prediction markets, artist pipeline, Solana PDAs |
 | [Archive](./_archive/) | 77 | Superseded docs (preserved for history) |
 
 ---

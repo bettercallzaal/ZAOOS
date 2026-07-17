@@ -147,7 +147,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 
 1. **The Story** - Zaal bought a house in Ellsworth. This is his town. Year 1 of a multi-year commitment.
 2. **The Opportunity** - Gateway to Acadia (4M visitors), Maine Craft Weekend (statewide), National Historic Register town
-3. **The Audience** - ZAO community (188 gated members, 400+ newsletter editions, 90+ governance sessions) + Ellsworth locals (9,000 residents, 5,000 awareness target) + Acadia tourists
+3. **The Audience** - ZAO community (188 gated members, 400+ newsletter editions, 100+ governance sessions) + Ellsworth locals (9,000 residents, 5,000 awareness target) + Acadia tourists
 4. **What Sponsors Get** - (customize per tier, but always include post-event metrics report)
 5. **Past Events** - ZAO-CHELLA Art Basel '24 (10 artists, Wynwood), ZAO-PALOOZA, COC Concertz (5 events monthly), WaveWarZ (795 battles)
 6. **The Team** - 14 members + 4 advisors including Craig Gonzalez (Whop, $1.6B), Tom Fellenz (NFT Music Hall), FailOften (NEA/Warhol funded)
@@ -177,7 +177,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 
 ### ZAOstock's Unique Position
 No other festival combines:
-1. **Decentralized governance** (90+ weeks of fractal governance, Respect-weighted)
+1. **Decentralized governance** (100+ weeks of fractal governance, Respect-weighted)
 2. **Onchain infrastructure** (WaveWarZ, 0xSplits, POAP/Magnetiq)
 3. **Existing virtual event track record** (COC Concertz, ZAO-CHELLA, ZAO-PALOOZA)
 4. **Build-in-public approach** (400+ daily newsletters documenting the journey)

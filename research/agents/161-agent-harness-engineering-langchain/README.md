@@ -104,7 +104,7 @@ The most novel pattern. For tasks spanning multiple context windows:
 This enables multi-hour, multi-window autonomous work. The filesystem is the bridge between context windows.
 
 **ZAO OS relevance:** A weekly fractal compilation agent could use the Ralph Loop to:
-- Process 90+ weeks of historical data across multiple context windows
+- Process 100+ weeks of historical data across multiple context windows
 - Compile cross-platform publishing reports
 - Generate governance summaries from multi-day proposal discussions
 

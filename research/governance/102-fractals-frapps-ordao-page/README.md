@@ -137,7 +137,7 @@ const balance = await client.getRespectOf(walletAddress);
 /fractals
 ├── Hero: "ZAO Fractal Governance"
 │   ├── Next call: Monday 6pm EST (Telegram/Discord link)
-│   ├── Quick stats: 40 members, 90+ sessions, your score
+│   ├── Quick stats: 40 members, 100+ sessions, your score
 │   └── CTA: "Play Respect Game" + "View on frapps.xyz"
 │
 ├── Tab 1: Sessions (from fractal_sessions + fractal_scores)

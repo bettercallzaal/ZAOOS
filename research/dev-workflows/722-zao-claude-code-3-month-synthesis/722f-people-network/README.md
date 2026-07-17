@@ -62,7 +62,7 @@ original-query: "Map every collaborator, advisor, and named-person who showed up
 
 | Name / Role | Context | Active Project (May 2026) | Last Touch | Memory File | Net New | Status |
 |---|---|---|---|---|---|---|
-| **Dan + Tadas** | Fractal architects, governance guides | ZAO Fractal circles (90+ week cadence, Mondays 6pm EST) | 2026-05-18 call (doc 675) references; Fractal process live | `project_fractal_process.md` | No | Active |
+| **Dan + Tadas** | Fractal architects, governance guides | ZAO Fractal circles (100+ week cadence, Mondays 6pm EST) | 2026-05-18 call (doc 675) references; Fractal process live | `project_fractal_process.md` | No | Active |
 | **Jose** | ZAOstock team, ops + community | ZAOstock standup, tracker consolidation | 2026-05-19 standup (doc 720) | None (core team) | No | Active |
 | **Defresh** (Broski) | ZAOstock team, ops | ZAOstock standup, action tracking | 2026-05-19 standup (doc 720) | None (core team) | No | Active |
 | **Cannon** | Zao Cards sub-team lead (NFC networking cards) | Zao Cards (IRL + virtual wall for Oct 3 event) | 2026-05-19 standup (doc 720) | None (yet) | No | Active |

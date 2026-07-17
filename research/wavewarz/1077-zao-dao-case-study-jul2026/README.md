@@ -109,7 +109,7 @@ Other music DAOs often claim decentralization but fail on one or more of:
 
 The ZAO is NOT yet:
 - Large-scale (188 members, not 1,000+)
-- Highly profitable (17.42 SOL platform revenue cumulatively, not a sustaining business yet)
+- Highly profitable (17.44 SOL platform revenue cumulatively, not a sustaining business yet)
 - Broadly known (primarily Farcaster + Solana ecosystem)
 
 Those gaps are growth targets, not disqualifiers. A case study is honest about both.

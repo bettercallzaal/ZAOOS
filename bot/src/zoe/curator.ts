@@ -48,8 +48,13 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { execSync } from 'node:child_process';
 
-const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
-const TOPIC_THREAD_MAP_PATH = join(ZOE_HOME, 'topic_thread_map.json');
+// Read lazily so tests can override process.env.ZOE_HOME via vi.stubEnv/beforeEach.
+function zoeHome(): string {
+  return process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
+}
+function topicThreadMapPath(): string {
+  return join(zoeHome(), 'topic_thread_map.json');
+}
 
 export type TopicKey = 'newsletter' | 'github' | 'artizen' | 'recommendations' | 'general';
 
@@ -63,7 +68,7 @@ export interface TopicThreadMap {
  */
 export async function readTopicThreadMap(): Promise<TopicThreadMap> {
   try {
-    const raw = await fs.readFile(TOPIC_THREAD_MAP_PATH, 'utf8');
+    const raw = await fs.readFile(topicThreadMapPath(), 'utf8');
     return JSON.parse(raw) as TopicThreadMap;
   } catch {
     return {};
@@ -74,8 +79,8 @@ export async function readTopicThreadMap(): Promise<TopicThreadMap> {
  * Write the topic -> thread_id map to disk atomically.
  */
 export async function writeTopicThreadMap(map: TopicThreadMap): Promise<void> {
-  await fs.mkdir(ZOE_HOME, { recursive: true });
-  await fs.writeFile(TOPIC_THREAD_MAP_PATH, JSON.stringify(map, null, 2), 'utf8');
+  await fs.mkdir(zoeHome(), { recursive: true });
+  await fs.writeFile(topicThreadMapPath(), JSON.stringify(map, null, 2), 'utf8');
 }
 
 /**
@@ -216,10 +221,6 @@ export async function generateGithubDigest(): Promise<{ text: string; timestamp:
     for (const pr of topPrs) {
       const repoLabel = pr.repository?.includes('ZAOcowork') ? '[ZAOcowork]' : '';
       digestText += `\n#${pr.number}: ${pr.title}${repoLabel ? ` ${repoLabel}` : ''}`;
-    let digestText = `Today's ships (${dateStr}):
-Merged PRs across ZAO repos:`;
-      digestText += `
-#${pr.number}: ${pr.title}${repoLabel ? ` ${repoLabel}` : ''}`;
     }
 
     // Add a closing note summarizing what shipped (keeps it high-signal, not spammy)
@@ -245,9 +246,6 @@ Merged PRs across ZAO repos:`;
 
     if (categorySummary) {
       digestText += `\n\nToday: ${categorySummary} across the ecosystem.`;
-      digestText += `
-
-Today: ${categorySummary} across the ecosystem.`;
     }
 
     return {

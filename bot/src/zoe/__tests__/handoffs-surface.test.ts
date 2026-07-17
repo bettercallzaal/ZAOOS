@@ -90,6 +90,9 @@ describe('surfaceNewHandoffs', () => {
   });
 
   it('updates the last-seen timestamp to the max created_at after surfacing', async () => {
+    // Freeze to 08:00 so the ENOENT fallback (now-1h = 07:00) is before all test rows.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-17T08:00:00.000Z'));
     process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
     process.env.COWORK_TRACKER_KEY = 'test-key';
     mockReadFile.mockRejectedValue(new Error('ENOENT'));
@@ -101,7 +104,8 @@ describe('surfaceNewHandoffs', () => {
     ];
     stubFetch(rows);
     await surfaceNewHandoffs(vi.fn().mockResolvedValue(undefined));
-    // setLastSeen should write the latest timestamp
+    vi.useRealTimers();
+    // setLastSeen should write the latest timestamp from the rows
     const written = mockWriteFile.mock.calls[mockWriteFile.mock.calls.length - 1][1];
     expect(JSON.parse(written).at).toBe('2026-07-17T12:00:00Z');
   });

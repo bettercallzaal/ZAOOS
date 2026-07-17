@@ -77,7 +77,7 @@ describe('cost-governance', () => {
 
       const status = getSpendStatus();
       expect(status.percentUsed).toBeGreaterThan(60);
-      expect(status.thresholdLevelPercent).toBe(61);
+      expect(status.thresholdLevelPercent).toBe(60); // threshold level crossed, not the actual pct
       expect(status.isAtThreshold).toBe(true);
     });
 
@@ -128,8 +128,8 @@ describe('cost-governance', () => {
       ]);
 
       const status = getSpendStatus();
-      expect(status.percentUsed).toBe(0); // cap 0 means pct = 0
-      expect(status.capUsd).toBe(10); // falls back to default
+      expect(status.capUsd).toBe(10); // falls back to default when 0 is set
+      expect(status.percentUsed).toBe(10); // $1 of $10 default cap = 10%
     });
 
     it('uses ZOE_DAILY_BUDGET_USD env var', () => {

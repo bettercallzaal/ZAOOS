@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** sponsor-pitch-templates
 > **status:** research-complete
-> **last-validated:** 2026-05-21
+> **last-validated:** 2026-07-17
 > **original-query:** What are the sponsor pitch templates (by tier) for ZAOstock outreach to local and corporate partners? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-20
@@ -18,7 +18,7 @@
 |----------|--------|
 | **Tier structure** | Small (under $1K), Medium ($1-5K), Large ($5K+) |
 | **Tone** | Warm, community-first, music-forward. Lead with the event, not the tech. |
-| **Proof points** | Use credibility stats from Doc 363: 90+ governance sessions, 795 WaveWarZ battles, 400+ newsletter editions, ZAO-CHELLA/ZAO-PALOOZA track record |
+| **Proof points** | Use credibility stats from Doc 363: 100+ governance sessions, 1,245 WaveWarZ battles (522 SOL volume), 400+ newsletter editions, ZAO-CHELLA/ZAO-PALOOZA track record |
 | **Venue details** | Franklin Street Parklet, Ellsworth ME. Part of 9th Annual Art of Ellsworth / Maine Craft Weekend. 12pm-6pm. After-party at Black Moon Public House. |
 | **Customization notes** | Replace [BUSINESS NAME], [YOUR NAME], and specific benefit lines per prospect |
 
@@ -107,7 +107,7 @@ ZAOstock is a first-of-its-kind outdoor music festival launching October 3, 2026
 
 **The event:** 10 live artists, a WaveWarZ live music battle bracket (audience votes via QR code — real stakes, real payouts to artists on-chain), 5 short talks, and an after-party at Black Moon Public House. Six hours of programming at the Franklin Street Parklet during Maine Craft Weekend, one of the state's largest statewide arts weekends. Free admission. Fully livestreamed.
 
-**The organization behind it:** The ZAO (ZTalent Artist Organization) is a 188-member decentralized music community that has run 90+ consecutive weekly governance sessions, published 400+ daily newsletter editions, produced events at NFT NYC (12 artists), Art Basel Miami (10 artists, AR installations), and ETH Denver. Our WaveWarZ music battle platform has hosted 795 battles with 435 SOL ($37K+) in real trading volume and direct artist payouts. We have a 14-person organizing team with advisors from Whop ($1.6B creator platform), JPMorgan/Accenture alumni, and NEA/Warhol-funded artists.
+**The organization behind it:** The ZAO (ZTalent Artist Organization) is a 188-member decentralized music community that has run 100+ consecutive weekly governance sessions, published 400+ daily newsletter editions, produced events at NFT NYC (12 artists), Art Basel Miami (10 artists, AR installations), and ETH Denver. Our WaveWarZ music battle platform has hosted 1,245 battles with 522 SOL (~$39K) in real trading volume and direct artist payouts. We have a 14-person organizing team with advisors from Whop ($1.6B creator platform), JPMorgan/Accenture alumni, and NEA/Warhol-funded artists.
 
 **At the $5,000+ presenting sponsor level:**
 

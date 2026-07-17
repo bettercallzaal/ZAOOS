@@ -24,7 +24,7 @@ const ZOE_VERSION = '0.2.0';
  * Render the 4 memory blocks as a system prompt for Claude Code CLI.
  * The user's message is passed separately as `prompt`.
  */
-export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean): string {
+export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean): string {
   const chatLine =
     blocks.chat_scope === 'private'
       ? 'Chat: DM with Zaal'
@@ -97,17 +97,23 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
     blocks.working,
     `</working_memory>`,
     ``,
-    `<tasks>`,
-    blocks.tasks,
-    `</tasks>`,
-    ``,
-    `<quests>`,
-    blocks.quests,
-    `</quests>`,
-    ``,
-    `<open_threads>`,
-    blocks.open_threads ?? '(no open threads)',
-    `</open_threads>`,
+    // For conversational turns (short chat, no work keywords) skip the heavy
+    // task/quest/thread context — it's irrelevant overhead and slows the reply.
+    ...(conversational
+      ? []
+      : [
+          `<tasks>`,
+          blocks.tasks,
+          `</tasks>`,
+          ``,
+          `<quests>`,
+          blocks.quests,
+          `</quests>`,
+          ``,
+          `<open_threads>`,
+          blocks.open_threads ?? '(no open threads)',
+          `</open_threads>`,
+        ]),
     ...recallBlock,
     ...brandBlock,
     ...linkResearchBlock,
@@ -160,7 +166,7 @@ async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli')
  * 6. Return structured result
  */
 export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
-  const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date, opts.recallContext, opts.brandContext, opts.linkResearchIntent);
+  const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date, opts.recallContext, opts.brandContext, opts.linkResearchIntent, opts.conversational);
 
   const senderLabel = opts.senderLabel ?? 'Zaal';
   const userPrompt = `${senderLabel}: ${opts.message}`;

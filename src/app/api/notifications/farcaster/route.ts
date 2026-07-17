@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
   try {
     const cursor = request.nextUrl.searchParams.get('cursor') ?? undefined;
     const limitParam = request.nextUrl.searchParams.get('limit');
-    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+    // Guard NaN: a non-numeric limit falls back to undefined (let getNotifications
+    // apply its own default) rather than passing NaN downstream to Neynar.
+    const parsedLimit = limitParam ? parseInt(limitParam, 10) : undefined;
+    const limit = Number.isNaN(parsedLimit) ? undefined : parsedLimit;
 
     const data = await getNotifications(session.fid, cursor, limit);
     return NextResponse.json(data);

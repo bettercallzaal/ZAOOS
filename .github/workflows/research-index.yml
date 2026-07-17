@@ -6,8 +6,19 @@ name: Research index guard
 # merge time to catch it - happened with docs 1076, 1174, and 1176, each found and
 # repaired only later by a manual `--all` audit. This runs that full --all audit on
 # every PR that touches research/, so an unindexed doc fails CI before it can merge.
+#
+# The push trigger below re-runs --all AFTER every merge into main so that a
+# squash-merge that drops a folder-index row (conflict between two agents both
+# appending to the same README) shows as a failing check on main rather than
+# silently becoming a gap discovered only on the next PR.
 on:
   pull_request:
+    paths:
+      - 'research/**'
+      - 'scripts/check-research-index.sh'
+  push:
+    branches:
+      - main
     paths:
       - 'research/**'
       - 'scripts/check-research-index.sh'

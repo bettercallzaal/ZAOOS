@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-07-06
+last-validated: 2026-07-17
 superseded-by:
 related-docs: 974, 975, 977, 443, 050, 836
 original-query: "ZAO Numbers - set up framing - a single honest way to present ZAO's ecosystem numbers so decks, the site, and casts stop citing conflicting figures"
@@ -32,7 +32,7 @@ These are not the same population and must never be merged into one "~200" figur
 
 | Claim | Number | Caveat | Source |
 |-------|--------|--------|--------|
-| Unbroken weekly Fractals | **~101 weeks** ("100+") | Corrects the old "90+"; use 100+ | Doc 975 / 977 |
+| Unbroken weekly Fractals | **100+** (102 by date-calc; 63 on-chain) | Two-layer: date-calc 102 weeks (start 2024-07-30) + 63 weeks verified on-chain (doc 1202). Cite: "100+ weekly Respect Games, 63 weeks with on-chain Respect settlement." | Doc 1201 / 1202 |
 | OG Respect supply | 38,484 (frozen) | measured | Doc 975 |
 | Distribution Gini | **0.73** (OG-only, concentrated) | Do NOT claim "egalitarian / 0.23" - that was modeled and wrong (Doc 977) | Doc 975 |
 | OREC proposal concentration | 94% from one relayer | State it - it is the honest limitation | Doc 975 |
@@ -57,18 +57,17 @@ The distribution number is the discipline test: the honest 0.73 (concentrated) b
 
 ### WaveWarZ - the one to caveat hardest
 
-The numbers here are **self-reported and disagree across surfaces.** Doc 974 is the reconciled source. Present as directional, never precise:
+Live API data is now authoritative. Use `wavewarz.info/api/public/stats` (public, no auth, 60s cache) as the canonical source. The "directional / self-reported" caveat is **retired as of 2026-07-17**.
 
-- Volume: **~$33K (~491 SOL)** reconciled (Doc 974) - NOT "$37K / 435 SOL" (older deck figure). Pick one, cite Doc 974, flag "directional, pending a live on-chain pull."
-- Battles: **~1,125** reconciled - NOT "795" (older figure).
-- The load-bearing honest point from Doc 974: platform revenue has exceeded artist payouts. Do not bury it.
-
-Until a live on-chain pull reconciles WaveWarZ (Doc 974 next action), every WaveWarZ number carries "self-reported / directional."
+- Volume: **522 SOL (~$39K at $75/SOL)** — live API 2026-07-17. NOT "491 SOL" or "435 SOL" (older figures).
+- Battles: **1,245** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) — live API 2026-07-17. NOT "~1,125" or "795" (older figures).
+- Artist payouts: **9.05 SOL** — live API. Platform revenue: **17.43 SOL** (exceeds artist payouts — still the honest load-bearing point, state it).
+- Trader claims: **127.34 SOL** — live API.
 
 ## The "which number when" cheat sheet
 
 - **Sponsor deck** -> lead with dated festival receipts + 100+ weeks + 400+ newsletter editions. Concrete, verifiable, no crypto jargon.
-- **Governance / DAO audience** -> 156 holders, ~101 weeks, Gini 0.73 stated honestly, 94% proposer concentration named as the limitation.
+- **Governance / DAO audience** -> 157 unique holders (doc 1200), 100+ weeks (two-layer, doc 1201/1202), Gini 0.73 stated honestly, 94% proposer concentration named as the limitation.
 - **Farcaster / community cast** -> 188-member community, build-in-public, 400+ editions.
 - **Never in any context** -> "~200 members", "Gini 0.23 / egalitarian", precise WaveWarZ dollar figures without the "directional" flag.
 
@@ -85,7 +84,7 @@ Until a live on-chain pull reconciles WaveWarZ (Doc 974 next action), every Wave
 |--------|-------|------|---------|
 | Adopt this canonical set in the next sponsor deck + thezao.xyz copy; purge "~200 / Gini 0.23 / precise WaveWarZ $" | @Zaal | Edit | 2026-07-20 |
 | Confirm the ETH Denver artist count so the festivals row is complete | @Zaal | Research | 2026-07-20 |
-| After Doc 974's live WaveWarZ pull, update the WaveWarZ figures here and drop "directional" | @Zaal | Edit | 2026-07-27 |
+| ~~After Doc 974's live WaveWarZ pull, update the WaveWarZ figures here and drop "directional"~~ | DONE 2026-07-17 (live API confirmed, directional caveat retired) | | |
 
 ## Sources
 

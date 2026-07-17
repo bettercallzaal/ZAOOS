@@ -128,7 +128,7 @@ Hub currently links 8 portals. Sub-Agent B identified 25 more projects/people/br
 | SongJam (SANG token + $ZABAL leaderboard) | songjam.space | Live-now widget + top-5 Empire embed | 5 |
 | ZAO Stock (Oct 2026 festival, Ellsworth ME) | zaoos.com/stock | Hero card + countdown | 5 |
 | COC Concertz (150+ weekly VR shows) | cocconcertz.com | "Next show" badge | 4 |
-| WaveWarZ (795 battles, 435 SOL volume) | wavewarz.com | "Top recent battle" embed | 5 |
+| WaveWarZ (1,245 battles, 522 SOL volume) | wavewarz.com | "Top recent battle" embed | 5 |
 | Magnetiq Proof-of-Meet (IRL connection badges) | magnetiq.xyz | Portal card in ecosystem grid | 4 |
 | Ohnahji University ("Web3's first HBCU") | ohnahjiu.com | Portal card | 3 |
 | Hats Protocol (ZAO roles, tree 226 Optimism) | hatsprotocol.xyz | Roles section in About | 3 |

@@ -123,6 +123,53 @@ export function formatCockpitBrief(b: CockpitBrief): string {
   return parts.join('\n');
 }
 
+/**
+ * Concise brief for the Claude CLI prompt.
+ *
+ * Sends counts + top-3 DO-FIRST + top-3 per other section so the LLM
+ * has full context for the operator read without a huge token payload.
+ * Keeps the operator-read API call well under COCKPIT_BUDGET_USD.
+ */
+export function formatCockpitBriefCli(b: CockpitBrief): string {
+  const parts: string[] = [];
+  parts.push(`Cockpit - ${b.date}`);
+  parts.push(
+    `${b.counts.open} open | ${b.counts.needsYou} need you | ${b.counts.needsReview} PRs to review | ${b.counts.handoffs} handoffs | ${b.counts.captures} captures | ${b.counts.stale} stale | ${b.counts.blocked} blocked`,
+  );
+  if (b.top3.length) parts.push('\nDO FIRST\n' + b.top3.slice(0, 3).map(line).join('\n'));
+  if (b.needsReview.length) {
+    const shown = b.needsReview.slice(0, 3);
+    const extra = b.needsReview.length - shown.length;
+    parts.push(
+      `\nNEEDS YOUR REVIEW (${b.counts.needsReview} total)\n` +
+        shown.map((p) => `- ${p.repo} #${p.number}: ${p.title}`).join('\n') +
+        (extra > 0 ? `\n(+${extra} more)` : ''),
+    );
+  }
+  if (b.handoffs.length) {
+    const shown = b.handoffs.slice(0, 3);
+    const extra = b.handoffs.length - shown.length;
+    parts.push(
+      `\nHANDOFFS (${b.counts.handoffs} total)\n` +
+        shown.map((h) => `- ${h.slug}: ${h.title}`).join('\n') +
+        (extra > 0 ? `\n(+${extra} more)` : ''),
+    );
+  }
+  if (b.needsYou.length) {
+    const shown = b.needsYou.slice(0, 3);
+    const extra = b.needsYou.length - shown.length;
+    parts.push(
+      `\nNEEDS YOU (${b.counts.needsYou} total)\n` +
+        shown.map(line).join('\n') +
+        (extra > 0 ? `\n(+${extra} more)` : ''),
+    );
+  }
+  if (b.blocked.length) {
+    parts.push(`\nBLOCKED (${b.counts.blocked} total)\n` + b.blocked.slice(0, 3).map(line).join('\n'));
+  }
+  return parts.join('\n');
+}
+
 /** Persist the brief to the artifact store. Best-effort - never throws. */
 export async function saveBriefArtifact(b: CockpitBrief): Promise<string | null> {
   try {

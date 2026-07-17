@@ -1,0 +1,31 @@
+# WaveWarZ
+
+<!-- GENERATED from research/identity/icm-boxes/wavewarz.llm.txt — single source of truth. Do not edit directly; edit the box and re-run build-llms-txt.py. -->
+
+> WaveWarZ is live-traded music battles: artists battle, fans trade and earn. Part of The ZAO ecosystem.
+
+## What it is
+- A prediction-market-style music battle platform on Solana (mainnet), with a Base testnet and a Base-to-Solana bridge (via Mayan and Wormhole).
+- Quick battles run on weekdays; main events run on Sundays.
+- Artists compete; fans trade positions on the outcome and earn.
+
+## In the ZAO ecosystem
+- One of the ZAO production lanes alongside ZABAL Games and the festivals.
+- August ZABAL Games Finals integrate WaveWarZ-Base for on-chain settlement.
+
+## Find it
+- wavewarz.com
+- X: @WaveWarZ
+- Farcaster: the /wavewarz channel
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- ZABAL Games (zabalgamez)
+
+## Canonical identity
+- Name: WaveWarZ
+- URL: https://wavewarz.com
+- sameAs:
+  - https://x.com/WaveWarZ
+  - https://warpcast.com/~/channel/wavewarz

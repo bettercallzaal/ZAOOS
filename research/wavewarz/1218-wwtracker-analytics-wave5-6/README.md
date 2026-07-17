@@ -178,3 +178,4 @@ After all 82 open PRs merge:
 - [Doc 1214](../1214-wavewarz-creative-ecosystem-jul2026/) — ZAO IP catalog ($1,497 charity, interview verifications)
 - [Doc 1216](../1216-wwtracker-analytics-wave4/) — Wave 4 (preceding waves)
 - [Doc 1077](../1077-zao-dao-case-study-jul2026/) — ZAO DAO case study (primary external citation doc)
+

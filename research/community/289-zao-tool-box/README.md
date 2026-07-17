@@ -306,7 +306,7 @@ The ZAO Tool Box is the complete inventory of products built inside ZAO OS. Each
 | Field | Detail |
 |-------|--------|
 | **Name** | Fractal Dashboard |
-| **What it does** | Weekly governance meetings (Mondays 6pm EST, 90+ weeks running). Fibonacci-scored consensus process. Session tracking, member analytics, proposal submissions (frapps). Integrated with Discord bot (Python, existing infrastructure). |
+| **What it does** | Weekly governance meetings (Mondays 6pm EST, 100+ weeks running). Fibonacci-scored consensus process. Session tracking, member analytics, proposal submissions (frapps). Integrated with Discord bot (Python, existing infrastructure). |
 | **How you could use it** | Participate in weekly fractals to earn Respect. Submit frapps (fractal apps/proposals). Track your contribution history and analytics. |
 | **Key files** | `src/app/(auth)/fractals/page.tsx`, `src/app/api/fractals/sessions/route.ts`, `src/app/api/fractals/proposals/route.ts`, `src/app/api/fractals/member-analytics/route.ts` |
 | **API endpoints** | 5 — proposals, sessions, member-analytics, webhooks |

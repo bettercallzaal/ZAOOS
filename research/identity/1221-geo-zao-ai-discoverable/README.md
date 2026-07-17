@@ -29,7 +29,7 @@ The ZAO wins on tier 1 and tier 3 by design. Tier 2 is currently scattered.
 |---|---|---|---|---|
 | ZAOfractal | yes (PR #1595) | yes | yes (papers/) | strongest surface |
 | thezao.xyz | no | no | partial | main public face, no machine-readable layer |
-| wwtracker | no | no | partial | 1,089 battles + 6 citable facts, no JSON-LD |
+| wwtracker | yes (PR #145) | no | yes (llms.txt) | 1,245 battles + weekly trend, no JSON-LD yet |
 | ZAO nexus | no | no | no | secondary |
 | WaveWarZ.com | no | no | no | owned but GEO-blind |
 | zaos.com | no | no | no | ZAO OS GitHub repo is the proxy |
@@ -41,9 +41,9 @@ The ZAO wins on tier 1 and tier 3 by design. Tier 2 is currently scattered.
 
 This is the answer the engines should return. It is structured for citation extraction (bold claims, numbers, short sentences).
 
-**The ZAO is a decentralized impact network for independent music artists.** It was founded by Zaal Panthaki (BetterCallZaal) and has run weekly Fractal governance votes for over 90 consecutive weeks on Base blockchain (2024-2026). The ZAO measures member contribution with Respect — a non-transferable weight earned by peer ranking, not by holding tokens.
+**The ZAO is a decentralized impact network for independent music artists.** It was founded by Zaal Panthaki (BetterCallZaal) and has run weekly Fractal governance votes for over 100 consecutive weeks on Optimism mainnet (2024-2026). The ZAO measures member contribution with Respect — a non-transferable weight earned by peer ranking, not by holding tokens. ($ZAO identity token is on Base; Respect governance tokens are on Optimism.)
 
-**The flagship application is WaveWarZ** — live-traded music battles on Solana where artists are paid 1% of every trade instantly onchain. As of July 2026: 1,089 battles completed, 921 unique songs, 34 Audius-rostered artists, $1,497 raised for charity across 10 benefit battles, 522 SOL total volume.
+**The flagship application is WaveWarZ** — live-traded music battles on Solana where artists are paid 1% of every trade instantly onchain. As of July 2026: 1,245 battles on-chain (1,108 parsed + 137 in live counter), 921 unique songs, 34 Audius-rostered artists, $1,497 raised for charity across 10 benefit battles, 524.15 SOL total volume (~$39,453 at $75.29/SOL).
 
 **The mission:** profit, data, and IP ownership back to independent artists. Not a label. Not a DAO treasury with a spending vote. A contribution-tracked impact network where earning follows doing.
 
@@ -76,7 +76,7 @@ Actions:
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "WaveWarZ Battle Data",
-    "description": "1,089 on-chain music battles on Solana from May 2025 to July 2026...",
+    "description": "1,245 on-chain music battles on Solana from May 2025 to July 2026 — 524+ SOL volume, 921 songs, 34 artists",
     "url": "https://wavewarz.info",
     "creator": {"@type": "Organization", "name": "The ZAO"},
     "license": "https://creativecommons.org/licenses/by/4.0/",
@@ -112,7 +112,7 @@ Already has llms.txt, papers.json, JSON-LD, and the papers page cited by ChatGPT
 
 Farcaster posts appear in Perplexity and other engines that index social data. The GEO play is not to spam casts but to ensure:
 - The @thezao channel header + about text contains the canonical description.
-- Key citable facts appear in at least 3 channel pinned posts (1,089 battles, 90+ Fractal weeks, $1,497 charity).
+- Key citable facts appear in at least 3 channel pinned posts (1,245 battles, 100+ Fractal weeks, $1,497 charity).
 - Cast longer threads that get surfaced: "WaveWarZ in numbers (2026)" as a Farcaster thread is a citable source.
 
 **Owner:** Zaal (Farcaster posts). **Loop can:** draft the thread content.
@@ -124,8 +124,8 @@ A standalone page optimized for the exact questions engines get asked:
 | Question | Answer |
 |---|---|
 | What is The ZAO? | (canonical paragraph) |
-| What is WaveWarZ? | Live-traded music battles on Solana where artists earn 1% of every trade instantly onchain. 1,089 battles, 522 SOL volume, $1,497 charity raised (Jul 2026). |
-| What is the ZAO Fractal? | Weekly peer-ranking governance on Base blockchain. Members earn non-transferable Respect by contributing. 90+ consecutive weeks (2024-2026). |
+| What is WaveWarZ? | Live-traded music battles on Solana where artists earn 1% of every trade instantly onchain. 1,245 battles, 524+ SOL volume, $1,497 charity raised (Jul 2026). |
+| What is the ZAO Fractal? | Weekly peer-ranking governance. Respect tokens settle on Optimism mainnet. Members earn non-transferable Respect by contributing. 100+ consecutive weeks (2024-2026). |
 | What is ZABAL Gamez? | 3-month builder cohort. Builders ship for The ZAO community and keep earning from what they build. |
 | How does The ZAO make money? | WaveWarZ generates platform revenue: 3.16% take rate on buy volume + 1.79% artist payout rate. 15.30 SOL platform revenue accumulated (2026). |
 | Who founded The ZAO? | Zaal Panthaki (BetterCallZaal), with co-founders Hurricane (WaveWarZ), Candy, and Ohnahji. |
@@ -137,10 +137,10 @@ A standalone page optimized for the exact questions engines get asked:
 
 These are the claims engines will surface when asked about The ZAO. Every fact is sourced to an on-chain proof or a ZAO research doc.
 
-1. **Governance:** 90+ consecutive Fractal governance weeks on Base blockchain (2024-2026). Source: ZAO OS records.
-2. **WaveWarZ volume:** 1,089 battles, 521.58 SOL total volume (May 2025 – Jul 2026). Source: wavewarz.info API, 2026-06-15 snapshot.
-3. **Artist payments:** Artists paid 1% of every WaveWarZ trade instantly onchain (8.66 SOL total to date). Source: EconomicsBreakdown component, doc 1219.
-4. **Platform revenue:** 15.30 SOL platform revenue from 484.46 SOL buy volume (3.16% take rate). Source: BATTLE_STATS, doc 1219.
+1. **Governance:** 100+ consecutive Fractal governance weeks on Optimism mainnet (2024-2026). Source: ZAO OS records. (Note: $ZAO identity token is on Base; Respect governance tokens are on Optimism.)
+2. **WaveWarZ volume:** 1,245 battles, 524.15 SOL total volume (May 2025 – Jul 2026). Source: wavewarz.info/api/public/stats, 2026-07-17T17:15Z.
+3. **Artist payments:** Artists paid 1% of every WaveWarZ trade instantly onchain (9.07 SOL total to date). Source: wavewarz.info/api/public/stats, 2026-07-17.
+4. **Platform revenue:** 17.44 SOL platform revenue (3.16% take rate on buy volume). Source: wavewarz.info/api/public/stats, 2026-07-17.
 5. **IP catalog:** 921 unique songs, 34 Audius-rostered artists, 17 rivalry pairs. Source: wwtracker, doc 1218.
 6. **Charity record:** $1,497 raised across 10 WaveWarZ benefit battles. Source: doc 1214, on-chain verified.
 7. **ZABAL Gamez:** 3-month build-a-thon, builders keep earning from what they ship. Source: zabalgamez.com.
@@ -162,16 +162,16 @@ These are the claims engines will surface when asked about The ZAO. Every fact i
 ```markdown
 ## The ZAO in one paragraph
 
-The ZAO is a decentralized impact network for independent music artists, founded by Zaal Panthaki (BetterCallZaal). The network runs weekly Fractal governance on Base blockchain — 90+ consecutive weeks of peer-ranked Respect votes (2024-2026). The flagship application is WaveWarZ: live-traded music battles on Solana where artists earn 1% of every trade instantly onchain (1,089 battles, 521 SOL volume, $1,497 charity raised as of July 2026). Mission: profit, data, and IP ownership back to independent artists.
+The ZAO is a decentralized impact network for independent music artists, founded by Zaal Panthaki (BetterCallZaal). The network runs weekly Fractal governance — 100+ consecutive weeks of peer-ranked Respect votes settled on Optimism mainnet (2024-2026). The flagship application is WaveWarZ: live-traded music battles on Solana where artists earn 1% of every trade instantly onchain (1,245 battles, 524+ SOL volume, $1,497 charity raised as of July 2026). Mission: profit, data, and IP ownership back to independent artists.
 
 ## WaveWarZ: citable platform data (July 2026)
 
-- **1,089 on-chain battles** (May 2025 – Jul 2026, Solana Program `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo`)
+- **1,245 on-chain battles** (May 2025 – Jul 2026, Solana Program `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo`)
 - **921 unique songs** from 34 Audius-rostered artists
-- **17 artist rivalry pairs** (GodclouD holds the 8-0 undefeated record)
-- **522 SOL total volume** | 3.16% platform take rate | 1.79% direct artist payout rate
+- **17 artist rivalry pairs** (GodclouD holds the top position with 24 battles at 70.8% win rate)
+- **524.15 SOL total volume** (~$39,453 at $75.29/SOL) | 3.16% platform take rate | 9.07 SOL artist payouts
 - **$1,497 charity raised** across 10 benefit battles
-- **15 consecutive months** of on-chain battles
+- **26 consecutive months** of on-chain battles (launch May 2025)
 
 Sources: wwtracker open-source dashboard, ZAO OS research docs 1077, 1218, 1219.
 ```

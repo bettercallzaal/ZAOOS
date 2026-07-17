@@ -122,7 +122,7 @@
 | **Website** | [wavewarz.com](https://www.wavewarz.com), [wavewarz.info](https://wavewarz.info) (analytics) |
 | **Total battles** | 1,245 (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) |
 | **Total volume** | 524.15 SOL (~$39K at $75/SOL, 2026-07-17) |
-| **Total artist payouts** | 9.05 SOL |
+| **Total artist payouts** | 9.07 SOL |
 | **Artist economics** | 1% trading volume + 5-7% settlement bonus, instant onchain |
 | **Legal entity** | Delaware C-Corp |
 | **Founders** | Hurric4n3Ike + Candy |

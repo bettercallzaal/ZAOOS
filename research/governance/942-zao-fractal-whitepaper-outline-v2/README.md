@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-07-02
+last-validated: 2026-07-17
 related-docs: 718, 935, 936, 941, 696, 703
 original-query: "go hard on the fractal stuff from all our learning - advance the ZAO protocol/fractal whitepaper"
 tier: STANDARD
@@ -54,7 +54,7 @@ Same 11-chapter spine as 718, with the new docs folded in and the decay correcti
 |---|---|
 | 4, 5, 6 | Re-verify the OG/ZOR/OREC contract addresses + chain on-chain before publish (718 already flagged; 718c cites Optimism). Confirm which chain is canonical now. |
 | 5 | Confirm the live Fibonacci curve + consensus threshold against current code/process, not just 718b's description. |
-| 8 | Refresh the "90+ weeks" count and the OG/ZOR ledger split numbers to the current week (703 is the anchor; re-date it). |
+| ~~8~~ | ~~Refresh the "90+ weeks" count~~ → **CLOSED 2026-07-17:** use "100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism" (doc 1201 + doc 1202). OG/ZOR ledger split: 157 unique holders (doc 1200). |
 | 9 | Confirm the "two wallets drive OREC" operating-core claim is still true (it drives the honesty chapter). |
 | 9 | Weave in doc 1142's error-recovery framework: the reversible/irreversible decision taxonomy, the amendment process, and the failure feedback loop. State the "irreversible decisions with no recovery path" exposure (doc 1139) as a named open problem, not hidden. |
 | 10 | 941's on-chain pieces (gas-free relayer submit, Snapshot-strategy bounty routing) are buildable-but-unbuilt - frame as roadmap, never as shipped. |
@@ -69,8 +69,9 @@ Four of the pre-draft gaps above are now closed by direct code check - these fac
 | Contract addresses + chain | `respect/transfers/route.ts`, `proposals/vote/route.ts`, `fractals/AboutTab.tsx` | OG `0x34cE89...216957`, ZOR `0x9885CC...E7445c`, OREC `0xcB05F9...6Be532` - all match 718c and resolve to **Optimism** (optimistic.etherscan.io). Confirmed. |
 | Vote-weight path | `voteWeight.ts` | OG (ERC-20, formatEther) + ZOR (ERC-1155 integer) via viem multicall. Matches 718c/936. Confirmed. |
 | Fibonacci scoring curve | `src/app/(auth)/fractals/AboutTab.tsx:33` | 1x: 55/34/21/13/8/5; 2x: 110/68/42/26/16/10 - matches 718b exactly. Confirmed. |
+| Fractal week count (Ch 8) | doc 1201 + doc 1202 (2026-07-17) | Two-layer verified: (1) date-calc — start 2024-07-30, 716 days ÷ 7 = 102 complete weeks as of 2026-07-16; (2) on-chain — 63 distinct settlement weeks (OG 33 + ZOR 31, Blockscout-verified). Cite in Ch 8 as: **"100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism."** Confirmed. |
 
-Still open (need on-chain / live data, not code): the current fractal week count (718g's "90+ weeks" - re-count before Ch 8) and the "two wallets drive OREC" operating-core claim (Ch 9) - both need an on-chain/process query, not a grep.
+Still open (need on-chain / live data, not code): the "two wallets drive OREC" operating-core claim (Ch 9) — needs an on-chain/process query, not a grep. ~~Fractal week count~~ → CLOSED 2026-07-17 (see row above).
 
 ## Decisions only Zaal can make (the brainstorm gate)
 

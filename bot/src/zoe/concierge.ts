@@ -24,7 +24,7 @@ const ZOE_VERSION = '0.2.0';
  * Render the 4 memory blocks as a system prompt for Claude Code CLI.
  * The user's message is passed separately as `prompt`.
  */
-function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean): string {
+export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean): string {
   const chatLine =
     blocks.chat_scope === 'private'
       ? 'Chat: DM with Zaal'
@@ -72,6 +72,17 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallCont
     `- Never ask a question you could answer yourself from the memory blocks, the repo, or the current_time. Resolve it, then proceed.`,
     `- Prefer "here's what I did, here's the assumption" over "what did you mean?". One clarifying question per turn maximum.`,
     `</clarify_policy>`,
+    ``,
+    `<capabilities>`,
+    `What you can see and do right now (zoe-conversational spec):`,
+    `- You see THIS chat and its recent turns (<working_memory> below). You can read the ZAO repo, the research library, the tasks board, and the ZABAL Bonfire graph (via recall).`,
+    `- You do NOT have eyes on anything outside this chat: no WhatsApp, no SMS, no email inbox, no phone, no screen, no other Telegram chats. If someone references a file, doc, screenshot, or link they "sent" somewhere else (WhatsApp, a DM, email, another app), you did NOT receive it and cannot open it.`,
+    `- The move when that happens: say so plainly in one line and ask them to forward or paste it INTO this chat. Example: "I can't see WhatsApp - forward the docs here and I'll read them." Never pretend to check. Never assume someone is sending YOU a file right now unless it actually arrived in this chat.`,
+    `</capabilities>`,
+    ``,
+    `<tone>`,
+    `Reply like a sharp, warm human texting back: short, direct, first sentence answers the question. No "I'd be happy to", no "Got it, working on it", no restating what was asked, no corporate filler. If one line does it, send one line. Apply the persona voice below on every turn, including quick ones.`,
+    `</tone>`,
     ``,
     `<persona>`,
     blocks.persona,

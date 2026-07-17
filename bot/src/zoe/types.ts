@@ -233,6 +233,33 @@ export function selectModel(message: string): string {
   return ZOE_DEFAULT_MODEL;
 }
 
+/**
+ * Is this a plain conversational turn (chat) vs. real work (research, planning,
+ * multi-step build)? Conversational turns get the quick model for instant
+ * replies and skip the "working on it" ack (spec: zoe-conversational, 2026-07-16).
+ *
+ * "Real work" = anything with a URL to fetch/analyze, a strategic/planning ask,
+ * an explicit build/research/draft request, or a long substantive message. Those
+ * keep the default/hard model and the honest progress narration. Everything
+ * else - short questions, back-and-forth, quick asks - is chat.
+ */
+export function isConversationalTurn(message: string): boolean {
+  const text = message.trim();
+  if (text.length === 0) return false;
+  // A link to fetch + analyze is work, not chat.
+  if (/https?:\/\//i.test(text)) return false;
+  const lower = text.toLowerCase();
+  const workKeywords = [
+    'plan', 'strategy', 'should i', 'tradeoff', 'compare', 'whitepaper',
+    'architecture', 'research', 'analyze', 'decompose', 'dispatch', 'audit',
+    'draft ', 'write up', 'write a', 'build ', 'design ', 'spec ',
+  ];
+  if (workKeywords.some((kw) => lower.includes(kw))) return false;
+  // Long messages are usually substantive work, not a quick back-and-forth.
+  if (text.length > 220) return false;
+  return true;
+}
+
 // --- SIDEQUESTZ (doc 648 / spec 2026-05-14) -----------------------------------
 
 export interface SideQuest {

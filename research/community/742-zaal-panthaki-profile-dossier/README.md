@@ -176,7 +176,7 @@ Mirrors Ike's chain (football → EE → Infosys → sales → spaces → indie 
 
 - **188** ZAO members on Base
 - **1,000+** ecosystem participants (broader)
-- **90+** consecutive weekly Respect Games
+- **100+** consecutive weekly Respect Games (63 with on-chain Respect settlement, doc 1202)
 - **540+** research docs in ZAOOS
 - **301** API routes, **279** components, **19** custom hooks
 - **400+** daily newsletter editions

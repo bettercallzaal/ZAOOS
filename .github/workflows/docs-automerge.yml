@@ -1,11 +1,21 @@
 name: Auto-merge safe PRs
 
 # Safe categories self-merge once CI is green:
-#   docs  — research/** and docs/** only (with doc-number collision guard)
-#   tests — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
+#   docs    — research/** and docs/** only (with doc-number collision guard)
+#   tests   — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
+#   scripts — NEWLY-ADDED standalone tools under scripts/**/*.py|*.sh (may ride
+#             alongside docs). Safe because: (a) additive only — a *modified*
+#             script drops the PR to unsafe, so nothing already-wired changes;
+#             (b) standalone — scripts/** is not imported by the app or the bot
+#             runtime, so merging one cannot break the build or boot; (c) it
+#             cannot be auto-invoked by the merge — only .husky/** and
+#             .github/** run automatically, both outside scripts/. Convention:
+#             the author runs the script's --selftest before opening the PR.
 # All other PRs (runtime code, config, CI changes) wait for Zaal.
 # --auto requires all required status checks to pass before merging.
 # No fallback merge without CI receipt — the || bypass is intentionally removed.
+# Mix rule: any combination of docs + tests + additive scripts auto-merges (none is
+# runtime); any runtime/config/CI file makes the whole PR unsafe (waits for Zaal).
 
 on:
   pull_request:
@@ -25,26 +35,50 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
-          echo "$files"
-          category=""
-          while IFS= read -r f; do
+          # Read "status<TAB>filename" pairs so we can require additive-only scripts.
+          pairs=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | "\(.status)\t\(.filename)"')
+          echo "$pairs"
+          has_docs=0; has_tests=0; has_scripts=0; has_unsafe=0
+          while IFS=$'\t' read -r status f; do
+            [ -z "$f" ] && continue
             case "$f" in
               research/*|docs/*)
-                [ "$category" = "tests" ] && { category="unsafe"; break; }
-                category="docs"
+                has_docs=1
                 ;;
               *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx|*/__tests__/*)
-                [ "$category" = "docs" ] && { category="unsafe"; break; }
-                category="tests"
+                has_tests=1
+                ;;
+              scripts/*.py|scripts/*.sh)
+                # additive standalone tools only — a modified script may be wired
+                # into something, so it is NOT auto-safe.
+                if [ "$status" = "added" ]; then has_scripts=1; else has_unsafe=1; fi
                 ;;
               *)
-                category="unsafe"
-                break
+                has_unsafe=1
                 ;;
             esac
-          done <<< "$files"
-          echo "category=${category:-unsafe}" >> "$GITHUB_OUTPUT"
+          done <<< "$pairs"
+
+          # Combination rules: any file touching runtime/config/CI -> unsafe (waits
+          # for Zaal). Otherwise ANY mix of the three individually-safe categories
+          # (docs, tests, additive scripts) auto-merges - none of them contains
+          # runtime code, so a mix cannot break the build or bot. If docs are present
+          # the category is "docs" so the doc-number collision guard runs.
+          # (Relaxed 2026-07-17: docs+tests was previously forced unsafe, which piled
+          #  up green PRs that bundle a research-doc edit with test files - a big chunk
+          #  of the merge backlog. Mixing individually-safe categories is still safe.)
+          if [ "$has_unsafe" = "1" ]; then
+            category="unsafe"
+          elif [ "$has_docs" = "1" ]; then
+            category="docs"        # docs, optionally + tests + additive scripts; collision guard runs
+          elif [ "$has_tests" = "1" ]; then
+            category="tests"       # tests, optionally + additive scripts; no docs
+          elif [ "$has_scripts" = "1" ]; then
+            category="scripts"
+          else
+            category="unsafe"
+          fi
+          echo "category=${category}" >> "$GITHUB_OUTPUT"
 
       - name: Block doc-number collisions
         if: steps.classify.outputs.category == 'docs'
@@ -53,10 +87,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # A doc number must be globally unique across research/. If this PR
-          # adds research/<topic>/NNN-slug/ and main already has NNN under a
+          # ADDS research/<topic>/NNN-slug/ and main already has NNN under a
           # different slug anywhere, hold the PR for a human instead of merging
           # a collision (this happened: #1073 duplicated 964).
-          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
+          #
+          # Only ADDED doc dirs can introduce a NEW collision. Filtering to
+          # status=added is load-bearing: a PR that merely EDITS an existing doc
+          # whose number was historically collided (30+ such pre-band dups on main,
+          # e.g. 363 exists as both community/363-... and agents/363-...) would
+          # otherwise be falsely held forever - which blocked real green docs PRs
+          # (#1650/#1654/#1661/#1613) on edits they did not author. (Fixed 2026-07-17.)
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | select(.status=="added") | .filename')
           newdirs=$(echo "$files" | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u || true)
           if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)
@@ -76,7 +117,8 @@ jobs:
       - name: Enable auto-merge (squash)
         if: |
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||
-          steps.classify.outputs.category == 'tests'
+          steps.classify.outputs.category == 'tests' ||
+          steps.classify.outputs.category == 'scripts'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

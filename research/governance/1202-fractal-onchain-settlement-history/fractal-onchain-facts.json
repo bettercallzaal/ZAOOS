@@ -1,0 +1,21 @@
+{
+  "verified": "2026-07-17 via Blockscout explorer.optimism.io token transfers (enumerated)",
+  "og_erc20": {
+    "distinct_weeks": 33,
+    "distinct_txs": 438,
+    "span": [
+      "2024-07-30T00:20:15.000000Z",
+      "2025-12-20T22:52:43.000000Z"
+    ]
+  },
+  "zor_erc1155": {
+    "distinct_weeks": 31,
+    "distinct_txs": 67,
+    "span": [
+      "2025-09-25T06:29:11.000000Z",
+      "2026-07-06T23:33:15.000000Z"
+    ]
+  },
+  "combined_distinct_weeks_onchain_settlement": 63,
+  "overlap_weeks": 1
+}

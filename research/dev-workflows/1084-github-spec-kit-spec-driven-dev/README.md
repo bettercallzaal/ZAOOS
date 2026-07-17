@@ -61,7 +61,7 @@ Integration: 30+ AI agents (Copilot, Claude Code, Gemini CLI, Cursor, etc.) via 
 
 | Spec Kit Artifact | ZAO Equivalent | Location | Evidence |
 |---|---|---|---|
-| Spec (requirements + principles) | 8x .claude/rules/ files (api-routes, components, typescript-hygiene, tests, etc.) | `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/rules/` | Each rule file IS a spec for its domain (e.g., api-routes.md specifies: "Validate ALL input with Zod safeParse," "Check session," "Return NextResponse.json") |
+| Spec (requirements + principles) | 8x .claude/rules/ files (api-routes, components, typescript-hygiene, tests, etc.) | `.claude/rules/` | Each rule file IS a spec for its domain (e.g., api-routes.md specifies: "Validate ALL input with Zod safeParse," "Check session," "Return NextResponse.json") |
 | Spec (branding + config) | CLAUDE.md + community.config.ts | `CLAUDE.md` (lines 86-93) + root | CLAUDE.md section "Workflow Orchestration" rule 1: "Plan first. For any task with 3+ steps or architectural decisions, enter plan mode." This IS the "specify" step. |
 | Plan (technical breakdown) | /plan skill + superpowers:writing-plans | Available as `/plan-eng-review`, `/plan-ceo-review` skills | ZAO developers invoke planning skills before code; agents use plan output to guide implementation. |
 | Tasks (actionable work items) | Cowork board + Telegram tasks via ZOE | `thezao.xyz/bots/cowork-board` (Supabase-backed) + ZOE @zaoclaw_bot task routing | ZOE surfaces tasks to Telegram; board auto-syncs (doc 1312, 2026-07-13 sync). |
@@ -130,6 +130,16 @@ ZOE currently:
 | **DO: Adopt "markdown is prompt" principle in ZOL/DreamLoops** | @Zaal (if DreamLoops ships) | 2026-09-01 | When DreamLoops lands, ensure agent reads manifest.md (the spec) before generating code, just like Spec Kit agents read spec.md. This is already ZAO practice; DreamLoops should inherit it. |
 | **Fold Spec Kit evaluation into agent-loops.md (rule 10: "Learn online")** | Async (next loop tick) | 2026-07-30 | Update agent-loops.md with finding: "Spec Kit's SDD recommended for single-feature agent pipelines (ZOE) but not for monorepo-as-lab. Markdown-as-source-of-truth is ZAO-native; tool adoption is optional." |
 
+## Review (2026-07-17)
+
+Reviewed per board task `research-doc:1084`. Two things:
+
+- **The board task's title is wrong metadata.** The task reads "Review research doc 1084 - ADHD tooling for builders", but doc 1084 is this GitHub Spec Kit / SDD study. There is **no** ADHD-tooling research doc (only ZOE's `bot/src/zoe/__tests__/adhd-accommodations.test.ts`, which is code, not a doc), and 1084 is not collided (one dir). So the task's number/title reference is stale - **fix the task title to match this doc** (or repoint it if an ADHD doc is later written). Flagged to ZAAL BOTZ.
+- **The doc's verdict holds - and is validated by live practice.** "ZAO already does spec-driven development via `.claude/rules/` + plan-first; adopt markdown-as-source-of-truth, not the full SDD ceremony" is exactly what this session demonstrated: operating lessons were PR'd straight into `.claude/rules/agent-loops.md` (rules 21-27), which agents then read automatically - the distributed, live-updated "spec is the prompt" pattern the doc praises, without Spec Kit's single-artifact bottleneck. The "DO NOT scale full SDD to all of ZAOOS" call (9/10) is well-reasoned; nothing to change.
+- Also fixed in this PR: the doc's Sources + evidence table hard-coded an absolute Mac path (`/Users/.../ZAO OS V1/...`); genericized to repo-relative paths (portable + no personal path).
+
+No new follow-up boarded - the doc's own Next Actions (pilot SDD on ZOE, fold the finding into agent-loops.md) already capture it, and the markdown-as-source-of-truth principle is already the practice.
+
 ## Sources
 
 - [GitHub Spec Kit Repository](https://github.com/github/spec-kit) — Star count: 121,209; created 2025-08-21; Python; MIT License. [FULL]
@@ -142,10 +152,10 @@ ZOE currently:
 
 ## Related Project Files
 
-- `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/rules/` (8 files: existing spec-like discipline)
-- `/Users/zaalpanthaki/Documents/ZAO OS V1/CLAUDE.md` (lines 86-93: workflow orchestration + "Plan first" rule)
-- `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/rules/agent-loops.md` (operational specs for autonomous agents; rule 10 calls for online learning)
-- `/Users/zaalpanthaki/Documents/ZAO OS V1/research/agents/928-agent-loop-best-practices/` (source of agent-loops.md rules)
+- `.claude/rules/` (8 files: existing spec-like discipline)
+- `CLAUDE.md` (lines 86-93: workflow orchestration + "Plan first" rule)
+- `.claude/rules/agent-loops.md` (operational specs for autonomous agents; rule 10 calls for online learning)
+- `research/agents/928-agent-loop-best-practices/` (source of agent-loops.md rules)
 
 ---
 

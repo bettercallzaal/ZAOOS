@@ -51,6 +51,24 @@ Default the Sparkz wizard to 0xSplits-first (it is always safe and the product i
 
 **Gated (not done here):** the wizard build (zaalcaster, owned separately), Jango's launch plan, and any on-chain deploy remain Zaal's hand. This is the design/rail update only.
 
+## Legal guardrail: contributor-not-holder (from doc 1108 review, 2026-07-17)
+
+**This is a design guardrail + a question for counsel (Greg), not legal advice.** But it is load-bearing enough to sit in the locked-in brief so no future build session designs it away.
+
+The 0xSplits launch rail above routes fees through a Splits contract. Doc 1108's Howey table flags "**revenue-sharing token (% of payouts) = SECURITY, highest risk**" - which *looks* like it condemns the whole Sparkz fee model. The distinction that keeps Sparkz on the safer memocoin/utility side:
+
+- The Splits contract routes fees to the **creators / collaborators / contributors** - the people doing the work - **not to token holders**. Howey's risk is promising *holders* a profit from others' efforts; paying the *workers* is not that.
+- This holds **only if two things stay true**:
+  1. the token's pitch **never** promises holders they will receive fees, treasury yield, or price appreciation. "Hold this and earn" is the trap - it reintroduces Howey prongs 3 + 4 and turns the coin into a security.
+  2. reward mechanics stay **participation/energy-based, not holding-based**. This is the same energy-first thesis the whole product rests on - and it matters most for the boostr "50% to the leaderboard" split (doc 1141 Part 7): that reward must be **earned by showing up**, never by *holding the coin*.
+
+**Build implications (bake these into the wizard + copy):**
+- The Sparkz wizard's collaborator/leaderboard step writes **contributor** wallets into the Splits contract - frame it as "paying the people who did the work," never "paying holders."
+- No surface (landing, token page, cast copy, wizard) may say or imply "hold $TOKEN and earn." Reward = energy/participation, full stop.
+- Keep the energy-first framing the *legal* moat, not just the marketing one.
+
+**The question for counsel (Greg):** does routing fees via 0xSplits to contributors (not holders), plus an energy-based (not holding-based) leaderboard reward, keep a Sparkz creator-coin on the memocoin/utility side rather than the revenue-sharing-security side? (Boarded: `research-doc:1108`; source analysis in [doc 1108](../1108-sparkz-legal-framing/).)
+
 ## The positioning verdict (from doc 1097 - the honest read)
 
 Sparkz's wedge (energy-first + AI-judged launch timing) is **real but narrow**. No competitor gates launch on readiness - but the quality gate deliberately cuts volume. So **Sparkz wins as the sustainability leader, not the volume leader.** Success = tokens that last 90+ days and build community, not 48-hour pumps.

@@ -1,8 +1,11 @@
-name: Auto-merge doc-only PRs
+name: Auto-merge safe PRs
 
-# Retrospective fix (2026-07-03): 27 doc PRs piled up when the daily-merge
-# habit lapsed, went stale, and all conflicted. Doc-only PRs (research/** and
-# docs/**) now auto-merge once checks pass. Code PRs still wait for Zaal.
+# Safe categories self-merge once CI is green:
+#   docs  — research/** and docs/** only (with doc-number collision guard)
+#   tests — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
+# All other PRs (runtime code, config, CI changes) wait for Zaal.
+# --auto requires all required status checks to pass before merging.
+# No fallback merge without CI receipt — the || bypass is intentionally removed.
 
 on:
   pull_request:
@@ -17,23 +20,34 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Check changed files are docs-only
-        id: check
+      - name: Classify PR files
+        id: classify
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[].filename')
           echo "$files"
-          docs_only=true
+          category=""
           while IFS= read -r f; do
             case "$f" in
-              research/*|docs/*) ;;
-              *) docs_only=false; break ;;
+              research/*|docs/*)
+                [ "$category" = "tests" ] && { category="unsafe"; break; }
+                category="docs"
+                ;;
+              *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx|*/__tests__/*)
+                [ "$category" = "docs" ] && { category="unsafe"; break; }
+                category="tests"
+                ;;
+              *)
+                category="unsafe"
+                break
+                ;;
             esac
           done <<< "$files"
-          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+          echo "category=${category:-unsafe}" >> "$GITHUB_OUTPUT"
+
       - name: Block doc-number collisions
-        if: steps.check.outputs.docs_only == 'true'
+        if: steps.classify.outputs.category == 'docs'
         id: collide
         env:
           GH_TOKEN: ${{ github.token }}
@@ -53,16 +67,18 @@ jobs:
             hits=$(echo "$main_dirs" | grep -E "/${num}-" | grep -v "/${slug}$" || true)
             if [ -n "$hits" ]; then
               collision=true
-              gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"                 -f body="Auto-merge held: doc number ${num} already exists on main under a different slug: ${hits}. Renumber before merging." >/dev/null
+              gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+                -f body="Auto-merge held: doc number ${num} already exists on main under a different slug: ${hits}. Renumber before merging." >/dev/null
             fi
           done <<< "$newdirs"
           echo "collision=$collision" >> "$GITHUB_OUTPUT"
+
       - name: Enable auto-merge (squash)
-        if: steps.check.outputs.docs_only == 'true' && steps.collide.outputs.collision != 'true'
+        if: |
+          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||
+          steps.classify.outputs.category == 'tests'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr merge ${{ github.event.pull_request.number }} \
-            --repo "${{ github.repository }}" --squash --auto \
-            || gh pr merge ${{ github.event.pull_request.number }} \
-                 --repo "${{ github.repository }}" --squash
+            --repo "${{ github.repository }}" --squash --auto

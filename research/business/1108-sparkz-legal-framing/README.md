@@ -292,6 +292,20 @@ tier: DEEP
 
 ---
 
+## Review (2026-07-17)
+
+Reviewed per board task `research-doc:1108`. The doc is sound and well-sourced (the Feb-2025 SEC meme-coin staff statement, the Mar-2026 taxonomy, and the Kik / Ripple / Terraform case law). **This is research, not legal advice - the real call is counsel (Greg); the note below is a design consideration + a question to put to counsel, nothing more.**
+
+**Direct implication for the Sparkz designs already in the repo** (launch rail doc 1098, collab-split `papers/drafts/sparkz-music-collabs.md`, boostr pilot doc 1141 Part 7): those all route fees through a **0xSplits** contract. This doc's Howey table puts "**revenue-sharing token (% of payouts) = SECURITY, highest risk**" - which *looks* like it flags the whole Sparkz fee-routing model. The load-bearing distinction the design should make explicit:
+
+- 0xSplits in the Sparkz designs routes fees to the **creators / collaborators / contributors** (the people doing the work) - **not to token holders**. Howey's risk is promising *holders* profit from others' efforts; paying the workers is not that. So the architecture leans to the safer "utility / memocoin" side **as long as** two things hold:
+  1. the token's pitch **never** promises holders they will receive fees, treasury yield, or price appreciation ("hold this and earn" is the trap - it reintroduces prongs 3 and 4), and
+  2. reward mechanics stay **participation/energy-based, not holding-based** (this matters for the boostr "50% to the leaderboard people" split - keep it earned by *showing up*, i.e. the energy-first thesis, not by *holding the coin*).
+
+**The specific question for counsel:** does routing fees via 0xSplits to contributors (not holders), plus an energy-based (not holding-based) leaderboard reward, keep a Sparkz creator-coin on the memocoin/utility side rather than the revenue-sharing-security side?
+
+Follow-up boarded (`research-doc:1108`): add this as an explicit **legal-framing guardrail** to the Sparkz design docs - splits go to contributors not holders; no "hold and earn" pitch; energy-based not holding-based rewards - and put the counsel question to Greg. Design guardrail + question only, not legal advice.
+
 ## Also See
 
 - [Doc 1101](../1101-sparkz-onchain-revenue-mechanism/) - Revenue splitting mechanics (mentions Howey flag)

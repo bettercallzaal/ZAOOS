@@ -136,7 +136,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
 
           // Route the morning brief as a status message (with veto keyboard if available)
           if (opts.routingDeps) {
-            await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status' });
+            await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status', replyMarkup: vetoKeyboard });
           } else {
             const sendOpts = vetoKeyboard ? { reply_markup: vetoKeyboard } : {};
             await opts.bot.api.sendMessage(opts.zaalTgId, brief, sendOpts);

@@ -19,7 +19,7 @@ tier: STANDARD
 
 | Decision | Status | Details |
 |----------|--------|---------|
-| **Process is live + tested** | ACTIVE | 90+ weeks running (since Aug 2024), Mondays 6pm EST + anytime with 4+ unplayed members |
+| **Process is live + tested** | ACTIVE | 100+ weeks running (since Aug 2024), Mondays 6pm EST + anytime with 4+ unplayed members |
 | **Bot platform: Discord** | LIVE | Not Telegram or web; Python 3.10+, discord.py 2.0+, hosted on bot-hosting.net |
 | **Bot repo: fractalbotmarch2026** | v2.1 CURRENT | GitHub: bettercallzaal/fractalbotmarch2026; v2.1 (2026-03-28) - onchain auto-submit, Farcaster linking, Snapshot cog. Storage on Supabase since v2.0. |
 | **Fibonacci scoring (2x era)** | DEPLOYED | Ranks 1-6 award 110/68/42/26/16/10 Respect (Fibonacci double from year 1) |
@@ -454,7 +454,7 @@ respect: {
 - **Doc 102:** Fractals page design (frapps, ORDAO, ZAO OS integration)
 - **Doc 103:** Fractal governance ecosystem
 - **Doc 104:** Fractal communities directory
-- **Doc 109:** ZAO fractal history (90+ weeks, Mondays 6pm EST)
+- **Doc 109:** ZAO fractal history (100+ weeks, Mondays 6pm EST)
 - **Doc 114:** Fractal live infrastructure + data flows (companion to this doc)
 - **Doc 285:** (Community governance deep dives)
 - **Doc 444:** (Governance tools audit)

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { sendToZaal, constructRoutingDeps, type TelegramRoutingDeps } from '../telegram-routing';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { sendToZaal, constructRoutingDeps, chunkText, type TelegramRoutingDeps } from '../telegram-routing';
 
 describe('telegram-routing', () => {
   describe('sendToZaal routing', () => {
@@ -14,6 +14,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What should I do?', { kind: 'question' });
 
+      // No markup → no third arg (cleaner DM call)
       expect(sendMessage).toHaveBeenCalledWith(123, 'What should I do?');
       expect(sendMessage).toHaveBeenCalledTimes(1);
     });
@@ -69,6 +70,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'Status message', { kind: 'status' });
 
+      // DM fallback: no markup → no third arg
       expect(sendMessage).toHaveBeenCalledWith(123, 'Status message');
     });
 
@@ -82,6 +84,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What do you think?', { kind: 'question' });
 
+      // No markup → no third arg
       expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?');
     });
   });
@@ -133,9 +136,90 @@ describe('telegram-routing', () => {
 
       const deps = constructRoutingDeps(sendMessage);
 
+      // Invalid group id should be coerced to undefined, not NaN
       expect(deps.groupId).toBeUndefined();
       expect(warnSpy).toHaveBeenCalled();
       warnSpy.mockRestore();
+    });
+  });
+
+  describe('chunkText', () => {
+    it('returns single chunk when text is under limit', () => {
+      const result = chunkText('hello world', 100);
+      expect(result).toEqual(['hello world']);
+    });
+
+    it('returns single chunk when text equals limit exactly', () => {
+      const text = 'x'.repeat(4000);
+      const result = chunkText(text);
+      expect(result).toEqual([text]);
+    });
+
+    it('splits at newline boundary when text exceeds limit', () => {
+      const line1 = 'a'.repeat(3990) + '\n';
+      const line2 = 'b'.repeat(50);
+      const result = chunkText(line1 + line2, 4000);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toBe(line1);
+      expect(result[1]).toBe(line2);
+    });
+
+    it('falls back to hard cut when no newline within limit', () => {
+      const text = 'x'.repeat(4100);
+      const result = chunkText(text, 4000);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveLength(4000);
+      expect(result[1]).toHaveLength(100);
+    });
+
+    it('produces three chunks for very long text', () => {
+      const block = 'line\n'.repeat(1000); // 5000 chars
+      const result = chunkText(block, 2000);
+      expect(result.length).toBeGreaterThan(2);
+      for (const chunk of result) {
+        expect(chunk.length).toBeLessThanOrEqual(2000);
+      }
+      expect(result.join('')).toBe(block);
+    });
+  });
+
+  describe('chunked sending', () => {
+    const KEYBOARD = {
+      inline_keyboard: [[{ text: 'ok', callback_data: 'ok' }]],
+    };
+
+    it('sends long text as multiple chunks to group, markup on last only', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = { sendMessage, zaalId: 1, groupId: 2 };
+      const chunk1 = 'A'.repeat(3990) + '\n';
+      const chunk2 = 'B'.repeat(100);
+      await sendToZaal(deps, chunk1 + chunk2, { kind: 'status', replyMarkup: KEYBOARD });
+
+      expect(sendMessage).toHaveBeenCalledTimes(2);
+      // First chunk: no markup
+      expect(sendMessage).toHaveBeenNthCalledWith(1, 2, chunk1, {});
+      // Last chunk: markup attached
+      expect(sendMessage).toHaveBeenNthCalledWith(2, 2, chunk2, { reply_markup: KEYBOARD });
+    });
+
+    it('sends long question as multiple DM chunks, markup on last only', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = { sendMessage, zaalId: 1, groupId: 2 };
+      // 3999 Q's + newline = 4000 chars; + 'end' = 4003 total → splits at the newline
+      const chunk1 = 'Q'.repeat(3999) + '\n';
+      const chunk2 = 'end';
+      await sendToZaal(deps, chunk1 + chunk2, { kind: 'question', replyMarkup: KEYBOARD });
+
+      expect(sendMessage).toHaveBeenCalledTimes(2);
+      expect(sendMessage).toHaveBeenNthCalledWith(1, 1, chunk1);
+      expect(sendMessage).toHaveBeenNthCalledWith(2, 1, chunk2, { reply_markup: KEYBOARD });
+    });
+
+    it('sends single short message without splitting', async () => {
+      const sendMessage = vi.fn().mockResolvedValue({});
+      const deps: TelegramRoutingDeps = { sendMessage, zaalId: 1, groupId: 2 };
+      await sendToZaal(deps, 'short', { kind: 'status' });
+      expect(sendMessage).toHaveBeenCalledTimes(1);
     });
   });
 });

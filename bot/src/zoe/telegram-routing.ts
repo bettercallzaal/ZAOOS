@@ -21,6 +21,28 @@
 
 export type MessageKind = 'question' | 'status';
 
+/** Maximum Telegram message length before chunking kicks in. */
+const TG_MAX_LEN = 4000;
+
+/**
+ * Split text into chunks of at most maxLen characters, preferring newline
+ * boundaries so markdown headers / bullet points stay intact.
+ */
+export function chunkText(text: string, maxLen = TG_MAX_LEN): string[] {
+  if (text.length <= maxLen) return [text];
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > maxLen) {
+    const slice = remaining.slice(0, maxLen);
+    const lastNl = slice.lastIndexOf('\n');
+    const breakAt = lastNl > 0 ? lastNl + 1 : maxLen;
+    chunks.push(remaining.slice(0, breakAt));
+    remaining = remaining.slice(breakAt);
+  }
+  if (remaining.length > 0) chunks.push(remaining);
+  return chunks;
+}
+
 export interface SendToZaalOptions {
   kind?: MessageKind; // defaults to 'status'
   /**
@@ -54,27 +76,47 @@ export async function sendToZaal(
 ): Promise<any> {
   const kind = opts.kind ?? 'status';
   const markupOpts = opts.replyMarkup ? { reply_markup: opts.replyMarkup } : {};
+  const hasMarkup = Object.keys(markupOpts).length > 0;
+  const chunks = chunkText(text);
 
   // question -> always DM
   if (kind === 'question') {
-    return deps.sendMessage(deps.zaalId, text, markupOpts);
+    let result: any;
+    for (let i = 0; i < chunks.length; i++) {
+      const isLast = i === chunks.length - 1;
+      result = isLast && hasMarkup
+        ? await deps.sendMessage(deps.zaalId, chunks[i], markupOpts)
+        : await deps.sendMessage(deps.zaalId, chunks[i]);
+    }
+    return result;
   }
 
   // status -> group (if configured), else fallback to DM
   const groupId = deps.groupId;
   if (!groupId) {
-    // Group not configured yet, fall back to DM to avoid silent drops
     console.log(
       '[zoe/telegram-routing] ZAALBOTS_GROUP_CHAT_ID not set, routing status to DM (fallback)',
     );
-    return deps.sendMessage(deps.zaalId, text, markupOpts);
+    let result: any;
+    for (let i = 0; i < chunks.length; i++) {
+      const isLast = i === chunks.length - 1;
+      result = isLast && hasMarkup
+        ? await deps.sendMessage(deps.zaalId, chunks[i], markupOpts)
+        : await deps.sendMessage(deps.zaalId, chunks[i]);
+    }
+    return result;
   }
 
-  const messageOpts = {
-    ...(deps.groupThreadId ? { message_thread_id: deps.groupThreadId } : {}),
-    ...markupOpts,
-  };
-  return deps.sendMessage(groupId, text, messageOpts);
+  let result: any;
+  for (let i = 0; i < chunks.length; i++) {
+    const isLast = i === chunks.length - 1;
+    const messageOpts = {
+      ...(deps.groupThreadId ? { message_thread_id: deps.groupThreadId } : {}),
+      ...(isLast ? markupOpts : {}),
+    };
+    result = await deps.sendMessage(groupId, chunks[i], messageOpts);
+  }
+  return result;
 }
 
 /**
@@ -95,8 +137,9 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
   }
 
   const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
-  const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
-  if (groupIdRaw && Number.isNaN(groupId)) {
+  const groupIdParsed = groupIdRaw ? Number(groupIdRaw) : undefined;
+  const groupId = groupIdParsed !== undefined && Number.isNaN(groupIdParsed) ? undefined : groupIdParsed;
+  if (groupIdRaw && Number.isNaN(groupIdParsed)) {
     console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
   }
 

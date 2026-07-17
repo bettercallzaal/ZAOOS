@@ -48,7 +48,7 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 | Fractal weeks: "90+" / "100+" / "ninety consecutive" | whitepaper 942, ICM box, dossier 742, doc 622 | Varies by doc (90 vs 100+). Needs the canonical meeting count — the Fractal/Respect Game record (Optimystics respectgame or the on-chain OREC history). |
 | WaveWarZ battles: "735" / "958" / "416" | dossier 742 (735), COC lesson (958), old scraper (416) | Known scraper drift (COC lesson: scraper was 5× off). The **ww loop owns reconciliation** (ref PRs #1609 / doc 974) — this ledger defers to it; do not re-derive here. |
 | "$60K+ traded" (WaveWarZ) | dossier 742 | Needs the settlement/volume source; ww-loop lane. |
-| "34 PRs/week" | doc 449 one-pager | Needs a defined window + `gh` query to substantiate. |
+| ~~"34 PRs/week"~~ → **resolved** | doc 449 one-pager | **VERIFIED, see [doc 1203](../1203-zaoos-build-velocity/):** "34/week" was the human-era baseline (W12–W15, ~30/week product code). Now 60–175+/week total but **50–73% is agent docs/tests automation**; product (feat/fix) velocity is stable ~30/week. Quote total only with the automation caveat. |
 
 ## Recommendation (single source, same discipline as GEO llms.txt + Respect facts)
 

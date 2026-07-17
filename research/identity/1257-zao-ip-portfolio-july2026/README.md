@@ -98,11 +98,11 @@ The ZAO is a decentralized impact network for independent music artists, founded
 
 | Fact | Value | Source |
 |------|-------|--------|
-| Platform | Farcaster (FID 19640 = ZAOclawbot) | ZOL repo |
-| DreamLoops | 10+ active loops (weekly-curator, artist-spotlight, etc.) | ZOL deliverables |
+| Handle | @zolbot (Farcaster, FID 3338501) | ZOL repo README |
+| DreamLoops | 20 active loops (weekly-curator, artist-spotlight, etc.) | ZOL repo loops/ dir |
 | Test coverage | 700+ test cases | ZOL v2 deliverables |
-| Architecture | Raspberry Pi + Node.js (always-on, home-hosted) | ZOL repo |
-| Social handle | @bettercallzaal (Farcaster primary) | doc 1083 |
+| Architecture | Raspberry Pi + Node.js 18+ (always-on, home-hosted) | ZOL repo |
+| Human gate | All posts Telegram-gated (2 auto-carve-outs: zol-daily, zol-follow) | ZOL repo README |
 
 ---
 

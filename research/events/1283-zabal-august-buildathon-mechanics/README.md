@@ -6,7 +6,7 @@ created: 2026-07-17
 board-task: 815b8e69
 related-docs: 1255, 1271, 1264, 701
 owner: Zaal (to confirm mechanics before Aug 1)
-deadline: 2026-07-28 (7 days before August opens)
+deadline: 2026-07-28 (lock mechanics 7 days before August 1 opens)
 ---
 
 # 1283 -- ZABAL Games August Build-a-Thon: Complete Mechanics Brief

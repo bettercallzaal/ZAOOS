@@ -24,9 +24,9 @@ parent-doc: 718
 | **Two-Tier System: Vision + Mechanics** | Separate "why we exist" (vision, fractal philosophy, soulbound Respect) from "how decisions happen" (voting thresholds, cycle lengths, proposal formats). Vitalik calls these "concave" vs. "convex" problems. | Whitepaper: Sections 1-4 = why + vision. Sections 5-8 = mechanics + implementation. |
 | **Governance Documents Must Be Enforceable** | Kleros + Optimism model: constitution is worthless without smart-contract enforcement or judicial review. Rules without enforcement = theater. | ZAO whitepaper must specify: Who enforces Respect decisions? How do dissenters appeal? What stops a rogue admin? |
 | **Tokenomics / Respect-omics Must Be Explicit** | MakerDAO, Nouns, Fractally all spell out exactly: supply, minting rules, burn mechanisms, voting thresholds, quorum. Vague = red flag. | Spell out Respect: annual supply cap, earn rate per contribution, decay/dilution mechanics, minimum holdings for proposals, veto thresholds. No handwaving. |
-| **Common Mistakes That Sink DAOs** | Overpromising (feature creep), vague tokenomics, no failure mode analysis, no legal wrapper, no enforcement mechanism, decision fatigue from voting on everything. | Avoid: "ZAO will revolutionize music" (undefensible). Instead: "Soulbound Respect enables peer-to-peer contribution tracking within a 90-week fractal cycle." |
+| **Common Mistakes That Sink DAOs** | Overpromising (feature creep), vague tokenomics, no failure mode analysis, no legal wrapper, no enforcement mechanism, decision fatigue from voting on everything. | Avoid: "ZAO will revolutionize music" (undefensible). Instead: "Soulbound Respect enables peer-to-peer contribution tracking across ZAO's 100+ week fractal history." |
 | **Why Whitepapers Are Canonical** | Community references it for 5+ years. Legitimacy for partnerships, fundraising, onboarding, legal defense. Single source of truth. | The ZAO whitepaper will be cited in future partnerships, research papers, legal docs, feature proposals. It must be airtight. |
-| **ZAO's Unique Angle** | Web3 music community + soulbound Respect governance + 90-week fractal cycles = novel. Fractally tested fractal, Eden tested Respect-voting, ZAO combines both in music context. Emphasize novelty but ground in precedent. | Structure: Nod to Fractally + Eden + MakerDAO, but position ZAO as "first to combine fractal + soulbound Respect + music/culture coordination." |
+| **ZAO's Unique Angle** | Web3 music community + soulbound Respect governance + 100+ week fractal history = novel. Fractally tested fractal, Eden tested Respect-voting, ZAO combines both in music context. Emphasize novelty but ground in precedent. | Structure: Nod to Fractally + Eden + MakerDAO, but position ZAO as "first to combine fractal + soulbound Respect + music/culture coordination." |
 
 ---
 
@@ -54,7 +54,7 @@ parent-doc: 718
 - Clear problem statement: token-weighted voting fails; peer evaluation is better
 - Tokenomics are specific (not hand-wavy)
 
-**Relevant to ZAO:** ZAO Whitepaper should follow this two-tier pattern: vision (soulbound Respect breaks artist-vs-community divide in music) + mechanics (90-week cycle, proposal process, Respect earn rates).
+**Relevant to ZAO:** ZAO Whitepaper should follow this two-tier pattern: vision (soulbound Respect breaks artist-vs-community divide in music) + mechanics (100+ weeks of weekly fractal cycle, proposal process, Respect earn rates).
 
 ---
 
@@ -104,7 +104,7 @@ parent-doc: 718
 - Delegate model scales voting power without removing individual veto
 - Amendment process is restrictive (protects constitution from casual drift)
 
-**Relevant to ZAO:** ZAO Constitution should define proposal types: Respect Rebalance (adjust earn rates), Cycle Amendment (change 90-week structure), Budget Allocation (treasury), Culture Veto (music artist partnership review). Each gets different thresholds.
+**Relevant to ZAO:** ZAO Constitution should define proposal types: Respect Rebalance (adjust earn rates), Cycle Amendment (change fractal cadence), Budget Allocation (treasury), Culture Veto (music artist partnership review). Each gets different thresholds.
 
 ---
 

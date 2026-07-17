@@ -89,18 +89,6 @@ export const PORTALS: Portal[] = [
         description: 'Agent command center',
         external: true,
       },
-      {
-        name: 'Pixel Agents',
-        url: 'https://pixels.zaoos.com',
-        description: 'Pixel agent office',
-        external: true,
-      },
-      {
-        name: 'Paperclip',
-        url: 'https://paperclip.zaoos.com',
-        description: 'Paperclip agent',
-        external: true,
-      },
     ],
   },
   {

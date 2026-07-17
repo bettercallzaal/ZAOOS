@@ -47,7 +47,6 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
     description: 'Music battles - trade SOL on outcomes in a Solana prediction market for music.',
     url: 'https://www.wavewarz.com',
     links: [
-      { label: 'Analytics', url: 'https://analytics-wave-warz.vercel.app', icon: '\uD83D\uDCCA' },
       {
         label: 'Intelligence',
         url: 'https://wavewarz-intelligence.vercel.app',

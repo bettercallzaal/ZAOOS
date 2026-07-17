@@ -1,8 +1,9 @@
 // @vitest-environment node
 // Tests for the pure classification and formatting functions in tg-interactions.ts.
 // No mocks needed: classifyIntent, formatPulse, formatAgenda have no I/O.
-import { describe, expect, it } from 'vitest';
-import { classifyIntent, formatAgenda, formatPulse, type BoardItem } from '../tg-interactions';
+import { describe, expect, it, vi } from 'vitest';
+import { classifyIntent, formatAgenda, formatPulse, handleMessageReaction, type BoardItem } from '../tg-interactions';
+import type { Context } from 'grammy';
 
 function makeItem(
   id: string,
@@ -182,5 +183,129 @@ describe('formatAgenda', () => {
     const result = await formatAgenda(items);
     expect(result).toContain('Item 19');
     expect(result).not.toContain('Item 20');
+  });
+});
+
+// ── handleMessageReaction ─────────────────────────────────────────────────────
+
+function makeReactionCtx(opts: {
+  chatId?: number;
+  messageId?: number;
+  emojis?: string[];
+  noReaction?: boolean;
+} = {}): Context {
+  const { chatId = 456, messageId = 99, emojis = [], noReaction = false } = opts;
+  return {
+    chat: chatId !== undefined ? { id: chatId } : undefined,
+    messageReaction: noReaction
+      ? undefined
+      : {
+          message_id: messageId,
+          new_reaction: emojis.map((e) => ({ emoji: e, type: 'emoji' })),
+        },
+  } as unknown as Context;
+}
+
+function makeDeps(
+  overrides: Partial<{
+    isFromZaal: boolean;
+    getTaskForMessage: (id: number) => Promise<string | null>;
+  }> = {},
+) {
+  return {
+    isFromZaal: overrides.isFromZaal ?? true,
+    zaalId: 123,
+    reactions: {
+      unpin: vi.fn<[number, number], Promise<void>>().mockResolvedValue(undefined),
+      markDone: vi.fn<[string, 'done'], Promise<void>>().mockResolvedValue(undefined),
+      getTaskForMessage: overrides.getTaskForMessage ?? vi.fn<[number], Promise<string | null>>().mockResolvedValue(null),
+      ping: vi.fn<[string, string], Promise<void>>().mockResolvedValue(undefined),
+    },
+  };
+}
+
+describe('handleMessageReaction', () => {
+  it('ignores reactions from non-Zaal users', async () => {
+    const deps = makeDeps({ isFromZaal: false });
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['👍'] }), deps);
+    expect(result).toEqual({ handled: false });
+    expect(deps.reactions.unpin).not.toHaveBeenCalled();
+  });
+
+  it('ignores update with no messageReaction', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ noReaction: true }), deps);
+    expect(result).toEqual({ handled: false });
+  });
+
+  it('ignores update with no chat id', async () => {
+    const deps = makeDeps();
+    const ctx = { chat: undefined, messageReaction: { message_id: 1, new_reaction: [] } } as unknown as Context;
+    const result = await handleMessageReaction(ctx, deps);
+    expect(result).toEqual({ handled: false });
+  });
+
+  it('thumbs-up calls unpin and returns approve', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['👍'] }), deps);
+    expect(result).toEqual({ handled: true, action: 'approve' });
+    expect(deps.reactions.unpin).toHaveBeenCalledWith(456, 99);
+  });
+
+  it('+1 string alias also triggers approve', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['+1'] }), deps);
+    expect(result).toEqual({ handled: true, action: 'approve' });
+    expect(deps.reactions.unpin).toHaveBeenCalledTimes(1);
+  });
+
+  it('checkmark with no linked task returns mark-done without DB call', async () => {
+    const deps = makeDeps({ getTaskForMessage: vi.fn().mockResolvedValue(null) });
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['✅'] }), deps);
+    expect(result).toEqual({ handled: true, action: 'mark-done' });
+    expect(deps.reactions.markDone).not.toHaveBeenCalled();
+    expect(deps.reactions.unpin).not.toHaveBeenCalled();
+  });
+
+  it('checkmark with linked task calls markDone + unpin', async () => {
+    const deps = makeDeps({ getTaskForMessage: vi.fn().mockResolvedValue('task-abc') });
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['✅'], messageId: 7 }), deps);
+    expect(result).toEqual({ handled: true, action: 'mark-done' });
+    expect(deps.reactions.markDone).toHaveBeenCalledWith('task-abc', 'done');
+    expect(deps.reactions.unpin).toHaveBeenCalledWith(456, 7);
+  });
+
+  it('fire emoji calls ping with urgent queue', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['🔥'], messageId: 5 }), deps);
+    expect(result).toEqual({ handled: true, action: 'mark-urgent' });
+    expect(deps.reactions.ping).toHaveBeenCalledWith('urgent', expect.stringContaining('5'));
+  });
+
+  it('lightning bolt alias also triggers mark-urgent', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['⚡'] }), deps);
+    expect(result).toEqual({ handled: true, action: 'mark-urgent' });
+  });
+
+  it('unknown emoji returns handled:true with no action', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['🎵'] }), deps);
+    expect(result).toEqual({ handled: true });
+    expect(deps.reactions.unpin).not.toHaveBeenCalled();
+    expect(deps.reactions.ping).not.toHaveBeenCalled();
+  });
+
+  it('empty reaction list returns handled:true with no action', async () => {
+    const deps = makeDeps();
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: [] }), deps);
+    expect(result).toEqual({ handled: true });
+  });
+
+  it('surfaces error when unpin throws', async () => {
+    const deps = makeDeps();
+    deps.reactions.unpin.mockRejectedValueOnce(new Error('network timeout'));
+    const result = await handleMessageReaction(makeReactionCtx({ emojis: ['👍'] }), deps);
+    expect(result).toEqual({ handled: true, error: 'network timeout' });
   });
 });

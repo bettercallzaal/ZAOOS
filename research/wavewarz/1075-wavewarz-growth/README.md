@@ -24,7 +24,7 @@ tier: DEEP
 
 ## Executive Summary
 
-WaveWarZ is the ZAO's only working revenue product (98.5% of every dollar stays in the ecosystem, only 1.5% platform fee). At 522 SOL (~$39K USD at Jul 2026 SOL price) volume and 1,244 battles, it has product-market fit in the ZAO community (188 members). Growth now is about **breaking out beyond the ZAO** via three unlocked levers:
+WaveWarZ is the ZAO's only working revenue product (98.5% of every dollar stays in the ecosystem, only 1.5% platform fee). At 524.15 SOL (~$39K USD at Jul 2026 SOL price) volume and 1,245 battles, it has product-market fit in the ZAO community (188 members). Growth now is about **breaking out beyond the ZAO** via three unlocked levers:
 
 1. **Distribution via existing partnerships** - the 7 partners (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM, Privy) have no active co-marketing plan
 2. **Tournament engagement** - the weekly bracket + leaderboard is registered but not live/promoted
@@ -38,7 +38,7 @@ The financials show a healthy unit economics story: artists earned 9.05 SOL (~$6
 
 | Metric | Value | Benchmark | Status |
 |--------|-------|-----------|--------|
-| Total Volume | 522 SOL (~$39K USD) | — | Early but real. Spotify pays $0.003-0.005/play; 1M plays = $3-5K. WaveWarZ doing that in 1,244 battles. |
+| Total Volume | 524.15 SOL (~$39K USD) | — | Early but real. Spotify pays $0.003-0.005/play; 1M plays = $3-5K. WaveWarZ doing that in 1,245 battles. |
 | Battles | 1,244 (1,046 Quick + 162 Main Battles + 50 Main Events + 36 Community) | - | Consistent flow. |
 | Artist Payouts | 9.05 SOL | ~$680 USD (at $75.13/SOL) | Real artist income. Foundation.app / Sound.xyz artist cohorts earn $5-50/month early-stage. WaveWarZ is competitive. |
 | Platform Revenue | 17.42 SOL | ~$1,308 USD (at $75.13/SOL) | 1.93× artist payouts — driven by per-trade fee + 3% settlement cut. Ratio expected to improve as volume grows. |
@@ -234,7 +234,7 @@ The financials show a healthy unit economics story: artists earned 9.05 SOL (~$6
 | **Daily Active Traders** | Unknown (missing data) | 50 | 200 | Predictor of volume growth |
 | **Daily Active Artists** | 20-30 estimated | 40 | 100 | Artist supply bottleneck |
 | **Weekly Tournament Attendance** | N/A (not live) | 30 traders | 100 traders | Retention + virality flywheel |
-| **Total Volume (SOL)** | 522 SOL (live Jul 16) | 700 SOL (+34%) | 1500 SOL (+187%) | Revenue proxy |
+| **Total Volume (SOL)** | 524.15 SOL (live Jul 16) | 700 SOL (+34%) | 1500 SOL (+187%) | Revenue proxy |
 | **Artist Payouts (SOL)** | 9.05 SOL cumulative | 20 SOL / week | 50 SOL / week | Product-market-fit for artists |
 | **Daily X Space Concurrent Viewers** | ~50-100 estimated | 200 | 500 | Virality + community event |
 | **Partner Co-Marketing Volume (%)** | 0% (not tracked) | 20% of daily volume | 40% of daily volume | Partnership activation ROI |

@@ -78,9 +78,9 @@ Research: [Doc 1077](https://github.com/bettercallzaal/ZAOOS/tree/main/research/
 - **Governance:** 100+ consecutive weekly Fractal votes on Base blockchain (2024–2026) — Respect-weighted peer ranking
 - **Flagship product:** WaveWarZ (see above)
 - **IRL events:** ZAO-CHELLA (Art Basel Miami, Dec 6 2024) · ZAOstock (Ellsworth ME, Oct 3 2026)
-- **Social:** X [@thezaodao](https://x.com/thezaodao) · Instagram [@zaofestivals](https://instagram.com/zaofestivals) · Farcaster [/channel/the-zao](https://warpcast.com/~/channel/the-zao)
+- **Social:** X [@thezaodao](https://x.com/thezaodao) · Instagram [@zaofestivals](https://instagram.com/zaofestivals) · Farcaster [/channel/the-zao](https://warpcast.com/~/channel/zao)
 
 ## Community
 
-- [The ZAO](https://warpcast.com/~/channel/the-zao): Farcaster channel
+- [The ZAO /zao](https://warpcast.com/~/channel/zao): Farcaster channel (93 followers, verified 2026-07-17)
 - [ZABAL Token](https://basescan.org/token/0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07): Base chain ERC-20

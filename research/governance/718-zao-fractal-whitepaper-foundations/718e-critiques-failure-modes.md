@@ -333,4 +333,4 @@ The ZAO fractal whitepaper will be more **credible** if it names these failure m
 
 Readers will assume ZAO has thought about these if the whitepaper doesn't mention them. By including an honest "Known Limitations" chapter, the whitepaper builds trust and provides Zaal with a **roadmap of experiments** to run. The governance model becomes iterative, not gospel.
 
-This is especially important because ZAO operates at 90+ weeks (as of May 2026 research). The fractal circles experiment is **real, ongoing, and undocumented publicly**. If the whitepaper omits failure modes, it looks like ZAO is selling governance rather than studying it. The honest version says: "Here's what we're trying, here's what can break, here's how we're learning."
+This is especially important because ZAO operates at 100+ weeks (as of July 2026). The fractal circles experiment is **real, ongoing, and undocumented publicly**. If the whitepaper omits failure modes, it looks like ZAO is selling governance rather than studying it. The honest version says: "Here's what we're trying, here's what can break, here's how we're learning."

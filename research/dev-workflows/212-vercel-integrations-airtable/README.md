@@ -121,7 +121,7 @@ The existing import only covers the Respect summary table. The Airtable base lik
 | Airtable Table | Data | Supabase Target | Priority |
 |----------------|------|-----------------|----------|
 | Respect (summary) | Member totals, wallets | `respect_members` | DONE |
-| Session history | Per-session scores, dates, participants | `fractal_sessions` | HIGH — 90+ weeks of history |
+| Session history | Per-session scores, dates, participants | `fractal_sessions` | HIGH — 100+ weeks of history |
 | Contributions | Individual frapps/submissions per session | `fractal_contributions` | MEDIUM — useful for analytics |
 | Members directory | Contact info, roles, join dates | `community_profiles` (Doc 110) | MEDIUM — feeds CRM |
 

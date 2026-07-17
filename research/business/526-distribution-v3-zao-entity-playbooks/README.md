@@ -173,7 +173,7 @@ Do NOT batch entities. ZAO OS sprint and ZAOstock sprint and Devz sprint run in 
 - **17** ZAOstock artists already signed up (memory `feedback_no_regenerate_codes.md`)
 - **188** ZAO members today, primary ICP source (`project_four_pillars.md`)
 - **$0.003** Spotify per-play, $33 per 10k plays - the streaming pain anchor (whitepaper doc 051)
-- **90+ weeks** fractal meetings running, real revealed-preference WTP evidence (doc 106 + 474)
+- **100+ weeks** fractal meetings running, real revealed-preference WTP evidence (doc 106 + 474)
 - **0.1%** behavior change from standalone education (doc 470 168-study meta) - drives the "distribute-with-them not teach-them" wedge
 - **10** minimum first-believer N before any ZAO surface ships outbound copy (V3 ch4 + ch5)
 - **15** weight on paid-and-failing pain signals vs 0.5 on theorizing (Dog Food Labs pattern)

@@ -104,7 +104,7 @@ If ZAO were to run a music-specific AI education cohort, here's what it could lo
 ### What ZAO Has That Others Don't
 
 1. **A live platform** (ZAO OS) — students build features for a real product with real users
-2. **An existing community** (100+ members, 90+ weeks of fractal governance)
+2. **An existing community** (100+ members, 100+ weeks of fractal governance)
 3. **Claude Code skills library** (48 skills, 168+ research docs)
 4. **On-chain infrastructure** (ZOUNZ DAO, Respect tokens, Arweave storage)
 5. **Music domain expertise** (artist org, curation, cross-platform publishing)

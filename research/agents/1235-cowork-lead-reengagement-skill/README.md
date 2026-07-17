@@ -163,7 +163,7 @@ ZOE matches the lead's interest area to the latest ZAO milestone:
 | Fractal / governance | "ZAO Fractal just hit 90+ consecutive sessions — 2 years of weekly Respect governance, unbroken." |
 | ZABAL Gamez | "ZABAL Gamez just passed 9 qualifying projects across artist/builder/creator tracks — we built a real tournament structure." |
 | Festivals / IRL | "ZAOville Pool Party is Jul 25 (Laurel, MD) + ZAOstock is Oct 3 (Ellsworth, ME) — these are on the calendar now." |
-| ZAO ecosystem | "ZAO is now 188 onchain members, 522 SOL in WaveWarZ volume, and 313 live API routes — it's a working system." |
+| ZAO ecosystem | "ZAO is now 188 onchain members, 524.15 SOL in WaveWarZ volume, and 313 live API routes — it's a working system." |
 | COC / livestream | "COC Concertz #7 (WaveWarZ Takeover) is tomorrow/this Friday 4PM EST — want a link?" |
 
 The message template is filled by ZOE's concierge brain (`runConciergeTurn`) with a restricted system prompt:

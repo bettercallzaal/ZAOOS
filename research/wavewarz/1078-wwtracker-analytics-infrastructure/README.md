@@ -199,7 +199,7 @@ wwtracker is the measurement instrument that converts WaveWarZ activity into cit
 Artist profile pages link the Audius music identity (follower counts, playable track embeds) directly to on-chain battle performance. For any ZAO artist who battles on WaveWarZ, wwtracker becomes a portfolio page: a proof of the intersection of their music career and onchain activity. This is ZAO IP made visible and linkable.
 
 **Grant / press citation pattern:**
-> "WaveWarZ has run 1,245 battles and generated 522 SOL in lifetime volume since August 2025. You can explore artist-level performance, H2H rivalries, and cumulative growth at [wwtracker URL]. Data updates in real time from the Solana program."
+> "WaveWarZ has run 1,245 battles and generated 524.15 SOL in lifetime volume since August 2025. You can explore artist-level performance, H2H rivalries, and cumulative growth at [wwtracker URL]. Data updates in real time from the Solana program."
 
 ---
 

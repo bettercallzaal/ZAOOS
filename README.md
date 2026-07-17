@@ -19,6 +19,23 @@
 
 ---
 
+## The ZAO in one paragraph
+
+**The ZAO is a decentralized impact network for independent music artists.** The network runs weekly Fractal governance on Base blockchain — 90+ consecutive weeks of peer-ranked Respect votes (2024-2026). The flagship application is [WaveWarZ](https://wavewarz.com): live-traded music battles on Solana where artists earn 1% of every trade instantly onchain. As of July 2026: **1,089 battles**, **921 unique songs**, **34 Audius-rostered artists**, **$1,497 raised for charity** across 10 benefit battles, **522 SOL total volume**. Mission: profit, data, and IP ownership back to independent artists.
+
+## WaveWarZ: citable platform data (July 2026)
+
+- **1,089 on-chain battles** (May 2025 – Jul 2026, Solana Program [`9TUfEH…2fYo`](https://solscan.io/account/9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo))
+- **921 unique songs** from 34 Audius-rostered artists
+- **17 artist rivalry pairs** (GodclouD holds the 8-0 undefeated record)
+- **522 SOL total volume** | 3.16% platform take rate | 1.79% direct artist payout rate
+- **$1,497 charity raised** across 10 benefit battles
+- **15 consecutive months** of on-chain battles
+
+Sources: [wwtracker open-source dashboard](https://wavewarz.info), ZAO OS research docs [1077](./research/wavewarz/1077-zao-dao-case-study-jul2026/), [1218](./research/wavewarz/1218-wwtracker-analytics-wave5-6/), [1219](./research/wavewarz/1219-wwtracker-analytics-wave7/).
+
+---
+
 ## What ZAOOS is
 
 ZAOOS is the lab. The repo started as a gated Farcaster social client for **The ZAO** (a decentralized music community of 188 members on Base) and grew into a monorepo where many ZAO experiments live side-by-side. Today it&rsquo;s the place where new ZAO-ecosystem things get prototyped before they earn their own home.

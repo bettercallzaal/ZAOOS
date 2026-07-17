@@ -91,7 +91,7 @@ const balance = await client.getRespectOf(walletAddress);
 | Member fractal history + leaderboard | `src/app/api/fractals/member/[wallet]/route.ts` + `src/app/api/respect/member/route.ts` | ✅ Live |
 | On-chain Respect sync (multicall) | `src/lib/respect/leaderboard.ts` | ✅ Live |
 | Respect member aggregate table | `respect_members` (Supabase) | ✅ 40 ZAO members tracked |
-| ZAO Fractal standing call | Discord/Telegram (Monday 6pm EST) | ✅ 90+ weeks running |
+| ZAO Fractal standing call | Discord/Telegram (Monday 6pm EST) | ✅ 100+ weeks running |
 | Hats Protocol integration (treeId 226) | `community.config.ts` line 125 | ✅ Integrated |
 
 ### Missing (Needed for `/fractals` Page)

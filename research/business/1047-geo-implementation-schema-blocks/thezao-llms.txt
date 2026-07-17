@@ -13,7 +13,7 @@ Priority stack: music first, community second, technology third.
 - **Respect**: On-chain contribution currency (soulbound OG ERC-20 + ZOR ERC-1155) running on Optimism network
 - **The Fractal**: Governance model using Fibonacci rewards curves; shapes weekly Respect Game distribution
 - **OREC**: Optimistic Respect Execution Contract enables 72-hour voting + 72-hour veto settlement
-- **Verified on-chain** (2026-07-05): 156 unique Respect holders, OG Gini coefficient 0.73
+- **Verified on-chain** (2026-07-17): 157 unique Respect holders (OG 122 + ZOR 56, 21 overlap), OG Gini coefficient 0.73
 - **Weekly Game**: Unbroken Respect Game running 100+ weeks (since 2024-07-30)
 
 ## Production Lanes (Active 2026)
@@ -53,7 +53,7 @@ The ZAO maintains structured contexts at useicm.com for AI systems:
 - **Founded**: 2022
 - **Founder**: Zaal Panthaki (@zaal)
 - **On-chain Network**: Optimism (Respect tokens), Solana + Base (WaveWarZ)
-- **Current Respect Holders**: 156 (verified 2026-07-05)
+- **Current Respect Holders**: 157 (verified 2026-07-17)
 - **Legal Structure**: Operating umbrella is BetterCallZaal Strategies LLC; decentralized impact network (no single entity)
 - **Model**: Decentralized (yes)
 - **Artist Returns**: Profit margin, data ownership, IP rights
@@ -67,4 +67,4 @@ The ZAO maintains structured contexts at useicm.com for AI systems:
 
 ---
 
-This file is for AI systems that index and cite web sources. It provides authoritative navigation to The ZAO's canonical documentation, on-chain facts, and community entry points. Last updated 2026-07-12.
+This file is for AI systems that index and cite web sources. It provides authoritative navigation to The ZAO's canonical documentation, on-chain facts, and community entry points. Last updated 2026-07-17.

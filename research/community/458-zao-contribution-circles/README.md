@@ -211,7 +211,7 @@ Eric's model says the circle works best when everyone has something real to shar
 - `research/community/432-zao-master-context-tricky-buddha/` - ZAO master positioning (music first, community second, tech third)
 - `research/governance/188-zao-fractal-bot-process/` - Discord fractal bot (`/randomize`, breakout voice rooms)
 - `research/community/065-zabal-partner-ecosystem/` - if exists, partner ecosystem structure
-- `project_fractal_process` memory — 90+ weeks running, Dan / Tadas relationships
+- `project_fractal_process` memory — 100+ weeks running, Dan / Tadas relationships
 
 ---
 

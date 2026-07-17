@@ -86,7 +86,7 @@ The actual ZAO product, stated correctly:
 |-------|-----------|------------------------|
 | 1. Distribution infrastructure | ZAO OS cross-posts to Farcaster + X + Bluesky + Hive + Lens; Empire Builder Telegram raids; fractal weekly attention; ZAO Stock stage | Not "here's a blog about distribution" |
 | 2. Behavioral nudges | Default-on autostake, 24h friction on emotional decisions, commitment devices (Stake-More-Tomorrow), ZOE contextual intervention at wallet+claim+withdraw (doc 470) | Not "financial literacy course" |
-| 3. Live-fire learning | Fractal meetings where members ship together weekly, 90+ weeks running (doc 106, 051). Learning is a byproduct of shipping, not the product | Not a "curriculum" or "academy" |
+| 3. Live-fire learning | Fractal meetings where members ship together weekly, 100+ weeks running (doc 106, 051). Learning is a byproduct of shipping, not the product | Not a "curriculum" or "academy" |
 
 **The reframe:** ZAO doesn't teach artists how to distribute. ZAO distributes with them, and they learn by doing. The distinction is the whole pitch.
 
@@ -152,7 +152,7 @@ Foundercheck marked WTP `"evidence_level": "inferred"`. It's actually observable
 
 | Signal | Source | Interpretation |
 |--------|--------|---------------|
-| 90+ weekly fractal meetings with consistent attendance (doc 051) | ZAO fractal Discord logs | Members pay in time — ~1.5hr/week each. Time-WTP > $0 dollar-WTP for this cohort |
+| 100+ weekly fractal meetings with consistent attendance (doc 051) | ZAO fractal Discord logs | Members pay in time — ~1.5hr/week each. Time-WTP > $0 dollar-WTP for this cohort |
 | Respect accrual curves | `src/app/api/respect/*` + fractal data | Who keeps showing up after 4+ weeks = high-intent paid-for-free segment |
 | ZABAL holders with >0 balance AND any on-chain activity | Base chain indexer | Crypto-comfortable AND engaged — highest conversion probability for paid tier |
 | ZAO Stock artist applications (doc 472) | `src/app/stock/apply/` | Paid in effort to submit = revealed intent |

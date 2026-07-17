@@ -81,7 +81,7 @@ Sopha runs as both a standalone site AND a Farcaster Mini App. ZAO OS already ha
 | **Curation** | Topic-based (implicit) | Respect-weighted voting (explicit) |
 | **Gating** | Open (anyone on Farcaster) | Allowlist-gated (100 members) |
 | **Cross-posting** | Farcaster only | Farcaster + Bluesky + X |
-| **Governance** | None visible | Fractal consensus, 90+ weeks |
+| **Governance** | None visible | Fractal consensus, 100+ weeks |
 | **Music** | None | 8-platform player, radio, submissions |
 | **Messaging** | Farcaster casts only | Farcaster + XMTP encrypted DMs |
 | **Mini App** | Yes | Yes |

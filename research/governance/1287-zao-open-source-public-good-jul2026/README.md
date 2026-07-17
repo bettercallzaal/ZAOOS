@@ -7,7 +7,7 @@ audience: Optimism Retro Funding evaluators, grant reviewers, open source funder
 related-docs: 1209, 1273, 1278, 1282
 ---
 
-# 1286 — The ZAO as Open Source Public Good (July 2026)
+# 1287 — The ZAO as Open Source Public Good (July 2026)
 
 > **Purpose:** Document The ZAO's open source contributions for Optimism Retro Funding and general grant applications. What has been released publicly, who can use it, and how it qualifies as a public good.
 

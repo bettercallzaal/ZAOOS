@@ -295,11 +295,13 @@ describe('POST /api/chat/schedule', () => {
   it('accepts valid embedHash format (0x followed by 40 hex chars)', async () => {
     mockGetSessionData.mockResolvedValue(mockAuthenticatedSession({ signerUuid: 'valid-uuid' }));
 
+    const futureDate = new Date();
+    futureDate.setHours(futureDate.getHours() + 1);
     const validHash = '0x1234567890abcdef1234567890abcdef12345678';
     const req = makePostRequest('/api/chat/schedule', {
       text: 'Hello',
       channel: 'zao',
-      scheduledFor: '2026-07-17T10:00:00Z',
+      scheduledFor: futureDate.toISOString(),
       embedHash: validHash,
     });
 

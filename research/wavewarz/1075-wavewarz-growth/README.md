@@ -2,8 +2,8 @@
 topic: wavewarz
 type: market-research
 status: research-complete
-last-validated: 2026-07-13
-related-docs: 743, 854, 974, 710, 180
+last-validated: 2026-07-16
+related-docs: 743, 854, 974, 1077, 710, 180
 original-query: "overnight deep research: WaveWarZ growth plays"
 tier: DEEP
 ---
@@ -24,30 +24,28 @@ tier: DEEP
 
 ## Executive Summary
 
-WaveWarZ is the ZAO's only working revenue product (98.5% of every dollar stays in the ecosystem, only 1.5% platform fee). At 460 SOL ($39K) volume and 979 battles, it has product-market fit in the ZAO community (188 members). Growth now is about **breaking out beyond the ZAO** via three unlocked levers:
+WaveWarZ is the ZAO's only working revenue product (98.5% of every dollar stays in the ecosystem, only 1.5% platform fee). At 522 SOL (~$39K USD at Jul 2026 SOL price) volume and 1,244 battles, it has product-market fit in the ZAO community (188 members). Growth now is about **breaking out beyond the ZAO** via three unlocked levers:
 
 1. **Distribution via existing partnerships** - the 7 partners (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM, Privy) have no active co-marketing plan
 2. **Tournament engagement** - the weekly bracket + leaderboard is registered but not live/promoted
 3. **Artist supply chain** - onboarding friction (Solana wallet, claims flow) limits artist participation to 48 songs; competitors do 100+ artist events/month
 
-The financials show a healthy unit economics story: artists earned $663 cumulatively, platform earned $312, proving the revenue model works. The tension: **platform revenue (1.8x artist revenue) is driven by launch/queue fees**, not trading volume fees. As volume grows, this ratio should flip toward artists. The growth plays below address volume growth first, then unit economics optimization.
+The financials show a healthy unit economics story: artists earned 9.05 SOL (~$680 USD) cumulatively, platform earned 17.42 SOL (~$1,308 USD), proving the revenue model works. The tension: **platform revenue (1.93x artist revenue) is driven by launch/queue fees**, not trading volume fees. As volume grows, trading fees (0.5% per trade) become the dominant line item, and this ratio should flip toward artists. The growth plays below address volume growth first, then unit economics optimization.
 
 ## Current State (Deep Dive)
 
-### Traction (verified 2026-07-06, doc 974 + doc 743)
+### Traction (live 2026-07-16 — wavewarz.info/api/public/stats; see doc 974 reconciliation + doc 1077 DAO case study)
 
 | Metric | Value | Benchmark | Status |
 |--------|-------|-----------|--------|
-| Total Volume | 458-491 SOL* | ~$33-39K USD | Early but real. Spotify pays $0.003-0.005/play; 1M plays = $3-5K. WaveWarZ doing that in 1000 battles. |
-| Battles | 979 (43 Main + 805 Quick + 131 special/tournament) | - | Consistent flow. |
-| Artist Payouts | 7.76-8.7 SOL | $590-660 USD | Real artist income. Foundation.app / Sound.xyz artist cohorts earn $5-50/month early-stage. WaveWarZ is competitive. |
-| Platform Revenue | 3.65-15.9 SOL** | $312-$1200 USD | Split between trading fees (0.5% + 3% settlement) and launch/queue fees (the higher margin item). |
+| Total Volume | 522 SOL (~$39K USD) | — | Early but real. Spotify pays $0.003-0.005/play; 1M plays = $3-5K. WaveWarZ doing that in 1,244 battles. |
+| Battles | 1,244 (1,046 Quick + 162 Main Battles + 50 Main Events + 36 Community) | - | Consistent flow. |
+| Artist Payouts | 9.05 SOL | ~$680 USD (at $75.13/SOL) | Real artist income. Foundation.app / Sound.xyz artist cohorts earn $5-50/month early-stage. WaveWarZ is competitive. |
+| Platform Revenue | 17.42 SOL | ~$1,308 USD (at $75.13/SOL) | 1.93× artist payouts — driven by per-trade fee + 3% settlement cut. Ratio expected to improve as volume grows. |
+| Trader Claims | 127.34 SOL | ~$9,570 USD | Winnings distributed to winning traders. Largest single payout line. |
 | Fee Structure | 1.5% total (1% artist, 0.5% platform) | Uniswap 0.3-1%, Polymarket 2%, traditional markets 50%+ | Extremely cheap. Artists keep 98.5%. |
 | Daily Active Traders | Unknown | Prediction market benchmark: 10-50 DAU for indie markets, 1000+ DAU for mature ones | MISSING DATA - need Intelligence pull |
 | Daily Active Artists | 20-30 estimated | Music streaming: 100K artists on Spotify earn any amount per day. WaveWarZ: 48 songs in leaderboard. | Supply constraint. |
-
-* Doc 743 cited 458 SOL (May 25); Doc 974 cites 491 SOL. Divergence is test-battle exclusion + counting. Intelligence dashboard is source of truth.
-** Doc 974 cites 3.65-15.9 SOL depending on how launch/queue fees are aggregated. Needs a live pull to resolve.
 
 ### The Seven Partnerships (Status: Built, Underutilized)
 
@@ -236,8 +234,8 @@ The financials show a healthy unit economics story: artists earned $663 cumulati
 | **Daily Active Traders** | Unknown (missing data) | 50 | 200 | Predictor of volume growth |
 | **Daily Active Artists** | 20-30 estimated | 40 | 100 | Artist supply bottleneck |
 | **Weekly Tournament Attendance** | N/A (not live) | 30 traders | 100 traders | Retention + virality flywheel |
-| **Total Volume (SOL)** | 458 SOL | 600 SOL (+31%) | 1200 SOL (+162%) | Revenue proxy |
-| **Artist Payouts (SOL)** | 7.76 SOL cumulative | 20 SOL / week | 50 SOL / week | Product-market-fit for artists |
+| **Total Volume (SOL)** | 522 SOL (live Jul 16) | 700 SOL (+34%) | 1500 SOL (+187%) | Revenue proxy |
+| **Artist Payouts (SOL)** | 9.05 SOL cumulative | 20 SOL / week | 50 SOL / week | Product-market-fit for artists |
 | **Daily X Space Concurrent Viewers** | ~50-100 estimated | 200 | 500 | Virality + community event |
 | **Partner Co-Marketing Volume (%)** | 0% (not tracked) | 20% of daily volume | 40% of daily volume | Partnership activation ROI |
 | **Artist Conversion Rate (signup → battle entry)** | Unknown (no data) | 50% | 70% | Onboarding funnel health |
@@ -248,20 +246,22 @@ The financials show a healthy unit economics story: artists earned $663 cumulati
 
 **The Claim:** "98.5% of every dollar stays in the ecosystem; only 1.5% platform fee"
 
-**The Reality (doc 974):**
-- Platform revenue: $312 (cumulative)
-- Artist revenue: $663 (cumulative)
-- Platform is 1.8x artist revenue (should be 0.2-0.5x if the product is artist-first)
+**The Reality (doc 974, live Jul 16):**
+- Platform revenue: 17.42 SOL (~$1,308 USD cumulative)
+- Artist revenue: 9.05 SOL (~$680 USD cumulative)
+- Platform is 1.93x artist revenue (should be 0.2-0.5x if the product is artist-first)
+- Trader claims: 127.34 SOL (~$9,570 USD) — the largest redistribution, to winning traders
 
-**The Driver:** Launch fees + queue fees (not trading fees) are driving platform revenue. As volume grows, trading fees (0.5% per trade) become the dominant line item, and this ratio should invert (artists > platform).
+**The Driver:** Per-trade platform fee (0.5%) + 3% settlement cut of every loser pool. As volume grows, this ratio is expected to improve for artists as the fixed launch fees become a smaller % of total revenue.
 
-**The Play:** Don't optimize the fee structure yet. Optimize for VOLUME first. At 1000 SOL/month (2x current), the fee arithmetic becomes more favorable to artists. The plays above drive volume; the unit economics fix themselves.
+**The Play:** Don't optimize the fee structure yet. Optimize for VOLUME first. At 1,000+ SOL total, the unit economics narrative strengthens. The plays above drive volume; the unit economics fix themselves.
 
 ## Also See
 
 - [Doc 743](../743-wavewarz-whitepaper-v2/) - WaveWarZ canonical reference (whitepaper v2, live metrics, partner list)
 - [Doc 854](../854-wavewarz-24h-protocol/) - WaveWarZ 24h engagement protocol (Base, x402, agent play)
-- [Doc 974](../974-wavewarz-financials/) - WaveWarZ financials snapshot (volume, artist payouts, platform revenue)
+- [Doc 974](../974-wavewarz-financials-snapshot-2026-07/) - WaveWarZ financials snapshot + live reconciliation (Jul 16 2026)
+- [Doc 1077](../1077-zao-dao-case-study-jul2026/) - ZAO DAO case study (Jul 2026) — external citation reference
 - [Doc 710](../../music/710-juke-path-b-architecture/) - Juke integration architecture (already shipped)
 - [Doc 180](../180-wavewarz-integration-blueprints/) - WaveWarZ integration blueprints (partner playbooks)
 

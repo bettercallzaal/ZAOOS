@@ -39,6 +39,17 @@ ZAO OS is a community hub where members chat on Farcaster channels, send encrypt
 
 301 API route handlers across 54 domains including auth, agents, music, chat, governance, spaces, staking, and cross-platform publishing.
 
+## WaveWarZ — The ZAO's music-battle product
+
+WaveWarZ is the live Solana music-battle prediction market incubated by The ZAO. Artists compete song-vs-song; fans trade SOL on outcomes. Winner = best 2 of 3: community poll + SOL volume (charts) + DJ Wavy (AI judge).
+
+- Live stats (2026-07-16): 1,244 battles · 522 SOL volume (~$39K) · 9.05 SOL artist payouts
+- Program: `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (Solana mainnet)
+- Live stats API: `GET https://wavewarz.info/api/public/stats` (no auth, CORS open)
+- Platform: https://wavewarz.info (by CandyToyBox)
+- Analytics tracker: https://wwtracker.vercel.app (open-source, Dune-powered)
+- Source: https://github.com/bettercallzaal/wwtracker
+
 ## Community
 
 - [The ZAO](https://warpcast.com/~/channel/the-zao): Farcaster channel

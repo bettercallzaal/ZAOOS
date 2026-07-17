@@ -51,7 +51,7 @@ tier: DISPATCH
 | 2023 | Co-founded WaveWarZ with Hurric4n3IKE + Candytoybox (Samantha Denton-Kinney). | WaveWarZ whitepaper; Doc 050 |
 | 2024 | Apr: produced **ZAO-PALOOZA** at NFT NYC (12 artists, 6 weeks lead, broke even). | Doc 050 |
 | 2024 | Dec: produced **ZAO-CHELLA** at Miami Art Basel (10 artists, WaveWarZ LIVE battle, AR art). | Doc 050 |
-| 2024 | Started weekly Respect Game fractal governance. 90+ consecutive weeks as of May 2026. | Doc 050 |
+| 2024 | Started weekly Respect Game fractal governance. 100+ consecutive weeks as of 2026-07-17 (63 with verified on-chain Respect settlement, doc 1202). | Doc 050 |
 | 2024 | Relocated to Ellsworth, Maine. "Where there was zero blockchain exposure" — turned that into bridging local arts scene to onchain rails. | Doc 050; bettercallzaal.com |
 | 2026 | Jan 1: launched **$ZABAL token** on Base via Clanker/Empire Builder. Liquid reward token, no governance power. Contract `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07`. | memory `project_nexus_hub_live` |
 | 2026 | May 7: shipped **Nexus Hub** — 14-brand ecosystem directory at bettercallzaal.com/nexus.html. | memory `project_nexus_hub_live` |
@@ -134,7 +134,7 @@ Mirrors Ike's chain (football → EE → Infosys → sales → spaces → indie 
 3. **Automation Engineer at PCC Structurals** — $1.5M robotics project, 7x throughput; learning to make systems that move physical value
 4. **2022 bear market Web3 pivot** — discovered software could MOVE VALUE not just compute; smart contracts on Base + Solana, zero exploits
 5. **Founded The ZAO (2023)** in the crypto winter — only-the-serious-people-left timing
-6. **90+ weeks of fractal Respect Game governance** — designed + iterated soulbound mechanics + education-through-participation
+6. **100+ weeks of fractal Respect Game governance** — designed + iterated soulbound mechanics + education-through-participation
 7. **Produced ZAO-PALOOZA (NFT NYC) + ZAO-CHELLA (Art Basel)** — six-person team, six-week lead, broke even on PALOOZA, brought music into web3 events
 8. **400+ daily newsletter editions** building in public — Year of the ZAO, ZABAL, ZTalent
 9. **BCZ YapZ podcast (20 episodes)** + co-hosting LTAW3 — long-form public speaking via voice

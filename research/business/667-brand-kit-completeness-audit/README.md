@@ -27,7 +27,7 @@ tier: DEEP
 
 | # | Brand | Category | Status | Why Missing? | Source That Surfaced It |
 |---|---|---|---|---|---|
-| 1 | **ZAO Fractals** | governance (new cat) | active | I rolled it into "The ZAO" card initially; it's distinct enough to stand alone (90+ weeks, two contracts, two ledgers, separate bot, separate frontend at zao.frapps.xyz) | `project_fractal_process.md` + `project_fractal_vision.md` + ZAOOS code paths (`src/app/(auth)/fractals/`, `src/app/api/respect/fractal`, `src/app/api/discord/fractal-live`) |
+| 1 | **ZAO Fractals** | governance (new cat) | active | I rolled it into "The ZAO" card initially; it's distinct enough to stand alone (100+ weeks, two contracts, two ledgers, separate bot, separate frontend at zao.frapps.xyz) | `project_fractal_process.md` + `project_fractal_vision.md` + ZAOOS code paths (`src/app/(auth)/fractals/`, `src/app/api/respect/fractal`, `src/app/api/discord/fractal-live`) |
 | 2 | **ZAO Music** | music | building | Doc 475 explicitly named ZAO Music as a DBA under BCZ Strategies — wasn't in initial scan | `project_zao_music_entity.md` + Doc 475 |
 | 3 | **ZAO Music Bot (`zaomusicbot`)** | agents | active | Live JS bot, 117KB, last push 2026-03-12 — wasn't in my 663b/c/e audits | `gh repo view bettercallzaal/zaomusicbot` |
 | 4 | **ZOUNZ** | music | building | Substantial brand — "Farcaster Music Mini App: AI music gen + Audius + Zora NFT on Base + Attention Markets on Solana." 173KB repo. Has its own `/src/components/zounz/` + `/src/app/api/zounz/` in ZAOOS. | `gh repo view bettercallzaal/ZOUNZ` description; ZAOOS code paths |

@@ -34,8 +34,8 @@ tier: STANDARD
 
 - **zaalcaster** - open-sourced his own Farcaster client, vibe-coded with an AI agent. github.com/bettercallzaal/zaalcaster
 - **ZLANK** - no-code Farcaster snap builder, won FarHack 2026 Snaps track. zlank.online
-- **The ZAO** - 90+ weeks of onchain peer-ranked Respect governance on Base. thezao.xyz (note: on-chain truth is ~101 weeks / 156 holders per doc 975 - use the accurate figure)
-- **WaveWarZ** - artists paid 1% of every trade instantly onchain, 500+ SOL volume.
+- **The ZAO** - 100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism. 157 unique Respect holders (doc 1200). thezao.xyz
+- **WaveWarZ** - artists paid 1% of every trade instantly onchain, 522 SOL lifetime volume (~$39K, 1,245 battles, 2026-07-17).
 - **ZABAL Gamez** - 3-month build-a-thon. zabalgamez.com
 - Build-in-public / vibe-coding lessons; artists owning their tools; onchain music.
 

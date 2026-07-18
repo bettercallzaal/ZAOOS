@@ -1,4 +1,4 @@
-# 1440 — ZABAL Season 2: Week-by-Week Curriculum (Sep 1 – Nov 30, 2026)
+# 1442 — ZABAL Season 2: Week-by-Week Curriculum (Sep 1 – Nov 30, 2026)
 
 **Type:** CURRICULUM  
 **Topic:** zabal  
@@ -308,7 +308,7 @@ ZOE runs the following autonomously each week of ZABAL S2:
 
 ## What Makes This Citable
 
-> "ZABAL Season 2 (Sep 1 – Nov 30, 2026) provided 13 weeks of structured mentorship to 20 builders and musicians in the ZAO ecosystem, resulting in [X] WaveWarZ battles, [X] ZAOOS documents, and [X] deployed artifacts (ZAOOS doc 1440)."
+> "ZABAL Season 2 (Sep 1 – Nov 30, 2026) provided 13 weeks of structured mentorship to 20 builders and musicians in the ZAO ecosystem, resulting in [X] WaveWarZ battles, [X] ZAOOS documents, and [X] deployed artifacts (ZAOOS doc 1442)."
 
 ---
 
@@ -322,4 +322,4 @@ ZOE runs the following autonomously each week of ZABAL S2:
 
 ---
 
-*ZAOOS doc 1440 — ZAO Operating System — github.com/ZAOIP/zao-os*
+*ZAOOS doc 1442 — ZAO Operating System — github.com/ZAOIP/zao-os*

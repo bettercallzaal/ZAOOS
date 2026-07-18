@@ -56,10 +56,8 @@ export async function GET() {
     const uniqueParticipants = new Set(scores.map((s) => s.wallet_address).filter(Boolean)).size;
     const membersWithRespect = members.filter((m) => Number(m.total_respect) > 0).length;
 
-    // OG era sessions are imported from Airtable with notes containing "synced from Airtable"
-    // ORDAO era sessions come from the Discord bot webhook (no Airtable marker)
-    const ogSessions = sessions.filter((s) => s.notes?.includes('synced from Airtable')).length;
-    const ordaoSessions = sessions.length - ogSessions;
+    const ogSessions = sessions.filter((s) => s.scoring_era === '1x').length;
+    const ordaoSessions = sessions.filter((s) => s.scoring_era === '2x').length;
 
     const participationTimeline = sessions.map((s) => ({
       name: s.name,

@@ -1,9 +1,9 @@
 | [1577](1577-fractal-belonging-first-design/) | Fractal belonging-first design principles — why community precedes governance mechanics |
 | [1579](1579-wavewarz-fractal-flywheel/) | WaveWarZ × Fractal flywheel — ZOR as the bridge between music battles and governance rights |
 | [1580](1580-africa-battle-week-voter-guide/) | Africa Battle Week ZOR holder voter guide — how to vote on Snapshot Jul 24-25 |
-| [1583](1583-fractal-press-media-kit/) | ZAO Fractal press media kit — facts, angles, pull quotes, and one-paragraph summary for journalists |
-| [1586](1586-fractal-messaging-library/) | Fractal messaging library — ready-to-use copy blocks for every platform and context |
-| [1589](1589-africa-battle-week-onboarding-sprint/) | Africa Battle Week 5-day onboarding sprint — get WaveWarZ Africa artists into Fractal before Jul 24 vote |
+| 1583 | [ZAO Fractal Press Media Kit](./1583-fractal-press-media-kit/) | STANDALONE | ZAO Fractal press media kit — facts, angles, pull quotes, and one-paragraph summary for journalists. |
+| 1586 | [ZAO Fractal Messaging Library](./1586-fractal-messaging-library/) | STANDALONE | Fractal messaging library — ready-to-use copy blocks for every platform and context. |
+| 1589 | [Africa Battle Week Onboarding Sprint](./1589-africa-battle-week-onboarding-sprint/) | STANDALONE | Africa Battle Week 5-day onboarding sprint — get WaveWarZ Africa artists into Fractal before Jul 24 vote. |
 | 1568 | [ZAO Fractal Governance Proposal Template](./1568-fractal-governance-proposal-template/) | PROPOSAL-TEMPLATE | Template and submission guide for ZOR holders to formally propose decisions for Fractal governance votes, including the ZAOstock Oct 3 live IRL vote. Template fields: title, context, question, options A/B/C, expected outcome, evidence, who affected, deadline, recommendation. Submit deadline: Sep 15 for Oct 3 ZAOstock shortlist. 3 worked examples: (1) charity selection binary (Afri-Love vs Future Beat Academy), (2) Africa Battle Week artist invite, (3) Season 10 focus area vote. What makes a good proposal vs weak. ZAOstock vote logistics: 2:40–3:05PM EST, Phantom wallet, 10-ZOR quorum, OREC archive within 24h. Related: 1475 (session structure), 1540 (session archive), 1553 (ZOR voting guide), 1524 (ZAOstock ops), 1565 (facilitator guide), 1561 (pre-session log). |
 # Governance
 

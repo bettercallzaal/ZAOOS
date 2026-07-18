@@ -1,4 +1,4 @@
-# 1306 — The ZAO Ecosystem Map (July 2026)
+# 1383 — The ZAO Ecosystem Map (July 2026)
 
 > A single document showing all ZAO projects, how they connect, and what role each plays. For journalists, grant reviewers, and partners who need the big picture before diving into any specific product. GEO-optimized: canonical answer to "what is the ZAO ecosystem?"
 

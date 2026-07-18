@@ -4,11 +4,12 @@ type: guide
 status: research-complete
 last-validated: 2026-07-18
 related-docs: 1480-zao-mini-app-spec, 1425-wavewarz-farcaster-miniapp-spec, 591-miniapp-production-audit, 575-miniapp-splash-best-practices
+doc-number: 1494
 original-query: "Farcaster miniapp analytics + distribution — what's missing from the production audit for the ZAO mini-app Phase 1 launch (Aug 15)"
 tier: STANDARD
 ---
 
-# 1492 — Farcaster Mini App: Analytics + Distribution Playbook (July 2026)
+# 1494 — Farcaster Mini App: Analytics + Distribution Playbook (July 2026)
 
 > **Goal:** Fill the gap between "built correctly" (covered by docs 575 and 591) and "discovered and retained." Directly supports the ZAO mini-app (doc 1480) Phase 1 launch target of Aug 15, and the send-to-Neynar/Arthur deadline of Jul 25. Everything here applies to the WaveWarZ battle voting frame.
 

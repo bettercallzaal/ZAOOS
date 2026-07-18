@@ -370,7 +370,7 @@ describe('GET /api/fractals/member/[wallet]', () => {
       expect(body.history[0].sessionName).toBe('Session B');
     });
 
-    it('detects ORDAO sessions from notes', async () => {
+    it('detects ORDAO sessions from scoring_era field', async () => {
       const member = {
         name: 'Henry',
         wallet_address: VALID_WALLET.toLowerCase(),
@@ -393,11 +393,11 @@ describe('GET /api/fractals/member/[wallet]', () => {
           member_name: member.name,
           fractal_sessions: {
             id: 's1',
-            name: 'ORDAO',
+            name: 'Fractal 80',
             session_date: '2024-03-10',
-            scoring_era: '3x',
+            scoring_era: '2x',
             participant_count: 12,
-            notes: 'ORDAO test',
+            notes: null,
           },
         },
         {

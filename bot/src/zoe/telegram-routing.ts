@@ -95,14 +95,16 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
   }
 
   const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
-  const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
-  if (groupIdRaw && Number.isNaN(groupId)) {
+  const groupIdParsed = groupIdRaw ? Number(groupIdRaw) : undefined;
+  const groupId = Number.isNaN(groupIdParsed) ? undefined : groupIdParsed;
+  if (groupIdRaw && Number.isNaN(groupIdParsed)) {
     console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
   }
 
   const threadIdRaw = process.env.ZAALBOTS_STATUS_THREAD_ID;
-  const threadId = threadIdRaw ? Number(threadIdRaw) : undefined;
-  if (threadIdRaw && Number.isNaN(threadId)) {
+  const threadIdParsed = threadIdRaw ? Number(threadIdRaw) : undefined;
+  const threadId = Number.isNaN(threadIdParsed) ? undefined : threadIdParsed;
+  if (threadIdRaw && Number.isNaN(threadIdParsed)) {
     console.warn(`Invalid ZAALBOTS_STATUS_THREAD_ID: ${threadIdRaw} (must be a number, will be ignored)`);
   }
 

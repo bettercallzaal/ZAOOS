@@ -14,7 +14,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What should I do?', { kind: 'question' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'What should I do?');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'What should I do?', {});
       expect(sendMessage).toHaveBeenCalledTimes(1);
     });
 
@@ -69,7 +69,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'Status message', { kind: 'status' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'Status message');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'Status message', {});
     });
 
     it('questions always go to DM even if group is configured', async () => {
@@ -82,7 +82,7 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, 'What do you think?', { kind: 'question' });
 
-      expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?');
+      expect(sendMessage).toHaveBeenCalledWith(123, 'What do you think?', {});
     });
   });
 

@@ -1735,7 +1735,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       const report = await runAudit([], Date.now());
       const formatted = formatAuditForTelegram(report);
       progress.stop();
-      await sendLongMessage(ctx, formatted);
+      await replyChunked(ctx, formatted);
     } catch (err) {
       progress.stop();
       const msg = err instanceof Error ? err.message : String(err);

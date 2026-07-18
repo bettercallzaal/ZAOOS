@@ -105,3 +105,5 @@
 
 | 1560 | [ZAO Media Vault: Emergency Backup Protocol](./1560-zao-media-vault-backup-protocol/) | OPERATIONAL-PROTOCOL | URGENT — 64GB single-copy ZAO media (30GB+ irreplaceable live performance recordings) has zero offsite backup. Step-by-step protocol: Step 1 tonight (iCloud Photos + Google Photos), Step 2 this week (Backblaze B2 /mo), Step 3 ongoing (automated nightly rsync). Asset inventory table (~/Movies 30GB irreplaceable, ~/Desktop 15GB, ~/Downloads 10GB, ~/Documents/ZAO OS 10GB). Action-owner: Zaal only (filesystem access required). Related: board task 8f14ad65. |
 | [1609](1609-fractal-dashboard-pr-review-guide/) | Fractal dashboard code PRs review guide — 9 waiting PRs, what each fixes, test sequence |
+
+| 1609 | [ZAO Fractal Dashboard Code PRs — Review Guide](./1609-fractal-dashboard-pr-review-guide/) | STANDALONE | Fractal dashboard code PRs review guide — 9 waiting PRs, what each fixes, test sequence. |

@@ -8,7 +8,7 @@ original-query: "Warpee Knowledge API query plan - GM Farcaster podcast knowledg
 tier: PLAN
 ---
 
-# 1470 - Warpee Query Plan: GM Farcaster Podcast Knowledge vs ZAO Products
+# 1477 - Warpee Query Plan: GM Farcaster Podcast Knowledge vs ZAO Products
 
 > **What:** Prioritized list of queries to run against the Warpee API (`POST api.gmfarcaster.com/v1/query`) — the GM Farcaster Knowledge API over hundreds of podcast episodes/transcripts. Each query costs $0.005 USDC via x402 on Base. This plan surfaces the gap Warpee fills: **podcast ecosystem sentiment** (what builders and creators say on-air) vs our existing web/technical research.
 >

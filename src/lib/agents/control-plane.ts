@@ -10,7 +10,7 @@
  * Database I/O lives in src/app/api/agents/* routes and bot/src/zoe/*
  */
 
-import type { z } from 'zod';
+import type { z } from "zod";
 
 /**
  * AssignmentEnvelope: The complete work directive from human plane to machine.
@@ -42,16 +42,16 @@ export interface AssignmentEnvelope {
 
   /** Context references (doc ids, URLs, code snippets for the agent to consider) */
   contextReferences: Array<{
-    type: 'doc' | 'url' | 'code_snippet' | 'memory';
+    type: "doc" | "url" | "code_snippet" | "memory";
     value: string;
   }>;
 
   /** Approval policy: 'auto' (no approval), 'user_confirm' (needs sign-off),
    * 'external_spend' (financial), 'on_chain' (blockchain action) */
-  approvalPolicy: 'auto' | 'user_confirm' | 'external_spend' | 'on_chain';
+  approvalPolicy: "auto" | "user_confirm" | "external_spend" | "on_chain";
 
   /** Visibility: 'private' (team only), 'team' (team + observers), 'public' (all) */
-  visibility: 'private' | 'team' | 'public';
+  visibility: "private" | "team" | "public";
 
   /** Budget constraints (optional) */
   budget?: {
@@ -72,14 +72,14 @@ export interface AssignmentEnvelope {
  * Transitions are constrained - not all paths are legal.
  */
 export type RunStatus =
-  | 'queued' // Created, waiting to be routed
-  | 'routing' // Routing layer deciding which agent
-  | 'running' // Agent is executing
-  | 'awaiting_approval' // Awaiting human approval (approval_policy != 'auto')
-  | 'verifying' // Result is being verified
-  | 'done' // Successfully completed
-  | 'failed' // Agent failed (or hit hard limit)
-  | 'cancelled'; // Manually cancelled
+  | "queued" // Created, waiting to be routed
+  | "routing" // Routing layer deciding which agent
+  | "running" // Agent is executing
+  | "awaiting_approval" // Awaiting human approval (approval_policy != 'auto')
+  | "verifying" // Result is being verified
+  | "done" // Successfully completed
+  | "failed" // Agent failed (or hit hard limit)
+  | "cancelled"; // Manually cancelled
 
 /**
  * AgentRun: The database row reflecting a single assignment's execution.
@@ -101,8 +101,8 @@ export interface AgentRun {
     externalSpendLimit?: number;
     deadline?: string;
   } | null;
-  approvalState: 'auto' | 'pending' | 'approved' | 'rejected';
-  visibility: 'private' | 'team' | 'public';
+  approvalState: "auto" | "pending" | "approved" | "rejected";
+  visibility: "private" | "team" | "public";
   idempotencyKey: string;
   createdBy: string;
   createdAt: string; // ISO8601
@@ -122,8 +122,8 @@ export interface Receipt {
   tool: string; // e.g. 'neynar_api'
   action: string; // e.g. 'post_cast'
   inputDigest: string | null; // SHA256 of request body
-  resultType: 'success' | 'error' | 'pending_approval' | 'rate_limited';
-  approvalClass: 'auto' | 'user_confirm' | 'external_spend' | 'on_chain';
+  resultType: "success" | "error" | "pending_approval" | "rate_limited";
+  approvalClass: "auto" | "user_confirm" | "external_spend" | "on_chain";
   evidenceUrl: string | null; // S3/IPFS link to full evidence
   createdAt: string; // ISO8601
 }
@@ -133,11 +133,11 @@ export interface Receipt {
  * Not all paths are allowed (e.g., can't go from 'done' to 'running').
  */
 const LEGAL_TRANSITIONS: Record<RunStatus, RunStatus[]> = {
-  queued: ['routing', 'cancelled'],
-  routing: ['running', 'failed', 'cancelled'],
-  running: ['awaiting_approval', 'done', 'failed', 'cancelled'],
-  awaiting_approval: ['verifying', 'failed', 'cancelled'],
-  verifying: ['done', 'failed', 'cancelled'],
+  queued: ["routing", "cancelled"],
+  routing: ["running", "failed", "cancelled"],
+  running: ["awaiting_approval", "verifying", "done", "failed", "cancelled"],
+  awaiting_approval: ["verifying", "failed", "cancelled"],
+  verifying: ["done", "failed", "cancelled"],
   done: [], // Terminal state
   failed: [], // Terminal state
   cancelled: [], // Terminal state
@@ -157,10 +157,10 @@ export function buildAssignmentEnvelope(input: {
   requestedBy: string;
   objective: string;
   requiredCapabilities?: string[];
-  contextReferences?: AssignmentEnvelope['contextReferences'];
-  approvalPolicy?: 'auto' | 'user_confirm' | 'external_spend' | 'on_chain';
-  visibility?: 'private' | 'team' | 'public';
-  budget?: AssignmentEnvelope['budget'];
+  contextReferences?: AssignmentEnvelope["contextReferences"];
+  approvalPolicy?: "auto" | "user_confirm" | "external_spend" | "on_chain";
+  visibility?: "private" | "team" | "public";
+  budget?: AssignmentEnvelope["budget"];
   idempotencyKey: string;
 }): AssignmentEnvelope {
   return {
@@ -171,8 +171,8 @@ export function buildAssignmentEnvelope(input: {
     objective: input.objective,
     requiredCapabilities: input.requiredCapabilities ?? [],
     contextReferences: input.contextReferences ?? [],
-    approvalPolicy: input.approvalPolicy ?? 'auto',
-    visibility: input.visibility ?? 'team',
+    approvalPolicy: input.approvalPolicy ?? "auto",
+    visibility: input.visibility ?? "team",
     budget: input.budget ?? undefined,
     idempotencyKey: input.idempotencyKey,
   };
@@ -190,33 +190,33 @@ export function buildAssignmentEnvelope(input: {
 export function nextRunStatus(
   currentStatus: RunStatus,
   event:
-    | 'route_complete' // Routing layer assigned an agent
-    | 'execute_start' // Agent started execution
-    | 'approval_needed' // Needs human sign-off
-    | 'execute_success' // Agent completed successfully
-    | 'execute_failure' // Agent failed
-    | 'verify_start' // Started verification
-    | 'verify_complete' // Verification passed
-    | 'user_approve' // Human approved
-    | 'user_reject' // Human rejected
-    | 'cancel_request', // Cancellation requested
+    | "route_complete" // Routing layer assigned an agent
+    | "execute_start" // Agent started execution
+    | "approval_needed" // Needs human sign-off
+    | "execute_success" // Agent completed successfully
+    | "execute_failure" // Agent failed
+    | "verify_start" // Started verification
+    | "verify_complete" // Verification passed
+    | "user_approve" // Human approved
+    | "user_reject" // Human rejected
+    | "cancel_request", // Cancellation requested
 ): RunStatus {
   const nextMap: Readonly<Record<string, RunStatus>> = {
-    'queued:route_complete': 'routing',
-    'routing:execute_start': 'running',
-    'routing:execute_failure': 'failed',
-    'running:approval_needed': 'awaiting_approval',
-    'running:execute_success': 'verifying',
-    'running:execute_failure': 'failed',
-    'awaiting_approval:user_approve': 'verifying',
-    'awaiting_approval:user_reject': 'failed',
-    'verifying:verify_complete': 'done',
-    'verifying:execute_failure': 'failed',
-    'queued:cancel_request': 'cancelled',
-    'routing:cancel_request': 'cancelled',
-    'running:cancel_request': 'cancelled',
-    'awaiting_approval:cancel_request': 'cancelled',
-    'verifying:cancel_request': 'cancelled',
+    "queued:route_complete": "routing",
+    "routing:execute_start": "running",
+    "routing:execute_failure": "failed",
+    "running:approval_needed": "awaiting_approval",
+    "running:execute_success": "verifying",
+    "running:execute_failure": "failed",
+    "awaiting_approval:user_approve": "verifying",
+    "awaiting_approval:user_reject": "failed",
+    "verifying:verify_complete": "done",
+    "verifying:execute_failure": "failed",
+    "queued:cancel_request": "cancelled",
+    "routing:cancel_request": "cancelled",
+    "running:cancel_request": "cancelled",
+    "awaiting_approval:cancel_request": "cancelled",
+    "verifying:cancel_request": "cancelled",
   };
 
   const key = `${currentStatus}:${event}`;
@@ -257,7 +257,7 @@ export function isTerminal(status: RunStatus): boolean {
  * @returns The approval class for receipts from this run
  */
 export function getApprovalClass(
-  approvalPolicy: 'auto' | 'user_confirm' | 'external_spend' | 'on_chain',
-): Receipt['approvalClass'] {
-  return approvalPolicy as Receipt['approvalClass'];
+  approvalPolicy: "auto" | "user_confirm" | "external_spend" | "on_chain",
+): Receipt["approvalClass"] {
+  return approvalPolicy as Receipt["approvalClass"];
 }

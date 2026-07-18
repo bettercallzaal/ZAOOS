@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { buildFocusDigest } from '../focus-guard';
 import { buildTriageSummary } from '../inbox-triage';
 import { formatAuditForTelegram } from '../trust-audit';
+import { FOCUS_ON_RE, FOCUS_OFF_RE, CHECKPOINT_PREFIX, AUDIT_COMMAND_RE } from '../commands';
 
 describe('focus-guard', () => {
   describe('buildFocusDigest', () => {
@@ -89,7 +90,6 @@ describe('trust-audit', () => {
 
 describe('commands module', () => {
   it('recognizes /focus command pattern', () => {
-    const { FOCUS_ON_RE, FOCUS_OFF_RE } = require('../commands');
     expect(FOCUS_ON_RE.test('/focus')).toBe(true);
     expect(FOCUS_ON_RE.test('/focus on')).toBe(true);
     expect(FOCUS_OFF_RE.test('/focus off')).toBe(true);
@@ -97,14 +97,12 @@ describe('commands module', () => {
   });
 
   it('recognizes /checkpoint command pattern', () => {
-    const { CHECKPOINT_PREFIX } = require('../commands');
     const match = CHECKPOINT_PREFIX.exec('/checkpoint working on ZAO branding');
     expect(match).not.toBeNull();
     expect(match?.[1]).toBe('working on ZAO branding');
   });
 
   it('recognizes /audit command', () => {
-    const { AUDIT_COMMAND_RE } = require('../commands');
     expect(AUDIT_COMMAND_RE.test('/audit')).toBe(true);
     expect(AUDIT_COMMAND_RE.test('/audit full')).toBe(false);
   });

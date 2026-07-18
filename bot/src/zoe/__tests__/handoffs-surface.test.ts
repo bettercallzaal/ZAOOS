@@ -12,6 +12,7 @@ vi.mock('node:fs', () => ({
 const mockFetch = vi.fn();
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
   delete process.env.COWORK_TRACKER_URL;
@@ -90,6 +91,8 @@ describe('surfaceNewHandoffs', () => {
   });
 
   it('updates the last-seen timestamp to the max created_at after surfacing', async () => {
+    // Freeze time so "1h ago" fallback lands before the test data timestamps.
+    vi.useFakeTimers({ now: new Date('2026-07-17T07:00:00Z') });
     process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
     process.env.COWORK_TRACKER_KEY = 'test-key';
     mockReadFile.mockRejectedValue(new Error('ENOENT'));

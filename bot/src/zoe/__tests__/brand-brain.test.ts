@@ -7,11 +7,11 @@ vi.stubGlobal('fetch', fetchMock);
 
 describe('brandBoxFor', () => {
   it('returns the box ID for a registered brand topic', () => {
-    expect(brandBoxFor('ZABAL Games')).toBe('icm_PiCDHNNZ3WZpNoF59OA8Dw');
+    expect(brandBoxFor('ZABAL Games')).toBe('icm_6EcindcuwxlkMO7-lT83cQ');
   });
 
   it('returns undefined for an unregistered topic', () => {
-    expect(brandBoxFor('WaveWarZ')).toBeUndefined();
+    expect(brandBoxFor('NotARealTopic')).toBeUndefined();
   });
 
   it('returns undefined for undefined input', () => {

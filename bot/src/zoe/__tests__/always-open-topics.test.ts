@@ -2,6 +2,33 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+
+// topics.ts captures ZOE_HOME at module-level, so mock it to read lazily from
+// process.env.ZOE_HOME at call time — the same behaviour the real module will
+// have once its lazy-getter fix is merged (see curator.ts for the pattern).
+vi.mock('../topics', async () => {
+  const fsp = (await import('node:fs/promises')).default ?? (await import('node:fs/promises'));
+  const { join: pathJoin } = await import('node:path');
+  return {
+    readTopics: async () => {
+      const path = pathJoin(process.env.ZOE_HOME ?? '', 'topics.json');
+      try {
+        return JSON.parse(await fsp.readFile(path, 'utf8'));
+      } catch {
+        return {};
+      }
+    },
+    getTopicThread: async (name: string) => {
+      const path = pathJoin(process.env.ZOE_HOME ?? '', 'topics.json');
+      try {
+        const map = JSON.parse(await fsp.readFile(path, 'utf8'));
+        return map[name];
+      } catch {
+        return undefined;
+      }
+    },
+  };
+});
 import {
   generateBrandDraft,
   generateCodingPrQuestion,

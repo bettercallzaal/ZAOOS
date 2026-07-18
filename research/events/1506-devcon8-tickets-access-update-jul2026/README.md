@@ -10,7 +10,7 @@ original-query: "Devcon 8 ticket access update July 2026 — doc 1063 had 'Build
 tier: STANDARD
 ---
 
-# 1503 — Devcon 8 Tickets + Access Update (July 18, 2026)
+# 1506 — Devcon 8 Tickets + Access Update (July 18, 2026)
 
 > **STATUS: APPLY NOW.** Builder Discount (Sanctuary Tech Builder) opened July 14, 2026 — 4 days ago. Early Bird at $349 with limited quantity. This updates doc 1063 which had this as "expected July 2026, not yet confirmed."
 

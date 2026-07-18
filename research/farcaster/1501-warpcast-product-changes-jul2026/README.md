@@ -8,7 +8,7 @@ original-query: "What has changed in Warpcast (the app) since Neynar acquired Fa
 tier: STANDARD
 ---
 
-# 1496 — Warpcast Product Changes Jul 2026: What Changed + ZAO Action Map
+# 1501 — Warpcast Product Changes Jul 2026: What Changed + ZAO Action Map
 
 > **Goal:** Synthesize the Warpcast-level product changes since the Neynar acquisition (October 2025) into an explicit ZAO action map. The protocol changes are in doc 1094c; this doc is about the app surface. Source: doc 984 (Farcaster's own state-of-ecosystem recap) + related docs.
 

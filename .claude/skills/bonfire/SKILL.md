@@ -1,6 +1,6 @@
 ---
 name: bonfire
-description: Post episodes to the ZABAL Bonfire knowledge graph, or look up how Bonfire works. Bonfire is ZAO's knowledge-graph memory at zabal.bonfires.ai - meetings, decisions, captures flow in as natural-language episodes. The API key lives only on the VPS, so this skill posts via SSH and the key never touches the local machine. Use when the user types /bonfire, asks to push something to the knowledge graph, asks "what is in our Bonfire", or asks how Bonfire posting works.
+description: Post episodes to the ZABAL Bonfire knowledge graph, or look up how Bonfire works. Bonfire is ZAO's knowledge-graph memory at zabal.bonfires.ai - meetings, decisions, captures flow in as natural-language episodes. The API key lives in ~/.zao/zao.env locally AND on the VPS at /root/cowork-zaodevz/agent/.env (key migration landed 2026-05-24, doc 754). This skill SSHes the VPS as the original architecture, which still works; the /meeting skill posts locally because the key is on the mac. Use when the user types /bonfire, asks to push something to the knowledge graph, asks "what is in our Bonfire", or asks how Bonfire posting works.
 allowed-tools: Read Write Edit Bash
 ---
 
@@ -16,16 +16,23 @@ design: `research/agents/680-meeting-skill-bonfire-bridge`.
 
 ## The key constraint - why this skill SSHes the VPS
 
-The Bonfire API key (`BONFIRE_API_KEY`) lives ONLY on the VPS, in
-`/root/cowork-zaodevz/agent/.env`. It is deliberately not on Zaal's mac. So
-this skill never holds the key: it secret-scans the episodes locally, ships
-them to the VPS over SSH, and runs the POST there where the env already has
-the key. This mirrors how `transcribe.sh` falls back to the VPS.
+The Bonfire API key (`BONFIRE_API_KEY`) is in TWO places as of 2026-05-24:
+locally in `~/.zao/zao.env` (mac) AND on the VPS in
+`/root/cowork-zaodevz/agent/.env`. The on-mac copy was an intentional
+ergonomics move so local skills can curl Bonfire directly (see doc 754
+which reverses doc 717 decision #3).
+
+This skill still SSHes the VPS because (a) it was the original architecture
+(doc 717), (b) callers running ON the VPS itself (ZOE / Hermes) have the
+VPS env naturally, and (c) the SSH transport keeps working. For posting
+from the mac, the `/meeting` skill takes the simpler local path via
+`bonfire-episode.sh` (doc 754 patch).
 
 | Fact | Value |
 |------|-------|
 | VPS | `root@187.77.3.104` (override with `BONFIRE_VPS`) |
 | Key env file (on VPS) | `/root/cowork-zaodevz/agent/.env` - has `BONFIRE_API_KEY`, `BONFIRE_ID`, `BONFIRE_API_URL` |
+| Key env file (local mac, since 2026-05-24) | `~/.zao/zao.env` - same vars; used by `/meeting` skill via `bonfire-episode.sh` (doc 754) |
 | API base | `https://tnt-v2.api.bonfires.ai` |
 | Write endpoint | `POST /knowledge_graph/episode/create` - works with the non-admin key |
 | Read endpoint | `POST /vector_store/search` - works but returns `[]` until an admin runs labeling (doc 680) |

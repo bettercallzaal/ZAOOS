@@ -41,8 +41,9 @@ Look at what the user supplied (the slash-command argument, a pasted block, or j
 - **craig_url** - the input is a URL starting `https://craig.horse/`
 - **fathom_url** - the input is a URL starting `https://fathom.video/`
 - **local_audio** - the input is a path ending `.m4a` / `.mp3` / `.wav` / `.mp4` / `.mov` / `.opus` and the file exists. A video file (mp4/mov) additionally triggers frame extraction - see Phase 1.
+- **ingest_url** - the input is a Spotify episode URL, a YouTube URL, an Apple Podcasts URL, an RSS feed, a direct `.mp3`/`.m4a` URL, or an on-site transcript page. Route it through the shared ingestion engine (see Phase 1 "Mode: ingest_url"). This is how /meeting handles podcasts/videos, not just calls.
 - **paste** - the input (or the last user message) is a block of transcript / meeting-notes text, roughly 200+ chars. Also covers the user narrating the meeting in chat ("Iman said X, then Zaal said Y...") - use the conversation context as the transcript.
-- **unclear** - none of the above. Ask the user one question: paste the transcript, give a file path, or give a Craig/Fathom URL.
+- **unclear** - none of the above. Ask the user one question: paste the transcript, give a file path, or give a Craig/Fathom/Spotify/YouTube/podcast URL.
 
 Do not echo the raw argument back into a table - just classify it and proceed.
 
@@ -82,7 +83,17 @@ bash ${CLAUDE_SKILL_DIR}/scripts/extract-frames.sh "$MEDIA_PATH"
 The script prints a frames directory path, or the literal `NO_VIDEO` for an
 audio-only file (then skip straight to Step 2). Scene-change detection catches
 slide flips and screenshare switches; a fixed-interval fallback covers static
-talking-head calls. Capped at 24 frames. Keep the frames dir path for Phase 2.
+talking-head calls. Capped at 12 frames. Keep the frames dir path for Phase 2.
+
+**Single-feed check (do this before reading every frame).** Zaal's recordings are
+almost always a single-feed capture of HIS OWN camera - so the only name tag that
+ever appears is "Zaal Panthaki" and the other attendees are audio-only. Reading 12
+near-identical frames of Zaal yields zero attendee-identity value. So: in Phase 2,
+`Read` the FIRST frame only. If it shows a single talking head / just Zaal's name
+tag (no slides, no screenshare, no gallery of participant tiles), STOP - do not
+read the rest, and get attendee identities from content + a Phase 2.5 question
+instead. Only read multiple frames when frame 1 reveals a screenshare, slides, a
+whiteboard, or multiple participant tiles with name tags.
 
 **Step 2 - transcribe.**
 
@@ -109,7 +120,19 @@ plain `whisper-large-v3` on long calls - it can loop catastrophically (doc
 709); `whisper-large-v3-turbo` is the safe default.
 
 **Step 3 - diarize (speaker labels).** Whisper emits one unlabeled block - no
-speaker turns. Add them so the extraction passes know who said what:
+speaker turns. Add them so the extraction passes know who said what.
+
+**SKIP Step 3 entirely on 1-2 person calls.** Diarization runs sherpa-onnx for
+a few minutes and, on a 2-person call, the labeled output is a nice-to-have, not
+load-bearing - content attribution (who is the host, who is the guest) is
+unambiguous. Zaal has repeatedly declined the wait on 2-person calls. So: if the
+call is 1-2 people - detectable from the filename (`Tyler x zaal`, `AdrianxZaal`,
+`Duo do`, any `A x B` / `AxB` pattern), the attendee count, or a quick skim -
+skip diarization, use the plain transcript, and attribute speakers from content.
+Only run Step 3 when the call is **3+ people** (where "who owns this action" gets
+genuinely ambiguous), or when Zaal explicitly asks for speaker labels.
+
+When you do run it (3+ people):
 
 ```bash
 bash ${CLAUDE_SKILL_DIR}/scripts/diarize.sh "$MEDIA_PATH" "${TRANSCRIPT%.txt}.json"
@@ -153,18 +176,32 @@ bash ${CLAUDE_SKILL_DIR}/scripts/transcribe.sh "/tmp/craig-<id>.flac"
 ### Mode: fathom_url
 Use WebFetch on the share URL to extract transcript JSON from the page. Fathom share pages typically embed transcript in JSON-LD or a script tag. If WebFetch returns no transcript, ask Zaal to paste it manually.
 
+### Mode: ingest_url (Spotify / YouTube / Apple / RSS / direct mp3 / transcript page)
+Hand the URL to the shared ingestion engine, which resolves + transcribes it (reusing this skill's `transcribe.sh` under the hood):
+
+```bash
+~/bin/zao-ingest.sh "$URL"
+# prints the transcript .txt path on stdout; also writes <transcript>.meta.json
+```
+
+Use the printed `.txt` as the Phase 2 input exactly like a `local_audio` transcript. The `.meta.json` sidecar carries the episode title/source - use it for the recap doc's title + the Platform field (e.g. "Spotify podcast", "YouTube"). For a podcast/video there is no frame extraction and usually no single speaker to diarize - attribute speakers from content. If the engine exits non-zero (DRM-only Spotify original, no RSS match), relay its message and ask Zaal for an alternate URL (RSS / Apple / YouTube). See the `/ingest` skill for the full source matrix.
+
 ## Phase 2 - Extract structure
 
 Multi-pass extraction, NOT one monolithic prompt (doc 676 - monolithic extraction hallucinates). Run these passes in order, each over the same transcript:
 
-**Video input - read the frames first.** If Phase 1 produced a frames directory,
-`Read` every JPG in it before Pass A. Use what the frames show - slide text,
-shared screens, whiteboards, participant name tags - as corroborating context
-across all five passes: they disambiguate attendees (Pass A), surface decisions
-shown on a slide but not said aloud (Pass B/C), and confirm name spellings
-against the brand glossary. A frame is corroboration, never a substitute for the
-transcript - if a frame and the transcript conflict, the transcript wins and the
-item is flagged `confidence: low`.
+**Video input - read frame 1 first, then decide.** If Phase 1 produced a frames
+directory, `Read` the FIRST frame before anything else (see the Phase 1 single-feed
+check). If it is a single-feed talking head (just Zaal's name tag, no slides /
+screenshare / participant gallery) - the common case for Zaal's recordings - do
+NOT read the rest; the frames add no attendee-identity value, so go straight to
+the transcript and resolve identities via content + Phase 2.5. Only when frame 1
+shows slides, a screenshare, a whiteboard, or multiple named tiles do you `Read`
+the remaining JPGs and use them as corroborating context across the five passes:
+they disambiguate attendees (Pass A), surface decisions shown on a slide but not
+said aloud (Pass B/C), and confirm name spellings against the brand glossary. A
+frame is corroboration, never a substitute for the transcript - if a frame and the
+transcript conflict, the transcript wins and the item is flagged `confidence: low`.
 
 **Speaker-labeled transcript - map the labels.** If Step 3 produced a
 `[Speaker N]`-labeled transcript, those labels are anonymous diarization output.
@@ -269,9 +306,11 @@ Then ask Zaal:
 > - [x] Action tracker for `<project>` (default ON)
 > - [x] research/events/NNN-<slug>/README.md (default ON, every meeting, always ZAOOS)
 > - [x] Bonfire knowledge-graph episodes (default ON - the graph should always have meeting context, doc 680)
+> - [x] Airtable CRM write (default ON if `AIRTABLE_CRM_TOKEN` env present - contacts + 1 activity row per doc 737 Flow E)
 > - [ ] Telegram copy-paste block (opt-in, default OFF - print only on request)
 > - [ ] Memory writes (opt-in, confirm each)
 > - [ ] Calendar event update (opt-in if title matches a Google Cal event)
+> - [ ] Opportunities proposals (opt-in - skill presents 0+ proposed `opportunities` rows from extraction; only writes on explicit Zaal OK per item)
 
 Wait for Zaal's reply before any destructive write. Confirm the project before touching any tracker - a ZAOstock meeting must not write into the cowork-zaodevz tracker.
 
@@ -349,6 +388,29 @@ The script POSTs each episode to `POST /knowledge_graph/episode/create` (Bearer 
 
 Do NOT use the old `content/bonfire-ingest/` file path - that is the bulk-backfill pipeline (research library, READMEs), wrong tool for per-meeting real-time. See doc 680.
 
+### Airtable CRM write (default-ON if Airtable env present - per doc 737 Flow E)
+
+Mirrors the Bonfire pattern. Default-ON, best-effort, never aborts the run.
+
+The script writes the meeting's structured data into the ZAO CRM AGENTIC Airtable base (separate from the existing Respect-import Airtable - see doc 212):
+
+1. For each `meeting.attendees[i]` NOT already in the `contacts` table -> insert a minimum contact row (`name`, `met_via=meeting-skill (<source-tag>)`, `first_contact_date`, `last_touch_date`).
+2. Insert ONE row into the `activity` table: `type=meeting`, linked to all attendee contacts, `source=meeting-skill`, `raw_source=research/events/<NNN>-<slug>/`, `zao_relevance` heuristically classified from title + attendees, `bonfire_episode_id` back-link.
+3. Do NOT auto-create `opportunities` rows. The Phase 3 confirm surface lists proposed opportunities; only write them after Zaal explicit OK (separate flow, not in this script).
+
+```bash
+python3 ${CLAUDE_SKILL_DIR}/scripts/airtable-crm-write.py \
+  /tmp/extracted-meeting.json \
+  --recap-doc <NNN> \
+  --source-slug <slug>
+```
+
+Env from `~/.zao/zao.env` (auto-sourced by the script): `AIRTABLE_CRM_TOKEN` + `AIRTABLE_CRM_BASE_ID`. If unset, prints `Airtable CRM: skipped (no env)` and exits 0. Per `.claude/rules/pii-hygiene.md`: emails / personal contact details inside Airtable are fine (private workspace, only Zaal-invited collaborators); PII redaction kicks in when data leaves Airtable (research docs, Bonfire bodies, Telegram blocks).
+
+Idempotency: the contacts-ensure step looks up by `name` and skips if present. Activity rows are append-only - re-running on the same meeting will create a duplicate activity row (skill is not expected to re-fire on the same meeting; if you do need to, manually delete the prior row in Airtable first).
+
+Doc 737 schema reference: `research/business/737-airtable-agentic-crm-v3/`. Table IDs are hardcoded in the script (built 2026-05-24).
+
 ### Telegram copy-paste block
 Print a single fenced block ready for long-press-copy. No header/footer (per `feedback_copyable_content_own_bubble`). Format:
 
@@ -382,6 +444,7 @@ Print to user a one-line per-target summary. `[OK]` = done, `[--]` = skipped. On
 [OK] Recap doc - research/events/<NNN>-<slug>/README.md - draft written, review before commit
 [OK] Transcript - research/events/<NNN>-<slug>/transcript.md
 [--] Bonfire - skipped
+[OK] Airtable CRM - <N> contacts + 1 activity row inserted
 [OK] Telegram - block printed above
 [OK] Memory - <N> entries (<slugs>)
 [--] Calendar - no matching event
@@ -438,6 +501,18 @@ Rules:
 - Do NOT use emojis in any output (per global `feedback_no_emojis`).
 - Do NOT use em dashes (per global `feedback_no_em_dashes`).
 
+## Git: ONE branch + ONE PR per session, not per meeting (doc 789)
+
+When processing multiple meetings in one session, do NOT branch + PR per meeting. That was the dominant repeated tax in the 2026-05-31 session - 9 meetings became 9 branches, 9 PRs, and 4 merge conflicts on `_meetings-index.md` (every PR inserted a row at the same top region). The `/autoresearch` run (doc 789 addendum) crowned the fix: accumulate the session's recaps on a SINGLE branch and open ONE PR.
+
+Rule:
+- First meeting of a session: create/use one `ws/meetings-<date>` branch off `origin/main`.
+- Every subsequent meeting in the session: write its recap dir + transcript + index row + commit onto that SAME branch. Do NOT branch again.
+- One PR at the end (or push incrementally to the same PR). The index gets edited once per commit on one branch, so there is zero intra-session conflict.
+- This makes the single-meeting case identical (one branch, one PR) and the multi-meeting case conflict-free.
+
+Cross-session durable fix (when convenient, not blocking): split `_meetings-index.md` into per-month files (`_meetings-index-YYYY-MM.md`) with the main index linking to them, so two same-day sessions touch different files. Until then, one-branch-per-session removes 100% of the observed conflicts.
+
 ## Doc numbering (collision-safe)
 
 When creating the recap doc, parallel Claude sessions may race for the same number. Pick the next number defensively: `git fetch origin` first, scan `research/` for the max, and if the chosen folder already exists, increment again. Per doc 663 collision-tolerance, a small gap in numbering is fine - a collision is not.
@@ -450,13 +525,15 @@ When creating the recap doc, parallel Claude sessions may race for the same numb
 
 ## Scripts
 
-- `scripts/transcribe.sh` - local-first transcription: mlx-whisper on Apple Silicon, VPS Whisper fallback. Emits a `.txt` transcript + `.json` segment-timestamp sidecar.
+- `scripts/transcribe.sh` - local-first transcription: mlx-whisper on Apple Silicon, VPS Whisper fallback. Emits a `.txt` transcript + `.json` segment-timestamp sidecar. Auto-runs `trim-loops.sh` on the `.txt`.
+- `scripts/trim-loops.sh` - collapses Whisper's catastrophic repetition loops (e.g. "Cheers" x100) in the `.txt`. Timestamp-free, so diarization-safe. Called automatically by `transcribe.sh`; safe to run standalone.
 - `scripts/extract-frames.sh` - pull scene-change + interval still frames from a meeting video
 - `scripts/diarize.sh` - speaker diarization via sherpa-onnx: who-spoke-when, merged with the whisper json into a `[Speaker N]`-labeled transcript. Local, offline, no HF token.
 - `scripts/diarize.py` - the diarization + transcript-merge engine called by `diarize.sh` (runs under `uv run --with sherpa-onnx`).
 - `scripts/fetch-craig.sh` - curl Craig recording URL, extract audio
-- `scripts/append-actions.sh` - bulk insert meeting actions into the unified Supabase cowork tracker (project `etwvzrmlxeobinrlytza`, table `tasks`). ZAO Devz project only.
+- `scripts/append-actions.sh` - bulk insert meeting actions into the unified Supabase cowork tracker (project `etwvzrmlxeobinrlytza`, table `tasks`). ZAO Devz project only. Soft-fallback: if `~/.zao/cowork-tracker.env` is missing (creds live on the VPS), it prints a paste-block + the `/coworkvps` route and exits 0 instead of hard-failing. Warns on unresolved external owners.
 - `scripts/bonfire-episode.sh` - POST meeting episodes to the ZABAL Bonfire KG (always-on, best-effort, doc 680)
+- `scripts/airtable-crm-write.py` - write contacts + 1 activity row into the ZAO CRM AGENTIC Airtable base (default-ON when env present, best-effort, doc 737 Flow E). Mirrors the bonfire-episode pattern.
 
 ## Evals
 

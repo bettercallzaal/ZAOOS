@@ -33,7 +33,7 @@ const DISCORD_MAX = 1990;
  * Split a long string into Discord-sized chunks, preferring paragraph then
  * line then word boundaries. Falls back to a hard cut if no boundary is found.
  */
-function chunkMessage(text: string, max = DISCORD_MAX): string[] {
+export function chunkMessage(text: string, max = DISCORD_MAX): string[] {
   if (text.length <= max) return [text];
   const chunks: string[] = [];
   let remaining = text;

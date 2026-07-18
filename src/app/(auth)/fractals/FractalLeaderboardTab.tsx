@@ -31,7 +31,7 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
 
   useEffect(() => {
     fetch('/api/respect/leaderboard')
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => {
         const seen = new Map<string, LeaderboardEntry>();
         for (const e of d.leaderboard ?? []) {
@@ -94,6 +94,11 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
   return (
     <div className="pt-2 space-y-3">
       {/* My Stats Card */}
+      {!me && !loading && (
+        <div className="bg-[#0d1b2a] rounded-xl border border-white/10 p-4 text-center text-gray-500 text-sm">
+          No stats yet — join the next Fractal session to earn Respect
+        </div>
+      )}
       {me && (
         <div className="bg-gradient-to-br from-[#f5a623]/10 to-[#0d1b2a] rounded-xl border border-[#f5a623]/20 p-4">
           <div className="flex items-center justify-between mb-3">

@@ -45,7 +45,7 @@ export function SessionsTab({ isAdmin }: Props) {
 
   useEffect(() => {
     fetch('/api/fractals/sessions?limit=200')
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => {
         setSessions(d.sessions ?? []);
         setTotal(d.total ?? 0);

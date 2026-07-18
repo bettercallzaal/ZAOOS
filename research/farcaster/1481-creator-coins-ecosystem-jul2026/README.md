@@ -8,7 +8,7 @@ original-query: "Farcaster creator coins ecosystem snapshot — July 2026"
 tier: STANDARD
 ---
 
-# 1478 — Creator Coins Ecosystem: Farcaster/Base, July 2026
+# 1481 — Creator Coins Ecosystem: Farcaster/Base, July 2026
 
 > **Goal:** A citable, up-to-date snapshot of where creator coins stand on Farcaster and Base in July 2026 — what has collapsed, what has survived, what new frameworks have emerged, and what this means for Sparkz. Supplements doc 1095 (Sparkz timing) and doc 1286 (failure patterns) with the July 2026 ground truth.
 
@@ -119,7 +119,7 @@ The Clanker and Empire teams are holding a joint Farcaster space on 2026-07-23. 
 - [Doc 1325 - Zaal x Chris Dolinski call (access coins)](../../events/1325-chris-dolinski-viniapp-sparkz-jul17/)
 - [Doc 1326 - Culture Coins + Meme Engine synthesis](../../business/1326-culture-coins-meme-engine-sparkz-synthesis/)
 - [Doc 1476 - Viniapp × Sparkz partnership evaluation](../../business/1476-viniapp-sparkz-partnership-evaluation/)
-- [Doc 1477 - Warpee query plan](./1477-warpee-query-plan/) — pending authorization to add podcast signal to this picture
+- [Doc 1477 - Warpee query plan](../1477-warpee-query-plan/) — pending authorization to add podcast signal to this picture
 
 ## Sources
 

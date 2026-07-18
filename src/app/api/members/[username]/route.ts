@@ -321,15 +321,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
     const history = (fractalScores || [])
       .map((s) => {
         const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
-        const isOrdao = (sess as Record<string, unknown>)?.notes?.toString().includes('ORDAO');
+        const scoringEra = (sess as Record<string, unknown>)?.scoring_era as string | undefined;
         return {
           sessionName: (sess as Record<string, unknown>)?.name ?? 'Unknown',
           sessionDate: (sess as Record<string, unknown>)?.session_date ?? null,
-          era: (sess as Record<string, unknown>)?.scoring_era ?? '2x',
+          era: scoringEra ?? '2x',
           rank: Math.min(Math.max(s.rank, 1), 6),
           score: s.score,
           participants: (sess as Record<string, unknown>)?.participant_count ?? 0,
-          source: isOrdao ? 'ordao' : 'og',
+          source: scoringEra === '2x' ? 'ordao' : 'og',
         };
       })
       .sort((a, b) => {

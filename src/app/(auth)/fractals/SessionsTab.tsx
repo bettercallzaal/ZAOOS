@@ -89,16 +89,14 @@ export function SessionsTab({ isAdmin }: Props) {
       />
       <div className="flex gap-1 mb-3">
         {(['all', 'og', 'ordao'] as const).map((era) => {
-          const ogCount = sessions.filter(
-            (s) => s.notes?.includes('OG era') || s.notes?.includes('Airtable'),
-          ).length;
-          const ordaoCount = sessions.filter((s) => s.notes?.includes('ORDAO')).length;
+          const ogCount = sessions.filter((s) => s.scoring_era === '1x').length;
+          const ordaoCount = sessions.filter((s) => s.scoring_era === '2x').length;
           const label =
             era === 'all'
               ? `All (${total})`
               : era === 'og'
-                ? `OG (${ogCount})`
-                : `ORDAO (${ordaoCount})`;
+                ? `1x Era (${ogCount})`
+                : `2x Era (${ordaoCount})`;
           return (
             <button
               key={era}
@@ -126,9 +124,8 @@ export function SessionsTab({ isAdmin }: Props) {
             );
             if (!matchName && !matchHost && !matchParticipant) return false;
           }
-          if (eraFilter === 'og')
-            return s.notes?.includes('OG era') || s.notes?.includes('Airtable');
-          if (eraFilter === 'ordao') return s.notes?.includes('ORDAO');
+          if (eraFilter === 'og') return s.scoring_era === '1x';
+          if (eraFilter === 'ordao') return s.scoring_era === '2x';
           return true;
         })
         .map((session) => {

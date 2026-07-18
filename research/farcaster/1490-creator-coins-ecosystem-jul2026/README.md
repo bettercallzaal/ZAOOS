@@ -8,7 +8,7 @@ original-query: "Farcaster creator coins ecosystem snapshot — July 2026"
 tier: STANDARD
 ---
 
-# 1481 — Creator Coins Ecosystem: Farcaster/Base, July 2026
+# 1490 — Creator Coins Ecosystem: Farcaster/Base, July 2026
 
 > **Goal:** A citable, up-to-date snapshot of where creator coins stand on Farcaster and Base in July 2026 — what has collapsed, what has survived, what new frameworks have emerged, and what this means for Sparkz. Supplements doc 1095 (Sparkz timing) and doc 1286 (failure patterns) with the July 2026 ground truth.
 

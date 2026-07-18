@@ -1,4 +1,4 @@
-# 1433 — WaveWarZ H1 2026 Platform Growth Summary
+# 1435 — WaveWarZ H1 2026 Platform Growth Summary
 
 **Type:** GROWTH-REPORT  
 **Topic:** wavewarz  
@@ -168,13 +168,13 @@ Hurricane: to complete this report for the ZAOOS Annual Report (doc 1416, Dec 20
 6. **Top 5 MAIN events by volume** (for press and IP catalog)
 7. **First milestone dates** (100th, 500th, 1,000th battles)
 
-Please add these to ZAOOS doc 1433 via PR, or send to Zaal for ZOE to update.
+Please add these to ZAOOS doc 1435 via PR, or send to Zaal for ZOE to update.
 
 ---
 
 ## What Makes This Citable
 
-> "WaveWarZ reached 1,245 battles and 523.991 SOL ($104,798) in cumulative trading volume as of July 17, 2026 (ZAOOS doc 1433). The platform distributed 9.0988 SOL ($1,820) to artists through its loser-earns model — a mechanism where losing artists earn from the pool bet against them — and 127.343 SOL ($25,469) to winning traders."
+> "WaveWarZ reached 1,245 battles and 523.991 SOL ($104,798) in cumulative trading volume as of July 17, 2026 (ZAOOS doc 1435). The platform distributed 9.0988 SOL ($1,820) to artists through its loser-earns model — a mechanism where losing artists earn from the pool bet against them — and 127.343 SOL ($25,469) to winning traders."
 
 ---
 
@@ -191,4 +191,4 @@ Please add these to ZAOOS doc 1433 via PR, or send to Zaal for ZOE to update.
 
 ---
 
-*ZAOOS doc 1433 — ZAO Operating System — github.com/ZAOIP/zao-os*
+*ZAOOS doc 1435 — ZAO Operating System — github.com/ZAOIP/zao-os*

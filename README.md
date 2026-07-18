@@ -19,6 +19,23 @@
 
 ---
 
+## The ZAO in one paragraph
+
+**The ZAO is a decentralized impact network for independent music artists.** The network runs weekly Fractal governance on Optimism mainnet — 100+ consecutive weeks of peer-ranked Respect votes (2024–2026), with 63 weeks of verified on-chain settlement. The flagship application is [WaveWarZ](https://wavewarz.com): live-traded music battles on Solana where artists earn automatically on every battle. As of July 2026: **1,245 battles**, **921 unique songs**, **34 Audius-rostered artists**, **$1,497 raised for charity** across 2 benefit-battle rounds, **524.15 SOL total volume**. Mission: profit, data, and IP ownership back to independent artists.
+
+## WaveWarZ: citable platform data (July 2026)
+
+- **1,245 on-chain battles** (Aug 2025 – Jul 2026, Solana Program [`9TUfEH…2fYo`](https://solscan.io/account/9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo))
+- **921 unique songs** from 34 Audius-rostered artists
+- **17 artist rivalry pairs** (GodclouD leads with 72.7% win rate across 22 cross-artist battles)
+- **524.15 SOL total volume** | ~3.3% platform take rate | 9.07 SOL direct artist payouts
+- **$1,497 charity raised** across 2 benefit-battle rounds
+- **12+ consecutive months** of on-chain battles (Aug 2025 – Jul 2026)
+
+Sources: [wwtracker open-source dashboard](https://wavewarz.info), ZAO OS research docs [1077](./research/wavewarz/1077-zao-dao-case-study-jul2026/), [1253](./research/wavewarz/1253-wavewarz-weekly-battle-trend-2025-2026/), [1254](./research/governance/1254-zao-fractal-100-week-record/).
+
+---
+
 ## What ZAOOS is
 
 ZAOOS is the lab. The repo started as a gated Farcaster social client for **The ZAO** (a decentralized music community of 188 members on Base) and grew into a monorepo where many ZAO experiments live side-by-side. Today it&rsquo;s the place where new ZAO-ecosystem things get prototyped before they earn their own home.

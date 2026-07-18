@@ -1,7 +1,7 @@
 | [1577](1577-fractal-belonging-first-design/) | Fractal belonging-first design principles — why community precedes governance mechanics |
 | [1579](1579-wavewarz-fractal-flywheel/) | WaveWarZ × Fractal flywheel — ZOR as the bridge between music battles and governance rights |
 | [1580](1580-africa-battle-week-voter-guide/) | Africa Battle Week ZOR holder voter guide — how to vote on Snapshot Jul 24-25 |
-| [1608](1608-fractal-doc-navigator/) | ZAO Fractal doc navigator — find the right doc by persona (new member, facilitator, journalist, partner, builder) |
+| 1608 | [ZAO Fractal Doc Navigator](./1608-fractal-doc-navigator/) | STANDALONE | ZAO Fractal doc navigator — find the right doc by persona (new member, facilitator, journalist, partner, builder). |
 | 1583 | [ZAO Fractal Press Media Kit](./1583-fractal-press-media-kit/) | STANDALONE | ZAO Fractal press media kit — facts, angles, pull quotes, and one-paragraph summary for journalists. |
 | 1586 | [ZAO Fractal Messaging Library](./1586-fractal-messaging-library/) | STANDALONE | Fractal messaging library — ready-to-use copy blocks for every platform and context. |
 | 1589 | [Africa Battle Week Onboarding Sprint](./1589-africa-battle-week-onboarding-sprint/) | STANDALONE | Africa Battle Week 5-day onboarding sprint — get WaveWarZ Africa artists into Fractal before Jul 24 vote. |

@@ -321,7 +321,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
     const history = (fractalScores || [])
       .map((s) => {
         const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
-        const isOrdao = (sess as Record<string, unknown>)?.notes?.toString().includes('ORDAO');
+        const isOrdao = (sess as Record<string, unknown>)?.scoring_era === '2x';
         return {
           sessionName: (sess as Record<string, unknown>)?.name ?? 'Unknown',
           sessionDate: (sess as Record<string, unknown>)?.session_date ?? null,

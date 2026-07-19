@@ -4,6 +4,7 @@ import {
   getApprovalClass,
   isTerminal,
   nextRunStatus,
+  type RunStatus,
 } from '../control-plane';
 
 describe('control-plane: buildAssignmentEnvelope', () => {
@@ -75,60 +76,63 @@ describe('control-plane: buildAssignmentEnvelope', () => {
 });
 
 describe('control-plane: nextRunStatus', () => {
-  it('should transition from queued to routing on route_complete', () => {
-    const next = nextRunStatus('queued', 'route_complete');
-    expect(next).toBe('routing');
+  it('should transition from created to ready on mark_ready', () => {
+    expect(nextRunStatus('created', 'mark_ready')).toBe('ready');
   });
 
-  it('should transition from routing to running on execute_start', () => {
-    const next = nextRunStatus('routing', 'execute_start');
-    expect(next).toBe('running');
+  it('should transition from ready to leased on lease_granted', () => {
+    expect(nextRunStatus('ready', 'lease_granted')).toBe('leased');
   });
 
-  it('should transition from running to awaiting_approval on approval_needed', () => {
-    const next = nextRunStatus('running', 'approval_needed');
-    expect(next).toBe('awaiting_approval');
+  it('should transition from leased to running on execute_start', () => {
+    expect(nextRunStatus('leased', 'execute_start')).toBe('running');
+  });
+
+  it('should transition from running to waiting_approval on approval_needed', () => {
+    expect(nextRunStatus('running', 'approval_needed')).toBe('waiting_approval');
   });
 
   it('should transition from running to verifying on execute_success', () => {
-    const next = nextRunStatus('running', 'execute_success');
-    expect(next).toBe('verifying');
+    expect(nextRunStatus('running', 'execute_success')).toBe('verifying');
   });
 
-  it('should transition from verifying to done on verify_complete', () => {
-    const next = nextRunStatus('verifying', 'verify_complete');
-    expect(next).toBe('done');
+  it('should transition from verifying to completed on verify_complete', () => {
+    expect(nextRunStatus('verifying', 'verify_complete')).toBe('completed');
   });
 
-  it('should reject illegal transition from done to running', () => {
+  it('should reject illegal transition from completed to running', () => {
     expect(() => {
-      nextRunStatus('done', 'execute_start');
+      nextRunStatus('completed', 'execute_start');
     }).toThrow('Illegal transition');
   });
 
-  it('should reject illegal transition from failed to running', () => {
+  it('should reject illegal transition from cancelled to running', () => {
     expect(() => {
-      nextRunStatus('failed', 'execute_start');
+      nextRunStatus('cancelled', 'execute_start');
     }).toThrow('Illegal transition');
   });
 
   it('should allow cancel from any non-terminal state', () => {
-    const states: Array<'queued' | 'routing' | 'running' | 'awaiting_approval' | 'verifying'> = [
-      'queued',
-      'routing',
+    const states: RunStatus[] = [
+      'created',
+      'ready',
+      'leased',
       'running',
-      'awaiting_approval',
+      'waiting_approval',
+      'blocked',
       'verifying',
+      'recovering',
+      'failed',
+      'quarantined',
     ];
 
     states.forEach((state) => {
-      const next = nextRunStatus(state, 'cancel_request');
-      expect(next).toBe('cancelled');
+      expect(nextRunStatus(state, 'cancel_request')).toBe('cancelled');
     });
   });
 
   it('should reject cancel from terminal states', () => {
-    const terminals: Array<'done' | 'failed' | 'cancelled'> = ['done', 'failed', 'cancelled'];
+    const terminals: Array<'completed' | 'cancelled'> = ['completed', 'cancelled'];
     terminals.forEach((state) => {
       expect(() => {
         nextRunStatus(state, 'cancel_request');
@@ -136,53 +140,78 @@ describe('control-plane: nextRunStatus', () => {
     });
   });
 
-  it('should handle user approval flow', () => {
-    let status = nextRunStatus('awaiting_approval', 'user_approve');
+  it('should handle user approval flow (approve resumes running, then verifies)', () => {
+    let status = nextRunStatus('waiting_approval', 'user_approve');
+    expect(status).toBe('running');
+
+    status = nextRunStatus(status, 'execute_success');
     expect(status).toBe('verifying');
 
     status = nextRunStatus(status, 'verify_complete');
-    expect(status).toBe('done');
+    expect(status).toBe('completed');
   });
 
   it('should handle user rejection flow', () => {
-    const status = nextRunStatus('awaiting_approval', 'user_reject');
-    expect(status).toBe('failed');
+    expect(nextRunStatus('waiting_approval', 'user_reject')).toBe('failed');
   });
 
   it('should handle execution failure at any point', () => {
-    expect(nextRunStatus('routing', 'execute_failure')).toBe('failed');
     expect(nextRunStatus('running', 'execute_failure')).toBe('failed');
-    expect(nextRunStatus('verifying', 'execute_failure')).toBe('failed');
+    expect(nextRunStatus('blocked', 'execute_failure')).toBe('failed');
+    expect(nextRunStatus('recovering', 'execute_failure')).toBe('failed');
+  });
+
+  it('should route a stale lease into recovery and reassign', () => {
+    expect(nextRunStatus('running', 'lease_expired')).toBe('recovering');
+    expect(nextRunStatus('recovering', 'recover_reassign')).toBe('ready');
+  });
+
+  it('should allow an approved failed run to retry into recovery', () => {
+    expect(nextRunStatus('failed', 'retry_approved')).toBe('recovering');
+  });
+
+  it('should quarantine from recovery and release back to ready', () => {
+    expect(nextRunStatus('recovering', 'quarantine')).toBe('quarantined');
+    expect(nextRunStatus('quarantined', 'release')).toBe('ready');
+  });
+
+  it('should handle a block/unblock cycle', () => {
+    expect(nextRunStatus('running', 'blocked')).toBe('blocked');
+    expect(nextRunStatus('blocked', 'unblocked')).toBe('running');
   });
 });
 
 describe('control-plane: isTerminal', () => {
-  it('should identify done as terminal', () => {
-    expect(isTerminal('done')).toBe(true);
-  });
-
-  it('should identify failed as terminal', () => {
-    expect(isTerminal('failed')).toBe(true);
+  it('should identify completed as terminal', () => {
+    expect(isTerminal('completed')).toBe(true);
   });
 
   it('should identify cancelled as terminal', () => {
     expect(isTerminal('cancelled')).toBe(true);
   });
 
-  it('should identify queued as non-terminal', () => {
-    expect(isTerminal('queued')).toBe(false);
+  it('should identify failed as non-terminal (retryable)', () => {
+    expect(isTerminal('failed')).toBe(false);
   });
 
-  it('should identify routing as non-terminal', () => {
-    expect(isTerminal('routing')).toBe(false);
+  it('should identify quarantined as non-terminal (releasable)', () => {
+    expect(isTerminal('quarantined')).toBe(false);
+  });
+
+  it('should identify created as non-terminal', () => {
+    expect(isTerminal('created')).toBe(false);
+  });
+
+  it('should identify leased as non-terminal', () => {
+    expect(isTerminal('leased')).toBe(false);
   });
 
   it('should identify running as non-terminal', () => {
     expect(isTerminal('running')).toBe(false);
   });
 
-  it('should identify awaiting_approval as non-terminal', () => {
-    expect(isTerminal('awaiting_approval')).toBe(false);
+  it('should identify recovering as non-terminal', () => {
+    expect(isTerminal('recovering')).toBe(false);
   });
 
   it('should identify verifying as non-terminal', () => {

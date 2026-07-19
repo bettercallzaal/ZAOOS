@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 1764 | [Audio to MP4 Visualization: Copy-Paste FFmpeg Recipes for ZAO Social](./1764-audio-mp4-visualization-recipes/) | GUIDE | Three working ffmpeg recipes for branded waveform/spectrum visualization + captioned audiograms. Convert audio (X Spaces, podcasts, POIDH, music) to MP4 with gold-on-navy branding, Whisper timestamps for captions. Tool verdict: ffmpeg now, MoviePy later for scaling. Immediate use: showwaves with cover art overlay. |
 | 1263 | [ZAO Papers Program: Whitepaper Status + Publishing Roadmap (July 2026)](./1263-zao-papers-program-roadmap-july2026/) | ROADMAP | ZAO Papers status tracker: 4 papers drafted (2 PRs open in zao-papers repo), 12 total needed. Publishing path via Arweave + Hats Protocol (Approach C). Action sequence for permaweb publish + Hat mint (GATED). |
 | 030 | [bettercallzaal GitHub Projects Inventory](./030-bettercallzaal-github/) | STANDALONE | Map all 65 public repos, identify reusable code and patterns for ZAO OS |
 | 038 | [AI Code Audit & Cleanup Agents](./038-ai-code-audit-cleanup/) | STANDALONE | Best practices for auditing AI-written code and using agents for cleanup |

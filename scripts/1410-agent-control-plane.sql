@@ -21,8 +21,11 @@ BEGIN;
 -- Couples to public.tasks via task_id (not a foreign key - tasks is mutable).
 -- Lease model: only one agent holds the lease at a time (lease_owner field).
 --
--- Status lifecycle: queued -> routing -> running -> awaiting_approval ->
---   verifying -> done/failed/cancelled
+-- Status lifecycle (frozen with Brandon's Heart spec, 2026-07-19):
+--   created -> ready -> leased -> running ->
+--   { waiting_approval | verifying | blocked | recovering } ->
+--   { completed | failed | cancelled | quarantined }
+--   failed is retryable (-> recovering); quarantined is releasable (-> ready).
 --
 -- Budget: JSON object with optional fields:
 --   { computeLimit?: number, externalSpendLimit?: number, deadline?: ISO8601 }
@@ -49,9 +52,10 @@ CREATE TABLE IF NOT EXISTS agent_runs (
   required_capabilities TEXT[] NOT NULL DEFAULT '{}',
 
   -- Current state of execution
-  status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN (
-    'queued', 'routing', 'running', 'awaiting_approval',
-    'verifying', 'done', 'failed', 'cancelled'
+  status TEXT NOT NULL DEFAULT 'created' CHECK (status IN (
+    'created', 'ready', 'leased', 'running', 'waiting_approval',
+    'blocked', 'verifying', 'recovering', 'completed', 'failed',
+    'cancelled', 'quarantined'
   )),
 
   -- Which agent is assigned (agent identity, e.g. 'zol', 'zai', or a fid)

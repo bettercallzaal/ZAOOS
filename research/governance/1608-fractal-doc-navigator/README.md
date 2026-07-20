@@ -157,3 +157,32 @@ Don't create a new doc if there's already one that covers it. Before adding to t
 1. Check this navigator — is your question already answered somewhere?
 2. Grep `research/governance/` README files for keywords.
 3. If a new doc IS needed: check the collision guard (no same-folder number reuse), run the Python conflict resolution on governance/README.md, and add a row to the index.
+
+---
+## Run the weekly Respect awards (operators)
+| Doc | What |
+|-----|------|
+| [1770](../1770-fractal-respect-operations/) | **THE operations guide** — breakout denominations (55/34/21/13/8/5, x2 doubles), even-split path (40 each), camera-on Respect (+10/meeting), the submitBreakout URL format, name->wallet resolution, newcomer handling, weekly run-book. Read this to actually award Respect after a session. |
+| [1706](../1706-zoe-fractal-weekly-ops-guide/) | ZOE's weekly ops automation (pre-session stats, vote monitoring, archive). |
+
+---
+## Consolidation map (2026-07-20) — this navigator is the ONE hub
+
+There were 3 prior "fix the docs" attempts (977 correction-catalogue, 1531 canonical-reference, 1608 this navigator) and the sprawl still grew to 80+ fractal docs. Rule going forward: **1608 is THE hub. Do not create a 4th consolidation doc — update this one.**
+
+**Clear duplicates — archive candidates (Zaal to confirm, then move to research/_archive/):**
+| Keep | Archive (superseded/dupe) | Why |
+|------|---------------------------|-----|
+| 1770 + 1619 | 1475 (session guide) | Two "Fractal Democracy Session Guide"s; 1619 is the fuller current one, 1770 is the ops layer |
+| 702 (lineage) | 696 (lineage) | Same title "Respect & Fractal Governance: The Complete Lineage" — near-identical |
+| 1312 (deep dive) | 1280, 1423 (explainers) | Three "how ZAO governs" explainers; keep 1312 (technical) + 1280 (plain-english) for GEO, retire the overlap |
+| 1200 (on-chain facts) | 975 (live numbers) | Both "the honest numbers"; 1200 is the verified-on-chain one |
+| 1531 (canonical ref) | — | Fold its content into THIS navigator, then archive 1531 |
+| 977 (correction catalogue) | — | Was a one-time cleanup task; archive once its corrections are applied |
+
+**Canonical source per topic (start here, ignore the rest):**
+- Session flow: **1619** · Facilitator: **1565** · Run the awards: **1770**
+- Respect system: **1312** (technical) · On-chain facts: **1200** · ZOR guide: **1532**
+- Bot: **981** (synthesis) + **1069** (voting mechanism) · Frontend: **1068** (build spec)
+- New member: **1573** · Contribution rubric: **1542** · Growth/new nodes: **1523**
+- Governance explainer (public/GEO): **1280** · History: **1254** (100-week record)

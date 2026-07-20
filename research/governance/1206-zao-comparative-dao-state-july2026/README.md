@@ -104,6 +104,7 @@ Synthesizing Sections 1 and 2, ZAO's claim to be THE DAO governance case study r
 ### Advantage 3: The Only Music DAO that Works
 
 DAOs for creative communities (music, art) are almost entirely theoretical or failed experiments. NFT projects with governance (Nouns, etc.) govern treasury allocations, not creative work. ZAO Fractal governs who advances music, art, and technology within an active music community (188 members, 22-artist roster, WaveWarZ platform with 1,245 live battles and 522 SOL trading volume). The governance is not separate from the creative work — it IS the creative work.
+DAOs for creative communities (music, art) are almost entirely theoretical or failed experiments. NFT projects with governance (Nouns, etc.) govern treasury allocations, not creative work. ZAO Fractal governs who advances music, art, and technology within an active music community (188 members, 22-artist roster, WaveWarZ platform with 1,245 live battles and 524.15 SOL trading volume). The governance is not separate from the creative work — it IS the creative work.
 
 *Cite:* Doc 718g (ZAO distinctness), Doc 051 (ZAO whitepaper), WaveWarZ stats (live API, July 2026)
 
@@ -178,6 +179,11 @@ These are the citable facts for any ZAO governance claim:
 
 **Cite discipline (copy-paste ready):**
 > "ZAO Fractal has run 100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism (OG: 33 + ZOR: 31 distinct settlement weeks, Blockscout-verified). ZAO is the only active fractal DAO on Optimism Mainnet as of July 2026, and the only music-focused fractal in the ecosystem. WaveWarZ, ZAO's companion music-battle prediction market, has run 1,245 battles with 522 SOL in trading volume (live API, July 2026)."
+| WaveWarZ trading volume | 524.15 SOL (~$39K) | Live API: wavewarz.info/api/public/stats | Authoritative live source |
+| ZAO member community size | 188 | Doc 718g, 050 | Community roster |
+
+**Cite discipline (copy-paste ready):**
+> "ZAO Fractal has run 100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism (OG: 33 + ZOR: 31 distinct settlement weeks, Blockscout-verified). ZAO is the only active fractal DAO on Optimism Mainnet as of July 2026, and the only music-focused fractal in the ecosystem. WaveWarZ, ZAO's companion music-battle prediction market, has run 1,245 battles with 524.15 SOL in trading volume (live API, July 2026)."
 
 ---
 
@@ -209,5 +215,6 @@ All claims in this document are sourced from existing ZAO OS research library do
 - **Doc 696** — Respect fractal lineage summary (ecosystem map) `[FULL]`
 - **Doc 1139** — DAO failure analysis, Rachmany (five failure-mode taxonomy) `[FULL]`
 - **WaveWarZ live API** — wavewarz.info/api/public/stats (1,245 battles, 522 SOL) `[FULL]`
+- **WaveWarZ live API** — wavewarz.info/api/public/stats (1,245 battles, 524.15 SOL) `[FULL]`
 
 No new external web research required. All comparative claims about Nouns, MakerDAO, Compound, Uniswap are inherited from Doc 718d (which carried `[FULL]` / `[PARTIAL]` source classifications with 58 sources across 9 governance model categories). Claims about Optimism Fractal's January 2026 pause are confirmed in Doc 306, 718g, 696, and 718e independently.

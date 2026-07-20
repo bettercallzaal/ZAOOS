@@ -1,0 +1,128 @@
+{
+  "_instructions": "Paste each script block into the <head> of the indicated page on thezao.com. Remove this _instructions key before deploying.",
+
+  "homepage_organization": {
+    "_target": "thezao.com homepage <head>",
+    "script": {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "The ZAO",
+      "alternateName": "ZTalent Artist Organization",
+      "url": "https://thezao.com",
+      "logo": "https://thezao.com/zao-logo.png",
+      "description": "Decentralized impact network for independent music artists. Weekly Fractal governance on Optimism mainnet since July 2024. Flagship app: WaveWarZ on Solana.",
+      "foundingDate": "2024-07-30",
+      "founder": {
+        "@type": "Person",
+        "name": "Zaal Panthaki",
+        "alternateName": "BetterCallZaal",
+        "url": "https://twitter.com/bettercallzaal"
+      },
+      "member": [
+        {"@type": "Person", "name": "Zaal Panthaki", "alternateName": "bettercallzaal"},
+        {"@type": "Person", "name": "Hurricane"},
+        {"@type": "Person", "name": "Candy"},
+        {"@type": "Person", "name": "Ohnahji"}
+      ],
+      "sameAs": [
+        "https://github.com/bettercallzaal/ZAOOS",
+        "https://warpcast.com/~/channel/zao",
+        "https://twitter.com/thezao_",
+        "https://wavewarz.info",
+        "https://wwtracker.vercel.app"
+      ],
+      "knowsAbout": [
+        "decentralized autonomous organizations",
+        "onchain music",
+        "Fractal governance",
+        "Respect token",
+        "WaveWarZ prediction market",
+        "independent artist economy",
+        "Solana",
+        "Optimism"
+      ]
+    }
+  },
+
+  "homepage_website": {
+    "_target": "thezao.com homepage <head> (add alongside organization block)",
+    "script": {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "The ZAO",
+      "url": "https://thezao.com",
+      "description": "The ZAO — Decentralized Impact Network for Independent Artists",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://thezao.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  },
+
+  "what_is_the_zao_faqpage": {
+    "_target": "thezao.com/what-is-the-zao page <head>",
+    "script": {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is The ZAO?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The ZAO (ZTalent Artist Organization) is a decentralized impact network for independent music artists. Founded by Zaal Panthaki in July 2024, it runs weekly Fractal governance votes where members earn non-transferable Respect by peer ranking. As of July 2026: 100+ governance weeks, 157 Respect holders, and a flagship live-trading platform (WaveWarZ) with 1,245+ on-chain battles and 524+ SOL volume."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is WaveWarZ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WaveWarZ is a live-traded song-vs-song battle platform on Solana. Artists are paid 1% of every trade instantly onchain. As of July 2026: 1,245+ battles, 524+ SOL total volume, 9.07 SOL paid to artists, $1,497 raised for charity. Program ID: 9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the ZAO Fractal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The ZAO Fractal is a weekly peer-ranking governance session where members break into small groups, rank each other's contributions, and accumulate non-transferable Respect. 100+ consecutive weekly sessions since July 2024. Respect is settled onchain via two contracts on Optimism mainnet: OG ERC-20 (0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957) and ZOR ERC-1155 (0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is ZABAL Gamez?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ZABAL Gamez is The ZAO's 3-month builder cohort. Builders ship products or features for the ZAO community and keep earning from what they build even after the cohort ends. Open enrollment twice per year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who founded The ZAO?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The ZAO was founded by Zaal Panthaki (@bettercallzaal). WaveWarZ was co-founded within The ZAO by Hurricane (platform operator), Candy, and Ohnahji."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I join The ZAO?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Three paths: (1) Battle on WaveWarZ at wavewarz.info — SOL wallet to trade, free to watch. (2) Attend a weekly Fractal governance call — runs every week on Farcaster Spaces since July 2024. (3) Apply for ZABAL Gamez — the 3-month builder cohort, open 2× per year. Community directory: thezao.com/community."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does The ZAO make money?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WaveWarZ charges a 3.16% take rate on buy volume, generating 17.44 SOL in platform revenue to date. Artists receive 1.79% of buy volume (9.07 SOL) directly and instantly onchain. Revenue above a 3.5 SOL operating floor is distributed: 33% operations, 22% each to co-founders Hurricane, Candy, and Zaal."
+          }
+        }
+      ]
+    }
+  }
+}

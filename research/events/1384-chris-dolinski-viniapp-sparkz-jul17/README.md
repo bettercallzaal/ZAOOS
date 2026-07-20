@@ -8,7 +8,7 @@ original-query: "/meeting - Zaal x Chris Dolinski (Viniapp) call about Sparkz, 2
 tier: STANDARD
 ---
 
-# 1325 — Zaal x Chris Dolinski (Viniapp): Sparkz + Creator/Culture Coins
+# 1384 — Zaal x Chris Dolinski (Viniapp): Sparkz + Creator/Culture Coins
 
 > **Goal:** Capture the strategy call where Chris Dolinski (Viniapp founder, ex-Vibehut) and Zaal aligned on Sparkz - the "access coins" reframe, the fee model, and a Sparkz-on-Viniapp collaboration.
 

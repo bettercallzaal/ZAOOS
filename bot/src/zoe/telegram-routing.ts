@@ -126,10 +126,15 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
     throw new Error(`Invalid ZAAL_TELEGRAM_ID: ${zaalIdRaw} (must be a number)`);
   }
 
-  const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
+  // The rest of the bot (index.ts, scheduler.ts) reads the group id as
+  // ZAAL_BOTZ_GROUP_ID; only this router looked for ZAALBOTS_GROUP_CHAT_ID,
+  // which was never set. Result: groupId stayed undefined and EVERY status
+  // message fell back to Zaal's DM instead of the group - the "ZOE spams my
+  // DM" complaint. Read the canonical name, keep the old one as a fallback.
+  const groupIdRaw = process.env.ZAAL_BOTZ_GROUP_ID ?? process.env.ZAALBOTS_GROUP_CHAT_ID;
   const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
   if (groupIdRaw && Number.isNaN(groupId)) {
-    console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
+    console.warn(`Invalid group id ${groupIdRaw} (ZAAL_BOTZ_GROUP_ID / ZAALBOTS_GROUP_CHAT_ID must be numeric, will be ignored)`);
   }
 
   const threadIdRaw = process.env.ZAALBOTS_STATUS_THREAD_ID;

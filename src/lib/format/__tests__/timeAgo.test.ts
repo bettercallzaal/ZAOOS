@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   formatNumber,
   formatTimeRemaining,
@@ -110,44 +110,33 @@ describe('timeAgoSimple', () => {
 // formatTimeRemaining
 // ---------------------------------------------------------------------------
 describe('formatTimeRemaining', () => {
-  const FIXED_NOW = new Date('2026-07-17T12:00:00.000Z').getTime();
-
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(FIXED_NOW);
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('returns "Voting closed" for past deadlines', () => {
-    const past = new Date(FIXED_NOW - 60 * 1000);
+    const past = new Date(Date.now() - 60 * 1000);
     expect(formatTimeRemaining(past)).toBe('Voting closed');
   });
 
   it('returns "Xm remaining" for deadlines within the next hour', () => {
-    const future = new Date(FIXED_NOW + 20 * 60 * 1000);
+    const future = new Date(Date.now() + 20 * 60 * 1000);
     expect(formatTimeRemaining(future)).toBe('20m remaining');
   });
 
   it('returns "Xh remaining" for deadlines within the next day', () => {
-    const future = new Date(FIXED_NOW + 5 * 60 * 60 * 1000);
+    const future = new Date(Date.now() + 5 * 60 * 60 * 1000);
     expect(formatTimeRemaining(future)).toBe('5h remaining');
   });
 
   it('returns "Xd Xh remaining" for deadlines more than a day away', () => {
-    const future = new Date(FIXED_NOW + (2 * 24 + 3) * 60 * 60 * 1000);
+    const future = new Date(Date.now() + (2 * 24 + 3) * 60 * 60 * 1000);
     expect(formatTimeRemaining(future)).toBe('2d 3h remaining');
   });
 
   it('accepts a date string', () => {
-    const future = new Date(FIXED_NOW + 10 * 60 * 1000);
+    const future = new Date(Date.now() + 10 * 60 * 1000);
     expect(formatTimeRemaining(future.toISOString())).toBe('10m remaining');
   });
 
   it('returns at least "1m remaining" for imminent deadlines', () => {
-    const future = new Date(FIXED_NOW + 30 * 1000); // 30 seconds
+    const future = new Date(Date.now() + 30 * 1000); // 30 seconds
     expect(formatTimeRemaining(future)).toBe('1m remaining');
   });
 });

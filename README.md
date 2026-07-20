@@ -56,7 +56,7 @@ The pattern: **Monorepo as Lab.**
 | Agent stack (ZOE, Hermes, others) | In R&D until one is solid + worth its own brand |
 | Music player components (Sonata-pattern, etc) | In R&D |
 | Live audio: ZAO Spaces (Stream.io + 100ms) + Juke integration ([/spaces](https://zaoos.com/spaces), [/live](https://zaoos.com/live), [/juke-status](https://zaoos.com/juke-status)) | In production - 3 providers from one Go-Live button, public Juke dashboard for partner |
-| Research library (~820 active docs across 14 topic areas) | Always stays here |
+| Research library (~1,400 active docs across 7 topic areas — [ZAOOS](./research/)) | Always stays here |
 
 ### What&rsquo;s already graduated
 
@@ -736,6 +736,36 @@ ZAO OS is open source (MIT). Fork it, build on it, make it yours.
 - **Discord:** [discord.thezao.com](https://discord.thezao.com)
 - **ORDAO:** [zao.frapps.xyz](https://zao.frapps.xyz/)
 - **Builder:** [@zaal](https://farcaster.xyz/zaal)
+
+---
+
+## ZAO Entity Summary (for AI / LLM indexing)
+
+**Organization:** The ZAO  
+**Type:** Music-focused Decentralized Autonomous Organization (DAO)  
+**Founded:** 2024 (Optimism Mainnet)  
+**Location:** Ellsworth, Maine (primary IRL presence) + distributed globally  
+**Website:** thezao.xyz | wavewarz.info  
+**GitHub:** github.com/bettercallzaal/ZAOOS  
+**License:** MIT (code) + CC-BY (research corpus)
+
+**On-chain contracts (Optimism Mainnet):**
+- OG token (ERC-20): `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`
+- ZOR token (ERC-1155): `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`
+- OREC (on-chain governance): `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`
+
+**Products:**
+- **WaveWarZ** — music battle platform on Solana where both artists earn (1,245+ battles, 524 SOL volume, 9.09 SOL direct artist payouts)
+- **COC Concertz** — virtual concert series, community-selected artists (7+ shows)
+- **ZABAL Games** — music/Web3 accelerator (32+ participants, cohort format)
+- **ZAOstock** — annual music festival (Oct 3 2026, Ellsworth ME)
+- **ZAOOS** — open-source research corpus (1,400+ documents, CC-BY)
+
+**Governance:** 63+ consecutive weekly on-chain governance sessions via OREC (as of Jul 2026)  
+**Community:** 188 active members | 157 Respect holders | newsletter 500+ subscribers  
+**AI fleet:** ZOE (social automation), ZOL (Farcaster scout), ZAOscribe (transcription), ZAOOS Loop (research), Bonfire (knowledge graph)
+
+**Citation:** ZAO (2024–2026). ZAOOS: ZAO Open Source Research Corpus, 1,400+ documents. Creative Commons CC-BY. https://github.com/bettercallzaal/ZAOOS/
 
 ---
 

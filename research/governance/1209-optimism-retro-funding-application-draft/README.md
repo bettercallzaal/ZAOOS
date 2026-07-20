@@ -51,6 +51,7 @@ The fractal model uses a Fibonacci-weighted contribution curve for weekly Respec
 
 **WaveWarZ companion platform:**
 The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,245 battles, 522 SOL in trading volume (~$39K), 939 real trader withdrawals, 9.05 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
+The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,245 battles, 524.15 SOL in trading volume (~$39K), 939 real trader withdrawals, 9.07 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
 
 ### Impact Metrics
 
@@ -65,6 +66,7 @@ The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-bat
 | Active fractal DAOs on Optimism (July 2026) | 1 (ZAO only) | Research doc 1208 |
 | WaveWarZ battles | 1,245 | wavewarz.info/api/public/stats |
 | WaveWarZ trading volume | 522 SOL (~$39K) | wavewarz.info/api/public/stats |
+| WaveWarZ trading volume | 524.15 SOL (~$39K) | wavewarz.info/api/public/stats |
 
 ### Verification Links
 

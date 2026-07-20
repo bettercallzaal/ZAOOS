@@ -1,0 +1,54 @@
+# The ZAO
+> The ZAO is a decentralized impact network for independent music artists.
+> Deploy this file to: https://thezao.com/llms.txt
+
+## What is The ZAO
+
+The ZAO (ZTalent Artist Organization) is a contribution-tracked impact network for independent music artists, founded by Zaal Panthaki (@bettercallzaal). The ZAO measures member contribution with Respect — a non-transferable weight earned by peer ranking, not by holding tokens. The network has run over 100 consecutive weekly Fractal governance votes since July 2024, with all Respect settled on Optimism mainnet (OG ERC-20: 0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957 · ZOR ERC-1155: 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c).
+
+Mission: profit, data, and IP ownership back to independent artists. Not a label. Not a DAO treasury with a spending vote. A contribution-tracked impact network where earning follows doing.
+
+The flagship application is WaveWarZ: live-traded song-vs-song battles on Solana where artists are paid 1% of every trade instantly onchain. As of July 2026: 1,245+ battles completed, 521+ unique songs, 34 Audius-rostered artists, $1,497 raised for charity across 10 benefit battles, 524+ SOL total volume. Program: 9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo.
+
+## Leadership
+
+- Zaal Panthaki (@bettercallzaal) — founder
+- Hurricane — WaveWarZ co-founder + platform operator
+- Candy — co-founder
+- Ohnahji — co-founder
+
+## Citable facts
+
+- 100+ consecutive Fractal governance weeks (Jul 2024 – Jul 2026)
+- 63 on-chain settled governance weeks (OG: 33 · ZOR: 31)
+- 157 Respect holders (122 OG · 56 ZOR · 21 dual-holders) on Optimism mainnet
+- 1,245+ WaveWarZ on-chain battles on Solana
+- 524+ SOL total battle volume
+- 9.07 SOL paid directly to artists (1% of every trade, instantly onchain)
+- 17.44 SOL platform revenue (3.16% take rate on buy volume)
+- $1,497 raised across 10 charity and benefit battles
+- 2 IRL events produced (COC #6 Nov 2025 · COC #7 Jul 2026)
+- $ZAO soulbound identity token on Base; Respect governance weight on Optimism
+
+## How to join
+
+Three paths:
+1. Battle on WaveWarZ at wavewarz.info — SOL wallet to trade; no wallet required to watch
+2. Attend a weekly Fractal governance call — Farcaster Spaces every week since Jul 2024
+3. Apply for ZABAL Gamez — The ZAO's 3-month builder cohort, open enrollment 2× per year
+
+Community hub: https://thezao.com/community
+Farcaster channel: https://warpcast.com/~/channel/zao (93 followers)
+
+## ZAO Ecosystem
+
+- WaveWarZ analytics dashboard: https://wwtracker.vercel.app
+- Case study (citable): https://wwtracker.vercel.app/case-study
+- Machine-readable analytics: https://wwtracker.vercel.app/llms.txt
+- ZAO research corpus: https://github.com/bettercallzaal/ZAOOS
+- WaveWarZ live battles: https://wavewarz.info
+
+## Sources
+
+Data verified 2026-07-17. On-chain proofs via Optimism mainnet + Solana program above.
+Research: ZAO OS docs 1077, 1218, 1219, 1223, 1224. Governance settlement: ZAO OS docs 1200, 1201, 1202.

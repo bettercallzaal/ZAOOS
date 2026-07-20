@@ -109,4 +109,3 @@
 | 1629 | [Nexus Rebuild: July 2026 Status Audit + Implementation Brief](./1629-nexus-rebuild-jul2026-implementation-brief/) | IMPLEMENTATION-BRIEF | Backend ~90% done (nexus_links table + public API + admin CRUD all live). Gap: frontend page still hardcoded. Hurricane handoff spec for 1-PR frontend wire-up, 10 missing July 2026 links, 6 open spec questions resolved. Board task #14. |
 | [1609](1609-fractal-dashboard-pr-review-guide/) | Fractal dashboard code PRs review guide — 9 waiting PRs, what each fixes, test sequence |
 
-| 1609 | [ZAO Fractal Dashboard Code PRs — Review Guide](./1609-fractal-dashboard-pr-review-guide/) | STANDALONE | Fractal dashboard code PRs review guide — 9 waiting PRs, what each fixes, test sequence. |

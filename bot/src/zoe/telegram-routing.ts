@@ -9,15 +9,17 @@
  * This centralizes the decision: sendToZaal(text, {kind}) routes based
  * on kind. All message sends flow through this helper.
  *
- * Environment variables (set on VPS):
- * - ZAAL_TELEGRAM_ID: Zaal's personal DM chat id (existing)
- * - ZAALBOTS_GROUP_CHAT_ID: the ZAALBOTS group chat id (new)
- * - ZAALBOTS_STATUS_THREAD_ID: forum topic id within the group for status
- *   messages (new, optional - if group has forum topics)
+ * Environment: all config comes from the canonical env module (./env), which
+ * resolves each value from its canonical name AND known aliases so the
+ * env-drift bug (router reading a different name than the deploy env sets)
+ * cannot recur. Group id -> ZAAL_BOTZ_GROUP_ID, thread -> ZAAL_BOTZ_RESEARCH_THREAD,
+ * DM -> ZAAL_TELEGRAM_ID.
  *
- * Fallback: if group chat id is unset, all messages fall back to Zaal's DM
- * so nothing breaks pre-config.
+ * Fallback: if group id is unset, messages fall back to Zaal's DM so nothing
+ * breaks pre-config.
  */
+
+import { ZAAL_DM_ID, ZAAL_BOTZ_GROUP_ID, ZAAL_BOTZ_RESEARCH_THREAD } from './env';
 
 const TELEGRAM_MAX = 3900;
 
@@ -117,31 +119,21 @@ export async function sendToZaal(
  * Returns deps ready to pass to sendToZaal().
  */
 export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendMessage']): TelegramRoutingDeps {
-  const zaalIdRaw = process.env.ZAAL_TELEGRAM_ID;
-  if (!zaalIdRaw) {
+  // All three values now come from the canonical env module (env.ts), which
+  // resolves each from its canonical name AND its known aliases. This is what
+  // stopped the env-drift bug: the router used to read ZAALBOTS_GROUP_CHAT_ID /
+  // ZAALBOTS_STATUS_THREAD_ID while the deploy env set ZAAL_BOTZ_GROUP_ID /
+  // ZAAL_BOTZ_RESEARCH_THREAD, so groupId + threadId came back undefined and
+  // every status message silently fell back to Zaal's DM.
+  const zaalId = ZAAL_DM_ID;
+  if (zaalId === undefined) {
     throw new Error('Missing ZAAL_TELEGRAM_ID env var (required for ZOE)');
-  }
-  const zaalId = Number(zaalIdRaw);
-  if (Number.isNaN(zaalId)) {
-    throw new Error(`Invalid ZAAL_TELEGRAM_ID: ${zaalIdRaw} (must be a number)`);
-  }
-
-  const groupIdRaw = process.env.ZAALBOTS_GROUP_CHAT_ID;
-  const groupId = groupIdRaw ? Number(groupIdRaw) : undefined;
-  if (groupIdRaw && Number.isNaN(groupId)) {
-    console.warn(`Invalid ZAALBOTS_GROUP_CHAT_ID: ${groupIdRaw} (must be a number, will be ignored)`);
-  }
-
-  const threadIdRaw = process.env.ZAALBOTS_STATUS_THREAD_ID;
-  const threadId = threadIdRaw ? Number(threadIdRaw) : undefined;
-  if (threadIdRaw && Number.isNaN(threadId)) {
-    console.warn(`Invalid ZAALBOTS_STATUS_THREAD_ID: ${threadIdRaw} (must be a number, will be ignored)`);
   }
 
   return {
     sendMessage: sendMessageImpl,
     zaalId,
-    groupId,
-    groupThreadId: threadId,
+    groupId: ZAAL_BOTZ_GROUP_ID,
+    groupThreadId: ZAAL_BOTZ_RESEARCH_THREAD,
   };
 }

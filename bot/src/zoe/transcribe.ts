@@ -13,6 +13,23 @@ export function transcriptionConfigured(): boolean {
   return !!process.env.GROQ_API_KEY;
 }
 
+// Groq rejects any filename whose extension is not in this list. Telegram
+// serves voice notes as `.oga` - the SAME OGG/Opus container as `.ogg`, but
+// spelled differently - so passing Telegram's filename straight through made
+// Groq 400 on every single voice note ("file must be one of the following
+// types: [flac mp3 mp4 mpeg mpga m4a ogg opus wav webm]"). Normalize instead.
+const GROQ_AUDIO_EXTS = new Set([
+  'flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'opus', 'wav', 'webm',
+]);
+
+/** Coerce a filename to an extension Groq accepts, defaulting to .ogg. */
+export function normalizeAudioFilename(name: string): string {
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  if (GROQ_AUDIO_EXTS.has(ext)) return name;
+  const base = name.replace(/\.[^.]*$/, '') || 'voice';
+  return `${base}.ogg`;
+}
+
 /** Transcribe raw audio bytes (e.g. a Telegram voice .ogg) to text. */
 export async function transcribeAudio(
   bytes: Uint8Array,
@@ -59,7 +76,7 @@ export async function transcribeTelegramFile(
   );
   if (!fileRes.ok) throw new Error(`telegram file download ${fileRes.status}`);
   const bytes = new Uint8Array(await fileRes.arrayBuffer());
-  const name = filePath.split('/').pop() || 'voice.ogg';
+  const name = normalizeAudioFilename(filePath.split('/').pop() || 'voice.ogg');
   return transcribeAudio(bytes, name);
 }
 

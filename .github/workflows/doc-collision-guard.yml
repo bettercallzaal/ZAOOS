@@ -1,0 +1,88 @@
+name: Doc number collision guard
+
+# WHY THIS EXISTS
+#
+# A doc-number collision guard already existed in two places, and neither one
+# could actually stop a collision from landing:
+#
+#   1. .husky/pre-commit -> only runs on a local commit, on a clone that ran
+#      `npm install`. The VPS loops and codex agents commit from clones that
+#      often have no hooks installed, and `--no-verify` bypasses it anyway.
+#   2. docs-automerge.yml -> computes `collision` but only uses it as an
+#      AUTOMERGE CONDITION. On a collision it simply declines to auto-merge.
+#      It never fails the PR, so a human merges it and the collision lands.
+#
+# Result: the collision count went from ~30 (when COLLISION_TOLERANCE.md was
+# written, 2026-05-18) to 169 (2026-07-20).
+#
+# This workflow FAILS the PR instead. It is server-side, so it applies to every
+# author - human, loop, or agent - and cannot be bypassed with --no-verify.
+#
+# It only ever fails on NEWLY INTRODUCED collisions. The historical collisions
+# on main are deliberately grandfathered per research/COLLISION_TOLERANCE.md
+# (renaming them would break the cross-reference link graph), so this guard
+# compares added directories against main rather than auditing main itself.
+
+on:
+  pull_request:
+    paths:
+      - "research/**"
+
+jobs:
+  collision:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fail on a newly introduced doc-number collision
+        run: |
+          set -uo pipefail
+          base="origin/${{ github.base_ref }}"
+          git fetch origin "${{ github.base_ref }}" --quiet
+
+          # Only ADDED doc dirs can introduce a NEW collision. A modified doc
+          # cannot, and filtering to additions keeps renames from false-firing.
+          newdirs=$(git diff --name-only --diff-filter=A "$base"...HEAD \
+            | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
+            | sort -u || true)
+
+          if [ -z "$newdirs" ]; then
+            echo "No new research doc directories in this PR. Nothing to check."
+            exit 0
+          fi
+
+          # Every doc number that already exists on the base branch.
+          existing=$(git ls-tree -r --name-only "$base" \
+            | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
+            | sed -E 's|^research/[^/]+/([0-9]{3,4})-.*|\1|' \
+            | sort -u || true)
+
+          fail=0
+          while read -r d; do
+            [ -z "$d" ] && continue
+            num=$(echo "$d" | sed -E 's|^research/[^/]+/([0-9]{3,4})-.*|\1|')
+            if echo "$existing" | grep -qx "$num"; then
+              echo "::error title=Doc number $num already exists::$d collides with an existing doc number on ${{ github.base_ref }}."
+              echo "  existing doc(s) with number $num:"
+              git ls-tree -r --name-only "$base" \
+                | grep -oE "^research/[^/]+/${num}-[^/]+/" | sed 's/^/    /' | sort -u
+              fail=1
+            fi
+          done <<< "$newdirs"
+
+          if [ "$fail" -eq 1 ]; then
+            echo ""
+            echo "Fix: renumber your new doc to the next free number, rename its"
+            echo "directory, and update the row you added to research/<topic>/README.md."
+            echo ""
+            echo "Next free number:"
+            git ls-tree -r --name-only "$base" \
+              | grep -oE '^research/[^/]+/[0-9]{3,4}-' \
+              | grep -oE '[0-9]{3,4}' | sort -n | tail -1 \
+              | awk '{print "  " $1 + 1}'
+            exit 1
+          fi
+
+          echo "No new doc-number collisions introduced."

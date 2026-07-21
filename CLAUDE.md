@@ -117,6 +117,7 @@ Env vars: see `.env.example`. App wallet: `npx tsx scripts/generate-wallet.ts`.
 - Use grep on `research/*/README.md`, not bulk reads
 - Don't pre-read `src/components/spaces/` (40+), `music/` (30+), `governance/`, `zounz/`
 - Batch related questions into single messages
+- Surface tiering (which surface for which task; reserve the Claude Code weekly cap for grounded live-code): `.claude/rules/claude-usage.md`
 
 ## Style
 

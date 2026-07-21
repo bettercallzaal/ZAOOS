@@ -167,3 +167,47 @@ describe('buildSystemBlocks — link research intent', () => {
     expect(out).toContain('research-worker dispatch');
   });
 });
+
+// ── conversational mode ───────────────────────────────────────────────────────
+
+describe('buildSystemBlocks — conversational mode', () => {
+  it('includes tasks/quests/open_threads by default (non-conversational)', () => {
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE);
+    expect(out).toContain('<tasks>');
+    expect(out).toContain('<quests>');
+    expect(out).toContain('<open_threads>');
+  });
+
+  it('omits tasks/quests/open_threads when conversational=true', () => {
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE, undefined, undefined, undefined, true);
+    expect(out).not.toContain('<tasks>');
+    expect(out).not.toContain('<quests>');
+    expect(out).not.toContain('<open_threads>');
+  });
+
+  it('still includes persona/human/working_memory when conversational=true', () => {
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE, undefined, undefined, undefined, true);
+    expect(out).toContain('<persona>');
+    expect(out).toContain('<human>');
+    expect(out).toContain('<working_memory>');
+    expect(out).toContain('ZAO keeper. Sharp, warm.');
+    expect(out).toContain('Zaal is building ZAO DAO.');
+  });
+
+  it('still includes recall context in conversational mode', () => {
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE, 'recall: ZAO launched May 2024', undefined, undefined, true);
+    expect(out).toContain('<bonfire_recall>');
+    expect(out).toContain('recall: ZAO launched May 2024');
+    expect(out).not.toContain('<tasks>');
+  });
+
+  it('conversational=false behaves the same as omitting it (includes all blocks)', () => {
+    const outDefault = buildSystemBlocks(BASE_BLOCKS, DATE);
+    const outFalse = buildSystemBlocks(BASE_BLOCKS, DATE, undefined, undefined, undefined, false);
+    expect(outFalse).toContain('<tasks>');
+    expect(outFalse).toContain('<quests>');
+    expect(outFalse).toContain('<open_threads>');
+    expect(outFalse).toContain(BASE_BLOCKS.tasks);
+    expect(outDefault).toContain(BASE_BLOCKS.tasks);
+  });
+});

@@ -1932,6 +1932,8 @@ async function dispatchConcierge(
       recallContext,
       brandContext,
       linkResearchIntent: wantsLinkResearch(text),
+      // Conversational turns skip task/quest/thread context blocks (irrelevant overhead).
+      conversational,
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,

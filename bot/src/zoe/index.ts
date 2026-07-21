@@ -28,6 +28,7 @@ import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
 import { checkAndRecordZoeCall } from './call-budget';
 import { runCockpit } from '../cockpit/cockpit';
 import { applyTaskOps, seedInitialTasks } from './tasks';
+import { readFleetStatus, formatLoopsStatus, formatLoopDetail } from './loops-status';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
@@ -688,6 +689,21 @@ bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
+});
+
+// Fleet loop status (Zaal P1, 2026-07-17). /loops = all loops; /loop <name> = one.
+// Reads the keepalive supervisor's /tmp/fleet-status.json. Read-only, Zaal-only.
+bot.command('loops', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const data = await readFleetStatus();
+  await replyChunked(ctx, formatLoopsStatus(data, Date.now()));
+});
+
+bot.command('loop', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const name = (ctx.match ?? '').toString().trim();
+  const data = await readFleetStatus();
+  await replyChunked(ctx, formatLoopDetail(data, name, Date.now()));
 });
 
 // On-demand operator cockpit: the same brief the 5am cron sends, triggerable

@@ -254,7 +254,7 @@ async function handleFractalStarted(
       session_date: new Date().toISOString().split('T')[0],
       host_name: data.facilitatorDiscordId,
       participant_count: data.participantDiscordIds.length,
-      scoring_era: 'ORDAO',
+      scoring_era: '2x',
       status: 'active',
       notes: JSON.stringify({
         guildId: data.guildId,

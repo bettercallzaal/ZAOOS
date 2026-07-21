@@ -2,7 +2,7 @@
 // Tests for formatCockpitBrief() — the pure CockpitBrief → Telegram string formatter.
 // No mocks needed: function takes a plain object and returns a string.
 import { describe, expect, it } from 'vitest';
-import { formatCockpitBrief } from '../brief';
+import { formatCockpitBrief, formatCockpitBriefCli } from '../brief';
 import type { CockpitBrief, CockpitTask, Handoff, Capture, ReviewPR, WriteProposal } from '../types';
 
 // ── builders ──────────────────────────────────────────────────────────────────
@@ -345,5 +345,84 @@ describe('formatCockpitBrief — PROPOSED section', () => {
     );
     const brief: CockpitBrief = { ...EMPTY_BRIEF, proposedWrites: proposals };
     expect(formatCockpitBrief(brief)).not.toContain('Proposal 10');
+  });
+});
+
+// ── formatCockpitBriefCli ─────────────────────────────────────────────────────
+
+describe('formatCockpitBriefCli — concise CLI form', () => {
+  it('includes the header and summary counts', () => {
+    const brief: CockpitBrief = {
+      ...EMPTY_BRIEF,
+      counts: { open: 148, needsYou: 12, needsReview: 15, handoffs: 4, captures: 2, stale: 8, blocked: 3 },
+    };
+    const out = formatCockpitBriefCli(brief);
+    expect(out.split('\n')[0]).toBe('Cockpit - 2026-07-17');
+    expect(out).toContain('148 open');
+    expect(out).toContain('15 PRs to review');
+  });
+
+  it('includes DO FIRST items', () => {
+    const brief: CockpitBrief = { ...EMPTY_BRIEF, top3: [makeTask({ title: 'Merge the PRs' })] };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).toContain('DO FIRST');
+    expect(out).toContain('Merge the PRs');
+  });
+
+  it('caps DO FIRST at 3', () => {
+    const tasks = Array.from({ length: 5 }, (_, i) => makeTask({ id: `t-${i}`, title: `T${i}` }));
+    const brief: CockpitBrief = { ...EMPTY_BRIEF, top3: tasks };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).toContain('T2');
+    expect(out).not.toContain('T3');
+  });
+
+  it('shows top-3 review PRs with (+N more) suffix when truncated', () => {
+    const prs = Array.from({ length: 5 }, (_, i) => makePR({ number: i + 1, title: `PR ${i}` }));
+    const brief: CockpitBrief = { ...EMPTY_BRIEF, needsReview: prs, counts: { ...EMPTY_BRIEF.counts, needsReview: 5 } };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).toContain('PR 0');
+    expect(out).toContain('PR 2');
+    expect(out).not.toContain('PR 3');
+    expect(out).toContain('(+2 more)');
+  });
+
+  it('shows top-3 handoffs with (+N more) suffix when truncated', () => {
+    const handoffs = Array.from({ length: 5 }, (_, i) =>
+      makeHandoff({ taskId: `h-${i}`, slug: `slug-${i}`, title: `Handoff ${i}` }),
+    );
+    const brief: CockpitBrief = { ...EMPTY_BRIEF, handoffs, counts: { ...EMPTY_BRIEF.counts, handoffs: 5 } };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).toContain('Handoff 2');
+    expect(out).not.toContain('Handoff 3');
+    expect(out).toContain('(+2 more)');
+  });
+
+  it('omits review URL lines (keeps CLI brief short)', () => {
+    const brief: CockpitBrief = { ...EMPTY_BRIEF, needsReview: [makePR()] };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).not.toContain('https://github.com');
+  });
+
+  it('omits handoff note line (keeps CLI brief short)', () => {
+    const brief: CockpitBrief = {
+      ...EMPTY_BRIEF,
+      handoffs: [makeHandoff({ note: 'Sensitive note content' })],
+    };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).not.toContain('Sensitive note content');
+  });
+
+  it('omits IDEA INBOX, STALE, and PROPOSED sections', () => {
+    const brief: CockpitBrief = {
+      ...EMPTY_BRIEF,
+      captures: [makeCapture()],
+      stale: [makeTask({ title: 'Old task' })],
+      proposedWrites: [makeProposal()],
+    };
+    const out = formatCockpitBriefCli(brief);
+    expect(out).not.toContain('IDEA INBOX');
+    expect(out).not.toContain('STALE');
+    expect(out).not.toContain('PROPOSED');
   });
 });

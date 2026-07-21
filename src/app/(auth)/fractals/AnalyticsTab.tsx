@@ -93,7 +93,7 @@ export function AnalyticsTab() {
 
   useEffect(() => {
     fetch('/api/fractals/analytics')
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => setData(d))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -103,7 +103,7 @@ export function AnalyticsTab() {
     setSelectedMember(walletOrName);
     setMemberLoading(true);
     fetch(`/api/fractals/member/${encodeURIComponent(walletOrName)}`)
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => setMemberProfile(d))
       .catch(console.error)
       .finally(() => setMemberLoading(false));

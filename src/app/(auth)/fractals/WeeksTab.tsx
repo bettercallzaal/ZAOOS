@@ -39,7 +39,7 @@ export function WeeksTab() {
 
   useEffect(() => {
     fetch('/api/fractals/matrix')
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => setData(d))
       .catch(console.error)
       .finally(() => setLoading(false));

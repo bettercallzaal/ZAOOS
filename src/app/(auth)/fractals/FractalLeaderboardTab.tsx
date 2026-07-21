@@ -12,12 +12,13 @@ interface LeaderboardEntry {
   fractalCount: number;
   onchainOG: number;
   onchainZOR: number;
+  onchainTotal: number;
   eventRespect: number;
   hostingRespect: number;
   bonusRespect: number;
 }
 
-type SortKey = 'totalRespect' | 'fractalRespect' | 'onchainOG' | 'fractalCount';
+type SortKey = 'totalRespect' | 'fractalRespect' | 'onchainTotal' | 'fractalCount';
 
 interface Props {
   currentFid: number;
@@ -36,9 +37,10 @@ export function FractalLeaderboardTab({ currentFid, onViewMember }: Props) {
       .then((d) => {
         const seen = new Map<string, LeaderboardEntry>();
         for (const e of d.leaderboard ?? []) {
+          const entry = { ...e, onchainTotal: (e.onchainOG ?? 0) + (e.onchainZOR ?? 0) };
           const existing = seen.get(e.name);
-          if (!existing || e.totalRespect > existing.totalRespect) {
-            seen.set(e.name, e);
+          if (!existing || entry.totalRespect > existing.totalRespect) {
+            seen.set(e.name, entry);
           }
         }
         setEntries([...seen.values()]);
@@ -85,7 +87,7 @@ export function FractalLeaderboardTab({ currentFid, onViewMember }: Props) {
   const SORT_OPTIONS: { key: SortKey; label: string }[] = [
     { key: 'totalRespect', label: 'Total' },
     { key: 'fractalRespect', label: 'Fractal' },
-    { key: 'onchainOG', label: 'On-Chain' },
+    { key: 'onchainTotal', label: 'On-Chain' },
     { key: 'fractalCount', label: 'Sessions' },
   ];
 
@@ -129,7 +131,7 @@ export function FractalLeaderboardTab({ currentFid, onViewMember }: Props) {
               <p className="text-[10px] text-gray-500">Fractal R</p>
             </div>
             <div className="bg-[#0a1628]/60 rounded-lg p-2 text-center">
-              <p className="text-lg font-bold text-white">{me.onchainOG.toLocaleString()}</p>
+              <p className="text-lg font-bold text-white">{me.onchainTotal.toLocaleString()}</p>
               <p className="text-[10px] text-gray-500">On-Chain</p>
             </div>
           </div>
@@ -224,7 +226,7 @@ export function FractalLeaderboardTab({ currentFid, onViewMember }: Props) {
         <span className="w-7">#</span>
         <span className="flex-1">Name</span>
         <span className="w-16 text-right">Fractal</span>
-        <span className="w-16 text-right">OG</span>
+        <span className="w-16 text-right">On-Chain</span>
         <span className="w-14 text-right">Total</span>
       </div>
 
@@ -270,7 +272,7 @@ export function FractalLeaderboardTab({ currentFid, onViewMember }: Props) {
                 <p className="text-xs font-mono text-[#f5a623]">{entry.fractalRespect}</p>
               </div>
               <div className="w-16 text-right">
-                <p className="text-xs font-mono text-gray-400">{entry.onchainOG}</p>
+                <p className="text-xs font-mono text-gray-400">{entry.onchainTotal}</p>
               </div>
               <div className="w-14 text-right">
                 <p className="text-xs font-mono font-bold text-white">{entry.totalRespect}</p>

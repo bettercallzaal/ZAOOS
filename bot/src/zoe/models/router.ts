@@ -84,6 +84,10 @@ function hasClaudeApiKey(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
+function hasOpenRouterApiKey(): boolean {
+  return Boolean(process.env.OPENROUTER_API_KEY?.trim());
+}
+
 /**
  * Generic OpenAI-compatible chat completion request.
  */
@@ -233,6 +237,114 @@ async function callGpt(systemPrompt: string, userMessage: string): Promise<Claud
   } catch (error: unknown) {
     throw new Error(`GPT call failed: ${error instanceof Error ? error.message : String(error)}`);
   }
+}
+
+/**
+ * Call OpenRouter — OpenAI-compatible aggregator. Gives ZOE a cheap, always-on
+ * non-Claude path (deepseek, gemini, llama, etc.), aligned with the fleet's
+ * cheap-AI stack. This is the primary CAP FALLBACK provider: when the Claude CLI
+ * is rate-limited or over its weekly cap, ZOE drops here instead of failing.
+ */
+async function callOpenRouter(systemPrompt: string, userMessage: string): Promise<ClaudeCliResult> {
+  if (!hasOpenRouterApiKey()) {
+    throw new Error('OPENROUTER_API_KEY not set');
+  }
+
+  const baseUrl = 'https://openrouter.ai/api/v1';
+  // Default to a cheap, capable non-Anthropic model so a fallback never re-hits
+  // the same Anthropic cap that triggered it. Override via OPENROUTER_MODEL.
+  const model = process.env.OPENROUTER_MODEL ?? 'deepseek/deepseek-chat';
+  const apiKey = process.env.OPENROUTER_API_KEY;
+
+  const request: OpenAiRequest = {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage },
+    ],
+    temperature: 1,
+    max_tokens: 4096,
+  };
+
+  const startMs = Date.now();
+
+  try {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'User-Agent': 'ZOE-bot/1.0',
+        'HTTP-Referer': 'https://thezao.com',
+        'X-Title': 'ZOE',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenRouter API error ${response.status}: ${errorText.slice(0, 300)}`);
+    }
+
+    const data = (await response.json()) as OpenAiResponse;
+    const text = data.choices[0]?.message?.content ?? '';
+    if (!text.trim()) {
+      throw new Error('OpenRouter returned empty completion');
+    }
+
+    return {
+      text,
+      inputTokens: data.usage?.prompt_tokens ?? 0,
+      outputTokens: data.usage?.completion_tokens ?? 0,
+      totalCostUsd: 0, // OpenRouter cost varies by model; not tracked precisely here
+      model: `openrouter/${model}`,
+      durationMs: Date.now() - startMs,
+      numTurns: 1,
+      isError: false,
+      sessionId: `openrouter-${startMs}`,
+    };
+  } catch (error: unknown) {
+    throw new Error(`OpenRouter call failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * CAP FALLBACK: the Claude CLI is rate-limited or over its weekly cap, so run
+ * this concierge turn on the best available non-Claude provider instead of
+ * failing. Tries OpenRouter first (cheap, always-on), then Grok, then GPT.
+ * Throws only if NO non-Claude provider is configured (then the caller surfaces
+ * the original Claude error).
+ */
+export function hasCapFallbackProvider(): boolean {
+  return hasOpenRouterApiKey() || hasGrokApiKey() || hasGptApiKey();
+}
+
+export async function callCapFallback(
+  systemPrompt: string,
+  userMessage: string,
+): Promise<{ result: ClaudeCliResult; provider: string }> {
+  const attempts: Array<{ name: string; fn: () => Promise<ClaudeCliResult> }> = [];
+  if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage) });
+  if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
+  if (hasGptApiKey()) attempts.push({ name: 'gpt', fn: () => callGpt(systemPrompt, userMessage) });
+
+  if (attempts.length === 0) {
+    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, XAI_API_KEY, or OPENAI_API_KEY)');
+  }
+
+  const errors: string[] = [];
+  for (const attempt of attempts) {
+    try {
+      const result = await attempt.fn();
+      console.log('[zoe/models/router] cap-fallback succeeded via', attempt.name);
+      return { result, provider: attempt.name };
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`[zoe/models/router] cap-fallback ${attempt.name} failed:`, msg);
+      errors.push(`${attempt.name}: ${msg.slice(0, 80)}`);
+    }
+  }
+  throw new Error(`all cap-fallback providers failed [${errors.join(' | ')}]`);
 }
 
 /**

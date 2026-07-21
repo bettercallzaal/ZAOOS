@@ -116,6 +116,34 @@ def cmd_start(args, url, key) -> int:
     return 0
 
 
+def claim_url(base: str, task_id: str) -> str:
+    """PATCH target for an ATOMIC claim: only matches a row still in 'todo'.
+
+    The &status=eq.todo filter is the whole trick - PostgREST applies the UPDATE
+    only to rows matching the filter, so if a sibling already flipped it to
+    in_progress the update touches 0 rows and returns []. That is a lock-free
+    compare-and-swap on the existing status column (no schema change needed).
+    """
+    return f"{base}/rest/v1/tasks?id=eq.{urllib.parse.quote(task_id)}&status=eq.todo"
+
+
+def cmd_claim(args, url, key) -> int:
+    """Atomically claim a todo task (the race-safe replacement for `start`).
+
+    Exit 0 = you won the claim (task is now yours, in_progress).
+    Exit 2 = a sibling already holds it - pick another task.
+    This is the fix for the parallel-loop duplication that keeps burning fleet
+    work (three P1s built twice in one session, 2026-07-17). Loops MUST claim
+    before starting; on exit 2, move on.
+    """
+    rows = _req("PATCH", claim_url(url, args.id), key, {"status": "in_progress"})
+    if rows:
+        print(f"CLAIMED {args.id}")
+        return 0
+    print(f"ALREADY-CLAIMED {args.id} (a sibling holds it) - pick another task")
+    return 2
+
+
 def cmd_done(args, url, key) -> int:
     cur = _req("GET", f"{url}/rest/v1/tasks?id=eq.{urllib.parse.quote(args.id)}&select=notes", key)
     existing_notes = cur[0].get("notes") if cur else None
@@ -158,6 +186,9 @@ def _selftest() -> int:
     f = dedup_filter("A B", "src")
     checks.append(("dedup filter encodes title + source + open-status",
                    "status=in.(todo,in_progress)" in f and "A%20B" in f and "legacy_source=eq.src" in f))
+    cu = claim_url("https://x.co", "abc-123")
+    checks.append(("claim url is an atomic CAS (id=eq + status=eq.todo)",
+                   "id=eq.abc-123" in cu and "status=eq.todo" in cu and cu.startswith("https://x.co/rest/v1/tasks?")))
     fails = 0
     for label, ok in checks:
         fails += 0 if ok else 1
@@ -174,6 +205,8 @@ def main() -> int:
     a = sub.add_parser("add"); a.add_argument("title")
     a.add_argument("--priority", default="P2"); a.add_argument("--source"); a.add_argument("--project", default="zaodevz")
     a.add_argument("--notes"); a.add_argument("--dedup", action="store_true")
+    cl = sub.add_parser("claim", help="atomically claim a todo task (race-safe; exit 2 if a sibling holds it)")
+    cl.add_argument("id")
     s = sub.add_parser("start"); s.add_argument("id")
     dn = sub.add_parser("done"); dn.add_argument("id"); dn.add_argument("--pr")
     ls = sub.add_parser("list"); ls.add_argument("--source"); ls.add_argument("--status")
@@ -185,7 +218,7 @@ def main() -> int:
         p.print_help(); return 1
 
     url, key = load_creds()
-    return {"add": cmd_add, "start": cmd_start, "done": cmd_done, "list": cmd_list}[args.cmd](args, url, key)
+    return {"add": cmd_add, "claim": cmd_claim, "start": cmd_start, "done": cmd_done, "list": cmd_list}[args.cmd](args, url, key)
 
 
 if __name__ == "__main__":

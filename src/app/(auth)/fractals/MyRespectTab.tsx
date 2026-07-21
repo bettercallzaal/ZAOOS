@@ -46,6 +46,9 @@ interface MemberResponse {
 
 interface Props {
   currentFid: number;
+  // When set (e.g. from clicking a leaderboard row), show this member instead
+  // of auto-resolving the logged-in user.
+  initialMember?: string | null;
 }
 
 const SOURCE_STYLE: Record<LedgerRow['source'], string> = {
@@ -65,7 +68,7 @@ function fmtDate(d: string | null): string {
   return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function MyRespectTab({ currentFid }: Props) {
+export function MyRespectTab({ currentFid, initialMember }: Props) {
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [member, setMember] = useState<MemberData | null>(null);
   const [ledger, setLedger] = useState<LedgerRow[]>([]);
@@ -144,18 +147,34 @@ export function MyRespectTab({ currentFid }: Props) {
   }, []);
 
   useEffect(() => {
-    if (loading) return;
     setTotalMembers(ranked.length);
+  }, [ranked]);
+
+  // Targeted member (from a leaderboard click) takes priority - reload whenever
+  // it changes, even if a member is already shown.
+  useEffect(() => {
+    if (loading || !initialMember) return;
+    const entry = ranked.find((e) => e.name === initialMember);
+    void fetchMember({
+      entry,
+      name: initialMember,
+      wallet: entry?.wallet || undefined,
+      fid: entry?.fid || undefined,
+    });
+  }, [loading, initialMember, ranked, fetchMember]);
+
+  // Otherwise auto-resolve the logged-in member by fid, once.
+  useEffect(() => {
+    if (loading || initialMember) return;
     if (member) return; // already resolved (e.g. via lookup)
     if (currentFid > 0) {
       const mine = ranked.find((e) => e.fid === currentFid);
       if (mine) {
         void fetchMember({ entry: mine, wallet: mine.wallet || undefined, fid: mine.fid || undefined });
-        return;
       }
     }
     // no fid match - leave to manual lookup
-  }, [loading, ranked, currentFid, member, fetchMember]);
+  }, [loading, initialMember, ranked, currentFid, member, fetchMember]);
 
   const lookupMatches = useMemo(() => {
     if (!lookup.trim()) return [];

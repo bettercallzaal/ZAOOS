@@ -68,6 +68,14 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
   const tabParam = searchParams.get('tab') as Tab | null;
   const initialTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'proposals';
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+  // Member the "My Respect" tab is focused on. Set by clicking a leaderboard row;
+  // null means auto-resolve the logged-in user.
+  const [viewMember, setViewMember] = useState<string | null>(null);
+
+  const viewMemberInTab = (name: string) => {
+    setViewMember(name);
+    setActiveTab('mine');
+  };
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'mine', label: 'My Respect' },
@@ -113,7 +121,12 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
         {TABS.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              // Tapping "My Respect" directly returns to your own view, not the
+              // last member opened from a leaderboard click.
+              if (tab.id === 'mine') setViewMember(null);
+              setActiveTab(tab.id);
+            }}
             className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
               activeTab === tab.id
                 ? 'text-[#f5a623] border-b-2 border-[#f5a623]'
@@ -126,9 +139,17 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
       </div>
 
       <div className="max-w-lg mx-auto px-4 py-4">
-        {activeTab === 'mine' && <MyRespectTab currentFid={currentFid} />}
+        {activeTab === 'mine' && (
+          <MyRespectTab
+            key={viewMember ?? 'self'}
+            currentFid={currentFid}
+            initialMember={viewMember}
+          />
+        )}
         {activeTab === 'sessions' && <SessionsTab isAdmin={isAdmin} />}
-        {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
+        {activeTab === 'leaderboard' && (
+          <FractalLeaderboardTab currentFid={currentFid} onViewMember={viewMemberInTab} />
+        )}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'weeks' && <WeeksTab />}
         {activeTab === 'proposals' && <ProposalsTab isAdmin={isAdmin} currentFid={currentFid} />}

@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-20 | August ZABAL Games format + ZAOstock planning | ZABAL/general | Zaal, Sam, Johnny, Ohnahji | [1771](1771-aug-zabal-format-zaostock-planning/) | 5 |
 | 2026-07-18 | COC Concertz Space | COC Concertz | Zaal, Candy Toybox, Rev, Moses, Iman, James | [1763](1763-coc-concertz-space-jul18/) | 0 |
 | 2026-07-17 | Zaal x Chris Dolinski (Viniapp) - Sparkz + access coins | Sparkz | Zaal, Chris Dolinski | [1325](1325-chris-dolinski-viniapp-sparkz-jul17/) | 4 |
 | 2026-07-14 | Zaal x Adrian (Empire Builder) - zaalcaster + creator coins | Empire Builder | Zaal, Adrian | [1118](1118-empire-builder-zaal-adrian-jul14/) | 6 |

@@ -3,10 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const mockMkdir = vi.hoisted(() => vi.fn());
 const mockWriteFile = vi.hoisted(() => vi.fn());
+const mockReadFileSync = vi.hoisted(() => vi.fn(() => { throw new Error('ENOENT'); }));
 const mockFetch = vi.hoisted(() => vi.fn());
 
 vi.mock('node:fs', () => ({
   promises: { mkdir: mockMkdir, writeFile: mockWriteFile },
+  readFileSync: mockReadFileSync,
 }));
 
 import {
@@ -21,6 +23,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.GROQ_API_KEY;
   delete process.env.GROQ_WHISPER_MODEL;
+  mockReadFileSync.mockImplementation(() => { throw new Error('ENOENT'); });
 });
 
 // ── transcriptionConfigured ───────────────────────────────────────────────────
@@ -46,6 +49,12 @@ function makeFetchOk(text: string) {
 function makeFetchFail(status: number, detail = '') {
   mockFetch.mockResolvedValue({ ok: false, status, text: vi.fn().mockResolvedValue(detail) });
   vi.stubGlobal('fetch', mockFetch);
+}
+
+function withGlossary(whisperPrompt: string, corrections: Record<string, string>) {
+  mockReadFileSync.mockReturnValue(
+    JSON.stringify({ whisperPrompt, corrections }),
+  );
 }
 
 describe('transcribeAudio', () => {
@@ -76,6 +85,39 @@ describe('transcribeAudio', () => {
     await transcribeAudio(new Uint8Array([1]));
     const body = (mockFetch.mock.calls[0][1] as RequestInit).body as FormData;
     expect(body.get('model')).toBe('whisper-large-v3');
+  });
+
+  it('sends whisperPrompt as prompt field when glossary is loaded', async () => {
+    process.env.GROQ_API_KEY = 'test-key';
+    withGlossary('ZAO, ZABAL, WaveWarZ', {});
+    makeFetchOk('ok');
+    await transcribeAudio(new Uint8Array([1]));
+    const body = (mockFetch.mock.calls[0][1] as RequestInit).body as FormData;
+    expect(body.get('prompt')).toBe('ZAO, ZABAL, WaveWarZ');
+  });
+
+  it('does not send prompt field when glossary file is missing', async () => {
+    process.env.GROQ_API_KEY = 'test-key';
+    makeFetchOk('ok');
+    await transcribeAudio(new Uint8Array([1]));
+    const body = (mockFetch.mock.calls[0][1] as RequestInit).body as FormData;
+    expect(body.get('prompt')).toBeNull();
+  });
+
+  it('applies corrections map to the raw transcript (case-insensitive)', async () => {
+    process.env.GROQ_API_KEY = 'test-key';
+    withGlossary('', { 'wave wars': 'WaveWarZ', 'z a b a l': 'ZABAL' });
+    makeFetchOk('The Z A B A L team played Wave Wars tonight');
+    const result = await transcribeAudio(new Uint8Array([1]));
+    expect(result).toBe('The ZABAL team played WaveWarZ tonight');
+  });
+
+  it('returns raw transcript unchanged when glossary has no corrections', async () => {
+    process.env.GROQ_API_KEY = 'test-key';
+    withGlossary('ZAO', {});
+    makeFetchOk('  plain text  ');
+    const result = await transcribeAudio(new Uint8Array([1]));
+    expect(result).toBe('plain text');
   });
 });
 

@@ -160,6 +160,8 @@ export interface ConciergeOptions {
   brandContext?: string;
   /** True if the message contains a URL + research intent keywords. Routes toward research-worker dispatch. */
   linkResearchIntent?: boolean;
+  /** True for casual back-and-forth (short, no URLs, no work keywords). Skips task/quest/thread blocks. */
+  conversational?: boolean;
 }
 
 export interface ConciergeResult {

@@ -1,0 +1,56 @@
+# Sparkz - context for AI
+
+You are being given grounded context on Sparkz so you can understand it and give useful, actionable advice. Sparkz is a product from The ZAO (a web3 music and culture network; founder Zaal / BetterCallZaal), co-developed with Brandon Ducar (DreamNet).
+
+## What Sparkz is (one line)
+
+Sparkz lets a creator start with a spark, not a token: build community and momentum first, and launch a token only later, if ever. "Back the album, not buy a coin."
+
+## The central concept: every project is a Capsule, not a coin
+
+Every Sparkz project begins as a **Capsule**. The Capsule accumulates identity, contributors, history, cultural lore, content/code, contribution records, supporters, receipts, reputation, governance, economic config, and Meme Engine memory. **The coin is an optional economic output of the Capsule** - not the entry fee. This lets Sparkz serve pre-token, tokenized, permanently-tokenless, sponsored, membership, bounty, and event projects, so the business is not a bet on speculation.
+
+Four connected entry points (one schema supports all; v1 builds one):
+1. Creator Coin - monetize a person + their work/audience/collaborators.
+2. Culture Coin - monetize + coordinate a community/movement/scene/event.
+3. Open-Source Project - monetize repos/contributors/maintainers/dependencies (build above Drips, don't recreate it).
+4. Meme Engine - the cultural intelligence + distribution + community-mobilization system powering the other three.
+
+## The moat (this matters most)
+
+Not the token contract, not image generation, not AI recommendations. The moat is the combined accumulating system: persistent Capsules + contribution graphs + cultural memory + trend history + meme lineage + community mobilization + economic routing + cross-platform attribution + verification receipts + performance data. The more Sparkz operates, the smarter every Capsule gets.
+
+## The framing (still true, still leads)
+
+- Lead with FEATURES, not the coin. Sell collectables, a boost/leaderboard, fee-sharing, community backing; the coin is an opt-in extra, later, if ever.
+- The problem word is "coin," not "creator." Downplay the coin - it is plumbing, never the pitch.
+- Non-technical by default. Frame it for the non-technical artist.
+- Legal-safe: a monetization mechanism, never a "raise." Perks are what backers enjoy today, not promises of return.
+
+## How it works
+
+- Start tokenless (a "spark"): collectables + backing + a boost engine, no token.
+- A human-in-the-loop Meme Engine loop (v1): a human flags a cultural moment -> Sparkz drafts 3 Capsule-grounded responses -> human approves -> publish -> a Community Swarm remixes the approved material in a time-boxed mission -> attribution + performance tracked -> useful contributors rewarded -> a learning report. Trend sources are behind a swappable adapter (SignalSource), so v1's human source upgrades to Alpha Radar later without a rebuild. Meme Receipts are written from day one (the data moat).
+- Rewards need not be a token: points, reputation, leaderboard, collectables, access, perks, launch-allocation eligibility, sponsor-funded rewards.
+- Optionally graduate to a token later, customized by an AI advisor on the Clanker + Empire rails (fee split, vault, governance), via a mutable 0xSplits contract so the split stays adjustable.
+- Backed by ZAO: not a permissionless farm. ZAO stands behind who launches (quality over speculation) and takes an aligned locked stake, never a fee slice.
+
+## The differentiator: multi-recipient fee splits (music-native)
+
+- Collab songs: fees split between collaborating artists, so both are incentivized to promote.
+- Group crowdfunding (e.g. f2dc, Farcaster-to-Devcon): split by the people who crowdfund toward a shared goal; they make proposals; token holders vote. "A light Nouns DAO, but with liquid tokens."
+
+## V1 (the shippable floor) + the convergence
+
+- V1 proves ONE loop: Zoostr (ZABAL x Boostr) as a Creator Capsule - pre-token backing, fiat/BYOK onboarding, the human Meme Engine loop, Community Swarm, contributor leaderboard, Meme Receipts, 1/1/98 creator-first economics, Farcaster-Eats-First.
+- The proof is NOT "we launched a coin." It is: Sparkz turned supporters into an attributable cultural distribution network, measured what they made, rewarded the useful contributors, and learned how to improve the next campaign.
+- Every ZAO brand is a Capsule candidate - the ZAO estate is being audited and rolled into Sparkz brand-by-brand, each with a Spark-readiness checklist. CoCConcertZ is an early Spark.
+
+## How to help / advise
+
+- Pressure-test the framing first - framing is everything here. Complaints with no actionable fix get ignored.
+- Keep it legal-safe: no "raise," no promised returns, "back the album."
+- Anti-failure gate for any proposed feature: (1) helps someone earn/participate/distribute? (2) measurable? (3) strengthens the Capsule's proprietary data? (4) testable with a real project in 30 days?
+- Repo: github.com/bettercallzaal/sparkz (public, OSS-first). First spark: Zoostr.
+
+Updated 2026-07-21.

@@ -16,7 +16,7 @@ import { recordCall } from './cost-ledger';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
-import { shouldUseRouting, selectBestModel, routeAndCall } from './models/router';
+import { shouldUseRouting, selectBestModel, routeAndCall, callCapFallback, hasCapFallbackProvider } from './models/router';
 
 const ZOE_VERSION = '0.2.0';
 
@@ -130,7 +130,7 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
  *   c) Error classification/logging (CliAuthError, CliError types)
  *   d) Cost ledger tracking (records both CLI and API-key calls)
  */
-async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli').ClaudeCliOptions, 'cwd'> & { cwd: string }): Promise<import('../hermes/claude-cli').ClaudeCliResult> {
+async function callClaudeCliRoute(opts: Omit<import('../hermes/claude-cli').ClaudeCliOptions, 'cwd'> & { cwd: string }): Promise<import('../hermes/claude-cli').ClaudeCliResult> {
   const useCliPath = process.env.ZOE_USE_CLI === '1';
   if (!useCliPath) {
     return callClaudeCli(opts);
@@ -142,7 +142,7 @@ async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli')
     console.log('[zoe/concierge] CLI route succeeded, cost recorded');
     return result;
   } catch (err: unknown) {
-    const { CliAuthError, CliError, classifyClaudeError } = await import('../hermes/claude-cli');
+    const { CliAuthError, CliError } = await import('../hermes/claude-cli');
     if (err instanceof CliAuthError) {
       console.warn('[zoe/concierge] CLI auth failed, falling back to API key:', (err as Error).message);
     } else if (err instanceof CliError) {
@@ -153,6 +153,32 @@ async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli')
     // Fallback: disable CLI and retry via API key
     const apiOpts = { ...opts, bare: false };
     return callClaudeCli(apiOpts);
+  }
+}
+
+/**
+ * Claude model call with CAP FALLBACK. Runs the normal Claude CLI route; if
+ * Claude is rate-limited or over its weekly cap (CliError kind rate_limit /
+ * usage_limit / auth) AND a non-Claude provider is configured, runs the turn on
+ * OpenRouter/Grok/GPT instead of surfacing a raw 429 to Zaal. This is what keeps
+ * ZOE working while the Claude cap is exhausted (see doc: ZOE cap failover).
+ */
+async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli').ClaudeCliOptions, 'cwd'> & { cwd: string }): Promise<import('../hermes/claude-cli').ClaudeCliResult> {
+  try {
+    return await callClaudeCliRoute(opts);
+  } catch (err: unknown) {
+    const { CliError } = await import('../hermes/claude-cli');
+    const isCap = err instanceof CliError && (err.kind === 'rate_limit' || err.kind === 'usage_limit' || err.kind === 'auth');
+    if (isCap && hasCapFallbackProvider()) {
+      const kind = (err as import('../hermes/claude-cli').CliError).kind;
+      console.warn('[zoe/concierge] Claude capped (' + kind + ') - cap-fallback to a non-Claude provider');
+      const sys = opts.appendSystemPrompt ?? '';
+      const user = opts.prompt ?? '';
+      const fb = await callCapFallback(sys, user);
+      console.log('[zoe/concierge] cap-fallback served by', fb.provider);
+      return fb.result;
+    }
+    throw err;
   }
 }
 

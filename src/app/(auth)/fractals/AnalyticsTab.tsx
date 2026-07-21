@@ -185,8 +185,7 @@ export function AnalyticsTab() {
         <div className="flex items-end gap-px h-24 overflow-x-auto">
           {participationTimeline.map((entry, i) => {
             const height = (entry.participants / maxParticipants) * 100;
-            const isOrdao =
-              entry.era === '2x' && i >= participationTimeline.length - overview.ordaoSessions;
+            const isOrdao = entry.era === '2x';
             return (
               <div
                 key={`${entry.name}-${i}`}
@@ -515,7 +514,7 @@ export function AnalyticsTab() {
       )}
 
       <p className="text-[10px] text-gray-600 text-center">
-        Data from Airtable (OG era) + ORDAO on-chain (Optimism). All on-chain data verifiable.
+        OG era records (scoring_era 1x) + ORDAO on-chain results (scoring_era 2x, Optimism). All on-chain data verifiable.
       </p>
     </div>
   );

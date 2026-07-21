@@ -13,6 +13,10 @@ const FractalLeaderboardTab = dynamic(
   () => import('./FractalLeaderboardTab').then((m) => ({ default: m.FractalLeaderboardTab })),
   { ssr: false },
 );
+const MyRespectTab = dynamic(
+  () => import('./MyRespectTab').then((m) => ({ default: m.MyRespectTab })),
+  { ssr: false },
+);
 const ProposalsTab = dynamic(
   () => import('./ProposalsTab').then((m) => ({ default: m.ProposalsTab })),
   { ssr: false },
@@ -41,8 +45,9 @@ const LiveFractalDashboard = dynamic(
   { ssr: false },
 );
 
-type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'weeks' | 'proposals' | 'events' | 'live' | 'about';
+type Tab = 'mine' | 'sessions' | 'leaderboard' | 'analytics' | 'weeks' | 'proposals' | 'events' | 'live' | 'about';
 const VALID_TABS: Tab[] = [
+  'mine',
   'sessions',
   'leaderboard',
   'analytics',
@@ -65,6 +70,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const TABS: { id: Tab; label: string }[] = [
+    { id: 'mine', label: 'My Respect' },
     { id: 'proposals', label: 'Proposals' },
     { id: 'live', label: 'Live' },
     { id: 'events', label: 'Events' },
@@ -120,6 +126,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
       </div>
 
       <div className="max-w-lg mx-auto px-4 py-4">
+        {activeTab === 'mine' && <MyRespectTab currentFid={currentFid} />}
         {activeTab === 'sessions' && <SessionsTab isAdmin={isAdmin} />}
         {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
         {activeTab === 'analytics' && <AnalyticsTab />}

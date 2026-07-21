@@ -216,13 +216,11 @@ export function LiveFractalDashboard() {
   useEffect(() => {
     fetchData();
 
-    // Auto-refresh every 10 seconds when there are active sessions
-    const interval = setInterval(() => {
-      fetchData();
-    }, 10_000);
+    // 10s when a session is live, 60s otherwise (saves API calls between Mondays)
+    const interval = setInterval(fetchData, data?.has_active ? 10_000 : 60_000);
 
     return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [fetchData, data?.has_active]);
 
   if (loading) {
     return (

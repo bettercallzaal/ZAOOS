@@ -212,21 +212,21 @@ function buildTaskContext(task: BoardTask): string {
 }
 
 /** Draft a proposed answer to a team member's question. Best-effort; returns empty string on failure. */
-async function draftAnswerForQuestion(task: BoardTask, question: string, workspace_dir: string): Promise<string> {
+async function draftAnswerForQuestion(task: BoardTask, question: string, workspace_dir: string, linkContext = ''): Promise<string> {
   try {
     const context = buildTaskContext(task);
     const systemPrompt = `You are ZOE, a cowork assistant. Your job is to draft concise, helpful answers to team member questions about tasks.
 
-Keep responses short (2-3 sentences max, under 150 chars). Ground answers ONLY in the task context provided - if you don't have enough info, say "need more context from Zaal" rather than inventing details.
+Keep responses short (2-3 sentences max, under 150 chars). Ground answers ONLY in the task context + any linked content provided - if you don't have enough info, say "need more context from Zaal" rather than inventing details.
 
 Respond as if Zaal would: direct, practical, no fluff.`;
 
     const prompt = `Task context:
 ${context}
-
+${linkContext ? `\nLinked content ZOE fetched:\n${linkContext}\n` : ''}
 Team member's question: "${question}"
 
-Draft a brief answer (as Zaal would respond). Keep it short and grounded in the context above.`;
+Draft a brief answer (as Zaal would respond). Keep it short and grounded in the context + linked content above.`;
 
     const result = await callClaudeCli({
       model: ZOE_DEFAULT_MODEL,
@@ -340,14 +340,64 @@ async function postNotedAck(
   }
 }
 
-function buildTeammateAskMessage(pending: TeamCommentPending): string {
+/** Up to 2 distinct http(s) URLs from a comment. */
+function extractUrls(text: string): string[] {
+  const m = text.match(/https?:\/\/[^\s"'<>)]+/g) || [];
+  return Array.from(new Set(m)).slice(0, 2);
+}
+
+/**
+ * Fetch the links a teammate referenced so ZOE's ping/draft is grounded in what
+ * is actually there, not a blind echo. Keyless - works even when Claude is
+ * capped. Plain site: title + reachable status. Google Doc/Drive: noted (private
+ * docs are not machine-readable). Best-effort, never throws.
+ */
+async function fetchLinkContext(text: string, fetchImpl: typeof fetch = fetch): Promise<string> {
+  const urls = extractUrls(text);
+  if (urls.length === 0) return '';
+  const host = (u: string): string => {
+    try {
+      return new URL(u).host;
+    } catch {
+      return u;
+    }
+  };
+  const parts: string[] = [];
+  for (const url of urls) {
+    try {
+      if (/docs\.google\.com|drive\.google\.com/.test(url)) {
+        parts.push(`- Google Doc (open to review; private docs are not machine-readable): ${url}`);
+        continue;
+      }
+      const res = await fetchImpl(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (ZOE)' },
+        signal: AbortSignal.timeout(8000),
+        redirect: 'follow',
+      });
+      if (!res.ok) {
+        parts.push(`- ${host(url)}: HTTP ${res.status} (may be down or gated)`);
+        continue;
+      }
+      const html = await res.text();
+      const titleM = html.match(/<title[^>]*>([^<]{2,120})<\/title>/i);
+      const title = titleM ? titleM[1].trim().replace(/\s+/g, ' ') : '';
+      parts.push(`- ${host(url)}: loads OK${title ? ` - "${title}"` : ''}`);
+    } catch (err) {
+      parts.push(`- ${host(url)}: could not reach (${(err as Error).message.slice(0, 40)})`);
+    }
+  }
+  return parts.length ? `\nZOE checked the link(s):\n${parts.join('\n')}` : '';
+}
+
+function buildTeammateAskMessage(pending: TeamCommentPending, linkContext = ''): string {
   const { task, comment } = pending;
   const who = comment.displayName || comment.userId || 'Someone';
   const snippet = comment.content.replace(/\s+/g, ' ').trim().slice(0, 200);
   const taskLabel = task.legacy_id ? `#${task.legacy_id}` : task.title;
   return (
-    `[${who}] on task "${task.title}":\n\n"${snippet}"\n\n` +
-    `What should I reply?\n\n` +
+    `[${who}] on task "${task.title}":\n\n"${snippet}"\n` +
+    (linkContext ? `${linkContext}\n` : '') +
+    `\nWhat should I reply?\n\n` +
     `Task: thezao.xyz/board?task=${task.legacy_id ?? task.id}`
   );
 }
@@ -394,10 +444,14 @@ export async function runTaskTeammateAck(
     const task = pend.task;
     const comment = pend.comment;
 
+    // Fetch any links the teammate referenced ONCE, so both the draft and the
+    // ping to Zaal are grounded in what's actually there (keyless, cap-proof).
+    const linkCtx = await fetchLinkContext(comment.content, fetchImpl);
+
     if (draftAnswersEnabled) {
       // Draft-first flow: draft answer, ask Zaal for approval
       const askerName = comment.displayName || comment.userId || 'Someone';
-      const draft = await draftAnswerForQuestion(task, comment.content, workspaceDir);
+      const draft = await draftAnswerForQuestion(task, comment.content, workspaceDir, linkCtx);
 
       if (!draft) {
         // Draft failed; fall back to ask-first flow
@@ -405,7 +459,7 @@ export async function runTaskTeammateAck(
         // Continue to ask-first flow below
       } else {
         // Post acknowledgment to the task
-        const ackPosted = await postNotedAck(task, fetchImpl);
+        const ackPosted = await postNotedAck(task, comment, fetchImpl);
         if (!ackPosted) {
           console.warn('[zoe/teammate-ack] ack post failed, skipping telegram ask for', task.id);
           continue;
@@ -453,8 +507,8 @@ export async function runTaskTeammateAck(
       continue;
     }
 
-    // Send Zaal the ask on Telegram.
-    const message = buildTeammateAskMessage(pend);
+    // Send Zaal the ask on Telegram, grounded with the link context.
+    const message = buildTeammateAskMessage(pend, linkCtx);
     let messageId: number | null = null;
     try {
       messageId = await sendTg(zaalChatId, message);

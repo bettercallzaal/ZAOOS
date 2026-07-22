@@ -5,6 +5,7 @@ import { openPullRequest } from './pr';
 import { runPreFlightGate } from './preflight';
 import { watchPullRequest } from './pr-watcher';
 import { createRun, updateRun } from './db';
+import { emitReceipt } from '../zoe/receipts';
 import {
   HERMES_DEFAULT_MAX_ATTEMPTS,
   HERMES_PASS_THRESHOLD,
@@ -199,6 +200,20 @@ export async function dispatchHermesRun(
           title: fixerOut.prTitle,
           body: `${fixerOut.prBody}\n\n**Critic score:** ${critique.score}/100\n**Critic feedback:** ${critique.feedback}`,
         });
+
+        // Emit receipt for the successful PR creation (proof of action)
+        emitReceipt({
+          agentIdentity: 'hermes',
+          capability: 'post_github',
+          tool: 'github_cli',
+          action: 'create_pull_request',
+          resultType: 'success',
+          approvalClass: 'auto',
+          evidenceUrl: pr.url,
+        }).catch((err) => {
+          console.error("[hermes] receipt emit failed (continuing):", (err as Error)?.message);
+        });
+
         try {
           await narrator?.onPrOpened?.(created.id, pr.number, pr.url, critique.score);
         } catch (e) {

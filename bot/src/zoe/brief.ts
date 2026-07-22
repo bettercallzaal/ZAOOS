@@ -23,6 +23,7 @@ import { graphTopicAgeDays } from './recall';
 import { getCalendarEvents, formatEventForBrief, formatTodayTomorrowEvents } from './calendar';
 import { gatherPendingDecisions } from './pending-decisions';
 import { readTriageContext } from './memory';
+import { getRecentMeetingsForBrief } from './meetings';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -38,6 +39,9 @@ PENDING DECISIONS
 
 CALENDAR
 - Today and Tomorrow events. Skip entire section if no events in next 2 days.
+
+MEETINGS
+- Recent meetings/captures (last 48h). Format: "Meetings (last 48h): Title (date), Title2 (date)". Skip entirely if no recent meetings.
 
 WAITING-ON-YOU
 - Tasks that are blocked on Zaal's decision/action. Highest interrupt priority. One per line, sorted by due date. Skip entirely if none.
@@ -86,6 +90,7 @@ interface BriefContext {
   upcomingEvents: Array<{ title: string; start: string; location?: string }>;
   pendingDecisions: string | null;
   todayTomorrowEvents: string | null;
+  recentMeetings: string | null;
   triageContext: string; // Formatted triage summary (grouped by bucket)
 }
 
@@ -298,6 +303,14 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     triageContext = '';
   }
 
+  // Recent meetings — last 48 hours from the meetings index. Best-effort.
+  let recentMeetings: string | null = null;
+  try {
+    recentMeetings = getRecentMeetingsForBrief(repoDir, 48);
+  } catch {
+    recentMeetings = null;
+  }
+
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
@@ -312,6 +325,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     upcomingEvents,
     pendingDecisions,
     todayTomorrowEvents,
+    recentMeetings,
     triageContext,
   };
 }
@@ -334,6 +348,10 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
     ? `CALENDAR:\n${ctx.todayTomorrowEvents}`
     : 'CALENDAR: (no events today/tomorrow - skip the CALENDAR section)';
 
+  const meetingsLine = ctx.recentMeetings
+    ? `MEETINGS: ${ctx.recentMeetings}`
+    : 'MEETINGS: (no recent meetings - skip the MEETINGS section)';
+
   const triageLine = ctx.triageContext
     ? `INBOX TRIAGE:\n${ctx.triageContext}`
     : 'INBOX TRIAGE: (none - skip the INBOX TRIAGE section)';
@@ -343,6 +361,7 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
 CONTEXT:
 - Pending decisions (PRs, blocked/review tasks): ${pendingDecisionsLine}
 - Calendar (today + tomorrow): ${calendarLine}
+- ${meetingsLine}
 - Open tasks: ${JSON.stringify(ctx.open_tasks, null, 2)}
 - Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}

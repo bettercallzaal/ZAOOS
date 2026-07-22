@@ -62,8 +62,12 @@ function getCalendarUrl(): string | null {
 
   // Default to ZAO Luma public ICS feed.
   // luma.com/zao has cal id cal-jPH4al7AMlXzdNN.
-  // The public ICS endpoint is: https://lu.ma/event/cal-<ID>/ics
-  return 'https://lu.ma/event/cal-jPH4al7AMlXzdNN/ics';
+  // The public ICS endpoint is the Luma ICS API:
+  //   https://api.lu.ma/ics/get?entity=calendar&id=cal-<ID>
+  // (the old https://lu.ma/event/cal-<ID>/ics path now 404s - returns the SPA
+  // HTML shell, which failed the VCALENDAR check and left the brief with no
+  // calendar section. Verified 2026-07-22: api.lu.ma returns BEGIN:VCALENDAR.)
+  return 'https://api.lu.ma/ics/get?entity=calendar&id=cal-jPH4al7AMlXzdNN';
 }
 
 /**

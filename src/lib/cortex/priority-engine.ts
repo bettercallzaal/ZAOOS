@@ -56,8 +56,14 @@ function scoreBlockingOthers(goal: Goal, edges: WorkDependencyEdge[], allGoals: 
 
   if (dependents.length === 0) return 0;
 
-  // Count how many are active (ready or in_progress)
-  const activeCount = dependents.filter((g) => g.status === 'ready' || g.status === 'in_progress').length;
+  // Count how many dependents are actively waiting on this task: 'ready' or
+  // 'in_progress' (want to start / are running) OR 'blocked' (a task in the
+  // 'blocked' state downstream of a 'blocks' edge is blocked BY this one, so it
+  // is precisely what this task is holding up). Only 'backlog'/'completed'/
+  // 'cancelled' dependents do not count as actively blocked.
+  const activeCount = dependents.filter(
+    (g) => g.status === 'ready' || g.status === 'in_progress' || g.status === 'blocked',
+  ).length;
 
   if (activeCount >= 3) return 0.9;
   if (activeCount >= 1) return 0.6;

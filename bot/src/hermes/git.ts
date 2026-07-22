@@ -214,6 +214,66 @@ export async function commitAndPush(
 
   const push = await runCmd('git', ['push', '-u', 'origin', branchName], workdir);
   if (push.exitCode !== 0) throw new Error(`git push failed: ${push.stderr.slice(0, 400)}`);
+
+  // Post-action assertion: a 0 exit code from `git push` does NOT guarantee the
+  // ref actually landed on origin (a push hook, proxy, or branch-protection rule
+  // can reject/rewrite the ref while the local command still reports success).
+  // Re-read reality via ls-remote before returning - otherwise the caller opens a
+  // PR against a branch that is not there and fails cryptically downstream.
+  const head = await runCmd('git', ['rev-parse', 'HEAD'], workdir);
+  const expectedSha = head.exitCode === 0 ? head.stdout.trim() : undefined;
+  await verifyRemoteBranch(workdir, branchName, expectedSha);
+}
+
+/**
+ * Pure assertion over `git ls-remote --heads origin <branch>` output. Confirms
+ * the branch is present on origin and (when expectedSha is given) that its tip
+ * matches the commit we pushed. Split out from verifyRemoteBranch so it is
+ * unit-testable without a real git remote.
+ * @throws if the branch is absent, or present at a different sha.
+ */
+export function assertRemoteBranchPresent(
+  lsRemoteStdout: string,
+  branch: string,
+  expectedSha?: string,
+): string {
+  const line = lsRemoteStdout
+    .trim()
+    .split('\n')
+    .find((l) => l.trimEnd().endsWith(`refs/heads/${branch}`));
+  if (!line) {
+    throw new Error(
+      `post-push verify FAILED: branch '${branch}' is not on origin after a push that reported success. ` +
+        `The push exit code was misleading - a push hook, proxy, or branch-protection rule likely rejected the ref. ` +
+        `Aborting before a PR is opened against a non-existent branch.`,
+    );
+  }
+  const remoteSha = line.split(/\s+/)[0] ?? '';
+  if (expectedSha && remoteSha !== expectedSha) {
+    throw new Error(
+      `post-push verify FAILED: origin/${branch} is at ${remoteSha.slice(0, 8)} but the commit we just pushed is ${expectedSha.slice(0, 8)}. ` +
+        `The remote ref does not match local HEAD - do not open a PR against a diverged branch.`,
+    );
+  }
+  return remoteSha;
+}
+
+/**
+ * Post-action assertion for a push: re-read origin via ls-remote and confirm the
+ * branch (optionally at expectedSha) actually landed. See assertRemoteBranchPresent.
+ */
+export async function verifyRemoteBranch(
+  workdir: string,
+  branch: string,
+  expectedSha?: string,
+): Promise<string> {
+  const ls = await runCmd('git', ['ls-remote', '--heads', 'origin', branch], workdir);
+  if (ls.exitCode !== 0) {
+    throw new Error(
+      `post-push verify failed: git ls-remote errored for '${branch}': ${ls.stderr.slice(0, 300)}`,
+    );
+  }
+  return assertRemoteBranchPresent(ls.stdout, branch, expectedSha);
 }
 
 export async function diffAgainstMain(workdir: string): Promise<string> {

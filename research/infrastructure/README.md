@@ -79,6 +79,7 @@
 | 1773 | [Building Streamer Tools for Web3 Music Communities](./1773-streamer-tools-web3-music/) | GUIDE | Evaluates overlay tooling (Overlayr, chat-overlay), multistreaming (Restreamer vs Restream SaaS), web3 tipping (Tip Jar Frames on Base), and forkable OSS repos. Recommends MVP: Farcaster chat overlay + tip button in OBS. Two key forkable repos: bensblueprints/overlayr (MIT) and phessophissy/tip-jar-frames (MIT). |
 | 1780 | [Building Stream Bots + Overlay Widgets for ZAO](./1780-stream-bots-streamelements-serybot/) | GUIDE | Hands-on build guide for StreamElements custom overlay widgets (HTML/CSS/JS) + sery.bot research. Maps 6 widget ideas to ZAO use cases (WaveWarZ battle overlay, Respect ticker, /zao chat display). Lean first bot: Now Playing + Battle Status widget. Includes API integration spec, field config, deployment checklist, and self-hosting alternative. |
 
+| 1410 | [Agent Control Plane: Two-Plane OS Machine Execution](./1410-agent-control-plane-two-plane-os/) | DECISION | Implement our half of Brandon's DreamNet two-plane OS: the Supabase control plane (agent_runs + receipts tables), TypeScript types (AssignmentEnvelope, RunStatus), and pure helpers. Locks three ZAO adjustments: human plane = Telegram+cowork (not Slack), execution = Supabase (not Linear), research canon = git docs (not Notion). Gated: migration apply, n8n bridge wire, ZOE routing (doc 1411). |
 
 
 

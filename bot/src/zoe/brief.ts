@@ -15,7 +15,7 @@
  *   - list
  *   portal.zaoos.com/todos - brain dump
  */
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { listOpenTasks } from './tasks';
 import { getOpenTeamTasks, summarizeTeamForBrief, zaalFocusForBrief } from './team-tracker';
 import { fleetConsensus } from './fleet-health';
@@ -375,7 +375,7 @@ CONTEXT:
 
 Output the brief now in the exact format from your system prompt.`;
 
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model: opts.model ?? 'sonnet',
     prompt: userPrompt,
     cwd: opts.repoDir,

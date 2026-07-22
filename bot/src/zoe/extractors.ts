@@ -16,7 +16,7 @@ import { createHash } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { remember, bonfireConfigured } from './recall';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
@@ -172,7 +172,7 @@ async function runExtractor(
   today: string,
   cwd: string,
 ): Promise<Candidate[]> {
-  const res = await callClaudeCli({
+  const res = await callClaudeCliCapAware({
     model: 'haiku',
     prompt: message,
     cwd,

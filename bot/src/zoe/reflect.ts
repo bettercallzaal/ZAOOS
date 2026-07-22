@@ -9,7 +9,7 @@
  * Zaal replies free-form. The next concierge turn parses the answers and
  * captures them as Bonfire-eligible notes (status + priorities update).
  */
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { recordCall } from './cost-ledger';
 import { listOpenTasks } from './tasks';
 import { listLiveThreads, isOverdue, type OpenThread } from './threads';
@@ -117,7 +117,7 @@ ${
     : '\nOutput the reflection prompt in the exact format from your system prompt. Reference 1-2 specifics from today.'
 }`;
 
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model: opts.model ?? 'haiku',
     prompt: userPrompt,
     cwd: opts.repoDir,

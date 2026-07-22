@@ -1,9 +1,9 @@
 import {
-  callClaudeCli,
   HERMES_CRITIC_FAST_MODEL,
   HERMES_CRITIC_MODEL,
   HERMES_ROUTING_ENABLED,
 } from './claude-cli';
+import { callClaudeCliCapAware } from '../zoe/models/cli-cap-aware';
 import { runCmd } from './git';
 import { classifyDiffComplexity, type CritiqueInput, type CritiqueOutput } from './types';
 
@@ -98,7 +98,7 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
   ].join('\n');
 
   const criticModel = selectCriticModel(diff, input.filesChanged);
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model: criticModel,
     prompt: userPrompt,
     cwd: input.workTreePath,

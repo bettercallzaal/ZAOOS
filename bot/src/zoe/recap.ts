@@ -16,7 +16,7 @@
  *   RESEARCH DOCS
  *   - list
  */
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { execSync } from 'node:child_process';
 
 const RECAP_SYSTEM_PROMPT = `You are ZOE writing Zaal's nightly recap at 9pm EST.
@@ -124,7 +124,7 @@ CONTEXT:
 
 Output the recap now in the exact format from your system prompt.`;
 
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model: opts.model ?? 'sonnet',
     prompt: userPrompt,
     cwd: opts.repoDir,

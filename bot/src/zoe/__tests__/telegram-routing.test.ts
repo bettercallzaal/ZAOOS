@@ -85,11 +85,17 @@ describe('telegram-routing', () => {
 
       await sendToZaal(deps, text, { kind: 'status' });
 
-      // Verify each chunk ends with a complete word (no mid-word splits)
+      // Verify no word was split across chunks: every whitespace-separated token
+      // in every chunk is the COMPLETE word. (chunkLongMessage trims trailing
+      // whitespace, so a chunk ends with a whole word, not a space - the old
+      // assertion checked for a trailing space that trimEnd() always removes,
+      // so it could never pass.)
       for (const call of sendMessageMock.mock.calls) {
-        const message = call[1].replace(/^\(\d+\/\d+\) /, ''); // Remove prefix
-        // Should end with word boundary or whitespace, not mid-word
-        expect(message).toMatch(/(\s|^)$/);
+        const message = call[1].replace(/^\(\d+\/\d+\) /, ''); // Remove chunk prefix
+        const tokens = message.trim().split(/\s+/).filter(Boolean);
+        for (const token of tokens) {
+          expect(token).toBe(longWord);
+        }
       }
     });
 

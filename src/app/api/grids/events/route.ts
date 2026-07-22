@@ -18,10 +18,7 @@ const querySchema = z.object({
     .enum(['concert', 'battle', 'stream', 'submission', 'other'])
     .optional(),
   window: z.enum(['upcoming', 'past']).optional(),
-  limit: z
-    .string()
-    .optional()
-    .pipe(z.coerce.number().int().positive().max(500).catch(50)),
+  limit: z.coerce.number().int().positive().max(500).catch(50),
 });
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

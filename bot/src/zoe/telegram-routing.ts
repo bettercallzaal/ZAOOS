@@ -44,7 +44,7 @@ function chunkLongMessage(text: string, max = TELEGRAM_MAX): string[] {
   return chunks;
 }
 
-export type MessageKind = 'question' | 'status';
+export type MessageKind = 'question' | 'status' | 'whisper';
 
 export interface SendToZaalOptions {
   kind?: MessageKind; // defaults to 'status'
@@ -70,6 +70,9 @@ export interface TelegramRoutingDeps {
  * reply_markup is applied only to the first chunk.
  *
  * kind='question': DM Zaal directly (personal chat). These need his answer/decision.
+ * kind='whisper':  DM Zaal directly, but no answer required - a private
+ *   notification (approval prompts, private alerts). Keeps it out of the group
+ *   so the ZAALBOTS group stays status-only; only Zaal sees it.
  * kind='status': ZAALBOTS group (+ thread if configured). Informational.
  *
  * Fallback: if groupId is not set, all messages go to Zaal's DM to avoid
@@ -83,8 +86,11 @@ export async function sendToZaal(
   const kind = opts.kind ?? 'status';
   const chunks = chunkLongMessage(text);
 
-  // Determine target chat id based on message kind
-  const targetChatId = kind === 'question' ? deps.zaalId : (deps.groupId ?? deps.zaalId);
+  // Determine target chat id based on message kind. Questions AND whispers both
+  // go to Zaal's DM (questions need a reply, whispers are private notifications);
+  // only status goes to the group.
+  const targetChatId =
+    kind === 'question' || kind === 'whisper' ? deps.zaalId : (deps.groupId ?? deps.zaalId);
 
   // For status messages, also use group thread id if configured
   const messageOpts = (chatId: number) => {

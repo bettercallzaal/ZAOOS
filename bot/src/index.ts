@@ -29,6 +29,7 @@ import {
   cmdCoordinators,
   cmdCharter,
 } from './circles';
+import { cmdBoard } from './miniapp';
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -528,6 +529,10 @@ bot.command('coordinators', async (ctx) => {
 bot.command('charter', async (ctx) => {
   const slug = (ctx.match ?? '').trim();
   await cmdCharter(ctx, slug || undefined);
+});
+
+bot.command('board', async (ctx) => {
+  await cmdBoard(ctx);
 });
 
 // ---- Free-text + @mention handler ------------------------------------------

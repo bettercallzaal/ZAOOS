@@ -6,16 +6,36 @@ import { emitReceipt, emitReceiptBatch } from '../receipts';
  * Does NOT test actual database I/O (db() is mocked).
  */
 
-// Mock the supabase module
-vi.mock('../../supabase', () => ({
-  db: vi.fn(() => ({
-    from: vi.fn((table: string) => ({
-      insert: vi.fn((payload: unknown) => ({
-        select: vi.fn(() => Promise.resolve({ data: payload, error: null })),
+// Mock the supabase module. The builder is:
+//  - awaitable (then)                 -> resolves to { data: <insert payload>, error: null }
+//  - chainable .select().single()     -> resolves to { data: { id }, error: null }  (adhoc agent_run)
+//  - chainable .select() then awaited -> resolves to { data: <insert payload>, error: null } (batch)
+interface MockResult {
+  data: unknown;
+  error: null;
+}
+interface MockBuilder {
+  select: () => MockBuilder;
+  single: () => Promise<MockResult>;
+  then: (resolve: (v: MockResult) => void) => void;
+}
+vi.mock('../../supabase', () => {
+  const makeBuilder = (payload: unknown): MockBuilder => {
+    const builder: MockBuilder = {
+      select: () => builder,
+      single: () => Promise.resolve({ data: { id: 'adhoc-run-id' }, error: null }),
+      then: (resolve) => resolve({ data: payload, error: null }),
+    };
+    return builder;
+  };
+  return {
+    db: vi.fn(() => ({
+      from: vi.fn(() => ({
+        insert: vi.fn((payload: unknown) => makeBuilder(payload)),
       })),
     })),
-  })),
-}));
+  };
+});
 
 describe('emitReceipt', () => {
   it('should emit a receipt with all fields populated', async () => {

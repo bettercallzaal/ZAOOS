@@ -12,7 +12,42 @@
  * No database calls from this file - all I/O is via db() imported caller-side.
  */
 
+import { randomUUID } from 'node:crypto';
 import { db } from '../supabase';
+
+/**
+ * Resolve a run_id for a receipt. receipts.run_id is NOT NULL with an FK to
+ * agent_runs, so a receipt cannot exist without a run. When the caller has no
+ * run context, create a minimal "adhoc" agent_run so the action is still
+ * recorded and auditable - otherwise the insert silently fails the constraint
+ * and the receipt is lost. Returns null only if even the run insert fails
+ * (then the receipt is dropped, best-effort).
+ */
+async function resolveRunId(
+  client: ReturnType<typeof db>,
+  input: { runId?: string | null; action: string; agentIdentity: string },
+): Promise<string | null> {
+  if (input.runId) return input.runId;
+  const assignmentId = randomUUID();
+  const { data, error } = await client
+    .from('agent_runs')
+    .insert([
+      {
+        assignment_id: assignmentId,
+        objective: `adhoc: ${input.action}`.slice(0, 500),
+        idempotency_key: `adhoc-${assignmentId}`,
+        created_by: input.agentIdentity,
+        status: 'completed',
+      },
+    ])
+    .select('id')
+    .single();
+  if (error || !data) {
+    console.error('[zoe/receipts] adhoc agent_run insert failed:', error?.message || error);
+    return null;
+  }
+  return (data as { id: string }).id;
+}
 
 export interface ReceiptInput {
   /** FK to agent_runs.id. Optional in v1 for adhoc receipts; if null, create a lightweight run. */
@@ -63,12 +98,12 @@ export async function emitReceipt(input: ReceiptInput): Promise<boolean> {
   try {
     const client = db();
 
-    // If runId is not provided, v1 accepts null per the schema NOT NULL FK constraint check.
-    // If the schema requires a run to exist, create a lightweight one or make runId mandatory.
-    // For now, this handler respects whatever runId is passed (null or a real UUID).
+    // receipts.run_id is NOT NULL + FK: resolve (or create) a run before inserting.
+    const runId = await resolveRunId(client, input);
+    if (!runId) return false;
 
     const payload = {
-      run_id: input.runId ?? null,
+      run_id: runId,
       agent_identity: input.agentIdentity,
       capability: input.capability,
       tool: input.tool,
@@ -106,17 +141,24 @@ export async function emitReceiptBatch(inputs: ReceiptInput[]): Promise<number> 
 
   try {
     const client = db();
-    const payloads = inputs.map((input) => ({
-      run_id: input.runId ?? null,
-      agent_identity: input.agentIdentity,
-      capability: input.capability,
-      tool: input.tool,
-      action: input.action,
-      input_digest: input.inputDigest ?? null,
-      result_type: input.resultType,
-      approval_class: input.approvalClass ?? 'auto',
-      evidence_url: input.evidenceUrl ?? null,
-    }));
+    // Resolve (or create) a run_id per receipt - run_id is NOT NULL + FK.
+    const resolved = await Promise.all(
+      inputs.map(async (input) => ({ input, runId: await resolveRunId(client, input) })),
+    );
+    const payloads = resolved
+      .filter((r) => r.runId !== null)
+      .map(({ input, runId }) => ({
+        run_id: runId,
+        agent_identity: input.agentIdentity,
+        capability: input.capability,
+        tool: input.tool,
+        action: input.action,
+        input_digest: input.inputDigest ?? null,
+        result_type: input.resultType,
+        approval_class: input.approvalClass ?? 'auto',
+        evidence_url: input.evidenceUrl ?? null,
+      }));
+    if (payloads.length === 0) return 0;
 
     const { data, error } = await client.from('receipts').insert(payloads).select('id');
 

@@ -180,4 +180,45 @@ describe('telegram-routing', () => {
       });
     });
   });
+
+  describe('sendToZaal routing by kind', () => {
+    const makeDeps = (mock: ReturnType<typeof vi.fn>): TelegramRoutingDeps => ({
+      sendMessage: mock,
+      zaalId: 123,
+      groupId: 456,
+    });
+
+    it("routes kind='whisper' to Zaal's DM, never the group", async () => {
+      const mock = vi.fn();
+      await sendToZaal(makeDeps(mock), 'Approve PR #123?', { kind: 'whisper' });
+      expect(mock).toHaveBeenCalledWith(123, 'Approve PR #123?', {});
+      expect(mock).not.toHaveBeenCalledWith(456, expect.anything(), expect.anything());
+    });
+
+    it("routes kind='question' to Zaal's DM", async () => {
+      const mock = vi.fn();
+      await sendToZaal(makeDeps(mock), 'Which option?', { kind: 'question' });
+      expect(mock).toHaveBeenCalledWith(123, 'Which option?', {});
+    });
+
+    it("routes kind='status' to the group", async () => {
+      const mock = vi.fn();
+      await sendToZaal(makeDeps(mock), 'FYI deploy done', { kind: 'status' });
+      expect(mock).toHaveBeenCalledWith(456, 'FYI deploy done', {});
+    });
+
+    it('passes reply_markup through on a whisper (approval buttons stay private)', async () => {
+      const mock = vi.fn();
+      const markup = { inline_keyboard: [[{ text: 'Approve', callback_data: 'ok' }]] };
+      await sendToZaal(makeDeps(mock), 'Approve?', { kind: 'whisper', replyMarkup: markup });
+      expect(mock).toHaveBeenCalledWith(123, 'Approve?', { reply_markup: markup });
+    });
+
+    it('whispers fall back to the DM even when no group is configured', async () => {
+      const mock = vi.fn();
+      const deps: TelegramRoutingDeps = { sendMessage: mock, zaalId: 123 };
+      await sendToZaal(deps, 'private note', { kind: 'whisper' });
+      expect(mock).toHaveBeenCalledWith(123, 'private note', {});
+    });
+  });
 });

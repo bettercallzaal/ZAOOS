@@ -1,4 +1,4 @@
-import { runCmd } from './git';
+import { runCmd, verifyRemoteBranch } from './git';
 
 export interface OpenedPR {
   number: number;
@@ -27,6 +27,11 @@ export async function openPullRequest(opts: {
   // Belt-and-suspenders: re-push to make sure remote is in sync before gh runs.
   // If the branch tip already matches, this is a no-op.
   await runCmd('git', ['push', '-u', 'origin', opts.branchName], opts.workdir);
+
+  // Post-action assertion: confirm the ref is actually on origin before gh opens
+  // a PR against it. gh's own remote-state detection is flaky (see the note
+  // above), so assert reality via ls-remote rather than trust the push exit code.
+  await verifyRemoteBranch(opts.workdir, opts.branchName);
 
   const r = await runCmd(
     'gh',

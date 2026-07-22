@@ -2,7 +2,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const mockRunCmd = vi.hoisted(() => vi.fn());
-vi.mock('../git', () => ({ runCmd: mockRunCmd }));
+// verifyRemoteBranch is the post-push assertion; default it to a no-op success.
+// It is NOT a runCmd, so the mockRunCmd call ordering below (push=#1, gh=#2) is
+// unchanged by its presence.
+const mockVerify = vi.hoisted(() => vi.fn());
+vi.mock('../git', () => ({ runCmd: mockRunCmd, verifyRemoteBranch: mockVerify }));
 
 import { openPullRequest } from '../pr';
 

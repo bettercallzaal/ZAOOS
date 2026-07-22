@@ -1060,6 +1060,36 @@ bot.command('list', async (ctx) => {
 });
 
 
+// Auto-allowlist: when someone is added to a CONFIGURED group, add them to that
+// group's member_allowlist so they can talk to ZOE. Without this, a new member
+// is silently ignored by shouldRespond (sender not in allowlist) - so "add a
+// person to the chat" would not work. Only fires for groups ZOE already knows
+// (getGroupConfig != null), never for random chats; bots are skipped.
+bot.on('message:new_chat_members', async (ctx) => {
+  const chatId = ctx.chat?.id;
+  if (chatId === undefined) return;
+  const cfg = await getGroupConfig(chatId);
+  if (!cfg) return;
+  const added: string[] = [];
+  for (const member of ctx.message?.new_chat_members ?? []) {
+    if (member.is_bot) continue;
+    try {
+      await addAllowlistMember(chatId, member.id);
+      added.push(member.first_name || String(member.id));
+    } catch (err) {
+      console.error('[zoe] auto-allowlist failed for', member.id, err);
+    }
+  }
+  if (added.length > 0) {
+    console.log(`[zoe] auto-allowlisted ${added.length} new member(s) in ${cfg.chat_title}: ${added.join(', ')}`);
+    const threadId = ctx.message?.message_thread_id;
+    await ctx
+      .reply(`Welcome ${added.join(', ')} - you can talk to me right here.`, threadId ? { message_thread_id: threadId } : {})
+      .catch(() => undefined);
+  }
+});
+
+
 bot.on('message:text', async (ctx) => {
   const text = ctx.message.text;
   if (text.startsWith('/')) return; // commands handled above

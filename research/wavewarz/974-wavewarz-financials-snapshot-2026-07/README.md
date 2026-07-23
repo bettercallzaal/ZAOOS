@@ -2,7 +2,7 @@
 topic: wavewarz
 type: market-research
 status: research-complete
-last-validated: 2026-07-17
+last-validated: 2026-07-23
 related-docs: 743, 968
 original-query: "WaveWarZ financials - consolidate the current on-chain volume, battle count, artist payouts, platform revenue, and sponsorship state into one snapshot (reconstructed)"
 tier: STANDARD
@@ -14,28 +14,30 @@ tier: STANDARD
 
 ## Headline
 
-**Live-reconciled 2026-07-17** (updated from Jul 16 baseline). The figures below are pulled directly from `wavewarz.info/api/public/stats` (public API, no auth, 60 s cache), which is the canonical source for self-reported WaveWarZ stats. The prior discrepancies (Intelligence vs testimonial) are explained and resolved below.
+**Live-reconciled 2026-07-23** (refreshed from Jul 17; major movement due to AI Artist Tournament Jul 16–23). The figures below are pulled directly from `wavewarz.info/api/public/stats` (public API, no auth, 60 s cache), which is the canonical source for self-reported WaveWarZ stats.
 
-The one hard tension that survives: **the platform has taken ~1.93x what artists have earned in aggregate**, largely via launch/queue fees. For a product whose pitch is "the artist earns," that ratio is the single thing to watch. It has widened slightly from the July 6 estimate (~1.8x).
+**Key shift (Jul 23):** The platform:artist ratio improved from **1.92× → 1.49×** — AI tournament volume drove artist payouts up 47% (+4.32 SOL) while platform revenue grew only 15% (+2.55 SOL). This is the first documented ratio improvement since Jul 6. Trader claims tripled (127 → 381 SOL) in 6 days — the AI tournament redistributed significant value to traders.
 
 ---
 
-## Reconciled figures (updated pull 2026-07-17, SOL at $75.29)
+## Reconciled figures (updated pull 2026-07-23, SOL at $77.49)
 
-| Metric | Live figure | USD equiv | Prior (Jul 6) | Delta |
+| Metric | Live figure (Jul 23) | USD equiv | Prior (Jul 17) | Delta |
 |---|---|---|---|---|
-| Total volume | **524.15 SOL** | ~$39,453 | ~491 SOL | +33 SOL |
-| Total battles | **1,245** | — | ~1,125 | +120 |
-| Quick battles | 1,047 | — | — | — |
-| Main-event battles | 162 (across 50 events) | — | — | — |
-| Community battles | 36 | — | — | — |
-| Artist payouts | **9.07 SOL** | ~$683 | ~8.7 SOL | +0.37 SOL |
-| Platform revenue | **17.44 SOL** | ~$1,314 | ~15.9 SOL | +1.54 SOL |
-| Trader claims (manual) | **127.34 SOL** | ~$9,580 | (not tracked) | — |
+| Total volume | **878.316 SOL** | ~$68,061 | 524.15 SOL | +354.17 SOL |
+| Total battles | **1,285** | — | 1,245 | +40 |
+| Quick battles | 1,084 | — | 1,047 | +37 |
+| Main-event battles | 165 (across 51 events) | — | 162 (50 events) | +3 |
+| Community battles | 36 | — | 36 | — |
+| Artist payouts | **13.3918 SOL** | ~$1,038 | 9.07 SOL | +4.32 SOL |
+| Platform revenue | **19.9867 SOL** | ~$1,549 | 17.44 SOL | +2.55 SOL |
+| Trader claims | **381.197 SOL** | ~$29,540 | 127.34 SOL | +253.86 SOL |
+| Withdrawal count | **1,526** | — | (not tracked) | — |
+| Last 7-day volume | **356.621 SOL** | ~$27,622 | — | AI tournament week |
 
-**Platform vs artist ratio:** 17.44 ÷ 9.07 = **1.92×** (platform captures ~1.92x what artists have earned, up from ~1.8× on Jul 6).
+**Platform vs artist ratio:** 19.99 ÷ 13.39 = **1.49×** (platform captures ~1.49× what artists have earned, down from 1.92× on Jul 17 — ratio improving as volume scales).
 
-Source: `GET https://wavewarz.info/api/public/stats`, live pull 2026-07-17.
+Source: `GET https://wavewarz.info/api/public/stats`, live pull 2026-07-23T10:08Z.
 
 ---
 
@@ -49,15 +51,17 @@ Source: `GET https://wavewarz.info/api/public/stats`, live pull 2026-07-17.
 
 ---
 
-## The ratio (load-bearing finding, updated)
+## The ratio (load-bearing finding, updated Jul 23)
 
-Platform: **17.44 SOL** cumulative revenue.
-Artists: **9.07 SOL** cumulative payouts.
-Ratio: **1.92× in platform's favor**, up slightly from the ~1.8× on July 6.
+Platform: **19.9867 SOL** cumulative revenue.
+Artists: **13.3918 SOL** cumulative payouts.
+Ratio: **1.49× in platform's favor**, improved from 1.92× on Jul 17.
 
-Why: the 0.5% per-trade platform fee + 3% of every losing pool at settlement + launch/queue fees. The launch and queue fees are the structural driver — they accrue at battle creation, before any trading. Until the artist-side fees (1% of volume per side, plus the 5%/2% settlement split) compound on higher volumes, the platform ratio will likely stay above 1.5× at current scale.
+**Why the ratio improved:** The AI Artist Tournament (Jul 16–23) drove 354+ SOL in battle volume in a single week. At high volume, the artist-side fees (5%/2% settlement split applied to large pools) compound significantly — GEEK MYTH and LUI each took meaningful payouts from ~342 SOL in the semifinal alone. Meanwhile, platform revenue (0.5% per trade + 3% of losing pool) grew at its normal rate. The tournament showed that volume shocks benefit artists faster than the platform.
 
-What this means: the "artists earn" narrative is real but still early-stage. At 524 SOL of lifetime volume and ~9 SOL of lifetime artist payouts, the platform has paid out ~1.73% of volume to artists. The structural mechanism works; the absolute scale is small.
+**What this means at Jul 23:** The "artists earn" narrative is strengthening. At 878 SOL of lifetime volume and 13.39 SOL in artist payouts, the platform has paid out ~1.52% of volume to artists (down from 1.73% on Jul 17 — the AI tournament was a volume spike that temporarily compressed the percentage, but the absolute amounts increased sharply). The structural mechanism works and is scaling. Traders have claimed 381 SOL — the trader incentive is clearly working too.
+
+**Watch for:** Whether the post-tournament ratio holds above or below 1.5× as the platform returns to normal volume. If the ratio stays below 1.5×, it will become a credible "artists earn fairly" narrative anchor.
 
 ---
 

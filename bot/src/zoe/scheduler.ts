@@ -33,6 +33,7 @@ import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
+import { runRepoImproverTick } from './repo-improver-io';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
@@ -640,6 +641,25 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.error('[zoe/scheduler] error-remediation tick failed:', (err as Error).message);
         }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Repo-improver scout - every 3h, audit the next ZAO repo with a CHEAP
+  // OpenRouter model (off the Claude cap), then ZOE reviews each proposed
+  // finding with its own judgment, logs the decision (learning trail), and
+  // routes approved fixes through the Hermes pipeline. Human gate stays only at
+  // PR merge. Gated on the OpenRouter key + the group + the cost hard-stop.
+  tasks.push(
+    cron.schedule(
+      '30 */3 * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        if (!gid) return; // not configured
+        if (!process.env.OPENROUTER_API_KEY?.trim()) return; // scout needs the cheap model
+        if (shouldPauseAutonomousWork()) return; // cost hard-stop
+        await runRepoImproverTick((text: string) => opts.bot.api.sendMessage(gid, text).then(() => {}));
       },
       { timezone: 'UTC' },
     ),

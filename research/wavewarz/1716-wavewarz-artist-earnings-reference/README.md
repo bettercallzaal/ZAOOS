@@ -66,12 +66,13 @@ Losing artist earns:  winning_pool × 10%
 | Lui | 30.0 SOL | Multiple MAIN + Quick | Tier 1 — ZAOstock candidate |
 | Cannon Jones | 15.5 SOL | MAIN + Quick | Tier 2 — strong earner |
 
-**Total to all artists (platform-wide):** 9.0988 SOL as of Jul 2026
-- 1,245 battles total
-- **Average per battle: ~0.0073 SOL to artists** (includes small quick battles dragging average down)
+**Total to all artists (platform-wide):** 13.3918 SOL as of Jul 23, 2026
+- 1,285 battles total
+- **Average per battle: ~0.0104 SOL to artists** (includes small quick battles dragging average down)
 - MAIN battles: significantly higher average payouts per artist
+- AI Artist Tournament (Jul 16–23): added ~4.3 SOL in artist payouts in one week
 
-Note: Individual artist totals above reflect cumulative earnings across all battles. Platform total (9.09 SOL) reflects all artists combined.
+Note: Individual artist totals above reflect cumulative earnings across all battles. Platform total (13.39 SOL) reflects all artists combined. Milestone crossed: 10 SOL to artists (Jul 23, 2026).
 
 ---
 
@@ -80,15 +81,15 @@ Note: Individual artist totals above reflect cumulative earnings across all batt
 For press pitches and artist conversations: how does a WaveWarZ payout compare to Spotify?
 
 **Spotify royalty rate (2026):** $0.003–$0.005 per stream (major DSP average)
-**SOL price reference:** ~$200 per SOL (Jul 2026 — verify current price)
+**SOL price reference:** ~$77.49 per SOL (Jul 23, 2026 — verify current price before citing)
 
-| SOL Earned | USD Value | Spotify Equivalent |
-|-----------|-----------|-------------------|
-| 0.1 SOL | $20 | 4,000–6,700 streams |
-| 0.5 SOL | $100 | 20,000–33,000 streams |
-| 1.0 SOL | $200 | 40,000–66,000 streams |
-| 5.0 SOL | $1,000 | 200,000–333,000 streams |
-| 10.0 SOL | $2,000 | 400,000–667,000 streams |
+| SOL Earned | USD Value (at $77.49) | Spotify Equivalent |
+|-----------|----------------------|-------------------|
+| 0.1 SOL | $7.75 | 1,550–2,580 streams |
+| 0.5 SOL | $38.75 | 7,750–12,900 streams |
+| 1.0 SOL | $77.49 | 15,500–25,800 streams |
+| 5.0 SOL | $387.45 | 77,500–129,000 streams |
+| 10.0 SOL | $774.90 | 155,000–258,000 streams |
 
 **The key difference:** WaveWarZ payouts settle instantly, per battle, to the artist's wallet. Spotify royalties take 3-6 months to arrive via distributor.
 
@@ -159,7 +160,7 @@ To receive payouts in any WaveWarZ battle:
 
 Use these when recruiting artists for WaveWarZ or Africa Battle Week:
 
-1. "WaveWarZ has paid 9.09 SOL directly to artists as of July 2026 — including losing artists, automatically."
+1. "WaveWarZ has paid 13.39 SOL (~$1,038) directly to artists as of July 23, 2026 — including losing artists, automatically. In July 2026, the AI Artist Tournament added 4.3 SOL in a single week."
 2. "The top WaveWarZ artist (STILOWORLD) has earned 41.6 SOL in automatic battle payouts."
 3. "A mid-sized WaveWarZ MAIN battle pays both artists the equivalent of 40,000–100,000 Spotify streams."
 4. "Artist payouts arrive in your wallet within minutes of battle settlement — no claim, no label, no wait."

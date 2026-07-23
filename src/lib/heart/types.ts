@@ -5,7 +5,22 @@
  * Maps to agent_runs table structure for race-safe lease operations.
  */
 
-import type { RunStatus } from '@/lib/agents/control-plane';
+/**
+ * Agent run status: the complete lifecycle of a machine assignment.
+ */
+export type RunStatus =
+  | 'created'
+  | 'ready'
+  | 'leased'
+  | 'running'
+  | 'waiting_approval'
+  | 'blocked'
+  | 'verifying'
+  | 'recovering'
+  | 'completed'
+  | 'failed'
+  | 'cancelled'
+  | 'quarantined';
 
 /**
  * AgentRunRow: Database row as returned by Supabase.

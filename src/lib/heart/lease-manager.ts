@@ -9,9 +9,29 @@
  */
 
 import { z } from 'zod';
-import { getSupabaseAdmin } from '@/lib/db/supabase';
-import type { RunStatus } from '@/lib/agents/control-plane';
-import type { AgentRunRow, LeaseAcquisitionResult, ExpiredLeaseRecoverySummary } from './types';
+import type { RunStatus, AgentRunRow, LeaseAcquisitionResult, ExpiredLeaseRecoverySummary } from './types';
+
+// Import Supabase admin client for production use.
+// Tests use FakeAgentRunsStore and don't call these async functions.
+let _getSupabaseAdmin: ((
+
+) => any) | null = null;
+
+try {
+  // This import may fail in test contexts, which is fine - the tests don't use it.
+  _getSupabaseAdmin = require('@/lib/db/supabase').getSupabaseAdmin;
+} catch {
+  // Test context; async functions won't be called
+}
+
+function getSupabaseAdmin() {
+  if (!_getSupabaseAdmin) {
+    throw new Error(
+      'Supabase admin client not initialized. This should only happen in test contexts.',
+    );
+  }
+  return _getSupabaseAdmin();
+}
 
 /**
  * Input validation: acquire lease request

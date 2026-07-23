@@ -34,6 +34,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
+import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
@@ -103,6 +104,16 @@ export interface SchedulerOptions {
 
 export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   const tasks: ScheduledTask[] = [];
+
+  // Config preflight FIRST: report any capability that is missing its env, to
+  // the log and to Zaal. Silent degradation (a dead db() that every tick just
+  // logs past) is the failure mode this exists to kill. Fire-and-forget - a
+  // preflight problem must never stop the scheduler from starting.
+  void runPreflight(async (report: string) => {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const target = gid || opts.zaalTgId;
+    if (target) await opts.bot.api.sendMessage(target, report).then(() => {});
+  });
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
   // Cron: '0 9 * * *' → 09:00 UTC daily.

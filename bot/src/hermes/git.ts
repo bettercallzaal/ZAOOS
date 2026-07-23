@@ -88,6 +88,12 @@ const HERMES_REPO_PROFILES: Record<HermesRepoTarget, RepoProfile> = {
     defaultBranch: 'main',
     installSubdirs: [],
   },
+  zaocowork: {
+    target: 'zaocowork',
+    url: process.env.HERMES_ZAOCOWORK_REPO_URL ?? 'https://github.com/ZAODEVZ/ZAOcowork.git',
+    defaultBranch: 'main',
+    installSubdirs: [],
+  },
 };
 
 export function getRepoProfile(target: HermesRepoTarget): RepoProfile {

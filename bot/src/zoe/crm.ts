@@ -12,8 +12,12 @@
  * this path too:
  *   - C-H1: ZOE may NEVER publish. is_public is dropped and every interaction
  *     is written `private`. Publishing stays an admin-only action in /crm.
- *   - C-M2: a name-only contact is INSERTed with a uniquified slug, never
- *     upserted onto a slug a different person already owns.
+ *   - C-M2: dedup is by exact name against the real `contacts` table (which has
+ *     no slug column). An existing person is reused, never duplicated.
+ *
+ * 2026-07-22: retargeted from the non-existent crm_contacts/crm_interactions
+ * tables to the real `contacts` (951 rows) + `contact_log` tables - the prior
+ * writes silently failed the missing-table constraint.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -27,35 +31,32 @@ export interface CrmResult {
   error?: string;
 }
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/^@/, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64);
-}
-
-function deriveContactSlug(c: CrmOp['contact']): string {
-  return slugify(c.farcaster_handle || c.x_handle || c.github_handle || c.name);
-}
-
-/** A handle uniquely identifies a person; a bare name does not (C-M2). */
-function hasStableContactKey(c: CrmOp['contact']): boolean {
-  return Boolean(c.farcaster_handle || c.x_handle || c.github_handle);
-}
-
-/** Pick a free slug for a name-only contact: john-smith, john-smith-2, … (C-M2). */
-async function uniqueNameSlug(client: SupabaseClient, base: string): Promise<string> {
-  const { data } = await client.from('crm_contacts').select('slug').like('slug', `${base}%`);
-  const taken = new Set((data ?? []).map((r) => (r as { slug: string | null }).slug));
-  if (!taken.has(base)) return base;
-  for (let i = 2; i < 1000; i++) {
-    const candidate = `${base}-${i}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-  return `${base}-${Date.now()}`;
+/**
+ * Map a CrmOp contact to the `contacts` table columns. `contacts` is the single
+ * real CRM (951 rows, what zao-crm + the /crm page read) - NOT crm_contacts,
+ * which does not exist in this Supabase. It has no slug and no handle columns, so
+ * dedup is by name (see runCrmOps) and farcaster/x/github/telegram handles ride
+ * in `tags` (fc:/x:/gh:/tg: prefixes) where they stay queryable.
+ */
+function toContactRow(c: Omit<CrmOp['contact'], 'is_public'>): Record<string, unknown> {
+  const strip = (h: string): string => h.replace(/^@/, '');
+  const tags: string[] = [];
+  if (c.farcaster_handle) tags.push(`fc:${strip(c.farcaster_handle)}`);
+  if (c.x_handle) tags.push(`x:${strip(c.x_handle)}`);
+  if (c.github_handle) tags.push(`gh:${strip(c.github_handle)}`);
+  if (c.telegram_handle) tags.push(`tg:${strip(c.telegram_handle)}`);
+  return compact({
+    name: c.name,
+    role: c.role,
+    company: c.org,
+    where_met: c.how_we_met,
+    email: c.email,
+    origin: c.location,
+    bio: c.public_summary,
+    tags: tags.length > 0 ? tags : undefined,
+    source: 'zoe',
+    status: 'active',
+  });
 }
 
 function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
@@ -88,42 +89,46 @@ export async function runCrmOps(ops: CrmOp[], client?: SupabaseClient): Promise<
       const { is_public: _omitPublic, ...contactSafe } = op.contact;
       void _omitPublic;
 
-      const stableKey = hasStableContactKey(op.contact);
-      const baseSlug = deriveContactSlug(op.contact);
-      const slug = stableKey ? baseSlug : await uniqueNameSlug(supabase, baseSlug);
-      const contactRow = compact({ ...contactSafe, slug });
-
-      const contactQuery = stableKey
-        ? supabase.from('crm_contacts').upsert(contactRow, { onConflict: 'slug' })
-        : supabase.from('crm_contacts').insert(contactRow);
-
-      const { data: contact, error: contactErr } = await contactQuery
-        .select('id, slug')
-        .single();
-
-      if (contactErr || !contact) {
-        results.push({ op, status: 'failed', error: contactErr?.message ?? 'contact upsert failed' });
-        continue;
-      }
-      const contactId = (contact as { id: string }).id;
-
-      const { error: interactionErr } = await supabase
-        .from('crm_interactions')
-        .insert(
-          compact({
-            contact_id: contactId,
-            type: op.interaction.type ?? 'note',
-            title: op.interaction.title,
-            public_summary: op.interaction.public_summary,
-            private_notes: op.interaction.private_notes,
-            visibility: 'private', // C-H1: bot interactions are always private
-            occurred_at: op.interaction.occurred_at,
-            source: 'zoe',
-            created_by: 'zoe',
-          }),
-        )
+      // Dedup by exact name: `contacts` has no slug column. If the person is
+      // already in the CRM, reuse their row; otherwise insert a new one.
+      const name = op.contact.name;
+      const { data: found } = await supabase
+        .from('contacts')
         .select('id')
-        .single();
+        .eq('name', name)
+        .limit(1)
+        .maybeSingle();
+
+      let contactId: string;
+      if (found && (found as { id?: string }).id) {
+        contactId = (found as { id: string }).id;
+      } else {
+        const { data: contact, error: contactErr } = await supabase
+          .from('contacts')
+          .insert(toContactRow(contactSafe))
+          .select('id')
+          .single();
+        if (contactErr || !contact) {
+          results.push({ op, status: 'failed', error: contactErr?.message ?? 'contact insert failed' });
+          continue;
+        }
+        contactId = (contact as { id: string }).id;
+      }
+
+      // Interaction -> contact_log (the interactions table). C-H1: internal only,
+      // never public. contact_log has no visibility column, so it is not exposed.
+      const summary = [op.interaction.title, op.interaction.public_summary, op.interaction.private_notes]
+        .filter(Boolean)
+        .join(' - ');
+      const { error: interactionErr } = await supabase.from('contact_log').insert(
+        compact({
+          project: 'zaodevz',
+          contact: name,
+          channel: op.interaction.type ?? 'note',
+          summary: summary.length > 0 ? summary : undefined,
+          logged_at: op.interaction.occurred_at,
+        }),
+      );
 
       if (interactionErr) {
         results.push({ op, status: 'failed', contact_id: contactId, error: interactionErr.message });

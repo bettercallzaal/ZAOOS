@@ -69,3 +69,38 @@ export interface ExpiredLeaseRecoverySummary {
   /** Any errors encountered during reclaim */
   errors: Array<{ runId: string; error: string }>;
 }
+
+/**
+ * Instance liveness status. An instance heartbeats while alive; when its
+ * heartbeat goes stale it is declared dead and its leased runs are reclaimed
+ * PROACTIVELY (without waiting for each run's lease TTL to expire).
+ */
+export type InstanceStatus = 'alive' | 'draining' | 'dead';
+
+/**
+ * AgentInstanceRow: a registered worker process. lease_owner on agent_runs
+ * references instance_id here.
+ */
+export interface AgentInstanceRow {
+  instance_id: string;
+  hostname: string | null;
+  pid: number | null;
+  status: InstanceStatus;
+  started_at: string;
+  last_heartbeat: string;
+  metadata: Record<string, unknown> | null;
+}
+
+/**
+ * DeadInstanceReclaimSummary: results from reclaimDeadInstanceRuns.
+ */
+export interface DeadInstanceReclaimSummary {
+  /** Instance ids that were declared dead this cycle. */
+  deadInstanceIds: string[];
+  /** Number of runs reset to 'ready' because their owner was dead. */
+  reclaimedCount: number;
+  /** IDs of the runs that were reclaimed. */
+  reclaimedIds: string[];
+  /** Any errors encountered. */
+  errors: Array<{ id: string; error: string }>;
+}

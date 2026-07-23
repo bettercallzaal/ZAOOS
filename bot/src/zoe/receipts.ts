@@ -14,6 +14,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { db } from '../supabase';
+import { computeActionDigest } from './receipt-envelope';
 
 /**
  * Resolve a run_id for a receipt. receipts.run_id is NOT NULL with an FK to
@@ -108,7 +109,9 @@ export async function emitReceipt(input: ReceiptInput): Promise<boolean> {
       capability: input.capability,
       tool: input.tool,
       action: input.action,
-      input_digest: input.inputDigest ?? null,
+      // Default to a stable action-identity digest so replays are detectable
+      // on the existing column (DreamNet contentSha256 pattern, doc 2030).
+      input_digest: input.inputDigest ?? computeActionDigest(input, runId),
       result_type: input.resultType,
       approval_class: input.approvalClass ?? 'auto',
       evidence_url: input.evidenceUrl ?? null,
@@ -153,7 +156,7 @@ export async function emitReceiptBatch(inputs: ReceiptInput[]): Promise<number> 
         capability: input.capability,
         tool: input.tool,
         action: input.action,
-        input_digest: input.inputDigest ?? null,
+        input_digest: input.inputDigest ?? computeActionDigest(input, runId as string),
         result_type: input.resultType,
         approval_class: input.approvalClass ?? 'auto',
         evidence_url: input.evidenceUrl ?? null,

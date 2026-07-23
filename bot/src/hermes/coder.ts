@@ -26,6 +26,17 @@ function repoContextBlock(target: HermesRepoTarget): string {
       'No specific member counts (use "100+"). No crypto/web3/onchain in body copy. Sponsors pay money, partners give time.',
     ].join('\n');
   }
+  if (target === 'zaocowork') {
+    return [
+      '# Repo Context: zaocowork',
+      'You are working on the ZAODEVZ/ZAOcowork Next.js app - the cowork board at thezao.xyz/board.',
+      'Stack: Next.js App Router, React, Tailwind, Supabase. The board reads the cowork `tasks` table.',
+      'The board renders per `brand` query param (e.g. ?brand=ZAOstock). Brand-specific render paths',
+      'must tolerate tasks with null/optional fields - a single unguarded deref throws the whole page',
+      'into the error boundary. Prefer the smallest defensive guard/default over a broad refactor.',
+      'No emojis, no em dashes - use hyphens.',
+    ].join('\n');
+  }
   return [
     '# Repo Context: ZAO OS',
     'You are working on the bettercallzaal/ZAOOS monorepo (Farcaster-native social platform + bot).',

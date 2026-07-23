@@ -2,7 +2,7 @@
 
 **Type:** OUTREACH-DRAFT  
 **Topic:** Identity  
-**Status:** SEND JUL 23 — Zaal sends from zaalp99@gmail.com. Subject line and body are paste-ready.
+**Status:** SEND JUL 23 — Zaal sends from zaalp99@gmail.com. Subject line and body are paste-ready. Stats refreshed Jul 23, 2026 — use numbers below, not prior versions.
 
 ---
 
@@ -16,28 +16,32 @@
 
 **To:** `[HOST EMAIL — find via Green Pill website or @GreenPilled_ Twitter DM]`  
 **CC:** none  
-**Subject:** `ZAO: A DAO That Runs a Live Music Platform — 64 Consecutive Governance Weeks`
+**Subject:** `ZAO: A DAO Running a Live Music Platform — AI Artists, On-Chain Judges, 878 SOL`
 
 ---
 
 ## Part 1 — The Email (Paste-Ready)
 
 ```
-Subject: ZAO: A DAO That Runs a Live Music Platform — 64 Consecutive Governance Weeks
+Subject: ZAO: A DAO Running a Live Music Platform — AI Artists, On-Chain Judges, 878 SOL
 
 Hi [HOST NAME],
 
 I run ZAO, a DAO that governs WaveWarZ — a live music battle platform where artists earn 
-money even when they lose. We've run 64 consecutive Fractal Democracy governance sessions 
-without missing a single week.
+money even when they lose. We just had our biggest week ever: 356 SOL (~$27,600) in 7 days.
 
-The "regen" angle: instead of theory, ZAO applies decentralized governance to a live 
-creative economy — real artists, real payouts, real decisions made on-chain by ZOR holders.
+The platform just ran its first AI Artist Tournament — AI-generated personas (GEEK MYTH, 
+Stormbourne, LUI) competing in on-chain elimination brackets with an AI judge (DJ Wavy) 
+plus a community prediction market. The semifinal alone generated ~342 SOL — 8.7x the 
+prior platform record. That's your "AI + regen + music" story, with real on-chain receipts.
 
-Numbers from our public API:
-• 1,245 battles completed
-• 523.991 SOL in total volume
-• 9.0988 SOL paid directly to artists (including the losers)
+The ZAO angle: instead of theory, we apply decentralized governance to a live creative 
+economy — real artists, real payouts, real decisions made on-chain by ZOR holders.
+
+Live numbers (wavewarz.info/api/public/stats, Jul 23, 2026):
+• 1,285 battles completed
+• 878.316 SOL all-time volume ($68,061)
+• 13.39 SOL paid directly to artists (including the losers)
 • 36 community battles where ZOR holders voted on the artist matchups
 
 I think the Green Pill audience would find the "loser earns" mechanic genuinely interesting — 

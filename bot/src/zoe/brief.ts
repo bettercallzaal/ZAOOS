@@ -24,6 +24,7 @@ import { getCalendarEvents, formatEventForBrief, formatTodayTomorrowEvents } fro
 import { gatherPendingDecisions } from './pending-decisions';
 import { readTriageContext } from './memory';
 import { getRecentMeetingsForBrief } from './meetings';
+import type { ZoeTask } from './types';
 import { execSync } from 'node:child_process';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
@@ -76,9 +77,45 @@ portal.zaoos.com/todos - brain dump
 
 Output the brief in plaintext. NO markdown headers, NO emojis, NO pleasantries.`;
 
+/**
+ * Format task source into a compact human-readable suffix.
+ * Returns a short tag like "(from a meeting)", "(from research)", or null if
+ * source is not meaningful for the brief (e.g. ad-hoc or unset).
+ *
+ * Meaningful sources:
+ * - meeting:* -> "(from a meeting)"
+ * - research-dispatch, doc-dispatch -> "(from research dispatch)"
+ * - doc-* -> "(from research)"
+ * - research, bonfire-recall -> "(from research)"
+ * - pr-auto, pr-auto-fix, github -> "(from PR auto)"
+ *
+ * For plain human-added tasks, returns null (no suffix).
+ */
+export function formatTaskSource(task: ZoeTask): string | null {
+  const src = task.source?.toLowerCase() || '';
+
+  if (src.startsWith('meeting')) {
+    return '(from a meeting)';
+  }
+  // Check specific dispatch sources first (before general doc-*)
+  if (src === 'research-dispatch' || src === 'doc-dispatch') {
+    return '(from research dispatch)';
+  }
+  // Then check general research sources
+  if (src.startsWith('doc-') || src === 'research' || src === 'bonfire-recall') {
+    return '(from research)';
+  }
+  if (src === 'pr-auto' || src === 'github' || src === 'pr-auto-fix') {
+    return '(from PR auto)';
+  }
+
+  // Plain ad-hoc or unset — no suffix needed
+  return null;
+}
+
 interface BriefContext {
   today_iso: string;
-  open_tasks: Array<{ priority: string; title: string }>;
+  open_tasks: Array<{ priority: string; title: string; source?: string }>;
   commits_24h: string[];
   cross_repo_24h: string[];
   open_prs: Array<{ number: number; title: string }>;
@@ -313,7 +350,7 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
 
   return {
     today_iso: new Date().toISOString().slice(0, 10),
-    open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
+    open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title, source: t.source })),
     commits_24h: commits24h,
     cross_repo_24h: crossRepo24h,
     open_prs: prs,
@@ -356,13 +393,19 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
     ? `INBOX TRIAGE:\n${ctx.triageContext}`
     : 'INBOX TRIAGE: (none - skip the INBOX TRIAGE section)';
 
+  // Format open tasks with source suffixes for better traceability
+  const formattedTasks = ctx.open_tasks.map((t) => {
+    const sourceTag = t.source ? formatTaskSource({ source: t.source } as ZoeTask) : null;
+    return `${t.title}${sourceTag ? ` ${sourceTag}` : ''}`;
+  });
+
   const userPrompt = `Generate the morning brief for ${day} ${date}.
 
 CONTEXT:
 - Pending decisions (PRs, blocked/review tasks): ${pendingDecisionsLine}
 - Calendar (today + tomorrow): ${calendarLine}
 - ${meetingsLine}
-- Open tasks: ${JSON.stringify(ctx.open_tasks, null, 2)}
+- Open tasks: ${formattedTasks.length === 0 ? '(none)' : formattedTasks.join('\n  ')}
 - Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
 - Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}

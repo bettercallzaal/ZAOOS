@@ -8,4 +8,21 @@
  */
 
 export { acquireLease, renewLease, releaseLease, reclaimExpiredLeases, isLeaseExpired, canAcquire } from './lease-manager';
-export type { AgentRunRow, LeaseAcquisitionResult, ExpiredLeaseRecoverySummary } from './types';
+export {
+  registerInstance,
+  heartbeat,
+  drainInstance,
+  reclaimDeadInstanceRuns,
+  isInstanceExpired,
+  deadInstanceIds,
+  runsLeasedToDeadInstances,
+  DEFAULT_LIVENESS_TTL_MS,
+} from './liveness';
+export type {
+  AgentRunRow,
+  LeaseAcquisitionResult,
+  ExpiredLeaseRecoverySummary,
+  AgentInstanceRow,
+  InstanceStatus,
+  DeadInstanceReclaimSummary,
+} from './types';

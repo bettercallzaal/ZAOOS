@@ -65,21 +65,22 @@ This is not a subsidy or a pity payment. It is designed into the smart contract.
 
 ---
 
-## Live Evidence (Jul 2026)
+## Live Evidence (Jul 23, 2026)
 
-**Source:** wavewarz.info/api/public/stats (real-time, no auth required)
+**Source:** wavewarz.info/api/public/stats (real-time, no auth required, pulled 2026-07-23T10:08Z)
 
-| Metric | Value (Jul 2026) |
-|--------|-----------------|
-| Total battles | 1,245 |
-| Total SOL volume | 523.991 SOL |
-| Artist payouts (total) | 9.0988 SOL |
-| Trader claims | 127.343 SOL |
-| MAIN battles | 162 |
+| Metric | Value (Jul 23, 2026) |
+|--------|---------------------|
+| Total battles | 1,285 |
+| Total SOL volume | 878.316 SOL |
+| Artist payouts (total) | 13.3918 SOL |
+| Trader claims | 381.197 SOL (1,526 withdrawals) |
+| MAIN battles | 165 |
 | Community battles | 36 |
-| Quick battles | 1,047 |
+| Quick battles | 1,084 |
+| Last 7-day volume | 356.621 SOL (AI Artist Tournament, Jul 16–23) |
 
-**What "9.0988 SOL to artists" means:** Every artist in every battle — winner and loser — received their cut automatically. There was no artist who competed and received nothing.
+**What "13.3918 SOL to artists" means:** Every artist in every battle — winner and loser — received their cut automatically. There was no artist who competed and received nothing. The AI Artist Tournament (Jul 16–23) drove the largest single-week volume in platform history (356 SOL), with the loser-earns mechanic running automatically across every tournament match including the semifinal (~342 SOL, GEEK MYTH def. LUI 2-1).
 
 **Solana explorer verification:** Pull any MAIN battle's settlement TX on Solscan — two outbound transfers from battle PDA: one to winning artist wallet, one to losing artist wallet, within the same block.
 
@@ -93,10 +94,12 @@ This is not a subsidy or a pity payment. It is designed into the smart contract.
 The WaveWarZ platform (wavewarz.info) implements a novel "dual-earner" settlement 
 mechanism on the Solana blockchain. In each music battle, both the winning and 
 losing artist receive automatic on-chain payments upon battle closure, with the 
-losing artist earning 10% of the winning side's staked pool. As of July 2026, 
-the platform has settled 1,245 battles with 523.991 SOL in total volume and 
-9.0988 SOL in verified artist payouts. Settlement is executed via per-battle 
-Program Derived Addresses (PDAs) with no human intermediary. The platform is 
+losing artist earning 10% of the winning side's staked pool. As of July 23, 2026, 
+the platform has settled 1,285 battles with 878.316 SOL in total volume (~$68,061 
+USD at $77.49/SOL) and 13.3918 SOL in verified artist payouts. Settlement is 
+executed via per-battle Program Derived Addresses (PDAs) with no human intermediary.
+In July 2026, the platform ran the first AI Artist Tournament on any blockchain 
+music platform — 356 SOL traded in a single week (Jul 16–23). The platform is 
 operated by The ZAO, a music DAO with 100+ consecutive weekly governance sessions 
 on Optimism (contract: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532).
 
@@ -110,9 +113,11 @@ DAO governance contract: Optimism Mainnet OREC 0xcB05F9254765CA521F7698e61E0A6CA
 WaveWarZ is the first music platform where losing a competition automatically pays 
 the artist. When a battle closes, both artists receive SOL within seconds — the 
 winner earns more, but the loser never walks away empty. This isn't charity: it's 
-written into the smart contract. As of July 2026, the platform has paid out artists 
-across 1,245 battles on Solana. The platform is governed by The ZAO, a music DAO 
-that has held over 100 consecutive weekly governance sessions with zero failures.
+written into the smart contract. As of July 23, 2026, the platform has paid 13.39 SOL 
+to artists across 1,285 battles on Solana — including every match in July 2026's 
+AI Artist Tournament (356 SOL in a single week, the highest-volume week in the 
+platform's history). The platform is governed by The ZAO, a music DAO that has held 
+over 100 consecutive weekly governance sessions with zero failures.
 ```
 
 ### For Grant Applications
@@ -121,9 +126,13 @@ that has held over 100 consecutive weekly governance sessions with zero failures
 WaveWarZ introduces a verified novel payment model: automatic dual-artist payout on 
 every music battle. The losing artist receives 10% of the winning pool — on-chain, 
 within seconds, with no application, no human gatekeeper, and no platform fee. As 
-of July 2026: 1,245 battles settled, 523.991 SOL volume, 9.0988 SOL to artists. 
-This model has been operational for [X] months with zero settlement failures. 
-The underlying DAO has operated with 100+ consecutive governance sessions on Optimism.
+of July 23, 2026: 1,285 battles settled, 878.316 SOL total volume (~$68,061), 
+13.3918 SOL to artists, 381.197 SOL returned to traders (1,526 on-chain withdrawals). 
+In July 2026, WaveWarZ hosted the first AI Artist Tournament on any blockchain music 
+platform — 356 SOL traded in a single week, with the loser-earns mechanic operating 
+automatically on every match. This model has been operational since August 2025 with 
+zero settlement failures. The underlying DAO has operated with 100+ consecutive 
+governance sessions on Optimism.
 ```
 
 ### For Social Media (X / Farcaster)
@@ -137,7 +146,8 @@ When the battle closes, both artists receive SOL automatically:
 
 No gatekeepers. No withdrawal form. No wait.
 
-1,245 battles. $523 SOL volume. Both artists earned in every one.
+1,285 battles. 878 SOL volume. Both artists earned in every one.
+(Jul 2026 AI tournament: 356 SOL in one week — the mechanic ran on every match)
 ```
 
 ### For Web3 / Crypto Audience
@@ -184,12 +194,12 @@ Every time it is cited:
 
 | Audience | Lead with | Proof point | CTA |
 |----------|-----------|-------------|-----|
-| Music journalist | "Losing a battle still pays the artist" | 9.09 SOL to artists across 1,245 battles | wavewarz.info |
+| Music journalist | "Losing a battle still pays the artist" | 13.39 SOL to artists across 1,285 battles | wavewarz.info |
 | Web3 / crypto | "Dual-earner PDA settlement on Solana" | Solscan TX verification | wavewarz.info/api/public/stats |
-| Grant reviewer | "Novel dual-artist automatic payment model" | 1,245 battles, zero settlement failures | OREC contract address |
+| Grant reviewer | "Novel dual-artist automatic payment model" | 1,285 battles, zero settlement failures | OREC contract address |
 | Academic researcher | "First implementation of dual-earner competitive music settlement" | Full citation block above | ZAOOS archive (ZAOOS) |
 | Artist considering joining | "Even if you lose, you earn something" | Artist earnings reference (doc 1716) | wavewarz.info + ZAO Telegram |
-| Investor/partner | "The platform pays all participants — alignment without subsidies" | 127.343 SOL trader claims + 9.09 SOL artist payouts | wavewarz.info |
+| Investor/partner | "The platform pays all participants — alignment without subsidies" | 381.197 SOL trader claims + 13.39 SOL artist payouts | wavewarz.info |
 
 ---
 

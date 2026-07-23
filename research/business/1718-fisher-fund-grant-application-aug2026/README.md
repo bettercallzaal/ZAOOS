@@ -55,7 +55,9 @@ ZAOstock will feature four Maine-connected artists in supporting sets, culminati
 
 The event is intentionally free. ZAO's mission is artist economic equity — not gatekeeping music access by ticket price. We have budgeted for costs including venue, sound, production, and artist compensation without charging admission.
 
-The ZAO is a music DAO (Decentralized Autonomous Organization) that has operated with weekly community governance sessions for over 100 consecutive weeks, with zero governance failures. Our platform has settled 1,245 music battles on Solana, with over $1,800 in direct artist payouts — including artists who lost their battles.
+The ZAO is a music DAO (Decentralized Autonomous Organization) that has operated with weekly community governance sessions for over 100 consecutive weeks, with zero governance failures. Our platform has settled 1,285 music battles on Solana, with 13.39 SOL in direct artist payouts — including artists who lost their battles.
+
+In July 2026, WaveWarZ hosted the first AI Artist Tournament on any blockchain music platform — an AI-generated music battle bracket where community members staked 356 SOL (~$27,600) in a single week, the highest-volume week in the platform's history. This is not a hypothetical: it happened, it was on-chain, and the results are verifiable. ZAOstock is where we bring this level of community energy to a free public stage in Ellsworth, Maine.
 
 ZAOstock is our first IRL event in Maine. It is a direct extension of the community we have built online: a group of music fans and artists who believe in a model where everyone who shows up gets paid something.
 
@@ -145,7 +147,7 @@ Attach after FA approval:
 - [ ] FA approval email received and FA member ID confirmed
 - [ ] FA statement paragraph updated with actual FA EIN and member ID
 - [ ] Zaal's Maine address confirmed (for Section 1)
-- [ ] Current wavewarz.info battle count pulled and inserted ("1,245+" or current number)
+- [ ] Current wavewarz.info battle count pulled and inserted ("1,285" as of Jul 23, 2026 — pull fresh on submission day)
 - [ ] Budget reviewed — confirm venue + sound costs are actual quotes by Aug 1
 - [ ] Fisher Fund current cycle deadline confirmed at fisherfund.org (verify Aug 15 is correct)
 - [ ] Application submitted at fisherfund.org

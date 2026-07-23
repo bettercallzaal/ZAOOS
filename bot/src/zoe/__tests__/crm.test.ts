@@ -4,49 +4,49 @@ import assert from 'node:assert/strict';
 import { runCrmOps, summarizeCrmResults } from '../crm.ts';
 import type { CrmOp } from '../types.ts';
 
-// A minimal chainable fake of the supabase-js client, capturing every
-// upsert/insert so we can assert the C-H1 / C-M2 guards on the direct-write
-// path. No network, no real DB.
+// Minimal chainable fake of the supabase-js client, capturing every insert so we
+// can assert the direct-write path. runCrmOps now uses:
+//   contacts:    .select('id').eq('name', n).limit(1).maybeSingle()  (dedup by name)
+//                .insert(row).select('id').single()                   (new contact)
+//   contact_log: .insert(row)  (awaited directly)                     (interaction)
+// No network, no real DB.
 interface Recorded {
   table: string;
-  kind: 'upsert' | 'insert' | 'select-like';
+  kind: 'insert';
   row?: Record<string, unknown>;
 }
 
-function makeFakeDb(opts: { existingSlugs?: string[]; contactId?: string } = {}) {
+function makeFakeDb(opts: { existingContact?: { id: string } | null; contactId?: string } = {}) {
   const calls: Recorded[] = [];
-  const existing = opts.existingSlugs ?? [];
   const contactId = opts.contactId ?? 'contact-1';
+  const existingContact = opts.existingContact ?? null;
 
   function query(table: string) {
-    let row: Record<string, unknown> | undefined;
+    let insertedRow: Record<string, unknown> | undefined;
     const builder: Record<string, unknown> = {
-      upsert(r: Record<string, unknown>) {
-        row = r;
-        calls.push({ table, kind: 'upsert', row: r });
-        return builder;
-      },
       insert(r: Record<string, unknown>) {
-        row = r;
+        insertedRow = r;
         calls.push({ table, kind: 'insert', row: r });
         return builder;
       },
       select() {
         return builder;
       },
-      like(_column: string, pattern: string) {
-        calls.push({ table, kind: 'select-like' });
-        const base = pattern.replace(/%$/, '');
-        const data = existing
-          .filter((s) => s.startsWith(base))
-          .map((slug) => ({ slug }));
-        return Promise.resolve({ data, error: null });
+      eq() {
+        return builder;
+      },
+      limit() {
+        return builder;
+      },
+      maybeSingle() {
+        return Promise.resolve({ data: existingContact, error: null });
       },
       single() {
-        return Promise.resolve({
-          data: { id: contactId, slug: row?.slug ?? null },
-          error: null,
-        });
+        return Promise.resolve({ data: { id: contactId }, error: null });
+      },
+      // thenable so `await from('contact_log').insert(...)` resolves.
+      then(resolve: (v: { data: unknown; error: null }) => void) {
+        resolve({ data: insertedRow ?? null, error: null });
       },
     };
     return builder;
@@ -63,41 +63,53 @@ function op(overrides: Partial<CrmOp['contact']> = {}, interaction: Partial<CrmO
   };
 }
 
-test('C-H1: a bot write never publishes — is_public dropped, interaction forced private', async () => {
-  const { client, calls } = makeFakeDb();
+test('C-H1: a bot write never publishes — is_public dropped, interaction stays internal', async () => {
+  const { client, calls } = makeFakeDb({ existingContact: null });
   const results = await runCrmOps(
-    [op({ farcaster_handle: 'zaal', is_public: true }, { visibility: 'public', public_summary: 'x' })],
+    [op({ farcaster_handle: 'zaal', is_public: true }, { public_summary: 'x' })],
     client,
   );
   assert.equal(results[0].status, 'logged');
 
-  const contactWrite = calls.find((c) => c.table === 'crm_contacts');
+  const contactWrite = calls.find((c) => c.table === 'contacts');
   assert.ok(contactWrite);
   assert.equal('is_public' in (contactWrite.row ?? {}), false);
+  assert.equal(contactWrite.row?.source, 'zoe');
+  // the handle rides into tags, not a dedicated column
+  assert.ok(
+    Array.isArray(contactWrite.row?.tags) && (contactWrite.row?.tags as string[]).includes('fc:zaal'),
+  );
 
-  const interactionWrite = calls.find((c) => c.table === 'crm_interactions');
+  const interactionWrite = calls.find((c) => c.table === 'contact_log');
   assert.ok(interactionWrite);
-  assert.equal(interactionWrite.row?.visibility, 'private');
-  assert.equal(interactionWrite.row?.created_by, 'zoe');
-  assert.equal(interactionWrite.row?.source, 'zoe');
+  // contact_log has no visibility/is_public column: internal by design.
+  assert.equal('visibility' in (interactionWrite.row ?? {}), false);
+  assert.equal(interactionWrite.row?.contact, 'Test Person');
 });
 
-test('C-M2: a name-only contact INSERTs with a uniquified slug (no overwrite)', async () => {
-  const { client, calls } = makeFakeDb({ existingSlugs: ['test-person'] });
-  const results = await runCrmOps([op()], client); // no handle => name-only
+test('an existing contact is reused (dedup by name, no duplicate insert)', async () => {
+  const { client, calls } = makeFakeDb({ existingContact: { id: 'existing-1' } });
+  const results = await runCrmOps([op()], client);
   assert.equal(results[0].status, 'logged');
-
-  const contactWrite = calls.find((c) => c.table === 'crm_contacts' && c.kind !== 'select-like');
-  assert.ok(contactWrite);
-  assert.equal(contactWrite.kind, 'insert'); // never upsert for a name-only key
-  assert.equal(contactWrite.row?.slug, 'test-person-2');
+  assert.equal(results[0].contact_id, 'existing-1');
+  // no contacts INSERT when the person already exists
+  assert.equal(
+    calls.some((c) => c.table === 'contacts'),
+    false,
+  );
+  // interaction is still logged against the existing contact
+  assert.ok(calls.find((c) => c.table === 'contact_log'));
 });
 
-test('a contact WITH a handle upserts (stable, idempotent)', async () => {
-  const { client, calls } = makeFakeDb();
-  await runCrmOps([op({ x_handle: 'someone' })], client);
-  const contactWrite = calls.find((c) => c.table === 'crm_contacts');
-  assert.equal(contactWrite?.kind, 'upsert');
+test('a new contact is INSERTed into contacts with fields mapped + handles in tags', async () => {
+  const { client, calls } = makeFakeDb({ existingContact: null });
+  await runCrmOps([op({ x_handle: 'someone', org: 'Acme', role: 'Founder' })], client);
+  const contactWrite = calls.find((c) => c.table === 'contacts');
+  assert.ok(contactWrite);
+  assert.equal(contactWrite.row?.name, 'Test Person');
+  assert.equal(contactWrite.row?.company, 'Acme'); // org -> company
+  assert.equal(contactWrite.row?.role, 'Founder');
+  assert.ok((contactWrite.row?.tags as string[]).includes('x:someone'));
 });
 
 test('runCrmOps([]) is a no-op', async () => {

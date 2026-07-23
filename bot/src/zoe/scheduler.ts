@@ -32,6 +32,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
+import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
@@ -608,6 +609,36 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           });
         } catch (err) {
           console.error('[zoe/scheduler] work-loop tick failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Error remediation - every 10 min, turn a captured production error digest
+  // (app_errors, status='new') into a routed fix + PR and report the outcome to
+  // ZAALBOTS. Routes, does not ask (feedback_zoe_route_dont_ask). One error per
+  // tick; the fix pipeline enforces the fleet daily cap. Silent when there is
+  // nothing new or the group is not configured.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        if (!gid) return; // not configured
+        if (shouldPauseAutonomousWork()) return; // cost hard-stop
+        try {
+          const deps = defaultRemediationDeps(
+            (text: string) => opts.bot.api.sendMessage(gid, text).then(() => {}),
+            opts.zaalTgId,
+            gid,
+          );
+          const status = await runErrorRemediationTick(deps);
+          if (status !== 'no new errors') {
+            console.log(`[zoe/scheduler] error-remediation: ${status}`);
+          }
+        } catch (err) {
+          console.error('[zoe/scheduler] error-remediation tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

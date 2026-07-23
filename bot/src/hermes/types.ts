@@ -41,7 +41,7 @@ export interface HermesRun {
  * Adding more targets: extend HERMES_REPO_PROFILES in git.ts and update the
  * per-target system-prompt context in coder.ts.
  */
-export type HermesRepoTarget = 'zaoos' | 'zaostock';
+export type HermesRepoTarget = 'zaoos' | 'zaostock' | 'zaocowork';
 
 export const HERMES_DEFAULT_TARGET: HermesRepoTarget = 'zaoos';
 

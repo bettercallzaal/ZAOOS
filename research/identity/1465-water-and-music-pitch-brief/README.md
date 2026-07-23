@@ -2,7 +2,7 @@
 
 **Type:** MEDIA-PITCH  
 **Topic:** Identity  
-**Status:** ACTIONABLE — send email Jul 24 (parallel to Green Pill pitch Jul 23, doc 1462)
+**Status:** ACTIONABLE — send email Jul 24. Stats refreshed Jul 23, 2026 — use updated numbers below.
 
 ---
 
@@ -15,6 +15,8 @@ Water & Music (waterandmusic.com) is Cherie Hu's research-first music industry n
 - Other journalists (Water & Music pieces get picked up by MBW, Hypebot, and Pitchfork)
 
 **Target:** pitch Cherie Hu or a Water & Music contributor to cover ZAO/WaveWarZ as a case study in regenerative music economics.
+
+**News hook (Jul 23, 2026):** WaveWarZ just had its highest-volume week ever — 356 SOL (~$27,600) in 7 days (Jul 16–23), more than the platform's entire prior 13 months combined. This is the strongest "why now" for the pitch.
 
 ---
 
@@ -30,9 +32,9 @@ ZAO/WaveWarZ hits three of those pillars simultaneously:
 
 1. **The loser-earns model is a genuinely new economic structure** — the losing artist earns real money from platform trading activity, not pity. This inverts standard music competition formats (Battle of the Bands, American Idol) where losing is zero-value.
 
-2. **Proof at scale** — 1,245 battles, 523.99 SOL total volume, 9.10 SOL in artist payouts, 127.34 SOL in trader claims. These are not projections. They're public on-chain data from a live platform.
+2. **Proof at scale (Jul 23, 2026 figures)** — 1,285 battles, 878.316 SOL all-time volume ($68,061), 13.39 SOL in artist payouts ($1,038), 381.197 SOL in trader claims ($29,539), 1,526 withdrawal events. Record week: 356 SOL (~$27,600) in 7 days (Jul 16–23) — more than the prior 13 months combined. These are not projections. They're public on-chain data from a live platform. Source: wavewarz.info/api/public/stats (2026-07-23T10:08Z). See doc 1784 for the full milestone breakdown.
 
-3. **Governance layer** — 63 consecutive weekly governance sessions, three on-chain contracts (Optimism Mainnet), and a documented DAO process. This is the missing piece most web3 music projects lack: a working community structure that has made real decisions.
+3. **Governance layer** — consecutive weekly governance sessions since 2024, three on-chain contracts (Optimism Mainnet), and a documented DAO process. This is the missing piece most web3 music projects lack: a working community structure that has made real decisions.
 
 **Unique angle for W&M:** "The DAO That Makes Losing Pay" — a live experiment in whether on-chain governance and inverted contest economics can fix the economic precarity at the bottom of the music discovery ladder.
 
@@ -45,13 +47,13 @@ ZAO/WaveWarZ hits three of those pillars simultaneously:
 | **Cherie Hu** | Founder + Editor | Direct email; cite specific W&M articles her work influenced |
 | **W&M Contributors** | Staff writers | LinkedIn or Twitter DM if Cherie doesn't respond in 7 days |
 
-**Cherie's public email:** Research her website + LinkedIn for current contact. Do NOT DM cold on social without email first.
+**Cherie's public email:** cherie@waterandmusic.com (from doc 1324)
 
 ---
 
 ## Pitch Email (Send Jul 24)
 
-**Subject line:** The DAO that makes the losing artist earn — live data from 1,245 battles
+**Subject line:** WaveWarZ just had its biggest week ever — $27,600 in music battles in 7 days. Worth covering?
 
 **Body:**
 
@@ -60,15 +62,19 @@ Hi Cherie,
 
 I'm Zaal Panthaki, co-founder of ZAO (The DAO) and WaveWarZ — a live music battle platform on Solana where the *losing artist* earns money from platform trading activity while they lose.
 
-I'm writing because Water & Music is the only publication I know that would actually do the economics justice. Here's the short version:
+Quick data point first: WaveWarZ just had its highest-volume week ever — 356 SOL (~$27,600) in 7 days (Jul 16–23, 2026), more trading volume than the platform's entire prior 13 months combined. Total all-time: 878 SOL ($68,061) across 1,285 battles. Artist payouts: 13.39 SOL ($1,038) direct to artists on-chain. Trader claims: 381 SOL ($29,539) in 1,526 withdrawal events.
 
-WaveWarZ has run 1,245 battles since launch. Total volume: 523.99 SOL. Artist payouts: 9.10 SOL. Trader claims: 127.34 SOL. The losing artist in each battle receives real payout — not because we engineered charity into the model, but because the market structure makes losing economically viable.
+I'm writing because Water & Music is the only publication I know that would actually do the economics justice.
 
-The governance layer is equally unusual: ZAO has held 63 consecutive weekly governance sessions over 8 months. Three live smart contracts on Optimism Mainnet. No token sale. Every major decision documented publicly.
+The model: WaveWarZ is a music prediction market. Each battle creates two ephemeral bonding-curve pools (Artist A / Artist B). Traders buy the side they think will win, adding SOL. At battle close: the winning artist gets 5%, the losing artist gets 2%, the platform takes 3%. The loser still earns — because market structure, not charity.
+
+The judge: Poll (community vote) + Charts (which artist's pool drew more SOL) + DJ Wavy (AI judge). Best 2-of-3. An on-chain AI judge with a unique dual-wallet transfer signature, verifiable on Dune. V2 launched Mar 10, 2026.
+
+The governance layer is equally unusual: ZAO has held consecutive weekly governance sessions since 2024. Three live smart contracts on Optimism Mainnet. No token sale. Every major decision documented publicly.
 
 We're building toward ZAOstock — a live music festival in Ellsworth, Maine on October 3 where the headline slot was earned through WaveWarZ battle performance, not label backing or streaming numbers.
 
-I'd love to offer you an exclusive look at our public on-chain data, a call with our WaveWarZ dev (Hurricane), or a draft feature pitch tailored to your editorial calendar. We're also publishing a full Q2 progress report and a Mirror article in the next 2 weeks if you'd like to wait for those.
+I'd love to offer you an exclusive look at our public on-chain data (wavewarz.info/api/public/stats — no auth, fully open), a call with our WaveWarZ dev (Hurricane), or a draft feature pitch tailored to your editorial calendar.
 
 No ask beyond 10 minutes of your time if this sparks anything.
 
@@ -86,21 +92,21 @@ WaveWarZ: wavewarz.info | ZAOOS: github.com/bettercallzaal/ZAOOS
 | Asset | Status | Where |
 |---|---|---|
 | Public stats URL | LIVE | wavewarz.info/api/public/stats |
+| Volume surge doc | READY | ZAOOS doc 1784 (356 SOL/7-day milestone) |
 | Q2 Progress Report | Ready | doc 1453 (ZAOOS) |
-| Mirror Article 1 draft | Ready Aug 1 | doc 1454 |
 | On-chain contract addresses | Ready | OG `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`, ZOR `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`, OREC `0xcB05F9254765CA521F7698e61E0A6CA6456Be532` |
 | ZAOOS GitHub | Live | github.com/bettercallzaal/ZAOOS |
-| Eventbrite URL | NEEDED — launch Jul 21 | doc 1452 |
+| Dune DJ Wavy data | Available | Dual-transfer pattern on-chain (ask Hurricane for Dune link) |
 
 ---
 
 ## Pitching Strategy
 
 ### Tier 1 — Direct email to Cherie (Jul 24)
-Short, data-forward, no hype. Offer: exclusive data access + call + feature pitch.
+Short, data-forward, no hype. Lead with the record week stat. Offer: exclusive data access + call + feature pitch.
 
 ### Tier 2 — Follow-up (Aug 7, if no response)
-Attach Mirror Article 1 (published Aug 1) as proof of documentation depth. One sentence: "Attaching our first public ZAO narrative piece in case it helps frame this."
+Re-surface with ZAOstock announcement + updated stats. One sentence: "Following up — ZAOstock is now confirmed for Oct 3, Ellsworth ME. WaveWarZ volume continues to climb."
 
 ### Tier 3 — Contributor pitch (Aug 14, if still no response)
 Pitch W&M contributors directly with a specific article concept: "We have a 1,200-word explainer on loser-earns economics — would this fit as a contributed post?"
@@ -116,10 +122,10 @@ Water & Music covers "the intersection of the music business and technology." He
 
 **Angle A — The Economic Model**  
 "Loser-Earns: What Happens When You Invert the Music Contest"  
-Compare WaveWarZ's loser-payout mechanic to streaming payouts ($0.003/stream), performance fees ($0 for unsigned acts), and Battle of the Bands prizes ($0 for losers). Show the math: 1 WaveWarZ battle ≈ 11,667 Spotify streams in payout per battle SOL volume.
+Compare WaveWarZ's loser-payout mechanic to streaming payouts ($0.003/stream), performance fees ($0 for unsigned acts), and Battle of the Bands prizes ($0 for losers). Show the math: 1 WaveWarZ battle at average volume ≈ thousands of Spotify streams in payout per SOL traded. With 356 SOL in a single week: the platform processed more artist-earnable revenue in 7 days than most indie artists see from streaming in a year.
 
 **Angle B — The Governance Layer**  
-"63 Weeks: What a DAO That Actually Makes Weekly Decisions Looks Like"  
+"What a DAO That Actually Makes Weekly Decisions Looks Like"  
 Most "music DAOs" are treasury coordination vehicles. ZAO runs a weekly Fractal Democracy session on Zoom, records it, archives it on Arweave, and has produced 1,460+ ZAOOS research documents. Frame this as: what does sustained decentralized governance actually require?
 
 **Angle C — The Live Event Question**  
@@ -140,6 +146,7 @@ ZAOstock Oct 3 = first live ZAO governance vote from a stage, live WaveWarZ batt
 
 ## Related Docs
 
+- 1784 — WaveWarZ Jul 16–23 volume surge (356 SOL/week — the news hook for this pitch)
 - 1462 — Green Pill Podcast Pitch (send Jul 23, parallel track)
 - 1389 — Water & Music Research (existing W&M pitch context)
 - 1414 — Hypebot/Music Press Pitch Pack
@@ -147,3 +154,7 @@ ZAOstock Oct 3 = first live ZAO governance vote from a stage, live WaveWarZ batt
 - 1453 — Q2 Progress Report (supporting asset for pitch)
 - 1437 — Wikipedia Draft (GEO layer)
 - 1427 — WaveWarZ Public API Docs (data source for Cherie)
+
+---
+
+*Stats refreshed 2026-07-23 from wavewarz.info/api/public/stats. Prior version had Jul 17 figures.*

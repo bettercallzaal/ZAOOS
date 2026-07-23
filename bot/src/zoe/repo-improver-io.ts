@@ -16,6 +16,10 @@ import { db } from '../supabase';
 import { ZOE_PATHS } from './memory';
 import { callCapFallback } from './models/router';
 import { dispatchHermesRun } from '../hermes/runner';
+import { emitReceipt } from './receipts';
+
+// Scout decisions that are worth a durable, portable receipt (ZOE acted).
+const RECEIPTED_STATUSES = new Set(['fixed', 'rejected', 'escalated']);
 import type { HermesRepoTarget } from '../hermes/types';
 import {
   SCOUT_REPOS,
@@ -141,6 +145,19 @@ function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id);
+      // Every ZOE decision the scout makes leaves a portable receipt (best-effort).
+      if (RECEIPTED_STATUSES.has(status)) {
+        await emitReceipt({
+          runId: extra?.run_id ?? null,
+          agentIdentity: 'zoe',
+          capability: 'repo_improve',
+          tool: 'repo-improver-scout',
+          action: `scout_${status}`,
+          resultType: 'success',
+          approvalClass: 'auto',
+          evidenceUrl: extra?.pr_url ?? null,
+        });
+      }
     },
     dispatchFix: async ({ issueText, targetRepo }) => {
       const res = await dispatchHermesRun({

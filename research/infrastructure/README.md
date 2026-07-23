@@ -114,3 +114,4 @@
 | [1609](1609-fractal-dashboard-pr-review-guide/) | Fractal dashboard code PRs review guide — 9 waiting PRs, what each fixes, test sequence |
 
 | 2032 | [ZAO Assistant in Apple CarPlay: Build Plan and Constraints](./2032-zao-assistant-carplay/) | STANDALONE | Research doc 2032. |
+| 2034 | [Livepeer + Baraza Streaming Media Kit Integration](./2034-livepeer-baraza-integration/) | STANDALONE | Research doc 2034. |

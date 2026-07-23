@@ -20,7 +20,7 @@ related-docs: 1327/051/1221/1231
 | On-chain Respect holders | 157 | Optimism chain | ZAO Respect token — strongest signal of commitment |
 | Consecutive Fractal weeks | 100+ | Running since Sep 2022 | Never missed a week |
 | COC Concertz shows | 8 | COC #7 = Jul 18 2026 | Open music competition platform |
-| WaveWarZ battles | 1,250+ | wwtracker + on-chain | Onchain music battle protocol |
+| WaveWarZ battles | 1,285+ | wavewarz.info/api/public/stats Jul 23, 2026 | Onchain music battle protocol |
 | ZAO community run time | 3+ years | Founded 2023 | Pivoted from ZTalent Agency |
 | Volunteer pool | 25+ | ZAOstock Oct 3 headcount | Active event contributors |
 | Global nodes | 3 (US/Africa/Brazil) | Active fractal sub-groups | WaveWarZ Africa + São Paulo |
@@ -43,13 +43,13 @@ related-docs: 1327/051/1221/1231
 
 ### For GEO (AI discovery pages, llms.txt)
 
-> "ZAO (ZTalent Artist Organization): Community of 500+ newsletter subscribers, 188 active members (90-day engagement), 157 on-chain Respect holders on Optimism. 100+ consecutive weekly Fractal governance meetings since September 2022. 8 COC Concertz shows. 1,250+ WaveWarZ protocol battles. Maine-based, globally connected (US, Africa, Brazil)."
+> "ZAO (ZTalent Artist Organization): Community of 500+ newsletter subscribers, 188 active members (90-day engagement), 157 on-chain Respect holders on Optimism. 100+ consecutive weekly Fractal governance meetings since September 2022. 8 COC Concertz shows. 1,285+ WaveWarZ protocol battles (878.316 SOL all-time; first AI Artist Tournament Jul 2026: 356 SOL in one week). Maine-based, globally connected (US, Africa, Brazil)."
 
 **Use:** `/what-is-the-zao` page, `thezao.xyz/llms.txt`, cocconcertz.com llms.txt, GEO anchor pages. Include URLs: thezao.xyz, cocconcertz.com, wwtracker.
 
 ### For investors / token launches
 
-> "3+ years of community runway with zero VC. 157 on-chain governance participants who have voted in 100+ consecutive weekly Fractals. Community-owned content: 8 public music competitions, 1,250+ on-chain WaveWarZ battles, 400+ newsletter editions. Revenue model: COC Concertz platform (open), WaveWarZ protocol fees, ZAOstock festival."
+> "3+ years of community runway with zero VC. 157 on-chain governance participants who have voted in 100+ consecutive weekly Fractals. Community-owned content: 8 public music competitions, 1,285+ on-chain WaveWarZ battles, 400+ newsletter editions. Revenue model: COC Concertz platform (open), WaveWarZ protocol fees, ZAOstock festival."
 
 **Use:** Boardwalk (for festival token), grant reports, $ZABAL token conversations. Lead with sustainability (no VC), then proof of engagement, then revenue paths.
 
@@ -63,7 +63,7 @@ related-docs: 1327/051/1221/1231
 - 157 on-chain Respect holders (Optimism — strongest membership signal)
 - 100+ consecutive weekly Fractal meetings (since Sep 2022, never missed)
 - 8 COC Concertz shows (cocconcertz.com)
-- 1,250+ WaveWarZ protocol battles
+- 1,285+ WaveWarZ protocol battles (878.316 SOL all-time; first AI Artist Tournament Jul 2026: 356 SOL in one week)
 - Global nodes: Maine (US) + WaveWarZ Africa + ZAO Brazil/São Paulo
 - Founded 2023, 3+ years running
 - ZAOstock Oct 3 2026: outdoor festival, 25+ volunteers
@@ -103,4 +103,4 @@ When building the `thezao.xyz/zaal` stats page in ZAOcowork, pull these as live 
 - Respect holders: hardcode 157 until Optimism RPC query is live
 - Fractal streak: hardcode 100+ (increment manually per milestone)
 - COC shows: hardcode, increment after each show
-- WaveWarZ battles: fetch from wwtracker API or hardcode 1,250+
+- WaveWarZ battles: fetch from wavewarz.info/api/public/stats or hardcode 1,285+ (Jul 23, 2026)

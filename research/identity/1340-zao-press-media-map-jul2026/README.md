@@ -4,7 +4,8 @@ type: PRESS-RELATIONS
 status: LIVE — update as coverage lands
 created: 2026-07-17
 updated: 2026-07-17
-related-docs: 1296, 1328, 1330, 1331, 1332, 1339
+related-docs: 1296, 1328, 1330, 1331, 1332, 1339, 2043
+updated: 2026-07-23
 owner: Zaal + ZOE
 ---
 
@@ -54,13 +55,23 @@ COC Concertz threads (@wavewarz X), ZAOstock Farcaster announcement (/zao), ZABA
 
 ## Part 3: Target Outlets by Tier
 
+### Tier A+ — AI Tournament Priority (Angle 0 — pitch NOW, Jul 2026 window)
+
+| Outlet | Contact | Angle | Status |
+|--------|---------|-------|--------|
+| **Musictech.net** | tips@musictech.net | "AI artists compete on Solana, $26k traded" | OPEN — pitch now (doc 2043) |
+| **Futurism** | futurism.com/tips | "First AI vs AI music championship on-chain" | OPEN — pitch now (doc 2043) |
+| **The Defiant** | tips@thedefiant.io | AI tournament + on-chain settlement volume | OPEN — pitch now |
+| **The Verge** | tips@theverge.com | "AI artist earns $26k defeating another AI in music battle" | OPEN — after grand final |
+| **Unchained** | tips@unchainedpodcast.com | On-chain AI artist tournament + DAO governance | COLD — after grand final |
+
 ### Tier A — Music Tech & Industry
 
 | Outlet | Contact | Angle | Status |
 |--------|---------|-------|--------|
-| **Water & Music** | cherie@waterandmusic.com | Artist economics; "loser-earns" mechanic = ZAO artists get paid regardless of who wins | PITCH JUL 24 — template in doc 1324 |
+| **Water & Music** | cherie@waterandmusic.com | Artist economics; "loser-earns" mechanic + AI tournament hook | PITCH JUL 24 — template in doc 1324 + Angle 0 |
 | **Music Business Worldwide** | Editorial (no direct contact) | Post-ZAOstock: "Maine DAO pays artists onchain night-of" | COLD — pitch Oct 4 |
-| **Hypebot** | tips@hypebot.com | "WaveWarZ pays artists 1% of every bet — 9.09 SOL paid so far" | COLD — pitch Aug 1 |
+| **Hypebot** | tips@hypebot.com | "WaveWarZ pays artists 1% of every bet — 13.39 SOL paid so far" | COLD — pitch Aug 1 |
 | **Ari's Take** | ariherstand.com/contact | ZAOstock: "how a DAO booked 8 artists via onchain battle history" | PITCH JUL 31 — template in doc 1328 |
 | **Digital Music News** | tips@digitalmusicnews.com | Post-ZAOstock attendance + artist payment numbers | COLD — pitch Oct 4 |
 
@@ -68,7 +79,7 @@ COC Concertz threads (@wavewarz X), ZAOstock Farcaster announcement (/zao), ZABA
 
 | Outlet | Contact | Angle | Status |
 |--------|---------|-------|--------|
-| **Decrypt** | decrypt.co/submit-story | "1,245 Solana music battles, $39K volume — artists keep 1%" | COLD — pitch Aug 1 |
+| **Decrypt** | decrypt.co/submit-story | AI tournament or "1,285 battles, $68K volume" | COLD — pitch after grand final |
 | **The Defiant** | Editorial team | 63 weeks Fractal governance without token-weighted voting | COLD — pitch via podcast first |
 | **Bankless** (newsletter) | banklesshq.com | DAO case study — follows podcast ep booking | PITCH via podcast first (doc 1328 Track B) |
 | **CoinDesk** | Press contact form | "First onchain-curated music festival — Oct 3 Ellsworth ME" — embargo Sep 26 | COLD — pitch Sep 1 |
@@ -97,6 +108,9 @@ COC Concertz threads (@wavewarz X), ZAOstock Farcaster announcement (/zao), ZABA
 
 ## Part 4: Pitch Angles (paste-ready)
 
+### Angle 0 — "First AI vs AI Music Championship on Solana — $26,500 Traded" ⭐ LEAD ANGLE (all outlets)
+WaveWarZ ran the first-ever AI Artist Tournament in Jul 2026: AI-generated musical personas (GEEK MYTH, AI LUI, Stormbourne) competed in elimination brackets on a Solana prediction market. Fans traded real SOL on the AI artists they backed; the winner was decided by trading volume, community vote, and an AI judge (DJ Wavy). Semifinal: GEEK MYTH def. AI LUI 2-1, ~342 SOL (~$26,500) — 8.7x the prior platform record. Grand final (GEEK MYTH vs Stormbourne) upcoming. **Full pitch pack + paste-ready sample paragraphs in doc 2043.**
+
 ### Angle 1 — "Artists Earn Regardless of Who Wins" (Water & Music, Hypebot, Ari's Take)
 WaveWarZ uses a loser-earns mechanic: artists collect 1% of trading volume + settlement bonuses on every battle, regardless of outcome. After 1,245 battles, artists have earned 9.09 SOL (~$681 at Jul 2026 price). In a world where streaming pays $0.003/stream, guaranteed onchain payouts per battle are structurally different. Contact: see doc 1324 (Tier 1 template) or doc 1328 (Track C).
 
@@ -119,7 +133,8 @@ ZAO has 200+ ZAOOS research docs spanning 63 governance sessions, published on-c
 ```
 JUL 23:  Email Green Pill (doc 1328 Template B)
          Email Metagov / Dan SingJoy (doc 1324)
-JUL 24:  Email Water & Music / Cherie Hu (doc 1324 template)
+         PITCH Angle 0 (AI tournament) to: Musictech.net + Futurism + The Defiant (OPEN — no gate; use doc 2043)
+JUL 24:  Email Water & Music / Cherie Hu (doc 1324 template + Angle 0 hook)
 JUL 31:  Email Ari's Take (doc 1328 Track C)
          Email Hypebot tips line (Angle 1 above)
 AUG 1:   Follow up on all Jul pitches

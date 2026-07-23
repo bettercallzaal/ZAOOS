@@ -8,6 +8,8 @@
 - Optimism Retro Funding: Pack ready (doc 1311) — GATED (submit this round)
 - Other grants: researched below, prioritized by deadline
 
+> **Stats refreshed Jul 23, 2026 (23 days to Fisher deadline):** WaveWarZ now at 1,285 battles / 878.316 SOL all-time / 13.39 SOL ($1,038) in artist payouts. Last 7-day volume: 356 SOL (~$27,600) — highest week in platform history. Use these numbers in all grant applications. See doc 1784 for the full milestone breakdown.
+
 ---
 
 ## Section 1: PRIORITY 1 — Fractured Atlas Fiscal Sponsorship
@@ -37,7 +39,7 @@ Fractured Atlas is a nonprofit fiscal sponsor for artists and arts organizations
 **Project Name:** The ZAO / ZAOstock
 
 **Project Description (paste this):**
-"The ZAO is a music-focused decentralized autonomous organization (DAO) that has operated continuously since 2024. We produce COC Concertz (7 live concerts, Arweave-archived), WaveWarZ (music prediction market — 1,245 battles, 921 songs, $1,497 in charity payouts), ZABAL Games (32 builders, 28 workshops), and ZAOstock, our inaugural 1-day music festival planned for October 3, 2026 in the Portland/Maine area. We use transparent, on-chain governance to make all organizational decisions. Our mission: prove that artists can earn meaningfully from community-driven music technology."
+"The ZAO is a music-focused decentralized autonomous organization (DAO) that has operated continuously since 2024. We produce COC Concertz (7 live concerts, Arweave-archived), WaveWarZ (music prediction market — 1,285 battles, 921 songs, $1,497+ in charity payouts, 878 SOL all-time volume), ZABAL Games (32 builders, 28 workshops), and ZAOstock, our inaugural 1-day music festival planned for October 3, 2026 in the Portland/Maine area. We use transparent, on-chain governance to make all organizational decisions. Our mission: prove that artists can earn meaningfully from community-driven music technology."
 
 **Artistic Discipline:** Music / Interdisciplinary Arts
 
@@ -69,7 +71,7 @@ The Fisher Center for the Performing Arts (or similar Fisher foundation — Zaal
 **250-word project description:**
 "ZAOstock is The ZAO's inaugural live music festival, planned for October 3, 2026. The ZAO is a music-focused DAO (decentralized autonomous organization) that has operated continuously since 2024, using on-chain governance technology to make all organizational decisions transparently.
 
-ZAOstock brings together 8-12 independent artists from The ZAO's WaveWarZ platform — a music prediction market where artists have earned 9.07 SOL ($677) in direct, blockchain-verified payouts through 1,245 artist battles. Our artist payment model is 1.73% of battle volume paid directly to artists — versus $0.004/stream on Spotify, a 600x improvement in artist earnings per engagement.
+ZAOstock brings together 8-12 independent artists from The ZAO's WaveWarZ platform — a music prediction market where artists have earned 13.39 SOL ($1,038) in direct, blockchain-verified payouts through 1,285 artist battles. Our artist payment model pays artists automatically on-chain — versus $0.004/stream on Spotify. WaveWarZ processed 356 SOL (~$27,600) in a single week (Jul 16–23, 2026), demonstrating rapid adoption and real economic activity.
 
 The festival doubles as a ZAO community showcase, bringing together online participants from the US, UK, Zambia, and India with a live Maine audience. Headlining artists include Fellenz (confirmed) and DCoop (confirmed), with additional artists announced weekly beginning August 4.
 
@@ -78,8 +80,8 @@ Budget request of $[X] from the Fisher grant would fund: venue deposit, sound eq
 The ZAO is fiscally sponsored by Fractured Atlas. All event revenue, expenses, and artist payouts will be recorded publicly on-chain — making ZAOstock one of the most financially transparent independent festivals in New England."
 
 **Impact metrics to include:**
-- 1,245 WaveWarZ battles since launch
-- $1,497 in charity raised through community battles
+- 1,285 WaveWarZ battles since launch (878 SOL / ~$68,061 all-time volume)
+- $1,497+ in charity raised through community battles
 - 7 COC Concertz already produced (track record)
 - 32 builders engaged through ZABAL Games
 - Expected ZAOstock attendance: 200-500
@@ -150,7 +152,7 @@ All paste-ready assets for any grant application:
 
 For any grant reviewer who asks "what is The ZAO?":
 
-> "The ZAO is a music-focused DAO that has run weekly on-chain governance meetings for 63+ consecutive weeks. We've produced 7 live concerts, 1,245 music battles (with $1,497 in verified charity payouts), and 28 ZABAL Games workshops for 32 builders — all governed transparently on Optimism blockchain. Our WaveWarZ platform pays artists 1.73% of battle volume directly in crypto — 600x more per engagement than Spotify. ZAOstock, our first annual festival (Oct 3, 2026, Maine), is the culmination of two years of community-built infrastructure. We're applying for [grant] to fund [specific use]."
+> "The ZAO is a music-focused DAO that has run weekly on-chain governance meetings for 63+ consecutive weeks. We've produced 7 live concerts, 1,285 music battles (878 SOL / ~$68,000 all-time volume; $1,497+ in verified charity payouts), and 28 ZABAL Games workshops for 32 builders — all governed transparently on Optimism blockchain. Our WaveWarZ platform pays artists on-chain automatically — $1,038 in artist payouts to date, with 356 SOL (~$27,600) traded in a single week (Jul 16–23, 2026). ZAOstock, our first annual festival (Oct 3, 2026, Maine), is the culmination of two years of community-built infrastructure. We're applying for [grant] to fund [specific use]."
 
 ---
 

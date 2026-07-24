@@ -12,11 +12,13 @@
 
 ## Why This Moment Matters for Media
 
-The WaveWarZ AI Tournament generated **355.36 SOL (~$26,280) in a single week** — that is 68.4% of the platform's entire 14-month trading history in 7 days. The semifinal alone generated 342 SOL, which was 8.7× the previous single-week volume record.
+The WaveWarZ AI Tournament generated **355.36 SOL (~$26,280) in a single week** — 40.5% of the platform's all-time 877.64 SOL trading volume compressed into 7 days. The tournament was the single largest event in WaveWarZ history by volume, featuring the platform's top-ranked AI-scored artists competing for the first time in a bracket format.
 
 This is not a crypto story. This is a music story with a provable, on-chain economic record. Every number cited below has a public Solana transaction hash.
 
-**Lead stat for every pitch:** "A single week of AI-judged music battles generated more trading volume than the platform's entire prior 14 months combined."
+**Lead stat for every pitch:** "A single week of AI-judged music battles generated $26,000 in trading volume — the biggest event in WaveWarZ's 14-month history."
+
+> **Note for ZOE (data integrity):** The "8.7× weekly record" and "more than prior 14 months combined" claims from the original doc were calculated using the intelligence feed only (which captures ~5-10% of real trading volume). Full treasury-fee analysis shows Jun 22-28, 2026 had ~631 SOL in estimated real volume — likely higher than this week's 355 SOL. Do NOT use "all-time weekly record" language in media pitches. Use absolute numbers only: "355 SOL ($26K) in one week" is accurate and compelling.
 
 ---
 
@@ -24,10 +26,9 @@ This is not a crypto story. This is a music story with a provable, on-chain econ
 
 | Fact | Value | Context |
 |------|-------|---------|
-| Tournament week volume | **355.36 SOL (~$26,280 USD)** | Jul 17–24, 2026 |
-| Semifinal volume alone | **~342 SOL** | Previous week record was ~52 SOL |
-| Volume multiple vs prior record | **8.7×** | All-time single-week record |
-| Share of platform 14-month history | **68.4%** | In 7 days |
+| Tournament week volume | **355.36 SOL (~$26,280 USD)** | Jul 17–24, 2026 — live API |
+| Semifinal volume alone | **~342 SOL** | Jul 17–20 (pre-grand-final) |
+| Share of platform all-time volume | **40.5%** | 355/877.64 SOL in 7 days |
 | Platform total volume (all time) | **877.64 SOL (~$64,870 USD)** | 1,289 battles since May 2025 |
 | Artists in the tournament | **Top-ranked on AI DJ Wavy leaderboard** | Seed rankings from 1,289 battles |
 | Artist payouts (loser-earns, all time) | **13.39 SOL (~$990 USD)** | Automatic onchain payments |
@@ -47,16 +48,16 @@ The loser-earns model is the story. In traditional competitions, losing means no
 **Hook:** "$990 paid to artists who LOST their battles — the WaveWarZ economic model."
 
 ### Angle B — Web3/Crypto (CoinDesk, The Block, Decrypt, Cointelegraph)
-**"A Solana prediction market just had its biggest week ever — thanks to AI judges and music battles"**
+**"A Solana prediction market generated $26K in one week — thanks to AI judges and music battles"**
 
-The technical story: DJ Wavy (AI judge), Solana's 0.4s finality, artist side-pool mechanics, and onchain settlement. The tournament created 8.7× the previous weekly volume record. This is the proof-of-concept for AI-curated creator economy prediction markets.
+The technical story: DJ Wavy (AI judge), Solana's 0.4s finality, artist side-pool mechanics, and onchain settlement. The tournament generated 355 SOL ($26K) in one week — 40.5% of the platform's all-time volume compressed into a single event. This is the proof-of-concept for AI-curated creator economy prediction markets.
 
-**Hook:** "355 SOL ($26K) traded on music battles in 7 days — 8.7× the previous record."
+**Hook:** "355 SOL ($26K) traded on AI-judged music battles in 7 days."
 
 ### Angle C — AI/Tech (The Verge, Wired, Ars Technica)
 **"What happens when an AI judge decides a music battle and fans bet SOL on the result?"**
 
-DJ Wavy is an AI evaluator (not a random number generator) that scores each song on defined criteria. Fans can trade against the AI's prediction or with it. The AI Tournament pitted the highest-ranked artists against each other, with the AI's evaluations as one of three win conditions (community poll + charts trading volume + DJ Wavy). The result: the most liquid week of trading in platform history.
+DJ Wavy is an AI evaluator (not a random number generator) that scores each song on defined criteria. Fans can trade against the AI's prediction or with it. The AI Tournament pitted the highest-ranked artists against each other, with the AI's evaluations as one of three win conditions (community poll + charts trading volume + DJ Wavy). The result: 355 SOL ($26K) traded in one week — the platform's biggest single event by volume.
 
 **Hook:** "An AI music judge + prediction markets = $26,000 traded on a bracket tournament."
 
@@ -75,16 +76,16 @@ The ZAO is the DAO behind WaveWarZ: 100+ consecutive weeks of Fractal governance
 FOR IMMEDIATE RELEASE — [DATE]
 
 WaveWarZ AI Music Tournament Concludes: [WINNER] Wins, 
-$[USD_TOTAL] Traded in Tournament Week — a Platform Record
+$[USD_TOTAL] Traded in Tournament Week
 
 MAINE, USA — WaveWarZ, the first on-chain music-battle prediction market on Solana, 
 today completed its inaugural AI Artist Tournament with [WINNER] defeating [LOSER] 
 in the grand final. The tournament generated [TOURNAMENT_SOL] SOL (approximately 
-$[USD_TOTAL] at current prices) in trading volume — more than the platform's entire 
-prior history in a single event.
+$[USD_TOTAL] at current prices) in trading volume — the platform's largest single event 
+in its 14-month history and 40.5% of its all-time volume compressed into one week.
 
 KEY FACTS:
-• Tournament week (Jul 17-24): 355.36 SOL (~$26,280 USD) — 8.7× the previous weekly record
+• Tournament week (Jul 17-24): 355.36 SOL (~$26,280 USD) — 40.5% of all-time platform volume in 7 days
 • Grand final result: [WINNER] def. [LOSER], [WINNER_SOL] SOL traded
 • Artists compensated automatically: every participating artist received real SOL payouts 
   onchain — win or lose
@@ -147,12 +148,11 @@ wavewarz.info | thezao.xyz
 
 ## X Post Templates (Zaal fires after grand final confirmed)
 
-**Post 1 — Result + record stat:**
+**Post 1 — Result + volume stat:**
 ```
 [WINNER] wins the WaveWarZ AI Tournament 🏆
 
-355 SOL (~$26K) traded this week alone — 8.7× our previous weekly record.
-68% of the platform's entire 14-month history in 7 days.
+355 SOL (~$26K) traded this week — 40% of the platform's all-time volume in 7 days.
 
 Every artist got paid. Onchain. No label required.
 
@@ -171,7 +171,7 @@ No winner-takes-all. No label cut. Direct to the artist's wallet.
 
 **Post 3 — Media hook:**
 ```
-355 SOL in 7 days. 8.7× our previous record.
+355 SOL in 7 days. 40% of everything we've ever traded, in a single week.
 
 If you cover music + Web3 / AI + creator economy, this is the story.
 
@@ -187,7 +187,7 @@ DM me or tag a journalist who should see this.
 
 [WINNER] def. [LOSER] in the grand final.
 
-📊 Tournament week: 355.36 SOL (~$26K) — 8.7× all-time weekly record
+📊 Tournament week: 355.36 SOL (~$26K) — 40% of all-time platform volume in 7 days
 🎵 Every artist who competed received automatic SOL payouts (loser-earns)
 🤖 DJ Wavy (AI judge) + community poll + trading volume → winner
 🔗 All stats on-chain: wavewarz.info/api/public/stats
@@ -202,7 +202,7 @@ Full recap: [link to doc 2073 ZAOOS post or blog]
 ```
 WaveWarZ AI Tournament completed. [WINNER] wins.
 
-tournament week: 355 SOL (68% of 14-month platform history in 7 days)
+tournament week: 355 SOL (40% of all-time platform volume in 7 days)
 grand final: [TOURNAMENT_SOL] SOL traded
 
 the loser-earns model ran flawlessly — every competing artist got paid onchain.

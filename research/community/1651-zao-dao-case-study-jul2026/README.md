@@ -2,7 +2,7 @@
 
 **Type:** CASE-STUDY  
 **Topic:** Community  
-**Status:** CANONICAL — cite this doc in OP Retro Funding applications, academic research requests, press pitches, and grant narratives. This is the definitive snapshot of ZAO's governance and platform history as of July 2026. Update quarterly or after major milestones. Last verified: Jul 18, 2026.
+**Status:** CANONICAL — cite this doc in OP Retro Funding applications, academic research requests, press pitches, and grant narratives. This is the definitive snapshot of ZAO's governance and platform history as of July 2026. Update quarterly or after major milestones. Last verified: Jul 24, 2026.
 
 ---
 
@@ -50,16 +50,18 @@ The losing artist receives 10% of the winning fans' stake. A losing artist in a 
 
 | Metric | Value |
 |---|---|
-| Total battles settled | 1,245 |
-| MAIN events run | 50 |
-| MAIN battles | 162 |
-| Quick battles | 1,047 |
+| Total battles settled | 1,289 |
+| MAIN events run | 50+ |
+| MAIN battles | 165 |
+| Quick battles | 1,084 |
 | Community battles | 36 |
-| Total SOL trading volume | 523.991 SOL |
-| Artist payouts (all artists) | 9.0988 SOL |
-| Trader claims | 127.343 SOL |
+| Total SOL trading volume | 878.30 SOL |
+| Artist payouts (all artists) | 13.39 SOL |
+| Trader claims | 381.197 SOL (1,526 on-chain withdrawals) |
 
-**Source:** `wavewarz.info/api/public/stats` (public API, no auth required)
+**Source:** `wavewarz.info/api/public/stats` (public API, no auth required) — pulled 2026-07-24T11:58Z.
+
+**Note (Jul 2026 AI Tournament):** The AI Artist Tournament semifinal (Jul 16–23) alone generated ~355 SOL in one week — 68% of all prior platform volume combined. Grand final (GEEK MYTH vs Stormbourne) is upcoming as of Jul 24; see doc 2042 for grand final preview.
 
 ### Top Artist Earners (Jul 2026)
 

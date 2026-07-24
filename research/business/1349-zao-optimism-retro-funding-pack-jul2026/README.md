@@ -27,7 +27,7 @@
 **Project Name:** The ZAO / WaveWarZ
 
 **One-liner (under 50 words):**
-The ZAO is the only active Fractal DAO on Optimism — 63+ consecutive on-chain governance weeks, 157 Respect holders, and a live music prediction market (WaveWarZ) with 1,289 battles and $39K+ in verified on-chain volume. Open-source. Artist-first. Running every week since October 2022.
+The ZAO is the only active Fractal DAO on Optimism — 63+ consecutive on-chain governance weeks, 157 Respect holders, and a live music prediction market (WaveWarZ) with 1,289 battles and $64.8K+ in verified on-chain volume. Open-source. Artist-first. Running every week since October 2022.
 
 ---
 
@@ -146,7 +146,7 @@ All on Optimism Mainnet:
 
 ## Section 8: Why Now + What Funding Would Fund
 
-**Why now:** The ZAO is at an inflection point — 63+ weeks of proven governance, $39K+ in WaveWarZ volume, and a live IRL festival (ZAOstock, Oct 3 2026). Retro Funding at this stage would:
+**Why now:** The ZAO is at an inflection point — 63+ weeks of proven governance, $64.8K+ in WaveWarZ volume, and a live IRL festival (ZAOstock, Oct 3 2026). Retro Funding at this stage would:
 1. Validate the Fractal DAO model as worth scaling
 2. Fund the ZAOstock festival production (currently bootstrapped)
 3. Fund WaveWarZ expansion to Base (Arthur/Neynar partnership)

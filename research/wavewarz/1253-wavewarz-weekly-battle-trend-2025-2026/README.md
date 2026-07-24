@@ -135,7 +135,7 @@ The Jul 6 week (37 battles) is the highest single ISO week since Apr 20 (40 batt
 
 5. **Jun–Jul 2026**: Rebound. A notable main event (AI LUI vs Benny J, 17.66 SOL) lifts June volume. July picking up to 37–42 battles/week — above the May plateau.
 
-**Bottom line for citation:** WaveWarZ has run continuously for 14+ months since May 2025, processed 1,289 total battles (live API) / 1,108 parsed, and settled 878.30 SOL (~$39,453) in trading volume. Quick battle participation is stable and recovering after the Q1 2026 peak. The platform is an active, continuously-operating onchain music prediction market.
+**Bottom line for citation:** WaveWarZ has run continuously for 14+ months since May 2025, processed 1,289 total battles (live API) / 1,108 parsed, and settled 878.30 SOL (~$64.8K) in trading volume. Quick battle participation is stable and recovering after the Q1 2026 peak. The platform is an active, continuously-operating onchain music prediction market.
 
 ---
 

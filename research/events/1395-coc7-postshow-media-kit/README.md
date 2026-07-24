@@ -60,7 +60,7 @@ COC Concertz is a monthly virtual concert series that integrates live music with
 participation tools. Shows are hosted inside Spatial.io's "Dope Stilo Music Club" and
 simulcast on Twitch for free. Artists who perform inside the metaverse are the same artists
 who compete on WaveWarZ, The ZAO's live music battle platform (1,289+ battles on Solana,
-$39K+ total SOL volume as of July 2026).
+$64.8K+ total SOL volume as of July 2026).
 
 "[HEADLINE_QUOTE]" — Zaal Panthaki, COC Concertz producer
 

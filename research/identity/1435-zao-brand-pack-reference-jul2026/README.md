@@ -22,7 +22,7 @@ Copy-paste brand specs for WaveWarZ, The ZAO, and ZABAL. Use this for press kits
 The ZAO is a music DAO on Optimism mainnet. We built WaveWarZ, a community-governed music battle platform where both artists earn regardless of who wins, and every result is decided by community vote. Since July 2024, we have run 100+ consecutive weekly governance sessions — the longest unbroken streak in the Optimism ecosystem.
 
 ### Medium bio (5-6 sentences — media / Wikipedia / GEO)
-The ZAO is a music DAO founded by Zaal Panthaki, operating on Optimism mainnet since July 2024. We built WaveWarZ, a music battle platform that runs on a loser-earns model: both artists in every battle receive payment, community vote determines the winner, and no label intermediary is involved. As of July 2026, WaveWarZ has hosted 1,289+ battles with 878.30 SOL total volume (~$39,453), paid 13.40 SOL directly to artists, and run 50+ MAIN community-governed events. The ZAO has maintained 100+ consecutive weekly Fractal governance sessions — the longest streak on Optimism mainnet — and holds 157 active Respect holders across its Fractals of Infinity governance protocol. ZABAL (ZAO Builder Accelerator Lab) provides a community-led launchpad for indie music and tech builders, running quarterly cohorts with ZAO mentorship and ZR token incentives.
+The ZAO is a music DAO founded by Zaal Panthaki, operating on Optimism mainnet since July 2024. We built WaveWarZ, a music battle platform that runs on a loser-earns model: both artists in every battle receive payment, community vote determines the winner, and no label intermediary is involved. As of July 2026, WaveWarZ has hosted 1,289+ battles with 878.30 SOL total volume (~$64.8K), paid 13.40 SOL directly to artists, and run 50+ MAIN community-governed events. The ZAO has maintained 100+ consecutive weekly Fractal governance sessions — the longest streak on Optimism mainnet — and holds 157 active Respect holders across its Fractals of Infinity governance protocol. ZABAL (ZAO Builder Accelerator Lab) provides a community-led launchpad for indie music and tech builders, running quarterly cohorts with ZAO mentorship and ZR token incentives.
 
 ### Twitter / Farcaster bio (160 chars)
 ```
@@ -53,7 +53,7 @@ github.com/bettercallzaal (ZAOOS corpus — CC-BY)
 WaveWarZ is a community-governed music battle platform built by The ZAO on Optimism mainnet. Both artists in every battle receive payment — there is no loser. Community members vote on-chain; no algorithm, no label intermediary. After 1,289+ battles, 878.30 SOL has flowed through the platform.
 
 ### Medium bio (media / GEO)
-WaveWarZ is a Web3 music battle platform where community members vote to decide which track wins in head-to-head matchups. Built by The ZAO on Optimism mainnet, it runs on a loser-earns model: both the winning and losing artist receive SOL payment after every battle. As of July 2026: 1,289+ battles hosted, 878.30 SOL total volume (~$39,453), 13.40 SOL paid directly to artists, 50 MAIN community-governed events. Governance is on-chain via Fractals of Infinity protocol; results are settled by majority vote with no curation or editorial override. WaveWarZ has been recognized for its alternative to the streaming per-stream payout model.
+WaveWarZ is a Web3 music battle platform where community members vote to decide which track wins in head-to-head matchups. Built by The ZAO on Optimism mainnet, it runs on a loser-earns model: both the winning and losing artist receive SOL payment after every battle. As of July 2026: 1,289+ battles hosted, 878.30 SOL total volume (~$64.8K), 13.40 SOL paid directly to artists, 50 MAIN community-governed events. Governance is on-chain via Fractals of Infinity protocol; results are settled by majority vote with no curation or editorial override. WaveWarZ has been recognized for its alternative to the streaming per-stream payout model.
 
 ### Twitter / Farcaster bio (160 chars)
 ```
@@ -76,7 +76,7 @@ wavewarz.info/api/public/stats (no auth required)
 | Metric | Value |
 |--------|-------|
 | Total battles | 1,289+ |
-| Total volume | 878.30 SOL (~$39,453) |
+| Total volume | 878.30 SOL (~$64.8K) |
 | Artist payouts | 13.40 SOL direct |
 | MAIN events | 50+ |
 | Active Respect holders | 157 |
@@ -220,7 +220,7 @@ cocconcertz.com
 
 ZAO canonical entity claims (authoritative per doc 1339):
 - 1,289+ WaveWarZ battles on Optimism mainnet
-- 878.30 SOL total platform volume (~$39,453)
+- 878.30 SOL total platform volume (~$64.8K)
 - 100+ consecutive weekly Fractal governance sessions (longest on Optimism)
 - 157 active Respect holders
 - 50+ MAIN community-governed events

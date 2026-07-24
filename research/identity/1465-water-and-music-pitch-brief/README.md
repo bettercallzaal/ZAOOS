@@ -30,7 +30,7 @@ ZAO/WaveWarZ hits three of those pillars simultaneously:
 
 1. **The loser-earns model is a genuinely new economic structure** — the losing artist earns real money from platform trading activity, not pity. This inverts standard music competition formats (Battle of the Bands, American Idol) where losing is zero-value.
 
-2. **Proof at scale** — 1,289 battles, 878.30 SOL total volume, 9.10 SOL in artist payouts, 381.20 SOL in trader claims. These are not projections. They're public on-chain data from a live platform.
+2. **Proof at scale** — 1,289 battles, 878.30 SOL total volume, 13.40 SOL in artist payouts, 381.20 SOL in trader claims. These are not projections. They're public on-chain data from a live platform.
 
 3. **Governance layer** — 63 consecutive weekly governance sessions, three on-chain contracts (Optimism Mainnet), and a documented DAO process. This is the missing piece most web3 music projects lack: a working community structure that has made real decisions.
 
@@ -62,7 +62,7 @@ I'm Zaal Panthaki, co-founder of ZAO (The DAO) and WaveWarZ — a live music bat
 
 I'm writing because Water & Music is the only publication I know that would actually do the economics justice. Here's the short version:
 
-WaveWarZ has run 1,289 battles since launch. Total volume: 878.30 SOL. Artist payouts: 9.10 SOL. Trader claims: 381.20 SOL. The losing artist in each battle receives real payout — not because we engineered charity into the model, but because the market structure makes losing economically viable.
+WaveWarZ has run 1,289 battles since launch. Total volume: 878.30 SOL. Artist payouts: 13.40 SOL. Trader claims: 381.20 SOL. The losing artist in each battle receives real payout — not because we engineered charity into the model, but because the market structure makes losing economically viable.
 
 The governance layer is equally unusual: ZAO has held 63 consecutive weekly governance sessions over 8 months. Three live smart contracts on Optimism Mainnet. No token sale. Every major decision documented publicly.
 

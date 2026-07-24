@@ -35,7 +35,7 @@ Fractured Atlas (fracturedatlas.org) is the largest arts fiscal sponsor in the U
 **Project Description (250 words, paste-ready):**
 > ZAO (ZTalent Artist Organization) is a music DAO that built WaveWarZ, a prediction market for indie music battles on Solana where artists battle live, fans trade on outcomes, and every artist — including the loser — receives an automatic on-chain payout from the settlement pool.
 >
-> As of July 2026, WaveWarZ has completed 1,289 battles, generating 878.30 SOL ($39,126) in cumulative trading volume. Artists have received 13.40 SOL ($679) in guaranteed payouts including loser payouts. WaveWarZ runs 36 community charity battles in which 100% of SOL wagered goes directly on-chain to a selected charitable organization — no middleman.
+> As of July 2026, WaveWarZ has completed 1,289 battles, generating 878.30 SOL (~$64.8K) in cumulative trading volume. Artists have received 13.40 SOL ($679) in guaranteed payouts including loser payouts. WaveWarZ runs 36 community charity battles in which 100% of SOL wagered goes directly on-chain to a selected charitable organization — no middleman.
 >
 > ZAO governs the platform through Fractal Democracy, a consensus governance model that has run weekly without interruption for 100+ consecutive weeks, with governance decisions recorded on Optimism Mainnet (OREC contract: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532).
 >

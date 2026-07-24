@@ -41,7 +41,7 @@ owner: Zaal
 **Pitch frame for FA application:**
 - The ZAO is an artist-governance model for independent music — every artist earns, every decision is voted on
 - ZAOstock (Oct 3) is the flagship event: 200-300 attendees, 8 performing artists, live stream
-- 63+ community governance sessions; $9.10 SOL in direct artist payouts to date
+- 63+ community governance sessions; 13.40 SOL in direct artist payouts to date
 - Not a blockchain project — an arts governance experiment using transparent tooling
 
 **After FA approves:** Immediately apply to Fisher (Grant 2) using ZAOstock as the event anchor.

@@ -39,7 +39,7 @@ deadline: 2026-07-21 (lock August plan by Monday)
 
 ## WaveWarZ: August 3-Track Framework
 
-WaveWarZ is at a scale inflection point: 1,289 battles, 921 songs, 878 SOL total traded ($39K lifetime), 3% platform fee (~$1,170 ZAO take). August determines whether it monetizes, grows, or features new mechanics.
+WaveWarZ is at a scale inflection point: 1,289 battles, 921 songs, 878 SOL total traded ($64.8K lifetime), 3% platform fee (~$1,170 ZAO take). August determines whether it monetizes, grows, or features new mechanics.
 
 ### Track A — Growth (Expand the Roster)
 

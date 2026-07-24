@@ -93,7 +93,7 @@ wavewarz.info is free, requires no account, and has a public API. Any journalist
 ## Angles for Music Journalists
 
 1. **"The music platform where losing pays"** — the loser-earns mechanic as a story about inverting music industry economics
-2. **"$39,000 bet on indie music"** — the volume story, who's betting, what they're betting on
+2. **"$65K bet on indie music"** — the volume story, who's betting, what they're betting on
 3. **"A DAO built a Spotify competitor"** — the governance story, 100 consecutive weekly sessions → WaveWarZ
 4. **"The 600x artist payout gap"** — WaveWarZ 1.73% vs Spotify $0.004/stream as economic critique
 5. **"Maine music festival meets prediction market"** — ZAOstock (outdoor festival) + WaveWarZ (digital battles) as the same ecosystem

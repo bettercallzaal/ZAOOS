@@ -3,14 +3,14 @@
 **Type:** PRODUCT-SPEC  
 **Topic:** farcaster  
 **Status:** DECISION NEEDED — Hurricane implements; Zaal approves priority  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1295 (Farcaster Channel Strategy), 1374 (Farcaster Growth Strategy), 1350 (WaveWarZ 101), 1341 (MAIN Event Strategy), 1412 (Community Infrastructure Map — CH03/CH04)
 
 ---
 
 ## Why This Matters (for Zaal to share with Hurricane)
 
-The WaveWarZ Farcaster Mini App is the #1 unlock for ZAO's Farcaster growth. Currently, /zao has 93 followers — well below what 63+ weeks of governance and 1,245 battles justifies. The reason: there's no native way to interact with WaveWarZ from inside Farcaster.
+The WaveWarZ Farcaster Mini App is the #1 unlock for ZAO's Farcaster growth. Currently, /zao has 93 followers — well below what 63+ weeks of governance and 1,289 battles justifies. The reason: there's no native way to interact with WaveWarZ from inside Farcaster.
 
 With a Mini App (formerly called a Frame in Farcaster), a user can:
 - See an active WaveWarZ battle without leaving Warpcast

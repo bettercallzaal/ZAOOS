@@ -260,9 +260,9 @@ Questions: Telegram ZAO Public.
 ```
 Pitch sent. [Publication] asked for more data.
 
-1,245 battles.
-523.991 SOL.
-9.09 SOL to artists — including losers.
+1,289 battles.
+878.30 SOL.
+13.40 SOL to artists — including losers.
 
 The mechanic works.
 wavewarz.info/api/public/stats

@@ -144,7 +144,7 @@ Key quote from the piece: *"One WaveWarZ battle is worth roughly 11,667 Spotify 
 ### Footer
 
 The ZAO is a decentralized autonomous organization for music, art, and culture.  
-63 consecutive weeks of on-chain governance. 1,245+ WaveWarZ battles. ZAOstock Oct 3, 2026.
+63 consecutive weeks of on-chain governance. 1,289+ WaveWarZ battles. ZAOstock Oct 3, 2026.
 
 [Unsubscribe] | [View on Paragraph] | Reply to this email — we read every response.
 

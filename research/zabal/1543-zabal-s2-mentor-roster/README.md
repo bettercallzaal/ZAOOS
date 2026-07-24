@@ -109,7 +109,7 @@ Subject: ZABAL S2 — Open to async questions from our cohort?
 
 Hey [Name],
 
-I run ZAO, a music DAO that governs WaveWarZ (1,245+ on-chain music battles).
+I run ZAO, a music DAO that governs WaveWarZ (1,289+ on-chain music battles).
 ZABAL is our Sep–Nov cohort for builders + musicians — 20 participants selected 
 from an open application.
 

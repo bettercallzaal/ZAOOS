@@ -16,7 +16,7 @@ ZAO sounds like someone who built something real and has the receipts. We don't 
 
 **1. Receipts over claims**
 - Wrong: "WaveWarZ is changing the music industry"
-- Right: "1,245 battles settled. Artists paid, including losers. On Solana. Automatic."
+- Right: "1,289 battles settled. Artists paid, including losers. On Solana. Automatic."
 
 **2. Numbers do the talking**
 - Wrong: "Our community is incredible"
@@ -193,7 +193,7 @@ doc 1570 update needed — approve? Reply "Y" or corrections.
 **What reviewers want to see:** What you built (specific), who it serves (specific), why this grant matters for the outcome (specific).
 
 **Grant voice template:**
-> "ZAO is a music DAO that has operated 100+ consecutive weekly governance sessions on Optimism Mainnet, settling 1,245 WaveWarZ battles with automatic artist payouts — including losing artists. ZAOstock (October 3, Ellsworth ME) is the first live IRL event where this model takes the stage. [This grant / This sponsorship] would directly fund [specific line item: $X for artist travel, $Y for sound equipment], making ZAOstock free and accessible to all Maine community members."
+> "ZAO is a music DAO that has operated 100+ consecutive weekly governance sessions on Optimism Mainnet, settling 1,289 WaveWarZ battles with automatic artist payouts — including losing artists. ZAOstock (October 3, Ellsworth ME) is the first live IRL event where this model takes the stage. [This grant / This sponsorship] would directly fund [specific line item: $X for artist travel, $Y for sound equipment], making ZAOstock free and accessible to all Maine community members."
 
 **What NOT to write:**
 - "ZAO is disrupting the music industry" (unverifiable, jargon)
@@ -219,7 +219,7 @@ Hi Cherie,
 
 I run ZAO — a music DAO that built WaveWarZ, a prediction market for music battles on Solana.
 
-The mechanic: when the battle closes, the losing artist gets paid automatically — 10% of the winning fans' stake, no claim needed. 1,245 battles settled. $9.09 SOL to artists, including losers.
+The mechanic: when the battle closes, the losing artist gets paid automatically — 10% of the winning fans' stake, no claim needed. 1,289 battles settled. $13.40 SOL to artists, including losers.
 
 This seems like something Water & Music readers would care about — you cover the structural economics of music, and this inverts one of the oldest assumptions (losing = zero).
 
@@ -265,7 +265,7 @@ When ZOE writes automated posts, it applies the following rules:
 - Never add editorial ("incredible match", "what a show")
 
 **Stat posts:**
-- Lead with the number, not the label ("1,245 battles" not "Number of battles: 1,245")
+- Lead with the number, not the label ("1,289 battles" not "Number of battles: 1,289")
 - Source: always wavewarz.info/api/public/stats (don't cite memory)
 
 **Event announcement posts:**

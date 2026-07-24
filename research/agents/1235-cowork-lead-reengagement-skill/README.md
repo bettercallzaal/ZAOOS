@@ -2,7 +2,7 @@
 topic: agents
 type: design
 status: design-complete
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 743 (cold-outreach workflow), 742 (Zaal Panthaki dossier), 621 (ZAO context canon), 987 (LinkedIn playbook), 1233 (values-axis ZIP-006)
 original-query: "Claude Cowork lead-reengagement skill for BCZ/ZOE — from Return My Time email; board task e943b4ce"
 tier: STANDARD
@@ -43,7 +43,7 @@ The email case that triggered this task: a cowork lead (ZAO-adjacent creator/ent
 Key observations:
 1. **The re-open happened on the lead's terms** — they initiated. A ZOE skill should replicate this by making the bump so low-pressure it feels like the lead is in control.
 2. **No CRM was tracking the 14-day silence** — ZOE had no signal. A skill needs to add that observability.
-3. **The bump message that works is 1–3 lines max** — not a pitch deck, not a Loom, not a meeting request. It's a fact or event ("WaveWarZ just hit 1,245 battles — thought you'd want to see this") with a zero-friction door open.
+3. **The bump message that works is 1–3 lines max** — not a pitch deck, not a Loom, not a meeting request. It's a fact or event ("WaveWarZ just hit 1,289 battles — thought you'd want to see this") with a zero-friction door open.
 
 ---
 
@@ -62,7 +62,7 @@ Key observations:
 |---|---|---|
 | Last contact date | Supabase `contact_log` (ZAOcowork) | From existing CRM schema |
 | Lead context / profile | Bonfire (prior episodes) | ZOE recall query |
-| Recent ZAO milestone | ZAOOS llms.txt or hardcoded fact set | E.g., "WaveWarZ just crossed 1,245 battles" |
+| Recent ZAO milestone | ZAOOS llms.txt or hardcoded fact set | E.g., "WaveWarZ just crossed 1,289 battles" |
 | Lead interest area | CRM `circle` field or Bonfire tags | Music / Fractal / WaveWarZ / ZABAL / Festivals |
 | Channel of original contact | `contact_log.channel` | Email / LinkedIn DM / Telegram / Farcaster |
 | Zaal's current relationship depth | CRM `relationship_tier` (1=met once, 2=chatted, 3=worked together) | |
@@ -159,11 +159,11 @@ ZOE matches the lead's interest area to the latest ZAO milestone:
 
 | Interest area | Hook pool (Jul 2026) |
 |---|---|
-| WaveWarZ / Music | "WaveWarZ just crossed 1,245 battles on Solana — no other onchain music battle platform is close." |
+| WaveWarZ / Music | "WaveWarZ just crossed 1,289 battles on Solana — no other onchain music battle platform is close." |
 | Fractal / governance | "ZAO Fractal just hit 90+ consecutive sessions — 2 years of weekly Respect governance, unbroken." |
 | ZABAL Gamez | "ZABAL Gamez just passed 9 qualifying projects across artist/builder/creator tracks — we built a real tournament structure." |
 | Festivals / IRL | "ZAOville Pool Party is Jul 25 (Laurel, MD) + ZAOstock is Oct 3 (Ellsworth, ME) — these are on the calendar now." |
-| ZAO ecosystem | "ZAO is now 188 onchain members, 524.15 SOL in WaveWarZ volume, and 313 live API routes — it's a working system." |
+| ZAO ecosystem | "ZAO is now 188 onchain members, 878.30 SOL in WaveWarZ volume, and 313 live API routes — it's a working system." |
 | COC / livestream | "COC Concertz #7 (WaveWarZ Takeover) is tomorrow/this Friday 4PM EST — want a link?" |
 
 The message template is filled by ZOE's concierge brain (`runConciergeTurn`) with a restricted system prompt:

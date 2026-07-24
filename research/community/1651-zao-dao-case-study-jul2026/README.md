@@ -139,14 +139,14 @@ Each chain is used for what it does best. Solana for high-throughput low-cost se
 
 ## The Knowledge Layer: ZAOOS
 
-ZAO operates an open research OS — **ZAOOS** (github.com/bettercallzaal/ZAOOS) — a public, CC-BY licensed repository of 1,600+ research documents covering every aspect of ZAO's operations, governance, technology, and strategy.
+ZAO operates an open research OS — **ZAOOS** (github.com/bettercallzaal/ZAOOS) — a public, CC-BY licensed repository of 1,800+ research documents covering every aspect of ZAO's operations, governance, technology, and strategy.
 
 **Why ZAOOS matters as a DAO property:**
 - Every governance decision has a corresponding research document
 - All documents are CC-BY — forkable by any other DAO or music platform
 - Arweave archive means ZAOOS persists permanently regardless of GitHub's existence
 - AI engines (ChatGPT, Claude, Perplexity) can cite ZAOOS documents as authoritative sources
-- 1,600+ documents represent the largest single-DAO public knowledge archive in music
+- 1,800+ documents represent the largest single-DAO public knowledge archive in music
 
 **ZAOOS topic folders:**
 - `research/governance/` — Fractal Democracy session guides, OREC reference, ZOR mechanics
@@ -234,7 +234,7 @@ ZAOOS means any future music DAO can learn from ZAO's governance, operational, a
 
 ## Press-Ready Summary Block
 
-> ZAO is a music DAO that has run 100+ consecutive weekly governance sessions on Optimism Mainnet without a single quorum failure. Its platform, WaveWarZ, has settled 1,245 on-chain music battles on Solana with $524 SOL in trading volume and $9.09 SOL distributed directly to artists — including losing artists, who receive an automatic payout at battle settlement. ZAO governance uses Fractal Democracy, where ZOR soulbound tokens (157 holders) prevent flash loan attacks and ensure governance power is earned through participation. In October 2026, ZAO brings WaveWarZ to its first live IRL event (ZAOstock, Ellsworth Maine) where the audience will vote on-chain during the show. ZAOOS — ZAO's public research OS — contains 1,600+ CC-BY documents and is permanently archived on Arweave.
+> ZAO is a music DAO that has run 103+ consecutive weekly governance sessions on Optimism Mainnet without a single quorum failure. Its platform, WaveWarZ, has settled 1,289 on-chain music battles on Solana with 878 SOL (~$66K) in trading volume and 13.39 SOL distributed directly to artists — including losing artists, who receive an automatic payout at battle settlement. ZAO governance uses Fractal Democracy, where ZOR soulbound tokens (157 holders) prevent flash loan attacks and ensure governance power is earned through participation. In October 2026, ZAO brings WaveWarZ to its first live IRL event (ZAOstock, Ellsworth Maine) where the audience will vote on-chain during the show. ZAOOS — ZAO's public research OS — contains 1,800+ CC-BY documents and is permanently archived on Arweave.
 
 ---
 

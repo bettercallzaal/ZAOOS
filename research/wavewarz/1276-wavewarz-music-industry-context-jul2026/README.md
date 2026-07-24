@@ -94,13 +94,13 @@ All from `wavewarz.info/api/public/stats` (public API, no auth):
 | Metric | Value | Significance |
 |--------|-------|-------------|
 | Total battles | 1,289 | 1,289 individual head-to-head competitions |
-| Total volume | 878.30 SOL (~$39,453) | Real money flowing through the platform |
+| Total volume | 878.30 SOL (~$64.8K) | Real money flowing through the platform |
 | Artist payouts | 13.40 SOL (~$683) | Paid to artists automatically, with no invoices |
 | Unique songs battled | 921 | 921 songs are actively in the market |
 | Audius-rostered artists | 34 | Artists with discoverable Audius profiles |
 | Charity raised | $1,497 | Via Community Battle benefit rounds |
 
-**The numbers at context:** 13.40 SOL (~$683) to artists from 878 SOL (~$39,453) volume = 1.73% payout rate. On Spotify, to earn $683, an artist would need 170,750 streams at $0.004/stream. WaveWarZ generated that equivalent from 1,289 battles — not 170,750 individual listener events.
+**The numbers at context:** 13.40 SOL (~$683) to artists from 878 SOL (~$64.8K) volume = 1.73% payout rate. On Spotify, to earn $683, an artist would need 170,750 streams at $0.004/stream. WaveWarZ generated that equivalent from 1,289 battles — not 170,750 individual listener events.
 
 ---
 

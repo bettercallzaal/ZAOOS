@@ -51,7 +51,7 @@
 
 ### Priority 1: WaveWarZ trademark — USPTO filing NOW
 
-**Why:** WaveWarZ is the primary revenue-generating product, has 1,289 verified battles and $39K+ in volume, and the name is distinctive enough to register. If someone else files first, ZAO loses the brand.
+**Why:** WaveWarZ is the primary revenue-generating product, has 1,289 verified battles and $64.8K+ in volume, and the name is distinctive enough to register. If someone else files first, ZAO loses the brand.
 
 **What to file:** 
 - Class 41 (Entertainment services, online gaming)

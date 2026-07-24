@@ -32,7 +32,7 @@ tier: CANONICAL
 | Governance longevity | Consecutive Fractal weeks | **100+** (since Jul 30, 2024) | doc 1254 |
 | On-chain settlement | Verified Optimism settlement weeks | **63** (OG: 33 + ZOR: 31) | doc 1202 |
 | Respect holders | Unique wallets with Respect tokens | **157** | doc 1200 |
-| Product traction | WaveWarZ lifetime volume | **878.30 SOL (~$39,453)** | live API |
+| Product traction | WaveWarZ lifetime volume | **878.30 SOL (~$64.8K)** | live API |
 | Product traction | WaveWarZ battles completed | **1,289** (1,108 in public feed) | live API |
 | Community impact | Charity raised via WaveWarZ | **$1,497** (2 rounds, HuRya Foundation) | doc 1214 |
 | IRL events | Confirmed events with on-chain elements | **2** (ZAO-CHELLA Dec 2024; ZAOstock Oct 3 2026) | doc 1077 |
@@ -42,7 +42,7 @@ tier: CANONICAL
 
 ### The Claim We Can Make
 
-> "The ZAO has run 100+ consecutive weekly Fractal governance sessions on Optimism mainnet since July 2024 — longer than any other verified fractal DAO in the Optimism ecosystem. WaveWarZ, the ZAO's flagship application, has completed 1,289 on-chain music battles totaling 878.30 SOL in volume ($39,453), demonstrating that a DAO's governance model can be productized into live economic activity."
+> "The ZAO has run 100+ consecutive weekly Fractal governance sessions on Optimism mainnet since July 2024 — longer than any other verified fractal DAO in the Optimism ecosystem. WaveWarZ, the ZAO's flagship application, has completed 1,289 on-chain music battles totaling 878.30 SOL in volume (~$64.8K), demonstrating that a DAO's governance model can be productized into live economic activity."
 
 ### Evidence Quality: STRONG
 

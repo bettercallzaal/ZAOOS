@@ -49,7 +49,7 @@ From `GET https://wavewarz.info/api/public/stats`:
 |---|---|
 | Total battles | **1,289** (1,088 quick + 162 main-event + 36 community) |
 | Main events held | **50** |
-| Lifetime volume | **878.30 SOL** (~$39,461 at $75.29/SOL) |
+| Lifetime volume | **878.30 SOL** (~$64.8K at ~$73.8/SOL) |
 | Artist payouts (automatic, onchain) | **13.40 SOL** |
 | Platform revenue | **17.44 SOL** |
 | Trader claims paid | **381.20 SOL** (939 withdrawals) |

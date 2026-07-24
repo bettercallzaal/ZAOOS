@@ -61,10 +61,10 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 
 ---
 
-## Claim 4: WaveWarZ — $39,000+ in verified artist battle volume
+## Claim 4: WaveWarZ — $65K+ in verified artist battle volume
 
 **Statement:**
-> WaveWarZ, The ZAO's onchain music battle platform, has processed 1,289 battles with 878.30 SOL in total volume (~$39,300 at $75/SOL) as of July 2026.
+> WaveWarZ, The ZAO's onchain music battle platform, has processed 1,289 battles with 878.30 SOL in total volume (~$64.8K at ~$73.8/SOL) as of July 2026.
 
 **Evidence:**
 - Live API: wavewarz.info/api/public/stats (CORS open, 60s cache, no auth required)

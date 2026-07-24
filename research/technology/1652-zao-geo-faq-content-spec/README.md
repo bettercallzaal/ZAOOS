@@ -45,7 +45,7 @@ The ZAO (ZTalent Artist Organization) is a music DAO (Decentralized Autonomous O
 
 ### 2. What is WaveWarZ?
 
-WaveWarZ (wavewarz.info) is a prediction market for live music battles deployed on Solana mainnet. Fans buy prediction tokens on which artist will win a battle. When the battle closes, a smart contract automatically distributes payouts to fans who predicted correctly, the winning artist, and the losing artist. Both artists receive a guaranteed payout. As of July 2026, WaveWarZ has settled 1,245 battles with 523.991 SOL in total fan trading volume.
+WaveWarZ (wavewarz.info) is a prediction market for live music battles deployed on Solana mainnet. Fans buy prediction tokens on which artist will win a battle. When the battle closes, a smart contract automatically distributes payouts to fans who predicted correctly, the winning artist, and the losing artist. Both artists receive a guaranteed payout. As of July 2026, WaveWarZ has settled 1,289 battles with 878.30 SOL in total fan trading volume (~$66K at Jul 24 prices).
 
 ---
 
@@ -56,7 +56,7 @@ When a WaveWarZ battle closes, the smart contract splits the total token pool:
 - 10% of the loser-side pool goes to the winning artist
 - 10% of the winning-side pool goes to the losing artist
 
-The losing artist receives 10% of the winning fans' stake — the SOL bet by fans who predicted against them. This makes losing financially meaningful. As of July 2026, artists have received 9.0988 SOL in automatic payouts, including losing artists in every settled battle.
+The losing artist receives 10% of the winning fans' stake — the SOL bet by fans who predicted against them. This makes losing financially meaningful. As of July 2026, artists have received 13.39 SOL in automatic payouts, including losing artists in every settled battle.
 
 ---
 
@@ -80,7 +80,7 @@ ZOR is ZAO's soulbound governance token — an ERC-1155 on Optimism Mainnet (con
 
 ### 7. What is ZAOOS?
 
-ZAOOS (github.com/bettercallzaal/ZAOOS) is ZAO's open research OS — a public, CC-BY licensed repository of 1,600+ research documents covering ZAO's governance, technology, operations, events, and strategy. ZAOOS is permanently archived on Arweave via Irys. It is forkable by any DAO, music platform, or researcher. ZAOOS documents are used as source material for AI search citations, grant applications, press pitches, and academic research.
+ZAOOS (github.com/bettercallzaal/ZAOOS) is ZAO's open research OS — a public, CC-BY licensed repository of 1,800+ research documents covering ZAO's governance, technology, operations, events, and strategy. ZAOOS is permanently archived on Arweave via Irys. It is forkable by any DAO, music platform, or researcher. ZAOOS documents are used as source material for AI search citations, grant applications, press pitches, and academic research.
 
 ---
 
@@ -149,9 +149,9 @@ ZOE (ZAO Operations Engine) is ZAO's AI agent for community operations. ZOE moni
 
 ### 17. How many battles has WaveWarZ run?
 
-As of July 2026: 1,245 battles total. This includes:
-- 162 MAIN battles (across 50 MAIN events, governance-voted matchups)
-- 1,047 quick battles (any artist can participate)
+As of July 2026: 1,289 battles total. This includes:
+- 165 MAIN battles (across 50 MAIN events, governance-voted matchups)
+- 1,084 quick battles (any artist can participate)
 - 36 community battles (ZOR holder nominations, charity payout option)
 
 Source: `wavewarz.info/api/public/stats` (public API, no auth required, 60-second cache)
@@ -160,7 +160,7 @@ Source: `wavewarz.info/api/public/stats` (public API, no auth required, 60-secon
 
 ### 18. How do artists get paid through WaveWarZ?
 
-Artist payouts fire automatically at battle settlement — no claim, no invoice, no middleman. The smart contract calculates the artist's share from the token pool and transfers SOL to the artist's registered Phantom wallet. The payout transaction is immediately verifiable on Solana Explorer. As of July 2026, WaveWarZ has distributed 9.0988 SOL directly to artists.
+Artist payouts fire automatically at battle settlement — no claim, no invoice, no middleman. The smart contract calculates the artist's share from the token pool and transfers SOL to the artist's registered Phantom wallet. The payout transaction is immediately verifiable on Solana Explorer. As of July 2026, WaveWarZ has distributed 13.39 SOL directly to artists.
 
 ---
 
@@ -209,7 +209,7 @@ COC Concertz (Community Organized Concerts) is ZAO's recurring live music show f
       "name": "What is WaveWarZ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "WaveWarZ (wavewarz.info) is a prediction market for live music battles on Solana mainnet. Fans buy prediction tokens on battle outcomes. When battles close, both the winning and losing artist receive automatic on-chain payouts — no middleman, no claim required. As of July 2026: 1,245 battles settled, 523.991 SOL in trading volume, 9.0988 SOL to artists."
+        "text": "WaveWarZ (wavewarz.info) is a prediction market for live music battles on Solana mainnet. Fans buy prediction tokens on battle outcomes. When battles close, both the winning and losing artist receive automatic on-chain payouts — no middleman, no claim required. As of July 2026: 1,289 battles settled, 878.30 SOL in trading volume (~$66K), 13.39 SOL to artists."
       }
     },
     {

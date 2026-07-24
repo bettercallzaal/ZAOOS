@@ -56,7 +56,7 @@ import {
 } from './reflexion';
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
-import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
+import { disableNudges, enableNudges, nudgesEnabled, markNudgeSent } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -1022,8 +1022,11 @@ bot.command('pulse', async (ctx) => {
   }
 });
 
-bot.command('agenda', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+// Shared agenda body so /agenda and its /list alias run the SAME handler.
+// (Previously /list did `ctx.api.sendMessage(chat, '/agenda')`, which posted the
+// literal text "/agenda" from the bot - it never ran the handler, so /list did
+// nothing.)
+async function sendAgenda(ctx: Context): Promise<void> {
   try {
     const supaUrl = process.env.SUPABASE_URL;
     const supaKey = process.env.SUPABASE_ANON_KEY;
@@ -1052,12 +1055,17 @@ bot.command('agenda', async (ctx) => {
     console.error('[zoe/index] agenda command failed:', e);
     await ctx.reply(`Agenda failed: ${sanitizeErrorForUser(e)}`);
   }
+}
+
+bot.command('agenda', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  await sendAgenda(ctx);
 });
 
 bot.command('list', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  // /list is an alias for /agenda (show all items)
-  await ctx.api.sendMessage(ctx.chat.id, '/agenda');
+  // /list is an alias for /agenda (show all items).
+  await sendAgenda(ctx);
 });
 
 
@@ -2645,8 +2653,20 @@ async function applyLearnProposals(
 
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   const action = ctx.match[1];
-  await ctx.answerCallbackQuery({ text: `Marked ${action}.` });
-  console.log(`[zoe/index] nudge dismissed: ${action}`);
+  // Previously this only acked + logged - the button was a no-op, so "later"
+  // still nudged again on the next tick. "later"/"shelve" now actually snooze
+  // the nudge stream for the cooldown window (markNudgeSent resets it); "now"
+  // just acknowledges (Zaal is acting on it). Confirm the real effect to Zaal.
+  const acted: Record<string, string> = { now: 'On it.', later: 'Snoozed for now.', shelve: 'Shelved for now.' };
+  if (action === 'later' || action === 'shelve') {
+    try {
+      await markNudgeSent();
+    } catch (e) {
+      console.error('[zoe/index] nudge snooze failed:', e);
+    }
+  }
+  await ctx.answerCallbackQuery({ text: acted[action] ?? 'Got it.' });
+  console.log(`[zoe/index] nudge ${action} (snoozed=${action !== 'now'})`);
 });
 
 async function main(): Promise<void> {

@@ -34,7 +34,7 @@ tier: STANDALONE
 | **Tile 3** | Total Fees Generated: sum of both ◎ + $USD |
 | **Footer** | Revenue split reminder: 33% ops · 22% each Hurricane/Candy/Zaal |
 
-Live values (2026-07-17): **4.98×** ratio · 17.44 SOL platform revenue · 9.07 SOL artist payouts · 26.51 SOL total fees.
+Live values (2026-07-17): **4.98×** ratio · 17.44 SOL platform revenue · 13.40 SOL artist payouts · 26.51 SOL total fees.
 
 ---
 
@@ -78,7 +78,7 @@ Instead of hardcoded `"3.5 SOL"`. This is consistent with the rest of AppShell (
 ## NORTH STAR alignment
 
 - **ZAO = THE case study of a successful DAO:** The `4.98×` ratio is a single citable number proving WaveWarZ has generated 5× its operating floor in platform revenue alone — the platform is self-sustaining, not just surviving. This is the strongest "platform health" signal in the tracker.
-- **ZAO IP = a staple in onchain art, music and culture:** The artist payouts tile (9.07 SOL = $669) alongside platform revenue makes visible that the platform's economic model benefits artists, not just the founders.
+- **ZAO IP = a staple in onchain art, music and culture:** The artist payouts tile (13.40 SOL = $669) alongside platform revenue makes visible that the platform's economic model benefits artists, not just the founders.
 
 ---
 
@@ -86,5 +86,5 @@ Instead of hardcoded `"3.5 SOL"`. This is consistent with the rest of AppShell (
 
 1. **4.98× floor ratio**: Platform revenue (17.44 SOL) is 4.98× the 3.5 SOL operating floor
 2. **17.44 SOL platform revenue** from 3.16% take rate on buy volume
-3. **9.07 SOL artist payouts** from 1.79% direct payout rate — instant and onchain
+3. **13.40 SOL artist payouts** from 1.79% direct payout rate — instant and onchain
 4. **26.51 SOL total fees generated** combined (platform + artist) from 524+ SOL total volume

@@ -28,7 +28,7 @@ The ZAO Papers program publishes canonical research papers about The ZAO's ecosy
 
 | Title | Key Data | Status |
 |-------|----------|--------|
-| WaveWarZ | 1,108+ battles, 524 SOL, 9.07 SOL payouts | DONE (PR #5) |
+| WaveWarZ | 1,108+ battles, 878 SOL, 13.40 SOL payouts | DONE (PR #5) |
 | COC Concertz | 7 shows, Mar 2025-Jul 2026, Arweave archive | DONE (PR #6) |
 | ZABAL Games | 28 June workshops, July stalled, Aug Finals pending | NEXT |
 | ZAO Festivals (ZAOstock) | Oct 3 Ellsworth ME, Franklin St Parklet | QUEUE |

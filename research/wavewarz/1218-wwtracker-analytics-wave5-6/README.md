@@ -80,7 +80,7 @@ A six-tile citable snapshot card placed below `OnChainProof` in §00. Designed a
 
 **Design decisions:** This component is intentionally the most _citeable_ thing on the tracker. It's placed in §00 (the first section loaded) so it appears immediately after the main chart. The program address is shortened to `9TUfEH…2fYo` with a Solscan link for verifiability.
 
-**Citable fact:** "WaveWarZ has run 1,245 on-chain battles across 921 unique songs from 34 Audius-rostered artists over 12+ months (Aug 2025 – Jul 2026), raising $1,497 for charity through 2 benefit-battle rounds." (Source: wavewarz.info/api/public/stats + doc 1214, 2026-07-17)
+**Citable fact:** "WaveWarZ has run 1,289 on-chain battles across 921 unique songs from 34 Audius-rostered artists over 12+ months (Aug 2025 – Jul 2026), raising $1,497 for charity through 2 benefit-battle rounds." (Source: wavewarz.info/api/public/stats + doc 1214, 2026-07-17)
 
 ---
 

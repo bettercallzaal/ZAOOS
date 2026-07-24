@@ -50,7 +50,7 @@ tier: STANDALONE
 | 500th battle | Mar 2026 |
 | 1,000th battle | Jun 2026 |
 | Tracker total | 375 ◎ / 1,089 battles (as of ww-battles.json snapshot) |
-| Live platform total | 524+ ◎ / 1,245+ battles (live API) |
+| Live platform total | 524+ ◎ / 1,289+ battles (live API) |
 
 Note: tracker total < live total because the JSON tracker started May 2025 and pre-launch activity is not captured.
 
@@ -100,4 +100,4 @@ GrowthMomentum     ← 30-day battle pace comparison (pre-empted from PR #139)
 1. **100 ◎ cumulative volume crossed Nov 2025** — within the first 6 months
 2. **250 ◎ crossed Mar 2026** — the same month as the 500th battle
 3. **1,000th battle Jun 26, 2026** — platform longevity milestone
-4. **1,089 battles tracked in ww-battles.json** (live total 1,245+)
+4. **1,089 battles tracked in ww-battles.json** (live total 1,289+)

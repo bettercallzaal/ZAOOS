@@ -141,7 +141,7 @@ Section intro: *"the full on-chain picture — baked analytics, pace trends, mon
 
 ## Sources
 
-- `public/ww-battles.json` (wwtracker, 1,245 battles, 2026-07-17)
+- `public/ww-battles.json` (wwtracker, 1,289 battles, 2026-07-17)
 - PR #93 (TopRivalries.tsx commit: `1d2f0cd`, wwtracker feat/song-arena-rankings)
 - PR #122 (BattleTempo: `153704f`; LivePlatformStats: `d7804b3`; NailBiters: `6f76561`, wwtracker feat/platform-pulse)
 - PR #136 (wavewarz.info stats API contract doc — LivePlatformStats API spec)

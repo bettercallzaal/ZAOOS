@@ -128,4 +128,4 @@ PRs #38 and #104 also carry unrelated component changes (`LiveTicker.tsx`, `Rece
 
 1. **wavewarz.info/api/public/stats is a public, auth-free, CORS-open endpoint** — any site can fetch live WaveWarZ stats client-side with no proxy
 2. **The smoke test verifies 13 shape invariants** including `volume.totalSol > 0`, `battles.total > 0`, and `liveBattle === null || object`
-3. **Artist payouts are queryable in real-time** via `artistPayouts.totalSol` — 9.07 ◎ ($677) cumulative to artists as of 2026-07-17
+3. **Artist payouts are queryable in real-time** via `artistPayouts.totalSol` — 13.40 ◎ ($989) cumulative to artists as of 2026-07-17

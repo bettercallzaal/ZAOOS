@@ -31,7 +31,7 @@ tier: STANDALONE
 | `BattleCalendar` | Full activity calendar | Every day platform ran since May 2025 |
 | `BattleArena` | Artist rankings across all battle types | Sortable by W/L, by vol, by type |
 | `RecentStandings` | Current 30-day W/L standings | Live from ww-battles.json, last 30d window |
-| `ArtistEarnings` | Per-artist estimated SOL earnings | GodclouD leads; total 9.07 ◎ artist payouts |
+| `ArtistEarnings` | Per-artist estimated SOL earnings | GodclouD leads; total 13.40 ◎ artist payouts |
 | `ArtistProfile` | Deep profile for any tagged handle | Full battle history, earnings, W/L, streaks |
 | `HandleH2H` | Head-to-head record any two handles | GodclouD vs Hurricane, etc. |
 | `RivalryBoard` | 17 documented rivalries by battle count | GodclouD 8-0 in headliner format |
@@ -84,7 +84,7 @@ BiggestBattles     ← top 10 by volume: the most expensive battles ever
 | Margin distribution shape | MarginDistribution | Bimodal: mass near 0% AND mass near 60%+ |
 | Longest rivalry | RivalryBoard | GodclouD headliner: 8 matchups (8-0) |
 | Highest-volume battle ever | BiggestBattles | Top battle from ww-battles.json |
-| Total artist payouts | ArtistEarnings | 9.07 ◎ across all tagged artists |
+| Total artist payouts | ArtistEarnings | 13.40 ◎ across all tagged artists |
 
 ---
 
@@ -118,4 +118,4 @@ PR #160 and any of the above can merge in any order — zero conflict.
 1. **Monday = highest-volume day** on WaveWarZ (~213 ◎ average across all Mondays in the dataset)
 2. **Battle margin distribution is bimodal** — strong cluster at <10% margin AND at >60% margin; very few battles in the 20-50% range, suggesting battles tend to be either very close or dominant
 3. **17 documented rivalries** on WaveWarZ, with GodclouD going 8-0 in the headliner format
-4. **Total artist payouts: 9.07 ◎** across all tagged handles — per-artist breakdown visible in ArtistEarnings for any of the 27 tagged handles
+4. **Total artist payouts: 13.40 ◎** across all tagged handles — per-artist breakdown visible in ArtistEarnings for any of the 27 tagged handles

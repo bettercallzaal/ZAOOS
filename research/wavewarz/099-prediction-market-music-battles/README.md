@@ -62,7 +62,7 @@ Simple voting ("which song do you like?") has weak signal. Everyone clicks and m
 - Two songs matched, fans deposit SOL into Battle Vault PDAs
 - Winners get proportional share + 40% of losing pool
 - Losers get 50% refund (partial recovery); artists earn 5% winning/2% losing
-- 1,245 battles total (July 2026), 522 SOL total volume (~$39K USD)
+- 1,289 battles total (July 2026), 878.30 SOL total volume (~$64.8K USD)
 - Settlement: 2 out of 3 factors (Human Judge + SOL vote + DJ Wavy AI scoring)
 - 126 Main Events (artist vs artist), 578 Quick Battles (song vs song)
 - Live Quick Battles every weeknight 8:30pm EST on YouTube

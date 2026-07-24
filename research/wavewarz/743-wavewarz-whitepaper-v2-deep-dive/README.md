@@ -26,7 +26,7 @@ tier: DISPATCH
 
 ## Executive Summary
 
-WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,245 production battles, 522 SOL of cumulative volume (July 2026), and live integration into seven external rails (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
+WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,289 production battles, 878.30 SOL of cumulative volume (July 2026), and live integration into seven external rails (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
 
 | Field | Value |
 |---|---|
@@ -34,10 +34,10 @@ WaveWarZ is a decentralized music-battle platform on Solana that has grown from 
 | Stack | Solana mainnet (Anchor/Rust) + Base Sepolia testnet (Solidity/Foundry) + Next.js/React + Supabase + Recharts |
 | Solana program ID | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (v1; needs current confirmation) |
 | Base testnet contract | `0xe28709DF5c77eD096f386510240A4118848c1098` (Base Sepolia) |
-| Live volume (May 25) | 458 SOL ($39,113 at $85.40/SOL) |
-| Battles | 979 total (43 Main Events + 805 Quick Battles + 131 special/tournament) |
-| Artist payouts to date | 7.76 SOL ($663) |
-| Platform revenue to date | 3.65 SOL ($312) |
+| Live volume (Jul 24) | 878.30 SOL ($64,758 at $73.73/SOL) |
+| Battles | 1,289 total (51 Main Events + 1,088 Quick Battles + 165 main + 36 community) |
+| Artist payouts to date | 13.40 SOL ($988 at $73.73/SOL) |
+| Platform revenue to date | 20.04 SOL ($1,477 at $73.73/SOL) |
 | Fee structure | 1.5% total (1% artist, 0.5% platform); 98.5% ecosystem retention |
 | Settlement bonus | Winner +5% of loser pool, loser +2% of loser pool, 3% platform, 50% to losing traders |
 | Current public surfaces | wavewarz.com (app) + wavewarz-intelligence.vercel.app (leaderboards/claim) + analytics-wave-warz.vercel.app (charts) |
@@ -53,18 +53,18 @@ Triple judging system, 2 of 3 wins: a human judge + an X poll + the SOL pool. Qu
 
 The thesis is not music distribution. It is music **as a head-to-head sport with onchain settlement and real economics**. Music as the only globally consumable competitive medium that has not yet had its prediction-market layer built.
 
-## Live State (verified 2026-05-25)
+## Live State (verified 2026-07-24)
 
-**Source:** wavewarz-intelligence.vercel.app `[FULL]`, cross-checked against Doc 723d (May 21 snapshot) and Zaal's paste during the research session.
+**Source:** wavewarz.info/api/public/stats (live API, 60s cache) — replaces stale intelligence dashboard reference.
 
-### Platform metrics (test battles excluded)
+### Platform metrics
 
-| Metric | SOL | USD (at $85.40/SOL) |
+| Metric | SOL | USD (at $73.73/SOL) |
 |--------|-----|---|
-| Total Volume | 458 | $39,113 |
-| Artist Payouts | 7.76 | $663 |
-| Platform Revenue | 3.65 | $312 |
-| Battles (43 Main + 805 Quick + 131 misc) | 979 | - |
+| Total Volume | 878.30 | $64,758 |
+| Artist Payouts | 13.40 | $988 |
+| Platform Revenue | 20.04 | $1,477 |
+| Battles (51 main events + 165 main + 1,088 quick + 36 community) | 1,289 | - |
 
 ### Numbers discrepancy (flagged per skill rule on contradictions)
 
@@ -74,7 +74,7 @@ Three production-aggregate snapshots disagree:
 |--------|------|--------|---------|------|
 | Doc 101 (canonical synthesis) | 2026-03-21 | 423.37 SOL | 647 | ZAO research synthesis |
 | Doc 723d (Avax/x402 doc) | 2026-05-21 | 472.71 SOL | 735 | Pulled from earlier Intelligence snapshot |
-| Intelligence dashboard | 2026-05-25 | 458 SOL | 979 | Production-only ("test battles excluded") |
+| wavewarz.info/api/public/stats | 2026-07-24 | 878.30 SOL | 1,289 | Live API (post-AI-Tournament) |
 
 The 472 vs 458 reversal (with battles JUMPING from 735 to 979) is almost certainly **test-battle exclusion + counting methodology**. Doc 723's "735" likely counted Main + Quick only (43 + 805 = 848, not 735 - still off). The Intelligence number is the production source of truth. **Action:** Confirm with Ike whether the canonical reporting metric is "Main + Quick" or "all battle types including special/tournament." Until then, cite Intelligence dashboard as the authoritative live source.
 

@@ -41,9 +41,9 @@ That single mechanic — loser earns — is the thread that connects everything 
 
 The ZAO launched in March 2024 with a simple premise: run a decentralized autonomous organization around music and document everything in public.
 
-Two years later, that documentation project is 1,454 open-source documents across nine topic areas — governance, technology, events, business, community, and more. Every document is CC-BY licensed. Every governance session is recorded. Every WaveWarZ transaction is on-chain.
+Two years later, that documentation project is over 1,600 open-source documents across nine topic areas — governance, technology, events, business, community, and more. Every document is CC-BY licensed. Every governance session is recorded. Every WaveWarZ transaction is on-chain.
 
-We've never missed a weekly session. 63 consecutive weeks, running on Optimism Mainnet.
+We've never missed a weekly session. [ZAAL: update week count on Aug 1 — was 63 at time of draft, each week adds 1], running on Optimism Mainnet.
 
 That consistency wasn't planned. It happened because the structure demanded it. Each week, ZAO contributors gather, present their work, and vote on contributions using fractal governance — a peer-ranking system where Respect tokens flow to the people the community judges most valuable that week. No founder veto. No whales. One week, one session, one vote.
 
@@ -59,7 +59,7 @@ The loser-earns mechanic works like this: when a battle closes, the losing side'
 
 One losing battle appearance on WaveWarZ earns approximately $35 — equivalent to *11,667 Spotify streams*.
 
-We've run 1,289 battles. [ZAAL: update this if stats have changed by Aug 1]. $104,000 in total volume. $1,820 to losing artists. $25,469 to traders.
+We've run [ZAAL: verify battle count Aug 1 — was 1,289 on Jul 24] battles. [ZAAL: verify all dollar amounts vs wavewarz.info/api/public/stats on publish day — SOL price moves daily. Jul 24 snapshot: 877.58 SOL total (~$64,844 at $73.89/SOL), 13.39 SOL artist payouts (~$989), 381.20 SOL trader claims (~$28,167).] $[total_volume_usd] in total volume. $[artist_payouts_usd] to losing artists. $[trader_claims_usd] to traders.
 
 None of those payments required a label deal. None required a publishing advance. None required 10,000 streams to hit a payout threshold. A musician in Baltimore submits a track, another musician battles it, the community votes, both artists get paid within minutes.
 
@@ -81,7 +81,7 @@ This is what "onchain" looks like when it's not a buzzword.
 
 #### What we learned about consistency
 
-When you run a DAO for 63 weeks without missing a session, you learn something about structure: consistency compounds.
+When you run a DAO for [ZAAL: same week count as above] weeks without missing a session, you learn something about structure: consistency compounds.
 
 The first ten sessions feel like you're proving something. Sessions 11 through 30, you're building muscle memory. By session 50, the structure is invisible — it just runs. Contributors know when to show up. ZOE, our AI operations agent, handles the scheduling, the social posts, the reminders. The humans handle the judgment calls.
 
@@ -101,7 +101,7 @@ The crowd votes. Both artists earn. The loser still gets paid.
 
 5% of [paid] ticket revenue goes to [ZAAL: confirm charity name] — an Ellsworth-area music education nonprofit.
 
-We are hosting a music festival because a DAO said yes to it, and then kept saying yes every week for 63 weeks until it became real.
+We are hosting a music festival because a DAO said yes to it, and then kept saying yes every week for [ZAAL: same week count as above] weeks until it became real.
 
 [ZAAL: add one personal line here — why Ellsworth, what the festival means to you, something human. Two sentences max.]
 
@@ -155,6 +155,6 @@ The loser-earns paragraph is the article's load-bearing claim. The Spotify compa
 
 The article intentionally does not mention the word "blockchain" until the governance contracts section — this is deliberate. Music-first framing, then proof.
 
-The 63-week streak number: update to the actual count on Aug 1. Each week after Jul 18 adds 1.
+The governance session count: update to the actual count on Aug 1. Was 63 at time of draft (Jul 2026); each week adds 1. Check the ZAOOS governance folder for the latest session number. Three [ZAAL: same week count] placeholders in the article — update all three.
 
 Keep the Ellsworth section short and personal. The rest of the article is data. That section is voice.

@@ -40,9 +40,9 @@ owner: ZOE (distribute via social) + Zaal (press pitches)
 
 | Metric | Value | Source |
 |--------|-------|--------|
-| Total artist payouts (Jul 2026) | 9.0988 SOL | wavewarz.info/api/public/stats |
-| Total battles (Jul 2026) | 1,245 | wavewarz.info/api/public/stats |
-| Average artist payout per battle | 9.0988 / 1,245 = ~0.0073 SOL | Calculated |
+| Total artist payouts (Jul 2026) | 13.40 SOL | wavewarz.info/api/public/stats |
+| Total battles (Jul 2026) | 1,289 | wavewarz.info/api/public/stats |
+| Average artist payout per battle | 13.40 / 1,289 = ~0.0104 SOL | Calculated |
 | SOL price (Jul 2026 estimate) | $180 | Market rate Jul 2026 |
 | Average payout per battle (USD) | ~$1.31 | 0.0073 × $180 |
 | MAIN event payout (higher stakes) | Larger — MAIN volume is 70% of total | Doc 1079 |
@@ -119,7 +119,7 @@ Artist submits track → Battle → Community votes → BOTH artists earn
 | Entry barrier | Submit a track = compete | Need label/distribution/marketing | WaveWarZ |
 | Artist need to get discovered | Battles create visibility | Need viral moment or playlist | WaveWarZ |
 | Revenue predictability | Per-battle (predictable if submitting) | Variable, stream-dependent | WaveWarZ |
-| Total artist payouts (Jul 2026) | 9.0988 SOL (~$1,638) | Variable by track | N/A |
+| Total artist payouts (Jul 2026) | 13.40 SOL (~$1,638) | Variable by track | N/A |
 | Artist who earns nothing | None (in battles) | Most artists | WaveWarZ |
 
 ---
@@ -127,8 +127,8 @@ Artist submits track → Battle → Community votes → BOTH artists earn
 ## The "Both Sides Get Paid" Proof
 
 From WaveWarZ live data (Jul 2026):
-- Total battles: 1,245
-- Total artist payouts: 9.0988 SOL
+- Total battles: 1,289
+- Total artist payouts: 13.40 SOL
 - Per-battle average artist payout: ~0.0073 SOL
 - **In every battle, both artists received payment**
 
@@ -141,16 +141,16 @@ This is verifiable on-chain. The contract pays both artist addresses after each 
 ## Audience-Specific Framing
 
 ### For Hypebot (Music Industry)
-> **WaveWarZ pays the loser.** While Spotify's per-stream rate leaves most independent artists earning fractions of pennies, WaveWarZ's loser-earns model guarantees both sides of a music battle receive payment. With 1,245 battles and 9.09 SOL distributed directly to artists, WaveWarZ is demonstrating an alternative economic model — where community governance, not algorithmic streaming, determines artist income.
+> **WaveWarZ pays the loser.** While Spotify's per-stream rate leaves most independent artists earning fractions of pennies, WaveWarZ's loser-earns model guarantees both sides of a music battle receive payment. With 1,289 battles and 13.40 SOL distributed directly to artists, WaveWarZ is demonstrating an alternative economic model — where community governance, not algorithmic streaming, determines artist income.
 
 ### For Water & Music / Cherie Hu (Music Economics)
-> **The 600× argument:** WaveWarZ's loser-earns mechanism achieves a per-listener artist payout approximately 600× higher than Spotify's per-stream rate. While this comparison has methodological limitations (battle "audiences" vs. streaming "listeners" are different), the directional argument holds: community-governed, on-chain settlement creates more favorable economics for artists who participate. WaveWarZ has distributed 9.09 SOL to artists across 1,245 battles — data the music industry should study.
+> **The 600× argument:** WaveWarZ's loser-earns mechanism achieves a per-listener artist payout approximately 600× higher than Spotify's per-stream rate. While this comparison has methodological limitations (battle "audiences" vs. streaming "listeners" are different), the directional argument holds: community-governed, on-chain settlement creates more favorable economics for artists who participate. WaveWarZ has distributed 13.40 SOL to artists across 1,289 battles — data the music industry should study.
 
 ### For Ari's Take (Independent Artist Focus)
-> **What if you got paid every time you lost?** WaveWarZ's loser-earns model means submitting to a battle and losing is still a paying engagement. For independent artists who spend money on distribution, sessions, and promotion with no guarantee of return, WaveWarZ offers something novel: guaranteed payout for competing, regardless of outcome. 1,245 battles later, they're proving the model works.
+> **What if you got paid every time you lost?** WaveWarZ's loser-earns model means submitting to a battle and losing is still a paying engagement. For independent artists who spend money on distribution, sessions, and promotion with no guarantee of return, WaveWarZ offers something novel: guaranteed payout for competing, regardless of outcome. 1,289 battles later, they're proving the model works.
 
 ### For Decrypt / The Defiant (Crypto/Web3)
-> **Music battle settlements on-chain: why it changes artist economics.** WaveWarZ processes music battles on Solana, settling artist payouts directly without intermediary intervention. The loser-earns model isn't a marketing tagline — it's an on-chain contract: both battling artist wallets receive payment after community voting closes. 9.09 SOL distributed, 524 SOL in total volume, 1,245 battles. The on-chain music economy has a working data set.
+> **Music battle settlements on-chain: why it changes artist economics.** WaveWarZ processes music battles on Solana, settling artist payouts directly without intermediary intervention. The loser-earns model isn't a marketing tagline — it's an on-chain contract: both battling artist wallets receive payment after community voting closes. 13.40 SOL distributed, 524 SOL in total volume, 1,289 battles. The on-chain music economy has a working data set.
 
 ---
 
@@ -182,8 +182,8 @@ This is verifiable on-chain. The contract pays both artist addresses after each 
 **Tweet 3:**
 > The numbers so far:
 >
-> ⚔️ 1,245 battles
-> 💸 9.09 SOL paid to artists directly
+> ⚔️ 1,289 battles
+> 💸 13.40 SOL paid to artists directly
 > 📊 524 SOL total volume
 >
 > Both sides of every battle received payment.

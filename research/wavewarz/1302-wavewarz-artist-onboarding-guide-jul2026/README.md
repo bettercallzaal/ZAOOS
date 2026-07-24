@@ -15,7 +15,7 @@ WaveWarZ is a music battle game on Solana. Two artists submit songs. Fans bet on
 - You earn from *being voted on*, not just from winning
 - Earnings are in SOL (Solana), sent onchain, no waiting
 - Your song competes in real time; fans watch and bet live
-- 921 unique songs have been battled so far; 1,245+ battles total
+- 921 unique songs have been battled so far; 1,289+ battles total
 - No label, no middleman, no algorithm suppressing your reach
 
 ---
@@ -103,9 +103,9 @@ This is where WaveWarZ is fundamentally different from any other music platform.
 **Why the loser-earns model matters:** Every artist earns something from every battle, even a loss. This means participating in WaveWarZ always generates income, not just winning.
 
 **The platform as of July 2026:**
-- 1,245 battles completed
+- 1,289 battles completed
 - 524 SOL total volume (~$78,000 at current prices)
-- 9.07 SOL total artist payouts ($677)
+- 13.40 SOL total artist payouts ($677)
 - $1,497 raised for charity through Community Battles
 - 34 Audius-rostered artists currently battling
 
@@ -193,7 +193,7 @@ For journalists, grant reviewers, and ZAOOS citations:
 - 921 unique songs have been submitted for battle
 - The "loser-earns" model is a structural innovation: losing artists earn income, not just winners
 - Artist payouts are instant and onchain (SOL), not delayed 30–90 days like streaming platforms
-- Total artist payouts: 9.07 SOL ($677) across 1,245 battles — verified, not estimated
+- Total artist payouts: 13.40 SOL ($677) across 1,289 battles — verified, not estimated
 - Community Battles have raised $1,497 for charity with zero take from artists
 
 ---

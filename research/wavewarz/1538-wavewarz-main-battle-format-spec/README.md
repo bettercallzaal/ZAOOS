@@ -16,7 +16,7 @@ A MAIN battle is the highest-stakes format on WaveWarZ — a live, on-chain musi
 
 MAIN battles are the organizing mechanism of COC Concertz shows and ZAOstock. They differ from quick battles (lower stakes, shorter window, no ZOR holder vote) and community battles (charity-payout variant, Sep 26 Africa Battle Week).
 
-**Citable fact:** "As of July 2026, WaveWarZ has hosted 162 MAIN battles with a combined volume of 523.991 SOL and $9.09 SOL in total artist payouts to losers." (wavewarz.info/api/public/stats)
+**Citable fact:** "As of July 2026, WaveWarZ has hosted 165 MAIN battles with a combined volume of 878.30 SOL and $13.40 SOL in total artist payouts to losers." (wavewarz.info/api/public/stats)
 
 ---
 
@@ -53,7 +53,7 @@ MAIN battles are the organizing mechanism of COC Concertz shows and ZAOstock. Th
 
 **Trader Claims:**
 - Listeners who voted for the winning artist can claim their share of the trader pool
-- Total trader claims to date: 127.343 SOL (Jul 2026)
+- Total trader claims to date: 381.20 SOL (Jul 2026)
 
 ### 6. On-Chain Record
 - Payout transactions broadcast on Solana Mainnet
@@ -71,7 +71,7 @@ MAIN battles are the organizing mechanism of COC Concertz shows and ZAOstock. Th
 | ZOR holder vote | Yes (COC/ZAOstock context) | No | Optional |
 | On-chain governance | Yes (OREC session logged) | No | Yes (charity vote) |
 | Artist payout guarantee | Yes (loser earns) | Yes (loser earns) | Yes (both artists earn) |
-| Count (Jul 2026) | 162 MAIN | 1,047 quick | 36 community |
+| Count (Jul 2026) | 162 MAIN | 1,088 quick | 36 community |
 
 ---
 
@@ -142,17 +142,17 @@ Source: wavewarz.info/api/public/stats
 
 | Metric | Value |
 |---|---|
-| Total battles | 1,245 |
+| Total battles | 1,289 |
 | MAIN battles | 162 |
 | Quick battles | 1,047 |
 | Community battles | 36 |
-| Total volume | 523.991 SOL |
-| Artist payouts (losers) | 9.0988 SOL |
-| Trader claims | 127.343 SOL |
+| Total volume | 878.30 SOL |
+| Artist payouts (losers) | 13.40 SOL |
+| Trader claims | 381.20 SOL |
 
-**Citable claim for press:** "WaveWarZ pays artists even when they lose — 162 MAIN battles have distributed 9.09 SOL to losing artists."
+**Citable claim for press:** "WaveWarZ pays artists even when they lose — 165 MAIN battles have distributed 13.40 SOL to losing artists."
 
-**Citable claim for OP RF:** "WaveWarZ has executed 162 MAIN battles under ZAO governance, with every loser earning a guaranteed on-chain payout." (doc 1525)
+**Citable claim for OP RF:** "WaveWarZ has executed 165 MAIN battles under ZAO governance, with every loser earning a guaranteed on-chain payout." (doc 1525)
 
 ---
 

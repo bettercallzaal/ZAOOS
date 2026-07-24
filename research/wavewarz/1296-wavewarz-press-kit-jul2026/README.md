@@ -21,7 +21,7 @@ related-docs: 1278, 1279, 1288, 1290
 
 ## The 50-Word Version
 
-WaveWarZ is a Solana-based music prediction market built by The ZAO, a decentralized artist collective. Two songs go head to head. Fans bet SOL. Both sides earn regardless of outcome. Artists receive automatic royalties on every trade. Since launching in August 2025: 1,245 battles, 521 unique songs, 524 SOL in volume, $1,497 raised for charity.
+WaveWarZ is a Solana-based music prediction market built by The ZAO, a decentralized artist collective. Two songs go head to head. Fans bet SOL. Both sides earn regardless of outcome. Artists receive automatic royalties on every trade. Since launching in August 2025: 1,289 battles, 521 unique songs, 878.30 SOL in volume, $1,497 raised for charity.
 
 ---
 
@@ -29,7 +29,7 @@ WaveWarZ is a Solana-based music prediction market built by The ZAO, a decentral
 
 WaveWarZ is a music prediction market — a new category in music technology where fan engagement generates real revenue for artists. Two songs enter a "battle." Fans place bets using SOL (Solana's native cryptocurrency) on which song they think will win. Both the winning side and the losing side earn. Artists receive approximately 1.73% of every trade in automatic onchain royalties — no label, no intermediary, no payout delay.
 
-The platform was built by The ZAO, a decentralized artist collective that has been running weekly governance sessions on the Optimism blockchain for over 100 consecutive weeks. WaveWarZ launched in August 2025. As of July 2026: 1,245 battles, 921 unique songs, 524 SOL ($39,000+) in trading volume, $1,497 raised for charity (HuRya). The platform operates on Solana, with analytics available free at wavewarz.info.
+The platform was built by The ZAO, a decentralized artist collective that has been running weekly governance sessions on the Optimism blockchain for over 100 consecutive weeks. WaveWarZ launched in August 2025. As of July 2026: 1,289 battles, 921 unique songs, 878.30 SOL (~$64.8K) in trading volume, $1,497 raised for charity (HuRya). The platform operates on Solana, with analytics available free at wavewarz.info.
 
 ---
 
@@ -37,10 +37,10 @@ The platform was built by The ZAO, a decentralized artist collective that has be
 
 | Fact | Number | Verified By |
 |------|--------|-------------|
-| Total battles | 1,245 | wavewarz.info/api/public/stats |
-| Total trading volume | 524 SOL (~$39,000) | wavewarz.info/api/public/stats |
+| Total battles | 1,289 | wavewarz.info/api/public/stats |
+| Total trading volume | 878.30 SOL (~$64.8K) | wavewarz.info/api/public/stats |
 | Unique songs battled | 921 | wavewarz.info/api/public/stats |
-| Artist payouts (total) | 9.07 SOL (~$680) | wavewarz.info/api/public/stats |
+| Artist payouts (total) | 13.40 SOL (~$680) | wavewarz.info/api/public/stats |
 | Charity raised | $1,497 | wavewarz.info/api/public/stats |
 | Artist payout rate | ~1.73% per trade | doc 1237 (on-chain verified) |
 | Spotify equivalent | ~4,325 streams = 1 WaveWarZ battle payout | Calculated from $0.004/stream |

@@ -3,14 +3,14 @@
 **Type:** REFERENCE  
 **Topic:** business  
 **Status:** Active — update when any status changes  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1349/1372 (Fractured Atlas), 1285 (Fisher grant deadline), 1311 (OP Retro Funding), 1379 (ZAOstock ticketing), 1384 (Charity partner), 1387 (Artist economics), 1405 (Green Pill/Gitcoin ecosystem), 1408 (Academic research brief)
 
 ---
 
 ## Purpose
 
-This is the single reference for all ZAO funding sources, grant applications, and revenue streams as of July 17, 2026. Use it for:
+This is the single reference for all ZAO funding sources, grant applications, and revenue streams as of July 24, 2026. Use it for:
 - Zaal's weekly funding status check
 - ZOE deadline alerts
 - Grant reviewers asking "what other funding does ZAO have?"
@@ -153,7 +153,7 @@ This is the single reference for all ZAO funding sources, grant applications, an
 **What it is:** ZAO earns 3% of all WaveWarZ battle volume.
 
 **Current rate (annualized):**
-- 523.99 SOL × 3% = 15.72 SOL in protocol fees since launch
+- 878.30 SOL × 3% = 15.72 SOL in protocol fees since launch
 - At $200/SOL: ~$3,144 in total protocol revenue since launch
 - Monthly run rate: ~[calculate based on battle volume growth]
 

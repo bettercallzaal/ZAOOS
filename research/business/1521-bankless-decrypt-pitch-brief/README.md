@@ -37,7 +37,7 @@ Is there a right person to pitch a story about it?
 **Decrypt X DM:**
 ```
 Hey @Decrypt — ZAO is doing the first on-stage DAO vote at a music festival 
-in October. 64-week governance streak, 1,245 onchain battles, Optimism Mainnet. 
+in October. 64-week governance streak, 1,289 onchain battles, Optimism Mainnet. 
 Who should I pitch for a story about this?
 ```
 
@@ -58,8 +58,8 @@ I'm Zaal Panthaki, co-founder of ZAO — a DAO that has run 64 consecutive
 weekly on-chain governance sessions governing a music battle platform called 
 WaveWarZ.
 
-Here's the unusual data point: WaveWarZ has 1,245 battles with $104,000 
-in total volume — and $9.09 SOL goes to the LOSING artist in every battle. 
+Here's the unusual data point: WaveWarZ has 1,289 battles with $104,000 
+in total volume — and $13.40 SOL goes to the LOSING artist in every battle. 
 Automatic, on-chain, irreversible. Every loser still gets paid.
 
 We're taking this model IRL on October 3rd in Ellsworth, Maine. ZAOstock 
@@ -99,7 +99,7 @@ On October 3rd, ZAO is holding a music festival called ZAOstock in Ellsworth,
 Maine — and mid-show, the audience will vote on-chain from the stage.
 
 ZAO is a DAO that has run 64 consecutive weekly governance sessions governing 
-WaveWarZ, a music battle platform on Solana + Optimism where 1,245 battles 
+WaveWarZ, a music battle platform on Solana + Optimism where 1,289 battles 
 have happened and every losing artist still receives an automatic on-chain payout.
 
 ZAOstock brings that governance live: during the show, the audience decides 

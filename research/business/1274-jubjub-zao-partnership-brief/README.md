@@ -2,7 +2,7 @@
 topic: business/partnerships
 type: partnership-brief
 status: ready-for-zaal-call
-created: 2026-07-17
+created: 2026-07-24
 board-task: 981ea506
 related-docs: 984, 1221
 owner: Zaal (to schedule call + approve integration tier)
@@ -35,7 +35,7 @@ ZAO has 250+ onchain artists and a media archive that already exists and current
 | Asset | Status | JubJub opportunity |
 |-------|--------|-------------------|
 | COC Concertz show recordings (7 shows) | Arweave-archived, free to watch | Each archived show becomes a passive revenue stream |
-| WaveWarZ battle clips | ~1,245+ battles, stored but monetization = 0 | Per-second pay for fans replaying battle highlights |
+| WaveWarZ battle clips | ~1,289+ battles, stored but monetization = 0 | Per-second pay for fans replaying battle highlights |
 | COC #7 pilot archives | Going live July 18 (gateless experiment) | First test: gateless view BUT pay-per-second if you keep watching |
 | BCZ YapZ + interview clips | ~17+ episodes on YouTube | Embed JubJub player alongside YT for superfans who want to pay |
 | ZAOville livestream (Jul 25) | DC cowork house, planned | First full livestream monetized per-second from day one |
@@ -92,7 +92,7 @@ The ZAO already has the Arweave archive model (PR #40 COC). JubJub is the revenu
 
 - 250+ onchain artists (ZAO Respect NFT holders on Optimism, OG+ZOR union)
 - 7 COC Concertz shows, Arweave-archived
-- 1,245+ WaveWarZ music battles (524 SOL volume)
+- 1,289+ WaveWarZ music battles (878 SOL volume)
 - ZAOstock Oct 3 2026 (Ellsworth, ME) — potential for live pay-per-second gate at venue
 - ZAO OS already has wallet infrastructure (wagmi + viem, Base + Optimism)
 - ZAO artists already have Ethereum wallet fields in Firestore (can route directly)

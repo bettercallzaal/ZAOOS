@@ -2,7 +2,7 @@
 topic: business/fundraising
 type: PITCH-DECK
 status: actionable
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1277, 1285, 1296, 1321, 1325, 1329, 1266
 owner: Zaal
@@ -25,8 +25,8 @@ owner: Zaal
 - Attendance target: 200-300 (doc 1329)
 
 **The community behind it:**
-- 1,245 WaveWarZ battles (onchain, verifiable)
-- 523.99 SOL in artist payouts
+- 1,289 WaveWarZ battles (onchain, verifiable)
+- 878.30 SOL in artist payouts
 - 921 unique songs entered into battles
 - 63+ consecutive weeks of community governance
 - 157 on-chain governance participants (Optimism mainnet)
@@ -186,7 +186,7 @@ Oct 3:
 >
 > I'm Zaal Panthaki, co-founder of ZAO (ZTalent Artist Organization) and WaveWarZ.
 >
-> We're hosting ZAOstock, a one-day music festival on October 3rd in Ellsworth, Maine. 8 artists selected through community-governed onchain music battles (1,245 documented battles, 524 SOL in artist payouts).
+> We're hosting ZAOstock, a one-day music festival on October 3rd in Ellsworth, Maine. 8 artists selected through community-governed onchain music battles (1,289 documented battles, 878 SOL in artist payouts).
 >
 > We're offering sponsorship packages starting at $250 for local/indie businesses up to $2,500 for a presenting sponsor. Benefits include event branding, artist co-promotion, social exposure to our 2K+ X followers and 500+ newsletter subscribers, and VIP tickets.
 >
@@ -219,4 +219,4 @@ Securing sponsors:
 
 ---
 
-*Created: 2026-07-17 | Cross-refs: doc 1277 (bank+Artizen pitches), 1266 (grant narratives), 1296 (press kit), 1329 (event promotion plan)*
+*Created: 2026-07-24 | Cross-refs: doc 1277 (bank+Artizen pitches), 1266 (grant narratives), 1296 (press kit), 1329 (event promotion plan)*

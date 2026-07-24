@@ -51,7 +51,7 @@ Fisher requires a 501(c)(3) fiscal sponsor or applicant. ZAO is not yet a legal 
 ZAOstock 2026 is a one-day music festival in Ellsworth, Maine on October 3, 2026 — 
 featuring live WaveWarZ music battles, governance voting by token holders, and a 
 charity battle whose proceeds go directly on-chain to a Maine-based arts nonprofit. 
-As of July 2026, WaveWarZ has facilitated 1,245 battles and distributed 9.09 SOL 
+As of July 2026, WaveWarZ has facilitated 1,289 battles and distributed 13.40 SOL 
 ($678) in guaranteed payments to artists, including the losing competitor in each 
 battle (the "loser-earns" mechanic).
 
@@ -149,7 +149,7 @@ Hey Kevin,
 
 Kevin — I run The ZAO, a music DAO that governs WaveWarZ: a prediction market for indie music battles where even the loser earns SOL on-chain.
 
-Numbers: 1,245 battles, 100+ consecutive governance weeks on Optimism Fractal Democracy, $678 distributed to artists (including losers), 1,600+ CC-BY research docs on GitHub.
+Numbers: 1,289 battles, 100+ consecutive governance weeks on Optimism Fractal Democracy, $678 distributed to artists (including losers), 1,600+ CC-BY research docs on GitHub.
 
 ZAO would be a great Green Pill episode: onchain music + DAO governance + real artist payouts. We're taking it IRL at ZAOstock Oct 3 (Ellsworth ME).
 
@@ -172,7 +172,7 @@ Zaal (bettercallzaal on X/Farcaster)
 
 ### Pitch hook
 
-"ZAO has run 1,245 music battles on Solana — including the first live-audience WaveWarZ battle at a physical show (COC Concertz #7, Jul 18, 2026). The 'loser earns' mechanic is a new revenue model for indie artists in Web3."
+"ZAO has run 1,289 music battles on Solana — including the first live-audience WaveWarZ battle at a physical show (COC Concertz #7, Jul 18, 2026). The 'loser earns' mechanic is a new revenue model for indie artists in Web3."
 
 **Contact:** Research Cherie Hu's current contact (Water & Music newsletter, X @cheriehu42)
 

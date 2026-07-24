@@ -44,7 +44,7 @@ Fill in these fields:
 **Project name:** The ZAO
 
 **Project description (paste-ready):**
-> The ZAO is a music decentralized autonomous organization (DAO) producing WaveWarZ — a music battle platform where losing artists earn from trading activity — and ZAOstock, a free community music festival in Ellsworth, Maine on October 3, 2026. ZAO has completed 1,245 WaveWarZ music battles generating 523.991 SOL ($104K) in volume, with direct artist payouts including losing artists. ZAO runs 64 consecutive weekly governance sessions using Fractal Democracy on Optimism Mainnet, making it one of the most active governance DAOs in the ecosystem. ZAOstock will feature 6-8 artists, live WaveWarZ battles from the stage, and a charity fundraiser benefiting a local Maine organization.
+> The ZAO is a music decentralized autonomous organization (DAO) producing WaveWarZ — a music battle platform where losing artists earn from trading activity — and ZAOstock, a free community music festival in Ellsworth, Maine on October 3, 2026. ZAO has completed 1,289 WaveWarZ music battles generating 878.30 SOL ($64.8K) in volume, with direct artist payouts including losing artists. ZAO runs 64 consecutive weekly governance sessions using Fractal Democracy on Optimism Mainnet, making it one of the most active governance DAOs in the ecosystem. ZAOstock will feature 6-8 artists, live WaveWarZ battles from the stage, and a charity fundraiser benefiting a local Maine organization.
 
 **Primary artistic discipline:** Music
 

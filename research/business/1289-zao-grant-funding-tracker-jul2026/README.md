@@ -2,7 +2,7 @@
 topic: business/grants
 type: TRACKER
 status: active
-created: 2026-07-17
+created: 2026-07-24
 audience: Zaal + Iman (internal decision tracker)
 related-docs: 1277, 1278, 1285, 1287, 1288
 ---
@@ -61,7 +61,7 @@ related-docs: 1277, 1278, 1285, 1287, 1288
 
 | Source | Status | Monthly Est. | Notes |
 |--------|--------|-------------|-------|
-| WaveWarZ platform fee (3% of trades) | ACTIVE | Variable | 524 SOL total to date. ~$39K lifetime. ZAO gets 3% = ~$1,170 equivalent |
+| WaveWarZ platform fee (3% of trades) | ACTIVE | Variable | 878 SOL total to date. ~$64.8K lifetime. ZAO gets 3% = ~$1,170 equivalent |
 | ZABAL token utility fees | NOT LIVE | — | Token exists (351 holders on Base) but fee mechanics not deployed |
 | COC Concertz tickets | NOT LIVE | — | Currently free/wallet-gated. Ticket sales possible for ZAOstock |
 | Newsletter paid subscribers | ACTIVE (small) | ~$78/mo | 78 paid supporters × ~$1/mo (Paragraph.com estimate) |
@@ -76,7 +76,7 @@ related-docs: 1277, 1278, 1285, 1287, 1288
 
 > ZAO is a decentralized artist collective that has run 100+ consecutive weekly governance sessions, built WaveWarZ (a music prediction market with instant artist payouts), and incubated 32 music-tech builders through ZABAL Games. ZAOstock is our first live music event — an outdoor festival in Ellsworth, Maine that will feature WaveWarZ artists performing and battling live for the first time.
 
-Key numbers: 1,245 battles, 921 songs, $1,497 raised for charity, 32 builders in cohort.
+Key numbers: 1,289 battles, 921 songs, $1,497 raised for charity, 32 builders in cohort.
 
 ### For tech/blockchain funders (Optimism, Ethereum, Gitcoin, Mozilla)
 

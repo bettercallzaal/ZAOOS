@@ -166,7 +166,7 @@ Doc 1718 is your ready-to-paste Fisher Fund application.
 
 Steps:
 1. Confirm your Maine address (Section 1)
-2. Pull current wavewarz.info battle stats (replace "1,245" if updated)
+2. Pull current wavewarz.info battle stats (replace "1,289" if updated)
 3. Paste FA member ID into Section 7
 4. Submit at fisherfund.org by Aug 15
 

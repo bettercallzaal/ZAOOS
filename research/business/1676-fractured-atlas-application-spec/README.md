@@ -52,7 +52,7 @@ ZAOstock (Oct 3, Ellsworth Maine) is the primary trigger — it's an IRL arts ev
 
 > The ZAO is a music DAO (decentralized autonomous organization) that builds tools for independent artists to earn from their music in new ways. Our flagship platform, WaveWarZ, runs prediction-market-style music battles on Solana: fans stake on artists, battles settle automatically on-chain, and every participating artist — including the loser — receives an automatic payout at settlement. No labels, no intermediaries, no manual claims.
 >
-> As of July 2026, WaveWarZ has settled 1,245 battles with 523.991 SOL in total volume and $9.09 SOL in direct artist payouts. The ZAO has held 100+ consecutive weekly governance sessions where ZOR holders (157 members) vote on programming, artist selection, and community initiatives.
+> As of July 2026, WaveWarZ has settled 1,289 battles with 878.30 SOL in total volume and $13.40 SOL in direct artist payouts. The ZAO has held 100+ consecutive weekly governance sessions where ZOR holders (157 members) vote on programming, artist selection, and community initiatives.
 >
 > ZAOstock (October 3, 2026, Ellsworth Maine) is our first live IRL event: a public, free-to-attend music festival where WaveWarZ battles happen in front of a live audience, with automatic artist payouts happening on-stage in real time. The event features Maine-based and national independent artists, and is designed to be free and accessible to the Ellsworth community.
 >
@@ -60,7 +60,7 @@ ZAOstock (Oct 3, Ellsworth Maine) is the primary trigger — it's an IRL arts ev
 
 **Word count:** ~215 words. If the form has a word/character limit, use the short version:
 
-> The ZAO is a music DAO that runs WaveWarZ — a prediction market for music battles on Solana where every artist (including losers) earns automatic on-chain payouts. 1,245 battles settled. 157 governance members. ZAOstock (Oct 3, Ellsworth ME) is our first free public IRL event, bringing this model to a live audience with on-stage automatic artist payouts. We also run ZABAL, a 12-week cohort for independent artists learning on-chain music tools.
+> The ZAO is a music DAO that runs WaveWarZ — a prediction market for music battles on Solana where every artist (including losers) earns automatic on-chain payouts. 1,289 battles settled. 157 governance members. ZAOstock (Oct 3, Ellsworth ME) is our first free public IRL event, bringing this model to a live audience with on-stage automatic artist payouts. We also run ZABAL, a 12-week cohort for independent artists learning on-chain music tools.
 
 ---
 

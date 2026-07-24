@@ -2,7 +2,7 @@
 topic: business/zabal-wavewarz
 type: DECISION-BRIEF
 status: ready
-created: 2026-07-17
+created: 2026-07-24
 board-task: c993bb9c
 related-docs: 1262, 1283, 1295, 1300, 1290
 owner: Zaal + Iman
@@ -39,7 +39,7 @@ deadline: 2026-07-21 (lock August plan by Monday)
 
 ## WaveWarZ: August 3-Track Framework
 
-WaveWarZ is at a scale inflection point: 1,245 battles, 921 songs, 524 SOL total traded ($39K lifetime), 3% platform fee (~$1,170 ZAO take). August determines whether it monetizes, grows, or features new mechanics.
+WaveWarZ is at a scale inflection point: 1,289 battles, 921 songs, 878 SOL total traded ($39K lifetime), 3% platform fee (~$1,170 ZAO take). August determines whether it monetizes, grows, or features new mechanics.
 
 ### Track A — Growth (Expand the Roster)
 
@@ -67,7 +67,7 @@ WaveWarZ is at a scale inflection point: 1,245 battles, 921 songs, 524 SOL total
 | Activate archive tiered access (JubJub per-second USDC) | Depends on JubJub call | Aug |
 | ZABAL token fee mechanics on Base | Zaal-gated (contract deploy) | DECISION NEEDED |
 
-**Why run this track:** WaveWarZ has 524 SOL volume but ZAO take is only ~$1,170 (~3%). JubJub + Boostr open two new revenue lines without touching the core protocol.
+**Why run this track:** WaveWarZ has 878 SOL volume but ZAO take is only ~$1,170 (~3%). JubJub + Boostr open two new revenue lines without touching the core protocol.
 
 ---
 

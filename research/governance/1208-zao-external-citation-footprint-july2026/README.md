@@ -1,6 +1,6 @@
 # 1208 — ZAO External Citation Footprint (July 2026)
 
-**Research date**: 2026-07-17  
+**Research date**: 2026-07-24  
 **Method**: Live WebFetch survey across 12+ ecosystem venues  
 **Status**: Complete — citation vacuum confirmed, action list compiled
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ZAO has **zero discoverable external citations** in the major Web3 governance and DAO ecosystem venues as of July 2026. The canonical home (`thezao.xyz`) is functional and substantive, but ZAO's governance work — 100+ Fractal weeks, 63 on-chain verified settlements, 157 Respect holders, 1,245 WaveWarZ battles — is not referenced anywhere outside ZAO's own docs and the ZAOOS research corpus.
+ZAO has **zero discoverable external citations** in the major Web3 governance and DAO ecosystem venues as of July 2026. The canonical home (`thezao.xyz`) is functional and substantive, but ZAO's governance work — 100+ Fractal weeks, 63 on-chain verified settlements, 157 Respect holders, 1,289 WaveWarZ battles — is not referenced anywhere outside ZAO's own docs and the ZAOOS research corpus.
 
 This is the baseline. Every future citation, listing, or application can be measured against it.
 
@@ -45,7 +45,7 @@ The canonical ZAO home is `thezao.xyz` (not `.com`). The pages are real and subs
 
 - **`/what-is-the-zao`**: 15-question FAQ. Mentions Optimism (primary blockchain), Hats Protocol, Solana, Base. **Does not mention Fractally, Eden, or any other fractal ecosystem.**
 - **`/papers`**: 6 documents — Whitepaper, Technical Whitepaper, Manifesto, WaveWarZ Whitepaper, Protocol paper, Ecosystem Drafts. Listed as "published on-chain" but no external hosting links (no Mirror.xyz, IPFS, Arweave URLs).
-- **Minor data gap**: FAQ says "122 holders" — should be "157 unique holders (122 OG + 56 ZOR, 21 both)" as of 2026-07-17 (verified doc 1200).
+- **Minor data gap**: FAQ says "122 holders" — should be "157 unique holders (122 OG + 56 ZOR, 21 both)" as of 2026-07-24 (verified doc 1200).
 
 The content is accurate but the documents have no external provenance trail — no way for an outside researcher to independently verify the on-chain publication.
 
@@ -111,7 +111,7 @@ This is both a risk (single point of documentation) and an opportunity: whoever 
 
 ## Sources
 
-- Live WebFetch survey, 2026-07-17
+- Live WebFetch survey, 2026-07-24
 - doc 1200: Respect holder counts (157 unique, verified Blockscout)
 - doc 1201: ZAO Fractal governance verified stats (100+ weeks, 63 on-chain)
 - doc 1202: Fractal on-chain settlement history (OG:33 + ZOR:31 weeks)

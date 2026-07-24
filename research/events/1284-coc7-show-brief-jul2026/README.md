@@ -2,7 +2,7 @@
 topic: events/coc-concertz
 type: SHOW-BRIEF
 status: pre-show
-created: 2026-07-17
+created: 2026-07-24
 show-date: 2026-07-18 4PM EST
 venue: Spatial.io (Dope Stilo Music Club) + Twitch bettercallzaal
 related-docs: 1210, 1256, 1275, 1278
@@ -10,7 +10,7 @@ related-docs: 1210, 1256, 1275, 1278
 
 # 1284 — COC Concertz #7 Show Brief (July 18, 2026)
 
-> **For Zaal's use during the show.** Talking points, WaveWarZ numbers, and what to say when introducing the ZAO, the platform, and what attendees can do right now. All numbers verified July 17, 2026.
+> **For Zaal's use during the show.** Talking points, WaveWarZ numbers, and what to say when introducing the ZAO, the platform, and what attendees can do right now. All numbers verified July 24, 2026.
 
 ---
 
@@ -33,7 +33,7 @@ related-docs: 1210, 1256, 1275, 1278
 >
 > WaveWarZ is a music prediction market. Two songs go head-to-head. You bet on who wins using real money — SOL on Solana. The winning side earns. The losing side earns too. And the artists? They earn automatically on every single trade.
 >
-> As of today: 1,245 battles. 524 SOL in volume. $1,497 raised for charity. And tonight you're part of that history.
+> As of today: 1,289 battles. 878 SOL in volume. $1,497 raised for charity. And tonight you're part of that history.
 >
 > Head to wavewarz.info or look for the BattleVote button on this page to join a battle right now."
 
@@ -45,9 +45,9 @@ Use these when talking about WaveWarZ to the audience:
 
 | Stat | Number | Context |
 |------|--------|---------|
-| Total battles | **1,245** | Running since August 2025 |
-| Total volume | **524 SOL (~$39,000)** | Real onchain trading by real fans |
-| Artist payouts | **9.07 SOL (~$680)** | Auto, instant, no middleman |
+| Total battles | **1,289** | Running since August 2025 |
+| Total volume | **878 SOL (~$64,800)** | Real onchain trading by real fans |
+| Artist payouts | **13.40 SOL (~$680)** | Auto, instant, no middleman |
 | Charity raised | **$1,497** | 2 benefit-battle rounds for HuRya |
 | Artist payout rate | **~1.73% of each trade** | vs Spotify's ~$0.004/stream |
 | Songs ever battled | **921 unique songs** | On Solana, permanent record |

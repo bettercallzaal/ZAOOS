@@ -74,7 +74,7 @@ ZAOstock is live.
 
 Doors open. Ellsworth, Maine. 
 
-64 weeks of onchain governance. 1,245 battles. $104K volume.
+64 weeks of onchain governance. 1,289 battles. $64.8K volume.
 Today the audience votes IRL.
 
 #ZAOstock #WaveWarZ

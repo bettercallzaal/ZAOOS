@@ -41,7 +41,7 @@ OP RF applications typically request:
 **The ZAO (ZAO DAO)**
 
 ### Short Description (≤ 280 characters)
-> ZAO is a music DAO on Optimism Mainnet running 64+ weekly governance sessions. WaveWarZ (1,245 battles, 524 SOL) pays losing artists — on-chain, every time. ZAOstock Oct 3 brings it IRL.
+> ZAO is a music DAO on Optimism Mainnet running 64+ weekly governance sessions. WaveWarZ (1,289 battles, 878 SOL) pays losing artists — on-chain, every time. ZAOstock Oct 3 brings it IRL.
 
 ### Category
 - [x] Governance / DAO tooling
@@ -67,8 +67,8 @@ consecutive weekly governance sessions on Optimism Mainnet — one of the longes
 on-chain governance streaks of any DAO in the ecosystem.
 
 WaveWarZ, ZAO's flagship product, is a music prediction market on Solana where the losing 
-artist earns a structural share of platform trading fees. As of July 2026: 1,245 battles, 
-523.991 SOL in trading volume, 9.0988 SOL in direct artist payouts (including to losers), 
+artist earns a structural share of platform trading fees. As of July 2026: 1,289 battles, 
+878.30 SOL in trading volume, 13.40 SOL in direct artist payouts (including to losers), 
 and 127.343 SOL returned to traders. This is documented public data from a live, functioning 
 platform — not a whitepaper or prototype.
 
@@ -94,8 +94,8 @@ is deployed and verifiable, and every dollar flows to artists, builders, and com
 
 ### Verifiable Metrics
 - 64+ weekly governance sessions (on-chain, verifiable via OREC)
-- 1,245 battles on WaveWarZ (verifiable via public API)
-- 523.991 SOL trading volume (verifiable on Solana Mainnet)
+- 1,289 battles on WaveWarZ (verifiable via public API)
+- 878.30 SOL trading volume (verifiable on Solana Mainnet)
 - 1,460+ ZAOOS documents (verifiable on GitHub)
 - ZOR token: 157+ holders (verifiable on Optimism Mainnet)
 

@@ -45,7 +45,7 @@ ZAOstock 2026 — the first WaveWarZ live-audience event.
 
 On October 3, 2026, WaveWarZ comes to Ellsworth, Maine in person for the first time. WaveWarZ is a music battle prediction market where two artists go head-to-head, fans trade on who wins, and even the losing artist receives a guaranteed on-chain payout — automatically, no middleman.
 
-1,245 WaveWarZ battles have been completed since launch. ZAOstock brings the first live audience into the room.
+1,289 WaveWarZ battles have been completed since launch. ZAOstock brings the first live audience into the room.
 
 ---
 
@@ -62,7 +62,7 @@ The headline event. Two artists battle live. The audience votes in real time —
 
 ---
 
-ZAO is the music DAO that built WaveWarZ — 100+ consecutive weeks of on-chain governance, 1,245 battles completed, and now: live.
+ZAO is the music DAO that built WaveWarZ — 100+ consecutive weeks of on-chain governance, 1,289 battles completed, and now: live.
 
 This is a small event. Capacity is limited.
 

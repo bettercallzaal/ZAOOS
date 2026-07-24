@@ -127,7 +127,7 @@ The charity was selected by ZAO governance: 157 ZOR token holders voted via Snap
 Live battles: wavewarz.info
 Live governance: snapshot.org/[thezao.eth or bettercallzaal.eth]
 
-About The ZAO: The ZAO (ZAO Decentralized Autonomous Organization) has run 1,245+ WaveWarZ battles since launch, with 9.09 SOL paid to artists — including losing artists — automatically on Solana. 100+ consecutive governance sessions with zero quorum failures.
+About The ZAO: The ZAO (ZAO Decentralized Autonomous Organization) has run 1,289+ WaveWarZ battles since launch, with 13.40 SOL paid to artists — including losing artists — automatically on Solana. 100+ consecutive governance sessions with zero quorum failures.
 
 Contact: Zaal Panthaki, co-founder — zaalp99@gmail.com
 ```

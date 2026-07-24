@@ -58,9 +58,9 @@ As of July 2026, ZAO has conducted **63+ consecutive weekly governance sessions*
 **WaveWarZ as a Public Goods Music Platform**
 
 WaveWarZ is the revenue-generating product that funds ZAO's operations and demonstrates the "DAO economy" thesis: a DAO can govern a self-sustaining protocol that pays its community members (artists) regardless of outcome. As of July 2026:
-- 1,245+ battles completed on Solana
-- 524 SOL (~$104K) in total trading volume
-- 9.09 SOL ($1,820) paid to **losing artists** via the loser-earns mechanism
+- 1,289+ battles completed on Solana
+- 878 SOL (~$64.8K) in total trading volume
+- 13.40 SOL ($1,820) paid to **losing artists** via the loser-earns mechanism
 - 127 SOL ($25,469) distributed to winning traders
 
 The "loser-earns" mechanism is architecturally novel: it means every artist who participates in a WaveWarZ battle earns something, structurally redistributing value to musicians who would otherwise earn $0.004/stream on Spotify.
@@ -101,9 +101,9 @@ ZAO directly advances Optimism's vision of a "Regenerative Crypto Economy":
 |--------|-------|--------|
 | Governance sessions (consecutive) | 63+ | ZAOOS docs 1394, 1434 |
 | ZOR holders | 157 | Optimism Mainnet (ZAOOS doc 1434) |
-| WaveWarZ battles | 1,245+ | wavewarz.info/api/public/stats |
-| WaveWarZ SOL volume | 524 SOL (~$104K) | wavewarz.info/api/public/stats |
-| Artist payouts (loser-earns) | 9.09 SOL ($1,820) | wavewarz.info/api/public/stats |
+| WaveWarZ battles | 1,289+ | wavewarz.info/api/public/stats |
+| WaveWarZ SOL volume | 878 SOL (~$64.8K) | wavewarz.info/api/public/stats |
+| Artist payouts (loser-earns) | 13.40 SOL ($1,820) | wavewarz.info/api/public/stats |
 | ZAOOS documents (CC-BY) | 1,440+ | github.com/ZAOIP/zao-os |
 | ZAOstock (Oct 3, 2026) | Free public festival | Eventbrite + permit application |
 
@@ -137,7 +137,7 @@ Before Zaal submits, fill in these placeholders:
 ```
 ZAO just submitted to Optimism Retro Funding.
 
-63 weeks of on-chain governance. 1,245 WaveWarZ battles. $1,820 to losing artists. 1,440 CC-BY documents. ZAOstock Oct 3.
+63 weeks of on-chain governance. 1,289 WaveWarZ battles. $1,820 to losing artists. 1,440 CC-BY documents. ZAOstock Oct 3.
 
 All of it built on Optimism Fractal — the non-plutocratic governance model that doesn't need token purchases.
 
@@ -150,7 +150,7 @@ If you're an Optimism badge holder or RF voter: link in bio.
 
 ## What Makes This Citable
 
-> "The ZAO applied to Optimism Retro Funding in [MONTH] 2026, presenting 63+ consecutive governance sessions, 524 SOL in WaveWarZ trading volume, and 1,440+ CC-BY open documents as evidence of public goods impact (ZAOOS doc 1444)."
+> "The ZAO applied to Optimism Retro Funding in [MONTH] 2026, presenting 63+ consecutive governance sessions, 878 SOL in WaveWarZ trading volume, and 1,440+ CC-BY open documents as evidence of public goods impact (ZAOOS doc 1444)."
 
 ---
 

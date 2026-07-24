@@ -2,7 +2,7 @@
 topic: events/zaostock-press
 type: PRESS-RELEASE
 status: DRAFT — fill bracketed placeholders by Aug 25; distribute Sep 1
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1313, 1362, 1363, 1384, 1388, 1389
 owner: Zaal (fill + approve) + ZOE (distribute Sep 1 per doc 1377)
 ---
@@ -37,7 +37,7 @@ A portion of ticket proceeds will be donated to **[charity name]** — [one-sent
 
 **The Economics That Set ZAOstock Apart**
 
-WaveWarZ operates on a "loser-earns" model: both artists in a music battle earn payment regardless of who wins the community vote. To date, the platform has processed **1,245 artist battles** with **9.09 SOL paid directly to artists** and **524 SOL in total volume** — all distributed without label intermediaries and settled on Solana blockchain.
+WaveWarZ operates on a "loser-earns" model: both artists in a music battle earn payment regardless of who wins the community vote. To date, the platform has processed **1,289 artist battles** with **13.40 SOL paid directly to artists** and **878 SOL in total volume** — all distributed without label intermediaries and settled on Solana blockchain.
 
 "Most music competition is winner-take-all," said Zaal Panthaki, founder of The ZAO. "WaveWarZ is built on the opposite premise: competing itself should have economic value. Artists who submit to battles earn whether they win or lose. ZAOstock is the live version of that model — the mid-show battle will pay both artists in front of the audience."
 
@@ -66,7 +66,7 @@ The ZAO is a community-governed music DAO operating on Optimism Mainnet. Founded
 
 **About WaveWarZ**
 
-WaveWarZ is a community-governed music battle platform on Solana. Artists submit tracks, community members vote, and both artists earn — regardless of outcome. WaveWarZ has processed 1,245+ battles with 524 SOL in total economic activity. wavewarz.info.
+WaveWarZ is a community-governed music battle platform on Solana. Artists submit tracks, community members vote, and both artists earn — regardless of outcome. WaveWarZ has processed 1,289+ battles with 878 SOL in total economic activity. wavewarz.info.
 
 **###**
 
@@ -104,7 +104,7 @@ ZOE sends this via email on Sep 1. Send to all outlets in this order:
 - [ ] Venue address (from permit — doc 1285)
 - [ ] Eventbrite ticket link (set by Jul 21, doc 1365)
 - [ ] ZAOOS doc count (will be 1,389+ by Sep 1 — update number)
-- [ ] Verify WaveWarZ stats from API day-of (may have grown from 1,245)
+- [ ] Verify WaveWarZ stats from API day-of (may have grown from 1,289)
 - [ ] High-res artist photos (from doc 1383 — collect by Sep 1)
 
 ---
@@ -138,4 +138,4 @@ If no external outlets pick up the release by Sep 15:
 
 ---
 
-*Created: 2026-07-17 | Fill by Aug 25 | Distribute Sep 1 | Related: 1313 (lineup), 1362 (press kit), 1363 (Maine local PR), 1384 (charity), 1388 (Hypebot pitch), 1389 (Water & Music pitch)*
+*Created: 2026-07-24 | Fill by Aug 25 | Distribute Sep 1 | Related: 1313 (lineup), 1362 (press kit), 1363 (Maine local PR), 1384 (charity), 1388 (Hypebot pitch), 1389 (Water & Music pitch)*

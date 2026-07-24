@@ -92,7 +92,7 @@ The ZAO's governance contracts operate on the Optimism blockchain, including an 
 
 WaveWarZ is a music battle platform developed by The ZAO that uses a prediction market model in which audience members bet cryptocurrency (SOL) on which of two competing artists will win a head-to-head competition. Unlike traditional music streaming, WaveWarZ's "loser-earns" mechanism distributes a share of the losing side's pool to the artist who lost, providing revenue for artists regardless of outcome.<ref>[CITE: Hypebot or Ari's Take article]</ref>
 
-As of July 2026, WaveWarZ had facilitated over 1,245 battles with cumulative trading volume exceeding 523 SOL.<ref>[CITE: wavewarz.info API / ZAOOS doc]</ref>
+As of July 2026, WaveWarZ had facilitated over 1,289 battles with cumulative trading volume exceeding 878 SOL.<ref>[CITE: wavewarz.info API / ZAOOS doc]</ref>
 
 === ZAOstock ===
 
@@ -118,7 +118,7 @@ WaveWarZ operates three battle formats: MAIN battles (curated multi-battle event
 
 === History ===
 
-WaveWarZ launched in 2024. As of July 2026, the platform had completed over 1,245 battles across 50 MAIN events, with cumulative trading volume of approximately 524 SOL (approximately $104,000 USD at July 2026 prices).<ref>[CITE: wavewarz.info public API / ZAOOS doc 1435]</ref>
+WaveWarZ launched in 2024. As of July 2026, the platform had completed over 1,289 battles across 51 MAIN events, with cumulative trading volume of approximately 878 SOL (approximately $66,000 USD at July 2026 prices).<ref>[CITE: wavewarz.info public API / ZAOOS doc 1435]</ref>
 
 === Criticism and analysis ===
 

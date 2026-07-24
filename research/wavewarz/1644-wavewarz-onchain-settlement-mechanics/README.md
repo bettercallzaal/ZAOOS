@@ -2,7 +2,7 @@
 
 **Type:** TECHNICAL-REFERENCE  
 **Topic:** WaveWarZ  
-**Status:** CANONICAL — use for press pitches, grant applications, academic citations, and technical due diligence. Describes how WaveWarZ settles battles on-chain automatically, including how the losing artist receives a guaranteed payout. Update after any significant protocol change. Last verified: Jul 2026 (1,245 battles settled).
+**Status:** CANONICAL — use for press pitches, grant applications, academic citations, and technical due diligence. Describes how WaveWarZ settles battles on-chain automatically, including how the losing artist receives a guaranteed payout. Update after any significant protocol change. Last verified: Jul 2026 (1,289 battles settled).
 
 ---
 
@@ -119,10 +119,10 @@ Source: `wavewarz.info/api/public/stats` (public, no auth required)
 
 | Metric | Value |
 |---|---|
-| Total battles settled | 1,245 |
-| Total SOL volume | 523.991 SOL |
-| Artist payouts (all artists) | 9.0988 SOL |
-| Trader claims | 127.343 SOL |
+| Total battles settled | 1,289 |
+| Total SOL volume | 878.30 SOL |
+| Artist payouts (all artists) | 13.40 SOL |
+| Trader claims | 381.20 SOL |
 | MAIN events | 50 |
 | MAIN battles | 162 |
 | Quick battles | 1,047 |
@@ -148,7 +148,7 @@ See doc 1435 (WaveWarZ Stats Reference) for full payout history and per-artist b
 | Live performance (typical open mic) | $0 or tips |
 | Music battle (traditional) | $0 (losing artist earns nothing) |
 
-**Key framing:** A losing artist in a WaveWarZ quick battle earns the equivalent of 9,000–93,000 Spotify streams in a single event. This is not hypothetical — it is the on-chain track record across 1,245 settled battles.
+**Key framing:** A losing artist in a WaveWarZ quick battle earns the equivalent of 9,000–93,000 Spotify streams in a single event. This is not hypothetical — it is the on-chain track record across 1,289 settled battles.
 
 ---
 
@@ -156,15 +156,15 @@ See doc 1435 (WaveWarZ Stats Reference) for full payout history and per-artist b
 
 ### For Grant Applications (Fisher, MAC, OP RF)
 
-> WaveWarZ is a prediction market for music battles deployed on Solana mainnet. Fans purchase prediction tokens on which artist will win a battle; when the battle closes, the smart contract automatically distributes the token pool: 80% to winning-side traders, 10% to the winning artist, and 10% to the losing artist. The settlement fires automatically, with no manual intervention or middleman. As of July 2026, 1,245 battles have been settled with $524 SOL in total trading volume and $9.09 SOL distributed directly to artists — including losing artists — as automatic on-chain payouts.
+> WaveWarZ is a prediction market for music battles deployed on Solana mainnet. Fans purchase prediction tokens on which artist will win a battle; when the battle closes, the smart contract automatically distributes the token pool: 80% to winning-side traders, 10% to the winning artist, and 10% to the losing artist. The settlement fires automatically, with no manual intervention or middleman. As of July 2026, 1,289 battles have been settled with $878.30 SOL in total trading volume and $13.40 SOL distributed directly to artists — including losing artists — as automatic on-chain payouts.
 
 ### For Press Pitches (Water & Music, Bankless, Decrypt, Hypebot)
 
-> WaveWarZ is the first live music platform where the losing artist earns a guaranteed automatic payout. Here's the mechanic: fans stake SOL on who wins a music battle. When it closes, a Solana smart contract splits the pool — 80% to winning traders, 10% to the winning artist, 10% to the losing artist. The losing artist's payout comes from the winning fans' stake: the bigger the crowd betting against you, the more you earn for losing. 1,245 battles settled on Solana mainnet since launch. No human trigger needed — it fires automatically.
+> WaveWarZ is the first live music platform where the losing artist earns a guaranteed automatic payout. Here's the mechanic: fans stake SOL on who wins a music battle. When it closes, a Solana smart contract splits the pool — 80% to winning traders, 10% to the winning artist, 10% to the losing artist. The losing artist's payout comes from the winning fans' stake: the bigger the crowd betting against you, the more you earn for losing. 1,289 battles settled on Solana mainnet since launch. No human trigger needed — it fires automatically.
 
 ### For Academic/DAO Research Citations
 
-> WaveWarZ (wavewarz.info) implements a prediction market settlement model for live music performance on Solana blockchain, using per-battle Program Derived Addresses (PDAs) for fund isolation and a bonding curve for dynamic token pricing. Settlement is fully automated: upon outcome submission, the Anchor/Rust program distributes the loser-side token pool 80% to winning traders and 10% to the winning artist, while distributing 10% of the winning-side token pool to the losing artist. This "loser-earns" mechanism inverts standard music competition economics and has been validated across 1,245 on-chain settlements (July 2026). Governance of MAIN battle matchups is conducted via Fractal Democracy on Optimism Mainnet (OREC: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532), linking the Solana performance layer to the Optimism governance layer.
+> WaveWarZ (wavewarz.info) implements a prediction market settlement model for live music performance on Solana blockchain, using per-battle Program Derived Addresses (PDAs) for fund isolation and a bonding curve for dynamic token pricing. Settlement is fully automated: upon outcome submission, the Anchor/Rust program distributes the loser-side token pool 80% to winning traders and 10% to the winning artist, while distributing 10% of the winning-side token pool to the losing artist. This "loser-earns" mechanism inverts standard music competition economics and has been validated across 1,289 on-chain settlements (July 2026). Governance of MAIN battle matchups is conducted via Fractal Democracy on Optimism Mainnet (OREC: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532), linking the Solana performance layer to the Optimism governance layer.
 
 ---
 

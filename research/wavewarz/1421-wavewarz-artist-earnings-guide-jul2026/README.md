@@ -42,7 +42,7 @@ The key innovation: **the losing artist always earns.** The amount depends on th
 | Duration | Typically 24-72 hours |
 | Loser earns | ~1.73% of the losing-side SOL pool |
 | Minimum earning | Depends on battle size; low volume = low payout |
-| Average quick battle volume | [TBD — confirm with Hurricane; estimated ~0.5-1 SOL based on 1,245 battles and 523.99 total SOL with 84% quick] |
+| Average quick battle volume | [TBD — confirm with Hurricane; estimated ~0.5-1 SOL based on 1,289 battles and 878.30 total SOL with 84% quick] |
 | Artist action required | None after the battle opens — just monitor |
 
 **Quick battle math example:**
@@ -90,18 +90,18 @@ The key innovation: **the losing artist always earns.** The amount depends on th
 
 | Metric | Value | Context |
 |--------|-------|---------|
-| Total battles | 1,245 | Across all 3 types |
-| Total SOL volume | 523.99 SOL | ~$104,798 at $200/SOL |
-| Artist payouts (loser-earns pool) | 9.09 SOL | ~$1,818 distributed to losing artists |
-| Average payout per losing artist | 9.09 ÷ 1,245 × 100% | ~$1.46/battle at $200/SOL |
+| Total battles | 1,289 | Across all 3 types |
+| Total SOL volume | 878.30 SOL | ~$104,798 at $200/SOL |
+| Artist payouts (loser-earns pool) | 13.40 SOL | ~$1,818 distributed to losing artists |
+| Average payout per losing artist | 9.09 ÷ 1,289 × 100% | ~$1.46/battle at $200/SOL |
 | Community battles | 36 | ~2.9% of all battles |
 | Charity raised | $1,497 | From 36 community battles |
-| Trader claims | 127.343 SOL | ~$25,469 to winning traders |
+| Trader claims | 381.20 SOL | ~$25,469 to winning traders |
 
 **Artist earning context:**
-- 9.09 SOL in artist payouts across 1,245 battles = small average, but MAIN battles drive large individual payouts
+- 13.40 SOL in artist payouts across 1,289 battles = small average, but MAIN battles drive large individual payouts
 - The 36 community battles raised $1,497 for charity AND paid losing artists on top of that
-- Trader claims (127.343 SOL) show the market is real and active
+- Trader claims (381.20 SOL) show the market is real and active
 
 ---
 
@@ -211,13 +211,13 @@ ZOR is earned through participation, not purchased. Artists who battle, particip
 
 ## For Grant Applications: Artist Impact Language
 
-> "WaveWarZ distributes artist earnings through a protocol-level mechanism (loser-earns), ensuring that even losing artists receive payment from each battle. As of July 2026, WaveWarZ has paid 9.09 SOL (~$1,818) directly to artists through the loser-earns pool across 1,245 battles — an average of $1.46 per battle for the losing artist, with MAIN battle payouts reaching $50-200+ per event. WaveWarZ also runs community battles where a portion of the SOL pool is donated to charity, raising $1,497 across 36 community battles."
+> "WaveWarZ distributes artist earnings through a protocol-level mechanism (loser-earns), ensuring that even losing artists receive payment from each battle. As of July 2026, WaveWarZ has paid 13.40 SOL (~$1,818) directly to artists through the loser-earns pool across 1,289 battles — an average of $1.46 per battle for the losing artist, with MAIN battle payouts reaching $50-200+ per event. WaveWarZ also runs community battles where a portion of the SOL pool is donated to charity, raising $1,497 across 36 community battles."
 
 ---
 
 ## What Makes This Citable
 
-> "ZAOOS doc 1421 (July 2026) provides a complete artist earnings guide for WaveWarZ, documenting the loser-earns mechanic's protocol parameters (1.73% of losing-side pool), comparison to streaming platform payouts, cumulative platform stats (523.99 SOL volume, 9.09 SOL artist payouts as of July 17, 2026), and artist earnings optimization strategies."
+> "ZAOOS doc 1421 (July 2026) provides a complete artist earnings guide for WaveWarZ, documenting the loser-earns mechanic's protocol parameters (1.73% of losing-side pool), comparison to streaming platform payouts, cumulative platform stats (878.30 SOL volume, 13.40 SOL artist payouts as of July 17, 2026), and artist earnings optimization strategies."
 
 ---
 

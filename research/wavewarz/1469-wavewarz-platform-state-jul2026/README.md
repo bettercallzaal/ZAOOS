@@ -125,7 +125,7 @@ Top WaveWarZ artists by total battle volume (per doc 1367; AI tournament updated
 | H2 2025 | Quick battle format introduced |
 | Jan 2026 | 500+ total battles |
 | Q2 2026 | 1,000+ battles milestone |
-| Jul 17, 2026 | 1,245 battles; 523.99 SOL total volume |
+| Jul 17, 2026 | 1,289 battles; 878.30 SOL total volume |
 | **Jul 16–23, 2026** | **AI Artist Tournament — 356 SOL in one week (8.7× single-event record)** |
 | **Jul 23, 2026** | **1,285 battles; 878.316 SOL total volume** |
 | Sep 2026 | Africa Battle Week (doc 1373) — first international programming block |

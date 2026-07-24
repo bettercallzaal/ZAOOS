@@ -72,17 +72,17 @@ The result: artists keep submitting, because even a loss has economic value. Thi
 
 | Metric | Value |
 |--------|-------|
-| Total battles completed | 1,245 |
+| Total battles completed | 1,289 |
 | MAIN events (premium battles) | 50 events / 162 battles |
 | Quick battles | 1,047 |
 | Community battles | 36 |
-| Total SOL volume | 523.991 SOL (~$4,760 USD at Jul 2026 prices) |
-| Artist payouts (losing artist earnings) | 9.0988 SOL (~$82 USD) |
-| Trader claims (bettor winnings) | 127.343 SOL (~$1,155 USD) |
+| Total SOL volume | 878.30 SOL (~$64.8K USD at $73.87/SOL) |
+| Artist payouts (losing artist earnings) | 13.40 SOL (~$989 USD at $73.87/SOL) |
+| Trader claims (bettor winnings) | 381.20 SOL (~$1,155 USD) |
 | Charity raised | See wavewarz.info for current total |
 
-**What "523.991 SOL in volume" means in plain English:**
-The WaveWarZ community has bet the equivalent of ~$4,760 USD on music battles since the platform launched — that money has flowed to winning traders, losing artists, and charity. No label. No middleman. All automatic.
+**What "878.30 SOL in volume" means in plain English:**
+The WaveWarZ community has bet the equivalent of ~$64.8K USD on music battles since the platform launched — that money has flowed to winning traders, losing artists, and charity. No label. No middleman. All automatic.
 
 ---
 
@@ -187,7 +187,7 @@ The 8 ZAOstock artists (October 3, Ellsworth ME) were selected by their WaveWarZ
 
 If you're writing about WaveWarZ or reviewing a ZAO grant application, the following one-paragraph summary is designed for non-specialist readers:
 
-> WaveWarZ (wavewarz.info) is a music battle platform built on Solana where independent artists submit tracks to head-to-head competitions, community members bet on outcomes, and — crucially — the losing artist still earns a payout. Since launch, the platform has facilitated 1,245 battles, 523.991 SOL (~$4,760 USD) in total volume, and paid $82+ USD to losing artists automatically on-chain. It is governed by The ZAO (ZTalent Artist Organization), a decentralized community that has maintained 63+ consecutive weeks of on-chain governance sessions on Optimism Mainnet.
+> WaveWarZ (wavewarz.info) is a music battle platform built on Solana where independent artists submit tracks to head-to-head competitions, community members bet on outcomes, and — crucially — the losing artist still earns a payout. Since launch, the platform has facilitated 1,289 battles, 878.30 SOL (~$64.8K USD) in total volume, and paid $989+ USD to losing artists automatically on-chain. It is governed by The ZAO (ZTalent Artist Organization), a decentralized community that has maintained 63+ consecutive weeks of on-chain governance sessions on Optimism Mainnet.
 
 ---
 

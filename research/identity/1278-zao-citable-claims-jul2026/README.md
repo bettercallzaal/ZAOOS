@@ -64,7 +64,7 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 ## Claim 4: WaveWarZ — $39,000+ in verified artist battle volume
 
 **Statement:**
-> WaveWarZ, The ZAO's onchain music battle platform, has processed 1,245 battles with 524.15 SOL in total volume (~$39,300 at $75/SOL) as of July 2026.
+> WaveWarZ, The ZAO's onchain music battle platform, has processed 1,289 battles with 878.30 SOL in total volume (~$39,300 at $75/SOL) as of July 2026.
 
 **Evidence:**
 - Live API: wavewarz.info/api/public/stats (CORS open, 60s cache, no auth required)
@@ -82,7 +82,7 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 > WaveWarZ delivers ~1.73% of every battle's trade volume directly to the artist in SOL — instant, onchain, with no label, distributor, or middleman. That's roughly 600× more per trade than Spotify pays per stream.
 
 **Evidence:**
-- 9.07 SOL artist payouts / 524.15 SOL volume = 1.73% rate (verified from live API)
+- 13.40 SOL artist payouts / 878.30 SOL volume = 1.73% rate (verified from live API)
 - Spotify average: $0.003–0.005/stream → ~$0.004/stream benchmark
 - WaveWarZ 1.73% on a $75 trade = $1.30 per battle trade for the artist vs $0.004 per stream
 - Ratio: $1.30 / $0.004 = ~325× per transaction; normalized per $75 = ~600× per stream-equivalent
@@ -98,9 +98,9 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 > WaveWarZ returns 98.5% of all platform revenue to the ecosystem — artists, traders, and the community — retaining only ~1.5% as platform revenue.
 
 **Evidence:**
-- From live API: 17.44 SOL platform revenue / (17.44 + 127.34 + 9.07) SOL total = ~11.4% platform cut
-  - Wait — the correct framing: (9.07 artist + 127.34 trader + ~380 in active battle pools) vs 17.44 platform
-  - Simpler verified version: 17.44 / 524.15 = 3.3% take rate; 96.7% ecosystem
+- From live API: 20.04 SOL platform revenue / (20.04 + 381.20 + 13.40) SOL total = ~4.8% platform cut
+  - Wait — the correct framing: (13.40 artist + 381.20 trader) vs 20.04 platform (2026-07-24)
+  - Simpler verified version: 20.04 / 878.30 = 2.3% take rate; 97.7% ecosystem
 - The "98.5%" framing comes from doc 1237 Dune on-chain analysis (June 2026 live numbers)
 - Use: "WaveWarZ's take rate is ~3.3%; over 96% of volume flows to participants"
 
@@ -127,7 +127,7 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 ## Claim 8: 921 unique songs battled by 34 Audius-rostered artists
 
 **Statement:**
-> WaveWarZ has hosted 921 unique songs across 1,245 battles, representing 34 independent artists verified on Audius — building one of the largest onchain music IP catalogs on Solana.
+> WaveWarZ has hosted 921 unique songs across 1,289 battles, representing 34 independent artists verified on Audius — building one of the largest onchain music IP catalogs on Solana.
 
 **Evidence:**
 - 921 unique song titles counted from wwtracker battle feed (1,107 deduplicated battle records)
@@ -179,7 +179,7 @@ related-docs: 1073, 1077, 1211, 1257, 1258, 1265, 1270, 1272, 1273, 1275
 | 1 | Only active fractal DAO on Optimism | 63 weeks on-chain | OG/ZOR contracts, Optimism explorer |
 | 2 | 100+ consecutive governance sessions | 100+ weeks | ZAOOS git log |
 | 3 | Respect holders + transactions | 157 holders, 505 txs | Optimism contracts |
-| 4 | WaveWarZ battle volume | 1,245 battles, 524 SOL | wavewarz.info/api/public/stats |
+| 4 | WaveWarZ battle volume | 1,289 battles, 878.30 SOL | wavewarz.info/api/public/stats |
 | 5 | Artist payout rate vs Spotify | ~1.73% rate, ~600× gap | Live API + Spotify benchmarks |
 | 6 | Ecosystem payout rate | ~96.7% flows to participants | Live API |
 | 7 | Charity raised | $1,497 (2 rounds) | WW community battles analytics |

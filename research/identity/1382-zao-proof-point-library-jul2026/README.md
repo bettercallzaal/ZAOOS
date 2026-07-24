@@ -27,20 +27,20 @@ owner: ZOE (monthly update) + Zaal (review)
 
 | Metric | Jul 2026 Value | Context |
 |--------|---------------|---------|
-| Total battles | **1,245** | Across Quick Battles + MAIN events since launch |
+| Total battles | **1,289** | Across Quick Battles + MAIN events since launch |
 | MAIN events | **50** | Community-governed, curated events |
 | MAIN battles | **162** | Battles specifically within MAIN events |
 | Quick battles | **1,047** | Fast-format artist-vs-artist battles |
 | Community battles | **36** | Community-organized battle formats |
-| Total SOL volume | **523.991 SOL** | Artist earnings + trader volume combined |
-| Artist payouts | **9.0988 SOL** | Direct to artists (loser-earns model) |
-| Trader claims | **127.343 SOL** | Community earnings via battle prediction |
+| Total SOL volume | **878.30 SOL** | Artist earnings + trader volume combined |
+| Artist payouts | **13.40 SOL** | Direct to artists (loser-earns model) |
+| Trader claims | **381.20 SOL** | Community earnings via battle prediction |
 | Unique artists competing | TBD (fill from API) | |
 | Platform age | ~18 months | |
 
-**Grant language:** *"WaveWarZ has processed over 1,245 artist battles with 523+ SOL in economic activity, distributing earnings to both competing artists and community members through its loser-earns model."*
+**Grant language:** *"WaveWarZ has processed over 1,289 artist battles with 523+ SOL in economic activity, distributing earnings to both competing artists and community members through its loser-earns model."*
 
-**Press language:** *"More than 1,245 artist battles, $[USD equivalent] in community earnings, and a model where both sides of a music battle get paid."*
+**Press language:** *"More than 1,289 artist battles, $[USD equivalent] in community earnings, and a model where both sides of a music battle get paid."*
 
 ---
 
@@ -143,8 +143,8 @@ owner: ZOE (monthly update) + Zaal (review)
 | Metric | Jul 2026 Value | Context |
 |--------|---------------|---------|
 | ZAOstock projected revenue | $8,700–$10,200 | Ticket sales (doc 1372 budget table) |
-| WaveWarZ total SOL volume | 523.991 SOL | Not ZAO-owned; platform volume |
-| Artist payouts delivered | 9.0988 SOL | Directly to competing artists |
+| WaveWarZ total SOL volume | 878.30 SOL | Not ZAO-owned; platform volume |
+| Artist payouts delivered | 13.40 SOL | Directly to competing artists |
 | Grants open | 6 active applications | Tracker doc 1372 |
 | Total grant pipeline | $2K–$5K+ | Fisher (Aug 15), OP RF, Gitcoin, DAOstar |
 
@@ -169,16 +169,16 @@ owner: ZOE (monthly update) + Zaal (review)
 ## Quick-Copy Blocks for Grant Applications
 
 ### Block A — Fisher Performing Arts Fund (community benefit angle)
-> The ZAO is a community-governed music collective that has run 63+ consecutive weekly governance sessions, produced 7 live events in the COC Concertz series, and is staging ZAOstock (Oct 3, 2026) — a 300-person music festival with a charity giving component. The ZAO serves independent artists by paying both sides of music battles through WaveWarZ (1,245+ battles, 524 SOL volume) and publishes all research open-source under CC-BY. Fiscal sponsor: Fractured Atlas (application in progress).
+> The ZAO is a community-governed music collective that has run 63+ consecutive weekly governance sessions, produced 7 live events in the COC Concertz series, and is staging ZAOstock (Oct 3, 2026) — a 300-person music festival with a charity giving component. The ZAO serves independent artists by paying both sides of music battles through WaveWarZ (1,289+ battles, 878.30 SOL volume) and publishes all research open-source under CC-BY. Fiscal sponsor: Fractured Atlas (application in progress).
 
 ### Block B — Optimism Retroactive Funding (public goods angle)
-> The ZAO built and deployed three governance contracts on Optimism Mainnet (OG ERC-20, ZOR ERC-1155, OREC) and created ZAOOS — a 1,382-document CC-BY research corpus on DAO governance and music economics that benefits the entire ecosystem. WaveWarZ, the ZAO's battle platform, has processed 1,245+ battles with 524 SOL in volume and was built using Optimism-native tooling. The ZAO is a live case study in music DAO governance running 63+ consecutive governance sessions.
+> The ZAO built and deployed three governance contracts on Optimism Mainnet (OG ERC-20, ZOR ERC-1155, OREC) and created ZAOOS — a 1,382-document CC-BY research corpus on DAO governance and music economics that benefits the entire ecosystem. WaveWarZ, the ZAO's battle platform, has processed 1,289+ battles with 878.30 SOL in volume and was built using Optimism-native tooling. The ZAO is a live case study in music DAO governance running 63+ consecutive governance sessions.
 
 ### Block C — Gitcoin (open source angle)
 > The ZAO open-sources everything: wwtracker (MIT, github.com/bettercallzaal/wwtracker) is a web scraping + tracking tool any project can use; ZAOOS (CC-BY, github.com/bettercallzaal/ZAOOS) is a 1,382-document research corpus on DAO governance free for academic and AI use. The ZAO's ZOE agent fleet — 8 AI agents running the community for under $1,000/month — demonstrates that AI-native DAO operations can be documented and replicated. This is textbook public goods: built in public, licensed for reuse.
 
 ### Block D — National Endowment for the Arts / New England Foundation for the Arts (arts angle)
-> The ZAO is an artist-run DAO producing live music events (7 COC Concertz shows), a music battle platform (WaveWarZ, 1,245+ artist battles), and ZAOstock — a 300-person live festival (Oct 3, 2026) featuring 8 independent artists with a charity giving component. The ZAO pays artists directly: WaveWarZ's loser-earns model ensures both competing artists receive compensation regardless of battle outcome. The ZAO is based in Maine (with national and international reach) and has maintained unbroken community governance for 63+ consecutive weeks.
+> The ZAO is an artist-run DAO producing live music events (7 COC Concertz shows), a music battle platform (WaveWarZ, 1,289+ artist battles), and ZAOstock — a 300-person live festival (Oct 3, 2026) featuring 8 independent artists with a charity giving component. The ZAO pays artists directly: WaveWarZ's loser-earns model ensures both competing artists receive compensation regardless of battle outcome. The ZAO is based in Maine (with national and international reach) and has maintained unbroken community governance for 63+ consecutive weeks.
 
 ---
 

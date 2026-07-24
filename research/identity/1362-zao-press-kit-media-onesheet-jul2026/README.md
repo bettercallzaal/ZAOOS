@@ -27,11 +27,11 @@ owner: Zaal (shares) + ZOE (updates stats quarterly)
 
 > The ZAO (ZTalent Artist Organization) is a music-focused decentralized autonomous organization (DAO) based in the United States. Founded in 2025, The ZAO operates WaveWarZ (wavewarz.info), an online music battle platform built on Solana where independent artists compete in head-to-head track competitions judged by community betting. Uniquely, the losing artist in every battle receives an automatic on-chain payout — a direct inversion of the winner-takes-all model dominant in streaming.
 >
-> As of July 2026, WaveWarZ has facilitated over 1,245 battles, 523 SOL in total volume, and $80+ in direct artist payouts. The ZAO has conducted 63+ consecutive weekly governance sessions on Optimism Mainnet using the Fractal governance model — one of the longest uninterrupted DAO governance streaks documented globally. ZAOstock, The ZAO's annual outdoor music festival, debuts October 3, 2026 in Ellsworth, Maine, with 8 artists selected via WaveWarZ battle history.
+> As of July 2026, WaveWarZ has facilitated over 1,289 battles, 523 SOL in total volume, and $80+ in direct artist payouts. The ZAO has conducted 63+ consecutive weekly governance sessions on Optimism Mainnet using the Fractal governance model — one of the longest uninterrupted DAO governance streaks documented globally. ZAOstock, The ZAO's annual outdoor music festival, debuts October 3, 2026 in Ellsworth, Maine, with 8 artists selected via WaveWarZ battle history.
 
 ### One-paragraph pitch (for email cold outreach to media)
 
-> I'm the co-founder of The ZAO, a music DAO that's running a quiet but verifiable experiment: what happens when the *losing* artist in every music competition gets paid automatically, on-chain, every time? We've done 63+ consecutive weekly governance votes on Ethereum (Optimism) without missing a single week — most DAOs never hold a second vote. Our music battle platform, WaveWarZ, has processed 1,245+ battles with over 523 SOL in volume and is holding its first-ever IRL festival, ZAOstock, in Ellsworth, Maine on October 3, 2026 — artists are chosen entirely by on-chain battle records, not industry connections. I think there's a story here about what governance actually looks like when someone shows up every week for 15 months. Happy to talk.
+> I'm the co-founder of The ZAO, a music DAO that's running a quiet but verifiable experiment: what happens when the *losing* artist in every music competition gets paid automatically, on-chain, every time? We've done 63+ consecutive weekly governance votes on Ethereum (Optimism) without missing a single week — most DAOs never hold a second vote. Our music battle platform, WaveWarZ, has processed 1,289+ battles with over 523 SOL in volume and is holding its first-ever IRL festival, ZAOstock, in Ellsworth, Maine on October 3, 2026 — artists are chosen entirely by on-chain battle records, not industry connections. I think there's a story here about what governance actually looks like when someone shows up every week for 15 months. Happy to talk.
 
 ---
 
@@ -39,13 +39,13 @@ owner: Zaal (shares) + ZOE (updates stats quarterly)
 
 | Stat | Value | Source |
 |------|-------|--------|
-| Total WaveWarZ battles | 1,245+ | wavewarz.info/api/public/stats |
+| Total WaveWarZ battles | 1,289+ | wavewarz.info/api/public/stats |
 | MAIN event battles | 162 | wavewarz.info/api/public/stats |
 | Quick battles | 1,047 | wavewarz.info/api/public/stats |
 | Community battles | 36 | wavewarz.info/api/public/stats |
-| Total SOL volume | 523.991 SOL | wavewarz.info/api/public/stats |
-| Artist payouts (losing artist) | 9.0988 SOL | wavewarz.info/api/public/stats |
-| Trader claims | 127.343 SOL | wavewarz.info/api/public/stats |
+| Total SOL volume | 878.30 SOL | wavewarz.info/api/public/stats |
+| Artist payouts (losing artist) | 13.40 SOL | wavewarz.info/api/public/stats |
+| Trader claims | 381.20 SOL | wavewarz.info/api/public/stats |
 | Governance sessions (consecutive) | 63+ | Optimism block explorer → OREC |
 | Governance sessions missed | 0 | Optimism block explorer → OREC |
 | ZAOOS research docs | 1,360+ | github.com/bettercallzaal/ZAOOS |
@@ -80,7 +80,7 @@ These are the facts that make ZAO stand out in a crowded field. Use them as stor
 > *Best for: Metagov, DAOstar newsletter, Unchained, Bankless, crypto-governance podcasts*
 
 ### Angle 2: "Losing pays" (music / creator economy media)
-> On WaveWarZ, the losing artist in every music battle earns an automatic payout — on-chain, same night. No waiting for Spotify royalties. No industry gatekeepers. 1,245+ battles have been settled this way, with $80+ paid to losing artists. The bet: if losing still pays, more artists take more risks.
+> On WaveWarZ, the losing artist in every music battle earns an automatic payout — on-chain, same night. No waiting for Spotify royalties. No industry gatekeepers. 1,289+ battles have been settled this way, with $80+ paid to losing artists. The bet: if losing still pays, more artists take more risks.
 >
 > *Best for: Water & Music, Hypebot, Ari's Take, Music Ally, music-tech podcasts, NPR Music*
 

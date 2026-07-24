@@ -16,7 +16,7 @@ Bankless audience: DeFi-native Ethereum users, sophisticated crypto investors, b
 ZAO's Green Pill pitch (doc 1405) leads with redistribution, public goods, and DAO governance. The Bankless pitch leads with:
 - **Market mechanics** (WaveWarZ SOL volume, payout math, trading behavior)
 - **Protocol primitives** (Solana PDA vaults, Optimism governance, cross-chain narrative)
-- **Traction numbers** (1,245 battles, 524 SOL, $1,497 charity, 2 IRL events)
+- **Traction numbers** (1,289 battles, 878.30 SOL, $1,497 charity, 2 IRL events)
 - **The onchain culture angle** (ZAOstock = first festival where governance decides the lineup)
 
 Bankless does NOT want "we're a DAO doing good things." They want "here's a protocol that creates novel market dynamics, here's the data, here's the onchain proof."
@@ -64,7 +64,7 @@ Here's what happened:
 - $[X] went to [charity] from ticket sales + battles
 - ZOR holders voted on [motion] during the event — first live onchain governance vote at a music festival
 
-The platform behind it is WaveWarZ: music battles on Solana where **the losing artist gets paid**. Here's the economics: every battle has a buy-side pool. Losing artists earn 1.73% of it. We've run 1,245+ battles, pushed 523+ SOL through the system, and paid out 9+ SOL directly to artists who lost. Traders have taken 127+ SOL in winnings.
+The platform behind it is WaveWarZ: music battles on Solana where **the losing artist gets paid**. Here's the economics: every battle has a buy-side pool. Losing artists earn 1.73% of it. We've run 1,289+ battles, pushed 523+ SOL through the system, and paid out 9+ SOL directly to artists who lost. Traders have taken 127+ SOL in winnings.
 
 The DAO is ZAO. 63+ consecutive weekly governance sessions on Optimism Mainnet using Fractal/Respect-weighted voting — no token plutocracy. Governance contracts: OG ERC-20 at `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`, OREC at `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`.
 
@@ -85,7 +85,7 @@ zao.community | wavewarz.info
 ### Angle B — "WaveWarZ: The DeFi Protocol for Music"
 
 Frame WaveWarZ as a prediction market built on music, not a streaming platform:
-- SOL volume: 523.991 SOL through a music betting protocol on Solana
+- SOL volume: 878.30 SOL through a music betting protocol on Solana
 - Take rate: 3% (WaveWarZ protocol fee; lower than OpenSea's 2.5% at same scale)
 - Payout split: 65% buy-side claims, 22% sell-side claims, 9% artist payouts, 4% charity
 - Loser-earns = anti-winner-take-all liquidity mechanism
@@ -115,7 +115,7 @@ Hook: "The real multi-chain use case isn't DeFi — it's a DAO that uses each ch
 If Bankless says yes, have these ready:
 
 **Non-negotiable stats (verify day-of from API):**
-- Battle count: 1,245+ (live on wavewarz.info/api/public/stats)
+- Battle count: 1,289+ (live on wavewarz.info/api/public/stats)
 - SOL volume: 523.991+ SOL
 - Artist payouts: 9.0988+ SOL ("~$600 to losing artists at current SOL price")
 - Trader claims: 127.343+ SOL ("~$9K to traders")

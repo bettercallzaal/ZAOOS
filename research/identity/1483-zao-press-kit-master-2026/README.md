@@ -21,13 +21,13 @@ This is the ZAO master press kit for July 2026. It contains:
 ## One-Paragraph Boilerplate (Use Verbatim)
 
 **For music press (Hypebot, Water & Music, Ari's Take):**
-> The ZAO is a music decentralized autonomous organization (DAO) that operates WaveWarZ — a music battle prediction market where the losing artist earns from trading activity. WaveWarZ has completed 1,245 battles generating 523.991 SOL (~$104,000) in total volume, with 9.0988 SOL ($1,820) paid directly to artists — including losing artists. ZAO has held 64 consecutive weekly governance sessions using Fractal Democracy on Optimism Mainnet, making it one of the most operationally consistent DAOs in the ecosystem. ZAO is producing ZAOstock, a free live music festival in Ellsworth, Maine on October 3, 2026, where the first in-person WaveWarZ battle will happen from the main stage.
+> The ZAO is a music decentralized autonomous organization (DAO) that operates WaveWarZ — a music battle prediction market where the losing artist earns from trading activity. WaveWarZ has completed 1,289 battles generating 878.30 SOL (~$104,000) in total volume, with 13.40 SOL ($1,820) paid directly to artists — including losing artists. ZAO has held 64 consecutive weekly governance sessions using Fractal Democracy on Optimism Mainnet, making it one of the most operationally consistent DAOs in the ecosystem. ZAO is producing ZAOstock, a free live music festival in Ellsworth, Maine on October 3, 2026, where the first in-person WaveWarZ battle will happen from the main stage.
 
 **For web3/crypto press (Bankless, Decrypt, Defiant):**
-> The ZAO is a music DAO with three live smart contracts on Optimism Mainnet, 64 consecutive Fractal Democracy governance sessions, and 1,245 music battles on its Solana-based prediction market WaveWarZ. What makes WaveWarZ unique: the losing artist earns — approximately 10% of the trading pool, equivalent to 11,667 Spotify streams per battle. 524 SOL (~$104K) in volume has flowed through the platform since 2024. ZAO is producing ZAOstock, the first DAO-run music festival, in Ellsworth, Maine on October 3, 2026.
+> The ZAO is a music DAO with three live smart contracts on Optimism Mainnet, 64 consecutive Fractal Democracy governance sessions, and 1,289 music battles on its Solana-based prediction market WaveWarZ. What makes WaveWarZ unique: the losing artist earns — approximately 10% of the trading pool, equivalent to 11,667 Spotify streams per battle. 878.30 SOL (~$104K) in volume has flowed through the platform since 2024. ZAO is producing ZAOstock, the first DAO-run music festival, in Ellsworth, Maine on October 3, 2026.
 
 **For academic/grant reviewers:**
-> The ZAO (Zeal Autonomous Organization) is a music-focused decentralized autonomous organization operating on Optimism Mainnet with three smart contracts: an OG ERC-20 governance token (0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957), a ZOR ERC-1155 participation token (0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c), and an OREC governance contract (0xcB05F9254765CA521F7698e61E0A6CA6456Be532). ZAO uses Fractal Democracy (from the ORDAO framework) for weekly governance, with 64+ consecutive sessions as of July 2026. ZAO's WaveWarZ platform has completed 1,245 music battles on Solana, distributing 9.0988 SOL ($1,820) in artist payouts. ZAO completed ZABAL Season 1 (28 workshops, 32 active participants) in H1 2026, and is producing ZAOstock, a free public music festival in Ellsworth, Maine on October 3, 2026.
+> The ZAO (Zeal Autonomous Organization) is a music-focused decentralized autonomous organization operating on Optimism Mainnet with three smart contracts: an OG ERC-20 governance token (0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957), a ZOR ERC-1155 participation token (0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c), and an OREC governance contract (0xcB05F9254765CA521F7698e61E0A6CA6456Be532). ZAO uses Fractal Democracy (from the ORDAO framework) for weekly governance, with 64+ consecutive sessions as of July 2026. ZAO's WaveWarZ platform has completed 1,289 music battles on Solana, distributing 13.40 SOL ($1,820) in artist payouts. ZAO completed ZABAL Season 1 (28 workshops, 32 active participants) in H1 2026, and is producing ZAOstock, a free public music festival in Ellsworth, Maine on October 3, 2026.
 
 ---
 
@@ -37,10 +37,10 @@ This is the ZAO master press kit for July 2026. It contains:
 
 | Metric | Value |
 |---|---|
-| Total battles completed | 1,245 |
-| Total trading volume | 523.991 SOL (~$104,000) |
-| Artist payouts (losing artists share) | 9.0988 SOL (~$1,820) |
-| Trader claims | 127.343 SOL (~$25,469) |
+| Total battles completed | 1,289 |
+| Total trading volume | 878.30 SOL (~$104,000) |
+| Artist payouts (losing artists share) | 13.40 SOL (~$1,820) |
+| Trader claims | 381.20 SOL (~$25,469) |
 | MAIN battles | 162 (across 50 MAIN events) |
 | Quick battles | 1,047 |
 | Community (charity) battles | 36 |
@@ -152,7 +152,7 @@ This is the ZAO master press kit for July 2026. It contains:
 
 ### Hypebot / Music Business Worldwide / Ari's Take
 **Angle:** "The music battle platform where the loser earns"
-- Hook: $1,820 paid to losing artists from 1,245 battles
+- Hook: $1,820 paid to losing artists from 1,289 battles
 - Data point: 11,667 Spotify stream equivalent per losing battle
 - ZAOstock as the IRL demonstration
 - Quote: loser-earns model quote (above)
@@ -168,7 +168,7 @@ This is the ZAO master press kit for July 2026. It contains:
 ### Bankless / Decrypt / The Defiant
 **Angle:** "Music DAO with live contracts on Optimism bakes loser-earns into a Solana prediction market"
 - Hook: cross-chain (Optimism governance + Solana trading)
-- Data: 3 contracts, 64 sessions, 524 SOL volume
+- Data: 3 contracts, 64 sessions, 878.30 SOL volume
 - ZAOOS as public goods DAO output
 - ZAOstock charity component
 

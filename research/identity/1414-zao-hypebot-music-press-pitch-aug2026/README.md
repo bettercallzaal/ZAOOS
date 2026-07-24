@@ -28,7 +28,7 @@ The music industry press can reach **independent artists at scale** — the exac
 |--------|----------|--------------|-------|---------|
 | **Hypebot** | Music industry professionals, indie artists | ~200K | Business model: "prediction market pays losing artists" | Editor: Bruce Houghton (hypebot.com) |
 | **Ari's Take** | Independent musicians, music educators | 100K+ email | Artist empowerment: "get paid even when you lose" | Ari Herstand (aristake.com) |
-| **Music Ally** | Label executives, DSP industry | 40K+ | Data story: 523.99 SOL volume, 1.73% payout vs streaming $0.003/stream | Editor-in-chief (musicallied.com) |
+| **Music Ally** | Label executives, DSP industry | 40K+ | Data story: 878.30 SOL volume, 1.73% payout vs streaming $0.003/stream | Editor-in-chief (musicallied.com) |
 | **The Trichordist** | Music rights, streaming economics | ~30K | Rights angle: loser-earns = new artist revenue stream without label cut | David Lowery + Blake Morgan |
 | **Future of Music Coalition** | Music policy, artist advocacy | ~25K | Policy angle: protocol-level artist redistribution, no middleman |  futureofmusic.org |
 
@@ -37,7 +37,7 @@ The music industry press can reach **independent artists at scale** — the exac
 ## Hypebot Pitch (Primary Target — send Aug 1)
 
 **To:** Bruce Houghton, Hypebot  
-**Subject:** What if the loser got paid? WaveWarZ ran 1,245 battles and proved it works.
+**Subject:** What if the loser got paid? WaveWarZ ran 1,289 battles and proved it works.
 
 ---
 
@@ -47,8 +47,8 @@ Pitch: a music prediction market where the losing artist gets paid.
 
 WaveWarZ is a head-to-head music battle platform on Solana. Listeners vote with SOL on who they think will win. When the battle closes, traders who picked the winner earn, the protocol takes 3%, and — here's the part that changes the math — the losing artist receives a guaranteed payout from the losing side's pool.
 
-After 1,245 battles and 524 SOL in total volume, this is what the data says:
-- 9.09 SOL paid directly to losing artists (verified on-chain)
+After 1,289 battles and 878.30 SOL in total volume, this is what the data says:
+- 13.40 SOL paid directly to losing artists (verified on-chain)
 - 36 community battles that raised $1,497 for charity through the same mechanism
 - Average quick battle volume: higher than most independent artists earn per month from Spotify
 
@@ -78,7 +78,7 @@ Hi Ari,
 
 One line: WaveWarZ is a music platform that pays the losing artist.
 
-I know that sounds counterintuitive, so here's the math: In a standard WaveWarZ battle, listeners bet SOL on who they think will win. The losing artist receives a guaranteed payout from the losing side's prediction pool. After 1,245 battles, 9.09 SOL has been distributed directly to losing artists — plus $1,497 raised for charity through community battles.
+I know that sounds counterintuitive, so here's the math: In a standard WaveWarZ battle, listeners bet SOL on who they think will win. The losing artist receives a guaranteed payout from the losing side's prediction pool. After 1,289 battles, 13.40 SOL has been distributed directly to losing artists — plus $1,497 raised for charity through community battles.
 
 Why does this matter for your audience?
 
@@ -96,13 +96,13 @@ Zaal Panthaki
 ## Music Ally Pitch (Aug 1-5)
 
 **To:** Music Ally editorial  
-**Subject:** Data story: prediction market for music hits 523.99 SOL volume — and the loser earns
+**Subject:** Data story: prediction market for music hits 878.30 SOL volume — and the loser earns
 
 ---
 
 Music Ally team,
 
-Data pitch: WaveWarZ, a music prediction market on Solana, has reached 523.99 SOL in total volume across 1,245 battles as of July 2026.
+Data pitch: WaveWarZ, a music prediction market on Solana, has reached 878.30 SOL in total volume across 1,289 battles as of July 2026.
 
 The business model is structurally different from streaming:
 - **Revenue distribution:** traders (winner side), 3% protocol fee, losing artist payout pool
@@ -134,9 +134,9 @@ The Trichordist covers streaming economics and artist rights. I have a data stor
 
 WaveWarZ is a Solana-based music prediction market. What makes it different: the losing artist gets paid. It's embedded in the protocol — not a donation, not a label policy, not an optional revenue share. The smart contract routes a portion of the losing side's SOL pool to the artist who lost the battle.
 
-After 1,245 battles: 9.09 SOL paid to losing artists. 36 community battles raised $1,497 for charity through the same mechanism.
+After 1,289 battles: 13.40 SOL paid to losing artists. 36 community battles raised $1,497 for charity through the same mechanism.
 
-This isn't a fix for the streaming payout problem. But it's proof that a music platform can be designed from the ground up to pay artists on both sides of any competition — and that 524 SOL in volume makes it economically real, not theoretical.
+This isn't a fix for the streaming payout problem. But it's proof that a music platform can be designed from the ground up to pay artists on both sides of any competition — and that 878.30 SOL in volume makes it economically real, not theoretical.
 
 Full story: [MIRROR LINK]
 
@@ -172,7 +172,7 @@ Hi [name],
 
 Following up in case my prior email got buried.
 
-The short version: WaveWarZ pays the losing artist — 9.09 SOL distributed to date, on-chain and verifiable. 
+The short version: WaveWarZ pays the losing artist — 13.40 SOL distributed to date, on-chain and verifiable. 
 
 ZAOstock is October 3 in Baltimore. If this is a fit for a pre-event piece, I'm available this week or next.
 
@@ -215,7 +215,7 @@ Before sending any pitch:
 
 ## What Makes This Citable
 
-> "ZAO conducted a coordinated music industry press outreach in August 2026 (ZAOOS doc 1414), targeting Hypebot, Ari's Take, Music Ally, The Trichordist, and Future of Music Coalition. All pitches referenced WaveWarZ's 1,245-battle dataset and the loser-earns mechanic, with the Mirror article (doc 1413) as the canonical public source."
+> "ZAO conducted a coordinated music industry press outreach in August 2026 (ZAOOS doc 1414), targeting Hypebot, Ari's Take, Music Ally, The Trichordist, and Future of Music Coalition. All pitches referenced WaveWarZ's 1,289-battle dataset and the loser-earns mechanic, with the Mirror article (doc 1413) as the canonical public source."
 
 ---
 

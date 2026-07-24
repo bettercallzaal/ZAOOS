@@ -17,9 +17,9 @@ ZAO's revenue comes from three sources: (1) WaveWarZ platform fees on every batt
 WaveWarZ operates a prediction market: listeners bet SOL on which artist wins a battle. The platform takes a fee on every bet.
 
 **Confirmed fee structure (from WW API stats, Jul 2026):**
-- Total volume: 523.991 SOL across 1,245 battles
-- Artist payouts to losers: 9.0988 SOL
-- Trader claims (winning bettors): 127.343 SOL
+- Total volume: 878.30 SOL across 1,289 battles
+- Artist payouts to losers: 13.40 SOL
+- Trader claims (winning bettors): 381.20 SOL
 - **Implied platform revenue:** 523.991 − 9.0988 − 127.343 − [winner artist payouts] = remainder goes to platform
 
 **Why this matters for grants:**
@@ -34,7 +34,7 @@ WaveWarZ operates a prediction market: listeners bet SOL on which artist wins a 
 
 *Fee percentages are approximate — confirm exact split with Hurricane.*
 
-**Trajectory:** At 1,245 battles / ~$523 SOL, WaveWarZ has processed meaningful on-chain volume for a sub-100 user platform. The 1,500 battle milestone (next) = additional ~200 battles × ~$0.05-0.35 avg platform fee = incremental.
+**Trajectory:** At 1,289 battles / ~$523 SOL, WaveWarZ has processed meaningful on-chain volume for a sub-100 user platform. The 1,500 battle milestone (next) = additional ~200 battles × ~$0.05-0.35 avg platform fee = incremental.
 
 ---
 
@@ -106,10 +106,10 @@ ZAO is a non-profit arts organization (pre-fiscal-sponsorship structure). All re
 ## Revenue Claims for Grants (Copy-Paste Blocks)
 
 ### Fisher Grant (Short)
-> "WaveWarZ has processed 523.991 SOL in total trading volume across 1,245 battles, with 9.0988 SOL paid directly to losing artists as guaranteed payouts. ZAO's platform is self-sustaining with real transaction volume and does not rely solely on grant funding."
+> "WaveWarZ has processed 878.30 SOL in total trading volume across 1,289 battles, with 13.40 SOL paid directly to losing artists as guaranteed payouts. ZAO's platform is self-sustaining with real transaction volume and does not rely solely on grant funding."
 
 ### OP Retro Funding (Short)
-> "ZAO has operated WaveWarZ for 64+ consecutive weeks under on-chain governance. Platform volume: 523.991 SOL, 1,245 battles, 36 community charity battles. All governance transactions are verifiable on Optimism Mainnet (OREC contract 0xcB05...)."
+> "ZAO has operated WaveWarZ for 64+ consecutive weeks under on-chain governance. Platform volume: 878.30 SOL, 1,289 battles, 36 community charity battles. All governance transactions are verifiable on Optimism Mainnet (OREC contract 0xcB05...)."
 
 ### MAC Grant (Short)
 > "ZAOstock 2026 is projected to generate $1,100–$3,800 in ticket and sponsor revenue while costing $3,525–$4,800 to produce. A MAC grant of $1,000–$2,000 would close the production gap and allow ZAO to bring free community admission while providing artist compensation."
@@ -132,11 +132,11 @@ ZAO is a non-profit arts organization (pre-fiscal-sponsorship structure). All re
 
 | Metric | Jul 2026 (actual) | Dec 2026 (target) | Driver |
 |---|---|---|---|
-| WaveWarZ volume | 523.991 SOL | ~700 SOL | 300+ new battles |
+| WaveWarZ volume | 878.30 SOL | ~700 SOL | 300+ new battles |
 | Platform fee revenue | ~$90–140 (SOL) | ~$120–190 | Linear with battles |
 | ZAOstock ticket revenue | $0 (not yet) | $600–1,000 | Oct 3 event |
 | Grant revenue | $0 confirmed | $2,000–5,000 | Fisher + OP RF |
-| Total community payout | 9.0988 SOL artist + 127.343 SOL trader | 12 SOL artist, 170 SOL trader | Battle growth |
+| Total community payout | 13.40 SOL artist + 381.20 SOL trader | 12 SOL artist, 170 SOL trader | Battle growth |
 
 ---
 

@@ -36,9 +36,9 @@
 - Audius track references (Audius is Solana-based)
 
 **Key Solana facts for press:**
-- "1,245 battles settled on Solana mainnet" (Jul 2026)
-- "523.991 SOL ($39,126) in cumulative trading volume"
-- "9.09 SOL in guaranteed artist payouts, including losing artists"
+- "1,289 battles settled on Solana mainnet" (Jul 2026)
+- "878.30 SOL ($39,126) in cumulative trading volume"
+- "13.40 SOL in guaranteed artist payouts, including losing artists"
 - Average per-battle settlement: ~0.42 SOL per battle
 
 **Not on Solana:** ZAO governance — that's Optimism. ZAO identity token — that's Base.

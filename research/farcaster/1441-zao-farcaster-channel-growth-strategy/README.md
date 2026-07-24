@@ -51,7 +51,7 @@ The `/zao` channel on Farcaster is ZAO's owned community hub — a public channe
 ### Segment 3: Crypto Prediction Markets
 - Channels: /polymarket, /degen, /base
 - Content they engage with: market mechanics, volume stats, new prediction market types
-- ZAO angle: "No-oracle prediction market for music — 524 SOL volume, 1,245 battles"
+- ZAO angle: "No-oracle prediction market for music — 878 SOL volume, 1,289 battles"
 
 ### Segment 4: Optimism Ecosystem
 - Channels: /optimism, /retrodrop, /farcaster
@@ -88,13 +88,13 @@ The `/zao` channel on Farcaster is ZAO's owned community hub — a public channe
 
 ### Formula 1: The Surprising Stat
 ```
-WaveWarZ paid the losing artist in 1,245 battles.
+WaveWarZ paid the losing artist in 1,289 battles.
 
 Every artist gets something.
 
 Whether they win or lose, the loser-earns mechanism sends ~1.73% of the losing pool to the artist.
 
-Total paid to losing artists: 9.09 SOL (~$1,820)
+Total paid to losing artists: 13.40 SOL (~$1,820)
 
 That's 364,000–607,000 Spotify streams worth of income — for artists who LOST.
 

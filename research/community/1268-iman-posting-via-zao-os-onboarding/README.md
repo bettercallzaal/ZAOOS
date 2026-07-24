@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: ready-to-use
-created: 2026-07-17
+created: 2026-07-24
 board-task: c9655dc3
 related-docs: 897, 898, 987, 1261
 owner: Iman (executes) + Zaal (grants access)
@@ -42,8 +42,8 @@ curl -X POST https://zaalcaster.vercel.app/api/digest \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "linkedin",
-    "topic": "WaveWarZ crossed 1,245 battles and 524 SOL volume -- artists get 1% of every trade instantly",
-    "facts": "1,245 battles total as of July 17, 2026. 524.15 SOL lifetime volume (~$39K at current prices). 9.07 SOL direct to artists (not counting staker payouts). 98.5% ecosystem payout rate. 921 unique songs."
+    "topic": "WaveWarZ crossed 1,289 battles and 878 SOL volume -- artists get 1% of every trade instantly",
+    "facts": "1,289 battles total as of July 24, 2026. 878.30 SOL lifetime volume (~$64.8K at current prices). 13.40 SOL direct to artists (not counting staker payouts). 98.5% ecosystem payout rate. 921 unique songs."
   }'
 ```
 

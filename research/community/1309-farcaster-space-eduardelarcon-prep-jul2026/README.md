@@ -2,7 +2,7 @@
 topic: community/distribution
 type: EVENT-PREP
 status: action-ready
-created: 2026-07-17
+created: 2026-07-24
 board-task: 26456722
 related-docs: 1295, 1257, 1278, 1265
 owner: Zaal
@@ -48,7 +48,7 @@ Zaal explains: a prediction market for music battles on Solana. Artists submit s
 
 **Eduard's angle:** "So it's like a Battle of the Bands that actually pays people in real-time?"
 
-**Numbers to cite:** 1,245 battles, 921 songs, 524 SOL total volume, $1,497 to charity.
+**Numbers to cite:** 1,289 battles, 921 songs, 878 SOL total volume, $1,497 to charity.
 
 ---
 

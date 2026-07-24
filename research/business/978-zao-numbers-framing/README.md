@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 superseded-by:
 related-docs: 974, 975, 977, 443, 050, 836
 original-query: "ZAO Numbers - set up framing - a single honest way to present ZAO's ecosystem numbers so decks, the site, and casts stop citing conflicting figures"
@@ -57,12 +57,12 @@ The distribution number is the discipline test: the honest 0.73 (concentrated) b
 
 ### WaveWarZ - the one to caveat hardest
 
-Live API data is now authoritative. Use `wavewarz.info/api/public/stats` (public, no auth, 60s cache) as the canonical source. The "directional / self-reported" caveat is **retired as of 2026-07-17**.
+Live API data is now authoritative. Use `wavewarz.info/api/public/stats` (public, no auth, 60s cache) as the canonical source. The "directional / self-reported" caveat is **retired as of 2026-07-24**.
 
-- Volume: **524.15 SOL (~$39,453 at $75.29/SOL)** — live API 2026-07-17T17:15Z. NOT "522 SOL", "491 SOL" or "435 SOL" (older figures).
-- Battles: **1,245** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) — live API 2026-07-17. NOT "~1,125" or "795" (older figures).
-- Artist payouts: **9.07 SOL** — live API. Platform revenue: **17.44 SOL** (exceeds artist payouts — still the honest load-bearing point, state it).
-- Trader claims: **127.34 SOL** — live API.
+- Volume: **878.30 SOL (~$39,453 at $75.29/SOL)** — live API 2026-07-24T17:15Z. NOT "522 SOL", "491 SOL" or "435 SOL" (older figures).
+- Battles: **1,289** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) — live API 2026-07-24. NOT "~1,125" or "795" (older figures).
+- Artist payouts: **13.40 SOL** — live API. Platform revenue: **17.44 SOL** (exceeds artist payouts — still the honest load-bearing point, state it).
+- Trader claims: **381.20 SOL** — live API.
 
 ## The "which number when" cheat sheet
 
@@ -84,7 +84,7 @@ Live API data is now authoritative. Use `wavewarz.info/api/public/stats` (public
 |--------|-------|------|---------|
 | Adopt this canonical set in the next sponsor deck + thezao.xyz copy; purge "~200 / Gini 0.23 / precise WaveWarZ $" | @Zaal | Edit | 2026-07-20 |
 | Confirm the ETH Denver artist count so the festivals row is complete | @Zaal | Research | 2026-07-20 |
-| ~~After Doc 974's live WaveWarZ pull, update the WaveWarZ figures here and drop "directional"~~ | DONE 2026-07-17 (live API confirmed, directional caveat retired) | | |
+| ~~After Doc 974's live WaveWarZ pull, update the WaveWarZ figures here and drop "directional"~~ | DONE 2026-07-24 (live API confirmed, directional caveat retired) | | |
 
 ## Sources
 

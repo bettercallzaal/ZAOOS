@@ -36,8 +36,8 @@ The ZAO is a music DAO that governs WaveWarZ — the first music battle platform
 WaveWarZ uses a prediction market model: the audience bets SOL (Solana cryptocurrency) on head-to-head music battles. When a battle closes, the losing artist earns a share of the pool bet against them. We call this "loser-earns."
 
 By July 2026:
-- **1,245+ battles** completed
-- **524 SOL (~$104K)** in trading volume
+- **1,289+ battles** completed
+- **878 SOL (~$64.8K)** in trading volume
 - **$1,820** paid to losing artists
 - **63+ consecutive weekly governance sessions** on-chain (Optimism Mainnet)
 - **ZAOstock Oct 3** — first DAO-produced music festival (Ellsworth, ME)
@@ -87,8 +87,8 @@ The ZAO partners with:
 
 **Our Proof Points**
 
-- **1,245 battles** — more music prediction market battles than any other platform
-- **524 SOL ($104K)** — real trading volume, not test transactions
+- **1,289 battles** — more music prediction market battles than any other platform
+- **878 SOL ($64.8K)** — real trading volume, not test transactions
 - **$1,820 to losing artists** — proof of concept for the loser-earns model
 - **63+ consecutive weekly governance sessions** — we show up every week
 - **ZAOstock Oct 3** — a real event, not a roadmap item
@@ -111,7 +111,7 @@ The ZAO partners with:
 **Add to opener:** "We're planning Africa Battle Week (Sep 22-26) — 5 MAIN battles featuring African artists. We're looking for a music community with strong West African presence to co-produce this with us."
 
 ### For Music Publications (Hypebot, Ari's Take)
-**Add to opener:** "I'd love to share data from 1,245 WaveWarZ battles — the loser-earns model is the most counter-intuitive music economic model since streaming began."
+**Add to opener:** "I'd love to share data from 1,289 WaveWarZ battles — the loser-earns model is the most counter-intuitive music economic model since streaming began."
 
 ### For DAOs + Crypto Communities (Nouns, Gitcoin)
 **Add to opener:** "ZAO uses Optimism Fractal governance — 63+ consecutive sessions, 0 quorum failures. We're a living case study for non-plutocratic DAO governance."

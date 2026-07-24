@@ -57,7 +57,7 @@ We anticipate 75–150 in-person attendees, with additional virtual viewers thro
 
 **WaveWarZ: Our Music Platform**
 
-The centerpiece of ZAOstock is the first-ever live WaveWarZ music battle on a public stage. WaveWarZ is a music battle platform where artists submit original tracks and community members vote on their favorites. The platform is distinguished by its "loser earns" mechanic: the artist who loses the battle still earns income from the betting pool. To date, WaveWarZ has processed 1,245 music battles and distributed $1,820 to losing artists — on the principle that musical participation has economic value regardless of whether it "wins."
+The centerpiece of ZAOstock is the first-ever live WaveWarZ music battle on a public stage. WaveWarZ is a music battle platform where artists submit original tracks and community members vote on their favorites. The platform is distinguished by its "loser earns" mechanic: the artist who loses the battle still earns income from the betting pool. To date, WaveWarZ has processed 1,289 music battles and distributed $1,820 to losing artists — on the principle that musical participation has economic value regardless of whether it "wins."
 
 At ZAOstock, this vote will happen live. The community in attendance becomes the jury. Both artists earn compensation from the battle pool regardless of the outcome.
 
@@ -158,7 +158,7 @@ Fractured Atlas may request:
 
 **Zaal bio (paste-ready):**
 ```
-Zaal Panthaki is the co-founder of The ZAO and WaveWarZ. Since March 2024, he has led 63 consecutive weekly community governance sessions while building WaveWarZ — a music battle platform that has processed 1,245 battles and distributed $1,820 to losing artists. ZAOstock 2026 is Zaal's first in-person public festival production.
+Zaal Panthaki is the co-founder of The ZAO and WaveWarZ. Since March 2024, he has led 63 consecutive weekly community governance sessions while building WaveWarZ — a music battle platform that has processed 1,289 battles and distributed $1,820 to losing artists. ZAOstock 2026 is Zaal's first in-person public festival production.
 ```
 
 ---

@@ -27,7 +27,7 @@
 **Project Name:** The ZAO / WaveWarZ
 
 **One-liner (under 50 words):**
-The ZAO is the only active Fractal DAO on Optimism — 63+ consecutive on-chain governance weeks, 157 Respect holders, and a live music prediction market (WaveWarZ) with 1,245 battles and $39K+ in verified on-chain volume. Open-source. Artist-first. Running every week since October 2022.
+The ZAO is the only active Fractal DAO on Optimism — 63+ consecutive on-chain governance weeks, 157 Respect holders, and a live music prediction market (WaveWarZ) with 1,289 battles and $39K+ in verified on-chain volume. Open-source. Artist-first. Running every week since October 2022.
 
 ---
 
@@ -42,11 +42,11 @@ The ZAO runs the Fractal Respect model (pioneered by Eden Fractal), which means 
 **WaveWarZ: The ZAO's Revenue Product**
 
 The ZAO built WaveWarZ, a music prediction market on Solana where listeners bet SOL on which song wins a head-to-head battle. Since May 2025:
-- 1,245 battles completed
-- 524 SOL (~$39K) in total volume
+- 1,289 battles completed
+- 878 SOL (~$64.8K) in total volume
 - 921 unique songs submitted by independent artists
 - 34 Audius-rostered artists rostered
-- 9.07 SOL ($677) paid directly to artists
+- 13.40 SOL ($677) paid directly to artists
 - $1,497 raised for HuRya charity via Community Battles
 
 The "loser-earns" model means both the winning AND losing artist earn from every battle — a structural inversion of the winner-take-all music industry. WaveWarZ pays artists ~1.73% of battle volume per battle, compared to Spotify's $0.004/stream.
@@ -84,10 +84,10 @@ This is exactly the kind of ecosystem participant Retro Funding was designed to 
 | Consecutive governance weeks | 63+ | OREC contract 0xcB05F9254765CA521F7698e61E0A6CA6456Be532 |
 | Unique Respect holders | 157 | OG token 0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957 |
 | Total governance transactions | 505 | OREC on-chain |
-| WaveWarZ battles completed | 1,245 | wavewarz.info/api/public/stats |
-| WaveWarZ volume | 524 SOL (~$39K) | wavewarz.info/api/public/stats |
+| WaveWarZ battles completed | 1,289 | wavewarz.info/api/public/stats |
+| WaveWarZ volume | 878 SOL (~$64.8K) | wavewarz.info/api/public/stats |
 | Unique songs submitted | 921 | wavewarz.info/api/public/stats |
-| Artist payouts | 9.07 SOL ($677) | wavewarz.info/api/public/stats |
+| Artist payouts | 13.40 SOL ($677) | wavewarz.info/api/public/stats |
 | Charity raised (Community Battles) | $1,497 | wavewarz.info/api/public/stats |
 | Newsletter editions | 400+ | paragraph.com/@thezao |
 | Open-source repos | wwtracker (MIT) + ZAOOS | github.com/bettercallzaal |
@@ -173,4 +173,4 @@ Before submitting, verify:
 
 ---
 
-*Created: 2026-07-17 | ZAO OS doc 1311 | Business subfolder | DECISION NEEDED to submit — content is paste-ready*
+*Created: 2026-07-24 | ZAO OS doc 1311 | Business subfolder | DECISION NEEDED to submit — content is paste-ready*

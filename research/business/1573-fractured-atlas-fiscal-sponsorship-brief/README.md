@@ -35,7 +35,7 @@ The ZAO is a community-governed music collective operating WaveWarZ — a music 
 that pays losing artists in real time — and ZAOstock, an annual music festival in Ellsworth, Maine. 
 ZAOstock 2026 (October 3) will feature live music performances, an on-chain governance vote 
 by community members, a charity fundraiser, and cryptocurrency-enabled artist payouts. 
-ZAO has completed 1,245 music battles paying $1,820 to artists, raised $1,497 for charity, 
+ZAO has completed 1,289 music battles paying $1,820 to artists, raised $1,497 for charity, 
 and runs ZABAL — a 12-week artist/builder accelerator now in its second season.
 ```
 
@@ -94,7 +94,7 @@ If FA pending on Aug 15: submit Fisher grant anyway, note "FA application submit
 **MAC application materials:**
 - Organization/project description (use Fisher grant description above)
 - ZAOstock budget (doc 1547)
-- ZAO community impact statement: "WaveWarZ paid $1,820 to losing artists across 1,245 battles; ZAO's ZABAL accelerator has trained 32 artists and builders since 2025."
+- ZAO community impact statement: "WaveWarZ paid $1,820 to losing artists across 1,289 battles; ZAO's ZABAL accelerator has trained 32 artists and builders since 2025."
 - Artist bios (from ZAOstock lineup — confirm Aug 1)
 
 ---

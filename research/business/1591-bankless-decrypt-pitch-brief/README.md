@@ -30,7 +30,7 @@ Bankless is the highest-authority crypto publication for OP RF credibility. Bank
 ### Bankless Pitch Email
 
 **To:** editorial@bankless.com (or Banklesshq.com submit form — ZOE fetch to confirm current pitch channel)  
-**Subject:** "A Music DAO That Pays Losers: WaveWarZ, 1,245 Battles, and ZAO's On-Chain Governance Streak"  
+**Subject:** "A Music DAO That Pays Losers: WaveWarZ, 1,289 Battles, and ZAO's On-Chain Governance Streak"  
 **Send:** Aug 1, 10:00 AM
 
 **Body:**
@@ -46,9 +46,9 @@ time, on-chain.
 
 Why this is a Bankless story:
 
-→ Prediction market + music = real human interest. WaveWarZ has run 1,245 battles 
-   with 523.991 SOL (~$104K) in total volume since launch. Losing artists have earned 
-   9.0988 SOL ($1,820) — without a record deal, without winning.
+→ Prediction market + music = real human interest. WaveWarZ has run 1,289 battles 
+   with 878.30 SOL (~$64.8K) in total volume since launch. Losing artists have earned 
+   13.40 SOL ($1,820) — without a record deal, without winning.
 
 → DAO governance with a 100+ week streak. ZAO runs Fractal Democracy sessions weekly on 
    Optimism Mainnet (OREC contract: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532). 
@@ -120,7 +120,7 @@ Here's how it works: Two artists compete. The audience bets SOL on who wins the 
 vote. The loser of the vote — the "losing artist" — receives a guaranteed percentage of 
 the pool, automatically, on-chain, in seconds.
 
-We've run 1,245 of these battles. Losing artists have earned 9.0988 SOL ($1,820 USD). 
+We've run 1,289 of these battles. Losing artists have earned 13.40 SOL ($1,820 USD). 
 One losing WaveWarZ battle earns the equivalent of 11,667 Spotify streams in artist payout value.
 
 On October 3, we're hosting ZAOstock — a live music festival in Ellsworth, Maine — where 

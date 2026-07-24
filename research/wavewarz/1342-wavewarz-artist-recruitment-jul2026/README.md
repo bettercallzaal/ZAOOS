@@ -11,7 +11,7 @@ owner: Zaal
 
 > **Distinction from doc 1302 (Artist Onboarding Guide):** Doc 1302 covers what to do AFTER an artist says yes. This doc covers how to find the right artists and get them to say yes in the first place.
 >
-> **Current state:** 921 unique songs across 1,245 battles. 43-artist verified roster in wwtracker. The pipeline to add new artists is manual and undocumented.
+> **Current state:** 921 unique songs across 1,289 battles. 43-artist verified roster in wwtracker. The pipeline to add new artists is manual and undocumented.
 >
 > **North Star impact:** distribution 4/10 → 5.0 (new artist audiences), IP catalog 8/10 → 8.5 (more ZAO-affiliated music IP).
 
@@ -117,7 +117,7 @@ Hey [Artist Name]! Loved [track title] — the [specific thing: beat, lyric, vib
 
 I'm Zaal from WaveWarZ — we're a music battle platform on Solana where artists battle their tracks and actually earn SOL regardless of who wins (1% of every bet, guaranteed payout).
 
-We've had 921 songs battle, 1,245 battles total. Would you want to enter one? No wallet required upfront — I can walk you through the 2-minute setup.
+We've had 921 songs battle, 1,289 battles total. Would you want to enter one? No wallet required upfront — I can walk you through the 2-minute setup.
 
 What do you think?
 ```
@@ -126,7 +126,7 @@ What do you think?
 ```
 Your [track name] just showed up in my feed via ZOL — it's exactly the kind of track that would do well in a WaveWarZ battle.
 
-We're a Solana music battle platform: artists battle tracks, community bets SOL, winner earns more but loser still collects 1% of volume. 921 songs have battled. 9.09 SOL in guaranteed artist payouts so far.
+We're a Solana music battle platform: artists battle tracks, community bets SOL, winner earns more but loser still collects 1% of volume. 921 songs have battled. 13.40 SOL in guaranteed artist payouts so far.
 
 Want to throw your track in a MAIN event? Takes 10 minutes to set up. wavewarz.info
 ```

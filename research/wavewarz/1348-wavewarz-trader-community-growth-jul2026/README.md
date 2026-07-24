@@ -11,7 +11,7 @@ owner: Zaal + ZOE + Hurricane (WaveWarZ team)
 
 > **The two sides of WaveWarZ:** Artists supply the battles. Traders/bettors create the volume. Growing only the artist side (doc 1342) without growing the trader side produces underbetted battles with low SOL volume — the network effect that makes WaveWarZ compelling breaks down. This doc is the demand-side companion to doc 1342.
 >
-> **Current state:** 1,245 total battles, 523.991 SOL volume, 127.343 SOL in trader claims. The trader pool is active but its size is opaque. Growing it by 2x would roughly double SOL volume with no additional artist changes.
+> **Current state:** 1,289 total battles, 878.30 SOL volume, 381.20 SOL in trader claims. The trader pool is active but its size is opaque. Growing it by 2x would roughly double SOL volume with no additional artist changes.
 
 ---
 
@@ -29,7 +29,7 @@ owner: Zaal + ZOE + Hurricane (WaveWarZ team)
 
 ### What makes a WaveWarZ trader stay
 
-Based on 127.343 SOL in trader claims (vs. 9.0988 SOL artist payouts — traders earn 14x artists):
+Based on 381.20 SOL in trader claims (vs. 13.40 SOL artist payouts — traders earn 14x artists):
 - Trader economics are compelling: high skill floor (musical taste) + on-chain payout
 - The loser-earns mechanic creates guaranteed prizes (no zero-sum frustration from artist side)
 - But: only retained traders (repeat bettors) drive volume; one-time bettors don't compound
@@ -265,7 +265,7 @@ Trading WaveWarZ like a pro. Who's next?
 | Overall | 7.0/10 | 7.3/10 |
 
 **Volume projection:** If trader pool doubles from current active traders:
-- Battle volume: 1,245 → ~1,800 battles by Dec 2026 (milestone: 2,000 target in doc 1345)
+- Battle volume: 1,289 → ~1,800 battles by Dec 2026 (milestone: 2,000 target in doc 1345)
 - SOL volume: 523.991 → ~750 SOL by Dec 2026
 - Artist payouts: 9.0988 → ~15 SOL by Dec 2026
 

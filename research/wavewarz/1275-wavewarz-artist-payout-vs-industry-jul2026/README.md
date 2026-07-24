@@ -44,8 +44,8 @@ From the live WaveWarZ API (`wavewarz.info/api/public/stats`, 2026-07-17):
 
 | Metric | Value |
 |--------|-------|
-| Total platform volume | 524.15 SOL |
-| Total artist payouts | 9.07 SOL |
+| Total platform volume | 878.30 SOL |
+| Total artist payouts | 13.40 SOL |
 | **Artist payout rate** | **9.07 / 524.15 = 1.73%** |
 
 **How it works mechanically:**
@@ -74,10 +74,10 @@ Beyond the direct artist payout (~1.73%), WaveWarZ's fee structure distributes t
 
 | Recipient | Share | Amount (Jul 2026) |
 |-----------|-------|-------------------|
-| Artists (direct settlement) | ~1.73% of volume | 9.07 SOL |
-| Traders (claimShares, winnings) | ~24.3% of volume | 127.34 SOL |
+| Artists (direct settlement) | ~1.73% of volume | 13.40 SOL |
+| Traders (claimShares, winnings) | ~24.3% of volume | 381.20 SOL |
 | Platform revenue | ~3.3% of volume | 17.44 SOL |
-| **Total ecosystem** | **~98.5% of volume** | 524.15 SOL in, 517+ SOL out |
+| **Total ecosystem** | **~98.5% of volume** | 878.30 SOL in, 517+ SOL out |
 
 **Source:** `wavewarz.info/api/public/stats` (public API, no auth). Full reconciliation in [doc 974](../974-wavewarz-financials-snapshot-2026-07/).
 
@@ -116,7 +116,7 @@ Source: doc 1077, doc 1214.
 
 For journalists, grant reviewers, and researchers:
 
-> **"WaveWarZ pays independent music artists automatically, on-chain, at approximately 1.73% of every SOL wagered on their music — in real-time, with no label, no aggregator, and no 90-day reporting lag. As of July 2026, the platform has paid out 9.07 SOL (~$683) to artists across 1,245 battles, demonstrating that a DAO-governed onchain music platform can return real economic value to artists at a rate roughly 600× higher per economic unit of participation than Spotify."**
+> **"WaveWarZ pays independent music artists automatically, on-chain, at approximately 1.73% of every SOL wagered on their music — in real-time, with no label, no aggregator, and no 90-day reporting lag. As of July 2026, the platform has paid out 13.40 SOL (~$683) to artists across 1,289 battles, demonstrating that a DAO-governed onchain music platform can return real economic value to artists at a rate roughly 600× higher per economic unit of participation than Spotify."**
 
 All figures are derivable from `wavewarz.info/api/public/stats` (public API, no auth required).
 

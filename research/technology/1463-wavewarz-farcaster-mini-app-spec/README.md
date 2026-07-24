@@ -41,7 +41,7 @@ A Farcaster Mini App (formerly Frames v2) allows WaveWarZ to be embedded nativel
 ### Use Case 2: Platform Stats Widget
 **What it shows when embedded in a ZAO/ZOE statistics post:**
 - Live stat pull from `/api/public/stats`
-- "1,245 battles | 524 SOL | $1,820 to losing artists"
+- "1,289 battles | 878 SOL | $988 to losing artists (Jul 2026)"
 - Rolling ticker of recent MAIN battle results
 - CTA: "See all battles on wavewarz.info"
 

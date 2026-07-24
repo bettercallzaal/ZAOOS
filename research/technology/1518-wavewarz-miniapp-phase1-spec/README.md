@@ -65,16 +65,33 @@ All data for Phase 1 comes from the public WaveWarZ API. No authentication neede
 GET https://wavewarz.info/api/public/stats
 ```
 
-**Response (Jul 2026 format):**
+**Response (Jul 2026 format — verified 2026-07-24):**
 ```json
 {
-  "totalBattles": 1245,
-  "mainBattles": 162,
-  "quickBattles": 1047,
-  "communityBattles": 36,
-  "totalVolumeSol": 523.991,
-  "artistPayoutsSol": 9.0988,
-  "traderClaimsSol": 127.343
+  "updatedAt": "2026-07-24T17:36:58.703Z",
+  "solPriceUsd": 73.87,
+  "volume": {
+    "totalSol": 878.30,
+    "last7dSol": 355.36
+  },
+  "liveBattle": null,
+  "artistPayouts": {
+    "totalSol": 13.40
+  },
+  "traderClaims": {
+    "totalSol": 381.20,
+    "withdrawalCount": 1526
+  },
+  "platformRevenue": {
+    "totalSol": 20.04
+  },
+  "battles": {
+    "total": 1289,
+    "mainEvents": 51,
+    "mainBattles": 165,
+    "quickBattles": 1088,
+    "communityBattles": 36
+  }
 }
 ```
 
@@ -92,9 +109,9 @@ Check if `wavewarz.info/api/public/battles/live` or similar exists — if yes, u
 ┌─────────────────────────────────────┐
 │  🎵 WaveWarZ                        │
 ├─────────────────────────────────────┤
-│  Total Battles: 1,245               │
-│  Volume: 523.991 ◎                  │
-│  Artist Payouts: 9.0988 ◎           │
+│  Total Battles: 1,289               │
+│  Volume: 878.30 ◎                   │
+│  Artist Payouts: 13.40 ◎            │
 ├─────────────────────────────────────┤
 │  [ Last Battle ]                    │
 │  [Artist A] beat [Artist B]         │

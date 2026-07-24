@@ -194,7 +194,7 @@ ZAO never holds your funds. When you stake on WaveWarZ, your SOL goes into smart
 **"Where can I verify ZAO's track record?"**
 - WaveWarZ stats: wavewarz.info/api/public/stats
 - Governance sessions: OREC contract on Optimistic Etherscan (`0xcB05F9254765CA521F7698e61E0A6CA6456Be532`)
-- ZAOOS knowledge base: github.com/bettercallzaal/ZAOOS (1,600+ CC-BY docs)
+- ZAOOS knowledge base: github.com/bettercallzaal/ZAOOS (1,800+ CC-BY docs)
 
 ---
 

@@ -25,7 +25,7 @@ A single, well-structured newsletter hitting all three — with clear CTAs and t
 `ZAOstock tickets are live. ZABAL applications open. COC #8 announced.`
 
 **B (stats-forward):**  
-`1,245 battles. Now: ZAOstock. ZABAL S2. COC #8.`
+`1,289 battles. Now: ZAOstock. ZABAL S2. COC #8.`
 
 **Preview text (both):**  
 `Three things you can do today to be part of ZAO's biggest month.`
@@ -47,7 +47,7 @@ July 21, 2026
 
 > WaveWarZ is the music battle platform where fans trade on outcomes and every artist — including the loser — earns automatically, on-chain.
 > 
-> As of today: 1,245 battles. 523 SOL in trading volume. 9.09 SOL to artists including losers.
+> As of today: 1,289 battles. 878 SOL in trading volume. 13.39 SOL to artists including losers.
 > 
 > Today we're launching three things at once. Here's what they are and how to act.
 
@@ -168,7 +168,7 @@ ZOE posts this as a thread after newsletter send:
 `3/ COC #8 date announced: [date]. Next live WaveWarZ battle series show.`
 
 **Tweet 5:**
-`ZAO: 1,245 battles. Every artist earns. wavewarz.info`
+`ZAO: 1,289 battles. Every artist earns. wavewarz.info`
 
 ---
 

@@ -40,7 +40,7 @@ owner: Zaal
 | **BASS DROP** (Sound.xyz) | Sound's native pod; cross-promotion opportunity even as competitor. | @soundxyz_io DM |
 | **The Art of the Hustle** | Music business meets blockchain. | contact@artofthehustlepodcast.com |
 
-**Pitch hook:** *"We built a music battle platform where the loser still earns. 1,245 battles, 524 SOL in artist payouts, community-governed. Here's why prediction markets are the future of music discovery."*
+**Pitch hook:** *"We built a music battle platform where the loser still earns. 1,289 battles, 878 SOL in volume, community-governed. Here's why prediction markets are the future of music discovery."*
 
 ---
 
@@ -87,7 +87,7 @@ owner: Zaal
 >
 > Hi [Host name],
 >
-> Quick pitch: ZAO built WaveWarZ — a music battle platform where fans stake SOL predicting which artist wins. 1,245 battles, 524 SOL in payouts, and here's the twist: the loser still earns.
+> Quick pitch: ZAO built WaveWarZ — a music battle platform where fans stake SOL predicting which artist wins. 1,289 battles, 878 SOL in volume, and here's the twist: the loser still earns.
 >
 > The numbers (all verifiable at wavewarz.info):
 > - 1.73% of every SOL bet goes directly to artists, instantly, onchain

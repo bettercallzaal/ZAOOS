@@ -68,7 +68,7 @@ From doc 1265 (distribution network) and doc 1201 (canonical facts):
 | Battle hot take | "Song A just beat Song B on WaveWarZ. Nobody saw this coming. Here's why." | 2x/week |
 | Build-in-public | "Shipped [thing]. Here's what I learned." | 2x/week |
 | Governance update | "ZAO Fractal #[N] done. This week's top contributor: [name]. [Respect distribution link]." | 1x/week |
-| Number drop | "WaveWarZ just crossed 1,250 battles. 524 SOL in volume. Artist payout rate: 1.73%." | As milestones hit |
+| Number drop | "WaveWarZ just crossed 1,300 battles. 878 SOL in volume. Artist payout rate: 1.52%." | As milestones hit |
 
 ### @wavewarz
 
@@ -81,7 +81,7 @@ From doc 1265 (distribution network) and doc 1201 (canonical facts):
 |------|--------|-----------|
 | Battle result | "[Artist A] defeats [Artist B] on @WaveWarZ. [Volume] SOL traded. wavewarz.info" | After big battles |
 | Leaderboard update | "This week's leaderboard: 1. GodclouD (71% win rate) 2. [Artist B] 3. [Artist C]. Track your stats: wavewarz.info" | Weekly |
-| Platform milestone | "1,245 battles. 524 SOL. $1,497 for charity. This is what WaveWarZ looks like." | Monthly |
+| Platform milestone | "1,289 battles. 878 SOL. $1,497 for charity. This is what WaveWarZ looks like." | Monthly |
 | Artist payout | "[Artist name] just received [X] SOL in payouts from WaveWarZ battles. Automatically. No middleman." | When notable payouts happen |
 
 ---
@@ -139,7 +139,7 @@ See doc 1294 (community calendar) for the event schedule. Map to Farcaster:
 
 Based on ZAO's onchain-native audience, these formats consistently drive follows and engagement on Warpcast:
 
-1. **Number posts** — "1,245 battles. 524 SOL. 921 songs. WaveWarZ." Short, verifiable stats drive recast.
+1. **Number posts** — "1,289 battles. 878 SOL. 921 songs. WaveWarZ." Short, verifiable stats drive recast.
 2. **Milestone celebrations** — "100 weeks of ZAO Fractal governance. No missed weeks. Onchain." Milestone posts get shared.
 3. **Artist spotlights** — tag the artist: "@[audius-handle-if-on-farcaster] just crossed 10 battles on WaveWarZ. Total SOL: [X]."
 4. **Frame embeds** — when WW Mini App is live, embed the battle frame directly in the cast

@@ -33,7 +33,7 @@ ZAO's "loser earns" angle is exactly the kind of story Water & Music covers — 
 ## Subject Line Options
 
 **A (recommended):**  
-`Music battles where the loser earns — 1,245 on-chain settlements, zero label cuts`
+`Music battles where the loser earns — 1,289 on-chain settlements, zero label cuts`
 
 **B (question hook):**  
 `What if losing a music battle still paid you?`
@@ -52,7 +52,7 @@ I run ZAO — a music DAO that built WaveWarZ, a prediction market for music bat
 
 The mechanic I think is worth covering for Water & Music: when two artists battle on WaveWarZ, fans trade on the outcome. When the battle closes, the losing artist receives an automatic on-chain payout from the settlement pool — no label, no middleman, no claim needed.
 
-As of July 2026: 1,245 battles settled. 9.09 SOL ($679 at current rate) distributed to artists including losing artists. 523 SOL ($39,126) in total fan trading volume. Every single payout has been automatic.
+As of July 2026: 1,289 battles settled. 13.40 SOL ($679 at current rate) distributed to artists including losing artists. 878 SOL ($39,126) in total fan trading volume. Every single payout has been automatic.
 
 This is live on Solana mainnet. Not a demo.
 
@@ -120,7 +120,7 @@ Companion outreach the day before. ZOE handles the Green Pill pitch independentl
 Hey Owocki —
 
 ZAO is a music DAO that built WaveWarZ (prediction market for live music battles on Solana). 
-We've run 100+ consecutive weekly Fractal Democracy governance sessions on Optimism — and the platform has settled 1,245 battles with automatic artist payouts including for losing artists.
+We've run 100+ consecutive weekly Fractal Democracy governance sessions on Optimism — and the platform has settled 1,289 battles with automatic artist payouts including for losing artists.
 
 We're bringing it live to an IRL festival in Maine in October.
 

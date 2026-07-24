@@ -70,7 +70,7 @@ ZAOstock is a live music festival and community governance event scheduled for S
 
 ZABAL (the ZAO Builder and Artist Learning program) is a 10-week music and web3 education cohort. Season 1 completed in 2026 with 28 workshops for 32 participants. Season 2 launches August 1, 2026 and will offer micro-grants ($100–$250) to eligible completers.
 
-WaveWarZ is a music battle platform where every battle is recorded on the Optimism blockchain. As of July 2026: 1,245 battles, $524 SOL in total volume, $9 SOL in artist payouts. The "loser earns" model — where losing artists still receive a payout — is unique to WaveWarZ and central to ZAO's mission: sustaining independent artists through participatory economics.
+WaveWarZ is a music battle platform where every battle is recorded on the Optimism blockchain. As of July 2026: 1,289 battles, $878 SOL in total volume, $9 SOL in artist payouts. The "loser earns" model — where losing artists still receive a payout — is unique to WaveWarZ and central to ZAO's mission: sustaining independent artists through participatory economics.
 
 Fiscal sponsorship through Fractured Atlas would allow ZAO to accept tax-deductible donations for ZAOstock production costs (sound, venue, insurance, artist fees) and ZABAL S2 micro-grants.
 ```

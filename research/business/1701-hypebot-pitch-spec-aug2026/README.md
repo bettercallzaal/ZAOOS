@@ -41,7 +41,7 @@ I'm Zaal Panthaki, co-founder of WaveWarZ — a music battle platform where the 
 
 Here's the mechanic: fans stake on artists (like a prediction market). When the battle closes, the winning fans take 80% of the opposing pool. The winning artist takes 10%. The **losing artist takes 10% of the winning fans' pool — automatically, on-chain, in seconds**.
 
-Numbers as of August 2026: 1,245 battles settled. $9.09 SOL in direct artist payouts, including losing artists. On Solana. Zero label cuts.
+Numbers as of August 2026: 1,289 battles settled. $13.40 SOL in direct artist payouts, including losing artists. On Solana. Zero label cuts.
 
 The mainstream equivalent: a losing artist earns the equivalent of 9,000–93,000 Spotify streams per battle — from the winning side's fan base.
 
@@ -104,9 +104,9 @@ Live API (real-time): wavewarz.info/api/public/stats
 Full context on the mechanic + economics: [Mirror Article URL]
 
 Quick stat summary:
-- 1,245 battles settled
-- 523.991 SOL volume (~$104K)
-- 9.09 SOL ($1,820) to losing artists
+- 1,289 battles settled
+- 878.30 SOL volume (~$64.8K)
+- 13.40 SOL ($1,820) to losing artists
 - 127.343 SOL ($25,469) to winning traders
 - Both artists earn in every battle, automatically
 
@@ -143,7 +143,7 @@ Hi [Name], just checking if the WaveWarZ pitch landed — the "loser earns" mech
 |---------|---------|-----------------|
 | Lead with | Music industry problem (losers earn $0) | Prediction market innovation |
 | Avoid | "DAO", "ZOR", "Optimism Mainnet", "on-chain" until explained | Nothing — crypto-native audience |
-| SOL payout framing | "Artists earned $1,820 in automatic payouts" (dollar value) | "9.09 SOL to losing artists" (SOL) |
+| SOL payout framing | "Artists earned $1,820 in automatic payouts" (dollar value) | "13.40 SOL to losing artists" (SOL) |
 | ZAOstock angle | "Free public festival" | "First IRL on-chain governance vote" |
 | Governance mention | Only if asked — don't lead with it | Lead with Optimism Mainnet contracts |
 | Audience assumption | Knows music, doesn't know crypto | Knows crypto, knows some music |

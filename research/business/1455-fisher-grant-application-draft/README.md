@@ -71,7 +71,7 @@ ZAOstock 2026 — Free Public Music Festival in Ellsworth, Maine
 ```
 ZAOstock 2026 is a free, all-ages outdoor music festival scheduled for October 3, 2026 in Ellsworth, Maine. The event is produced by The ZAO, a community music organization that has operated weekly music programming since March 2024.
 
-ZAOstock will feature live performances by independent artists affiliated with The ZAO's online music community, WaveWarZ. WaveWarZ is a music battle platform where artists compete for community votes — with a unique feature: the artist who loses the battle still earns income from the event. This "loser earns" model has distributed $1,820 to independent musicians over 1,245 battles since launch.
+ZAOstock will feature live performances by independent artists affiliated with The ZAO's online music community, WaveWarZ. WaveWarZ is a music battle platform where artists compete for community votes — with a unique feature: the artist who loses the battle still earns income from the event. This "loser earns" model has distributed $1,820 to independent musicians over 1,289 battles since launch.
 
 The centerpiece of ZAOstock is the first-ever live WaveWarZ music battle on a public stage. Community members vote in real time; both the winning and losing artist receive payment from the battle's prize pool. This live demonstration of the loser-earns model is designed to help non-technical audience members experience and understand how independent musicians can earn income from a new model of community-supported music.
 
@@ -79,7 +79,7 @@ ZAOstock 2026 will take place at [ZAAL: venue name + address from permit call]. 
 
 [ZAAL: add 1-2 sentences about your personal connection to Ellsworth/Maine, or why you chose Ellsworth. This is the most important personal touch for a Maine foundation.]
 
-All artists performing at ZAOstock will be compensated. The ZAO has a documented track record of artist payment: $1,820 distributed to losing WaveWarZ artists and $25,469 to community traders across 1,245 battles as of July 2026.
+All artists performing at ZAOstock will be compensated. The ZAO has a documented track record of artist payment: $1,820 distributed to losing WaveWarZ artists and $25,469 to community traders across 1,289 battles as of July 2026.
 
 The ZAO has operated 63 consecutive weekly community sessions since March 2024 with zero interruptions — a record of organizational consistency and community engagement that demonstrates our capacity to execute a public event. This grant would support performer fees, sound equipment rental, permitting costs, and logistics for ZAOstock 2026.
 ```
@@ -110,7 +110,7 @@ TOTAL EXPENSES:                         $[sum]
 ```
 The ZAO is a decentralized music community that has operated continuously since March 2024. Over 63 consecutive weekly sessions, our community of musicians, builders, and listeners has gathered to share work, vote on contributions, and support independent artists.
 
-We operate WaveWarZ, a music platform built on the belief that every artist who participates in a music competition has value — including the artist who loses. WaveWarZ has processed 1,245 music battles, distributing $1,820 to losing artists and $25,469 to community participants as of July 2026.
+We operate WaveWarZ, a music platform built on the belief that every artist who participates in a music competition has value — including the artist who loses. WaveWarZ has processed 1,289 music battles, distributing $1,820 to losing artists and $25,469 to community participants as of July 2026.
 
 The ZAO maintains a public knowledge base of over 1,450 open-source community documents, all licensed under Creative Commons CC-BY, covering governance, events, music platform design, and community education. This commitment to public documentation is central to our organizational values.
 
@@ -124,7 +124,7 @@ Our team includes [ZAAL: list 2-3 key people: yourself, Iman, any Maine-local co
 ```
 - 63 consecutive weekly community governance sessions (March 2024 – present)
 - 157 unique participants holding ZOR governance tokens (Optimism blockchain, verifiable)
-- 1,245 WaveWarZ music battles completed with 8+ active performing artists
+- 1,289 WaveWarZ music battles completed with 8+ active performing artists
 - ZAOstock RSVP list: [ZAAL: fill with count from Eventbrite / Google Form at time of apply]
 - Community endorsements: [ZAAL: add 2-3 names/orgs who have expressed support — RAM Africa, ZABAL participants, Ellsworth local contacts]
 - Permit confirmation from City of Ellsworth: [ZAAL: attach or reference]

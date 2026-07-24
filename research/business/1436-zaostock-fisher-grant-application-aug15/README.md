@@ -3,7 +3,7 @@
 **Type:** GRANT-APPLICATION  
 **Topic:** business  
 **Status:** DECISION NEEDED — Aug 15 hard deadline; ~4 hours of work; Zaal must complete  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1266 (grant narratives — source for narrative text), 1422 (grant funding pipeline overview), 1070 (permit/EMS — confirms ZAOstock is real), 1357 (charity — adds community benefit angle), 1433 (WaveWarZ stats — add to application)
 
 ---
@@ -61,7 +61,7 @@ Complete these in order. Check off each item as done.
 **Supplement with (add after paste):**
 - Attendance: 200 in-person + 2,000-3,500 virtual (livestream on YouTube + Twitch)
 - Artists: 8 Maine and mid-Atlantic based artists (lineup confirmed August 1)
-- WaveWarZ stats as of application date: **1,245+ battles, 523.991 SOL volume, $1,820 paid to losing artists**
+- WaveWarZ stats as of application date: **1,289+ battles, 878.30 SOL volume, $1,820 paid to losing artists**
 - Governance streak: **63+ consecutive weekly governance sessions, zero quorum failures**
 - Heart of Ellsworth partnership: Parklet venue access, local volunteer network, downtown Ellsworth promotion
 
@@ -101,7 +101,7 @@ Complete these in order. Check off each item as done.
 
 **Paste from doc 1266 — Impact Statement block:**
 
-> ZAOstock advances three community benefit goals: (1) Economic access for independent musicians — ZAO's WaveWarZ platform pays artists even when they lose competitions through a "loser-earns" revenue model; as of July 2026, 1,245 WaveWarZ battles have distributed $1,820 to artists who lost. (2) Community governance — ZAOstock will feature the first live on-chain DAO governance vote at a public arts festival, making decentralized governance accessible and participatory for a general audience. (3) Charitable giving — the ZAOstock WaveWarZ community battle will direct a portion of proceeds to a Maine-based music education nonprofit (selected by the ZAO community in July 2026 via ZOR governance vote).
+> ZAOstock advances three community benefit goals: (1) Economic access for independent musicians — ZAO's WaveWarZ platform pays artists even when they lose competitions through a "loser-earns" revenue model; as of July 2026, 1,289 WaveWarZ battles have distributed $1,820 to artists who lost. (2) Community governance — ZAOstock will feature the first live on-chain DAO governance vote at a public arts festival, making decentralized governance accessible and participatory for a general audience. (3) Charitable giving — the ZAOstock WaveWarZ community battle will direct a portion of proceeds to a Maine-based music education nonprofit (selected by the ZAO community in July 2026 via ZOR governance vote).
 
 **Add (for Maine focus):**
 > ZAOstock brings national web3 music innovation to Ellsworth, Maine — a community that has been building a distinctive arts culture through Heart of Ellsworth, the Art of Ellsworth festival, and the Ellsworth American newspaper. ZAO's events create an economic multiplier for local businesses (hotels, restaurants, parking) and position Ellsworth as a hub for the intersection of music, technology, and community governance.

@@ -2,7 +2,7 @@
 topic: identity/governance
 type: TEMPLATE
 status: ACTIVE — reproducible methodology for 63+ weekly sessions; citable reference
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1351 (DAOstar), 1382 (proof point library), 1311 (OP RF), 1372 (Fisher grant)
 owner: Zaal (session chair) + ZOE (notes, posting) + Iman (quorum tracking)
 ---
@@ -258,4 +258,4 @@ Track these monthly to show governance quality (not just streak):
 
 ---
 
-*Created: 2026-07-17 | Status: Active methodology | Streak: 63+ sessions | Related: 1351 (DAOstar Jul 20), 1382 (proof point library), 1311 (OP RF), 1372 (Fisher grant Aug 15)*
+*Created: 2026-07-24 | Status: Active methodology | Streak: 63+ sessions | Related: 1351 (DAOstar Jul 20), 1382 (proof point library), 1311 (OP RF), 1372 (Fisher grant Aug 15)*

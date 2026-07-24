@@ -2,7 +2,7 @@
 topic: identity/positioning
 type: DOC
 status: synthesized
-created: 2026-07-17
+created: 2026-07-24
 audience: journalists, grant reviewers, Retro Funding evaluators, academic researchers
 data-note: Competitor data sourced from public documentation as of knowledge cutoff; ZAO data verified July 2026 from live sources.
 related-docs: 1278, 1280, 1281, 1273, 1077
@@ -75,7 +75,7 @@ The ZAO is closest to the "Builder DAO" model — it runs governance AND ships a
 - Songcamp is project-cohort-based: camps start, run, end. The ZAO is continuous (100+ weeks without break).
 - Songcamp focuses on creation (making music together); The ZAO focuses on economic enablement (helping artists own and trade their IP onchain via WaveWarZ)
 - Songcamp does not have a live revenue-generating product with onchain settlement; WaveWarZ does
-- The ZAO has verified artist payouts ($9.07 SOL directly to artists, onchain); Songcamp distributes NFT sale proceeds to participants
+- The ZAO has verified artist payouts ($13.40 SOL directly to artists, onchain); Songcamp distributes NFT sale proceeds to participants
 
 ---
 

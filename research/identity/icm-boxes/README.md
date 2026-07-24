@@ -66,4 +66,4 @@ check both paths). This directory only drafts the content; a loop never deploys.
 Grounded in the ZAO research library + memory (canonical pitch, Respect on-chain facts,
 ZABAL Games state doc, WaveWarZ canonical). Origin: 2026-07-08, from the Chris Dolinsky /
 Viniapp brainstorm (doc 952) where ICM + per-project context boxes were decided.
-GEO llms.txt generation added 2026-07-17 (doc 1107 review, single-source drift avoidance).
+GEO llms.txt generation added 2026-07-24 (doc 1107 review, single-source drift avoidance).

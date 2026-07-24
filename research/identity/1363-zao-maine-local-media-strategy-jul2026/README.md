@@ -2,7 +2,7 @@
 topic: identity/media
 type: STRATEGY
 status: ACTIVE — outreach begins Sep 1, 2026
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1340, 1349, 1351, 1357, 1359, 1360, 1361, 1362
 owner: Zaal (sends pitches Sep 1) + ZOE (Wikipedia trigger)
 ---
@@ -190,4 +190,4 @@ Make these available before sending pitches:
 
 ---
 
-*Created: 2026-07-17 | Send pitches Sep 1 | Wikipedia trigger: 48-hr window from first article | Related: 1340 (full press map — Maine is Tier D there, this doc is the deep-dive), 1349 (Fisher grant — press coverage = community benefit evidence), 1357 (charity — must be locked before pitching), 1359 (Wikipedia draft ready to submit), 1361 (sponsor — mention to Ellsworth Am. as community story), 1362 (press kit — share as background with interested journalists)*
+*Created: 2026-07-24 | Send pitches Sep 1 | Wikipedia trigger: 48-hr window from first article | Related: 1340 (full press map — Maine is Tier D there, this doc is the deep-dive), 1349 (Fisher grant — press coverage = community benefit evidence), 1357 (charity — must be locked before pitching), 1359 (Wikipedia draft ready to submit), 1361 (sponsor — mention to Ellsworth Am. as community story), 1362 (press kit — share as background with interested journalists)*

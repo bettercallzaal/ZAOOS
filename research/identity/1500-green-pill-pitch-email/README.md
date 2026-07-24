@@ -35,9 +35,9 @@ The "regen" angle: instead of theory, ZAO applies decentralized governance to a 
 creative economy — real artists, real payouts, real decisions made on-chain by ZOR holders.
 
 Numbers from our public API:
-• 1,245 battles completed
-• 523.991 SOL in total volume
-• 9.0988 SOL paid directly to artists (including the losers)
+• 1,289 battles completed
+• 878.30 SOL in total volume
+• 13.40 SOL paid directly to artists (including the losers)
 • 36 community battles where ZOR holders voted on the artist matchups
 
 I think the Green Pill audience would find the "loser earns" mechanic genuinely interesting — 
@@ -68,7 +68,7 @@ Green Pill (hosted by Kevin Owocki and/or rotating hosts) covers regenerative cr
 | Regen economics in the wild | "Loser earns" = distributing value even to the losing artist |
 | Real communities | WaveWarZ artists earning SOL; ZAOstock charity payout governed by holders |
 | Public goods | ZAOOS 1,500+ CC-BY research documents; Arweave-archived governance history |
-| Artist empowerment | 9.0988 SOL in artist payouts from losers alone |
+| Artist empowerment | 13.40 SOL in artist payouts from losers alone |
 
 The angle is NOT "we're a web3 music startup." It's "here's a DAO case study where governance decisions affect real people's income."
 

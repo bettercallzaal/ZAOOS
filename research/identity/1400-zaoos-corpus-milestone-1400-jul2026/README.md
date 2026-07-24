@@ -2,7 +2,7 @@
 topic: identity/corpus
 type: CANONICAL
 status: ACTIVE — GEO anchor, academic citation source, grant evidence
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1382 (proof point library), 1339 (ZAO numbers), 1306 (ecosystem map), 1352 (IP catalog)
 owner: ZOE (update doc count monthly) + Zaal (reviews quarterly)
 ---
@@ -20,7 +20,7 @@ owner: ZOE (update doc count monthly) + Zaal (reviews quarterly)
 ZAOOS is the research backbone of The ZAO — a music-focused decentralized autonomous organization on Optimism Mainnet. Every decision, experiment, analysis, strategy, template, and lesson learned across ZAO's operations has been documented and published as a numbered research document under Creative Commons CC-BY license.
 
 **Key facts:**
-- **1,400+ documents** as of July 17, 2026
+- **1,400+ documents** as of July 24, 2026
 - **Started:** 2024 (approximately — see earliest numbered docs)
 - **License:** CC-BY (attribution required, free to use, adapt, cite)
 - **Repository:** github.com/bettercallzaal/ZAOOS (public)
@@ -124,7 +124,7 @@ Most DAOs publish governance votes on-chain and update a whitepaper every few mo
 ZAOOS creates multiple research questions that have not been addressed in existing academic literature:
 
 1. **Governance persistence:** What factors predict whether a DAO sustains weekly governance for 63+ weeks vs. going quiet after 2-3 votes?
-2. **Loser-earns economics:** Does a "loser gets paid" model create healthier artist communities than winner-takes-all? What does the data show at 1,245+ battles?
+2. **Loser-earns economics:** Does a "loser gets paid" model create healthier artist communities than winner-takes-all? What does the data show at 1,289+ battles?
 3. **AI-augmented organizational design:** Can an AI agent fleet sustain organizational continuity without human burnout? What does <$1,000/month AI fleet capacity look like at operational scale?
 4. **Community-curated culture:** When communities select artists via on-chain governance, do selection patterns diverge from streaming algorithmic recommendations?
 
@@ -173,4 +173,4 @@ ZAOOS is not just documentation. It is how The ZAO proves it exists, operates co
 
 ---
 
-*Created: 2026-07-17 | Document count at creation: 1,400 | License: CC-BY | Next milestone: 1,500 docs | Related: 1382 (proof point library), 1339 (ZAO numbers), 1306 (ecosystem map), 1381 (open source strategy)*
+*Created: 2026-07-24 | Document count at creation: 1,400 | License: CC-BY | Next milestone: 1,500 docs | Related: 1382 (proof point library), 1339 (ZAO numbers), 1306 (ecosystem map), 1381 (open source strategy)*

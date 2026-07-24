@@ -2,8 +2,8 @@
 topic: identity/media
 type: PRESS-RELATIONS
 status: LIVE — update as coverage lands
-created: 2026-07-17
-updated: 2026-07-17
+created: 2026-07-24
+updated: 2026-07-24
 related-docs: 1296, 1328, 1330, 1331, 1332, 1339, 2043
 updated: 2026-07-23
 owner: Zaal + ZOE
@@ -21,7 +21,7 @@ owner: Zaal + ZOE
 
 ## Part 1: Existing Coverage Inventory
 
-As of 2026-07-17. Tier 1 = highest authority for Wikipedia notability purposes.
+As of 2026-07-24. Tier 1 = highest authority for Wikipedia notability purposes.
 
 ### Tier 1 — Podcasts / Audio (confirmed independent)
 
@@ -112,7 +112,7 @@ COC Concertz threads (@wavewarz X), ZAOstock Farcaster announcement (/zao), ZABA
 WaveWarZ ran the first-ever AI Artist Tournament in Jul 2026: AI-generated musical personas (GEEK MYTH, AI LUI, Stormbourne) competed in elimination brackets on a Solana prediction market. Fans traded real SOL on the AI artists they backed; the winner was decided by trading volume, community vote, and an AI judge (DJ Wavy). Semifinal: GEEK MYTH def. AI LUI 2-1, ~342 SOL (~$26,500) — 8.7x the prior platform record. Grand final (GEEK MYTH vs Stormbourne) upcoming. **Full pitch pack + paste-ready sample paragraphs in doc 2043.**
 
 ### Angle 1 — "Artists Earn Regardless of Who Wins" (Water & Music, Hypebot, Ari's Take)
-WaveWarZ uses a loser-earns mechanic: artists collect 1% of trading volume + settlement bonuses on every battle, regardless of outcome. After 1,245 battles, artists have earned 9.09 SOL (~$681 at Jul 2026 price). In a world where streaming pays $0.003/stream, guaranteed onchain payouts per battle are structurally different. Contact: see doc 1324 (Tier 1 template) or doc 1328 (Track C).
+WaveWarZ uses a loser-earns mechanic: artists collect 1% of trading volume + settlement bonuses on every battle, regardless of outcome. After 1,289 battles, artists have earned 13.40 SOL (~$681 at Jul 2026 price). In a world where streaming pays $0.003/stream, guaranteed onchain payouts per battle are structurally different. Contact: see doc 1324 (Tier 1 template) or doc 1328 (Track C).
 
 ### Angle 2 — "63 Weeks of DAO Governance, No Token Vote" (Green Pill, Metagov, Bankless)
 ZAO has held 63+ consecutive weekly Fractal governance sessions using the Respect mechanic (ERC-20 on Optimism, 157 unique holders, 505 on-chain transactions). No token-weighted voting, no quorum drama, no governance theater. This is one of the longest documented governance streaks of any DAO using Fractal. Contact: doc 1328 Template B (Green Pill), doc 1324 (Metagov).
@@ -191,4 +191,4 @@ if tier1_count + tier2_count >= 2:
 
 ---
 
-*Created: 2026-07-17 | Owner: Zaal + ZOE | See also: 1296, 1324, 1328, 1329, 1330, 1332, 1339*
+*Created: 2026-07-24 | Owner: Zaal + ZOE | See also: 1296, 1324, 1328, 1329, 1330, 1332, 1339*

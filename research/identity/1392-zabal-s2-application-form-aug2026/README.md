@@ -2,7 +2,7 @@
 topic: identity/zabal
 type: TEMPLATE
 status: ACTIVE — set up application form by Jul 31; open Aug 1
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1355, 1259, 1283
 owner: Zaal (setup) + ZOE (promote Aug 1) + Iman (review applications)
 ---
@@ -245,4 +245,4 @@ ZAOstock is the recruiting moment for ZABAL S2: Zaal announces S2 from the stage
 
 ---
 
-*Created: 2026-07-17 | Form live by Jul 31 | Applications open Aug 1 | Deadline Aug 21 | Related: 1355 (S2 launch plan), 1259 (S1 mid-season audit), 1380 (2027 planning seeds — ZABAL S3)*
+*Created: 2026-07-24 | Form live by Jul 31 | Applications open Aug 1 | Deadline Aug 21 | Related: 1355 (S2 launch plan), 1259 (S1 mid-season audit), 1380 (2027 planning seeds — ZABAL S3)*

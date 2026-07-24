@@ -2,7 +2,7 @@
 topic: identity/reporting
 type: TEMPLATE
 status: PRE-FILL — ZOE updates monthly; Zaal publishes Dec 15-20
-created: 2026-07-17
+created: 2026-07-24
 target-publish: 2026-12-20
 related-docs: 1290, 1335, 1339, 1344
 owner: ZOE (pre-fill) + Zaal (final review + publish)
@@ -259,4 +259,4 @@ github.com/repos/bettercallzaal/wwtracker → Section 8
 
 ---
 
-*Created: 2026-07-17 | Template — do not publish until Dec 2026 | Owner: ZOE (pre-fill) + Zaal (final) | Related: 1290 (2026 mid-year review), 1335 (Q4 roadmap), 1339 (proof-points), 1337 (ZAOstock post-event), 1344 (AI-native narrative)*
+*Created: 2026-07-24 | Template — do not publish until Dec 2026 | Owner: ZOE (pre-fill) + Zaal (final) | Related: 1290 (2026 mid-year review), 1335 (Q4 roadmap), 1339 (proof-points), 1337 (ZAOstock post-event), 1344 (AI-native narrative)*

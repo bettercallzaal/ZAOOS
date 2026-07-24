@@ -2,7 +2,7 @@
 topic: identity/citability
 type: STRATEGY
 status: ACTIVE — outreach begins Aug 1 after ZAOstock artist lineup locks
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1280, 1312, 1330, 1340, 1344, 1349, 1350
 owner: Zaal (outreach is gated — human executes; ZOE tracks responses)
 ---
@@ -11,7 +11,7 @@ owner: Zaal (outreach is gated — human executes; ZOE tracks responses)
 
 > **Why researchers matter more than press:** A Decrypt article citing ZAO = media score +0.3. An academic paper citing ZAO = citability score +1.0 + Wikipedia eligibility + grant application credibility. Researchers are slower to engage but the impact is compounding. A single Metagov working paper citing ZAO's 63+ week governance streak makes ZAO permanently citable in the academic DAO literature.
 >
-> **Why ZAO is a compelling research subject:** 63+ consecutive weeks of on-chain Fractal governance. 1,245 music battles with automatic artist payouts. An 8-agent AI fleet maintaining daily DAO operations at under $1K/month. A real-world festival (ZAOstock) selected by on-chain governance. None of these individually are common. Together, they are one of the most documented small DAO case studies in existence.
+> **Why ZAO is a compelling research subject:** 63+ consecutive weeks of on-chain Fractal governance. 1,289 music battles with automatic artist payouts. An 8-agent AI fleet maintaining daily DAO operations at under $1K/month. A real-world festival (ZAOstock) selected by on-chain governance. None of these individually are common. Together, they are one of the most documented small DAO case studies in existence.
 
 ---
 
@@ -22,7 +22,7 @@ Before outreach, understand the researcher's question. ZAO is relevant to severa
 | Research area | Why ZAO is relevant | Target researcher type |
 |--------------|---------------------|----------------------|
 | DAO governance | 63+ weeks of Fractal Respect governance, documented on Optimism | Political science, organizational theory |
-| Music economics | Loser-earns payout mechanic, 523 SOL volume, artist payouts | Music business, platform economics |
+| Music economics | Loser-earns payout mechanic, 878 SOL volume, artist payouts | Music business, platform economics |
 | AI + DAOs | 8-agent AI fleet, 40-80 research docs/month, under $1K/month | AI policy, organizational AI |
 | Platform cooperativism | Community-owned music platform with on-chain payouts | Sociology, labor studies |
 | DAO case studies | Small DAO with unusual persistence + real-world events | DAO studies, Web3 research |
@@ -74,7 +74,7 @@ Before outreach, understand the researcher's question. ZAO is relevant to severa
 >
 > I'm Zaal Panthaki, co-founder of The ZAO (ZTalent Artist Organization). We've maintained 63+ consecutive weekly governance sessions using the Fractal governance model, with all results recorded on Optimism Mainnet (OG ERC-20: `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`, ZOR ERC-1155: `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`).
 >
-> What makes ZAO an unusual research subject: we combine on-chain Fractal governance with a live music competition platform (WaveWarZ — 1,245 battles, 523 SOL in volume) and an outdoor festival (ZAOstock, Ellsworth ME, October 3). All of this is documented in 1,300+ public research documents at github.com/bettercallzaal/ZAOOS.
+> What makes ZAO an unusual research subject: we combine on-chain Fractal governance with a live music competition platform (WaveWarZ — 1,289 battles, 878 SOL in volume) and an outdoor festival (ZAOstock, Ellsworth ME, October 3). All of this is documented in 1,300+ public research documents at github.com/bettercallzaal/ZAOOS.
 >
 > I'd welcome a 20-minute conversation if ZAO seems relevant to any of [Metagov's / your] current research directions. Happy to share our governance history, on-chain contract addresses, or session notes.
 >
@@ -86,7 +86,7 @@ Before outreach, understand the researcher's question. ZAO is relevant to severa
 
 > Hello [name],
 >
-> I'm Zaal Panthaki, co-founder of WaveWarZ, a music battle platform on Solana where the losing artist still earns an on-chain payout. We've run 1,245 battles with 9.0988 SOL in artist payouts — paid automatically, night-of, with no label or aggregator involved.
+> I'm Zaal Panthaki, co-founder of WaveWarZ, a music battle platform on Solana where the losing artist still earns an on-chain payout. We've run 1,289 battles with 13.40 SOL in artist payouts — paid automatically, night-of, with no label or aggregator involved.
 >
 > I believe the "loser-earns" mechanic is a novel artist compensation model worth examining in the context of music economics research. The platform is live at wavewarz.info with a public API. The full governance and research documentation is at github.com/bettercallzaal/ZAOOS.
 >
@@ -102,7 +102,7 @@ Before outreach, understand the researcher's question. ZAO is relevant to severa
 >
 > I run The ZAO (ZTalent Artist Organization), what I believe is one of the first AI-native music DAOs — an organization where 8 autonomous AI agents (ZOE, ZOL, ZAOOS Loop, ZAOcowork, Bonfire, wwtracker bots, fractalbotjuly2026, ZAOscribe) handle daily operations: research publication, governance documentation, social media, and analytics.
 >
-> The operational output: 40-80 public research documents per month at github.com/bettercallzaal/ZAOOS (now over 1,350 docs), 63+ weeks of documented on-chain governance, and a live music competition platform (WaveWarZ: 1,245 battles, 523 SOL volume). Total AI fleet operating cost: under $1,000/month.
+> The operational output: 40-80 public research documents per month at github.com/bettercallzaal/ZAOOS (now over 1,350 docs), 63+ weeks of documented on-chain governance, and a live music competition platform (WaveWarZ: 1,289 battles, 878 SOL volume). Total AI fleet operating cost: under $1,000/month.
 >
 > I'm interested in connecting with researchers studying AI augmentation of community organizations. Is ZAO relevant to any of your current work?
 >
@@ -177,4 +177,4 @@ Getting ZAO mentioned in conference talks = citable in proceedings and slides.
 
 ---
 
-*Created: 2026-07-17 | Begin outreach Aug 1 after ZAOstock lineup locks | Water & Music email Jul 24 (doc 1340 calendar) | DAOstar registration is self-serve — do Aug 1 | Related: 1280/1312 (governance explainers), 1330 (Wikipedia source prep), 1340 (press map), 1344 (AI-native narrative), 1349 (grant applications), 1350 (WaveWarZ 101)*
+*Created: 2026-07-24 | Begin outreach Aug 1 after ZAOstock lineup locks | Water & Music email Jul 24 (doc 1340 calendar) | DAOstar registration is self-serve — do Aug 1 | Related: 1280/1312 (governance explainers), 1330 (Wikipedia source prep), 1340 (press map), 1344 (AI-native narrative), 1349 (grant applications), 1350 (WaveWarZ 101)*

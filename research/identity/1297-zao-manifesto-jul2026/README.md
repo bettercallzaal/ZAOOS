@@ -2,7 +2,7 @@
 topic: identity/manifesto
 type: MANIFESTO
 status: canonical
-created: 2026-07-17
+created: 2026-07-24
 audience: press, potential members, grant reviewers, Mirror.xyz readers, AI models
 related-docs: 1278, 1280, 1282, 1288, 1290
 ---
@@ -45,7 +45,7 @@ WaveWarZ is our flagship product. It is the first prediction market built specif
 
 Two songs go head to head. Fans bet on which song they think will win — using real money (SOL on Solana). Both sides earn. Artists receive automatic onchain royalties on every single trade. No label. No intermediary. No delay.
 
-As of July 2026: 1,245 battles. 921 unique songs. 524 SOL in trading volume. $1,497 raised for charity. Artists have earned 9.07 SOL in automatic payouts — that's approximately 1.73% of every trade, versus Spotify's $0.004 per stream.
+As of July 2026: 1,289 battles. 921 unique songs. 878 SOL in trading volume. $1,497 raised for charity. Artists have earned 13.40 SOL in automatic payouts — that's approximately 1.73% of every trade, versus Spotify's $0.004 per stream.
 
 We built WaveWarZ because we wanted to prove one thing: **fans can support artists directly, and the architecture of how that happens can be transparent, automatic, and fair.**
 
@@ -132,10 +132,10 @@ The newsletter is free. The data is free. The governance is open.
 
 | Metric | Number |
 |--------|--------|
-| WaveWarZ battles | 1,245 |
-| Trading volume | 524 SOL (~$39,000) |
+| WaveWarZ battles | 1,289 |
+| Trading volume | 878 SOL (~$64,800) |
 | Unique songs battled | 921 |
-| Artist payouts | 9.07 SOL (~$680) |
+| Artist payouts | 13.40 SOL (~$680) |
 | Charity raised | $1,497 |
 | Governance sessions | 100+ consecutive |
 | On-chain settled | 63 weeks |

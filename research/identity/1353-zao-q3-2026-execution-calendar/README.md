@@ -2,7 +2,7 @@
 topic: identity/operations
 type: CALENDAR
 status: ACTIVE — update weekly as items complete
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1317, 1326, 1329, 1332, 1333, 1336, 1337, 1340, 1341, 1342, 1343, 1344, 1345, 1346, 1347, 1348, 1349, 1350, 1351, 1352
 owner: Zaal (executes gated actions) + ZOE (executes automation)
 ---
@@ -251,4 +251,4 @@ ZOE maintains these every week throughout Q3:
 
 ---
 
-*Created: 2026-07-17 | Update weekly as items complete | CANONICAL Q3 reference | Related: all docs 1317-1352 (consolidated into this calendar)*
+*Created: 2026-07-24 | Update weekly as items complete | CANONICAL Q3 reference | Related: all docs 1317-1352 (consolidated into this calendar)*

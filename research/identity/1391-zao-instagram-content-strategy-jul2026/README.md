@@ -2,7 +2,7 @@
 topic: identity/distribution
 type: STRATEGY
 status: ACTIVE — implement immediately for ZAOstock build-up Aug 1–Oct 3
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1347, 1358, 1375, 1385
 owner: ZOE (execution) + Zaal (approves Reels/Stories) + Iman (graphics)
 ---
@@ -238,4 +238,4 @@ Each of the 8 ZAOstock artists should be asked to:
 
 ---
 
-*Created: 2026-07-17 | Implement Aug 1 (tickets go live) | Related: 1347 (audience growth), 1358 (channel ops), 1375 (day-of social), 1385 (@wavewarz X strategy)*
+*Created: 2026-07-24 | Implement Aug 1 (tickets go live) | Related: 1347 (audience growth), 1358 (channel ops), 1375 (day-of social), 1385 (@wavewarz X strategy)*

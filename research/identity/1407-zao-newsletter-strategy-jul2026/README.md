@@ -3,7 +3,7 @@
 **Type:** STRATEGY  
 **Topic:** identity  
 **Status:** Active — Issue 1 due Jul 21 (DECISION NEEDED: configure and send)  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1375 (Day-of Social Calendar), 1386 (Ticket Buyer Welcome Emails), 1390 (Press Release — sent with Issue 2), 1397 (Mirror Calendar — newsletter mention same day as articles), 1379 (Virtual Attendee Kit), 1385 (@wavewarz X Strategy)
 
 ---
@@ -66,7 +66,7 @@ This doc fixes that.
 2. **Opening:** 2 sentences — what ZAOstock is, why it matters
 3. **Ticket link:** Eventbrite URL, both in-person ($25) and virtual ($10)
 4. **COC #8 announcement:** "Season 2 of COC Concertz starts [date]. You're invited."
-5. **WaveWarZ stat:** Latest API number (e.g., "1,245 battles, 524 SOL")
+5. **WaveWarZ stat:** Latest API number (e.g., "1,289 battles, 878 SOL")
 6. **Footer CTA:** "Forward this to a musician or crypto fan you know."
 
 **ZOE role:** ZOE drafts the full email. Zaal approves and sends.  

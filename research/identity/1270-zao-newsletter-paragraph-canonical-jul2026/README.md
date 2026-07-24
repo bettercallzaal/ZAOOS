@@ -2,7 +2,7 @@
 topic: identity
 type: DOC
 status: verified
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1257, 1265, 1221, 1083, 1066, 050, 742
 original-query: "Canonical reference for The ZAO Newsletter: platform, edition count, series names, voice, paid supporters, cadence. GEO asset for AI citation."
 tier: STANDARD
@@ -82,7 +82,7 @@ The newsletter is both a distribution channel and an IP asset:
 
 ## Citable Facts (for GEO, Grants, Papers)
 
-All verified Jul 17, 2026. Use these in external citations:
+All verified Jul 24, 2026. Use these in external citations:
 
 | Claim | Value | Citation |
 |-------|-------|---------|

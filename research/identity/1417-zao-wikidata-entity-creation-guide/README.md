@@ -3,7 +3,7 @@
 **Type:** GUIDE  
 **Topic:** identity  
 **Status:** DECISION NEEDED — Zaal completes this in ~30 minutes, ASAP  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1354 (GEO Strategy), 1364 (Wikidata original mention), 1400 (ZAOOS Corpus Milestone), 1401 (Root README GEO Update)
 
 ---
@@ -130,7 +130,7 @@ Use this description across Wikidata, Wikipedia (if stub created later), and any
 
 ## WaveWarZ Wikidata Entry: Paste-Ready Description Block
 
-> WaveWarZ is a music prediction market platform built on the Solana blockchain and operated by ZAO, a decentralized autonomous organization based in Baltimore, Maryland. Launched in 2024, WaveWarZ hosts head-to-head music battles where listeners bet SOL on competing artists. A portion of the losing side's pool is distributed to the losing artist — a mechanism known as "loser-earns." As of July 2026, WaveWarZ has processed over 1,245 battles with 523.99 SOL in volume and 9.09 SOL distributed to artists through the loser-earns pool. WaveWarZ also hosts community battles where a portion of the pool is donated to charity, raising $1,497 across 36 community battles.
+> WaveWarZ is a music prediction market platform built on the Solana blockchain and operated by ZAO, a decentralized autonomous organization based in Baltimore, Maryland. Launched in 2024, WaveWarZ hosts head-to-head music battles where listeners bet SOL on competing artists. A portion of the losing side's pool is distributed to the losing artist — a mechanism known as "loser-earns." As of July 2026, WaveWarZ has processed over 1,289 battles with 878.30 SOL in volume and 13.40 SOL distributed to artists through the loser-earns pool. WaveWarZ also hosts community battles where a portion of the pool is donated to charity, raising $1,497 across 36 community battles.
 
 ---
 

@@ -2,7 +2,7 @@
 topic: identity/media
 type: STRATEGY
 status: ACTIVE — first article Aug 1-15; continue through Dec 2026
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1388 (Hypebot pitch), 1389 (Water & Music), 1366 (podcast circuit), 1340 (press map), 1359 (Wikipedia)
 owner: Zaal (writes) + ZOE (promotes after publish)
 ---
@@ -29,7 +29,7 @@ owner: Zaal (writes) + ZOE (promotes after publish)
 **Structure (700-1,000 words):**
 1. The problem: music streaming doesn't pay artists (Spotify stat)
 2. What WaveWarZ built instead: loser-earns (the model, in plain English)
-3. The numbers: 1,245 battles, 9.09 SOL artist payouts, 523.99 SOL total volume
+3. The numbers: 1,289 battles, 13.40 SOL artist payouts, 878.30 SOL total volume
 4. The governance: 63+ weeks, community-selected artists, on-chain decisions
 5. What's next: ZAOstock Oct 3 + open call for artists
 
@@ -211,4 +211,4 @@ Mirror publishing is the lowest-barrier, highest-independence media move ZAO can
 
 ---
 
-*Created: 2026-07-17 | First article: Aug 1-15 | Final: Dec 15-20 | Related: 1387 (vs Spotify), 1388 (Hypebot), 1389 (W&M), 1394 (governance template), 1340 (press map), 1359 (Wikipedia)*
+*Created: 2026-07-24 | First article: Aug 1-15 | Final: Dec 15-20 | Related: 1387 (vs Spotify), 1388 (Hypebot), 1389 (W&M), 1394 (governance template), 1340 (press map), 1359 (Wikipedia)*

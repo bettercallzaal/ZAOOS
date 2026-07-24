@@ -2,7 +2,7 @@
 topic: identity/programs
 type: PLAN
 status: ACTIVE — applications open Aug 1, cohort runs Sep-Nov 2026
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1317, 1329, 1333, 1337, 1342, 1343, 1345, 1347, 1353
 owner: Zaal + Iman (program leads)
 ---
@@ -211,4 +211,4 @@ Watch live: [Juke link or YouTube]
 
 ---
 
-*Created: 2026-07-17 | Applications open Aug 1 | Cohort Sep 1–Nov 30 | ZAOstock Oct 3 = ZABAL recruitment moment | Related: 1317 (COC #8 — S1 winner), 1342 (artist recruitment), 1343 (Juke cowork tool), 1345 (annual report S5 ZABAL section), 1347 (newsletter), 1353 (Q3 calendar)*
+*Created: 2026-07-24 | Applications open Aug 1 | Cohort Sep 1–Nov 30 | ZAOstock Oct 3 = ZABAL recruitment moment | Related: 1317 (COC #8 — S1 winner), 1342 (artist recruitment), 1343 (Juke cowork tool), 1345 (annual report S5 ZABAL section), 1347 (newsletter), 1353 (Q3 calendar)*

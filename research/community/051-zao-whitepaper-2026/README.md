@@ -96,7 +96,7 @@ The team is supported by a roster of independent artists, a network of mutual co
 | Artists in roster | 22 | [thezao.com](https://www.thezao.com) |
 | Combined Spotify listeners | 378,000+ | Individual artist profiles |
 | Tracks across roster | 500+ | Streaming platforms |
-| WaveWarZ volume | [524.15 SOL (~$39K)](https://wavewarz.info/) across 1,245 battles | Solana on-chain (2026-07-17) |
+| WaveWarZ volume | [878.30 SOL (~$66K)](https://wavewarz.info/) across 1,289 battles | Solana on-chain (2026-07-24) |
 | Revenue generated | $10,000+ | Festivals + WaveWarZ |
 | IRL festivals produced | 4 | [@zaofestivals](https://www.instagram.com/zaofestivals/) |
 | Metaverse concerts (COC) | 150+ weekly | [stilo.world](https://www.stilo.world/) |

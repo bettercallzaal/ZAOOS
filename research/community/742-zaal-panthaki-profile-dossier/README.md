@@ -20,7 +20,7 @@ tier: DISPATCH
 | 2 | USE **"The Front Door / Gravity Well"** as Zaal's archetype (LOCKED 2026-05-25 by Zaal) | Zaal corrected the framing during draft review: he is not the rails-closer or partnerships negotiator (those are outcomes). He is the person other founders bring their own ecosystems through. The ZAO is the gravity well; WaveWarZ is what those founders discover once they're inside. Proof points: Tyler/Magnetiq, Jordan/Empire Builder, Arthur/Neynar, Ryan/Bonfires, Nicky/Juke, Vlad/Singularity, Shriyash/Apna Coding — all run their own ecosystems and orbit The ZAO. See [[feedback_zaal_wavewarz_positioning]]. |
 | 3 | USE **BetterCallZaal nickname tie-back** as mythology hook | Direct structural mirror of Ike's "Hurric4n3IKE → WaveZ" tie-back. "Got a problem? BetterCallZaal" is already on the homepage. Lands the same kind of name-foretells-destiny move. |
 | 4 | USE **The ZAO is the purpose, WaveWarZ is the role** framing | Important nuance: Ike's purpose = WaveWarZ. Zaal's purpose = The ZAO (decentralized impact network). WaveWarZ is where his role finally synthesizes every skill he stacked. Honest, and stronger than copy-pasting Ike's "purpose" line. |
-| 5 | USE Solana volume + ZAO scale + Coinflow rail as the proof points | Concrete, specific, verifiable: ~$39K trading volume, 1,245 battles, 524.15 SOL, 188 ZAO members already trading, Coinflow ISV closed (merchantID "wavestation"). |
+| 5 | USE Solana volume + ZAO scale + Coinflow rail as the proof points | Concrete, specific, verifiable: ~$66K trading volume, 1,289 battles, 878.30 SOL, 188 ZAO members already trading, Coinflow ISV closed (merchantID "wavestation"). |
 
 ## Identity
 
@@ -90,9 +90,9 @@ For the Alliance application Zaal upgrades the title to **"Director of Ecosystem
 
 **WaveWarZ scale to cite in the brag (per public whitepaper + Doc 723d):**
 
-- ~$39K cumulative trading volume (524.15 SOL at ~$75/SOL, July 2026)
-- 1,245 live battles run
-- 524.15 SOL cumulative volume
+- ~$66K cumulative trading volume (878.30 SOL at ~$75/SOL, July 2026)
+- 1,289 live battles run
+- 878.30 SOL cumulative volume
 - Daily X Spaces Mon-Fri 11am EST
 - Sunday 8pm EST battles + special events
 - Real-time scoring + automated payout (no team intervention)
@@ -185,9 +185,9 @@ Mirrors Ike's chain (football → EE → Infosys → sales → spaces → indie 
 - **22** artists in ZAO roster
 - **378,000+** combined Spotify monthly listeners
 - **500+** tracks across artist roster
-- **1,245** WaveWarZ live battles
-- **524.15** SOL cumulative WaveWarZ volume
-- **~$39K** WaveWarZ trading volume (July 2026)
+- **1,289** WaveWarZ live battles
+- **878.30** SOL cumulative WaveWarZ volume
+- **~$66K** WaveWarZ trading volume (July 2026)
 - **$10,000+** ecosystem revenue (festivals + WaveWarZ)
 - **150+** consecutive weekly COC Concertz concerts
 - **14-brand** Nexus Hub

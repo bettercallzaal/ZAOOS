@@ -66,9 +66,9 @@ The coordination layer is where value moves.
 
 The distribution layer is where output reaches audiences.
 
-**WaveWarZ** — a live music battle prediction market on Solana. Artists compete in 15-minute battles. ZOR holders vote. Trading fees accumulate during battles. Winner takes more; loser still earns. As of July 2026: 1,245 battles, 523.991 SOL total volume, 9.0988 SOL distributed to losing artists.
+**WaveWarZ** — a live music battle prediction market on Solana. Artists compete in 15-minute battles. ZOR holders vote. Trading fees accumulate during battles. Winner takes more; loser still earns. As of July 2026: 1,289 battles, 878.30 SOL total volume, 13.39 SOL distributed to artists.
 
-**ZAO OS** — the coordination and research hub at `zaoos.com` (also `thezao.xyz`). 1,600+ research documents. Gated client for ZAO members. Onboarding flows. The source of truth for what ZAO builds.
+**ZAO OS** — the coordination and research hub at `zaoos.com` (also `thezao.xyz`). 1,800+ research documents. Gated client for ZAO members. Onboarding flows. The source of truth for what ZAO builds.
 
 **ZABAL Bonfire** (`zabal.bonfires.ai`) — the ZAO knowledge graph. Every research doc, meeting note, and agent output feeds into it. AI recall against the graph enables the ZAO assistant to answer from grounded facts.
 

@@ -98,7 +98,7 @@ Hey [name] — haven't seen you at Fractal lately. We've been on a 100+ week str
 ```
 Hey [name] — I was looking at the ZAO governance record and found your name on session [#]. We've now hit 100+ consecutive weeks on-chain, and I wanted to reach out personally.
 
-We're launching ZABAL Season 2 in September — [1-line description of S2]. WaveWarZ just crossed 1,245 battles. COC Concertz #7 was today.
+We're launching ZABAL Season 2 in September — [1-line description of S2]. WaveWarZ just crossed 1,289 battles. COC Concertz #7 was today.
 
 No ask — just wanted you to know what became of the thing you were part of. If you want to rejoin or know someone who'd be interested, I'd love to reconnect.
 
@@ -117,7 +117,7 @@ No ask — just wanted you to know what became of the thing you were part of. If
 
 **Template (ZOE generates, Zaal sends):**
 ```
-Hey [artist name] — you submitted [TRACK] to WaveWarZ back in [MONTH]. We've crossed 1,245 battles since then. Things have grown.
+Hey [artist name] — you submitted [TRACK] to WaveWarZ back in [MONTH]. We've crossed 1,289 battles since then. Things have grown.
 
 COC Concertz #7 is tonight — our live concert series where WaveWarZ battles are featured live. We're building toward #8. If you have new music or want to get back in, submissions are open.
 

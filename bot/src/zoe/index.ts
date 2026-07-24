@@ -17,7 +17,8 @@
 import { config as loadEnv } from 'dotenv';
 loadEnv();
 
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InlineKeyboard } from 'grammy';
+import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
@@ -384,7 +385,14 @@ bot.command('start', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await ctx.reply(
     'ZOE online. Hermes runtime, Sonnet/Opus brain via Max plan. Memory blocks loaded (persona/human/working/tasks). Send anything.',
+    { reply_markup: BUTTON_BAR },
   );
+});
+
+// /menu - (re)show the persistent tap-first cockpit bar at the bottom of the DM.
+bot.command('menu', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
 });
 
 // /chatid - report this chat's id + (in a forum topic) its topic thread id, so
@@ -1103,6 +1111,36 @@ bot.on('message:new_chat_members', async (ctx) => {
 bot.on('message:text', async (ctx) => {
   const text = ctx.message.text;
   if (text.startsWith('/')) return; // commands handled above
+
+  // Cockpit button-bar taps arrive as plain text (a reply keyboard sends the
+  // label). Intercept them BEFORE the concierge treats them as conversation,
+  // and route each to its existing action. Zaal-only + private chat.
+  if (isFromZaal(ctx) && ctx.chat.type === 'private' && isBarLabel(text)) {
+    try {
+      if (text === 'Agenda') {
+        await sendAgenda(ctx);
+      } else if (text === 'Budget') {
+        await ctx.reply(formatSpendStatus(false));
+      } else if (text === 'Focus') {
+        if (await isFocusMode()) {
+          const released = await endFocus();
+          await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
+        } else {
+          await startFocus();
+          await ctx.reply('Focus ON. Non-urgent pings queue until you tap Focus again.');
+        }
+      } else if (text === 'Note') {
+        await ctx.reply('Send it as: note: <your thought>');
+      } else if (text === 'Board') {
+        const boardUrl = process.env.BOARD_MINI_URL || 'https://thezao.xyz/board';
+        await ctx.reply('ZAO board:', { reply_markup: new InlineKeyboard().url('Open board', boardUrl) });
+      }
+    } catch (e) {
+      console.error('[zoe/index] button-bar action failed:', e);
+      await ctx.reply(`That action hit a snag: ${sanitizeErrorForUser(e)}`);
+    }
+    return;
+  }
 
   const chatType = ctx.chat.type;
   const chatId = ctx.chat.id;
@@ -2691,6 +2729,11 @@ async function main(): Promise<void> {
   } catch (err) {
     console.error('[zoe/index] getMe failed:', (err as Error).message);
   }
+
+  // Register the `/` command menu so the underused commands are discoverable.
+  await bot.api.setMyCommands(ZOE_COMMANDS).catch((err: unknown) => {
+    console.error('[zoe/index] setMyCommands failed:', (err as Error).message);
+  });
 
   startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });
 

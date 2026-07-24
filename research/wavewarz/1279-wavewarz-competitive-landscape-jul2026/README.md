@@ -36,7 +36,7 @@ WaveWarZ is the only platform where audiences bet real money on music head-to-he
 | **Charity mechanism** | Benefit battles ($1,497 verified) | None built-in | None built-in | None built-in | None built-in | Spotify-charity program |
 | **IP catalog (songs)** | 921 unique songs (verified) | Varies per artist | Varies per artist | Varies per artist | Millions (streaming) | Millions (streaming) |
 | **Transaction fees** | ~$0.01 Solana fee | Ethereum gas (varies) | Ethereum gas (varies) | Ethereum gas (varies) | Free (L1) | Free (streaming) |
-| **Verified volume (Jul 2026)** | 524.15 SOL (~$39K) | Public (varies) | Private | Private | N/A | $4B+ annual |
+| **Verified volume (Jul 2026)** | 878.30 SOL (~$39K) | Public (varies) | Private | Private | N/A | $4B+ annual |
 
 ---
 
@@ -66,7 +66,7 @@ Spotify pays monthly, after deducting label cuts and distributor fees, on a mini
 
 WaveWarZ settles in SOL. At current fees, a WaveWarZ payout transaction costs $0.01. It lands in the artist's wallet in seconds, not months.
 
-For independent artists in emerging markets — where $9.07 SOL total platform payouts represents real income — this timing difference matters.
+For independent artists in emerging markets — where $13.40 SOL total platform payouts represents real income — this timing difference matters.
 
 ### 4. Community Governance via Fractal DAO
 

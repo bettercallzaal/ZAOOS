@@ -95,7 +95,7 @@ Platform age: 14 months (May 2025 → Jul 2026)
 
 **Lead:** "For the first time in music history, two AI-generated artists just competed in a live on-chain prediction market — and $26,500 in real money was traded on who would win."
 
-**Follow-up:** "The ZAO, a Maine-based DAO, ran an AI Artist Tournament on WaveWarZ — their Solana prediction market. The 16-artist bracket generated 355 SOL in one week (68% of all prior platform history). The tournament concluded [DATE] with [WINNER] winning. Here's why this matters for music's future: [Mirror article link]."
+**Follow-up:** "The ZAO, a Maine-based DAO, ran an AI Artist Tournament on WaveWarZ — their Solana prediction market. The 16-artist bracket generated 355 SOL in one week (40% of all-time platform volume). The tournament concluded [DATE] with [WINNER] winning. Here's why this matters for music's future: [Mirror article link]."
 
 **Pitch template (customize per outlet):**
 ```
@@ -105,7 +105,7 @@ Hi [Name],
 
 Wanted to flag something that hasn't been covered yet: The ZAO, a Maine-based music DAO, just wrapped the first documented public competition between AI-generated musical artists in a live on-chain prediction market.
 
-16 AI-generated artists competed in a bracket-style tournament on WaveWarZ (a Solana prediction market). The tournament alone drove $26,200+ in trading volume in a single week — 68% of everything the platform had done in 14 months before that week.
+16 AI-generated artists competed in a bracket-style tournament on WaveWarZ (a Solana prediction market). The tournament alone drove $26,200+ in trading volume in a single week — 40% of all-time platform volume in 7 days.
 
 The winner (determined by community vote + trading market): [WINNER — fill before send].
 

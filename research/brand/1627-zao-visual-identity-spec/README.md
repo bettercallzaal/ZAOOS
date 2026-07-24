@@ -25,7 +25,7 @@
 ### Tagline
 
 **Primary:** "Music battles. Everyone gets paid."  
-**Secondary (one-stat):** "1,245 battles. Every artist earns."  
+**Secondary (one-stat):** "1,289 battles. Every artist earns."  
 **URL-friendly slug:** wavewarz.info / zao.community (confirm with Zaal)
 
 ---

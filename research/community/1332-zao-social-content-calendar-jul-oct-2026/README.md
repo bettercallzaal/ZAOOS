@@ -2,7 +2,7 @@
 topic: community/distribution
 type: CALENDAR
 status: actionable
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1319, 1322, 1325, 1329, 1331, 1292, 1293
 owner: ZOE
@@ -294,4 +294,4 @@ Anything to override or customize? Reply to this message.
 
 ---
 
-*Created: 2026-07-17 | ZOE automates all TMP-01 through TMP-06 | Zaal approves WED (ZAO Insight) + artist reveals | Cross-refs: doc 1322 (automation index), 1292 (X Space format), 1329 (ZAOstock promotion), 1331 (newsletter calendar)*
+*Created: 2026-07-24 | ZOE automates all TMP-01 through TMP-06 | Zaal approves WED (ZAO Insight) + artist reveals | Cross-refs: doc 1322 (automation index), 1292 (X Space format), 1329 (ZAOstock promotion), 1331 (newsletter calendar)*

@@ -131,7 +131,7 @@ What it is:
 - Phase 3 (Oct): ZOR governance surface (who gets to fight next)
 
 Why now:
-- WaveWarZ has run 162 MAIN battles with $523 SOL total volume, $9 in artist payouts
+- WaveWarZ has run 165 MAIN battles with $878 SOL total volume, $9 in artist payouts
 - ZOR = Fractal game governance token, 100+ active holders
 - ZAOville pool party today (Jul 25) featuring WaveWarZ battle demo through PA — live proof of community
 - Africa Battle Week (Sep 26): US vs. West Africa battle with charity payout — announced in /zao
@@ -189,6 +189,6 @@ Tags: music, battles, prediction, wavewarz
 ## Sources
 
 - ZAOOS docs: 1490 (creator coins), 1494 (miniapp distribution), 1501 (Warpcast changes), 1514 (WaveWarZ sprint), 1518 (Phase 1 spec)
-- ZAO internal: WaveWarZ API stats (162 MAIN battles, $523 SOL volume, $9 artist payouts)
+- ZAO internal: WaveWarZ API stats (165 MAIN battles, $878 SOL volume, $9 artist payouts)
 - Board task context: Jul 25 submission to Arthur (Neynar)
 - Note: competitive landscape based on ZAOOS doc synthesis + general Farcaster ecosystem knowledge through Aug 2025; specific competitor miniapp data should be verified against current Farcaster discovery surfaces before finalizing pitch

@@ -151,7 +151,7 @@ WaveWarZ battle vote goes live at [TIME]. Stream: [Spatial/Twitch link]
 ```
 "The Loser Earns: How ZAO Built a Music Economy Where Losing Pays"
 
-New article on Mirror. 1,245 battles. 64 governance weeks. ZAOstock Oct 3.
+New article on Mirror. 1,289 battles. 64 governance weeks. ZAOstock Oct 3.
 
 [Mirror URL]
 

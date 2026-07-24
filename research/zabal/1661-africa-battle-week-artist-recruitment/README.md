@@ -102,7 +102,7 @@ ZOL searches for casts in music-adjacent channels that mention African music, Af
 ```
 Hey [name] — I run ZAO, a music DAO that built WaveWarZ.
 
-WaveWarZ is a prediction market for music battles on Solana. When a battle closes, both artists get paid automatically — including the loser. 1,245 battles settled, $9 SOL to artists so far.
+WaveWarZ is a prediction market for music battles on Solana. When a battle closes, both artists get paid automatically — including the loser. 1,289 battles settled, $9 SOL to artists so far.
 
 We're running Africa Battle Week Sep 22-26 — 5 days of WaveWarZ battles featuring African and diaspora artists. Battle against a matched opponent, earn SOL win or lose.
 

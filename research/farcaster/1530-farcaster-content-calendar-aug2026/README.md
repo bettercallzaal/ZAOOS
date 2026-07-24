@@ -41,10 +41,10 @@ ZOE mirrors /wavewarz posts to X @wavewarz the same day, 2 hours later (per doc 
 
 **Monday Jul 21 — Launch Day Stats**
 ```
-WaveWarZ is 1,245 battles deep.
+WaveWarZ is 1,289 battles deep.
 
-523.991 SOL in total volume.
-9.0988 SOL to losing artists.
+878.30 SOL in total volume.
+13.40 SOL to losing artists.
 
 Today: ZAOstock Eventbrite goes live.
 COC #8 date: announced today.
@@ -110,7 +110,7 @@ More soon. /wavewarz
 ```
 The Loser Earns.
 
-64 weeks of DAO governance. 1,245 battles. $104K in volume.
+64 weeks of DAO governance. 1,289 battles. $64.8K in volume.
 The artist who LOSES still gets paid.
 
 Full story: [Mirror URL]

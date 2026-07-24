@@ -87,7 +87,7 @@ What moves this to 6/10:
 ### Dimension: IP Catalog Depth
 
 **Verified IP assets:**
-- WaveWarZ: 1,245 battles, 921 unique songs, 34 artists, $39K+ volume
+- WaveWarZ: 1,245 battles, 921 unique songs, 34 artists, $64.8K+ volume
 - COC Concertz: 7 shows, Arweave-archived, verifiable on-chain
 - ZAOstock: IRL festival Oct 3 (in planning, venue confirmed)
 - ZABAL Games: 32 builders, 28 workshops, August Finals incoming

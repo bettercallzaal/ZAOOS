@@ -78,7 +78,7 @@ worth playing for everyone who enters.
 
 As of today [FILL DATE], WaveWarZ has processed:
 • 1,289 battles total
-• 878.30 SOL in total volume (~$39,000 at current SOL price)
+• 878.30 SOL in total volume (~$65K at current SOL price)
 • 13.40 SOL paid directly to artists
 • 381.20 SOL returned to traders who backed winners
 

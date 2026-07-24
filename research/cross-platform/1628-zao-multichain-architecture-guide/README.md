@@ -37,7 +37,7 @@
 
 **Key Solana facts for press:**
 - "1,289 battles settled on Solana mainnet" (Jul 2026)
-- "878.30 SOL ($39,126) in cumulative trading volume"
+- "878.30 SOL (~$64.8K) in cumulative trading volume"
 - "13.40 SOL in guaranteed artist payouts, including losing artists"
 - Average per-battle settlement: ~0.42 SOL per battle
 

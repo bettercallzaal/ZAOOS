@@ -43,7 +43,7 @@ owner: Zaal (Director of Ecosystem Strategy & Partnerships)
 
 **What to do:**
 1. Email Coinflow account manager: "Can WaveWarZ be featured as a merchant success story in your newsletter or website?"
-2. Provide: battle count (1,289), volume ($39K), "first onchain music battle platform using Coinflow for fiat on-ramp"
+2. Provide: battle count (1,289), volume ($64.8K), "first onchain music battle platform using Coinflow for fiat on-ramp"
 3. Ask: "Can you add a co-branded callout on your website under 'Partner Success Stories'?"
 
 **Expected yield:** 1 mention in Coinflow's channels = 500-2,000 new WaveWarZ eyeballs

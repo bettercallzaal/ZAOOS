@@ -59,7 +59,7 @@ The distribution number is the discipline test: the honest 0.73 (concentrated) b
 
 Live API data is now authoritative. Use `wavewarz.info/api/public/stats` (public, no auth, 60s cache) as the canonical source. The "directional / self-reported" caveat is **retired as of 2026-07-24**.
 
-- Volume: **878.30 SOL (~$39,453 at $75.29/SOL)** — live API 2026-07-24T17:15Z. NOT "522 SOL", "491 SOL" or "435 SOL" (older figures).
+- Volume: **878.30 SOL (~$64.8K at ~$73.8/SOL)** — live API 2026-07-24T17:15Z. NOT "522 SOL", "491 SOL" or "435 SOL" (older figures).
 - Battles: **1,289** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community) — live API 2026-07-24. NOT "~1,125" or "795" (older figures).
 - Artist payouts: **13.40 SOL** — live API. Platform revenue: **17.44 SOL** (exceeds artist payouts — still the honest load-bearing point, state it).
 - Trader claims: **381.20 SOL** — live API.

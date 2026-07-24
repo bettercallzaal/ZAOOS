@@ -83,7 +83,7 @@ All ZABAL builder work is public, on-chain or open-source. Nouns will be credite
 | Claim | Value | Source |
 |-------|-------|--------|
 | WaveWarZ battles | 1,289+ | wavewarz.info/api/public/stats |
-| Total volume | 878.30 SOL (~$39,453) | Same |
+| Total volume | 878.30 SOL (~$64.8K) | Same |
 | Governance streak | 100+ consecutive weeks | ZAO Fractal governance, on-chain Optimism |
 | Respect holders | 157 | ZAOOS doc 1259 |
 | ZABAL S1 builders | 8-12 (S1 cohort) | ZAOOS doc 1283 |

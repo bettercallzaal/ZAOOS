@@ -20,7 +20,7 @@ related-docs: 1273, 1258, 1278, 1202, 1200
 The ZAO (ZTalent Artist Organization) is a decentralized artist collective of 188 active members — independent musicians, developers, and creators — who build together and govern themselves through a weekly community session.
 
 It was founded by Zaal Panthaki and operates primarily online, with members across the United States and internationally. The ZAO has produced:
-- WaveWarZ, an onchain music battle platform with $39,000+ in artist trade volume
+- WaveWarZ, an onchain music battle platform with $64.8K+ in artist trade volume
 - 7 COC Concertz virtual concert events
 - ZABAL Games, a 3-month builder incubator program
 - ZAOstock, a planned free outdoor music festival in Ellsworth, Maine (October 3, 2026)

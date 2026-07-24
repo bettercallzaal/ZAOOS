@@ -36,7 +36,7 @@ This sentence works for: X bios, grant taglines, elevator pitches, press subject
 
 > ZAO (ZTalent Artist Organization) is a music DAO that governs WaveWarZ: a prediction market for indie music battles on Solana where fans trade per-battle tokens on a bonding curve, artists earn 1% of every trade in real time, and the losing artist still receives a guaranteed payout from the settlement pool.
 > 
-> As of July 2026, WaveWarZ has completed 1,289 battles — 162 MAIN events and 1,047 quick battles — distributing 13.40 SOL ($679) to artists including losers, enabling 381.20 SOL ($9,505) in trader claims, and generating 878.30 SOL ($39,126) in cumulative trading volume.
+> As of July 2026, WaveWarZ has completed 1,289 battles — 162 MAIN events and 1,047 quick battles — distributing 13.40 SOL ($679) to artists including losers, enabling 381.20 SOL ($9,505) in trader claims, and generating 878.30 SOL (~$64.8K) in cumulative trading volume.
 > 
 > ZAO governs the platform through Fractal Democracy: a weekly governance session that has run unbroken for 100+ consecutive weeks, with governance actions recorded on Optimism Mainnet (OREC contract: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532).
 > 
@@ -109,7 +109,7 @@ Every narrative choice should advance one or both of these. The press angle ("lo
 These are verified, paste-ready, and should appear in every grant + press narrative:
 
 1. "1,289 WaveWarZ battles completed as of July 2026"
-2. "878.30 SOL ($39,126 at $74.64/SOL) total trading volume"
+2. "878.30 SOL (~$64.8K at ~$73.8/SOL) total trading volume"
 3. "13.40 SOL paid to artists, including losing artists, in guaranteed on-chain payouts"
 4. "100+ consecutive weeks of Fractal Democracy governance, recorded on Optimism Mainnet"
 5. "1,600+ CC-BY licensed research documents in ZAOOS (github.com/bettercallzaal/ZAOOS)"

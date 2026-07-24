@@ -72,7 +72,7 @@ On-chain: Optimism Mainnet | OG Token: 0x34cE89baA7E4a4B00E17F7E4C0cb97105C21695
 | Artist Payouts (SOL) | [ZOE] | [ZOE] | [ZOE] | [ZOE] |
 
 **Estimated from known Jul 17 totals (for placeholder):**
-- Jul 17 cumulative: 1,245 battles, 523.991 SOL, 9.0988 SOL artist payouts
+- Jul 17 cumulative: 1,289 battles, 878.30 SOL, 13.40 SOL artist payouts
 - Q2 period likely accounts for ~400-500 battles (estimate; ZOE confirms from API history)
 
 ### WaveWarZ Public Goods Argument

@@ -33,7 +33,7 @@ The ZAO (ZTalent Artist Organization) has run a weekly fractal governance cycle 
 **On-chain governance record:**
 - **102 weeks** of weekly Respect Games (Discord-recorded, publicly logged)
 - **63 weeks** of verified on-chain Respect settlement (OG ERC-20: 33 settlement weeks; ZOR ERC-1155: 31 settlement weeks — Blockscout-verified, independently auditable)
-- **157 unique Respect holders** (122 OG ERC-20 + 56 ZOR ERC-1155, 21 holding both) — verified 2026-07-17
+- **157 unique Respect holders** (122 OG ERC-20 + 56 ZOR ERC-1155, 21 holding both) — verified 2026-07-24
 
 **Contracts deployed on Optimism Mainnet:**
 - **OG Respect** (ERC-20, soulbound): `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` — 122 holders
@@ -50,8 +50,8 @@ The fractal model uses a Fibonacci-weighted contribution curve for weekly Respec
 4. ZAO's fractal model is music-first but domain-agnostic — the same pattern applies to any creator or contributor community
 
 **WaveWarZ companion platform:**
-The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,245 battles, 522 SOL in trading volume (~$39K), 939 real trader withdrawals, 9.05 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
-The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,245 battles, 524.15 SOL in trading volume (~$39K), 939 real trader withdrawals, 9.07 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
+The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,289 battles, 522 SOL in trading volume (~$64.8K), 939 real trader withdrawals, 9.05 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
+The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-battle prediction market. As of July 2026: 1,289 battles, 878.30 SOL in trading volume (~$64.8K), 939 real trader withdrawals, 13.40 SOL in automatic artist payouts. WaveWarZ demonstrates that the ZAO governance model (artist-first, IP-returning) can be commercialized into live economic activity.
 
 ### Impact Metrics
 
@@ -59,14 +59,14 @@ The ZAO's companion project, WaveWarZ, operates on Solana Mainnet as a music-bat
 |---|---|---|
 | Weeks of live governance | 102 | Discord logs + ZAOOS research |
 | On-chain settlement weeks (verified) | 63 (OG:33 + ZOR:31) | Blockscout, Optimism Mainnet |
-| Unique Respect holders | 157 | Blockscout 2026-07-17 |
+| Unique Respect holders | 157 | Blockscout 2026-07-24 |
 | OG Respect contract | `0x34cE89...957` | Optimism Mainnet |
 | ZOR Respect contract | `0x9885CC...45c` | Optimism Mainnet |
 | OREC contract | `0xcB05F9...532` | Optimism Mainnet |
 | Active fractal DAOs on Optimism (July 2026) | 1 (ZAO only) | Research doc 1208 |
-| WaveWarZ battles | 1,245 | wavewarz.info/api/public/stats |
-| WaveWarZ trading volume | 522 SOL (~$39K) | wavewarz.info/api/public/stats |
-| WaveWarZ trading volume | 524.15 SOL (~$39K) | wavewarz.info/api/public/stats |
+| WaveWarZ battles | 1,289 | wavewarz.info/api/public/stats |
+| WaveWarZ trading volume | 522 SOL (~$64.8K) | wavewarz.info/api/public/stats |
+| WaveWarZ trading volume | 878.30 SOL (~$64.8K) | wavewarz.info/api/public/stats |
 
 ### Verification Links
 
@@ -92,7 +92,7 @@ Before submitting to atlas.optimism.io, verify:
 - [ ] Atlas is accepting applications (check `https://atlas.optimism.io` for active round)
 - [ ] Optimism wallet connected (the OREC deployer address or a ZAO wallet with on-chain history)
 - [ ] Confirm current Respect holder counts on Blockscout (may have grown past 157)
-- [ ] Add any recent governance milestones (new ZIPs, new settlement weeks since 2026-07-17)
+- [ ] Add any recent governance milestones (new ZIPs, new settlement weeks since 2026-07-24)
 - [ ] Review the funding category selection — "Governance & Collaboration" is most accurate
 - [ ] Add Mirror.xyz links for the ZAO papers if they've been published (see doc 1208 action list)
 
@@ -115,7 +115,7 @@ Before submitting to atlas.optimism.io, verify:
 
 ## Sources
 
-- doc 1200: Respect holder counts (157 unique, Blockscout-verified 2026-07-17)
+- doc 1200: Respect holder counts (157 unique, Blockscout-verified 2026-07-24)
 - doc 1201: ZAO Fractal governance verified stats (100+ weeks, 63 on-chain)
 - doc 1202: Fractal on-chain settlement history (OG:33 + ZOR:31 weeks)
 - doc 1205: ZAO on-chain contract registry (OREC + Respect addresses)

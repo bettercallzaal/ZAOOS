@@ -89,7 +89,7 @@ I'm Zaal Panthaki, founder of The ZAO and WaveWarZ.
 
 On October 3, 2026, we're hosting ZAOstock at [VENUE] in Ellsworth — the first 
 music festival with a live on-stage DAO governance vote. 162 music battles, 
-$104K in volume, and for the first time, a live audience votes on the winner.
+$64.8K in volume, and for the first time, a live audience votes on the winner.
 
 We're looking for local arts organizations to partner with us as community sponsors.
 
@@ -153,7 +153,7 @@ using blockchain technology.
 Here's the unusual part: the artist who LOSES the music battle still gets paid 
 automatically in cryptocurrency. No judges, no politics — just code.
 
-We've run 162 of these battles online (1,245 total), with $104K in volume 
+We've run 162 of these battles online (1,289 total), with $64.8K in volume 
 and $1,820 paid to losing artists. ZAOstock is where it goes live on stage.
 
 Happy to provide:

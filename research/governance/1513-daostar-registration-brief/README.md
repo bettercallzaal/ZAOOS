@@ -149,7 +149,7 @@ This is OP RF Gate 2. We're building the evidence trail.
 ```
 ZAO is EIP-4824 registered on DAOstar.
 
-64+ governance weeks. 3 Optimism contracts. 1,245 WaveWarZ battles.
+64+ governance weeks. 3 Optimism contracts. 1,289 WaveWarZ battles.
 
 Now machine-readable: [daostar URL]
 

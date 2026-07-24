@@ -175,7 +175,7 @@ For local Maine businesses at the $500 or $1,000 tier:
 
 Send them doc 1651 (ZAO DAO Case Study) link or paste:
 ```
-ZAO has run 100+ consecutive weekly governance sessions on Optimism Mainnet. WaveWarZ has settled 1,245 music battles with $524 SOL in fan trading volume and automatic artist payouts. ZAOstock is the first IRL event. We're bringing what we've built online to a live stage in Ellsworth, Maine.
+ZAO has run 100+ consecutive weekly governance sessions on Optimism Mainnet. WaveWarZ has settled 1,289 music battles with $878 SOL in fan trading volume and automatic artist payouts. ZAOstock is the first IRL event. We're bringing what we've built online to a live stage in Ellsworth, Maine.
 
 Here's the case study: [ZAOOS doc 1651 link or zaoos.com/faq]
 ```

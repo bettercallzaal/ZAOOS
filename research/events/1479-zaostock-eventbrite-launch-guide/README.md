@@ -106,8 +106,8 @@ Performers TBA — follow @wavewarz on X and @zao on Farcaster for updates.
 ---
 
 PRESENTED BY ZAO
-ZAO is a music decentralized autonomous organization that has run 1,245+ WaveWarZ battles 
-with 523.991 SOL (~$104K) in volume since 2024. 64 consecutive weekly governance sessions 
+ZAO is a music decentralized autonomous organization that has run 1,289+ WaveWarZ battles 
+with 878.30 SOL (~$64.8K) in volume since 2024. 64 consecutive weekly governance sessions 
 on Optimism Mainnet. ZAOstock is the first live expression of ZAO governance IRL.
 
 Questions: [zaalp99@gmail.com]

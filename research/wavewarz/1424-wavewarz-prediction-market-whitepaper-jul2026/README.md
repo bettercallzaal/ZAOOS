@@ -12,7 +12,7 @@
 
 WaveWarZ is a music prediction market deployed on Solana. Unlike conventional music platforms that pay artists based on stream count, WaveWarZ creates a liquid prediction market for music listening preference, where traders bet SOL on the outcome of head-to-head music battles. The market distributes surplus to losing artists via a protocol-level mechanism — "loser-earns" — ensuring economic participation for artists regardless of market outcome.
 
-This whitepaper documents WaveWarZ's market design, economic mechanics, empirical performance data (1,245 battles, 523.99 SOL volume as of July 2026), and distinguishing features relative to existing prediction markets.
+This whitepaper documents WaveWarZ's market design, economic mechanics, empirical performance data (1,289 battles, 878.30 SOL volume as of July 2026), and distinguishing features relative to existing prediction markets.
 
 ---
 
@@ -106,13 +106,13 @@ As volume scales, the loser-earns mechanism generates increasing artist payouts 
 
 | Metric | Value |
 |--------|-------|
-| Total battles completed | 1,245 |
+| Total battles completed | 1,289 |
 | Quick battles | ~1,047 (84%) |
 | MAIN battles | ~162 (13%) |
 | Community battles | 36 (3%) |
-| Total SOL volume | 523.991 SOL |
-| Total artist payouts (loser-earns) | 9.0988 SOL |
-| Total trader claims | 127.343 SOL |
+| Total SOL volume | 878.30 SOL |
+| Total artist payouts (loser-earns) | 13.40 SOL |
+| Total trader claims | 381.20 SOL |
 | Protocol revenue (3%) | ~15.72 SOL |
 | Average volume per quick battle | ~0.44 SOL |
 | Average volume per MAIN battle | ~2.59 SOL |
@@ -123,9 +123,9 @@ At current volume levels:
 - **Average loser-earns per battle:** 0.0073 SOL (~$1.46 at $200/SOL)
 - **MAIN battle loser payout (average):** ~0.045 SOL (~$9)
 - **Top-end MAIN battle payout:** 0.865+ SOL ($173+)
-- **Total artist redistribution:** 9.0988 SOL (~$1,820 at $200/SOL)
+- **Total artist redistribution:** 13.40 SOL (~$1,820 at $200/SOL)
 
-Comparison: 9.0988 SOL in artist payouts = earnings from approximately 607,000 Spotify streams at $0.003/stream.
+Comparison: 13.40 SOL in artist payouts = earnings from approximately 607,000 Spotify streams at $0.003/stream.
 
 ### 3.3 Charity Impact
 
@@ -202,11 +202,11 @@ WaveWarZ battle records are archived on Arweave, creating a permanent public dat
 
 ### For DeFi/crypto press (Bankless, Decrypt)
 
-> "WaveWarZ is a music prediction market on Solana that has cleared 523.99 SOL (~$104,798) in volume across 1,245 battles since launch. The protocol charges a 3% fee and redirects 1.73% of the losing-side pool to the losing artist — a loser-earns mechanic that pays artists regardless of market outcome. This is the first documented implementation of creator-directed surplus redistribution at the prediction market protocol level."
+> "WaveWarZ is a music prediction market on Solana that has cleared 878.30 SOL (~$64.8K) in volume across 1,289 battles since launch. The protocol charges a 3% fee and redirects 1.73% of the losing-side pool to the losing artist — a loser-earns mechanic that pays artists regardless of market outcome. This is the first documented implementation of creator-directed surplus redistribution at the prediction market protocol level."
 
 ### For academic researchers
 
-> "WaveWarZ (wavewarz.info) implements a pairwise music preference market on Solana with an embedded loser-earns mechanism (1.73% of losing-side SOL pool to the losing artist). As of July 2026, the platform has processed 1,245 battles with 523.991 SOL total volume and 9.0988 SOL in artist payouts. Full dataset: wavewarz.info/api/public/stats. Documentation: ZAOOS doc 1424, github.com/ZAOIP/zao-os."
+> "WaveWarZ (wavewarz.info) implements a pairwise music preference market on Solana with an embedded loser-earns mechanism (1.73% of losing-side SOL pool to the losing artist). As of July 2026, the platform has processed 1,289 battles with 878.30 SOL total volume and 13.40 SOL in artist payouts. Full dataset: wavewarz.info/api/public/stats. Documentation: ZAOOS doc 1424, github.com/ZAOIP/zao-os."
 
 ### For OP Retro Funding
 
@@ -216,7 +216,7 @@ WaveWarZ battle records are archived on Arweave, creating a permanent public dat
 
 ## What Makes This Citable
 
-> "WaveWarZ is documented as a music prediction market in ZAOOS doc 1424 (July 2026), including full market design specifications, empirical performance data (1,245 battles, 523.99 SOL volume as of July 17, 2026), the loser-earns mechanism (1.73% of losing-side pool to losing artist), and comparison to existing prediction market protocols. The dataset is publicly accessible at wavewarz.info/api/public/stats."
+> "WaveWarZ is documented as a music prediction market in ZAOOS doc 1424 (July 2026), including full market design specifications, empirical performance data (1,289 battles, 878.30 SOL volume as of July 24, 2026), the loser-earns mechanism (1.73% of losing-side pool to losing artist), and comparison to existing prediction market protocols. The dataset is publicly accessible at wavewarz.info/api/public/stats."
 
 ---
 

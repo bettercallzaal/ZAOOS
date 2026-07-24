@@ -33,7 +33,7 @@ owner: Zaal (send email) + ZOE (follow-up reminder at +7 days no response)
 
 ## The Pitch (X DM Version — 280 chars)
 
-> @brucehoughton — WaveWarZ just passed 1,245 community music battles with 9.09 SOL paid directly to artists. Both sides of every battle earn. Loser-earns economics. Would a short piece on this be a fit for Hypebot?
+> @brucehoughton — WaveWarZ just passed 1,289 community music battles with 13.40 SOL paid directly to artists. Both sides of every battle earn. Loser-earns economics. Would a short piece on this be a fit for Hypebot?
 
 ---
 
@@ -49,9 +49,9 @@ I'm Zaal Panthaki, founder of The ZAO — a music DAO that built WaveWarZ, a com
 
 I think your readers would find this interesting: **WaveWarZ pays both sides of a music battle, regardless of who wins.** We call it loser-earns. Here's what that looks like in data:
 
-- **1,245 battles** completed to date
-- **9.09 SOL (~$1,638) paid directly to artists** — both winner and loser
-- **524 SOL total volume** through the platform
+- **1,289 battles** completed to date
+- **13.40 SOL (~$1,638) paid directly to artists** — both winner and loser
+- **878.30 SOL total volume** through the platform
 - **50 MAIN events** organized by community governance
 
 For context: an average WaveWarZ losing artist earns more from a single battle than from 328 Spotify streams.
@@ -79,9 +79,9 @@ zaalp99@gmail.com | wavewarz.info | @bettercallzaal on X
 
 **Intro (100 words):** The problem — Spotify pays $0.004/stream. Most artists earn less than $100/month. Winner-take-all economics dominate music.
 
-**The WaveWarZ model (150 words):** How loser-earns works. Both artists submit. Community votes. Both get paid. The economics: 1,245 battles, 9.09 SOL to artists, both sides. Why "loser-earns" isn't charity — it's a different market design.
+**The WaveWarZ model (150 words):** How loser-earns works. Both artists submit. Community votes. Both get paid. The economics: 1,289 battles, 13.40 SOL to artists, both sides. Why "loser-earns" isn't charity — it's a different market design.
 
-**The numbers (100 words):** 524 SOL volume. 50 MAIN events. 36 community battles. Artist payouts vs. Spotify per-stream comparison (from doc 1387). The 600× argument (honest caveat included).
+**The numbers (100 words):** 878.30 SOL volume. 50 MAIN events. 36 community battles. Artist payouts vs. Spotify per-stream comparison (from doc 1387). The 600× argument (honest caveat included).
 
 **Community governance (100 words):** How ZAO runs this — 63+ consecutive weekly governance sessions, on-chain voting, community decides the rules. Not a label. Not an algorithm.
 
@@ -95,9 +95,9 @@ zaalp99@gmail.com | wavewarz.info | @bettercallzaal on X
 
 | Stat | Value | Source |
 |------|-------|--------|
-| Total battles | 1,245 | wavewarz.info/api/public/stats |
-| Total SOL volume | 523.991 SOL | Same |
-| Artist payouts (direct) | 9.0988 SOL | Same |
+| Total battles | 1,289 | wavewarz.info/api/public/stats |
+| Total SOL volume | 878.30 SOL | Same |
+| Artist payouts (direct) | 13.40 SOL | Same |
 | MAIN events | 50 | Same |
 | Governance sessions | 63+ consecutive | ZAOOS records |
 | Governance contract (Optimism) | Live on-chain | doc 1356 |

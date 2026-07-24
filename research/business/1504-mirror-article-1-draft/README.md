@@ -10,7 +10,7 @@
 
 - [ ] Zaal reviews draft (30 min, Jul 30)
 - [ ] Fill `[ZAAL PERSONAL SECTION]` — 2-3 sentences in your voice (see Part 6)
-- [ ] Update battle count if above 1,245 (check API)
+- [ ] Update battle count if above 1,289 (check API)
 - [ ] Add Mirror URL to docs 1470 (OP RF), 1467 (Newsletter Issue 2), 1500 (Green Pill reply)
 - [ ] Publish at Mirror.xyz under ZAO or Zaal's wallet
 - [ ] ZOE posts to X, Farcaster, Telegram within 1h of publish
@@ -44,8 +44,8 @@ it is. That's the point.
 [ZAAL PERSONAL SECTION: 2-3 sentences on why you built this. What did you 
 want to fix? What broke you about the existing system?]
 
-Since we launched WaveWarZ, 1,245 battles have run on-chain. Artists have 
-earned 9.0988 SOL in direct payouts — including the losers. That's roughly 
+Since we launched WaveWarZ, 1,289 battles have run on-chain. Artists have 
+earned 13.40 SOL in direct payouts — including the losers. That's roughly 
 $677 at current prices, distributed automatically by smart contracts, 
 requiring no label, no manager, no royalty accounting firm.
 
@@ -77,10 +77,10 @@ made: that the goal isn't to crown a winner. The goal is to make the game
 worth playing for everyone who enters.
 
 As of today [FILL DATE], WaveWarZ has processed:
-• 1,245 battles total
-• 523.991 SOL in total volume (~$39,000 at current SOL price)
-• 9.0988 SOL paid directly to artists
-• 127.343 SOL returned to traders who backed winners
+• 1,289 battles total
+• 878.30 SOL in total volume (~$39,000 at current SOL price)
+• 13.40 SOL paid directly to artists
+• 381.20 SOL returned to traders who backed winners
 
 The platform is live. The contracts are on Solana mainnet. The data is 
 publicly accessible at wavewarz.info/api/public/stats.

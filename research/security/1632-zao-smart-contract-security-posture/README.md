@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ZAO's on-chain components have operated without a security incident through 1,245 WaveWarZ battles and 100+ Fractal Democracy governance sessions (Jul 2026). No formal third-party audit has been completed as of Jul 2026. The design philosophy minimizes blast radius: governance contracts are optimistic (72h veto window), artist payouts are automatic (no manual intervention), and no user funds are custodied by ZAO.
+ZAO's on-chain components have operated without a security incident through 1,289 WaveWarZ battles and 100+ Fractal Democracy governance sessions (Jul 2026). No formal third-party audit has been completed as of Jul 2026. The design philosophy minimizes blast radius: governance contracts are optimistic (72h veto window), artist payouts are automatic (no manual intervention), and no user funds are custodied by ZAO.
 
 **Key security property:** ZAO never holds user funds. Fan prediction tokens are custodied by the WaveWarZ smart contract; artist payouts fire automatically at settlement; charity payouts fire automatically at settlement. There is no ZAO treasury wallet that could be compromised to drain user funds.
 
@@ -140,7 +140,7 @@ Before commissioning an audit, ZAO should:
 ## What ZAO Can Cite Today (Press/Grants)
 
 **Honest framing:**
-> "ZAO's smart contracts have operated through 1,245 WaveWarZ battles and 100+ governance sessions without a security incident. Key security properties: ZAO never custodies user funds (all held in smart contracts), governance uses a 72-hour optimistic veto window, and ZOR's soulbound design prevents flash loan governance attacks. A formal third-party audit is planned as part of ZAO's 2026 growth roadmap."
+> "ZAO's smart contracts have operated through 1,289 WaveWarZ battles and 100+ governance sessions without a security incident. Key security properties: ZAO never custodies user funds (all held in smart contracts), governance uses a 72-hour optimistic veto window, and ZOR's soulbound design prevents flash loan governance attacks. A formal third-party audit is planned as part of ZAO's 2026 growth roadmap."
 
 **What NOT to claim:**
 - "Audited" (not yet true)

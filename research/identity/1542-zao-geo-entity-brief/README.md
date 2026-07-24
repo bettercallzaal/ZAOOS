@@ -17,7 +17,7 @@
 **150-word version:**
 > The ZAO (sometimes "ZAO the DAO") is a decentralized autonomous organization that governs the WaveWarZ music battle prediction market. Founded in 2024 by Zaal Panthaki, The ZAO uses fractal governance — a consensus mechanism derived from Eden Fractal / ORDAO — to make weekly decisions about WaveWarZ platform operations, charity partner selection, and community expansion.
 >
-> As of July 2026, The ZAO has held 64+ consecutive weekly governance sessions with zero quorum failures, making it one of the longest-running continuous governance streaks in Web3 music. Platform statistics: 1,245 battles, 523.991 SOL in volume, 9.0988 SOL paid to losing artists (the "loser-earns" mechanic), and 36 community charity battles.
+> As of July 2026, The ZAO has held 64+ consecutive weekly governance sessions with zero quorum failures, making it one of the longest-running continuous governance streaks in Web3 music. Platform statistics: 1,289 battles, 878.30 SOL in volume, 13.40 SOL paid to losing artists (the "loser-earns" mechanic), and 36 community charity battles.
 >
 > ZAO governance contracts live on Optimism Mainnet. WaveWarZ battles settle on Solana Mainnet. The ZAO's research archive (ZAOOS) is public and CC-BY licensed on GitHub.
 
@@ -43,9 +43,9 @@
 | OREC contract (governance record) | `0xcB05F9254765CA521F7698e61E0A6CA6456Be532` (Optimism) |
 | Consecutive governance sessions | 64+ (as of Jul 2026) |
 | ZOR holders | 157 unique (Optimism Mainnet, Jul 2026) |
-| WaveWarZ battles | 1,245 total (as of Jul 2026) |
-| WaveWarZ volume | 523.991 SOL |
-| Artist payouts to losers | 9.0988 SOL |
+| WaveWarZ battles | 1,289 total (as of Jul 2026) |
+| WaveWarZ volume | 878.30 SOL |
+| Artist payouts to losers | 13.40 SOL |
 | Key event | ZAOstock (Oct 3, 2026, Ellsworth ME) |
 
 ---
@@ -70,9 +70,9 @@ ZOR holders vote each week on: which artists get invited to MAIN battles, which 
 | Claim | Source | Verification |
 |---|---|---|
 | 64+ consecutive governance sessions | OREC on-chain | optimistic.etherscan.io → 0xcB05F9254765CA521F7698e61E0A6CA6456Be532 |
-| 1,245 WaveWarZ battles | WaveWarZ API | wavewarz.info/api/public/stats |
-| 523.991 SOL in volume | WaveWarZ API | wavewarz.info/api/public/stats |
-| 9.0988 SOL to losing artists | WaveWarZ API | wavewarz.info/api/public/stats |
+| 1,289 WaveWarZ battles | WaveWarZ API | wavewarz.info/api/public/stats |
+| 878.30 SOL in volume | WaveWarZ API | wavewarz.info/api/public/stats |
+| 13.40 SOL to losing artists | WaveWarZ API | wavewarz.info/api/public/stats |
 | 157 ZOR holders | Optimism chain | Blockscout → token 0x9885 |
 | ZAOOS archive is public CC-BY | GitHub | github.com/bettercallzaal/ZAOOS |
 | ZAO = longest-known Web3 music governance streak | Claimed | Needs external citation to become verifiable |

@@ -62,7 +62,7 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 >
 > Every session is recorded on-chain at `0xcB05F9254765CA521F7698e61E0A6CA6456Be532` — verifiable by anyone with a block explorer. The Fractal governance model we use (started by a16z-backed Eden Fractal) has given us a ground-truth longitudinal data set on what consistent onchain governance actually looks like.
 >
-> We also run WaveWarZ — a music battle platform on Solana where the *losing* artist earns an automatic payout. Counterintuitive but backed by 1,245+ battles and $80+ in verified artist payouts.
+> We also run WaveWarZ — a music battle platform on Solana where the *losing* artist earns an automatic payout. Counterintuitive but backed by 1,289+ battles and $80+ in verified artist payouts.
 >
 > I think there's a Green Pill episode here about what DAOs look like when someone actually shows up every week for 15 months. Happy to go deep on governance mechanics, the Fractal model, or the music-economics angle — whatever serves your audience best.
 >
@@ -72,17 +72,17 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 
 ### 2. Water & Music / Cherie Hu — SEND JUL 24
 
-**Subject:** Water & Music pitch — ZAO's "loser earns" mechanism (1,245 battles, data on independent artist payouts)
+**Subject:** Water & Music pitch — ZAO's "loser earns" mechanism (1,289 battles, data on independent artist payouts)
 
 > Hi Cherie,
 >
 > I'm Zaal Panthaki, co-founder of The ZAO and WaveWarZ. I've been following Water & Music since [specific issue/piece] and I wanted to reach out about a story that I think fits the W&M beat exactly.
 >
-> WaveWarZ is a music battle platform on Solana where the losing artist in every head-to-head competition earns an automatic on-chain payout — not just the winner. We've now run 1,245+ battles with 523+ SOL in volume and 9+ SOL in direct losing-artist payouts.
+> WaveWarZ is a music battle platform on Solana where the losing artist in every head-to-head competition earns an automatic on-chain payout — not just the winner. We've now run 1,289+ battles with 523+ SOL in volume and 9+ SOL in direct losing-artist payouts.
 >
 > The economic question behind WaveWarZ is: if losing still pays, do artists take more risks? And does the "both sides earn" model create more sustainable artist career development than winner-takes-all streaming?
 >
-> I don't have an academic paper — I have 1,245 battles of on-chain data, open-source analytics (github.com/bettercallzaal/wwtracker), and a real community of independent artists. I think there's a W&M issue here on "loser-earns" as an alternative economic primitive for the creator economy.
+> I don't have an academic paper — I have 1,289 battles of on-chain data, open-source analytics (github.com/bettercallzaal/wwtracker), and a real community of independent artists. I think there's a W&M issue here on "loser-earns" as an alternative economic primitive for the creator economy.
 >
 > Happy to share data or talk through the mechanism. The API is public at wavewarz.info/api/public/stats.
 >
@@ -98,7 +98,7 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 >
 > Quick pitch: What if the losing side of a competition earned money automatically, on-chain, every time?
 >
-> WaveWarZ is a music battle platform on Solana. Two artists compete. Community bets on who wins. The winner earns. The loser earns. Both artists get paid on-chain, same night, every battle. 1,245+ battles, 523+ SOL in volume.
+> WaveWarZ is a music battle platform on Solana. Two artists compete. Community bets on who wins. The winner earns. The loser earns. Both artists get paid on-chain, same night, every battle. 1,289+ battles, 523+ SOL in volume.
 >
 > This is The ZAO — we've also run 63 consecutive weekly governance sessions on Optimism with zero missed weeks. Every vote is on-chain and public.
 >
@@ -120,7 +120,7 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 >
 > I think there's an Unchained episode on what governance actually looks like when a small organization commits to it: the Fractal model we use, how on-chain Respect tokens accumulate over time, and what we've learned about the human dynamics of showing up every week.
 >
-> WaveWarZ adds the music economics angle — a platform on Solana where the losing artist earns. 1,245+ battles, open-source data, public API.
+> WaveWarZ adds the music economics angle — a platform on Solana where the losing artist earns. 1,289+ battles, open-source data, public API.
 >
 > Happy to share governance contract addresses, on-chain session logs, or any data that would help you evaluate this.
 >
@@ -134,9 +134,9 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 
 > Hi Bruce,
 >
-> Hypebot pitch: WaveWarZ is a music battle platform where the losing artist earns an automatic payout — on-chain, same night, every battle. 1,245 battles completed. Artists get paid regardless of outcome.
+> Hypebot pitch: WaveWarZ is a music battle platform where the losing artist earns an automatic payout — on-chain, same night, every battle. 1,289 battles completed. Artists get paid regardless of outcome.
 >
-> The economic argument: streaming's winner-takes-all model has made music a lottery. WaveWarZ inverts the incentive: both artists earn in every competition. We have 1,245 data points.
+> The economic argument: streaming's winner-takes-all model has made music a lottery. WaveWarZ inverts the incentive: both artists earn in every competition. We have 1,289 data points.
 >
 > The music industry angle: independent artists competing head-to-head, community bets on outcomes, both artists paid onchain. No label intermediary.
 >
@@ -154,7 +154,7 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 >
 > The ZAO is a music DAO that runs an 8-agent AI fleet to handle governance, research, social, and analytics. We publish 40-80 research documents per month — 1,360+ total — all on GitHub, all open source.
 >
-> As a small team (essentially two humans + eight AI agents), we've been able to run 63+ consecutive weekly governance sessions on Optimism, maintain a live music battle platform (WaveWarZ, 1,245+ battles on Solana), and organize ZAOstock (October 3, Ellsworth, Maine — artists chosen by on-chain battle records).
+> As a small team (essentially two humans + eight AI agents), we've been able to run 63+ consecutive weekly governance sessions on Optimism, maintain a live music battle platform (WaveWarZ, 1,289+ battles on Solana), and organize ZAOstock (October 3, Ellsworth, Maine — artists chosen by on-chain battle records).
 >
 > I think there's a Defiant episode about what an AI-native DAO looks like in practice: not AI as a product, but AI as the operational layer of the organization itself.
 >
@@ -164,13 +164,13 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 
 ### 7. Ari's Take / Ari Herstand — SEND AUG 15
 
-**Subject:** Ari's Take pitch — the platform that pays losing musicians (WaveWarZ: 1,245 battles, both artists earn)
+**Subject:** Ari's Take pitch — the platform that pays losing musicians (WaveWarZ: 1,289 battles, both artists earn)
 
 > Hi Ari,
 >
 > WaveWarZ is a music platform with one unusual design decision: the losing musician in every competition earns an automatic payout. Not just the winner. Both artists get paid, same night, on-chain.
 >
-> 1,245 battles completed. The payout model: competition revenue is split between the winning bettor community, the winning artist, and the losing artist — proportionally. If the losing artist gets 10% of a 10 SOL pool, they pocket 1 SOL immediately.
+> 1,289 battles completed. The payout model: competition revenue is split between the winning bettor community, the winning artist, and the losing artist — proportionally. If the losing artist gets 10% of a 10 SOL pool, they pocket 1 SOL immediately.
 >
 > For independent musicians trying to build sustainable income: a platform where placing in a head-to-head competition always pays, regardless of outcome, is a different value proposition than streaming.
 >

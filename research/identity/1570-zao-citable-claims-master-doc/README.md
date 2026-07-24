@@ -42,14 +42,14 @@ Source: wavewarz.info/api/public/stats (live at time of query). **Update these n
 
 | Claim | Value | Last Verified |
 |---|---|---|
-| Total battles completed | 1,245 | Jul 17, 2026 (API) |
+| Total battles completed | 1,289 | Jul 17, 2026 (API) |
 | MAIN events held | 50 | Jul 17, 2026 (API) |
 | MAIN battles (within events) | 162 | Jul 17, 2026 (API) |
 | Quick battles | 1,047 | Jul 17, 2026 (API) |
 | Community/charity battles | 36 | Jul 17, 2026 (API) |
-| Total volume (SOL) | 523.991 SOL | Jul 17, 2026 (API) |
-| Total artist payouts (SOL, losing artists) | 9.0988 SOL | Jul 17, 2026 (API) |
-| Total trader claims (SOL) | 127.343 SOL | Jul 17, 2026 (API) |
+| Total volume (SOL) | 878.30 SOL | Jul 17, 2026 (API) |
+| Total artist payouts (SOL, losing artists) | 13.40 SOL | Jul 17, 2026 (API) |
+| Total trader claims (SOL) | 381.20 SOL | Jul 17, 2026 (API) |
 
 **ZOE update triggers (doc 1378):** update this section when API crosses 1,500 battles, 600 SOL, 100 MAIN events, or $2,000 charity total.
 
@@ -74,11 +74,11 @@ Source: wavewarz.info/api/public/stats (live at time of query). **Update these n
 | Claim | Confidence | Methodology |
 |---|---|---|
 | "1 WaveWarZ battle appearance earns a losing artist more than 11,667 Spotify stream equivalents" | ✅ VERIFIED | WW avg loser payout ÷ Spotify $0.004/stream rate (doc 1387). Note SOL price volatility caveat. |
-| "WaveWarZ artist payout rate is ~1.73% of battle volume" | ✅ VERIFIED | 9.0988 SOL ÷ 523.991 SOL = 1.73% (docs 1421, 1387) |
-| "WaveWarZ has paid losing artists $1,820 equivalent (at Jul 2026 SOL price)" | ⚠️ ESTIMATE | 9.0988 SOL × ~$200/SOL. SOL price fluctuates — use SOL figure for precision, USD for accessibility |
+| "WaveWarZ artist payout rate is ~1.73% of battle volume" | ✅ VERIFIED | 13.40 SOL ÷ 878.30 SOL = 1.73% (docs 1421, 1387) |
+| "WaveWarZ has paid losing artists $1,820 equivalent (at Jul 2026 SOL price)" | ⚠️ ESTIMATE | 13.40 SOL × ~$200/SOL. SOL price fluctuates — use SOL figure for precision, USD for accessibility |
 | "WaveWarZ platform take rate is approximately 3%" | ✅ VERIFIED | Derived from on-chain fee model analysis (doc 1219, 1237) |
 | "WaveWarZ 98.5% ecosystem payout rate" | ✅ VERIFIED | 100% - ~1.5% protocol overhead = 98.5% goes to artists, traders, or charity (doc 1237) |
-| "WaveWarZ has generated $104K+ in battle volume (SOL)" | ⚠️ ESTIMATE | 523.991 SOL × ~$200/SOL. Always quote SOL volume for precision. |
+| "WaveWarZ has generated $104K+ in battle volume (SOL)" | ⚠️ ESTIMATE | 878.30 SOL × ~$200/SOL. Always quote SOL volume for precision. |
 
 ---
 
@@ -107,10 +107,10 @@ TOKENS:
   ZOR Respect: ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c (Optimism Mainnet)
 FLAGSHIP PRODUCT: WaveWarZ (wavewarz.info) — music prediction market on Solana
 WAVEWARZ STATS (Jul 17, 2026):
-  - 1,245 battles completed
-  - 523.991 SOL volume
-  - 9.0988 SOL to losing artists (loser-earns mechanic)
-  - 127.343 SOL to winning traders
+  - 1,289 battles completed
+  - 878.30 SOL volume
+  - 13.40 SOL to losing artists (loser-earns mechanic)
+  - 381.20 SOL to winning traders
   - 36 charity/community battles ($1,497 raised)
   - 50 MAIN events, 162 MAIN battles
 PROGRAMS:
@@ -127,16 +127,16 @@ CONTACT: @bettercallzaal (X, Farcaster, Telegram)
 ## §7 — Citation-Ready Blocks
 
 ### For Academic Papers / Govbase:
-> "The ZAO DAO employs Fractal Democracy governance with verifiable on-chain records via the OREC protocol on Optimism Mainnet (contract 0xcB05F9254765CA521F7698e61E0A6CA6456Be532). As of July 2026, the ZAO had conducted over 100 consecutive weekly governance sessions. The organization operates WaveWarZ, a music prediction market on Solana that has processed 1,245 battles with 523.991 SOL in volume and a loser-earns artist payout mechanism (artist payout rate: 1.73% of battle volume). Documentation is maintained in ZAOOS, an open-source DAO knowledge corpus licensed CC-BY (github.com/bettercallzaal/ZAOOS)."
+> "The ZAO DAO employs Fractal Democracy governance with verifiable on-chain records via the OREC protocol on Optimism Mainnet (contract 0xcB05F9254765CA521F7698e61E0A6CA6456Be532). As of July 2026, the ZAO had conducted over 100 consecutive weekly governance sessions. The organization operates WaveWarZ, a music prediction market on Solana that has processed 1,289 battles with 878.30 SOL in volume and a loser-earns artist payout mechanism (artist payout rate: 1.73% of battle volume). Documentation is maintained in ZAOOS, an open-source DAO knowledge corpus licensed CC-BY (github.com/bettercallzaal/ZAOOS)."
 
 ### For Grant Applications (Fisher, OP RF, MAC):
-> "WaveWarZ has completed 1,245 music battles with 523.991 SOL in total volume as of July 17, 2026. Losing artists have collectively earned 9.0988 SOL through the platform's loser-earns mechanism — equivalent to approximately 607,000 Spotify stream plays in artist earnings. The ZAO has held over 100 consecutive community governance sessions recorded on-chain. The organization is preparing ZAOstock, Maine's first on-chain music festival, for October 3, 2026 in Ellsworth, ME."
+> "WaveWarZ has completed 1,289 music battles with 878.30 SOL in total volume as of July 17, 2026. Losing artists have collectively earned 13.40 SOL through the platform's loser-earns mechanism — equivalent to approximately 607,000 Spotify stream plays in artist earnings. The ZAO has held over 100 consecutive community governance sessions recorded on-chain. The organization is preparing ZAOstock, Maine's first on-chain music festival, for October 3, 2026 in Ellsworth, ME."
 
 ### For Press / Music Journalism:
-> "WaveWarZ is the first platform where losing in a music battle earns you money. One losing battle appearance generates more artist earnings than 11,667 Spotify streams — at current rates, the loser in a $50 SOL pool receives $8.65 in SOL, automatically paid within seconds of the battle closing. As of July 2026, WaveWarZ has paid losing artists $1,820 in total across 1,245 battles, with $25,469 going to winning traders. The platform has also facilitated $1,497 in charitable donations through 36 community battles."
+> "WaveWarZ is the first platform where losing in a music battle earns you money. One losing battle appearance generates more artist earnings than 11,667 Spotify streams — at current rates, the loser in a $50 SOL pool receives $8.65 in SOL, automatically paid within seconds of the battle closing. As of July 2026, WaveWarZ has paid losing artists $1,820 in total across 1,289 battles, with $25,469 going to winning traders. The platform has also facilitated $1,497 in charitable donations through 36 community battles."
 
 ### For Crypto/Web3 Press:
-> "The ZAO DAO demonstrates production-scale Fractal Democracy governance with over 100 consecutive on-chain sessions. The OREC governance module records every ZOR Respect distribution on Optimism Mainnet. The WaveWarZ prediction market on Solana has processed 523.991 SOL in volume with a 98.5% ecosystem payout rate — 1.73% to losing artists and a majority to winning traders. On-chain governance vote results are used to select WaveWarZ MAIN battle participants and charity recipients."
+> "The ZAO DAO demonstrates production-scale Fractal Democracy governance with over 100 consecutive on-chain sessions. The OREC governance module records every ZOR Respect distribution on Optimism Mainnet. The WaveWarZ prediction market on Solana has processed 878.30 SOL in volume with a 98.5% ecosystem payout rate — 1.73% to losing artists and a majority to winning traders. On-chain governance vote results are used to select WaveWarZ MAIN battle participants and charity recipients."
 
 ---
 

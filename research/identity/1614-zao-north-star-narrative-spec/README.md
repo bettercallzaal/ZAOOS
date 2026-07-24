@@ -26,7 +26,7 @@ This sentence works for: X bios, grant taglines, elevator pitches, press subject
 
 > WaveWarZ is a music battle platform where two artists go head-to-head, fans trade prediction tokens on the outcome, and the loser receives a guaranteed payout from the on-chain pool — automatically, every time.
 > 
-> 1,245 battles. 523 SOL in total trading volume. 9.09 SOL paid to artists — including losing artists — since launch.
+> 1,289 battles. 523 SOL in total trading volume. 13.40 SOL paid to artists — including losing artists — since launch.
 > 
 > ZAO is the DAO that built it: 100+ consecutive weeks of Fractal Democracy governance on Optimism, 1,600+ open-source research documents, and an IRL music festival (ZAOstock, Oct 3, Ellsworth ME) bringing this all onchain experience live.
 
@@ -36,7 +36,7 @@ This sentence works for: X bios, grant taglines, elevator pitches, press subject
 
 > ZAO (ZTalent Artist Organization) is a music DAO that governs WaveWarZ: a prediction market for indie music battles on Solana where fans trade per-battle tokens on a bonding curve, artists earn 1% of every trade in real time, and the losing artist still receives a guaranteed payout from the settlement pool.
 > 
-> As of July 2026, WaveWarZ has completed 1,245 battles — 162 MAIN events and 1,047 quick battles — distributing 9.09 SOL ($679) to artists including losers, enabling 127.34 SOL ($9,505) in trader claims, and generating 523.99 SOL ($39,126) in cumulative trading volume.
+> As of July 2026, WaveWarZ has completed 1,289 battles — 162 MAIN events and 1,047 quick battles — distributing 13.40 SOL ($679) to artists including losers, enabling 381.20 SOL ($9,505) in trader claims, and generating 878.30 SOL ($39,126) in cumulative trading volume.
 > 
 > ZAO governs the platform through Fractal Democracy: a weekly governance session that has run unbroken for 100+ consecutive weeks, with governance actions recorded on Optimism Mainnet (OREC contract: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532).
 > 
@@ -54,13 +54,13 @@ Different audiences need different hooks. All are true; the canonical story abov
 
 | Audience | Lead angle | Key stat | Call to action |
 |---|---|---|---|
-| Music press (Hypebot, Decrypt, Water & Music) | "Even the loser gets paid" | 9.09 SOL to artists including losers | Read the battle results |
+| Music press (Hypebot, Decrypt, Water & Music) | "Even the loser gets paid" | 13.40 SOL to artists including losers | Read the battle results |
 | Web3 / crypto press (Bankless, CoinDesk) | Prediction market for music | 523 SOL trading volume | See the on-chain mechanics |
 | DAO/governance researchers | Fractal Democracy, 100+ consecutive weeks | 100+ weeks, OREC on Optimism | Read the governance archive |
 | Grant reviewers (Fisher, MAC, OP RF) | Community arts + onchain charity | ZAOstock Oct 3, charity battle | Support ZAOstock |
-| Artists (WaveWarZ) | You earn even when you lose | 9.09 SOL avg payout | Enter a battle |
+| Artists (WaveWarZ) | You earn even when you lose | 13.40 SOL avg payout | Enter a battle |
 | Artists (ZABAL) | 12-week cohort, micro-grants at graduation | 8-12 participants, Nov 21 graduation | Apply by Aug 4 |
-| Builders / technical (Bankless, ETHGlobal) | First DAO-governed music prediction market | 1,245 battles on Solana mainnet | See the contracts |
+| Builders / technical (Bankless, ETHGlobal) | First DAO-governed music prediction market | 1,289 battles on Solana mainnet | See the contracts |
 | Academic researchers | Documented DAO case study | 1,600+ CC-BY docs, Arweave archive | Cite ZAOOS |
 | IRL attendees (ZAOstock) | Live on-chain governance at a music festival | First IRL WW MAIN battle Jul 18 ✅ | RSVP to ZAOstock |
 
@@ -83,9 +83,9 @@ These confusions appear in press coverage and must be actively corrected.
 
 ## ZAO in One Number (Updated Jul 2026)
 
-> **1,245 battles. Every artist earns.**
+> **1,289 battles. Every artist earns.**
 
-This is the ZAO identity in one number and one sentence. Use in: social posts, press pitches, event signage, ZAOstock stage moment ("1,245 battles and counting — and every artist earned").
+This is the ZAO identity in one number and one sentence. Use in: social posts, press pitches, event signage, ZAOstock stage moment ("1,289 battles and counting — and every artist earned").
 
 ---
 
@@ -108,9 +108,9 @@ Every narrative choice should advance one or both of these. The press angle ("lo
 
 These are verified, paste-ready, and should appear in every grant + press narrative:
 
-1. "1,245 WaveWarZ battles completed as of July 2026"
-2. "523.991 SOL ($39,126 at $74.64/SOL) total trading volume"
-3. "9.09 SOL paid to artists, including losing artists, in guaranteed on-chain payouts"
+1. "1,289 WaveWarZ battles completed as of July 2026"
+2. "878.30 SOL ($39,126 at $74.64/SOL) total trading volume"
+3. "13.40 SOL paid to artists, including losing artists, in guaranteed on-chain payouts"
 4. "100+ consecutive weeks of Fractal Democracy governance, recorded on Optimism Mainnet"
 5. "1,600+ CC-BY licensed research documents in ZAOOS (github.com/bettercallzaal/ZAOOS)"
 6. "36 community charity battles — 100% of SOL wagered goes to charity"

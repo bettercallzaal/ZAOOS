@@ -46,10 +46,10 @@ Choose the right version by context:
 ### 2. Two Sentences (~50 words)
 
 **Music-first:**
-> Zaal Panthaki is co-founder of ZAO, a decentralized autonomous organization that has run 1,245+ music battles on its WaveWarZ platform — where the losing artist earns from platform trading fees. ZAO has held 64 consecutive weekly governance sessions and is producing ZAOstock, a free live music festival in Ellsworth, Maine on October 3, 2026.
+> Zaal Panthaki is co-founder of ZAO, a decentralized autonomous organization that has run 1,289+ music battles on its WaveWarZ platform — where the losing artist earns from platform trading fees. ZAO has held 64 consecutive weekly governance sessions and is producing ZAOstock, a free live music festival in Ellsworth, Maine on October 3, 2026.
 
 **Crypto-first:**
-> Zaal Panthaki co-founded ZAO, a music DAO with three smart contracts on Optimism Mainnet and 64 unbroken weeks of fractal governance — one of the longest streaks in the ecosystem. His platform WaveWarZ has completed 1,245 battles on Solana, paying both winning and losing artists from trading activity.
+> Zaal Panthaki co-founded ZAO, a music DAO with three smart contracts on Optimism Mainnet and 64 unbroken weeks of fractal governance — one of the longest streaks in the ecosystem. His platform WaveWarZ has completed 1,289 battles on Solana, paying both winning and losing artists from trading activity.
 
 **Use for:** Podcast show notes, pitch email signature, panel bio.
 
@@ -67,7 +67,7 @@ Choose the right version by context:
 ### 4. 100-Word Bio
 
 **Grant / organization-first (Fisher, MAC, OP RF):**
-> Zaal Panthaki is co-founder and lead organizer of ZAO (The DAO), a music-first decentralized autonomous organization based in the United States. ZAO operates WaveWarZ, a music battle prediction market on Solana that has completed 1,245 battles and distributed 9.1 SOL directly to artists — including losing artists, who earn a structural share of trading fees. ZAO has maintained 64 consecutive weekly governance sessions on Optimism Mainnet, using three live smart contracts to govern community decisions. ZAO is producing ZAOstock, a free community music festival in Ellsworth, Maine on October 3, 2026, where a live WaveWarZ battle will happen from the main stage.
+> Zaal Panthaki is co-founder and lead organizer of ZAO (The DAO), a music-first decentralized autonomous organization based in the United States. ZAO operates WaveWarZ, a music battle prediction market on Solana that has completed 1,289 battles and distributed 9.1 SOL directly to artists — including losing artists, who earn a structural share of trading fees. ZAO has maintained 64 consecutive weekly governance sessions on Optimism Mainnet, using three live smart contracts to govern community decisions. ZAO is producing ZAOstock, a free community music festival in Ellsworth, Maine on October 3, 2026, where a live WaveWarZ battle will happen from the main stage.
 
 **Use for:** Grant applications, fellowship applications, formal speaker bios.
 
@@ -103,7 +103,7 @@ Choose the right version by context:
 
 ### 7. Farcaster Bio (≤ 320 characters)
 
-> co-founder of ZAO (@wavewarz) — the DAO that makes losing artists earn. WaveWarZ: 1,245 battles, 524 SOL volume on Solana. 64 weekly governance sessions on Optimism. ZAOstock Oct 3 in Ellsworth, Maine 🎵
+> co-founder of ZAO (@wavewarz) — the DAO that makes losing artists earn. WaveWarZ: 1,289 battles, 878.30 SOL volume on Solana. 64 weekly governance sessions on Optimism. ZAOstock Oct 3 in Ellsworth, Maine 🎵
 
 **Use for:** @bettercallzaal Farcaster profile.
 
@@ -118,9 +118,9 @@ All bios reference live stats. Update this doc when:
 
 **Current stats (verify before citing):**
 - Governance sessions: 64 consecutive weeks
-- WaveWarZ battles: 1,245
-- SOL volume: 523.991 SOL
-- Artist payouts: 9.0988 SOL
+- WaveWarZ battles: 1,289
+- SOL volume: 878.30 SOL
+- Artist payouts: 13.40 SOL
 
 ---
 

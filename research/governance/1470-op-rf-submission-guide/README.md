@@ -69,7 +69,7 @@ on-chain governance streaks of any DAO in the ecosystem.
 WaveWarZ, ZAO's flagship product, is a music prediction market on Solana where the losing 
 artist earns a structural share of platform trading fees. As of July 2026: 1,289 battles, 
 878.30 SOL in trading volume, 13.40 SOL in direct artist payouts (including to losers), 
-and 127.343 SOL returned to traders. This is documented public data from a live, functioning 
+and 381.20 SOL returned to traders. This is documented public data from a live, functioning 
 platform — not a whitepaper or prototype.
 
 ZAO's governance architecture uses three contracts on Optimism Mainnet:

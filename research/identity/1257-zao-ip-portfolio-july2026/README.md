@@ -25,7 +25,7 @@ The ZAO is a decentralized impact network for independent music artists, founded
 | Fact | Value | Source |
 |------|-------|--------|
 | Total battles | 1,108+ (public feed) | doc 1252 |
-| Total SOL volume | 524.15 ◎ (~$64,800 at $75.29/SOL) | doc 1077 |
+| Total SOL volume | 878.30 ◎ (~$64,800 at $75.29/SOL) | doc 1077 |
 | Unique songs battled | 921 | doc 1214 |
 | Artists with tagged handles | 34 Audius-rostered | doc 1214 |
 | Charity raised | $1,497 across 2 benefit-battle rounds | doc 1077 |
@@ -204,6 +204,6 @@ Use these for citation in any external document. All verified July 24, 2026.
 
 1. **No-signer guarantee on ZOL**: ZOL never moves funds autonomously — every trade triggers a Zaal-confirmation step (Telegram → approve/reject). The agent helps but does not act unilaterally.
 2. **Contribution-tracked, not token-weighted**: Respect is earned by peer ranking in weekly Fractals, not by buying a token. This is the core ZAO governance innovation.
-3. **Artist-first economics**: WaveWarZ's ~98.5% ecosystem payout rate vs. Spotify's ~12% royalty. The ~1.73% direct-to-artist instant payout (13.40 ◎ on 524.15 ◎ volume) is verified onchain.
+3. **Artist-first economics**: WaveWarZ's ~98.5% ecosystem payout rate vs. Spotify's ~12% royalty. The ~1.73% direct-to-artist instant payout (13.40 ◎ on 878.30 ◎ volume) is verified onchain.
 4. **100+ weeks of unbroken governance**: No other documented music-focused DAO has maintained this streak continuously.
 5. **Onchain archive for every concert**: Every COC Concertz fan gallery upload is permanently archived to Arweave with UDL licenses — unlike any other virtual concert series.

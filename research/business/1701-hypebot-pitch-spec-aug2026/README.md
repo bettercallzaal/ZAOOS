@@ -107,7 +107,7 @@ Quick stat summary:
 - 1,289 battles settled
 - 878.30 SOL volume (~$64.8K)
 - 13.40 SOL ($1,820) to losing artists
-- 127.343 SOL ($25,469) to winning traders
+- 381.20 SOL ($28,155) to winning traders
 - Both artists earn in every battle, automatically
 
 Let me know if you'd like artist quotes, a video demo, or to speak live.

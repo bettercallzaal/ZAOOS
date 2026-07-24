@@ -168,7 +168,7 @@ Gitcoin runs periodic matching-fund rounds for open-source projects and public g
 > The ZAO (ZTalent Artist Organization) is a decentralized music organization running at the intersection of Web3 governance, AI operations, and independent music. We have maintained 63+ consecutive weeks of on-chain Fractal governance sessions, deployed governance contracts on Optimism Mainnet (OG ERC-20: `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`), and built WaveWarZ — the only music battle platform on Solana where the losing song still earns.
 >
 > **What we've built (public, open-source):**
-> - WaveWarZ: 1,289+ battles, 878.30 SOL volume, 13.40 SOL in artist payouts, 127.343 SOL in community trader claims. wavewarz.info (free public API, no auth)
+> - WaveWarZ: 1,289+ battles, 878.30 SOL volume, 13.40 SOL in artist payouts, 381.20 SOL in community trader claims. wavewarz.info (free public API, no auth)
 > - ZAOOS: 1,300+ public research documents on music, governance, and onchain economics. github.com/bettercallzaal/ZAOOS (MIT license)
 > - wwtracker: Open-source battle analytics dashboard. github.com/bettercallzaal/wwtracker (MIT license)
 > - COC Concertz: Virtual concert series with Arweave-permanent archives

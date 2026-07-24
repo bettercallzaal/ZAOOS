@@ -94,7 +94,7 @@ Spotify pays $0.004 per stream.
 WaveWarZ pays artists 1.73% of every SOL bet on them.
 Instantly. Onchain. Even when they lose.
 
-9.07 ◎ paid to artists since launch.
+13.40 ◎ paid to artists since launch.
 That's 600× Spotify's rate per unit.
 
 → wavewarz.info/api/public/stats

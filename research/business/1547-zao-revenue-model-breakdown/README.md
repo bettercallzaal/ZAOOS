@@ -20,7 +20,7 @@ WaveWarZ operates a prediction market: listeners bet SOL on which artist wins a 
 - Total volume: 878.30 SOL across 1,289 battles
 - Artist payouts to losers: 13.40 SOL
 - Trader claims (winning bettors): 381.20 SOL
-- **Implied platform revenue:** 523.991 − 9.0988 − 127.343 − [winner artist payouts] = remainder goes to platform
+- **Implied platform revenue:** 878.30 − 13.3869 − 381.197 − [winner artist payouts] = remainder goes to platform
 
 **Why this matters for grants:**
 > "WaveWarZ is a self-sustaining platform with on-chain revenue. ZAO does not rely solely on grant funding."

@@ -71,7 +71,7 @@ Before anything else — you're about to see something you've never seen before.
 Two artists are going to battle. You're going to vote on your phone. 
 And whoever loses — gets paid. Right now. On-chain. From this stage.
 
-We've done this 1,245 times online. Tonight, you're the audience.
+We've done this 1,289 times online. Tonight, you're the audience.
 
 Let's start with the music."
 ```

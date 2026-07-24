@@ -57,7 +57,7 @@ As of September 1, [X] tickets have been claimed.
 
 **About The ZAO**
 
-The ZAO is a Respect-based decentralized autonomous organization that governs WaveWarZ, a music battle prediction market on the Solana blockchain. WaveWarZ uses a "loser-earns" mechanism in which the losing artist in every battle receives a share of the prediction market pool — a structural alternative to streaming royalties. As of [MONTH] 2026, WaveWarZ has facilitated over 1,245 music battles with 524 SOL (~$104,000) in trading volume, including $1,820 paid to losing artists.
+The ZAO is a Respect-based decentralized autonomous organization that governs WaveWarZ, a music battle prediction market on the Solana blockchain. WaveWarZ uses a "loser-earns" mechanism in which the losing artist in every battle receives a share of the prediction market pool — a structural alternative to streaming royalties. As of [MONTH] 2026, WaveWarZ has facilitated over 1,289 music battles with 878 SOL (~$104,000) in trading volume, including $1,820 paid to losing artists.
 
 ZAO governance operates on the Optimism blockchain using the Optimism Fractal model. More information is available at github.com/ZAOIP/zao-os (CC-BY licensed).
 

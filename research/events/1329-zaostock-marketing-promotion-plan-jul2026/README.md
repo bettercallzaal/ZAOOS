@@ -2,7 +2,7 @@
 topic: events/marketing
 type: PLAN
 status: actionable
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1285, 1291, 1296, 1321, 1325, 1326, 1328
 owner: Zaal
@@ -155,7 +155,7 @@ ZAO, a musician-led decentralized autonomous organization, announces ZAOstock â€
 a one-day music festival at [VENUE], Ellsworth, ME on October 3, 2026.
 
 ZAOstock features 8 artists selected by community-governed onchain battle history 
-on WaveWarZ, a music prediction market with 1,245 documented battles and $1,497 
+on WaveWarZ, a music prediction market with 1,289 documented battles and $1,497 
 raised for charity. All artists have earned their place through performance â€” not 
 industry connections.
 
@@ -222,4 +222,4 @@ Target: 200+ attendees + 1 Maine press mention + 1 podcast episode before show =
 
 ---
 
-*Created: 2026-07-17 | Cross-refs: doc 1285 (permit), 1291 (ZABAL/lineup), 1296 (press kit), 1321 (artist booking), 1325 (Q3 calendar), 1326 (ticketing), 1328 (podcast pitch)*
+*Created: 2026-07-24 | Cross-refs: doc 1285 (permit), 1291 (ZABAL/lineup), 1296 (press kit), 1321 (artist booking), 1325 (Q3 calendar), 1326 (ticketing), 1328 (podcast pitch)*

@@ -48,11 +48,11 @@ ZOR holders use OREC to vote on community WaveWarZ battles, ZABAL grant recipien
 
 **On-chain verification:**
 - Solana Mainnet battle contracts: automatic payout txns on every battle close
-- 9.0988 SOL ($1,820 equivalent) distributed to losing artists across 1,245 battles
+- 13.40 SOL ($1,820 equivalent) distributed to losing artists across 1,289 battles
 - Public API: `wavewarz.info/api/public/stats` (live, no auth required)
 
 **Paste-ready citation:**
-> "WaveWarZ has completed 1,245 battles with 523.991 SOL in total volume. Losing artists automatically receive 10% of each battle pool — 9.0988 SOL distributed to losing artists as of Jul 2026, with no claiming required. API: wavewarz.info/api/public/stats"
+> "WaveWarZ has completed 1,289 battles with 878.30 SOL in total volume. Losing artists automatically receive 10% of each battle pool — 13.40 SOL distributed to losing artists as of Jul 2026, with no claiming required. API: wavewarz.info/api/public/stats"
 
 **ZAOOS source:** doc 1433 (H1 2026 Platform Growth Summary)
 
@@ -187,8 +187,8 @@ On-chain proof (Optimism Mainnet):
 • OREC (governance): 0xcB05F9254765CA521F7698e61E0A6CA6456Be532
 
 Results (as of Jul 2026):
-• 1,245 battles, 523.991 SOL volume ($104K)
-• 9.09 SOL to losing artists (automatic, no claiming required)
+• 1,289 battles, 878.30 SOL volume ($64.8K)
+• 13.40 SOL to losing artists (automatic, no claiming required)
 • 36 community battles with charity payouts voted by ZOR holders
 • 1,500+ governance documents in ZAOOS (CC-BY 4.0, github.com/bettercallzaal/ZAOOS)
 • Registered with DAOstar under EIP-4824

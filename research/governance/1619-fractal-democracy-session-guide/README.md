@@ -155,7 +155,7 @@ As of July 2026, ZAO has run Fractal Democracy sessions weekly with zero quorum 
 
 The governance track record is ZAO's primary OP RF evidence block. Paste-ready:
 
-> ZAO is an Optimism-native DAO that has run Fractal Democracy governance sessions weekly for 100+ consecutive weeks. Governance decisions are executed via OREC (0xcB05F9254765CA521F7698e61E0A6CA6456Be532) on Optimism Mainnet. ZOR token governance (ERC-1155, 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c) determines MAIN battle artist selection and charity partner selection for WaveWarZ, a live music battle prediction market that has completed 1,245 battles and distributed 9.09 SOL to artists. ZAO documents 1,600+ CC-BY research documents in ZAOOS (github.com/bettercallzaal/ZAOOS), archived permanently on Arweave, making ZAO one of the most thoroughly documented onchain communities building on Optimism.
+> ZAO is an Optimism-native DAO that has run Fractal Democracy governance sessions weekly for 100+ consecutive weeks. Governance decisions are executed via OREC (0xcB05F9254765CA521F7698e61E0A6CA6456Be532) on Optimism Mainnet. ZOR token governance (ERC-1155, 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c) determines MAIN battle artist selection and charity partner selection for WaveWarZ, a live music battle prediction market that has completed 1,289 battles and distributed 13.40 SOL to artists. ZAO documents 1,600+ CC-BY research documents in ZAOOS (github.com/bettercallzaal/ZAOOS), archived permanently on Arweave, making ZAO one of the most thoroughly documented onchain communities building on Optimism.
 
 ---
 

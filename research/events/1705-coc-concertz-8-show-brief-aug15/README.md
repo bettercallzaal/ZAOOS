@@ -15,7 +15,7 @@
 - COC #7: July 18, 2026 (just ran — result available from Zaal for follow-up posts)
 - COC #8: **August 15, 2026**
 
-**Volume context (total as of Jul 2026):** 50 MAIN events total, 162 MAIN battles. COC shows are the primary driver of MAIN event volume.
+**Volume context (total as of Jul 2026):** 50 MAIN events total, 165 MAIN battles. COC shows are the primary driver of MAIN event volume.
 
 ---
 

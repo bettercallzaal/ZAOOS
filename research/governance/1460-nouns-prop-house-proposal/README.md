@@ -78,7 +78,7 @@ All grant recipients will be documented in the ZAO OS (CC-BY, permanent public r
 
 **About Zaal**
 
-Zaal Panthaki is the co-founder of The ZAO and WaveWarZ. He has run 63 consecutive weekly governance sessions and built a 1,245-battle music platform. He is the primary ZABAL S2 facilitator. @bettercallzaal on X and Farcaster.
+Zaal Panthaki is the co-founder of The ZAO and WaveWarZ. He has run 63 consecutive weekly governance sessions and built a 1,289-battle music platform. He is the primary ZABAL S2 facilitator. @bettercallzaal on X and Farcaster.
 ```
 
 ### Requested Amount

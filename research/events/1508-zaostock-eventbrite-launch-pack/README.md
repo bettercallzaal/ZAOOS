@@ -72,7 +72,7 @@ WHAT HAPPENS AT ZAOSTOCK:
 • WaveWarZ live battle: two artists face off, crowd votes in real time, winner earns SOL onchain
 
 THE ZAOSTOCK STORY:
-ZAOstock is presented by ZAO — a decentralized autonomous organization that has run 64+ consecutive weekly governance sessions without missing a single week since 2024. ZAO governs the WaveWarZ music battle platform, where artists have battled in 1,245 on-chain battles, generating $524 SOL in volume with every losing artist still earning a payout.
+ZAOstock is presented by ZAO — a decentralized autonomous organization that has run 64+ consecutive weekly governance sessions without missing a single week since 2024. ZAO governs the WaveWarZ music battle platform, where artists have battled in 1,289 on-chain battles, generating $878 SOL in volume with every losing artist still earning a payout.
 
 ZAOstock brings the DAO to the people — a live experiment in participatory governance, where the audience IS the vote.
 

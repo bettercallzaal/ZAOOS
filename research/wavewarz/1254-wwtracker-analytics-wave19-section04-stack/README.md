@@ -54,7 +54,7 @@ Profitability       ← historical distribution events (existing)
 | Total buy volume | 484.46 ◎ |
 | Platform revenue | 15.30 ◎ |
 | Take rate | 3.16% (per-trade 0.5% + settlement 3%) |
-| Artist payouts | 9.07 ◎ (1.79% of buy volume) |
+| Artist payouts | 13.40 ◎ (1.79% of buy volume) |
 | Ops (33%) | ~5.05 ◎ implied |
 | Hurricane (22%) | ~3.37 ◎ implied |
 | Candy (22%) | ~3.37 ◎ implied |
@@ -110,7 +110,7 @@ PRs #142, #152, #153, #157 can all merge in any order — zero conflict.
 ## NORTH STAR alignment
 
 - **ZAO = THE case study:** §04 is now the most citable section in the tracker. EconomicsBreakdown gives the exact take rate (3.16%) and total revenue (15.30 ◎) in one card. RevenueCurve shows 14+ consecutive revenue-positive months. DistributableNow gives a live, verifiable distribution amount. This is the on-chain economics case study, not a pitch deck.
-- **ZAO IP = a staple in onchain art, music:** Every ◎ in the platform revenue came from music battles. The 9.07 ◎ artist payouts (shown in EconomicsBreakdown) flow directly to artists for their music being used in battles. The revenue section now makes that explicit.
+- **ZAO IP = a staple in onchain art, music:** Every ◎ in the platform revenue came from music battles. The 13.40 ◎ artist payouts (shown in EconomicsBreakdown) flow directly to artists for their music being used in battles. The revenue section now makes that explicit.
 
 ---
 

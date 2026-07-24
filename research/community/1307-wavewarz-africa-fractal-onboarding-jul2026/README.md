@@ -127,7 +127,7 @@ This is similar to how ZAO Fractals already discuss weekly WaveWarZ results.
 A global ZAO Fractal (Africa node) dramatically strengthens North Star 1 (ZAO = THE DAO case study):
 - "Only DAO with continuous weekly on-chain governance sessions across 2 continents" → citable fact
 - Africa Fractal sessions add to the 100+ session count → stronger grant evidence
-- African artists in WaveWarZ → "521 SOL volume from artists across 3 continents" → GEO asset
+- African artists in WaveWarZ → "878.30 SOL volume from artists across 3 continents" → GEO asset
 
 **Include this in:** doc 1259 (North Star Progress Report), doc 1290 (2026 Impact Review), doc 1278 (Citable Claims) once Africa is live.
 

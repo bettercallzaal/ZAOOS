@@ -32,7 +32,7 @@ Welcome listeners. Set the stage.
 **Script template:**
 > "Welcome to WaveWarZ Battle Space — I'm [Zaal / guest host]. It's [Day], [Date]. Tonight we're covering [# of battles] active battles and [# of total battles]-plus battles in the history books. Let's get into it."
 
-Name-drop 2-3 current live battles from the active battle feed. State the volume ticker (e.g., "524 SOL lifetime volume — up from [yesterday's number]").
+Name-drop 2-3 current live battles from the active battle feed. State the volume ticker (e.g., "878 SOL lifetime volume — up from [yesterday's number]").
 
 ---
 

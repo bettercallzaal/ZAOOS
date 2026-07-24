@@ -15,7 +15,7 @@ A concrete battle-protocol proposal for using WaveWarZ as the competitive engine
 
 ## The Core Opportunity
 
-WaveWarZ has 1,108 battles, 524 SOL volume, and a proven community engagement loop: battles → votes → winner advances → more battles. ZABAL Games has 9+ builder projects building tools for the ZAO ecosystem. The final month bridges both: **builders battle each other live on WaveWarZ**, the community votes onchain, and the results feed directly into the final ZABAL Games scoring.
+WaveWarZ has 1,289 battles, 878 SOL volume, and a proven community engagement loop: battles → votes → winner advances → more battles. ZABAL Games has 9+ builder projects building tools for the ZAO ecosystem. The final month bridges both: **builders battle each other live on WaveWarZ**, the community votes onchain, and the results feed directly into the final ZABAL Games scoring.
 
 Key mechanic: in WaveWarZ, every battle is a head-to-head vote between two "songs" (in this case: two builder demos or pitches). The existing community — 27 tagged artist handles, daily active traders — becomes the voter base for ZABAL builder competition.
 
@@ -93,7 +93,7 @@ Key mechanic: in WaveWarZ, every battle is a head-to-head vote between two "song
 
 ## Citable Facts (for pitching this format)
 
-1. WaveWarZ has run 1,108 battles since May 2025 with 524 SOL (~$39k) in total volume — the community knows how to vote.
+1. WaveWarZ has run 1,289 battles since May 2025 with 878 SOL (~$64.8K) in total volume — the community knows how to vote.
 2. MAIN event battles (the 3.6% premium slot) drive 70% of all WaveWarZ volume — placing builder battles here maximizes visibility.
 3. WaveWarZ `COMMUNITY` benefit battles have raised $1,497 for charity — the collab track (Track B) uses the same proven format.
 4. The existing daily battle cadence (Mon–Fri 8:30 PM EST) means builder battles can slot into an established audience without new scheduling.

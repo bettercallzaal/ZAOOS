@@ -25,12 +25,12 @@ The ZAO is a decentralized impact network for independent music artists, founded
 | Fact | Value | Source |
 |------|-------|--------|
 | Total battles | 1,108+ (public feed) | doc 1252 |
-| Total SOL volume | 524.15 ◎ (~$39,453 at $75.29/SOL) | doc 1077 |
+| Total SOL volume | 524.15 ◎ (~$64,800 at $75.29/SOL) | doc 1077 |
 | Unique songs battled | 921 | doc 1214 |
 | Artists with tagged handles | 34 Audius-rostered | doc 1214 |
 | Charity raised | $1,497 across 2 benefit-battle rounds | doc 1077 |
 | Platform take rate | ~3.3% (Jul 2026) | wavewarz.info/api/public/stats |
-| Artist payouts | ~1.73% of volume (9.07 ◎ total) | doc 1211 + live API |
+| Artist payouts | ~1.53% of volume (13.40 ◎ total) | doc 1211 + live API |
 | Top rival pair | GodclouD 8-0 all-time | doc 1214 |
 | Live cadence | Mon–Fri 8:30 PM EST quick-battle X Space + YouTube | doc 1223 |
 | Launch date | May 2025 | doc 1252 |
@@ -186,10 +186,10 @@ Use these for citation in any external document. All verified July 24, 2026.
 | Claim | Number | Source |
 |-------|--------|--------|
 | Weekly governance streak | 100+ consecutive Fractal weeks | doc 1254 |
-| WaveWarZ on-chain volume | 878 SOL (~$39,453) | doc 1077 |
+| WaveWarZ on-chain volume | 878 SOL (~$64,800) | doc 1077 |
 | WaveWarZ battles completed | 1,108+ | doc 1252 |
 | WaveWarZ unique songs | 921 | doc 1214 |
-| WaveWarZ artist payout rate | ~1.73% of volume (9.07 ◎; ecosystem: ~98.5%) | live API + doc 1237 |
+| WaveWarZ artist payout rate | ~1.53% of volume (13.40 ◎; ecosystem: ~98.5%) | live API + doc 1237 |
 | Charity raised via WaveWarZ | $1,497 (2 benefit-battle rounds) | doc 1077 |
 | COC Concertz shows | 7 (Mar 2025 – Jul 2026) | doc 1256 |
 | COC Concertz monthly cadence | 5 consecutive months (Mar–Jul 2026) | doc 1256 |
@@ -204,6 +204,6 @@ Use these for citation in any external document. All verified July 24, 2026.
 
 1. **No-signer guarantee on ZOL**: ZOL never moves funds autonomously — every trade triggers a Zaal-confirmation step (Telegram → approve/reject). The agent helps but does not act unilaterally.
 2. **Contribution-tracked, not token-weighted**: Respect is earned by peer ranking in weekly Fractals, not by buying a token. This is the core ZAO governance innovation.
-3. **Artist-first economics**: WaveWarZ's ~98.5% ecosystem payout rate vs. Spotify's ~12% royalty. The ~1.73% direct-to-artist instant payout (9.07 ◎ on 524.15 ◎ volume) is verified onchain.
+3. **Artist-first economics**: WaveWarZ's ~98.5% ecosystem payout rate vs. Spotify's ~12% royalty. The ~1.73% direct-to-artist instant payout (13.40 ◎ on 524.15 ◎ volume) is verified onchain.
 4. **100+ weeks of unbroken governance**: No other documented music-focused DAO has maintained this streak continuously.
 5. **Onchain archive for every concert**: Every COC Concertz fan gallery upload is permanently archived to Arweave with UDL licenses — unlike any other virtual concert series.

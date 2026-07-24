@@ -32,7 +32,7 @@ WaveWarZ protocol wallet receives ~3% SOL
 Nothing happens (fee sits in wallet)
 ```
 
-At 524 SOL total volume (per doc 1278), the 3% fee pool is ~15.7 SOL (~$2,000 at $125/SOL). Future: at 1,000 SOL/month run rate, fee pool is 30 SOL/month (~$3,750/month).
+At 878 SOL total volume (per doc 1278), the 3% fee pool is ~15.7 SOL (~$2,000 at $125/SOL). Future: at 1,000 SOL/month run rate, fee pool is 30 SOL/month (~$3,750/month).
 
 ---
 

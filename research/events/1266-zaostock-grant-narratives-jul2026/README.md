@@ -146,7 +146,7 @@ All facts verified July 17, 2026. Cite doc 1077 and doc 1257 as primary sources.
 | Active members | 188+ globally | doc 1257 |
 | Newsletter editions | 400+ on Paragraph.com | doc 1265, doc 1083 |
 | Governance streak | 100+ consecutive Fractal weeks | doc 1254 |
-| WaveWarZ trade volume | $39,453 (~524 SOL at Jul 2026 price) | doc 1077 |
+| WaveWarZ trade volume | $64,800 (~878 SOL at Jul 2026 price) | doc 1077 |
 | WaveWarZ battles | 1,108+ documented | doc 1252 |
 | WaveWarZ artists | 34 Audius-rostered | doc 1214 |
 | Charity raised | $1,497 to HuRya Empowerment Foundation | doc 1077 |

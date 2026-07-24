@@ -75,7 +75,7 @@ Based on doc 1223 (WaveWarZ Live Programming, verified July 2026):
 ### Tier C: Evergreen (lower urgency, still valuable)
 
 - **Explainer clips** — "how WaveWarZ works in 60 seconds"
-- **Stats deep dives** — "WaveWarZ by the numbers: 921 songs, 524 SOL"
+- **Stats deep dives** — "WaveWarZ by the numbers: 921 songs, 878 SOL"
 - **Comparison clips** — "WaveWarZ vs Spotify: the payout gap"
 
 ---

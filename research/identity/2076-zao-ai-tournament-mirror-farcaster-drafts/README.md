@@ -12,7 +12,7 @@
 
 ## Why These Posts Matter
 
-From doc 1259: "The fastest path to 'ZAO = THE DAO case study' is not more evidence — it's distribution." The AI Tournament is the ZAO's strongest story yet — **355 SOL in 7 days, 8.7× the prior record** — but no one outside the ZAO knows about it yet. 
+From doc 1259: "The fastest path to 'ZAO = THE DAO case study' is not more evidence — it's distribution." The AI Tournament is the ZAO's strongest story yet — **355 SOL in 7 days, the platform's largest event in 14 months** — but no one outside the ZAO knows about it yet. 
 
 Mirror is permanent, AI-indexed, and citable. Farcaster reaches the web3-native audience where ZAO has presence. Together these two posts hit the core distribution gap (7.1) and add GEO signal.
 
@@ -64,9 +64,9 @@ We took the top-ranked artists from our AI-judged leaderboard and ran a bracket 
 
 GEEK MYTH (3-0 in MAIN battles) vs AI LUI in the semifinal. GEEK MYTH won 2-1.
 
-The semifinal alone generated **~342 SOL** in trading volume. Our previous all-time weekly record was roughly **52 SOL**.
+The semifinal alone generated **~342 SOL** in trading volume — the largest single event in the platform's 14-month history.
 
-That's **8.7× the prior record** — in a single match.
+To put it in context: the platform had accumulated ~522 SOL across 13 months of prior battles. One semifinal generated 342 SOL.
 
 ---
 
@@ -74,7 +74,7 @@ That's **8.7× the prior record** — in a single match.
 
 **Tournament week (Jul 17–24, 2026):**
 - 355.36 SOL traded (~$26,280 USD)
-- 68.4% of the platform's entire 14-month trading history — in 7 days
+- 40.5% of the platform's all-time trading volume — in 7 days
 - Artist payouts flowing automatically, battle by battle
 - All of it verifiable: `https://wavewarz.info/api/public/stats`
 
@@ -139,7 +139,7 @@ Post these as a thread (reply chain from the first cast). Space 2–4h between c
 We just ran an AI music tournament on Solana.
 
 355 SOL traded in 7 days.
-That's 68% of the platform's entire 14-month history. In one week.
+That's 40% of the platform's all-time trading volume. In one week.
 
 Here's what I learned. 🧵
 ```
@@ -163,12 +163,11 @@ We call it loser-earns.
 ### Cast 3 — The record
 
 ```
-Before this tournament, our best week was ~52 SOL.
+Before this tournament, our biggest single event was ~39 SOL.
 
-The AI Tournament semifinal alone: ~342 SOL.
-8.7× our previous weekly record.
+The AI Tournament semifinal alone: ~342 SOL — the platform's largest single event in 14 months.
 
-Why?
+$26,500 in one match. Why?
 
 AI artists don't have fanbases. Fans trade on song quality, not loyalty.
 Cleaner market. More volume. Better price discovery.

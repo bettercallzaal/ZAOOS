@@ -34,7 +34,7 @@ Most music platforms keep the revenue, the data, and the relationship. The artis
 
 What this looks like in practice:
 
-WaveWarZ -- an onchain music battle platform on Solana. Artists earn 1% of every trade, paid instantly to their wallet. 1,245 battles have run. Lifetime volume: 524 SOL (~$39K). No streaming deal, no label cut, no waiting.
+WaveWarZ -- an onchain music battle platform on Solana. Artists earn 1% of every trade, paid instantly to their wallet. 1,289 battles have run. Lifetime volume: 878 SOL (~$66K). No streaming deal, no label cut, no waiting.
 
 The ZAO -- a music-tech DAO that has run 101+ consecutive weekly governance sessions. 63 of those weeks are settled on-chain (Optimism). 157 unique Respect holders. It is the most consistent onchain music community I know of.
 
@@ -77,7 +77,7 @@ LinkedIn Featured allows pinned links or posts. Pin in this order:
 ### Pin 3 -- WaveWarZ (best available link -- wwtracker or app)
 
 - **URL:** https://wavewarz.xyz (or wwtracker equivalent -- confirm live URL with Zaal)
-- **Headline:** "WaveWarZ -- 524 SOL volume, 1% instantly to artists"
+- **Headline:** "WaveWarZ -- 878 SOL volume, 1% instantly to artists"
 - **Why third:** The most concrete proof point. Real numbers, real payouts.
 
 **Note on Featured posts:** Once the LinkedIn posting cadence is running (3x/week per doc 987), replace Pin 3 with the highest-performing post (ranked by saves + comments). Best-performing posts move to Featured; evergreen links stay in Pins 1 and 2.
@@ -97,8 +97,8 @@ LinkedIn Featured allows pinned links or posts. Pin in this order:
 
 | Claim | Source |
 |-------|--------|
-| 1,245 WaveWarZ battles | Doc 1077 (July 17 audit), wwtracker |
-| 524 SOL lifetime volume | Doc 1077, 1219, 1237 |
+| 1,289 WaveWarZ battles | Live API Jul 24, wwtracker |
+| 878 SOL lifetime volume | Live API Jul 24 |
 | 1% instant artist payout | WaveWarZ smart contract, confirmed doc 1252 |
 | 101+ weekly Fractal sessions | Doc 1254 (ZAO Fractal 100-week record) |
 | 63 on-chain weeks (Optimism) | Doc 1254 |

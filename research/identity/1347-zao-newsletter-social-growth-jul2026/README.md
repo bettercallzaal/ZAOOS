@@ -2,7 +2,7 @@
 topic: identity/distribution
 type: STRATEGY
 status: ACTIVE — execute Aug 1–Oct 3 ZAOstock window
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1332, 1340, 1341, 1343, 1345, 1346
 owner: Zaal + ZOE
 ---
@@ -317,4 +317,4 @@ ZOE should track monthly and post to the ZAOOS Bonfire knowledge graph:
 
 ---
 
-*Created: 2026-07-17 | Execute Aug 1–Oct 3 ZAOstock window | Related: 1332 (social content calendar), 1340 (press map), 1343 (partner activation), 1345 (annual report), 1346 (ZAOstock livestream)*
+*Created: 2026-07-24 | Execute Aug 1–Oct 3 ZAOstock window | Related: 1332 (social content calendar), 1340 (press map), 1343 (partner activation), 1345 (annual report), 1346 (ZAOstock livestream)*

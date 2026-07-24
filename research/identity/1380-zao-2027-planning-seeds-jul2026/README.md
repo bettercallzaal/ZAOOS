@@ -2,7 +2,7 @@
 topic: identity/strategy
 type: PLANNING
 status: SEEDS — populate after ZAOstock (Oct 3, 2026); review Dec 2026 annual report
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1259, 1306, 1335, 1345
 owner: Zaal (strategy decisions) + ZOE (execution calendar)
 ---
@@ -194,4 +194,4 @@ In the post-event newsletter (doc 1377 Issue 5), ZOE includes:
 
 ---
 
-*Created: 2026-07-17 | Fill [RESULT] fields after ZAOstock Oct 3 | Key review: Dec 15-20, 2026 annual report | Related: 1259 (North Star baseline), 1306 (ecosystem map), 1335 (Q4 roadmap), 1345 (annual report template)*
+*Created: 2026-07-24 | Fill [RESULT] fields after ZAOstock Oct 3 | Key review: Dec 15-20, 2026 annual report | Related: 1259 (North Star baseline), 1306 (ecosystem map), 1335 (Q4 roadmap), 1345 (annual report template)*

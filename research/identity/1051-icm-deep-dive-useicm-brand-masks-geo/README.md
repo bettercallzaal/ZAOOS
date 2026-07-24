@@ -432,7 +432,7 @@ For each new box:
 |--------|-------|------|---------|------------------|
 | Author BetterCallZaal box content (use template from section 3) + get Zaal approval | Claude (with Zaal approval) | Authoring | 2026-07-14 | Draft in `research/identity/icm-boxes/bettercallzaal.llm.txt` + PR ready |
 | Mint BetterCallZaal box via API (POST, capture key to ~/.zao/private/) | Zaal | Manual API | 2026-07-16 | Key stored, hash confirmed, box resolves with `curl https://useicm.com/api/objects/<hash>/llm.txt` |
-| Register BetterCallZaal in brand-brain.ts + test in-character response | Zaal (or loop) | Code | 2026-07-17 | PR merged, ZOE boots clean, test response in bot group |
+| Register BetterCallZaal in brand-brain.ts + test in-character response | Zaal (or loop) | Code | 2026-07-24 | PR merged, ZOE boots clean, test response in bot group |
 | Review + refresh ZAO Festivals box (update 2026 dates) | Zaal | Authoring | 2026-07-18 | Updated content re-PUTted via API, box reflects current fest plan |
 | Mint Magnetiq box (workshop platform context) | Zaal + Iman | Authoring + API | 2026-07-20 | Box live, linked in brand-brain.ts |
 | Set up weekly AI-answer tracker (Perplexity/Claude/ChatGPT/Google for "what is The ZAO") | Zaal | Measurement | 2026-07-23 | First week's data logged (spreadsheet or script), baseline established |

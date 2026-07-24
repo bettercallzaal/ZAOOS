@@ -25,7 +25,7 @@
 "We built a music platform where the artist who loses the battle still gets paid. 
 That single decision — loser earns — is the thread that connects everything we do.
 
-In two years: 1,245 battles, $1,820 distributed to losing artists, 63 consecutive 
+In two years: 1,289 battles, $1,820 distributed to losing artists, 63 consecutive 
 weekly governance sessions. Zero missed. Not one."
 ```
 
@@ -110,7 +110,7 @@ We built in public because we believe the whole model only works if it's open so
 ### "How do you sustain this economically?"
 ```
 WaveWarZ takes 3% of every battle pool as a protocol fee. That's roughly $3,100 in 
-revenue since launch across 1,245 battles.
+revenue since launch across 1,289 battles.
 
 That doesn't fund staff. We don't have staff. ZOE, our AI operations agent, handles 
 social media, scheduling, and community management. The whole system costs $215-440/month 

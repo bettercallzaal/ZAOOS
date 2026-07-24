@@ -2,7 +2,7 @@
 topic: identity/narrative
 type: NARRATIVE
 status: ACTIVE
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 972, 989, 1306, 1339, 1340
 owner: Zaal
 ---
@@ -104,7 +104,7 @@ A case study requires documentation. ZAO's AI fleet generates documentation at a
 
 **North Star #2: ZAO IP = staple in onchain art, music, culture**
 
-ZAO's IP includes not just the music IP (921 songs battled, 1,245 battles) but the *documentation IP* — the ZAOOS research base is itself a form of intellectual property. Researchers studying music DAOs, Fractal governance, or AI-native organizations will cite ZAOOS. The AI fleet makes ZAO's IP continuously compounding.
+ZAO's IP includes not just the music IP (921 songs battled, 1,289 battles) but the *documentation IP* — the ZAOOS research base is itself a form of intellectual property. Researchers studying music DAOs, Fractal governance, or AI-native organizations will cite ZAOOS. The AI fleet makes ZAO's IP continuously compounding.
 
 ---
 
@@ -165,4 +165,4 @@ Running strong.
 
 ---
 
-*Created: 2026-07-17 | Owner: Zaal | Related: 972 (agent stack comparison), 989 (ZOE architecture), 1306 (ecosystem map), 1339 (proof-points), 1340 (press map) | Use this doc as Angle 6 in press pitches*
+*Created: 2026-07-24 | Owner: Zaal | Related: 972 (agent stack comparison), 989 (ZOE architecture), 1306 (ecosystem map), 1339 (proof-points), 1340 (press map) | Use this doc as Angle 6 in press pitches*

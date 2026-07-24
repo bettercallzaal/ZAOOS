@@ -3,7 +3,7 @@
 **Type:** OUTREACH-BRIEF  
 **Topic:** identity  
 **Status:** Active — send to Metagov after DAOstar registration (Jul 20)  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1351 (DAOstar Registration), 1394 (Governance Session Template — the document Metagov would cite), 1400 (ZAOOS Corpus — the dataset researchers would study), 1345 (ZAO 2027 North Star Planning)
 
 ---
@@ -86,8 +86,8 @@ ZAO is an unusual research subject because of the data density:
 |---------------|--------|--------|
 | ZAOOS research corpus | 1,400+ docs | Public, MIT-licensed, GitHub |
 | Governance session records | 63+ sessions | ZAOOS (tagged with doc type FRACTAL or GOVERNANCE) |
-| WaveWarZ onchain data | 1,245 battles, all on Solana | Public (wavewarz.info/api/public/stats) |
-| Artist earnings data | 9.09 SOL across 34 artists | Public API |
+| WaveWarZ onchain data | 1,289 battles, all on Solana | Public (wavewarz.info/api/public/stats) |
+| Artist earnings data | 13.40 SOL across 34 artists | Public API |
 | ZAO contracts (Optimism) | OG ERC-20, ZOR ERC-1155, OREC | Public (Etherscan/OP explorer) |
 | Governance session template | Reproducible methodology | ZAOOS doc 1394 |
 
@@ -95,7 +95,7 @@ ZAO is an unusual research subject because of the data density:
 1. **Volume + rate.** 1,400+ docs in 18 months by a 2-human + AI-fleet team is unusual. What does AI-assisted organizational documentation look like at scale?
 2. **Onchain governance continuity.** 63+ consecutive weekly governance sessions with recorded vote outcomes on Optimism Mainnet — a longitudinal governance dataset most DAO researchers don't have.
 3. **Cross-chain coordination.** WaveWarZ (Solana) + ZAO governance (Optimism) + Arweave archiving = multi-chain coordination primitive. What does cross-chain DAO look like in practice?
-4. **Loser-earns economics.** 1,245 battles with public SOL payment data = a real dataset on "losing as participation incentive" in a digital market.
+4. **Loser-earns economics.** 1,289 battles with public SOL payment data = a real dataset on "losing as participation incentive" in a digital market.
 
 ---
 
@@ -173,7 +173,7 @@ ZAO runs WaveWarZ, a music battle protocol on Solana that distributes revenue to
 
 In 18 months, ZAO has:
 - Run 63+ consecutive weekly governance sessions
-- Distributed SOL to artists in 1,245 battles (losers included)
+- Distributed SOL to artists in 1,289 battles (losers included)
 - Raised $1,497 for charity through community battles
 - Documented the entire operation in 1,400+ public research docs (MIT-licensed, GitHub)
 

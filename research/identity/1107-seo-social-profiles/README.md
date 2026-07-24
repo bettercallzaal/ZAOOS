@@ -123,7 +123,7 @@ If the display names are inconsistent ("+Zaal (on farcaster)" on X, no YouTube p
 | Add JSON-LD Person/Organization schema to all profile + about pages (bettercallzaal.com, thezao.com, wavewarz.com YouTube) with canonical name + sameAs links | @Iman | PR (code) | 2026-08-10 | Schema validated via Google Rich Result Test (https://search.google.com/test/rich-results); Google Search Console shows 0 errors for `Person` or `Organization` schema |
 | Verify all X/YouTube/IG/Farcaster bios link back to canonical domain + canonical domain links out to all social profiles (cross-linking audit) | @Team | Audit + manual update | 2026-08-15 | All profile bios contain live link to canonical domain; audit doc (CSV or checklist) confirms 100% coverage; spot-check 2-3 profiles |
 
-## Review (2026-07-17)
+## Review (2026-07-24)
 
 Reviewed per board task `research-doc:1107`. Sound and already actionable (owners + dates + shipped-criteria per fix). One review insight and a routing note:
 

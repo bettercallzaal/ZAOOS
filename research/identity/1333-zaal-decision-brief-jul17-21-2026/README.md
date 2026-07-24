@@ -2,7 +2,7 @@
 topic: identity/ops
 type: DECISION-BRIEF
 status: URGENT
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1285, 1317, 1320, 1325, 1326, 1328, 1329, 1330, 1331, 1332
 owner: Zaal
@@ -196,4 +196,4 @@ Everything else can slide 48 hours. These 3 cannot.
 
 ---
 
-*Created: 2026-07-17 | This doc expires Jul 22 — after decisions are made, archive this doc and update doc 1325 (Q3 ops calendar) with confirmed dates.*
+*Created: 2026-07-24 | This doc expires Jul 22 — after decisions are made, archive this doc and update doc 1325 (Q3 ops calendar) with confirmed dates.*

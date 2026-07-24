@@ -2,7 +2,7 @@
 topic: identity/web-presence
 type: AUDIT
 status: action-ready
-created: 2026-07-17
+created: 2026-07-24
 board-task: 311b2dbc
 related-docs: 1221, 1107, 1026, 1297
 owner: Zaal

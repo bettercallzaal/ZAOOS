@@ -2,7 +2,7 @@
 topic: identity
 type: progress-report
 status: current
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1077, 1221, 1231, 1254, 1257
 original-query: "North Star progress report Q3 2026 — where does The ZAO stand on becoming THE documented DAO case study and making ZAO IP a staple in onchain culture?"
 tier: CANONICAL
@@ -10,7 +10,7 @@ tier: CANONICAL
 
 # 1259 — The ZAO North Star Progress Report (Q3 2026)
 
-> **Purpose:** Baseline progress report against The ZAO's two North Star goals for 2026. For use by Zaal in grant applications, partner pitches, investor briefs, and strategic planning. All metrics are verified as of July 17, 2026.
+> **Purpose:** Baseline progress report against The ZAO's two North Star goals for 2026. For use by Zaal in grant applications, partner pitches, investor briefs, and strategic planning. All metrics are verified as of July 24, 2026.
 
 ## The Two North Stars
 
@@ -32,8 +32,8 @@ tier: CANONICAL
 | Governance longevity | Consecutive Fractal weeks | **100+** (since Jul 30, 2024) | doc 1254 |
 | On-chain settlement | Verified Optimism settlement weeks | **63** (OG: 33 + ZOR: 31) | doc 1202 |
 | Respect holders | Unique wallets with Respect tokens | **157** | doc 1200 |
-| Product traction | WaveWarZ lifetime volume | **524.15 SOL (~$39,453)** | live API |
-| Product traction | WaveWarZ battles completed | **1,245** (1,108 in public feed) | live API |
+| Product traction | WaveWarZ lifetime volume | **878.30 SOL (~$39,453)** | live API |
+| Product traction | WaveWarZ battles completed | **1,289** (1,108 in public feed) | live API |
 | Community impact | Charity raised via WaveWarZ | **$1,497** (2 rounds, HuRya Foundation) | doc 1214 |
 | IRL events | Confirmed events with on-chain elements | **2** (ZAO-CHELLA Dec 2024; ZAOstock Oct 3 2026) | doc 1077 |
 | Governance token | $ZAO soulbound identity token | On Base | doc 1201 |
@@ -42,7 +42,7 @@ tier: CANONICAL
 
 ### The Claim We Can Make
 
-> "The ZAO has run 100+ consecutive weekly Fractal governance sessions on Optimism mainnet since July 2024 — longer than any other verified fractal DAO in the Optimism ecosystem. WaveWarZ, the ZAO's flagship application, has completed 1,245 on-chain music battles totaling 524.15 SOL in volume ($39,453), demonstrating that a DAO's governance model can be productized into live economic activity."
+> "The ZAO has run 100+ consecutive weekly Fractal governance sessions on Optimism mainnet since July 2024 — longer than any other verified fractal DAO in the Optimism ecosystem. WaveWarZ, the ZAO's flagship application, has completed 1,289 on-chain music battles totaling 878.30 SOL in volume ($39,453), demonstrating that a DAO's governance model can be productized into live economic activity."
 
 ### Evidence Quality: STRONG
 
@@ -127,12 +127,12 @@ ZAO IP exists and is documented. What's missing is **velocity** — the rate at 
 
 ---
 
-## Combined Scorecard (as of Jul 17, 2026)
+## Combined Scorecard (as of Jul 24, 2026)
 
 | Category | Score | Notes |
 |---|---|---|
 | **Governance documentation** | 9/10 | 100+ weeks, on-chain, independently verifiable |
-| **Product traction** | 7/10 | 1,245 battles + 524 SOL is real but not yet press-worthy scale |
+| **Product traction** | 7/10 | 1,289 battles + 878 SOL is real but not yet press-worthy scale |
 | **Community impact** | 7/10 | 157 Respect holders, 188 members, $1,497 charity — solid |
 | **IP catalog** | 8/10 | 921 songs, 34 artists, 7 COC Concertz shows, 2 IRL events |
 | **External citability** | 4/10 | Evidence exists; distribution is the bottleneck |

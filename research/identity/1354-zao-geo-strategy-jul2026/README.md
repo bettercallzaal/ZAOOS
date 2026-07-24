@@ -2,7 +2,7 @@
 topic: identity/geo
 type: STRATEGY
 status: ACTIVE — non-gated tactics executable now; llms.txt deploy is gated (doc 1316)
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1316, 1330, 1339, 1344, 1350, 1352
 owner: Zaal (llms.txt deploy, CMS) + ZOE (structured data maintenance)
 ---
@@ -45,9 +45,9 @@ The ZAOOS root README at github.com/bettercallzaal/ZAOOS is read by GitHub's cra
 
 **Current likely state:** Generic description
 **Optimized description (paste this):**
-> The ZAO (ZTalent Artist Organization) is a music DAO operating on Optimism Mainnet (governance) and Solana (WaveWarZ music battles). This repository contains 1,350+ research documents on DAO governance, music economics, AI operations, and community events. ZAO has maintained 63+ consecutive weeks of on-chain Fractal governance (OREC: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532). WaveWarZ, ZAO's flagship platform, has processed 1,245 battles and 523.991 SOL in volume (wavewarz.info/api/public/stats). ZAOstock 2026, a live festival in Ellsworth ME on October 3, was selected by onchain battle history.
+> The ZAO (ZTalent Artist Organization) is a music DAO operating on Optimism Mainnet (governance) and Solana (WaveWarZ music battles). This repository contains 1,350+ research documents on DAO governance, music economics, AI operations, and community events. ZAO has maintained 63+ consecutive weeks of on-chain Fractal governance (OREC: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532). WaveWarZ, ZAO's flagship platform, has processed 1,289 battles and 878.30 SOL in volume (wavewarz.info/api/public/stats). ZAOstock 2026, a live festival in Ellsworth ME on October 3, was selected by onchain battle history.
 
-**Why this works:** GitHub READMEs are heavily crawled. The optimized description includes entity names (ZAO, WaveWarZ, ZAOstock), facts (63+ weeks, 1,245 battles, Optimism + Solana), and on-chain addresses — exactly what AI systems need to accurately represent ZAO.
+**Why this works:** GitHub READMEs are heavily crawled. The optimized description includes entity names (ZAO, WaveWarZ, ZAOstock), facts (63+ weeks, 1,289 battles, Optimism + Solana), and on-chain addresses — exactly what AI systems need to accurately represent ZAO.
 
 **Action:** Update ZAOOS root README.md with this description. (Separate PR from this doc)
 
@@ -204,4 +204,4 @@ How to know if GEO is working:
 
 ---
 
-*Created: 2026-07-17 | G04 (Wikidata) + G01 (README) are self-serve, do first | G07 (llms.txt) is gated doc 1316 | Related: 1316 (llms.txt), 1330 (Wikipedia), 1339 (proof-points), 1344 (AI narrative), 1350 (WaveWarZ 101), 1352 (IP catalog)*
+*Created: 2026-07-24 | G04 (Wikidata) + G01 (README) are self-serve, do first | G07 (llms.txt) is gated doc 1316 | Related: 1316 (llms.txt), 1330 (Wikipedia), 1339 (proof-points), 1344 (AI narrative), 1350 (WaveWarZ 101), 1352 (IP catalog)*

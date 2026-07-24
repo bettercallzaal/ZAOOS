@@ -2,7 +2,7 @@
 topic: identity/ip
 type: REFERENCE
 status: CANONICAL — update as new IP is created; ZOE updates Arweave links as episodes are archived
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1280, 1312, 1330, 1339, 1344, 1349, 1351
 owner: Zaal (IP authority) + ZOE (Arweave link maintenance)
 ---
@@ -32,9 +32,9 @@ owner: Zaal (IP authority) + ZOE (Arweave link maintenance)
 | Documentation | See doc 1350 (WaveWarZ 101 explainer) |
 
 **WaveWarZ on-chain activity (Jul 2026):**
-- 1,245 battles completed
-- 523.991 SOL total volume
-- 9.0988 SOL artist payouts
+- 1,289 battles completed
+- 878.30 SOL total volume
+- 13.40 SOL artist payouts
 - 127.343 SOL trader claims
 - 50 MAIN events
 - Source: wavewarz.info/api/public/stats
@@ -239,4 +239,4 @@ ZAO's 8-agent AI fleet is itself an IP asset — the documented methodology for 
 
 ---
 
-*Created: 2026-07-17 | CANONICAL — update as new IP is created | ZOE: fill Arweave links for COC Concertz and ZAOville tables | Related: 1280, 1312, 1330, 1339, 1344, 1349, 1351*
+*Created: 2026-07-24 | CANONICAL — update as new IP is created | ZOE: fill Arweave links for COC Concertz and ZAOville tables | Related: 1280, 1312, 1330, 1339, 1344, 1349, 1351*

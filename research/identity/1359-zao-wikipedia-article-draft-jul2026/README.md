@@ -2,7 +2,7 @@
 topic: identity/citability
 type: DRAFT
 status: READY TO SUBMIT — waiting for 2nd independent reliable source (doc 1340 press outreach → Water & Music or equivalent)
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1280, 1312, 1330, 1339, 1340, 1344, 1350, 1351, 1352, 1356
 owner: Zaal (submits when 2nd source confirmed) + ZOE (updates facts as they change)
 ---
@@ -33,15 +33,15 @@ owner: Zaal (submits when 2nd source confirmed) + ZOE (updates facts as they cha
 
 ## Overview
 
-The ZAO describes itself as "a community-driven hub where musicians, artists, and technologists unite to unlock the potential of Web3." It operates on Optimism Mainnet for governance functions and Solana for its WaveWarZ music battle platform.<ref name="zaoos">{{cite web|title=ZAOOS Research Repository|url=https://github.com/bettercallzaal/ZAOOS|publisher=bettercallzaal (GitHub)|accessdate=2026-07-17}}</ref>
+The ZAO describes itself as "a community-driven hub where musicians, artists, and technologists unite to unlock the potential of Web3." It operates on Optimism Mainnet for governance functions and Solana for its WaveWarZ music battle platform.<ref name="zaoos">{{cite web|title=ZAOOS Research Repository|url=https://github.com/bettercallzaal/ZAOOS|publisher=bettercallzaal (GitHub)|accessdate=2026-07-24}}</ref>
 
-As of July 2026, The ZAO had maintained 63 consecutive weeks of weekly governance sessions using the Fractal governance model, with results recorded on-chain via three smart contracts on Optimism Mainnet: an ERC-20 governance token (OG), an ERC-1155 token (ZOR), and an on-chain governance contract (OREC).<ref name="optimism">{{cite web|title=OREC Contract|url=https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532|publisher=Optimism Etherscan|accessdate=2026-07-17}}</ref>
+As of July 2026, The ZAO had maintained 63 consecutive weeks of weekly governance sessions using the Fractal governance model, with results recorded on-chain via three smart contracts on Optimism Mainnet: an ERC-20 governance token (OG), an ERC-1155 token (ZOR), and an on-chain governance contract (OREC).<ref name="optimism">{{cite web|title=OREC Contract|url=https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532|publisher=Optimism Etherscan|accessdate=2026-07-24}}</ref>
 
 ## WaveWarZ
 
 WaveWarZ is a music battle platform operated in association with The ZAO, running on Solana. On the platform, two songs compete in a head-to-head battle where community members bet on which track will win. An unusual feature of the platform is that the losing artist in each battle receives an automatic on-chain payout, referred to as the "loser-earns" mechanic.
 
-As of July 2026, the platform had facilitated over 1,245 battles with approximately 523 SOL (Solana) in total volume and over 9 SOL in direct artist payouts.<ref name="wavewarz-api">{{cite web|title=WaveWarZ Public Stats API|url=https://wavewarz.info/api/public/stats|publisher=WaveWarZ|accessdate=2026-07-17}}</ref>
+As of July 2026, the platform had facilitated over 1,289 battles with approximately 878 SOL (Solana) in total volume and over 9 SOL in direct artist payouts.<ref name="wavewarz-api">{{cite web|title=WaveWarZ Public Stats API|url=https://wavewarz.info/api/public/stats|publisher=WaveWarZ|accessdate=2026-07-24}}</ref>
 
 WaveWarZ runs three categories of battles: quick battles, community battles, and MAIN events. MAIN events are the platform's flagship format, designed as curated head-to-head competitions with higher betting volumes.
 
@@ -59,11 +59,11 @@ ZAOstock is an annual outdoor music festival organized by The ZAO. The first edi
 
 The ZAO operates an AI agent fleet to assist with documentation, social media, research, and analytics. As of 2026, the fleet included eight autonomous agents. The organization maintains a public research repository (ZAOOS) with over 1,300 documents on music, governance, and the creator economy, published under an open-source license on GitHub.<ref name="zaoos"/>
 
-An open-source analytics dashboard (wwtracker) is also available, providing public access to WaveWarZ battle data without authentication.<ref name="wwtracker">{{cite web|title=wwtracker|url=https://github.com/bettercallzaal/wwtracker|publisher=bettercallzaal (GitHub)|accessdate=2026-07-17}}</ref>
+An open-source analytics dashboard (wwtracker) is also available, providing public access to WaveWarZ battle data without authentication.<ref name="wwtracker">{{cite web|title=wwtracker|url=https://github.com/bettercallzaal/wwtracker|publisher=bettercallzaal (GitHub)|accessdate=2026-07-24}}</ref>
 
 ## Media coverage
 
-The organization has been featured in independent media. In 2026, it was discussed on [[Crypto Magic Hour]], a podcast focused on cryptocurrency and digital art.<ref name="cmh">{{cite podcast|title=Crypto Magic Hour EP.50|url=[URL TBD from doc 1330]|publisher=Crypto Magic Hour|date=2026|accessdate=2026-07-17}}</ref>
+The organization has been featured in independent media. In 2026, it was discussed on [[Crypto Magic Hour]], a podcast focused on cryptocurrency and digital art.<ref name="cmh">{{cite podcast|title=Crypto Magic Hour EP.50|url=[URL TBD from doc 1330]|publisher=Crypto Magic Hour|date=2026|accessdate=2026-07-24}}</ref>
 
 [SOURCE 2 CITATION — add here when confirmed from doc 1340 press outreach]
 
@@ -131,4 +131,4 @@ When submitting, add categories at the bottom of the article:
 
 ---
 
-*Created: 2026-07-17 | BLOCKED on 2nd independent reliable source | Once source confirmed, submit via AfC | See doc 1330 for full submission guide | ZOE: update stats (63+ weeks, 1245 battles, 523 SOL, etc.) before submission | Related: 1280, 1312, 1330, 1339, 1340, 1351, 1352, 1356*
+*Created: 2026-07-24 | BLOCKED on 2nd independent reliable source | Once source confirmed, submit via AfC | See doc 1330 for full submission guide | ZOE: update stats (63+ weeks, 1289 battles, 878 SOL, etc.) before submission | Related: 1280, 1312, 1330, 1339, 1340, 1351, 1352, 1356*

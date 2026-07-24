@@ -2,7 +2,7 @@
 topic: identity/founder
 type: FACT-SHEET
 status: verified
-created: 2026-07-17
+created: 2026-07-24
 audience: grant reviewers, press, Optimism Atlas evaluators, event producers
 related-docs: 1273, 1278, 1282, 1287
 ---
@@ -40,8 +40,8 @@ Zaal Panthaki is co-founder of The ZAO — a decentralized artist collective bui
 | Achievement | Date | Verifiable At |
 |-------------|------|--------------|
 | WaveWarZ launched | August 2025 | wavewarz.info/api/public/stats |
-| 1,245 WaveWarZ battles | July 2026 | wavewarz.info/api/public/stats |
-| 524 SOL trading volume | July 2026 | wavewarz.info/api/public/stats |
+| 1,289 WaveWarZ battles | July 2026 | wavewarz.info/api/public/stats |
+| 878 SOL trading volume | July 2026 | wavewarz.info/api/public/stats |
 | $1,497 raised for charity (HuRya) | July 2026 | wavewarz.info/api/public/stats |
 | 921 unique songs battled | July 2026 | wavewarz.info/api/public/stats |
 | 100+ Fractal governance sessions | July 2026 | ZAO Discord, on-chain settlement |
@@ -102,7 +102,7 @@ The ZAO is a member-owned collective where decisions are made via weekly democra
 
 The ZAO is the only organization that has:
 
-1. **Built and operated a live music prediction market** (WaveWarZ — 1,245 battles, 524 SOL volume, instant artist payouts onchain)
+1. **Built and operated a live music prediction market** (WaveWarZ — 1,289 battles, 878 SOL volume, instant artist payouts onchain)
 2. **Run continuous weekly Fractal DAO governance** (100+ sessions, 63 on-chain, only active OREC deployer on Optimism)
 3. **Built an open-source analytics platform** (wwtracker — MIT-licensed, free public API)
 4. **Incubated 32 music-tech builders** (ZABAL Games — June 2026 cohort complete)

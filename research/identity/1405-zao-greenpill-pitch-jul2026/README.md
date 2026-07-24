@@ -3,7 +3,7 @@
 **Type:** PITCH-BRIEF  
 **Topic:** identity  
 **Status:** Send Jul 23 — DECISION NEEDED (outbound email)  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1366 (Podcast Circuit — Green Pill listed as #2 of 5), 1328 (Green Pill research), 1387 (Artist Economics Comparison), 1350 (WaveWarZ 101), 1394 (Governance Template), 1311 (OP Retro Funding — mentions Green Pill ecosystem)
 
 ---
@@ -50,7 +50,7 @@ I'm Zaal, co-founder of ZAO — a DAO running a music battle platform called Wav
 
 Here's the short pitch:
 
-**WaveWarZ pays artists for losing.** Every battle has a buy-side pool. The losing artist earns 1.73% of that pool — proportional to how many people bet on them. One losing battle earns more than 328 Spotify streams. We've distributed 9.09 SOL (~$677) to artists across 1,245 battles. The platform's on Solana; no artist needs to know crypto to earn.
+**WaveWarZ pays artists for losing.** Every battle has a buy-side pool. The losing artist earns 1.73% of that pool — proportional to how many people bet on them. One losing battle earns more than 328 Spotify streams. We've distributed 13.40 SOL (~$677) to artists across 1,289 battles. The platform's on Solana; no artist needs to know crypto to earn.
 
 This isn't charity. It's a protocol design that flips winner-take-all music economics. Independent artists earn for participating — not just for winning.
 
@@ -91,9 +91,9 @@ Hook: ZAO runs 8 AI agents (ZOE being the primary) managing content, governance 
 If Owocki says yes, here's what Zaal should have ready for the call:
 
 **Headline stats (confirm from /api/public/stats day-of):**
-- Battles: 1,245+ (say "over 1,200")
-- SOL volume: 523.991 SOL ("over 500 SOL")
-- Artist payouts: 9.0988 SOL ("over $600 to losing artists")
+- Battles: 1,289+ (say "over 1,200")
+- SOL volume: 878.30 SOL ("over 500 SOL")
+- Artist payouts: 13.40 SOL ("over $600 to losing artists")
 - Trader claims: 127.343 SOL ("traders have taken over $9,000 in winnings")
 - Governance sessions: 63+ weekly (say "over 60 consecutive weeks")
 - ZAOOS: 1,400+ public research docs (MIT-licensed)

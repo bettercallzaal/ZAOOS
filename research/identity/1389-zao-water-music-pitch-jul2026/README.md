@@ -2,7 +2,7 @@
 topic: identity/press
 type: PITCH-BRIEF
 status: READY TO SEND — send Jul 24 per doc 1353 execution calendar
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1340, 1351, 1366, 1387, 1388
 owner: Zaal (send email) + ZOE (follow-up reminder +10 days)
 ---
@@ -38,7 +38,7 @@ owner: Zaal (send email) + ZOE (follow-up reminder +10 days)
 
 **To:** cheriehu42@gmail.com (or use contact form at waterandmusic.com if no public email)
 **CC:** none
-**Subject:** WaveWarZ data: 1,245 battles, loser-earns economics, community governance — available for research
+**Subject:** WaveWarZ data: 1,289 battles, loser-earns economics, community governance — available for research
 
 ---
 
@@ -52,9 +52,9 @@ I've been following your work on music streaming economics for years. Your resea
 
 WaveWarZ uses a "loser-earns" model: both artists in a battle earn, regardless of who wins. Community votes, on-chain settlement, no label intermediary.
 
-The data after 1,245 battles:
-- 9.09 SOL paid directly to artists (~$1,638 at current price)
-- 524 SOL total volume through the platform
+The data after 1,289 battles:
+- 13.40 SOL paid directly to artists (~$1,638 at current price)
+- 878 SOL total volume through the platform
 - 50 MAIN community-governed events
 - Both artists receive payment in every battle
 
@@ -74,7 +74,7 @@ zaalp99@gmail.com | wavewarz.info | thezao.xyz
 
 **The economics brief (pull from doc 1387):**
 - Spotify: $0.004/stream average
-- WaveWarZ: 9.09 SOL ÷ 1,245 battles = ~$1.31 per battle appearance (loser and winner)
+- WaveWarZ: 13.40 SOL ÷ 1,289 battles = ~$1.31 per battle appearance (loser and winner)
 - Both sides paid on-chain, immediate settlement
 - Comparison table: Spotify vs. WaveWarZ on intermediary cut, payout speed, entry barrier, winner-take-all
 
@@ -175,4 +175,4 @@ Doc 1366 also has a Cherie Hu pitch (as a podcast guest). This doc is a DIFFEREN
 
 ---
 
-*Created: 2026-07-17 | Send: Jul 24 | Related: 1340 (press map), 1351 (academic outreach), 1366 (podcast pitches), 1387 (Spotify comparison), 1388 (Hypebot pitch)*
+*Created: 2026-07-24 | Send: Jul 24 | Related: 1340 (press map), 1351 (academic outreach), 1366 (podcast pitches), 1387 (Spotify comparison), 1388 (Hypebot pitch)*

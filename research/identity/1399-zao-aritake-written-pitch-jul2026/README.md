@@ -2,7 +2,7 @@
 topic: identity/media
 type: PITCH-BRIEF
 status: ACTIVE — send Aug 15 (if Hypebot hasn't covered by then, pitch Ari's Take as parallel)
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1388 (Hypebot pitch), 1366 (podcast circuit — separate Ari's Take podcast ask), 1387 (vs Spotify — basis for pitch), 1340 (press map), 1397 (Mirror fallback)
 owner: Zaal (sends pitch) + ZOE (follow-up tracking)
 ---
@@ -27,7 +27,7 @@ owner: Zaal (sends pitch) + ZOE (follow-up tracking)
 
 Hi Ari,
 
-I run WaveWarZ — a music battle platform on Solana where both artists earn, win or lose. We've done 1,245+ community battles with 9.09 SOL (~$1,600) paid directly to artists.
+I run WaveWarZ — a music battle platform on Solana where both artists earn, win or lose. We've done 1,289+ community battles with 13.40 SOL (~$1,600) paid directly to artists.
 
 The math: one losing WaveWarZ battle earns roughly $1.31 — more than 328 Spotify streams.
 
@@ -67,14 +67,14 @@ This isn't new. But it's still true.
 **Section 2 — A Different Model (200 words)**
 WaveWarZ is a music battle platform. Two artists are matched. The community bets on who they think is better. The winner takes home more. But here's what's different from a typical competition: **the loser also gets paid.**
 
-Every battle, both artists earn directly from the pool. No streaming royalties. No label cut. No platform take beyond operating fees. On average across 1,245 battles: $1.31 per battle appearance.
+Every battle, both artists earn directly from the pool. No streaming royalties. No label cut. No platform take beyond operating fees. On average across 1,289 battles: $1.31 per battle appearance.
 
 To put that in context: you'd need 328 Spotify streams to earn the same amount.
 
 **Section 3 — The Numbers (150 words)**
-- 1,245 battles since May 2025
-- 9.09 SOL paid directly to artists (~$1,600)
-- 523.99 SOL total community betting volume (~$94,000)
+- 1,289 battles since May 2025
+- 13.40 SOL paid directly to artists (~$1,600)
+- 878.30 SOL total community betting volume (~$94,000)
 - Charity raised from dedicated community battles: $1,497
 - Platform fee model: transparent, on-chain, publicly auditable
 
@@ -151,9 +151,9 @@ Do not send both simultaneously. Written guest post = lower barrier for Ari; pod
 |---------------------|---------|---------------------|
 | Media | 5.5/10 | +0.75 → 6.25 (credible editorial + massive indie artist audience) |
 | Distribution | 7.0/10 | +0.5 (100K+ indie artist readers; direct WaveWarZ sign-up CTA) |
-| WaveWarZ artist traction | 1,245 battles | +20-50 new battles if 100-200 artists try from the piece |
+| WaveWarZ artist traction | 1,289 battles | +20-50 new battles if 100-200 artists try from the piece |
 | Citability | 9.5/10 | +0.2 (potential Wikipedia source, lower weight than Hypebot) |
 
 ---
 
-*Created: 2026-07-17 | Send: Aug 15 (after Hypebot window closes Aug 8) | Related: 1388 (Hypebot pitch — send first), 1366 (podcast circuit — separate Ari's Take podcast ask), 1387 (vs Spotify data), 1397 (Mirror fallback if no response)*
+*Created: 2026-07-24 | Send: Aug 15 (after Hypebot window closes Aug 8) | Related: 1388 (Hypebot pitch — send first), 1366 (podcast circuit — separate Ari's Take podcast ask), 1387 (vs Spotify data), 1397 (Mirror fallback if no response)*

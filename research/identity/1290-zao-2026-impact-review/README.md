@@ -2,7 +2,7 @@
 topic: identity/impact
 type: NARRATIVE
 status: verified
-created: 2026-07-17
+created: 2026-07-24
 audience: press, grant reviewers, newsletter readers, Farcaster, potential members
 related-docs: 1273, 1278, 1280, 1281, 1282, 1287, 1288, 1289
 ---
@@ -15,7 +15,7 @@ related-docs: 1273, 1278, 1280, 1281, 1282, 1287, 1288, 1289
 
 ## The Headline
 
-The ZAO is a decentralized artist collective that has spent the past three years building at the intersection of music and blockchain — and in 2026, it's all coming together. One platform with 1,245 live music battles. One governance system running 100 consecutive weeks. One builder cohort with 32 active participants. One music festival in the pipeline. And a community of 157 onchain Respect holders who have been voting, building, and earning together since 2023.
+The ZAO is a decentralized artist collective that has spent the past three years building at the intersection of music and blockchain — and in 2026, it's all coming together. One platform with 1,289 live music battles. One governance system running 100 consecutive weeks. One builder cohort with 32 active participants. One music festival in the pipeline. And a community of 157 onchain Respect holders who have been voting, building, and earning together since 2023.
 
 ---
 
@@ -24,10 +24,10 @@ The ZAO is a decentralized artist collective that has spent the past three years
 In August 2025, The ZAO launched WaveWarZ: a music prediction market where fans bet on song battles using real money (SOL on Solana), winners earn, losers earn, and artists get paid automatically on every trade.
 
 **By July 2026:**
-- **1,245 battles** have been fought
+- **1,289 battles** have been fought
 - **921 unique songs** have been battled — every one permanently recorded on Solana
-- **524 SOL (~$39,000)** has traded hands between fans betting on music
-- **$9.07 SOL (~$680)** has been paid directly to artists — automatically, instantly, no middleman
+- **878 SOL (~$64,800)** has traded hands between fans betting on music
+- **$13.40 SOL (~$680)** has been paid directly to artists — automatically, instantly, no middleman
 - **$1,497** has been raised for charity through benefit battle rounds for HuRya
 
 The artist payout rate is approximately **1.73% of each trade** — compared to Spotify's ~$0.004 per stream. For a song that trades $1,000 in a single battle, the artist earns $17.30 automatically. That same song on Spotify would need 4,325 streams to match it.
@@ -133,7 +133,7 @@ The ZAO publishes a build-in-public newsletter (paragraph.com/@thezao) documenti
 
 The ZAO is not a thought experiment about what a DAO could be. It is a working example of what a DAO is, right now, in 2026:
 - 100+ consecutive governance sessions, 63 on-chain
-- A live revenue product (WaveWarZ) with 524 SOL in volume
+- A live revenue product (WaveWarZ) with 878 SOL in volume
 - An open-source analytics platform (wwtracker) used by the platform operator
 - A builder cohort that has shipped 30+ PRs in one month
 
@@ -142,7 +142,7 @@ No other music DAO in the world can point to all four simultaneously.
 **North Star #2: ZAO IP = cultural staple**
 
 The ZAO has created and operates:
-- WaveWarZ — the first prediction-market music platform (1,245 battles, 921 songs)
+- WaveWarZ — the first prediction-market music platform (1,289 battles, 921 songs)
 - COC Concertz — 7 shows, Arweave-archived, UDL-licensed
 - ZABAL Games — the first DAO-run music-tech build-a-thon
 - ZAOstock — the first ZAO music festival
@@ -155,10 +155,10 @@ These are not concepts. They are products. They run. They pay people. They are d
 
 | Metric | Number | As of |
 |--------|--------|-------|
-| WaveWarZ battles | 1,245 | July 2026 |
-| WaveWarZ volume | 524 SOL (~$39K) | July 2026 |
+| WaveWarZ battles | 1,289 | July 2026 |
+| WaveWarZ volume | 878 SOL (~$64.8K) | July 2026 |
 | Unique songs battled | 921 | July 2026 |
-| Artist payouts | 9.07 SOL (~$680) | July 2026 |
+| Artist payouts | 13.40 SOL (~$680) | July 2026 |
 | Charity raised | $1,497 | July 2026 |
 | Artist payout rate | ~1.73% per trade | July 2026 |
 | Fractal sessions | 100+ | July 2026 |

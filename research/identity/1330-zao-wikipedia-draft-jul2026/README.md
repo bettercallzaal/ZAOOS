@@ -2,7 +2,7 @@
 topic: identity/external-citability
 type: DRAFT
 status: actionable
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1077, 1327, 1296, 1275, 1237, 1324, 1319
 owner: Zaal
@@ -31,7 +31,7 @@ Wikipedia requires: *"The organization has been the subject of multiple, non-tri
 | Crypto Magic Hour EP.50 (@VeVeMagic) | Podcast | ✅ YouTube oEmbed-confirmed | Independent coverage; not solicited by ZAO |
 | XTinct artist interview (@wavewarz YouTube) | Interview | ✅ oEmbed-confirmed | ZAO-produced but features an external artist |
 | Optimism mainnet contracts | Blockchain | ✅ Etherscan | OG: 0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957 |
-| WaveWarZ on-chain transactions | Blockchain | ✅ Solana explorer | 1,245 battles, public PDAs |
+| WaveWarZ on-chain transactions | Blockchain | ✅ Solana explorer | 1,289 battles, public PDAs |
 | Fisher grant application (if filed) | Grant record | ⏳ Pending Zaal action | Would create an institutional record |
 | Academic outreach targets (doc 1324) | Pending | ⏳ Water & Music, Metagov | One published mention = notability threshold |
 
@@ -53,15 +53,15 @@ Wikipedia requires: *"The organization has been the subject of multiple, non-tri
 
 == Background ==
 
-The ZAO was established as a community-driven hub for musicians, artists, and technologists in the Web3 ecosystem. The organization describes itself as part of the ZTalent Network, a broader collective of creator-economy projects. Its governance model uses '''Fractal Respect''' — a contribution-weighted consensus mechanism — rather than token-weighted voting, meaning membership is determined by participation rather than capital investment.<ref name="thezao">{{cite web |url=https://thezao.com/about |title=About The ZAO |publisher=The ZAO |accessdate=2026-07-17}}</ref>
+The ZAO was established as a community-driven hub for musicians, artists, and technologists in the Web3 ecosystem. The organization describes itself as part of the ZTalent Network, a broader collective of creator-economy projects. Its governance model uses '''Fractal Respect''' — a contribution-weighted consensus mechanism — rather than token-weighted voting, meaning membership is determined by participation rather than capital investment.<ref name="thezao">{{cite web |url=https://thezao.com/about |title=About The ZAO |publisher=The ZAO |accessdate=2026-07-24}}</ref>
 
-As of July 2026, the organization has conducted over 100 consecutive weekly Fractal governance sessions, which the organization claims may represent the longest-running governance streak among music-focused DAOs.<ref name="1077">{{cite web |url=https://github.com/bettercallzaal/ZAOOS |title=ZAO OS Research Repository |publisher=ZAO |accessdate=2026-07-17}}</ref>
+As of July 2026, the organization has conducted over 100 consecutive weekly Fractal governance sessions, which the organization claims may represent the longest-running governance streak among music-focused DAOs.<ref name="1077">{{cite web |url=https://github.com/bettercallzaal/ZAOOS |title=ZAO OS Research Repository |publisher=ZAO |accessdate=2026-07-24}}</ref>
 
 == WaveWarZ ==
 
 WaveWarZ is a music prediction market platform developed by ZAO and deployed on the [[Solana]] blockchain. The platform enables fans to stake SOL (Solana's native cryptocurrency) on the outcome of head-to-head music battles between artists. A distinctive feature is the "loser-earns" mechanic, in which the losing artist in a battle still receives a portion of the staked volume.
 
-As of July 2026, the platform has recorded 1,245 battles, 523.99 SOL in total volume, and approximately $1,497 raised for charity through a community benefit battle program.<ref name="wwapi">{{cite web |url=https://wavewarz.info/api/public/stats |title=WaveWarZ Public Statistics API |publisher=WaveWarZ |accessdate=2026-07-17}}</ref> The platform has been covered by the independent podcast ''Crypto Magic Hour''.<ref name="cmh">{{cite web |url=https://www.youtube.com/watch?v=rx0PeGv8lPI |title=Crypto Magic Hour EP.50 |publisher=VeVeMagic |date=2026 |accessdate=2026-07-17}}</ref>
+As of July 2026, the platform has recorded 1,289 battles, 878.30 SOL in total volume, and approximately $1,497 raised for charity through a community benefit battle program.<ref name="wwapi">{{cite web |url=https://wavewarz.info/api/public/stats |title=WaveWarZ Public Statistics API |publisher=WaveWarZ |accessdate=2026-07-24}}</ref> The platform has been covered by the independent podcast ''Crypto Magic Hour''.<ref name="cmh">{{cite web |url=https://www.youtube.com/watch?v=rx0PeGv8lPI |title=Crypto Magic Hour EP.50 |publisher=VeVeMagic |date=2026 |accessdate=2026-07-24}}</ref>
 
 == Governance ==
 
@@ -152,4 +152,4 @@ Submit draft after first podcast episode (Aug-Sep per doc 1328 cadence). Expecte
 
 ---
 
-*Created: 2026-07-17 | Cross-refs: doc 1077 (DAO case study), 1327 (membership counts), 1296 (press kit), 1324 (academic outreach), 1328 (podcast kit)*
+*Created: 2026-07-24 | Cross-refs: doc 1077 (DAO case study), 1327 (membership counts), 1296 (press kit), 1324 (academic outreach), 1328 (podcast kit)*

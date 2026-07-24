@@ -70,7 +70,7 @@ artists; the smart contract distributes payouts proportionally, with both the wi
 and losing artist receiving a share of the pool. This "loser earns" mechanism ensures 
 all participating artists receive compensation regardless of battle outcome.{{cn}}
 
-As of July 2026, the platform had processed over 1,245 battles with approximately 524 SOL 
+As of July 2026, the platform had processed over 1,289 battles with approximately 878 SOL 
 in total volume and 9 SOL in direct artist payouts.{{cn}}
 
 === Governance ===

@@ -3,7 +3,7 @@
 **Type:** GUIDE  
 **Topic:** identity  
 **Status:** PRE-PRESS — create Wikipedia article after first Hypebot or Ari's Take coverage publishes (Aug 1-10); draft text ready to paste now  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1417 (Wikidata guide — companion action), 1414 (Hypebot/music press pitches — prerequisite), 1413 (Mirror Article 1 — secondary source candidate), 1430 (DAOstar — sameAs source), 1408 (academic research brief — secondary source candidate)
 
 ---

@@ -17,7 +17,7 @@ tier: DISPATCH
 | # | Gap | Fix | Cost | Owner | By When |
 |---|-----|-----|------|-------|---------|
 | 1 | 64GB of media exists ONLY on the Mac - zero offsite copies. Includes irreplaceable recordings (ZABAL Fireside 2.3GB, COC #6 2.2GB, 7+ Spaces, Craig multitracks). | Tonight: external drive / Time Machine. Then ArDrive/Arweave for permanence. | $0 tonight; ArDrive ~cost of storage | @Zaal | 2026-07-16 |
-| 2 | Apex DNS broken on bettercallzaal.com, zlank.online, zaoos.com - all three bare domains point to a dead AWS IP (18.204.152.241) while www works on Vercel. (Collector called this "3 sites down" - wrong; it is stale apex A-records.) | In each DNS provider: apex A -> 76.76.21.21 (or ALIAS cname.vercel-dns.com). | $0, ~5 min/domain | @Zaal | 2026-07-17 |
+| 2 | Apex DNS broken on bettercallzaal.com, zlank.online, zaoos.com - all three bare domains point to a dead AWS IP (18.204.152.241) while www works on Vercel. (Collector called this "3 sites down" - wrong; it is stale apex A-records.) | In each DNS provider: apex A -> 76.76.21.21 (or ALIAS cname.vercel-dns.com). | $0, ~5 min/domain | @Zaal | 2026-07-24 |
 | 3 | ZERO registered trademarks across all 13 brands. Known collisions: ZAO (Russian band + US restaurant chain), BetterCallZaal (Better Call Saul proximity), Sparkz (crowded), WaveWarZ (Wave Wars variants). Exposure HIGH. | Counsel review + USPTO filings on the core marks (The ZAO, WaveWarZ, ZABAL). Research only - decision with Greg. | $2-5K | @Zaal + Greg | 2026-09-01 |
 | 4 | llms.txt missing on all 10 domains; only 2 have JSON-LD. (Collector claimed "overdue TODAY" - wrong; doc 1083 batch-1 target is 2026-07-28.) | Deploy llms.txt per the GEO plan (doc 1016/1083). | Low | @Iman | 2026-07-28 |
 | 5 | Handle hygiene: X display name "+Zaal (on farcaster)" hides the brand; YouTube @bettercallzaal invisible vs Better Call Saul; "Wave Warz Zm" misspelling; IG/TikTok bios frozen on 2024; @wavewarsmusic squatting on IG. | The doc 1107 fix list (display name = 30 seconds). | $0 | @Zaal | 2026-07-22 |
@@ -62,7 +62,7 @@ tier: DISPATCH
 | Action | Owner | Type | By When | Shipped criteria |
 |--------|-------|------|---------|-----------------|
 | External-drive backup of ~/Movies + ~/Desktop/downloads + ~/Downloads | @Zaal | Manual | 2026-07-16 | A second copy exists off the Mac |
-| Fix apex DNS on the 3 domains (A 76.76.21.21) | @Zaal | Manual | 2026-07-17 | curl https://bettercallzaal.com returns 200/30x |
+| Fix apex DNS on the 3 domains (A 76.76.21.21) | @Zaal | Manual | 2026-07-24 | curl https://bettercallzaal.com returns 200/30x |
 | Take the trademark question set to Greg (marks, collisions, filing order) | @Zaal | Counsel | 2026-07-25 | Counsel call held; filing decision recorded |
 | ArDrive permanence pass (recordings + brand kits + papers) | @Zaal + loop | Build | 2026-08-08 | Assets visible on Arweave; manifest committed |
 | Brand-kit consolidation PR (one home per brand, kill duplicate dir, commit partner logos) | loop | PR | 2026-08-01 | PR open; duplicate dir removed; kits under brand-kits/ |

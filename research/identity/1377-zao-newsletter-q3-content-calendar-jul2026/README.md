@@ -2,7 +2,7 @@
 topic: identity/newsletter
 type: CALENDAR
 status: ACTIVE — ZOE pre-fills issue drafts; Zaal reviews + sends
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1270, 1329, 1336, 1347
 owner: ZOE (drafts) + Zaal (review + send)
 ---
@@ -203,4 +203,4 @@ For each of the 5 anchor issues:
 
 ---
 
-*Created: 2026-07-17 | 5 anchor issues Aug 1 → Oct 5 | ZOE pre-drafts 7 days ahead | Related: 1270 (newsletter canonical), 1313 (artist reveal calendar), 1329 (marketing plan), 1336 (day-of runbook), 1347 (subscriber growth), 1375 (day-of social calendar)*
+*Created: 2026-07-24 | 5 anchor issues Aug 1 → Oct 5 | ZOE pre-drafts 7 days ahead | Related: 1270 (newsletter canonical), 1313 (artist reveal calendar), 1329 (marketing plan), 1336 (day-of runbook), 1347 (subscriber growth), 1375 (day-of social calendar)*

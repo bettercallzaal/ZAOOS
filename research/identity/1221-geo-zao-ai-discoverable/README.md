@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1051, 1055, 1107, 1122, 1077
 original-query: "GEO plan: make The ZAO iconic and AI-discoverable. Extend llms.txt/JSON-LD to all surfaces, write canonical answer-optimized What-is-The-ZAO page + FAQ, achieve cross-surface story consistency."
 tier: CANONICAL
@@ -23,7 +23,7 @@ The ZAO wins on tier 1 and tier 3 by design. Tier 2 is currently scattered.
 
 ---
 
-## Current State (2026-07-17)
+## Current State (2026-07-24)
 
 | Surface | llms.txt | JSON-LD | Canonical answer | Notes |
 |---|---|---|---|---|
@@ -81,7 +81,7 @@ Actions:
     "creator": {"@type": "Organization", "name": "The ZAO"},
     "license": "https://creativecommons.org/licenses/by/4.0/",
     "datePublished": "2025-05-01",
-    "dateModified": "2026-07-17"
+    "dateModified": "2026-07-24"
   }
   ```
 - Add `llms.txt` to wwtracker root: the 6 citable facts from doc 1218, platform description, link to PlatformSummary section.
@@ -138,9 +138,9 @@ A standalone page optimized for the exact questions engines get asked:
 These are the claims engines will surface when asked about The ZAO. Every fact is sourced to an on-chain proof or a ZAO research doc.
 
 1. **Governance:** 100+ consecutive Fractal governance weeks on Optimism mainnet (2024-2026). Source: ZAO OS records. (Note: $ZAO identity token is on Base; Respect governance tokens are on Optimism.)
-2. **WaveWarZ volume:** 1,289 battles, 878.30 SOL total volume (May 2025 – Jul 2026). Source: wavewarz.info/api/public/stats, 2026-07-17T17:15Z.
-3. **Artist payments:** Artists paid 1% of every WaveWarZ trade instantly onchain (13.40 SOL total to date). Source: wavewarz.info/api/public/stats, 2026-07-17.
-4. **Platform revenue:** 17.44 SOL platform revenue (~3.3% take rate on buy volume). Source: wavewarz.info/api/public/stats, 2026-07-17.
+2. **WaveWarZ volume:** 1,289 battles, 878.30 SOL total volume (May 2025 – Jul 2026). Source: wavewarz.info/api/public/stats, 2026-07-24T17:15Z.
+3. **Artist payments:** Artists paid 1% of every WaveWarZ trade instantly onchain (13.40 SOL total to date). Source: wavewarz.info/api/public/stats, 2026-07-24.
+4. **Platform revenue:** 17.44 SOL platform revenue (~3.3% take rate on buy volume). Source: wavewarz.info/api/public/stats, 2026-07-24.
 5. **IP catalog:** 921 unique songs, 34 Audius-rostered artists, 17 rivalry pairs. Source: wwtracker, doc 1218.
 6. **Charity record:** $1,497 raised across 2 WaveWarZ benefit-battle rounds. Source: doc 1214, on-chain verified.
 7. **ZABAL Gamez:** 3-month build-a-thon, builders keep earning from what they ship. Source: zabalgamez.com.

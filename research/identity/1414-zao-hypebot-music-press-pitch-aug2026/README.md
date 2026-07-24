@@ -3,7 +3,7 @@
 **Type:** PITCH-BRIEF  
 **Topic:** identity  
 **Status:** DECISION NEEDED — send Aug 1, 2026 (same day as Mirror Article 1 publishes)  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1296 (Press Kit), 1328 (Podcast Pitch Kit), 1387 (Artist Economics), 1399 (Ari's Take strategy), 1405 (Green Pill pitch), 1406 (Bankless pitch), 1413 (Mirror Article 1)
 
 ---

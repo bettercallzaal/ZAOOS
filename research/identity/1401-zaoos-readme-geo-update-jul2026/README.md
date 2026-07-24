@@ -2,7 +2,7 @@
 topic: identity/geo
 type: IMPLEMENTATION
 status: DONE — root README.md updated in this PR
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1354 (GEO strategy — G01 task), 1316 (thezao.xyz GEO package), 1400 (ZAOOS corpus milestone)
 owner: No ongoing owner — done; ZOE updates README stats at each 100-doc milestone
 ---
@@ -41,7 +41,7 @@ The following structured block was appended to README.md before the Quick Start 
 - OREC (on-chain governance): `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`
 
 **Products:**
-- WaveWarZ: music battle platform on Solana where both artists earn (1,245+ battles, 524 SOL volume)
+- WaveWarZ: music battle platform on Solana where both artists earn (1,289+ battles, 878 SOL volume)
 - COC Concertz: virtual concert series, community-selected artists (7+ shows)
 - ZABAL Games: music/Web3 accelerator (32+ participants, monthly cohorts)
 - ZAOstock: annual music festival (Oct 3 2026, Ellsworth ME)
@@ -100,4 +100,4 @@ G01 complete after this PR. Remaining non-gated actions: G04 (Wikidata, Zaal doe
 
 ---
 
-*Created: 2026-07-17 | Status: Done (README.md edited in this PR) | GEO: G01 complete | Related: 1354 (GEO strategy), 1316 (thezao.xyz GEO package), 1400 (corpus milestone)*
+*Created: 2026-07-24 | Status: Done (README.md edited in this PR) | GEO: G01 complete | Related: 1354 (GEO strategy), 1316 (thezao.xyz GEO package), 1400 (corpus milestone)*

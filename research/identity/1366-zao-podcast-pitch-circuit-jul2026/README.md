@@ -2,7 +2,7 @@
 topic: identity/media
 type: PLAYBOOK
 status: ACTIVE — send in waves: Jul 23 (Green Pill), Jul 24 (Water & Music), Aug 1 (circuit wave)
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1328, 1340, 1351, 1362
 owner: Zaal (sends pitches — gated human action)
 ---
@@ -92,7 +92,7 @@ Doc 1328 has this. Summary of angle: ZAO = "the DAO that shows up every week" go
 
 ### 3. Bankless — SEND AUG 1
 
-**Subject:** Bankless pitch — "The blockchain where the loser wins" (WaveWarZ, 523 SOL volume, ZAO governance)
+**Subject:** Bankless pitch — "The blockchain where the loser wins" (WaveWarZ, 878 SOL volume, ZAO governance)
 
 > Hi Ryan + David,
 >
@@ -210,4 +210,4 @@ Once a show confirms:
 
 ---
 
-*Created: 2026-07-17 | Send Green Pill Jul 23, Water & Music Jul 24, circuit wave Aug 1 | Track sends in Part 3 table | Related: 1328 (Green Pill pitch — this doc adds 7 more shows), 1340 (full press map), 1351 (academic outreach — separate track), 1362 (press kit — share as "more background" when shows ask), 1363 (Maine media — separate track), 1359 (Wikipedia — podcast episode may unlock source #2)*
+*Created: 2026-07-24 | Send Green Pill Jul 23, Water & Music Jul 24, circuit wave Aug 1 | Track sends in Part 3 table | Related: 1328 (Green Pill pitch — this doc adds 7 more shows), 1340 (full press map), 1351 (academic outreach — separate track), 1362 (press kit — share as "more background" when shows ask), 1363 (Maine media — separate track), 1359 (Wikipedia — podcast episode may unlock source #2)*

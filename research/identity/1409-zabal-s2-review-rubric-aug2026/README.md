@@ -3,7 +3,7 @@
 **Type:** PLAYBOOK  
 **Topic:** identity  
 **Status:** Use Aug 22-29, 2026  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1392 (ZABAL S2 Application Form — the questions), 1355 (ZABAL S2 Launch Plan), 1259 (S1 Mid-Season Audit — what worked), 1283 (S1 August Build-a-Thon Mechanics)
 
 ---

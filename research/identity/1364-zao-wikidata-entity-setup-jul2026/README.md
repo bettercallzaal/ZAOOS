@@ -2,7 +2,7 @@
 topic: identity/geo
 type: GUIDE
 status: ACTIVE — self-serve, no approval needed, ~30 min for Zaal
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1221, 1354, 1359, 1362, 1363
 owner: Zaal (creates the entity)
 ---
@@ -169,4 +169,4 @@ Before creating The ZAO entity, check if these already exist on Wikidata. Search
 
 ---
 
-*Created: 2026-07-17 | Execute: self-serve, ~30 min | Priority: G04 from doc 1354, highest non-gated GEO action | After completing: update doc 1352 (IP catalog) with Q-numbers + doc 1354 (GEO strategy) with G04 DONE | Related: 1221 (GEO master plan), 1354 (GEO strategy), 1359 (Wikipedia draft — add wikidata Q-number to infobox), 1362 (press kit — add Wikidata link to links table)*
+*Created: 2026-07-24 | Execute: self-serve, ~30 min | Priority: G04 from doc 1354, highest non-gated GEO action | After completing: update doc 1352 (IP catalog) with Q-numbers + doc 1354 (GEO strategy) with G04 DONE | Related: 1221 (GEO master plan), 1354 (GEO strategy), 1359 (Wikipedia draft — add wikidata Q-number to infobox), 1362 (press kit — add Wikidata link to links table)*

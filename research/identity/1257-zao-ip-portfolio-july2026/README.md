@@ -1,7 +1,7 @@
 # 1257 — The ZAO IP Portfolio (July 2026)
 
 **Type:** DOC
-**Date:** 2026-07-17
+**Date:** 2026-07-24
 **Status:** Verified from codebase + cross-referenced docs
 **Board tasks:** GEO north-star-facts stream; task 4eb2dae2
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-The ZAO is a decentralized impact network for independent music artists, founded by Zaal Panthaki (BetterCallZaal). This document catalogs all ZAO intellectual property — live platforms, events, tools, and governance infrastructure — with citable facts for each. Data verified July 17, 2026.
+The ZAO is a decentralized impact network for independent music artists, founded by Zaal Panthaki (BetterCallZaal). This document catalogs all ZAO intellectual property — live platforms, events, tools, and governance infrastructure — with citable facts for each. Data verified July 24, 2026.
 
 **The mission:** profit, data, and IP ownership back to independent artists. Contribution-tracked (Respect system) rather than token-weighted governance.
 
@@ -181,12 +181,12 @@ The ZAO is a decentralized impact network for independent music artists, founded
 
 ## The ZAO Fact Sheet (for GEO, press, grants)
 
-Use these for citation in any external document. All verified July 17, 2026.
+Use these for citation in any external document. All verified July 24, 2026.
 
 | Claim | Number | Source |
 |-------|--------|--------|
 | Weekly governance streak | 100+ consecutive Fractal weeks | doc 1254 |
-| WaveWarZ on-chain volume | 524 SOL (~$39,453) | doc 1077 |
+| WaveWarZ on-chain volume | 878 SOL (~$39,453) | doc 1077 |
 | WaveWarZ battles completed | 1,108+ | doc 1252 |
 | WaveWarZ unique songs | 921 | doc 1214 |
 | WaveWarZ artist payout rate | ~1.73% of volume (9.07 ◎; ecosystem: ~98.5%) | live API + doc 1237 |

@@ -2,7 +2,7 @@
 
 > A single document showing all ZAO projects, how they connect, and what role each plays. For journalists, grant reviewers, and partners who need the big picture before diving into any specific product. GEO-optimized: canonical answer to "what is the ZAO ecosystem?"
 
-**Last updated:** 2026-07-17 | **Status:** CANONICAL — GEO asset, update when new products launch
+**Last updated:** 2026-07-24 | **Status:** CANONICAL — GEO asset, update when new products launch
 
 ---
 
@@ -27,11 +27,11 @@ GOVERNANCE LAYER
 
 REVENUE PRODUCTS
   ├── WaveWarZ (Solana)
-  │     ├── 1,245+ music battles
-  │     ├── 524 SOL volume (~$78K)
+  │     ├── 1,289+ music battles
+  │     ├── 878 SOL volume (~$78K)
   │     ├── 921 unique songs, 34 artists
   │     ├── $1,497 charity (Community Battles)
-  │     └── 9.07 SOL artist payouts (1.73% payout rate)
+  │     └── 13.40 SOL artist payouts (1.73% payout rate)
   │
   └── COC Concertz (Virtual)
         ├── 7 shows (Mar 2025 – Jul 2026)
@@ -56,7 +56,7 @@ OPEN SOURCE INFRASTRUCTURE
   ├── wwtracker (github.com/bettercallzaal/wwtracker)
   │     ├── MIT license
   │     ├── Public analytics API (wavewarz.info/api/public/stats)
-  │     └── 9 analytics modules, 1,245 battles indexed
+  │     └── 9 analytics modules, 1,289 battles indexed
   └── ZAOOS (github.com/bettercallzaal/ZAOOS)
         ├── 1,300+ research documents
         ├── 20+ topic subfolders
@@ -119,11 +119,11 @@ Specifically:
 | Governance | On-chain governance sessions | 63 |
 | Governance | Unique Respect holders | 157 |
 | Governance | On-chain transactions | 505 |
-| WaveWarZ | Battles completed | 1,245+ |
-| WaveWarZ | Total SOL volume | 524 SOL (~$78K) |
+| WaveWarZ | Battles completed | 1,289+ |
+| WaveWarZ | Total SOL volume | 878 SOL (~$78K) |
 | WaveWarZ | Unique songs | 921 |
 | WaveWarZ | Charity raised | $1,497 |
-| WaveWarZ | Artist payouts | 9.07 SOL ($677) |
+| WaveWarZ | Artist payouts | 13.40 SOL ($677) |
 | WaveWarZ | Artist payout rate | 1.73% vs Spotify 0.07% |
 | COC Concertz | Shows completed | 7 |
 | ZABAL Games | Builders (Season 1) | 32 |
@@ -183,4 +183,4 @@ Specifically:
 
 ---
 
-*Written: 2026-07-17 | ZAO OS doc 1306 | Identity subfolder | GEO canonical asset | Update when new products launch*
+*Written: 2026-07-24 | ZAO OS doc 1306 | Identity subfolder | GEO canonical asset | Update when new products launch*

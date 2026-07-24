@@ -2,7 +2,7 @@
 topic: identity/community
 type: PLAYBOOK
 status: ACTIVE — ZOE implements; Zaal reviews weekly
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1280, 1332, 1347, 1348, 1353, 1355
 owner: ZOE (daily ops) + Zaal (weekly review + escalations)
 ---
@@ -189,4 +189,4 @@ ZOE should escalate to Zaal (tag in Telegram or flag for weekly review) when:
 
 ---
 
-*Created: 2026-07-17 | ZOE: implement content matrix immediately | Zaal: confirm Discord status, approve escalation protocol | Related: 1280 (governance), 1332 (content calendar — complements this), 1347 (social audience growth), 1348 (trader growth), 1353 (Q3 calendar), 1355 (ZABAL S2 — participants join community channels)*
+*Created: 2026-07-24 | ZOE: implement content matrix immediately | Zaal: confirm Discord status, approve escalation protocol | Related: 1280 (governance), 1332 (content calendar — complements this), 1347 (social audience growth), 1348 (trader growth), 1353 (Q3 calendar), 1355 (ZABAL S2 — participants join community channels)*

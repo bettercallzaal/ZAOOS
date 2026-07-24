@@ -2,7 +2,7 @@
 topic: identity/open-source
 type: STRATEGY
 status: ACTIVE — wwtracker MIT is live; ZAOOS CC-BY pending license file; both are GEO + grant assets
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1078, 1276, 1352, 1354
 owner: Zaal (license file) + ZOE (GitHub stats + citations)
 ---
@@ -25,14 +25,14 @@ owner: Zaal (license file) + ZOE (GitHub stats + citations)
 
 **Significance:**
 - Only open-source analytics platform for an onchain music battle game
-- All 1,245+ WaveWarZ battles are publicly visible and analyzable
+- All 1,289+ WaveWarZ battles are publicly visible and analyzable
 - Researchers can run their own analysis without asking ZAO for data
 - 100% of the transparency claim is backed by a live, forkable codebase
 
 **Current state:**
 - 9 analytics modules documented in docs 1079, 1080, 1081, 1216, 1218, 1219
 - Real-time API: wavewarz.info/api/public/stats (public endpoint)
-- Battle data: wavewarz.info/public/ww-battles.json (raw JSON, 1,245+ entries)
+- Battle data: wavewarz.info/public/ww-battles.json (raw JSON, 1,289+ entries)
 - Open to contributions: any developer can submit PRs
 
 **Citable fact:**
@@ -79,7 +79,7 @@ owner: Zaal (license file) + ZOE (GitHub stats + citations)
 > "The ZAO's analytics infrastructure (wwtracker) is fully open-source (MIT license) and freely available. Any independent researcher, journalist, or community member can access, fork, and build on our tools."
 
 **For OP RF application:** Include this paragraph:
-> "wwtracker is a public-goods analytics platform built on WaveWarZ, an Optimism-adjacent ecosystem (The ZAO governance runs on Optimism Mainnet). The platform is MIT-licensed, openly published, and has been used to analyze 1,245+ battles and $524 SOL in transactions. ZAOOS, our research corpus, is CC-BY licensed and contains 1,380+ documents including governance analysis, economic research, and event planning — all publicly available."
+> "wwtracker is a public-goods analytics platform built on WaveWarZ, an Optimism-adjacent ecosystem (The ZAO governance runs on Optimism Mainnet). The platform is MIT-licensed, openly published, and has been used to analyze 1,289+ battles and $878 SOL in transactions. ZAOOS, our research corpus, is CC-BY licensed and contains 1,380+ documents including governance analysis, economic research, and event planning — all publicly available."
 
 **For Gitcoin:** This is the pitch. Public goods are what Gitcoin funds. Both wwtracker and ZAOOS are textbook examples.
 
@@ -167,4 +167,4 @@ Adding items 3 and 4 makes ZAOOS "citeable by convention" to LLMs — they treat
 
 ---
 
-*Created: 2026-07-17 | Action #1: Add CC-BY LICENSE file to ZAOOS root (5 min, Zaal) | Action #2: Update OP RF + Fisher text to include open source paragraph | Related: 1078 (wwtracker infrastructure), 1352 (IP catalog), 1354 (GEO strategy), 1278 (citable claims)*
+*Created: 2026-07-24 | Action #1: Add CC-BY LICENSE file to ZAOOS root (5 min, Zaal) | Action #2: Update OP RF + Fisher text to include open source paragraph | Related: 1078 (wwtracker infrastructure), 1352 (IP catalog), 1354 (GEO strategy), 1278 (citable claims)*

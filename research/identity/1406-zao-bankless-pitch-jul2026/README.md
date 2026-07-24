@@ -150,7 +150,7 @@ If Bankless says yes, have these ready:
 
 ## Part 7: What Makes This Citable Now
 
-> "ZAO prepared a Bankless podcast pitch in July 2026 (ZAOOS doc 1406), positioning WaveWarZ as a music prediction protocol with 524+ SOL volume and 63+ week DAO governance, framed for a crypto-native DeFi audience. ZAO targeted a post-ZAOstock pitch window to include verified event data."
+> "ZAO prepared a Bankless podcast pitch in July 2026 (ZAOOS doc 1406), positioning WaveWarZ as a music prediction protocol with 878+ SOL volume and 63+ week DAO governance, framed for a crypto-native DeFi audience. ZAO targeted a post-ZAOstock pitch window to include verified event data."
 
 ---
 

@@ -266,8 +266,8 @@ Trading WaveWarZ like a pro. Who's next?
 
 **Volume projection:** If trader pool doubles from current active traders:
 - Battle volume: 1,289 → ~1,800 battles by Dec 2026 (milestone: 2,000 target in doc 1345)
-- SOL volume: 523.991 → ~750 SOL by Dec 2026
-- Artist payouts: 9.0988 → ~15 SOL by Dec 2026
+- SOL volume: 878.30 SOL (Dec 2026 ~750 SOL target exceeded Jul 24 2026)
+- Artist payouts: 13.40 SOL (and growing)
 
 ---
 

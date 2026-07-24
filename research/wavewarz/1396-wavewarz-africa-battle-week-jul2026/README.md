@@ -2,7 +2,7 @@
 topic: wavewarz/community
 type: PLAN
 status: ACTIVE — Sep 22-26 target date (doc 1368 RAM DM "lock"); TechCabal pitch angle; ZABAL S2 recruitment
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1368 (partner DM pack — RAM Africa/Songchain DM references "Sep 22-26 Africa Battle Week lock"), 1390 (ZAOstock press release — TechCabal on distribution list), 1355 (ZABAL S2 — RAM Africa recruits), 1385 (X strategy), 1362 (press kit)
 owner: Zaal (design) + ZOE (social + outreach) + RAM/Songchain (Africa partner — DM sent via doc 1368 by Jul 25)
 ---
@@ -105,7 +105,7 @@ owner: Zaal (design) + ZOE (social + outreach) + RAM/Songchain (Africa partner �
 **Pitch body (150 words):**
 > Hi [name],
 >
-> WaveWarZ is a music battle platform built by ZAO, a US-based music DAO. Our model is unusual: both artists — winner and loser — earn from every battle. We've run 1,245+ battles with 9.09 SOL paid directly to artists.
+> WaveWarZ is a music battle platform built by ZAO, a US-based music DAO. Our model is unusual: both artists — winner and loser — earn from every battle. We've run 1,289+ battles with 13.40 SOL paid directly to artists.
 >
 > In November we're running Africa Battle Week: 7 days, 14 African music artists, every battle on Solana. We wanted to bring WaveWarZ to the African music scene because the loser-earns model matters even more where streaming pays even less.
 >
@@ -177,8 +177,8 @@ Seeds to plant at Africa Battle Week:
 | Media | 5.5/10 | +0.5 (TechCabal = Tier B media, editorial independence) |
 | Distribution | 7.0/10 | +0.3 (African music community network; @wavewarz +50-100 followers) |
 | IP catalog | 9.5/10 | +0.1 (first international expansion event = IP portfolio milestone) |
-| WaveWarZ traction | 1,245 battles | +7-14 battles (MAIN × 7 days) |
+| WaveWarZ traction | 1,289 battles | +7-14 battles (MAIN × 7 days) |
 
 ---
 
-*Created: 2026-07-17 | Event: Sep 22-26, 2026 | TechCabal pitch: Sep 8 | Partner: RAM/Songchain (DM Jul 25 via doc 1368, confirm Aug 1) | Related: 1368 (partner DM pack), 1390 (press release TechCabal slot), 1355 (ZABAL S2 recruits), 1385 (X strategy), 1362 (press kit)*
+*Created: 2026-07-24 | Event: Sep 22-26, 2026 | TechCabal pitch: Sep 8 | Partner: RAM/Songchain (DM Jul 25 via doc 1368, confirm Aug 1) | Related: 1368 (partner DM pack), 1390 (press release TechCabal slot), 1355 (ZABAL S2 recruits), 1385 (X strategy), 1362 (press kit)*

@@ -8,7 +8,7 @@
 
 ## Context: Why MAIN Event Cadence Matters
 
-WaveWarZ has completed 162 MAIN battles across 50 MAIN events as of Jul 17, 2026. MAIN events are the high-stakes, ZOR-holder-governed battles that:
+WaveWarZ has completed 165 MAIN battles across 50 MAIN events as of Jul 24, 2026. MAIN events are the high-stakes, ZOR-holder-governed battles that:
 - Drive the highest SOL volume per event
 - Generate the most press-worthy on-chain payouts
 - Feed the COC Concertz show format + ZAOstock programming

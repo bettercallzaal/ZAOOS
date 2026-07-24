@@ -2,7 +2,7 @@
 topic: wavewarz
 type: market-research
 status: research-complete
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1077, 1079, 1080, 1081, 1211, 101
 original-query: "Catalog WaveWarZ's creative output — songs, artists, rivalries, collaborations, and benefit battles — as ZAO IP assets (Jul 2026)"
 tier: STANDARD
@@ -14,7 +14,7 @@ tier: STANDARD
 
 ## One-Paragraph Summary
 
-WaveWarZ has generated 921 unique songs across 1,245 battles, a roster of 34 Audius-verified artists, 17 recurring artist rivalries, two verified artist interview series (XTinct, Kata7yst), at least one AI×human collaborative music video, and a novel benefit-battle philanthropic format that raised $1,497 for HuRya Empowerment Foundation. The platform's most-battled song — "WaveWarZ, the electric vibez" (38 battles) — has become a cultural touchstone for the community. This creative output is onchain-verifiable, citable, and represents the ZAO's most tangible claim to being a staple in onchain art, music, and culture.
+WaveWarZ has generated 921 unique songs across 1,289 battles, a roster of 34 Audius-verified artists, 17 recurring artist rivalries, two verified artist interview series (XTinct, Kata7yst), at least one AI×human collaborative music video, and a novel benefit-battle philanthropic format that raised $1,497 for HuRya Empowerment Foundation. The platform's most-battled song — "WaveWarZ, the electric vibez" (38 battles) — has become a cultural touchstone for the community. This creative output is onchain-verifiable, citable, and represents the ZAO's most tangible claim to being a staple in onchain art, music, and culture.
 
 ---
 
@@ -26,9 +26,9 @@ WaveWarZ has generated 921 unique songs across 1,245 battles, a roster of 34 Aud
 | Songs with 5+ battles ("battle veterans") | 95 |
 | Songs with 10+ battles ("platform staples") | 24 |
 | Songs with 20+ battles ("anthems") | 4 |
-| Total battles analyzed | 1,245 |
+| Total battles analyzed | 1,289 |
 
-Source: `public/ww-battles.json`, wwtracker open-source analytics, verified 2026-07-17.
+Source: `public/ww-battles.json`, wwtracker open-source analytics, verified 2026-07-24.
 
 **What this means:** 921 different tracks have entered the WaveWarZ arena — a large and growing music catalog that is entirely community-sourced. Each song's win/loss record is permanently settled onchain, making WaveWarZ a uniquely verifiable music reputation layer.
 
@@ -95,7 +95,7 @@ The following artists have Audius profiles verified and mapped in the wwtracker 
 | frameworkfortune | (ENTERLUDE) | 4 battles |
 | +13 additional | Sicariobaby, MetaVerseSlim, Retrospect, NDA_WaveWarz, ace1yoda, bettercallzaal, NemesisLadyRyn, NFTWonderfull, ozthecryptogoat, TuckNuisance, DCoopOfficial, ItsMoneyMiller, zKeyz | Rostered on Audius |
 
-Source: `lib/artists.ts` (wwtracker, open-source), 2026-07-17.
+Source: `lib/artists.ts` (wwtracker, open-source), 2026-07-24.
 
 **Citable fact #3:** 34 artists are Audius-rostered and battle-verified on WaveWarZ — representing a genuine cross-section of independent music across genres (hip-hop, Latin, electronic, ambient). Their music is on the decentralized streaming protocol AND has been battle-tested onchain.
 
@@ -108,11 +108,11 @@ WaveWarZ has produced a verified artist interview video series, hosted on the of
 | Artist | Video ID | Verified By | Notes |
 |---|---|---|---|
 | XTinct (Alejandro Estrella) | FmrzjYtdF6A | wavewarz.info/events | Chicago-born bilingual artist; dark ambient + trippy visuals |
-| Kata7yst | ZU0ga5LRdyU | YouTube oEmbed API (2026-07-17) | Author confirmed as "WaveWarZ" official channel |
+| Kata7yst | ZU0ga5LRdyU | YouTube oEmbed API (2026-07-24) | Author confirmed as "WaveWarZ" official channel |
 
 These interviews establish WaveWarZ not just as a trading platform but as a media entity that profiles its artists — creating lasting cultural documentation.
 
-**Citable fact #4:** WaveWarZ has produced at least 2 verified artist interview videos on its official YouTube channel. The Kata7yst interview (video ID: ZU0ga5LRdyU) was verified via YouTube oEmbed as authored by "WaveWarZ" on 2026-07-17. Source: PR #137, wwtracker docs.
+**Citable fact #4:** WaveWarZ has produced at least 2 verified artist interview videos on its official YouTube channel. The Kata7yst interview (video ID: ZU0ga5LRdyU) was verified via YouTube oEmbed as authored by "WaveWarZ" on 2026-07-24. Source: PR #137, wwtracker docs.
 
 ---
 
@@ -145,7 +145,7 @@ WaveWarZ has generated 17 recurring artist rivalries — pairs who have faced ea
 
 **Citable fact #5:** GodclouD vs RoCkY2GriMeY is the most-contested rivalry in WaveWarZ history: 8 battles, GodclouD undefeated 8-0. This head-to-head arc — more than any single battle — demonstrates that WaveWarZ creates lasting competitive narratives between artists.
 
-Source: TopRivalries component, wwtracker, 2026-07-17. [PR #93]
+Source: TopRivalries component, wwtracker, 2026-07-24. [PR #93]
 
 ---
 
@@ -188,19 +188,19 @@ WaveWarZ's creative output constitutes genuine IP for The ZAO because:
 
 | # | Fact | Source |
 |---|---|---|
-| 1 | "No Regrets @Hurric4n3Ike x @dopestilo" has 80% win rate in 20 battles — highest among 20+ battle songs | ww-battles.json, 2026-07-17 |
+| 1 | "No Regrets @Hurric4n3Ike x @dopestilo" has 80% win rate in 20 battles — highest among 20+ battle songs | ww-battles.json, 2026-07-24 |
 | 2 | GodclouD's "Fuck yo feelingZ" has 71% win rate in 21 battles; SongArena heat score 100/100 | ww-battles.json + wwtracker SongArena |
 | 3 | 34 artists are Audius-rostered and battle-verified on WaveWarZ as of Jul 2026 | lib/artists.ts, wwtracker |
-| 4 | WaveWarZ has produced at least 2 verified artist interview videos (XTinct, Kata7yst) on official YouTube | PR #137, oEmbed API 2026-07-17 |
-| 5 | GodclouD vs RoCkY2GriMeY: 8 battles, GodclouD 8-0 — most dominant series on platform | TopRivalries, PR #93, 2026-07-17 |
-| 6 | 921 unique songs across 1,245 battles; "WaveWarZ, the electric vibez" has 38 appearances (most-battled) | ww-battles.json, 2026-07-17 |
+| 4 | WaveWarZ has produced at least 2 verified artist interview videos (XTinct, Kata7yst) on official YouTube | PR #137, oEmbed API 2026-07-24 |
+| 5 | GodclouD vs RoCkY2GriMeY: 8 battles, GodclouD 8-0 — most dominant series on platform | TopRivalries, PR #93, 2026-07-24 |
+| 6 | 921 unique songs across 1,289 battles; "WaveWarZ, the electric vibez" has 38 appearances (most-battled) | ww-battles.json, 2026-07-24 |
 | 7 | Benefit battle format raised $1,497 across 2 series (Dec 2024, Feb 2025) for HuRya Empowerment Foundation | wavewarz.info/events, verified 2026-07-16 |
 
 ---
 
 ## Sources
 
-- `public/ww-battles.json` (wwtracker open-source, 1,245 battles, 2026-07-17)
+- `public/ww-battles.json` (wwtracker open-source, 1,289 battles, 2026-07-24)
 - `lib/artists.ts` (wwtracker, Audius-verified roster)
 - [Doc 1077](../1077-zao-dao-case-study-jul2026/) — ZAO DAO case study (governance + charity)
 - [Doc 1079](../1079-wavewarz-battle-intelligence-layer/) — Battle intelligence (song analytics detail)
@@ -208,5 +208,5 @@ WaveWarZ's creative output constitutes genuine IP for The ZAO because:
 - [Doc 1211](../1211-wavewarz-artist-economy-jul2026/) — Artist economy (earnings by artist)
 - PR #93 (wwtracker): TopRivalries component (artist series records)
 - PR #137 (wwtracker): community research verification + Kata7yst interview
-- YouTube oEmbed API: `youtube.com/oembed?url=...&format=json` (Kata7yst verification, 2026-07-17)
+- YouTube oEmbed API: `youtube.com/oembed?url=...&format=json` (Kata7yst verification, 2026-07-24)
 - `wavewarz.info/events` — charity + event details (verified 2026-07-16)

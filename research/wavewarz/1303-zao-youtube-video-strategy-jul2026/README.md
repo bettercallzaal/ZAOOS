@@ -2,7 +2,7 @@
 
 > Growth playbook for @wavewarz YouTube channel and ZAO video content ecosystem. Covers channel audit, content types, upload cadence, ZOE automation, and Q3 targets. Companion to [doc 1299](../../community/1299-zao-x-twitter-strategy-jul2026/) (X strategy), [doc 1295](../../community/1295-zao-farcaster-strategy-jul2026/) (Farcaster strategy), [doc 1292](./1292-wavewarz-xspace-daily-format-jul2026/) (X Space format).
 
-**Last updated:** 2026-07-17 | **Status:** ACTIVE — all tactics non-GATED
+**Last updated:** 2026-07-24 | **Status:** ACTIVE — all tactics non-GATED
 
 ---
 
@@ -103,7 +103,7 @@ WaveWarZ is likely discoverable for zero of the search queries that its potentia
 | "wavewarz tutorial" | "WaveWarZ Tutorial: Upload, Battle, Earn in Under 10 Minutes" |
 
 **The channel description** is also invisible to most visitors. Current: probably the default. Should be:
-> WaveWarZ is a music battle game on Solana. Artists earn onchain from their songs. 1,245 battles, 921 unique songs, $1,497 raised for charity. Live Monday-Friday 8:30 PM EST. wavewarz.info
+> WaveWarZ is a music battle game on Solana. Artists earn onchain from their songs. 1,289 battles, 921 unique songs, $1,497 raised for charity. Live Monday-Friday 8:30 PM EST. wavewarz.info
 
 ---
 
@@ -163,4 +163,4 @@ The WaveWarZ Clippers program (doc 1293, t.me/wavewarzclipshq) already has a mec
 
 ---
 
-*Written: 2026-07-17 | ZAO OS doc 1303 | WaveWarZ subfolder | Companion: [doc 1299](../../community/1299-zao-x-twitter-strategy-jul2026/) (X), [doc 1295](../../community/1295-zao-farcaster-strategy-jul2026/) (Farcaster), [doc 1293](./1293-wavewarz-clippers-program-guide-jul2026/) (Clippers), [doc 1301](../../community/1301-zao-newsletter-growth-playbook-jul2026/) (Newsletter)*
+*Written: 2026-07-24 | ZAO OS doc 1303 | WaveWarZ subfolder | Companion: [doc 1299](../../community/1299-zao-x-twitter-strategy-jul2026/) (X), [doc 1295](../../community/1295-zao-farcaster-strategy-jul2026/) (Farcaster), [doc 1293](./1293-wavewarz-clippers-program-guide-jul2026/) (Clippers), [doc 1301](../../community/1301-zao-newsletter-growth-playbook-jul2026/) (Newsletter)*

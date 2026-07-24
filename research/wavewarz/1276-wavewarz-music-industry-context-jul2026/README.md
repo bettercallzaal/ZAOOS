@@ -2,7 +2,7 @@
 topic: wavewarz
 type: DOC
 status: verified
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1275, 1211, 1077, 1257, 1258, 1237, 743
 original-query: "How does WaveWarZ fit into the broader music industry landscape — the streaming crisis, onchain music moment, and NFT music wave? Position WaveWarZ as a cultural innovation, not just a technical product."
 tier: STANDARD
@@ -93,14 +93,14 @@ All from `wavewarz.info/api/public/stats` (public API, no auth):
 
 | Metric | Value | Significance |
 |--------|-------|-------------|
-| Total battles | 1,245 | 1,245 individual head-to-head competitions |
-| Total volume | 524.15 SOL (~$39,453) | Real money flowing through the platform |
-| Artist payouts | 9.07 SOL (~$683) | Paid to artists automatically, with no invoices |
+| Total battles | 1,289 | 1,289 individual head-to-head competitions |
+| Total volume | 878.30 SOL (~$39,453) | Real money flowing through the platform |
+| Artist payouts | 13.40 SOL (~$683) | Paid to artists automatically, with no invoices |
 | Unique songs battled | 921 | 921 songs are actively in the market |
 | Audius-rostered artists | 34 | Artists with discoverable Audius profiles |
 | Charity raised | $1,497 | Via Community Battle benefit rounds |
 
-**The numbers at context:** 9.07 SOL (~$683) to artists from 524 SOL (~$39,453) volume = 1.73% payout rate. On Spotify, to earn $683, an artist would need 170,750 streams at $0.004/stream. WaveWarZ generated that equivalent from 1,245 battles — not 170,750 individual listener events.
+**The numbers at context:** 13.40 SOL (~$683) to artists from 878 SOL (~$39,453) volume = 1.73% payout rate. On Spotify, to earn $683, an artist would need 170,750 streams at $0.004/stream. WaveWarZ generated that equivalent from 1,289 battles — not 170,750 individual listener events.
 
 ---
 

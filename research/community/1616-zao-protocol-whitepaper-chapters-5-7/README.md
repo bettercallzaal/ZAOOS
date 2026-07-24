@@ -41,9 +41,9 @@ That last point is structural. The loser still gets paid. WaveWarZ was designed 
 
 | Metric | Value |
 |--------|-------|
-| Total battles | 1,245 |
-| Total trading volume | 523.991 SOL |
-| Artist payouts (total) | 9.0988 SOL |
+| Total battles | 1,289 |
+| Total trading volume | 878.30 SOL |
+| Artist payouts (total) | 13.39 SOL |
 | Indexed artists | 43 |
 | Governance token holders | 43 ZOR holders |
 
@@ -171,7 +171,7 @@ Three entry points:
 Fork `github.com/bettercallzaal/ZAOOS`, deploy to Vercel, point at your own Supabase instance, swap in your Neynar API key. You have a functioning ZAO-adjacent coordination app.
 
 **2. Read the ZAOOS research library**  
-1,600+ research documents at `zaoos.com` (gated for ZAO members). Every architecture decision, every integration spec, every product design lives here. Partners and builders who want deep context get a read key.
+1,800+ research documents at `zaoos.com` (gated for ZAO members). Every architecture decision, every integration spec, every product design lives here. Partners and builders who want deep context get a read key.
 
 **3. Engage at Fractal sessions**  
 Every Monday at 6pm EST in Discord. Bring a project, rank contributions, earn OG Respect. This is the fastest path to Builder Hat access and OREC proposal rights.

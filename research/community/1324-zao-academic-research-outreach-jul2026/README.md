@@ -16,7 +16,7 @@ The North Star gap: evidence 9/10, distribution/external validation ~4/10. A sin
 4. **Small-scale, high-cohesion DAO** — most DAO research focuses on Compound/Uniswap (10K+ holders); ZAO = case study of a 157-member DAO that actually functions
 
 ### For music/creator economy researchers:
-1. **Prediction market applied to music** — first documented case of music battles as a prediction market (1,245 battles, verifiable)
+1. **Prediction market applied to music** — first documented case of music battles as a prediction market (1,289 battles, verifiable)
 2. **Artist payouts: 1.73% of volume vs. Spotify's $0.004/stream** — empirically measurable comparison
 3. **Loser-earns mechanic** — economic inversion of traditional winner-take-all; citable design pattern
 4. **$1,497 charity through community battles** — documented prosocial behavior in crypto platforms
@@ -75,7 +75,7 @@ I run The ZAO, a music-focused DAO that I think fits squarely into your research
 
 Quick overview of what makes us interesting from a research perspective:
 
-1. WaveWarZ: 1,245 music battles where fans bet SOL on which song wins. Total volume: 524 SOL ($39K). Artists earn 1.73% of battle volume directly — approximately 600× more per listener interaction than Spotify ($0.004/stream). All data is public API.
+1. WaveWarZ: 1,289 music battles where fans bet SOL on which song wins. Total volume: 878 SOL ($66K). Artists earn 1.52% of battle volume directly — approximately 600× more per listener interaction than Spotify ($0.004/stream). All data is public API.
 
 2. Fractal Respect governance: We've run 63+ consecutive weekly on-chain governance sessions on Optimism — one of the longest continuous records in the DAO space. 157 unique Respect holders. Zero token voting. Mechanism design paper: [link to doc 1312 if public-facing version exists]
 
@@ -106,7 +106,7 @@ Some data points that might be relevant to your research:
 - 505 total governance transactions
 - Weekly Fractal meeting → breakout groups → Fibonacci ranking → OREC execution
 - No token voting, no plutocracy, no Sybil attacks in 63 weeks
-- We connect governance decisions to WaveWarZ (music prediction market, 1,245 battles)
+- We connect governance decisions to WaveWarZ (music prediction market, 1,289 battles)
 
 I've written a technical explainer on how Fractal Respect works in practice: [link to doc 1312 if public]. Happy to share raw governance data, OREC logs, or participate in interviews/panels.
 
@@ -129,7 +129,7 @@ Pitching a talk or panel for [CONFERENCE NAME]:
 
 **"63 Weeks of Music DAO Governance: What We Learned"**
 
-The ZAO has run consecutive weekly on-chain governance sessions for 63+ weeks without a break. We govern a music prediction market (WaveWarZ, 1,245 battles), produce concerts (COC Concertz, 7 shows), and are building toward our first IRL festival (ZAOstock, Oct 3, 2026).
+The ZAO has run consecutive weekly on-chain governance sessions for 103+ weeks without a break. We govern a music prediction market (WaveWarZ, 1,289 battles), produce concerts (COC Concertz, 7 shows), and are building toward our first IRL festival (ZAOstock, Oct 3, 2026).
 
 3-4 main takeaways:
 1. What a "small, high-function DAO" looks like vs. the 10,000-member token-voting DAOs that get all the research

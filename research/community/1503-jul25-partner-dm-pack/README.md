@@ -53,7 +53,7 @@ zaalp99@gmail.com | wavewarz.info | ZAOstock Oct 3
 
 ```
 Hey — sent you an email Jul 23 about ZAO and our WaveWarZ platform (live music battles 
-where the loser earns). 64 consecutive governance sessions, 1,245 battles. We're hosting 
+where the loser earns). 103+ consecutive governance sessions, 1,289 battles. We're hosting 
 a community DAO governance vote from a stage at ZAOstock Oct 3 in Maine — thought it 
 might be a Green Pill episode.
 
@@ -113,7 +113,7 @@ zaalp99@gmail.com | ZAOstock Oct 3 | wavewarz.info
 
 ```
 Hey — I run WaveWarZ, a music battle platform where artists earn money even when they 
-lose ("loser earns"). 1,245 battles, 523 SOL in volume, 9 SOL in direct artist payouts.
+lose ("loser earns"). 1,289 battles, 878 SOL in volume, 13.39 SOL in direct artist payouts.
 
 ZAOstock is happening Oct 3 in Maine — free festival, live on-chain WaveWarZ battle from 
 the stage, charity payout voted by our DAO.

@@ -43,7 +43,7 @@ The fix is outreach, not quality. The ZAO has more citable facts than 95% of mus
 **Hook:** "WaveWarZ isn't a streaming platform or an NFT marketplace. It's a music prediction market — you bet on which song wins the battle. It's Polymarket for music."
 **Why it works:** "First X for music" framing gets coverage; prediction markets are hot in 2026
 **Target shows:** Web3 innovation, fintech, DeFi podcasts, mainstream tech
-**Supporting facts:** 1,245 battles, 524 SOL volume ($39K+), Solana native
+**Supporting facts:** 1,289 battles, 878 SOL volume ($66K+), Solana native
 
 ### Angle 4: The ZAO vs. the Music Industry (CULTURAL ANGLE)
 **Hook:** "A DAO built a music battle platform that generates more verifiable artist income per song than Spotify. And they run their governance live every week on-chain. This is what the music industry's alternative looks like."
@@ -110,9 +110,9 @@ I'm Zaal, co-founder of The ZAO — a music DAO that's been running Fractal gove
 We're probably the only active Fractal DAO on Optimism. While most DAOs vote once per quarter, The ZAO's 157 Respect holders show up every week to vote on-chain, allocate Respect, and govern the ecosystem.
 
 What we've built:
-- WaveWarZ: a music prediction market (1,245 battles, 524 SOL volume, 921 unique songs)
-- Paying artists 1.73% of battle volume — 600× better than Spotify's per-stream rate
-- 100+ governance sessions, $1,497 raised for charity via Community Battles
+- WaveWarZ: a music prediction market (1,289 battles, 878 SOL volume, 921 unique songs)
+- Paying artists 1.52% of battle volume — 600× better than Spotify's per-stream rate
+- 103+ governance sessions, $1,497 raised for charity via Community Battles
 - Full open-source stack (MIT license, public GitHub)
 
 Happy to share the governance data, on-chain receipts, and walk through how it actually works.
@@ -137,7 +137,7 @@ I'm Zaal, co-founder of WaveWarZ — the first music prediction market, running 
 
 Here's the data point I can't stop thinking about: WaveWarZ pays losing artists 1.73% of battle volume, instantly, in SOL. Spotify pays $0.004/stream. That's roughly a 600× difference in payout rate.
 
-We've run 1,245 battles with 921 unique songs from 34 rostered artists. Total artist payouts: 9.07 SOL (~$677). Small numbers — but every dollar is verifiable on-chain, which is more than can be said for streaming royalties.
+We've run 1,289 battles with 921 unique songs from 34 rostered artists. Total artist payouts: 13.39 SOL (~$1,005). Numbers verified on-chain, which is more than can be said for streaming royalties.
 
 The model is simple: two songs battle, listeners vote (with SOL), the winner's artist gets paid, and so does the loser's — at different rates. Prediction market + music discovery + artist income in one.
 
@@ -162,7 +162,7 @@ I'm Zaal Panthaki, co-founder of The ZAO — a music DAO based in Maine running 
 
 What makes it different: the whole event runs on blockchain technology. Artists are paid via a platform called WaveWarZ (a music battle prediction market), attendees can vote on performances on-chain, and the festival's governance is run weekly by a community of 157 members across the US and internationally.
 
-We've already run 7 virtual concerts (COC Concertz), 1,245 live music battles, and paid $1,497 to charity through our Community Battles program.
+We've already run 7 virtual concerts (COC Concertz), 1,289 live music battles, and paid $1,497 to charity through our Community Battles program.
 
 ZAOstock is part of the Art of Ellsworth weekend (Oct 1-4). It's free and open to the public.
 
@@ -227,8 +227,8 @@ ZOE CANNOT (Zaal must do):
 
 All verifiable, from docs 1278 and 1290:
 
-1. "1,245 music battles run since May 2025 — all public, all on Solana" (wavewarz.info)
-2. "524 SOL in volume from music prediction market betting" (~$39K at $74/SOL)
+1. "1,289 music battles run since May 2025 — all public, all on Solana" (wavewarz.info)
+2. "878 SOL in volume from music prediction market betting" (~$66K at $75/SOL)
 3. "WaveWarZ pays 1.73% of battle volume to artists — vs Spotify's $0.004/stream" (doc 1275)
 4. "63 consecutive on-chain governance weeks, 157 Respect holders" (OREC contract)
 5. "The only active Fractal DAO on Optimism Mainnet" (doc 1282)

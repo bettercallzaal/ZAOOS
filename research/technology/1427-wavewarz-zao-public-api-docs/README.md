@@ -101,7 +101,7 @@ curl "https://wavewarz.info/api/public/battles?status=active&limit=10"
       "closes_at": "2026-07-18T20:00:00Z"
     }
   ],
-  "total": 1245,
+  "total": 1289,
   "page": 1
 }
 ```

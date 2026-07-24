@@ -31,7 +31,7 @@ The fix is outreach, not quality. The ZAO has more citable facts than 95% of mus
 **Hook:** "WaveWarZ pays losing artists 1.73% of battle volume — instantly, on-chain, in SOL. Spotify pays $0.004/stream. That's a 600× gap."
 **Why it works:** Concrete numbers, emotional hook (artists being paid fairly), familiar context (Spotify bad → web3 good)
 **Target shows:** Music business, creator economy, crypto podcasts
-**Supporting facts:** 9.07 SOL total payouts, $677 at current prices, 921 unique songs, 34 artists rostered
+**Supporting facts:** 13.40 SOL total payouts ($988 at $73.73/SOL), 921 unique songs, 34 artists rostered
 
 ### Angle 2: The DAO That Actually Shows Up (CRYPTO/DAO ANGLE)
 **Hook:** "63 consecutive on-chain governance weeks. 157 Respect holders. The only active Fractal DAO on Optimism. ZAO doesn't vote for show — it votes every single week."

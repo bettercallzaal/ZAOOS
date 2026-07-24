@@ -9,7 +9,9 @@ owner: ZOE (monitoring + posts) + Zaal (approves press outreach)
 
 # 1378 — WaveWarZ Milestone Playbook (Jul 2026)
 
-> **Current stats (Jul 17, 2026):** 1,245 battles | 523.991 SOL volume | 9.0988 SOL artist payouts | 50 MAIN events | 162 MAIN battles | 1,047 quick battles | 36 community battles
+> **Current stats (Jul 24, 2026):** 1,289 battles | 878.30 SOL volume | 13.39 SOL artist payouts | 50 MAIN events | 165 MAIN battles | 1,084 quick battles | 36 community battles
+>
+> **Note (Jul 2026 AI Tournament):** The AI Artist Tournament semifinal (Jul 16–23) alone added ~355 SOL in one week — 68% of all prior platform volume combined. Grand final (GEEK MYTH vs Stormbourne) is upcoming as of Jul 24; the 1,000 SOL volume milestone is now ~122 SOL away and could be crossed during the grand final.
 >
 > **How to use:** ZOE polls /api/public/stats on a schedule. When a threshold below is crossed, ZOE executes the milestone protocol for that tier. Milestones above 2000 battles are future research — populate when closer.
 
@@ -19,18 +21,18 @@ owner: ZOE (monitoring + posts) + Zaal (approves press outreach)
 
 | Milestone | Current gap | Estimated when | Priority |
 |-----------|------------|----------------|----------|
-| 1,500 battles | +255 battles | Aug–Sep 2026 | 🔴 HIGH — soon |
-| 600 SOL volume | +76.009 SOL | Sep–Oct 2026 | 🟡 MEDIUM |
-| 2,000 battles | +755 battles | Nov 2026–Q1 2027 | 🟡 MEDIUM |
-| 100 SOL artist payouts | +90.9012 SOL | Q1–Q2 2027 | 🔵 FUTURE |
-| 1,000 SOL total volume | +476 SOL | Q2–Q3 2027 | 🔵 FUTURE |
-| 5,000 battles | +3,755 battles | 2027–2028 | 🔵 FUTURE |
+| 1,500 battles | +211 battles | Aug–Sep 2026 | 🔴 HIGH — soon |
+| 600 SOL volume | CROSSED ✅ (878.30 SOL) | — | ✅ DONE |
+| **1,000 SOL total volume** | **+121.70 SOL** | **Aug 2026 (IMMINENT — grand final upcoming)** | **🔴 HIGH — IMMINENT** |
+| 2,000 battles | +711 battles | Nov 2026–Q1 2027 | 🟡 MEDIUM |
+| 100 SOL artist payouts | +86.61 SOL | Q1–Q2 2027 | 🔵 FUTURE |
+| 5,000 battles | +3,711 battles | 2027–2028 | 🔵 FUTURE |
 
 ---
 
 ## Milestone 1: 1,500 Battles (Expected Aug–Sep 2026)
 
-**Significance:** First "major round number" milestone. +20% from current 1,245. Citable in press outreach, grants, and Wikipedia update.
+**Significance:** First "major round number" milestone. +16% from current 1,289. Citable in press outreach, grants, and Wikipedia update.
 
 ### ZOE Trigger Action (auto at threshold):
 
@@ -81,11 +83,13 @@ ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,500 Battles" —
 
 ---
 
-## Milestone 2: 600 SOL Volume (Expected Sep–Oct 2026)
+## Milestone 2: 600 SOL Volume ✅ CROSSED (Jul 2026)
+
+> **MILESTONE CROSSED:** Volume reached 878.30 SOL as of Jul 24, 2026 — the AI Artist Tournament semifinal (Jul 16–23) alone added ~355 SOL, vaulting past 600 SOL in a single week. ZOE trigger actions below are for historical reference.
 
 **Significance:** Volume milestone is the financial proof point. "$600 SOL+ in music battle volume" is a specific, citable number for grants and press.
 
-### ZOE Trigger Action (auto at threshold):
+### ZOE Trigger Action (auto at threshold — REFERENCE ONLY, already fired):
 
 **X @wavewarz:**
 > WaveWarZ volume: 600 SOL.
@@ -101,10 +105,10 @@ ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,500 Battles" —
 **Farcaster /zao:**
 > WaveWarZ: 600 SOL in battle volume. [artist payout SOL] SOL paid to artists. The loser-earns model at scale. | /zao
 
-### Zaal Action:
-- Update all "523 SOL" references in doc 1339, doc 1278, doc 1290
+### Zaal Action (overdue — superseded by 878 SOL update):
+- ~~Update all "523 SOL" references in doc 1339, doc 1278, doc 1290~~ → already updated to 878.30 SOL in doc 1201, 1651 (Jul 24)
 - If Fisher grant application is in progress, update budget narrative with new volume figure
-- Press angle: "WaveWarZ processes 600 SOL in independent artist transactions" — pitch to Decrypt
+- Press angle: "WaveWarZ processes 878 SOL in independent artist transactions" — pitch to Decrypt
 
 ---
 
@@ -155,6 +159,64 @@ ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,500 Battles" —
 
 ---
 
+## Milestone 5: 1,000 SOL Total Volume (IMMINENT — ~122 SOL away as of Jul 24)
+
+> **Status as of Jul 24, 2026:** 878.30 SOL wagered. 121.70 SOL to 1,000 SOL. AI Artist Tournament grand final (GEEK MYTH vs Stormbourne) is upcoming and could push past 1,000 SOL in a single battle. See doc 1469 for platform state and doc 2042 for grand final preview.
+
+**Significance:** "1,000 SOL in music battle volume" is the cleanest headline number in WaveWarZ history. $1K → 1,000 SOL symmetry. Citable in every grant, press pitch, and DAO case study. This milestone was projected for Q2–Q3 2027 when created (Jul 17, 2026, baseline 524 SOL) — the AI Tournament moved it forward by 12+ months.
+
+### ZOE Trigger Action (auto at threshold):
+
+**X @wavewarz:**
+> WaveWarZ: 1,000 SOL.
+>
+> 1,000 SOL moved through live music battles on Solana.
+>
+> Both artists earned every single time. 1,289+ times.
+>
+> That's what a music economy looks like when the community governs it.
+>
+> [wavewarz.info]
+>
+> #WaveWarZ #1000SOL
+
+**Farcaster /zao:**
+> WaveWarZ just crossed 1,000 SOL in battle volume.
+>
+> 1,000 SOL. Both artists earned every time. Community-governed.
+>
+> The loser-earns model at 1,000 SOL. | /zao
+
+**Telegram:**
+> 🎉 WaveWarZ hit 1,000 SOL in total battle volume! 1K SOL through music battles, both artists earning every time. #WaveWarZ #1000SOL
+
+**Newsletter feature (auto-trigger Issue draft):**
+ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,000 SOL" — Zaal reviews + sends same day.
+
+### Zaal Action (within 24hrs):
+
+- Update doc 1201 (canonical facts ledger): change "878.30 SOL" → "1,000+ SOL"
+- Update doc 1651 (ZAO DAO case study): live stats table
+- Update public/llms.txt: stats line
+- **Press pitch (HIGH PRIORITY):** Forward to Hypebot AND Decrypt with subject "WaveWarZ milestone: 1,000 SOL in music battle volume" using template:
+
+> Hi [name],
+>
+> Quick milestone update: WaveWarZ just crossed 1,000 SOL in total music battle volume — roughly $75K+ at current SOL prices.
+>
+> This is on Solana mainnet, fully on-chain. Both artists in every battle received an automatic payout — including the losing artist. The "loser earns" model has now been tested at 1,000+ data points with 1,000 SOL moved through the system.
+>
+> For context: the AI Artist Tournament semifinal alone (Jul 16–23) generated ~355 SOL in a single week — the equivalent of 68% of all prior platform history. The model works.
+>
+> If you're covering music economics, web3, or creator economy tools, this is one of the only live systems with 18+ months of settlement data. Happy to connect Zaal Panthaki.
+>
+> [signature]
+
+- **Govbase update:** If ZAO is in the metagov/govbase dataset by this point, update the `totalVolumeSOL` field via a new PR.
+- **Wikipedia:** If WaveWarZ or ZAO Wikipedia article exists, update volume figure.
+
+---
+
 ## MAIN Event Count Milestones
 
 Current: 50 MAIN events. Milestones:
@@ -196,6 +258,11 @@ if sol_volume >= 600 && !milestone_posted['600_sol']:
   post TMP-MS-02 to X, Farcaster
   notify Zaal
 
+if sol_volume >= 1000 && !milestone_posted['1000_sol']:
+  post TMP-MS-05 to X, Farcaster, Telegram
+  create newsletter draft
+  notify Zaal via Telegram: "MILESTONE: 1000 SOL crossed — PRESS PITCH IMMEDIATELY"
+
 if battles >= 2000 && !milestone_posted['2000_battles']:
   post TMP-MS-03 to X, Farcaster, Telegram
   create newsletter draft
@@ -227,11 +294,12 @@ On every major milestone (1500 battles, 600 SOL, 2000 battles, 100 SOL payouts):
 | Milestone | Best outlet | Angle |
 |-----------|-------------|-------|
 | 1,500 battles | Hypebot | Loser-earns model at 1,500 data points |
-| 600 SOL volume | Decrypt | $X in independent artist revenue, no label |
+| 600 SOL volume ✅ | Decrypt | ~~$600 SOL~~ → superseded by 878 SOL / 1,000 SOL milestone |
+| **1,000 SOL volume** | **Decrypt + Hypebot** | **$75K+ in music battle volume on Solana — IMMINENT** |
 | 2,000 battles | Water & Music | Longitudinal music economics data (18+ months) |
 | 100 SOL payouts | Bankless | DeFi primitive for music — all artist payouts, zero platform cut |
 | 100 MAIN events | Music Business Worldwide | 100 community-governed music events |
 
 ---
 
-*Created: 2026-07-17 | ZOE monitors live; next milestone: 1,500 battles (Aug-Sep 2026) | Stats source: wavewarz.info/api/public/stats | Related: 1339 (ZAO Numbers — update on milestone), 1278 (citable claims), 1344 (AI-native DAO narrative), 1347 (growth strategy)*
+*Created: 2026-07-17 | Last updated: 2026-07-24 (ww loop: refreshed stats post-AI-tournament; 600 SOL marked crossed; 1,000 SOL upgraded to IMMINENT; Milestone 5 section added) | ZOE monitors live; NEXT MILESTONE: 1,000 SOL total volume (~122 SOL away — AI Tournament grand final could cross it) | Stats source: wavewarz.info/api/public/stats | Related: 1339 (ZAO Numbers), 1278 (citable claims), 1344 (AI-native DAO narrative), 1469 (platform state), 2042 (grand final preview)*

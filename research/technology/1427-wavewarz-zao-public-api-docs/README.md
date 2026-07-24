@@ -45,14 +45,14 @@ curl https://wavewarz.info/api/public/stats
 **Response (example, as of July 17, 2026):**
 ```json
 {
-  "battles": 1245,
+  "battles": 1289,
   "mainEvents": 50,
-  "mainBattles": 162,
-  "quickBattles": 1047,
+  "mainBattles": 165,
+  "quickBattles": 1084,
   "communityBattles": 36,
-  "volume": 523.991,
-  "artistPayouts": 9.0988,
-  "traderClaims": 127.343
+  "volume": 878.30,
+  "artistPayouts": 13.39,
+  "traderClaims": 381.197
 }
 ```
 

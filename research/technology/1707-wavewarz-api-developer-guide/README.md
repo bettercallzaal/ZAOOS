@@ -28,15 +28,15 @@ Returns current platform-wide aggregate statistics.
 
 ```json
 {
-  "total_battles": 1245,
+  "total_battles": 1289,
   "main_events": 50,
-  "main_battles": 162,
-  "quick_battles": 1047,
+  "main_battles": 165,
+  "quick_battles": 1084,
   "community_battles": 36,
-  "total_volume_sol": 523.991,
-  "artist_payouts_sol": 9.0988,
-  "trader_claims_sol": 127.343,
-  "updated_at": "2026-07-18T..."
+  "total_volume_sol": 878.30,
+  "artist_payouts_sol": 13.39,
+  "trader_claims_sol": 381.197,
+  "updated_at": "2026-07-24T..."
 }
 ```
 
@@ -262,7 +262,7 @@ When displaying artist results, always use the Audius handle from the WaveWarZ A
 When OP Retro Funding, Fisher, or other grants ask for evidence of "open ecosystem" or "public API":
 
 **Citable language:**
-> WaveWarZ provides a public REST API at wavewarz.info/api/public/stats with no authentication required, returning real-time battle statistics, SOL volume, and artist payout data. As of July 2026: 1,245 battles settled, 523.991 SOL in volume, 9.0988 SOL in direct artist payouts. The API is used by ZABAL builders, ZOE (the ZAO AI agent), and third-party Farcaster frames.
+> WaveWarZ provides a public REST API at wavewarz.info/api/public/stats with no authentication required, returning real-time battle statistics, SOL volume, and artist payout data. As of July 2026: 1,289 battles settled, 878.30 SOL in volume, 13.39 SOL in direct artist payouts. The API is used by ZABAL builders, ZOE (the ZAO AI agent), and third-party Farcaster frames.
 
 **On-chain verification (complements the API):**
 > All battle settlements are executed by the WaveWarZ Solana program. Each settlement is an on-chain transaction verifiable on Solscan. ZAO governance decisions that initiate battles are recorded on Optimism Mainnet via the OREC contract at 0xcB05F9254765CA521F7698e61E0A6CA6456Be532.

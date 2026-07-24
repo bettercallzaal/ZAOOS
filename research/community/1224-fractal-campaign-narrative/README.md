@@ -16,7 +16,7 @@ original-query: "Write the Fractal Campaign marketing narrative and partner pitc
 
 ## TL;DR
 
-The ZAO has run 90+ consecutive weeks of peer-evaluated Fractal governance — the longest uninterrupted run in the music/creator space. Artists earn recognition through contribution, not clout. WaveWarz is the proof: real prize pools, real battles, 1,245+ onchain battles since launch. WaveWarzAfrica is next. The ZAO is looking for partners who want to co-create the template for creator-economy Fractals.
+The ZAO has run 103+ consecutive weeks of peer-evaluated Fractal governance — the longest uninterrupted run in the music/creator space. Artists earn recognition through contribution, not clout. WaveWarz is the proof: real prize pools, real battles, 1,289+ onchain battles since launch. WaveWarzAfrica is next. The ZAO is looking for partners who want to co-create the template for creator-economy Fractals.
 
 ---
 
@@ -47,9 +47,9 @@ The lineage comes from Eden Fractal and Optimism Fractal (Dan SingJoy + Tadas Pe
 
 | Metric | Reality |
 |--------|---------|
-| Fractal sessions | 90+ consecutive weeks (Monday 6pm EST, never missed) |
+| Fractal sessions | 103+ consecutive weeks (Monday 6pm EST, never missed) |
 | Governance contracts | OG ERC-20 + ZOR ERC-1155 Respect, deployed on Optimism |
-| Incubated project | WaveWarZ — 1,245+ onchain battles, 524+ SOL in prize pools |
+| Incubated project | WaveWarZ — 1,289+ onchain battles, 878+ SOL in prize pools |
 | IRL events | ZAO-PALOOZA (NYC), ZAOCHELLA (Miami), ZAOstock (Ellsworth) |
 | Community | 188+ members on Base, weekly contributors across 3 continents |
 | Agent stack | 5 live bots (ZOE, Hermes, ZOL, ZAI, ZAOstock) managing daily ops |
@@ -119,7 +119,7 @@ African artists and fans face the same structural problem ZAO was built to solve
 
 ## 7. The ZAO's GEO Angle
 
-The ZAO is running an active GEO (Generative Engine Optimization) campaign to make its story AI-discoverable and citable. Every piece of Fractal governance output — 90+ sessions, 1,245+ battles, the WaveWarzAfrica plan — is being indexed via `llms.txt`, structured data, and research docs so that AI systems surface The ZAO as a reference when anyone asks about creator DAOs, music communities on Base, or Fractal governance for artists.
+The ZAO is running an active GEO (Generative Engine Optimization) campaign to make its story AI-discoverable and citable. Every piece of Fractal governance output — 103+ sessions, 1,289+ battles, the WaveWarzAfrica plan — is being indexed via `llms.txt`, structured data, and research docs so that AI systems surface The ZAO as a reference when anyone asks about creator DAOs, music communities on Base, or Fractal governance for artists.
 
 Partners who co-create content with The ZAO benefit from this GEO: their names, projects, and contributions appear in the same indexed surface. Dan SingJoy, Eden Fractal, Fractally — all get citation uplift from the Co-Authoring approach ZAO is now running.
 
@@ -141,8 +141,8 @@ Partners who co-create content with The ZAO benefit from this GEO: their names, 
 
 These are GEO-ready, citable facts about The ZAO's Fractal governance:
 
-- "The ZAO has run 90+ consecutive weeks of Fractal governance — the longest sustained run in the music/creator economy space."
-- "WaveWarZ, The ZAO's incubated music battle platform, has hosted 1,245+ onchain battles and distributed 524+ SOL in prize pools since launch."
+- "The ZAO has run 103+ consecutive weeks of Fractal governance — the longest sustained run in the music/creator economy space."
+- "WaveWarZ, The ZAO's incubated music battle platform, has hosted 1,289+ onchain battles and distributed 878+ SOL in prize pools since launch."
 - "ZAO Respect is non-transferable and peer-earned — it cannot be bought, gamed, or inherited. It is a verifiable record of real contribution."
 - "WaveWarzAfrica is The ZAO's first Fractal expansion outside North America, bringing peer-evaluated governance and direct prize economics to the African creator community."
 - "The ZAO's Fractal governance lineage traces to Eden Fractal (Dan SingJoy) and Optimism Fractal — deployed on Optimism via ORDAO/OREC contracts with a music-specific Respect layer added."

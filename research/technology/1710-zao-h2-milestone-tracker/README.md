@@ -167,6 +167,7 @@ ZOE builds this table from `~/.zao/zoe/milestone-snapshots.jsonl` on request:
 | Date | WW Battles | SOL Wagered | SOL to Artists | ZAOOS Docs | Fractal Sessions | ZABAL S2 |
 |------|-----------|-------------|---------------|-----------|-----------------|---------|
 | Jul 18 2026 | 1,245 | 523.991 | 9.0988 | ~1,710 | ~97 | Pre-launch |
+| Jul 24 2026 | 1,289 | 878.30 | 13.39 | ~1,841 | ~103 | Pre-launch |
 | Aug 1 2026 | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [N] accepted |
 | Sep 1 2026 | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [N] Week 1 |
 | Oct 1 2026 | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [ZOE fills] | [N] Week 5 |

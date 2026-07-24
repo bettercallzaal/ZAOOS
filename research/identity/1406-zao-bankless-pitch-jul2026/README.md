@@ -116,7 +116,7 @@ If Bankless says yes, have these ready:
 
 **Non-negotiable stats (verify day-of from API):**
 - Battle count: 1,289+ (live on wavewarz.info/api/public/stats)
-- SOL volume: 523.991+ SOL
+- SOL volume: 878.30+ SOL
 - Artist payouts: 9.0988+ SOL ("~$600 to losing artists at current SOL price")
 - Trader claims: 381.20+ SOL ("~$28K to traders")
 - Governance sessions: 63+ weekly consecutive

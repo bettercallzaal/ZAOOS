@@ -53,12 +53,12 @@ On-chain contracts (Optimism Mainnet):
 
 ## WaveWarZ (Product)
 
-WaveWarZ is a music battle prediction market. Stats as of July 2026:
-- 1,245+ battles completed
-- 50 MAIN events
-- 523.99 SOL total trading volume (~$104K USD)
-- 9.09 SOL paid to losing artists
-- 127.34 SOL claimed by winning traders
+WaveWarZ is a music battle prediction market. Stats as of July 2026 (post-AI-Tournament):
+- 1,289+ battles completed
+- 51 MAIN events
+- 878.30 SOL total trading volume (~$64.8K USD at $73.73/SOL)
+- 13.40 SOL paid to artists (instant, per-trade)
+- 381.20 SOL claimed by winning traders
 - 3 battle types: MAIN, Quick Battle, Community/Charity Battle
 
 The "loser-earns" mechanism: when a battle closes, the losing artist receives ~1.73% of the pool bet against them. This means every artist earns something regardless of outcome — structurally different from streaming royalties.

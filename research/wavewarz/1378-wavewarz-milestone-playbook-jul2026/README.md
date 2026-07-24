@@ -2,14 +2,14 @@
 topic: wavewarz/milestones
 type: PLAYBOOK
 status: ACTIVE — ZOE monitors /api/public/stats; triggers on threshold hit
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1339, 1344, 1359, 1372
 owner: ZOE (monitoring + posts) + Zaal (approves press outreach)
 ---
 
 # 1378 — WaveWarZ Milestone Playbook (Jul 2026)
 
-> **Current stats (Jul 17, 2026):** 1,245 battles | 523.991 SOL volume | 9.0988 SOL artist payouts | 50 MAIN events | 162 MAIN battles | 1,047 quick battles | 36 community battles
+> **Current stats (Jul 24, 2026):** 1,289 battles | 878.30 SOL volume | 13.40 SOL artist payouts | 50 MAIN events | 165 MAIN battles | 1,088 quick battles | 36 community battles
 >
 > **How to use:** ZOE polls /api/public/stats on a schedule. When a threshold below is crossed, ZOE executes the milestone protocol for that tier. Milestones above 2000 battles are future research — populate when closer.
 
@@ -30,7 +30,7 @@ owner: ZOE (monitoring + posts) + Zaal (approves press outreach)
 
 ## Milestone 1: 1,500 Battles (Expected Aug–Sep 2026)
 
-**Significance:** First "major round number" milestone. +20% from current 1,245. Citable in press outreach, grants, and Wikipedia update.
+**Significance:** First "major round number" milestone. +20% from current 1,289. Citable in press outreach, grants, and Wikipedia update.
 
 ### ZOE Trigger Action (auto at threshold):
 
@@ -62,7 +62,7 @@ ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,500 Battles" —
 
 ### Zaal Action (within 24hrs):
 
-**Update doc 1339** (ZAO Numbers canonical doc): change "1,245+ battles" to "1,500+ battles" in all instances.
+**Update doc 1339** (ZAO Numbers canonical doc): change "1,289+ battles" to "1,500+ battles" in all instances.
 
 **Update doc 1278** (citable claims): update the battle count claim.
 
@@ -102,7 +102,7 @@ ZOE creates a draft newsletter issue with subject: "WaveWarZ: 1,500 Battles" —
 > WaveWarZ: 600 SOL in battle volume. [artist payout SOL] SOL paid to artists. The loser-earns model at scale. | /zao
 
 ### Zaal Action:
-- Update all "523 SOL" references in doc 1339, doc 1278, doc 1290
+- Update all "878 SOL" references in doc 1339, doc 1278, doc 1290
 - If Fisher grant application is in progress, update budget narrative with new volume figure
 - Press angle: "WaveWarZ processes 600 SOL in independent artist transactions" — pitch to Decrypt
 
@@ -234,4 +234,4 @@ On every major milestone (1500 battles, 600 SOL, 2000 battles, 100 SOL payouts):
 
 ---
 
-*Created: 2026-07-17 | ZOE monitors live; next milestone: 1,500 battles (Aug-Sep 2026) | Stats source: wavewarz.info/api/public/stats | Related: 1339 (ZAO Numbers — update on milestone), 1278 (citable claims), 1344 (AI-native DAO narrative), 1347 (growth strategy)*
+*Created: 2026-07-24 | ZOE monitors live; next milestone: 1,500 battles (Aug-Sep 2026) | Stats source: wavewarz.info/api/public/stats | Related: 1339 (ZAO Numbers — update on milestone), 1278 (citable claims), 1344 (AI-native DAO narrative), 1347 (growth strategy)*

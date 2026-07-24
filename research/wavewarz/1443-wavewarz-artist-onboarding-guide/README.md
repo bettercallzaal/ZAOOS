@@ -25,7 +25,7 @@ WaveWarZ is a music battle platform where two artists compete head-to-head and t
 
 Here's what makes WaveWarZ different: **the losing artist gets paid.** When a battle closes, the losing artist receives a share of the SOL bet against them — roughly 1.73% of the losing pool. So every artist who participates earns something, regardless of whether they win or lose. That's structurally different from Spotify, YouTube, or any streaming platform.
 
-As of July 2026, 1,245+ battles have been completed on WaveWarZ with over 524 SOL (~$104K) in total trading volume.
+As of July 2026, 1,289+ battles have been completed on WaveWarZ with over 878 SOL (~$64.8K) in total trading volume.
 
 ---
 

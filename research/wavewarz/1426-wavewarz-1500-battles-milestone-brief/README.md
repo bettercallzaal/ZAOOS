@@ -3,16 +3,16 @@
 **Type:** MILESTONE  
 **Topic:** wavewarz  
 **Status:** Pre-written — ZOE triggers when wavewarz.info/api/public/stats shows battles ≥ 1,500  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1341 (MAIN Event Strategy — TMP-MILESTONE), 1378 (Milestone Playbook), 1400 (ZAOOS Corpus Milestone — similar doc for 1,400 docs), 1421 (Artist Earnings Guide), 1424 (Whitepaper)
 
 ---
 
 ## Milestone Context
 
-WaveWarZ had **1,245 battles** as of July 17, 2026.
+WaveWarZ had **1,289 battles** as of July 24, 2026.
 
-At recent battle pace (~30-40 battles/month based on 1,245 battles since launch), the 1,500 milestone should occur approximately **September or October 2026**.
+At recent battle pace (~30-40 battles/month based on 1,289 battles since launch), the 1,500 milestone should occur approximately **September or October 2026**.
 
 This doc is fully pre-written. ZOE checks the public API weekly and fires the templates below when battles ≥ 1,500.
 
@@ -146,7 +146,7 @@ When the trigger fires, ZOE should also update the ZAOOS milestone log. If no lo
 
 | Milestone | Date | SOL Volume | Artist Payouts | Charity | Doc |
 |-----------|------|-----------|---------------|---------|-----|
-| 1,245 battles | Jul 17, 2026 | 523.99 SOL | 9.09 SOL | $1,497 | baseline (1424) |
+| 1,289 battles | Jul 24, 2026 | 878.30 SOL | 13.40 SOL | $1,497 | baseline (1424) |
 | 1,500 battles | [DATE] | [SOL] | [SOL] | [$] | 1426 |
 ```
 
@@ -160,7 +160,7 @@ After the milestone fires, add this fact to:
 - Press kit (doc 1296): "WaveWarZ reached 1,500 battles in [MONTH] 2026"
 - Academic brief (doc 1408): update battle count
 - Whitepaper (doc 1424): update empirical data section
-- Mirror Article 2 template (doc 1418): update `[1,245 battles]` placeholder if it's still being edited
+- Mirror Article 2 template (doc 1418): update `[1,289 battles]` placeholder if it's still being edited
 
 ---
 

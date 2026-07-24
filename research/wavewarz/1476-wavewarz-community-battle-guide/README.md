@@ -115,7 +115,7 @@ As part of Africa Battle Week (doc 1373), a special Community Battle is planned 
 | Metric | Value |
 |---|---|
 | Total Community Battles run | 36 |
-| As % of total battles | 2.9% (36 of 1,245) |
+| As % of total battles | 2.9% (36 of 1,289) |
 | Typical proposal-to-battle time | 7-14 days |
 | Artist participation rate | [Confirm with Hurricane] |
 

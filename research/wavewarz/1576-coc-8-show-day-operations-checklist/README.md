@@ -16,7 +16,7 @@
 | Artists | 2 MAIN headliners + 2–4 supporting (from doc 1559 ZAOstock pipeline) |
 | Venue | [Venue TBD — confirm with Zaal] |
 | ZOR vote window | 2 Thursdays before COC #8 (from doc 1559 Phase 1) |
-| WaveWarZ MAIN slots | 3 battles (standard MAIN format: 162 MAIN battles completed as of Jul 17) |
+| WaveWarZ MAIN slots | 3 battles (standard MAIN format: 165 MAIN battles completed as of Jul 17) |
 
 ---
 
@@ -114,7 +114,7 @@ Reply to confirm you're set. See you there 🔥
 
 **Battle format notes:**
 - Standard MAIN: audience vote window = [check wavewarz.info MAIN settings before show]
-- Payout: loser receives SOL automatically after battle closes (from doc 1570: 9.0988 SOL total to losing artists as of Jul 17)
+- Payout: loser receives SOL automatically after battle closes (from doc 1570: 13.40 SOL total to losing artists as of Jul 17)
 - Volume: add to running total for doc 1570 citable claims update after show
 - COC #8 is the 2nd COC show with live audience (COC #7 was the first — Jul 18 from doc 1559)
 

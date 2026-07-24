@@ -2,7 +2,7 @@
 topic: wavewarz/partnerships
 type: PLAYBOOK
 status: URGENT — send by Jul 25, 2026
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1343, 1348, 1349, 1353
 owner: Zaal (sends DMs — gated human action)
 ---
@@ -22,7 +22,7 @@ owner: Zaal (sends DMs — gated human action)
 
 > Hey [contact],
 >
-> I'm Zaal from WaveWarZ (wavewarz.info) — Solana music battle platform, 1,245+ battles, 523+ SOL volume. Right now participants need SOL to bet. We want to add a USD on-ramp to lower the barrier for non-crypto music fans.
+> I'm Zaal from WaveWarZ (wavewarz.info) — Solana music battle platform, 1,289+ battles, 523+ SOL volume. Right now participants need SOL to bet. We want to add a USD on-ramp to lower the barrier for non-crypto music fans.
 >
 > Coinflow seems like the right partner here. Can we do a 20-min intro call to explore what an integration would look like?
 >
@@ -152,4 +152,4 @@ owner: Zaal (sends DMs — gated human action)
 
 ---
 
-*Created: 2026-07-17 | Send all 7 by Jul 25 | Companion to doc 1343 (strategic overview) | Related: 1348 (trader growth — Privy flip key dependency), 1353 (Q3 calendar), 1365 (ticketing — Privy flip affects virtual ticket conversion)*
+*Created: 2026-07-24 | Send all 7 by Jul 25 | Companion to doc 1343 (strategic overview) | Related: 1348 (trader growth — Privy flip key dependency), 1353 (Q3 calendar), 1365 (ticketing — Privy flip affects virtual ticket conversion)*

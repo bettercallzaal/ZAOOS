@@ -2,7 +2,7 @@
 
 **Type:** DOC  
 **Status:** Live — data from wwtracker (bettercallzaal/wwtracker) + wavewarz.info/api/public/stats  
-**Date:** 2026-07-17  
+**Date:** 2026-07-24  
 **Related:** [1077 ZAO DAO Case Study](../1077-zao-dao-case-study-jul2026/), [1079 Battle Intelligence](../1079-wavewarz-battle-intelligence-layer/), [1081 Wave 3 Analytics](../1081-wwtracker-analytics-wave3/)
 
 ---
@@ -31,8 +31,8 @@ Artists receive an automatic, on-chain payout when a battle settles.
 | Battle settled — winner side | ~3% of battle volume (0.5% trade fee + settlement bonus) |
 | Battle settled — loser side | ~1.5% of battle volume (0.5% trade fee only) |
 
-All-time platform artist payouts (wavewarz.info/api/public/stats, 2026-07-17T17:15Z):
-**9.07 SOL** (~$683 at $75.29/SOL) across 1,245 battles.
+All-time platform artist payouts (wavewarz.info/api/public/stats, 2026-07-24T17:15Z):
+**13.40 SOL** (~$683 at $75.29/SOL) across 1,289 battles.
 
 ---
 
@@ -41,7 +41,7 @@ All-time platform artist payouts (wavewarz.info/api/public/stats, 2026-07-17T17:
 Derived from `public/ww-battles.json` (1,108 battles, PR #175 branch): handle-tagged cross-artist battles.
 Formula: winner battles × vol × 0.03 + loser battles × vol × 0.015.
 Self-battles (same artist on both sides) excluded. Min 2 cross-artist battles to qualify.
-Dataset refresh: 2026-07-17 (parser fix added 19 battles including the 1.87 SOL Luchador battle).
+Dataset refresh: 2026-07-24 (parser fix added 19 battles including the 1.87 SOL Luchador battle).
 
 | Rank | Artist (X handle) | W | L | Win% | Vol in (◎) | Est. Earnings (◎) |
 |------|-------------------|---|---|------|------------|-------------------|
@@ -65,7 +65,7 @@ Dataset refresh: 2026-07-17 (parser fix added 19 battles including the 1.87 SOL 
 
 **Note on GodclouD:** 24 total appearances in the feed (including 2 self-battles excluded from this table). Cross-artist record: 22 battles (16W/6L). Volume figure (10.436 SOL) excludes self-battle volume. GodclouD's earnings lead is 2.1× the second-place artist.
 
-**Note on coverage:** Handle-tagged cross-artist battles are ~12% of all 1,245 WaveWarZ battles (live API).
+**Note on coverage:** Handle-tagged cross-artist battles are ~12% of all 1,289 WaveWarZ battles (live API).
 Total platform payouts = 9.07 ◎ (all battles). As handle tagging expands, per-artist
 earnings estimates will become more complete.
 
@@ -117,9 +117,9 @@ All components derive from `public/ww-battles.json` — no runtime API calls.
 These statements can be verified directly from the on-chain battle record:
 
 1. **"GodclouD has earned an estimated 0.258 SOL (~$19) from WaveWarZ battle participation — the most of any artist in the tagged battle record (22 cross-artist battles, 72.7% win rate, 10.44 SOL volume)."**
-2. **"ZAO artists have received 9.07 SOL ($683) in automatic, on-chain payouts from WaveWarZ battles (all-time as of Jul 2026)."**
-3. **"WaveWarZ has run 1,245 on-chain battles across 12+ months (Aug 2025 – Jul 2026), generating 524.15 SOL in total trading volume."**
-4. **"Artists earn automatically at settlement — no claim required. The platform has issued 939 trader withdrawals (127.34 SOL) alongside artist payouts."**
+2. **"ZAO artists have received 13.40 SOL ($683) in automatic, on-chain payouts from WaveWarZ battles (all-time as of Jul 2026)."**
+3. **"WaveWarZ has run 1,289 on-chain battles across 12+ months (Aug 2025 – Jul 2026), generating 878.30 SOL in total trading volume."**
+4. **"Artists earn automatically at settlement — no claim required. The platform has issued 939 trader withdrawals (381.20 SOL) alongside artist payouts."**
 
 ---
 
@@ -128,7 +128,7 @@ These statements can be verified directly from the on-chain battle record:
 | Source | What it provides | How to access |
 |--------|-----------------|---------------|
 | `public/ww-battles.json` (wwtracker) | Battle records, handles, winner, volume | bettercallzaal/wwtracker (public) |
-| `wavewarz.info/api/public/stats` | Platform-level totals (9.07 SOL artist payouts) | No auth, CORS open |
+| `wavewarz.info/api/public/stats` | Platform-level totals (13.40 SOL artist payouts) | No auth, CORS open |
 | wwtracker components | Live per-artist charts | tracker.thezao.com (when PRs merge) |
 
 ---

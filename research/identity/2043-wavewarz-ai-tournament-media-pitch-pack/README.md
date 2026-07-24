@@ -20,7 +20,7 @@ expires: 2026-10-03
 
 ## The Lead Angle (One Paragraph)
 
-> **"For the first time in music history, two AI-generated artists just competed in an on-chain prediction market — and $26,500 in real money was traded on who would win. WaveWarZ, a Solana-based music battle platform built by a Maine DAO, ran an AI Artist Tournament where fans bet real SOL on AI-generated songs. The outcome — decided by community vote, trading volume, and an AI judge — was GEEK MYTH defeating AI LUI 2-1, generating 342 SOL (~$26,500). That's 8.7x more volume than any prior event in the platform's history. The grand final (GEEK MYTH vs Stormbourne) is next."**
+> **"For the first time in music history, two AI-generated artists just competed in an on-chain prediction market — and $26,500 in real money was traded on who would win. WaveWarZ, a Solana-based music battle platform built by a Maine DAO, ran an AI Artist Tournament where fans bet real SOL on AI-generated songs. The outcome — decided by community vote, trading volume, and an AI judge — was GEEK MYTH defeating AI LUI 2-1, generating 342 SOL (~$26,500). That is the platform's largest single event by volume in its 14-month history. The grand final (GEEK MYTH vs Stormbourne) is next."**
 
 This angle works for: AI music press, crypto media, mainstream music tech, mainstream tech (Wired, The Verge), and podcast hosts.
 
@@ -30,8 +30,8 @@ This angle works for: AI music press, crypto media, mainstream music tech, mains
 
 | Fact | Value | Context |
 |------|-------|---------|
-| Semifinal volume | ~342 SOL (~$26,500) | 8.7x prior platform record |
-| Jul 16–23 week total | 356.621 SOL | 68.4% of all prior WaveWarZ history in one week |
+| Semifinal volume | ~342 SOL (~$26,500) | Largest single event in platform history (14 months) |
+| Jul 16–23 week total | 355.36 SOL | 40.5% of all-time platform volume in one week |
 | Cumulative platform volume | 878 SOL (~$67,900) | AI tournament alone = ~39% of all-time |
 | Trader withdrawals | 381 SOL ($29,500) | Real on-chain claims, +254 SOL surge from AI tournament |
 | Withdrawal events | 1,526 | Distinct on-chain claimShares transactions |
@@ -88,7 +88,7 @@ This angle works for: AI music press, crypto media, mainstream music tech, mains
 >
 > Quick pitch for [publication]: WaveWarZ just completed the first-ever AI Artist Tournament — an elimination bracket where AI-generated musical artist personas (GEEK MYTH, AI LUI, Stormbourne) competed on a Solana prediction market. Fans traded real SOL on their preferred AI artist; the winner was determined by trading volume, community vote, and an AI judge.
 >
-> Semifinal result: GEEK MYTH defeated AI LUI 2-1, generating ~342 SOL (~$26,500) in a single event — 8.7x the platform's prior single-event record. The grand final (GEEK MYTH vs Stormbourne) is upcoming.
+> Semifinal result: GEEK MYTH defeated AI LUI 2-1, generating ~342 SOL (~$26,500) in a single event — the platform's largest single event by volume in 14 months of operation. The grand final (GEEK MYTH vs Stormbourne) is upcoming.
 >
 > This is the first documented instance of AI-generated artist personas competing in an on-chain prediction market with an AI judge deciding outcomes. The platform is built and operated by ZAO, a Maine-based DAO, running 63+ consecutive weekly governance sessions via Fractal.
 >
@@ -102,7 +102,7 @@ This angle works for: AI music press, crypto media, mainstream music tech, mains
 >
 > Hi [name],
 >
-> WaveWarZ (Solana) ran an AI Artist Tournament this week — two AI-generated musical artist personas competed in elimination battles where traders bet real SOL on the outcome. Semifinal result: GEEK MYTH def. AI LUI, 342 SOL (~$26,500) traded. That's 8.7x the platform's prior single-event record.
+> WaveWarZ (Solana) ran an AI Artist Tournament this week — two AI-generated musical artist personas competed in elimination battles where traders bet real SOL on the outcome. Semifinal result: GEEK MYTH def. AI LUI, 342 SOL (~$26,500) traded — the platform's largest single event in 14 months of operation.
 >
 > Context: WaveWarZ has processed 1,285 battles and 878 SOL in total trading volume since May 2025. The AI tournament alone represented ~39% of all-time platform volume in a single week.
 >

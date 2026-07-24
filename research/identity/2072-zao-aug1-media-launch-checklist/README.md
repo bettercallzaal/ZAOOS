@@ -83,7 +83,7 @@ Total battles: 1,289 (51 MAIN events, 165 main battles, 1,088 quick, 36 communit
 Total SOL volume: 878.30 SOL (~$64.8K at $73.87/SOL)
 Artist payouts: 13.40 SOL ($989)
 Trader claims: 381.20 SOL ($28,155) — 1,526 on-chain withdrawal transactions
-AI Tournament week: 355.36 SOL last 7 days (68.4% of all prior WaveWarZ history in one week)
+AI Tournament week: 355.36 SOL last 7 days (40.5% of all-time platform volume in one week)
 AI Tournament semifinal: GEEK MYTH defeated AI LUI 2-1 (~342 SOL)
 Grand final: GEEK MYTH vs Stormbourne — [result TBD, fill when resolved]
 Platform age: 14 months (May 2025 → Jul 2026)

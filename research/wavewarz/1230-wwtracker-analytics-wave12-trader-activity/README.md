@@ -104,14 +104,14 @@ These are live and auto-update on every page load.
 
 ## NORTH STAR alignment
 
-- **ZAO = THE case study:** 127.34 SOL paid out to winning traders is hard proof that WaveWarZ runs a functioning prediction market, not a demo. Placing this at the top of §07 means any visitor looking at "who's trading" sees the macro number first.
+- **ZAO = THE case study:** 381.20 SOL paid out to winning traders is hard proof that WaveWarZ runs a functioning prediction market, not a demo. Placing this at the top of §07 means any visitor looking at "who's trading" sees the macro number first.
 - **ZAO IP = a staple in onchain art, music:** Trader claims are on-chain (`claimShares` vault transactions). Surfacing them live in the analytics layer deepens the "everything verifiable" story.
 
 ---
 
 ## 4 citable facts (live, Jul 2026)
 
-1. **127.34 SOL paid out** to winning traders — lifetime aggregate
+1. **381.20 SOL paid out** to winning traders — lifetime aggregate
 2. **939 successful withdrawals** — individual claimShares transactions
 3. **~0.136 SOL avg claim** — 127.34 / 939
 4. **Live 24h/7d volume** — auto-refreshes from stats API on every load

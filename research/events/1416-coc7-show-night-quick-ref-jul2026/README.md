@@ -85,9 +85,9 @@ Key fields:
 
 | Stat | Number |
 |------|--------|
-| Total battles | 1,245 |
-| Total volume | 524 SOL (~$39,000) |
-| Artist payouts | 9.07 SOL (~$680) |
+| Total battles | 1,289 |
+| Total volume | 878 SOL (~$64,800) |
+| Artist payouts | 13.40 SOL (~$680) |
 | Charity raised | $1,497 (2 HuRya rounds) |
 | Artist payout rate | ~1.73% of every trade |
 

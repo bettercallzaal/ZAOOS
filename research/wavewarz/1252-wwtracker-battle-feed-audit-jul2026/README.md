@@ -72,14 +72,14 @@ GodclouD is the most-tracked artist in the WaveWarZ battle feed — they feature
 
 | Metric | Value |
 |---|---|
-| Total battles | 1,245 |
-| Total volume | 524.15 SOL (~$39,453 at $75.29) |
+| Total battles | 1,289 |
+| Total volume | 878.30 SOL (~$39,453 at $75.29) |
 | Quick battles | 1,047 |
 | Main event battles | 50 (across 162 multi-round bouts) |
 | Community battles | 36 |
-| Artist payouts | 9.07 SOL (~$683) |
+| Artist payouts | 13.40 SOL (~$683) |
 | Platform revenue | 17.44 SOL (~$1,313) |
-| Trader claims (claimShares) | 127.34 SOL (~$9,588) — 939 withdrawals |
+| Trader claims (claimShares) | 381.20 SOL (~$9,588) — 939 withdrawals |
 
 ---
 
@@ -88,7 +88,7 @@ GodclouD is the most-tracked artist in the WaveWarZ battle feed — they feature
 1. **42 battles / 9.45 SOL in Jul 10–17, 2026** — the most active 7-day period in Q3 2026 and highest since April 2026 (all-time peak by battle count is Mar 9–15: 55 battles; see doc 1253 for full weekly trend).
 2. **Parser bug discovered Jul 17, 2026** — battles with embedded `"` in artist names were silently dropped; the fix surfaced a 1.87 SOL battle that had been invisible for 24+ hours.
 3. **GodclouD: 24 tagged battles, 70.8% win rate, 11.11 SOL volume** — leading artist by battle frequency and volume in the wwtracker feed.
-4. **WaveWarZ platform total: 1,245 battles / 524.15 SOL / $39,453 all-time volume** as of 2026-07-17.
+4. **WaveWarZ platform total: 1,289 battles / 878.30 SOL / $39,453 all-time volume** as of 2026-07-17.
 
 ---
 

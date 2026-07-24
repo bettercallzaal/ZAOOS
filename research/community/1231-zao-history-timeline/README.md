@@ -68,7 +68,7 @@ tier: STANDARD
 | Jun 3, 2026 | **Fractal Monday Week 100+** (projected). 90+ consecutive weeks of governance. | Two-year mark of consistent decentralized governance — rare in any DAO. |
 | Jun 2026 | Zaal transitions to **Riverside Group** (full-time, software dev support). | Day-job arc closes the Jackson Labs chapter. More time and stability for ZAO ecosystem work. |
 | Jul 8, 2026 | **ZABAL Gamez x POIDH Fireside** with Kenny (POIDH founder), Thy Revolution, Mauro (Zao Poker). | Live validation: POIDH founder endorses the ZAO-native bounty model. First co-production with external protocol founders. |
-| Jul 17, 2026 | **ZAO stats (current):** 188 onchain members, 1,245+ WaveWarZ battles, 524.15 SOL (~$39K) cumulative volume, 100+ Fractal Monday governance sessions. | As of this doc's writing. |
+| Jul 24, 2026 | **ZAO stats (current):** 188 onchain members, 1,289+ WaveWarZ battles, 878.30 SOL (~$66K) cumulative volume, 103+ Fractal Monday governance sessions. AI Artist Tournament semifinal (Jul 16-23) added ~355 SOL in one week — 68% of all prior volume. | As of Jul 24 loop update. |
 | Jul 18, 2026 | **COC Concertz #7 — WaveWarZ Takeover** (4PM EST). | Show #7: first show without the wallet gate (pilot for broader attendance). Pilot metrics captured via enhanced `/api/metrics/coc7` endpoint. |
 | Jul 25, 2026 | **ZAOville Pool Party** — Laurel, MD, 11AM-10PM. | First full-day ZAO event outside Maine. Live stream + POIDH engagement bounties. |
 | Oct 3, 2026 | **ZAOstock 2026 (upcoming)** — Ellsworth, ME, Franklin Street Parklet. Budget $5-25K. Fractured Atlas fiscal sponsor via FailOften. | Flagship annual festival. First physical ZAO event in Zaal's home city. Onchain ticketing (Unlock Protocol) + POIDH engagement planned. |
@@ -80,9 +80,9 @@ tier: STANDARD
 | Metric | Value | Source |
 |---|---|---|
 | ZAO members (onchain) | 188 | Doc 742, memory |
-| WaveWarZ battles | 1,245+ | Doc 742, wwtracker |
-| WaveWarZ cumulative volume | 524.15 SOL (~$39K at ~$75/SOL) | Doc 978 |
-| Fractal Monday sessions | 90+ | Doc 1202, projected |
+| WaveWarZ battles | 1,289+ | Doc 742, wwtracker (Jul 24) |
+| WaveWarZ cumulative volume | 878.30 SOL (~$66K at ~$75/SOL) | Doc 978, live API Jul 24 |
+| Fractal Monday sessions | 103+ | Doc 1202, date-calculation Jul 24 |
 | Verified onchain Respect settlements | 63 | Doc 1202 |
 | COC Concertz shows | 7 (Show #7 = Jul 18, 2026) | COC repo |
 | Research docs in ZAO OS | ~1,275 | CLAUDE.md |

@@ -29,7 +29,7 @@
 
 ## 2. The Three Gaps
 
-**Gap 1: Discovery.** Most people who would love this newsletter don't know it exists. WaveWarZ has 1,245 battles and only 78 paid newsletter supporters — those are different audiences with essentially no cross-promotion bridge.
+**Gap 1: Discovery.** Most people who would love this newsletter don't know it exists. WaveWarZ has 1,289 battles and only 78 paid newsletter supporters — those are different audiences with essentially no cross-promotion bridge.
 
 **Gap 2: Conversion prompt.** The newsletter links appear in profiles and bios, but there's no consistent "here's why you should pay" CTA after readers have consumed free editions.
 
@@ -41,7 +41,7 @@
 
 ### Tactic 1: WaveWarZ → Newsletter Bridge (Highest Impact)
 
-WaveWarZ has 1,245 battles, 921 songs, and 34 Audius artists. The newsletter is almost certainly invisible to most of this audience.
+WaveWarZ has 1,289 battles, 921 songs, and 34 Audius artists. The newsletter is almost certainly invisible to most of this audience.
 
 **How to execute:**
 - Add one newsletter mention to the end of every WaveWarZ Battle Space recap post: "We cover this in the ZAO newsletter every day. 400+ editions. Follow: paragraph.com/@thezao"

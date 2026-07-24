@@ -66,7 +66,7 @@ Dataset refresh: 2026-07-24 (parser fix added 19 battles including the 1.87 SOL 
 **Note on GodclouD:** 24 total appearances in the feed (including 2 self-battles excluded from this table). Cross-artist record: 22 battles (16W/6L). Volume figure (10.436 SOL) excludes self-battle volume. GodclouD's earnings lead is 2.1× the second-place artist.
 
 **Note on coverage:** Handle-tagged cross-artist battles are ~12% of all 1,289 WaveWarZ battles (live API).
-Total platform payouts = 9.07 ◎ (all battles). As handle tagging expands, per-artist
+Total platform payouts = 13.40 ◎ (all battles). As handle tagging expands, per-artist
 earnings estimates will become more complete.
 
 ---

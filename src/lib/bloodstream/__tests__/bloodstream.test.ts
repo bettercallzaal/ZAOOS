@@ -66,7 +66,7 @@ describe('Bloodstream circulation', () => {
 
   it('caches: the same observation within TTL is NOT re-distributed (the whole point)', async () => {
     const b = new Bloodstream({ sleep: noSleep, cacheTtlMs: 60_000 });
-    b.registerSpike(priceSpike({ price: 3500 }));
+    b.registerSpike(priceSpike({ price: 3500 }, { minIntervalMs: 0 })); // no rate limit - isolate the cache path
     let delivered = 0;
     b.subscribe({ id: 's', kinds: [], deliver: () => { delivered++; } });
     await b.circulateSpike('coinbase-eth', ctx);

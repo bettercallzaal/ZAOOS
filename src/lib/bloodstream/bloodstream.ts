@@ -128,8 +128,11 @@ export class Bloodstream {
 
   // ---- health ----
   private status(s: SpikeState): SpikeStatus {
-    if (s.consecutiveFailures >= 5) return 'failing';
-    if (s.consecutiveFailures >= 2) return 'degraded';
+    // Every failure here is retry-EXHAUSTED (ingestWithBackoff already retried
+    // internally), so a single one is a real fault -> degraded immediately, not
+    // a transient blip. Sustained failure (3+ cycles) is failing.
+    if (s.consecutiveFailures >= 3) return 'failing';
+    if (s.consecutiveFailures >= 1) return 'degraded';
     return 'healthy';
   }
   private errorRate(s: SpikeState): number {

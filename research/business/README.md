@@ -225,3 +225,4 @@
 | 2038 | [ZABAL Gamez QV Submission Pipeline: Architecture & Build Plan](./2038-zabal-gamez-qv-submission-pipeline/) | STANDALONE | Research doc 2038. |
 | 2050 | [JubJub Developer Platform - ZAO Relevance Assessment](./2050-jubjub-developer-platform-eval/) | STANDALONE | Research doc 2050. |
 | 2058 | [Sparkz UX/OSS Teardown: High-Traffic Creator & Crypto Apps](./2058-sparkz-ux-oss-teardown/) | STANDALONE | Research doc 2058. |
+| 2070 | [Work Efficiency: Flow Finish Lines (Method + Science Caveats + ZAO Application)](./2070-work-efficiency-flow-finish-lines/) | STANDALONE | Capture Rian Doris's "work efficiency" method (a hard daily finish line that forces flow), flag which of its science is solid vs popularized, and turn it into a concrete setup for how Zaal works and how ZAO's autonomous loops are governed. |

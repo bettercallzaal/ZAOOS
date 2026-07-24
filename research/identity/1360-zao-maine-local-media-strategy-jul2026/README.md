@@ -2,7 +2,7 @@
 topic: identity/media
 type: STRATEGY
 status: ACTIVE — submit ZAOstock preview to outlets by Sep 5; post-event follow-up Oct 4-7
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1329, 1333, 1340, 1349, 1357, 1359
 owner: Zaal (sends press outreach — gated human action)
 ---
@@ -177,4 +177,4 @@ The moment a Maine outlet publishes ANY article about ZAOstock, that becomes Wik
 
 ---
 
-*Created: 2026-07-17 | Send press release to Maine outlets Sep 1-5 | Post-event follow-up Oct 4-7 | First Maine article = Wikipedia source #2 = submit doc 1359 immediately | Related: 1329 (ZAOstock promo), 1340 (national/crypto press), 1349 (grants — Fisher/MAC care about Maine press), 1357 (charity — central to Maine story), 1359 (Wikipedia draft — waiting for this source)*
+*Created: 2026-07-24 | Send press release to Maine outlets Sep 1-5 | Post-event follow-up Oct 4-7 | First Maine article = Wikipedia source #2 = submit doc 1359 immediately | Related: 1329 (ZAOstock promo), 1340 (national/crypto press), 1349 (grants — Fisher/MAC care about Maine press), 1357 (charity — central to Maine story), 1359 (Wikipedia draft — waiting for this source)*

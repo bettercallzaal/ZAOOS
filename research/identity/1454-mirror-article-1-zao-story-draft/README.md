@@ -59,7 +59,7 @@ The loser-earns mechanic works like this: when a battle closes, the losing side'
 
 One losing battle appearance on WaveWarZ earns approximately $35 — equivalent to *11,667 Spotify streams*.
 
-We've run 1,245 battles. [ZAAL: update this if stats have changed by Aug 1]. $104,000 in total volume. $1,820 to losing artists. $25,469 to traders.
+We've run 1,289 battles. [ZAAL: update this if stats have changed by Aug 1]. $104,000 in total volume. $1,820 to losing artists. $25,469 to traders.
 
 None of those payments required a label deal. None required a publishing advance. None required 10,000 streams to hit a payout threshold. A musician in Baltimore submits a track, another musician battles it, the community votes, both artists get paid within minutes.
 

@@ -19,7 +19,7 @@ The ZAO is a music DAO that has been running Fractal governance on Optimism Main
 
 The ZAO builds and governs a music ecosystem at the intersection of web3 technology, live music, and community governance:
 
-- **WaveWarZ** — a music prediction market on Solana where listeners bet SOL on which song wins a head-to-head battle. Since May 2025: 1,245 battles, 524 SOL volume (~$39K), 921 unique songs, 34 rostered artists, $1,497 raised for charity.
+- **WaveWarZ** — a music prediction market on Solana where listeners bet SOL on which song wins a head-to-head battle. Since May 2025: 1,289 battles, 878 SOL volume (~$64.8K), 921 unique songs, 34 rostered artists, $1,497 raised for charity.
 - **COC Concertz** — a monthly virtual concert series (7 shows as of July 2026) running on Spatial.io + Twitch.
 - **ZABAL Games** — a Farcaster-native builder incubator program (32 builders, 28 workshops as of July 2026).
 - **ZAOstock** — an annual IRL music festival in Ellsworth, Maine (October 3, 2026).
@@ -76,7 +76,7 @@ Add to the `<head>` of the homepage:
 <meta name="description" content="The ZAO is a music DAO running Fractal governance on Optimism Mainnet since October 2022. We build WaveWarZ (music prediction market), COC Concertz, ZABAL Games, and ZAOstock festival. 63+ governance weeks. 157 Respect holders. Open source.">
 <meta name="keywords" content="music DAO, WaveWarZ, Fractal governance, Optimism, music prediction market, COC Concertz, ZABAL Games, ZAOstock">
 <meta property="og:title" content="The ZAO — Music DAO on Optimism">
-<meta property="og:description" content="The only active Fractal DAO on Optimism. WaveWarZ music prediction market. 1,245 battles. 524 SOL volume. 63+ governance weeks. Open source.">
+<meta property="og:description" content="The only active Fractal DAO on Optimism. WaveWarZ music prediction market. 1,289 battles. 878 SOL volume. 63+ governance weeks. Open source.">
 <meta property="og:url" content="https://thezao.xyz">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -98,7 +98,7 @@ Add inside a `<script type="application/ld+json">` tag:
   "alternateName": ["ZAO", "ZAO DAO", "The ZAO DAO"],
   "url": "https://thezao.xyz",
   "logo": "https://thezao.xyz/logo.png",
-  "description": "The ZAO is a music DAO running Fractal Respect governance on Optimism Mainnet every week since October 2022. Ecosystem: WaveWarZ (music prediction market), COC Concertz (virtual concerts), ZABAL Games (builder incubator), ZAOstock (IRL music festival). 63+ governance weeks, 157 Respect holders, 524 SOL battle volume.",
+  "description": "The ZAO is a music DAO running Fractal Respect governance on Optimism Mainnet every week since October 2022. Ecosystem: WaveWarZ (music prediction market), COC Concertz (virtual concerts), ZABAL Games (builder incubator), ZAOstock (IRL music festival). 63+ governance weeks, 157 Respect holders, 878 SOL battle volume.",
   "foundingDate": "2022",
   "founder": {
     "@type": "Person",
@@ -126,7 +126,7 @@ Add inside a `<script type="application/ld+json">` tag:
       {
         "@type": "Offer",
         "name": "WaveWarZ",
-        "description": "Music prediction market on Solana. 1,245 battles, 524 SOL volume, 921 unique songs."
+        "description": "Music prediction market on Solana. 1,289 battles, 878 SOL volume, 921 unique songs."
       },
       {
         "@type": "Offer",
@@ -157,7 +157,7 @@ wwtracker is the open-source analytics layer for [WaveWarZ](https://wavewarz.inf
 The ZAO is a music DAO running Fractal Respect governance on Optimism Mainnet since October 2022:
 - 63+ consecutive on-chain governance weeks
 - 157 unique Respect holders
-- WaveWarZ: 1,245 battles, 524 SOL volume, 921 unique songs
+- WaveWarZ: 1,289 battles, 878 SOL volume, 921 unique songs
 - Artist payout rate ~1.73% of battle volume (vs Spotify's $0.004/stream)
 
 **Governance contracts on Optimism:** [OG](https://optimistic.etherscan.io/token/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957) | [ZOR](https://optimistic.etherscan.io/token/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c) | [OREC](https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532)
@@ -199,4 +199,4 @@ This is the lowest-cost, highest-ROI GEO action available. The content is verifi
 
 ---
 
-*Created: 2026-07-17 | ZAO OS doc 1316 | Identity subfolder | DECISION NEEDED to deploy — all 4 files are ready*
+*Created: 2026-07-24 | ZAO OS doc 1316 | Identity subfolder | DECISION NEEDED to deploy — all 4 files are ready*

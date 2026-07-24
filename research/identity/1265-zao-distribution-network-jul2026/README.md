@@ -2,7 +2,7 @@
 topic: identity
 type: DOC
 status: verified
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1221, 1258, 1260, 1077, 1083
 original-query: "Catalog all ZAO distribution channels — newsletter, social, community — with verified facts. Addresses the distribution 4/10 gap in the North Star Q3 2026 scorecard (doc 1258)."
 tier: STANDARD
@@ -47,7 +47,7 @@ This doc catalogs the full distribution surface so future sessions and external 
 
 | Field | Value | Source |
 |-------|-------|--------|
-| Channel ID | `/zao` | Warpcast API, verified 2026-07-17 via Lesson 30 |
+| Channel ID | `/zao` | Warpcast API, verified 2026-07-24 via Lesson 30 |
 | Followers | 93 | Warpcast API (channel created 2024-09-03) |
 | Primary handle | @bettercallzaal (FID 19640) | ZOL repo, doc 1083 |
 | ZAOclawbot FID | 19640 (used by ZOL) | ZOL repo |
@@ -118,7 +118,7 @@ This doc catalogs the full distribution surface so future sessions and external 
 
 | Field | Value | Source |
 |-------|-------|--------|
-| Handle | @wavewarzclipshq | Confirmed 2026-07-17 via t.me (doc 1260) |
+| Handle | @wavewarzclipshq | Confirmed 2026-07-24 via t.me (doc 1260) |
 | Purpose | Clip-sharing community — community members post WaveWarZ battle clips for YouTube/X/TikTok distribution | doc 1260 |
 
 ### ZOE Bot (@zaoclaw_bot)
@@ -179,7 +179,7 @@ This doc catalogs the full distribution surface so future sessions and external 
 
 ## 10. Citable Facts Summary
 
-For use in grant applications, GEO citations, and press materials (all verified July 17, 2026):
+For use in grant applications, GEO citations, and press materials (all verified July 24, 2026):
 
 | Claim | Number | Source |
 |-------|--------|--------|

@@ -2,7 +2,7 @@
 topic: identity/geo
 type: CODE-PACKAGE
 status: READY TO DEPLOY — give to Hurricane; ~15 min to add to wavewarz.info HEAD
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1221, 1316, 1354, 1362, 1364
 owner: Hurricane (deploys — gated; Zaal to forward this doc)
 ---
@@ -93,7 +93,7 @@ Paste these in the `<head>` of wavewarz.info's main layout. Replace `[OG_IMAGE_U
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://wavewarz.info" />
 <meta property="og:title" content="WaveWarZ — Music Battles on Solana | Both Artists Earn" />
-<meta property="og:description" content="1,245+ music battles on Solana. Artists compete head-to-head — the winning AND losing artist earn an automatic payout. Community bets on outcomes." />
+<meta property="og:description" content="1,289+ music battles on Solana. Artists compete head-to-head — the winning AND losing artist earn an automatic payout. Community bets on outcomes." />
 <meta property="og:image" content="[OG_IMAGE_URL]" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -104,7 +104,7 @@ Paste these in the `<head>` of wavewarz.info's main layout. Replace `[OG_IMAGE_U
 <meta name="twitter:site" content="@wavewarz" />
 <meta name="twitter:creator" content="@wavewarz" />
 <meta name="twitter:title" content="WaveWarZ — Music Battles on Solana | Both Artists Earn" />
-<meta name="twitter:description" content="1,245+ music battles on Solana. Artists compete head-to-head — the winning AND losing artist earn an automatic payout. Community bets on outcomes." />
+<meta name="twitter:description" content="1,289+ music battles on Solana. Artists compete head-to-head — the winning AND losing artist earn an automatic payout. Community bets on outcomes." />
 <meta name="twitter:image" content="[OG_IMAGE_URL]" />
 
 <!-- Farcaster (uses Open Graph) -->
@@ -204,10 +204,10 @@ If this image doesn't exist yet, ask Iman to create it. It's needed for:
 // app/layout.tsx
 export const metadata = {
   title: 'WaveWarZ — Music Battles on Solana',
-  description: 'Music battle platform where both artists earn. 1,245+ battles on Solana.',
+  description: 'Music battle platform where both artists earn. 1,289+ battles on Solana.',
   openGraph: {
     title: 'WaveWarZ — Music Battles on Solana | Both Artists Earn',
-    description: '1,245+ music battles. Both winning and losing artists earn an automatic on-chain payout.',
+    description: '1,289+ music battles. Both winning and losing artists earn an automatic on-chain payout.',
     url: 'https://wavewarz.info',
     siteName: 'WaveWarZ',
     images: [{ url: '[OG_IMAGE_URL]', width: 1200, height: 630 }],
@@ -242,4 +242,4 @@ When combined with Wikidata (doc 1364) and llms.txt (doc 1316), total non-gated 
 
 ---
 
-*Created: 2026-07-17 | Forward to Hurricane: "doc 1370, paste these blocks into wavewarz.info HEAD, ~15 min" | Blocks 1-3 deploy now; Block 4 (ZAOstock Event schema) add Oct 1 | Related: 1221 (GEO master plan), 1316 (llms.txt — the bigger GEO unlock), 1354 (GEO strategy — G05 action), 1364 (Wikidata — also needed for full GEO picture)*
+*Created: 2026-07-24 | Forward to Hurricane: "doc 1370, paste these blocks into wavewarz.info HEAD, ~15 min" | Blocks 1-3 deploy now; Block 4 (ZAOstock Event schema) add Oct 1 | Related: 1221 (GEO master plan), 1316 (llms.txt — the bigger GEO unlock), 1354 (GEO strategy — G05 action), 1364 (Wikidata — also needed for full GEO picture)*

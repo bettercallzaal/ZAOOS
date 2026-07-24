@@ -2,14 +2,14 @@
 topic: identity/distribution
 type: STRATEGY
 status: ACTIVE — ZOE automates weekly; Zaal does 3-5 manual engagements/week
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1265, 1270, 1347, 1353, 1371-events
 owner: ZOE (automated posts) + Zaal (manual engagement)
 ---
 
 # 1374 — ZAO Farcaster /zao Channel Growth Strategy (Jul 2026)
 
-> **Current state:** /zao channel has 93 followers (Jul 2026). This is well below potential given 63+ governance sessions, 1,245+ battles, 8 COC shows — almost none of it has reached Farcaster. The platform hosts exactly the audience ZAO needs: DAO governance enthusiasts, crypto-native music fans, and Web3 builders who already understand the underlying model.
+> **Current state:** /zao channel has 93 followers (Jul 2026). This is well below potential given 63+ governance sessions, 1,289+ battles, 8 COC shows — almost none of it has reached Farcaster. The platform hosts exactly the audience ZAO needs: DAO governance enthusiasts, crypto-native music fans, and Web3 builders who already understand the underlying model.
 >
 > **Target:** 250 followers by December 2026. That's +157 over 6 months, roughly 26/month. Achievable without paid promotion by converting ZAO's existing activity into consistent Farcaster content.
 
@@ -20,7 +20,7 @@ owner: ZOE (automated posts) + Zaal (manual engagement)
 | ZAO asset | How many? | How many reached Farcaster so far? |
 |-----------|-----------|-------------------------------------|
 | On-chain governance sessions | 63+ | ~5-10% |
-| WaveWarZ battles | 1,245+ | ~5% |
+| WaveWarZ battles | 1,289+ | ~5% |
 | COC Concertz shows | 8 | ~2-3 posts total |
 | ZABAL Games workshops | 28+ | Minimal |
 | Newsletter editions | 400+ | ~1-2% recycled |
@@ -186,4 +186,4 @@ Farcaster is indexed by AI discovery tools including Neynar's feed and various L
 
 ---
 
-*Created: 2026-07-17 | Renumbered from 1371 (number collision) | Target: 250 followers by Dec 2026 | ZAOstock Oct 3 = biggest acquisition event | Related: 1265 (distribution network), 1270 (newsletter), 1347 (newsletter + social growth), 1353 (Q3 execution calendar), 1358 (community channel ops)*
+*Created: 2026-07-24 | Renumbered from 1371 (number collision) | Target: 250 followers by Dec 2026 | ZAOstock Oct 3 = biggest acquisition event | Related: 1265 (distribution network), 1270 (newsletter), 1347 (newsletter + social growth), 1353 (Q3 execution calendar), 1358 (community channel ops)*

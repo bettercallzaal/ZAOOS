@@ -2,7 +2,7 @@
 topic: identity/strategy
 type: ROADMAP
 status: planning
-created: 2026-07-17
+created: 2026-07-24
 board-task: dfbf3f0e
 related-docs: 1319, 1291, 1305, 1325, 1329, 1333
 owner: Zaal
@@ -84,7 +84,7 @@ DM each artist with payment confirmation + "ZAOstock thank you" note. Template f
 
 ### Gitcoin Grants
 - Open rounds run quarterly. October 2026 round is the next target after ZAOstock.
-- **Pitch:** "ZAO produced ZAOstock, a first onchain-governed music festival. 200+ attendees, [N] press mentions, 1,245 battles."
+- **Pitch:** "ZAO produced ZAOstock, a first onchain-governed music festival. 200+ attendees, [N] press mentions, 1,289 battles."
 - ZAOstock becomes the proof point that wasn't available at Q2 Gitcoin.
 - Apply at grants.gitcoin.co when round opens.
 
@@ -180,4 +180,4 @@ If all these land: North Star #1 is at 9-10/10, North Star #2 is at 8-9/10. ZAO 
 
 ---
 
-*Created: 2026-07-17 | This is the planning doc — actual results go in doc 1336 (ZAOstock post-event report, create after Oct 3) | Cross-refs: doc 1319 (Q3 scorecard), 1305 (COC Season 2), 1325 (Q3 ops cal), 1328 (podcast), 1330 (Wikipedia), 1331 (newsletter)*
+*Created: 2026-07-24 | This is the planning doc — actual results go in doc 1336 (ZAOstock post-event report, create after Oct 3) | Cross-refs: doc 1319 (Q3 scorecard), 1305 (COC Season 2), 1325 (Q3 ops cal), 1328 (podcast), 1330 (Wikipedia), 1331 (newsletter)*

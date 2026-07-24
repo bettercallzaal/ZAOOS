@@ -16,7 +16,7 @@ Hypebot (hypebot.com) is the leading music industry trade blog covering emerging
 
 ZAO is a natural fit because:
 - The "loser earns" mechanic inverts music industry convention (artists usually earn nothing from a competitive format)
-- 1,245 on-chain battles with $524 SOL in volume is a verifiable, unusual stat
+- 1,289 on-chain battles with $878 SOL in volume is a verifiable, unusual stat
 - ZAOstock is a news hook (first DAO-governed music festival in Maine)
 - The Mirror article (doc 1504) gives them a well-written source to quote directly
 
@@ -51,8 +51,8 @@ governing a music battle platform called WaveWarZ.
 
 Here's the unusual part: the artist who loses the battle still gets paid.
 
-Since 2024, WaveWarZ has run 1,245 battles with 523.991 SOL ($104,000) in total 
-volume — and $9.09 SOL has gone directly to losing artists as on-chain payouts. 
+Since 2024, WaveWarZ has run 1,289 battles with 878.30 SOL ($104,000) in total 
+volume — and $13.40 SOL has gone directly to losing artists as on-chain payouts. 
 Every payout is automatic, verifiable, and irreversible.
 
 We've published the details in a Mirror article today:
@@ -111,7 +111,7 @@ Hypebot has multiple content areas. Tailor the angle depending on who responds:
 | Music Business | "Loser earns" as new revenue model for artists in competition formats |
 | Music Tech | WaveWarZ on-chain platform architecture + SOL payouts |
 | Live Music / Events | ZAOstock: first DAO-governed music festival + IRL governance vote |
-| Artist Economy | $9.09 SOL to losing artists = 1,820 Spotify stream equivalents in actual payouts |
+| Artist Economy | $13.40 SOL to losing artists = 1,820 Spotify stream equivalents in actual payouts |
 | DAO / Web3 Music | 64-week consecutive governance streak as music industry case study |
 
 ---

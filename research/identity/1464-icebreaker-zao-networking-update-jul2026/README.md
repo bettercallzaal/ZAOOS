@@ -51,7 +51,7 @@ Board task `f25c9332` — "Feature: Icebreaker networking update." ZAO needs to:
 ### Immediate (Zaal, ~30 min)
 - [ ] Create or claim ZAO organization profile at icebreaker.xyz
 - [ ] Fill fields: ZAO name, description (from doc 1435 medium bio), website (thezao.xyz), Farcaster (/zao), X (@bettercallzaal), GitHub (ZAODEVZ)
-- [ ] Add WaveWarZ stats (1,245+ battles, 524 SOL volume) as a credential/achievement
+- [ ] Add WaveWarZ stats (1,289+ battles, 878 SOL volume) as a credential/achievement
 - [ ] Link Zaal's personal profile to the ZAO org
 
 ### Short-term (Jul-Aug)
@@ -71,7 +71,7 @@ Board task `f25c9332` — "Feature: Icebreaker networking update." ZAO needs to:
 The ZAO
 
 ### Description (use doc 1435 short bio)
-A decentralized music DAO running 1,245+ WaveWarZ battles, 100+ weekly governance sessions, and ZAOstock — an IRL web3 music festival in Ellsworth, Maine. 157 onchain Respect holders. Open-source infrastructure on Optimism and Base.
+A decentralized music DAO running 1,289+ WaveWarZ battles, 100+ weekly governance sessions, and ZAOstock — an IRL web3 music festival in Ellsworth, Maine. 157 onchain Respect holders. Open-source infrastructure on Optimism and Base.
 
 ### Social Links
 - Website: thezao.xyz
@@ -81,7 +81,7 @@ A decentralized music DAO running 1,245+ WaveWarZ battles, 100+ weekly governanc
 - Mirror: mirror.xyz/bettercallzaal.eth
 
 ### Key Credentials to Add
-- WaveWarZ: 1,245+ onchain battles (Solana program: [program ID])
+- WaveWarZ: 1,289+ onchain battles (Solana program: [program ID])
 - Governance: 100+ Fractal sessions with Optimism Respect Game
 - Community: 157 onchain Respect token holders
 - Infrastructure: ZAOOS (open-source ZAO OS, AGPL-3.0)

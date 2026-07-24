@@ -2,7 +2,7 @@
 topic: identity
 type: reference
 status: ready-to-ship
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 original-query: "GEO revive: ship the canonical FAQ + JSON-LD for AI engines (TOP PRIORITY, 2026-07-07)"
 related-docs: [doc 1016 (GEO tactics), doc 1070 (GEO playbook), doc 1051 (ICM deep dive), doc 1047 (GEO schema blocks)]
 tier: STANDARD

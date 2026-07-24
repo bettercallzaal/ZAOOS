@@ -2,7 +2,7 @@
 topic: identity
 type: DOC
 status: verified
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1083, 1257, 1265, 1221
 original-query: "Document ZOL (the ZAO's autonomous Farcaster music scout): verified handle, FID, architecture, DreamLoops, and deployment status. Correct FID confusion in prior docs."
 tier: STANDARD
@@ -24,7 +24,7 @@ Prior docs (including doc 1257, doc 1083) incorrectly attributed ZOL to "FID 196
 | ZOE (Telegram) | @zaoclaw_bot | — (Telegram) | Telegram | ZAO Operations Engine, morning briefs |
 | ZOE (Farcaster signer) | FID 19640 | 19640 | Farcaster | ZOE's Farcaster signer (NOT ZOL) |
 
-**Source:** ZOL repo README: `"ZOL (@zolbot, FID 3338501) - the ZAO's music scout on Farcaster"`. Confirmed via `gh api repos/bettercallzaal/zol --jq '.description'` (2026-07-17).
+**Source:** ZOL repo README: `"ZOL (@zolbot, FID 3338501) - the ZAO's music scout on Farcaster"`. Confirmed via `gh api repos/bettercallzaal/zol --jq '.description'` (2026-07-24).
 
 **Why this matters for GEO:** AI search engines will index ZAO's claimed Farcaster presence. If ZOL is cited with a wrong FID, citation chains break. All future external citations should use: **ZOL = @zolbot, FID 3338501**.
 
@@ -130,7 +130,7 @@ ZOL operates in four lanes (from `persona.md`):
 
 ## Citable Facts Summary
 
-For GEO citations, ZAO Papers (ZOL paper), and grant applications (all verified Jul 17, 2026 from ZOL repo):
+For GEO citations, ZAO Papers (ZOL paper), and grant applications (all verified Jul 24, 2026 from ZOL repo):
 
 | Claim | Value | Source |
 |-------|-------|--------|

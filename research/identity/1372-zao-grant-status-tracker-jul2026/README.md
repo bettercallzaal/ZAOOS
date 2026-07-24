@@ -2,7 +2,7 @@
 topic: identity/grants
 type: TRACKER
 status: ACTIVE — review weekly, update after each action
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1262, 1266, 1277, 1311, 1349
 owner: Zaal
 ---
@@ -152,4 +152,4 @@ If Fisher comes in at $5K (max range), ZAOstock is fully funded with surplus. If
 
 ---
 
-*Created: 2026-07-17 | Review: weekly | Hard deadline: Aug 15 (Fisher, blocked by FA) | Next action: Fractured Atlas application at fracturedatlas.org | Related: 1262 (early grant research), 1266 (NEA context), 1277 (OP governance setup), 1311 (RF paste-ready), 1349 (FA + Fisher brief)*
+*Created: 2026-07-24 | Review: weekly | Hard deadline: Aug 15 (Fisher, blocked by FA) | Next action: Fractured Atlas application at fracturedatlas.org | Related: 1262 (early grant research), 1266 (NEA context), 1277 (OP governance setup), 1311 (RF paste-ready), 1349 (FA + Fisher brief)*

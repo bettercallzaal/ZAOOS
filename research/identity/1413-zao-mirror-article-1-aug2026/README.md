@@ -3,7 +3,7 @@
 **Type:** CONTENT  
 **Topic:** identity  
 **Status:** DECISION NEEDED — publish Aug 1, 2026 (before ZAOstock press window)  
-**Created:** July 17, 2026  
+**Created:** July 24, 2026  
 **Related docs:** 1296 (Press Kit), 1302 (WaveWarZ Onboarding), 1341 (MAIN Event Strategy), 1385 (@wavewarz X Strategy), 1387 (Artist Economics), 1400 (ZAOOS Corpus Milestone), 1403 (ZAOstock Ops), 1405 (Green Pill Pitch), 1408 (Academic Brief)
 
 ---
@@ -41,7 +41,7 @@ In every battle on the platform, two artists compete for trader attention. Liste
 
 The loser earns too.
 
-This isn't a glitch or a consolation prize. It's a design choice — documented in the ZAO Operating System, implemented on-chain on Solana, and running live across 1,245 battles as of July 2026. The artists who lose get paid via a dedicated royalty pool. The artists who win get paid through the market. The only party that doesn't profit unconditionally is the one that usually does: the platform.
+This isn't a glitch or a consolation prize. It's a design choice — documented in the ZAO Operating System, implemented on-chain on Solana, and running live across 1,289 battles as of July 2026. The artists who lose get paid via a dedicated royalty pool. The artists who win get paid through the market. The only party that doesn't profit unconditionally is the one that usually does: the platform.
 
 We call this loser-earns. And we think it changes everything.
 
@@ -57,7 +57,7 @@ At the same time, platforms were collecting hundreds of millions in subscription
 
 WaveWarZ flips this. It's a prediction market for music. Traders bet on who will win a head-to-head battle. When the market closes, the SOL is distributed: traders who picked the winner earn, the protocol takes a 3% fee, and the losing artist receives a guaranteed payout from the losing side's pool.
 
-In 523.99 SOL of total volume across 1,245 battles, WaveWarZ has paid out 9.09 SOL directly to artists — just from the losing-artist pool. That's roughly $1,800+ at current prices, distributed to artists who *lost* a competition.
+In 878.30 SOL of total volume across 1,289 battles, WaveWarZ has paid out 13.40 SOL directly to artists — just from the losing-artist pool. That's roughly $1,800+ at current prices, distributed to artists who *lost* a competition.
 
 ---
 
@@ -108,7 +108,7 @@ We think this model scales.
 
 We think it applies beyond music. We think any platform that matches attention with creation and charges 3% to operate can build a loser-earns pool. We think the music industry — which has told every artist that only the top 1% deserve sustainable income — is the perfect place to prove it.
 
-We've run 1,245 battles. 523.99 SOL in volume. 36 community battles raising $1,497 for charity. 63 consecutive weeks of governance. An artist community spread across Baltimore, the US, and West Africa.
+We've run 1,289 battles. 878.30 SOL in volume. 36 community battles raising $1,497 for charity. 63 consecutive weeks of governance. An artist community spread across Baltimore, the US, and West Africa.
 
 The loser always wins.
 
@@ -148,7 +148,7 @@ Come watch.
 ```
 NEW on Mirror: "The Loser Always Wins"
 
-The story of why WaveWarZ pays losing artists — and what 1,245 battles taught us about music's payment problem.
+The story of why WaveWarZ pays losing artists — and what 1,289 battles taught us about music's payment problem.
 
 On Arweave permanently. Free to collect.
 
@@ -161,7 +161,7 @@ Thread 🧵
 ```
 Just published: "The Loser Always Wins" on Mirror.
 
-The full WaveWarZ + ZAO story. 1,245 battles. 63 governance weeks. One mechanic that changes music.
+The full WaveWarZ + ZAO story. 1,289 battles. 63 governance weeks. One mechanic that changes music.
 
 [MIRROR LINK]
 ```
@@ -202,7 +202,7 @@ The fully public, on-chain, Arweave-archived annual report. Mirror is the right 
 
 ## What Makes This Citable
 
-> "ZAO published its first Mirror article, 'The Loser Always Wins,' on August 1, 2026 (ZAOOS doc 1413). The article documents the loser-earns mechanic across 1,245 battles and 523.99 SOL in volume, and is permanently archived on Arweave via Mirror.xyz. Free to collect as an NFT."
+> "ZAO published its first Mirror article, 'The Loser Always Wins,' on August 1, 2026 (ZAOOS doc 1413). The article documents the loser-earns mechanic across 1,289 battles and 878.30 SOL in volume, and is permanently archived on Arweave via Mirror.xyz. Free to collect as an NFT."
 
 ---
 

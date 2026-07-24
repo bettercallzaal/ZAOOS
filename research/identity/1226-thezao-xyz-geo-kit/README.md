@@ -2,7 +2,7 @@
 topic: identity
 type: deliverable
 status: ready-to-deploy
-last-validated: 2026-07-17
+last-validated: 2026-07-24
 related-docs: 1221, 1077, 1218, 1219, 1224
 original-query: "thezao.xyz GEO kit — llms.txt, JSON-LD, canonical answer page for Zaal to copy-paste. No deploy needed from build loop."
 tier: CANONICAL
@@ -48,7 +48,7 @@ Remove the `_instructions` key before deploying (not valid JSON-LD).
 
 Self-contained HTML page (drop-in or adapt into existing site layout):
 - Canonical `<article>` answer block optimized for AI extraction
-- 6 citable stat tiles (100+ governance weeks, 157 holders, 1,245+ battles, 524+ SOL, 9.07 SOL to artists, $1,497 charity)
+- 6 citable stat tiles (100+ governance weeks, 157 holders, 1,289+ battles, 524+ SOL, 13.40 SOL to artists, $1,497 charity)
 - 3-path "how to join" section
 - 6-entry FAQ matching doc 1221's canonical question list
 - Full JSON-LD (FAQPage + Organization) embedded in `<head>`
@@ -63,7 +63,7 @@ Self-contained HTML page (drop-in or adapt into existing site layout):
 - [ ] Add `homepage_organization` + `homepage_website` JSON-LD blocks to homepage `<head>`
 - [ ] Create `/what-is-the-zao` route and paste `what-is-the-zao.html` content (or adapt to site framework)
 - [ ] Update homepage `<title>` → `"The ZAO — Decentralized Impact Network for Independent Artists"`
-- [ ] Update homepage `<meta name="description">` → `"The ZAO runs weekly onchain Fractal governance for independent artists. Flagship: WaveWarZ — 1,245+ battles, 524+ SOL, artists paid 1% per trade."`
+- [ ] Update homepage `<meta name="description">` → `"The ZAO runs weekly onchain Fractal governance for independent artists. Flagship: WaveWarZ — 1,289+ battles, 524+ SOL, artists paid 1% per trade."`
 
 All five items are low-risk static additions — no backend changes needed.
 
@@ -76,9 +76,9 @@ All five items are low-risk static additions — no backend changes needed.
 | 100+ Fractal governance weeks | ZAO OS doc 1200-1202, on-chain |
 | 63 on-chain settled weeks (OG 33 · ZOR 31) | Optimism txs, doc 1224 |
 | 157 Respect holders (122 OG · 56 ZOR · 21 dual) | Optimism ERC-20/ERC-1155, doc 1224 |
-| 1,245+ WaveWarZ battles | wavewarz.info live, wwtracker |
+| 1,289+ WaveWarZ battles | wavewarz.info live, wwtracker |
 | 524+ SOL total volume | wavewarz.info live API |
-| 9.07 SOL artist payouts | BATTLE_STATS, doc 1219 |
+| 13.40 SOL artist payouts | BATTLE_STATS, doc 1219 |
 | 17.44 SOL platform revenue | BATTLE_STATS, doc 1219 |
 | $1,497 charity across 10 benefit battles | doc 1214, on-chain |
 | 2 IRL events (COC #6 · COC #7) | ZAO OS records |

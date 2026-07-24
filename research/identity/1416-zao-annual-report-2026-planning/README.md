@@ -2,8 +2,8 @@
 
 **Type:** PLANNING  
 **Topic:** identity  
-**Status:** Active — ZOE begins collecting data Jul 17, 2026; publish Dec 15-20  
-**Created:** July 17, 2026  
+**Status:** Active — ZOE begins collecting data Jul 24, 2026; publish Dec 15-20  
+**Created:** July 24, 2026  
 **Related docs:** 1400 (ZAOOS Corpus Milestone), 1407 (Newsletter Strategy — Issue 4 companion), 1413 (Mirror Article 3 = the Annual Report), 1394 (Governance History), 1387 (Artist Economics), 1295 (Farcaster Strategy), 1303 (YouTube Strategy)
 
 ---

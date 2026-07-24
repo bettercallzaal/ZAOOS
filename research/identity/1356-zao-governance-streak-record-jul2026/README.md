@@ -2,14 +2,14 @@
 topic: identity/governance
 type: REFERENCE
 status: CANONICAL — update streak count weekly; ZOE: increment week number after each session
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1280, 1312, 1339, 1344, 1349, 1351, 1352
 owner: Zaal (governance lead) + ZOE (weekly count maintenance)
 ---
 
 # 1356 — ZAO Governance Streak: The Record That Sets ZAO Apart (Jul 2026)
 
-> **The record:** As of July 17, 2026, The ZAO (ZTalent Artist Organization) has conducted 63+ consecutive weekly Fractal governance sessions with on-chain Respect allocation on Optimism Mainnet. No session has been missed.
+> **The record:** As of July 24, 2026, The ZAO (ZTalent Artist Organization) has conducted 63+ consecutive weekly Fractal governance sessions with on-chain Respect allocation on Optimism Mainnet. No session has been missed.
 >
 > **Why this matters:** Most DAOs never hold a second governance vote. Most that do fail to maintain a weekly cadence for more than 2-3 months. ZAO has done it for 15+ months straight, with every session's results recorded immutably on a public blockchain. This is the most verifiable single fact about ZAO — and it's provable to anyone with an internet connection.
 >
@@ -19,7 +19,7 @@ owner: Zaal (governance lead) + ZOE (weekly count maintenance)
 
 ## The Streak in Numbers
 
-| Metric | Value (as of Jul 17, 2026) |
+| Metric | Value (as of Jul 24, 2026) |
 |--------|--------------------------|
 | Consecutive governance sessions | 63+ |
 | Duration | 15+ months |
@@ -87,7 +87,7 @@ Academic governance researchers use DAO case studies to study decentralized deci
 Journalists covering Web3 and DAOs are skeptical for good reason — most DAOs are vaporware. The streak is the simplest proof that ZAO is different:
 
 **Press pitch sentence:**
-> "Unlike most DAOs that post a whitepaper and disappear, The ZAO has held 63+ consecutive weekly governance sessions on Optimism Mainnet — every session, every week, for 15+ months — with real-world outcomes including the WaveWarZ music battle platform (1,245 battles, 523 SOL volume) and ZAOstock, an outdoor festival in Maine."
+> "Unlike most DAOs that post a whitepaper and disappear, The ZAO has held 63+ consecutive weekly governance sessions on Optimism Mainnet — every session, every week, for 15+ months — with real-world outcomes including the WaveWarZ music battle platform (1,289 battles, 878 SOL volume) and ZAOstock, an outdoor festival in Maine."
 
 ### For Wikipedia
 
@@ -155,4 +155,4 @@ After each governance session, ZOE should:
 
 ---
 
-*Created: 2026-07-17 | ZOE: update streak count weekly after each session | CANONICAL — link from all press pitches, grant applications, and academic outreach | Related: 1280 (governance model), 1312 (governance history), 1339 (proof-points), 1349 (grants), 1351 (academic outreach), 1352 (IP catalog)*
+*Created: 2026-07-24 | ZOE: update streak count weekly after each session | CANONICAL — link from all press pitches, grant applications, and academic outreach | Related: 1280 (governance model), 1312 (governance history), 1339 (proof-points), 1349 (grants), 1351 (academic outreach), 1352 (IP catalog)*

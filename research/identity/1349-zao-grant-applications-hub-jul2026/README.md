@@ -2,7 +2,7 @@
 topic: identity/funding
 type: PLAYBOOK
 status: URGENT — Fractured Atlas ASAP, Fisher Aug 15
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1311, 1320, 1333, 1339, 1344
 owner: Zaal (must execute — all submissions are gated human actions)
 ---
@@ -168,7 +168,7 @@ Gitcoin runs periodic matching-fund rounds for open-source projects and public g
 > The ZAO (ZTalent Artist Organization) is a decentralized music organization running at the intersection of Web3 governance, AI operations, and independent music. We have maintained 63+ consecutive weeks of on-chain Fractal governance sessions, deployed governance contracts on Optimism Mainnet (OG ERC-20: `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`), and built WaveWarZ — the only music battle platform on Solana where the losing song still earns.
 >
 > **What we've built (public, open-source):**
-> - WaveWarZ: 1,245+ battles, 523.991 SOL volume, 9.0988 SOL in artist payouts, 127.343 SOL in community trader claims. wavewarz.info (free public API, no auth)
+> - WaveWarZ: 1,289+ battles, 878.30 SOL volume, 13.40 SOL in artist payouts, 127.343 SOL in community trader claims. wavewarz.info (free public API, no auth)
 > - ZAOOS: 1,300+ public research documents on music, governance, and onchain economics. github.com/bettercallzaal/ZAOOS (MIT license)
 > - wwtracker: Open-source battle analytics dashboard. github.com/bettercallzaal/wwtracker (MIT license)
 > - COC Concertz: Virtual concert series with Arweave-permanent archives
@@ -226,4 +226,4 @@ Grants directly fund:
 
 ---
 
-*Created: 2026-07-17 | URGENT — Fractured Atlas application needed by Jul 25 at latest to meet Fisher Aug 15 deadline | Related: 1311 (OP RF), 1320 (Fisher background), 1333 (ZAOstock planning), 1344 (AI narrative for grant text), 1345 (annual report Section 7)*
+*Created: 2026-07-24 | URGENT — Fractured Atlas application needed by Jul 25 at latest to meet Fisher Aug 15 deadline | Related: 1311 (OP RF), 1320 (Fisher background), 1333 (ZAOstock planning), 1344 (AI narrative for grant text), 1345 (annual report Section 7)*

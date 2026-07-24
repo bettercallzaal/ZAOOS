@@ -35,7 +35,7 @@ owner: Zaal (IP authority) + ZOE (Arweave link maintenance)
 - 1,289 battles completed
 - 878.30 SOL total volume
 - 13.40 SOL artist payouts
-- 127.343 SOL trader claims
+- 381.20 SOL trader claims
 - 50 MAIN events
 - Source: wavewarz.info/api/public/stats
 

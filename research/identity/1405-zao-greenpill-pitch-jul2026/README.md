@@ -94,7 +94,7 @@ If Owocki says yes, here's what Zaal should have ready for the call:
 - Battles: 1,289+ (say "over 1,200")
 - SOL volume: 878.30 SOL ("over 500 SOL")
 - Artist payouts: 13.40 SOL ("over $600 to losing artists")
-- Trader claims: 127.343 SOL ("traders have taken over $9,000 in winnings")
+- Trader claims: 381.20 SOL ("traders have taken over $9,000 in winnings")
 - Governance sessions: 63+ weekly (say "over 60 consecutive weeks")
 - ZAOOS: 1,400+ public research docs (MIT-licensed)
 

@@ -28,7 +28,7 @@ owner: Zaal + Hurricane
 | Total battles | 1,289 |
 | Total SOL volume | 523.991 |
 | Artist payouts | 13.40 SOL (~$682) |
-| Trader claims | 127.343 SOL (~$9,546) |
+| Trader claims | 381.20 SOL (~$9,546) |
 
 ### MAIN Event Share Analysis
 

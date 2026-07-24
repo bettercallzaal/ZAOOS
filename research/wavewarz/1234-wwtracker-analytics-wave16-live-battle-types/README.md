@@ -90,7 +90,7 @@ From `wavewarz.info/api/public/stats` as of session:
 | Community Battles | 36 | 2.9% |
 | **Total** | **1,289** | — |
 
-**Key insight (citable):** Main Events = ~4% of all battles but drive ~70% of total volume (524 ◎ platform total; events are flagship format with peak individual bet sizes).
+**Key insight (citable):** Main Events = ~4% of all battles but drive ~70% of total volume (878 ◎ platform total; events are flagship format with peak individual bet sizes).
 
 ---
 

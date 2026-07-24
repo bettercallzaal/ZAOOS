@@ -656,9 +656,10 @@ bot.on('message_reaction', async (ctx) => {
       unpin: async (chatId, messageId) => {
         await ctx.api.unpinChatMessage(chatId, messageId).catch(() => {});
       },
-      markDone: async (taskId, status) => {
+      markDone: async (taskId, _status) => {
         if (taskId) {
-          await updateItem(taskId, { status }).catch((e) => {
+          // _status is the literal 'done'; the tracker's TaskStatus is 'DONE'.
+          await updateItem(taskId, { status: 'DONE' }).catch((e) => {
             console.error('[zoe/tg-interactions] mark-done failed:', e);
           });
         }
@@ -1776,6 +1777,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // Session checkpoint: `/checkpoint <note>` saves a breadcrumb.
   const checkpointMatch = CHECKPOINT_PREFIX.exec(text);
   if (checkpointMatch) {
+    if (!ctx.chatId) return;
     const chatId = ctx.chatId.toString();
     await saveCheckpoint(chatId, checkpointMatch[1]);
     await ctx.reply(`Checkpoint saved: "${checkpointMatch[1].slice(0, 60)}${checkpointMatch[1].length > 60 ? '...' : ''}"`);
@@ -1784,6 +1786,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
 
   // Trust audit: `/audit` scans for fallen tasks/captures.
   if (AUDIT_COMMAND_RE.test(text.trim())) {
+    if (!ctx.chatId) return;
     const progress = startProgressNarration(ctx, ctx.chatId, { first: 'Running audit...' });
     try {
       const report = await runAudit([], Date.now());

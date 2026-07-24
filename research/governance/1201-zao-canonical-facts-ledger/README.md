@@ -2,7 +2,7 @@
 
 **Tier:** STANDARD
 **Date:** 2026-07-17
-**Last-updated:** 2026-07-17 (ww loop: added Fractal count calculation, WaveWarZ live stats, PolyRaiders dates + HuRya beneficiary count — all verified from public sources); 2026-07-17 (ww loop: added on-chain Respect settlement rows from doc 1202, resolved Fractal weeks to two-layer)
+**Last-updated:** 2026-07-24 (ww loop: refreshed WaveWarZ live stats post-AI-tournament + fractal week calculation); 2026-07-17 (ww loop: added Fractal count calculation, WaveWarZ live stats, PolyRaiders dates + HuRya beneficiary count — all verified from public sources); 2026-07-17 (ww loop: added on-chain Respect settlement rows from doc 1202, resolved Fractal weeks to two-layer)
 **Status:** Living ledger (verified facts + open provenance gaps)
 **Owner:** builder loop (verified rows), Zaal (pin the canonical membership definition)
 
@@ -34,16 +34,16 @@ it's a claim that they are **currently un-citable**, which is a fixable liabilit
 | `/zao` Farcaster channel members (role) | **4** | same | this doc |
 | `/zao` channel created | **2024-09-03** | same (`createdAt` 1725405513) | this doc |
 | Fractal start date | **2024-07-30** | ZAOOS public record (community.config.ts, doc 622, dossier 742) | 1077 |
-| Fractal weeks elapsed (as of 2026-07-16) | **≥102** (calculation) | (2026-07-16 − 2024-07-30) = 716 days ÷ 7 = 102.3 complete weeks | this doc |
+| Fractal weeks elapsed (as of 2026-07-24) | **≥103** (calculation) | (2026-07-24 − 2024-07-30) = 724 days ÷ 7 = 103.4 complete weeks | this doc |
 | Fractal weeks — conservative public claim | **"100+"** | date-calculation lower bound; no skipped-week proof available from public data | this doc |
 | OG Respect on-chain settlement (Optimism) | **33 distinct weeks** (2024-07-30 → 2025-12-20, 438 txs) | Blockscout tx enumeration, verified 2026-07-17 | [1202](../1202-fractal-onchain-settlement-history/) |
 | ZOR Respect on-chain settlement (Optimism) | **31 distinct weeks** (2025-09-25 → 2026-07-06, 67 txs) | Blockscout tx enumeration, verified 2026-07-17 | 1202 |
 | Combined on-chain settlement weeks (OG ∪ ZOR) | **63 distinct weeks** (1 overlap week) | union of OG + ZOR settlement sets | 1202 |
-| WaveWarZ lifetime volume | **524.15 SOL (~$39K)** | `wavewarz.info/api/public/stats`, live 2026-07-17 | [978](../../business/978-zao-numbers-framing/), [1077](../1077-zao-dao-case-study-jul2026/) |
-| WaveWarZ total battles | **1,245** | same live API | 974, 1077 |
-| WaveWarZ artist payouts | **9.07 SOL** | same | 978 |
-| WaveWarZ platform revenue | **17.44 SOL** | same | 978 |
-| WaveWarZ trader claims | **127.34 SOL** | same | 974 |
+| WaveWarZ lifetime volume | **878.30 SOL (~$66K)** | `wavewarz.info/api/public/stats`, live 2026-07-24 | [978](../../business/978-zao-numbers-framing/), [1077](../1077-zao-dao-case-study-jul2026/), [2041](../../wavewarz/2041-wavewarz-trader-economy-jul2026/) |
+| WaveWarZ total battles | **1,289** | same live API | 974, 1077 |
+| WaveWarZ artist payouts | **13.39 SOL** | same | 978 |
+| WaveWarZ platform revenue | **19.99 SOL** | same | 978 |
+| WaveWarZ trader claims | **381.197 SOL** | same (1,526 on-chain withdrawals) | 974, [2041](../../wavewarz/2041-wavewarz-trader-economy-jul2026/) |
 | PolyRaiders Holiday Heat (benefit battle) | **Dec 12, 2024 · ~$270** | wavewarz.info/events (canonical) + tweet 1999858390567117201 snowflake → 2025-12-13 (anniversary recap, not the event date) | [1077](../1077-zao-dao-case-study-jul2026/) |
 | Love Song Benefit battle | **Feb 13, 2025 · ~$1,221** | wavewarz.info/events | 1077 |
 | Charity total (2 rounds) | **~$1,497 to HuRya Empowerment Foundation** | wavewarz.info/events | 1077 |
@@ -62,8 +62,8 @@ curl -s "https://api.warpcast.com/v1/channel?channelId=zao" | \
 |--------------|------------------|-------------------------------|
 | **"188 members on Base"** | `CLAUDE.md`, docs 625, 449, 530, 622, 1078, 742 (7+) | The nearest **public** proxy — the `/zao` channel — shows **93 followers / 4 members**, nowhere near 188. So "188" measures something else (most likely the gated Farcaster client's registered users in Supabase, which is not publicly verifiable). Its **definition** ("member" = app-registered? Respect-holder? channel-follower? Discord?) and **as-of date** are unpinned. This is THE most-repeated ZAO headline number and the least traceable. |
 | ~~Fractal weeks: "90+" / "100+"~~ → **RESOLVED (two-layer)** | whitepaper 942, ICM box, dossier 742, doc 622 | Two-layer verified: (1) date-calculation: 716 days ÷ 7 = 102 complete weeks as of 2026-07-16; (2) on-chain settlement: 63 distinct weeks in doc 1202. Cite as: "100+ weekly Respect Games (Discord-recorded), with 63 weeks of verified on-chain Respect settlement on Optimism." |
-| ~~WaveWarZ battles: "735" / "958" / "416"~~ → **RESOLVED** | dossier 742 (735), COC lesson (958), old scraper (416) | **Canonical: 1,245 battles** (live API 2026-07-16). Scraper-era numbers are obsolete. Source: doc 974. |
-| ~~"$60K+ traded"~~ → **RESOLVED** | dossier 742 | Live volume: 524.15 SOL (~$39,453 at $75.29/SOL, 2026-07-17). The "$60K+" claim was from a higher SOL price period (SOL was ~$120–150 in early 2025) — plausible historically but do not cite at current prices. Canonical source: doc 978. |
+| ~~WaveWarZ battles: "735" / "958" / "416"~~ → **RESOLVED** | dossier 742 (735), COC lesson (958), old scraper (416) | **Canonical: 1,289 battles** (live API 2026-07-24). Scraper-era numbers are obsolete. Source: doc 974. |
+| ~~"$60K+ traded"~~ → **RESOLVED** | dossier 742 | Live volume: 878.30 SOL (~$66,110 at $75.27/SOL, 2026-07-24). Note: AI Artist Tournament semifinal (Jul 16–23) added ~355 SOL in one week — 68% of all prior platform history. Canonical source: doc 978, doc 2041. |
 | ~~"34 PRs/week"~~ → **resolved** | doc 449 one-pager | **VERIFIED, see [doc 1203](../1203-zaoos-build-velocity/):** "34/week" was the human-era baseline (W12–W15, ~30/week product code). Now 60–175+/week total but **50–73% is agent docs/tests automation**; product (feat/fix) velocity is stable ~30/week. Quote total only with the automation caveat. |
 
 ## Recommendation (single source, same discipline as GEO llms.txt + Respect facts)

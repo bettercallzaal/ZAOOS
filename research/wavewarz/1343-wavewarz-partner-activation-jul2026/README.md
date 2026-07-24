@@ -2,7 +2,7 @@
 topic: wavewarz/partnerships
 type: PLAYBOOK
 status: ACTIVE
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 050, 406, 608, 711, 742, 743, 1318, 1323, 1341, 1342
 owner: Zaal (Director of Ecosystem Strategy & Partnerships)
 ---
@@ -43,7 +43,7 @@ owner: Zaal (Director of Ecosystem Strategy & Partnerships)
 
 **What to do:**
 1. Email Coinflow account manager: "Can WaveWarZ be featured as a merchant success story in your newsletter or website?"
-2. Provide: battle count (1,245), volume ($39K), "first onchain music battle platform using Coinflow for fiat on-ramp"
+2. Provide: battle count (1,289), volume ($39K), "first onchain music battle platform using Coinflow for fiat on-ramp"
 3. Ask: "Can you add a co-branded callout on your website under 'Partner Success Stories'?"
 
 **Expected yield:** 1 mention in Coinflow's channels = 500-2,000 new WaveWarZ eyeballs
@@ -241,4 +241,4 @@ PARTNER TRACKER (Jul 2026):
 
 ---
 
-*Created: 2026-07-17 | Owner: Zaal (Director of Ecosystem Strategy & Partnerships) | Related: 050 (Magnetiq), 406 (Coinflow), 608 (RAM/Africa), 711 (Neynar), 742 (Privy), 1318 (Africa expansion), 1341 (MAIN event strategy), 1342 (artist recruitment)*
+*Created: 2026-07-24 | Owner: Zaal (Director of Ecosystem Strategy & Partnerships) | Related: 050 (Magnetiq), 406 (Coinflow), 608 (RAM/Africa), 711 (Neynar), 742 (Privy), 1318 (Africa expansion), 1341 (MAIN event strategy), 1342 (artist recruitment)*

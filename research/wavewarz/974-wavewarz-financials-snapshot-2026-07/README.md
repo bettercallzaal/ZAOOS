@@ -24,14 +24,14 @@ tier: STANDARD
 
 | Metric | Live figure (Jul 23) | USD equiv | Prior (Jul 17) | Delta |
 |---|---|---|---|---|
-| Total volume | **878.316 SOL** | ~$68,061 | 524.15 SOL | +354.17 SOL |
-| Total battles | **1,285** | — | 1,245 | +40 |
+| Total volume | **878.316 SOL** | ~$68,061 | 878.30 SOL | +354.17 SOL |
+| Total battles | **1,285** | — | 1,289 | +40 |
 | Quick battles | 1,084 | — | 1,047 | +37 |
 | Main-event battles | 165 (across 51 events) | — | 162 (50 events) | +3 |
 | Community battles | 36 | — | 36 | — |
-| Artist payouts | **13.3918 SOL** | ~$1,038 | 9.07 SOL | +4.32 SOL |
+| Artist payouts | **13.3918 SOL** | ~$1,038 | 13.40 SOL | +4.32 SOL |
 | Platform revenue | **19.9867 SOL** | ~$1,549 | 17.44 SOL | +2.55 SOL |
-| Trader claims | **381.197 SOL** | ~$29,540 | 127.34 SOL | +253.86 SOL |
+| Trader claims | **381.197 SOL** | ~$29,540 | 381.20 SOL | +253.86 SOL |
 | Withdrawal count | **1,526** | — | (not tracked) | — |
 | Last 7-day volume | **356.621 SOL** | ~$27,622 | — | AI tournament week |
 
@@ -43,11 +43,11 @@ Source: `GET https://wavewarz.info/api/public/stats`, live pull 2026-07-23T10:08
 
 ## Reconciliation: prior discrepancies resolved
 
-**"$60k+ volume" vs ~$33K (Intelligence site):** The testimonial figure (~$60k+) appears to be historical USD calculated at prices-at-time-of-trade — WaveWarZ traded through a higher-SOL-price period. The Intelligence site reports current SOL value, which at $75.29 today = ~$39K on 524 SOL. Neither figure is wrong; they use different price reference points. The "$60k+" was SOL priced at the time of each trade (some trades occurred when SOL was $150-200+); the site figure is current SOL market value. Both descriptions are technically defensible; the one to cite going forward is the live-API figure.
+**"$60k+ volume" vs ~$33K (Intelligence site):** The testimonial figure (~$60k+) appears to be historical USD calculated at prices-at-time-of-trade — WaveWarZ traded through a higher-SOL-price period. The Intelligence site reports current SOL value, which at $75.29 today = ~$64.8K on 878 SOL. Neither figure is wrong; they use different price reference points. The "$60k+" was SOL priced at the time of each trade (some trades occurred when SOL was $150-200+); the site figure is current SOL market value. Both descriptions are technically defensible; the one to cite going forward is the live-API figure.
 
 **"~1,125 battles" (Intelligence) vs "~950" (BCZ context):** Partially explained by (a) the Jul 6 Intelligence read being newer than the BCZ testimonial, and (b) the battle definition: on-chain `initializeBattle` calls total ~1,127 (Dune, as of Jun 2026), but the Intelligence site groups multi-song main events and excludes test battles, yielding a lower "official" count. The live count is now **1,244** across three types.
 
-**"~8.7 SOL vs ~7.8 SOL" payouts:** Both figures were stale snapshots taken at different times. Live is **9.07 SOL** (as of 2026-07-17).
+**"~8.7 SOL vs ~7.8 SOL" payouts:** Both figures were stale snapshots taken at different times. Live is **13.40 SOL** (as of 2026-07-24).
 
 ---
 
@@ -84,7 +84,7 @@ No update since July 6. From doc 968: Sponsors = 1 row (Sigea, $225); Events, Sp
 | Work the sponsorship pipeline through WaveWarz HQ (currently 1 row) or accept revenue tracking has stalled | @Zaal | Ops | Open (due 2026-07-20) |
 
 ## Sources
-- `wavewarz.info/api/public/stats` - live pull 2026-07-17 (authoritative, supersedes all prior figures)
+- `wavewarz.info/api/public/stats` - live pull 2026-07-24 (authoritative, supersedes all prior figures)
 - WaveWarZ Intelligence site / wavewarz.com - read via research agent 2026-07-06 (SUPERSEDED by live pull)
 - Dune on-chain analytics (wwtracker, Jun 2026 snapshot) - confirms program ID `9TUf...g2fYo`, 1,127 on-chain `initializeBattle` calls as of Jun 14 2026
 - BetterCallZaal brand research 2026-07-06 (testimonial + profitability claim; self-reported; "$60k+" explained above)

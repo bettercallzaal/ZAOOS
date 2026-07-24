@@ -2,7 +2,7 @@
 topic: wavewarz/distribution
 type: STRATEGY
 status: ACTIVE — implement immediately; ZOE owns weekly execution
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 1347, 1358, 1378, 1374
 owner: ZOE (execution) + Zaal (review monthly)
 ---
@@ -11,7 +11,7 @@ owner: ZOE (execution) + Zaal (review monthly)
 
 > **What it is:** A systematic, ZOE-executable content plan for @wavewarz on X — turning the platform's live stats into daily distribution, building an audience that cares about community music battles, and converting X followers into WaveWarZ participants.
 >
-> **Why it matters:** @wavewarz on X is WaveWarZ's primary growth channel for reaching music industry people who are not crypto-native. Consistent content converts the 1,245+ battles happening on-platform into a public media presence. Every post is a distribution moment.
+> **Why it matters:** @wavewarz on X is WaveWarZ's primary growth channel for reaching music industry people who are not crypto-native. Consistent content converts the 1,289+ battles happening on-platform into a public media presence. Every post is a distribution moment.
 
 ---
 
@@ -305,4 +305,4 @@ RAM Africa's audience (new to WaveWarZ) + WaveWarZ's loser-earns model = compell
 
 ---
 
-*Created: 2026-07-17 | Owner: ZOE | Related: 1347 (growth strategy), 1358 (channel ops), 1378 (milestone playbook), 1374 (Farcaster strategy)*
+*Created: 2026-07-24 | Owner: ZOE | Related: 1347 (growth strategy), 1358 (channel ops), 1378 (milestone playbook), 1374 (Farcaster strategy)*

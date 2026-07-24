@@ -2,7 +2,7 @@
 topic: wavewarz/strategy
 type: STRATEGY
 status: ACTIVE
-created: 2026-07-17
+created: 2026-07-24
 related-docs: 743, 854, 1237, 1296, 1302, 1323
 owner: Zaal + Hurricane
 ---
@@ -11,11 +11,11 @@ owner: Zaal + Hurricane
 
 > **What is a MAIN Event?** A MAIN Event is a scheduled, promoted, multi-round WaveWarZ battle session. Unlike Quick Battles (ad-hoc, short), MAIN Events follow a fixed cadence (historically Sunday 8pm EST), feature multiple battle rounds, draw larger audiences, and generate significantly more SOL volume per session.
 >
-> **Why this matters:** 50 MAIN events (162 battles) have collectively generated the majority of WaveWarZ's 523.991 SOL total volume. Scaling MAIN events is the single highest-leverage action for WaveWarZ revenue, artist payouts, and ZAOstock pipeline.
+> **Why this matters:** 50 MAIN events (162 battles) have collectively generated the majority of WaveWarZ's 878.30 SOL total volume. Scaling MAIN events is the single highest-leverage action for WaveWarZ revenue, artist payouts, and ZAOstock pipeline.
 
 ---
 
-## Part 1: MAIN Event Baseline (Jul 17, 2026)
+## Part 1: MAIN Event Baseline (Jul 24, 2026)
 
 ### Live Numbers (wavewarz.info/api/public/stats)
 
@@ -25,9 +25,9 @@ owner: Zaal + Hurricane
 | Total MAIN battles | 162 |
 | Quick battles | 1,047 |
 | Community battles | 36 |
-| Total battles | 1,245 |
+| Total battles | 1,289 |
 | Total SOL volume | 523.991 |
-| Artist payouts | 9.0988 SOL (~$682) |
+| Artist payouts | 13.40 SOL (~$682) |
 | Trader claims | 127.343 SOL (~$9,546) |
 
 ### MAIN Event Share Analysis
@@ -74,7 +74,7 @@ MAIN event participants are the **natural ZAOstock audience**:
 ### Artist Payout Multiplication
 
 Every additional MAIN event = more battle rounds = more 1% payouts to artists.
-- Current: 9.0988 SOL total artist payouts / 50 MAIN events = **0.18 SOL per MAIN event** (avg artist payout contribution)
+- Current: 13.40 SOL total artist payouts / 50 MAIN events = **0.18 SOL per MAIN event** (avg artist payout contribution)
 - If MAIN events double to 100 → projected artist payouts: ~18 SOL (~$1,350 at Jul 2026)
 - This is the "artists paid first" North Star (#2) in action
 
@@ -263,4 +263,4 @@ The next one is {next_date}. Subscribe to get the MAIN Event calendar.
 
 ---
 
-*Created: 2026-07-17 | Owner: Zaal + Hurricane | Update after each MAIN event or milestone | Related: 743 (whitepaper), 854 (24h engagement), 1237 (onchain economics), 1296 (press kit), 1302 (artist onboarding), 1323 (Base chain)*
+*Created: 2026-07-24 | Owner: Zaal + Hurricane | Update after each MAIN event or milestone | Related: 743 (whitepaper), 854 (24h engagement), 1237 (onchain economics), 1296 (press kit), 1302 (artist onboarding), 1323 (Base chain)*

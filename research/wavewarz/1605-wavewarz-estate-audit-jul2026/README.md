@@ -159,7 +159,7 @@
 **Broken/stale:**
 - Last commit Jun 16 — same day as wavewarzapp (likely same session)
 - No co-founder matched yet → no active development
-- Stats in README are stale (735 battles, 472 SOL vs. current 1,245 battles, 523.991 SOL)
+- Stats in README are stale (735 battles, 472 SOL vs. current 1,289 battles, 878.30 SOL)
 
 **Decision needed:** (1) Update README stats with current numbers (wavewarz.info/api/public/stats), (2) decide whether to keep this as an active co-founder pitch or move to a private spec.
 
@@ -243,7 +243,7 @@ Personal Farcaster client. Includes `/wavewarz` channel feed as a curated view. 
 
 | Field | Value |
 |---|---|
-| Last push | Jul 17, 2026 |
+| Last push | Jul 24, 2026 |
 | Open PRs | 2 |
 | WW surface | /wavewarz channel feed, reply drafts grounded in ZAO context |
 
@@ -300,4 +300,4 @@ Personal Farcaster client. Includes `/wavewarz` channel feed as a curated view. 
 - 1576 — COC #8 Show Day Ops Checklist (CoCConcertZ deployment reference)
 - 1574 — WaveWarZ Platform Stats Reference (live API numbers — baseline for wwbase README update)
 - 1433 — WaveWarZ H1 2026 Platform Growth Summary (wwtracker stats history)
-- 1388 — ZAO Platform Stats Reference (current numbers: 1,245 battles, 523.991 SOL)
+- 1388 — ZAO Platform Stats Reference (current numbers: 1,289 battles, 878.30 SOL)

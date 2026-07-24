@@ -15,7 +15,7 @@ A quick battle is the standard WaveWarZ battle format — two artists submit tra
 - **Minimum setup:** Audius account + Phantom wallet + SOL for gas (~0.001 SOL)
 - **Duration:** typically 24-48 hours (current default — check wavewarz.info for live setting)
 
-**As of July 2026:** 1,047 quick battles completed. 1,245 total battles.
+**As of July 2026:** 1,088 quick battles completed. 1,289 total battles.
 
 ---
 

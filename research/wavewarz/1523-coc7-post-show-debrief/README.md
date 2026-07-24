@@ -52,7 +52,7 @@ COC #7 just happened.
 
 For the first time, a live audience watched a WaveWarZ battle IRL.
 
-64 consecutive governance sessions. 1,245 onchain battles. $104K volume.
+64 consecutive governance sessions. 1,289 onchain battles. $64.8K volume.
 The losing artist still gets paid.
 
 ZAOstock is October 3rd.

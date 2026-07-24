@@ -24,6 +24,7 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
+import { sanitizeErrorForUser } from './user-errors';
 import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
 import { checkAndRecordZoeCall } from './call-budget';
 import { runCockpit } from '../cockpit/cockpit';
@@ -55,7 +56,7 @@ import {
 } from './reflexion';
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
-import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
+import { disableNudges, enableNudges, nudgesEnabled, markNudgeSent } from './nudges';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -655,9 +656,10 @@ bot.on('message_reaction', async (ctx) => {
       unpin: async (chatId, messageId) => {
         await ctx.api.unpinChatMessage(chatId, messageId).catch(() => {});
       },
-      markDone: async (taskId, status) => {
+      markDone: async (taskId, _status) => {
         if (taskId) {
-          await updateItem(taskId, { status }).catch((e) => {
+          // _status is the literal 'done'; the tracker's TaskStatus is 'DONE'.
+          await updateItem(taskId, { status: 'DONE' }).catch((e) => {
             console.error('[zoe/tg-interactions] mark-done failed:', e);
           });
         }
@@ -1017,12 +1019,15 @@ bot.command('pulse', async (ctx) => {
     await replyChunked(ctx, output);
   } catch (e) {
     console.error('[zoe/index] pulse command failed:', e);
-    await ctx.reply(`Pulse failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+    await ctx.reply(`Pulse failed: ${sanitizeErrorForUser(e)}`);
   }
 });
 
-bot.command('agenda', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+// Shared agenda body so /agenda and its /list alias run the SAME handler.
+// (Previously /list did `ctx.api.sendMessage(chat, '/agenda')`, which posted the
+// literal text "/agenda" from the bot - it never ran the handler, so /list did
+// nothing.)
+async function sendAgenda(ctx: Context): Promise<void> {
   try {
     const supaUrl = process.env.SUPABASE_URL;
     const supaKey = process.env.SUPABASE_ANON_KEY;
@@ -1049,14 +1054,19 @@ bot.command('agenda', async (ctx) => {
     await replyChunked(ctx, output);
   } catch (e) {
     console.error('[zoe/index] agenda command failed:', e);
-    await ctx.reply(`Agenda failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+    await ctx.reply(`Agenda failed: ${sanitizeErrorForUser(e)}`);
   }
+}
+
+bot.command('agenda', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  await sendAgenda(ctx);
 });
 
 bot.command('list', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  // /list is an alias for /agenda (show all items)
-  await ctx.api.sendMessage(ctx.chat.id, '/agenda');
+  // /list is an alias for /agenda (show all items).
+  await sendAgenda(ctx);
 });
 
 
@@ -1467,7 +1477,7 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
   try {
     transcript = await transcribeTelegramFile(token, fileId);
   } catch (err) {
-    await ctx.reply(`Could not transcribe that - ${(err as Error).message.slice(0, 160)}`).catch(() => {});
+    await ctx.reply(`Could not transcribe that - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
   if (!transcript) {
@@ -1538,7 +1548,7 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
   try {
     savedPath = await downloadTelegramFile(token, fileId, join(ZOE_PATHS.home, 'inbox'), preferName);
   } catch (err) {
-    await ctx.reply(`Could not fetch that ${label} - ${(err as Error).message.slice(0, 150)}`).catch(() => {});
+    await ctx.reply(`Could not fetch that ${label} - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
   // FEATURE 2: FILE/PHOTO/LINK AUTO-ROUTE
@@ -1722,9 +1732,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       );
       console.log(`[zoe/index] note saved (#${count}): ${noteMatch[2].slice(0, 80)}`);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('[zoe/index] note save failed:', msg);
-      await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
+      console.error('[zoe/index] note save failed:', err);
+      await ctx.reply(`(note save failed - ${sanitizeErrorForUser(err)})`);
     }
     return;
   }
@@ -1768,6 +1777,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // Session checkpoint: `/checkpoint <note>` saves a breadcrumb.
   const checkpointMatch = CHECKPOINT_PREFIX.exec(text);
   if (checkpointMatch) {
+    if (!ctx.chatId) return;
     const chatId = ctx.chatId.toString();
     await saveCheckpoint(chatId, checkpointMatch[1]);
     await ctx.reply(`Checkpoint saved: "${checkpointMatch[1].slice(0, 60)}${checkpointMatch[1].length > 60 ? '...' : ''}"`);
@@ -1776,6 +1786,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
 
   // Trust audit: `/audit` scans for fallen tasks/captures.
   if (AUDIT_COMMAND_RE.test(text.trim())) {
+    if (!ctx.chatId) return;
     const progress = startProgressNarration(ctx, ctx.chatId, { first: 'Running audit...' });
     try {
       const report = await runAudit([], Date.now());
@@ -1784,8 +1795,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       await replyChunked(ctx, formatted);
     } catch (err) {
       progress.stop();
-      const msg = err instanceof Error ? err.message : String(err);
-      await ctx.reply(`Audit failed: ${msg.slice(0, 200)}`);
+      console.error('[zoe/index] audit failed:', err);
+      await ctx.reply(`Audit failed: ${sanitizeErrorForUser(err)}`);
     }
     return;
   }
@@ -1797,8 +1808,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       const budgetText = formatSpendStatus(detailed);
       await ctx.reply(budgetText);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      await ctx.reply(`Budget lookup failed: ${msg.slice(0, 100)}`);
+      console.error('[zoe/index] budget lookup failed:', err);
+      await ctx.reply(`Budget lookup failed: ${sanitizeErrorForUser(err)}`);
     }
     return;
   }
@@ -1936,7 +1947,7 @@ async function dispatchConcierge(
     }
     if (budget.justCrossed) {
       console.error(`[zoe/index] ALERT daily LLM call cap exceeded (${budget.count}/${budget.cap}) — still answering (warn-only)`);
-      await ctx.reply(`⚠️ Past today's ${budget.cap}-call budget (${budget.count}). Still answering, but worth a glance.`).catch(() => {});
+      await ctx.reply(`Past today's ${budget.cap}-call budget (${budget.count}). Still answering, but worth a glance.`).catch(() => {});
     }
 
     const chatTitle =
@@ -2148,11 +2159,13 @@ async function dispatchConcierge(
         .catch((e) => console.error('[zoe/index] inline research-doc failed:', (e as Error)?.message));
     }
 
-    console.log(
-      `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
-        4,
-      )} tokens=${result.inputTokens}/${result.outputTokens} duration=${result.durationMs}ms`,
-    );
+    if (process.env.DEBUG_ZOE) {
+      console.log(
+        `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
+          4,
+        )} tokens=${result.inputTokens}/${result.outputTokens} duration=${result.durationMs}ms`,
+      );
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[zoe/index] concierge turn failed:', msg);
@@ -2643,8 +2656,20 @@ async function applyLearnProposals(
 
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   const action = ctx.match[1];
-  await ctx.answerCallbackQuery({ text: `Marked ${action}.` });
-  console.log(`[zoe/index] nudge dismissed: ${action}`);
+  // Previously this only acked + logged - the button was a no-op, so "later"
+  // still nudged again on the next tick. "later"/"shelve" now actually snooze
+  // the nudge stream for the cooldown window (markNudgeSent resets it); "now"
+  // just acknowledges (Zaal is acting on it). Confirm the real effect to Zaal.
+  const acted: Record<string, string> = { now: 'On it.', later: 'Snoozed for now.', shelve: 'Shelved for now.' };
+  if (action === 'later' || action === 'shelve') {
+    try {
+      await markNudgeSent();
+    } catch (e) {
+      console.error('[zoe/index] nudge snooze failed:', e);
+    }
+  }
+  await ctx.answerCallbackQuery({ text: acted[action] ?? 'Got it.' });
+  console.log(`[zoe/index] nudge ${action} (snoozed=${action !== 'now'})`);
 });
 
 async function main(): Promise<void> {

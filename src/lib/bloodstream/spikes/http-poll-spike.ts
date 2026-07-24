@@ -12,6 +12,7 @@
 import { createObservation } from '@/lib/eyes';
 import type { Observation, SensorHealthSnapshot } from '@/lib/eyes';
 import type { VacuumSpike, VacuumSpikeManifest, SpikeHealth, IngestContext, IngestResult } from '../types';
+import { assertSafeUrl } from './url-guard';
 
 export interface MappedRecord {
   kind: string;
@@ -35,6 +36,11 @@ export interface HttpPollSpikeOptions {
   headers?: (config: Readonly<Record<string, string | undefined>>) => Record<string, string>;
   /** Validate + map a body to records. Return [] to ingest nothing. Pure. */
   map: (body: unknown) => MappedRecord[];
+  /**
+   * SSRF allowlist: if set, the endpoint host must be one of these. Private/
+   * loopback/metadata IPs and non-http(s) schemes are always blocked regardless.
+   */
+  allowedHosts?: string[];
 }
 
 async function defaultFetchJson(endpoint: string, headers: Record<string, string>): Promise<unknown> {
@@ -44,6 +50,11 @@ async function defaultFetchJson(endpoint: string, headers: Record<string, string
 }
 
 export function createHttpPollSpike(opts: HttpPollSpikeOptions): VacuumSpike {
+  // SSRF guard: the endpoint is fixed at creation, so validate it once here.
+  // Blocks private/loopback/metadata IPs + non-http(s), and enforces the
+  // allowlist when given. Throws before any spike that could reach a bad host
+  // is ever registered.
+  assertSafeUrl(opts.endpoint, opts.allowedHosts);
   const fetchJson = opts.fetchJson ?? defaultFetchJson;
   const manifest: VacuumSpikeManifest = {
     spikeId: opts.spikeId,

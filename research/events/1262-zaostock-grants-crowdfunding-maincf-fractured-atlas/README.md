@@ -142,7 +142,7 @@ Use these verified facts from doc 1257 and doc 986 in every application narrativ
 |-------|----------------|
 | ZAO community members | 188+ |
 | ZAO daily newsletter editions | 400+ |
-| WaveWarZ on-chain volume | 524 SOL (~$39,453) |
+| WaveWarZ on-chain volume | 878 SOL (~$64,800) |
 | WaveWarZ battles completed | 1,108+ |
 | COC Concertz shows | 7 (Mar 2025-Jul 2026) |
 | Weekly governance streak | 100+ consecutive Fractal weeks |

@@ -150,7 +150,7 @@ This is verifiable on-chain. The contract pays both artist addresses after each 
 > **What if you got paid every time you lost?** WaveWarZ's loser-earns model means submitting to a battle and losing is still a paying engagement. For independent artists who spend money on distribution, sessions, and promotion with no guarantee of return, WaveWarZ offers something novel: guaranteed payout for competing, regardless of outcome. 1,289 battles later, they're proving the model works.
 
 ### For Decrypt / The Defiant (Crypto/Web3)
-> **Music battle settlements on-chain: why it changes artist economics.** WaveWarZ processes music battles on Solana, settling artist payouts directly without intermediary intervention. The loser-earns model isn't a marketing tagline — it's an on-chain contract: both battling artist wallets receive payment after community voting closes. 13.40 SOL distributed, 524 SOL in total volume, 1,289 battles. The on-chain music economy has a working data set.
+> **Music battle settlements on-chain: why it changes artist economics.** WaveWarZ processes music battles on Solana, settling artist payouts directly without intermediary intervention. The loser-earns model isn't a marketing tagline — it's an on-chain contract: both battling artist wallets receive payment after community voting closes. 13.40 SOL distributed, 878 SOL in total volume, 1,289 battles. The on-chain music economy has a working data set.
 
 ---
 
@@ -184,7 +184,7 @@ This is verifiable on-chain. The contract pays both artist addresses after each 
 >
 > ⚔️ 1,289 battles
 > 💸 13.40 SOL paid to artists directly
-> 📊 524 SOL total volume
+> 📊 878 SOL total volume
 >
 > Both sides of every battle received payment.
 > On-chain. Instant settlement. No label cut.

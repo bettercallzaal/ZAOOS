@@ -46,7 +46,7 @@ From the live WaveWarZ API (`wavewarz.info/api/public/stats`, 2026-07-17):
 |--------|-------|
 | Total platform volume | 878.30 SOL |
 | Total artist payouts | 13.40 SOL |
-| **Artist payout rate** | **9.07 / 524.15 = 1.73%** |
+| **Artist payout rate** | **13.40 / 878.30 = 1.53%** |
 
 **How it works mechanically:**
 - Every trade (buy or sell) during a battle collects a fee (currently ~3.5% of the trade)
@@ -74,7 +74,7 @@ Beyond the direct artist payout (~1.73%), WaveWarZ's fee structure distributes t
 
 | Recipient | Share | Amount (Jul 2026) |
 |-----------|-------|-------------------|
-| Artists (direct settlement) | ~1.73% of volume | 13.40 SOL |
+| Artists (direct settlement) | ~1.53% of volume | 13.40 SOL |
 | Traders (claimShares, winnings) | ~24.3% of volume | 381.20 SOL |
 | Platform revenue | ~3.3% of volume | 17.44 SOL |
 | **Total ecosystem** | **~98.5% of volume** | 878.30 SOL in, 517+ SOL out |
@@ -89,7 +89,7 @@ Note: "Trader claims" represent winnings returned to participants, not platform 
 
 | Platform | Payout Model | Chain | Artist Earnings |
 |----------|-------------|-------|----------------|
-| **WaveWarZ** | Battle fee split (auto-settlement) | Solana | **~1.73% of volume, instant** |
+| **WaveWarZ** | Battle fee split (auto-settlement) | Solana | **~1.53% of volume, instant** |
 | Sound.xyz | Primary mint revenue (auction) | Ethereum/Base | 100% of mint, one-time |
 | Catalog | Primary sale | Ethereum | 100% of sale + 10% secondary |
 | Audius | Streaming royalty pool | Audius chain | ~$0.0004–$0.001 per play |

@@ -167,7 +167,7 @@ ZOE sends ZAO Newsletter Issue 1 via Paragraph to the full list.
 **Newsletter body (condensed version — see doc 1448 for full draft):**
 1. COC #8 announcement (show date + time)
 2. ZAOstock Eventbrite is LIVE (ticket link prominently placed)
-3. WaveWarZ stats (1,245 battles, brief loser-earns reminder)
+3. WaveWarZ stats (1,289 battles, brief loser-earns reminder)
 4. Call to action: RSVP + share
 
 **ZOE sending checklist for Newsletter Issue 1:**

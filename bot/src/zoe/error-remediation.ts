@@ -22,6 +22,7 @@ import { createHash } from 'node:crypto';
 import type { HermesRepoTarget } from '../hermes/types';
 import { db } from '../supabase';
 import { dispatchHermesRun } from '../hermes/runner';
+import { emitReceipt } from './receipts';
 
 export interface AppError {
   id: string;
@@ -201,12 +202,33 @@ export function defaultRemediationDeps(
         .from('app_errors')
         .update({ status: 'fixed', pr_url: prUrl, run_id: runId, updated_at: new Date().toISOString() })
         .eq('id', id);
+      // Portable receipt for the autonomous fix (best-effort, never throws).
+      await emitReceipt({
+        runId,
+        agentIdentity: 'zoe',
+        capability: 'error_remediation',
+        tool: 'error-remediation-rail',
+        action: 'auto_fix_pr',
+        resultType: 'success',
+        approvalClass: 'auto',
+        evidenceUrl: prUrl,
+      });
     },
     markEscalated: async (id: string, notes: string) => {
       await db()
         .from('app_errors')
         .update({ status: 'escalated', notes, updated_at: new Date().toISOString() })
         .eq('id', id);
+      await emitReceipt({
+        runId: null,
+        agentIdentity: 'zoe',
+        capability: 'error_remediation',
+        tool: 'error-remediation-rail',
+        action: 'escalated',
+        resultType: 'error',
+        approvalClass: 'auto',
+        evidenceUrl: null,
+      });
     },
     dispatchFix: async ({ issueText, targetRepo }) => {
       const result = await dispatchHermesRun({

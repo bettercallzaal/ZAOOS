@@ -524,7 +524,7 @@ describe('GET /api/fractals/member/[wallet]', () => {
             id: 's1',
             name: 'Session 1',
             session_date: '2024-01-01',
-            scoring_era: '2x',
+            scoring_era: '1x',
             participant_count: 10,
             notes: 'og',
           },

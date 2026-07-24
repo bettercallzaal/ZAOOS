@@ -271,7 +271,7 @@ export async function handleAutoRoute(
     const guess = `[classify:${intent}] ${text || url || '(media)'}`;
     await pushRecent(
       { from: 'zaal', text: guess, sender: 'auto-classify' },
-      String(ctx.chat.id),
+      String(ctx.chat?.id ?? ''),
     );
   } catch {
     // continue even if log fails
@@ -289,7 +289,9 @@ export async function handleReplyRoute(
   ctx: Context,
   deps: {
     isFromZaal: boolean;
-    messageIdToContext: Map<number, { qid?: string; taskId?: string }>;
+    // Optional in-memory fallback; the persistent getMessageContext store is the
+    // primary source, so callers without a live map may omit it.
+    messageIdToContext?: Map<number, { qid?: string; taskId?: string }>;
   },
 ): Promise<{ handled: boolean; contextType?: string; id?: string; error?: string }> {
   if (!deps.isFromZaal) {
@@ -304,7 +306,7 @@ export async function handleReplyRoute(
   }
 
   try {
-    const context = (await getMessageContext(replyToId)) || deps.messageIdToContext.get(replyToId);
+    const context = (await getMessageContext(replyToId)) || deps.messageIdToContext?.get(replyToId);
     if (!context) {
       return { handled: false };
     }

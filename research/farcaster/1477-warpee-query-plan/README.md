@@ -65,7 +65,7 @@ Which music artists, music producers, or music-focused builders have been featur
 ```
 What have GM Farcaster guests said about monetizing music on-chain — what models do they believe in (streaming royalties, NFTs, fan tokens, battles, live experiences) and which have they seen work?
 ```
-*Why:* WaveWarZ (music battles, 524 SOL volume) and Sparkz (creator backing) both need the "music monetization" narrative. This tells us which framing resonates with the podcast-listening builder community.
+*Why:* WaveWarZ (music battles, 878 SOL volume) and Sparkz (creator backing) both need the "music monetization" narrative. This tells us which framing resonates with the podcast-listening builder community.
 
 **Q7 — Music battle platforms or prediction-market-style fan products**
 ```

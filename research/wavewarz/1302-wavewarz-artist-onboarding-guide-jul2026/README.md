@@ -104,7 +104,7 @@ This is where WaveWarZ is fundamentally different from any other music platform.
 
 **The platform as of July 2026:**
 - 1,289 battles completed
-- 524 SOL total volume (~$78,000 at current prices)
+- 878 SOL total volume (~$64.8K at current prices)
 - 13.40 SOL total artist payouts ($677)
 - $1,497 raised for charity through Community Battles
 - 34 Audius-rostered artists currently battling

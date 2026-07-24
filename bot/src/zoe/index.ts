@@ -24,6 +24,7 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
+import { sanitizeErrorForUser } from './user-errors';
 import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
 import { checkAndRecordZoeCall } from './call-budget';
 import { runCockpit } from '../cockpit/cockpit';
@@ -1017,7 +1018,7 @@ bot.command('pulse', async (ctx) => {
     await replyChunked(ctx, output);
   } catch (e) {
     console.error('[zoe/index] pulse command failed:', e);
-    await ctx.reply(`Pulse failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+    await ctx.reply(`Pulse failed: ${sanitizeErrorForUser(e)}`);
   }
 });
 
@@ -1049,7 +1050,7 @@ bot.command('agenda', async (ctx) => {
     await replyChunked(ctx, output);
   } catch (e) {
     console.error('[zoe/index] agenda command failed:', e);
-    await ctx.reply(`Agenda failed: ${e instanceof Error ? e.message.slice(0, 100) : 'unknown error'}`);
+    await ctx.reply(`Agenda failed: ${sanitizeErrorForUser(e)}`);
   }
 });
 
@@ -1467,7 +1468,7 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
   try {
     transcript = await transcribeTelegramFile(token, fileId);
   } catch (err) {
-    await ctx.reply(`Could not transcribe that - ${(err as Error).message.slice(0, 160)}`).catch(() => {});
+    await ctx.reply(`Could not transcribe that - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
   if (!transcript) {
@@ -1538,7 +1539,7 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
   try {
     savedPath = await downloadTelegramFile(token, fileId, join(ZOE_PATHS.home, 'inbox'), preferName);
   } catch (err) {
-    await ctx.reply(`Could not fetch that ${label} - ${(err as Error).message.slice(0, 150)}`).catch(() => {});
+    await ctx.reply(`Could not fetch that ${label} - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
   // FEATURE 2: FILE/PHOTO/LINK AUTO-ROUTE
@@ -1722,9 +1723,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       );
       console.log(`[zoe/index] note saved (#${count}): ${noteMatch[2].slice(0, 80)}`);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('[zoe/index] note save failed:', msg);
-      await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
+      console.error('[zoe/index] note save failed:', err);
+      await ctx.reply(`(note save failed - ${sanitizeErrorForUser(err)})`);
     }
     return;
   }
@@ -1784,8 +1784,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       await replyChunked(ctx, formatted);
     } catch (err) {
       progress.stop();
-      const msg = err instanceof Error ? err.message : String(err);
-      await ctx.reply(`Audit failed: ${msg.slice(0, 200)}`);
+      console.error('[zoe/index] audit failed:', err);
+      await ctx.reply(`Audit failed: ${sanitizeErrorForUser(err)}`);
     }
     return;
   }
@@ -1797,8 +1797,8 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       const budgetText = formatSpendStatus(detailed);
       await ctx.reply(budgetText);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      await ctx.reply(`Budget lookup failed: ${msg.slice(0, 100)}`);
+      console.error('[zoe/index] budget lookup failed:', err);
+      await ctx.reply(`Budget lookup failed: ${sanitizeErrorForUser(err)}`);
     }
     return;
   }
@@ -1936,7 +1936,7 @@ async function dispatchConcierge(
     }
     if (budget.justCrossed) {
       console.error(`[zoe/index] ALERT daily LLM call cap exceeded (${budget.count}/${budget.cap}) — still answering (warn-only)`);
-      await ctx.reply(`⚠️ Past today's ${budget.cap}-call budget (${budget.count}). Still answering, but worth a glance.`).catch(() => {});
+      await ctx.reply(`Past today's ${budget.cap}-call budget (${budget.count}). Still answering, but worth a glance.`).catch(() => {});
     }
 
     const chatTitle =
@@ -2148,11 +2148,13 @@ async function dispatchConcierge(
         .catch((e) => console.error('[zoe/index] inline research-doc failed:', (e as Error)?.message));
     }
 
-    console.log(
-      `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
-        4,
-      )} tokens=${result.inputTokens}/${result.outputTokens} duration=${result.durationMs}ms`,
-    );
+    if (process.env.DEBUG_ZOE) {
+      console.log(
+        `[zoe/index] turn handled — scope=${scope} sender=${label} model=${result.model} cost=$${result.costUsd.toFixed(
+          4,
+        )} tokens=${result.inputTokens}/${result.outputTokens} duration=${result.durationMs}ms`,
+      );
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[zoe/index] concierge turn failed:', msg);

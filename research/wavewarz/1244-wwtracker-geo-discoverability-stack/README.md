@@ -44,9 +44,9 @@ All four are standalone (no AppShell changes) and can merge in any order.
 | Fractal governance weeks | 100+ (since Jul 30, 2024) |
 | On-chain settlement weeks | 63 (OG 33 + ZOR 31) |
 | Respect holders | 157 (122 OG + 56 ZOR + 21 dual) |
-| WaveWarZ battles | 1,245+ on Solana |
-| Cumulative trading volume | 524+ SOL (~$39K USD) |
-| Artist payouts | 9.07 SOL (automatic, 1% per trade, 34 artists) |
+| WaveWarZ battles | 1,289+ on Solana |
+| Cumulative trading volume | 524+ SOL (~$64.8K USD) |
+| Artist payouts | 13.40 SOL (automatic, 1% per trade, 34 artists) |
 | Charity raised | $1,497 (2 benefit-battle series) |
 | IRL events | 2 confirmed (ZAO-CHELLA Dec 2024, ZAOstock Oct 2026) |
 

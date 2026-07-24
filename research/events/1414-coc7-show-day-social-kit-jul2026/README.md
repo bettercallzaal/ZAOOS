@@ -36,7 +36,7 @@ COC Concertz #7 is tomorrow — Saturday July 18, 4PM EST.
 
 WaveWarZ Takeover. The crowd votes live on which song wins the battle.
 
-1,245 battles. 524 SOL in volume. Tonight you're in the room.
+1,289 battles. 878 SOL in volume. Tonight you're in the room.
 
 No wallet required. Join from any browser.
 

@@ -77,14 +77,14 @@ The `highlight` prop gives the tile a gold border (`C.accent`). This is the most
 
 ## NORTH STAR alignment
 
-- **ZAO = THE case study:** "1,245+ battles · 524+ SOL · $668 to artists" visible immediately after the explainer makes the ZAO's flagship app look as serious as it is. Not a toy, not a demo — a live platform with real money.
+- **ZAO = THE case study:** "1,289+ battles · 524+ SOL · $668 to artists" visible immediately after the explainer makes the ZAO's flagship app look as serious as it is. Not a toy, not a demo — a live platform with real money.
 - **ZAO IP = a staple in onchain art, music:** "ARTIST PAYOUTS: 9.07 ◎ · 1% of every trade, instant onchain" is the clearest single statement of what makes WaveWarZ different. First-impression placement in §01 maximizes reach.
 
 ---
 
 ## 4 citable facts (live, Jul 2026)
 
-1. **1,245+ battles** — live from stats API, auto-updates
+1. **1,289+ battles** — live from stats API, auto-updates
 2. **524+ SOL total volume** — live
-3. **9.07 SOL paid to artists** — 1% of every trade, instant onchain
+3. **13.40 SOL paid to artists** — 1% of every trade, instant onchain
 4. **Mon–Fri 8:30 PM EST** — daily quick-battle schedule (doc 1223, wavewarz.info)

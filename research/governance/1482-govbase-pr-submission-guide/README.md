@@ -2,7 +2,7 @@
 
 **Type:** ACTION-BRIEF  
 **Topic:** Governance  
-**Status:** EXECUTE JUL 25 — 30-minute task; adds ZAO to the governance research database used by academics, journalists, and DAO researchers.
+**Status:** EXECUTE JUL 25 — 30-minute task; adds ZAO to the governance research database used by academics, journalists, and DAO researchers. Stats refreshed 2026-07-24.
 
 ---
 
@@ -18,7 +18,7 @@ Govbase is an open-source database of governance structures across DAOs, platfor
 1. **Research citability**: journalists and academics searching for music DAOs will find ZAO
 2. **OP RF citability**: OP RF reviewers often cross-reference Govbase for governance legitimacy
 3. **DAOstar connection**: Govbase and DAOstar are companion registries; ZAO should be in both
-4. **64-week streak documentation**: Govbase lets ZAO claim the Fractal Democracy streak in a searchable, permanent database
+4. **96-week streak documentation**: Govbase lets ZAO claim the Fractal Democracy streak in a searchable, permanent database
 
 ---
 
@@ -55,7 +55,7 @@ Create a new file: `data/orgs/zao-the-dao.json`
   "shortName": "ZAO",
   "type": "DAO",
   "sector": "Music / Creative Economy",
-  "description": "The ZAO (Zeal Autonomous Organization) is a music DAO that operates WaveWarZ, a music battle prediction market on Solana where losing artists earn from trading activity. ZAO uses Fractal Democracy governance, with 64+ consecutive weekly governance sessions as of July 2026.",
+  "description": "The ZAO (Zeal Autonomous Organization) is a music DAO that operates WaveWarZ, a music battle prediction market on Solana where losing artists earn from trading activity. ZAO uses Fractal Democracy governance, with 96+ consecutive weekly governance sessions as of July 2026.",
   "website": "https://wavewarz.info",
   "socialLinks": {
     "twitter": "https://twitter.com/wavewarz",
@@ -89,7 +89,7 @@ Create a new file: `data/orgs/zao-the-dao.json`
     "model": "Fractal Democracy",
     "framework": "ORDAO (Optimistic Respect-based DAO)",
     "sessionFrequency": "weekly",
-    "consecutiveSessions": 64,
+    "consecutiveSessions": 96,
     "sessionStartDate": "2025",
     "rankingMechanism": "peer ranking in small groups (fractals) of 3-5",
     "respectScoring": "Fibonacci-weighted (55/34/21/13/8 by rank position)",
@@ -97,15 +97,15 @@ Create a new file: `data/orgs/zao-the-dao.json`
   },
   "primaryActivity": "Music battle prediction market (WaveWarZ)",
   "platformStats": {
-    "totalBattles": 1245,
-    "totalVolumeSOL": 523.991,
+    "totalBattles": 1289,
+    "totalVolumeSOL": 878.2995,
     "artistPayoutsSOL": 9.0988,
-    "traderClaimsSOL": 127.343,
-    "asOf": "2026-07-18"
+    "traderClaimsSOL": 381.197,
+    "asOf": "2026-07-24"
   },
   "notableFeatures": [
     "Loser-earns mechanic: losing artists earn ~10% of trading pool per battle",
-    "64+ consecutive weekly Fractal Democracy governance sessions (as of Jul 2026)",
+    "96+ consecutive weekly Fractal Democracy governance sessions (as of Jul 2026)",
     "Three live smart contracts on Optimism Mainnet",
     "Free community music festival (ZAOstock) on Oct 3, 2026 in Ellsworth, Maine"
   ],
@@ -120,7 +120,7 @@ Create a new file: `data/orgs/zao-the-dao.json`
 1. Commit the new file to your fork with message: `Add ZAO (The ZAO) - music DAO with Fractal Democracy governance`
 2. Go to github.com/metagov/govbase
 3. Click "New Pull Request" → compare your fork branch
-4. Title: `Add ZAO (The ZAO) — music battle DAO with 64-week Fractal Democracy streak`
+4. Title: `Add ZAO (The ZAO) — music battle DAO with 96-week Fractal Democracy streak`
 5. Description:
 
 ```
@@ -129,17 +129,18 @@ Adding ZAO (The ZAO) to the Govbase DAO registry.
 ZAO is a music DAO that operates WaveWarZ, a music battle prediction market on Solana.
 
 Governance highlights:
-- 64+ consecutive weekly Fractal Democracy governance sessions (as of Jul 2026)
+- 96+ consecutive weekly Fractal Democracy governance sessions (as of Jul 2026)
 - Framework: ORDAO (Optimistic Respect-based DAO) — Fibonacci-weighted peer ranking
 - 3 live contracts on Optimism Mainnet (OG token, ZOR token, OREC)
 - 157 ZOR token holders
 
-Platform stats (as of Jul 18, 2026):
-- 1,245 WaveWarZ battles
-- 523.991 SOL in volume
-- 9.0988 SOL in artist payouts (including losing artists)
+Platform stats (as of Jul 24, 2026):
+- 1,289 WaveWarZ battles
+- 878.30 SOL in volume ($66,110 USD at $75.27/SOL)
+- 381.20 SOL in trader claims paid out
+- 9.0988 SOL in artist payouts (loser-earns on-chain)
 
-Research archive: https://github.com/bettercallzaal/ZAOOS (1,480+ CC-BY licensed documents)
+Research archive: https://github.com/bettercallzaal/ZAOOS (1,700+ CC-BY licensed documents)
 Wikidata: [add when Wikidata entity is created — doc 1417]
 ```
 
@@ -156,7 +157,7 @@ Wikidata: [add when Wikidata entity is created — doc 1417]
 ```
 📋 ZAO is now listed in Govbase — the academic DAO governance database maintained by the Metagov community.
 
-64 consecutive weekly governance sessions. 3 Optimism Mainnet contracts. 1,245 WaveWarZ battles.
+96 consecutive weekly governance sessions. 3 Optimism Mainnet contracts. 1,289 WaveWarZ battles.
 
 [GOVBASE_LINK]
 ```
@@ -192,7 +193,7 @@ Wikidata: [add when Wikidata entity is created — doc 1417]
 
 ## Citable (After Govbase Merge)
 
-> "The ZAO is listed in Govbase (metagov/govbase), the academic governance research database maintained by the Metagov community, with 64+ consecutive Fractal Democracy sessions documented." (for OP RF, press, grant applications)
+> "The ZAO is listed in Govbase (metagov/govbase), the academic governance research database maintained by the Metagov community, with 96+ consecutive Fractal Democracy sessions documented." (for OP RF, press, grant applications)
 
 ---
 
@@ -200,6 +201,6 @@ Wikidata: [add when Wikidata entity is created — doc 1417]
 
 - 1450 — DAOstar Registration Guide (companion registry; higher urgency for OP RF)
 - 1470 — OP RF Submission Guide (references Govbase as supporting evidence)
-- 1475 — Fractal Democracy Session Guide (the 64-week streak Govbase documents)
+- 1475 — Fractal Democracy Session Guide (the 96-week streak Govbase documents)
 - 1430 — DAOstar Registration Brief (Gate 2 for OP RF — do this first)
 - 1417 — Wikidata Entity Creation Guide (Gate 1 for OP RF — do this first)

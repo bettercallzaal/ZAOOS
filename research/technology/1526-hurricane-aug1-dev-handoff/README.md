@@ -31,11 +31,11 @@ a music battle platform on Solana where losing artists automatically receive
 an onchain payout. Founded 2024.
 
 ### Key Facts
-- 64+ consecutive weekly governance sessions (Fractal Democracy on Optimism Mainnet)
-- 1,245 battles completed (as of Jul 2026)
-- 523.991 SOL volume (~$104,000 USD)
-- 9.0988 SOL distributed to LOSING artists (loser-earns mechanism)
-- 127.343 SOL distributed to winning traders
+- 103+ consecutive weekly governance sessions (Fractal Democracy on Optimism Mainnet)
+- 1,289 battles completed (as of Jul 24, 2026)
+- 878.30 SOL volume (~$66K USD)
+- 13.39 SOL distributed to artists (loser-earns mechanism)
+- 381.197 SOL distributed to winning traders (1,526 on-chain withdrawals)
 - 36 community battles with charity payouts voted by ZOR holders
 
 ### Governance Contracts (Optimism Mainnet)

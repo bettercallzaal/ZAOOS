@@ -170,13 +170,13 @@ const stats = await fetch('https://wavewarz.info/api/public/stats')
   .then(r => r.json())
 
 const report = {
-  totalBattles: stats.totalBattles,     // 1245
-  totalVolume: stats.totalVolume,       // 523.991 SOL
-  artistPayouts: stats.artistPayouts,   // 9.0988 SOL
-  traderClaims: stats.traderClaims,     // 127.343 SOL
+  totalBattles: stats.totalBattles,     // 1289
+  totalVolume: stats.totalVolume,       // 878.30 SOL
+  artistPayouts: stats.artistPayouts,   // 13.39 SOL
+  traderClaims: stats.traderClaims,     // 381.197 SOL
   mainEvents: stats.mainEvents,         // 50
-  mainBattles: stats.mainBattles,       // 162
-  quickBattles: stats.quickBattles,     // 1047
+  mainBattles: stats.mainBattles,       // 165
+  quickBattles: stats.quickBattles,     // 1084
   communityBattles: stats.communityBattles // 36
 }
 ```

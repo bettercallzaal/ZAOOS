@@ -240,3 +240,4 @@
 | 90 | [AI-Run Community: Self-Improving Agent OS for ZAO](90-*) |
 | 2030 | [DreamNet Public Core is the receipt contract our organism should speak](./2030-dreamnet-public-core-organism-contract/) | STANDALONE | Assess Brandon's DreamNet repo constellation (Whale League + Public Core contracts) grounded in the actual code, and decide the single highest-leverage collab move for ZAO's organism. |
 | 2040 | [Suchbot Evaluation for ZOE](./2040-suchbot-evaluation-for-zoe/) | STANDALONE | Research doc 2040. |
+| 2062 | [Eyes organ + the ZAO organism roadmap](./2062-eyes-organ-and-organism-roadmap/) | STANDALONE | Evolve ZAO from a set of services into a modular digital organism where every organ has a single responsibility and clean interfaces, cooperating through the Spine. This doc designs the Eyes organ (shipped as `src/lib/eyes/`) and roadmaps the remaining organs. |

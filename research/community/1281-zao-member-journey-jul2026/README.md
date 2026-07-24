@@ -165,7 +165,7 @@ Grant reviewers often ask: "How do we verify your community is real?" The ZAO ha
 
 2. **The newsletter is an externally auditable archive.** 400+ editions at paragraph.com/@thezao, with 78 paid subscribers. Each edition is timestamped and public.
 
-3. **WaveWarZ volume is onchain.** 524.15 SOL in trade volume is real economic activity by real participants — not artificially inflated.
+3. **WaveWarZ volume is onchain.** 878.30 SOL in trade volume is real economic activity by real participants — not artificially inflated.
 
 The combination of on-chain governance + on-chain economic activity + verifiable publication record makes The ZAO's community claims unusually hard to fake.
 

@@ -2,7 +2,7 @@
 topic: business
 type: research
 status: research-complete
-last-validated: 2026-07-24
+last-validated: 2026-07-25
 superseded-by:
 related-docs: 863, 1507
 original-query: "Unlock Protocol integration options for the zao-festivals React Native / Expo (SDK 57) mobile app — sell the $50 pro ticket tier as an onchain time-bound NFT membership, reusing the existing Reown AppKit (WalletConnect v2 / SIWE) wallet infra. Report on RN SDK support, mint/checkout flow, chain overlap, gas cost, EVENTS check-in reality, and whether it's shippable before Oct 3 2026."
@@ -53,7 +53,7 @@ Via viem: `writeContract({ address: lock, abi: publicLockAbi, functionName: 'pur
 
 ### 3. Which chain — does it overlap with ZAO's?
 
-**Perfect overlap: Base (chainId 8453).** Unlock is deployed on Base (Unlock factory `0xd0b14797b9D08493392865647384974470202A78`). The ZAO ecosystem already lives on **Base** — the 188-member gate, and Doc 863 already fixed Base as the network for ZAO event locks. Same chain, same wallets, cheap gas. No new-chain decision needed. (Confirm the app's Reown AppKit config includes the Base chain — it should, given the ZAO footprint; cross-ref [Doc 1507](../../technology/1507-privy-auth-pivot-decision/) on the app's auth/chain direction.)
+**Perfect overlap: Base (chainId 8453).** Unlock is deployed on Base (Unlock factory `0xd0b14797b9D08493392865647384974470202A78`). The ZAO ecosystem already lives on **Base** — the 188-member gate, and Doc 863 already fixed Base as the network for ZAO event locks. Same chain, same wallets, cheap gas. No new-chain decision needed. **Confirmed against live code (2026-07-25):** `zao-festivals/lib/wallet-config.ts` imports `{ base, baseSepolia } from 'wagmi/chains'` and registers both in the AppKit `networks` array (comment: "that's where the ZAO Hats tree will live … minted on mainnet Base") — so the app already targets Base mainnet, with Base Sepolia for testing. (Note: the GitHub repo *description* still reads "Privy-embedded-wallet auth" — that is **stale**; the shipped code is Reown AppKit + wagmi/viem, matching this doc.) Cross-ref [Doc 1507](../../technology/1507-privy-auth-pivot-decision/) on the app's auth/chain direction.
 
 ### 4. Gas / deployment cost for one Lock
 

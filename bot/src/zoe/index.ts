@@ -490,7 +490,7 @@ bot.command('zoldraft', async (ctx) => {
 // tapped one does (Fable audit fix - without this, typed answers were untagged).
 const pendingTypeAnswers = new Map<number, string>();
 
-bot.on('callback_query:data', async (ctx) => {
+bot.on('callback_query:data', async (ctx, next) => {
   if (!isFromZaal(ctx)) {
     await ctx.answerCallbackQuery();
     return;
@@ -585,8 +585,12 @@ bot.on('callback_query:data', async (ctx) => {
 
   const parsed = parseDraftCallback(ctx.callbackQuery.data);
   if (!parsed) {
-    await ctx.answerCallbackQuery();
-    return;
+    // Not a question/veto/draft callback - pass it THROUGH to the specific
+    // handlers registered below (post-*, nudge:*) instead of acking + returning.
+    // The old silent return here swallowed those callbacks entirely (this
+    // handler runs first), so post/nudge buttons never fired. A final fallback
+    // handler acks anything that truly matches nothing.
+    return next();
   }
   const draft = getDraft(parsed.id);
   if (!draft) {
@@ -2670,6 +2674,18 @@ bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   }
   await ctx.answerCallbackQuery({ text: acted[action] ?? 'Got it.' });
   console.log(`[zoe/index] nudge ${action} (snoozed=${action !== 'now'})`);
+});
+
+// Final callback fallback: registered LAST, so it only runs when a callback
+// matched no handler above (question/veto/draft/post/nudge all pass through on
+// no-match). Instead of leaving Zaal with a silent spinner on a stale/expired
+// button, give feedback + log the orphan data. Only Zaal's callbacks reach here
+// (non-Zaal is acked+returned at the top handler).
+bot.on('callback_query:data', async (ctx) => {
+  console.log(`[zoe/index] unhandled callback data: ${ctx.callbackQuery.data?.slice(0, 40)}`);
+  await ctx
+    .answerCallbackQuery({ text: "That button expired or isn't recognized - the message may be old." })
+    .catch(() => {});
 });
 
 async function main(): Promise<void> {

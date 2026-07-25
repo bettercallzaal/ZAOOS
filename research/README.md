@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **~820 active research documents** across 14 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy. Counts verified 2026-06-11 ([Doc 836](./infrastructure/836-zaoos-repo-estate-census/)).
+> **~1,700+ active research documents** across 15 topic folders (77 superseded docs in `_archive/`) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy. Counts snapshot 2026-07-25 (grow daily; verify with `ls research/<topic>/ | grep -c "^[0-9]"`).
 
 ---
 
@@ -8,20 +8,21 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Dev Workflows](./dev-workflows/) | 167 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Agents](./agents/) | 152 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
-| [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
-| [Business](./business/) | 81 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
-| [Events](./events/) | 94 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
-| [Infrastructure](./infrastructure/) | 59 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub, repo+estate census (836), estate map (844) |
-| [Community](./community/) | 45 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
-| [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
-| [Governance](./governance/) | 43 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
-| [Identity](./identity/) | 25 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph, Privy auth/wallets |
-| [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
-| [Inspiration](./inspiration/) | 9 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
-| [Security](./security/) | 8 | Audits, API verification, testing |
-| [WaveWarZ](./wavewarz/) | 11 | Prediction markets, artist pipeline, Solana PDAs, DAO case study, financials, estate audit, growth |
+| [Dev Workflows](./dev-workflows/) | 217 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 246 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
+| [Music](./music/) | 94 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
+| [Business](./business/) | 212 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Events](./events/) | 240 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
+| [Infrastructure](./infrastructure/) | 103 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub, repo+estate census (836), estate map (844) |
+| [Community](./community/) | 106 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
+| [Farcaster](./farcaster/) | 87 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
+| [Governance](./governance/) | 139 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
+| [Identity](./identity/) | 123 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph, Privy auth/wallets |
+| [Cross-Platform](./cross-platform/) | 23 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
+| [Inspiration](./inspiration/) | 10 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
+| [Security](./security/) | 15 | Audits, API verification, testing |
+| [WaveWarZ](./wavewarz/) | 116 | Prediction markets, artist pipeline, Solana PDAs, DAO case study, financials, estate audit, growth, AI Tournament |
+| [ZABAL](./zabal/) | 26 | ZABAL Gamez S2 — cohort ops, curriculum, workshop calendar, mentor roster |
 | [Archive](./_archive/) | 77 | Superseded docs (preserved for history) |
 
 ---

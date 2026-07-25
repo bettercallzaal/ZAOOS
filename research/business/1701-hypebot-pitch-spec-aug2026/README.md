@@ -41,7 +41,7 @@ I'm Zaal Panthaki, co-founder of WaveWarZ — a music battle platform where the 
 
 Here's the mechanic: fans stake on artists (like a prediction market). When the battle closes, the winning fans take 80% of the opposing pool. The winning artist takes 10%. The **losing artist takes 10% of the winning fans' pool — automatically, on-chain, in seconds**.
 
-Numbers as of August 2026: 1,289 battles settled. $13.40 SOL in direct artist payouts, including losing artists. On Solana. Zero label cuts.
+Numbers as of August 2026: 1,289 battles settled. 13.40 SOL (~$989 at Jul 2026 price) in direct artist payouts, including losing artists. On Solana. Zero label cuts. [ZAAL: update battle count and USD equivalent on publish day via wavewarz.info/api/public/stats]
 
 The mainstream equivalent: a losing artist earns the equivalent of 9,000–93,000 Spotify streams per battle — from the winning side's fan base.
 
@@ -106,8 +106,8 @@ Full context on the mechanic + economics: [Mirror Article URL]
 Quick stat summary:
 - 1,289 battles settled
 - 878.30 SOL volume (~$64.8K)
-- 13.40 SOL ($1,820) to losing artists
-- 381.20 SOL ($28,155) to winning traders
+- 13.40 SOL (~$989 at Jul 2026 price) to losing artists [verify $ on send day]
+- 381.20 SOL (~$28,155 at Jul 2026 price) to winning traders [verify $ on send day]
 - Both artists earn in every battle, automatically
 
 Let me know if you'd like artist quotes, a video demo, or to speak live.

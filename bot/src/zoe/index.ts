@@ -19,7 +19,8 @@ loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
 import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
-import { surfaceGrill, applyGrillAction, applyGrillAnswer } from './grill';
+import { surfaceGrill, applyGrillAction, applyGrillAnswer, resolveGrillByReply } from './grill';
+import { resolveTaskDecision } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
@@ -1198,6 +1199,28 @@ bot.on('message:text', async (ctx) => {
   if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
     const replyToId = ctx.message.reply_to_message.message_id;
     try {
+      // Resolve-by-reply: if Zaal replied to the pinned OPEN grill question, his
+      // text is the resolution. Record it, move the source task off the board's
+      // needs-you queue, unpin, and advance to the next grill item. This is the
+      // "what do I press to resolve" answer - a reply IS the resolve.
+      const gr = await resolveGrillByReply(replyToId, text.trim());
+      if (gr) {
+        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        await pushRecent(
+          { from: 'zaal', text: `[grill-resolve] ${gr.title ?? gr.key}: ${gr.value}`, sender: 'grill' },
+          String(gid || zaalId),
+        ).catch((e) => console.error('[zoe/grill] resolve log failed:', (e as Error)?.message));
+        await resolveTaskDecision(gr.key, gr.value).catch((e) =>
+          console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
+        );
+        await ctx.api.unpinChatMessage(zaalId, replyToId).catch(() => {});
+        await ctx.reply(`Resolved: ${gr.value}. Logged it and moved it off your plate.`);
+        await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+          console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+        );
+        return;
+      }
+
       // Try draft flow first
       const draft = await getPendingDraft(replyToId);
       if (draft) {
@@ -2738,6 +2761,35 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
       { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${value}`, sender: 'grill' },
       String(gid || zaalId),
     ).catch((e) => console.error('[zoe/grill] answer log failed:', (e as Error)?.message));
+    // Move the resolved decision off the board's needs-you queue (best-effort).
+    await resolveTaskDecision(r.key, value).catch((e) =>
+      console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
+    );
+  }
+  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+    console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+  );
+});
+
+// grill:approve - the one-tap resolve for a single-action decision ("yes, do
+// this") or an unblock. Records the call AND moves the source task off the
+// board's needs-you queue, then advances. This is what "resolve" means for an
+// item that has no clean 1/2/3 options.
+bot.callbackQuery('grill:approve', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const r = await applyGrillAnswer('approved');
+  await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
+  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
+  if (r.key) {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    await pushRecent(
+      { from: 'zaal', text: `[grill-approve] ${r.title ?? r.key}: approved`, sender: 'grill' },
+      String(gid || zaalId),
+    ).catch((e) => console.error('[zoe/grill] approve log failed:', (e as Error)?.message));
+    await resolveTaskDecision(r.key, 'approved').catch((e) =>
+      console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
+    );
   }
   await surfaceGrill(grillDeps(zaalId)).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),

@@ -44,6 +44,8 @@ export interface GrillState {
   items: Record<string, GrillItemState>;
   activeKey: string | null;
   activeTitle?: string | null;
+  /** kind of the active item, so a text-reply resolve knows how to route it. */
+  activeKind?: GrillKind | null;
   /** message_id of the pinned open question, so we can unpin it on answer. */
   activeMessageId?: number | null;
   lastAskedAt: string | null;
@@ -158,24 +160,35 @@ export function formatGrill(
   const link = item.link ? `\n${item.link}` : '';
   const tail = remaining > 0 ? `\n\n${remaining} more waiting under this - answer and the next pops up.` : '';
 
+  // A reply to the (pinned) question IS the resolve path for any item - Zaal can
+  // voice/text his call and ZOE logs it + moves it off his plate. Tell him so;
+  // the buttons alone never made "resolve" discoverable (the gap he flagged).
+  const resolveHint =
+    item.kind === 'review'
+      ? '\n\nReply with a note, or tap Reviewed to clear it.'
+      : '\n\nReply with your call and I log it + move it off your plate. Or use the buttons.';
+
   // If the decision has baked-in options ("pick 1/2/3", "yes/no"), make THOSE
-  // the buttons so Zaal answers in one tap. Otherwise generic Done/Skip/Later.
+  // the buttons so Zaal answers in one tap. Otherwise a kind-specific resolve
+  // button (Approve/Reviewed/Unblock) that actually acts, + Skip/Later.
   const options = item.kind === 'decision' ? parseOptions(item.title) : [];
   let buttons: { text: string; data: string }[][];
   if (options.length >= 2) {
     const answerRow = options.map((o) => ({ text: o.label.slice(0, 28), data: `grill:ans:${o.value}`.slice(0, 60) }));
     buttons = [answerRow, [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   } else {
-    const doneLabel = item.kind === 'review' ? 'Reviewed' : 'Done';
-    buttons = [
-      [
-        { text: doneLabel, data: 'grill:done' },
-        { text: 'Skip', data: 'grill:skip' },
-        { text: 'Later', data: 'grill:snooze' },
-      ],
-    ];
+    // grill:approve resolves a single-action decision ("yes, do this") - it
+    // records the call AND moves the source task off the needs-you queue.
+    // Reviews/blocked use grill:done (mark handled). Skip = not mine, Later = snooze.
+    const resolveBtn =
+      item.kind === 'review'
+        ? { text: 'Reviewed', data: 'grill:done' }
+        : item.kind === 'blocked'
+          ? { text: 'Unblock', data: 'grill:approve' }
+          : { text: 'Approve', data: 'grill:approve' };
+    buttons = [[resolveBtn, { text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   }
-  return { text: `${lead}${link}${tail}`, buttons };
+  return { text: `${lead}${link}${resolveHint}${tail}`, buttons };
 }
 
 export interface SurfaceGrillDeps {
@@ -218,6 +231,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.items[item.key] = { askedAt: new Date(now).toISOString(), status: 'asked' };
   state.activeKey = item.key;
   state.activeTitle = item.title;
+  state.activeKind = item.kind;
   state.activeMessageId = messageId ?? null;
   state.lastAskedAt = new Date(now).toISOString();
   await writeGrillState(state);
@@ -254,7 +268,36 @@ export async function applyGrillAnswer(
   state.items[key] = { ...state.items[key], status: 'done', answer: value };
   state.activeKey = null;
   state.activeTitle = null;
+  state.activeKind = null;
   state.activeMessageId = null;
   await writeGrillState(state);
   return { note: `Locked in: ${value}. Next one coming.`, key, title, value };
+}
+
+/**
+ * Resolve the active grill item by a TEXT REPLY to its pinned message. This is
+ * the general "resolve" path: Zaal replies (voice/text) with his call, ZOE
+ * captures it, marks the item done, and hands the key/kind back so the caller
+ * can record the decision + move the source task off the board's needs-you queue.
+ * Returns null when the reply was not to the currently-active pinned question
+ * (so normal message handling continues).
+ */
+export async function resolveGrillByReply(
+  repliedMessageId: number,
+  replyText: string,
+  now = Date.now(),
+): Promise<{ key: string; kind: GrillKind; title: string | null; value: string } | null> {
+  const state = await readGrillState();
+  if (!state.activeMessageId || state.activeMessageId !== repliedMessageId) return null;
+  const key = state.activeKey;
+  if (!key || !state.items[key]) return null;
+  const title = state.activeTitle ?? null;
+  const kind = state.activeKind ?? 'decision';
+  state.items[key] = { ...state.items[key], status: 'done', answer: replyText };
+  state.activeKey = null;
+  state.activeTitle = null;
+  state.activeKind = null;
+  state.activeMessageId = null;
+  await writeGrillState(state);
+  return { key, kind, title, value: replyText };
 }

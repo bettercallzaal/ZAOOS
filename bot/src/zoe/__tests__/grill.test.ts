@@ -116,8 +116,26 @@ describe('formatGrill one-click buttons', () => {
     // second row = Skip / Later
     expect(buttons[1].map((b) => b.data)).toEqual(['grill:skip', 'grill:snooze']);
   });
-  it('falls back to Done/Skip/Later when a decision has no options', () => {
-    const { buttons } = formatGrill({ key: 'k', kind: 'decision', title: 'Onboard Brandon to Discord', priority: 1 }, 0);
-    expect(buttons[0].map((b) => b.data)).toEqual(['grill:done', 'grill:skip', 'grill:snooze']);
+  it('a no-option decision offers Approve (resolve) / Skip / Later', () => {
+    const { buttons, text } = formatGrill(
+      { key: 'k', kind: 'decision', title: 'Onboard Brandon to Discord', priority: 1 },
+      0,
+    );
+    expect(buttons[0].map((b) => b.data)).toEqual(['grill:approve', 'grill:skip', 'grill:snooze']);
+    expect(buttons[0][0].text).toBe('Approve');
+    // the reply-to-resolve path is surfaced in the text
+    expect(text).toContain('Reply with your call');
+  });
+  it('a review offers Reviewed (grill:done) + a reply-with-a-note hint', () => {
+    const { buttons, text } = formatGrill(
+      { key: 'https://github.com/x/y/pull/1', kind: 'review', title: 'a PR', link: 'u', priority: 2 },
+      0,
+    );
+    expect(buttons[0][0]).toEqual({ text: 'Reviewed', data: 'grill:done' });
+    expect(text).toContain('Reply with a note');
+  });
+  it('a blocked item offers Unblock (grill:approve)', () => {
+    const { buttons } = formatGrill({ key: 'k', kind: 'blocked', title: 'stuck on X', priority: 3 }, 0);
+    expect(buttons[0][0]).toEqual({ text: 'Unblock', data: 'grill:approve' });
   });
 })

@@ -32,8 +32,8 @@ The tournament represents a ZAO IP milestone: ZAO is the only organization that 
 ### Semifinal (Jul 16–23, 2026)
 - **GEEK MYTH def. AI LUI, 2-1**
 - Battle volume: **~342 SOL** (~$26,500 USD)
-- 8.7× the previous single-event platform record
-- Drove 356.621 SOL in the Jul 16–23 week — 68.4% of all prior WaveWarZ history in one week
+- The largest single event in WaveWarZ's 14-month history (source: doc 2077)
+- Drove 355.36 SOL in the Jul 16–23 week — **40.5% of all-time platform volume**; ~38× the prior weekly average
 - Trader claims surged from ~127 SOL (cumulative) to 381.197 SOL — a 254 SOL jump in one week
 - Source: ZAOOS doc 1787 + wavewarz.info/api/public/stats
 
@@ -105,7 +105,7 @@ Fill in the section below immediately when the grand final result is confirmed:
 **Winner:** [GEEK MYTH / Stormbourne]
 **Result:** [2-0 / 2-1]
 **Battle Volume:** [X SOL] (~$Y USD at $Z/SOL)
-**Record set:** [X× previous platform record / beats semifinal Y/N]
+**Volume vs semifinal:** [beats ~342 SOL Y/N] / [grand final SOL total]
 **Cumulative tournament volume:** [semifinal ~342 SOL + grand final X SOL = Z SOL total]
 **Trader claims post-grand-final:** [update from wavewarz.info/api/public/stats]
 
@@ -125,8 +125,8 @@ Fill in the section below immediately when the grand final result is confirmed:
 These are already verifiable as of Jul 23, 2026:
 
 1. WaveWarZ hosted the first AI vs AI music battle tournament on a live Solana prediction market
-2. The semifinal (GEEK MYTH def. AI LUI, 2-1) generated ~342 SOL (~$26,500 USD) — 8.7× the previous single-event platform record
-3. The tournament's semifinal week (Jul 16–23) drove 356.621 SOL — 68.4% of all prior WaveWarZ history in 7 days
+2. The semifinal (GEEK MYTH def. AI LUI, 2-1) generated ~342 SOL (~$26,500 USD) — the largest single event in WaveWarZ's 14-month history (doc 2077)
+3. The tournament's semifinal week (Jul 16–23) drove 355.36 SOL — 40.5% of all-time platform volume; ~38× the prior weekly average (doc 2077)
 4. The tournament generated ~254 SOL in new trader claims in one week, the largest single-week payout event in platform history
 5. Grand final matchup: GEEK MYTH vs Stormbourne (upcoming as of Jul 23, 2026)
 

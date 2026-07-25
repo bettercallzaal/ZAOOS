@@ -44,6 +44,8 @@ export interface GrillState {
   items: Record<string, GrillItemState>;
   activeKey: string | null;
   activeTitle?: string | null;
+  /** message_id of the pinned open question, so we can unpin it on answer. */
+  activeMessageId?: number | null;
   lastAskedAt: string | null;
 }
 
@@ -177,8 +179,12 @@ export function formatGrill(
 }
 
 export interface SurfaceGrillDeps {
-  sendDM: (text: string, buttons: { text: string; data: string }[][]) => Promise<unknown>;
+  /** Send the DM; returns the sent message so we can pin it. */
+  sendDM: (text: string, buttons: { text: string; data: string }[][]) => Promise<{ message_id?: number } | unknown>;
   now?: number;
+  /** Pin the open question so ONLY it is pinned; unpin the previous one. Optional. */
+  pin?: (messageId: number) => Promise<unknown>;
+  unpin?: (messageId: number) => Promise<unknown>;
   /** Injectable fetchers for tests. */
   fetchTasks?: () => Promise<CockpitTask[]>;
   fetchPRs?: () => Promise<ReviewPR[]>;
@@ -199,12 +205,20 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
     return q.key !== item.key && (!s || s.status !== 'done');
   }).length;
 
+  // Unpin the previous open question so at most ONE question is ever pinned.
+  if (deps.unpin && state.activeMessageId) await deps.unpin(state.activeMessageId).catch(() => {});
+
   const { text, buttons } = formatGrill(item, remaining);
-  await deps.sendDM(text, buttons);
+  const sent = (await deps.sendDM(text, buttons)) as { message_id?: number } | undefined;
+  const messageId = sent && typeof sent === 'object' ? sent.message_id : undefined;
+
+  // Pin the new open question (silent) so it stays easy to find until answered.
+  if (deps.pin && messageId) await deps.pin(messageId).catch(() => {});
 
   state.items[item.key] = { askedAt: new Date(now).toISOString(), status: 'asked' };
   state.activeKey = item.key;
   state.activeTitle = item.title;
+  state.activeMessageId = messageId ?? null;
   state.lastAskedAt = new Date(now).toISOString();
   await writeGrillState(state);
   return { sent: true, item };
@@ -219,6 +233,7 @@ export async function applyGrillAction(action: 'done' | 'skip' | 'snooze', now =
   else if (action === 'skip') state.items[key] = { ...state.items[key], status: 'skipped' };
   else state.items[key] = { ...state.items[key], status: 'snoozed', snoozeUntil: new Date(now + SNOOZE_MS).toISOString() };
   state.activeKey = null;
+  state.activeMessageId = null;
   await writeGrillState(state);
   return action === 'done' ? 'Done - next one coming.' : action === 'skip' ? 'Skipped.' : 'Snoozed for a bit.';
 }
@@ -239,6 +254,7 @@ export async function applyGrillAnswer(
   state.items[key] = { ...state.items[key], status: 'done', answer: value };
   state.activeKey = null;
   state.activeTitle = null;
+  state.activeMessageId = null;
   await writeGrillState(state);
   return { note: `Locked in: ${value}. Next one coming.`, key, title, value };
 }

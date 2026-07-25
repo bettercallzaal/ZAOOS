@@ -25,7 +25,7 @@
 
 ### The DAO That Makes Losing Pay
 
-**In two years, a music DAO built entirely in public has run 63 consecutive weekly governance sessions, generated $104,000 in trading volume, and paid $1,820 to artists who *lost*. This is what that looks like from the inside.**
+**In two years, a music DAO built entirely in public has run [ZAAL: update week count — was 63 at draft] consecutive weekly governance sessions, generated $[ZAAL: update total_volume_usd — was ~$64,844 at Jul 24 2026 ($73.89/SOL); verify via wavewarz.info/api/public/stats on publish day] in trading volume, and paid $[ZAAL: update artist_payouts_usd — was ~$989 at Jul 24 2026 (13.40 SOL)] to artists who *lost*. This is what that looks like from the inside.**
 
 ---
 

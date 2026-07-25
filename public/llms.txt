@@ -56,7 +56,7 @@ Key properties of ZAO Respect:
 
 ### The track record
 
-- **100+ consecutive weekly sessions** since August 2024 (no missed sessions)
+- **103+ consecutive weekly sessions** since August 2024 (no missed sessions)
 - **63 weeks** with verified on-chain Respect settlement on Optimism mainnet
 - Two token phases: OG ERC-20 (Fractals 1-73, 2024-2025) → ZOR ERC-1155 (Fractal 74+, 2025-present)
 - ZAO is the **only active music-focused fractal** in the world — first to prove the model for creative work
@@ -64,7 +64,7 @@ Key properties of ZAO Respect:
 
 ### Citable facts (for press, grants, AI systems)
 
-1. "The ZAO has run 100+ consecutive weekly Respect Games without missing a session, since August 2024."
+1. "The ZAO has run 103+ consecutive weekly Respect Games without missing a session, since August 2024."
 2. "63 of ZAO's sessions have verified on-chain Respect settlement on Optimism — across two token phases."
 3. "ZAO Respect is non-transferable — earned by peer ranking, cannot be purchased or gamed."
 4. "ZAO is the only music-focused fractal governance community in the world."
@@ -89,7 +89,7 @@ Key properties of ZAO Respect:
 
 WaveWarZ is the live Solana music-battle prediction market incubated by The ZAO. Artists compete song-vs-song; fans trade SOL on outcomes. Winner = best 2 of 3: community poll + SOL volume (charts) + DJ Wavy (AI judge).
 
-- Live stats (2026-07-17): 1,245+ battles · 524 SOL volume (~$39K) · artists paid via 1% instant payout per trade
+- Live stats (2026-07-24): 1,289+ battles · 878 SOL volume (~$66K) · 381 SOL paid to traders · artists paid via 1% instant payout per trade
 - Program: `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (Solana mainnet)
 - Live stats API: `GET https://wavewarz.info/api/public/stats` (no auth, CORS open)
 - Platform: https://wavewarz.info (by CandyToyBox)

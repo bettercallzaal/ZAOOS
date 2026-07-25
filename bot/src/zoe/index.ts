@@ -396,21 +396,27 @@ bot.command('menu', async (ctx) => {
   await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
 });
 
-// The agent's proactive grill: DM Zaal the next thing that needs him, one at a
-// time. Sends to his DM (never a group). Reused by /grill and the scheduler cron.
-function grillSendDM(chatId: number) {
-  return (text: string, buttons: { text: string; data: string }[][]) =>
-    bot.api.sendMessage(chatId, text, {
-      reply_markup: {
-        inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
-      },
-    });
+// The agent's proactive grill deps: DM Zaal the next thing that needs him, one at
+// a time, to his DM (never a group). PIN the open question (and unpin the prior
+// one) so ONLY the question awaiting his answer is ever pinned. Reused by /grill,
+// the callbacks, and the scheduler cron.
+function grillDeps(chatId: number) {
+  return {
+    sendDM: (text: string, buttons: { text: string; data: string }[][]) =>
+      bot.api.sendMessage(chatId, text, {
+        reply_markup: {
+          inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
+        },
+      }),
+    pin: (messageId: number) => bot.api.pinChatMessage(chatId, messageId, { disable_notification: true }),
+    unpin: (messageId: number) => bot.api.unpinChatMessage(chatId, messageId),
+  };
 }
 
 // /grill - surface the next item that needs you, on demand (also runs on a cron).
 bot.command('grill', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  const r = await surfaceGrill({ sendDM: grillSendDM(zaalId) });
+  const r = await surfaceGrill(grillDeps(zaalId));
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
 });
 
@@ -2724,6 +2730,8 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
   const r = await applyGrillAnswer(value);
   await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
   await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  // Unpin the answered question - only OPEN questions stay pinned.
+  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
   if (r.key) {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     await pushRecent(
@@ -2731,7 +2739,7 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
       String(gid || zaalId),
     ).catch((e) => console.error('[zoe/grill] answer log failed:', (e as Error)?.message));
   }
-  await surfaceGrill({ sendDM: grillSendDM(zaalId) }).catch((e) =>
+  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 });
@@ -2744,8 +2752,10 @@ bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   const note = await applyGrillAction(action);
   await ctx.answerCallbackQuery({ text: note }).catch(() => {});
   await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  // Unpin the answered question - only OPEN questions stay pinned.
+  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
   // Advance: surface the next item that needs him.
-  await surfaceGrill({ sendDM: grillSendDM(zaalId) }).catch((e) =>
+  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 });

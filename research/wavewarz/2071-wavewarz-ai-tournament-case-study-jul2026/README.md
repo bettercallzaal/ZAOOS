@@ -26,7 +26,7 @@ related-docs: "1787, 1784, 2041, 2042, 2044, 1385, 1387"
 
 ## Abstract (For Citation)
 
-> In July 2026, WaveWarZ — a Solana-based prediction market for music battles operated by The ZAO — hosted the first documented public competition between AI-generated musical artists in a live on-chain market. Sixteen AI artists competed in a single-elimination bracket over 16 days (July 7–23, 2026). The tournament's semifinal alone drove 355.36 SOL (~$26,200 USD) in trading volume in one week — 68% of all prior WaveWarZ volume accumulated over 13 months (May 2025 through July 15, 2026). This represents the first empirical data point demonstrating that AI-generated music can drive real economic activity in public prediction markets, with 1,526+ on-chain withdrawal transactions verifying genuine trader participation. The grand final between GEEK MYTH and Stormbourne remains pending as of July 24, 2026.
+> In July 2026, WaveWarZ — a Solana-based prediction market for music battles operated by The ZAO — hosted the first documented public competition between AI-generated musical artists in a live on-chain market. Sixteen AI artists competed in a single-elimination bracket over 16 days (July 7–23, 2026). The tournament's semifinal alone drove 355.36 SOL (~$26,200 USD) in trading volume in one week — **40.5% of all-time platform volume** (355.36 / 877.58 SOL, Jul 24 2026) and ~38× the prior weekly average. This represents the first empirical data point demonstrating that AI-generated music can drive real economic activity in public prediction markets, with 1,526+ on-chain withdrawal transactions verifying genuine trader participation. The grand final between GEEK MYTH and Stormbourne remains pending as of July 24, 2026.
 
 **Cite as:** ZAOOS doc 2071, github.com/bettercallzaal/ZAOOS, CC-BY license.
 
@@ -83,9 +83,9 @@ This is an important methodological note: these are **human-directed AI artists*
 | **Jul 24, 2026 (all-time total)** | **878.30 SOL** | `volume.totalSol` |
 | All-time in USD (Jul 24) | **$64,758** | at $73.73/SOL |
 
-**Tournament week volume (355.36 SOL) = 68.1% of all prior platform history in 7 days.**
+**Tournament week volume (355.36 SOL) = 40.5% of all-time platform volume (877.58 SOL, Jul 24 2026); ~38× the prior weekly average of ~9.3 SOL/week.**
 
-This ratio — a single-week tournament driving more volume than the preceding 13 months — is the central empirical finding.
+This ratio — a single-week tournament driving volume equal to 40.5% of the platform's entire 14-month history — is the central empirical finding. (Note: the historical framing "68% of all prior volume" was accurate at the time but is ambiguous in press contexts; 40.5% of all-time is the canonical figure per doc 2077.)
 
 ### Battle-Level Data (Semifinal: GEEK MYTH vs AI LUI)
 

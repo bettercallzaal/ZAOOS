@@ -36,12 +36,47 @@ export interface GrillItemState {
   askedAt: string;
   status: 'asked' | 'done' | 'skipped' | 'snoozed';
   snoozeUntil?: string;
+  /** The one-click answer Zaal chose, if any. */
+  answer?: string;
 }
 
 export interface GrillState {
   items: Record<string, GrillItemState>;
   activeKey: string | null;
+  activeTitle?: string | null;
   lastAskedAt: string | null;
+}
+
+/**
+ * Extract one-click answer options from a decision title, if it cleanly has any.
+ * Handles "pick 1 (intro) / 2 (map) / 3 (both)", "yes / no", "publish / hold".
+ * Returns [] when there is no clean 2-4 option set (falls back to Done/Skip/Later).
+ */
+export function parseOptions(title: string): { value: string; label: string }[] {
+  const body = title.includes(':') ? title.slice(title.lastIndexOf(':') + 1) : title;
+  const parts = body
+    .split('/')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length < 2 || parts.length > 4) return [];
+  const opts: { value: string; label: string }[] = [];
+  for (const part of parts) {
+    const num = part.match(/^(?:pick\s+)?(\d+)\s*(?:\(([^)]+)\))?/i);
+    if (num) {
+      const v = num[1];
+      const paren = num[2]?.trim();
+      opts.push({ value: v, label: paren ? `${v}: ${paren}` : v });
+      continue;
+    }
+    const word = part.replace(/[()]/g, '').trim();
+    if (/^[A-Za-z][A-Za-z0-9 -]{0,13}$/.test(word)) {
+      opts.push({ value: word.toLowerCase().split(' ')[0], label: word });
+      continue;
+    }
+    return []; // a part did not parse cleanly -> generic buttons
+  }
+  if (new Set(opts.map((o) => o.value)).size !== opts.length) return []; // colliding values
+  return opts;
 }
 
 const ASK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // don't re-surface a still-open item within 3h
@@ -120,14 +155,24 @@ export function formatGrill(
         : `Decision needed:\n${item.title}`;
   const link = item.link ? `\n${item.link}` : '';
   const tail = remaining > 0 ? `\n\n${remaining} more waiting under this - answer and the next pops up.` : '';
-  const doneLabel = item.kind === 'review' ? 'Reviewed' : 'Done';
-  const buttons = [
-    [
-      { text: doneLabel, data: 'grill:done' },
-      { text: 'Skip', data: 'grill:skip' },
-      { text: 'Later', data: 'grill:snooze' },
-    ],
-  ];
+
+  // If the decision has baked-in options ("pick 1/2/3", "yes/no"), make THOSE
+  // the buttons so Zaal answers in one tap. Otherwise generic Done/Skip/Later.
+  const options = item.kind === 'decision' ? parseOptions(item.title) : [];
+  let buttons: { text: string; data: string }[][];
+  if (options.length >= 2) {
+    const answerRow = options.map((o) => ({ text: o.label.slice(0, 28), data: `grill:ans:${o.value}`.slice(0, 60) }));
+    buttons = [answerRow, [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
+  } else {
+    const doneLabel = item.kind === 'review' ? 'Reviewed' : 'Done';
+    buttons = [
+      [
+        { text: doneLabel, data: 'grill:done' },
+        { text: 'Skip', data: 'grill:skip' },
+        { text: 'Later', data: 'grill:snooze' },
+      ],
+    ];
+  }
   return { text: `${lead}${link}${tail}`, buttons };
 }
 
@@ -159,6 +204,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
 
   state.items[item.key] = { askedAt: new Date(now).toISOString(), status: 'asked' };
   state.activeKey = item.key;
+  state.activeTitle = item.title;
   state.lastAskedAt = new Date(now).toISOString();
   await writeGrillState(state);
   return { sent: true, item };
@@ -175,4 +221,24 @@ export async function applyGrillAction(action: 'done' | 'skip' | 'snooze', now =
   state.activeKey = null;
   await writeGrillState(state);
   return action === 'done' ? 'Done - next one coming.' : action === 'skip' ? 'Skipped.' : 'Snoozed for a bit.';
+}
+
+/**
+ * Record a one-click ANSWER to the active grill item (e.g. Zaal tapped "2 (map)").
+ * Marks it done + stores the answer, and returns the key/title/value so the caller
+ * can log the decision where ZOE's brain + loops will act on it.
+ */
+export async function applyGrillAnswer(
+  value: string,
+  now = Date.now(),
+): Promise<{ note: string; key: string | null; title: string | null; value: string }> {
+  const state = await readGrillState();
+  const key = state.activeKey;
+  const title = state.activeTitle ?? null;
+  if (!key || !state.items[key]) return { note: 'Nothing active to answer.', key: null, title: null, value };
+  state.items[key] = { ...state.items[key], status: 'done', answer: value };
+  state.activeKey = null;
+  state.activeTitle = null;
+  await writeGrillState(state);
+  return { note: `Locked in: ${value}. Next one coming.`, key, title, value };
 }

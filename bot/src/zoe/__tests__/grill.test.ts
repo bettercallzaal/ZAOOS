@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toQueue, pickNext, formatGrill, type GrillState } from '../grill';
+import { toQueue, pickNext, formatGrill, parseOptions, type GrillState } from '../grill';
 import type { CockpitTask, ReviewPR } from '../../cockpit/types';
 
 function task(over: Partial<CockpitTask>): CockpitTask {
@@ -85,3 +85,39 @@ describe('formatGrill', () => {
     expect(text).not.toContain('more waiting');
   });
 });
+
+describe('parseOptions (one-click)', () => {
+  it('parses numbered options with labels', () => {
+    const o = parseOptions('Creator Studio: pick 1 (intro test) / 2 (map) / 3 (both)');
+    expect(o.map((x) => x.value)).toEqual(['1', '2', '3']);
+    expect(o[0].label).toBe('1: intro test');
+    expect(o[2].label).toBe('3: both');
+  });
+  it('parses word options', () => {
+    expect(parseOptions('Publish the box: publish / hold').map((x) => x.value)).toEqual(['publish', 'hold']);
+    expect(parseOptions('yes / no').map((x) => x.value)).toEqual(['yes', 'no']);
+  });
+  it('returns [] when there is no clean option set', () => {
+    expect(parseOptions('Finish the whitepaper docs and schedule the stream')).toEqual([]);
+    expect(parseOptions('a / b / c / d / e')).toEqual([]); // >4
+    expect(parseOptions('review this long descriptive title with slashes / and more prose here that is too long')).toEqual([]);
+  });
+});
+
+describe('formatGrill one-click buttons', () => {
+  it('renders the actual options as answer buttons for a decision', () => {
+    const { buttons } = formatGrill(
+      { key: 'k', kind: 'decision', title: 'Creator Studio: pick 1 (intro test) / 2 (map) / 3 (both)', priority: 0 },
+      5,
+    );
+    // first row = the 3 answer options, mapped to grill:ans:<value>
+    expect(buttons[0].map((b) => b.data)).toEqual(['grill:ans:1', 'grill:ans:2', 'grill:ans:3']);
+    expect(buttons[0][0].text).toBe('1: intro test');
+    // second row = Skip / Later
+    expect(buttons[1].map((b) => b.data)).toEqual(['grill:skip', 'grill:snooze']);
+  });
+  it('falls back to Done/Skip/Later when a decision has no options', () => {
+    const { buttons } = formatGrill({ key: 'k', kind: 'decision', title: 'Onboard Brandon to Discord', priority: 1 }, 0);
+    expect(buttons[0].map((b) => b.data)).toEqual(['grill:done', 'grill:skip', 'grill:snooze']);
+  });
+})

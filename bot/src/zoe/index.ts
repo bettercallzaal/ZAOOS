@@ -19,6 +19,7 @@ loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
 import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
+import { surfaceGrill, applyGrillAction } from './grill';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
@@ -393,6 +394,24 @@ bot.command('start', async (ctx) => {
 bot.command('menu', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
+});
+
+// The agent's proactive grill: DM Zaal the next thing that needs him, one at a
+// time. Sends to his DM (never a group). Reused by /grill and the scheduler cron.
+function grillSendDM(chatId: number) {
+  return (text: string, buttons: { text: string; data: string }[][]) =>
+    bot.api.sendMessage(chatId, text, {
+      reply_markup: {
+        inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
+      },
+    });
+}
+
+// /grill - surface the next item that needs you, on demand (also runs on a cron).
+bot.command('grill', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const r = await surfaceGrill({ sendDM: grillSendDM(zaalId) });
+  if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
 });
 
 // /chatid - report this chat's id + (in a forum topic) its topic thread id, so
@@ -2695,6 +2714,20 @@ async function applyLearnProposals(
   );
   console.log(`[zoe/index] learnings applied: ${applied.join(', ')}`);
 }
+
+// Grill buttons (Done / Skip / Later) act on the active grill item, then the
+// next item pops immediately - the "answer and the next one comes" behavior.
+bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const action = ctx.match[1] as 'done' | 'skip' | 'snooze';
+  const note = await applyGrillAction(action);
+  await ctx.answerCallbackQuery({ text: note }).catch(() => {});
+  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  // Advance: surface the next item that needs him.
+  await surfaceGrill({ sendDM: grillSendDM(zaalId) }).catch((e) =>
+    console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+  );
+});
 
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   const action = ctx.match[1];

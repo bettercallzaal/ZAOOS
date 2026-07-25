@@ -40,6 +40,7 @@ import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
+import { surfaceGrill } from './grill';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -163,6 +164,36 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // The AGENT grill loop (bot->agent upgrade). Every 2 hours during waking hours
+  // (10:00-01:00 UTC ~= 6am-9pm ET), DM Zaal the next thing that needs him - one
+  // at a time, to his DM. This is what makes ZOE proactive instead of reactive:
+  // it comes to him with decisions + builds-to-test, he answers, the next pops.
+  // Defensive: surfaceGrill only sends if there is an unanswered item + honours
+  // its own cooldown, so it never nags.
+  tasks.push(
+    cron.schedule(
+      '0 10-23,0,1 * * *',
+      async () => {
+        try {
+          const r = await surfaceGrill({
+            sendDM: (text, buttons) =>
+              opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                reply_markup: {
+                  inline_keyboard: buttons.map((row) =>
+                    row.map((b) => ({ text: b.text, callback_data: b.data })),
+                  ),
+                },
+              }),
+          });
+          if (r.sent) console.log(`[zoe/scheduler] grilled Zaal: ${r.item?.kind} - ${r.item?.title?.slice(0, 50)}`);
+        } catch (err) {
+          console.warn('[zoe/scheduler] grill tick failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

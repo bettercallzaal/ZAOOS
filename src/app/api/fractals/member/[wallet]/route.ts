@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ wall
 
     const history = (scores ?? []).map((s) => {
       const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
-      const isOrdao = sess?.notes?.includes('ORDAO') || sess?.notes?.includes('on-chain');
+      const isOrdao = sess?.scoring_era === '2x';
       const txMatch = sess?.notes?.match(/Tx: (0x[a-fA-F0-9]+)/);
       return {
         sessionName: sess?.name ?? 'Unknown',

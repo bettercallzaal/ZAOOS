@@ -19,7 +19,7 @@ loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
 import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
-import { surfaceGrill, applyGrillAction } from './grill';
+import { surfaceGrill, applyGrillAction, applyGrillAnswer } from './grill';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
@@ -2714,6 +2714,27 @@ async function applyLearnProposals(
   );
   console.log(`[zoe/index] learnings applied: ${applied.join(', ')}`);
 }
+
+// One-click ANSWER: for a decision with baked-in options (pick 1/2/3, yes/no),
+// the buttons ARE the options. Tapping records the answer, logs the decision so
+// ZOE's brain + loops act on it, then surfaces the next item.
+bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const value = ctx.match[1];
+  const r = await applyGrillAnswer(value);
+  await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
+  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+  if (r.key) {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    await pushRecent(
+      { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${value}`, sender: 'grill' },
+      String(gid || zaalId),
+    ).catch((e) => console.error('[zoe/grill] answer log failed:', (e as Error)?.message));
+  }
+  await surfaceGrill({ sendDM: grillSendDM(zaalId) }).catch((e) =>
+    console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+  );
+});
 
 // Grill buttons (Done / Skip / Later) act on the active grill item, then the
 // next item pops immediately - the "answer and the next one comes" behavior.

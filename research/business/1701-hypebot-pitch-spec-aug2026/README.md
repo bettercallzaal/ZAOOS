@@ -143,7 +143,7 @@ Hi [Name], just checking if the WaveWarZ pitch landed — the "loser earns" mech
 |---------|---------|-----------------|
 | Lead with | Music industry problem (losers earn $0) | Prediction market innovation |
 | Avoid | "DAO", "ZOR", "Optimism Mainnet", "on-chain" until explained | Nothing — crypto-native audience |
-| SOL payout framing | "Artists earned $1,820 in automatic payouts" (dollar value) | "13.40 SOL to losing artists" (SOL) |
+| SOL payout framing | "Artists earned ~$989 in automatic payouts" (dollar value — verify on send day) | "13.40 SOL to losing artists" (SOL) |
 | ZAOstock angle | "Free public festival" | "First IRL on-chain governance vote" |
 | Governance mention | Only if asked — don't lead with it | Lead with Optimism Mainnet contracts |
 | Audience assumption | Knows music, doesn't know crypto | Knows crypto, knows some music |

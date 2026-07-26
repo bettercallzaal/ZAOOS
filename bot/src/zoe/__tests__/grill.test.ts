@@ -37,6 +37,15 @@ describe('toQueue', () => {
     expect(q.map((i) => i.title)).not.toContain('not mine');
   });
 
+  it("today's events lead the queue (priority -1, above P0) so the day starts with the schedule", () => {
+    const tasks = [task({ id: '1', title: 'P0 decision', priority: 'P0', next_owner: 'me' })];
+    const events = [{ key: 'evt:abc', title: '5:30pm - Promotions Committee @ Franklin St' }];
+    const q = toQueue(tasks, [], events);
+    expect(q[0].kind).toBe('event');
+    expect(q[0].title).toContain('Promotions Committee');
+    expect(q[1].title).toBe('P0 decision');
+  });
+
   it('dedupes by key keeping the most urgent', () => {
     const tasks = [task({ id: '5', legacy_id: 'k', title: 'P1', priority: 'P1', next_owner: 'me' })];
     const q = toQueue([...tasks, ...tasks], []);
@@ -137,5 +146,14 @@ describe('formatGrill one-click buttons', () => {
   it('a blocked item offers Unblock (grill:approve)', () => {
     const { buttons } = formatGrill({ key: 'k', kind: 'blocked', title: 'stuck on X', priority: 3 }, 0);
     expect(buttons[0][0]).toEqual({ text: 'Unblock', data: 'grill:approve' });
+  });
+  it('an event is informational - "On your calendar today" + a single Got it button', () => {
+    const { buttons, text } = formatGrill(
+      { key: 'evt:1', kind: 'event', title: '6:00pm - Artizen w/ Brandon', priority: -1 },
+      2,
+    );
+    expect(text).toContain('On your calendar today');
+    expect(buttons[0][0]).toEqual({ text: 'Got it', data: 'grill:done' });
+    expect(text).toContain('Reply if you want me to prep');
   });
 })

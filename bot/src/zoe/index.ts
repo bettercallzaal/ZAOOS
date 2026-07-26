@@ -417,7 +417,7 @@ function grillDeps(chatId: number) {
 // /grill - surface the next item that needs you, on demand (also runs on a cron).
 bot.command('grill', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  const r = await surfaceGrill(grillDeps(zaalId));
+  const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
 });
 
@@ -1215,7 +1215,7 @@ bot.on('message:text', async (ctx) => {
         );
         await ctx.api.unpinChatMessage(zaalId, replyToId).catch(() => {});
         await ctx.reply(`Resolved: ${gr.value}. Logged it and moved it off your plate.`);
-        await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+        await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
           console.error('[zoe/grill] advance failed:', (e as Error)?.message),
         );
         return;
@@ -2766,7 +2766,7 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
       console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
     );
   }
-  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+  await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 });
@@ -2791,7 +2791,7 @@ bot.callbackQuery('grill:approve', async (ctx) => {
       console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
     );
   }
-  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+  await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 });
@@ -2807,7 +2807,7 @@ bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   // Unpin the answered question - only OPEN questions stay pinned.
   { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
   // Advance: surface the next item that needs him.
-  await surfaceGrill(grillDeps(zaalId)).catch((e) =>
+  await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 });

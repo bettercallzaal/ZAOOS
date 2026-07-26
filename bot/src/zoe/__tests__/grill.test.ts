@@ -80,13 +80,23 @@ describe('pickNext', () => {
 });
 
 describe('formatGrill', () => {
-  it('frames a review as build-to-test with a link + remaining counter', () => {
+  it('frames a review as build-to-test with a link + calm cockpit pointer (no guilt-count)', () => {
     const { text, buttons } = formatGrill({ key: 'u', kind: 'review', title: 'PR X', link: 'https://gh/pr/1', priority: 2 }, 3);
     expect(text).toContain('review/test');
     expect(text).toContain('https://gh/pr/1');
-    expect(text).toContain('3 more waiting');
+    // reframed: the old "N more waiting" guilt-count is gone; the rest live in /cockpit
+    expect(text).toContain('/cockpit');
+    expect(text).not.toContain('more waiting');
     expect(buttons[0][0].text).toBe('Reviewed');
     expect(buttons[0].map((b) => b.data)).toEqual(['grill:done', 'grill:skip', 'grill:snooze']);
+  });
+  it('renders one-line context from task notes so the card explains itself', () => {
+    const { text } = formatGrill(
+      { key: 'k', kind: 'decision', title: 'lock token config', priority: 1, context: 'freezes supply + 50%/mo emissions' },
+      0,
+    );
+    expect(text).toContain('lock token config');
+    expect(text).toContain('freezes supply');
   });
   it('frames a decision plainly with no counter when none remain', () => {
     const { text } = formatGrill({ key: 'a', kind: 'decision', title: 'pick 1 or 2', priority: 0 }, 0);

@@ -226,3 +226,4 @@
 | 2050 | [JubJub Developer Platform - ZAO Relevance Assessment](./2050-jubjub-developer-platform-eval/) | STANDALONE | Research doc 2050. |
 | 2058 | [Sparkz UX/OSS Teardown: High-Traffic Creator & Crypto Apps](./2058-sparkz-ux-oss-teardown/) | STANDALONE | Research doc 2058. |
 | 2070 | [Work Efficiency: Flow Finish Lines (Method + Science Caveats + ZAO Application)](./2070-work-efficiency-flow-finish-lines/) | STANDALONE | Capture Rian Doris's "work efficiency" method (a hard daily finish line that forces flow), flag which of its science is solid vs popularized, and turn it into a concrete setup for how Zaal works and how ZAO's autonomous loops are governed. |
+| 2085 | [Shriyash Soni: what ZAO can take from his repos](./2085-shriyash-soni-repo-adoptables/) | STANDALONE | Scan ZABAL Games mentor Shriyash Soni's GitHub for patterns, stacks, or code ZAO can actually adopt - and name the few worth acting on vs. the noise. |

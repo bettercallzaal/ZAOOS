@@ -597,19 +597,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
-  // Phase 4 - hourly Devz tip cron (group target). Stays gated on devzChatId.
-  if (opts.devzChatId) {
-    tasks.push(
-      cron.schedule(
-        '15 * * * *',
-        async () => {
-          // TODO Phase 4 - generate tip via Claude CLI similar to brief.ts but tip-flavored
-          console.log('[zoe/scheduler] devz tip cron fired (Phase 4 - implementation pending)');
-        },
-        { timezone: 'UTC' },
-      ),
-    );
-  }
+  // (Removed 2026-07-26: the Phase-4 Devz-tip cron was a stub that fired every
+  // 15 min and only logged "implementation pending" - dead weight. Bring it back
+  // as a real feature if hourly Devz tips are ever wanted, not as a no-op timer.)
 
   // Watcher (doc 927) - daily dispatch-health supervisor. Reads the run
   // telemetry dispatch.ts records and pings Zaal ONLY on a cost / failure /

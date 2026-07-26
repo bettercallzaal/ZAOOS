@@ -38,6 +38,8 @@ export interface GrillItem {
   title: string;
   link?: string;
   priority: number; // lower = more urgent
+  /** One-line context from the task notes, so the card explains itself. */
+  context?: string;
 }
 
 export interface GrillItemState {
@@ -57,7 +59,15 @@ export interface GrillState {
   /** message_id of the pinned open question, so we can unpin it on answer. */
   activeMessageId?: number | null;
   lastAskedAt: string | null;
+  /** How many items ZOE has proactively pushed today, so it caps at DAILY_PUSH_CAP
+   * (top-N-not-96). Reset when the date rolls. /grill and post-answer advances
+   * bypass the cap - it only gates unsolicited cron pushes. */
+  daySurfaced?: { date: string; count: number };
 }
+
+/** ZOE proactively pushes at most this many items/day (the "top few, not 96"
+ * fix). Zaal can always pull more with /grill; answering also flows past it. */
+const DAILY_PUSH_CAP = 5;
 
 /**
  * Extract one-click answer options from a decision title, if it cleanly has any.
@@ -121,11 +131,16 @@ export function toQueue(tasks: CockpitTask[], prs: ReviewPR[], events: GrillEven
     link: e.link,
     priority: -1,
   }));
+  const firstLine = (s: string | null | undefined): string | undefined => {
+    const line = (s ?? '').split('\n').map((l) => l.trim()).find(Boolean);
+    return line ? line.slice(0, 140) : undefined;
+  };
   const decisions: GrillItem[] = needsYou(tasks).map((t) => ({
     key: t.legacy_id ?? String(t.id),
     kind: 'decision',
     title: t.title,
     priority: priorityRank(t.priority),
+    context: firstLine(t.notes),
   }));
   const reviews: GrillItem[] = prs.map((p) => ({
     key: p.url,
@@ -139,6 +154,7 @@ export function toQueue(tasks: CockpitTask[], prs: ReviewPR[], events: GrillEven
     kind: 'blocked',
     title: t.title,
     priority: 3,
+    context: firstLine(t.notes),
   }));
   // dedupe by key, keep the most-urgent instance
   const byKey = new Map<string, GrillItem>();
@@ -175,8 +191,13 @@ export function formatGrill(
         : item.kind === 'blocked'
           ? `Blocked, needs you to unblock:\n${item.title}`
           : `Decision needed:\n${item.title}`;
+  // One-line context from the task notes makes the card self-explaining, so Zaal
+  // decides at a glance without opening anything.
+  const context = item.context ? `\n${item.context}` : '';
   const link = item.link ? `\n${item.link}` : '';
-  const tail = remaining > 0 ? `\n\n${remaining} more waiting under this - answer and the next pops up.` : '';
+  // No more "96 more waiting" guilt-count. ZOE caps its daily pushes (top few, not
+  // the whole backlog); the rest lives in /cockpit, pulled on demand.
+  const tail = remaining > 0 ? `\n\n(+${remaining} more in /cockpit when you want them)` : '';
 
   // Events are informational (acknowledge, don't resolve). Everything else: a reply
   // to the (pinned) question IS the resolve path - Zaal can voice/text his call and
@@ -211,7 +232,7 @@ export function formatGrill(
             : { text: 'Approve', data: 'grill:approve' };
     buttons = [[resolveBtn, { text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   }
-  return { text: `${lead}${link}${resolveHint}${tail}`, buttons };
+  return { text: `${lead}${context}${link}${resolveHint}${tail}`, buttons };
 }
 
 export interface SurfaceGrillDeps {
@@ -225,6 +246,9 @@ export interface SurfaceGrillDeps {
   fetchTasks?: () => Promise<CockpitTask[]>;
   fetchPRs?: () => Promise<ReviewPR[]>;
   fetchEvents?: () => Promise<GrillEvent[]>;
+  /** When true, ignore the daily push cap (Zaal pulled it via /grill, or is
+   * actively answering and advancing). The cap only gates unsolicited crons. */
+  bypassCap?: boolean;
 }
 
 /** Today's calendar events -> grill events. Best-effort; [] if the calendar is off. */
@@ -259,6 +283,14 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   const events = await (deps.fetchEvents ?? (() => todaysGrillEvents(now)))().catch(() => [] as GrillEvent[]);
   const queue = toQueue(tasks, prs, events);
   const state = await readGrillState();
+
+  // Daily push cap: ZOE surfaces at most DAILY_PUSH_CAP items/day unsolicited, so
+  // it drives the top few instead of firehosing all 88. /grill + post-answer
+  // advances pass bypassCap=true so Zaal can always flow past it on demand.
+  const today = new Date(now).toISOString().slice(0, 10);
+  const day = state.daySurfaced?.date === today ? state.daySurfaced : { date: today, count: 0 };
+  if (!deps.bypassCap && day.count >= DAILY_PUSH_CAP) return { sent: false };
+
   const item = pickNext(queue, state, now);
   if (!item) return { sent: false };
 
@@ -283,6 +315,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.activeKind = item.kind;
   state.activeMessageId = messageId ?? null;
   state.lastAskedAt = new Date(now).toISOString();
+  state.daySurfaced = { date: today, count: day.count + 1 };
   await writeGrillState(state);
   return { sent: true, item };
 }

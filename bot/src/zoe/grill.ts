@@ -21,8 +21,16 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fetchCockpitTasks, fetchReviewPRs, needsYou, blocked, priorityRank } from '../cockpit/adapters';
 import type { CockpitTask, ReviewPR } from '../cockpit/types';
+import { getCalendarEvents } from './calendar';
 
-export type GrillKind = 'decision' | 'review' | 'blocked';
+export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
+
+/** A calendar event for today, fed into the day-driver grill (informational). */
+export interface GrillEvent {
+  key: string; // stable id (calendar uid)
+  title: string; // "5:30pm - Promotions Committee @ Franklin St Parklet"
+  link?: string;
+}
 
 export interface GrillItem {
   key: string; // stable id: task legacy_id/id, or PR url
@@ -103,8 +111,16 @@ export async function writeGrillState(s: GrillState): Promise<void> {
   await fs.writeFile(stateFile(), JSON.stringify(s, null, 2));
 }
 
-/** Build the ranked grill queue from cockpit tasks + review PRs. Pure. */
-export function toQueue(tasks: CockpitTask[], prs: ReviewPR[]): GrillItem[] {
+/** Build the ranked grill queue from cockpit tasks + review PRs + today's events. Pure. */
+export function toQueue(tasks: CockpitTask[], prs: ReviewPR[], events: GrillEvent[] = []): GrillItem[] {
+  // Today's events lead the day - they are time-bound, so priority -1 (above P0).
+  const evts: GrillItem[] = events.map((e) => ({
+    key: e.key,
+    kind: 'event',
+    title: e.title,
+    link: e.link,
+    priority: -1,
+  }));
   const decisions: GrillItem[] = needsYou(tasks).map((t) => ({
     key: t.legacy_id ?? String(t.id),
     kind: 'decision',
@@ -126,7 +142,7 @@ export function toQueue(tasks: CockpitTask[], prs: ReviewPR[]): GrillItem[] {
   }));
   // dedupe by key, keep the most-urgent instance
   const byKey = new Map<string, GrillItem>();
-  for (const it of [...decisions, ...reviews, ...blk]) {
+  for (const it of [...evts, ...decisions, ...reviews, ...blk]) {
     const cur = byKey.get(it.key);
     if (!cur || it.priority < cur.priority) byKey.set(it.key, it);
   }
@@ -152,21 +168,26 @@ export function formatGrill(
   remaining: number,
 ): { text: string; buttons: { text: string; data: string }[][] } {
   const lead =
-    item.kind === 'review'
-      ? `Built and waiting on you - review/test:\n${item.title}`
-      : item.kind === 'blocked'
-        ? `Blocked, needs you to unblock:\n${item.title}`
-        : `Decision needed:\n${item.title}`;
+    item.kind === 'event'
+      ? `On your calendar today:\n${item.title}`
+      : item.kind === 'review'
+        ? `Built and waiting on you - review/test:\n${item.title}`
+        : item.kind === 'blocked'
+          ? `Blocked, needs you to unblock:\n${item.title}`
+          : `Decision needed:\n${item.title}`;
   const link = item.link ? `\n${item.link}` : '';
   const tail = remaining > 0 ? `\n\n${remaining} more waiting under this - answer and the next pops up.` : '';
 
-  // A reply to the (pinned) question IS the resolve path for any item - Zaal can
-  // voice/text his call and ZOE logs it + moves it off his plate. Tell him so;
-  // the buttons alone never made "resolve" discoverable (the gap he flagged).
+  // Events are informational (acknowledge, don't resolve). Everything else: a reply
+  // to the (pinned) question IS the resolve path - Zaal can voice/text his call and
+  // ZOE logs it + moves it off his plate. Tell him so; buttons alone never made
+  // "resolve" discoverable (the gap he flagged).
   const resolveHint =
-    item.kind === 'review'
-      ? '\n\nReply with a note, or tap Reviewed to clear it.'
-      : '\n\nReply with your call and I log it + move it off your plate. Or use the buttons.';
+    item.kind === 'event'
+      ? '\n\nReply if you want me to prep or remind you for this.'
+      : item.kind === 'review'
+        ? '\n\nReply with a note, or tap Reviewed to clear it.'
+        : '\n\nReply with your call and I log it + move it off your plate. Or use the buttons.';
 
   // If the decision has baked-in options ("pick 1/2/3", "yes/no"), make THOSE
   // the buttons so Zaal answers in one tap. Otherwise a kind-specific resolve
@@ -181,11 +202,13 @@ export function formatGrill(
     // records the call AND moves the source task off the needs-you queue.
     // Reviews/blocked use grill:done (mark handled). Skip = not mine, Later = snooze.
     const resolveBtn =
-      item.kind === 'review'
-        ? { text: 'Reviewed', data: 'grill:done' }
-        : item.kind === 'blocked'
-          ? { text: 'Unblock', data: 'grill:approve' }
-          : { text: 'Approve', data: 'grill:approve' };
+      item.kind === 'event'
+        ? { text: 'Got it', data: 'grill:done' }
+        : item.kind === 'review'
+          ? { text: 'Reviewed', data: 'grill:done' }
+          : item.kind === 'blocked'
+            ? { text: 'Unblock', data: 'grill:approve' }
+            : { text: 'Approve', data: 'grill:approve' };
     buttons = [[resolveBtn, { text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   }
   return { text: `${lead}${link}${resolveHint}${tail}`, buttons };
@@ -201,6 +224,31 @@ export interface SurfaceGrillDeps {
   /** Injectable fetchers for tests. */
   fetchTasks?: () => Promise<CockpitTask[]>;
   fetchPRs?: () => Promise<ReviewPR[]>;
+  fetchEvents?: () => Promise<GrillEvent[]>;
+}
+
+/** Today's calendar events -> grill events. Best-effort; [] if the calendar is off. */
+export async function todaysGrillEvents(now = Date.now()): Promise<GrillEvent[]> {
+  try {
+    const events = await getCalendarEvents(2, now);
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
+    return events
+      .filter((e) => e.start >= startOfDay && e.start <= endOfDay)
+      .map((e) => {
+        const t = e.start.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: 'America/New_York',
+        });
+        const loc = e.location ? ` @ ${e.location.split(',')[0]}` : '';
+        return { key: `evt:${e.id}`, title: `${t} - ${e.title}${loc}`, link: e.url };
+      });
+  } catch {
+    return [];
+  }
 }
 
 /** One proactive tick: DM Zaal the next item that needs him. Returns what it did. */
@@ -208,7 +256,8 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   const now = deps.now ?? Date.now();
   const tasks = await (deps.fetchTasks ?? fetchCockpitTasks)();
   const prs = await (deps.fetchPRs ?? fetchReviewPRs)().catch(() => [] as ReviewPR[]);
-  const queue = toQueue(tasks, prs);
+  const events = await (deps.fetchEvents ?? (() => todaysGrillEvents(now)))().catch(() => [] as GrillEvent[]);
+  const queue = toQueue(tasks, prs, events);
   const state = await readGrillState();
   const item = pickNext(queue, state, now);
   if (!item) return { sent: false };

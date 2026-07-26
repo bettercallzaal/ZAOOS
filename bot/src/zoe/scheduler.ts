@@ -161,6 +161,25 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           postBriefToDiscord(brief).catch((err) =>
             console.warn('[zoe/scheduler] discord webhook failed (non-fatal):', (err as Error).message),
           );
+
+          // Week-grill: right after the digest, start walking Zaal through today
+          // one item at a time (events + the top coding task + reviews), so the
+          // morning brief flows straight into the do-it-with-me loop instead of
+          // being a passive read. The hourly grill loop below carries it onward.
+          try {
+            await surfaceGrill({
+              sendDM: (text, buttons) =>
+                opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                  reply_markup: {
+                    inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
+                  },
+                }),
+              pin: (mid) => opts.bot.api.pinChatMessage(opts.zaalTgId, mid, { disable_notification: true }),
+              unpin: (mid) => opts.bot.api.unpinChatMessage(opts.zaalTgId, mid),
+            });
+          } catch (grillErr) {
+            console.warn('[zoe/scheduler] morning grill kick failed (nbd):', (grillErr as Error).message);
+          }
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);

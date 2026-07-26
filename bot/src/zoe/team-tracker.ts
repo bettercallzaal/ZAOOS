@@ -107,6 +107,8 @@ export interface NewTeamTask {
   title: string;
   project: string;
   priority?: string;
+  /** Rich context stored on the task, so the grill card explains itself. */
+  notes?: string;
 }
 
 /**
@@ -124,6 +126,7 @@ export function buildTeamTaskRow(t: NewTeamTask): Record<string, unknown> {
     legacy_source: 'zoe-bot',
   };
   if (t.priority) row.priority = t.priority;
+  if (t.notes && t.notes.trim()) row.notes = t.notes.trim();
   // Doc 983 Rec #4: auto-tag on the write-path so every ZOE-created task lands
   // pre-classified (brand / category / themes / next_owner) instead of naked.
   const c = classifyTask({ title: t.title });
@@ -204,6 +207,36 @@ export async function addTeamTask(t: NewTeamTask): Promise<AddTeamTaskResult> {
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'insert failed' };
   }
+}
+
+/** ZoeTask's high/med/low -> the tracker's P1/P2/P3 (P0 is reserved for true urgents). */
+export function capturePriority(p: 'high' | 'med' | 'low' | string): string {
+  return p === 'high' ? 'P1' : p === 'low' ? 'P3' : 'P2';
+}
+
+/**
+ * Mirror concierge-captured tasks into the Supabase tracker (what the grill +
+ * board read) WITH the description as notes, so a voice/forward capture becomes
+ * a self-explaining grill card - not a title with no context. Best-effort: the
+ * local ZoeTask store is still the source for ZOE's brief/reflect/nudge
+ * reasoning; this is an additive write so the item also reaches the day-driver.
+ * Returns how many mirrored. Never throws.
+ */
+export async function mirrorCapturesToTracker(
+  captured: Array<{ title: string; description?: string; priority?: string }>,
+): Promise<number> {
+  let n = 0;
+  for (const t of captured) {
+    if (!t.title?.trim()) continue;
+    const r = await addTeamTask({
+      title: t.title,
+      project: 'zaodevz',
+      priority: capturePriority(t.priority ?? 'med'),
+      notes: t.description?.trim() || undefined,
+    }).catch(() => ({ ok: false }) as { ok: boolean });
+    if (r.ok) n++;
+  }
+  return n;
 }
 
 const MAX_SHOWN = 15;

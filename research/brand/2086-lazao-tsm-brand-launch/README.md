@@ -8,26 +8,23 @@
 
 ## TL;DR
 
-- **LaZAO** = the umbrella. "La ZAO" — it's all a ZAO. Not The ZAO (the 188-member music DAO); a *separate personal label* Zaal uses to mint consumer brands fast. The ZAO graduates products from a code monorepo; LaZAO graduates **media brands** from a shared playbook. Same lab DNA, different medium.
-- **TSM** = the first property. **Two Spoiled Mastholes** (or *Two Short Mastholes* — the indecision is a bug that becomes a feature). Boston sports fan brand: podcast-first, clips-driven, website as the hub.
+- **LaZAO is just the misspelling.** "La ZAO" — it's all a ZAO. It's the wordplay/vibe Zaal files fresh experiments under, not a holdco, label, or corporate umbrella. Don't build scaffolding around it. The only real thing to build is the actual brand: **TSM**.
+- **TSM** = the brand. **Two Spoiled Mastholes** (or *Two Short Mastholes* — the indecision is a bug that becomes a feature). Boston sports fan brand: podcast-first, clips-driven, website as the hub.
 - **The strong angle is "spoiled."** Boston fans *are* objectively spoiled — 12+ titles across four teams since 2001. Owning that with self-aware humor is a real POV, not "two guys talk sports." That POV is the whole brand.
 - **Ship the minimum brand, not the maximum.** Podcast host + a one-page site + short vertical clips. No custom code needed to launch. Consistency beats polish.
-- **Keep ZAO/on-chain OUT of the front door.** A Boston sports audience does not care about DAOs. LaZAO is backend/label; TSM is a clean consumer brand. Tokenized fan layer is a *later, optional* graduation — never the pitch.
+- **Keep ZAO/on-chain OUT of the front door.** A Boston sports audience does not care about DAOs or the ZAO joke. TSM is a clean consumer brand that stands on its own. Any tokenized fan layer is a *later, optional* add — never the pitch.
 
 ---
 
 ## 1. What "under LaZAO" actually means
 
-For a **media** brand, "sitting under a label" is not a legal or technical dependency — it's four shared assets:
+Not much, on purpose. **LaZAO is the misspelling — "La ZAO," it's all a ZAO.** It's a personal vibe/tag Zaal files fresh experiments under, not a company, label, or umbrella with any machinery. Treating it as a holdco would be over-building a joke. So:
 
-1. **A reusable launch playbook** (this doc → template for property #2, #3…).
-2. **A shared production stack** — recording tool, auto-clipper, podcast host, landing-page template. Set up once, reused per property.
-3. **A cross-promo network** — every LaZAO property promotes the next one. TSM is the seed audience for whatever launches after it.
-4. **A house sign-off** — "a LaZAO joint" (à la a Spike Lee joint) as the quiet tag. That's where the "it's all a ZAO" easter egg lives, *not* in the consumer-facing name.
+- **Don't** stand up shared corporate structure, a label brand, or a "machine for minting brands." There's nothing to operationalize.
+- **Do** keep it as a wink: if you want, "a LaZAO joint" is a nice tiny credit-line tag (à la a Spike Lee joint) — that's the *only* place the ZAO-misspelling gag needs to live, and it's optional.
+- The real work is **TSM as its own standalone brand.** Fans meet TSM. LaZAO is just the family name on the shelf it sits on — it doesn't need to do anything.
 
-So: **TSM is the artist, LaZAO is the label.** Fans meet TSM. Only the credits say LaZAO.
-
-**The meta-play:** LaZAO is a *machine for minting brands*. TSM is proof-of-concept. If the playbook works once, it works N times — that's the actual asset being built here, bigger than any single pod.
+Everything below is the TSM strategy. LaZAO requires no separate build.
 
 ---
 
@@ -113,7 +110,7 @@ Boston fandom is extremely online and tribal — an advantage, because the commu
 Monetize *after* there's an audience, in this rough order:
 1. **Merch** — Boston fans buy merch hard. "Spoiled" hoodies/tees are the natural first drop.
 2. **Local sponsors** — bars, barbershops, local brands. (Careful with **sportsbook/gambling** ads — heavy rules + brand-safety flags.)
-3. **Membership / paid tier** — Patreon-style bonus eps, or a later on-chain fan layer (POAP-style attendance, fan token, member area) — *only if the audience asks for deeper participation.* This is where LaZAO's ZAO DNA could quietly re-enter, but never as the launch pitch.
+3. **Membership / paid tier** — Patreon-style bonus eps, or a later on-chain fan layer (POAP-style attendance, fan token, member area) — *only if the audience asks for deeper participation,* never as the launch pitch.
 4. **Live shows** — a spoiled-Mastholes bar night once there's a local crowd.
 
 ---
@@ -128,16 +125,16 @@ Monetize *after* there's an audience, in this rough order:
 
 ---
 
-## 9. The reusable LaZAO playbook (what to keep after TSM)
+## 9. The repeatable checklist (if you ever launch another one)
 
-Whatever of this survives contact with reality becomes the **LaZAO template**:
+Not a "LaZAO machine" — just the steps that worked, reusable if a next idea comes:
 1. Name + clear the two naming decisions (spelling, collision check).
 2. Secure handles + .com everywhere, same handle.
-3. Set up the shared stack once (record → auto-clip → host → landing page).
+3. Set up the stack once (record → auto-clip → host → landing page).
 4. Bank content, launch, seed to the native community, grow on clips.
 5. Monetize on merch → local sponsors → membership, in that order.
 
-TSM tests the machine. If it works, LaZAO mints property #2 with half the effort — *that* is the thing being built.
+For now, all that matters is getting TSM out the door.
 
 ---
 

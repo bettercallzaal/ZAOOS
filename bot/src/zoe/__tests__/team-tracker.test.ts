@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, type TeamTask } from '../team-tracker';
 
 describe('zaalFocusForBrief', () => {
   it('returns null when nothing is dated and nothing needs Zaal', () => {
@@ -61,6 +61,22 @@ describe('buildTeamTaskRow', () => {
   });
   it('includes priority when given', () => {
     expect(buildTeamTaskRow({ title: 'x', project: 'p', priority: 'P1' }).priority).toBe('P1');
+  });
+  it('writes notes (context) when given, and omits them when empty', () => {
+    expect(buildTeamTaskRow({ title: 'x', project: 'p', notes: '  freezes supply + 50%/mo  ' }).notes).toBe(
+      'freezes supply + 50%/mo',
+    );
+    expect('notes' in buildTeamTaskRow({ title: 'x', project: 'p', notes: '   ' })).toBe(false);
+    expect('notes' in buildTeamTaskRow({ title: 'x', project: 'p' })).toBe(false);
+  });
+});
+
+describe('capturePriority', () => {
+  it('maps ZoeTask high/med/low -> tracker P1/P2/P3', () => {
+    expect(capturePriority('high')).toBe('P1');
+    expect(capturePriority('med')).toBe('P2');
+    expect(capturePriority('low')).toBe('P3');
+    expect(capturePriority('whatever')).toBe('P2');
   });
 });
 

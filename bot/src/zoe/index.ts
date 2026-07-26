@@ -36,7 +36,7 @@ import { readFleetStatus, formatLoopsStatus, formatLoopDetail } from './loops-st
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask } from './team-tracker';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -2089,7 +2089,14 @@ async function dispatchConcierge(
     });
 
     if (result.task_ops.length > 0) {
-      await applyTaskOps(result.task_ops);
+      const { added } = await applyTaskOps(result.task_ops);
+      // Mirror new captures into the Supabase tracker WITH context, so a voice/
+      // forward/DM capture becomes a self-explaining grill card (not a bare title).
+      if (added.length > 0) {
+        await mirrorCapturesToTracker(added).catch((e) =>
+          console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
+        );
+      }
     }
 
     if (result.quest_ops.length > 0) {
@@ -2955,7 +2962,13 @@ async function main(): Promise<void> {
         senderLabel: 'Board',
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
-      if (result.task_ops.length > 0) await applyTaskOps(result.task_ops);
+      if (result.task_ops.length > 0) {
+        const { added } = await applyTaskOps(result.task_ops);
+        if (added.length > 0)
+          await mirrorCapturesToTracker(added).catch((e) =>
+            console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
+          );
+      }
       let todoMarked = false;
       if (todoId) {
         const r = await markDone(todoId, 'completed by ZOE via control plane');

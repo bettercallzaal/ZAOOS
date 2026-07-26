@@ -149,12 +149,49 @@ Losing has never paid this well.
 
 ---
 
+## ZOE Pre-Publish Stats Block (Jul 26 snapshot — refresh on Aug 1)
+
+**⚠️ Refresh all numbers on Aug 1 via `curl -s https://wavewarz.info/api/public/stats`**
+
+```
+Jul 26 snapshot (wavewarz.info/api/public/stats):
+  totalSol:      878.1237 SOL
+  SOL price:     ~$74.44
+  total_volume:  ~$65,377 USD  ← use for [total_volume_usd]
+  battles:       1,291          ← use for battle count
+  artistPayouts: 13.3921 SOL = ~$997 USD  ← use for [artist_payouts_usd]
+  traderClaims:  381.1971 SOL = ~$28,381 USD  ← use for [trader_claims_usd]
+```
+
+**Governance session count — IMPORTANT (doc 1254):**
+- "100+" = total weekly Fractal sessions since Jul 2024 (recorded in Discord; verified via date-calc: first on-chain settlement 2024-07-30 → Aug 1 2026 ≈ 106 weeks)
+- "63" = on-chain-settled subset verifiable on Optimism mainnet (was 63 on Jul 18, now ~65)
+- **Use "100+" in the article** for the three [ZAAL: week count] placeholders — it's the accurate total. Optionally add "with 65 weeks settled on Optimism mainnet" for technical credibility.
+- Never use just "63" as the total count — it understates the actual streak.
+
+**AI Tournament paragraph — add before "What's next: ZAOstock":**
+```
+[After Grand Final result] — Add a paragraph here:
+"This July, WaveWarZ ran its first AI Artist Tournament — a 16-artist bracket
+of AI-generated tracks, traded in a live prediction market. The tournament 
+drove [TOTAL_TOURNAMENT_SOL] SOL in volume in one week. [WINNER] won. 
+Every competing AI artist received loser-earns payouts on Solana."
+```
+
+**Three [ZAAL: same week count] placeholders are at:**
+- Line ~28 (lede sentence)
+- Line ~46 (body paragraph)
+- Line ~84 (consistency section)
+- Line ~104 (ZAOstock section)
+
+---
+
 ## Editing Notes for Zaal
 
 The loser-earns paragraph is the article's load-bearing claim. The Spotify comparison (11,667 streams = 1 WW battle) is from doc 1387 — double-check the SOL price on publish day and update the dollar figure accordingly.
 
 The article intentionally does not mention the word "blockchain" until the governance contracts section — this is deliberate. Music-first framing, then proof.
 
-The governance session count: update to the actual count on Aug 1. Was 63 at time of draft (Jul 2026); each week adds 1. Check the ZAOOS governance folder for the latest session number. Three [ZAAL: same week count] placeholders in the article — update all three.
+The governance session count: use "100+" for total, "~65" for on-chain subset (see ZOE Pre-Publish block above for context from doc 1254). Do NOT use just "63" — that understates the streak. Three [ZAAL: same week count] placeholders — update all three consistently.
 
 Keep the Ellsworth section short and personal. The rest of the article is data. That section is voice.

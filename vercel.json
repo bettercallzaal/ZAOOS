@@ -1,6 +1,6 @@
 {
   "fluid": true,
-  "ignoreCommand": "git diff --quiet $VERCEL_GIT_PREVIOUS_SHA $VERCEL_GIT_COMMIT_SHA -- src public package.json package-lock.json next.config.ts tsconfig.json community.config.ts vercel.json",
+  "ignoreCommand": "git cat-file -e $VERCEL_GIT_PREVIOUS_SHA 2>/dev/null && git diff --quiet $VERCEL_GIT_PREVIOUS_SHA $VERCEL_GIT_COMMIT_SHA -- src public package.json package-lock.json next.config.ts tsconfig.json community.config.ts vercel.json",
   "functions": {
     "src/app/api/auth/verify/route.ts": {
       "memory": 1024,
@@ -21,9 +21,21 @@
       "path": "/api/cron/agents/vault",
       "schedule": "0 6 * * *"
     },
-    { "path": "/api/cron/agents/banker", "schedule": "0 14 * * *" },
-    { "path": "/api/cron/agents/dealer", "schedule": "0 22 * * *" },
-    { "path": "/api/cron/juke-stale-rooms", "schedule": "0 4 * * *" },
-    { "path": "/api/cron/heart-recovery", "schedule": "*/5 * * * *" }
+    {
+      "path": "/api/cron/agents/banker",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/agents/dealer",
+      "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/cron/juke-stale-rooms",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/heart-recovery",
+      "schedule": "*/5 * * * *"
+    }
   ]
 }

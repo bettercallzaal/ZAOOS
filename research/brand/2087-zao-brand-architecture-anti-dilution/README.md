@@ -2,7 +2,7 @@
 
 **Type:** BRAND-STRATEGY
 **Topic:** Brand
-**Status:** DRAFT — Zaal-initiated (2026-07-26), spun out of doc 2086 (LaZAO/TSM). The question: as ZAO keeps spawning things (WaveWarZ, ZABAL, ZAOstock, COC, ZOUNZ, ZOE, now LaZAO/TSM…), how do you launch new brands **without turning "ZAO" into mush** — diluting the parent, splitting a 188-person community's attention, or building a graveyard that taxes everything's credibility? This is the ecosystem-level decision framework; doc 2086 is the single-brand application.
+**Status:** DRAFT — Zaal-initiated (2026-07-26), spun out of doc 2086 (TSM). The question: as ZAO keeps spawning things (WaveWarZ, ZABAL, ZAOstock, COC, ZOUNZ, ZOE, now TSM…), how do you launch new brands **without turning "ZAO" into mush** — diluting the parent, splitting a 188-person community's attention, or building a graveyard that taxes everything's credibility? This is the ecosystem-level decision framework; doc 2086 is the single-brand application. *(Wheel-and-spoke + conversion-bridge refold pending — 2026-07-26; see §5.)*
 
 ---
 
@@ -19,7 +19,7 @@
 | **Attention dilution** | A ~188-member community + a tiny team can only carry so many live brands. Every new one splits finite effort, audience, and Zaal's focus. | **#1 killer.** This, not naming, is what kills ZAO brands. |
 | **Meaning dilution** | If "ZAO" means music/artist/on-chain community, stapling it to Boston sports (or gambling, or whatever) makes "ZAO" stop meaning anything. | High — the "it's all a ZAO" gag *encourages* this. |
 | **Quality/graveyard dilution** | Dead ZAO things (FISHBOWLZ, decommissioned bots, stalled experiments) make the whole family read as "abandoned projects." Every visible corpse taxes the parent. | High — ZAO already has a graveyard; the discipline is what saves it (§4). |
-| **Naming/soup dilution** | Too many ZAO-rhyming names (ZAO, ZAOOS, ZOE, ZOUNZ, ZABAL, ZAOstock, LaZAO…) blur together; the joke goes stale; nobody can tell them apart. | Medium — cute at 5 names, noise at 15. |
+| **Naming/soup dilution** | Too many ZAO-rhyming names (ZAO, ZAOOS, ZOE, ZOUNZ, ZABAL, ZAOstock…) blur together; the joke goes stale; nobody can tell them apart. | Medium — cute at 5 names, noise at 15. |
 
 **Aim at attention first.** The others are real, but a small team's scarcest asset is focus. Any framework that lets you launch freely but *doesn't force the focus question* will fail regardless of how clean the naming is.
 
@@ -42,7 +42,8 @@ New thing →
   Q1 or Q2 NO (off-mission / off-audience)
                              → STANDALONE brand. Clean name, own front door.
                                Borrows ZAO's PLUMBING (stack, ZOE tooling, research memory),
-                               never its NAME or reputation. "a LaZAO joint" wink at most.
+                               never its NAME or reputation. Runs as a SPOKE: reaches a fresh
+                               audience + funnels the curious back to the ZAO hub.
                                → TSM / Two Spoiled Mastholes.
 
   Q3 NO (can't sustain)      → it does NOT launch as a brand yet. It stays a lab
@@ -76,7 +77,7 @@ The way to get family *leverage* without family *dilution* is the P&G model: **s
 - **ZOE** (clipping, posting, ops), the agent stack, the research/institutional memory, the tooling, the deploy pipeline.
 - New brands plug into this and move fast **without** wearing the ZAO name. TSM gets ZOE's auto-clipping; its audience never sees ZAO.
 
-This is the reconciliation of the doc-2086 correction: **LaZAO isn't a holdco, it's the misspelling** — but the *function* people reach for when they say "holdco" (a place off-mission bets live so they don't dilute the core) is real, and it's served by **shared plumbing + standalone brands**, not by a corporate umbrella. ZAO is the core; the plumbing is the Alphabet layer; LaZAO is just the wink on the off-mission shelf.
+**There is no umbrella brand above ZAO** (no LaZAO, no holdco). The *function* people reach for when they say "holdco" — a place off-mission bets can live without diluting the core — is served here by **shared plumbing + standalone spokes**, not by a corporate layer. ZAO is the hub; the plumbing (ZOE, stack, memory) is the invisible Alphabet layer every spoke draws from; each off-mission brand is a spoke with its own clean front door that pipes newcomers back to the hub.
 
 ---
 
@@ -98,7 +99,7 @@ This is the reconciliation of the doc-2086 correction: **LaZAO isn't a holdco, i
 | Brand | Q1 mission | Q2 audience | Verdict |
 |---|---|---|---|
 | WaveWarZ, ZABAL, ZAOstock, COC, ZOUNZ, ZOE | ✅ music/artist/community | ✅ ZAO's people | **Wears the name** — endorsed/branded, compounds equity. Correct as-is. |
-| **TSM / Two Spoiled Mastholes** | ❌ Boston sports | ❌ different crowd | **Standalone** — clean brand, borrows plumbing, "a LaZAO joint" wink at most. Correct per doc 2086. |
+| **TSM / Two Spoiled Mastholes** | ❌ Boston sports | ❌ different crowd | **Standalone spoke** — clean brand, borrows plumbing, funnels to the ZAO hub. Correct per doc 2086. |
 | FISHBOWLZ, decommissioned bots | — | — | **Gravestones** — killed/redirected. The discipline that *prevents* dilution, not a failure of it. |
 
 The framework says the current instincts are right. Its job is to keep them right at brand #10 and #15, when the temptation to slap "ZAO" on everything (or to leave dead things lying around) is strongest.
@@ -123,4 +124,4 @@ If a proposed brand can't clear 1–4, it stays a lab experiment with no public 
 - Aaker brand architecture spectrum (branded house / endorsed / house of brands) + dilution-from-overextension — [Brand VM (2025)](https://www.brandvm.com/post/branded-house-vs-house-of-brands-2025), [Appinio](https://www.appinio.com/en/blog/market-research/brand-architecture), [Deep Marketing](https://www.deepmarketing.it/en/blog/strong-brands-and-success-the-power-of-brand-architecture)
 - Barstool decentralized sub-brand model — [Vizologi](https://vizologi.com/business-strategy-canvas/barstool-sports-business-model-canvas/)
 - MrBeast / Beast Industries holding co + shared-engine binding constraint — [Everything-PR](https://everything-pr.com/mrbeast-built-a-holding-company-the-beast-industries-case-at-5-billion), [Intersection](https://intersection.danieldoes.co/p/beast-business)
-- ZAO internal: CLAUDE.md "Monorepo as Lab / graduation" + "no new bots without a doc"; doc 601 (agent stack cleanup / decommission discipline); doc 2086 (LaZAO/TSM application); doc 1238 (front door consolidation); doc 1627/1663 (visual + voice identity).
+- ZAO internal: CLAUDE.md "Monorepo as Lab / graduation" + "no new bots without a doc"; doc 601 (agent stack cleanup / decommission discipline); doc 2086 (TSM application); doc 1238 (front door consolidation); doc 1627/1663 (visual + voice identity).

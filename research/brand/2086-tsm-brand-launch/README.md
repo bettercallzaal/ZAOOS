@@ -1,30 +1,27 @@
-# 2086 — LaZAO: minting a new brand (case study: TSM / Two Spoiled Mastholes)
+# 2086 — Making a new ZAO brand (case study: TSM / Two Spoiled Mastholes)
 
 **Type:** BRAND-STRATEGY
 **Topic:** Brand
-**Status:** DRAFT — Zaal-initiated brainstorm (2026-07-26). Two things at once: (1) stand up **LaZAO** as a personal creator-label / brand holdco, distinct from The ZAO music DAO, and (2) launch its first property — **TSM**, a Boston sports fan brand (podcast + website) built with a friend. This doc is the strategy + the reusable playbook, not a spec.
+**Status:** DRAFT — Zaal-initiated brainstorm (2026-07-26). Launch **TSM**, a Boston sports fan brand (podcast + website) built with a friend, as a new **spoke of The ZAO** (a fresh-audience brand that funnels newcomers to the ZAO hub — see doc 2087 for the wheel-and-spoke architecture). This doc is the single-brand strategy + reusable playbook, not a spec. *(Hub-and-spoke / conversion-bridge refold pending — 2026-07-26.)*
 
 ---
 
 ## TL;DR
 
-- **LaZAO is just the misspelling.** "La ZAO" — it's all a ZAO. It's the wordplay/vibe Zaal files fresh experiments under, not a holdco, label, or corporate umbrella. Don't build scaffolding around it. The only real thing to build is the actual brand: **TSM**.
-- **TSM** = the brand. **Two Spoiled Mastholes** (or *Two Short Mastholes* — the indecision is a bug that becomes a feature). Boston sports fan brand: podcast-first, clips-driven, website as the hub.
+- **TSM** = the brand. **Two Spoiled Mastholes** (or *Two Short Mastholes* — the indecision is a bug that becomes a feature). Boston sports fan brand: podcast-first, clips-driven, website as the hub. It's a **spoke of The ZAO** — its own clean consumer brand that reaches a new audience and pipes the curious into the ZAO community.
 - **The strong angle is "spoiled."** Boston fans *are* objectively spoiled — 12+ titles across four teams since 2001. Owning that with self-aware humor is a real POV, not "two guys talk sports." That POV is the whole brand.
 - **Ship the minimum brand, not the maximum.** Podcast host + a one-page site + short vertical clips. No custom code needed to launch. Consistency beats polish.
-- **Keep ZAO/on-chain OUT of the front door.** A Boston sports audience does not care about DAOs or the ZAO joke. TSM is a clean consumer brand that stands on its own. Any tokenized fan layer is a *later, optional* add — never the pitch.
+- **Keep ZAO/on-chain OUT of the front door.** A Boston sports audience does not care about DAOs up front. TSM is a clean consumer brand that stands on its own. The bridge to the ZAO hub is deliberate and downstream (show notes, a members-only perk, an eventual "come build with us" moment) — never the opening pitch. The tokenized/on-chain fan layer is where TSM does its **on-chain R&D and shares findings back to the ZAO community** (the spoke's return loop), but it comes *after* audience, never before.
 
 ---
 
-## 1. What "under LaZAO" actually means
+## 1. TSM as a spoke of The ZAO
 
-Not much, on purpose. **LaZAO is the misspelling — "La ZAO," it's all a ZAO.** It's a personal vibe/tag Zaal files fresh experiments under, not a company, label, or umbrella with any machinery. Treating it as a holdco would be over-building a joke. So:
+**There is no LaZAO** — TSM is simply a new ZAO brand, built as a **spoke**: a standalone consumer brand that reaches an audience (Boston sports fans) the ZAO hub could never reach directly, and funnels the curious ones into the community. So:
 
-- **Don't** stand up shared corporate structure, a label brand, or a "machine for minting brands." There's nothing to operationalize.
-- **Do** keep it as a wink: if you want, "a LaZAO joint" is a nice tiny credit-line tag (à la a Spike Lee joint) — that's the *only* place the ZAO-misspelling gag needs to live, and it's optional.
-- The real work is **TSM as its own standalone brand.** Fans meet TSM. LaZAO is just the family name on the shelf it sits on — it doesn't need to do anything.
-
-Everything below is the TSM strategy. LaZAO requires no separate build.
+- **Don't** stand up any separate label, holdco, or umbrella. There's nothing to operationalize above TSM — the hub is The ZAO, full stop.
+- **Do** treat TSM as its own clean brand at the front door (fans meet TSM, not ZAO), with a deliberate downstream **conversion bridge** into the ZAO hub, and an **on-chain-R&D-shared-back** return loop. (Architecture: doc 2087.)
+- The real work is **TSM as its own standalone brand.** Everything below is the TSM strategy; the ecosystem mechanics live in doc 2087.
 
 ---
 
@@ -127,7 +124,7 @@ Monetize *after* there's an audience, in this rough order:
 
 ## 9. The repeatable checklist (if you ever launch another one)
 
-Not a "LaZAO machine" — just the steps that worked, reusable if a next idea comes:
+Not a separate "machine" — just the steps that worked, reusable if a next spoke comes:
 1. Name + clear the two naming decisions (spelling, collision check).
 2. Secure handles + .com everywhere, same handle.
 3. Set up the stack once (record → auto-clip → host → landing page).
@@ -143,4 +140,5 @@ For now, all that matters is getting TSM out the door.
 - Doc 1663 — ZAO Brand Voice Guide (house voice discipline; TSM's voice is its own but the *rigor* transfers)
 - Doc 1627 — ZAO Visual Identity Spec (how ZAO does brand systems — reference for building TSM's)
 - Doc 1717 — ZAO X Content Playbook (X posting mechanics; adapt the templates for a sports audience)
-- CLAUDE.md "Monorepo as Lab / graduation" — the conceptual parent of LaZAO-as-label
+- Doc 2087 — ZAO brand architecture (the wheel-and-spoke / anti-dilution framework TSM slots into)
+- CLAUDE.md "Monorepo as Lab / graduation" — the conceptual parent of spinning up ZAO brands

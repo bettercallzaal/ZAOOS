@@ -1,6 +1,6 @@
 {
   "fluid": true,
-  "ignoreCommand": "git cat-file -e $VERCEL_GIT_PREVIOUS_SHA 2>/dev/null && git diff --quiet $VERCEL_GIT_PREVIOUS_SHA $VERCEL_GIT_COMMIT_SHA -- src public package.json package-lock.json next.config.ts tsconfig.json community.config.ts vercel.json",
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" != production ]; then exit 0; fi; git cat-file -e $VERCEL_GIT_PREVIOUS_SHA 2>/dev/null && git diff --quiet $VERCEL_GIT_PREVIOUS_SHA $VERCEL_GIT_COMMIT_SHA -- src public package.json package-lock.json next.config.ts tsconfig.json community.config.ts vercel.json",
   "functions": {
     "src/app/api/auth/verify/route.ts": {
       "memory": 1024,

@@ -195,9 +195,9 @@ export function formatGrill(
   // decides at a glance without opening anything.
   const context = item.context ? `\n${item.context}` : '';
   const link = item.link ? `\n${item.link}` : '';
-  // No more "96 more waiting" guilt-count. ZOE caps its daily pushes (top few, not
-  // the whole backlog); the rest lives in /cockpit, pulled on demand.
-  const tail = remaining > 0 ? `\n\n(+${remaining} more in /cockpit when you want them)` : '';
+  // No running count at all - even "+85" read as a chore when AFK. ZOE caps its
+  // daily pushes (top few); the rest just live in /cockpit, pulled on demand.
+  const tail = remaining > 0 ? `\n\n(more in /cockpit when you want them)` : '';
 
   // Events are informational (acknowledge, don't resolve). Everything else: a reply
   // to the (pinned) question IS the resolve path - Zaal can voice/text his call and

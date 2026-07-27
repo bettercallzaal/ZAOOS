@@ -402,6 +402,10 @@ bot.command('menu', async (ctx) => {
 // one) so ONLY the question awaiting his answer is ever pinned. Reused by /grill,
 // the callbacks, and the scheduler cron.
 function grillDeps(chatId: number) {
+  // No pin/unpin: pinning each grill item spawned a "ZOE pinned ..." service
+  // message per item, cluttering the DM. With the daily cap (~5/day) the cards
+  // are few and self-resolving (see grillResolvedText), so a pin isn't needed -
+  // and the clutter made the DM unusable AFK (Zaal, 2026-07-26).
   return {
     sendDM: (text: string, buttons: { text: string; data: string }[][]) =>
       bot.api.sendMessage(chatId, text, {
@@ -409,9 +413,16 @@ function grillDeps(chatId: number) {
           inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
         },
       }),
-    pin: (messageId: number) => bot.api.pinChatMessage(chatId, messageId, { disable_notification: true }),
-    unpin: (messageId: number) => bot.api.unpinChatMessage(chatId, messageId),
   };
+}
+
+// Rewrite a grill card to its resolved state so a tap is UNMISTAKABLE. The old
+// callbacks only stripped the buttons + flashed a transient toast, so Skip/Later
+// looked dead. This keeps the decision line, drops the reply/buttons prompt, and
+// appends the outcome - the card visibly becomes "... -> Skipped".
+function grillResolvedText(original: string | undefined, outcome: string): string {
+  const lead = (original ?? 'Item').split('\n\n')[0]; // the "Decision needed:\n<title>" block
+  return `${lead}\n\n-> ${outcome}`;
 }
 
 // /grill - surface the next item that needs you, on demand (also runs on a cron).
@@ -2759,9 +2770,11 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
   const value = ctx.match[1];
   const r = await applyGrillAnswer(value);
   await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
-  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
-  // Unpin the answered question - only OPEN questions stay pinned.
-  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
+  await ctx
+    .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, `Locked in: ${value}`), {
+      reply_markup: { inline_keyboard: [] },
+    })
+    .catch(() => {});
   if (r.key) {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     await pushRecent(
@@ -2786,8 +2799,11 @@ bot.callbackQuery('grill:approve', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const r = await applyGrillAnswer('approved');
   await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
-  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
-  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
+  await ctx
+    .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, 'Approved - on it.'), {
+      reply_markup: { inline_keyboard: [] },
+    })
+    .catch(() => {});
   if (r.key) {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     await pushRecent(
@@ -2810,9 +2826,12 @@ bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   const action = ctx.match[1] as 'done' | 'skip' | 'snooze';
   const note = await applyGrillAction(action);
   await ctx.answerCallbackQuery({ text: note }).catch(() => {});
-  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
-  // Unpin the answered question - only OPEN questions stay pinned.
-  { const mid = ctx.callbackQuery.message?.message_id; if (mid) await ctx.api.unpinChatMessage(zaalId, mid).catch(() => {}); }
+  const outcome = action === 'done' ? 'Done.' : action === 'skip' ? 'Skipped.' : 'Later - I will bring it back.';
+  await ctx
+    .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, outcome), {
+      reply_markup: { inline_keyboard: [] },
+    })
+    .catch(() => {});
   // Advance: surface the next item that needs him.
   await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),

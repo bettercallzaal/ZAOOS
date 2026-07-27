@@ -174,8 +174,6 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
                     inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
                   },
                 }),
-              pin: (mid) => opts.bot.api.pinChatMessage(opts.zaalTgId, mid, { disable_notification: true }),
-              unpin: (mid) => opts.bot.api.unpinChatMessage(opts.zaalTgId, mid),
             });
           } catch (grillErr) {
             console.warn('[zoe/scheduler] morning grill kick failed (nbd):', (grillErr as Error).message);
@@ -209,8 +207,6 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
                   ),
                 },
               }),
-            pin: (mid) => opts.bot.api.pinChatMessage(opts.zaalTgId, mid, { disable_notification: true }),
-            unpin: (mid) => opts.bot.api.unpinChatMessage(opts.zaalTgId, mid),
           });
           if (r.sent) console.log(`[zoe/scheduler] grilled Zaal: ${r.item?.kind} - ${r.item?.title?.slice(0, 50)}`);
         } catch (err) {

@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-07-27
 original-query: Document multi-agent paradigms (sub-agents vs agent teams) and Claude Architect patterns for ZAO OS (reconstructed)
 tier: reference
 ---
@@ -202,6 +202,31 @@ to the appropriate research/ or src/ location."
 Start with a single agent. Push it until it breaks. That failure point tells you exactly what to add next. Add complexity only where it solves a real, measured problem.
 
 ZAO proved this: started with 1 CEO agent, it naturally identified the need for a Founding Engineer, proposed the hire, and delegated work. Organic growth beats pre-planned 5-agent architectures.
+
+---
+
+---
+
+## Updated 2026-07-27
+
+Three materially new developments since the original (March 2026) write-up:
+
+**1. Sub-agents CAN now spawn sub-agents (depth 3).** The doc's original rule — "Sub-agents can't spawn other sub-agents" — is no longer accurate. On 2026-07-21, Claude Code v2.1.217 banned nested sub-agent spawning entirely. Three days later, v2.1.219 reinstated it at a default depth of 3. Three independent limits now govern sub-agent fan-out: concurrency (default 20), per-session total (default 200), and spawn depth (default 3). Source: multiple community accounts confirming the v2.1.217/v2.1.219 changelog; search query "Claude Code subagent depth limits budget caps 2026."
+
+**2. A third paradigm now exists: Managed Agents multiagent orchestration.** Announced at Code with Claude SF on 2026-05-06 and available in public beta via `managed-agents-2026-04-01` API header. This is the official, API-grade version of the coordinator/specialist model the doc described informally. Key architecture (verified from platform.claude.com/docs/en/managed-agents/multiagent-orchestration):
+- Coordinator declares a `multiagent.agents` roster of up to 20 specialist agents
+- Up to 25 concurrent session threads; shared filesystem and vault credentials; each thread has its own isolated context window
+- Threads are **persistent** — the coordinator can follow up with the same specialist, which retains its prior turn history (contrast: Claude Code sub-agents are fire-and-forget)
+- One level of nesting enforced: a coordinator's specialists cannot themselves have a `multiagent.agents` roster
+- Full observability: per-thread event streams via `/v1/sessions/{id}/threads/{id}/stream`
+
+**3. Claude Code Agent Teams is now production-grade.** The doc noted Agent Teams as exploratory; by March 2026 it moved to production default. The experimental `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` env var is no longer required. The git-based coordination model (agents claim tasks, merge changes continuously) was documented in claude-code-ultimate-guide as the current stable pattern.
+
+**Also added at Code with Claude SF 2026:** "Outcomes" (rubric-based grading to evaluate agent task completion results) and "Dreaming" (scheduled memory consolidation that improves agent memory stores over time). These complement the orchestration patterns but don't alter the sub-agent/team/managed-agent taxonomy.
+
+**ZAO OS implication:** The "never nest sub-agents" rule in `.claude/rules/agent-loops.md` rule 1 area should be updated. Nesting to depth 3 is now supported with guardrails. For production-grade coordinator/specialist workloads (e.g., ZOE orchestrating VAULT/BANKER/DEALER as typed specialists), the Managed Agents API is now the right primitive.
+
+Sources verified: [Anthropic Managed Agents multiagent orchestration docs](https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration) (full page fetch) · [Claude Code Ultimate Guide — Agent Teams](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/agent-teams.md) (full page fetch) · Web search "Claude Code subagent depth limits budget caps 2026" · Web search "Anthropic Code with Claude 2026 Managed Agents Outcomes multiagent orchestration"
 
 ---
 

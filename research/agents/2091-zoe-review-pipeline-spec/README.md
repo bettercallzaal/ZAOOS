@@ -130,30 +130,33 @@ Top 3 ZAO connects:
 
 ---
 
-## 4. ROUTING STATE MACHINE
+## 4. ROUTING STATE MACHINE (score-gated ladder - Zaal's model, 2026-07-28)
+
+The score at each hop is a GATE: **pass (score > 5) advances one step; fail
+(score <= 5) goes BACK to the author to revise.** Same shape at every hop. This
+replaces the earlier "skip Jose if >=7" design - the point is a quick quality
+ladder where weak work is bounced early, not pushed forward.
 
 ```
-TRIGGER: New submission detected
+Iman submits to the ZAO board
   ↓
-ZOE-REVIEW: Score, surface gaps, suggest edits (Telegram DM to @zoe private chat)
+ZOE reviews -> scores 0/10
+  • score > 5  -> ADVANCE to Jose
+  • score <= 5 -> BACK TO IMAN (ZOE returns the gaps + suggested edits; Iman revises + resubmits)
   ↓
-  IF score >= 7 → SKIP Jose, go directly to Zaal
-  IF score < 7 → continue
+Jose reviews (web3/ZAO fit) -> scores 0/10
+  • score > 5  -> ADVANCE to Zaal
+  • score <= 5 -> BACK TO IMAN (with Jose's notes; revise + resubmit)
   ↓
-JOSE-REVIEW: Jose reads for web3/ZAO relevance; comments inline or replies in TG
-  • TG delivery: ZOE posts the review to a private "Jose reviews" thread in ZAALBOTS group
-  • Jose replies with structured feedback (ZAO fit, risks, partner anchors)
-  ↓
-ZOE-FINALIZE: Fold Jose's feedback into a v2 score + commentary
-  ↓
-ZAAL-APPROVAL: ZOE posts a 30-second "ready?" summary to Zaal's DM
-  • Buttons: [Approve + Push] [Request Changes] [Archive]
-  ↓
-APPROVED: Post review + v2 document to cowork board as a comment on the original task
-  • Comment by ZOE: "Review complete: 8/10 [approved by Zaal]. v2 published below."
-  ↓
-CLOSED: Mark task `status = 'DONE'` (or leave TODO if Iman requested revisions)
+Zaal reviews -> final call
+  • approve -> publish (v2 to the board as a comment on the original task)
+  • request changes -> BACK TO IMAN
 ```
+
+Threshold: **> 5 advances, <= 5 returns.** No "skip a step" - every submission
+that ships has been gated by ZOE, then Jose, then Zaal. Focus stays on polish +
+flair, not gatekeeping; a bounce always carries the specific gaps so Iman knows
+exactly what to fix.
 
 **Delivery methods:**
 - **ZOE-REVIEW (ZOE → Zaal):** DM in @zaoclaw_bot, no action buttons yet (read-only). TG message max 2 blocks.

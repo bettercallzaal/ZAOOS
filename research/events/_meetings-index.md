@@ -4,6 +4,9 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-28 | Aziz x Zaal - Baraza partnership + Sparkz streaming kit | ZAO/partnership | Zaal, Aziz | [2100](2100-aziz-baraza-sparkz-streaming-kit/) | 7 |
+| 2026-07-27 | ZAO Fractal - Sparkz tokenomics (James) + Festival 3 recap | Sparkz/ZAO | Zaal, James, Samantha, DCoop | [2101](2101-fractal-sparkz-tokenomics-james-festival3/) | 4 |
+| 2026-07-27 | Web3 Aligra (Abdul) - DevCon 8 Mumbai pitch | WaveWarZ/partnership | Zaal, Abdul | [2102](2102-web3-aligra-devcon8-pitch/) | 3 |
 | 2026-07-27 | Jose 1:1 - realign, content loop, resource hub | ZAO Devz | Zaal, Jose | [2061](2061-jose-1-1-realign-content-loop/) | 7 |
 | 2026-07-20 | August ZABAL Games format + ZAOstock planning | ZABAL/general | Zaal, Sam, Johnny, Ohnahji | [1771](1771-aug-zabal-format-zaostock-planning/) | 5 |
 | 2026-07-18 | COC Concertz Space | COC Concertz | Zaal, Candy Toybox, Rev, Moses, Iman, James | [1763](1763-coc-concertz-space-jul18/) | 0 |

@@ -83,3 +83,40 @@ Behavior-changing lessons from the tg-interactions.ts boot crash that took ZOE o
 31. **Verify on a FRESH checkout of the target commit, then restart the live bot onto it - never verify the live clone in place.** The old flow edited/verified the live clone directly, so a bad edit was already live before verify ran. The hardened `zoe-autodeploy.sh` (v2): clone origin/main to `/tmp/zoe-verify`, boot-verify THERE (rule 22), and only on green does it ff the live clone + `npm install` + restart + 12s health-check + auto-rollback to the prior SHA on any boot error. The bot is only ever restarted onto code that already proved it boots. Pair with rule 11 (never leave the live clone dirty - the fix must be COMMITTED in origin/main, not an uncommitted edit a checkout reverts).
 
 32. **The verify checkout MUST actually contain the target commit's object - a `git clone --depth 1 <localclone>` does NOT bring the clone's `origin/main`, so you silently verify the WRONG commit and the deploy stalls forever.** Found 2026-07-17: the ZOE bot ran healthy on its separate `~/zao-bot-live` clone (rule 25 clone-split, done) but sat **59 commits behind origin/main and never advanced**, despite the `*/10` autodeploy cron, no HOLD file, and `origin/main` boot-verifying **clean**. Root cause in `zoe-autodeploy.sh`'s verify step: it did `git clone --depth 1 "$LIVE" /tmp/zoe-verify` then `git fetch "$LIVE" main` and `git checkout "$REMOTE"`. A shallow clone of the *local* live clone carries only that clone's checked-out tip and its `main` branch - **not** its `origin/main` ref/object. So `$REMOTE` (the real `origin/main` SHA) was absent, `git checkout "$REMOTE"` silently failed, and it fell through to a **stale `FETCH_HEAD`** - boot-verifying an old commit that of course passed, while the actual origin/main was never deployed. Diagnosis was read-only (rule 21): inspect `/tmp/zoe-verify` HEAD + `git rev-parse origin/main` there (it printed `NO`), confirm the live clone is a clean ancestor of origin/main, and boot-verify origin/main yourself on a throwaway `git worktree add --detach <wt> origin/main` off the MAIN repo (which HAS the object). **The fix (gated, `~/bin` operator script - board it, never hot-edit the live deploy script or restart the bot yourself):** verify by `git -C "$LIVE" worktree add --detach /tmp/zoe-verify origin/main` - the live clone already fetched `origin main` at the top of the script, so it *has* the object; a worktree off it checks out the exact target commit, esbuild there, `git -C "$LIVE" worktree remove`. General rule for any verify-before-deploy: **assert the verify checkout's `HEAD` equals the intended SHA before trusting the verify** - a verify that ran against the wrong commit is a vacuous pass (sibling of rule 30).
+
+## Overnight-loop + subagent-trust lessons (2026-07-27, fold-back per rule 10)
+
+Behavior-changing lessons from a long multi-terminal session + an overnight
+system-improvement loop.
+
+33. **VERIFY a subagent's file-writes and its severity grades before trusting or
+    PR-ing them.** In one session, two subagents each claimed to have written a
+    file that did NOT exist (a research doc, and a `.claude/rules/*.md`), and a
+    third graded 8 findings as "critical" when manual check showed most were
+    intentional/defensible and only ONE was a real decision. A subagent's prose
+    ("the rule has been written to X", "8 critical bugs") is a CLAIM, not a
+    fact. Before acting: `ls` the file it says it wrote, and spot-read the source
+    for any high-stakes finding. Downgrade honestly - fabricated alarm wastes
+    Zaal's morning. Extends `feedback_no_sub_agent_context_fabrication` from
+    context-fabrication to file-write + severity claims.
+
+34. **A subagent that writes a numbered research doc will collide - relocate it.**
+    A research subagent wrote `research/agents/2041-...` (a low, colliding number)
+    straight into the SHARED working tree. The loop must: reserve the real next
+    number, move the content to a worktree off origin/main at that number
+    (`sed` its self-references), add the index row, PR it, and `rm` the stray so
+    the working tree is left clean. Never leave a subagent's file uncommitted in
+    the working tree (a later `git checkout` reverts it - rule 11).
+
+35. **Overnight/unsupervised loops are PR-only + honest, never auto-code.** The
+    loop's deliverable is durable reviewable artifacts (docs, rules, specs on
+    branches -> PRs), NOT unsupervised code changes to live routes, NOT merges,
+    NOT anything gated (DMs/posts/deploys/spend/on-chain). When the loop finds a
+    real bug (e.g. a route returning `{ok:true}` on a failed DB write), it
+    DOCUMENTS + flags it for the human, it does not fix prod code at 3am.
+
+36. **On a marathon multi-thread session, coordination should be a shared surface,
+    not the human as message bus.** A full session ran on Zaal hand-relaying
+    ">>> PASTE INTO X <<<" blocks between terminals - clunky and error-prone
+    (a referenced PR that did not exist; double-run risk). The durable fix is a
+    shared `lane_handoffs` log (doc 2092), not more clipboard discipline.

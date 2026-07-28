@@ -221,7 +221,11 @@ export async function POST(req: NextRequest) {
 
         if (updateErr) {
           logger.error('[crm/capture] update failed:', updateErr);
-          return NextResponse.json({ ok: true }); // soft-fail: don't expose internal errors
+          // Real status so a dropped contact is visible; internal error logged, not exposed.
+          return NextResponse.json(
+            { ok: false, error: 'Could not save right now, please try again' },
+            { status: 500 },
+          );
         }
       } else {
         // Insert new
@@ -231,7 +235,10 @@ export async function POST(req: NextRequest) {
 
         if (insertErr) {
           logger.error('[crm/capture] insert failed:', insertErr);
-          return NextResponse.json({ ok: true }); // soft-fail
+          return NextResponse.json(
+            { ok: false, error: 'Could not save right now, please try again' },
+            { status: 500 },
+          );
         }
       }
     } else {
@@ -242,7 +249,10 @@ export async function POST(req: NextRequest) {
 
       if (insertErr) {
         logger.error('[crm/capture] insert failed:', insertErr);
-        return NextResponse.json({ ok: true }); // soft-fail
+        return NextResponse.json(
+          { ok: false, error: 'Could not save right now, please try again' },
+          { status: 500 },
+        );
       }
     }
 
@@ -259,7 +269,11 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: unknown) {
     logger.error('[crm/capture] unexpected error:', error);
-    return NextResponse.json({ ok: true }, { status: 200 }); // soft-fail: never expose errors
+    // Real status on unexpected failure; internal error logged, not exposed to the client.
+    return NextResponse.json(
+      { ok: false, error: 'Could not save right now, please try again' },
+      { status: 500 },
+    );
   }
 }
 

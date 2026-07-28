@@ -115,3 +115,4 @@
 
 | 2032 | [ZAO Assistant in Apple CarPlay: Build Plan and Constraints](./2032-zao-assistant-carplay/) | STANDALONE | Research doc 2032. |
 | 2034 | [Livepeer + Baraza Streaming Media Kit Integration](./2034-livepeer-baraza-integration/) | STANDALONE | Research doc 2034. |
+| 2099 | [One event -> lu.ma + Google Calendar + Unlock collectible (audit + design)](./2099-one-event-three-surfaces/) | STANDALONE | Make one event, and have it land on lu.ma/zao, your Google Calendar, and Unlock Protocol as a collectible. This audits what ZAO already has (a lot) and designs the missing orchestration - honestly, including the surface that can't be auto-written. |

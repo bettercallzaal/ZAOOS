@@ -164,6 +164,9 @@ export interface RelayBridgeDeps {
   /** Register the sent message's id -> reply-qid so a NATIVE Telegram reply to the
    *  relay message routes back to the lane with no button tap. Best-effort, optional. */
   recordContext?: (messageId: number, qid: string) => Promise<void>;
+  /** Arm the chat so Zaal's NEXT plain typed message (in General) answers this relay -
+   *  the gesture-free "just type" path. Best-effort, optional. */
+  armPending?: (chatId: number, qid: string) => void;
 }
 
 /** One "Reply" (arms freetext) + one "Ack" quick button, both routed by qid. */
@@ -201,6 +204,8 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       if (mid && deps.recordContext) {
         await deps.recordContext(mid, relayReplyQid(r.from)).catch(() => {});
       }
+      // Arm the gesture-free path: the next plain message in General answers this relay.
+      deps.armPending?.(deps.chatId, relayReplyQid(r.from));
     } catch {
       // one send failure does not block the others; leave it unpushed to retry next tick
     }

@@ -17,7 +17,7 @@ Laurel, Joy, Zaal, Chesnee, Leslie. Date: 2026-07-28, 5:30pm, Franklin Street Pa
 
 ## The ZAO slice (what actually touches Zaal / The ZAO)
 **Art of Ellsworth, Oct 1-4 - ZAO Stock confirmed:**
-- Zaal confirmed **ZAO Stock for Art of Ellsworth, Saturday 12-6 pm** (Saturday = Oct 4 within the Oct 1-4 window). NOTE: reconcile with the known ZAO Stock date (Oct 3, Franklin St Parklet) - confirm whether these are the same event/day or two slots.
+- Zaal confirmed **ZAO Stock for Art of Ellsworth, Saturday 12-6 pm** (Saturday = Oct 3, within the Oct 1-4 window; confirmed by Zaal 2026-07-29). Same day as the known ZAO Stock date (Oct 3, Franklin St Parklet) - one event, no conflict.
 - **Black Moon** may host an after-party; **projection mapping** planned after dark.
 - **Sen** confirmed to perform.
 - Zaal said content from a **recent Maryland event** will help promote the October event, and the **HofE org-story video** will help introduce the town/community to ZAO's audience.
@@ -38,19 +38,19 @@ Laurel, Joy, Zaal, Chesnee, Leslie. Date: 2026-07-28, 5:30pm, Franklin Street Pa
 ## Zaal's action items (extracted - the rest of the committee ACTION ITEMS are Chesnee's)
 | Action | Owner | Why | Done when | Confidence |
 |--------|-------|-----|-----------|------------|
-| Confirm the ZAO Stock date/slot at Art of Ellsworth (Sat 12-6) vs the known Oct 3 ZAO Stock date | Zaal | avoid a double/date-conflict on the flagship event | before Oct 1 | high |
+| ZAO Stock @ Art of Ellsworth confirmed = Oct 3 (Saturday) 12-6, same as the known date | Zaal | avoid a double/date-conflict on the flagship event | before Oct 1 | high |
 | Reach out to Courthouse Gallery + Flexit as possible additional Art-of-Ellsworth venues | Zaal | expand the ZAO footprint at the event | before Oct 1 | high |
 | Confirm Sen's performance + Black Moon after-party + projection-mapping logistics | Zaal | locks the ZAO Stock program | before Oct 1 | medium |
 | Package the Maryland-event content + the HofE org video into the Oct promo | Zaal | agreed promo support | Sept | medium |
 
 ## VERIFY (for Zaal)
-- The "Saturday 12-6" ZAO Stock slot at Art of Ellsworth (Oct 4) vs the ZAO Stock date in memory ([[project_zao_stock_confirmed]] says Oct 3, Franklin St Parklet) - CONFIRM these are the same event or two distinct things before it goes on any calendar/promo.
+- RESOLVED (Zaal 2026-07-29): Oct 3 IS the Saturday, so the Art of Ellsworth ZAO Stock slot and the known ZAO Stock date ([[project_zao_stock_confirmed]]) are the SAME event on Oct 3. No conflict.
 - These are committee minutes, not a transcript - attributions are as written in the minutes.
 
 ## Next Actions
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Reconcile the ZAO Stock date (Oct 3 vs Art of Ellsworth Sat Oct 4) | @Zaal | decision | 2026-08-15 |
+| ZAO Stock @ Art of Ellsworth = Oct 3 (Sat) 12-6 - CONFIRMED, no reconcile needed |  | done | 2026-07-29 |
 | Reach out to Courthouse Gallery + Flexit re: Art of Ellsworth venues | @Zaal | outreach | 2026-09-01 |
 | Confirm Sen + Black Moon after-party + projection mapping | @Zaal | confirm | 2026-09-15 |
 | Assemble Oct promo (Maryland content + HofE org video) | @Zaal | content | 2026-09-15 |

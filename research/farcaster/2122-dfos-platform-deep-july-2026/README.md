@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-07-29
 superseded-by:
-related-docs: "123, 599d, 804, 876, 2123, 2124, 2125, 2126, 308"
+related-docs: "123, 599d, 804, 876, 2123, 2124, 2125, 2126, 2127, 2128, 308"
 original-query: "https://app.dfos.com/spaces/space_vnzfk7hth9vadc3daahd48 use claude in chrome and /zao-research dfos - keep researching on this until we understand the platform fully"
 tier: DEEP
 ---
@@ -19,7 +19,7 @@ tier: DEEP
 
 | # | Decision | Recommendation |
 |---|----------|----------------|
-| 1 | **Create a ZAO space on DFOS.** Public beta is open, space creation is self-serve, and SpaceCamp (a 5-day guided cohort for launching a space) kicks off 2026-08-02. | DO IT. Join the 2026-08-02 SpaceCamp cohort and stand up a ZAO space with a public Front Page. This reverses Doc 123 decision #4 ("MAYBE - when DFOS opens public beta"). The condition is met. |
+| 1 | **Finish the ZAO space on DFOS.** *(Corrected 2026-07-29 - a `zabal` space already exists at `space_t8v7497vazc6tztkvvan7c` with Zaal as Spacerunner. It is an empty shell: 1 member, chat + calendar only.)* Public beta is open and SpaceCamp (a 5-day guided cohort) kicks off 2026-08-02. | FINISH OR DELETE IT. Join the 2026-08-02 SpaceCamp cohort and build out the existing space with a public Front Page - see [Doc 2128](../../community/2128-dfos-operator-manual-zabal-space/) for the checklist. This reverses Doc 123 decision #4 ("MAYBE - when DFOS opens public beta"). The condition is met. |
 | 2 | **Start on DFOS Free (10% transaction fee), not DFOS Pro.** Pro is $30/mo ($360/yr) + 5% fee, shipping "later this year." | STAY FREE until the ZAO space clears **$7,200/yr of GMV** - the exact breakeven where `$360 + 0.05G` beats `0.10G`. Below that, Pro costs more. Re-evaluate when Pro actually ships (not announced yet). |
 | 3 | **Do NOT implement Sign In With DFOS (SIWD) yet.** It exists and is specified, but is v0.1, explicitly outside the frozen v1 protocol surface, and **no reference implementation of the third-party verifier exists**. | WAIT. Revisit when Metalabel ships a verifier. ZAO would be writing the first third-party implementation against a 0.x spec with no test partner. |
 | 4 | **Do NOT move ZAO identity to `did:dfos`.** Doc 123's call stands and is reinforced: DFOS explicitly is "not a social protocol" - no feeds, no graph, no federation. | HOLD on Farcaster FIDs + Neynar (`src/lib/farcaster/neynar.ts`). DFOS identity is complementary, not a replacement. |
@@ -228,6 +228,8 @@ The durable ZAO edge is the combination DFOS explicitly declines to build: **onc
 - [Doc 2124](../../business/2124-metalabel-post-crypto-pivot-vs-zao-onchain-thesis/) - why Metalabel removed blockchains, and what it means for ZAO's onchain thesis
 - [Doc 2125](../../business/2125-dfos-vs-community-platform-market/) - DFOS pricing vs Circle / Skool / Mighty / Patreon, with crossover math
 - [Doc 2126](../../security/2126-dfos-protocol-security-conformance/) - protocol threat model, credentials, conformance tiers
+- [Doc 2127](../../business/2127-post-naive-internet-movement-and-its-crypto-problem/) - the post-naive internet movement and its rejection of crypto
+- [Doc 2128](../../community/2128-dfos-operator-manual-zabal-space/) - operator manual and the existing zabal space
 - [Doc 804](../../business/804-colorado-artist-corporation-acorp/) - Colorado Artist Company Act (SB 26-133)
 - [Doc 876](../../business/876-artist-corporations-acorp-model-zao/) - A-Corp model mapped to ZAO
 - [Doc 308](../308-farcaster-ecosystem-spring-2026/) - Farcaster ecosystem context

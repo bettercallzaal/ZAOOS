@@ -4,7 +4,8 @@ type: market-research
 status: research-complete
 last-validated: 2026-05-21
 original-query: "DFOS/Metalabel community-custom-internet pitch vs ZAOOS-as-Lab - decide stance (reconstructed)"
-related-docs: 123, 308, 489, 591, 599
+related-docs: 123, 308, 489, 591, 599, 2122
+superseded-by: 2122
 tier: STANDARD
 ---
 

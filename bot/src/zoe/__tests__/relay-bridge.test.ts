@@ -107,10 +107,13 @@ describe('pushInboundRelays', () => {
     vi.stubGlobal('fetch', fetchMock);
     const sendMessage = vi.fn(async () => ({ message_id: 42 }));
     const recordContext = vi.fn(async () => {});
-    const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext });
+    const armPending = vi.fn();
+    const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext, armPending });
     expect(n).toBe(1);
     expect(sendMessage).toHaveBeenCalledOnce();
     expect(recordContext).toHaveBeenCalledWith(42, 'rl-cowork');
+    // gesture-free path: General armed so the next plain message answers this relay
+    expect(armPending).toHaveBeenCalledWith(999, 'rl-cowork');
     vi.unstubAllGlobals();
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;

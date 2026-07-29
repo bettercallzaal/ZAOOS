@@ -45,8 +45,13 @@ That distinction matters because it changes the countermeasure. An evidence gate
 | 5 | "Bare catches went UP after fixing 10" | The explanatory comment I inserted contained the literal string `catch {}` and matched my own grep | **Self-polluting measurement** — the instrument measured the observer |
 | 6 | "There is no zaalcaster HTML at all" | `public/papers/drafts/zaalcaster.html`, 479 lines, 37KB. `ls public/papers/` did not recurse | **Non-exhaustive search reported as absence** |
 | 7 | "The PR touches neither file" | `git add -A` swept 3 unauthored papers edits into the commit; one deleted a live nav link | **Truncated output read as complete** (`--stat \| tail -3`) |
+| 8 | "This PR contains exactly 2 files" (said while shipping *this doc*) | The branch carried a 4th-party `infra:` commit and 3 VPS scripts. Local `main` was **236 behind origin and 1 ahead**; branching off it inherited a stranger's unpushed commit | **Stale base treated as current** — and the `git pull` that would have revealed it had its output suppressed with `2>/dev/null` |
 
-Incidents 1, 4, 5, 6, 7 are scope errors. Only 2 and 3 are inference-dressed-as-fact in the classic sense.
+Incidents 1, 4, 5, 6, 7, 8 are scope errors. Only 2 and 3 are inference-dressed-as-fact in the classic sense.
+
+**Incident 8 happened while shipping this document, and is the most instructive of the set.** Both the "exactly 2 files" claim and this doc's own "max merged is 2060" claim came from the same broken instrument: a local clone 236 commits behind origin. `find` over the working tree measures *what is checked out*, not *what is merged* — the true figure was 2123. The staging discipline from incident 7 was applied correctly and did not help, because the contamination entered through the *base commit*, not through `git add`.
+
+The root cause is narrower and more embarrassing than either: the command whose success everything depended on was run as `git pull -q 2>/dev/null`. It was on a diverged branch, it did not succeed, and its complaint went to `/dev/null`. **Suppressing the output of a command you are depending on converts a loud failure into a silent false premise.** Every downstream claim inherited it.
 
 Two further observations that generalise:
 
@@ -81,7 +86,9 @@ The additional check, asked before reporting any measurement:
 1. **What did this instrument NOT cover?** (`ls` without `-R`; grep scoped to two of three directories; `tail -3` of a 36-line list.)
 2. **Could the act of measuring have changed the result?** (Incident 5.)
 3. **Is the thing I measured the thing I am claiming?** (Incident 1: `notes` is not "context.")
-4. **Does the count have a denominator I checked?** ("68 bare catches" out of what total, found by what pattern, over what path set?)
+4. **Is my base current?** For anything read from a clone: is the local ref actually synced, or am I measuring a stale checkout? (Incident 8. `git rev-list --left-right --count origin/main...main` answers it in one line.)
+5. **Did I silence anything?** A `2>/dev/null` or `| tail -n` on a command you are depending on is a scope error waiting to happen. (Incidents 7 and 8.)
+6. **Does the count have a denominator I checked?** ("68 bare catches" out of what total, found by what pattern, over what path set?)
 
 In practice this is one sentence appended to any measurement: *"Counted with X, over Y, excluding Z."* Incident 4 dies immediately if the report has to name its path set. This discipline was eventually adopted mid-engagement — call counts were produced by a script that strips comments and imports rather than by grep, precisely because grep both under- and over-counted — and it held for the rest of the work.
 
@@ -127,6 +134,8 @@ Being explicit here matters as much as the recommendations, because the heavy en
 |---|---|---|
 | Staged-file manifest on commit | ZAOcowork | PreToolUse hook on `Bash(git commit*)` printing the full `git diff --cached --name-only`, not a truncated stat. Mirrors the ZAOOS eslint-staged hook. |
 | Ban `git add -A` in agent sessions | both | Name files explicitly. Incident 7's whole causal chain was `add -A` plus a truncated read. |
+| Verify the base before branching | both | `git rev-list --left-right --count origin/main...main` before cutting a branch. Incident 8 inherited a stranger's commit from a local main 236 behind and 1 ahead. |
+| Never suppress the output of a command you depend on | both | `git pull -q 2>/dev/null` turned a diverged-branch failure into a silent false premise that every later claim inherited. |
 | Measurement preamble | both | Any reported count carries "counted with X, over Y, excluding Z." One sentence. |
 | Source-nameability before assertion | both | Standing rule, first ~50 lines of the instructions file so it is not buried. |
 | Post-action assertion for state-changing ops | ZAOcowork | The hermes pattern: after an operation claims success, re-read the world. Already proven in ZAOOS. |

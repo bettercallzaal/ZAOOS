@@ -13,6 +13,7 @@ import { logAgentEvent } from './events';
 import { getSwapQuote, getZabalPrice } from './swap';
 import { type AgentAction, type AgentName, TOKENS } from './types';
 import { executeSwap } from './wallet';
+import { executeWithLease } from '@/lib/heart';
 
 export interface AgentRunResult {
   action: AgentAction;
@@ -61,7 +62,36 @@ async function withRetry<T>(fn: () => Promise<T>, delayMs = 5000): Promise<T> {
  * Run the standard agent routine for any agent.
  * Checks config, budget, balance, executes buy_zabal, burns, posts, auto-stakes.
  */
+/**
+ * Per-agent lease resource ids (stable UUIDs). Each agent is one resource, so
+ * only one instance of an agent may run at a time when lease enforcement is on.
+ */
+const AGENT_RUN_IDS: Record<AgentName, string> = {
+  VAULT: 'a11ceed0-0000-4000-8000-0000000000a1',
+  BANKER: 'a11ceed0-0000-4000-8000-0000000000b2',
+  DEALER: 'a11ceed0-0000-4000-8000-0000000000d3',
+};
+
+/**
+ * runAgent - the entrypoint. Behind HEART_LEASE_ENFORCE=1 it acquires a Heart
+ * lease first, so two instances (e.g. overlapping crons) cannot both trade the
+ * same agent. When the flag is off, it is exactly runAgentUnguarded (zero change).
+ * The pre-existing atomic budget claim still applies inside; this adds run-level
+ * fencing on top. Requires the per-agent agent_runs rows to be seeded before
+ * enabling; the recovery cron reclaims a lease if a process dies mid-run.
+ */
 export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
+  if (process.env.HEART_LEASE_ENFORCE !== '1') return runAgentUnguarded(agentName);
+  const owner = process.env.HOSTNAME || process.env.FLY_MACHINE_ID || 'agent-runner';
+  const outcome = await executeWithLease(
+    { runId: AGENT_RUN_IDS[agentName], owner, ttlSeconds: 180 },
+    () => runAgentUnguarded(agentName),
+  );
+  if (outcome.ran) return outcome.result;
+  return { action: 'report', status: 'skipped', details: `Heart lease held - ${agentName} is already running on another instance (${outcome.reason})` };
+}
+
+export async function runAgentUnguarded(agentName: AgentName): Promise<AgentRunResult> {
   const config = await getAgentConfig(agentName);
   if (!config) {
     return { action: 'report', status: 'failed', details: `No config found for ${agentName}` };

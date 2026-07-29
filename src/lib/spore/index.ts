@@ -10,3 +10,4 @@
 export { SPORE_HASH_ALG } from './types';
 export type { Spore, SporeHashAlg, SporeHashInput } from './types';
 export { sporeContentHash, verifySpore, observationToSpore } from './spore';
+export * from './receipt';

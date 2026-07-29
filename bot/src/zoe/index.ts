@@ -1368,6 +1368,23 @@ bot.on('message:text', async (ctx) => {
       }
     }
 
+    // NATIVE REPLY ROUTING: if Zaal replied DIRECTLY to a message with recorded
+    // context (e.g. a relay push, qid "rl-<lane>"), route it as "[answer:<qid>]"
+    // so the orchestrator reads it the same way the "Type my own" button does -
+    // no button tap needed. Mirrors the private-DM handleReplyRoute path so a
+    // plain reply to a relay message routes back to its lane.
+    if (ctx.message.reply_to_message?.message_id) {
+      const routed = await handleReplyRoute(ctx, { isFromZaal: isFromZaal(ctx) }).catch(
+        () => ({ handled: false as const }),
+      );
+      if (routed.handled && routed.contextType === 'question') {
+        await ctx
+          .reply(`Got your answer for "${routed.id}".`, threadId ? { message_thread_id: threadId } : {})
+          .catch(() => {});
+        return;
+      }
+    }
+
     // Per-topic behavior (topic = intent, Zaal 2026-07-11): dropping a plain
     // message into a topic auto-acts per that topic. Internal actions fire now;
     // outbound casts are drafted with an Approve button (money/public gate).

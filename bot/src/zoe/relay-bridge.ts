@@ -75,10 +75,11 @@ export function laneFromReplyQid(qid: string): string | null {
   return lane || null;
 }
 
-/** Human-readable DM body for an inbound relay. */
+/** Human-readable DM body for an inbound relay. The hint tells Zaal he can just
+ *  reply to the message directly (native Telegram reply) - no button tap needed. */
 export function formatInboundDm(r: RelayMsg): string {
   const when = (r.ts || '').slice(11, 16);
-  return `Relay from ${r.from}${when ? ` (${when})` : ''}:\n\n${r.msg}`;
+  return `Relay from ${r.from}${when ? ` (${when})` : ''}:\n\n${r.msg}\n\n(Reply to this message to answer, or tap Reply/Ack.)`;
 }
 
 // ---------------------------------------------------------------------------
@@ -156,10 +157,13 @@ export async function sendRelayReply(lane: string, msg: string, ts: string): Pro
 export interface RelayBridgeDeps {
   /** Zaal's DM chat id (ZAAL_DM_ID). */
   chatId: number;
-  /** grammy bot.api.sendMessage, injected for testability. */
-  sendMessage: (chatId: number, text: string, options?: unknown) => Promise<unknown>;
+  /** grammy bot.api.sendMessage - returns the sent Message (we read message_id). */
+  sendMessage: (chatId: number, text: string, options?: unknown) => Promise<{ message_id?: number } | unknown>;
   /** Monotonic timestamp for the mark-pushed write (injected so tests are deterministic). */
   now: () => string;
+  /** Register the sent message's id -> reply-qid so a NATIVE Telegram reply to the
+   *  relay message routes back to the lane with no button tap. Best-effort, optional. */
+  recordContext?: (messageId: number, qid: string) => Promise<void>;
 }
 
 /** One "Reply" (arms freetext) + one "Ack" quick button, both routed by qid. */
@@ -189,8 +193,14 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
   const pushedTs = new Set<string>();
   for (const r of pending) {
     try {
-      await deps.sendMessage(deps.chatId, formatInboundDm(r), { reply_markup: replyKeyboard(r.from) });
+      const sent = await deps.sendMessage(deps.chatId, formatInboundDm(r), { reply_markup: replyKeyboard(r.from) });
       pushedTs.add(r.ts);
+      // Register message_id -> rl-<lane> so a plain reply to THIS message routes
+      // back to the lane (no button tap). Best-effort - never blocks the push.
+      const mid = (sent as { message_id?: number } | null)?.message_id;
+      if (mid && deps.recordContext) {
+        await deps.recordContext(mid, relayReplyQid(r.from)).catch(() => {});
+      }
     } catch {
       // one send failure does not block the others; leave it unpushed to retry next tick
     }

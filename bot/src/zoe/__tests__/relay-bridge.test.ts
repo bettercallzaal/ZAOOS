@@ -7,6 +7,7 @@ import {
   laneFromReplyQid,
   formatInboundDm,
   pushInboundRelays,
+  tryInstantRelayReply,
   type RelayMsg,
 } from '../relay-bridge';
 
@@ -78,6 +79,40 @@ describe('formatInboundDm', () => {
     expect(out).toContain('zoostr');
     expect(out).toContain('13:45');
     expect(out).toContain('shipped');
+  });
+});
+
+describe('tryInstantRelayReply', () => {
+  it('returns false for a non-relay qid and does no IO', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await tryInstantRelayReply('q1', 'hi', 't')).toBe(false);
+    expect(await tryInstantRelayReply('research-topic', 'hi', 't')).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('routes a relay qid to its lane and returns true', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://x.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    const hub = { id: 'h1', metadata: { relays: [] as RelayMsg[] } };
+    let patched: unknown;
+    const fetchMock = vi.fn(async (_url: string, init?: { method?: string; body?: string }) => {
+      if (init?.method === 'PATCH') {
+        patched = JSON.parse(init.body || '{}');
+        return { ok: true, text: async () => '' } as unknown as Response;
+      }
+      return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const ok = await tryInstantRelayReply('rl-cowork', 'on it', 'ts1');
+    expect(ok).toBe(true);
+    // the appended reply targets the cowork lane with from:zoe
+    const relays = (patched as { metadata: { relays: RelayMsg[] } }).metadata.relays;
+    expect(relays.at(-1)).toMatchObject({ from: 'zoe', to: 'cowork', msg: 'on it', read: false });
+    vi.unstubAllGlobals();
+    delete process.env.COWORK_TRACKER_URL;
+    delete process.env.COWORK_TRACKER_KEY;
   });
 });
 

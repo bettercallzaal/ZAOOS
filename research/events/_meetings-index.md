@@ -4,6 +4,9 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-07-22 | Yulia x Zaal - job search + build-a-thon + Maine event | ZAO/network | Zaal, Yulia | [2128](2128-yulia-zaal-jobsearch-buildathon/) | 4 |
+| 2026-07-29 | Matteo Tambussi x Zaal - decentralized tooling + Spaghetti radio x ZAO streams | ZAO/partnership | Zaal, Matteo | [2129](2129-matteo-tambussi-decentralized-tooling/) | 4 |
+| 2026-07-21 | Freeze x Zaal - OBS + Restream multi-platform streaming (livestream) | ZAO/streaming | Zaal, Freeze | [2130](2130-freeze-zaal-obs-streaming-setup/) | 2 |
 | 2026-07-28 | Aziz x Zaal - Baraza partnership + Sparkz streaming kit | ZAO/partnership | Zaal, Aziz | [2100](2100-aziz-baraza-sparkz-streaming-kit/) | 7 |
 | 2026-07-27 | ZAO Fractal - Sparkz tokenomics (James) + Festival 3 recap | Sparkz/ZAO | Zaal, James, Samantha, DCoop | [2101](2101-fractal-sparkz-tokenomics-james-festival3/) | 4 |
 | 2026-07-27 | Web3 Aligra (Abdul) - DevCon 8 Mumbai pitch | WaveWarZ/partnership | Zaal, Abdul | [2102](2102-web3-aligra-devcon8-pitch/) | 3 |

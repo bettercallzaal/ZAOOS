@@ -97,6 +97,7 @@ import {
 } from './tg-interactions';
 import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
 import { takePendingAnswer } from './pending-answers';
+import { tryInstantRelayReply } from './relay-bridge';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
@@ -1395,6 +1396,13 @@ bot.on('message:text', async (ctx) => {
     const awaitingQid = pendingTypeAnswers.get(chatId);
     if (awaitingQid) {
       pendingTypeAnswers.delete(chatId);
+      // Relay answer -> route instantly + skip the [answer] log (tick would double-route).
+      if (await tryInstantRelayReply(awaitingQid, text, new Date().toISOString())) {
+        await ctx
+          .reply(`Sent to ${awaitingQid.replace(/^rl-/, '')}.`, threadId ? { message_thread_id: threadId } : {})
+          .catch(() => {});
+        return;
+      }
       await pushRecent(
         { from: 'zaal', text: `[answer:${awaitingQid}] ${text}`, sender: 'zaalbotz-type' },
         String(zaalBotzGroupId),
@@ -1413,6 +1421,13 @@ bot.on('message:text', async (ctx) => {
     if (!threadId) {
       const armedQid = takePendingAnswer(zaalBotzGroupId);
       if (armedQid) {
+        // Relay answer -> route to its lane INSTANTLY (no 5-min tick lag) and do
+        // NOT log [answer] (the tick would double-route). Non-relay (orchestrator
+        // question) falls through to the tick path.
+        if (await tryInstantRelayReply(armedQid, text, new Date().toISOString())) {
+          await ctx.reply(`Sent to ${armedQid.replace(/^rl-/, '')}.`).catch(() => {});
+          return;
+        }
         await pushRecent(
           { from: 'zaal', text: `[answer:${armedQid}] ${text}`, sender: 'zaalbotz-general' },
           String(zaalBotzGroupId),

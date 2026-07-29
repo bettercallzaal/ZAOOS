@@ -444,8 +444,13 @@ function questionTextFor(qid: string): string | null {
  * Disabled by default; only runs when ZOE_ORCHESTRATOR_ENABLED === 'true'.
  */
 export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<void> {
-  // SAFETY: disabled by default
-  if (process.env.ZOE_ORCHESTRATOR_ENABLED !== 'true') {
+  // SAFETY: disabled by default. This cron tick is shared by two independently
+  // gated features - the orchestrator question loop and the relay-Telegram bridge.
+  // Run if EITHER is on; each feature's own work is guarded by its own flag below,
+  // so enabling the relay bridge does NOT switch on the orchestrator loop.
+  const orchestratorOn = process.env.ZOE_ORCHESTRATOR_ENABLED === 'true';
+  const relayOn = process.env.ZOE_RELAY_TG_ENABLED === 'true';
+  if (!orchestratorOn && !relayOn) {
     return;
   }
 
@@ -469,13 +474,12 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
     const state = await readState();
     const answers = await detectNewAnswers(state.lastSeenTs, deps.groupId);
 
-    if (answers.length === 0) {
-      console.log('[zoe/orchestrator] no new answers, silent');
-      return;
-    }
-
-    // Stage 2: Process each new answer via action classification
+    // Stage 2: Process each new answer via action classification.
+    // (Do NOT early-return on no answers - the relay push below must still run.)
     let actioned = 0;
+    if (answers.length === 0) {
+      console.log('[zoe/orchestrator] no new answers');
+    }
     for (const answer of answers) {
       // Relay-bridge: a 'rl-<lane>' answer is Zaal replying to an inbound fleet
       // relay from Telegram. Route his answer back to that lane and consume it -
@@ -490,6 +494,9 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           continue;
         }
       }
+
+      // Everything below is orchestrator-loop work - skip it in relay-only mode.
+      if (!orchestratorOn) continue;
 
       // Check if this is a topic-based open-thing answer (e.g., "coding-pr-...", "research-...")
       // If so, clear that topic so refillOpenThings will post a new one.
@@ -585,20 +592,22 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       }
     }
 
-    // Refill any topics that lost their open items (after processing answers)
-    try {
-      const refillResult = await refillOpenThings({
-        bot: deps.bot,
-        groupId: deps.groupId,
-        now: deps.now,
-      });
-      if (refillResult.refilled > 0) {
-        console.log(
-          `[zoe/orchestrator] always-open refilled ${refillResult.refilled} topic(s), skipped ${refillResult.skipped}`,
-        );
+    // Refill any topics that lost their open items (orchestrator-loop work only).
+    if (orchestratorOn) {
+      try {
+        const refillResult = await refillOpenThings({
+          bot: deps.bot,
+          groupId: deps.groupId,
+          now: deps.now,
+        });
+        if (refillResult.refilled > 0) {
+          console.log(
+            `[zoe/orchestrator] always-open refilled ${refillResult.refilled} topic(s), skipped ${refillResult.skipped}`,
+          );
+        }
+      } catch (err) {
+        console.error('[zoe/orchestrator] refillOpenThings failed:', (err as Error)?.message);
       }
-    } catch (err) {
-      console.error('[zoe/orchestrator] refillOpenThings failed:', (err as Error)?.message);
     }
   } finally {
     await releaseLock();

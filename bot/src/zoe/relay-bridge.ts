@@ -150,6 +150,22 @@ export async function sendRelayReply(lane: string, msg: string, ts: string): Pro
   return saveHubRelays(hub.id, appendReply(hub.relays, lane, msg, ts));
 }
 
+/**
+ * If `qid` is a relay-reply qid (`rl-<lane>`), route `text` back to that lane
+ * IMMEDIATELY and return true - so the answer reaches the sending terminal now,
+ * not up to 5 min later on the next orchestrator tick. Returns false for a
+ * non-relay qid (an orchestrator question) so the caller logs it for the tick.
+ *
+ * IMPORTANT: when this returns true, the caller MUST NOT also log `[answer:qid]`
+ * - the tick would re-route it and the lane would get the reply twice.
+ */
+export async function tryInstantRelayReply(qid: string, text: string, ts: string): Promise<boolean> {
+  const lane = laneFromReplyQid(qid);
+  if (!lane) return false;
+  await sendRelayReply(lane, text, ts).catch(() => {});
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // The tick step (push inbound relays to Zaal's DM)
 // ---------------------------------------------------------------------------

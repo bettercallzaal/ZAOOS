@@ -312,6 +312,12 @@ export async function handleReplyRoute(
     }
 
     if (context.qid) {
+      // Relay answer -> route to its lane INSTANTLY (no tick lag); don't log
+      // [answer] (the tick would re-route). Non-relay falls through to the log.
+      const { tryInstantRelayReply } = await import('./relay-bridge');
+      if (await tryInstantRelayReply(context.qid, text, new Date().toISOString())) {
+        return { handled: true, contextType: 'question', id: context.qid };
+      }
       const logText = `[answer:${context.qid}] ${text}`;
       try {
         await pushRecent(

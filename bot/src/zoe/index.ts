@@ -96,6 +96,7 @@ import {
   classifyIntent,
 } from './tg-interactions';
 import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
+import { takePendingAnswer } from './pending-answers';
 import { commitResearchDoc } from './research-doc';
 import { extractFirstUrl, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
@@ -1402,6 +1403,23 @@ bot.on('message:text', async (ctx) => {
         .reply(`Got your answer for "${awaitingQid}".`, threadId ? { message_thread_id: threadId } : {})
         .catch(() => {});
       return;
+    }
+
+    // COMBO (Zaal 2026-07-29): General is the gesture-free ANSWER surface. A plain
+    // typed message in General (no topic thread) answers the last relay/question ZOE
+    // pushed - no swipe, no button. Topics + DM stay normal chat, so this fires ONLY
+    // in General (threadId falsy) and only when something is armed. "use zaalbots as
+    // just a response, normal chat -> DM."
+    if (!threadId) {
+      const armedQid = takePendingAnswer(zaalBotzGroupId);
+      if (armedQid) {
+        await pushRecent(
+          { from: 'zaal', text: `[answer:${armedQid}] ${text}`, sender: 'zaalbotz-general' },
+          String(zaalBotzGroupId),
+        ).catch((e) => console.error('[zoe/index] general-answer log failed:', (e as Error)?.message));
+        await ctx.reply(`Got your answer for "${armedQid}".`).catch(() => {});
+        return;
+      }
     }
 
     const topicName = await topicNameForThread(threadId).catch(() => undefined);

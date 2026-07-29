@@ -15,6 +15,16 @@
 
 import type { ClaudeCliResult } from '../../hermes/claude-cli';
 
+/**
+ * Output-token cap for the fallback API providers (Grok/GPT/OpenRouter). The
+ * Claude CLI path generates freely, but when Claude is weekly-capped the fleet
+ * fails over here - and the old 4096 cap cut long replies (a detailed audit)
+ * off mid-sentence with no chunk continuation (the ZONEXUS-audit bug, 2026-07-29).
+ * 8192 is supported by all three providers (GPT-4o 16k, Grok large, deepseek 8k).
+ * Tunable via ZOE_FALLBACK_MAX_TOKENS.
+ */
+const FALLBACK_MAX_TOKENS = Number(process.env.ZOE_FALLBACK_MAX_TOKENS) || 8192;
+
 export interface ModelChoice {
   model: string;
   provider: 'claude' | 'grok' | 'gpt';
@@ -128,7 +138,7 @@ async function callGrok(systemPrompt: string, userMessage: string): Promise<Clau
       { role: 'user', content: userMessage },
     ],
     temperature: 1,
-    max_tokens: 4096,
+    max_tokens: FALLBACK_MAX_TOKENS,
   };
 
   const startMs = Date.now();
@@ -193,7 +203,7 @@ async function callGpt(systemPrompt: string, userMessage: string): Promise<Claud
       { role: 'user', content: userMessage },
     ],
     temperature: 1,
-    max_tokens: 4096,
+    max_tokens: FALLBACK_MAX_TOKENS,
   };
 
   const startMs = Date.now();
@@ -263,7 +273,7 @@ async function callOpenRouter(systemPrompt: string, userMessage: string): Promis
       { role: 'user', content: userMessage },
     ],
     temperature: 1,
-    max_tokens: 4096,
+    max_tokens: FALLBACK_MAX_TOKENS,
   };
 
   const startMs = Date.now();

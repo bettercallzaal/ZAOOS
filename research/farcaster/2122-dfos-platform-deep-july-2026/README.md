@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-07-29
 superseded-by:
-related-docs: "123, 599d, 804, 876, 2123, 308"
+related-docs: "123, 599d, 804, 876, 2123, 2124, 2125, 2126, 308"
 original-query: "https://app.dfos.com/spaces/space_vnzfk7hth9vadc3daahd48 use claude in chrome and /zao-research dfos - keep researching on this until we understand the platform fully"
 tier: DEEP
 ---
@@ -225,6 +225,9 @@ The durable ZAO edge is the combination DFOS explicitly declines to build: **onc
 - [Doc 123](../123-dfos-dark-forest-protocol/) - original DFOS protocol reference (mark superseded by this doc)
 - [Doc 599d](../599d-dfos-spaces-update-may-2026/) - May 2026 DFOS state (superseded by this doc)
 - [Doc 2123](../../business/2123-acorp-town-hall-boulder-2026/) - A-Corp Boulder town hall, July 2026
+- [Doc 2124](../../business/2124-metalabel-post-crypto-pivot-vs-zao-onchain-thesis/) - why Metalabel removed blockchains, and what it means for ZAO's onchain thesis
+- [Doc 2125](../../business/2125-dfos-vs-community-platform-market/) - DFOS pricing vs Circle / Skool / Mighty / Patreon, with crossover math
+- [Doc 2126](../../security/2126-dfos-protocol-security-conformance/) - protocol threat model, credentials, conformance tiers
 - [Doc 804](../../business/804-colorado-artist-corporation-acorp/) - Colorado Artist Company Act (SB 26-133)
 - [Doc 876](../../business/876-artist-corporations-acorp-model-zao/) - A-Corp model mapped to ZAO
 - [Doc 308](../308-farcaster-ecosystem-spring-2026/) - Farcaster ecosystem context

@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-07-29
 superseded-by:
-related-docs: "804, 876, 2122, 724"
+related-docs: "804, 876, 2122, 2124, 724"
 original-query: "heres an email also note all of the info down in the repo - Artist Corporations (DFOS) acorp@newsletter.dfos.com, 'What's an A-Corp? - Slides and transcript from our A-Corp Town Hall in Boulder', Jul 27 2026"
 tier: STANDARD
 ---

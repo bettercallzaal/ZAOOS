@@ -35,6 +35,7 @@ import { homedir } from 'node:os';
 import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQuestion } from './questions';
 import { pushRecent, ZOE_PATHS } from './memory';
 import { enqueueWork } from './work-loop';
+import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
 import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
 import { topicNameForThread } from './topic-router';
 
@@ -476,6 +477,20 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
     // Stage 2: Process each new answer via action classification
     let actioned = 0;
     for (const answer of answers) {
+      // Relay-bridge: a 'rl-<lane>' answer is Zaal replying to an inbound fleet
+      // relay from Telegram. Route his answer back to that lane and consume it -
+      // do NOT run the orchestrator classifier on it. Off unless ZOE_RELAY_TG_ENABLED.
+      if (process.env.ZOE_RELAY_TG_ENABLED === 'true') {
+        const replyLane = laneFromReplyQid(answer.qid);
+        if (replyLane) {
+          const body = answer.value === 'ack' ? '[acked by Zaal]' : answer.value;
+          const ok = await sendRelayReply(replyLane, body, deps.now.toISOString());
+          console.log(`[zoe/relay-bridge] reply -> ${replyLane}: ${ok ? 'sent' : 'FAILED'}`);
+          if (ok) actioned++; // advance the answer pointer so it is not re-sent next tick
+          continue;
+        }
+      }
+
       // Check if this is a topic-based open-thing answer (e.g., "coding-pr-...", "research-...")
       // If so, clear that topic so refillOpenThings will post a new one.
       const topicForAnswer = topicFromQid(answer.qid);
@@ -552,6 +567,22 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       await writeState({ lastSeenTs: latestTs });
       await bumpToday(dateStr);
       console.log(`[zoe/orchestrator] tick: ${answers.length} answer(s), ${posted} action(s) executed`);
+    }
+
+    // Relay-bridge: surface NEW inbound fleet relays (addressed to the `zoe` lane)
+    // in this topic with a Reply button, so Zaal answers them from Telegram. Runs
+    // every tick regardless of answers. Off unless ZOE_RELAY_TG_ENABLED. Best-effort.
+    if (process.env.ZOE_RELAY_TG_ENABLED === 'true') {
+      try {
+        const pushed = await pushInboundRelays({
+          chatId: deps.groupId,
+          sendMessage: (id, text, opts) => deps.bot.api.sendMessage(id, text, opts as never),
+          now: () => deps.now.toISOString(),
+        });
+        if (pushed > 0) console.log(`[zoe/relay-bridge] pushed ${pushed} inbound relay(s) to topic`);
+      } catch (err) {
+        console.error('[zoe/relay-bridge] push failed:', (err as Error)?.message);
+      }
     }
 
     // Refill any topics that lost their open items (after processing answers)

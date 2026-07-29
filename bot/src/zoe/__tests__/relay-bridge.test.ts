@@ -94,4 +94,25 @@ describe('pushInboundRelays', () => {
     if (prevUrl) process.env.COWORK_TRACKER_URL = prevUrl;
     if (prevKey) process.env.COWORK_TRACKER_KEY = prevKey;
   });
+
+  it('registers message_id -> rl-<lane> so a native reply can route back', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://x.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    const hub = { id: 'h1', metadata: { relays: [rel({ from: 'cowork', to: 'zoe', ts: 'a', tg_pushed: false })] } };
+    // GET hub -> row; PATCH -> ok. fetchHub is called twice (initial + re-fetch before mark).
+    const fetchMock = vi.fn(async (_url: string, init?: { method?: string }) => {
+      if (init?.method === 'PATCH') return { ok: true, text: async () => '' } as unknown as Response;
+      return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const sendMessage = vi.fn(async () => ({ message_id: 42 }));
+    const recordContext = vi.fn(async () => {});
+    const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext });
+    expect(n).toBe(1);
+    expect(sendMessage).toHaveBeenCalledOnce();
+    expect(recordContext).toHaveBeenCalledWith(42, 'rl-cowork');
+    vi.unstubAllGlobals();
+    delete process.env.COWORK_TRACKER_URL;
+    delete process.env.COWORK_TRACKER_KEY;
+  });
 });

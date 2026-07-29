@@ -36,6 +36,7 @@ import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQue
 import { pushRecent, ZOE_PATHS } from './memory';
 import { enqueueWork } from './work-loop';
 import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
+import { recordMessageContext } from './message-context';
 import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
 import { topicNameForThread } from './topic-router';
 
@@ -585,6 +586,8 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           chatId: deps.groupId,
           sendMessage: (id, text, opts) => deps.bot.api.sendMessage(id, text, opts as never),
           now: () => deps.now.toISOString(),
+          // register message_id -> rl-<lane> so a plain Telegram reply routes back
+          recordContext: (mid, qid) => recordMessageContext(mid, { qid }),
         });
         if (pushed > 0) console.log(`[zoe/relay-bridge] pushed ${pushed} inbound relay(s) to topic`);
       } catch (err) {

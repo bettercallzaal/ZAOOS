@@ -26,3 +26,4 @@ export type {
   InstanceStatus,
   DeadInstanceReclaimSummary,
 } from './types';
+export * from './execute-with-lease';

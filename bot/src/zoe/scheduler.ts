@@ -35,6 +35,7 @@ import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
 import { sendChunkedToTelegram } from './tg-chunk';
+import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
 import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
@@ -721,6 +722,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         await runRepoImproverTick(async (text: string) => {
           await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
         });
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Heart fleet CANARY beat - every 10 min, a lease-guarded no-op through the
+  // shared packages/heart-fleet layer against the live agent_runs table. The
+  // module self-gates on ZOE_HEART_FLEET_CANARY (default OFF), so this is inert
+  // until the env flips; when two instances ever race, the lease-held skip in
+  // the logs is the success evidence. Doc 2139 rollout ladder step 2.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        if (!heartCanaryEnabled()) return; // flag off = zero work, zero logs
+        try {
+          await runHeartFleetCanary();
+        } catch (err) {
+          console.error('[zoe/scheduler] heart canary beat failed:', (err as Error)?.message);
+        }
       },
       { timezone: 'UTC' },
     ),

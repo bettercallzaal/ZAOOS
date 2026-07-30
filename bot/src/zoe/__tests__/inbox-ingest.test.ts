@@ -107,3 +107,22 @@ test('ingestInbox survives a non-ok fetch without throwing', async () => {
   const r = await ingest.ingestInbox(fakeFetch([], false, 500));
   assert.equal(r.ingested, 0);
 });
+
+test('ingestInbox source.apiKey works without AGENTMAIL_API_KEY in the env (per-brand)', async () => {
+  const prev = process.env.AGENTMAIL_API_KEY;
+  delete process.env.AGENTMAIL_API_KEY; // env has NO default key
+  const r = await ingest.ingestInbox(
+    fakeFetch([{ id: 'brand-1', from: 'x@thezao.com', subject: 'hi', preview: 'yo' }]),
+    { inbox: 'wavewarz@agentmail.to', apiKey: 'brand-key' },
+  );
+  assert.equal(r.ingested, 1, 'per-brand creds ingest even with no env key');
+  if (prev) process.env.AGENTMAIL_API_KEY = prev;
+});
+
+test('ingestInbox with no source still requires the env key (backward compatible)', async () => {
+  const prev = process.env.AGENTMAIL_API_KEY;
+  delete process.env.AGENTMAIL_API_KEY;
+  const r = await ingest.ingestInbox(fakeFetch([{ id: 'z', subject: 'x' }]));
+  assert.deepEqual(r, { ingested: 0, skipped: 0, scanned: 0 }, 'no env key + no source -> no-op');
+  if (prev) process.env.AGENTMAIL_API_KEY = prev;
+});

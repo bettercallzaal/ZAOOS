@@ -54,6 +54,17 @@ export interface IngestResult {
   scanned: number;
 }
 
+/**
+ * Which inbox to ingest from. Both fields default to ZOE's own inbox +
+ * AGENTMAIL_API_KEY, so an existing call `ingestInbox()` / `ingestInbox(fetch)`
+ * behaves exactly as before. A per-brand caller (doc 2155 fleet) passes an
+ * identity's resolved inbox + apiKey to ingest that brand's mail instead.
+ */
+export interface InboxSource {
+  inbox?: string;
+  apiKey?: string;
+}
+
 /** Stable dedup key for a message. Falls back to from+subject when no id. */
 function sourceId(m: RawAgentMailMessage): string {
   return (
@@ -86,18 +97,22 @@ export function synthesizeSummary(m: RawAgentMailMessage): string {
 /**
  * Fetch + ingest new forwarded mail. Returns counts; never throws.
  * @param fetchImpl injectable for tests (defaults to global fetch).
+ * @param source which inbox + key to read (defaults to ZOE's own — backward
+ *   compatible; existing no-arg / fetch-only callers are unchanged).
  */
 export async function ingestInbox(
   fetchImpl: typeof fetch = fetch,
+  source: InboxSource = {},
 ): Promise<IngestResult> {
   const empty: IngestResult = { ingested: 0, skipped: 0, scanned: 0 };
-  const key = process.env.AGENTMAIL_API_KEY;
+  const inbox = source.inbox ?? AGENTMAIL_INBOX;
+  const key = source.apiKey ?? process.env.AGENTMAIL_API_KEY;
   if (!key) return empty;
 
   let messages: RawAgentMailMessage[];
   try {
     const res = await fetchImpl(
-      `https://api.agentmail.to/v0/inboxes/${AGENTMAIL_INBOX}/messages?limit=${FETCH_LIMIT}`,
+      `https://api.agentmail.to/v0/inboxes/${inbox}/messages?limit=${FETCH_LIMIT}`,
       { headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(8000) },
     );
     if (!res.ok) {
@@ -155,7 +170,9 @@ export async function ingestInbox(
   }
 
   if (ingested > 0) {
-    console.log(`[zoe/inbox-ingest] folded ${ingested} forwarded message(s) into ZOE context`);
+    console.log(
+      `[zoe/inbox-ingest] folded ${ingested} forwarded message(s) from ${inbox} into ZOE context`,
+    );
   }
   return { ingested, skipped, scanned: messages.length };
 }

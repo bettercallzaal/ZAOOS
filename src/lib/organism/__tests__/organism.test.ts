@@ -44,9 +44,11 @@ describe('organism - first living end-to-end flow', () => {
     expect((working[0].payload as { price: number }).price).toBe(3421.55);
     expect(working[0].source).toBe('coinbase-eth-usd');
 
-    // the Control Plane sees both organs live + healthy
-    expect(t1.snapshot.total).toBe(2);
-    expect(t1.snapshot.healthy).toBe(2);
+    // the Control Plane sees all three organs live + healthy
+    // (bloodstream + receipts + memory; the receipt emitter organ landed with
+    // the live receipt-emission wiring - PR #2713 / doc 2138).
+    expect(t1.snapshot.total).toBe(3);
+    expect(t1.snapshot.healthy).toBe(3);
     expect(t1.snapshot.degraded).toBe(0);
     const providers = org.controlPlane.discover('market.price');
     expect(providers.some((p) => p.organId === 'bloodstream' && p.status === 'healthy')).toBe(true);

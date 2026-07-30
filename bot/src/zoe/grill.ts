@@ -58,6 +58,11 @@ export interface GrillState {
   activeKind?: GrillKind | null;
   /** message_id of the pinned open question, so we can unpin it on answer. */
   activeMessageId?: number | null;
+  /** Parsed one-click options of the active decision, so typed answers and the
+   * multi-select keyboard can match against them (#51). */
+  activeOptions?: { value: string; label: string }[] | null;
+  /** Values toggled on in multi-select mode (order follows activeOptions). */
+  activeMulti?: string[] | null;
   lastAskedAt: string | null;
   /** How many items ZOE has proactively pushed today, so it caps at DAILY_PUSH_CAP
    * (top-N-not-96). Reset when the date rolls. /grill and post-answer advances
@@ -75,7 +80,24 @@ const DAILY_PUSH_CAP = 5;
  * Returns [] when there is no clean 2-4 option set (falls back to Done/Skip/Later).
  */
 export function parseOptions(title: string): { value: string; label: string }[] {
-  const body = title.includes(':') ? title.slice(title.lastIndexOf(':') + 1) : title;
+  // The options may themselves contain colons ("... 1: intro test / 2: map"),
+  // so neither first- nor last-colon splitting alone is safe. Try candidates
+  // from longest to shortest; the first that parses cleanly into 2-4 options
+  // wins: after the FIRST colon, after the LAST colon, then the whole title.
+  const candidates: string[] = [];
+  const firstColon = title.indexOf(':');
+  const lastColon = title.lastIndexOf(':');
+  if (firstColon >= 0) candidates.push(title.slice(firstColon + 1));
+  if (lastColon > firstColon) candidates.push(title.slice(lastColon + 1));
+  candidates.push(title);
+  for (const body of candidates) {
+    const opts = parseOptionsBody(body);
+    if (opts.length >= 2) return opts;
+  }
+  return [];
+}
+
+function parseOptionsBody(body: string): { value: string; label: string }[] {
   const parts = body
     .split('/')
     .map((p) => p.trim())
@@ -83,11 +105,13 @@ export function parseOptions(title: string): { value: string; label: string }[] 
   if (parts.length < 2 || parts.length > 4) return [];
   const opts: { value: string; label: string }[] = [];
   for (const part of parts) {
-    const num = part.match(/^(?:pick\s+)?(\d+)\s*(?:\(([^)]+)\))?/i);
+    // Numbered option: "1 (intro test)", "1: intro test", "1 - intro test",
+    // "pick 1 (intro)", or a bare "3".
+    const num = part.match(/^(?:pick\s+)?(\d+)\s*(?:\(([^)]+)\)|[:.\-]\s*(.+))?$/i);
     if (num) {
       const v = num[1];
-      const paren = num[2]?.trim();
-      opts.push({ value: v, label: paren ? `${v}: ${paren}` : v });
+      const label = (num[2] ?? num[3])?.trim();
+      opts.push({ value: v, label: label ? `${v}: ${label}` : v });
       continue;
     }
     const word = part.replace(/[()]/g, '').trim();
@@ -99,6 +123,67 @@ export function parseOptions(title: string): { value: string; label: string }[] 
   }
   if (new Set(opts.map((o) => o.value)).size !== opts.length) return []; // colliding values
   return opts;
+}
+
+/**
+ * Match a TYPED message against the active decision's options, so a plain
+ * typed answer registers without a button tap (the #51 capture fix). Returns
+ * the option value, a comma-joined multi ("1,3"), or null when the text is not
+ * option-shaped - null means "this is normal chat, leave it alone".
+ */
+export function matchTypedAnswer(
+  text: string,
+  options: { value: string; label: string }[],
+): string | null {
+  if (!options.length) return null;
+  const t = text.trim().toLowerCase();
+  if (!t || t.length > 80) return null;
+  for (const o of options) {
+    if (t === o.value.toLowerCase() || t === o.label.toLowerCase()) return o.value;
+    // "2: map" typed as just "map" (the label tail)
+    const tail = o.label.toLowerCase().replace(/^\d+:\s*/, '');
+    if (tail && t === tail) return o.value;
+  }
+  // Multi-choice: "1,2", "1 and 3", "1 2", "1 & 2" - every token must be a value.
+  const values = new Set(options.map((o) => o.value.toLowerCase()));
+  const tokens = t.split(/\s*(?:,|\band\b|&|\+|\s)\s*/).filter(Boolean);
+  if (tokens.length >= 2 && tokens.every((tok) => values.has(tok))) {
+    const uniq = [...new Set(tokens)];
+    if (uniq.length >= 2) return uniq.join(',');
+  }
+  return null;
+}
+
+/** Pure multi-select toggle: add/remove a value, preserving option order. */
+export function toggleSelection(
+  selected: string[],
+  value: string,
+  options: { value: string; label: string }[],
+): string[] {
+  const next = selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value];
+  const order = options.map((o) => o.value);
+  return next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+}
+
+/**
+ * Keyboard rows for multi-select mode: each option toggles ([x]/[ ] prefix),
+ * plus Send/Cancel. Pure - index.ts renders it into grammy's shape.
+ */
+export function multiKeyboard(
+  options: { value: string; label: string }[],
+  selected: string[],
+): { text: string; data: string }[][] {
+  const rows = options.map((o) => [
+    {
+      text: `${selected.includes(o.value) ? '[x]' : '[ ]'} ${o.label.slice(0, 24)}`,
+      data: `grill:tog:${o.value}`.slice(0, 60),
+    },
+  ]);
+  rows.push([
+    { text: `Send${selected.length ? ` (${selected.length})` : ''}`, data: 'grill:multisend' },
+    { text: 'Cancel', data: 'grill:multicancel' },
+  ]);
+  return rows;
 }
 
 const ASK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // don't re-surface a still-open item within 3h
@@ -182,7 +267,7 @@ export function pickNext(queue: GrillItem[], state: GrillState, now: number): Gr
 export function formatGrill(
   item: GrillItem,
   remaining: number,
-): { text: string; buttons: { text: string; data: string }[][] } {
+): { text: string; buttons: { text: string; data: string }[][]; options: { value: string; label: string }[] } {
   const lead =
     item.kind === 'event'
       ? `On your calendar today:\n${item.title}`
@@ -217,7 +302,10 @@ export function formatGrill(
   let buttons: { text: string; data: string }[][];
   if (options.length >= 2) {
     const answerRow = options.map((o) => ({ text: o.label.slice(0, 28), data: `grill:ans:${o.value}`.slice(0, 60) }));
-    buttons = [answerRow, [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
+    const tailRow = [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }];
+    // 3+ options: offer multi-select ("1 and 3"), single taps still instant.
+    if (options.length >= 3) tailRow.unshift({ text: 'Pick multiple', data: 'grill:multi' });
+    buttons = [answerRow, tailRow];
   } else {
     // grill:approve resolves a single-action decision ("yes, do this") - it
     // records the call AND moves the source task off the needs-you queue.
@@ -232,7 +320,7 @@ export function formatGrill(
             : { text: 'Approve', data: 'grill:approve' };
     buttons = [[resolveBtn, { text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   }
-  return { text: `${lead}${context}${link}${resolveHint}${tail}`, buttons };
+  return { text: `${lead}${context}${link}${resolveHint}${tail}`, buttons, options };
 }
 
 export interface SurfaceGrillDeps {
@@ -302,7 +390,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   // Unpin the previous open question so at most ONE question is ever pinned.
   if (deps.unpin && state.activeMessageId) await deps.unpin(state.activeMessageId).catch(() => {});
 
-  const { text, buttons } = formatGrill(item, remaining);
+  const { text, buttons, options } = formatGrill(item, remaining);
   const sent = (await deps.sendDM(text, buttons)) as { message_id?: number } | undefined;
   const messageId = sent && typeof sent === 'object' ? sent.message_id : undefined;
 
@@ -314,6 +402,8 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.activeTitle = item.title;
   state.activeKind = item.kind;
   state.activeMessageId = messageId ?? null;
+  state.activeOptions = options.length ? options : null;
+  state.activeMulti = null;
   state.lastAskedAt = new Date(now).toISOString();
   state.daySurfaced = { date: today, count: day.count + 1 };
   await writeGrillState(state);
@@ -352,8 +442,57 @@ export async function applyGrillAnswer(
   state.activeTitle = null;
   state.activeKind = null;
   state.activeMessageId = null;
+  state.activeOptions = null;
+  state.activeMulti = null;
   await writeGrillState(state);
   return { note: `Locked in: ${value}. Next one coming.`, key, title, value };
+}
+
+/**
+ * Read the active decision's options + current multi selection (for the
+ * multi-select keyboard and typed-answer matching). Null when nothing active
+ * or the active item has no parsed options.
+ */
+export async function getActiveGrill(): Promise<{
+  key: string;
+  options: { value: string; label: string }[];
+  selected: string[];
+  messageId: number | null;
+} | null> {
+  const state = await readGrillState();
+  if (!state.activeKey || !state.activeOptions?.length) return null;
+  return {
+    key: state.activeKey,
+    options: state.activeOptions,
+    selected: state.activeMulti ?? [],
+    messageId: state.activeMessageId ?? null,
+  };
+}
+
+/** Toggle a value in multi-select mode; returns the new keyboard state. */
+export async function toggleGrillMulti(
+  value: string,
+): Promise<{ options: { value: string; label: string }[]; selected: string[] } | null> {
+  const state = await readGrillState();
+  if (!state.activeKey || !state.activeOptions?.length) return null;
+  const selected = toggleSelection(state.activeMulti ?? [], value, state.activeOptions);
+  state.activeMulti = selected;
+  await writeGrillState(state);
+  return { options: state.activeOptions, selected };
+}
+
+/**
+ * Commit the multi selection as the answer ("1,3"). Returns the same shape as
+ * applyGrillAnswer so index.ts reuses one resolve path; null when nothing is
+ * selected (the tap is answered with a hint instead).
+ */
+export async function commitGrillMulti(
+  now = Date.now(),
+): Promise<{ note: string; key: string | null; title: string | null; value: string } | null> {
+  const state = await readGrillState();
+  const selected = state.activeMulti ?? [];
+  if (!state.activeKey || selected.length === 0) return null;
+  return applyGrillAnswer(selected.join(','), now);
 }
 
 /**
@@ -380,6 +519,8 @@ export async function resolveGrillByReply(
   state.activeTitle = null;
   state.activeKind = null;
   state.activeMessageId = null;
+  state.activeOptions = null;
+  state.activeMulti = null;
   await writeGrillState(state);
   return { key, kind, title, value: replyText };
 }

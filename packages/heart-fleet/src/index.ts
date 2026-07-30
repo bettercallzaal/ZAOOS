@@ -24,3 +24,11 @@ export {
 export { MemoryLeaseStore } from './memory-store';
 export { SupabaseLeaseStore, type SupabaseLikeClient } from './supabase-store';
 export { canonicalize, sha256Hex, deterministicResourceId } from './canonical';
+export {
+  DurableEffectLedger,
+  type OutboxClient,
+  type EffectChannel,
+  type IntentRow,
+  type DurableEffectLedgerOpts,
+} from './durable-effect-ledger';
+export { sendOnce, effectKey, type SendOnceInput, type SendOnceOutcome } from './outbox';

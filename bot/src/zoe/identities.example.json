@@ -4,16 +4,46 @@
     {
       "brand": "The ZAO",
       "agent": "ZOE",
-      "email": { "inbox": "zoe-zao@agentmail.to", "keyEnv": "AGENTMAIL_API_KEY" },
+      "email": {
+        "inbox": "zoe-zao@agentmail.to",
+        "keyEnv": "AGENTMAIL_API_KEY"
+      },
       "icmBox": "thezao",
-      "personaRef": "human.md"
+      "personaRef": "bot/src/zoe/human.md"
     },
     {
       "brand": "WaveWarZ",
       "agent": "wavewarz-agent",
-      "email": { "inbox": "wavewarz@agentmail.to", "keyEnv": "AGENTMAIL_KEY_WAVEWARZ" },
+      "email": {
+        "inbox": "wavewarz@agentmail.to",
+        "keyEnv": "AGENTMAIL_KEY_WAVEWARZ"
+      },
       "icmBox": "wavewarz",
-      "socials": { "farcaster": "@wavewarz", "x": "@wavewarz" }
+      "socials": {
+        "farcaster": "@wavewarz",
+        "x": "@wavewarz"
+      },
+      "personaRef": "research/identity/personas/wavewarz.persona.md"
+    },
+    {
+      "brand": "ZABAL Games",
+      "agent": "zabalgamez-agent",
+      "email": {
+        "inbox": "zabalgamez@agentmail.to",
+        "keyEnv": "AGENTMAIL_KEY_ZABAL"
+      },
+      "icmBox": "zabalgamez",
+      "personaRef": "research/identity/personas/zabalgamez.persona.md"
+    },
+    {
+      "brand": "Sparkz",
+      "agent": "sparkz-agent",
+      "email": {
+        "inbox": "sparkz@agentmail.to",
+        "keyEnv": "AGENTMAIL_KEY_SPARKZ"
+      },
+      "icmBox": "sparkz",
+      "personaRef": "research/identity/personas/sparkz.persona.md"
     }
   ]
 }

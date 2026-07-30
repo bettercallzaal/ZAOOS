@@ -12,6 +12,8 @@ tier: STANDARD
 
 > **Goal:** Everything Zaal needs for the Saturday (2026-08-01) announcement: the concept locked in one line, every format option on the table with a recommendation, a deployable website page draft, and the announcement copy per platform. Announcement is PUBLIC = Zaal approves and posts; nothing here auto-publishes.
 
+> **REWORKED 2026-07-30 03:20 (Zaal's directive): mentor pairing is the CORE.** See [MENTOR-PAIRING-CORE.md](./MENTOR-PAIRING-CORE.md) in this folder - the headline is now "every July submitter gets a ZAO mentor" (pods for all + live draft day recommended); the announcement copy there SUPERSEDES the versions in announcement-copy.md. The tournament structure below stands as the engine.
+
 ## The concept (one line)
 
 **August is comprised of the July submitters.** Everyone who submitted anything in July - any format, partial counts (per the zabalgamez ICM box) - IS the finals pool. No new application, no gate. July was the open door; August is what the people who walked through it do next.

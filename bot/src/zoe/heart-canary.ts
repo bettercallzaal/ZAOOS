@@ -23,6 +23,7 @@ import {
   DurableEffectLedger,
   executeWithLease,
   sendOnce,
+  reconcileOutbox,
   effectKey,
   deterministicResourceId,
   type SupabaseLikeClient,
@@ -82,6 +83,15 @@ async function runOutboxDemo(
       toExternalRef: (r) => ({ message_id: r.message_id ?? null }),
     });
     console.log(`[zoe/heart-canary] outbox demo: ${JSON.stringify(outcome.sent ? { sent: true } : outcome)}`);
+    // Defensive reconcile: resolve any dispatched-but-uncommitted rows left by a
+    // prior crash. No probes wired for telegram (it has no 'did I send X' query),
+    // so unknown rows are left/abandoned - never resent (at-most-once). Doc 2145.
+    try {
+      const rec = await reconcileOutbox(ledger());
+      if (rec.scanned > 0) console.log(`[zoe/heart-canary] outbox reconcile: ${JSON.stringify(rec)}`);
+    } catch (e) {
+      console.warn('[zoe/heart-canary] outbox reconcile skipped:', (e as Error)?.message);
+    }
     return outcome.sent ? 'sent' : outcome.reason;
   } catch (err) {
     const msg = (err as Error)?.message ?? String(err);

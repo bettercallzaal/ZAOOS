@@ -44,3 +44,10 @@ export {
   type InstanceStatus,
   type DeadInstanceReclaimSummary,
 } from './liveness';
+export {
+  reconcileOutbox,
+  type ChannelProbe,
+  type ProbeResult,
+  type ReconcileOptions,
+  type ReconcileSummary,
+} from './reconcile';

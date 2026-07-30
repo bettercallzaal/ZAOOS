@@ -34,6 +34,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
+import { sendChunkedToTelegram } from './tg-chunk';
 import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
@@ -708,7 +709,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         if (!gid) return; // not configured
         if (!process.env.OPENROUTER_API_KEY?.trim()) return; // scout needs the cheap model
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
-        await runRepoImproverTick((text: string) => opts.bot.api.sendMessage(gid, text).then(() => {}));
+        // Chunk the send: audits routinely exceed Telegram's 4096-char limit and
+        // were getting truncated mid-sentence (tg-chunk.ts). Never raw-send long text.
+        await runRepoImproverTick((text: string) =>
+          sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text),
+        );
       },
       { timezone: 'UTC' },
     ),

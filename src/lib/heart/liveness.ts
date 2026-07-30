@@ -23,6 +23,11 @@ import type {
   InstanceStatus,
   DeadInstanceReclaimSummary,
 } from './types';
+import {
+  LivenessReclaimer,
+  type LivenessStore,
+  type AgentInstanceRow as PkgInstanceRow,
+} from '../../../packages/heart-fleet/src/index';
 
 // Lazy admin client, same pattern as lease-manager (tests never touch the DB).
 let _getSupabaseAdmin: (() => any) | null = null;
@@ -36,6 +41,53 @@ function getSupabaseAdmin() {
     throw new Error('Supabase admin client not initialized. Test-context only.');
   }
   return _getSupabaseAdmin();
+}
+
+/**
+ * SupabaseLivenessStore - adapts getSupabaseAdmin() to the shared package's
+ * LivenessStore, so reclaimDeadInstanceRuns delegates to the ONE ported
+ * LivenessReclaimer (doc 2149). The query shapes are identical to what this
+ * module did by hand; injectable for tests.
+ */
+class SupabaseLivenessStore implements LivenessStore {
+  now(): Date {
+    return new Date();
+  }
+  async liveInstances(): Promise<PkgInstanceRow[]> {
+    const { data, error } = await getSupabaseAdmin().from('agent_instances').select('*').neq('status', 'dead');
+    if (error) throw new Error(error.message);
+    return (data ?? []) as PkgInstanceRow[];
+  }
+  async markInstancesDead(ids: string[]): Promise<void> {
+    await getSupabaseAdmin().from('agent_instances').update({ status: 'dead' as InstanceStatus }).in('instance_id', ids);
+  }
+  async runsOwnedBy(ownerIds: string[], limit: number): Promise<AgentRunRow[]> {
+    const { data, error } = await getSupabaseAdmin()
+      .from('agent_runs')
+      .select('*')
+      .in('status', ['leased', 'running'] as RunStatus[])
+      .in('lease_owner', ownerIds)
+      .limit(limit);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as AgentRunRow[];
+  }
+  async reclaimRun(runId: string, expectedOwner: string, retries: number): Promise<boolean> {
+    const { data, error } = await getSupabaseAdmin()
+      .from('agent_runs')
+      .update({
+        status: 'ready' as RunStatus,
+        lease_owner: null,
+        lease_expires_at: null,
+        retries,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', runId)
+      .eq('lease_owner', expectedOwner) // still owned by the dead instance
+      .select('id')
+      .single();
+    if (error || !data) return false;
+    return true;
+  }
 }
 
 /** Default liveness TTL: an instance silent this long is presumed dead. */
@@ -158,78 +210,23 @@ export async function drainInstance(instanceId: string): Promise<void> {
 export async function reclaimDeadInstanceRuns(options?: {
   ttlMs?: number;
   maxReclaimsPerCycle?: number;
+  store?: LivenessStore;
 }): Promise<DeadInstanceReclaimSummary> {
   const ttlMs = options?.ttlMs ?? DEFAULT_LIVENESS_TTL_MS;
   const maxReclaims = options?.maxReclaimsPerCycle ?? 200;
-  const db = getSupabaseAdmin();
-  const now = new Date();
-  const summary: DeadInstanceReclaimSummary = {
-    deadInstanceIds: [],
-    reclaimedCount: 0,
-    reclaimedIds: [],
-    errors: [],
-  };
 
   try {
-    const { data: instances, error: instErr } = await db
-      .from('agent_instances')
-      .select('*')
-      .neq('status', 'dead');
-    if (instErr) {
-      summary.errors.push({ id: 'instances', error: instErr.message });
-      return summary;
-    }
-
-    const dead = deadInstanceIds((instances ?? []) as AgentInstanceRow[], now, ttlMs);
-    if (dead.length === 0) return summary;
-    summary.deadInstanceIds = dead;
-
-    // Mark the dead instances dead (best-effort; reclaim proceeds regardless).
-    await db
-      .from('agent_instances')
-      .update({ status: 'dead' as InstanceStatus })
-      .in('instance_id', dead);
-
-    const { data: runs, error: runErr } = await db
-      .from('agent_runs')
-      .select('*')
-      .in('status', RECLAIMABLE_STATUSES as RunStatus[])
-      .in('lease_owner', dead)
-      .limit(maxReclaims);
-    if (runErr) {
-      summary.errors.push({ id: 'runs', error: runErr.message });
-      return summary;
-    }
-
-    for (const run of (runs ?? []) as AgentRunRow[]) {
-      try {
-        const { data: updated, error: updErr } = await db
-          .from('agent_runs')
-          .update({
-            status: 'ready' as RunStatus,
-            lease_owner: null,
-            lease_expires_at: null,
-            retries: (run.retries ?? 0) + 1,
-            updated_at: now.toISOString(),
-          })
-          .eq('id', run.id)
-          .eq('lease_owner', run.lease_owner) // still owned by the dead instance
-          .select('id')
-          .single();
-        if (updErr || !updated) {
-          summary.errors.push({ id: run.id, error: updErr?.message ?? 'no rows (re-leased)' });
-        } else {
-          summary.reclaimedIds.push(run.id);
-        }
-      } catch (err: unknown) {
-        summary.errors.push({ id: run.id, error: err instanceof Error ? err.message : String(err) });
-      }
-    }
-
-    summary.reclaimedCount = summary.reclaimedIds.length;
-    return summary;
+    // Delegate to the shared LivenessReclaimer (packages/heart-fleet) - the ONE
+    // dead-instance reclaim implementation. Same query shapes, same
+    // conditional-update guard (a run re-leased mid-reclaim is not clobbered).
+    const reclaimer = new LivenessReclaimer({ store: options?.store ?? new SupabaseLivenessStore(), ttlMs });
+    return await reclaimer.reclaimDeadInstanceRuns({ maxReclaimsPerCycle: maxReclaims });
   } catch (err: unknown) {
-    summary.errors.push({ id: 'exception', error: err instanceof Error ? err.message : String(err) });
-    return summary;
+    return {
+      deadInstanceIds: [],
+      reclaimedCount: 0,
+      reclaimedIds: [],
+      errors: [{ id: 'exception', error: err instanceof Error ? err.message : String(err) }],
+    };
   }
 }

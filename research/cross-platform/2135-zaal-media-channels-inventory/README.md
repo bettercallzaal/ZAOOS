@@ -20,7 +20,7 @@ tier: DEEP
 | 2 | **One archive, not scattered.** External drive (already partial: ZUSB backed up to SANDISK, task 1279) + Arweave/permaweb for the ZAO-canon ones (whitepaper task 579 already targets permaweb). Local recordings + Spaces `.mp4`s + downloaded VODs land there, indexed. | Turns "am I losing content everywhere?" into "it's all in one backed-up place." Ties to the second-brain (doc 606). | @Zaal |
 | 3 | **Repurpose through ONE pipeline: `zaalclip` + Postiz.** You're already building it (tasks 939/940/1092/1093). One stream -> clips fanned to TikTok/IG Reels/YT Shorts/X. Don't build per-platform; finish the one router. | Firefly (team cross-poster) + Postiz + Livepeer/FlowStage are all in-flight. Consolidating on `zaalclip` avoids N half-built posters. Matches `[[feedback_firefly_only]]`. | @Zaal |
 | 4 | **Fix the two account-integrity leaks now (cheap, time-sensitive):** the X @bettercallzaal display name (task 1090, deadline already passed 2026-07-20) and the squatted @wavewarz Instagram (task 1091, @wavewarsmusic). | Brand/handle integrity - a squatted handle + a wrong display name cost discoverability (ties to the GEO priority, task 724). Both are quick decisions, not builds. | @Zaal |
-| 5 | **Farcaster is home; everything else is distribution.** Post native to Farcaster (@bettercallzaal + /zao channel), auto-fan everything else. Don't treat 13 platforms as 13 first-class homes. | You already live on Farcaster (zaalcaster is the whole thesis). One source, many mirrors, per the ICM-grounding "generate outward" model. | @Zaal |
+| 5 | **Farcaster is home; everything else is distribution.** Post native to Farcaster (@zaal + /zao channel), auto-fan everything else. Don't treat 13 platforms as 13 first-class homes. | You already live on Farcaster (zaalcaster is the whole thesis). One source, many mirrors, per the ICM-grounding "generate outward" model. | @Zaal |
 
 ## The full channel inventory
 
@@ -31,7 +31,7 @@ tier: DEEP
 | **TikTok** | @zaoconcertz | NOT CREATED | (planned clipping account) | Create (1087) + Postiz (1093) |
 | **Instagram** | @zaoconcertz (planned); **@wavewarz SQUATTED** | PARTLY BLOCKED | (planned Reels clip account) | Create @zaoconcertz (1088); @wavewarz taken by @wavewarsmusic - DECISION (1091) |
 | **X / Twitter** | [@bettercallzaal](https://x.com/bettercallzaal) (+ @zaal, verify) | ACTIVE | posts, casts cross-posted, Spaces | Fix display name (1090, overdue); X longform drafts parked (611); Firefly cross-poster |
-| **Farcaster** | @bettercallzaal + /zao channel + @thezao | PRIMARY | casts, zaalcaster, the home base | Healthy - this is home |
+| **Farcaster** | **@zaal** (personal) + /zao channel + @thezao (org) | PRIMARY | casts, zaalcaster, the home base | Healthy - this is home |
 | **Audius** | (account TBD) | DORMANT | music | "add music to audius" (598) |
 | **Twitter Spaces** | via @bettercallzaal | ACTIVE (recorded) | `space_*.mp4` recordings on Mac | Songjam fork -> zaoos.com spaces (672); SongJam audio extension |
 | **LinkedIn** | ZAO Festivals page | LOW-USE | event promo | Post ZAOstock promo (1249); Yulia cross-share |

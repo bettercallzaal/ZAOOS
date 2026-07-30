@@ -32,3 +32,15 @@ export {
   type DurableEffectLedgerOpts,
 } from './durable-effect-ledger';
 export { sendOnce, effectKey, type SendOnceInput, type SendOnceOutcome } from './outbox';
+export {
+  LivenessReclaimer,
+  isInstanceExpired,
+  deadInstanceIds,
+  runsLeasedToDeadInstances,
+  DEFAULT_LIVENESS_TTL_MS,
+  type LivenessStore,
+  type LivenessOptions,
+  type AgentInstanceRow,
+  type InstanceStatus,
+  type DeadInstanceReclaimSummary,
+} from './liveness';

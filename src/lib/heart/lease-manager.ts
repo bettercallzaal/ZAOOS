@@ -10,6 +10,26 @@
 
 import { z } from 'zod';
 import type { RunStatus, AgentRunRow, LeaseAcquisitionResult, ExpiredLeaseRecoverySummary } from './types';
+import {
+  HeartFleet,
+  SupabaseLeaseStore,
+  type LeaseStore,
+  type SupabaseLikeClient,
+} from '../../../packages/heart-fleet/src/index';
+
+/**
+ * Build a HeartFleet over the shared lease core (packages/heart-fleet). This is
+ * the ONE lease implementation; acquireLease + reclaimExpiredLeases delegate to
+ * it. `maxRetries: Infinity` preserves this module's historical behavior of
+ * re-readying an expired lease forever (the package would otherwise QUARANTINE
+ * at a ceiling - that stricter behavior is the deliberate Option-B follow-up,
+ * doc 2149, gated behind the canary; NOT changed here). A `store` may be
+ * injected for tests; production wraps the Supabase admin client.
+ */
+function buildFleet(store?: LeaseStore): HeartFleet {
+  const leaseStore = store ?? new SupabaseLeaseStore(getSupabaseAdmin() as unknown as SupabaseLikeClient);
+  return new HeartFleet({ store: leaseStore, maxRetries: Number.POSITIVE_INFINITY });
+}
 
 // Import Supabase admin client for production use.
 // Tests use FakeAgentRunsStore and don't call these async functions.
@@ -115,6 +135,7 @@ export function canAcquire(run: AgentRunRow, now: Date | string): boolean {
  */
 export async function acquireLease(
   input: unknown,
+  opts?: { store?: LeaseStore },
 ): Promise<LeaseAcquisitionResult> {
   const parsed = AcquireLeaseInputSchema.safeParse(input);
   if (!parsed.success) {
@@ -126,102 +147,13 @@ export async function acquireLease(
   }
 
   const { runId, owner, ttlSeconds } = parsed.data;
-  const db = getSupabaseAdmin();
-  const now = new Date();
-  const leaseExpiresAt = new Date(now.getTime() + ttlSeconds * 1000).toISOString();
 
   try {
-    // Fetch current run to check its state
-    const { data: currentRun, error: fetchError } = await db
-      .from('agent_runs')
-      .select('*')
-      .eq('id', runId)
-      .single();
-
-    if (fetchError || !currentRun) {
-      return {
-        acquired: false,
-        run: null,
-        reason: `Run not found: ${fetchError?.message ?? 'unknown error'}`,
-      };
-    }
-
-    const run = currentRun as AgentRunRow;
-
-    // Check if we can acquire this run
-    if (!canAcquire(run, now)) {
-      return {
-        acquired: false,
-        run,
-        reason: `Cannot acquire: run status is '${run.status}' and lease is not expired`,
-      };
-    }
-
-    // Atomic conditional UPDATE: only succeed if status matches expected value
-    // For ready: update from ready to leased
-    // For leased/running with expired lease: update but only if the lease is expired
-    let updateResult;
-
-    if (run.status === 'ready') {
-      const { data: updated, error } = await db
-        .from('agent_runs')
-        .update({
-          lease_owner: owner,
-          lease_expires_at: leaseExpiresAt,
-          status: 'leased' as RunStatus,
-          updated_at: now.toISOString(),
-        })
-        .eq('id', runId)
-        .eq('status', 'ready')
-        .select('*')
-        .single();
-
-      updateResult = { data: updated, error };
-    } else if ((run.status === 'leased' || run.status === 'running') && isLeaseExpired(run, now)) {
-      // Lease is expired; try to reclaim it
-      const { data: updated, error } = await db
-        .from('agent_runs')
-        .update({
-          lease_owner: owner,
-          lease_expires_at: leaseExpiresAt,
-          status: 'leased' as RunStatus,
-          updated_at: now.toISOString(),
-        })
-        .eq('id', runId)
-        .eq('status', run.status)
-        .eq('lease_expires_at', run.lease_expires_at) // Ensure lease hasn't been renewed
-        .select('*')
-        .single();
-
-      updateResult = { data: updated, error };
-    } else {
-      return {
-        acquired: false,
-        run,
-        reason: `Unexpected state: cannot determine acquisition path`,
-      };
-    }
-
-    if (updateResult.error) {
-      return {
-        acquired: false,
-        run,
-        reason: `Update failed: ${updateResult.error.message}`,
-      };
-    }
-
-    if (!updateResult.data) {
-      return {
-        acquired: false,
-        run,
-        reason: `Collision: another owner beat this request to the lease`,
-      };
-    }
-
-    return {
-      acquired: true,
-      run: updateResult.data as AgentRunRow,
-    };
+    // Delegate to the shared lease core. Its acquire does the same
+    // fetch-then-conditional-UPDATE (ready OR expired-takeover on exact
+    // expiry) this module did by hand - one implementation now.
+    const result = await buildFleet(opts?.store).acquire(runId, owner, ttlSeconds);
+    return { acquired: result.acquired, run: result.run, reason: result.reason };
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     return {
@@ -331,75 +263,22 @@ export async function releaseLease(input: unknown): Promise<AgentRunRow | null> 
  * @returns Summary of reclaimed runs and any errors
  */
 export async function reclaimExpiredLeases(
-  options?: { maxReclaimsPerCycle?: number },
+  options?: { maxReclaimsPerCycle?: number; store?: LeaseStore },
 ): Promise<ExpiredLeaseRecoverySummary> {
   const maxReclaims = options?.maxReclaimsPerCycle ?? 100;
-  const db = getSupabaseAdmin();
-  const now = new Date();
 
   try {
-    // Step 1: Find expired leases
-    const { data: expiredRuns, error: fetchError } = await db
-      .from('agent_runs')
-      .select('*')
-      .in('status', ['leased', 'running'] as RunStatus[])
-      .lt('lease_expires_at', now.toISOString())
-      .limit(maxReclaims);
-
-    if (fetchError) {
-      return {
-        reclaimedCount: 0,
-        reclaimedIds: [],
-        errors: [{ runId: 'unknown', error: `Fetch error: ${fetchError.message}` }],
-      };
-    }
-
-    if (!expiredRuns || expiredRuns.length === 0) {
-      return {
-        reclaimedCount: 0,
-        reclaimedIds: [],
-        errors: [],
-      };
-    }
-
-    const reclaimedIds: string[] = [];
-    const errors: Array<{ runId: string; error: string }> = [];
-
-    // Step 2: Reset each expired run
-    for (const run of expiredRuns as AgentRunRow[]) {
-      try {
-        const { data: updated, error: updateError } = await db
-          .from('agent_runs')
-          .update({
-            status: 'ready' as RunStatus,
-            lease_owner: null,
-            lease_expires_at: null,
-            retries: (run.retries ?? 0) + 1,
-            updated_at: now.toISOString(),
-          })
-          .eq('id', run.id)
-          .eq('lease_expires_at', run.lease_expires_at) // Ensure lease hasn't been renewed
-          .select('id')
-          .single();
-
-        if (updateError || !updated) {
-          errors.push({
-            runId: run.id,
-            error: updateError?.message ?? 'No rows updated (collision)',
-          });
-        } else {
-          reclaimedIds.push(run.id);
-        }
-      } catch (error: unknown) {
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        errors.push({ runId: run.id, error: errorMsg });
-      }
-    }
-
+    // Delegate to the shared lease core. It finds expired leases the same way
+    // (status in leased/running, lease_expires_at < now) and resets each with a
+    // conditional UPDATE on the exact expiry. maxRetries: Infinity (buildFleet)
+    // means it NEVER quarantines - identical to this module's historical
+    // re-ready-and-increment behavior. quarantinedIds is therefore always empty
+    // and dropped to preserve the exact ExpiredLeaseRecoverySummary shape.
+    const summary = await buildFleet(options?.store).reclaimExpired({ limit: maxReclaims });
     return {
-      reclaimedCount: reclaimedIds.length,
-      reclaimedIds,
-      errors,
+      reclaimedCount: summary.reclaimedCount,
+      reclaimedIds: summary.reclaimedIds,
+      errors: summary.errors,
     };
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error);

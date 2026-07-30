@@ -12,7 +12,7 @@ tier: STANDARD
 
 > **Goal:** Everything Zaal needs for the Saturday (2026-08-01) announcement: the concept locked in one line, every format option on the table with a recommendation, a deployable website page draft, and the announcement copy per platform. Announcement is PUBLIC = Zaal approves and posts; nothing here auto-publishes.
 
-> **REWORKED 2026-07-30 03:20 (Zaal's directive): mentor pairing is the CORE.** See [MENTOR-PAIRING-CORE.md](./MENTOR-PAIRING-CORE.md) in this folder - the headline is now "every July submitter gets a ZAO mentor" (pods for all + live draft day recommended); the announcement copy there SUPERSEDES the versions in announcement-copy.md. The tournament structure below stands as the engine.
+> **REWORKED 2026-07-30 03:20 (Zaal's directive): mentor pairing is the CORE.** See [MENTOR-PAIRING-CORE.md](./MENTOR-PAIRING-CORE.md) in this folder - the headline is now "every July submitter gets a ZAO mentor" (pods for all + live draft day recommended); the announcement copy there SUPERSEDES announcement-copy.md. FINAL DECISION 2026-07-30: pods YES, live-draft NO - the DEFINITIVE Saturday copy is FINAL-SATURDAY-COPY.md. The tournament structure below stands as the engine.
 
 ## The concept (one line)
 

@@ -23,6 +23,8 @@ import { ControlPlane } from '@/lib/control-plane';
 import type { HealthReport, OrganRegistration, OrganStatus } from '@/lib/control-plane';
 import { Memory } from '@/lib/memory';
 import type { VacuumSpike } from '@/lib/bloodstream';
+import { ReceiptEmitter } from '@/lib/spore/receipt-emitter';
+import type { PortableReceipt } from '@/lib/spore';
 
 export interface OrganismOptions {
   /** Clock - injectable for deterministic tests. */
@@ -33,6 +35,10 @@ export interface OrganismOptions {
   bloodstream?: BloodstreamOptions;
   /** Options for the default Coinbase spike when none is provided. */
   coinbase?: CoinbaseSpikeOptions;
+  /** Receipt issuer identity. Default 'organism:zao:main'. */
+  receiptIssuer?: string;
+  /** Durable/transport sink for emitted receipts (in-memory ring regardless). */
+  onReceipt?: (receipt: PortableReceipt) => void | Promise<void>;
 }
 
 export interface TickResult {
@@ -48,6 +54,8 @@ export interface Organism {
   readonly controlPlane: ControlPlane;
   readonly bloodstream: Bloodstream;
   readonly memory: Memory;
+  /** Every distributed Observation leaves as portable, verifiable evidence. */
+  readonly receipts: ReceiptEmitter;
   /** Pull -> circulate -> store -> heartbeat -> snapshot. One heartbeat of life. */
   runTick(): Promise<TickResult>;
   snapshot(): ReturnType<ControlPlane['snapshot']>;
@@ -82,6 +90,12 @@ export function assembleOrganism(opts: OrganismOptions = {}): Organism {
   // Memory subscribes to the Bloodstream - every distributed Observation is stored.
   bloodstream.subscribe({ id: 'memory', kinds: [], deliver: (obs) => memory.record(obs) });
 
+  // Phase 2 in the live path: every distributed Observation also emits a
+  // portable dreamnet.receipt.v1 (Phase 3-conformant), so the organism's
+  // perception is externally verifiable evidence by default (doc 2138).
+  const receipts = new ReceiptEmitter({ issuer: opts.receiptIssuer ?? 'organism:zao:main', onReceipt: opts.onReceipt, now });
+  bloodstream.subscribe(receipts.subscriber());
+
   // Register the organs so the organism can discover + health-check itself.
   const registrations: OrganRegistration[] = [
     {
@@ -94,6 +108,17 @@ export function assembleOrganism(opts: OrganismOptions = {}): Organism {
       endpoints: [{ name: 'circulate', address: 'internal:bloodstream', protocol: 'internal' }],
       secrets: [],
       health: stamp('starting', { spikes: 1 }),
+    },
+    {
+      organId: 'receipts',
+      name: 'Receipt Emitter (portable evidence)',
+      version: VERSION,
+      layer: 'data',
+      capabilities: [{ name: 'receipt.v1.emit', version: '1', description: 'emits dreamnet.receipt.v1 per observation' }],
+      dependencies: ['bloodstream'],
+      endpoints: [{ name: 'recent', address: 'internal:receipts', protocol: 'internal' }],
+      secrets: [],
+      health: stamp('starting', { emitted: 0 }),
     },
     {
       organId: 'memory',
@@ -119,6 +144,13 @@ export function assembleOrganism(opts: OrganismOptions = {}): Organism {
       deduped: bloodMetrics.deduped,
     }));
 
+    const rm = receipts.metrics();
+    controlPlane.heartbeat('receipts', stamp(rm.sinkErrors > 0 ? 'degraded' : 'healthy', {
+      emitted: rm.emitted,
+      buffered: rm.buffered,
+      sinkErrors: rm.sinkErrors,
+    }));
+
     const mem = memory.snapshot();
     controlPlane.heartbeat('memory', stamp(mem.status, {
       records: mem.total,
@@ -138,6 +170,7 @@ export function assembleOrganism(opts: OrganismOptions = {}): Organism {
     controlPlane,
     bloodstream,
     memory,
+    receipts,
     runTick,
     snapshot: () => controlPlane.snapshot(),
   };

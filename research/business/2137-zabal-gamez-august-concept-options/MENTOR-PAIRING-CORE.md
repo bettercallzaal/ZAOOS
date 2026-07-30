@@ -1,5 +1,11 @@
 # August rework: MENTOR PAIRING is the core (Zaal, 2026-07-30 03:20)
 
+> **DECIDED 2026-07-30: Option A (pods for all) YES, Option B (live on-stream draft) NO.**
+> Pods are matched by track behind the scenes, no on-camera draft. The FINAL
+> Saturday copy is in `FINAL-SATURDAY-COPY.md` (this folder) - it SUPERSEDES the
+> draft-day copy below. The page draft's hero + mentorship section are updated to
+> match. The mechanism sections below are kept for the record; ignore the live-draft framing.
+
 > Zaal's overnight directive: "make August a way to pair you with a ZAO mentor - mentor being the main goal and idea of this whole ZABAL Gamez." This reframes the README in this folder: the competition structure stays, but it is now the ENGINE for pairing, not the point. The point is: **submit anything in July, and a ZAO mentor builds August with you.**
 
 ## The reframe in one line

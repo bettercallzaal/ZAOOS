@@ -28,13 +28,13 @@ All predate this session's work; none are caused by it (verified by reading each
 
 | Suite | Count | Symptom | Likely cause |
 |-------|-------|---------|--------------|
-| `api/events/create` | 3 | route returns **400** where the test expects 409/201/500 | schema drift - the test fixtures no longer satisfy the route's current Zod schema; the request is rejected at validation before reaching the tested branch |
+| `api/events/create` | 3 (+5 false-pass) | route returned **400** where the test expected 409/201/500 | **FIXED (PR follows):** NOT schema drift - the test called `makePostRequest(valid)` with ONE arg, but the helper signature is `(path, body)`, so `valid` became the URL and the body was undefined -> `json()` empty -> 400. 5 other tests in the file were FALSE-PASSING (200/403 for the wrong reason). Route proven correct (returns 201) with a proper call. Fix: pass the path arg to all 8 calls. |
 | `api/streaks` (GET) | 1 | `isActiveToday`/`isAtRisk` mismatch | date-dependent: computed against the real wall clock, not a frozen one |
 | `api/streaks/record` | 2 | "same-day re-record" branch not taken | date-dependent: "today" comparison drifts with the real date |
 | `api/music/history` | 1 | "filters last_played_at for today" wrong bound | date-dependent: same "today" window drift |
 | `api/livepeer/clip` | 1 | "unique default names on successive calls" | FLAKY: `Date.now()`-based default name collides when two calls land in the same ms (passed on one of two runs) |
 
-Two clean fix batches for a focused session: (a) the 4 date-dependent suites want an injected/frozen clock (they assert "today" against `new Date()`); (b) the events/create fixtures need re-aligning to the current schema (or the schema tightened intentionally and the fixtures were never updated).
+events/create is FIXED (helper-signature drift, proven route-correct). The remaining 4 date-dependent suites (streaks x2, streaks/record, music/history) use the helper correctly and are genuine date/timezone issues - they want an injected/frozen clock and a careful read of the route's "today" computation (a blind fix could mask a real TZ off-by-one), so they stay for a focused session. livepeer's "unique default names" is a Date.now() collision in the route, inherently flaky.
 
 ## Why this PR does NOT fix those 8
 

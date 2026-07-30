@@ -43,29 +43,29 @@ beforeEach(() => {
 describe('POST /api/events/create', () => {
   it('403s when not admin', async () => {
     mockGetSessionData.mockResolvedValue({ fid: 123, isAdmin: false });
-    const res = await POST(makePostRequest(valid));
+    const res = await POST(makePostRequest('/api/events/create', valid));
     expect(res.status).toBe(403);
   });
 
   it('403s when unauthenticated', async () => {
     mockGetSessionData.mockResolvedValue(null);
-    const res = await POST(makePostRequest(valid));
+    const res = await POST(makePostRequest('/api/events/create', valid));
     expect(res.status).toBe(403);
   });
 
   it('400s on invalid input (bad slug)', async () => {
-    const res = await POST(makePostRequest({ ...valid, slug: 'Bad Slug!' }));
+    const res = await POST(makePostRequest('/api/events/create', { ...valid, slug: 'Bad Slug!' }));
     expect(res.status).toBe(400);
   });
 
   it('400s when title is missing', async () => {
-    const res = await POST(makePostRequest({ slug: 'x', is_published: false }));
+    const res = await POST(makePostRequest('/api/events/create', { slug: 'x', is_published: false }));
     expect(res.status).toBe(400);
   });
 
   it('409s on a duplicate slug', async () => {
     mockFrom.mockReturnValue(queuedChain([{ data: { id: 'existing-uuid' } }]));
-    const res = await POST(makePostRequest(valid));
+    const res = await POST(makePostRequest('/api/events/create', valid));
     expect(res.status).toBe(409);
   });
 
@@ -76,7 +76,7 @@ describe('POST /api/events/create', () => {
         { data: { id: 'new-uuid', slug: valid.slug, title: valid.title, is_published: true } },
       ]),
     );
-    const res = await POST(makePostRequest(valid));
+    const res = await POST(makePostRequest('/api/events/create', valid));
     expect(res.status).toBe(201);
     const json = await res.json();
     expect(json.ok).toBe(true);
@@ -87,12 +87,12 @@ describe('POST /api/events/create', () => {
     mockFrom.mockReturnValue(
       queuedChain([{ data: null }, { error: { message: 'db down' } }]),
     );
-    const res = await POST(makePostRequest(valid));
+    const res = await POST(makePostRequest('/api/events/create', valid));
     expect(res.status).toBe(500);
   });
 
   it('rejects a bad lock_address', async () => {
-    const res = await POST(makePostRequest({ ...valid, lock_address: 'nope' }));
+    const res = await POST(makePostRequest('/api/events/create', { ...valid, lock_address: 'nope' }));
     expect(res.status).toBe(400);
   });
 });

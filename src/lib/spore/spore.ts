@@ -6,12 +6,12 @@
  * field set {kind, subjectKey, payload}. The tag is stamped as a prefix so a
  * consumer on either side knows exactly how to reproduce it.
  *
- * IMPORTANT (conformance): byte-identical cross-organism hashing requires that
- * BOTH sides serialize numbers + strings identically and hash the SAME fields.
- * ZAO and the Spore SDK both use sorted-json today, but the byte-exactness must
- * be proven against the SDK's own conformance vectors (see the __tests__ note).
- * Until that passes against Brandon's repo, treat cross-org matches as expected
- * but unverified.
+ * Conformance status: PROVEN bidirectionally against the public SDK
+ * (BrandonDucar/dreamnet-spore-sdk, pinned 4072102) - byte-identical canonical
+ * serialization, identical subject hashes, identical receipt digests, tamper +
+ * unsupported-schema rejection. Permanent vectors:
+ * `__tests__/fixtures/cross-runtime-vectors.json` (DreamNet-runtime-generated);
+ * executable gate: `npx tsx scripts/spore-conformance.ts`.
  */
 
 import { canonicalize, sha256Hex } from '@/lib/eyes';

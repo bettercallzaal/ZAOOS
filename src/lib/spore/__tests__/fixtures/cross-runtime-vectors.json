@@ -1,0 +1,204 @@
+{
+  "_meta": {
+    "generator": "DreamNet spore-sdk (dreamnet-spore-sdk)",
+    "sdkCommit": "4072102ace9c4ccf1dda40302f685ac5d8e01268",
+    "generatedAt": "2026-07-30T00:00:00.000Z",
+    "note": "Every dreamnet* value in this file was produced by executing SDK code at the pinned commit. Do not edit values - they are the cross-org contract."
+  },
+  "canonicalization": [
+    {
+      "name": "phase1-golden",
+      "input": {
+        "z": 100,
+        "a": "dreamnet-spore",
+        "m": {
+          "b": true,
+          "a": null
+        }
+      },
+      "dreamnetCanonicalJson": "{\"a\":\"dreamnet-spore\",\"m\":{\"a\":null,\"b\":true},\"z\":100}",
+      "dreamnetSha256": "6b560a8869530ac60f9d3795e55d04240d237010140502f8f7a768d190de013a"
+    },
+    {
+      "name": "simple-sort",
+      "input": {
+        "b": 2,
+        "a": 1
+      },
+      "dreamnetCanonicalJson": "{\"a\":1,\"b\":2}",
+      "dreamnetSha256": "43258cff783fe7036d8a43033f830adfc60ec037382473548ac742b888292777"
+    },
+    {
+      "name": "nested-sort-arrays",
+      "input": {
+        "z": [
+          3,
+          2,
+          1
+        ],
+        "a": {
+          "y": "test",
+          "x": true
+        }
+      },
+      "dreamnetCanonicalJson": "{\"a\":{\"x\":true,\"y\":\"test\"},\"z\":[3,2,1]}",
+      "dreamnetSha256": "462eef214fd615c2687f8959ab7ede89c62cf4f2f3dcd5cb01097015737f9938"
+    },
+    {
+      "name": "undefined-omission",
+      "input": {
+        "active": true,
+        "list": [
+          1,
+          null,
+          3
+        ]
+      },
+      "dreamnetCanonicalJson": "{\"active\":true,\"list\":[1,null,3]}",
+      "dreamnetSha256": "fde122458e9787b46712d0467d5ccc732f8bf6b0ada34f7648b9daa7d41ab388"
+    },
+    {
+      "name": "integer-like-keys",
+      "input": {
+        "2": 4,
+        "10": 3,
+        "B": 1,
+        "a": 2,
+        "_z": 5
+      },
+      "dreamnetCanonicalJson": "{\"10\":3,\"2\":4,\"B\":1,\"_z\":5,\"a\":2}",
+      "dreamnetSha256": "e9e4735773c21ac5ecfa6ab3bd29a28038e24c68980c0e4cd693a4995f60dc2e"
+    },
+    {
+      "name": "unicode-escapes",
+      "input": {
+        "käy": "väl\"ue\n\t",
+        "emoji": "x"
+      },
+      "dreamnetCanonicalJson": "{\"emoji\":\"x\",\"käy\":\"väl\\\"ue\\n\\t\"}",
+      "dreamnetSha256": "e93527685df386164c9b22b222e3171ffb87477b4032e3ccc0e43d93795c5568"
+    },
+    {
+      "name": "numbers",
+      "input": {
+        "a": 0,
+        "b": 1.5,
+        "c": 1e+21,
+        "d": -3,
+        "e": 0.1,
+        "f": 9007199254740991
+      },
+      "dreamnetCanonicalJson": "{\"a\":0,\"b\":1.5,\"c\":1e+21,\"d\":-3,\"e\":0.1,\"f\":9007199254740991}",
+      "dreamnetSha256": "5117f8234bfe2e31547c760aff094776b493a2d5f2064436ccc49bcecc5317ff"
+    },
+    {
+      "name": "null-empty",
+      "input": {
+        "a": null,
+        "b": [
+          null,
+          null
+        ],
+        "c": {},
+        "d": []
+      },
+      "dreamnetCanonicalJson": "{\"a\":null,\"b\":[null,null],\"c\":{},\"d\":[]}",
+      "dreamnetSha256": "1097c7baae8b823288b1d0d077f6bae8dcde93c6742609b5299f7f8d55dba74e"
+    },
+    {
+      "name": "deep-nesting",
+      "input": {
+        "d": {
+          "c": {
+            "b": {
+              "a": [
+                {
+                  "z": 1,
+                  "y": 2
+                }
+              ]
+            }
+          }
+        }
+      },
+      "dreamnetCanonicalJson": "{\"d\":{\"c\":{\"b\":{\"a\":[{\"y\":2,\"z\":1}]}}}}",
+      "dreamnetSha256": "72deae4a60a155f3e5f94fd802262b87f785b9d74895e2bcec867146dc33d78a"
+    },
+    {
+      "name": "top-level-array",
+      "input": [
+        {
+          "b": 1,
+          "a": 2
+        },
+        3
+      ],
+      "dreamnetCanonicalJson": "[{\"a\":2,\"b\":1},3]",
+      "dreamnetSha256": "a364f9c3f3fe507574d20ea35c619cdf05815968d51aa534641810fcd62f0d79"
+    }
+  ],
+  "failClosed": [
+    {
+      "label": "NaN",
+      "threw": true,
+      "message": "Canonical JSON Error: Non-finite number NaN cannot be serialized."
+    },
+    {
+      "label": "Infinity",
+      "threw": true,
+      "message": "Canonical JSON Error: Non-finite number Infinity cannot be serialized."
+    },
+    {
+      "label": "-Infinity",
+      "threw": true,
+      "message": "Canonical JSON Error: Non-finite number -Infinity cannot be serialized."
+    }
+  ],
+  "dreamnetArtifact": {
+    "schemaVersion": "proof-artifact.v1",
+    "artifactId": "proof_phase3_conformance_001",
+    "creatorId": "dreamnet_reference_worker",
+    "artifactType": "ZAO_PROOF_DROP",
+    "evidenceData": {
+      "task": "phase3-cross-runtime-verification",
+      "z": 100,
+      "a": "dreamnet-spore",
+      "m": {
+        "b": true,
+        "a": null
+      }
+    },
+    "contentHash": "969ddea2fd401f463ae69e0267ec0c618fce485fb6527361d70bcdb5d8438e24",
+    "signature": "sig_dreamnet_reference",
+    "createdIso": "2026-07-30T00:00:00.000Z"
+  },
+  "dreamnetReceipt": {
+    "schemaVersion": "receipt.v1",
+    "receiptId": "3d3a55b6-0000-4000-8000-000000000001",
+    "issuerId": "organism:dreamnet:reference",
+    "subjectHash": "ed6b4bc66e9395fbe7204e568d708bf102cce167c9a5e62bbb560559264cf08e",
+    "timestamp": "2026-07-30T00:00:00.000Z",
+    "digest": "97e07016284eb155d7f3a5bf82f0da55b5d4a19f70f47d72f37e2e297b30a7b5"
+  },
+  "dreamnetReceiptSubject": {
+    "kind": "market.price",
+    "subjectKey": "asset:BTC-USD",
+    "payload": {
+      "price": 118250.5,
+      "currency": "USD"
+    }
+  },
+  "zaoDirection": {
+    "subject": {
+      "kind": "repo.pr",
+      "subjectKey": "github:bettercallzaal/ZAOOS#2703",
+      "payload": {
+        "state": "merged",
+        "title": "chunk the audit send"
+      }
+    },
+    "issuer": "organism:zao:zoe",
+    "subjectHashByDreamnet": "0cb09a809d83c2ae289fe086e71eb50fc39d0604e8e8e15c4287951e86fb2c68",
+    "digestInputHashByDreamnet": "a799aff0848b588e8e0844bd6efda230f59c237c302cc43225b24d635a282441"
+  }
+}

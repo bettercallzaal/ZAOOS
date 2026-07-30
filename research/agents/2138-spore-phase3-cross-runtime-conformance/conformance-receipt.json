@@ -1,0 +1,53 @@
+{
+  "zaoReceipt": {
+    "schemaVersion": "dreamnet.receipt.v1",
+    "receiptId": "eab80cc4-acdf-456a-aef6-10e7be49cf3a",
+    "spore": {
+      "schemaVersion": "dreamnet.spore.v0",
+      "subjectKey": "spore:phase3:zao<->dreamnet:sdk-4072102",
+      "kind": "federation.conformance",
+      "payload": {
+        "phase": 3,
+        "result": "PASS",
+        "checks": {
+          "total": 47,
+          "passed": 47,
+          "failed": 0
+        },
+        "sdkCommit": "4072102ace9c4ccf1dda40302f685ac5d8e01268",
+        "directions": [
+          "dreamnet->zao",
+          "zao->dreamnet"
+        ],
+        "proven": [
+          "byte-identical canonical serialization (10 vectors)",
+          "identical sha256 subject hashes",
+          "identical receipt digests (recomputed by DreamNet primitives)",
+          "tamper rejection: issuer/payload/subjectHash/digest",
+          "unsupported-schema fails closed",
+          "non-finite numbers fail closed"
+        ],
+        "claim": "ZAO is the first independently-operated conformant Spore node at the hash and receipt layers"
+      },
+      "contentHash": "sha256:dreamnet-sorted-json:v0:4e43e7b8d72fc568e7a97d5c672e9ed81729d6a9852a631e8d5d4789abd01080",
+      "hashAlg": "sha256:dreamnet-sorted-json:v0",
+      "source": "sensor:conformance-runner",
+      "capturedAt": "2026-07-30T04:40:00.000Z"
+    },
+    "issuer": "organism:zao:zoe",
+    "issuedAt": "2026-07-30T04:40:00.000Z",
+    "provenance": {
+      "method": "observation"
+    },
+    "digest": "sha256:dreamnet-sorted-json:v0:697e5322b7293ed0d4f87f640a469afeb7e6363d2e23d14f644695ef5312879d",
+    "verificationStatus": "unverified"
+  },
+  "dreamnetReceiptV1": {
+    "schemaVersion": "receipt.v1",
+    "receiptId": "eab80cc4-acdf-456a-aef6-10e7be49cf3a",
+    "issuerId": "organism:zao:zoe",
+    "subjectHash": "4e43e7b8d72fc568e7a97d5c672e9ed81729d6a9852a631e8d5d4789abd01080",
+    "timestamp": "2026-07-30T04:40:00.000Z",
+    "digest": "8cb92899cb2d322c651398a1f03ecdc881f8e07bd55adc668d3f7b6eaadce16c"
+  }
+}

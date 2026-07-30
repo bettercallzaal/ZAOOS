@@ -1,0 +1,19 @@
+{
+  "_comment": "Per-brand Identity Kit registry (doc 2155). Copy to a real path and point ZOE_IDENTITIES_PATH at it. NEVER put a key VALUE here - only keyEnv, the NAME of the env var holding that brand's AgentMail key. Values live in the environment / ~/.zao/private. With no registry configured, the runtime uses only the built-in default (ZOE on zoe-zao@agentmail.to).",
+  "identities": [
+    {
+      "brand": "The ZAO",
+      "agent": "ZOE",
+      "email": { "inbox": "zoe-zao@agentmail.to", "keyEnv": "AGENTMAIL_API_KEY" },
+      "icmBox": "thezao",
+      "personaRef": "human.md"
+    },
+    {
+      "brand": "WaveWarZ",
+      "agent": "wavewarz-agent",
+      "email": { "inbox": "wavewarz@agentmail.to", "keyEnv": "AGENTMAIL_KEY_WAVEWARZ" },
+      "icmBox": "wavewarz",
+      "socials": { "farcaster": "@wavewarz", "x": "@wavewarz" }
+    }
+  ]
+}

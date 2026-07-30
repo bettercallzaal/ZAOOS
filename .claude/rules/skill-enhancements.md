@@ -34,3 +34,31 @@ If the user agrees, apply these constraints one at a time:
 5. **Music label constraint:** "How would a traditional label solve this? Now how would a decentralized label do it better?"
 
 Pick the 3 most relevant constraints for the topic. Each constraint often reveals a simpler or more creative solution than the obvious approach.
+
+## Planning: Feature-Teaching Annotations (doc 2150)
+
+When any planning skill runs (`superpowers:writing-plans`, `/plan-eng-review`,
+`/plan-ceo-review`, or plan mode), annotate the plan with WHICH Claude Code
+feature fits each step - a one-line note per step, in-place. Adopted from the
+r/claudeskills "Adeptly" idea (doc 2150): the plan becomes a teaching surface,
+so anyone reading it learns the tool by seeing the right feature used in the
+right spot. This matters more as more ZAO teammates pick up Claude Code
+(build-in-public).
+
+Annotate with the feature + why, e.g.:
+- A step that reads across many files -> "(subagent: fan out a parallel
+  explorer, keep only the conclusion in context)"
+- A repeatable multi-step procedure -> "(skill: this is worth a `/name` skill so
+  it's not re-explained)"
+- A gate that must always run -> "(hook: enforce in settings.json so the model
+  can't skip it)"
+- Before opening a PR on security-sensitive code -> "(/security-review first)"
+- A long-running or scheduled task -> "(cron/ScheduleWakeup, not an inline wait)"
+- Grounded live-code edit + verify + PR -> "(the Claude Code cap tier - spend it
+  here, per claude-usage.md)"
+
+Keep it light: one annotation per step that genuinely benefits, not every line.
+The point is to teach the reach-for-the-right-tool instinct, not to decorate.
+Skip on trivial plans. This is the write-side of the surface-tiering discipline
+in `claude-usage.md` - it makes the "which surface / which feature" call visible
+in the plan itself.

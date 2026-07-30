@@ -14,20 +14,43 @@ import type {
   ObserveContext,
 } from './types';
 
-/** Deterministic canonical JSON: keys sorted recursively, arrays in order. */
+/**
+ * Deterministic canonical JSON: keys sorted recursively (lexicographic),
+ * arrays in order. Byte-identical to DreamNet's `canonicalJsonStringify`
+ * (`sha256:dreamnet-sorted-json:v0` - spore-sdk pinned 4072102), proven by the
+ * cross-runtime vectors in `src/lib/spore/__tests__/fixtures/`.
+ *
+ * Serialization is built manually (NOT via JSON.stringify on a rebuilt object)
+ * because the cross-org contract requires:
+ *  - LEXICOGRAPHIC key order even for integer-like keys ("10" < "2"; a rebuilt
+ *    JS object would reorder them numerically),
+ *  - `toJSON` methods ignored (a value is hashed as its own enumerable shape),
+ *  - non-finite numbers REJECTED (fail closed), never silently `null`,
+ *  - `undefined`/function/symbol object values omitted; `undefined` array
+ *    entries serialized as `null`.
+ */
 export function canonicalize(value: unknown): string {
-  const sortDeep = (v: unknown): unknown => {
-    if (Array.isArray(v)) return v.map(sortDeep);
-    if (v && typeof v === 'object') {
-      const out: Record<string, unknown> = {};
-      for (const k of Object.keys(v as Record<string, unknown>).sort()) {
-        out[k] = sortDeep((v as Record<string, unknown>)[k]);
-      }
-      return out;
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw new Error(`Canonical JSON Error: Non-finite number ${value} cannot be serialized.`);
     }
-    return v;
-  };
-  return JSON.stringify(sortDeep(value));
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => (item === undefined ? 'null' : canonicalize(item))).join(',')}]`;
+  }
+  if (typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const keyValues = Object.keys(obj)
+      .sort()
+      .filter((k) => obj[k] !== undefined && typeof obj[k] !== 'function' && typeof obj[k] !== 'symbol')
+      .map((k) => `${JSON.stringify(k)}:${canonicalize(obj[k])}`);
+    return `{${keyValues.join(',')}}`;
+  }
+  throw new Error(`Canonical JSON Error: Unsupported value type ${typeof value}`);
 }
 
 /** sha256 hex of a string. */

@@ -110,24 +110,43 @@ const APPROVAL_TO_RISK: Record<
 };
 
 /**
- * Deterministic canonical JSON: object keys sorted recursively, arrays in
- * order. Two structurally-equal objects always serialize identically, so a
- * hash over the output is stable regardless of key insertion order.
+ * Deterministic canonical JSON: object keys sorted recursively
+ * (lexicographic), arrays in order. Two structurally-equal objects always
+ * serialize identically, so a hash over the output is stable regardless of
+ * key insertion order.
+ *
+ * Byte-identical to DreamNet's `canonicalJsonStringify`
+ * (`sha256:dreamnet-sorted-json:v0`) and to the app-side copy in
+ * `src/lib/eyes/observation.ts` - the bot build is isolated (no `@/lib`
+ * alias), so the impl is duplicated; the cross-runtime fixtures in
+ * `src/lib/spore/__tests__/fixtures/` pin BOTH copies. Manual serialization
+ * (not JSON.stringify of a rebuilt object) because the contract requires
+ * lexicographic order for integer-like keys, `toJSON` ignored, non-finite
+ * numbers rejected (fail closed), and undefined/function/symbol object
+ * values omitted (undefined array entries -> null).
  */
 export function canonicalize(value: unknown): string {
-  return JSON.stringify(sortDeep(value));
-}
-
-function sortDeep(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortDeep);
-  if (value && typeof value === 'object') {
-    const out: Record<string, unknown> = {};
-    for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      out[key] = sortDeep((value as Record<string, unknown>)[key]);
-    }
-    return out;
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
   }
-  return value;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw new Error(`Canonical JSON Error: Non-finite number ${value} cannot be serialized.`);
+    }
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => (item === undefined ? 'null' : canonicalize(item))).join(',')}]`;
+  }
+  if (typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const keyValues = Object.keys(obj)
+      .sort()
+      .filter((k) => obj[k] !== undefined && typeof obj[k] !== 'function' && typeof obj[k] !== 'symbol')
+      .map((k) => `${JSON.stringify(k)}:${canonicalize(obj[k])}`);
+    return `{${keyValues.join(',')}}`;
+  }
+  throw new Error(`Canonical JSON Error: Unsupported value type ${typeof value}`);
 }
 
 function sha256Hex(input: string): string {

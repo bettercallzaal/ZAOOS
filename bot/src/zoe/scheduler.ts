@@ -114,7 +114,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   void runPreflight(async (report: string) => {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     const target = gid || opts.zaalTgId;
-    if (target) await opts.bot.api.sendMessage(target, report).then(() => {});
+    if (target)
+      await sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), target, report);
   });
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
@@ -154,8 +155,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (opts.routingDeps) {
             await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status', replyMarkup: vetoKeyboard });
           } else {
-            const sendOpts = vetoKeyboard ? { reply_markup: vetoKeyboard } : {};
-            await opts.bot.api.sendMessage(opts.zaalTgId, brief, sendOpts);
+            // Brief is LLM-generated and can exceed 4096 - chunk the fallback
+            // send too (the routed path already chunks). Keyboard on chunk 1.
+            await sendChunkedToTelegram(
+              (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+              opts.zaalTgId,
+              brief,
+              vetoKeyboard ? { replyMarkup: vetoKeyboard } : undefined,
+            );
           }
           console.log('[zoe/scheduler] morning brief sent (cockpit)' + (vetoKeyboard?.inline_keyboard.length ? ' + veto keyboard' : ''));
           // Mirror to Discord #zao-status if DISCORD_WEBHOOK_STATUS is set (doc 1135 Stage 1a).
@@ -300,7 +307,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (opts.routingDeps) {
             await sendToZaalRouted(opts.routingDeps, recap, { kind: 'status' });
           } else {
-            await opts.bot.api.sendMessage(opts.zaalTgId, recap);
+            await sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), opts.zaalTgId, recap);
           }
           console.log('[zoe/scheduler] nightly recap sent');
         } catch (err) {
@@ -711,9 +718,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
         // Chunk the send: audits routinely exceed Telegram's 4096-char limit and
         // were getting truncated mid-sentence (tg-chunk.ts). Never raw-send long text.
-        await runRepoImproverTick((text: string) =>
-          sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text),
-        );
+        await runRepoImproverTick(async (text: string) => {
+          await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
+        });
       },
       { timezone: 'UTC' },
     ),

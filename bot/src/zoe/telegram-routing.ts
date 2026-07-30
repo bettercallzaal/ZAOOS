@@ -21,28 +21,9 @@
 
 import { ZAAL_DM_ID, ZAAL_BOTZ_GROUP_ID, ZAAL_BOTZ_RESEARCH_THREAD } from './env';
 
-const TELEGRAM_MAX = 3900;
-
-/**
- * Split a long string into Telegram-sized chunks, preferring paragraph then
- * line then word boundaries. Falls back to a hard cut only if no boundary is
- * found in the back half of the window.
- */
-function chunkLongMessage(text: string, max = TELEGRAM_MAX): string[] {
-  if (text.length <= max) return [text];
-  const chunks: string[] = [];
-  let remaining = text;
-  while (remaining.length > max) {
-    let cut = remaining.lastIndexOf('\n\n', max);
-    if (cut < max * 0.5) cut = remaining.lastIndexOf('\n', max);
-    if (cut < max * 0.5) cut = remaining.lastIndexOf(' ', max);
-    if (cut < max * 0.5) cut = max;
-    chunks.push(remaining.slice(0, cut).trimEnd());
-    remaining = remaining.slice(cut).trimStart();
-  }
-  if (remaining.length > 0) chunks.push(remaining);
-  return chunks;
-}
+// Chunking is shared with every other long-send path (tg-chunk.ts) so the
+// boundary logic can never drift between the router and direct sends.
+import { chunkForTelegram } from './tg-chunk';
 
 export type MessageKind = 'question' | 'status' | 'whisper';
 
@@ -84,7 +65,7 @@ export async function sendToZaal(
   opts: SendToZaalOptions = {},
 ): Promise<any> {
   const kind = opts.kind ?? 'status';
-  const chunks = chunkLongMessage(text);
+  const chunks = chunkForTelegram(text);
 
   // Determine target chat id based on message kind. Questions AND whispers both
   // go to Zaal's DM (questions need a reply, whispers are private notifications);

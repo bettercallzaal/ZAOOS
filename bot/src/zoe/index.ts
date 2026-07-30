@@ -15,6 +15,7 @@
  *   OR: systemd user unit zoe-bot.service
  */
 import { config as loadEnv } from 'dotenv';
+import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
@@ -520,10 +521,12 @@ bot.command('zoldraft', async (ctx) => {
   }
   const id = 'zol-' + Date.now().toString(36);
   putDraft('zol-cast', text, id);
-  await bot.api.sendMessage(gid, `ZOL draft:\n${text}`, {
-    message_thread_id: zolThread,
-    reply_markup: draftKeyboard(id),
-  });
+  await sendChunkedToTelegram(
+    (cid, t, o) => bot.api.sendMessage(cid, t, o as never),
+    gid,
+    `ZOL draft:\n${text}`,
+    { baseOpts: { message_thread_id: zolThread }, replyMarkup: draftKeyboard(id), markupOn: 'last' },
+  );
   await ctx.reply('Staged in the ZOL topic with Post/Skip/Edit.');
 });
 
@@ -1538,12 +1541,14 @@ bot.on('message:text', async (ctx) => {
       }
       const id = `${action.draftKind}-${Date.now().toString(36)}`;
       putDraft(action.draftKind, text, id);
-      await bot.api
-        .sendMessage(chatId, `${action.label}:\n${text}`, {
-          ...threadOpt,
-          reply_markup: draftKeyboard(id),
-        })
-        .catch(() => {});
+      // Draft text is LLM-length; chunk the send, keyboard on the LAST chunk
+      // so Post/Skip/Edit sits at the bottom of the draft.
+      await sendChunkedToTelegram(
+        (cid, t, o) => bot.api.sendMessage(cid, t, o as never),
+        chatId,
+        `${action.label}:\n${text}`,
+        { baseOpts: { ...threadOpt }, replyMarkup: draftKeyboard(id), markupOn: 'last' },
+      ).catch(() => {});
       return;
     }
 

@@ -23,6 +23,8 @@
  * is OFF unless ZOE_RELAY_TG_ENABLED === 'true'.
  */
 
+import { sendChunkedToTelegram } from './tg-chunk';
+
 const HUB_LEGACY_ID = '9000';
 
 /** One relay message in the hub. `tg_pushed` is this bridge's dedup marker. */
@@ -212,7 +214,15 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
   const pushedTs = new Set<string>();
   for (const r of pending) {
     try {
-      const sent = await deps.sendMessage(deps.chatId, formatInboundDm(r), { reply_markup: replyKeyboard(r.from) });
+      // A relayed message can be arbitrarily long (a terminal can relay a
+      // paste) - chunk it; the Reply/Ack keyboard rides the LAST chunk and the
+      // returned message is that one, so reply-context arms on the right mid.
+      const sent = await sendChunkedToTelegram(
+        (cid, t, o) => deps.sendMessage(cid, t, o as never),
+        deps.chatId,
+        formatInboundDm(r),
+        { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
+      );
       pushedTs.add(r.ts);
       // Register message_id -> rl-<lane> so a plain reply to THIS message routes
       // back to the lane (no button tap). Best-effort - never blocks the push.

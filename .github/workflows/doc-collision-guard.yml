@@ -44,7 +44,15 @@ jobs:
 
           # Only ADDED doc dirs can introduce a NEW collision. A modified doc
           # cannot, and filtering to additions keeps renames from false-firing.
-          newdirs=$(git diff --name-only --diff-filter=A "$base"...HEAD \
+          #
+          # Run the git command as its OWN step and check IT failed, so a git
+          # error aborts (fail closed) instead of yielding empty output that the
+          # guard reads as "nothing to check" and passes vacuously
+          # (silent-failure-guard rule 5). grep's expected no-match stays benign
+          # via the inner `|| true` on the grep pipe only.
+          added=$(git diff --name-only --diff-filter=A "$base"...HEAD) \
+            || { echo "::error title=doc-guard git diff failed::cannot compute added files - failing closed"; exit 1; }
+          newdirs=$(printf '%s\n' "$added" \
             | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
             | sort -u || true)
 
@@ -54,7 +62,9 @@ jobs:
           fi
 
           # Every doc number that already exists on the base branch.
-          existing=$(git ls-tree -r --name-only "$base" \
+          basetree=$(git ls-tree -r --name-only "$base") \
+            || { echo "::error title=doc-guard git ls-tree failed::cannot read base tree - failing closed"; exit 1; }
+          existing=$(printf '%s\n' "$basetree" \
             | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
             | sed -E 's|^research/[^/]+/([0-9]{3,4})-.*|\1|' \
             | sort -u || true)

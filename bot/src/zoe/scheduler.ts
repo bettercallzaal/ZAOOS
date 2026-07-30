@@ -738,7 +738,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!heartCanaryEnabled()) return; // flag off = zero work, zero logs
         try {
-          await runHeartFleetCanary();
+          // Pass a send + target so the canary can exercise the transactional
+          // outbox end-to-end when ZOE_OUTBOX_DEMO is also on (still no-op when
+          // that flag is off). Target = the ZAAL BOTZ ops group (internal).
+          const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+          await runHeartFleetCanary(undefined, {
+            groupId: gid || undefined,
+            send: gid
+              ? (chatId, text) => opts.bot.api.sendMessage(chatId, text) as Promise<{ message_id?: number }>
+              : undefined,
+          });
         } catch (err) {
           console.error('[zoe/scheduler] heart canary beat failed:', (err as Error)?.message);
         }

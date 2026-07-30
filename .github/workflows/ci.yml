@@ -52,7 +52,13 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm i @rollup/rollup-linux-x64-gnu || true
+      # vite 8 bundles with ROLLDOWN, not rollup. The npm optional-deps bug
+      # (npm/cli#4828) can skip the platform-specific native binding, so vitest
+      # fails to LOAD ITS RUNNER ("Cannot find native binding") and the whole
+      # suite silently never runs (silent-failure-guard incident #3). Install
+      # both the rollup (legacy) and rolldown (current) linux bindings so the
+      # runner always loads and the 8800+ app tests actually execute on CI.
+      - run: npm i @rollup/rollup-linux-x64-gnu @rolldown/binding-linux-x64-gnu || true
 
       - run: npm test
 

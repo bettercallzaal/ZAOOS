@@ -20,7 +20,17 @@ loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
 import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
-import { surfaceGrill, applyGrillAction, applyGrillAnswer, resolveGrillByReply } from './grill';
+import {
+  surfaceGrill,
+  applyGrillAction,
+  applyGrillAnswer,
+  resolveGrillByReply,
+  getActiveGrill,
+  matchTypedAnswer,
+  toggleGrillMulti,
+  commitGrillMulti,
+  multiKeyboard,
+} from './grill';
 import { resolveTaskDecision } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
@@ -404,6 +414,10 @@ bot.command('menu', async (ctx) => {
 // a time, to his DM (never a group). PIN the open question (and unpin the prior
 // one) so ONLY the question awaiting his answer is ever pinned. Reused by /grill,
 // the callbacks, and the scheduler cron.
+function toGrammyRows(rows: { text: string; data: string }[][]) {
+  return rows.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data })));
+}
+
 function grillDeps(chatId: number) {
   // No pin/unpin: pinning each grill item spawned a "ZOE pinned ..." service
   // message per item, cluttering the DM. With the daily cap (~5/day) the cards
@@ -1332,6 +1346,43 @@ bot.on('message:text', async (ctx) => {
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
     if (!isFromZaal(ctx)) return;
+    // #51 typed-answer capture: a PLAIN typed message that is option-shaped for
+    // the active grill decision ("2", "map", "1 and 3") resolves it directly -
+    // previously only button taps and exact swipe-replies registered, so a
+    // typed answer sat unregistered until Zaal tapped Later. Only fires on an
+    // exact option match, so normal DM chat is never eaten.
+    if (!ctx.message.reply_to_message) {
+      try {
+        const active = await getActiveGrill();
+        const matched = active ? matchTypedAnswer(text, active.options) : null;
+        if (active && matched) {
+          const r = await applyGrillAnswer(matched);
+          if (r.key) {
+            const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+            await pushRecent(
+              { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${matched}`, sender: 'grill' },
+              String(gid || zaalId),
+            ).catch((e) => console.error('[zoe/grill] typed-answer log failed:', (e as Error)?.message));
+            await resolveTaskDecision(r.key, matched).catch((e) =>
+              console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
+            );
+            // Strip the now-answered card's buttons (best-effort).
+            if (active.messageId) {
+              await ctx.api
+                .editMessageReplyMarkup(zaalId, active.messageId, { reply_markup: { inline_keyboard: [] } })
+                .catch(() => {});
+            }
+            await ctx.reply(`Locked in: ${matched}. Logged it and moved it off your plate.`);
+            await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
+              console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+            );
+            return;
+          }
+        }
+      } catch (e: unknown) {
+        console.error('[zoe/grill] typed-answer capture failed:', (e as Error)?.message);
+      }
+    }
     // Thread context: when Zaal QUOTE-REPLIES a message, fold what he replied to
     // into the turn so a short reply ("zol yes") anchors to the right draft
     // instead of arriving context-free. Telegram only gives us the quoted text.
@@ -2838,6 +2889,74 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
     ).catch((e) => console.error('[zoe/grill] answer log failed:', (e as Error)?.message));
     // Move the resolved decision off the board's needs-you queue (best-effort).
     await resolveTaskDecision(r.key, value).catch((e) =>
+      console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
+    );
+  }
+  await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
+    console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+  );
+});
+
+// #51 multi-choice: "Pick multiple" swaps the card's keyboard for toggle rows
+// ([x]/[ ] per option) + Send/Cancel. Single taps elsewhere stay instant.
+bot.callbackQuery('grill:multi', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const active = await getActiveGrill();
+  if (!active) {
+    await ctx.answerCallbackQuery({ text: 'Nothing active.' }).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery().catch(() => {});
+  await ctx
+    .editMessageReplyMarkup({ reply_markup: { inline_keyboard: toGrammyRows(multiKeyboard(active.options, active.selected)) } })
+    .catch(() => {});
+});
+
+bot.callbackQuery(/^grill:tog:(.+)$/, async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const r = await toggleGrillMulti(ctx.match[1]);
+  if (!r) {
+    await ctx.answerCallbackQuery({ text: 'Nothing active.' }).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery().catch(() => {});
+  await ctx
+    .editMessageReplyMarkup({ reply_markup: { inline_keyboard: toGrammyRows(multiKeyboard(r.options, r.selected)) } })
+    .catch(() => {});
+});
+
+bot.callbackQuery('grill:multicancel', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const active = await getActiveGrill();
+  await ctx.answerCallbackQuery().catch(() => {});
+  if (!active) return;
+  // Back to single-tap rows (same shape formatGrill builds for a decision).
+  const answerRow = active.options.map((o) => ({ text: o.label.slice(0, 28), callback_data: `grill:ans:${o.value}`.slice(0, 60) }));
+  const tailRow = [{ text: 'Skip', callback_data: 'grill:skip' }, { text: 'Later', callback_data: 'grill:snooze' }];
+  if (active.options.length >= 3) tailRow.unshift({ text: 'Pick multiple', callback_data: 'grill:multi' });
+  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [answerRow, tailRow] } }).catch(() => {});
+});
+
+bot.callbackQuery('grill:multisend', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const r = await commitGrillMulti();
+  if (!r) {
+    await ctx.answerCallbackQuery({ text: 'Toggle at least one option first.' }).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
+  await ctx
+    .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, `Locked in: ${r.value}`), {
+      reply_markup: { inline_keyboard: [] },
+    })
+    .catch(() => {});
+  if (r.key) {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    await pushRecent(
+      { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${r.value}`, sender: 'grill' },
+      String(gid || zaalId),
+    ).catch((e) => console.error('[zoe/grill] multi log failed:', (e as Error)?.message));
+    await resolveTaskDecision(r.key, r.value).catch((e) =>
       console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
     );
   }

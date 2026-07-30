@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { toQueue, pickNext, formatGrill, parseOptions, type GrillState } from '../grill';
+import {
+  toQueue,
+  pickNext,
+  formatGrill,
+  parseOptions,
+  matchTypedAnswer,
+  toggleSelection,
+  multiKeyboard,
+  type GrillState,
+} from '../grill';
 import type { CockpitTask, ReviewPR } from '../../cockpit/types';
 
 function task(over: Partial<CockpitTask>): CockpitTask {
@@ -132,8 +141,8 @@ describe('formatGrill one-click buttons', () => {
     // first row = the 3 answer options, mapped to grill:ans:<value>
     expect(buttons[0].map((b) => b.data)).toEqual(['grill:ans:1', 'grill:ans:2', 'grill:ans:3']);
     expect(buttons[0][0].text).toBe('1: intro test');
-    // second row = Skip / Later
-    expect(buttons[1].map((b) => b.data)).toEqual(['grill:skip', 'grill:snooze']);
+    // second row = Pick multiple (3+ options, #51) then Skip / Later
+    expect(buttons[1].map((b) => b.data)).toEqual(['grill:multi', 'grill:skip', 'grill:snooze']);
   });
   it('a no-option decision offers Approve (resolve) / Skip / Later', () => {
     const { buttons, text } = formatGrill(
@@ -167,3 +176,99 @@ describe('formatGrill one-click buttons', () => {
     expect(text).toContain('Reply if you want me to prep');
   });
 })
+
+describe('parseOptions - #51 colon forms (the "solid" Creator Studio example)', () => {
+  it('parses "1: intro test / 2: map / 3: both" with a colon prefix in the title', () => {
+    const o = parseOptions('Creator Studio decision: 1: intro test / 2: map / 3: both');
+    expect(o.map((x) => x.value)).toEqual(['1', '2', '3']);
+    expect(o.map((x) => x.label)).toEqual(['1: intro test', '2: map', '3: both']);
+  });
+
+  it('still parses the paren form after a prefix colon', () => {
+    const o = parseOptions('Creator Studio: pick 1 (intro test) / 2 (map) / 3 (both)');
+    expect(o.map((x) => x.value)).toEqual(['1', '2', '3']);
+    expect(o[0].label).toBe('1: intro test');
+  });
+
+  it('parses dash-labeled options', () => {
+    const o = parseOptions('Ship it: 1 - now / 2 - after review');
+    expect(o.map((x) => x.label)).toEqual(['1: now', '2: after review']);
+  });
+});
+
+describe('matchTypedAnswer - #51 typed capture', () => {
+  const opts = [
+    { value: '1', label: '1: intro test' },
+    { value: '2', label: '2: map' },
+    { value: '3', label: '3: both' },
+  ];
+
+  it('matches a bare value, a full label, and a label tail', () => {
+    expect(matchTypedAnswer('2', opts)).toBe('2');
+    expect(matchTypedAnswer('2: map', opts)).toBe('2');
+    expect(matchTypedAnswer('map', opts)).toBe('2');
+    expect(matchTypedAnswer('BOTH', opts)).toBe('3');
+  });
+
+  it('matches multi forms and joins values', () => {
+    expect(matchTypedAnswer('1,2', opts)).toBe('1,2');
+    expect(matchTypedAnswer('1 and 3', opts)).toBe('1,3');
+    expect(matchTypedAnswer('1 2 3', opts)).toBe('1,2,3');
+  });
+
+  it('never eats normal chat', () => {
+    expect(matchTypedAnswer('can you also check the deploy logs', opts)).toBeNull();
+    expect(matchTypedAnswer('1 but only after the map is done', opts)).toBeNull();
+    expect(matchTypedAnswer('', opts)).toBeNull();
+    expect(matchTypedAnswer('yes', opts)).toBeNull(); // not one of THESE options
+    expect(matchTypedAnswer('anything', [])).toBeNull();
+  });
+
+  it('dedupes repeated tokens in a multi answer', () => {
+    expect(matchTypedAnswer('1, 1, 2', opts)).toBe('1,2');
+  });
+});
+
+describe('toggleSelection + multiKeyboard - #51 multi-choice', () => {
+  const opts = [
+    { value: '1', label: '1: intro test' },
+    { value: '2', label: '2: map' },
+    { value: '3', label: '3: both' },
+  ];
+
+  it('toggles on/off and keeps option order', () => {
+    let sel = toggleSelection([], '3', opts);
+    sel = toggleSelection(sel, '1', opts);
+    expect(sel).toEqual(['1', '3']);
+    sel = toggleSelection(sel, '3', opts);
+    expect(sel).toEqual(['1']);
+  });
+
+  it('renders [x]/[ ] rows plus Send/Cancel', () => {
+    const rows = multiKeyboard(opts, ['2']);
+    expect(rows).toHaveLength(4);
+    expect(rows[0][0].text).toBe('[ ] 1: intro test');
+    expect(rows[1][0].text).toBe('[x] 2: map');
+    expect(rows[1][0].data).toBe('grill:tog:2');
+    expect(rows[3].map((b) => b.data)).toEqual(['grill:multisend', 'grill:multicancel']);
+    expect(rows[3][0].text).toBe('Send (1)');
+  });
+});
+
+describe('formatGrill - Pick multiple appears only for 3+ option decisions', () => {
+  it('adds the multi button for a 3-option decision', () => {
+    const { buttons } = formatGrill(
+      { key: 'k', kind: 'decision', title: 'Pick: 1: a / 2: b / 3: c', priority: 0 },
+      0,
+    );
+    expect(buttons[1].map((b) => b.data)).toEqual(['grill:multi', 'grill:skip', 'grill:snooze']);
+  });
+
+  it('keeps the plain tail for a 2-option decision', () => {
+    const { buttons } = formatGrill(
+      { key: 'k', kind: 'decision', title: 'Publish: yes / no', priority: 0 },
+      0,
+    );
+    expect(buttons[1].map((b) => b.data)).toEqual(['grill:skip', 'grill:snooze']);
+  });
+});

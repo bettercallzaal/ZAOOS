@@ -238,3 +238,4 @@
 | 2126 | [Repo/web improvement: Does the competing `thezao.xyz` domain (currentl](./2126-repo-web-improvement-does-the-competing-thezao/) | STANDALONE | Research doc 2126. |
 | 2137 | [ZABAL Games August Finals: concept, format options, page draft, announcement (board #49)](./2137-zabal-gamez-august-concept-options/) | STANDALONE | Everything for the Saturday announcement: August = the July submitters, every format option + recommendation, deployable page draft, per-platform copy + rollout. |
 | 2133 | [Managed agents that build agents (Nick/Corey model) - ZAO already owns ~70% of the stack](./2133-managed-agents-agent-builds-agent/) | STANDALONE | Decide what ZAO takes from the "$5K/mo managed-agent, an agent builds the agents, B2B2B" playbook - the business model vs the stack pieces - given ZAO already runs most of the stack. |
+| 2118 | [ZOE research](./2118-research/) | DISPATCH | ZOE research: https://github.com/cabinetai/cabinet |

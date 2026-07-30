@@ -2,7 +2,7 @@
 topic: events
 type: meeting-recap
 status: research-complete
-last-validated: 2026-05-12
+last-validated: 2026-07-30
 related-docs: 648, 669, 670, 673, 680
 tier: STANDARD
 ---
@@ -93,6 +93,21 @@ ZAO OS / personal-infra call - no external tracker. Actions live here.
 - The main-quest / side-quest alignment-scoring gamification modal (Zaal's idea) - worth its own doc
 - Limitless pendant as a meeting-capture device - relevant to the /meeting skill + ZAO Craig (doc 670)
 - Hermes vs Ryan's framework - the reconciliation doc 648 calls for
+
+## Updated 2026-07-30
+
+**Tailscale gap (Decision 3) now has production tooling.** The "remote agent-to-agent comms via Tailscale" identified on May 12 as the one unbuilt piece has since shipped from Tailscale's side:
+- **Aperture** (launched Feb 2026): AI governance layer that centralizes LLM access via Tailscale identity, eliminating per-device API key distribution. Acts as an AI gateway — agent identity is the auth mechanism. Source: search results for "Tailscale identity governance AI agents 2026".
+- **tsnet for agents**: Embeds Tailscale directly in an agent binary, giving it a stable 100.x.x.x node identity that persists across reboots and network changes. Enables mutual authentication between agents.
+- **tsidp**: Tailscale's identity provider now supports MCP (Model Context Protocol) authorization via Dynamic Client Registration — relevant to any ZAO/Ryan framework using MCP.
+- **Highflame partnership**: Real-time security evaluation of AI activity at the network layer (Aperture integration). Ships visibility into LLM interactions between agents.
+- **Agent communication protocol convergence**: Four competing standards as of mid-2026 — A2A (Google), MCP (Anthropic), ACP (IBM), ANP (community). Q3 2026 joint MCP/A2A specification effort underway. ACP from IBM frames itself as the "TCP/IP of the Agentic Web." The remote comms gap Ryan and Zaal identified in May is now an active industry-wide problem with multiple standard contenders.
+
+**Ryan's memory-from-birth architecture is now mainstream research.** The three-tier memory taxonomy (episodic, semantic, procedural) Ryan's framework anticipated is now the consensus architecture. Mem0 is the leading production framework (~48k GitHub stars, $24M funding as of Oct 2025). Cross-session identity and memory staleness remain open problems. Ryan's codec compressing experience to symbolic language aligns with the "temporal abstraction at scale" research frontier.
+
+**Bonfires.ai platform**: Still operating. The 20-minute knowledge extraction cycle (entities, relationships, episodic summaries → shared graph) is confirmed as the current architecture. Multi-platform agent deployment (Telegram, Discord, API) is live. ZAO remains on Genesis tier. No major architectural pivots found since May 2026.
+
+Sources checked (2026-07-30): search queries on "Tailscale tsnet AI agents identity 2026", "bonfires.ai knowledge graph Telegram Discord 2026", "agent memory persistence born with memory LLM 2026", "Tailscale ACP Agent Communication Protocol Q3 2026". Direct web fetches of bonfires.ai and Tailscale product pages returned 403; findings above from search result summaries only (marked as partial).
 
 ## Memory Updates
 

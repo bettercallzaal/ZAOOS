@@ -49,7 +49,7 @@ import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { checkAndResend, readLastUserReplyAt } from './escalation';
 import { reconcileUntaggedTasks, getTaskStatusByIds } from './team-tracker';
-import { ingestInbox } from './inbox-ingest';
+import { ingestAllIdentities } from './fleet';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
 import { runTaskTeammateAck, readPendingReplies, removePendingReply } from './task-teammate-ack';
@@ -389,16 +389,24 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.warn('[zoe/scheduler] emit-queue flush failed (nbd):', (err as Error).message);
         }
 
-        // Fold any mail Zaal forwarded to zoe-zao@agentmail.to into ZOE's
-        // standing context (PII-scrubbed one-liners, deduped). Best-effort -
-        // a no-op when AGENTMAIL_API_KEY is unset.
+        // Fold any mail forwarded to the fleet's inboxes into standing context
+        // (PII-scrubbed one-liners, deduped, per-brand namespaced). With no
+        // ZOE_IDENTITIES_PATH configured this is exactly ZOE's own inbox as
+        // before (loadIdentities returns just the default identity); with a fleet
+        // registry it also ingests each brand's inbox into its own log (doc 2159).
+        // Best-effort - a no-op when the keys are unset.
         try {
-          const ing = await ingestInbox();
-          if (ing.ingested > 0) {
-            console.log(`[zoe/scheduler] inbox-ingest: folded ${ing.ingested} forwarded message(s)`);
+          const fleet = await ingestAllIdentities();
+          const total = fleet.reduce((n, r) => n + (r.result?.ingested ?? 0), 0);
+          if (total > 0) {
+            const per = fleet
+              .filter((r) => (r.result?.ingested ?? 0) > 0)
+              .map((r) => `${r.brand}:${r.result?.ingested}`)
+              .join(', ');
+            console.log(`[zoe/scheduler] fleet-ingest: folded ${total} forwarded message(s) (${per})`);
           }
         } catch (err) {
-          console.warn('[zoe/scheduler] inbox-ingest failed (nbd):', (err as Error).message);
+          console.warn('[zoe/scheduler] fleet-ingest failed (nbd):', (err as Error).message);
         }
 
         // Reply to any @zoe comments left on board tasks (thezao.xyz/board).

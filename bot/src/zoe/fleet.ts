@@ -17,7 +17,7 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { loadIdentities, resolveEmail, type BrandIdentity } from './identities';
+import { loadIdentities, resolveEmail, DEFAULT_INBOX, type BrandIdentity } from './identities';
 import { ingestInbox, type IngestResult } from './inbox-ingest';
 
 /** Per-brand ingest outcome. `result` is null when the brand was skipped. */
@@ -50,7 +50,10 @@ export async function ingestAllIdentities(
       continue;
     }
     try {
-      const result = await ingestInbox(fetchImpl, { inbox, apiKey });
+      // ZOE's own inbox keeps the shared context log (no namespace); every other
+      // brand gets its own namespaced logs so mail never cross-contaminates (doc 2159).
+      const namespace = inbox === DEFAULT_INBOX ? undefined : brand;
+      const result = await ingestInbox(fetchImpl, { inbox, apiKey, namespace });
       out.push({ brand, inbox, result });
     } catch (err) {
       out.push({ brand, inbox, result: null, skipped: (err as Error).message });

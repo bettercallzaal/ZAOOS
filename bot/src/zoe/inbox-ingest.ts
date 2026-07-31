@@ -63,6 +63,12 @@ export interface IngestResult {
 export interface InboxSource {
   inbox?: string;
   apiKey?: string;
+  /**
+   * Brand namespace for the context logs (doc 2159). Omitted -> ZOE's shared
+   * logs (unchanged). A brand slug -> that brand's own inbox_context.<slug>.jsonl
+   * + triage log + dedup set, so a brand's mail never mixes into ZOE's context.
+   */
+  namespace?: string;
 }
 
 /** Stable dedup key for a message. Falls back to from+subject when no id. */
@@ -126,7 +132,8 @@ export async function ingestInbox(
     return empty;
   }
 
-  const seen = await readIngestedSourceIds();
+  const ns = source.namespace;
+  const seen = await readIngestedSourceIds(ns);
   let ingested = 0;
   let skipped = 0;
 
@@ -146,7 +153,7 @@ export async function ingestInbox(
         source_id: sourceId_,
         summary,
         received_at: m.timestamp ?? m.created_at ?? m.date,
-      });
+      }, ns);
 
       // Triage the item
       const bucket = classifyBucket(m, summary);
@@ -160,7 +167,7 @@ export async function ingestInbox(
         bucket,
         connected_project: connectedProject,
         next_step: nextStep,
-      });
+      }, ns);
 
       ingested++;
     } catch (err) {

@@ -35,6 +35,19 @@ const BUILD_STATE_PATH = join(ZOE_HOME, 'build_state.jsonl');
 const INBOX_CONTEXT_PATH = join(ZOE_HOME, 'inbox_context.jsonl');
 const TRIAGE_CONTEXT_PATH = join(ZOE_HOME, 'triage_context.jsonl');
 
+/**
+ * Resolve a context-log path, optionally namespaced by brand (doc 2159 - the
+ * per-brand fleet). No namespace -> the shared ZOE log (unchanged behavior).
+ * A brand slug -> a separate log, e.g. inbox_context.wavewarz.jsonl, so a brand
+ * agent's mail never mixes into ZOE's context.
+ */
+function nsPath(fullPath: string, namespace?: string): string {
+  if (!namespace) return fullPath;
+  const slug = namespace.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (!slug) return fullPath;
+  return fullPath.replace(/\.jsonl$/, `.${slug}.jsonl`);
+}
+
 const RECENT_MAX = 8;
 
 export type ChatScope = 'private' | string;
@@ -637,10 +650,10 @@ export async function appendBuildState(record: Omit<BuildStateRecord, 'id' | 'cr
  * mail) from the append-only inbox_context.jsonl log. Returns last N records
  * (most recent first) for concierge-prompt injection.
  */
-export async function readInboxContext(limit = 6): Promise<InboxContextRecord[]> {
+export async function readInboxContext(limit = 6, namespace?: string): Promise<InboxContextRecord[]> {
   await ensureZoeHome();
   try {
-    const raw = await fs.readFile(INBOX_CONTEXT_PATH, 'utf8');
+    const raw = await fs.readFile(nsPath(INBOX_CONTEXT_PATH, namespace), 'utf8');
     const lines = raw.trim().split('\n').filter((line) => line.trim());
     return lines
       .slice(-limit)
@@ -656,10 +669,10 @@ export async function readInboxContext(limit = 6): Promise<InboxContextRecord[]>
  * skip mail it has already summarized, so each forwarded message lands in ZOE's
  * context exactly once. Reads the whole log (small; one line per ingested mail).
  */
-export async function readIngestedSourceIds(): Promise<Set<string>> {
+export async function readIngestedSourceIds(namespace?: string): Promise<Set<string>> {
   await ensureZoeHome();
   try {
-    const raw = await fs.readFile(INBOX_CONTEXT_PATH, 'utf8');
+    const raw = await fs.readFile(nsPath(INBOX_CONTEXT_PATH, namespace), 'utf8');
     const ids = raw
       .trim()
       .split('\n')
@@ -677,7 +690,10 @@ export async function readIngestedSourceIds(): Promise<Set<string>> {
  * already run the summary through pii.ts redaction - this function does not
  * scrub, it only persists.
  */
-export async function appendInboxContext(record: Omit<InboxContextRecord, 'id' | 'created_at'>): Promise<void> {
+export async function appendInboxContext(
+  record: Omit<InboxContextRecord, 'id' | 'created_at'>,
+  namespace?: string,
+): Promise<void> {
   await ensureZoeHome();
   const doc: InboxContextRecord = {
     id: `inbox-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -686,7 +702,7 @@ export async function appendInboxContext(record: Omit<InboxContextRecord, 'id' |
     received_at: record.received_at,
     created_at: new Date().toISOString(),
   };
-  await fs.appendFile(INBOX_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
+  await fs.appendFile(nsPath(INBOX_CONTEXT_PATH, namespace), JSON.stringify(doc) + '\n', 'utf8');
 }
 
 /**
@@ -741,6 +757,7 @@ export async function readTriageContext(limit = 5): Promise<string> {
  */
 export async function appendTriageContext(
   record: Omit<import('./types').TriageRecord, 'id' | 'created_at'>,
+  namespace?: string,
 ): Promise<void> {
   await ensureZoeHome();
   const doc: import('./types').TriageRecord = {
@@ -753,7 +770,7 @@ export async function appendTriageContext(
     capture_id: record.capture_id,
     created_at: new Date().toISOString(),
   };
-  await fs.appendFile(TRIAGE_CONTEXT_PATH, JSON.stringify(doc) + '\n', 'utf8');
+  await fs.appendFile(nsPath(TRIAGE_CONTEXT_PATH, namespace), JSON.stringify(doc) + '\n', 'utf8');
 }
 
 /**

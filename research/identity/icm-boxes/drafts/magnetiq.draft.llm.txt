@@ -1,0 +1,33 @@
+# ICM: Magnetiq (The ZAO's use of Magnetiq) - DRAFT, needs Zaal sign-off before publishing
+
+> DRAFT for the empty magnetiq ICM box (id icm_ObVlvn960SvOLc-W-IV3wQ). Generated 2026-07-30 from memory `project_magnetiq` / `project_tyler_stambaugh`. GATED: publishing is Zaal's action. Confirm box scope (ZAO's-use-of-Magnetiq vs a partner box for Tyler's platform). NOTE - URL correction to carry back: the ZAOOS CLAUDE.md brand glossary lists magnetiq.io, but the verified URL is **magnetiq.xyz** (magnetiq.io is a different company, Koinema Srl). Fix the glossary when you get a chance.
+
+Magnetiq is **Tyler Stambaugh's all-in-one event/launch platform** at **magnetiq.xyz** (NOT magnetiq.io - a different company). The ZAO uses it as the "you were here" layer of its live events. A Magnetiq **Magnet** is an **attendance-gated collectible NFT on the Flow blockchain**, claimed only by people who show up - carrying zero-party data, UGC/polls/feedback, and a Shopify commerce path. It is a partner platform, not a ZAO-owned product.
+
+## What Magnetiq is (the platform)
+- Tyler Stambaugh's community + collectible + commerce engine at magnetiq.xyz.
+- A "Magnet" = an attendance-gated collectible NFT on Flow. Claim it by attending; it carries owned attendee data, feedback/polls, and a commerce path.
+- Not just UGC feedback - a full live-event engagement + collectible + commerce layer.
+
+## How The ZAO uses it (the 3-platform event stack)
+The ZAO runs live events on a three-platform collectible split:
+- **Lu.ma** - discovery + RSVP (the front door).
+- **Magnetiq Magnet** - the live "you were here" claim + feedback + owned data (on Flow).
+- **Unlock** - on-chain rights/gating + composability on Base (ERC-721 keys gating ZAO OS / Discord / Telegram / build-eligibility).
+ZABAL Games runs its workshop-attendance Magnet here: app.magnetiq.xyz/brand/zabal/magnet/zabal-gamez.
+
+## Open thread (not yet resolved)
+- Cross-chain reconcile: Magnets are on Flow, Unlock keys are on Base. The open question to Tyler: how to QUERY a Magnet (read holders/claimers via API/webhook/Flow on-chain) so ZAO can gate perks off attendance, and whether Magnetiq can host an open/close-on-schedule claim page + live in-room ping (docs 863/865/867).
+
+## In the ZAO ecosystem
+- The attendance/collectible layer for ZAO events (ZABAL Games workshops, festivals). A partner platform (Tyler Stambaugh), not ZAO-owned.
+
+## Find it
+- magnetiq.xyz | ZABAL Gamez magnet: app.magnetiq.xyz/brand/zabal/magnet/zabal-gamez
+- Founder: Tyler Stambaugh.
+
+## Related boxes
+- ZABAL Games (zabalgamez), The ZAO (thezao), ZAO Festivals (zao-festivals).
+
+## Source
+Memory `project_magnetiq` (magnetiq.xyz confirmed 2026-06-17, .io warning), `project_tyler_stambaugh`, docs 863/865/867. Draft written in the overnight loop; NOT published.

@@ -71,14 +71,12 @@ function isRecentMeeting(dateStr: string, hoursBack: number = 48): boolean {
     // Parse: try ISO first, then common variants
     let date: Date | null = null;
 
-    // Try ISO date (2026-07-20) or with time (2026-07-20 8:03)
-    // "YYYY-MM-DD H:mm" is not valid ISO 8601 — normalize to "YYYY-MM-DDTHH:mm"
+    // Try ISO date (2026-07-20) or with time (2026-07-20 8:03).
+    // Strip any time suffix and compare at day granularity — avoids future-time
+    // false-negatives when a meeting is logged at e.g. 8am but CI runs at 3am UTC.
     if (dateStr.includes('-') && dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
-      const normalized = dateStr.trim().replace(
-        /^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2})$/,
-        (_, d, h, m) => `${d}T${h.padStart(2, '0')}:${m}`,
-      );
-      date = new Date(normalized);
+      const dateOnly = dateStr.trim().replace(/^(\d{4}-\d{2}-\d{2}).*$/, '$1');
+      date = new Date(dateOnly);
     }
 
     if (!date || isNaN(date.getTime())) return false;

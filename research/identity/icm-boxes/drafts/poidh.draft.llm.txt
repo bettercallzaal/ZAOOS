@@ -1,0 +1,29 @@
+# ICM: POIDH (The ZAO's POIDH bounty program) - DRAFT, needs Zaal sign-off before publishing
+
+> DRAFT for the empty poidh ICM box (id icm_1CRn7Oyvee1jDSK9kje7dw). Generated 2026-07-30 from the poidh dev docs + ZAO's zpoidh repo + memory. GATED: publishing to the live box is Zaal's action. Confirm scope: is this box "The ZAO's use of POIDH" (assumed here) or POIDH-the-platform? Adjust before publishing.
+
+The ZAO runs **POIDH bounties** - "pics or it didn't happen" - as a core part of ZABAL Games and community engagement. POIDH itself is a decentralized bounty platform (founder: Kenny / @poidhbot): users create tasks, submit image proof of completion, and the community votes on valid submissions. The ZAO's program (run by BetterCallZaal) issues bounty rounds and judges them.
+
+## What POIDH is (the platform)
+- A decentralized "pics or it didn't happen" bounty platform. Create a bounty, submit a picture as proof, community votes, winner is paid; a proof-of-completion NFT is minted.
+- POIDH v3 contracts are immutable, deployed on Ethereum, Arbitrum, Base, and Degen Chain.
+- Data via the indexer API (indexer.poidh.xyz) + direct JSON bounty endpoints. NOT a ZAO product - it is Kenny's platform; The ZAO is a heavy user + partner.
+
+## The ZAO's POIDH program (BCZ-run)
+- Bounty rounds tied to ZABAL Games: e.g. Round 3 (best ZABAL Gamez ad, resolved + paid on-chain, winner @femmie), Round 4 (the ZABAL Gamez open pot, live on Base bounty 1249, July open-build month), Round 5 in draft (POIDH x Unlock Protocol clipping bounty).
+- Each round: cast the bounty, collect image-proof claims, judge with a rubric (floor checks + pick-score 0-10), pay the winner on-chain, cast the winner. Judging pages + brand kits live in the zpoidh repo.
+- Source of truth for BCZ POIDH ops: the zpoidh repo (rounds, judging pages, brand kits, leaderboard).
+
+## In the ZAO ecosystem
+- A production/engagement lane feeding ZABAL Games - bounties get real community builds shipped with real on-chain payouts.
+- Partnership with Kenny/POIDH (co-amplification; Kenny is a high-signal Farcaster relationship, 106k).
+
+## Find it
+- POIDH: poidh.xyz | indexer: indexer.poidh.xyz | founder: Kenny (@poidhbot)
+- ZAO/BCZ POIDH hub: (Zaal to confirm the canonical public URL before publishing.)
+
+## Related boxes
+- ZABAL Games (zabalgamez), The ZAO (thezao), WaveWarZ (wavewarz).
+
+## Source
+poidh dev docs (docs.poidh.xyz/developers), the zpoidh repo README, memory `project_poidh_bounty_live` / `project_poidh_judging_arch`. Draft written in the overnight loop; NOT published.

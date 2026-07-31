@@ -1,0 +1,33 @@
+# ICM: ZAOstock (DRAFT - needs Zaal sign-off before publishing)
+
+> DRAFT for the empty zaostock ICM box (id icm_lda7p0d9o_Ysg-SYZOIWjw) - the #1 gap from the brand audit (doc 2161): the flagship festival had no canonical AI-readable context with a hard public date approaching. Generated 2026-07-30 from confirmed facts (memory `project_zao_stock_confirmed`). GATED: publishing is Zaal's action. NO dollar figures included (Zaal's rule - budget is internal, never in public GEO/box content).
+
+ZAOstock is **The ZAO's flagship annual festival** - a music-first, community-run outdoor event in Ellsworth, Maine. The 2026 edition is **October 3, 2026** at the **Franklin Street Parklet**, and it is an **official part of Art of Ellsworth: Maine Craft Weekend** (statewide promotion).
+
+## What it is
+- The ZAO's flagship festival - the network's biggest IRL moment of the year, where the online community (artists, builders, believers) shows up in person.
+- Music first: live performances, plus the ZAO's onchain music culture (WaveWarZ) brought into the real world.
+- Outdoor, community-run, all-volunteer. Part of the ZAO Festivals family alongside COC Concertz and the other ZAO events.
+
+## 2026 details
+- **Date:** October 3, 2026 (confirmed).
+- **Venue:** Franklin Street Parklet, Ellsworth, Maine (in partnership with Heart of Ellsworth).
+- **Official status:** part of Art of Ellsworth: Maine Craft Weekend - a statewide Maine craft/arts weekend, with promotion support.
+- **Format:** outdoor daytime show; livestreamed for the online community.
+
+## In the ZAO ecosystem
+- One of the ZAO Festivals lanes; the annual flagship. Ties the online network (The ZAO, WaveWarZ, ZABAL Games) to a real place and date.
+- Built and run by The ZAO (ZTalent Artist Organization) - a decentralized impact network returning profit, data, and rights to artists.
+
+## Find it
+- (Fill: official ZAOstock event page / Luma / thezao.com link - Zaal to confirm before publishing.)
+
+## Related boxes
+- The ZAO (thezao), ZAO Festivals (zao-festivals), WaveWarZ (wavewarz), COC Concertz (coc-concertz).
+
+## Guardrails for this box
+- NEVER include budget/dollar figures (internal only, per Zaal 2026-07-12).
+- Keep it public-facing festival context; internal team roles/logistics stay out of the box.
+
+## Source
+Memory `project_zao_stock_confirmed` (date/venue/Maine Craft Weekend confirmed), brand audit doc 2161. Draft written in the overnight loop; NOT published.

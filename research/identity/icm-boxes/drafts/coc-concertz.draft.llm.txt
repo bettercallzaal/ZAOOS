@@ -1,0 +1,28 @@
+# ICM: COC Concertz (DRAFT - needs Zaal + ideally Thy Revolution sign-off before publishing)
+
+> DRAFT for the empty coc-concertz ICM box (id icm_PmXTIAro8llyOv9LCJ-LZw). Generated 2026-07-30 from confirmed ZAO facts (memory `project_coc_concertz_framing`, doc 866). GATED: publishing to the live box is Zaal's action - and because COC Concertz is a partnership, the partnership framing below should be confirmed with Thy Revolution before it goes live (Fellenz brand challenge 4, doc 839, was exactly this framing being wrong).
+
+COC Concertz is a concert series - a **50/50 joint venture between The ZAO and the COC**, led by **Thy Revolution**. It sits in the middle of both brands: the COC owns its piece, Thy Revolution leads it, and **The ZAO does not own it.** Part of the ZAO Festivals family, run to stand independent.
+
+## What it is
+- A partnership concert series, not a ZAO-owned property. Frame it publicly as "ZAO Festivals + COC Concertz," never "The ZAO's COC."
+- Thy Revolution leads; the COC owns its share. The ZAO is the partner, not the owner.
+- Built to run independent - "a place in the ZAO that you own, separate, so you don't need Zaal to succeed."
+
+## In the ZAO ecosystem
+- One of the ZAO Festivals lanes alongside ZAOstock and the other festivals.
+- The ZAO currently covers the streaming portion only (Thy Revolution lacks a laptop; a crowdfund is in motion). This is a support role, not ownership.
+
+## Framing rules (important - this brand has been miswritten before)
+- ALWAYS a partnership: The ZAO + the COC, Thy Revolution lead.
+- NEVER "The ZAO owns COC" or "COC is a ZAO project." It is a 50/50 JV.
+- Do not add "(pending COC confirmation)" - the partnership itself is confirmed (2026-06-17 call). What still needs confirmation is THIS box's exact wording, with Thy Revolution.
+
+## Find it
+- (Fill: official COC Concertz link / channel - Zaal to provide before publishing.)
+
+## Related boxes
+- The ZAO (thezao), ZAO Festivals (zao-festivals), ZAOstock (zaostock).
+
+## Source
+Confirmed framing: memory `project_coc_concertz_framing` (Thy Rev call 2026-06-17, doc 866), doc 839 (Fellenz brand challenge 4). Draft written in the overnight loop; NOT published.

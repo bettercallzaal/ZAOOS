@@ -1,0 +1,19 @@
+{
+  "_comment": "LIVE fleet registry (doc 2155). Point ZOE_IDENTITIES_PATH here. Secret VALUES never live here - keyEnv names the env var. AgentMail uses ONE account-level key (AGENTMAIL_API_KEY) for all inboxes; brands differ by inbox address.",
+  "identities": [
+    {
+      "brand": "The ZAO",
+      "agent": "ZOE",
+      "email": { "inbox": "zoe-zao@agentmail.to", "keyEnv": "AGENTMAIL_API_KEY" },
+      "icmBox": "thezao",
+      "personaRef": "bot/src/zoe/human.md"
+    },
+    {
+      "brand": "ZABAL Games",
+      "agent": "zabalgamez-agent",
+      "email": { "inbox": "zabalgamez@agentmail.to", "keyEnv": "AGENTMAIL_API_KEY" },
+      "icmBox": "zabalgamez",
+      "personaRef": "research/identity/personas/zabalgamez.persona.md"
+    }
+  ]
+}

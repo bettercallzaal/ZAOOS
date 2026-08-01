@@ -36,6 +36,15 @@ import { runErrorRemediationTick, defaultRemediationDeps } from './error-remedia
 import { runRepoImproverTick } from './repo-improver-io';
 import { sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
+import {
+  HeartFleet,
+  SupabaseLeaseStore,
+  executeWithLease,
+  deterministicResourceId,
+  type ExecuteOutcome,
+  type SupabaseLikeClient,
+} from '../../../packages/heart-fleet/src/index';
+import { db } from '../supabase';
 import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
@@ -94,6 +103,54 @@ async function releaseFire(trigger: string): Promise<void> {
   } catch {
     // already gone — nothing to release
   }
+}
+
+/** Flag to enable repo-improver scout through the Heart lease layer. Default OFF. */
+function repoImproverLeaseEnabled(): boolean {
+  return process.env.ZOE_REPO_IMPROVER_LEASES === 'true';
+}
+
+/** Singleton Heart instance for scheduler-wide use. */
+let _heart: HeartFleet | null = null;
+function heart(): HeartFleet {
+  if (_heart) return _heart;
+  _heart = new HeartFleet({
+    store: new SupabaseLeaseStore(db() as unknown as SupabaseLikeClient),
+    onReceipt: (r) => {
+      console.log(`[zoe/scheduler] heart receipt ${r.event} run=${r.runId.slice(0, 8)} owner=${r.owner}`);
+    },
+  });
+  return _heart;
+}
+
+/**
+ * Wraps runRepoImproverTick through the Heart lease layer when the flag is on.
+ * When the flag is off, runs the scout exactly as today (zero behavior change).
+ * Deterministic resource id prevents duplicate scouts running concurrently.
+ */
+async function runRepoImproverScout(log: (m: string) => Promise<void>): Promise<ExecuteOutcome<void>> {
+  if (!repoImproverLeaseEnabled()) {
+    // Flag OFF: run scout directly, no lease (zero behavior change from baseline).
+    await runRepoImproverTick(log);
+    console.log('[zoe/scheduler] repo-improver scout ran (lease disabled)');
+    return { ran: true, result: undefined };
+  }
+
+  // Flag ON: run scout inside a lease to prevent double-runs.
+  const resourceId = deterministicResourceId('zoe.repo-improver-scout', 'singleton');
+  const owner = `zoe:scheduler:${process.env.HOSTNAME ?? 'host'}:${process.pid}`;
+  const outcome = await executeWithLease(heart(), { runId: resourceId, owner, ttlSeconds: 120 }, async () => {
+    await runRepoImproverTick(log);
+    return undefined;
+  });
+
+  if (outcome.ran) {
+    console.log('[zoe/scheduler] repo-improver scout ran (lease acquired)');
+  } else {
+    console.log(`[zoe/scheduler] repo-improver scout skipped (lease held - reason: ${outcome.reason})`);
+  }
+
+  return outcome;
 }
 
 export interface SchedulerOptions {
@@ -717,6 +774,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // finding with its own judgment, logs the decision (learning trail), and
   // routes approved fixes through the Hermes pipeline. Human gate stays only at
   // PR merge. Gated on the OpenRouter key + the group + the cost hard-stop.
+  // When ZOE_REPO_IMPROVER_LEASES=true, runs through Heart lease layer to
+  // prevent concurrent scouts. Default OFF (zero behavior change until flag flips).
   tasks.push(
     cron.schedule(
       '30 */3 * * *',
@@ -727,9 +786,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
         // Chunk the send: audits routinely exceed Telegram's 4096-char limit and
         // were getting truncated mid-sentence (tg-chunk.ts). Never raw-send long text.
-        await runRepoImproverTick(async (text: string) => {
-          await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
-        });
+        try {
+          await runRepoImproverScout(async (text: string) => {
+            await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
+          });
+        } catch (err) {
+          console.error('[zoe/scheduler] repo-improver scout failed:', (err as Error).message);
+        }
       },
       { timezone: 'UTC' },
     ),

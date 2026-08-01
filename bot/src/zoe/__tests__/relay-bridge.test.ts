@@ -96,10 +96,15 @@ describe('tryInstantRelayReply', () => {
     process.env.COWORK_TRACKER_URL = 'https://x.test';
     process.env.COWORK_TRACKER_KEY = 'k';
     const hub = { id: 'h1', metadata: { relays: [] as RelayMsg[] } };
-    let patched: unknown;
-    const fetchMock = vi.fn(async (_url: string, init?: { method?: string; body?: string }) => {
-      if (init?.method === 'PATCH') {
-        patched = JSON.parse(init.body || '{}');
+    let merged: unknown;
+    let mergeUrl = '';
+    const fetchMock = vi.fn(async (url: string, init?: { method?: string; body?: string }) => {
+      // The write goes through the atomic relay_hub_merge RPC (POST), NOT a
+      // whole-object PATCH - a PATCH of { metadata: { relays } } replaces the
+      // whole metadata column and wipes metadata.holds (doc 2170 R0).
+      if (init?.method === 'POST') {
+        mergeUrl = url;
+        merged = JSON.parse(init.body || '{}');
         return { ok: true, text: async () => '' } as unknown as Response;
       }
       return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
@@ -107,9 +112,12 @@ describe('tryInstantRelayReply', () => {
     vi.stubGlobal('fetch', fetchMock);
     const ok = await tryInstantRelayReply('rl-cowork', 'on it', 'ts1');
     expect(ok).toBe(true);
+    // it hit the merge RPC, and the patch touches ONLY the relays key
+    expect(mergeUrl).toContain('/rest/v1/rpc/relay_hub_merge');
+    const patch = (merged as { p_patch: { relays: RelayMsg[] } }).p_patch;
+    expect(Object.keys(patch)).toEqual(['relays']);
     // the appended reply targets the cowork lane with from:zoe
-    const relays = (patched as { metadata: { relays: RelayMsg[] } }).metadata.relays;
-    expect(relays.at(-1)).toMatchObject({ from: 'zoe', to: 'cowork', msg: 'on it', read: false });
+    expect(patch.relays.at(-1)).toMatchObject({ from: 'zoe', to: 'cowork', msg: 'on it', read: false });
     vi.unstubAllGlobals();
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;

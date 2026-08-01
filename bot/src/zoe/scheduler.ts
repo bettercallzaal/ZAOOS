@@ -24,6 +24,7 @@ import { generateMorningBrief } from './brief';
 import { runCockpit } from '../cockpit/cockpit';
 import { generateEveningReflection } from './reflect';
 import { generateNightlyRecap } from './recap';
+import { persistDailyDigest } from './afferent-digest';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
@@ -371,6 +372,41 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('nightly-recap');
           console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Afferent digest — 02:30 UTC (30 min after nightly recap). Receipts -> memory bridge.
+  // Turns the day's organism activity into ONE durable self-knowledge record.
+  // Silent when nothing to digest (no send, no sentinel claim).
+  tasks.push(
+    cron.schedule(
+      '30 2 * * *',
+      async () => {
+        if (!(await claimFire('afferent-digest'))) return;
+        try {
+          const result = await persistDailyDigest();
+          if (result.status === 'silent') {
+            // Silent when nothing to digest — release the claim so logging is clean
+            await releaseFire('afferent-digest');
+            console.log('[zoe/scheduler] afferent digest: nothing to digest (silent)');
+            return;
+          }
+          if (result.status === 'error') {
+            // Loud-fail: DB error or critical issue
+            await releaseFire('afferent-digest');
+            console.error('[zoe/scheduler] afferent digest failed:', result.message);
+            return;
+          }
+          // Success: log the digest summary
+          console.log(
+            `[zoe/scheduler] afferent digest: ${result.receiptCount} receipts, bonfire=${result.bonfire ?? false}`,
+          );
+        } catch (err) {
+          await releaseFire('afferent-digest');
+          console.error('[zoe/scheduler] afferent digest error:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

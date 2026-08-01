@@ -25,6 +25,7 @@ import { runCockpit } from '../cockpit/cockpit';
 import { generateEveningReflection } from './reflect';
 import { generateNightlyRecap } from './recap';
 import { persistDailyDigest } from './afferent-digest';
+import { rolloverNotes } from './daily-note';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
@@ -410,6 +411,28 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         }
       },
       { timezone: 'UTC' },
+    ),
+  );
+
+  // Daily note rollover — 00:00 America/New_York (EST/EDT midnight, not UTC).
+  // Idempotent per (owner_id, note_date): creates today's note for each owner with
+  // a yesterday note, copies unchecked items to the TOP, increments roll_count,
+  // and runs automatic promotion (@mention + committed date -> real task rows).
+  // Loud-fail on DB error (exits non-zero to page).
+  tasks.push(
+    cron.schedule(
+      '0 0 * * *',
+      async () => {
+        if (!(await claimFire('daily-note-rollover'))) return;
+        try {
+          const summary = await rolloverNotes();
+          console.log(`[zoe/scheduler] daily note rollover: ${summary}`);
+        } catch (err) {
+          await releaseFire('daily-note-rollover');
+          console.error('[zoe/scheduler] daily note rollover failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'America/New_York' },
     ),
   );
 

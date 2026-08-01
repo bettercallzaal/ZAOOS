@@ -220,11 +220,37 @@ function hasCommittedDate(text: string): boolean {
 }
 
 /**
- * Determine if an item should be promoted based on its text.
- * Returns the reason if promoting, null otherwise.
+ * Test if the item states a DONE-CONDITION - the work is already defined enough
+ * to know when it is finished. Per cowork's measurement across all 1367 board
+ * tasks (doc 2169 amendment): source/definition predicts completion far better
+ * than priority (decorative, ~flat) or dates (met only 11.5% of the time). The
+ * 100%-completion buckets - pr-test-task, research-dispatch, meeting-capture -
+ * all shared one trait: a concrete done-condition existed when the work landed.
+ * This is the single variable separating the 100% buckets from the ~56%
+ * speculative ones, so an item that states one is worth surfacing as a real task.
+ */
+function hasDoneCondition(text: string): boolean {
+  // A concrete deliverable/artifact reference (URL, PR#/issue#, "doc NNN", a file path)
+  if (/https?:\/\/|\bPR\s*#?\d+|#\d{2,}|\bdoc\s+\d+|\/[\w-]+\.[a-z]{2,4}\b/i.test(text)) return true;
+  // Explicit outcome / done-when clauses
+  if (/\b(done when|so that|until it|passes|returns|ships?|deliver(ed|s)?|merge[ds]?|resolves?)\b/i.test(text)) return true;
+  // Arrow-to-outcome: "X -> Y"
+  if (/->/.test(text)) return true;
+  return false;
+}
+
+/**
+ * Determine if an item should be promoted based on its text, and WHICH signal
+ * fired (logged per-promotion so we can measure which of the three earns its
+ * place after a few weeks - cowork's ask). Order reflects the measured strength:
+ * mention (visibility - items naming a person complete LESS, 68.7% vs 76.1%, so
+ * they most need surfacing), then done-condition (the strongest completion
+ * predictor), then date (kept but noisy - dates are aspirational 88.5% of the
+ * time; promotion only creates a row, so noise is cheap).
  */
 function promoteReason(text: string): string | null {
   if (hasKnownMention(text)) return 'mention';
+  if (hasDoneCondition(text)) return 'done-condition';
   if (hasCommittedDate(text)) return 'date';
   return null;
 }

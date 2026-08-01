@@ -311,8 +311,16 @@ async function promoteCarriedItems(note: DailyNoteRow): Promise<DailyNoteRow> {
         continue;
       }
 
-      // Check if item should promote
-      const reason = promoteReason(item.text);
+      // Check if item should promote: a text signal, OR the DAY-7 dead-zone
+      // intervention. cowork's audit of 1367 tasks: completion is BIMODAL - done
+      // in week 1 (~18%) or done in a month-or-two (~79%), with a dead zone at
+      // days 8-14. If a task is not done in the first week it does not get done
+      // for another 3-8 weeks, and nothing currently acts at day 7. roll_count
+      // already counts the days, so an item that has rolled >= 7 times is entering
+      // the dead zone - surface it as a real row (the first behavioural
+      // intervention the board has; a signal it earned, not a date someone invented).
+      let reason = promoteReason(item.text);
+      if (!reason && (item.roll_count ?? 0) >= 7) reason = 'dead-zone-day7';
       if (!reason) {
         updatedItems.push(item);
         continue;

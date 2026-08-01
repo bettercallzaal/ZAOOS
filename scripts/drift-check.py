@@ -54,7 +54,7 @@ def rel(fp):
 # --- 1. brand-domain drift (canonical-free) ---
 # ZAO-owned / ZAO-relevant brand names whose domain should be consistent.
 BRANDS = [
-    "magnetiq", "wavewarz", "thezao", "zabalgamez", "zabalgames", "sparkz",
+    "wavewarz", "thezao", "zabalgamez", "zabalgames", "sparkz",
     "poidh", "zaostock", "bettercallzaal", "useicm", "restream",
 ]
 # Known-legit multi-domain brands (own more than one on purpose - NOT drift).

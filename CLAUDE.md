@@ -17,7 +17,7 @@ The pattern: **Monorepo as Lab.**
 - Sharing model: clone, no deps. Each graduate stands alone.
 - Research stays in ZAOOS forever - it's the institutional memory across every product.
 
-**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, ~1,275 active research docs. 313 API routes, 296 components, 20 hooks. (Counts verified 2026-07-17 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, ~1,275 active research docs. 322 API routes, 296 components, 18 hooks. (Counts verified 2026-07-31 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
 
 **Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
 
@@ -25,7 +25,7 @@ The pattern: **Monorepo as Lab.**
 
 | Directory | What | When to Read |
 |-----------|------|-------------|
-| `src/app/api/` | 313 route handlers across 55 domains | Working on backend |
+| `src/app/api/` | 322 route handlers across 55 domains | Working on backend |
 | `src/components/` | 296 components by feature | Working on UI |
 | `src/hooks/` | 20 custom hooks (useAuth, useChat, useRadio, etc.) | Working on state |
 | `src/lib/` | Utils across 42 domains: auth, db, farcaster, music, publish, agents | Working on business logic |

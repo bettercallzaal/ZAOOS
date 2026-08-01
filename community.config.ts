@@ -171,18 +171,6 @@ export const communityConfig = {
    *  Icons: 'magnet' | 'music' | 'castle' | 'rocket' | 'coin' | 'nouns' | 'battle' */
   partners: [
     {
-      name: 'MAGNETIQ',
-      description: 'Proof of Meet hub — verify real-world connections and earn attestations.',
-      url: 'https://app.magnetiq.xyz',
-      icon: 'magnet',
-    },
-    {
-      name: 'SongJam',
-      description: 'Live audio spaces & ZABAL mention leaderboard — host rooms, earn points.',
-      url: 'https://songjam.space/zabal',
-      icon: 'music',
-    },
-    {
       name: 'Empire Builder',
       description: 'Token empire rewards — stake and earn in the ZABAL ecosystem.',
       url: 'https://empirebuilder.world',

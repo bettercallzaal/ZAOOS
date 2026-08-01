@@ -22,6 +22,7 @@ import { homedir } from 'node:os';
 import type { DecompositionPlan } from './decompose';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
+import { emitReceipt } from './receipts';
 import type { ZoeContext } from './types';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
@@ -151,6 +152,8 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
 
   try {
     const item = q[0];
+    // Captured from the research-doc hook so the receipt can point at the PR (R1b).
+    let evidenceUrl: string | null = null;
     const ctx: ZoeContext = {
       zaal_tg_id: deps.zaalTgId,
       workspace_dir: deps.repoDir,
@@ -191,6 +194,7 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
           onSubtaskDone: async (st, r) => {
             if (st.worker === 'research-worker' && r.status === 'completed' && r.output) {
               const doc = await commitResearchDoc({ question: item.input, findings: r.output });
+              if (doc.ok) evidenceUrl = doc.prUrl ?? null;
               // Report the result to the topic it was requested from (else DM).
               await reportFor(item, deps)(
                 doc.ok
@@ -203,9 +207,28 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       });
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
       await bumpToday(deps.currentDate);
+      // Receipt so the afferent digest (R1) sees the work-loop's output, not just
+      // repo-improver. Best-effort - never let a receipt failure break the tick.
+      await emitReceipt({
+        agentIdentity: 'zoe',
+        capability: 'research',
+        tool: 'work-loop',
+        action: 'work_tick',
+        resultType: 'success',
+        evidenceUrl,
+        approvalClass: 'auto',
+      }).catch(() => {});
     } catch (e) {
       const errMsg = (e as Error)?.message ?? String(e);
       console.error('[zoe/work-loop] tick failed:', errMsg);
+      await emitReceipt({
+        agentIdentity: 'zoe',
+        capability: 'research',
+        tool: 'work-loop',
+        action: 'work_tick',
+        resultType: 'error',
+        approvalClass: 'auto',
+      }).catch(() => {});
       await reportFor(item, deps)(
         `Work-loop error: failed to process "${item.input.slice(0, 60)}..." - ${errMsg.slice(0, 120)}`,
       ).catch(() => {});

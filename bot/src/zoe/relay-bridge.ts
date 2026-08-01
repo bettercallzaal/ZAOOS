@@ -132,14 +132,23 @@ export async function fetchHub(): Promise<HubRow | null> {
   return { id: rows[0].id, relays: rows[0].metadata?.relays ?? [] };
 }
 
-/** Write the relays array back onto the hub row. Best-effort; returns success. */
-export async function saveHubRelays(id: string, relays: RelayMsg[]): Promise<boolean> {
+/** Write the relays array back onto the hub row. Best-effort; returns success.
+ *
+ * Uses the atomic `relay_hub_merge(p_patch)` RPC (server-side `metadata = metadata
+ * || p_patch`) instead of a whole-object PATCH. A whole-object PATCH of
+ * `{ metadata: { relays } }` REPLACES the entire metadata column, silently
+ * destroying every other top-level key - most importantly `metadata.holds`
+ * (Zaal-gated decisions parked by any lane). The merge only touches the `relays`
+ * key, so a relay write can never clobber holds and vice versa. The RPC targets
+ * the hub row internally (legacy_id 9000); `id` is kept for call-site
+ * compatibility but is not needed by the merge. See doc 2170 (R0). */
+export async function saveHubRelays(_id: string, relays: RelayMsg[]): Promise<boolean> {
   const c = creds();
   if (!c) return false;
-  const out = await fetchJson(`${c.base}/rest/v1/tasks?id=eq.${id}`, {
-    method: 'PATCH',
+  const out = await fetchJson(`${c.base}/rest/v1/rpc/relay_hub_merge`, {
+    method: 'POST',
     headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({ metadata: { relays: relays.slice(-500) } }),
+    body: JSON.stringify({ p_patch: { relays: relays.slice(-500) } }),
   });
   return out !== null;
 }

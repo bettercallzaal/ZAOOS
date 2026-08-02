@@ -245,3 +245,6 @@
 | 2166 | [ZABAL Week 2: Challenge Options (needs Zaal pick)](./2166-zabal-week2-challenge-options/) | DESIGN | 3 Week-2 options bridging Week-1-most-improved -> WaveWarZ finale: A Ship-New, B Pay-It-Forward (RECOMMENDED - you become the helper, scored on credits RECEIVED = Respect culture as a challenge, compounds the Wk1 flywheel), C Battle-Prep. Rec: B + a dose of C. THE one open design decision left before Loops config can finalize. Related: 2165, 2137, 2164. |
 | 2168 | [ZABAL Finale: WaveWarZ battle mechanics](./2168-zabal-wavewarz-finale-mechanics/) | DESIGN | How top-2/track -> 3-5 WaveWarZ Community Battles -> one winner/track; grounded on doc 743 + wavewarz ICM box. Flags THE open dependency: which chain settles (Solana mainnet is the proven live rail; WaveWarZ-Base needs ship+audit confirmation). Track->battle mapping (build/content = entry). $500 pool sits on top; 1%-forever to entries. Owner-flagged open items for Ike/Sam. Related: 2137, 2165, 2166. |
 | 2177 | [research](./2177-research/) | DISPATCH | ZOE research: https://x.com/aibullss/status/2082458925149081960?s=46 research |
+| 2177 | [Research](./2177-research/) | DISPATCH | ZOE research: https://x.com/cyrilxbt/status/2083235395236495817?s=46
+
+Research |

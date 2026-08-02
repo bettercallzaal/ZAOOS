@@ -17,6 +17,7 @@ on:
     paths:
       - 'research/**'
       - 'scripts/backfill-research-index.sh'
+      - '.github/workflows/research-index.yml'
 permissions:
   contents: write
 jobs:
@@ -33,7 +34,17 @@ jobs:
           if ! git diff --quiet -- research; then
             git config user.name "zao-index-bot"
             git config user.email "zao-index-bot@users.noreply.github.com"
-            git add research/*/README.md
+            # `git add research/*/README.md` died here: the shell glob expands
+            # to research/314-music-metadata-isrc-ai-distribution/README.md,
+            # which sits behind a TRACKED SYMLINK (research/314-... ->
+            # music/314-...), and git refuses a pathspec that traverses a
+            # symlink ("fatal: ... is beyond a symbolic link", exit 128). The
+            # step is `bash -e`, so the job died and the backfill was thrown
+            # away on every run that actually had rows to commit.
+            # `-u` stages modifications to already-tracked files under
+            # research/ (all this script ever does is append to an existing
+            # topic README), and a directory pathspec never walks the symlink.
+            git add -u -- research
             git commit -m "chore(research): CI backfill folder index rows [skip ci]"
             git push || echo "::warning::index backfill could not push (branch protection?) - nightly backfill will catch it"
           else

@@ -36,8 +36,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Read "status<TAB>filename" pairs so we can require additive-only scripts.
-          pairs=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | "\(.status)\t\(.filename)"')
+          #
+          # --paginate is load-bearing: without it this returns only the FIRST page
+          # (100 files) and every file past that is invisible to the classifier. A
+          # PR whose 101st file is runtime code would be classified off its first
+          # 100 (docs) and auto-merged unreviewed. GitHub still hard-caps this
+          # endpoint at 3000 files, so the count assertion below fails closed on
+          # any remaining truncation (silent-failure-guard rules 1-3).
+          pairs=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | "\(.status)\t\(.filename)"')
           echo "$pairs"
+
+          # Fail closed unless we saw EVERY changed file. A short list can only
+          # under-report unsafe files, so anything incomplete waits for Zaal.
+          seen=$(printf '%s\n' "$pairs" | grep -c . || true)
+          expected='${{ github.event.pull_request.changed_files }}'
+          if [ "$seen" != "$expected" ]; then
+            echo "::warning title=PR file list incomplete::classified $seen of $expected changed files - holding for review"
+            echo "category=unsafe" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           has_docs=0; has_tests=0; has_scripts=0; has_unsafe=0
           while IFS=$'\t' read -r status f; do
             [ -z "$f" ] && continue
@@ -97,7 +115,9 @@ jobs:
           # e.g. 363 exists as both community/363-... and agents/363-...) would
           # otherwise be falsely held forever - which blocked real green docs PRs
           # (#1650/#1654/#1661/#1613) on edits they did not author. (Fixed 2026-07-17.)
-          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | select(.status=="added") | .filename')
+          # --paginate for the same reason as the classifier: an added doc dir past
+          # the first page would otherwise never be collision-checked.
+          files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | select(.status=="added") | .filename')
           newdirs=$(echo "$files" | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u || true)
           if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)

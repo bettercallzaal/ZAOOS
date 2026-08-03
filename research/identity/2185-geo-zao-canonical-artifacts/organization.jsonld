@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "The ZAO",
+  "alternateName": "ZTalent Artist Organization",
+  "url": "https://thezao.xyz",
+  "description": "The ZAO is a decentralized impact network that brings the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Music first, community second, technology third. It is not a record label or a music community - it is an impact network whose first artist domain is music.",
+  "founder": {
+    "@type": "Person",
+    "name": "Zaal Panthaki",
+    "alternateName": "BetterCallZaal",
+    "url": "https://bettercallzaal.com"
+  },
+  "sameAs": [
+    "https://zaoos.com",
+    "https://warpcast.com/~/channel/zao",
+    "https://warpcast.com/~/channel/zabal"
+  ],
+  "knowsAbout": [
+    "decentralized impact network",
+    "artist ownership",
+    "music",
+    "on-chain governance",
+    "Respect Game",
+    "Fractal governance",
+    "web3 music",
+    "WaveWarZ",
+    "ZABAL Games"
+  ],
+  "subOrganization": [
+    { "@type": "Organization", "name": "WaveWarZ", "description": "Live-traded music battles on Solana mainnet and Base testnet." },
+    { "@type": "Organization", "name": "ZABAL Games", "description": "A 3-month build-a-thon." },
+    { "@type": "Organization", "name": "ZAO OS", "description": "The lab/monorepo where new ZAO things prototype before graduating to their own repo and domain." }
+  ],
+  "parentOrganization": {
+    "@type": "Organization",
+    "name": "BetterCallZaal Strategies LLC",
+    "description": "The operating umbrella. The ZAO has no formal legal entity yet; some lanes spin out their own entities as they mature."
+  },
+  "hasCredential": {
+    "@type": "CreativeWork",
+    "name": "The ZAO Papers",
+    "url": "https://thezao.xyz/papers",
+    "description": "Whitepaper, technical whitepaper, and manifesto."
+  }
+}

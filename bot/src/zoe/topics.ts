@@ -21,6 +21,7 @@ export const STANDARD_TOPICS = [
   'Farcaster',
   'Coding',
   'Ideas',
+  'Learn',
   'Newsletter',
   'WaveWarZ',
   'ZABAL Games',

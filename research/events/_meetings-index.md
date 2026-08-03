@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-03 | ZAO launchpad + ZM livestream sync | ZAO Devz | Zaal, Jose, Jim | [2186](2186-zao-launchpad-livestream-sync-jose-jim/) | 5 |
 | 2026-07-28 | Heart of Ellsworth Promotion Committee - ZAO Stock @ Art of Ellsworth | ZAO/events | Zaal, Laurel, Joy, Chesnee, Leslie | [2134](2134-heart-of-ellsworth-promo-jul28/) | 4 |
 | 2026-07-22 | Yulia x Zaal - job search + build-a-thon + Maine event | ZAO/network | Zaal, Yulia | [2128](2128-yulia-zaal-jobsearch-buildathon/) | 4 |
 | 2026-07-29 | Matteo Tambussi x Zaal - decentralized tooling + Spaghetti radio x ZAO streams | ZAO/partnership | Zaal, Matteo | [2129](2129-matteo-tambussi-decentralized-tooling/) | 4 |

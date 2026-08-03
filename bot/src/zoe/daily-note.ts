@@ -367,15 +367,32 @@ async function promoteCarriedItems(note: DailyNoteRow): Promise<DailyNoteRow> {
 }
 
 /**
+ * What a rollover run reports back to the scheduler.
+ *
+ * The scheduler must be able to tell "there was nothing to roll" apart from
+ * "the database was down", because those need opposite handling: a silent run
+ * is normal, a failed run must log at error level and must NOT leave the day's
+ * fire sentinel claimed (.claude/rules/silent-failure-guard.md rule 6). This
+ * mirrors the discriminated status `persistDailyDigest` already returns.
+ */
+export type RolloverStatus = 'success' | 'silent' | 'error';
+
+export interface RolloverResult {
+  status: RolloverStatus;
+  summary: string;
+}
+
+/**
  * Rollover cron job — called daily at 00:00 EST.
  * For each owner with a yesterday note:
  *   1. Create today's note if not present (idempotent).
  *   2. Copy unchecked items to TOP of today, increment roll_count.
  *   3. Run promotion pass on carried items.
  *
- * Returns a summary of what was rolled (for logging).
+ * Returns the run status plus a summary of what was rolled (for logging).
+ * Never throws — a failure is reported as status 'error' so the caller decides.
  */
-export async function rolloverNotes(): Promise<string> {
+export async function rolloverNotes(): Promise<RolloverResult> {
   try {
     const client = db();
     const yesterday = yesterdayIso();
@@ -390,16 +407,17 @@ export async function rolloverNotes(): Promise<string> {
 
     if (error) {
       console.error('[zoe/daily-note] rollover query failed:', error.message);
-      return 'error: DB query failed';
+      return { status: 'error', summary: `DB query failed: ${error.message}` };
     }
 
     if (!yesterdayNotes || yesterdayNotes.length === 0) {
       console.log('[zoe/daily-note] rollover: no yesterday notes found (silent)');
-      return 'silent: no notes to roll';
+      return { status: 'silent', summary: 'no notes to roll' };
     }
 
     let totalRolled = 0;
     let totalPromoted = 0;
+    let failedOwners = 0;
 
     for (const yesterdayRow of yesterdayNotes) {
       const yesterdayMeta = (yesterdayRow.metadata as DailyNoteMetadata) ?? { items: [], note_date: yesterday };
@@ -414,7 +432,8 @@ export async function rolloverNotes(): Promise<string> {
       // Create today's note (idempotent by owner + date)
       const todayNote = await getOrCreateTodayNote(ownerId);
       if (!todayNote) {
-        console.warn(`[zoe/daily-note] failed to create today note for owner ${ownerId}`);
+        console.error(`[zoe/daily-note] failed to create today note for owner ${ownerId}`);
+        failedOwners++;
         continue;
       }
 
@@ -443,6 +462,7 @@ export async function rolloverNotes(): Promise<string> {
 
       if (updateError) {
         console.error(`[zoe/daily-note] rollover update failed for owner ${ownerId}:`, updateError.message);
+        failedOwners++;
         continue;
       }
 
@@ -462,11 +482,21 @@ export async function rolloverNotes(): Promise<string> {
     }
 
     const summary = `rolled ${totalRolled} items, promoted ${totalPromoted}`;
+
+    // A partial failure is still a failure: the owners that errored have items
+    // stranded on yesterday's note, and tomorrow's run only looks at TODAY's
+    // note, so they are never picked up again unless this run is retried.
+    if (failedOwners > 0) {
+      const detail = `${summary} (${failedOwners}/${yesterdayNotes.length} owners failed)`;
+      console.error(`[zoe/daily-note] rollover partially failed: ${detail}`);
+      return { status: 'error', summary: detail };
+    }
+
     console.log(`[zoe/daily-note] rollover complete: ${summary}`);
-    return summary;
+    return { status: 'success', summary };
   } catch (err) {
     console.error('[zoe/daily-note] rolloverNotes error:', (err as Error)?.message ?? err);
-    return `error: ${(err as Error)?.message ?? 'unknown'}`;
+    return { status: 'error', summary: (err as Error)?.message ?? 'unknown' };
   }
 }
 

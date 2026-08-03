@@ -26,6 +26,24 @@ export interface DigestResult {
 }
 
 /**
+ * Result of a digest build. "nothing happened today" (empty) and "we could not find
+ * out what happened today" (error) are DIFFERENT outcomes and must not collapse into
+ * one silent status - a DB outage reported as "nothing to digest" is exactly the
+ * green-while-broken failure `.claude/rules/silent-failure-guard.md` bans.
+ */
+type DigestBuild =
+  | {
+      kind: 'ok';
+      digest: string;
+      receiptCount: number;
+      statsByAgent: Record<string, number>;
+      statsByCapability: Record<string, number>;
+      statsByResultType: Record<string, number>;
+    }
+  | { kind: 'empty' }
+  | { kind: 'error'; message: string };
+
+/**
  * Compose a concise prose digest of today's organism activity.
  *
  * Queries receipts from the last 24h, groups by agent + capability, and produces
@@ -33,13 +51,7 @@ export interface DigestResult {
  *   "Today the organism: 42 receipts across zoe(35), zol(7). Actions: 28 posts,
  *    8 repos, 4 fetches, 2 decisions. 1 error, rest success."
  */
-async function buildDailyDigest(): Promise<{
-  digest: string;
-  receiptCount: number;
-  statsByAgent: Record<string, number>;
-  statsByCapability: Record<string, number>;
-  statsByResultType: Record<string, number>;
-} | null> {
+async function buildDailyDigest(): Promise<DigestBuild> {
   try {
     const client = db();
 
@@ -53,7 +65,7 @@ async function buildDailyDigest(): Promise<{
 
     if (error) {
       console.error('[zoe/afferent-digest] receipts query failed:', error.message);
-      return null;
+      return { kind: 'error', message: `receipts query failed: ${error.message}` };
     }
 
     const receipts = (data ?? []) as Array<{
@@ -65,7 +77,7 @@ async function buildDailyDigest(): Promise<{
     }>;
 
     if (receipts.length === 0) {
-      return null; // Silent if nothing to report
+      return { kind: 'empty' }; // Silent if nothing to report
     }
 
     // Group by agent, capability, result type
@@ -101,18 +113,30 @@ async function buildDailyDigest(): Promise<{
     const date = new Date().toISOString().slice(0, 10);
     const digest = `[${date}] Organism daily digest: ${receipts.length} actions across ${agentsSummary}. ${capsSummary}. ${resultsSummary}.`;
 
-    return { digest, receiptCount: receipts.length, statsByAgent, statsByCapability, statsByResultType };
+    return {
+      kind: 'ok',
+      digest,
+      receiptCount: receipts.length,
+      statsByAgent,
+      statsByCapability,
+      statsByResultType,
+    };
   } catch (err) {
-    console.error('[zoe/afferent-digest] buildDailyDigest error:', (err as Error)?.message ?? err);
-    return null;
+    const message = (err as Error)?.message ?? String(err);
+    console.error('[zoe/afferent-digest] buildDailyDigest error:', message);
+    return { kind: 'error', message };
   }
 }
 
 /**
  * Check if a digest receipt already exists for today (idempotency check).
  * Uses a per-day key: `afferent-digest-YYYY-MM-DD`.
+ *
+ * Tri-state on purpose: 'unknown' means the check itself failed, which is NOT the
+ * same as "no digest exists". Collapsing 'unknown' into false would let a flaky
+ * check wave through a duplicate emit - the opposite of the safeguard.
  */
-async function digestExistsForToday(): Promise<boolean> {
+async function digestExistsForToday(): Promise<'yes' | 'no' | 'unknown'> {
   try {
     const client = db();
     const today = new Date().toISOString().slice(0, 10);
@@ -130,13 +154,13 @@ async function digestExistsForToday(): Promise<boolean> {
     if (error && error.code !== 'PGRST116') {
       // PGRST116 = not found (ok), any other error is loud-fail
       console.error('[zoe/afferent-digest] idempotency check failed:', error.message);
-      return false; // On check failure, don't emit (safeguard against double-fire)
+      return 'unknown'; // On check failure, don't emit (safeguard against double-fire)
     }
 
-    return !!data; // true if receipt found, false if not
+    return data ? 'yes' : 'no';
   } catch (err) {
     console.error('[zoe/afferent-digest] digestExistsForToday error:', (err as Error)?.message ?? err);
-    return false;
+    return 'unknown';
   }
 }
 
@@ -149,13 +173,21 @@ async function digestExistsForToday(): Promise<boolean> {
 export async function persistDailyDigest(): Promise<DigestResult> {
   try {
     // Idempotency: one digest per calendar day
-    if (await digestExistsForToday()) {
+    const existing = await digestExistsForToday();
+    if (existing === 'yes') {
       return { status: 'silent', message: 'digest already emitted today' };
+    }
+    if (existing === 'unknown') {
+      // The check failed, so we cannot prove this is not a re-run. Do NOT emit.
+      return { status: 'error', message: 'idempotency check failed - skipped emit' };
     }
 
     // Build the digest
     const digestData = await buildDailyDigest();
-    if (!digestData) {
+    if (digestData.kind === 'error') {
+      return { status: 'error', message: digestData.message };
+    }
+    if (digestData.kind === 'empty') {
       return { status: 'silent', message: 'no receipts to digest' };
     }
 

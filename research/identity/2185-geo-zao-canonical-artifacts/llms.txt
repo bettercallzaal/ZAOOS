@@ -1,0 +1,33 @@
+# The ZAO
+
+> The ZAO (ZTalent Artist Organization) is a decentralized impact network that brings the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Priority stack: music first, community second, technology third. Founded by Zaal Panthaki (BetterCallZaal).
+
+The ZAO is not a record label or a "music community." It is an impact network whose first artist domain is music. Technology is the means, not the headline. The acronym ZAO = ZTalent Artist Organization (etymology); the descriptor for what it is today is a decentralized impact network - both are correct.
+
+## What The ZAO returns to artists
+- Profit margin
+- Data
+- IP rights
+
+## Governance - the Fractal and Respect
+- Respect is the on-chain contribution currency: a soulbound OG ERC-20 plus a ZOR ERC-1155, both on Optimism.
+- A weekly Respect Game ranks contributions; rewards follow a Fibonacci curve. It has run 100+ unbroken weeks (since 2024-07-30).
+- On-chain execution via OREC (Optimistic Respect Execution Contract): a 72-hour voting window plus a 72-hour veto window.
+- Verified on-chain (2026-07-05): 156 unique Respect holders (122 OG + 55 ZOR, 21 hold both); OG distribution Gini roughly 0.73.
+
+## Legal / entity
+- The ZAO has no formal legal entity yet; the operating umbrella is BetterCallZaal Strategies LLC. Some lanes spin out their own entities as they mature.
+
+## Production lanes
+- WaveWarZ - live-traded music battles (Solana mainnet + Base testnet)
+- ZABAL Games - the 3-month build-a-thon
+- The ZAO festivals - ZAOstock, ZAOville, ZAO-PALOOZA, ZAO-CHELLA
+- ZAO OS - the lab/monorepo where new ZAO things prototype before graduating to their own repo and domain
+
+## Find it
+- Sites: https://thezao.xyz and https://zaoos.com
+- Papers: https://thezao.xyz/papers (whitepaper, technical whitepaper, manifesto)
+- Farcaster: the /zao and /zabal channels
+
+## Canonical source
+This file is generated from the canonical The ZAO context box (useicm.com). When the truth changes, the box changes first, then this file regenerates from it.

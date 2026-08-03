@@ -38,6 +38,11 @@ export function routeTopic(topicName: string | undefined): TopicAction {
       return { kind: 'coding' };
     case 'Ideas':
       return { kind: 'capture', project: 'ideas' };
+    case 'Learn':
+      // Things to absorb + apply: podcasts/talks/articles to transcribe, distill,
+      // and turn into personal action. Captured under the `learn` project so they
+      // funnel to the one board and can be triaged into concrete todos.
+      return { kind: 'capture', project: 'learn' };
     case 'Newsletter':
       return { kind: 'draft', draftKind: 'newsletter', label: 'Newsletter draft' };
     case 'Farcaster':

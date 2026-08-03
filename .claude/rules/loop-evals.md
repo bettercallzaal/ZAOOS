@@ -70,6 +70,29 @@ Each autonomous loop tracks a running reliability number and self-gates on it:
 - The number is REPORTED (in the loop's self-report / the board), so the count never
   surprises Zaal (workflow-discipline rule 2 - a loop self-reports what it opened).
 
+## High-stakes gate: default-FAIL, fresh-context evaluator
+
+For any HIGH-STAKES loop output (a code change to a live route, a deploy-path edit, a
+security-relevant finding, anything graded "critical"), the builder does not grade its own
+work. A SEPARATE evaluator - fresh context, NO write/edit tools - reviews the work against
+EVIDENCE and returns PASS / NEEDS_WORK. This is Anthropic's long-running-agent harness
+pattern (the `cwc-long-running-agents` "Default-FAIL Contract"), verified 2026-08-03, and it
+is strictly stronger than "the builder self-verifies."
+
+- **Default-FAIL.** Every gate criterion starts `false`. It flips to `true` ONLY when the
+  evaluator opens the cited evidence (the typecheck output, the failing-then-passing test,
+  the file:line) and confirms it. Absent evidence = stays failed. A criterion the evaluator
+  cannot verify is NEEDS_WORK, never a silent pass (extends `silent-failure-guard.md` and
+  `anti-fabrication.md` rule 2 - evidence or UNVERIFIED).
+- **Fresh context, no write tools.** The evaluator is a distinct agent/subagent that did not
+  build the change and cannot edit it - so it cannot rationalize its own work or quietly
+  "fix and pass." It only reads, checks evidence, and votes. This is the concrete form of
+  `agent-loops.md` rule 33 (verify a subagent's claims) + rule 7 (subagent for bounded
+  verification).
+- **Applies to high-stakes only.** Low-stakes prose/doc loops do not need a separate
+  evaluator (that would burn the cap for no gain - `claude-usage.md`); the A-F gate above is
+  enough. Reserve the fresh-context evaluator for changes whose failure is expensive.
+
 ## Guards
 
 - This gate is PR-only. Passing the rubric earns a PR, never an auto-merge or a
@@ -88,5 +111,7 @@ Andrej Karpathy's 2025-2026 agent model (loops + harnesses; march of nines; agen
 bloat) via research task (board #9075, 2026-08-02). The two exact X posts Zaal linked
 (x.com/0xkkai, x.com/sairahul1) returned 402 and are UNVERIFIED; the Karpathy
 synthesis is separately sourced. This rule operationalizes his model into ZAO's
-existing PR-only harness. Companion: `agent-loops.md`, `silent-failure-guard.md`,
-`anti-fabrication.md`, `code-restraint.md`, `workflow-discipline.md`.
+existing PR-only harness. The default-FAIL fresh-context evaluator section was folded
+in 2026-08-03 from Anthropic's `cwc-long-running-agents` harness (Default-FAIL Contract),
+verified FULL via the agent-tooling research task. Companion: `agent-loops.md`,
+`silent-failure-guard.md`, `anti-fabrication.md`, `code-restraint.md`, `workflow-discipline.md`.

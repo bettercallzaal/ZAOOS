@@ -425,8 +425,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('daily-note-rollover'))) return;
         try {
-          const summary = await rolloverNotes();
-          console.log(`[zoe/scheduler] daily note rollover: ${summary}`);
+          const result = await rolloverNotes();
+          if (result.status === 'error') {
+            // Loud-fail: rolloverNotes swallows its own exceptions and reports
+            // the failure as a status, so this branch (not the catch) is what
+            // actually fires on a DB outage. Release the claim so the day is not
+            // recorded as rolled, and log at error level.
+            await releaseFire('daily-note-rollover');
+            console.error('[zoe/scheduler] daily note rollover failed:', result.summary);
+            return;
+          }
+          if (result.status === 'silent') {
+            await releaseFire('daily-note-rollover');
+            console.log('[zoe/scheduler] daily note rollover: nothing to roll (silent)');
+            return;
+          }
+          console.log(`[zoe/scheduler] daily note rollover: ${result.summary}`);
         } catch (err) {
           await releaseFire('daily-note-rollover');
           console.error('[zoe/scheduler] daily note rollover failed:', (err as Error).message);

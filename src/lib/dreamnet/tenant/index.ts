@@ -78,3 +78,9 @@ export {
   runTenantCanary,
 } from './canary';
 export type { CanaryIdentity, CanaryTrustDeps, BuildEnvelopeOpts, CanaryResult, RunCanaryOpts } from './canary';
+
+export { runTenantConformance } from './conformance';
+export type { ConformanceCheck, ConformanceReport, ConformanceInput } from './conformance';
+
+export { onboardTenant, offboardTenant } from './onboarding';
+export type { TenantProfile, OnboardResult, OffboardResult } from './onboarding';

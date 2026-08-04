@@ -180,14 +180,20 @@ const PENDING_FILE = join(ZOE_PATHS.home, 'pending-approvals.json');
 // In-memory store, one pending item per chat scope. Mirror of disk.
 const pendingByScope = new Map<string, PendingApproval>();
 
-const REJECT_RE = /^\s*(n|no|nope|cancel|stop|abort|skip|nah|nvm|never\s*mind)\b/i;
+const REJECT_RE = /^\s*(n|no|nope|cancel|stop|abort|skip|nah|nvm|never\s*mind|don'?t|do\s+not)\b/i;
 const APPROVE_RE = /^\s*(y|yes|yep|yeah|yup|approve|approved|go|go ahead|ship it|ship|send it|do it|lgtm|sounds good)\b/i;
 const EDIT_RE = /^\s*(edit|revise|change|tweak|adjust|instead|actually|no but|wait)\b[:,]?\s*(.*)/i;
 // An explicit approval verb appearing ANYWHERE (not just at the start). Used to
 // override a leading edit/reject prefix (doc 770 MED): "actually yes do it" and
 // "no but go ahead" are approvals, not edits/rejects. Conservative — omits the
 // bare "y"/"go"/"ship" forms that would false-positive mid-sentence.
-const APPROVE_ANYWHERE_RE = /\b(yes|yep|yeah|yup|approved?|go ahead|ship it|send it|do it|lgtm|sounds good)\b/i;
+const APPROVE_ANYWHERE_RE = /\b(yes|yep|yeah|yup|approved?|go ahead|ship it|send it|do it|lgtm|sounds good)\b/gi;
+// A negation ADJACENT to the approval verb inverts it: "no, don't do it" and
+// "do not ship it" are rejections, not approvals. Only an immediately-preceding
+// negator (plus at most two filler words) counts, so the contrastive
+// "no but go ahead" / "change nothing, ship it" stay approvals.
+const NEGATED_APPROVE_TAIL_RE =
+  /\b(?:do\s*not|don'?t|does\s*not|doesn'?t|did\s*not|didn'?t|cannot|can'?t|won'?t|wouldn'?t|shouldn'?t|never|not|no|hold\s+off(?:\s+on)?)\s*[,:-]?\s+(?:(?:really|just|please|actually|ever|yet|still|you|i|we|to|go|maybe)\s+){0,2}$/i;
 // Subtask / patch / proposal ids: st-1, patch-2, lp-3, etc.
 const ID_RE = /\b((?:st|patch|lp|sq|task)-[a-z0-9]+)\b/gi;
 
@@ -206,7 +212,7 @@ export function parseApprovalReply(text: string): ApprovalReply {
   const trimmed = text.trim();
   if (!trimmed) return { decision: 'not-an-approval', ids: [] };
 
-  const containsApprove = APPROVE_ANYWHERE_RE.test(trimmed);
+  const containsApprove = hasUnnegatedApproval(trimmed);
 
   if (REJECT_RE.test(trimmed) && !containsApprove) {
     return { decision: 'reject', ids: [] };
@@ -228,6 +234,18 @@ export function parseApprovalReply(text: string): ApprovalReply {
   }
 
   return { decision: 'not-an-approval', ids: [] };
+}
+
+/**
+ * True when an approval verb appears WITHOUT an adjacent negation. Used for the
+ * approve-anywhere override, so "no but go ahead" still approves while
+ * "no, don't do it" does not.
+ */
+function hasUnnegatedApproval(text: string): boolean {
+  for (const m of text.matchAll(APPROVE_ANYWHERE_RE)) {
+    if (!NEGATED_APPROVE_TAIL_RE.test(text.slice(0, m.index))) return true;
+  }
+  return false;
 }
 
 function extractIds(text: string): string[] {

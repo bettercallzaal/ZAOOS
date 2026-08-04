@@ -180,6 +180,28 @@ export class DurableEffectLedger implements EffectLedger {
     await this.logAttempt(runId, effectKey, 0, 'reconciled', { reopened: true });
   }
 
+  /**
+   * Reconciler bookkeeping: record ONE unresolved reconcile pass on a stale
+   * dispatched row. `attempts` is inserted as 0 by claimIntent and no other path
+   * writes it, so without this the reconciler's abandon ceiling can never be
+   * reached and an unverifiable row is revisited forever instead of reaching a
+   * terminal state. Conditional on state='dispatched' so a row that got resolved
+   * concurrently is not touched. Returns the recorded count.
+   */
+  async noteUnresolved(runId: string, effectKey: string, currentAttempts: number): Promise<number> {
+    const next = (Number.isFinite(currentAttempts) ? currentAttempts : 0) + 1;
+    const { error } = await this.client
+      .from(this.intents)
+      .update({ attempts: next })
+      .eq('run_id', runId)
+      .eq('effect_key', effectKey)
+      .eq('state', 'dispatched')
+      .select('run_id')
+      .maybeSingle();
+    if (error) throw new Error(`noteUnresolved failed: ${error.message}`);
+    return next;
+  }
+
   /** Reconciler outcome: give up past the attempt ceiling (terminal). */
   async abandon(runId: string, effectKey: string, reason: string): Promise<void> {
     await this.client

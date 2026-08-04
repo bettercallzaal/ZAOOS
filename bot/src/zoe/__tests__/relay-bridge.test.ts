@@ -161,4 +161,30 @@ describe('pushInboundRelays', () => {
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;
   });
+
+  it('does NOT mark pushed (or arm the reply path) when every Telegram send fails', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://x.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    const hub = { id: 'h1', metadata: { relays: [rel({ from: 'cowork', to: 'zoe', ts: 'a', tg_pushed: false })] } };
+    const writes: string[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: { method?: string }) => {
+      if (init?.method === 'POST') writes.push(url);
+      return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const sendMessage = vi.fn(async () => {
+      throw new Error('telegram 429');
+    });
+    const recordContext = vi.fn(async () => {});
+    const armPending = vi.fn();
+    const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext, armPending });
+    // the relay stays pending so the next tick retries it - not silently dropped
+    expect(n).toBe(0);
+    expect(writes).toEqual([]);
+    expect(recordContext).not.toHaveBeenCalled();
+    expect(armPending).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+    delete process.env.COWORK_TRACKER_URL;
+    delete process.env.COWORK_TRACKER_KEY;
+  });
 });

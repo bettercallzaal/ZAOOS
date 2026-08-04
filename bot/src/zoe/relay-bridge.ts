@@ -232,6 +232,13 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
         formatInboundDm(r),
         { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
       );
+      // sendChunkedToTelegram swallows per-chunk send errors and returns null
+      // ONLY when every chunk failed - so the catch below never fires on a send
+      // failure. Marking tg_pushed there would permanently drop the relay (it is
+      // the only dedup gate and is never re-evaluated), and would also arm the
+      // gesture-free reply path for a message Zaal never saw. Leave it unpushed
+      // so the next tick retries. (silent-failure-guard rules 1 + 6.)
+      if (sent == null) continue;
       pushedTs.add(r.ts);
       // Register message_id -> rl-<lane> so a plain reply to THIS message routes
       // back to the lane (no button tap). Best-effort - never blocks the push.

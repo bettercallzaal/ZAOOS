@@ -159,6 +159,38 @@ test('an approval verb anywhere overrides a leading reject ("no but go ahead")',
   assert.equal(parseApprovalReply('no but go ahead').decision, 'approve-all');
 });
 
+test('a NEGATED approval verb never approves ("no, don\'t do it")', () => {
+  // The approve-anywhere override used to fire on the verb inside a negation,
+  // so a rejection containing "do it"/"ship it"/"go ahead" was parsed as
+  // approve-all and the plan dispatched.
+  for (const t of [
+    "no, don't do it",
+    "don't do it",
+    "do not ship it",
+    "no, don't go ahead",
+    "nope, don't send it",
+    "no do it",
+    "never do it",
+    "can't ship it",
+  ]) {
+    assert.notEqual(parseApprovalReply(t).decision, 'approve-all', `"${t}" must not approve`);
+    assert.notEqual(parseApprovalReply(t).decision, 'approve-ids', `"${t}" must not approve`);
+  }
+});
+
+test('leading "don\'t" / "do not" resolve to reject', () => {
+  for (const t of ["don't do it", "don't", 'do not ship it', "no, don't do it"]) {
+    assert.equal(parseApprovalReply(t).decision, 'reject', `"${t}" should reject`);
+  }
+});
+
+test('negation detection does not swallow real approvals', () => {
+  assert.equal(parseApprovalReply('no but go ahead').decision, 'approve-all');
+  assert.equal(parseApprovalReply('change nothing, ship it').decision, 'approve-all');
+  assert.equal(parseApprovalReply('actually yes do it').decision, 'approve-all');
+  assert.equal(parseApprovalReply("don't wait, ship it").decision, 'approve-all');
+});
+
 test('a bare edit keyword with no content is NOT an edit (leaves pending)', () => {
   // "wait" alone used to become edit with empty text → empty re-decompose.
   assert.equal(parseApprovalReply('wait').decision, 'not-an-approval');

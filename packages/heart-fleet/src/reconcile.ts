@@ -80,7 +80,10 @@ export async function reconcileOutbox(
         await ledger.reopen(intent.run_id, intent.effect_key, 'reconciler: provably not sent, reopened for retry');
         summary.reopened++;
       } else {
-        // unknown - never resend (at-most-once). Abandon past the ceiling.
+        // unknown - never resend (at-most-once). Abandon past the ceiling. The
+        // count lives on the row and is bumped once per unresolved pass below;
+        // nothing else writes `attempts`, so skipping that bump would make this
+        // ceiling unreachable and leave the row dispatched forever.
         if (intent.attempts >= maxAttempts) {
           await ledger.abandon(
             intent.run_id,
@@ -89,6 +92,7 @@ export async function reconcileOutbox(
           );
           summary.abandoned++;
         } else {
+          await ledger.noteUnresolved(intent.run_id, intent.effect_key, intent.attempts);
           summary.left++;
         }
       }

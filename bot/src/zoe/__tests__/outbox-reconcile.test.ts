@@ -130,6 +130,25 @@ describe('reconcileOutbox', () => {
     expect(row.last_error).toContain('at-most-once');
   });
 
+  it("counts each unresolved pass so an 'unknown' row reaches the ceiling (production starts at attempts=0)", async () => {
+    // claimIntent inserts attempts=0 and nothing else ever writes the column, so
+    // a real stale row starts here. Without per-pass counting the ceiling is
+    // unreachable and the row is revisited forever, never reaching a terminal state.
+    client.seedDispatched('e-real', 'telegram', 0);
+
+    const first = await reconcileOutbox(ledger, { maxAttempts: 2, now: NOW });
+    expect(first.left).toBe(1);
+    expect([...client.rows.values()][0].attempts).toBe(1);
+
+    const second = await reconcileOutbox(ledger, { maxAttempts: 2, now: NOW });
+    expect(second.left).toBe(1);
+    expect([...client.rows.values()][0].attempts).toBe(2);
+
+    const third = await reconcileOutbox(ledger, { maxAttempts: 2, now: NOW });
+    expect(third.abandoned).toBe(1);
+    expect([...client.rows.values()][0].state).toBe('abandoned');
+  });
+
   it('scans nothing when there are no stale dispatched rows', async () => {
     const s = await reconcileOutbox(ledger, { now: NOW });
     expect(s.scanned).toBe(0);

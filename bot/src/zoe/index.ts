@@ -110,7 +110,7 @@ import { recordMessageContext, getMessageContext, clearMessageContext } from './
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
 import { commitResearchDoc } from './research-doc';
-import { extractFirstUrl, wasResearched } from './research-dedupe';
+import { extractFirstUrl, isFollowUpNotResearch, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -1507,6 +1507,14 @@ bot.on('message:text', async (ctx) => {
         // Override the draft routing to chat routing when we have brand context.
         action = { kind: 'chat' };
       }
+    }
+
+    // Research topic reroute: a plain topic or URL is a research subject, but a
+    // conversational follow-up/command ("can u share it with me", "thanks") is
+    // NOT - queuing it spins a worker to "research" that phrase (audit afaa850).
+    // Reroute those to chat so ZOE answers instead of producing a junk doc.
+    if (action.kind === 'research' && !extractFirstUrl(text) && isFollowUpNotResearch(text)) {
+      action = { kind: 'chat' };
     }
 
     // Bridge log: record EVERY ZAAL BOTZ turn (all topics, incl auto-act ones)

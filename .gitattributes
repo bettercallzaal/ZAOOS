@@ -1,0 +1,9 @@
+# Union-merge append-only research prose so concurrent doc-index appends don't
+# conflict. When two research docs land at once, each appends a row to a topic
+# README.md; without a union driver git can't auto-merge the two appends and the
+# branch conflicts on every landing. See .claude/rules/agent-loops.md rule 29.
+#
+# SCOPED TO RESEARCH MARKDOWN ONLY. Union merge is safe for append-only prose
+# (it dedupes/concatenates lines); it is NEVER safe on code, where it duplicates
+# blocks and drops braces. Do NOT extend this to *.ts / source files.
+research/**/*.md merge=union

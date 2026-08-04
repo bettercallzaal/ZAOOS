@@ -95,6 +95,10 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { parseVetoCallback, applyVeto } from './brief-veto';
+import {
+  parseBuildCandidateCallback,
+  applyBuildCandidate,
+} from './build-candidate';
 import { dispatchPlan } from './dispatch';
 import {
   handleVoiceAnswer,
@@ -643,6 +647,59 @@ bot.on('callback_query:data', async (ctx, next) => {
         .catch(() => {});
     } else {
       await ctx.answerCallbackQuery({ text: 'Veto failed — check logs.' });
+    }
+    return;
+  }
+
+  // Fleet BUILD candidate — "bc:approve:<id>" / "bc:skip:<id>". Records the
+  // decision as a metadata flag (build_approved/build_skipped) so build-queue
+  // picks it up; merges into existing metadata so `why`/`tier` survive.
+  const bc = parseBuildCandidateCallback(ctx.callbackQuery.data);
+  if (bc) {
+    const base = process.env.COWORK_TRACKER_URL;
+    const key = process.env.COWORK_TRACKER_KEY;
+    if (!base || !key) {
+      await ctx.answerCallbackQuery({ text: 'Tracker not configured.' });
+      return;
+    }
+    const root = base.replace(/\/$/, '');
+    const readMetadata = async (id: string): Promise<Record<string, unknown> | null> => {
+      const res = await fetch(
+        `${root}/rest/v1/tasks?legacy_id=eq.${id}&select=metadata`,
+        { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+      );
+      if (!res.ok) throw new Error(`Tracker GET failed (${res.status})`);
+      const rows = (await res.json()) as Array<{ metadata: Record<string, unknown> | null }>;
+      if (!rows.length) return null;
+      return rows[0].metadata ?? {};
+    };
+    const patchMetadata = async (id: string, metadata: Record<string, unknown>): Promise<void> => {
+      const res = await fetch(`${root}/rest/v1/tasks?legacy_id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metadata }),
+      });
+      if (!res.ok) throw new Error(`Tracker PATCH failed (${res.status})`);
+    };
+
+    const result = await applyBuildCandidate(
+      bc.action,
+      bc.id,
+      readMetadata,
+      patchMetadata,
+      new Date().toISOString(),
+    );
+    if (result.ok) {
+      const verb = bc.action === 'approve' ? 'Approved' : 'Skipped';
+      const note = result.already ? `Already ${verb.toLowerCase()}.` : `${verb}.`;
+      const toast =
+        bc.action === 'approve' && !result.already
+          ? 'Approved - a build session will pick it up.'
+          : note;
+      await ctx.answerCallbackQuery({ text: toast });
+      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    } else {
+      await ctx.answerCallbackQuery({ text: `Failed - ${result.error ?? 'check logs'}.` });
     }
     return;
   }

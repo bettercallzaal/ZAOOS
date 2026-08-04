@@ -250,3 +250,4 @@
 | 2183 | [Research Sweep, 2026-08-02](./2183-research-sweep-20260802/) | STANDALONE | Capture the day's dropped-idea research in one durable place (they were executed live as board items via the per-brand harness, doc 2182). The actionable centerpiece: how to stand up a **tokenless empire on Empire Builder** now that Clanker v5 is delayed. |
 | 2184 | [Repo/web improvement: What JSON-LD schema types (WebApplication vs. Sp](./2184-repo-web-improvement-what-json-ld-schema/) | DISPATCH | ZOE research: Repo/web improvement: What JSON-LD schema types (WebApplication vs. SportsEvent vs. Datase |
 | 2190 | [Sparkz x Jim's Crypto Endowment Network: launchpad integration spec](./2190-sparkz-endowment-network-integration/) | STANDALONE | Prepare the integration of Sparkz into Jim's endowment-backed launchpad network as |
+| 2190 | [research](./2190-research/) | DISPATCH | ZOE research: https://www.reddit.com/r/claudeskills/s/lLqDti8Oum research |

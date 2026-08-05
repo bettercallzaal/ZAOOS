@@ -21,6 +21,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { callClaudeCli, CliAuthError, CliError } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
+import { Trace, writeTrace } from './trace';
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
 import type { Subtask, WorkerKind } from './decompose';
@@ -323,10 +324,22 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     durationMs: 0,
   };
 
+  // Step-level trace (best-effort; doc 2200). Records the worker run as a span
+  // tree - each model call + critic as a child span - so we can see WHERE a run
+  // failed, not just that it did. All best-effort: never breaks the worker.
+  const trace = new Trace(`worker:${worker}`, Date.now(), { 'gen_ai.request.model': cfg.model });
+  const flushTrace = (status: 'ok' | 'error', attrs: Record<string, unknown> = {}): void => {
+    try {
+      trace.finish(Date.now(), status, attrs);
+      void writeTrace(trace.root, new Date().toISOString());
+    } catch { /* telemetry must never break a run */ }
+  };
+
   let spec: string;
   try {
     spec = await loadSpec(worker, args.context);
   } catch (err) {
+    flushTrace('error', { error: 'spec load failed' });
     return {
       ...base,
       status: 'failed',
@@ -338,20 +351,31 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
   }
 
   const call = async (criticFeedback?: string, budgetUsd: number = cfg.maxBudgetUsd) => {
-    const r = await callClaudeCli({
-      model: cfg.model,
-      prompt: buildWorkerPrompt(args, criticFeedback),
-      cwd: args.context.workspace_dir,
-      appendSystemPrompt: spec,
-      allowedTools: cfg.allowedTools,
-      disallowedTools: cfg.disallowedTools,
-      permissionMode: 'default',
-      outputFormat: 'json',
-      maxBudgetUsd: budgetUsd,
-      bare: false,
-    });
-    recordCall('worker:' + worker, r);
-    return r;
+    trace.begin('llm.call', 'generation', Date.now(), { 'gen_ai.request.model': cfg.model });
+    try {
+      const r = await callClaudeCli({
+        model: cfg.model,
+        prompt: buildWorkerPrompt(args, criticFeedback),
+        cwd: args.context.workspace_dir,
+        appendSystemPrompt: spec,
+        allowedTools: cfg.allowedTools,
+        disallowedTools: cfg.disallowedTools,
+        permissionMode: 'default',
+        outputFormat: 'json',
+        maxBudgetUsd: budgetUsd,
+        bare: false,
+      });
+      recordCall('worker:' + worker, r);
+      trace.end(Date.now(), 'ok', {
+        'gen_ai.usage.input_tokens': r.inputTokens,
+        'gen_ai.usage.output_tokens': r.outputTokens,
+        'gen_ai.cost_usd': r.totalCostUsd,
+      });
+      return r;
+    } catch (e) {
+      trace.end(Date.now(), 'error', { error: (e as Error)?.message });
+      throw e;
+    }
   };
 
   try {
@@ -362,7 +386,9 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     let cost = first.totalCostUsd;
     let dur = first.durationMs;
 
+    trace.begin('critic', 'critic', Date.now());
     let critique = await runCriticFor(cfg.critic, args, output);
+    trace.end(Date.now(), 'ok', { score: critique?.score });
     let revised = false;
 
     if (critique && critique.score < CRITIQUE_PASS_THRESHOLD) {
@@ -383,7 +409,9 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
         outTok += second.outputTokens;
         cost += second.totalCostUsd;
         dur += second.durationMs;
+        trace.begin('critic', 'critic', Date.now());
         critique = await runCriticFor(cfg.critic, args, output);
+        trace.end(Date.now(), 'ok', { score: critique?.score });
       }
     }
 
@@ -391,6 +419,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     if (critique) cost += critique.costUsd;
 
     const passed = !critique || critique.score >= CRITIQUE_PASS_THRESHOLD;
+    flushTrace(passed ? 'ok' : 'error', { 'gen_ai.cost_usd': cost });
     return {
       ...base,
       status: passed ? 'completed' : 'needs-revision',
@@ -407,6 +436,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     if (isAuthError) {
       console.error(`[zoe/workers] auth error in ${worker}:`, (err as Error).message);
     }
+    flushTrace('error', { error: (err as Error).message });
     return {
       ...base,
       status: 'failed',

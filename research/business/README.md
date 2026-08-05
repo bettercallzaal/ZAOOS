@@ -253,3 +253,4 @@
 | 2190 | [research](./2190-research/) | DISPATCH | ZOE research: https://www.reddit.com/r/claudeskills/s/lLqDti8Oum research |
 | 2195 | [Creator-coin launch mechanics + anti-rug: what the community actually says, and what it means for Sparkz](./2195-creator-coin-launch-mechanics-sparkz/) | STANDALONE | Overnight Reddit/community research on how token launches actually work (fair launch vs presale vs bonding curve) and how rugs actually happen - so Sparkz's launcher design is grounded in real failure modes, not theory. |
 | 2202 | [POIDH x ZAO collaboration: current state + brand-alignment ground truth](./2202-poidh-zao-collab-current-state-brand-alignment/) | STANDALONE | One current-state synthesis of everything ZAO has already built on/with POIDH, |
+| 2203 | [POIDH x ZAO: full lore, founding to today](./2203-poidh-zao-full-lore-history/) | STANDALONE | One chronological, start-to-finish narrative of the BCZ/ZAO x POIDH |

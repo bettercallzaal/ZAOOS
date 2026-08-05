@@ -1,4 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { formatHit } from '../recall';
+
+describe('formatHit (untruncation fix)', () => {
+  it('prefers full content over a thin summary', () => {
+    const out = formatHit({ content: 'the full rich episode body about ZAO', summary: 'stub' } as never);
+    expect(out).toContain('the full rich episode body about ZAO');
+    expect(out).not.toBe('- stub');
+  });
+
+  it('keeps far more than the old 500-char cap (rich episodes survive)', () => {
+    const long = 'x'.repeat(1100);
+    const out = formatHit({ content: long } as never);
+    expect(out.length).toBeGreaterThan(1000); // old cap cut at 500
+    expect(out).not.toContain('...'); // 1100 < 1200 default, not truncated
+  });
+
+  it('falls back to summary then name when content is absent', () => {
+    expect(formatHit({ summary: 'only a summary' } as never)).toContain('only a summary');
+    expect(formatHit({ name: 'just a name' } as never)).toContain('just a name');
+  });
+});
 
 const ORIGINAL_ENV = { ...process.env };
 

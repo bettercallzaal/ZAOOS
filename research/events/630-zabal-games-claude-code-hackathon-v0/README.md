@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: draft
-last-validated: 2026-05-14
+last-validated: 2026-08-05
 related-docs: 701, 654, 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
 tier: STANDARD
 ---
@@ -16,6 +16,8 @@ tier: STANDARD
 > **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic).
 
 > **State note (2026-05-21):** Doc 701 is now canonical for FORMAT, CALENDAR, MENTOR MODEL, and INFRA STATE. Changes since this doc: the named 8-mentor roster is removed (mentors openly recruited, finalist count decided after July), the calendar is June prep / July build / August Finals (Doc 654), and the build prompt drops fixed Option A-E tracks for an adopt-a-started-project-or-build-from-scratch model. This doc stays the long-form spec + decision log; where it conflicts with Doc 701, Doc 701 wins.
+
+> **Updated 2026-08-05 (radar revalidation):** Several material changes since last-validated 2026-05-14. (1) Official site moved to zabalgamez.com (was bettercallzaal.com/zabalgames.html). (2) Scale exceeded original plan: 32 builders enrolled, 28 workshops delivered in June (original spec: 8 finalists). (3) Prize structure evolved materially — original doc: $500 USDC tiered pool for top-8; current: Top 8 share USDC, Top 16 receive $ZABAL tokens, every Finisher gets a commemorative collectible; finalist prizes include SOL + a COC Concertz #8 performance slot as 1st-place add-on (Doc 1291 Option C). (4) FarHack Online: Zaal & Zlank won the Snaps category; that prize seeded the ZABAL Games pool (new fact not in original spec). (5) WaveWarZ Finals integration: three battle tracks (Doc 1255) serve as the closing ceremony alongside a QV (quadratic voting) ballot — original spec used Respect-weighted 1-person-1-vote only. (6) Finals format changed: from original 72-hour T+0 sprint to Aug 4–10 submission window → Aug 11–17 judging → Aug 18 winners announced (per Docs 1283, 1291). (7) August Finals window OPENED Aug 4, 2026 — event is live as of this revalidation. Sources: [PARTIAL] zabalgamez.com (403 on fetch; search snippets confirmed prize structure and timeline); [FULL] internal Docs 1283, 1291, 1314, 1319.
 
 ---
 

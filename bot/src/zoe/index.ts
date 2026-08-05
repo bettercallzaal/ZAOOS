@@ -47,7 +47,7 @@ import { readFleetStatus, formatLoopsStatus, formatLoopDetail } from './loops-st
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker } from './team-tracker';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, runTeamDigest } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -856,6 +856,21 @@ bot.command('team', async (ctx) => {
   }
   const tasks = await getOpenTeamTasks();
   await replyChunked(ctx, formatTeamTasks(tasks));
+});
+
+// /board - the shareable per-OWNER team digest ("what is each person on right
+// now"), built for Zaal to forward to the team for coordination (doc 2201).
+// Read-only, Zaal-only. Does NOT mirror to Bonfire (that's the scheduled run).
+bot.command('board', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply(
+      'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
+    );
+    return;
+  }
+  const { digest } = await runTeamDigest({ mirrorToBonfire: false });
+  await replyChunked(ctx, digest);
 });
 
 // Write path: add a task to the team board. Usage:

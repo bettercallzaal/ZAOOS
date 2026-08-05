@@ -67,7 +67,7 @@ import { runTaskTeammateAck, readPendingReplies, removePendingReply } from './ta
 import { runCuratorTick } from './curator';
 import { runPingLifecycleTick } from './ping-lifecycle';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
-import { getOpenTeamTasks } from './team-tracker';
+import { getOpenTeamTasks, runTeamDigest } from './team-tracker';
 import { buildVetoKeyboard, type VetoTask } from './brief-veto';
 import { postBriefToDiscord } from './discord-webhook';
 
@@ -342,6 +342,40 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('evening-reflect');
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Team digest — 13:00 UTC = 09:00 EDT / 08:00 EST, aligned to the 9:30 Iman
+  // sync. Posts the shareable per-owner "what is each person on" digest (doc
+  // 2201) and mirrors current priorities into Bonfire so the graph reflects live
+  // state, not just doc stubs. Autonomous read+write across board AND bonfire.
+  tasks.push(
+    cron.schedule(
+      '0 13 * * *',
+      async () => {
+        if (!(await claimFire('team-digest'))) return;
+        try {
+          const { digest, taskCount, mirrored } = await runTeamDigest({ mirrorToBonfire: true });
+          if (taskCount > 0) {
+            if (opts.routingDeps) {
+              await sendToZaalRouted(opts.routingDeps, digest, { kind: 'status' });
+            } else {
+              await sendChunkedToTelegram(
+                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                opts.zaalTgId,
+                digest,
+              );
+            }
+            console.log(`[zoe/scheduler] team digest sent (${taskCount} tasks, bonfire mirror=${mirrored})`);
+          } else {
+            console.log('[zoe/scheduler] team digest skipped - no open team tasks');
+          }
+        } catch (err) {
+          await releaseFire('team-digest');
+          console.error('[zoe/scheduler] team digest failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

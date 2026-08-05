@@ -1,5 +1,89 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, type TeamTask } from '../team-tracker';
+
+describe('buildTeamContextBlock', () => {
+  const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);
+  const tt = (o: Partial<TeamTask>): TeamTask => ({
+    title: 'x', status: 'todo', priority: null, due: null, project: null, legacy_id: null, ...o,
+  });
+
+  it('lists in-progress items by owner, compact', () => {
+    const out = buildTeamContextBlock([
+      tt({ title: 'shipping board', status: 'in_progress', owner_id: 'u1' }),
+      tt({ title: 'backlog item', status: 'todo', owner_id: 'u2' }),
+    ], members);
+    expect(out).toContain('Team board (live): 2 open');
+    expect(out).toContain('In progress now:');
+    expect(out).toContain('zaal: shipping board');
+    expect(out).not.toContain('backlog item'); // todo not listed in the compact block
+  });
+
+  it('returns undefined when only standing items or empty', () => {
+    expect(buildTeamContextBlock([], members)).toBeUndefined();
+    expect(buildTeamContextBlock([tt({ title: '[standing] x', owner_id: 'u1' })], members)).toBeUndefined();
+  });
+});
+
+const t = (o: Partial<TeamTask>): TeamTask => ({
+  title: 'x', status: 'todo', priority: null, due: null, project: null, legacy_id: null, ...o,
+});
+
+describe('formatTeamDigest', () => {
+  const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);
+
+  it('groups by owner, in-progress people first, doing before todo', () => {
+    const tasks: TeamTask[] = [
+      t({ title: 'iman backlog A', status: 'todo', owner_id: 'u2' }),
+      t({ title: 'zaal shipping X', status: 'in_progress', owner_id: 'u1' }),
+      t({ title: 'zaal todo Y', status: 'todo', priority: 'P1', owner_id: 'u1' }),
+    ];
+    const out = formatTeamDigest(tasks, members);
+    expect(out.indexOf('zaal')).toBeLessThan(out.indexOf('iman'));
+    expect(out).toContain('zaal shipping X [doing]');
+    expect(out.indexOf('zaal shipping X')).toBeLessThan(out.indexOf('zaal todo Y'));
+    expect(out).toContain('1 in progress now');
+  });
+
+  it('maps unknown/null owners to unassigned and sorts them last', () => {
+    const tasks: TeamTask[] = [
+      t({ title: 'orphan', owner_id: null }),
+      t({ title: 'zaal doing', status: 'in_progress', owner_id: 'u1' }),
+    ];
+    const out = formatTeamDigest(tasks, members);
+    expect(out).toContain('unassigned');
+    expect(out.indexOf('zaal')).toBeLessThan(out.indexOf('unassigned'));
+  });
+
+  it('drops standing/recurring items and handles empty', () => {
+    expect(formatTeamDigest([], members)).toMatch(/No open team tasks/);
+    const onlyStanding = [t({ title: '[standing] weekly review', owner_id: 'u1' })];
+    expect(formatTeamDigest(onlyStanding, members)).toMatch(/only standing/i);
+  });
+});
+
+describe('buildPrioritiesEpisode', () => {
+  const members = new Map([['u1', 'zaal']]);
+
+  it('builds a rich episode from in-progress + P0/P1, with owners', () => {
+    const tasks: TeamTask[] = [
+      t({ title: 'shipping the board', status: 'in_progress', owner_id: 'u1' }),
+      t({ title: 'p1 thing', status: 'todo', priority: 'P1', owner_id: 'u1' }),
+      t({ title: 'p3 noise', status: 'todo', priority: 'P3', owner_id: 'u1' }),
+    ];
+    const ep = buildPrioritiesEpisode(tasks, members, '2026-08-05T12:00:00Z');
+    expect(ep).not.toBeNull();
+    expect(ep!.name).toBe('zao-priorities:2026-08-05');
+    expect(ep!.body).toContain('In progress right now');
+    expect(ep!.body).toContain('shipping the board (zaal)');
+    expect(ep!.body).toContain('p1 thing');
+    expect(ep!.body).not.toContain('p3 noise');
+  });
+
+  it('returns null when nothing is in progress or P0/P1', () => {
+    const tasks = [t({ title: 'low', status: 'todo', priority: 'P3', owner_id: 'u1' })];
+    expect(buildPrioritiesEpisode(tasks, members, '2026-08-05T12:00:00Z')).toBeNull();
+  });
+});
 
 describe('zaalFocusForBrief', () => {
   it('returns null when nothing is dated and nothing needs Zaal', () => {

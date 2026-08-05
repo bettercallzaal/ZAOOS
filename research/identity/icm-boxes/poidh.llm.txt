@@ -1,0 +1,60 @@
+# ICM: POIDH @ ZAO
+
+POIDH ("pics or it didn't happen") is an on-chain bounty platform on Base (also live on
+Ethereum, Arbitrum, and Degen Chain), founded by Kenny. The ZAO runs clip-up, creative,
+and now code bounties on it. (Style: lowercase "poidh".) Contracts are immutable once
+deployed - v3 core contract on Base + Arbitrum shares one address:
+0x5555fa783936c260f77385b4e153b9725fef1719.
+
+## What it is (for ZAO)
+- The ZAO posts bounties on poidh.xyz: people do a task (clip a video, make an ad, fix a
+  bug), post it publicly, and submit the link to claim the reward on Base.
+- Format ZAO uses: We-Them-Media (WTM) audition style - a clear "the bar" + a scoring
+  rubric, a single judge, an explicit deadline, an open pot anyone can top up. Run every
+  bounty past Kenny first.
+- Ops home: the zpoidh repo (github.com/bettercallzaal/zpoidh) - round pages, brand
+  kits, judging records, and a growing set of tools (leaderboard refresh, deadline
+  calendar, a standalone non-Farcaster bounty-creation tool at docs/create-bounty.html).
+
+## Round history (2026)
+- R1 (bounty 1151) - clip-up, closed + paid.
+- R2 (bounty 1166) - best 60s ad, closed + paid.
+- R3 (bounty 1180) - ZABAL Gamez ad, closed + paid (confirmed on-chain via claim-NFT
+  ownership - winner cast still pending).
+- R4 (bounty 1249) - ZABAL Gamez July open-build pot, OPEN-SPLIT format (everyone who
+  shipped splits the pot equally, no single winner). Deadline passed; closeout in
+  progress - real submissions live on zabalgamez's own board, not POIDH claims
+  directly, so Zaal is filing one claim documenting everyone who qualified. Lesson:
+  OPEN-SPLIT only works cleanly when there's a tight loop from "you built it" straight
+  to "you claimed on POIDH" - R4 didn't have that, R1-R3's single-winner OPEN format
+  did.
+- R5 - Unlock Protocol clip bounty, Unlock-DAO co-funded pitch (via trigs/Kenny). Still
+  a draft; pitch DM never sent.
+- R6 - the solo-cast version of the same Unlock Protocol idea, pointed at the real
+  ZABAL Gamez workshop w/Ceci Sakura. Tooling built and live (auto-versioning v1/v2/v3
+  derived from POIDH itself, no manual tracking). Recommended path over R5 - no
+  external dependency, same proven single-winner format as R1-R3.
+- R7 - first CODE bounty (bug fixes for zabalgamez.com, judged on impact + craft, not
+  winner-take-all). Also the first controlled money-action rung for ZOL's trust ladder.
+
+## Building on poidh (developer notes)
+- docs.poidh.xyz has the dev docs: immutable contracts, supported chains, contract
+  addresses per chain.
+- Undocumented-but-real endpoint: `poidh.xyz/base/bounty/<id>/data` returns the full
+  bounty + all claims as JSON, with Farcaster/X handles already resolved - much better
+  data source than scraping the tRPC API and cross-referencing web3.bio by hand.
+- The $ZABAL Empire Builder leaderboard (POIDH Submitters, slot 8) pulls from a fixed
+  `api_endpoint` URL set once in EB's dashboard - it does not auto-follow whichever repo
+  is "current." Drifted stale for weeks pointing at an old bettercallzaal.com file
+  frozen at R2 while zpoidh's own data was already fresh through R4. Worth remembering:
+  any leaderboard/data integration with an external platform needs its source URL
+  checked periodically, not just the data itself.
+
+## Find it
+- poidh.xyz, the zpoidh repo
+- Farcaster: /poidh
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- ZABAL Games (zabalgamez)

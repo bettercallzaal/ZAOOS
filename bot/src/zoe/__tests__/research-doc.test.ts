@@ -31,9 +31,16 @@ function execOk(stdout = ''): { stdout: string; stderr: string } {
 /**
  * Set up mocks for the full happy path.
  * nextDocNum: readdir returns no matching files → max=0 → num=1
- *             gh api for PR titles → stdout '' → no PR numbers → num stays 1+1=2 actually 0+1=1
+ *             gh api for PR titles → stdout '' → no PR numbers → num stays 0+1=1
+ *             git ls-remote for in-flight ws/zoe-research-N branches → stdout ''
  * commitResearchDoc git calls: checkout main, pull, checkout -B branch, add, commit, push, checkout main
  * commitResearchDoc gh call for PR: returns URL
+ *
+ * Dispatch on the COMMAND, not on call order. A positional
+ * mockResolvedValueOnce queue silently breaks whenever the source adds another
+ * probe: #2830 inserted a `git ls-remote` in nextDocNum(), which shifted every
+ * later slot by one, ran the queue dry mid-run and made `exec` resolve
+ * undefined — so all three happy-path tests failed on `r.ok`.
  */
 function setupHappyPath(num = 1, prUrl = 'https://github.com/org/repo/pull/501') {
   // readdir: ENOENT for all topic dirs (no existing docs)
@@ -42,26 +49,11 @@ function setupHappyPath(num = 1, prUrl = 'https://github.com/org/repo/pull/501')
   mockWriteFile.mockResolvedValue(undefined);
   mockAppendFile.mockResolvedValue(undefined);
 
-  // exec calls in order:
-  // 1. gh api for open PR titles (nextDocNum)
-  // 2. git checkout main
-  // 3. git pull --quiet
-  // 4. git checkout -B branch
-  // 5. git add ...
-  // 6. git commit ...
-  // 7. git push ...
-  // 8. gh api POST create PR → returns URL
-  // 9. git checkout main
-  mockExec
-    .mockResolvedValueOnce(execOk(''))             // gh api PR titles
-    .mockResolvedValueOnce(execOk(''))             // git checkout main
-    .mockResolvedValueOnce(execOk(''))             // git pull
-    .mockResolvedValueOnce(execOk(''))             // git checkout -B branch
-    .mockResolvedValueOnce(execOk(''))             // git add
-    .mockResolvedValueOnce(execOk(''))             // git commit
-    .mockResolvedValueOnce(execOk(''))             // git push
-    .mockResolvedValueOnce(execOk(`${prUrl}\n`))   // gh api POST PR
-    .mockResolvedValueOnce(execOk(''));            // git checkout main (final)
+  // Only the PR-create call (`gh api -X POST .../pulls`) needs a distinct
+  // stdout; every other git/gh call is an empty success.
+  mockExec.mockImplementation(async (cmd: string, args: string[]) =>
+    cmd === 'gh' && args.includes('-X') ? execOk(`${prUrl}\n`) : execOk(''),
+  );
 }
 
 // ── commitResearchDoc ─────────────────────────────────────────────────────────

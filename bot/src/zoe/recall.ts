@@ -30,6 +30,11 @@ const API_KEY = process.env.BONFIRE_API_KEY ?? '';
 const BONFIRE_ID = process.env.BONFIRE_ID ?? '';
 const READ_TIMEOUT_MS = 10_000;
 const WRITE_TIMEOUT_MS = 15_000;
+// Per-episode chars injected into ZOE's <bonfire_recall> context. The old 500
+// truncated rich episodes (research docs + handoffs run 600-4000 chars) into
+// stub-shaped fragments, so ZOE understood ZAO through a keyhole. Raised +
+// env-configurable. recall() fetches 12 episodes, so keep this bounded.
+const RECALL_EPISODE_CHARS = Math.max(200, Number(process.env.ZOE_RECALL_EPISODE_CHARS ?? 1200));
 
 export function bonfireConfigured(): boolean {
   return !!API_KEY && !!BONFIRE_ID;
@@ -174,15 +179,18 @@ async function delveBonfire(
 // which flows straight into ZOE's synthesis context. containsSecret (above)
 // only guards the WRITE side; this guards the READ side. Flag, don't strip -
 // the episode may still be useful context, just not trusted instructions.
-function formatHit(hit: DelveEpisode): string {
-  const body = String(hit.summary || hit.content || hit.name || JSON.stringify(hit));
+export function formatHit(hit: DelveEpisode): string {
+  // Prefer the FULL content over a thin auto-summary - the summary loses the
+  // substance ZOE needs to actually understand a fact. Fall back to summary/name.
+  const body = String(hit.content || hit.summary || hit.name || JSON.stringify(hit));
   const src = hit.source_description ? ` [src: ${hit.source_description}]` : '';
   const injectionHits = detectPromptInjection(body);
   if (injectionHits.length > 0) {
     console.warn(`[zoe/recall] delve hit flagged for possible prompt injection: ${injectionHits.join(', ')}`);
   }
   const flag = injectionHits.length > 0 ? '[UNVERIFIED - matched injection pattern] ' : '';
-  return `- ${flag}${body.slice(0, 500)}${src}`;
+  const truncated = body.length > RECALL_EPISODE_CHARS ? '...' : '';
+  return `- ${flag}${body.slice(0, RECALL_EPISODE_CHARS)}${truncated}${src}`;
 }
 
 /**

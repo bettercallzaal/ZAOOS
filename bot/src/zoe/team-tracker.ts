@@ -16,6 +16,7 @@
  */
 
 import { classifyTask, applyClassification, planReconciliation, type TrackerRow } from './task-classifier';
+import { remember } from './recall';
 
 export interface TeamTask {
   title: string;
@@ -28,6 +29,9 @@ export interface TeamTask {
   // judgment-routing focus line in the morning brief. Optional - null when the
   // row predates the auto-tagger.
   metadata?: Record<string, unknown> | null;
+  // Who the task is assigned to (FK -> team_members.id). Needed for the
+  // team-coordination digest ("what is each person on"). Null = unassigned.
+  owner_id?: string | null;
 }
 
 const MAX_TASKS = 30;
@@ -48,7 +52,7 @@ export async function getOpenTeamTasks(): Promise<TeamTask[]> {
   const url =
     `${base.replace(/\/$/, '')}/rest/v1/tasks` +
     `?status=neq.done&archived_at=is.null` +
-    `&select=title,status,priority,due,project,legacy_id,metadata` +
+    `&select=title,status,priority,due,project,legacy_id,metadata,owner_id` +
     `&order=due.asc.nullslast&limit=${MAX_TASKS}`;
 
   try {
@@ -320,4 +324,159 @@ export function zaalFocusForBrief(tasks: TeamTask[]): string | null {
   if (top3.length) parts.push(`TOP 3 BY DEADLINE: ${top3.join(' | ')}`);
   if (needsMe) parts.push(`${needsMe} task${needsMe === 1 ? '' : 's'} waiting on your call`);
   return parts.join('. ');
+}
+
+// --- team-coordination digest (doc 2201) ------------------------------------
+// The board reads above are Zaal-facing ("what is the board"). Team coordination
+// needs the OWNER dimension: "what is each person actively on". These build a
+// shareable per-owner digest + a rich Bonfire episode of current priorities, so
+// ZOE integrates BOTH the board (read) and Bonfire (write) from one place.
+
+/** display name for an owner_id, resolved via the member map; 'unassigned' if unknown/null. */
+function ownerName(ownerId: string | null | undefined, members: Map<string, string>): string {
+  if (!ownerId) return 'unassigned';
+  return members.get(ownerId) ?? 'unassigned';
+}
+
+function isInProgress(status: string): boolean {
+  const s = status.toLowerCase();
+  return s === 'in_progress' || s === 'doing';
+}
+
+/**
+ * Fetch a {owner_id -> display name} map from team_members. Best-effort: returns
+ * an empty map if unconfigured or on any error (so the digest degrades to
+ * "unassigned" rather than throwing). team_members is small - no limit needed.
+ */
+export async function getTeamMemberMap(): Promise<Map<string, string>> {
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  const map = new Map<string, string>();
+  if (!base || !key) return map;
+  const url = `${base.replace(/\/$/, '')}/rest/v1/team_members?select=id,legacy_owner,name`;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      signal: controller.signal,
+      cache: 'no-store',
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return map;
+    const rows = (await res.json()) as Array<{ id: string; legacy_owner: string | null; name: string | null }>;
+    for (const r of rows) {
+      if (r.id) map.set(r.id, r.legacy_owner || r.name || 'member');
+    }
+    return map;
+  } catch {
+    return map;
+  }
+}
+
+const MAX_PER_OWNER = 6;
+
+/**
+ * A shareable, per-owner team digest: for each person, their in-progress items
+ * first (that is "happening now"), then their top open todos by priority. Built
+ * for Zaal to forward to the team for coordination. Pure + exported for testing.
+ *
+ * Ordering: owners with in-progress work first, then by open-task count; within
+ * an owner, in-progress before todo, then priority. 'unassigned' always last.
+ */
+export function formatTeamDigest(tasks: TeamTask[], members: Map<string, string>): string {
+  if (tasks.length === 0) return 'No open team tasks (or the tracker is not wired up).';
+
+  // Group by owner display name, excluding standing/recurring noise.
+  const groups = new Map<string, TeamTask[]>();
+  for (const t of tasks) {
+    if (isRecurring(t.title)) continue;
+    const who = ownerName(t.owner_id, members);
+    (groups.get(who) ?? groups.set(who, []).get(who)!).push(t);
+  }
+  if (groups.size === 0) return 'No active team tasks right now (only standing items are open).';
+
+  const ownerHasDoing = (list: TeamTask[]) => list.some((t) => isInProgress(t.status));
+  const ordered = [...groups.entries()].sort((a, b) => {
+    if (a[0] === 'unassigned') return 1;
+    if (b[0] === 'unassigned') return -1;
+    const da = ownerHasDoing(a[1]) ? 0 : 1;
+    const db = ownerHasDoing(b[1]) ? 0 : 1;
+    if (da !== db) return da - db;
+    return b[1].length - a[1].length;
+  });
+
+  const blocks = ordered.map(([who, list]) => {
+    const sorted = [...list].sort((a, b) => {
+      const ia = isInProgress(a.status) ? 0 : 1;
+      const ib = isInProgress(b.status) ? 0 : 1;
+      if (ia !== ib) return ia - ib;
+      return priorityRank(a.priority) - priorityRank(b.priority);
+    });
+    const lines = sorted.slice(0, MAX_PER_OWNER).map((t) => {
+      const doing = isInProgress(t.status) ? ' [doing]' : '';
+      const pri = priorityRank(t.priority) <= 2 ? `[${t.priority!.toUpperCase()}] ` : '';
+      const over = isOverdue(t.due) ? ' (overdue)' : '';
+      return `  - ${pri}${t.title}${doing}${over}`;
+    });
+    const more = list.length > MAX_PER_OWNER ? `\n  +${list.length - MAX_PER_OWNER} more` : '';
+    return `${who} (${list.length}):\n${lines.join('\n')}${more}`;
+  });
+
+  const doingCount = tasks.filter((t) => isInProgress(t.status)).length;
+  const header = `Team todos - ${doingCount} in progress now, ${groups.size} people active:`;
+  return `${header}\n\n${blocks.join('\n\n')}\n\nfull board: thezao.xyz`;
+}
+
+/**
+ * A rich "current team priorities" episode for Bonfire (doc 2201 gap: the graph
+ * was full of shallow doc-title stubs, not current state). Body is prose so a
+ * /delve for "what are we doing now" returns substance, not just titles. Pure.
+ * Returns null when there is nothing in progress or P0/P1 to report.
+ */
+export function buildPrioritiesEpisode(
+  tasks: TeamTask[],
+  members: Map<string, string>,
+  dateIso: string,
+): { name: string; body: string } | null {
+  const doing = tasks.filter((t) => isInProgress(t.status) && !isRecurring(t.title));
+  const topTodos = tasks
+    .filter((t) => !isInProgress(t.status) && !isRecurring(t.title) && priorityRank(t.priority) <= 1)
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority))
+    .slice(0, 8);
+  if (doing.length === 0 && topTodos.length === 0) return null;
+
+  const day = dateIso.slice(0, 10);
+  const line = (t: TeamTask) => `- ${t.title} (${ownerName(t.owner_id, members)})`;
+  const parts: string[] = [`ZAO current priorities as of ${day}.`];
+  if (doing.length) parts.push(`In progress right now:\n${doing.map(line).join('\n')}`);
+  if (topTodos.length) parts.push(`Top open priorities (P0/P1):\n${topTodos.map(line).join('\n')}`);
+  return { name: `zao-priorities:${day}`, body: parts.join('\n\n') };
+}
+
+export interface TeamDigestResult {
+  digest: string;
+  taskCount: number;
+  mirrored: boolean;
+}
+
+/**
+ * Orchestrate the team digest: read the board + the member map, format the
+ * shareable per-owner digest, and (when mirrorToBonfire) push a rich current-
+ * priorities episode so the graph reflects live state (doc 2201). Best-effort:
+ * the digest is always returned; a Bonfire failure only flips `mirrored`.
+ */
+export async function runTeamDigest(opts?: { mirrorToBonfire?: boolean }): Promise<TeamDigestResult> {
+  const [tasks, members] = await Promise.all([getOpenTeamTasks(), getTeamMemberMap()]);
+  const digest = formatTeamDigest(tasks, members);
+  let mirrored = false;
+  if (opts?.mirrorToBonfire) {
+    const ep = buildPrioritiesEpisode(tasks, members, new Date().toISOString());
+    if (ep) {
+      const r = await remember({ body: ep.body, name: ep.name, sourceTag: 'zoe:priorities' }).catch(
+        () => ({ ok: false }) as { ok: boolean },
+      );
+      mirrored = r.ok === true;
+    }
+  }
+  return { digest, taskCount: tasks.length, mirrored };
 }

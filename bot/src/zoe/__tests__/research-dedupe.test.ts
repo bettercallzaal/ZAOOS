@@ -1,7 +1,43 @@
 import { describe, it, expect, vi } from 'vitest';
-import { extractFirstUrl, normalizeUrl, wasResearched } from '../research-dedupe';
+import {
+  extractFirstUrl,
+  isFollowUpNotResearch,
+  normalizeUrl,
+  wasResearched,
+} from '../research-dedupe';
 
 describe('research-dedupe', () => {
+  describe('isFollowUpNotResearch', () => {
+    it('reroutes conversational commands aimed at ZOE (the audit bug)', () => {
+      // The exact phrase that got queued as a research task (audit afaa850).
+      expect(isFollowUpNotResearch('can u share it with me')).toBe(true);
+      expect(isFollowUpNotResearch('can you send it to me')).toBe(true);
+      expect(isFollowUpNotResearch('share the doc')).toBe(true);
+      expect(isFollowUpNotResearch('resend it')).toBe(true);
+      expect(isFollowUpNotResearch('pls send me that doc')).toBe(true);
+    });
+
+    it('reroutes short replies / acknowledgements', () => {
+      expect(isFollowUpNotResearch('thanks')).toBe(true);
+      expect(isFollowUpNotResearch('yes please')).toBe(true);
+      expect(isFollowUpNotResearch('ok cool')).toBe(true);
+      expect(isFollowUpNotResearch('')).toBe(true);
+      expect(isFollowUpNotResearch('nvm')).toBe(true);
+    });
+
+    it('keeps genuine research subjects as research', () => {
+      expect(isFollowUpNotResearch('vector database options for RAG')).toBe(false);
+      expect(isFollowUpNotResearch('research the Audos platform summer camp')).toBe(false);
+      expect(isFollowUpNotResearch('deep dive on Farcaster mini apps')).toBe(false);
+      expect(isFollowUpNotResearch('how do rollups handle data availability now')).toBe(false);
+    });
+
+    it('always treats a URL as a research subject even with command words', () => {
+      expect(isFollowUpNotResearch('can u look at https://example.com/x')).toBe(false);
+      expect(isFollowUpNotResearch('share https://example.com/y')).toBe(false);
+    });
+  });
+
   describe('extractFirstUrl', () => {
     it('extracts a URL from text', () => {
       expect(extractFirstUrl('research this https://example.com/page')).toBe(

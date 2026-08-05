@@ -47,7 +47,7 @@ import { readFleetStatus, formatLoopsStatus, formatLoopDetail } from './loops-st
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, runTeamDigest } from './team-tracker';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, runTeamDigest, getTeamMemberMap, formatOwnerDigest } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -867,6 +867,13 @@ bot.command('board', async (ctx) => {
     await ctx.reply(
       'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
     );
+    return;
+  }
+  // "/board iman" -> that person's view; "/board" -> the full per-owner digest.
+  const person = (ctx.match ?? '').toString().trim();
+  if (person) {
+    const [tasks, members] = await Promise.all([getOpenTeamTasks(), getTeamMemberMap()]);
+    await replyChunked(ctx, formatOwnerDigest(tasks, members, person));
     return;
   }
   const { digest } = await runTeamDigest({ mirrorToBonfire: false });

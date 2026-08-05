@@ -1,5 +1,30 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, formatOwnerDigest, type TeamTask } from '../team-tracker';
+
+describe('formatOwnerDigest', () => {
+  const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);
+  const tk = (o: Partial<TeamTask>): TeamTask => ({
+    title: 'x', status: 'todo', priority: null, due: null, project: null, legacy_id: null, ...o,
+  });
+
+  it('filters to one person by name (case-insensitive), in-progress first', () => {
+    const tasks = [
+      tk({ title: 'iman UI work', status: 'in_progress', owner_id: 'u2' }),
+      tk({ title: 'iman todo', status: 'todo', priority: 'P1', owner_id: 'u2' }),
+      tk({ title: 'zaal thing', status: 'in_progress', owner_id: 'u1' }),
+    ];
+    const out = formatOwnerDigest(tasks, members, 'IMAN');
+    expect(out).toContain('iman - 2 open, 1 in progress');
+    expect(out).toContain('iman UI work [doing]');
+    expect(out).not.toContain('zaal thing');
+    expect(out.indexOf('iman UI work')).toBeLessThan(out.indexOf('iman todo'));
+  });
+
+  it('handles no-match and empty query', () => {
+    expect(formatOwnerDigest([], members, '')).toMatch(/Usage/);
+    expect(formatOwnerDigest([tk({ owner_id: 'u1' })], members, 'nobody')).toMatch(/No open tasks found/);
+  });
+});
 
 describe('buildTeamContextBlock', () => {
   const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);

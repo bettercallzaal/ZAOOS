@@ -474,6 +474,49 @@ export function formatTeamDigest(tasks: TeamTask[], members: Map<string, string>
 }
 
 /**
+ * Per-person board view: "/board iman" -> what that one teammate is on right now
+ * (in-progress first, then their open todos by priority). `query` is matched
+ * case-insensitively against the member display names AND their raw owner_id.
+ * Pure + exported for testing. Returns a not-found message when no one matches.
+ */
+export function formatOwnerDigest(
+  tasks: TeamTask[],
+  members: Map<string, string>,
+  query: string,
+): string {
+  const q = query.trim().toLowerCase();
+  if (!q) return 'Usage: /board <person> - e.g. /board iman';
+  // resolve matching owner_ids: display name contains q, or the id equals q
+  const matchIds = new Set<string>();
+  for (const [id, name] of members) {
+    if (name.toLowerCase().includes(q) || id.toLowerCase() === q) matchIds.add(id);
+  }
+  const theirs = tasks.filter(
+    (t) => !isRecurring(t.title) && t.owner_id != null && matchIds.has(t.owner_id),
+  );
+  // resolve the display name for the header (first match), fall back to the query
+  const displayName =
+    [...matchIds].map((id) => members.get(id)).find(Boolean) ?? query.trim();
+  if (theirs.length === 0) {
+    return `No open tasks found for "${query.trim()}" (they may have nothing assigned, or the name didn't match a teammate).`;
+  }
+  const sorted = [...theirs].sort((a, b) => {
+    const ia = isInProgress(a.status) ? 0 : 1;
+    const ib = isInProgress(b.status) ? 0 : 1;
+    if (ia !== ib) return ia - ib;
+    return priorityRank(a.priority) - priorityRank(b.priority);
+  });
+  const lines = sorted.map((t) => {
+    const doing = isInProgress(t.status) ? ' [doing]' : '';
+    const pri = priorityRank(t.priority) <= 2 ? `[${t.priority!.toUpperCase()}] ` : '';
+    const over = isOverdue(t.due) ? ' (overdue)' : '';
+    return `- ${pri}${t.title}${doing}${over}`;
+  });
+  const doingN = theirs.filter((t) => isInProgress(t.status)).length;
+  return `${displayName} - ${theirs.length} open, ${doingN} in progress:\n\n${lines.join('\n')}`;
+}
+
+/**
  * A rich "current team priorities" episode for Bonfire (doc 2201 gap: the graph
  * was full of shallow doc-title stubs, not current state). Body is prose so a
  * /delve for "what are we doing now" returns substance, not just titles. Pure.

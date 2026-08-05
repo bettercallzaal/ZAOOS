@@ -1,5 +1,6 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getSessionData } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 
 interface CoworkTask {
@@ -26,12 +27,26 @@ interface TasksResponse {
  * Queries the COWORK_TRACKER Supabase project for tasks.
  * Returns gracefully if the tracker is not configured (env vars missing).
  *
+ * Session required. The tracker is queried with its SERVICE ROLE key, which
+ * bypasses RLS and returns every row of the internal task board (titles,
+ * owners, sources). Without this guard the whole board is readable by any
+ * anonymous caller on the internet - middleware only rate-limits, it does not
+ * authenticate, and /api/tasks has no rate-limit entry either.
+ *
  * Response:
  * - If configured: { configured: true, tasks: [...] }
  * - If not configured: { configured: false, message: "..." }
  */
 export async function GET(): Promise<NextResponse<TasksResponse>> {
   try {
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json(
+        { configured: false, message: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const trackerUrl = process.env.COWORK_TRACKER_URL;
     const trackerKey = process.env.COWORK_TRACKER_SERVICE_ROLE_KEY;
 

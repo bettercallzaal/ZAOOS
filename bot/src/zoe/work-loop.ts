@@ -23,6 +23,8 @@ import type { DecompositionPlan } from './decompose';
 import { dispatchPlan } from './dispatch';
 import { commitResearchDoc } from './research-doc';
 import { emitReceipt } from './receipts';
+import { callClaudeCli } from '../hermes/claude-cli';
+import { verifyReplanResearch } from './verify-replan';
 import type { ZoeContext } from './types';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
@@ -184,27 +186,59 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
     ).catch(() => {});
 
     try {
-      await dispatchPlan({
-        goal: item.input,
-        plan,
-        context: ctx,
-        chatId: deps.zaalTgId,
-        zaalTgId: deps.zaalTgId,
-        hooks: {
-          onSubtaskDone: async (st, r) => {
-            if (st.worker === 'research-worker' && r.status === 'completed' && r.output) {
-              const doc = await commitResearchDoc({ question: item.input, findings: r.output });
-              if (doc.ok) evidenceUrl = doc.prUrl ?? null;
-              // Report the result to the topic it was requested from (else DM).
-              await reportFor(item, deps)(
-                doc.ok
-                  ? `Work-loop done: doc ${doc.num} -> ${doc.prUrl}`
-                  : `Work-loop: doc save failed - ${doc.error}`,
-              ).catch(() => {});
-            }
+      // A single research-worker pass that returns its output (used for the
+      // first pass AND for verify-replan retries).
+      const runResearch = async (goal: string): Promise<string> => {
+        let out = '';
+        const rp: DecompositionPlan = {
+          ...plan,
+          goal_summary: goal,
+          subtasks: [{ ...plan.subtasks[0], title: goal.slice(0, 90) }],
+        };
+        await dispatchPlan({
+          goal,
+          plan: rp,
+          context: ctx,
+          chatId: deps.zaalTgId,
+          zaalTgId: deps.zaalTgId,
+          hooks: {
+            onSubtaskDone: async (st, r) => {
+              if (st.worker === 'research-worker' && r.status === 'completed' && r.output) out = r.output;
+            },
           },
-        },
-      });
+        });
+        return out;
+      };
+
+      const firstOutput = await runResearch(item.input);
+      if (firstOutput.trim()) {
+        // Verify the result answers the goal; on a graded-incomplete verdict,
+        // re-research (bounded) with the missing aspects fed back. Only commit
+        // the accepted/best output - no more silently-partial research docs.
+        const judge = async (prompt: string): Promise<string> => {
+          const r = await callClaudeCli({
+            model: 'haiku',
+            prompt,
+            cwd: ctx.workspace_dir,
+            bare: true,
+            maxBudgetUsd: 0.15,
+            timeoutMs: 120000,
+          });
+          return r.text;
+        };
+        const { output: finalOutput, retries } = await verifyReplanResearch(item.input, firstOutput, {
+          research: runResearch,
+          judge,
+          log: (m) => console.log(`[zoe/work-loop] ${m}`),
+        });
+        const doc = await commitResearchDoc({ question: item.input, findings: finalOutput });
+        if (doc.ok) evidenceUrl = doc.prUrl ?? null;
+        await reportFor(item, deps)(
+          doc.ok
+            ? `Work-loop done: doc ${doc.num}${retries ? ` (verified, ${retries} replan${retries > 1 ? 's' : ''})` : ' (verified)'} -> ${doc.prUrl}`
+            : `Work-loop: doc save failed - ${doc.error}`,
+        ).catch(() => {});
+      }
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
       await bumpToday(deps.currentDate);
       // Receipt so the afferent digest (R1) sees the work-loop's output, not just

@@ -28,7 +28,7 @@ async function git(args: string[]): Promise<string> {
   return stdout.trim();
 }
 
-/** Highest doc number across merged dirs + open PR titles, +1. */
+/** Highest doc number across merged dirs + open PR titles + in-flight branches, +1. */
 async function nextDocNum(): Promise<number> {
   let max = 0;
   for (const t of TOPICS) {
@@ -40,6 +40,14 @@ async function nextDocNum(): Promise<number> {
     const { stdout } = await exec('gh', ['api', 'repos/bettercallzaal/ZAOOS/pulls?state=open&per_page=80', '--jq', '.[].title'], { maxBuffer: 1024 * 1024 });
     for (const line of stdout.split('\n')) { const m = line.match(/doc[ #]?(\d{3,})/i); if (m) max = Math.max(max, Number(m[1])); }
   } catch { /* gh optional */ }
+  // In-flight branches: a doc branched (ws/zoe-research-N) but not yet merged or
+  // PR'd collides otherwise (audit afaa850, 2026-08-04). Bound to 3-4 digits so a
+  // slug's stray digits/SHA can't poison the max into the trillions (the loose-regex
+  // bug the /zao-research skill already learned, 2026-07-22).
+  try {
+    const { stdout } = await exec('git', ['-C', REPO, 'ls-remote', '--heads', 'origin', 'ws/zoe-research-*'], { maxBuffer: 1024 * 1024 });
+    for (const line of stdout.split('\n')) { const m = line.match(/ws\/zoe-research-(\d{3,4})\b/); if (m) max = Math.max(max, Number(m[1])); }
+  } catch { /* git optional */ }
   return max + 1;
 }
 

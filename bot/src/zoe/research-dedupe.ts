@@ -18,6 +18,40 @@ export function extractFirstUrl(text: string): string | null {
 }
 
 /**
+ * Decide whether a message dropped in the Research topic is a conversational
+ * follow-up / command TO ZOE ("can u share it with me", "thanks", "send it")
+ * rather than an actual research subject. The Research topic auto-enqueues every
+ * plain message as a research task (topic = intent), so without this guard a
+ * reply like "can u share it with me" gets queued as a research goal and ZOE
+ * spins up a worker to "research" that phrase (audit afaa850, 2026-08-04).
+ *
+ * Bias: a URL or an explicit research verb is ALWAYS a research subject. Only the
+ * obvious command/reply family is rerouted; a genuine multi-word topic with no
+ * command markers still researches. A false skip just makes ZOE answer in chat
+ * (recoverable); a false research produces a junk doc (the bug we're fixing).
+ *
+ * Returns true when the message should be treated as chat, not research.
+ */
+export function isFollowUpNotResearch(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  if (!t) return true; // empty is not a research subject
+  if (/https?:\/\//.test(t)) return false; // a URL is always a research subject
+  // Explicit research intent always wins over the command heuristics below.
+  if (/^(research|look into|deep dive|dig into|find out|study|investigate|explore|analyz|analys|compare|summari)/.test(t)) {
+    return false;
+  }
+  // Conversational command/question aimed at ZOE about prior work, not a topic.
+  if (/^(can|could|would|will)\s+(you|u|ya)\b/.test(t)) return true; // "can u share it with me"
+  if (/^(pls|plz|please|share|send|show|give|resend|forward|link|thanks|thank|ty|ok|okay|cool|nice|great|yes|yep|no|nope|sure|nvm)\b/.test(t)) {
+    return true;
+  }
+  if (/\b(share it|send it|show me|link me|with me|to me|that doc|the doc|resend it)\b/.test(t)) return true;
+  // Very short with no research verb: a reply/aside ("thanks!", "yes please").
+  if (t.split(/\s+/).filter(Boolean).length <= 2) return true;
+  return false;
+}
+
+/**
  * Normalize a URL for robust matching: lowercase host, strip protocol,
  * trailing slash, query, and fragment.
  *

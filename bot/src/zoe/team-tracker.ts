@@ -373,6 +373,52 @@ export async function getTeamMemberMap(): Promise<Map<string, string>> {
   }
 }
 
+// --- live team context for ZOE's turn (doc 2201: reason with team state) -----
+// buildMemoryBlocks runs on every concierge turn, so we CACHE the board read
+// (5-min TTL) to avoid hammering Supabase per message. Compact by design - the
+// full per-owner view is /board; this is just enough for ZOE to know who is on
+// what while reasoning.
+
+let _teamCtxCache: { block: string | undefined; ts: number } | null = null;
+const TEAM_CTX_TTL_MS = 5 * 60 * 1000;
+
+/** Compact "who is on what right now" block for the turn context. Pure. */
+export function buildTeamContextBlock(tasks: TeamTask[], members: Map<string, string>): string | undefined {
+  const active = tasks.filter((t) => !isRecurring(t.title));
+  if (active.length === 0) return undefined;
+  const doing = active.filter((t) => isInProgress(t.status));
+  const lines: string[] = [`Team board (live): ${active.length} open.`];
+  if (doing.length) {
+    lines.push('In progress now:');
+    for (const t of doing.slice(0, 10)) {
+      lines.push(`- ${ownerName(t.owner_id, members)}: ${t.title.slice(0, 80)}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+/**
+ * Cached live team-context block for buildMemoryBlocks. Best-effort: returns the
+ * cached value within the TTL, refetches otherwise, and returns undefined when
+ * the tracker is unconfigured or the board is empty (so ZOE degrades silently).
+ */
+export async function getTeamContextBlock(nowMs: number): Promise<string | undefined> {
+  if (_teamCtxCache && nowMs - _teamCtxCache.ts < TEAM_CTX_TTL_MS) return _teamCtxCache.block;
+  if (!teamTrackerConfigured()) {
+    _teamCtxCache = { block: undefined, ts: nowMs };
+    return undefined;
+  }
+  try {
+    const [tasks, members] = await Promise.all([getOpenTeamTasks(), getTeamMemberMap()]);
+    const block = buildTeamContextBlock(tasks, members);
+    _teamCtxCache = { block, ts: nowMs };
+    return block;
+  } catch {
+    _teamCtxCache = { block: undefined, ts: nowMs };
+    return undefined;
+  }
+}
+
 const MAX_PER_OWNER = 6;
 
 /**

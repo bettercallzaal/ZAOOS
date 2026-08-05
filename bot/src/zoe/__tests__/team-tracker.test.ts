@@ -1,5 +1,28 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, type TeamTask } from '../team-tracker';
+
+describe('buildTeamContextBlock', () => {
+  const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);
+  const tt = (o: Partial<TeamTask>): TeamTask => ({
+    title: 'x', status: 'todo', priority: null, due: null, project: null, legacy_id: null, ...o,
+  });
+
+  it('lists in-progress items by owner, compact', () => {
+    const out = buildTeamContextBlock([
+      tt({ title: 'shipping board', status: 'in_progress', owner_id: 'u1' }),
+      tt({ title: 'backlog item', status: 'todo', owner_id: 'u2' }),
+    ], members);
+    expect(out).toContain('Team board (live): 2 open');
+    expect(out).toContain('In progress now:');
+    expect(out).toContain('zaal: shipping board');
+    expect(out).not.toContain('backlog item'); // todo not listed in the compact block
+  });
+
+  it('returns undefined when only standing items or empty', () => {
+    expect(buildTeamContextBlock([], members)).toBeUndefined();
+    expect(buildTeamContextBlock([tt({ title: '[standing] x', owner_id: 'u1' })], members)).toBeUndefined();
+  });
+});
 
 const t = (o: Partial<TeamTask>): TeamTask => ({
   title: 'x', status: 'todo', priority: null, due: null, project: null, legacy_id: null, ...o,

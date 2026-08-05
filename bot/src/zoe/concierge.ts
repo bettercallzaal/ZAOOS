@@ -113,6 +113,9 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
           `<open_threads>`,
           blocks.open_threads ?? '(no open threads)',
           `</open_threads>`,
+          ...(blocks.team
+            ? ['', `<team_board>`, blocks.team, `</team_board>`]
+            : []),
         ]),
     ...recallBlock,
     ...brandBlock,

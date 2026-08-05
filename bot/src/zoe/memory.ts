@@ -21,6 +21,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import type { ZoeTask, DecisionRecord, BuildStateRecord, InboxContextRecord } from './types';
 import { buildQuestsBlock } from './sidequests';
+import { getTeamContextBlock } from './team-tracker';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
@@ -410,6 +411,9 @@ export interface MemoryBlocks {
   open_threads?: string;
   /** Synthesized, PII-scrubbed lines from mail Zaal forwarded to zoe-zao@agentmail.to. */
   inbox_context?: string;
+  /** Live "who is on what" from the cowork board, so ZOE reasons with team state
+   *  (doc 2201). Cached 5min; undefined when the tracker is unconfigured/empty. */
+  team?: string;
   chat_scope: ChatScope;
   chat_title?: string;
 }
@@ -785,7 +789,7 @@ export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
 ): Promise<MemoryBlocks> {
-  const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox] = await Promise.all([
+  const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
     readPersona(),
     readHuman(),
     readRecent(scope),
@@ -794,6 +798,7 @@ export async function buildMemoryBlocks(
     readDecisions(5),
     readBuildState(5),
     readInboxContext(6),
+    getTeamContextBlock(Date.now()),
   ]);
 
   const working =
@@ -834,7 +839,7 @@ export async function buildMemoryBlocks(
       ? undefined
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
-  return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, chat_scope: scope, chat_title: chatTitle };
+  return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle };
 }
 
 /**

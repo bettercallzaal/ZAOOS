@@ -1,8 +1,8 @@
 ---
 topic: business
 type: research
-status: research-complete
-last-validated: 2026-07-25
+status: implemented
+last-validated: 2026-08-05
 superseded-by:
 related-docs: 863, 1507
 original-query: "Unlock Protocol integration options for the zao-festivals React Native / Expo (SDK 57) mobile app — sell the $50 pro ticket tier as an onchain time-bound NFT membership, reusing the existing Reown AppKit (WalletConnect v2 / SIWE) wallet infra. Report on RN SDK support, mint/checkout flow, chain overlap, gas cost, EVENTS check-in reality, and whether it's shippable before Oct 3 2026."
@@ -93,6 +93,15 @@ So the honest framing for Zaal: the mobile SDK question (Q1–Q4) is the *easy* 
 3. From the Expo app, add a **"Get Pro ticket"** button that opens the hosted checkout via `expo-web-browser` (reuses the connected wallet for crypto, or card for everyone else). Keep the **free RSVP flow native** as-is.
 4. Add 2–3 volunteers as **Verifiers**; dry-run the scan loop before the gate opens.
 5. **Only** build a native in-app `purchase()` mint later, if a crypto-native "holder tier" UX justifies it (viem `writeContract` on the existing stack — no unlock-js, no ethers shims).
+
+## Implementation status (2026-08-05)
+
+Step 3 of the recommended path above has shipped:
+
+- **PR #249** (`bettercallzaal/zao-festivals`) — adds the "Get Pro Ticket · $50" button to the festival detail screen for upcoming events. Opens Unlock hosted checkout via `expo-web-browser`. Checkout URL read from `EXPO_PUBLIC_UNLOCK_CHECKOUT_URL` env var; section hidden when unset (safe-by-default — no broken link shown before a Lock is deployed).
+- **PR #250** (`bettercallzaal/zao-festivals`) — adds `.env.example` documenting all four `EXPO_PUBLIC_*` vars including the new Unlock checkout URL.
+
+**To go live:** merge PRs #249 and #250, deploy a Lock at events.unlock-protocol.com (Base, $50, Oct 3 window), then set `EXPO_PUBLIC_UNLOCK_CHECKOUT_URL=https://app.unlock-protocol.com/checkout?id=<UUID>` in EAS env vars. Payment rail (crypto vs card) is toggled in the Unlock Dashboard — no further app code changes needed.
 
 ## Sources
 

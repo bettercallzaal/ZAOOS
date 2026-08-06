@@ -342,6 +342,16 @@ describe('cost-governance', () => {
       expect(text).toContain('1 calls');
     });
 
+    it('shows cache-hit % in the breakdown when tokens were cached', () => {
+      vi.mocked(costLedger.todaySummary).mockReturnValue([
+        { model: 'sonnet', calls: 2, inputTokens: 1000, outputTokens: 200, cachedInputTokens: 750, costUsd: 0.02 },
+        { model: 'haiku', calls: 1, inputTokens: 400, outputTokens: 50, cachedInputTokens: 0, costUsd: 0.001 },
+      ]);
+      const text = formatSpendStatus(true);
+      expect(text).toContain('75% cached'); // sonnet: 750/1000
+      expect(text).not.toContain('0% cached'); // haiku: no cache -> no note
+    });
+
     it('handles empty ledger', () => {
       vi.mocked(costLedger.todaySummary).mockReturnValue([]);
 

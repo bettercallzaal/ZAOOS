@@ -106,10 +106,18 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
 
   const userPrompt = buildCriticUserPrompt(input, diff);
   const crossFamilyAvailable = hasCodexCli() || hasCapFallbackProvider();
+  // Complexity gate (doc 2215 #4): the 2-3 model panel is 2-3x the cost/latency,
+  // so only spend it where a second opinion can catch something - 'complex'
+  // diffs (logic/security/large). Docs + trivial low-risk edits stay single-critic
+  // even with the panel/shadow flag on. Override with ZOE_CRITIC_PANEL_ALL_DIFFS=1.
+  const worthPanel =
+    crossFamilyAvailable &&
+    (process.env.ZOE_CRITIC_PANEL_ALL_DIFFS === '1' ||
+      classifyDiffComplexity({ diff, filesChanged: input.filesChanged }) === 'complex');
 
-  // Multi-family panel GATES the PR when ZOE_CRITIC_PANEL=1 and a cross-family
-  // reviewer is available (doc 2214). Otherwise the single critic gates.
-  if (panelEnabled() && crossFamilyAvailable) {
+  // Multi-family panel GATES the PR when ZOE_CRITIC_PANEL=1 and the diff is worth
+  // a panel (doc 2214). Otherwise the single critic gates.
+  if (panelEnabled() && worthPanel) {
     return runCriticPanel(input, diff, userPrompt);
   }
 
@@ -117,7 +125,7 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
   // ALSO run the panel in parallel and log the delta - pure measurement, zero
   // risk to the gate. This is how we PROVE the panel beats the single critic
   // before ever turning it on by default.
-  if (shadowEnabled() && crossFamilyAvailable) {
+  if (shadowEnabled() && worthPanel) {
     const [single, panel] = await Promise.all([
       runSingleCritic(input, diff, userPrompt),
       runCriticPanel(input, diff, userPrompt).catch(() => null),

@@ -21,6 +21,7 @@ const input = { workTreePath: '/tmp/wt', branchName: 'b', filesChanged: ['a.ts']
 
 beforeEach(() => {
   process.env.ZOE_CRITIC_PANEL = '1';
+  process.env.ZOE_CRITIC_PANEL_ALL_DIFFS = '1'; // these tests exercise panel logic, not the complexity gate
   delete process.env.ZOE_CRITIC_PANEL_VERIFY;
   m.runCmd.mockReset().mockResolvedValue({ exitCode: 0, stdout: 'diff --git a/a.ts b/a.ts\n+x', stderr: '' });
   m.hasCodexCli.mockReset().mockReturnValue(true);
@@ -30,6 +31,7 @@ beforeEach(() => {
   m.callClaudeCliCapAware.mockReset();
 });
 afterEach(() => {
+  delete process.env.ZOE_CRITIC_PANEL_ALL_DIFFS;
   delete process.env.ZOE_CRITIC_PANEL;
   delete process.env.ZOE_CRITIC_PANEL_VERIFY;
 });

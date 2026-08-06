@@ -24,6 +24,7 @@ import { recordCall } from './cost-ledger';
 import { Trace, writeTrace } from './trace';
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
+import { modelForCostClass } from './decompose';
 import type { Subtask, WorkerKind } from './decompose';
 import { CRITIQUE_PASS_THRESHOLD, type CritiqueOutput } from './critics/types';
 import { runResearchCritic } from './critics/research-critic';
@@ -314,10 +315,14 @@ async function runCriticFor(
 export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult> {
   const worker = args.subtask.worker as ClaudeWorkerKind;
   const cfg = WORKER_CONFIG[worker];
+  // Per-task complexity routing (opt-in via ZOE_TASK_COMPLEXITY_ROUTING): map the
+  // subtask's decomposer-rated cost class to a model tier; falls back to the
+  // worker-kind default when routing is off. See decompose.modelForCostClass.
+  const model = modelForCostClass(cfg.model, args.subtask.estimated_cost_class);
   const base: Omit<WorkerResult, 'status' | 'output' | 'critique' | 'revised'> = {
     subtaskId: args.subtask.id,
     worker,
-    model: cfg.model,
+    model,
     inputTokens: 0,
     outputTokens: 0,
     costUsd: 0,
@@ -327,7 +332,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
   // Step-level trace (best-effort; doc 2200). Records the worker run as a span
   // tree - each model call + critic as a child span - so we can see WHERE a run
   // failed, not just that it did. All best-effort: never breaks the worker.
-  const trace = new Trace(`worker:${worker}`, Date.now(), { 'gen_ai.request.model': cfg.model });
+  const trace = new Trace(`worker:${worker}`, Date.now(), { 'gen_ai.request.model': model });
   const flushTrace = (status: 'ok' | 'error', attrs: Record<string, unknown> = {}): void => {
     try {
       trace.finish(Date.now(), status, attrs);
@@ -351,10 +356,10 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
   }
 
   const call = async (criticFeedback?: string, budgetUsd: number = cfg.maxBudgetUsd) => {
-    trace.begin('llm.call', 'generation', Date.now(), { 'gen_ai.request.model': cfg.model });
+    trace.begin('llm.call', 'generation', Date.now(), { 'gen_ai.request.model': model });
     try {
       const r = await callClaudeCli({
-        model: cfg.model,
+        model,
         prompt: buildWorkerPrompt(args, criticFeedback),
         cwd: args.context.workspace_dir,
         appendSystemPrompt: spec,

@@ -15,11 +15,11 @@
  * traced to a Zaal chat message or codebase fact.
  */
 
-import { callClaudeCli } from '../../hermes/claude-cli';
 import {
   selectCriticModel,
   wrapUntrustedInput,
   parseCritiqueJson,
+  runCritiqueModel,
   type CritiqueOutput,
   type CritiqueIssue,
 } from './types';
@@ -130,16 +130,13 @@ export async function runCommsCritic(input: CommsCritiqueInput): Promise<Critiqu
 
   const userPrompt = `Score the draft against ZOE brand voice + anti-fabrication rules. Return ONLY the JSON.${surfaceLine}${confirmedLine}\n\n${wrappedDraft}`;
 
-  const result = await callClaudeCli({
-    model,
-    prompt: userPrompt,
+  const result = await runCritiqueModel({
+    system: COMMS_CRITIC_SYSTEM,
+    user: userPrompt,
     cwd: input.cwd,
-    appendSystemPrompt: COMMS_CRITIC_SYSTEM,
-    allowedTools: [],
+    claudeModel: model,
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'default',
-    outputFormat: 'json',
-    bare: false,
+    validate: (t) => parseCritiqueJson(t) !== null,
   });
 
   const parsed = parseCritiqueJson(result.text);
@@ -173,5 +170,6 @@ export async function runCommsCritic(input: CommsCritiqueInput): Promise<Critiqu
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
     durationMs: result.durationMs,
+    reviewerFamily: result.reviewerFamily,
   };
 }

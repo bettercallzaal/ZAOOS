@@ -17,12 +17,12 @@
  * what the original task asked for?
  */
 
-import { callClaudeCli } from '../../hermes/claude-cli';
 import {
   selectCriticModel,
   wrapUntrustedInput,
   parseCritiqueJson,
   defaultShipsAsIs,
+  runCritiqueModel,
   type CritiqueOutput,
 } from './types';
 
@@ -98,16 +98,13 @@ export async function runTaskResultCritic(
 
   const userPrompt = `Score whether the worker output meets the original task. Return ONLY the JSON.${workerLine}${parentLine}\n\n${wrappedTask}\n\n${wrappedClaim}\n\n${wrappedOutput}`;
 
-  const result = await callClaudeCli({
-    model,
-    prompt: userPrompt,
+  const result = await runCritiqueModel({
+    system: TASK_RESULT_CRITIC_SYSTEM,
+    user: userPrompt,
     cwd: input.cwd,
-    appendSystemPrompt: TASK_RESULT_CRITIC_SYSTEM,
-    allowedTools: [],
+    claudeModel: model,
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'default',
-    outputFormat: 'json',
-    bare: false,
+    validate: (t) => parseCritiqueJson(t) !== null,
   });
 
   const parsed = parseCritiqueJson(result.text);
@@ -141,5 +138,6 @@ export async function runTaskResultCritic(
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
     durationMs: result.durationMs,
+    reviewerFamily: result.reviewerFamily,
   };
 }

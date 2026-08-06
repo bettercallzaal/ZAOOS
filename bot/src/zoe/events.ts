@@ -50,9 +50,11 @@ async function readSeen(): Promise<Record<string, number>> {
   }
 }
 
-async function writeSeen(seen: Record<string, number>): Promise<void> {
-  // prune old keys so the file stays small
-  const cutoff = Date.now() - SEEN_TTL_MS;
+async function writeSeen(seen: Record<string, number>, now: number = Date.now()): Promise<void> {
+  // Prune old keys so the file stays small. Pruned against the SAME injected
+  // clock the callers key their entries with - reading Date.now() here instead
+  // would drop a key the caller just wrote whenever the two clocks disagree.
+  const cutoff = now - SEEN_TTL_MS;
   const pruned: Record<string, number> = {};
   for (const [k, ts] of Object.entries(seen)) if (ts >= cutoff) pruned[k] = ts;
   await fs.mkdir(ZOE_PATHS.home, { recursive: true });
@@ -130,7 +132,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     });
   }
 
-  if (out.length > 0) await writeSeen(seen);
+  if (out.length > 0) await writeSeen(seen, now);
   return out;
 }
 
@@ -190,7 +192,7 @@ export async function gatherGraphCandidates(now: number = Date.now()): Promise<C
   }
 
   seen[`graphcheck:${today}`] = now; // mark the sweep done for today regardless
-  await writeSeen(seen);
+  await writeSeen(seen, now);
 
   if (!coldest) return [];
   return [
@@ -245,7 +247,7 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
   const key = `inactivity:${today}`;
   if (seen[key]) return [];
   seen[key] = now;
-  await writeSeen(seen);
+  await writeSeen(seen, now);
 
   const hrs = Math.floor(silentHrs);
   return [
@@ -355,6 +357,6 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
     console.warn('[zoe/events] ZOE calendar check failed (nbd):', (err as Error).message);
   }
 
-  if (out.length > 0) await writeSeen(seen);
+  if (out.length > 0) await writeSeen(seen, now);
   return out;
 }

@@ -342,14 +342,17 @@ describe('cost-governance', () => {
       expect(text).toContain('1 calls');
     });
 
-    it('shows cache-hit % in the breakdown when tokens were cached', () => {
+    it('shows cache-hit % over total input (fresh + cached), never over 100%', () => {
       vi.mocked(costLedger.todaySummary).mockReturnValue([
-        { model: 'sonnet', calls: 2, inputTokens: 1000, outputTokens: 200, cachedInputTokens: 750, costUsd: 0.02 },
-        { model: 'haiku', calls: 1, inputTokens: 400, outputTokens: 50, cachedInputTokens: 0, costUsd: 0.001 },
+        // fresh 250 + cached 750 = 1000 total => 75%
+        { model: 'sonnet', calls: 2, inputTokens: 250, outputTokens: 200, cachedInputTokens: 750, costUsd: 0.02 },
+        // real-shape: tiny fresh, huge cache_read => must be 100%, not 212410%
+        { model: 'haiku', calls: 1, inputTokens: 10, outputTokens: 50, cachedInputTokens: 21241, costUsd: 0.001 },
       ]);
       const text = formatSpendStatus(true);
-      expect(text).toContain('75% cached'); // sonnet: 750/1000
-      expect(text).not.toContain('0% cached'); // haiku: no cache -> no note
+      expect(text).toContain('75% cached'); // sonnet: 750/(250+750)
+      expect(text).toContain('100% cached'); // haiku: 21241/(10+21241) rounds to 100
+      expect(text).not.toMatch(/\d{4,}% cached/); // no absurd 4+-digit %
     });
 
     it('handles empty ledger', () => {

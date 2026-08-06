@@ -104,15 +104,19 @@ export function summaryText(day = today()): string {
   const totalCalls = rows.reduce((s, r) => s + r.calls, 0);
   const lines = rows.map((r) => {
     const cached = r.cachedInputTokens ?? 0;
-    const cacheNote = cached > 0 && r.inputTokens > 0
-      ? ` (${Math.round((cached / r.inputTokens) * 100)}% cached in)`
+    // Cache-hit % = cached / total-input, where total input = fresh (inputTokens,
+    // the non-cached count) + cached. Dividing by inputTokens alone overstates it
+    // wildly (cache_read can dwarf the tiny fresh input -> >100%).
+    const totalInput = r.inputTokens + cached;
+    const cacheNote = cached > 0 && totalInput > 0
+      ? ` (${Math.round((cached / totalInput) * 100)}% cached in)`
       : '';
     return `- ${r.model}: ${r.calls} calls, ${(r.inputTokens + r.outputTokens).toLocaleString()} tok${cacheNote}, $${r.costUsd.toFixed(4)}`;
   });
   const totalIn = rows.reduce((s, r) => s + r.inputTokens, 0);
   const totalCached = rows.reduce((s, r) => s + (r.cachedInputTokens ?? 0), 0);
-  const cacheLine = totalCached > 0 && totalIn > 0
-    ? ` (${Math.round((totalCached / totalIn) * 100)}% of input tokens served from cache)`
+  const cacheLine = totalCached > 0 && totalIn + totalCached > 0
+    ? ` (${Math.round((totalCached / (totalIn + totalCached)) * 100)}% of input tokens served from cache)`
     : '';
   return [`ZOE spend ${day} - $${total.toFixed(4)} across ${totalCalls} calls${cacheLine}:`, ...lines].join('\n');
 }

@@ -144,12 +144,21 @@ describe('cache observability', () => {
     expect(todaySummary(TEST_DAY)[0].cachedInputTokens).toBe(0);
   });
 
-  it('summaryText shows a cache-hit percentage when cached tokens exist', () => {
-    // 800 of 1000 input tokens cached = 80%
-    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'sonnet', in: 1000, out: 100, cached: 800, usd: 0.01 }) + '\n');
+  it('summaryText shows a cache-hit % over TOTAL input (fresh + cached)', () => {
+    // in=250 fresh + cached=750 => total input 1000, hit-rate 750/1000 = 75%.
+    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'sonnet', in: 250, out: 100, cached: 750, usd: 0.01 }) + '\n');
     const text = summaryText(TEST_DAY);
-    expect(text).toContain('80% of input tokens served from cache');
-    expect(text).toContain('80% cached in');
+    expect(text).toContain('75% of input tokens served from cache');
+    expect(text).toContain('75% cached in');
+  });
+
+  it('summaryText never reports over 100% when cached dwarfs fresh input (the bug)', () => {
+    // Real shape: fresh input is tiny (10), cache_read is huge (21241). Dividing
+    // by fresh alone gave 212410%; correct is 21241/21251 = ~100%.
+    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'haiku', in: 10, out: 40, cached: 21241, usd: 0.01 }) + '\n');
+    const text = summaryText(TEST_DAY);
+    expect(text).toContain('100% cached in');
+    expect(text).not.toMatch(/\d{4,}% cached/); // no 4+-digit percentage
   });
 
   it('summaryText omits the cache line when nothing is cached', () => {

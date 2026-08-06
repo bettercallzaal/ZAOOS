@@ -140,8 +140,12 @@ export function formatSpendStatus(detailed = false): string {
         // Cache-hit % of input tokens (prompt-caching savings) - only shown when
         // caching actually happened, so non-caching providers stay quiet.
         const cached = row.cachedInputTokens ?? 0;
-        const cacheNote = cached > 0 && row.inputTokens > 0
-          ? `, ${Math.round((cached / row.inputTokens) * 100)}% cached`
+        // Denominator is total input (fresh + cached), not fresh alone - else
+        // cache_read dwarfing the tiny fresh input yields absurd >100% (see
+        // cost-ledger.summaryText).
+        const totalInput = row.inputTokens + cached;
+        const cacheNote = cached > 0 && totalInput > 0
+          ? `, ${Math.round((cached / totalInput) * 100)}% cached`
           : '';
         main.push(`  ${modelShort}: ${row.calls} calls, $${row.costUsd.toFixed(4)}${cacheNote}`);
       }

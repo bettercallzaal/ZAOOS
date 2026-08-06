@@ -21,7 +21,7 @@
 
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from '../types';
 import { callClaudeCli } from '../../hermes/claude-cli';
-import { hasCapFallbackProvider, callCapFallback } from '../models/router';
+import { hasCodexCli, callCodexCli } from '../../hermes/codex-cli';
 
 export type CritiqueSeverity = 'critical' | 'high' | 'med' | 'low';
 
@@ -191,15 +191,15 @@ function crossFamilyEnabled(): boolean {
  * github.com/99darwin/orchestrator) via nickysap - see doc 2204 + the wider
  * cross-model-review literature. Credited per .claude/rules/credit-attribution.md.
  *
- * Run a critic's model call, cross-FAMILY by default. When a
- * non-Claude fleet provider is configured (OpenRouter/DeepSeek/Grok/GPT) and
- * cross-family is enabled, the critique runs on a DIFFERENT model family than
- * the Claude builder it is reviewing - a different family catches what
- * same-family self-review rationalizes away. Falls back to same-family Claude
- * (and flags `reviewerFamily: 'same'`) when no non-Claude provider exists or the
- * cross-family call fails - never silently, so the caller can note the reduced
- * coverage. The critic's system+user prompts and tolerant JSON parsing are
- * unchanged; only WHO answers changes.
+ * Run a critic's model call, cross-FAMILY by default. When cross-family is
+ * enabled and the Codex CLI is present, the critique runs on Codex (OpenAI) - a
+ * DIFFERENT model family than the Claude builder it is reviewing, on the flat-rate
+ * Codex subscription (no per-call credits, no OpenRouter). A different family
+ * catches what same-family self-review rationalizes away. Falls back to
+ * same-family Claude (and flags `reviewerFamily: 'same'`) when Codex is absent,
+ * usage-capped, or returns an unusable response - never silently, so the caller
+ * can note the reduced coverage. The critic's system+user prompts and tolerant
+ * JSON parsing are unchanged; only WHO answers changes.
  */
 export async function runCritiqueModel(opts: {
   system: string;
@@ -238,19 +238,24 @@ export async function runCritiqueModel(opts: {
     };
   };
 
-  if (crossFamilyEnabled() && hasCapFallbackProvider()) {
+  if (crossFamilyEnabled() && hasCodexCli()) {
     try {
-      const { result, provider } = await callCapFallback(opts.system, opts.user);
+      const result = await callCodexCli({
+        system: opts.system,
+        user: opts.user,
+        cwd: opts.cwd,
+        timeoutMs: 120000,
+      });
       if (opts.validate && !opts.validate(result.text)) {
-        // Cross-family provider answered but the response is unusable - retry
-        // same-family so a flaky provider never degrades the critique to a
-        // false failure. Loud, not silent.
-        console.warn('[zoe/critic] cross-family reviewer returned an invalid response - retrying same-family');
+        // Codex answered but the response is unusable - retry same-family so a
+        // flaky/agentic transcript never degrades the critique to a false
+        // failure. Loud, not silent.
+        console.warn('[zoe/critic] codex cross-family returned an invalid response - retrying same-family');
         return sameFamily();
       }
       return {
         text: result.text,
-        model: result.model || `cross:${provider}`,
+        model: result.model,
         inputTokens: result.inputTokens,
         outputTokens: result.outputTokens,
         totalCostUsd: result.totalCostUsd,
@@ -258,10 +263,10 @@ export async function runCritiqueModel(opts: {
         reviewerFamily: 'cross',
       };
     } catch (err) {
-      // Cross-family provider failed - fall back to same-family rather than
-      // failing the critique outright. Loud, not silent.
+      // Codex unavailable (usage-capped, not logged in, timed out) - fall back
+      // to same-family Claude rather than failing the critique. Loud, not silent.
       console.warn(
-        '[zoe/critic] cross-family reviewer unavailable, falling back to same-family:',
+        '[zoe/critic] codex cross-family unavailable, falling back to same-family:',
         (err as Error).message,
       );
     }

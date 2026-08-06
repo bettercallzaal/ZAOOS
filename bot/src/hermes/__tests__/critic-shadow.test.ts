@@ -26,6 +26,7 @@ const input = { workTreePath: '/tmp/wt', branchName: 'ws/x', filesChanged: ['a.t
 beforeEach(() => {
   delete process.env.ZOE_CRITIC_PANEL;
   process.env.ZOE_CRITIC_PANEL_SHADOW = '1';
+  process.env.ZOE_CRITIC_PANEL_ALL_DIFFS = '1'; // these tests exercise panel logic, not the complexity gate
   m.runCmd.mockReset().mockResolvedValue({ exitCode: 0, stdout: 'diff --git a/a.ts b/a.ts\n+x', stderr: '' });
   m.hasCodexCli.mockReset().mockReturnValue(false);
   m.hasCapFallbackProvider.mockReset().mockReturnValue(true);
@@ -37,6 +38,7 @@ beforeEach(() => {
   m.readFileSync.mockReset();
 });
 afterEach(() => {
+  delete process.env.ZOE_CRITIC_PANEL_ALL_DIFFS;
   delete process.env.ZOE_CRITIC_PANEL_SHADOW;
 });
 

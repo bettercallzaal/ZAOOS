@@ -8,6 +8,9 @@ import { hasCodexCli, callCodexCli } from './codex-cli';
 import { hasCapFallbackProvider, callCapFallback } from '../zoe/models/router';
 import { runCmd } from './git';
 import { classifyDiffComplexity, HERMES_PASS_THRESHOLD, type CritiqueInput, type CritiqueOutput } from './types';
+import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 
 /**
  * Sprint 1 cost-routing (per doc 541): when HERMES_ROUTING=on, classify
@@ -102,15 +105,32 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
   }
 
   const userPrompt = buildCriticUserPrompt(input, diff);
+  const crossFamilyAvailable = hasCodexCli() || hasCapFallbackProvider();
 
-  // Multi-family review panel (doc 2214, DEEP): when ZOE_CRITIC_PANEL=1 AND a
-  // cross-family reviewer is actually available, run 2-3 disjoint families
-  // INDEPENDENTLY and aggregate (vote, never debate). Otherwise fall through to
-  // the single-critic path below, byte-for-byte unchanged.
-  if (panelEnabled() && (hasCodexCli() || hasCapFallbackProvider())) {
+  // Multi-family panel GATES the PR when ZOE_CRITIC_PANEL=1 and a cross-family
+  // reviewer is available (doc 2214). Otherwise the single critic gates.
+  if (panelEnabled() && crossFamilyAvailable) {
     return runCriticPanel(input, diff, userPrompt);
   }
 
+  // SHADOW mode (doc 2215, milestone 2): the single critic still GATES, but we
+  // ALSO run the panel in parallel and log the delta - pure measurement, zero
+  // risk to the gate. This is how we PROVE the panel beats the single critic
+  // before ever turning it on by default.
+  if (shadowEnabled() && crossFamilyAvailable) {
+    const [single, panel] = await Promise.all([
+      runSingleCritic(input, diff, userPrompt),
+      runCriticPanel(input, diff, userPrompt).catch(() => null),
+    ]);
+    logShadowComparison(input, single, panel);
+    return single;
+  }
+
+  return runSingleCritic(input, diff, userPrompt);
+}
+
+/** The single-family Claude critic (the historical path). Gates unless the panel is on. */
+async function runSingleCritic(input: CritiqueInput, diff: string, userPrompt: string): Promise<CritiqueOutput> {
   const criticModel = selectCriticModel(diff, input.filesChanged);
   const result = await callClaudeCliCapAware({
     model: criticModel,
@@ -454,4 +474,109 @@ async function verifyDisagreement(
   } catch {
     return null;
   }
+}
+
+// ─── Shadow-mode eval harness (doc 2215, milestone 2) ────────────────────────
+// PROVE-then-enable: with ZOE_CRITIC_PANEL_SHADOW=1 the single critic still GATES
+// the PR, but we run the panel alongside it and log both verdicts + the delta.
+// Reading the log tells us whether the panel would catch more real blockers (or
+// just add noise) BEFORE we ever flip ZOE_CRITIC_PANEL on by default. Fully
+// fail-safe: logging never affects the gate and never throws.
+
+const SHADOW_DIR = process.env.ZOE_HOME
+  ? join(process.env.ZOE_HOME, 'critic-shadow')
+  : join(homedir(), '.zao', 'zoe', 'critic-shadow');
+
+/** Shadow measurement is opt-in and independent of the gating panel. */
+function shadowEnabled(): boolean {
+  return process.env.ZOE_CRITIC_PANEL_SHADOW === '1';
+}
+
+function shadowDay(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Append one panel-vs-single comparison to the shadow log. `panel` is null if
+ * the panel run failed - recorded as such, never silently dropped. Best-effort:
+ * a logging failure must never break a critic run.
+ */
+function logShadowComparison(input: CritiqueInput, single: CritiqueOutput, panel: CritiqueOutput | null): void {
+  try {
+    mkdirSync(SHADOW_DIR, { recursive: true });
+    const singlePass = single.score >= HERMES_PASS_THRESHOLD;
+    const panelPass = panel ? panel.score >= HERMES_PASS_THRESHOLD : null;
+    const line = JSON.stringify({
+      ts: new Date().toISOString(),
+      branch: input.branchName,
+      files: input.filesChanged.length,
+      single_score: single.score,
+      single_pass: singlePass,
+      panel_score: panel?.score ?? null,
+      panel_model: panel?.modelUsed ?? null,
+      panel_pass: panelPass,
+      // agree = did they reach the SAME pass/fail decision at the threshold?
+      agree: panelPass === null ? null : singlePass === panelPass,
+      // delta > 0 = panel stricter (scored lower); the disagreements are what we read.
+      delta: panel ? single.score - panel.score : null,
+      panel_feedback: panel?.feedback?.slice(0, 300) ?? null,
+    });
+    appendFileSync(join(SHADOW_DIR, `${shadowDay()}.jsonl`), `${line}\n`);
+  } catch {
+    /* shadow logging is measurement only - never break a critic run over it */
+  }
+}
+
+export interface ShadowSummary {
+  total: number;
+  bothRan: number;
+  agree: number;
+  disagree: number;
+  panelStricterFails: number; // panel FAILED where single PASSED (candidate extra catches)
+  singleStricterFails: number; // single FAILED where panel PASSED (panel too lenient?)
+  panelFailedToRun: number;
+}
+
+/** Aggregate a day's shadow log so the enable-decision is readable. Returns zeros on error. */
+export function shadowSummary(day = shadowDay()): ShadowSummary {
+  const s: ShadowSummary = {
+    total: 0,
+    bothRan: 0,
+    agree: 0,
+    disagree: 0,
+    panelStricterFails: 0,
+    singleStricterFails: 0,
+    panelFailedToRun: 0,
+  };
+  try {
+    const raw = readFileSync(join(SHADOW_DIR, `${day}.jsonl`), 'utf8');
+    for (const l of raw.split('\n')) {
+      if (!l.trim()) continue;
+      let rec: {
+        single_pass?: boolean;
+        panel_pass?: boolean | null;
+        agree?: boolean | null;
+      };
+      try {
+        rec = JSON.parse(l) as typeof rec;
+      } catch {
+        continue;
+      }
+      s.total += 1;
+      if (rec.panel_pass === null || rec.panel_pass === undefined) {
+        s.panelFailedToRun += 1;
+        continue;
+      }
+      s.bothRan += 1;
+      if (rec.agree) s.agree += 1;
+      else {
+        s.disagree += 1;
+        if (rec.single_pass === true && rec.panel_pass === false) s.panelStricterFails += 1;
+        if (rec.single_pass === false && rec.panel_pass === true) s.singleStricterFails += 1;
+      }
+    }
+  } catch {
+    /* no log yet / unreadable -> zeros */
+  }
+  return s;
 }

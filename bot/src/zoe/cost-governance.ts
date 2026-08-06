@@ -137,7 +137,13 @@ export function formatSpendStatus(detailed = false): string {
       main.push('\nBreakdown by model:');
       for (const row of summary) {
         const modelShort = row.model.length > 20 ? row.model.slice(0, 17) + '...' : row.model;
-        main.push(`  ${modelShort}: ${row.calls} calls, $${row.costUsd.toFixed(4)}`);
+        // Cache-hit % of input tokens (prompt-caching savings) - only shown when
+        // caching actually happened, so non-caching providers stay quiet.
+        const cached = row.cachedInputTokens ?? 0;
+        const cacheNote = cached > 0 && row.inputTokens > 0
+          ? `, ${Math.round((cached / row.inputTokens) * 100)}% cached`
+          : '';
+        main.push(`  ${modelShort}: ${row.calls} calls, $${row.costUsd.toFixed(4)}${cacheNote}`);
       }
     }
   }

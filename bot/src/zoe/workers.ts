@@ -399,10 +399,21 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       const remaining = revisionBudget(cfg.maxBudgetUsd, cost);
       if (remaining >= MIN_REVISION_BUDGET_USD) {
         revised = true;
-        const feedback = [
-          `Score ${critique.score}/100: ${critique.summary}`,
-          ...critique.issues.map((i) => `- [${i.severity}] ${i.location ?? ''} ${i.issue}`),
-        ].join('\n');
+        // When the critique came from a DIFFERENT model family (doc 2204), frame
+        // its findings as hypotheses to fact-check, not orders to blind-apply -
+        // otherwise cross-family review just launders one model's mistakes through
+        // another. The reviser verifies each against its actual output, fixes real
+        // issues, and justifies dismissing false ones ("CTO who can disagree").
+        const crossFamilyNote =
+          critique.reviewerFamily === 'cross'
+            ? 'A reviewer from a DIFFERENT model family flagged the items below. Treat each as a hypothesis: check it against your ACTUAL output before changing anything. Fix the real issues; if a finding is wrong or does not apply, briefly say why instead of applying it.\n\n'
+            : '';
+        const feedback =
+          crossFamilyNote +
+          [
+            `Score ${critique.score}/100: ${critique.summary}`,
+            ...critique.issues.map((i) => `- [${i.severity}] ${i.location ?? ''} ${i.issue}`),
+          ].join('\n');
         const second = await call(feedback, remaining);
         output = second.text;
         inTok += second.inputTokens;

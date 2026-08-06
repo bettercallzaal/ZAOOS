@@ -24,12 +24,12 @@
  *  12. Frontmatter carries `original-query`
  */
 
-import { callClaudeCli } from '../../hermes/claude-cli';
 import {
   selectCriticModel,
   wrapUntrustedInput,
   parseCritiqueJson,
   defaultShipsAsIs,
+  runCritiqueModel,
   type CritiqueOutput,
 } from './types';
 
@@ -97,16 +97,12 @@ export async function runResearchCritic(
   const userPrompt =
     `Score the research doc${input.docPath ? ` at ${input.docPath}` : ''} against the 12 Hard Requirements. Return ONLY the JSON.\n\n${wrappedDoc}`;
 
-  const result = await callClaudeCli({
-    model,
-    prompt: userPrompt,
+  const result = await runCritiqueModel({
+    system: RESEARCH_CRITIC_SYSTEM,
+    user: userPrompt,
     cwd: input.cwd,
-    appendSystemPrompt: RESEARCH_CRITIC_SYSTEM,
-    allowedTools: [],
+    claudeModel: model,
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'default',
-    outputFormat: 'json',
-    bare: false,
   });
 
   const parsed = parseCritiqueJson(result.text);
@@ -140,5 +136,6 @@ export async function runResearchCritic(
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
     durationMs: result.durationMs,
+    reviewerFamily: result.reviewerFamily,
   };
 }

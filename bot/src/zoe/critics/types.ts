@@ -20,6 +20,8 @@
  */
 
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from '../types';
+import { callClaudeCli } from '../../hermes/claude-cli';
+import { hasCapFallbackProvider, callCapFallback } from '../models/router';
 
 export type CritiqueSeverity = 'critical' | 'high' | 'med' | 'low';
 
@@ -46,6 +48,15 @@ export interface CritiqueOutput {
   outputTokens: number;
   costUsd: number;
   durationMs: number;
+  /**
+   * Which model FAMILY produced this critique relative to the builder it
+   * reviewed. 'cross' = a different family (a non-Claude fleet provider) - the
+   * default when one is configured, so the reviewer does not share the Claude
+   * builder's blind spots (doc 2204). 'same' = Claude reviewing Claude, used
+   * only when no non-Claude provider is available. Surfaced so a same-family
+   * review is never silently treated as cross-family (silent-failure-guard).
+   */
+  reviewerFamily?: 'cross' | 'same';
 }
 
 /** Pass threshold per Hermes precedent. Below this = needs revision. */
@@ -157,4 +168,85 @@ export function parseCritiqueJson(raw: string): {
     }))
     .filter((x) => x.issue);
   return { score, summary, issues };
+}
+
+/** The model-call result a critic needs, plus which family reviewed. */
+export interface CritiqueModelResult {
+  text: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  totalCostUsd: number;
+  durationMs: number;
+  reviewerFamily: 'cross' | 'same';
+}
+
+/** Cross-family verification is on by default; set ZOE_CROSS_FAMILY_VERIFY=0 to force same-family. */
+function crossFamilyEnabled(): boolean {
+  return process.env.ZOE_CROSS_FAMILY_VERIFY !== '0';
+}
+
+/**
+ * Cross-family verification pattern adapted from 99darwin/orchestrator (MIT,
+ * github.com/99darwin/orchestrator) via nickysap - see doc 2204 + the wider
+ * cross-model-review literature. Credited per .claude/rules/credit-attribution.md.
+ *
+ * Run a critic's model call, cross-FAMILY by default. When a
+ * non-Claude fleet provider is configured (OpenRouter/DeepSeek/Grok/GPT) and
+ * cross-family is enabled, the critique runs on a DIFFERENT model family than
+ * the Claude builder it is reviewing - a different family catches what
+ * same-family self-review rationalizes away. Falls back to same-family Claude
+ * (and flags `reviewerFamily: 'same'`) when no non-Claude provider exists or the
+ * cross-family call fails - never silently, so the caller can note the reduced
+ * coverage. The critic's system+user prompts and tolerant JSON parsing are
+ * unchanged; only WHO answers changes.
+ */
+export async function runCritiqueModel(opts: {
+  system: string;
+  user: string;
+  cwd: string;
+  claudeModel: string;
+  disallowedTools: string[];
+}): Promise<CritiqueModelResult> {
+  if (crossFamilyEnabled() && hasCapFallbackProvider()) {
+    try {
+      const { result, provider } = await callCapFallback(opts.system, opts.user);
+      return {
+        text: result.text,
+        model: result.model || `cross:${provider}`,
+        inputTokens: result.inputTokens,
+        outputTokens: result.outputTokens,
+        totalCostUsd: result.totalCostUsd,
+        durationMs: result.durationMs,
+        reviewerFamily: 'cross',
+      };
+    } catch (err) {
+      // Cross-family provider failed - fall back to same-family rather than
+      // failing the critique outright. Loud, not silent.
+      console.warn(
+        '[zoe/critic] cross-family reviewer unavailable, falling back to same-family:',
+        (err as Error).message,
+      );
+    }
+  }
+  const result = await callClaudeCli({
+    model: opts.claudeModel,
+    prompt: opts.user,
+    cwd: opts.cwd,
+    appendSystemPrompt: opts.system,
+    allowedTools: [],
+    disallowedTools: opts.disallowedTools,
+    permissionMode: 'default',
+    outputFormat: 'json',
+    bare: false,
+  });
+  return {
+    text: result.text,
+    model: result.model,
+    inputTokens: result.inputTokens,
+    outputTokens: result.outputTokens,
+    totalCostUsd: result.totalCostUsd,
+    durationMs: result.durationMs,
+    reviewerFamily: 'same',
+  };
 }

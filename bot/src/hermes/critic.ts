@@ -6,6 +6,7 @@ import {
 import { callClaudeCliCapAware } from '../zoe/models/cli-cap-aware';
 import { hasCodexCli, callCodexCli } from './codex-cli';
 import { hasCapFallbackProvider, callCapFallback } from '../zoe/models/router';
+import { recordCall } from '../zoe/cost-ledger';
 import { runCmd } from './git';
 import { classifyDiffComplexity, HERMES_PASS_THRESHOLD, type CritiqueInput, type CritiqueOutput } from './types';
 import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
@@ -264,6 +265,7 @@ async function reviewWithClaude(
       maxBudgetUsd: Number(process.env.HERMES_CRITIC_BUDGET_USD ?? '1'),
     });
     if (result.isError) return null;
+    recordCall('critic-panel:claude', result); // telemetry (doc 2215 #5): panel cost -> /budget
     const p = parseCriticReview(result.text);
     if (!p) return null;
     return { family: 'claude', model, score: p.score, feedback: p.feedback, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
@@ -276,6 +278,7 @@ async function reviewWithCodex(input: CritiqueInput, userPrompt: string): Promis
   if (!hasCodexCli()) return null;
   try {
     const r = await callCodexCli({ system: CRITIC_SYSTEM, user: userPrompt, cwd: input.workTreePath, timeoutMs: 4 * 60 * 1000 });
+    recordCall('critic-panel:codex', { model: r.model, inputTokens: r.inputTokens, outputTokens: r.outputTokens, totalCostUsd: 0 });
     const p = parseCriticReview(r.text);
     if (!p) return null;
     return { family: 'codex', model: r.model, score: p.score, feedback: p.feedback, inputTokens: r.inputTokens, outputTokens: r.outputTokens };
@@ -288,6 +291,7 @@ async function reviewWithOpenRouter(input: CritiqueInput, userPrompt: string): P
   if (!hasCapFallbackProvider()) return null;
   try {
     const { result } = await callCapFallback(CRITIC_SYSTEM, userPrompt);
+    recordCall('critic-panel:openrouter', result);
     const p = parseCriticReview(result.text);
     if (!p) return null;
     return { family: 'openrouter', model: result.model, score: p.score, feedback: p.feedback, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
@@ -478,6 +482,7 @@ async function verifyDisagreement(
       maxBudgetUsd: Number(process.env.HERMES_CRITIC_BUDGET_USD ?? '1'),
     });
     if (result.isError) return null;
+    recordCall('critic-panel:verify', result);
     return parseVerifyResult(result.text);
   } catch {
     return null;

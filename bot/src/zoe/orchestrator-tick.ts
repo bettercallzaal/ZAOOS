@@ -38,6 +38,7 @@ import { enqueueWork } from './work-loop';
 import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
 import { recordMessageContext } from './message-context';
 import { armPendingAnswer } from './pending-answers';
+import { startNudge, stopNudge, markPinged, dueTracks, nudgeLadderEnabled } from './nudge-ladder';
 import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
 import { topicNameForThread } from './topic-router';
 
@@ -483,6 +484,11 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       console.log('[zoe/orchestrator] no new answers');
     }
     for (const answer of answers) {
+      // Nudge ladder: Zaal answered this qid - kill any escalating ping for it.
+      // Runs BEFORE the ping step below, so an answered question never gets a
+      // stray re-ping in the same tick. No-op for untracked qids (relay replies).
+      if (nudgeLadderEnabled()) await stopNudge(answer.qid);
+
       // Relay-bridge: a 'rl-<lane>' answer is Zaal replying to an inbound fleet
       // relay from Telegram. Route his answer back to that lane and consume it -
       // do NOT run the orchestrator classifier on it. Off unless ZOE_RELAY_TG_ENABLED.
@@ -550,6 +556,15 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
             });
             // arm General: Zaal's next plain typed message answers this question
             armPendingAnswer(deps.groupId, action.nextQuestion.qid);
+            // Nudge ladder: begin the escalating->decaying ping for this open question.
+            if (nudgeLadderEnabled()) {
+              await startNudge(
+                action.nextQuestion.qid,
+                qText.slice(0, 60),
+                action.nextQuestion.options,
+                deps.now.getTime(),
+              );
+            }
             actioned++;
             console.log(
               `[zoe/orchestrator] posted ${action.nextQuestion.qid} after answer (${answer.qid}, "${answer.value}")`,
@@ -567,6 +582,23 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
             `[zoe/orchestrator] no rule for (${answer.qid}, "${answer.value}"), silent`,
           );
           break;
+      }
+    }
+
+    // Nudge ladder: re-ping Zaal for any unanswered question that is DUE on the
+    // escalating->decaying cadence. Answers were detected + stopped above, so this
+    // only pings genuinely-open items. Runs on the */5 orchestrator cron.
+    if (orchestratorOn && nudgeLadderEnabled()) {
+      const nowMs = deps.now.getTime();
+      for (const t of await dueTracks(nowMs)) {
+        try {
+          await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
+            reply_markup: questionKeyboard(t.qid, t.options),
+          });
+          await markPinged(t.qid, nowMs);
+        } catch (err) {
+          console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
+        }
       }
     }
 

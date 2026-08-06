@@ -22,7 +22,7 @@
  */
 
 import { callClaudeCli } from '../hermes/claude-cli';
-import { ZOE_DEFAULT_MODEL, ZOE_HARD_MODEL } from './types';
+import { ZOE_DEFAULT_MODEL, ZOE_HARD_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
 
 export type WorkerKind =
@@ -219,6 +219,32 @@ function findLastJsonObject(text: string): string | null {
  * via ZOE_MAX_SUBTASKS.
  */
 export const MAX_SUBTASKS = Math.max(1, Number(process.env.ZOE_MAX_SUBTASKS ?? 12));
+
+/**
+ * Pick a model for one subtask from its decomposer-rated `estimated_cost_class`
+ * (schema: 'small' = haiku-sized, 'medium' = sonnet, 'large' = opus). The
+ * decomposer already rates this per-subtask AS a model tier - this wires that
+ * rating to the actual model, so a boilerplate subtask drops to the quick tier
+ * and a genuinely-hard one gets the strong tier, instead of every subtask
+ * running the worker-kind's fixed default.
+ *
+ * OPT-IN: returns `defaultModel` unchanged unless ZOE_TASK_COMPLEXITY_ROUTING=1,
+ * so the current worker-kind behavior is preserved until Zaal enables it. The
+ * strong (opus) tier is only reached for a 'large' subtask, which the decomposer
+ * is prompted to mark sparingly (decompose prompt: "Default to lower cost class").
+ */
+export function modelForCostClass(defaultModel: string, costClass?: CostClass): string {
+  if (process.env.ZOE_TASK_COMPLEXITY_ROUTING !== '1') return defaultModel;
+  switch (costClass) {
+    case 'small':
+      return ZOE_QUICK_MODEL;
+    case 'large':
+      return ZOE_HARD_MODEL;
+    case 'medium':
+    default:
+      return ZOE_DEFAULT_MODEL;
+  }
+}
 
 /**
  * Validate + narrow the parsed JSON into a DecompositionPlan. Throws on

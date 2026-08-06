@@ -143,3 +143,33 @@ test('renderPlanForApproval handles single-step plan cleanly', () => {
   assert.match(out, /Steps \(1\):/);
   assert.match(out, /st-1\. Look up the answer inline -> task-dispatcher/);
 });
+
+// --- modelForCostClass: per-task complexity routing (opt-in) ---
+import { modelForCostClass } from '../decompose.ts';
+
+test('modelForCostClass: routing OFF returns the worker default unchanged', () => {
+  const prev = process.env.ZOE_TASK_COMPLEXITY_ROUTING;
+  delete process.env.ZOE_TASK_COMPLEXITY_ROUTING;
+  try {
+    assert.equal(modelForCostClass('sonnet', 'small'), 'sonnet');
+    assert.equal(modelForCostClass('haiku', 'large'), 'haiku');
+    assert.equal(modelForCostClass('sonnet', undefined), 'sonnet');
+  } finally {
+    if (prev === undefined) delete process.env.ZOE_TASK_COMPLEXITY_ROUTING;
+    else process.env.ZOE_TASK_COMPLEXITY_ROUTING = prev;
+  }
+});
+
+test('modelForCostClass: routing ON maps cost class to model tier', () => {
+  const prev = process.env.ZOE_TASK_COMPLEXITY_ROUTING;
+  process.env.ZOE_TASK_COMPLEXITY_ROUTING = '1';
+  try {
+    assert.equal(modelForCostClass('sonnet', 'small'), 'haiku'); // ZOE_QUICK_MODEL
+    assert.equal(modelForCostClass('haiku', 'medium'), 'sonnet'); // ZOE_DEFAULT_MODEL
+    assert.equal(modelForCostClass('haiku', 'large'), 'opus'); // ZOE_HARD_MODEL
+    assert.equal(modelForCostClass('sonnet', undefined), 'sonnet'); // default -> medium tier
+  } finally {
+    if (prev === undefined) delete process.env.ZOE_TASK_COMPLEXITY_ROUTING;
+    else process.env.ZOE_TASK_COMPLEXITY_ROUTING = prev;
+  }
+});

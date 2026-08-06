@@ -47,7 +47,7 @@ openrouter_run() {
 import sys,json
 try:
   d=json.load(sys.stdin); u=d.get('usage',{})
-  ch=u.get('prompt_cache_hit_tokens', u.get('cached_tokens',0))
+  ch=u.get('prompt_tokens_details',{}).get('cached_tokens',0) or u.get('prompt_cache_hit_tokens',0)
   print(f\"{u.get('prompt_tokens',0)}|{ch}|{u.get('completion_tokens',0)}|0|$((end-start))\")
 except Exception as e:
   print(f'ERR|{str(e)[:30]}|0|0|0')

@@ -3,7 +3,7 @@ topic: agents
 type: guide
 status: research-in-progress
 last-validated: 2026-08-06
-related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765
+related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
 original-query: "Deep research on how to have agentic tooling post on socials better - looped for an hour+, very important. Grounded in tonight's finding that the R3 winner cast sat drafted-but-unposted in a markdown file for weeks despite being ready."
 tier: DEEP
 ---
@@ -31,6 +31,12 @@ this pass.
 | 3 | **RESOLVED (this pass): the relay bridge exists but is the wrong shape for posting.** `bot/src/zoe/relay-bridge.ts` is live (gated `ZOE_RELAY_TG_ENABLED`) - a `zao-relay send zoe "<msg>"` from any terminal DOES reach ZOE's orchestrator tick and gets pushed to Zaal's Telegram DM with Reply/Ack buttons. But its own code comment is explicit: *"reply-to-lane is an INTERNAL fleet message... not an outbound post/DM to a third party - so it is not a gated action."* It's a generic notification channel, not wired to `caster/index.ts` at all. Separately, `runCasterPipeline()` (the actual draft→safety→approve→publish entry point) always calls `draftCast()` internally - an OpenRouter LLM call from a context string - there is no parameter to hand it an already-finished draft and skip straight to safety-check + Telegram-approval + publish. **The real gap is two small, well-scoped code changes, not a redesign**: (a) extend `CasterTrigger` (or add a sibling function) so a pre-written draft can enter the pipeline at the safety-check stage instead of always being freshly generated, and (b) extend `relay-bridge.ts` (or add a parallel bridge) so a relay message tagged as a cast draft routes into that entry point instead of the generic DM path. | Verified by reading `relay-bridge.ts` (`pushInboundRelays`, `formatInboundDm`) and `caster/index.ts`/`reason.ts` (`runCasterPipeline`, `draftCast`) directly, not inferred from docs. |
 | 4 | External research independently confirms ZOE's existing pattern is the right one, not something to redesign. Industry framing in 2026 calls this "autonomous with guardrails" / "AI proposes, human approves" - agent drafts, selects context, queues for review; fully autonomous posting "does not exist in production today" as an industry norm, matching ZAO's own stated design. | Cross-checked against fresh external sources (see Sources), not just internal docs - the point was to verify ZAO's approach isn't stale, not to import new frameworks. |
 | 5 | **Extend ZOE's caster pipeline for Farcaster, don't stand up Postiz/MCP-posting-server for it.** Postiz generates its own separate Farcaster signer (a fresh on-chain approval, not reuse of an existing one) and its approval flow is a public web-link review, not integrated with the Klearu+Telegram flow Zaal already uses daily. Extending `runCasterPipeline()` to accept an already-final draft is a smaller, more reused change. Postiz-style MCP posting servers remain the right call for platforms ZAO has no custom write infra for at all (Bluesky, general Telegram) - not a replacement for Farcaster's already-working path. | Verified how Postiz actually authenticates (fresh signer + on-chain approval, not credential reuse) before recommending either way - this was a real decision point, not assumed. |
+
+## Important adjacent work - not duplicated here
+
+**Doc 2174 (design spec, not built, 2026-08-01)** covers the *opposite* direction from this doc and is worth reading alongside it, not instead of it. This doc (2213) is about a Claude Code session's finished OUTPUT (a cast draft) getting OUT to a posting pipeline. Doc 2174 is about Zaal's typed FEEDBACK getting IN to a running Claude Code session from Discord/Telegram/the clipboard page - it documents that the inbound path already partly works today (a `UserPromptSubmit` hook auto-runs `zao-relay inbox <lane>` and injects unread messages at the top of each turn), and specs extending that to more surfaces.
+
+The two docs share infrastructure (the same relay hub, the same "thin adapter" extension pattern) and doc 2174's phasing approach - "adapter is thin... two forward rules," ship the lowest-effort surface first, prove the loop end-to-end - is exactly the shape this doc's Key Decision 3 recommendation should follow too: extend the existing relay-bridge with one new message type (a tagged cast-draft) rather than building new infrastructure. Citing this as precedent, not re-deriving it.
 
 ## What ZOL/ZOE can actually do today (2026-08-06, verified against live code)
 
@@ -93,6 +99,54 @@ Compare that to what's needed to extend the caster pipeline: `runCasterPipeline(
 
 - **Bluesky (AT Protocol):** app-password auth still works for self-scripted single-account bots; official guidance has shifted toward OAuth for anything onboarding other users, which doesn't apply to ZAO's own-account use case. Bot accounts should self-label as automated per platform norms. Not currently wired for ZAO at all - Postiz's existing Bluesky support (same MCP server that covers Farcaster) is a plausible fast path if this becomes a priority.
 - **Telegram:** fully specified (prior research, doc 1610), not yet built. Gated on Zaal providing a channel ID and one other PR merging - a ~2 hour build once unblocked, reusing ZOE's existing bot infrastructure (`@zaoclaw_bot`). Lowest-effort platform to add next if a second platform is wanted before the MCP question above is resolved.
+
+## Concrete implementation scope (for whoever picks this up)
+
+Grounded directly in the actual current interfaces (read this session, not sketched from memory):
+
+**Change 1 - `bot/src/zoe/caster/index.ts`:** `runCasterPipeline(bot, zaalId, trigger: CasterTrigger)` always calls `draftCast()` internally. Add an optional field to skip that:
+
+```ts
+export interface CasterTrigger {
+  agentId: string;
+  persona: string;
+  context: string;
+  parent?: { fid: number; hash: `0x${string}` };
+  imagePaths?: string[];
+  model?: string;
+  /** NEW: if set, skip draftCast() entirely and use this text as-is - for
+   *  drafts a Claude Code session already finished, not something to re-generate. */
+  preDrafted?: string;
+}
+```
+
+Inside `runCasterPipeline`, branch on `trigger.preDrafted` before the `draftCast()` call - if present, use it directly as `draftText` and go straight to `checkCast()` (the Klearu safety check). Everything downstream (Telegram approval buttons, `publishCast()` on approve) is unchanged - this is additive, not a rewrite.
+
+**Change 2 - `bot/src/zoe/relay-bridge.ts`:** `pushInboundRelays()` currently treats every inbound `zoe`-lane relay identically (a generic DM with Reply/Ack buttons). Add a tagged-message convention so a cast-draft relay routes differently:
+
+```ts
+export interface RelayMsg {
+  from: string;
+  to: string;
+  msg: string;
+  ts: string;
+  read?: boolean;
+  tg_pushed?: boolean;
+  /** NEW: optional tag. 'cast_draft' routes into runCasterPipeline() instead
+   *  of the generic DM path. Absent = today's existing behavior, unchanged. */
+  kind?: 'cast_draft';
+}
+```
+
+In `pushInboundRelays`, branch on `r.kind === 'cast_draft'`: instead of `formatInboundDm` + the generic Reply/Ack keyboard, call `runCasterPipeline(bot, zaalId, { agentId: r.from, persona: 'claude-code-session', context: r.msg, preDrafted: r.msg })` - reusing Change 1's new field. Zaal then sees the SAME POST/REGEN/SKIP Telegram UI he already uses for every ZOE-drafted cast, just sourced from a Claude Code session instead of OpenRouter.
+
+**Sender side (a Claude Code session, e.g. this one, tonight):** instead of writing a cast draft to a markdown file for manual copy-paste, send it tagged:
+```bash
+zao-relay send zoe "<finished cast text>" --kind cast_draft   # illustrative - zao-relay's CLI would need a --kind flag added, or a JSON payload convention
+```
+(`zao-relay`'s current CLI only takes a plain string message - passing structured metadata like `kind` would need a small CLI extension too, e.g. accepting a JSON body or a `--kind` flag that gets folded into the stored `RelayMsg`.)
+
+**Net new/changed code:** roughly 3 small, additive changes across `caster/index.ts`, `relay-bridge.ts`, and `zao-relay`'s CLI - no new services, no new infrastructure, reuses every existing safety/approval/publish stage as-is.
 
 ## Contradictions and staleness - independently re-verified this pass, not just repeated
 

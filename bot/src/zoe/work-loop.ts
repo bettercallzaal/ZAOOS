@@ -220,7 +220,12 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
             model: 'haiku',
             prompt,
             cwd: ctx.workspace_dir,
-            bare: true,
+            // NOTE: do NOT pass `bare: true` here. `--bare` skips config
+            // auto-discovery, which is where the CLI's OAuth login lives - so
+            // bare returns "Not logged in", the judge always throws, and
+            // verify-replan silently fail-opens (rubber-stamps every result
+            // instead of verifying). Proven via A/B on the VPS 2026-08-05;
+            // see feedback_no_bare_with_oauth. Keep the judge authenticated.
             maxBudgetUsd: 0.15,
             timeoutMs: 120000,
           });

@@ -125,3 +125,45 @@ describe('recordCall', () => {
     expect(() => recordCall('test', { model: 'haiku', inputTokens: 0, outputTokens: 0, totalCostUsd: 0 })).not.toThrow();
   });
 });
+
+// ── cache-aware observability (cachedInputTokens) ───────────────────────────────
+
+describe('cache observability', () => {
+  it('aggregates cachedInputTokens per model', () => {
+    const l1 = JSON.stringify({ model: 'sonnet', in: 1000, out: 100, cached: 800, usd: 0.01 });
+    const l2 = JSON.stringify({ model: 'sonnet', in: 500, out: 50, cached: 400, usd: 0.005 });
+    mockReadFileSync.mockReturnValue(`${l1}\n${l2}\n`);
+    const rows = todaySummary(TEST_DAY);
+    const sonnet = rows.find((r) => r.model === 'sonnet');
+    expect(sonnet!.cachedInputTokens).toBe(1200);
+    expect(sonnet!.inputTokens).toBe(1500);
+  });
+
+  it('defaults cachedInputTokens to 0 for records without the field (old logs)', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'haiku', in: 100, out: 20, usd: 0.001 }) + '\n');
+    expect(todaySummary(TEST_DAY)[0].cachedInputTokens).toBe(0);
+  });
+
+  it('summaryText shows a cache-hit percentage when cached tokens exist', () => {
+    // 800 of 1000 input tokens cached = 80%
+    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'sonnet', in: 1000, out: 100, cached: 800, usd: 0.01 }) + '\n');
+    const text = summaryText(TEST_DAY);
+    expect(text).toContain('80% of input tokens served from cache');
+    expect(text).toContain('80% cached in');
+  });
+
+  it('summaryText omits the cache line when nothing is cached', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({ model: 'haiku', in: 100, out: 20, cached: 0, usd: 0.001 }) + '\n');
+    const text = summaryText(TEST_DAY);
+    expect(text).not.toContain('cached');
+  });
+
+  it('recordCall persists the cached field', () => {
+    mockMkdirSync.mockImplementation(() => {}); // reset the throwing impl bled from an earlier test
+    mockWriteFileSync.mockImplementation(() => {});
+    mockReadFileSync.mockReturnValue('');
+    recordCall('worker', { model: 'sonnet', inputTokens: 1000, outputTokens: 100, cachedInputTokens: 700, totalCostUsd: 0.01 });
+    const parsed = JSON.parse((mockAppendFileSync.mock.calls[0][1] as string).trim());
+    expect(parsed.cached).toBe(700);
+  });
+});

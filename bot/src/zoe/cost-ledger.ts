@@ -25,6 +25,8 @@ export interface CallCost {
   model: string;
   inputTokens: number;
   outputTokens: number;
+  /** Input tokens served from the prompt cache (Claude cache_read_input_tokens). */
+  cachedInputTokens?: number;
   totalCostUsd: number;
 }
 
@@ -33,6 +35,9 @@ export interface ModelRollup {
   calls: number;
   inputTokens: number;
   outputTokens: number;
+  /** Of inputTokens, how many were served from cache. Optional: rollups from
+   * pre-cache-observability logs have no value. */
+  cachedInputTokens?: number;
   costUsd: number;
 }
 
@@ -53,6 +58,7 @@ export function recordCall(caller: string, r: CallCost): void {
       model: r.model,
       in: r.inputTokens ?? 0,
       out: r.outputTokens ?? 0,
+      cached: r.cachedInputTokens ?? 0,
       usd: r.totalCostUsd ?? 0,
     });
     appendFileSync(join(COST_DIR, `${today()}.jsonl`), `${line}\n`);
@@ -69,17 +75,18 @@ export function todaySummary(day = today()): ModelRollup[] {
     const byModel = new Map<string, ModelRollup>();
     for (const l of raw.split('\n')) {
       if (!l.trim()) continue;
-      let rec: { model?: string; in?: number; out?: number; usd?: number };
+      let rec: { model?: string; in?: number; out?: number; cached?: number; usd?: number };
       try {
         rec = JSON.parse(l) as typeof rec;
       } catch {
         continue;
       }
       const model = rec.model ?? 'unknown';
-      const m = byModel.get(model) ?? { model, calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 };
+      const m = byModel.get(model) ?? { model, calls: 0, inputTokens: 0, outputTokens: 0, cachedInputTokens: 0, costUsd: 0 };
       m.calls += 1;
       m.inputTokens += rec.in ?? 0;
       m.outputTokens += rec.out ?? 0;
+      m.cachedInputTokens = (m.cachedInputTokens ?? 0) + (rec.cached ?? 0);
       m.costUsd += rec.usd ?? 0;
       byModel.set(model, m);
     }
@@ -95,10 +102,19 @@ export function summaryText(day = today()): string {
   if (rows.length === 0) return `No ZOE model calls logged for ${day}.`;
   const total = rows.reduce((s, r) => s + r.costUsd, 0);
   const totalCalls = rows.reduce((s, r) => s + r.calls, 0);
-  const lines = rows.map(
-    (r) => `- ${r.model}: ${r.calls} calls, ${(r.inputTokens + r.outputTokens).toLocaleString()} tok, $${r.costUsd.toFixed(4)}`,
-  );
-  return [`ZOE spend ${day} - $${total.toFixed(4)} across ${totalCalls} calls:`, ...lines].join('\n');
+  const lines = rows.map((r) => {
+    const cached = r.cachedInputTokens ?? 0;
+    const cacheNote = cached > 0 && r.inputTokens > 0
+      ? ` (${Math.round((cached / r.inputTokens) * 100)}% cached in)`
+      : '';
+    return `- ${r.model}: ${r.calls} calls, ${(r.inputTokens + r.outputTokens).toLocaleString()} tok${cacheNote}, $${r.costUsd.toFixed(4)}`;
+  });
+  const totalIn = rows.reduce((s, r) => s + r.inputTokens, 0);
+  const totalCached = rows.reduce((s, r) => s + (r.cachedInputTokens ?? 0), 0);
+  const cacheLine = totalCached > 0 && totalIn > 0
+    ? ` (${Math.round((totalCached / totalIn) * 100)}% of input tokens served from cache)`
+    : '';
+  return [`ZOE spend ${day} - $${total.toFixed(4)} across ${totalCalls} calls${cacheLine}:`, ...lines].join('\n');
 }
 
 function writeDailySummary(): void {

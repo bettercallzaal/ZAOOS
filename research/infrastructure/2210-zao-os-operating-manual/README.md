@@ -28,6 +28,13 @@ Decommissioned (do NOT restart): openclaw squad, Composio AO, ZOE v2, the 10-bot
 
 Deployed + healthy on the VPS: cross-family verification (critic runs on a different model family - OpenRouter/DeepSeek - than the Claude builder, via `runCritiqueModel`, fact-checked before apply), verify-replan on autonomous research (VMAO; the `bare`-strips-OAuth judge bug is fixed), step-level tracing (`trace.ts`, OTel-shaped, writes `~/.zao/zoe/traces/`), golden-eval, the board-in-context team block, `/board`, recall un-truncation. Cost/observability: `cost-ledger.ts`, `watcher.ts`, `runs.ts`.
 
+**Shipped 2026-08-06 (this build loop, PRs #2877/#2881-2884):**
+- **Per-task complexity model routing** - the decomposer already rates each subtask's `estimated_cost_class` (small=haiku, medium=sonnet, large=opus); this now drives model selection in `runClaudeWorker` (`decompose.modelForCostClass`), so boilerplate drops to the quick tier and hard subtasks get the strong tier. **Flag: `ZOE_TASK_COMPLEXITY_ROUTING=1` (default OFF)** - no behavior change until set; opus (large) only reached when enabled.
+- **Mobile nudge ladder** - escalating->decaying Telegram pings for a needs-Zaal item (5-in-10-min burst, decaying to daily), stops the instant he answers. `nudge-ladder.ts` + `orchestrator-tick.runNudgePing`, a dedicated `*/2` cron plus the `*/5` orchestrator tick. **Flag: `ZOE_NUDGE_LADDER=1` (default OFF).**
+- **Cache-hit visibility ("prompt catching")** - `callClaudeCli` now captures `usage.cache_read_input_tokens` (was dropped at the source); the ledger aggregates it and **`/budget` (detailed) shows the per-model cache-hit %**, so the prompt-caching savings are finally visible. No flag - on by default, additive.
+
+**To activate the two flag-gated ones:** set the env var in the VPS bot `.env` + restart `zoe-bot`. Verify nudge by raising a test needs-Zaal question and watching the ping cadence; verify routing by watching the `/budget` model mix shift as subtasks route by cost class.
+
 ## 3. The autonomous fleet (~21 loops)
 
 Shell loops (cheap-loop.sh / loop-agent.sh) in tmux on the VPS, PR-only, one item/tick, status to ZAAL BOTZ. As of 2026-08-06 **all pinned to OpenRouter** (`~/.zao/openrouter-loops`) to preserve the Claude weekly cap; cheap-loop defaults to OpenRouter (DeepSeek), Ollama as local fallback.
@@ -40,7 +47,7 @@ Shell loops (cheap-loop.sh / loop-agent.sh) in tmux on the VPS, PR-only, one ite
 
 ## 5. Cost model (doc 2208)
 
-Cost ladder: Ollama (local, $0) -> OpenRouter/DeepSeek (cheap, now primary for loops) -> Codex ($20 flat, periodically capped) -> Claude (the Max weekly cap - reserve for grounded live-code). **Biggest unclaimed wins: prompt caching (90% off reused context, verified) + Batch API (~50% off async).** ZAO has: cost-ledger, watcher, coarse model-routing, OpenRouter. Gap: caching, batch, a hard per-loop daily halt-cap.
+Cost ladder: Ollama (local, $0) -> OpenRouter/DeepSeek (cheap, now primary for loops) -> Codex ($20 flat, periodically capped) -> Claude (the Max weekly cap - reserve for grounded live-code). **Prompt caching:** the Claude CLI auto-caches the system prompt (~90% off reused context) - as of 2026-08-06 this is now VISIBLE in `/budget` (the per-model cache-hit %), confirming it fires. DeepSeek-via-OpenRouter does NOT cache (no `cached_tokens` returned), but is already dirt-cheap, so the miss is low-value. ZAO has: cost-ledger (now cache-aware), watcher, coarse + per-task model-routing, OpenRouter. **Remaining gap: Batch API (~50% off async) + a hard per-loop daily halt-cap.**
 
 ## 6. Repo estate (doc 2209)
 

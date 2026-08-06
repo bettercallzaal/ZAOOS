@@ -62,6 +62,17 @@ jobs:
 
       - run: npm test
 
+      # The estate-control-plane ships its OWN standalone vitest config (node
+      # env, scoped to tools/) because the root config only scans src/ +
+      # scripts/. Nothing ever invoked it, so its 8 tests never executed on CI -
+      # the "test suite that never ran" silent failure
+      # (.claude/rules/silent-failure-guard.md incident #3). Its checks gate
+      # every PR through the Estate Health ratchet, so a regression in
+      # drift/zombie/quality must fail here, not silently change what the
+      # guardrail enforces.
+      - name: Test (estate-control-plane)
+        run: npx vitest run --config tools/estate-control-plane/vitest.config.ts
+
   bot-test:
     name: Bot Tests
     runs-on: ubuntu-latest

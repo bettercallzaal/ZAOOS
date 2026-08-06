@@ -6,7 +6,7 @@ last-validated: 2026-08-06
 related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
 status: research-in-progress
 last-validated: 2026-08-06
-related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765
+related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
 original-query: "Deep research on how to have agentic tooling post on socials better - looped for an hour+, very important. Grounded in tonight's finding that the R3 winner cast sat drafted-but-unposted in a markdown file for weeks despite being ready."
 tier: DEEP
 ---

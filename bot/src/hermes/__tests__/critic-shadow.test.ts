@@ -16,6 +16,7 @@ vi.mock('../../zoe/models/cli-cap-aware', () => ({ callClaudeCliCapAware: m.call
 vi.mock('../codex-cli', () => ({ hasCodexCli: m.hasCodexCli, callCodexCli: m.callCodexCli }));
 vi.mock('../../zoe/models/router', () => ({ hasCapFallbackProvider: m.hasCapFallbackProvider, callCapFallback: m.callCapFallback }));
 vi.mock('../git', () => ({ runCmd: m.runCmd }));
+vi.mock('../../zoe/cost-ledger', () => ({ recordCall: vi.fn() }));
 vi.mock('node:fs', () => ({ appendFileSync: m.appendFileSync, mkdirSync: m.mkdirSync, readFileSync: m.readFileSync }));
 
 import { runCritic, shadowSummary } from '../critic';

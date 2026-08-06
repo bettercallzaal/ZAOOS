@@ -52,6 +52,33 @@ export function hasCodexCli(): boolean {
 const CAP_OR_AUTH = /usage limit|hit your usage limit|not logged in|please run .*login|quota|insufficient|\b401\b|\b403\b|\b429\b/i;
 
 /**
+ * Decide whether a FINISHED codex run means "codex is unavailable" (capped /
+ * not logged in) rather than "codex answered". Returns the matched marker, or
+ * null when the run succeeded.
+ *
+ * The cap markers may only be matched against a run that FAILED, because the
+ * text we scan (`combined` = the agent's own stdout + stderr) contains the
+ * critique itself - a critic reviewing a research doc routinely writes
+ * "insufficient sources", "quota", or a bare "429". Matching those in a
+ * successful run threw away a valid cross-family critique and silently
+ * downgraded the review to same-family Claude - and an untrusted input could
+ * trigger it on purpose just by containing the word "insufficient".
+ *
+ * A clean run - exit 0 AND a non-empty final-message file - is a success no
+ * matter what the transcript says. Anything else falls back to the marker scan,
+ * which is where a genuine cap/auth failure lands (codex writes no final
+ * message when it refuses to run).
+ */
+export function detectCodexUnavailable(opts: {
+  code: number | null;
+  finalMessage: string;
+  combined: string;
+}): string | null {
+  if (opts.code === 0 && opts.finalMessage.trim()) return null;
+  return opts.combined.match(CAP_OR_AUTH)?.[0] ?? null;
+}
+
+/**
  * Run one headless Codex critique. Returns the agent's final message text.
  * Throws CodexUnavailableError on cap / auth / spawn / timeout so the caller
  * can fall back to same-family review.
@@ -105,13 +132,6 @@ export async function callCodexCli(opts: {
     });
     child.on('close', async (code) => {
       clearTimeout(timer);
-      const combined = `${stdout}\n${stderr}`;
-      if (CAP_OR_AUTH.test(combined)) {
-        cleanup();
-        const hit = combined.match(CAP_OR_AUTH)?.[0] ?? 'cap/auth';
-        reject(new CodexUnavailableError(`codex unavailable (${hit})`));
-        return;
-      }
       let last = '';
       try {
         last = await readFile(outFile, 'utf8');
@@ -119,6 +139,12 @@ export async function callCodexCli(opts: {
         /* no last-message file written */
       }
       cleanup();
+      const combined = `${stdout}\n${stderr}`;
+      const hit = detectCodexUnavailable({ code, finalMessage: last, combined });
+      if (hit) {
+        reject(new CodexUnavailableError(`codex unavailable (${hit})`));
+        return;
+      }
       const text = last.trim() || stdout.trim();
       if (!text) {
         reject(new CodexUnavailableError(`codex produced no output (exit ${code})`));

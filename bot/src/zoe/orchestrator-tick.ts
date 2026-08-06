@@ -446,6 +446,42 @@ function questionTextFor(qid: string): string | null {
  * Main orchestrator tick: detect new answers, decide follow-ups, post questions.
  * Disabled by default; only runs when ZOE_ORCHESTRATOR_ENABLED === 'true'.
  */
+/**
+ * Fast nudge-ping pass (its own 2-min cron). Re-pings Zaal for any unanswered
+ * button-question that is DUE on the escalating->decaying cadence, so the phase-1
+ * burst hits the full 5-in-10-min instead of the 5-min orchestrator granularity.
+ * Lightweight: it stops nudges for any answer seen since the pointer (so an
+ * answered question never gets a stray re-ping) but does NOT advance the pointer -
+ * the orchestrator tick owns that. No-op unless ZOE_NUDGE_LADDER=1.
+ */
+export async function runNudgePing(deps: {
+  bot: OrchestratorTickDeps['bot'];
+  groupId: number;
+  now: Date;
+}): Promise<void> {
+  if (!nudgeLadderEnabled()) return;
+  try {
+    // Stop nudges for anything Zaal already answered (do NOT advance the pointer).
+    const state = await readState();
+    const answers = await detectNewAnswers(state.lastSeenTs, deps.groupId);
+    for (const a of answers) await stopNudge(a.qid);
+    // Re-ping the due, still-open questions.
+    const nowMs = deps.now.getTime();
+    for (const t of await dueTracks(nowMs)) {
+      try {
+        await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
+          reply_markup: questionKeyboard(t.qid, t.options),
+        });
+        await markPinged(t.qid, nowMs);
+      } catch (err) {
+        console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
+      }
+    }
+  } catch (err) {
+    console.error('[zoe/nudge-ladder] ping pass failed:', (err as Error)?.message);
+  }
+}
+
 export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<void> {
   // SAFETY: disabled by default. This cron tick is shared by two independently
   // gated features - the orchestrator question loop and the relay-Telegram bridge.
@@ -585,22 +621,8 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       }
     }
 
-    // Nudge ladder: re-ping Zaal for any unanswered question that is DUE on the
-    // escalating->decaying cadence. Answers were detected + stopped above, so this
-    // only pings genuinely-open items. Runs on the */5 orchestrator cron.
-    if (orchestratorOn && nudgeLadderEnabled()) {
-      const nowMs = deps.now.getTime();
-      for (const t of await dueTracks(nowMs)) {
-        try {
-          await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
-            reply_markup: questionKeyboard(t.qid, t.options),
-          });
-          await markPinged(t.qid, nowMs);
-        } catch (err) {
-          console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
-        }
-      }
-    }
+    // (Nudge re-pings run on their own faster 2-min cron via runNudgePing, so the
+    // phase-1 burst hits the full 5-in-10-min instead of this 5-min granularity.)
 
     const posted = actioned;
 

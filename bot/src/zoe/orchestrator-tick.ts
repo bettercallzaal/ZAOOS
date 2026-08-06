@@ -592,10 +592,17 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
       const nowMs = deps.now.getTime();
       for (const t of await dueTracks(nowMs)) {
         try {
+          // Record the ping BEFORE sending - fail CLOSED. If the counter cannot
+          // be persisted, the track's pingMs never grows, so it stays permanently
+          // DUE and MAX_PINGS never trips: ZOE would re-ping this one question
+          // every cron tick forever. Skipping a ping is the safe direction.
+          if (!(await markPinged(t.qid, nowMs))) {
+            console.error(`[zoe/nudge-ladder] could not record ping for ${t.qid}, skipping re-ping`);
+            continue;
+          }
           await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
             reply_markup: questionKeyboard(t.qid, t.options),
           });
-          await markPinged(t.qid, nowMs);
         } catch (err) {
           console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
         }

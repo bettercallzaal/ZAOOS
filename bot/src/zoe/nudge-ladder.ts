@@ -95,18 +95,28 @@ export function isExhausted(track: NudgeTrack): boolean {
 
 async function load(): Promise<NudgeTrack[]> {
   try {
-    return JSON.parse(await fs.readFile(ladderPath(), 'utf8')) as NudgeTrack[];
+    const parsed = JSON.parse(await fs.readFile(ladderPath(), 'utf8')) as unknown;
+    // A hand-edited / truncated-then-repaired file can parse to a non-array
+    // ({} or null). Callers immediately .filter()/.find() the result, so a
+    // non-array would throw a TypeError out of dueTracks() and take the whole
+    // orchestrator tick down. Treat anything that is not an array as "no tracks".
+    return Array.isArray(parsed) ? (parsed as NudgeTrack[]) : [];
   } catch {
     return [];
   }
 }
 
-async function save(tracks: NudgeTrack[]): Promise<void> {
+/** Persist. Returns false (and logs) when the write failed - callers that are
+ *  about to SEND a ping must treat a false here as "do not ping": an unrecorded
+ *  ping means the schedule never advances and MAX_PINGS never trips. */
+async function save(tracks: NudgeTrack[]): Promise<boolean> {
   try {
     await fs.mkdir(ladderHome(), { recursive: true });
     await fs.writeFile(ladderPath(), JSON.stringify(tracks, null, 2));
-  } catch {
-    /* best-effort */
+    return true;
+  } catch (err) {
+    console.error('[zoe/nudge-ladder] persist failed:', (err as Error)?.message);
+    return false;
   }
 }
 
@@ -135,13 +145,16 @@ export async function stopNudge(qid: string): Promise<boolean> {
   return true;
 }
 
-/** Record that a re-ping was just sent for a qid (advances the schedule). */
-export async function markPinged(qid: string, nowMs: number): Promise<void> {
+/** Reserve a ping slot for a qid (advances the schedule). Returns true only if
+ *  the advance was PERSISTED - call this BEFORE sending, and skip the send when
+ *  it returns false. Failing to record a ping is what turns the ladder into the
+ *  runaway spam it exists to prevent. */
+export async function markPinged(qid: string, nowMs: number): Promise<boolean> {
   const tracks = await load();
   const t = tracks.find((x) => x.qid === qid);
-  if (!t) return;
+  if (!t) return false;
   t.pingMs.push(nowMs);
-  await save(tracks);
+  return save(tracks);
 }
 
 /** The open tracks that are due for a re-ping right now. */

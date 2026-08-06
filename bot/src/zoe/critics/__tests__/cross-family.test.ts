@@ -86,6 +86,28 @@ describe('runCritiqueModel cross-family routing', () => {
     expect(mocks.callClaudeCli).toHaveBeenCalledTimes(1);
   });
 
+  it('retries same-family when the cross-family response fails validation (garbage JSON)', async () => {
+    mocks.hasCapFallbackProvider.mockReturnValue(true);
+    mocks.callCapFallback.mockResolvedValue({
+      result: { ...crossResult.result, text: 'not json at all' },
+      provider: 'openrouter',
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const r = await runCritiqueModel({ ...opts, validate: (t) => t.trim().startsWith('{') });
+    expect(r.reviewerFamily).toBe('same');
+    expect(mocks.callCapFallback).toHaveBeenCalledTimes(1);
+    expect(mocks.callClaudeCli).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('keeps the cross-family result when it passes validation', async () => {
+    mocks.hasCapFallbackProvider.mockReturnValue(true);
+    const r = await runCritiqueModel({ ...opts, validate: (t) => t.trim().startsWith('{') });
+    expect(r.reviewerFamily).toBe('cross');
+    expect(mocks.callClaudeCli).not.toHaveBeenCalled();
+  });
+
   it('falls back to same-family (loud, not a failure) when the cross-family call throws', async () => {
     mocks.hasCapFallbackProvider.mockReturnValue(true);
     mocks.callCapFallback.mockRejectedValue(new Error('provider down'));

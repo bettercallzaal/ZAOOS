@@ -207,10 +207,47 @@ export async function runCritiqueModel(opts: {
   cwd: string;
   claudeModel: string;
   disallowedTools: string[];
+  /**
+   * Optional validity check on the raw response text. If a CROSS-family result
+   * fails it - e.g. unparseable JSON from a less-reliable provider - we retry
+   * same-family rather than let a garbage response become a false score-0 and
+   * trigger a wasted revision. Pass `(t) => parseCritiqueJson(t) !== null`.
+   */
+  validate?: (text: string) => boolean;
 }): Promise<CritiqueModelResult> {
+  const sameFamily = async (): Promise<CritiqueModelResult> => {
+    const result = await callClaudeCli({
+      model: opts.claudeModel,
+      prompt: opts.user,
+      cwd: opts.cwd,
+      appendSystemPrompt: opts.system,
+      allowedTools: [],
+      disallowedTools: opts.disallowedTools,
+      permissionMode: 'default',
+      outputFormat: 'json',
+      bare: false,
+    });
+    return {
+      text: result.text,
+      model: result.model,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      totalCostUsd: result.totalCostUsd,
+      durationMs: result.durationMs,
+      reviewerFamily: 'same',
+    };
+  };
+
   if (crossFamilyEnabled() && hasCapFallbackProvider()) {
     try {
       const { result, provider } = await callCapFallback(opts.system, opts.user);
+      if (opts.validate && !opts.validate(result.text)) {
+        // Cross-family provider answered but the response is unusable - retry
+        // same-family so a flaky provider never degrades the critique to a
+        // false failure. Loud, not silent.
+        console.warn('[zoe/critic] cross-family reviewer returned an invalid response - retrying same-family');
+        return sameFamily();
+      }
       return {
         text: result.text,
         model: result.model || `cross:${provider}`,
@@ -229,24 +266,5 @@ export async function runCritiqueModel(opts: {
       );
     }
   }
-  const result = await callClaudeCli({
-    model: opts.claudeModel,
-    prompt: opts.user,
-    cwd: opts.cwd,
-    appendSystemPrompt: opts.system,
-    allowedTools: [],
-    disallowedTools: opts.disallowedTools,
-    permissionMode: 'default',
-    outputFormat: 'json',
-    bare: false,
-  });
-  return {
-    text: result.text,
-    model: result.model,
-    inputTokens: result.inputTokens,
-    outputTokens: result.outputTokens,
-    totalCostUsd: result.totalCostUsd,
-    durationMs: result.durationMs,
-    reviewerFamily: 'same',
-  };
+  return sameFamily();
 }

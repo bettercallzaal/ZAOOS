@@ -103,6 +103,7 @@ export async function runResearchCritic(
     cwd: input.cwd,
     claudeModel: model,
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
+    validate: (t) => parseCritiqueJson(t) !== null,
   });
 
   const parsed = parseCritiqueJson(result.text);

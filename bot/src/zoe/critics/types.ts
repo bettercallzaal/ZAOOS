@@ -22,6 +22,7 @@
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from '../types';
 import { callClaudeCli } from '../../hermes/claude-cli';
 import { hasCodexCli, callCodexCli } from '../../hermes/codex-cli';
+import { hasCapFallbackProvider, callCapFallback } from '../models/router';
 
 export type CritiqueSeverity = 'critical' | 'high' | 'med' | 'low';
 
@@ -192,14 +193,18 @@ function crossFamilyEnabled(): boolean {
  * cross-model-review literature. Credited per .claude/rules/credit-attribution.md.
  *
  * Run a critic's model call, cross-FAMILY by default. When cross-family is
- * enabled and the Codex CLI is present, the critique runs on Codex (OpenAI) - a
- * DIFFERENT model family than the Claude builder it is reviewing, on the flat-rate
- * Codex subscription (no per-call credits, no OpenRouter). A different family
- * catches what same-family self-review rationalizes away. Falls back to
- * same-family Claude (and flags `reviewerFamily: 'same'`) when Codex is absent,
- * usage-capped, or returns an unusable response - never silently, so the caller
- * can note the reduced coverage. The critic's system+user prompts and tolerant
- * JSON parsing are unchanged; only WHO answers changes.
+ * enabled the critique runs on a DIFFERENT model family than the Claude builder
+ * it is reviewing - a different family catches what same-family self-review
+ * rationalizes away. Two cross-family reviewers are tried in order:
+ *   1. Codex (OpenAI) - flat-rate subscription, no per-call credits. Preferred.
+ *   2. OpenRouter/DeepSeek (via callCapFallback) - cheap per-call, and crucially
+ *      still works while Codex is usage-capped (Codex caps periodically), so
+ *      cross-family coverage does not silently collapse to same-family.
+ * Only if BOTH cross-family reviewers are unavailable (absent, capped, or return
+ * an unusable response) does it fall back to same-family Claude and flag
+ * `reviewerFamily: 'same'` - never silently, so the caller can note the reduced
+ * coverage. The critic's system+user prompts and tolerant JSON parsing are
+ * unchanged; only WHO answers changes.
  */
 export async function runCritiqueModel(opts: {
   system: string;
@@ -238,20 +243,18 @@ export async function runCritiqueModel(opts: {
     };
   };
 
-  if (crossFamilyEnabled() && hasCodexCli()) {
+  // Second cross-family reviewer: OpenRouter/DeepSeek (or grok/gpt) via
+  // callCapFallback. Returns a 'cross' result, or null if it is unavailable or
+  // returns an unusable response (caller then continues to same-family). This is
+  // what keeps cross-family alive while Codex is capped.
+  const openRouterCross = async (): Promise<CritiqueModelResult | null> => {
     try {
-      const result = await callCodexCli({
-        system: opts.system,
-        user: opts.user,
-        cwd: opts.cwd,
-        timeoutMs: 120000,
-      });
+      const { result, provider } = await callCapFallback(opts.system, opts.user);
       if (opts.validate && !opts.validate(result.text)) {
-        // Codex answered but the response is unusable - retry same-family so a
-        // flaky/agentic transcript never degrades the critique to a false
-        // failure. Loud, not silent.
-        console.warn('[zoe/critic] codex cross-family returned an invalid response - retrying same-family');
-        return sameFamily();
+        console.warn(
+          `[zoe/critic] ${provider} cross-family returned an invalid response - falling back to same-family`,
+        );
+        return null;
       }
       return {
         text: result.text,
@@ -263,13 +266,55 @@ export async function runCritiqueModel(opts: {
         reviewerFamily: 'cross',
       };
     } catch (err) {
-      // Codex unavailable (usage-capped, not logged in, timed out) - fall back
-      // to same-family Claude rather than failing the critique. Loud, not silent.
       console.warn(
-        '[zoe/critic] codex cross-family unavailable, falling back to same-family:',
+        '[zoe/critic] openrouter cross-family unavailable, falling back to same-family:',
         (err as Error).message,
       );
+      return null;
+    }
+  };
+
+  if (crossFamilyEnabled()) {
+    // 1. Codex (preferred cross-family - flat-rate, no per-call credits).
+    if (hasCodexCli()) {
+      try {
+        const result = await callCodexCli({
+          system: opts.system,
+          user: opts.user,
+          cwd: opts.cwd,
+          timeoutMs: 120000,
+        });
+        if (opts.validate && !opts.validate(result.text)) {
+          // Codex answered but the response is unusable - fall through to the
+          // OpenRouter cross-family reviewer, not straight to same-family. Loud.
+          console.warn('[zoe/critic] codex cross-family returned an invalid response - trying openrouter');
+        } else {
+          return {
+            text: result.text,
+            model: result.model,
+            inputTokens: result.inputTokens,
+            outputTokens: result.outputTokens,
+            totalCostUsd: result.totalCostUsd,
+            durationMs: result.durationMs,
+            reviewerFamily: 'cross',
+          };
+        }
+      } catch (err) {
+        // Codex unavailable (usage-capped, not logged in, timed out) - fall
+        // through to the OpenRouter cross-family reviewer. Loud, not silent.
+        console.warn(
+          '[zoe/critic] codex cross-family unavailable, trying openrouter:',
+          (err as Error).message,
+        );
+      }
+    }
+
+    // 2. OpenRouter/DeepSeek cross-family (works while Codex is capped).
+    if (hasCapFallbackProvider()) {
+      const orResult = await openRouterCross();
+      if (orResult) return orResult;
     }
   }
+
   return sameFamily();
 }

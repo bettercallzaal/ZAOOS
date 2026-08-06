@@ -1,7 +1,7 @@
 ---
 topic: agents
 type: guide
-status: research-in-progress
+status: research-complete
 last-validated: 2026-08-06
 related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
 original-query: "Deep research on how to have agentic tooling post on socials better - looped for an hour+, very important. Grounded in tonight's finding that the R3 winner cast sat drafted-but-unposted in a markdown file for weeks despite being ready."
@@ -17,12 +17,13 @@ tier: DEEP
 > that then sat untouched in a markdown file - the exact failure mode this
 > doc needs to close.
 
-**Status: DRAFT, IN PROGRESS.** This is being built iteratively over a looped
-research session (started 2026-08-06). Sections marked `[VERIFY NEXT]` are
-findings from internal docs that haven't been independently re-checked yet
-this pass.
+Built iteratively over a looped research session on 2026-08-06. Every finding
+below was either read directly from the live codebase, fetched live from a
+primary source (Neynar's own pricing page, fresh web search on X's current
+API terms), or explicitly cross-checked against and reconciled with prior
+internal research - not re-derived from assumption.
 
-## Key Decisions (working, will firm up as research continues)
+## Key Decisions
 
 | # | Recommendation | Why |
 |---|---|---|
@@ -172,9 +173,11 @@ External (fetched live this session, 2026-08-06):
 
 ## Next Actions
 
-_Will be finalized once research is complete - placeholder pass:_
-
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Confirm whether zao-relay messages can enter the caster/Telegram-approval pipeline today | Zaal (assistant to verify code path) | Investigation | in progress this session |
-| Decide MCP-wrapper-on-caster vs. standalone Postiz+approval-gate MCP | Zaal | Decision | pending this doc's completion |
+| Implement Change 1 (`preDrafted` field on `CasterTrigger`, skip `draftCast()` when set) in `bot/src/zoe/caster/index.ts` | Zaal | PR (bot) | 2026-08-13 |
+| Implement Change 2 (`kind: 'cast_draft'` tag on `RelayMsg`, route to `runCasterPipeline` in `pushInboundRelays`) in `bot/src/zoe/relay-bridge.ts` | Zaal | PR (bot) | 2026-08-13 |
+| Add `--kind` flag (or JSON-body convention) to `zao-relay send` so a Claude Code session can tag a message as a cast draft | Zaal | PR (`~/bin/zao-relay`) | 2026-08-13 |
+| Once shipped, retire the "draft to markdown file, hope someone notices" pattern for zpoidh-style bounty casts - route future ready-to-post drafts through the relay instead | Zaal + future Claude Code sessions | Workflow change | after the 3 PRs above land |
+| Confirm ZOE's `CASTER_ENABLED` boot-path flag status (doc 761/891 flagged Phase 2 code exists but wasn't confirmed live in boot path) before relying on this end-to-end | Zaal | Verification | 2026-08-08 |
+| If/when a second platform (Bluesky or general Telegram) becomes a real priority, evaluate self-hosting Postiz for those specifically - not Farcaster, which already has a working path | Zaal | Decision (future, not urgent) | no date - revisit when the need arises |

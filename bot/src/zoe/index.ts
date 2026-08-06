@@ -147,6 +147,7 @@ import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
+import { shadowSummary } from '../hermes/critic';
 import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback } from './questions';
@@ -824,6 +825,31 @@ bot.command('loops', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const data = await readFleetStatus();
   await replyChunked(ctx, formatLoopsStatus(data, Date.now()));
+});
+
+// Critic-panel shadow eval (doc 2215): panel-vs-single-critic agreement on
+// today's Hermes reviews. Read-only, Zaal-only. /shadow [YYYY-MM-DD].
+bot.command('shadow', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const day = (ctx.match ?? '').toString().trim() || undefined;
+  const s = day ? shadowSummary(day) : shadowSummary();
+  if (s.total === 0) {
+    await ctx.reply(
+      `No critic-panel shadow data${day ? ` for ${day}` : ' today'} yet. Enable with ZOE_CRITIC_PANEL_SHADOW=1 + a few Hermes fix-PRs on complex diffs.`,
+    );
+    return;
+  }
+  const lines = [
+    `Critic panel shadow eval${day ? ` (${day})` : ' (today)'}:`,
+    `- reviews: ${s.total} (both ran: ${s.bothRan}, panel failed: ${s.panelFailedToRun})`,
+    `- AGREE with single critic: ${s.agree}/${s.bothRan}`,
+    `- disagree: ${s.disagree}`,
+    `  - panel stricter (would BLOCK where single passed): ${s.panelStricterFails}  <- candidate extra catches`,
+    `  - single stricter (panel too lenient): ${s.singleStricterFails}`,
+    '',
+    'Read: high panel-stricter with real bugs = the panel earns default-ON; high single-stricter or noise = keep it off. Raw log: ~/.zao/zoe/critic-shadow/.',
+  ];
+  await replyChunked(ctx, lines.join('\n'));
 });
 
 bot.command('loop', async (ctx) => {

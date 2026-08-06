@@ -44,6 +44,7 @@ export const ZOE_COMMANDS = [
   { command: 'focus', description: 'Toggle hyperfocus (queue non-urgent pings)' },
   { command: 'agenda', description: 'Show the board - all open items' },
   { command: 'budget', description: "Today's spend + headroom" },
+  { command: 'shadow', description: 'Critic panel vs single-critic eval' },
   { command: 'checkpoint', description: 'Save a breadcrumb note' },
   { command: 'audit', description: 'Scan for fallen tasks / captures' },
 ];

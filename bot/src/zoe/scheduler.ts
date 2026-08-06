@@ -51,7 +51,7 @@ import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
 import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
-import { runOrchestratorTick } from './orchestrator-tick';
+import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
@@ -990,6 +990,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // based on simple decision rules. DISABLED by default (ZOE_ORCHESTRATOR_ENABLED
   // env flag) so it never runs while a Claude Code terminal orchestrator is
   // active. Empty queue = silent. File-locked, daily-capped.
+  // Nudge-ladder fast ping: every 2 min, re-ping Zaal for DUE unanswered questions
+  // so the phase-1 burst hits the full 5-in-10-min. No-op unless ZOE_NUDGE_LADDER=1.
+  tasks.push(
+    cron.schedule('*/2 * * * *', async () => {
+      const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+      if (!gid) return;
+      try {
+        await runNudgePing({ bot: opts.bot, groupId: gid, now: new Date() });
+      } catch (err) {
+        console.error('[zoe/scheduler] nudge ping failed:', (err as Error).message);
+      }
+    }),
+  );
+
   tasks.push(
     cron.schedule(
       '*/5 * * * *',

@@ -61,23 +61,34 @@ jobs:
             exit 0
           fi
 
-          # Every doc number that already exists on the base branch.
+          # Every doc DIRECTORY that already exists on the base branch. Compare
+          # directories, not bare numbers, so a doc can never collide with
+          # ITSELF: `$base` is re-fetched at job start and points at LIVE main,
+          # and auto-merge routinely lands a docs PR while this job is still
+          # running (PRs #2840/#2843/#2844 all merged 9-15s after their guard job
+          # started). The number-only comparison then found the PR's own,
+          # just-merged directory on main and failed the PR against itself - so
+          # the guard red-flagged every clean docs PR and a REAL collision became
+          # indistinguishable from the routine false alarm. Excluding the exact
+          # same path keeps a genuine same-number/different-slug collision failing,
+          # including one that landed on main after this branch was cut.
           basetree=$(git ls-tree -r --name-only "$base") \
             || { echo "::error title=doc-guard git ls-tree failed::cannot read base tree - failing closed"; exit 1; }
-          existing=$(printf '%s\n' "$basetree" \
+          existingdirs=$(printf '%s\n' "$basetree" \
             | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
-            | sed -E 's|^research/[^/]+/([0-9]{3,4})-.*|\1|' \
             | sort -u || true)
 
           fail=0
           while read -r d; do
             [ -z "$d" ] && continue
             num=$(echo "$d" | sed -E 's|^research/[^/]+/([0-9]{3,4})-.*|\1|')
-            if echo "$existing" | grep -qx "$num"; then
+            hits=$(printf '%s\n' "$existingdirs" \
+              | grep -E "^research/[^/]+/${num}-" \
+              | grep -vxF "$d" || true)
+            if [ -n "$hits" ]; then
               echo "::error title=Doc number $num already exists::$d collides with an existing doc number on ${{ github.base_ref }}."
               echo "  existing doc(s) with number $num:"
-              git ls-tree -r --name-only "$base" \
-                | grep -oE "^research/[^/]+/${num}-[^/]+/" | sed 's/^/    /' | sort -u
+              printf '%s\n' "$hits" | sed 's/^/    /'
               fail=1
             fi
           done <<< "$newdirs"

@@ -4,6 +4,13 @@ export interface ClaudeCliResult {
   text: string;
   inputTokens: number;
   outputTokens: number;
+  /**
+   * Input tokens served from the prompt cache (Claude: usage.cache_read_input_tokens).
+   * These are ~10x cheaper than fresh input tokens, so this is the number that
+   * proves caching is actually saving money. Optional: providers without a cache
+   * (e.g. DeepSeek via OpenRouter) leave it 0. See cost-ledger for the rollup.
+   */
+  cachedInputTokens?: number;
   totalCostUsd: number;
   model: string;
   durationMs: number;
@@ -207,7 +214,7 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
             result?: string;
             session_id?: string;
             total_cost_usd?: number;
-            usage?: { input_tokens?: number; output_tokens?: number };
+            usage?: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number };
             modelUsage?: Record<string, { inputTokens: number; outputTokens: number; costUSD: number }>;
           };
           if (parsed.is_error) {
@@ -237,6 +244,7 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
             text: parsed.result ?? '',
             inputTokens: usage.input_tokens ?? 0,
             outputTokens: usage.output_tokens ?? 0,
+            cachedInputTokens: usage.cache_read_input_tokens ?? 0,
             totalCostUsd: parsed.total_cost_usd ?? 0,
             model: opts.model,
             durationMs: parsed.duration_ms ?? 0,

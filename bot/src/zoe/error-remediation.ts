@@ -19,6 +19,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { mcEmit } from './mission-control';
 import type { HermesRepoTarget } from '../hermes/types';
 import { db } from '../supabase';
 import { dispatchHermesRun } from '../hermes/runner';
@@ -121,6 +122,7 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
 
   const claimed = await deps.claimError(next.id);
   if (!claimed) return `lost claim race on ${next.id}`;
+  mcEmit('error-remediation', 'zoe', 3, `claimed error ${next.ref_code ?? next.id.slice(0, 8)} in ${next.repo}`);
 
   const target = repoToTarget(next.repo);
   if (!target) {
@@ -150,6 +152,7 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
     await deps.report(
       `Error ${tag} (${target}${next.brand ? `, brand ${next.brand}` : ''}): diagnosed -> fixed -> ${prLabel} open${result.prUrl ? ` ${result.prUrl}` : ''}. Ready for your merge.`,
     );
+    mcEmit('error-remediation', 'zoe', 5, `error ${tag} fixed -> ${result.prUrl ?? 'PR open'}`);
     return `fixed -> ${result.prUrl ?? 'pr'}`;
   }
 
@@ -157,6 +160,7 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
   await deps.report(
     `Error ${tag} (${target}) - pipeline could not auto-fix (${result.kind}): ${result.reason}. Needs you.`,
   );
+  mcEmit('error-remediation', 'zoe', 8, `error ${tag} NEEDS ZAAL (${result.kind}): ${result.reason}`);
   return `escalated (${result.kind})`;
 }
 

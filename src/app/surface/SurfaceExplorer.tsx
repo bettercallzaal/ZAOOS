@@ -31,6 +31,7 @@ const AUTH_STYLES: Record<string, string> = {
   session: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
   cron: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
   signed: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+  token: 'bg-teal-500/15 text-teal-300 border-teal-500/30',
   public: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
 };
 
@@ -51,6 +52,7 @@ function statusTone(status: number | null): string {
 export default function SurfaceExplorer({ routes, generatedAt }: Props) {
   const [query, setQuery] = useState('');
   const [authFilter, setAuthFilter] = useState<string>('all');
+  const [reviewOnly, setReviewOnly] = useState(false);
   const [results, setResults] = useState<Record<string, Result>>({});
   const [pending, setPending] = useState<string | null>(null);
 
@@ -60,14 +62,17 @@ export default function SurfaceExplorer({ routes, generatedAt }: Props) {
     return byAuth;
   }, [routes]);
 
+  const reviewCount = useMemo(() => routes.filter((r) => r.review).length, [routes]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return routes.filter((r) => {
+      if (reviewOnly && !r.review) return false;
       if (authFilter !== 'all' && r.auth !== authFilter) return false;
       if (!q) return true;
       return r.path.toLowerCase().includes(q) || r.what.toLowerCase().includes(q);
     });
-  }, [routes, query, authFilter]);
+  }, [routes, query, authFilter, reviewOnly]);
 
   async function test(r: RouteEntry) {
     if (!isTestable(r)) return; // belt and braces - the button is also disabled
@@ -142,10 +147,31 @@ export default function SurfaceExplorer({ routes, generatedAt }: Props) {
           </select>
         </div>
 
-        <p className="mt-3 text-xs text-gray-500">
-          Showing {filtered.length} of {routes.length}. A 401 on a guarded route is the guard
-          working, not a failure.
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setReviewOnly((v) => !v)}
+            className={`rounded-lg border px-3 py-1.5 text-sm transition ${
+              reviewOnly
+                ? 'border-red-500/50 bg-red-500/20 text-red-200'
+                : 'border-white/10 bg-white/5 text-gray-300'
+            }`}
+          >
+            Needs review ({reviewCount})
+          </button>
+          <p className="text-xs text-gray-500">
+            Showing {filtered.length} of {routes.length}. A 401 on a guarded route is the guard
+            working, not a failure.
+          </p>
+        </div>
+
+        {reviewOnly && (
+          <p className="mt-3 max-w-2xl text-sm text-gray-400">
+            These have no auth guard yet hold a service-role key, which bypasses row-level security.
+            That is the shape of the anonymous board leak (#2829), so each one wants a human read.
+            Some are deliberately public - flagged is not the same as broken.
+          </p>
+        )}
       </header>
 
       <ul className="mx-auto mt-5 max-w-5xl space-y-2">
@@ -185,6 +211,30 @@ export default function SurfaceExplorer({ routes, generatedAt }: Props) {
                     {r.dynamic && (
                       <span className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-gray-500">
                         needs a param
+                      </span>
+                    )}
+                    {r.serviceRole && (
+                      <span
+                        className="rounded border border-orange-500/30 bg-orange-500/10 px-1.5 py-0.5 text-xs text-orange-300"
+                        title="Holds a service-role key - queries bypass row-level security"
+                      >
+                        service-role
+                      </span>
+                    )}
+                    {r.rateLimited && (
+                      <span
+                        className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-gray-400"
+                        title="Rate-limited. Slows enumeration; does not authorize anyone."
+                      >
+                        rate-limited
+                      </span>
+                    )}
+                    {r.review && (
+                      <span
+                        className="rounded border border-red-500/40 bg-red-500/15 px-1.5 py-0.5 text-xs text-red-300"
+                        title="No auth guard, but holds an RLS-bypassing key. Read this handler."
+                      >
+                        review
                       </span>
                     )}
                   </div>

@@ -7,13 +7,29 @@ Run this in the SAME PR as any route add/remove/rename:
 A hand-maintained map drifts within a week; a generated one cannot. This feeds
 both /surface (the clickable explorer) and research doc 2245 (the written map).
 
-The auth column is INFERRED from the source text, so it is a strong hint and a
-starting point for a security pass - not a proof. `public` here means "no guard
-token was found in this file", which is exactly the set worth auditing by hand.
+WHY THE AUTH DETECTOR LOOKS FOR SO MANY THINGS (the 2026-08-07 audit)
+--------------------------------------------------------------------
+v1 of this script only knew two guards: `isAdmin` and `getSession`. Everything
+else fell through to `public`, which produced 35 "public" routes and sent a
+security audit chasing four false positives in a row - /api/crm/capture (token +
+origin allowlist + rate limit), /api/stream/webhook (HMAC + timingSafeEqual),
+/api/webhooks/alchemy (HMAC, fails closed), /api/miniapp/webhook (Farcaster's
+own verification). All four were correctly guarded. A detector that cries wolf
+35 times gets ignored on the one that matters, so it now recognises the guards
+this codebase actually uses.
+
+The far more useful signal turned out not to be "is it public" but
+"is it public AND does it hold a service-role key". A service-role client
+bypasses RLS, so an unauthenticated handler holding one can read whole tables -
+that is precisely the shape of the August 2026 anonymous-board leak (#2829).
+That combination is what `review` flags.
+
+`auth` remains INFERRED FROM SOURCE TEXT. It is a strong hint and an audit
+starting point, never a proof. Read the handler before you trust the label.
 """
+import json
 import os
 import re
-import json
 import subprocess
 import sys
 
@@ -21,6 +37,25 @@ ROOT = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=Tru
 API = os.path.join(ROOT, 'src', 'app', 'api')
 OUT = os.path.join(ROOT, 'src', 'lib', 'surface-map.ts')
 SUFFIX_LEN = len('/route.ts')  # 9. Getting this wrong silently truncates every path.
+
+# Each guard the codebase actually uses, most-specific first. Order matters:
+# a route with both a session check and an HMAC is reported as `session`.
+GUARDS = [
+    ('admin', ('isAdmin',)),
+    ('session', ('getSession', 'getSessionData')),
+    ('cron', ('CRON_SECRET',)),
+    # Cryptographic sender verification - HMAC, timing-safe compare, or a
+    # protocol library that does the same (Farcaster, SIWE).
+    ('signed', ('WEBHOOK_SECRET', 'createHmac', 'timingSafeEqual', 'verifyAppKey',
+                'parseWebhookEvent', 'verifySignature', 'verifyMessage')),
+    # A shared token and/or an origin allowlist. Weaker than a signature but a
+    # real gate - the caller must know something or come from somewhere.
+    ('token', ('ALLOWED_ORIGIN', 'allowedOrigins', 'CAPTURE_TOKEN',
+               'authorization', 'Bearer')),
+]
+
+SERVICE_ROLE_MARKERS = ('getSupabaseAdmin', 'SERVICE_ROLE')
+RATELIMIT_MARKERS = ('rateLimit', 'ratelimit', 'checkRate', 'RATE_LIMIT')
 
 
 def first_doc(path, maxlines=14):
@@ -42,14 +77,11 @@ def first_doc(path, maxlines=14):
 
 
 def auth_of(src, path):
-    if 'isAdmin' in src:
-        return 'admin'
-    if 'getSession' in src:
-        return 'session'
-    if 'CRON_SECRET' in src or '/cron/' in path:
+    for label, markers in GUARDS:
+        if any(m in src for m in markers):
+            return label
+    if '/cron/' in path:
         return 'cron'
-    if 'WEBHOOK_SECRET' in src:
-        return 'signed'
     return 'public'
 
 
@@ -67,8 +99,23 @@ def main():
         rel = p.replace(os.path.join(ROOT, 'src', 'app'), '')[:-SUFFIX_LEN]
         methods = [m for m in ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
                    if re.search(rf'export async function {m}\b', src)]
-        routes.append({'path': rel, 'methods': methods, 'auth': auth_of(src, p),
-                       'what': first_doc(p), 'dynamic': '[' in rel})
+        auth = auth_of(src, p)
+        service_role = any(m in src for m in SERVICE_ROLE_MARKERS)
+        rate_limited = any(m in src for m in RATELIMIT_MARKERS)
+        # The one combination worth a human's eyes: no gate at all, yet holding a
+        # key that bypasses RLS. A rate limit slows enumeration but does not
+        # authorize anyone, so it does not clear the flag.
+        review = auth == 'public' and service_role
+        routes.append({
+            'path': rel,
+            'methods': methods,
+            'auth': auth,
+            'what': first_doc(p),
+            'dynamic': '[' in rel,
+            'serviceRole': service_role,
+            'rateLimited': rate_limited,
+            'review': review,
+        })
     routes.sort(key=lambda r: r['path'])
 
     stamp = subprocess.check_output(
@@ -81,11 +128,17 @@ def main():
 export interface RouteEntry {{
   path: string;
   methods: string[];
-  /** auth guard inferred from the route source: admin | session | cron | signed | public */
+  /** guard inferred from the route source: admin | session | cron | signed | token | public */
   auth: string;
   what: string;
   /** true when the path has a [param] segment - not directly callable without a value */
   dynamic: boolean;
+  /** holds a service-role / RLS-bypassing Supabase client */
+  serviceRole: boolean;
+  /** applies its own rate limit (slows enumeration; does NOT authorize anyone) */
+  rateLimited: boolean;
+  /** public AND service-role: no gate, but a key that bypasses RLS. Read this handler. */
+  review: boolean;
 }}
 
 export const GENERATED_AT = '{stamp}';
@@ -96,8 +149,14 @@ export const ROUTES: RouteEntry[] = {json.dumps(routes, indent=2)};
     # lint failure - the generator has to agree with biome, not fight it.
     subprocess.run(['npx', 'biome', 'format', '--write', OUT],
                    cwd=ROOT, capture_output=True)
-    pub = sum(1 for r in routes if r['auth'] == 'public')
-    print(f'wrote {OUT}: {len(routes)} routes ({pub} public - audit these)')
+
+    by_auth = {}
+    for r in routes:
+        by_auth[r['auth']] = by_auth.get(r['auth'], 0) + 1
+    flagged = sum(1 for r in routes if r['review'])
+    print(f'wrote {OUT}: {len(routes)} routes')
+    print('  ' + '  '.join(f'{k}={v}' for k, v in sorted(by_auth.items())))
+    print(f'  NEEDS REVIEW (public + service-role): {flagged}')
     return 0
 
 

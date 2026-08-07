@@ -4,6 +4,7 @@ import {
   hasCapFallbackProvider,
   callCapFallback,
   routeAndCall,
+  OPENROUTER_HIGH_MODEL,
 } from '../router';
 
 /**
@@ -16,7 +17,7 @@ import {
  * (openrouter fails -> grok succeeds) without hitting any provider.
  */
 
-const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED'];
+const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL'];
 const saved: Record<string, string | undefined> = {};
 const realFetch = globalThis.fetch;
 
@@ -139,5 +140,37 @@ describe('routeAndCall', () => {
     await expect(
       routeAndCall('sys', 'msg', { model: 'claude', provider: 'claude', rationale: 'x' }),
     ).rejects.toThrow(/fall back to Claude/);
+  });
+});
+
+describe('callCapFallback tier routing (high-tier escalation, doc 2217)', () => {
+  function bodyModelOf(fetchMock: ReturnType<typeof vi.fn>): string {
+    const init = fetchMock.mock.calls[0][1] as { body: string };
+    return (JSON.parse(init.body) as { model: string }).model;
+  }
+
+  it("default tier uses the cheap OpenRouter model (deepseek)", async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or' });
+    const fetchMock = vi.fn(async () => okResponse('ok'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await callCapFallback('sys', 'msg');
+    expect(bodyModelOf(fetchMock)).toBe('deepseek/deepseek-chat');
+  });
+
+  it("tier 'high' escalates to the frontier cross-family model (OPENROUTER_HIGH_MODEL)", async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or' });
+    const fetchMock = vi.fn(async () => okResponse('ok'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await callCapFallback('sys', 'msg', { tier: 'high' });
+    expect(bodyModelOf(fetchMock)).toBe(OPENROUTER_HIGH_MODEL);
+    expect(OPENROUTER_HIGH_MODEL).toContain('gpt-5.5'); // evidence-based default
+  });
+
+  it('OPENROUTER_MODEL still overrides the cheap default', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or', OPENROUTER_MODEL: 'meta-llama/llama-4' });
+    const fetchMock = vi.fn(async () => okResponse('ok'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await callCapFallback('sys', 'msg');
+    expect(bodyModelOf(fetchMock)).toBe('meta-llama/llama-4');
   });
 });

@@ -255,15 +255,30 @@ async function callGpt(systemPrompt: string, userMessage: string): Promise<Claud
  * cheap-AI stack. This is the primary CAP FALLBACK provider: when the Claude CLI
  * is rate-limited or over its weekly cap, ZOE drops here instead of failing.
  */
-async function callOpenRouter(systemPrompt: string, userMessage: string): Promise<ClaudeCliResult> {
+/**
+ * High-tier cross-family model for HIGH-STAKES escalations (e.g. a code-review
+ * critic when we want the best non-Claude reviewer, not the cheap one). Chosen
+ * from Aug-2026 community benchmarks: GPT-5.5 is the strongest NON-Claude agentic
+ * coder (Gemini 3.1 Pro clearly trails on multi-file/tool-call work). Opus 4.8 is
+ * the best coder overall but is Claude-family, so it's not the cross-family pick.
+ * Override via OPENROUTER_HIGH_MODEL. See research doc 2217.
+ */
+export const OPENROUTER_HIGH_MODEL = process.env.OPENROUTER_HIGH_MODEL ?? 'openai/gpt-5.5';
+
+async function callOpenRouter(
+  systemPrompt: string,
+  userMessage: string,
+  modelOverride?: string,
+): Promise<ClaudeCliResult> {
   if (!hasOpenRouterApiKey()) {
     throw new Error('OPENROUTER_API_KEY not set');
   }
 
   const baseUrl = 'https://openrouter.ai/api/v1';
   // Default to a cheap, capable non-Anthropic model so a fallback never re-hits
-  // the same Anthropic cap that triggered it. Override via OPENROUTER_MODEL.
-  const model = process.env.OPENROUTER_MODEL ?? 'deepseek/deepseek-chat';
+  // the same Anthropic cap that triggered it. Override via OPENROUTER_MODEL, or
+  // pass modelOverride for a high-stakes escalation (OPENROUTER_HIGH_MODEL).
+  const model = modelOverride ?? process.env.OPENROUTER_MODEL ?? 'deepseek/deepseek-chat';
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   const request: OpenAiRequest = {
@@ -332,9 +347,15 @@ export function hasCapFallbackProvider(): boolean {
 export async function callCapFallback(
   systemPrompt: string,
   userMessage: string,
+  opts?: { tier?: 'cheap' | 'high' },
 ): Promise<{ result: ClaudeCliResult; provider: string }> {
+  // tier 'high' (default 'cheap'): route the OpenRouter attempt to the frontier
+  // cross-family model (OPENROUTER_HIGH_MODEL) instead of the cheap default -
+  // for high-stakes calls where we WANT the best non-Claude model, not the
+  // cheapest. Grok/GPT direct paths are unchanged.
+  const orModel = opts?.tier === 'high' ? OPENROUTER_HIGH_MODEL : undefined;
   const attempts: Array<{ name: string; fn: () => Promise<ClaudeCliResult> }> = [];
-  if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage) });
+  if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage, orModel) });
   if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
   if (hasGptApiKey()) attempts.push({ name: 'gpt', fn: () => callGpt(systemPrompt, userMessage) });
 

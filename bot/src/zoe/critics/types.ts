@@ -249,7 +249,13 @@ export async function runCritiqueModel(opts: {
   // what keeps cross-family alive while Codex is capped.
   const openRouterCross = async (): Promise<CritiqueModelResult | null> => {
     try {
-      const { result, provider } = await callCapFallback(opts.system, opts.user);
+      // High-stakes review: opt into the frontier cross-family model
+      // (OPENROUTER_HIGH_MODEL = GPT-5.5) instead of cheap DeepSeek, which the
+      // panel simulation found too lenient to be a useful second reviewer. This
+      // is a real per-review cost, so it is gated OFF by default - flip
+      // ZOE_CRITIC_HIGH_TIER=1 to use frontier for cross-family critique.
+      const tier = process.env.ZOE_CRITIC_HIGH_TIER === '1' ? 'high' : 'cheap';
+      const { result, provider } = await callCapFallback(opts.system, opts.user, { tier });
       if (opts.validate && !opts.validate(result.text)) {
         console.warn(
           `[zoe/critic] ${provider} cross-family returned an invalid response - falling back to same-family`,

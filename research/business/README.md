@@ -259,3 +259,6 @@
 | 2211 | [Are the 171 zao-festivals PRs adding value? (a value analysis + a loop-governance lesson)](./2211-festivals-171-pr-value-analysis/) | STANDALONE | The zao-festivals loop opened 171 open PRs overnight. Zaal: "are they good, or a waste?" Grounded value analysis of all 171 against the actual product, with a keep/kill map and the real fix. |
 | 2216 | [Cheapest AI Inference + Free Credits for the Best Models](./2216-cheapest-ai-inference-credits/) | STANDALONE | The concrete answer to "how do we run the best models for the least money" - the cheapest open-model hosts, the free-credit programs for frontier models, and what to actually do for ZAO's fleet + Claude usage. |
 | 2219 | [Surplus Intelligence + the Substrate Inversion (what it means for ZAO)](./2219-surplus-intelligence-substrate-thesis/) | STANDALONE | Define "surplus intelligence" from the real sources and turn it into a |
+| 2220 | [research](./2220-research/) | STANDALONE | Research doc 2220. |
+| 2222 | [SEO/web-presence: What keyword and backlink delta separates thezao.com](./2222-seo-web-presence-what-keyword-and-backlink/) | STANDALONE | Research doc 2222. |
+| 2223 | [research](./2223-research/) | STANDALONE | Research doc 2223. |

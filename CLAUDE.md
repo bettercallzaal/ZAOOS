@@ -173,7 +173,7 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 - Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
 
-**Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = persona block in `bot/src/zoe/` `human.md`, NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
+**Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = a persona block in ZOE's runtime memory at `~/.zao/zoe/persona.md` / `~/.zao/zoe/human.md` (seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`; content voice lives in `bot/src/zoe/brand.md`), NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
 
 ## ICM Context Boxes (AI-readable ZAO context)
 

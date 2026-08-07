@@ -289,3 +289,4 @@
 | 2229 | [clawd claude-p-attest (EAS web-of-trust): the on-chain anchor for ZAO's trust chain](./2229-clawd-attest-eas-trust-adopt/) | STANDALONE | Read clawd's real attestation code and name what it adds to the off-chain |
 | 2231 | [clawd repo sweep: 6-repo parallel Workflow triage (verified)](./2231-clawd-repo-sweep-workflow-triage/) | STANDALONE | Broaden the clawd/Austin research beyond the trust chain by reading 6 more |
 | 2235 | [ZOE vs the agent toolkits: an honest competitive audit](./2235-zoe-vs-agent-toolkits-audit/) | STANDALONE | Audit ZOE against the major agent frameworks/toolkits - grounded in ZOE's |
+| 2239 | [ZOE Capability Map (living doc - read BEFORE claiming anything is missing)](./2239-zoe-capability-map/) | STANDALONE | The living map `confirm-before-claiming-absence.md` demands: every |

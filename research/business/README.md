@@ -263,3 +263,4 @@
 | 2222 | [SEO/web-presence: What keyword and backlink delta separates thezao.com](./2222-seo-web-presence-what-keyword-and-backlink/) | STANDALONE | Research doc 2222. |
 | 2223 | [research](./2223-research/) | STANDALONE | Research doc 2223. |
 | 2232 | [Whop for clippers + incentives: the OSS/on-chain check-twice + the Unlock bridge](./2232-whop-clippers-incentives-oss-alternatives/) | STANDALONE | Zaal wants Whop for the clipper + incentive layer (with POIDH), and asked |
+| 2233 | [Unlock -> Whop crypto-access bridge (spec, grounded in ZAO's existing Unlock code)](./2233-unlock-whop-crypto-access-bridge/) | STANDALONE | Spec Zaal's idea - pay in crypto (Unlock), get community/subscription access |

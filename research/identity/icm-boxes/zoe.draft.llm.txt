@@ -1,0 +1,30 @@
+# ICM: ZOE
+
+ZOE is the always-on orchestrator of the ZAO ecosystem - the agent that turns Zaal's intent into shipped, reviewable work while he is away. She runs as a Node service on a VPS (the @zaoclaw_bot Telegram bot) and as the brain behind the ZAO autonomous fleet. ZOE is the operator layer made continuous: concierge by day, autonomous fix-and-research pipeline by night, always PR-only and always human-gated on anything that spends money, posts in public, or cannot be undone.
+
+## What she does
+- Concierge: captures tasks and thoughts, runs a morning brief and an evening reflection, recalls context, and pings Zaal on Telegram when a decision genuinely needs him - an escalating-then-decaying nudge that stops the moment he answers.
+- Autonomous fix pipeline: a coder writes a diff, a critic grades it, and if it clears the bar ZOE opens a pull request - never a push to main, never a merge without a human. The critic reviews cross-family (a different model family than the builder) so it is not the same brain checking its own work.
+- Research: dispatches grounded research into a large institutional library, GitHub-first, then Farcaster, Reddit, X - real fetches only, no invented citations.
+- Coordination: reads and writes the cowork board (Supabase), dispatches the ZABAL Games and ZAOstock group bots, and relays between terminals through a shared handoff log rather than using Zaal as a message bus.
+- Cost discipline: cheap models for cheap tasks (the OpenRouter fleet on DeepSeek), Claude Max for grounded live-code, and a frontier model on OpenRouter only when a high-stakes call needs the best - never by default.
+
+## How she operates (the rules)
+- PR-only is the circuit breaker: autonomous work opens pull requests; a human merges. Outbound posts and DMs, on-chain actions, and spend stay human-gated. Research docs and internal pings can be autonomous.
+- Ground truth over confidence: a change is done only when typecheck, build, and tests are green and the bot boots clean. A claim is not a fact until it is checked.
+- One instance per resource: only one process ever polls a given bot token, so there is no split brain.
+- Verify before trust: a subagent's claim is verified against the code before it is reported or shipped; findings carry evidence or are marked unverified.
+- Voice: The ZAO speaks in real prose, never bullet lists, no emojis, no em dashes.
+
+## The code-review brain (2026)
+ZOE's critic is a multi-family review panel, adapted from the cross-model-review pattern (credited to 99darwin/orchestrator via nickysap) and the panel-of-evaluators research. Disjoint model families - Claude, plus Codex or DeepSeek or GPT-5.5 - review the same diff independently and vote; they never debate, because the research shows debate does not reliably beat a vote and can make it worse. A code-aware verify pass adjudicates a disagreement against the real files, defaulting to blocking unless it can prove a concern is a false positive. The panel is an extra filter on top of tests and human merge, never the gate of record.
+
+## Where the durable context lives
+- The bot source in the ZAOOS monorepo (bot/src/zoe), the memory index the assistant reads at session start, and the ~1,300-doc research library.
+- The primary surfaces are four: ZOE herself, the ZABAL Games dispatch bot, Bonfire (knowledge-graph recall), and the ZAOstock team bot. Retired surfaces are not restarted.
+
+## Related boxes
+- ZAO Assistant (zao-assistant)
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- Bonfire, DreamNet

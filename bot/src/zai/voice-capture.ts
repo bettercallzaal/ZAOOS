@@ -7,7 +7,7 @@
  * per session and periodically flushes to ~/.zao/private/.
  */
 
-import { VoiceConnection, VoiceReceiveStream, EndBehaviorType } from '@discordjs/voice';
+import { VoiceConnection, AudioReceiveStream, EndBehaviorType } from '@discordjs/voice';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import type { CaptureSession, TranscriptLine } from './types';
@@ -42,7 +42,7 @@ export function startVoiceCapture(
   const handleSpeakingStart = (userId: string) => {
     if (buffers.has(userId)) return;
 
-    const audioStream: VoiceReceiveStream = connection.receiver.subscribe(userId, {
+    const audioStream: AudioReceiveStream = connection.receiver.subscribe(userId, {
       end: { behavior: EndBehaviorType.AfterSilence, duration: SILENCE_THRESHOLD_MS },
     });
 
@@ -94,10 +94,43 @@ export function startVoiceCapture(
 
   connection.receiver.speaking.on('start', handleSpeakingStart);
 
-  // Return cleanup function
+  // Return cleanup function.
+  //
+  // The cast is deliberate and narrow. @discordjs/voice declares
+  // `interface SpeakingMap extends EventEmitter` carrying ONLY `on` overloads,
+  // which leaves the inherited removal methods off the visible type - so neither
+  // `removeListener` nor `off` typechecks, even though SpeakingMap really does
+  // extend EventEmitter and both exist at runtime. That is a gap in the library's
+  // typings, not in this code, so the honest fix is to say so at the call site
+  // rather than change behaviour or silence the file.
+  //
+  // Without this, the listener is never detached and every capture session leaks
+  // one. It went unnoticed because the bot's dependencies were not installed
+  // locally, so tsc reported 183 phantom errors and buried the three real ones.
   return () => {
-    connection.receiver.speaking.removeListener('start', handleSpeakingStart);
+    (connection.receiver.speaking as unknown as ListenerRemover).removeListener(
+      'start',
+      handleSpeakingStart,
+    );
   };
+}
+
+/**
+ * The single EventEmitter method this module needs from SpeakingMap.
+ *
+ * Declared here rather than imported because neither route typechecks:
+ * @discordjs/voice declares `interface SpeakingMap extends EventEmitter` carrying
+ * ONLY `on` overloads, which hides the inherited removal methods, and node's own
+ * `EventEmitter` type splits its class and interface in @types/node 22 such that
+ * `off` is not on the imported interface either.
+ *
+ * SpeakingMap genuinely extends EventEmitter, so removeListener exists at
+ * runtime. Naming the exact method we rely on is narrower and more honest than
+ * casting to `any` - if this assumption ever stops holding, the failure is a
+ * visible one line, not a silent no-op.
+ */
+interface ListenerRemover {
+  removeListener(event: string, listener: (...args: never[]) => void): unknown;
 }
 
 /**

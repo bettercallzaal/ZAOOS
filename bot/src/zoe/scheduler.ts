@@ -502,9 +502,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
 
           const result = await runCuratorTick(
-            (chatId, text, sendOpts) => sendOpts?.message_thread_id
-              ? opts.bot.api.sendMessage(chatId, text, { message_thread_id: sendOpts.message_thread_id })
-              : opts.bot.api.sendMessage(chatId, text),
+            // Braces, not a bare expression: the callback is typed Promise<void>
+            // and sendMessage resolves to a TextMessage. Returning it happened to
+            // work but did not typecheck, and the returned message was discarded
+            // anyway - so discard it explicitly.
+            async (chatId, text, sendOpts) => {
+              if (sendOpts?.message_thread_id) {
+                await opts.bot.api.sendMessage(chatId, text, {
+                  message_thread_id: sendOpts.message_thread_id,
+                });
+                return;
+              }
+              await opts.bot.api.sendMessage(chatId, text);
+            },
             zaoGroupId,
           );
 

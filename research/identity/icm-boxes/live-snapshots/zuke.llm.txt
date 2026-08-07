@@ -1,0 +1,20 @@
+# ICM: Zuke (ZAO Spaces)
+
+Zuke is The ZAO's audio-spaces app - live audio rooms for the community, integrated with Juke. Runs at zuke.thezao.com.
+
+## What it is
+- A Next.js app (repo: ZAODEVZ/Zuke) that hosts and records ZAO audio spaces, built on Juke.
+- Juke = nickysap's Farcaster-native live audio app (juke.audio, LiveKit transport, SIWF auth). Zaal hosts ZAO spaces on Juke; Zuke wraps + records them.
+- Has a recordings pipeline: import X Space recordings, generate recaps and snippets, create/end Juke spaces.
+- Multi-provider path in progress (moving off 100ms toward a clean seam/HMS setup).
+
+## How it connects
+- Zuke recordings are the source that the ZAO video pipeline (ZAOVideoEditor) turns into YouTube-ready videos, and that the clip pipeline (research doc 992) turns into POIDH clip bounties.
+
+## Find it
+- zuke.thezao.com
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- Farcaster (farcaster)

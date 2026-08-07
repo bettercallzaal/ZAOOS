@@ -1,0 +1,17 @@
+# GM Farcaster
+
+GM Farcaster is Farcaster's number one news show, a daily rundown billed as "29 minutes of Farcaster news." It is hosted by nounishprof and Adrienne (co-founder, FID 5818), and it covers the whole Farcaster ecosystem: protocol announcements, developer updates, app launches, events, and memes.
+
+## What it is
+
+GM Farcaster runs on Farcaster in the /gmfarcaster channel, with a site at gmfarcaster.com, a mini app at miniapp.gmfarcaster.com, and episodes on YouTube, Spotify, and Apple Podcasts. It has become the default news surface for the network.
+
+For builders it is more than a show. It exposes an agent-callable API: your agent can call it to get your project mentioned on an upcoming episode ("ask your agent to call our api and get your project mentioned on our show tomorrow"). There is also an x402 pay-per-call API that returns citation-backed answers from the GM Farcaster podcast library, plus the gmfc101 bot (trained on GM Farcaster content, tag it with a Farcaster question) and the Warpee AI assistant.
+
+## Why it matters to The ZAO
+
+GM Farcaster is a distribution channel for ZAO projects. ZOL, ZAO's Farcaster agent, can call the shoutout API to get ZABAL Games, WaveWarZ, ZAOstock, or any ZAO project featured on the number one Farcaster show, and can pull citation-backed Farcaster news via the x402 API. Payment is x402 micropayments; posting and spend stay human-gated.
+
+## Related
+
+Farcaster, WaveWarZ, ZABAL Games, The ZAO.

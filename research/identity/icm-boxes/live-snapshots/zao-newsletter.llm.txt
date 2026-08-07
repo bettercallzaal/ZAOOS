@@ -1,0 +1,25 @@
+# ICM: The ZAO Newsletter
+
+The ZAO Newsletter is the daily build log of The ZAO - published on Paragraph (paragraph.com/@thezao). Written as BetterCallZaal (Zaal) on behalf of the ZABAL Team.
+
+## What it is
+- A daily "Year of the ZABAL - Day N" build-in-public log: what shipped, what is coming, the quiet work compounding.
+- Audience: builders, artists, and web3/Farcaster people who care about artists owning their work.
+
+## The voice (strict)
+- All prose lowercase. Zero commas in the body. Open with "zm". No emojis, no em dashes, no bullet lists, no exclamation.
+- Short punchy fragments, line by line. Links render as rich cards, never bare urls.
+- One canonical signature only: "- BetterCallZaal on behalf of the ZABAL Team".
+- Catchphrases used naturally: play a game take a board; it reads the record not your word; builders building for builders; the quiet work compounds; small moves out loud every day.
+
+## How it runs
+- Drafted with Paragraph's AI agent; the repo (ZAODEVZ/zaoonparagraph) is the durable ledger / source of truth for voice + facts (Paragraph's own memory is unreliable).
+- X distribution via the Paragraph agent (@bettercallzaal); Farcaster build-in-public via ZOL. Posting is human-gated: approve -> lock -> post.
+
+## Find it
+- paragraph.com/@thezao
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- Farcaster (farcaster)

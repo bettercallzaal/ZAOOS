@@ -1,0 +1,21 @@
+# ICM: ZAO Festivals
+
+The ZAO Festivals are the IRL / live-culture arm of The ZAO - real events where the community and artists show up in person. Part of The ZAO ecosystem (see thezao).
+
+## The festivals
+- ZAOstock - the flagship. 2026 edition: Oct 3 2026, Ellsworth, Maine. Community-run music + culture festival; budget in the low five figures ($5-25k range). Ties to the Art of Ellsworth / Maine Craft Weekend calendar.
+- ZAOville - a ZAO festival/gathering (mid-2026 prep, ~Jul 25).
+- ZAO-PALOOZA and ZAO-CHELLA - earlier/recurring ZAO festival brands under the umbrella.
+
+## Why it matters
+- Festivals are how The ZAO returns value to artists in the physical world, not just on-chain. They are a production lane alongside WaveWarZ and ZABAL Games.
+- ZAOstock is spinning toward its own repo/ops as it graduates.
+
+## Find it
+- thezao.xyz (events), the ZAO calendar
+- Farcaster: /zao
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (bettercallzaal)
+- COC Concertz (coc-concertz)

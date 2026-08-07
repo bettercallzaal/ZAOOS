@@ -1,0 +1,26 @@
+# ICM: Milk Road (reference)
+
+Milk Road is a crypto media/newsletter company. This box is reference knowledge (used to study the newsletter/media playbook for The ZAO). Full analysis: ZAOOS research doc 993.
+
+## What it is
+- Founded Jan 2022 by Shaan Puri and Ben Levy. "The smart friend explaining crypto in plain English." Mascot: the Milk Man.
+- Acquired by Bitfo in Dec 2022, ~10 months after launch - an 8-figure deal paid in shares (exact price undisclosed).
+- 2026: three newsletters (Milk Road Crypto, Macro, AI), each with a PRO tier.
+
+## How it grew (0 to ~250k subs in 10 months)
+- 85%+ paid acquisition (Facebook/TikTok at ~$1-1.30/subscriber, meme + social-proof creative), run like a startup.
+- A dead-simple ONE-referral loop unlocking a high-value free report (roughly doubled the viral coefficient).
+- The $1M public wallet stunt: readers watched + voted on real trades; transparency was the moat (signups kept climbing even down 70%).
+- ~$1M ARR by month 6; 45% open rate at scale.
+
+## Business model
+- Native in-voice sponsorships ($10-25k/send at peak) + affiliate + a PRO premium tier. Free daily feeds the funnel; PRO monetizes the core.
+
+## The ZAO takeaways
+- COPY: smart-friend anti-jargon voice; multi-format (a weekly recap pod); authenticity as moat; a one-referral loop rewarded in ZOLs.
+- AVOID: 85% paid acquisition (wrong market for a niche music/builder audience); sponsorship-heavy revenue; growth-at-all-costs / built-to-exit.
+
+## Related boxes
+- The ZAO (thezao)
+- The ZAO Newsletter (zao-newsletter)
+- Zaal (bettercallzaal)

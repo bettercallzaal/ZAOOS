@@ -1,0 +1,13 @@
+# Magnetiq
+
+Magnetiq is an all-in-one event and launch platform at magnetiq.io, founded by Tyler Stambaugh. It brings event hosting, launches, and community programming into one surface.
+
+## What it is
+
+For the ZAO ecosystem, Magnetiq is where the ZABAL Games workshop library and builder portal run. Workshops, slots, and the program's builder-facing materials live on Magnetiq, with streaming handled through Restream and slot booking through Cal.com. It is the operational home for running the ZABAL Games build-a-thon month to month.
+
+Magnetiq matters to The ZAO because it lets a small team run real programming, workshops, launches, and events, without stitching together a dozen separate tools. Tyler Stambaugh is the founder and the primary point of contact.
+
+## Related
+
+ZABAL Games, The ZAO, BetterCallZaal.

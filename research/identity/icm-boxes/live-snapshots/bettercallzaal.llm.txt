@@ -1,0 +1,17 @@
+# BetterCallZaal
+
+BetterCallZaal is the personal brand and operator layer of Zaal Panthaki, founder of The ZAO. It is one word, camelCase, and it is where his build-in-public practice, consulting, and web3-music work live under a single name. The legal entity behind it is BCZ Strategies LLC.
+
+## What it is
+
+Zaal builds at the intersection of music, culture, and emerging technology, using blockchain and AI as means rather than headlines. BetterCallZaal is the layer that ships that work. Through it he founded and runs The ZAO, a decentralized impact network that returns profit margin, data, and IP rights to artists, with music as its first artist domain. The same operator layer runs WaveWarZ, ZABAL Games, and the ZAOstock festival.
+
+BetterCallZaal is also an agency. It advises and builds for other founders and communities moving into web3 and AI, with a strong bias toward open source and shipping in public rather than pitching decks. The working style is direct, builder-first, and allergic to hype.
+
+## How to reach it
+
+Farcaster @zaal, X and YouTube @bettercallzaal, and the site bettercallzaal.com. Zaal wakes early and builds in focused blocks, documenting the process as he goes.
+
+## Related
+
+The ZAO, WaveWarZ, ZABAL Games, ZAOstock, Fractal.

@@ -145,3 +145,4 @@
 | 2196 | [Agent-native docs, adoption reality: llms.txt is hygiene, MCP is the lever](./2196-agent-native-docs-llmstxt-mcp-reality/) | STANDALONE | Doc 2194 recommended adopting basehub.org's agent-native pattern (llms.txt + .md + MCP) for ZAO. This checks what the developer community ACTUALLY found works - and it materially refines that recommendation. |
 | 2218 | [ICM Coverage + Currency Audit (overnight loop tracking doc)](./2218-icm-coverage-currency-audit/) | STANDALONE | One map of every real ZAO project/product/idea, whether it has an ICM |
 | 2224 | [Farcaster High-Signal Discovery (batch 1, grounded via the graph)](./2224-farcaster-high-signal-discovery-batch1/) | STANDALONE | Accounts @zaal (FID 19640) does NOT follow that many of his follows DO |
+| 2241 | [ICM currency audit: 23 live boxes vs repo truth](./2241-icm-currency-audit/) | STANDALONE | The ICM boxes are the AI-readable source of truth for every ZAO brand |

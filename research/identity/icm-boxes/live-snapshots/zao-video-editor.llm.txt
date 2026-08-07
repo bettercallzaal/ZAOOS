@@ -1,0 +1,11 @@
+# ZAO Video Editor
+
+ZAO Video Editor is a browser-based video editing tool in the ZAO ecosystem, built for fast turnaround on clips and content. Live at zao-video-editor.vercel.app.
+
+## What it is
+
+It focuses on quick editing with fast automatic transcription, using Groq for speed, so creators can cut, caption, and repurpose video without heavy desktop software. It fits the ZAO pattern of lightweight, single-purpose web tools that help members ship content faster.
+
+## Related
+
+The ZAO, BetterCallZaal.

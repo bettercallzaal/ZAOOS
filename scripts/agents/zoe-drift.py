@@ -81,7 +81,8 @@ def repo_top_entries(root: str) -> set[str]:
         return set()
 
 
-def missing(cand: str, doc_dir: str, root: str, top: set[str]) -> bool:
+def missing(cand: str, doc_dir: str, root: str, top: set[str],
+            md_basenames: set[str] | None = None) -> bool:
     """True iff `cand` is a checkable in-repo path claim that does NOT resolve."""
     cand = _clean(cand)
     if _obviously_not_a_path(cand):
@@ -99,8 +100,26 @@ def missing(cand: str, doc_dir: str, root: str, top: set[str]) -> bool:
             return False  # a rule file
         if os.path.exists(os.path.join(root, cand)):
             return False  # repo-root doc
+        # a bare .md whose basename exists ANYWHERE in the repo is a convention
+        # reference (e.g. "renamed to PERSONA.md", which lives at agents/*/PERSONA.md),
+        # not a broken path. Only a basename that exists NOWHERE is a real lie.
+        if md_basenames is not None and cand in md_basenames:
+            return False
         return True       # a .md cross-ref that resolves nowhere = a real lie
     return False          # bare non-.md (module name, script name) = too ambiguous
+
+
+def md_basename_index(root: str) -> set[str]:
+    """Every .md basename present anywhere in the repo (minus node_modules/.git) -
+    so a bare `PERSONA.md` convention-reference that lives at agents/*/PERSONA.md
+    isn't flagged as a broken path."""
+    out = set()
+    for dp, dn, fns in os.walk(root):
+        dn[:] = [d for d in dn if d not in ("node_modules", ".git")]
+        for fn in fns:
+            if fn.endswith(".md"):
+                out.add(fn)
+    return out
 
 
 def doc_files(root: str, scan: list[str]) -> list[str]:
@@ -117,7 +136,7 @@ def doc_files(root: str, scan: list[str]) -> list[str]:
     return sorted(set(out))
 
 
-def scan_doc(path: str, root: str, top: set[str]) -> list[tuple[int, str]]:
+def scan_doc(path: str, root: str, top: set[str], md_basenames: set[str]) -> list[tuple[int, str]]:
     """Return [(lineno, missing_path)] for every backtick repo-path missing on disk."""
     misses = []
     doc_dir = os.path.dirname(path)
@@ -125,7 +144,7 @@ def scan_doc(path: str, root: str, top: set[str]) -> list[tuple[int, str]]:
         for i, line in enumerate(fh, 1):
             for m in BACKTICK.finditer(line):
                 cand = _clean(m.group(1))
-                if missing(cand, doc_dir, root, top):
+                if missing(cand, doc_dir, root, top, md_basenames):
                     misses.append((i, cand))
     return misses
 
@@ -133,10 +152,11 @@ def scan_doc(path: str, root: str, top: set[str]) -> list[tuple[int, str]]:
 def run(root: str, scan: list[str]) -> dict:
     report = {"root": root, "docs_scanned": 0, "fails": []}
     top = repo_top_entries(root)
+    md_basenames = md_basename_index(root)
     for doc in doc_files(root, scan):
         report["docs_scanned"] += 1
         rel = os.path.relpath(doc, root)
-        for lineno, miss in scan_doc(doc, root, top):
+        for lineno, miss in scan_doc(doc, root, top, md_basenames):
             report["fails"].append({"doc": rel, "line": lineno, "missing": miss})
     return report
 
@@ -150,6 +170,9 @@ def _selftest() -> int:
         open(os.path.join(td, "scripts", "agents", "present.py"), "w").close()
         # a real sibling rule the doc can cross-ref truthfully
         open(os.path.join(td, ".claude", "rules", "sibling.md"), "w").close()
+        # a convention file that lives DEEP under a path, referenced bare elsewhere
+        os.makedirs(os.path.join(td, "agents", "ceo"))
+        open(os.path.join(td, "agents", "ceo", "PERSONA.md"), "w").close()
         rule = os.path.join(td, ".claude", "rules", "x.md")
         with open(rule, "w") as fh:
             fh.write(
@@ -157,20 +180,21 @@ def _selftest() -> int:
                 "Broken ref to `scripts/agents/GONE.py` - must FAIL.\n"        # 2 missing, first seg 'scripts' real -> FAIL
                 "Sibling `sibling.md` resolves in rules - must PASS.\n"        # 3 bare .md sibling -> ok
                 "Dangling `no-such-rule.md` cross-ref - must FAIL.\n"          # 4 bare .md nowhere -> FAIL
-                "Skip git ref `origin/main` (first seg not a repo entry).\n"  # 5 origin not entry -> skip
-                "Skip npm import `next/dynamic` entirely.\n"                  # 6 next not entry -> skip
-                "Skip gitignored `bot/node_modules/.bin/esbuild`.\n"          # 7 node_modules -> skip
-                "Skip bare module `recall.ts` (no slash, not .md).\n"         # 8 bare non-md -> skip
-                "Skip the URL `https://useicm.com/api` entirely.\n"           # 9 url -> skip
-                "Skip a glob `research/*/README.md` entirely.\n"              # 10 glob -> skip
-                "Skip a function `getSession()` idiom.\n"                     # 11 call -> skip
-                "Skip placeholder `adapters/yours.py`.\n"                     # 12 'your' -> skip
+                "Convention ref `PERSONA.md` exists at agents/ceo - must PASS.\n"  # 5 bare .md, basename exists deep -> skip
+                "Skip git ref `origin/main` (first seg not a repo entry).\n"  # 6 origin not entry -> skip
+                "Skip npm import `next/dynamic` entirely.\n"                  # 7 next not entry -> skip
+                "Skip gitignored `bot/node_modules/.bin/esbuild`.\n"          # 8 node_modules -> skip
+                "Skip bare module `recall.ts` (no slash, not .md).\n"         # 9 bare non-md -> skip
+                "Skip the URL `https://useicm.com/api` entirely.\n"           # 10 url -> skip
+                "Skip a glob `research/*/README.md` entirely.\n"              # 11 glob -> skip
+                "Skip a function `getSession()` idiom.\n"                     # 12 call -> skip
+                "Skip placeholder `adapters/yours.py`.\n"                     # 13 'your' -> skip
             )
         rep = run(td, DEFAULT_SCAN)
         fails = rep["fails"]
         miss_set = {(f["line"], f["missing"]) for f in fails}
         assert miss_set == {(2, "scripts/agents/GONE.py"), (4, "no-such-rule.md")}, \
-            f"expected exactly the 2 real lies, got {sorted(miss_set)}"
+            f"expected exactly the 2 real lies (PERSONA.md must be skipped), got {sorted(miss_set)}"
         # a clean doc (only resolvable refs) -> zero fails
         with open(rule, "w") as fh:
             fh.write("Only `scripts/agents/present.py` and `sibling.md` here.\n")

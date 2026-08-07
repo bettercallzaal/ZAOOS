@@ -38,6 +38,8 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { detectBuildIntent } from './build-intent';
+import { doneKeyboard, maybeKeyboard, runningKeyboard } from './dm-build-buttons';
+import { stashPending, takePending, worthOffering } from './dm-build-pending';
 import {
   beginBuild,
   describeActive,
@@ -1013,6 +1015,72 @@ bot.command('drafts', async (ctx) => {
 });
 
 // Post slate v2 - callback handler for POST/REGEN/SKIP buttons under draft messages.
+// --- DM build buttons (Zaal: "i want more buttons alwys") -------------------
+// Every one answers the callback FIRST. An unanswered callback leaves Telegram
+// spinning on the button, which reads as a hang and gets tapped again.
+
+bot.callbackQuery('dmb:stop', async (ctx) => {
+  const chatId = ctx.chat?.id;
+  if (!chatId) return;
+  const stopped = requestCancel(chatId);
+  await ctx.answerCallbackQuery(stopped ? 'Stopping' : 'Nothing running').catch(() => {});
+  await ctx
+    .reply(
+      stopped
+        ? 'Stopping after the current attempt - killing it mid-attempt would leave a ' +
+            'half-written worktree and nothing to show for the tokens. No PR will open.'
+        : 'Nothing is building right now.',
+    )
+    .catch(() => {});
+});
+
+bot.callbackQuery('dmb:status', async (ctx) => {
+  const chatId = ctx.chat?.id;
+  if (!chatId) return;
+  const running = getActiveBuild(chatId);
+  await ctx.answerCallbackQuery(running ? 'Checking' : 'Idle').catch(() => {});
+  await ctx
+    .reply(running ? describeActive(running) : 'Nothing building. Send a build and I will start one.')
+    .catch(() => {});
+});
+
+bot.callbackQuery('dmb:again', async (ctx) => {
+  await ctx.answerCallbackQuery().catch(() => {});
+  await ctx
+    .reply('Send the next one - or prefix it with "build:" if you want to skip the guessing.')
+    .catch(() => {});
+});
+
+// The near-miss prompt. "Build it" turns a declined classification into one tap
+// instead of a retyped message.
+bot.callbackQuery(/^dmb:yes:(.+)$/, async (ctx) => {
+  const chatId = ctx.chat?.id;
+  const key = ctx.match?.[1];
+  if (!chatId || !key) return;
+  const task = takePending(String(key));
+  if (!task) {
+    // Expired, or already tapped. Say which rather than failing silently - a
+    // double-tap must never start two builds.
+    await ctx.answerCallbackQuery('That one expired').catch(() => {});
+    await ctx.reply('That request aged out (or already started). Send it again.').catch(() => {});
+    return;
+  }
+  if (getActiveBuild(chatId)) {
+    await ctx.answerCallbackQuery('Already building').catch(() => {});
+    await ctx.reply('A build is already running - send that again when it finishes.').catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery('Building').catch(() => {});
+  await startDmBuild(ctx, chatId, task, 'you tapped Build it');
+});
+
+bot.callbackQuery(/^dmb:no:(.+)$/, async (ctx) => {
+  const key = ctx.match?.[1];
+  if (key) takePending(String(key)); // drop it so it cannot be tapped later
+  await ctx.answerCallbackQuery('Left it').catch(() => {});
+  await ctx.reply('Left it alone.').catch(() => {});
+});
+
 bot.callbackQuery(/^post-(approve|regen|skip):/, async (ctx) => {
   if (ctx.from?.id !== zaalId) {
     await ctx.answerCallbackQuery('not authorized');
@@ -2273,8 +2341,9 @@ async function startDmBuild(
   await ctx
     .reply(
       `Building this (${reason}).\n\n` +
-        'I will report each phase here. Say "stop" to end it, or just send a ' +
-        'correction and I will run that next.',
+        'Phases report here. Tap Stop any time, or send a correction and I will ' +
+        'run that next.',
+      { reply_markup: runningKeyboard() },
     )
     .catch(() => {});
 
@@ -2312,7 +2381,11 @@ async function startDmBuild(
       onPrOpened: async (_id, prNumber, prUrl, score) => {
         const followUp = takeFollowUp(chatId);
         endBuild(chatId);
-        await say(`Built it: PR #${prNumber} (critic ${score}/10)\n${prUrl}\n\nYours to merge.`);
+        await bot.api
+          .sendMessage(chatId, `Built it: PR #${prNumber} (critic ${score}/10)\n\nYours to merge.`, {
+            reply_markup: doneKeyboard(prUrl),
+          })
+          .catch(() => {});
         if (followUp) await runQueuedFollowUp(chatId, followUp);
       },
       onEscalated: async (_id, escalateReason) => {
@@ -2421,6 +2494,16 @@ async function dispatchConcierge(
     const intent = detectBuildIntent(text);
     if (intent.build && intent.task) {
       await startDmBuild(ctx, chatId, intent.task, intent.reason);
+      return;
+    }
+    // Declined, but borderline: offer the tap instead of making him retype the
+    // whole thing with a `build:` prefix. The classifier stays stingy; the COST
+    // of its stinginess drops to one button.
+    if (worthOffering(text, intent.reason)) {
+      const key = stashPending(text);
+      await ctx
+        .reply(`Want me to build that? (${intent.reason})`, { reply_markup: maybeKeyboard(key) })
+        .catch(() => {});
       return;
     }
   }

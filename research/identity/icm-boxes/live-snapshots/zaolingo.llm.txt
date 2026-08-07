@@ -1,0 +1,13 @@
+# ZAOlingo
+
+ZAOlingo is a Duolingo-style, gamified web app that teaches people to build with Claude Code the ZAO way. It is phone-first, bite-sized, and built so anyone can go from zero to shipping.
+
+## What it is
+
+The north star is concrete: get a learner confident enough to submit a project to the ZABAL Games build-a-thon, where a submission can be partial and built on top of later. The first track is Claude Code Mechanics, a path of short lessons and small real tasks covering what Claude Code is, starting work with worksession and branches, skills and slash commands, subagents and orchestration, and a capstone that has you open your first pull request.
+
+Learners earn XP, keep a daily streak, and collect ZOLs, the ZAO contribution credit, as they progress. Lessons are community-contributed over time, and the app is open for the ZAO community to extend. It is the on-ramp that turns curious members into builders.
+
+## Related
+
+ZABAL Games, The ZAO, BetterCallZaal, zao-assistant.

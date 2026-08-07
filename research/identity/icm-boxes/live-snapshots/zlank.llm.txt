@@ -1,0 +1,11 @@
+# zlank
+
+zlank is a no-code Farcaster Snap builder. You stack blocks, hit Deploy, and share the result straight to your feed.
+
+## What it is
+
+Built on the @farcaster/snap SDK and Next.js 16, zlank lets anyone assemble a Farcaster mini-app, a Snap, by composing blocks with no coding required, then deploy and share it in a single flow. It collapses the distance from idea to shipped mini-app, which fits the ZAO mission of turning community members into builders. Live at zlank.vercel.app.
+
+## Related
+
+The ZAO, Farcaster, ZABAL Games, BetterCallZaal.

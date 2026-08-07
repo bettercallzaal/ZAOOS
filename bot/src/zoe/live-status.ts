@@ -19,9 +19,27 @@
  * explicitly "allowing bots to ... stream AI-generated replies with seamless rich
  * formatting", including an InputRichBlockThinking block, and 10.2 (2026-07-14)
  * added Ephemeral Messages (group messages visible to one user). Those are the
- * real end state for an agent surface. This repo is on grammy ^1.29.0, which
- * predates both, so they are a deliberate follow-up rather than something to
- * hand-roll against raw HTTP today.
+ * real end state for an agent surface.
+ *
+ * CORRECTION (2026-08-07): an earlier version of this comment said the repo runs
+ * grammy ^1.29.0. That is the RANGE in package.json, not what is installed - the
+ * lockfile pins 1.42.0 and the live bot confirms 1.42.0. Read the lockfile, not
+ * the range; a caret range tells you the floor, never the version.
+ *
+ * The conclusion survives the correction, for a different reason. grammy 1.42.0
+ * ships @grammyjs/types 3.26.0 (2026-04-03), which predates both API releases -
+ * verified by grepping the installed package for InputRichMessage, RichTextBold,
+ * ephemeral_message_id, receiver_user_id and Community: zero occurrences of any
+ * of them. So the types genuinely are absent; the version number was just wrong.
+ *
+ * THE REAL BLOCKER IS NOT THE VERSION. grammy 1.42.0 -> 1.45.1 is a minor bump
+ * (same major, semver-safe at runtime), and 1.45.1 pulls @grammyjs/types 4.0.0,
+ * released 2026-07-15 - one day after Bot API 10.2 - so it almost certainly
+ * carries these types. But grammy's types DO NOT RESOLVE in this repo's tsconfig
+ * at all: 21 files carry `TS2307: Cannot find module 'grammy'`, which is why
+ * every ctx parameter is implicitly `any`. Upgrading into that would mean writing
+ * Rich Message calls with no type checking whatsoever. Fix the type resolution
+ * first, then upgrade, then build on it - in that order.
  *
  * DESIGN NOTES THAT MATTER IN PRACTICE
  *

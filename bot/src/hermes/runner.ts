@@ -57,6 +57,16 @@ export interface DispatchInput {
   issue_text: string;
   /** Which repo to clone + open the PR against. Default 'zaoos'. */
   target_repo?: HermesRepoTarget;
+  /**
+   * Optional cooperative cancel. Polled at each ATTEMPT boundary - never
+   * mid-attempt, because killing a coder halfway leaves a half-written worktree
+   * and nothing useful to show for the tokens already spent.
+   *
+   * So "stop" honestly means "stop after this attempt", and the caller says so
+   * rather than implying an instant kill. Omitted by every existing caller, so
+   * their behavior is byte-identical.
+   */
+  shouldCancel?: () => boolean;
 }
 
 /**
@@ -121,6 +131,21 @@ export async function dispatchHermesRun(
     let attempt = 0;
     while (attempt < HERMES_DEFAULT_MAX_ATTEMPTS) {
       attempt += 1;
+
+      // Cooperative cancel, checked BEFORE this attempt spends anything. A run
+      // stopped here has done no work on the current attempt, so there is
+      // nothing half-finished to reconcile.
+      if (input.shouldCancel?.()) {
+        await updateRun(created.id, {
+          status: 'failed',
+          error_message: 'cancelled by request',
+          completed_at: new Date().toISOString(),
+        });
+        const stopped = (await reloadRun(created.id)) ?? created;
+        await narrator?.onFailed?.(created.id, 'cancelled by request');
+        return { kind: 'failed', run: stopped, reason: 'cancelled by request' };
+      }
+
       await updateRun(created.id, { fixer_attempts: attempt, status: 'fixing' });
       await narrator?.onCoderStart?.(created.id, attempt, HERMES_DEFAULT_MAX_ATTEMPTS, input.issue_text);
 

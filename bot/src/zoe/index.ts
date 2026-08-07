@@ -38,6 +38,19 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { detectBuildIntent } from './build-intent';
+import {
+  beginBuild,
+  describeActive,
+  endBuild,
+  getActiveBuild,
+  isCancelRequested,
+  isStopRequest,
+  queueFollowUp,
+  requestCancel,
+  setPhase,
+  setRunId,
+  takeFollowUp,
+} from './dm-build-session';
 import { runConciergeTurn } from './concierge';
 import { sanitizeErrorForUser } from './user-errors';
 import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
@@ -2235,6 +2248,127 @@ function startProgressNarration(
   };
 }
 
+/**
+ * Run one DM build and narrate every phase back into the same chat.
+ *
+ * The narrator already exposed EIGHT hooks - coder start/done, critic
+ * start/done, retry, escalate, fail, PR. #2956 wired three of them, which is why
+ * a build went quiet after "on it" and only spoke again at the end. A silent
+ * three-minute gap is indistinguishable from a hang, and the natural response to
+ * a hang is to send the request again - which is how you get two builds.
+ *
+ * So: every hook reports. Retries especially, because a retry is the single most
+ * reassuring thing to see - it means the critic caught something and the loop is
+ * working, not that it is stuck.
+ */
+async function startDmBuild(
+  ctx: Context,
+  chatId: number,
+  task: string,
+  reason: string,
+): Promise<void> {
+  beginBuild(chatId, task);
+  const say = (t: string) => bot.api.sendMessage(chatId, t).catch(() => {});
+
+  await ctx
+    .reply(
+      `Building this (${reason}).\n\n` +
+        'I will report each phase here. Say "stop" to end it, or just send a ' +
+        'correction and I will run that next.',
+    )
+    .catch(() => {});
+
+  void dispatchHermesRun(
+    {
+      triggered_by_telegram_id: zaalId,
+      triggered_in_chat_id: chatId,
+      issue_text: task,
+      shouldCancel: () => isCancelRequested(chatId),
+    },
+    {
+      onCoderStart: async (runId, attempt, max) => {
+        setRunId(chatId, runId);
+        setPhase(chatId, `coding (attempt ${attempt}/${max})`);
+        if (attempt > 1) await say(`Attempt ${attempt}/${max} - coding.`);
+      },
+      onCoderDone: async (_id, _attempt, filesChanged) => {
+        setPhase(chatId, 'coded, awaiting critic');
+        const n = filesChanged.length;
+        const list = filesChanged.slice(0, 4).join(', ');
+        await say(
+          `Wrote ${n} file${n === 1 ? '' : 's'}${list ? `: ${list}` : ''}${n > 4 ? ' ...' : ''}\nCritic reviewing.`,
+        );
+      },
+      onCriticStart: async () => setPhase(chatId, 'critic reviewing'),
+      onCriticDone: async (_id, score) => {
+        setPhase(chatId, `critic scored ${score}/10`);
+      },
+      // A retry is good news - the loop caught something. Say so, or it reads
+      // like failure.
+      onRetry: async (_id, nextAttempt, feedback) => {
+        setPhase(chatId, `retrying (attempt ${nextAttempt})`);
+        await say(`Critic pushed back - going again (attempt ${nextAttempt}).\n${feedback.slice(0, 220)}`);
+      },
+      onPrOpened: async (_id, prNumber, prUrl, score) => {
+        const followUp = takeFollowUp(chatId);
+        endBuild(chatId);
+        await say(`Built it: PR #${prNumber} (critic ${score}/10)\n${prUrl}\n\nYours to merge.`);
+        if (followUp) await runQueuedFollowUp(chatId, followUp);
+      },
+      onEscalated: async (_id, escalateReason) => {
+        const followUp = takeFollowUp(chatId);
+        endBuild(chatId);
+        await say(`Stopped - needs your eyes: ${escalateReason.slice(0, 220)}`);
+        if (followUp) await runQueuedFollowUp(chatId, followUp);
+      },
+      onFailed: async (_id, failReason) => {
+        const cancelled = failReason.includes('cancelled');
+        const followUp = takeFollowUp(chatId);
+        endBuild(chatId);
+        await say(
+          cancelled
+            ? 'Stopped. Nothing was merged and no PR opened.'
+            : `Could not build it: ${failReason.slice(0, 220)}`,
+        );
+        // A cancel means he changed his mind about the whole thing, so a queued
+        // correction is almost certainly stale. Surface it, do not run it.
+        if (followUp) {
+          if (cancelled) {
+            await say(`You had queued: "${followUp.slice(0, 140)}"\nSend it again if you still want it.`);
+          } else {
+            await runQueuedFollowUp(chatId, followUp);
+          }
+        }
+      },
+    },
+  ).catch(async (e) => {
+    endBuild(chatId);
+    await say(`Build pipeline error: ${(e as Error).message.slice(0, 160)}`);
+  });
+}
+
+/** Run the correction Zaal queued mid-build, once the first run has ended. */
+async function runQueuedFollowUp(chatId: number, text: string): Promise<void> {
+  const say = (t: string) => bot.api.sendMessage(chatId, t).catch(() => {});
+  const intent = detectBuildIntent(text);
+  if (!intent.build || !intent.task) {
+    // It was a comment, not a build. Say so plainly rather than silently
+    // dropping it - a swallowed message is how trust in the surface dies.
+    await say(`Your follow-up did not read as a build (${intent.reason}), so I left it:\n"${text.slice(0, 160)}"`);
+    return;
+  }
+  await say(`Now the follow-up: "${intent.task.slice(0, 140)}"`);
+  await startDmBuildFromQueue(chatId, intent.task, intent.reason);
+}
+
+/** Same as startDmBuild but without a ctx to reply to (the queued path). */
+async function startDmBuildFromQueue(chatId: number, task: string, reason: string): Promise<void> {
+  const fakeCtx = {
+    reply: (t: string) => bot.api.sendMessage(chatId, t),
+  } as unknown as Context;
+  await startDmBuild(fakeCtx, chatId, task, reason);
+}
+
 async function dispatchConcierge(
   ctx: Context,
   text: string,
@@ -2245,44 +2379,48 @@ async function dispatchConcierge(
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
 
-  // BUILD FROM THE DM (Zaal 2026-08-07: "how im able to build using my telegram
-  // bot conversation with you ... that is a 1/10").
+  // BUILD FROM THE DM, AND BE ABLE TO TALK TO IT WHILE IT RUNS.
   //
-  // The coder pipeline already existed but had exactly ONE call site, in the
-  // ZAAL BOTZ *group* handler, reachable only from a forum topic named "Coding".
-  // A DM went to the concierge, which talks and files tasks - so the surface
-  // Zaal actually lives in could not build anything. This is that missing wire.
+  // #2956 wired the DM to the coder (a 1 -> ~4: you can start a build and get a
+  // PR link). This adds the part that makes it a conversation rather than a
+  // fire-and-forget button: real phase-by-phase progress, "stop", and a
+  // correction that queues instead of starting a competing second build.
   //
-  // Flag-gated (ZOE_DM_BUILD=1, default OFF) so merging this cannot change the
-  // running bot's behavior; flipping it is a deliberate act. PR-only is what
-  // makes auto-dispatch safe at all: the pipeline opens a PR and a human merges
-  // (agent-loops rule 8). Building is not a gated action; merging is.
+  // Flag-gated (ZOE_DM_BUILD=1, default OFF). PR-only is what makes auto-
+  // dispatch safe: the pipeline opens a PR, a human merges (agent-loops rule 8).
   if (scope === 'private' && process.env.ZOE_DM_BUILD === '1') {
-    const intent = detectBuildIntent(text);
-    if (intent.build && intent.task) {
-      // Say what is happening BEFORE the work starts. Silence during a long run
-      // is the failure mode that makes a build surface feel broken.
+    const running = getActiveBuild(chatId);
+
+    // A message arriving DURING a build is about that build. Treating it as a
+    // fresh turn is what made mid-run corrections either start a second build or
+    // disappear into the concierge while the wrong PR kept going.
+    if (running) {
+      if (isStopRequest(text)) {
+        requestCancel(chatId);
+        await ctx
+          .reply(
+            'Stopping after the current attempt - killing it mid-attempt would leave a ' +
+              'half-written worktree and nothing to show for the tokens. No PR will open.',
+          )
+          .catch(() => {});
+        return;
+      }
+      const { replaced } = queueFollowUp(chatId, text);
       await ctx
         .reply(
-          `Building this (${intent.reason}). Coder + critic running - PR link lands here.\n\n` +
-            `Not what you meant? Reply "stop" and I will leave it; the PR is not merged either way.`,
+          `${describeActive(running)}\n\n` +
+            (replaced
+              ? 'Swapped your correction for this newer one - I keep only the latest, so you get one PR, not three.'
+              : 'Queued that as the follow-up. It runs when this finishes.') +
+            '\nSay "stop" to drop the current one instead.',
         )
         .catch(() => {});
-      const say = (t: string) => bot.api.sendMessage(chatId, t).catch(() => {});
-      void dispatchHermesRun(
-        { triggered_by_telegram_id: zaalId, triggered_in_chat_id: chatId, issue_text: intent.task },
-        {
-          onPrOpened: async (_id, prNumber, prUrl, score) => {
-            await say(`Built it: PR #${prNumber} (critic ${score}/10)\n${prUrl}\n\nYours to merge.`);
-          },
-          onEscalated: async (_id, reason) => {
-            await say(`Stopped - needs your eyes: ${reason.slice(0, 200)}`);
-          },
-          onFailed: async (_id, reason) => {
-            await say(`Could not build it: ${reason.slice(0, 200)}`);
-          },
-        },
-      ).catch((e) => say(`Build pipeline error: ${(e as Error).message.slice(0, 160)}`));
+      return;
+    }
+
+    const intent = detectBuildIntent(text);
+    if (intent.build && intent.task) {
+      await startDmBuild(ctx, chatId, intent.task, intent.reason);
       return;
     }
   }

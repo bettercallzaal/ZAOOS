@@ -57,6 +57,22 @@ GUARDS = [
 SERVICE_ROLE_MARKERS = ('getSupabaseAdmin', 'SERVICE_ROLE')
 RATELIMIT_MARKERS = ('rateLimit', 'ratelimit', 'checkRate', 'RATE_LIMIT')
 
+# A route that is public + service-role ON PURPOSE, and has been read by a human
+# who wrote down why, carries this marker in its header comment:
+#
+#     @public-reviewed 2026-08-07 - OBS overlays cannot carry a session; ...
+#
+# Without it, the `review` flag would be permanent: the four flagged routes on
+# 2026-08-07 included one that is correctly public, so the count could never
+# reach zero and would become exactly the background noise this audit existed to
+# remove. A signal that can never be cleared is a signal that gets ignored - the
+# same failure as v1's 35 false-positive `public` labels.
+#
+# The marker asserts "a human read this and it is public on purpose", not "safe".
+# It is deliberately a source comment: it lives with the code, moves with it, and
+# shows up in the diff if someone removes it.
+REVIEWED_MARKER = '@public-reviewed'
+
 
 def first_doc(path, maxlines=14):
     """First human line of the file header - a JSDoc bullet or a // comment."""
@@ -105,7 +121,8 @@ def main():
         # The one combination worth a human's eyes: no gate at all, yet holding a
         # key that bypasses RLS. A rate limit slows enumeration but does not
         # authorize anyone, so it does not clear the flag.
-        review = auth == 'public' and service_role
+        reviewed = REVIEWED_MARKER in src
+        review = auth == 'public' and service_role and not reviewed
         routes.append({
             'path': rel,
             'methods': methods,
@@ -114,6 +131,7 @@ def main():
             'dynamic': '[' in rel,
             'serviceRole': service_role,
             'rateLimited': rate_limited,
+            'reviewed': reviewed,
             'review': review,
         })
     routes.sort(key=lambda r: r['path'])
@@ -137,7 +155,9 @@ export interface RouteEntry {{
   serviceRole: boolean;
   /** applies its own rate limit (slows enumeration; does NOT authorize anyone) */
   rateLimited: boolean;
-  /** public AND service-role: no gate, but a key that bypasses RLS. Read this handler. */
+  /** carries an @public-reviewed marker: a human read it and it is public on purpose */
+  reviewed: boolean;
+  /** public AND service-role AND not yet reviewed. Read this handler. */
   review: boolean;
 }}
 
@@ -154,9 +174,11 @@ export const ROUTES: RouteEntry[] = {json.dumps(routes, indent=2)};
     for r in routes:
         by_auth[r['auth']] = by_auth.get(r['auth'], 0) + 1
     flagged = sum(1 for r in routes if r['review'])
+    ok = sum(1 for r in routes if r['reviewed'])
     print(f'wrote {OUT}: {len(routes)} routes')
     print('  ' + '  '.join(f'{k}={v}' for k, v in sorted(by_auth.items())))
-    print(f'  NEEDS REVIEW (public + service-role): {flagged}')
+    print(f'  NEEDS REVIEW (public + service-role, unreviewed): {flagged}')
+    print(f'  reviewed-and-intentional: {ok}')
     return 0
 
 

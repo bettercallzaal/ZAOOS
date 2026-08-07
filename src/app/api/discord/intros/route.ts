@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+
+/** Ceiling on the signed-in bulk read. Not authorization - blast radius. */
+const BULK_LIMIT = 500;
 
 const introsQuerySchema = z.object({
   discord_id: z
@@ -63,11 +67,27 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // all=true — return every intro
+    // all=true — the BULK path. This is a member-directory export: every
+    // Discord id, username and intro in one anonymous request, and a Discord id
+    // is a stable handle someone can be contacted through. Unpaginated bulk
+    // reads of member data behind no session is exactly the anonymous-board
+    // leak (#2829), so this branch now requires one. The single-id lookup below
+    // stays public: it is targeted, and the caller must already know the id.
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Sign in to list all intros. A single intro is available via ?discord_id=' },
+        { status: 401 },
+      );
+    }
+
+    // Even signed in, cap it. A limit is not authorization - it is the blast
+    // radius if a session is ever obtained cheaply.
     const { data, error } = await supabase
       .from('discord_intros')
       .select('discord_id, discord_username, intro_text, posted_at')
-      .order('posted_at', { ascending: false });
+      .order('posted_at', { ascending: false })
+      .limit(BULK_LIMIT);
 
     if (error) {
       logger.error('[Discord intros] Query error:', error);

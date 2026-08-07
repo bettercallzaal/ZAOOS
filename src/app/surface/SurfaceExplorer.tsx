@@ -167,9 +167,12 @@ export default function SurfaceExplorer({ routes, generatedAt }: Props) {
 
         {reviewOnly && (
           <p className="mt-3 max-w-2xl text-sm text-gray-400">
-            These have no auth guard yet hold a service-role key, which bypasses row-level security.
-            That is the shape of the anonymous board leak (#2829), so each one wants a human read.
-            Some are deliberately public - flagged is not the same as broken.
+            These have no auth guard yet hold a service-role key, which bypasses row-level security
+            - the shape of the anonymous board leak (#2829). A route leaves this list by being read:
+            once someone confirms it is public on purpose and writes the reason as an{' '}
+            <code className="text-[#f5a623]">@public-reviewed</code> line in its header, it shows as
+            reviewed instead. That matters because a count that can never reach zero stops being
+            read at all.
           </p>
         )}
       </header>
@@ -227,6 +230,14 @@ export default function SurfaceExplorer({ routes, generatedAt }: Props) {
                         title="Rate-limited. Slows enumeration; does not authorize anyone."
                       >
                         rate-limited
+                      </span>
+                    )}
+                    {r.reviewed && (
+                      <span
+                        className="rounded border border-green-500/30 bg-green-500/10 px-1.5 py-0.5 text-xs text-green-300"
+                        title="Public on purpose - a human read it and wrote down why (@public-reviewed in the route header)"
+                      >
+                        reviewed
                       </span>
                     )}
                     {r.review && (

@@ -8,7 +8,19 @@ const querySchema = z.object({
 });
 
 /**
- * Public GET endpoint for OBS overlays — no auth required.
+ * @public-reviewed 2026-08-07 - an OBS browser source cannot carry a session;
+ * the fid is Zod-validated and scoped to one user; the track someone is playing
+ * is what they are actively broadcasting. Public by intent, not by omission.
+ *
+ * Public GET endpoint for OBS overlays — no auth required, DELIBERATELY.
+ *
+ * Reviewed 2026-08-07 against the surface-map audit (doc 2245), which flags this
+ * as public + service-role. That combination is worth a look every time, and
+ * here the answer is that it is correct: an OBS browser source cannot carry a
+ * session, the fid is Zod-validated and scoped to the single requested user, and
+ * what it returns - the track someone is playing - is what they are actively
+ * broadcasting to a stream. Public by intent, not by omission.
+ *
  * Reads the user's now-playing status from the `overlay_now_playing` table.
  * Falls back to the track_of_the_day if nothing is actively playing.
  */

@@ -68,9 +68,9 @@ describe('GET /api/discord/fractal-live', () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.active).toEqual(activeSessions);
-    expect(body.paused).toEqual(pausedSessions);
-    expect(body.recent).toEqual(recentSessions);
+    expect(body.active).toMatchObject(activeSessions);
+    expect(body.paused).toMatchObject(pausedSessions);
+    expect(body.recent).toMatchObject(recentSessions);
     expect(body.has_active).toBe(true);
   });
 
@@ -116,7 +116,7 @@ describe('GET /api/discord/fractal-live', () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.active).toEqual(activeSessions);
+    expect(body.active).toMatchObject(activeSessions);
     expect(body.recent).toEqual([]);
   });
 
@@ -140,7 +140,7 @@ describe('GET /api/discord/fractal-live', () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.active).toEqual(activeSessions);
+    expect(body.active).toMatchObject(activeSessions);
     expect(body.paused).toEqual([]);
   });
 
@@ -174,5 +174,38 @@ describe('GET /api/discord/fractal-live', () => {
     const res = await GET(makeGetRequest('/api/discord/fractal-live'));
     const body = await res.json();
     expect(body.has_active).toBe(false);
+  });
+
+  // The regression test for the surface-map audit finding (doc 2245, PR #2950).
+  // This route is public AND holds a service-role client, so it published
+  // `host_wallet` - the mapping from a fractal host's name to their wallet -
+  // to anyone who asked. The response is built from an allowlist now, and this
+  // asserts it from the outside: put the sensitive column in the row the
+  // database returns, and prove it does not appear in the JSON.
+  it('never publishes host_wallet, or any column outside the allowlist', async () => {
+    const rows = [
+      {
+        id: 'a1',
+        status: 'active',
+        name: 'ZAO Fractal #42',
+        host_name: 'Zaal',
+        host_wallet: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        internal_notes: 'private',
+        created_at: '2026-08-07T00:00:00Z',
+      },
+    ];
+    mockFrom.mockReturnValue(fractalsChain({ data: rows, error: null }));
+    const res = await GET(makeGetRequest('/api/discord/fractal-live'));
+    const body = await res.json();
+
+    // the safe fields still make it through
+    expect(body.active[0].host_name).toBe('Zaal');
+    expect(body.active[0].name).toBe('ZAO Fractal #42');
+
+    // the wallet does not - checked on the serialized payload too, so it cannot
+    // hide inside a nested object we forgot to look at
+    expect(body.active[0].host_wallet).toBeUndefined();
+    expect(body.active[0].internal_notes).toBeUndefined();
+    expect(JSON.stringify(body)).not.toContain('0xdeadbeef');
   });
 });

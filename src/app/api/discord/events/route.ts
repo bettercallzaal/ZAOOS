@@ -85,6 +85,10 @@ function formatCountdown(ms: number): string {
 /**
  * GET /api/discord/events
  * Returns all scheduled discord events with next occurrence + countdown.
+ *
+ * @public-reviewed 2026-08-07 - a public schedule of public Discord events, read
+ * unauthenticated by EventsCalendar.tsx. Hardened rather than gated: the response
+ * is an explicit allowlist, so a column added later is private by default.
  */
 export async function GET() {
   try {
@@ -119,7 +123,20 @@ export async function GET() {
       };
 
       return {
-        ...evt,
+        // Explicit allowlist, not `...evt`. This route is public and holds a
+        // service-role client, so a `select('*')` spread publishes every column
+        // the table has - including any added later by a migration whose author
+        // never opened this file. The fields below are exactly the ones
+        // EventsCalendar.tsx declares in its DiscordEvent interface, so this is
+        // verified against the real consumer rather than guessed. A new column
+        // now defaults to private; publishing it is a deliberate edit here.
+        id: evt.id,
+        name: evt.name,
+        description: evt.description ?? null,
+        day_of_week: evt.day_of_week ?? null,
+        time: evt.time ?? null,
+        timezone: evt.timezone ?? null,
+        channel_name: evt.channel_name ?? null,
         next_occurrence: nextOccurrence.toISOString(),
         countdown: formatCountdown(msUntil),
         countdown_ms: msUntil,

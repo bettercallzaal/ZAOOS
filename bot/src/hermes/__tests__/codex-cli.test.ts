@@ -32,7 +32,7 @@ function makeSpawn(stdout: string, stderr: string, exitCode: number | null) {
         if (ev === 'data' && stderr) process.nextTick(() => cb(Buffer.from(stderr)));
       }),
     },
-    stdin: { write: vi.fn(), end: vi.fn() },
+    stdin: { write: vi.fn(), end: vi.fn(), on: vi.fn() },
     on: vi.fn((ev: string, cb: (code: number | null) => void) => {
       if (ev === 'close') setTimeout(() => cb(exitCode), 10);
     }),

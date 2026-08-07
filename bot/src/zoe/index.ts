@@ -37,6 +37,7 @@ import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { detectBuildIntent } from './build-intent';
 import { runConciergeTurn } from './concierge';
 import { sanitizeErrorForUser } from './user-errors';
 import { isConversationalTurn, ZOE_QUICK_MODEL } from './types';
@@ -2243,6 +2244,49 @@ async function dispatchConcierge(
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
+
+  // BUILD FROM THE DM (Zaal 2026-08-07: "how im able to build using my telegram
+  // bot conversation with you ... that is a 1/10").
+  //
+  // The coder pipeline already existed but had exactly ONE call site, in the
+  // ZAAL BOTZ *group* handler, reachable only from a forum topic named "Coding".
+  // A DM went to the concierge, which talks and files tasks - so the surface
+  // Zaal actually lives in could not build anything. This is that missing wire.
+  //
+  // Flag-gated (ZOE_DM_BUILD=1, default OFF) so merging this cannot change the
+  // running bot's behavior; flipping it is a deliberate act. PR-only is what
+  // makes auto-dispatch safe at all: the pipeline opens a PR and a human merges
+  // (agent-loops rule 8). Building is not a gated action; merging is.
+  if (scope === 'private' && process.env.ZOE_DM_BUILD === '1') {
+    const intent = detectBuildIntent(text);
+    if (intent.build && intent.task) {
+      // Say what is happening BEFORE the work starts. Silence during a long run
+      // is the failure mode that makes a build surface feel broken.
+      await ctx
+        .reply(
+          `Building this (${intent.reason}). Coder + critic running - PR link lands here.\n\n` +
+            `Not what you meant? Reply "stop" and I will leave it; the PR is not merged either way.`,
+        )
+        .catch(() => {});
+      const say = (t: string) => bot.api.sendMessage(chatId, t).catch(() => {});
+      void dispatchHermesRun(
+        { triggered_by_telegram_id: zaalId, triggered_in_chat_id: chatId, issue_text: intent.task },
+        {
+          onPrOpened: async (_id, prNumber, prUrl, score) => {
+            await say(`Built it: PR #${prNumber} (critic ${score}/10)\n${prUrl}\n\nYours to merge.`);
+          },
+          onEscalated: async (_id, reason) => {
+            await say(`Stopped - needs your eyes: ${reason.slice(0, 200)}`);
+          },
+          onFailed: async (_id, reason) => {
+            await say(`Could not build it: ${reason.slice(0, 200)}`);
+          },
+        },
+      ).catch((e) => say(`Build pipeline error: ${(e as Error).message.slice(0, 160)}`));
+      return;
+    }
+  }
+
   // Conversational turns (short chat, no link/plan/build) answer directly on the
   // quick model with NO "working on it" ack. Real work keeps the honest progress
   // narration + default/hard model. (zoe-conversational spec, 2026-07-16).

@@ -21,7 +21,7 @@ const { makeSpawn } = vi.hoisted(() => {
       stderr: {
         on: (_event: string, _cb: unknown) => {},
       },
-      stdin: { write: vi.fn(), end: vi.fn() },
+      stdin: { write: vi.fn(), end: vi.fn(), on: vi.fn() },
       on: (event: string, cb: (code: number) => void) => {
         if (event === 'close') setImmediate(() => cb(exitCode));
       },

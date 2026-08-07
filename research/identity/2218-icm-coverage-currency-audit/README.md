@@ -99,3 +99,6 @@ box. A person like a collaborator is NOT a project box.)
 - Doc 1016 (GEO), 1021 (boxes as bot brains), 1051 (ICM deep dive), 2154 (ZOE identity) [repo].
 - `research/identity/icm-boxes/` (existing box drafts) + `.claude/rules/icm-grounding.md` [repo].
 - Community sources per item, GitHub-first ([[feedback_research_source_hierarchy]]).
+
+## Loop log
+- **Batch 1 (2026-08-07):** drafted ICM boxes for **ZOL** + **ZAI** (Tier B, ZAO-owned agents; DreamNet/Bonfire deferred - they are partner projects, not ZAO-owned, so credited-not-boxed). Farcaster discovery batch 1 shipped as **doc 2224** (grounded friends-of-friends of @zaal's 2,880 follows; 12 verified high-signal accounts he doesn't follow). Next: more Tier-B boxes (Juke, Spore/DreamNet-tenant, channelz/zlank/zartizen/zaoscout repos) + topic-targeted FC pass once the scout has a Neynar key.

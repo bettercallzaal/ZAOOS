@@ -125,6 +125,29 @@ export async function dispatchHermesRun(
 
   const targetRepo: HermesRepoTarget = input.target_repo ?? 'zaoos';
 
+  /**
+   * Finish the run as cancelled, or return null if no cancel was asked for.
+   *
+   * Checked at TWO points: before an attempt starts (nothing spent yet), and
+   * after the critic passes but BEFORE anything is pushed. The second check is
+   * the one that keeps the promise the caller makes to the user - ZOE's stop
+   * reply says "No PR will open", and without it a cancel that arrives while the
+   * winning attempt is running still opens a PR and pings back "Built it".
+   */
+  const finishIfCancelled = async (): Promise<DispatchResult | null> => {
+    if (!input.shouldCancel?.()) return null;
+    await updateRun(created.id, {
+      status: 'failed',
+      error_message: 'cancelled by request',
+      total_input_tokens: totalIn,
+      total_output_tokens: totalOut,
+      completed_at: new Date().toISOString(),
+    });
+    const stopped = (await reloadRun(created.id)) ?? created;
+    await narrator?.onFailed?.(created.id, 'cancelled by request');
+    return { kind: 'failed', run: stopped, reason: 'cancelled by request' };
+  };
+
   try {
     await cloneAndBranch(workdir, branchName, targetRepo);
 
@@ -135,16 +158,8 @@ export async function dispatchHermesRun(
       // Cooperative cancel, checked BEFORE this attempt spends anything. A run
       // stopped here has done no work on the current attempt, so there is
       // nothing half-finished to reconcile.
-      if (input.shouldCancel?.()) {
-        await updateRun(created.id, {
-          status: 'failed',
-          error_message: 'cancelled by request',
-          completed_at: new Date().toISOString(),
-        });
-        const stopped = (await reloadRun(created.id)) ?? created;
-        await narrator?.onFailed?.(created.id, 'cancelled by request');
-        return { kind: 'failed', run: stopped, reason: 'cancelled by request' };
-      }
+      const cancelledBeforeAttempt = await finishIfCancelled();
+      if (cancelledBeforeAttempt) return cancelledBeforeAttempt;
 
       await updateRun(created.id, { fixer_attempts: attempt, status: 'fixing' });
       await narrator?.onCoderStart?.(created.id, attempt, HERMES_DEFAULT_MAX_ATTEMPTS, input.issue_text);
@@ -218,6 +233,14 @@ export async function dispatchHermesRun(
       }
 
       if (critique.score >= HERMES_PASS_THRESHOLD) {
+        // Last exit before anything leaves this machine. The attempt is over, so
+        // nothing is half-written - but a cancel that arrived while it ran must
+        // not still produce a PR. Pushing here would put an unwanted branch and
+        // PR on the repo after the user explicitly said stop, and the run would
+        // report "Built it: PR #N" one message after "No PR will open".
+        const cancelledBeforePr = await finishIfCancelled();
+        if (cancelledBeforePr) return cancelledBeforePr;
+
         await commitAndPush(workdir, branchName, fixerOut.commitMessage);
         const pr = await openPullRequest({
           workdir,

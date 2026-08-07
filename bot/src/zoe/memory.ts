@@ -22,6 +22,7 @@ import { dirname, join } from 'node:path';
 import type { ZoeTask, DecisionRecord, BuildStateRecord, InboxContextRecord } from './types';
 import { buildQuestsBlock } from './sidequests';
 import { getTeamContextBlock } from './team-tracker';
+import { commitMemoryWrite } from './memory-git';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
@@ -468,14 +469,18 @@ export async function readHuman(): Promise<string> {
  * to persist a Zaal-approved memory patch. Only ever called after explicit
  * y/n approval — never autonomously.
  */
-export async function writeHuman(contents: string): Promise<void> {
+export async function writeHuman(contents: string, reason = 'human.md update'): Promise<void> {
   await ensureZoeHome();
   await fs.writeFile(HUMAN_PATH, contents, 'utf8');
+  // Flag-gated audit trail (ZOE_MEMORY_GIT=1): commit-per-edit versioning, doc 2235
+  // #1 adopt. Best-effort - a git failure never breaks the write (loud log inside).
+  await commitMemoryWrite('human.md', reason);
 }
 
-export async function writePersona(contents: string): Promise<void> {
+export async function writePersona(contents: string, reason = 'persona.md update'): Promise<void> {
   await ensureZoeHome();
   await fs.writeFile(PERSONA_PATH, contents, 'utf8');
+  await commitMemoryWrite('persona.md', reason);
 }
 
 function recentPathFor(scope: ChatScope): string {

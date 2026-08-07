@@ -257,3 +257,4 @@
 | 2221 | [How others run agentic Macs, and where this one is ahead vs exposed](./2221-agentic-mac-landscape/) | STANDALONE | Benchmark this Mac's agentic setup against what the GitHub/HN field actually ships, so the work goes to the real gaps instead of rebuilding what already runs here. |
 | 2230 | [clawd-scribe: what to adopt for ZAO's /meeting (grounded, file:line)](./2230-clawd-scribe-meeting-capture-adopt/) | STANDALONE | Read clawd's local meeting-notes tool and name what it structurally does |
 | 2237 | [clawd-clipper -> ZAO content: adopt the hallucination-proof anchoring](./2237-clawd-clipper-content-pipeline-adopt/) | STANDALONE | Spec what ZAO's content pipeline (episodes, Fractal calls, ZAOstock, the |
+| 2247 | [The CONTRA layer: a vault that argues back](./2247-obsidian-contra-loop/) | STANDALONE | Decide whether to build the contrarian-loop pattern on top of `~/zao-vault`, |

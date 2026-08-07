@@ -468,11 +468,16 @@ export async function runNudgePing(deps: {
     // Re-ping the due, still-open questions.
     const nowMs = deps.now.getTime();
     for (const t of await dueTracks(nowMs)) {
+      // Advance the schedule FIRST and only ping if the advance PERSISTED. If the
+      // write fails and we ping anyway, the track stays due every tick -> pings
+      // forever and MAX_PINGS never trips (the runaway #2879 fixed). Missing one
+      // ping on a failed write is the safe trade.
+      const advanced = await markPinged(t.qid, nowMs);
+      if (!advanced) continue;
       try {
         await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
           reply_markup: questionKeyboard(t.qid, t.options),
         });
-        await markPinged(t.qid, nowMs);
       } catch (err) {
         console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
       }

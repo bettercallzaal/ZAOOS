@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -102,5 +102,17 @@ describe('persistence + the kill switch', () => {
   });
   it('stopNudge on an unknown qid returns false', async () => {
     expect(await stopNudge('nope')).toBe(false);
+  });
+  it('markPinged reports whether the advance was persisted (#2879 runaway guard)', async () => {
+    expect(await markPinged('nope', 0)).toBe(false); // unknown qid -> false, never pinged
+    await startNudge('qZ', 'c', ['x'], 0);
+    expect(await markPinged('qZ', 3 * MIN)).toBe(true);
+    await stopNudge('qZ');
+  });
+  it('a corrupt (non-array) state file degrades to no tracks, not a throw', async () => {
+    const path = join(TMP, 'nudge-ladder.json');
+    writeFileSync(path, '{"oops":true}');
+    await expect(dueTracks(10 * MIN)).resolves.toEqual([]);
+    writeFileSync(path, '[]');
   });
 });

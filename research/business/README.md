@@ -262,3 +262,4 @@
 | 2220 | [research](./2220-research/) | STANDALONE | Research doc 2220. |
 | 2222 | [SEO/web-presence: What keyword and backlink delta separates thezao.com](./2222-seo-web-presence-what-keyword-and-backlink/) | STANDALONE | Research doc 2222. |
 | 2223 | [research](./2223-research/) | STANDALONE | Research doc 2223. |
+| 2232 | [Whop for clippers + incentives: the OSS/on-chain check-twice + the Unlock bridge](./2232-whop-clippers-incentives-oss-alternatives/) | STANDALONE | Zaal wants Whop for the clipper + incentive layer (with POIDH), and asked |

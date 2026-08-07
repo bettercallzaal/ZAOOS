@@ -7,6 +7,7 @@
  * the scheduler decides whether to ping. No autonomous actions of its own.
  */
 import { readRuns, type RunRecord } from './runs';
+import { mcEmit } from './mission-control';
 
 export interface WatcherAlert {
   level: 'info' | 'warn';
@@ -77,7 +78,9 @@ export async function runWatcherTick(
   cfg: WatcherConfig = DEFAULT_WATCHER,
 ): Promise<WatcherAlert[]> {
   const runs = await readRuns(1);
-  return analyzeRuns(runs, cfg);
+  const alerts = analyzeRuns(runs, cfg);
+  for (const a of alerts) mcEmit('watcher', 'watcher', 8, a.message);
+  return alerts;
 }
 
 /** One-line render for a Telegram ping to Zaal. */

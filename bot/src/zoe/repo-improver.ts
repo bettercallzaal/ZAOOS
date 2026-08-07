@@ -22,6 +22,7 @@
  */
 
 import { z } from 'zod';
+import { mcEmit } from './mission-control';
 import type { HermesRepoTarget } from '../hermes/types';
 
 /** The repos the scout rotates through. hermesTarget=null => surface-only (no auto-fix target yet). */
@@ -193,6 +194,7 @@ export async function runRepoImproverScout(deps: ScoutDeps): Promise<string> {
     pr_url: null,
     run_id: null,
   });
+  mcEmit('repo-improver', 'scout', 4, `proposed improvement: ${target.repo} - ${finding.area}`);
   return `proposed: ${target.repo} - ${finding.area}`;
 }
 

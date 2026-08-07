@@ -94,6 +94,20 @@ export async function emitStep(
   return step;
 }
 
+/**
+ * Fire-and-forget step emission for ZOE's loops, gated on ZOE_MISSION_CONTROL=1
+ * (default OFF = zero I/O, keeps unit tests hermetic). A journal failure never
+ * breaks the loop - but it logs LOUDLY (silent-failure-guard rule 6: a silent
+ * audit-trail outage is silent data loss).
+ */
+export function mcEmit(topic: string, actor: string, severity: number, text: string): void {
+  if (process.env.ZOE_MISSION_CONTROL !== '1') return;
+  emitStep(topic, actor, severity, text).catch((error: unknown) => {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[mission-control] emit failed (${topic}/${actor}): ${msg}`);
+  });
+}
+
 export interface RenderOptions {
   /** Topics muted at render time (the spec's mutable channels). */
   mutedTopics?: string[];

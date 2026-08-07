@@ -5,11 +5,17 @@
 export interface RouteEntry {
   path: string;
   methods: string[];
-  /** auth guard inferred from the route source: admin | session | cron | signed | public */
+  /** guard inferred from the route source: admin | session | cron | signed | token | public */
   auth: string;
   what: string;
   /** true when the path has a [param] segment - not directly callable without a value */
   dynamic: boolean;
+  /** holds a service-role / RLS-bypassing Supabase client */
+  serviceRole: boolean;
+  /** applies its own rate limit (slows enumeration; does NOT authorize anyone) */
+  rateLimited: boolean;
+  /** public AND service-role: no gate, but a key that bypasses RLS. Read this handler. */
+  review: boolean;
 }
 
 export const GENERATED_AT = '2026-08-07';
@@ -20,6 +26,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Mirrors the Stream room create schema so a token gate set in HostRoomModal is',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/100ms/rooms/[id]',
@@ -27,6 +36,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/100ms/rooms/[id]/stage',
@@ -34,6 +46,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/100ms/token',
@@ -41,6 +56,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/100ms/webhook',
@@ -48,6 +66,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'Ingests 100ms server webhooks (parity with the Stream webhook) so rooms react',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/activity/feed',
@@ -55,6 +76,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/agents',
@@ -62,6 +86,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/agents/status',
@@ -69,6 +96,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/allowlist',
@@ -76,6 +106,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/apo/prompts',
@@ -83,6 +116,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'src/app/api/admin/apo/prompts/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/apo/run',
@@ -90,6 +126,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'src/app/api/admin/apo/run/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/audit-log',
@@ -97,6 +136,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/backfill',
@@ -104,6 +146,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/broadcast',
@@ -111,6 +156,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/contacts',
@@ -118,6 +166,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Strict contact field schema - bounds every field and rejects unknown keys so',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/discord-link',
@@ -125,6 +176,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/dormant',
@@ -132,6 +186,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "Admin only. Returns active members who haven't been seen in N days,",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/ens-subnames',
@@ -139,6 +196,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/ens-subnames/requests',
@@ -146,6 +206,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/export',
@@ -153,6 +216,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Prevent spreadsheet formula injection: prefix cells starting with',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/hidden',
@@ -160,6 +226,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/member-fid',
@@ -167,6 +236,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/member-fix',
@@ -174,6 +246,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/member-health',
@@ -181,6 +256,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Admin only. Shows: missing fields, unlinked records, tier mismatches',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/nexus',
@@ -188,6 +266,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/onboarding-funnel',
@@ -195,6 +276,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/poll-config',
@@ -202,6 +286,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/quick-stats',
@@ -209,6 +296,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Admin only. Returns counts for members, sessions, respect, dormancy, audit actions',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/respect-import',
@@ -216,6 +306,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Allow up to 60s on Vercel Pro for this heavy sync',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/search-users',
@@ -223,6 +316,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Resolve address \u2192 ENS name (returns null if none)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/spaces',
@@ -230,6 +326,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 List all rooms (admin only)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/spaces/[id]',
@@ -237,6 +336,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Permanently delete a room (admin only)',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/upload',
@@ -244,6 +346,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/users',
@@ -251,6 +356,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/admin/users/import',
@@ -258,6 +366,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Import all allowlist entries into the users table',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/agents/health',
@@ -265,6 +376,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Pre-flight check: verify all agent infrastructure is configured',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/artists/[username]',
@@ -272,6 +386,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Session-authenticated. Returns combined profile, songs, respect, social data',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/artists/featured',
@@ -279,6 +396,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Session-authenticated. Returns compact artist cards for horizontal scroll',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/facebook',
@@ -286,6 +406,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/facebook/callback',
@@ -293,6 +416,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/kick',
@@ -300,6 +426,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/kick/callback',
@@ -307,6 +436,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/lastfm',
@@ -314,6 +446,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/lastfm/callback',
@@ -321,6 +456,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/lastfm/disconnect',
@@ -328,6 +466,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/listenbrainz',
@@ -335,6 +476,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/listenbrainz/status',
@@ -342,6 +486,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/logout',
@@ -349,6 +496,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/register',
@@ -356,6 +506,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Rate limiting: middleware covers /api/auth/* at 10/min',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/session',
@@ -363,6 +516,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/signer',
@@ -370,6 +526,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "SECURITY: This uses the APP's signer wallet (APP_SIGNER_PRIVATE_KEY),",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/signer/save',
@@ -377,6 +536,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/signer/status',
@@ -384,13 +546,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/siwe',
     methods: ['GET', 'POST'],
-    auth: 'public',
+    auth: 'signed',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/twitch',
@@ -398,6 +566,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/twitch/callback',
@@ -405,6 +576,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/verify',
@@ -412,6 +586,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/youtube',
@@ -419,6 +596,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/auth/youtube/callback',
@@ -426,6 +606,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/autocliper/approve',
@@ -433,6 +616,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Approve a clip draft for publishing',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/autocliper/drafts',
@@ -440,6 +626,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'List all clip drafts by stage',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/autocliper/ingest',
@@ -447,6 +636,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Ingest a video source and create a clip draft',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/autocliper/publish',
@@ -454,6 +646,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Publish an approved clip via Postiz',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/autocliper/status',
@@ -461,6 +656,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Get autocliper system status',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: true,
+    review: false,
   },
   {
     path: '/api/bluesky',
@@ -468,6 +666,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "\u2014 Get current user's Bluesky connection status",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/bluesky/feed',
@@ -475,6 +676,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '\u2014 Bluesky Feed Generator endpoint',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/bluesky/members',
@@ -482,6 +686,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 List all Bluesky members tracked for the feed (admin only)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/bluesky/sync',
@@ -489,6 +696,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Sync Bluesky member posts into the feed index (admin only)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/bots/status',
@@ -496,6 +706,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Live fleet status, proxied from the cowork control-plane board',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/broadcast/start',
@@ -503,6 +716,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/broadcast/status',
@@ -510,6 +726,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/broadcast/targets',
@@ -517,6 +736,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/casts/delete',
@@ -524,6 +746,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/casts/summary',
@@ -531,6 +756,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/assistant',
@@ -538,6 +766,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/hide',
@@ -545,6 +776,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/messages',
@@ -552,6 +786,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Server-side TTL: first request in each window refreshes from Neynar,',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/minimax',
@@ -559,6 +796,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/react',
@@ -566,6 +806,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/schedule',
@@ -573,6 +816,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/search',
@@ -580,6 +826,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/send',
@@ -587,6 +836,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/thread/[hash]',
@@ -594,6 +846,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/chat/trending',
@@ -601,6 +856,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/community-issues',
@@ -608,6 +866,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 List community-submitted issues',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cortex',
@@ -615,13 +876,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Executive Cortex API - strategic advisory interface',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/crm/capture',
     methods: ['GET', 'POST'],
-    auth: 'public',
+    auth: 'token',
     what: 'Public CRM form capture endpoint. Accepts POST requests from Webflow forms',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: true,
+    review: false,
   },
   {
     path: '/api/crm/interactions',
@@ -629,6 +896,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Constant-time secret comparison (C-H2). Hashing both sides to a fixed-length',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/100ms-stale-rooms',
@@ -636,6 +906,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Manual / on-demand trigger for the 100ms ghost-room sweep. The sweep also runs',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/agents/banker',
@@ -643,6 +916,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/agents/dealer',
@@ -650,6 +926,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/agents/vault',
@@ -657,6 +936,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Vercel cron -- runs VAULT agent daily at 6 AM UTC',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/daily-digest',
@@ -664,6 +946,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Vercel cron \u2014 posts a daily summary cast to /zao channel',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/engagement-collect',
@@ -671,6 +956,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/follower-snapshot',
@@ -678,6 +966,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Vercel cron-compatible route that:',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/health-snapshot',
@@ -685,6 +976,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Weekly cron (Sunday midnight UTC) that snapshots community health metrics',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/heart-recovery',
@@ -692,6 +986,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: "The Heart's recovery runtime. Runs on a Vercel cron and performs both",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/juke-stale-rooms',
@@ -699,6 +996,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Sweeps any juke_spaces row still marked `active` that has not seen a',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: true,
+    review: false,
   },
   {
     path: '/api/cron/weekly-reflection',
@@ -706,6 +1006,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Require CRON_SECRET to be configured',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/cron/zounz-events',
@@ -713,6 +1016,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/directory',
@@ -720,6 +1026,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Clamp a non-numeric/negative limit to the default (never pass NaN downstream)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/directory/[slug]',
@@ -727,6 +1036,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/discord/events',
@@ -734,6 +1046,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Day-of-week helpers for calculating next occurrence',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: true,
   },
   {
     path: '/api/discord/fractal-live',
@@ -741,6 +1056,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Returns active fractal sessions and recent completed sessions',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: true,
   },
   {
     path: '/api/discord/intros',
@@ -748,6 +1066,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: true,
   },
   {
     path: '/api/discord/link',
@@ -755,6 +1076,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'Body: { discord_id: string, fid: number }',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/discord/member-stats',
@@ -762,6 +1086,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Query params:',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/discord/proposals',
@@ -769,6 +1096,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Query params:',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/discord/proposals/vote',
@@ -776,6 +1106,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "Body: { proposalId: number, vote: 'yes' | 'no' | 'abstain' }",
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/discord/sync',
@@ -783,6 +1116,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '?type=members | intros | threads',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/empire-builder/leaderboard',
@@ -790,6 +1126,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/empire-builder/me',
@@ -797,6 +1136,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/empire-builder/snapshot',
@@ -804,6 +1146,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/ens',
@@ -811,6 +1156,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Public endpoint (no auth) \u2014 ENS data is public on-chain',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/ens/subname-request',
@@ -818,6 +1166,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Creates a pending request for admin approval',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/events/[slug]',
@@ -825,6 +1176,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/events/create',
@@ -832,6 +1186,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Admin-only. Turns "edit the SQL migration" into "make an event". The `events`',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/events/rsvp',
@@ -839,6 +1196,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/events/verify-ticket',
@@ -846,6 +1206,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Verify whether a person holds the Unlock ticket (key) for an event',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fc-identity/check',
@@ -853,6 +1216,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/feedback',
@@ -860,6 +1226,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: true,
+    review: false,
   },
   {
     path: '/api/following/online',
@@ -867,6 +1236,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/analytics',
@@ -874,6 +1246,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/matrix',
@@ -881,6 +1256,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/member/[wallet]',
@@ -888,6 +1266,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/proposals',
@@ -895,6 +1276,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'src/app/api/fractals/proposals/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/sessions',
@@ -902,6 +1286,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'src/app/api/fractals/sessions/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/fractals/webhook',
@@ -909,6 +1296,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'src/app/api/fractals/webhook/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/grids/battle',
@@ -916,6 +1306,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Battle Grid query seam',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/grids/creator',
@@ -923,6 +1316,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Creator Grid query seam',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/grids/events',
@@ -930,6 +1326,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Event Grid query seam',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/grids/reputation',
@@ -937,6 +1336,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Reputation Grid query seam',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/grids/sponsor',
@@ -944,6 +1346,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Sponsor Grid query seam',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/hats/check',
@@ -951,6 +1356,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/hats/tree',
@@ -958,6 +1366,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/admin/agent-join',
@@ -965,6 +1376,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Drops a partner-scoped agent (ZOE by default) into a Juke room ZAO owns',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/admin/delete-webhook',
@@ -972,6 +1386,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "Admin-only cleanup for orphan webhook subscriptions on Juke's side. Created",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: true,
+    review: false,
   },
   {
     path: '/api/juke/admin/end-space',
@@ -979,6 +1396,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "Calls Juke's developer end-space endpoint to terminate a room the host or",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/admin/mark-ended',
@@ -986,6 +1406,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "Manual override that flips a Juke space row to `status: 'ended'` in our DB,",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/admin/register-webhook',
@@ -993,6 +1416,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Server-side wrapper around `POST https://api.juke.audio/v1/developer/webhooks`',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/partner-token',
@@ -1000,6 +1426,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Mints a short-lived Juke partner JWT for the CURRENT signed-in ZAO user',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/space',
@@ -1007,6 +1436,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "Constant-time string comparison. Both inputs are SHA-256'd to a fixed",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/status',
@@ -1014,6 +1446,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Same data as /juke-status (HTML) and /juke-integration.md (markdown). Built',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/juke/webhooks',
@@ -1021,6 +1456,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'dispatcher (Juke PR 2026-05-23)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/comments',
@@ -1028,6 +1466,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/delete',
@@ -1035,6 +1476,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/docs',
@@ -1042,6 +1486,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/entries',
@@ -1049,6 +1496,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/submit',
@@ -1056,6 +1506,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/library/vote',
@@ -1063,6 +1516,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/livepeer/clip',
@@ -1070,6 +1526,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/livepeer/stream',
@@ -1077,6 +1536,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/livepeer/stream/[id]',
@@ -1084,6 +1546,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members',
@@ -1091,6 +1556,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns all active ZAO allowlist members with their profile info',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/[username]',
@@ -1098,6 +1566,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/[username]/friends',
@@ -1105,6 +1576,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/[username]/popular',
@@ -1112,6 +1586,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/directory',
@@ -1119,6 +1596,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/me',
@@ -1126,6 +1606,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/nfts',
@@ -1133,6 +1616,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/members/profile',
@@ -1140,6 +1626,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/memory/[userId]/recall',
@@ -1147,6 +1636,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/memory/[userId]/reflect',
@@ -1154,6 +1646,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/memory/[userId]/retain',
@@ -1161,6 +1656,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/memory/community/recall',
@@ -1168,13 +1666,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Community bank ID - uses a shared bank for community-wide memories',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/miniapp/auth',
     methods: ['GET'],
-    auth: 'public',
+    auth: 'token',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/miniapp/auth-context',
@@ -1182,6 +1686,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Miniapp context-based auth \u2014 silent (no SIWF signature prompt)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/miniapp/discover',
@@ -1189,6 +1696,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Defensively clamp: a non-numeric/negative limit falls back to the default',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/miniapp/search',
@@ -1196,13 +1706,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/miniapp/webhook',
     methods: ['POST'],
-    auth: 'public',
+    auth: 'signed',
     what: "Verify webhook signature using Farcaster's official verification",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/moderation/queue',
@@ -1210,6 +1726,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Admin-only. Returns flagged items pending review',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/artists',
@@ -1217,6 +1736,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/collect',
@@ -1224,6 +1746,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/comments',
@@ -1231,6 +1756,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/curators',
@@ -1238,6 +1766,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/digest',
@@ -1245,6 +1776,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/feed',
@@ -1252,6 +1786,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/frame',
@@ -1259,6 +1796,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/generate',
@@ -1266,6 +1806,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'ACE-Step v1.5 via HuggingFace Gradio Space',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/history',
@@ -1273,6 +1816,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/library',
@@ -1280,6 +1826,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/library/like',
@@ -1287,6 +1836,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/library/play',
@@ -1294,6 +1846,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Fire-and-forget from client on each play',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/library/react',
@@ -1301,6 +1856,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/listening-party',
@@ -1308,6 +1866,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/lyrics',
@@ -1315,6 +1876,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2500\u2500\u2500 In-memory LRU-ish cache (max 500 entries) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/metadata',
@@ -1322,6 +1886,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/mint',
@@ -1329,6 +1896,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/permaweb',
@@ -1336,6 +1906,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists',
@@ -1343,6 +1916,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/[id]',
@@ -1350,6 +1926,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/[id]/tracks',
@@ -1357,6 +1936,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/collaborative',
@@ -1364,6 +1946,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'GET \u2014 list all public collaborative playlists with counts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/collaborative/[id]',
@@ -1371,6 +1956,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'GET \u2014 single playlist with tracks + members',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/collaborative/[id]/join',
@@ -1378,6 +1966,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'POST \u2014 join a collaborative playlist as contributor',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/collaborative/[id]/tracks',
@@ -1385,6 +1976,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/playlists/collaborative/[id]/vote',
@@ -1392,6 +1986,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'POST \u2014 vote on a track in a collaborative playlist',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/radio',
@@ -1399,6 +1996,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Disable Next.js fetch cache \u2014 Audius data should be fresh',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/resolve',
@@ -1406,6 +2006,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/scrobble',
@@ -1413,6 +2016,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/search',
@@ -1420,6 +2026,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/share-card',
@@ -1427,6 +2036,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/submissions',
@@ -1434,6 +2046,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/submissions/review',
@@ -1441,6 +2056,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'POST - approve or reject a song submission (admin only)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/submissions/vote',
@@ -1448,6 +2066,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/track-of-day',
@@ -1455,6 +2076,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "GET \u2014 return today's Track of the Day + current nominations",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/track-of-day/select',
@@ -1462,6 +2086,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: "POST \u2014 select today's Track of the Day",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/track-of-day/vote',
@@ -1469,6 +2096,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'POST \u2014 toggle vote on a nomination',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/trending-weighted',
@@ -1476,6 +2106,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/music/wallet',
@@ -1483,6 +2116,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/nexus/links',
@@ -1490,6 +2126,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Public API: GET /api/nexus/links',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/neynar/cast',
@@ -1497,6 +2136,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/neynar/follow',
@@ -1504,6 +2146,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/neynar/like',
@@ -1511,6 +2156,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/neynar/recast',
@@ -1518,6 +2166,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications',
@@ -1525,6 +2176,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Fetch notifications for the current user',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications/farcaster',
@@ -1532,6 +2186,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Guard NaN: a non-numeric limit falls back to undefined (let getNotifications',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications/push/send',
@@ -1539,6 +2196,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications/push/subscribe',
@@ -1546,6 +2206,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications/send',
@@ -1553,6 +2216,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'Send push notifications to Farcaster Mini App users via their notification tokens',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/notifications/status',
@@ -1560,6 +2226,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns whether the current user has push notifications enabled',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/overlay/now-playing',
@@ -1567,6 +2236,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Public GET endpoint for OBS overlays \u2014 no auth required',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: true,
   },
   {
     path: '/api/overlay/now-playing/update',
@@ -1574,6 +2246,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/facebook',
@@ -1581,6 +2256,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/facebook/broadcast',
@@ -1588,6 +2266,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Optional: override which page to stream to (defaults to primary page)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/hive',
@@ -1595,6 +2276,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Connect a Hive account to the current user',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/kick',
@@ -1602,6 +2286,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/lens',
@@ -1609,6 +2296,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Strict EVM address shape. Validating to 0x + 40 hex chars BEFORE interpolating',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/twitch',
@@ -1616,6 +2306,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "Optional: look up another user's public Twitch info by FID (no secrets)",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/youtube',
@@ -1623,6 +2316,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/platforms/youtube/broadcast',
@@ -1630,6 +2326,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/profile/platforms',
@@ -1637,6 +2336,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "\u2014 Fetch the current user's connected platform statuses",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/proposals',
@@ -1644,6 +2346,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 List proposals with vote tallies',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/proposals/comment',
@@ -1651,6 +2356,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Get comments for a proposal',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/proposals/test-publish',
@@ -1658,6 +2366,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Debug endpoint to test the publish threshold flow',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/proposals/vote',
@@ -1665,6 +2376,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/bluesky',
@@ -1672,6 +2386,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/compose',
@@ -1679,6 +2396,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: 'The missing orchestrator. ZAO already had every publisher (auto-cast, x,',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/discord',
@@ -1686,6 +2406,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/engagement',
@@ -1693,6 +2416,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Fetch engagement metrics for published posts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/farcaster',
@@ -1700,6 +2426,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '\u2014 Publish a governance-approved proposal to @thezao Farcaster account',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/hive',
@@ -1707,6 +2436,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/lens',
@@ -1714,6 +2446,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/status',
@@ -1721,6 +2456,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Check cross-platform publish status for a given cast hash',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/telegram',
@@ -1728,6 +2466,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/threads',
@@ -1735,6 +2476,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/publish/x',
@@ -1742,6 +2486,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/event',
@@ -1749,6 +2496,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/fractal',
@@ -1756,6 +2506,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/leaderboard',
@@ -1763,6 +2516,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/leaderboard/embed',
@@ -1770,6 +2526,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/member',
@@ -1777,6 +2536,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/sync',
@@ -1784,6 +2546,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/respect/transfers',
@@ -1791,6 +2556,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/scrape',
@@ -1798,6 +2566,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/search',
@@ -1805,6 +2576,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '---------------------------------------------------------------------------',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/search/users',
@@ -1812,6 +2586,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/snapshot/polls',
@@ -1819,6 +2596,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Returns active + recent Snapshot polls for the ZAO space',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/clusters',
@@ -1826,6 +2606,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'In-memory cache \u2014 1 hour TTL',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/community-graph',
@@ -1833,6 +2616,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Cache the full graph in memory for 10 minutes (drastically reduces Neynar calls)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/compare',
@@ -1840,6 +2626,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Per-pair cache \u2014 5 minute TTL',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/engagement',
@@ -1847,6 +2636,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns global + personalized OpenRank engagement scores for the given FIDs',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/engagement-heatmap',
@@ -1854,6 +2646,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'In-memory cache \u2014 1 hour TTL, keyed by FID',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/growth',
@@ -1861,6 +2656,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns member_stats_history for the requested FID over the requested period',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/spotlight',
@@ -1868,6 +2666,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Deterministic: sorts by respect, picks index = dayOfYear % count',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/suggestions',
@@ -1875,6 +2676,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Follow suggestions for the current user',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/taste-match',
@@ -1882,6 +2686,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "Compares current user's liked songs with target user's liked songs",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/trending',
@@ -1889,6 +2696,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns top-ranked users in a Farcaster channel via OpenRank',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/trending-topics',
@@ -1896,6 +2706,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Clamp a non-numeric/negative limit to the default (never pass NaN downstream)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/unfollowers',
@@ -1903,6 +2716,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Returns recent unfollowers for the authenticated user',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/social/verifications',
@@ -1910,6 +2726,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: "Intentionally PUBLIC (no session guard): returns a FID's on-chain account",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/songjam/leaderboard',
@@ -1917,6 +2736,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Cache for 60 seconds',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/chat',
@@ -1924,6 +2746,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/gate-check',
@@ -1931,6 +2756,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/hand-raise',
@@ -1938,6 +2766,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/leaderboard',
@@ -1945,6 +2776,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/past',
@@ -1952,6 +2786,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/scheduled',
@@ -1959,6 +2796,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/scheduled/[id]/rsvp',
@@ -1966,6 +2806,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/session',
@@ -1973,6 +2816,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/song-request',
@@ -1980,6 +2826,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/stats',
@@ -1987,6 +2836,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/tips',
@@ -1994,6 +2846,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spaces/voice-agent/token',
@@ -2001,6 +2856,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Mint a short-lived signed ElevenLabs ConvAI URL for a space voice agent',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/spore/verify',
@@ -2008,6 +2866,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'Spore federation boundary - Phase 4, the externally-reachable verify surface',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/staking/leaderboard',
@@ -2015,6 +2876,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'public',
     what: 'src/app/api/staking/leaderboard/route.ts',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/streaks',
@@ -2022,6 +2886,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/streaks/record',
@@ -2029,6 +2896,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/stream/rooms',
@@ -2036,6 +2906,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/stream/rooms/[id]',
@@ -2043,6 +2916,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'admin',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/stream/token',
@@ -2050,13 +2926,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Auth guard \u2014 prevent unauthenticated token minting',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/stream/webhook',
     methods: ['POST'],
-    auth: 'public',
+    auth: 'signed',
     what: 'Verify Stream.io webhook signature',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/tasks/list',
@@ -2064,6 +2946,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/chat',
@@ -2071,6 +2956,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/clip',
@@ -2078,6 +2966,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/marker',
@@ -2085,6 +2976,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/poll',
@@ -2092,6 +2986,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/prediction',
@@ -2099,6 +2996,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/twitch/stream-info',
@@ -2106,6 +3006,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Get a valid token (auto-refreshes if expired)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/upload',
@@ -2113,6 +3016,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/[fid]',
@@ -2120,6 +3026,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/[fid]/followers',
@@ -2127,6 +3036,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/[fid]/following',
@@ -2134,6 +3046,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: true,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/block',
@@ -2141,6 +3056,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/follow',
@@ -2148,6 +3066,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/follow-batch',
@@ -2155,6 +3076,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Batch follow multiple users at once',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/messaging-prefs',
@@ -2162,6 +3086,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 return current messaging preferences (with defaults)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/mute',
@@ -2169,6 +3096,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/profile',
@@ -2176,6 +3106,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/socials',
@@ -2183,6 +3116,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/solana-wallet',
@@ -2190,6 +3126,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/storage',
@@ -2197,6 +3136,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/wallet',
@@ -2204,6 +3146,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/wallet-visibility',
@@ -2211,6 +3156,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/users/xmtp-address',
@@ -2218,6 +3166,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: "Save the user's XMTP-derived address so other members can discover them",
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/wavewarz/artists',
@@ -2225,6 +3176,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Clamp a non-numeric/negative limit to the default (never pass NaN downstream)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/wavewarz/battles',
@@ -2232,6 +3186,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/wavewarz/random-stat',
@@ -2239,6 +3196,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/wavewarz/sync',
@@ -2246,13 +3206,19 @@ export const ROUTES: RouteEntry[] = [
     auth: 'cron',
     what: 'Verify cron secret',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/webhooks/alchemy',
     methods: ['POST'],
-    auth: 'public',
+    auth: 'signed',
     what: 'Two webhooks, two signing keys (ZOR ERC-1155 + OG ERC-20)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/webhooks/github',
@@ -2260,6 +3226,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'GitHub webhook -> Hermes activity feed',
     dynamic: false,
+    serviceRole: true,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/webhooks/neynar',
@@ -2267,6 +3236,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'signed',
     what: 'Extract channel ID from Neynar cast object',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/zounz/proposals',
@@ -2274,6 +3246,9 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: '\u2014 Fetch ZOUNZ on-chain proposal count and governance info',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
   {
     path: '/api/zounz/proposals/list',
@@ -2281,5 +3256,8 @@ export const ROUTES: RouteEntry[] = [
     auth: 'session',
     what: 'Nouns Builder Goldsky subgraph (may be 404 \u2014 falls back to getLogs)',
     dynamic: false,
+    serviceRole: false,
+    rateLimited: false,
+    review: false,
   },
 ];

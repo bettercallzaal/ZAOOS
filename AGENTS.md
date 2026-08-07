@@ -157,6 +157,6 @@ The `bot/` tree houses Telegram bots running on VPS 1 (Hostinger KVM 2). Hermes 
 Conventions inside `bot/`:
 - Letta-style memory blocks at `~/.zao/zoe/` (persona, human, recent, tasks, captures, facts, newsletters)
 - Brand voice rules at `bot/src/zoe/brand.md` (Year of the ZABAL: no emojis, no em dashes, fact-only)
-- Persona at `bot/src/zoe/persona.md` (deployed to VPS at `~/.zao/zoe/persona.md`)
+- Persona is a RUNTIME file at `~/.zao/zoe/persona.md` (+ `~/.zao/zoe/human.md`), seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts` - there is no committed `bot/src/zoe/persona.md`
 - Hermes pattern documented in [research doc 613](./research/agents/613-hermes-canonical-agent-framework/)
 - No new bots without a numbered research doc + Zaal sign-off (CLAUDE.md "Primary Surfaces")

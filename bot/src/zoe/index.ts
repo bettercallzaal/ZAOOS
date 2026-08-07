@@ -39,6 +39,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { detectBuildIntent } from './build-intent';
 import { doneKeyboard, maybeKeyboard, runningKeyboard } from './dm-build-buttons';
+import { LiveStatus, renderBuildStatus } from './live-status';
 import { stashPending, takePending, worthOffering } from './dm-build-pending';
 import {
   beginBuild,
@@ -1071,7 +1072,7 @@ bot.callbackQuery(/^dmb:yes:(.+)$/, async (ctx) => {
     return;
   }
   await ctx.answerCallbackQuery('Building').catch(() => {});
-  await startDmBuild(ctx, chatId, task, 'you tapped Build it');
+  await startDmBuild(chatId, task, 'you tapped Build it');
 });
 
 bot.callbackQuery(/^dmb:no:(.+)$/, async (ctx) => {
@@ -2329,23 +2330,44 @@ function startProgressNarration(
  * reassuring thing to see - it means the critic caught something and the loop is
  * working, not that it is stuck.
  */
-async function startDmBuild(
-  ctx: Context,
-  chatId: number,
-  task: string,
-  reason: string,
-): Promise<void> {
+async function startDmBuild(chatId: number, task: string, reason: string): Promise<void> {
   beginBuild(chatId, task);
-  const say = (t: string) => bot.api.sendMessage(chatId, t).catch(() => {});
 
-  await ctx
-    .reply(
-      `Building this (${reason}).\n\n` +
-        'Phases report here. Tap Stop any time, or send a correction and I will ' +
-        'run that next.',
-      { reply_markup: runningKeyboard() },
-    )
-    .catch(() => {});
+  // ONE message that updates, not six that pile up. Found by reading the
+  // Telegram Bot API changelog: ZOE only ever edited messages inside button
+  // callbacks and had never held a message id across a long operation, so a
+  // single build emitted start / coded / critic / retry / PR as separate blocks -
+  // a screenful on a phone to find the one line that matters.
+  const live = new LiveStatus({
+    send: async (text, markup) => {
+      const m = await bot.api
+        .sendMessage(chatId, text, markup ? { reply_markup: markup as never } : {})
+        .catch(() => null);
+      return m?.message_id ?? null;
+    },
+    edit: async (messageId, text, markup) => {
+      await bot.api.editMessageText(chatId, messageId, text, {
+        ...(markup ? { reply_markup: markup as never } : {}),
+      });
+    },
+  });
+
+  const startedAt = Date.now();
+  const history: string[] = [];
+  const show = (phase: string, opts: { done?: boolean; force?: boolean } = {}) =>
+    live.render(
+      renderBuildStatus({
+        task,
+        phase,
+        history,
+        elapsedSec: Math.round((Date.now() - startedAt) / 1000),
+        done: opts.done,
+      }),
+      opts.done ? undefined : runningKeyboard(),
+      opts.force ?? opts.done,
+    );
+
+  await show(`Building (${reason})`);
 
   void dispatchHermesRun(
     {
@@ -2358,56 +2380,70 @@ async function startDmBuild(
       onCoderStart: async (runId, attempt, max) => {
         setRunId(chatId, runId);
         setPhase(chatId, `coding (attempt ${attempt}/${max})`);
-        if (attempt > 1) await say(`Attempt ${attempt}/${max} - coding.`);
+        await show(`Coding - attempt ${attempt}/${max}`);
       },
       onCoderDone: async (_id, _attempt, filesChanged) => {
         setPhase(chatId, 'coded, awaiting critic');
         const n = filesChanged.length;
-        const list = filesChanged.slice(0, 4).join(', ');
-        await say(
-          `Wrote ${n} file${n === 1 ? '' : 's'}${list ? `: ${list}` : ''}${n > 4 ? ' ...' : ''}\nCritic reviewing.`,
-        );
+        history.push(`wrote ${n} file${n === 1 ? '' : 's'}: ${filesChanged.slice(0, 3).join(', ')}`);
+        await show('Critic reviewing');
       },
-      onCriticStart: async () => setPhase(chatId, 'critic reviewing'),
+      onCriticStart: async () => {
+        setPhase(chatId, 'critic reviewing');
+        await show('Critic reviewing');
+      },
       onCriticDone: async (_id, score) => {
         setPhase(chatId, `critic scored ${score}/10`);
+        history.push(`critic scored ${score}/10`);
+        await show(`Critic scored ${score}/10`);
       },
-      // A retry is good news - the loop caught something. Say so, or it reads
-      // like failure.
+      // A retry is GOOD news - the critic caught something and the loop works.
+      // Said plainly, or it reads as failure.
       onRetry: async (_id, nextAttempt, feedback) => {
         setPhase(chatId, `retrying (attempt ${nextAttempt})`);
-        await say(`Critic pushed back - going again (attempt ${nextAttempt}).\n${feedback.slice(0, 220)}`);
+        history.push(`retry ${nextAttempt}: ${feedback.slice(0, 90)}`);
+        await show(`Critic pushed back - going again (attempt ${nextAttempt})`);
       },
       onPrOpened: async (_id, prNumber, prUrl, score) => {
         const followUp = takeFollowUp(chatId);
         endBuild(chatId);
-        await bot.api
-          .sendMessage(chatId, `Built it: PR #${prNumber} (critic ${score}/10)\n\nYours to merge.`, {
-            reply_markup: doneKeyboard(prUrl),
-          })
-          .catch(() => {});
+        await live.flush();
+        history.push(`PR #${prNumber} opened`);
+        await live.render(
+          renderBuildStatus({
+            task,
+            phase: `Built it: PR #${prNumber} (critic ${score}/10) - yours to merge`,
+            history,
+            elapsedSec: Math.round((Date.now() - startedAt) / 1000),
+            done: true,
+          }),
+          doneKeyboard(prUrl),
+          true,
+        );
         if (followUp) await runQueuedFollowUp(chatId, followUp);
       },
       onEscalated: async (_id, escalateReason) => {
         const followUp = takeFollowUp(chatId);
         endBuild(chatId);
-        await say(`Stopped - needs your eyes: ${escalateReason.slice(0, 220)}`);
+        await live.flush();
+        await show(`Stopped - needs your eyes: ${escalateReason.slice(0, 180)}`, { done: true });
         if (followUp) await runQueuedFollowUp(chatId, followUp);
       },
       onFailed: async (_id, failReason) => {
         const cancelled = failReason.includes('cancelled');
         const followUp = takeFollowUp(chatId);
         endBuild(chatId);
-        await say(
-          cancelled
-            ? 'Stopped. Nothing was merged and no PR opened.'
-            : `Could not build it: ${failReason.slice(0, 220)}`,
+        await live.flush();
+        await show(
+          cancelled ? 'Stopped. No PR opened, nothing merged.' : `Could not build it: ${failReason.slice(0, 180)}`,
+          { done: true },
         );
-        // A cancel means he changed his mind about the whole thing, so a queued
-        // correction is almost certainly stale. Surface it, do not run it.
+        // A cancel makes a queued correction stale - surface it, do not run it.
         if (followUp) {
           if (cancelled) {
-            await say(`You had queued: "${followUp.slice(0, 140)}"\nSend it again if you still want it.`);
+            await bot.api
+              .sendMessage(chatId, `You had queued: "${followUp.slice(0, 140)}"\nSend it again if you still want it.`)
+              .catch(() => {});
           } else {
             await runQueuedFollowUp(chatId, followUp);
           }
@@ -2416,7 +2452,7 @@ async function startDmBuild(
     },
   ).catch(async (e) => {
     endBuild(chatId);
-    await say(`Build pipeline error: ${(e as Error).message.slice(0, 160)}`);
+    await show(`Build pipeline error: ${(e as Error).message.slice(0, 160)}`, { done: true });
   });
 }
 
@@ -2431,15 +2467,7 @@ async function runQueuedFollowUp(chatId: number, text: string): Promise<void> {
     return;
   }
   await say(`Now the follow-up: "${intent.task.slice(0, 140)}"`);
-  await startDmBuildFromQueue(chatId, intent.task, intent.reason);
-}
-
-/** Same as startDmBuild but without a ctx to reply to (the queued path). */
-async function startDmBuildFromQueue(chatId: number, task: string, reason: string): Promise<void> {
-  const fakeCtx = {
-    reply: (t: string) => bot.api.sendMessage(chatId, t),
-  } as unknown as Context;
-  await startDmBuild(fakeCtx, chatId, task, reason);
+  await startDmBuild(chatId, intent.task, intent.reason);
 }
 
 async function dispatchConcierge(
@@ -2493,7 +2521,7 @@ async function dispatchConcierge(
 
     const intent = detectBuildIntent(text);
     if (intent.build && intent.task) {
-      await startDmBuild(ctx, chatId, intent.task, intent.reason);
+      await startDmBuild(chatId, intent.task, intent.reason);
       return;
     }
     // Declined, but borderline: offer the tap instead of making him retype the

@@ -108,6 +108,14 @@ function run(cmdTemplate: string, stdinText: string | null, timeoutMs: number): 
       clearTimeout(timer);
       reject(e);
     });
+    // If the classifier exits before reading the text, the stdin write below fails
+    // (EPIPE/EOF). An unhandled stream 'error' event is an uncaughtException that
+    // kills the process; `child.on('error')` does not cover it. Reject instead, so
+    // the caller returns failVerdict() and the gate fails CLOSED as designed.
+    child.stdin.on('error', (e: NodeJS.ErrnoException) => {
+      clearTimeout(timer);
+      reject(new Error(`klearu closed stdin before reading input (${e.code ?? e.message})`));
+    });
     child.on('close', (code) => {
       clearTimeout(timer);
       if (code === 0) resolve(out);

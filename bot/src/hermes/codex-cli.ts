@@ -103,6 +103,20 @@ export async function callCodexCli(opts: {
       cleanup();
       reject(new CodexUnavailableError(`codex spawn failed: ${e.message}`));
     });
+    // A capped / not-logged-in codex exits BEFORE it consumes the prompt, so the
+    // pending stdin write below fails (EPIPE on Linux, EOF on Windows). Without a
+    // listener that is an unhandled stream 'error' event -> uncaughtException ->
+    // the whole bot process dies, instead of the same-family fallback this module
+    // exists to provide. `child.on('error')` does NOT cover stdin stream errors.
+    child.stdin.on('error', (e: NodeJS.ErrnoException) => {
+      clearTimeout(timer);
+      cleanup();
+      reject(
+        new CodexUnavailableError(
+          `codex closed stdin before reading the prompt (${e.code ?? e.message})`,
+        ),
+      );
+    });
     child.on('close', async (code) => {
       clearTimeout(timer);
       const combined = `${stdout}\n${stderr}`;

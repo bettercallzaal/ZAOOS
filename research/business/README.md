@@ -265,3 +265,5 @@
 | 2232 | [Whop for clippers + incentives: the OSS/on-chain check-twice + the Unlock bridge](./2232-whop-clippers-incentives-oss-alternatives/) | STANDALONE | Zaal wants Whop for the clipper + incentive layer (with POIDH), and asked |
 | 2233 | [Unlock -> Whop crypto-access bridge (spec, grounded in ZAO's existing Unlock code)](./2233-unlock-whop-crypto-access-bridge/) | STANDALONE | Spec Zaal's idea - pay in crypto (Unlock), get community/subscription access |
 | 2234 | [leftclaw x402 -> POIDH: adopt the agent-payable funding layer, NOT the escrow](./2234-leftclaw-x402-poidh-bounty-funding/) | STANDALONE | Spec what POIDH should adopt from clawd's leftclaw-services. The grounding |
+| 2242 | [x402 -> POIDH funding endpoint (spec)](./2242-x402-poidh-funding-endpoint-spec/) | STANDALONE | The design for doc 2234's #1 adopt: an HTTP-402 endpoint that lets an AGENT |
+| 2243 | [Audos: the "Record Label for Entrepreneurs" + the zaofestivals prompt](./2243-audos-platform-zaofestivals/) | STANDALONE | Zaal's drop (2026-08-07): research Audos and produce the prompt that builds |

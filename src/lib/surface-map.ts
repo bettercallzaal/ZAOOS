@@ -14,7 +14,9 @@ export interface RouteEntry {
   serviceRole: boolean;
   /** applies its own rate limit (slows enumeration; does NOT authorize anyone) */
   rateLimited: boolean;
-  /** public AND service-role: no gate, but a key that bypasses RLS. Read this handler. */
+  /** carries an @public-reviewed marker: a human read it and it is public on purpose */
+  reviewed: boolean;
+  /** public AND service-role AND not yet reviewed. Read this handler. */
   review: boolean;
 }
 
@@ -28,6 +30,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -38,6 +41,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -48,6 +52,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -58,6 +63,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -68,6 +74,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -78,6 +85,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -88,6 +96,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -98,6 +107,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -108,6 +118,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -118,6 +129,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -128,6 +140,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -138,6 +151,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -148,6 +162,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -158,6 +173,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -168,6 +184,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -178,6 +195,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -188,6 +206,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -198,6 +217,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -208,6 +228,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -218,6 +239,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -228,6 +250,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -238,6 +261,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -248,6 +272,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -258,6 +283,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -268,6 +294,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -278,6 +305,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -288,6 +316,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -298,6 +327,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -308,6 +338,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -318,6 +349,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -328,6 +360,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -338,6 +371,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -348,6 +382,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -358,6 +393,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -368,6 +404,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -378,6 +415,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -388,6 +426,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -398,6 +437,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -408,6 +448,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -418,6 +459,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -428,6 +470,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -438,6 +481,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -448,6 +492,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -458,6 +503,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -468,6 +514,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -478,6 +525,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -488,6 +536,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -498,6 +547,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -508,6 +558,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -518,6 +569,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -528,6 +580,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -538,6 +591,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -548,6 +602,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -558,6 +613,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -568,6 +624,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -578,6 +635,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -588,6 +646,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -598,6 +657,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -608,6 +668,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -618,6 +679,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -628,6 +690,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -638,6 +701,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -648,6 +712,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -658,6 +723,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: true,
+    reviewed: false,
     review: false,
   },
   {
@@ -668,6 +734,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -678,6 +745,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -688,6 +756,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -698,6 +767,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -708,6 +778,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -718,6 +789,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -728,6 +800,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -738,6 +811,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -748,6 +822,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -758,6 +833,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -768,6 +844,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -778,6 +855,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -788,6 +866,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -798,6 +877,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -808,6 +888,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -818,6 +899,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -828,6 +910,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -838,6 +921,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -848,6 +932,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -858,6 +943,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -868,6 +954,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -878,6 +965,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -888,6 +976,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: true,
+    reviewed: false,
     review: false,
   },
   {
@@ -898,6 +987,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -908,6 +998,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -918,6 +1009,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -928,6 +1020,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -938,6 +1031,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -948,6 +1042,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -958,6 +1053,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -968,6 +1064,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -978,6 +1075,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -988,6 +1086,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -998,6 +1097,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: true,
+    reviewed: false,
     review: false,
   },
   {
@@ -1008,6 +1108,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1018,6 +1119,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1028,6 +1130,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1038,6 +1141,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1048,7 +1152,8 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
-    review: true,
+    reviewed: true,
+    review: false,
   },
   {
     path: '/api/discord/fractal-live',
@@ -1058,17 +1163,19 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
-    review: true,
+    reviewed: true,
+    review: false,
   },
   {
     path: '/api/discord/intros',
     methods: ['GET'],
-    auth: 'public',
+    auth: 'session',
     what: '',
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
-    review: true,
+    reviewed: false,
+    review: false,
   },
   {
     path: '/api/discord/link',
@@ -1078,6 +1185,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1088,6 +1196,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1098,6 +1207,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1108,6 +1218,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1118,6 +1229,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1128,6 +1240,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1138,6 +1251,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1148,6 +1262,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1158,6 +1273,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1168,6 +1284,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1178,6 +1295,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1188,6 +1306,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1198,6 +1317,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1208,6 +1328,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1218,6 +1339,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1228,6 +1350,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: true,
+    reviewed: false,
     review: false,
   },
   {
@@ -1238,6 +1361,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1248,6 +1372,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1258,6 +1383,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1268,6 +1394,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1278,6 +1405,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1288,6 +1416,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1298,6 +1427,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1308,6 +1438,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1318,6 +1449,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1328,6 +1460,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1338,6 +1471,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1348,6 +1482,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1358,6 +1493,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1368,6 +1504,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1378,6 +1515,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1388,6 +1526,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: true,
+    reviewed: false,
     review: false,
   },
   {
@@ -1398,6 +1537,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1408,6 +1548,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1418,6 +1559,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1428,6 +1570,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1438,6 +1581,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1448,6 +1592,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1458,6 +1603,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1468,6 +1614,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1478,6 +1625,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1488,6 +1636,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1498,6 +1647,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1508,6 +1658,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1518,6 +1669,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1528,6 +1680,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1538,6 +1691,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1548,6 +1702,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1558,6 +1713,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1568,6 +1724,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1578,6 +1735,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1588,6 +1746,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1598,6 +1757,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1608,6 +1768,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1618,6 +1779,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1628,6 +1790,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1638,6 +1801,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1648,6 +1812,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1658,6 +1823,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1668,6 +1834,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1678,6 +1845,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1688,6 +1856,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1698,6 +1867,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1708,6 +1878,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1718,6 +1889,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1728,6 +1900,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1738,6 +1911,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1748,6 +1922,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1758,6 +1933,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1768,6 +1944,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1778,6 +1955,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1788,6 +1966,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1798,6 +1977,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1808,6 +1988,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1818,6 +1999,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1828,6 +2010,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1838,6 +2021,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1848,6 +2032,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1858,6 +2043,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1868,6 +2054,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1878,6 +2065,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1888,6 +2076,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1898,6 +2087,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1908,6 +2098,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1918,6 +2109,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1928,6 +2120,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1938,6 +2131,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1948,6 +2142,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1958,6 +2153,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1968,6 +2164,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1978,6 +2175,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1988,6 +2186,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -1998,6 +2197,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2008,6 +2208,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2018,6 +2219,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2028,6 +2230,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2038,6 +2241,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2048,6 +2252,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2058,6 +2263,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2068,6 +2274,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2078,6 +2285,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2088,6 +2296,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2098,6 +2307,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2108,6 +2318,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2118,6 +2329,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2128,6 +2340,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2138,6 +2351,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2148,6 +2362,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2158,6 +2373,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2168,6 +2384,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2178,6 +2395,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2188,6 +2406,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2198,6 +2417,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2208,6 +2428,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2218,6 +2439,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2228,17 +2450,19 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
     path: '/api/overlay/now-playing',
     methods: ['GET'],
     auth: 'public',
-    what: 'Public GET endpoint for OBS overlays \u2014 no auth required',
+    what: '@public-reviewed 2026-08-07 - an OBS browser source cannot carry a session;',
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
-    review: true,
+    reviewed: true,
+    review: false,
   },
   {
     path: '/api/overlay/now-playing/update',
@@ -2248,6 +2472,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2258,6 +2483,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2268,6 +2494,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2278,6 +2505,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2288,6 +2516,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2298,6 +2527,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2308,6 +2538,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2318,6 +2549,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2328,6 +2560,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2338,6 +2571,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2348,6 +2582,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2358,6 +2593,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2368,6 +2604,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2378,6 +2615,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2388,6 +2626,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2398,6 +2637,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2408,6 +2648,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2418,6 +2659,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2428,6 +2670,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2438,6 +2681,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2448,6 +2692,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2458,6 +2703,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2468,6 +2714,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2478,6 +2725,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2488,6 +2736,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2498,6 +2747,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2508,6 +2758,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2518,6 +2769,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2528,6 +2780,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2538,6 +2791,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2548,6 +2802,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2558,6 +2813,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2568,6 +2824,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2578,6 +2835,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2588,6 +2846,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2598,6 +2857,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2608,6 +2868,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2618,6 +2879,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2628,6 +2890,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2638,6 +2901,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2648,6 +2912,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2658,6 +2923,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2668,6 +2934,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2678,6 +2945,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2688,6 +2956,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2698,6 +2967,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2708,6 +2978,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2718,6 +2989,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2728,6 +3000,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2738,6 +3011,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2748,6 +3022,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2758,6 +3033,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2768,6 +3044,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2778,6 +3055,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2788,6 +3066,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2798,6 +3077,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2808,6 +3088,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2818,6 +3099,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2828,6 +3110,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2838,6 +3121,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2848,6 +3132,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2858,6 +3143,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2868,6 +3154,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2878,6 +3165,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2888,6 +3176,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2898,6 +3187,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2908,6 +3198,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2918,6 +3209,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2928,6 +3220,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2938,6 +3231,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2948,6 +3242,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2958,6 +3253,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2968,6 +3264,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2978,6 +3275,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2988,6 +3286,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -2998,6 +3297,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3008,6 +3308,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3018,6 +3319,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3028,6 +3330,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3038,6 +3341,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3048,6 +3352,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: true,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3058,6 +3363,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3068,6 +3374,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3078,6 +3385,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3088,6 +3396,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3098,6 +3407,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3108,6 +3418,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3118,6 +3429,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3128,6 +3440,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3138,6 +3451,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3148,6 +3462,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3158,6 +3473,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3168,6 +3484,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3178,6 +3495,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3188,6 +3506,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3198,6 +3517,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3208,6 +3528,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3218,6 +3539,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3228,6 +3550,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: true,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3238,6 +3561,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3248,6 +3572,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
   {
@@ -3258,6 +3583,7 @@ export const ROUTES: RouteEntry[] = [
     dynamic: false,
     serviceRole: false,
     rateLimited: false,
+    reviewed: false,
     review: false,
   },
 ];

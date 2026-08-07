@@ -244,7 +244,14 @@ describe('GET /api/discord/events', () => {
     expect(typeof reminders.within1h).toBe('boolean');
   });
 
-  it('preserves all original event fields in enriched response', async () => {
+  // This test previously asserted the OPPOSITE - that every column passed
+  // through, `color: '#ff0000'` included. That is the behavior the surface-map
+  // audit flagged: this route is public and holds a service-role client, so a
+  // spread of `select('*')` publishes whatever the table happens to contain,
+  // including columns added later by someone who never opened this file.
+  // The route now returns an explicit allowlist, so the test asserts the same
+  // thing from the other side: named fields survive, unnamed ones do not.
+  it('publishes the allowlisted fields and drops everything else', async () => {
     const events = [
       {
         id: 'abc123',
@@ -253,7 +260,9 @@ describe('GET /api/discord/events', () => {
         day_of_week: 'monday',
         time: '10:00',
         timezone: 'America/New_York',
+        channel_name: 'general',
         color: '#ff0000',
+        internal_note: 'do not publish me',
         created_at: '2026-01-01T00:00:00Z',
       },
     ];
@@ -261,10 +270,22 @@ describe('GET /api/discord/events', () => {
     const res = await GET();
     const body = await res.json();
     const enriched = body.events[0];
+
+    // everything EventsCalendar.tsx declares is still there
     expect(enriched.id).toBe('abc123');
     expect(enriched.name).toBe('Full Event');
     expect(enriched.description).toBe('An event description');
-    expect(enriched.color).toBe('#ff0000');
+    expect(enriched.day_of_week).toBe('monday');
+    expect(enriched.time).toBe('10:00');
+    expect(enriched.timezone).toBe('America/New_York');
+    expect(enriched.channel_name).toBe('general');
+    // and the computed fields the consumer also reads
+    expect(enriched.next_occurrence).toBeDefined();
+    expect(enriched.countdown).toBeDefined();
+
+    // a column nobody allowlisted must NOT reach the public
+    expect(enriched.color).toBeUndefined();
+    expect(enriched.internal_note).toBeUndefined();
   });
 
   it('returns 500 when supabase query errors', async () => {

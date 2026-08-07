@@ -95,18 +95,27 @@ export function isExhausted(track: NudgeTrack): boolean {
 
 async function load(): Promise<NudgeTrack[]> {
   try {
-    return JSON.parse(await fs.readFile(ladderPath(), 'utf8')) as NudgeTrack[];
+    const parsed = JSON.parse(await fs.readFile(ladderPath(), 'utf8')) as unknown;
+    // A hand-edited / truncated-then-repaired file can parse to a non-array
+    // ({} or null). Callers immediately .filter()/.find() the result, so a
+    // non-array would throw a TypeError out of dueTracks() and take the whole
+    // orchestrator tick down. Treat anything that is not an array as "no tracks".
+    return Array.isArray(parsed) ? (parsed as NudgeTrack[]) : [];
   } catch {
     return [];
   }
 }
 
-async function save(tracks: NudgeTrack[]): Promise<void> {
+/** Persist. Returns false (best-effort) when the write failed - callers that are
+ *  about to SEND a ping must treat false as "do not ping": an unrecorded ping
+ *  means the schedule never advances and MAX_PINGS never trips (runaway pings). */
+async function save(tracks: NudgeTrack[]): Promise<boolean> {
   try {
     await fs.mkdir(ladderHome(), { recursive: true });
     await fs.writeFile(ladderPath(), JSON.stringify(tracks, null, 2));
+    return true;
   } catch {
-    /* best-effort */
+    return false;
   }
 }
 
@@ -135,13 +144,15 @@ export async function stopNudge(qid: string): Promise<boolean> {
   return true;
 }
 
-/** Record that a re-ping was just sent for a qid (advances the schedule). */
-export async function markPinged(qid: string, nowMs: number): Promise<void> {
+/** Record that a re-ping was just sent for a qid (advances the schedule).
+ *  Returns true only if the advance was PERSISTED - a caller that pings-on-true
+ *  then never pings a track it could not advance (else it would ping forever). */
+export async function markPinged(qid: string, nowMs: number): Promise<boolean> {
   const tracks = await load();
   const t = tracks.find((x) => x.qid === qid);
-  if (!t) return;
+  if (!t) return false;
   t.pingMs.push(nowMs);
-  await save(tracks);
+  return save(tracks);
 }
 
 /** The open tracks that are due for a re-ping right now. */

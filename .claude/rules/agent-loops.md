@@ -74,7 +74,7 @@ Durable operating rules for any autonomous /loop or agent building/deploying in 
 
 35. **Overnight/unsupervised loops are PR-only + honest, never auto-code.** Deliverable = durable reviewable artifacts (docs/rules/specs -> PRs), NOT unsupervised code changes to live routes, NOT merges, NOT anything gated. A real bug found at 3am is DOCUMENTED + flagged, not fixed in prod.
 
-36. **Coordination is a shared surface, not the human as message bus.** Don't run a session on Zaal hand-relaying paste-blocks between terminals. The durable fix is a shared `lane_handoffs` log (doc 2092) - which is what the `relay` tools + ZOE relay-bridge now provide.
+36. **Coordination is a shared surface, not the human as message bus.** Don't run a session on Zaal hand-relaying paste-blocks between terminals. **Claude-to-Claude on one machine: use the native `SendMessage`** (shipped 2026-08-07) - named addressing that outlives the agent, push delivery, and a summary rather than your history. **Everything else stays on the relay/bus**: cross-machine (Mac / Windows desktop / VPS / Pi), non-Claude agents (tasern, Codex, the fleet), and reaching Zaal's phone via ZOE. And a message is transport, never the record - anything that matters still lands in `lane_handoffs` (doc 2092) or a PR. See doc 2246.
 
 ## Source
 

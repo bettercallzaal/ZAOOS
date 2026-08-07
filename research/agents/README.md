@@ -285,3 +285,4 @@
 | 2215 | [Critic Panel Milestone 2: Precision + Prove-Then-Enable](./2215-critic-panel-milestone2-precision/) | STANDALONE | Milestone 1 built the panel (run >1 family, vote, verify). Milestone 2 |
 | 2225 | [Austin Griffith + clawd: a self-improving agent that builds its own tools (and what ZAO should steal)](./2225-austin-griffith-clawd-agent-swarm/) | STANDALONE | Map Austin Griffith's `clawd` agent (`clawdbotatg`) + everything it has |
 | 2226 | [TG Pinned Mission-Control (spec)](./2226-tg-pinned-mission-control-spec/) | STANDALONE | A live pinned Telegram message that lets Zaal READ everything the swarm |
+| 2228 | [clawd claude-p-agent: what to adopt for ZOE (grounded, file:line)](./2228-clawd-claude-p-agent-adopt-spec/) | STANDALONE | Read Austin Griffith / clawd's `claude-p-agent` actual code and name the |

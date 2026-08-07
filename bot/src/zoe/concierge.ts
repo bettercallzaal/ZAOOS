@@ -13,6 +13,8 @@
  */
 import { callClaudeCli } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
+import { runConciergeGuardrails } from './guardrail-adapters';
+import { redactPii } from './pii';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
@@ -200,6 +202,22 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
   const senderLabel = opts.senderLabel ?? 'Zaal';
   const userPrompt = `${senderLabel}: ${opts.message}`;
 
+  // Guardrail pre-check (ZOE_GUARDRAILS=1, default OFF = zero behavior change).
+  // A tripped input guard refuses BEFORE any model call is spent (#2932, doc 2235).
+  if (process.env.ZOE_GUARDRAILS === '1') {
+    const pre = runConciergeGuardrails({ input: opts.message }, 'input');
+    if (!pre.passed) {
+      const reasons = pre.trips.map((t) => `- ${t.reason}`).join('\n');
+      return {
+        reply: `Held by guardrails:\n${reasons}`,
+        task_ops: [], quest_ops: [], captures: [], bot_relay_ops: [], crm_ops: [],
+        thread_ops: [], decision_ops: [], build_state_ops: [],
+        inputTokens: 0, outputTokens: 0, costUsd: 0,
+        model: 'none (guardrail hold)', durationMs: 0,
+      };
+    }
+  }
+
   let result: import('../hermes/claude-cli').ClaudeCliResult;
   let selectedModel: string;
   let modelRationale: string | undefined;
@@ -272,6 +290,19 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
   recordCall('concierge', result);
 
   let { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps, decisionOps, buildStateOps } = splitReplyAndOps(result.text);
+
+  // Guardrail post-check (same ZOE_GUARDRAILS=1 flag): a tripped pii guard redacts
+  // the reply before it leaves; other output trips are surfaced inline, never silent.
+  if (process.env.ZOE_GUARDRAILS === '1') {
+    const post = runConciergeGuardrails({ output: reply }, 'output');
+    if (!post.passed) {
+      if (post.trips.some((t) => t.name === 'pii')) reply = redactPii(reply);
+      const others = post.trips.filter((t) => t.name !== 'pii');
+      if (others.length > 0) {
+        reply = `${reply}\n\n[guardrails] ${others.map((t) => t.reason).join('; ')}`;
+      }
+    }
+  }
 
   // Append model rationale if present
   if (modelRationale && shouldUseRouting()) {

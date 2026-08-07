@@ -286,3 +286,4 @@
 | 2225 | [Austin Griffith + clawd: a self-improving agent that builds its own tools (and what ZAO should steal)](./2225-austin-griffith-clawd-agent-swarm/) | STANDALONE | Map Austin Griffith's `clawd` agent (`clawdbotatg`) + everything it has |
 | 2226 | [TG Pinned Mission-Control (spec)](./2226-tg-pinned-mission-control-spec/) | STANDALONE | A live pinned Telegram message that lets Zaal READ everything the swarm |
 | 2228 | [clawd claude-p-agent: what to adopt for ZOE (grounded, file:line)](./2228-clawd-claude-p-agent-adopt-spec/) | STANDALONE | Read Austin Griffith / clawd's `claude-p-agent` actual code and name the |
+| 2229 | [clawd claude-p-attest (EAS web-of-trust): the on-chain anchor for ZAO's trust chain](./2229-clawd-attest-eas-trust-adopt/) | STANDALONE | Read clawd's real attestation code and name what it adds to the off-chain |

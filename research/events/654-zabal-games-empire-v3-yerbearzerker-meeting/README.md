@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: research-complete
-last-validated: 2026-05-16
+last-validated: 2026-08-07
 related-docs: 701, 630, 646, 631, 584, 599, 498, 505, 527, 322, 324
 tier: STANDARD
 ---
@@ -14,6 +14,8 @@ tier: STANDARD
 > **Status:** research-complete. Supersedes the "all-in-June" framing from Doc 630. Doc 630 spec stays canonical for format; this doc updates the calendar + adds the Empire V3 mechanic.
 
 > **State note (2026-05-21):** Doc 701 is the current canonical state - it carries this doc's calendar pivot forward plus the mentor-roster-open decision. Where this doc conflicts with Doc 701, Doc 701 wins.
+
+> **Updated 2026-08-07:** The June/July/August calendar pivot decided in this meeting has executed as planned. June prep ran with recorded workshops including one by yerbearserker (Jordan) on Empire Builder — confirming action item #9 (Jordan records an Empire Builder bootcamp session). July open build was live with submissions open. August finals are now underway; prize structure confirmed as Top 8 share USDC, Top 16 get $ZABAL, every Finisher gets a commemorative collectible. Full workshop recordings and transcripts are available at zabalgamez.com/recordings. Empire Builder has expanded platform-wide — a tweet from @glankerempire confirms "everyone on Farcaster has an Empire Builder profile" (consistent with V3 growth). Songjam has a leaderboard at leaderboard.songjam.space but direct verification of Empire Builder API migration was not possible (domain blocked by proxy). Sources: zabalgamez.com (search snippet, FULL), zabalgamez.com/recordings (search snippet, FULL), @glankerempire X post 1947647704470880728 (PARTIAL — title only).
 
 ---
 

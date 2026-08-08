@@ -42,10 +42,10 @@ import {
   HeartFleet,
   SupabaseLeaseStore,
   executeWithLease,
-  deterministicResourceId,
   type ExecuteOutcome,
   type SupabaseLikeClient,
 } from '../../../packages/heart-fleet/src/index';
+import { ensureLeaseRun, resetRunReady, type RunTableClient } from './heart-run';
 import { db } from '../supabase';
 import { runPreflight } from './preflight';
 import { shouldFireAlert, shouldPauseAutonomousWork, formatSpendStatus } from './cost-governance';
@@ -133,41 +133,75 @@ function loopLeasesEnabled(): boolean {
 }
 
 /**
- * Run a named loop tick under a Heart lease when ZOE_LOOP_LEASES is on.
+ * Run a named tick under a Heart lease when its flag is on. The ONE wrapper all
+ * three leased loops go through - work-loop, orchestrator-tick and the
+ * repo-improver scout - because two hand-written copies of the lease dance is how
+ * the same resource-id bug got into both of them.
  *
- * Deliberately the same shape as runRepoImproverScout above - that wrapper has
- * been in the tree and working, so this generalises a proven pattern rather than
- * inventing a second one (code-restraint rung 2: reuse beats rewrite). Flag OFF
- * means the tick runs exactly as it does today, byte for byte.
+ * `enabled` off means the tick runs exactly as it does today, byte for byte.
  */
-async function runLoopTickLeased(
+async function runTickLeased(
   name: string,
+  enabled: boolean,
+  ttlSeconds: number,
   run: () => Promise<void>,
 ): Promise<ExecuteOutcome<void>> {
-  if (!loopLeasesEnabled()) {
+  if (!enabled) {
+    await run();
+    console.log(`[zoe/scheduler] ${name} ran (lease disabled)`);
+    return { ran: true, result: undefined };
+  }
+
+  // The lease fences on an agent_runs ROW, so the row has to exist and we have
+  // to pass its primary key. deterministicResourceId is the idempotency_key, not
+  // the id - passing it straight through meant acquire never found a row and the
+  // tick never ran. See heart-run.ts.
+  const runId = await ensureLeaseRun(
+    db() as unknown as RunTableClient,
+    `zoe.${name}`,
+    'singleton',
+    `ZOE ${name}: cross-machine single-instance lease for the scheduler's ${name} tick`,
+  );
+  if (!runId) {
+    // Fail OPEN, loudly. Running unleased is exactly what the flag-off path does
+    // today, so this is no worse than the current production behaviour and the
+    // per-machine tick-lock still holds; skipping instead would mean a Supabase
+    // blip silently stops ZOE's autonomous loops, which is the failure mode we
+    // are here to remove.
+    console.error(
+      `[zoe/scheduler] ${name} could not establish a lease row - running UNLEASED (per-machine tick-lock still applies)`,
+    );
     await run();
     return { ran: true, result: undefined };
   }
 
-  const resourceId = deterministicResourceId(`zoe.${name}`, 'singleton');
   const owner = `zoe:scheduler:${process.env.HOSTNAME ?? 'host'}:${process.pid}`;
   const outcome = await executeWithLease(
     heart(),
-    { runId: resourceId, owner, ttlSeconds: 600 },
+    { runId, owner, ttlSeconds },
     async () => {
       await run();
       return undefined;
     },
   );
 
+  // executeWithLease releases to a terminal status, but canAcquire only takes
+  // 'ready' or an expired lease - so without this the resource works once and
+  // then refuses every later tick forever.
+  await resetRunReady(db() as unknown as RunTableClient, runId);
+
   // Log BOTH outcomes. A skip is the feature working - another host already has
   // it - and a silent skip is indistinguishable from a loop that stopped running,
-  // which is exactly how a broken loop hides (silent-failure-guard).
-  console.log(
-    outcome.ran
-      ? `[zoe/scheduler] ${name} ran (lease acquired)`
-      : `[zoe/scheduler] ${name} skipped (lease held elsewhere - ${outcome.reason})`,
-  );
+  // which is exactly how a broken loop hides (silent-failure-guard). 'lease-held'
+  // and 'lease-error' are reported apart: only the first one means the feature
+  // worked, and calling an error "held elsewhere" is the lie that hid this bug.
+  if (outcome.ran) {
+    console.log(`[zoe/scheduler] ${name} ran (lease acquired)`);
+  } else if (outcome.reason === 'lease-held') {
+    console.log(`[zoe/scheduler] ${name} skipped (lease held elsewhere)`);
+  } else {
+    console.error(`[zoe/scheduler] ${name} DID NOT RUN - lease error (${outcome.reason})`);
+  }
   return outcome;
 }
 
@@ -187,31 +221,15 @@ function heart(): HeartFleet {
 /**
  * Wraps runRepoImproverTick through the Heart lease layer when the flag is on.
  * When the flag is off, runs the scout exactly as today (zero behavior change).
- * Deterministic resource id prevents duplicate scouts running concurrently.
+ *
+ * This now goes through the SAME wrapper as the other loops rather than carrying
+ * its own copy of the lease dance. Two hand-written copies is how the resource-id
+ * bug reached both of them (code-restraint rung 2: reuse beats rewrite).
  */
 async function runRepoImproverScout(log: (m: string) => Promise<void>): Promise<ExecuteOutcome<void>> {
-  if (!repoImproverLeaseEnabled()) {
-    // Flag OFF: run scout directly, no lease (zero behavior change from baseline).
-    await runRepoImproverTick(log);
-    console.log('[zoe/scheduler] repo-improver scout ran (lease disabled)');
-    return { ran: true, result: undefined };
-  }
-
-  // Flag ON: run scout inside a lease to prevent double-runs.
-  const resourceId = deterministicResourceId('zoe.repo-improver-scout', 'singleton');
-  const owner = `zoe:scheduler:${process.env.HOSTNAME ?? 'host'}:${process.pid}`;
-  const outcome = await executeWithLease(heart(), { runId: resourceId, owner, ttlSeconds: 120 }, async () => {
-    await runRepoImproverTick(log);
-    return undefined;
-  });
-
-  if (outcome.ran) {
-    console.log('[zoe/scheduler] repo-improver scout ran (lease acquired)');
-  } else {
-    console.log(`[zoe/scheduler] repo-improver scout skipped (lease held - reason: ${outcome.reason})`);
-  }
-
-  return outcome;
+  return runTickLeased('repo-improver-scout', repoImproverLeaseEnabled(), 120, () =>
+    runRepoImproverTick(log),
+  );
 }
 
 export interface SchedulerOptions {
@@ -892,7 +910,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
           const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
           const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
-          await runLoopTickLeased('work-loop', () => runWorkTick({
+          await runTickLeased('work-loop', loopLeasesEnabled(), 600, () => runWorkTick({
             sendToZaal: (t: string) => {
               // Work-loop messages are status messages
               if (opts.routingDeps) {
@@ -1084,7 +1102,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             console.log('[zoe/scheduler] orchestrator tick skipped (cost hard-stop at 95%+)');
             return;
           }
-          await runLoopTickLeased('orchestrator-tick', () => runOrchestratorTick({
+          await runTickLeased('orchestrator-tick', loopLeasesEnabled(), 600, () => runOrchestratorTick({
             bot: opts.bot,
             groupId: gid,
             zaalTgId: opts.zaalTgId,

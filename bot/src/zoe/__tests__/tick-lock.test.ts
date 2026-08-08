@@ -84,6 +84,31 @@ describe('acquireTickLock', () => {
     expect(results.filter((r) => r.acquired)).toHaveLength(1);
   });
 
+  // The break is guarded by `<lock>.break` so only one contender at a time may
+  // decide a lock is dead. While another contender holds that, the correct answer
+  // is to skip this tick - not to break a lock somebody else may be about to win.
+  it('does not break a stale lock while another contender is mid-break', async () => {
+    await acquireTickLock(lock);
+    await fs.writeFile(lock, String(Date.now() - (DEFAULT_STALE_MS + 60_000)));
+    await fs.writeFile(`${lock}.break`, String(Date.now()));
+
+    const blocked = await acquireTickLock(lock);
+    expect(blocked.acquired).toBe(false);
+    // The stale lock is still there: nobody deleted it behind the break lock.
+    await expect(fs.stat(lock)).resolves.toBeTruthy();
+  });
+
+  // ...but a process killed mid-break must not wedge every future break forever.
+  it('clears an abandoned break lock so a crash cannot wedge the break', async () => {
+    await acquireTickLock(lock);
+    await fs.writeFile(lock, String(Date.now() - (DEFAULT_STALE_MS + 60_000)));
+    await fs.writeFile(`${lock}.break`, String(Date.now() - 10 * 60_000));
+
+    expect((await acquireTickLock(lock)).acquired).toBe(true);
+    // The break lock is released again, not left behind for the next tick.
+    await expect(fs.stat(`${lock}.break`)).rejects.toThrow();
+  });
+
   it('honours a custom staleness threshold', async () => {
     await acquireTickLock(lock);
     await fs.writeFile(lock, String(Date.now() - 5000));

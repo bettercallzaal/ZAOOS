@@ -112,6 +112,65 @@ function repoImproverLeaseEnabled(): boolean {
   return process.env.ZOE_REPO_IMPROVER_LEASES === 'true';
 }
 
+/**
+ * Cross-machine leasing for the remaining autonomous loops (work-loop and the
+ * orchestrator tick).
+ *
+ * Why a second flag rather than reusing ZOE_REPO_IMPROVER_LEASES: these loops
+ * carry a different blast radius. The repo-improver scout proposes; the work-loop
+ * spends on research and opens PRs. Rolling them independently means the proven
+ * one stays on if the new one has to come off.
+ *
+ * WHAT THIS ADDS THAT THE FILE LOCK CANNOT. tick-lock.ts made the single-machine
+ * case correct (atomic create - exactly one winner). But a filesystem lock cannot
+ * span machines, and ZOE's loops can run from a Mac, the VPS, a Pi and a Windows
+ * desktop. The Heart fences on a shared Supabase row, so it is the only layer
+ * that can stop two HOSTS running the same tick. Both are wanted: the file lock
+ * is free and instant, the lease is authoritative.
+ */
+function loopLeasesEnabled(): boolean {
+  return process.env.ZOE_LOOP_LEASES === 'true';
+}
+
+/**
+ * Run a named loop tick under a Heart lease when ZOE_LOOP_LEASES is on.
+ *
+ * Deliberately the same shape as runRepoImproverScout above - that wrapper has
+ * been in the tree and working, so this generalises a proven pattern rather than
+ * inventing a second one (code-restraint rung 2: reuse beats rewrite). Flag OFF
+ * means the tick runs exactly as it does today, byte for byte.
+ */
+async function runLoopTickLeased(
+  name: string,
+  run: () => Promise<void>,
+): Promise<ExecuteOutcome<void>> {
+  if (!loopLeasesEnabled()) {
+    await run();
+    return { ran: true, result: undefined };
+  }
+
+  const resourceId = deterministicResourceId(`zoe.${name}`, 'singleton');
+  const owner = `zoe:scheduler:${process.env.HOSTNAME ?? 'host'}:${process.pid}`;
+  const outcome = await executeWithLease(
+    heart(),
+    { runId: resourceId, owner, ttlSeconds: 600 },
+    async () => {
+      await run();
+      return undefined;
+    },
+  );
+
+  // Log BOTH outcomes. A skip is the feature working - another host already has
+  // it - and a silent skip is indistinguishable from a loop that stopped running,
+  // which is exactly how a broken loop hides (silent-failure-guard).
+  console.log(
+    outcome.ran
+      ? `[zoe/scheduler] ${name} ran (lease acquired)`
+      : `[zoe/scheduler] ${name} skipped (lease held elsewhere - ${outcome.reason})`,
+  );
+  return outcome;
+}
+
 /** Singleton Heart instance for scheduler-wide use. */
 let _heart: HeartFleet | null = null;
 function heart(): HeartFleet {
@@ -833,7 +892,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
           const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
           const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
-          await runWorkTick({
+          await runLoopTickLeased('work-loop', () => runWorkTick({
             sendToZaal: (t: string) => {
               // Work-loop messages are status messages
               if (opts.routingDeps) {
@@ -847,7 +906,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             zaalTgId: opts.zaalTgId,
             repoDir: opts.repoDir,
             currentDate: new Date().toISOString().slice(0, 10),
-          });
+          }));
         } catch (err) {
           console.error('[zoe/scheduler] work-loop tick failed:', (err as Error).message);
         }
@@ -1025,12 +1084,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             console.log('[zoe/scheduler] orchestrator tick skipped (cost hard-stop at 95%+)');
             return;
           }
-          await runOrchestratorTick({
+          await runLoopTickLeased('orchestrator-tick', () => runOrchestratorTick({
             bot: opts.bot,
             groupId: gid,
             zaalTgId: opts.zaalTgId,
             now: new Date(),
-          });
+          }));
         } catch (err) {
           console.error('[zoe/scheduler] orchestrator tick failed:', (err as Error).message);
         }

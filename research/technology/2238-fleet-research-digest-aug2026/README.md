@@ -89,3 +89,16 @@ Ten research briefs answered via fleet relay 2026-08-05 to 08-07, preserved here
 ---
 
 Also handled via relay in this window (not research, recorded for the trail): zpoidh duplicate-PR calls (#22 over #21 - real-data tests + single-language suite; #33 over #28 - deterministic backbone honors "AI-assisted, never AI-decides", #28 reworkable as score-proposer) and the R3 POIDH winner cast review for @femmie (verified on-chain payout + brand rules, packaged for Iman review via clipboard).
+
+---
+
+## 11. Addendum (2026-08-08): YouTube-side constraints for the 24/7 channel + upload automation
+
+The missing half of the desktop-h2ov6da channel plan (section 10 territory) - what YouTube itself allows:
+
+- THE 12-HOUR ARCHIVE WALL: YouTube streams over 12 hours are NOT auto-archived - the VOD is simply never created, and watch-hours from unarchived streams do not count toward the 4,000-hour monetization requirement. A literal 24/7 stream builds zero monetization credit and leaves no replay. Mitigation that costs nothing: run the channel as programming blocks under 12h (scheduled service restart every ~11.5h, or the 6pm-2am block idea from the bandwidth analysis) - each block archives normally. Sources: support.google.com/youtube/answer/6247592, space-node.net duration-limits writeup, streamrecorder.io.
+- LOOPED-CONTENT POLICY: unlimited stream duration is allowed and 24/7 loop channels are permitted to EXIST, but "reused/repetitious content" rules gate MONETIZATION, not presence. For ZNN's distribution-first goal this is acceptable; just do not build revenue projections on a loop channel.
+- UPLOAD QUOTA REVOLUTION (this changes our automation math): Google cut videos.insert from ~1,600 quota units to ~100 on 2025-12-04 - from 6 uploads/day to ~100/day on the free default - and since 2026-06-01 uploads bill to their own daily bucket separate from read/search quota. Consequence: the Twitch-mirror uploader, batch archive backfill, and ZM auto-ingest can all run on the free tier with no compliance audit at ZAO scale. The audit form (developers.google.com quota_and_compliance_audits) is only needed far beyond this. Sources: getphyllo.com and blotato.com 2026 quota guides.
+- Practical notes: use resumable uploads for big VOD files, default archive mirrors to unlisted, one playlist per show to keep the channel navigable, and remember uploads still need the channel advanced-verification for >15min videos.
+
+Net: the 24/7 channel should be a segmented block channel (archives + monetization-safe), and the upload-automation lane that every preservation design leaned on is now quota-cheap enough to just build.

@@ -25,6 +25,15 @@
  * Staleness is then handled explicitly and separately, which is also the only
  * safe way to do it.
  *
+ * AND THE PLACE THAT WAS NOT ENOUGH. Making the create atomic is necessary, not
+ * sufficient. The STALE BREAK was left as a bare `fs.unlink` followed by that
+ * atomic create - and while each call is atomic, the pair is not, so the break
+ * reintroduced check-then-act one line further down and two contenders could
+ * again both come away holding the lock. `breakStaleLock` below closes it. The
+ * lesson this header already states turned out to apply to its own fix: a guard
+ * that looks like a guard is the worst kind, because it stops anyone looking
+ * again - including at the guard.
+ *
  * WHAT THIS STILL DOES NOT DO. A filesystem lock is per-machine. It cannot stop
  * the Mac and the VPS from both running a tick, because they do not share a
  * filesystem - and Zaal runs loops on a Mac, a VPS, a Pi and a Windows desktop.
@@ -39,6 +48,14 @@ import { dirname } from 'node:path';
 
 /** How long before a held lock is assumed to belong to a dead process. */
 export const DEFAULT_STALE_MS = 30 * 60 * 1000;
+
+/**
+ * How long the break lock (below) may be held before it is itself assumed
+ * abandoned. The critical section it guards is two filesystem calls, so a minute
+ * is already several orders of magnitude of headroom - it exists only so a
+ * process killed mid-break cannot wedge every future stale break forever.
+ */
+const BREAK_STALE_MS = 60 * 1000;
 
 export interface TickLockOptions {
   staleMs?: number;
@@ -71,6 +88,69 @@ async function lockAgeMs(path: string, now: () => number): Promise<number | null
   const st = await fs.stat(path).catch(() => null);
   if (!st) return null;
   return now() - st.mtimeMs;
+}
+
+/**
+ * Remove a stale lock, but only ever the stale one - under a second lock so that
+ * exactly one contender is deciding at a time.
+ *
+ * WHY THIS IS NOT JUST `unlink`. The break used to be an unconditional
+ * `fs.unlink(path)` followed by an atomic create. The create is atomic; the
+ * *pair* is not. Two contenders that both read the same stale age interleave as:
+ *
+ *     A unlink -> A create (WINS) -> B unlink (deletes A's FRESH lock) -> B create (WINS)
+ *
+ * and both return `acquired: true`. That is the identical check-then-act shape
+ * this module was written to delete, just moved one call further down, and it is
+ * strictly worse than the bug it replaced because the loser also destroys the
+ * winner's lock on its way through.
+ *
+ * THE FIX HAS TWO HALVES, and it needs both:
+ *  1. Re-read the age and unlink ONLY while it is still stale, so a lock a winner
+ *     has already refreshed is never deleted.
+ *  2. Do that re-read and unlink inside `path.break`, itself taken with the same
+ *     atomic 'wx' create, so step 1 cannot be raced by a second contender.
+ *
+ * The final create deliberately stays OUTSIDE this section: it is already atomic,
+ * so whichever contenders reach it, exactly one wins. All this has to guarantee
+ * is that nobody deletes a lock somebody else is holding.
+ */
+async function breakStaleLock(path: string, staleMs: number, now: () => number): Promise<void> {
+  const breakPath = `${path}.break`;
+
+  type BreakHandle = { writeFile(data: string): Promise<void>; close(): Promise<void> };
+  const openBreak = async (): Promise<BreakHandle | null> => {
+    try {
+      return await fs.open(breakPath, 'wx');
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== 'EEXIST') return null;
+      // Either another contender is mid-break - in which case backing off is the
+      // correct outcome, it will have broken the lock by the next tick - or a
+      // process died holding it. Only the second case may be cleared.
+      const breakAge = await lockAgeMs(breakPath, now);
+      if (breakAge === null || breakAge < BREAK_STALE_MS) return null;
+      await fs.unlink(breakPath).catch(() => {});
+      return await fs.open(breakPath, 'wx').catch(() => null);
+    }
+  };
+
+  const fh = await openBreak();
+  if (!fh) return;
+  try {
+    // Stamp it with OUR clock, for the same reason the main lock carries one:
+    // reading age from the filesystem mtime instead would compare an injectable
+    // now() against real wall-clock and yield a meaningless number.
+    await fh.writeFile(String(now()));
+
+    // Re-read UNDER the break lock. `null` means someone already broke it and has
+    // not created theirs yet; anything fresher than staleMs means someone broke it
+    // and won. Neither is ours to delete.
+    const age = await lockAgeMs(path, now);
+    if (age !== null && age >= staleMs) await fs.unlink(path).catch(() => {});
+  } finally {
+    await fh.close().catch(() => {});
+    await fs.unlink(breakPath).catch(() => {});
+  }
 }
 
 /**
@@ -127,10 +207,11 @@ export async function acquireTickLock(
   }
   if (age < staleMs) return { acquired: false, reason: 'held', heldForMs: age };
 
-  // Stale: the holder is presumed dead. Remove and retry exactly once. If another
-  // process breaks it at the same moment, the atomic create still picks one
-  // winner - the loser simply skips this tick, which is the correct outcome.
-  await fs.unlink(path).catch(() => {});
+  // Stale: the holder is presumed dead. Break it - guarded, so a lock somebody
+  // else has already taken is never deleted - then retry exactly once. If several
+  // processes break at the same moment, the atomic create still picks one winner;
+  // the losers simply skip this tick, which is the correct outcome.
+  await breakStaleLock(path, staleMs, now);
   return (await attempt()) ?? { acquired: false, reason: 'held', heldForMs: age };
 }
 

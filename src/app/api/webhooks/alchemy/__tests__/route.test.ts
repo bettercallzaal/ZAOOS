@@ -1,6 +1,6 @@
 // @vitest-environment node
 import crypto from 'crypto';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // SIGNING_KEYS is evaluated at module load — must set env before import
@@ -12,19 +12,30 @@ vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-const mockMaybeSingle = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null }));
+const mockMaybeSingle = vi.hoisted(() => vi.fn());
 const mockIlike = vi.hoisted(() => vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle }));
 const mockSelect = vi.hoisted(() => vi.fn().mockReturnValue({ ilike: mockIlike }));
-const mockUpsert = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }));
+// upsert(...).select('id') — the chain the route uses to learn whether the row
+// was actually inserted (first delivery) or ignored as a duplicate (replay).
+const mockUpsertSelect = vi.hoisted(() => vi.fn());
+const mockUpsert = vi.hoisted(() => vi.fn().mockReturnValue({ select: mockUpsertSelect }));
+const mockUpdateEq = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }));
+const mockUpdate = vi.hoisted(() => vi.fn().mockReturnValue({ eq: mockUpdateEq }));
 const mockFrom = vi.hoisted(() =>
   vi.fn().mockImplementation((table: string) => {
     if (table === 'respect_transfers') return { upsert: mockUpsert };
-    return { select: mockSelect };
+    return { select: mockSelect, update: mockUpdate };
   }),
 );
 vi.mock('@/lib/db/supabase', () => ({ supabaseAdmin: { from: mockFrom } }));
 
 import { POST } from '../route';
+
+beforeEach(() => {
+  // Defaults: the transfer row inserts cleanly, and no member/user matches.
+  mockUpsertSelect.mockResolvedValue({ data: [{ id: 'transfer-1' }], error: null });
+  mockMaybeSingle.mockResolvedValue({ data: null });
+});
 
 afterEach(() => vi.clearAllMocks());
 
@@ -59,6 +70,13 @@ const ZOR_ACTIVITY_PAYLOAD = JSON.stringify({
   },
 });
 
+/** respect_members lookup hits first, then the users lookup. */
+function respectMemberFound() {
+  mockMaybeSingle
+    .mockResolvedValueOnce({ data: { id: 'member-1', onchain_og: 0, onchain_zor: 10 } })
+    .mockResolvedValueOnce({ data: null });
+}
+
 describe('POST /api/webhooks/alchemy', () => {
   it('returns 401 when HMAC signature does not match', async () => {
     const req = makeAlchemyRequest(EMPTY_PAYLOAD, 'wrong-signature-deadbeef');
@@ -83,7 +101,7 @@ describe('POST /api/webhooks/alchemy', () => {
     expect(body.ok).toBe(true);
     expect(mockUpsert).toHaveBeenCalledWith(
       expect.objectContaining({ token_type: 'zor_erc1155', tx_hash: '0xtxhash' }),
-      expect.any(Object),
+      expect.objectContaining({ ignoreDuplicates: true }),
     );
   });
 
@@ -95,5 +113,32 @@ describe('POST /api/webhooks/alchemy', () => {
     expect(res.status).toBe(200);
     expect(body.ok).toBe(true);
     expect(body.error).toBeDefined();
+  });
+
+  // Alchemy re-delivers anything it did not get a 2xx for, so the same signed
+  // payload can legitimately arrive twice. The balance must move exactly once.
+  describe('idempotency on re-delivery', () => {
+    it('credits the mint on the first delivery of a transfer', async () => {
+      respectMemberFound();
+      await POST(makeAlchemyRequest(ZOR_ACTIVITY_PAYLOAD));
+      expect(mockUpdate).toHaveBeenCalledWith({ onchain_zor: 15 });
+    });
+
+    it('does NOT credit again when the same transfer is re-delivered', async () => {
+      // Duplicate: ON CONFLICT DO NOTHING inserted nothing, so select returns [].
+      mockUpsertSelect.mockResolvedValue({ data: [], error: null });
+      respectMemberFound();
+      await POST(makeAlchemyRequest(ZOR_ACTIVITY_PAYLOAD));
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('does NOT credit when the transfer row could not be recorded', async () => {
+      // No ledger row means the next delivery would look like the first one, so
+      // crediting here would double-count on the retry.
+      mockUpsertSelect.mockResolvedValue({ data: null, error: { message: 'db down' } });
+      respectMemberFound();
+      await POST(makeAlchemyRequest(ZOR_ACTIVITY_PAYLOAD));
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
   });
 });

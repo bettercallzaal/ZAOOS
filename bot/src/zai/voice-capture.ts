@@ -10,15 +10,27 @@
 import { VoiceConnection, AudioReceiveStream, EndBehaviorType } from '@discordjs/voice';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { opus } from 'prism-media';
 import type { CaptureSession, TranscriptLine } from './types';
 import { transcribeAudio } from '../zoe/transcribe';
+import { encodeWav } from './wav';
 
 const SILENCE_THRESHOLD_MS = 2000; // 2s silence to end a chunk
+
+/** Discord always sends 48kHz stereo Opus, and the decoder emits 16-bit signed
+ *  little-endian PCM at the same rate. 960 samples is one 20ms frame, which is
+ *  the frame size Discord encodes at. */
+const SAMPLE_RATE = 48000;
+const CHANNELS = 2;
+const FRAME_SIZE = 960;
 
 interface AudioChunkBuffer {
   speaker: string;
   userId: string;
-  pcmData: number[];
+  /** Decoded PCM, kept as the chunks the decoder emitted. Concatenating once at
+   *  the end beats accumulating a `number[]` of individual bytes, which cost
+   *  ~8x the memory and pushed with a spread that can overflow the call stack. */
+  pcmChunks: Buffer[];
   startTime: Date;
   lastAudioTime: Date;
 }
@@ -42,53 +54,92 @@ export function startVoiceCapture(
   const handleSpeakingStart = (userId: string) => {
     if (buffers.has(userId)) return;
 
-    const audioStream: AudioReceiveStream = connection.receiver.subscribe(userId, {
+    const opusStream: AudioReceiveStream = connection.receiver.subscribe(userId, {
       end: { behavior: EndBehaviorType.AfterSilence, duration: SILENCE_THRESHOLD_MS },
+    });
+
+    // receiver.subscribe() yields OPUS packets, not PCM. Nothing here ever
+    // decoded them - the old comment said "decoder happens at transcription
+    // boundary" and no decoder was ever written - so a compressed bitstream was
+    // handed to Whisper inside a WAV header. prism-media and @discordjs/opus are
+    // already dependencies; they were declared and never imported.
+    const decoder = new opus.Decoder({
+      frameSize: FRAME_SIZE,
+      channels: CHANNELS,
+      rate: SAMPLE_RATE,
+    });
+
+    // Forwarded by hand rather than with .pipe(). prism-media's OpusStream does
+    // not satisfy `NodeJS.WritableStream` under @types/node 22 - the same
+    // class-vs-interface EventEmitter split documented on the cleanup function
+    // below - so `.pipe(decoder)` is a type error. write/end are declared on
+    // Transform itself and typecheck cleanly. Opus frames are 20ms and one
+    // speaker at a time, so there is no backpressure worth the cast.
+    opusStream.on('data', (packet: Buffer) => {
+      decoder.write(packet);
+    });
+    opusStream.on('end', () => {
+      decoder.end();
     });
 
     const buffer: AudioChunkBuffer = {
       speaker: `user_${userId}`,
       userId,
-      pcmData: [],
+      pcmChunks: [],
       startTime: new Date(),
       lastAudioTime: new Date(),
     };
 
     buffers.set(userId, buffer);
 
-    audioStream.on('data', (packet: Buffer) => {
-      // Collect raw bytes; decoder happens at transcription boundary
-      buffer.pcmData.push(...Array.from(packet));
+    // A stream 'error' with no listener is an UNCAUGHT EXCEPTION in Node, which
+    // takes the whole ZAI process down. One malformed packet should cost one
+    // speaker's chunk, not the bot.
+    const dropSpeaker = (err: unknown) => {
+      console.error(`Voice capture stream failed for ${buffer.speaker}:`, err);
+      buffers.delete(userId);
+    };
+    opusStream.on('error', dropSpeaker);
+    decoder.on('error', dropSpeaker);
+
+    decoder.on('data', (chunk: Buffer) => {
+      buffer.pcmChunks.push(chunk);
       buffer.lastAudioTime = new Date();
     });
 
-    audioStream.on('end', async () => {
-      // Audio ended - transcribe if we have data
-      if (buffer.pcmData.length > 0) {
-        const wavBytes = constructWav(buffer.pcmData);
-        try {
-          const text = await transcribeAudio(new Uint8Array(wavBytes), `${buffer.speaker}.wav`);
-          const line: TranscriptLine = {
-            timestamp: new Date(),
-            speaker: buffer.speaker,
-            userId: buffer.userId,
-            text,
-          };
-          session.transcript.push(line);
-
-          // Persist transcript chunk
-          const transcriptPath = join(sessionDir, `transcript-${Date.now()}.jsonl`);
-          await fs.appendFile(transcriptPath, `${JSON.stringify(line)}\n`).catch(() => {
-            /* ignore file write errors */
-          });
-
-          // Notify caller
-          await onTranscribed(line);
-        } catch (err) {
-          console.error(`Transcription failed for ${buffer.speaker}:`, err);
-        }
-      }
+    decoder.on('end', async () => {
+      const pcm = Buffer.concat(buffer.pcmChunks);
+      // Release the slot BEFORE the await. Transcription takes seconds, and
+      // handleSpeakingStart bails when the map still holds this user - so the
+      // old ordering silently dropped whatever they said while the previous
+      // chunk was still in flight.
       buffers.delete(userId);
+      if (pcm.length === 0) return;
+
+      try {
+        const text = await transcribeAudio(
+          encodeWav(pcm, { sampleRate: SAMPLE_RATE, channels: CHANNELS }),
+          `${buffer.speaker}.wav`,
+        );
+        const line: TranscriptLine = {
+          timestamp: new Date(),
+          speaker: buffer.speaker,
+          userId: buffer.userId,
+          text,
+        };
+        session.transcript.push(line);
+
+        // Persist transcript chunk
+        const transcriptPath = join(sessionDir, `transcript-${Date.now()}.jsonl`);
+        await fs.appendFile(transcriptPath, `${JSON.stringify(line)}\n`).catch(() => {
+          /* ignore file write errors */
+        });
+
+        // Notify caller
+        await onTranscribed(line);
+      } catch (err) {
+        console.error(`Transcription failed for ${buffer.speaker}:`, err);
+      }
     });
   };
 
@@ -131,48 +182,6 @@ export function startVoiceCapture(
  */
 interface ListenerRemover {
   removeListener(event: string, listener: (...args: never[]) => void): unknown;
-}
-
-/**
- * Simple WAV header constructor. Input is raw PCM samples (16-bit signed, 48kHz).
- * Returns full WAV file bytes.
- */
-function constructWav(pcmData: number[]): Uint8Array {
-  const sampleRate = 48000;
-  const channels = 1;
-  const bytesPerSample = 2;
-  const dataLength = pcmData.length * bytesPerSample;
-  const fileLength = 36 + dataLength;
-
-  const buffer = new ArrayBuffer(44 + dataLength);
-  const view = new DataView(buffer);
-
-  // RIFF header
-  view.setUint32(0, 0x46464952, true); // 'RIFF'
-  view.setUint32(4, fileLength, true);
-  view.setUint32(8, 0x45564157, true); // 'WAVE'
-
-  // fmt sub-chunk
-  view.setUint32(12, 0x20746d66, true); // 'fmt '
-  view.setUint32(16, 16, true); // sub-chunk1 size
-  view.setUint16(20, 1, true); // audio format (1 = PCM)
-  view.setUint16(22, channels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * channels * bytesPerSample, true); // byte rate
-  view.setUint16(32, channels * bytesPerSample, true); // block align
-  view.setUint16(34, 16, true); // bits per sample
-
-  // data sub-chunk
-  view.setUint32(36, 0x61746164, true); // 'data'
-  view.setUint32(40, dataLength, true);
-
-  // Copy PCM data (as 16-bit signed integers)
-  const pcmView = new Int16Array(buffer, 44);
-  for (let i = 0; i < pcmData.length; i++) {
-    pcmView[i] = pcmData[i];
-  }
-
-  return new Uint8Array(buffer);
 }
 
 /**

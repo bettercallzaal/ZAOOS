@@ -33,7 +33,22 @@ export interface ExecContext {
 export interface ExecResult {
   executed: number;
   receipt: string;
+  /**
+   * Set when this tick deliberately did nothing and the comment must be tried
+   * again later. The caller must NOT fall through to the reply path on a
+   * skip: answering conversationally marks the comment as handled, which would
+   * throw the command away permanently.
+   */
   skipped?: string;
+}
+
+/**
+ * The `legacy_source` stamped on every task created from a comment.
+ *
+ * This doubles as the execution marker - see `alreadyExecuted`.
+ */
+export function commandSource(commentId: string): string {
+  return `zoe-command:${commentId}`;
 }
 
 function cfg(): { root: string; headers: Record<string, string> } | null {
@@ -63,6 +78,47 @@ async function resolveOwner(slug: string, fetchImpl: typeof fetch): Promise<stri
   }
 }
 
+/**
+ * Has this comment already been executed on an earlier tick?
+ *
+ * WHY THIS IS NEEDED. Execution runs BEFORE the caller's freshness re-check and
+ * before the receipt is posted, and the receipt is the only thing that marks a
+ * comment as handled. So any failure between the two - `postReply` timing out
+ * on its 8s AbortSignal, the row being PATCHed by the app in between, the
+ * process restarting - leaves the board already mutated and the comment still
+ * looking unanswered. The hourly cron then re-runs the whole comment.
+ *
+ * `close_task` and `assign_task` are idempotent under a replay (setting status
+ * to 'done' twice, or the same owner_id twice, changes nothing the second
+ * time). `create_task` is not: it INSERTs, so one transient failure produced a
+ * duplicate task every hour, forever, with no unique constraint to stop it.
+ *
+ * The marker is the `legacy_source` already written on every created task, so
+ * this needs no schema change - just a read of what the previous run left
+ * behind.
+ *
+ * Returns 'unknown' when the lookup itself fails, which the caller treats as
+ * "skip this tick and retry", never as "safe to run again".
+ */
+async function alreadyExecuted(
+  commentId: string,
+  fetchImpl: typeof fetch,
+): Promise<boolean | 'unknown'> {
+  const c = cfg();
+  if (!c) return 'unknown';
+  try {
+    const r = await fetchImpl(
+      `${c.root}/rest/v1/tasks?select=id&legacy_source=eq.${encodeURIComponent(commandSource(commentId))}&limit=1`,
+      { headers: c.headers },
+    );
+    if (!r.ok) return 'unknown';
+    const rows = (await r.json()) as unknown;
+    return Array.isArray(rows) && rows.length > 0;
+  } catch {
+    return 'unknown';
+  }
+}
+
 async function applyOne(
   cmd: BoardCommand,
   ctx: ExecContext,
@@ -84,7 +140,7 @@ async function applyOne(
       status: 'todo',
       owner_id: ownerId,
       notes: `${why}\n\nSource: @zoe command in a comment on task ${ctx.taskId}.`,
-      legacy_source: `zoe-command:${ctx.commentId}`,
+      legacy_source: commandSource(ctx.commentId),
       project: 'zaodevz',
     };
     try {
@@ -159,6 +215,29 @@ export async function executeBoardComment(
 
   const { commands, rejected, dropped } = parseCommands(raw);
   if (commands.length === 0 && rejected.length === 0) return null;
+
+  // Replay guard, and only where a replay actually costs something: create is
+  // the sole INSERT, so it is the sole action a re-run can duplicate. Checked
+  // before ANY action runs, so a replayed comment re-applies nothing at all.
+  if (commands.some((cmd) => cmd.action === 'create_task')) {
+    const done = await alreadyExecuted(ctx.commentId, fetchImpl);
+    if (done === 'unknown') {
+      // Fail closed. The comment stays unanswered, so the next tick retries it -
+      // whereas running now could duplicate, and falling through to a chat reply
+      // would mark it handled and lose the command outright.
+      return {
+        executed: 0,
+        receipt: '',
+        skipped: 'could not confirm whether this comment already ran; will retry',
+      };
+    }
+    if (done) {
+      return {
+        executed: 0,
+        receipt: 'already applied on an earlier run - nothing re-run.',
+      };
+    }
+  }
 
   featureRan('board-commands', `task ${ctx.taskId}`);
 

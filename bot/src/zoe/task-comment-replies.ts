@@ -242,6 +242,7 @@ export async function runTaskCommentReplies(
     // for the board to change. Only an authorized commander gets here; a
     // teammate tagging @zoe still falls straight through to the reply path.
     let ans: string | null = null;
+    let skip = false;
     try {
       const done = await executeBoardComment(
         {
@@ -269,11 +270,22 @@ export async function runTaskCommentReplies(
       );
       // The receipt IS the reply - so a board change is always visible in the
       // thread that caused it, never a silent mutation.
-      if (done) ans = done.receipt;
+      //
+      // A SKIP is not a reply. The executor sets it when it could not tell
+      // whether this comment already ran; answering conversationally would mark
+      // the comment handled and discard the command, so leave the comment
+      // untouched and let the next tick retry it.
+      if (done?.skipped) {
+        skip = true;
+        console.warn(`[zoe/board-commands] task ${task.id} skipped this tick: ${done.skipped}`);
+      } else if (done) {
+        ans = done.receipt;
+      }
     } catch (err) {
       console.warn('[zoe/board-commands] execution failed (falling back to a reply):', (err as Error)?.message);
     }
 
+    if (skip) continue;
     if (!ans) ans = await answerMention(task, comment, call);
     if (!ans) continue;
     // Re-fetch just before writing to shrink the window where a concurrent app

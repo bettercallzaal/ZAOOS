@@ -178,6 +178,11 @@ def remote_state(expectations=None):
             f'V=$(grep -m1 "^{flag}=" bot/.env 2>/dev/null | cut -d= -f2-); '
             f'if [ -z "$V" ]; then echo "CHK={flag}:unset"; '
             f'elif [ "$V" = "{want}" ]; then echo "CHK={flag}:ok"; '
+            # false/0/off/no is a deliberate disable, not a typo. Reporting it as
+            # WRONG VALUE cries wolf on the normal way to turn something off -
+            # which is how a column stops being read (noisy-signal-guard).
+            f'elif [ "$V" = "false" ] || [ "$V" = "0" ] || [ "$V" = "off" ] || [ "$V" = "no" ]; '
+            f'then echo "CHK={flag}:EXPLICIT_OFF"; '
             f'else echo "CHK={flag}:MISMATCH"; fi; '
         )
     script = (
@@ -225,6 +230,11 @@ def main():
             verdict = remote.get('checks', {}).get(flag)
             if verdict == 'ok':
                 live = 'ON'
+            elif verdict == 'EXPLICIT_OFF':
+                # Set to false/0/off on purpose. Not a mistake - someone turned
+                # it off deliberately, which is different from a typo and must
+                # not be reported as one.
+                live = 'off (set)'
             elif verdict == 'MISMATCH':
                 # Set, but to a value the code does not accept. This reads as
                 # done and does nothing - the worst of both.

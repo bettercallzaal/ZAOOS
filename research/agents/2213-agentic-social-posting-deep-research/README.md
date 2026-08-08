@@ -4,6 +4,9 @@ type: guide
 status: research-complete
 last-validated: 2026-08-06
 related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
+status: research-in-progress
+last-validated: 2026-08-06
+related-docs: 925, 997, 2106, 891, 892, 910, 1607, 1610, 761, 762, 484, 602, 659, 765, 2174
 original-query: "Deep research on how to have agentic tooling post on socials better - looped for an hour+, very important. Grounded in tonight's finding that the R3 winner cast sat drafted-but-unposted in a markdown file for weeks despite being ready."
 tier: DEEP
 ---
@@ -24,6 +27,12 @@ API terms), or explicitly cross-checked against and reconciled with prior
 internal research - not re-derived from assumption.
 
 ## Key Decisions
+**Status: DRAFT, IN PROGRESS.** This is being built iteratively over a looped
+research session (started 2026-08-06). Sections marked `[VERIFY NEXT]` are
+findings from internal docs that haven't been independently re-checked yet
+this pass.
+
+## Key Decisions
 
 | # | Recommendation | Why |
 |---|---|---|
@@ -38,6 +47,8 @@ internal research - not re-derived from assumption.
 **Doc 2174 (design spec, not built, 2026-08-01)** covers the *opposite* direction from this doc and is worth reading alongside it, not instead of it. This doc (2213) is about a Claude Code session's finished OUTPUT (a cast draft) getting OUT to a posting pipeline. Doc 2174 is about Zaal's typed FEEDBACK getting IN to a running Claude Code session from Discord/Telegram/the clipboard page - it documents that the inbound path already partly works today (a `UserPromptSubmit` hook auto-runs `zao-relay inbox <lane>` and injects unread messages at the top of each turn), and specs extending that to more surfaces.
 
 The two docs share infrastructure (the same relay hub, the same "thin adapter" extension pattern) and doc 2174's phasing approach - "adapter is thin... two forward rules," ship the lowest-effort surface first, prove the loop end-to-end - is exactly the shape this doc's Key Decision 3 recommendation should follow too: extend the existing relay-bridge with one new message type (a tagged cast-draft) rather than building new infrastructure. Citing this as precedent, not re-deriving it.
+| 3 | `zao-relay` (`~/bin/zao-relay send zoe "<message>"`) already exists as a terminal-to-terminal message bus and was used successfully earlier tonight to reach ZOE's inbox. **`[VERIFY NEXT]`** whether a relayed message from a Claude Code session can actually enter the caster pipeline's Telegram-approval flow, or whether that wiring doesn't exist yet - this is the single highest-leverage thing to confirm before recommending it as *the* bridge. | If relay→caster already works, the fix is a documented workflow change, not new code. If it doesn't, it's a small, well-scoped build (the caster pipeline already has every other piece). |
+| 4 | External research independently confirms ZOE's existing pattern is the right one, not something to redesign. Industry framing in 2026 calls this "autonomous with guardrails" / "AI proposes, human approves" - agent drafts, selects context, queues for review; fully autonomous posting "does not exist in production today" as an industry norm, matching ZAO's own stated design. | Cross-checked against fresh external sources (see Sources), not just internal docs - the point was to verify ZAO's approach isn't stale, not to import new frameworks. |
 
 ## What ZOL/ZOE can actually do today (2026-08-06, verified against live code)
 
@@ -75,6 +86,9 @@ External confirmation (fresh search this session): Neynar's own docs describe ma
 - **Chosen path:** Firefly cross-posting (Farcaster → X simultaneously), free, no API key custody. This is explicitly the "don't pay to automate a platform you're stepping back from" call from prior research - only wire a paid X API path if X engagement actually earns back the cost (see corrected pricing below - now stronger evidence for staying on Firefly than prior research had).
 - **Gap Firefly doesn't cover:** inbound X-native replies/mentions - those need the paid API path if ZOL is ever expected to respond on X directly, not just cross-post outbound.
 - **X API pricing has changed since prior research (verified this pass, see full detail below):** the old $200/mo flat Basic tier was closed to new signups in Feb 2026. Current model is pay-per-use: $0.015/post, $0.20/post if it contains a link.
+- **Chosen path:** Firefly cross-posting (Farcaster → X simultaneously), free, no API key custody. This is explicitly the "don't pay to automate a platform you're stepping back from" call from prior research - only wire a paid X API path if X engagement actually earns back a ~$200/mo Basic tier cost.
+- **Gap Firefly doesn't cover:** inbound X-native replies/mentions - those need the paid API path if ZOL is ever expected to respond on X directly, not just cross-post outbound.
+- **X API pricing has changed since prior research (verified this pass, see full detail below):** the old $200/mo flat Basic tier was closed to new signups in Feb 2026. Current model is pay-per-use: $0.015/post, $0.20/post if it contains a link.
 
 External research this session on X specifically: 2026 guidance is consistent with ZAO's approach - autonomous *posting* is explicitly permitted by X's own policy, autonomous *engagement* (auto-like, auto-follow, auto-reply) is the thing that gets accounts flagged. Behavioral fingerprinting is real (velocity anomalies, exact-interval posting without jitter) - worth folding into any future ZOL→X wiring as a concrete implementation detail, not just a cost decision.
 
@@ -95,6 +109,7 @@ Checked how Postiz actually authenticates to Farcaster: it generates its own new
 Compare that to what's needed to extend the caster pipeline: `runCasterPipeline()` and `draftCast()` already exist, already have Klearu safety-checking wired in, already post to the exact signer/hub ZOL uses today. The only change needed is letting a caller skip the `draftCast()` LLM call and hand in already-final text - a small, additive change to an interface that already has every other stage built, verified, and running in production. It reuses Zaal's existing daily review habit (Telegram buttons) instead of adding a second one.
 
 **Where Postiz (or an equivalent MCP posting server) still earns its place:** platforms ZAO has NOT built custom write infrastructure for at all - Bluesky and general Telegram beyond the ZABAL-specific spec (doc 1610) are the concrete candidates. For those, standing up Postiz once and getting 30+ platforms "for free" beats writing a bespoke signer/write client per platform the way `farcaster/write.ts` was hand-built for Farcaster specifically. This is a "yes, and" not an "either/or" - extend caster for the platform ZAO already has deep infrastructure for (Farcaster), consider Postiz for the platforms it doesn't (Bluesky, generalized Telegram).
+**`[VERIFY NEXT]`**: whether it's lower-effort to (a) build a thin MCP wrapper around ZOE's *existing* caster pipeline so Claude Code sessions can call into the same Telegram-approval flow ZOE already has, or (b) stand up a general-purpose approval-gated MCP posting server (Postiz + an approval-gate MCP in front of it) independent of ZOE. Option (a) reuses more; option (b) is more platform-agnostic (covers Bluesky/Telegram/etc. for free via Postiz's 33-platform coverage instead of building each one by hand, per the Telegram-autopost spec that's sitting ready-but-unbuilt in prior research).
 
 ## Other platforms
 
@@ -154,6 +169,12 @@ zao-relay send zoe "<finished cast text>" --kind cast_draft   # illustrative - z
 - **Neynar credit costs (RE-VERIFIED, live from dev.neynar.com/pricing, 2026-08-06):** exact credit table pulled directly. `POST /v2/farcaster/cast` (posting) = **150 credits**. `POST /v1/submitMessage` (raw hub write, what ZOL's self-custodied path actually uses) = **75 credits**. Managed-signer creation = 5-20 credits one-time, with an optional "Sponsored Signer" add-on at 4,000-40,000 credits. **Ongoing API-managed signer cost: 20,000 credits/month per active signer** - a real recurring cost if ZOL ever moved to a Neynar-hosted signer instead of its current self-custodied one. **The $-per-credit conversion is still genuinely behind a login wall** (confirmed by navigating dev.neynar.com directly this session, not just citing the old flag) - this opacity is real and current, not stale. Bottom line: ZOL's current self-custodied-signer + free-hub path avoids this cost structure entirely, which is one more concrete reason it's the right call, not just the zero-cost one.
 - **X API pricing (RESOLVED - this was stale, now corrected):** the "~$200/mo Basic tier" figure in prior research is **no longer accurate**. Confirmed via fresh search: X closed the flat $200/mo Basic tier to new signups in February 2026 and force-migrated remaining subscribers to pay-per-use after June 1, 2026. Current model: **$0.015 per post, or $0.20 per post if it contains a link.** This materially changes the X/Firefly-vs-API tradeoff in this doc's "X/Twitter posting" section above - a link-containing post (which is most ZAO announcement casts) costs 13x more per-post than a plain-text one under the new model. Reinforces the existing recommendation (Firefly free cross-post over a paid API integration) even more strongly than prior research knew.
 - EIP-8004 on-chain agent identity registration for ZOL was explicitly evaluated and skipped for v1 (zero Farcaster agents were found registered on the standard as of the last check) - Neynar's own reputation score is being used as the practical trust signal instead. Not re-verified this pass; low urgency given the skip decision was already deliberate.
+## Contradictions and staleness carried from prior research (flagging, not yet independently re-verified)
+## Contradictions and staleness - independently re-verified this pass, not just repeated
+
+- **Neynar credit costs (RE-VERIFIED, live from dev.neynar.com/pricing, 2026-08-06):** exact credit table pulled directly. `POST /v2/farcaster/cast` (posting) = **150 credits**. `POST /v1/submitMessage` (raw hub write, what ZOL's self-custodied path actually uses) = **75 credits**. Managed-signer creation = 5-20 credits one-time, with an optional "Sponsored Signer" add-on at 4,000-40,000 credits. **Ongoing API-managed signer cost: 20,000 credits/month per active signer** - a real recurring cost if ZOL ever moved to a Neynar-hosted signer instead of its current self-custodied one. **The $-per-credit conversion is still genuinely behind a login wall** (confirmed by navigating dev.neynar.com directly this session, not just citing the old flag) - this opacity is real and current, not stale. Bottom line: ZOL's current self-custodied-signer + free-hub path avoids this cost structure entirely, which is one more concrete reason it's the right call, not just the zero-cost one.
+- **X API pricing (RESOLVED - this was stale, now corrected):** the "~$200/mo Basic tier" figure in prior research is **no longer accurate**. Confirmed via fresh search: X closed the flat $200/mo Basic tier to new signups in February 2026 and force-migrated remaining subscribers to pay-per-use after June 1, 2026. Current model: **$0.015 per post, or $0.20 per post if it contains a link.** This materially changes the X/Firefly-vs-API tradeoff in this doc's "X/Twitter posting" section above - a link-containing post (which is most ZAO announcement casts) costs 13x more per-post than a plain-text one under the new model. Reinforces the existing recommendation (Firefly free cross-post over a paid API integration) even more strongly than prior research knew.
+- EIP-8004 on-chain agent identity registration for ZOL was explicitly evaluated and skipped for v1 (zero Farcaster agents were found registered on the standard as of the last check) - Neynar's own reputation score is being used as the practical trust signal instead. Not re-verified this pass; low urgency given the skip decision was already deliberate.
 
 ## Sources
 
@@ -172,6 +193,16 @@ External (fetched live this session, 2026-08-06):
 - [The MCP Security Survival Guide](https://towardsdatascience.com/the-mcp-security-survival-guide-best-practices-pitfalls-and-real-world-lessons/)
 
 ## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Implement Change 1 (`preDrafted` field on `CasterTrigger`, skip `draftCast()` when set) in `bot/src/zoe/caster/index.ts` | Zaal | PR (bot) | 2026-08-13 |
+| Implement Change 2 (`kind: 'cast_draft'` tag on `RelayMsg`, route to `runCasterPipeline` in `pushInboundRelays`) in `bot/src/zoe/relay-bridge.ts` | Zaal | PR (bot) | 2026-08-13 |
+| Add `--kind` flag (or JSON-body convention) to `zao-relay send` so a Claude Code session can tag a message as a cast draft | Zaal | PR (`~/bin/zao-relay`) | 2026-08-13 |
+| Once shipped, retire the "draft to markdown file, hope someone notices" pattern for zpoidh-style bounty casts - route future ready-to-post drafts through the relay instead | Zaal + future Claude Code sessions | Workflow change | after the 3 PRs above land |
+| Confirm ZOE's `CASTER_ENABLED` boot-path flag status (doc 761/891 flagged Phase 2 code exists but wasn't confirmed live in boot path) before relying on this end-to-end | Zaal | Verification | 2026-08-08 |
+| If/when a second platform (Bluesky or general Telegram) becomes a real priority, evaluate self-hosting Postiz for those specifically - not Farcaster, which already has a working path | Zaal | Decision (future, not urgent) | no date - revisit when the need arises |
+_Will be finalized once research is complete - placeholder pass:_
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|

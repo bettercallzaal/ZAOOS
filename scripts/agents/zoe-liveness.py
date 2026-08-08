@@ -91,7 +91,7 @@ def read(p):
 
 def flag_sites():
     """Which file(s) read each behaviour flag, and what the default is."""
-    out = {f: {'files': [], 'default_on': None} for f in BEHAVIOUR_FLAGS}
+    out = {f: {'files': [], 'default_on': None, 'expects': None} for f in BEHAVIOUR_FLAGS}
     for p in ts_files():
         if '__tests__' in p:
             continue
@@ -109,6 +109,33 @@ def flag_sites():
                 out[flag]['default_on'] = True
             elif out[flag]['default_on'] is None:
                 out[flag]['default_on'] = False
+
+            # WHICH literal does the code compare against? This matters more than
+            # it looks. On 2026-08-07 five flags were switched on by writing
+            # `true` to all of them - but three compare `=== '1'`, so guardrails,
+            # memory-git and mission-control sat there LOOKING enabled and doing
+            # nothing. A flag set to the wrong value is worse than an unset one,
+            # because it reads as done. The first version of this script reported
+            # them all as `set`, which is the same failure it exists to catch,
+            # one level down.
+            m = re.search(rf"process\.env\.{flag}\s*===\s*'([^']*)'", src)
+            if m and not out[flag]['expects']:
+                out[flag]['expects'] = m.group(1)
+            m2 = re.search(rf"process\.env\.{flag}\s*!==\s*'([^']*)'", src)
+            if m2 and not out[flag]['expects']:
+                lit = m2.group(1)
+                # `!==` cuts BOTH ways and the direction is what matters.
+                #   if (env !== '1') return;      -> the flag REQUIRES '1'
+                #   if (env !== 'false') enable;  -> on unless explicitly disabled
+                # The early-return guard is by far the commoner shape here, so a
+                # truthy literal means "this exact value is required" - reading it
+                # as an exclusion is how ZOE_MISSION_CONTROL got rendered as
+                # needing anything-but-1, which is the opposite of the truth.
+                if lit in ('false', '0', 'off', 'no'):
+                    out[flag]['expects'] = f'!{lit}'
+                    out[flag]['default_on'] = True
+                else:
+                    out[flag]['expects'] = lit
     return out
 
 
@@ -134,14 +161,32 @@ def git(*args, cwd=ROOT):
         return ''
 
 
-def remote_state():
-    """Ask the live host what it is actually running. NAMES ONLY - never values."""
+def remote_state(expectations=None):
+    """Ask the live host what it is actually running.
+
+    Flag VALUES never leave the host. The expected literal is sent TO the box, the
+    comparison happens THERE, and only a verdict comes back (ok / MISMATCH). That
+    keeps the original security property - this script never transmits, prints or
+    stores an env value - while still answering the question that actually
+    matters, which is not "is it set" but "is it set to something that works".
+    """
+    checks = ''
+    for flag, want in (expectations or {}).items():
+        if not want or want.startswith('!'):
+            continue  # inverse-match flags are on unless explicitly disabled
+        checks += (
+            f'V=$(grep -m1 "^{flag}=" bot/.env 2>/dev/null | cut -d= -f2-); '
+            f'if [ -z "$V" ]; then echo "CHK={flag}:unset"; '
+            f'elif [ "$V" = "{want}" ]; then echo "CHK={flag}:ok"; '
+            f'else echo "CHK={flag}:MISMATCH"; fi; '
+        )
     script = (
         'cd ~/zao-bot-live 2>/dev/null || exit 1; '
         'echo "COMMIT=$(git rev-parse --short HEAD)"; '
         'git fetch origin main -q 2>/dev/null; '
         'echo "BEHIND=$(git rev-list --count HEAD..origin/main)"; '
         'echo "ACTIVE=$(systemctl --user is-active zoe-bot 2>/dev/null)"; '
+        + checks +
         'cut -d= -f1 bot/.env 2>/dev/null | grep -E "^ZOE_|^ZAO_|^HEART_" | sort -u | sed "s/^/FLAG=/"'
     )
     try:
@@ -150,9 +195,12 @@ def remote_state():
             text=True, stderr=subprocess.DEVNULL, timeout=60)
     except Exception as e:
         return {'error': str(e)[:80]}
-    st = {'flags': set()}
+    st = {'flags': set(), 'checks': {}}
     for line in out.splitlines():
-        if line.startswith('FLAG='):
+        if line.startswith('CHK='):
+            name, _, verdict = line[4:].partition(':')
+            st['checks'][name] = verdict.strip()
+        elif line.startswith('FLAG='):
             st['flags'].add(line[5:].strip())
         elif '=' in line:
             k, v = line.split('=', 1)
@@ -167,19 +215,30 @@ def main():
     args = ap.parse_args()
 
     sites = flag_sites()
-    remote = remote_state() if args.remote else None
+    remote = remote_state({f: sites[f]['expects'] for f in BEHAVIOUR_FLAGS}) if args.remote else None
 
     rows = []
     for flag, what in sorted(BEHAVIOUR_FLAGS.items()):
         info = sites[flag]
         built = len(info['files']) > 0
         if remote and 'error' not in remote:
-            live = 'set' if flag in remote['flags'] else ('default-on' if info['default_on'] else 'OFF')
+            verdict = remote.get('checks', {}).get(flag)
+            if verdict == 'ok':
+                live = 'ON'
+            elif verdict == 'MISMATCH':
+                # Set, but to a value the code does not accept. This reads as
+                # done and does nothing - the worst of both.
+                live = 'WRONG VALUE'
+            elif flag in remote['flags']:
+                live = 'set'
+            else:
+                live = 'default-on' if info['default_on'] else 'OFF'
         else:
             live = '?'
         rows.append({
             'flag': flag, 'what': what, 'built': built,
             'default_on': bool(info['default_on']),
+            'expects': info['expects'],
             'files': info['files'], 'live': live,
         })
 
@@ -201,15 +260,16 @@ def main():
                   f'bot={remote.get("active","?")}')
     print()
 
-    print(f'{"FLAG":<30} {"DEFAULT":<9} {"LIVE":<11} WHAT')
-    print('-' * 92)
+    print(f'{"FLAG":<30} {"EXPECTS":<9} {"LIVE":<12} WHAT')
+    print('-' * 96)
+    wrong = 0
     for r in rows:
-        if not r['built']:
-            state = 'NOT IN CODE'
-        else:
-            state = r['live']
-        default = 'on' if r['default_on'] else 'off'
-        print(f'{r["flag"]:<30} {default:<9} {state:<11} {r["what"]}')
+        state = r['live'] if r['built'] else 'NOT IN CODE'
+        if state == 'WRONG VALUE':
+            wrong += 1
+        print(f'{r["flag"]:<30} {(r["expects"] or "-"):<9} {state:<12} {r["what"]}')
+    if wrong:
+        print(f'\n  {wrong} flag(s) are SET TO A VALUE THE CODE REJECTS - they look on and are off.')
 
     # The four-state check for the modules where I actually got it wrong.
     print('\nWIRING - does anything outside the module and its tests import it?')

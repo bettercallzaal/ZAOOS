@@ -152,14 +152,20 @@ describe('isSilenceAlertDue - the asker learns in 8h, not 24', () => {
 });
 
 describe('the messages', () => {
+  // Posted in ZAO Devz, addressed to them - not a DM.
+  it('addresses them by handle so it reads as a group message', () => {
+    const out = renderAsk(['Upload COC Concertz 5 and 6'], IMAN_DEFAULT);
+    expect(out.startsWith('@iman')).toBe(true);
+  });
+
   it('names the open work so a reply can be a tap', () => {
     const out = renderAsk(['Upload COC Concertz 5 and 6', 'Review ZAO whitepapers']);
-    expect(out).toContain('What are you on');
+    expect(out).toContain('what are you on');
     expect(out).toContain('Upload COC Concertz');
   });
 
   it('works with nothing open', () => {
-    expect(renderAsk([])).toContain('What are you on');
+    expect(renderAsk([])).toContain('what are you on');
   });
 
   it('always offers buttons, including a way to say blocked', () => {

@@ -26,6 +26,22 @@
  * unresponsiveness is a timezone artifact, not a work-ethic one - so this module
  * schedules in the TEAMMATE's local hours, never the asker's.
  *
+ * WHERE IT POSTS: THE GROUP, NOT A DM
+ * ----------------------------------
+ * Zaal, 2026-08-08: "I don't want Zoe to directly dm him I want it to be in the
+ * zao devz group."
+ *
+ * That is the better shape for three reasons. The check-in becomes a normal
+ * team ritual rather than a manager tapping one person on the shoulder, which
+ * is a very different thing to receive three times a day. Zaal sees the answer
+ * where it is posted instead of needing it relayed to him. And the rest of the
+ * team gets ambient awareness of what is moving, which a DM would keep private
+ * to two people.
+ *
+ * The SILENCE alert is the exception and goes to Zaal privately. "No word from
+ * X in 9h" is information a lead needs; announcing it to the group is a public
+ * reprimand, and this module is not built to do that to anyone.
+ *
  * WHAT IT DOES NOT DO
  * ------------------
  * It does not chase, escalate on a ladder, or nag. One question per slot, three
@@ -52,6 +68,11 @@ export interface HeartbeatConfig {
   workEndHour: number;
   /** Hours between asks. */
   everyHours: number;
+  /**
+   * Telegram handle used to address them in the group. The ask is a group
+   * message that mentions them, never a direct message.
+   */
+  mentionHandle: string;
 }
 
 /**
@@ -64,6 +85,7 @@ export const IMAN_DEFAULT: HeartbeatConfig = {
   workStartHour: 10,
   workEndHour: 20,
   everyHours: 4,
+  mentionHandle: '@iman',
 };
 
 /** The teammate's local hour for a given UTC instant. */
@@ -171,14 +193,15 @@ export function isSilenceAlertDue(input: SilenceInput): DueResult {
 }
 
 /**
- * The message.
+ * The group message.
  *
- * Short, because it is answered on a phone mid-task. Names the open work so the
- * reply can be a tap rather than a recall exercise, and never opens with a
- * reprimand - it is a check-in, not an audit.
+ * Addressed to them by handle, posted in ZAO Devz. Short, because it is
+ * answered on a phone mid-task; names the open work so the reply can be a tap
+ * rather than a recall exercise; and never opens with a reprimand - in a group,
+ * tone is the whole difference between a ritual and a summons.
  */
-export function renderAsk(openTitles: string[]): string {
-  const lines = ['What are you on right now?'];
+export function renderAsk(openTitles: string[], cfg: HeartbeatConfig = IMAN_DEFAULT): string {
+  const lines = [`${cfg.mentionHandle} what are you on right now?`];
   if (openTitles.length > 0) {
     lines.push('');
     lines.push('Your open ones:');
@@ -196,6 +219,12 @@ export function askButtons(openTitles: string[]): string[] {
 }
 
 /** What the asker sees. States the local time so silence reads correctly. */
+/**
+ * The silence alert - sent to ZAAL PRIVATELY, never to the group.
+ *
+ * A lead needs to know; a group does not need to watch someone be named for
+ * being quiet. Same information, chosen audience.
+ */
 export function renderSilenceAlert(cfg: HeartbeatConfig, quietHours: number, nowUtcMs: number): string {
   const theirHour = localHour(nowUtcMs, cfg.utcOffsetHours);
   return (

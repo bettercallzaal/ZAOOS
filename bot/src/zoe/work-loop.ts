@@ -17,6 +17,7 @@
  *  - the watcher (watcher.ts) independently flags cost/quality anomalies.
  */
 import { promises as fs } from 'node:fs';
+import { acquireTickLock, releaseTickLock } from './tick-lock';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import type { DecompositionPlan } from './decompose';
@@ -120,20 +121,22 @@ async function bumpToday(date: string): Promise<void> {
   await fs.writeFile(COUNTER(), JSON.stringify({ date, n }));
 }
 
+// Lock acquisition moved to tick-lock.ts. The version that lived here was
+// stat-then-write, which is check-then-act: two overlapping ticks could both see
+// a free lock and both proceed. tick-lock uses an atomic exclusive create, so
+// exactly one caller ever wins - which is what agent-loops rule 9 (one instance
+// per resource) actually requires.
 async function acquireLock(): Promise<boolean> {
-  const st = await fs.stat(LOCK()).catch(() => null);
-  if (st && Date.now() - st.mtimeMs < LOCK_STALE_MS) return false;
-  await fs.mkdir(dir(), { recursive: true });
-  await fs.writeFile(LOCK(), String(Date.now()));
-  return true;
+  const r = await acquireTickLock(LOCK(), { staleMs: LOCK_STALE_MS });
+  if (!r.acquired && r.reason === 'held') {
+    const held = r.heldForMs !== undefined ? ` (held ${Math.round(r.heldForMs / 1000)}s)` : '';
+    console.log(`[zoe/work-loop] another tick holds the lock${held} - skipping`);
+  }
+  return r.acquired;
 }
 
 async function releaseLock(): Promise<void> {
-  try {
-    await fs.unlink(LOCK());
-  } catch {
-    /* best-effort */
-  }
+  await releaseTickLock(LOCK());
 }
 
 /** Run one queued research item through the existing pipeline. Safe to call on a cron. */

@@ -30,6 +30,7 @@
  */
 
 import { promises as fs } from 'node:fs';
+import { acquireTickLock, releaseTickLock } from './tick-lock';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQuestion } from './questions';
@@ -263,19 +264,18 @@ async function bumpToday(date: string): Promise<void> {
 }
 
 async function acquireLock(): Promise<boolean> {
-  const st = await fs.stat(ORCHESTRATOR_LOCK()).catch(() => null);
-  if (st && Date.now() - st.mtimeMs < LOCK_STALE_MS) return false;
-  await fs.mkdir(join(ORCHESTRATOR_LOCK(), '..'), { recursive: true });
-  await fs.writeFile(ORCHESTRATOR_LOCK(), String(Date.now()));
-  return true;
+  // See tick-lock.ts: the stat-then-write version this replaces was check-then-act
+  // and could let two overlapping ticks both acquire.
+  const r = await acquireTickLock(ORCHESTRATOR_LOCK(), { staleMs: LOCK_STALE_MS });
+  if (!r.acquired && r.reason === 'held') {
+    const held = r.heldForMs !== undefined ? ` (held ${Math.round(r.heldForMs / 1000)}s)` : '';
+    console.log(`[zoe/orchestrator] another tick holds the lock${held} - skipping`);
+  }
+  return r.acquired;
 }
 
 async function releaseLock(): Promise<void> {
-  try {
-    await fs.unlink(ORCHESTRATOR_LOCK());
-  } catch {
-    // best-effort
-  }
+  await releaseTickLock(ORCHESTRATOR_LOCK());
 }
 
 /**

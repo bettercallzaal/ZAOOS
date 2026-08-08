@@ -128,6 +128,21 @@ describe('POST /api/publish/compose', () => {
     expect(json.data.results[0].detail).toContain('failed');
   });
 
+  it('broadcasts ONLY to the channel that was selected', async () => {
+    mocks.broadcastToChannels.mockResolvedValue({
+      telegram: { success: true },
+      discord: { success: false, error: 'Discord not selected' },
+    });
+    const res = await POST(req({ text: 'post', platforms: ['telegram'], dryRun: false }));
+    // The load-bearing assertion: Discord is explicitly opted OUT, not left to
+    // the helper's both-channels default.
+    expect(mocks.broadcastToChannels).toHaveBeenCalledWith(
+      expect.objectContaining({ channels: { telegram: true, discord: false } }),
+    );
+    const json = await res.json();
+    expect(json.data.results.map((r: { platform: string }) => r.platform)).toEqual(['telegram']);
+  });
+
   it('400s on an empty platform list or empty text', async () => {
     expect((await POST(req({ text: 'hi', platforms: [] }))).status).toBe(400);
     expect((await POST(req({ text: '', platforms: ['x'] }))).status).toBe(400);

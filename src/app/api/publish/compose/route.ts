@@ -189,7 +189,19 @@ export async function POST(req: NextRequest) {
           }
         }
       } else {
-        const b = await broadcastToChannels({ text, imageUrl, castHash: castHash ?? undefined });
+        // Pass the selection through. broadcastToChannels defaults to BOTH
+        // channels, so calling it because EITHER was ticked used to publish to
+        // both - an irreversible send to a public channel the admin did not
+        // select, and one this response never reported.
+        const b = await broadcastToChannels({
+          text,
+          imageUrl,
+          castHash: castHash ?? undefined,
+          channels: {
+            telegram: platforms.includes('telegram'),
+            discord: platforms.includes('discord'),
+          },
+        });
         if (platforms.includes('telegram')) {
           results.push({
             platform: 'telegram',

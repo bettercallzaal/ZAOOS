@@ -16,6 +16,28 @@ claim, number, quote, URL, or repo in a research output traces to a page the age
 run - or it is marked UNVERIFIED. This mirrors Anthropic Hermes's "grounded-citations" (claims
 fact-checked against actual page text) and ZAO's Proof Drops (a claim anchored to quotable evidence).
 
+## RAW TEXT, NOT A SUMMARY - the WebFetch trap (added 2026-08-08)
+
+A fetch is not automatically grounding. **`WebFetch` does not return the page** -
+its own description says it "answers `prompt` against it **using a small fast
+model**". You receive that model's answer about text you never saw, so every
+quote, number and name in it is recall, not source.
+
+- **Never quote from WebFetch.** Attribute it as a summary or do not use it.
+- **Load-bearing claims come from RAW text**: `curl` plus an HTML strip, an
+  official JSON API, or ZAO's keyless fetchers (`zao-fetch-reddit.sh`,
+  `zao-fetch-farcaster.sh`, FxTwitter) - all of which return raw by construction.
+- **State the METHOD in Sources**, not just FULL/PARTIAL/FAILED, so a reader can
+  tell a verbatim quote from a reconstructed one.
+- **The same trap applies to subagents.** A subagent's prose report IS a summary.
+  If its specifics matter, have it write the raw text to a file and return the
+  PATH - then quote from disk (`anti-fabrication.md` rule 1).
+- WebFetch stays fine for triage: does this page exist, what is it broadly about.
+  The line is whether a sentence will be quoted, carry a number, or support a
+  decision.
+
+Full audit and the community source: doc 2250.
+
 ## Dispatching a research subagent (the enforced prompt)
 
 Every research/audit subagent prompt MUST include, verbatim-equivalent:

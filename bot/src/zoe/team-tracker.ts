@@ -16,6 +16,13 @@
  */
 
 import { classifyTask, applyClassification, planReconciliation, type TrackerRow } from './task-classifier';
+import {
+  capCloses,
+  findVacuousReviewReminders,
+  planAutoCloses,
+  trackedPrNum,
+  type RepoFacts,
+} from './done-work-detector';
 import { remember } from './recall';
 
 export interface TeamTask {
@@ -568,4 +575,180 @@ export async function runTeamDigest(opts?: { mirrorToBonfire?: boolean }): Promi
     }
   }
   return { digest, taskCount: tasks.length, mirrored };
+}
+
+
+/**
+ * AUTO-CLOSE: the missing half of the loop (2026-08-08).
+ *
+ * reconcileUntaggedTasks above TAGS. Nothing CLOSED - eight writers could create
+ * a task and none could finish one, so the board reached 474 open / 122 overdue.
+ *
+ * See done-work-detector.ts for WHY this closes so little: the obvious rule
+ * ("the doc it names is merged") turned out to be true for 25 of 25 doc-review
+ * tasks at birth, so it proved nothing. What survives is PR tasks whose PR
+ * reached a terminal state - a real change after the task was created.
+ */
+export interface AutoCloseResult {
+  ok: boolean;
+  scanned: number;
+  closed: number;
+  deferred: number;
+  reasons: string[];
+  /** Doc-review reminders that were never actionable. REPORTED, never closed -
+   *  a bulk decision that belongs to a human. */
+  vacuousReminders: number;
+  error?: string;
+}
+
+/**
+ * Gather PR + doc state.
+ *
+ * Merges come from the LOCAL CLONE (a squash merge writes "(#NNNN)" into the
+ * subject on main) - no token, no rate limit. A CLOSED-WITHOUT-MERGE PR leaves
+ * no trace in the log at all, so that one case needs the API - but only for the
+ * handful of PR numbers actually on the board, never a blanket listing.
+ */
+async function gatherRepoFacts(repoDir: string, prNums: string[]): Promise<RepoFacts> {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile);
+  const facts: RepoFacts = {
+    mergedPrNums: new Set(),
+    closedUnmergedPrNums: new Set(),
+    mergedDocNums: new Set(),
+  };
+
+  try {
+    // Fetch first - a stale clone under-reports concluded work. That is safe
+    // (it closes nothing) but useless.
+    await run('git', ['-C', repoDir, 'fetch', 'origin', 'main', '--quiet'], { timeout: 60_000 });
+
+    const { stdout: log } = await run(
+      'git', ['-C', repoDir, 'log', 'origin/main', '--format=%s', '-n', '4000'],
+      { timeout: 60_000, maxBuffer: 16 * 1024 * 1024 },
+    );
+    for (const line of log.split('\n')) {
+      const m = /\(#(\d{1,6})\)\s*$/.exec(line.trim());
+      if (m) facts.mergedPrNums.add(m[1]);
+    }
+
+    // ls-tree, not the working tree, so a dirty checkout cannot invent or hide a
+    // doc. Used only to report vacuous reminders - never to close.
+    const { stdout: tree } = await run(
+      'git', ['-C', repoDir, 'ls-tree', '-d', '-r', '--name-only', 'origin/main', 'research/'],
+      { timeout: 60_000, maxBuffer: 32 * 1024 * 1024 },
+    );
+    for (const line of tree.split('\n')) {
+      const m = /research\/[^/]+\/(\d{3,4})-/.exec(line);
+      if (m) facts.mergedDocNums.add(m[1]);
+    }
+  } catch {
+    // Leave the sets empty. Empty facts close NOTHING - the safe failure.
+  }
+
+  // Only the PRs the board actually names, and only those the log did not
+  // already prove merged. Usually two or three calls; often zero.
+  for (const pr of prNums) {
+    if (facts.mergedPrNums.has(pr)) continue;
+    try {
+      const { stdout } = await run(
+        'gh', ['api', `repos/bettercallzaal/ZAOOS/pulls/${pr}`, '--jq', '{state:.state,merged:.merged}'],
+        { timeout: 20_000 },
+      );
+      const info = JSON.parse(stdout) as { state?: string; merged?: boolean };
+      if (info.state === 'closed' && info.merged === true) facts.mergedPrNums.add(pr);
+      else if (info.state === 'closed') facts.closedUnmergedPrNums.add(pr);
+      // open -> record nothing, so the task stays open.
+    } catch {
+      // gh missing, unauthenticated, or the PR is from another repo. Unknown
+      // state means we leave the task alone.
+    }
+  }
+  return facts;
+}
+
+/**
+ * Close open board tasks whose tracked PR has concluded.
+ *
+ * Best-effort, never throws. Appends the reason to the task\'s notes so every
+ * close is auditable and reversible - status only, never a delete.
+ */
+export async function autoCloseFinishedTasks(
+  repoDir: string,
+  limit = 500,
+): Promise<AutoCloseResult> {
+  const empty = { scanned: 0, closed: 0, deferred: 0, reasons: [] as string[], vacuousReminders: 0 };
+  const base = process.env.COWORK_TRACKER_URL;
+  const key = process.env.COWORK_TRACKER_KEY;
+  if (!base || !key) return { ok: false, ...empty, error: 'team tracker not configured' };
+  if (!repoDir) return { ok: false, ...empty, error: 'no repoDir' };
+
+  const root = base.replace(/\/$/, '');
+  const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+
+  try {
+    const res = await fetch(
+      `${root}/rest/v1/tasks?status=eq.todo&archived_at=is.null&select=id,title,notes,legacy_source&limit=${limit}`,
+      { headers, cache: 'no-store' },
+    );
+    if (!res.ok) return { ok: false, ...empty, error: `read ${res.status}` };
+    const rows = (await res.json()) as Array<{
+      id: string;
+      title: string;
+      notes?: string;
+      legacy_source?: string;
+    }>;
+    const tasks = rows.map((r) => ({ id: r.id, title: r.title, legacySource: r.legacy_source }));
+
+    const prNums = [...new Set(tasks.map(trackedPrNum).filter((x): x is string => x !== null))];
+    const facts = await gatherRepoFacts(repoDir, prNums);
+    if (facts.mergedPrNums.size === 0 && facts.closedUnmergedPrNums.size === 0) {
+      // Could not read the repo at all. Closing now would be closing on absence
+      // of evidence, which this must never do.
+      return { ok: false, ...empty, scanned: rows.length, error: 'no repo facts - closed nothing' };
+    }
+
+    const vacuousReminders = findVacuousReviewReminders(tasks, facts).length;
+    const { toClose, deferred } = capCloses(planAutoCloses(tasks, facts));
+
+    let closed = 0;
+    const reasons: string[] = [];
+    const refused: string[] = [];
+    for (const v of toClose) {
+      const row = rows.find((r) => r.id === v.id);
+      const stamp = new Date().toISOString().slice(0, 10);
+      const notes = `${(row?.notes || '').trim()}\n\nAUTO-CLOSED ${stamp}: ${v.reason}`.trim();
+      const patch = await fetch(`${root}/rest/v1/tasks?id=eq.${v.id}`, {
+        method: 'PATCH',
+        headers: { ...headers, Prefer: 'return=minimal' },
+        // 'done', NOT 'completed'. A CHECK constraint on tasks.status rejects
+        // anything else with a 400 (Postgres 23514), and the failure is silent
+        // at this level - patch.ok goes false, the count stays 0, and the pass
+        // looks like "nothing to close" rather than "every close was refused".
+        // The live values are: todo (286), done (710), blocked (2), in_progress
+        // (2). This exact mistake already cost four failed attempts at a
+        // `zao-tracker done` subcommand before the 400 body was ever read.
+        body: JSON.stringify({ status: 'done', notes }),
+      });
+      if (patch.ok) {
+        closed += 1;
+        reasons.push(`${v.title.slice(0, 60)} - ${v.reason}`);
+      } else {
+        // Never let a rejected write read as "nothing needed closing".
+        refused.push(`${patch.status} on ${v.title.slice(0, 50)}`);
+      }
+    }
+    return {
+      ok: refused.length === 0,
+      scanned: rows.length,
+      closed,
+      deferred,
+      reasons,
+      vacuousReminders,
+      error: refused.length ? `${refused.length} close(s) REFUSED: ${refused.join('; ')}` : undefined,
+    };
+  } catch (e) {
+    return { ok: false, ...empty, error: e instanceof Error ? e.message : 'auto-close failed' };
+  }
 }

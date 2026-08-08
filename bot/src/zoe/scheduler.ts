@@ -59,7 +59,7 @@ import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidate
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { checkAndResend, readLastUserReplyAt } from './escalation';
-import { reconcileUntaggedTasks, getTaskStatusByIds } from './team-tracker';
+import { reconcileUntaggedTasks, getTaskStatusByIds, autoCloseFinishedTasks } from './team-tracker';
 import { ingestAllIdentities } from './fleet';
 import { runTaskCommentReplies } from './task-comment-replies';
 import { runMentionNotify } from './task-mention-notify';
@@ -713,6 +713,40 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
         } catch (err) {
           console.warn('[zoe/scheduler] auto-tag reconcile failed (nbd):', (err as Error).message);
+        }
+
+        // Auto-CLOSE the finished ones. The tagger above and this closer are the
+        // two halves of the same hourly pass: eight writers could open a task and
+        // nothing could finish one, so the board reached 474 open / 122 overdue
+        // with every sampled doc-review pointing at an already-merged doc.
+        //
+        // Closes only on POSITIVE evidence (the doc is on main, the PR's merge
+        // commit is on main) and caps the blast radius per run, so the worst a
+        // bug can do is a reviewable handful rather than the whole board.
+        try {
+          const c = await autoCloseFinishedTasks(process.env.ZOE_REPO_DIR ?? '/home/zaal/zao-os');
+          if (c.ok && c.closed > 0) {
+            console.log(
+              `[zoe/scheduler] auto-close: closed ${c.closed}/${c.scanned}` +
+                (c.deferred > 0 ? ` (${c.deferred} deferred to next run)` : ''),
+            );
+            // Log each one. A close nobody can see is a close nobody can undo.
+            for (const r of c.reasons) console.log(`[zoe/scheduler] auto-close: ${r}`);
+          } else if (!c.ok && c.error) {
+            console.warn(`[zoe/scheduler] auto-close skipped: ${c.error}`);
+          }
+          // Surfaced, never closed. These doc-review reminders were created when
+          // their doc shipped, so "the doc is merged" was true from birth and
+          // proves nothing - the queue needs one human decision, not a machine
+          // deleting it under a proof that does not hold.
+          if (c.ok && c.vacuousReminders > 0) {
+            console.log(
+              `[zoe/scheduler] auto-close: ${c.vacuousReminders} doc-review reminders left open ` +
+                '(never actionable - needs one bulk decision from Zaal, not an auto-close)',
+            );
+          }
+        } catch (err) {
+          console.warn('[zoe/scheduler] auto-close failed (nbd):', (err as Error).message);
         }
 
         // Task #930: ping-lifecycle resolution. Hourly check for any teammate-ack

@@ -291,3 +291,4 @@
 | 2235 | [ZOE vs the agent toolkits: an honest competitive audit](./2235-zoe-vs-agent-toolkits-audit/) | STANDALONE | Audit ZOE against the major agent frameworks/toolkits - grounded in ZOE's |
 | 2239 | [ZOE Capability Map (living doc - read BEFORE claiming anything is missing)](./2239-zoe-capability-map/) | STANDALONE | The living map `confirm-before-claiming-absence.md` demands: every |
 | 2246 | [Claude Code cross-session messaging: the human stops being the message bus](./2246-claude-code-cross-session-messaging/) | STANDALONE | Decide what changes for ZAO now that Claude Code sessions can message each |
+| 2249 | [CLI messaging vs SSH orchestration across machines](./2249-cli-messaging-vs-ssh-orchestration/) | STANDALONE | Test a claim - that linking Claude Code across machines works better |

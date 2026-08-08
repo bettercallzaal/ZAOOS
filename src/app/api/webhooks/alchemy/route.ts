@@ -94,18 +94,51 @@ export async function POST(req: NextRequest) {
           ? parseInt(activity.blockNum, 16)
           : null;
 
-      await supabaseAdmin.from('respect_transfers').upsert(
-        {
-          tx_hash: txHash,
-          from_address: fromAddress,
-          to_address: toAddress,
-          token_type: tokenType,
-          amount,
-          block_number: blockNumber,
-          block_timestamp: payload?.createdAt || new Date().toISOString(),
-        },
-        { onConflict: 'tx_hash,to_address,token_type' },
-      );
+      // IDEMPOTENCY. Alchemy re-delivers any activity it did not get a 2xx for,
+      // and a function timeout looks exactly like that from its side, so the
+      // SAME transfer can arrive more than once. The UNIQUE(tx_hash, to_address,
+      // token_type) already de-duplicates the ledger row, but the balance credit
+      // below used to run on every delivery, so a replay added the mint amount to
+      // onchain_zor/onchain_og a second time and the inflated total never came
+      // back down (nothing reconciles these columns against the chain).
+      //
+      // `ignoreDuplicates` makes the insert a no-op on replay, and `.select()`
+      // then returns rows ONLY for a row we actually inserted. That turns the
+      // unique key the ledger already relies on into the answer to "have we
+      // credited this transfer before?".
+      const { data: insertedTransfer, error: transferError } = await supabaseAdmin
+        .from('respect_transfers')
+        .upsert(
+          {
+            tx_hash: txHash,
+            from_address: fromAddress,
+            to_address: toAddress,
+            token_type: tokenType,
+            amount,
+            block_number: blockNumber,
+            block_timestamp: payload?.createdAt || new Date().toISOString(),
+          },
+          { onConflict: 'tx_hash,to_address,token_type', ignoreDuplicates: true },
+        )
+        .select('id');
+
+      if (transferError) {
+        // Do NOT credit a transfer we failed to record. Without the ledger row
+        // the next delivery would look like the first one and credit it again -
+        // the exact double-count this guard exists to prevent.
+        logger.error('[alchemy-webhook] could not record transfer - balance NOT credited', {
+          txHash,
+          tokenType,
+          error: transferError,
+        });
+      }
+
+      const firstDelivery = !transferError && (insertedTransfer?.length ?? 0) > 0;
+      if (!transferError && !firstDelivery) {
+        logger.info(
+          `[alchemy-webhook] duplicate delivery for ${txHash.slice(0, 12)}... - already credited, not crediting again`,
+        );
+      }
 
       // Update respect_members on-chain balance for the recipient
       const { data: member } = await supabaseAdmin
@@ -114,7 +147,7 @@ export async function POST(req: NextRequest) {
         .ilike('wallet_address', toAddress)
         .maybeSingle();
 
-      if (member) {
+      if (member && firstDelivery) {
         const isMint = fromAddress === '0x0000000000000000000000000000000000000000';
         if (isMint) {
           const mintAmount = Number(amount) || 0;

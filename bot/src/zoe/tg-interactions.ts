@@ -422,7 +422,40 @@ export interface BatchAnswer {
   value: string;
 }
 
+/**
+ * Words that are COMMANDS, not batch-answer keys.
+ *
+ * The batch-answer format is "1:A 2:best 3:skip" - a question id, a colon, a
+ * choice. The id was allowed to be alphabetic ("a:yes") as well as numeric,
+ * which quietly made every lowercase-word-plus-colon look like a batch answer.
+ *
+ * That included `build:`. On 2026-08-08 Zaal sent
+ * "build: add a comment at the top of README.md" to the ZOE DM twice and got
+ * "Logged 1 answer from batch." both times. The batch handler runs about a
+ * thousand lines before detectBuildIntent, so the build classifier never ran -
+ * confirmed by zero [zoe/ran] lines in the journal.
+ *
+ * Every verb in build-intent's EXPLICIT_PREFIX (build|code|fix|ship|implement)
+ * is lowercase letters followed by a colon, so ALL of them were swallowed. The
+ * DM build feature was unreachable through its own documented syntax, which is
+ * the mechanical cause of the 1/10 Zaal graded it.
+ */
+export const COMMAND_PREFIXES = new Set([
+  'build', 'code', 'fix', 'ship', 'implement',
+  'note', 'todo', 'research', 'capture', 'remember', 'ask', 'brief',
+]);
+
+/** Does this text open with a command prefix rather than a batch-answer key? */
+export function isCommandPrefixed(text: string): boolean {
+  const m = /^\s*([a-z]+)\s*:/i.exec(text);
+  return m ? COMMAND_PREFIXES.has(m[1].toLowerCase()) : false;
+}
+
 export function parseBatchAnswer(text: string): BatchAnswer[] {
+  // A command is not an answer. Bail before parsing so a build request can
+  // reach the classifier that is supposed to handle it.
+  if (isCommandPrefixed(text)) return [];
+
   const answers: BatchAnswer[] = [];
   const lines = text.split('\n').filter((l) => l.trim());
 

@@ -27,6 +27,17 @@ export interface BroadcastOptions {
   castHash?: string;
   /** Direct URL to link to (overrides default ZAO OS link). */
   url?: string;
+  /**
+   * Which channels to attempt. Omitted (or an omitted key) means BOTH, which is
+   * the historical behavior every existing caller relies on.
+   *
+   * This exists because "broadcast" is only the right default when the caller
+   * genuinely wants every channel. /api/publish/compose lets an admin tick
+   * Telegram and Discord independently, and calling this helper because EITHER
+   * was ticked posted to BOTH — an irreversible send to a public channel nobody
+   * selected, and one the response never mentioned.
+   */
+  channels?: { telegram?: boolean; discord?: boolean };
 }
 
 export interface BroadcastResult {
@@ -41,13 +52,16 @@ export interface BroadcastResult {
 /**
  * Publish a message to Telegram and Discord channels in parallel.
  *
+ * - Only attempts a channel the caller selected (default: both).
  * - Only attempts Telegram if TELEGRAM_BOT_TOKEN is set.
  * - Only attempts Discord if DISCORD_WEBHOOK_URL is set.
  * - Never throws — returns results for both platforms.
  */
 export async function broadcastToChannels(options: BroadcastOptions): Promise<BroadcastResult> {
-  const hasTelegram = !!process.env.TELEGRAM_BOT_TOKEN;
-  const hasDiscord = !!process.env.DISCORD_WEBHOOK_URL;
+  const wantsTelegram = options.channels?.telegram ?? true;
+  const wantsDiscord = options.channels?.discord ?? true;
+  const hasTelegram = wantsTelegram && !!process.env.TELEGRAM_BOT_TOKEN;
+  const hasDiscord = wantsDiscord && !!process.env.DISCORD_WEBHOOK_URL;
 
   // Build links to append
   const farcasterLink = options.castHash
@@ -68,7 +82,10 @@ export async function broadcastToChannels(options: BroadcastOptions): Promise<Br
         parseMode: 'HTML',
         disablePreview: false,
       })
-    : Promise.resolve({ success: false, error: 'Telegram not configured' });
+    : Promise.resolve({
+        success: false,
+        error: wantsTelegram ? 'Telegram not configured' : 'Telegram not selected',
+      });
 
   const discordPromise = hasDiscord
     ? publishToDiscord({
@@ -84,7 +101,10 @@ export async function broadcastToChannels(options: BroadcastOptions): Promise<Br
             ]
           : undefined,
       })
-    : Promise.resolve({ success: false, error: 'Discord not configured' });
+    : Promise.resolve({
+        success: false,
+        error: wantsDiscord ? 'Discord not configured' : 'Discord not selected',
+      });
 
   const [telegramResult, discordResult] = await Promise.allSettled([
     telegramPromise,

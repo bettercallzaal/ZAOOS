@@ -62,6 +62,43 @@ describe('platform guards', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Channel selection - a send is irreversible, so an unselected channel must
+// never receive anything even when it is fully configured.
+// ---------------------------------------------------------------------------
+
+describe('channel selection', () => {
+  it('does not post to Discord when only Telegram is selected', async () => {
+    mockPublishToTelegram.mockResolvedValue({ success: true });
+    const result = await broadcastToChannels({
+      text: 'hi',
+      channels: { telegram: true, discord: false },
+    });
+    expect(mockPublishToTelegram).toHaveBeenCalled();
+    expect(mockPublishToDiscord).not.toHaveBeenCalled();
+    expect(result.discord).toEqual({ success: false, error: 'Discord not selected' });
+  });
+
+  it('does not post to Telegram when only Discord is selected', async () => {
+    mockPublishToDiscord.mockResolvedValue({ success: true });
+    const result = await broadcastToChannels({
+      text: 'hi',
+      channels: { telegram: false, discord: true },
+    });
+    expect(mockPublishToDiscord).toHaveBeenCalled();
+    expect(mockPublishToTelegram).not.toHaveBeenCalled();
+    expect(result.telegram).toEqual({ success: false, error: 'Telegram not selected' });
+  });
+
+  it('omitting channels still posts to both (existing callers unchanged)', async () => {
+    mockPublishToTelegram.mockResolvedValue({ success: true });
+    mockPublishToDiscord.mockResolvedValue({ success: true });
+    await broadcastToChannels({ text: 'hi' });
+    expect(mockPublishToTelegram).toHaveBeenCalled();
+    expect(mockPublishToDiscord).toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Both succeed
 // ---------------------------------------------------------------------------
 

@@ -30,6 +30,14 @@ export interface BoardComment {
   content: string;
   createdAt?: string;
   editedAt?: string;
+  /**
+   * For a ZOE comment: the id of the comment it is answering.
+   *
+   * Added 2026-08-08. Without it, "has this been answered?" could only ask
+   * "is there ANY later ZOE comment", which is wrong whenever two ZOE modules
+   * write to the same thread - see findUnansweredMentions.
+   */
+  replyTo?: string;
 }
 
 export interface BoardTask {
@@ -68,6 +76,31 @@ function tagsZoe(c: BoardComment): boolean {
  * ZOE-authored comment (userId === 'zoe') appearing later in the ordered
  * comments array. Pure + exported for unit testing.
  */
+/**
+ * Which @zoe comments are still waiting on ZOE.
+ *
+ * THE BUG THIS FIXES (found live, 2026-08-08)
+ * -----------------------------------------
+ * This used to treat ANY later ZOE comment as an answer:
+ *
+ *   comments.slice(i + 1).some((later) => later.userId === ZOE_USER_ID)
+ *
+ * ZOE is not one writer. task-teammate-ack also posts as ZOE, acknowledging a
+ * teammate's comment. On task #9246 the thread ran:
+ *
+ *   [Iman] @zaal <PR link>
+ *   [Zaal] @zoe ... make a new todo ... and close this one
+ *   [ZOE]  Noted - flagged to Zaal: "<Iman's comment>"     <- ack of IMAN
+ *
+ * That ack landed after Zaal's command, so his command was marked answered by a
+ * message that had nothing to do with it. It would never have been processed -
+ * silently, forever, with no error anywhere.
+ *
+ * Now a ZOE comment answers a specific mention only when it says so. Legacy ZOE
+ * comments carry no replyTo, so they still count as a generic answer - without
+ * that, every historical @zoe mention would suddenly read as unanswered and ZOE
+ * would flood old threads re-answering them.
+ */
 export function findUnansweredMentions(
   tasks: BoardTask[],
 ): Array<{ task: BoardTask; comment: BoardComment }> {
@@ -77,7 +110,14 @@ export function findUnansweredMentions(
     for (let i = 0; i < comments.length; i++) {
       const c = comments[i];
       if (!tagsZoe(c)) continue;
-      const answered = comments.slice(i + 1).some((later) => later.userId === ZOE_USER_ID);
+      const answered = comments.slice(i + 1).some((later) => {
+        if (later.userId !== ZOE_USER_ID) return false;
+        // Tagged reply: only counts for the comment it names.
+        if (later.replyTo) return later.replyTo === c.id;
+        // Untagged = written before this fix. Keep the old meaning so old
+        // threads stay quiet rather than all reopening at once.
+        return true;
+      });
       if (!answered) out.push({ task, comment: c });
     }
   }
@@ -180,6 +220,7 @@ async function postReply(
   task: BoardTask,
   answer: string,
   fetchImpl: typeof fetch,
+  replyTo?: string,
 ): Promise<boolean> {
   const base = process.env.COWORK_TRACKER_URL;
   const key = process.env.COWORK_TRACKER_KEY;
@@ -190,6 +231,7 @@ async function postReply(
     displayName: ZOE_DISPLAY,
     content: answer,
     createdAt: new Date().toISOString(),
+    replyTo,
   };
   const metadata = { ...(task.metadata ?? {}) };
   const existing = Array.isArray(metadata.comments) ? (metadata.comments as BoardComment[]) : [];
@@ -283,7 +325,7 @@ export async function runTaskCommentReplies(
       (m) => m.comment.id === comment.id,
     );
     if (!stillUnanswered) continue;
-    if (await postReply(fresh, ans, fetchImpl)) answered++;
+    if (await postReply(fresh, ans, fetchImpl, comment.id)) answered++;
   }
 
   if (answered > 0) {

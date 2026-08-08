@@ -8,7 +8,8 @@
 // Optional GROQ_WHISPER_MODEL (default whisper-large-v3-turbo).
 
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
 
@@ -17,11 +18,51 @@ interface VoiceGlossary {
   corrections: Record<string, string>;
 }
 
+/**
+ * Absolute path to the ZAO proper-noun glossary.
+ *
+ * TWO THINGS WERE WRONG HERE, and both were invisible because the only reader
+ * swallowed every error and returned null.
+ *
+ * 1. THE DEPTH. This file lives at `bot/src/zoe/`, so `../../../../` from here
+ *    resolves ABOVE the repository root - the glossary was never at the path
+ *    being read, on any machine. Three levels reach the repo root; four leave it.
+ *
+ * 2. `__dirname`. `bot/package.json` is `"type": "module"` and this file is an
+ *    ES module, where `__dirname` is not a module-scope binding - referencing it
+ *    is a ReferenceError under plain node, and whether a loader shims it is a
+ *    property of the loader, not of the code. Every other file in `bot/src` that
+ *    needs its own directory already uses `fileURLToPath(import.meta.url)`
+ *    (mcp/farcaster-client.ts, the heart-fleet and spore tests); this one was
+ *    the outlier.
+ *
+ * Exported so a test can assert the path RESOLVES against the real filesystem.
+ * The existing suite mocks `node:fs` wholesale, so it exercised the parsing and
+ * never the location - which is exactly how a path that escapes the repo stayed
+ * green through CI.
+ */
+export const GLOSSARY_PATH = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../research/reference/zao-voice-glossary.json',
+);
+
+/** Log the glossary miss once per process, not once per voice note. */
+let warnedAboutGlossary = false;
+
 function loadGlossary(): VoiceGlossary | null {
   try {
-    const p = join(__dirname, '../../../../research/reference/zao-voice-glossary.json');
-    return JSON.parse(readFileSync(p, 'utf8')) as VoiceGlossary;
-  } catch {
+    return JSON.parse(readFileSync(GLOSSARY_PATH, 'utf8')) as VoiceGlossary;
+  } catch (err) {
+    // Optional input, so this stays non-fatal - but it is logged, once, because
+    // silence is what let a broken path survive. A soft-fail nobody can see is
+    // indistinguishable from a feature that works (`silent-failure-guard.md`).
+    if (!warnedAboutGlossary) {
+      warnedAboutGlossary = true;
+      console.warn(
+        `[zoe/transcribe] voice glossary unavailable at ${GLOSSARY_PATH} - ` +
+          `transcribing without ZAO proper-noun bias: ${(err as Error)?.message ?? String(err)}`,
+      );
+    }
     return null;
   }
 }

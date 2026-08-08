@@ -1,0 +1,23 @@
+{
+  // Typecheck config for CI: the bot's RUNTIME source only.
+  //
+  // WHY THIS EXISTS. `bot/` runs under tsx, which strips types without checking
+  // them, and nothing in CI ever ran `tsc` over it: the root tsconfig excludes
+  // "bot", and the bot-test job runs only `vitest run`. So a type error in the
+  // 199 bot source modules reached main whenever no test happened to import the
+  // broken module - and the first thing that noticed was the live bot at
+  // runtime. `npm run typecheck` existed in bot/package.json the whole time; it
+  // simply had no caller.
+  //
+  // WHY IT EXCLUDES TESTS RATHER THAN USING tsconfig.json DIRECTLY. The plain
+  // `tsc --noEmit` currently reports 37 errors, all of them in `__tests__` and
+  // all of them stale vitest generics (`Mock<[number, number]>` is the vitest-2
+  // form; vitest 3 parameterises Mock by the function type). Zero are in runtime
+  // source. Gating on the full config would mean a check that is red on arrival,
+  // which is a check nobody reads (noisy-signal-guard). This one is green today,
+  // so the only thing that can turn it red is a real regression in code that
+  // actually ships. Fixing the test generics is worth doing separately; it does
+  // not need to block the gate that protects production code.
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts"]
+}

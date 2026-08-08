@@ -36,6 +36,7 @@
  */
 import { promises as fs } from 'node:fs';
 import { dirname } from 'node:path';
+import { featureRan } from './feature-ran';
 
 /** How long before a held lock is assumed to belong to a dead process. */
 export const DEFAULT_STALE_MS = 30 * 60 * 1000;
@@ -98,6 +99,7 @@ export async function acquireTickLock(
       } finally {
         await fh.close();
       }
+      featureRan('tick-lock');
       return { acquired: true };
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code === 'EEXIST') return null; // someone holds it

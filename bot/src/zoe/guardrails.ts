@@ -17,6 +17,8 @@
  * Pattern credit: openai/openai-agents-python guardrail.py (Apache-2.0).
  */
 
+import { featureRan } from './feature-ran';
+
 /** When a guardrail runs relative to the model call. */
 export type GuardrailStage = 'input' | 'output' | 'both';
 
@@ -70,6 +72,7 @@ export function runGuardrails(
   stage: 'input' | 'output',
 ): GuardrailRunResult {
   const trips: Array<{ name: string; reason: string }> = [];
+  featureRan('guardrails', `${guards.length} guards, ${stage}`);
   for (const g of guards) {
     if (!appliesTo(g, stage)) continue;
     const r = g.check(ctx);

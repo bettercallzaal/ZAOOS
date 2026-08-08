@@ -29,6 +29,8 @@
  * everything ambiguous stays conversation.
  */
 
+import { featureRan } from './feature-ran';
+
 export type BuildConfidence = 'explicit' | 'likely';
 
 export interface BuildIntent {
@@ -102,6 +104,7 @@ const has = (haystack: string, needles: string[]): boolean =>
  */
 export function detectBuildIntent(message: string): BuildIntent {
   const text = (message || '').trim();
+  featureRan('build-intent');
   if (!text) return { build: false, reason: 'empty message' };
 
   // 1. The explicit prefix. Zaal typed it on purpose; do not second-guess it.

@@ -53,6 +53,8 @@
  *   Losing the thread of a running build is worse than an extra message.
  */
 
+import { featureRan } from './feature-ran';
+
 export interface LiveStatusDeps {
   send: (text: string, replyMarkup?: unknown) => Promise<number | null>;
   edit: (messageId: number, text: string, replyMarkup?: unknown) => Promise<void>;
@@ -153,6 +155,7 @@ export function renderBuildStatus(opts: {
   elapsedSec: number;
   done?: boolean;
 }): string {
+  featureRan('live-status');
   const { task, phase, history, elapsedSec, done } = opts;
   const elapsed = elapsedSec < 90 ? `${elapsedSec}s` : `${Math.round(elapsedSec / 60)}m`;
   const head = done ? phase : `${phase} - ${elapsed}`;

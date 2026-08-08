@@ -16,6 +16,7 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { featureRan } from './feature-ran';
 
 /** One step-journal row (mirrors step-journal.py's append() shape exactly). */
 export interface JournalStep {
@@ -102,6 +103,7 @@ export async function emitStep(
  */
 export function mcEmit(topic: string, actor: string, severity: number, text: string): void {
   if (process.env.ZOE_MISSION_CONTROL !== '1') return;
+  featureRan('mission-control');
   emitStep(topic, actor, severity, text).catch((error: unknown) => {
     const msg = error instanceof Error ? error.message : String(error);
     console.error(`[mission-control] emit failed (${topic}/${actor}): ${msg}`);

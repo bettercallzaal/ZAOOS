@@ -20,6 +20,7 @@
  * and tg-chunk for the 4096 limit.
  */
 import { chunkForTelegram } from './tg-chunk';
+import { featureRan } from './feature-ran';
 
 /** The tasern wire contract (identical to infra/bus/bus.js - one shape, both ends). */
 export interface BusMessage {
@@ -42,6 +43,7 @@ export function shortId(id: string): string {
  * long partner message survives Telegram's 4096 limit instead of being cut to 120.
  */
 export function renderBusMessage(msg: BusMessage): string[] {
+  featureRan('bus-bridge');
   const header = [
     `BUS ${msg.from} -> ${msg.to}`,
     msg.subject ? `Subject: ${msg.subject}` : '',

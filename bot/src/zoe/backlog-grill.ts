@@ -1,0 +1,219 @@
+/**
+ * backlog-grill.ts - drip the board backlog to Zaal's phone, one card every
+ * couple of minutes, answered by pressing a number.
+ *
+ * WHAT ALREADY EXISTS (extend, never rebuild)
+ * ------------------------------------------
+ * grill.ts already DMs Zaal one item at a time, keeps state so nothing repeats,
+ * pins the open question, renders buttons, and matches a typed answer. None of
+ * that is rebuilt here. Three things were missing for what Zaal asked for:
+ *
+ *   1. SOURCE. grill.ts pulls from the cockpit - decisions that need him, PRs to
+ *      review, blocked items. It has no path to the 356-task board backlog,
+ *      which is where the actual pile is.
+ *   2. OPTIONS. parseOptions() reads choices OUT of a title ("1: intro / 2: map").
+ *      A backlog task has no options in its title; it needs the same five
+ *      verdicts every time, so the answer becomes muscle memory.
+ *   3. CADENCE. The grill cron is every 2 hours. Zaal asked for one added every
+ *      couple of minutes so a queue builds and he sweeps it in one pass.
+ *
+ * WHY FIVE FIXED VERDICTS
+ * ----------------------
+ * The terminal grill today proved the shape: 24 tasks reviewed, 9 closed, in
+ * minutes, because every question had the same small set of answers. Zaal:
+ * "ill just come though and go though the whole queu just like today and knock
+ * them out with pressing 1,2,3,4,5 or typign in a reply."
+ *
+ * So the options never change per card. 1 is always done, 3 is always work-on-it.
+ * You stop reading the options after the first few cards, which is the entire
+ * point - the bottleneck is his attention, not the interface.
+ *
+ * WHY "WORK ON IT" IS ONE OF THE FIVE
+ * ----------------------------------
+ * Also from today: sending a task to be worked mid-grill, and having it come
+ * back at the END of the queue for confirmation, is what turns the grill from
+ * sorting into progress. A task never gets marked done because work STARTED -
+ * it re-enters the queue and is confirmed by a human, which is why `requeue` is
+ * part of the verdict shape rather than an afterthought.
+ */
+
+/** The five, in the order they are pressed. Stable - do not reorder. */
+export const VERDICTS = [
+  { n: 1, key: 'done', label: 'Done - close it' },
+  { n: 2, key: 'keep', label: 'Keep open' },
+  { n: 3, key: 'work', label: 'Work on it now' },
+  { n: 4, key: 'drop', label: 'Drop it' },
+  { n: 5, key: 'skip', label: 'Skip for now' },
+] as const;
+
+export type VerdictKey = (typeof VERDICTS)[number]['key'];
+
+export interface Verdict {
+  key: VerdictKey;
+  /** Anything Zaal typed instead of, or alongside, a number. */
+  note?: string;
+  /** Does this go back in the queue for a later confirmation? */
+  requeue: boolean;
+  /** Does this change the board now? */
+  closesTask: boolean;
+}
+
+/**
+ * Read an answer.
+ *
+ * Accepts a bare number, the word, or free text. Free text is never discarded -
+ * it becomes the note, because "1" and "1 but ask iman first" mean different
+ * things and the second one is the more valuable message.
+ *
+ * A bare number is deliberately the fastest path: it is what a thumb does at a
+ * traffic light.
+ */
+export function parseVerdict(reply: string): Verdict | null {
+  const raw = (reply || '').trim();
+  if (!raw) return null;
+
+  // A leading number, optionally followed by anything else.
+  const m = /^([1-5])\b[\s.:)-]*(.*)$/s.exec(raw);
+  if (m) {
+    const v = VERDICTS.find((x) => x.n === Number(m[1]));
+    if (v) return build(v.key, m[2].trim() || undefined);
+  }
+
+  // The word itself: "done", "keep", "drop", "skip", "work on it".
+  const lower = raw.toLowerCase();
+  for (const v of VERDICTS) {
+    if (lower === v.key || lower.startsWith(`${v.key} `)) {
+      return build(v.key, raw.slice(v.key.length).trim() || undefined);
+    }
+  }
+  if (/^work on it/i.test(lower)) return build('work', raw.slice(10).trim() || undefined);
+
+  // Anything else is a real instruction. Treat it as "work on it" with the
+  // typed text as the brief - a sentence is a richer answer than a number, and
+  // dropping it because it did not start with a digit would be the wrong call.
+  return build('work', raw);
+}
+
+function build(key: VerdictKey, note?: string): Verdict {
+  return {
+    key,
+    note,
+    // Work re-enters the queue: a task is never done because work STARTED.
+    requeue: key === 'work' || key === 'skip',
+    closesTask: key === 'done' || key === 'drop',
+  };
+}
+
+/**
+ * The card.
+ *
+ * One task, its age, its why if it has one, and the five options. Age is shown
+ * because a 36-day-old task and a 2-day-old one deserve different answers, and
+ * that is invisible from a title.
+ */
+export function renderCard(
+  task: { title: string; createdAt?: string; why?: string | null },
+  position: { index: number; total: number },
+  now = Date.now(),
+): string {
+  const lines: string[] = [];
+  lines.push(`${position.index}/${position.total}`);
+  lines.push('');
+  lines.push(task.title.slice(0, 200));
+
+  if (task.createdAt) {
+    const days = Math.floor((now - Date.parse(task.createdAt)) / 86400_000);
+    if (Number.isFinite(days) && days >= 0) {
+      lines.push(`open ${days}d`);
+    }
+  }
+  const why = (task.why || '').trim();
+  // The boilerplate note is worse than nothing - it takes up a line and says
+  // nothing. 13 of Iman's 20 open tasks carry it; do not put it on a card.
+  if (why && !/Reply to Claude in next session/i.test(why)) {
+    lines.push('');
+    lines.push(why.slice(0, 180));
+  }
+  lines.push('');
+  for (const v of VERDICTS) lines.push(`${v.n}. ${v.label}`);
+  return lines.join('\n');
+}
+
+/** Buttons, always - a number is faster to tap than to type. */
+export function verdictButtons(): { text: string; data: string }[][] {
+  return [
+    [
+      { text: '1 Done', data: 'bg:done' },
+      { text: '2 Keep', data: 'bg:keep' },
+      { text: '3 Work', data: 'bg:work' },
+    ],
+    [
+      { text: '4 Drop', data: 'bg:drop' },
+      { text: '5 Skip', data: 'bg:skip' },
+    ],
+  ];
+}
+
+export interface DripConfig {
+  /** Minutes between cards. Zaal asked for ~2. */
+  everyMinutes: number;
+  /** Most unanswered cards allowed to pile up before we stop adding. */
+  maxOutstanding: number;
+  /** Local hours (Zaal's) in which cards may be sent. */
+  startHour: number;
+  endHour: number;
+}
+
+/**
+ * A pile is fine; a flood is not.
+ *
+ * Zaal wants a queue to sweep, so outstanding cards are the FEATURE - but
+ * unbounded they become a wall he never opens, and a check nobody reads is
+ * worth nothing. 20 is roughly one sweep's worth at the pace he cleared them
+ * today.
+ */
+export const DRIP_DEFAULT: DripConfig = {
+  everyMinutes: 2,
+  maxOutstanding: 20,
+  startHour: 6,
+  endHour: 22,
+};
+
+export interface DripInput {
+  nowMs: number;
+  /** Zaal's local hour, 0-23. */
+  localHour: number;
+  lastSentMs: number | null;
+  outstanding: number;
+  remainingInQueue: number;
+  cfg?: DripConfig;
+}
+
+export function shouldSendNext(input: DripInput): { send: boolean; reason: string } {
+  const cfg = input.cfg ?? DRIP_DEFAULT;
+  if (input.remainingInQueue <= 0) return { send: false, reason: 'queue empty' };
+  if (input.localHour < cfg.startHour || input.localHour >= cfg.endHour) {
+    return { send: false, reason: `outside ${cfg.startHour}-${cfg.endHour}` };
+  }
+  if (input.outstanding >= cfg.maxOutstanding) {
+    return { send: false, reason: `${input.outstanding} already unanswered - let him catch up` };
+  }
+  const since = input.lastSentMs === null ? Infinity : input.nowMs - input.lastSentMs;
+  if (since < cfg.everyMinutes * 60_000) {
+    return { send: false, reason: 'too soon since the last card' };
+  }
+  return { send: true, reason: 'due' };
+}
+
+/** What gets written into the task's notes, so every close explains itself. */
+export function verdictNote(v: Verdict, date: string): string {
+  const base = {
+    done: 'confirmed done',
+    keep: 'still wanted - kept open',
+    work: 'sent to be worked on',
+    drop: 'dropped - not doing it',
+    skip: 'skipped for now',
+  }[v.key];
+  const note = v.note ? ` Zaal added: "${v.note}"` : '';
+  return `GRILL ${date} (Telegram): ${base}.${note}`;
+}

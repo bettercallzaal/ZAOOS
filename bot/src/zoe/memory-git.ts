@@ -18,6 +18,7 @@ import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+import { featureRan } from './feature-ran';
 
 const execFileAsync = promisify(execFile);
 
@@ -69,6 +70,7 @@ export async function commitMemoryWrite(
       '-m', `memory: ${file} - ${reason}\n\nAuthor: ${author}`,
       '--author', `${author} <${author}@thezao.com>`,
     ]);
+    featureRan('memory-git', file);
     return await git(['rev-parse', '--short', 'HEAD']);
   } catch (error: unknown) {
     // LOUD soft-fail: versioning must never break a memory write, but a silent

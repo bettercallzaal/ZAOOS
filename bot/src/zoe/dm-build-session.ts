@@ -25,6 +25,8 @@
  * reply says so.
  */
 
+import { featureRan } from './feature-ran';
+
 export interface ActiveBuild {
   /** Hermes run id, once the runner has created it. */
   runId?: string;
@@ -51,6 +53,7 @@ export function isStopRequest(message: string): boolean {
 }
 
 export function beginBuild(chatId: number, task: string): ActiveBuild {
+  featureRan('dm-build', `chat ${chatId}`);
   const b: ActiveBuild = {
     task,
     startedAt: Date.now(),

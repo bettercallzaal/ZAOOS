@@ -77,6 +77,16 @@ jobs:
       - run: npm ci
         working-directory: bot
 
+      # Typecheck the bot's runtime source. Nothing did this before: the root
+      # tsconfig excludes "bot", and this job ran only vitest - so the ~50 bot
+      # modules that no test imports were never type-checked by anything, and
+      # since the bot runs under tsx (which strips types without checking them),
+      # the first thing to notice a bad type was the live bot at runtime.
+      # Scoped to non-test sources via tsconfig.ci.json - see the comment there.
+      - name: Typecheck (bot runtime source)
+        run: npx tsc --noEmit -p tsconfig.ci.json
+        working-directory: bot
+
       - run: npm test
         working-directory: bot
 

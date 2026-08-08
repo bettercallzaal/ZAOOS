@@ -10,20 +10,23 @@ import {
 } from '../board-commands';
 
 describe('authorization - a comment box must not become a write API', () => {
-  it('Zaal may command', () => {
-    expect(isAuthorizedCommander('Zaal')).toBe(true);
+  // The board stamps Zaal's comments { userId: 'zaal', displayName: 'Zaal' }
+  // (task-teammate-ack.ts:601, :671), and userId is what every sibling module
+  // in this directory uses as identity. This gate reads the same field.
+  it('Zaal may command, matched on the account id', () => {
     expect(isAuthorizedCommander('zaal')).toBe(true);
+    expect(isAuthorizedCommander('Zaal')).toBe(true);
     expect(isAuthorizedCommander('  ZAAL  ')).toBe(true);
   });
 
   // Iman can still ASK @zoe anything - the reply path is untouched. He just
   // cannot mutate the board through a comment.
   it('a teammate may not command', () => {
-    expect(isAuthorizedCommander('Iman')).toBe(false);
-    expect(isAuthorizedCommander('Samantha')).toBe(false);
+    expect(isAuthorizedCommander('iman')).toBe(false);
+    expect(isAuthorizedCommander('samantha')).toBe(false);
   });
 
-  it('an unknown or missing name is never a commander', () => {
+  it('an unknown or missing id is never a commander', () => {
     expect(isAuthorizedCommander(undefined)).toBe(false);
     expect(isAuthorizedCommander(null)).toBe(false);
     expect(isAuthorizedCommander('')).toBe(false);
@@ -46,19 +49,47 @@ describe('tagsZoe', () => {
 
 describe('shouldExecute - all three gates', () => {
   it('runs for an authorized commander tagging zoe', () => {
-    expect(shouldExecute({ content: '@zoe close this', displayName: 'Zaal' }).execute).toBe(true);
+    const r = shouldExecute({ content: '@zoe close this', userId: 'zaal', displayName: 'Zaal' });
+    expect(r.execute).toBe(true);
   });
 
   it('does not run when zoe is not tagged', () => {
-    const r = shouldExecute({ content: 'close this please', displayName: 'Zaal' });
+    const r = shouldExecute({ content: 'close this please', userId: 'zaal', displayName: 'Zaal' });
     expect(r.execute).toBe(false);
     expect(r.reason).toContain('does not tag');
   });
 
   it('does not run for an unauthorized commenter, and says who', () => {
-    const r = shouldExecute({ content: '@zoe close this task', displayName: 'Iman' });
+    const r = shouldExecute({ content: '@zoe close this task', userId: 'iman', displayName: 'Iman' });
     expect(r.execute).toBe(false);
     expect(r.reason).toContain('Iman');
+  });
+
+  // The reason this gate moved off displayName. A display name is a profile
+  // field the user picks; the account id is not. Before this, the comment below
+  // executed - anyone who renamed themselves "Zaal" could create, reassign and
+  // close board tasks.
+  it('a teammate whose display name says Zaal still may not command', () => {
+    const r = shouldExecute({ content: '@zoe close this task', userId: 'iman', displayName: 'Zaal' });
+    expect(r.execute).toBe(false);
+    expect(r.reason).toContain('not an authorized commander');
+  });
+
+  it('refuses, rather than trusting the label, when there is no account behind the comment', () => {
+    const r = shouldExecute({ content: '@zoe close this task', displayName: 'Zaal' });
+    expect(r.execute).toBe(false);
+    expect(r.reason).toContain('no userId');
+  });
+
+  // And the inverse failure: a fuller display name must not stop the real Zaal
+  // from commanding, which is what keying on the label would have done.
+  it('a longer display name does not block the real commander', () => {
+    const r = shouldExecute({
+      content: '@zoe close this task',
+      userId: 'zaal',
+      displayName: 'Zaal Panthaki',
+    });
+    expect(r.execute).toBe(true);
   });
 });
 

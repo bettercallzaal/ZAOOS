@@ -27,6 +27,9 @@ export interface ExecContext {
   taskTitle: string;
   commentId: string;
   commentContent: string;
+  /** The commenter's board ACCOUNT id. Authorization reads this and nothing else. */
+  commentAuthorId?: string | null;
+  /** The commenter's display name. Label only - never grants authority. */
   commentAuthor?: string | null;
 }
 
@@ -143,7 +146,11 @@ export async function executeBoardComment(
   extract: (prompt: string) => Promise<string | null>,
   fetchImpl: typeof fetch = fetch,
 ): Promise<ExecResult | null> {
-  const gate = shouldExecute({ content: ctx.commentContent, displayName: ctx.commentAuthor });
+  const gate = shouldExecute({
+    content: ctx.commentContent,
+    userId: ctx.commentAuthorId,
+    displayName: ctx.commentAuthor,
+  });
   if (!gate.execute) return null;
 
   let raw: unknown = null;

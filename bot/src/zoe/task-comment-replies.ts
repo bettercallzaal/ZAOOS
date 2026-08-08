@@ -249,6 +249,10 @@ export async function runTaskCommentReplies(
           taskTitle: task.title,
           commentId: comment.id,
           commentContent: comment.content,
+          // userId is the identity this file already trusts (see tagsZoe above,
+          // which recognises ZOE's own comments by userId). displayName goes
+          // along only so a refusal can name who was refused.
+          commentAuthorId: comment.userId,
           commentAuthor: comment.displayName,
         },
         // Extraction is a small, mechanical transform - cheap model, no tools,

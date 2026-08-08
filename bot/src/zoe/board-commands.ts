@@ -48,13 +48,32 @@ const AUTHORIZED_COMMANDERS = new Set(['zaal']);
 /**
  * Is this commenter allowed to issue commands?
  *
- * Matched on the board's displayName, lowercased. Deliberately strict: an
- * unknown name is not a commander. A teammate tagging @zoe still gets an
- * ANSWER (that path is unchanged) - they just cannot mutate the board through
- * it, which stops a comment box from becoming an unauthenticated write API.
+ * Matched on the comment's `userId` - the board's stable account identity -
+ * NOT on `displayName`.
+ *
+ * WHY NOT displayName. It was, and that was an authorization check on a
+ * human-readable label. A board comment record carries both fields, and every
+ * sibling module in this directory already treats `userId` as the identity and
+ * `displayName` as decoration: task-comment-replies.ts recognises ZOE's own
+ * replies by `c.userId !== 'zoe'`, task-teammate-ack.ts tests
+ * `c.userId !== 'zaal'`, task-mention-notify.ts matches handles against
+ * `comment.userId`, and both of the comments this repo writes on Zaal's behalf
+ * are stamped `{ userId: 'zaal', displayName: 'Zaal' }`
+ * (task-teammate-ack.ts:601, :671). Only this gate reached for the label.
+ *
+ * That mismatch fails in both directions. A display name is a profile field a
+ * user picks, so anyone who can set theirs to "Zaal" (or "zaal", or " ZAAL ")
+ * inherits create/assign/close authority over the board - the comment box
+ * becoming a write API is exactly what this module says it prevents. And in the
+ * other direction, if the board renders a fuller name ("Zaal Panthaki"), the
+ * gate silently matches nobody and every board command falls through to a chat
+ * reply, which is the failure that looks like the feature was never built.
+ *
+ * A teammate tagging @zoe still gets an ANSWER - that path is untouched. They
+ * just cannot mutate the board through it.
  */
-export function isAuthorizedCommander(displayName?: string | null): boolean {
-  return AUTHORIZED_COMMANDERS.has((displayName || '').trim().toLowerCase());
+export function isAuthorizedCommander(userId?: string | null): boolean {
+  return AUTHORIZED_COMMANDERS.has((userId || '').trim().toLowerCase());
 }
 
 /** Does this comment address ZOE at all? */
@@ -150,15 +169,30 @@ function summarize(entry: unknown): string {
  *
  * Three gates, in order of cheapness. All must pass.
  */
-export function shouldExecute(comment: { content?: string; displayName?: string | null }): {
+export function shouldExecute(comment: {
+  content?: string;
+  /** The board account that wrote the comment. The ONLY thing authorization reads. */
+  userId?: string | null;
+  /** Label only - used to say who was refused. Never grants anything. */
+  displayName?: string | null;
+}): {
   execute: boolean;
   reason: string;
 } {
   const content = comment.content || '';
   if (!tagsZoe(content)) return { execute: false, reason: 'does not tag @zoe' };
-  if (!isAuthorizedCommander(comment.displayName)) {
+  if (!comment.userId) {
+    // Fail closed. A comment with no account behind it cannot be authorized by
+    // the name printed next to it, and refusing loudly beats executing on a
+    // label - the reply path still answers it.
+    return { execute: false, reason: 'comment carries no userId - refusing to authorize on a display name' };
+  }
+  if (!isAuthorizedCommander(comment.userId)) {
     // Still answerable by the existing reply path - just not executable.
-    return { execute: false, reason: `${comment.displayName || 'unknown'} is not an authorized commander` };
+    return {
+      execute: false,
+      reason: `${comment.displayName || comment.userId} is not an authorized commander`,
+    };
   }
   return { execute: true, reason: 'authorized' };
 }

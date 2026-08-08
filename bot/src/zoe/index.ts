@@ -38,6 +38,8 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { detectBuildIntent } from './build-intent';
+import { parseBusReply } from './bus-bridge';
+import { replySubject, sendBusReply } from './bus-send';
 import { doneKeyboard, maybeKeyboard, runningKeyboard } from './dm-build-buttons';
 import { LiveStatus, renderBuildStatus } from './live-status';
 import { stashPending, takePending, worthOffering } from './dm-build-pending';
@@ -2489,6 +2491,30 @@ async function dispatchConcierge(
   //
   // Flag-gated (ZOE_DM_BUILD=1, default OFF). PR-only is what makes auto-
   // dispatch safe: the pipeline opens a PR, a human merges (agent-loops rule 8).
+  // "reply <id> <your words>" - the syntax every bus message tells him to type.
+  //
+  // Until now nothing parsed it, so typing it fell through to the concierge and
+  // was answered as ordinary chat. bus-bridge.ts has had parseBusReply() for
+  // exactly this and was left deliberately unwired; this is that wiring step.
+  //
+  // Checked BEFORE the build classifier, because "reply ab12cd fix the api" must
+  // be a bus reply, not a build request - the prefix is explicit and wins.
+  if (scope === 'private') {
+    const busReply = parseBusReply(text);
+    if (busReply) {
+      const res = await sendBusReply({
+        to: process.env.BUS_PARTNER ?? 'coordinator',
+        subject: replySubject(),
+        body: busReply.text,
+      });
+      await ctx.reply(res.reply).catch(() => {});
+      if (!res.ok) {
+        console.warn(`[zoe/index] bus reply not sent (${res.reason}) - text preserved in the chat`);
+      }
+      return;
+    }
+  }
+
   if (scope === 'private' && process.env.ZOE_DM_BUILD === '1') {
     const running = getActiveBuild(chatId);
 

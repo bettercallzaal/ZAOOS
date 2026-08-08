@@ -714,6 +714,7 @@ export async function autoCloseFinishedTasks(
 
     let closed = 0;
     const reasons: string[] = [];
+    const refused: string[] = [];
     for (const v of toClose) {
       const row = rows.find((r) => r.id === v.id);
       const stamp = new Date().toISOString().slice(0, 10);
@@ -721,14 +722,32 @@ export async function autoCloseFinishedTasks(
       const patch = await fetch(`${root}/rest/v1/tasks?id=eq.${v.id}`, {
         method: 'PATCH',
         headers: { ...headers, Prefer: 'return=minimal' },
-        body: JSON.stringify({ status: 'completed', notes }),
+        // 'done', NOT 'completed'. A CHECK constraint on tasks.status rejects
+        // anything else with a 400 (Postgres 23514), and the failure is silent
+        // at this level - patch.ok goes false, the count stays 0, and the pass
+        // looks like "nothing to close" rather than "every close was refused".
+        // The live values are: todo (286), done (710), blocked (2), in_progress
+        // (2). This exact mistake already cost four failed attempts at a
+        // `zao-tracker done` subcommand before the 400 body was ever read.
+        body: JSON.stringify({ status: 'done', notes }),
       });
       if (patch.ok) {
         closed += 1;
         reasons.push(`${v.title.slice(0, 60)} - ${v.reason}`);
+      } else {
+        // Never let a rejected write read as "nothing needed closing".
+        refused.push(`${patch.status} on ${v.title.slice(0, 50)}`);
       }
     }
-    return { ok: true, scanned: rows.length, closed, deferred, reasons, vacuousReminders };
+    return {
+      ok: refused.length === 0,
+      scanned: rows.length,
+      closed,
+      deferred,
+      reasons,
+      vacuousReminders,
+      error: refused.length ? `${refused.length} close(s) REFUSED: ${refused.join('; ')}` : undefined,
+    };
   } catch (e) {
     return { ok: false, ...empty, error: e instanceof Error ? e.message : 'auto-close failed' };
   }

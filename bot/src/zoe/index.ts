@@ -127,8 +127,7 @@ import {
   formatPulse,
   formatAgenda,
   parseBatchAnswer,
-  classifyIntent,
-} from './tg-interactions';
+  classifyIntent, isCommandPrefixed } from './tg-interactions';
 import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
@@ -1397,7 +1396,17 @@ bot.on('message:text', async (ctx) => {
 
   // FEATURE 6: BATCH-ANSWER parsing
   // Parse "1:A 2:best 3:skip" format for multi-question answers
-  if (chatType === 'private' && isFromZaal(ctx) && text.includes(':') && /^\d+:|^[a-z]+:/i.test(text.trim())) {
+  // isCommandPrefixed keeps `build:`/`fix:`/`ship:` out of the batch parser.
+  // Guarding here as well as inside parseBatchAnswer is deliberate: this branch
+  // RETURNS, so if it matches, nothing downstream ever runs. Defence at the
+  // gate as well as in the room.
+  if (
+    chatType === 'private' &&
+    isFromZaal(ctx) &&
+    text.includes(':') &&
+    !isCommandPrefixed(text) &&
+    /^\d+:|^[a-z]+:/i.test(text.trim())
+  ) {
     const answers = parseBatchAnswer(text);
     if (answers.length > 0) {
       // Log each batch answer

@@ -21,6 +21,7 @@
  */
 
 import { callClaudeCli } from '../hermes/claude-cli';
+import { executeBoardComment } from './board-command-executor';
 
 export interface BoardComment {
   id: string;
@@ -233,7 +234,47 @@ export async function runTaskCommentReplies(
   let answered = 0;
 
   for (const { task, comment } of pending) {
-    const ans = await answerMention(task, comment, call);
+    // COMMAND FIRST, then fall through to answering.
+    //
+    // Most @zoe comments are questions and this returns null for all of them.
+    // But when Zaal writes "make a new todo called X, task it to iman and close
+    // this one", answering it with a sentence is the wrong response - he asked
+    // for the board to change. Only an authorized commander gets here; a
+    // teammate tagging @zoe still falls straight through to the reply path.
+    let ans: string | null = null;
+    try {
+      const done = await executeBoardComment(
+        {
+          taskId: task.id,
+          taskTitle: task.title,
+          commentId: comment.id,
+          commentContent: comment.content,
+          commentAuthor: comment.displayName,
+        },
+        // Extraction is a small, mechanical transform - cheap model, no tools,
+        // short leash. It only ever produces JSON that the pure layer then
+        // validates, so it is given no ability to touch the repo.
+        async (prompt) => {
+          const res = await call({
+            model: 'haiku',
+            prompt,
+            cwd: process.cwd(),
+            allowedTools: [],
+            timeoutMs: 45_000,
+            maxBudgetUsd: 0.1,
+          });
+          return res.isError ? null : (res.text || '').trim() || null;
+        },
+        fetchImpl,
+      );
+      // The receipt IS the reply - so a board change is always visible in the
+      // thread that caused it, never a silent mutation.
+      if (done) ans = done.receipt;
+    } catch (err) {
+      console.warn('[zoe/board-commands] execution failed (falling back to a reply):', (err as Error)?.message);
+    }
+
+    if (!ans) ans = await answerMention(task, comment, call);
     if (!ans) continue;
     // Re-fetch just before writing to shrink the window where a concurrent app
     // write clobbers our append or someone else already answered.

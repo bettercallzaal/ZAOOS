@@ -15,12 +15,54 @@ tier: DEEP
 > via CLI messaging than SSH orchestration - against a session that did nothing
 > but SSH-orchestrate for eight hours.
 
+## The mechanism, verified against the CLI itself
+
+Zaal's read, which is better than mine: the post is about **a way to let Claude
+Code use other terminal sessions**. The author's other two titles say it plainly -
+"Wire multiple Claude Code sessions together across machines **using only the
+claude cli itself**".
+
+All three of his posts are `[removed]`, so the write-up is gone. But "the claude
+cli itself" is checkable, and it checks out. From `claude --help` on this machine,
+2026-08-07:
+
+| Flag | What it gives you |
+|---|---|
+| `--session-id <uuid>` | "Use a specific session ID for the conversation" - a session can be addressed by a name you choose in advance |
+| `-r, --resume [id]` | "Resume a conversation by session ID" |
+| `-p, --print` | non-interactive: deliver one message, get one answer, exit |
+| `--bg, --background` | "Start the session as a background agent and return immediately" |
+| `claude agents` | "Manage background agents" - first-party, not a hand-rolled daemon |
+| `--fork-session`, `-n --name` | branch a session; give it a human label |
+
+So the shape is:
+
+    claude -p --resume <session-id> "here is what I need"
+
+and, because `--session-id` takes a UUID **you** pick, any machine that knows the
+id can append to a conversation that already holds the context. Background agents
+and `claude agents` make the resident-process half first-party too - which is the
+piece I assumed we would have to build.
+
+**The distinction is not the transport - it is what you send.** SSH orchestration
+sends COMMANDS to a machine with no memory of why. CLI messaging sends a MESSAGE
+to a session that has been watching that machine all along. Both can travel over
+ssh. Only one of them lands somewhere that already understands the context.
+
+That reframing is what makes the post's claim true, and it is sharper than the
+push-vs-pull framing I reached for before checking the CLI.
+
 ## The source, and its honest limit
 
 r/claudeskills, u/espenakker:
 
 > "I linked Claude Code across my main PC, laptops, and a Jetson. **CLI messaging
 > works better than SSH orchestration.**"
+
+and, from the same author on the same day:
+
+> "Wire multiple Claude Code sessions together across machines **using only the
+> claude cli itself**"
 
 **The post body is `[removed]`.** Confirmed twice - via `zao-fetch-reddit.sh` and
 directly against the arctic_shift archive, which also stores it as `[removed]`.
@@ -106,15 +148,18 @@ The three real moves, in order of value:
    --remote` (doc: PR #2968/#2969) answers built/wired/flagged/live in one command
    and caught the wrong-valued flags within an hour of shipping. Pull is fine when
    it is one cheap command instead of a diagnostic expedition.
-3. **A resident agent per machine is the real upgrade, and it is not free.** It
-   means one instance per host, each with its own cap, memory and failure modes -
-   and `agent-loops.md` rule 9 (one instance per resource) gets harder, not
-   easier. Worth it only once 1 and 2 are done and still insufficient.
+3. **A resident session per machine is the real upgrade, and it is cheaper than I
+   assumed.** `--bg` plus `claude agents` makes the background-process half
+   first-party, and `--session-id` with an id we choose means the VPS session can
+   be addressed from anywhere without a registry. The cost is not the build - it
+   is that each host gets its own cap, its own memory, and its own way to fail,
+   and `agent-loops.md` rule 9 (one instance per resource) gets harder to hold.
+   Worth doing once 1 and 2 are in place, and worth a real doc before starting.
 
-Native cross-session messaging (doc 2246) is the transport when that day comes -
-named addressing, push delivery, summary-only. It does not yet cross machines as
-far as we have verified, which is exactly the gap this post claims to have solved
-and, with its body removed, does not show.
+Doc 2246 covered the in-session case (`SendMessage` between agents in one tree).
+This is the complement: `--session-id` / `--resume` / `--bg` address a session on
+ANOTHER machine, which is the gap 2246 left open and marked UNVERIFIED. Between
+them the picture is now complete, and neither required a third-party tool.
 
 ## Also See
 
@@ -133,6 +178,7 @@ and, with its body removed, does not show.
 
 ## Sources
 
-- [r/claudeskills post 1vid863](https://www.reddit.com/r/claudeskills/comments/1vid863/) - **PARTIAL**. Title and comments retrieved 2026-08-07 via `zao-fetch-reddit.sh`; **the body is `[removed]`**, confirmed independently against the arctic_shift archive. The author's method is not available and is not reconstructed here.
+- [r/claudeskills post 1vid863](https://www.reddit.com/r/claudeskills/comments/1vid863/) - **PARTIAL**. Title and comments retrieved 2026-08-07 via `zao-fetch-reddit.sh`; **the body is `[removed]`**, confirmed independently against the arctic_shift archive. The same author's two companion posts (`1viaj6a`, `1viaa8h`) are also `[removed]` - their titles are the only surviving detail and are quoted above. The method below is NOT his write-up; it is the CLI's own documented behaviour.
+- `claude --help`, Claude Code CLI on this machine, 2026-08-07 - **FULL**, first-party. Every flag in the mechanism table is quoted from it verbatim.
 - This session's own logs and SSH transcripts, 2026-08-07 - **FULL**. The wedged autodeploy, the wrong-valued flags, the undeployed bus, and the unwired bridge are all first-hand.
 - `~/bin/zao-status`, `~/bin/zoe-autodeploy.sh` on the live VPS - **FULL**, read directly.

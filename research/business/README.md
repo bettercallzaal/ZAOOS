@@ -268,3 +268,4 @@
 | 2242 | [x402 -> POIDH funding endpoint (spec)](./2242-x402-poidh-funding-endpoint-spec/) | STANDALONE | The design for doc 2234's #1 adopt: an HTTP-402 endpoint that lets an AGENT |
 | 2243 | [Audos: the "Record Label for Entrepreneurs" + the zaofestivals prompt](./2243-audos-platform-zaofestivals/) | STANDALONE | Zaal's drop (2026-08-07): research Audos and produce the prompt that builds |
 | 2248 | [DGCL 251(g): testing a Superstonk thesis against the statute and the filings](./2248-dgcl-251g-gamestop-holdco/) | STANDALONE | Take a specific claim - that Ryan Cohen has spent the year setting up a |
+| 2251 | [Sparkz rebrand + modular wheel-and-spokes architecture](./2251-sparkz-rebrand-and-modular-architecture/) | STANDALONE | Decide the naming (product / core unit / supporter), and the simplest vendor-plugin |

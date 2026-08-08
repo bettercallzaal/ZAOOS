@@ -258,3 +258,4 @@
 | 2230 | [clawd-scribe: what to adopt for ZAO's /meeting (grounded, file:line)](./2230-clawd-scribe-meeting-capture-adopt/) | STANDALONE | Read clawd's local meeting-notes tool and name what it structurally does |
 | 2237 | [clawd-clipper -> ZAO content: adopt the hallucination-proof anchoring](./2237-clawd-clipper-content-pipeline-adopt/) | STANDALONE | Spec what ZAO's content pipeline (episodes, Fractal calls, ZAOstock, the |
 | 2247 | [The CONTRA layer: a vault that argues back](./2247-obsidian-contra-loop/) | STANDALONE | Decide whether to build the contrarian-loop pattern on top of `~/zao-vault`, |
+| 2250 | [WebFetch summarises. It does not quote.](./2250-webfetch-summarises-it-does-not-quote/) | STANDALONE | Establish whether Claude Code's `WebFetch` can be cited verbatim, and |

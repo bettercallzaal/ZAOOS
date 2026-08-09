@@ -38,6 +38,7 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { detectBuildIntent } from './build-intent';
+import { applyBacklogAnswer } from './backlog-grill-runner';
 import { parseBusReply } from './bus-bridge';
 import { replySubject, sendBusReply } from './bus-send';
 import { doneKeyboard, maybeKeyboard, runningKeyboard } from './dm-build-buttons';
@@ -1580,6 +1581,31 @@ bot.on('message:text', async (ctx) => {
         }
       } catch (e: unknown) {
         console.error('[zoe/grill] typed-answer capture failed:', (e as Error)?.message);
+      }
+    }
+
+    // BACKLOG GRILL typed answer. Deliberately placed AFTER the block above:
+    // the grill up there BLOCKS on its item, so if it has an open decision a
+    // bare "1" belongs to it. This only claims what that one declined.
+    //
+    // Guarded tightly, per first-handler-wins: it fires only when a backlog
+    // card is genuinely open AND the text is a bare 1-5 or one of the five
+    // words. Anything longer falls through to normal chat, so a sentence is
+    // never eaten - the "work on it with a typed brief" path lives on the
+    // buttons, not here, precisely so ordinary DM prose stays untouched.
+    if (!ctx.message.reply_to_message && /^\s*([1-5]|done|keep|work|drop|skip)\s*$/i.test(text)) {
+      try {
+        const { readState } = await import('./backlog-grill-runner');
+        const bgState = await readState();
+        if (bgState.activeTaskId) {
+          const r = await applyBacklogAnswer(text);
+          if (r.ok) {
+            await ctx.reply(r.message);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('[zoe/backlog-grill] typed answer failed:', (e as Error)?.message);
       }
     }
     // Thread context: when Zaal QUOTE-REPLIES a message, fold what he replied to
@@ -3340,6 +3366,23 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
 
 // #51 multi-choice: "Pick multiple" swaps the card's keyboard for toggle rows
 // ([x]/[ ] per option) + Send/Cancel. Single taps elsewhere stay instant.
+// BACKLOG GRILL taps. One handler for all five - the verdict is the suffix.
+bot.callbackQuery(/^bg:(done|keep|work|drop|skip)$/, async (ctx) => {
+  const key = (ctx.callbackQuery.data || '').slice(3);
+  try {
+    const r = await applyBacklogAnswer(key);
+    await ctx.answerCallbackQuery({ text: r.message.slice(0, 190) });
+    // Edit the card so an answered one cannot be answered twice, and so a
+    // scroll-back through the queue shows what was decided.
+    await ctx
+      .editMessageText(`${ctx.callbackQuery.message?.text || ''}\n\n-> ${r.message}`)
+      .catch(() => {});
+  } catch (e) {
+    await ctx.answerCallbackQuery({ text: 'That did not land - try again.' }).catch(() => {});
+    console.error('[zoe/backlog-grill] tap failed:', (e as Error)?.message);
+  }
+});
+
 bot.callbackQuery('grill:multi', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const active = await getActiveGrill();

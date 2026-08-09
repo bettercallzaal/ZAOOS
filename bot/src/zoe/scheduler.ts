@@ -54,6 +54,7 @@ import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
+import { runBacklogGrillTick } from './backlog-grill-runner';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -326,6 +327,52 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // BACKLOG GRILL. Every 2 minutes during Zaal's waking hours, drip ONE board
+  // task to his DM with the same five answers every time (1 done, 2 keep,
+  // 3 work on it, 4 drop, 5 skip).
+  //
+  // This is not the grill above. That one surfaces what NEEDS him - decisions,
+  // PRs - and waits for each answer. This one works the 357-task backlog, and
+  // deliberately lets cards pile up (capped at 20) because the pile IS the queue
+  // he sweeps. He cleared 24 in one sitting in a terminal doing exactly this.
+  //
+  // Every guard lives in backlog-grill.ts: nothing outside 06:00-22:00 his time,
+  // nothing once 20 are unanswered, nothing when the queue is empty. This cron
+  // only supplies the clock.
+  tasks.push(
+    cron.schedule(
+      '*/2 * * * *',
+      async () => {
+        try {
+          // Zaal is ET; the box is UTC. Computing his local hour here rather
+          // than assuming, because a card at 3am is how a feature gets muted.
+          const localHour = Number(
+            new Intl.DateTimeFormat('en-US', {
+              timeZone: 'America/New_York',
+              hour: 'numeric',
+              hour12: false,
+            }).format(new Date()),
+          );
+          const r = await runBacklogGrillTick({
+            localHour,
+            sendDM: (text, buttons) =>
+              opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                reply_markup: {
+                  inline_keyboard: buttons.map((row) =>
+                    row.map((b) => ({ text: b.text, callback_data: b.data })),
+                  ),
+                },
+              }),
+          });
+          if (r.sent) console.log(`[zoe/backlog-grill] sent: ${r.title}`);
+        } catch (err) {
+          console.warn('[zoe/backlog-grill] tick failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

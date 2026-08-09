@@ -55,6 +55,7 @@ import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillTick } from './backlog-grill-runner';
+import { featureRan } from './feature-ran';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -370,6 +371,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
                 },
               }),
           });
+          // Announce the FIRST tick after a boot whatever it decided, so a
+          // quiet morning is legible: 'outside 6-22' and 'queue empty' are very
+          // different from a cron that never fired, and without this they look
+          // identical (state-claims.md - silence is not evidence).
+          featureRan('backlog-grill', r.sent ? 'sending' : r.reason);
           if (r.sent) console.log(`[zoe/backlog-grill] sent: ${r.title}`);
         } catch (err) {
           console.warn('[zoe/backlog-grill] tick failed (nbd):', (err as Error).message);

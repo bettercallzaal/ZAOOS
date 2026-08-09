@@ -194,6 +194,60 @@ Ask: "What do you need? I can:
 4. **Tell ZOE to do something** (`/vps tell ...`) — Telegram message
 5. **Ask ZOE a question** (`/vps ask ...`) — Telegram message"
 
+## The three tools to reach for first (added 2026-08-08)
+
+These postdate the rest of this skill. Reach for them before hand-rolling an
+`ssh` one-liner.
+
+### Deploy: never restart the bot by hand
+
+    ssh vps '~/bin/zoe-autodeploy.sh'
+
+Verifies `origin/main` in a throwaway worktree FIRST, and only restarts the live
+clone if that passes - with auto-rollback on a boot error. It exists because
+`tsc` passing is not enough: esbuild bundles the real boot graph and can crash a
+bot that typechecks cleanly. Do not hot-edit the live clone or restart the
+service directly; both are how you get a bot running code nobody verified.
+
+Confirm it landed rather than trusting the output:
+
+    ssh vps 'cd ~/zao-bot-live && echo "HEAD=$(git rev-parse --short HEAD) behind=$(git rev-list --count HEAD..origin/main)"'
+
+### Is a feature actually RUNNING?
+
+    python3 scripts/agents/zoe-liveness.py --remote
+
+Answers built / wired / flagged / live per feature, and compares each flag's
+LIVE value against the literal the code accepts. That last part matters: several
+flags are gated on `=== '1'`, so setting one to `true` leaves it OFF while
+reading as done - the worst kind of wrong, because it looks finished.
+
+And to prove a feature has actually executed since the last boot:
+
+    ssh vps "journalctl --user -u zoe-bot.service --since '1 hour ago' | grep '\[zoe/ran\]'"
+
+One line per feature per boot. **Zero lines is only meaningful if the feature can
+log at all** - see `state-claims.md`, "silence is not evidence".
+
+### Check a claim before repeating it
+
+    python3 scripts/agents/zao-verify.py dep|wired|flag|exists|env <arg>
+
+Each answer prints its source. `env` first whenever a tool reports something
+surprising: an empty `node_modules` produces hundreds of confident fake errors.
+
+## Where the logs actually are
+
+ZOE runs as a **systemd user unit** (`zoe-bot.service`), so its stdout goes to
+**journald, not a tmux pane**. Looking for it in tmux wastes time - the sessions
+named after lanes are unrelated. Ancestry check when unsure:
+
+    ssh vps 'cat /proc/$(systemctl --user show -p MainPID --value zoe-bot.service)/cgroup | grep -o "[a-z-]*\.service"'
+
+Note the split: **ZOE runs from `~/zao-bot-live`, but `ZOE_REPO_DIR` points at
+`~/zao-os`** - a separate clone used for reading repo state. They are not the
+same checkout, and confusing them sends you editing code the bot never loads.
+
 ## Known Gotchas (current architecture)
 
 1. **It's systemd `--user`, not system-wide.** Always pass `--user` to `systemctl` / `journalctl`. Without it you'll query the wrong (empty) scope.

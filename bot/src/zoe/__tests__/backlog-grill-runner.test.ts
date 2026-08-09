@@ -131,6 +131,29 @@ describe('applyBacklogAnswer - the answer follows the card, not the cursor', () 
     expect(patched).toHaveLength(1);
   });
 
+  /**
+   * Closing REPLACES `notes`, so it has to read them first. When that read
+   * fails there is nothing to preserve, and writing anyway replaced the whole
+   * note history with one grill line while telling Zaal "Closed."
+   */
+  it('does not close - or overwrite notes - when the notes read fails', async () => {
+    const failingRead = (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        patched.push({ url: String(url), body: JSON.parse(String(init.body)) });
+        return { ok: true, status: 200 } as unknown as Response;
+      }
+      return { ok: false, status: 503, json: async () => [] } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+    const r = await applyBacklogAnswer('done', failingRead, OLD);
+
+    expect(r.ok).toBe(false);
+    expect(r.message).toContain('503');
+    expect(patched).toHaveLength(0);
+    // Still unanswered, so the next tap retries instead of losing the card.
+    expect((await readState()).answered[OLD]).toBeUndefined();
+  });
+
   // A requeued verdict forgets the `answered` mark, so the task is answerable
   // the second time - but KEEPS `asked`, stamped, so it does not jump the queue.
   it('lets a requeued task be answered again when it returns', async () => {

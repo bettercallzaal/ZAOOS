@@ -55,6 +55,7 @@ import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillTick } from './backlog-grill-runner';
+import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
@@ -360,23 +361,33 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               hour12: false,
             }).format(new Date()),
           );
-          const r = await runBacklogGrillTick({
-            localHour,
-            sendDM: (text, buttons) =>
-              opts.bot.api.sendMessage(opts.zaalTgId, text, {
-                reply_markup: {
-                  inline_keyboard: buttons.map((row) =>
-                    row.map((b) => ({ text: b.text, callback_data: b.data })),
-                  ),
-                },
+          // One tick at a time. The cron fires every 2 minutes; if a tick ever
+          // outlives that - a slow board query, a Telegram timeout - two would
+          // overlap, both read the same state, both pick the same oldest task,
+          // and Zaal gets the SAME card twice while one state write clobbers
+          // the other. Reuses the lock the work-loop and orchestrator use.
+          const locked = await withTickLock(
+            join(ZOE_PATHS.home, 'backlog-grill.tick.lock'),
+            async () =>
+              runBacklogGrillTick({
+                localHour,
+                sendDM: (text, buttons) =>
+                  opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                    reply_markup: {
+                      inline_keyboard: buttons.map((row) =>
+                        row.map((b) => ({ text: b.text, callback_data: b.data })),
+                      ),
+                    },
+                  }),
               }),
-          });
+          );
           // Announce the FIRST tick after a boot whatever it decided, so a
-          // quiet morning is legible: 'outside 6-22' and 'queue empty' are very
-          // different from a cron that never fired, and without this they look
-          // identical (state-claims.md - silence is not evidence).
+          // quiet morning is legible: 'outside 6-22', 'queue empty' and a
+          // contended lock are very different from a cron that never fired, and
+          // without this they look identical (state-claims.md).
+          const r = locked.ran ? locked.value : { sent: false, reason: `lock ${locked.reason}` };
           featureRan('backlog-grill', r.sent ? 'sending' : r.reason);
-          if (r.sent) console.log(`[zoe/backlog-grill] sent: ${r.title}`);
+          if (r.sent) console.log(`[zoe/backlog-grill] sent: ${(r as { title?: string }).title}`);
         } catch (err) {
           console.warn('[zoe/backlog-grill] tick failed (nbd):', (err as Error).message);
         }

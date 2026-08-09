@@ -17,6 +17,10 @@ const ctx: ExecContext = {
   taskTitle: 'ship the thing',
   commentId: 'comment-abc',
   commentContent: '@zoe make a new todo called zartizen ui cleanup and close this one',
+  // Authorization reads the ACCOUNT id, never the label (#2992). This test was
+  // written against the older shape that gated on displayName; both PRs were
+  // green alone and only collided once both were on main.
+  commentAuthorId: 'zaal',
   commentAuthor: 'Zaal',
 };
 
@@ -116,11 +120,35 @@ describe('authorization still gates everything', () => {
   it('a non-commander executes nothing and never queries', async () => {
     const { impl, calls } = makeFetch();
     const res = await executeBoardComment(
-      { ...ctx, commentAuthor: 'Iman' },
+      { ...ctx, commentAuthorId: 'iman', commentAuthor: 'Iman' },
       extract(CREATE_AND_CLOSE),
       impl,
     );
     expect(res).toBeNull();
     expect(calls).toHaveLength(0);
+  });
+
+  // The vulnerability #2992 closed: a display name is a field the user picks.
+  // Setting it to 'Zaal' must grant nothing.
+  it('a spoofed display name grants no authority', async () => {
+    const { impl, calls } = makeFetch();
+    const res = await executeBoardComment(
+      { ...ctx, commentAuthorId: 'iman', commentAuthor: 'Zaal' },
+      extract(CREATE_AND_CLOSE),
+      impl,
+    );
+    expect(res).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  // And the mirror: the right account works even when the label is unhelpful.
+  it('the right account is authorized whatever the label says', async () => {
+    const { impl } = makeFetch({ existingRows: [] });
+    const res = await executeBoardComment(
+      { ...ctx, commentAuthorId: 'zaal', commentAuthor: 'Zaal Panthaki' },
+      extract(CREATE_AND_CLOSE),
+      impl,
+    );
+    expect(res?.executed).toBe(2);
   });
 });

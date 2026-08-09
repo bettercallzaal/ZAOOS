@@ -48,6 +48,12 @@ export interface BoardComment {
   content: string;
   createdAt?: string;
   editedAt?: string;
+  /**
+   * For a ZOE comment: the id of the comment it is answering. Mirrors the field
+   * in task-comment-replies.ts, which reads it to decide whether a @zoe mention
+   * is still waiting - see buildNotedAck.
+   */
+  replyTo?: string;
 }
 
 export interface BoardTask {
@@ -300,6 +306,32 @@ async function fetchCandidateTasks(fetchImpl: typeof fetch): Promise<BoardTask[]
   }
 }
 
+/**
+ * The "noted" ack comment for one teammate comment.
+ *
+ * `replyTo` is the load-bearing field, and it names the comment this ack is
+ * about. ZOE is not one writer: task-comment-replies.ts also posts as ZOE, and
+ * it decides whether a @zoe mention is still waiting by looking for a later
+ * ZOE-authored comment. An ack with no replyTo is read there as a generic
+ * answer to everything before it, so this ack of IMAN silently marked ZAAL's
+ * @zoe command answered - the #9246 thread. That command then never ran, with
+ * no error anywhere.
+ *
+ * Pure so the field is testable without a network or a disk write.
+ */
+export function buildNotedAck(task: BoardTask, comment: BoardComment): BoardComment {
+  const taskLabel = task.legacy_id ? `#${task.legacy_id}` : task.id;
+  const snippet = comment.content.replace(/\s+/g, ' ').trim().slice(0, 60);
+  return {
+    id: `zoe-ack-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    userId: ZOE_USER_ID,
+    displayName: ZOE_DISPLAY,
+    content: `Noted on ${taskLabel} - flagged to Zaal: "${snippet}". He will reply here.`,
+    createdAt: new Date().toISOString(),
+    replyTo: comment.id,
+  };
+}
+
 /** Append a "noted" ack to the task's metadata.comments. */
 async function postNotedAck(
   task: BoardTask,
@@ -309,15 +341,7 @@ async function postNotedAck(
   const base = process.env.COWORK_TRACKER_URL;
   const key = process.env.COWORK_TRACKER_KEY;
   if (!base || !key) return false;
-  const taskLabel = task.legacy_id ? `#${task.legacy_id}` : task.id;
-  const snippet = comment.content.replace(/\s+/g, ' ').trim().slice(0, 60);
-  const ack: BoardComment = {
-    id: `zoe-ack-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    userId: ZOE_USER_ID,
-    displayName: ZOE_DISPLAY,
-    content: `Noted on ${taskLabel} - flagged to Zaal: "${snippet}". He will reply here.`,
-    createdAt: new Date().toISOString(),
-  };
+  const ack = buildNotedAck(task, comment);
   const metadata = { ...(task.metadata ?? {}) };
   const existing = Array.isArray(metadata.comments) ? (metadata.comments as BoardComment[]) : [];
   metadata.comments = [...existing, ack];

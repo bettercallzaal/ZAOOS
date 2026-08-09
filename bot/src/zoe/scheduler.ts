@@ -55,6 +55,7 @@ import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillTick } from './backlog-grill-runner';
+import { runPinnedBriefTick } from './pinned-brief-runner';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
@@ -390,6 +391,50 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (r.sent) console.log(`[zoe/backlog-grill] sent: ${(r as { title?: string }).title}`);
         } catch (err) {
           console.warn('[zoe/backlog-grill] tick failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // THE PINNED BRIEF. Zaal (2026-08-09): "can we stop making artifacts, they
+  // just get lost... if it not a quick glance its hard to get to it."
+  //
+  // Measured: he answers what ARRIVES (11 of 14 grill cards) and ignores what he
+  // must NAVIGATE to (hosted pages, the cockpit, docs - all near zero). So this
+  // is not another page. It is ONE message, pinned in his DM, edited in place
+  // forever - always the same spot, one tap, never scrolling away.
+  //
+  // Every 5 minutes: cheap (a file read plus one gh call), and it skips the API
+  // entirely when nothing changed, so a quiet hour costs nothing and never
+  // re-marks the message as changed on his phone.
+  tasks.push(
+    cron.schedule(
+      '*/5 * * * *',
+      async () => {
+        try {
+          const r = await withTickLock(
+            join(ZOE_PATHS.home, 'pinned-brief.tick.lock'),
+            async () =>
+              runPinnedBriefTick({
+                sendMessage: async (text) => {
+                  const m = await opts.bot.api.sendMessage(opts.zaalTgId, text);
+                  return { message_id: m.message_id };
+                },
+                pinMessage: (messageId) =>
+                  // disable_notification: the brief updating is not an event he
+                  // needs alerting to - the whole point is that it is quietly
+                  // always correct when he looks.
+                  opts.bot.api.pinChatMessage(opts.zaalTgId, messageId, {
+                    disable_notification: true,
+                  }),
+                editMessage: (messageId, text) =>
+                  opts.bot.api.editMessageText(opts.zaalTgId, messageId, text),
+              }),
+          );
+          featureRan('pinned-brief-tick', r.ran ? r.value.action : `lock ${r.reason}`);
+        } catch (err) {
+          console.warn('[zoe/pinned-brief] tick failed (nbd):', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

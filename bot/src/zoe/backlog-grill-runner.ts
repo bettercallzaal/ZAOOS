@@ -40,8 +40,14 @@ import {
 const STATE_PATH = join(homedir(), '.zao/zoe/backlog-grill-state.json');
 
 export interface BacklogGrillState {
-  /** taskId -> when we sent its card. Presence means "asked". */
-  asked: Record<string, { at: string; title: string }>;
+  /**
+   * taskId -> when we sent its card. Presence means "asked".
+   *
+   * `requeuedAt` marks one that was answered "work" or "skip" and is waiting to
+   * come round again. It stays IN `asked` so it is not treated as never-asked -
+   * see nextTask for why that distinction is the whole fix.
+   */
+  asked: Record<string, { at: string; title: string; requeuedAt?: string }>;
   /** taskId -> the verdict, once answered. */
   answered: Record<string, { at: string; verdict: string; note?: string }>;
   /** The card a bare "1" answers - the most recent one sent. */
@@ -64,9 +70,16 @@ export async function writeState(s: BacklogGrillState): Promise<void> {
   await fs.writeFile(STATE_PATH, JSON.stringify(s, null, 2), { mode: 0o600 });
 }
 
-/** How many cards are out and unanswered. This is the backpressure signal. */
+/**
+ * How many cards are out and unanswered. This is the backpressure signal.
+ *
+ * A requeued task is not outstanding: Zaal already answered it once, and it is
+ * parked at the back of the queue rather than sitting on his phone waiting. If
+ * it counted, twenty skips would permanently pin the cap and the drip would
+ * stop for good.
+ */
 export function outstandingCount(s: BacklogGrillState): number {
-  return Object.keys(s.asked).filter((id) => !s.answered[id]).length;
+  return Object.keys(s.asked).filter((id) => !s.answered[id] && !s.asked[id].requeuedAt).length;
 }
 
 interface BoardTask {
@@ -88,15 +101,23 @@ function cfg(): { root: string; headers: Record<string, string> } | null {
 }
 
 /**
- * The oldest open task not yet asked about.
+ * The next card: the oldest task never asked about, and only once those run
+ * out, the task requeued longest ago.
  *
  * Oldest first on purpose: a 36-day-old task is the one most likely to be dead,
  * and clearing the tail is where the board actually shrinks.
+ *
+ * The two-tier order is what makes "it comes back at the END of the queue" true.
+ * Cards go out oldest-first, so the card Zaal just skipped was by definition the
+ * oldest unasked one - simply un-asking it put it straight back at the FRONT and
+ * the next tick re-sent the same card, forever, and no other task could ever
+ * surface behind it. A requeued task therefore keeps its `asked` mark and waits
+ * behind every task that has not been seen at all.
  */
 async function nextTask(
   s: BacklogGrillState,
   fetchImpl: typeof fetch,
-): Promise<{ task: BoardTask; remaining: number } | null> {
+): Promise<{ task: BoardTask; remaining: number; unasked: number } | null> {
   const c = cfg();
   if (!c) return null;
   const url =
@@ -106,8 +127,14 @@ async function nextTask(
   if (!r.ok) return null;
   const rows = (await r.json()) as BoardTask[];
   const fresh = rows.filter((t) => !s.asked[t.id]);
-  if (fresh.length === 0) return null;
-  return { task: fresh[0], remaining: fresh.length };
+  const requeued = rows
+    .filter((t) => s.asked[t.id]?.requeuedAt && !s.answered[t.id])
+    .sort((a, b) =>
+      String(s.asked[a.id].requeuedAt).localeCompare(String(s.asked[b.id].requeuedAt)),
+    );
+  const queue = [...fresh, ...requeued];
+  if (queue.length === 0) return null;
+  return { task: queue[0], remaining: queue.length, unasked: fresh.length };
 }
 
 export interface GrillTickDeps {
@@ -145,7 +172,9 @@ export async function runBacklogGrillTick(
   });
   if (!gate.send) return { sent: false, reason: gate.reason };
 
-  const total = Object.keys(state.asked).length + next.remaining;
+  // `unasked`, not `remaining`: a requeued task is already inside `asked`, so
+  // counting the queue length here would count it twice in the "3/357" line.
+  const total = Object.keys(state.asked).length + next.unasked;
   const index = Object.keys(state.asked).length + 1;
   const why = (next.task.notes || '').split('\n')[0];
   const text = renderCard(
@@ -156,6 +185,8 @@ export async function runBacklogGrillTick(
 
   await deps.sendDM(text, verdictButtons(next.task.id));
 
+  // Rewritten wholesale, which clears any `requeuedAt`: it has now come round
+  // again, so it is an ordinary open card until it is answered a second time.
   state.asked[next.task.id] = { at: new Date(now).toISOString(), title: next.task.title };
   state.activeTaskId = next.task.id;
   state.lastSentMs = now;
@@ -221,11 +252,18 @@ export async function applyBacklogAnswer(
     verdict: v.key,
     note: v.note,
   };
-  // Requeued verdicts forget BOTH marks so the task comes round again as if it
-  // had never been asked - leaving the `answered` mark behind would make the
-  // second card un-answerable by the already-answered guard above.
+  // A requeued verdict forgets the `answered` mark - otherwise the guard above
+  // would refuse the second card - but KEEPS the `asked` mark, stamped with
+  // `requeuedAt`. Deleting `asked` outright made the task never-asked again, and
+  // since cards go out oldest-first it was the oldest never-asked task, so the
+  // next tick re-sent the very card he had just skipped and the queue never
+  // moved past it. nextTask now sends requeued tasks only after the unseen ones.
   if (v.requeue) {
-    delete state.asked[taskId];
+    state.asked[taskId] = {
+      at: state.asked[taskId]?.at ?? new Date().toISOString(),
+      title: state.asked[taskId]?.title ?? '',
+      requeuedAt: new Date().toISOString(),
+    };
     delete state.answered[taskId];
   }
   // Only the card in play stops being the card in play. Answering an older one

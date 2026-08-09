@@ -149,6 +149,15 @@
             "statusMessage": "Typechecking before push..."
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$PROJECT_DIR/scripts/check-pipeline-exit.py\" --hook"
+          }
+        ]
       }
     ],
     "PostToolUse": [

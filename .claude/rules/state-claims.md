@@ -74,6 +74,57 @@ WIRED, FLAGGED, LIVE - and only the first is visible from the code. Use
 `zoe-liveness --remote`. A flag set to a value the code rejects reads as done and
 does nothing, which is worse than unset.
 
+## Silence is not evidence (added 2026-08-08)
+
+Rule 5 above says "merged" is not "running". The follow-on, learned the hard
+way: **you cannot conclude a feature did NOT run from the absence of log
+lines - unless you first prove it CAN log.**
+
+Asked which of eight features shipped that week had executed in production,
+seven days of journald could not answer. Not because they had failed. Because
+five of the eight contained **no logging statement of any kind**, and the other
+three spoke only from inside a `catch`. So silence meant "nothing crashed",
+never "it ran", and a flag reading ON proved the code was REACHABLE, not that
+it had been reached.
+
+That gap is the whole distance between merged and running, and it is why a week
+of work was untestable rather than broken.
+
+### The fix, and why it is one line per feature
+
+`featureRan(name, detail)` prints ONE line the first time a feature actually
+executes after a boot:
+
+    [zoe/ran] dm-build - chat 12345
+
+Once per process, not per call, deliberately - a lock acquired every tick would
+produce thousands of lines a day and become the noise nobody greps
+(`noisy-signal-guard.md`). One line per boot answers the only question being
+asked, and the whole inventory becomes one grep.
+
+Placement is on the SUCCESS path, at the point of effect. Never at import time:
+that proves the module loaded, which is the same empty proof a flag already
+gives.
+
+### What it bought, the same day
+
+A build request typed into the DM did nothing. Zero `[zoe/ran]` lines for the
+classifier proved it had **never executed** - separating "ran and declined" from
+"never reached". Without that distinction the debugging starts inside the
+classifier, where nothing was wrong; the actual bug was a different handler
+eating the message a thousand lines earlier (`first-handler-wins.md`).
+
+### The gate
+
+Before reporting that a feature is or is not running:
+
+1. **Does it emit anything on success?** If not, its silence is meaningless -
+   fix the observability before drawing any conclusion.
+2. **Is the log line on the success path, or only in a `catch`?** A module that
+   speaks only when it fails tells you nothing when it works.
+3. **Say which you measured.** "No `[zoe/ran]` line since the last boot" is a
+   fact. "It is not running" is an inference, and only sound once (1) holds.
+
 ## The tell
 
 If you are about to write "it's built", "nothing does X", "we're on version Y", or

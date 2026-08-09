@@ -260,3 +260,4 @@
 | 2247 | [The CONTRA layer: a vault that argues back](./2247-obsidian-contra-loop/) | STANDALONE | Decide whether to build the contrarian-loop pattern on top of `~/zao-vault`, |
 | 2250 | [WebFetch summarises. It does not quote.](./2250-webfetch-summarises-it-does-not-quote/) | STANDALONE | Establish whether Claude Code's `WebFetch` can be cited verbatim, and |
 | 2254 | [Agent work should write itself to the board, with what it cost](./2254-agent-work-writes-itself-to-the-board/) | STANDALONE | Decide what to take from Lumberjack Tasks. Answer: not the tool - we |
+| 2255 | [Claude Code built-in tools: what we hand-rolled that already existed](./2255-claude-code-builtin-tools-audit/) | STANDALONE | Audit ZAO's Claude Code setup against the built-in tools actually |

@@ -35,7 +35,7 @@ tools shipped, and nothing re-reads the rules when the harness gains a feature.*
 | Hooks | `PreToolUse`, `PostToolUse`, `SessionStart`, `Stop`, `Notification` |
 | Custom agents | 6 - `code-reviewer`, `zao-build-orchestrator`, `zao-builder`, `zao-evaluator`, `zao-formatter` |
 | Skills | 79 user-scope + 56 project-scope |
-| `statusLine` | **unset** |
+| `statusLine` | set at USER level (`zao-cc-statusline.sh`), unset at project level |
 | `outputStyle` | unset |
 | `permissions` / `env` | set |
 
@@ -88,15 +88,47 @@ This is worth naming plainly because it is the failure mode the rule was written
 to prevent, happening to the rule itself. Either the ledger gets used or the rule
 gets cut; a rule that is reliably ignored trains everyone to ignore rules.
 
-### 4. `statusLine` - unset, and the cheapest win here
+### 4. `statusLine` - already configured, and now extended (CORRECTED)
 
-Nothing is configured. A status line renders on every prompt in every terminal,
-which makes it the only surface that reaches Zaal without him asking for it.
+**This section originally said "unset. Nothing is configured." That was wrong,
+and it is worth leaving the correction visible rather than quietly editing it.**
 
-Candidates, all already queryable from scripts that exist: bot alive/dead, open
-PR count, grill queue depth, the current lane. This lands directly on the
-"teach me my own system while you build" feedback - a system you can see is a
-system you can learn.
+The claim came from parsing `.claude/settings.json` - the PROJECT settings - and
+concluding absence. `~/.claude/settings.json`, the USER settings, has had a
+status line the whole time: `zao-cc-statusline.sh`, `refreshInterval: 2`. It
+prints a `[WORKING]` / `[WAITING FOR YOU]` badge driven by hooks, then chains
+into the caveman plugin's badge.
+
+This is exactly the failure `confirm-before-claiming-absence.md` was written to
+stop: an absence claim from a partial read. Settings are layered - user,
+project, and local - and reading one layer proves nothing about the others. The
+rule says an absence claim must carry the scope it searched. This one did not,
+so it was wrong within the hour, after the doc had already merged.
+
+**What actually shipped**, on 2026-08-09, extending that script rather than
+replacing it (`code-restraint.md` rung 2 - reuse outranks rewrite):
+
+| Script | Role |
+|---|---|
+| `zao-status-refresh` | background, ~2s, writes `~/.zao/status.json` |
+| `zao-statusline` | render only, ~26ms, no network at all |
+| `zao-cc-statusline.sh` | existing wrapper, now chains the fleet segment after the badges |
+
+The split is forced by the harness contract, not by taste: Claude Code re-runs
+the status line on every prompt and tool use, debounces at 300ms, and **cancels
+an in-flight script** when the next update fires. A status line that called
+`gh api` or `ssh` would be killed mid-flight and render nothing at all. So every
+network call happens in the background refresher, and the render path only reads
+a local cache.
+
+Two properties worth keeping in any future version:
+
+- **Staleness is displayed, not hidden.** Past 15 minutes the fleet numbers get
+  a `?` marker. A cached number rendered as if it were live is a lie the reader
+  cannot detect (`noisy-signal-guard.md`).
+- **It degrades to the badges.** Empty stdin, non-JSON stdin, a missing cache,
+  and a missing fleet script were each tested; all still render `[WAITING FOR
+  YOU]`. A status line that can break the prompt is worse than no status line.
 
 ### 5. `Artifact` - complements the clipboard skill, does not replace it
 
@@ -152,7 +184,7 @@ two as complementary.
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Ship a `statusLine` showing bot alive + open PRs + grill depth; visible in every terminal | @Zaal | PR | 2026-08-12 |
+| ~~Ship a `statusLine`~~ - DONE 2026-08-09, extends the existing user-level one; fleet segment live | @Zaal | Done | 2026-08-09 |
 | Test whether `SendMessage` crosses independent terminal sessions; correct rule 36 either way | @Zaal | PR | 2026-08-16 |
 | Update `agent-loops.md` rule 25 to name `EnterWorktree`, keeping the shell form as fallback | @Zaal | PR | 2026-08-16 |
 | Arm a `Monitor` in the next autonomous loop instead of a timed poll; report whether it fired | @Zaal | PR | 2026-08-16 |

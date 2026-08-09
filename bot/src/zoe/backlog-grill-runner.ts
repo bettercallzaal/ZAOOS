@@ -228,7 +228,17 @@ export async function applyBacklogAnswer(
     const cur = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=notes`, {
       headers: c.headers,
     });
-    const rows = cur.ok ? ((await cur.json()) as Array<{ notes?: string }>) : [];
+    // Closing is a read-modify-write on a text column, and the PATCH below
+    // REPLACES `notes` wholesale. If the read fails we do not know what was in
+    // there, so writing anyway swaps the task's entire note history for one
+    // grill line - silently, because the PATCH still succeeds and Zaal is told
+    // "Closed." A 429 or a 5xx on the read is enough to do it.
+    //
+    // Fail closed instead: the card stays open and unanswered, so the next tap
+    // (or a typed answer) retries it. A close that has to be repeated is much
+    // cheaper than notes that cannot be recovered.
+    if (!cur.ok) return { ok: false, message: `could not read that task (${cur.status}) - not closing` };
+    const rows = (await cur.json()) as Array<{ notes?: string }>;
     const notes = `${(rows[0]?.notes || '').trim()}\n\n${verdictNote(v, new Date().toISOString().slice(0, 10))}`.trim();
     // 'done', never 'completed' - tasks.status has a CHECK constraint that 400s
     // on anything else, and the rejection reads as "nothing to close".

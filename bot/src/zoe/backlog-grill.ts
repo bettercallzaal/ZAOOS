@@ -139,17 +139,28 @@ export function renderCard(
   return lines.join('\n');
 }
 
-/** Buttons, always - a number is faster to tap than to type. */
-export function verdictButtons(): { text: string; data: string }[][] {
+/**
+ * Buttons, always - a number is faster to tap than to type.
+ *
+ * The task id rides IN the callback data. Cards deliberately pile up (that is
+ * the queue Zaal sweeps), so by the time he taps card 3 the newest card is 20 -
+ * a button that only said "done" would be applied to whatever was sent last,
+ * closing the wrong task. The tap has to carry its own subject.
+ *
+ * Telegram caps callback_data at 64 bytes; `bg:done:` is 8, leaving 56 for the
+ * id (a uuid is 36).
+ */
+export function verdictButtons(taskId: string): { text: string; data: string }[][] {
+  const d = (key: VerdictKey) => `bg:${key}:${taskId}`;
   return [
     [
-      { text: '1 Done', data: 'bg:done' },
-      { text: '2 Keep', data: 'bg:keep' },
-      { text: '3 Work', data: 'bg:work' },
+      { text: '1 Done', data: d('done') },
+      { text: '2 Keep', data: d('keep') },
+      { text: '3 Work', data: d('work') },
     ],
     [
-      { text: '4 Drop', data: 'bg:drop' },
-      { text: '5 Skip', data: 'bg:skip' },
+      { text: '4 Drop', data: d('drop') },
+      { text: '5 Skip', data: d('skip') },
     ],
   ];
 }

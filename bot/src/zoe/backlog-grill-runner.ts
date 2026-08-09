@@ -154,7 +154,7 @@ export async function runBacklogGrillTick(
     now,
   );
 
-  await deps.sendDM(text, verdictButtons());
+  await deps.sendDM(text, verdictButtons(next.task.id));
 
   state.asked[next.task.id] = { at: new Date(now).toISOString(), title: next.task.title };
   state.activeTaskId = next.task.id;
@@ -164,20 +164,30 @@ export async function runBacklogGrillTick(
 }
 
 /**
- * Apply an answer to the card currently in play.
+ * Apply an answer to a card.
  *
  * `raw` is whatever Zaal did - a tapped button's key, a bare "1", or a typed
  * sentence. parseVerdict owns the interpretation; this only performs it.
+ *
+ * `taskId` is the card the answer BELONGS to, and a tap always supplies it: up
+ * to 20 cards sit unanswered at once by design, so "the card in play" is only
+ * the right subject for a TYPED answer (a bare "1" with no card attached can
+ * only mean the newest). A tap that fell back to activeTaskId would close
+ * whichever task happened to be sent last, not the one under his thumb.
  */
 export async function applyBacklogAnswer(
   raw: string,
   fetchImpl: typeof fetch = fetch,
+  explicitTaskId?: string,
 ): Promise<{ ok: boolean; message: string }> {
   const c = cfg();
   if (!c) return { ok: false, message: 'tracker not configured' };
   const state = await readState();
-  const taskId = state.activeTaskId;
+  const taskId = explicitTaskId ?? state.activeTaskId;
   if (!taskId) return { ok: false, message: 'no card is open' };
+  if (state.answered[taskId]) {
+    return { ok: false, message: 'already answered that one' };
+  }
 
   const v: Verdict | null = parseVerdict(raw);
   if (!v) return { ok: false, message: 'could not read that answer' };
@@ -211,9 +221,16 @@ export async function applyBacklogAnswer(
     verdict: v.key,
     note: v.note,
   };
-  // Requeued verdicts forget the "asked" mark so the task comes round again.
-  if (v.requeue) delete state.asked[taskId];
-  state.activeTaskId = null;
+  // Requeued verdicts forget BOTH marks so the task comes round again as if it
+  // had never been asked - leaving the `answered` mark behind would make the
+  // second card un-answerable by the already-answered guard above.
+  if (v.requeue) {
+    delete state.asked[taskId];
+    delete state.answered[taskId];
+  }
+  // Only the card in play stops being the card in play. Answering an older one
+  // from the pile must not orphan the newest card's typed-answer path.
+  if (state.activeTaskId === taskId) state.activeTaskId = null;
   await writeState(state);
   return { ok: true, message };
 }

@@ -3367,10 +3367,17 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
 // #51 multi-choice: "Pick multiple" swaps the card's keyboard for toggle rows
 // ([x]/[ ] per option) + Send/Cancel. Single taps elsewhere stay instant.
 // BACKLOG GRILL taps. One handler for all five - the verdict is the suffix.
-bot.callbackQuery(/^bg:(done|keep|work|drop|skip)$/, async (ctx) => {
-  const key = (ctx.callbackQuery.data || '').slice(3);
+// The task id rides in the data (`bg:<key>:<taskId>`) because up to 20 cards
+// are outstanding at once - without it a tap on card 3 would be applied to
+// whichever card was sent last. Cards sent before this shipped carry no id and
+// still fall back to the card in play.
+bot.callbackQuery(/^bg:(done|keep|work|drop|skip)(?::(.+))?$/, async (ctx) => {
+  const [, key, taskId] = /^bg:(done|keep|work|drop|skip)(?::(.+))?$/.exec(
+    ctx.callbackQuery.data || '',
+  ) ?? [];
+  if (!key) return;
   try {
-    const r = await applyBacklogAnswer(key);
+    const r = await applyBacklogAnswer(key, undefined, taskId);
     await ctx.answerCallbackQuery({ text: r.message.slice(0, 190) });
     // Edit the card so an answered one cannot be answered twice, and so a
     // scroll-back through the queue shows what was decided.

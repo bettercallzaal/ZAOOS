@@ -121,9 +121,27 @@ describe('renderCard', () => {
 
 describe('verdictButtons', () => {
   it('offers all five as taps', () => {
-    const flat = verdictButtons().flat();
+    const flat = verdictButtons('t1').flat();
     expect(flat).toHaveLength(5);
     for (const v of VERDICTS) expect(flat.some((b) => b.text.startsWith(String(v.n)))).toBe(true);
+  });
+
+  // The bug this guards: cards pile up by design, so a button that named only
+  // the verdict got applied to whatever card was sent LAST - closing the wrong
+  // board task. Every tap has to carry its own subject.
+  it('names the task each tap belongs to', () => {
+    const flat = verdictButtons('abc-123').flat();
+    for (const b of flat) expect(b.data.endsWith(':abc-123')).toBe(true);
+    expect(new Set(flat.map((b) => b.data)).size).toBe(5);
+  });
+
+  // Telegram rejects callback_data over 64 bytes, which would make the whole
+  // card fail to send.
+  it('stays inside the 64-byte callback_data limit for a uuid', () => {
+    const uuid = '0f2b8c1e-9a4d-4e77-b3c1-6d5a2f8e91ab';
+    for (const b of verdictButtons(uuid).flat()) {
+      expect(Buffer.byteLength(b.data, 'utf8')).toBeLessThanOrEqual(64);
+    }
   });
 });
 

@@ -62,6 +62,7 @@ import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
+import { flushQueue } from './bonfire-retry';
 import { checkAndResend, readLastUserReplyAt } from './escalation';
 import { reconcileUntaggedTasks, getTaskStatusByIds, autoCloseFinishedTasks } from './team-tracker';
 import { ingestAllIdentities } from './fleet';
@@ -745,6 +746,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
 
         try {
           await flushEmitQueue();
+          // Same cadence, the other queue: every Bonfire writer that is not a
+          // thread transition (priorities mirror, afferent digest). Reports what
+          // it actually did, so a queue that never drains is visible rather than
+          // quietly growing.
+          const bf = await flushQueue();
+          if (bf.sent || bf.kept || bf.dropped) {
+            featureRan('bonfire-retry', `sent ${bf.sent}, kept ${bf.kept}, dropped ${bf.dropped}`);
+          }
         } catch (err) {
           console.warn('[zoe/scheduler] emit-queue flush failed (nbd):', (err as Error).message);
         }

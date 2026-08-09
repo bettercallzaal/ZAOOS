@@ -21,6 +21,7 @@ import {
   applyBacklogAnswer,
   outstandingCount,
   readState,
+  runBacklogGrillTick,
   writeState,
   type BacklogGrillState,
 } from '../backlog-grill-runner';
@@ -56,10 +57,11 @@ describe('outstandingCount - the backpressure signal', () => {
     expect(outstandingCount(s)).toBe(0);
   });
 
-  // A requeued task has its `asked` mark deleted so it comes round again -
-  // so it must not still count against the outstanding cap.
-  it('does not count a requeued task that was un-asked', () => {
-    const s = st({ asked: {}, answered: { a: { at: 'x', verdict: 'work' } } });
+  // A requeued task keeps its `asked` mark (that is what stops it jumping the
+  // queue), so the cap has to look past it - otherwise twenty skips would pin
+  // the outstanding count at 20 and the drip would stop for good.
+  it('does not count a task parked for requeue', () => {
+    const s = st({ asked: { a: { at: 'x', title: 'A', requeuedAt: 'y' } } });
     expect(outstandingCount(s)).toBe(0);
   });
 });
@@ -129,17 +131,82 @@ describe('applyBacklogAnswer - the answer follows the card, not the cursor', () 
     expect(patched).toHaveLength(1);
   });
 
-  // A requeued verdict forgets BOTH marks, so the task comes round again and is
-  // answerable the second time.
+  // A requeued verdict forgets the `answered` mark, so the task is answerable
+  // the second time - but KEEPS `asked`, stamped, so it does not jump the queue.
   it('lets a requeued task be answered again when it returns', async () => {
     await applyBacklogAnswer('skip', fakeFetch, OLD);
     const after = await readState();
-    expect(after.asked[OLD]).toBeUndefined();
+    expect(after.asked[OLD]?.requeuedAt).toBeTruthy();
     expect(after.answered[OLD]).toBeUndefined();
 
     await writeState({ ...after, asked: { ...after.asked, [OLD]: { at: 'y', title: 'Old' } } });
     const second = await applyBacklogAnswer('done', fakeFetch, OLD);
     expect(second.ok).toBe(true);
     expect(patched.some((p) => p.url.includes(`id=eq.${OLD}`))).toBe(true);
+  });
+});
+
+/**
+ * The bug this guards: cards go out oldest-first, so the card just skipped was
+ * the oldest one. Un-asking it made it the oldest UNASKED one too, and the next
+ * tick re-sent the same card - forever. Skip meant "show me this again in two
+ * minutes, and never show me anything else".
+ */
+describe('runBacklogGrillTick - a skipped card goes to the back, not the front', () => {
+  const rows = [
+    { id: 'a', title: 'Oldest', created_at: '2026-01-01T00:00:00Z' },
+    { id: 'b', title: 'Middle', created_at: '2026-02-01T00:00:00Z' },
+    { id: 'c', title: 'Newest', created_at: '2026-03-01T00:00:00Z' },
+  ];
+
+  const boardFetch = (async (url: string, init?: RequestInit) => {
+    if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+    if (String(url).includes('order=created_at.asc')) {
+      return { ok: true, status: 200, json: async () => rows } as unknown as Response;
+    }
+    return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+  }) as unknown as typeof fetch;
+
+  const sent: string[] = [];
+  const tick = (now: number) =>
+    runBacklogGrillTick({
+      sendDM: async (text) => {
+        sent.push(text);
+      },
+      localHour: 10,
+      now,
+      fetchImpl: boardFetch,
+    });
+
+  beforeEach(async () => {
+    files.clear();
+    sent.length = 0;
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+  });
+
+  it('sends the next unseen task after a skip, then returns the skipped one last', async () => {
+    const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    const every = 2 * 60_000;
+
+    expect((await tick(t0)).title).toBe('Oldest');
+    await applyBacklogAnswer('skip', boardFetch, 'a');
+
+    // Before the fix this was 'Oldest' again - and every tick after it.
+    expect((await tick(t0 + every)).title).toBe('Middle');
+    expect((await tick(t0 + 2 * every)).title).toBe('Newest');
+    // Only now, with nothing unseen left, does the skipped one come round.
+    expect((await tick(t0 + 3 * every)).title).toBe('Oldest');
+  });
+
+  it('does not re-send a requeued card while unseen tasks remain', async () => {
+    const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    await tick(t0);
+    await applyBacklogAnswer('work', boardFetch, 'a');
+    const second = await tick(t0 + 2 * 60_000);
+
+    expect(second.sent).toBe(true);
+    expect(second.title).not.toBe('Oldest');
+    expect((await readState()).asked.a?.requeuedAt).toBeTruthy();
   });
 });

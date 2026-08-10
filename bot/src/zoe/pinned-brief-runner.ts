@@ -15,6 +15,8 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { DRIP_DEFAULT } from './backlog-grill';
+import { outstandingCount, type BacklogGrillState } from './backlog-grill-runner';
 import { renderPinnedBrief, syncPinnedBrief, type BriefInput, type PinDeps, type PinResult } from './pinned-brief';
 
 const run = promisify(exec);
@@ -31,14 +33,28 @@ async function sh(cmd: string): Promise<string | null> {
   }
 }
 
-/** How many grill cards are sent-but-unanswered. Reads the grill's own state. */
+/**
+ * How many grill cards are sent-but-unanswered. Reads the grill's own state.
+ *
+ * The count MUST be the grill's own `outstandingCount`, not a re-derivation.
+ * A task answered "work" or "skip" keeps its `asked` mark (stamped
+ * `requeuedAt`) and has its `answered` mark DELETED, so "asked minus answered"
+ * counts every requeue as an outstanding card. Since a requeue is never
+ * un-asked until it is answered a second time, that number only ever climbs -
+ * it crosses the cap on its own and then pins a permanent, false
+ * "Grill stuck at 20" in the one place the brief promises to be correct.
+ * The grill's own docstring warns about exactly this arithmetic.
+ */
 export async function grillDepth(): Promise<number | null> {
   try {
     const raw = await fs.readFile(join(homedir(), '.zao/zoe/backlog-grill-state.json'), 'utf8');
-    const d = JSON.parse(raw) as { asked?: Record<string, unknown>; answered?: Record<string, unknown> };
-    const asked = Object.keys(d.asked ?? {});
-    const answered = new Set(Object.keys(d.answered ?? {}));
-    return asked.filter((id) => !answered.has(id)).length;
+    const d = JSON.parse(raw) as Partial<BacklogGrillState>;
+    return outstandingCount({
+      asked: d.asked ?? {},
+      answered: d.answered ?? {},
+      activeTaskId: null,
+      lastSentMs: null,
+    });
   } catch {
     return null;
   }
@@ -68,8 +84,11 @@ export async function gatherBrief(now: Date = new Date()): Promise<BriefInput> {
   }
 
   if (depth !== null) {
-    running.push(['grill queue', depth >= 20 ? `${depth} (at cap)` : String(depth)]);
-    if (depth >= 20) needsYou.push('Grill stuck at 20 - answer any card to restart it');
+    // The cap comes from the grill's own config, so the brief can never claim
+    // "at cap" at a number the drip does not actually stop at.
+    const cap = DRIP_DEFAULT.maxOutstanding;
+    running.push(['grill queue', depth >= cap ? `${depth} (at cap)` : String(depth)]);
+    if (depth >= cap) needsYou.push(`Grill stuck at ${cap} - answer any card to restart it`);
   }
 
   const updatedLabel = new Intl.DateTimeFormat('en-US', {

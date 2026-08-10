@@ -17,6 +17,7 @@
 import { db } from '../supabase';
 import { emitReceipt } from './receipts';
 import { buildEpisode, promoteSubmission, queueConfigured, type BonfireSubmission } from './bonfire-queue';
+import { enqueueWrite } from './bonfire-retry';
 
 export interface DigestResult {
   status: 'success' | 'error' | 'silent';
@@ -233,6 +234,17 @@ export async function persistDailyDigest(): Promise<DigestResult> {
         bonfireSuccess = result.ok === true;
         if (!bonfireSuccess) {
           console.warn('[zoe/afferent-digest] bonfire promotion returned non-ok:', result);
+          // This used to end at the warning, and the digest was gone. Queue it so
+          // the graph catches up when Bonfire returns. A guard skip is terminal -
+          // re-sending it would trip the same guard forever.
+          if (!(result as { skipped?: string }).skipped) {
+            const ep = buildEpisode(submission);
+            await enqueueWrite({
+              body: ep.body,
+              name: ep.name,
+              sourceTag: 'zoe:afferent-digest',
+            }).catch(() => {});
+          }
         }
       } catch (err) {
         console.error('[zoe/afferent-digest] bonfire promotion failed:', (err as Error)?.message ?? err);

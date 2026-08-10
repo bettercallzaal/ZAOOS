@@ -145,8 +145,17 @@
           },
           {
             "type": "command",
-            "command": "cd \"$PROJECT_DIR\" && npm run typecheck 2>&1 | tail -10",
+            "command": "cd \"$PROJECT_DIR\" && bash .claude/skills/worksession/typecheck-guard.sh",
             "statusMessage": "Typechecking before push..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$PROJECT_DIR/scripts/check-pipeline-exit.py\" --hook"
           }
         ]
       }

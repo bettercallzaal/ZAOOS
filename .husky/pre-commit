@@ -12,3 +12,11 @@ bash "$(git rev-parse --show-toplevel)/scripts/git-secret-scan.sh" || exit 1
 #    missing folder-index row NO LONGER blocks a commit - PRs must not hand-edit
 #    the shared README (that caused concurrent doc PRs to collide). Advisory only.
 bash "$(git rev-parse --show-toplevel)/scripts/check-research-index.sh" || echo "[research-index] note: doc(s) not indexed yet - CI backfills on merge (not blocking)"
+
+# 4. Block third-party PII in the staged diff (.claude/rules/pii-hygiene.md).
+#    The rule was written 2026-05-23 and its own line 153 called this hook "a
+#    worthwhile follow-up"; it was never built, so for fifteen months the rule was
+#    a manual checklist. Measured at 0 false positives across the last 40 commits
+#    on main before shipping. Fails closed: a security scan that passes on error
+#    is not a scan (silent-failure-guard rule 5).
+python3 "$(git rev-parse --show-toplevel)/scripts/git-pii-scan.py" || exit 1

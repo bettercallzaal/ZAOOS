@@ -24,6 +24,7 @@ import {
   type RepoFacts,
 } from './done-work-detector';
 import { remember } from './recall';
+import { enqueueWrite } from './bonfire-retry';
 
 export interface TeamTask {
   title: string;
@@ -569,9 +570,16 @@ export async function runTeamDigest(opts?: { mirrorToBonfire?: boolean }): Promi
     const ep = buildPrioritiesEpisode(tasks, members, new Date().toISOString());
     if (ep) {
       const r = await remember({ body: ep.body, name: ep.name, sourceTag: 'zoe:priorities' }).catch(
-        () => ({ ok: false }) as { ok: boolean },
+        () => ({ ok: false }) as { ok: boolean; skipped?: string },
       );
       mirrored = r.ok === true;
+      // A send failure used to end here, with `mirrored = false` and the episode
+      // gone. Queue it instead so the graph catches up when Bonfire returns. A
+      // guard SKIP is terminal and must not be queued - it would fail identically
+      // forever and the queue would never drain.
+      if (!mirrored && !(r as { skipped?: string }).skipped) {
+        await enqueueWrite({ body: ep.body, name: ep.name, sourceTag: 'zoe:priorities' }).catch(() => {});
+      }
     }
   }
   return { digest, taskCount: tasks.length, mirrored };

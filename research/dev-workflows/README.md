@@ -261,3 +261,4 @@
 | 2250 | [WebFetch summarises. It does not quote.](./2250-webfetch-summarises-it-does-not-quote/) | STANDALONE | Establish whether Claude Code's `WebFetch` can be cited verbatim, and |
 | 2254 | [Agent work should write itself to the board, with what it cost](./2254-agent-work-writes-itself-to-the-board/) | STANDALONE | Decide what to take from Lumberjack Tasks. Answer: not the tool - we |
 | 2255 | [Claude Code built-in tools: what we hand-rolled that already existed](./2255-claude-code-builtin-tools-audit/) | STANDALONE | Audit ZAO's Claude Code setup against the built-in tools actually |
+| 2259 | [ComfyUI as the asset lane: moving repetitive image work off the dollar-a-turn meter](./2259-comfyui-asset-lane/) | STANDALONE | Decide whether ComfyUI belongs in the ZAO workflow, and if so for what. The answer turns out to depend on doc 2258's finding rather than on image quality. |

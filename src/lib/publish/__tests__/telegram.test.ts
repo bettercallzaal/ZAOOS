@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { escapeMarkdownV2, publishToTelegram } from '../telegram';
+import { escapeHtml, escapeMarkdownV2, publishToTelegram } from '../telegram';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -57,6 +57,25 @@ describe('escapeMarkdownV2', () => {
 
   it('leaves plain alphanumeric text unchanged', () => {
     expect(escapeMarkdownV2('HelloWorld123')).toBe('HelloWorld123');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// escapeHtml
+// ---------------------------------------------------------------------------
+
+describe('escapeHtml', () => {
+  it('escapes the three symbols the Bot API requires', () => {
+    expect(escapeHtml('a < b > c & d')).toBe('a &lt; b &gt; c &amp; d');
+  });
+
+  it('escapes the ampersand first so the escapes do not escape each other', () => {
+    expect(escapeHtml('<3')).toBe('&lt;3');
+    expect(escapeHtml('&')).toBe('&amp;');
+  });
+
+  it('leaves text with none of them unchanged', () => {
+    expect(escapeHtml('New track approved: Midnight')).toBe('New track approved: Midnight');
   });
 });
 

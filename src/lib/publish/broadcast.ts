@@ -8,7 +8,7 @@
  */
 
 import { buildZaoEmbed, publishToDiscord } from '@/lib/publish/discord';
-import { publishToTelegram } from '@/lib/publish/telegram';
+import { escapeHtml, publishToTelegram } from '@/lib/publish/telegram';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,9 +75,14 @@ export async function broadcastToChannels(options: BroadcastOptions): Promise<Br
     ? `\n\n[View on Farcaster](${farcasterLink}) · [Join ZAO OS](${pageUrl})`
     : `\n\n[Join ZAO OS](${pageUrl})`;
 
+  // Telegram is sent with parse_mode HTML and every caller passes PLAIN text,
+  // some of it user-supplied (a track title, an artist name). A raw `<` makes
+  // the Bot API reject the whole message with 400 `can't parse entities`, so a
+  // track called "Love <3" is announced nowhere at all. Only the caller's text
+  // needs escaping — linksSuffix is ours and carries no markup.
   const telegramPromise = hasTelegram
     ? publishToTelegram({
-        text: options.text + linksSuffix,
+        text: escapeHtml(options.text) + linksSuffix,
         imageUrl: options.imageUrl,
         parseMode: 'HTML',
         disablePreview: false,

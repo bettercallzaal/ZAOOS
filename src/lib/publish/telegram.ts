@@ -74,6 +74,20 @@ export function escapeMarkdownV2(text: string): string {
   return text.replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 }
 
+/**
+ * Escape text for Telegram HTML parse mode.
+ *
+ * The Bot API is explicit: "All <, > and & symbols that are not a part of a tag
+ * or an HTML entity must be replaced with the corresponding HTML entities."
+ * Sending them raw is not a rendering nit — the API rejects the WHOLE message
+ * with 400 `can't parse entities`, so the post never happens.
+ * Ampersand first, or the later escapes get escaped in turn.
+ * See: https://core.telegram.org/bots/api#html-style
+ */
+export function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ---------------------------------------------------------------------------
 // Publish
 // ---------------------------------------------------------------------------

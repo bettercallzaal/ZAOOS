@@ -11,6 +11,16 @@ tier: DISPATCH
 
 # 743 - WaveWarZ Whitepaper v2 Deep Dive
 
+> **NUMBERS WARNING (added 2026-08-09).** This doc contains TWO different sets of
+> headline figures. Key Decision 1 below says 458 SOL / 979 battles is canonical;
+> the Overview and two later sections say 878.30 SOL / 1,289 production battles.
+> This doc is last-validated 2026-05-25 - the 458 figure is the May number, and
+> the 878.30 figure is July. Doc 974 (WaveWarZ financials snapshot, validated
+> 2026-07-23) independently confirms 878.30 SOL.
+>
+> **Use doc 974 for any current figure. Do not copy Key Decision 1's numbers.**
+> A public brand page copied them on 2026-08-09 and had to be corrected.
+
 > **Goal:** Refresh the canonical WaveWarZ doc against (a) the official Oct 2025 Hackmd whitepaper v1, (b) the live Intelligence + Analytics dashboards, and (c) seven months of shipped product + partner deals. Supersedes Doc 101 as the ZAO research library's canonical WaveWarZ reference.
 
 ## Key Decisions
@@ -19,14 +29,14 @@ tier: DISPATCH
 |---|----------|-----------|
 | 1 | USE the live Intelligence numbers (458 SOL / 979 battles / 43 Main + 805 Quick) as canonical, NOT Doc 101's Mar 21 numbers or Doc 723's May 21 numbers | Intelligence dashboard is the production-truth source ("test battles excluded"). Doc 101 + Doc 723 are stale or used different aggregation. Discrepancy flagged in Findings. |
 | 2 | USE "multi-chain" framing (Solana primary + Base L2 testnet live) for v2, NOT "Solana-only" from v1 | wavewarz-base contracts deployed Feb 27 2026 on Base Sepolia. Whitepaper v1 (Oct 2025) was pre-Base. Hard delta. |
-| 3 | USE the 7-partner network framing for distribution (Coinflow ISV, Juke, Magnetiq, Empire Builder, Neynar/Arthur, RAM/Africa, Privy onboarding-built) | Whitepaper v1 named zero partners. The partner density doubled in the 7-month delta and is now WaveWarZ's primary distribution thesis. |
+| 3 | USE the partner-network framing for distribution (Coinflow ISV, Juke, Empire Builder, Neynar/Arthur, RAM/Africa, Privy onboarding-built). NOTE 2026-08-09: Magnetiq was listed here and has been REMOVED - the partnership was retired 2026-07-31 and must not be cited in brand copy | Whitepaper v1 named zero partners. The partner density doubled in the 7-month delta and is now WaveWarZ's primary distribution thesis. |
 | 4 | USE AI-artist tournament as a separate product line (prototype/pilot), not a feature of human battles | Doc 711 + Doc 723 + Intelligence's "AI Artist Tournament" registration indicate this is a distinct vertical. Treating it as a feature understates the strategic move. |
 | 5 | USE Zaal's verified title "Director of Ecosystem Strategy & Partnerships" downstream | Whitepaper v1 lists "Internal & External Communications" - the upgraded title reflects the actual rail/room work documented in Doc 742. |
 | 6 | FLAG that the canonical Solana program ID `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` is from whitepaper v1 - confirm it is the current production program before any direct RPC reads | Doc 101 Section 8 marked "NOT CONFIRMED" - Ikechi response pending. |
 
 ## Executive Summary
 
-WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,289 production battles, 878.30 SOL of cumulative volume (July 2026), and live integration into seven external rails (Coinflow, Juke, Magnetiq, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
+WaveWarZ is a decentralized music-battle platform on Solana that has grown from a 3-person Oct 2025 launch into a multi-chain, multi-partner ecosystem with 1,289 production battles, 878.30 SOL of cumulative volume (July 2026), and live integration into six external rails (Coinflow, Juke, Empire Builder, Neynar, RAM SongChain, Privy). The Hackmd whitepaper v1 (Oct 2025) remains broadly accurate on mechanics and tokenomics but is now stale on chain coverage (Base L2 testnet live), AI-artist tournaments (in prototype), partner network (zero named partners in v1, seven now), and geographic expansion (Africa announced May 4). This doc is the v2 reference until the next material change.
 
 | Field | Value |
 |---|---|
@@ -182,7 +192,7 @@ Break-even per battle: $500 in volume. Current volume per match: $800-$2,500.
   |---|---|---|---|
   | Coinflow ISV | Fiat on-ramp, merchantID "wavestation", SOL tx fees covered | Live | Doc 406 |
   | Juke | Audio rooms via /spaces + /live integration; 9 of 11 ZAO asks shipped May 23 | Live | memory `project_juke_consumer_2026_05_24` |
-  | Magnetiq / Proof of Meet | IRL connection NFTs, ZABAL Connector at ETH Boulder Feb 2026 | Live | Doc 050; memory `project_tyler_stambaugh` |
+  | ~~Magnetiq / Proof of Meet~~ | IRL connection NFTs, ZABAL Connector at ETH Boulder Feb 2026 | **RETIRED 2026-07-31** - do not cite as a partner. The collectible PLATFORM at collect.zabalgamez.com is still in use; the partnership is not | Doc 050 |
   | Empire Builder v3 | Farcaster mini-app + ZABAL rewards | Live (6 PRs across Docs 560-566, 582-585) | memory `project_empire_builder_zabal_integration` |
   | Neynar / Arthur | EVM contract review + ZABAL Games mentor | Active | Doc 711 |
   | RAM SongChain | WaveWarZ Africa per-country battle leagues | Announced (May 4) | Doc 608 |

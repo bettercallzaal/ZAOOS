@@ -1,9 +1,9 @@
 ---
 topic: events
-type: guide
+type: media-appearance
 status: research-complete
 last-validated: 2026-08-10
-related-docs: "1372, 743, 2137"
+related-docs: "1763, 1372, 743, 2137, 2135"
 original-query: "see what we can get out of this - the Community Communities Web3 Space, 2026-08-10, all about The ZAO / ZAOstock / ZAO Festivals / ZAOville"
 tier: STANDARD
 ---
@@ -11,6 +11,27 @@ tier: STANDARD
 # 2261 - Community Communities Space, 2026-08-10: the ZAO Festivals lineage, and eight new ZAOstock facts
 
 > **Goal:** Deep-analyse the 3h38m Space, preserve the transcript for later questioning, and pull out everything that updates the ZAOstock site and the festivals record.
+
+## Media appearance record
+
+Filed as an **official media appearance** - Zaal as a guest on someone else's show, not a ZAO
+meeting. It is the **second** in this series: [doc 1763](../1763-coc-concertz-space-jul18/) was
+the COC Concertz Space of 2026-07-18, same host, with Candy and Rev also present.
+
+| Field | Value |
+|---|---|
+| Show | Community Communities / COC Web3 Space |
+| Host | Thy (Rev) |
+| Aired | 2026-08-10, Saturday |
+| Format | X Space, live, recorded |
+| Runtime | 3h 38m (218 min) |
+| Role | Zaal as featured guest |
+| Topics | The ZAO, ZAOstock, ZAO Festivals, ZAOville, WaveWarZ |
+| Transcript | `transcript.txt` (this folder) + `~/.zao/transcripts/zao-community-communities-space-2026-08-10.txt` |
+| Source audio | `~/Downloads/space_2026-08-10T15-46-53-040Z.mp4` |
+
+Listed in [`_meetings-index.md`](../_meetings-index.md), the canonical
+"show me every past meeting and appearance" list.
 
 ## What it was
 

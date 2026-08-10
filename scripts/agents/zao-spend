@@ -1,0 +1,236 @@
+#!/usr/bin/env python3
+"""zao-spend - what the agent work actually cost, and what it produced.
+
+Zaal, 2026-08-10: "I just reupped twice this week, this is unsustainable. I
+don't even know what results I'm getting out of these loops. It said used over
+$10 and I want to know on what, in less than 24 hours."
+
+Nothing recorded that. Claude Code writes token counts into its session
+transcripts but NO dollar figure, and no ledger existed anywhere on this
+machine. So spend was invisible by construction - the only signal was the bill.
+
+This reads the transcripts, prices the tokens, and puts the cost next to the
+OUTPUT it bought (PRs opened, commits landed) in the same window. Cost alone
+tells you to stop; cost next to output tells you what to stop doing.
+
+  zao-spend                 last 24 hours
+  zao-spend --hours 6       a custom window
+  zao-spend --days 7        the week
+  zao-spend --by-lane       group by working directory instead of session
+  zao-spend --no-output     skip the gh calls (offline / faster)
+
+WHAT THE NUMBERS MEAN, EXACTLY
+
+Zaal is on Claude Max, so these are NOT invoice amounts - the subscription
+covers usage until the cap, and a "reup" buys more. The dollar figure is the
+LIST-PRICE VALUE of the tokens consumed, which is the same basis Claude Code
+uses for the number it shows you. Treat it as a consumption meter, not a bill.
+
+Rates are list prices per million tokens, hardcoded because this must run
+offline. If Anthropic changes pricing these drift - they are stated in the
+output so a wrong rate is visible rather than silent.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+PROJECTS = Path.home() / ".claude" / "projects"
+
+# USD per million tokens. (input, output, cache_write, cache_read)
+# Cache writes bill above input; cache reads bill far below it, which is why a
+# long session can read billions of cached tokens for very little.
+RATES = {
+    "opus":   (15.00, 75.00, 18.75, 1.50),
+    "sonnet": (3.00, 15.00, 3.75, 0.30),
+    "haiku":  (1.00, 5.00, 1.25, 0.10),
+    "fable":  (3.00, 15.00, 3.75, 0.30),
+}
+UNKNOWN = ("unknown", (3.00, 15.00, 3.75, 0.30))
+
+
+def rate_for(model: str):
+    m = (model or "").lower()
+    for name, r in RATES.items():
+        if name in m:
+            return name, r
+    return UNKNOWN
+
+
+def parse_ts(raw: str):
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def scan(since: datetime):
+    """-> (rows, totals). One row per session file that had usage in the window."""
+    rows = []
+    if not PROJECTS.is_dir():
+        return rows
+
+    for f in PROJECTS.rglob("*.jsonl"):
+        # A file untouched since the window opened cannot contain events inside it.
+        try:
+            if datetime.fromtimestamp(f.stat().st_mtime, timezone.utc) < since:
+                continue
+        except OSError:
+            continue
+
+        by_model = defaultdict(lambda: [0, 0, 0, 0])
+        name, cwd, first, last = None, None, None, None
+        try:
+            with f.open(errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line and '"cwd"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    cwd = d.get("cwd") or cwd
+                    name = d.get("sessionName") or d.get("session_name") or name
+                    ts = parse_ts(d.get("timestamp", ""))
+                    msg = d.get("message") or {}
+                    u = msg.get("usage")
+                    if not (u and ts and ts >= since):
+                        continue
+                    first = ts if first is None or ts < first else first
+                    last = ts if last is None or ts > last else last
+                    t = by_model[msg.get("model") or "unknown"]
+                    t[0] += u.get("input_tokens", 0) or 0
+                    t[1] += u.get("output_tokens", 0) or 0
+                    t[2] += u.get("cache_creation_input_tokens", 0) or 0
+                    t[3] += u.get("cache_read_input_tokens", 0) or 0
+        except OSError:
+            continue
+
+        if not by_model:
+            continue
+
+        cost, tok = 0.0, [0, 0, 0, 0]
+        models = set()
+        for model, t in by_model.items():
+            label, (ri, ro, rw, rr) = rate_for(model)
+            models.add(label)
+            cost += (t[0] * ri + t[1] * ro + t[2] * rw + t[3] * rr) / 1_000_000
+            for i in range(4):
+                tok[i] += t[i]
+
+        rows.append({
+            "file": f, "name": name, "cwd": cwd, "cost": cost, "tok": tok,
+            "models": ",".join(sorted(models)), "first": first, "last": last,
+            "size_mb": f.stat().st_size / 1e6,
+        })
+
+    rows.sort(key=lambda r: r["cost"], reverse=True)
+    return rows
+
+
+def outputs(since: datetime):
+    """PRs opened in the window, per repo. The 'what did it buy' half."""
+    found = []
+    iso = since.strftime("%Y-%m-%dT%H:%M:%SZ")
+    for repo in ("bettercallzaal/ZAOOS", "ZAODEVZ/zabalgames", "ZAODEVZ/ZAOstock"):
+        try:
+            out = subprocess.run(
+                ["gh", "pr", "list", "--repo", repo, "--state", "all",
+                 "--limit", "40", "--json", "number,title,createdAt,state"],
+                capture_output=True, text=True, timeout=25,
+            )
+            if out.returncode != 0:
+                continue
+            for pr in json.loads(out.stdout or "[]"):
+                if pr.get("createdAt", "") >= iso:
+                    found.append((repo.split("/")[-1], pr["number"], pr["state"], pr["title"]))
+        except Exception:
+            continue
+    return found
+
+
+def human(n: int) -> str:
+    for unit, div in (("B", 1e9), ("M", 1e6), ("k", 1e3)):
+        if n >= div:
+            return f"{n/div:.1f}{unit}"
+    return str(n)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="What the agent work cost, and what it produced.")
+    ap.add_argument("--hours", type=float)
+    ap.add_argument("--days", type=float)
+    ap.add_argument("--by-lane", action="store_true", help="group by working directory")
+    ap.add_argument("--no-output", action="store_true", help="skip gh calls")
+    a = ap.parse_args()
+
+    hours = a.hours if a.hours else (a.days * 24 if a.days else 24)
+    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+
+    rows = scan(since)
+    if not rows:
+        print(f"No agent activity in the last {hours:g}h.")
+        return 0
+
+    total = sum(r["cost"] for r in rows)
+    tok = [sum(r["tok"][i] for r in rows) for i in range(4)]
+
+    print(f"\nAGENT SPEND - last {hours:g}h (since {since.astimezone():%b %d %H:%M})")
+    print("=" * 78)
+
+    if a.by_lane:
+        by = defaultdict(lambda: [0.0, 0])
+        for r in rows:
+            k = (r["cwd"] or "unknown").replace(str(Path.home()), "~")
+            by[k][0] += r["cost"]
+            by[k][1] += 1
+        print(f"\n  {'lane':<44} {'cost':>9}  sessions")
+        for k, (c, n) in sorted(by.items(), key=lambda kv: -kv[1][0]):
+            print(f"  {k[-44:]:<44} {'$%.2f' % c:>9}  {n}")
+    else:
+        print(f"\n  {'session':<26} {'cost':>8} {'out':>7} {'cache rd':>9} {'size':>7}  model")
+        for r in rows[:14]:
+            label = r["name"] or (r["cwd"] or "?").split("/")[-1][:24]
+            print(f"  {label[:26]:<26} {'$%.2f' % r['cost']:>8} {human(r['tok'][1]):>7} "
+                  f"{human(r['tok'][3]):>9} {r['size_mb']:>6.0f}M  {r['models']}")
+        if len(rows) > 14:
+            rest = sum(r["cost"] for r in rows[14:])
+            print(f"  {'... %d more' % (len(rows)-14):<26} {'$%.2f' % rest:>8}")
+
+    print("\n" + "-" * 78)
+    print(f"  TOTAL  ${total:.2f}   across {len(rows)} session(s)")
+    print(f"  tokens in {human(tok[0])}  out {human(tok[1])}  "
+          f"cache-write {human(tok[2])}  cache-read {human(tok[3])}")
+
+    # Output tokens are what the model actually GENERATED - the honest measure of
+    # work done. Cache reads dominate the token count but cost almost nothing, so
+    # a huge token number is not by itself a sign of waste.
+    if tok[1]:
+        print(f"  ${total/tok[1]*1000:.2f} per 1k output tokens generated")
+
+    if not a.no_output:
+        prs = outputs(since)
+        print(f"\n  WHAT IT BOUGHT - {len(prs)} PR(s) opened in the same window")
+        for repo, num, state, title in sorted(prs):
+            print(f"    {repo:<12} #{num:<5} {state:<7} {title[:44]}")
+        if prs:
+            print(f"\n    ${total/len(prs):.2f} per PR")
+        else:
+            print("    (none - a window with real spend and no PR is the one to look at)")
+
+    print("\n  Rates are LIST PRICE per million tokens: opus 15/75, sonnet 3/15,")
+    print("  haiku 1/5, cache-read at a tenth of input. On Max this is a consumption")
+    print("  meter, not an invoice - the subscription covers it until the cap.\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

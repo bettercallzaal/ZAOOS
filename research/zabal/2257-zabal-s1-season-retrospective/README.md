@@ -113,6 +113,33 @@ was left out.
 | 2026-06-30 | ZABAL GAMEZ Workshop w/Duo Do | Duo Do | Clementine and Santi | artist | yes | yes |
 | 2026-06-30 | ZABAL GAMEZ Workshop w/Adrienne from GM Farcaster | Adrienne Shulman | GM Farcaster | builder | yes | yes |
 
+
+## The four gaps, and what they have in common
+
+Doc-level counts say 28 of 32 sessions have a YouTube link and 29 of 32 a
+transcript. Named, the gaps are:
+
+| Date | Session | Format as recorded | Has |
+|---|---|---|---|
+| 2026-06-06 | Bonfires + a vibe-coding masterclass (Carlos / Plat0x) | Live X Space fireside, recorded | transcript, no video |
+| 2026-06-20 | Farcaster Batches, and the builders behind it (Jub Jub) | Farcaster Space fireside, recorded | neither |
+| 2026-06-21 | Selling merch onchain (Minted Merch) | Fireside, recorded | neither |
+| 2026-06-22 | ZABAL Gamez AMA with The Farcaster Intern | Audio space fireside / AMA, recorded | neither |
+
+**Every gap is an audio space. Every regular workshop has video.** The first read
+of this data was that three consecutive days had failed - that is wrong. June 20
+carried three sessions, two of them fully captured; June 21 carried two, one
+fully captured. The variable is FORMAT, not date.
+
+That matters because all four records say **"recorded"** in their own format
+field, and each has a live page (`/recordings/15`, `/19`, `/20`, `/fireside/1`).
+So this is very likely a publishing gap rather than lost material: Farcaster and X
+Space audio was captured and never pushed to YouTube or transcribed.
+
+Four sessions, four presenters, one fixable cause. Worth closing before the
+retrospective is cited to a funder - or, if the audio is genuinely gone, worth
+saying so in the same breath as the 28 that exist.
+
 ## Next Actions
 
 | Action | Owner | Type | By When |
@@ -120,7 +147,7 @@ was left out.
 | Use the 31-presenters / 25-orgs / 28-recordings figures verbatim in the Fisher application's community-support section | @Zaal | Grant | 2026-08-15 |
 | Submit the Fractured Atlas application, which blocks Fisher entirely (task 9249) | @Zaal | Application | 2026-08-11 |
 | Publish this as the public season retrospective alongside the finals announcement | @Zaal | Post | 2026-08-31 |
-| Fill the 3 missing transcripts and 4 missing YouTube links, so the record is complete before it is cited publicly | @Zaal | Content | 2026-08-23 |
+| Recover the 4 audio-space recordings (2026-06-06 Plat0x, 06-20 Jub Jub, 06-21 Minted Merch, 06-22 Farcaster Intern) - all four say "recorded", so check the Space archives before treating them as lost | @Zaal | Content | 2026-08-23 |
 
 ## Sources
 

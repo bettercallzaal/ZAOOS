@@ -5,7 +5,12 @@ const mockPublishToTelegram = vi.hoisted(() => vi.fn());
 const mockPublishToDiscord = vi.hoisted(() => vi.fn());
 const mockBuildZaoEmbed = vi.hoisted(() => vi.fn());
 
-vi.mock('@/lib/publish/telegram', () => ({ publishToTelegram: mockPublishToTelegram }));
+// escapeHtml is deliberately NOT mocked — these tests exist to prove broadcast
+// really escapes, so the real implementation has to run.
+vi.mock('@/lib/publish/telegram', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../telegram')>();
+  return { publishToTelegram: mockPublishToTelegram, escapeHtml: actual.escapeHtml };
+});
 vi.mock('@/lib/publish/discord', () => ({
   publishToDiscord: mockPublishToDiscord,
   buildZaoEmbed: mockBuildZaoEmbed,
@@ -171,6 +176,39 @@ describe('castHash link appending', () => {
     const telegramCall = mockPublishToTelegram.mock.calls[0][0];
     expect(telegramCall.text).toContain('custom.site');
     expect(telegramCall.text).not.toContain('zaoos.com');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Telegram HTML escaping — the text goes out with parse_mode HTML, so a raw
+// `<` in caller text makes the Bot API reject the WHOLE message (400 can't
+// parse entities) and the announcement is never posted.
+// ---------------------------------------------------------------------------
+
+describe('telegram HTML escaping', () => {
+  beforeEach(() => {
+    mockPublishToTelegram.mockResolvedValue({ success: true });
+    mockPublishToDiscord.mockResolvedValue({ success: true });
+  });
+
+  it('escapes < > and & in the caller text', async () => {
+    await broadcastToChannels({ text: 'New track approved: Love <3 by Simon & Garfunkel' });
+    const telegramCall = mockPublishToTelegram.mock.calls[0][0];
+    expect(telegramCall.text).toContain('Love &lt;3 by Simon &amp; Garfunkel');
+    expect(telegramCall.text).not.toContain('<3');
+  });
+
+  it('does not double-escape an ampersand into &amp;amp;', async () => {
+    await broadcastToChannels({ text: 'R&B' });
+    const telegramCall = mockPublishToTelegram.mock.calls[0][0];
+    expect(telegramCall.text).toContain('R&amp;B');
+    expect(telegramCall.text).not.toContain('&amp;amp;');
+  });
+
+  it('leaves the Discord text unescaped — Discord is markdown, not HTML', async () => {
+    await broadcastToChannels({ text: 'Love <3 & more' });
+    const discordCall = mockPublishToDiscord.mock.calls[0][0];
+    expect(discordCall.text).toBe('Love <3 & more');
   });
 });
 

@@ -61,6 +61,49 @@ capability map (the module list + one-line purpose + "what it already does") as 
 doc/rule that any session reads first. A stale or absent map is what made this
 expensive; a current one makes "is this already built?" a 10-second lookup.
 
+
+## Mechanisation was attempted and DOES NOT WORK - do not rebuild it
+
+A rules audit on 2026-08-09 ranked this the highest-value discipline-only rule to
+mechanise, and proposed a PreToolUse hook that inspects output for absence-claim
+phrasings. It was attempted on 2026-08-10 and abandoned. Recording why, so the
+next person does not spend the same hours.
+
+**Reason 1 - hooks cannot see the claim.** PreToolUse hooks fire on TOOL CALLS and
+receive `tool_input`. They never see prose written to the user. Most absence claims
+are made in conversation, so the proposed hook is structurally blind to the common
+case.
+
+**Reason 2 - the durable-artifact version fires on the wrong things.** A regex over
+committed `research/` and `.claude/` diffs was measured across 60 commits on main:
+
+- 5 absence-shaped claims found, 3 without adjacent evidence
+- **3 of 60 commits would have fired, and all three were false positives** -
+  rhetorical prose ("Nothing writes it down"), analysis ("There is no durable
+  trail of who did what"), and `state-claims.md` quoting the pattern it teaches
+
+**Reason 3 - and this is decisive - it misses the real case.** The worst absence
+claim of that session was doc 2255 asserting `statusLine` was unset when it had
+been set at user level all along. The three lines that carried it were:
+
+    | `statusLine` | **unset** |
+    ### 4. `statusLine` - unset, and the cheapest win here
+    Nothing is configured. A status line renders on every prompt...
+
+The detector matched NONE of them. A table cell, a heading, and a plain sentence.
+Any regex broad enough to catch all three catches ordinary writing too.
+
+**The underlying reason it cannot work.** What makes an absence claim wrong is not
+in the text. `statusLine is unset` and `statusLine is set` are equally well-formed
+sentences; the difference is whether anyone looked, and in which of the layered
+settings files. No amount of pattern-matching on the sentence recovers that.
+
+**What to do instead.** The mechanism that DID hold on 2026-08-10 was structural,
+not textual: `session-boundaries.md`. Absence claims failed four times in one
+session because re-verifying grew expensive as the session grew, so verification
+got economised exactly when it was needed most. Shorter, single-thread sessions
+make the exhaustive check affordable again. Fix the conditions, not the sentence.
+
 ## Guards
 
 - This is NOT a licence to skip building - it is a licence to build the RIGHT thing

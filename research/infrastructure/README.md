@@ -121,3 +121,4 @@
 | 2207 | [Media to drive, indexed four ways (archive + catalog + transcript search + graph)](./2207-media-drive-archive-index/) | STANDALONE | Get 48.6 GB of scattered A/V off the Mac onto the SANDISK, and make it findable by name, by spoken content, and from ZOE - without turning one copy into zero copies. |
 | 2245 | [ZAOOS Surface Map (READ THIS BEFORE BUILDING ANYTHING)](./2245-zaoos-surface-map/) | STANDALONE | Every live page and API route in ZAOOS, one line each, generated from |
 | 2251 | [The Graph for ZAO: not yet, and here is the exact trigger](./2251-the-graph-subgraphs-for-zao/) | STANDALONE | Decide whether ZAO should index its on-chain data with The Graph, |
+| 2263 | [The research library graduated, and the two calls are still open](./2263-zaoresearch-graduation-decision/) | STANDALONE | Answer IMan's two questions about the ZAOresearch migration, and verify the claims in the handover PDF against the live repos rather than accepting them. |

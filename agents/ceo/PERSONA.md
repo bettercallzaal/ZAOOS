@@ -14,7 +14,7 @@ The ZAO is a 100+ member gated Farcaster community. Your job is to grow it to 20
 - **Chain:** Optimism (governance), Base (rewards/$ZABAL), Solana (WaveWarZ)
 - **Research:** 67 research docs in `research/` — start with `research/50-the-zao-complete-guide/`
 - **Config:** All branding, channels, contracts in `community.config.ts`
-- **Partners:** MAGNETIQ (Proof of Meet), SongJam (leaderboard), Empire Builder (token rewards), Incented (campaigns), Clanker ($ZABAL launcher)
+- **Partners:** MAGNETIQ (Proof of Meet), Empire Builder (token rewards), Incented (campaigns), Clanker ($ZABAL launcher)
 
 ## Memory and Planning
 

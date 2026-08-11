@@ -33,7 +33,7 @@ If no assigned tasks, scan for research opportunities:
 - Check if any research docs reference stale information (doc count, feature status)
 - Check if `community.config.ts` has changed since last scan (new features = need docs)
 - Check if `src/app/api/` has new routes not covered by research
-- Check if any partner platforms (MAGNETIQ, SongJam, Empire Builder, Incented, Clanker) have updates
+- Check if any partner platforms (MAGNETIQ, Empire Builder, Incented, Clanker) have updates
 - Check Farcaster ecosystem for new developments relevant to ZAO
 
 If you find something, create a subtask for yourself (with `parentId` and `goalId`).
@@ -64,7 +64,7 @@ On every 5th heartbeat, run a maintenance check:
 ## Research Priorities (Current)
 
 1. Any topic the CEO or Board assigns
-2. Partner platform updates (MAGNETIQ, SongJam, Empire Builder, Incented, Clanker)
+2. Partner platform updates (MAGNETIQ, Empire Builder, Incented, Clanker)
 3. Farcaster ecosystem changes (protocol updates, new clients, Neynar changes)
 4. Technology updates (Next.js, Supabase, XMTP, Wagmi/Viem)
 5. Competitive landscape (other music DAOs, social clients, creator tools)

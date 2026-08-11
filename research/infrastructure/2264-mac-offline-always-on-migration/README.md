@@ -5,13 +5,15 @@ status: research-complete
 last-validated: 2026-08-11
 superseded-by:
 related-docs: "826, 879, 928, 1031, 2036, 2156, 2246, 2262"
-original-query: "we need to make our whole ecosystem work without the Mac having internet so that everything stays up looping on desktop, VPS and Pi - DEEP tier, inventory what only exists on the Mac before proposing anything, deliverable is a numbered doc in research/infrastructure/ with owners and real dates"
+original-query: "we need to make our whole ecosystem work without the Mac having internet so that everything stays up looping on desktop, VPS and Pi - DEEP tier, inventory what only exists on the Mac before proposing anything, deliverable is a numbered doc in research/infrastructure/ with owners and real dates. EXTENDED same day: what if i run out of usage for this week and switch to my zao claude - we will lose some connections, let's clean that up as a weakness. what's the best way to build in more functionality for moving vendors if needed."
 tier: DEEP
 ---
 
 # 2264 - What has to change for the ecosystem to survive the Mac being offline
 
-> **Goal:** Decide, per capability, where it lives when the Mac is shut - based on an exhaustive inventory of what only exists on the Mac today, not on an assumption about what is missing.
+> **Goal:** Decide, per capability, where it lives when the Mac is shut - based on an exhaustive inventory of what only exists on the Mac today, not on an assumption about what is missing. **Extended 2026-08-11** to the same question one layer up: what breaks when the Claude ACCOUNT switches, and where a vendor holds the only copy of our state.
+
+> **The single most urgent item in this doc is Section 9.** ZABAL Gamez Season 1 exists only inside Upstash, the fix is already written as PR #615, and that PR as it stands would publish every live agent auth token to a public repository. Read that section before the migration order.
 
 ## The one-paragraph answer
 
@@ -204,6 +206,131 @@ The order is forced by dependencies, not preference. Each step is independently 
 - **The Windows desktop.** It stays a tailnet member with no shell until OpenSSH Server is installed on it. Out of scope here, worth a separate small task.
 - **Browser-session work.** Genuinely Mac-bound. If Zaal needs a logged-in Chrome while travelling, that is a different research question.
 
+## Section 8 - The Claude account switch: what a cap-out actually costs
+
+Zaal, 2026-08-11: "what if i run out of usage for this week and switch to my zao claude - we will lose some connections."
+
+The brief carried a working list of what survives and what does not. **Measured, that list is wrong in three places**, and the shape of the problem is three-way rather than two-way. What follows is from `~/.claude.json` and the macOS keychain on 2026-08-11, not from the list.
+
+### 8a. The real classification
+
+**Class 1 - Anthropic-account-bound. Definitely lost on a switch.** `claudeAiMcpEverConnected` holds **13** connectors, not the 9 in the brief:
+
+`Google Calendar`, `Gmail`, `Google Drive`, **`Claude Code Remote`**, `Descript`, `Expedia`, `Linear`, `TravExp`, `Slack`, `Notion`, `Canva`, `Calendly`, `Dropbox`
+
+**The one that matters most is the one the brief did not list: `claude.ai Claude Code Remote`.** That is Remote Control - the feature `remoteControlAtStartup: true` turns on, and the thing that lets Zaal reach a session from his phone. It is bound to the Anthropic account. **Switching to the ZAO Claude account breaks phone reach into sessions**, which collides head-on with the Mac-independence goal in the first half of this doc. The two halves of the brief turn out to be one problem.
+
+`Descript`, `Expedia` and `TravExp` were also missing from the list.
+
+**Class 2 - vendor OAuth, stored on THIS MACHINE.** These are local HTTP MCP servers whose OAuth is to the VENDOR, not to Anthropic: `paragraph`, `notion` (the project-scoped one, distinct from the claude.ai connector of the same name), `supabase-cowork`, `hyperagent`, `grep`, `exa`. Config evidence: each is `type: http` with a `url` and **no `env` and no `headers`** - there is no key in the file, so the credential is an OAuth token held elsewhere.
+
+**This class is the brief's main error.** It listed Supabase under "survives, keyed by file". Measured, `supabase-cowork` is `https://mcp.supabase.com/mcp?project_ref=etwvzrmlxeobinrlytza&read_only=true` with no headers and no env - it is OAuth, not file-keyed, and belongs in class 2.
+
+**Class 3 - file-keyed or no-auth. Survives an account switch outright.** `context7`, `playwright`, `serena`, `gitnexus` (all `type: stdio`, launched by command, no credential), and `dune` - which genuinely is file-keyed, carrying `x-dune-api-key` in its `headers` block in `~/.claude.json`. The brief was right about Dune.
+
+### 8b. What was NOT determined, stated as such
+
+**Where class 2's OAuth tokens are stored, and therefore whether an Anthropic account switch actually loses them.** The macOS keychain holds exactly two relevant service entries - `Claude Code-credentials` and `Claude Safe Storage` - and no per-MCP-server items. `~/.claude/` holds `mcp-needs-auth-cache.json` and `mcp-health-cache.json`, which are caches, not credential stores. The tokens are therefore inside one of those two opaque keychain blobs, which were not opened.
+
+So: class 2 is definitely lost if the MACHINE is lost, and **may or may not** be lost on an account switch. Rather than guess, the checklist below treats them as at-risk and the test is two minutes of Zaal's time (Next Actions).
+
+Note also that `mcp-needs-auth-cache.json` currently lists `claude.ai Notion` and `notion` as needing auth - so Notion is already disconnected on both surfaces, independent of any switch.
+
+### 8c. The re-auth checklist, in priority order
+
+Run top to bottom after any account switch. The ordering is by what blocks work soonest, not alphabetically.
+
+| # | Surface | Why this position | How to restore |
+|---|---|---|---|
+| 1 | **Claude Code Remote** | Without it Zaal cannot reach any session from his phone - and per Section 4 that is the whole operator layer | Reconnect the connector on the new account; confirm the session appears on the phone |
+| 2 | **Paragraph** | The publishing path. 366 editions; a newsletter cannot ship without it | Re-run the browser OAuth against `mcp.paragraph.com` |
+| 3 | **supabase-cowork** | The board and the tracker read through it; `todo`/`crush`/`zao-triage` degrade without it | Re-authorize `mcp.supabase.com` for project `etwvzrmlxeobinrlytza` |
+| 4 | **Gmail + Google Calendar** | Inbound and scheduling; the daily loop notices within hours | Reconnect both claude.ai connectors |
+| 5 | **Slack, Linear, Notion, Dropbox, Drive** | Real but not daily-blocking | Reconnect as needed, not upfront |
+| 6 | **Canva, Calendly, Descript, Expedia, TravExp** | Occasional | Reconnect on first use |
+| - | context7, playwright, serena, gitnexus, dune, grep, exa | **No action** - class 3, survives | - |
+
+**Ten minutes, in that order, and only the first four before real work resumes.** That is the deliverable the brief asked for: a cap-out becomes a procedure rather than a discovery.
+
+## Section 9 - Vendor exit, and the one that is an emergency
+
+The principle the brief states is the right one and worth keeping verbatim: **you are locked in wherever the ONLY COPY of state lives inside a vendor. The fix is not migration, it is a nightly export into a repo we own, so leaving stays possible even when it is not planned.**
+
+Ranked by that test, not by spend:
+
+| Rank | Vendor | Only copy inside? | Verdict |
+|---|---|---|---|
+| 1 | **Upstash / Vercel KV** | **Yes - totally** | **Emergency. See below.** |
+| 2 | Paragraph | Yes for 366 editions | Alpha API, OAuth-bound. Export is real work, not yet scoped |
+| 3 | Vercel / Supabase / Neynar | No - data is portable | Rentable. Moving is work, not loss |
+| 4 | Anthropic | Irreplaceable | Plan around the cap (Section 8), not the exit |
+
+### 9a. The KV emergency is bigger than the brief said - and it is already built
+
+The brief named three key patterns (`zabal:subs:*`, `qv:tally:*`, `zabal:points:tally`). **An exhaustive grep of `~/Documents/zabalgames` across `.ts/.tsx/.mjs/.js` finds 97 distinct key patterns**, spanning submissions, profiles, points, referrals, raffles, POAP claims, clips, comments, four separate vote systems, live presence, notifications and intake. The exposure is roughly 30x what the brief described.
+
+Two corrections to the brief's framing, both in the direction of precision:
+
+- **The points ROSTER is already safe.** `data/points-roster.json` (version, `_schema`, season, 15 people) is committed and was last updated 2026-08-11. `api/points.mjs` reads that roster and writes `zabal:points:tally`. So the roster is in git; **the accrued tally is what lives only in KV.**
+- **No script in the repo reads live KV.** Three scripts match a KV grep - `test-crons.mjs`, `test-judging.mjs`, `test-submission-pipeline.mjs` - and all three use an in-memory Upstash stand-in and never contact the service ("never contacts external services", `test-submission-pipeline.mjs:3`). The absence of an exporter is confirmed by exhaustive search, not assumed.
+
+**And the fix already exists.** `ZAODEVZ/zabalgames` **PR #615** ("feat(backup): nightly KV export, so Season 1 survives the vendor") was opened 2026-08-11T23:52Z, adding `api/export.mjs` (+125) and `.github/workflows/kv-backup.yml` (+81). Per `code-restraint.md` rung 1 and `agent-loops.md` rule 28, **do not build a second one.**
+
+### 9b. PR #615 is well built, and must NOT be merged as written
+
+Read directly rather than taken from the PR body. **What is right:**
+
+- `verifyAdmin(req, DOMAIN)` runs **before** any KV access, returning 401 (`api/export.mjs`, handler). Correct order per `api-routes.md`.
+- `verifyAdmin` (`lib/auth.mjs:89-107`) tries a Farcaster Quick Auth JWT + `isAdminFid`, then falls back to a **constant-time** compare against `ADMIN_KEY` - and the fallback is guarded by `if (ADMIN_KEY)`, so an unset key does not degrade into "empty string matches". Fail-closed, correctly.
+- Errors return **502, not 200-with-partial** - the exact `silent-failure-guard.md` lesson, applied without being asked.
+- It SCANs the keyspace rather than enumerating prefixes, and reads each key by its actual type. Both are the right calls, and the 97-pattern count above is evidence for why.
+
+**The blocker:**
+
+`ZAODEVZ/zabalgames` is **`"private": false, "visibility": "public"`**. The workflow commits the **entire** export to `backups/kv-latest.json` on a public repo, nightly at 05:20 UTC. Among the 97 key patterns are:
+
+| Key pattern | What it holds | Evidence |
+|---|---|---|
+| `zabal:agent:tok:${agentToken}` | **A live agent auth token, in the key NAME** | Written `api/submissions.mjs:417`; `api/agent.mjs:71` authenticates by reading `zabal:agent:tok:${tok}` |
+| `zabal:notif:tokens` | Push notification tokens | `api/webhook.mjs:22` |
+| `zabal:profile:nonce:${handle}` | Auth nonces | `api/profile.mjs:183` |
+| `qv:ballots:*` | Per-voter private ballots | The PR body flags these itself |
+
+**A keyspace dump to a public repo therefore publishes every live agent authentication token, permanently, in git history** - because the token IS the key name, redacting values would not help. The PR body's own privacy note says "nothing derived from this export may republish them", and the workflow it ships republishes them. That is not a criticism of the work; it is one step that was not taken, and it is irreversible once pushed.
+
+This is `secret-hygiene.md` guard 4 and `pii-hygiene.md` rule 3, and it fires automatically the moment `ADMIN_KEY` is set - the one action the PR asks Zaal for.
+
+**The fix is small and does not weaken the backup.** Any one of: commit to a private repo instead; encrypt the artifact before commit (age/gpg, key held by Zaal); or split the export so secret-bearing and ballot prefixes go to an encrypted or private destination while the rest stays in the public repo. The choice is Zaal's; the requirement is that **no unencrypted secret-bearing key reaches the public repo.**
+
+## Section 10 - The two cron bugs, measured
+
+### 10a. `zao-spend` overstates Opus by exactly 3x - not the ~10x suspected
+
+`~/bin/zao-spend:49-53` sets rates per million as `(input, output, cache_write, cache_read)`:
+
+```
+"opus":   (15.00, 75.00, 18.75, 1.50)
+"sonnet": (3.00, 15.00, 3.75, 0.30)
+"haiku":  (1.00, 5.00, 1.25, 0.10)
+"fable":  (3.00, 15.00, 3.75, 0.30)
+```
+
+Current published pricing: **Opus 5 is $5 / $25** per million (input/output), with cache write at 1.25x input and cache read at ~0.1x input - so $6.25 and $0.50. The table carries **Opus 4.1-era pricing** ($15/$75), which Opus 4.5 superseded.
+
+- **Opus: every figure is exactly 3x too high** (15/5, 75/25, 18.75/6.25, 1.50/0.50 all equal 3).
+- **Sonnet and Haiku are correct.**
+- **Fable is wrong in the other direction** - it is priced at Sonnet rates but Fable 5 is $10/$50, so fable spend is **understated ~3.3x**.
+
+Worked against the live one-hour window (output 364.7k, cache-write 6.4M, cache-read 143.9M), the reported **$337.48 becomes roughly $112** at correct rates. The tool's own footer prints "opus 15/75", so it states the wrong rate honestly - the fix is four numbers, and the ledger's historical rows should be treated as 3x inflated rather than deleted.
+
+**Zaal's instinct that the number was wrong was right; the magnitude was 3x, not 10x.** The reason it feels larger is the thing `agent-spend.md` already documented: cost is dominated by cache reads, not by output tokens, so "93.8k output tokens" and "$140" are not comparable quantities and the ratio between them is not the error.
+
+### 10b. `zao-vault-log` logs "0 shipped" every run
+
+`~/bin/zao-vault-log:105` prints `logged $n shipped items` and line 112 commits `log: $DAY ($n shipped)`. The vault's last three commits are `log: 2026-08-11 (0 shipped)`, `log: 2026-08-10 (0 shipped)`, `log: 2026-08-09 (0 shipped)` - while 2026-08-11 alone shipped the PRs listed in this doc. The detector is broken, not the day.
+
+Per `noisy-signal-guard.md`, a signal that always reads zero is a signal nobody will ever read, and it has now been wrong for at least three consecutive days. Either fix the detector or delete the cron - a third state, where it keeps running and keeps lying, is the one option that is not acceptable.
+
 ## Also See
 
 - [Doc 826](../826-zao-infrastructure-estate-map/) - the estate map this updates
@@ -227,6 +354,12 @@ The order is forced by dependencies, not preference. Each step is independently 
 | Move the `zaoresearch` lane to the VPS under `tmux new -A -s zaoresearch` and KILL the Mac copy; done when `zj vps` shows it and `tmux ls` on the Mac does not | @Zaal | Migration | 2026-08-18 |
 | Port `zj`, `todo`, `crush`, `zao-triage`, `zao-tracker` to the VPS; done when `todo "test"` from a VPS shell appears on the board | @Zaal | PR | 2026-08-22 |
 | Bounded T3 Code trial on the VPS only (`t3 service install` + `t3 pair --tailscale`), scratch repo, nothing gated; done when Zaal has driven one agent thread from his phone and written a keep/drop line here | @Zaal | Trial | 2026-08-25 |
+| **DO NOT set `ADMIN_KEY` on zabalgames until PR #615's destination is changed** - a public repo cannot receive `zabal:agent:tok:*`; done when the workflow writes somewhere private or encrypted | @Zaal | **Blocker** | 2026-08-12 |
+| Choose the KV backup destination (private repo / encrypted artifact / split export), then set `ADMIN_KEY`; done when `backups/kv-latest.json` exists with no unencrypted agent token in it | @Zaal | Decision + secret | 2026-08-13 |
+| Rotate any `zabal:agent:tok:*` issued before the backup lands, if the export ever ran against the public repo; done when old tokens 401 | @Zaal | Security | 2026-08-13 |
+| Fix the `opus` row in `~/bin/zao-spend` to 5.00/25.00/6.25/0.50 and `fable` to 10.00/50.00/12.50/1.00; done when a 1h run reports roughly a third of today's figure | @Zaal | PR (dotfiles) | 2026-08-12 |
+| Fix or delete `zao-vault-log`'s shipped detector; done when a run reports a non-zero count on a day with merged PRs, or the cron is gone | @Zaal | PR (dotfiles) | 2026-08-14 |
+| Test whether a Claude account switch drops class-2 vendor OAuth (Paragraph / supabase-cowork); done when the answer is written into Section 8b | @Zaal | 2-minute test | 2026-08-15 |
 | Re-validate this doc after the migration; done when `last-validated` is updated and the "what breaks" table is re-measured | @Zaal | Doc update | 2026-09-11 |
 
 ## Sources
@@ -248,6 +381,21 @@ Local measurement (all run 2026-08-11, all on the machines named):
 - `nc -z` probes to 100.72.152.63:22 and 100.117.191.11:22 [FULL] - Windows closed, Pi open
 - `lsof -nP -iTCP -sTCP:LISTEN` on the Mac [FULL] - node dev servers on 3000/3100/3200/3300, no production listener
 - `head` of `~/zaal-dotfiles/bin/lane-relay-daemon`, `~/bin/zj`, `~/bin/todo`, `~/bin/zao-tracker` [FULL] - purpose and backing store read from source
+
+Added for Sections 8-10 (all run 2026-08-11):
+
+- `~/.claude.json` - `claudeAiMcpEverConnected` (13 entries), global + project `mcpServers` with per-server `type`/`url`/`env`/`headers` [FULL] - the OAuth-vs-key classification
+- `~/.claude/plugins/**/.mcp.json` [FULL] - the plugin-provided servers (exa, github, memory, sequential-thinking)
+- `security dump-keychain` service names + `ls ~/.claude/` [FULL] - only `Claude Code-credentials` / `Claude Safe Storage`; no per-MCP items, hence the stated unknown in 8b
+- Exhaustive grep of `~/Documents/zabalgames` for `(zabal|qv):` key patterns across `.ts/.tsx/.mjs/.js` [FULL] - 97 distinct patterns
+- `data/points-roster.json` shape + `api/points.mjs` [FULL] - roster in git, tally in KV
+- `scripts/test-crons.mjs`, `test-judging.mjs`, `test-submission-pipeline.mjs` headers [FULL] - all three mock KV; no exporter exists
+- `gh api repos/ZAODEVZ/zabalgames` [FULL] - `"private": false, "visibility": "public"`
+- PR #615: metadata, file list, body, and the **source** of `api/export.mjs` + `.github/workflows/kv-backup.yml` on `ws/kv-backup`, plus `lib/auth.mjs:89-107` on main [FULL] - the auth guard and the destination were read, not taken from the PR description
+- `api/submissions.mjs:417`, `api/agent.mjs:71`, `api/webhook.mjs:22`, `api/profile.mjs:183` [FULL] - the token-in-key-name evidence
+- `~/bin/zao-spend:49-53` rate table + a live `--hours 1` run [FULL]
+- `~/bin/zao-vault-log:105,112` + `git -C ~/zao-vault log -3` [FULL]
+- Anthropic published model pricing via the bundled `claude-api` skill [FULL] - Opus 5 $5/$25, Fable 5 $10/$50, Sonnet 5 $3/$15, Haiku 4.5 $1/$5; cache write 1.25x input, cache read ~0.1x input. Consulted rather than recalled, because the whole 10a finding turns on it.
 
 External:
 

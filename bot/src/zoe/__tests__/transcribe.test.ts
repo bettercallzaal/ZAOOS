@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const mockMkdir = vi.hoisted(() => vi.fn());
 const mockWriteFile = vi.hoisted(() => vi.fn());
-const mockReadFileSync = vi.hoisted(() => vi.fn(() => { throw new Error('ENOENT'); }));
+const mockReadFileSync = vi.hoisted(() => vi.fn<() => string>(() => { throw new Error('ENOENT'); }));
 const mockFetch = vi.hoisted(() => vi.fn());
 
 vi.mock('node:fs', () => ({

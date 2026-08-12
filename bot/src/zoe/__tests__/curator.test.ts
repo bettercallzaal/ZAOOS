@@ -8,7 +8,9 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 // Mock execSync before importing curator
-let mockExecSyncImpl = (cmd: string) => {
+// Annotated: without this the throwing default infers `(cmd: string) => never`,
+// and every test that swaps in a string-returning impl fails to typecheck.
+let mockExecSyncImpl: (cmd: string) => string = (_cmd: string) => {
   throw new Error('execSync not mocked');
 };
 

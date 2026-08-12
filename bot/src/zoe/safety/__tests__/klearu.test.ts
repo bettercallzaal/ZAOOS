@@ -12,7 +12,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Hoist so the fn reference is stable before vi.mock hoisting.
 const { makeSpawn } = vi.hoisted(() => {
   function makeSpawn(stdout: string, exitCode = 0) {
-    return vi.fn(() => ({
+    // rest signature so the vi.mock factory can forward its args through
+    return vi.fn((..._args: unknown[]) => ({
       stdout: {
         on: (event: string, cb: (d: Buffer) => void) => {
           if (event === 'data' && stdout) cb(Buffer.from(stdout));

@@ -70,7 +70,7 @@ describe('updateRun', () => {
     const update = vi.fn().mockReturnValue({ eq });
     mockDb.mockReturnValue({ from: vi.fn().mockReturnValue({ update }) });
 
-    await expect(updateRun('run-uuid-1', { status: 'done' })).rejects.toThrow(
+    await expect(updateRun('run-uuid-1', { status: 'ready' })).rejects.toThrow(
       'updateRun failed: update failed',
     );
   });

@@ -15,6 +15,7 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { claudeBriefLines, readClaudeHealth } from '../hermes/claude-health';
 import { DRIP_DEFAULT } from './backlog-grill';
 import { outstandingCount, type BacklogGrillState } from './backlog-grill-runner';
 import { renderPinnedBrief, syncPinnedBrief, type BriefInput, type PinDeps, type PinResult } from './pinned-brief';
@@ -63,10 +64,13 @@ export async function grillDepth(): Promise<number | null> {
 const REPO = 'bettercallzaal/ZAOOS';
 
 export async function gatherBrief(now: Date = new Date()): Promise<BriefInput> {
-  const [prsRaw, ciRaw, depth] = await Promise.all([
+  const [prsRaw, ciRaw, depth, health] = await Promise.all([
     sh(`gh api 'repos/${REPO}/pulls?state=open&per_page=100' --jq 'length'`),
     sh(`gh api 'repos/${REPO}/actions/runs?branch=main&per_page=1' --jq '.workflow_runs[0].conclusion // ""'`),
     grillDepth(),
+    // A file read, same cost class as the grill state. The brief must never call
+    // Claude itself - it runs every 5 minutes forever.
+    readClaudeHealth(),
   ]);
 
   const needsYou: string[] = [];
@@ -90,6 +94,15 @@ export async function gatherBrief(now: Date = new Date()): Promise<BriefInput> {
     running.push(['grill queue', depth >= cap ? `${depth} (at cap)` : String(depth)]);
     if (depth >= cap) needsYou.push(`Grill stuck at ${cap} - answer any card to restart it`);
   }
+
+  // Claude reachability. The whole point is that this line exists at all: when the
+  // OAuth token was revoked on 2026-08-08 the brief had nothing to say about Claude,
+  // so four days of total failure looked exactly like four days of working fine.
+  // `claudeBriefLines` only claims health from a recorded success, and only alerts
+  // on an observed auth failure - so it can reach zero when the token is fixed.
+  const claude = claudeBriefLines(health, now.getTime());
+  running.push(claude.status);
+  if (claude.alert) needsYou.push(claude.alert);
 
   const updatedLabel = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',

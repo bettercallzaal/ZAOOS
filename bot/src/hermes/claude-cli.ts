@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { recordClaudeFailure, recordClaudeOk } from './claude-health';
 
 export interface ClaudeCliResult {
   text: string;
@@ -92,7 +93,29 @@ export function classifyClaudeError(text: string): { kind: ClaudeErrorKind; hint
   return { kind: 'unknown', hint: 'unclassified claude CLI failure - check logs' };
 }
 
-export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
+/**
+ * Every Claude call in the fleet funnels through here, which makes this the one
+ * place that can answer "is Claude actually reachable right now". Recording the
+ * outcome at the single spawn point means no caller has to remember to, and no
+ * new call path can silently escape the check - which is exactly how the
+ * 2026-08-08 token revocation went unseen for four days.
+ *
+ * Recording never throws (see claude-health.ts) and the original error is always
+ * rethrown unchanged, so this is observation only - it cannot alter behaviour.
+ */
+export async function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
+  try {
+    const result = await callClaudeCliInner(opts);
+    await recordClaudeOk();
+    return result;
+  } catch (err: unknown) {
+    if (err instanceof CliAuthError) await recordClaudeFailure('auth', err.hint);
+    else if (err instanceof CliError) await recordClaudeFailure(err.kind, err.hint);
+    throw err;
+  }
+}
+
+function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
   return new Promise((resolve, reject) => {
     const outputFormat = opts.outputFormat ?? 'json';
     const args: string[] = [
@@ -323,6 +346,7 @@ export async function checkClaudeAuth(cwd: string = '/home/zaal/zao-os'): Promis
       bare: true,
       outputFormat: 'text',
     });
+    // No record call here: this went through callClaudeCli, which already did it.
     return { ok: true };
   } catch (err) {
     if (err instanceof CliAuthError) {

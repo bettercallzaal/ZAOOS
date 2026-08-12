@@ -129,7 +129,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$PROJECT_DIR\" && STAGED=$(git diff --cached --name-only --diff-filter=d | grep -E '\\.(ts|tsx)$' | tr '\\n' ' '); if [ -n \"$STAGED\" ]; then npx eslint --max-warnings 10 $STAGED 2>&1 | tail -20; fi",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && STAGED=$(git diff --cached --name-only --diff-filter=d | grep -E '\\.(ts|tsx)$' | tr '\\n' ' '); if [ -n \"$STAGED\" ]; then npx eslint --max-warnings 10 $STAGED 2>&1 | tail -20; fi",
             "statusMessage": "Linting staged files..."
           }
         ]
@@ -140,12 +140,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$PROJECT_DIR\" && bash .claude/skills/worksession/branch-guard.sh",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && bash .claude/skills/worksession/branch-guard.sh",
             "statusMessage": "Checking branch safety..."
           },
           {
             "type": "command",
-            "command": "cd \"$PROJECT_DIR\" && bash .claude/skills/worksession/typecheck-guard.sh",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && bash .claude/skills/worksession/typecheck-guard.sh",
             "statusMessage": "Typechecking before push..."
           }
         ]
@@ -155,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$PROJECT_DIR/scripts/check-pipeline-exit.py\" --hook"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/check-pipeline-exit.py\" --hook"
           }
         ]
       }
@@ -178,7 +178,7 @@
           {
             "type": "command",
             "if": "Edit(src/**/*.ts)|Edit(src/**/*.tsx)|Write(src/**/*.ts)|Write(src/**/*.tsx)",
-            "command": "cd \"$PROJECT_DIR\" && npx eslint --fix \"$TOOL_ARG_FILE_PATH\" 2>/dev/null; exit 0",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && npx eslint --fix \"$TOOL_ARG_FILE_PATH\" 2>/dev/null; exit 0",
             "statusMessage": "Auto-formatting..."
           }
         ]
@@ -189,7 +189,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$PROJECT_DIR\" && BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [[ \"$BRANCH\" != ws/* ]]; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"SessionStart\\\",\\\"additionalContext\\\":\\\"WARNING: You are on branch [$BRANCH], not a ws/ worksession branch. CLAUDE.md requires running /worksession at session start to create an isolated branch. Invoke /worksession NOW before doing any work.\\\"}}\"; fi",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [[ \"$BRANCH\" != ws/* ]]; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"SessionStart\\\",\\\"additionalContext\\\":\\\"WARNING: You are on branch [$BRANCH], not a ws/ worksession branch. CLAUDE.md requires running /worksession at session start to create an isolated branch. Invoke /worksession NOW before doing any work.\\\"}}\"; fi",
             "statusMessage": "Checking worksession branch..."
           },
           {

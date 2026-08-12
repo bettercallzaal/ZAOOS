@@ -123,3 +123,4 @@
 | 2251 | [The Graph for ZAO: not yet, and here is the exact trigger](./2251-the-graph-subgraphs-for-zao/) | STANDALONE | Decide whether ZAO should index its on-chain data with The Graph, |
 | 2263 | [The research library graduated, and the two calls are still open](./2263-zaoresearch-graduation-decision/) | STANDALONE | Answer IMan's two questions about the ZAOresearch migration, and verify the claims in the handover PDF against the live repos rather than accepting them. |
 | 2264 | [What has to change for the ecosystem to survive the Mac being offline](./2264-mac-offline-always-on-migration/) | STANDALONE | Decide, per capability, where it lives when the Mac is shut - based on an exhaustive inventory of what only exists on the Mac today, not on an assumption about what is missing. |
+| 2265 | [Session state, 2026-08-11: what shipped, what is verified, what I got wrong](./2265-session-2026-08-11-state/) | STANDARD | 2026-08-11 |

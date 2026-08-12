@@ -19,6 +19,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import type { BusConfig } from './bus-send';
 import { busConfig, busConfigured } from './bus-send';
+import { featureRan } from './feature-ran';
 
 export interface FileUploadResult {
   ok: boolean;
@@ -90,6 +91,7 @@ export async function uploadFileToBus(
     const fileId = data.id ? String(data.id) : undefined;
     const idDisplay = fileId ? ` (id ${fileId.slice(0, 8)})` : '';
 
+    featureRan('bus-upload', filename);
     return {
       ok: true,
       reply: `Uploaded ${filename}${idDisplay}.`,

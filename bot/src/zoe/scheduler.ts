@@ -56,6 +56,7 @@ import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillTick } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
+import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
@@ -436,6 +437,36 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           featureRan('pinned-brief-tick', r.ran ? r.value.action : `lock ${r.reason}`);
         } catch (err) {
           console.warn('[zoe/pinned-brief] tick failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Prove Claude is reachable, hourly, with an actual call.
+  //
+  // This is the positive half of the 401 fix. Recording outcomes inside
+  // callClaudeCli covers every real call, but a quiet ZOE makes no real calls -
+  // and "no failures recorded" is not evidence of health
+  // (`.claude/rules/state-claims.md`, silence is not evidence). So once an hour
+  // we spend one haiku call to establish the fact either way, and the pinned
+  // brief reads the result.
+  //
+  // checkClaudeAuth already existed in hermes/claude-cli.ts and its docstring
+  // claimed "Used by: bot/src/zoe/index.ts onBotStart hook". It had zero callers.
+  // This is that wiring, finally made real.
+  tasks.push(
+    cron.schedule(
+      '7 * * * *',
+      async () => {
+        try {
+          const r = await checkClaudeAuth();
+          featureRan('claude-auth-probe', r.ok ? 'ok' : `${r.kind ?? 'fail'}`);
+          if (!r.ok) console.warn(`[zoe/scheduler] claude auth probe failed: ${r.kind ?? 'unknown'} - ${r.hint ?? ''}`);
+        } catch (err) {
+          // The probe failing to RUN is different from Claude being down, and
+          // callClaudeCli has already recorded whatever it saw.
+          console.warn('[zoe/scheduler] claude auth probe threw:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

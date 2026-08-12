@@ -18,9 +18,24 @@ vi.mock('node:os', async (importOriginal) => {
   return { ...actual, default: { ...actual, homedir: () => FAKE_HOME }, homedir: () => FAKE_HOME };
 });
 
+// gatherBrief shells out to `gh` twice. Failing them fast keeps this offline and
+// exercises the documented omit-rather-than-guess path.
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:child_process')>();
+  return {
+    ...actual,
+    exec: (_cmd: string, _opts: unknown, cb?: (e: Error | null, o: string, e2: string) => void) => {
+      const done = typeof _opts === 'function' ? (_opts as typeof cb) : cb;
+      done?.(new Error('offline in tests'), '', '');
+      return undefined as never;
+    },
+  };
+});
+
 import { DRIP_DEFAULT } from '../backlog-grill';
 import { outstandingCount } from '../backlog-grill-runner';
-import { grillDepth } from '../pinned-brief-runner';
+import { gatherBrief, grillDepth } from '../pinned-brief-runner';
+import { CLAUDE_HEALTH_PATH } from '../../hermes/claude-health';
 
 const STATE_PATH = join(FAKE_HOME, '.zao/zoe/backlog-grill-state.json');
 
@@ -78,5 +93,50 @@ describe('grillDepth', () => {
 
   it('returns null when the state cannot be read, so the line is omitted', async () => {
     expect(await grillDepth()).toBeNull();
+  });
+});
+
+
+/**
+ * The regression for 2026-08-08: ZOE's OAuth token was revoked, every Claude call
+ * 401'd for four days, and the brief said nothing because it had no Claude line at
+ * all. These assert the line exists, that it alerts on a real observed failure,
+ * and - just as importantly - that it does not invent health when nothing is known.
+ */
+describe('gatherBrief surfaces Claude reachability', () => {
+  async function writeHealth(h: unknown): Promise<void> {
+    await fs.mkdir(dirname(CLAUDE_HEALTH_PATH), { recursive: true });
+    await fs.writeFile(CLAUDE_HEALTH_PATH, JSON.stringify(h), 'utf8');
+  }
+
+  beforeEach(async () => {
+    await fs.rm(CLAUDE_HEALTH_PATH, { force: true });
+  });
+
+  it('puts an auth failure in needs-you', async () => {
+    const now = new Date('2026-08-12T12:00:00.000Z');
+    await writeHealth({
+      lastOkMs: now.getTime() - 6 * 86400_000,
+      lastFailMs: now.getTime() - 4 * 86400_000,
+      lastFailKind: 'auth',
+      lastFailHint: 'run /login',
+    });
+    const brief = await gatherBrief(now);
+    expect(brief.needsYou.some((l) => l.includes('cannot reach Claude'))).toBe(true);
+    expect(brief.running).toContainEqual(['claude', 'auth failed']);
+  });
+
+  it('reports "not checked" rather than ok when nothing has been observed', async () => {
+    const brief = await gatherBrief(new Date('2026-08-12T12:00:00.000Z'));
+    expect(brief.running).toContainEqual(['claude', 'not checked']);
+    expect(brief.needsYou.some((l) => l.includes('Claude'))).toBe(false);
+  });
+
+  it('says ok, and raises nothing, after a recent success', async () => {
+    const now = new Date('2026-08-12T12:00:00.000Z');
+    await writeHealth({ lastOkMs: now.getTime() - 60_000, lastFailMs: null, lastFailKind: null, lastFailHint: null });
+    const brief = await gatherBrief(now);
+    expect(brief.running).toContainEqual(['claude', 'ok']);
+    expect(brief.needsYou.some((l) => l.includes('Claude'))).toBe(false);
   });
 });

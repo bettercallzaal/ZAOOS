@@ -193,7 +193,7 @@ export interface ConciergeResult {
 
 export type TaskOp =
   | { op: 'add'; task: Omit<ZoeTask, 'id' | 'created_at' | 'updated_at'> }
-  | { op: 'update'; id: string; patch: Partial<Pick<ZoeTask, 'status' | 'description' | 'priority' | 'notes'>> }
+  | { op: 'update'; id: string; patch: Partial<Pick<ZoeTask, 'title' | 'status' | 'description' | 'priority' | 'notes'>> }
   | { op: 'complete'; id: string; outcome?: string }
   | { op: 'defer'; id: string; reason?: string };
 

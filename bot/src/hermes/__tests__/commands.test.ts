@@ -14,6 +14,7 @@ vi.mock('../db', () => ({
 vi.mock('../runner', () => ({ dispatchHermesRun: vi.fn() }));
 
 import { cmdFix, cmdFixStatus, cmdZsEdit } from '../commands';
+import type { TeamMember } from '../../auth';
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -41,8 +42,10 @@ function makeCtx(text: string, fromId = 99999, role?: 'admin' | 'member') {
   };
 }
 
-const NON_ADMIN_MEMBER = { fid: 1, name: 'Alice', role: 'member' as const, telegram_id: 99999 };
-const ADMIN_MEMBER = { fid: 2, name: 'Bob', role: 'admin' as const, telegram_id: 88888 };
+// Shaped to TeamMember (src/auth.ts). These previously carried a `fid` field that
+// TeamMember has never had, and omitted id, scope and telegram_username.
+const NON_ADMIN_MEMBER: TeamMember = { id: 'm-1', name: 'Alice', scope: 'zao', role: 'member', telegram_id: 99999, telegram_username: 'alice' };
+const ADMIN_MEMBER: TeamMember = { id: 'm-2', name: 'Bob', scope: 'zao', role: 'admin', telegram_id: 88888, telegram_username: 'bob' };
 
 // ── cmdFix ────────────────────────────────────────────────────────────────────
 

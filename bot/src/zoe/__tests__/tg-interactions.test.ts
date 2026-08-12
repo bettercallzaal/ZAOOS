@@ -216,10 +216,10 @@ function makeDeps(
     isFromZaal: overrides.isFromZaal ?? true,
     zaalId: 123,
     reactions: {
-      unpin: vi.fn<[number, number], Promise<void>>().mockResolvedValue(undefined),
-      markDone: vi.fn<[string, 'done'], Promise<void>>().mockResolvedValue(undefined),
-      getTaskForMessage: overrides.getTaskForMessage ?? vi.fn<[number], Promise<string | null>>().mockResolvedValue(null),
-      ping: vi.fn<[string, string], Promise<void>>().mockResolvedValue(undefined),
+      unpin: vi.fn<(chatId: number, messageId: number) => Promise<void>>().mockResolvedValue(undefined),
+      markDone: vi.fn<(taskId: string, status: 'done') => Promise<void>>().mockResolvedValue(undefined),
+      getTaskForMessage: overrides.getTaskForMessage ?? vi.fn<(messageId: number) => Promise<string | null>>().mockResolvedValue(null),
+      ping: vi.fn<(queueName: string, reason: string) => Promise<void>>().mockResolvedValue(undefined),
     },
   };
 }

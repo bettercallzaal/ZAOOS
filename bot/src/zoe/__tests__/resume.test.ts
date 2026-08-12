@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockCallClaudeCli = vi.hoisted(() => vi.fn());
 vi.mock('../../hermes/claude-cli', () => ({

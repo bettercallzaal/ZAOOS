@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockRunCmd = vi.hoisted(() => vi.fn());
 vi.mock('../git', () => ({ runCmd: mockRunCmd }));
@@ -17,8 +17,12 @@ import { runCritic } from '../critic';
 type CmdResult = { stdout: string; stderr: string; exitCode: number };
 const cmdOk = (stdout: string): CmdResult => ({ stdout, stderr: '', exitCode: 0 });
 
+// branchName is required by CritiqueInput and IS read by runCritic (critic.ts,
+// `branch: input.branchName` in the shadow-log line). It was missing here, so every
+// test below ran with branch: undefined - an input shape production cannot produce.
 const MOCK_INPUT = {
   workTreePath: '/tmp/wt',
+  branchName: 'ws/fix-greeting-typo',
   issueText: 'Fix the typo in greeting',
   filesChanged: ['src/greet.ts'],
 };

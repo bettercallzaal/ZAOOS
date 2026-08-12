@@ -20,7 +20,7 @@ Recommendations first.
 | # | Decision | Rationale |
 |---|---|---|
 | 1 | **USE AssemblyAI for public Space recaps.** Universal-2 async plus diarization, $0.17/hr. | Speaker naming is the blocker, not transcription. AssemblyAI's Speaker Identification maps `Speaker A` to a real name from in-audio context with no voice enrollment. The local path cannot do this at all. |
-| 2 | **KEEP local mlx-whisper for private internal meetings.** No change to `/meeting`. | The Candy structure meeting and any founder call is content we should not upload. Local is free, already working, and measured at 5.7x realtime on this machine today. |
+| 2 | **ROUTE BY STREAM SHAPE, not by sensitivity.** Mixed single stream to AssemblyAI, speaker-separated tracks to local mlx-whisper. | Corrected after this doc's first draft. A Craig/Discord recording ships one audio file per speaker, named by speaker - attribution is already perfect and free, so paid diarization buys literally nothing. Only a single mixed stream (an X Space) has a speaker problem worth paying to solve. Sensitivity is a second filter on top, not the primary rule. |
 | 3 | **SET TTL to 1 day and opt out of the model improvement program BEFORE the first upload.** | A 2h49m candid founder Space is the payload. AssemblyAI defaults retain audio and transcripts; both are changed on one dashboard page. Doing this after the first upload is too late. |
 | 4 | **USE Auto Highlights (+$0.01/hr), SKIP Auto Chapters (+$0.08/hr).** | Auto Chapters is Universal-2 only and marked deprecated. Building the clip-candidate step on a deprecated feature buys a migration. Auto Highlights is 8x cheaper and not deprecated. |
 | 5 | **DO NOT retire the local path.** Run it as the fallback. | The only benchmark that measured duration resilience found AssemblyAI degrades most on long audio and Whisper+Pyannote degrades least. Our files are 169 minutes. See the contradiction in Findings. |
@@ -42,6 +42,23 @@ Three tiers of the problem, and only one product solves the third:
 AssemblyAI's Speaker Identification takes a list of names you supply and matches them to diarized speakers by **context inference** - it uses names spoken inside the audio, not voiceprints. No enrollment, no audio samples. Config is a `speaker_identification` block with `speaker_type: "name"` and a `speakers` array, optionally enriched with `description`, `company`, or `title` for extra context. It requires `speaker_labels: true` as a prerequisite, and has a `effort: "medium"` mode documented as the right setting for conference calls and interrupted conversation, which is exactly what a Space is.
 
 The constraint that matters: **names cannot be extracted if absent from the audio.** On a Space where hosts greet each other by name this works. On a Space where nobody says a name, it cannot invent one, and we are back to manual labeling. This is a real limit, not a rounding error.
+
+### Correction: stream shape decides this, not sensitivity
+
+The first draft of this doc split the routing on public-versus-private. That was wrong, and a real file proved it within the hour.
+
+A Craig recording of the 2026-08-12 Candy meeting arrived as a directory of **per-speaker tracks**: `1-candytoybox.aac` (69 min) and `2-zaal.aac` (45 min). Craig records each Discord participant to a separate stream. Speaker attribution is therefore not a hard problem to be solved, it is metadata already sitting in the filename. Transcribe each track independently, merge the segments by timestamp, and the result is 100% correct attribution with real names at zero cost - strictly better than anything a diarizer can infer from a mixed stream, because there is nothing to infer.
+
+Doc 709 reached this conclusion in May about ZAOscribe and called separate-stream recording "genuinely the cleanest approach where the platform allows it." This confirms it on a real file.
+
+The corrected routing rule:
+
+| Input shape | Example | Route | Why |
+|---|---|---|---|
+| One track per speaker | Craig / Discord recording | Local mlx-whisper, per track | Attribution is free and perfect. Paid diarization adds cost and can only be worse. |
+| Single mixed stream | X Space mp4 | AssemblyAI, diarization + Speaker Identification | The only case with a genuine speaker problem. |
+
+Sensitivity remains a second filter: anything that must not leave the machine stays local regardless of shape, accepting whatever attribution loss follows. It is not the first question, though, because on this evidence the shape question answers most cases before sensitivity is reached.
 
 ### Cost, computed for our actual file
 

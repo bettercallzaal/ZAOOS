@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   toQueue,
   pickNext,
+  askCooldownMs,
   formatGrill,
   parseOptions,
   matchTypedAnswer,
@@ -85,6 +86,71 @@ describe('pickNext', () => {
     const snoozed: GrillState = { ...emptyState, items: { a: { askedAt: '2026-07-25T00:00:00Z', status: 'snoozed', snoozeUntil: '2026-07-25T06:00:00Z' } } };
     expect(pickNext(queue, snoozed, now + 3600_000)).toBeNull(); // still snoozed
     expect(pickNext(queue, snoozed, Date.parse('2026-07-25T07:00:00Z'))?.key).toBe('a'); // snooze elapsed
+  });
+});
+
+// Zaal, 2026-08-11: "older cards must nag MORE frequently, not expire."
+describe('askCooldownMs - an older item nags harder', () => {
+  const H = 3600_000;
+  const D = 24 * H;
+
+  it('holds the 3h default for a fresh item', () => {
+    expect(askCooldownMs(0)).toBe(3 * H);
+    expect(askCooldownMs(6 * H)).toBe(3 * H);
+  });
+
+  it('shortens monotonically as the item ages, and never lengthens', () => {
+    const ages = [0, 12 * H, 1 * D, 2 * D, 3 * D, 6 * D, 7 * D, 30 * D];
+    const waits = ages.map(askCooldownMs);
+    for (let i = 1; i < waits.length; i++) expect(waits[i]).toBeLessThanOrEqual(waits[i - 1]);
+    expect(waits.at(-1)).toBeLessThan(waits[0]);
+  });
+
+  it('floors at 45m so a week-old item cannot arrive every tick', () => {
+    expect(askCooldownMs(7 * D)).toBe(45 * 60_000);
+    expect(askCooldownMs(365 * D)).toBe(45 * 60_000); // a year old is still floored
+  });
+});
+
+describe('pickNext - age drives the cooldown, and nothing ever expires', () => {
+  const queue = toQueue([task({ id: '1', legacy_id: 'a', title: 'A', priority: 'P0', next_owner: 'me' })], []);
+  const now = Date.parse('2026-08-11T12:00:00Z');
+  const H = 3600_000;
+  const D = 24 * H;
+
+  it('a week-old item re-surfaces after 1h where a fresh one would not', () => {
+    // Both were asked 1h ago. The only difference is when they were FIRST asked.
+    const asked = new Date(now - 1 * H).toISOString();
+    const fresh: GrillState = { ...emptyState, items: { a: { askedAt: asked, status: 'asked', firstAskedAt: asked } } };
+    const old: GrillState = {
+      ...emptyState,
+      items: { a: { askedAt: asked, status: 'asked', firstAskedAt: new Date(now - 8 * D).toISOString() } },
+    };
+    expect(pickNext(queue, fresh, now)).toBeNull(); // 1h into a 3h wait
+    expect(pickNext(queue, old, now)?.key).toBe('a'); // 1h into a 45m wait - overdue
+  });
+
+  it('an item unanswered for a month still surfaces - age never removes it', () => {
+    const s: GrillState = {
+      ...emptyState,
+      items: {
+        a: {
+          askedAt: new Date(now - 2 * H).toISOString(),
+          status: 'asked',
+          firstAskedAt: new Date(now - 30 * D).toISOString(),
+        },
+      },
+    };
+    expect(pickNext(queue, s, now)?.key).toBe('a');
+  });
+
+  it('falls back to askedAt for a state file written before firstAskedAt existed', () => {
+    const s: GrillState = {
+      ...emptyState,
+      items: { a: { askedAt: new Date(now - 1 * H).toISOString(), status: 'asked' } },
+    };
+    expect(pickNext(queue, s, now)).toBeNull(); // reads as new -> 3h default, still cooling
+    expect(pickNext(queue, s, now + 3 * H)?.key).toBe('a');
   });
 });
 

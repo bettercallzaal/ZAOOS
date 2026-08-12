@@ -1444,6 +1444,15 @@ bot.on('message:text', async (ctx) => {
           console.error('[zoe/grill] board resolve failed:', (e as Error)?.message),
         );
         await ctx.api.unpinChatMessage(zaalId, replyToId).catch(() => {});
+        // Strip the answered card's buttons. Zaal, 2026-08-11: "when I reply to
+        // these they don't remove the buttons." Both other resolve paths (the
+        // tap at grill:ans and the typed-answer capture in the DM path) already
+        // did this; only the reply path unpinned and left a live keyboard
+        // behind, so an answered card still read as open and re-tapping it
+        // re-answered an item that was already off the queue.
+        await ctx.api
+          .editMessageReplyMarkup(zaalId, replyToId, { reply_markup: { inline_keyboard: [] } })
+          .catch(() => {});
         await ctx.reply(`Resolved: ${gr.value}. Logged it and moved it off your plate.`);
         await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
           console.error('[zoe/grill] advance failed:', (e as Error)?.message),

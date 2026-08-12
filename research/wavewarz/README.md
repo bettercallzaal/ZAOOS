@@ -4,6 +4,7 @@
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
+| 2267 | [WaveWarZ surface map: three sites, three owners, one API](./2267-wavewarz-surface-map/) | STANDALONE | Corrects doc 1605 - wavewarz.info is CandyToyBox/wavewarz-intelligence, not wwtracker. Full public API spec, live 2026-08-12 numbers, licence gap. |
 | 099 | [Prediction Market Music Battles](./099-prediction-market-music-battles/) | STANDALONE | Prediction-market-style voting for music battles using virtual Respect points in Supabase |
 | 100 | [Solana PDA Reading from Next.js](./100-solana-pda-reading-nextjs/) | STANDALONE | Reading Solana Program Derived Address data server-side for WaveWarZ Battle Vaults |
 | 101 | [WaveWarZ x ZAO OS Integration Whitepaper](./101-wavewarz-zao-whitepaper/) | CANONICAL | Comprehensive strategic integration document synthesizing docs 95-100 |

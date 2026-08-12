@@ -65,6 +65,16 @@ export function verifyReceipt(
     return 'CANNOT_VERIFY';
   }
 
+  // OUR OWN side must be present too. Comparing '' to '' is true, so an empty
+  // local hash would sail through as a MATCH while proving nothing whatsoever -
+  // the vacuous verify of agent-loops.md rule 30, where the check passes because
+  // it never actually ran. sha256 cannot return an empty string, so reaching
+  // here means a caller passed one, and that is a bug we must not launder into
+  // a green result.
+  if (!sentMessageId || !sentContentHash) {
+    return 'CANNOT_VERIFY';
+  }
+
   // Both fields are present. Check if they match what we sent (comparing as strings).
   const messageIdMatch = String(receipt.messageId) === sentMessageId;
   const contentHashMatch = String(receipt.contentHash) === sentContentHash;

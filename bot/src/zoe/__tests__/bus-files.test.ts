@@ -235,6 +235,25 @@ describe('uploadFileToBus', () => {
   });
 });
 
+// The receipt can be perfect and the verify still prove nothing, if OUR side of
+// the comparison is empty. '' === '' is true, so an empty local hash would read
+// as MATCH - a check that passes because it never ran (agent-loops.md rule 30).
+describe('verifyReceipt - our own side must be present, or it is not a verify', () => {
+  const receipt: DreamNetReceipt = { messageId: 'msg-1', contentHash: 'abc123' };
+
+  it('an empty local hash is CANNOT_VERIFY, never MATCH', () => {
+    expect(verifyReceipt({ messageId: 'msg-1', contentHash: '' }, 'msg-1', '')).toBe('CANNOT_VERIFY');
+  });
+
+  it('an empty local messageId is CANNOT_VERIFY, never MATCH', () => {
+    expect(verifyReceipt({ messageId: '', contentHash: 'abc123' }, '', 'abc123')).toBe('CANNOT_VERIFY');
+  });
+
+  it('still MATCHes when both sides are genuinely present and equal', () => {
+    expect(verifyReceipt(receipt, 'msg-1', 'abc123')).toBe('MATCH');
+  });
+});
+
 describe('verifyReceipt', () => {
   it('returns MATCH when contentHash and messageId both match', () => {
     const receipt: DreamNetReceipt = {

@@ -128,10 +128,27 @@ describe('the health file', () => {
     expect(claudeBriefLines(await readClaudeHealth(path), T).alert).toBeNull();
   });
 
-  it('never throws when the path is unwritable', async () => {
-    // A health file that cannot be written must not break the call it observes.
-    await expect(recordClaudeOk(T, '/proc/definitely/not/writable.json')).resolves.toBeUndefined();
-  });
+  it(
+    'never throws when the path is unwritable',
+    async () => {
+      // A health file that cannot be written must not break the call it observes.
+      //
+      // The path has to be unwritable for the SAME reason on every platform.
+      // This used to be '/proc/definitely/not/writable.json', which fails
+      // instantly on macOS (no /proc at all) and hung past the 5s default on
+      // Linux CI - so the suite passed on every developer machine and left main
+      // red. A plain file used as a parent directory gives a deterministic
+      // ENOTDIR everywhere and returns immediately.
+      const blocker = join(dir, 'a-file-not-a-directory');
+      await (await import('node:fs/promises')).writeFile(blocker, 'x', 'utf8');
+
+      await expect(recordClaudeOk(T, join(blocker, 'claude-health.json'))).resolves.toBeUndefined();
+    },
+    // Deliberately tighter than the default. The property is that the writer
+    // gives up immediately on an unwritable path; if it ever starts blocking
+    // again, this must fail loudly rather than sit for five seconds first.
+    2000,
+  );
 
   it('survives a corrupt file rather than crashing the brief', async () => {
     await recordClaudeOk(T, path);

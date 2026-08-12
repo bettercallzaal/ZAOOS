@@ -2,7 +2,7 @@
 topic: events
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-11
 superseded-by:
 related-docs: 609, 650, 662, 672, 677, 679, 682
 tier: QUICK
@@ -11,6 +11,10 @@ tier: QUICK
 # 684 — ZAOstock Task Tracking: The Fragmentation + Connecting It to the Six Circles
 
 > **Goal:** Answer "how are ZAOstock todos stored, and can we connect them to the cobuild six circles." Ground truth from code: todos live in three disconnected stores, none of which is linked to a circle. Recommend the FK + the canonical-store split.
+
+## Findings
+
+Updated 2026-08-11: Code re-verified against live repo. The primary recommendation (add `circle_id uuid REFERENCES circles(id)` to the `todos` table) remains **unimplemented**. `bot/src/actions.ts` `add_todo` has no `circle` field; `bot/src/circles.ts` uses `circle_id` only for `circle_members` (membership), not for todos. The `stock-circles-v1-migration.sql` (applied 2026-04-25) added `circle_id` to `stock_circle_members`, `stock_proposals`, and `stock_qa_log` — but NOT to `stock_todos`. The disconnect is unchanged. No external sources exist for this internal ZAO tooling topic. **ATTENTION: the "Before Aug 15 dry run" migration deadline from the Next Actions table is now 4 days away (2026-08-11 → Aug 15).**
 
 ## Key Decisions (recommendations first)
 
@@ -97,7 +101,8 @@ Correct behavior: a bulk-todo paste should result in the items added and one sho
 
 ## Sources
 
-- ZAOstock bot code: `bot/src/actions.ts` (`add_todo` -> `todos` table), `bot/src/status.ts` (`buildAllOpenTodos`, `buildStatus`), `bot/src/circles.ts` (six-circle commands), `bot/src/capture.ts` (`/gemba /idea /note`)
+- ZAOstock bot code: `bot/src/actions.ts` (`add_todo` -> `todos` table), `bot/src/status.ts` (`buildAllOpenTodos`, `buildStatus`), `bot/src/circles.ts` (six-circle commands), `bot/src/capture.ts` (`/gemba /idea /note`) — re-verified 2026-08-11
 - `Documents/cowork/data/actions.json` - cowork-zaodevz tracker shape, verified 2026-05-20
 - `Documents/iman/data/actions.json` - stale duplicate, `updatedAt 2026-05-06` vs cowork `2026-05-14`, verified 2026-05-20
 - Doc 609 (six circles), Doc 679 (cowork bot audit, finding A1 = bot code uncommitted)
+- `scripts/stock-archive/2026-04-25-applied/stock-circles-v1-migration.sql` — confirmed circle_id added to circle_members/proposals/qa_log but NOT todos, re-verified 2026-08-11

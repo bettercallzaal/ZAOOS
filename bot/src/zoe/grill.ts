@@ -48,6 +48,13 @@ export interface GrillItemState {
   snoozeUntil?: string;
   /** The one-click answer Zaal chose, if any. */
   answer?: string;
+  /**
+   * When this item was FIRST surfaced, never overwritten on a re-ask. `askedAt`
+   * moves every time the card is pushed, so it can only answer "how long since
+   * the last nudge" - it cannot answer "how long has this been unanswered",
+   * which is the question the cooldown needs (see askCooldownMs).
+   */
+  firstAskedAt?: string;
 }
 
 export interface GrillState {
@@ -189,6 +196,33 @@ export function multiKeyboard(
 const ASK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // don't re-surface a still-open item within 3h
 const SNOOZE_MS = 6 * 60 * 60 * 1000;
 
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+
+/**
+ * How long to wait before re-surfacing a still-open item - SHORTER the longer it
+ * has gone unanswered.
+ *
+ * Zaal, 2026-08-11: "older cards must nag MORE frequently, not expire." The
+ * instinct to age an item out is exactly backwards. An item that has sat for a
+ * week is not less important than one raised this morning; it is the one thing
+ * demonstrably not getting done, and letting it go quiet is how it disappears.
+ * Nothing here ever removes an item - only `done` does that, and only Zaal
+ * produces a `done`.
+ *
+ * The floor is deliberate. A cooldown that keeps shrinking would eventually
+ * re-ask on every scheduler tick, and a card that arrives constantly is one that
+ * stops being read (`noisy-signal-guard.md`). 45m is the floor, and
+ * DAILY_PUSH_CAP still bounds the day at 5 unsolicited pushes regardless - so
+ * this changes WHICH item gets those five slots, not how many arrive.
+ */
+export function askCooldownMs(ageMs: number): number {
+  if (ageMs >= 7 * DAY_MS) return 45 * 60 * 1000;
+  if (ageMs >= 3 * DAY_MS) return 1.5 * HOUR_MS;
+  if (ageMs >= 1 * DAY_MS) return 2 * HOUR_MS;
+  return ASK_COOLDOWN_MS;
+}
+
 const DEFAULT_STATE: GrillState = { items: {}, activeKey: null, lastAskedAt: null };
 const stateFile = () => join(homedir(), '.zao', 'zoe', 'grill_state.json');
 
@@ -257,7 +291,13 @@ export function pickNext(queue: GrillItem[], state: GrillState, now: number): Gr
     if (!s) return item; // never asked
     if (s.status === 'done') continue;
     if (s.status === 'snoozed' && s.snoozeUntil && Date.parse(s.snoozeUntil) > now) continue;
-    if (s.status === 'asked' && now - Date.parse(s.askedAt) < ASK_COOLDOWN_MS) continue; // waiting on a reply, don't nag yet
+    if (s.status === 'asked') {
+      // Age is measured from the FIRST ask, not the last one. Falling back to
+      // askedAt keeps every pre-existing state file working - an item written
+      // before this field existed simply reads as new and gets the 3h default.
+      const age = now - Date.parse(s.firstAskedAt ?? s.askedAt);
+      if (now - Date.parse(s.askedAt) < askCooldownMs(age)) continue; // waiting on a reply, don't nag yet
+    }
     return item; // skipped / cooled-down / snooze-elapsed -> re-surface
   }
   return null;
@@ -397,7 +437,16 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   // Pin the new open question (silent) so it stays easy to find until answered.
   if (deps.pin && messageId) await deps.pin(messageId).catch(() => {});
 
-  state.items[item.key] = { askedAt: new Date(now).toISOString(), status: 'asked' };
+  // firstAskedAt survives every re-ask - it is what makes an old item nag harder.
+  // Writing the whole object fresh (rather than spreading the old one) is on
+  // purpose: a re-ask must clear a stale snoozeUntil/answer. Only the age carries.
+  const prior = state.items[item.key];
+  const askedAt = new Date(now).toISOString();
+  state.items[item.key] = {
+    askedAt,
+    status: 'asked',
+    firstAskedAt: prior?.firstAskedAt ?? prior?.askedAt ?? askedAt,
+  };
   state.activeKey = item.key;
   state.activeTitle = item.title;
   state.activeKind = item.kind;

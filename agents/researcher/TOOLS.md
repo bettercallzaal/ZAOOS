@@ -90,7 +90,6 @@ You have READ-ONLY access to the codebase plus web research:
 | Platform | URL | What to Watch |
 |----------|-----|--------------|
 | Incented | incented.co/organizations/zabal | New campaigns, protocol updates |
-| SongJam | songjam.space/zabal | Leaderboard changes, $SANG updates |
 | Empire Builder | empirebuilder.world | Empire features, Clanker integration |
 | MAGNETIQ | magnetiq.xyz | API release, POM updates |
 | Clanker | clanker.world | Protocol changes (now owned by Neynar) |

@@ -24,7 +24,6 @@ Run this checklist on every heartbeat cycle. This covers local planning and orga
 - Review Respect leaderboard for governance health (`src/lib/respect/leaderboard.ts`)
 - Check partner platform status:
   - Incented campaigns: `incented.co/organizations/zabal`
-  - SongJam leaderboard: `songjam.space/zabal`
   - Empire Builder: ZABAL empire activity
 - Note any community issues, trending topics, or opportunities
 

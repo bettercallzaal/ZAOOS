@@ -69,7 +69,6 @@ npm run lint         # ESLint
 | Platform | URL | What |
 |----------|-----|------|
 | Incented | `incented.co/organizations/zabal` | Community campaigns |
-| SongJam | `songjam.space/zabal` | Mention leaderboard |
 | Empire Builder | `empirebuilder.world/profile/0x7234c...` | Token empire |
 | MAGNETIQ | `app.magnetiq.xyz` | Proof of Meet hub |
 | Clanker | `clanker.world` | $ZABAL token launcher |

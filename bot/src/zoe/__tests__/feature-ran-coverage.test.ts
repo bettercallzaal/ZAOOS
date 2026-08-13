@@ -33,10 +33,12 @@ import { announcedFeatures, featureRan, resetAnnouncedForTest } from '../feature
  * Modules that do work with no human watching. Each must announce on its
  * success path.
  *
- * Deliberately NOT here: brief.ts and reflect.ts. They belong by the same rule,
- * but their success paths were not read when this landed, and a featureRan
- * placed in unread code would announce something other than what it claims.
- * Follow-up, not an oversight.
+ * brief.ts and reflect.ts were excluded on the first pass because their success
+ * paths had not been read, and a featureRan placed in unread code announces
+ * something other than what it claims. They have been read now: both return a
+ * string on BOTH paths - a real one, or a degraded stub - so each announces with
+ * a detail saying which, because "it ran" and "it worked" are different
+ * questions when a fallback still produces output.
  */
 const AUTONOMOUS_FEATURES = [
   'heart-run.ts',
@@ -46,6 +48,8 @@ const AUTONOMOUS_FEATURES = [
   'bus-receipt.ts',
   'afferent-digest.ts',
   'recap.ts',
+  'brief.ts',
+  'reflect.ts',
 ];
 
 function sourceOf(file: string): string {

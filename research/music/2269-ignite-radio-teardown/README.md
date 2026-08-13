@@ -11,6 +11,17 @@ PR #1 carries the same finding plus raw API and on-chain snapshots under `eviden
 for that doc's verdict), 2267 (WaveWarZ surface map - Ignite Radio links out to
 wavewarz.com), 112 (Audius API deep dive - 42% of Ignite's catalogue is re-hosted Audius).
 
+## Read this first: they are a partner
+
+**Ignite Radio sponsors WaveWarZ and is part of the onchain music family.** This document
+was researched and largely written before that was established, in a compete-or-integrate
+frame that turned out to be the wrong question. The facts below all stand and were
+re-verified; the framing in Q6 has been corrected, and nothing here should be read as
+sizing up a rival.
+
+The partner-facing output of this work is **`founder-share.md`** in this repo - the
+findings worth sending to them, written to be useful rather than clever.
+
 ## One-line answer
 
 Ignite Radio is a real, working indie radio platform with roughly a dozen genuinely active
@@ -20,6 +31,11 @@ almost no revenue, and a tipping feature that does not work in production.
 Researched in two passes on 2026-08-12. The second pass found their per-station stats
 endpoint, which **corrected the engagement numbers upward** and sharpened the audience
 finding considerably. Corrections are marked inline rather than quietly overwritten.
+
+**Re-verified 2026-08-12 against their current build** (`g2-index-Bs0eLnht.js`), which
+shipped during the research. The tip bug, the client-side API key and the dead Discord
+invite all persist in the live build. One station, "The Forgotten Child Station", was
+removed between passes, taking the count from 32 to 31.
 
 ## How this was grounded
 
@@ -391,42 +407,42 @@ and:
   by Sui, Walrus and Seal. Notably Harmony Hub uses Walrus while Ignite Radio does not.
 - Payments accept crypto **or PayPal**.
 
-## Q6. Compete, integrate, or ignore - now answerable
+## Q6. Compete, integrate, or ignore - the question was wrong
 
-**Recommendation: integrate, cheaply and specifically. Do not compete, and do not ignore.**
+**This question is void, and the doc was written before we knew it.** Ignite Radio
+**sponsors WaveWarZ** and is part of the onchain music family. They are a partner, not a
+target to be evaluated. The `/wavewarz` page linking out to `wavewarz.com` is not a
+curiosity to investigate - it is the sponsorship, visible from outside.
 
-Reasoning:
+Re-framed, the useful question is: **what does a partner need from us, and what do we
+now know that helps them?**
 
-- **Do not compete.** There is nothing here to beat technically. The tipping "mechanic" is
-  eight lines of SDK boilerplate with no contract behind it. Any ZAO surface could ship the
-  same thing in an afternoon on Base or Solana. Sui buys them nothing we would want -
-  their storage is a filesystem, their database is SQLite, their rewards are off-chain
-  points, and their own EVM rails have never been used. The chain is branding.
-- **Do not ignore.** The asset is the roster. 32 independent artists and 53 profiles who
-  chose to show up and upload 356 tracks to an unknown platform is real, hard-won creator
-  supply - exactly the thing ZAO spends effort on. Their problem is the opposite of ours
-  in kind: they have supply and no audience.
-- **But size the roster honestly.** The second pass sharpened this. The engaged core is
-  about a dozen people, and the two operator accounts are 47% of all fanclub activity.
-  So the acquirable asset is closer to **10 to 15 genuinely active independent artists**
-  than to 53 profiles. That is still worth a conversation - it is just a conversation
-  about a dozen artists, not a platform.
-- **A relationship already exists.** Their sidebar has a WaveWarz page that links out to
-  `wavewarz.com`, describing it as "Live music battles you can trade ... artists get paid
-  on every trade". There is a `fellenz` profile and station, and a profile with handle
-  `zaal` and display name "Zaal Panthaki". Zaal should confirm what is already agreed
-  here before anything is proposed. Note their site writes it "WaveWarz", not WaveWarZ.
+What the research supports, restated for that frame:
 
-**Concrete opening move:** email the contact address published in their Terms with two
-things they would want to know and cannot easily see themselves:
+- **Their constraint is audience, not product or technology.** The engaged core is about
+  a dozen people, and the two operator accounts are 47% of all fanclub activity. That is
+  not a knock - creator supply is the hard half and they have it. It is the specific
+  asymmetry that makes the relationship worth more than a logo swap.
+- **The tipping design is values-correct.** Non-custodial, zero fee, artist keeps 100%.
+  It is architecturally minimal, but it is minimal in the right direction.
+- **They are shipping.** They pushed a new bundle mid-research and added a station the day
+  we looked.
+- **Their CPM Collabs model is the natural collaboration surface** - creators keep 100%,
+  splits agreed in writing before mint. That is close to how ZAO handles artist splits,
+  and it is where a joint design conversation would actually go somewhere.
 
-1. Their tip button is dead in production, because `owner_id` is stripped from the public
-   stations API, so the modal always falls to "hasn't linked a Sui wallet yet".
-2. A static `x-api-key` is embedded in their client bundle and readable by any visitor.
+**What we owe them:** the findings that are useful and hard to see from the inside.
+Written up in `founder-share.md` in this repo - the dead tip button, the client-side API
+key, and the fact that tips are unmeasurable by construction so every artist sees
+`totalEarnings: 0`. That last one is the highest-value item for them and is a design
+suggestion, not a bug report.
 
-Both are verifiable in a minute, cost us nothing, and demonstrate competence without
-asking for anything. The conversation to have after that is audience-for-supply, not
-technology. Send it privately to the operator, not publicly.
+**How to send it:** privately, directly, and with the API key value handed over
+out-of-band rather than written down. Not as a cold opener - we already have the
+relationship - but as what a partner does after spending a day in someone's product.
+
+**Note on the brand:** their site writes it "WaveWarz". Ours is WaveWarZ. Minor, but if
+they are a sponsor the wordmark is worth getting right on both sides.
 
 **What would change this call:** if a large listener base exists but is invisible to the
 counters I could reach. The second pass makes that less likely - `/api/stats/:id` is their

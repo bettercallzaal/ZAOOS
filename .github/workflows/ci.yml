@@ -1,10 +1,36 @@
 name: CI
 
+# WHY THIS HAS A SCHEDULE AND A DISPATCH, NOT JUST push + pull_request
+#
+# `push: [main]` looks like it covers merges. It does not cover the merges we
+# actually do most of. GitHub does not start a workflow run for a push made with
+# the automatic GITHUB_TOKEN - a deliberate anti-recursion rule - and
+# docs-automerge.yml merges with `GH_TOKEN: ${{ github.token }}`. So every
+# auto-merged PR lands on main and CI never runs on the result.
+#
+# Measured 2026-08-12: PR #3057 was merged by a user and got CI on main. The next
+# four (#3059, #3062, #3064, #3066) were merged by github-actions[bot] and got
+# ZERO runs between them. The last main commit that did run CI, f90e3ce, FAILED -
+# so main sat red-then-unknown while every PR opened afterwards showed green,
+# because a PR check tests the branch head and never the merge result.
+#
+# The schedule below means main's true state is never more than a day stale even
+# when nothing but the bot merges, and workflow_dispatch means anyone asking "is
+# main actually green right now" can get an answer instead of an inference.
+#
+# This does not fix the cause. The cause is the token, and fixing it needs a PAT
+# or GitHub App token in docs-automerge.yml - see the note there.
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # 06:40 UTC daily. Offset from the estate-health and backup jobs so a red
+    # main is its own signal rather than one line inside a busy morning.
+    - cron: '40 6 * * *'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,6 +59,11 @@ jobs:
       # pre-existing backlog is worked down, this is non-blocking: it reports
       # issues on touched files without failing CI. Flip continue-on-error to
       # false to make it enforcing. See research doc 887 / loop-zaoos-fixes.
+      # On the schedule/dispatch runs this diffs main against itself and so lints
+      # nothing. That is harmless rather than a hidden pass: the step is already
+      # continue-on-error, so it has never been the thing that fails CI. The
+      # blocking checks on those runs are Typecheck, test, bot-test and build,
+      # all of which are absolute rather than diff-scoped.
       - name: Lint (biome, changed files)
         continue-on-error: true
         run: npm run ci:lint:changed

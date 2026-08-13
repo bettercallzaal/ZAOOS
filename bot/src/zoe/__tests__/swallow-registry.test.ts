@@ -136,38 +136,6 @@ const SWALLOW_REGISTRY: SwallowEntry[] = [
     excludes: [],
   },
   {
-    matcher: 'FOCUS_ON_RE.test(',
-    occurrences: 1,
-    why: 'Enables focus mode. Anchored slash-command pattern.',
-    returns: true,
-    broad: false,
-    excludes: [],
-  },
-  {
-    matcher: 'FOCUS_OFF_RE.test(',
-    occurrences: 1,
-    why: 'Disables focus mode and flushes the queued digest. Anchored slash-command pattern.',
-    returns: true,
-    broad: false,
-    excludes: [],
-  },
-  {
-    matcher: 'AUDIT_COMMAND_RE.test(',
-    occurrences: 1,
-    why: 'Runs the trust audit. Anchored slash-command pattern.',
-    returns: true,
-    broad: false,
-    excludes: [],
-  },
-  {
-    matcher: 'BUDGET_COMMAND_RE.test(',
-    occurrences: 1,
-    why: 'Reports spend and remaining headroom. Anchored slash-command pattern.',
-    returns: true,
-    broad: false,
-    excludes: [],
-  },
-  {
     matcher: '/res[ae]arch/i.test(',
     occurrences: 1,
     why: 'Paired with the URL test to decide whether an already-answered private research DM also gets committed as a numbered doc. Fire-and-forget, gates no return.',
@@ -235,7 +203,14 @@ describe('swallow registry: index.ts cannot grow a new user-text matcher silentl
   it('detects the matchers that are actually there (guards the detector itself)', () => {
     // If this drops to zero the detector broke and every other assertion below
     // would pass vacuously - a green test proving nothing.
-    expect(sites.length).toBeGreaterThanOrEqual(12);
+    //
+    // The floor was 12 and is now 10, because four command regexes
+    // (FOCUS_ON_RE, FOCUS_OFF_RE, AUDIT_COMMAND_RE, BUDGET_COMMAND_RE) moved out
+    // of index.ts into COMMAND_TABLE and are dispatched via classifyCommand.
+    // Lowering this number is how a broken detector would hide, so it is only
+    // ever moved together with a deliberate, named removal - never to make a
+    // red test go green.
+    expect(sites.length).toBeGreaterThanOrEqual(10);
   });
 
   it('every matcher in index.ts is declared in the registry', () => {

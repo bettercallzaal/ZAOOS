@@ -55,7 +55,7 @@ export interface CommandRoute {
   kind: CommandKind;
   pattern: RegExp;
   /**
-   * The identifier index.ts uses at the dispatch site. Null when the command is
+   * The EXACT text index.ts uses at the dispatch site. Null when the command is
    * not dispatched through a named export there, which excludes it from the
    * order check below rather than pretending it has a position.
    */
@@ -86,14 +86,14 @@ export const COMMAND_TABLE: ReadonlyArray<CommandRoute> = [
   // Disjoint from every other pattern, so its position carries no risk. Kept
   // first to preserve exactly what isZoeCommand tested before this table.
   { kind: 'nudge-toggle', pattern: NUDGE_TOGGLE_RE, indexToken: null },
-  { kind: 'note', pattern: NOTE_PREFIX, indexToken: 'NOTE_PREFIX' },
-  { kind: 'queue', pattern: QUEUE_PREFIX, indexToken: 'QUEUE_PREFIX' },
-  { kind: 'focus-on', pattern: FOCUS_ON_RE, indexToken: 'FOCUS_ON_RE' },
-  { kind: 'focus-off', pattern: FOCUS_OFF_RE, indexToken: 'FOCUS_OFF_RE' },
-  { kind: 'checkpoint', pattern: CHECKPOINT_PREFIX, indexToken: 'CHECKPOINT_PREFIX' },
-  { kind: 'audit', pattern: AUDIT_COMMAND_RE, indexToken: 'AUDIT_COMMAND_RE' },
-  { kind: 'budget', pattern: BUDGET_COMMAND_RE, indexToken: 'BUDGET_COMMAND_RE' },
-  { kind: 'plan', pattern: PLAN_PREFIX, indexToken: 'PLAN_PREFIX' },
+  { kind: 'note', pattern: NOTE_PREFIX, indexToken: 'NOTE_PREFIX.exec' },
+  { kind: 'queue', pattern: QUEUE_PREFIX, indexToken: 'QUEUE_PREFIX.exec' },
+  { kind: 'focus-on', pattern: FOCUS_ON_RE, indexToken: "command === 'focus-on'" },
+  { kind: 'focus-off', pattern: FOCUS_OFF_RE, indexToken: "command === 'focus-off'" },
+  { kind: 'checkpoint', pattern: CHECKPOINT_PREFIX, indexToken: 'CHECKPOINT_PREFIX.exec' },
+  { kind: 'audit', pattern: AUDIT_COMMAND_RE, indexToken: "command === 'audit'" },
+  { kind: 'budget', pattern: BUDGET_COMMAND_RE, indexToken: "command === 'budget'" },
+  { kind: 'plan', pattern: PLAN_PREFIX, indexToken: 'PLAN_PREFIX.exec' },
 ];
 
 /**

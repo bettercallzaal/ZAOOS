@@ -88,7 +88,7 @@ describe('isZoeCommand still behaves, now with one list instead of two', () => {
 describe('the declared order matches index.ts, so the two cannot drift', () => {
   it('every dispatched command appears in index.ts', () => {
     const missing = COMMAND_TABLE.filter((r) => r.indexToken !== null)
-      .filter((r) => !INDEX_SOURCE.includes(`${r.indexToken}.`))
+      .filter((r) => !INDEX_SOURCE.includes(r.indexToken as string))
       .map((r) => r.kind);
     expect(missing, `declared as dispatched in index.ts but not found there: ${missing.join(', ')}`).toEqual([]);
   });
@@ -98,7 +98,7 @@ describe('the declared order matches index.ts, so the two cannot drift', () => {
     const importBlockEnd = INDEX_SOURCE.indexOf("} from './commands'");
     const positions = COMMAND_TABLE.filter((r) => r.indexToken !== null).map((r) => ({
       kind: r.kind,
-      at: INDEX_SOURCE.indexOf(`${r.indexToken}.`, importBlockEnd > 0 ? importBlockEnd : 0),
+      at: INDEX_SOURCE.indexOf(r.indexToken as string, importBlockEnd > 0 ? importBlockEnd : 0),
     }));
 
     expect(
@@ -119,4 +119,41 @@ describe('the declared order matches index.ts, so the two cannot drift', () => {
         `index.ts: ${actual.join(' -> ')}`,
     ).toEqual(actual);
   });
+});
+
+describe('the substitution is safe: no two patterns claim the same input', () => {
+  // index.ts now asks classifyCommand ONCE and compares the answer, where it used
+  // to run four independent regex tests. Those are equivalent only while no two
+  // patterns match the same string. If two ever did, the TABLE's order would
+  // start deciding an outcome that four separate tests used to decide
+  // independently - a behaviour change hiding inside a refactor.
+  const corpus = [
+    '/focus',
+    '/focus on',
+    '/focus off',
+    '/audit',
+    '/budget',
+    '/budget detailed',
+    '/checkpoint shipped it',
+    'note: x',
+    'cc: x',
+    'claude: x',
+    'plan: x',
+    'decompose: x',
+    'queue: x',
+    'stop nudges',
+    'pause tips',
+    'resume nudges',
+    'build: a fix',
+    'ordinary prose about the day',
+    '',
+    '   ',
+  ];
+
+  for (const input of corpus) {
+    it(`at most one pattern claims ${JSON.stringify(input)}`, () => {
+      const hits = COMMAND_TABLE.filter((r) => r.pattern.test(input.trim())).map((r) => r.kind);
+      expect(hits.length, `ambiguous - claimed by: ${hits.join(', ')}`).toBeLessThanOrEqual(1);
+    });
+  }
 });

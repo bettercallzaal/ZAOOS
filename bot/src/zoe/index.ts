@@ -151,11 +151,8 @@ import {
   NOTE_PREFIX,
   PLAN_PREFIX,
   QUEUE_PREFIX,
-  FOCUS_ON_RE,
-  FOCUS_OFF_RE,
   CHECKPOINT_PREFIX,
-  AUDIT_COMMAND_RE,
-  BUDGET_COMMAND_RE,
+  classifyCommand,
   isZoeCommand,
 } from './commands';
 import { formatSpendStatus } from './cost-governance';
@@ -2208,15 +2205,22 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
     return;
   }
 
+  // Which command this is, decided ONCE by COMMAND_TABLE rather than by four
+  // independent regex tests whose relative order was only implied by where they
+  // happen to sit in this file. The branches below still run in the same order;
+  // the difference is that the order is now declared in commands.ts and asserted
+  // by a test, instead of being a property of line numbers in a 3700-line file.
+  const command = classifyCommand(text);
+
   // Hyperfocus guard: `/focus` or `/focus on` enables focus mode.
-  if (FOCUS_ON_RE.test(text.trim())) {
+  if (command === 'focus-on') {
     await startFocus();
     await ctx.reply('Focus mode ON. Non-urgent pings will queue until you send /focus off.');
     return;
   }
 
   // Hyperfocus guard: `/focus off` disables focus mode and sends queued digest.
-  if (FOCUS_OFF_RE.test(text.trim())) {
+  if (command === 'focus-off') {
     const queuedPings = await endFocus();
     const digest = buildFocusDigest(queuedPings);
     await ctx.reply('Focus mode OFF.\n\n' + digest);
@@ -2234,7 +2238,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   }
 
   // Trust audit: `/audit` scans for fallen tasks/captures.
-  if (AUDIT_COMMAND_RE.test(text.trim())) {
+  if (command === 'audit') {
     if (!ctx.chatId) return;
     const progress = startProgressNarration(ctx, ctx.chatId, { first: 'Running audit...' });
     try {
@@ -2251,7 +2255,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   }
 
   // Budget status: `/budget` shows today's spend and remaining headroom.
-  if (BUDGET_COMMAND_RE.test(text.trim())) {
+  if (command === 'budget') {
     const detailed = text.toLowerCase().includes('detailed');
     try {
       const budgetText = formatSpendStatus(detailed);

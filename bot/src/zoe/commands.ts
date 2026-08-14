@@ -39,23 +39,87 @@ export const AUDIT_COMMAND_RE = /^\/audit$/i;
 /** `/budget` - check ZOE daily spend and remaining budget. */
 export const BUDGET_COMMAND_RE = /^\/budget(?:\s+detailed)?$/i;
 
+/** Every command index.ts dispatches by one of the patterns above. */
+export type CommandKind =
+  | 'nudge-toggle'
+  | 'note'
+  | 'queue'
+  | 'focus-on'
+  | 'focus-off'
+  | 'checkpoint'
+  | 'audit'
+  | 'budget'
+  | 'plan';
+
+export interface CommandRoute {
+  kind: CommandKind;
+  pattern: RegExp;
+  /**
+   * The EXACT text index.ts uses at the dispatch site. Null when the command is
+   * not dispatched through a named export there, which excludes it from the
+   * order check below rather than pretending it has a position.
+   */
+  indexToken: string | null;
+}
+
+/**
+ * THE ORDER IS THE CONTRACT.
+ *
+ * index.ts routes positionally across ~153 early-return branches with no
+ * routing table, so whichever branch matches first wins and returns. On
+ * 2026-08-08 that made ZOE's entire DM build vocabulary unreachable through
+ * its own documented syntax, and every test stayed green
+ * (.claude/rules/first-handler-wins.md).
+ *
+ * This table is that order, written down once and testable without importing
+ * index.ts - which agent-loops.md rule 21 forbids, because its top level boots
+ * a live poller. A companion test asserts this sequence still matches the
+ * sequence in index.ts source, so the two cannot drift apart silently.
+ *
+ * Sequence measured from index.ts dispatch sites, NOT copied from the previous
+ * body of isZoeCommand - which listed `plan` third while index.ts dispatches it
+ * last, after `budget`. That mismatch was invisible while the only consumer
+ * returned a boolean, and would have become a real routing bug the moment
+ * anything asked WHICH command a message is.
+ */
+export const COMMAND_TABLE: ReadonlyArray<CommandRoute> = [
+  // Disjoint from every other pattern, so its position carries no risk. Kept
+  // first to preserve exactly what isZoeCommand tested before this table.
+  { kind: 'nudge-toggle', pattern: NUDGE_TOGGLE_RE, indexToken: null },
+  { kind: 'note', pattern: NOTE_PREFIX, indexToken: 'NOTE_PREFIX.exec' },
+  { kind: 'queue', pattern: QUEUE_PREFIX, indexToken: 'QUEUE_PREFIX.exec' },
+  { kind: 'focus-on', pattern: FOCUS_ON_RE, indexToken: "command === 'focus-on'" },
+  { kind: 'focus-off', pattern: FOCUS_OFF_RE, indexToken: "command === 'focus-off'" },
+  { kind: 'checkpoint', pattern: CHECKPOINT_PREFIX, indexToken: 'CHECKPOINT_PREFIX.exec' },
+  { kind: 'audit', pattern: AUDIT_COMMAND_RE, indexToken: "command === 'audit'" },
+  { kind: 'budget', pattern: BUDGET_COMMAND_RE, indexToken: "command === 'budget'" },
+  { kind: 'plan', pattern: PLAN_PREFIX, indexToken: 'PLAN_PREFIX.exec' },
+];
+
+/**
+ * Which command a DM is, or null if it is not one.
+ *
+ * First match wins, exactly as index.ts does it. Returning the KIND rather than
+ * a boolean is what makes routing order assertable: a test can state that
+ * `/focus off` reaches focus-off and not focus-on, in one line, with no bot.
+ */
+export function classifyCommand(text: string): CommandKind | null {
+  const trimmed = text.trim();
+  for (const route of COMMAND_TABLE) {
+    if (route.pattern.test(trimmed)) return route.kind;
+  }
+  return null;
+}
+
 /**
  * True if a DM is a recognized ZOE command. Such messages must bypass the
  * await-reflection pending capture (doc 770 H1): the evening reflection arms
  * a long-TTL pending, and a `plan:` sent in that window would otherwise be
  * swallowed as the reflection answer and never dispatched.
+ *
+ * Delegates to the table so there is ONE list of commands rather than two that
+ * can disagree - the duplication that hid the plan-ordering mismatch above.
  */
 export function isZoeCommand(text: string): boolean {
-  const trimmed = text.trim();
-  return (
-    NUDGE_TOGGLE_RE.test(trimmed) ||
-    NOTE_PREFIX.test(trimmed) ||
-    PLAN_PREFIX.test(trimmed) ||
-    QUEUE_PREFIX.test(trimmed) ||
-    FOCUS_ON_RE.test(trimmed) ||
-    FOCUS_OFF_RE.test(trimmed) ||
-    CHECKPOINT_PREFIX.test(trimmed) ||
-    AUDIT_COMMAND_RE.test(trimmed) ||
-    BUDGET_COMMAND_RE.test(trimmed)
-  );
+  return classifyCommand(text) !== null;
 }

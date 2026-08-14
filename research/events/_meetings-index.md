@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-13 | Ellsworth promotion and marketing - Heart of Ellsworth x ZAOstock | ZAOstock | Zaal, Chesnee Barney, Tom Fellenz, Sam | [2279](2279-ellsworth-promo-marketing-chesnee-aug13/) | 15 |
 | 2026-08-10 | **Media appearance:** Community Communities Web3 Space - The ZAO, ZAOstock, ZAO Festivals, ZAOville | ZAO/media | Zaal, Candy, DeCoup, Paper Hand, Quan, Flenz, Trey, Miss Evie, Stormy, GG, Rev (host) | [2261](2261-zao-community-communities-space-2026-08-10/) | 6 |
 | 2026-08-03 | ZAO launchpad + ZM livestream sync | ZAO Devz | Zaal, Jose, Jim | [2186](2186-zao-launchpad-livestream-sync-jose-jim/) | 5 |
 | 2026-07-28 | Heart of Ellsworth Promotion Committee - ZAO Stock @ Art of Ellsworth | ZAO/events | Zaal, Laurel, Joy, Chesnee, Leslie | [2134](2134-heart-of-ellsworth-promo-jul28/) | 4 |

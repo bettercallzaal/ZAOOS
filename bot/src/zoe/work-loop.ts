@@ -26,6 +26,7 @@ import { commitResearchDoc } from './research-doc';
 import { emitReceipt } from './receipts';
 import { callClaudeCli } from '../hermes/claude-cli';
 import { verifyReplanResearch } from './verify-replan';
+import { parkWork, resumeWork } from './work-park';
 import type { ZoeContext } from './types';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
@@ -214,6 +215,10 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       };
 
       const firstOutput = await runResearch(item.input);
+      // The receipt used to say 'success' unconditionally, including when
+      // research returned nothing and when the doc failed to commit. It now
+      // reports what actually happened (doc 2272).
+      let resultType: 'success' | 'error' = 'success';
       if (firstOutput.trim()) {
         // Verify the result answers the goal; on a graded-incomplete verdict,
         // re-research (bounded) with the missing aspects fed back. Only commit
@@ -246,6 +251,25 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
             ? `Work-loop done: doc ${doc.num}${retries ? ` (verified, ${retries} replan${retries > 1 ? 's' : ''})` : ' (verified)'} -> ${doc.prUrl}`
             : `Work-loop: doc save failed - ${doc.error}`,
         ).catch(() => {});
+        if (!doc.ok) {
+          // Research that SUCCEEDED and merely failed to land was previously
+          // discarded exactly like research that never ran. Keep the output.
+          await parkWork(item, 'doc-failed', {
+            stage: 'commit',
+            error: doc.error ? String(doc.error) : 'doc save failed',
+            output: finalOutput,
+          });
+          resultType = 'error';
+        }
+      } else {
+        // THE SILENT PATH. reportFor lives inside the branch above, so an empty
+        // research result used to send nothing anywhere, delete the item, charge
+        // it against the daily cap, and emit a 'success' receipt. Park it, say so.
+        await parkWork(item, 'empty-output', { stage: 'research' });
+        resultType = 'error';
+        await reportFor(item, deps)(
+          `Work-loop: "${item.input.slice(0, 60)}" produced no research output - parked, not lost. Ask ZOE for parked work.`,
+        ).catch(() => {});
       }
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
       await bumpToday(deps.currentDate);
@@ -256,7 +280,10 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
         capability: 'research',
         tool: 'work-loop',
         action: 'work_tick',
-        resultType: 'success',
+        resultType,
+        // Without the item id the receipt trail can say a tick failed but never
+        // WHICH topic - the gap doc 2272 names.
+        inputDigest: item.id,
         evidenceUrl,
         approvalClass: 'auto',
       }).catch(() => {});
@@ -269,15 +296,37 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
         tool: 'work-loop',
         action: 'work_tick',
         resultType: 'error',
+        inputDigest: item.id,
         approvalClass: 'auto',
       }).catch(() => {});
       await reportFor(item, deps)(
         `Work-loop error: failed to process "${item.input.slice(0, 60)}..." - ${errMsg.slice(0, 120)}`,
       ).catch(() => {});
+      // Park BEFORE dequeuing. The comment below is still right - retrying a
+      // deterministic failure would burn DAILY_CAP forever - but dequeuing is
+      // not the same as deleting, and this used to do both (doc 2272).
+      await parkWork(item, 'error', { stage: 'unknown', error: errMsg });
       // Remove from queue even on error to avoid infinite retry loop
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
     }
   } finally {
     await releaseLock();
   }
+}
+
+/**
+ * Put a parked item back on the queue. **Operator-initiated only.**
+ *
+ * Nothing in this file calls it - not runWorkTick, not a drain, not boot. That
+ * is the property that keeps parking safe rather than a retry storm, and
+ * `work-park.test.ts` asserts it by reading this file as source.
+ */
+export async function resumeParkedWork(id: string, answer?: string): Promise<WorkItem | null> {
+  const item = await resumeWork(id, answer);
+  if (!item) return null;
+  const q = await readQueue();
+  if (q.some((x) => x.id === item.id)) return item; // already queued, do not duplicate
+  q.push(item);
+  await writeQueue(q);
+  return item;
 }

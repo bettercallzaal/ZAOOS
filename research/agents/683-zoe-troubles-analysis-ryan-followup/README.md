@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-12
 related-docs: 647, 648, 669, 672, 676, 680, 682
 tier: STANDARD
 ---
@@ -10,6 +10,18 @@ tier: STANDARD
 # 683 - ZOE Troubles Analysis + Ryan Kagy Followup
 
 > **Goal:** Deep analysis of the ZOE agent troubles visible in the 2026-05-20 "ZAO Civilization" Telegram thread, with code evidence from `bot/src/zoe/`, plus the followup package Ryan Kagy needs to ship the compiled new ZOE without inheriting the same bugs.
+
+## Updated 2026-08-12
+
+**P0 still unimplemented (code-verified 2026-08-12):** `readArchive` is NOT called in `buildMemoryBlocks` (the renamed `loadMemory` in `memory.ts`). `RECENT_MAX` remains at 8 (line 53). ZOE's write-only archive problem from this doc has not been fixed in 83 days.
+
+**P1 partially applied:** `sendChunkedToTelegram` is now imported and used in `scheduler.ts` for several sends, but raw `bot.api.sendMessage` calls remain at lines 323, 378, 489, 540, and others.
+
+**External: "Always-On Agents" survey validates the diagnosis (arxiv 2606.30306, June 29 2026).** A 435-work survey of persistent memory in LLM agents, submitted after this doc's last-validated date. It introduces "state mutation and recovery obligations" as first-class governance requirements — ZOE's write-only archive (state mutated on every turn, never recovered into context) is the canonical failure mode this survey targets. The paper's evaluation protocol (AOEP-v0) scores exactly this class of bug. Source: https://arxiv.org/abs/2606.30306
+
+**External: MRMS paper proposes multi-resolution substrate (arxiv 2607.04617, July 4 2026).** "Multi-Resolution Memory Substrate for Long-Lived AI Agents" describes memory organized along two axes: representational (structured/vector/graph) and temporal (short-term traces / medium-term abstractions / long-term semantic commitments). This is the v2 "rolling summary" fix from this doc's P0 section made rigorous — the medium-term abstraction tier maps to a summarized archive tail, exactly what was recommended here. Source: https://arxiv.org/abs/2607.04617
+
+**Ryan Kagy / ZABAL lifestream status:** No new public information found. The Farcaster profile exists (warpcast.com/rskagy.eth) but was unreachable from this environment. No public announcement of a compiled ZOE or lifestream memory system located.
 
 ## Key Findings
 

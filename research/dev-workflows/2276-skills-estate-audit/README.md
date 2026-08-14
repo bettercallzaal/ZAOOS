@@ -29,7 +29,13 @@ tier: STANDARD
 
 ## What is actually on disk
 
-`~/.claude/skills` holds **66 entries**, of which **24 are symlinks**. The brief said 69; the difference is unexplained and may be plugin-provided skills, which live under `~/.claude/plugins/` and were not in scope here. I am reporting what I counted rather than reconciling to the expected number.
+`~/.claude/skills` holds **69 entries**, of which 24 are symlinks.
+
+> **Corrected 2026-08-14, same day.** This section originally reported **66 entries** and called the gap against the expected 69 "unexplained". Both numbers were right, and the reason matters more than the count: **`ls -d */` does not list a dangling symlink**, because a broken link is not a directory. 66 + 3 broken links = 69.
+>
+> The three entries invisible to that count - `find-skills`, `supabase`, `supabase-postgres-best-practices`, all dangling into a `~/.agents/skills/` that does not exist - **are exactly the three that were broken.** The counting method had a blind spot precisely where the defects were.
+>
+> Found by `zao-skills-check` (`zaal-dotfiles` PR #41) within a minute of it first running. That is the argument for a checker over an audit: a hand audit is a snapshot, and this one was blind in the one place it needed to see. The defect list below should be read as **five**, not two.
 
 ### Loaded size is not directory size
 
@@ -173,7 +179,8 @@ Nothing is superseded outright. But `zao-topic` at zero references is worth noti
 
 ## Sources
 
-- `~/.claude/skills/` - **[FULL]** enumerated on disk 2026-08-14: 66 entries, 24 symlinks, every `SKILL.md` byte-counted, every description frontmatter parsed.
+- `~/.claude/skills/` - **[FULL]** enumerated on disk 2026-08-14: **69 entries** (corrected from 66 - see the note above; `ls -d */` omits dangling symlinks), 24 symlinks of which **3 dangle**, every `SKILL.md` byte-counted, every description frontmatter parsed.
+- `zao-skills-check` run against the live directory 2026-08-14 - **[FULL]** method: the tool in `zaal-dotfiles` PR #41. Five findings, exit 1. This is what corrected the count.
 - `~/.claude/skills/last30days/LICENSE` and `SKILL.md` frontmatter - **[FULL]** MIT / Matt Van Horn / v3.1.1 / `github.com/mvanhorn/last30days-skill`, read from disk.
 - `~/.claude/skills/bcz-research/SKILL.md` + a filesystem check of the path it names - **[FULL]** target confirmed missing.
 - `~/.gstack/analytics/skill-usage.jsonl` - **[PARTIAL]** counts carried from the brief's prior pass and not independently recounted; its gstack-only scope is treated as a hard limit on what it can support.

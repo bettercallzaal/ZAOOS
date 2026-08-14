@@ -195,6 +195,8 @@ Which means the real answer to "merge or kill" is upstream of both: **write back
 - `/tmp/peter-src/skills/peter/references/state.md` - **[FULL]** read in full.
 - Reddit community threads - **[FAILED]** no thread fetched. `zao-fetch-reddit.sh --selftest` today: creds ABSENT, oauth 403, public `.json` returns `text/html`, redlib 0/3. WebSearch will not return reddit.com results to this user agent. The browse route was available but not spent, because the four sources above already cover community practice with raw text.
 
+  > **Corrected 2026-08-14, same day:** "the browse route was available" is no longer true. Within roughly 48 hours of the three threads it fetched on 2026-08-12, the headless-Chromium path closed too - a thread's `.json` now returns **403** in-session, as do sub listings, search, and user pages, and the sub's HTML page returns **200 carrying a block-page body**. Every reddit path from this machine is walled. Measured and tabulated in [doc 2282](../../business/2282-reddit-as-oss-outreach-channel/). Do not plan work around the browse route; the durable fix is the OAuth credential ([doc 2273](../2273-reddit-oauth-recovered-from-stash/)).
+
 ## Credit
 
 `zao-topic` and `zao-lanes` are Zaal's. The picker-and-kill pattern and the "no hooks to install" observation are **craftzdog**'s (MIT). The context-rebuild cost framing is **kaz123**'s. Peter is **robertkeus**'s (MIT). Agent teams and the native session flags are Anthropic's.

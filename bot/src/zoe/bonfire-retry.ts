@@ -26,6 +26,7 @@ import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
 import { remember, containsSecret, bonfireConfigured } from './recall';
 import { containsPii, scanPii } from './pii';
+import { featureRan } from './feature-ran';
 
 /**
  * Resolved LAZILY, never at module load. This module is imported by
@@ -153,6 +154,15 @@ export async function flushQueue(path?: string, now: number = Date.now()): Promi
       `[zoe/bonfire-retry] ${remaining.length} still queued` +
         (stuck > 0 ? ` - ${stuck} have failed 5+ times, Bonfire may need a look` : ''),
     );
+  }
+
+  // Announce only when the queue actually moved. A flush that found nothing
+  // to do has not run in any sense worth reporting, and claiming otherwise
+  // would make the [zoe/ran] line mean 'the cron fired' rather than 'the
+  // feature worked' - which is the exact confusion this whole mechanism exists
+  // to remove.
+  if (sent > 0 || dropped > 0) {
+    featureRan('bonfire-retry', `sent ${sent}, dropped ${dropped}`);
   }
 
   return { sent, kept: remaining.length, dropped };

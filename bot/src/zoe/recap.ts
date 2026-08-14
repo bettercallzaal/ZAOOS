@@ -18,6 +18,7 @@
  */
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { execSync } from 'node:child_process';
+import { featureRan } from './feature-ran';
 
 const RECAP_SYSTEM_PROMPT = `You are ZOE writing Zaal's nightly recap at 9pm EST.
 
@@ -133,7 +134,9 @@ Output the recap now in the exact format from your system prompt.`;
     bare: false,
   });
 
-  return guardEmpty(result.text);
+  const recap = guardEmpty(result.text);
+  if (recap) featureRan('recap');
+  return recap;
 }
 
 const EMPTY_GUARD_MIN = 50;

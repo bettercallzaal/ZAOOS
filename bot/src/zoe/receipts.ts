@@ -15,6 +15,7 @@
 import { randomUUID } from 'node:crypto';
 import { db } from '../supabase';
 import { computeActionDigest } from './receipt-envelope';
+import { featureRan } from './feature-ran';
 
 /**
  * Resolve a run_id for a receipt. receipts.run_id is NOT NULL with an FK to
@@ -124,6 +125,7 @@ export async function emitReceipt(input: ReceiptInput): Promise<boolean> {
       return false;
     }
 
+    featureRan('receipts', input.capability);
     return true;
   } catch (err) {
     // Swallow all errors: network, parse, auth, etc. Receipts are best-effort.

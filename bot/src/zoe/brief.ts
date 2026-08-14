@@ -26,6 +26,7 @@ import { readTriageContext } from './memory';
 import { getRecentMeetingsForBrief } from './meetings';
 import type { ZoeTask } from './types';
 import { execSync } from 'node:child_process';
+import { featureRan } from './feature-ran';
 
 const BRIEF_SYSTEM_PROMPT = `You are ZOE writing Zaal's daily morning brief at 5am EST.
 
@@ -427,6 +428,12 @@ Output the brief now in the exact format from your system prompt.`;
     bare: false,
   });
 
+  // Both paths below return a string - a real brief, or the degraded stub. So
+  // "it ran" and "it worked" are different questions here, and the detail says
+  // which. guardEmpty already logs the degraded case at error level; this line
+  // is the one that proves the 5am scheduler reached this code at all.
+  const generated = result.text.trim().length >= EMPTY_GUARD_MIN;
+  featureRan('brief', generated ? 'generated' : 'degraded');
   return guardEmpty(result.text);
 }
 

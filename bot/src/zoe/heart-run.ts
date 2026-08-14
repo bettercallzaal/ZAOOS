@@ -35,6 +35,7 @@
  */
 import { randomUUID } from 'node:crypto';
 import { deterministicResourceId } from '../../../packages/heart-fleet/src/index';
+import { featureRan } from './feature-ran';
 
 /** One row shape this module reads back - only the primary key is needed. */
 interface RunIdRow {
@@ -90,7 +91,10 @@ export async function ensureLeaseRun(
       .select('id')
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
-    if (existing?.id) return existing.id as string;
+    if (existing?.id) {
+      featureRan('heart-run', kind);
+      return existing.id as string;
+    }
 
     const { data: created, error } = await client
       .from('agent_runs')
@@ -110,7 +114,10 @@ export async function ensureLeaseRun(
       })
       .select('id')
       .single();
-    if (!error && created?.id) return created.id as string;
+    if (!error && created?.id) {
+      featureRan('heart-run', kind);
+      return created.id as string;
+    }
 
     // A unique violation on idempotency_key means a sibling host created the row
     // between our read and our insert - re-read rather than fail.
@@ -119,7 +126,10 @@ export async function ensureLeaseRun(
       .select('id')
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
-    if (raced?.id) return raced.id as string;
+    if (raced?.id) {
+      featureRan('heart-run', kind);
+      return raced.id as string;
+    }
 
     console.error(
       `[zoe/heart-run] could not ensure lease run for ${kind}:${key}: ${error?.message ?? 'unknown error'}`,

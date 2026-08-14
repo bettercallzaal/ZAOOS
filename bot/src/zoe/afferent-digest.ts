@@ -18,6 +18,7 @@ import { db } from '../supabase';
 import { emitReceipt } from './receipts';
 import { buildEpisode, promoteSubmission, queueConfigured, type BonfireSubmission } from './bonfire-queue';
 import { enqueueWrite } from './bonfire-retry';
+import { featureRan } from './feature-ran';
 
 export interface DigestResult {
   status: 'success' | 'error' | 'silent';
@@ -211,6 +212,10 @@ export async function persistDailyDigest(): Promise<DigestResult> {
       console.error('[zoe/afferent-digest] failed to emit digest receipt');
       return { status: 'error', message: 'receipt emit failed', receiptCount };
     }
+
+    // The digest receipt is the effect. Bonfire below is best-effort, so the
+    // feature has run by this point whether or not the graph write lands.
+    featureRan('afferent-digest', `${receiptCount} receipts`);
 
     // If Bonfire is configured, write an episode for long-term graph memory
     let bonfireSuccess = false;

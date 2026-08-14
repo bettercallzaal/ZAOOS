@@ -16,6 +16,7 @@
 
 import type { BusConfig } from './bus-send';
 import { busConfig, busConfigured, sendBusReply } from './bus-send';
+import { featureRan } from './feature-ran';
 
 /**
  * Result of verifying a receipt against what we sent. Three distinct outcomes
@@ -57,6 +58,9 @@ export function verifyReceipt(
   sentMessageId: string,
   sentContentHash: string,
 ): ReceiptVerificationResult {
+  // A pure function: being called IS running it, so announce at entry rather
+  // than per verdict. CANNOT_VERIFY is a real outcome, not a failure to run.
+  featureRan('bus-receipt-verify');
   // Both fields must be present and non-null to proceed.
   const hasMessageId = receipt.messageId !== null && receipt.messageId !== undefined;
   const hasContentHash = receipt.contentHash !== null && receipt.contentHash !== undefined;

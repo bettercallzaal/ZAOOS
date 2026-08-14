@@ -64,6 +64,7 @@ interface ReflectContext {
 }
 
 import { execSync } from 'node:child_process';
+import { featureRan } from './feature-ran';
 
 function loadReflectContext(repoDir: string): ReflectContext {
   let commits: string[] = [];
@@ -129,6 +130,9 @@ ${
   recordCall('reflect', result);
 
   const trimmed = result.text.trim();
+  // As in brief.ts: the canned three-question fallback is still a returned
+  // string, so the detail distinguishes a real reflection from the stub.
+  featureRan('reflect', trimmed.length < 60 ? 'degraded' : 'generated');
   if (trimmed.length < 60) {
     console.error('[zoe/reflect] empty reflection, length=', trimmed.length);
     return [

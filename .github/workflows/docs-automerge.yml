@@ -134,6 +134,24 @@ jobs:
           done <<< "$newdirs"
           echo "collision=$collision" >> "$GITHUB_OUTPUT"
 
+      # KNOWN GAP - this merge produces a main commit that CI never runs on.
+      #
+      # GitHub does not start a workflow run for a push made with the automatic
+      # GITHUB_TOKEN (anti-recursion). `github.token` below IS that token, so the
+      # squash-merge this step performs lands on main silently: ci.yml's
+      # `push: [main]` trigger never fires. Measured 2026-08-12 - four consecutive
+      # bot-merged commits (#3059, #3062, #3064, #3066) with zero runs between them,
+      # while the user-merged #3057 immediately before got its run normally.
+      #
+      # The gate itself is still real: --auto holds the merge until the PR's
+      # required checks pass. What is missing is verification of the MERGE RESULT,
+      # which is a different tree from the branch head that was checked.
+      #
+      # THE FIX needs a token whose pushes do trigger workflows - a fine-grained
+      # PAT or a GitHub App installation token in a repo secret, swapped in for
+      # `github.token` on this step only. That is a Zaal action because it means
+      # creating and storing a credential. Until then, ci.yml carries a daily
+      # schedule + workflow_dispatch so main's real state stays observable.
       - name: Enable auto-merge (squash)
         if: |
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||

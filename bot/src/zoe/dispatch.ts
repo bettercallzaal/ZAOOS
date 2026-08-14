@@ -27,6 +27,7 @@ import {
   type WorkerResult,
 } from './workers';
 import { recordRun, newRunId, type RunRecord } from './runs';
+import { featureRan } from './feature-ran';
 
 const DEFAULT_PLAN_BUDGET_USD = Number(process.env.ZOE_PLAN_BUDGET_USD ?? 5);
 
@@ -355,5 +356,8 @@ export async function dispatchPlan(args: DispatchPlanArgs): Promise<DispatchRepo
     }
   }
 
+  // Completion only. A plan paused for an approval gate has not finished, and
+  // announcing there would report a wait as a result.
+  featureRan('dispatch', 'plan completed');
   return finish('completed');
 }

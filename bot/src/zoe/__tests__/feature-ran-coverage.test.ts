@@ -50,6 +50,17 @@ const AUTONOMOUS_FEATURES = [
   'recap.ts',
   'brief.ts',
   'reflect.ts',
+  // Added by the 2026-08-14 audit. Every one was ERR-ONLY or SILENT: it spoke
+  // only when it failed, or not at all, so its silence meant nothing.
+  'work-loop.ts',
+  'orchestrator-tick.ts',
+  'repo-improver.ts',
+  'error-remediation.ts',
+  'backlog-grill-runner.ts',
+  'trust-audit.ts',
+  'dispatch.ts',
+  'proactive.ts',
+  'team-tracker.ts',
 ];
 
 function sourceOf(file: string): string {
@@ -80,23 +91,51 @@ describe('featureRan coverage on the autonomous path', () => {
 
   it('the call is on the success path, not only inside a catch', () => {
     // A module that speaks only when it fails tells you nothing when it works.
+    //
+    // The first version of this walked backwards to the nearest `} catch (` and
+    // called that enclosing. That is wrong whenever a catch has already CLOSED
+    // above the line - the shape `try { ...; try{}catch{}; HERE } finally {}` -
+    // and the 2026-08-14 audit found it mislabelling three success-path calls in
+    // orchestrator-tick, repo-improver and error-remediation. Track brace depth.
+    //
+    // Known limit, found by mutating this test rather than by reasoning about
+    // it: a SINGLE-LINE `try { ... } catch { featureRan(...) }` is not detected,
+    // because the scan only reads preceding lines and the catch opener is on the
+    // call's own line. Real code does not write it that way, and widening the
+    // scan to the current line would misread a call that merely follows a closed
+    // catch on one line. Stated rather than left as a surprise.
+    const insideCatch = (lines: string[], idx: number): boolean => {
+      let depth = 0;
+      const catchDepths: number[] = [];
+      for (let j = 0; j < idx; j++) {
+        const line = lines[j];
+        const s = line.trim();
+        if (s.startsWith('//') || s.startsWith('*')) continue;
+        let opensCatch = /\bcatch\s*(\([^)]*\))?\s*\{/.test(line);
+        for (const ch of line) {
+          if (ch === '{') {
+            depth++;
+            if (opensCatch) {
+              catchDepths.push(depth);
+              opensCatch = false;
+            }
+          } else if (ch === '}') {
+            if (catchDepths.length && catchDepths[catchDepths.length - 1] === depth) catchDepths.pop();
+            depth--;
+          }
+        }
+      }
+      return catchDepths.length > 0;
+    };
+
     const catchOnly: string[] = [];
     for (const f of AUTONOMOUS_FEATURES) {
-      const src = sourceOf(f);
-      const lines = src.split('\n');
-      const callLines = lines
+      const lines = sourceOf(f).split('\n');
+      const callIdx = lines
         .map((l, i) => ({ l, i }))
-        .filter(({ l }) => /\bfeatureRan\s*\(/.test(l) && !l.trim().startsWith('//'));
-      const allInCatch = callLines.every(({ i }) => {
-        // walk back to the nearest brace-opening construct
-        for (let j = i; j >= 0 && i - j < 25; j--) {
-          if (/\}\s*catch\s*\(/.test(lines[j])) return true;
-          if (/^\s*(export\s+)?(async\s+)?function\b/.test(lines[j])) return false;
-          if (/\btry\s*\{/.test(lines[j])) return false;
-        }
-        return false;
-      });
-      if (callLines.length > 0 && allInCatch) catchOnly.push(f);
+        .filter(({ l }) => /\bfeatureRan\s*\(/.test(l) && !l.trim().startsWith('//') && !l.startsWith('import'))
+        .map(({ i }) => i);
+      if (callIdx.length > 0 && callIdx.every((i) => insideCatch(lines, i))) catchOnly.push(f);
     }
     expect(catchOnly, `featureRan only reachable from a catch block in: ${catchOnly.join(', ')}`).toEqual([]);
   });

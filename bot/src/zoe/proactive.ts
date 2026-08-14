@@ -28,6 +28,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
+import { featureRan } from './feature-ran';
 import {
   listLiveThreads,
   nextEscalationAction,
@@ -355,6 +356,7 @@ export async function runReasoningTick(deps: ReasoningTickDeps = {}): Promise<Pr
     considered: candidates.length,
     unacked,
   });
+  featureRan('proactive', `spoke: ${best.threadId ?? 'thread'}`);
   return {
     speak: true,
     message: best.message,

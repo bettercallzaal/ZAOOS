@@ -24,6 +24,7 @@ import type { HermesRepoTarget } from '../hermes/types';
 import { db } from '../supabase';
 import { dispatchHermesRun } from '../hermes/runner';
 import { emitReceipt } from './receipts';
+import { featureRan } from './feature-ran';
 
 export interface AppError {
   id: string;
@@ -153,6 +154,7 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
       `Error ${tag} (${target}${next.brand ? `, brand ${next.brand}` : ''}): diagnosed -> fixed -> ${prLabel} open${result.prUrl ? ` ${result.prUrl}` : ''}. Ready for your merge.`,
     );
     mcEmit('error-remediation', 'zoe', 5, `error ${tag} fixed -> ${result.prUrl ?? 'PR open'}`);
+    featureRan('error-remediation', 'auto-fixed');
     return `fixed -> ${result.prUrl ?? 'pr'}`;
   }
 
@@ -161,6 +163,7 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
     `Error ${tag} (${target}) - pipeline could not auto-fix (${result.kind}): ${result.reason}. Needs you.`,
   );
   mcEmit('error-remediation', 'zoe', 8, `error ${tag} NEEDS ZAAL (${result.kind}): ${result.reason}`);
+  featureRan('error-remediation', `escalated: ${result.kind}`);
   return `escalated (${result.kind})`;
 }
 

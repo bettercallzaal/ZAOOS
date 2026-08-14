@@ -25,6 +25,7 @@ import {
 } from './done-work-detector';
 import { remember } from './recall';
 import { enqueueWrite } from './bonfire-retry';
+import { featureRan } from './feature-ran';
 
 export interface TeamTask {
   title: string;
@@ -747,6 +748,11 @@ export async function autoCloseFinishedTasks(
         refused.push(`${patch.status} on ${v.title.slice(0, 50)}`);
       }
     }
+    // The scan completed and wrote whatever it decided to write. `closed` is the
+    // effect; a scan that closed nothing still RAN, and that is the distinction
+    // this line exists to make - previously the whole module was silent, so a
+    // dead auto-close and a quiet one looked identical.
+    featureRan('auto-close', `${closed} closed, ${deferred} deferred`);
     return {
       ok: refused.length === 0,
       scanned: rows.length,

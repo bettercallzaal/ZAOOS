@@ -36,6 +36,11 @@ import {
   verdictNote,
   type Verdict,
 } from './backlog-grill';
+// IMPORTED, never copied. There is exactly one re-ask ladder and grill.ts owns
+// it. The last time this policy got a second implementation - the status line's
+// inline copy of outstandingCount - the copy silently drifted from the original
+// and painted a jam over a healthy grill. Import it or leave it alone.
+import { askCooldownMs } from './grill';
 
 const STATE_PATH = join(homedir(), '.zao/zoe/backlog-grill-state.json');
 
@@ -46,8 +51,15 @@ export interface BacklogGrillState {
    * `requeuedAt` marks one that was answered "work" or "skip" and is waiting to
    * come round again. It stays IN `asked` so it is not treated as never-asked -
    * see nextTask for why that distinction is the whole fix.
+   *
+   * `at` moves on every send, so it answers "how long since the last card" and
+   * nothing else. `firstAskedAt` is stamped once and never overwritten, because
+   * the ladder needs "how long has this gone unanswered" - the same split
+   * grill.ts documents on GrillItemState. A record written before this field
+   * existed falls back to `at`, which for a card that has never been re-sent is
+   * the same instant.
    */
-  asked: Record<string, { at: string; title: string; requeuedAt?: string }>;
+  asked: Record<string, { at: string; title: string; requeuedAt?: string; firstAskedAt?: string }>;
   /** taskId -> the verdict, once answered. */
   answered: Record<string, { at: string; verdict: string; note?: string }>;
   /** The card a bare "1" answers - the most recent one sent. */
@@ -71,15 +83,41 @@ export async function writeState(s: BacklogGrillState): Promise<void> {
 }
 
 /**
- * How many cards are out and unanswered. This is the backpressure signal.
+ * How many cards are IN FRONT OF HIM right now. This is the backpressure signal.
  *
- * A requeued task is not outstanding: Zaal already answered it once, and it is
- * parked at the back of the queue rather than sitting on his phone waiting. If
- * it counted, twenty skips would permanently pin the cap and the drip would
- * stop for good.
+ * Three things do not count, all for the same reason - none of them is sitting
+ * on his phone waiting for a thumb:
+ *
+ *  - answered: he dealt with it.
+ *  - requeued: he answered it once and it is parked at the back of the queue.
+ *    If it counted, twenty skips would permanently pin the cap.
+ *  - older than `capWindowMs`: sent days ago and long since scrolled past.
+ *
+ * That last one is the 2026-08-09 jam. Twenty cards sent over two days pinned
+ * the cap at 20 and the drip stopped for five days, because the only thing that
+ * could lower the count was Zaal answering cards he could no longer find. A
+ * backpressure signal that cannot fall on its own is not backpressure, it is a
+ * latch - and `grill JAMMED 20/20` printed unchanged on every lane until nobody
+ * read it.
+ *
+ * Aging out of the CAP is not aging out of the QUEUE. The card stays in `asked`
+ * forever and comes back through nextTask's re-ask tier, sooner the older it
+ * gets. Nothing here deletes anything.
  */
-export function outstandingCount(s: BacklogGrillState): number {
-  return Object.keys(s.asked).filter((id) => !s.answered[id] && !s.asked[id].requeuedAt).length;
+export function outstandingCount(
+  s: BacklogGrillState,
+  now = Date.now(),
+  capWindowMs = DRIP_DEFAULT.capWindowMs,
+): number {
+  return Object.keys(s.asked).filter((id) => {
+    if (s.answered[id] || s.asked[id].requeuedAt) return false;
+    const sentAt = Date.parse(s.asked[id].at);
+    // An undateable `at` counts. We cannot prove the card has gone quiet, and
+    // between flooding him and holding a slot, holding the slot is the safe
+    // error.
+    if (!Number.isFinite(sentAt)) return true;
+    return now - sentAt < capWindowMs;
+  }).length;
 }
 
 interface BoardTask {
@@ -107,16 +145,32 @@ function cfg(): { root: string; headers: Record<string, string> } | null {
  * Oldest first on purpose: a 36-day-old task is the one most likely to be dead,
  * and clearing the tail is where the board actually shrinks.
  *
- * The two-tier order is what makes "it comes back at the END of the queue" true.
+ * The tiered order is what makes "it comes back at the END of the queue" true.
  * Cards go out oldest-first, so the card Zaal just skipped was by definition the
  * oldest unasked one - simply un-asking it put it straight back at the FRONT and
  * the next tick re-sent the same card, forever, and no other task could ever
  * surface behind it. A requeued task therefore keeps its `asked` mark and waits
  * behind every task that has not been seen at all.
+ *
+ * TIER 3, THE RE-ASK (2026-08-14). An asked-but-unanswered card used to match
+ * neither tier: `fresh` excludes it (it is in `asked`) and `requeued` excludes
+ * it (no `requeuedAt`). So it was sent exactly ONCE, ever. Scroll past it and it
+ * was gone - while still holding a cap slot forever. Twenty of those is what
+ * froze the drip for five days.
+ *
+ * Eligibility is grill.ts's ladder, imported unchanged: 3h fresh, 2h after a
+ * day, 1.5h after three, 45m after a week. Age is measured from `firstAskedAt`,
+ * so a card nags HARDER the longer it has gone unanswered rather than expiring.
+ *
+ * It sits LAST on purpose. The 324 tasks that have never been seen once are the
+ * pile Zaal actually wants moving, and a re-ask tier in front of them would
+ * recreate the starvation this whole change exists to undo - just with a
+ * different set of twenty at the front.
  */
 async function nextTask(
   s: BacklogGrillState,
   fetchImpl: typeof fetch,
+  now: number,
 ): Promise<{ task: BoardTask; remaining: number; unasked: number } | null> {
   const c = cfg();
   if (!c) return null;
@@ -132,7 +186,20 @@ async function nextTask(
     .sort((a, b) =>
       String(s.asked[a.id].requeuedAt).localeCompare(String(s.asked[b.id].requeuedAt)),
     );
-  const queue = [...fresh, ...requeued];
+  const reask = rows
+    .filter((t) => {
+      const a = s.asked[t.id];
+      if (!a || a.requeuedAt || s.answered[t.id]) return false;
+      const sentAt = Date.parse(a.at);
+      if (!Number.isFinite(sentAt)) return false;
+      const firstAt = Date.parse(a.firstAskedAt ?? a.at);
+      const age = now - (Number.isFinite(firstAt) ? firstAt : sentAt);
+      return now - sentAt >= askCooldownMs(age);
+    })
+    // Longest since its last card goes first, so the ladder's "nag the old ones
+    // harder" survives contact with a tier that holds more than one card.
+    .sort((a, b) => Date.parse(s.asked[a.id].at) - Date.parse(s.asked[b.id].at));
+  const queue = [...fresh, ...requeued, ...reask];
   if (queue.length === 0) return null;
   return { task: queue[0], remaining: queue.length, unasked: fresh.length };
 }
@@ -159,14 +226,14 @@ export async function runBacklogGrillTick(
   if (!cfg()) return { sent: false, reason: 'tracker not configured' };
 
   const state = await readState();
-  const next = await nextTask(state, fetchImpl);
+  const next = await nextTask(state, fetchImpl, now);
   if (!next) return { sent: false, reason: 'nothing left to ask about' };
 
   const gate = shouldSendNext({
     nowMs: now,
     localHour: deps.localHour,
     lastSentMs: state.lastSentMs,
-    outstanding: outstandingCount(state),
+    outstanding: outstandingCount(state, now, DRIP_DEFAULT.capWindowMs),
     remainingInQueue: next.remaining,
     cfg: DRIP_DEFAULT,
   });
@@ -187,7 +254,16 @@ export async function runBacklogGrillTick(
 
   // Rewritten wholesale, which clears any `requeuedAt`: it has now come round
   // again, so it is an ordinary open card until it is answered a second time.
-  state.asked[next.task.id] = { at: new Date(now).toISOString(), title: next.task.title };
+  // `firstAskedAt` is the one thing carried across, because it is what makes an
+  // old card nag harder - reset it on every re-send and the ladder would read
+  // every card as brand new and never climb.
+  const prior = state.asked[next.task.id];
+  const sentAt = new Date(now).toISOString();
+  state.asked[next.task.id] = {
+    at: sentAt,
+    title: next.task.title,
+    firstAskedAt: prior?.firstAskedAt ?? prior?.at ?? sentAt,
+  };
   state.activeTaskId = next.task.id;
   state.lastSentMs = now;
   await writeState(state);
@@ -272,6 +348,7 @@ export async function applyBacklogAnswer(
     state.asked[taskId] = {
       at: state.asked[taskId]?.at ?? new Date().toISOString(),
       title: state.asked[taskId]?.title ?? '',
+      firstAskedAt: state.asked[taskId]?.firstAskedAt ?? state.asked[taskId]?.at,
       requeuedAt: new Date().toISOString(),
     };
     delete state.answered[taskId];

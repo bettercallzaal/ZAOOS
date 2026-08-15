@@ -136,3 +136,22 @@ Per decision #5. ZOE is the highest-stakes bot, so the rebuild never touches the
 - 3 background research dispatches, 2026-05-20: fleet topology; graph-as-coordination-layer; shared-core spec
 - Doc 683a (bot-fleet consolidation audit), Doc 467, Doc 527 - prior ZAO bot research
 - Live code: `bot/src/zoe/`, `bot/src/hermes/`, `cowork-zaodevz` (ZAOcoworkingBot), `zaoscribe`
+
+## Updated 2026-08-15
+
+**Telegram Bot API evolution since lock date (May 20, 2026):**
+
+- **Bot API 10.0 (May 8, 2026 — 12 days before lock):** Added native bot-to-bot communication (opt-in via @BotFather). Bots can send messages to other bots by @username if both enable the mode. Also added Guest Mode (bots reply within chats they aren't members of) and Secretary Bots (bots process messages on a user's behalf). New API fields: `guest_bot_caller_user`, `guest_bot_caller_chat`, `guest_query_id`, `answerGuestQuery()`. Source: github.com/python-telegram-bot/python-telegram-bot/issues/5228 (FULL fetch).
+  - **Architecture verdict: Decision #4 ("shared-state, never direct calls") remains correct.** Native bot-to-bot messaging has the infinite-loop risk Telegram itself warns about; the task-queue pattern structurally prevents this. The new feature is noted but not a reason to change the architecture.
+
+- **Bot API 10.1 (June 11, 2026):** Added Rich Messages — `sendRichMessage`, structured block types (lists, tables, slideshows, thinking blocks). Relevant for ZOE's user-facing response quality. Source: github.com/python-telegram-bot/python-telegram-bot/issues/5261 (search-verified).
+
+- **Bot API 10.2 (July 14, 2026):** Added ephemeral interactions (`receiver_user_id`, `ephemeral_message_id`) and richer structured agent responses. Source: github.com/NousResearch/hermes-agent/issues/64497 (search-verified).
+
+- **grammY v1.45.1 (July 17, 2026):** Latest release; supports Bot API 10.2. Bug fix: "bad subscription narrowing." The `telegram-io` module spec in this doc remains compatible — no breaking changes. Source: github.com/grammyjs/grammY/releases (FULL fetch).
+
+**Letta (memory-blocks module):**
+
+- **Letta v0.16.7 (March 31, 2026):** Default context window raised from 32k to 128k. Fixed context window reset bug. Added conversation forking. Expanded model support (GPT-5.4, GLM-5, MiniMax M2.7). Source: github.com/letta-ai/letta/releases (FULL fetch). The `memory-blocks` module spec (4-block, ring buffer) remains valid; the larger context window means less-frequent compaction for ZOE's working memory.
+
+**Overall:** Core architecture decisions (shared-state handoff, lean fleet on shared core, ZOE as the single human-facing bot) all validated. The main actionable update is that grammY now supports through Bot API 10.2 — the `telegram-io` module can expose Rich Message types when ZOE is rebuilt on the shared core.

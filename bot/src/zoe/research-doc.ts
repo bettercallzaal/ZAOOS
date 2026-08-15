@@ -29,12 +29,46 @@ async function git(args: string[]): Promise<string> {
 }
 
 /** Highest doc number across merged dirs + open PR titles + in-flight branches, +1. */
+/** Highest doc number in a `git ls-tree` listing of research/. Exported for tests. */
+export function maxDocNumFrom(lines: string): number {
+  let max = 0;
+  for (const line of lines.split('\n')) {
+    // research/<topic>/<NNNN>-slug  - topic is NOT constrained to the TOPICS
+    // list, because the repo has 25 topic dirs and TOPICS names 13. Reading only
+    // the known ones would miss whichever dir happens to hold the highest number.
+    const m = line.match(/^research\/[^/]+\/(\d{3,4})-/);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return max;
+}
+
 async function nextDocNum(): Promise<number> {
   let max = 0;
-  for (const t of TOPICS) {
-    let entries: string[] = [];
-    try { entries = await fs.readdir(join(REPO, 'research', t)); } catch { /* topic dir may not exist */ }
-    for (const e of entries) { const m = e.match(/^(\d+)-/); if (m) max = Math.max(max, Number(m[1])); }
+
+  // Ask the REMOTE, not a local checkout.
+  //
+  // This used to read `REPO` off disk, and REPO defaults to ~/zao-os while the
+  // bot actually runs from ~/zao-bot-live. Nothing keeps ~/zao-os current, so on
+  // 2026-08-15 it was ~6 days behind and numbering picked 2249 - a number
+  // already taken by research/agents/2249-cli-messaging-vs-ssh-orchestration.
+  // The collision guard caught it, but only after a PR had been opened.
+  let sawRemote = false;
+  try {
+    await exec('git', ['-C', REPO, 'fetch', 'origin', 'main', '--quiet'], { maxBuffer: 1024 * 1024 });
+    const { stdout } = await exec('git', ['-C', REPO, 'ls-tree', '-r', '-d', '--name-only', 'origin/main', 'research/'], { maxBuffer: 8 * 1024 * 1024 });
+    max = Math.max(max, maxDocNumFrom(stdout));
+    sawRemote = max > 0;
+  } catch { /* fall through to the disk scan below */ }
+
+  // Disk fallback, and LOUD about it. A silent fallback here is how a stale
+  // checkout produced a duplicate number without anyone noticing.
+  if (!sawRemote) {
+    console.log('[zoe/research-doc] WARNING: could not read origin/main for doc numbering - falling back to the local checkout, which may be stale');
+    for (const t of TOPICS) {
+      let entries: string[] = [];
+      try { entries = await fs.readdir(join(REPO, 'research', t)); } catch { /* topic dir may not exist */ }
+      for (const e of entries) { const m = e.match(/^(\d+)-/); if (m) max = Math.max(max, Number(m[1])); }
+    }
   }
   try {
     const { stdout } = await exec('gh', ['api', 'repos/bettercallzaal/ZAOOS/pulls?state=open&per_page=80', '--jq', '.[].title'], { maxBuffer: 1024 * 1024 });

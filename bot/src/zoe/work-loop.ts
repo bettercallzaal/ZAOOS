@@ -26,7 +26,7 @@ import { commitResearchDoc } from './research-doc';
 import { emitReceipt } from './receipts';
 import { callClaudeCli } from '../hermes/claude-cli';
 import { verifyReplanResearch } from './verify-replan';
-import { parkWork, resumeWork } from './work-park';
+import { parkWork, resumeWork, type ParkReason } from './work-park';
 import type { ZoeContext } from './types';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
@@ -160,6 +160,11 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
     const item = q[0];
     // Captured from the research-doc hook so the receipt can point at the PR (R1b).
     let evidenceUrl: string | null = null;
+    // The worker's own failure text. Without this, a FAILED worker and a
+    // worker that returned nothing are indistinguishable downstream, and the
+    // item gets parked as 'empty-output' - which is a lie when the truth was
+    // 'claude CLI exited 1 [rate_limit]'.
+    let lastWorkerError = '';
     const ctx: ZoeContext = {
       zaal_tg_id: deps.zaalTgId,
       workspace_dir: deps.repoDir,
@@ -207,7 +212,19 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
           zaalTgId: deps.zaalTgId,
           hooks: {
             onSubtaskDone: async (st, r) => {
-              if (st.worker === 'research-worker' && r.status === 'completed' && r.output) out = r.output;
+              if (st.worker !== 'research-worker') return;
+              // needs-revision IS the full output - the critic flagged it, the
+              // worker still produced it (workers.ts sets
+              // `status: passed ? 'completed' : 'needs-revision'`). Discarding it
+              // threw away a paid research pass - measured at $0.93 and $0.97 on
+              // 2026-08-14 - and then reported the item as 'empty-output'.
+              //
+              // It also meant verifyReplanResearch below NEVER RAN, because `out`
+              // stayed empty. That judge is exactly the layer meant to decide
+              // whether a critic-flagged result is good enough, so this hands it
+              // back its job rather than pre-empting it here.
+              if (r.output && (r.status === 'completed' || r.status === 'needs-revision')) out = r.output;
+              if (r.status === 'failed') lastWorkerError = r.error ?? 'worker failed, no reason recorded';
             },
           },
         });
@@ -265,10 +282,20 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
         // THE SILENT PATH. reportFor lives inside the branch above, so an empty
         // research result used to send nothing anywhere, delete the item, charge
         // it against the daily cap, and emit a 'success' receipt. Park it, say so.
-        await parkWork(item, 'empty-output', { stage: 'research' });
+        // Say WHICH failure this was. 16 of 20 research runs on 2026-08-14
+        // failed with a real reason (rate_limit, timeout, unclassified) and all
+        // of them would have been filed as 'empty-output' - a category that
+        // describes the symptom and hides the cause.
+        const reason: ParkReason = lastWorkerError ? 'error' : 'empty-output';
+        await parkWork(item, reason, {
+          stage: 'research',
+          ...(lastWorkerError ? { error: lastWorkerError } : {}),
+        });
         resultType = 'error';
         await reportFor(item, deps)(
-          `Work-loop: "${item.input.slice(0, 60)}" produced no research output - parked, not lost. Ask ZOE for parked work.`,
+          lastWorkerError
+            ? `Work-loop: "${item.input.slice(0, 60)}" failed - ${lastWorkerError.slice(0, 120)}. Parked, not lost.`
+            : `Work-loop: "${item.input.slice(0, 60)}" produced no research output - parked, not lost. Ask ZOE for parked work.`,
         ).catch(() => {});
       }
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));

@@ -13,6 +13,7 @@
  */
 
 import { db } from '../supabase';
+import { featureRan } from './feature-ran';
 
 export interface DailyNoteItem {
   id: string;
@@ -152,6 +153,7 @@ export async function appendItem(ownerId: string, text: string): Promise<DailyNo
       return null;
     }
 
+    featureRan('daily-note', 'item appended');
     return item;
   } catch (err) {
     console.error('[zoe/daily-note] appendItem error:', (err as Error)?.message ?? err);

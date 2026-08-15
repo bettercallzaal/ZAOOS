@@ -18,6 +18,7 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { ZoeTask } from './types';
+import { featureRan } from './feature-ran';
 
 export interface AuditFinding {
   type: 'capture' | 'task';
@@ -170,6 +171,7 @@ export async function runAudit(recentShippedPRs: string[] = [], now: number = Da
     summary = `Trust audit found ${findings.length} potential gaps: ${captures} old captures, ${tasks} stuck tasks. Review details.`;
   }
 
+  featureRan('trust-audit', `${findings.length} findings`);
   return {
     scannedAt: new Date(now).toISOString(),
     findings,

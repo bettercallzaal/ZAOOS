@@ -28,6 +28,7 @@ import { callClaudeCli } from '../hermes/claude-cli';
 import { verifyReplanResearch } from './verify-replan';
 import { parkWork, resumeWork, type ParkReason } from './work-park';
 import type { ZoeContext } from './types';
+import { featureRan } from './feature-ran';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
 const QUEUE = (): string => join(dir(), 'work-queue.json');
@@ -300,6 +301,9 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       }
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
       await bumpToday(deps.currentDate);
+      // A tick reached the end of an item. resultType distinguishes a committed
+      // doc from a parked failure - both are 'it ran', only one is 'it worked'.
+      featureRan('work-loop', resultType);
       // Receipt so the afferent digest (R1) sees the work-loop's output, not just
       // repo-improver. Best-effort - never let a receipt failure break the tick.
       await emitReceipt({

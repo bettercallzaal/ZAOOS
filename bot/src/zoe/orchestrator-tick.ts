@@ -42,6 +42,7 @@ import { armPendingAnswer } from './pending-answers';
 import { startNudge, stopNudge, markPinged, dueTracks, nudgeLadderEnabled } from './nudge-ladder';
 import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
 import { topicNameForThread } from './topic-router';
+import { featureRan } from './feature-ran';
 
 const ORCHESTRATOR_STATE_PATH = (): string =>
   join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'), 'orchestrator-state.json');
@@ -676,6 +677,9 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
         console.error('[zoe/orchestrator] refillOpenThings failed:', (err as Error)?.message);
       }
     }
+    // The tick reached the end of its work without throwing. Placed before the
+    // finally so a lock release on the error path cannot masquerade as a run.
+    featureRan('orchestrator-tick');
   } finally {
     await releaseLock();
   }

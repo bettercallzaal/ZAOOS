@@ -27,6 +27,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+import { featureRan } from './feature-ran';
 import {
   DRIP_DEFAULT,
   parseVerdict,
@@ -267,6 +268,9 @@ export async function runBacklogGrillTick(
   state.activeTaskId = next.task.id;
   state.lastSentMs = now;
   await writeState(state);
+  // Only the SENT path. A tick that declined to send has not run in any sense
+  // worth reporting, and saying otherwise makes the line mean 'the cron fired'.
+  featureRan('backlog-grill', next.task.title.slice(0, 60));
   return { sent: true, reason: 'sent', title: next.task.title };
 }
 

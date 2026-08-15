@@ -64,6 +64,46 @@ describe('outstandingCount - the backpressure signal', () => {
     const s = st({ asked: { a: { at: 'x', title: 'A', requeuedAt: 'y' } } });
     expect(outstandingCount(s)).toBe(0);
   });
+
+  /**
+   * The 2026-08-09 jam, reproduced. Twenty cards sent over two days pinned the
+   * cap and the drip stopped for five days, because the only thing that could
+   * lower the count was Zaal answering cards buried a week deep in Telegram.
+   *
+   * The requirement Zaal set: this number must be able to reach ZERO on its
+   * own. A flag that can never clear is a flag nobody reads.
+   */
+  describe('the 12h cap window - the count has to be able to reach zero', () => {
+    const NOW = Date.UTC(2026, 7, 14, 14, 0, 0);
+    const hoursAgo = (h: number) => new Date(NOW - h * 3_600_000).toISOString();
+
+    it('counts a card sent inside the window', () => {
+      const s = st({ asked: { a: { at: hoursAgo(11), title: 'A' } } });
+      expect(outstandingCount(s, NOW)).toBe(1);
+    });
+
+    it('releases the slot once the card is older than 12h', () => {
+      const s = st({ asked: { a: { at: hoursAgo(13), title: 'A' } } });
+      expect(outstandingCount(s, NOW)).toBe(0);
+    });
+
+    // The whole point: twenty stale cards no longer latch the gate shut.
+    it('falls from 20 to 0 as a day-old pile ages out, with nothing answered', () => {
+      const asked: BacklogGrillState['asked'] = {};
+      for (let i = 0; i < 20; i++) asked[`t${i}`] = { at: hoursAgo(30), title: `T${i}` };
+      const s = st({ asked });
+
+      expect(outstandingCount(s, NOW - 20 * 3_600_000)).toBe(20); // 10h old: all held
+      expect(outstandingCount(s, NOW)).toBe(0); // 30h old: all released
+      expect(Object.keys(s.asked)).toHaveLength(20); // released from the CAP, not the queue
+    });
+
+    // Between flooding him and holding a slot, holding the slot is the safe error.
+    it('counts a card whose timestamp cannot be parsed', () => {
+      const s = st({ asked: { a: { at: 'not-a-date', title: 'A' } } });
+      expect(outstandingCount(s, NOW)).toBe(1);
+    });
+  });
 });
 
 /**
@@ -231,5 +271,56 @@ describe('runBacklogGrillTick - a skipped card goes to the back, not the front',
     expect(second.sent).toBe(true);
     expect(second.title).not.toBe('Oldest');
     expect((await readState()).asked.a?.requeuedAt).toBeTruthy();
+  });
+
+  /**
+   * An asked-but-unanswered card matched neither tier - `fresh` excludes it
+   * (it is in `asked`), `requeued` excludes it (no `requeuedAt`). So it went out
+   * exactly ONCE, ever, and scrolling past it lost it for good while it went on
+   * holding a cap slot. Twenty of those froze the drip for five days.
+   */
+  it('re-sends an unanswered card once its ladder cooldown has elapsed', async () => {
+    const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    const every = 2 * 60_000;
+
+    await tick(t0);
+    await tick(t0 + every);
+    await tick(t0 + 2 * every);
+
+    // All three seen, none answered. Six minutes in, the ladder's 3h fresh rung
+    // is doing its job - re-asking here would be nagging, not surfacing.
+    expect((await tick(t0 + 3 * every)).reason).toBe('nothing left to ask about');
+
+    // 4h in, every card is past that rung. Before this change the queue stayed
+    // empty here for ever, and these three cards were unreachable.
+    const again = await tick(t0 + 4 * 3_600_000);
+    expect(again.sent).toBe(true);
+    expect(again.title).toBe('Oldest'); // longest since its last card leads
+  });
+
+  // Age drives the ladder, so it has to survive the re-send that answers it.
+  it('keeps firstAskedAt across a re-send so the ladder can climb', async () => {
+    const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    await tick(t0);
+    const first = (await readState()).asked.a?.firstAskedAt;
+    expect(first).toBe(new Date(t0).toISOString());
+
+    await tick(t0 + 4 * 3_600_000);
+    const after = (await readState()).asked.a;
+    expect(after?.firstAskedAt).toBe(first); // never overwritten
+    expect(after?.at).not.toBe(first); // but the last-sent stamp moved
+  });
+
+  // The 324 never-seen tasks are the pile Zaal wants moving. A re-ask tier in
+  // front of them would just starve them behind a different twenty.
+  it('sends every unseen task before any re-ask, however overdue', async () => {
+    const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    await tick(t0);
+
+    // A week later 'Oldest' is deep into the 45m rung - it still waits.
+    const week = t0 + 7 * 86_400_000;
+    expect((await tick(week)).title).toBe('Middle');
+    expect((await tick(week + 2 * 60_000)).title).toBe('Newest');
+    expect((await tick(week + 4 * 60_000)).title).toBe('Oldest');
   });
 });

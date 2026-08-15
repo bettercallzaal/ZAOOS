@@ -170,6 +170,11 @@ export interface DripConfig {
   everyMinutes: number;
   /** Most unanswered cards allowed to pile up before we stop adding. */
   maxOutstanding: number;
+  /**
+   * How long a sent card counts against `maxOutstanding`. Past this it is no
+   * longer "on his phone" and stops holding a slot - see DRIP_DEFAULT.
+   */
+  capWindowMs: number;
   /** Local hours (Zaal's) in which cards may be sent. */
   startHour: number;
   endHour: number;
@@ -182,10 +187,29 @@ export interface DripConfig {
  * unbounded they become a wall he never opens, and a check nobody reads is
  * worth nothing. 20 is roughly one sweep's worth at the pace he cleared them
  * today.
+ *
+ * WHY THE CAP NEEDS A WINDOW (2026-08-14)
+ * --------------------------------------
+ * Without one, `maxOutstanding` counted every card ever sent and never
+ * answered - including cards sent days ago and buried under a week of
+ * Telegram. Twenty of those pinned the cap on 2026-08-09 and the drip stopped
+ * for five days: 324 open board tasks frozen behind 20 cards Zaal could no
+ * longer scroll back to. The count could only fall if he answered cards he
+ * could not find, so it could never reach zero, and `grill JAMMED 20/20`
+ * printed the identical string on every lane until it stopped being read
+ * (noisy-signal-guard.md).
+ *
+ * The cap was always trying to measure "how much is in front of him right
+ * now". 12h says that plainly: a card sent this morning is pressure, a card
+ * sent on Saturday is not. Releasing the slot does NOT release the card -
+ * nothing here removes anything, and the re-ask ladder in grill.ts brings old
+ * cards back HARDER as they age (Zaal, 2026-08-11: "older cards must nag MORE
+ * frequently, not expire").
  */
 export const DRIP_DEFAULT: DripConfig = {
   everyMinutes: 2,
   maxOutstanding: 20,
+  capWindowMs: 12 * 60 * 60 * 1000,
   startHour: 6,
   endHour: 22,
 };

@@ -44,7 +44,13 @@ async function writeState(state: unknown): Promise<void> {
   await fs.writeFile(STATE_PATH, JSON.stringify(state), 'utf8');
 }
 
-const ts = '2026-08-09T12:00:00.000Z';
+// An hour ago, not a fixed calendar date. The depth is time-relative now - a
+// card stops holding a cap slot once it is older than DRIP_DEFAULT.capWindowMs -
+// so a hardcoded timestamp would quietly age past the window and leave every
+// assertion below passing or failing for the wrong reason.
+const ts = new Date(Date.now() - 3_600_000).toISOString();
+/** Older than the cap window: sent, never answered, long since scrolled past. */
+const stale = new Date(Date.now() - 5 * 86_400_000).toISOString();
 
 describe('grillDepth', () => {
   beforeEach(async () => {
@@ -78,6 +84,21 @@ describe('grillDepth', () => {
     };
     await writeState(state);
     expect(await grillDepth()).toBe(outstandingCount(state));
+  });
+
+  /**
+   * The phone-side twin of the 2026-08-09 jam. Twenty cards sent days ago and
+   * never answered pinned the terminal's "grill JAMMED 20/20" AND this brief's
+   * "stuck at 20" for five days. The brief promises to be the one correct
+   * surface, so it has to release them too.
+   */
+  it('does not count cards that aged out of the cap window', async () => {
+    const asked: Record<string, { at: string; title: string }> = {};
+    for (let i = 0; i < DRIP_DEFAULT.maxOutstanding; i++) {
+      asked[`t${i}`] = { at: stale, title: `t${i}` };
+    }
+    await writeState({ asked, answered: {}, activeTaskId: null, lastSentMs: null });
+    expect(await grillDepth()).toBe(0);
   });
 
   it('twenty requeues do not fake the cap', async () => {

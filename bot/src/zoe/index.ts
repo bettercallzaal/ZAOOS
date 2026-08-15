@@ -3140,10 +3140,25 @@ async function runApprovedPlan(
           await ctx.reply(`${mark} ${st.id} ${res.status}`.slice(0, 120)).catch(() => {});
           // Durability: a completed research-worker subtask becomes a numbered doc
           // + PR to main (trusted Node commit; the worker stays sandboxed).
-          if (st.worker === 'research-worker' && res.status === 'completed' && res.output) {
+          // needs-revision is the SAME discard bug as work-loop.ts had: the
+          // critic flagged the output, the worker still produced it, and
+          // gating on 'completed' threw away a paid research pass. The mark
+          // three lines up already renders needs-revision as ↻, so the state
+          // was known here and dropped anyway.
+          //
+          // This path commits straight to a PR with no verify-replan behind
+          // it, so a critic-flagged doc is SAVED and LABELLED rather than
+          // silently kept or silently binned - Zaal decides what to trust.
+          const usable = res.output && (res.status === 'completed' || res.status === 'needs-revision');
+          if (st.worker === 'research-worker' && usable) {
             const doc = await commitResearchDoc({ question: goal, findings: res.output });
+            const flagged = res.status === 'needs-revision' ? ' (critic-flagged - read before trusting)' : '';
             await ctx
-              .reply(doc.ok ? `Saved to main: doc ${doc.num} -> ${doc.prUrl}` : `(could not auto-save the research doc: ${doc.error})`)
+              .reply(
+                doc.ok
+                  ? `Saved to main: doc ${doc.num}${flagged} -> ${doc.prUrl}`
+                  : `(could not auto-save the research doc: ${doc.error})`,
+              )
               .catch(() => {});
           }
         },

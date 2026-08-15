@@ -229,6 +229,20 @@ describe('work-park', () => {
   });
 });
 
+describe('the interactive path has the same discard bug, asserted against source', () => {
+  // index.ts cannot be imported (agent-loops rule 21 - its top level boots a
+  // live poller), so this reads it as text. The bug was ONE SHAPE in TWO
+  // PLACES: work-loop.ts:210 and index.ts:3143 both gated a research commit on
+  // status === 'completed', discarding a critic-flagged result that cost real
+  // money. Fixing one and not the other would have left the interactive path
+  // - the one Zaal actually types into - still throwing work away.
+  it('index.ts does not gate the research commit on completed alone', () => {
+    const src = readFileSync(fileURLToPath(new URL('../index.ts', import.meta.url)), 'utf8');
+    expect(src).not.toMatch(/research-worker' && res\.status === 'completed' && res\.output/);
+    expect(src).toContain("res.status === 'completed' || res.status === 'needs-revision'");
+  });
+});
+
 describe('the fold, which is where a naive implementation loses the payload', () => {
   it('a later status-only append does NOT shed the item', () => {
     // Peter retired latest-record-wins for exactly this: under it, appending

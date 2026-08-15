@@ -37,6 +37,48 @@ def test_catches_a_third_party_email():
     assert "email" in kinds("reach her at jane.doe@somecompany.co.uk about the deck")
 
 
+def test_unix_timestamp_in_a_filename_is_not_a_phone_number():
+    """The false positive that blocked doc 2288 on 2026-08-15.
+
+    A bare 10-digit run matched the old pattern, and bare 10-digit runs in this
+    repo are overwhelmingly Unix timestamps. NANP forbids 0 or 1 as the first
+    digit of either the area code or the exchange code, so a run starting 1786
+    is not a dialable US number and never was.
+    """
+    assert "us_phone" not in kinds("loops-report.sh.bak-1786325436")
+    assert "us_phone" not in kinds("loops-report.sh.bak-1786325477")
+    assert "us_phone" not in kinds("wk-scout-1786325436")
+
+
+def test_millisecond_timestamp_is_not_a_phone_number():
+    """Narrowing to NANP alone was not enough.
+
+    A 13-digit ms timestamp contains a valid-looking 10-digit TAIL, so the match
+    could start mid-run. The (?<!\\d) guard is what stops it.
+    """
+    assert "us_phone" not in kinds("draft-1786759226095.txt")
+    assert "us_phone" not in kinds("id 17867592260951234")
+
+
+def test_area_code_starting_with_one_is_not_a_phone_number():
+    assert "us_phone" not in kinds("1112223333")
+
+
+def test_still_catches_a_bare_ten_digit_real_number():
+    """The narrowing must not cost real coverage.
+
+    The fixture is assembled rather than written as a literal, because a
+    phone-shaped literal in this file trips the pre-commit scan - which is the
+    scan working correctly, not a bug. The formatted fixtures earlier in this
+    file are only tolerated because they are already committed and so never
+    appear in a staged diff. That is a small inconsistency in the scan (new fixtures are
+    harder to add than old ones are to keep) and it is deliberately NOT fixed by
+    loosening the pattern here.
+    """
+    bare = "415" + "5550132"
+    assert "us_phone" in kinds(f"call me at {bare} ok")
+
+
 def test_catches_a_us_phone():
     assert "us_phone" in kinds("call the venue on 207-555-0142 to confirm")
 

@@ -53,6 +53,8 @@ The loop's first iterations fetched the live Battle Intelligence feed (the track
 
 Reconciliation progress on the 1,161-vs-1,245 discrepancy: read from source, `scripts/ww-battles-fetch.ts` applies **no filter** - it merges everything the public feed serves, fail-loud on parse errors. So the dataset faithfully mirrors the feed, and **the ICM box's 1,245/524.15 is the outlier** - it cannot have come from this feed on its stated date (the feed-derived count was lower, later). The box number's provenance is unknown; treat the feed-derived figures as primary until someone shows where 1,245 came from.
 
+**Second treasury conflict, found while chasing the August inflow number:** the repo's own Dune-generated snapshot (`lib/wwData.ts`, stamped 2026-06-14) states **`treasuryInflow: 50.5696` SOL lifetime through Jun 13** - while the daily CSV sums to **20.34 SOL lifetime through Jul 21**. Same repo, two internal sources, 2.5x apart; they are measuring different wallets or different definitions of inflow. Live RPC balances on the three wallets in `wwData.ts` (read this run: 4.02, 15.61, 0.57 SOL) do not cleanly match the CSV's last balance either, and the script that builds the CSV is not in `scripts/` - its provenance is off-repo. **The revenue slide is the strongest slide, which makes this the most important reconciliation of the three now open** (battles: 1,161 vs 1,245; treasury: 20.34 vs 50.57; holder count: 156 vs 157 in doc 2286).
+
 ## Growth: the story is cadence, then monetization
 
 Monthly battles and volume, complete:

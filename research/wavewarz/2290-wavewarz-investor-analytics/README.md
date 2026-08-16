@@ -38,17 +38,18 @@ Raw dataset: `~/Desktop/repos/wwtracker/public/ww-battles.json` - 1,161 battle r
 2. **Artist handles exist on only 212 of 1,161 battles** - handle capture evidently began around June 2026. Every artist metric below covers that window only, and the 5 largest battles of all time have no artist attribution at all.
 3. **This dataset disagrees with the public ICM box.** The box (doc 2286, repo source dated 2026-07-16) claims **1,245 battles / 524.15 SOL lifetime**; this file holds **1,161 / 393.17 SOL** through a *later* date. Possibilities: the box counted something this file filters (cancelled battles, off-chain events), or one of the two is wrong. **UNRESOLVED - reconcile before either number is ever said to an investor**, because a diligence pass that finds the discrepancy first costs credibility, not just a correction.
 
-## UPDATE 2026-08-16, same day: August is a breakout, and the "plateau" framing below is already wrong
+## UPDATE 2026-08-16, same day: August measured live - cadence holds, stakes shifted, and a self-correction
 
-The first loop iteration fetched the live Battle Intelligence feed (the tracker's own upstream, `wavewarz-intelligence.vercel.app/battles`) to measure what the 18-day-stale dataset is missing:
+The loop's first iterations fetched the live Battle Intelligence feed (the tracker's own upstream, `wavewarz-intelligence.vercel.app/battles`) to measure what the 18-day-stale dataset is missing. Parsed with the repo parser's own method - balanced-brace JSON extraction keyed on `battle_id` - not by scraping visible text.
 
-- **~196 battles since 2026-07-29** - pages 1-4 of the feed are *entirely August*, **160 battles in the first 16 days**.
-- That is **~10 battles/day, a ~300/month pace, against July's 143.** Cadence has more than doubled, not plateaued.
+**August so far (through 2026-08-16, deduped by `battle_id`):**
 
-Two consequences for the pitch:
+- **~80 battles in 16 days (~5/day)** - a **~150/month pace, in line with July's 143.** The Apr-Jul plateau reading below extends through August: cadence is stable, not surging and not decaying.
+- **10.01 SOL of battle volume in those 16 days** (~19-20 SOL/month pace, versus July's 29.68).
+- **The stake profile shifted:** August's median stake is **0.0768 SOL, roughly 3x the lifetime median of 0.0246**, while only **one** August battle cleared 1 SOL (top three: 1.33, 0.79, 0.66). Broader mid-stakes participation, fewer whale events - which is exactly the mitigation the "whale dependence" section below says the platform needs, showing up in the data unprompted. Worth one deck slide if it holds a full month.
+- Whether the June-July **treasury** step-up (5.4/5.2 SOL inflow) held through August is still open - the treasury CSV ends 2026-07-21 and inflow is not derivable from the battle feed. Next loop iteration.
 
-1. **The strongest month of the product's life is happening right now and is absent from every table below.** The "Plateau (Apr-Jul)" phase reading stands for those months, but the deck's growth slide should lead with August.
-2. **August volumes are not yet computed** - the feed shows the battles but this pass counted rather than parsed stakes. Whether the monetization step-up (June-July's 5.4/5.2 SOL inflow) held through the August surge is now the single most important open number. Next loop iteration.
+**Self-correction, logged because the wrong number was briefly pushed:** this update's first version claimed "~196 battles since Jul 29, 160 in 16 days - a breakout." That was a counting artifact - each battle renders its date **twice** in the page markup, and a text-level date count doubled everything. Verified: page 1 holds exactly **20 distinct `battle_id`s against 40 date strings**. The corrected figures above come from distinct ids. The lesson is the repo parser's own: extract the embedded JSON, never count the rendered page.
 
 Reconciliation progress on the 1,161-vs-1,245 discrepancy: read from source, `scripts/ww-battles-fetch.ts` applies **no filter** - it merges everything the public feed serves, fail-loud on parse errors. So the dataset faithfully mirrors the feed, and **the ICM box's 1,245/524.15 is the outlier** - it cannot have come from this feed on its stated date (the feed-derived count was lower, later). The box number's provenance is unknown; treat the feed-derived figures as primary until someone shows where 1,245 came from.
 

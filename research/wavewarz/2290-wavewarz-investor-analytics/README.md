@@ -38,6 +38,20 @@ Raw dataset: `~/Desktop/repos/wwtracker/public/ww-battles.json` - 1,161 battle r
 2. **Artist handles exist on only 212 of 1,161 battles** - handle capture evidently began around June 2026. Every artist metric below covers that window only, and the 5 largest battles of all time have no artist attribution at all.
 3. **This dataset disagrees with the public ICM box.** The box (doc 2286, repo source dated 2026-07-16) claims **1,245 battles / 524.15 SOL lifetime**; this file holds **1,161 / 393.17 SOL** through a *later* date. Possibilities: the box counted something this file filters (cancelled battles, off-chain events), or one of the two is wrong. **UNRESOLVED - reconcile before either number is ever said to an investor**, because a diligence pass that finds the discrepancy first costs credibility, not just a correction.
 
+## UPDATE 2026-08-16, same day: August is a breakout, and the "plateau" framing below is already wrong
+
+The first loop iteration fetched the live Battle Intelligence feed (the tracker's own upstream, `wavewarz-intelligence.vercel.app/battles`) to measure what the 18-day-stale dataset is missing:
+
+- **~196 battles since 2026-07-29** - pages 1-4 of the feed are *entirely August*, **160 battles in the first 16 days**.
+- That is **~10 battles/day, a ~300/month pace, against July's 143.** Cadence has more than doubled, not plateaued.
+
+Two consequences for the pitch:
+
+1. **The strongest month of the product's life is happening right now and is absent from every table below.** The "Plateau (Apr-Jul)" phase reading stands for those months, but the deck's growth slide should lead with August.
+2. **August volumes are not yet computed** - the feed shows the battles but this pass counted rather than parsed stakes. Whether the monetization step-up (June-July's 5.4/5.2 SOL inflow) held through the August surge is now the single most important open number. Next loop iteration.
+
+Reconciliation progress on the 1,161-vs-1,245 discrepancy: read from source, `scripts/ww-battles-fetch.ts` applies **no filter** - it merges everything the public feed serves, fail-loud on parse errors. So the dataset faithfully mirrors the feed, and **the ICM box's 1,245/524.15 is the outlier** - it cannot have come from this feed on its stated date (the feed-derived count was lower, later). The box number's provenance is unknown; treat the feed-derived figures as primary until someone shows where 1,245 came from.
+
 ## Growth: the story is cadence, then monetization
 
 Monthly battles and volume, complete:

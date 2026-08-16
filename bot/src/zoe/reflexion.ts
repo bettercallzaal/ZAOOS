@@ -26,6 +26,7 @@
 import { callClaudeCli } from '../hermes/claude-cli';
 import { ZOE_DEFAULT_MODEL, ZOE_HARD_MODEL } from './types';
 import type { ZoeContext } from './types';
+import { featureRan } from './feature-ran';
 
 export type MemoryFile = 'human.md' | 'persona.md';
 export type Confidence = 'high' | 'medium' | 'low';
@@ -332,6 +333,7 @@ export async function runReflexion(input: ReflexionInput): Promise<ReflexionResu
     voice_note_request: needsVoiceNote.length > 0 ? renderVoiceNoteRequest(needsVoiceNote) : null,
   };
 
+  featureRan('reflexion', `${highConfidence.length} high-confidence`);
   return {
     plan,
     model: result.model,

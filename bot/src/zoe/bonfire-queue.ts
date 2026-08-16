@@ -17,6 +17,7 @@
  */
 
 import { remember, type RememberResult } from './recall';
+import { featureRan } from './feature-ran';
 
 const QUEUE_KEY = 'zg:bonfire:pending';
 const REST_URL = process.env.ZG_UPSTASH_REST_URL ?? '';
@@ -149,7 +150,11 @@ export function buildEpisode(item: BonfireSubmission): {
 
 /** Promote a submission into the canonical graph (episode/create). */
 export async function promoteSubmission(item: BonfireSubmission): Promise<RememberResult> {
-  return remember(buildEpisode(item));
+  const r = await remember(buildEpisode(item));
+  // remember() can return ok:false (Bonfire down) or skipped:true (secret or
+  // PII scan). Neither is a promotion, so neither announces.
+  if (r.ok) featureRan('bonfire-promote', item.type);
+  return r;
 }
 
 /** Telegram render of a submission under review. */

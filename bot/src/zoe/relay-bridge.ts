@@ -24,6 +24,7 @@
  */
 
 import { sendChunkedToTelegram } from './tg-chunk';
+import { featureRan } from './feature-ran';
 
 const HUB_LEGACY_ID = '9000';
 
@@ -158,7 +159,10 @@ export async function saveHubRelays(_id: string, relays: RelayMsg[]): Promise<bo
 export async function sendRelayReply(lane: string, msg: string, ts: string): Promise<boolean> {
   const hub = await fetchHub();
   if (!hub) return false;
-  return saveHubRelays(hub.id, appendReply(hub.relays, lane, msg, ts));
+  const saved = await saveHubRelays(hub.id, appendReply(hub.relays, lane, msg, ts));
+  // Only when the write LANDED. A failed save is not a relay.
+  if (saved) featureRan('relay-bridge', lane);
+  return saved;
 }
 
 /**

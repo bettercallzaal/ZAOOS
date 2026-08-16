@@ -61,6 +61,14 @@ const AUTONOMOUS_FEATURES = [
   'dispatch.ts',
   'proactive.ts',
   'team-tracker.ts',
+  // Batch 2, 2026-08-15. Only four, because re-reading the candidates found
+  // curator.ts, task-teammate-ack.ts and task-comment-replies.ts already log
+  // their counts on the success path - they never needed one, and the audit
+  // classifier had mislabelled them.
+  'daily-note.ts',
+  'reflexion.ts',
+  'relay-bridge.ts',
+  'bonfire-queue.ts',
 ];
 
 function sourceOf(file: string): string {

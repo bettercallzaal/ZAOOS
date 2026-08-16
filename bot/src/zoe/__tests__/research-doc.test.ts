@@ -104,9 +104,13 @@ describe('commitResearchDoc', () => {
     mockMkdir.mockResolvedValue(undefined);
     mockWriteFile.mockResolvedValue(undefined);
     mockAppendFile.mockResolvedValue(undefined);
-    // gh api returns PR titles with doc numbers
+    // Call order matters now: nextDocNum asks origin/main FIRST (fetch, then
+    // ls-tree), and only falls back to the disk scan and PR titles when the
+    // remote read yields nothing. An empty ls-tree here exercises that fallback.
     mockExec
-      .mockResolvedValueOnce(execOk('doc 750: some research\ndoc 755: more research\n'))
+      .mockResolvedValueOnce(execOk(''))  // git fetch origin main
+      .mockResolvedValueOnce(execOk(''))  // git ls-tree origin/main research/ - empty
+      .mockResolvedValueOnce(execOk('doc 750: some research\ndoc 755: more research\n'))  // gh api PR titles
       .mockResolvedValue(execOk('https://github.com/org/repo/pull/756\n'));
     const r = await commitResearchDoc({ question: 'Another question', findings: '...' });
     expect(r.ok).toBe(true);

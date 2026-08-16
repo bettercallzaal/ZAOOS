@@ -9,7 +9,7 @@ original-query: "Repo/web improvement: How should a niche Web3/music-creator hub
 tier: STANDARD
 ---
 
-# 2249 - Repo/web improvement: How should a niche Web3/music-creator hub earn t
+# 2289 - Repo/web improvement: How should a niche Web3/music-creator hub earn t
 
 > Drafted by ZOE's research-worker from "Repo/web improvement: How should a niche Web3/music-creator hub earn topical backlinks and domain authority to rank for non-branded queries like "Web3 artist resources"?". Auto-committed to main for durability; review + deepen as needed.
 

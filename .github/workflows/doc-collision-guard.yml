@@ -23,10 +23,24 @@ name: Doc number collision guard
 # (renaming them would break the cross-reference link graph), so this guard
 # compares added directories against main rather than auditing main itself.
 
+# WHY THERE IS NO `paths:` FILTER
+#
+# There was one, scoped to research/**, and it made this check impossible to
+# REQUIRE. A required check that does not report leaves a PR blocked forever
+# rather than failing it, so a path-filtered check can never be mandatory - it
+# simply does not run on a code-only PR.
+#
+# That was not theoretical. On 2026-08-15 PR #3101 carried `collision: fail`
+# for a genuine duplicate (doc 2249) and `automerge` still read green, because
+# collision was not among the required checks and could not be made one.
+#
+# The job is already cheap and safe to run on every PR: if the diff adds no new
+# research doc directories it prints "Nothing to check" and exits 0. Removing
+# the filter costs one checkout per PR and buys a check that can actually be
+# binding.
+
 on:
   pull_request:
-    paths:
-      - "research/**"
 
 jobs:
   collision:

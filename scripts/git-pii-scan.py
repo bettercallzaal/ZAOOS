@@ -60,7 +60,17 @@ URL_RE = re.compile(r"https?://|www\.")
 PATTERNS: dict[str, tuple[str, bool]] = {
     # name: (regex, skip_on_uuid_or_url)
     "email": (r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", False),
-    "us_phone": (r"\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b", True),
+    # NANP: neither the area code nor the exchange code may begin with 0 or 1.
+    # The old pattern allowed any digits, so a bare 10-digit run matched - and
+    # bare 10-digit runs in this repo are overwhelmingly Unix timestamps. It
+    # blocked doc 2288 on the filenames loops-report.sh.bak-1786325436 and
+    # -1786325477, and the header above already records that BOTH historical
+    # us_phone hits were false positives too. Requiring [2-9] on both codes
+    # costs no real coverage: a number those digits would reject is not a
+    # dialable US number. The (?<!\d) also stops a match STARTING mid-run: a
+    # 13-digit millisecond timestamp like draft-1786759226095 contains a
+    # perfectly valid-looking 10-digit tail, which the NANP fix alone allowed.
+    "us_phone": (r"(?<![\d])\+?1?[\s.-]?\(?[2-9]\d{2}\)?[\s.-]?[2-9]\d{2}[\s.-]?\d{4}\b", True),
     # The rule's own regex was r"\+\d{1,3}\s*\d{6,}", which requires the digits
     # to run together and therefore MISSES a normally-formatted number like
     # "+44 208 8901282". Widened to allow internal spaces, dots and hyphens.

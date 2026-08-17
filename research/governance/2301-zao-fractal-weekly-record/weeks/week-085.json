@@ -9,7 +9,45 @@
   "groups": [
     {
       "group": 1,
+      "mode": "even_split",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0xeaa5d0d48330289f1542315b909875d1a91bee18a0ceb84a2bc0eece35bef35f",
+      "results": [
+        {
+          "name": "Collinsx",
+          "wallet": "0xE11C28F65177481A7CFE165E214c32482B10191D",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": {
+            "tx": "0xeaa5d0d48330289f1542315b909875d1a91bee18a0ceb84a2bc0eece35bef35f",
+            "block": 147529447,
+            "minted_at": "2026-02-09T17:21:11.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "RJ",
+          "wallet": "0x0f02419a4AeddBfE3F97E535C1C53008b54F89e3",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": {
+            "tx": "0xeaa5d0d48330289f1542315b909875d1a91bee18a0ceb84a2bc0eece35bef35f",
+            "block": 147529447,
+            "minted_at": "2026-02-09T17:21:11.000000Z"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 1,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x12d230fb406298e826497250f6b5de15c5c004f703b162f6a2d0bf4d32040c20",
       "results": [
         {
           "name": "Meta Mu",
@@ -19,39 +57,11 @@
           "respect": 110,
           "settled": {
             "tx": "0x12d230fb406298e826497250f6b5de15c5c004f703b162f6a2d0bf4d32040c20",
-            "token_id": "0x0000000a00000000000000542d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
-            "minted_at": "2026-02-09T17:22:01+00:00"
+            "block": 147529472,
+            "minted_at": "2026-02-09T17:22:01.000000Z"
           },
           "title": null,
           "reason": null
-        },
-        {
-          "name": "Collinsx",
-          "wallet": "0xE11C28F65177481A7CFE165E214c32482B10191D",
-          "rank": 1,
-          "level": 6,
-          "respect": 110,
-          "settled": {
-            "tx": "0xeaa5d0d48330289f1542315b909875d1a91bee18a0ceb84a2bc0eece35bef35f",
-            "token_id": "0x0000000a0000000000000054e11c28f65177481a7cfe165e214c32482b10191d",
-            "minted_at": "2026-02-09T17:21:11+00:00"
-          },
-          "title": "Meeting 85 Group 1 Respect Intro for Collinsx",
-          "reason": "Meeting 85 Group 1 Respect Award for participating in the respect Game"
-        },
-        {
-          "name": "RJ",
-          "wallet": "0x0f02419a4AeddBfE3F97E535C1C53008b54F89e3",
-          "rank": 1,
-          "level": 6,
-          "respect": 110,
-          "settled": {
-            "tx": "0xeaa5d0d48330289f1542315b909875d1a91bee18a0ceb84a2bc0eece35bef35f",
-            "token_id": "0x0000000a00000000000000540f02419a4aeddbfe3f97e535c1c53008b54f89e3",
-            "minted_at": "2026-02-09T17:21:11+00:00"
-          },
-          "title": "Meeting 85 Group 1 Respect Intro for Emily",
-          "reason": "Meeting 85 Group 1 Respect Award for participating in the respect Game"
         },
         {
           "name": "Ohnahji B",
@@ -61,8 +71,8 @@
           "respect": 68,
           "settled": {
             "tx": "0x12d230fb406298e826497250f6b5de15c5c004f703b162f6a2d0bf4d32040c20",
-            "token_id": "0x0000000a000000000000005464a15b1d2de581097cb48e5d82619203e24bb3e1",
-            "minted_at": "2026-02-09T17:22:01+00:00"
+            "block": 147529472,
+            "minted_at": "2026-02-09T17:22:01.000000Z"
           },
           "title": null,
           "reason": null
@@ -75,8 +85,8 @@
           "respect": 42,
           "settled": {
             "tx": "0x12d230fb406298e826497250f6b5de15c5c004f703b162f6a2d0bf4d32040c20",
-            "token_id": "0x0000000a00000000000000547234c36a71ec237c2ae7698e8916e0735001e9af",
-            "minted_at": "2026-02-09T17:22:01+00:00"
+            "block": 147529472,
+            "minted_at": "2026-02-09T17:22:01.000000Z"
           },
           "title": null,
           "reason": null
@@ -89,8 +99,8 @@
           "respect": 26,
           "settled": {
             "tx": "0x12d230fb406298e826497250f6b5de15c5c004f703b162f6a2d0bf4d32040c20",
-            "token_id": "0x0000000a00000000000000548d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
-            "minted_at": "2026-02-09T17:22:01+00:00"
+            "block": 147529472,
+            "minted_at": "2026-02-09T17:22:01.000000Z"
           },
           "title": null,
           "reason": null
@@ -102,13 +112,17 @@
   "camera_on": [],
   "photos": [],
   "attendance": null,
+  "participants": 6,
+  "respect_total": 466,
+  "unnamed_wallets": 0,
   "sources": [
-    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",
-  "notes": [],
-  "participants": 6,
-  "respect_total": 466,
-  "unnamed_wallets": 0
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
 }

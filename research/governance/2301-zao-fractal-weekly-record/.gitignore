@@ -1,0 +1,4 @@
+# Rebuildable Blockscout response cache (3.4MB, mostly address-tag metadata).
+# Nothing depends on it: `python3 fetch-zor-onchain.py --fetch` re-creates it.
+# The committed evidence is zor-awards.json (normalized) + weeks/.
+zor-transfers-raw.json

@@ -1,7 +1,7 @@
 {
-  "week": 78,
-  "period_number": 77,
-  "date": "2025-12-22",
+  "week": 92,
+  "period_number": 91,
+  "date": "2026-03-30",
   "era": "zor",
   "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
   "chain": "optimism",
@@ -10,47 +10,33 @@
     {
       "group": 1,
       "mode": "ranked",
-      "group_source": "ordaoawards.csv",
-      "settlement_tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
       "results": [
         {
-          "name": "Prizem",
-          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "name": "Motomoto",
+          "wallet": "0x849e1C0b2460979D2f7c77B87b90C65C70406421",
           "rank": 1,
           "level": 6,
           "respect": 110,
           "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
           },
           "title": null,
           "reason": null
         },
         {
-          "name": "CandyToyBox",
-          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "name": "SwarthyHatter",
+          "wallet": "0x4D16FCE1BD6E327AE31398CE9A2c4E12C077ecB1",
           "rank": 2,
           "level": 5,
           "respect": 68,
           "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
-          },
-          "title": null,
-          "reason": null
-        },
-        {
-          "name": "Steve Strange",
-          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
-          "rank": 3,
-          "level": 4,
-          "respect": 42,
-          "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
           },
           "title": null,
           "reason": null
@@ -58,13 +44,13 @@
         {
           "name": "Zach L.",
           "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
-          "rank": 4,
-          "level": 3,
-          "respect": 26,
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
           "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
           },
           "title": null,
           "reason": null
@@ -72,13 +58,27 @@
         {
           "name": "Ohnahji B",
           "wallet": "0x64A15b1D2DE581097CB48e5D82619203E24BB3e1",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
           "rank": 5,
           "level": 2,
           "respect": 16,
           "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
           },
           "title": null,
           "reason": null
@@ -90,9 +90,9 @@
           "level": 1,
           "respect": 10,
           "settled": {
-            "tx": "0x61e8878fa8f3dcc146e92b722f327a68bfb607e8a7ac8a22923fec7d5ce01337",
-            "block": 145422583,
-            "minted_at": "2025-12-22T22:52:23.000000Z"
+            "tx": "0x8ae4ed904ec385de7359276596bdf1970c6b4dd41cf837984a9e2548d7db845c",
+            "block": 149644300,
+            "minted_at": "2026-03-30T16:16:17.000000Z"
           },
           "title": null,
           "reason": null
@@ -109,7 +109,6 @@
   "unnamed_wallets": 0,
   "sources": [
     "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
-    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",

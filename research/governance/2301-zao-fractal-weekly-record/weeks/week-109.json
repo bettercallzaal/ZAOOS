@@ -1,7 +1,7 @@
 {
-  "week": 84,
-  "period_number": 83,
-  "date": "2026-02-02",
+  "week": 109,
+  "period_number": 108,
+  "date": "2026-08-10",
   "era": "zor",
   "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
   "chain": "optimism",
@@ -10,47 +10,47 @@
     {
       "group": 1,
       "mode": "ranked",
-      "group_source": "ordaoawards.csv",
-      "settlement_tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0x39cc343b78fe97154a89337f3528bb83ce26594d2c21d9bd536e512533703eec",
       "results": [
         {
-          "name": "CandyToyBox",
-          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "name": "Motomoto",
+          "wallet": "0x849e1C0b2460979D2f7c77B87b90C65C70406421",
           "rank": 1,
           "level": 6,
           "respect": 110,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x39cc343b78fe97154a89337f3528bb83ce26594d2c21d9bd536e512533703eec",
+            "block": 155400624,
+            "minted_at": "2026-08-10T22:13:45.000000Z"
           },
           "title": null,
           "reason": null
         },
         {
-          "name": "Steve Strange",
-          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "name": "john blackwell",
+          "wallet": "0x03726e10565402A1137960ba06681754BE7Fe05f",
           "rank": 2,
           "level": 5,
           "respect": 68,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x39cc343b78fe97154a89337f3528bb83ce26594d2c21d9bd536e512533703eec",
+            "block": 155400624,
+            "minted_at": "2026-08-10T22:13:45.000000Z"
           },
           "title": null,
           "reason": null
         },
         {
-          "name": "SwarthyHatter",
-          "wallet": "0x4D16FCE1BD6E327AE31398CE9A2c4E12C077ecB1",
+          "name": null,
+          "wallet": "0xEdc5999b1Ec1759970a681B9F5C197dd0B474016",
           "rank": 3,
           "level": 4,
           "respect": 42,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x39cc343b78fe97154a89337f3528bb83ce26594d2c21d9bd536e512533703eec",
+            "block": 155400624,
+            "minted_at": "2026-08-10T22:13:45.000000Z"
           },
           "title": null,
           "reason": null
@@ -62,9 +62,9 @@
           "level": 3,
           "respect": 26,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x39cc343b78fe97154a89337f3528bb83ce26594d2c21d9bd536e512533703eec",
+            "block": 155400624,
+            "minted_at": "2026-08-10T22:13:45.000000Z"
           },
           "title": null,
           "reason": null
@@ -78,10 +78,9 @@
   "attendance": null,
   "participants": 4,
   "respect_total": 246,
-  "unnamed_wallets": 0,
+  "unnamed_wallets": 1,
   "sources": [
     "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
-    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",

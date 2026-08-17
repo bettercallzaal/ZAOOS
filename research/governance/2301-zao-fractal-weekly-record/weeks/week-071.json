@@ -1,0 +1,53 @@
+{
+  "week": 71,
+  "period_number": 70,
+  "date": "2025-10-17",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 0,
+  "groups": [],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "participants": 0,
+  "respect_total": 0,
+  "unnamed_wallets": 0,
+  "sources": [
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "reversed_awards": [
+    {
+      "name": "Jose (Joesph Goats)",
+      "wallet": "0x29185eB8cfD22Aa719529217bFbadE61677e0Ad2",
+      "respect": 55,
+      "minted_at": "2025-10-17T01:43:09.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    },
+    {
+      "name": null,
+      "wallet": "0xc79797f76F059753C57D931FEC7961BA437B38A7",
+      "respect": 34,
+      "minted_at": "2025-10-17T01:43:09.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    },
+    {
+      "name": "Hurric4n3ike",
+      "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
+      "respect": 21,
+      "minted_at": "2025-10-17T01:43:09.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    }
+  ],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched.",
+    "NO LIVE AWARDS: every ZOR award minted for this week was later burned. Settlement was attempted and fully reversed - this week is not a gap in the record, it is a reversal.",
+    "3 award(s) for this week were minted and later BURNED on-chain; they are excluded from participants and respect_total and listed in reversed_awards."
+  ]
+}

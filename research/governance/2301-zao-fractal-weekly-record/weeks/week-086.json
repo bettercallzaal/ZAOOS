@@ -10,21 +10,9 @@
     {
       "group": 1,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
       "results": [
-        {
-          "name": "RJ",
-          "wallet": "0x0f02419a4AeddBfE3F97E535C1C53008b54F89e3",
-          "rank": 1,
-          "level": 6,
-          "respect": 110,
-          "settled": {
-            "tx": "0x35edf1eef4e9301c2ba8f1c610bd209d6c6f402705071826a2402f5fc689f0bf",
-            "token_id": "0x0000000a00000000000000550f02419a4aeddbfe3f97e535c1c53008b54f89e3",
-            "minted_at": "2026-02-16T23:57:29+00:00"
-          },
-          "title": "Meeting 86 Group 2 Respect Intro for RJ",
-          "reason": "Meeting 86 Group 2 Respect Intro Award for participating in the respect Game"
-        },
         {
           "name": "Hurric4n3ike",
           "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
@@ -33,8 +21,8 @@
           "respect": 110,
           "settled": {
             "tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
-            "token_id": "0x0000000a000000000000005529f5dee65e1fb856b816eab4f0b702c10e5eaa34",
-            "minted_at": "2026-02-16T23:52:51+00:00"
+            "block": 147843597,
+            "minted_at": "2026-02-16T23:52:51.000000Z"
           },
           "title": null,
           "reason": null
@@ -47,8 +35,8 @@
           "respect": 68,
           "settled": {
             "tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
-            "token_id": "0x0000000a000000000000005529185eb8cfd22aa719529217bfbade61677e0ad2",
-            "minted_at": "2026-02-16T23:52:51+00:00"
+            "block": 147843597,
+            "minted_at": "2026-02-16T23:52:51.000000Z"
           },
           "title": null,
           "reason": null
@@ -61,8 +49,8 @@
           "respect": 42,
           "settled": {
             "tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
-            "token_id": "0x0000000a0000000000000055b7f4b9caba6bb0aeaa2b5d8df23e2b59c192bdbb",
-            "minted_at": "2026-02-16T23:52:51+00:00"
+            "block": 147843597,
+            "minted_at": "2026-02-16T23:52:51.000000Z"
           },
           "title": null,
           "reason": null
@@ -75,8 +63,8 @@
           "respect": 26,
           "settled": {
             "tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
-            "token_id": "0x0000000a000000000000005503726e10565402a1137960ba06681754be7fe05f",
-            "minted_at": "2026-02-16T23:52:51+00:00"
+            "block": 147843597,
+            "minted_at": "2026-02-16T23:52:51.000000Z"
           },
           "title": null,
           "reason": null
@@ -89,8 +77,30 @@
           "respect": 16,
           "settled": {
             "tx": "0xe7ef0d49153ff64c9ced21c375c45118cf8598b884c9df2a2ff9b0570e654950",
-            "token_id": "0x0000000a00000000000000557234c36a71ec237c2ae7698e8916e0735001e9af",
-            "minted_at": "2026-02-16T23:52:51+00:00"
+            "block": 147843597,
+            "minted_at": "2026-02-16T23:52:51.000000Z"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 1,
+      "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x35edf1eef4e9301c2ba8f1c610bd209d6c6f402705071826a2402f5fc689f0bf",
+      "results": [
+        {
+          "name": "RJ",
+          "wallet": "0x0f02419a4AeddBfE3F97E535C1C53008b54F89e3",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x35edf1eef4e9301c2ba8f1c610bd209d6c6f402705071826a2402f5fc689f0bf",
+            "block": 147843736,
+            "minted_at": "2026-02-16T23:57:29.000000Z"
           },
           "title": null,
           "reason": null
@@ -100,6 +110,8 @@
     {
       "group": 2,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x66c6fea69603301ddaaa938d700babee09ebfce1b69f74f6b066fdd20eb795bf",
       "results": [
         {
           "name": "Jake K",
@@ -109,8 +121,8 @@
           "respect": 110,
           "settled": {
             "tx": "0x66c6fea69603301ddaaa938d700babee09ebfce1b69f74f6b066fdd20eb795bf",
-            "token_id": "0x0000000a00000000000000555c4a053de47c69f033acec58c2bd1aa4d683e5aa",
-            "minted_at": "2026-02-16T23:56:49+00:00"
+            "block": 147843716,
+            "minted_at": "2026-02-16T23:56:49.000000Z"
           },
           "title": null,
           "reason": null
@@ -123,8 +135,8 @@
           "respect": 68,
           "settled": {
             "tx": "0x66c6fea69603301ddaaa938d700babee09ebfce1b69f74f6b066fdd20eb795bf",
-            "token_id": "0x0000000a0000000000000055fab9a3d37999e12252b47468d2ffd4be15936012",
-            "minted_at": "2026-02-16T23:56:49+00:00"
+            "block": 147843716,
+            "minted_at": "2026-02-16T23:56:49.000000Z"
           },
           "title": null,
           "reason": null
@@ -137,8 +149,8 @@
           "respect": 42,
           "settled": {
             "tx": "0x66c6fea69603301ddaaa938d700babee09ebfce1b69f74f6b066fdd20eb795bf",
-            "token_id": "0x0000000a00000000000000558d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
-            "minted_at": "2026-02-16T23:56:49+00:00"
+            "block": 147843716,
+            "minted_at": "2026-02-16T23:56:49.000000Z"
           },
           "title": null,
           "reason": null
@@ -150,13 +162,17 @@
   "camera_on": [],
   "photos": [],
   "attendance": null,
+  "participants": 9,
+  "respect_total": 592,
+  "unnamed_wallets": 0,
   "sources": [
-    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",
-  "notes": [],
-  "participants": 9,
-  "respect_total": 592,
-  "unnamed_wallets": 0
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
 }

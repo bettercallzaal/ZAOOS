@@ -382,6 +382,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
                       ),
                     },
                   }),
+                pinMessage: (messageId) =>
+                  opts.bot.api.pinChatMessage(opts.zaalTgId, messageId, {
+                    disable_notification: true,
+                  }),
+                unpinMessage: (messageId) => opts.bot.api.unpinChatMessage(opts.zaalTgId, messageId),
               }),
           );
           // Announce the FIRST tick after a boot whatever it decided, so a

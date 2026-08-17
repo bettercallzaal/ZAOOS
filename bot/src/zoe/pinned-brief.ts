@@ -135,8 +135,11 @@ export type PinResult =
  *               re-send and re-pin rather than going silent, because a brief
  *               that quietly stops updating is worse than no brief: it shows
  *               stale state as if it were current.
+ *
+ * When skipPin is true (2026-08-17), existing messages are edited in place but
+ * NEW messages are not pinned - grill pin takes precedence over brief pin.
  */
-export async function syncPinnedBrief(text: string, deps: PinDeps): Promise<PinResult> {
+export async function syncPinnedBrief(text: string, deps: PinDeps, skipPin = false): Promise<PinResult> {
   const statePath = deps.statePath ?? PIN_STATE_PATH;
   const existing = await readPinState(statePath);
 
@@ -161,16 +164,18 @@ export async function syncPinnedBrief(text: string, deps: PinDeps): Promise<PinR
 
   try {
     const sent = await deps.sendMessage(text);
-    try {
-      await deps.pinMessage(sent.message_id);
-    } catch (error: unknown) {
-      // The message exists and is readable even unpinned - degraded, not broken,
-      // so say so loudly and keep the id rather than throwing the brief away.
-      const msg = error instanceof Error ? error.message : String(error);
-      console.error(`[zoe/pinned-brief] sent but pin failed: ${msg}`);
+    if (!skipPin) {
+      try {
+        await deps.pinMessage(sent.message_id);
+      } catch (error: unknown) {
+        // The message exists and is readable even unpinned - degraded, not broken,
+        // so say so loudly and keep the id rather than throwing the brief away.
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error(`[zoe/pinned-brief] sent but pin failed: ${msg}`);
+      }
     }
     await writePinState({ messageId: sent.message_id, lastText: text }, statePath);
-    featureRan('pinned-brief', `pinned ${sent.message_id}`);
+    featureRan('pinned-brief', skipPin ? `sent ${sent.message_id} (no pin)` : `pinned ${sent.message_id}`);
     return { action: 'pinned', messageId: sent.message_id };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

@@ -9,7 +9,7 @@ original-query: "ZM show runbook adoption - the show ledger lives at ~/.zao/draf
 tier: STANDARD
 ---
 
-# 2301 - The ZM show runbook, and the per-day prep that makes 5pm automatic
+# 2304 - The ZM show runbook, and the per-day prep that makes 5pm automatic
 
 > **Goal:** Make the M-F 5pm show survivable without heroics: the runbook as a durable doc, a prep checklist per weekday, and today's show-11 sheet - prep only, promo HELD.
 

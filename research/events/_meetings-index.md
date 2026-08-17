@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-06 | Matteo x Zaal x Candy - Livepeer, web3 radio, Harberger ads | BCZ / WaveWarZ | Zaal, Matteo Tambussi, Samantha | [2297](2297-matteo-livepeer-web3radio-harberger-aug6/) | 4 |
 | 2026-08-04 | Dylan x Rizzle x Zaal - Clanker v5, droids, practice-launch plan | ZAO Devz | Zaal, Epic Dylan, Rizzle, Samantha | [2296](2296-dylan-rizzle-clanker-v5-token-planning-aug4/) | 7 |
 | 2026-08-15 | Steve Peer x Zaal - Black Moon becomes the second stage | ZAOstock | Zaal, Steve Peer | [2295](2295-steve-peer-black-moon-logistics-aug15/) | 7 |
 | 2026-08-14 | Yerb x Zaal - tokenless Empire for ZAOstock launched live | ZAOstock | Zaal, Jordan Oram, 0xquan, Samantha | [2287](2287-yerb-empire-tokenless-aug14/) | 6 |

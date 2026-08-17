@@ -75,6 +75,9 @@ export interface GrillState {
    * (top-N-not-96). Reset when the date rolls. /grill and post-answer advances
    * bypass the cap - it only gates unsolicited cron pushes. */
   daySurfaced?: { date: string; count: number };
+  /** Recently-answered cards that can still accept post-answer context replies.
+   * Maps message_id -> {key, taskKey, answeredAt}. Entries pruned after 24h. */
+  recentAnswered?: Record<string, { key: string; taskKey: string; answeredAt: string }>;
 }
 
 /** ZOE proactively pushes at most this many items/day (the "top few, not 96"
@@ -223,8 +226,20 @@ export function askCooldownMs(ageMs: number): number {
   return ASK_COOLDOWN_MS;
 }
 
-const DEFAULT_STATE: GrillState = { items: {}, activeKey: null, lastAskedAt: null };
+const DEFAULT_STATE: GrillState = { items: {}, activeKey: null, lastAskedAt: null, recentAnswered: {} };
 const stateFile = () => join(homedir(), '.zao', 'zoe', 'grill_state.json');
+
+/** Prune answered cards older than 24h from the recentAnswered map. */
+function pruneRecentAnswered(state: GrillState, now: number): void {
+  const ANSWER_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+  if (!state.recentAnswered) return;
+  for (const [msgId, record] of Object.entries(state.recentAnswered)) {
+    const age = now - Date.parse(record.answeredAt);
+    if (age > ANSWER_TTL_MS) {
+      delete state.recentAnswered[msgId];
+    }
+  }
+}
 
 export async function readGrillState(): Promise<GrillState> {
   try {
@@ -332,8 +347,8 @@ export function formatGrill(
     item.kind === 'event'
       ? '\n\nReply if you want me to prep or remind you for this.'
       : item.kind === 'review'
-        ? '\n\nReply with a note, or tap Reviewed to clear it.'
-        : '\n\nReply with your call and I log it + move it off your plate. Or use the buttons.';
+        ? '\n\nReply with a note, or tap Reviewed to clear it. You can also reply after tapping a button to add context.'
+        : '\n\nReply with your call and I log it + move it off your plate. Or use the buttons. Reply after tapping a button to add context.';
 
   // If the decision has baked-in options ("pick 1/2/3", "yes/no"), make THOSE
   // the buttons so Zaal answers in one tap. Otherwise a kind-specific resolve
@@ -467,11 +482,22 @@ export async function applyGrillAction(
 ): Promise<string> {
   const state = await readGrillState();
   const key = state.activeKey;
+  const messageId = state.activeMessageId;
   if (!key || !state.items[key]) return 'Nothing active.';
   if (action === 'done') state.items[key] = { ...state.items[key], status: 'done' };
   else if (action === 'skip') state.items[key] = { ...state.items[key], status: 'skipped' };
   else state.items[key] = { ...state.items[key], status: 'snoozed', snoozeUntil: new Date(now + SNOOZE_MS).toISOString() };
-  const messageIdToUnpin = state.activeMessageId;
+  // Track answered cards so replies to them can add context (Feature 1)
+  if (action === 'done' && messageId) {
+    if (!state.recentAnswered) state.recentAnswered = {};
+    state.recentAnswered[String(messageId)] = {
+      key,
+      taskKey: key,
+      answeredAt: new Date(now).toISOString(),
+    };
+    pruneRecentAnswered(state, now);
+  }
+  const messageIdToUnpin = messageId;
   state.activeKey = null;
   state.activeMessageId = null;
   await writeGrillState(state);
@@ -494,9 +520,20 @@ export async function applyGrillAnswer(
   const state = await readGrillState();
   const key = state.activeKey;
   const title = state.activeTitle ?? null;
+  const messageId = state.activeMessageId;
   if (!key || !state.items[key]) return { note: 'Nothing active to answer.', key: null, title: null, value };
   state.items[key] = { ...state.items[key], status: 'done', answer: value };
-  const messageIdToUnpin = state.activeMessageId;
+  // Track answered cards so replies to them can add context (Feature 1)
+  if (messageId) {
+    if (!state.recentAnswered) state.recentAnswered = {};
+    state.recentAnswered[String(messageId)] = {
+      key,
+      taskKey: key,
+      answeredAt: new Date(now).toISOString(),
+    };
+    pruneRecentAnswered(state, now);
+  }
+  const messageIdToUnpin = messageId;
   state.activeKey = null;
   state.activeTitle = null;
   state.activeKind = null;
@@ -585,4 +622,28 @@ export async function resolveGrillByReply(
   state.activeMulti = null;
   await writeGrillState(state);
   return { key, kind, title, value: replyText };
+}
+
+/**
+ * Handle a reply to a recently-answered grill card. If the message_id matches a
+ * recently-answered card, return the task key so the caller can append the reply
+ * text as context to the task's notes. Removes the entry from recentAnswered.
+ * Returns null when the message_id is not a recently-answered card (so normal
+ * message handling continues).
+ */
+export async function addContextToRecentAnswer(
+  repliedMessageId: number,
+  replyText: string,
+  now = Date.now(),
+): Promise<{ taskKey: string } | null> {
+  const state = await readGrillState();
+  if (!state.recentAnswered) return null;
+  const msgIdStr = String(repliedMessageId);
+  const record = state.recentAnswered[msgIdStr];
+  if (!record) return null;
+  // Found a recently-answered card - clean it up and return the task key
+  delete state.recentAnswered[msgIdStr];
+  pruneRecentAnswered(state, now);
+  await writeGrillState(state);
+  return { taskKey: record.taskKey };
 }

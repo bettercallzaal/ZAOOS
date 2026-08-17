@@ -371,7 +371,38 @@ export async function applyBacklogAnswer(
     if (!patch.ok) return { ok: false, message: `close failed (${patch.status})` };
     message = v.key === 'done' ? 'Closed.' : 'Dropped.';
   } else if (v.key === 'work') {
-    message = v.note ? `On it: ${v.note.slice(0, 80)}` : 'On it - it comes back at the end for confirmation.';
+    // Feature 2: "Work on it" visible effect - set status to in_progress
+    const taskRead = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=title,metadata`, {
+      headers: c.headers,
+    });
+    if (taskRead.ok) {
+      const rows = (await taskRead.json()) as Array<{ title?: string; metadata?: Record<string, unknown> }>;
+      const task = rows[0];
+      const route = task?.metadata?.route as string | undefined;
+
+      // Set status to in_progress
+      await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
+        method: 'PATCH',
+        headers: { ...c.headers, Prefer: 'return=minimal', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'in_progress' }),
+      }).catch(() => {});
+
+      // Build response message with task title and route meaning
+      const routeMeaning =
+        route === 'agent'
+          ? 'flagged for the fleet - a lane picks it up from the in_progress queue'
+          : route === 'prep'
+            ? 'marked in progress on your board - the prep side lands with your next fleet dispatch'
+            : route === 'human'
+              ? 'marked in progress - waiting for you to work on it'
+              : 'marked in progress';
+
+      message = v.note
+        ? `On it: ${v.note.slice(0, 60)}. ${routeMeaning}`
+        : `Working on: ${task?.title ? task.title.slice(0, 50) : 'the task'}. ${routeMeaning}`;
+    } else {
+      message = v.note ? `On it: ${v.note.slice(0, 80)}` : 'On it - it comes back at the end for confirmation.';
+    }
   } else if (v.key === 'skip') {
     message = 'Skipped - it returns later.';
   } else {

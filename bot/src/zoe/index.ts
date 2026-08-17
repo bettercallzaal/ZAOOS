@@ -25,13 +25,14 @@ import {
   applyGrillAction,
   applyGrillAnswer,
   resolveGrillByReply,
+  addContextToRecentAnswer,
   getActiveGrill,
   matchTypedAnswer,
   toggleGrillMulti,
   commitGrillMulti,
   multiKeyboard,
 } from './grill';
-import { resolveTaskDecision } from '../cockpit/adapters';
+import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
@@ -468,6 +469,48 @@ bot.command('grill', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
+});
+
+// /working - list tasks currently in_progress with how long they've been in that state
+bot.command('working', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  try {
+    const base = process.env.COWORK_TRACKER_URL;
+    const apiKey = process.env.COWORK_TRACKER_KEY;
+    if (!base || !apiKey) {
+      await ctx.reply('Tracker not configured.');
+      return;
+    }
+    const root = base.replace(/\/$/, '');
+    const headers = { apikey: apiKey, Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
+
+    const res = await fetch(
+      `${root}/rest/v1/tasks?status=eq.in_progress&select=id,title,updated_at&order=updated_at.asc&limit=50`,
+      { headers, cache: 'no-store' },
+    );
+    if (!res.ok) {
+      await ctx.reply(`Board query failed (${res.status}).`);
+      return;
+    }
+
+    const tasks = (await res.json()) as Array<{ id: string; title: string; updated_at?: string }>;
+    if (tasks.length === 0) {
+      await ctx.reply('Nothing in progress.');
+      return;
+    }
+
+    const now = Date.now();
+    const lines = tasks.map((t) => {
+      const age = t.updated_at ? Math.floor((now - Date.parse(t.updated_at)) / 60_000) : 0;
+      const ageStr = age < 60 ? `${age}m` : age < 1440 ? `${Math.floor(age / 60)}h` : `${Math.floor(age / 1440)}d`;
+      return `${t.title.slice(0, 50)} (${ageStr})`;
+    });
+
+    await ctx.reply(`In progress (${tasks.length}):\n${lines.join('\n')}`);
+  } catch (e) {
+    console.error('[zoe/working] error:', (e as Error)?.message);
+    await ctx.reply('Something went wrong listing in-progress tasks.');
+  }
 });
 
 // /chatid - report this chat's id + (in a forum topic) its topic thread id, so
@@ -1457,6 +1500,17 @@ bot.on('message:text', async (ctx) => {
         await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
           console.error('[zoe/grill] advance failed:', (e as Error)?.message),
         );
+        return;
+      }
+
+      // Feature 1: Reply-after-button context. Check if Zaal replied to a recently-answered
+      // grill card to add context. If so, append the reply text to the task's notes.
+      const recentAnswer = await addContextToRecentAnswer(replyToId, text.trim());
+      if (recentAnswer) {
+        await appendTaskContext(recentAnswer.taskKey, text.trim()).catch((e) =>
+          console.error('[zoe/grill] context append failed:', (e as Error)?.message),
+        );
+        await ctx.reply(`Added context to the task.`);
         return;
       }
 

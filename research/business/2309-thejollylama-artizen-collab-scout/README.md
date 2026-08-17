@@ -228,12 +228,51 @@ as fact.
   site. "Decent Agency" as a legal entity was not checked.
 - **Whether he was on the 2026-08-17 Artizen call**, and what was actually said there. This lane was
   not on the call; the founding directive is the only source, and it does not say.
-- **Live ZAO Fund rank/score as of today.** Both `browse` and Chrome timed out on
-  `artizen.fund/index/matchfunds` this session (see "Tooling failure" below). The July README figure
-  (rank ~19 of 82+ funds) is carried forward UNRE-VERIFIED and must not be quoted to anyone until a
-  successful render.
+- ~~Live ZAO Fund rank/score as of today.~~ **RESOLVED later in the same session - see "The live fund
+  number we finally got" below. It is worse than the stale figure suggested.**
 - **Whether `arti-ZEN_FUN-d` is deployed anywhere public.** `homepage` is null on the API and no Pages
   URL was confirmed; the README says it is Pages-deployable, which is not the same as deployed.
+
+## The live fund number we finally got (and why it changes the priority)
+
+After three tool paths failed (below), raw Playwright with a desktop Chrome user agent and a 25s settle
+window rendered the page: 26,186 characters, captured 2026-08-17.
+
+`artizen.fund/index/matchfunds` now **redirects to `artizen.fund/index/leaderboard/?season=7`** - the
+fund-vs-fund leaderboard is no longer its own page.
+
+**ZAO Fund for Emerging Culture, Season 7, 2026-08-17:**
+
+| Field | Value |
+|---|---|
+| Rank | **#45** of **101** funds listed |
+| Score | 0.01 |
+| Sales | **$0** |
+| Match deployed | **$0** |
+| Prize | $100 |
+| Raised | $100 |
+| Projects | 12 |
+| Sponsors | 22 |
+
+45 of the 101 funds carry a numbered rank; the other 56 show "-". **#45 is the lowest numbered rank on
+the board** - so the ZAO Fund is the last fund with any recorded Season 7 activity at all.
+
+**Parse warning, because this one is a trap.** On this page each fund card's stat block *precedes* its
+name. The card immediately above ZAO - Artisanal Intelligence Fund, rank #44 - shows an *identical*
+`0.01 / $0 / $0 / $100 / $100` line. An off-by-one read here returns plausible, wrong numbers and
+throws no error. Verified by walking back two cards to confirm the offset.
+
+Live drive context from the same render: **Fund drive #12, the "Flywheel Fund Drive", ends Thursday
+2026-08-20 at 2:00pm**, with $2,709,753 in match funding and $288,980 in cash prizes; drive-wide total
+raised $900,897 against a $2.1M goal. The page also displays a **$22,445,422 endowment** figure, which
+is Artizen's own on-page claim as of 2026-08-17 and is noted here only because `ZAOartizen/CLAUDE.md`
+currently records the endowment as contested - this does not resolve that, it is one more self-report.
+
+**Why this matters more than the collaborator scout it is attached to:** $0 sales means $0 match
+deployed, and match deployed is the single KPI `TEAM-PLAYBOOK.md` names as "the true KPI of a good
+fund" and the thing we intended to take to René. The proof currently reads as a dormant fund. The
+Season 7 Artifacts are the unblock - there is nothing for anyone to buy. The tracker card for that work
+was re-scoped to P1 and re-dated to 2026-08-20, the drive close.
 
 ## Tooling failure worth logging
 
@@ -244,11 +283,27 @@ and `browse url` returns empty immediately after a successful `browse goto ... (
 Running the same steps through `browse chain` timed out; Chrome via the extension navigated fine but
 `get_page_text` hit three consecutive 45s `document_idle` timeouts on the same page.
 
-Net effect: **the live fund scoreboard was not readable this session by any of three paths.** The
-script is not wrong - it failed safe, exactly as its header comment intends. Candidate for
-`/agentic-issue` if it recurs. Retry before quoting any live Artizen number.
+Net effect: **the live fund scoreboard was not readable by any of those three paths.** The script is
+not wrong - it failed safe, exactly as its header comment intends.
+
+This is **instance 3** of a known shape, already root-caused: ZAOOS issue **#3065**. `browse`'s
+`ensureServer()` health-check uses a single 2s probe that cannot tell a busy daemon from a dead one, so
+it deletes the state file and spawns a replacement at `about:blank` without killing the original. Fixed
+upstream in gstack 1.62.0.0 (`probeHealthWithBackoff`); local is 0.9.2.0. Instance 3 appended to #3065
+on 2026-08-17, with the Playwright workaround **validated for the first time** and one addition:
+default-UA Playwright now returns HTTP 200 with a **zero-length body** - it needs a desktop Chrome user
+agent, a fixed viewport, and a fixed settle window. Orphan count was 0 before my run, so the bug
+reproduces on a clean machine.
+
+**`refresh-fund.mjs` is now broken for a second, independent reason** that fixing gstack would not
+solve: its target URL redirects, and the page's stats-before-name layout inverts its parse. It needs
+its own PR - deliberately not written into this research branch.
 
 ## Recommended sequence
+
+**0. Mint the Season 7 Artifacts before Thursday 2026-08-20, 2:00pm.** This is not part of the
+collaborator thread and it outranks all of it. The fund is rank #45 of 101 with $0 in sales; every
+other move in this doc is downstream of having something to sell.
 
 1. Zaal comments on issue #10 (draft below) - lowest-friction, highest-relevance first contact, in the
    place he is already working.
@@ -301,8 +356,10 @@ channel from the call, send it there instead and cut the first line.
   our best-verified version, but Artizen mechanics move - if Venus has since restated it, use that.
 - Do **not** mention Stephen Reid, his leaderboards, or any introduction between them until Stephen has
   replied to your email.
-- Do **not** quote a live ZAO Fund rank or score in this or any message right now - the leaderboard
-  could not be rendered on 2026-08-17 and the July figure is stale.
+- Do **not** quote a live ZAO Fund rank or score in this message. The reason changed mid-session: it is
+  no longer that we cannot verify it, it is that we now can, and it is rank #45 of 101 with $0 in
+  Season 7 sales. Nothing in the draft needs it, and leading a first contact with that number trades
+  away the credibility the rest of the note earns. Fix the number, then quote it.
 - Offering "happy to hand you the script" commits us to sharing `scripts/refresh-fund.mjs`. It is
   public-safe (no keys, no auth, reads a public page) - but confirm you want it public before offering.
 
@@ -327,6 +384,7 @@ All fetched 2026-08-17 by the zao-artizen lane. Method noted per
 | `thejollylama.github.io` | `curl` + HTML strip | FULL |
 | `site:artizen.fund` search for jolly/decent agency | `curl` DuckDuckGo HTML | FULL (zero results - inconclusive, Bubble app is unindexed) |
 | `artizen.fund/index/matchfunds` (live fund rank) | `browse` binary, `browse chain`, Chrome extension | **FAILED** (all three - see "Tooling failure") |
+| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, desktop Chrome UA + 1440x900 viewport + 25s settle, `innerText` captured to disk | **FULL** (26,186 chars; quotes above are from the saved capture, not from memory) |
 
 Internal sources: `ZAOartizen/TEAM-PLAYBOOK.md`, `ZAOartizen/CLAUDE.md`,
 `ZAOartizen/scripts/refresh-fund.mjs` (header comment), ZAOOS docs 844, 852, 887.

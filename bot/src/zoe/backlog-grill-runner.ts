@@ -59,13 +59,19 @@ export interface BacklogGrillState {
    * grill.ts documents on GrillItemState. A record written before this field
    * existed falls back to `at`, which for a card that has never been re-sent is
    * the same instant.
+   *
+   * `messageId` tracks the Telegram message ID so we can pin/unpin the oldest
+   * unanswered card (added 2026-08-17).
    */
-  asked: Record<string, { at: string; title: string; requeuedAt?: string; firstAskedAt?: string }>;
+  asked: Record<string, { at: string; title: string; requeuedAt?: string; firstAskedAt?: string; messageId?: number }>;
   /** taskId -> the verdict, once answered. */
   answered: Record<string, { at: string; verdict: string; note?: string }>;
   /** The card a bare "1" answers - the most recent one sent. */
   activeTaskId: string | null;
   lastSentMs: number | null;
+  /** The message ID of the currently pinned oldest-unanswered card, so we only
+   * re-pin when the oldest changes. */
+  pinnedOldestMessageId?: number | null;
 }
 
 const EMPTY: BacklogGrillState = { asked: {}, answered: {}, activeTaskId: null, lastSentMs: null };
@@ -206,11 +212,25 @@ async function nextTask(
 }
 
 export interface GrillTickDeps {
-  sendDM: (text: string, buttons: { text: string; data: string }[][]) => Promise<unknown>;
+  sendDM: (text: string, buttons: { text: string; data: string }[][]) => Promise<{ message_id: number }>;
+  pinMessage?: (messageId: number) => Promise<unknown>;
+  unpinMessage?: (messageId: number) => Promise<unknown>;
   /** Zaal's local hour, 0-23 - cards never go out at night. */
   localHour: number;
   now?: number;
   fetchImpl?: typeof fetch;
+}
+
+/**
+ * Find the oldest unanswered card's taskId. Returns null if no unanswered cards.
+ * (2026-08-17) Used to maintain pin invariant: the oldest open card is always pinned.
+ */
+function getOldestUnansweredTaskId(s: BacklogGrillState): string | null {
+  const unanswered = Object.entries(s.asked)
+    .filter(([taskId]) => !s.answered[taskId])
+    .map(([taskId, item]) => ({ taskId, at: Date.parse(item.at) }))
+    .sort((a, b) => a.at - b.at);
+  return unanswered.length > 0 ? unanswered[0].taskId : null;
 }
 
 /**
@@ -251,7 +271,8 @@ export async function runBacklogGrillTick(
     now,
   );
 
-  await deps.sendDM(text, verdictButtons(next.task.id));
+  const sent = await deps.sendDM(text, verdictButtons(next.task.id));
+  const messageId = sent.message_id;
 
   // Rewritten wholesale, which clears any `requeuedAt`: it has now come round
   // again, so it is an ordinary open card until it is answered a second time.
@@ -264,9 +285,27 @@ export async function runBacklogGrillTick(
     at: sentAt,
     title: next.task.title,
     firstAskedAt: prior?.firstAskedAt ?? prior?.at ?? sentAt,
+    messageId,
   };
   state.activeTaskId = next.task.id;
   state.lastSentMs = now;
+
+  // Pin the oldest unanswered card (if pinning is available and oldest changed).
+  // Only re-pin when the identity changes, never on every send, to avoid churn.
+  const oldestTaskId = getOldestUnansweredTaskId(state);
+  if (oldestTaskId && deps.pinMessage) {
+    const oldestCard = state.asked[oldestTaskId];
+    if (oldestCard?.messageId && state.pinnedOldestMessageId !== oldestCard.messageId) {
+      // Unpin the previous pin if it exists and is different
+      if (state.pinnedOldestMessageId && deps.unpinMessage) {
+        await deps.unpinMessage(state.pinnedOldestMessageId).catch(() => {});
+      }
+      // Pin the new oldest card
+      await deps.pinMessage(oldestCard.messageId).catch(() => {});
+      state.pinnedOldestMessageId = oldestCard.messageId;
+    }
+  }
+
   await writeState(state);
   // Only the SENT path. A tick that declined to send has not run in any sense
   // worth reporting, and saying otherwise makes the line mean 'the cron fired'.
@@ -290,6 +329,8 @@ export async function applyBacklogAnswer(
   raw: string,
   fetchImpl: typeof fetch = fetch,
   explicitTaskId?: string,
+  pinMessage?: (messageId: number) => Promise<unknown>,
+  unpinMessage?: (messageId: number) => Promise<unknown>,
 ): Promise<{ ok: boolean; message: string }> {
   const c = cfg();
   if (!c) return { ok: false, message: 'tracker not configured' };
@@ -360,6 +401,27 @@ export async function applyBacklogAnswer(
   // Only the card in play stops being the card in play. Answering an older one
   // from the pile must not orphan the newest card's typed-answer path.
   if (state.activeTaskId === taskId) state.activeTaskId = null;
+
+  // Update pin after answer: if oldest unanswered card changed, repin
+  // (2026-08-17). Only re-pin when the identity changes to avoid churn.
+  const newOldestTaskId = getOldestUnansweredTaskId(state);
+  if (newOldestTaskId && pinMessage) {
+    const newOldestCard = state.asked[newOldestTaskId];
+    if (newOldestCard?.messageId && state.pinnedOldestMessageId !== newOldestCard.messageId) {
+      // Unpin the previous one if it exists and is different
+      if (state.pinnedOldestMessageId && unpinMessage) {
+        await unpinMessage(state.pinnedOldestMessageId).catch(() => {});
+      }
+      // Pin the new oldest card
+      await pinMessage(newOldestCard.messageId).catch(() => {});
+      state.pinnedOldestMessageId = newOldestCard.messageId;
+    }
+  } else if (!newOldestTaskId && state.pinnedOldestMessageId && unpinMessage) {
+    // All cards answered - unpin the last one
+    await unpinMessage(state.pinnedOldestMessageId).catch(() => {});
+    state.pinnedOldestMessageId = null;
+  }
+
   await writeState(state);
   return { ok: true, message };
 }

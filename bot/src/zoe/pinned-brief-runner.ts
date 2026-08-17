@@ -61,6 +61,24 @@ export async function grillDepth(): Promise<number | null> {
   }
 }
 
+/**
+ * Check if there are any unanswered backlog grill cards.
+ * Returns true if the brief should skip pinning (oldest grill card takes pin priority).
+ * (2026-08-17) Coexistence guard: grill pin wins over brief pin.
+ */
+export async function hasUnansweredBacklogCards(): Promise<boolean> {
+  try {
+    const raw = await fs.readFile(join(homedir(), '.zao/zoe/backlog-grill-state.json'), 'utf8');
+    const d = JSON.parse(raw) as Partial<BacklogGrillState>;
+    const asked = d.asked ?? {};
+    const answered = d.answered ?? {};
+    // Check if any unanswered card exists
+    return Object.keys(asked).some((taskId) => !answered[taskId] && !asked[taskId].requeuedAt);
+  } catch {
+    return false;
+  }
+}
+
 const REPO = 'bettercallzaal/ZAOOS';
 
 export async function gatherBrief(now: Date = new Date()): Promise<BriefInput> {
@@ -122,5 +140,9 @@ export interface BriefTickDeps extends Omit<PinDeps, 'statePath'> {
 
 export async function runPinnedBriefTick(deps: BriefTickDeps): Promise<PinResult> {
   const input = await (deps.gather ?? gatherBrief)();
-  return syncPinnedBrief(renderPinnedBrief(input), deps);
+  // Grill pin takes precedence over brief pin (2026-08-17). Skip pinning the
+  // brief when there are unanswered grill cards - keep editing in place, but
+  // don't steal the pin from the oldest card.
+  const skipPin = await hasUnansweredBacklogCards();
+  return syncPinnedBrief(renderPinnedBrief(input), deps, skipPin);
 }

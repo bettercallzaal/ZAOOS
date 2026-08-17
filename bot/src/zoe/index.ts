@@ -626,6 +626,9 @@ bot.on('callback_query:data', async (ctx, next) => {
       await ctx
         .editMessageText(`Answered (${q.qid}): ${q.value}`, { reply_markup: { inline_keyboard: [] } })
         .catch(() => {});
+      if (pinnedMid) {
+        await ctx.api.unpinChatMessage(gid, pinnedMid).catch(() => {});
+      }
       await pushRecent(
         { from: 'zaal', text: `[answer:${q.qid}] ${q.value}`, sender: 'zaalbotz-btn' },
         String(gid),
@@ -1562,7 +1565,9 @@ bot.on('message:text', async (ctx) => {
         const active = await getActiveGrill();
         const matched = active ? matchTypedAnswer(text, active.options) : null;
         if (active && matched) {
-          const r = await applyGrillAnswer(matched);
+          const r = await applyGrillAnswer(matched, undefined, (messageId) =>
+            ctx.api.unpinChatMessage(zaalId, messageId),
+          );
           if (r.key) {
             const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
             await pushRecent(
@@ -3354,7 +3359,9 @@ async function applyLearnProposals(
 bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const value = ctx.match[1];
-  const r = await applyGrillAnswer(value);
+  const r = await applyGrillAnswer(value, undefined, (messageId) =>
+    ctx.api.unpinChatMessage(zaalId, messageId),
+  );
   await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
   await ctx
     .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, `Locked in: ${value}`), {
@@ -3390,7 +3397,14 @@ bot.callbackQuery(/^bg:(done|keep|work|drop|skip)(?::(.+))?$/, async (ctx) => {
   ) ?? [];
   if (!key) return;
   try {
-    const r = await applyBacklogAnswer(key, undefined, taskId);
+    const r = await applyBacklogAnswer(
+      key,
+      undefined,
+      taskId,
+      (messageId) =>
+        ctx.api.pinChatMessage(zaalId, messageId, { disable_notification: true }),
+      (messageId) => ctx.api.unpinChatMessage(zaalId, messageId),
+    );
     await ctx.answerCallbackQuery({ text: r.message.slice(0, 190) });
     // Edit the card so an answered one cannot be answered twice, and so a
     // scroll-back through the queue shows what was decided.
@@ -3475,7 +3489,9 @@ bot.callbackQuery('grill:multisend', async (ctx) => {
 // item that has no clean 1/2/3 options.
 bot.callbackQuery('grill:approve', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  const r = await applyGrillAnswer('approved');
+  const r = await applyGrillAnswer('approved', undefined, (messageId) =>
+    ctx.api.unpinChatMessage(zaalId, messageId),
+  );
   await ctx.answerCallbackQuery({ text: r.note }).catch(() => {});
   await ctx
     .editMessageText(grillResolvedText(ctx.callbackQuery.message?.text, 'Approved - on it.'), {
@@ -3502,7 +3518,9 @@ bot.callbackQuery('grill:approve', async (ctx) => {
 bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const action = ctx.match[1] as 'done' | 'skip' | 'snooze';
-  const note = await applyGrillAction(action);
+  const note = await applyGrillAction(action, undefined, (messageId) =>
+    ctx.api.unpinChatMessage(zaalId, messageId),
+  );
   await ctx.answerCallbackQuery({ text: note }).catch(() => {});
   const outcome = action === 'done' ? 'Done.' : action === 'skip' ? 'Skipped.' : 'Later - I will bring it back.';
   await ctx

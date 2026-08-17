@@ -460,16 +460,24 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
 }
 
 /** Apply a button action to the currently-active grill item. */
-export async function applyGrillAction(action: 'done' | 'skip' | 'snooze', now = Date.now()): Promise<string> {
+export async function applyGrillAction(
+  action: 'done' | 'skip' | 'snooze',
+  now = Date.now(),
+  unpinCallback?: (messageId: number) => Promise<unknown>,
+): Promise<string> {
   const state = await readGrillState();
   const key = state.activeKey;
   if (!key || !state.items[key]) return 'Nothing active.';
   if (action === 'done') state.items[key] = { ...state.items[key], status: 'done' };
   else if (action === 'skip') state.items[key] = { ...state.items[key], status: 'skipped' };
   else state.items[key] = { ...state.items[key], status: 'snoozed', snoozeUntil: new Date(now + SNOOZE_MS).toISOString() };
+  const messageIdToUnpin = state.activeMessageId;
   state.activeKey = null;
   state.activeMessageId = null;
   await writeGrillState(state);
+  if (messageIdToUnpin && unpinCallback) {
+    await unpinCallback(messageIdToUnpin).catch(() => {});
+  }
   return action === 'done' ? 'Done - next one coming.' : action === 'skip' ? 'Skipped.' : 'Snoozed for a bit.';
 }
 
@@ -481,12 +489,14 @@ export async function applyGrillAction(action: 'done' | 'skip' | 'snooze', now =
 export async function applyGrillAnswer(
   value: string,
   now = Date.now(),
+  unpinCallback?: (messageId: number) => Promise<unknown>,
 ): Promise<{ note: string; key: string | null; title: string | null; value: string }> {
   const state = await readGrillState();
   const key = state.activeKey;
   const title = state.activeTitle ?? null;
   if (!key || !state.items[key]) return { note: 'Nothing active to answer.', key: null, title: null, value };
   state.items[key] = { ...state.items[key], status: 'done', answer: value };
+  const messageIdToUnpin = state.activeMessageId;
   state.activeKey = null;
   state.activeTitle = null;
   state.activeKind = null;
@@ -494,6 +504,9 @@ export async function applyGrillAnswer(
   state.activeOptions = null;
   state.activeMulti = null;
   await writeGrillState(state);
+  if (messageIdToUnpin && unpinCallback) {
+    await unpinCallback(messageIdToUnpin).catch(() => {});
+  }
   return { note: `Locked in: ${value}. Next one coming.`, key, title, value };
 }
 

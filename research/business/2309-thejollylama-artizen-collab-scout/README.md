@@ -296,15 +296,27 @@ on 2026-08-17, with the Playwright workaround **validated for the first time**. 
 before my run, so the bug reproduces on a clean machine - which settles that orphans are downstream of
 it, not a precondition.
 
-**Two claims I made in that first report did not survive retesting, and are corrected on the issue.**
-(a) I reported that default-UA Playwright returns HTTP 200 with a zero-length body. I saw that once and
-**could not reproduce it in six later runs across three configurations**; a second lane never
-reproduced it at all. It is not a property of the site - do not carry it forward. (b) I recommended the
-desktop-UA recipe as the fix, and on re-measurement it gives a **one-character** difference here
-(26,186 vs 26,185 on defaults). Another lane measured a genuine 41% gain from it on their machine;
-neither of us can explain the divergence. **The settle window is the part both lanes measured a clear
-benefit from; the user agent is unproven and harmless.** The numbers in the table above are unaffected -
-every configuration returned the same content.
+**Two claims from the first tooling report were retracted after retesting - one from each lane, each
+caught by the other re-measuring.** Both retractions are on the issue.
+
+- **Retracted (this lane):** "default-UA Playwright returns HTTP 200 with a zero-length body." Seen
+  once, **not reproducible in six later runs across three configurations**; the other lane never
+  reproduced it. Not a property of the site.
+- **Retracted (ignite-radio):** "the desktop-UA recipe yields 41% more content." Their original was a
+  single run per config; re-measured at three runs each it is **26,178-26,191 on defaults vs
+  26,191/26,190/26,191 with the UA** - about 13 characters apart, indistinguishable. Matches what this
+  lane measured independently (26,185 vs 26,186).
+
+**What survives is the settle window**, which both lanes measured a real benefit from: ~23,034 chars at
+3s vs ~26,185 at 25s. The user agent does nothing. `waitUntil: 'networkidle'` never resolves because
+the page polls.
+
+The figures in the table above are unaffected - all six of this lane's runs returned the same content.
+
+Worth recording as method, not just outcome: **two unreproduced one-offs, one per lane, each surfaced
+by the other lane re-running the measurement rather than accepting the report.** ignite-radio named the
+asymmetry explicitly - they applied more scepticism to the incoming number than to their own. Single
+runs became durable artifacts in both cases. Three runs would have caught either one.
 
 The rule this shape has owed since its second instance is now written:
 `.claude/rules/liveness-probe-guard.md` (ZAOOS PR #3137).
@@ -398,7 +410,7 @@ All fetched 2026-08-17 by the zao-artizen lane. Method noted per
 | `thejollylama.github.io` | `curl` + HTML strip | FULL |
 | `site:artizen.fund` search for jolly/decent agency | `curl` DuckDuckGo HTML | FULL (zero results - inconclusive, Bubble app is unindexed) |
 | `artizen.fund/index/matchfunds` (live fund rank) | `browse` binary, `browse chain`, Chrome extension | **FAILED** (all three - see "Tooling failure") |
-| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, `domcontentloaded` + 25s settle, `innerText` captured to disk; re-run 6x across 3 configs, all agreeing | **FULL** (26,184-26,186 chars; quotes above are from the saved capture, not from memory) |
+| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, `domcontentloaded` + **25s settle** (the load-bearing part), `innerText` captured to disk; re-run 6x across 3 configs, all agreeing, and corroborated by a second lane at 3 runs/config | **FULL** (26,184-26,186 chars; quotes above are from the saved capture, not from memory) |
 
 Internal sources: `ZAOartizen/TEAM-PLAYBOOK.md`, `ZAOartizen/CLAUDE.md`,
 `ZAOartizen/scripts/refresh-fund.mjs` (header comment), ZAOOS docs 844, 852, 887.

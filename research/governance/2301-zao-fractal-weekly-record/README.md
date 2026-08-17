@@ -82,6 +82,7 @@ No dedicated fractal photo archive exists on disk. The closest is `~/Documents/z
 **The record is real but split across four incompatible stores, and the newest ~20 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks.
 
 Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. On-chain settlement runs to 2026-07-06. So **weeks ~92 through ~111 exist on Optimism and in Discord, and nowhere in a file anyone can read.**
+**The record is real but split across four incompatible stores, and the newest ~19 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks. Doc 1770 was written from the live session at **week 106** on 2026-07-20, and on-chain settlement runs to 2026-07-06 - so weeks ~92 through ~110 exist on Optimism and in Discord, and nowhere in a file anyone can read.
 
 ---
 
@@ -193,6 +194,7 @@ python3 validate-weeks.py --dir weeks   # PASS - 18 week file(s) valid
 | Gap | Where the data is | Blocker |
 |---|---|---|
 | **Weeks ~92-111** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
+| **Weeks ~92-110** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
 | **Weeks 1-73** | `csv import/Respect-Grid view.csv`, by name | Parser must handle drifting column names and both Fibonacci tiers; no wallets, no tx proof |
 | **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed; current-era video mints not exported |
 | **Attendance** | Discord session records | No source enumerated |

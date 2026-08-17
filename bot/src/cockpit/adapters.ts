@@ -374,3 +374,55 @@ export async function resolveTaskDecision(
     return { ok: false, error: e instanceof Error ? e.message : 'patch failed' };
   }
 }
+
+/**
+ * Append context to a task's notes without changing status or metadata.
+ * Used when Zaal replies to a recently-answered grill card to add context.
+ * Best-effort: returns {ok:false,...} on any miss rather than throwing.
+ */
+export async function appendTaskContext(key: string, contextText: string): Promise<{ ok: boolean; error?: string }> {
+  if (/^https?:\/\//.test(key)) return { ok: false, error: 'pr-not-task' };
+  const base = process.env.COWORK_TRACKER_URL;
+  const apiKey = process.env.COWORK_TRACKER_KEY;
+  if (!base || !apiKey) return { ok: false, error: 'tracker not configured' };
+  const root = base.replace(/\/$/, '');
+  const headers = { apikey: apiKey, Authorization: `Bearer ${apiKey}` };
+
+  const fetchRow = async (col: string): Promise<RawRow | null> => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      const res = await fetch(
+        `${root}/rest/v1/tasks?${col}=eq.${encodeURIComponent(key)}&select=id,notes&limit=1`,
+        { headers, signal: controller.signal, cache: 'no-store' },
+      ).finally(() => clearTimeout(timer));
+      if (!res.ok) return null;
+      const rows = (await res.json()) as RawRow[];
+      return rows[0] ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  const row = (await fetchRow('id')) ?? (await fetchRow('legacy_id'));
+  if (!row) return { ok: false, error: 'task not found' };
+
+  const date = new Date().toISOString().slice(0, 10);
+  const contextNote = `Zaal context (post-answer): ${contextText}`;
+  const note = `${row.notes ? `${row.notes}\n` : ''}[${date}] ${contextNote}`;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const res = await fetch(`${root}/rest/v1/tasks?id=eq.${encodeURIComponent(row.id)}`, {
+      method: 'PATCH',
+      headers: { ...headers, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ notes: note }),
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return { ok: false, error: `patch returned ${res.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'patch failed' };
+  }
+}

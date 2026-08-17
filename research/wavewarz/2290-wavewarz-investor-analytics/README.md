@@ -20,7 +20,7 @@ tier: DEEP
 | Battles on Solana mainnet | **1,161** over 14 months (2025-05-28 to 2026-07-29) | Live product, real history |
 | Lifetime battle volume | **393.17 SOL** in this dataset | Real money, modest scale |
 | Battle cadence | **~140/month** sustained since January | 24x the Nov-2025 rate, stable 6 months |
-| Treasury gross inflow (revenue proxy) | **20.34 SOL** lifetime; **10.62 SOL of it in June+July alone** | **Revenue is accelerating while battle count is flat - monetization per battle improved** |
+| Treasury net-positive daily inflow (revenue proxy, day-level - see the resolved note below) | **20.34 SOL** lifetime; **10.62 SOL of it in June+July alone** | **Revenue is accelerating while battle count is flat - monetization per battle improved** |
 | Artist retention (known-handle window) | **20 of 32 artists active in 2+ months (62%)** | Strong for a creator platform |
 | Artist concentration | Top 10 hold **74.8%** of battle slots | The Ignite question, aimed at us |
 | Median battle stake | **0.0246 SOL** | Casual-scale participation |
@@ -53,7 +53,7 @@ The loop's first iterations fetched the live Battle Intelligence feed (the track
 
 Reconciliation progress on the 1,161-vs-1,245 discrepancy: read from source, `scripts/ww-battles-fetch.ts` applies **no filter** - it merges everything the public feed serves, fail-loud on parse errors. So the dataset faithfully mirrors the feed, and **the ICM box's 1,245/524.15 is the outlier** - it cannot have come from this feed on its stated date (the feed-derived count was lower, later). The box number's provenance is unknown; treat the feed-derived figures as primary until someone shows where 1,245 came from.
 
-**Second treasury conflict, found while chasing the August inflow number:** the repo's own Dune-generated snapshot (`lib/wwData.ts`, stamped 2026-06-14) states **`treasuryInflow: 50.5696` SOL lifetime through Jun 13** - while the daily CSV sums to **20.34 SOL lifetime through Jul 21**. Same repo, two internal sources, 2.5x apart; they are measuring different wallets or different definitions of inflow. Live RPC balances on the three wallets in `wwData.ts` (read this run: 4.02, 15.61, 0.57 SOL) do not cleanly match the CSV's last balance either, and the script that builds the CSV is not in `scripts/` - its provenance is off-repo. **The revenue slide is the strongest slide, which makes this the most important reconciliation of the three now open** (battles: 1,161 vs 1,245; treasury: 20.34 vs 50.57; holder count: 156 vs 157 in doc 2286).
+**Treasury "conflict" RESOLVED 2026-08-17 - it was this doc's own definitional error, and the two sources agree.** An earlier version of this section called the Dune snapshot's `treasuryInflow: 50.5696` (through Jun 13) versus the CSV's 20.34 (through Jul 21) a "2.5x conflict". Verified against source: **the CSV balance on 2026-06-13 is 3.5078 SOL and the Dune snapshot's `treasuryNet` is 3.5076 - agreement to 0.0002 SOL.** The difference is the measure, not the data: the CSV's `delta_sol` is a **day-level net balance change**, so summing its positive days undercounts transaction-level gross (a day with 2 SOL in and 1.5 out contributes +0.5 here, +2.0 to Dune). Dune's 50.57/47.06 is per-transaction gross; the CSV's 20.34/14.83 is net-positive/net-negative **days**. Both are right. Every "inflow" figure in this doc is therefore labeled as the day-level measure - the month-to-month comparison stands because the method is constant across months, but it must never be quoted as gross revenue. Reconciliations still genuinely open: **two** (battles 1,161 vs 1,245; holders 156 vs 157 in doc 2286), not three.
 
 ## Growth: the story is cadence, then monetization
 
@@ -80,7 +80,7 @@ Three phases an investor will see immediately:
 
 ## Revenue: the strongest slide in the deck
 
-Treasury gross inflow by month (the fee stream, from the daily on-chain CSV):
+Treasury net-positive daily balance change by month (the revenue proxy; day-level, NOT transaction gross - see the resolved note above):
 
 | Month | Inflow (SOL) | | Month | Inflow (SOL) |
 |---|---:|---|---|---:|

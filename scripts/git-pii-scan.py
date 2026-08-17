@@ -56,6 +56,17 @@ ZAO_DOMAINS = ("thezao.com", "bettercallzaal.com", "zabalgamez.com", "zaofestiva
 # Lines that produced every observed false positive. A UUID is not a phone number.
 UUID_RE = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}", re.I)
 URL_RE = re.compile(r"https?://|www\.")
+# Long hex tokens - a transaction hash, an address, a token id - contain runs of
+# ten consecutive decimal digits by pure chance, and such a run satisfies the
+# NANP phone pattern. Real case, 2026-08-17: the on-chain evidence for the
+# fractal weekly record was blocked because an Optimism tx hash ended in a
+# ten-digit decimal run. The (?<![\d]) lookbehind does not help, because those
+# digits are preceded by a hex LETTER rather than a digit. Same false-positive
+# class the header already records for a UUID, so it joins the same guard.
+# (The offending hash is not reproduced here - a literal digit run in this file
+# would trip the scanner it belongs to. It is pinned in the tests, assembled at
+# runtime, alongside the pre-existing fixtures that do the same.)
+HEX_RE = re.compile(r"0x[0-9a-fA-F]{16,}|\b[0-9a-fA-F]{32,}\b")
 
 PATTERNS: dict[str, tuple[str, bool]] = {
     # name: (regex, skip_on_uuid_or_url)
@@ -110,7 +121,9 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
     """-> [(kind, file, match, line)]"""
     found: list[tuple[str, str, str, str]] = []
     for path, line in rows:
-        skip_numeric = bool(UUID_RE.search(line) or URL_RE.search(line))
+        skip_numeric = bool(
+            UUID_RE.search(line) or URL_RE.search(line) or HEX_RE.search(line)
+        )
         for kind, (pat, guarded) in PATTERNS.items():
             if guarded and skip_numeric:
                 continue

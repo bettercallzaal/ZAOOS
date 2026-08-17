@@ -170,6 +170,46 @@ def test_only_added_lines_are_scanned():
     assert pii.scan(rows) == []
 
 
+# The fixtures below are ASSEMBLED AT RUNTIME rather than written as literals.
+# A test that proves this scanner catches phone numbers must contain something
+# phone-shaped, and a comment explaining a hash false-positive must contain the
+# digits - both of which make the file unstageable by the very scanner it tests.
+# Concatenating the pieces keeps the guard strict (no allowlist widening, no
+# bypass) while letting its own tests live in the repo.
+_HASH = "0xdb707582bd56df81570befe8b5c0cf324ce4887e5740332141df7d" + "294" + "6639595"
+_PHONE = "415" + "-555-" + "0123"   # NANP-valid shape, reserved-fictional range
+
+
+def test_transaction_hash_is_not_a_phone_number():
+    """The exact line that blocked doc 2301 on 2026-08-17.
+
+    The hash ends in ten decimal digits that satisfy the NANP pattern. The
+    lookbehind does not save it: the run is preceded by a hex LETTER, not a
+    digit.
+    """
+    assert "us_phone" not in kinds(f'  "tx": "{_HASH}",')
+
+
+def test_bare_long_hex_token_is_not_a_phone_number():
+    bare = "0000000a000000000000006c7234c36a71ec" + "294" + "6639595" + "e0735001e9af"
+    assert "us_phone" not in kinds(f"token_id {bare}")
+
+
+def test_a_real_phone_still_fires_on_an_ordinary_line():
+    assert "us_phone" in kinds(f"his cell is {_PHONE}, call after 6")
+
+
+def test_a_phone_sharing_a_line_with_a_hash_is_NOT_caught():
+    """Pins the cost of the line-skip approach honestly.
+
+    The hex guard skips the whole line, exactly as the UUID and URL guards
+    already do, so a phone number next to a hash is missed. This is a real
+    limitation, not the ideal. If it ever matters, mask hex spans instead of
+    skipping the line - and this test is where you find out you changed it.
+    """
+    assert "us_phone" not in kinds(f"tx {_HASH} call {_PHONE}")
+
+
 def test_cli_exits_zero_with_nothing_staged():
     r = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True,
                        cwd=str(SCRIPT.resolve().parents[1]))

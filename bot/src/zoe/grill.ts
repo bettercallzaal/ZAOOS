@@ -463,7 +463,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
 export async function applyGrillAction(
   action: 'done' | 'skip' | 'snooze',
   now = Date.now(),
-  unpinCallback?: (messageId: number) => Promise<void>,
+  unpinCallback?: (messageId: number) => Promise<unknown>,
 ): Promise<string> {
   const state = await readGrillState();
   const key = state.activeKey;
@@ -489,7 +489,7 @@ export async function applyGrillAction(
 export async function applyGrillAnswer(
   value: string,
   now = Date.now(),
-  unpinCallback?: (messageId: number) => Promise<void>,
+  unpinCallback?: (messageId: number) => Promise<unknown>,
 ): Promise<{ note: string; key: string | null; title: string | null; value: string }> {
   const state = await readGrillState();
   const key = state.activeKey;

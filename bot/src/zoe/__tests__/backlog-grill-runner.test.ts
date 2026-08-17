@@ -235,6 +235,7 @@ describe('runBacklogGrillTick - a skipped card goes to the back, not the front',
     runBacklogGrillTick({
       sendDM: async (text) => {
         sent.push(text);
+        return { message_id: sent.length };
       },
       localHour: 10,
       now,

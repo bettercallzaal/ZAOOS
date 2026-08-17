@@ -213,8 +213,8 @@ async function nextTask(
 
 export interface GrillTickDeps {
   sendDM: (text: string, buttons: { text: string; data: string }[][]) => Promise<{ message_id: number }>;
-  pinMessage?: (messageId: number) => Promise<void>;
-  unpinMessage?: (messageId: number) => Promise<void>;
+  pinMessage?: (messageId: number) => Promise<unknown>;
+  unpinMessage?: (messageId: number) => Promise<unknown>;
   /** Zaal's local hour, 0-23 - cards never go out at night. */
   localHour: number;
   now?: number;
@@ -329,8 +329,8 @@ export async function applyBacklogAnswer(
   raw: string,
   fetchImpl: typeof fetch = fetch,
   explicitTaskId?: string,
-  pinMessage?: (messageId: number) => Promise<void>,
-  unpinMessage?: (messageId: number) => Promise<void>,
+  pinMessage?: (messageId: number) => Promise<unknown>,
+  unpinMessage?: (messageId: number) => Promise<unknown>,
 ): Promise<{ ok: boolean; message: string }> {
   const c = cfg();
   if (!c) return { ok: false, message: 'tracker not configured' };

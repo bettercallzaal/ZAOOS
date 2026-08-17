@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-17
 related-docs: 460, 467, 524, 527, 676, 677, 683
 tier: DEEP
 ---
@@ -121,6 +121,14 @@ Per decision #5. ZOE is the highest-stakes bot, so the rebuild never touches the
 | Dogfood new-ZOE in parallel, then cut over | @Zaal + next session | Test + deploy | Phase 2-3 |
 | Migrate ZAOcoworkingBot onto the proven core | next session | PR (cowork-zaodevz) | Phase 4 |
 | Update doc 467 frontmatter - `superseded-by: 684` for the topology section | next session | doc edit | With Phase 0 |
+
+## Updated 2026-08-17
+
+**Decision #4 (shared-state handoff) — new native alternative exists.** Telegram Bot API 10.0 (released 2026-05-07, 13 days before the prior validation date) introduced native bot-to-bot communication. Key new primitives: **Guest Mode** (a bot can receive messages and reply within chats it is not a member of), **`answerGuestQuery` method** (a bot responds directly to a query from another bot), and **Managed/Secretary Bot patterns** (a Manager Bot creates and delegates to specialized child bots with human-observable coordination). Decision #4's shared-state approach remains architecturally sound and avoids the openclaw collision problem; but these new primitives offer a Telegram-native, observable alternative worth evaluating for future ZAO multi-bot handoff design. The "mutual opt-in" requirement prevents silent collision. Sources: full fetch of [openclaw/openclaw#85754](https://github.com/openclaw/openclaw/issues/85754) (FULL); search result summaries for Telegram Bot API 10.0 (PARTIAL — core.telegram.org and techtimes.com blocked by proxy).
+
+**Bot count change.** Since the doc was written, Hermes was adapted into ZOE (2026-06-29, per CLAUDE.md). The fleet in scope is now 4 bots (ZOE, ZAOstockTeamBot, ZAOcoworkingBot, ZAOscribe), not 5. ZAOstock is also spinning out. The shared-core `@zao/bot-core` design remains the right approach for the remaining fleet; the ZOE rebuild is effectively started (Hermes code reused by ZOE, not run as a separate bot).
+
+**grammy status.** grammy reached v1.45.1 (published ~July 2026), still actively maintained. GramIO (v0.10, May 2026) has emerged as an alternative with full Telegram Bot API 10.0 support and multi-runtime support (Bun/Deno). No immediate reason to migrate, but worth tracking. Source: search result summary (PARTIAL — npmjs.com returned 403).
 
 ## Sources
 

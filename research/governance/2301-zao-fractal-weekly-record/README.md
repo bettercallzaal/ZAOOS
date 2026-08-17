@@ -61,6 +61,10 @@ ZAOOS has live tables `fractal_sessions`, `fractal_scores`, `respect_events`, `r
 
 **Whether that importer was ever run against production, and what those tables currently hold, was NOT verified** - reading `.env.local` was declined in this session, so no query was made. Treat the tables as unknown-state until someone queries them. Do not assume the backfill below is redundant with them, and do not assume it is not.
 
+**Narrowed 2026-08-17, but still open.** The `zaoos-infra` lane checked its own independent, read-only Supabase grant (project `etwvzrmlxeobinrlytza`) and listed 38 tables: none of the eight are among them. That project is the cowork tracker - `tasks`, `contacts`, `meeting_notes`, `bot_*`, `agent_runs`, `receipts`. So the fractal tables live in a **different Supabase project** that no lane currently holds a grant for. This is real evidence about where they are not; it says nothing about what they contain.
+
+**Closing this needs Zaal, deliberately.** A permission declined in one session must not be routed around by asking another session to run the same query - that turns a "no" into a question of which lane happens to be watching. The unblock is Zaal granting access on purpose, not a lane finding a side door.
+
 ### 1.6 Frontend and in-flight work
 
 `src/app/(auth)/fractals/` (FractalsClient, FractalLeaderboardTab), `src/components/governance/LiveFractalDashboard.tsx`. Branch `feat/fractal-run-awards` (unmerged, 1 commit) adds a `RunAwardsTab.tsx` operator view - the weekly awards under one roof. No open PR or remote branch is doing fractal DATA storage; this lane is not duplicating a sibling.
@@ -75,7 +79,9 @@ No dedicated fractal photo archive exists on disk. The closest is `~/Documents/z
 
 ### 1.9 What the inventory says, in one line
 
-**The record is real but split across four incompatible stores, and the newest ~19 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks. Doc 1770 was written from the live session at **week 106** on 2026-07-20, and on-chain settlement runs to 2026-07-06 - so weeks ~92 through ~110 exist on Optimism and in Discord, and nowhere in a file anyone can read.
+**The record is real but split across four incompatible stores, and the newest ~20 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks.
+
+Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. On-chain settlement runs to 2026-07-06. So **weeks ~92 through ~111 exist on Optimism and in Discord, and nowhere in a file anyone can read.**
 
 ---
 
@@ -170,11 +176,23 @@ python3 build-weeks.py --repo "/path/to/ZAO OS V1" --out weeks
 
 `groups` counts the group numbers that appear in the export for that week, which is a floor: a group whose awards were never minted leaves no trace here.
 
+### Validate before you trust it
+
+`validate-weeks.py` checks every week file against the convention above: filename matches the `week` field, no duplicate weeks, valid `era`/`coverage`/`mode`, `date` is `YYYY-MM-DD`, `sources` non-empty, every wallet a real 20-byte address, no wallet twice in one group, `respect` maps to the rank it claims, `level` and `rank` agree (`rank = 7 - level`), the derived `participants`/`respect_total`/`unnamed_wallets` match a recount, and `attendance` never below the number of people who received awards.
+
+```bash
+python3 validate-weeks.py --dir weeks   # PASS - 18 week file(s) valid
+```
+
+**Why this is here rather than in CI.** `docs-automerge.yml` classifies `research/**` as docs and auto-merges with `GITHUB_TOKEN`, and GitHub does not start a workflow run for a push made with that token - so the merge result gets **zero CI** (measured 2026-08-12: four consecutive bot-merged commits, zero runs between them; doc 2291). Branch protection is `strict:false`, so a branch need not be current with main to merge. The daily scheduled run on main (PR #3069, confirmed firing) catches problems the *next morning*; it does not gate them. Anything asserted about these files has to be asserted from the branch, before the merge - so it is, and the validator is checked in so the next person can re-run it.
+
+**The validator was proven to fail before it was trusted.** Run against deliberately corrupted copies it caught all four planted faults (an off-table denomination, a level/rank disagreement, and two derived-field mismatches) and exited 1; run against an empty directory it refuses to pass vacuously. A check that has only ever passed is not evidence.
+
 ### What is not backfilled yet, and why
 
 | Gap | Where the data is | Blocker |
 |---|---|---|
-| **Weeks ~92-110** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
+| **Weeks ~92-111** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
 | **Weeks 1-73** | `csv import/Respect-Grid view.csv`, by name | Parser must handle drifting column names and both Fibonacci tiers; no wallets, no tx proof |
 | **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed; current-era video mints not exported |
 | **Attendance** | Discord session records | No source enumerated |

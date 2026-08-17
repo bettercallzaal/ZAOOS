@@ -208,7 +208,13 @@ export interface DripConfig {
  */
 export const DRIP_DEFAULT: DripConfig = {
   everyMinutes: 2,
-  maxOutstanding: 20,
+  // ZOE_GRILL_MAX_OUTSTANDING overrides the unanswered-card ceiling (Zaal,
+  // 2026-08-17: "make sure the grill doesn't only max at 20"). Falls back to
+  // 20 when unset or not a positive integer - never NaN into the gate.
+  maxOutstanding: (() => {
+    const raw = Number(process.env.ZOE_GRILL_MAX_OUTSTANDING);
+    return Number.isInteger(raw) && raw > 0 ? raw : 20;
+  })(),
   capWindowMs: 12 * 60 * 60 * 1000,
   startHour: 6,
   endHour: 22,

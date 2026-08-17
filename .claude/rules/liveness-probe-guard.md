@@ -1,0 +1,111 @@
+# Liveness Probe Guard - busy is not dead
+
+A health check that cannot tell a **busy** service from a **dead** one will
+eventually kill a healthy one. Then it will kill the replacement. The symptom
+never looks like "the probe was wrong" - it looks like the service crash-looping.
+
+This rule exists because the same bug was diagnosed three times across three
+lanes before anyone wrote it down.
+
+## The three instances (all confirmed, ZAOOS#3065)
+
+`gstack browse` - the headless browser the fleet uses for client-rendered pages.
+
+1. **2026-07-13** (zao-artizen). `browse restart` on an already-healthy session
+    repeatedly triggered "crashed twice in a row". Worked around at the call site:
+    `ZAOartizen/scripts/refresh-fund.mjs` stopped calling `restart` and started
+    verifying the URL after `goto` instead.
+2. **2026-08-12** (zao-artizen). The same crash-loop, *without* anything calling
+    `restart` - it happened inside the binary's own retry logic during a plain
+    `goto`. Same signature, different trigger path.
+3. **2026-08-14** (ignite-radio) - **root-caused.** Nothing was crashing.
+    `ensureServer()` probes `/health` with a single `AbortSignal.timeout(2000)`.
+    Measured latency on the *same* server: **0.007s idle vs 2.02s and 3.92s while
+    a heavy page loads** - a ~150x degradation that crosses the budget. On probe
+    failure it calls `startServer()`, which `unlinkSync`s the state file and
+    spawns a replacement **without killing the original**. So: busy server
+    misread as dead -> state file deleted -> second server spawns on a new port
+    at `about:blank` -> the page silently vanishes -> the original keeps running,
+    orphaned, holding its Chromium. Repeat per command. Falsifiable prediction,
+    confirmed: **7 orphaned servers and 36 headless Chromium** before cleanup.
+4. **2026-08-17** (zao-artizen). Reproduced with **0 orphans on the machine
+    beforehand**, which settles that orphans are downstream of the bug, not a
+    precondition for it.
+
+Upstream fixed it in gstack 1.62.0.0 (`probeHealthWithBackoff`, their issue
+\#1781); local is 0.9.2.0. Their own code comment describes this exact failure -
+independent confirmation of the diagnosis.
+
+## The one principle
+
+**A single short-timeout probe measures load, not liveness.** "No answer within
+N ms" and "dead" are different claims, and only the second one justifies killing
+something.
+
+## Rules (behavior-changing)
+
+1. **A liveness probe retries with backoff before declaring death.** One timed
+    probe is a load measurement. Use several attempts spaced apart (upstream's
+    `probeHealthWithBackoff(port, attempts=3, backoffMs=250)` is the reference
+    shape). If you are writing the probe, this is the whole fix.
+
+2. **Never spawn a replacement without killing the original.** If a supervisor
+    concludes a process is dead and it is wrong, the cost must be one wasted
+    check, not an orphan holding a browser. Kill-then-start, or do not start.
+
+3. **Deleting shared state on a failed probe is how you lose the thing you were
+    checking on.** `unlinkSync(stateFile)` before the old process is confirmed
+    gone destroys the only handle to a service that is still running fine.
+
+4. **When a tool reports "crashed", check whether anything actually crashed.**
+    Instance 3 was titled "crash-loops" for two days. Nothing crashed. Look for
+    changing PIDs, accumulating processes, and a working first command followed
+    by a failing second - that pattern is a supervisor problem, not a crash.
+
+5. **Do not tune the timeout up and call it fixed.** A bigger budget moves the
+    threshold; it does not make the probe able to distinguish the two states.
+    The number was never the bug.
+
+## The companion clause: an empty result is a failure
+
+Adjacent shape, same session. A fetch can return **HTTP 200, a real final URL,
+no exception, and zero content.** Code that trusts the status records "the source
+has no data" instead of "I could not read the source" - and that lie propagates
+into a dashboard or a research doc as a fact.
+
+**Assert on content, not on status.** For any scrape or fetch whose output feeds
+a number someone will act on, treat `length == 0` (or below a sane floor) as a
+hard failure. The guard is one line and it is correct regardless of cause.
+
+Honest scope: on 2026-08-17 one lane observed a zero-length 200 from
+`artizen.fund` and **could not reproduce it in six subsequent runs across three
+configurations**, while a second lane never reproduced it at all. So this is
+**not** recorded as a property of that site - it is recorded because the guard
+costs nothing and the failure mode is real wherever it occurs.
+`silent-failure-guard.md` rule 2 states the general form ("assert the thing it
+was supposed to produce exists and is non-empty"); this is that rule pointed
+specifically at fetches that feed figures.
+
+## Guards
+
+- This does not ban short probes for cheap, local, uncontended things. It binds
+  where a probe's failure triggers a **destructive** action - a kill, a respawn,
+  a state-file delete, a failover.
+- Do not patch a vendored dependency to fix this if an upstream release already
+  has. The 2026-08-14 lane attempted a minimal backport of
+  `probeHealthWithBackoff`, measured that it **regressed the working case**, and
+  deliberately shipped nothing. That was the right call. Upgrade, or leave it and
+  route around at the call site.
+- Routing around at the call site is legitimate and was the right move twice
+  here - but log it as a workaround, or instance N+1 gets diagnosed from scratch.
+
+## Source
+
+Written 2026-08-17 by the zao-artizen lane at ignite-radio's request, after that
+lane root-caused instance 3 and stopped for a fleet refresh. Three prior
+instances, two of them fully diagnosed, zero rules - which is exactly the failure
+`agentic-issue` exists to prevent, recurring inside the tooling that skill
+monitors. Tracking issue: bettercallzaal/ZAOOS#3065. Siblings:
+`silent-failure-guard.md` (green while broken - the general form of the companion
+clause), `noisy-signal-guard.md` (red while fine), `anti-fabrication.md`
+(evidence or UNVERIFIED), `vanishing-dependencies.md`.

@@ -1,0 +1,167 @@
+{
+  "week": 32,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Gneric",
+          "wallet": "0x744cdf12d5d289db118ed9293c10cfa952169071",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Geek Myth",
+          "wallet": "0x29f9ef8286dcc4F9a94340278DB01f12c3483988",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
+          "rank": null,
+          "level": null,
+          "respect": 68,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "jed XO",
+          "wallet": "0xA70fE49c71529808EB881455073bEdED47f7016C",
+          "rank": null,
+          "level": null,
+          "respect": 68,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "heather",
+          "wallet": "0xbC66077E3a212c5f255Cfc986e7C0508cFeABFD1",
+          "rank": null,
+          "level": null,
+          "respect": 42,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "fellenz",
+          "wallet": "0x82Cb2305388C853eCfe9eA83a1604Acf58466659",
+          "rank": null,
+          "level": null,
+          "respect": 42,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Jango UU",
+          "wallet": "0xF6519fEf3EAcfdB7843BEEa94a887255794438F0",
+          "rank": null,
+          "level": null,
+          "respect": 26,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Desultor",
+          "wallet": "0x1D95b0b6D3582FEeC7Ef35D2CCF91564DEd0Cf7f",
+          "rank": null,
+          "level": null,
+          "respect": 26,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "FailOften",
+          "wallet": "0xfda73b8459f66b6758d1809372df921365053af1",
+          "rank": null,
+          "level": null,
+          "respect": 16,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "john blackwell",
+          "wallet": "0x03726e10565402A1137960ba06681754BE7Fe05f",
+          "rank": null,
+          "level": null,
+          "respect": 16,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 10,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 9,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "Attabotty",
+    "EZinCrypto",
+    "Gneric",
+    "jed XO",
+    "heather",
+    "FailOften",
+    "Jango UU",
+    "fellenz",
+    "Desultor",
+    "Geek Myth"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 12,
+  "respect_total": 543,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 32'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 32'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "Values off the Fibonacci curve in this week: [9]. Recorded verbatim, not corrected."
+  ]
+}

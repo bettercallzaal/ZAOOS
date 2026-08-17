@@ -1,0 +1,100 @@
+{
+  "week": 54,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "EZinCrypto",
+          "wallet": "0xfAb9a3D37999E12252b47468D2FFD4BE15936012",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Ohnahji B",
+          "wallet": "0x64a15b1d2de581097cb48e5d82619203e24bb3e1",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Jose (Joesph Goats)",
+          "wallet": "0x29185eB8cfD22Aa719529217bFbadE61677e0Ad2",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Tricky",
+          "wallet": "0x1aF4c2950C5c892D1F4aacd60E8f656A14555E5A",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Prizem",
+    "EZinCrypto",
+    "Ohnahji B",
+    "Jose (Joesph Goats)"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 6,
+  "respect_total": 240,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 54'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 54'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "Values off the Fibonacci curve in this week: [40]. Recorded verbatim, not corrected."
+  ]
+}

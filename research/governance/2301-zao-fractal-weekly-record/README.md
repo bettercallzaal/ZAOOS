@@ -8,8 +8,13 @@ original-query: "inventory every existing store of past ZAO Fractal data, design
 tier: STANDARD
 ---
 
-<!-- ZOR era enumerated from Optimism 2026-08-17: 39 weeks (68-109), 288 live
-     awards, 288+28 reversed = 316 mints reconciled. OG ERC-20 era still open. -->
+<!-- Both contracts enumerated from Optimism 2026-08-17.
+     ZOR ERC-1155: 39 weeks (68-109), 288 live awards, 288+28 reversed = 316 mints.
+     OG ERC-20: 69 mints -> 1 operator -> 447 distributions over 48 days; carries no
+     week number, so weeks 1-73 come from the Airtable export instead, reconciled
+     against the chain at 98 of 104 members exact.
+     105 week files total. Remaining gaps are off-chain: attendance, photos,
+     current-era camera-on, and weeks 6/61/73 which the source never recorded. -->
 
 # 2301 - ZAO Fractal Weekly Record (inventory + data convention)
 
@@ -87,7 +92,6 @@ No dedicated fractal photo archive exists on disk. The closest is `~/Documents/z
 **The record is real but split across four incompatible stores, and the newest ~20 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks.
 
 Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. On-chain settlement runs to 2026-07-06. So **weeks ~92 through ~111 exist on Optimism and in Discord, and nowhere in a file anyone can read.**
-**The record is real but split across four incompatible stores, and the newest ~19 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks. Doc 1770 was written from the live session at **week 106** on 2026-07-20, and on-chain settlement runs to 2026-07-06 - so weeks ~92 through ~110 exist on Optimism and in Discord, and nowhere in a file anyone can read.
 Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. So **weeks ~92 onward existed on Optimism and in Discord, and nowhere in a file anyone could read.**
 
 > **Resolved the same day.** Part 3 enumerated the ZOR contract directly and closed this: weeks 92-109 are now files. The finding stands as the reason the work happened, and the remaining gap is now the OG era (weeks 1-67) plus meetings 72, 73 and 104.
@@ -150,15 +154,22 @@ One JSON per week at `weeks/week-NNN.json`, `NNN` zero-padded to the meeting num
 
 ## Part 3 - Backfill (newest first)
 
-Two builders, and **the on-chain one supersedes the CSV one** for every ZOR-era week:
+Four scripts. **On-chain supersedes CSV wherever both exist**, and the order below is the order to run them:
 
-- `fetch-zor-onchain.py` - enumerates the ZOR ERC-1155 contract on Optimism via Blockscout and writes `weeks/`. This is the authoritative path.
-- `build-weeks.py` - the original CSV path, kept because it is the only reader of `data/ordaoawards.csv`'s group numbers and titles, which the chain does not carry.
+| Script | Covers | Role |
+|---|---|---|
+| `fetch-zor-onchain.py` | weeks 68-109 | Enumerates the ZOR ERC-1155. Authoritative - the token id carries the meeting number |
+| `build-airtable-weeks.py` | weeks 1-73 | The pre-chain record by name, plus camera-on. Never overwrites a chain-derived file that has live awards |
+| `fetch-og-onchain.py` | no weeks | Enumerates the OG ERC-20 into a settlement record + the reconciliation. Deliberately writes **no** week files - see Part 4 |
+| `build-weeks.py` | weeks 74-91 | The original CSV path, kept as the only reader of `data/ordaoawards.csv`'s group numbers and titles |
+| `validate-weeks.py` | all | The gate. Run it last, every time |
 
 ```bash
-python3 fetch-zor-onchain.py --fetch          # enumerate the contract, cache raw
-python3 fetch-zor-onchain.py --out weeks      # decode the cache into week files
-python3 validate-weeks.py --dir weeks         # gate it
+python3 fetch-zor-onchain.py --fetch          # enumerate ZOR, cache raw
+python3 fetch-zor-onchain.py --out weeks      # decode into week files
+python3 build-airtable-weeks.py --out weeks   # weeks 1-73 from the Airtable export
+python3 fetch-og-onchain.py --fetch           # OG settlement record + reconciliation
+python3 validate-weeks.py --dir weeks         # gate it - 105/105 PASS
 ```
 
 ### How the ZOR encoding actually works
@@ -256,24 +267,77 @@ python3 validate-weeks.py --dir weeks   # PASS - 18 week file(s) valid
 
 **The validator was proven to fail before it was trusted.** Run against deliberately corrupted copies it caught all four planted faults (an off-table denomination, a level/rank disagreement, and two derived-field mismatches) and exited 1; run against an empty directory it refuses to pass vacuously. A check that has only ever passed is not evidence.
 
+## Part 4 - The OG era (weeks 1-73)
+
+The OG Respect **ERC-20** `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` on Optimism. Metadata read back matches the on-chain-facts memory exactly: "ZAO RESPECT TOKEN", 18 decimals, total supply **38,484**, **122 holders**.
+
+### Why the chain cannot number these weeks
+
+ZOR encodes the meeting number inside the token id. **The OG ERC-20 encodes nothing** - it is a plain fungible token. Its 518 transfer rows break down as:
+
+| | |
+|---|---|
+| Mints | 69, **every one to a single operator wallet** `0x7234c36A71...` |
+| Operator to member | 447 |
+| Member to operator | 2 (returns, 2025-12-12 and 2025-12-20) |
+| Burns | 0 |
+
+So the model is: mint to one wallet, distribute from it. Those distributions land across **48 days**, and classifying each day by whether all its values sit on the Fibonacci curve gives the decisive number:
+
+- **8 days** are `single_week_fibonacci` - most likely one week's awards
+- **40 days** are `aggregate_or_backfill` - arbitrary sums
+
+The first day alone, 2024-07-30, pays 22 people amounts like 210, 185, 110, 93, 86 - it settled everything accumulated off-chain before the token existed. **Assigning week numbers to OG transfers would be fabrication**, so this doc does not do it. `og-settlements.json` records the settlement days, their shape classification, and every award with its tx.
+
+### Where weeks 1-73 actually come from
+
+`csv import/Respect-Grid view.csv` - 92 session columns and 87 `ZAO Video N` columns across 173 members. `build-airtable-weeks.py` turns those into week files:
+
+- **70 week files written** covering weeks 1-73
+- **255 camera-on entries across 50 weeks** (13-72), from the video columns - the first time the camera-on record exists as data
+- `era: "airtable"`, `date: null`, `settled: null` - these weeks have **no settlement transaction** and say so
+- one group with `mode: "recorded"`, because the group structure of that era is not known and a fabricated ranking would be worse than an honest absence
+- wallets attached where the Airtable map knows one, `null` otherwise
+
+**Weeks 6, 61 and 73 have no column at all** in the export - a genuine gap in the source, not a build failure. The column `ZAO Fractal 73.2` is a sub-session with no week slot; it is deliberately **not** written and left for a human to place.
+
+### The reconciliation that makes this trustworthy
+
+Summing what each member actually received on-chain and comparing it against Airtable's own `actual ZAO onchain` column:
+
+| Result | Count |
+|---|---|
+| **Exact match** | **98** |
+| Mismatched | 6 |
+| Unmappable (no wallet, or never received on-chain) | 5 |
+
+Two independent records - a spreadsheet maintained by hand and a token contract - agreeing to the unit on 98 of 104 mappable members. The largest mismatch is the operator wallet itself, understated by construction: it holds the undistributed mint balance and is the *sender* of every distribution, so what it received is not what it was awarded. The other five differ by 5-25 Respect.
+
+### Weeks 68-71 are merged, not overwritten
+
+Those four weeks exist in both records: the Airtable has what the room awarded, while their ZOR mints were fully burned. The builder merges rather than choosing - Airtable results become the live record, and the reversed on-chain awards stay in `reversed_awards`. A chain-derived file with live awards is never overwritten.
+
+### A measured note on transferability
+
+The governance docs describe Respect as non-transferable. Precisely: **the OG ERC-20 permits transfers and 449 occurred** - but 447 are the operator distributing awards, and the remaining 2 are returns to that same operator. There is no member-to-member transfer in the record, and no purchase path appears anywhere in it. So the *substance* of the claim holds on the evidence; the *mechanism* is a distribution model rather than a technical transfer lock. ZOR is the soulbound one. Anyone restating the claim externally (OP RF, Govbase, press) should use the precise form.
+
+---
+
 ### What is not backfilled yet, and why
 
 | Gap | Where the data is | Blocker |
 |---|---|---|
-| **Weeks ~92-111** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
-| **Weeks ~92-110** (the newest, and top priority) | Optimism ZOR contract + zao.frapps.xyz + Discord | Needs an enumeration of ZOR transfers per week; no local export exists |
-| **Weeks 1-73** | `csv import/Respect-Grid view.csv`, by name | Parser must handle drifting column names and both Fibonacci tiers; no wallets, no tx proof |
-| **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed; current-era video mints not exported |
-| **Attendance** | Discord session records | No source enumerated |
-| **Meetings 72, 73, 104** - absent from ZOR | 72/73 are OG-era (the OG ERC-20 covers fractals 1-73); 104 is unexplained | Needs an OG ERC-20 enumeration for 72/73. **104 is a real open question** - it sits between two settled weeks and nobody should assume it did not happen |
-| **Weeks 110-111** | possibly nowhere yet | No ZOR settlement exists. Either not yet held or not yet settled - ask someone who was there rather than infer |
-| **Weeks 1-67** | `csv import/Respect-Grid view.csv` by name, OG ERC-20 by wallet | The OG contract is enumerable the same way this one was - that is the obvious next build. The CSV parser must handle drifting column names and both Fibonacci tiers |
-| **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed. The chain does not distinguish a video award from a breakout award, so this needs the CSV plus the room's knowledge |
-| **Attendance** | Discord session records | No source enumerated. Note attendance is NOT the award count - someone can attend and receive nothing |
-| **Photos** | scattered; `~/Documents/zao-media/appearances/` is the nearest thing | No per-week visual archive exists to point at |
-| **2026-08-16 camera batch** | the lane's founding directive only | Week number for 2026-08-16 not confirmed. Weeks 106-109 all settled 2026-08-10, so the mapping from that date to a week number is exactly the inference this doc warns against - do not file it under a guessed week |
+| **Weeks 6, 61, 73** | nowhere found | No column exists in the Airtable export, and the OG chain cannot supply a week number. A genuine hole in the source |
+| **`ZAO Fractal 73.2`** | the Airtable export | A sub-session with no week slot. Deliberately not written - a human should place it |
+| **Meeting 104** | unexplained | Absent from ZOR while 103 and 105 both settled. **Nobody should assume it did not happen** |
+| **Weeks 110-111** | possibly nowhere yet | No ZOR settlement. Either not yet held or not yet settled - ask someone who was there rather than infer |
+| **Week numbers for OG settlements** | not recoverable from chain | The ERC-20 carries no meeting number and 40 of 48 distribution days are bulk backfills. Mapping them would be fabrication; the Airtable supplies the numbering instead |
+| **Attendance, every week** | Discord session records | No source enumerated. Attendance is NOT the award count - someone can attend and receive nothing |
+| **Photos, every week** | scattered; `~/Documents/zao-media/appearances/` is the nearest thing | No per-week visual archive exists to point at |
+| **Camera-on after week 72** | doc 1770's video-Respect stream | The Airtable video columns stop being populated after 72, and the chain does not distinguish a video award from a breakout award |
+| **2026-08-16 camera batch** | the lane's founding directive only | Week number not confirmed. Weeks 106-109 all settled 2026-08-10, so inferring a week from that date is exactly what this doc warns against |
 
-The ZOR era is now done. The next enumeration is the **OG ERC-20** `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`, which covers fractals 1-73 and would close most of the remaining record using the method already proven here.
+Both contracts are now enumerated. What remains is not on any chain: attendance, photos, the current-era camera-on stream, and three weeks the source itself never recorded.
 
 ---
 

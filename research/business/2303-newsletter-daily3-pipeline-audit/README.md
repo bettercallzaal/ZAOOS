@@ -4,7 +4,7 @@ type: audit
 status: research-complete
 last-validated: 2026-08-17
 superseded-by:
-related-docs: 944, 1066, 2301
+related-docs: 944, 1066, 2304
 original-query: "Newsletter/Paragraph pipeline - audit the ZABAL newsletter daily-3 flow, propose what is automatable vs Zaal-voice, doc it. No publishing."
 tier: STANDARD
 ---
@@ -29,7 +29,7 @@ Source of truth: `NEWSLETTER-UPDATE.md` at the root of `bettercallzaal/zabalnews
 | 4 | Platform variants | **Already code**: `lib/variants.ts` - `toFarcaster` (<=1024 chars), `toXThread` (<=280/post) | Done. Extending to LinkedIn/Telegram variants is a small PR the file itself invites |
 | 5 | Publish to Paragraph | Manual paste to paragraph.com/@thezao | **Technically automatable, deliberately GATED.** Publishing is outbound; the tap is Zaal's. The right automation is everything up to the paste |
 | 6 | Socials generation | `/socials` skill -> `/clipboard` page, 7 platforms in posting order | **Already semi-automated; keep the human send.** The runbook is explicit: generate, never auto-post |
-| 7 | Feed the 5pm show | The issue IS the ZM script (doc 2301: if it does not exist at 4pm, that is the emergency) | **AUTOMATE the existence check**: a 3pm tick that verifies today's issue exists and pings if not - a deadline guard, not a writer |
+| 7 | Feed the 5pm show | The issue IS the ZM script (doc 2304: if it does not exist at 4pm, that is the emergency) | **AUTOMATE the existence check**: a 3pm tick that verifies today's issue exists and pings if not - a deadline guard, not a writer |
 
 ## Where the line is, and why it is exactly there
 
@@ -40,7 +40,7 @@ The same logic gates the sends. Stage 5 and the seven posts in stage 6 are outbo
 ## What to build (all draft-side, nothing outbound)
 
 1. **Nightly win-candidate stager** - ZOE assembles tomorrow's 3 candidate wins from the board + merged PRs, each pre-shaped as build/number/person/link, written into the builder's draft store. Zaal picks and rewrites. (This is the "wire ZOE to auto-draft issues" idea already noted in the project memory - adopted; its sibling "push finished issue to Paragraph" is rejected here as gated.)
-2. **The 3pm existence guard** - today's issue exists and scores >= 80, or Zaal gets pinged with the gap named. Protects the 5pm show dependency (doc 2301's invariant-one).
+2. **The 3pm existence guard** - today's issue exists and scores >= 80, or Zaal gets pinged with the gap named. Protects the 5pm show dependency (doc 2304's invariant-one).
 3. **Two more variant targets** in `lib/variants.ts` (LinkedIn with its one-line context rule, Telegram) - closes the gap between the composer's tabs and the 7-platform posting order.
 
 ## State observations, sources named
@@ -60,7 +60,7 @@ The same logic gates the sends. Stage 5 and the seven posts in stage 6 are outbo
 
 - [Doc 944](../../dev-workflows/944-newsletter-growth-deliverability-playbook/) - growth + deliverability
 - [Doc 1066](../1066-zaoonparagraph-buildout/) - the Paragraph buildout
-- [Doc 2301](../../media/2301-zm-show-runbook/) - the 5pm show this pipeline scripts
+- [Doc 2304](../../media/2304-zm-show-runbook/) - the 5pm show this pipeline scripts
 
 ## Next Actions
 

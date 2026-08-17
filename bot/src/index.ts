@@ -2,7 +2,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
-import { startHeartbeat } from './lib/cowork';
+import { startHeartbeat, reportEvent, startCommandPoller } from './lib/cowork';
 import {
   resolveMember,
   linkUsernameToMember,
@@ -43,6 +43,24 @@ const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
   .filter((n) => Number.isFinite(n) && n > 0);
 
 const bot = new Bot<Context>(token);
+
+// ---- Cowork control plane ---------------------------------------------------
+// Reconciled from the VPS deploy, 2026-08-17. This wiring ran in production for
+// weeks while existing nowhere in git, so the board could pause this bot and the
+// repo had no record of it. lib/cowork.ts already anticipated this consumer - its
+// restart comment names `zaostock-bot Restart=always` - so only the wiring was
+// missing, not the capability.
+const COWORK_BOOT_TS = Date.now();
+let coworkTask = 'booting';
+let coworkLastError: string | null = null;
+let coworkPaused = false;
+
+// A `pause` command from the board drops incoming Telegram updates. Registered
+// before every other handler so pausing is total rather than partial.
+bot.use(async (_ctx, next) => {
+  if (coworkPaused) return;
+  await next();
+});
 
 // Routing policy: bot must NEVER post in the ZAO Festivals General topic.
 // Anything that lacks an explicit message_thread_id when targeting that
@@ -592,6 +610,8 @@ bot.on('message:text', async (ctx) => {
 
 bot.catch((err) => {
   console.error('[zaostock-bot] error:', err);
+  coworkLastError = err?.message ?? String(err);
+  void reportEvent('error', coworkLastError, { unit: 'zaostock-bot' });
   alertDevops(bot, `error: ${err?.message ?? String(err)}`).catch(() => undefined);
 });
 
@@ -621,11 +641,19 @@ process.on('uncaughtException', (err) => {
 
 console.log('[zaostock-bot] starting...');
 // Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
-startHeartbeat(60_000, () => 'up', { unit: 'zaostock-bot' });
+// The 4th argument is evaluated per tick, so the board shows what the bot is
+// doing now rather than only that it is alive.
+startHeartbeat(60_000, () => 'up', { unit: 'zaostock-bot' }, () => ({
+  current_task: coworkTask,
+  last_error: coworkLastError,
+  uptime_s: Math.round((Date.now() - COWORK_BOOT_TS) / 1000),
+}));
 bot.start({
   onStart: async (info) => {
     console.log(`[zaostock-bot] running as @${info.username}`);
     cachedUsername = info.username.toLowerCase();
+    coworkTask = 'idle (polling)';
+    void reportEvent('startup', `online as @${info.username}`, { unit: 'zaostock-bot' });
     scheduleAll(bot, (err, label) => {
       console.error(`[schedule] ${label} failed:`, err);
       alertDevops(bot, `${label} digest failed: ${err instanceof Error ? err.message : 'unknown'}`).catch(
@@ -643,4 +671,21 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   alertDevops(bot, 'bot stopping (SIGINT)').catch(() => undefined);
   bot.stop();
+});
+
+// ---- Cowork control-plane poller --------------------------------------------
+// Lifecycle only (pause/resume). onRunTask/onAsk are deliberately omitted:
+// lib/cowork.ts reports unsupported commands as a clear error result rather than
+// dropping them, so the board shows an honest outcome instead of silence.
+startCommandPoller({
+  onPause: () => {
+    coworkPaused = true;
+    coworkTask = 'paused';
+    void reportEvent('paused', 'paused via control plane', { unit: 'zaostock-bot' });
+  },
+  onResume: () => {
+    coworkPaused = false;
+    coworkTask = 'idle (polling)';
+    void reportEvent('resumed', 'resumed via control plane', { unit: 'zaostock-bot' });
+  },
 });

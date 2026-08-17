@@ -235,8 +235,10 @@ as fact.
 
 ## The live fund number we finally got (and why it changes the priority)
 
-After three tool paths failed (below), raw Playwright with a desktop Chrome user agent and a 25s settle
-window rendered the page: 26,186 characters, captured 2026-08-17.
+After three tool paths failed (below), raw Playwright rendered the page: 26,186 characters, captured
+2026-08-17. The load-bearing ingredient is the **25s settle window** - `waitUntil: 'networkidle'` never
+resolves because the page polls. (I originally credited a desktop user agent for the fix; retesting
+showed it makes a one-character difference here. See the correction under "Tooling failure".)
 
 `artizen.fund/index/matchfunds` now **redirects to `artizen.fund/index/leaderboard/?season=7`** - the
 fund-vs-fund leaderboard is no longer its own page.
@@ -290,10 +292,22 @@ This is **instance 3** of a known shape, already root-caused: ZAOOS issue **#306
 `ensureServer()` health-check uses a single 2s probe that cannot tell a busy daemon from a dead one, so
 it deletes the state file and spawns a replacement at `about:blank` without killing the original. Fixed
 upstream in gstack 1.62.0.0 (`probeHealthWithBackoff`); local is 0.9.2.0. Instance 3 appended to #3065
-on 2026-08-17, with the Playwright workaround **validated for the first time** and one addition:
-default-UA Playwright now returns HTTP 200 with a **zero-length body** - it needs a desktop Chrome user
-agent, a fixed viewport, and a fixed settle window. Orphan count was 0 before my run, so the bug
-reproduces on a clean machine.
+on 2026-08-17, with the Playwright workaround **validated for the first time**. Orphan count was 0
+before my run, so the bug reproduces on a clean machine - which settles that orphans are downstream of
+it, not a precondition.
+
+**Two claims I made in that first report did not survive retesting, and are corrected on the issue.**
+(a) I reported that default-UA Playwright returns HTTP 200 with a zero-length body. I saw that once and
+**could not reproduce it in six later runs across three configurations**; a second lane never
+reproduced it at all. It is not a property of the site - do not carry it forward. (b) I recommended the
+desktop-UA recipe as the fix, and on re-measurement it gives a **one-character** difference here
+(26,186 vs 26,185 on defaults). Another lane measured a genuine 41% gain from it on their machine;
+neither of us can explain the divergence. **The settle window is the part both lanes measured a clear
+benefit from; the user agent is unproven and harmless.** The numbers in the table above are unaffected -
+every configuration returned the same content.
+
+The rule this shape has owed since its second instance is now written:
+`.claude/rules/liveness-probe-guard.md` (ZAOOS PR #3137).
 
 **`refresh-fund.mjs` is now broken for a second, independent reason** that fixing gstack would not
 solve: its target URL redirects, and the page's stats-before-name layout inverts its parse. It needs
@@ -384,7 +398,7 @@ All fetched 2026-08-17 by the zao-artizen lane. Method noted per
 | `thejollylama.github.io` | `curl` + HTML strip | FULL |
 | `site:artizen.fund` search for jolly/decent agency | `curl` DuckDuckGo HTML | FULL (zero results - inconclusive, Bubble app is unindexed) |
 | `artizen.fund/index/matchfunds` (live fund rank) | `browse` binary, `browse chain`, Chrome extension | **FAILED** (all three - see "Tooling failure") |
-| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, desktop Chrome UA + 1440x900 viewport + 25s settle, `innerText` captured to disk | **FULL** (26,186 chars; quotes above are from the saved capture, not from memory) |
+| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, `domcontentloaded` + 25s settle, `innerText` captured to disk; re-run 6x across 3 configs, all agreeing | **FULL** (26,184-26,186 chars; quotes above are from the saved capture, not from memory) |
 
 Internal sources: `ZAOartizen/TEAM-PLAYBOOK.md`, `ZAOartizen/CLAUDE.md`,
 `ZAOartizen/scripts/refresh-fund.mjs` (header comment), ZAOOS docs 844, 852, 887.

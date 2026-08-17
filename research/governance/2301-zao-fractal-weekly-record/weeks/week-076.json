@@ -1,0 +1,286 @@
+{
+  "week": 76,
+  "period_number": 75,
+  "date": "2025-11-24",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "Kosbaar",
+          "wallet": "0x698e5A259c7564Fc209a31994d664Cb919725383",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x8708f2bf778b8dd3f61023d3a662724121bef65354acdf713ccc4600223ea75e",
+            "token_id": "0x0000000a000000000000004b698e5a259c7564fc209a31994d664cb919725383",
+            "minted_at": "2026-01-10T19:02:37+00:00"
+          },
+          "title": "Meeting 76 Group 1 Respect Level 6 for Kosbaar",
+          "reason": "Meeting 76 Group 1 Respect Award for participating in the respect Game"
+        },
+        {
+          "name": "SwarthyHatter",
+          "wallet": "0x4D16FCE1BD6E327AE31398CE9A2c4E12C077ecB1",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x8708f2bf778b8dd3f61023d3a662724121bef65354acdf713ccc4600223ea75e",
+            "token_id": "0x0000000a000000000000004b4d16fce1bd6e327ae31398ce9a2c4e12c077ecb1",
+            "minted_at": "2026-01-10T19:02:37+00:00"
+          },
+          "title": "Meeting 76 Group 1 Respect for SwarthyHatter",
+          "reason": "Meeting 76 Group 1 Respect Award for participating in the respect Game"
+        },
+        {
+          "name": "Steve Strange",
+          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x8708f2bf778b8dd3f61023d3a662724121bef65354acdf713ccc4600223ea75e",
+            "token_id": "0x0000000a000000000000004b07686bedb0102e47d33cec73307d2cc391aff396",
+            "minted_at": "2026-01-10T19:02:37+00:00"
+          },
+          "title": "Meeting 76 Group 1 Respect for Steve Strange",
+          "reason": "Meeting 76 Group 1 Respect Award for participating in the respect Game"
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "Jango UU",
+          "wallet": "0xF6519fEf3EAcfdB7843BEEa94a887255794438F0",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xf040902cae9fe2403c84f07bf8cddd64d3c2454e1daf578f063e8b93d1cbed5b",
+            "token_id": "0x0000000a000000000000004bf6519fef3eacfdb7843beea94a887255794438f0",
+            "minted_at": "2025-11-24T23:58:55+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xf040902cae9fe2403c84f07bf8cddd64d3c2454e1daf578f063e8b93d1cbed5b",
+            "token_id": "0x0000000a000000000000004b8d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
+            "minted_at": "2025-11-24T23:58:55+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "fellenz",
+          "wallet": "0x82Cb2305388C853eCfe9eA83a1604Acf58466659",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xf040902cae9fe2403c84f07bf8cddd64d3c2454e1daf578f063e8b93d1cbed5b",
+            "token_id": "0x0000000a000000000000004b82cb2305388c853ecfe9ea83a1604acf58466659",
+            "minted_at": "2025-11-24T23:58:55+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Mumbo",
+          "wallet": "0x8a1891e106b504656c525b3C45a3E95F7A73A73E",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xf040902cae9fe2403c84f07bf8cddd64d3c2454e1daf578f063e8b93d1cbed5b",
+            "token_id": "0x0000000a000000000000004b8a1891e106b504656c525b3c45a3e95f7a73a73e",
+            "minted_at": "2025-11-24T23:58:55+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Ohnahji B",
+          "wallet": "0x64A15b1D2DE581097CB48e5D82619203E24BB3e1",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0xf040902cae9fe2403c84f07bf8cddd64d3c2454e1daf578f063e8b93d1cbed5b",
+            "token_id": "0x0000000a000000000000004b64a15b1d2de581097cb48e5d82619203e24bb3e1",
+            "minted_at": "2025-11-24T23:58:55+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 3,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": null,
+          "wallet": "0xFb63D640E6061e4Fe50089620815483069D8eeAa",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x410e6cb3a2f4c1039a32de50b0f3f9dc3892e3672f2a280345e80f575bcdb16f",
+            "token_id": "0x0000000a000000000000004bfb63d640e6061e4fe50089620815483069d8eeaa",
+            "minted_at": "2025-12-08T23:15:35+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0xaB2759Ef5C399a0a704183f5146eC9f13AE442c3",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0x410e6cb3a2f4c1039a32de50b0f3f9dc3892e3672f2a280345e80f575bcdb16f",
+            "token_id": "0x0000000a000000000000004bab2759ef5c399a0a704183f5146ec9f13ae442c3",
+            "minted_at": "2025-12-08T23:15:35+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x33B03BEB0C8277d8FC35A844974daBfe289938c9",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0x410e6cb3a2f4c1039a32de50b0f3f9dc3892e3672f2a280345e80f575bcdb16f",
+            "token_id": "0x0000000a000000000000004b33b03beb0c8277d8fc35a844974dabfe289938c9",
+            "minted_at": "2025-12-08T23:15:35+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x96575Ac5E90e7b34d985F4e85d39E57bd552A60E",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0x410e6cb3a2f4c1039a32de50b0f3f9dc3892e3672f2a280345e80f575bcdb16f",
+            "token_id": "0x0000000a000000000000004b96575ac5e90e7b34d985f4e85d39e57bd552a60e",
+            "minted_at": "2025-12-08T23:15:35+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 4,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": null,
+          "wallet": "0x6f558AebfBd35477797Ffa7A03Fb81623C994769",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x97ed395247d2c13c257178dee3cb7e292399cadf47e37c23756308f812f51e77",
+            "token_id": "0x0000000a000000000000004b6f558aebfbd35477797ffa7a03fb81623c994769",
+            "minted_at": "2025-12-08T23:15:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0xa8B382EEE1D88eaff0B5398bc6AC6e32f6606fd0",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0x97ed395247d2c13c257178dee3cb7e292399cadf47e37c23756308f812f51e77",
+            "token_id": "0x0000000a000000000000004ba8b382eee1d88eaff0b5398bc6ac6e32f6606fd0",
+            "minted_at": "2025-12-08T23:15:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x876EEb06f5d50f4BC348D63a7d94f62eE029C792",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0x97ed395247d2c13c257178dee3cb7e292399cadf47e37c23756308f812f51e77",
+            "token_id": "0x0000000a000000000000004b876eeb06f5d50f4bc348d63a7d94f62ee029c792",
+            "minted_at": "2025-12-08T23:15:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Leo (Civil_Monkey)",
+          "wallet": "0xe5adabBD71225E8074E30ff6cE2a66c9319C071b",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0x97ed395247d2c13c257178dee3cb7e292399cadf47e37c23756308f812f51e77",
+            "token_id": "0x0000000a000000000000004be5adabbd71225e8074e30ff6ce2a66c9319c071b",
+            "minted_at": "2025-12-08T23:15:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0x97ed395247d2c13c257178dee3cb7e292399cadf47e37c23756308f812f51e77",
+            "token_id": "0x0000000a000000000000004b7234c36a71ec237c2ae7698e8916e0735001e9af",
+            "minted_at": "2025-12-08T23:15:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "sources": [
+    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "notes": [],
+  "participants": 17,
+  "respect_total": 1100,
+  "unnamed_wallets": 7
+}

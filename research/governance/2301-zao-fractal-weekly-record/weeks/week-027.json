@@ -1,0 +1,129 @@
+{
+  "week": 27,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "FailOften",
+          "wallet": "0xfda73b8459f66b6758d1809372df921365053af1",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Mr McFly",
+          "wallet": "0x50878dF070d764AeDe0D91101d2de83FdCDCf79A",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Binx",
+          "wallet": "0xE86840d9c4Db42DA83366A9ee75E57c711A34204",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "JayConnects",
+          "wallet": null,
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "heather",
+          "wallet": "0xbC66077E3a212c5f255Cfc986e7C0508cFeABFD1",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "john blackwell",
+          "wallet": "0x03726e10565402A1137960ba06681754BE7Fe05f",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Tricky",
+          "wallet": "0x1aF4c2950C5c892D1F4aacd60E8f656A14555E5A",
+          "rank": null,
+          "level": null,
+          "respect": 5,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Dr. Bruce",
+          "wallet": "0x74f1668CeA1E733B434DEc0D6DCf1F3EC64973d6",
+          "rank": null,
+          "level": null,
+          "respect": 5,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "heather",
+    "Binx"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 9,
+  "respect_total": 243,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 27'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 27'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "1 of 9 people this week have no known wallet in the Airtable map - recorded by name only, never guessed."
+  ]
+}

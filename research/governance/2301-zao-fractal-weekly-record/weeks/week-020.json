@@ -1,0 +1,89 @@
+{
+  "week": 20,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Trey",
+          "wallet": "0x06D43fE5B16a6783Dfdaff1c6a4024e926E89E1F",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "heather",
+          "wallet": "0xbC66077E3a212c5f255Cfc986e7C0508cFeABFD1",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Dan Shinder",
+          "wallet": null,
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "jed XO",
+          "wallet": "0xA70fE49c71529808EB881455073bEdED47f7016C",
+          "rank": null,
+          "level": null,
+          "respect": 8,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "heather",
+    "Dan Shinder"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 5,
+  "respect_total": 131,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 20'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 20'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "1 of 5 people this week have no known wallet in the Airtable map - recorded by name only, never guessed."
+  ]
+}

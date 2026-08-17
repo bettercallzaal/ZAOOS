@@ -1,0 +1,110 @@
+{
+  "week": 40,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "EZinCrypto",
+          "wallet": "0xfAb9a3D37999E12252b47468D2FFD4BE15936012",
+          "rank": null,
+          "level": null,
+          "respect": 68,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Gneric",
+          "wallet": "0x744cdf12d5d289db118ed9293c10cfa952169071",
+          "rank": null,
+          "level": null,
+          "respect": 42,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Tricky",
+          "wallet": "0x1aF4c2950C5c892D1F4aacd60E8f656A14555E5A",
+          "rank": null,
+          "level": null,
+          "respect": 26,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "jed XO",
+          "wallet": "0xA70fE49c71529808EB881455073bEdED47f7016C",
+          "rank": null,
+          "level": null,
+          "respect": 16,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 10,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "K3O$",
+          "wallet": "0xDFbc0b0819F841CDdA9b418078B4304809600185",
+          "rank": null,
+          "level": null,
+          "respect": 10,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "Prizem",
+    "EZinCrypto",
+    "Gneric",
+    "Tricky"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 7,
+  "respect_total": 282,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 40'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 40'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking."
+  ]
+}

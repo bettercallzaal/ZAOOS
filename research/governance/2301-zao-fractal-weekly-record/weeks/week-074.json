@@ -10,6 +10,8 @@
     {
       "group": 1,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
       "results": [
         {
           "name": "john blackwell",
@@ -19,8 +21,8 @@
           "respect": 110,
           "settled": {
             "tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
-            "token_id": "0x0000000a000000000000004903726e10565402a1137960ba06681754be7fe05f",
-            "minted_at": "2025-11-10T10:48:53+00:00"
+            "block": 143586478,
+            "minted_at": "2025-11-10T10:48:53.000000Z"
           },
           "title": null,
           "reason": null
@@ -33,8 +35,8 @@
           "respect": 68,
           "settled": {
             "tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
-            "token_id": "0x0000000a000000000000004929f5dee65e1fb856b816eab4f0b702c10e5eaa34",
-            "minted_at": "2025-11-10T10:48:53+00:00"
+            "block": 143586478,
+            "minted_at": "2025-11-10T10:48:53.000000Z"
           },
           "title": null,
           "reason": null
@@ -47,8 +49,8 @@
           "respect": 42,
           "settled": {
             "tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
-            "token_id": "0x0000000a0000000000000049b7f4b9caba6bb0aeaa2b5d8df23e2b59c192bdbb",
-            "minted_at": "2025-11-10T10:48:53+00:00"
+            "block": 143586478,
+            "minted_at": "2025-11-10T10:48:53.000000Z"
           },
           "title": null,
           "reason": null
@@ -61,8 +63,8 @@
           "respect": 26,
           "settled": {
             "tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
-            "token_id": "0x0000000a00000000000000498a1891e106b504656c525b3c45a3e95f7a73a73e",
-            "minted_at": "2025-11-10T10:48:53+00:00"
+            "block": 143586478,
+            "minted_at": "2025-11-10T10:48:53.000000Z"
           },
           "title": null,
           "reason": null
@@ -75,8 +77,8 @@
           "respect": 16,
           "settled": {
             "tx": "0xe014968ac9321afdee647e204e8de9580a5021db7dea8bec6bff59f81aa46654",
-            "token_id": "0x0000000a00000000000000497234c36a71ec237c2ae7698e8916e0735001e9af",
-            "minted_at": "2025-11-10T10:48:53+00:00"
+            "block": 143586478,
+            "minted_at": "2025-11-10T10:48:53.000000Z"
           },
           "title": null,
           "reason": null
@@ -86,6 +88,8 @@
     {
       "group": 2,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
       "results": [
         {
           "name": "Jose (Joesph Goats)",
@@ -95,8 +99,8 @@
           "respect": 110,
           "settled": {
             "tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
-            "token_id": "0x0000000a000000000000004929185eb8cfd22aa719529217bfbade61677e0ad2",
-            "minted_at": "2025-11-10T10:49:09+00:00"
+            "block": 143586486,
+            "minted_at": "2025-11-10T10:49:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -109,8 +113,8 @@
           "respect": 68,
           "settled": {
             "tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
-            "token_id": "0x0000000a000000000000004982cb2305388c853ecfe9ea83a1604acf58466659",
-            "minted_at": "2025-11-10T10:49:09+00:00"
+            "block": 143586486,
+            "minted_at": "2025-11-10T10:49:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -123,8 +127,8 @@
           "respect": 42,
           "settled": {
             "tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
-            "token_id": "0x0000000a00000000000000493d5e3102b2df3289799f5b09fe4827a59c3e59ef",
-            "minted_at": "2025-11-10T10:49:09+00:00"
+            "block": 143586486,
+            "minted_at": "2025-11-10T10:49:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -137,8 +141,8 @@
           "respect": 26,
           "settled": {
             "tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
-            "token_id": "0x0000000a000000000000004964a15b1d2de581097cb48e5d82619203e24bb3e1",
-            "minted_at": "2025-11-10T10:49:09+00:00"
+            "block": 143586486,
+            "minted_at": "2025-11-10T10:49:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -151,8 +155,8 @@
           "respect": 16,
           "settled": {
             "tx": "0xb226ec65f581b18c62c5b74c45853d02e5df86d7dd5b64fc5b7ed53aeaa4d0ac",
-            "token_id": "0x0000000a00000000000000498d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
-            "minted_at": "2025-11-10T10:49:09+00:00"
+            "block": 143586486,
+            "minted_at": "2025-11-10T10:49:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -164,13 +168,17 @@
   "camera_on": [],
   "photos": [],
   "attendance": null,
+  "participants": 10,
+  "respect_total": 524,
+  "unnamed_wallets": 0,
   "sources": [
-    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",
-  "notes": [],
-  "participants": 10,
-  "respect_total": 524,
-  "unnamed_wallets": 0
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
 }

@@ -1,7 +1,7 @@
 {
-  "week": 84,
-  "period_number": 83,
-  "date": "2026-02-02",
+  "week": 96,
+  "period_number": 95,
+  "date": "2026-04-27",
   "era": "zor",
   "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
   "chain": "optimism",
@@ -10,47 +10,47 @@
     {
       "group": 1,
       "mode": "ranked",
-      "group_source": "ordaoawards.csv",
-      "settlement_tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0x8d8d1419cb35aa52e996e901c0e378f2747847dd79d6e5242579198e2b0a3427",
       "results": [
         {
-          "name": "CandyToyBox",
-          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "name": "XTincT",
+          "wallet": "0x381CC779761212344f8400373a994d29E17522c6",
           "rank": 1,
           "level": 6,
           "respect": 110,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x8d8d1419cb35aa52e996e901c0e378f2747847dd79d6e5242579198e2b0a3427",
+            "block": 150864996,
+            "minted_at": "2026-04-27T22:26:09.000000Z"
           },
           "title": null,
           "reason": null
         },
         {
-          "name": "Steve Strange",
-          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
           "rank": 2,
           "level": 5,
           "respect": 68,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x8d8d1419cb35aa52e996e901c0e378f2747847dd79d6e5242579198e2b0a3427",
+            "block": 150864996,
+            "minted_at": "2026-04-27T22:26:09.000000Z"
           },
           "title": null,
           "reason": null
         },
         {
-          "name": "SwarthyHatter",
-          "wallet": "0x4D16FCE1BD6E327AE31398CE9A2c4E12C077ecB1",
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
           "rank": 3,
           "level": 4,
           "respect": 42,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x8d8d1419cb35aa52e996e901c0e378f2747847dd79d6e5242579198e2b0a3427",
+            "block": 150864996,
+            "minted_at": "2026-04-27T22:26:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -62,9 +62,9 @@
           "level": 3,
           "respect": 26,
           "settled": {
-            "tx": "0x18354cf4350a05d6db9cc0ce8cc1fd5bdb60369229930bf1f0bf839562e85a2c",
-            "block": 147238232,
-            "minted_at": "2026-02-02T23:34:01.000000Z"
+            "tx": "0x8d8d1419cb35aa52e996e901c0e378f2747847dd79d6e5242579198e2b0a3427",
+            "block": 150864996,
+            "minted_at": "2026-04-27T22:26:09.000000Z"
           },
           "title": null,
           "reason": null
@@ -81,7 +81,6 @@
   "unnamed_wallets": 0,
   "sources": [
     "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
-    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",

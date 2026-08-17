@@ -10,6 +10,8 @@
     {
       "group": 1,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x69e938923f87215a9ad93d9117d72b31ca28be909476946a0e5e674d5ed30fcf",
       "results": [
         {
           "name": "Leo (Civil_Monkey)",
@@ -19,8 +21,8 @@
           "respect": 110,
           "settled": {
             "tx": "0x69e938923f87215a9ad93d9117d72b31ca28be909476946a0e5e674d5ed30fcf",
-            "token_id": "0x0000000a0000000000000058e5adabbd71225e8074e30ff6ce2a66c9319c071b",
-            "minted_at": "2026-03-09T22:42:43+00:00"
+            "block": 148748693,
+            "minted_at": "2026-03-09T22:42:43.000000Z"
           },
           "title": null,
           "reason": null
@@ -33,8 +35,8 @@
           "respect": 68,
           "settled": {
             "tx": "0x69e938923f87215a9ad93d9117d72b31ca28be909476946a0e5e674d5ed30fcf",
-            "token_id": "0x0000000a0000000000000058c96ab83c1b1605c9cf5ecc661a415e41423185d8",
-            "minted_at": "2026-03-09T22:42:43+00:00"
+            "block": 148748693,
+            "minted_at": "2026-03-09T22:42:43.000000Z"
           },
           "title": null,
           "reason": null
@@ -47,8 +49,8 @@
           "respect": 42,
           "settled": {
             "tx": "0x69e938923f87215a9ad93d9117d72b31ca28be909476946a0e5e674d5ed30fcf",
-            "token_id": "0x0000000a0000000000000058698e5a259c7564fc209a31994d664cb919725383",
-            "minted_at": "2026-03-09T22:42:43+00:00"
+            "block": 148748693,
+            "minted_at": "2026-03-09T22:42:43.000000Z"
           },
           "title": null,
           "reason": null
@@ -61,8 +63,8 @@
           "respect": 26,
           "settled": {
             "tx": "0x69e938923f87215a9ad93d9117d72b31ca28be909476946a0e5e674d5ed30fcf",
-            "token_id": "0x0000000a00000000000000587234c36a71ec237c2ae7698e8916e0735001e9af",
-            "minted_at": "2026-03-09T22:42:43+00:00"
+            "block": 148748693,
+            "minted_at": "2026-03-09T22:42:43.000000Z"
           },
           "title": null,
           "reason": null
@@ -72,6 +74,8 @@
     {
       "group": 2,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x564b4cdfd01110a3793f1bda2e18dfd6c816d4a2ddbead8866cbcad755ea1dac",
       "results": [
         {
           "name": "DopeStilo",
@@ -81,8 +85,8 @@
           "respect": 110,
           "settled": {
             "tx": "0x564b4cdfd01110a3793f1bda2e18dfd6c816d4a2ddbead8866cbcad755ea1dac",
-            "token_id": "0x0000000a00000000000000585d89bc84fb2ed7c9bc5405ed0b1297114eb39fcc",
-            "minted_at": "2026-03-18T18:28:57+00:00"
+            "block": 149129880,
+            "minted_at": "2026-03-18T18:28:57.000000Z"
           },
           "title": null,
           "reason": null
@@ -95,8 +99,8 @@
           "respect": 68,
           "settled": {
             "tx": "0x564b4cdfd01110a3793f1bda2e18dfd6c816d4a2ddbead8866cbcad755ea1dac",
-            "token_id": "0x0000000a0000000000000058f73485a61856ab07ad57152151db3ab99df9a8ea",
-            "minted_at": "2026-03-18T18:28:57+00:00"
+            "block": 149129880,
+            "minted_at": "2026-03-18T18:28:57.000000Z"
           },
           "title": null,
           "reason": null
@@ -109,8 +113,8 @@
           "respect": 42,
           "settled": {
             "tx": "0x564b4cdfd01110a3793f1bda2e18dfd6c816d4a2ddbead8866cbcad755ea1dac",
-            "token_id": "0x0000000a0000000000000058fa893e0326bc79aa30d72d64359e784770376d90",
-            "minted_at": "2026-03-18T18:28:57+00:00"
+            "block": 149129880,
+            "minted_at": "2026-03-18T18:28:57.000000Z"
           },
           "title": null,
           "reason": null
@@ -123,8 +127,8 @@
           "respect": 26,
           "settled": {
             "tx": "0x564b4cdfd01110a3793f1bda2e18dfd6c816d4a2ddbead8866cbcad755ea1dac",
-            "token_id": "0x0000000a0000000000000058fab9a3d37999e12252b47468d2ffd4be15936012",
-            "minted_at": "2026-03-18T18:28:57+00:00"
+            "block": 149129880,
+            "minted_at": "2026-03-18T18:28:57.000000Z"
           },
           "title": null,
           "reason": null
@@ -134,6 +138,8 @@
     {
       "group": 3,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
       "results": [
         {
           "name": "Jose (Joesph Goats)",
@@ -143,8 +149,8 @@
           "respect": 110,
           "settled": {
             "tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
-            "token_id": "0x0000000a000000000000005829185eb8cfd22aa719529217bfbade61677e0ad2",
-            "minted_at": "2026-03-10T09:30:35+00:00"
+            "block": 148768129,
+            "minted_at": "2026-03-10T09:30:35.000000Z"
           },
           "title": null,
           "reason": null
@@ -157,8 +163,8 @@
           "respect": 68,
           "settled": {
             "tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
-            "token_id": "0x0000000a00000000000000588d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
-            "minted_at": "2026-03-10T09:30:35+00:00"
+            "block": 148768129,
+            "minted_at": "2026-03-10T09:30:35.000000Z"
           },
           "title": null,
           "reason": null
@@ -171,8 +177,8 @@
           "respect": 42,
           "settled": {
             "tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
-            "token_id": "0x0000000a00000000000000583d5e3102b2df3289799f5b09fe4827a59c3e59ef",
-            "minted_at": "2026-03-10T09:30:35+00:00"
+            "block": 148768129,
+            "minted_at": "2026-03-10T09:30:35.000000Z"
           },
           "title": null,
           "reason": null
@@ -185,8 +191,8 @@
           "respect": 26,
           "settled": {
             "tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
-            "token_id": "0x0000000a000000000000005864a15b1d2de581097cb48e5d82619203e24bb3e1",
-            "minted_at": "2026-03-10T09:30:35+00:00"
+            "block": 148768129,
+            "minted_at": "2026-03-10T09:30:35.000000Z"
           },
           "title": null,
           "reason": null
@@ -199,8 +205,30 @@
           "respect": 16,
           "settled": {
             "tx": "0x2b5cff0167ab5a37b4144d2093b6698216097b6a0a5ecc7ed3cd12bf148993b2",
-            "token_id": "0x0000000a000000000000005829f5dee65e1fb856b816eab4f0b702c10e5eaa34",
-            "minted_at": "2026-03-10T09:30:35+00:00"
+            "block": 148768129,
+            "minted_at": "2026-03-10T09:30:35.000000Z"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 4,
+      "mode": "ranked",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0x993fd3e269f84f9092e892f0da7e6edc8ad3f9a2786cd09882246c6acadf017f",
+      "results": [
+        {
+          "name": "Penguin",
+          "wallet": "0xfaCEf700458D4Fc9746F7f3e0d37B462711fF09e",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0x993fd3e269f84f9092e892f0da7e6edc8ad3f9a2786cd09882246c6acadf017f",
+            "block": 150237169,
+            "minted_at": "2026-04-13T09:38:35.000000Z"
           },
           "title": null,
           "reason": null
@@ -212,13 +240,17 @@
   "camera_on": [],
   "photos": [],
   "attendance": null,
+  "participants": 14,
+  "respect_total": 796,
+  "unnamed_wallets": 2,
   "sources": [
-    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",
-  "notes": [],
-  "participants": 13,
-  "respect_total": 754,
-  "unnamed_wallets": 2
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
 }

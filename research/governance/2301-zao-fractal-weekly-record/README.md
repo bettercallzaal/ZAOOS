@@ -8,6 +8,9 @@ original-query: "inventory every existing store of past ZAO Fractal data, design
 tier: STANDARD
 ---
 
+<!-- ZOR era enumerated from Optimism 2026-08-17: 39 weeks (68-109), 288 live
+     awards, 288+28 reversed = 316 mints reconciled. OG ERC-20 era still open. -->
+
 # 2301 - ZAO Fractal Weekly Record (inventory + data convention)
 
 > **Purpose:** The durable home for the ZAO Fractal week-by-week record - rankings, Respect awarded per person, attendance, camera-on/video awards, photos. This doc is two things: (1) the exhaustive INVENTORY of where fractal data already lives, done before storing anything new, and (2) the per-week JSON convention plus the first backfill.
@@ -49,7 +52,9 @@ This is the strongest structured per-person, per-week data we hold: it carries t
 - ZOR ERC-1155 `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` - 31 distinct weeks, 67 txs, 2025-09-25 to 2026-07-06
 - Combined 63 distinct on-chain-settled weeks, 1 week of overlap
 
-Both contracts are on **Optimism**, not Base. There is no per-week, per-recipient enumeration checked in anywhere - only these counts. `research/governance/1200-respect-onchain-facts-verified/respect-facts.json` is the sibling holder-level fact sheet.
+Both contracts are on **Optimism**, not Base. There was no per-week, per-recipient enumeration checked in anywhere - only these counts. `research/governance/1200-respect-onchain-facts-verified/respect-facts.json` is the sibling holder-level fact sheet.
+
+> **Part 3 changed this for ZOR.** `zor-awards.json` in this directory is now the per-award enumeration of the ZOR contract - 316 mints and 28 burns, every one with its tx, block, timestamp, recipient, Respect value and meeting number. Doc 1202's aggregate of 31 ZOR weeks is consistent with it. The OG ERC-20 still has counts only.
 
 ### 1.4 The Discord bot - thin, not the record
 
@@ -83,6 +88,9 @@ No dedicated fractal photo archive exists on disk. The closest is `~/Documents/z
 
 Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. On-chain settlement runs to 2026-07-06. So **weeks ~92 through ~111 exist on Optimism and in Discord, and nowhere in a file anyone can read.**
 **The record is real but split across four incompatible stores, and the newest ~19 weeks are in none of them.** Airtable covers weeks 1-92 by name. ORDAO covers weeks 74-91 by wallet with tx proof. On-chain holds 63 settled weeks as a COUNT with no per-week rows. The Discord bot holds 3 real weeks. Doc 1770 was written from the live session at **week 106** on 2026-07-20, and on-chain settlement runs to 2026-07-06 - so weeks ~92 through ~110 exist on Optimism and in Discord, and nowhere in a file anyone can read.
+Doc 1770's live-session horizon is **week 107**: line 53 cites week 106 (the even split, 40 each), line 63 cites week 106 cameras, **line 64 cites week 107 cameras** (Ohnahji + Zaal), and line 73 cites week 103 newcomers. So **weeks ~92 onward existed on Optimism and in Discord, and nowhere in a file anyone could read.**
+
+> **Resolved the same day.** Part 3 enumerated the ZOR contract directly and closed this: weeks 92-109 are now files. The finding stands as the reason the work happened, and the remaining gap is now the OG era (weeks 1-67) plus meetings 72, 73 and 104.
 
 ---
 
@@ -142,13 +150,72 @@ One JSON per week at `weeks/week-NNN.json`, `NNN` zero-padded to the meeting num
 
 ## Part 3 - Backfill (newest first)
 
-`build-weeks.py` reads `data/ordaoawards.csv` + `csv import/Wallet Data-Grid view.csv` and writes `weeks/`. Run:
+Two builders, and **the on-chain one supersedes the CSV one** for every ZOR-era week:
+
+- `fetch-zor-onchain.py` - enumerates the ZOR ERC-1155 contract on Optimism via Blockscout and writes `weeks/`. This is the authoritative path.
+- `build-weeks.py` - the original CSV path, kept because it is the only reader of `data/ordaoawards.csv`'s group numbers and titles, which the chain does not carry.
 
 ```bash
-python3 build-weeks.py --repo "/path/to/ZAO OS V1" --out weeks
+python3 fetch-zor-onchain.py --fetch          # enumerate the contract, cache raw
+python3 fetch-zor-onchain.py --out weeks      # decode the cache into week files
+python3 validate-weeks.py --dir weeks         # gate it
 ```
 
-**Built 2026-08-17: 18 weeks, meetings 91 down to 74.**
+### How the ZOR encoding actually works
+
+This was an open question - the on-chain-facts memory recorded it as unresolved ("does amount = Respect, or does tokenId encode Respect and amount = count?"). **The answer is both, in two token ids emitted by a single `TransferBatch` log:**
+
+| token id | value | meaning |
+|---|---|---|
+| `0` | 110, 68, 42, 26, 16, 10, ... | the **Respect amount** |
+| `mintType(4B) \| period(8B) \| recipient(20B)` | `1` | a per-period badge, one per award |
+
+Both rows carry the same `tx_hash`, `log_index` and `to`, so an award is recovered by pairing on that triple. **`meeting = period + 1`.** That is why a naive holder-balance sum produces the mix of `1`s and Fibonacci numbers the memory flagged, and why a combined Gini could not be computed from balances: half the rows are badges, not amounts.
+
+### Verification of the method itself
+
+Reconstructing meetings 74-91 from the chain and diffing against `data/ordaoawards.csv`: **15 of 18 meetings match exactly**, recipient-for-recipient and value-for-value. The 3 that differ all differ the same way - the chain holds one award the CSV lacks, and the CSV holds nothing the chain lacks:
+
+| Meeting | Chain | Export | The award only the chain has |
+|---|---|---|---|
+| 89 | 14 | 13 | 42 Respect to `0xfaCEf700...ff09e` |
+| 90 | 15 | 14 | 110 Respect to `0x570e563b...5cad` |
+| 91 | 9 | 8 | 110 Respect to `0x9763c16d...9eea` |
+
+**The local CSV export under-reports the settled record by three awards.** The chain is the source of truth; the CSV is now used only for group numbers and titles.
+
+Two independent cross-checks landed on top of that: meeting 106 comes back as six awards of 40 each, which is exactly the even split [doc 1770](../1770-fractal-respect-operations/) line 53 describes as "week 106 = 40 each" - confirming the meeting numbering matches the one humans use in the room. And meeting 107 exists on-chain, matching line 64's week-107 camera note.
+
+### Mints, burns, and why four weeks show zero
+
+The contract's 688 transfer rows are **632 mints and 56 burns**, which pair into **316 mints and 28 burns**. The burns are all dated 2025-10-24, all at the 1x tier, and all against meetings 68-71: those weeks were minted onto ZOR shortly after its 2025-10-16 launch and then **fully reversed**.
+
+Every burn is netted against its mint, so a reversed award never counts toward a total. But the week files for 68-71 are still written, carrying `participants: 0` and a populated `reversed_awards` list, because **a reversal is not a gap** - dropping those files would erase the fact that settlement was attempted and undone. Accounting closes exactly: 288 live + 28 reversed = 316 mints.
+
+### Built 2026-08-17 from the chain: 39 weeks, meetings 109 down to 68
+
+| | |
+|---|---|
+| Weeks with live awards | **35** (74-109, less 104) |
+| Weeks fully reversed | 4 (68, 69, 70, 71) |
+| Live awards | **288**, totalling **16,418 Respect** |
+| Reversed awards | 28, totalling 848 Respect |
+| Newest settled week | **109**, settled 2026-08-10 |
+
+Recent weeks, read back out of the generated files:
+
+| Week | Settled | Awards | Respect | Shape |
+|---|---|---|---|---|
+| 109 | 2026-08-10 | 4 | 246 | ranked |
+| 108 | 2026-08-10 | 12 | 644 | 3 groups |
+| 107 | 2026-08-10 | 7 | 382 | matches doc 1770's week-107 note |
+| 106 | 2026-08-03 | 6 | 240 | even split, 40 each - matches doc 1770 line 53 |
+| 105 | 2026-07-06 | 4 | 246 | ranked |
+| 103 | 2026-06-22 | 6 | 272 | ranked |
+
+Weeks 106 through 109 all settled on 2026-08-10 - four weeks minted in one batch. This is the settlement-vs-session gap at its widest, and the reason `date` is never presented as a session date.
+
+**Where the record actually ends.** The newest settled week on-chain is **109**. The lane was pointed at "weeks 92-111"; weeks 110 and 111 have no ZOR settlement, which means either they have not happened yet or they have not been settled. **That is not evidence they are missing** - `state-claims.md`, silence is not evidence. Someone who was in the room should say which.
 
 | Week | Settled | Groups | Participants | Respect |
 |---|---|---|---|---|
@@ -198,15 +265,21 @@ python3 validate-weeks.py --dir weeks   # PASS - 18 week file(s) valid
 | **Weeks 1-73** | `csv import/Respect-Grid view.csv`, by name | Parser must handle drifting column names and both Fibonacci tiers; no wallets, no tx proof |
 | **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed; current-era video mints not exported |
 | **Attendance** | Discord session records | No source enumerated |
+| **Meetings 72, 73, 104** - absent from ZOR | 72/73 are OG-era (the OG ERC-20 covers fractals 1-73); 104 is unexplained | Needs an OG ERC-20 enumeration for 72/73. **104 is a real open question** - it sits between two settled weeks and nobody should assume it did not happen |
+| **Weeks 110-111** | possibly nowhere yet | No ZOR settlement exists. Either not yet held or not yet settled - ask someone who was there rather than infer |
+| **Weeks 1-67** | `csv import/Respect-Grid view.csv` by name, OG ERC-20 by wallet | The OG contract is enumerable the same way this one was - that is the obvious next build. The CSV parser must handle drifting column names and both Fibonacci tiers |
+| **Video / camera-on awards, all weeks** | 87 `ZAO Video N` columns (weeks 1-92); doc 1770 stream after | Not yet parsed. The chain does not distinguish a video award from a breakout award, so this needs the CSV plus the room's knowledge |
+| **Attendance** | Discord session records | No source enumerated. Note attendance is NOT the award count - someone can attend and receive nothing |
 | **Photos** | scattered; `~/Documents/zao-media/appearances/` is the nearest thing | No per-week visual archive exists to point at |
-| **2026-08-16 camera batch** | the lane's founding directive only | Week number for 2026-08-16 not yet confirmed - do not file it under a guessed week |
+| **2026-08-16 camera batch** | the lane's founding directive only | Week number for 2026-08-16 not confirmed. Weeks 106-109 all settled 2026-08-10, so the mapping from that date to a week number is exactly the inference this doc warns against - do not file it under a guessed week |
 
-Newest-first means weeks 92+ are the next work, not weeks 1-73.
+The ZOR era is now done. The next enumeration is the **OG ERC-20** `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`, which covers fractals 1-73 and would close most of the remaining record using the method already proven here.
 
 ---
 
 ## Sources
 
+- **Optimism mainnet, enumerated 2026-08-17** - ZOR Respect ERC-1155 `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` via the Blockscout v2 API (`optimism.blockscout.com`), 688 transfer rows over 14 pages, pagination run to natural exhaustion (no page cap hit). Contract confirmed as "ZAO Fractal Respect", ERC-1155, 58 holders at time of read. Raw JSON was fetched and decoded locally; `zor-awards.json` in this directory is the normalized result and is the quotable evidence for every number in Part 3.
 - ZAOOS repo, measured 2026-08-17: `csv import/*.csv`, `data/ordaoawards.csv`, `scripts/archive/old/create-respect-tables.sql`, `scripts/archive/old/create-fractal-live-tables.sql`, `scripts/archive/2026-04-25-cleanup/import-fractal-history.ts`, `src/app/api/fractals/*`, `src/app/api/respect/*`, branch `feat/fractal-run-awards`
 - `~/Desktop/repos/fractalbotjuly2026/data/*.json` (Discord bot state), `~/Desktop/repos/ZAOfractal`, `~/Desktop/repos/zaofractal-contracts`, `~/Documents/zao-media/appearances/`
 - Docs [1254](../1254-zao-fractal-100-week-record/), [1202](../1202-fractal-onchain-settlement-history/), [1200](../1200-respect-onchain-facts-verified/), [1770](../1770-fractal-respect-operations/) (the rank-to-denomination table), [1069](../1069-fractal-discord-bot-voting-mechanism/), [696](../696-respect-fractal-lineage-summary/)

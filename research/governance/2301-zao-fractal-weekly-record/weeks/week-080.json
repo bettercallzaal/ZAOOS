@@ -10,6 +10,8 @@
     {
       "group": 1,
       "mode": "ranked",
+      "group_source": "ordaoawards.csv",
+      "settlement_tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
       "results": [
         {
           "name": "Steve Strange",
@@ -19,8 +21,8 @@
           "respect": 110,
           "settled": {
             "tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
-            "token_id": "0x0000000a000000000000004f07686bedb0102e47d33cec73307d2cc391aff396",
-            "minted_at": "2025-12-22T22:54:37+00:00"
+            "block": 145422650,
+            "minted_at": "2025-12-22T22:54:37.000000Z"
           },
           "title": null,
           "reason": null
@@ -33,8 +35,8 @@
           "respect": 68,
           "settled": {
             "tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
-            "token_id": "0x0000000a000000000000004f2d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
-            "minted_at": "2025-12-22T22:54:37+00:00"
+            "block": 145422650,
+            "minted_at": "2025-12-22T22:54:37.000000Z"
           },
           "title": null,
           "reason": null
@@ -47,8 +49,8 @@
           "respect": 42,
           "settled": {
             "tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
-            "token_id": "0x0000000a000000000000004f744cdf12d5d289db118ed9293c10cfa952169071",
-            "minted_at": "2025-12-22T22:54:37+00:00"
+            "block": 145422650,
+            "minted_at": "2025-12-22T22:54:37.000000Z"
           },
           "title": null,
           "reason": null
@@ -61,8 +63,8 @@
           "respect": 26,
           "settled": {
             "tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
-            "token_id": "0x0000000a000000000000004f8d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
-            "minted_at": "2025-12-22T22:54:37+00:00"
+            "block": 145422650,
+            "minted_at": "2025-12-22T22:54:37.000000Z"
           },
           "title": null,
           "reason": null
@@ -75,8 +77,8 @@
           "respect": 16,
           "settled": {
             "tx": "0xf6da88ca0fa4f5a5b04bf93f629869ec557a13a9cf8f76b546c4e596873fe8e6",
-            "token_id": "0x0000000a000000000000004f7234c36a71ec237c2ae7698e8916e0735001e9af",
-            "minted_at": "2025-12-22T22:54:37+00:00"
+            "block": 145422650,
+            "minted_at": "2025-12-22T22:54:37.000000Z"
           },
           "title": null,
           "reason": null
@@ -88,13 +90,17 @@
   "camera_on": [],
   "photos": [],
   "attendance": null,
+  "participants": 5,
+  "respect_total": 262,
+  "unnamed_wallets": 0,
   "sources": [
-    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "data/ordaoawards.csv (group numbers only)",
     "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
   ],
   "coverage": "partial",
-  "notes": [],
-  "participants": 5,
-  "respect_total": 262,
-  "unnamed_wallets": 0
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
 }

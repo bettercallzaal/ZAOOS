@@ -1,0 +1,53 @@
+{
+  "week": 70,
+  "period_number": 69,
+  "date": "2025-10-17",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 0,
+  "groups": [],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "participants": 0,
+  "respect_total": 0,
+  "unnamed_wallets": 0,
+  "sources": [
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "reversed_awards": [
+    {
+      "name": "Zach L.",
+      "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+      "respect": 55,
+      "minted_at": "2025-10-17T02:04:33.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    },
+    {
+      "name": "CandyToyBox",
+      "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+      "respect": 34,
+      "minted_at": "2025-10-17T02:04:33.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    },
+    {
+      "name": "Zaal",
+      "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+      "respect": 21,
+      "minted_at": "2025-10-17T02:04:33.000000Z",
+      "burned_at": "2025-10-24T06:50:45.000000Z",
+      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
+    }
+  ],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched.",
+    "NO LIVE AWARDS: every ZOR award minted for this week was later burned. Settlement was attempted and fully reversed - this week is not a gap in the record, it is a reversal.",
+    "3 award(s) for this week were minted and later BURNED on-chain; they are excluded from participants and respect_total and listed in reversed_awards."
+  ]
+}

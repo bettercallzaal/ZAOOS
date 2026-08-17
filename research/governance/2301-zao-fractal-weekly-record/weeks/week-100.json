@@ -1,0 +1,169 @@
+{
+  "week": 100,
+  "period_number": 99,
+  "date": "2026-05-25",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "ranked",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0x5d6d63984bdd223606c398a305c7131202d119ca6561e4707b1ee4def645d262",
+      "results": [
+        {
+          "name": null,
+          "wallet": "0xF73485A61856Ab07Ad57152151db3ab99dF9a8Ea",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x5d6d63984bdd223606c398a305c7131202d119ca6561e4707b1ee4def645d262",
+            "block": 152075002,
+            "minted_at": "2026-05-25T22:39:41.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x6ca74cEbd564A837991E10a701ab7605CAB3D358",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0x5d6d63984bdd223606c398a305c7131202d119ca6561e4707b1ee4def645d262",
+            "block": 152075002,
+            "minted_at": "2026-05-25T22:39:41.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "0$",
+          "wallet": "0xEd78B6236C14c4088715cd90513C6C604275Db96",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0x5d6d63984bdd223606c398a305c7131202d119ca6561e4707b1ee4def645d262",
+            "block": 152075002,
+            "minted_at": "2026-05-25T22:39:41.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x4440397b9E67A020bc96269F263817BE63184F3A",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0x5d6d63984bdd223606c398a305c7131202d119ca6561e4707b1ee4def645d262",
+            "block": 152075002,
+            "minted_at": "2026-05-25T22:39:41.000000Z"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "mode": "ranked",
+      "group_source": "inferred_from_settlement_tx",
+      "settlement_tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+      "results": [
+        {
+          "name": "Thy Rev",
+          "wallet": "0x5eCC8a94C117Eeb5c6233600927E941c2548d574",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+            "block": 152075030,
+            "minted_at": "2026-05-25T22:40:37.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x461Da8b51a36a3F845A02BF8924A66e0Ca76e27e",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+            "block": 152075030,
+            "minted_at": "2026-05-25T22:40:37.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+            "block": 152075030,
+            "minted_at": "2026-05-25T22:40:37.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+            "block": 152075030,
+            "minted_at": "2026-05-25T22:40:37.000000Z"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0xf92de718f9dedb2816a20b600501ab27119abe34903240e3ed6d27259cdb3dfd",
+            "block": 152075030,
+            "minted_at": "2026-05-25T22:40:37.000000Z"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "participants": 9,
+  "respect_total": 508,
+  "unnamed_wallets": 4,
+  "sources": [
+    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "reversed_awards": [],
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched."
+  ]
+}

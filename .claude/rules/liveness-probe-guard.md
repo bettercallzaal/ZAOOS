@@ -4,33 +4,35 @@ A health check that cannot tell a **busy** service from a **dead** one will
 eventually kill a healthy one. Then it will kill the replacement. The symptom
 never looks like "the probe was wrong" - it looks like the service crash-looping.
 
-This rule exists because the same bug was diagnosed three times across three
-lanes before anyone wrote it down.
+This rule exists because the same bug was hit three times over five weeks, and
+fully root-caused a month in, before anyone wrote it down.
 
 ## The three instances (all confirmed, ZAOOS#3065)
 
 `gstack browse` - the headless browser the fleet uses for client-rendered pages.
+All three were hit by the zao-artizen lane, in `ZAOartizen/scripts/refresh-fund.mjs`.
 
-1. **2026-07-13** (zao-artizen). `browse restart` on an already-healthy session
-    repeatedly triggered "crashed twice in a row". Worked around at the call site:
-    `ZAOartizen/scripts/refresh-fund.mjs` stopped calling `restart` and started
-    verifying the URL after `goto` instead.
-2. **2026-08-12** (zao-artizen). The same crash-loop, *without* anything calling
-    `restart` - it happened inside the binary's own retry logic during a plain
-    `goto`. Same signature, different trigger path.
-3. **2026-08-14** (ignite-radio) - **root-caused.** Nothing was crashing.
-    `ensureServer()` probes `/health` with a single `AbortSignal.timeout(2000)`.
-    Measured latency on the *same* server: **0.007s idle vs 2.02s and 3.92s while
-    a heavy page loads** - a ~150x degradation that crosses the budget. On probe
-    failure it calls `startServer()`, which `unlinkSync`s the state file and
-    spawns a replacement **without killing the original**. So: busy server
-    misread as dead -> state file deleted -> second server spawns on a new port
-    at `about:blank` -> the page silently vanishes -> the original keeps running,
-    orphaned, holding its Chromium. Repeat per command. Falsifiable prediction,
-    confirmed: **7 orphaned servers and 36 headless Chromium** before cleanup.
-4. **2026-08-17** (zao-artizen). Reproduced with **0 orphans on the machine
-    beforehand**, which settles that orphans are downstream of the bug, not a
-    precondition for it.
+1. **2026-07-13.** `browse restart` on an already-healthy session repeatedly
+    triggered "crashed twice in a row". Worked around at the call site:
+    `refresh-fund.mjs` stopped calling `restart` and started verifying the URL
+    after `goto` instead.
+2. **2026-08-12.** The same crash-loop, *without* anything calling `restart` - it
+    happened inside the binary's own retry logic during a plain `goto`. Same
+    signature, different trigger path. Issue filed.
+3. **2026-08-17.** Reproduced with **0 orphans on the machine beforehand**, which
+    settles that orphans are downstream of the bug, not a precondition for it.
+
+**Root-caused 2026-08-14 by the ignite-radio lane** (investigating instance 2 -
+analysis, not a fourth occurrence). Nothing was crashing. `ensureServer()` probes
+`/health` with a single `AbortSignal.timeout(2000)`. Measured latency on the
+*same* server: **0.007s idle vs 2.02s and 3.92s while a heavy page loads** - a
+~150x degradation that crosses the budget. On probe failure it calls
+`startServer()`, which `unlinkSync`s the state file and spawns a replacement
+**without killing the original**. So: busy server misread as dead -> state file
+deleted -> second server spawns on a new port at `about:blank` -> the page
+silently vanishes -> the original keeps running, orphaned, holding its Chromium.
+Repeat per command. Falsifiable prediction, confirmed: **7 orphaned servers and
+36 headless Chromium** before cleanup.
 
 Upstream fixed it in gstack 1.62.0.0 (`probeHealthWithBackoff`, their issue
 \#1781); local is 0.9.2.0. Their own code comment describes this exact failure -
@@ -91,7 +93,7 @@ specifically at fetches that feed figures.
 The strongest argument for this rule is not either finding above. It is what
 happened to both of them.
 
-Investigating instance 4, the two lanes produced **one unreproduced one-off
+Investigating instance 3, the two lanes produced **one unreproduced one-off
 each**, and each was caught only because the other lane re-ran the measurement
 instead of accepting the report:
 
@@ -136,10 +138,11 @@ convergence is not proof (`research-grounding.md` rule 3).
 ## Source
 
 Written 2026-08-17 by the zao-artizen lane at ignite-radio's request, after that
-lane root-caused instance 3 and stopped for a fleet refresh. Three prior
-instances, two of them fully diagnosed, zero rules - which is exactly the failure
-`agentic-issue` exists to prevent, recurring inside the tooling that skill
-monitors. The "measure three times" section was added after both lanes retracted
+lane root-caused the bug on 2026-08-14 and then stopped for a fleet refresh.
+Three instances, fully root-caused a month in, and still zero rules - which is
+exactly the failure `agentic-issue` exists to prevent, recurring inside the
+tooling that skill monitors. The "measure three times" section was added after
+both lanes retracted
 an unreproduced one-off during the same investigation - each caught by the other,
 neither caught by its author. Tracking issue: bettercallzaal/ZAOOS#3065.
 Siblings:

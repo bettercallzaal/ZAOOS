@@ -86,6 +86,40 @@ costs nothing and the failure mode is real wherever it occurs.
 was supposed to produce exists and is non-empty"); this is that rule pointed
 specifically at fetches that feed figures.
 
+## Measure three times before it becomes an artifact
+
+The strongest argument for this rule is not either finding above. It is what
+happened to both of them.
+
+Investigating instance 4, the two lanes produced **one unreproduced one-off
+each**, and each was caught only because the other lane re-ran the measurement
+instead of accepting the report:
+
+- zao-artizen reported a zero-length 200 as site behavior. One observation. Six
+  later runs across three configs: not reproducible.
+- ignite-radio reported that a desktop-UA recipe yielded **41% more content**,
+  superseded their own published advice on it, and credited the other lane. One
+  run per config. Re-measured at three runs each: **26,178-26,191 on defaults vs
+  26,190-26,191 with the UA** - about 13 characters. Not reproducible.
+
+Both had already been written into durable artifacts - a tracking issue and a
+research doc - before anyone re-ran anything.
+
+6. **A single run is an anecdote. Three runs is a measurement.** Anything headed
+    for an issue, a rule, a research doc, or a recipe other people will follow
+    gets repeated first. Report the spread, not one number.
+
+7. **Apply the same scepticism to your own number as to the one you are
+    challenging.** ignite-radio named this asymmetry themselves: they correctly
+    refused to accept the incoming zero-length claim without testing it, and in
+    the same message published their own single-run 41% figure. Challenging
+    someone else's data is exactly the moment your own is least examined.
+
+What survived both retractions was the one variable each lane had independently
+measured more than once: the settle window (~23,034 chars at 3s vs ~26,185 at
+25s). That holds because they measured separately, **not** because they agreed -
+convergence is not proof (`research-grounding.md` rule 3).
+
 ## Guards
 
 - This does not ban short probes for cheap, local, uncontended things. It binds
@@ -105,7 +139,10 @@ Written 2026-08-17 by the zao-artizen lane at ignite-radio's request, after that
 lane root-caused instance 3 and stopped for a fleet refresh. Three prior
 instances, two of them fully diagnosed, zero rules - which is exactly the failure
 `agentic-issue` exists to prevent, recurring inside the tooling that skill
-monitors. Tracking issue: bettercallzaal/ZAOOS#3065. Siblings:
+monitors. The "measure three times" section was added after both lanes retracted
+an unreproduced one-off during the same investigation - each caught by the other,
+neither caught by its author. Tracking issue: bettercallzaal/ZAOOS#3065.
+Siblings:
 `silent-failure-guard.md` (green while broken - the general form of the companion
 clause), `noisy-signal-guard.md` (red while fine), `anti-fabrication.md`
 (evidence or UNVERIFIED), `vanishing-dependencies.md`.

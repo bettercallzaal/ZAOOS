@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-07-12
+last-validated: 2026-08-17
 superseded-by:
 related-docs: "1032, 1013"
 original-query: "keep planning stuff - real insurance/liability coverage plan, since a 500-person public outdoor event has never had one researched despite a real permit ordinance requiring a surety bond"
@@ -51,6 +51,44 @@ Maine-specific page, starting at $199. All three can plausibly bind coverage wit
 - this is no longer a "find a vendor" problem, just a "make the call" one. [FULL - this session's research,
 3 real vendors with confirmed pricing and contact info]
 
+### 3.6 UPDATE 2026-08-17 - the city made it concrete, alcohol is resolved, fire is the open wrinkle
+
+**The requirement is no longer hypothetical.** Roddy Ehrlenbach (City of Ellsworth) emailed 2026-08-17
+11:43 AM: the city needs a COPY of our event insurance; the city's own liability covers only the parklet's
+physical structure; our property, assets, performers, and their equipment are ours to cover. A liability
+release is being drafted by city legal and will be forwarded. This supersedes Finding 6's uncertainty -
+the city expects our own policy. Whether they also want "additional insured" status on it is the one
+question to ask in the reply thread. [FULL - the email itself, received 2026-08-17]
+
+**Alcohol question (Finding 5) is now resolved:** the parklet is a free dry stage; all bar activity is
+Black Moon Public House operating under its own liquor license inside its own venue. No liquor liability
+rider needed on our policy (GatherGuard's included host-liquor coverage is bonus, not requirement).
+[FULL - venue structure per doc 2295 and the 2026-08-17 standup]
+
+**Fire performance is the wrinkle standard policies do not cover.** Fire spinning (DeCoup) is planned, and
+standard event general-liability policies exclude open-flame performance - fire performers carry their OWN
+specialty policies (commonly ~$1M/occurrence, sold as fire-performer coverage) and issue a certificate
+naming the event and venue as additional insureds. So the move is NOT to buy fire coverage ourselves: it is
+to require DeCoup's own COI naming ZAOstock and the City of Ellsworth, alongside the Fire Dept permit-route
+call. GatherGuard's exclusion list (inflatables, mechanical rides, rodeos, motorized) does not name fire,
+but its FAQ is explicit that performers are never covered by the event policy - the performer-carries-own
+rule applies regardless of carrier. [FULL - gatherguard.com/festivals-cultural-events fetched 2026-08-17;
+fire-performer insurance practice via insuranks.com / tonkinsurance.com / hestiafiredance.com search
+results same day, method: WebFetch summary + WebSearch, not raw text]
+
+**Vendors re-verified live 2026-08-17, call in this order** (contact details are in Finding 3.5 above -
+not restated here):
+1. **Brown, Holmes & Milliken** (Ellsworth local) - one call can quote the GL policy, advise on the surety
+   bond in the same conversation, and a local agent relationship compounds for every future ZAO Festivals
+   event.
+2. **GatherGuard** - online bind, $1-2M per occurrence / $2M aggregate, host liquor included. Page live,
+   verified this session.
+3. **RVNA** - from $199, Maine page live, additional-insured handled via their quote flow.
+
+Certificate turnaround at the national carriers is same-day-to-next-day once paid, so this stays a
+"make the call" task - but the city copy requirement plus the Sept 23 fire-marshal contingency argue for
+closing it THIS WEEK, not in September.
+
 ### 4. Vendors and performers typically carry their own coverage - worth requiring proof, not assuming
 
 Standard event practice is that food vendors and performers carry their own liability insurance and provide a certificate of insurance naming the event organizer as additional insured. This connects directly to doc 1044's food-vendor plan - the vendor confirmation checklist that doc recommends should include an insurance-status question, not just permit status. [FULL - per subagent research, cross-referenced against doc 1044's vendor sourcing plan]
@@ -74,15 +112,19 @@ Ellsworth's own published ordinance text doesn't explicitly state an "additional
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Get a real general-liability insurance quote for the event (target $300-$600 range) | Zaal | Task | 2026-08-15 |
-| Ask New Media Commons and ENTERACT directly whether any liability coverage is included in their sponsorship arrangement (Finding 3) | Zaal | Todo | 2026-08-01 |
-| Decide the alcohol question - this determines whether liquor liability coverage is needed (Finding 5) | Zaal | Todo | 2026-07-21 |
-| Confirm the surety bond dollar amount and whether "additional insured" status is required, when filing the Aug 19 mass-gathering permit (Findings 1, 6) | Zaal | Task | 2026-08-19 |
-| Confirm with Heart of Ellsworth whether they have their own insurance/additional-insured requirement for using the Franklin Street Parklet | Zaal | Todo | 2026-08-01 |
+| Call Brown, Holmes & Milliken (contacts in Finding 3.5) for a GL quote + surety-bond advice; fall back to GatherGuard online if local cannot bind fast | Zaal | Task | 2026-08-21 |
+| Reply on the Roddy email thread: insurance quotes in motion, ask if the city wants additional-insured status, get the permit confirmed in the same exchange | Zaal | Task | 2026-08-18 |
+| Require DeCoup's own fire-performer COI naming ZAOstock + City of Ellsworth (Finding 3.6) | Zaal | Task | 2026-08-24 |
+| Review + sign the city liability release when Roddy forwards it | Zaal | Task | 2026-08-28 |
+| Ask New Media Commons and ENTERACT directly whether any liability coverage is included in their sponsorship arrangement (Finding 3 - still unanswered) | Zaal | Todo | 2026-08-21 |
 
 ## Sources
 
 - One DEEP-tier subagent research pass (event insurance types/costs for small outdoor festivals, fiscal-sponsorship liability practice, Maine municipal additional-insured norms), run this session, 20+ sources checked — [FULL, returned a complete written report with cited sources; full detail saved separately at `/private/tmp/claude-501/-Users-zaalpanthaki-Desktop-repos-zaostock/ab99e3db-c258-46d8-a61d-5a97125518f9/scratchpad/ZAOstock_Event_Insurance_Research_Report.md`]
+- Roddy Ehrlenbach (City of Ellsworth) email, 2026-08-17 11:43 AM - [FULL, the primary source for Finding 3.6's requirement]
+- [GatherGuard - Festivals & Cultural Events](https://www.gatherguard.com/festivals-cultural-events) - [FULL, fetched 2026-08-17 via WebFetch summary]
+- [RVNA - Maine Event Insurance](https://www.specialeventinsurance.com/event-insurance/maine) - [FULL, fetched 2026-08-17 via WebFetch summary]
+- Fire-performer coverage practice: [insuranks.com fire performers](https://www.insuranks.com/fire-performers-insurance), [Tonk Insurance](https://www.tonkinsurance.com/fire-performer-insurance/), [Hestia Fire Dance guide](https://hestiafiredance.com/safety-first-fire-performance-insurance-guide/) - [PARTIAL, WebSearch result summaries 2026-08-17, not raw pages]
 - [City of Ellsworth Ordinance Chapter 14](https://www.ellsworthmaine.gov/wp-content/uploads/2016/06/ord14_licenses_permits.pdf) — [FULL, previously fetched (doc 1032), re-cited here]
 - [Fractured Atlas — Insurance](https://www.fracturedatlas.org/insurance) — [FULL, per subagent research, source of the 2019 program-end finding]
 - [Doc 1032 — ZAOstock Day-of Operations Plan](../../events/1032-zaostock-day-of-operations-plan/) — [FULL, internal]

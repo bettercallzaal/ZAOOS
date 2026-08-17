@@ -4,6 +4,10 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-05 | Paper x Zaal - Bomb Squad, the seventh man, media vault | BCZ / WaveWarZ | Zaal, Paper | [2298](2298-paper-bomb-squad-collab-aug5/) | 5 |
+| 2026-08-06 | Matteo x Zaal x Candy - Livepeer, web3 radio, Harberger ads | BCZ / WaveWarZ | Zaal, Matteo Tambussi, Samantha | [2297](2297-matteo-livepeer-web3radio-harberger-aug6/) | 4 |
+| 2026-08-04 | Dylan x Rizzle x Zaal - Clanker v5, droids, practice-launch plan | ZAO Devz | Zaal, Epic Dylan, Rizzle, Samantha | [2296](2296-dylan-rizzle-clanker-v5-token-planning-aug4/) | 7 |
+| 2026-08-15 | Steve Peer x Zaal - Black Moon becomes the second stage | ZAOstock | Zaal, Steve Peer | [2295](2295-steve-peer-black-moon-logistics-aug15/) | 7 |
 | 2026-08-14 | Yerb x Zaal - tokenless Empire for ZAOstock launched live | ZAOstock | Zaal, Jordan Oram, 0xquan, Samantha | [2287](2287-yerb-empire-tokenless-aug14/) | 6 |
 | 2026-08-13 | Ellsworth promotion and marketing - Heart of Ellsworth x ZAOstock | ZAOstock | Zaal, Chesnee Barney, Tom Fellenz, Sam | [2279](2279-ellsworth-promo-marketing-chesnee-aug13/) | 15 |
 | 2026-08-10 | **Media appearance:** Community Communities Web3 Space - The ZAO, ZAOstock, ZAO Festivals, ZAOville | ZAO/media | Zaal, Candy, DeCoup, Paper Hand, Quan, Flenz, Trey, Miss Evie, Stormy, GG, Rev (host) | [2261](2261-zao-community-communities-space-2026-08-10/) | 6 |

@@ -1,0 +1,142 @@
+{
+  "week": 79,
+  "period_number": 78,
+  "date": "2025-12-22",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "even_split",
+      "results": [
+        {
+          "name": "Sven",
+          "wallet": "0x0c687a27410E8a655Bf31befc4c88237A60B1D3D",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e0c687a27410e8a655bf31befc4c88237a60b1d3d",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Seven Intro 79",
+          "reason": "Seven Intro for meeting 79"
+        },
+        {
+          "name": null,
+          "wallet": "0x062108149bd327d43556716d6C523D3E0Db508b7",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e062108149bd327d43556716d6c523d3e0db508b7",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "King Sam Intro 79",
+          "reason": "King Sam Intro for meeting 79"
+        },
+        {
+          "name": "Jango UU",
+          "wallet": "0xF6519fEf3EAcfdB7843BEEa94a887255794438F0",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004ef6519fef3eacfdb7843beea94a887255794438f0",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "JANGO UU Points 79",
+          "reason": "JANGO UU Split Points 40 since bot not working"
+        },
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e8d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Candy Points 79",
+          "reason": "Candy Split Points 40 since bot not working"
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e7234c36a71ec237c2ae7698e8916e0735001e9af",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Zaal Points 79",
+          "reason": "Zaal Split Points 40 since bot not working"
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e65284960d4eadaf45e923430a59b7d3bf34db641",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Prizem Points 79",
+          "reason": "Prizem Split Points 40 since bot not working"
+        },
+        {
+          "name": "Meta Mu",
+          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e2d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Meta Mu Points 79",
+          "reason": "Meta Mu Split Points 40 since bot not working"
+        },
+        {
+          "name": "Steve Strange",
+          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "rank": null,
+          "level": null,
+          "respect": 40,
+          "settled": {
+            "tx": "0x7c6dc1e0dfc12a4a5308019b1c21d5293f1657bdb19ac867c031c661785f2d53",
+            "token_id": "0x0000000a000000000000004e07686bedb0102e47d33cec73307d2cc391aff396",
+            "minted_at": "2025-12-22T22:51:49+00:00"
+          },
+          "title": "Steve Strange Points 79",
+          "reason": "Steve Strange Split Points 40 since bot not working"
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "sources": [
+    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "notes": [],
+  "participants": 8,
+  "respect_total": 460,
+  "unnamed_wallets": 1
+}

@@ -1,0 +1,162 @@
+{
+  "week": 77,
+  "period_number": 76,
+  "date": "2025-12-07",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "Motomoto",
+          "wallet": "0x849e1C0b2460979D2f7c77B87b90C65C70406421",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xe7f88500cafd6db5d4d5be582ced935b785fb5111c7b8c246c0795f106762b74",
+            "token_id": "0x0000000a000000000000004c849e1c0b2460979d2f7c77b87b90c65c70406421",
+            "minted_at": "2025-12-07T23:19:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Meta Mu",
+          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xe7f88500cafd6db5d4d5be582ced935b785fb5111c7b8c246c0795f106762b74",
+            "token_id": "0x0000000a000000000000004c2d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
+            "minted_at": "2025-12-07T23:19:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Steve Strange",
+          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xe7f88500cafd6db5d4d5be582ced935b785fb5111c7b8c246c0795f106762b74",
+            "token_id": "0x0000000a000000000000004c07686bedb0102e47d33cec73307d2cc391aff396",
+            "minted_at": "2025-12-07T23:19:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xe7f88500cafd6db5d4d5be582ced935b785fb5111c7b8c246c0795f106762b74",
+            "token_id": "0x0000000a000000000000004c7234c36a71ec237c2ae7698e8916e0735001e9af",
+            "minted_at": "2025-12-07T23:19:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0xe7f88500cafd6db5d4d5be582ced935b785fb5111c7b8c246c0795f106762b74",
+            "token_id": "0x0000000a000000000000004cb7f4b9caba6bb0aeaa2b5d8df23e2b59c192bdbb",
+            "minted_at": "2025-12-07T23:19:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xe866008380950813b8bd89b4f31e3d52ef1f3b3cd70a8192f61cc2b7d5074d22",
+            "token_id": "0x0000000a000000000000004c8d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
+            "minted_at": "2025-12-08T23:13:27+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xe866008380950813b8bd89b4f31e3d52ef1f3b3cd70a8192f61cc2b7d5074d22",
+            "token_id": "0x0000000a000000000000004c65284960d4eadaf45e923430a59b7d3bf34db641",
+            "minted_at": "2025-12-08T23:13:27+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "SwarthyHatter",
+          "wallet": "0x4D16FCE1BD6E327AE31398CE9A2c4E12C077ecB1",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xe866008380950813b8bd89b4f31e3d52ef1f3b3cd70a8192f61cc2b7d5074d22",
+            "token_id": "0x0000000a000000000000004c4d16fce1bd6e327ae31398ce9a2c4e12c077ecb1",
+            "minted_at": "2025-12-08T23:13:27+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xe866008380950813b8bd89b4f31e3d52ef1f3b3cd70a8192f61cc2b7d5074d22",
+            "token_id": "0x0000000a000000000000004c29f5dee65e1fb856b816eab4f0b702c10e5eaa34",
+            "minted_at": "2025-12-08T23:13:27+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "sources": [
+    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "notes": [],
+  "participants": 9,
+  "respect_total": 508,
+  "unnamed_wallets": 0
+}

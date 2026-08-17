@@ -1,0 +1,286 @@
+{
+  "week": 75,
+  "period_number": 74,
+  "date": "2025-11-17",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "fellenz",
+          "wallet": "0x82Cb2305388C853eCfe9eA83a1604Acf58466659",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xefcdf35eb388e71e3c08bc36106af9fe54fc49de74cc7cece309aa5e329158ba",
+            "token_id": "0x0000000a000000000000004a82cb2305388c853ecfe9ea83a1604acf58466659",
+            "minted_at": "2025-11-17T23:11:21+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Meta Mu",
+          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xefcdf35eb388e71e3c08bc36106af9fe54fc49de74cc7cece309aa5e329158ba",
+            "token_id": "0x0000000a000000000000004a2d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
+            "minted_at": "2025-11-17T23:11:21+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xefcdf35eb388e71e3c08bc36106af9fe54fc49de74cc7cece309aa5e329158ba",
+            "token_id": "0x0000000a000000000000004ab7f4b9caba6bb0aeaa2b5d8df23e2b59c192bdbb",
+            "minted_at": "2025-11-17T23:11:21+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xefcdf35eb388e71e3c08bc36106af9fe54fc49de74cc7cece309aa5e329158ba",
+            "token_id": "0x0000000a000000000000004a7234c36a71ec237c2ae7698e8916e0735001e9af",
+            "minted_at": "2025-11-17T23:11:21+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xe0df9e208de9b9544ee0a3e3844f88b1d05124779b4e790a4664cf6a852dd882",
+            "token_id": "0x0000000a000000000000004a8d43a3fc2fed663bf6b82ea4792c0e5239d5ee66",
+            "minted_at": "2025-11-17T23:11:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xe0df9e208de9b9544ee0a3e3844f88b1d05124779b4e790a4664cf6a852dd882",
+            "token_id": "0x0000000a000000000000004a65284960d4eadaf45e923430a59b7d3bf34db641",
+            "minted_at": "2025-11-17T23:11:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xe0df9e208de9b9544ee0a3e3844f88b1d05124779b4e790a4664cf6a852dd882",
+            "token_id": "0x0000000a000000000000004a29f5dee65e1fb856b816eab4f0b702c10e5eaa34",
+            "minted_at": "2025-11-17T23:11:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Ohnahji B",
+          "wallet": "0x64A15b1D2DE581097CB48e5D82619203E24BB3e1",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xe0df9e208de9b9544ee0a3e3844f88b1d05124779b4e790a4664cf6a852dd882",
+            "token_id": "0x0000000a000000000000004a64a15b1d2de581097cb48e5d82619203e24bb3e1",
+            "minted_at": "2025-11-17T23:11:49+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 3,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": null,
+          "wallet": "0xFb63D640E6061e4Fe50089620815483069D8eeAa",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004afb63d640e6061e4fe50089620815483069d8eeaa",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x33B03BEB0C8277d8FC35A844974daBfe289938c9",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004a33b03beb0c8277d8fc35a844974dabfe289938c9",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Leo (Civil_Monkey)",
+          "wallet": "0xe5adabBD71225E8074E30ff6cE2a66c9319C071b",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004ae5adabbd71225e8074e30ff6ce2a66c9319c071b",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x164e31F960ab37369e5b17Ed0faDA994E71AEE5c",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004a164e31f960ab37369e5b17ed0fada994e71aee5c",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0xEcd67fc6095Cf25C31516333413a1a2daE7401dF",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004aecd67fc6095cf25c31516333413a1a2dae7401df",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x79299542c9011305E0f2b4f37986CD54a1C9EF58",
+          "rank": 6,
+          "level": 1,
+          "respect": 10,
+          "settled": {
+            "tx": "0x3213b34851fbffadccaee011156fa2871c3e8109c4a64f202b2fa354453f7cd4",
+            "token_id": "0x0000000a000000000000004a79299542c9011305e0f2b4f37986cd54a1c9ef58",
+            "minted_at": "2025-11-24T23:57:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "group": 4,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": null,
+          "wallet": "0x96575Ac5E90e7b34d985F4e85d39E57bd552A60E",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xa6bcf730ac34b9c131b338551e74c9ba7c26ba655dc2801f0e416f924236f64d",
+            "token_id": "0x0000000a000000000000004a96575ac5e90e7b34d985f4e85d39e57bd552a60e",
+            "minted_at": "2026-01-10T19:00:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0xaB2759Ef5C399a0a704183f5146eC9f13AE442c3",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xa6bcf730ac34b9c131b338551e74c9ba7c26ba655dc2801f0e416f924236f64d",
+            "token_id": "0x0000000a000000000000004aab2759ef5c399a0a704183f5146ec9f13ae442c3",
+            "minted_at": "2026-01-10T19:00:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": null,
+          "wallet": "0x5F18D3e8Fd97e4E95033b53c0f4c6861825A0564",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xa6bcf730ac34b9c131b338551e74c9ba7c26ba655dc2801f0e416f924236f64d",
+            "token_id": "0x0000000a000000000000004a5f18d3e8fd97e4e95033b53c0f4c6861825a0564",
+            "minted_at": "2026-01-10T19:00:51+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "sources": [
+    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "notes": [],
+  "participants": 17,
+  "respect_total": 984,
+  "unnamed_wallets": 8
+}

@@ -1,0 +1,100 @@
+{
+  "week": 82,
+  "period_number": 81,
+  "date": "2026-01-26",
+  "era": "zor",
+  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+  "chain": "optimism",
+  "mint_type": 10,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "ranked",
+      "results": [
+        {
+          "name": "EZinCrypto",
+          "wallet": "0xfAb9a3D37999E12252b47468D2FFD4BE15936012",
+          "rank": 1,
+          "level": 6,
+          "respect": 110,
+          "settled": {
+            "tx": "0xe7b001b68409122c859a01903f3ffd256961afb01c0b6a387051ae6660c1ef3a",
+            "token_id": "0x0000000a0000000000000051fab9a3d37999e12252b47468d2ffd4be15936012",
+            "minted_at": "2026-01-26T23:43:57+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": 2,
+          "level": 5,
+          "respect": 68,
+          "settled": {
+            "tx": "0xe7b001b68409122c859a01903f3ffd256961afb01c0b6a387051ae6660c1ef3a",
+            "token_id": "0x0000000a0000000000000051b7f4b9caba6bb0aeaa2b5d8df23e2b59c192bdbb",
+            "minted_at": "2026-01-26T23:43:57+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Meta Mu",
+          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "rank": 3,
+          "level": 4,
+          "respect": 42,
+          "settled": {
+            "tx": "0xe7b001b68409122c859a01903f3ffd256961afb01c0b6a387051ae6660c1ef3a",
+            "token_id": "0x0000000a00000000000000512d9cbc4ecfbd1b8f66aa798fd51585ae058daa8b",
+            "minted_at": "2026-01-26T23:43:57+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Steve Strange",
+          "wallet": "0x07686BedB0102E47D33Cec73307D2CC391aFf396",
+          "rank": 4,
+          "level": 3,
+          "respect": 26,
+          "settled": {
+            "tx": "0xe7b001b68409122c859a01903f3ffd256961afb01c0b6a387051ae6660c1ef3a",
+            "token_id": "0x0000000a000000000000005107686bedb0102e47d33cec73307d2cc391aff396",
+            "minted_at": "2026-01-26T23:43:57+00:00"
+          },
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": 5,
+          "level": 2,
+          "respect": 16,
+          "settled": {
+            "tx": "0xe7b001b68409122c859a01903f3ffd256961afb01c0b6a387051ae6660c1ef3a",
+            "token_id": "0x0000000a00000000000000517234c36a71ec237c2ae7698e8916e0735001e9af",
+            "minted_at": "2026-01-26T23:43:57+00:00"
+          },
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "sources": [
+    "data/ordaoawards.csv (ORDAO award export, ZAOOS repo)",
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+  ],
+  "coverage": "partial",
+  "notes": [],
+  "participants": 5,
+  "respect_total": 262,
+  "unnamed_wallets": 0
+}

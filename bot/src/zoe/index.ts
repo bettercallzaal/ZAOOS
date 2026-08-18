@@ -158,7 +158,13 @@ import {
 } from './commands';
 import { formatSpendStatus } from './cost-governance';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
-import { STANDARD_TOPICS, readTopics, writeTopics } from './topics';
+import {
+  GENERAL_THREAD_SENTINEL,
+  GENERAL_TOPIC,
+  STANDARD_TOPICS,
+  readTopics,
+  writeTopics,
+} from './topics';
 import { routeTopic, topicNameForThread } from './topic-router';
 import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
@@ -546,6 +552,13 @@ bot.command('inittopics', async (ctx) => {
 
   const results: string[] = [];
   for (const name of STANDARD_TOPICS) {
+    // The native General topic cannot be created via createForumTopic; record
+    // the sentinel so senders know to omit message_thread_id (doc 2314).
+    if (name === GENERAL_TOPIC) {
+      topics[name] = GENERAL_THREAD_SENTINEL;
+      results.push(`${name}: group root (native, not created)`);
+      continue;
+    }
     if (topics[name]) {
       results.push(`${name}: ${topics[name]} (exists)`);
       continue;

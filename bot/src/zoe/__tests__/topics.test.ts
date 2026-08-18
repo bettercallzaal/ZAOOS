@@ -13,7 +13,14 @@ vi.mock('node:fs', () => ({
   },
 }));
 
-import { getTopicThread, readTopics, STANDARD_TOPICS, writeTopics } from '../topics';
+import {
+  GENERAL_THREAD_SENTINEL,
+  GENERAL_TOPIC,
+  getTopicThread,
+  readTopics,
+  STANDARD_TOPICS,
+  writeTopics,
+} from '../topics';
 
 afterEach(() => vi.clearAllMocks());
 
@@ -26,6 +33,40 @@ describe('STANDARD_TOPICS', () => {
 
   it('contains at least 5 topics', () => {
     expect(STANDARD_TOPICS.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('contains General (fleet-wide flows, doc 2314)', () => {
+    expect(STANDARD_TOPICS).toContain(GENERAL_TOPIC);
+  });
+});
+
+// ── General sentinel ─────────────────────────────────────────────────────────
+
+describe('General topic sentinel', () => {
+  it('sentinel is falsy so senders omit message_thread_id', () => {
+    expect(GENERAL_THREAD_SENTINEL).toBe(0);
+    expect(Boolean(GENERAL_THREAD_SENTINEL)).toBe(false);
+  });
+
+  it('getTopicThread returns the sentinel for a mapped General', async () => {
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({ Research: 101, [GENERAL_TOPIC]: GENERAL_THREAD_SENTINEL }),
+    );
+    expect(await getTopicThread(GENERAL_TOPIC)).toBe(GENERAL_THREAD_SENTINEL);
+  });
+});
+
+// ── roundtrip (doc 2314 phase 1a: read, write, read) ─────────────────────────
+
+describe('topics.json roundtrip', () => {
+  it('writeTopics output parses back to the same map via readTopics', async () => {
+    const map = { Research: 101, [GENERAL_TOPIC]: GENERAL_THREAD_SENTINEL };
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    await writeTopics(map);
+    const written = mockWriteFile.mock.calls[0][1] as string;
+    mockReadFile.mockResolvedValue(written);
+    expect(await readTopics()).toEqual(map);
   });
 });
 

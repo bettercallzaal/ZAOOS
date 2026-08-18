@@ -51,6 +51,8 @@ jobs:
           fetch-depth: 0
 
       - name: Fail on a newly introduced doc-number collision
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
           base="origin/${{ github.base_ref }}"
@@ -92,6 +94,36 @@ jobs:
             | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
             | sort -u || true)
 
+          # ALSO compare against every OTHER OPEN PR's added doc dirs.
+          #
+          # On 2026-08-15 doc 2282 landed TWICE - research/business/2282-reddit-
+          # as-oss-outreach-channel and research/infrastructure/2282-fleet-output-
+          # audit. Both PRs passed this guard, correctly by its own logic: neither
+          # doc was on main when the other was checked, and both merged after.
+          # Comparing only against the base branch cannot see a sibling in flight.
+          #
+          # HONEST LIMIT: this narrows the window, it does not close it. Two
+          # guards running at the same moment can still both miss, because each
+          # sees the other's PR before its files are final. Closing it properly
+          # means requiring branches to be up to date before merging, which is
+          # deliberately off (it would put every PR on a rebase treadmill).
+          otherdirs=""
+          if [ -n "${GH_TOKEN:-}" ]; then
+            others=$(gh api "repos/${{ github.repository }}/pulls?state=open&per_page=100" \
+              --jq ".[] | select(.number != ${{ github.event.pull_request.number }}) | .number" 2>/dev/null | head -40) || others=""
+            if [ -z "$others" ]; then
+              echo "::warning title=doc-guard::could not list open PRs - checking against ${{ github.base_ref }} only, so a sibling PR with the same number would not be caught"
+            fi
+            for n in $others; do
+              files=$(gh api "repos/${{ github.repository }}/pulls/$n/files?per_page=100" \
+                --jq '.[] | select(.status=="added") | .filename' 2>/dev/null) || continue
+              d=$(printf '%s\n' "$files" | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' | sort -u || true)
+              [ -n "$d" ] && otherdirs=$(printf '%s\n%s' "$otherdirs" "$d#$n")
+            done
+          else
+            echo "::warning title=doc-guard::no GH_TOKEN - checking against ${{ github.base_ref }} only"
+          fi
+
           fail=0
           while read -r d; do
             [ -z "$d" ] && continue
@@ -103,6 +135,17 @@ jobs:
               echo "::error title=Doc number $num already exists::$d collides with an existing doc number on ${{ github.base_ref }}."
               echo "  existing doc(s) with number $num:"
               printf '%s\n' "$hits" | sed 's/^/    /'
+              fail=1
+            fi
+
+            # Same number, different open PR. Names the PR so the fix is obvious.
+            inflight=$(printf '%s\n' "$otherdirs" \
+              | grep -E "^research/[^/]+/${num}-" \
+              | grep -v "^${d}#" || true)
+            if [ -n "$inflight" ]; then
+              echo "::error title=Doc number $num is claimed by an open PR::$d collides with a doc in flight."
+              echo "  claimed by:"
+              printf '%s\n' "$inflight" | sed 's/#/  <- PR #/' | sed 's/^/    /'
               fail=1
             fi
           done <<< "$newdirs"

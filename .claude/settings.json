@@ -236,6 +236,7 @@
     "ZOE_DEFAULT_MODEL": "sonnet",
     "ZOE_HARD_MODEL": "opus",
     "ZOE_QUICK_MODEL": "haiku",
-    "PUBLIC_BASE_URL": "https://www.thezao.xyz"
+    "PUBLIC_BASE_URL": "https://www.thezao.xyz",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
   }
 }

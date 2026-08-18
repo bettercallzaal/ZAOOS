@@ -157,6 +157,57 @@ def outputs(since: datetime):
     return found
 
 
+LEDGER = Path.home() / ".zao" / "spend-ledger.jsonl"
+
+
+def append_ledger(hours: float, total: float, tok, rows, prs) -> None:
+    """One line per run. Append-only, so a wrong number is visible as history
+    rather than silently overwritten.
+
+    This exists because the Prometheus exporter Claude Code ships binds a SINGLE
+    port (localhost:9464), so with several lanes running only the first to start
+    exports anything. Reading the transcripts covers every lane with no port, no
+    collector, and no process to keep alive.
+    """
+    LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    rec = {
+        "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "window_hours": hours,
+        "cost_usd": round(total, 2),
+        "sessions": len(rows),
+        "tokens": {"in": tok[0], "out": tok[1], "cache_write": tok[2], "cache_read": tok[3]},
+        "prs_opened": len(prs),
+        "cost_per_pr": round(total / len(prs), 2) if prs else None,
+        "top": [{"lane": (r["cwd"] or "?").split("/")[-1], "cost": round(r["cost"], 2)}
+                for r in rows[:5]],
+    }
+    with LEDGER.open("a") as fh:
+        fh.write(json.dumps(rec) + "\n")
+
+
+def show_history() -> int:
+    if not LEDGER.exists():
+        print("No ledger yet. Run: zao-spend --ledger")
+        return 0
+    recs = []
+    for line in LEDGER.read_text().splitlines():
+        try:
+            recs.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    if not recs:
+        print("Ledger is empty.")
+        return 0
+    print(f"\n  {'when':<18} {'window':>7} {'cost':>9} {'PRs':>4} {'$/PR':>8}")
+    for r in recs[-24:]:
+        when = r["ts"].replace("T", " ")[:16]
+        cpp = f"${r['cost_per_pr']:.2f}" if r.get("cost_per_pr") else "-"
+        print(f"  {when:<18} {r['window_hours']:>6g}h {'$%.2f' % r['cost_usd']:>9} "
+              f"{r.get('prs_opened', 0):>4} {cpp:>8}")
+    print(f"\n  {len(recs)} snapshot(s) in {LEDGER}\n")
+    return 0
+
+
 def human(n: int) -> str:
     for unit, div in (("B", 1e9), ("M", 1e6), ("k", 1e3)):
         if n >= div:
@@ -170,18 +221,29 @@ def main() -> int:
     ap.add_argument("--days", type=float)
     ap.add_argument("--by-lane", action="store_true", help="group by working directory")
     ap.add_argument("--no-output", action="store_true", help="skip gh calls")
+    ap.add_argument("--ledger", action="store_true",
+                    help="append a snapshot to ~/.zao/spend-ledger.jsonl and print nothing else")
+    ap.add_argument("--history", action="store_true", help="show the ledger trend")
     a = ap.parse_args()
+
+    if a.history:
+        return show_history()
 
     hours = a.hours if a.hours else (a.days * 24 if a.days else 24)
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
 
     rows = scan(since)
     if not rows:
-        print(f"No agent activity in the last {hours:g}h.")
+        if not a.ledger:
+            print(f"No agent activity in the last {hours:g}h.")
         return 0
 
     total = sum(r["cost"] for r in rows)
     tok = [sum(r["tok"][i] for r in rows) for i in range(4)]
+
+    if a.ledger:
+        append_ledger(hours, total, tok, rows, [] if a.no_output else outputs(since))
+        return 0
 
     print(f"\nAGENT SPEND - last {hours:g}h (since {since.astimezone():%b %d %H:%M})")
     print("=" * 78)

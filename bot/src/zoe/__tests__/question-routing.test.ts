@@ -16,6 +16,7 @@ import {
   REACTION_TYPES,
 } from '../questions';
 import {
+  openQuestionCapReport,
   resolveQuestionTopic,
   routeQuestionToTopic,
   type TelegramRoutingDeps,
@@ -138,5 +139,49 @@ describe('reaction callbacks', () => {
 
   it('throws when callback_data would exceed the 64-byte cap', () => {
     expect(() => encodeReaction('x'.repeat(60), 'approve')).toThrow(/64/);
+  });
+});
+
+// ── open-question caps (doc 2314 flow 2b) ───────────────────────────────────
+
+describe('openQuestionCapReport', () => {
+  const q = (n: number, topic: string, lane?: string) => ({ qid: `q${n}`, topic, lane });
+
+  it('stays quiet at or under the warn threshold', () => {
+    const report = openQuestionCapReport([q(1, 'Coding'), q(2, 'Coding'), q(3, 'Coding')]);
+    expect(report.warnings).toEqual([]);
+    expect(report.alerts).toEqual([]);
+  });
+
+  it('warns per topic past the warn threshold', () => {
+    const report = openQuestionCapReport([
+      q(1, 'Coding'),
+      q(2, 'Coding'),
+      q(3, 'Coding'),
+      q(4, 'Coding'),
+      q(5, 'Research'),
+    ]);
+    expect(report.warnings).toEqual(['topic "Coding" has 4 open questions']);
+    expect(report.alerts).toEqual([]);
+  });
+
+  it('alerts when a topic is jammed by enough distinct lanes', () => {
+    const report = openQuestionCapReport([
+      q(1, 'Coding', 'lane-a'),
+      q(2, 'Coding', 'lane-a'),
+      q(3, 'Coding', 'lane-b'),
+      q(4, 'Coding', 'lane-b'),
+      q(5, 'Coding', 'lane-c'),
+      q(6, 'Coding', 'lane-c'),
+    ]);
+    expect(report.alerts).toEqual(['topic "Coding" looks jammed: 6 unanswered from 3 lanes']);
+  });
+
+  it('never alerts without lane data, even past the alert threshold', () => {
+    const report = openQuestionCapReport(
+      Array.from({ length: 7 }, (_, i) => q(i, 'Coding')),
+    );
+    expect(report.warnings).toHaveLength(1);
+    expect(report.alerts).toEqual([]);
   });
 });

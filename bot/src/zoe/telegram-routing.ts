@@ -180,3 +180,50 @@ export async function routeQuestionToTopic(
   }
   await deps.sendMessage(chatId, q.text, sendOpts);
 }
+
+/** One open (unanswered) needs-you question, for cap accounting. */
+export interface OpenQuestion {
+  qid: string;
+  topic: string;
+  /** Lane that asked. Optional until phase 1c's unread-replies log carries it. */
+  lane?: string;
+}
+
+/** Doc 2314 flow 2b caps: warn (never block) past this many open questions in
+ *  one topic; alert the operator when a topic looks jammed. */
+export const OPEN_QUESTION_WARN_THRESHOLD = 3;
+export const OPEN_QUESTION_ALERT_THRESHOLD = 5;
+export const OPEN_QUESTION_ALERT_MIN_LANES = 2;
+
+/**
+ * Pure cap report over the open-question set. Warnings fire per topic past the
+ * warn threshold. Alerts fire only when a topic is past the alert threshold AND
+ * the questions come from more than OPEN_QUESTION_ALERT_MIN_LANES distinct
+ * KNOWN lanes - with no lane data the alert stays quiet rather than guessing
+ * (anti-fabrication; lane data arrives with the phase 1c unread-replies log).
+ */
+export function openQuestionCapReport(open: OpenQuestion[]): {
+  warnings: string[];
+  alerts: string[];
+} {
+  const byTopic = new Map<string, OpenQuestion[]>();
+  for (const q of open) {
+    const list = byTopic.get(q.topic) ?? [];
+    list.push(q);
+    byTopic.set(q.topic, list);
+  }
+  const warnings: string[] = [];
+  const alerts: string[] = [];
+  for (const [topic, qs] of byTopic) {
+    if (qs.length > OPEN_QUESTION_WARN_THRESHOLD) {
+      warnings.push(`topic "${topic}" has ${qs.length} open questions`);
+    }
+    const lanes = new Set(qs.map((q) => q.lane).filter(Boolean));
+    if (qs.length > OPEN_QUESTION_ALERT_THRESHOLD && lanes.size > OPEN_QUESTION_ALERT_MIN_LANES) {
+      alerts.push(
+        `topic "${topic}" looks jammed: ${qs.length} unanswered from ${lanes.size} lanes`,
+      );
+    }
+  }
+  return { warnings, alerts };
+}

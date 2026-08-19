@@ -173,7 +173,7 @@ import { dispatchHermesRun } from '../hermes/runner';
 import { shadowSummary } from '../hermes/critic';
 import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
-import { parseQuestionCallback } from './questions';
+import { parseQuestionCallback, parseReactionCallback } from './questions';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -690,6 +690,30 @@ bot.on('callback_query:data', async (ctx, next) => {
         String(gid),
       ).catch((e) => console.error('[zoe/index] q-answer log failed:', (e as Error)?.message));
     }
+    return;
+  }
+
+  // Reaction buttons ("r:<qid>:<b64>", doc 2314 phase 1b) - Approve/Done pair.
+  // Same qid bridge as q: answers: log to recent/ so the session reads it; the
+  // reaction value rides in the same [answer:<qid>] shape so downstream answer
+  // detection needs no second path.
+  const r = parseReactionCallback(ctx.callbackQuery.data);
+  if (r) {
+    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    await ctx.answerCallbackQuery({ text: 'Got it.' });
+    await ctx
+      .editMessageText(`Answered (${r.qid}): ${r.reaction}`, {
+        reply_markup: { inline_keyboard: [] },
+      })
+      .catch(() => {});
+    const mid = ctx.callbackQuery.message?.message_id;
+    if (mid) {
+      await ctx.api.unpinChatMessage(gid, mid).catch(() => {});
+    }
+    await pushRecent(
+      { from: 'zaal', text: `[answer:${r.qid}] ${r.reaction}`, sender: 'zaalbotz-btn' },
+      String(gid),
+    ).catch((e) => console.error('[zoe/index] r-answer log failed:', (e as Error)?.message));
     return;
   }
 

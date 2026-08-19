@@ -101,3 +101,24 @@ referral on this call ("He's a great guy... runs a van to Boston").
 ## Sources
 
 - [FULL] The recording: 30 min, transcribed + diarized locally. Transcripts preserved at `~/.zao/private/meetings/batch-aug17/`.
+
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+Core partnership decisions all held. Actions the first pass missed (all
+boarded/folded 2026-08-19):
+
+- **Facebook event** - Zaal, same-day goal on the call: "my goal is to make
+  a Facebook event... that's important for getting the word out locally."
+- **Star 97.7 radio appearance** - "I'm trying to go on the radio with Paul
+  from Star 97.7... hopefully soon."
+- **Partner logos** - not just Black Moon: **Wallace Events and Star 97.7
+  logos** also need adding to the site and materials.
+- **Website photo gallery** - attendees post pictures to the site, "that's
+  what we did with our last one" (post-event engagement feature).
+- **Meal structure detail:** lunches + dinners Thu/Fri/Sat; Thu-Fri smaller,
+  Saturday peaks under ~20 people - feeds the Katina headcount.
+- **Showcase intent:** the WaveWarZ live-traded battles demo is THE thing to
+  show Black Moon in person ("that's kind of our big showcase").
+- **Contingencies:** local acts can fill schedule blanks; Steve suggests
+  ASSIGNING performers to stages rather than polling preferences.

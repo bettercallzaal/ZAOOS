@@ -99,3 +99,22 @@ people's secrets").
 ## Sources
 
 - [FULL] The recording: 36 min, transcribed + diarized locally. Preserved at `~/.zao/private/meetings/batch-aug17/`.
+
+
+## Re-verify pass 2026-08-19 - SPEAKER ATTRIBUTION FLAG (unresolved)
+
+A full transcript re-read flagged possible reversed attributions in "the
+exchange" section: the transcript's Speaker 1 says they use Firefly, found
+Audos (via Lu.ma), and run the ZABAL auto-like - and the verification pass
+read Speaker 1 as Paper, which would invert this doc.
+
+HELD AS UNVERIFIED, leaning original-correct: Zaal's standing tooling
+(Firefly-only posting rule, Audos usage, ZABAL is Zaal's brand, ICM keys are
+Zaal's) matches Speaker 1's statements, so Speaker 1 is more plausibly ZAAL
+and this doc's attribution stands. The transcript's speaker labels are the
+weak link, not the doc. Zaal can settle it in five seconds.
+
+Two items that hold regardless of speaker:
+- A shared **Obsidian project folder** for the collaboration was planned
+  (ICM material + ZAO Festivals info dropped in).
+- A **livestream demo of the Bomb Squad store** purchase flow was planned.

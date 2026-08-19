@@ -103,3 +103,30 @@ ZAO context: this call is ZAOstock (Oct 3, Franklin Street Parklet) sponsor/atte
 - [Empire Builder](https://empirebuilder.world) - the platform the Empire + leaderboard were created on. Facts about v3 tokenless, the 20/80 split, cross-chain boosters, and Robinhood/BNB/Monad chain support are as STATED ON THE CALL by Jordan (its founder), not re-verified against docs this run.
 - [Clanker](https://www.clanker.world) - deployment rail Empire uses; v5 "being audited" per Jordan, UNVERIFIED.
 - Not re-fetched this run: pump.fun, AutoBuy, Droid/Neynar, Trinity. All claims about them in this doc are call statements, graded accordingly.
+
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+Verification agent re-read the complete transcript. Core decisions all held.
+Additions the first pass missed:
+
+- **FACTUAL FIX - supported chains:** Zaal confirmed on-call that Empire also
+  has **Polygon and Optimism** support ("we have polygon support we have
+  optimism") - the chain list above (Base, Arbitrum, Robinhood, BNB, Monad)
+  was incomplete. Solana remains the one gap.
+- **NEW ACTION - Wyoming DEX outreach:** beyond sending Jordan the material,
+  Zaal committed to his own follow-up: "I owe him a message... I definitely
+  want to collaborate with them more." (Boarded 2026-08-19.)
+- **Token distribution structure discussed** (not yet a decision): team
+  airdrop with vesting past the dump window + a crowdfund list ("pop in
+  twenty dollars... you are now on the list for getting the airdrop...
+  one to one... at a vesting schedule") seeding the LP.
+- **Zalcastr practice-launch ratio options:** "probably take 50% of the
+  tokens or 75 and then put 50% up against a USDC or ETH pool."
+- **Design assumption for ZAOstock:** "We're going to have more people on
+  the stream than we're going to have in person" - the virtual audience is
+  primary; reward design should assume it.
+- **Positioning note (Jordan):** "You don't have to call things tokens. You
+  can call them points" - friction-lowering framing for non-crypto audiences.
+- **WaveWarZ x Empire idea (Zaal):** a no-token Empire per battle,
+  distributing rewards cross-chain to Solana wallets via Farcaster.

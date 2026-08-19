@@ -33,13 +33,14 @@ import { promises as fs } from 'node:fs';
 import { acquireTickLock, releaseTickLock } from './tick-lock';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { parseQuestionCallback, questionKeyboard, encodeQuestion, type ParsedQuestion } from './questions';
+import { parseQuestionCallback, encodeQuestion, type ParsedQuestion } from './questions';
+import { routeQuestionToTopic, resolveQuestionTopic, openQuestionCapReport } from './telegram-routing';
 import { pushRecent, ZOE_PATHS } from './memory';
 import { enqueueWork } from './work-loop';
 import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
 import { recordMessageContext } from './message-context';
 import { armPendingAnswer } from './pending-answers';
-import { startNudge, stopNudge, markPinged, dueTracks, nudgeLadderEnabled } from './nudge-ladder';
+import { startNudge, stopNudge, markPinged, dueTracks, nudgeLadderEnabled, openTracks } from './nudge-ladder';
 import { refillOpenThings, clearOpenThing, topicFromQid, type TopicOpenThingState } from './always-open-topics';
 import { topicNameForThread } from './topic-router';
 import { featureRan } from './feature-ran';
@@ -476,9 +477,14 @@ export async function runNudgePing(deps: {
       const advanced = await markPinged(t.qid, nowMs);
       if (!advanced) continue;
       try {
-        await deps.bot.api.sendMessage(deps.groupId, `Still need your answer: ${t.label}`, {
-          reply_markup: questionKeyboard(t.qid, t.options),
-        });
+        // Re-ping into the question's topic (doc 2314 phase 1b): topic from the
+        // qid prefix where one is encoded, Claude Code for neutral questions.
+        // zaalId is the DM fallback slot only - groupId is always set here.
+        await routeQuestionToTopic(
+          { sendMessage: deps.bot.api.sendMessage, zaalId: deps.groupId, groupId: deps.groupId },
+          resolveQuestionTopic(topicFromQid(t.qid) ?? undefined),
+          { qid: t.qid, text: `Still need your answer: ${t.label}`, options: t.options },
+        );
       } catch (err) {
         console.error('[zoe/nudge-ladder] re-ping failed:', (err as Error)?.message);
       }
@@ -593,9 +599,21 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           }
 
           try {
-            await deps.bot.api.sendMessage(deps.groupId, qText, {
-              reply_markup: questionKeyboard(action.nextQuestion.qid, action.nextQuestion.options),
-            });
+            // Post into the question's topic (doc 2314 phase 1b): topic from the
+            // qid prefix where one is encoded, Claude Code for neutral questions.
+            await routeQuestionToTopic(
+              {
+                sendMessage: deps.bot.api.sendMessage,
+                zaalId: deps.zaalTgId,
+                groupId: deps.groupId,
+              },
+              resolveQuestionTopic(topicFromQid(action.nextQuestion.qid) ?? undefined),
+              {
+                qid: action.nextQuestion.qid,
+                text: qText,
+                options: action.nextQuestion.options,
+              },
+            );
             // arm General: Zaal's next plain typed message answers this question
             armPendingAnswer(deps.groupId, action.nextQuestion.qid);
             // Nudge ladder: begin the escalating->decaying ping for this open question.
@@ -606,6 +624,16 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
                 action.nextQuestion.options,
                 deps.now.getTime(),
               );
+              // Doc 2314 flow 2b caps: warn (never block) when a topic piles up.
+              const open = await openTracks();
+              const report = openQuestionCapReport(
+                open.map((tr) => ({
+                  qid: tr.qid,
+                  topic: resolveQuestionTopic(topicFromQid(tr.qid) ?? undefined),
+                })),
+              );
+              for (const w of report.warnings) console.warn(`[zoe/orchestrator] ${w}`);
+              for (const a of report.alerts) console.error(`[zoe/orchestrator] ALERT: ${a}`);
             }
             actioned++;
             console.log(

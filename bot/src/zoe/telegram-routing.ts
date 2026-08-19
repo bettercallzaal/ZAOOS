@@ -20,6 +20,8 @@
  */
 
 import { ZAAL_DM_ID, ZAAL_BOTZ_GROUP_ID, ZAAL_BOTZ_RESEARCH_THREAD } from './env';
+import { GENERAL_TOPIC, STANDARD_TOPICS, getTopicThread } from './topics';
+import { questionKeyboard, reactionKeyboard } from './questions';
 
 // Chunking is shared with every other long-send path (tg-chunk.ts) so the
 // boundary logic can never drift between the router and direct sends.
@@ -123,4 +125,58 @@ export function constructRoutingDeps(sendMessageImpl: TelegramRoutingDeps['sendM
     groupId: ZAAL_BOTZ_GROUP_ID,
     groupThreadId: ZAAL_BOTZ_RESEARCH_THREAD,
   };
+}
+
+// ── per-topic question routing (doc 2314 phase 1b) ──────────────────────────
+
+/**
+ * Resolve which ZAAL BOTZ topic a question belongs in. A lane declares its
+ * BRAND context (doc 2314 decision 2: routing by brand, not assignment); a
+ * brand that is a standard topic routes there, anything else - unbranded,
+ * unknown, or a non-topic brand - falls back to the Claude Code topic.
+ */
+export function resolveQuestionTopic(brand?: string): string {
+  if (brand && (STANDARD_TOPICS as readonly string[]).includes(brand)) return brand;
+  return 'Claude Code';
+}
+
+export interface TopicQuestion {
+  qid: string;
+  text: string;
+  /** Answer options; empty array = reaction pair (Approve/Done) instead. */
+  options: string[];
+  includeType?: boolean;
+}
+
+/**
+ * Post a needs-you question into a ZAAL BOTZ topic thread. Replies come back
+ * through the existing qid bridge (parseQuestionCallback / parseReactionCallback)
+ * - topics are never a command bus (doc 2314 doctrine).
+ *
+ * Thread resolution: topics.json via getTopicThread. General's sentinel (0) and
+ * any unmapped topic both post to the group root so the question stays VISIBLE;
+ * an unmapped topic additionally logs loud (stale topics.json - run /inittopics).
+ * No groupId configured: falls back to Zaal's DM, same as sendToZaal.
+ */
+export async function routeQuestionToTopic(
+  deps: TelegramRoutingDeps,
+  topicName: string,
+  q: TopicQuestion,
+): Promise<void> {
+  const keyboard = q.options.length
+    ? questionKeyboard(q.qid, q.options, q.includeType ?? true)
+    : reactionKeyboard(q.qid);
+  const chatId = deps.groupId ?? deps.zaalId;
+  const sendOpts: any = { reply_markup: keyboard };
+  if (deps.groupId) {
+    const threadId = await getTopicThread(topicName);
+    if (threadId) {
+      sendOpts.message_thread_id = threadId;
+    } else if (topicName !== GENERAL_TOPIC) {
+      console.error(
+        `[zoe/telegram-routing] topic "${topicName}" not in topics.json; posting question ${q.qid} to group root (run /inittopics)`,
+      );
+    }
+  }
+  await deps.sendMessage(chatId, q.text, sendOpts);
 }

@@ -11,6 +11,16 @@ import { homedir } from 'node:os';
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const TOPICS_PATH = join(ZOE_HOME, 'topics.json');
 
+/**
+ * The group's built-in General topic (fleet-wide flows: morning digest,
+ * stale-capture nudges - doc 2314). Telegram forums ship with a native General
+ * topic that createForumTopic cannot create; posting WITHOUT message_thread_id
+ * lands there. So General maps to GENERAL_THREAD_SENTINEL (0) in topics.json: a
+ * falsy thread id that tells senders to omit message_thread_id.
+ */
+export const GENERAL_TOPIC = 'General';
+export const GENERAL_THREAD_SENTINEL = 0;
+
 /** The standard ZAAL BOTZ topics ZOE manages. Order is the create order.
  * Each has a behavior in topic-router.ts (topic = intent). */
 export const STANDARD_TOPICS = [
@@ -25,6 +35,7 @@ export const STANDARD_TOPICS = [
   'Newsletter',
   'WaveWarZ',
   'ZABAL Games',
+  GENERAL_TOPIC,
 ] as const;
 
 /** name -> message_thread_id */

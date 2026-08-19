@@ -258,3 +258,39 @@ export function verdictNote(v: Verdict, date: string): string {
   const note = v.note ? ` Zaal added: "${v.note}"` : '';
   return `GRILL ${date} (Telegram): ${base}.${note}`;
 }
+
+// ── reconcile (grill unification, card 6b6875d1) ────────────────────────────
+// Zaal grills from BOTH ends - this Telegram drip and terminal grill sessions.
+// The terminal end closes tasks and writes verdict lines into notes, and the
+// Telegram state file has no idea: 23 stale asked-entries were hand-reconciled
+// on 2026-08-19 (209 -> 186 outstanding). These helpers make that automatic.
+
+/**
+ * A terminal grill verdict as it actually appears in task notes, measured on
+ * the live board 2026-08-19 (14/346 todo tasks): a line starting
+ * "GRILL <date>" (terminal sessions stamp "(Zaal)", this file's own close path
+ * stamps "(Telegram)") or "ZAAL VERDICT <date>". The Telegram variant only
+ * ever lands on tasks this runner ALREADY answered, so matching it here is
+ * harmless - reconcile only looks at unanswered entries.
+ */
+export const TERMINAL_VERDICT_RE =
+  /(^|\n)\s*(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
+
+/**
+ * Classify one asked-entry's board row for reconcile.
+ *
+ *  - row missing (task deleted): 'board-closed' - there is nothing left to ask.
+ *  - status no longer todo, or archived: 'board-closed' - the other end dealt
+ *    with it; the card must stop counting and stop re-asking.
+ *  - still todo but notes carry a terminal verdict: 'verdict-synced' - Zaal
+ *    already ruled on it in a terminal; asking again on the phone is a dupe.
+ *  - otherwise null: a genuinely open card, leave it alone.
+ */
+export function classifyReconcile(
+  row: { status?: string; archived_at?: string | null; notes?: string | null } | undefined,
+): 'board-closed' | 'verdict-synced' | null {
+  if (!row) return 'board-closed';
+  if (row.status !== 'todo' || row.archived_at) return 'board-closed';
+  if (row.notes && TERMINAL_VERDICT_RE.test(row.notes)) return 'verdict-synced';
+  return null;
+}

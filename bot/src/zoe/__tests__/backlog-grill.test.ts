@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  classifyReconcile,
   DRIP_DEFAULT,
   parseVerdict,
   renderCard,
   shouldSendNext,
+  TERMINAL_VERDICT_RE,
   verdictButtons,
   verdictNote,
   VERDICTS,
@@ -197,5 +199,42 @@ describe('verdictNote - every change explains itself', () => {
 
   it('never claims done for a drop', () => {
     expect(verdictNote(parseVerdict('4')!, '2026-08-08')).not.toContain('confirmed done');
+  });
+});
+
+// ── grill unification (card 6b6875d1) ───────────────────────────────────────
+
+describe('TERMINAL_VERDICT_RE - the verdict forms measured on the live board', () => {
+  it('matches every form actually found in task notes (2026-08-19 audit)', () => {
+    expect(TERMINAL_VERDICT_RE.test('GRILL 2026-08-19 (Zaal): route to AGENT.')).toBe(true);
+    expect(TERMINAL_VERDICT_RE.test('ZAAL VERDICT 2026-08-19: combine the grills.')).toBe(true);
+    expect(TERMINAL_VERDICT_RE.test('GRILL 2026-08-18 (Telegram): confirmed done.')).toBe(true);
+    expect(TERMINAL_VERDICT_RE.test('context above\n  GRILL 2026-08-19 (Zaal): mid-notes.')).toBe(true);
+  });
+
+  it('does not fire on prose that merely mentions the grill', () => {
+    expect(TERMINAL_VERDICT_RE.test('add this to the grill queue later')).toBe(false);
+    expect(TERMINAL_VERDICT_RE.test('the GRILL ran on some date')).toBe(false);
+    expect(TERMINAL_VERDICT_RE.test('')).toBe(false);
+  });
+});
+
+describe('classifyReconcile - what the other end settled', () => {
+  it('board-closed for a missing, done, or archived row', () => {
+    expect(classifyReconcile(undefined)).toBe('board-closed');
+    expect(classifyReconcile({ status: 'done', archived_at: null })).toBe('board-closed');
+    expect(classifyReconcile({ status: 'in_progress', archived_at: null })).toBe('board-closed');
+    expect(classifyReconcile({ status: 'todo', archived_at: '2026-08-19T00:00:00Z' })).toBe('board-closed');
+  });
+
+  it('verdict-synced for a still-todo row carrying a terminal verdict', () => {
+    expect(
+      classifyReconcile({ status: 'todo', archived_at: null, notes: 'GRILL 2026-08-19 (Zaal): keep.' }),
+    ).toBe('verdict-synced');
+  });
+
+  it('null for a genuinely open row - reconcile must be able to touch nothing', () => {
+    expect(classifyReconcile({ status: 'todo', archived_at: null, notes: 'no ruling yet' })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null })).toBeNull();
   });
 });

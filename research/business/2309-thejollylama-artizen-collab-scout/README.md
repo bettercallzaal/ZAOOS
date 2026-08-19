@@ -235,27 +235,89 @@ as fact.
 
 ## The live fund number we finally got (and why it changes the priority)
 
-After three tool paths failed (below), raw Playwright with a desktop Chrome user agent and a 25s settle
-window rendered the page: 26,186 characters, captured 2026-08-17.
+After three tool paths failed (below), raw Playwright rendered the page: 26,186 characters, captured
+2026-08-17. The load-bearing ingredient is the **25s settle window** - `waitUntil: 'networkidle'` never
+resolves because the page polls. (A desktop user agent was originally credited for the fix; retesting
+by both lanes showed it makes no measurable difference. See "Tooling failure".)
 
 `artizen.fund/index/matchfunds` now **redirects to `artizen.fund/index/leaderboard/?season=7`** - the
 fund-vs-fund leaderboard is no longer its own page.
 
-**ZAO Fund for Emerging Culture, Season 7, 2026-08-17:**
+> **CORRECTED 2026-08-18. The figures below are DRIVE-scoped, not season-scoped, and the original
+> reading of them was wrong.** Rendering the fund's own page the next day surfaced a `$15,431` season
+> total that the leaderboard does not show. See "Correction: drive scope vs season scope" immediately
+> after this table. The table itself is accurate for what it measures; the conclusion drawn from it was
+> not.
+
+**ZAO Fund for Emerging Culture, on the fund-vs-fund leaderboard, 2026-08-17:**
 
 | Field | Value |
 |---|---|
 | Rank | **#45** of **101** funds listed |
 | Score | 0.01 |
-| Sales | **$0** |
-| Match deployed | **$0** |
+| Sales (this drive) | **$0** |
+| Match unlocked (this drive) | **$0** |
 | Prize | $100 |
 | Raised | $100 |
-| Projects | 12 |
-| Sponsors | 22 |
+| Projects | +12 |
+| Sponsors | +22 |
 
-45 of the 101 funds carry a numbered rank; the other 56 show "-". **#45 is the lowest numbered rank on
-the board** - so the ZAO Fund is the last fund with any recorded Season 7 activity at all.
+45 of the 101 funds carried a numbered rank that day; the other 56 showed "-".
+
+## Correction: drive scope vs season scope
+
+Rendering the fund's **own** page on 2026-08-18
+(`artizen.fund/index/mf/zao-fund-for-emerging-culture?season=7`) showed that the leaderboard's SALES and
+MATCH columns are **scoped to the current fund drive**, not to the season. They match that page's drive
+box exactly. The season total is a separate figure the leaderboard never displays.
+
+**What I got wrong on 2026-08-17:** I read `$0 / $0` as the fund's Season 7 performance and wrote that
+it was "the last fund with any recorded Season 7 activity at all". Both were wrong.
+
+**What is actually true (fund page, 2026-08-18):**
+
+| Field | Value |
+|---|---|
+| Rank | **#55** of **101** funds (57 ranked, 44 unranked) |
+| **Season 7 total** | **$15,431** |
+| Current drive (#12 Flywheel) - sales | $0 |
+| Current drive - match unlocked | $0 |
+| Match remaining / available | $1,272 |
+| Prize | $100 |
+| Projects listed | 15 |
+| Sponsors | James $100, civil $70, Tom $10 |
+
+**The fund is not dormant. The current drive is.** Several projects in it are performing well:
+
+| # | Project | Creator | Match | Sales |
+|---|---|---|---|---|
+| 1 | HOPE | JED XO | $10,693 | $4,540 |
+| 2 | HERITAGE COLLECTION: Fashion, Music & Blockchain Show | Gneric | $12,600 | $3,750 |
+| 3 | The Creator Block | KOSBAAR | $4,529 | $1,500 |
+| 4 | Building Tomorrow: A Web3-Powered Community | Poly Raiders (HuRya) | $1,170 | $360 |
+
+**And here is the finding that actually matters, which the wrong framing was hiding:** the ZAO's *own*
+projects are the bottom of the ZAO's own fund.
+
+| # | Project | Creator | Match | Sales |
+|---|---|---|---|---|
+| 11 | ZAO Festivals | Zaal | $40 | $10 |
+| 12 | COCConcertZ | +communityofcommunities | $0 | $0 |
+| 13 | Baraza TV | Aziz Motomoto | $0 | $0 |
+| 14 | Memethology | Colton | $0 | $0 |
+| 15 | WaveWarZ | WaveWarZ | $0 | $0 |
+
+**BCZ Strategies does not appear in this fund's roster at all.**
+
+So the fund works - other people's projects are raising real money through it. The problem is narrower
+and more fixable than "the fund is dead": the ZAO's own five projects have raised **$10 between them**,
+and four of the five are at exactly zero.
+
+**On the rank move, #45 -> #55:** the ZAO Fund did not lose anything. The number of *ranked* funds went
+from 45 to 57 over the same day - 12 more funds recorded activity during the drive while the ZAO Fund
+recorded none, and it was passed. Same parse method both days, cross-checked against the fund page's own
+self-reported rank (#55), which agrees. Note this contradicts `refresh-fund.mjs`'s header comment, which
+says the fund's own page does not display its rank - it does now.
 
 **Parse warning, because this one is a trap.** On this page each fund card's stat block *precedes* its
 name. The card immediately above ZAO - Artisanal Intelligence Fund, rank #44 - shows an *identical*
@@ -290,10 +352,29 @@ This is **instance 3** of a known shape, already root-caused: ZAOOS issue **#306
 `ensureServer()` health-check uses a single 2s probe that cannot tell a busy daemon from a dead one, so
 it deletes the state file and spawns a replacement at `about:blank` without killing the original. Fixed
 upstream in gstack 1.62.0.0 (`probeHealthWithBackoff`); local is 0.9.2.0. Instance 3 appended to #3065
-on 2026-08-17, with the Playwright workaround **validated for the first time** and one addition:
-default-UA Playwright now returns HTTP 200 with a **zero-length body** - it needs a desktop Chrome user
-agent, a fixed viewport, and a fixed settle window. Orphan count was 0 before my run, so the bug
-reproduces on a clean machine.
+on 2026-08-17, with the Playwright workaround **validated for the first time**. Orphan count was 0
+before my run, so the bug reproduces on a clean machine - which settles that orphans are downstream of
+it, not a precondition.
+
+**Two claims from that first report were retracted after retesting - one from each lane, each caught by
+the other re-measuring.** Both retractions are on ZAOOS#3065.
+
+- **Retracted (this lane):** "default-UA Playwright returns HTTP 200 with a zero-length body." Seen
+  once, **not reproducible in six later runs across three configurations**; the other lane never
+  reproduced it. Not a property of the site.
+- **Retracted (ignite-radio):** "the desktop-UA recipe yields 41% more content." Their original was a
+  single run per config; re-measured at three runs each it is **26,178-26,191 on defaults vs
+  26,190-26,191 with the UA** - indistinguishable, and matching this lane's independent 26,185 vs
+  26,186.
+
+**What survives is the settle window**, which both lanes measured a real benefit from: ~23,034 chars at
+3s vs ~26,185 at 25s. The user agent does nothing.
+
+Worth recording as method: **two unreproduced one-offs, one per lane, each surfaced only because the
+other lane re-ran the measurement rather than accepting the report.** Single runs became durable
+artifacts in both cases. The rule that came out of it is
+`.claude/rules/liveness-probe-guard.md` (merged, ZAOOS#3137) - see its "Measure three times before it
+becomes an artifact" section.
 
 **`refresh-fund.mjs` is now broken for a second, independent reason** that fixing gstack would not
 solve: its target URL redirects, and the page's stats-before-name layout inverts its parse. It needs
@@ -302,8 +383,9 @@ its own PR - deliberately not written into this research branch.
 ## Recommended sequence
 
 **0. Mint the Season 7 Artifacts before Thursday 2026-08-20, 2:00pm.** This is not part of the
-collaborator thread and it outranks all of it. The fund is rank #45 of 101 with $0 in sales; every
-other move in this doc is downstream of having something to sell.
+collaborator thread and it outranks all of it. The ZAO's own five projects in its own fund have raised
+$10 between them, and the current drive is at $0 with roughly a day left; every other move in this doc
+is downstream of the ZAO's own projects having something worth collecting.
 
 1. Zaal comments on issue #10 (draft below) - lowest-friction, highest-relevance first contact, in the
    place he is already working.
@@ -357,9 +439,10 @@ channel from the call, send it there instead and cut the first line.
 - Do **not** mention Stephen Reid, his leaderboards, or any introduction between them until Stephen has
   replied to your email.
 - Do **not** quote a live ZAO Fund rank or score in this message. The reason changed mid-session: it is
-  no longer that we cannot verify it, it is that we now can, and it is rank #45 of 101 with $0 in
-  Season 7 sales. Nothing in the draft needs it, and leading a first contact with that number trades
-  away the credibility the rest of the note earns. Fix the number, then quote it.
+  no longer that we cannot verify it, it is that we now can, and as of 2026-08-18 it is rank #55 of 101
+  with the ZAO's own projects at the bottom of it. Nothing in the draft needs a number, and leading a
+  first contact with that one trades away the credibility the rest of the note earns. Fix it, then quote
+  it. (The fund's $15,431 season total is the quotable figure once there is a reason to quote one.)
 - Offering "happy to hand you the script" commits us to sharing `scripts/refresh-fund.mjs`. It is
   public-safe (no keys, no auth, reads a public page) - but confirm you want it public before offering.
 
@@ -384,7 +467,9 @@ All fetched 2026-08-17 by the zao-artizen lane. Method noted per
 | `thejollylama.github.io` | `curl` + HTML strip | FULL |
 | `site:artizen.fund` search for jolly/decent agency | `curl` DuckDuckGo HTML | FULL (zero results - inconclusive, Bubble app is unindexed) |
 | `artizen.fund/index/matchfunds` (live fund rank) | `browse` binary, `browse chain`, Chrome extension | **FAILED** (all three - see "Tooling failure") |
-| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, desktop Chrome UA + 1440x900 viewport + 25s settle, `innerText` captured to disk | **FULL** (26,186 chars; quotes above are from the saved capture, not from memory) |
+| `artizen.fund/index/leaderboard/?season=7` (live fund rank, retry) | raw Playwright, `domcontentloaded` + **25s settle** (the load-bearing part), `innerText` captured to disk; re-run 6x across 3 configs, all agreeing, corroborated by a second lane at 3 runs/config | **FULL** (26,184-26,186 chars; quotes are from the saved capture, not from memory) |
+| `artizen.fund/index/leaderboard/?season=7` (re-render 2026-08-18, to check the rank move) | same recipe, 28s settle | **FULL** (26,174 chars; gave #55, 57 ranked of 101) |
+| `artizen.fund/index/mf/zao-fund-for-emerging-culture?season=7` (the fund's OWN page - source of the scope correction) | same recipe, 25s settle | **FULL** (3,257 chars; season total $15,431, 15-project roster, self-reported rank #55) |
 
 Internal sources: `ZAOartizen/TEAM-PLAYBOOK.md`, `ZAOartizen/CLAUDE.md`,
 `ZAOartizen/scripts/refresh-fund.mjs` (header comment), ZAOOS docs 844, 852, 887.

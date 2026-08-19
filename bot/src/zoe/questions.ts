@@ -65,3 +65,60 @@ export function parseQuestionCallback(data: string): ParsedQuestion | null {
   }
   return { qid, value, isType: value === TYPE_SENTINEL };
 }
+
+// ── reactions (doc 2314 phase 1b) ───────────────────────────────────────────
+// Approve/done answers as their own callback family ("r:") so a reaction tap
+// never collides with a q: option whose text happens to be "Approve". Buttons,
+// not the Telegram reactions API - the doc's fallback path, chosen because
+// reactions arrive as message_reaction updates with no qid to parse.
+
+export const REACTION_TYPES = ['approve', 'done'] as const;
+export type ReactionType = (typeof REACTION_TYPES)[number];
+
+/** A tapped reaction: the question id + which reaction. */
+export interface ParsedReaction {
+  qid: string;
+  reaction: ReactionType;
+}
+
+/** Build the callback_data for one reaction. Same 64-byte cap as questions. */
+export function encodeReaction(qid: string, reaction: ReactionType): string {
+  const data = `r:${qid}:${b64urlEncode(reaction)}`;
+  if (Buffer.byteLength(data, 'utf8') > 64) {
+    throw new Error(`callback_data too long (${Buffer.byteLength(data)}B > 64): shorten qid for reaction "${reaction}"`);
+  }
+  return data;
+}
+
+/** Inline keyboard for the reaction pair: Approve + Done on one row. */
+export function reactionKeyboard(
+  qid: string,
+): { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> } {
+  return {
+    inline_keyboard: [
+      [
+        { text: 'Approve', callback_data: encodeReaction(qid, 'approve') },
+        { text: 'Done', callback_data: encodeReaction(qid, 'done') },
+      ],
+    ],
+  };
+}
+
+/** Parse an "r:<qid>:<b64>" callback, or null if not a reaction callback or the
+ *  decoded value is not a known reaction type. */
+export function parseReactionCallback(data: string): ParsedReaction | null {
+  if (!data.startsWith('r:')) return null;
+  const rest = data.slice(2);
+  const sep = rest.indexOf(':');
+  if (sep < 0) return null;
+  const qid = rest.slice(0, sep);
+  if (!qid) return null;
+  let value: string;
+  try {
+    value = Buffer.from(rest.slice(sep + 1), 'base64url').toString('utf8');
+  } catch {
+    return null;
+  }
+  if (!(REACTION_TYPES as readonly string[]).includes(value)) return null;
+  return { qid, reaction: value as ReactionType };
+}

@@ -101,3 +101,17 @@ where the $0 YouTube-RTMP MVP was the standing decision.
 - Matteo's Medium articles on Pensy/Harberger ads: Cloudflare-blocked during
   the call; he is dropping links in the Telegram group - attach them here when
   they land rather than citing from memory.
+
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+Complete on decisions and actions. Two context notes added:
+
+- **Credibility marker:** Matteo self-flagged his Livepeer knowledge as ~2
+  years stale ("It's been a while that I haven't been an active user...
+  a couple of years") - his Daydream/VST pointers are informed check-ins,
+  not hands-on experience. Verify current state before building on them.
+- **Why Harberger ads (his framing):** "on-chain advertising has big
+  potential especially to democratize the access... a way for people to
+  fund themselves" - the democratization lens, which is the ZAO-values fit,
+  not just the mechanism.

@@ -94,3 +94,23 @@ tier: STANDARD
 ## Sources
 
 - [FULL] The recording: 57 min, transcribed locally. Raw transcript preserved at `~/.zao/private/meetings/batch-aug17/dyl-raw.txt`. Diarization invalid (2-speaker run on a 4-voice call) - deliberately not used.
+
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+Decision-complete; operational detail the first pass compressed away:
+
+- **Trinity pool architecture, exact:** 50% USDC primary pair, 15% ETH, 15%
+  Clanker, remainder bought/staked or feeding the **accumulator bot** that
+  compounds fees into new Trinity pairs.
+- **Implementation step:** Rizzle recommends a **Gnosis Safe as the Clanker
+  admin** before launch; he has tooling and offered a setup call.
+- **Airdrop alternative discussed:** stake prior ZAO tokens into a contract
+  for a time window = the airdrop list (participation-gated, not snapshot).
+- **Whipcoin offered as the working model** to replicate, not just an
+  anecdote - the ~$5k bonding-curve floor mechanism is the template.
+- **Open risk, unresolved on-call:** droid economics at Clanker's 10% fee
+  split - "I feel like it dies out too quickly"; whether fees can sustain a
+  droid is THE open question on the recursive design.
+- **FEF idea (exploratory):** "Farcaster Eats First" - post to Farcaster
+  first, auto-cascade to other platforms later; wants a repo if pursued.

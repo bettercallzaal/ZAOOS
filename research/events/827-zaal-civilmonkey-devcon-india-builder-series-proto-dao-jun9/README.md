@@ -79,3 +79,43 @@ Three threads, plus a milestone:
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 68-line transcript re-read)
+
+Citations sound, every specific traces to source, and the hedging is preserved
+correctly - the scholarship advice reads as uncertain in the doc because it was
+uncertain on the call: "I'm not positive that they are going to be offered this
+year but this year they last year they were and it was around now that those were
+closing" (9).
+
+### Roughly half this call is now moot
+
+ZAO bailed on Devcon India for 2026, so the scholarship application and the
+crowdfund to get Thy Revolution and Iman there are history rather than open
+items. The doc is not wrong; the world moved. What survives is the rest: the
+AI-queryable builder series built from the ZABAL batches and agentic-bootcamp
+transcripts, the DeepFunding look, the proto-DAO research, and the onboarding
+work - none of which carry a recorded outcome.
+
+### Checked and still unresolved: the Marie / Civil Monkey question
+
+Board card 336916cd records a promise to introduce Marie to Civil Monkey, with a
+deliberate UNRESOLVED marker because doc 947's speaker labels are inferred and it
+was unclear whether she already knew him. This call was searched specifically for
+that: **no mention of Marie, Berlin, or any connection between them anywhere in
+these 68 lines.** The question stays open. Recorded so the next person does not
+re-run the same search hoping.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | Devcon India scholarship application | himself | "in time" | MOOT - ZAO bailed on Devcon India 2026 |
+| Zaal | Crowdfund Thy Rev + Iman travel | Thy Rev, Iman | before Devcon | MOOT, same reason |
+| Zaal | Transcripts onto a page, AI-queryable | internal | "this month" | none |
+| Zaal | Look into DeepFunding (@deep_funding) | internal | "next" | none |
+| Zaal | Proto-DAO research | internal | "next" | none |
+| Zaal | Improve ZAO/fractal onboarding | internal | ongoing | none |
+
+Civil Monkey gave advice and took on nothing, so there is no debt in either
+direction here.

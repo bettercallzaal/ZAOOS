@@ -72,3 +72,56 @@ Two threads:
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 193-line transcript re-read)
+
+All four quoted blocks verified verbatim at their cited lines; the metadata,
+attendees and named page slugs (recordings-1/2/3, fireside-1, recordings-4) all
+trace to source.
+
+### A spelling flag that was raised and rejected
+
+The checking pass flagged "Ohnahji" in this doc as an error because the
+transcript says "Onaji". **The doc is right and the transcript is the artifact.**
+Ohnahji is the canonical spelling: 390 occurrences across research and 11 in
+project memory, against 26 and 1 for the phonetic form. A transcript is
+authoritative for WHAT WAS SAID, never for how a name is SPELLED - the same
+correction already applied in doc 994, where "divvy fly" is the transcript's
+rendering of diviflyy. Recorded here so the doc is not "fixed" backwards later.
+
+### Follow-through block
+
+Everything below was owed by Iman with "this week" attached, meaning about
+2026-06-14. Nothing records an outcome, 73 days on.
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Iman | Embed recordings in-page, remove the watch-on-YouTube button | Zaal / the site | ~2026-06-14 | none |
+| Iman | Next/previous-workshop nav across ZABAL Games pages | Zaal / the site | ~2026-06-14 | none |
+| Iman | Rebuild the recordings page with jump-to buttons | Zaal / the site | ~2026-06-14 | none |
+| Iman | Upload the Ohnahji recording as recordings-4 | Zaal / the site | ~2026-06-14 | none |
+| Iman | A screenshot/spec of the back-button nav | Zaal | "next" | none |
+| Iman | Surface @mentions on My Work / Activity, and find why Jose's posts are missing | Zaal | "next" | none |
+| Zaal | Build the back-button nav | Iman | after the spec | BLOCKED on the row above |
+
+Iman is a teammate rather than an outside party, so this is an internal thread
+rather than a relationship debt. It is still the same shape as the rest of the
+sweep: undated or loosely-dated promises with no closing note.
+
+### Worth knowing for the live recordings work
+
+The intent recorded here is unambiguous and still current: "we should just have
+our own stuff on our own platform pretty much as much as we can" (175) and
+"remove the watch on YouTube button, focus on bringing people to these websites
+under the recordings page" (180-181). Any recovery of the missing ZABAL sessions
+should land on the site's own recordings page, not only on YouTube.
+
+One thing this call flags but does not solve: Jose's posts were missing from the
+activity feed as of 2026-06-08, and nothing here resolves it.
+
+### Attribution caveat
+
+The transcript is a single unlabeled block - the header says so - and speakers
+are inferred from content. The inference reads correctly, but no line here is
+explicitly attributed, so treat any "Iman said" as reconstruction rather than
+label.

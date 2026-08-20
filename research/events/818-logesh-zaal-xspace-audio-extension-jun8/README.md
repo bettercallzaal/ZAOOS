@@ -76,3 +76,50 @@ The most commercially interesting thread: WaveWarZ currently loses data because 
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 107-line transcript re-read)
+
+### The partner is retired - read this doc as history
+
+SongJam is a RETIRED partner as of 2026-07-31 (Zaal: "We are no longer working
+with magnetiq please do not reference it again or songjam"). Logesh's three
+open build items - remove the mixer, add the soundboard, play/pause and a movable
+icon - are therefore moot rather than outstanding, and nothing here should be
+chased or cited forward. Recorded rather than deleted, because the technical
+findings below still hold and the record of what was tested is worth keeping.
+
+### This extension does NOT solve the ZABAL recordings problem
+
+Worth stating plainly, because the titles look like a match and they are
+opposites. This tool pushes computer audio INTO a live Space so it broadcasts.
+The ZABAL problem is pulling audio OUT of Spaces that already happened and were
+never captured. Nothing in this transcript addresses extraction. Anyone working
+the four missing ZABAL audio-Spaces should not come here expecting a method.
+
+The settings that did work, for the record: mic at 0, tab audio at 100%.
+
+### A hedge flattened into a quote
+
+The doc renders as a direct quote: "the WaveWarZ team would be willing to pay
+10-15 a month for a tool that automatically pulled all of our transcriptions from
+the X spaces."
+
+What was actually said (93-99) is exploratory: "**I think** the Wave Wars team
+would be willing to pay a certain amount per month **I just don't know how much
+that is** and like what we would need right... i think that we would be willing
+to pay like even you know 10 15 a month". Speaker's own uncertainty, twice, plus
+"even" doing work on the number.
+
+The doc's Decision 4 is correctly marked medium confidence, so the analysis was
+right; only the quotation overstates. A price point lifted from here into a
+pricing discussion would be quoting a guess as a commitment.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Logesh (SongJam, external) | Remove mixer, add soundboard, play/pause, movable icon | Zaal | not stated | none - and MOOT, partner retired |
+| Zaal | Test the extension asynchronously | Logesh | not stated | none |
+| Zaal | Scope the auto-transcription tool | internal | not stated | none |
+
+The transcript is unlabeled; speakers are inferred from content.

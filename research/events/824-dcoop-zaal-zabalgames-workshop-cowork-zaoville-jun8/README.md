@@ -74,3 +74,28 @@ Three threads:
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 48-line transcript re-read)
+
+Clean. Every claim traces verbatim or as a fair paraphrase - the VEC workshop,
+the three-month build-a-thon shape (month 1 workshops, month 2 open build, month
+3 finals in July), the cowork tagging bug where a user can "approve it yourself",
+the backup DJ, and the rider going to a Google Doc. No hedges dropped, nothing
+invented, and the speakers are properly diarized rather than inferred.
+
+### Follow-through block
+
+All five items are internal - Dcoop is a teammate, not an outside party - and all
+are ~73 days past with no recorded outcome.
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Dcoop | Schedule the ZABAL workshop | Zaal | not stated | none |
+| Dcoop | Convert the rider to a Google Doc | Zaal | not stated | none |
+| Dcoop | Text the groups and email artists for links | Zaal | not stated | none |
+| Zaal | Fix the cowork approval flow | Dcoop / the team | not stated | none |
+| Zaal | Send the recap | Dcoop | not stated | none |
+
+The cowork approval bug is the one worth a second look: a user being able to
+approve their own tag is a live product behaviour, not a scheduling item, and
+nothing here records whether it was fixed.

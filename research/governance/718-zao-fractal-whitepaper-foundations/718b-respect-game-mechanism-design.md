@@ -3,6 +3,7 @@ topic: governance
 type: guide
 status: research-complete
 last-validated: 2026-05-22
+superseded-by: "975 (for its numeric parameters only - structure/mechanism prose remains current)"
 related-docs: 56, 58, 103, 306, 696, 718
 original-query: "Keep studying [Respect Game mechanism design, for the ZAO Fractal Whitepaper]"
 tier: DEEP

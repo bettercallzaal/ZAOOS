@@ -242,9 +242,9 @@ Practical ORDAO defaults:
 
 | Parameter | Suggested default | Basis |
 |---|---|---|
-| Voting period | 48 hours | Common OREC examples and ZAO usage |
-| Veto period | 48 hours | Same |
-| Minimum yes-weight threshold | 5-10% of total Respect | OREC is designed for low-turnout execution; ZAO docs use 10% as a typical framing |
+| Voting period | 72 hours | ZAO on-chain `voteLen` = 259,200s (doc 975) |
+| Veto period | 72 hours | ZAO on-chain `vetoLen` = 259,200s (doc 975) |
+| Minimum yes-weight threshold | 1,000 Respect (~2.6% of OG supply) | ZAO on-chain `minWeight` (doc 975); OREC is designed for low-turnout execution |
 | Max live yes votes per account | 10 | Matches documented anti-spam pattern |
 | Respect token standard | Respect1155 | Best-aligned with current ecosystem practice |
 | SDK | `@ordao/orclient` | Best-documented integration path |

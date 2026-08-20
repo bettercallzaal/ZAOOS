@@ -78,6 +78,20 @@ Wherever any fractal doc says "~200 members / ~200 holders", correct to **156 un
 | Edit `696`/`114`/`102`: "90+ weeks" -> "100+ weeks (~101)" everywhere | @Zaal | PR | 2026-07-13 |
 | Add `superseded-by: 975` to doc 718b frontmatter (its numbers, not its structure) | @Zaal | Edit | 2026-07-13 |
 
+## Applied (2026-08-20, fractal lane)
+
+All research-library corrections above are now applied in one PR (branch
+ws/research-977-apply-fractal-doc-fixes): 718c (48h->72h everywhere incl.
+the block math and the two diagram boxes, 10%->minWeight 1,000 Respect ~2.6%),
+705 (params table: 72h/72h + 1,000 Respect), 696 (Gini 0.23 -> 0.41 single
+round / 0.73 cumulative, honest framing), 718b (frontmatter superseded-by:
+975 for numbers). The "90+ weeks" and "~200 members" fixes were already
+applied on main before this pass. The ZAOfractal whitepaper repo side was
+fixed and deployed 2026-07-21/22 (two accuracy passes; see
+fractal-whitepaper-accuracy memory). Remaining open items need Zaal: the
+fractal numbering/date overlap (OG freeze vs ZOR start), and the dashboard
+OG+ZOR weight display (a ZAOOS surface, not a doc).
+
 ## Sources
 
 - [FULL] `718c-ordao-onchain-architecture.md`, `705-.../README.md`, `696-.../README.md`, `114-.../README.md`, `102-.../README.md` (ZAOOS working tree, grepped 2026-07-06) - the exact stale lines are cited above.

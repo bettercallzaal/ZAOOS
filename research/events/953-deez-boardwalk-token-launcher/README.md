@@ -127,3 +127,65 @@ Boardwalk is positioned as infrastructure for **meaning-driven tokenization** (a
 - **Recording:** MP4, local mlx-whisper transcription (raw transcript at `transcript.md`)
 - **Confidence level:** High (transcript is clear, ~11 minutes)
 - **Garbled points:** Line 289-290 ("the evil of having the, uh, the evil of...") - intent clear but phrasing awkward; Line 98-101: specific percentage number wavered ("0.2% ... 0.25% ... let me get that correct number") - defer to Deez for exact LP fee percent.
+
+## Re-verify pass 2026-08-20 (full transcript re-read vs this doc)
+
+### The citations in this doc point past the end of its own transcript
+
+VERIFIED, not taken on a subagent's word: `transcript.md` is **156 lines**.
+The Decisions table cites lines **166-168, 170-171 and 172**. Those line
+numbers do not exist. The quotes themselves are real and accurate - they sit at
+transcript **lines 92-96** - so the substance stands and only the pointers are
+wrong, most likely written against a differently-formatted copy.
+
+Corrected anchors for the three spot-checked rows:
+
+| Doc cites | Actually at | Quote |
+|---|---|---|
+| lines 166-168 | **92-93** | "I'll take this recording and the LLMS.txt and parse it through my clod" |
+| lines 170-171 | **95** | "I'm probably going to launch as a clanker because of empire builder" |
+| line 172 | **96** | "for Zao festivals, this will be perfect" |
+
+The remaining citations in the Action Items and Quotes tables are wrong by a
+similar margin but were NOT rewritten here - correcting a line number without
+opening each one would be swapping a checkable error for an unverified guess.
+Anyone editing this doc should re-anchor each row against the 156-line file.
+
+(Minor: the doc quotes "the LMS Text"; the transcript says "the LLMS.txt".)
+
+### Status as of 2026-08-20 - both action items have expired
+
+- **Parse the Boardwalk transcript through Claude** was due "today or tomorrow"
+  from 2026-06-29. That is ~50 days ago with no recorded follow-up.
+- **The ZAO Festivals launch** targeted the days before a 2026-07-23 mini-DC
+  festival - ~4 weeks past.
+- The follow-on technical conversation was gated on the parse, so it never
+  started.
+
+### The blocker this doc records but does not flag as one
+
+Boardwalk requires roughly **10K/10E** of coordinated initial liquidity, and on
+the same call Zaal said plainly: *"realistically, I don't expect our community
+to be able to come up with those kinds of funds."* The doc lists that as an
+open TBD. It is closer to a gating constraint on the entire ZAO Festivals use
+case, and it should be answered before any further Boardwalk work.
+
+### Substance the summary compressed away
+
+- **LP holders earn from THREE fee sources**, not one: fee on transfer, fees in
+  the pool itself, and LP staking (which accrues "participation points"). The
+  summary names only the 0.23-0.25% transfer fee, which undersells the model.
+  What the "hundred percent rate" of participation-point accrual is measured
+  against is never defined on the call - genuinely unresolved, not omitted.
+- **Graduation auto-creates a Café Boardwalk profile** - a product feature the
+  Café description leaves out.
+- **The architectural trade-off in Deez's own words:** "There's either the bond
+  curve evil where people can change their mind midsection, or there's the evil
+  of having to coordinate a bunch of capital to get something to graduate. But
+  that initial liquidity is locked there... it makes sure that anyone who's
+  participating knows that they always have a way in and out of the token."
+- **The DeFi session is an OFFER, not a decision.** Deez proposed it; Zaal did
+  not accept. The doc's own note says he "did not commit verbatim", so listing
+  it under Decisions overstates it.
+- The 25-person volunteer pool is not uniform: "five or ten that are very
+  active" is the real number for any fee-sharing mechanism.

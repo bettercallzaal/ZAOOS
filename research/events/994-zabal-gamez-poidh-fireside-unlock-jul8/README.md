@@ -242,3 +242,50 @@ Proposed (not yet written - needs Zaal's confirm per the skill's memory-write ga
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full transcript re-read vs this doc)
+
+No contradictions. Decisions and action items all hold. Missing context and
+three status corrections, with live-vs-expired called out because this doc is
+six weeks old and a recovered July action is noise unless it is still true.
+
+**STATUS CORRECTIONS (the useful half):**
+
+- **zolcaster is no longer a "research seed" - it SHIPPED.** On the call Zaal
+  described it as a private client he was building. It launched as the
+  **Zalcastr** practice launch (Wed 2026-08-19, per the Yerb call, doc 2287).
+  Read the seed entry as history, not as a pending idea.
+- **Unlock Protocol sparking bounties was Zaal's literal NEXT coding task**,
+  not a deferred TODO: "that's going to be the next thing I code up here once
+  I grab this."
+- **The Logadog bounties have expired.** The call (2026-07-08) said "a couple
+  more weeks" past July 4; that window closed in July. Action item 8 should
+  read as done-or-lapsed, not pending.
+
+**COLLABORATORS THE DOC DID NOT NAME:**
+
+- **diviflyy** (Empire Builder) - "We had an awesome call with divvy fly of
+  empire builder yesterday". The transcript spells it phonetically; the
+  canonical handle is **diviflyy** (10 occurrences across ZAO memory and
+  research, incl. a July Divifly coding stream and the ZABAL Empire top-3
+  anchors). Recorded under the canonical spelling deliberately - the phonetic
+  form would not match anything on a future search.
+- **nickysap** - building an mp3-to-mp4 tool for Farcaster with Zaal's support.
+  Named in an action item but never recorded as a partner; per
+  `credit-attribution.md` a collaborator gets named as one.
+- **Lance and Burr** - the established Farcaster poker community Mauro
+  connected with; relevant to any ZAO Poker work.
+- **kmacb.eth** and **gencommunist.eth** - active POIDH bounty creators.
+
+**OPERATIONAL:**
+
+- A **private Farcaster group chat** coordinates ZABAL Gamez ("shoot me a DM"
+  to join) - a live coordination surface the doc never mentions.
+- Kenny's two remaining **$25 Farcaster bounty boosts** are a finite resource
+  with no expiry recorded.
+- Buildathon submissions have three formal categories: **artist** (art of any
+  kind), **builder** (code), **creator** (media).
+- Bounty-ecosystem scale at the time: a $5,000 "encrypt the mempool" bounty, a
+  $900 GM-Farcaster sponsor-referral bounty, and a $140 interview-a-politician
+  bounty then being widened beyond US politicians.
+- Mauro was also evaluating **Svelte** for the ZAO Poker front end.

@@ -115,3 +115,61 @@ Greg advised: risk-first entity planning (identify liability exposure before pic
 
 - Raw transcript: `/research/events/951-greg-autonomous-wavewarz-legal/transcript.md`
 - Transcription method: mlx-whisper (local) from mp4 recording (2026-07-01)
+
+## Re-verify pass 2026-08-20 - two corrections that affect legal decisions
+
+All six quoted passages verified verbatim against the transcript, attendees and
+every number (33/33/33, 50/50, 1.5 years, 18+ jurisdictions) traced. Citations
+are accurate. Two things in this doc could still mislead a decision.
+
+### 1. The CC0 line inverts Greg's actual position
+
+This doc records CC0 as a "fallback to traditional IP registration." Greg said
+close to the opposite. In his words (transcript 146-153):
+
+> "the ones that will win for sure are the cooperative ones... as an excellent
+> proof that you own that piece of music for example... creative commons is
+> very able to do it"
+
+and immediately after:
+
+> "the reality is that if you face a court or a legal suit well you will need
+> the proper tools not like this easygoing and accessible way of registering
+> intellectual property"
+
+So CC0 is **proof of authorship, and explicitly NOT court-ready**. Traditional
+filings are what he expects to win. Reading this doc's phrasing as permission to
+prioritise CC0 over trademark/IP filings would be reading it against the source.
+
+### 2. "May be worth 5-10% of deal" is not Greg's number
+
+The Deep Dive line "Offshore for friction, not safety... May be worth 5-10% of
+deal" carries a figure Greg never gave. The only percentages in the transcript
+are "hundred percent protectable/covered" (about liability, not valuation) and
+"one percent fees" (about the platform). Treat the 5-10% as the earlier author's
+own estimate, not legal advice received - it is unattributed either way.
+
+### Elevated from Research Seeds - two decision-level facts
+
+- **Nominee directors remove you from the public registry.** Greg (235-237):
+  "you won't be registered in any specific like public residency in caiman or
+  panama or whatever because we have nominee services that is a person that will
+  be representing you guys." That is a material privacy/liability property of the
+  offshore option, not background reading.
+- **The US pass-through buys bank-loan access.** Greg (224-231) gives that as a
+  specific reason for the hybrid structure - capital access, not just tax
+  simplicity. It is currently one item in a comma list.
+
+### Context that changes how to read the TBDs
+
+The call was time-boxed - "actually we're only on for seven more minutes"
+(line 167) - and one attendee said he was distracted in the closing stretch. The
+open TBD items were agreed under time pressure, so treat them as intentions
+rather than firm commitments. All action items are now ~50 days old with no
+recorded closure.
+
+### Actionability defect
+
+The follow-up action points at "otomos.com" (elsewhere "otomós.com"). On the call
+Greg spells it aloud as "o-t-o-m-o-s" while the screen shows a different domain
+(254-256). Confirm the real URL before anyone tries to action it.

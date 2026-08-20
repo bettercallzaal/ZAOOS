@@ -101,9 +101,9 @@ All in `github.com/bettercallzaal/zpoidh`, all shipped this session or earlier:
 
 - [Doc 759](../759-poidh-history-origin-to-2026/) - canonical POIDH history + founder framework
 - [Doc 1139](../1139-zabal-submission-pipeline-map/) - current-state pipeline map, still accurate
-- [Doc 1229](../1229-unlock-poidh-zao-event-stack/) - the Unlock+POIDH event-stack spec this doc's R5/R6 section builds on
+- [Doc 1229](../../events/1229-unlock-poidh-zao-event-stack/) - the Unlock+POIDH event-stack spec this doc's R5/R6 section builds on
 - [Doc 994](../994-zabal-gamez-poidh-fireside-unlock-jul8/) - full transcript source for the Kenny + Unlock positioning quoted above
-- [Doc 2161](../2161-zao-brand-audit/) - flags POIDH's own ICM box as a "draft pending publish" gap, now closed by this session's ICM update
+- [Doc 2161](../../identity/2161-zao-brand-audit/) - flags POIDH's own ICM box as a "draft pending publish" gap, now closed by this session's ICM update
 - zpoidh repo (`github.com/bettercallzaal/zpoidh`) - all round data + tooling referenced above
 
 ## Next Actions

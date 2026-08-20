@@ -57,8 +57,8 @@ July = the open build month. The June workshops already produced a roster of pro
 
 ## Also See
 
-- [Doc 897](../897-zao-social-posting-playbook/) - posting mechanics for the day-of promo.
-- [Doc 898](../898-zaal-brand-voice-posting/) - voice for the casts.
+- [Doc 897](../../community/897-zao-social-posting-playbook/) - posting mechanics for the day-of promo.
+- [Doc 898](../../community/898-zaal-brand-voice-posting/) - voice for the casts.
 - [Doc 900](../900-mental-wealth-academy-james/) - one of the projects that can anchor a Build Day.
 
 ## Next Actions

@@ -80,9 +80,9 @@ The weaknesses above are WHERE ZAO has these rules written but not yet wired int
 
 ## Also See
 
-- [Doc 928](../../../agents/928-agent-loop-best-practices/) - Agent loop best practices (learned online 2026-06-30)
+- [Doc 928](../../agents/928-agent-loop-best-practices/) - Agent loop best practices (learned online 2026-06-30)
 - [Doc 994](../../../agents/994-loop-engineering-taxonomy/) - Loop engineering: 4-loop taxonomy + Karpathy method
-- [Doc 998](../../../infrastructure/998-github-repo-estate-audit/) - Full GitHub repo + doc-numbering estate audit
+- [Doc 998](../../infrastructure/998-github-repo-estate-audit/) - Full GitHub repo + doc-numbering estate audit
 - [Doc/estate](../../../estate/README.md) - ZOE research pipeline leak diagnosis
 - [.claude/rules/agent-loops.md](../../.claude/rules/agent-loops.md) - Operating rules (source of truth for loop discipline)
 

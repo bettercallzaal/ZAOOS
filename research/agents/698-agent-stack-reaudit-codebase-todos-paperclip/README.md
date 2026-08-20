@@ -125,7 +125,7 @@ Restarting Paperclip trades the Doc 601 simplification (12 -> 5 systems) back fo
 - [Doc 601](../601-agent-stack-cleanup-decision/) - the 2026-05-04 stack-collapse decision being reversed
 - [Doc 653](../../dev-workflows/653-cron-bots-audit-may2026/) - VPS cron + crash-loop audit
 - [Doc 668](../668-zaocoworking-bot-audit/) + [Doc 672](../672-zaocoworking-bot-audit-postv213/) - ZAOcoworkingBot audits
-- [Doc 661](../661-zaoos-codebase-audit-may-2026/) - prior ZAOOS codebase audit
+- [Doc 661](../../dev-workflows/661-zaoos-codebase-audit-may-2026/) - prior ZAOOS codebase audit
 - ZAOOS `bot/src/` (ZOE, Hermes, devz), `.claude/rules/` - read 2026-05-21
 - `gh repo list bettercallzaal` + `songchaindao` - ecosystem repo state 2026-05-21
 - All sources [FULL] except VAULT/BANKER/DEALER last-run status [PARTIAL - cron logs not inspected]

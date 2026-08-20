@@ -170,7 +170,7 @@ Zlank is a unified TypeScript SDK wrapping token launch (Clanker), token operati
 
 - [Doc 281 - Farcaster agents landscape + registration](../../agents/281-farcaster-agents-landscape-registration/)
 - [Doc 361 - Empire Builder touchpoints](../361-empire-builder-touchpoints/) (if exists)
-- [Doc 475 - ZAO Music entity](../475-zao-music-entity/) - royalty backing for Model 3
+- [Doc 475 - ZAO Music entity](../../music/475-zao-music-entity/) - royalty backing for Model 3
 - [Doc 487 - QuadWork four-agent dev team](../../agents/487-quadwork-four-agent-dev-team/) - could build Zlank via Quad batch
 - [Doc 497 - Quad workflow deep dive](../../agents/497-quad-workflow-deep-dive/) - how to ship Zlank with the team
 

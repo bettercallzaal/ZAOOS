@@ -229,8 +229,8 @@ Empire Builder runs Next.js + RainbowKit on Base - identical stack to ZAO OS. Th
 
 - [Empire Builder](https://empirebuilder.world) - main platform
 - [ZABAL Empire Profile](https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af) - Zaal's empire
-- [Doc 065 - ZABAL Partner Ecosystem](../community/065-zabal-partner-ecosystem/) - original partner research
-- [Doc 348 - SongJam Points System Deep Dive](../community/348-songjam-points-system-deep-dive/) - multiplier mechanics
+- [Doc 065 - ZABAL Partner Ecosystem](../../community/065-zabal-partner-ecosystem/) - original partner research
+- [Doc 348 - SongJam Points System Deep Dive](../../community/348-songjam-points-system-deep-dive/) - multiplier mechanics
 - [Doc 360 - RaidSharks Telegram Engagement](../cross-platform/360-raidsharks-telegram-engagement-strategy/) - raid-to-ZABAL pipeline
 - [Adrian Call Prep](../../docs/call-prep/2026-04-13-adrian-empire-builder.md) - V3 API questions + integration plan
 - [ZABAL Update 3 (Paragraph)](https://paragraph.com/@thezao/zabal-update-3) - Empire Builder + SongJam integration announcement

@@ -125,8 +125,8 @@ None of these break the doc 761 architecture - the planes are right. They sharpe
 
 - [Doc 761](../../agents/761-zao-farcaster-multiagent-quilibrium-stack/) - the architecture + build this verifies
 - [Doc 318](../../agents/318-cassie-multi-agent-coordination-bootcamp/) - multi-agent design source
-- [Doc 468](../468-zao-farcaster-hub-poidh-hypersub-dual-hub/) - dual-hub read/write split
-- [Doc 484](../484-matricula-autonomous-farcaster-agent/) - autonomous Farcaster agent prior art
+- [Doc 468](../../agents/468-zao-farcaster-hub-poidh-hypersub-dual-hub/) - dual-hub read/write split
+- [Doc 484](../../agents/484-matricula-autonomous-farcaster-agent/) - autonomous Farcaster agent prior art
 
 ## Next Actions
 

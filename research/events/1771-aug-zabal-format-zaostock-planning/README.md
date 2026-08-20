@@ -55,7 +55,7 @@ Zaal talked through three options for the final month (August):
 
 ## Also See
 - [Doc 1455](../../technology/1455-zabal-gamez-show-expansion-bcz-yapz-lte-jul2026/) - ZABAL Gamez show expansion (Johnny, Ohnahji)
-- [Doc 274](../../community/274-zao-stock-team-deep-profiles/) - ZAOstock team profiles
+- [Doc 274](../274-zao-stock-team-deep-profiles/) - ZAOstock team profiles
 
 ## Sources
 - Craig recording `craig-G3r9ORZGaHTS` (4 per-speaker tracks, 2026-07-20), transcribed locally via mlx-whisper. Full cleaned transcript in [transcript.md](transcript.md).

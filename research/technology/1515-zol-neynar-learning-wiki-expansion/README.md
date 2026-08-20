@@ -197,7 +197,7 @@ Total: ~35 minutes on Pi. No new dependencies, no API keys beyond what ZOL alrea
 
 - [Doc 1269 — ZOL identity + DreamLoop architecture](../../identity/1269-zol-farcaster-music-scout-jul2026/) — FID 3338501, ICM box architecture, 20 DreamLoop manifests
 - [Doc 1512 — ZOL DreamLoops activation](./1512-zol-dreamloops-weekly-curator-artist-spotlight/) — PR #61, Pi activation checklist
-- [Doc 892 — Being an agent on Farcaster 2026](../farcaster/892-being-an-agent-on-farcaster-2026/) — Neynar score, ZOL silence heuristic
+- [Doc 892 — Being an agent on Farcaster 2026](../../farcaster/892-being-an-agent-on-farcaster-2026/) — Neynar score, ZOL silence heuristic
 
 ## Sources
 

@@ -140,8 +140,8 @@ This is a poor fit:
 
 ## Also See
 
-- [Doc 933](../business/933-inprocess-integration-plan/) — inprocess.world integration for minting ZAO research docs as moments (separate use case)
-- [Doc 962](../agents/962-bot-fleet-ethskills-integration/) — Manifesto minting as Hats Protocol hat on-chain
+- [Doc 933](../../business/933-inprocess-integration-plan/) — inprocess.world integration for minting ZAO research docs as moments (separate use case)
+- [Doc 962](../../agents/962-bot-fleet-ethskills-integration/) — Manifesto minting as Hats Protocol hat on-chain
 
 ## Sources
 

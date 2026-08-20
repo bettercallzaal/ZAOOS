@@ -226,7 +226,7 @@ Run this scoring weekly. Top 50 = the active outreach pool. Document rest as "mo
 
 ## Also See
 
-- [Doc 742](../742-zaal-panthaki-profile-dossier/) - Zaal's profile + voice context for cold-outreach personalization
+- [Doc 742](../../community/742-zaal-panthaki-profile-dossier/) - Zaal's profile + voice context for cold-outreach personalization
 - [Doc 737](../737-airtable-agentic-crm-v3/) - Airtable CRM AGENTIC base (reply-handling destination)
 - [Doc 739](../../dev-workflows/739-claude-code-efficiency-native-mcps/) - native MCP connectors (Gmail send + GCal scheduling)
 - [Doc 738](../../events/738-vlad-singularity-fractal-call-may24/) - Vlad / Singularity (potential funding-rail context for "VCs" angle messaging)

@@ -123,4 +123,4 @@ Plus ~30 gstack/superpowers skills, 8 autoresearch subcommands.
 
 - [@kirillk_web3 - Claude Skills by Anthropic Engineers](https://x.com/kirillk_web3/status/2043037616979759465)
 - [Claude Code Skills Documentation](https://docs.anthropic.com/en/docs/claude-code/skills)
-- [Doc 154 - Skills Commands Master Reference](../../154-skills-commands-master-reference/)
+- [Doc 154 - Skills Commands Master Reference](../154-skills-commands-master-reference/)

@@ -1,6 +1,6 @@
 # 1320 — ZAO Grant Strategy: Fractured Atlas + Fisher + Full Funding Pipeline (July 2026)
 
-> URGENT: Fisher grant deadline Aug 15, 2026 (29 days). Fractured Atlas fiscal sponsorship is the prerequisite — apply IMMEDIATELY. This doc consolidates every grant opportunity, application status, and paste-ready narrative. Cross-refs: [doc 1311](../1311-zao-optimism-retro-funding-pack-jul2026/) (OP RF application), [doc 1290](../identity/1290-zao-2026-impact-review/) (impact narrative), [doc 1288](../identity/1288-zao-founder-team-profile-jul2026/) (founder bio), [doc 1278](../identity/1278-zao-citable-claims-jul2026/) (10 citable claims).
+> URGENT: Fisher grant deadline Aug 15, 2026 (29 days). Fractured Atlas fiscal sponsorship is the prerequisite — apply IMMEDIATELY. This doc consolidates every grant opportunity, application status, and paste-ready narrative. Cross-refs: [doc 1311](../1311-zao-optimism-retro-funding-pack-jul2026/) (OP RF application), [doc 1290](../../identity/1290-zao-2026-impact-review/) (impact narrative), [doc 1288](../../identity/1288-zao-founder-team-profile-jul2026/) (founder bio), [doc 1278](../../identity/1278-zao-citable-claims-jul2026/) (10 citable claims).
 
 **Status as of July 17, 2026:**
 - Fractured Atlas: NOT APPLIED — GATED (Zaal must apply NOW)

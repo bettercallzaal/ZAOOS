@@ -135,12 +135,12 @@ The ZABAL crew just proved something. For two weeks, 31 people opted into a Boos
 - [Boostr /how (mechanics guide)](https://boostr.itscashless.com/how) [FULL] - opt-in signer, USDC on Arbitrum, bulk + browse purchase modes, profile earnings management
 - [Boostr ZABAL Auto-Like API](https://boostr.itscashless.com/api/zabaal/stats) [FULL] - live data: 31 contributors, 592 likes, user rankings with FID, username, followers, likes count
 - ZAOOS memory (zabalgamez loop log) [FULL] - cashlessman.eth (28.5K followers, builds boostr, CEF-granted, approached for submission-pipeline collab)
-- [Doc 1098 - Sparkz master brief](../../../business/1098-sparkz-master-brief/) [FULL] - tokenless-first sequencing, energy-first thesis, AI launch timing
-- [Doc 957 - 100K reach H2 2026](../../../business/957-100k-total-reach-h2-2026/) [FULL] - Farcaster as seed engine, cashlessman listed as ZABAL builder arrival vector
+- [Doc 1098 - Sparkz master brief](../../business/1098-sparkz-master-brief/) [FULL] - tokenless-first sequencing, energy-first thesis, AI launch timing
+- [Doc 957 - 100K reach H2 2026](../../business/957-100k-total-reach-h2-2026/) [FULL] - Farcaster as seed engine, cashlessman listed as ZABAL builder arrival vector
 
 ## Also See
 
-- [Doc 1098 - Sparkz master brief](../../../business/1098-sparkz-master-brief/) - The tokenless-energy-first thesis Zooster pilots
-- [Doc 1097 - Sparkz competitive landscape](../../../business/1097-sparkz-competitive-landscape/) - Clanker/Zora context for why energy-first matters
-- [Doc 957 - 100K reach H2](../../../business/957-100k-total-reach-h2-2026/) - Farcaster as seed engine, mentioning cashlessman
-- [Clawdchat incident (2024 Dec, internal context)](../1022-devcon-outreach-address-injection-scam) - Why "auto-engagement swarm" failed (ref for tension section)
+- [Doc 1098 - Sparkz master brief](../../business/1098-sparkz-master-brief/) - The tokenless-energy-first thesis Zooster pilots
+- [Doc 1097 - Sparkz competitive landscape](../../business/1097-sparkz-competitive-landscape/) - Clanker/Zora context for why energy-first matters
+- [Doc 957 - 100K reach H2](../../business/957-100k-total-reach-h2-2026/) - Farcaster as seed engine, mentioning cashlessman
+- [Clawdchat incident (2024 Dec, internal context)](../../security/1022-devcon-outreach-address-injection-scam/) - Why "auto-engagement swarm" failed (ref for tension section)

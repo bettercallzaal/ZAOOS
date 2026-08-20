@@ -118,4 +118,4 @@ long tail). Same shape as the Unlock/Whop decision in doc 2233 - the door stays 
 
 ## Also See
 
-- [Doc 2233](../business/2233-unlock-whop-crypto-access-bridge/) - the same own-the-door pattern applied to payments.
+- [Doc 2233](../../business/2233-unlock-whop-crypto-access-bridge/) - the same own-the-door pattern applied to payments.

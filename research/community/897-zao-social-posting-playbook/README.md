@@ -56,7 +56,7 @@ In zabalgames (the ZABAL Gamez Mini App), casts are composed through `assets/min
 
 ## Also See
 
-- [Doc 896](../896-unlock-events-luma-setup/) - the Unlock + Luma event this playbook was first applied to.
+- [Doc 896](../../events/896-unlock-events-luma-setup/) - the Unlock + Luma event this playbook was first applied to.
 
 ## Next Actions
 

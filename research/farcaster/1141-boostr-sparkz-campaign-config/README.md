@@ -416,13 +416,13 @@ Nothing here deploys, funds, or moves on-chain value; those remain Zaal's hand.
 ## Sources
 
 - [Doc 1132 - Zooster: Boostr/ZABAL Auto-Like Leaderboard](../1132-zooster-boostr-zabal-leaderboard/) [FULL] - guardrails, promo drafts, Clawdchat incident, 31-contributor live data
-- [Doc 1098 - Sparkz Master Brief](../../../business/1098-sparkz-master-brief/) [FULL] - tokenless-energy-first sequencing, AI launch-timing thesis, MVP definition
-- [Doc 1097 - Sparkz Competitive Landscape](../../../business/1097-sparkz-competitive-landscape/) [FULL] - why energy-first gates volume for sustainability
+- [Doc 1098 - Sparkz Master Brief](../../business/1098-sparkz-master-brief/) [FULL] - tokenless-energy-first sequencing, AI launch-timing thesis, MVP definition
+- [Doc 1097 - Sparkz Competitive Landscape](../../business/1097-sparkz-competitive-landscape/) [FULL] - why energy-first gates volume for sustainability
 - [Boostr homepage](https://boostr.itscashless.com) [FULL] - marketplace mechanics, USDC on Arbitrum
 - [Boostr /api/zabaal/stats](https://boostr.itscashless.com/api/zabaal/stats) [FULL] - live ZABAL Auto-Like data feed
 
 ## Also See
 
 - [Doc 1132 - Zooster Leaderboard](../1132-zooster-boostr-zabal-leaderboard/) - The proof-of-concept this campaign drives
-- [Doc 1098 - Sparkz Master Brief](../../../business/1098-sparkz-master-brief/) - The broader Sparkz thesis
-- [Doc 1097 - Sparkz Competitive Landscape](../../../business/1097-sparkz-competitive-landscape/) - Why this design wins vs Clanker/Zora
+- [Doc 1098 - Sparkz Master Brief](../../business/1098-sparkz-master-brief/) - The broader Sparkz thesis
+- [Doc 1097 - Sparkz Competitive Landscape](../../business/1097-sparkz-competitive-landscape/) - Why this design wins vs Clanker/Zora

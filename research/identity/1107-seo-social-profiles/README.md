@@ -145,7 +145,7 @@ Follow-up boarded (`research-doc:1107`): when the `llms.txt` files are authored,
 ## Also See
 
 - [Doc 1016](../1016-geo-zao-iconic/) - GEO + brand identity strategy; parent doc for owning AI-search answers across the ecosystem
-- [Doc 154](../154-skills-commands-master-reference/) - Skills + commands reference (relevant for automated GBP + schema submissions if future bots handle these)
+- [Doc 154](../../dev-workflows/154-skills-commands-master-reference/) - Skills + commands reference (relevant for automated GBP + schema submissions if future bots handle these)
 
 ---
 

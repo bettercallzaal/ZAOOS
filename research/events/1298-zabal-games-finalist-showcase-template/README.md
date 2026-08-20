@@ -1,6 +1,6 @@
 # 1298 — ZABAL Games August Finals: Builder Submission Kit + Showcase Script
 
-> Canonical template for the 32 ZABAL Games builders entering August finals. Covers what to submit, how to structure a 2-minute demo, scoring rubric, and the day-of showcase run-of-show. Cross-refs: [doc 1291](../1291-zabal-games-august-decision-brief-jul2026/) (5 key decisions), [doc 1283](../1283-zabal-august-buildathon-mechanics/) (full mechanics), [doc 1255](../1255-wavewarz-zabal-games-august-battle-protocol/) (WW battle track).
+> Canonical template for the 32 ZABAL Games builders entering August finals. Covers what to submit, how to structure a 2-minute demo, scoring rubric, and the day-of showcase run-of-show. Cross-refs: [doc 1291](../1291-zabal-games-august-decision-brief-jul2026/) (5 key decisions), [doc 1283](../1283-zabal-august-buildathon-mechanics/) (full mechanics), [doc 1255](../../wavewarz/1255-wavewarz-zabal-games-august-battle-protocol/) (WW battle track).
 
 **Last updated:** 2026-07-17 | **Status:** DRAFT — pending 5 decisions from doc 1291 before finalizing
 

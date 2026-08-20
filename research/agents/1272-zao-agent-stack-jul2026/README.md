@@ -107,7 +107,7 @@ ZOE's voice rules (from `persona.md`) are the canonical ZAO voice for all agents
 - 20 DreamLoop manifests (verified Jul 17, 2026 from ZOL repo `loops/` dir)
 - Cost: ~$0.001/cast draft (OpenRouter claude-fable-5)
 
-**Full canonical reference: [doc 1269](../identity/1269-zol-farcaster-music-scout-jul2026/)**
+**Full canonical reference: [doc 1269](../../identity/1269-zol-farcaster-music-scout-jul2026/)**
 
 **Identity correction:** FID 19640 belongs to ZOE's Farcaster signer, NOT ZOL. ZOL = @zolbot, FID 3338501.
 

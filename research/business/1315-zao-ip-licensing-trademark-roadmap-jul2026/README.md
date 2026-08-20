@@ -1,6 +1,6 @@
 # 1315 — ZAO IP Licensing + Trademark Roadmap (July 2026)
 
-> The ZAO has ZERO registered trademarks (HIGH exposure, per doc 1122). This doc maps what IP exists, what to protect first, how licensing could generate revenue, and the recommended Greg (Autonomous, doc 951) action sequence. Cross-refs: [doc 1122](../identity/1122-brand-ip-estate-audit/) (IP audit), [doc 1257](../identity/1257-zao-ip-portfolio-july2026/) (IP portfolio), [doc 951](../events/951-greg-autonomous-wavewarz-legal/) (Greg/Autonomous legal call), [doc 1214](../wavewarz/1214-wavewarz-creative-ecosystem-jul2026/) (WW creative ecosystem).
+> The ZAO has ZERO registered trademarks (HIGH exposure, per doc 1122). This doc maps what IP exists, what to protect first, how licensing could generate revenue, and the recommended Greg (Autonomous, doc 951) action sequence. Cross-refs: [doc 1122](../../identity/1122-brand-ip-estate-audit/) (IP audit), [doc 1257](../../identity/1257-zao-ip-portfolio-july2026/) (IP portfolio), [doc 951](../../events/951-greg-autonomous-wavewarz-legal/) (Greg/Autonomous legal call), [doc 1214](../../wavewarz/1214-wavewarz-creative-ecosystem-jul2026/) (WW creative ecosystem).
 
 **Current IP exposure level (from doc 1122):** HIGH
 - ZERO registered trademarks for any ZAO brand

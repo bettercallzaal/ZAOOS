@@ -1,6 +1,6 @@
 # 1313 — ZAOstock Artist Announcement + Reveal Strategy (July 2026)
 
-> How to announce artists for ZAOstock Oct 3 in a way that builds attendance momentum, grows followers, and fills the event. Oct 3 is 77 days away. This doc is fully non-GATED — all Zaal needs is the confirmed artist list and a posting schedule. Cross-refs: [doc 472](./472-zaostock-artist-lockin-timeline/) (artist lock-in timeline), [doc 1033](./1033-zaostock-photo-promo-calendar/) (promo calendar), [doc 1299](../community/1299-zao-x-twitter-strategy-jul2026/) (X strategy), [doc 1295](../community/1295-zao-farcaster-strategy-jul2026/) (Farcaster strategy).
+> How to announce artists for ZAOstock Oct 3 in a way that builds attendance momentum, grows followers, and fills the event. Oct 3 is 77 days away. This doc is fully non-GATED — all Zaal needs is the confirmed artist list and a posting schedule. Cross-refs: [doc 472](./472-zaostock-artist-lockin-timeline/) (artist lock-in timeline), [doc 1033](./1033-zaostock-photo-promo-calendar/) (promo calendar), [doc 1299](../../community/1299-zao-x-twitter-strategy-jul2026/) (X strategy), [doc 1295](../community/1295-zao-farcaster-strategy-jul2026/) (Farcaster strategy).
 
 **Current confirmed artists (from docs 839, 871, doc 814, doc 1305):**
 - Tom Fellenz — confirmed (doc 839 + COC Concertz veteran)

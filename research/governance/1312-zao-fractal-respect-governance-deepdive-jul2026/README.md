@@ -1,6 +1,6 @@
 # 1312 — ZAO Fractal Respect Governance: How It Actually Works (July 2026)
 
-> The explainer researchers, journalists, and grant reviewers need. This doc answers "how does The ZAO actually govern itself?" in technical but accessible terms — with on-chain receipts. Cross-refs: [doc 1282](../identity/1282-zao-vs-artist-daos-jul2026/) (ZAO vs other DAOs), [doc 1278](../identity/1278-zao-citable-claims-jul2026/) (citable claims), [doc 1311](../business/1311-zao-optimism-retro-funding-pack-jul2026/) (OP RF pack), [doc 1307](./1307-hats-protocol-zao-org-chart/) (Hats Protocol roles).
+> The explainer researchers, journalists, and grant reviewers need. This doc answers "how does The ZAO actually govern itself?" in technical but accessible terms — with on-chain receipts. Cross-refs: [doc 1282](../../identity/1282-zao-vs-artist-daos-jul2026/) (ZAO vs other DAOs), [doc 1278](../../identity/1278-zao-citable-claims-jul2026/) (citable claims), [doc 1311](../business/1311-zao-optimism-retro-funding-pack-jul2026/) (OP RF pack), [doc 1307](./1307-hats-protocol-zao-org-chart/) (Hats Protocol roles).
 
 **The one-sentence answer:** The ZAO uses Fractal Respect — a model where governance weight is earned by showing up and being peer-evaluated, not by buying a token — running every week on Optimism Mainnet since October 2022.
 

@@ -202,7 +202,7 @@ Follow-up boarded (`legacy_source=research-doc:1133`, P3): adopt that MCP compou
 
 ## Also See
 
-- [Doc 365](../365-recoupable-monorepo-best-practices/) - Recoupable's git-submodule monorepo + AGENTS.md patterns (infrastructure angle)
+- [Doc 365](../../dev-workflows/365-recoupable-monorepo-best-practices/) - Recoupable's git-submodule monorepo + AGENTS.md patterns (infrastructure angle)
 - [Doc 366](../../dev-workflows/366-agents-md-monorepo-best-practices-2026/) - Agent framework comparison including Recoupable
 - [Doc 472](../../dev-workflows/472-ai-tooling-roundup-apr21/) - AI tooling batch including Recoupable developer API mention
 - [Doc 649](../../identity/649-zaal-build-profile-ecosystem-survey/) - Agent framework experiments; mentions recoupable forks

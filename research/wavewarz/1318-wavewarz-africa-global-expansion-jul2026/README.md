@@ -1,6 +1,6 @@
 # 1318 — WaveWarZ Africa + Global Expansion Strategy (July 2026)
 
-> WaveWarZ has a live connection to Zambia via Ram / Songchain (doc 608). This doc turns that relationship into a documented expansion strategy — the starting point for "ZAO IP = cultural staple" becoming a global claim, not a US-only one. Cross-refs: [doc 608](../events/608-wavewarz-africa-ram-songchain-may4/) (Ram/Songchain call), [doc 1075](./1075-wavewarz-growth/) (WW growth strategy), [doc 1315](../business/1315-zao-ip-licensing-trademark-roadmap-jul2026/) (IP licensing), [doc 1302](./1302-wavewarz-artist-onboarding-guide-jul2026/) (artist onboarding guide).
+> WaveWarZ has a live connection to Zambia via Ram / Songchain (doc 608). This doc turns that relationship into a documented expansion strategy — the starting point for "ZAO IP = cultural staple" becoming a global claim, not a US-only one. Cross-refs: [doc 608](../../events/608-wavewarz-africa-ram-songchain-may4/) (Ram/Songchain call), [doc 1075](./1075-wavewarz-growth/) (WW growth strategy), [doc 1315](../../business/1315-zao-ip-licensing-trademark-roadmap-jul2026/) (IP licensing), [doc 1302](./1302-wavewarz-artist-onboarding-guide-jul2026/) (artist onboarding guide).
 
 **What we know (from doc 608):**
 - Ram = web3 builder in Zambia, co-founder of Songchain (blockchain music infrastructure for Africa)

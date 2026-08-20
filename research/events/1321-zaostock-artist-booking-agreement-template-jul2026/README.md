@@ -1,6 +1,6 @@
 # 1321 — ZAOstock Artist Booking + Performance Agreement Template (July 2026)
 
-> Paste-ready booking framework for all ZAOstock October 3 performers. Covers confirmation email, performance terms, on-chain payment structure, rider, day-of logistics, and rights grant. Cross-refs: [doc 1313](./1313-zaostock-artist-announcement-strategy-jul2026/) (reveal calendar), [doc 1302](../wavewarz/1302-wavewarz-artist-onboarding-guide-jul2026/) (WaveWarZ onboarding), [doc 1228](./1228-zaostock-day-of-runbook/) (day-of runbook), [doc 951](../business/951-artist-agreement-greg/) (Greg / Autonomous legal contact), [doc 1285](./1285-zaostock-permit-call-script/) (permit call script Jul 20).
+> Paste-ready booking framework for all ZAOstock October 3 performers. Covers confirmation email, performance terms, on-chain payment structure, rider, day-of logistics, and rights grant. Cross-refs: [doc 1313](./1313-zaostock-artist-announcement-strategy-jul2026/) (reveal calendar), [doc 1302](../../wavewarz/1302-wavewarz-artist-onboarding-guide-jul2026/) (WaveWarZ onboarding), [doc 1228](./1228-zaostock-day-of-runbook/) (day-of runbook), [doc 951](../business/951-artist-agreement-greg/) (Greg / Autonomous legal contact), [doc 1285](./1285-zaostock-permit-call-script/) (permit call script Jul 20).
 
 **Important:** This template is a starting point for artist communications, not a substitute for legal review. Flag clauses marked [LAWYER REVIEW] to Greg (Autonomous, doc 951) before sending to artists.
 

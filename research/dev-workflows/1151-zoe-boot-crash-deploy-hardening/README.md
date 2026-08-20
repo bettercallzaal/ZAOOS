@@ -63,7 +63,7 @@ The directive was "many solutions and try them all." Each candidate below was ev
 
 ## Also See
 
-- [Doc 928](../928-agent-loop-best-practices/) - agent loop rules; this incident added #26-28.
+- [Doc 928](../../agents/928-agent-loop-best-practices/) - agent loop rules; this incident added #26-28.
 - [Doc 994] - "the loop is the product" - self-improving loop lessons.
 - `.claude/rules/agent-loops.md` #11 (dirty clone), #18 (py-script edits), #26-28 (this incident).
 

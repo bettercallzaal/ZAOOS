@@ -137,7 +137,7 @@ Evaluated 8 platforms across 7 dimensions (reading UX, collaboration model, acco
 
 ## Also See
 
-- [Doc 154](../../154-skills-commands-master-reference/) - Skills + workflow reference
+- [Doc 154](../../dev-workflows/154-skills-commands-master-reference/) - Skills + workflow reference
 - [PROCESS.md](https://github.com/bettercallzaal/zao-papers/blob/main/PROCESS.md) - ZIP specification (source of truth)
 - [Astro Starlight docs](https://starlight.astro.build) - Theme configuration
 - [GitHub Discussions API](https://docs.github.com/en/graphql-core/reference/mutations#creatediscussion) - Automation

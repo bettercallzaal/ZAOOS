@@ -434,7 +434,7 @@ Apply time-weighting to **ORDAO votes:**
 
 ## Also See
 
-- [Doc 1781](../../1781-bread-coop-solidarity-primitives/) - Bread Cooperative research (source material)
+- [Doc 1781](../1781-bread-coop-solidarity-primitives/) - Bread Cooperative research (source material)
 - [Doc 1098](../../business/1098-sparkz-master-brief/) - Sparkz creator-coin launcher spec
 - [Doc 893](../../music/893-zol-music-native-farcaster-agent/) - ZOL agent design
 - [Doc 1532](../../governance/1532-zor-respect-token-practical-guide/) - Respect/ZOR token guide
@@ -458,7 +458,7 @@ Apply time-weighting to **ORDAO votes:**
 
 ## Sources
 
-- [Bread Cooperative Research (Doc 1781)](../../1781-bread-coop-solidarity-primitives/) - primary source on deposit-and-keep, 50/50 voting, time-weighting
+- [Bread Cooperative Research (Doc 1781)](../1781-bread-coop-solidarity-primitives/) - primary source on deposit-and-keep, 50/50 voting, time-weighting
 - [Sparkz Master Brief (Doc 1098)](../../business/1098-sparkz-master-brief/) - Sparkz architecture, 0xSplits rail, legal guardrails
 - [ZOL Design Guide (Doc 893)](../../music/893-zol-music-native-farcaster-agent/) - ZOL niche, persona, economic actions
 - [Respect/ZOR Practical Guide (Doc 1532)](../../governance/1532-zor-respect-token-practical-guide/) - ZOR mechanics, ORDAO voting, current state

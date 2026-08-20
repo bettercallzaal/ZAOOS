@@ -103,5 +103,5 @@ Hypersnap exists in political tension: **Neynar (centralized efficiency) vs farc
 - [SNAP token launch announcement (X/Twitter)](https://x.com/mirza_sarmin/status/2051258129111974235) - May 4, 2026 post
 - [farcasterorg governance (GitHub)](https://github.com/farcasterorg/hypersnap) - active repo, latest commits within 48h
 - [Doc 309 - Snapchain vs Hypersnap Protocol Deep Dive](../309-snapchain-hypersnap-protocol-deep-dive/) - technical context
-- [Doc 597 - Hypersnap Install Reality Check](../597-hypersnap-install-prep/) - hardware/cost analysis
+- [Doc 597 - Hypersnap Install Reality Check](../../farcaster/597-hypersnap-install-prep/) - hardware/cost analysis
 - Memory: [project_zao_os.md](~/.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_zao_os.md) - ZAO infrastructure status

@@ -159,7 +159,7 @@ $ curl https://api.virtuals.io/agents/0x7e4f2x/skills/find-gigs \
 - [SANG (SongJam)](https://www.songjam.xyz) - Music token + Virtuals integration example [FULL]
 
 ### ZAO Internal
-- [Doc 475 — ZAO Music Entity](../../community/475-zao-music-entity/) - $ZOA token governance design
+- [Doc 475 — ZAO Music Entity](../../music/475-zao-music-entity/) - $ZOA token governance design
 - [Doc 23 — ETH Skills / Onchain Credentials](../../agents/23-eth-skills-onchain-credentials/) - Agent identity standards
 - [Doc 202 — Multi-Agent Orchestration](../../agents/202-multi-agent-orchestration-openclaw-paperclip/) - ZAO agent squad coordination
 - [Doc 236 — Autonomous OpenClaw Pattern](../../agents/236-autonomous-openclaw-operator-pattern/) - Agent execution + consolidation

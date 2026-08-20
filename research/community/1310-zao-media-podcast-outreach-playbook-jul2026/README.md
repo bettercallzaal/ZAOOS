@@ -1,6 +1,6 @@
 # 1310 — ZAO Media & Podcast Outreach Playbook (July 2026)
 
-> How to move the ZAO media score from 3/10 to 6/10 by Q4 2026. Current coverage: 1 confirmed podcast hit (Crypto Magic Hour EP.50), 2 official artist interviews, 0 music press articles, 0 mainstream coverage. This doc maps the target shows, pitch angles, outreach templates, and tracking system — all non-GATED. Cross-refs: [doc 1296](../wavewarz/1296-wavewarz-press-kit-jul2026/) (press kit), [doc 1278](../identity/1278-zao-citable-claims-jul2026/) (10 citable claims), [doc 1290](../identity/1290-zao-2026-impact-review/) (impact review), [doc 1265](../identity/1265-zao-distribution-network-jul2026/) (distribution network).
+> How to move the ZAO media score from 3/10 to 6/10 by Q4 2026. Current coverage: 1 confirmed podcast hit (Crypto Magic Hour EP.50), 2 official artist interviews, 0 music press articles, 0 mainstream coverage. This doc maps the target shows, pitch angles, outreach templates, and tracking system — all non-GATED. Cross-refs: [doc 1296](../../wavewarz/1296-wavewarz-press-kit-jul2026/) (press kit), [doc 1278](../../identity/1278-zao-citable-claims-jul2026/) (10 citable claims), [doc 1290](../../identity/1290-zao-2026-impact-review/) (impact review), [doc 1265](../../identity/1265-zao-distribution-network-jul2026/) (distribution network).
 
 **Current state (verified 2026-07-17):**
 - Crypto Magic Hour EP.50 (oEmbed-confirmed) = only confirmed independent podcast coverage

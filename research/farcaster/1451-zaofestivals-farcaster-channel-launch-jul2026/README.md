@@ -217,10 +217,10 @@ From the ZAO distribution model (doc 1432, doc 1441):
 
 ## Related Docs
 
-- [1432 — ZAO Cross-Channel Content Calendar H2 2026](../community/1432-zao-cross-channel-content-calendar-h2-2026/)
+- [1432 — ZAO Cross-Channel Content Calendar H2 2026](../../community/1432-zao-cross-channel-content-calendar-h2-2026/)
 - [1441 — ZAO Lapsed Member Re-engagement Jul 2026](../community/1441-zao-lapsed-member-reengagement-jul2026/)
 - [1441 — ZAO Farcaster Channel Growth Strategy H2 2026](./1441-zao-farcaster-channel-growth-strategy/) (note: same number, different subfolder)
-- [1442 — ZAOstock Google Form Spec Jul 2026](../events/1442-zaostock-google-form-spec-jul2026/)
+- [1442 — ZAOstock Google Form Spec Jul 2026](../../events/1442-zaostock-google-form-spec-jul2026/)
 - [1425 — WaveWarZ Farcaster Mini App Spec](./1425-wavewarz-farcaster-miniapp-spec/)
 - [1335 — COC #7 Post-Show Farcaster Thread](./1335-coc7-farcaster-thread-jul2026/)
 

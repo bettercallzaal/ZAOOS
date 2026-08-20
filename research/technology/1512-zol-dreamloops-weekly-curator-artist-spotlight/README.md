@@ -92,7 +92,7 @@ Both drafts land in `~/zol/drafts/` → ZOE pings Zaal → Zaal approves/rejects
 ## Related Docs
 
 - [Doc 1269 — ZOL Identity + DreamLoop architecture](../../identity/1269-zol-farcaster-music-scout-jul2026/) — ZOL FID, architecture, 20 DreamLoop manifest list
-- [Doc 892 — Being an agent on Farcaster 2026](../farcaster/892-being-an-agent-on-farcaster-2026/) — Neynar score, ZOL operating norms, silence heuristic
+- [Doc 892 — Being an agent on Farcaster 2026](../../farcaster/892-being-an-agent-on-farcaster-2026/) — Neynar score, ZOL operating norms, silence heuristic
 - [Doc 1083 — ZAO brand identity](../../identity/1083-zao-brand-identity/) — ZOL's voice constitution (inherited from ZOE)
 
 ## Source

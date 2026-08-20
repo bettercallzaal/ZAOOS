@@ -134,7 +134,7 @@ works the same way established in Finding 6). [FULL - dedicated DC/Maryland-area
 
 ## Also See
 
-- [Doc 912 — Restream vs StreamYard vs OBS](../912-restream-vs-streamyard-vs-obs-workflow/) — already answers the distribution-platform question (multistreaming to YouTube+Twitch); this doc is about the field-production side that feeds into that choice, not a replacement for it
+- [Doc 912 — Restream vs StreamYard vs OBS](../../infrastructure/912-restream-vs-streamyard-vs-obs-workflow/) — already answers the distribution-platform question (multistreaming to YouTube+Twitch); this doc is about the field-production side that feeds into that choice, not a replacement for it
 - [Doc 629 — Streaming as Main Media Source Flywheel](../../infrastructure/629-streaming-as-main-media-source-flywheel/) — already answers what happens to the recording AFTER the event (VOD, clips, cross-posting); this doc stops at "how do we get a clean live signal out of the venue"
 - [Doc 217 — AV Quality Optimization](../../infrastructure/217-av-quality-optimization-live-streaming/) — covers ZAO OS's own online audio-room platform, a different technical problem than field-producing an in-person outdoor event
 - [Doc 1013 — ZAO Festivals Budgets](../../business/1013-zaofestivals-budgets-zaostock-zaoville/) — doc 1013's $20K/$8,000-Production framing is retracted (2026-07-12); this doc's $900-1,500 gear spend needs to be weighed against the real ~$5K budget instead, where it's a real pressure point, not a comfortable margin

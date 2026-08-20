@@ -95,3 +95,41 @@ Note: 2-person call, single-feed video (camera off, only Zaal's name tag) - no d
 - [[project_zabal_games_magnetic_build]] - the 3-track hackathon Zaal described
 - [[project_zaal_jackson_to_riverside]] - Zaal's job arc (the new virtual software role + consulting goal)
 - [[project_colorado_acorp]] / [[project_zao_brand_legal_architecture]] - the "no legal entity for The ZAO yet / DUNA cost" thread Zaal raised
+
+## Re-verify pass 2026-08-20 (full 347-line transcript re-read)
+
+The doc itself is clean. Every quote traces verbatim to its cited line, every
+figure sources correctly (11 shows a week, the 8:30pm and 11am ET battle slots,
+2.5M community members, 2M+ Instagram followers, 20,000 toys shipped, the
+$300-500k annual cost, the 10% revenue and 50/50 split, the June 26 Newark
+details), and the hedges are carried rather than flattened - the possible
+end-of-August event still reads as "we're still working on the details", which is
+what was said.
+
+The problem is not the writing. It is that nothing here has moved in 72 days.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | The WaveWarZ X account link ("i will just send you the X account for Wave Wars", 300-301) | Bayo | not stated | none |
+| Zaal | Django event footage for Bayo to re-post (324-326) | Bayo | not stated | none |
+| Zaal | A meeting summary ("i'll try and send you a meeting summary of the stuff as well", 343) | Bayo | not stated | none |
+| Zaal + Bayo | Connecting Bayo's brother into ZAOstock and WaveWarZ (68-74) | Bayo's brother | before ZAOstock | none |
+| Bayo | The Atrium / Quack and Lola Instagram pages (341) | Zaal | not stated | none |
+| Both | Reconnect in the July/August window | each other | that window | none, and the window has closed |
+
+**Five of the six run to or from someone outside ZAO.** Not one has a due date
+attached, which is most of the reason none of them has a recorded outcome: an
+undated promise has nothing to be late against, so it is never late, so it is
+never chased (`recap-followthrough.md`).
+
+The brother introduction is the one worth rescuing. It was framed on the call as
+useful to both sides and tied to ZAOstock, which is now six weeks out. It is also
+the only item here whose value decays on a fixed date.
+
+### Small note
+
+The transcript renders MPC as "NPC" in places (184, 192) and garbles Zaal's name
+early on. The doc reads through both correctly; recorded so nobody later "fixes"
+the doc toward the transcript.

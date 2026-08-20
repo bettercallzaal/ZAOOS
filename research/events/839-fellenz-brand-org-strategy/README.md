@@ -179,3 +179,58 @@ How to address:
 - No GitHub push of the transcript.
 - No Bonfire episode.
 - Recap + review only, flagged IMPORTANT.
+
+## Re-verify pass 2026-08-20 (full 844-line transcript re-read)
+
+This doc was re-read first among its batch because it is the ORIGIN of the
+"Fellenz brand challenge 4" lesson that now governs how ZAO describes COC
+Concertz, including in `icm-grounding.md` and in the live coc-concertz ICM box.
+A rule built on a misread origin would be worse than no rule.
+
+**The doc itself is faithful.** All eight challenges are captured with their
+quotes, every citation resolves, the figures trace (the ~20 major events, the
+$600/$900 flight costs, Zaal's 2023 arrival), and the hedges survive - including
+Zaal's own "maybe I have been mis-assuming some portions of ownership with them",
+which a tidier recap would have dropped.
+
+### What challenge 4 actually established, verbatim
+
+Fellenz (475): "it seems like you're claiming top level ownership of COC
+concerts". And (483): "It's not the Zao COC. It's a partnership, though."
+
+It resolves in the same call: Zaal - "my goal is to have the revolution run the
+CFC concerts and be the lead" (~33:08); "Thy Revolution is the lead for COC
+Concerts" (669); "I am technically a worker on the team of CoC Concerts" (675);
+"he, as a founder of the CoC, owns the CoC Concerts as his Zao contributor"
+(677).
+
+So challenge 4 is about **authority**: Thy Revolution leads and owns it, ZAO does
+not, and Zaal works on the team.
+
+### The "50/50" is real, but it is not Fellenz's
+
+The downstream memory records the framing as a "50/50 joint venture" and credits
+that to challenge 4. The 50/50 language is **Thy Revolution's own**, from a
+different call a week later (doc 866, 2026-06-17): "we kind of saw this as like
+the 50 50, it was like a joint venture thing... both teams are coming together
+for that one thing that's sort of like in the middle of your brand and our
+brand."
+
+Both statements are true and they are compatible - **50/50 describes the
+contribution, lead-and-owner describes the authority**. The error is only in the
+attribution: citing 50/50 as Fellenz challenge 4 credits the wrong person and
+loses the part he actually pressed on, which was ZAO claiming the top level.
+Corrected in project memory 2026-08-20.
+
+The live coc-concertz ICM box was checked against both and states each correctly.
+
+### Follow-through block
+
+Ten action items, all from 2026-06-10, none carrying a recorded outcome 71 days
+on: the org chart, re-elevating the ZAO brand, the ZABAL Games scope decision,
+the COC reframing, the Telegram restructure, the Tuesday 11:30 standup, an
+onboarding/commitment agreement, the entry-point work, the Wallace Events
+sponsorship visit, and a Farcaster mini-app idea. The COC reframing is the one
+that demonstrably landed - it is in memory, in the rules and in the published
+box. Wallace Events is live again on its own account (it resurfaced 2026-08-19 as
+a missing partner logo). The rest are unverified either way.

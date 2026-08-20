@@ -60,7 +60,9 @@ the Crypto Endowment Network. Jim's launchpad is the substantive new item.
 ## Note
 
 Personal discussion from this call (not ZAO business) is intentionally excluded from this
-recap and stored privately off-repo. The full raw transcript is not committed.
+recap and stored privately off-repo. The transcript was backfilled 2026-08-20 with those
+stretches redacted (inline markers): [transcript.md](transcript.md). Measured length is
+27.0 min per track, not the "~1 hour" above; see the backfill PR for the other deltas.
 
 ## Also See
 

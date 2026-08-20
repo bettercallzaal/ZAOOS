@@ -18,11 +18,22 @@ don't hold them in working memory or the transcript alone.
    truth for "what's still open," not the chat scrollback.
 
 2. **PARK-ON-PIVOT - when Zaal jumps threads before the current one is done,
-   capture the leaving thread to the inbox FIRST, then follow.** Run
-   `todo "<the parked thread + its next step>"` so it lands in the cowork inbox
-   and enters triage->crush. Never let a pivot leave a thread living only in the
-   conversation. A one-line `todo` is cheap; a lost thread is not. (If `todo` is
-   unavailable, mark it parked in the ledger and surface it in the end recap.)
+   capture the leaving thread FIRST, then follow.** Never let a pivot leave a
+   thread living only in the conversation. Capturing is cheap; a lost thread is
+   not.
+
+   > **TOOL STATUS 2026-08-19: `todo` IS NOT PRESENT on this Mac.** Verified four
+   > ways - absent from `~/bin` and `~/zaal-dotfiles/bin`, never in dotfiles git
+   > history (so git cannot restore it), and not a shell alias or function.
+   > `crush`, `cockpit`, `zao-triage`, `morning-pick` and `ztui` are gone with it.
+   > Board card 78f3279f tracks restore-or-retire.
+   >
+   > **Until it returns, the fallback IS the path:** write the parked thread into
+   > the session's task ledger AND straight onto the cowork board (the board is
+   > untouched and reachable), or send it to ZOE on Telegram, which is still a
+   > live capture door. Then surface it in the end recap. Do NOT invoke `todo`
+   > and assume it landed - it exits "command not found", which is a silent drop
+   > if nobody reads the shell output.
 
 3. **END RECAP - on a natural stop, a `/compact`, or when asked, surface the
    ledger in three buckets:** DONE (shipped, with proof - PR#/file), PARKED

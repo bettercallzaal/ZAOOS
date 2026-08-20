@@ -68,7 +68,7 @@ import { readFleetStatus, formatLoopsStatus, formatLoopDetail } from './loops-st
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, runTeamDigest, getTeamMemberMap, formatOwnerDigest } from './team-tracker';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, splitCapturesByQuality, runTeamDigest, getTeamMemberMap, formatOwnerDigest } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -631,6 +631,13 @@ bot.command('zoldraft', async (ctx) => {
 // tapped one does (Fable audit fix - without this, typed answers were untagged).
 const pendingTypeAnswers = new Map<number, string>();
 
+// Capture quality gate (card b8cba711): a DM capture with no why/who context is
+// held here instead of boarding silently; ZOE asks ONE button question. Keyed by
+// a short id riding in "capq:<w|b>:<key>" callbacks. pendingWhyReplies mirrors
+// pendingTypeAnswers: after an "Add a why" tap, Zaal's next DM text IS the why.
+const pendingBareCaptures = new Map<string, { title: string; description?: string; priority?: string }>();
+const pendingWhyReplies = new Map<number, string>();
+
 bot.on('callback_query:data', async (ctx, next) => {
   if (!isFromZaal(ctx)) {
     await ctx.answerCallbackQuery();
@@ -714,6 +721,42 @@ bot.on('callback_query:data', async (ctx, next) => {
       { from: 'zaal', text: `[answer:${r.qid}] ${r.reaction}`, sender: 'zaalbotz-btn' },
       String(gid),
     ).catch((e) => console.error('[zoe/index] r-answer log failed:', (e as Error)?.message));
+    return;
+  }
+
+  // Capture quality gate buttons ("capq:<w|b>:<key>", card b8cba711).
+  // w = Add a why: his next DM text becomes the capture's why, then it boards.
+  // b = Board it bare anyway: boards as-is - the gate prompts, never blocks.
+  const capq = /^capq:([wb]):(.+)$/.exec(ctx.callbackQuery.data);
+  if (capq) {
+    const [, action, key] = capq;
+    const held = pendingBareCaptures.get(key);
+    if (!held) {
+      await ctx.answerCallbackQuery({ text: 'That capture already resolved.' });
+      return;
+    }
+    if (action === 'b') {
+      pendingBareCaptures.delete(key);
+      await ctx.answerCallbackQuery({ text: 'Boarding bare.' });
+      const n = await mirrorCapturesToTracker([held]).catch(() => 0);
+      await ctx
+        .editMessageText(
+          n
+            ? `Boarded bare: "${held.title.slice(0, 80)}"`
+            : `Board write failed for "${held.title.slice(0, 60)}" - it stays in ZOE's local tasks`,
+          { reply_markup: { inline_keyboard: [] } },
+        )
+        .catch(() => {});
+    } else {
+      const cbChat = ctx.callbackQuery.message?.chat?.id;
+      if (cbChat) pendingWhyReplies.set(cbChat, key);
+      await ctx.answerCallbackQuery({ text: 'Reply with the why.' });
+      await ctx
+        .editMessageText(`Adding a why to "${held.title.slice(0, 80)}" - reply with one line.`, {
+          reply_markup: { inline_keyboard: [] },
+        })
+        .catch(() => {});
+    }
     return;
   }
 
@@ -2641,6 +2684,32 @@ async function dispatchConcierge(
   // was answered as ordinary chat. bus-bridge.ts has had parseBusReply() for
   // exactly this and was left deliberately unwired; this is that wiring step.
   //
+  // Capture-quality why reply (card b8cba711): Zaal just tapped "Add a why" on a
+  // bare capture, so this DM text IS the why. Checked FIRST in the private scope
+  // - the pending state is explicit, set only by that tap, and cleared here
+  // (first-handler-wins: a claiming branch must name exactly what it claims).
+  if (scope === 'private') {
+    const whyKey = pendingWhyReplies.get(chatId);
+    if (whyKey) {
+      pendingWhyReplies.delete(chatId);
+      const held = pendingBareCaptures.get(whyKey);
+      pendingBareCaptures.delete(whyKey);
+      if (held) {
+        held.description = text.trim();
+        const n = await mirrorCapturesToTracker([held]).catch(() => 0);
+        await ctx
+          .reply(
+            n
+              ? `Boarded with why: "${held.title.slice(0, 60)}" - ${text.trim().slice(0, 80)}`
+              : `Board write failed - "${held.title.slice(0, 60)}" stays in ZOE's local tasks`,
+          )
+          .catch(() => {});
+        return;
+      }
+      // Held capture evaporated (restart) - fall through so the text is not lost.
+    }
+  }
+
   // Checked BEFORE the build classifier, because "reply ab12cd fix the api" must
   // be a bus reply, not a build request - the prefix is explicit and wins.
   if (scope === 'private') {
@@ -2785,10 +2854,33 @@ async function dispatchConcierge(
       const { added } = await applyTaskOps(result.task_ops);
       // Mirror new captures into the Supabase tracker WITH context, so a voice/
       // forward/DM capture becomes a self-explaining grill card (not a bare title).
+      // Quality gate (card b8cba711): a capture with no why/who is HELD behind a
+      // one-button prompt instead of boarding silently - 5 seconds at capture
+      // time beats a wasted grill round six weeks later. Local ZoeTask store is
+      // untouched either way; only the board mirror is gated.
       if (added.length > 0) {
-        await mirrorCapturesToTracker(added).catch((e) =>
-          console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
-        );
+        const { ok, bare } = splitCapturesByQuality(added);
+        if (ok.length > 0) {
+          await mirrorCapturesToTracker(ok).catch((e) =>
+            console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
+          );
+        }
+        for (const t of bare) {
+          const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+          pendingBareCaptures.set(key, t);
+          await ctx
+            .reply(`"${t.title.slice(0, 100)}" has no why - board it anyway?`, {
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    { text: 'Add a why', callback_data: `capq:w:${key}` },
+                    { text: 'Board it bare', callback_data: `capq:b:${key}` },
+                  ],
+                ],
+              },
+            })
+            .catch(() => {});
+        }
       }
     }
 

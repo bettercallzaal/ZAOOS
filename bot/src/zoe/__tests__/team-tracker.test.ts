@@ -1,5 +1,34 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, formatOwnerDigest, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, zaalFocusForBrief, buildTeamTaskRow, capturePriority, formatTeamDigest, buildPrioritiesEpisode, buildTeamContextBlock, formatOwnerDigest, isBareCapture, splitCapturesByQuality, type TeamTask } from '../team-tracker';
+
+// ── capture quality gate (card b8cba711) ────────────────────────────────────
+
+describe('isBareCapture - flags empty context, does not grade prose', () => {
+  it('bare: no description, empty, whitespace, or too short to carry a why', () => {
+    expect(isBareCapture({ title: 'Sparq' })).toBe(true);
+    expect(isBareCapture({ title: 'Colleen', description: '' })).toBe(true);
+    expect(isBareCapture({ title: 'NEXUS', description: '   ' })).toBe(true);
+    expect(isBareCapture({ title: 'x', description: 'call him' })).toBe(true);
+  });
+
+  it('ok: any description long enough to carry a why', () => {
+    expect(
+      isBareCapture({ title: 'x', description: 'Sparq asked about ZAOstock sponsorship tiers' }),
+    ).toBe(false);
+  });
+});
+
+describe('splitCapturesByQuality', () => {
+  it('partitions without losing or reordering anything', () => {
+    const a = { title: 'a', description: 'why: follow up on the artizen submission' };
+    const b = { title: 'b' };
+    const c = { title: 'c', description: 'done when the deck v2 is in the vault' };
+    const { ok, bare } = splitCapturesByQuality([a, b, c]);
+    expect(ok).toEqual([a, c]);
+    expect(bare).toEqual([b]);
+    expect(ok.length + bare.length).toBe(3);
+  });
+});
 
 describe('formatOwnerDigest', () => {
   const members = new Map([['u1', 'zaal'], ['u2', 'iman']]);

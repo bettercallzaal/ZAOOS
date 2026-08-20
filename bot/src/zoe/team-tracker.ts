@@ -227,6 +227,35 @@ export function capturePriority(p: 'high' | 'med' | 'low' | string): string {
   return p === 'high' ? 'P1' : p === 'low' ? 'P3' : 'P2';
 }
 
+/** A concierge-captured task on its way to the board. */
+export interface CapturedTask {
+  title: string;
+  description?: string;
+  priority?: string;
+}
+
+/**
+ * Capture quality gate (card b8cba711): a card born without WHO/WHY context
+ * burns a grill round six weeks later (Sparq, Colleen, NEXUS - 2026-08-19).
+ * "Bare" = no description, or one too short to carry a why. The threshold is
+ * deliberately low: this flags EMPTY context, it does not grade prose.
+ */
+export const BARE_CAPTURE_MIN_CHARS = 12;
+
+export function isBareCapture(t: CapturedTask): boolean {
+  return (t.description ?? '').trim().length < BARE_CAPTURE_MIN_CHARS;
+}
+
+export function splitCapturesByQuality(added: CapturedTask[]): {
+  ok: CapturedTask[];
+  bare: CapturedTask[];
+} {
+  const ok: CapturedTask[] = [];
+  const bare: CapturedTask[] = [];
+  for (const t of added) (isBareCapture(t) ? bare : ok).push(t);
+  return { ok, bare };
+}
+
 /**
  * Mirror concierge-captured tasks into the Supabase tracker (what the grill +
  * board read) WITH the description as notes, so a voice/forward capture becomes

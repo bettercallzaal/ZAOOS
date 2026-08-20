@@ -1,0 +1,23 @@
+# The LIVE unit on VPS 1 (~zaal/.config/systemd/user/zao-bus.service), captured
+# 2026-08-20 when the unit was swapped from the Aug-4 localhost prototype
+# (~/.zao/private/zao-bus-server.js, preserved untouched) to the canonical
+# tested infra/bus/bus.js. Git-tracked per vanishing-dependencies.md.
+# Env: /home/zaal/.zao/private/bus.env (chmod 600; BUS_PORT=3099, BUS_DATA_DIR,
+# BUS_ADMIN_TOKEN, BUS_GUEST_TOKEN[+_CANDY,_JIM,_BRANDON]) - values never in git.
+# Public: bus.zaoos.com -> localhost:3099 via the zaal cloudflared tunnel.
+[Unit]
+Description=ZAO Agent-to-Agent Message Bus (canonical infra/bus/bus.js, tasern wire contract)
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/home/zaal/.zao/private/bus.env
+ExecStart=/usr/bin/node /home/zaal/zao-bus/bus.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+Environment="NODE_ENV=production"
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,30 @@
+# ICM: ZABAL Games (ZABAL Gamez)
+
+ZABAL Games is The ZAO's 3-month build-a-thon. Free to join, anyone welcome. It is a Farcaster-native onboarding event: ship something real in public, with a ZAO mentor in your corner, and earn Respect plus an on-chain credential. Build for a real 100+ member community, not a weekend you forget.
+
+## Three tracks
+- Artist - musical / visual builds
+- Builder - developer / aspiring-coder builds
+- Creator - media / distribution / content builds
+
+## The arc (2026)
+- June: recorded workshops (ZAO teachers + ecosystem partners on governance, Respect, tools like Claude Code, Empire Builder, POIDH, Juke, SongJam). Watchable live or async at zabalgamez.com/recordings.
+- July: open build month. Goal set by Zaal (2026-07-04): 200 distinct builders, multiple submissions each. Ship a live URL + open-source repo + short demo + a cast to /zabal. Every build that clears the bar earns Respect. Partial and WIP drafts count.
+- August: Finals. Six finalists announced 2026-08-17; finals week runs August 24-30 with a 24h build + promote + Respect-weighted vote + live reveal stream. Finalists paid in USDC (tiered). WaveWarZ-Base integration and on-chain settlement.
+
+## How it works
+- Entry: register on the site (/enter) with a wallet + GitHub repo.
+- Mentors: open roster (not a fixed panel) - each mentor defines the builder archetype they want and pairs with an open-submission builder; they get a Hats Protocol "ZAO Mentor" role.
+- Submissions: a public GitHub-backed board at zabalgamez.com/submissions; Bonfire (knowledge graph) is the system of record.
+- Empire Builder + Clanker are optional tools (leaderboards, token launch), not requirements.
+- What you walk away with: a live artifact + open repo; Respect for July finishers; a Hats Protocol collectible NFT on Base as a universal "I shipped at ZABAL Games" credential.
+
+## Find it
+- Site: zabalgamez.com (with a Z; old zabalgames.com redirects here)
+- Farcaster: the /zabal channel; tag posts "zabal gamez"
+- Stream overlay for workshops/finals: zaoos.com/overlay/zabal-games
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- WaveWarZ (wavewarz)

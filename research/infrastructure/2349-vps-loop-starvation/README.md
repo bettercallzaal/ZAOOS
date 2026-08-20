@@ -24,7 +24,7 @@ tier: DEEP
 | Load | **10.77 / 12.27 / 11.50** on **2 cores** (metawall measured 10.46 at 17:27) |
 | Uptime | 15 weeks 6 days (~111 days) |
 | `cheap-loop.sh` processes | **23**, across 8 named loops (bcz, maine, poidh, ww, wwafrica, zabal, zoe, zoostr) |
-| Files written under `/root` or `/home/zaal` in 3 days | **0** (metawall, `find -newermt`) |
+| Files written under `/home/zaal` in 3 days | **5,156** - and every one is probe exhaust, see below |
 | `loop-provider.log` | **909,455 lines**, of which **345,593 contain "fail"** |
 | Free RAM | **177 Mi** of 7.8 Gi |
 | Ollama models resident | **1** (`qwen2.5:3b`) |
@@ -51,7 +51,51 @@ The probe checks reachability, not spendability. So it elects a provider that ca
 
 **4. Codex and Claude health checks also fail.** Same log tail: `codex check failed`, `claude health check failed`. Every rung of the ladder in `claude-usage.md` is down at once.
 
-**5. So each loop spins.** Probe -> elect a dead provider -> call -> fail (or hang to a 120s timeout) -> retry. 23 processes doing that on 2 cores is the load. 345,593 failure lines is the receipt. **Zero files written is not a separate bug - it is the same bug.** The loops never get past the model call to the part that writes anything.
+**5. So each loop spins.** Probe -> elect a dead provider -> call -> fail (or hang to a 120s timeout) -> retry. 23 processes doing that on 2 cores is the load. 345,593 failure lines is the receipt. The loops never get past the model call to the part that writes anything.
+
+## The correction that sharpened this - the 5,156 files are the probe, not the work
+
+The first pass of this doc reported **0 files written in 3 days**, taken from metawall's `find`. metawall then corrected it: `find` reports **5,156** files, all under `~/.claude/projects/*.jsonl` and `.claude.json` backups - and read that as "the loops are running Claude sessions yet producing no repo output".
+
+**Measured, it is neither.** Opening the largest transcript written in the last 24 hours:
+
+```
+file:  ~/.claude/projects/-home-zaal/ebb56cc3-...jsonl   (37 KB)
+lines: 9
+first user message:  "reply OK"
+entry types: {queue-operation: 2, user: 1, attachment: 3, assistant: 1, last-prompt: 2}
+```
+
+**That is a health check, not a work session.** Nine lines. The 37 KB is system-prompt and attachment boilerplate; the entire exchange is `reply OK` and a reply. The three largest recent transcripts are all *exactly* 37 KB, which is what identical boilerplate with no real work looks like.
+
+**419 such transcripts in 3 days, 132 in the last 24 hours** - roughly one every eleven minutes, per loop.
+
+So the corrected finding is worse than either version:
+
+- Not "produces nothing" (files exist).
+- Not "runs Claude sessions that produce nothing" (no work session is ever started).
+- **The fleet spawns a full Claude Code session - system prompt, attachments, the lot - every few minutes, purely to ask "reply OK", and then elects a provider that 402s.** The probe is the workload. The transcripts are its exhaust.
+
+A liveness check that costs a whole agent session is not a cheap check. This is `noisy-signal-guard.md` from the other side: not a check that always fires, but a check that costs more than the thing it protects.
+
+## OpenRouter, measured directly
+
+metawall asked whether OpenRouter returns empty. It does not - it returns a clean, correct error that the callers are swallowing.
+
+```
+GET /api/v1/credits   ->  {"total_credits":70,"total_usage":70.207061849}
+POST /api/v1/chat/completions  ->  HTTP 402
+   {"error":{"message":"Insufficient credits. Add more using ...","code":402,
+     "metadata":{"limit_source":"openrouter_credits", ...}}}
+```
+
+Three things follow:
+
+1. **The key is valid.** A 402 is a billing rejection *after* successful authentication; an invalid key returns 401. So this is money, not credentials.
+2. **Overdrawn by $0.21**, and the ceiling moved: doc 2264 measured `60 / 60.21` on 2026-08-11. It now reads `70 / 70.21`. **Someone added $10 in the interim and it is already spent.** A top-up without fixing the burn buys about a week.
+3. **`zao-daily-tip.log` reports this as "no tip returned (openrouter empty)".** It is not empty - it is a 402 with an explanatory message and a remedy link. The script discards a precise error and substitutes a vague one, which is why nobody chased it. Same failure family as the probe: `silent-failure-guard.md`.
+
+One detail worth acting on: the 402 body suggests *"lower max_tokens / prompt size to fit your remaining balance."* The loop directives are enormous - the `ww` loop's prompt is several thousand words carried on the process command line. Large prompts on every retry is part of what burned $70.
 
 ### Why this looked like a CPU problem and is not
 
@@ -173,6 +217,9 @@ ssh vps 'systemctl --user start web-improve; sleep 20; systemctl --user status w
 | Give VPS `~/bin` a git remote so these scripts can be fixed by PR; done when `git -C ~/bin remote -v` shows one | @Zaal | Ops | 2026-08-24 |
 | Add `flock` cap of 1 + stagger + backoff-with-stop to `cheap-loop.sh`; done when 8 loops never run 2 concurrent model calls | @Zaal | Fix on VPS | 2026-08-26 |
 | Rotate `loop-provider.log` (909k lines); done when the live file is under 10k lines and the old one is preserved | @Zaal | Ops | 2026-08-21 |
+| Make the liveness probe cheap - a health check must not spawn a full Claude session to ask "reply OK"; done when 24h produces far fewer than 132 probe transcripts | @Zaal | Fix on VPS | 2026-08-26 |
+| Stop `zao-daily-tip.sh` reporting a 402 as "openrouter empty" - surface the real status; done when the log names the HTTP code | @Zaal | Fix on VPS | 2026-08-24 |
+| Shrink the loop directives (the `ww` prompt is thousands of words on the command line, re-sent every retry); done when a directive is a file reference, not an argv payload | @Zaal | Fix on VPS | 2026-08-28 |
 | Close out `web-improve.service` - `reset-failed` to decommission, or run once by hand to capture a fresh failure; done when it is not showing failed | @Zaal | Decision | 2026-08-22 |
 | Settle the doc-2291 keepwarm USE-or-STOP; done when either loops call Ollama, or the cron is commented out | @Zaal | Decision | 2026-08-22 |
 
@@ -188,4 +235,7 @@ All measured 2026-08-20 over ssh to the VPS. Nothing mutating was run.
 - `grep -n` of `~/bin/cheap-loop.sh` - provider selection, the 120s timeout, and the self-documented RAM failure at line 46 [FULL]
 - `systemctl --user status web-improve` + `journalctl --user -u web-improve` [PARTIAL - status FULL, **journal empty**: `-- No entries --` plus a permissions warning. Root cause is unrecoverable and is reported as such rather than guessed.]
 - `git -C ~/bin remote -v` on the VPS - no remote, corroborating doc 2288 [FULL]
+- `curl /api/v1/credits` and a real `POST /chat/completions` from the VPS [FULL] - 70/70.207 and HTTP 402 Insufficient credits; key valid (402 not 401)
+- Largest 24h transcript opened and parsed: 9 lines, first user message `reply OK` [FULL] - the probe-exhaust finding
+- `find ~/.claude/projects -name '*.jsonl' -newermt` [FULL] - 132 in 24h, 419 in 3 days
 - metawall's 17:27 measurement (load 10.46, 10 loops, 0 files in 3 days) taken as given per the card and consistent with mine [PRIOR]

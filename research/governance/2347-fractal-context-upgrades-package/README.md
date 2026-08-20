@@ -9,7 +9,7 @@ original-query: "we need to organize the whole fractal situation and add lots of
 tier: STANDARD
 ---
 
-# 2344 - Organize ZAO Fractal: context + upgrades package
+# 2347 - Organize ZAO Fractal: context + upgrades package
 
 > **Purpose:** One proposal doc that puts the whole fractal situation in front
 > of Zaal - the verified current state on one page, then the three requested

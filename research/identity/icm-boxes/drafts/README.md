@@ -18,3 +18,22 @@ The registry is a stale mirror; `https://useicm.com/api/objects/<id>/llm.txt` is
 source of truth, and reading it is unauthenticated.
 
 Written in the overnight build loop 2026-07-30. Source lines are in each draft.
+
+## Added 2026-08-20 (card 7f0af85c, one approval pass - doc 2241 actions)
+
+- `zabalgamez.draft.llm.txt` - proposed REPLACEMENT for the live box (live 2139c,
+  unchanged since the 8/7 snapshot, verified by fresh fetch 2026-08-20). Three
+  changes vs live: (1) August arc updated to reality - six finalists announced
+  2026-08-17, finals week Aug 24-30, no finalist names (kit still unmerged in
+  zabalgamez PR #624); (2) ALL Magnetiq references removed (entry + Find it) per
+  the retirement; (3) submissions URL restored from the repo copy. OPEN QUESTION
+  for Zaal in the approval sheet: what replaces Magnetiq for signup/collectibles?
+- **Magnetiq retirement** (doc 2241 item 4): no draft needed - the action is
+  deleting/archiving live box icm_ObVlvn960SvOLc-W-IV3wQ (817c, byte-identical to
+  `live-snapshots/magnetiq.llm.txt`, which stays as the permanent archive). Needs
+  Zaal's owner key. The zabalgamez draft above already drops its Magnetiq lines,
+  so no live box references Magnetiq after both actions.
+- The three new-box drafts (`../zoe.draft.llm.txt`, `../zai.draft.llm.txt`,
+  `../zol.draft.llm.txt`) verified still repo-only (registry = 23 live boxes,
+  none of the three present) and fact-checked 2026-08-20; publish-ready as
+  written. Approval sheet: zao-vault notes/icm-approval-sheet.md.

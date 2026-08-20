@@ -69,3 +69,51 @@ Three interleaved threads: (1) token strategy - Person A will wait for Clanker v
 ## Sources
 
 - Local recording transcribed via mlx-whisper (whisper-large-v3-turbo), 2026-07-03. Full transcript in transcript.md. [PARTIAL - Whisper single-block with heavy padding; speaker attribution medium-confidence, softer-item owners marked low]
+
+## Re-verify pass 2026-08-20 (full 817-line transcript re-read)
+
+All four quotes verified verbatim at their cited lines; every technical claim
+(splits, audited contracts, leaderboard, boosters, droids-on-legacy-tokens,
+self-serve API-key portal, ZOL under ZOE) traced to source. No fabricated
+numbers. Four corrections.
+
+### "zavall" should be ZABAL
+
+The brand appears as `zavall` three times here. The transcript says "Zabal"; the
+canonical form is **ZABAL** (all caps - `CLAUDE.md` brand glossary). Left in
+place rather than silently rewritten, because a doc's own text is evidence of
+what a transcript produced - but any copy taken from this doc should use ZABAL.
+
+### "eth-Seoul bridge" is almost certainly eth-SOLANA
+
+The transcript renders it "eth to soul" (385). WaveWarZ runs on **Solana + Base**
+(memory `project_wavewarz_canonical`, doc 743), and no Seoul/Korea context
+appears anywhere in the call. "Seoul" looks like a plausible-sounding cleanup of
+a phonetic transcription, which is the more dangerous kind of error - it reads as
+a fact. Treat as **Solana**, unverified against the audio.
+
+### A ~90-line legal/regulatory block is missing entirely
+
+Transcript ~440-530 carries a substantial discussion of WaveWarZ smart-contract
+decentralisation, enforcement risk and liability structure. It is absent from
+this recap - not summarised, not seeded, not flagged. That matters more than
+usual because it is the same subject as **doc 951** (the Greg/Autonomous legal
+call), and a future decision that reads only one of the two gets half the
+picture. Anyone re-opening the WaveWarZ legal question should read both.
+
+Two other under-covered blocks: the live Iceberg territory-game demo (~111-260)
+and the game/point/leaderboard mechanics (~260-353). The recap represents roughly
+a tenth of the transcript, which is fine for decisions and thin for mechanics.
+
+### Confidence inconsistency
+
+The live-build stream is Medium in the decisions table and High in the action
+items, for the same commitment - and the transcript settles a concrete slot
+("tuesday 9 00 p.m", with the Melbourne conversion). The action item has it
+right.
+
+### Status 2026-08-20
+
+Every dated action here has passed: the API-key rotation (same-day), the Tuesday
+live-build, the Glonky image-gen fix (June), and the create-Empire step. None
+carries a completion record. Read them as history unless separately revived.

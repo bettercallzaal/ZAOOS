@@ -172,6 +172,35 @@ describe('applyBacklogAnswer - the answer follows the card, not the cursor', () 
     expect(patched).toHaveLength(1);
   });
 
+  // Park (card 1b7fe7c9): the task stays OPEN - the PATCH carries a resurface
+  // note and NO status change. A drop that destroyed the row is off the menu.
+  it('park appends a resurface note and never touches status', async () => {
+    const r = await applyBacklogAnswer('4', fakeFetch, OLD);
+
+    expect(r.ok).toBe(true);
+    expect(r.message).toContain('Parked');
+    expect(patched).toHaveLength(1);
+    expect(patched[0].url).toContain(`id=eq.${OLD}`);
+    const body = patched[0].body as { status?: string; notes?: string };
+    expect(body.status).toBeUndefined();
+    expect(body.notes).toContain('parked - stays on the board');
+    expect((await readState()).answered[OLD]?.verdict).toBe('park');
+  });
+
+  it('does not park - or overwrite notes - when the notes read fails', async () => {
+    const failingRead = (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        patched.push({ url: String(url), body: JSON.parse(String(init.body)) });
+        return { ok: true, status: 200 } as unknown as Response;
+      }
+      return { ok: false, status: 500 } as unknown as Response;
+    }) as unknown as typeof fetch;
+    const r = await applyBacklogAnswer('4', failingRead, OLD);
+    expect(r.ok).toBe(false);
+    expect(patched).toHaveLength(0);
+    expect((await readState()).answered[OLD]).toBeUndefined();
+  });
+
   /**
    * Closing REPLACES `notes`, so it has to read them first. When that read
    * fails there is nothing to preserve, and writing anyway replaced the whole

@@ -482,6 +482,24 @@ export async function applyBacklogAnswer(
     }
   } else if (v.key === 'skip') {
     message = 'Skipped - it returns later.';
+  } else if (v.key === 'park') {
+    // Park (card 1b7fe7c9): the task stays OPEN on the board - only a resurface
+    // note is appended. Same read-modify-write + fail-closed guard as the close
+    // path: notes are replaced wholesale by PATCH, so writing over a failed
+    // read would destroy the task's note history.
+    const cur = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=notes`, {
+      headers: c.headers,
+    });
+    if (!cur.ok) return { ok: false, message: `could not read that task (${cur.status}) - not parking` };
+    const rows = (await cur.json()) as Array<{ notes?: string }>;
+    const notes = `${(rows[0]?.notes || '').trim()}\n\n${verdictNote(v, new Date().toISOString().slice(0, 10))}`.trim();
+    const patch = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
+      method: 'PATCH',
+      headers: { ...c.headers, Prefer: 'return=minimal' },
+      body: JSON.stringify({ notes }),
+    });
+    if (!patch.ok) return { ok: false, message: `park failed (${patch.status})` };
+    message = 'Parked - stays on the board, resurfaces later.';
   } else {
     message = 'Kept open.';
   }

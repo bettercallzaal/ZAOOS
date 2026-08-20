@@ -3458,8 +3458,10 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
 // are outstanding at once - without it a tap on card 3 would be applied to
 // whichever card was sent last. Cards sent before this shipped carry no id and
 // still fall back to the card in play.
-bot.callbackQuery(/^bg:(done|keep|work|drop|skip)(?::(.+))?$/, async (ctx) => {
-  const [, key, taskId] = /^bg:(done|keep|work|drop|skip)(?::(.+))?$/.exec(
+// `drop` stays accepted for cards sent before the 2026-08-20 Park swap
+// (card 1b7fe7c9) - parseVerdict maps a tapped/typed drop to park.
+bot.callbackQuery(/^bg:(done|keep|work|park|drop|skip)(?::(.+))?$/, async (ctx) => {
+  const [, key, taskId] = /^bg:(done|keep|work|park|drop|skip)(?::(.+))?$/.exec(
     ctx.callbackQuery.data || '',
   ) ?? [];
   if (!key) return;

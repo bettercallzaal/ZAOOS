@@ -37,12 +37,15 @@
  * part of the verdict shape rather than an afterthought.
  */
 
-/** The five, in the order they are pressed. Stable - do not reorder. */
+/** The five, in the order they are pressed. Stable - do not reorder.
+ * 4 was "Drop it" until 2026-08-20 (card 1b7fe7c9): triage never offers a drop
+ * option (feedback_never_drop_always_park). Park leaves the task OPEN on the
+ * board with a resurface note; nothing is destroyed. */
 export const VERDICTS = [
   { n: 1, key: 'done', label: 'Done - close it' },
   { n: 2, key: 'keep', label: 'Keep open' },
   { n: 3, key: 'work', label: 'Work on it now' },
-  { n: 4, key: 'drop', label: 'Drop it' },
+  { n: 4, key: 'park', label: 'Park it - resurfaces later' },
   { n: 5, key: 'skip', label: 'Skip for now' },
 ] as const;
 
@@ -79,7 +82,7 @@ export function parseVerdict(reply: string): Verdict | null {
     if (v) return build(v.key, m[2].trim() || undefined);
   }
 
-  // The word itself: "done", "keep", "drop", "skip", "work on it".
+  // The word itself: "done", "keep", "park", "skip", "work on it".
   const lower = raw.toLowerCase();
   for (const v of VERDICTS) {
     if (lower === v.key || lower.startsWith(`${v.key} `)) {
@@ -87,6 +90,11 @@ export function parseVerdict(reply: string): Verdict | null {
     }
   }
   if (/^work on it/i.test(lower)) return build('work', raw.slice(10).trim() || undefined);
+  // A typed "drop" maps to park - the standing rule reads it as intent to shelve,
+  // and destroying is never on the menu (never-drop-always-park).
+  if (lower === 'drop' || lower.startsWith('drop ')) {
+    return build('park', raw.slice(4).trim() || undefined);
+  }
 
   // Anything else is a real instruction. Treat it as "work on it" with the
   // typed text as the brief - a sentence is a richer answer than a number, and
@@ -100,7 +108,8 @@ function build(key: VerdictKey, note?: string): Verdict {
     note,
     // Work re-enters the queue: a task is never done because work STARTED.
     requeue: key === 'work' || key === 'skip',
-    closesTask: key === 'done' || key === 'drop',
+    // Only done closes now - park replaced drop and leaves the task open.
+    closesTask: key === 'done',
   };
 }
 
@@ -159,7 +168,7 @@ export function verdictButtons(taskId: string): { text: string; data: string }[]
       { text: '3 Work', data: d('work') },
     ],
     [
-      { text: '4 Drop', data: d('drop') },
+      { text: '4 Park', data: d('park') },
       { text: '5 Skip', data: d('skip') },
     ],
   ];
@@ -252,7 +261,7 @@ export function verdictNote(v: Verdict, date: string): string {
     done: 'confirmed done',
     keep: 'still wanted - kept open',
     work: 'sent to be worked on',
-    drop: 'dropped - not doing it',
+    park: 'parked - stays on the board, resurfaces later',
     skip: 'skipped for now',
   }[v.key];
   const note = v.note ? ` Zaal added: "${v.note}"` : '';

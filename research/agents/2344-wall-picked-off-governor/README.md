@@ -27,12 +27,12 @@ A 48h audit found 45 of 46 Claude sessions stamped WAITING and exactly ONE worki
 
 State lives in one file: `~/.claude/state/picked.json` - `{"picked": [{"proj": ..., "session": ..., "at": ...}]}`.
 
-Managed by a new `zao-wall` CLI (zaal-dotfiles/bin, git-tracked):
+**Naming reconciliation (2026-08-20, same day):** the metawall lane shipped `zao-wall` in ZAOOS PR #3196 while this spec was being written - the BOARD half (which CARDS each lane owns: `--claim/--release/--unclaimed`). Its docstring already names the missing "other half"; THIS spec is that other half - the SESSION half (which LANES Zaal has picked). One wall, one command: pick/hang extend the SAME `zao-wall` tool once #3196 merges, not a second binary:
 
 ```
-zao-wall pick <lane>    # Zaal engages a lane - add to picked set
-zao-wall hang <lane>    # back on the wall - remove from picked set
-zao-wall list           # picked set + count, "N/3"
+zao-wall --pick <lane>    # Zaal engages a lane - add to picked set
+zao-wall --hang <lane>    # back on the wall - remove from picked set
+zao-wall --picked         # picked set + count, "N/3"
 ```
 
 `pick` past 3 does NOT refuse (never block Zaal) - it prints which lanes are currently picked and asks which to hang, exactly one prompt. Why explicit and not inferred: inferring engagement from prompt activity misreads every metawall/lane-send push as Zaal, and misreads a quiet-but-engaged lane as abandoned. The mark is one tap and always true (state-claims: name the source - here the source is Zaal's own declaration).
@@ -65,10 +65,10 @@ Gated-ask detection is honest-first: v1 treats a lane as gated-blocked only when
 2. A lane idle on a non-gated question is treated as a defect in its brief - IDLE-BUG in zj + a tap-digest section naming the brief as the fix.
 3. The picked-off count is visible and holdable at 2-3 - `zao-wall list`, the zj header, and the over-cap hang prompt.
 
-## Implementation plan (follow-up PRs, all zaal-dotfiles, all small)
+## Implementation plan (follow-up PRs, all small)
 
-1. `zao-wall` CLI + picked.json (new file, ~80 lines).
-2. zj patch: picked column, N/3 header, CAPPED tag, IDLE-BUG tag, `--next` reread. One PR, no behavior change to attach/jump.
+1. Extend `zao-wall` (ZAOOS scripts/agents/zao-wall.py, PR #3196) with `--pick/--hang/--picked` + picked.json - after #3196 merges.
+2. zj patch (zaal-dotfiles): picked column, N/3 header, CAPPED tag, IDLE-BUG tag, `--next` reread. One PR, no behavior change to attach/jump.
 3. `zao-tap-digest` idle-on-wall section (3 lines, after PR #48 merges).
 
 Each lands as its own card so the wall can pick them up independently.

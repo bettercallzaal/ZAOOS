@@ -142,3 +142,39 @@ Broader context: Zaal positioned ZAO as a 188-member music/tech collective on Ba
 - **Filename:** Garbled during transcription ("gho-st m-in tops")
 - **Transcript:** Raw text in `transcript.md` (this directory)
 - **Extract:** Structured analysis provided pre-recap
+
+## Re-verify pass 2026-08-20 (full 280-line transcript re-read)
+
+All eight quotes verified verbatim; Brandon's background, handle, the 102
+mini-apps figure, and both parties' locations all trace to source.
+
+### Attribution error - one speaker's thought split across two people
+
+This doc reads "Brandon acknowledged 'so many cleaner ways'" and separately
+"Zaal framed the challenge: 'there's so many better things we could show.'"
+Transcript 224-232 is a single continuous passage from **one** speaker, who owns
+the work throughout - "so i made this and i would love for your help to improve
+this", "this is our wave wars dev wallet", "our operational wallet as well as the
+three founders". Both phrases belong to that speaker. Presenting them as a
+back-and-forth invents an exchange that did not happen.
+
+### "3.5 SOL operational payout" is a threshold, not a rate
+
+Transcript 230: "at 3.5 soul we're paying out our operational wallet as well as
+the three founders." That describes the point at which payouts trigger. Read as
+an ongoing payout rate it would misstate the economics.
+
+### "Franklin St Parklet" - true, but not from this call
+
+The venue does not appear anywhere in these 280 lines. It is nonetheless
+**correct** - Franklin Street Parklet is the confirmed ZAOstock venue across ZAO
+sources. So this is enrichment from outside knowledge, not invention, and it is
+kept. Flagged only so nobody later "verifies" it against this transcript, finds
+nothing, and deletes a true fact. What the call does confirm is the date:
+"october 3rd put it in your calendar" (59).
+
+### Status 2026-08-20
+
+All three action items - calendar add, sending Empire Builder documentation,
+exploring the monorepo - were due within a fortnight of 2026-07-03 and carry no
+completion record. Treat as expired unless revived.

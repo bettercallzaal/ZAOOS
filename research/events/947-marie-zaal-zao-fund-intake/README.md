@@ -85,3 +85,52 @@ Zaal called Marie after she applied to the ZAO Fund via Artisan to discuss colla
 ## Sources
 
 - Local recording transcribed via mlx-whisper (whisper-large-v3-turbo), 2026-07-03. Full transcript in transcript.md. [FULL]
+
+## Re-verify pass 2026-08-20 (full 355-line transcript re-read)
+
+Every citation checked and every figure traced: Marie's 15,000 EUR goal, the
+~3,000 raised, the 12,000 two-week sprint, the fund's ~$10.5K/$10,000/$433, the
+$1,000 Artizen pool, her $600 unlocked and $300 remaining, and the $500 ZAO match
+making $1,500. **Nothing fabricated** - unusually clean on numbers.
+
+### The hedge that got upgraded to certainty
+
+The action item records "Add Marie's project to ZAO Fund Discord voting by end of
+Wednesday" at **High confidence**. What was actually said (155-159) is firm about
+the doing and uncertain about the outcome:
+
+> "I'll make sure on Wednesday, at the end of the day on Wednesday, even though
+> I think the timer will end on Wednesday... And we can both look at it then and
+> go check that same place on your fund, on your website, and we'll **hopefully**
+> see Artisan Endowment and then also the Zao."
+
+Plus "the way the funding, my understanding it works is..." - someone describing
+a mechanism they are still learning. The commitment is real; the confidence that
+it would display correctly was not.
+
+### Three promises to a third party, 59 days old, no recorded outcome
+
+This doc was last validated 2026-07-03 - eleven days after the call and **before
+the Wednesday deadline it tracks could even resolve**. It is frozen at the moment
+of promising, which is exactly when a doc is least useful for accountability.
+
+| Promised to Marie | Source | Recorded outcome |
+|---|---|---|
+| Add her project to the ZAO Fund vote by Wed 2026-06-26 | 155-159 | none |
+| Introduce her to Civil Monkey | 63 | none |
+| Send the Maine music-events URL on WhatsApp | 237 | none |
+
+The Maine URL was **contingent and the doc does not say so**: at 235-236 Zaal
+says "I don't have any projects up. I will be" - the link could not be sent until
+he created the thing. An action item that omits its own precondition reads as
+neglected when it was actually blocked.
+
+On the Civil Monkey introduction, one nuance worth keeping before anyone treats
+it as a broken promise: at 64 the reply is "he's in Berlin. I know him also...
+he's a close collaborator of mine." The speaker labels here are inferred, so it
+is genuinely unclear whether Marie already knew him - in which case the
+introduction was courtesy rather than access. Recorded as **unresolved**, because
+guessing either way changes what is owed.
+
+These are commitments to someone outside ZAO who was mid-crowdfund at the time.
+Carded for Zaal rather than left in a doc, since only he can say what happened.

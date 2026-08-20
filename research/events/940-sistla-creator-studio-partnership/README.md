@@ -61,3 +61,47 @@ Monthly tiers 20 / 50 / 100 / 250. Mostly higher limits (compute, file size, enc
 
 ## Transcript
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 609-line transcript re-read)
+
+Citations all check out and no figure is invented - the 30/40/40/20 split
+(204-208), the 20/50/100/250 pricing (426-433), the compute-credit offer and the
+BYOK model all trace to source verbatim.
+
+### The partnership is blocked on deliverables that never arrived
+
+Two commitments run the other way here - Sistla owed them to Zaal - and the doc
+has recorded nothing since the call (2026-06-25, 56 days):
+
+> "i'll send across the link early next week for you to try it out... the compute
+> credits from our end i'll i'll like just fill the account for you and give it
+> to you" (220-222)
+
+Zaal cannot test Creator Studio without the link, and everything downstream -
+his feedback, the joint workshop, lining up Bar Harbor clients - is gated on
+that. So the doc reads like an active partnership while the actual state may be
+"waiting since early July." That difference matters before anyone re-opens it.
+
+### A hedge worth restoring
+
+On whether this could become paid work, Sistla was explicit (403-410): "I don't
+know yet if it can be a job because our goal is to... we're building this from
+scratch... Unless we are funded enough unless we know that there's distribution."
+The recap presents the arrangement as distribution/affiliate rev-share without
+that uncertainty attached. Similarly the DevCon India residency reads as mutual
+in the decisions table, while Sistla's actual response (283-284) is "it'll take a
+lot well i think we get a uh i mean i guess" - Zaal proposed it, Sistla was
+lukewarm.
+
+### The most useful thing the recap under-weights
+
+Bar Harbor appears once as geography. On the call (435-497) it is a **live
+distribution channel**: chamber of commerce, waterfront businesses, restaurants,
+and Zaal already doing digital marketing for musicians there. That is where
+Creator Studio could land paying non-crypto clients immediately, and it is the
+most actionable thing in the transcript.
+
+Also absent from the recap: a ~72-line comparison of local models vs cloud
+(102-174, incl. harness.ai as an alternative), the Farcaster workshop-recruitment
+strategy that is already working (67-76, 326-342), and the WaveWarZ music-NFT and
+NFC-card ideas (501-545).

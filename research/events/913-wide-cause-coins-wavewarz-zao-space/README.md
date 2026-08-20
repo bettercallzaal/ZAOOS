@@ -62,3 +62,33 @@ Full transcript: [transcript.md](transcript.md)
 ## Sources
 - [FULL] X Space recording `space_2026-06-27T14-39-51-918Z.mp4` (146 min), transcribed locally (mlx-whisper), 19,169 words.
 - [[project_moses_polyraiders]] (doc 884) - PolyRaiders context.
+
+## Re-verify pass 2026-08-20 - PASSES (1,467-line transcript re-read in full)
+
+Worth recording that a doc came through the sweep clean, since every other doc in
+batches 3-6 carried at least one defect.
+
+Checked: every cited quote traces verbatim to its line; all eleven attendees
+appear in the transcript; and every figure sources correctly - founded October
+2025 (377), 1% to the artist per trade (1045), the 18-month Feed the Children
+contract (1016), 50% exclusive to the cause pool (1017), 16 countries in the
+Hunger Cup (466), the 2% interchange fee (594), and the $100K-ad-spend-to-$2K
+routing example (731-732). No invented numbers.
+
+**Speaker attribution is correct throughout**, which is the hard part in a
+multi-speaker space and where a sibling doc (949) failed by splitting one
+speaker's thought across two people. Aaron's, Candy's and Zaal's quotes are all
+correctly assigned here.
+
+The recap covers ~4-5% of the transcript, and that is the right call: the
+remainder is arrival chatter, a live music set (~120 lines), and Q&A that does
+not bear on decisions. Compression is not a coverage gap.
+
+One qualifier to carry if this is ever quoted: the Feed the Children arrangement
+is an **18-month contract** (1016). The recap gives the 50%-exclusive term
+without the duration, which is fine as a summary and misleading if the sentence
+gets lifted on its own.
+
+Action items are honestly dated and simply have no completion record - the two
+time-boxed ones ("coming weeks" for card beta onboarding, and the 2026-06-28
+Solana Sky Pilots follow-up) are now ~8 weeks past.

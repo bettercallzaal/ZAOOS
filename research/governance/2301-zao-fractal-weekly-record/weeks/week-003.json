@@ -1,0 +1,114 @@
+{
+  "week": 3,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Ohnahji B",
+          "wallet": "0x64a15b1d2de581097cb48e5d82619203e24bb3e1",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Tej",
+          "wallet": "0x2c4B9348D19C85B23a1b7eA110F0295a657197f3",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Raqs",
+          "wallet": "0x3C4cBAde02a68F94D113005DA721C46A5238cDFC",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Poison Peso",
+          "wallet": "0xA32aC6F43458c40369385E60f704912B33312919",
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [],
+  "photos": [],
+  "attendance": null,
+  "participants": 8,
+  "respect_total": 246,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractactal 3 Respect'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "No video/camera column exists for this week."
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "week": 18,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "EZinCrypto",
+          "wallet": "0xfAb9a3D37999E12252b47468D2FFD4BE15936012",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Melatto",
+          "wallet": "0x69b256C8016759fDAb80aDa8e4B48Ba2F6ceA088",
+          "rank": null,
+          "level": null,
+          "respect": 55,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "FailOften",
+          "wallet": "0xfda73b8459f66b6758d1809372df921365053af1",
+          "rank": null,
+          "level": null,
+          "respect": 34,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Binx",
+          "wallet": "0xE86840d9c4Db42DA83366A9ee75E57c711A34204",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "hop the don",
+          "wallet": "0x81F2CB371985D4ecfe684011E489186Bac647702",
+          "rank": null,
+          "level": null,
+          "respect": 21,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Gneric",
+          "wallet": "0x744cdf12d5d289db118ed9293c10cfa952169071",
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Jango UU",
+          "wallet": "0xF6519fEf3EAcfdB7843BEEa94a887255794438F0",
+          "rank": null,
+          "level": null,
+          "respect": 13,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 8,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "fernando",
+          "wallet": "0x08AA4326a03aF42F45c8b82EC747430f5dE51eBd",
+          "rank": null,
+          "level": null,
+          "respect": 8,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "Attabotty",
+    "EZinCrypto",
+    "Gneric",
+    "FailOften",
+    "Melatto"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 10,
+  "respect_total": 262,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 18'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 18'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking."
+  ]
+}

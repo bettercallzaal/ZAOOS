@@ -33,7 +33,10 @@ REQUIRED_TOP = [
 ]
 REQUIRED_RESULT = ["name", "wallet", "rank", "level", "respect", "settled"]
 VALID_ERA = {"og", "zor", "airtable"}
-VALID_MODE = {"ranked", "even_split"}
+# "recorded" = the pre-chain Airtable era, where per-person values are known but
+# the group structure is NOT. It exists so that era does not have to invent a
+# ranking to satisfy the schema.
+VALID_MODE = {"ranked", "even_split", "recorded"}
 VALID_COVERAGE = {"partial", "complete"}
 
 
@@ -81,7 +84,11 @@ def validate(directory: str) -> list:
             fail(base, f"coverage {week.get('coverage')!r} not in {sorted(VALID_COVERAGE)}")
         if not week.get("sources"):
             fail(base, "sources is empty - every week must be traceable")
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(week.get("date", ""))):
+        # A pre-chain week has no settlement, so no date. Null is allowed;
+        # a malformed date is not.
+        if week.get("date") is not None and not re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}", str(week.get("date"))
+        ):
             fail(base, f"date {week.get('date')!r} is not YYYY-MM-DD")
 
         people = 0
@@ -96,12 +103,19 @@ def validate(directory: str) -> list:
                 for key in REQUIRED_RESULT:
                     if key not in result:
                         fail(base, f"group {gid}: result missing '{key}'")
-                wallet = result.get("wallet", "")
-                if not re.fullmatch(r"0x[0-9a-fA-F]{40}", str(wallet)):
-                    fail(base, f"group {gid}: wallet {wallet!r} is not a 20-byte address")
-                if wallet.lower() in wallets:
-                    fail(base, f"group {gid}: wallet {wallet} appears twice in one group")
-                wallets.add(wallet.lower())
+                # A pre-chain row may have no wallet - the Airtable record is by
+                # name. Null is allowed, a malformed address is not, and a row
+                # with neither wallet nor name would be unidentifiable.
+                wallet = result.get("wallet")
+                if wallet is None:
+                    if not result.get("name"):
+                        fail(base, f"group {gid}: result has neither wallet nor name")
+                else:
+                    if not re.fullmatch(r"0x[0-9a-fA-F]{40}", str(wallet)):
+                        fail(base, f"group {gid}: wallet {wallet!r} is not a 20-byte address")
+                    if wallet.lower() in wallets:
+                        fail(base, f"group {gid}: wallet {wallet} appears twice in one group")
+                    wallets.add(wallet.lower())
 
                 respect = result.get("respect")
                 if not isinstance(respect, int) or respect <= 0:

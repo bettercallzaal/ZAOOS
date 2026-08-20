@@ -1,5 +1,5 @@
 {
-  "week": 70,
+  "week": 47,
   "period_number": null,
   "date": null,
   "era": "airtable",
@@ -12,8 +12,8 @@
       "mode": "recorded",
       "results": [
         {
-          "name": "Meta Mu",
-          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "name": "FailOften",
+          "wallet": "0xfda73b8459f66b6758d1809372df921365053af1",
           "rank": null,
           "level": null,
           "respect": 110,
@@ -22,8 +22,8 @@
           "reason": null
         },
         {
-          "name": "Jose (Joesph Goats)",
-          "wallet": "0x29185eB8cfD22Aa719529217bFbadE61677e0Ad2",
+          "name": "Jango UU",
+          "wallet": "0xF6519fEf3EAcfdB7843BEEa94a887255794438F0",
           "rank": null,
           "level": null,
           "respect": 110,
@@ -32,8 +32,8 @@
           "reason": null
         },
         {
-          "name": "CandyToyBox",
-          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "name": "Hurric4n3ike",
+          "wallet": "0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34",
           "rank": null,
           "level": null,
           "respect": 68,
@@ -42,8 +42,8 @@
           "reason": null
         },
         {
-          "name": "0$",
-          "wallet": "0xEd78B6236C14c4088715cd90513C6C604275Db96",
+          "name": "fellenz",
+          "wallet": "0x82Cb2305388C853eCfe9eA83a1604Acf58466659",
           "rank": null,
           "level": null,
           "respect": 68,
@@ -62,8 +62,8 @@
           "reason": null
         },
         {
-          "name": "Ohnahji B",
-          "wallet": "0x64a15b1d2de581097cb48e5d82619203e24bb3e1",
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
           "rank": null,
           "level": null,
           "respect": 42,
@@ -82,11 +82,41 @@
           "reason": null
         },
         {
-          "name": "Mumbo",
-          "wallet": "0x8a1891e106b504656c525b3C45a3E95F7A73A73E",
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
           "rank": null,
           "level": null,
           "respect": 26,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Tricky",
+          "wallet": "0x1aF4c2950C5c892D1F4aacd60E8f656A14555E5A",
+          "rank": null,
+          "level": null,
+          "respect": 16,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 9,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Ohnahji B",
+          "wallet": "0x64a15b1d2de581097cb48e5d82619203e24bb3e1",
+          "rank": null,
+          "level": null,
+          "respect": 8,
           "settled": null,
           "title": null,
           "reason": null
@@ -96,7 +126,7 @@
           "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
           "rank": null,
           "level": null,
-          "respect": 16,
+          "respect": 8,
           "settled": null,
           "title": null,
           "reason": null
@@ -107,54 +137,25 @@
   "video_awards": [],
   "camera_on": [
     "Zaal",
+    "EZinCrypto",
     "Ohnahji B",
-    "Jose (Joesph Goats)"
+    "fellenz",
+    "PR0F!T"
   ],
   "photos": [],
   "attendance": null,
-  "participants": 9,
-  "respect_total": 508,
+  "participants": 12,
+  "respect_total": 533,
   "unnamed_wallets": 0,
   "sources": [
-    "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
-    "csv import/Wallet Data-Grid view.csv (name <-> wallet)",
-    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 70'",
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 47'",
     "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
-    "camera-on from column 'ZAO Video 70'"
+    "camera-on from column 'ZAO Video 47'"
   ],
   "coverage": "partial",
   "notes": [
-    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched.",
-    "NO LIVE AWARDS: every ZOR award minted for this week was later burned. Settlement was attempted and fully reversed - this week is not a gap in the record, it is a reversal.",
-    "3 award(s) for this week were minted and later BURNED on-chain; they are excluded from participants and respect_total and listed in reversed_awards.",
     "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
     "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
-    "MERGED: the ZOR mints for this week were fully reversed on-chain, so the live record here is the Airtable one. The reversed on-chain awards are preserved in reversed_awards."
-  ],
-  "reversed_awards": [
-    {
-      "name": "Zach L.",
-      "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
-      "respect": 55,
-      "minted_at": "2025-10-17T02:04:33.000000Z",
-      "burned_at": "2025-10-24T06:50:45.000000Z",
-      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
-    },
-    {
-      "name": "CandyToyBox",
-      "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
-      "respect": 34,
-      "minted_at": "2025-10-17T02:04:33.000000Z",
-      "burned_at": "2025-10-24T06:50:45.000000Z",
-      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
-    },
-    {
-      "name": "Zaal",
-      "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
-      "respect": 21,
-      "minted_at": "2025-10-17T02:04:33.000000Z",
-      "burned_at": "2025-10-24T06:50:45.000000Z",
-      "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
-    }
+    "Values off the Fibonacci curve in this week: [9]. Recorded verbatim, not corrected."
   ]
 }

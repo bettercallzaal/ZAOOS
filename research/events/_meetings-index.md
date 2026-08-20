@@ -8,6 +8,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | 2026-08-18 | Dank Phart x Zaal - ZAO identity layer, art DAO history, Peers bridge | ZAO Devz / fractal | Zaal, Dank Phart | [2339](2339-dank-phart-identity-layer-art-dao-aug18/) | 4 |
 | 2026-08-12 | Candy x Zaal - WaveWarZ as the oracle for music prediction markets | WaveWarZ | Zaal, Candy | [2340](2340-candy-zaal-wavewarz-prediction-market-aug12/) | 4 |
 | 2026-08-18 | Motomoto ZAOstock virtual-side catch-up | ZAOstock | Zaal, Iman, Aziz (Motomoto) | [2316](2316-motomoto-zaostock-virtual-catchup-aug18/) | 6 |
+| 2026-08-08 | WaveWarZ battle Space: Cannon Jones vs Mose (file mislabelled zaofestivals-space) | WaveWarZ | the host (unnamed), Cannon Jones, Mose, judges Catalyst + GodCloud | [2355](2355-wavewarz-battle-space-cannon-jones-vs-mose-aug8/) | 0 |
 | 2026-08-05 | Paper x Zaal - Bomb Squad, the seventh man, media vault | BCZ / WaveWarZ | Zaal, Paper | [2298](2298-paper-bomb-squad-collab-aug5/) | 5 |
 | 2026-08-06 | Matteo x Zaal x Candy - Livepeer, web3 radio, Harberger ads | BCZ / WaveWarZ | Zaal, Matteo Tambussi, Samantha | [2297](2297-matteo-livepeer-web3radio-harberger-aug6/) | 4 |
 | 2026-08-04 | Dylan x Rizzle x Zaal - Clanker v5, droids, practice-launch plan | ZAO Devz | Zaal, Epic Dylan, Rizzle, Samantha | [2296](2296-dylan-rizzle-clanker-v5-token-planning-aug4/) | 7 |

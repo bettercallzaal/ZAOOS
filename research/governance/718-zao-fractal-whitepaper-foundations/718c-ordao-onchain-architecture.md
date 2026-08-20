@@ -19,7 +19,7 @@ parent-doc: 718
 
 | Dimension | Finding | Implication for Whitepaper |
 |-----------|---------|---------------------------|
-| **OREC Mechanism** | Three-phase: voting (48h YES/NO) + veto (48h NO-only) + execution. Passes if YES weight >= threshold AND YES > 2x NO. | "Optimistic" = security via fraud-proof window, not active majority. Solves voter apathy. |
+| **OREC Mechanism** | Three-phase: voting (72h YES/NO) + veto (72h NO-only) + execution. Passes if YES weight >= threshold AND YES > 2x NO. | "Optimistic" = security via fraud-proof window, not active majority. Solves voter apathy. |
 | **Soulbound Design** | OG (ERC-20) frozen, historical ledger. ZOR (ERC-1155) active, living ledger. Both block transfers at contract level using `_beforeTokenTransfer` hooks. | Two-ledger model: historical preservation + democratic future. Transfer reversion = simple code, strong enforcement. |
 | **Vote Weight Source** | Reads OG Respect (ERC-20, frozen) at proposal block number for voting power. New Respect minted to ZOR (ERC-1155) post-execution. | Legacy votes remain valid; new distribution is democratic. Decouples vote rights from ongoing earnings. |
 | **Chain Choice** | Optimism OP Mainnet: EVM-equivalent, 100x lower gas than Ethereum, 2-second blocks, Superchain ecosystem ready. | Optimism enables affordable, scalable fractal governance. Base addition (2026) enables Superchain expansion. |
@@ -40,7 +40,7 @@ OREC inverts this model: **assume consensus exists, let the minority veto**. Thi
 
 OREC proposals move through three explicit phases:
 
-#### Phase 1: Voting Period (48 hours typical)
+#### Phase 1: Voting Period (72 hours - ZAO on-chain `voteLen`)
 
 - Proposal is open for YES and NO votes.
 - Vote weight = Respect balance at proposal start block (historical snapshot).
@@ -48,7 +48,7 @@ OREC proposals move through three explicit phases:
 - Votes are on-chain transactions; each vote costs gas (~$0.02-0.05 on Optimism).
 - Proposer's wallet auto-votes YES with their Respect weight upon submission.
 
-#### Phase 2: Veto Period (48 hours typical)
+#### Phase 2: Veto Period (72 hours - ZAO on-chain `vetoLen`)
 
 - Voting period has closed; no new YES votes accepted.
 - ONLY NO votes accepted (challenge window).
@@ -61,7 +61,7 @@ OREC proposals move through three explicit phases:
 - Both periods have elapsed.
 - Check passing conditions:
   - `voting_period_duration + veto_period_duration` time elapsed
-  - `yes_weight >= min_weight_threshold` (e.g., 10% of total Respect)
+  - `yes_weight >= min_weight_threshold` (ZAO on-chain `minWeight` = 1,000 Respect, ~2.6% of OG supply - see doc 975)
   - `yes_weight > 2 * no_weight` (supermajority: YES exceeds double the NO)
 - If conditions met, anyone calls `execute(propId)`.
 - OREC triggers minting in the Respect contract (or other actions, depending on proposal type).
@@ -233,7 +233,7 @@ This is cheaper than active majority voting because most proposals need no respo
 
 ### 4.2 Time-Window Reorg Risk
 
-On Optimism, blocks arrive ~2 seconds apart. A 48-hour veto window = 86,400 seconds = ~43,200 blocks. 
+On Optimism, blocks arrive ~2 seconds apart. A 72-hour veto window = 259,200 seconds = ~129,600 blocks. 
 
 **Low risk scenario:** An adversary cannot trigger a deep reorg (>12 blocks) on Optimism OP Mainnet without compromising Ethereum L1 itself (which secures Optimism via fraud-proofs). Optimism's security model inherits Ethereum's finality.
 
@@ -406,7 +406,7 @@ For the whitepaper, cite Nethermind audit results once finalized (expected June 
 2. **OREC: Optimistic Consent-Based Voting**
    - Problem: voter apathy in traditional DAOs.
    - Solution: optimistic execution (assume consensus, allow veto).
-   - Three phases: voting (48h, YES/NO) + veto (48h, NO-only) + execution.
+   - Three phases: voting (72h, YES/NO) + veto (72h, NO-only) + execution.
    - Passing criteria: quorum met + YES > 2x NO.
    - Security: 1/3 can veto, 2/3 can execute.
 
@@ -451,11 +451,11 @@ Respect Game (off-chain consensus)
 proposeBreakoutResult() to OREC
   ↓ OREC executes 3-phase cycle
 ┌─────────────────────────────────┐
-│ Phase 1: Voting (48h)           │
+│ Phase 1: Voting (72h)           │
 │ YES votes: 50 Respect            │
 │ NO votes: 5 Respect              │
 │ ↓                               │
-│ Phase 2: Veto (48h)             │
+│ Phase 2: Veto (72h)             │
 │ NO votes: 0 Respect (no change)  │
 │ ↓                               │
 │ Phase 3: Execution              │

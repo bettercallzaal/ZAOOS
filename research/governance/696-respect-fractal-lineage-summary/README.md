@@ -126,7 +126,7 @@ Respect is the primitive the whole system rests on.
 - **OG (ERC-20) vs ZOR (ERC-1155):** OG is fungible, cumulative, used for one-time awards and the historical ledger. ZOR is a non-transferable token-type (NTT) where each award is its own ERC-1155 id, distributed by ORDAO consensus for weekly scoring.
 - **Optional decay.** ZAO applies 2% weekly decay: `R(t) = R(t-1) * 0.98 + earned(t)`. Equilibrium under constant earning is `R_eq = earned / 0.02`; 2% gives a ~34-week half-life. Decay keeps governance weight tied to *recent* contribution, not a one-time burst years ago.
 - **Voting weight.** OREC reads OG Respect balances during a voting window. A proposal passes when `yesWeight > 2 x noWeight` (the 2/3+1 rule) and a minimum Respect threshold votes yes; 1/3 of participating Respect can veto.
-- **Equality.** A single Fibonacci round produces a Gini coefficient around 0.23 - dramatically more equal than typical token-voting DAOs (often 0.97-0.99). *See Doc 56, Doc 58, Doc 306.*
+- **Equality.** A single 6-person Fibonacci round computes to a Gini of about 0.41, and ZAO's cumulative OG distribution measures ~0.73 (top 10 hold ~53% - contribution concentrates in the core). Still more equal than typical token-voting DAOs (often 0.97-0.99), but the honest comparison is "meaningfully concentrated, transparently earned," not near-egalitarian. On-chain numbers: doc 975. *See Doc 56, Doc 58, Doc 306.*
 
 ## 6. ORDAO / OREC / frapps / Optimystics
 

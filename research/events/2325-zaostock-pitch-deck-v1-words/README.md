@@ -81,6 +81,31 @@ auth). **Use these, not the July figures in docs 1334/1539** (those say 1,245 or
 
 Refresh this table the week the deck ships; the API is one curl.
 
+### The build-a-thon (Season 1) - feeds slides 2, 3, 6 and 8
+
+The ZAO ran a 3-month build-a-thon June-August 2026 (June workshops, July open
+build, August finals). Per doc 839's binding rule the ZABAL name stays internal -
+on slides this is "our 3-month build-a-thon", which the online variant slide 8
+already references. Numbers below verified 2026-08-19/20 from the zabalgamez
+repo + live API reads (zabalgames lane).
+
+| Fact | Value | Source |
+|---|---|---|
+| Workshop sessions | 33 confirmed across the season | data/workshop-leads.json (all status:confirmed) |
+| Recorded + archived | 30 session recording pages, with transcripts | zabalgamez.com/recordings, repo recordings/ |
+| Projects submitted | 32 (19 builder / 7 creator / 6 artist) | GET /api/submissions?feed=projects, 2026-08-10 |
+| Community ballots | 25 quadratic ballots across three tracks | GET /api/qv-vote?results, 2026-08-10 |
+| Finalists | 6, two per track, named 2026-08-17 | zabalgamez data/finals.json (announce branch) |
+| Finals instrument | Live WaveWarZ community battles, one per track, 2026-08-24 to 2026-08-30, $500 USDC pool | docs/finale-standings-2026-08-10.md; Zaal 2026-08-10 |
+
+**The bridge worth a sentence on the WaveWarZ slide (online + general): the
+build-a-thon finals themselves settle on WaveWarZ battles the week of Aug 24.**
+By the time this deck is in front of a sponsor, WaveWarZ has just run the ZAO's
+own season finale - three fresh battles with named winners and trade volume.
+That is track record for exactly the thing slide 6 sells for October 3. Refresh
+with the finals results (three track winners + battle volume) after 2026-08-30
+before any outbound.
+
 ### Reach (VERIFY before any slide)
 
 Team X follower counts from an April 2026 scrape (memory
@@ -315,7 +340,9 @@ Live traction as of 2026-08-20: 1,419 battles. 901 SOL (~$78.8K) lifetime
 volume. 13.9 SOL paid to artists automatically on-chain. 396 SOL claimed by
 winning traders across 1,799 withdrawals. Public stats API, open-source
 tracker, program on Solana mainnet. A branded battle is a real product
-placement: "The [Sponsor] Battle", the week of the festival.
+placement: "The [Sponsor] Battle", the week of the festival. [After 2026-08-30
+add one line: WaveWarZ just settled our own build-a-thon season finale - three
+battles, three track winners, live volume - see the build-a-thon fact block.]
 
 **7. The virtual side**
 Aziz leads the virtual team. OBS to RTMP through Baraza, multi-platform. A
@@ -383,6 +410,7 @@ DM Zaal or 15 minutes on a call. zaostock.com. wavewarz.com.
 | Paper + Candy | Designed v1 (one design, three word-sets) | Zaal | Zaal sets the date - none on record |
 | Zaal | Tier ladder final ("numbers finalized") | this doc + card b80026fc | 2026-08-21 |
 | zaostock lane | Refresh WaveWarZ table + fold Zaal's edits into v2 | deck | when decisions land |
+| zabalgames lane | Build-a-thon finals results (three track winners + battle volume) for the fact block + slide 6 line | deck | 2026-08-31 |
 | Ohnahji / Aziz | ZAOville stream viewership figure (or "none recorded") | online deck slide 3 | before outreach |
 | Sponsor outreach | WAITS on this deck existing (Zaal's 8/19 gate) | - | - |
 
@@ -397,3 +425,10 @@ DM Zaal or 15 minutes on a call. zaostock.com. wavewarz.com.
 - ICM boxes: repo copies `research/identity/icm-boxes/thezao.llm.txt`, `wavewarz.llm.txt` - FULL. Live useicm.com - FAILED (HTTP 000, unreachable from this Mac at write time, sandboxed and unsandboxed). No zaostock box copy exists in the repo; registry has an id but no content.
 - Memory: project_zao_stock_confirmed, project_zao_stock_pitch_answers, project_zao_festivals_history, project_zao_festivals_umbrella, project_tom_fellenz.
 - Doc 1327 - membership tiers - FULL, internal.
+- Build-a-thon block (added 2026-08-20, zabalgames lane): zabalgamez repo
+  data/workshop-leads.json + recordings/ (counted on disk 2026-08-19);
+  docs/finale-standings-2026-08-10.md (32 submissions, 25 ballots, prize split,
+  WaveWarZ-community-battles instrument, all API-sourced 2026-08-10); the six +
+  the 2026-08-24..30 window from data/finals.json on branch
+  claude/zabal-gamez-season-1-finals-cctq96 (announce kit, unmerged as of
+  2026-08-19 - main still shows finalists empty; flagged to Zaal).

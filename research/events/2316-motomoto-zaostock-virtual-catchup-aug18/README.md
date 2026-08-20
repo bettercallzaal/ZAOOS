@@ -77,3 +77,30 @@ Full transcript: [transcript.md](transcript.md) (in this doc's folder: `research
 | Baraza test done and result noted on the board card | @Zaal | board card | 2026-08-22 |
 | Paste stakeholder recap reply to Aziz + Iman | @Zaal | tap | 2026-08-18 |
 | CRM merge Aziz/Motomoto rows (within completeness review) | @Zaal | board card | 2026-08-25 |
+
+## Re-verify pass 2026-08-19 - REVERSED ACTION CORRECTED (was blocking the test)
+
+Full transcript re-read. Everything else in this doc verified accurate
+(team lead, test-this-week, 12-6pm window, 5-10 crew, desktop + VPS/Pi
+fallback, TG coordination, LiDAR, fractal ping to Iman, Slack parked).
+
+**The one error, and it was a deadlock.** This doc recorded the plugin/spec
+exchange backwards. Transcript 05:23, AZIZ TO ZAAL:
+
+> "If you can send me the specs for your device, I can share with you some
+> plugins that you will need to run the live stream so that you can start
+> installing them meanwhile."
+
+Zaal: "just send it to me."
+
+CORRECT ORDER: **Zaal sends the desktop specs FIRST; Aziz then sends the
+plugin list.** The doc's action row ("Aziz sends plugin list + specs") had
+both sides waiting on each other, which is why nothing moved between 8/18
+and 8/19 with the test due 8/22. Board card 654b9aba corrected and raised
+to P1 on 2026-08-19; a specs message is clipboarded for Zaal.
+
+Independent of the exchange, the ZAO-side install list is already known
+from the baraza-tv repo: OBS 28+, Advanced Scene Switcher plugin plus
+obs/advss/baraza-advss-v2.json macros, the scenes/Baraza_Live.json
+collection, Python 3.12 + requirements.txt for baraza-bridge.py, 64-bit
+VLC for the playout scenes, OBS WebSocket on 4455.

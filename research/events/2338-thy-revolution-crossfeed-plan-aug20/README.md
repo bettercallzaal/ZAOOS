@@ -160,7 +160,7 @@ call changes the framing.
 ## Distribution Log
 
 - Cowork tracker: 5 tasks inserted (legacy_source=meeting:thy-revolution-x-zaal-cross-feed-content-2026-08-20)
-- Bonfire: see PR
+- Bonfire: 5 episodes posted, 0 failed
 - Telegram: skipped
 - Calendar: skipped
 - Memory writes: 0

@@ -81,3 +81,47 @@ A co-hosted session inside **The WIP Meetup** (doc 796 - longest-running web3 me
 
 - Lock the exact start time + Luma link.
 - Confirm final segment order + who opens.
+
+## Re-verify pass 2026-08-20 (full 213-line transcript re-read)
+
+All five decisions verified against source, and the run-of-show, the two-segment
+split, the AMA format and the overnight demo build all check out.
+
+### Attribution error - the quote is Zaal's, not rizzle's
+
+The doc attributes to rizzle: *"These are your people, man... I don't have to do
+this conversation I've had with so many people where they're like 'this is too
+complicated, you need to simplify.'"*
+
+The transcript (168-172) has **Zaal** saying it, and the giveaway is inside the
+quote itself: "that's why i like **your** audience". He is thanking rizzle for
+the audience, not describing his own. Attributing it to rizzle reverses who is
+complimenting whom, which is a small error with an awkward shape if it were ever
+quoted back to him.
+
+### This is a pre-event plan with no post-event record
+
+Every action item was due 2026-06-11 - about seventy days ago - and the doc ends
+at "open items for the session tomorrow". Nothing records whether the session
+ran, how the photocaster mechanic landed, what turned up, or whether rizzle sent
+the promo assets he offered.
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | Build the demo on theballgames.com | the session | overnight, 2026-06-10 | none |
+| Zaal | Photocaster + Empire Builder mechanic | the session | before the event | none |
+| Zaal | Update Luma + promo post | rizzle / WIP | before the event | none |
+| Zaal | Arrive 5-10 minutes early | rizzle | 2026-06-11 | none |
+| rizzle | WIP details and website | Zaal | before the event | none |
+| rizzle | Promo JPEGs | Zaal | before the event | none |
+
+The two rizzle rows are commitments from someone outside ZAO, and their silence
+cuts both ways: we do not know whether he delivered, and he has no record that we
+did either. A one-line outcome note - it ran, it did not, here is what happened -
+would close all six.
+
+### Absent from this transcript, not invented
+
+The "~370+ weekly sessions" figure for the WIP Meetup does not appear in this
+call. It is plausibly from doc 796 or project notes. Left in place and flagged,
+so nobody verifies it against this file, finds nothing, and deletes a true fact.

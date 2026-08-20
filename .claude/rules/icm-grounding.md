@@ -11,10 +11,23 @@ work from canonical facts, never stale copy or a hallucination.
 **Before working on, describing, or generating anything for a ZAO brand/project,
 GROUND on its ICM box first.**
 
-- In a terminal / tmux: `icm <brand>` prints that brand's canonical context
-  (`icm wavewarz`, `icm thezao`, `icm zabalgamez`). `icm` alone lists every box.
-- In code / an agent: fetch `https://useicm.com/api/objects/<id>/llm.txt` (ids from
-  `python3 ~/bin/zao-icm.py list` or `~/.zao/private/icm-registry.json`).
+> **TOOLING STATUS 2026-08-19: the `icm` CLI, `zao-icm.py`, and the `/icm` skill
+> are ALL ABSENT from this Mac, and none of them was ever git-tracked** (checked
+> `~/bin`, `~/zaal-dotfiles/bin`, `~/.claude/skills`, plus git history in both
+> repos - no commit ever contained them). They may still exist on another
+> machine; on this one they do not. Use the two routes below, both verified
+> working on 2026-08-19 when three boxes were published through them.
+
+- **Read a box (unauthenticated):** fetch
+  `https://useicm.com/api/objects/<id>/llm.txt` with BROWSER HEADERS - a plain
+  curl gets 403. `User-Agent: Mozilla/5.0 ...`, `Origin: https://useicm.com`,
+  `Referer: https://useicm.com/`.
+- **Box ids:** `~/.zao/private/icm-registry.json` (name -> id map). NOTE it is a
+  STALE MIRROR of content state - it lists boxes as empty that are live. Ids are
+  reliable; its `content` field is not. Curl the endpoint for truth.
+- **Write a box (Zaal-gated):** `PUT /api/objects/<hash>/llm.txt` with
+  `{"body": "<markdown>"}` and `Authorization: Bearer <api_key>` from
+  `~/.zao/private/icm-keys.json`. Verify by re-fetching and byte-comparing.
 - A subagent doing brand work should be handed the relevant box's content as
   grounding in its prompt.
 
@@ -43,5 +56,5 @@ The box is the source; everything else is downstream and derived FROM it:
 
 ## Source
 
-The `icm` command (`~/bin/icm`), the `/icm` skill, `~/bin/zao-icm.py`, and doc 1016
+Doc 1016
 (GEO) / doc 1021 (boxes as bot brains). Established as an agent-kit primitive 2026-07-27.

@@ -139,3 +139,46 @@ Zaal's confirmation.
 - Diarization attempted (sherpa-onnx), discarded: 150 speakers detected on a
   ~5-voice call - labels unusable, content attribution used instead
 - Doc 2295 + doc 1045 + the 2026-08-17 standup artifact page - [FULL, internal]
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+No contradictions found; three material omissions and one attribution fix.
+
+**1. THE TEAM STRUCTURE was missing entirely** - the standup assigned it
+explicitly and this doc did not carry it:
+
+> "we got Steve here and Katina, who are the owners of Black Moon... Then
+> we got Paper and Candy on the design side... Then we got music set up.
+> That's going to be Philems D. Coop helping support when I have AV
+> questions."
+
+- Venue / logistics: **Steve Peer + Katina (Black Moon)**
+- Design: **Paper + Candy**
+- Music + AV: **Dcoop**
+Each supports Zaal outside the standup itself.
+
+**2. ATTRIBUTION FIX.** The VERIFY item "I've been performing 15 years,
+strict on sets" is **Steve Peer**, not Dcoop - it sits inside Steve's own
+monologue on set discipline and the 45-minute structure. Resolved.
+
+**3. Dcoop's personal bridge loan** (material, not just "willing to buy
+gear"):
+
+> "i'm gonna have money coming in in january and february specifically for
+> zao festivals so even if i have to be the one that allocates like a
+> four-month portion you know loan and that it's getting paid back into...
+> for a zao festivals purchase I'm willing to do that."
+
+A four-month personal bridge repaid from Jan/Feb ZAO Festivals revenue.
+Treat as an offer on the record, not an accepted commitment - Zaal decides.
+
+**4. Steve's hip-hop crew has TWO slots**, not one: an afternoon teaser gig
+as well as the after-party anchor ("ideal for a little spot in the
+afternoon, like a little teaser gig... they clearly would be a great anchor
+for like the after party"). Steve also intends to book one of his own bands.
+
+**5. Still unresolved** (transcript does not settle them): whether the
+Momentify question came from Paper rather than Dcoop, and who recommended
+the brag/watch skills. The doc's MEDIUM flags on both were correct.
+Separately, the deck reference transcribes as "len" and reads as Fellenz -
+worth a one-word confirm.

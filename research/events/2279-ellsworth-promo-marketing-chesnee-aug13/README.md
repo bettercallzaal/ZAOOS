@@ -119,3 +119,34 @@ Flagged rather than guessed. Do not treat any of these as settled.
 - PR #35 on ZAODEVZ/ZAOstock - removes the unapproved Heart of Ellsworth partner claims and adds the approved partners.
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-19 (full transcript re-read vs this doc)
+
+No contradictions; the doc's handling of open questions held up. Two
+operational items were missing:
+
+**1. Zaal's lodging for the festival window** - not recorded anywhere:
+
+> "i'm actually going to be staying at the bed and breakfast on church that
+> i guess paul is a partner with a guy by the name of bill um it's the
+> victorian... just a couple blocks from downtown"
+
+The Victorian B&B on Church Street, a couple of blocks from downtown; Bill
+runs it and Paul (Star 97.7) is a partner. That connection also explains
+part of the Star 97.7 relationship.
+
+**2. The consultant meeting did not happen** on 2026-08-13 - Chesnee: "We
+had a meeting today and the meeting didn't happen." That is the reason the
+YouTube/Gmail migration is still open and the video stays unpublished; it
+is a delay with a cause, not a stalled decision.
+
+**3. Scope note on the radio booking:** the constraint is Zaal taking a day
+off, not Paul's willingness - "I need to get a day where I can take off and
+go on the radio." Paul is already on board.
+
+**4. Spectrum Reach** is the umbrella REGIONAL campaign (video + digital
+assets) that the Maine Craft Weekend listing feeds into, rather than a
+standalone channel.
+
+Still open, unchanged: whether Cara (director) and Karen (clay workshop)
+are the same person, and Eric Marisha's current vs former board status.

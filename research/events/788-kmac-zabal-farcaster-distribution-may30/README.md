@@ -61,3 +61,22 @@ Zaal's concrete request: next time kmac connects 1:1 with the Neynar devs, ask t
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md). The pair moved to a Quorum space partway through, so the back half of the recording is silence (auto-trimmed). A third-party reputational allegation mentioned in passing has been omitted per PII-hygiene.
+
+## Re-verify pass 2026-08-20 (full 39-line transcript re-read)
+
+Citations sound, numbers and names traced, nothing invented.
+
+One attribution to soften: the "people misguidedly understand PMF" insight is
+recorded as JC's directly, but in the transcript **kmac is relaying it** - "Someone
+mentioned this - oh, John Colton, JC..." (15). It is JC's idea by way of kmac, not
+a quote from this call.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| kmac (external) | Ask the Neynar devs to soften the JFS-signer requirement on snaps | the Neynar team | "next 1:1" | none |
+| kmac + Cassie | ZABAL Games presentations | Zaal | June 2026 | none - June is over |
+
+Both are 82 days old. The Neynar ask is the only one with any residual value; the
+June presentations are settled by time whether or not they happened.

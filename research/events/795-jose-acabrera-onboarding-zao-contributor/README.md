@@ -54,3 +54,42 @@ Zaal sent the first $100 USDC on Farcaster during the call.
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 366-line transcript re-read)
+
+Every figure traces to source and nothing is invented. The arrangement is
+recorded accurately.
+
+### The open item is compensation, and it is 50 days past
+
+Verbatim from the call (299-308):
+
+> "$100 a month, we'll say one hour a day-ish... **But I sent you the 100 on
+> Farcaster for June. Definitely in for June. On July 1st, I'll send the next
+> 100.** We'll see what we can do over two months and then go and then
+> recalibrate at the end of July."
+
+June is confirmed sent, on the call, on Farcaster (196-198). **July has no record
+either way in any doc**, and the end-of-July recalibration has no record either.
+That is a payment to someone doing about an hour a day, so it is the one item in
+this sweep that should be checked first thing rather than queued.
+
+Note what IS hedged and what is not. The move toward a larger number is
+explicitly uncertain - "I don't know where exactly we will be... I don't want to
+promise anything" - and the doc is right not to treat it as a commitment. The
+July $100 carries no such hedge; it is stated flatly.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | $100 USDC for June | Jose | on the call | YES - sent during the call |
+| Zaal | $100 USDC for July | Jose | 2026-07-01 | **none** |
+| Both | Recalibrate the arrangement | each other | end of July | **none** |
+| Zaal | Telegram-bot notification for tagged todos | Jose / the team | not stated | none |
+| Jose | Workshop (music ads coordination), Tue 2026-06-09 5pm ET | ZABAL Games | 2026-06-09 | none |
+| Jose | Test zao.xyz + Bonfire bot, correct his graph entries, watch workshop 2 | Zaal | not stated | none |
+
+Jose is a teammate rather than an outside party, but an onboarding doc records
+what a new contributor was told he would get - and a lapsed promise there costs
+more than a missed internal todo, not less.

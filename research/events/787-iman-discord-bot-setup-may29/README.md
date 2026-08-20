@@ -54,3 +54,20 @@ Zaal: he will handle the server-hosting + environment-variable part later; once 
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md) (long silent "Okay" loops auto-trimmed; the substantive ~4 minutes preserved).
+
+## Re-verify pass 2026-08-20 (full 29-line transcript re-read)
+
+Short, clean, nothing invented, all citations hold.
+
+### Follow-through block
+
+All internal, all 83 days old, none with a recorded outcome.
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | Send Iman the bot, host it, supply env vars | Iman | not stated | none |
+| Iman | Test the bot on the servers | Zaal | not stated | none |
+
+Worth a single line of closure: either the Discord bot shipped and this is done,
+or it was superseded, in which case say so. It is small enough that the answer is
+probably one word.

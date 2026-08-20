@@ -55,3 +55,36 @@ the exact Craig-to-recap-to-DM pipeline this meeting is being run through.
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md)
+
+## Re-verify pass 2026-08-20 (full 255-line transcript re-read)
+
+Citations check out; the mini-app, async-comms and ZAO Scribe decisions all trace
+verbatim.
+
+### One decision is firmer in the doc than it was on the call
+
+The doc records "Zaal sends the $20" for Jose's own Claude Code plan as a
+decision. The transcript is an offer being floated: "**I would say that I could
+toss you $20**... you should get cloud code on your own computer" (58-60), and
+"**let's find a time next week** for us to get Claude on your machine" (63-65).
+
+The distinction matters because 78 days later there is no record of either the
+$20 or the setup session, and a reader of the doc alone would assume a settled
+thing had quietly failed, rather than an offer that was never closed.
+
+The Claude 101 video is recorded as a bare action; on the call it was explicitly
+not started - "i have the video that i want to do it off of but **i haven't sat
+down and done that yet**" (62-63) - and no date was ever attached.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | $20 for Jose's Claude Code plan | Jose | "next week" (~2026-06-12) | none |
+| Zaal | Sit down and install Claude Code with Jose | Jose | "next week" | none |
+| Zaal | Make the Claude 101 onboarding video | Jose / new contributors | never set | none - not started at call time |
+| Jose | Try a mini app for the Farcaster hackathon | himself | 2026-06-05 | none |
+| Jose | 15 minutes in the cowork tracker | Zaal | 2026-06-07 | none |
+| Jose | Send a summary after each call | Zaal | ongoing | agreed on the call ("please do that every time"); no record since |
+
+Pairs with doc 795, which carries the compensation side of the same onboarding.

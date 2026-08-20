@@ -96,3 +96,26 @@ The elegant part: Zaal's custom build shrinks to a registration list + a schedul
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md) (heavy looping intro/outro auto-trimmed by trim-loops.sh - 56 looped lines collapsed).
+
+## Re-verify pass 2026-08-20 (full 45-line transcript re-read)
+
+Citations hold and the technical quotes match. One reported defect was checked
+and **does not exist**: a pass claimed this doc cites "~67 people" sourced from a
+different call. There is no such figure anywhere in this README.
+
+This one matters more than its neighbours in the batch, because **Bonfire is
+still the live knowledge-graph surface** - so the architecture discussed here is
+current rather than historical, and its unfinished pieces are unfinished now.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Zaal | Build the registration server + cron into the ZABAL Games repo and send it to Plat0x | Plat0x (external, Bonfires) | not stated | none |
+| Zaal | Prepare the LLMS.txt brand-info file | Bonfire integration | **before 2026-07-01** | none |
+| Plat0x (external) | Calendar invite for the 2026-06-01 session | Zaal | 2026-06-01 | none |
+
+The LLMS.txt item carried a real date and missed it by seven weeks. Since Bonfire
+is in daily use, that is worth checking rather than closing: either it was built
+under another name, or the integration is running without the piece this call
+said it needed.

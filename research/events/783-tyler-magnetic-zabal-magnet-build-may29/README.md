@@ -63,3 +63,36 @@ Tyler's recorded descriptor, with Zaal adding color: the **ZABAL Connector** is 
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md).
+
+## Re-verify pass 2026-08-20 (full 55-line transcript re-read)
+
+### Read this doc as history - the partner is retired
+
+Magnetiq was retired on 2026-07-31 (inactive founders), two months after this
+call. Tyler's open items here - clipping the session, the UI additions, the QR
+proof-of-meat updates - are **moot rather than outstanding**. Nothing here should
+be chased or cited forward. Kept as a record of what was built and tested.
+
+### One quotation that cannot be verified from the source
+
+The doc carries, in quotation marks: *"I had cowork go through and organize all
+my stuff so I knew what to delete - that was really helpful."*
+
+That sentence does not appear in the transcript, and neither do the words
+"cowork", "organize" or "delete" anywhere in its 55 lines. The recording is
+Tyler's screen-share with audio, so a spoken line should have been captured.
+
+This is not the same class as the screen-read figures in doc 785 - a number seen
+on a screen is genuinely unspeakable, whereas a sentence in quotation marks
+asserts exact spoken words. **Treat this as a paraphrase, not a quotation**,
+unless someone can source it from the recording. The underlying claim may well be
+true; the quote marks are what is unsupported.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| Tyler (Magnetiq) | Clip the recorded session | Zaal | not stated | MOOT - partner retired |
+| Tyler (Magnetiq) | UI additions (now button, resubmit) | Zaal | not stated | MOOT |
+| Tyler (Magnetiq) | QR proof-of-meat updates | Zaal | not stated | MOOT |
+| Zaal | Fix the magnet logo and description | internal | not stated | none |

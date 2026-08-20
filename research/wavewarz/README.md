@@ -131,3 +131,4 @@
 | 2115 | [WaveWarZ Artist Economy: "Loser Earns" Payout Model & Verified Figures (Jul 2026)](./2115-wavewarz-artist-economy-loser-earns/) | STANDALONE | (no Goal line in doc) |
 | 2116 | [WaveWarZ V1→V2 Judging Transition (Mar 10, 2026)](./2116-wavewarz-v1-v2-judging-transition/) | STANDALONE | (no Goal line in doc) |
 | 2117 | [WaveWarZ Treasury Floor Model: 3.5 SOL Operating Floor](./2117-wavewarz-treasury-floor-model/) | STANDALONE | (no Goal line in doc) |
+| 2356 | [WaveWarZ Twitch clip bounty: pre-launch grounding (zpoidh R5)](./2356-wavewarz-clip-bounty-grounding/) | STANDALONE | Check the R5 clip bounty text against live poidh claim data, clipping-program pay norms, Twitch clip/VOD rules, and WaveWarZ live state; ship the edits before Zaal creates it. |

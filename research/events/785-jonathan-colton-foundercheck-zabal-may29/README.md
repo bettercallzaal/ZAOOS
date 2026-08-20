@@ -67,3 +67,36 @@ Token-gated (you spend tokens to run reports / copy the plan). JC's **ICP**: Saa
 ## Transcript
 
 Full transcript: [transcript.md](transcript.md) (recording stopped before the confidential portion; looping outro auto-trimmed).
+
+## Re-verify pass 2026-08-20 (full 53-line transcript re-read)
+
+### Two figures flagged as fabricated, and they are not - but they need sourcing
+
+A checking pass reported the "23rd founder" detail and the "score jumped ~3.5
+points (to 6.5-6.8)" figures as invented, because neither appears in the
+transcript. Both are indeed absent from the transcript, and the explanation is
+simpler than fabrication: **this call was a live FounderCheck demo**, and the
+transcript is audio only. A score on screen is seen, not spoken. The audio has
+Zaal reading the qualitative part aloud - "So you've got to rethink its score.
+Problem severity is a little..." (17) - and no numbers, exactly as you would
+expect.
+
+So the numbers are most likely read off the FounderCheck UI during the demo.
+They are kept, and marked here as **screen-observed rather than spoken**, so the
+next reader does not search the transcript, find nothing, and delete a true
+detail. If they matter to a decision, re-run the tool rather than trusting a
+recollection of a screen.
+
+One genuine attribution softening: the "people misguidedly understand PMF"
+insight is recorded as JC's, and in the transcript kmac is relaying it - it
+belongs to JC by way of kmac, not as a direct quote from this call.
+
+### Follow-through block
+
+| Who owes | What | To whom | By when | Outcome recorded |
+|---|---|---|---|---|
+| JC (external) | Two ZABAL Games presentations | Zaal | June 2026 | none - June is over |
+| Zaal + JC + Eric | Copy-pasta virality feature and PFP image-gen | ZABAL Games | not stated | none |
+
+JC's two June talks are the item worth resolving: the window closed, and neither
+side has a record of whether he delivered or was ever booked.

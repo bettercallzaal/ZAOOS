@@ -29,6 +29,8 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { featureRan } from './feature-ran';
 import {
+  classifyReconcile,
+  TERMINAL_VERDICT_RE,
   DRIP_DEFAULT,
   parseVerdict,
   renderCard,
@@ -187,7 +189,11 @@ async function nextTask(
   const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
   if (!r.ok) return null;
   const rows = (await r.json()) as BoardTask[];
-  const fresh = rows.filter((t) => !s.asked[t.id]);
+  // A never-asked task whose notes already carry a terminal grill verdict was
+  // ruled on from the other end - sending it a phone card would be the exact
+  // both-ends dupe this card exists to kill (6b6875d1). It still shows up here
+  // if the verdict line is ever removed, so nothing is permanently hidden.
+  const fresh = rows.filter((t) => !s.asked[t.id] && !TERMINAL_VERDICT_RE.test(t.notes || ''));
   const requeued = rows
     .filter((t) => s.asked[t.id]?.requeuedAt && !s.answered[t.id])
     .sort((a, b) =>
@@ -234,6 +240,67 @@ function getOldestUnansweredTaskId(s: BacklogGrillState): string | null {
 }
 
 /**
+ * Reconcile the state file with the board (grill unification, card 6b6875d1).
+ *
+ * Zaal grills from both ends: this drip AND terminal sessions that close tasks
+ * or stamp verdict lines directly into notes. Without reconcile the state file
+ * keeps counting those as "in front of him" - 23 stale entries were
+ * hand-reconciled on 2026-08-19 and the count could never reach zero on its
+ * own (noisy-signal-guard: a number that cannot fall is a latch, not a signal).
+ *
+ * Every unanswered asked-entry (requeued ones included - a terminal close ends
+ * a parked card too) is checked against the board in chunks:
+ *  - task closed / archived / deleted -> answered {verdict: 'board-closed'}
+ *  - still todo but notes carry a terminal verdict -> {verdict: 'verdict-synced'}
+ *
+ * A failed chunk fetch marks NOTHING from that chunk - a card we could not
+ * check is a card we cannot prove is dealt with, and between over-counting and
+ * silently dropping a live card, over-counting is the safe error (same call as
+ * outstandingCount's undateable-`at` case). Mutates `state`; the caller writes.
+ */
+export async function reconcileBacklogState(
+  state: BacklogGrillState,
+  fetchImpl: typeof fetch,
+  now: number,
+): Promise<{ boardClosed: number; verdictSynced: number }> {
+  const c = cfg();
+  const result = { boardClosed: 0, verdictSynced: 0 };
+  if (!c) return result;
+  const pending = Object.keys(state.asked).filter((id) => !state.answered[id]);
+  if (pending.length === 0) return result;
+
+  const at = new Date(now).toISOString();
+  const CHUNK = 50;
+  for (let i = 0; i < pending.length; i += CHUNK) {
+    const ids = pending.slice(i, i + CHUNK);
+    const url =
+      `${c.root}/rest/v1/tasks?id=in.(${ids.join(',')})` +
+      `&select=id,status,archived_at,notes`;
+    let rows: Array<{ id: string; status?: string; archived_at?: string | null; notes?: string | null }>;
+    try {
+      const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
+      if (!r.ok) continue;
+      rows = await r.json();
+    } catch {
+      continue;
+    }
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    for (const id of ids) {
+      const verdict = classifyReconcile(byId.get(id));
+      if (!verdict) continue;
+      state.answered[id] = { at, verdict };
+      // A parked (requeued) card that the board settled is settled - clear the
+      // park mark so applyBacklogAnswer's requeue bookkeeping never revives it.
+      if (state.asked[id]?.requeuedAt) delete state.asked[id].requeuedAt;
+      if (state.activeTaskId === id) state.activeTaskId = null;
+      if (verdict === 'board-closed') result.boardClosed++;
+      else result.verdictSynced++;
+    }
+  }
+  return result;
+}
+
+/**
  * One tick. Sends at most ONE card, or nothing.
  *
  * Returns what it did so the scheduler can log it - a silent tick that did
@@ -247,6 +314,16 @@ export async function runBacklogGrillTick(
   if (!cfg()) return { sent: false, reason: 'tracker not configured' };
 
   const state = await readState();
+  // Reconcile BEFORE the gate: outstandingCount must reflect what would
+  // actually still be sent, or a terminal sweep leaves the drip jammed on
+  // cards the board already closed.
+  const rec = await reconcileBacklogState(state, fetchImpl, now);
+  if (rec.boardClosed || rec.verdictSynced) {
+    await writeState(state);
+    console.log(
+      `[zoe/backlog-grill] reconciled: ${rec.boardClosed} board-closed, ${rec.verdictSynced} verdict-synced`,
+    );
+  }
   const next = await nextTask(state, fetchImpl, now);
   if (!next) return { sent: false, reason: 'nothing left to ask about' };
 
@@ -405,6 +482,24 @@ export async function applyBacklogAnswer(
     }
   } else if (v.key === 'skip') {
     message = 'Skipped - it returns later.';
+  } else if (v.key === 'park') {
+    // Park (card 1b7fe7c9): the task stays OPEN on the board - only a resurface
+    // note is appended. Same read-modify-write + fail-closed guard as the close
+    // path: notes are replaced wholesale by PATCH, so writing over a failed
+    // read would destroy the task's note history.
+    const cur = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=notes`, {
+      headers: c.headers,
+    });
+    if (!cur.ok) return { ok: false, message: `could not read that task (${cur.status}) - not parking` };
+    const rows = (await cur.json()) as Array<{ notes?: string }>;
+    const notes = `${(rows[0]?.notes || '').trim()}\n\n${verdictNote(v, new Date().toISOString().slice(0, 10))}`.trim();
+    const patch = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
+      method: 'PATCH',
+      headers: { ...c.headers, Prefer: 'return=minimal' },
+      body: JSON.stringify({ notes }),
+    });
+    if (!patch.ok) return { ok: false, message: `park failed (${patch.status})` };
+    message = 'Parked - stays on the board, resurfaces later.';
   } else {
     message = 'Kept open.';
   }

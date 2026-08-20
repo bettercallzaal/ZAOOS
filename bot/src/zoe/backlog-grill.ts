@@ -37,12 +37,15 @@
  * part of the verdict shape rather than an afterthought.
  */
 
-/** The five, in the order they are pressed. Stable - do not reorder. */
+/** The five, in the order they are pressed. Stable - do not reorder.
+ * 4 was "Drop it" until 2026-08-20 (card 1b7fe7c9): triage never offers a drop
+ * option (feedback_never_drop_always_park). Park leaves the task OPEN on the
+ * board with a resurface note; nothing is destroyed. */
 export const VERDICTS = [
   { n: 1, key: 'done', label: 'Done - close it' },
   { n: 2, key: 'keep', label: 'Keep open' },
   { n: 3, key: 'work', label: 'Work on it now' },
-  { n: 4, key: 'drop', label: 'Drop it' },
+  { n: 4, key: 'park', label: 'Park it - resurfaces later' },
   { n: 5, key: 'skip', label: 'Skip for now' },
 ] as const;
 
@@ -79,7 +82,7 @@ export function parseVerdict(reply: string): Verdict | null {
     if (v) return build(v.key, m[2].trim() || undefined);
   }
 
-  // The word itself: "done", "keep", "drop", "skip", "work on it".
+  // The word itself: "done", "keep", "park", "skip", "work on it".
   const lower = raw.toLowerCase();
   for (const v of VERDICTS) {
     if (lower === v.key || lower.startsWith(`${v.key} `)) {
@@ -87,6 +90,11 @@ export function parseVerdict(reply: string): Verdict | null {
     }
   }
   if (/^work on it/i.test(lower)) return build('work', raw.slice(10).trim() || undefined);
+  // A typed "drop" maps to park - the standing rule reads it as intent to shelve,
+  // and destroying is never on the menu (never-drop-always-park).
+  if (lower === 'drop' || lower.startsWith('drop ')) {
+    return build('park', raw.slice(4).trim() || undefined);
+  }
 
   // Anything else is a real instruction. Treat it as "work on it" with the
   // typed text as the brief - a sentence is a richer answer than a number, and
@@ -100,7 +108,8 @@ function build(key: VerdictKey, note?: string): Verdict {
     note,
     // Work re-enters the queue: a task is never done because work STARTED.
     requeue: key === 'work' || key === 'skip',
-    closesTask: key === 'done' || key === 'drop',
+    // Only done closes now - park replaced drop and leaves the task open.
+    closesTask: key === 'done',
   };
 }
 
@@ -159,7 +168,7 @@ export function verdictButtons(taskId: string): { text: string; data: string }[]
       { text: '3 Work', data: d('work') },
     ],
     [
-      { text: '4 Drop', data: d('drop') },
+      { text: '4 Park', data: d('park') },
       { text: '5 Skip', data: d('skip') },
     ],
   ];
@@ -252,9 +261,45 @@ export function verdictNote(v: Verdict, date: string): string {
     done: 'confirmed done',
     keep: 'still wanted - kept open',
     work: 'sent to be worked on',
-    drop: 'dropped - not doing it',
+    park: 'parked - stays on the board, resurfaces later',
     skip: 'skipped for now',
   }[v.key];
   const note = v.note ? ` Zaal added: "${v.note}"` : '';
   return `GRILL ${date} (Telegram): ${base}.${note}`;
+}
+
+// ── reconcile (grill unification, card 6b6875d1) ────────────────────────────
+// Zaal grills from BOTH ends - this Telegram drip and terminal grill sessions.
+// The terminal end closes tasks and writes verdict lines into notes, and the
+// Telegram state file has no idea: 23 stale asked-entries were hand-reconciled
+// on 2026-08-19 (209 -> 186 outstanding). These helpers make that automatic.
+
+/**
+ * A terminal grill verdict as it actually appears in task notes, measured on
+ * the live board 2026-08-19 (14/346 todo tasks): a line starting
+ * "GRILL <date>" (terminal sessions stamp "(Zaal)", this file's own close path
+ * stamps "(Telegram)") or "ZAAL VERDICT <date>". The Telegram variant only
+ * ever lands on tasks this runner ALREADY answered, so matching it here is
+ * harmless - reconcile only looks at unanswered entries.
+ */
+export const TERMINAL_VERDICT_RE =
+  /(^|\n)\s*(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
+
+/**
+ * Classify one asked-entry's board row for reconcile.
+ *
+ *  - row missing (task deleted): 'board-closed' - there is nothing left to ask.
+ *  - status no longer todo, or archived: 'board-closed' - the other end dealt
+ *    with it; the card must stop counting and stop re-asking.
+ *  - still todo but notes carry a terminal verdict: 'verdict-synced' - Zaal
+ *    already ruled on it in a terminal; asking again on the phone is a dupe.
+ *  - otherwise null: a genuinely open card, leave it alone.
+ */
+export function classifyReconcile(
+  row: { status?: string; archived_at?: string | null; notes?: string | null } | undefined,
+): 'board-closed' | 'verdict-synced' | null {
+  if (!row) return 'board-closed';
+  if (row.status !== 'todo' || row.archived_at) return 'board-closed';
+  if (row.notes && TERMINAL_VERDICT_RE.test(row.notes)) return 'verdict-synced';
+  return null;
 }

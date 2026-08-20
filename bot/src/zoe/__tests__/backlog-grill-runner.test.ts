@@ -21,6 +21,7 @@ import {
   applyBacklogAnswer,
   outstandingCount,
   readState,
+  reconcileBacklogState,
   runBacklogGrillTick,
   writeState,
   type BacklogGrillState,
@@ -171,6 +172,35 @@ describe('applyBacklogAnswer - the answer follows the card, not the cursor', () 
     expect(patched).toHaveLength(1);
   });
 
+  // Park (card 1b7fe7c9): the task stays OPEN - the PATCH carries a resurface
+  // note and NO status change. A drop that destroyed the row is off the menu.
+  it('park appends a resurface note and never touches status', async () => {
+    const r = await applyBacklogAnswer('4', fakeFetch, OLD);
+
+    expect(r.ok).toBe(true);
+    expect(r.message).toContain('Parked');
+    expect(patched).toHaveLength(1);
+    expect(patched[0].url).toContain(`id=eq.${OLD}`);
+    const body = patched[0].body as { status?: string; notes?: string };
+    expect(body.status).toBeUndefined();
+    expect(body.notes).toContain('parked - stays on the board');
+    expect((await readState()).answered[OLD]?.verdict).toBe('park');
+  });
+
+  it('does not park - or overwrite notes - when the notes read fails', async () => {
+    const failingRead = (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        patched.push({ url: String(url), body: JSON.parse(String(init.body)) });
+        return { ok: true, status: 200 } as unknown as Response;
+      }
+      return { ok: false, status: 500 } as unknown as Response;
+    }) as unknown as typeof fetch;
+    const r = await applyBacklogAnswer('4', failingRead, OLD);
+    expect(r.ok).toBe(false);
+    expect(patched).toHaveLength(0);
+    expect((await readState()).answered[OLD]).toBeUndefined();
+  });
+
   /**
    * Closing REPLACES `notes`, so it has to read them first. When that read
    * fails there is nothing to preserve, and writing anyway replaced the whole
@@ -226,6 +256,16 @@ describe('runBacklogGrillTick - a skipped card goes to the back, not the front',
     if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
     if (String(url).includes('order=created_at.asc')) {
       return { ok: true, status: 200, json: async () => rows } as unknown as Response;
+    }
+    // The reconcile pass asks for the asked-entries' board rows; everything in
+    // these tests is a live todo task, so answer accordingly.
+    if (String(url).includes('id=in.(')) {
+      const ids = /id=in\.\(([^)]*)\)/.exec(String(url))?.[1]?.split(',') ?? [];
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ids.map((id) => ({ id, status: 'todo', archived_at: null, notes: '' })),
+      } as unknown as Response;
     }
     return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
   }) as unknown as typeof fetch;
@@ -323,5 +363,112 @@ describe('runBacklogGrillTick - a skipped card goes to the back, not the front',
     expect((await tick(week)).title).toBe('Middle');
     expect((await tick(week + 2 * 60_000)).title).toBe('Newest');
     expect((await tick(week + 4 * 60_000)).title).toBe('Oldest');
+  });
+});
+
+// ── grill unification (card 6b6875d1): both ends, one count ─────────────────
+
+describe('reconcileBacklogState - the terminal end settles phone cards', () => {
+  const NOW = Date.UTC(2026, 7, 19, 14, 0, 0);
+
+  const askedThree = (): BacklogGrillState =>
+    st({
+      asked: {
+        closed: { at: new Date(NOW - 3_600_000).toISOString(), title: 'Closed in terminal' },
+        ruled: { at: new Date(NOW - 3_600_000).toISOString(), title: 'Verdict in notes' },
+        open: { at: new Date(NOW - 3_600_000).toISOString(), title: 'Still open' },
+      },
+    });
+
+  const boardWith =
+    (rows: Array<{ id: string; status?: string; archived_at?: string | null; notes?: string }>) =>
+    (async () =>
+      ({ ok: true, status: 200, json: async () => rows }) as unknown as Response) as unknown as typeof fetch;
+
+  beforeEach(() => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+  });
+
+  it('marks board-closed and verdict-synced entries answered; the count reaches zero-able', async () => {
+    const s = askedThree();
+    expect(outstandingCount(s, NOW)).toBe(3);
+    const rec = await reconcileBacklogState(
+      s,
+      boardWith([
+        { id: 'closed', status: 'done', archived_at: null, notes: '' },
+        { id: 'ruled', status: 'todo', archived_at: null, notes: 'context\nGRILL 2026-08-19 (Zaal): route to AGENT.' },
+        { id: 'open', status: 'todo', archived_at: null, notes: 'nothing decided' },
+      ]),
+      NOW,
+    );
+    expect(rec).toEqual({ boardClosed: 1, verdictSynced: 1 });
+    expect(s.answered.closed?.verdict).toBe('board-closed');
+    expect(s.answered.ruled?.verdict).toBe('verdict-synced');
+    expect(s.answered.open).toBeUndefined();
+    // Spec point 4: the count now agrees with what would actually still send.
+    expect(outstandingCount(s, NOW)).toBe(1);
+  });
+
+  it('treats a deleted task as board-closed', async () => {
+    const s = st({ asked: { gone: { at: new Date(NOW).toISOString(), title: 'Deleted' } } });
+    const rec = await reconcileBacklogState(s, boardWith([]), NOW);
+    expect(rec.boardClosed).toBe(1);
+    expect(s.answered.gone?.verdict).toBe('board-closed');
+  });
+
+  it('marks NOTHING when the board read fails - over-counting is the safe error', async () => {
+    const s = askedThree();
+    const failing = (async () => ({ ok: false, status: 500 }) as unknown as Response) as unknown as typeof fetch;
+    const rec = await reconcileBacklogState(s, failing, NOW);
+    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0 });
+    expect(Object.keys(s.answered)).toHaveLength(0);
+    expect(outstandingCount(s, NOW)).toBe(3);
+  });
+
+  it('settles a parked (requeued) card the terminal closed, clearing the park mark', async () => {
+    const s = st({
+      asked: { parked: { at: new Date(NOW).toISOString(), title: 'Parked', requeuedAt: new Date(NOW).toISOString() } },
+    });
+    await reconcileBacklogState(s, boardWith([{ id: 'parked', status: 'done', archived_at: null }]), NOW);
+    expect(s.answered.parked?.verdict).toBe('board-closed');
+    expect(s.asked.parked?.requeuedAt).toBeUndefined();
+  });
+});
+
+describe('grill unification - the tick side', () => {
+  beforeEach(() => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+  });
+
+  it('never sends a fresh card for a task already carrying a terminal verdict, and queries ALL routes', async () => {
+    const seenUrls: string[] = [];
+    const rows = [
+      { id: 'v', title: 'Already ruled', created_at: '2026-01-01T00:00:00Z', notes: 'ZAAL VERDICT 2026-08-19: do X.' },
+      { id: 'n', title: 'Genuinely open', created_at: '2026-02-01T00:00:00Z', notes: '' },
+    ];
+    const f = (async (url: string) => {
+      seenUrls.push(String(url));
+      if (String(url).includes('order=created_at.asc')) {
+        return { ok: true, status: 200, json: async () => rows } as unknown as Response;
+      }
+      return { ok: true, status: 200, json: async () => [] } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: Date.UTC(2026, 7, 19, 14, 0, 0),
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(true);
+    expect(result.title).toBe('Genuinely open');
+    // Spec point 3: Zaal grills ALL routes - the board query must not filter one.
+    const boardUrl = seenUrls.find((u) => u.includes('order=created_at.asc'));
+    expect(boardUrl).toBeDefined();
+    expect(boardUrl).not.toContain('route');
   });
 });

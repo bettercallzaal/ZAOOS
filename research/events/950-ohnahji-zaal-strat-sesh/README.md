@@ -162,3 +162,47 @@ Renee (Artisan lead, weekly fund-manager mtgs), Gabe Covington / Hip Hop Crypto 
 ## Sources
 
 Raw transcript captured via mp4 recording and transcribed locally using mlx-whisper. Extract processed from transcript 2026-07-02.
+
+## Re-verify pass 2026-08-20 (full 1,245-line transcript re-read)
+
+### The bad number is still sitting in the decisions table
+
+This doc's own Deep Dive already caught it: "Buy side volume: 383,364 SOL" is
+impossible against ~500 SOL lifetime volume. But the figure is still presented as
+fact in the table above, where a reader will hit it first and the correction last.
+
+Verified at source (transcript 514): Zaal, reading a Dune dashboard aloud, says
+the buy side "is three, eight, three 64." That is a spoken string a transcript
+cannot disambiguate - it could be 383.64, 383,64 in a European decimal, or
+something else entirely. **Treat the table entry as UNVERIFIED**; the number
+needs re-reading off the dashboard, not off this doc.
+
+### Citation offsets
+
+Two quotes sit a few lines from where they are cited - the transcript is 1,245
+lines and both quotes exist, so this is drift rather than fabrication:
+
+- "There's so much in here..." is cited at 183-185; it begins at **186**.
+- "The goal here is to create like project management Kanban style boards..." is
+  cited at 36-38; it begins at **39**.
+
+### Expired actions
+
+- Review Zao.xyz board task #562 - due 2026-07-03, ~7 weeks past.
+- The 24-hour stream event targeted ~2026-08-07 and the transcript shows planning
+  only, no booking. Separately, the 24-hour stream idea was CLOSED on 2026-08-19
+  as never-happened (board card 082da183), so this one is settled: it did not run.
+
+The rest (whitepaper, Solana bridge test, Flow Stage review, Sam coordination,
+Artizen study, Twitch API) carry no dates and remain open.
+
+### On coverage - a deliberate non-finding
+
+An automated pass graded this doc as covering only ~30-40% of the transcript and
+flagged the compressed personal material - work shifts, family time, health,
+decompression - as under-representation. **That compression is correct and should
+not be "fixed."** A research doc records decisions and commitments; a colleague's
+and Zaal's personal circumstances are not repo content, and expanding them here
+would be a PII regression, not an improvement (`pii-hygiene.md`). The genuine
+coverage gap is elsewhere: the long Zao.xyz demo walkthrough (~377 lines) is
+summarised thinly, and that is the part worth expanding if anyone revisits.

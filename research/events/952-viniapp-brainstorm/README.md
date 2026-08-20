@@ -85,3 +85,46 @@ useicm.com / ICM (Chris's context tool, 129, 178), Nicky Sap (Chris's dev collab
 - [FULL] Re-transcribed recording (mlx-whisper turbo, anti-hallucination flags), `transcript.md` in this folder - 2026-07-05, ~6,000 words, verified loop-free.
 - Cross-ref: doc 950 (Ohnahji strat sesh) names "Chris Dolinsky / Vinny app / ICM".
 - Method note: the prior 2026-07-03 recap is superseded - it was written off a corrupted (~90% lost) transcript. Token name corrected ZOL -> ZABAL against transcript line 20.
+
+## Re-verify pass 2026-08-20 (full transcript re-read vs this doc)
+
+### ICM stands for "identifier context and mail" - the ambiguity was an artefact
+
+This doc records the acronym as `identifier context [mail/mgmt], line 178 - last
+word not fully audible`. The source is not ambiguous. The transcript simply wraps
+mid-sentence:
+
+- line 178: `a big piece of the ICM too is that so ICM stands for identifier context and`
+- line 179: `mail. So for instance, your Claude code and my Claude code,`
+
+Read across the line break it is plainly **"identifier context and mail"**, from
+Chris, who built useicm.com. Worth carrying beyond this doc: `icm-grounding.md`
+governs 24+ ZAO boxes and never states what the acronym expands to.
+
+The general lesson is cheap and repeatable: a quote cut at a line boundary can
+manufacture an ambiguity the speaker never had. Read one line further before
+recording uncertainty.
+
+### Staleness - this recap is ~7 weeks old and its actions have passed
+
+Every near-term action item here was due in early-to-mid July: try useicm.com and
+report back, draft the summary, share mentor evaluation criteria, build the GitHub
+integration. As of 2026-08-20 they are 38-52 days past. Read them as history
+unless separately revived; the ICM box work did continue (three ZAO boxes were
+published 2026-08-19).
+
+### Context the recap dropped
+
+- **Zaal was already building the thing Viniapp scaffolds.** "I've been on a
+  light tear just like sending my clod off to just like make basic small games
+  for the Zibal games" (11-13). That makes Viniapp a personal use case rather
+  than an abstract product discussion, which is the whole reason the beginner
+  tier matters to him.
+- **The beginner gap is specific, and it is the product's problem statement**
+  (23-40): never coded, does not know what a database is, does not know iOS from
+  Android, does not know how an app reaches the store or how a game gets "onto
+  your screen."
+- **Chris is his own first user** - a separate context box per project (himself,
+  Aware AI, ViniApp, API now.fun, ICM), which is the model demonstrating itself.
+- One small action never recorded: Zaal asked Chris for his bio to build him a
+  box (465).

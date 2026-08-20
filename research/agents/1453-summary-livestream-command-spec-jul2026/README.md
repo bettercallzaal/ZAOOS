@@ -254,4 +254,4 @@ Start with PR 1–3 for a functional v1. PR 4 is a separate story.
 - [1272 — The ZAO Agent Stack Jul 2026](./1272-zao-agent-stack-jul2026/)
 - [1319 — DreamLoops x ZAOcowork: Capsule Dispatch + Cost Caps](./1319-dreamloops-zaocowork-capsule-graft/)
 - [1235 — Cowork Lead-Reengagement Skill](./1235-cowork-lead-reengagement-skill/)
-- [717 — Bonfire Posting via VPS](../agents/717-meeting-bonfire-posting-via-vps/)
+- [717 — Bonfire Posting via VPS](../717-meeting-bonfire-posting-via-vps/)

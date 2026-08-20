@@ -224,7 +224,7 @@ Proposed (not yet written - needs Zaal's confirm per the skill's memory-write ga
 
 - [Doc 992](../../agents/992-live-clipper-agent-creator-ops/) - the clipper -> POIDH pipeline concept this call's Thread 1 is the live product conversation for
 - [Doc 631](../../../research/631-poidh-zabal-sentinel/) - POIDH x $ZABAL x Sentinel convergence map (Empire Builder collab context)
-- [Doc 625](../../../research/625-poidh-zao-bounty-playbook/) - POIDH x ZAO bounty playbook (18 templates)
+- [Doc 625](../../community/625-poidh-zao-bounty-playbook/) - POIDH x ZAO bounty playbook (18 templates)
 - [Doc 722f](../../dev-workflows/722-zao-claude-code-3-month-synthesis/722f-people-network/) - people network, includes Thy Revolution
 - [Doc 849](../../business/849-zao-artizen-execution-build-plan/) - references Thy Revolution / COC
 - [Doc 925](../../agents/925-zol-free-cast-posting-build-guide/) - zolcaster background

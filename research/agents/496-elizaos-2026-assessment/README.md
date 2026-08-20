@@ -94,6 +94,6 @@ ElizaOS is the right framework for ZAO's agent fleet (doc 205 plan: OpenClaw + P
 - [Digital Rain: "The Era of Large Frameworks Is Over"](https://digitalrain.studio/posts/2026-03-03-why-i-stayed-on-elizaos) — March 3, 2026 analysis. 60% framework fighting, 40% domain logic on ElizaOS v2.
 - [Medium: "ElizaOS vs. OpenClaw vs. Hermes 2026"](https://medium.com/@alvintoms2136/elizaos-vs-openclaw-vs-hermes-what-actually-matters-in-2026-a5cf7446726f) — Mar 10, 2026. $25M+ AUM in bots, memory injection vulnerability, ElizaOS proven for Web3 but hardening on developers.
 - [grammY Framework Comparison](https://grammy.dev/resources/comparison) — Oct 2024. Best TypeScript bot DX, handles 100M updates/day, fast iteration.
-- [ZAO OS Doc 205: OpenClaw + Paperclip + ElizaOS Deployment Plan](../../205-openclaw-paperclip-elizaos-deployment-plan/) — March 28, 2026. $15/mo stack, 3-phase deployment.
-- [ZAO OS Doc 268: Milady AI / ElizaOS Evolution](../../268-milady-ai-elizaos-evolution/) — March 28, 2026. Steward Wallet pattern, ERC-8004 identity tracking, plugin CLI patterns.
+- [ZAO OS Doc 205: OpenClaw + Paperclip + ElizaOS Deployment Plan](../205-openclaw-paperclip-elizaos-deployment-plan/) — March 28, 2026. $15/mo stack, 3-phase deployment.
+- [ZAO OS Doc 268: Milady AI / ElizaOS Evolution](../268-milady-ai-elizaos-evolution/) — March 28, 2026. Steward Wallet pattern, ERC-8004 identity tracking, plugin CLI patterns.
 - [ZAO OS Doc 495: ZAOstock Team Bot Architecture](../../495-zaostock-team-bot-architecture/) — April 24, 2026. Current grammy + Supabase design, no LLM routing yet.

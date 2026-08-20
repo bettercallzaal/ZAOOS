@@ -46,8 +46,8 @@ This is a 1956 mindset classic, not a strategy or a market. Its value is **frami
 
 ## Also See
 
-- [Doc 1771](../events/1771-aug-zabal-format-zaostock-planning/) - the August ZABAL Games build-a-thon format (the 30-day test in practice)
-- [Doc 2101](../events/2101-fractal-sparkz-tokenomics-james-festival3/) - Zaal's create-over-extract community thesis (the ethos this reinforces)
+- [Doc 1771](../../events/1771-aug-zabal-format-zaostock-planning/) - the August ZABAL Games build-a-thon format (the 30-day test in practice)
+- [Doc 2101](../../events/2101-fractal-sparkz-tokenomics-james-festival3/) - Zaal's create-over-extract community thesis (the ethos this reinforces)
 
 ## Sources
 

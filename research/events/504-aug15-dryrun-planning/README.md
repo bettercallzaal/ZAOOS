@@ -264,8 +264,8 @@ If dry-run passes all 10 rubric items, Oct 3 launch stays on track. If 1+ fails:
 
 ## Sources
 
-1. [Doc 502 - ZAOstock Circles v1 Spec](../governance/502-zaostock-circles-v1-spec/) — governance structure, Loomio, Respect tokens
-2. [Doc 499 - Music Festival Collective Governance](../events/499-music-festival-collective-governance/) — coordinated do-ocracy, conflict resolution
+1. [Doc 502 - ZAOstock Circles v1 Spec](../../governance/502-zaostock-circles-v1-spec/) — governance structure, Loomio, Respect tokens
+2. [Doc 499 - Music Festival Collective Governance](../499-music-festival-collective-governance/) — coordinated do-ocracy, conflict resolution
 3. [Doc 213 - ZAOstock Initial Planning](../ZAO-STOCK/research/213-zao-stock-planning/) — budget, vendor contacts
 4. [Doc 224 - ZAOstock Multi-Year Vision](../ZAO-STOCK/research/224-zao-stock-multi-year-vision/) — Oct 3 master plan
 5. Shambala Festival "Crew Camp" model — 28-year music festival, Canada. Reference: shambalafestival.com/governance.

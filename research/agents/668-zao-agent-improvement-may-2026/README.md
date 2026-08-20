@@ -85,9 +85,9 @@ This isn't unique to today — earlier in this session the codebase audit (Doc 6
 ## Cross-References
 
 - [Doc 601](../../601-agent-stack-cleanup-decision/) — primary surfaces baseline
-- [Doc 650](../../650-cowork-zaodevz-imanagent/) — ZAOcoworkingBot spec
-- [Doc 661](../../../dev-workflows/661-zaoos-codebase-audit-may-2026/) — Doc 661a is the prior bot audit
-- [Doc 663](../../../dev-workflows/663-zao-research-meta-audit-2026-05-17/) — Doc 663e covered bots from a different angle
+- [Doc 650](../650-cowork-zaodevz-imanagent/) — ZAOcoworkingBot spec
+- [Doc 661](../../dev-workflows/661-zaoos-codebase-audit-may-2026/) — Doc 661a is the prior bot audit
+- [Doc 663](../../dev-workflows/663-zao-research-meta-audit-2026-05-17/) — Doc 663e covered bots from a different angle
 - [Doc 665](../../665-bonfires-deep-dive-zao-integration/) — Bonfires architecture
 - `project_bonfires_zao_integration.md` — chat with Ryan, ZABAL bonfire status
 - `project_hermes_canonical.md` — Hermes is the canonical agent framework, no openclaw

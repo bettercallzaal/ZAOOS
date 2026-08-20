@@ -1,6 +1,6 @@
 # 1322 — ZOE Master Automation Index (July 2026)
 
-> Every automation ZOE targets, aggregated from all ZAOOS docs into a single shipping + backlog view. ZOE is cited as "ZOE automation target" in 40+ docs — this is the master index of those references, organized by product area and status. Cross-refs: [doc 254](../events/254-zoe-agent-ecosystem-status/) (ZOE status Apr 2026), [doc 606](../identity/606-zaal-second-brain-system/) (second-brain system), [doc 1269](../identity/1269-zol-farcaster-music-scout-jul2026/) (ZOL Farcaster scout), [doc 1292](../wavewarz/1292-wavewarz-xspace-daily-format-jul2026/) (X Space format).
+> Every automation ZOE targets, aggregated from all ZAOOS docs into a single shipping + backlog view. ZOE is cited as "ZOE automation target" in 40+ docs — this is the master index of those references, organized by product area and status. Cross-refs: [doc 254](../../events/254-zoe-agent-ecosystem-status/) (ZOE status Apr 2026), [doc 606](../../identity/606-zaal-second-brain-system/) (second-brain system), [doc 1269](../../identity/1269-zol-farcaster-music-scout-jul2026/) (ZOL Farcaster scout), [doc 1292](../../wavewarz/1292-wavewarz-xspace-daily-format-jul2026/) (X Space format).
 
 **What ZOE is:**
 ZOE is The ZAO's autonomous operations agent — a multi-modal AI agent running on The ZAO's VPS that handles scheduled content, data aggregation, Discord/Farcaster moderation, and ZAO ecosystem coordination. ZOE is part of a 4-agent suite (ZOE + Hermes + ZOL + [fourth agent TBD]).

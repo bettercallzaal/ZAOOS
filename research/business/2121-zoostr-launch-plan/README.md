@@ -73,7 +73,7 @@ So the funnel is: engage (boostr like) -> the post invites you -> you submit or 
 ## Also See
 
 - [Doc 1098](1098-sparkz-configurable-ai-advisor/) - Sparkz (Zoostr is its first launch)
-- [Doc 2101](../events/2101-fractal-sparkz-tokenomics-james-festival3/) - Clanker v5 fee-recipient mechanics (James)
+- [Doc 2101](../../events/2101-fractal-sparkz-tokenomics-james-festival3/) - Clanker v5 fee-recipient mechanics (James)
 - [Doc 2119](2119-casberi-one-place-for-your-apps/) - accountless.eth / Farcaster-native builders context
 
 ## Sources

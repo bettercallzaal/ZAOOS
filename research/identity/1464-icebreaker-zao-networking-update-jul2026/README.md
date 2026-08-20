@@ -102,7 +102,7 @@ A decentralized music DAO running 1,289+ WaveWarZ battles, 100+ weekly governanc
 
 ## Related Docs
 
-- [1435 — ZAO Brand Pack Reference](../identity/1435-zao-brand-pack-reference-jul2026/)
-- [1417 — ZAO Wikidata Entity Creation Guide](../identity/1417-zao-wikidata-entity-creation-guide/)
-- [1419 — ZABAL S2 Cohort Kickoff + Onboarding](../zabal/1419-zabal-s2-cohort-kickoff-sep2026/)
+- [1435 — ZAO Brand Pack Reference](../1435-zao-brand-pack-reference-jul2026/)
+- [1417 — ZAO Wikidata Entity Creation Guide](../1417-zao-wikidata-entity-creation-guide/)
+- [1419 — ZABAL S2 Cohort Kickoff + Onboarding](../../zabal/1419-zabal-s2-cohort-kickoff-sep2026/)
 - [1339 — ZAO Numbers Proof-Points](../community/1339-zao-numbers-proof-points/)

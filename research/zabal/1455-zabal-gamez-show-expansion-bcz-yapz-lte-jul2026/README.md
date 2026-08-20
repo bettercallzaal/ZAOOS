@@ -140,9 +140,9 @@ Empire config update: add these 5 new activities to the existing ZABAL Gamez tok
 
 ## Related Docs
 
-- [533 — POIDH Clip-Up Bounty: BCZ YapZ Ep 17](../community/533-poidh-clipup-bounty-bcz-yapz-hannah/)
-- [786 — ZABAL Gamez Brand Kit Rebuild](../business/786-zabal-gamez-brand-kit-rebuild/)
-- [948 — Empire Builder x ZABAL Gamez Build Sesh](../events/948-empire-builder-zabal-gamez-build-sesh/)
-- [961 — Agent Droids for ZABAL Gamez](../agents/961-agent-droids-zabalgamez-exponential/)
+- [533 — POIDH Clip-Up Bounty: BCZ YapZ Ep 17](../../community/533-poidh-clipup-bounty-bcz-yapz-hannah/)
+- [786 — ZABAL Gamez Brand Kit Rebuild](../../business/786-zabal-gamez-brand-kit-rebuild/)
+- [948 — Empire Builder x ZABAL Gamez Build Sesh](../../events/948-empire-builder-zabal-gamez-build-sesh/)
+- [961 — Agent Droids for ZABAL Gamez](../../agents/961-agent-droids-zabalgamez-exponential/)
 - [994 — ZABAL Gamez x POIDH Fireside (Jul 8)](../events/994-zabal-gamez-poidh-fireside-unlock-jul8/)
-- [1141 — Boostr x Sparkz Campaign Config](../farcaster/1141-boostr-sparkz-campaign-config/)
+- [1141 — Boostr x Sparkz Campaign Config](../../farcaster/1141-boostr-sparkz-campaign-config/)

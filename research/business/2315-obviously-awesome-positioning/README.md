@@ -226,8 +226,8 @@ For any ZAO brand or product entering a positioning phase:
 
 ## Also See
 
-- [Doc 2310 - ZAOstock Standup](../2310-zaostock-standup-aug17/) - sponsor pitch deck work + context
-- [Doc 2295 - Steve Peer Black Moon Logistics](../2295-steve-peer-black-moon-logistics-aug15/) - venue positioning + sponsor tiers
+- [Doc 2310 - ZAOstock Standup](../../events/2310-zaostock-standup-aug17/) - sponsor pitch deck work + context
+- [Doc 2295 - Steve Peer Black Moon Logistics](../../events/2295-steve-peer-black-moon-logistics-aug15/) - venue positioning + sponsor tiers
 - [Doc 2311 - Stephen Reid Artizen](../2311-stephen-reid-artizen/) - collaboration framing
 - [Doc 2302 - Sparkz Candidates](../2302-sparkz-candidates-verified/) - Spark positioning work
 - [Doc 2309 - TheJollyLama Artizen Scout](../2309-thejollylama-artizen-collab-scout/) - second Artizen collab track (related)

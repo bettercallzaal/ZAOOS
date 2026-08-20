@@ -1,6 +1,6 @@
 # 1301 — ZAO Newsletter Growth Playbook (July 2026)
 
-> Tactics to grow The ZAO's Paragraph.com newsletter from 78 paid subscribers to 150+ paid by Q4 2026. All tactics are non-GATED. Cross-refs: [doc 1270](../1270-zao-newsletter-paragraph-canonical-jul2026/) (canonical newsletter record), [doc 1265](../../wavewarz/1265-zao-distribution-network-jul2026/) (distribution network overview).
+> Tactics to grow The ZAO's Paragraph.com newsletter from 78 paid subscribers to 150+ paid by Q4 2026. All tactics are non-GATED. Cross-refs: [doc 1270](../../identity/1270-zao-newsletter-paragraph-canonical-jul2026/) (canonical newsletter record), [doc 1265](../../identity/1265-zao-distribution-network-jul2026/) (distribution network overview).
 
 **Last updated:** 2026-07-17 | **Status:** ACTIVE — all tactics executable without GATED approval
 
@@ -176,4 +176,4 @@ The referral program is the highest-leverage of these. If each of the 78 paid su
 
 ---
 
-*Written: 2026-07-17 | ZAO OS doc 1301 | Community subfolder | Companion: [doc 1270](../1270-zao-newsletter-paragraph-canonical-jul2026/) (canonical record), [doc 1299](../1299-zao-x-twitter-strategy-jul2026/) (X strategy), [doc 1295](../1295-zao-farcaster-strategy-jul2026/) (Farcaster strategy)*
+*Written: 2026-07-17 | ZAO OS doc 1301 | Community subfolder | Companion: [doc 1270](../../identity/1270-zao-newsletter-paragraph-canonical-jul2026/) (canonical record), [doc 1299](../1299-zao-x-twitter-strategy-jul2026/) (X strategy), [doc 1295](../1295-zao-farcaster-strategy-jul2026/) (Farcaster strategy)*

@@ -69,7 +69,7 @@ tier: QUICK
 
 ## Also See
 
-- [Doc 423](../../music/423-music-x-crypto-connect-sesh-apr17/) — earlier COC + ZAO collab sesh pattern
+- [Doc 423](../423-music-x-crypto-connect-sesh-apr17/) — earlier COC + ZAO collab sesh pattern
 - [Doc 364](../364-zao-festivals-deep-research/) — ZAO Festivals frame (ZAOstock parent)
 - [Doc 274](../274-zao-stock-team-deep-profiles/) — current team profiles for context
 

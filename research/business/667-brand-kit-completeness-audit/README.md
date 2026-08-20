@@ -143,7 +143,7 @@ Per Doc 660 + Doc 664 notes: `mcp__grep__searchGitHub` continues to return zero 
 ## Cross-References
 
 - [Doc 666](../666-zabal-brand-kit-page/) — the brand kit page this audit validates
-- [Doc 475](../475-zao-music-entity/) — ZAO Music DBA brief (surfaced ZAO Music as missing)
+- [Doc 475](../../music/475-zao-music-entity/) — ZAO Music DBA brief (surfaced ZAO Music as missing)
 - [Doc 547](../../community/547-zaostock-master-strategy/) — "infrastructure IS the product" framing
 - [Doc 661](../../dev-workflows/661-zaoos-codebase-audit-may-2026/) — 663b/c/e audits that initially listed many of these repos
 - [Doc 663](../../dev-workflows/663-zao-research-meta-audit-2026-05-17/) — ecosystem meta-audit that informed the categorization

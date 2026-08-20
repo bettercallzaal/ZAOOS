@@ -316,7 +316,7 @@ Phase 2+3 are gated on Zaal's review of this doc and go-ahead. Phase 1 completes
 
 - [Doc 1512 — ZOL DreamLoops activation](../../technology/1512-zol-dreamloops-weekly-curator-artist-spotlight/) — ZOL's parallel activation; pattern to mirror
 - [Doc 1269 — ZOL + DreamLoops architecture](../../identity/1269-zol-farcaster-music-scout-jul2026/) — 20 manifests, handler registry, runner pattern
-- [Doc 892 — Being an agent on Farcaster 2026](../farcaster/892-being-an-agent-on-farcaster-2026/) — agent-loops.md rule #9 (one instance per resource)
+- [Doc 892 — Being an agent on Farcaster 2026](../../farcaster/892-being-an-agent-on-farcaster-2026/) — agent-loops.md rule #9 (one instance per resource)
 
 ## Sources
 

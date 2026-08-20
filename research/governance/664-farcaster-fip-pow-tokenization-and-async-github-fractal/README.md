@@ -284,8 +284,8 @@ ZAO has been running fractal governance for 100+ weeks. Most people don't know f
 - [Doc 102](../102-fractals-frapps-ordao-page/) — frapps toolkit on ZAO OS
 - [Doc 103](../103-fractal-governance-ecosystem/) — broader ecosystem map
 - [Doc 109](../109-optimystics-tooling-ecosystem/) — Optimystics tools survey
-- [Doc 110](../110-community-directory-crm/) — member ledger reconciliation
-- [Doc 657](../../music/657-plural-events-deliberation-toolkit/) — Plural Events tooling (Polis + dembrane + RadxChange QV); adjacent governance-tool category
+- [Doc 110](../../community/110-community-directory-crm/) — member ledger reconciliation
+- [Doc 657](../657-plural-events-deliberation-toolkit/) — Plural Events tooling (Polis + dembrane + RadxChange QV); adjacent governance-tool category
 - [Doc 663](../../dev-workflows/663-zao-research-meta-audit-2026-05-17/) — meta-audit (in progress); will cross-link when complete
 - Memory: `project_fractal_process.md` (the 90-week record)
 - Memory: `project_fractal_vision.md` (Zaal's reconciliation goals)

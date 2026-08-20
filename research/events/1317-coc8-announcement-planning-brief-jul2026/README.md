@@ -1,6 +1,6 @@
 # 1317 — COC Concertz #8: Announcement + Planning Brief (July 2026)
 
-> **URGENT: Announce by July 21** (per doc 1300's COC #7 post-show 72-hour checklist). COC #8 is the first show of Season 2 (per doc 1305). Key pivot: the ZABAL Games August Finals winner performs. This doc covers the announcement copy, date decision, and planning checklist. Cross-refs: [doc 1305](../wavewarz/1305-coc-concertz-season2-roadmap-jul2026/) (Season 2 roadmap), [doc 1300](./1300-coc7-postshow-action-plan/) (COC #7 post-show), [doc 1256](./1256-coc-concertz-series-record-2025-2026/) (full series record), [doc 1291](./1291-zabal-games-august-decision-brief-jul2026/) (ZABAL Games August decisions).
+> **URGENT: Announce by July 21** (per doc 1300's COC #7 post-show 72-hour checklist). COC #8 is the first show of Season 2 (per doc 1305). Key pivot: the ZABAL Games August Finals winner performs. This doc covers the announcement copy, date decision, and planning checklist. Cross-refs: [doc 1305](../../wavewarz/1305-coc-concertz-season2-roadmap-jul2026/) (Season 2 roadmap), [doc 1300](./1300-coc7-postshow-action-plan/) (COC #7 post-show), [doc 1256](./1256-coc-concertz-series-record-2025-2026/) (full series record), [doc 1291](./1291-zabal-games-august-decision-brief-jul2026/) (ZABAL Games August decisions).
 
 **What we know from doc 1305:**
 - COC #8: August 2026 (exact date TBD by Zaal + Thy Rev)

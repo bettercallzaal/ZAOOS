@@ -141,7 +141,7 @@ This hub doc is the synthesis. Each finding traces back to its sub-doc's evidenc
 Methodology: 8 parallel general-purpose sub-agents launched via Claude Code Agent tool, each running STANDARD-tier research per the `/zao-research` skill. Each sub-agent independently inspected the repo (read-only Bash + Read), wrote its sub-doc, returned a 5-line summary. Hub doc synthesizes across the 8 returns. No source code was modified during the audit.
 
 Related precedents:
-- [Doc 154](../../154-skills-commands-master-reference/) — skills + commands canonical reference
+- [Doc 154](../154-skills-commands-master-reference/) — skills + commands canonical reference
 - [Doc 459](../459-workspace-worktrees-multi-session/) — parallel-session safety (relevant to the audit's parallel-agent pattern)
 - [Doc 547](../../community/547-zaostock-master-strategy/) — Cassie's "infrastructure IS the product" validation; informs graduation pattern
 - [Doc 601](../../agents/601-agent-stack-cleanup-decision/) — 12+ surfaces collapsed to 5; the cleanup this audit measures drift against

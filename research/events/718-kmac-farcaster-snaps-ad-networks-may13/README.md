@@ -101,7 +101,7 @@ Files written to `~/.claude/projects/.../memory/`:
 
 - [Doc 505 - Zlank no-code snap builder](../../dev-workflows/505-trae-ai-solo-evaluation/) - the ZAO-side snap builder; kmac's tool is sibling-adjacent
 - [Doc 571 - Intori SCIS + Tuum Tech DB](../../farcaster/571-intori-scis-tuum-tech-db-meeting/) - the data layer this conversation referenced
-- [Doc 597 - HyperSnap install prep](../../dev-workflows/597-hypersnap-install-prep/) - the hub the snap-embed SDK would call
+- [Doc 597 - HyperSnap install prep](../../farcaster/597-hypersnap-install-prep/) - the hub the snap-embed SDK would call
 - [[project_kmac_eth]] - new memory
 - [[project_zlank]] - the ZAO snap builder this complements
 

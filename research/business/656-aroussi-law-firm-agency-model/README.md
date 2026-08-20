@@ -152,7 +152,7 @@ The structure Aroussi describes is the structure ZAO already runs. The doc helps
 
 ## Also See
 
-- [Doc 475](../475-zao-music-entity/) — ZAO Music DBA under BCZ Strategies
+- [Doc 475](../../music/475-zao-music-entity/) — ZAO Music DBA under BCZ Strategies
 - [Doc 547](../../community/547-zaostock-master-strategy/) — Cassie validation: ZAOstock infrastructure IS the product
 - [Doc 650](../../agents/650-cowork-zaodevz-imanagent/) — Iman as universal team action tracker (Delivery Manager prototype)
 - [Doc 660](../../dev-workflows/660-x-content-extraction-v2/) — How the full verbatim body for this doc was retrieved (no-login)

@@ -253,11 +253,11 @@ pitch is built on top of.
 
 - [Doc 2202](../2202-poidh-zao-collab-current-state-brand-alignment/) - current-state synthesis + the brand-alignment Key Decisions this lore doc grounds
 - [Doc 759](../759-poidh-history-origin-to-2026/) - POIDH's own founder-framework history in full depth (this doc's Part 1 is a condensed retelling)
-- [Doc 1229](../1229-unlock-poidh-zao-event-stack/) - the full event-stack spec referenced in Part 4
+- [Doc 1229](../../events/1229-unlock-poidh-zao-event-stack/) - the full event-stack spec referenced in Part 4
 - [Doc 626](../626-poidh-empire-builder-zabal-integration/) - full Empire Builder wiring detail behind Part 5
 - [Doc 631](../631-poidh-sentinel-convergence-strategy/) - the poidh-sentinel fork/partner opportunity, still unclaimed
 - [Doc 994](../994-zabal-gamez-poidh-fireside-unlock-jul8/) - full fireside transcript, source for every direct Kenny quote above
-- [Doc 2161](../2161-zao-brand-audit/) - ICM box gap audit referenced in Part 6
+- [Doc 2161](../../identity/2161-zao-brand-audit/) - ICM box gap audit referenced in Part 6
 - zpoidh repo (`github.com/bettercallzaal/zpoidh`) - every round folder, script, and brand kit referenced above
 
 ## Next Actions

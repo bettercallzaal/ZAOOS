@@ -280,7 +280,7 @@ Doc 1016 (2026-07-09, STANDARD tier) identified the winning tactics: FAQ schema 
 
 - [doc 1016 - GEO Owning the AI Answer (2026-07-09, STANDARD, last-validated 2026-07-09)](../1016-geo-owning-the-ai-answer/) [FULL - foundational strategy, proven tactics]
 - [doc 1047 - GEO Implementation Schema Blocks (2026-07-12, STANDARD, last-validated 2026-07-12)](../1047-geo-implementation-schema-blocks/) [FULL - deployment-ready artifacts]
-- [doc 1051 - ICM Deep Dive: UseICM Brand Masks + GEO (2026-06-25, DEEP)](../../../identity/1051-icm-deep-dive-useicm-brand-masks-geo/) [FULL - 21 ICM boxes for The ZAO ecosystem]
+- [doc 1051 - ICM Deep Dive: UseICM Brand Masks + GEO (2026-06-25, DEEP)](../../identity/1051-icm-deep-dive-useicm-brand-masks-geo/) [FULL - 21 ICM boxes for The ZAO ecosystem]
 
 ---
 
@@ -305,7 +305,7 @@ Doc 1016 (2026-07-09, STANDARD tier) identified the winning tactics: FAQ schema 
 
 - [Doc 1016 - GEO Owning the AI Answer: Strategy (STANDARD)](../1016-geo-owning-the-ai-answer/)
 - [Doc 1047 - GEO Implementation: Schema Blocks (STANDARD)](../1047-geo-implementation-schema-blocks/)
-- [Doc 1051 - ICM Deep Dive: UseICM Context Boxes (DEEP)](../../../identity/1051-icm-deep-dive-useicm-brand-masks-geo/)
+- [Doc 1051 - ICM Deep Dive: UseICM Context Boxes (DEEP)](../../identity/1051-icm-deep-dive-useicm-brand-masks-geo/)
 - [Doc 952 - ICM Box Design (related, strategy)](../../../identity/952-icm-boxes/)
 - [Doc 977/978 - ZAO Numbers + Fractal Verification (related, facts)](../../../governance/977-fractal-numbers-verified/)
 

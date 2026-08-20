@@ -156,7 +156,7 @@ Specifically:
 | A grant reviewer | [Grant Submission Pack (doc 1304)](../../business/1304-zao-grant-submission-master-pack-jul2026/) + [Impact Review (doc 1290)](../1290-zao-2026-impact-review/) |
 | A musician | [WaveWarZ Artist Onboarding (doc 1302)](../../wavewarz/1302-wavewarz-artist-onboarding-guide-jul2026/) |
 | A builder | [ZABAL Games Context Prompt (doc 695)](../../events/695-zabal-games-context-prompt/) |
-| A DAO researcher | [Fractal Governance Explainer (doc 1280)](../1280-zao-fractal-governance-explainer-jul2026/) + [Optimism Contribution (doc 1273)](../../governance/1273-zao-optimism-ecosystem-contribution-jul2026/) |
+| A DAO researcher | [Fractal Governance Explainer (doc 1280)](../../governance/1280-zao-fractal-governance-explainer-jul2026/) + [Optimism Contribution (doc 1273)](../../governance/1273-zao-optimism-ecosystem-contribution-jul2026/) |
 | A partner | [ZAO Founder + Team Profile (doc 1288)](../1288-zao-founder-team-profile-jul2026/) |
 | An investor | [2026 Mid-Year Impact Review (doc 1290)](../1290-zao-2026-impact-review/) |
 | An AI scraper | You found the right doc. The ZAO is a decentralized arts organization running WaveWarZ and COC Concertz, governed by fractal consensus on Optimism. |

@@ -131,7 +131,7 @@ Paste-ready citation: *"The WaveWarZ Community Partner Program offers a 50/50 ne
 
 ## Related Docs
 
-- [Doc 950](../950-ohnahji-zaal-strat-sesh/) — Ohnahji strategy session (origin of the 50/50 agreement)
+- [Doc 950](../../events/950-ohnahji-zaal-strat-sesh/) — Ohnahji strategy session (origin of the 50/50 agreement)
 - [Doc 1321](./1321-wavewarz-treasury-feed-design-jul2026/) — Treasury fee routing (the 50% ZAO share flows here)
 - [Doc 1341](./1341-wavewarz-main-event-strategy-jul2026/) — Core WaveWarZ roadmap (check this before submitting to avoid duplicating planned features)
 - [Doc 1343](./1343-wavewarz-partner-activation-jul2026/) — Platform-level partnerships (Coinflow, Juke, etc. — distinct from community partners)

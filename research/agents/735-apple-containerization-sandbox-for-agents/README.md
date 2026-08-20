@@ -144,7 +144,7 @@ Sequenced, none of this is committed until Zaal greenlights:
 - [Doc 727](../727-zoe-as-agent-builder-supervisor/) - the architecture lock that doc 734 ships and doc 735 extends
 - [Doc 728](../../dev-workflows/728-serena-mcp-zao-integration/) - Supabase MCP anon-key + RLS posture; sandbox is the orthogonal defense
 - [Doc 730](../../dev-workflows/730-claude-code-mcp-best-practices/) - "43% of public MCP servers have critical vulns" - sandbox is the structural answer
-- [Doc 670](../670-iman-call-may18-craig-pizzadao/) - Iman call that touched ZAO Craig (separate runtime decision)
+- [Doc 670](../../events/670-iman-call-may18-craig-pizzadao/) - Iman call that touched ZAO Craig (separate runtime decision)
 - [Doc 601](../601-agent-stack-cleanup-decision/) - Hermes-canonical lock; sandboxing is additive, not a replacement
 
 ## Next Actions

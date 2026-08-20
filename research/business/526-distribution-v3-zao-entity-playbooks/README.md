@@ -164,7 +164,7 @@ Do NOT batch entities. ZAO OS sprint and ZAOstock sprint and Devz sprint run in 
 - [Doc 311](../../business/311-vibe-coded-apps-marketing-playbook/) - Adjacent vibe-coded marketing playbook
 - [Doc 051](../../community/051-zao-whitepaper-2026/) - Whitepaper canonical artist-first language
 - [Doc 363](../../community/363-zao-stock-people-brands-2026/) - ZAOstock people + brands
-- [Doc 475](../475-zao-music-entity/) - ZAO Music DBA + team + Cipher = release #1
+- [Doc 475](../../music/475-zao-music-entity/) - ZAO Music DBA + team + Cipher = release #1
 - [Doc 498](../498-zlank-unified-sdk-concept/) - Zlank cohort, source of Devz bot first believers
 - [Doc 506](../../dev-workflows/506-trae-ai-solo-bytedance-coding-agent/) - SKIP-but-steal patterns for bot stack
 

@@ -61,7 +61,7 @@ fleet (doc 2182): Zaal is the operator; the loops do the work.
 ## Also See
 
 - [Doc 2182](../../*/2182-*/) - per-brand terminals / the fleet
-- [Doc 928](../928-agent-loop-best-practices/) + [Doc 2127](../../agents/2127-*/) - the loop rulebook
+- [Doc 928](../../agents/928-agent-loop-best-practices/) + [Doc 2127](../../agents/2127-*/) - the loop rulebook
 - [Doc 2178](../../*/2178-*/) - orchestrator-worker harness
 - `.claude/rules/secret-hygiene.md`, `agent-loops.md`, `loop-evals.md`
 

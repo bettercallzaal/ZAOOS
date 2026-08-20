@@ -11,7 +11,7 @@ tier: STANDARD
 # 2245 - ZAOOS Surface Map (READ THIS BEFORE BUILDING ANYTHING)
 
 > **Goal:** Every live page and API route in ZAOOS, one line each, generated from
-> the source. The companion to [Doc 2239](../agents/2239-zoe-capability-map/) (ZOE's
+> the source. The companion to [Doc 2239](../../agents/2239-zoe-capability-map/) (ZOE's
 > 102 modules). That one answers "does ZOE have X?"; this answers "does the APP have X?"
 
 ## Why this exists (the honest reason)
@@ -477,5 +477,5 @@ admin, badges, calls, chat, community, compose, ecosystem, events, feedback, gat
 
 ## Also See
 
-- [Doc 2239](../agents/2239-zoe-capability-map/) - ZOE's 102-module map (the agent-side twin).
+- [Doc 2239](../../agents/2239-zoe-capability-map/) - ZOE's 102-module map (the agent-side twin).
 - `.claude/rules/confirm-before-claiming-absence.md` - the rule this map serves.

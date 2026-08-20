@@ -449,7 +449,7 @@ Per Doc 324, the agent stack is Privy + 0x + Base Paymaster. Streaming-specific 
 - [Doc 258 - ZABAL/SANG buyback](../258-zabal-sang-buyback/) - Treasury buyback flow
 - [Doc 283 - Privy Embedded Wallets](../../identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/) - Wallet provider rationale
 - [Doc 222 - Payment Infrastructure (Stripe + Coinbase)](../222-payment-infrastructure-stripe-coinbase/) - Fiat rail comparison
-- [Doc 125 - Coinflow Fiat Checkout](../../125-coinflow-fiat-checkout/) - Coinflow integration patterns
+- [Doc 125 - Coinflow Fiat Checkout](../125-coinflow-fiat-checkout/) - Coinflow integration patterns
 - [Doc 542 / 546 / 569 - Bonfire reputation graph](../../identity/) - Attestation consumer
 
 ---

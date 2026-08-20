@@ -1,6 +1,6 @@
 # 1314 — ZABAL Games August Finals: Builder Communication Pack (July 2026)
 
-> Ready-to-send communications for the 32 ZABAL Games builders entering August Finals. Zaal must approve the 5 decisions from doc 1291 before sending — but all copy is drafted here. Once decisions are locked, this is a 30-minute send. Cross-refs: [doc 1291](./1291-zabal-games-august-decision-brief-jul2026/) (5 decisions needed), [doc 1298](./1298-zabal-games-finalist-showcase-template/) (submission kit), [doc 1283](./1283-zabal-august-buildathon-mechanics/) (mechanics brief), [doc 1255](../wavewarz/1255-wavewarz-zabal-games-august-battle-protocol/) (WW battle protocol).
+> Ready-to-send communications for the 32 ZABAL Games builders entering August Finals. Zaal must approve the 5 decisions from doc 1291 before sending — but all copy is drafted here. Once decisions are locked, this is a 30-minute send. Cross-refs: [doc 1291](./1291-zabal-games-august-decision-brief-jul2026/) (5 decisions needed), [doc 1298](./1298-zabal-games-finalist-showcase-template/) (submission kit), [doc 1283](./1283-zabal-august-buildathon-mechanics/) (mechanics brief), [doc 1255](../../wavewarz/1255-wavewarz-zabal-games-august-battle-protocol/) (WW battle protocol).
 
 **DECISION NEEDED before sending:** Doc 1291's 5 items must be locked by Aug 1:
 1. Window dates (proposed: Aug 4-18)

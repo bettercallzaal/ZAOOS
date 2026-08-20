@@ -51,7 +51,7 @@ Specifically she pointed at:
 
 Cassie was direct: "in my experience, people don't read shit."
 
-This is consistent with [doc 263 (Obsidian lean team model)](../../dev-workflows/263-obsidian-lean-team-model/) and the per-person DM tailoring pattern shipped in [doc 477 (ZAOstock dashboard Notion replacement)](../../events/477-zaostock-dashboard-notion-replacement/).
+This is consistent with [doc 263 (Obsidian lean team model)](../../business/263-obsidian-lean-team-model/) and the per-person DM tailoring pattern shipped in [doc 477 (ZAOstock dashboard Notion replacement)](../../events/477-zaostock-dashboard-notion-replacement/).
 
 The fix Zaal is using and Cassie endorsed:
 - Tailored short messages per person ("here&rsquo;s what matters to you")
@@ -105,7 +105,7 @@ Recommendation: **don&rsquo;t pivot away from ZAOstock to chase this.** Ship the
 ## Also see
 
 - [Doc 432 — ZAO master context (Tricky Buddha)](../../community/432-zao-master-context-tricky-buddha/) — the music-first / community-second / tech-third ordering Cassie reinforced
-- [Doc 263 — Obsidian lean team model](../../dev-workflows/263-obsidian-lean-team-model/) — earlier framing of the lean-team coordination problem
+- [Doc 263 — Obsidian lean team model](../../business/263-obsidian-lean-team-model/) — earlier framing of the lean-team coordination problem
 - [Doc 458 — ZAO Contribution Circles](../../community/458-zao-contribution-circles/) — Impactful Giving pattern, similar territory
 - [Doc 477 — ZAOstock dashboard Notion replacement](../../events/477-zaostock-dashboard-notion-replacement/) — the system itself
 - [Doc 502 — ZAOstock circles v1 spec](../../governance/502-zaostock-circles-v1-spec/) — circles + governance model

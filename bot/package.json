@@ -9,6 +9,8 @@
     "start": "tsx src/index.ts",
     "dev:devz": "tsx watch src/devz/index.ts",
     "start:devz": "tsx src/devz/index.ts",
+    "dev:zai": "tsx watch src/zai/index.ts",
+    "start:zai": "tsx src/zai/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

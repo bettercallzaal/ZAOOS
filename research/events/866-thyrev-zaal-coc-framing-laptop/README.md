@@ -79,3 +79,48 @@ Net for the Fellenz reply: the "partnership, Thy Revolution leads, not ZAO-owned
 - [Doc 839](../839-fellenz-brand-org-strategy/) - the Fellenz critique; this call answers challenge 4
 - [Doc 352](../../community/352-coc-concertz-full-context-artist-profiles/) - COC Concertz full context
 - [Doc 856](../../community/856-zao101-content-expansion/) - the org chart / 201 work that carries the COC framing
+
+## Re-verify pass 2026-08-20 (full 158-line transcript re-read)
+
+### The framing check PASSES - no ownership creep
+
+Checked hardest, because this is the doc the COC framing depends on and doc 839
+records what happens when it drifts. Every statement here holds: 50/50 joint
+venture, COC ownership explicit, "not ZAO-owned" explicit, and Zaal's own intent
+verbatim at line 99 - "I would love for it to be separate of me so that you guys
+don't need me to succeed." No ZAO-ownership language anywhere. Safe to cite.
+
+One caveat on Decision 2 ("remove the pending-COC-confirmation hold"): that is a
+reasonable INFERENCE from the call, not something either speaker says. The
+framing confirmation is real; the instruction to go edit another doc is the
+author's. Worth knowing before it is cited as an agreement.
+
+### Seven action items, 64 days old, zero completion status
+
+The call was 2026-06-17. Nothing here records what happened next, and two items
+are commitments made TO Thy Revolution:
+
+- **$100 into a Giveth crowdfund toward a Mac Mini.** Verbatim (71-72): "i will
+  donate a hundred dollars and get you one sixth of the way there if you make a
+  giver giver.io i'm gonna send it to you right now." Conditional on Thy Rev
+  creating the Giveth - so possibly blocked rather than dropped, which the doc
+  does not distinguish.
+- **A COC Concerts call "after this weekend"** and **scheduling Thy Rev on
+  ZABAL/Farcaster** - both undated, both silent since.
+- The Christopher-and-Honey laptop lead (73-77) was already uncertain on the
+  call: customs, cost, "I'm not 100% sure."
+
+### The laptop thread is still open, and it is public
+
+Two months later the live coc-concertz ICM box states: "Thy Revolution lacks a
+laptop; a crowdfund is in motion." That sentence was published 2026-08-19 and is
+a **public claim about a third party's circumstances**. If the crowdfund never
+started - and nothing here or since records that it did - the box is asserting
+something that may not be true, about someone else, on a page anyone can read.
+Worth resolving before it is quoted anywhere further.
+
+### Minor
+
+The DCL admin item records Zaal's username as ".zol wallet address"; the
+transcript says "zoldot" (149-150). Ambiguous in the audio, so left as-is - noted
+so nobody treats either spelling as verified.

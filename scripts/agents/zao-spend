@@ -137,23 +137,45 @@ def scan(since: datetime):
 
 
 def outputs(since: datetime):
-    """PRs opened in the window, per repo. The 'what did it buy' half."""
+    """PRs opened in the window, per repo. The 'what did it buy' half.
+
+    2026-08-17 rewrite: this silently reported 0 PRs on a 16-merge day.
+    Three causes, each now fixed: (1) `gh pr list` rides the shared GraphQL
+    bucket that drains and 503s - use the REST pulls endpoint (separate
+    core bucket, doc 887); (2) two of three repo slugs did not exist
+    (ZAODEVZ/zabalgames, ZAODEVZ/ZAOstock) so 404s were eaten; (3) failures
+    hit a silent `continue`, so a broken meter read as a quiet day
+    (silent-failure-guard.md). Failures now print a warning line."""
     found = []
+    errs = []
     iso = since.strftime("%Y-%m-%dT%H:%M:%SZ")
-    for repo in ("bettercallzaal/ZAOOS", "ZAODEVZ/zabalgames", "ZAODEVZ/ZAOstock"):
+    repos = (
+        "bettercallzaal/ZAOOS",
+        "ZAODEVZ/ZAOcowork",
+        "ZAODEVZ/zabalgames",
+        "bettercallzaal/zaostock",
+        "bettercallzaal/zao-floor",
+        "bettercallzaal/zao-website",
+    )
+    for repo in repos:
         try:
             out = subprocess.run(
-                ["gh", "pr", "list", "--repo", repo, "--state", "all",
-                 "--limit", "40", "--json", "number,title,createdAt,state"],
+                ["gh", "api",
+                 f"repos/{repo}/pulls?state=all&sort=created&direction=desc&per_page=50",
+                 "--jq", "[.[] | {number, title, created_at, state}]"],
                 capture_output=True, text=True, timeout=25,
             )
             if out.returncode != 0:
+                errs.append(repo)
                 continue
             for pr in json.loads(out.stdout or "[]"):
-                if pr.get("createdAt", "") >= iso:
+                if pr.get("created_at", "") >= iso:
                     found.append((repo.split("/")[-1], pr["number"], pr["state"], pr["title"]))
         except Exception:
+            errs.append(repo)
             continue
+    if errs:
+        print(f"  WARNING: PR count incomplete - query failed for: {', '.join(errs)}", file=sys.stderr)
     return found
 
 

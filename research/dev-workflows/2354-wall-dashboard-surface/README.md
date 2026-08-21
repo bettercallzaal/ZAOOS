@@ -83,7 +83,11 @@ A localhost page is reachable only from the machine already running the terminal
 - **`zao-wall` is not merged.** It lives in ZAOOS PR #3196. A cowork route reading `metadata.lane` depends on that convention landing.
 - **Lane state is Mac-local.** `zj` reads tmux over ssh; a Vercel-hosted page cannot. Getting live lane state to a hosted page needs an agent pushing it (the state stamps, or a small writer to Supabase) - that is the one genuinely new piece of plumbing, and it is worth naming rather than discovering later.
 
-## Also See
+### Correction 2026-08-20 (fleet-build lane, card 8e868a63): half the plumbing already exists and is live
+
+The cowork Supabase (etwvzrmlxeobinrlytza) has a **`fleet_status` table** - `{session, state, last_line, updated_at}` - with 11 rows whose newest was minutes old when checked. The writer is the VPS `bin/loops-keepalive.sh` (per `scripts/fleet/README.md`, which also names a design-only "fleet + board page" over exactly this table). So the "one genuinely new piece of plumbing" above is HALF built: **VPS lane state already streams to Supabase live; only MAC lane state still needs a writer.** A `/lanes` route can render the VPS half on day one.
+
+Card 8e868a63's attention triple maps onto this route rather than wanting a different surface: **needs-you** = board `route=human` + gated asks, **active** = picked-off (doc 2344's `zao-wall --pick` state), **looping** = wall lanes working. Recommend the `/lanes` route adopt that three-way grouping as its top-level split. No separate attention-board - that would be the third surface decision 1 exists to prevent.
 
 - [Doc 288 - agent squad monitoring dashboards](../../agents/288-agent-squad-monitoring-dashboards/) - the survey whose recommendations were never adopted
 - [Doc 2343 - zj cannot tell IDLE from BLOCKED](../2343-zj-wall-signal-quality/)

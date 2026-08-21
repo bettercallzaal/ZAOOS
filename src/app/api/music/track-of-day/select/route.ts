@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { hasPermission } from '@/lib/hats/gating';
 import { logger } from '@/lib/logger';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+
+const WALLET_ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
 
 // POST — select today's Track of the Day
 // Admin-only manual selection, OR auto-select if past cutoff (6pm EST)
@@ -29,14 +32,22 @@ export async function POST() {
       );
     }
 
-    // Determine if this is admin manual select or auto-select
+    // Determine if this is admin manual select or auto-select.
+    // Augmented with the Hats Protocol 'feature_tracks' permission (the
+    // ZTalent Newsletter hat) so a hat wearer can select without also being
+    // a session admin - the first real consumer of src/lib/hats/gating.ts.
     const isAdmin = session.isAdmin;
+    const isHatFeaturer =
+      !isAdmin && session.walletAddress && WALLET_ADDRESS_RE.test(session.walletAddress)
+        ? await hasPermission(session.walletAddress as `0x${string}`, 'feature_tracks')
+        : false;
+    const canSelect = isAdmin || isHatFeaturer;
     const cutoffHour = 23; // 6pm EST ~ 23:00 UTC
     const now = new Date();
     const cutoffToday = new Date(`${today}T${String(cutoffHour).padStart(2, '0')}:00:00.000Z`);
     const isPastCutoff = now >= cutoffToday;
 
-    if (!isAdmin && !isPastCutoff) {
+    if (!canSelect && !isPastCutoff) {
       return NextResponse.json(
         { error: 'Only admins can select before the cutoff time (6pm EST)' },
         { status: 403 },

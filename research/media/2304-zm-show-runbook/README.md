@@ -111,3 +111,34 @@ Per the draft, these feed the show and are owned by other lanes: newsletter dail
 - `research/media/2153-zm-zao-media-aggregation-system/` - **[FULL]** frontmatter + architecture sections read for the feeds-in/feeds-out boundary.
 - Doc 2269 + the founder-share thread (2026-08-13 session) - **[FULL]** this lane's own verified work; the sensitivity flag derives from it.
 - The zoeee lane's dispatch of 2026-08-17 - **[FULL]** the tasking message, including the HOLD instruction, which this doc preserves.
+
+## The Tuesday night-of runbook (added 2026-08-20, card 75ed8f1d)
+
+Tuesday is interview day - the highest-variance show of the week, so it gets
+the only minute-by-minute runbook. Everything here derives from the invariant
+five above plus the Tue prep rules; nothing new is invented. Companion views:
+the show playbook + guest playbook live at
+`~/zao-vault/notes/stream-guest-playbook.md` - same facts, different reader.
+
+| T | Action |
+|---|---|
+| Mon 12:00 | Guest confirmed IN WRITING or the fallback (newsletter deep-dive) is locked now, not Tuesday |
+| Mon PM | Promo post goes out ONLY if confirmed. Never announce an unconfirmed guest |
+| Tue 4:00 | The invariant five (newsletter up, board pass, Restream targets, cold-open song, the CLOSE decided). Intro card written: who they are, what they built, ONE opening question |
+| Tue 4:40 | PROPOSED DEFAULT (Zaal confirms): guest joins the call for tech check - audio, camera, screen-share if they demo. No call time is recorded anywhere yet; this fills the gap flagged in the playbook |
+| Tue 4:45 | Restream test frame out. Guest briefed on shape: newsletter cold open, they enter after segment 3, ~20-30 min conversation, they stay for the CLOSE if they want |
+| 5:00 | Live. Cold open + newsletter as always - the guest waits; the skeleton does not bend |
+| ~5:15 | Guest enters (day-theme block). Open with the ONE question from the intro card |
+| ~5:45 | Wind toward the CLOSE: guest names where to find them + their one ask; Zaal delivers the show's one ask + tomorrow's tease (Wed = Farcaster news) |
+| Post | 2-3 timestamped clip moments flagged; VISIBLE credit line for the guest in every clip/cast (credit-attribution.md); same-day stakeholder recap reply TO the guest (playbook Pattern 2) |
+
+Failure modes, pre-decided: guest no-show at 4:50 = run the fallback without
+drama, never say the missing guest's name on air; tech fails mid-show = drop to
+audio-only, keep talking; guest goes long = the CLOSE still happens, cut the
+standing ticks not the ask.
+
+## Also See (addendum)
+
+- `~/zao-vault/notes/stream-guest-playbook.md` - the show playbook (how ZM works
+  beyond the night) + the guest playbook (being a great guest, both directions),
+  extended 2026-08-20 from the same grounding. Cards 8a2142a6 + 3dece757.

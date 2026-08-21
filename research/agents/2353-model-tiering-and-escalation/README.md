@@ -98,7 +98,7 @@ Take ZOE's, with one change forced by the runtime.
 
 Concretely:
 
-- **Haiku** - mechanical and verifiable: formatting, index rows, link fixes, dead-code removal. The estate already does this: `CLAUDE_CODE_SUBAGENT_MODEL: haiku` is set globally, so every subagent is already on the cheap tier.
+- **Haiku** - mechanical and verifiable: formatting, index rows, link fixes, dead-code removal. `CLAUDE_CODE_SUBAGENT_MODEL: haiku` is set globally, but see the correction below - it reaches far fewer subagents than this doc originally claimed.
 - **Sonnet - the floor.** Grounded edits, doc writing, repo hygiene, board work, most lane work.
 - **Opus - deliberate.** Architecture, ambiguous debugging, security-relevant review, and anything where being wrong is expensive. ZOE's keyword list is a good starting vocabulary.
 
@@ -146,3 +146,39 @@ All measured on this machine, 2026-08-20. No external fetches were needed.
 - [FULL - grep] `ZOE_TASK_COMPLEXITY_ROUTING` absent from `.claude/settings.json` and `~/.zao/zao.env`.
 - [FULL - read on disk] `~/zaal-dotfiles/claude/settings.json` line 70 (was `claude-fable-5[1m]`, set 2026-08-18 in `f7fdb94`); `CLAUDE_CODE_SUBAGENT_MODEL: haiku` line 4.
 - [FULL - `tmux` sweep] 16 of 19 lanes on Fable 5, 2 on Opus 5, with boot times - every lane booted before the settings change inherited Fable.
+
+### Correction, 2026-08-21: the global Haiku setting is a FALLBACK, not an override
+
+This doc originally said `CLAUDE_CODE_SUBAGENT_MODEL: haiku` meant "every
+subagent is already on the cheap tier." That is wrong, and it is wrong in the
+direction that matters - it implies a cost control which is mostly not in
+effect.
+
+**An agent definition that pins `model:` in its frontmatter wins.** The env var
+only supplies a default for agents that pin nothing.
+
+Measured 2026-08-21 across the loaded plugin agents (`~/.claude/plugins/marketplaces/**/agents/*.md`,
+excluding `cache/`, `docs/` translations and `.kiro/`, none of which load):
+
+| Pinned model | Agents |
+|---|---|
+| sonnet | 55 |
+| opus | 13 |
+| haiku | 2 |
+| **nothing pinned** | **26** |
+| total loaded | 96 |
+
+So the setting reaches **26 of 96** plugin agents, plus the built-ins
+`general-purpose`, `Explore` and `Plan`. Those three are the ones actually
+reached for most often, which is why the setting still matters - just not for
+the reason stated.
+
+**The practical consequence:** `Explore` on Haiku is correct, it is a search
+fan-out. `Plan` on Haiku is judgment work on the smallest model in the estate,
+and that is a per-agent decision rather than a global one.
+
+**How the error happened**, since it is the more useful half: the env var was
+read out of `settings.json` and its meaning inferred from its name, without
+checking what overrides it. That is `state-claims.md` exactly - a proxy that
+was cheaper to reach than the truth, and right often enough to feel safe. The
+file that would have proved it wrong was the agent frontmatter, one glob away.

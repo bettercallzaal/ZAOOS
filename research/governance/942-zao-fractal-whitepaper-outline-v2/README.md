@@ -73,15 +73,116 @@ Four of the pre-draft gaps above are now closed by direct code check - these fac
 
 Still open (need on-chain / live data, not code): the "two wallets drive OREC" operating-core claim (Ch 9) — needs an on-chain/process query, not a grep. ~~Fractal week count~~ → CLOSED 2026-07-17 (see row above).
 
-## Decisions only Zaal can make (the brainstorm gate)
+## "Two wallets drive OREC" - reopened, not resolved (2026-08-21)
 
-These block chapter drafting. Unchanged from 718's open questions, restated so the loop can surface them:
+Direct on-chain query against the OREC contract `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`
+on Optimism (Blockscout API, `/addresses/{addr}/transactions?filter=to`, fully
+paginated - 7 pages, 311 total transactions, no further `next_page_params`,
+queried 2026-08-21). Method: tallied `from` address and decoded `method` per
+transaction.
 
-1. **Form:** one whitepaper, or whitepaper + a short separate constitution (whitepaper argues; constitution states rules)?
-2. **Audience:** ZAO members, the wider DAO/governance world, potential partners, or all three? Changes the voice.
-3. **Math on the page:** Fibonacci + decay math inline, or in an appendix?
-4. **Voice:** manifesto, academic, or the 718f hybrid (manifesto for vision, precision for mechanics, plain honesty for risks)?
-5. **Decay stance in the doc:** does the whitepaper (a) describe only current no-decay reality, (b) present 941's decay proposal as the recommended future, or (c) both, clearly separated? Recommendation: (c) - current in Ch 5/6, proposed in Ch 10.
+**What the data shows:**
+
+| Address | ENS (via ensdata.net, 2026-08-21) | vote | execute | other |
+|---|---|---|---|---|
+| `0x7234c36A71ec237c2Ae7698e8916e0735001E9Af` | confirmed = **Zaal's wallet** (doc 361, direct match) | 154 | 127 | - |
+| `0x64A15b1D2DE581097CB48e5D82619203E24BB3e1` | no ENS found; NOT civilmonkey.eth's current address (see below) | 11 | 0 | - |
+| `0xAED620c450911c38714E666cd84137767e3D6286` | resolves to **sim31.eth** | 5 | 4 | - |
+| 6 more addresses | 1-3 votes each, none previously documented anywhere in the repo | 1-3 each | 0 | - |
+| (1 tx from `0xBb7F...`) | - | - | - | contract-creation-shaped input (`0x60806040`), likely a decode artifact - excluded from counts above |
+
+**The doc-703/1206 claim does not match this data as literally stated.**
+`civilmonkey.eth` currently resolves (ensdata.net, 2026-08-21) to
+`0x368C8A0AF7CBb2e9a7Bc0a0925Efb2AC00210bc1` - an address that does **not**
+appear anywhere in the 311-transaction OREC history pulled above. Either (a)
+civilmonkey's wallet changed/rotated since doc 703 (May 2026) and the old
+address just isn't in this window, (b) the ENS name was reassigned, or (c)
+civilmonkey interacts with a different contract in the OREC flow that this
+query didn't cover. **Not resolved - flagging, not asserting.**
+
+**What IS solid:** execution (the consensus-finalizing step) is still
+concentrated - 131 of 135 total `execute` calls come from 2 addresses
+(zaal.eth: 127, sim31.eth: 4). Voting is more distributed than doc 703/1206
+state - 8 distinct addresses have cast votes, not 2. So the honest Ch 9
+framing is narrower than the old claim: **execution is a 2-address
+bottleneck (one of them not previously documented as a signer); voting
+participation is wider than previously believed.** The exact "who is
+`0x64A15b1D...`" and "did civilmonkey's wallet change" questions are open -
+this overlaps `zao-identity`'s seam (trackers/who-decides-what), flagged
+there via IN-FLIGHT.md rather than dug further here.
+
+Do not cite "only two wallets, zaal.eth + civilmonkey.eth" in Ch 9 without
+resolving the civilmonkey-address mismatch above. Cite instead: "execution
+is concentrated in 2 of 9 addresses that have interacted with OREC as of
+2026-08-21; identity of the non-Zaal execute-address is unconfirmed."
+
+## Decisions locked (2026-08-21, Zaal via whitepaper-lane grill)
+
+Four of the five original decisions are answered. **Form is DEFERRED** - a
+new `zao-identity` lane owns it, because one-doc-vs-constitution turns on
+what the constitution would actually contain (the on-chain Hats role/
+governance structure, tree 226), which was undocumented until that lane
+started walking the tree 2026-08-21. See `handoffs/zao-identity.md` and
+`handoffs/whitepaper.md`. Do not re-ask Form; wait for that lane.
+
+1. ~~Form~~ - DEFERRED to zao-identity lane.
+2. **Audience: all three** (ZAO members + wider DAO/governance world +
+   potential partners).
+3. **Math on the page: appendix.** Fibonacci curve + decay math move out of
+   the chapter prose into a reference appendix.
+4. **Voice: academic throughout.** Overrides the 718f hybrid recommendation
+   below (kept for the record) - every chapter, including 1/2/3/8/11, is
+   precise/citable rather than manifesto-toned. The chapter map's Voice
+   column (row below) is stale as of this decision; treat it as "academic"
+   uniformly, not per-chapter.
+5. **Decay stance: both, clearly separated** (current no-decay reality in
+   Ch 5/6, doc 941's proposal as roadmap in Ch 10) - matches the doc's own
+   recommendation.
+
+Original brainstorm-gate text, kept for provenance:
+
+> 1. Form: one whitepaper, or whitepaper + a short separate constitution?
+> 2. Audience: ZAO members, wider DAO/governance world, partners, or all three?
+> 3. Math on the page: inline or appendix?
+> 4. Voice: manifesto, academic, or the 718f hybrid?
+> 5. Decay stance: (a) current-only, (b) proposed-only, (c) both, separated?
+
+## Decision 6 - two-tier document structure (2026-08-21, added mid-draft)
+
+Zaal, expanding on the appendix decision: *"do more things with the appendix.
+Maybe we do a long whitepaper and more technically whitepaper things are all
+in the appendix but we still need a normie simplified paper as the first
+entry point."*
+
+This is a SEPARATE decision from the deferred Form question (Form was
+whitepaper-vs-constitution, i.e. argument-doc vs rules-doc; this is
+reading-depth tiering within the whitepaper itself) - it does not wait on
+zao-identity.
+
+**Locked shape: two documents, one whitepaper.**
+
+1. **The long whitepaper** (academic voice, all 11 chapters, all-three
+   audience). Technical weight - Fibonacci curve derivation, decay-proposal
+   math (doc 941), contract addresses, on-chain verification methodology,
+   the 718a-g literature review, full citation list - moves OUT of chapter
+   prose and into a lettered appendix (Appendix A: Mechanism Math, Appendix
+   B: On-Chain Verification, Appendix C: Literature & Citations, growing as
+   drafting proceeds). Chapter prose stays readable at academic-but-not-
+   footnoted density; a reader who wants the derivation follows an appendix
+   pointer.
+2. **The normie entry point** (new, short, plain-language). Not a
+   constitution, not a summary-by-deletion - a standalone on-ramp: what ZAO
+   Fractal is, why it exists, how Respect works, written so someone with zero
+   governance-theory background finishes it understanding the shape of the
+   thing. Ends with a pointer into the long whitepaper for anyone who wants
+   the argument, the citations, or the math. Same academic-honesty standard
+   (no live/proposed conflation) at plain-language altitude - closer to
+   `dreamnet-communication-standard.md`'s "Explain It To A 12-Year-Old"
+   register than to Ch 1's Preamble.
+
+Both documents ship together; the normie doc is not a replacement draft, it
+is the front door. Numbering: long whitepaper stays under this 942 lineage;
+the normie doc gets its own doc number when drafted (see doc 2358 below).
 
 ## Also See
 - [Doc 718](../718-zao-fractal-whitepaper-foundations/) - the 7-sub-doc research foundation + v1 outline

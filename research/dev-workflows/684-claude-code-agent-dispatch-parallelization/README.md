@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-21
 related-docs: 685, 793
 original-query: "is there a Cowork Dispatch equivalent for Claude Code, focused on making it easy to parallelize agents? (reconstructed from r/ClaudeCode inbox item)"
 tier: QUICK
@@ -36,10 +36,20 @@ Forwarded by Zaal to ZOE's inbox. Thread "Claude Code agent dispatcher!" (r/Clau
 
 The Reddit thread's own top answers converge on the same three things: dangeresque, cmux/tmux for visibility, and "Spawn agent already does this." ZAO is ahead of the question - QuadWork is the productized version.
 
+## Updated 2026-08-21
+
+Sources re-checked via full GitHub API fetch + WebSearch (FULL). Material changes since 2026-05-20:
+
+- **cmux (craigsc/cmux):** Stars grew 537 → 599. Last commit 2026-06-16; inactive since then.
+- **manaflow-ai/cmux (NEW):** A separate, full-featured project under the same name "cmux" has emerged and captured ecosystem mindshare. It is a native macOS Ghostty-based terminal for AI agents with vertical tabs, embedded browser, socket API, Claude Code Teams integration (`cmux claude-teams`), and oh-my-claudecode support. It has its own domain (cmux.com) and is actively developed. The original `craigsc/cmux` is the simpler shell wrapper; manaflow-ai/cmux is the one showing up in search and discourse. ZAO should track manaflow-ai/cmux, not just the original. Decision 3 above should be re-evaluated against it.
+- **dangeresque (slikk66):** Still active — last push 2026-08-08 (13 days before this check), 17 open issues, 27 stars, 1 fork. Feature claims from 2026-05-20 stand but verify against the repo before adopting any specific pattern.
+- **New tools:** mcpmarket.com now lists an "Agent Dispatcher" skill (orchestration layer with file-set assignment, parallel execution waves, retry/escalation) and a "Fan-Out: Parallel Agent Dispatch" skill. The space has moved toward MCP skills/wrappers rather than standalone binaries. Source: WebSearch PARTIAL — specific feature claims are not full-page-verified.
+
 ## Staleness Notes
 
-- Reddit thread + star counts: captured 2026-05-20. cmux at 537 stars; star counts drift.
+- Reddit thread star counts: captured 2026-05-20; cmux (craigsc) at 599 stars as of 2026-08-21 (GitHub API, FULL).
 - dangeresque is a thin wrapper under active development; verify the feature set on the repo before adopting any pattern.
+- manaflow-ai/cmux feature claims are WebSearch PARTIAL — fetch cmux.com and the GitHub repo before adopting.
 
 ## Sources
 

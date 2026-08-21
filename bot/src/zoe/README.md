@@ -95,6 +95,9 @@ Unconfigured groups log non-Zaal sender IDs to journal so Zaal can discover Tele
 | `BONFIRE_AGENT_ID` | no | agent UUID |
 | `ZOE_DEFAULT_MODEL` | no | default `sonnet` |
 | `ZOE_HARD_MODEL` | no | default `opus` |
+| `SURPLUS_API_KEY` | no | Surplus Intelligence - the second cheap cap-fallback rung, tried right after OpenRouter. Without it, an OpenRouter outage escalates straight to Grok/GPT, which are neither cheap nor always configured. On 2026-08-21 that gap took the whole fleet down: 17 loops, zero output. |
+| `SURPLUS_BASE_URL` | no | default `https://api.surplusintelligence.ai/v1`. Only set it if the endpoint moves. |
+| `SURPLUS_MODEL` | no | default `auto` - their router picks the cheapest healthy seller. |
 | `ZOE_QUICK_MODEL` | no | default `haiku` |
 
 ## Turn model (doc 872 - effectiveness)

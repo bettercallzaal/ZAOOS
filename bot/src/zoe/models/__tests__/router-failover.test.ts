@@ -17,7 +17,7 @@ import {
  * (openrouter fails -> grok succeeds) without hitting any provider.
  */
 
-const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL'];
+const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL', 'SURPLUS_API_KEY', 'SURPLUS_BASE_URL', 'SURPLUS_MODEL'];
 const saved: Record<string, string | undefined> = {};
 const realFetch = globalThis.fetch;
 
@@ -172,5 +172,83 @@ describe('callCapFallback tier routing (high-tier escalation, doc 2217)', () => 
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await callCapFallback('sys', 'msg');
     expect(bodyModelOf(fetchMock)).toBe('meta-llama/llama-4');
+  });
+});
+
+
+/**
+ * SURPLUS INTELLIGENCE - the second cheap rung, added 2026-08-21.
+ *
+ * The whole fleet went silent that morning - 17 loops, zero output - because
+ * OpenRouter ran out of credits and the next rung was Grok, which is neither
+ * cheap nor always configured. These tests pin the behaviour that prevents a
+ * repeat: a cheap provider must have a cheap provider behind it.
+ */
+describe('surplus intelligence fallback rung', () => {
+  it('counts as a cap-fallback provider on its own', () => {
+    setEnv({ OPENROUTER_API_KEY: undefined, XAI_API_KEY: undefined, OPENAI_API_KEY: undefined, SURPLUS_API_KEY: 'sk-surplus-test' });
+    expect(hasCapFallbackProvider()).toBe(true);
+  });
+
+  it('carries the call when OpenRouter is out of credits - the 2026-08-21 case', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'sk-or-test', SURPLUS_API_KEY: 'sk-surplus-test', XAI_API_KEY: undefined, OPENAI_API_KEY: undefined });
+    const seen: string[] = [];
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      const href = String(url);
+      seen.push(href);
+      if (href.includes('openrouter.ai')) {
+        // What a drained OpenRouter key actually returns.
+        return { ok: false, status: 402, text: async () => 'insufficient credits', json: async () => ({}) } as unknown as Response;
+      }
+      return okResponse('answered by surplus') as unknown as Response;
+    }) as typeof fetch;
+
+    const { result, provider } = await callCapFallback('sys', 'hello');
+    expect(provider).toBe('surplus');
+    expect(result.text).toBe('answered by surplus');
+    expect(result.model).toMatch(/^surplus\//);
+    // Order matters: OpenRouter is still tried first, Surplus is the catch.
+    expect(seen[0]).toContain('openrouter.ai');
+    expect(seen[1]).toContain('surplusintelligence.ai');
+  });
+
+  it('is tried BEFORE grok, so an outage does not escalate to an expensive tier', async () => {
+    setEnv({ OPENROUTER_API_KEY: undefined, SURPLUS_API_KEY: 'sk-surplus-test', XAI_API_KEY: 'xai-test', OPENAI_API_KEY: undefined });
+    const seen: string[] = [];
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      seen.push(String(url));
+      return okResponse('ok') as unknown as Response;
+    }) as typeof fetch;
+
+    const { provider } = await callCapFallback('sys', 'hello');
+    expect(provider).toBe('surplus');
+    expect(seen).toHaveLength(1);
+    expect(seen[0]).toContain('surplusintelligence.ai');
+  });
+
+  it('treats a 200 with an empty completion as a FAILURE, not an empty answer', async () => {
+    setEnv({ OPENROUTER_API_KEY: undefined, SURPLUS_API_KEY: 'sk-surplus-test', XAI_API_KEY: undefined, OPENAI_API_KEY: undefined });
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: '   ' } }], usage: {} }),
+      text: async () => '',
+    })) as unknown as typeof fetch;
+
+    // Handing the caller a blank reply and calling it success is the silent
+    // failure this guard exists to stop.
+    await expect(callCapFallback('sys', 'hello')).rejects.toThrow(/empty completion/i);
+  });
+
+  it('honours SURPLUS_BASE_URL so the endpoint can be corrected without a deploy', async () => {
+    setEnv({ OPENROUTER_API_KEY: undefined, SURPLUS_API_KEY: 'sk-surplus-test', SURPLUS_BASE_URL: 'https://example.test/v9', XAI_API_KEY: undefined, OPENAI_API_KEY: undefined });
+    let called = '';
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      called = String(url);
+      return okResponse('ok') as unknown as Response;
+    }) as typeof fetch;
+
+    await callCapFallback('sys', 'hello');
+    expect(called).toBe('https://example.test/v9/chat/completions');
   });
 });

@@ -333,15 +333,109 @@ async function callOpenRouter(
   }
 }
 
+
+/**
+ * Surplus Intelligence base URL. OpenAI-compatible: POST /chat/completions with
+ * a bearer token, same request and response shape as OpenRouter, which is why
+ * this rung is a near-copy rather than a new abstraction.
+ *
+ * SOURCED FROM THEIR DOCS PAGE VIA A SUMMARISING FETCH, not raw text, so treat
+ * the constant as unverified until the first live call succeeds
+ * (`research-grounding.md`). If it is wrong the call throws and the ladder falls
+ * through to the next provider - the cost of being wrong here is one wasted
+ * attempt, never a silent failure.
+ */
+const SURPLUS_DEFAULT_BASE = 'https://api.surplusintelligence.ai/v1';
+
+export function hasSurplusApiKey(): boolean {
+  return Boolean(process.env.SURPLUS_API_KEY?.trim());
+}
+
+async function callSurplus(
+  systemPrompt: string,
+  userMessage: string,
+  modelOverride?: string,
+): Promise<ClaudeCliResult> {
+  if (!hasSurplusApiKey()) {
+    throw new Error('SURPLUS_API_KEY not set');
+  }
+
+  const baseUrl = process.env.SURPLUS_BASE_URL?.trim() || SURPLUS_DEFAULT_BASE;
+  // Surplus routes "one API key, every model - to the cheapest healthy seller",
+  // so the model id is theirs to resolve. Left overridable because the catalogue
+  // is a marketplace and will move.
+  const model = modelOverride ?? process.env.SURPLUS_MODEL ?? 'auto';
+  const apiKey = process.env.SURPLUS_API_KEY;
+
+  const request: OpenAiRequest = {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage },
+    ],
+    temperature: 1,
+    max_tokens: FALLBACK_MAX_TOKENS,
+  };
+
+  const startMs = Date.now();
+
+  try {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'User-Agent': 'ZOE-bot/1.0',
+        'X-Title': 'ZOE',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Surplus API error ${response.status}: ${errorText.slice(0, 300)}`);
+    }
+
+    const data = (await response.json()) as OpenAiResponse;
+    const text = data.choices[0]?.message?.content ?? '';
+    // A 200 carrying an empty completion is a FAILED call, not an empty answer.
+    // Treating it as success would hand the caller a blank reply and report it
+    // as working (`liveness-probe-guard.md`, the companion clause).
+    if (!text.trim()) {
+      throw new Error('Surplus returned empty completion');
+    }
+
+    return {
+      text,
+      inputTokens: data.usage?.prompt_tokens ?? 0,
+      outputTokens: data.usage?.completion_tokens ?? 0,
+      totalCostUsd: 0,
+      model: `surplus/${model}`,
+      durationMs: Date.now() - startMs,
+      numTurns: 1,
+      isError: false,
+      sessionId: `surplus-${startMs}`,
+    };
+  } catch (error: unknown) {
+    throw new Error(`Surplus call failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 /**
  * CAP FALLBACK: the Claude CLI is rate-limited or over its weekly cap, so run
  * this concierge turn on the best available non-Claude provider instead of
- * failing. Tries OpenRouter first (cheap, always-on), then Grok, then GPT.
+ * failing. Order: OpenRouter, then Surplus Intelligence, then Grok, then GPT.
+ *
+ * Surplus sits SECOND on purpose. On 2026-08-21 the entire fleet went silent -
+ * 17 loops, zero output - because OpenRouter ran out of credits and the next
+ * rung was Grok, which is neither cheap nor always configured. A cheap provider
+ * needs a cheap provider behind it, or an outage at the top is an outage for
+ * everything.
  * Throws only if NO non-Claude provider is configured (then the caller surfaces
  * the original Claude error).
  */
 export function hasCapFallbackProvider(): boolean {
-  return hasOpenRouterApiKey() || hasGrokApiKey() || hasGptApiKey();
+  return hasOpenRouterApiKey() || hasSurplusApiKey() || hasGrokApiKey() || hasGptApiKey();
 }
 
 export async function callCapFallback(
@@ -356,11 +450,12 @@ export async function callCapFallback(
   const orModel = opts?.tier === 'high' ? OPENROUTER_HIGH_MODEL : undefined;
   const attempts: Array<{ name: string; fn: () => Promise<ClaudeCliResult> }> = [];
   if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage, orModel) });
+  if (hasSurplusApiKey()) attempts.push({ name: 'surplus', fn: () => callSurplus(systemPrompt, userMessage) });
   if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
   if (hasGptApiKey()) attempts.push({ name: 'gpt', fn: () => callGpt(systemPrompt, userMessage) });
 
   if (attempts.length === 0) {
-    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, XAI_API_KEY, or OPENAI_API_KEY)');
+    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, or OPENAI_API_KEY)');
   }
 
   const errors: string[] = [];

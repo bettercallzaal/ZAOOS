@@ -66,15 +66,16 @@ building**, before any of this doc's own analysis.
   framing ("ZOL, wallet-less by design... give ZOL the wallet Zaal
   deliberately withheld").
 
-**A nuance worth flagging, not silently resolving:** on the podcast Zaal
-says ZOL "has a wallet" already ("a Farcaster account, it has a wallet and a
-social identity"). Read together with the repo finding above, the likely
-reconciliation is that ZOL has an **address** (for receiving/holding, tied to
-its Farcaster identity) but no **autonomous spend logic** - which is exactly
-what "give it the wallet Zaal deliberately withheld" means: not creating an
-address, but granting it agency to spend from one. This is an inference, not
-confirmed against the actual ZOL codebase's Farcaster/wallet wiring - worth a
-five-minute check before anyone treats it as settled.
+**The "ZOL has a wallet" nuance - resolved, not inferred (2026-08-21).**
+Checked directly on the Pi: ZOL's only key material is `PRIVATE_KEY`, used by
+`~/zol/farcaster-agent/src/add-signer.js` to add a Farcaster signer key to
+its FID via a self-signed key request - the script's own docstring: "since
+you control the custody address, you can sign the key request." **That is a
+Farcaster custody key for authorizing a cast signer, not a spending wallet,
+and it has no spend authority.** "ZOL has a wallet," on the podcast, is true
+only in the narrow on-chain-address sense; it is false in the sense the
+MIDAO pitch means. The deliberate constraint - no spend authority until a
+legal body + hard caps exist - has not been given away.
 
 ## Why not ZOE
 
@@ -116,8 +117,6 @@ this decision.**
 
 ## What is still open (not this doc's job to resolve)
 
-- The wallet-address-vs-spend-authority nuance above, if it matters before
-  MIDAO/OtoCo formation params are drafted.
 - Everything OpenMatter-side: deployment mechanics, the credits/balance
   discrepancy, the overdue reply to Chris B - tracked in
   `zao-vault/handoffs/openmatter.md` and the doc 1659 addendum, not here.

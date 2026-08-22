@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-08-17
+last-validated: 2026-08-22
 superseded-by:
 related-docs: 625, 768, 798, 891, 1534, 2202, 2266
 original-query: "POIDH weekly ZAO video competition spec - open weekly internet competition, contestants say 'this is for the ZAO' at video start, post to X/IG/Farcaster, tag ZAO, submit screenshot + link to POIDH bounty. Spec: bounty structure on POIDH, judging, prize sizing options, anti-gaming, weekly cadence, winners feeding ZOLs/social. Board task P2, source onenote sweep. Raffle-safe: skill-judged only, no pre-announced random draws. PR-only, nothing outbound."
@@ -253,6 +253,12 @@ that config is a prerequisite, not a follow-up** - it is a dashboard change, no 
 | If greenlit: build `rounds/weekly/_template/` (description with embedded rubric, THE BAR, promo cast, mid-window cast) in zpoidh (shipped = PR merged, template renders a week-1 description) | @Zaal (Claude) | PR (zpoidh) | after Open Decisions 1+2 answered |
 | Run the week-1 description past Kenny before casting, as with R1 (shipped = Kenny's reply captured in `rounds/weekly/w01/`) | @Zaal | Outbound (Zaal sends) | before week 1 casts |
 | Migrate `scripts/refresh-poidh-leaderboard.py` off tRPC to POIDH's `/data` endpoint before a weekly loop depends on it (shipped = PR merged, script pulls `/data`) | @Zaal (Claude) | PR (zpoidh) | 2026-08-31 |
+
+## 2026-08-22 Review Notes
+
+- **R5 (WaveWarZ clip bounty) context:** Doc 2356 (WaveWarZ clip bounty pre-launch grounding) covers zpoidh R5 specifically — that round uses the same poidh spec as this weekly competition but is WaveWarZ-branded. R5 was due to launch 2026-08-21; status unknown from this machine.
+- **Farcaster operator crisis (doc 2374):** If POIDH has a Farcaster-based entry flow, the Neynar uncertainty affects it. The weekly video competition spec should note which parts of the submission/verification flow are Farcaster-dependent vs chain-native.
+- **ZOL mention-listening (doc 2375):** Doc 2375 covers ZOL picking up @warpee.eth Farcaster mentions. A POIDH submission via Farcaster cast could trigger ZOL's mention router — the two specs should be reconciled so ZOL doesn't duplicate or conflict with the poidh-native submission flow.
 
 ## Sources
 

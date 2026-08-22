@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-08-18
+last-validated: 2026-08-22
 related-docs: "2318, 2036"
 original-query: "organize all of this so that i can just use obsidian and claude for everything - /zao-research this (Obsidian + Claude as the complete personal stack, from the OneNote consolidation session)"
 tier: STANDARD
@@ -83,6 +83,12 @@ No native REST API, no native AI surface - community plugins only. Confirms the 
 | Approve conventions + vault-organizer Phase 1 together (one nod covers both, doc 2318 Next Actions) | @Zaal | approval | 2026-08-21 |
 | Working Copy on iPhone/iPad pointed at zao-vault for mobile access | @Zaal | setup, ~10 min | 2026-08-25 |
 | Re-check obsidian-mcp only when a second concurrent vault writer exists | @Claude(any lane) | deferred gate | wontfix until multi-writer |
+
+## 2026-08-22 Review Notes
+
+- **Vault as hub (doc 2319 outcome):** The vault-as-hub decision from doc 2317 is now implemented — `zao-vault/handoffs/` is the living handoff home (migrated 2026-08-18, 13 briefs, TEMPLATE, IN-FLIGHT, people/, inbox/, security-rotation brief). Doc 2319 cross-validates this decision.
+- **OneNote corpus (doc 2324):** The OneNote routing pass (142 pages, 2026-08-18) demonstrated that the vault taxonomy works for inbox routing. The vault-organizer spec in doc 2318 extends it with automated routing.
+- **Farcaster crisis context (doc 2374):** Obsidian + zao-vault captures ZAO institutional knowledge. If Neynar / Farcaster infrastructure is in handoff, the vault's role as a capture surface for intelligence (not just task state) becomes more important — the knowledge should not live solely in session context.
 
 ## Sources
 

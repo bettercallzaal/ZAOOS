@@ -2,7 +2,7 @@
 topic: infrastructure
 type: audit
 status: research-complete
-last-validated: 2026-08-19
+last-validated: 2026-08-22
 related-docs: 2319, 2321
 original-query: "we still have 192 according to our status bar please audit our status bar stuff everywhere and /zao-research more about it and next steps with fixing it and updating it to have more important info"
 tier: STANDARD
@@ -79,6 +79,13 @@ held: zao-cc-state.sh carries its own 2026-08-12 rebuild scar in a comment).
 - [Doc 2321](../../dev-workflows/2321-vault-organizer-pass/) - the organizer/queue system feeding the board counts
 - Board cards: 6b6875d1 (grill unification, PR #3163), 190a964e (tap digest), 6437e936 (cap scheduler)
 - Vault: notes/workflow-review-2026-08-19.md (the day's evidence base)
+
+## 2026-08-22 Review Notes
+
+- **Actions due today (Aug 22):** The dotfiles PR (zaal-dotfiles refresher: `err_prs`/`err_ci` flags, LANES segment, TAPS + CAP) was due 2026-08-22. Status unknown from this machine.
+- **PR #3163** (grill auto-reconcile + verdict sync) was due 2026-08-21. Check if merged.
+- **ZOE auth failure context:** As of 21:07 UTC today, ZOE is failing with auth expiry (doc 2377). If the statusline has a CAP segment showing usage-limit panes, it may not reflect an auth failure correctly — auth fails are a distinct error kind from CAP. Doc 2377 recommends extending `classifyClaudeError` with more patterns; once that ships, the CAP indicator can differentiate auth vs rate-limit.
+- **Related docs added:** 2377 (ZOE pipeline audit) and 2374 (Farcaster operator crisis — if the statusline tracks ZOL/Neynar health, that dependency is now at elevated risk).
 
 ## Sources
 

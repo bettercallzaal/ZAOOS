@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-08-18
+last-validated: 2026-08-22
 related-docs: "1181, 734, 997, 496, 759, 796, 983"
 original-query: "/zao-research eliza OS and how it manages stuff and also our hermes agent and audit it with the lens of being able to parse through all this data and info use its context to help add more and organize it or know it needs to ask me for more info to categorize it (the OneNote-to-Obsidian corpus, 142 pages captured 2026-08-18)"
 tier: STANDARD
@@ -102,6 +102,12 @@ The 2026-08-18 OneNote sweep (142 pages -> vault, `~/zao-vault/onenote/`) was or
 | Approve vault-organizer spec (section "The build") so Phase 1 (walker + classifier + grill queue) can be built PR-only | @Zaal | approval | 2026-08-21 |
 | Route the 2026-08-18 grill answers: CRM adds (devcon 5 + interviews 17), fractal-lane directive (respect awards), finance-lane bundle (money items) | @Claude(zaoos-infra lane) | lane dispatch + CRM rows | 2026-08-19 |
 | Add `scope:`/`confidence:` frontmatter convention to vault template (templates/ dir) - PR to zao-vault | @Claude(zaoos-infra lane) | PR | 2026-08-20 |
+
+## 2026-08-22 Review Notes
+
+- **ZOE module count re-verified 2026-08-22:** bot/src/zoe/ contains 130 .ts files (confirmed by direct file listing; matches the 130 stated in section 3 above — no drift). See doc 2239 (ZOE capability map, refreshed 2026-08-22) for the full updated module inventory.
+- **Vault-organizer spec approval** was due 2026-08-21 (yesterday). Status unknown from this machine; @Zaal tap needed.
+- **Neynar risk note:** doc 2374 documents the Aug 17 Farcaster operator crisis. Bonfire (`recall.ts`) is non-Neynar. ZOE's vault-organizer plan is unaffected — all proposed organs (memory-git, task-classifier, grill queue) are local. The ask-Zaal loop has no Neynar dependency.
 
 ## Sources
 

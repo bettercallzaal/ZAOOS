@@ -2,7 +2,7 @@
 topic: business
 type: scout
 status: research-complete
-last-validated: 2026-08-17
+last-validated: 2026-08-22
 related-docs: 844, 847, 852, 853, 924, 1079
 original-query: "Research TheJollyLaMa properly (repos + site) and draft an outreach note - zao-artizen lane founding directive, 2026-08-17"
 tier: STANDARD
@@ -445,6 +445,13 @@ channel from the call, send it there instead and cut the first line.
   it. (The fund's $15,431 season total is the quotable figure once there is a reason to quote one.)
 - Offering "happy to hand you the script" commits us to sharing `scripts/refresh-fund.mjs`. It is
   public-safe (no keys, no auth, reads a public page) - but confirm you want it public before offering.
+
+## 2026-08-22 Review Notes
+
+- **Contact window:** Issue #10 was opened 2026-08-15 (7 days ago). The window is still warm; GitHub issue threads don't decay the way social media does. Outbound remains GATED (Zaal to send).
+- **Season 7 Artifact mint** (Recommended sequence step 0) was due before 2026-08-20. That date has passed; current season status unknown from this machine. Check with Zaal before sending the outreach note to ensure the fund rank quote is still accurate.
+- **ZAO Fund rank as of last check:** #55 of 101 (verified 2026-08-18). Re-verify before referencing in any outreach.
+- **DecentBusking bounty bot** (ZOL payout pattern, step 5 in sequence): Still unread as of this review. Board 9540381a (ZOL mention-listening) has moved forward via doc 2375 but the bounty-bot pattern review has not been captured.
 
 ## Sources
 

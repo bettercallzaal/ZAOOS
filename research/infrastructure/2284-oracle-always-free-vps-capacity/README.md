@@ -2,9 +2,9 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-08-14
+last-validated: 2026-08-22
 superseded-by:
-related-docs: "2264, 1204, 601"
+related-docs: "2264, 1204, 601, project_no_vps2 (memory), project_vps_consolidation (memory)"
 original-query: "Oracle Cloud Always Free as VPS capacity for the ZAO fleet - real limits, capacity reality, reclamation, alternatives"
 tier: STANDARD
 ---
@@ -88,6 +88,80 @@ Found while auditing this: **`~/.ssh/config` contains two `Host ansuz` blocks** 
 | **Hetzner Cloud** | PARTIAL - pricing not retrieved, see Sources | ARM and x86 shared-vCPU shapes | None - you pay, it stays | The honest comparison if Oracle's terms are unacceptable |
 | **Current Hostinger VPS** | Already paid | Existing | None | Stays primary |
 
+## Addendum 2026-08-22: re-asked, the standing decision, a live re-check, and the missing signup detail
+
+Zaal re-asked to research + try this (2026-08-21 night). Almost caught myself
+about to write a second doc on the same topic - a search for "oracle" in
+`research/infrastructure/README.md` before starting would have surfaced this
+one immediately (`confirm-before-claiming-absence.md`). Adding to this doc
+instead of duplicating it.
+
+**The standing decision, named for the record.** `project_no_vps2` (memory,
+2026-04-23) says not to propose a second VPS without Zaal explicitly
+sanctioning one - this ask IS that sanction, and this doc's own verdicts above
+(loop overflow + bot migration: USE; hot standby: SKIP) already answer "what
+would it be for" correctly. Nothing in the verdicts above needs to change.
+
+**Tonight's actual trigger, diagnosed - it wasn't VPS 1 being down.** The
+immediate reason Zaal asked was VPS 1 (`31.97.148.88`) being unreachable from
+his Mac (SSH + ICMP both timed out). Confirmed the VPS itself was fine the
+whole time: reached it successfully via the Pi over Tailscale and got a real
+`Permission denied (publickey)` - a completed TCP+SSH handshake, not a
+timeout - meaning only the Mac's network path was blocked (its active VPN
+tunnel), not the VPS. Also confirmed independently via `bot_heartbeats`: all 5
+VPS bots (zoe, zaodevz, zaostock, zaocoworking, farscout) reported UP within
+the same minute this was being diagnosed. **A second VPS does not fix a
+blocked network path on one machine** - worth being explicit about this so
+Oracle doesn't get built for a problem it can't solve, only for the two
+verdicts already above (loop overflow, bot migration).
+
+**Re-checked the flagged `~/.ssh/config` bug - it is NOT currently broken.**
+This doc's Finding 5 flagged a duplicate `Host ansuz` block as a live
+misconfiguration with a 2026-08-16 fix deadline. Checked today, empirically
+(`ssh -G ansuz` / `ssh -G vps`, not just reading the file): `ansuz` correctly
+resolves to `100.117.191.11` (the Pi) and `vps` correctly resolves to
+`31.97.148.88`. The file does have two `Host ansuz` patterns (line 3 is a
+shared connection-reuse block matching `ansuz 31.97.148.88` together with no
+`HostName` of its own; line 14 sets `ansuz`'s actual `HostName`) - but because
+the shared block never sets `HostName`, ssh's per-keyword (not per-block)
+first-match resolution falls through to the correct value. Either this was
+fixed since 2026-08-14 or the original diagnosis was wrong; either way, the
+Next Action below is done - marked, not left stale (`recap-followthrough.md`:
+re-validate before citing, note what happened rather than silently leaving an
+overdue action item sitting there).
+
+**The signup walkthrough this doc didn't include**, since Next Actions here
+say "create the account" but not how:
+
+1. Home region: pick a 3-availability-domain region for latency (this doc
+   already argues latency over capacity, correctly) - `us-ashburn-1` per
+   Finding 3 above.
+2. Networking → Virtual Cloud Network → Start VCN Wizard → "Create VCN with
+   Internet Connectivity" - accept the defaults (auto-provisions public/private
+   subnet, Internet Gateway, NAT Gateway, Service Gateway).
+3. Open ports in the VCN's security list before provisioning anything - 22 at
+   minimum, 80/443 if serving HTTP(S). Default security lists are closed.
+4. Compute → Instances → Create Instance, shape `VM.Standard.A1.Flex`, 2 OCPU
+   / 12GB as one instance (matches this doc's Next Actions row already).
+5. Paste your own SSH public key rather than letting Oracle generate one.
+
+**A named capacity-retry tool**, where this doc previously had only a HN
+title as evidence retry tooling exists:
+[`hitrov/oci-arm-host-capacity`](https://github.com/hitrov/oci-arm-host-capacity)
+[FULL, fetched directly] - a PHP script polling OCI's `LaunchInstance` API
+(cron every minute, or a GitHub Actions workflow every 5-20 minutes) that
+provisions automatically the moment capacity appears. Needs an OCI API key
+pair (OCI Console → generate), the subnet ID + image ID (grab via browser
+devtools during one manual attempt), and an SSH public key. This is a normal
+retry pattern against Oracle's own public API, not a workaround of anything
+against ToS.
+
+Corroborating source on the idle-reclamation thresholds (this doc's Finding 2)
+- treat as directional only, it's dated 2023 and Oracle's policy language
+may have shifted since: [LowEndTalk - Oracle may reclaim your idle
+VPS](https://lowendtalk.com/discussion/184161/oracle-may-reclaim-your-idle-vps)
+[PARTIAL, search snippet].
+
 ## Also See
 
 - [Doc 2264](../2264-mac-offline-always-on-migration/) - the Mac always-on migration this capacity question sits next to
@@ -98,9 +172,9 @@ Found while auditing this: **`~/.ssh/config` contains two `Host ansuz` blocks** 
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Create the Oracle Cloud account at oracle.com/cloud/free, home region us-ashburn-1. Done when the tenancy exists and the region is confirmed in the Console | @Zaal | Manual, gated | 2026-08-18 |
-| Fix the duplicate `Host ansuz` block in `~/.ssh/config` so `ansuz` resolves to 100.117.191.11. Done when `ssh -G ansuz` reports the Tailscale IP | @Zaal | Config | 2026-08-16 |
-| Provision A1 at 2 OCPU / 12GB / 100GB boot, retrying on out-of-capacity. Done when the instance is reachable over SSH | @Zaal | Infra | 2026-08-20 |
+| Create the Oracle Cloud account at oracle.com/cloud/free, home region us-ashburn-1. Done when the tenancy exists and the region is confirmed in the Console | @Zaal | Manual, gated | still open, re-sanctioned 2026-08-22 |
+| ~~Fix the duplicate `Host ansuz` block~~ - **DONE, re-verified 2026-08-22**: `ssh -G ansuz` correctly reports 100.117.191.11, `ssh -G vps` correctly reports 31.97.148.88 | @Zaal | Config | closed 2026-08-22 |
+| Provision A1 at 2 OCPU / 12GB / 100GB boot, retrying on out-of-capacity (script: `hitrov/oci-arm-host-capacity`, see addendum). Done when the instance is reachable over SSH | @Zaal | Infra | still open |
 | Confirm whether a reserved public IPv4 is inside Always Free before pointing any DNS or ssh config at the box. Done when the answer is written into this doc | @Zaal | Verify | 2026-08-20 |
 | Migrate one fleet loop (not a bot) as the first workload, to prove the box stays above the idle threshold. Done when 7 days pass without reclamation | @Zaal | Infra | 2026-08-28 |
 

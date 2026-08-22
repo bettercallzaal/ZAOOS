@@ -2,8 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-08-18
-related-docs: "2092, 2317, 2318"
+last-validated: 2026-08-22
+related-docs: "2092, 2317, 2318, 2373, 2374"
 original-query: "can we improve our handoffs from project to project and claude code sessions to claude code session and device to device lets audit our workflow and find places for improvement (+ 9 grill rounds, 36 decisions)"
 tier: STANDARD
 ---
@@ -75,6 +75,13 @@ tier: STANDARD
 | Update agent-loops rule 36 wording (lane_handoffs -> vault briefs) | @Claude(zaoos-infra lane) | PR | 2026-08-20 |
 | iPhone capture Shortcut -> Working Copy -> inbox/ | @Zaal + lane doc | setup | 2026-08-23 |
 | Failure drill, then relay decommission audit | @Claude(any lane) | drill + doc | 2026-08-24 |
+
+## 2026-08-22 Review Notes
+
+- **Proven value since shipping:** The IN-FLIGHT.md cross-lane collision system caught 3 doc-number collisions in one session (2026-08-22) — docs 1659/2273/2282 renamed to 2370/2371/2372 via PR #3251. The system works.
+- **Doc 2373 (ZAO Mistakes Log, 2026-08-22):** documents production failures; several of them (Silent-Failure pattern ×4) correlate directly with the "merged ≠ running" finding in this audit. The two docs are complementary.
+- **Neynar / Farcaster operator crisis (doc 2374, 2026-08-17):** The operator handoff is a scenario the handoff system was explicitly designed for — platform handoffs with visible restart debt. ZOL (ZOE's Farcaster output lane) depends on Neynar and is the first continuity concern. A `handoffs/zol-neynar-continuity.md` brief is the recommended pre-emptive action.
+- **Security rotation block (zao-rotate):** was due 2026-08-18. `~/zao-vault/handoffs/security-rotation.md` was NOT found on this Linux machine as of 2026-08-22; the block is still pending. Board card 9417 (P1) is open.
 
 ## Sources
 - Direct inventory: `ls ~/.zao/handoffs` (37 files), `research/_handoffs/` (3), cowork Supabase information_schema query (lane_handoffs absent), `~/bin/lane-send` header (executed-into-shell scar), doc 2092 full read - [FULL, local reads + live query 2026-08-18]

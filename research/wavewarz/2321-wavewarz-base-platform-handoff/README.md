@@ -2,9 +2,9 @@
 topic: wavewarz
 type: audit
 status: research-complete
-last-validated: 2026-08-18
+last-validated: 2026-08-22
 superseded-by:
-related-docs: "2320"
+related-docs: "2320, 2374"
 original-query: "WW Base handoff (onenote/todo/ww-base.md, 681L) -> ZAOOS research doc (organizer lane queued item, 2026-08-18). Source: Samantha (Candy / @candytoybox) full platform audit dated April 9, 2026."
 tier: STANDARD
 ---
@@ -82,6 +82,13 @@ The audit is dated April 9, 2026 - 4 months old at ingestion. Deploy states, fun
 | Run the ZAAL access checklist with Samantha (GitHub org, Vercel, Railway, Supabase, CDP Option A) - shipped = all 6 completion checks in the vault mirror ticked | @Zaal + @Samantha | outreach (Zaal's tap) | 2026-08-28 |
 | Re-verify audit state with Samantha (deploys still live? funding? pending list changes since April) - shipped = dated addendum appended to this doc | @Zaal | message + doc update | 2026-08-28 |
 | Fold the compromised-wallet history + CDP key locations into the zao-rotate security block context - shipped = line added to handoffs/security-rotation.md | organizer lane | vault edit | 2026-08-19 |
+
+## 2026-08-22 Review Notes
+
+- **Audit age:** 4.5 months old as of this review (April 9 → Aug 22). The re-verification with Samantha (@candytoybox) was due 2026-08-28 — still upcoming. This doc remains the best available baseline until then.
+- **Farcaster operator crisis context (doc 2374):** The WaveWarZ miniapp opportunity on Farcaster is MORE urgent given the operator uncertainty, not less. WaveWarZ Bracket Wars (see doc 2374 §WaveWarZ miniapp opportunity) was identified as the fastest ZAO product to ship before ecosystem restructuring. This Base platform (agentic AI battles) is a parallel track; the Farcaster miniapp spec should reference this doc for the Base infrastructure that will back the agent-battle content.
+- **x402 integration:** WaveWarZ Base already has `@coinbase/x402` 2.1.0 wired (not yet monetized). The Warpee API also uses x402 (doc 1477). These two stacks share the payment primitive — worth noting for any joint demo.
+- **Compromised wallet addendum:** the security-rotation.md brief should mention the retired `0x510B...` wallet. This action was due 2026-08-19; `~/zao-vault/handoffs/security-rotation.md` was NOT found on the Linux machine as of 2026-08-22. Will land with the security rotation block (board 9417).
 
 ## Sources
 

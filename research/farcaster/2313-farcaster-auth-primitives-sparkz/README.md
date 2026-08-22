@@ -2,9 +2,9 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-08-17
+last-validated: 2026-08-22
 superseded-by:
-related-docs: 591, 595, 2251
+related-docs: 591, 595, 2251, 2374
 original-query: "DEEP research for Sparkz (bettercallzaal/sparkz): the right way to build owner-by-FID auth in 2026, before we build it. Compare the three Farcaster auth primitives - Quick Auth (JWT, what ZAODEVZ/zabalgames api/lib/auth.mjs verifies), SIWF via @farcaster/auth-kit + server-side verifySignInMessage (what Sparkz's client already uses), and SIWN/Neynar managed signers (what zaalcaster uses) - for a Next.js App Router + Supabase app that needs: (a) web sign-in on trysparkz.com, (b) mini-app sign-in inside Farcaster clients, (c) a server session that gates per-Hearth owner actions (requireHearthOwner), (d) eventually cast publishing for receipts. Which primitive(s) to use where, what's current/deprecated in 2026 (auth-kit vs @farcaster/quick-auth vs miniapp-sdk), session strategy (JWT vs httpOnly cookie + HMAC), and how zabalgames' JWKS verifier fits. Also cover the secondary question: receipts measurement patterns - the right Neynar surface for measuring a cast's reach/engagement post-publish."
 tier: DEEP
 ---
@@ -85,6 +85,23 @@ question: does the session FID own this Hearth (or is it the operator)?
 | Swap gates to owner-or-admin on visibility/settings/empire-deploy + create-spark takes owner_fid from the verified session; PR merged | @Zaal | PR | 2026-08-24 |
 | Live test: Zaal signs in with FID 19640 and toggles ZABAL GAMEZ integration visibility WITHOUT the operator token; works on trysparkz.com | @Zaal | test | 2026-08-24 |
 | Receipts measurement spike: wire Neynar `GET /v2/farcaster/cast` into a receipts-update job when cast publishing lands; PR merged | @Zaal | PR | 2026-09-05 |
+
+## 2026-08-22 Review Addendum: Neynar operator uncertainty
+
+**Context:** On 2026-08-17 Farcaster announced it is seeking a 3rd operator in 8 months. Neynar is the affected infrastructure layer (doc 2374 covers this in full). Revenue collapsed ~99% Q1→Q3 2026. The handoff/continuity plan is open at the time of this review.
+
+**Impact on this doc's decisions:**
+
+| Decision affected | Impact |
+|---|---|
+| D1 – Quick Auth JWT | **UNAFFECTED.** Quick Auth is issued by `auth.farcaster.xyz`, which is controlled by the Farcaster protocol (not Neynar). JWKS endpoint at `auth.farcaster.xyz/.well-known/jwks.json` is protocol infrastructure. The zabalgames verifier lift remains the correct call. |
+| D2 – SIWF via auth-kit | **UNAFFECTED.** `@farcaster/auth-kit` is an open-source library; the server-verify call hits the key registry (protocol layer). Not Neynar. |
+| D4 – SIWN deprecated | **MORE CONFIRMED.** SIWN was already deprecated 2026-08-14; the operator change makes the managed-signer future even more uncertain. Skip with higher confidence. |
+| D8 – Receipts via `GET /v2/farcaster/cast` | **ELEVATED RISK.** This endpoint is Neynar-served. During a handoff/transition period, the Neynar API may change pricing, availability, or become unavailable. For early Sparkz volumes the 200K CU free tier is likely stable, but `NEYNAR_API_KEY` and the CU cost model should be re-verified at the time of receipts build (doc 2374 recommends an alt-API audit before any new Neynar dependencies). **Mitigation: design the receipts updater with a `CAST_DATA_PROVIDER` env var so a fallback endpoint can be swapped in.** |
+
+**The two-door, one-session architecture is operator-agnostic.** The auth path (Quick Auth JWT + auth-kit SIWF → HMAC session cookie) runs on protocol infrastructure and does not route through Neynar. Ship the owner-auth PR without modification to this design.
+
+**Owner-auth PR status:** was due 2026-08-22. Status unknown as of this review.
 
 ## Sources
 

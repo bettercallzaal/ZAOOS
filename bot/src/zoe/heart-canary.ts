@@ -34,6 +34,17 @@ import { db } from '../supabase';
 
 const CANARY_KIND = 'zoe.heart.canary';
 const CANARY_KEY = 'singleton';
+// agent_runs.assignment_id is `uuid NOT NULL` with no default. This used to be
+// set to the template string `heart-canary:singleton`, which Postgres rejected
+// on EVERY tick with:
+//   invalid input syntax for type uuid: "heart-canary:singleton"
+// so the canary could never create its run row and never reached INTENT.
+// Measured live 2026-08-22: flag on for ~7 minutes, one tick, effect_intents
+// stayed 0. The canary is a singleton, so a fixed UUID is correct here - it must
+// be stable across restarts so the find-or-create actually finds. Not derived
+// from deterministicResourceId(), which returns `heart:resource:<sha256>` and is
+// a string by design (correct for the TEXT idempotency_key column below).
+const CANARY_ASSIGNMENT_ID = '00000000-0000-4000-8000-00000000ca27';
 
 /** Fixed demo content - a deterministic effect_key, so it sends ONCE ever then
  *  dedupes on every subsequent beat (that IS the at-most-once proof). */
@@ -133,7 +144,7 @@ async function ensureCanaryRun(): Promise<string | null> {
     .from('agent_runs')
     .insert({
       id: randomUUID(),
-      assignment_id: `heart-canary:${CANARY_KEY}`,
+      assignment_id: CANARY_ASSIGNMENT_ID,
       objective: 'Heart fleet canary: lease-guarded no-op proving the shared lease layer on the live table',
       required_capabilities: [],
       status: 'ready',

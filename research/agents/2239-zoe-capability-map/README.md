@@ -2,7 +2,7 @@
 topic: agents
 type: reference
 status: research-complete
-last-validated: 2026-08-07
+last-validated: 2026-08-22
 related-docs: 2235, 601, 759
 original-query: "keep a living ZOE capability map so 'is this already built?' is a 10-second lookup (confirm-before-claiming-absence.md)"
 tier: STANDARD
@@ -28,9 +28,11 @@ tier: STANDARD
   `wf_eddf1949-77d`) reading the real 102 module headers; 5 modules spot-checked
   against source by the orchestrator on 2026-08-07 (reflexion, decompose, focus-guard,
   receipt-envelope, golden-eval - all match). Post-inventory adds (2026-08-07):
-  `memory-git.ts`, `guardrails.ts`, `guardrail-adapters.ts` (#2932).
+  `memory-git.ts`, `guardrails.ts`, `guardrail-adapters.ts` (#2932). Refresh (2026-08-22):
+  25 new modules added across bus, DM-build, federation, board-commands, and
+  pinned-brief subsystems (board task 9550).
 
-## ZOE Capability Inventory (102 files, ground-truth read)
+## ZOE Capability Inventory (130 files, ground-truth read)
 
 **MEMORY & RECALL**
 
@@ -63,6 +65,9 @@ tier: STANDARD
 | `topic-router.ts` | Map topic → behavior (intent-based routing; internal vs outbound) |
 | `tasks.ts` | Task queue read/write (~/.zao/zoe/tasks.json; TaskOp[] apply) |
 | `task-classifier.ts` | Auto-tag tasks (brand, work-type, themes, next_owner from title+notes) |
+| `heart-run.ts` | Resolve the agent_runs row that a Heart lease fences on (fixes runId bug in scheduler.ts) |
+| `tick-lock.ts` | Atomic single-instance lock for autonomous loops (replaces duplicate copy in work-loop + orchestrator-tick) |
+| `work-park.ts` | Failed work survives in a park (not deleted); can be queried and retried later |
 
 **COMMUNICATIONS (Telegram/Discord/Relay/Voice)**
 
@@ -82,6 +87,9 @@ tier: STANDARD
 | `discord-webhook.ts` | Discord status feed (POST to incoming webhook) |
 | `message-context.ts` | [message context enrichment] |
 | `curator.ts` | Clean-curator topic posting (low-freq, curated, deduplicated) |
+| `live-status.ts` | One message that updates in-place via editMessageText (vs sending multiple new messages) |
+| `topics.ts` | Forum-topic registry for ZAAL BOTZ ops group (name → message_thread_id, persisted to ~/.zao/zoe/topics.json) |
+| `thread-ops.ts` | Apply concierge's thread_ops (doc 796 Move 2); bridges hot store (threads.ts) + Bonfire emit (thread-memory.ts) |
 
 **SAFETY & GUARDRAILS**
 
@@ -107,6 +115,10 @@ tier: STANDARD
 | `watcher.ts` | Dispatch supervisor (reads runs.ts telemetry; cost/fail/quality anomalies) |
 | `advisors.ts` | Advisory sandbox (independent reviewers for Hermes decisions; no autonomous acts) |
 | `golden-eval.ts` | Regression harness (doc 2200; fixed golden set for persona/worker-spec changes) |
+| `feature-ran.ts` | Let a feature report once that it actually executed in production (solves "shipped but never verified running" gap) |
+| `done-work-detector.ts` | Detect open board tasks whose work has verifiably concluded (hourly pass; closes them automatically) |
+| `federation-checkpoint.ts` | Durable checkpoint for DreamNet federation canary (crash → resume instead of repeat) |
+| `federation-states.ts` | Terminal-state vocabulary for federation canary (both sides must prove success; no unilateral "done") |
 
 **IDENTITY & TRUST**
 
@@ -117,6 +129,25 @@ tier: STANDARD
 | `identities.ts` | Per-brand Identity Kit registry (doc 2155; brand-specific contexts) |
 | `brand-brain.ts` | ICM box fetching + caching (useicm.com; brand-specific ZOE voices) |
 | `fleet.ts` | Per-brand mailbox ingestion (iterates identity registry; skips unset keys) |
+| `bonfire-retry.ts` | Retry queue for ALL Bonfire writes (not just thread emits); replays on recovery, never accepts loss |
+
+**BUS / DREAMNET FEDERATION**
+
+| File | Purpose |
+|------|---------|
+| `bus-bridge.ts` | See a partner-bus message and reply well from phone (full body, not truncated; usable reply path) |
+| `bus-send.ts` | Parse "reply XXXX <words>" from a bus message and send via DreamNet bus |
+| `bus-receipt.ts` | ACK a DreamNet federation receipt and verify its content + message-ID hashes |
+| `bus-upload.ts` | Upload files to DreamNet federation bus with local sha256 verification |
+
+**DM BUILD FLOW**
+
+| File | Purpose |
+|------|---------|
+| `build-intent.ts` | Detect whether a DM to ZOE is asking for code to be written (classification gate) |
+| `dm-build-session.ts` | Make a running DM build steerable (mid-run steering; "no, use the other table" reaches the coder) |
+| `dm-build-pending.ts` | Pure half of DM build buttons (unit-testable; no grammy import so vitest runs) |
+| `dm-build-buttons.ts` | Inline keyboards for the DM build flow (every decision → a tap, not typing) |
 
 **REASONING & PROACTIVITY**
 
@@ -128,6 +159,9 @@ tier: STANDARD
 | `escalation.ts` | Resend critical pings if unack'd (escalating→decaying ladder) |
 | `events.ts` | Proactive event candidates (TAGGED: [SHIPPED], [STALE PR], [CI FAIL], ...) |
 | `pending-decisions.ts` | Surface pending decisions for morning brief (PRs, review queue, assigned tasks) |
+| `pinned-brief.ts` | ONE pinned Telegram message = always current state (replaces artifact-making; Zaal: "stop making artifacts they just get lost") |
+| `pinned-brief-runner.ts` | IO half: gathers real VPS state cheaply and keeps pinned-brief current |
+| `mission-control.ts` | Pure render + emit layer for TG pinned mission-control (doc 2226; parse step-journal, render pinned text) |
 
 **DAILY/SCHEDULED CYCLES**
 
@@ -160,6 +194,11 @@ tier: STANDARD
 | `daily-note.ts` | Auto-rollover daily notes (one per day; unchecked→top, increment roll_count) |
 | `ping-lifecycle.ts` | Tie task lifecycle to message pings (close task → resolve ping) |
 | `handoffs-surface.ts` | Post new handoffs to Handoffs topic (de-duped via last-seen) |
+| `backlog-grill.ts` | Drip the board backlog to Zaal's phone one card at a time (answered by number button) |
+| `backlog-grill-runner.ts` | IO half of backlog grill (reads board, sends card, records verdict; no policy) |
+| `board-commands.ts` | Pure layer: parse @zoe board comments into authorized commands (fully unit-tested) |
+| `board-command-executor.ts` | IO layer: execute commands authorized by board-commands.ts (no autonomous policy) |
+| `teammate-heartbeat.ts` | Ask a teammate what they're on (measured Iman accountability gap; pings on schedule) |
 
 **RESEARCH & DOCS**
 
@@ -202,6 +241,18 @@ tier: STANDARD
 | `env.ts` | Single source of truth for aliased env vars (prevents drift bugs) |
 | `node-cron.d.ts` | TypeScript definitions for node-cron |
 
+---
+
+**POST-INVENTORY ADDITIONS (2026-08-07, #2932)**
+
+| File | Purpose |
+|------|---------|
+| `memory-git.ts` | Commit-per-edit versioning of ~/.zao/zoe memory (flag ZOE_MEMORY_GIT=1; history/why/rollback) |
+| `guardrails.ts` | Composable Guardrail interface + runGuardrails pipeline (collect-all trips) |
+| `guardrail-adapters.ts` | cost/pii/preflight bound to the Guardrail interface + runConciergeGuardrails() |
+
+---
+
 **KEY GAPS ADDRESSED (doc 927 orchestrator vision)**
 
 - Gap 1: `decompose.ts` (structured goal decomposition)
@@ -214,16 +265,14 @@ tier: STANDARD
 
 **SUMMARY**
 
-ZOE is a multi-layered orchestrator across **6 architectural tiers**: (1) **Concierge brain** (concierge.ts + memory blocks); (2) **Orchestration** (decompose/dispatch/workers); (3) **Autonomy** (error-remediation, repo-improver, work-loop); (4) **Trust** (receipts, identities, brand-brain); (5) **Communications** (Telegram, Discord, relay, voice); (6) **Safety** (budgets, PII, cost governance, guards). The system is strongly gated: config preflight (fail-loud), live steering (turn-queue), team-aware (board bridge), and audit-ready (receipts, traces, golden-eval).
+ZOE is a multi-layered orchestrator across **8 architectural tiers**: (1) **Concierge brain** (concierge.ts + memory blocks); (2) **Orchestration** (decompose/dispatch/workers/tick-lock); (3) **Autonomy** (error-remediation, repo-improver, work-loop, done-work-detector); (4) **Trust** (receipts, identities, brand-brain, bonfire-retry); (5) **Communications** (Telegram, Discord, relay, voice, live-status, thread-ops); (6) **Safety** (budgets, PII, cost governance, guards); (7) **Bus/Federation** (bus-bridge/send/receipt/upload, federation-checkpoint/states — DreamNet integration); (8) **DM Build Flow** (build-intent, dm-build-session/buttons/pending — full Telegram → code path). The system is strongly gated: config preflight (fail-loud), live steering (turn-queue), team-aware (board bridge + board-commands), and audit-ready (receipts, traces, golden-eval, feature-ran).
 
-**Real code is ground truth.** All 102 files read directly from `/Users/zaalpanthaki/Documents/ZAO OS\ V1/bot/src/zoe/` with docstring headers verified.
-**Post-inventory additions (2026-08-07, #2932):**
+**Real code is ground truth.** All 130 files read directly from `~/zao-bot-live/bot/src/zoe/*.ts` headers.
 
-| File | Purpose |
-|------|---------|
-| `memory-git.ts` | Commit-per-edit versioning of ~/.zao/zoe memory (flag ZOE_MEMORY_GIT=1; history/why/rollback) |
-| `guardrails.ts` | Composable Guardrail interface + runGuardrails pipeline (collect-all trips) |
-| `guardrail-adapters.ts` | cost/pii/preflight bound to the Guardrail interface + runConciergeGuardrails() |
+**Refresh history:**
+- 2026-08-06: Initial inventory (102 modules, workflow wf_eddf1949-77d)
+- 2026-08-07: +3 post-inventory adds (memory-git, guardrails, guardrail-adapters — PR #2932)
+- 2026-08-22: +25 new modules (bus, DM-build, federation, board-commands, pinned-brief, tick-lock, heart-run, work-park, teammate-heartbeat, done-work-detector, feature-ran, live-status, thread-ops, topics — board task 9550)
 
 ## Next Actions
 
@@ -237,6 +286,7 @@ ZOE is a multi-layered orchestrator across **6 architectural tiers**: (1) **Conc
 - Workflow `wf_eddf1949-77d` grounded inventory (102 module headers read). [FULL]
 - Orchestrator spot-checks 2026-08-07: reflexion.ts, decompose.ts, focus-guard.ts,
   receipt-envelope.ts, golden-eval.ts headers vs claims - all match. [FULL]
+- 2026-08-22 refresh: headers of all 25 new modules read directly from ~/zao-bot-live/bot/src/zoe/ [FULL]
 - `.claude/rules/confirm-before-claiming-absence.md` (the rule this map serves). [FULL]
 
 ## Also See

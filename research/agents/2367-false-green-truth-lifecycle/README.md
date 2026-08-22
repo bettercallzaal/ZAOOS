@@ -212,6 +212,72 @@ Brandon asked to be told if the premise is wrong. Two corrections, one addition:
   a single lifecycle model onto them would design out V2 and V5.
 - **He is missing two incidents** (V4, V5), both live, one on a public account.
 
+
+## THE INDEPENDENT DERIVATION IS IN - and it converges with measurement
+
+Commissioned and returned 2026-08-22. Verbatim at
+[`INDEPENDENT-DERIVATION.md`](./INDEPENDENT-DERIVATION.md); the exact prompt it
+received at [`DERIVATION-BRIEF.md`](./DERIVATION-BRIEF.md).
+
+**Independence is verified, not asserted.** It ran in a neutral directory with
+no `CLAUDE.md` and no `.claude/rules` resolving from it (checked by walking the
+parent chain before dispatch). The brief was scrubbed to zero occurrences of
+ZAO/ZOE/ZOL/organism/bloodstream/Brandon/Zaal/rule-names, and its 325-line
+output contains **zero** of those terms coming back. It made 2 tool calls (read
+the brief, write the derivation) - correct for a closed reasoning task, and
+worth stating because two earlier subagents this session fabricated output while
+making zero real calls.
+
+### Its headline finding, and why it is credible
+
+> **"All five diagnostic questions reduce to arithmetic, not reasoning."**
+
+| Incident | Its derived check | Type |
+|---|---|---|
+| A | `compare(http_status, 200)` | equality |
+| B | `exists(measurement_file)` | existence |
+| C | `count(queue where new AND id not in delivered)` | set difference |
+| D | `compare(recent_logs + cpu + files_written, >0)` | comparison |
+| E | `forall(entities, exists_in_corpus)` | existence |
+
+**Three of those five are checks this session actually ran today, and each one
+caught its incident:** the missing `-f` at `heartbeat.sh:30` (A), the
+logs+cpu+files test that caught farscout (D), and the corpus grep that caught
+ZOL's five fabricated entities (E). An uncontaminated agent derived from
+evidence alone the same checks a contaminated one had already validated by
+execution. That convergence is the strongest evidence in this doc that the model
+is right.
+
+### Where it AGREES with this doc (derived separately)
+
+- Transport stays simple; verification belongs in business logic.
+- The nine-stage lifecycle is too long and "creates false checkpoints."
+- Do not build automatic question-generation or question-pattern promotion.
+
+### Where it DISAGREES with this doc - the useful part
+
+- **This doc argued against a new monitor** (prefer extending the existing
+  write-not-liveness audit). **It argues a narrow monitor IS warranted** - but
+  defines it as "five arithmetic operations: two equality comparisons, two
+  existence checks, one set difference," explicitly *not* a reasoning engine.
+  The disagreement is smaller than it looks and resolves in its favour: five
+  cheap assertions on a timer is closer to a cron than an organ, which is what
+  doc 2368's null hypothesis proposed anyway.
+- **On Brandon's "treat these as ONE problem":** this doc said no. It says
+  **"conceptually ONE, operationally SEVERAL"** - one principle (verify every
+  report), five different verification strategies. That is a better answer than
+  either of ours and is adopted here.
+
+### Its verdict on the reverse-prompt reflex
+
+Against. Not because questioning is bad, but because the specific questions
+Brandon wants generated are arithmetic, so a reasoning layer would be paying
+LLM cost for what a comparison operator already answers - and because
+"questions that fire frequently are usually high-precision failures or
+low-precision false alarms," so promoting patterns by firing-frequency selects
+for noise. **Doc 2366 measured that exact failure independently: 429 messages,
+0 actionable.**
+
 ## Next Actions
 
 | Action | Owner | Type | By When |

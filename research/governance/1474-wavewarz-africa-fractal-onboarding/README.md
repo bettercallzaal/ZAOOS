@@ -1,9 +1,9 @@
 ---
 topic: governance
 type: plan
-status: in-progress
-last-validated: 2026-07-18
-related-docs: 1232 (growing-fractals playbook), 1224 (fractal campaign narrative), 1227 (eden learnings), 696 (fractal whitepaper), 1254 (100-week record)
+status: research-complete
+last-validated: 2026-08-22
+related-docs: 1232 (growing-fractals playbook), 1224 (fractal campaign narrative), 1227 (eden learnings), 696 (fractal whitepaper), 1254 (100-week record), 1683 (africa artist welcome packet), 1699 (session97 africa kickoff runbook), 1774 (fractal campaign narrative v2)
 original-query: "WaveWarZ Africa Fractal: research + doc the onboarding plan for WaveWarZ Africa artists into the ZAO Fractal (per session notes from Jul 17 — Iman's brief)"
 tier: STANDARD
 ---

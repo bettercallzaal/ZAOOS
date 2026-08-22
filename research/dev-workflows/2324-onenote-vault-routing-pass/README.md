@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-08-19
+last-validated: 2026-08-22
 superseded-by:
 related-docs: "2317, 2318, 2319, 2320, 2321"
 original-query: "Write the pass-record doc for the OneNote 142/142 vault routing pass (organizer lane, 2026-08-18/19). Original claim of doc 2321 collided with the WaveWarZ Base platform handoff; audit ordered a fresh reservation-scanned number. (reconstructed)"
@@ -57,6 +57,12 @@ The organizer lane's IN-FLIGHT row claimed **doc 2321** for this pass, but 2321 
 | Merge this PR so the routing pass has a merged record (shipped when PR merged) | @Zaal | PR review | 2026-08-22 |
 | Pick a songs option from ~/.zao/clipboard/songs-options.md (shipped when choice lands in a lane brief) | @Zaal | Decision | 2026-08-26 |
 | Add "number must be in a pushed branch within the same session as the IN-FLIGHT claim" to the organizer brief template (shipped when brief updated in zao-vault) | @Zaal | Vault edit | 2026-08-26 |
+
+## 2026-08-22 Review Notes
+
+- **Vault-organizer spec (doc 2318):** The 142-page routing pass from this doc proved the ask-loop is necessary — 3 of 4 uncertain items needed Zaal's context. Doc 2318 proposes a `vault-organizer` ZOE-side loop that automates the confident routing and queues the rest as grill cards. Vault-organizer spec approval was due 2026-08-21 (1 day past due).
+- **Follow-up: CRM adds from this pass** — devcon 5 contacts + 17 interview list entries — were identified as an action item in doc 2318. Status unknown from this machine.
+- **Grill queue pattern confirmed:** The grill answer captures from this session (respect awards → fractal-lane, money items → finance-lane, interview contacts → CRM) document the NEEDS_ZAAL reason codes that doc 2318's vault-organizer would emit for low-confidence items.
 
 ## Sources
 

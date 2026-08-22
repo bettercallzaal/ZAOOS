@@ -2,7 +2,7 @@
 topic: wavewarz
 type: decision
 status: research-complete
-last-validated: 2026-08-20
+last-validated: 2026-08-22
 related-docs: 533, 625, 768, 1223, 1293, 2308
 original-query: "QUICK tier: ground the WaveWarZ Twitch clip bounty (zpoidh R5) before launch. Questions: (1) current WaveWarZ facts as of Aug 2026 - stream schedule, channels, team handles, recent notable battles or moments worth pointing clippers at; (2) what poidh clip/video bounties have actually drawn the most claims and at what prize sizes, from poidh.xyz live data; (3) comparable clipping programs (Whop clipping campaigns, creator clipper programs) - typical pay per clip and rules, to calibrate 0.0125 ETH; (4) Twitch clip/VOD rights and reuse rules for non-affiliate channels; (5) the existing WaveWarZ Clippers program (t.me/wavewarzclipshq) current rules so the bounty stacks instead of contradicting. Output: concrete edits to rounds/r5/description.md, or confirmation it stands."
 tier: STANDARD
@@ -91,6 +91,12 @@ Takeaway: $29 is far below market for a solo pot; it is fine as a seed only if t
 - [Doc 1293](../1293-wavewarz-clippers-program-guide-jul2026/) - Clippers program guide
 - [Doc 1223](../1223-wavewarz-live-programming-community-jul2026/) - channels and schedule, July 2026
 - zpoidh `rounds/r5/` - the bounty itself
+
+## 2026-08-22 Review Notes
+
+- **R5 launch timing:** All four actions were due 2026-08-21 (yesterday). IKE Twitch setting, on-chain R5 creation, pot top-up, and PR #101 merge — all are GATED (on-chain/DM actions). Status unknown from this machine. If R5 is live, verify the bounty URL was posted in the channels listed.
+- **Farcaster operator crisis impact (doc 2374):** The WaveWarZ miniapp on Farcaster (doc 2374 §WaveWarZ opportunity) is related but distinct from the clip bounty. The clip bounty runs through zpoidh/POIDH (Base chain, Twitch/Telegram) — not Farcaster-dependent. Neynar uncertainty does NOT block this round.
+- **WaveWarZ Base platform (doc 2321):** Samantha's April 2026 handoff includes a Postiz-driven social broadcasting layer for battles. The Twitch-clip-to-POIDH pipeline in R5 complements this. If the Base mainnet launch is planned during R5's window, coordinate timing.
 
 ## Sources
 

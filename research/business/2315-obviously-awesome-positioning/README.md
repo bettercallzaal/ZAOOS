@@ -2,7 +2,7 @@
 topic: business
 type: methodology
 status: research-complete
-last-validated: 2026-08-18
+last-validated: 2026-08-22
 related-docs: "2310, 2295, 2311, 2302, 2309"
 original-query: "Obviously Awesome (April Dunford's positioning methodology) ok awesome now /zao-research this - mapped to ZAO's LIVE positioning work"
 tier: STANDARD
@@ -243,6 +243,13 @@ For any ZAO brand or product entering a positioning phase:
 | Artizen x Stephen Reid positioning one-pager (if call books) | zao-artizen lane | Gated | 2026-08-24 |
 | Sparkz creator-coin positioning statement (final) | Jordan Oram | Gated | 2026-08-21 |
 | Apply Dunford framework to BetterCallZaal Strategies client positioning | BCZ team | GTM planning | 2026-08-28 |
+
+## 2026-08-22 Review Notes
+
+**Board task clarification:** The board task for "Review research doc 2315" was titled "ElizaOS memory vs ZAO corpus-organizing agent." That content was originally at doc 2315 before a collision with this Dunford doc. The ElizaOS doc was renumbered to **2318** (PR #3150). The ElizaOS/ZOE corpus doc (2318) was reviewed in PR #3258. This review covers the Obviously Awesome positioning doc (internally numbered 994 in its title).
+
+- Sparkz competitive differentiation vs Zora Creator Coins is now in doc 2376 (PR #3257, 2026-08-22) — Sparkz's token-deferred + 0xSplits moat is the material for the Sparkz creator-coin positioning statement.
+- The Dunford framework "positioning statement" deliverable (gated, Jordan Oram, due Aug 21) is 1 day past due. Status unknown from this machine.
 
 ## Sources
 

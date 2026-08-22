@@ -73,6 +73,12 @@ Gated-ask detection is honest-first: v1 treats a lane as gated-blocked only when
 
 Each lands as its own card so the wall can pick them up independently.
 
+## 2026-08-22 Review Notes
+
+- **Spec status confirmed:** This is a pure spec doc (no code, no daemon). The "cap what's PICKED OFF, not what's working" design is the confirmed intent. Board card 6437e936 tracks implementation.
+- **Connection to statusline (doc 2323):** The wall governor's attention-cap (max 2-3 lanes picked off) feeds directly into the LANES segment proposed in doc 2323 — the bar would show `lanes 3w/5z` (working/waiting). The two specs are complementary; the statusline audit (due Aug 22) was the visible surface, this doc is the attention model underneath it.
+- **Wall system now under test:** As of this review (2026-08-22), the ZOE research pipeline has been down since 21:07 UTC (auth expiry, doc 2377). With ZOE autonomous work paused, Zaal's manual attention is the only active lane — exactly the scenario the wall governor is designed to help manage.
+
 ## Sources
 
 - Card 6437e936 (Supabase cowork tracker) - original spec + the 2026-08-20 re-spec written into its notes after Zaal named the wall.

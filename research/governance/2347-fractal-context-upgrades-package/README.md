@@ -151,6 +151,12 @@ Jose hat [ ] yes [ ] no
 | Week record backfill | ZOR era done (doc 2301); OG era + camera/attendance open |
 | Doc corrections | Doc 977 catalogue fully applied (research PR + whitepaper repo) |
 
+## 2026-08-22 Review Notes
+
+- **Status: awaiting-zaal.** Board task 156bc028. The three open threads (bot PRs, prod migrations, whitepaper backfill) all require @Zaal tap or external dependencies. No change from this machine.
+- **Prod migrations 0002-0004 are still blocked** — mentioned as blocking awareness data. If ZOE's research pipeline is down (auth expiry, doc 2377), the pipeline for fractal-related processing is also affected.
+- **Week record backfill:** OG era + camera/attendance remains open. Doc 2301 (ZOR era) is done. If the OG era backfill connects to the security-rotation or fractal-explainer timeline, that context is in security-rotation.md (blocked on this machine per session 11).
+
 ## Sources
 
 - [FULL] Doc 2301 (ZOR enumeration, meeting = period + 1, week-record shape)

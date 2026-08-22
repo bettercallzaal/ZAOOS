@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-08-18
+last-validated: 2026-08-22
 superseded-by:
 related-docs: "2317, 2318, 2319"
 original-query: "Logging everything to Obsidian - capture completeness for a two-surface (Obsidian + Claude) operating stack. Cover: daily-note/session-log conventions that work with agents (community practice, real fetches), capture QA (how to VERIFY nothing is dropped - checksums/inventories/the 2026-08-18 OneNote sweep as the case study), append-only journals (llm-wiki-kit pattern from doc 2317), and the concrete ZAO convention to adopt."
@@ -67,6 +67,14 @@ tier: STANDARD
 | Add the convention to `.claude/rules/handoff-discipline.md` as rule 11 (one PR, ~15 lines); shipped = rule merged on main | @Zaal (review) / organizer lane (write) | PR | 2026-08-22 |
 | Organizer loop reports the unrouted-residual count in every daily-note section (already started: 122 as of batch 2); shipped = number present in each organizer entry in `daily/` | organizer lane | convention | 2026-08-19 |
 | Add `PROMOTE:` marker sweep to the organizer loop iteration checklist in `handoffs/organizer.md`; shipped = brief updated + first sweep logged | organizer lane | vault edit | 2026-08-19 |
+
+## 2026-08-22 Review Notes
+
+- **PR merge** was due 2026-08-21 (yesterday). The convention becoming binding depends on merge. Status unknown from this machine.
+- **Rule 11 to handoff-discipline.md** was due today (Aug 22). Status unknown.
+- **Organizer loop + PROMOTE: marker sweep** (due Aug 19) — these are vault-side actions by the organizer lane. Status unknown.
+- **ZOE pipeline down:** With ZOE's research pipeline in auth-failure state since 21:07 UTC (doc 2377), the organizer loop is paused. The logging convention becomes especially important when the pipeline resumes — the first resumed run should verify it is emitting to daily-note correctly.
+- **Cross-reference:** Doc 2324 (OneNote routing pass) is the case study this doc's "batch 2 → 122 unrouted" residual referenced. Both docs are part of the vault-organizer system (doc 2318).
 
 ## Sources
 

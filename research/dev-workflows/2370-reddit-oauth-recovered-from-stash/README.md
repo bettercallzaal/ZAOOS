@@ -9,7 +9,7 @@ original-query: "ITEM 2 - issue #1287, reddit OAuth for zao-fetch-reddit. This b
 tier: STANDARD
 ---
 
-# 2273 - The reddit fix existed for a month, named like a backup
+# 2370 - The reddit fix existed for a month, named like a backup
 
 > **Goal:** Close issue #1287, and record why a finished fix stayed invisible for a month so the next one does not.
 

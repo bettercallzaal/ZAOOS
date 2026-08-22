@@ -9,7 +9,7 @@ original-query: "Pi (zaal@ansuz, 7 sessions) and VPS (zaal@31.97.148.88, 20 sess
 tier: AUDIT
 ---
 
-# 2282 - The fleet is alive and producing nothing
+# 2371 - The fleet is alive and producing nothing
 
 > **Goal:** Judge all 27 tmux sessions across both hosts by what they WROTE, not
 > by whether a process exists. Name what should be retired.

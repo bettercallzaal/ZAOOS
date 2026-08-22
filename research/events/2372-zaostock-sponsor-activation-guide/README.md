@@ -1,4 +1,4 @@
-# 1659 — ZAOstock Sponsor Activation Guide (Oct 3, 2026)
+# 2372 — ZAOstock Sponsor Activation Guide (Oct 3, 2026)
 
 **Type:** OPERATIONS-GUIDE  
 **Topic:** Events  

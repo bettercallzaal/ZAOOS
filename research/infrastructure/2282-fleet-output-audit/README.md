@@ -179,3 +179,53 @@ All read live on 2026-08-14 over SSH; no host was modified.
 - `/home/zaal/.zao/loop-health.log`, `/tmp/fleet-status.json`, `crontab -l` on both
 - `git log origin/main --since="5 days ago" -- research/` for actual doc output
 - `curl` against the dashboard on its Tailscale bind address, port 8090
+
+## Addendum 2026-08-22: this audit's scope was tmux, and a systemd zombie survived it
+
+This doc judged "all 27 tmux sessions across both hosts." **systemd `--user`
+services were never in scope**, and that gap hid a live one.
+
+`farscout.service` on the VPS, measured 2026-08-22:
+
+| Signal | Value |
+|---|---|
+| systemd state | `active (running)` |
+| Uptime | 35 days (ActiveEnterTimestamp 2026-07-18) |
+| CPU | **0.0%** |
+| RSS | 24 MB |
+| journald entries | **none** ("-- No entries --") |
+| Files written in 30 days | **zero** |
+| `bot_heartbeats` row | **`status: up`**, updated within the minute |
+
+Exactly this doc's thesis - alive, producing nothing - on a surface this doc
+did not look at. And worse than the tmux cases, because it actively reports
+health: a session in `zj` at least looks idle, whereas farscout posts `up` to
+the cowork bots board every 60s via `fleet-heartbeat.timer`. On 2026-08-21 a
+session audit read that heartbeat and reported farscout to Zaal as a healthy
+fifth live bot. The heartbeat proves the *process* is alive, which is the
+`state-claims.md` service-pulse-vs-run-heartbeat distinction: it was never
+evidence of work.
+
+**It should not have been running at all.** [Doc 882](../../agents/882-zaoscout-audit-and-roadmap/)
+(2026-06-20, DEEP) decided: "`bettercallzaal/farscout` (old bot) and
+`bettercallzaal/ZAOscout` (a scraper-only repo) are both superseded ... Retire
+the duplicates." The decision was made two months ago; nothing stopped the
+service. Same shape as the rest of the estate - **the decision existed and
+nothing enforced it.**
+
+### What to change
+
+1. **Any future fleet-output audit enumerates systemd `--user` units too**, not
+   just tmux. `systemctl --user list-units --all` on each host, then judge each
+   by what it WROTE (`find <workdir> -newermt`), never by `is-active`.
+2. **A heartbeat that cannot fail is not a health signal.** `fleet-heartbeat`
+   reports per-unit `is-active`, which a zombie satisfies forever. It should
+   report last-output-age alongside liveness, or the bots board will keep
+   showing green for dead work (`silent-failure-guard.md` rule 7 - a health
+   check must assert the capability it claims to prove).
+3. **Retiring a bot means stopping the unit**, in the same pass as the doc that
+   retires it. Doc 882 named the retirement and left the process running.
+
+Stopping it is Zaal's call and Zaal's hand (`no-rm-rf.md`, gated ops):
+`systemctl --user stop farscout && systemctl --user disable farscout`.
+Nothing was stopped by this audit.

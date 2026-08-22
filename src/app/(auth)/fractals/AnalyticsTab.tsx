@@ -87,17 +87,22 @@ interface AnalyticsData {
 export function AnalyticsTab() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [memberLoading, setMemberLoading] = useState(false);
 
-  useEffect(() => {
+  const loadAnalytics = () => {
+    setLoading(true);
+    setError(false);
     fetch('/api/fractals/analytics')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => setData(d))
-      .catch(console.error)
+      .catch((err) => { console.error(err); setError(true); })
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadAnalytics(); }, []);
 
   const loadMember = (walletOrName: string) => {
     setSelectedMember(walletOrName);
@@ -119,8 +124,19 @@ export function AnalyticsTab() {
     );
   }
 
-  if (!data) {
-    return <p className="text-gray-500 text-center py-8">Failed to load analytics.</p>;
+  if (error || !data) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <p className="text-gray-500 text-center">Failed to load analytics.</p>
+        <button
+          type="button"
+          onClick={loadAnalytics}
+          className="px-4 py-2 text-sm rounded-lg bg-[#f5a623] text-black font-medium hover:opacity-90"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   const { overview, participationTimeline, respectCurve, topHosters } = data;

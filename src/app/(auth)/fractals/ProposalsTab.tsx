@@ -154,7 +154,10 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
     if (categoryFilter !== 'all') params.set('category', categoryFilter);
 
     fetch(`/api/proposals?${params}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status}`);
+        return r.json();
+      })
       .then((d) => setProposals(d.proposals ?? []))
       .catch(console.error)
       .finally(() => setLoading(false));

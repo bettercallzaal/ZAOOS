@@ -159,7 +159,7 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 | Surface | What | Source of truth |
 |---------|------|-----------------|
 | **ZOE** (`@zaoclaw_bot`) | The orchestrator. Concierge (tasks, captures, brief/reflect, recall) + the autonomous fix-PR pipeline (coder + critic + auto-PR) folded in from Hermes | `bot/src/zoe/` + reuses `bot/src/hermes/` coder/critic/pr modules |
-| **ZAO Devz** (`@zaodevz_bot`) | Group dispatch + hourly learning tip | `bot/src/devz/` (fold-in to ZOE as a group context pending) |
+| **ZAO Devz** (`@zaodevz_bot` + `@zoe_hermes_bot`) | **Dual-bot Coder + Critic runner** - boots two grammY bots in one process that narrate Hermes phases as distinct identities in the ZAO Devz chat, so the conversation reads like two agents checking each other's work. `/fix` runs Coder | `bot/src/devz/` (3 files; fold-in to ZOE as a group context pending) |
 | **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
 | **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
 
@@ -172,6 +172,15 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 - zao-team-bots (Magnetiq + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
 - Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
+
+> **Corrected 2026-08-22.** This row previously read "Group dispatch + hourly
+> learning tip." Both halves were wrong, verified against the deployed code and
+> git history: the module is a dual-bot Coder/Critic runner (`bot/src/devz/index.ts`
+> header), and the **hourly tip was a ZOE feature that was REPLACED on 2026-05-14**
+> by forward-nudges-from-task-queue (`64a2a398`, "replace hourly tips with forward
+> nudges from task queue", PR #519). Exhaustive grep of the whole 3-file devz module
+> on both the VPS and in this repo finds zero hourly/cron/setInterval/tip logic. The
+> table documented a removed feature, attributed to the wrong bot, for three months.
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = a persona block in ZOE's runtime memory at `~/.zao/zoe/persona.md` / `~/.zao/zoe/human.md` (seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`; content voice lives in `bot/src/zoe/brand.md`), NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
 

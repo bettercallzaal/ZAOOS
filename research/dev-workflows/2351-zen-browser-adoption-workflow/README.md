@@ -72,6 +72,12 @@ tier: STANDARD
 | Build "ZAO" Zen Mod (navy/gold theme) + submit to zen-browser theme-store - done when the PR to theme-store is open | @Zaal (Claude drafts) | PR | 2026-09-05 |
 | Apply Doc 796's about:config telemetry hardening to the new Zen profile - done when the pref list is applied | @Zaal | Manual | 2026-08-24 |
 
+## 2026-08-22 Review Notes
+
+- **Actions due today (Aug 22):** 4 Zen Workspaces setup + Arc-as-automation-browser standing rule — both due 2026-08-22. Status unknown from this machine.
+- **Farcaster context:** Doc 2374 identified Farcaster ecosystem in transition. If Zaal's SIWF/Warpcast web workflow runs in Arc (automation browser), the Farcaster operator situation may affect auth flow testing. Zen would handle general browsing; Arc stays for Vercel/Farcaster automation regardless.
+- No material changes to this doc's recommendations — MPL-2.0 license, open-source theme store, and workspace setup remain valid.
+
 ## Sources
 
 - [zen-browser/desktop repo facts](https://github.com/zen-browser/desktop) - [FULL, `gh api` JSON: stars/forks/issues/license/pushed_at, 2026-08-20]

@@ -17,7 +17,7 @@ tier: STANDARD
 > schedule the public `zaostock.com/program` page renders today.
 >
 > **This is a decision document, not a locked schedule.** Six decisions below need
-> the Monday 25 Aug 11:30 EDT standup. Everything else is derived from what is
+> the Monday 24 Aug 11:30 EDT standup. Everything else is derived from what is
 > already on the record.
 
 **No artist is named anywhere in this document.** The roster lives in the ZAOstock
@@ -26,6 +26,36 @@ in any local source - Werb and Lyons Den - and both are recorded as *talked to
 about performing*, not confirmed. Slots are therefore numbered, with the stage,
 the window and the person who fills them stated. Filling a slot with a plausible
 name would make this document worse than empty.
+
+---
+
+## The city is in the room on Monday, which changes what this has to answer
+
+Roddy (City of Ellsworth) has accepted the standup invite. That makes Monday the
+cheapest chance we will get to close the permit chain, and it moves two items from
+"prudent" to "conditional".
+
+**The 45-day notice window has already passed.** Doc 1032's Finding 7 quotes
+Ellsworth Ordinance Chapter 14 directly: 45 days' minimum notice to the Police
+Chief, a corporate surety bond from a Maine-authorized bonding company, and the
+Police or Fire Department may require paid personnel on site at our expense.
+Forty-five days before 3 October is **19 August**. That was three days ago.
+
+This is **not** a claim that we have missed the permit. Doc 1032 flagged an open
+question that was never closed: whether ZAOstock qualifies for the city-sponsored
+exemption via the Art of Ellsworth umbrella, in which case the standalone-applicant
+deadline never applied to us. Nobody has answered it, and the person who can will
+be on the call. It is a two-minute question that has been open since July.
+
+**The insurance certificate is a permit condition, not diligence.** The fire
+performance and the vendor set both sit behind it (doc 1045), and Roddy's legal
+team is separately drafting the city liability release. The broker research is done
+and ranked already - Brown Holmes & Milliken in Ellsworth first, as a warm contact
+- so what is missing is a phone call, not a decision.
+
+None of this is run-of-show material and it is deliberately not in the grid. It is
+here because a document that goes in front of the city on Monday should not leave
+its own permit chain unstated.
 
 ---
 
@@ -39,10 +69,18 @@ name would make this document worse than empty.
 | After-party | "call to Black Moon" at 17:55 | **18:00-20:00, programmed, indoors** (2310 decision 6) |
 | Soundchecks | not addressed | **None day-of. Friday is mandatory and contractual** (2310 decision 5) |
 
-**Action this implies:** `src/app/program/page.tsx` in `ZAOstock-canonical` still
-serves the doc-428 schedule publicly, including "Lineup announces August 2026",
-which has passed. That page needs replacing or unpublishing before the lineup
-reveal. Not done here - it is a public surface and a separate change.
+**Action this implies - now in flight.** `src/app/program/page.tsx` was still
+serving the doc-428 schedule publicly. It is rebuilt from this document in
+`ZAODEVZ/ZAOstock` PR #40, awaiting review.
+
+One correction to this doc's first draft, from re-measuring rather than assuming:
+the page did **not** still say "Lineup announces August 2026". That string was
+already fixed on `main` and in production, which reads "Lineup announced once every
+set is locked" - verified by fetching the live page directly. The stale reading
+came from a second clone (`~/Documents/ZAOstock-canonical`) sitting on an old
+branch. Both clones point at the same repo; only one was current. What was
+genuinely stale, and is what PR #40 fixes, is the single-track structure and the
+15-30 minute set lengths.
 
 ---
 
@@ -291,17 +329,19 @@ survivable, which the one-stage design was not.
 
 | Owed | By | To | When |
 |---|---|---|---|
-| Decision 1: 45-min set vs 40-min set in a 45-min slot | Zaal + Steve | the grid | Mon 25 Aug standup |
-| Decision 2: are the 6 travelling artists 6 acts? | whoever holds the roster | Zaal | Mon 25 Aug standup |
-| Decision 3: closes indoors, or swap 7 and 8 | Zaal + Steve | the grid | Mon 25 Aug standup |
-| Decision 4: Friday soundcheck venue - indoor-only, or move the outdoor build | Zaal + Dcoop + Steve | artist contracts | Mon 25 Aug standup |
-| Decision 5: name both Stage Managers; split First Aid off Zaal | Zaal | doc 1032's open item since July | Mon 25 Aug standup |
-| Decision 6: WaveWarZ in the day, in the after-party, or out | Zaal | the grid | Mon 25 Aug standup |
+| Decision 1: 45-min set vs 40-min set in a 45-min slot | Zaal + Steve | the grid | Mon 24 Aug standup |
+| Decision 2: are the 6 travelling artists 6 acts? | whoever holds the roster | Zaal | Mon 24 Aug standup |
+| Decision 3: closes indoors, or swap 7 and 8 | Zaal + Steve | the grid | Mon 24 Aug standup |
+| Decision 4: Friday soundcheck venue - indoor-only, or move the outdoor build | Zaal + Dcoop + Steve | artist contracts | Mon 24 Aug standup |
+| Decision 5: name both Stage Managers; split First Aid off Zaal | Zaal | doc 1032's open item since July | Mon 24 Aug standup |
+| Decision 6: WaveWarZ in the day, in the after-party, or out | Zaal | the grid | Mon 24 Aug standup |
 | PA scope list - gear, capacity, setup/strike, operator, power, time, price, cancellation | Zaal | Steve, in person | before Fri 29 Aug |
 | Equipment spec (was due Fri 21 Aug, arrival unconfirmed) | Fellenz + Dcoop | Zaal | overdue, confirm either way |
 | Stream operator resolved (Baraza OBS-to-RTMP, card 654b9aba, due 22 Aug) | Zaal + Aziz | the grid | overdue |
+| Confirm the Art of Ellsworth permit-exemption question - the 45-day standalone window closed 19 Aug | Zaal | Roddy, in the room | Mon 24 Aug standup |
+| Insurance certificate - it is a permit condition, brokers already ranked (BHM Ellsworth first) | Zaal | the city + the fire performance | before the permit closes |
 | Replace or unpublish `zaostock.com/program` - it serves the April one-stage schedule and says "lineup announces August 2026" | Zaal + Paper | the public | before the lineup reveal |
-| Artist contracts carrying the Friday soundcheck clause | Zaal | the 8 acts | 2026-08-24 (doc 2310) |
+| Artist contracts carrying the Friday soundcheck clause | Zaal | the 8 acts | Mon 24 Aug (doc 2310) - the same day as the standup |
 
 ---
 

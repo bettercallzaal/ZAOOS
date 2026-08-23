@@ -50,7 +50,10 @@ export function RunAwardsTab() {
 
   useEffect(() => {
     fetch('/api/respect/leaderboard')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status}`);
+        return r.json();
+      })
       .then((d) => {
         const list: Member[] = (d.leaderboard ?? d ?? [])
           .filter((m: Member) => m.wallet)

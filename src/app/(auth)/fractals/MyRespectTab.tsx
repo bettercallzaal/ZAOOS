@@ -137,7 +137,10 @@ export function MyRespectTab({ currentFid, initialMember }: Props) {
   // Load the leaderboard once, then auto-resolve the logged-in member by fid.
   useEffect(() => {
     fetch('/api/respect/leaderboard')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status}`);
+        return r.json();
+      })
       .then((d) => {
         const entries: LeaderboardEntry[] = d.leaderboard ?? [];
         setBoard(entries);

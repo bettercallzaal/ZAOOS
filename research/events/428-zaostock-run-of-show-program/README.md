@@ -4,6 +4,7 @@
 > **type:** event-runsheet-program
 > **status:** research-complete
 > **last-validated:** 2026-05-21
+> **superseded-by:** 2391 (2026-08-22) - this program was designed for ONE stage with 15-30 min blocks. The 2026-08-15 and 2026-08-17 decisions replaced it with TWO alternating stages on a 45-minute cadence. See `../2391-zaostock-run-of-show-oct3-v2/`. Contingency and per-block-type tech notes below still hold.
 > **original-query:** What is the day-of run-of-show program for ZAOstock (Oct 3 2026) balancing music sets, talks, WaveWarZ bracket, transitions, and contingency? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-17

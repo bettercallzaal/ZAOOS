@@ -2,7 +2,7 @@
 topic: events
 type: event-runsheet-program
 status: draft-for-decision
-last-validated: 2026-08-22
+last-validated: 2026-08-23
 supersedes: "428"
 related-docs: "428, 1032, 2295, 2310"
 original-query: "we have to make our run of show asap before Mondays meeting"
@@ -26,6 +26,77 @@ in any local source - Werb and Lyons Den - and both are recorded as *talked to
 about performing*, not confirmed. Slots are therefore numbered, with the stage,
 the window and the person who fills them stated. Filling a slot with a plausible
 name would make this document worse than empty.
+
+---
+
+## STRUCTURE CHANGED - Zaal, 2026-08-23. Read this before the grid below.
+
+Zaal set the day's blocks directly, which answers decision 6 and re-cuts the grid:
+
+| | |
+|---|---|
+| 12:00 - 16:00 | Artists |
+| 16:00 - 18:00 | **WaveWarZ** |
+| 18:00 - 20:00 | The party, **Stilo DJing** |
+| 20:00 onward | A couple of local Maine acts, brought by Steve |
+
+Three consequences, and the first one is urgent.
+
+### 1. The artist shortage inverts. We now have too many acts, not too few.
+
+The artist window is **240 minutes**, not 360.
+
+```
+12:00 -> 16:00   =  240 minutes
+240 / 45         =  5 slots (15 min spare)
+240 / 40         =  6 slots (zero slack)
+240 / 30         =  8 slots (zero slack)
+```
+
+The confirmed roster is **8 acts** - 6 flying out plus 2 local Maine (doc 2295). At
+the decided 45-minute set length, **5 of them fit and 3 do not.**
+
+Decision 2 below was written as "are there enough acts to fill eight slots". That
+question is now the opposite one, and it is sharper: **which acts are not playing a
+12-4 set, and do they know?** Three of the eight is not a rounding error, and six of
+them are being flown in.
+
+**The most likely reconciliation, which needs confirming rather than assuming:**
+WaveWarZ is artists. Doc 2295 describes the physical form as *"an emcee and two
+artists doing a little battle of music between each other."* If the 16:00-18:00
+block features acts from the confirmed roster, then 12-4 only has to hold four to
+six of them and the arithmetic closes cleanly. That is elegant and it may well be
+what was meant - but nobody has written it down, so it is a question, not a plan.
+
+The other way it closes: run the two stages **in parallel** during 12-4 rather than
+alternating, which doubles the window to ten slots. That fits everyone, and it
+costs the thing Steve designed the alternation for - *"there's no gap in the
+music"* becomes "there are two things on at once and you have to pick." That is a
+real trade and it is Steve's call as much as anyone's.
+
+### 2. Steve's hip-hop crew has lost its slot
+
+Doc 2310 recorded the after-party anchor as **Steve's hip-hop crew - 4-5 rappers
+plus a DJ from his 11th Hours night - plus one of his own bands.** That was the
+18:00-20:00 block. That block is now Stilo DJing.
+
+So either the crew are the "couple of local Maine acts" after 20:00, or they have
+been displaced from a commitment Steve made on a recorded call. Those are very
+different outcomes for the relationship with the venue owner who is also providing
+the PA and MCing the day. **Ask before Monday.**
+
+### 3. The day now runs past 20:00, which nobody has costed
+
+Every prior plan ended at 20:00. Local acts "after 8pm" push the finish out to an
+unknown hour, and three things hang off that: Black Moon's own closing time,
+Ellsworth's noise ordinance for a downtown venue, and doc 1032's load-out plan,
+which assumed the site was clear by 22:30. None of that is fatal. All of it is
+unasked.
+
+**Everything below this section was written against the previous 12:00-18:00
+eight-slot structure and is superseded where the two disagree.** It is kept because
+the reasoning - the arithmetic method, the Friday soundcheck collision, the
+unnamed owners - all still applies. The grid itself is the part that moves.
 
 ---
 
@@ -334,7 +405,13 @@ survivable, which the one-stage design was not.
 | Decision 3: closes indoors, or swap 7 and 8 | Zaal + Steve | the grid | Mon 24 Aug standup |
 | Decision 4: Friday soundcheck venue - indoor-only, or move the outdoor build | Zaal + Dcoop + Steve | artist contracts | Mon 24 Aug standup |
 | Decision 5: name both Stage Managers; split First Aid off Zaal | Zaal | doc 1032's open item since July | Mon 24 Aug standup |
-| Decision 6: WaveWarZ in the day, in the after-party, or out | Zaal | the grid | Mon 24 Aug standup |
+| ~~Decision 6: WaveWarZ in the day~~ **ANSWERED 23 Aug: its own 16:00-18:00 block** | Zaal | - | done |
+| **NEW: which 3 of the 8 confirmed acts are not playing a 12-4 set, and do they know?** | Zaal | the roster | Mon 24 Aug standup |
+| **NEW: does WaveWarZ 16-18 use roster artists?** If yes the 12-4 arithmetic closes | Zaal | the grid | Mon 24 Aug standup |
+| **NEW: 12-4 stages alternating (5 slots) or parallel (10 slots)?** Parallel fits everyone and costs Steve's no-gap design | Zaal + Steve | the grid | Mon 24 Aug standup |
+| **NEW: where did Steve's hip-hop crew go?** 18-20 was their block on the record; it is now Stilo | Zaal | Steve | before Monday |
+| **NEW: what time does the day actually end, and does the city know?** Acts after 20:00 vs noise ordinance + load-out | Zaal | Roddy, in the room | Mon 24 Aug standup |
+| **NEW: can Stilo do sound setup AND DJ 18-20?** 6am load-in to a late strike is one very long day | Zaal | Stilo | before Monday |
 | PA scope list - gear, capacity, setup/strike, operator, power, time, price, cancellation | Zaal | Steve, in person | before Fri 29 Aug |
 | Equipment spec (was due Fri 21 Aug, arrival unconfirmed) | Fellenz + Dcoop | Zaal | overdue, confirm either way |
 | Stream operator resolved (Baraza OBS-to-RTMP, card 654b9aba, due 22 Aug) | Zaal + Aziz | the grid | overdue |

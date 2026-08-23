@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-23
 related-docs: 687
 tier: STANDARD
 ---
@@ -85,12 +85,30 @@ tier: STANDARD
 
 5. **Local LLM for classify-only, not generation:** Ollama on VPS 1 (llama3.1:8b) is already in use. Keep it for binary classification, spam detection, language routing - low-latency, no token cost. For writing/coding/planning, always route to Claude Pro. This matches post #1's finding: local works for "experimentation," Claude wins for "production."
 
+## Updated 2026-08-23
+
+**Webflow and Wix layoffs confirm "obsolescence wave" prediction.** Both no-code website builder incumbents restructured in late May 2026, explicitly citing AI competition as a driver — a direct validation of Findings #1 ("the obsolescence wave is real") and Synthesis row on Webflow/Framer obsolescence.
+
+**What changed:**
+
+1. **Webflow cut ~140 employees on May 27, 2026** (second round in under 2 years). CEO Linda Tong cited an "agentic web" AI pivot as the restructuring rationale. An employee described sudden laptop lockout without notice. Sources: search results from americanbazaaronline.com (2026-05-29), layoffhedge.com, sfchronicle.com, mlq.ai — PARTIAL (full fetches blocked by egress proxy; corroborated across 6+ independent search snippets).
+
+2. **Wix cut ~1,000 jobs (~20% of workforce) in late May 2026**, citing AI competition from vibe-coding tools (and shekel/dollar currency pressure). Wix had already acquired vibe-coding startup Base44 for $80M (June 2025, solo founder Maor Shlomo, 250k users, profitable at acquisition) — the incumbent's response to the disruption the doc anticipated. As of June 2026, Base44 launched its own AI model under Wix. Sources: thenextweb.com, qz.com, Yahoo Finance — PARTIAL (egress blocked; corroborated across 5+ search snippets, globenewswire.com/seekingalpha for Base44).
+
+3. **Claude Code Max plan tiers formalized**: Pro $20/mo, Max 5x $100/mo, Max 20x $200/mo. "Max 20x ($200/mo) is the top individual tier with 20x Pro usage; rate limits stop being a practical concern for most full-day development work." Weekly active-compute cap (not calendar month) is the binding constraint. Sources: ssdnodes.com, cloudzero.com, nocode.mba, verdent.ai — PARTIAL (egress blocked; consistent across 8+ search snippets).
+
+**ZAO Application updates:** The "Confirm Claude Max is the right call" action item (doc's Next Actions) is resolved: the $100–200/mo Max plans are the correct tier for sustained agent + coding work. The Webflow/Wix layoffs mean "Skip building our own Webflow replacement" (ZAO Application #3) is even more confirmed — the category is actively shedding employees, not recovering.
+
 ## Sources
 
 - [r/LocalLLM - "I used Claude Code to build the same web app 3 ways"](https://www.reddit.com/r/LocalLLM/comments/1thq833/)
 - [r/vibecoding - "So apparently we don't need to pay Webflow/Framer"](https://www.reddit.com/r/vibecoding/comments/1tgisgr/)
 - [r/vibecoding - "I'm a software engineer with a decade of experience"](https://www.reddit.com/r/vibecoding/comments/1tf7dan/)
 - [r/vibecoding - "Vibecoding is expensive so I spent a weekend fixing my AI setup"](https://www.reddit.com/r/vibecoding/comments/1tc46hs/)
+- [Webflow Layoffs May 2026 - Dragdropship](https://dragdropship.com/blog/the-webflow-everyone-loved-is-becoming-something-different)
+- [Wix cuts 20% of workforce - The Next Web](https://thenextweb.com/news/wix-is-cutting-20-of-its-workforce-as-a-strong-shekel-and-ai-competition-squeeze-the-website-builder-from-both-sides)
+- [Wix acquires Base44 for $80M - GlobeNewswire](https://www.globenewswire.com/news-release/2025/06/18/3101508/0/en/Wix-Further-Expands-into-Vibe-Coding-with-Acquisition-of-Base44-a-Hyper-Growth-Startup-that-Simplifies-Web-and-App-Creation-with-AI.html)
+- [Claude Code Pricing 2026 - SSD Nodes](https://www.ssdnodes.com/blog/claude-code-pricing-in-2026-every-plan-explained-pro-max-api-teams/)
 
 ## Next Actions
 

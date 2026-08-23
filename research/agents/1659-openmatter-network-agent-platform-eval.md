@@ -631,3 +631,358 @@ doc 2284 (Oracle Always Free, the free-forever comparison), doc 2154/2155 (the
 identity ladder). Rules that bind this addendum: `research-grounding.md`,
 `anti-fabrication.md`, `state-claims.md`, `secret-hygiene.md`,
 `agent-loops.md` rule 9.
+
+---
+
+## Addendum v5 - 2026-08-23: the meeting record, and three corrections to v4
+
+The 2026-08-13 meeting notes have been carried as an open gap since this doc's
+v3 addendum ("searched `zao-vault` and `research/` on 2026-08-21 - not found").
+**Zaal supplied the Google Doc on 2026-08-23 and it has now been read in full,
+notes plus the complete 27-minute transcript.** The gap is closed.
+
+The raw document is a third-party record containing a counterparty's personal
+email, so per `.claude/rules/pii-hygiene.md` rule 1 it lives off-repo at
+`~/.zao/private/gdrive-zao-openmatter-agentic-legal-entities-20260813.md`, with
+the load-bearing extracts timestamped. What follows is the synthesis, with the
+counterparty's email redacted.
+
+It corrects three things v4 got wrong, confirms two things v4 flagged as
+unverified, and answers the company questions that had no public answer.
+
+### Correction 1 - the credits are a partner GRANT, not ZAO money
+
+v4 treated the 12.3513 Cr balance as a scarce resource whose consumption is a
+spend decision, and reasoned from there to "run nothing production there yet."
+The reasoning about *production* workloads still holds. The framing of the
+credits does not.
+
+Chris Biele, 00:13:38 and 00:14:42:
+
+> "what we'll do is we'll get you set up with some **test credits**... I'll
+> share the link here in the chat so you can log in straight after this call.
+> And there's a **free 50 tokens** on the free set, but you'll be able to, we'll
+> get you some **additional tokens** to be able to play around with this."
+
+And the Gemini summary of the call records it as a decision: *"It was decided to
+provide test credits to facilitate the creation of a newsletter agent as an
+initial use case."*
+
+So the credits were granted by OpenMatter, for a named purpose, as part of an
+agreed beta-test collaboration. Spending them on that purpose is not a cost, it
+is the deliverable. Zaal's own gate ("anything that spends credits is
+Zaal-gated") is his rule and it stands unchanged - but the scarcity framing v4
+built on top of it was wrong, and a lane reading v4 alone would be too cautious
+by exactly one step.
+
+### Correction 2 - the running deployment was created live on the 13th, and it is the agreed use case
+
+v4 treated the deployment as new on 2026-08-22 and the project name as
+incidental. Both wrong. At 00:25:02, screen-sharing, Zaal created it in front of
+Chris:
+
+> **Zaal:** "Oh, organization and project. I see. Okay. So let's do **the ZAO
+> newsletter** first. That'll be a nice simple easy one to do."
+> **Chris Biele:** "Yeah, perfect. So that might take a minute. It goes back and
+> pings back and forth between sent and received. Then it'll eventually log and
+> go to process."
+
+The dashboard's "The ZAO Newsletter" project is therefore not a placeholder -
+it is the exact initial use case both sides agreed to, created on the call.
+
+**This also breaks v4's arithmetic, usefully.** v4 derived ~0.837 Cr per
+compute-hour and concluded 12.3513 Cr buys ~14.8 hours. If a container had been
+Running continuously since 2026-08-13, that is ~240 hours by the 22nd, which at
+that rate would need ~200 Cr. The balance is 12.35 and Zaal's own 2026-08-14
+reading was 0.3932. So at least one of the following is true, and the fourth is
+the most likely:
+
+1. the deployment was not running continuously across those nine days;
+2. the real rate is far below 0.837 Cr/hr;
+3. the Particle plan absorbs the burn before credits are touched (its "0% used,
+   resets Aug 31" reading is consistent with this);
+4. the balance was topped up between the 14th and the 22nd - which is exactly
+   what Chris promised on the call ("we'll get you some additional tokens").
+
+Either way, **v4's ~15-hour runway is not a safe planning number.** It is the
+best that could be derived from one datum, and the meeting record now shows the
+datum was taken mid-grant. Treat the runway as unknown until read off the
+billing page.
+
+### Correction 3 - the wallet-versus-credits discrepancy has an ordinary explanation
+
+The 2026-08-14 "odd discrepancy between wallet balance and available credits"
+has been an open technical question since v2. The transcript shows the same
+confusion happening live, and being resolved by Chris in under a minute
+(00:24:17):
+
+> **Zaal:** "What should I do for the credits to actually launch it?"
+> **Chris Biele:** "under billing you should see that you've got 50 credits...
+> it should be automatically applied."
+> **Zaal:** "It said zero when I first looked, but it might have been a
+> different style of credits. I don't know. They're It's all one credit, right?"
+> **Chris Biele:** "down at the bottom there doesn't say free... go to the free
+> one. So just above that right there, **create an organization**."
+> **Zaal:** "Oh, okay. I see. I didn't create one yet."
+
+There are two distinct balances in Datavizor - an on-chain **wallet** address
+shown on the dashboard, and a **billing credits** balance scoped to an
+organization. Credits do not appear until an organization exists, and the free
+tier is a separate line from purchased credits. Reading one and expecting the
+other produces exactly the "discrepancy" that was reported.
+
+**Graded honestly: this is a strong hypothesis, not a confirmed diagnosis.** It
+explains the observed confusion precisely and it comes from the vendor's own
+mouth, but nobody has re-read the 2026-08-14 screen to confirm that was the same
+mistake. It downgrades the item from "unresolved technical blocker" to "probably
+a UI misreading, worth one look."
+
+### Confirmed - two things v4 and v3 flagged as unverified
+
+**The Adam Miller bridge is real.** v3 flagged it as "a signal, not a
+coincidence to assert as fact without more - ask Zaal directly." The transcript
+settles it without asking. Chris Biele opens the call, 00:00:00:
+
+> "as far as I understand, **Adam and you** have been talking about different
+> ways of allowing agents to sort of maybe one click deploy an agent that forms
+> its own entity, creates a bank account, and then becomes a business."
+
+And at 00:07:18 he refers to MIDAO as shared context, unprompted:
+
+> "in terms of **MIDA** [MIDAO] and how their **KYB and KYC** processes work, I
+> don't know if it's the same for every entity they do. But you're going to have
+> to figure out things like who's authorized to sign for the company, and I'm
+> assuming that's going to be the artist."
+
+An OpenMatter employee naming MIDAO's KYB/KYC flow as the assumed legal
+counterpart is direct evidence that the two halves are one plan, exactly as the
+lane brief asserted. `project_zao_midao_legal_body.md` can drop its hedge.
+
+**Hermes Agent is an OpenMatter template.** v4 listed this as unverifiable
+without a login. At 00:22:24, Chris walking Zaal through the deploy screen:
+
+> "you can click view all on the upper right and that will, so **just above the
+> Hermes**. Yeah, there you go. And then you can see them all laid out."
+
+So `nousresearch/hermes-agent` was visible in OpenMatter's template list on
+2026-08-13. The deployment was a template launch, not a custom container spec -
+which also means the `/opt/data` persistence question from v4 is a question
+about **OpenMatter's template definition**, not about anything Zaal configured.
+That makes it answerable by them in one message.
+
+### The company, from the vendor and from the record
+
+The DEEP-tier question this doc could not answer in July ("no public pricing, no
+step-by-step guides, enterprise-only, assume custom pricing") is now answerable.
+
+**Straight from Chris Biele, 00:18:07:**
+
+| Fact | Value |
+|---|---|
+| Team size | "about 12 people" |
+| Founded | stealth, September 2025 |
+| Testnet | February 2026 |
+| Mainnet | June 2026 |
+| Largest channel | the OpenMatter Substack, "like three something thousand followers" |
+| Self-described weakness | "we've been gearing ourselves towards enterprise companies, but not focusing on the DAO, not focusing on the token, not focusing on the community building side" |
+| Fix in progress | "We're going to bring on a marketing agency" |
+
+**From public sources, 2026-08-23:**
+
+- **OpenMatter Network Inc., Melbourne, Florida** - "Florida's Space Coast."
+- Launch positioning: "Don't Trust Data. Prove It." Three components as this
+  doc already recorded: Masked Compute, QuantumGuard, Datavizor.
+- Named partner: **Dara** (Dara AI Ltd.), a privacy-first health data platform;
+  its CEO is quoted in the launch release about joint healthcare-insight work.
+- Earlier partner: **talentDAO**, announced 2025-11-04, DeSci framing.
+- **No funding round is disclosed anywhere.** F4 Fund lists OpenMatter Network
+  as a portfolio startup (founded 2025, "1-10 employees") but names no amount.
+  Treat any specific figure as unknown, not as small.
+- Technical substrate, from the talentDAO announcement: masked computing is
+  "MPC network for up to five parties with dishonest majority and active
+  adversary present," issuing "a post quantum safe zk proof," with differential
+  privacy on outputs, "verified onchain using our coordination layer built on
+  **Substrate**" and **libp2p**.
+
+**A contradiction, left open.** SiliconAngle's launch piece names the founders
+as "Davis and Anderson," with backgrounds in secure systems architecture,
+distributed computing and cryptography. The lane brief's people list, drawn from
+the Telegram group, names Adam Miller (group owner), Ren (CEO), AdaJane (CTO),
+Chris Biele, and Chris (Quan) Marshall. F4 Fund says 1-10 employees; Chris said
+~12. These may all be reconcilable - surnames versus display names, a stale
+directory listing - but they are not reconciled here and should not be
+synthesised into a confident roster.
+
+### The features the transcript revealed that no public page describes
+
+Everything below is from the live demo and appears nowhere on the public site:
+
+- **A rebuilt OpenRouter.** "people who are using this interface will be able to
+  have a model router. So it's essentially open router that we've rebuilt. And
+  so they'll be able to set their agents up to do certain tasks via Anthropic,
+  other tasks via an LLM that's hosted on Open Matter Network, and other tasks
+  via an LLM that's hosted locally." For ZAO this is directly relevant - the
+  cheap-AI ladder in `.claude/rules/claude-usage.md` is exactly a model-routing
+  problem, and ZOL is out of OpenRouter credits.
+- **ZKBC - Zero Knowledge Boundary Compliance.** Being standardised with the
+  Hashgraph Online working group. "when your agent executes an action, be that
+  outputting data, accessing data sets, or using a tool call, it has to prove
+  that it's compliant to company policy... it creates a zero knowledge proof
+  that shows that the whole execution was compliant. And that includes the data
+  that was accessed, the data that was outputted, the tool calls that were used
+  in that entire action." Framed against the EU AI Act and California privacy
+  law. This is the single most architecturally interesting thing OpenMatter has
+  for the ZOL-in-a-legal-body design: a community-owned agent inside an LLC
+  needs to prove it obeyed its caps, and this is a mechanism for that.
+- **Runtime-only key decryption.** "all the keys and variables that that agent
+  is associated with... rather than just existing somewhere on our network in an
+  unencrypted fashion, they're all encrypted and then decrypted at runtime...
+  there's no honeypot to extract any keys and variables." Read this next to v4's
+  security section: it addresses key-at-rest exposure, and says nothing about an
+  exposed API server or dashboard port, which is a different attack surface. Both
+  can be true. v4's three security checks still stand.
+- **Post-quantum networking, including a post-quantum VPN.**
+- **Communities, organizations and projects** - discussions, membership,
+  permissioned data-set sharing. Explicitly "still in beta on these features."
+  Zaal identified this as solving a real ZAO problem: "that's like one of my
+  biggest challenges as well where I'm like I'm only giving access to people
+  that are well within the community."
+- **DePIN resource contribution.** "we're a DPIN network and people will be able
+  to add their resources and earn compute credits." Zaal's response is the
+  ZAO-shaped part: "we have a big network of individuals who also have just
+  computers sitting idle who would be super willing to earn... we can also work
+  out a deal where it's like not as much as normal compute but I'm giving them
+  the benefit of XYZ thing."
+
+### Pricing, triangulated
+
+OpenMatter still publishes no pricing (`/pricing` 404s, `docs.openmatter.network`
+does not resolve, Datavizor renders balance behind login - all re-checked
+2026-08-22). But the transcript gives an anchor the public site does not, and it
+cross-checks the derived rate.
+
+Chris Biele, 00:15:33:
+
+> "Currently it's **billed at a per hour for deployment**, which is **not
+> ideal**. That's not what we want because we don't want to be charging like,
+> you know, like **10 cents an hour** to run this thing. That's **not
+> sustainable**."
+
+Put that beside v4's derived ~0.837 Cr per compute-hour: if a credit is worth
+roughly **$0.12**, then 0.837 Cr/hr is about **$0.10/hr** - the exact figure
+Chris named. Two independent paths landing on the same number is meaningful.
+
+**Do not over-read it.** Chris said "like 10 cents an hour" as an illustrative
+figure while arguing the model is wrong, not as a quoted rate, and the vendor is
+explicitly planning to change it. The honest statement is: the derived rate is
+consistent with the only price anchor that exists, and both are provisional.
+
+On that basis 50 free credits is roughly $6, or ~60 compute-hours, and the
+current 12.3513 Cr is roughly $1.50. **These are small numbers**, which is the
+real point - and it reinforces correction 1. This is a sandbox grant, not a
+budget to defend.
+
+### Where OpenMatter sits among comparables
+
+The July doc said no pricing was findable and left the competitive question
+open. Grounded comparables, measured 2026-08-23:
+
+| Platform | Privacy mechanism | Deploy unit | Billing | Published rate |
+|---|---|---|---|---|
+| **OpenMatter** | MPC + FHE + ZK, keys decrypted at runtime, ZKBC | container from a template | credits, per compute-hour | **none published**; "like 10 cents an hour" spoken |
+| **Phala Cloud** | TEE - Intel TDX, AMD SEV-SNP, NVIDIA GPU TEE | Docker | prepaid credits, $PHA | **$0.05-0.06 per vCPU-hour** (16GB incl), $2.50/hr H100 |
+| **Nillion nilCC** | AMD SEV-SNP confidential VMs, dm-verity, attestation | Docker Compose | credits, burn NIL | tiered, published via API |
+| **Akash** | none - standard container isolation | Kubernetes container | on-chain spot auction, AKT | market-set |
+| **Fluence** | none - conventional VMs | VM | USDC, 24-hour epochs | posted, no egress fees |
+
+Read honestly, that table says: **OpenMatter's rate is in the same order as
+Phala's and possibly ~2x it, while Phala publishes its rate and OpenMatter does
+not.** OpenMatter's differentiator is not price and not raw compute - it is the
+combination of MPC-based multi-party collaboration (up to five parties) with
+ZKBC compliance proofs, which none of the others offer. If ZAO ever needs an
+agent to *prove* it obeyed a policy, that is the reason to be here. If ZAO needs
+cheap containers, three of the four alternatives are cheaper and one of them
+publishes what it charges.
+
+### What is now actually outstanding
+
+The 2026-08-13 call produced three named next steps. **All three were still open
+on 2026-08-23, ten days later**, and two of them are Zaal's:
+
+| Owed | By | Status |
+|---|---|---|
+| Send the GitHub repository link to Chris for review | Zaal | open; he said on the call "I'll send you my GitHub after this" |
+| Share the OpenMatter Substack URL | Chris Biele | open |
+| Explore the platform and share thoughts in the group chat | Zaal | partially done - the deploy exists, the feedback does not |
+
+Layered on top: the 2026-08-18 "how did you get on with your deployments?"
+exchange, unanswered since, now **five days**.
+
+This is textbook `.claude/rules/recap-followthrough.md` - a recap froze at the
+moment of promising, and the promises to someone outside ZAO have no board card
+and no owner. The fix is not another doc. It is a message and a repo link.
+
+### Revised verdict
+
+v4 split July's WATCH into "WATCH as infrastructure, live as a relationship."
+The meeting record sharpens both halves:
+
+- **As infrastructure for production workloads: still WATCH**, and the reasoning
+  in v4 survives - metered compute is the wrong home for work that currently
+  runs on hardware ZAO already pays for.
+- **As a funded, agreed beta test: ACTIVE, and under-delivered.** Both sides
+  agreed to beta testing plus joint demo content. OpenMatter provided credits
+  and has been waiting since. ZAO has a container running and has said nothing.
+- **As the compute layer of the ZOL legal-body design: strengthened.** ZKBC is a
+  better fit for a community-owned agent that must prove it obeyed its caps than
+  anything else surveyed, and the MIDAO link is now confirmed rather than
+  inferred.
+
+### Sources added in v5
+
+- **2026-08-13 meeting record** - Google Doc, "ZAO <> OpenMatter - Agentic Legal
+  Entities - 2026/08/13 16:30 BST - Notes by Gemini," owned by the OpenMatter
+  contact, supplied by Zaal 2026-08-23, read **[FULL]** via the Google Drive API
+  (notes plus the complete transcript to 00:27:06). Raw copy off-repo per
+  `pii-hygiene.md` at `~/.zao/private/gdrive-zao-openmatter-agentic-legal-entities-20260813.md`.
+  Gemini's own caveat kept: the transcript is machine-generated and contains ASR
+  errors ("the Zho" for The ZAO, "Wave Wars" for WaveWarZ, "MIDA" for MIDAO,
+  "Ashgraph" for Hashgraph, "DPIN" for DePIN).
+- `siliconangle.com/2026/06/30/startup-openmatter-wants-make-enterprises-prove-ai-agents/`
+  - **[PARTIAL - via exa semantic search highlights, not a raw page fetch]**.
+  Florida HQ, the three components, the Dara partnership, the founder surnames.
+  Marked PARTIAL deliberately: the founder-name claim rests on a search
+  highlight, which is why it is reported as an unresolved contradiction rather
+  than as the roster.
+- `helpnetsecurity.com/2026/06/30/...`, `securitybrief.news/story/openmatter-launches-verifiable-ai-collaboration-platform`,
+  `techstartups.com/2026/06/30/...` - **[PARTIAL - exa highlights]**. All three
+  are the same CyberNewswire launch release; treated as one source, not three.
+- `talentdao.substack.com/p/introducing-openmatter-network` (2025-11-04) -
+  **[PARTIAL - exa highlights]**. The Substrate/libp2p substrate detail and the
+  five-party dishonest-majority MPC description.
+- `f4.fund/startups/openmatter-network` - **[PARTIAL - exa highlights]**.
+  Portfolio listing, founded 2025, "1-10 employees" - which contradicts the
+  vendor's own "about 12 people" and is reported as such.
+- LinkedIn post by the OpenMatter GTM lead, 2026-07-02 - **[PARTIAL - exa
+  highlights]**. Corroborates the June mainnet date.
+- `phala.com/learn/Phala-vs-AWS-vs-Azure-vs-GCP`, `phala.com/posts/Phala-Akash-Fleek`,
+  `docs.nillion.com/blind-computer/build/compute/overview` and `/api-reference`,
+  `nillion.com/news/nillions-phase-2-upgrade-is-live...`,
+  `fluence.network/blog/decentralized-cloud-computing-guide/` - **[PARTIAL - exa
+  highlights]**. The comparables table. Phala's per-vCPU-hour figures are dated
+  "as of Q1 2025" by Phala itself and are used as an order-of-magnitude anchor,
+  not a current quote.
+- Hacker News, Algolia API (keyless) - **[FULL, negative result]**, 2026-08-23.
+  A query for "openmatter" returns 290 hits, every one of them a false positive
+  on the ordinary phrase "open matter." **There is no Hacker News discussion of
+  OpenMatter Network.** For a company that launched publicly in June 2026 with a
+  newswire release, that is a real signal about reach, and it matches the
+  vendor's own admission that community building has not been the focus.
+
+**Escalation honesty.** The secondary sources above are marked PARTIAL rather
+than FULL because they were read through exa's search highlights rather than
+fetched raw. They are used only for corroborating facts already stated by the
+vendor on the call (Florida HQ, June mainnet, the three components) or for the
+comparables table. **No load-bearing claim in this addendum rests on a PARTIAL
+source alone** - the meeting record is FULL, and it is where every correction
+above comes from.

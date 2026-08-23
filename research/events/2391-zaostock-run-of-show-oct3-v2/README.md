@@ -29,6 +29,57 @@ name would make this document worse than empty.
 
 ---
 
+## CORRECTIONS from Zaal, 2026-08-23. Three findings in this doc were WRONG.
+
+Grilled him on the open decisions and three things this document asserted did not
+survive contact. Recording them at the top because two of them were presented as
+discoveries, and one of those went into a PR body and an artifact.
+
+**1. The Friday soundcheck collision does not exist. The outdoor stage is already
+standing.** Zaal: *"Outdoor stage is up from summer series concerts."* Decision 4
+below was built on doc 1032's load-in timeline, which schedules "stage structure
+assembly" for 07:00-08:00 on 3 October. That line was generic festival-planning
+boilerplate, not a fact about the Franklin Street Parklet - and doc 1032 itself
+contains the clue I walked past: the City runs its own weekly Downtown Summer
+Concert Series at this exact parklet with amplified bands. A venue that hosts
+weekly amplified concerts does not build a stage each time.
+
+So there was never anything to collide. **Decision 4 below is void.** Zaal's actual
+answer: checks happen at whichever stage the act plays, and Friday night runs both
+outside and inside. What remains open is the Friday running order and who runs
+sound, which is a smaller question than the one this doc invented.
+
+*This also means doc 1032's Finding 1 timeline is wrong about the stage build and
+should be corrected separately.*
+
+**2. Sets are not uniform, so the eight-acts-five-slots crisis dissolves.** Zaal:
+*"some sets will be 20 mins, fellenz will be 40, lyons den will be 30."* The
+arithmetic below divided 240 minutes by a uniform 45 and concluded three acts did
+not fit. With mixed 20/30/40-minute sets, eight acts fit the four-hour window
+comfortably - 40 + 30 + six at 20 is 190 minutes against 240 available.
+
+Note this is what doc 2295 said all along: *"we are doing like 20 and 40 minutes
+sets."* Steve's "everybody's got a 45-minute set" on the 17th was his framing, not
+the operating rule, and this doc treated a later quote as superseding an earlier
+one when they were describing different things.
+
+**The real constraint is not time, it is the list.** Six artists are flying in and
+their names appear in no file reachable from this machine - not doc 2295, not the
+OneNote archive, not the CRM. They exist in the ZAOstock `artists` table, which is
+rate-limited until 21 September, and in Zaal's memory. For a festival 40 days out,
+that is the actual risk, and it is the vanishing-dependency shape rather than a
+scheduling one.
+
+**3. Werb and Yerb are two different people - confirmed.** Zaal: *"2 diff people."*
+Board card 3a60bcae, due 24 August, would have written "Werb is wrong, use Yerb"
+into the brand glossary and renamed a Connecticut musician into Jordan Oram of
+Empire Builder. That card must not execute. Werb is the correct spelling.
+
+Separately, PR #38 stays closed for now: Zaal's call is to keep both artists off
+the public site until the lineup reveal.
+
+---
+
 ## STRUCTURE CHANGED - Zaal, 2026-08-23. Read this before the grid below.
 
 Zaal set the day's blocks directly, which answers decision 6 and re-cuts the grid:
@@ -258,7 +309,7 @@ doc 1032 runs to 22:30.
 
 ---
 
-## Decision 4 - the Friday soundcheck has nowhere to happen
+## Decision 4 - VOID. The outdoor stage is already up; see Corrections above
 
 The mandatory Friday soundcheck (2310 decision 5) is contractual and doubles as
 content capture. But two decided facts collide:

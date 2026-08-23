@@ -29,6 +29,75 @@ name would make this document worse than empty.
 
 ---
 
+## THE ROSTER, as far as it exists - Zaal, 2026-08-23
+
+First time any of this has been written down outside his head. It answers one open
+question, creates a harder one, and shows the daytime is thin rather than full.
+
+| Block | Who | Notes |
+|---|---|---|
+| **12:00-16:00 artists** | **Fellenz** (40 min), **Lyons Den** (30 min), **Dcoop** | Set length for Dcoop not stated |
+| **16:00-18:00 WaveWarZ** | **Stilo, Jango, Lui, Quan** battling, **Hurricane** MCing | |
+| **18:00-20:00 party** | **Stilo** DJing | |
+| **20:00+** | a couple of local Maine acts, brought by Steve | not named |
+
+Zaal, verbatim: *"we dont have a full list right now, we have fellenz, dcoop, lyons
+den all confirmed"* and *"we also have stilo, jango, lui, quan battling during
+wavewarz with hurricane mcing so some of those people are in wavewrz."*
+
+### This answers Monday's biggest question
+
+**WaveWarZ does use our own artists.** That was the reconciliation this doc proposed
+and refused to assume, and it is now confirmed. Doc 2295 described the form exactly -
+*"an emcee and two artists doing a little battle of music"* - and four battlers plus
+an MC is that form, twice over.
+
+### But the daytime is now THIN, not full
+
+This doc has had the artist count wrong in both directions inside two days. First it
+said eight acts would not fit five slots. Then Zaal said three were confirmed, not
+eight. Now the shape is clear and it is the opposite problem:
+
+```
+12:00 -> 16:00        =  240 minutes
+Fellenz 40 + Lyons Den 30  =   70 minutes stated
+plus Dcoop, length unstated
+                      =  roughly 100 of 240 minutes filled
+```
+
+**More than half the daytime window has nobody in it.** Doc 2295's "six flying out
+confirmed" was from 15 August and has not held; the four names that arrived today are
+WaveWarZ battlers in the 16:00-18:00 block, not daytime sets.
+
+**The fix is already on the record and the person offering it is in Monday's room.**
+Steve, doc 2295: *"if you have some blanks, we can always get somebody to fill in a
+blank locally - if it's like, oh yeah, we have a two o'clock spot that's not filled,
+we better get it built."* That is a standing offer to fill daytime gaps with local
+acts, made by the venue owner, and it has never been taken up. Ask on Monday.
+
+### Stilo now has three jobs and two of them collide
+
+He is down for **sound setup**, **battling in WaveWarZ 16:00-18:00**, and **DJing the
+party 18:00-20:00**.
+
+The first two cannot both happen. **You cannot compete in a battle and run sound for
+that battle at the same time**, and the battle is the day's showcase - the thing Zaal
+told Steve he most wanted to demonstrate. Someone else has to be on sound for that
+block, and nobody has been named. This is no longer a question about whether one
+person can work a long day; it is a hard scheduling conflict inside a two-hour window.
+
+### Open, and not resolved by guessing
+
+- **Is Hurricane on site or remote?** Doc 1524 lists him as "Tech / A/V (remote)".
+  MCing a live battle from a laptop is a different job from MCing it in the room, and
+  which one changes the AV requirement.
+- **Where did Steve's hip-hop crew go?** Still unanswered from the structure change.
+  They were the recorded 18:00-20:00 anchor; that block is Stilo now.
+- **"and in morning"** in Zaal's roster message is ambiguous - either a fourth act
+  called Inmorning, or "more confirmations in the morning". Not resolved here.
+
+---
+
 ## CORRECTIONS from Zaal, 2026-08-23. Three findings in this doc were WRONG.
 
 Grilled him on the open decisions and three things this document asserted did not

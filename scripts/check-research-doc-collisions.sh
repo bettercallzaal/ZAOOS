@@ -46,6 +46,46 @@ for num in $NEW_NUMS; do
   fi
 done
 
+# ---------------------------------------------------------------------------
+# Reservation check. Added 2026-08-23.
+#
+# The collision block below only fires AFTER a doc is written at a taken number,
+# which is too late - it cost two renumbers in one session on 2026-08-22, and
+# the ceiling moved 20 numbers between reserving and committing because other
+# writers (lanes, ZOE's autonomous research loop) never called zao-doc-next.
+#
+# zao-doc-next reserves by pushing an annotated tag `doc-NNNN`, which is a real
+# compare-and-swap against the remote. But a reservation only serialises writers
+# that participate. This makes participation mandatory at the commit boundary,
+# which is the one place every writer has to pass through.
+#
+# Silent when a reservation exists, so it can reach zero (noisy-signal-guard).
+UNRESERVED=""
+for num in $NEW_NUMS; do
+  if ! git rev-parse -q --verify "refs/tags/doc-${num}" >/dev/null 2>&1 \
+     && ! git ls-remote --tags origin "doc-${num}" 2>/dev/null | grep -q .; then
+    UNRESERVED="${UNRESERVED} ${num}"
+  fi
+done
+
+if [[ -n "${UNRESERVED// /}" ]]; then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - doc number(s) not reserved:${UNRESERVED}" >&2
+  echo "" >&2
+  echo "A number is only yours once zao-doc-next has pushed its tag. Without" >&2
+  echo "that, another lane can take it while you write - which is exactly what" >&2
+  echo "happened twice on 2026-08-22." >&2
+  echo "" >&2
+  echo "  zao-doc-next <slug>     # reserves, prints the number to use" >&2
+  echo "" >&2
+  echo "Then rename the directory and its '# NNNN -' heading to match." >&2
+  echo "" >&2
+  echo "Genuinely need to bypass (a backfill, a rescued doc)? Reserve the tag" >&2
+  echo "by hand so the next writer still sees it taken:" >&2
+  echo "  git tag -a doc-NNNN -m 'reserved by hand: <why>' && git push origin doc-NNNN" >&2
+  exit 1
+fi
+
 if [[ -n "$COLLISIONS" ]]; then
   echo "" >&2
   echo "[doc-collision-guard] BLOCKED - new doc number collides with existing research/:" >&2

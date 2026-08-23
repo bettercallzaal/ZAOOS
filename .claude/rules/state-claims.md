@@ -143,6 +143,41 @@ should be phrased as one.
 - Applies hardest to autonomous and overnight work, where nobody is reading over
   your shoulder and a wrong state claim becomes a wrong build.
 
+## Filesystem metadata is not file age (added 2026-08-22)
+
+`stat` and `ls -l` report the mtime of when a file was last written — not when its
+content was *created*. Bulk operations destroy this signal entirely.
+
+**The concrete failure (2026-08-21, confirmed):** a pruning pass was proposed for
+`~/.claude/projects/.../memory/` based on file age. Every memory file returned
+`2026-08-12` as its mtime — because commit `e1b7de5` ("sync: add ZAOOS memory,
+284 files, secret-scanned") rewrote all 416 files in one operation on 2026-08-11.
+A pruning pass sorted by mtime would have deleted by a meaningless signal — the
+newest memories and the oldest look identical.
+
+**Canonical memory-age command:**
+
+```bash
+git log --diff-filter=A --format="%ci %s" -- <file>
+```
+
+`--diff-filter=A` returns only the commit that ADDED the file. The date that prints
+is the true creation date, unaffected by syncs, renames, or bulk checkouts.
+
+To check a specific file:
+```bash
+git log --diff-filter=A --format="%ci" -1 -- memory/feedback_no_emojis.md
+# → 2026-03-15 19:41:23 +0000   (the actual date, not the sync date)
+```
+
+**Rule:** before sorting or pruning files by age in any directory that is under
+version control, verify that mtime is not synthetic. One `git log --diff-filter=A`
+spot-check on two or three files is enough to catch a bulk-sync artifact.
+
+**Never use `stat` as a proxy for content age in a git repo.** It is the cheapest
+available measure of file age and wrong the one time it matters — right after a
+bulk operation.
+
 ## Source
 
 Zaal 2026-08-07/08, from eight wrong state claims in one session and the

@@ -22,18 +22,26 @@ don't hold them in working memory or the transcript alone.
    thread living only in the conversation. Capturing is cheap; a lost thread is
    not.
 
-   > **TOOL STATUS 2026-08-19: `todo` IS NOT PRESENT on this Mac.** Verified four
-   > ways - absent from `~/bin` and `~/zaal-dotfiles/bin`, never in dotfiles git
-   > history (so git cannot restore it), and not a shell alias or function.
-   > `crush`, `cockpit`, `zao-triage`, `morning-pick` and `ztui` are gone with it.
-   > Board card 78f3279f tracks restore-or-retire.
+   > **TOOL STATUS 2026-08-23: `todo` IS PRESENT. Use it.** All six resolve on
+   > this Mac - `todo`, `crush`, `cockpit`, `zao-triage`, `morning-pick`, `ztui`,
+   > each at `~/bin/<name>`, each git-tracked in `zaal-dotfiles`. Zaal rebuilt
+   > them on **2026-08-21 09:59 EDT** (zaal-dotfiles `9c8993b`, "rebuild the
+   > capture-triage-crush CLI six", PR #67). Board card 78f3279f is resolved by
+   > that commit.
    >
-   > **Until it returns, the fallback IS the path:** write the parked thread into
-   > the session's task ledger AND straight onto the cowork board (the board is
-   > untouched and reachable), or send it to ZOE on Telegram, which is still a
-   > live capture door. Then surface it in the end recap. Do NOT invoke `todo`
-   > and assume it landed - it exits "command not found", which is a silent drop
-   > if nobody reads the shell output.
+   > **This block previously said the opposite, and that was correct when it was
+   > written.** The 2026-08-19 note recorded a real absence, verified four ways.
+   > It went stale two days later when the rebuild landed, and nothing updated
+   > it - so for two days a rule loaded into every session told every lane to
+   > route around a tool that worked. Re-verified 2026-08-23 by resolving all
+   > six with `command -v` and confirming the dotfiles commit.
+   >
+   > **The lesson is the shape, not the tools.** A TOOL STATUS note is a claim
+   > with a shelf life, and an absence claim goes stale the moment someone fixes
+   > the thing. Any note in these rules asserting a tool is missing must be
+   > re-verified before it is acted on, not trusted because it is written down
+   > (`state-claims.md`: name the source; `vanishing-dependencies.md` rule 3: a
+   > dependency's existence is checked, not assumed - which cuts both ways).
 
 3. **END RECAP - on a natural stop, a `/compact`, or when asked, surface the
    ledger in three buckets:** DONE (shipped, with proof - PR#/file), PARKED
@@ -55,3 +63,9 @@ don't hold them in working memory or the transcript alone.
 2026-07-29 marathon-session retro. Siblings: `workflow-discipline.md` (one thread
 at a time), `agent-loops.md` (rule 4: never leave a broken state),
 `[[project_capture_triage_crush_loop]]`, doc 606 (second-brain system).
+
+TOOL STATUS corrected 2026-08-23 after an idle-lane audit (`idle-lane-audit.md`
+step 2, "does what we depend on still exist") resolved all six binaries that this
+rule had declared missing. Found while checking a different artifact's claims -
+which is the argument for that rule: the check cost seconds and the stale note
+had been steering every session for two days.

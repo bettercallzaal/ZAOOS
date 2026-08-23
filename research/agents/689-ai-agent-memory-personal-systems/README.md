@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-22
 related-docs: 687
 tier: STANDARD
 ---
@@ -90,6 +90,20 @@ Hermes + ZOE run on Claude Code. Native file-based memory at ~/.claude/projects/
 2. **Sunday process-memory ritual:** Query orphan memories (no incoming links). Archive 90% as Obsidian pattern suggests
 3. **Dual-index the memory graph:** Fast keyword search on filenames/tags + semantic search on content. Use Serena's find_referencing_symbols to surface memory connections
 
+## Updated 2026-08-22
+
+Re-research via direct GitHub fetches + web search confirmed three material developments since the 2026-05-20 validation:
+
+**1. Shokunin upgraded to v4.2.3** (was v1.x at time of original doc — 25/25 health checks, 8 MCP tools). Now 110 stars, 176 commits, 12 MCP tools (was 8), and new **freshness decay**: exponential recency blending with a 30-day half-life so stale memories fade rather than polluting recall. Also added `verify_file_path` MCP tool to validate file paths from old memory before the agent acts — a claim-verification layer the original doc did not mention. Source: https://github.com/EliasOulkadi/shokunin (FULL fetch 2026-08-22)
+
+**2. ai-memory-mcp (alphaonedev) — a notable new competing approach**: v0.9.0 July 2026. Pure SQLite FTS5, zero embeddings, zero API costs, yet achieves **97.8% R@5 on LongMemEval-S**. Three auto-promoting tiers (short 6h → mid 7d → long permanent on 5+ accesses), 101 MCP tools, 6-factor scoring (FTS relevance + priority + access frequency + confidence + tier boost + recency decay). Multi-agent federation via W-of-N quorum writes. Challenges the original doc's assumption that vector search is mandatory — for exact-match dominated workloads, FTS5 alone outperforms hybrid. Source: https://github.com/alphaonedev/ai-memory-mcp (FULL fetch 2026-08-22)
+
+**3. mnemostack (udjin-labs) adds graph memory as a 4th dimension**: vector (Qdrant) + BM25 + temporal + **Memgraph knowledge graph with temporal validity windows**, fused via RRF through an 8-stage ranking pipeline. The original doc's 3-layer model (ingest/organize/recall) is unchanged but the recall layer now commonly adds graph traversal for multi-hop entity resolution that pure vector/BM25 misses. Source: https://github.com/udjin-labs/mnemostack (FULL fetch 2026-08-22)
+
+**Core claims in the original doc remain valid**: 3-layer architecture, hybrid dual-index, on-disk storage, scheduled recall rituals — all confirmed as best practice across 2026 systems. The new addition is **freshness decay** (now standard in production systems, not mentioned in original) and graph memory as an optional 4th store for relational knowledge.
+
+**ZAO implication**: ZOE's 4-block memory file system should consider adding freshness timestamps to human.md entries (mirrors Shokunin's decay model). The ai-memory-mcp approach (pure SQLite FTS5) is worth evaluating as a zero-cost alternative to ChromaDB for the recall layer.
+
 ## Sources
 
 - [Shokunin - AI Agent Memory System](https://github.com/EliasOulkadi/shokunin)
@@ -97,6 +111,8 @@ Hermes + ZOE run on Claude Code. Native file-based memory at ~/.claude/projects/
 - [r/hermesagent: Obsidian 3-layer system](https://www.reddit.com/r/hermesagent/comments/1teaqmi/how_i_use_obsidian_as_the_spine_of_my_personal/)
 - [r/hermesagent: Agent daily use discussion](https://www.reddit.com/r/hermesagent/comments/1tcwarx/what_does_your_agent_actually_do_for_you_on_a/)
 - [Hindsight LongMemEval Paper](https://arxiv.org/abs/2411.12900) (cited in Shokunin)
+- [ai-memory-mcp — pure SQLite FTS5, 97.8% R@5 LongMemEval](https://github.com/alphaonedev/ai-memory-mcp)
+- [mnemostack — vector + BM25 + temporal + graph, MCP server](https://github.com/udjin-labs/mnemostack)
 
 ## Next Actions
 

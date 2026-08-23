@@ -1,24 +1,107 @@
 {
   "week": 71,
-  "period_number": 70,
-  "date": "2025-10-17",
-  "era": "zor",
-  "contract": "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
-  "chain": "optimism",
-  "mint_type": 0,
-  "groups": [],
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Jose (Joesph Goats)",
+          "wallet": "0x29185eB8cfD22Aa719529217bFbadE61677e0Ad2",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zach L.",
+          "wallet": "0xb7f4b9CAbA6bb0AEaA2B5d8dF23E2B59c192bDbB",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Goose Park",
+          "wallet": "0xE8b8679C248307A37A2Bd35Dd43D2278ba346138",
+          "rank": null,
+          "level": null,
+          "respect": 110,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "CandyToyBox",
+          "wallet": "0x8D43A3fC2fed663BF6B82Ea4792C0e5239D5eE66",
+          "rank": null,
+          "level": null,
+          "respect": 68,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 42,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Mumbo",
+          "wallet": "0x8a1891e106b504656c525b3C45a3E95F7A73A73E",
+          "rank": null,
+          "level": null,
+          "respect": 42,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
   "video_awards": [],
-  "camera_on": [],
+  "camera_on": [
+    "Zaal",
+    "Jose (Joesph Goats)",
+    "Mumbo",
+    "Goose Park"
+  ],
   "photos": [],
   "attendance": null,
-  "participants": 0,
-  "respect_total": 0,
+  "participants": 6,
+  "respect_total": 482,
   "unnamed_wallets": 0,
   "sources": [
     "Optimism ZOR ERC-1155 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c via Blockscout (enumerated)",
-    "csv import/Wallet Data-Grid view.csv (name <-> wallet)"
+    "csv import/Wallet Data-Grid view.csv (name <-> wallet)",
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 71'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 71'"
   ],
   "coverage": "partial",
+  "notes": [
+    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched.",
+    "NO LIVE AWARDS: every ZOR award minted for this week was later burned. Settlement was attempted and fully reversed - this week is not a gap in the record, it is a reversal.",
+    "3 award(s) for this week were minted and later BURNED on-chain; they are excluded from participants and respect_total and listed in reversed_awards.",
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "MERGED: the ZOR mints for this week were fully reversed on-chain, so the live record here is the Airtable one. The reversed on-chain awards are preserved in reversed_awards."
+  ],
   "reversed_awards": [
     {
       "name": "Jose (Joesph Goats)",
@@ -44,10 +127,5 @@
       "burned_at": "2025-10-24T06:50:45.000000Z",
       "burn_tx": "0x12c1c2514fc04d890ada3d96b4b0ca9f55aac5ef46b8eee357be9d7891eba0f1"
     }
-  ],
-  "notes": [
-    "Built from the on-chain settled record, which is authoritative. `date` is the settlement date, NOT the session date - awards are batched.",
-    "NO LIVE AWARDS: every ZOR award minted for this week was later burned. Settlement was attempted and fully reversed - this week is not a gap in the record, it is a reversal.",
-    "3 award(s) for this week were minted and later BURNED on-chain; they are excluded from participants and respect_total and listed in reversed_awards."
   ]
 }

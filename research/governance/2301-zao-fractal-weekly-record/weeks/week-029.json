@@ -1,0 +1,121 @@
+{
+  "week": 29,
+  "period_number": null,
+  "date": null,
+  "era": "airtable",
+  "contract": null,
+  "chain": null,
+  "mint_type": null,
+  "groups": [
+    {
+      "group": 1,
+      "mode": "recorded",
+      "results": [
+        {
+          "name": "Zaal",
+          "wallet": "0x7234c36A71ec237c2Ae7698e8916e0735001E9Af",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Attabotty",
+          "wallet": "0x7990d756acf4e12afc41f995130a33925fb868ee",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Prizem",
+          "wallet": "0x65284960d4eAdaf45e923430A59B7D3Bf34dB641",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "heather",
+          "wallet": "0xbC66077E3a212c5f255Cfc986e7C0508cFeABFD1",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Meta Mu",
+          "wallet": "0x2d9cBC4ECFBd1B8F66Aa798FD51585AE058dAA8B",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Danici",
+          "wallet": "0xc98520e01789D21509EC449DDB5285Fc56a6EED8",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Melatto",
+          "wallet": "0x69b256C8016759fDAb80aDa8e4B48Ba2F6ceA088",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        },
+        {
+          "name": "Mumbo",
+          "wallet": "0x8a1891e106b504656c525b3C45a3E95F7A73A73E",
+          "rank": null,
+          "level": null,
+          "respect": 23,
+          "settled": null,
+          "title": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "video_awards": [],
+  "camera_on": [
+    "Zaal",
+    "Prizem",
+    "heather",
+    "Meta Mu",
+    "Melatto"
+  ],
+  "photos": [],
+  "attendance": null,
+  "participants": 8,
+  "respect_total": 184,
+  "unnamed_wallets": 0,
+  "sources": [
+    "csv import/Respect-Grid view.csv, column 'ZAO Fractal 29'",
+    "csv import/Wallet Data-Grid view.csv (name -> wallet, where known)",
+    "camera-on from column 'ZAO Video 29'"
+  ],
+  "coverage": "partial",
+  "notes": [
+    "OFF-CHAIN RECORD. No settlement transaction exists for this week - the OG ERC-20 does not carry a week number, so the chain cannot confirm which week an award belongs to. Values are as recorded in Airtable, by name.",
+    "Group structure is NOT known for this era. All results are in one group with mode 'recorded' rather than an invented ranking.",
+    "Values off the Fibonacci curve in this week: [23]. Recorded verbatim, not corrected."
+  ]
+}

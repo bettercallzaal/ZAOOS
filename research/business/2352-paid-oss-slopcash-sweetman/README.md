@@ -90,3 +90,27 @@ Patrick Sweetman, CTO of Recoup ~2 years. GitHub `sweetmantech`: 272 public repo
 - [OnlyDust manifesto](https://www.onlydust.com/) + [Fellowship docs](https://docs.onlydust.com/contributors-hiya/onlydust-fellowship) + [$1M AI-allocation blog](https://blog.onlydust.com/we-gave-1m-to-oss-contributors-with-an-ai-agent-it-wasnt-enough/) - [PARTIAL - exa highlights across three pages] 2026-08-24
 - [Algora on OSS.Fund](https://www.oss.fund/algora/) - [PARTIAL - exa highlights; fee + stats from listing] 2026-08-24
 - [Paragraph: Hyperstructures for Music (sweetman, 2022)](https://paragraph.com/@sweetman-eth/hyperstructures-for-music) - [PARTIAL - exa highlights; historical context only] 2026-08-24
+
+## EXTENSION 2026-08-24 (same day): the "should we just work on Recoup?" decision
+
+Follow-up question researched: is Recoup itself the open-source opportunity, and should it get exclusive focus?
+
+### Recoup's actual contribution surface (gh api, verified 2026-08-24)
+- **Org is active DAILY**: `chat` (110 open issues, pushed today), `api` (103 issues), `docs` (36), `skills`, `tasks` - all live.
+- **But the shop is tiny and closed in practice**: the last 15 merged PRs on `chat` are ALL by sweetmantech himself. Whole visible team: sweetmantech + techeng322 + sidneyswift + two coding agents (`recoup-coding-agent`, `cursoragent`). `chat` has NO LICENSE file (all-rights-reserved by default) and no CONTRIBUTING.md.
+- **The one explicitly open door: `recoupable/skills`** - has contributing.md, a RESOLVER.md routing table, CI that fails on unreachable skills, and instructions for adding skills + fixtures. Apache-2.0 on the plugin repos, MIT on docs. This is where outside PRs are invited.
+- **Business state** (research.recoupable.com/blog/recoup-in-2026, read via exa): PROFITABLE, two enterprise partners, 2026 goal is enterprise retention/expansion. Their open strategy, verbatim: "open templates, agent recipes, integrations and SDKs while keeping enterprise features secure." Q4 2025 stack included x402 (agent payments).
+- **No paid contributor program exists.** No job postings found. Contributing to Recoup earns relationship and record, not money - today.
+
+### Verdict: NOT "just Recoup" - Recoup-FIRST, three lanes
+1. **The handshake (this week)**: 1-2 quality PRs to `recoupable/skills` - the repo that explicitly invites it. A music-community operator shipping a skill (e.g. a community/event-ops skill informed by running 250+ artists) is the most credible possible DM opener.
+2. **The relationship (the DM)**: sweetman outreach now references shipped work, not intentions. The ask is not a job: it is "your enterprise-retention roadmap needs artist-side distribution; I run the testbed."
+3. **The real money angle is NOT employment**: Recoup exposes its stack via API/MCP with agent self-signup. A community operator can deliver label-services (research briefs, catalog valuations, content batches) to their own artists ON Recoup's stack - their blog explicitly wants developers building on it. That converts an existing artist network into a service line without waiting on anyone's hiring plans.
+4. **Parallel lanes stay open** (from the main doc): OnlyDust Fellowship verification, the one-day slop.cash record-building run. Retroactive public-goods funding (Base Builder Grants, Optimism RetroPGF when a round opens, Octant) remains the structural fit for open-source work already shipped - retro lanes pay for aligned work, bounty lanes pay for races.
+
+### Next Actions (extension)
+| Action | Owner | Type | By When |
+|---|---|---|---|
+| Ship 1 PR to recoupable/skills (follow contributing.md + RESOLVER.md + fixture; CI green). Shipped = PR open with passing checks | @Zaal (agent-assisted) | PR | 2026-08-28 |
+| THEN send the sweetman DM referencing the shipped PR | @Zaal | outreach | 2026-08-29 |
+| Scope one Recoup-API-powered service for community artists (inputs: their 30 research endpoints; agent signup endpoint is auth-free). Shipped = one-page service spec | @Zaal | draft | 2026-09-05 |

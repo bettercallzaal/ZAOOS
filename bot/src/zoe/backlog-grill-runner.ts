@@ -32,6 +32,7 @@ import {
   classifyReconcile,
   TERMINAL_VERDICT_RE,
   DRIP_DEFAULT,
+  extractPrRef,
   parseVerdict,
   renderCard,
   shouldSendNext,
@@ -343,7 +344,12 @@ export async function runBacklogGrillTick(
   const index = Object.keys(state.asked).length + 1;
   const why = (next.task.notes || '').split('\n')[0];
   const text = renderCard(
-    { title: next.task.title, createdAt: next.task.created_at, why },
+    {
+      title: next.task.title,
+      createdAt: next.task.created_at,
+      why,
+      pr: extractPrRef(next.task.notes),
+    },
     { index, total },
     now,
   );

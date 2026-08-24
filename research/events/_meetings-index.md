@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-24 | ZAOstock Standup | ZAOstock | Zaal, Candy, Paper, Fellenz, Joseph Goats, Mickey, Maceo, Mauro | [2410](2410-zaostock-standup-aug24/) | 11 |
 | 2026-08-20 | Thy Revolution x Zaal - cross-feed content format + Discord presence | COC Concertz / BCZ | Zaal, Thy Revolution | [2338](2338-thy-revolution-crossfeed-plan-aug20/) | 5 |
 | 2026-08-18 | Dank Phart x Zaal - ZAO identity layer, art DAO history, Peers bridge | ZAO Devz / fractal | Zaal, Dank Phart | [2339](2339-dank-phart-identity-layer-art-dao-aug18/) | 4 |
 | 2026-08-12 | Candy x Zaal - WaveWarZ as the oracle for music prediction markets | WaveWarZ | Zaal, Candy | [2340](2340-candy-zaal-wavewarz-prediction-market-aug12/) | 4 |

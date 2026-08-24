@@ -125,6 +125,57 @@ Before reporting that a feature is or is not running:
 3. **Say which you measured.** "No `[zoe/ran]` line since the last boot" is a
    fact. "It is not running" is an inference, and only sound once (1) holds.
 
+## A claim carries its DATE as well as its source (added 2026-08-23)
+
+The rule above says name the source. Its twin: **a claim about a moving fact is
+only as good as the day it was made, so a durable artifact must carry that day.**
+A time-relative word written into a note, doc or brief is stale the moment the day
+turns, and nothing about the sentence announces that.
+
+Five instances of this shape landed in a single day on 2026-08-23, across three
+different lanes:
+
+| The claim | Written | Read as current | Reality |
+|---|---|---|---|
+| A brief set the standup at "2026-08-25" | 08-22 | 08-22 | It was Monday the **24th**; the 25th is a Tuesday, so the date and the day-name disagreed with each other |
+| "Lineup announces August 2026" measured off a local clone | - | 08-22 | The clone sat on a branch from days earlier. `main` and production had already been fixed |
+| "6 out-of-state artists CONFIRMED" (doc 2295) | 08-15 | 08-22 | **Three** confirmed. A whole doc's arithmetic was built on the stale eight |
+| A card note: "Zaal building the deck **TODAY**" | 08-19 | 08-23 | Propagated four days on by a lane that had no way to see the word was old |
+| Doc 2325's fact sheet: "8 confirmed **as of 2026-08-20**" | 08-20 | 08-23 | Also wrong by then - **and catchable in seconds, because it carried its date** |
+
+The last row is the fix, demonstrated. Same wrong number as row three; the only
+difference is that it said when.
+
+### The gate
+
+1. **Never write "today", "this week", "currently", "now" or "recently" into
+   anything that outlives the conversation** - a card note, a doc, a brief, a
+   handoff, a commit body. Write the date. "Zaal is building it today" becomes
+   "Zaal was building it 2026-08-19".
+2. **Stamp any figure that can move.** Counts, confirmations, versions, prices,
+   statuses. `as of YYYY-MM-DD` is four words and it converts a future wrong
+   answer into a visible one.
+3. **When you read a time-relative claim, resolve it against when it was
+   WRITTEN, not when you are reading.** Check the note's date, the doc's
+   `last-validated`, the commit. If you cannot establish when it was written,
+   that is itself the finding - say so rather than assuming it is current.
+4. **Check the day-name against the date.** "Mon 25 Aug" carries its own
+   contradiction if the 25th is a Tuesday, and `date -j -f %Y-%m-%d` settles it
+   in one command. Two of the five above were catchable this way alone.
+5. **A local clone is a time-relative claim too.** Measuring anything from a
+   working tree without checking what it is checked out to is reading a snapshot
+   of an unknown date. Measure against `origin/main`, or against production.
+
+### Why this is not covered by the rules already here
+
+`anti-fabrication.md` rule 5 bans **inventing** dates. This is the opposite
+failure: the date was real and true when written, and decayed. Nobody fabricated
+anything, and the claim still became false. `recap-followthrough.md` covers the
+same decay in meeting recaps specifically; this generalises it to every durable
+artifact.
+
+---
+
 ## The tell
 
 If you are about to write "it's built", "nothing does X", "we're on version Y", or

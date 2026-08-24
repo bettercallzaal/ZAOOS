@@ -176,6 +176,50 @@ function cfg(): { root: string; headers: Record<string, string> } | null {
  * recreate the starvation this whole change exists to undo - just with a
  * different set of twenty at the front.
  */
+const BOARD_PAGE = 500;
+const BOARD_MAX_PAGES = 20;
+
+/**
+ * THE FETCH WINDOW (2026-08-24). Every tier above sorts the rows this returns,
+ * so a truncated fetch starves the queue in a way no tier can see or undo.
+ *
+ * It fetched `limit=200` ordered oldest-first. Measured against the live board
+ * the same day: 385 open cards, 191 of the oldest 200 already asked. So `fresh`
+ * was nearly empty while 185 cards sat OUTSIDE the window - not grilled slowly,
+ * never grilled at all. The oldest 200 were a closed set that only shrank when
+ * Zaal answered one, and the newest card could not surface until 185 older ones
+ * were cleared.
+ *
+ * Paged rather than raised to a bigger constant: a bigger number is the same bug
+ * with a later trigger date. A short page ends the loop, so the window is the
+ * board. The page ceiling exists only to bound a runaway and SAYS SO when hit -
+ * it never silently returns a partial board.
+ *
+ * Fails CLOSED. A failed page returns null and the tick simply skips, because
+ * grilling off a half-read board reintroduces exactly this starvation.
+ */
+async function fetchTodoRows(
+  c: { root: string; headers: Record<string, string> },
+  fetchImpl: typeof fetch,
+): Promise<BoardTask[] | null> {
+  const out: BoardTask[] = [];
+  for (let page = 0; page < BOARD_MAX_PAGES; page++) {
+    const url =
+      `${c.root}/rest/v1/tasks?status=eq.todo&archived_at=is.null` +
+      `&select=id,legacy_id,title,created_at,notes&order=created_at.asc` +
+      `&limit=${BOARD_PAGE}&offset=${page * BOARD_PAGE}`;
+    const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
+    if (!r.ok) return null;
+    const rows = (await r.json()) as BoardTask[];
+    out.push(...rows);
+    if (rows.length < BOARD_PAGE) return out;
+  }
+  console.error(
+    `[grill] board exceeds ${BOARD_MAX_PAGES * BOARD_PAGE} open cards - tail not scanned`,
+  );
+  return out;
+}
+
 async function nextTask(
   s: BacklogGrillState,
   fetchImpl: typeof fetch,
@@ -183,12 +227,8 @@ async function nextTask(
 ): Promise<{ task: BoardTask; remaining: number; unasked: number } | null> {
   const c = cfg();
   if (!c) return null;
-  const url =
-    `${c.root}/rest/v1/tasks?status=eq.todo&archived_at=is.null` +
-    `&select=id,legacy_id,title,created_at,notes&order=created_at.asc&limit=200`;
-  const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
-  if (!r.ok) return null;
-  const rows = (await r.json()) as BoardTask[];
+  const rows = await fetchTodoRows(c, fetchImpl);
+  if (!rows) return null;
   // A never-asked task whose notes already carry a terminal grill verdict was
   // ruled on from the other end - sending it a phone card would be the exact
   // both-ends dupe this card exists to kill (6b6875d1). It still shows up here

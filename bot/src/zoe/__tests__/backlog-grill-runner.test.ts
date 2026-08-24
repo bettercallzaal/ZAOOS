@@ -472,3 +472,84 @@ describe('grill unification - the tick side', () => {
     expect(boardUrl).not.toContain('route');
   });
 });
+
+/**
+ * The bug this guards (2026-08-24, measured on the live board): the fetch asked
+ * for the oldest 200 cards while 385 were open, and 191 of that 200 had already
+ * been asked. The 185 cards outside the window could never be grilled at all -
+ * the tiers above only ever sorted rows the fetch had already thrown away.
+ */
+describe('runBacklogGrillTick - the fetch window is the whole board', () => {
+  const PAGE = 500;
+  // 600 cards: card 501 is unreachable under any single-page fetch.
+  const all = Array.from({ length: 600 }, (_, i) => ({
+    id: `t${i}`,
+    title: `Card ${i}`,
+    created_at: new Date(Date.UTC(2026, 0, 1) + i * 60_000).toISOString(),
+  }));
+
+  const pagedFetch = (seen: string[]) =>
+    (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+      const u = String(url);
+      if (u.includes('order=created_at.asc')) {
+        seen.push(u);
+        const offset = Number(/offset=(\d+)/.exec(u)?.[1] ?? 0);
+        return {
+          ok: true,
+          status: 200,
+          json: async () => all.slice(offset, offset + PAGE),
+        } as unknown as Response;
+      }
+      return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+  beforeEach(async () => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+  });
+
+  it('pages until the board is exhausted, so every card is reachable', async () => {
+    const seen: string[] = [];
+    const state = await readState();
+    // Every card in the first page has already been asked - the exact shape that
+    // starved the queue.
+    await writeState({
+      ...state,
+      asked: Object.fromEntries(all.slice(0, PAGE).map((t) => [t.id, { at: 'x', title: t.title }])),
+      answered: Object.fromEntries(all.slice(0, PAGE).map((t) => [t.id, { at: 'x', verdict: 'done' }])),
+    });
+
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: Date.UTC(2026, 7, 24, 14, 0, 0),
+      fetchImpl: pagedFetch(seen),
+    });
+
+    // Before the fix this was null - nothing to send, with 100 cards untouched.
+    expect(result.sent).toBe(true);
+    expect(result.title).toBe('Card 500');
+    expect(seen.length).toBeGreaterThan(1);
+  });
+
+  it('fails closed on a bad page rather than grilling a half-read board', async () => {
+    const f = (async (url: string) => {
+      const u = String(url);
+      if (u.includes('offset=0')) {
+        return { ok: true, status: 200, json: async () => all.slice(0, PAGE) } as unknown as Response;
+      }
+      if (u.includes('order=created_at.asc')) return { ok: false, status: 500 } as unknown as Response;
+      return { ok: true, status: 200, json: async () => [] } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: Date.UTC(2026, 7, 24, 14, 0, 0),
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(false);
+  });
+});

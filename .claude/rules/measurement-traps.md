@@ -134,6 +134,50 @@ for fifteen hours - thousands of requests, every one a 402, changing nothing.
 **A loop that cannot tell an error from an empty result cannot back off**, and
 one that cannot back off turns an outage into a bill.
 
+### 9. A noise-reducing flag can silently delete the measurement
+
+```
+WRONG   ffmpeg -v error -i test.mkv -af volumedetect -f null -   -> EMPTY output
+RIGHT   ffmpeg -i test.mkv -af volumedetect -f null -            -> the numbers
+```
+
+`volumedetect` writes its results at **info** level. `-v error` was added to
+suppress ffmpeg's banner noise and suppressed the answer with it. The command
+exits 0 and prints nothing, which reads exactly like "this file has no audio".
+
+Hit 2026-08-23 by the windows-desktop lane, which nearly reported "no audio
+analysis available" for a file whose audio was fine.
+
+**The general form: a flag chosen to reduce noise can remove the signal.** Any
+`-q`, `-s`, `--silent`, `--quiet`, `-v error` or `2>/dev/null` sitting between
+you and a measurement is a suspect. If a measurement command returns nothing,
+re-run it with the quieting removed BEFORE concluding the thing measures zero.
+
+### 10. The active item is not the population
+
+```
+WRONG   check the ACTIVE scene collection, conclude about all collections
+RIGHT   enumerate every collection, check each
+CHECK   is the setting I changed PER-ITEM or PROFILE-WIDE?
+```
+
+An OBS canvas change is **profile-level**, so it applied to every scene
+collection. Transforms were reset in the active one only. Measured afterwards:
+
+```
+Baraza Live   0 of 91 items wrong   (the one that was checked)
+WW1          29 of 46 items wrong   (that night's actual rig)
+Untitled      9 of 19 items wrong
+```
+
+Twenty-nine elements of the live show would have rendered at 2-3x oversize, and
+**the encode test would have passed the whole time** - the file was valid, the
+geometry was wrong.
+
+**The general form: when a setting is global and its consequences are local,
+checking the local thing in front of you proves nothing about the rest.** Ask
+what the blast radius of the change actually was, then enumerate that set.
+
 ## The gate
 
 Before reporting any measured claim, ask **which of these seven shapes am I in**:
@@ -145,8 +189,10 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 5. Is something supervising the thing I just changed?
 6. Does this provider actually observe what I am asking it to attribute?
 7. Did I assert on content, or on a status code?
+8. Is a quieting flag sitting between me and the measurement?
+9. Was the change global while I only checked the local case?
 
-Answering all seven costs seconds. Six of the eight wrong claims in the
+Answering all nine costs seconds. Six of the eight wrong claims in the
 2026-08-22/23 session would have died at question 1, 2, or 3.
 
 ## Guards

@@ -2,7 +2,7 @@
 topic: events
 type: pitch-deck-words
 status: draft-for-zaal
-last-validated: 2026-08-20
+last-validated: 2026-08-23
 board-task: 8556d703
 related-docs: "2310, 2315, 2316, 1334, 1539, 1079, 1327, 443, 1277, 1361, 1659"
 original-query: "Pitch deck v1 words: three variants (general / local / online) - Zaal writes words, Paper + Candy design. Modeled on Fellenz's deck."
@@ -27,6 +27,38 @@ tier: STANDARD
   slide. One design, three word-sets. Swap slides 4, 8, 9, 11 per variant; the
   rest is shared.
 - **Nobody sends anything from this doc.** Outbound is Zaal's tap.
+
+---
+
+## CORRECTED 2026-08-23 - SEVEN facts below are stale. Read this first.
+
+This doc was written 20-21 August. The day changed on the 23rd, and the roster
+changed twice. **Do not build slides straight from Part 1 without applying these.**
+
+| Fact in Part 1 | What is true as of 2026-08-23 |
+|---|---|
+| Event window "12 PM - 6 PM" | **12-4 artists, 4-6 WaveWarZ, 6-8 party, 8pm+ local acts** |
+| Stages flagged as a CONFLICT | **Resolved, and then replaced.** Not two alternating stages - **one venue at a time**: everything outdoors until 6, everything indoors at Black Moon after |
+| Sets "45 minutes, scripted" | **Variable.** Fellenz 40, Lyons Den 30, others 20 |
+| Artists "8 confirmed (6 flying in + 2 local)" | **Do not print a count.** It has moved three times in four days. Confirmed daytime: Fellenz, Dcoop, Lyons Den, Acadia Rising. WaveWarZ: Stilo, Jango, Lui, Quan, with Hurricane MCing |
+| After-party "Steve Peer's hip-hop crew + one of his bands" | **Stilo DJing.** Where that crew now sits is an open question with Steve |
+| WaveWarZ unscheduled | **Its own 16:00-18:00 block, outdoors** |
+| Fiscal sponsor / Fractured Atlas | **FA is OUT for this event (Zaal, 2026-08-23).** With no fiscal sponsor, donations are NOT tax-deductible and no slide may say they are - PR #39 already had to fix that claim once on /pitch and /sponsor. **The deck asks for SPONSORSHIP, a marketing spend, not a donation.** |
+
+**Two numbers to re-pull rather than copy.** The WaveWarZ battle and SOL totals in
+Part 1 came off the live API around 20 August and move daily. Pull them again the
+night the deck is built - a stale figure in a sponsor deck is the kind that gets
+checked.
+
+**Why this is a block at the top rather than an edit in place.** Part 1 is cited by
+`content/pitch-pack/pack.json` and by anyone who read this doc in the last three
+days. Silently rewriting the numbers would leave them believing a version that no
+longer exists. The corrections are visible; the original is still readable
+underneath.
+
+**Build sheets, current as of 2026-08-23**, on the clipboard: the slide-by-slide
+LOCAL sheet against Part 2's twelve-slide spine, and the tier ladder for slide 9
+which was the one blank.
 
 ---
 

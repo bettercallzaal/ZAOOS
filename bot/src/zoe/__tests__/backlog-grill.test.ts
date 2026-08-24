@@ -3,6 +3,7 @@ import {
   classifyReconcile,
   DRIP_DEFAULT,
   parseVerdict,
+  extractPrRef,
   renderCard,
   shouldSendNext,
   TERMINAL_VERDICT_RE,
@@ -126,6 +127,70 @@ describe('renderCard', () => {
 
   it('survives a task with no date or why', () => {
     expect(() => renderCard({ title: 'bare' }, { index: 1, total: 1 }, now)).not.toThrow();
+  });
+});
+
+describe('extractPrRef', () => {
+  // VERBATIM from the cowork tracker, 2026-08-24. Line 1 is the WHY; the PR
+  // reference is on line 2, which the card never showed. This is the exact
+  // input that failed, not a paraphrase.
+  const zpoidh =
+    'WHY: Handing off zpoidh/poidhz operations + the live WaveWarZ bounty to Iman\n' +
+    'FULL TITLE AS CAPTURED: zpoidh/poidhz handoff: R5 WaveWarZ clip bounty LIVE ' +
+    '(poidh.xyz/base/bounty/1330, deadline Aug 30), poidhz rebrand content-complete, ' +
+    'PR #103 open for review. Bundle: zpoidh/.handoffs/session-2026-08-21-wavewarz-r5-iman-handoff/README.md\n' +
+    'DONE WHEN: Iman has read the bundle and PR #103 is reviewed\n' +
+    'Action item captured from forwarded email.';
+
+  it('finds a PR named below line 1 - the 17-card defect', () => {
+    expect(zpoidh.split('\n')[0]).not.toContain('PR #103'); // what the card used to show
+    expect(extractPrRef(zpoidh)).toBe('PR #103');
+  });
+
+  it('prefers a tappable URL over a bare number', () => {
+    const notes = 'PR #12 was the old one\nnow at https://github.com/bettercallzaal/ZAOOS/pull/3303';
+    expect(extractPrRef(notes)).toBe('https://github.com/bettercallzaal/ZAOOS/pull/3303');
+  });
+
+  it('takes the LAST reference - notes are an append-log', () => {
+    expect(extractPrRef('PR #1 opened\n\nsuperseded by PR #2')).toBe('PR #2');
+  });
+
+  it('is null when no PR is named, so the card gains no line', () => {
+    expect(extractPrRef('just a note about a pull cart')).toBeNull();
+    expect(extractPrRef('')).toBeNull();
+    expect(extractPrRef(null)).toBeNull();
+  });
+
+  it('reads PR #123 in any spacing', () => {
+    expect(extractPrRef('see PR#615')).toBe('PR #615');
+    expect(extractPrRef('see PR # 615')).toBe('PR #615');
+  });
+
+  // The regexes are module-level and /g. A stateful lastIndex would make every
+  // second call on the same string return null - which would be invisible in a
+  // single-card test and wrong in production, where one process sends card
+  // after card.
+  it('is not stateful across calls', () => {
+    expect(extractPrRef(zpoidh)).toBe('PR #103');
+    expect(extractPrRef(zpoidh)).toBe('PR #103');
+  });
+});
+
+describe('renderCard with a PR', () => {
+  const task = { title: 'Fix Fractal documentation', createdAt: '2026-07-07T00:00:00Z' };
+  const now = Date.parse('2026-08-08T00:00:00Z');
+
+  it('shows the PR immediately above the buttons', () => {
+    const out = renderCard({ ...task, pr: 'PR #103' }, { index: 1, total: 5 }, now);
+    expect(out).toContain('PR #103');
+    expect(out.indexOf('PR #103')).toBeLessThan(out.indexOf('1. Done'));
+  });
+
+  it('adds no line when there is no PR - cards stay phone-sized', () => {
+    const without = renderCard(task, { index: 1, total: 5 }, now);
+    const withEmpty = renderCard({ ...task, pr: null }, { index: 1, total: 5 }, now);
+    expect(withEmpty).toBe(without);
   });
 });
 

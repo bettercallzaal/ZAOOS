@@ -113,6 +113,49 @@ function build(key: VerdictKey, note?: string): Verdict {
   };
 }
 
+const PR_URL_RE = /https?:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d+/gi;
+const PR_HASH_RE = /\bPR\s*#\s*(\d+)\b/gi;
+
+/**
+ * A pull-request reference from ANYWHERE in the notes, not just line 1.
+ *
+ * Notes on this board are an APPEND-LOG - `applyVerdict` below appends with
+ * `\n\n`, and lanes append their own updates the same way - but the card only
+ * ever showed `notes.split('\n')[0]`, the OLDEST line anyone wrote.
+ *
+ * Measured on the cowork tracker, 2026-08-24, 387 open cards: 196 have
+ * multiline notes, 49 name a PR, and on 17 of those the reference sits below
+ * line 1. So the card asked "work on it or skip?" about work that already had a
+ * PR open, with nothing on screen to say so. Verbatim example, card
+ * "Inbox action: zpoidh/poidhz handoff" - line 1 is the WHY, and
+ * "PR #103 open for review" is on line 2, invisible.
+ *
+ * This deliberately does NOT assert the task is finished. A note can name a PR
+ * as a dependency rather than as the deliverable, and inferring "prep is done"
+ * from a mention would be a guess. It puts the FACT on the card; seeing it is
+ * the whole difference between a question about open work and a question about
+ * something already waiting on him.
+ *
+ * A full URL wins over a bare `PR #123` because it is tappable on a phone. The
+ * LAST occurrence wins because the notes are append-ordered.
+ *
+ * REJECTED, so it is not rebuilt: a companion picker that showed the freshest
+ * DATED line instead of line 1. It regressed a real card - "KV backup Option 1"
+ * ends with "Source: missed-todos audit meeting, 2026-08-16", so the newest
+ * date is provenance, not an update, and the picker replaced a useful WHY with
+ * metadata. Restricting it to update markers (LANE PREP / TRIAGE / CORRECTED)
+ * would have been safe but covers only 5 of 196 multiline cards. Not worth a
+ * heuristic with a known false-positive mode.
+ */
+export function extractPrRef(notes?: string | null): string | null {
+  const text = notes || '';
+  const urls = text.match(PR_URL_RE);
+  if (urls && urls.length > 0) return urls[urls.length - 1];
+  const hashes = [...text.matchAll(PR_HASH_RE)];
+  if (hashes.length > 0) return `PR #${hashes[hashes.length - 1][1]}`;
+  return null;
+}
+
 /**
  * The card.
  *
@@ -121,7 +164,7 @@ function build(key: VerdictKey, note?: string): Verdict {
  * that is invisible from a title.
  */
 export function renderCard(
-  task: { title: string; createdAt?: string; why?: string | null },
+  task: { title: string; createdAt?: string; why?: string | null; pr?: string | null },
   position: { index: number; total: number },
   now = Date.now(),
 ): string {
@@ -142,6 +185,13 @@ export function renderCard(
   if (why && !/Reply to Claude in next session/i.test(why)) {
     lines.push('');
     lines.push(why.slice(0, 180));
+  }
+  // Last thing above the buttons, because it is the line that changes the
+  // answer: a card with a PR open is waiting on Zaal, not asking him to start.
+  const pr = (task.pr || '').trim();
+  if (pr) {
+    lines.push('');
+    lines.push(pr);
   }
   lines.push('');
   for (const v of VERDICTS) lines.push(`${v.n}. ${v.label}`);

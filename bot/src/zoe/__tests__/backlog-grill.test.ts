@@ -3,6 +3,7 @@ import {
   classifyReconcile,
   DRIP_DEFAULT,
   parseVerdict,
+  cardPosition,
   extractPrRef,
   renderCard,
   shouldSendNext,
@@ -191,6 +192,38 @@ describe('renderCard with a PR', () => {
     const without = renderCard(task, { index: 1, total: 5 }, now);
     const withEmpty = renderCard({ ...task, pr: null }, { index: 1, total: 5 }, now);
     expect(withEmpty).toBe(without);
+  });
+});
+
+describe('cardPosition', () => {
+  // The exact pair Zaal photographed on 2026-08-25: a card reading 559/558 with
+  // a pinned card reading 375/374 in the same screenshot. Both are re-asks with
+  // an empty fresh pile, which is the steady state once the queue is swept.
+  it('never renders index greater than total - the 559/558 bug', () => {
+    const { index, total } = cardPosition(558, 0, false);
+    expect(index).toBeLessThanOrEqual(total);
+    expect(`${index}/${total}`).toBe('558/558');
+  });
+
+  it('the pinned card in the same screenshot - 375/374', () => {
+    const { index, total } = cardPosition(374, 0, false);
+    expect(`${index}/${total}`).toBe('374/374');
+  });
+
+  it('a genuinely new card still advances the position', () => {
+    expect(cardPosition(2, 318, true)).toEqual({ index: 3, total: 320 });
+  });
+
+  it('a re-ask sits at the end of the pile, not past it', () => {
+    expect(cardPosition(10, 5, false)).toEqual({ index: 10, total: 15 });
+  });
+
+  it('the very first card reads 1/1, not 1/0', () => {
+    expect(cardPosition(0, 1, true)).toEqual({ index: 1, total: 1 });
+  });
+
+  it('degenerate input cannot produce 0/0 or a negative', () => {
+    expect(cardPosition(0, 0, false)).toEqual({ index: 1, total: 1 });
   });
 });
 

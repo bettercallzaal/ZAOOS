@@ -255,3 +255,50 @@ OpenMatter is enterprise-grade infrastructure for multi-organizational AI govern
 ---
 
 **Status**: Ready for Wednesday pod. Sources scanned for secrets; none found. No dependencies or blockers.
+
+---
+
+## Addendum - 2026-08-21 re-check (platform has moved since this doc)
+
+This doc's core "bring your own compute" finding is **stale**. Zaal has since
+been invited to OpenMatter (2026-08-10), has a funded credit wallet, and was in
+a working meeting with their team on 2026-08-13 ("ZAO <> OpenMatter - Agentic
+Legal Entities"). Re-fetched `openmatter.network` and `/platform` directly
+(raw HTML, stripped, not WebFetch-summarized) on 2026-08-21:
+
+> "OpenMatter delivers verifiable execution, governed AI behavior and secure
+> collaboration through Datavizor, QuantumGuard and the **OpenMatter Credit
+> network**." / "**Deploy** AI, analytics, and data pipelines **on shared
+> infrastructure** without exposing your inputs, models, or results." /
+> "**Distributed Orchestration** - choose where your deployments run.
+> Schedule compute jobs across private infrastructure, public providers, or
+> any blend of the two."
+
+That is a real compute/deploy/credit product. This doc's July 19 verdict
+("OpenMatter does NOT host your agent... you bring your own compute") no
+longer holds - either the product expanded between the two dates, or the
+July eval undersold what Datavizor already did. The governance/verification
+framing (QuantumGuard, cryptographic proof) is unchanged and still central.
+
+**Not found on the public site**: pricing, per-compute-hour rates, an
+"agentic legal entities" framing, or deployment step-by-steps - those live
+behind the logged-in Datavizor dashboard (`datavizor.openmatter.network`),
+which requires Zaal's session to read. The 2026-08-13 meeting notes doc
+(Gemini-generated, shared by Chris B in Telegram) has not been captured
+anywhere in `zao-vault` or `research/` as of this addendum - get it from Zaal
+before treating "agentic legal entities" as OpenMatter's own product framing
+vs. ZAO-specific meeting framing.
+
+**Relationship state as of 2026-08-21** (see `zao-vault/handoffs/openmatter.md`
+for the live brief): Zaal owes Chris B a reply - he said "I have not but plan
+to deploy a test today" on 2026-08-18 and nothing has gone back in 3 days.
+An 2026-08-14 wallet-balance/credits discrepancy (0.3932 credits, ~0.47
+compute-hr) was flagged in-thread and its resolution is unconfirmed. Also
+flagged, unconfirmed: whether "Adam Miller (TheThriller)," the OpenMatter
+group owner, is the same Adam Miller behind the MiDAO/RMI-LLC legal-body pitch
+(`project_zao_midao_legal_body.md`) - same full name, two separate pitches to
+Zaal, not yet asked directly.
+
+Sources: `https://www.openmatter.network/` (FULL, raw fetch 2026-08-21),
+`https://www.openmatter.network/platform` (FULL, raw fetch 2026-08-21).
+`datavizor.openmatter.network` (FAILED - requires login, not attempted here).

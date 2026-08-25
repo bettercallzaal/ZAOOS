@@ -553,3 +553,60 @@ describe('runBacklogGrillTick - the fetch window is the whole board', () => {
     expect(result.sent).toBe(false);
   });
 });
+
+/**
+ * The read half of the ready stamp: the runner has to actually fetch and pass
+ * `metadata`, or `renderCard` never sees the stamp a lane wrote.
+ */
+describe('runBacklogGrillTick - carries the prep-done stamp onto the card', () => {
+  const rows = [
+    {
+      id: 'r1',
+      title: 'Prepped card',
+      created_at: '2026-08-01T00:00:00Z',
+      notes: 'someone should do this',
+      metadata: {
+        route: 'prep',
+        prep_done_at: '2026-08-24T02:46:03Z',
+        pr: 'https://github.com/bettercallzaal/ZAOOS/pull/3303',
+        prep_note: 'fetch pages the whole board',
+      },
+    },
+  ];
+
+  it('sends READY with the PR, and asked the board for metadata', async () => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+
+    const seen: string[] = [];
+    const f = (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+      const u = String(url);
+      if (u.includes('order=created_at.asc')) {
+        seen.push(u);
+        return { ok: true, status: 200, json: async () => rows } as unknown as Response;
+      }
+      return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+    let body = '';
+    const result = await runBacklogGrillTick({
+      sendDM: async (text) => {
+        body = text;
+        return { message_id: 1 };
+      },
+      localHour: 10,
+      now: Date.UTC(2026, 7, 24, 14, 0, 0),
+      fetchImpl: f,
+    });
+
+    expect(result.sent).toBe(true);
+    // Without metadata in the select the stamp is invisible no matter what
+    // renderCard does - this is the half that actually broke.
+    expect(seen[0]).toContain('metadata');
+    expect(body).toContain('READY - prep done, waiting on you');
+    expect(body).toContain('https://github.com/bettercallzaal/ZAOOS/pull/3303');
+    expect(body).not.toContain('someone should do this');
+  });
+});

@@ -193,6 +193,27 @@ requirement does not apply and no external claim is made.
 - [FULL - `mcp__supabase-cowork__execute_sql` against the cowork tracker] 387 open cards; `owner_label` distribution; the Dank Phart, Aziz, Baraza, Zoostr, CEF and fractal-award cards quoted from their `title` and `notes`.
 - [FULL - read from disk] `zao-vault/people/Sam.md`, `people/Cassie.md`, `projects/brand-priorities.md` (locked 2026-08-18).
 - [FULL - read from disk] memory `project_zao_vs_zabal_projects` (2026-05-07), `project_fractal_process`, `project_james_meme_for_trees` (doc 2101), `project_coc_concertz_framing`, `project_wavewarz_canonical`, `project_hurric4n3ike`, `project_candytoybox_samantha`, `project_adrian_empire_builder`, `project_empire_builder_zabal_integration`, `project_jose_acabrera`, `project_marie_civilmonkey_berlin`, `project_zao_fund_artizen`.
-- [FULL - `~/.zao/private/icm-registry.json`] 23 ICM boxes, name list only. Carries no team data, which is itself a finding.
+- [FULL - `~/.zao/private/icm-registry.json`] 23 ICM boxes, name list only.
+
+> **CORRECTED 2026-08-25.** This line originally read "Carries no team data, which
+> is itself a finding." That was an absence claim made from the registry's NAME
+> LIST without opening a single box - exactly the failure
+> `confirm-before-claiming-absence.md` exists to prevent, committed inside an audit
+> about unread surfaces.
+>
+> Four boxes were then actually fetched. **`wavewarz` HAS a `## Team` section**:
+> `- Hurric4n3ike - founder / dev / MC`. `thezao`, `zabalgamez` and `coc-concertz`
+> have none. So the correct statement is: **one of four sampled boxes carries team
+> data, and it is incomplete.**
+>
+> The incompleteness is the live finding. That box names one of three people. Zaal
+> confirmed on 2026-08-24 that WaveWarZ is Hurric4n3ike (founder, lead dev),
+> **Candy (promo and media)** and **Zaal (ecosystem lead)**. ICM boxes are UPSTREAM -
+> `icm-grounding.md` says the box wins and downstream copy is generated from it - so
+> a box naming one third of a team propagates that gap outward into bios, pitch copy
+> and any agent that grounds on it.
+>
+> Editing a box is publishing public content and is **gated to Zaal**. Surfaced, not
+> changed.
 - **Zaal, direct, 2026-08-24:** the five original teams, the ZABAL / ZABAL Gamez split, Zoostr as the Cashlessman collab, the CEF mechanism, Let's Talk About Web 3 and the university streams with Ohnahji, ZAO Devz under Iman, ZAO Artizen with Jose / Civil Monkey / Candy. Quoted as given.
 - Credit: the collaborators named throughout are credited by the public identity each works under. Nothing here carries a private contact detail.

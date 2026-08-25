@@ -157,6 +157,35 @@ export function extractPrRef(notes?: string | null): string | null {
 }
 
 /**
+ * The "3/320" position line.
+ *
+ * WHY THIS IS NOT `seen + 1` (2026-08-25). Zaal photographed a card reading
+ * **559/558** with a pinned card reading **375/374** in the same screenshot -
+ * index one greater than the total, on both.
+ *
+ * The cause: `total` counted the tasks already asked plus the never-asked ones,
+ * while `index` was always `asked + 1`. That is right for a genuinely new card,
+ * which is about to join `asked`. It is wrong for a REQUEUED or RE-ASKED card,
+ * which is already inside `asked` - so it got counted twice and overflowed the
+ * total. Once the fresh pile empties, every card comes from those tiers, so the
+ * overflow is not an edge case: it is the steady state of a swept queue.
+ *
+ * A repeat therefore shows `558/558` - honestly at the end of the pile, which is
+ * exactly where a re-ask sits - and a new card advances the position.
+ */
+export function cardPosition(
+  seen: number,
+  unasked: number,
+  isFresh: boolean,
+): { index: number; total: number } {
+  const total = seen + unasked;
+  const index = isFresh ? seen + 1 : seen;
+  // Belt and braces: the display must never read n/m with n > m, whatever the
+  // caller passes.
+  return { index: Math.min(Math.max(index, 1), Math.max(total, 1)), total: Math.max(total, 1) };
+}
+
+/**
  * The card.
  *
  * One task, its age, its why if it has one, and the five options. Age is shown

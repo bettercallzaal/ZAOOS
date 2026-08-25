@@ -31,6 +31,7 @@ import { featureRan } from './feature-ran';
 import {
   classifyReconcile,
   TERMINAL_VERDICT_RE,
+  cardPosition,
   DRIP_DEFAULT,
   extractPrRef,
   parseVerdict,
@@ -380,8 +381,11 @@ export async function runBacklogGrillTick(
 
   // `unasked`, not `remaining`: a requeued task is already inside `asked`, so
   // counting the queue length here would count it twice in the "3/357" line.
-  const total = Object.keys(state.asked).length + next.unasked;
-  const index = Object.keys(state.asked).length + 1;
+  const { index, total } = cardPosition(
+    Object.keys(state.asked).length,
+    next.unasked,
+    !state.asked[next.task.id],
+  );
   const why = (next.task.notes || '').split('\n')[0];
   const text = renderCard(
     {

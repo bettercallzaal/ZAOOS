@@ -121,7 +121,13 @@ function build(key: VerdictKey, note?: string): Verdict {
  * that is invisible from a title.
  */
 export function renderCard(
-  task: { title: string; createdAt?: string; why?: string | null },
+  task: {
+    title: string;
+    createdAt?: string;
+    why?: string | null;
+    /** Set when a lane has stamped the card prepped - see the note below. */
+    ready?: { pr?: string; note?: string } | null;
+  },
   position: { index: number; total: number },
   now = Date.now(),
 ): string {
@@ -136,10 +142,31 @@ export function renderCard(
       lines.push(`open ${days}d`);
     }
   }
+  // THE READY STAMP (2026-08-24). A `prep` card means an agent preps and Zaal
+  // acts. When the prep was already finished the card still read as untouched
+  // work, so this asked "work on it or skip?" about something sitting done in a
+  // PR - four of ten cards in one sweep. The board could not say otherwise:
+  // measured that day, 0 of 386 open cards carried a prep-done marker, because
+  // nothing could write one. `zao-tracker ready` writes it; this reads it.
+  //
+  // The five verdicts deliberately do NOT change for a ready card. The header
+  // above is explicit that the options are identical every time so they become
+  // muscle memory, and that the bottleneck is his attention, not the interface.
+  // What was wrong was the QUESTION, not the answers - so only the text moves.
+  const ready = task.ready;
+  if (ready) {
+    lines.push('READY - prep done, waiting on you');
+    const readyNote = (ready.note || '').trim();
+    if (readyNote) lines.push(readyNote.slice(0, 180));
+    if (ready.pr) lines.push(ready.pr);
+  }
+
   const why = (task.why || '').trim();
   // The boilerplate note is worse than nothing - it takes up a line and says
   // nothing. 13 of Iman's 20 open tasks carry it; do not put it on a card.
-  if (why && !/Reply to Claude in next session/i.test(why)) {
+  // Suppressed on a ready card: the why describes work still to do and the
+  // stamp is newer by construction, so showing both contradicts the headline.
+  if (!ready && why && !/Reply to Claude in next session/i.test(why)) {
     lines.push('');
     lines.push(why.slice(0, 180));
   }

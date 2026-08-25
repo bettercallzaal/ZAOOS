@@ -135,6 +135,7 @@ interface BoardTask {
   created_at?: string;
   notes?: string;
   legacy_id?: string;
+  metadata?: Record<string, unknown> | null;
 }
 
 function cfg(): { root: string; headers: Record<string, string> } | null {
@@ -206,7 +207,7 @@ async function fetchTodoRows(
   for (let page = 0; page < BOARD_MAX_PAGES; page++) {
     const url =
       `${c.root}/rest/v1/tasks?status=eq.todo&archived_at=is.null` +
-      `&select=id,legacy_id,title,created_at,notes&order=created_at.asc` +
+      `&select=id,legacy_id,title,created_at,notes,metadata&order=created_at.asc` +
       `&limit=${BOARD_PAGE}&offset=${page * BOARD_PAGE}`;
     const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
     if (!r.ok) return null;
@@ -255,6 +256,24 @@ async function nextTask(
   const queue = [...fresh, ...requeued, ...reask];
   if (queue.length === 0) return null;
   return { task: queue[0], remaining: queue.length, unasked: fresh.length };
+}
+
+/**
+ * The prep-done stamp a lane wrote with `zao-tracker ready`, or null.
+ *
+ * Keyed on `prep_done_at`, NOT on the presence of a PR link: prep can finish
+ * without a PR (a draft written, a person emailed, a number measured), and
+ * requiring the link would leave those cards asking "work on it?" - the exact
+ * bug. A stamp carrying neither note nor PR still changes the question, which
+ * is the part that was wrong.
+ */
+function readyStamp(task: BoardTask): { pr?: string; note?: string } | null {
+  const md = task.metadata;
+  if (!md || typeof md !== 'object') return null;
+  if (!md.prep_done_at) return null;
+  const pr = typeof md.pr === 'string' ? md.pr : undefined;
+  const note = typeof md.prep_note === 'string' ? md.prep_note : undefined;
+  return { pr, note };
 }
 
 export interface GrillTickDeps {
@@ -383,7 +402,12 @@ export async function runBacklogGrillTick(
   const index = Object.keys(state.asked).length + 1;
   const why = (next.task.notes || '').split('\n')[0];
   const text = renderCard(
-    { title: next.task.title, createdAt: next.task.created_at, why },
+    {
+      title: next.task.title,
+      createdAt: next.task.created_at,
+      why,
+      ready: readyStamp(next.task),
+    },
     { index, total },
     now,
   );

@@ -140,8 +140,18 @@ See [Doc 154](research/154-skills-commands-master-reference/) for complete refer
 
 `.claude/skills/gstack/` is Garry Tan's open-source gstack toolkit (MIT,
 github.com/garrytan/gstack), vendored so any teammate cloning ZAOOS gets it.
-For web browsing, use the `/browse` skill from gstack - never
-`mcp__claude-in-chrome__*` tools.
+For web browsing, prefer the `/browse` skill from gstack when
+its binary is built; fall back to `mcp__claude-in-chrome__*` when it is not.
+
+> **BOTH ARE ALLOWED - changed 2026-08-24 by Zaal ("allow both").** This rule
+> previously read "never `mcp__claude-in-chrome__*`". It was measured and the ban
+> was not holding: over 30 days and 377 transcripts, `claude-in-chrome` was called
+> **1,786 times**, the most-used MCP by a factor of two, because
+> `gstack/browse/dist/` has never been built and `/browse` therefore cannot run
+> (see `idle-lane-audit.md`, and doc 2411). A rule that mandates a broken tool does
+> not get followed - it gets routed around silently. So: check whether `/browse`
+> works, use it if it does, and reach for `claude-in-chrome` without ceremony if
+> it does not.
 
 Available gstack skills: `/office-hours`, `/plan-ceo-review`,
 `/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`,

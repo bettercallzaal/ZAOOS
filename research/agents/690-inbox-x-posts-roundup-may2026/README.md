@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-25
 related-docs: 
 tier: STANDARD
 ---
@@ -147,3 +147,17 @@ TrustClaw (Sarah) is historical note only - tech stack we moved past.
 
 **Drafted:** 2026-05-20
 **Status:** All 5 posts fetched, 5/5 syndication hits, 4/5 require article-mirror fetch for full text.
+
+---
+
+## Updated 2026-08-25
+
+Re-researched via WebSearch + WebFetch (GitHub repo full fetch) on the two actionable items from this doc.
+
+**Steward.fi (NEW - material update):** The project is actively maintained and now includes an **MCP (Model Context Protocol) server implementation** (source: https://github.com/Steward-Fi/steward, fetched 2026-08-25). This makes it directly relevant to ZAO's current MCP-heavy stack. It now also has ElizaOS agent framework integration, multiple auth methods (passkeys, email, SIWE, OAuth), and Docker/embedded PGLite self-hosting. 95 GitHub stars, 1,576 commits on develop branch as of fetch date. The May 2026 recommendation to "monitor for future agent dashboard auth" is now more actionable — Steward.fi speaks MCP natively.
+
+**TrustClaw (confirmed, no new action):** Open-sourced as announced (source: https://www.highsignal.io/trustclaw-is-open-sourced/, search 2026-08-25). Now in SourceForge mirrors and comparison sites as an established OpenClaw alternative. Original NO ACTION recommendation stands — built on Composio which ZAO decommissioned (doc 601), and the project is positioned as a competitor to ZAO's own OpenClaw VPS instance.
+
+**Claude Code ecosystem (context only):** The Nainsi/Khairallah skill-design articles are now superseded by substantial community documentation — agentic workflow patterns, Routines, MCP integration guides. ZAO's `.claude/skills/` investment is on the right track. No new action required from those two posts.
+
+**Net assessment:** One material update (Steward.fi MCP integration). No decisions reversed. No urgent new action beyond noting Steward.fi's MCP server for any future agent-facing auth work.

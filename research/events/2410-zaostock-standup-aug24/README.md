@@ -18,9 +18,13 @@ tier: STANDARD
 **Date:** 2026-08-24 · **Duration:** ~40 min · **Platform:** Google Meet
 **Project:** ZAOstock
 
-**Attendees:** Zaal, Samantha Denton (Candy Toy Box), Paper, Tom Fellenz, Joseph Goats,
-Mickey Marsden, Maceo Wally, Mauro. One further participant asked the fundraising
-question and is **UNIDENTIFIED** - see Open Questions.
+**Attendees:** Zaal, Samantha Denton (Candy Toy Box), paper, Tom Fellenz, Joseph Goats,
+Mickey Marsden, **Maceo Whatley**, Mauro.
+
+*Speaker identity was resolved from the recording's own on-screen name tags, not from
+audio diarization - see Sources. **Maceo Whatley** is the correct spelling; the
+transcript rendered it both as "Maceo Wally" and, at the point he speaks, as "Miss
+Hale".*
 
 ## Key Decisions
 
@@ -115,7 +119,7 @@ content himself and explicitly not the design - *"that's not my wheelhouse and i
 look bad if I'm the person in charge for that."* Two versions: one for sponsors, one
 to share and promote.
 
-The unidentified participant offered a shortcut worth taking: lead with ZAO-CHELLA,
+**Maceo Whatley** offered a shortcut worth taking: lead with ZAO-CHELLA,
 pull footage and stills from it and ZAO-PALOOZA, and spend 90 minutes to two hours
 rather than building from scratch. They offered their own sponsor-winning decks as
 templates.
@@ -155,16 +159,13 @@ folders being created, which is the first evidence the structure is being used.
 | Add COC Concertz to the site's partner list - shipped when the PARTNERS array includes it and the logo renders | @Zaal | PR | 2026-08-29 |
 | Add Discord roles so the ZAOstock channel is open to the team - shipped when teammates can post in it | @Zaal | Ops | 2026-08-27 |
 | Schedule the Wednesday and Friday 11:30 meetings as calendar events named ZAOstock Design and ZAOstock AV - shipped when both invites are out | @Zaal | Calendar | 2026-08-25 |
-| Send Zaal the sponsor-deck templates offered on the call - shipped when the files arrive by email | @unidentified | Deck | 2026-08-26 |
+| Send Zaal the sponsor-deck templates offered on the call - shipped when the files arrive by email | @Maceo Whatley | Deck | 2026-08-26 |
 
 ## Open Questions
 
-- **Who asked the fundraising question and offered the deck templates?** Transcribed
-  as "Miss Hale", which is certainly a mis-transcription. Evidence: Zaal greeted them
-  by name, they had to leave within a minute, they have footage from ZAO-CHELLA and
-  ZAO-PALOOZA, they offered design and layout help, and they said their decks "got us
-  sponsorships or whatever for **OC**" - which reads as COC Concertz. **Not resolved,
-  and deliberately not guessed.**
+- ~~Who asked the fundraising question?~~ **RESOLVED: Maceo Whatley.** *Read directly
+  off the recording's name tag at 24:03, the moment he speaks. The transcript had
+  rendered him as "Miss Hale" there and "Maceo Wally" in the introductions.*
 - **Steve Peer as MC is agreed in principle and not scoped.** Which parts of the day
   he actually covers was not settled on this call and was not settled on Aug 17 either.
 - **Whether the Wednesday and Friday meetings are recurring or one-off** for this week
@@ -175,5 +176,6 @@ folders being created, which is the first evidence the structure is being used.
 - Full transcript: [transcript.md](transcript.md) **[FULL]** - the recording transcribed locally with `mlx-whisper` (`whisper-large-v3-turbo`), 6,730 words
 - Recording: `ZAO-STOCK Standup - 2026_08_24 11_26 EDT - Recording.mp4`, 285 MB, Google Meet capture **[FULL]**
 - Video frames: 12 extracted. **Frame 1 read only** - a single-feed capture of Zaal's own camera with one name tag, so the remaining frames carried no attendee-identity value and were deliberately not read **[PARTIAL, by design]**
-- **Diarization FAILED and was discarded.** `sherpa-onnx` returned **75 speakers** on auto-detect and still 48 distinct labels with the count forced to 6. Per `.claude/rules` and the /meeting skill's 2-person attribution trap, the labels were thrown away rather than used. **Every attribution in this doc rests on the transcript self-identifying the speaker** - a direct address by name, a self-introduction, or an unambiguous topic ownership. Smaller asides are not attributed at all **[FAILED, honestly]**
+- **Audio diarization FAILED and was discarded.** `sherpa-onnx` returned **75 speakers** on auto-detect and still 48 distinct labels with the count forced to 6. The labels were thrown away rather than used **[FAILED]**
+- **Speaker identity came from the video's own name tags instead, and this worked.** A Google Meet recording is an active-speaker feed: the tile switches to whoever is talking and their display name is burned into the frame. So the method is to take the utterance's timestamp from the Whisper JSON, extract the single frame at that second with `ffmpeg -ss`, and read the name. Verified on three speakers: **Tom Fellenz** on the audio-interface answer, **paper** on the push server, **Maceo Whatley** on the fundraising question. *Allow two to four seconds of lag - the feed does not switch instantly, so a frame taken on the first word of a sentence often still shows the previous speaker* **[FULL]**
 - Google Drive folder listing via the Drive API, 2026-08-24, for the logo inventory **[FULL]**

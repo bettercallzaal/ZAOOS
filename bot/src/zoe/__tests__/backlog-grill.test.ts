@@ -315,3 +315,65 @@ describe('classifyReconcile - what the other end settled', () => {
     expect(classifyReconcile({ status: 'todo', archived_at: null })).toBeNull();
   });
 });
+
+/**
+ * The bug this guards (2026-08-24): a `prep` card means an agent preps and Zaal
+ * acts. When the prep was already finished the card still read as untouched
+ * work, so it asked "work on it or skip?" about something sitting done in a PR.
+ * The board could not say otherwise - 0 of 386 open cards carried a prep-done
+ * marker, because nothing could write one.
+ */
+describe('renderCard - a prepped card asks a different question', () => {
+  it('leads with READY and shows the PR instead of the stale why', () => {
+    const card = renderCard(
+      {
+        title: 'Test plan: PR #3303 - grill fetch window',
+        createdAt: '2026-08-24T00:00:00Z',
+        why: 'Needs someone to page the board fetch',
+        ready: {
+          pr: 'https://github.com/bettercallzaal/ZAOOS/pull/3303',
+          note: 'fetch pages the whole board; tsc 0, suite 2484 pass',
+        },
+      },
+      { index: 3, total: 385 },
+      Date.parse('2026-08-24T12:00:00Z'),
+    );
+
+    expect(card).toContain('READY - prep done, waiting on you');
+    expect(card).toContain('https://github.com/bettercallzaal/ZAOOS/pull/3303');
+    expect(card).toContain('fetch pages the whole board');
+    // The why describes work still to do; the stamp is newer by construction.
+    expect(card).not.toContain('Needs someone to page');
+  });
+
+  it('changes the question even with no PR and no note - prep can finish without one', () => {
+    const card = renderCard(
+      { title: 'Email the venue', ready: {} },
+      { index: 1, total: 2 },
+    );
+    expect(card).toContain('READY - prep done, waiting on you');
+  });
+
+  it('leaves an ordinary card exactly as it was - the why still shows', () => {
+    const card = renderCard(
+      { title: 'Ordinary task', why: 'Because of the thing' },
+      { index: 1, total: 2 },
+    );
+    expect(card).not.toContain('READY');
+    expect(card).toContain('Because of the thing');
+  });
+
+  /**
+   * The five verdicts are muscle memory by design - this file's header says the
+   * options never change per card and that the bottleneck is his attention, not
+   * the interface. What was wrong was the question, not the answers.
+   */
+  it('does not touch the five options', () => {
+    const ready = renderCard({ title: 'x', ready: { pr: 'u' } }, { index: 1, total: 1 });
+    const plain = renderCard({ title: 'x' }, { index: 1, total: 1 });
+    for (const v of VERDICTS) {
+      expect(ready).toContain(`${v.n}. ${v.label}`);
+      expect(plain).toContain(`${v.n}. ${v.label}`);
+    }
+  });
+});

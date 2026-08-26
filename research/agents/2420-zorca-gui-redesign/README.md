@@ -130,6 +130,7 @@ Defects 1 and 2 are behavior, not aesthetics. They are specified first in SPEC.m
 - [Doc 2188](../2188-cheap-fleet-premium-escalation/) - the tiering this dashboard sits on top of
 - [Doc 2314](../2314-zaal-botz-fleet-interface-design/) - the Telegram half of the same attention-routing problem
 - [SPEC.md](./SPEC.md) - the build-ready spec
+- [OPTIMIZATIONS.md](./OPTIMIZATIONS.md) - the whole layer ranked by value per hour, top 5 implementable same-day (~80 lines, ~2 hours)
 
 ## Next actions
 

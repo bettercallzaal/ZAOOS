@@ -220,6 +220,48 @@ export const DRIP_DEFAULT: DripConfig = {
   endHour: 22,
 };
 
+/**
+ * THE DAILY BATCH (2026-08-26).
+ *
+ * The drip above sent ~190 cards a day from 2026-08-24 and recorded ZERO
+ * answers on the 25th and the 26th. A card every two minutes for sixteen hours
+ * is not a queue to sweep, it is a feed, and the measured response to a feed
+ * was nothing at all. Zaal: make it a daily digest at his wake time.
+ *
+ * Two knobs come off, and both for the same reason - the CRON is the schedule
+ * now, so the gate no longer has to be one:
+ *
+ *  - `everyMinutes: 0`. The spacing existed to pace a loop that fired all day.
+ *    Inside one batch it would block every card after the first, since
+ *    `lastSentMs` has just moved.
+ *  - `startHour: 0, endHour: 24`. The window existed to keep a two-minute loop
+ *    from firing at 3am. A once-a-day cron fixed to the morning-brief hour
+ *    cannot fire at 3am, and leaving the window in would have BLOCKED the
+ *    batch outright: the brief runs at 09:00 UTC, which is 05:00 EDT and
+ *    04:00 EST, and both are outside 6-22.
+ *
+ * `maxOutstanding` and `capWindowMs` stay exactly as they are. The cap is the
+ * one guard that still means something once cadence is no longer the limiter.
+ */
+export const BATCH_DEFAULT: DripConfig = {
+  ...DRIP_DEFAULT,
+  everyMinutes: 0,
+  startHour: 0,
+  endHour: 24,
+};
+
+/**
+ * How many cards one daily batch may send. Override with ZOE_GRILL_DAILY_BATCH.
+ *
+ * Ten, because a digest has to be readable in one sitting and he cleared 24 in
+ * a terminal on a good day. The old drip's answer to "how many" was 480 slots
+ * a day, which is how 190 got sent and none got answered.
+ */
+export function dailyBatchSize(): number {
+  const raw = Number(process.env.ZOE_GRILL_DAILY_BATCH);
+  return Number.isInteger(raw) && raw > 0 ? raw : 10;
+}
+
 export interface DripInput {
   nowMs: number;
   /** Zaal's local hour, 0-23. */

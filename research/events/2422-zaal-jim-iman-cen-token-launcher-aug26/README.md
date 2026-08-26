@@ -55,11 +55,12 @@ This is the execution follow-on to [doc 2362](../2362-jim-mcgee-crypto-endowment
 | jim (external) | Build the SongChain platform token factory tied back to Iman's token | The second layer of decision 2 | Factory deployed, contract address handed to Iman |
 | jim (external) | Look at a factory-of-factories so Zaal can unlock token launching for community members himself | *"I think I can even build a factory for factories, I've never done that... that's something I'm gonna look at today"*. **Reconcile against Sparkz before working this** - doc 2251 deliberately steered Sparkz away from coin-launching toward "back the work, not a coin", and this action runs close to its original premise (zaoos lane) | Zaal has the tool, and the Sparkz question is settled first |
 | iman | Scope token-gating on SongChain ("SongChain Pro") while Jim builds the launcher | Zaal wants the token gate testable as soon as Iman's token exists | A gated portion of SongChain exists to test against |
-| zaal | Email Venus at Artizen to add Jim as a collaborator | Jim has two Artizen accounts and needs to be on the ZAO fund. **Not closed by the live admin add** - that was Zaal's own fund; the Venus collaborator request is separate and still owed (bcz lane) | Jim shows as collaborator |
+| artizen | Email Venus to sort Jim's duplicate Artizen accounts and add him to the relevant project claim's collaborators section | Jim said he has two accounts and did not know how any of it worked. "Collaborator" on Artizen is the 5-slot section on a project **claim** in Grow, filled in by the creator - there is no such thing as collaborator access on a fund (artizen lane). Not closed by the live admin add. **Blocked:** Jim read his email aloud and it is redacted here per the PII rule, so pull it from the recording or ask him | Jim's accounts are reconciled and he is on the claim |
+| artizen | Name Jim a ZAO Fund curator | The separate half of what Zaal actually offered on the call - *"as, like, a curator for the ZAO Fund"*. Distinct from the collaborators section above; the artizen lane flags merging them as a mechanics error | Jim is recorded as a curator somewhere other than this recap |
 | zaal | Send Jim the Cassie / Hypersnap Farcaster protocol video via the ZABAL Gamez link | Jim did not know Hypersnap; the ZABAL link carries a transcript and an LLMs.txt so his agent can read it without watching. **Send doc 2418 too** - Hypersnap was documented in ZAOOS hours before this call (PR #3326, merged 01:04:59Z), so "Jim did not know" was already stale by the meeting (zaoos lane) | Link and doc 2418 sent |
 | zaal | Send Jim the Reddit thread on the Orca terminal GUI | Offered twice in the opening minutes | Link sent |
 | open | Invite Thy Revolution into the CEN DAO conversation properly | He joined this call but was never audible; Jim had already sent him a DAO invite | Rev has actually been talked to |
-| zaal | Buy into the Artizen 24-hour round | Starting within hours of the call; Jim's approach is to wait for the open then buy $100 | Position taken |
+| zaal | Buy into the Artizen 24-hour round | Opens within hours of the call. **The $100 is Jim's plan for his own project, not a ZAO number** - Zaal's reply was only *"I'll do that too"* (artizen lane). Two further flags from that lane: buying alone does not move rank, because Boost Score is multiplicative and needs boosts cast alongside it; and a standing decision of 2026-08-12 (commit `2bb5dd1`) sends Boost Points and outreach to the ZAO Fund's curated roster **overall** rather than one picked project, so backing a single project is a deliberate exception, not the default. Merge with the standing next-action in doc 853 rather than opening a second card | Position taken, with boosts cast |
 
 ## Lane weigh-in (Phase 3.5)
 
@@ -72,24 +73,36 @@ transcript, not by taking the keyword floor as a verdict. Considered and dropped
 `zabalgamez` (the hit is a link to a workshop recording, not a subject), `wavewarz`
 (one passing mention as a reputation source), `zaoweb`, `cowork`.
 
-### Delivery took two rounds, and the first round's silence was not silence
+### Delivery took three rounds, and the first round's silence was not silence
 
 | Lane | Round 1 | Round 2 | Replied |
 |---|---|---|---|
 | bcz | sent to the **wrong pane** - the Orca orchestration coordinator, picked as first repo match - never visible | re-sent to `term_4bc4db1b` "BCZ launch social drafts", **confirmed on screen** | yes |
 | zaoos | sent, never visible | re-sent to `term_3b8d016c` "ZID assignment collision scanning", **confirmed on screen** | yes |
 | fractal | sent, never visible; a second ZAOfractal pane correctly held as a bare shell | re-sent to `term_160aff73` in `ws-fractal-lane`, **confirmed on screen** | yes |
-| artizen | no live pane, spawn failed | respawned in `~/Documents/zaoartizen`, packet on screen, but the pane is **blocked on Claude's trust-this-folder picker** | no - **UNDELIVERED** |
+| artizen | no live pane, spawn failed | respawned in `~/Documents/zaoartizen`; landed on Claude's trust-this-folder picker, delivered only once Zaal cleared it | yes, on round 3 |
 
-Round 1 reported four silent lanes. That was wrong, and recording it as silence
-would have been the more damaging error: three of the four had simply never
-received the packet, and all three replied within minutes once they did. The
-lesson is that a send is not a delivery, and first-repo-match is not lane
-selection - the bcz packet went to the orchestration coordinator.
+Round 1 reported four silent lanes. **All four had simply never received the
+packet, and all four replied once they did.** Recording that first result as
+silence would have been the single most damaging thing in this doc: it would have
+published "no lane objected" over four lanes that between them corrected
+ownership on three actions, caught two stale facts, found a standing decision
+this call cuts against, and flagged a roster that does not exist.
 
-**artizen is UNDELIVERED, not silent.** Its pane sits on a trust picker, and digits
-sent to a picker select an option, so clearing it is Zaal's, not this skill's. No
-artizen input is represented below.
+Two distinct delivery bugs, both worth fixing in the skill:
+
+1. **First-repo-match is not lane selection.** The bcz packet went to the Orca
+   orchestration coordinator, which happens to run in `bczstrat`, rather than to
+   the BCZ working pane. Pane title and task matter, not just the repo.
+2. **A freshly spawned pane lands on Claude's directory-trust picker and never
+   sees the packet.** This is the Phase 3.5 root cause, identified by Zaal
+   2026-08-26. The spawn succeeds, the command is queued behind the picker, and
+   the visibility probe sees the path on screen and reports delivery, while no
+   agent has read anything. The skill must either send Enter to clear the trust
+   prompt or spawn with the folder pre-trusted before it counts a delivery.
+   Until then a spawned lane will always look delivered and answer nothing.
+
+A send is not a delivery, and a path visible on screen is not a delivery either.
 
 ### What the lanes changed
 
@@ -119,11 +132,25 @@ artizen input is represented below.
 - **Iman has no wallet in ZAO's member registry** - absent from all 144 named members and all 169 Respect-holding addresses in `data/members.json`. He is about to have a token with a wallet attached while ZAO's own registry cannot resolve him. If anyone is already collecting an address for the token launch, that is the cheap moment to register it.
 - **Respect must not blur with the tokens in this call.** Respect is soulbound at the contract level - all transfers revert, and zero peer-to-peer transfers across 518 ledger transfers. Nothing in a community-token launcher touches it, and Respect becoming transferable would collapse the governance model.
 
+**artizen** (`~/Documents/zaoartizen` @ `8c00be8`):
+
+- **The Venus action conflated two different Artizen roles.** "Collaborator" is the 5-slot section on a project **claim** in Grow, filled in by the creator; there is no collaborator access on a fund. What Zaal actually offered was a **ZAO Fund curator** seat. Split into two actions. Applied.
+- **The Venus email is about Jim's duplicate accounts, not permissions** - he said he had a second account and did not know how any of it worked. Applied.
+- **That action is blocked by this doc's own PII redaction.** Jim read his email aloud and it is redacted in the transcript, so whoever executes pulls it from the recording or asks him again. Recorded.
+- **"Alongside Civil and Jose" is not a roster.** No "Civil" appears anywhere in the artizen repo and there is no curator roster file, so this recap would have become the only record of a roster nobody has written down. Now recorded as something Zaal said. "Jose" is Jose Acabrera (Joseph Goats), whose own Artizen tie is flagged UNVERIFIED in doc 843. Applied.
+- **The $100 in the round is Jim's plan for his own project, not a ZAO number.** Zaal's reply was only "I'll do that too". Applied.
+- **Buying does not move rank on its own** - Boost Score is multiplicative in boosts received, so a large buy with few boosts loses to a smaller buy with boosts. Nobody said this on the call. Applied.
+- **A standing decision cuts against backing one project:** 2026-08-12, commit `2bb5dd1`, sends Boost Points and outreach to the fund's curated roster overall. Zaal backing a single project is a deliberate exception, not a fresh default. Applied, with the instruction to merge into doc 853's standing next-action rather than open a second card.
+- **Zaal's $3,000 was spoken from memory** and never checked against `app/dashboard/data.ts`. Flagged for re-measurement before it appears publicly. Applied.
+- **Do not treat the "3X match / 2X match" talk as a mechanic** - that was Zaal reasoning aloud and correcting himself. The real rule is that a $10 Artifact unlocks $1 of match from each fund backing that project, so the multiple depends on fund count. Never entered the doc.
+- Owns both Artizen actions. Neither is done. Season 7 is current, so any fund-rank figure dated 2026-06-21 is Season-6-era and superseded.
+- **Guard:** if decision 5 generates a targeted-outreach-list or prize-figure-reconciliation card on the Artizen side, that card should not exist - both were explicitly deprioritized on 2026-08-12.
+
 ### What no lane could settle
 
 - Whether Jim shipped IMAN that day. bcz says there is no confirmation on record.
-- The curator identities behind "Civil and Jose".
-- Anything artizen would have said - the fund admin add, the curator invite, the Venus email and the 24-hour round were all its subject matter, and it never received the packet.
+- **Who "Civil" is.** Both zaoos and artizen looked independently and neither could resolve the name; artizen found no curator roster file at all. Someone who was on the call has to say.
+- Jim's email address, needed to execute the Venus action, which this doc redacted on purpose.
 - Every CEN figure below remains Jim's spoken claim. bcz independently confirmed none were verified against contracts or a block explorer.
 
 ## The Crypto Endowment Network, in Jim's words
@@ -156,7 +183,7 @@ His own framing of why he built it:
 | **$2,244.19** | Currently locked into the endowments | Jim |
 | **6 of 100** | CEN founder NFTs claimed; Zaal is a founding member | Zaal, reading the screen |
 | **100** | Hard cap on Jim's DAO membership; after that, one invitation per member per year | Jim |
-| **$3,000** | Raised for ZAO Festivals - Zaal: *"if I really need to I can float it to myself"* | Zaal |
+| **$3,000** | Raised for ZAO Festivals - Zaal: *"if I really need to I can float it to myself"*. **Spoken from memory and never checked against `app/dashboard/data.ts`** (artizen lane). Re-measure before this appears anywhere public | Zaal |
 | **9.888 to 10** | BCZ market cap before and after the first buy | Zaal |
 | **0.001 ETH** | Size of that first buy | Zaal |
 | **~$200/month** | What Cassie runs a full Hypersnap fork on, at about half Farcaster's user count | Zaal |
@@ -203,7 +230,8 @@ Iman named **Nemesis** as a likely second volunteer for the trial, subject to as
 
 ## Commitments to people outside the org
 
-- **To Jim:** curator seat on the ZAO Artizen fund alongside Civil and Jose; Artizen collaborator access via Venus; the Hypersnap video and the Orca thread.
+- **To Jim:** a ZAO Fund curator seat, which Zaal described as alongside "Civil and Jose"; help sorting his duplicate Artizen accounts via Venus; the Hypersnap video and the Orca thread. **Record the curator names as something Zaal said, not as a roster.** The artizen lane found no "Civil" anywhere in its repo and no curator roster file at all, so this recap would otherwise become the only record of a roster nobody has written down. "Jose" is Jose Acabrera (Joseph Goats), whose own Artizen tie is itself flagged UNVERIFIED in doc 843.
+- **If Jim asks what curating pays:** 20 percent of sponsor dollars raised for the fund, match and prize excluded, is confirmed only verbally by Venus and Rene in the fund-director Telegram and has never been found in writing. Do not quote it to him as terms.
 - **To Iman:** community-manager support, live-stream slots and earned media around his token; a look at token-gating SongChain.
 - **From Jim, to both:** the token, the factory, and a possible factory-of-factories, built free, on the condition that they use the endowment tokens.
 

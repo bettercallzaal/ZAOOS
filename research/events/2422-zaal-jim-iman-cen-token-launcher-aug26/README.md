@@ -44,80 +44,87 @@ This is the execution follow-on to [doc 2362](../2362-jim-mcgee-crypto-endowment
 | 3 | **No further confirmation rounds needed** - Zaal: *"we don't have to do any more confirmations. I'm in. Like James can just make it and rock it out"* | zaal | high |
 | 4 | Iman keeps design authority; engineering goes to Jim - *"the design things you have full reign over"* | Open | high |
 | 5 | Zaal takes **community manager** of the token network: bringing people in, live streams, earned media, music and art around it, while Jim runs the endowment engineering | zaal | high |
-| 6 | Subscription-splitting is reframed to stay legal: members pay for **Zaal's written report about** a subscription, not for access to the subscription. Jim: *"That is a curated product where you become a media producer on top of a curated service"* | zaal | medium |
+| 6 | Subscription-splitting is reframed to stay legal: members pay for **Zaal's written report about** a subscription, not for access to the subscription. Jim: *"That is a curated product where you become a media producer on top of a curated service"*. **Not actually a commitment** - the bcz lane flags this as over-ranked: it got a legal shape from Jim and nothing else, no owner and no date. Check it against doc 1108 (Sparkz legal framing) rather than re-deriving it (zaoos lane) | Open | low |
 
 ## Actions
 
 | Owner | Action | Why | Done when |
 |---|---|---|---|
 | iman | DM Jim the token name, ticker (**IMAN**) and image | Jim cannot launch without all three; he asked for it in writing so he does not mess it up | Jim has all three in Telegram |
-| jim | Launch Iman's token | Committed on the call: *"within the next 10-20 minutes easily"* | Token is live on Base |
-| jim | Build the SongChain platform token factory tied back to Iman's token | The second layer of decision 2 | Factory deployed, contract address handed to Iman |
-| jim | Look at a factory-of-factories so Zaal can unlock token launching for community members himself | *"I think I can even build a factory for factories, I've never done that... that's something I'm gonna look at today"* | Zaal has the tool |
+| jim (external) | Launch Iman's token | Committed on the call: *"within the next 10-20 minutes easily"*. **Whether it actually shipped is not on record** - the bcz lane confirms no confirmation exists and deliberately omitted it from the launch drafts. Do not state it launched without a source that is not this transcript | Token is confirmed live on Base by something other than the recording |
+| jim (external) | Build the SongChain platform token factory tied back to Iman's token | The second layer of decision 2 | Factory deployed, contract address handed to Iman |
+| jim (external) | Look at a factory-of-factories so Zaal can unlock token launching for community members himself | *"I think I can even build a factory for factories, I've never done that... that's something I'm gonna look at today"*. **Reconcile against Sparkz before working this** - doc 2251 deliberately steered Sparkz away from coin-launching toward "back the work, not a coin", and this action runs close to its original premise (zaoos lane) | Zaal has the tool, and the Sparkz question is settled first |
 | iman | Scope token-gating on SongChain ("SongChain Pro") while Jim builds the launcher | Zaal wants the token gate testable as soon as Iman's token exists | A gated portion of SongChain exists to test against |
-| zaal | Email Venus at Artizen to add Jim as a collaborator | Jim has two Artizen accounts and needs to be on the ZAO fund | Jim shows as collaborator |
-| zaal | Send Jim the Cassie / Hypersnap Farcaster protocol video via the ZABAL Gamez link | Jim did not know Hypersnap; the ZABAL link carries a transcript and an LLMs.txt so his agent can read it without watching | Link sent |
+| zaal | Email Venus at Artizen to add Jim as a collaborator | Jim has two Artizen accounts and needs to be on the ZAO fund. **Not closed by the live admin add** - that was Zaal's own fund; the Venus collaborator request is separate and still owed (bcz lane) | Jim shows as collaborator |
+| zaal | Send Jim the Cassie / Hypersnap Farcaster protocol video via the ZABAL Gamez link | Jim did not know Hypersnap; the ZABAL link carries a transcript and an LLMs.txt so his agent can read it without watching. **Send doc 2418 too** - Hypersnap was documented in ZAOOS hours before this call (PR #3326, merged 01:04:59Z), so "Jim did not know" was already stale by the meeting (zaoos lane) | Link and doc 2418 sent |
 | zaal | Send Jim the Reddit thread on the Orca terminal GUI | Offered twice in the opening minutes | Link sent |
 | open | Invite Thy Revolution into the CEN DAO conversation properly | He joined this call but was never audible; Jim had already sent him a DAO invite | Rev has actually been talked to |
 | zaal | Buy into the Artizen 24-hour round | Starting within hours of the call; Jim's approach is to wait for the open then buy $100 | Position taken |
 
 ## Lane weigh-in (Phase 3.5)
 
-Run 2026-08-26, after the recap was already drafted and the Bonfire episodes
-already posted. Phase 3.5 is meant to sit BEFORE the fan-out; the skill gained it
-after this capture had fanned out, so this run is out of order by construction and
-could not have changed what already went to the graph.
+Run 2026-08-26. Phase 3.5 is meant to sit BEFORE the fan-out; the skill gained it
+after this capture had already written the doc and posted the Bonfire episodes, so
+this run is out of order by construction and could not change what is in the graph.
 
-**Lanes asked: bcz, artizen, zaoos, fractal.**
+**Lanes asked: bcz, artizen, zaoos, fractal.** Classified by reading the
+transcript, not by taking the keyword floor as a verdict. Considered and dropped:
+`zabalgamez` (the hit is a link to a workshop recording, not a subject), `wavewarz`
+(one passing mention as a reputation source), `zaoweb`, `cowork`.
 
-Classified by reading the transcript, not by taking the keyword floor as a verdict:
+### Delivery took two rounds, and the first round's silence was not silence
 
-| Lane | Why it was asked |
-|---|---|
-| bcz | The Better Call Zaal token is the hub every other token in this call pairs back to |
-| artizen | Jim and Iman were added as fund admins live; the curator invite, the Venus email and the 24-hour round all land here |
-| zaoos | The ZID and Hypersnap plan is already specced in doc 2419 |
-| fractal | "Count towards weekly respect" puts the ZAO social idea in the respect-game lane |
+| Lane | Round 1 | Round 2 | Replied |
+|---|---|---|---|
+| bcz | sent to the **wrong pane** - the Orca orchestration coordinator, picked as first repo match - never visible | re-sent to `term_4bc4db1b` "BCZ launch social drafts", **confirmed on screen** | yes |
+| zaoos | sent, never visible | re-sent to `term_3b8d016c` "ZID assignment collision scanning", **confirmed on screen** | yes |
+| fractal | sent, never visible; a second ZAOfractal pane correctly held as a bare shell | re-sent to `term_160aff73` in `ws-fractal-lane`, **confirmed on screen** | yes |
+| artizen | no live pane, spawn failed | respawned in `~/Documents/zaoartizen`, packet on screen, but the pane is **blocked on Claude's trust-this-folder picker** | no - **UNDELIVERED** |
 
-**Considered and dropped:** `zabalgamez` (keyword hit is a link to a workshop
-recording, not a subject), `wavewarz` (one passing mention as an on-chain
-reputation source), `zaoweb`, `cowork` (zero keyword hits).
+Round 1 reported four silent lanes. That was wrong, and recording it as silence
+would have been the more damaging error: three of the four had simply never
+received the packet, and all three replied within minutes once they did. The
+lesson is that a send is not a delivery, and first-repo-match is not lane
+selection - the bcz packet went to the orchestration coordinator.
 
-### Result: 0 of 4 replied
+**artizen is UNDELIVERED, not silent.** Its pane sits on a trust picker, and digits
+sent to a picker select an option, so clearing it is Zaal's, not this skill's. No
+artizen input is represented below.
 
-**Every lane asked stayed silent. None of them reviewed this doc.** That is
-recorded as silence, not as agreement and not as "no objections" - no lane has
-confirmed anything in this recap.
+### What the lanes changed
 
-Delivery was itself partial, which is a separate problem from lanes choosing not
-to answer:
+**bcz** (comms execution, `ws/lane-audit-2026-08-25`):
 
-| Lane | Delivery | Replied |
-|---|---|---|
-| bcz | sent to pane `term_b5ef6d3c`, **not visible on screen** | no |
-| artizen | no live pane, **spawn failed** | no |
-| zaoos | sent to pane `term_3b8d016c`, **not visible on screen** | no |
-| fractal | sent to pane `term_160aff73`, **not visible on screen**; second ZAOfractal pane **held, bare shell with no agent to read it** | no |
+- **Actions 2, 3 and 4 are Jim McGee's, not `Open`.** He committed to them on the call. Applied.
+- **Whether IMAN actually launched is not on record.** The lane deliberately omitted it from every social draft. The action now says so, and says not to assert it from this transcript. Applied.
+- **The Venus email is NOT closed by the live admin add** - different fund, still owed. Applied.
+- **Decision 6 was over-ranked as an actionable TODO** with an owner it never had. Downgraded to `Open` / `low`. Applied.
+- **Launch comms already exist and are unpublished:** a BCZ launch announcement and a what-is-CEN explainer for Farcaster/X via Firefly, Telegram, Discord and LinkedIn, committed `fd8c49f` at `drafts/social-bcz-live-2026-08-26/` in `bczstrat`. Nothing posted, waiting on Zaal. **Two things block them and neither was in the extraction: no contract address or Matcha link exists anywhere in the source, and Jim's Farcaster and X handles are not on record.**
+- Confirmed the extraction was right to carry the ticker as IMAN and warned that anyone reconciling against the transcript will try to "fix" it back to Ayman.
+- Agreed the ZOL arbitrage bot should stay a closed thread, not become a card.
 
-So three of four sends could not be confirmed as seen, and the fourth never got a
-terminal at all. It is likely no lane ever saw its packet. The packets are
-preserved in [lane-review/](lane-review/) so a lane can still pick one up.
+**zaoos** (ZID / identity, doc 2419):
 
-### What changed in this doc as a result
+- **"Jim did not know Hypersnap" was already stale at the time of the call.** It was documented in this repo at `research/farcaster/2418-hypersnap-state-and-zao-feasibility`, merged in PR #3326 at 2026-08-26T01:04:59Z, hours before the meeting. Action 7 now points at the doc as well as the video. Applied.
+- **Sparkz is already ZAO's creator-coin launcher and was deliberately steered away from being one.** Doc `2251-sparkz-rebrand-and-modular-architecture` repositions it as OSS-monetization, "back the work, not a coin". The factory-of-factories action runs close to its original premise and now carries that reconciliation. Applied.
+- **The securities question in decision 6 has prior work:** `research/business/1108-sparkz-legal-framing`. Cited rather than re-derived. Applied.
+- **Prior token-launcher evaluation exists:** `research/events/953-deez-boardwalk-token-launcher`. The CEN launcher is not the first considered.
+- **UNVERIFIED, flagged not resolved:** the ZAO Fund curators named as "Civil and Jose" could be CivilMonkey or Jose Acabrera / Joseph Goats. Someone on the call must confirm; not resolved by guessing.
+- If the factory-of-factories proceeds it reaches ZID: doc 2419 s4.3 argues against binding a ZID to a contract or external account, which is exactly what a community-token factory invites.
 
-**Nothing.** No correction, no ownership claim, no dropped action. Every decision,
-action, figure and quote below is as extracted from the transcript, unreviewed by
-any lane.
+**fractal** (respect / governance):
 
-The open items a lane would most usefully settle, if one picks this up later:
+- **Hypersnap is not an open question for ZAO.** `ROADMAP.md` (commit `fecda82`) builds L4 as an application on the Farcaster network with no node required, deferring node ownership to L7. The Hypersnap-node seed is reopening a settled position, and now says so. Applied.
+- **Iman is on ZAO's facilitator bench and has still not been asked.** `respect/FACILITATION-RUNBOOK.md` names Ohnahji B, Iman and Jose, and states four times that nobody on the bench has been contacted or agreed to anything. A recap showing Zaal and Iman collaborating this closely could easily be misread as the bench having been approached. **It has not been, as of this meeting.**
+- **Iman has no wallet in ZAO's member registry** - absent from all 144 named members and all 169 Respect-holding addresses in `data/members.json`. He is about to have a token with a wallet attached while ZAO's own registry cannot resolve him. If anyone is already collecting an address for the token launch, that is the cheap moment to register it.
+- **Respect must not blur with the tokens in this call.** Respect is soulbound at the contract level - all transfers revert, and zero peer-to-peer transfers across 518 ledger transfers. Nothing in a community-token launcher touches it, and Respect becoming transferable would collapse the governance model.
 
-- Four actions still carry `owner: Open` - launching Iman's token, the SongChain
-  factory, the factory-of-factories, and bringing Thy Revolution into the CEN DAO
-  conversation. Three of those are Jim's to claim and he is external.
-- Whether Jim actually shipped Iman's token that day, as he committed to on the
-  call. The bcz lane would know from the chain.
-- Whether the ZID work in doc 2419 has moved since, which would date the Hypersnap
-  seed here.
+### What no lane could settle
+
+- Whether Jim shipped IMAN that day. bcz says there is no confirmation on record.
+- The curator identities behind "Civil and Jose".
+- Anything artizen would have said - the fund admin add, the curator invite, the Venus email and the 24-hour round were all its subject matter, and it never received the packet.
+- Every CEN figure below remains Jim's spoken claim. bcz independently confirmed none were verified against contracts or a block explorer.
 
 ## The Crypto Endowment Network, in Jim's words
 
@@ -216,7 +223,12 @@ Iman named **Nemesis** as a likely second volunteer for the trial, subject to as
 
 - **ZAO Pro** - Zaal's active-members tier: open ZAO stays open, but a Pro group where the only entry condition is committing to be active, and a week of inactivity drops you back out. Directly prompted by Jim's 100-member DAO cap.
 - **ZID + living article** - a ZID number for every person who has been part of The ZAO, plus an article per person on how Zaal met them and what they are working on, kept living. Feeds thezao.com/<name> pages showing socials plus on-chain contribution history. Ties to doc 2419.
-- **Hypersnap node** - spin one up for network access and to host ZAO social on the fork rather than the main client.
+- **Hypersnap node** - Zaal's plan was to spin one up for network access and host
+  ZAO social on the fork rather than the main client. **The fractal lane flags this
+  as already decided the other way:** ZAO's published `ROADMAP.md` (commit `fecda82`)
+  builds L4 as an application on the Farcaster network with **no node required at
+  that level**, and defers node ownership to L7. Treat the seed as reopening a
+  settled position, not as a new idea, and see doc 2418 for the Hypersnap writeup.
 - **Factory-of-factories** - Jim has not built one before; if it works it is the mechanism for ZAO members to launch community tokens without Jim in the loop.
 - **Scam-flagging friction** - CEN tokens get auto-flagged as scams by blockchain explorers and screeners, and clearing it is currently manual, per token, by contacting each site. An unsolved distribution tax on every token launched from this stack.
 

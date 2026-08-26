@@ -61,6 +61,64 @@ This is the execution follow-on to [doc 2362](../2362-jim-mcgee-crypto-endowment
 | open | Invite Thy Revolution into the CEN DAO conversation properly | He joined this call but was never audible; Jim had already sent him a DAO invite | Rev has actually been talked to |
 | zaal | Buy into the Artizen 24-hour round | Starting within hours of the call; Jim's approach is to wait for the open then buy $100 | Position taken |
 
+## Lane weigh-in (Phase 3.5)
+
+Run 2026-08-26, after the recap was already drafted and the Bonfire episodes
+already posted. Phase 3.5 is meant to sit BEFORE the fan-out; the skill gained it
+after this capture had fanned out, so this run is out of order by construction and
+could not have changed what already went to the graph.
+
+**Lanes asked: bcz, artizen, zaoos, fractal.**
+
+Classified by reading the transcript, not by taking the keyword floor as a verdict:
+
+| Lane | Why it was asked |
+|---|---|
+| bcz | The Better Call Zaal token is the hub every other token in this call pairs back to |
+| artizen | Jim and Iman were added as fund admins live; the curator invite, the Venus email and the 24-hour round all land here |
+| zaoos | The ZID and Hypersnap plan is already specced in doc 2419 |
+| fractal | "Count towards weekly respect" puts the ZAO social idea in the respect-game lane |
+
+**Considered and dropped:** `zabalgamez` (keyword hit is a link to a workshop
+recording, not a subject), `wavewarz` (one passing mention as an on-chain
+reputation source), `zaoweb`, `cowork` (zero keyword hits).
+
+### Result: 0 of 4 replied
+
+**Every lane asked stayed silent. None of them reviewed this doc.** That is
+recorded as silence, not as agreement and not as "no objections" - no lane has
+confirmed anything in this recap.
+
+Delivery was itself partial, which is a separate problem from lanes choosing not
+to answer:
+
+| Lane | Delivery | Replied |
+|---|---|---|
+| bcz | sent to pane `term_b5ef6d3c`, **not visible on screen** | no |
+| artizen | no live pane, **spawn failed** | no |
+| zaoos | sent to pane `term_3b8d016c`, **not visible on screen** | no |
+| fractal | sent to pane `term_160aff73`, **not visible on screen**; second ZAOfractal pane **held, bare shell with no agent to read it** | no |
+
+So three of four sends could not be confirmed as seen, and the fourth never got a
+terminal at all. It is likely no lane ever saw its packet. The packets are
+preserved in [lane-review/](lane-review/) so a lane can still pick one up.
+
+### What changed in this doc as a result
+
+**Nothing.** No correction, no ownership claim, no dropped action. Every decision,
+action, figure and quote below is as extracted from the transcript, unreviewed by
+any lane.
+
+The open items a lane would most usefully settle, if one picks this up later:
+
+- Four actions still carry `owner: Open` - launching Iman's token, the SongChain
+  factory, the factory-of-factories, and bringing Thy Revolution into the CEN DAO
+  conversation. Three of those are Jim's to claim and he is external.
+- Whether Jim actually shipped Iman's token that day, as he committed to on the
+  call. The bcz lane would know from the chain.
+- Whether the ZID work in doc 2419 has moved since, which would date the Hypersnap
+  seed here.
+
 ## The Crypto Endowment Network, in Jim's words
 
 The clearest statement of the stack yet recorded:

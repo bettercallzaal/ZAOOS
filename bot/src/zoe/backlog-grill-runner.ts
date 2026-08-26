@@ -31,6 +31,8 @@ import { featureRan } from './feature-ran';
 import {
   classifyReconcile,
   TERMINAL_VERDICT_RE,
+  BATCH_DEFAULT,
+  dailyBatchSize,
   DRIP_DEFAULT,
   extractPrRef,
   parseVerdict,
@@ -38,8 +40,10 @@ import {
   shouldSendNext,
   verdictButtons,
   verdictNote,
+  type DripConfig,
   type Verdict,
 } from './backlog-grill';
+import { appendGrillQueue, type GrillQueueCard } from './grill-queue';
 // IMPORTED, never copied. There is exactly one re-ask ladder and grill.ts owns
 // it. The last time this policy got a second implementation - the status line's
 // inline copy of outstandingCount - the copy silently drifted from the original
@@ -306,6 +310,12 @@ export interface GrillTickDeps {
   localHour: number;
   now?: number;
   fetchImpl?: typeof fetch;
+  /**
+   * Which gate to run. Defaults to the drip. The daily batch passes
+   * BATCH_DEFAULT, which drops the spacing and the hour window - see the
+   * comment on BATCH_DEFAULT for why both had to go and why the cap did not.
+   */
+  cfg?: DripConfig;
 }
 
 /**
@@ -389,9 +399,13 @@ export async function reconcileBacklogState(
  */
 export async function runBacklogGrillTick(
   deps: GrillTickDeps,
-): Promise<{ sent: boolean; reason: string; title?: string }> {
+): Promise<{ sent: boolean; reason: string; title?: string; card?: GrillQueueCard }> {
   const fetchImpl = deps.fetchImpl ?? fetch;
   const now = deps.now ?? Date.now();
+  // `gateCfg`, not `cfg`: cfg() is already the tracker's credentials in this
+  // file and shadowing it here silently turned the guard below into a call on
+  // a config object.
+  const gateCfg = deps.cfg ?? DRIP_DEFAULT;
   if (!cfg()) return { sent: false, reason: 'tracker not configured' };
 
   const state = await readState();
@@ -412,9 +426,9 @@ export async function runBacklogGrillTick(
     nowMs: now,
     localHour: deps.localHour,
     lastSentMs: state.lastSentMs,
-    outstanding: outstandingCount(state, now, DRIP_DEFAULT.capWindowMs),
+    outstanding: outstandingCount(state, now, gateCfg.capWindowMs),
     remainingInQueue: next.remaining,
-    cfg: DRIP_DEFAULT,
+    cfg: gateCfg,
   });
   if (!gate.send) return { sent: false, reason: gate.reason };
 
@@ -474,7 +488,66 @@ export async function runBacklogGrillTick(
   // Only the SENT path. A tick that declined to send has not run in any sense
   // worth reporting, and saying otherwise makes the line mean 'the cron fired'.
   featureRan('backlog-grill', next.task.title.slice(0, 60));
-  return { sent: true, reason: 'sent', title: next.task.title };
+  return {
+    sent: true,
+    reason: 'sent',
+    title: next.task.title,
+    // Returned, not re-fetched: the batch writes the same cards to
+    // GRILL-QUEUE.md that it just sent to Telegram, and a second board query
+    // could disagree with the first.
+    card: {
+      taskId: next.task.id,
+      title: next.task.title,
+      why: why || undefined,
+      createdAt: next.task.created_at,
+    },
+  };
+}
+
+/**
+ * ONE DAILY BATCH. Replaces the every-two-minutes drip.
+ *
+ * The drip sent ~190 cards a day from 2026-08-24 and recorded zero answers on
+ * the 25th and the 26th while doing it. Zaal, 2026-08-26: one batch a day at
+ * his wake time, and every card into the grill lane rather than only Telegram.
+ *
+ * Sends up to `size` cards back to back, stopping the moment the gate says no -
+ * the cap and an empty queue both still stop it, only the clock no longer
+ * does. Then appends the whole batch to GRILL-QUEUE.md in one section, so the
+ * grill lane can clear the reversible ones under Zaal's standing rule while
+ * the same cards sit in his DM for the ones only he can answer.
+ *
+ * The queue append is best-effort and happens AFTER the sends. A vault that is
+ * missing (the VPS has none) or unwritable must not cost him the digest, and
+ * the result says which of the two destinations actually took the cards so the
+ * caller can log it instead of assuming both worked.
+ */
+export async function runBacklogGrillBatch(
+  deps: GrillTickDeps & { size?: number },
+): Promise<{ sent: number; reason: string; queued: string; titles: string[] }> {
+  const size = deps.size ?? dailyBatchSize();
+  const cards: GrillQueueCard[] = [];
+  let reason = 'batch complete';
+
+  for (let i = 0; i < size; i++) {
+    const r = await runBacklogGrillTick({ ...deps, cfg: deps.cfg ?? BATCH_DEFAULT });
+    if (!r.sent) {
+      // The gate's own words. "12 sent, then 200 already unanswered" and
+      // "12 sent, then the queue ran dry" are different mornings and the log
+      // has to be able to tell them apart.
+      reason = cards.length ? `stopped after ${cards.length}: ${r.reason}` : r.reason;
+      break;
+    }
+    if (r.card) cards.push(r.card);
+  }
+
+  const q = await appendGrillQueue(cards, { now: deps.now });
+  return {
+    sent: cards.length,
+    reason,
+    queued: `${q.wrote}:${q.count}${q.wrote === 'spool' ? ` (${q.path})` : ''}`,
+    titles: cards.map((c) => c.title),
+  };
 }
 
 /**

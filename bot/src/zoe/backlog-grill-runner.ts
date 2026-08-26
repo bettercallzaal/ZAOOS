@@ -74,13 +74,34 @@ export interface BacklogGrillState {
   pinnedOldestMessageId?: number | null;
 }
 
-const EMPTY: BacklogGrillState = { asked: {}, answered: {}, activeTaskId: null, lastSentMs: null };
+/**
+ * A FUNCTION, not a shared const.
+ *
+ * This was `const EMPTY = { asked: {}, ... }` and both returns below spread it.
+ * A spread is shallow, so every empty read handed back the SAME `asked` and
+ * `answered` objects, and the first `state.asked[id] = ...` mutated the
+ * module-level literal for the life of the process. Every later read that fell
+ * to the empty path inherited whatever had accumulated in it.
+ *
+ * Mostly invisible in production, because the state file almost always exists
+ * and the mutated copy gets written straight back out. It bites exactly when
+ * it hurts: if the file is missing, unreadable, or corrupt mid-run, the
+ * "fresh" state is not fresh - it carries stale `asked` entries that suppress
+ * cards as already-sent and stale `answered` entries that suppress them for
+ * good, on the one code path whose whole job is to start clean.
+ *
+ * Caught 2026-08-26 by the daily-batch tests, where each test started with the
+ * previous test's cards already asked despite a cleared filesystem.
+ */
+function empty(): BacklogGrillState {
+  return { asked: {}, answered: {}, activeTaskId: null, lastSentMs: null };
+}
 
 export async function readState(): Promise<BacklogGrillState> {
   try {
-    return { ...EMPTY, ...JSON.parse(await fs.readFile(STATE_PATH, 'utf8')) };
+    return { ...empty(), ...JSON.parse(await fs.readFile(STATE_PATH, 'utf8')) };
   } catch {
-    return { ...EMPTY };
+    return empty();
   }
 }
 

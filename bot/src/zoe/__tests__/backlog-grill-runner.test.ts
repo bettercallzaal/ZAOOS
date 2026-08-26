@@ -301,12 +301,26 @@ describe('runBacklogGrillTick - a skipped card goes to the back, not the front',
 
   // Age drives the ladder, so it has to survive the re-send that answers it.
   it('keeps firstAskedAt across a re-send so the ladder can climb', async () => {
+    // The board has to be EXHAUSTED before the re-ask tier can fire - it sits
+    // last, behind every task that has never been seen. This test used to send
+    // one card and jump 4h, which reaches the re-ask tier only if b and c are
+    // already asked; it passed anyway because readState's shared EMPTY object
+    // leaked the previous test's `asked` map into this one. With that fixed,
+    // the setup has to do it honestly: drain the queue first, then age it.
     const t0 = Date.UTC(2026, 7, 9, 14, 0, 0);
+    const every = 2 * 60_000;
     await tick(t0);
+    await tick(t0 + every);
+    await tick(t0 + 2 * every);
+
     const first = (await readState()).asked.a?.firstAskedAt;
     expect(first).toBe(new Date(t0).toISOString());
 
-    await tick(t0 + 4 * 3_600_000);
+    // 4h since a's only card, past the ladder's 3h fresh cooldown, and it is
+    // the least recently sent of the three - so a comes round first.
+    const re = await tick(t0 + 4 * 3_600_000);
+    expect(re.title).toBe('Oldest');
+
     const after = (await readState()).asked.a;
     expect(after?.firstAskedAt).toBe(first); // never overwritten
     expect(after?.at).not.toBe(first); // but the last-sent stamp moved

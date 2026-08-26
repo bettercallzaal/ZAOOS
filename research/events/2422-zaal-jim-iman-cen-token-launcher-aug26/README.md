@@ -149,7 +149,18 @@ A send is not a delivery, and a path visible on screen is not a delivery either.
 ### What no lane could settle
 
 - Whether Jim shipped IMAN that day. bcz says there is no confirmation on record.
-- **Who "Civil" is.** Both zaoos and artizen looked independently and neither could resolve the name; artizen found no curator roster file at all. Someone who was on the call has to say.
+- **OPEN QUESTION: who is "Civil"?** Zaal named "Civil and Jose" as existing ZAO
+  Fund curators when offering Jim a seat. **Two lanes searched independently and
+  neither could resolve the name.** zaoos found two records that could match
+  (`project_marie_civilmonkey_berlin` / CivilMonkey) but could not tell which was
+  meant from the packet. artizen found **no "Civil" anywhere in its repo and no
+  curator roster file of any kind**, which means this recap would otherwise become
+  the only written record of a roster that does not exist. "Jose" resolves to Jose
+  Acabrera (Joseph Goats), but even his Artizen tie is flagged UNVERIFIED in doc
+  843. Only someone who was on the call can settle this, and it must not be
+  resolved by guessing. Until then the recap records it as **something Zaal said,
+  never as a roster fact**, and nothing downstream should cite a curator list
+  sourced to this doc.
 - Jim's email address, needed to execute the Venus action, which this doc redacted on purpose.
 - Every CEN figure below remains Jim's spoken claim. bcz independently confirmed none were verified against contracts or a block explorer.
 

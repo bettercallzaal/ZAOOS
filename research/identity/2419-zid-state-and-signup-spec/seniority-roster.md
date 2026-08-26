@@ -1,9 +1,9 @@
 # Seniority roster - all 122 ZAO Respect holders by first on-chain receipt
 
-Companion data file to [doc 2418](./README.md). Measured 2026-08-25.
+Companion data file to [doc 2419](./README.md). Measured 2026-08-25.
 
 **This is a measurement, not an allocation.** No ZID was assigned. Whether ZIDs
-are ordered by this list at all is Zaal's decision (doc 2418 section 2.3), and
+are ordered by this list at all is Zaal's decision (doc 2419 section 2.3), and
 one of the two readings of his 2026-08-25 reversal says they are not.
 
 **Method.** All 518 `Transfer` events for

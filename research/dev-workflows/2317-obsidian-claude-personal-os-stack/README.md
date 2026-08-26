@@ -85,6 +85,31 @@ No native REST API, no native AI surface - community plugins only. Confirms the 
   skip in-app AI plugins, obsidian-mcp only when concurrent writers appear) were
   re-read on 2026-08-26 and all still hold.
 
+**A concurrent-writer race, observed the same day - worth recording because this
+doc deferred the obsidian-mcp decision until exactly this appeared.** The vault
+README commit above (`3baa919`) was made local-only, under an explicit
+instruction not to push. It reached `origin/main` anyway within the hour: a
+different lane working in the same vault clone committed its own work on top
+(`060a75e`, `5deab90`, `7eec30a`) and pushed the branch, carrying the unpushed
+commit out with it. Nothing failed and nothing warned - `git push` on a shared
+branch takes everything under HEAD, and the local branch simply read as 0 ahead
+of upstream afterwards.
+
+The content was correct, so it was left in place rather than reverted (Zaal's
+call, 2026-08-26). But note what the failure actually was: **not** a write
+conflict on one file, which is the case `obsidian-mcp`'s etag detection would
+catch. It was two writers sharing one branch, where a decision about one
+commit's visibility was silently overridden by another commit's push. An MCP
+server with conflict detection would not have prevented it. `agent-loops.md`
+rule 11 (git hygiene on a shared clone) and rule 25 (build in a worktree, never
+the shared working tree) are the rules that would have - the vault has no
+worktree discipline because until now it had one writer at a time.
+
+Open, not decided: whether vault edits from a lane should go through
+`git worktree add` the way ZAOOS edits already do. That buys isolation at the
+cost of making a two-line note edit ceremonial, which is most of what the vault
+is for.
+
 ## Also See
 
 - [Doc 2318](../../agents/2318-elizaos-memory-vs-zao-corpus-agent/) - the vault-organizer spec this doc feeds

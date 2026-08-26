@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-08-22
+last-validated: 2026-08-26
 related-docs: "2318, 2036"
 original-query: "organize all of this so that i can just use obsidian and claude for everything - /zao-research this (Obsidian + Claude as the complete personal stack, from the OneNote consolidation session)"
 tier: STANDARD
@@ -69,6 +69,21 @@ The 2026-08-18 OneNote mirror already carries source/section/captured/routed; th
 ### 5. Obsidian itself (v1.13.7, from obsidian-releases desktop-releases.json)
 
 No native REST API, no native AI surface - community plugins only. Confirms the vault-is-just-markdown stance: Obsidian is the reading/linking UI, Claude operates on files, git is the transport. The two-surface goal is architecturally sound because neither surface depends on the other's runtime.
+
+### 6. Added since this doc was written (2026-08-26)
+
+- **`TOC.md` + `scripts/build-toc.py`** now exist in the vault - the whole vault
+  in one generated table (path, type, status, first-line hook). This doc's
+  structure section predates it; a generated index is the cheap version of the
+  "hierarchical folders + index files" convention it recommends, and it is
+  regenerated rather than maintained by hand.
+- **`~/zao-vault/README.md` gained a source-order block.** The vault is one of
+  seven stores, and until now nothing said what to believe when two disagreed.
+  Full division + precedence: `CLAUDE.md` ("Where Knowledge Lives") and
+  `handoff-discipline.md` rule 7. Motivation and measurement: doc 2421.
+- The doc's other decisions (Claude Code directly on the vault, git-only sync,
+  skip in-app AI plugins, obsidian-mcp only when concurrent writers appear) were
+  re-read on 2026-08-26 and all still hold.
 
 ## Also See
 

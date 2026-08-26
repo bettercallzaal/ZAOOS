@@ -17,7 +17,7 @@ The pattern: **Monorepo as Lab.**
 - Sharing model: clone, no deps. Each graduate stands alone.
 - Research stays in ZAOOS forever - it's the institutional memory across every product.
 
-**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, ~2,020 active research docs. 324 API routes, 296 components, 18 hooks. (Counts verified 2026-08-11 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, and the research library. Counts of routes, components, hooks and docs are deliberately not repeated here - they go stale the week they are written. The live census is [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/); the doc count is whatever `research/README.md` indexes today.
 
 **Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
 
@@ -33,8 +33,33 @@ The pattern: **Monorepo as Lab.**
 | `src/lib/publish/` | Cross-platform posting (Farcaster, X, Bluesky) | Working on distribution |
 | `src/providers/` | Audio player, contexts | Working on player |
 | `community.config.ts` | All branding, channels, admin FIDs, contract addresses, nav | Forking or configuring |
-| `research/` | ~2,020 active research docs (see research/README.md) | Use grep, not bulk reads |
+| `research/` | The numbered research library - count lives in `research/README.md`, never here | Use grep, not bulk reads |
 | `scripts/` | SQL migrations, wallet generation, webhook setup | DB or infra work |
+| `~/zao-vault/` | NOT in this repo - Zaal's vault: lane briefs, decisions, people, daily notes | Starting a lane, writing a handoff |
+
+## Where Knowledge Lives (the division)
+
+ZAOOS is not the only store, and this file was silent about that until 2026-08-26
+while five rules files already depended on the vault. Seven stores, each owning
+one thing. When two disagree, the one higher in this table wins.
+
+| Store | Where | Owns | Never holds |
+|---|---|---|---|
+| ICM boxes | useicm.com, bodies in `research/identity/icm-boxes/` | Brand truth - what a ZAO brand IS | Operational state |
+| Rules | `.claude/rules/*.md` | Operating policy that binds every session | Facts, task state |
+| Skills | `~/.claude/skills/<name>/` | Repeatable procedures | Policy, one-off notes |
+| Research library | `research/<topic>/NNNN-slug/` | Findings, decisions, the why, with sources | Current task state |
+| Vault | `~/zao-vault/` | Zaal's own thinking, lane briefs, people, decisions-with-why | Anything another store owns (its own rule) |
+| Cowork board | Supabase, via `~/bin/zao-tracker` | Task truth - what is open, who owns it, when | Knowledge |
+| Agent memory | `~/.claude/projects/*/memory/` | User + project facts an agent needs at boot | Operating lessons - those go to `.claude/rules/` |
+
+Precedence exists because a superseded decision otherwise wins an argument on
+recency alone. Two more rules go with it: use the newest APPROVED information,
+not merely the newest file; and if the answer is missing from all seven, say
+what you could not find rather than filling the gap (`anti-fabrication.md`).
+
+Routing a correction to the right store is `agent-loops.md` rule 6. Which
+surface may carry state at all is `handoff-discipline.md` rule 7.
 
 ## Quick Start
 

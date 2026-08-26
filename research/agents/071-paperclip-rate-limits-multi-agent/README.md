@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-21
+last-validated: 2026-08-26
 original-query: Analyze rate limiting strategies for multi-agent systems using Paperclip (reconstructed)
 tier: archive
 note: Paperclip framework decommissioned 2026-05-04. Doc retained as historical reference; patterns may apply to other orchestration tools.
@@ -16,66 +16,107 @@ note: Paperclip framework decommissioned 2026-05-04. Doc retained as historical 
 
 ---
 
+## Updated 2026-08-26
+
+Major changes to Anthropic API tiers, rate limits, pricing, and model availability since original research (2026-03-18) and last validation (2026-05-21). Sections 1, 2, 5, 7, and 8 updated to reflect live docs as of 2026-08-26. Sections 3 and 4 (Paperclip internals) retained as-is since Paperclip is decommissioned.
+
+**Key changes verified against https://platform.claude.com/docs/en/api/rate-limits and https://platform.claude.com/docs/en/about-claude/pricing (full fetches, 2026-08-26):**
+
+1. **Tier names completely changed (June 2026):** Tier 1/2/3/4 → Start/Build/Scale/Custom. Advancement is now usage-history-based, not cumulative-spend-based.
+2. **Rate limits dramatically increased:** Start tier now has 1,000 RPM and 2M ITPM (vs. 50 RPM and 30K ITPM in old Tier 1). All tiers are 10–40x higher.
+3. **New Claude 5 models:** Fable 5, Opus 5, Sonnet 5, Mythos 5 (limited access).
+4. **Haiku 4.5 price increased:** $0.80/$4 per MTok → $1/$5 per MTok.
+5. **Models retired:** Haiku 3.5, Opus 4, Opus 4.1, Sonnet 4 (available on Bedrock/Google Cloud only).
+6. **Spend limits restructured:** Start=$500/mo, Build=$1,000/mo, Scale=$200,000/mo.
+
+---
+
 ## 1. Exact Anthropic Rate Limits per Tier
+
+> **⚠ UPDATED 2026-08-26:** Tiers were renamed and limits dramatically raised in June 2026. The original tier names (Tier 1–4) no longer exist. Source: https://platform.claude.com/docs/en/api/rate-limits (full page fetch).
 
 Rate limits are enforced at the **organization level**, not per API key. All keys in the same org share the same pool. Limits use the **token bucket algorithm** (continuous refill, not fixed resets).
 
-### Spend Limits
+### Spend Limits (as of 2026-08-26)
 
-| Tier | Credit Purchase (cumulative) | Monthly Spend Limit |
-|------|------------------------------|---------------------|
-| Tier 1 | $5 | $100/mo |
-| Tier 2 | $40 | $500/mo |
-| Tier 3 | $200 | $1,000/mo |
-| Tier 4 | $400 | $200,000/mo |
-| Monthly Invoicing | N/A | No limit |
+| Usage Tier | Monthly Spend Cap |
+|------------|------------------|
+| Start | $500/mo |
+| Build | $1,000/mo |
+| Scale | $200,000/mo |
+| Custom | No fixed cap (negotiated) |
 
-### Rate Limits — Claude Opus 4.x (shared across Opus 4, 4.1, 4.5, 4.6)
+**Advancement:** Tiers now advance automatically based on usage history and account standing — NOT based on cumulative credit deposits. New organizations may start in an Evaluation sub-tier (below Start limits) while history is established.
 
-| Tier | RPM | Input TPM | Output TPM |
-|------|-----|-----------|------------|
-| **Tier 1** | 50 | 30,000 | 8,000 |
-| **Tier 2** | 1,000 | 450,000 | 90,000 |
-| **Tier 3** | 2,000 | 800,000 | 160,000 |
-| **Tier 4** | 4,000 | 2,000,000 | 400,000 |
-
-### Rate Limits — Claude Sonnet 4.x (shared across Sonnet 4, 4.5, 4.6)
+### Rate Limits — Claude Opus 4.x combined (4.5, 4.6, 4.7, 4.8 — shared bucket; Opus 5 is separate)
 
 | Tier | RPM | Input TPM | Output TPM |
 |------|-----|-----------|------------|
-| **Tier 1** | 50 | 30,000 | 8,000 |
-| **Tier 2** | 1,000 | 450,000 | 90,000 |
-| **Tier 3** | 2,000 | 800,000 | 160,000 |
-| **Tier 4** | 4,000 | 2,000,000 | 400,000 |
+| **Start** | 1,000 | 2,000,000 | 400,000 |
+| **Build** | 5,000 | 5,000,000 | 1,000,000 |
+| **Scale** | 10,000 | 10,000,000 | 2,000,000 |
+
+### Rate Limits — Claude Opus 5 (separate bucket from Opus 4.x)
+
+| Tier | RPM | Input TPM | Output TPM |
+|------|-----|-----------|------------|
+| **Start** | 1,000 | 2,000,000 | 400,000 |
+| **Build** | 5,000 | 5,000,000 | 1,000,000 |
+| **Scale** | 10,000 | 10,000,000 | 2,000,000 |
+
+### Rate Limits — Claude Sonnet 4.x combined (Sonnet 4.5, 4.6 — shared bucket; Sonnet 5 is separate)
+
+| Tier | RPM | Input TPM | Output TPM |
+|------|-----|-----------|------------|
+| **Start** | 1,000 | 2,000,000 | 400,000 |
+| **Build** | 5,000 | 5,000,000 | 1,000,000 |
+| **Scale** | 10,000 | 10,000,000 | 2,000,000 |
+
+### Rate Limits — Claude Sonnet 5 (separate bucket from Sonnet 4.x)
+
+| Tier | RPM | Input TPM | Output TPM |
+|------|-----|-----------|------------|
+| **Start** | 1,000 | 2,000,000 | 400,000 |
+| **Build** | 5,000 | 5,000,000 | 1,000,000 |
+| **Scale** | 10,000 | 10,000,000 | 2,000,000 |
 
 ### Rate Limits — Claude Haiku 4.5
 
 | Tier | RPM | Input TPM | Output TPM |
 |------|-----|-----------|------------|
-| **Tier 1** | 50 | 50,000 | 10,000 |
-| **Tier 2** | 1,000 | 450,000 | 90,000 |
-| **Tier 3** | 2,000 | 1,000,000 | 200,000 |
-| **Tier 4** | 4,000 | 4,000,000 | 800,000 |
+| **Start** | 1,000 | 2,000,000 | 400,000 |
+| **Build** | 5,000 | 5,000,000 | 1,000,000 |
+| **Scale** | 10,000 | 10,000,000 | 2,000,000 |
 
-**Critical note:** Cached input tokens do NOT count toward ITPM for current models. With 80% cache hit rate you can effectively process 5x your ITPM limit.
+### Rate Limits — Claude Fable 5
 
-**Source:** https://platform.claude.com/docs/en/api/rate-limits
+| Tier | RPM | Input TPM | Output TPM |
+|------|-----|-----------|------------|
+| **Start** | 1,000 | 500,000 | 100,000 |
+| **Build** | 2,000 | 1,500,000 | 300,000 |
+| **Scale** | 4,000 | 4,000,000 | 800,000 |
+
+**Critical note:** Cached input tokens do NOT count toward ITPM for most models. With 80% cache hit rate you can effectively process ~10M total input tokens/min against a 2M ITPM limit (cached tokens are 0x toward the limit). Exception: Claude Haiku 3.5 (retired, Bedrock/GCloud only) counted cache reads toward ITPM.
+
+**Source:** https://platform.claude.com/docs/en/api/rate-limits (full fetch, 2026-08-26)
 
 ---
 
 ## 2. What Tier Is the User Likely On?
 
+> **⚠ UPDATED 2026-08-26:** Tier names and advancement criteria changed completely in June 2026. The old "$40 deposit = Tier 2" advice is obsolete.
+
 **If using Claude Code with a Pro/Max subscription:** Claude Code subscription usage is entirely separate from API tier limits. The subscription uses a rolling 5-hour window (~45 prompts for Pro, more for Max) shared across Claude.ai chat + Claude Code. This is NOT the API tier system.
 
-**If using an `ANTHROPIC_API_KEY`:** The tier depends on cumulative credit purchases:
-- $5 spent = Tier 1 (50 RPM, 30K ITPM for Opus — **this is almost certainly where you are**)
-- $40 spent = Tier 2 (1,000 RPM, 450K ITPM)
-- $200 spent = Tier 3
-- $400 spent = Tier 4
+**If using an `ANTHROPIC_API_KEY`:** The tier is now determined by **usage history and account standing**, not cumulative credit deposits. New accounts may start in an Evaluation sub-tier (below Start limits) while history is established, then graduate to Start, Build, and Scale automatically.
 
-**The problem:** At Tier 1, 5 agents sharing 50 RPM means ~10 requests/min per agent. With 30,000 ITPM for Opus, each agent gets ~6,000 input tokens/min. This is extremely tight — a single heartbeat with context can consume thousands of tokens.
+- **Start** (default entry): 1,000 RPM, 2M ITPM for most models — far more generous than old Tier 1
+- **Build**: 5,000 RPM, 5M ITPM — for growing production workloads
+- **Scale**: 10,000 RPM, 10M ITPM — for high-volume production
 
-**Recommendation:** Deposit $40 to reach Tier 2 immediately. The jump from 50 RPM / 30K ITPM to 1,000 RPM / 450K ITPM is massive (20x RPM, 15x ITPM).
+**The context has changed:** At Start tier, 5 agents sharing 1,000 RPM means 200 requests/min per agent — no longer a severe constraint for moderate workloads. ITPM is 2M per model class (shared bucket). With prompt caching the effective throughput is ~10M tokens/min.
+
+**Recommendation:** Check your tier and usage at https://platform.claude.com/settings/limits. If you're on Start and hitting limits, contact Anthropic support through the Rate limits page to request tier advancement; the "$40 deposit" workaround no longer applies.
 
 ---
 
@@ -205,20 +246,31 @@ If you set `ANTHROPIC_API_KEY`, Claude Code bypasses subscription limits entirel
 
 ## 7. Cost Implications of Running 5 Agents
 
-### Per-Token Pricing (2026)
+> **⚠ UPDATED 2026-08-26:** New Claude 5 models added; Haiku 4.5 price increased; Opus 4/4.1 and Haiku 3.5 retired. Source: https://platform.claude.com/docs/en/about-claude/pricing (full fetch, 2026-08-26).
 
-| Model | Input (per 1M tokens) | Output (per 1M tokens) |
-|-------|----------------------|------------------------|
-| Claude Opus 4.6 | $5 | $25 |
-| Claude Opus 4/4.1 | $15 | $75 |
-| Claude Sonnet 4.x | $3 | $15 |
-| Claude Haiku 4.5 | $0.80 | $4 |
+### Per-Token Pricing (as of 2026-08-26)
+
+| Model | Input (per 1M tokens) | Output (per 1M tokens) | Status |
+|-------|----------------------|------------------------|--------|
+| Claude Fable 5 | $10 | $50 | Active |
+| Claude Opus 5 | $5 | $25 | Active |
+| Claude Opus 4.8 | $5 | $25 | Active |
+| Claude Opus 4.7 | $5 | $25 | Active |
+| Claude Opus 4.6 | $5 | $25 | Active |
+| Claude Sonnet 5 | $2 | $10 | Active (introductory price now standard) |
+| Claude Sonnet 4.6 | $3 | $15 | Active |
+| Claude Haiku 4.5 | $1 | $5 | Active (was $0.80/$4 — **price increased**) |
+| Claude Opus 4.1 | $15 | $75 | Retired (Bedrock/Google Cloud only) |
+| Claude Opus 4 | $15 | $75 | Retired (Google Cloud only) |
+| Claude Haiku 3.5 | $0.80 | $4 | Retired (Bedrock/Google Cloud only) |
+
+**Note:** Claude 4.7 and later use a newer tokenizer that produces approximately 30% more tokens for the same text. Factor this in when estimating costs for newer models.
 
 ### Estimated Monthly Cost Scenarios
 
 Assuming each agent runs 8 heartbeats/day, each heartbeat consuming ~5K input + ~2K output tokens:
 
-**All Opus 4.6:**
+**All Opus 4.6 (same price as Opus 5):**
 - Per agent: 8 x 30 x (5K x $5/1M + 2K x $25/1M) = 240 x ($0.025 + $0.05) = $18/mo
 - 5 agents: **~$90/mo**
 
@@ -226,36 +278,44 @@ Assuming each agent runs 8 heartbeats/day, each heartbeat consuming ~5K input + 
 - Per agent: 240 x ($0.10 + $0.20) = $72/mo
 - 5 agents: **~$360/mo**
 
-**Mixed model strategy (recommended):**
-- CEO + Engineer on Opus 4.6: $144/mo
-- Security + Research on Sonnet 4.x: $43/mo (60% cheaper)
-- Agent 5 on Haiku 4.5: $5/mo (90% cheaper)
-- Total: **~$192/mo**
+**Mixed model strategy (recommended, updated pricing):**
+- CEO + Engineer on Opus 4.6/5: $144/mo
+- Security + Research on Sonnet 4.6: $43/mo (60% cheaper)
+- Agent 5 on Haiku 4.5: $6/mo (88% cheaper — note price increased from $5/mo)
+- Total: **~$193/mo**
+
+**Using Sonnet 5 for routine agents (new option):**
+- CEO on Opus 5: $72/mo
+- Engineer + Security + Research on Sonnet 5 ($2/$10): $17/mo each → $51/mo
+- Agent 5 on Haiku 4.5: $6/mo
+- Total: **~$129/mo** (further savings with Claude 5 tier)
 
 ### Cost Optimization Levers
 1. **Prompt caching** — cached input tokens cost 10% of base price and don't count toward ITPM
 2. **Batch API** — 50% discount for non-urgent work, separate rate limits
-3. **Model mixing** — Use Haiku for triage, Sonnet for routine work, Opus only for complex reasoning
+3. **Model mixing** — Use Haiku 4.5 for triage, Sonnet 5 ($2/MTok) for routine work, Opus 5 only for complex reasoning
 4. **Reduce heartbeat frequency** — Does the CEO agent really need to check every hour?
 
 ---
 
 ## 8. Recommended Action Plan
 
+> **⚠ UPDATED 2026-08-26:** Tier advancement is now usage-history-based. The "$40 deposit" advice is obsolete — Start tier already has 1,000 RPM and 2M ITPM by default.
+
 ### Immediate (today)
-1. **Check your current tier** at https://console.anthropic.com/settings/limits
-2. **Deposit $40** to reach Tier 2 (1,000 RPM vs 50 RPM — 20x improvement)
-3. **Stagger heartbeat schedules** — offset each agent by at least 10 minutes
+1. **Check your current tier** at https://platform.claude.com/settings/limits
+2. **Confirm you're on Start tier or higher** — limits are now much more generous. Most new accounts automatically progress based on usage.
+3. **Stagger heartbeat schedules** — offset each agent by at least 10 minutes to avoid thundering herd (still valid advice)
 
 ### Short-term (this week)
-4. **Create Workspaces** — one per agent with per-workspace rate limits
+4. **Create Workspaces** — one per agent with per-workspace rate limits (still valid; see Section 5)
 5. **Add jitter** to heartbeat timing (random 0-30s delay before each cycle)
 6. **Implement proper 429 handling** — exponential backoff respecting `retry-after` header
 7. **Enable prompt caching** for repeated system prompts and agent instructions
 
 ### Medium-term (this month)
-8. **Switch non-critical agents to Sonnet/Haiku** to reduce cost and rate limit pressure
-9. **Use Batch API** for Research Agent and Security Auditor (non-time-sensitive work)
+8. **Consider Claude Sonnet 5 ($2/$10 per MTok)** for routine agents — price is now confirmed permanent (introductory pricing locked in)
+9. **Use Batch API** for Research Agent and Security Auditor (non-time-sensitive work) — 50% discount still applies
 10. **Monitor usage** via Console rate limit charts to identify peak contention
 
 ---

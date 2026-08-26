@@ -35,9 +35,16 @@ Five things were unknown when this started. Four are now measured.
    value that violates the `UNIQUE` constraint. One-line check and one-line fix in
    section 1.4. This is an inference from three pieces of evidence, not an
    observation - it was not triggered on purpose.
-5. **Still genuinely open and still Zaal's:** who is ZID 0, how large the reserved
-   block is, and what orders it. Section 2 narrows the second one by arithmetic
-   and leaves the other two.
+5. **The seniority query is run.** All 518 Respect transfers, complete history,
+   first receipt per address. **All 122 current holders are ranked, with no
+   ties**, Zaal is rank 1 on chain, and every one of them predates the migration's
+   own "before March 2026" OG cutoff. Balance order and seniority order are almost
+   uncorrelated - Spearman rho **0.125** - so every roster produced for this work
+   so far is nearly unrelated to the ordering the migration asks for. Full list in
+   [`seniority-roster.md`](./seniority-roster.md).
+
+**Still genuinely open and still Zaal's:** who is ZID 0, how large the reserved
+block is, and whether that roster orders it at all.
 
 And one correction that changes the shape of the remaining work:
 
@@ -60,6 +67,7 @@ Every claim in this doc carries the way it was obtained.
 | Row counts | `Prefer: count=exact` with `Range: 0-0`, reading `content-range` |
 | Audit events | `GET /security_audit_log?action=eq.user.assign_zid` with an exact count |
 | Holders | Blockscout v2, `optimism.blockscout.com/api/v2/tokens/0x34cE.../holders`, three pages, 122 rows, browser user-agent |
+| Seniority | All 518 `Transfer` events from the same contract's Blockscout `/transfers` endpoint, 11 pages, complete history; first incoming transfer per address, ranked by block |
 | Holder-to-user overlap | Local set intersection of every EVM address in `primary_wallet`, `respect_wallet`, `custody_address` and `verified_addresses` against the 122 holder addresses, lowercased |
 | `team_members.wallet` | `select count(*), count(wallet) from team_members` on the cowork Supabase project |
 | Code facts | Read from `scripts/archive/old/add-zid-column.sql`, `src/app/api/admin/users/route.ts`, `src/lib/db/audit-log.ts` at commit `98b825df` |
@@ -195,6 +203,94 @@ This is `code-restraint.md` rung 2 in its purest form. The artist data model doe
 not need designing. It needs **a public/private split decided** (section 4.4) and
 it needs **filling in** - most of those columns are empty for most rows.
 
+### 1.7 The seniority query, now run
+
+The vault note recorded that true seniority "means reading first-received
+transfers per address - a different query, not yet run." It has now been run.
+
+**Method.** Every `Transfer` event for the contract, read from Blockscout v2
+across 11 pages: **518 transfers, 69 of them mints, complete history from
+2024-07-30 to 2025-12-20.** For each of the 122 current holders, the block of its
+first incoming transfer is its seniority rank.
+
+Four results, and each one changes something.
+
+**Every one of the 122 is ranked, and there are no ties.** All 122 have a first
+receipt, and every first receipt is in a distinct block - including the 22
+addresses that all received on day one, 2024-07-30, which land in 22 separate
+blocks. The ordering is total. Whatever else is unresolved about ordering, "we
+cannot rank them" is not one of the obstacles. Full list:
+[`seniority-roster.md`](./seniority-roster.md).
+
+**Balance order and seniority order are almost unrelated.** Spearman rho between
+the two rankings is **0.125**. Every roster produced for this work so far has been
+balance-ordered, because that is what the holders endpoint returns, and the
+migration asks for seniority. These are not two views of the same list; they are
+nearly independent. Handing out low ZIDs from the balance list would give them to
+whoever earned most, which is the exact failure the vault note warned about, now
+with a number on it.
+
+**Zaal is rank 1 on chain**, in the first mint batch, with the largest single
+balance. Whatever ZID he ends up with, the seniority data does not argue against
+it.
+
+**Every one of the 122 predates the OG cutoff.** The migration defines ZID 1-99
+as "early testers and OGs who had ZAO tokens before March 2026." The most recent
+first receipt among current holders is **2025-12-09**. So all 122 qualify, which
+settles section 2.2 from a second direction: the OG cohort under the migration's
+own definition is 122 people, and a 99-slot block cannot hold it.
+
+The top of the roster, with what each address resolves to:
+
+| Rank | First receipt | Respect | ENS | `users` row | ZID |
+|---|---|---|---|---|---|
+| 1 | 2024-07-30 | 3,094 | - | zaal | **1** |
+| 2 | 2024-07-30 | 1,265 | ohnahji.eth | wallet-only row | **3** |
+| 3 | 2024-07-30 | 2,512 | - | hurric4n3ike | **4** |
+| 4 | 2024-07-30 | 3,079 | attabotty.eth | wallet-only row | - |
+| 5 | 2024-07-30 | 239 | - | tejm | - |
+| 6 | 2024-07-30 | 1,914 | - | not in `users` | - |
+| 7 | 2024-07-30 | 65 | - | not in `users` | - |
+| 8 | 2024-07-30 | 910 | - | wallet-only row | - |
+| 9 | 2024-07-30 | 505 | - | wallet-only row | - |
+| 10 | 2024-07-30 | 28 | - | not in `users` | - |
+| 11 | 2024-07-30 | 878 | - | wallet-only row | - |
+| 12 | 2024-07-30 | 79 | - | not in `users` | - |
+| 13 | 2024-07-30 | 10 | - | not in `users` | - |
+| 14 | 2024-07-30 | 15 | - | not in `users` | - |
+| 15 | 2024-07-30 | 162 | - | not in `users` | - |
+| 16 | 2024-07-30 | 611 | - | wallet-only row | - |
+| 17 | 2024-07-30 | 451 | melatto.eth | wallet-only row | - |
+| 18 | 2024-07-30 | 220 | - | wallet-only row | - |
+| 19 | 2024-07-30 | 825 | - | metamu | - |
+| 20 | 2024-07-30 | 85 | - | not in `users` | - |
+
+Two things in that table are worth stating on their own.
+
+**ZID 3 is `ohnahji.eth`.** The address is
+`0x64a15b1d2de581097cb48e5d82619203e24bb3e1`, and Blockscout resolves it to
+`ohnahji.eth` - which is one of only three ENS names the vault note matched to a
+`people/` note **with confidence**. The whitepaper lane recorded this same
+address on 2026-08-21 as the number-two OREC submitter with 11 votes that "has no
+ENS match and isn't documented anywhere in the repo." It has an ENS, it is a
+`users` row, it holds ZID 3, and it is the second-most-senior holder on chain
+after Zaal.
+
+**The three existing ZIDs are already in seniority order.** Seniority ranks 1, 2
+and 3 hold ZIDs 1, 3 and 4 - the same order, offset by the hole at 2. Whoever
+assigned those three appears to have been working from a seniority list with a
+slot held open. That is an observation from a sample of three and it may be
+coincidence, but it is the only ordering hypothesis the live data supports, and
+it is worth putting to Zaal directly rather than re-deriving.
+
+**One more thing falls out of the transfer history:** the most recent transfer of
+any kind was **2025-12-20**, and the last mint was 2025-12-09. The Respect ledger
+has been static for eight months. That is consistent with the decentralization
+note's "static Respect ledgers (no decay, only the historical ledger votes)", and
+it means a seniority roster built today will not drift while these decisions are
+being made.
+
+
 ## 2. The four-way conflict, reconciled
 
 The four positions are usually stated as if they disagreed with each other. They
@@ -250,6 +346,14 @@ joins. **100 clears 60 but not 122 or 188.** So the arithmetic eliminates the
 migration's 99 and the reversal's own smallest option, and the real choice is
 **500 or 1000**.
 
+The seniority query closes this from a second direction. The migration defines the
+reserved tier as "early testers and OGs who had ZAO tokens before March 2026," and
+section 1.7 measured that **the most recent first receipt among all 122 current
+holders is 2025-12-09**. Every one of them is inside that cutoff. So the OG cohort
+under the migration's own definition is not "some subset of the holders" - it is
+all 122 of them, and 99 slots were never going to be enough. The `setval('zid_seq',
+99)` line in the migration is dead on arrival regardless of what else is decided.
+
 The difference between those two is not capacity, it is what an OG number is
 worth. 500 leaves roughly 2.7x headroom over 188 and keeps a low ZID scarce.
 1000 leaves 5.3x, which is exactly the growth multiple named in the L6 gate of
@@ -283,21 +387,29 @@ seniority order - and says it depends on item 4 settling the ordering.
 **Reading 2 - the reversal is about ORDER.** Numbers inside the block are not
 ranked by anything Respect-derived, and the block is a set rather than a ranking.
 
-Under Reading 1, somebody has to run a first-transfer query per address on
-Optimism - a query nobody has run, and one this pass did not run either, because
-ordering is a Zaal decision and running it first would have implied the answer.
-Under Reading 2, nobody ever needs to run it.
+Reading 1 needs a first-transfer query per address. **That query has now been
+run** (section 1.7) and the roster exists in full, so this reading no longer
+carries a cost - it is a decision about whether to use a list that is already
+sitting there. Reading 2 means nobody uses it.
+
+Running the query does not decide the question, and it was deliberately kept as a
+measurement: the roster is data, and whether ZIDs are ordered by it is Zaal's.
+What the measurement did add is a fact that bears on the choice - **balance order
+and seniority order are almost uncorrelated (rho 0.125)**, so this is not a case
+where the two candidate orderings would produce roughly the same list. They
+produce different lists, and picking one is a real choice with a visible outcome.
 
 **Recorded as UNRESOLVED rather than guessed.** Guessing changes what is owed, and
 `recap-followthrough.md` rule 5 says do not resolve an ambiguous promise by
 guessing. One sentence from Zaal closes it.
 
-There is also a third possible ordering that neither reading names and which the
-live data quietly suggests: **hand-ordered by Zaal, one at a time, as he writes
-each member up.** Queue item 5 is exactly that activity, and ZIDs 1, 3 and 4 were
-already assigned by hand. If ordering is going to be Zaal's judgement rather than
-a query's output, that is a cheaper answer than either reading, and it matches
-how the three existing ZIDs actually came to exist.
+There is a third possible ordering that neither reading names and which the live
+data quietly suggests: **hand-ordered by Zaal, one at a time, as he writes each
+member up.** Queue item 5 is exactly that activity, and ZIDs 1, 3 and 4 were
+assigned by hand. Note though that those three hand-assigned ZIDs turn out to
+match seniority ranks 1, 2 and 3 exactly, offset by the hole at 2 (section 1.7) -
+so the hand-ordered option and the seniority option may already be the same
+answer, and it would be worth asking Zaal whether that was deliberate.
 
 ### 2.4 The fourth conflict nobody has been counting - doc 005 describes a different object
 
@@ -512,8 +624,8 @@ people - all three are gated per `lane-autonomy.md`.
 | # | Decision | What this pass contributes |
 |---|---|---|
 | 1 | **Zaal is ZID 0 or stays ZID 1** | It is now an `UPDATE` on a live row, not a naming choice. If 0: does ZID 1 get reassigned or stay empty? Either way `project_four_pillars` and doc 005 need correcting. |
-| 2 | **Reserved block size** | **99 and 100 are eliminated by arithmetic** - 122 holders and 188 members both exceed them. Real choice is 500 or 1000. 1000 covers the entire 188-to-1,000 journey named in the L6 gate. |
-| 3 | **What orders the reserved block** | Two readings of the reversal, section 2.3, plus a third option the live data suggests: hand-ordered by Zaal as he writes each member up, which is how ZIDs 1/3/4 already happened. One sentence closes this. |
+| 2 | **Reserved block size** | **99 and 100 are eliminated by arithmetic, from two directions.** 122 holders and 188 members both exceed them; and separately, every one of the 122 first received Respect by 2025-12-09, so all 122 qualify as OGs under the migration's own "before March 2026" definition. Real choice is 500 or 1000. 1000 covers the entire 188-to-1,000 journey named in the L6 gate. |
+| 3 | **What orders the reserved block** | The seniority roster now EXISTS in full (section 1.7, all 122 ranked, no ties) so this is a choice about using a list, not a research task. Two readings of the reversal plus a third the data suggests - and the three ZIDs already assigned by hand match seniority ranks 1/2/3 exactly, so those two options may already be the same answer. Worth asking whether that was deliberate. One sentence closes this. |
 | 4 | **Run the sequence fix** | `SELECT setval('zid_seq', (SELECT COALESCE(MAX(zid),0) FROM users));` - safe, idempotent, correct under any answer to 2 and 3, and it prevents a confusing 500 on the first real assignment. |
 | 5 | **The public/private field split** | Section 4.4 proposes three tiers. Publishing artist details is publishing about other people, so the tier-1 list is Zaal's to approve, not an engineering default. |
 | 6 | **Whether ZID 2 stays a hole** | Records say Candy; the database says nobody. |
@@ -531,8 +643,9 @@ people - all three are gated per `lane-autonomy.md`.
   over the 83 addresses in chunks, which should shrink the 18.2% further.
 - **`zid_seq`'s current value was not read.** Section 1.4 gives the query. Reading
   it needed either DDL or a function call that would have burned a sequence value.
-- **No first-transfer seniority query was run.** Ordering is decision 3, and
-  running the query first would have implied its answer.
+- **The seniority roster is a measurement, not an allocation.** Running the
+  first-transfer query (section 1.7) produced the ranking; it did not decide
+  whether ZIDs use it. That is decision 3 and it is untouched.
 - **No ENS-to-person mapping was attempted.** The lane brief records two wrong
   matches from a fuzzy substring pass. An ENS name is a claim about a wallet,
   never proof of a person.
@@ -547,6 +660,9 @@ people - all three are gated per `lane-autonomy.md`.
 - Cowork Supabase project via the `supabase-cowork` MCP - `team_members`.
 - Blockscout v2 on Optimism, `optimism.blockscout.com/api/v2/tokens/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957/holders`,
   paginated to all 122 holders. [FULL]
+- Blockscout v2 on Optimism, the same contract's `/transfers`, paginated to all
+  **518 transfers** across 11 pages - complete history, 2024-07-30 to 2025-12-20,
+  69 mints. This is the seniority query. [FULL]
 - `api.farcaster.xyz/v2/user-by-verification` and `client.farcaster.xyz/v2/user-by-verification` -
   both HTTP 401, authentication required. [FAILED]
 

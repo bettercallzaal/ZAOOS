@@ -102,4 +102,8 @@ All five repos cloned to a scratch dir, one clone per repo, and read from disk.
 - Repo metadata (stars, push dates, sizes) via `gh api repos/99darwin/<name>` **[FULL]**
 - Our own ground truth: `grep -rn "write-set\|parallel-safe"` over `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/rules/` and `~/zao-vault/handoffs/lanes.md` - **zero hits**, the negative signal behind ranks 1-3 **[FULL]**
 
-**Path not verified:** "convention 5" and the lane brief template are named as targets from Zaal's own context; `grep` for a numbered convention 5 in `.claude/rules/lane-autonomy.md` and `~/zao-vault/handoffs/lanes.md` did not locate a literal file this session. Whoever ports these should confirm the path before editing.
+**Path confirmed (Zaal, 2026-08-27):** the numbered conventions live in `~/zao-vault/notes/orca-organization.md` under "Conventions to adopt" - **not** `.claude/rules/lane-autonomy.md`, which is where an earlier draft of this doc looked and found nothing. **Convention 5 is "File ownership when panes overlap"**, and it already cites the same incident: *"Two panes nearly edited sync-projects.js the same hour. Rule: the pane whose repo owns the file makes the change; the other reports findings and stands by."*
+
+That matters for how adoptions 1-3 land. Convention 5 already resolves an overlap **once it is noticed**; what `parallel-safety.md` adds is the step that notices it - computing and comparing write-sets *before* dispatch, rather than discovering the overlap when two panes are already in the same file. The port extends convention 5 rather than replacing it.
+
+That note also already carries a "Candidate conventions from 99darwin/orchestrator" section naming these same three, and defers source paths to this lane. This doc supplies them. The note is orchestrator-written and was not edited by this lane.

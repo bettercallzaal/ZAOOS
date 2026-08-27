@@ -1135,15 +1135,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
 
           if (heals.length) {
+            // Left on the `status` default, NOT `noise`. The 266 measured
+            // zero-reply "watchdog restart" messages match `watchdog` or
+            // `froze -> restarted`; neither string is emitted anywhere in this
+            // tree, so those restarts come from an unmapped sender. The split
+            // from the anomaly alarm above still earns its keep - one is a
+            // failure notice, one is a self-heal log - but this half gets no
+            // special cut until its real emitter is found.
             const msg = renderWatcherAlerts(heals);
-            await runWithSendClass('noise', async () => {
-              if (opts.routingDeps) {
-                await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
-              } else {
-                await opts.bot.api.sendMessage(opts.zaalTgId, msg);
-              }
-            });
-            console.log('[zoe/scheduler] watcher: ' + heals.length + ' self-heal note(s) offered');
+            if (opts.routingDeps) {
+              await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
+            } else {
+              await opts.bot.api.sendMessage(opts.zaalTgId, msg);
+            }
+            console.log('[zoe/scheduler] watcher: ' + heals.length + ' self-heal note(s) sent');
           }
 
           if (!anomalies.length && !heals.length) {
@@ -1411,20 +1416,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             if (shouldFireAlert(level)) {
               const status = formatSpendStatus(false);
               const alert = `COST ALERT: Spend reached ${level}% of daily cap\n\n${status}`;
-              // Cost reports are one of the eight types that drew zero replies
-              // in 151 days. Kept, but on the noise reserve, so they are the
-              // first thing cut on a busy day rather than the last.
-              await runWithSendClass('noise', async () => {
-                if (opts.routingDeps) {
-                  await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
-                    console.warn('[zoe/scheduler] cost alert send failed:', err);
-                  });
-                } else {
-                  await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
-                    console.warn('[zoe/scheduler] cost alert send failed:', err);
-                  });
-                }
-              });
+              // NOT tagged `noise`, though an earlier pass did tag it. The 24
+              // measured zero-reply "cost report" messages match
+              // `^Cost-of-pass YYYY-MM-DD:`, which does not appear anywhere in
+              // the bot tree - so they come from an unmapped sender, not from
+              // this COST ALERT. Left on the `status` default.
+              if (opts.routingDeps) {
+                await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
+                  console.warn('[zoe/scheduler] cost alert send failed:', err);
+                });
+              } else {
+                await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
+                  console.warn('[zoe/scheduler] cost alert send failed:', err);
+                });
+              }
             }
           }
         } catch (err) {

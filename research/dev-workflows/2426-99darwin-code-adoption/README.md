@@ -9,7 +9,7 @@ original-query: "DEEP: Nick Saponaro (github.com/99darwin, 95 repos) as a live c
 tier: DEEP
 ---
 
-# 2423 - 99darwin's code, read as source: the adoption list
+# 2426 - 99darwin's code, read as source: the adoption list
 
 > **Goal:** Docs 2204 and 2205 read Nick Saponaro's repos from READMEs (2205 marks itself `[PARTIAL - top 4 read fully]`). This doc clones five repos and reads the actual source, reads every LICENSE from the file per Hard Requirement 13, and produces a ranked adoption list with exact source paths, target, licence compatibility and effort.
 

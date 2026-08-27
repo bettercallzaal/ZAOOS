@@ -45,6 +45,34 @@ SAFE_MARKERS = ("pipefail", "PIPESTATUS")
 _PIPE = re.compile(r"(?<!\|)\|(?!\|)")
 
 
+_HEREDOC = re.compile(r"<<-?\s*[\'\"]?([A-Za-z_][A-Za-z0-9_]*)[\'\"]?")
+
+
+def _strip_heredocs(command: str) -> str:
+    """Blank out heredoc BODIES before scanning.
+
+    A heredoc payload is data, not shell - it is routinely Python, SQL, Markdown
+    or prose. On 2026-08-21 this check blocked a python patch script because its
+    own comments mentioned a status read next to a pipe character in a sentence.
+
+    Bodies are replaced with empty lines rather than removed, so reported line
+    numbers still match the command the author wrote.
+    """
+    out, marker = [], None
+    for line in command.split("\n"):
+        if marker is None:
+            out.append(line)
+            m = _HEREDOC.search(line)
+            if m:
+                marker = m.group(1)
+            continue
+        out.append("")
+        if line.strip() == marker:
+            out[-1] = line
+            marker = None
+    return "\n".join(out)
+
+
 def _strip_quoted(line: str) -> str:
     """Remove quoted spans so a literal '|' inside a string is not read as a pipe.
 
@@ -64,6 +92,67 @@ def _strip_quoted(line: str) -> str:
             continue
         out.append(ch)
     return "".join(out)
+
+
+def _segments(line: str) -> list[str]:
+    """Split a line into command segments on `;`, `&&` and `||`, outside quotes.
+
+    Segments are RAW (not quote-stripped) because a status read can sit inside a
+    quoted string. Command substitution is not parsed - a `;` inside `$( )` will
+    over-split, which yields a false NEGATIVE, the safe direction to be wrong in
+    for a check that can block a command.
+    """
+    out, buf, quote, i = [], [], None, 0
+    while i < len(line):
+        ch = line[i]
+        if quote:
+            buf.append(ch)
+            if ch == quote:
+                quote = None
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            buf.append(ch)
+            i += 1
+            continue
+        if ch == ";":
+            out.append("".join(buf))
+            buf = []
+            i += 1
+            continue
+        if line[i:i + 2] in ("&&", "||"):
+            out.append("".join(buf))
+            buf = []
+            i += 2
+            continue
+        buf.append(ch)
+        i += 1
+    out.append("".join(buf))
+    return out
+
+
+def _owning_segment(line: str) -> "str | None":
+    """The command whose status the read will actually receive, if it is on THIS
+    line.
+
+    A redirect-then-check on one line reads that command's status, so a pipeline
+    on the line above is irrelevant. Returns None when the read has no same-line
+    command before it, in which case the caller falls back to the previous-line
+    lookback.
+    """
+    segs = _segments(line)
+    idx = None
+    for i, seg in enumerate(segs):
+        if '$?' in seg:
+            idx = i
+            break
+    if idx is None:
+        return None
+    for prev in reversed(segs[:idx]):
+        if prev.strip():
+            return prev
+    return None
 
 
 def has_pipe(line: str) -> bool:
@@ -86,10 +175,23 @@ def check(command: str) -> list[tuple[int, str]]:
     if any(marker in command for marker in SAFE_MARKERS):
         return []
 
-    lines = command.split("\n")
+    # Heredoc bodies are payload, not shell. Scanning them produced a false
+    # positive on 2026-08-21 against a python script whose comments happened to
+    # contain both a pipe character and a status read.
+    lines = _strip_heredocs(command).split("\n")
     hits: list[tuple[int, str]] = []
     for i, line in enumerate(lines):
         if not reads_status(line):
+            continue
+        # A command earlier on the SAME line owns the status. Two false
+        # positives on 2026-08-21 came from skipping this, and one of them
+        # blocked the exact redirect-then-check shape this tool's own ADVICE
+        # recommends - the clearest possible sign the check was wrong rather
+        # than the author.
+        owner = _owning_segment(line)
+        if owner is not None:
+            if has_pipe(owner):
+                hits.append((i + 1, line.strip()))
             continue
         if has_pipe(line):
             hits.append((i + 1, line.strip()))

@@ -60,6 +60,7 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
+import { runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -267,7 +268,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 9 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('morning-brief'))) return;
         try {
           // Cockpit is the primary morning brief (doc 997 harness). Falls back to
@@ -309,6 +311,23 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             );
           }
           console.log('[zoe/scheduler] morning brief sent (cockpit)' + (vetoKeyboard?.inline_keyboard.length ? ' + veto keyboard' : ''));
+
+          // Everything the send budget held back since the last batch goes out
+          // HERE, as one message. A deferred digest that never resurfaces is
+          // just a silent drop with extra steps.
+          try {
+            const held = await drainDeferred();
+            if (held.length > 0) {
+              await sendChunkedToTelegram(
+                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                opts.zaalTgId,
+                renderDeferredBatch(held),
+              );
+              console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+            }
+          } catch (batchErr) {
+            console.warn('[zoe/scheduler] deferred morning batch failed (nbd):', (batchErr as Error).message);
+          }
           // Mirror to Discord #zao-status if DISCORD_WEBHOOK_STATUS is set (doc 1135 Stage 1a).
           postBriefToDiscord(brief).catch((err) =>
             console.warn('[zoe/scheduler] discord webhook failed (non-fatal):', (err as Error).message),
@@ -334,7 +353,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -367,7 +386,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 9 * * *',
-      async () => {
+      () =>
+        runWithSendClass('gated', async () => {
         if (!(await claimFire('backlog-grill-batch'))) return;
         try {
           // Zaal is ET; the box is UTC. Still computed rather than assumed:
@@ -422,7 +442,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.warn('[zoe/backlog-grill] batch failed (nbd):', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -510,7 +530,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 10-23,0,1 * * *',
-      async () => {
+      () =>
+        runWithSendClass('gated', async () => {
         try {
           const r = await surfaceGrill({
             sendDM: (text, buttons) =>
@@ -526,7 +547,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.warn('[zoe/scheduler] grill tick failed (nbd):', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -557,7 +578,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 1 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('evening-reflect'))) return;
         try {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
@@ -589,7 +611,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('evening-reflect');
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -601,7 +623,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 13 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('team-digest'))) return;
         try {
           const { digest, taskCount, mirrored } = await runTeamDigest({ mirrorToBonfire: true });
@@ -623,7 +646,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('team-digest');
           console.error('[zoe/scheduler] team digest failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -633,7 +656,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 2 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('nightly-recap'))) return;
         try {
           const recap = await generateNightlyRecap({ repoDir: opts.repoDir });
@@ -654,7 +678,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('nightly-recap');
           console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );

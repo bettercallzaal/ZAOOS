@@ -24,6 +24,7 @@
  */
 
 import { sendChunkedToTelegram } from './tg-chunk';
+import { runWithSendClass } from './send-budget';
 import { featureRan } from './feature-ran';
 
 const HUB_LEGACY_ID = '9000';
@@ -230,11 +231,18 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // A relayed message can be arbitrarily long (a terminal can relay a
       // paste) - chunk it; the Reply/Ack keyboard rides the LAST chunk and the
       // returned message is that one, so reply-context arms on the right mid.
-      const sent = await sendChunkedToTelegram(
-        (cid, t, o) => deps.sendMessage(cid, t, o as never),
-        deps.chatId,
-        formatInboundDm(r),
-        { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
+      // Agent-bus relays are one of the eight scheduled types the corpus
+      // measured at ZERO replies over 151 days, so they ride the noise reserve
+      // and are among the first things cut when the day fills up. The lane
+      // still has the board and the vault; this is the chattiest path to Zaal,
+      // not the only one. Every cut is logged by the gate - never silent.
+      const sent = await runWithSendClass('noise', () =>
+        sendChunkedToTelegram(
+          (cid, t, o) => deps.sendMessage(cid, t, o as never),
+          deps.chatId,
+          formatInboundDm(r),
+          { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
+        ),
       );
       // sendChunkedToTelegram swallows per-chunk send errors and returns null
       // ONLY when every chunk failed - so the catch below never fires on a send

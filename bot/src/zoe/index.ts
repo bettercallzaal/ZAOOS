@@ -257,9 +257,14 @@ async function alertAuthFailure(bot: Bot, zaalId: number, message: string): Prom
 ${message}
 
 Action: ssh VPS then run 'claude' and /login.`;
-  await bot.api.sendMessage(zaalId, fullMessage).catch((err: unknown) => {
-    console.error('[zoe/index] failed to send auth alert:', err);
-  });
+  // A dead research engine is a breakage notice, which is the class Zaal
+  // actually answers (17.6% vs 0.58% for asks). It passes the send budget
+  // whatever the day looks like, and it never waits for the morning batch.
+  await bot.api
+    .sendMessage(zaalId, fullMessage, { zoeSendClass: 'alarm' } as never)
+    .catch((err: unknown) => {
+      console.error('[zoe/index] failed to send auth alert:', err);
+    });
 }
 
 async function replyChunked(

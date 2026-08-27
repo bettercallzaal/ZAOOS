@@ -259,8 +259,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   void runPreflight(async (report: string) => {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     const target = gid || opts.zaalTgId;
+    // Preflight only speaks when something is broken - that is an alarm, not a
+    // status report, and it must not be capped or queued behind a busy day.
     if (target)
-      await sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), target, report);
+      await runWithSendClass('alarm', () =>
+        sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), target, report),
+      );
   });
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
@@ -1109,17 +1113,40 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('watcher'))) return;
         try {
-          const alerts = [...(await runWatcherTick()), ...(await healFleet({ date: new Date().toISOString().slice(0, 10) }))];
-          if (alerts.length) {
-            // Watcher alerts are status messages
-            const alertsMsg = renderWatcherAlerts(alerts);
-            if (opts.routingDeps) {
-              await sendToZaalRouted(opts.routingDeps, alertsMsg, { kind: 'status' });
-            } else {
-              await opts.bot.api.sendMessage(opts.zaalTgId, alertsMsg);
-            }
-            console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');
-          } else {
+          // These two were one message, and they should not be. A watcher
+          // anomaly is a failure notice - the highest-reply-rate thing ZOE
+          // sends. A fleet self-heal is a watchdog restart, one of the eight
+          // types measured at ZERO replies across 151 days. Sending them
+          // together forced the budget to treat them the same, which meant
+          // either capping the alarm or exempting the restart log.
+          const anomalies = await runWatcherTick();
+          const heals = await healFleet({ date: new Date().toISOString().slice(0, 10) });
+
+          if (anomalies.length) {
+            const msg = renderWatcherAlerts(anomalies);
+            await runWithSendClass('alarm', async () => {
+              if (opts.routingDeps) {
+                await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
+              } else {
+                await opts.bot.api.sendMessage(opts.zaalTgId, msg);
+              }
+            });
+            console.log('[zoe/scheduler] watcher: ' + anomalies.length + ' anomaly alert(s) sent');
+          }
+
+          if (heals.length) {
+            const msg = renderWatcherAlerts(heals);
+            await runWithSendClass('noise', async () => {
+              if (opts.routingDeps) {
+                await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
+              } else {
+                await opts.bot.api.sendMessage(opts.zaalTgId, msg);
+              }
+            });
+            console.log('[zoe/scheduler] watcher: ' + heals.length + ' self-heal note(s) offered');
+          }
+
+          if (!anomalies.length && !heals.length) {
             console.log('[zoe/scheduler] watcher: clean');
           }
         } catch (err) {
@@ -1384,16 +1411,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             if (shouldFireAlert(level)) {
               const status = formatSpendStatus(false);
               const alert = `COST ALERT: Spend reached ${level}% of daily cap\n\n${status}`;
-              // Cost alerts are status messages
-              if (opts.routingDeps) {
-                await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
-                  console.warn('[zoe/scheduler] cost alert send failed:', err);
-                });
-              } else {
-                await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
-                  console.warn('[zoe/scheduler] cost alert send failed:', err);
-                });
-              }
+              // Cost reports are one of the eight types that drew zero replies
+              // in 151 days. Kept, but on the noise reserve, so they are the
+              // first thing cut on a busy day rather than the last.
+              await runWithSendClass('noise', async () => {
+                if (opts.routingDeps) {
+                  await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
+                    console.warn('[zoe/scheduler] cost alert send failed:', err);
+                  });
+                } else {
+                  await opts.bot.api.sendMessage(opts.zaalTgId, alert).catch((err: unknown) => {
+                    console.warn('[zoe/scheduler] cost alert send failed:', err);
+                  });
+                }
+              });
             }
           }
         } catch (err) {

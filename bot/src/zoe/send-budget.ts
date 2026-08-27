@@ -42,19 +42,50 @@
  * The one thing that must NOT be cut: failure and breakage notices are the
  * class Zaal reliably answers. Alarms pass the gate and they never queue.
  *
- * FOUR OF THE EIGHT ARE DELIBERATELY UNTAGGED - DO NOT INFER THEM
- * ---------------------------------------------------------------
- * recurring status reports, build-candidate approvals, bot activity logs,
- * event promos and affirmation prose are named in the measurement but do not
- * map to specific send sites from the code alone. They sit on the `status`
- * default: capped, but not cut first. That is the CORRECT interim state, not
- * an oversight, and it is held open on purpose until the analysis lane
- * publishes the per-message source labels to tag from.
+ * WHERE THIS GATE CAN AND CANNOT REACH (measured 2026-08-27)
+ * ---------------------------------------------------------
+ * The analysis lane's send-site labels (zorca/docs/zoe-send-site-labels.md)
+ * carry a first-line matcher per zero-reply type. Every one of them was run
+ * against this source tree. Fifteen matchers, two hits:
  *
- * Do not close it by reading a send site and deciding it looks like one of the
- * five. A wrong `noise` tag is strictly worse than no tag: it silences
- * something nobody has checked, and the silence looks exactly like the budget
+ *   `Fleet health `   -> brief.ts, i.e. already inside the morning brief
+ *   `Team tracker - ` -> team-tracker.ts, reachable only via the /team
+ *                        command, so its single message in 151 days is an
+ *                        ANSWER to something Zaal typed
+ *
+ * The other thirteen - `=== ZAO FLEET`, `FLEET OUTPUT - `, `Ecosystem watch - `,
+ * `BUILD CANDIDATE #`, `ZOL followed `, the two affirmation texts,
+ * `Cost-of-pass `, `BUS from `, `BUS coordinator `, `watchdog`,
+ * `froze -> restarted`, `FLEET BRAIN DOWN` - appear NOWHERE in this tree.
+ * Nine of the twelve zero-reply types have no emitter here at all.
+ *
+ * So this gate is the chokepoint FOR THIS PROCESS, and only for it. It wraps
+ * the grammy Api instance the ZOE bot owns, which is the actual Telegram send
+ * call for every send this process makes. It is not the estate's chokepoint:
+ * a VPS cron that posts to the Bot API on its own never enters this process
+ * and therefore never touches this budget. Catching those needs a shared
+ * chokepoint keyed on the RECIPIENT (Zaal's chat id) rather than the sender -
+ * see DONE.md.
+ *
+ * `noise` HAS NO CALL SITE IN THIS REPO, ON PURPOSE
+ * ------------------------------------------------
+ * The class, its reserve and its tests are here and correct, and nothing in
+ * this tree is tagged with it. That is not an omission to tidy up: every
+ * candidate was checked against a matcher and none of them emit the measured
+ * text. An earlier pass DID tag three of them - agent-bus relays, cost alerts,
+ * fleet self-heals - by reading a module name and deciding it looked right.
+ * All three were wrong, and each would have silenced a working sender while
+ * the measured traffic carried on arriving.
+ *
+ * Do not tag anything `noise` from a name, a module path, or a resemblance.
+ * The bar is a first-line matcher from the labels file that this tree actually
+ * emits. A wrong `noise` tag is strictly worse than no tag: it silences
+ * something nobody has checked, and that silence looks exactly like the budget
  * working. An untagged type is merely capped, and stays visible.
+ *
+ * Named exception, from the labels file: `BUILD CANDIDATE #` approvals must be
+ * budgeted at the escalation PRODUCER, never at build-candidate.ts. Capping
+ * the button module would suppress the approval UI while the sends kept coming.
  *
  * THE SIX CLASSES
  * ---------------

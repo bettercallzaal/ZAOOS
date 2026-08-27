@@ -79,32 +79,103 @@ exists to bound.
 | `digest` | the morning-brief, evening-reflection, team-digest and nightly-recap cron callbacks |
 | `gated` | the backlog-grill daily batch and the hourly grill card |
 | `alarm` | the auth-failure alert (`index.ts`), the preflight report, and watcher anomalies |
-| `noise` | fleet self-heal notes, cost alerts, and agent-bus relay pushes |
+| `noise` | nowhere in this repo - no candidate emits a measured matcher (see below) |
 
 The watcher cron used to send anomalies and fleet self-heals as ONE message.
 They are now two: an anomaly is a failure notice, a self-heal is a watchdog
 restart - one of the eight zero-reply types. Merged, the budget had to either cap
 the alarm or exempt the restart log.
 
+## The chokepoint question, answered (2026-08-27)
+
+The analysis lane's `~/Documents/zorca/docs/zoe-send-site-labels.md` argues that
+9 of 12 zero-reply types have no emitter in the bot tree, so a budget living only
+in `bot/src` cannot throttle them, and the chokepoint must be the Telegram send
+call itself. I ran all fifteen of its first-line matchers against this source
+tree. **Two hit. Thirteen do not.**
+
+| Matcher | In this tree? |
+|---|---|
+| `Fleet health ` | yes - `bot/src/zoe/brief.ts`, already inside the morning brief (`digest`) |
+| `Team tracker - ` | yes - `bot/src/zoe/team-tracker.ts`, reachable only via the `/team` command |
+| `=== ZAO FLEET`, `FLEET OUTPUT - `, `Ecosystem watch - `, `BUILD CANDIDATE #`, `ZOL followed `, both affirmation texts, `Cost-of-pass `, `BUS from `, `BUS coordinator `, `watchdog`, `froze -> restarted` | **no hit** |
+
+### Does the gate sit at the chokepoint, or upstream of it?
+
+**Both, and the distinction is the whole answer.**
+
+It IS the chokepoint *for this process*. `installSendBudget(bot)` replaces
+`sendMessage` on the grammy `Api` instance the ZOE bot owns - the actual
+Telegram call, not a helper above it. `ctx.api` is that same object, and
+`caster` / `posts/buttons` are handed that same instance, so no send made by
+this process can route around it, including one added tomorrow.
+
+It is NOT the chokepoint *for the estate*. A VPS cron that posts to the Bot API
+on its own never enters this process, so it never reaches this gate. The lane is
+right, and the matcher run above is the proof rather than the argument: thirteen
+of the fifteen measured shapes are emitted by something that is not in this
+repository. The 4,709-message problem is therefore only partly a `bot/src`
+problem, and the share this gate can bound is the share this process sends.
+
+### What the estate-wide chokepoint would have to be
+
+The measurement is "messages Zaal RECEIVED", so the budget's natural key is his
+chat id, not the sender. That points at one shape:
+
+- **A local Bot API proxy that every emitter points at** - grammy's `apiRoot`,
+  curl's `--url`, whatever each cron uses - with the budget enforced inside it,
+  keyed on the destination chat. It is the only shape that also catches an
+  emitter nobody remembered to migrate, because a job that skips it stops
+  working rather than quietly bypassing the cap.
+- A shared `zao-tg-send` helper each cron must call is easier, and weaker: it
+  budgets only the jobs that adopt it, which is the same failure that left these
+  nine unmapped in the first place.
+
+**UNVERIFIED and load-bearing:** whether those unmapped emitters use the same
+bot token as ZOE. The VPS is down and was not touched. If they use different
+tokens, keying the budget on the recipient chat id rather than the token is what
+makes the proxy correct anyway.
+
+## Which of the untagged types got a label-to-module mapping
+
+**None that can be tagged.** Reported as measured, not as hoped:
+
+| Type | Mapping in the labels file | Tagged? |
+|---|---|---|
+| recurring status report | splits into four senders - fleet report, ecosystem watch, cockpit digest all UNMAPPED; **team tracker CONFIRMED** | **No.** Its one message in 151 days is the answer to a `/team` command Zaal typed - already class `reply`. Tagging it `noise` would cap a reply to his own command. |
+| build-candidate approval | SPLIT - button module confirmed, text producer UNMAPPED | **No**, and the labels file says why: budget the escalation PRODUCER, never `build-candidate.ts`. Capping the button module suppresses the approval UI while the sends keep coming. |
+| bot activity log | UNMAPPED (`ZOL followed ` is not in this tree) | No |
+| event promo | reclassified - 2 genuine promos UNMAPPED; the other 26 are social drafts, sites confirmed (`posts/fractal-promo.ts`, `posts/drafters.ts`) | **No.** Those 26 are tap-to-approve drafts, not promos, and the file does not establish them as zero-reply. Tagging them would be the inference this exercise exists to avoid. |
+| affirmation prose | UNMAPPED - content source found in a private note, no emitter in this tree | No |
+| agent-bus relay | UNMAPPED, per instruction | No - and **untagged**, see below |
+
+### Three earlier tags were wrong and have been reverted
+
+An earlier pass tagged agent-bus relays, cost alerts and fleet self-heals as
+`noise` by reading module names. The matchers say all three were the wrong
+sender:
+
+- **`relay-bridge.ts`** does not emit `BUS from ` / `BUS coordinator ` / `bus: N new message(s):`, and none of those appear anywhere in the tree. Reverted to the `status` default.
+- **The scheduler's `COST ALERT: Spend reached N%`** is not `^Cost-of-pass YYYY-MM-DD:`, which is what the 24 measured messages match. Reverted.
+- **The watcher's fleet self-heal note** emits neither `watchdog` nor `froze -> restarted`, which is what the 266 measured restarts match. Reverted.
+
+Each would have throttled a working sender while the measured traffic carried on
+arriving at full volume - a silence that looks exactly like the budget working.
+The watcher SPLIT is kept: an anomaly is a failure notice (`alarm`), a self-heal
+is not, and that distinction stands on the module's own doc rather than on a
+matcher.
+
+### So `noise` has no call site in this repo
+
+The class, its 25% reserve and its tests are in place and correct, and **nothing
+here is tagged with it.** Stated plainly because a budget class that can never
+fire must not be mistaken for one that is working. It becomes useful the moment
+either the unmapped emitters are found, or the budget moves to the recipient-keyed
+proxy above - and until then the honest position is that ZOE's chattiest traffic
+is not reachable from this repository.
+
 ## Honest gaps
 
-- **Four of the eight zero-reply types are deliberately untagged**: recurring
-  status reports, build-candidate approvals, bot activity logs, event promos, and
-  affirmation prose. Those labels do not map to specific send sites from the code
-  alone. They sit on the `status` default - capped, but not cut first - and that
-  is the **correct interim state**, held open until the analysis lane publishes
-  the per-message source labels to tag from.
-
-  **Do not close this by inference.** A wrong `noise` tag is worse than no tag:
-  it silences something nobody has checked, and the silence is indistinguishable
-  from the budget working. An untagged type is only capped, and stays visible.
-  The same note is in the `send-budget.ts` header, where the next lane will hit
-  it before editing.
-- **Agent-bus relays are classed `noise`** on the corpus evidence. That is the
-  lane-to-Zaal transport, so cutting it early is a real behaviour change - the
-  lanes still have the board and the vault, and every cut is logged, but this is
-  the one tag worth a second look before merge. Reversible: retag, or raise
-  `ZOE_NOISE_SHARE`.
 - **Scope is `bot/src/zoe/` only.** ZAO Devz, ZAOstock and ZAI construct their own
   `Bot` instances and are not gated. The measurement was ZOE's.
 - **Not deployed.** The VPS is down and was not touched. Nothing here has run in
@@ -118,8 +189,8 @@ New:
 
 Changed:
 - `bot/src/zoe/index.ts` - `installSendBudget(bot)` at boot; reply-class middleware; auth alert tagged `alarm`
-- `bot/src/zoe/scheduler.ts` - digest/gated cron wraps, morning-batch drain, preflight `alarm`, watcher split, cost alerts `noise`
-- `bot/src/zoe/relay-bridge.ts` - inbound relay pushes tagged `noise`
+- `bot/src/zoe/scheduler.ts` - digest/gated cron wraps, morning-batch drain, preflight `alarm`, watcher anomaly/self-heal split
+- `bot/src/zoe/relay-bridge.ts` - a comment recording why the inbound relay push is NOT tagged
 
 ## Verification
 

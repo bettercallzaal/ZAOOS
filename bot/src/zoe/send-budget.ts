@@ -42,6 +42,20 @@
  * The one thing that must NOT be cut: failure and breakage notices are the
  * class Zaal reliably answers. Alarms pass the gate and they never queue.
  *
+ * FOUR OF THE EIGHT ARE DELIBERATELY UNTAGGED - DO NOT INFER THEM
+ * ---------------------------------------------------------------
+ * recurring status reports, build-candidate approvals, bot activity logs,
+ * event promos and affirmation prose are named in the measurement but do not
+ * map to specific send sites from the code alone. They sit on the `status`
+ * default: capped, but not cut first. That is the CORRECT interim state, not
+ * an oversight, and it is held open on purpose until the analysis lane
+ * publishes the per-message source labels to tag from.
+ *
+ * Do not close it by reading a send site and deciding it looks like one of the
+ * five. A wrong `noise` tag is strictly worse than no tag: it silences
+ * something nobody has checked, and the silence looks exactly like the budget
+ * working. An untagged type is merely capped, and stays visible.
+ *
  * THE SIX CLASSES
  * ---------------
  *   reply   a direct answer to something Zaal said. ALWAYS passes, and does

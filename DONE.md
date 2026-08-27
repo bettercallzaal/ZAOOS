@@ -88,12 +88,18 @@ the alarm or exempt the restart log.
 
 ## Honest gaps
 
-- **Four of the eight zero-reply types are not yet tagged**: recurring status
-  reports, build-candidate approvals, bot activity logs, event promos, and
-  affirmation prose. I could not map those labels to specific send sites from the
-  code alone, and guessing the mapping would have produced confident wrong tags.
-  They currently fall to the `status` default, which caps them but does not cut
-  them first. Mapping them needs the analysis lane's per-message source labels.
+- **Four of the eight zero-reply types are deliberately untagged**: recurring
+  status reports, build-candidate approvals, bot activity logs, event promos, and
+  affirmation prose. Those labels do not map to specific send sites from the code
+  alone. They sit on the `status` default - capped, but not cut first - and that
+  is the **correct interim state**, held open until the analysis lane publishes
+  the per-message source labels to tag from.
+
+  **Do not close this by inference.** A wrong `noise` tag is worse than no tag:
+  it silences something nobody has checked, and the silence is indistinguishable
+  from the budget working. An untagged type is only capped, and stays visible.
+  The same note is in the `send-budget.ts` header, where the next lane will hit
+  it before editing.
 - **Agent-bus relays are classed `noise`** on the corpus evidence. That is the
   lane-to-Zaal transport, so cutting it early is a real behaviour change - the
   lanes still have the board and the vault, and every cut is logged, but this is

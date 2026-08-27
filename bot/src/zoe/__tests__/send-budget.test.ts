@@ -13,6 +13,9 @@ import { join } from 'node:path';
 
 import {
   DEFAULT_DAILY_SEND_CAP,
+  DEFAULT_NOISE_SHARE,
+  effectiveCap,
+  noiseShare,
   MAX_DEFERRED,
   dailySendCap,
   decide,
@@ -132,6 +135,92 @@ describe('decide - the policy', () => {
         expect(decide(cls, count, 20).reason.length).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The two classes the 9,627-message corpus forced (alarm + noise)
+// ---------------------------------------------------------------------------
+
+describe('alarm - the class Zaal reliably answers', () => {
+  it('always passes, cap spent or not', () => {
+    expect(decide('alarm', 0, 20).allow).toBe(true);
+    const over = decide('alarm', 500, 20);
+    expect(over.allow).toBe(true);
+    expect(over.outcome).toBe('sent');
+  });
+
+  it('NEVER queues - a deferred breakage notice is a lost one', () => {
+    for (const count of [0, 20, 500]) {
+      expect(decide('alarm', count, 20).outcome).not.toBe('deferred');
+    }
+  });
+
+  it('counts, so the number stays honest about what went out', () => {
+    expect(decide('alarm', 0, 20).counts).toBe(true);
+  });
+
+  it('reaches Telegram through the gate with the cap fully spent', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await gated(1, 'a status that will not make it');
+    await gated(1, 'ZOE bot crashed on boot', { zoeSendClass: 'alarm' });
+    expect(calls.map((c) => c.text)).toEqual(['burns the cap', 'ZOE bot crashed on boot']);
+    expect(await readDeferred()).toEqual([]);
+  });
+});
+
+describe('noise - the eight zero-reply types, cut first', () => {
+  it('defaults the reserve to a quarter of the day', () => {
+    expect(noiseShare()).toBe(DEFAULT_NOISE_SHARE);
+    expect(DEFAULT_NOISE_SHARE).toBe(0.25);
+    expect(effectiveCap('noise', 20)).toBe(5);
+  });
+
+  it('leaves every other class on the full cap', () => {
+    for (const cls of ['reply', 'alarm', 'gated', 'status', 'digest'] as SendClass[]) {
+      expect(effectiveCap(cls, 20)).toBe(20);
+    }
+  });
+
+  it('reads the reserve from ZOE_NOISE_SHARE and rejects an out-of-range one', () => {
+    process.env.ZOE_NOISE_SHARE = '0.5';
+    expect(effectiveCap('noise', 20)).toBe(10);
+    process.env.ZOE_NOISE_SHARE = '2';
+    expect(noiseShare()).toBe(DEFAULT_NOISE_SHARE);
+    process.env.ZOE_NOISE_SHARE = 'some';
+    expect(noiseShare()).toBe(DEFAULT_NOISE_SHARE);
+  });
+
+  it('runs out well before a status message does', () => {
+    // 5 sends into a 20-cap day: noise is finished, status has 15 left.
+    expect(decide('noise', 5, 20).allow).toBe(false);
+    expect(decide('status', 5, 20).allow).toBe(true);
+  });
+
+  it('is dropped, never deferred - re-sending tomorrow what he ignored 1,116 times saves nothing', () => {
+    expect(decide('noise', 5, 20).outcome).toBe('dropped');
+  });
+
+  it('says the noise reserve, not the cap, bound it', () => {
+    expect(decide('noise', 5, 20).reason).toContain('noise reserve');
+    expect(decide('noise', 5, 20).cap).toBe(5);
+  });
+
+  it('is the first traffic the gate actually cuts', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '4'; // noise reserve = 1
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'watchdog restarted a lane', { zoeSendClass: 'noise' });
+    await gated(1, 'another watchdog restart', { zoeSendClass: 'noise' });
+    await gated(1, 'an ordinary status');
+    expect(calls.map((c) => c.text)).toEqual(['watchdog restarted a lane', 'an ordinary status']);
+    const log = await readSendLog();
+    expect(log).toHaveLength(1);
+    expect(log[0].cls).toBe('noise');
+    expect(log[0].outcome).toBe('dropped');
   });
 });
 

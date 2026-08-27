@@ -23,17 +23,45 @@
  * and future, routed or raw - passes through by construction. There is no
  * bypass to forget.
  *
- * THE FOUR CLASSES
- * ----------------
+ * WHAT THE FULL CORPUS SAYS (9,627 messages, 151 days)
+ * ----------------------------------------------------
+ * The analysis lane measured reply rate by intent, and the answer is not
+ * "send less of everything" - it is "send less of one specific thing":
+ *
+ *   ANSWER     18.8% of traffic, 17.6% reply rate
+ *   ASK        51.6% of traffic,  0.58% reply rate
+ *   BROADCAST  29.6% of traffic,  1.97% reply rate
+ *
+ * Answering earns a reply about 30x more often than asking, and asking is half
+ * of everything ZOE sends. Eight scheduled message types - 1,116 messages over
+ * 151 days - drew ZERO replies: watchdog restarts, recurring status reports,
+ * build-candidate approvals, cost reports, bot activity logs, agent-bus
+ * relays, event promos, and affirmation prose. Those are the cut, and they are
+ * cut FIRST rather than at the cap.
+ *
+ * The one thing that must NOT be cut: failure and breakage notices are the
+ * class Zaal reliably answers. Alarms pass the gate and they never queue.
+ *
+ * THE SIX CLASSES
+ * ---------------
  *   reply   a direct answer to something Zaal said. ALWAYS passes, and does
  *           NOT count. Solicited traffic is not the problem: 12 replies a
  *           month is not what buried him.
+ *   alarm   a failure or breakage notice. ALWAYS passes, NEVER queues, and
+ *           counts. This is the highest-reply-rate traffic ZOE sends; a budget
+ *           that delays an alarm has optimised away its own best signal.
  *   gated   a needs-you / approval / decision card. ALWAYS passes, and DOES
  *           count - it is the traffic the budget is protecting, so it has to
  *           be visible in the number.
  *   status  ordinary notification. Capped. DROPPED past the cap.
- *   digest  brief / afferent-digest / reflection / recap / grill batch.
- *           Capped. DEFERRED past the cap into the next morning batch.
+ *   digest  brief / reflection / recap / team digest. Capped. DEFERRED past
+ *           the cap into the next morning batch.
+ *   noise   a type measured at zero replies over 151 days. Capped at a small
+ *           RESERVE of the day's budget (ZOE_NOISE_SHARE, default 25%), so it
+ *           is the first thing cut when the day gets busy rather than
+ *           competing on equal terms with traffic he answers. Dropped past
+ *           that reserve - never queued, because re-sending tomorrow what he
+ *           ignored 1,116 times is not a saving.
  *
  * NOTHING IS SILENT. Every drop and every deferral is logged twice - a
  * console line for journald and a JSONL row for counting later. A budget that
@@ -59,7 +87,7 @@ import { join } from 'node:path';
 // Types
 // ---------------------------------------------------------------------------
 
-export type SendClass = 'reply' | 'gated' | 'status' | 'digest';
+export type SendClass = 'reply' | 'alarm' | 'gated' | 'status' | 'digest' | 'noise';
 
 export type SendOutcome = 'sent' | 'dropped' | 'deferred';
 
@@ -89,9 +117,13 @@ interface ClassPolicy {
 
 const POLICY: Record<SendClass, ClassPolicy> = {
   reply: { alwaysPasses: true, counts: false, overflow: 'dropped' },
+  // An alarm always passes AND never queues - both halves matter. Deferring a
+  // breakage notice to the morning batch is the same as losing it.
+  alarm: { alwaysPasses: true, counts: true, overflow: 'dropped' },
   gated: { alwaysPasses: true, counts: true, overflow: 'dropped' },
   status: { alwaysPasses: false, counts: true, overflow: 'dropped' },
   digest: { alwaysPasses: false, counts: true, overflow: 'deferred' },
+  noise: { alwaysPasses: false, counts: true, overflow: 'dropped' },
 };
 
 export const DEFAULT_DAILY_SEND_CAP = 20;
@@ -107,6 +139,27 @@ export const MAX_DEFERRED = 200;
 export function dailySendCap(): number {
   const raw = Number(process.env.ZOE_DAILY_SEND_CAP);
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_DAILY_SEND_CAP;
+}
+
+/** Default share of the day's cap that measured-zero-reply traffic may use. */
+export const DEFAULT_NOISE_SHARE = 0.25;
+
+/**
+ * Share of the cap available to the `noise` class. `ZOE_NOISE_SHARE`, a
+ * fraction in (0, 1]; falls back to 0.25 on unset/garbage/out-of-range.
+ */
+export function noiseShare(): number {
+  const raw = Number(process.env.ZOE_NOISE_SHARE);
+  return Number.isFinite(raw) && raw > 0 && raw <= 1 ? raw : DEFAULT_NOISE_SHARE;
+}
+
+/**
+ * The cap that actually applies to one class. Only `noise` differs: it gets a
+ * reserve rather than the whole budget, which is what "cut first" means in
+ * code - it runs out early instead of racing traffic Zaal answers.
+ */
+export function effectiveCap(cls: SendClass, cap: number): number {
+  return cls === 'noise' ? Math.floor(cap * noiseShare()) : cap;
 }
 
 /** The gate enforces by default. `ZOE_SEND_BUDGET=off` disables it entirely. */
@@ -138,7 +191,10 @@ export function easternDay(now: Date = new Date()): string {
  */
 export function decide(cls: SendClass, countedToday: number, cap: number): SendDecision {
   const policy = POLICY[cls];
-  const capSpent = countedToday >= cap;
+  // `noise` runs out of budget early by design; every other class sees the
+  // whole cap. Report the effective number so the log says what really bound.
+  const limit = effectiveCap(cls, cap);
+  const capSpent = countedToday >= limit;
 
   if (policy.alwaysPasses) {
     return {
@@ -147,10 +203,10 @@ export function decide(cls: SendClass, countedToday: number, cap: number): SendD
       cls,
       countBefore: countedToday,
       counts: policy.counts,
-      cap,
+      cap: limit,
       reason: capSpent
-        ? `${cls} always passes (over cap ${countedToday}/${cap})`
-        : `${cls} always passes (${countedToday}/${cap})`,
+        ? `${cls} always passes (over cap ${countedToday}/${limit})`
+        : `${cls} always passes (${countedToday}/${limit})`,
     };
   }
 
@@ -161,8 +217,8 @@ export function decide(cls: SendClass, countedToday: number, cap: number): SendD
       cls,
       countBefore: countedToday,
       counts: policy.counts,
-      cap,
-      reason: `under cap (${countedToday}/${cap})`,
+      cap: limit,
+      reason: `under cap (${countedToday}/${limit}${cls === 'noise' ? ' noise reserve' : ''})`,
     };
   }
 
@@ -172,11 +228,11 @@ export function decide(cls: SendClass, countedToday: number, cap: number): SendD
     cls,
     countBefore: countedToday,
     counts: false, // a send that never left does not spend budget
-    cap,
+    cap: limit,
     reason:
       policy.overflow === 'deferred'
-        ? `cap spent (${countedToday}/${cap}) - queued for the next morning batch`
-        : `cap spent (${countedToday}/${cap}) - dropped`,
+        ? `cap spent (${countedToday}/${limit}) - queued for the next morning batch`
+        : `${cls === 'noise' ? 'noise reserve' : 'cap'} spent (${countedToday}/${limit}) - dropped`,
   };
 }
 
@@ -365,7 +421,7 @@ export function currentSendClass(): SendClass | undefined {
   return classStore.getStore();
 }
 
-const VALID: readonly SendClass[] = ['reply', 'gated', 'status', 'digest'];
+const VALID: readonly SendClass[] = ['reply', 'alarm', 'gated', 'status', 'digest', 'noise'];
 
 /**
  * Resolve the class for one send. Precedence:

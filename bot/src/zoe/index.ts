@@ -179,6 +179,7 @@ import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
 import { touchLastSeen } from './events';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
+import { installSendBudget, runWithSendClass } from './send-budget';
 import {
   fetchPending,
   removeFromQueue,
@@ -353,6 +354,12 @@ const zaalId = Number(zaalIdRaw);
 const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 
 const bot = new Bot(token);
+
+// THE SEND BUDGET. Installed before anything registers a handler or a cron, so
+// every outbound Telegram send - routed, raw, or added tomorrow - passes the
+// same daily cap. See send-budget.ts for the measured reason (4,709 sends in
+// August against 12 replies) and for the four classes.
+installSendBudget(bot);
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
 
@@ -378,7 +385,11 @@ bot.catch((err) => {
 // middleware). `resume` clears it. Registered before handlers so it gates them.
 bot.use(async (ctx, next) => {
   if (coworkPaused) return;
-  await next();
+  // Anything sent while handling an inbound update is a REPLY to Zaal: it is
+  // solicited, so it always passes the send budget and never spends it. One
+  // middleware covers every handler, so no reply path can be capped by
+  // accident.
+  await runWithSendClass('reply', () => next());
 });
 
 function isFromZaal(ctx: Context): boolean {

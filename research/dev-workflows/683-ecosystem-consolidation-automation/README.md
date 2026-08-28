@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-28
 related-docs: 460, 467, 524, 527, 661, 663, 676, 677
 tier: DISPATCH
 ---
@@ -82,6 +82,29 @@ Ranked by value/effort/risk. "Build now" = self-contained, zero live-bot/VPS ris
 | Extract `bot/_shared/` (memory-blocks + bonfire-writer) | next session | PR | Wave 1 |
 | Create `zao-template` repo + `@zaos/pre-commit-hooks` | @Zaal + next session | New repos | Wave 1 |
 | Wire deploy-on-push GitHub Action (needs VPS SSH key as repo secret) | @Zaal + next session | PR + repo secret | Wave 2 |
+
+## Updated 2026-08-28
+
+**Cheap win #1 (pre-commit hooks) — SHIPPED.** Verified in `.husky/pre-commit`: the hook now runs four guards — doc-collision check, secret scan (references doc 683), research-index check, and PII scan (python3 `scripts/git-pii-scan.py`). This was the #1 convergence finding and the top Wave 0 priority; it is done.
+
+**Cheap win #11 (cost tracking) — SHIPPED.** `scripts/agents/zao-spend` exists and prices transcripts with $/PR and $/1k-output breakdown (also described in `agent-spend.md`).
+
+**Bonfire as connective seam — PARTIALLY SHIPPED.** `bot/src/zoe/bonfire-queue.ts` and `bot/src/zoe/bonfire-retry.ts` exist with tests, wiring ZOE to the Bonfire KG. The cross-bot `bonfire-writer.ts` shared module (cheap win #4) has not been extracted — the code lives only in ZOE, not in a shared location.
+
+**`bot/_shared/` — NOT CREATED.** The 40% code-duplication finding still stands. No `bot/_shared/` directory or `bot/_shared/memory-blocks.ts` exists as of 2026-08-28. `bot/src/lib/` has `cowork.ts`, `injection-guard.ts`, and `__tests__/` but no grammy-core or memory-block abstractions.
+
+**Deploy automation — NOT SHIPPED.** No `deploy.sh`, no deploy-on-push GitHub Action. The 2 VPSes / 0 automated-deploys finding is still accurate. `.github/workflows/` has CI, collision-guard, docs-automerge, estate-health, and research-index pipelines — but no deploy pipeline.
+
+**Grammy version lag.** `bot/package.json` pins `"grammy": "^1.29.0"`. npm shows v1.45.1 as current (last published ~Aug 2026) — 16+ minor releases behind. No breaking changes noted for the grammy range, but the delta is material for a bot fleet. Source: npm registry search result, 2026-08-28.
+
+**Telegram Bot API material updates since May 2026 (external, VERIFIED via web search 2026-08-28):**
+
+- **Bot API 9.5 (March 1, 2026):** Full streaming for all bot types via `sendMessageDraft` — AI-generated replies can now stream natively in private chats, groups, and topics. Directly relevant to ZOE's concierge DM flow.
+- **Bot API 9.6 (April 3, 2026):** `correct_option_id` renamed to `correct_option_ids` in `Poll` and `sendPoll` — **breaking change** for any bot using quiz polls. New `ManagedBot*` types: one bot can now create, configure, and manage other bots programmatically (`getManagedBotToken`, `replaceManagedBotToken`, `savePreparedKeyboardButton`).
+- **Bot-to-bot communication (May 7, 2026):** Telegram enabled native direct messaging between autonomous AI bots. One bot can DM another via @username. This materially changes the consolidation architecture: Wave 1's `bot/_shared/` extraction is still correct for code reuse, but bots no longer need shared state via a common DB to coordinate — they can message each other natively. Source: TechTimes report "Telegram's Bot API Now Lets Autonomous AI Agents Coordinate Directly" (2026-05-18), https://www.techtimes.com/articles/316790/20260518/telegrams-bot-api-now-lets-autonomous-ai-agents-coordinate-directly-no-federal-multi-agent.htm
+- **Bot API 10.x:** Live photos, guest messages, poll media, message-reaction permissions, bot access settings. Source: GramIO changelog (gramio.dev), 2026-08-28.
+
+**Architecture note:** The managed-bots and bot-to-bot features make Wave 3 (Bonfire as connective seam) more achievable without centralised shared code: ZOE could manage fleet bots natively via Telegram API rather than via shared npm modules. The `bot/_shared/` extraction (cheap win #3, #4) remains valuable for eliminating code duplication, but is no longer the only path to multi-bot coordination.
 
 ## Also See
 

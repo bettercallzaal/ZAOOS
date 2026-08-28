@@ -6,6 +6,7 @@
  * Triggers:
  *   02:30 EST (06:30 UTC daily)  — stale capture + overdue task nudge (General topic)
  *   05:00 EST (09:00 UTC daily)  — morning brief
+ *   05:00 EST (09:00 UTC daily)  — backlog grill, ONE batch (was a 2-min drip)
  *   21:00 EST (01:00 UTC daily)  — evening reflection
  *   21:00 EST (02:00 UTC daily)  — nightly recap (silent if nothing shipped)
  *   hourly                        — forward nudge: the real next move from the task queue
@@ -54,11 +55,12 @@ import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
-import { runBacklogGrillTick } from './backlog-grill-runner';
+import { runBacklogGrillBatch } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
+import { runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -257,8 +259,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   void runPreflight(async (report: string) => {
     const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
     const target = gid || opts.zaalTgId;
+    // Preflight only speaks when something is broken - that is an alarm, not a
+    // status report, and it must not be capped or queued behind a busy day.
     if (target)
-      await sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), target, report);
+      await runWithSendClass('alarm', () =>
+        sendChunkedToTelegram((cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never), target, report),
+      );
   });
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
@@ -266,7 +272,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 9 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('morning-brief'))) return;
         try {
           // Cockpit is the primary morning brief (doc 997 harness). Falls back to
@@ -308,6 +315,23 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             );
           }
           console.log('[zoe/scheduler] morning brief sent (cockpit)' + (vetoKeyboard?.inline_keyboard.length ? ' + veto keyboard' : ''));
+
+          // Everything the send budget held back since the last batch goes out
+          // HERE, as one message. A deferred digest that never resurfaces is
+          // just a silent drop with extra steps.
+          try {
+            const held = await drainDeferred();
+            if (held.length > 0) {
+              await sendChunkedToTelegram(
+                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                opts.zaalTgId,
+                renderDeferredBatch(held),
+              );
+              console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+            }
+          } catch (batchErr) {
+            console.warn('[zoe/scheduler] deferred morning batch failed (nbd):', (batchErr as Error).message);
+          }
           // Mirror to Discord #zao-status if DISCORD_WEBHOOK_STATUS is set (doc 1135 Stage 1a).
           postBriefToDiscord(brief).catch((err) =>
             console.warn('[zoe/scheduler] discord webhook failed (non-fatal):', (err as Error).message),
@@ -333,30 +357,46 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
 
-  // BACKLOG GRILL. Every 2 minutes during Zaal's waking hours, drip ONE board
-  // task to his DM with the same five answers every time (1 done, 2 keep,
-  // 3 work on it, 4 drop, 5 skip).
+  // BACKLOG GRILL. ONE BATCH A DAY, at the same instant as the morning brief.
   //
   // This is not the grill above. That one surfaces what NEEDS him - decisions,
-  // PRs - and waits for each answer. This one works the 357-task backlog, and
-  // deliberately lets cards pile up (capped at 20) because the pile IS the queue
-  // he sweeps. He cleared 24 in one sitting in a terminal doing exactly this.
+  // PRs - and waits for each answer. This one works the backlog with the same
+  // five answers every time (1 done, 2 keep, 3 work on it, 4 drop, 5 skip).
   //
-  // Every guard lives in backlog-grill.ts: nothing outside 06:00-22:00 his time,
-  // nothing once 20 are unanswered, nothing when the queue is empty. This cron
-  // only supplies the clock.
+  // IT USED TO DRIP, every 2 minutes from 06:00 to 22:00 his time, on the
+  // theory that the pile IS the queue he sweeps - he had cleared 24 in one
+  // sitting in a terminal doing exactly that. Measured over the four days to
+  // 2026-08-26 the theory did not hold: 153, 281, 294 and 190 cards sent, and
+  // ZERO answers recorded on the 25th or the 26th. 480 slots a day is not a
+  // queue to sweep, it is a feed, and the measured response to a feed was
+  // nothing at all.
+  //
+  // Zaal, 2026-08-26: one batch a day at his wake time, and every card into
+  // the orchestrator grill lane rather than only Telegram. So this cron is now
+  // the brief's own '0 9 * * *' - if he is reading anything, he is reading it
+  // then - and runBacklogGrillBatch also appends the batch to GRILL-QUEUE.md,
+  // where the grill lane can clear the reversible ones under his standing rule
+  // without waiting for a thumb.
+  //
+  // The remaining guards still live in backlog-grill.ts: nothing once the cap
+  // is reached, nothing when the queue is empty. The hour window and the
+  // 2-minute spacing are gone with the drip - see BATCH_DEFAULT for why both
+  // had to go, and why the cap did not.
   tasks.push(
     cron.schedule(
-      '*/2 * * * *',
-      async () => {
+      '0 9 * * *',
+      () =>
+        runWithSendClass('gated', async () => {
+        if (!(await claimFire('backlog-grill-batch'))) return;
         try {
-          // Zaal is ET; the box is UTC. Computing his local hour here rather
-          // than assuming, because a card at 3am is how a feature gets muted.
+          // Zaal is ET; the box is UTC. Still computed rather than assumed:
+          // the batch no longer gates on the hour, but the value is logged and
+          // a wrong one would misreport which morning this was.
           const localHour = Number(
             new Intl.DateTimeFormat('en-US', {
               timeZone: 'America/New_York',
@@ -364,15 +404,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               hour12: false,
             }).format(new Date()),
           );
-          // One tick at a time. The cron fires every 2 minutes; if a tick ever
-          // outlives that - a slow board query, a Telegram timeout - two would
-          // overlap, both read the same state, both pick the same oldest task,
-          // and Zaal gets the SAME card twice while one state write clobbers
-          // the other. Reuses the lock the work-loop and orchestrator use.
+          // One batch at a time. A daily cron cannot overlap itself the way a
+          // 2-minute one could, but a restart at 09:00 can fire it beside the
+          // running one, and both would read the same state, pick the same
+          // oldest task, and clobber each other's write. Kept for that, and
+          // for the redeploy-at-the-wrong-minute case that actually happens.
           const locked = await withTickLock(
             join(ZOE_PATHS.home, 'backlog-grill.tick.lock'),
             async () =>
-              runBacklogGrillTick({
+              runBacklogGrillBatch({
                 localHour,
                 sendDM: (text, buttons) =>
                   opts.bot.api.sendMessage(opts.zaalTgId, text, {
@@ -389,17 +429,24 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
                 unpinMessage: (messageId) => opts.bot.api.unpinChatMessage(opts.zaalTgId, messageId),
               }),
           );
-          // Announce the FIRST tick after a boot whatever it decided, so a
-          // quiet morning is legible: 'outside 6-22', 'queue empty' and a
-          // contended lock are very different from a cron that never fired, and
-          // without this they look identical (state-claims.md).
-          const r = locked.ran ? locked.value : { sent: false, reason: `lock ${locked.reason}` };
-          featureRan('backlog-grill', r.sent ? 'sending' : r.reason);
-          if (r.sent) console.log(`[zoe/backlog-grill] sent: ${(r as { title?: string }).title}`);
+          // Announce whatever it decided, so a quiet morning is legible:
+          // 'queue empty', 'cap reached' and a contended lock are very
+          // different from a cron that never fired, and without this they look
+          // identical (state-claims.md). Once a day this line is the ONLY
+          // evidence the batch happened, so it also carries where the cards
+          // landed - 'queue:10' and 'spool:10' mean the grill lane can see
+          // them and that it cannot, and those must not read the same.
+          const r = locked.ran
+            ? locked.value
+            : { sent: 0, reason: `lock ${locked.reason}`, queued: 'nothing:0', titles: [] };
+          featureRan('backlog-grill', r.sent ? `batch ${r.sent}` : r.reason);
+          console.log(
+            `[zoe/backlog-grill] batch: sent ${r.sent}, ${r.reason}, queue ${r.queued}`,
+          );
         } catch (err) {
-          console.warn('[zoe/backlog-grill] tick failed (nbd):', (err as Error).message);
+          console.warn('[zoe/backlog-grill] batch failed (nbd):', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -487,7 +534,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 10-23,0,1 * * *',
-      async () => {
+      () =>
+        runWithSendClass('gated', async () => {
         try {
           const r = await surfaceGrill({
             sendDM: (text, buttons) =>
@@ -503,7 +551,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.warn('[zoe/scheduler] grill tick failed (nbd):', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -534,7 +582,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 1 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('evening-reflect'))) return;
         try {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
@@ -566,7 +615,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('evening-reflect');
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -578,7 +627,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 13 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('team-digest'))) return;
         try {
           const { digest, taskCount, mirrored } = await runTeamDigest({ mirrorToBonfire: true });
@@ -600,7 +650,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('team-digest');
           console.error('[zoe/scheduler] team digest failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -610,7 +660,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   tasks.push(
     cron.schedule(
       '0 2 * * *',
-      async () => {
+      () =>
+        runWithSendClass('digest', async () => {
         if (!(await claimFire('nightly-recap'))) return;
         try {
           const recap = await generateNightlyRecap({ repoDir: opts.repoDir });
@@ -631,7 +682,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await releaseFire('nightly-recap');
           console.error('[zoe/scheduler] nightly recap failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );
@@ -1062,17 +1113,45 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('watcher'))) return;
         try {
-          const alerts = [...(await runWatcherTick()), ...(await healFleet({ date: new Date().toISOString().slice(0, 10) }))];
-          if (alerts.length) {
-            // Watcher alerts are status messages
-            const alertsMsg = renderWatcherAlerts(alerts);
+          // These two were one message, and they should not be. A watcher
+          // anomaly is a failure notice - the highest-reply-rate thing ZOE
+          // sends. A fleet self-heal is a watchdog restart, one of the eight
+          // types measured at ZERO replies across 151 days. Sending them
+          // together forced the budget to treat them the same, which meant
+          // either capping the alarm or exempting the restart log.
+          const anomalies = await runWatcherTick();
+          const heals = await healFleet({ date: new Date().toISOString().slice(0, 10) });
+
+          if (anomalies.length) {
+            const msg = renderWatcherAlerts(anomalies);
+            await runWithSendClass('alarm', async () => {
+              if (opts.routingDeps) {
+                await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
+              } else {
+                await opts.bot.api.sendMessage(opts.zaalTgId, msg);
+              }
+            });
+            console.log('[zoe/scheduler] watcher: ' + anomalies.length + ' anomaly alert(s) sent');
+          }
+
+          if (heals.length) {
+            // Left on the `status` default, NOT `noise`. The 266 measured
+            // zero-reply "watchdog restart" messages match `watchdog` or
+            // `froze -> restarted`; neither string is emitted anywhere in this
+            // tree, so those restarts come from an unmapped sender. The split
+            // from the anomaly alarm above still earns its keep - one is a
+            // failure notice, one is a self-heal log - but this half gets no
+            // special cut until its real emitter is found.
+            const msg = renderWatcherAlerts(heals);
             if (opts.routingDeps) {
-              await sendToZaalRouted(opts.routingDeps, alertsMsg, { kind: 'status' });
+              await sendToZaalRouted(opts.routingDeps, msg, { kind: 'status' });
             } else {
-              await opts.bot.api.sendMessage(opts.zaalTgId, alertsMsg);
+              await opts.bot.api.sendMessage(opts.zaalTgId, msg);
             }
-            console.log('[zoe/scheduler] watcher: ' + alerts.length + ' alert(s) sent');
-          } else {
+            console.log('[zoe/scheduler] watcher: ' + heals.length + ' self-heal note(s) sent');
+          }
+
+          if (!anomalies.length && !heals.length) {
             console.log('[zoe/scheduler] watcher: clean');
           }
         } catch (err) {
@@ -1337,7 +1416,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             if (shouldFireAlert(level)) {
               const status = formatSpendStatus(false);
               const alert = `COST ALERT: Spend reached ${level}% of daily cap\n\n${status}`;
-              // Cost alerts are status messages
+              // NOT tagged `noise`, though an earlier pass did tag it. The 24
+              // measured zero-reply "cost report" messages match
+              // `^Cost-of-pass YYYY-MM-DD:`, which does not appear anywhere in
+              // the bot tree - so they come from an unmapped sender, not from
+              // this COST ALERT. Left on the `status` default.
               if (opts.routingDeps) {
                 await sendToZaalRouted(opts.routingDeps, alert, { kind: 'status' }).catch((err: unknown) => {
                   console.warn('[zoe/scheduler] cost alert send failed:', err);

@@ -230,6 +230,13 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // A relayed message can be arbitrarily long (a terminal can relay a
       // paste) - chunk it; the Reply/Ack keyboard rides the LAST chunk and the
       // returned message is that one, so reply-context arms on the right mid.
+      // NOT tagged `noise`, though an earlier pass did tag it. The 75 measured
+      // zero-reply "agent-bus relay" messages match `^BUS from `,
+      // `^BUS coordinator ` or `bus: <N> new message(s):` - none of which this
+      // module emits, and none of which appear anywhere in the bot tree. So
+      // that traffic comes from a different, unmapped sender, and capping this
+      // one would have throttled the wrong thing while the measured 75 kept
+      // arriving. Left on the `status` default until an emitter is identified.
       const sent = await sendChunkedToTelegram(
         (cid, t, o) => deps.sendMessage(cid, t, o as never),
         deps.chatId,

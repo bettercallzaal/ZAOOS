@@ -41,12 +41,23 @@ const rows = Array.from({ length: 25 }, (_, i) => ({
   title: `Task ${i}`,
   created_at: '2026-01-01T00:00:00Z',
   notes: `why ${i}`,
+  status: 'todo' as const,
+  archived_at: null,
 }));
 
 const boardFetch = (async (url: string, init?: RequestInit) => {
   if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
   if (String(url).includes('order=created_at.asc')) {
     return { ok: true, status: 200, json: async () => rows } as unknown as Response;
+  }
+  // Handle reconcile query: id=in.(t0,t1,...) - return matching tasks with proper status
+  const idMatch = String(url).match(/id=in\.\(([^)]+)\)/);
+  if (idMatch) {
+    const reqIds = idMatch[1].split(',');
+    const taskRows = reqIds
+      .map((id) => rows.find((r) => r.id === id))
+      .filter((r): r is typeof rows[0] => r !== undefined);
+    return { ok: true, status: 200, json: async () => taskRows } as unknown as Response;
   }
   return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
 }) as unknown as typeof fetch;

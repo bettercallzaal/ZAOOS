@@ -56,7 +56,7 @@ The two of them then talked shop for twenty minutes: Fetch.ai and ASI-1 inferenc
 ## What did not happen
 
 - **Neither builder said what they will build in the 24 hours.** The planned open-floor brainstorm and the pick-naming did not happen as segments; the room went to workflows and WaveWarZ content instead. There is no recorded pick for either finalist.
-- The **creator battle winner** was referenced as decided but never named on air. Still unwritten in `finals.json` and `season-1-results.json`.
+- The **creator battle winner** was referenced as decided but never named on air, and the name exists nowhere else. Re-checked at full fidelity on 2026-08-29 at about 16:55 ET: at real-audio 18:20 to 18:30 Zaal says, verbatim, "we have our artist finalists, we have our creator finalists winner, and now we're here to find our builder". Neither creator finalist is mentioned anywhere in the 100 minutes; zero hits for presdency or uniquebeing404 across the whole transcript. This is not a transcription gap, the result was referenced and never spoken. `finals.json` still reads the creator row as scheduled with null ranks and `season-1-results.json` has `winners.creator: null`. **Zaal's memory is the only copy.** Note for anyone clipping this recording: the segment timestamps in `transcript.md` run about 95 seconds behind real audio on this file.
 - **Mauro's mini app question went unanswered.**
 - The **judges rubric was never mentioned**, and nothing was said about how judges submit a pick or by when.
 - **Prize payout wallets** were not discussed. The 1 percent trade share uses Farcaster Solana addresses; the 100 and 50 USDC prizes have no address on file for either builder.

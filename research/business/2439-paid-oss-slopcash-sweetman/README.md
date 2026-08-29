@@ -9,7 +9,7 @@ original-query: "https://slop.cash/projects/eliza /zao-research this and also fi
 tier: STANDARD
 ---
 
-# 2352 - Paid Open-Source Work in 2026: slop.cash, the Bounty Market Reality, and the Sweetman Door
+# 2439 - Paid Open-Source Work in 2026: slop.cash, the Bounty Market Reality, and the Sweetman Door
 
 > **Goal:** Decide whether paid open-source contribution (slop.cash/eliza and peers) is a real income lane for a ZAO-ecosystem builder with heavy agent tooling, and what the sweetman.eth connection is actually worth.
 

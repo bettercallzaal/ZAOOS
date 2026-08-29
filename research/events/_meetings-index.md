@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-29 | ZABAL Gamez builder battle, Space 1 (opening) | ZABAL Gamez | Zaal, Candy, Thy Revolution, Iman Afrikah, paperhandpapi, jdwalka, ghostmintops, +6 | [2441](2441-zabal-gamez-builder-battle-space-1/) | 11 |
 | 2026-08-26 | Zaal x Jim McGee x Iman - CEN token launcher live, BCZ bought in, IMAN token commissioned | ZAO Devz / BCZ | Zaal, Jim McGee, Iman | [2422](2422-zaal-jim-iman-cen-token-launcher-aug26/) | 10 |
 | 2026-08-24 | ZAOstock Standup | ZAOstock | Zaal, Candy, paper, Fellenz, Joseph Goats, Mickey, Maceo Whatley, Mauro | [2410](2410-zaostock-standup-aug24/) | 11 |
 | 2026-08-20 | Thy Revolution x Zaal - cross-feed content format + Discord presence | COC Concertz / BCZ | Zaal, Thy Revolution | [2338](2338-thy-revolution-crossfeed-plan-aug20/) | 5 |

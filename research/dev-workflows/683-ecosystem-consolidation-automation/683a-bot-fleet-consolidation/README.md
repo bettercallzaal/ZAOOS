@@ -2,14 +2,50 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
-related-docs: 460, 467, 524, 527, 661, 663, 676
+last-validated: 2026-08-27
+related-docs: 460, 467, 524, 527, 601, 661, 663, 676
 tier: STANDARD
 ---
 
 # 683a - Bot Fleet Consolidation
 
 > **Goal:** Audit the ZAO bot ecosystem for consolidation opportunities (merging codebases / shared patterns) and automation opportunities (removing manual steps, shared ingest layers). Identify which are cheap wins (difficulty <= 3, high value).
+
+---
+
+## Updated 2026-08-27: Material Changes Since 2026-05-20
+
+**None of the 8 proposed cheap wins (the `bot/_shared/` consolidation layer) shipped as designed.** Verified 2026-08-27 by live filesystem check: `bot/_shared/` does not exist, `@zaos/bot-core` npm package was never published, `bot/personas/` directory was never created.
+
+However, the fleet restructured materially through a different path — **ZOE absorbed functionality** rather than extracting shared modules:
+
+| What changed | Detail | Source |
+|---|---|---|
+| **`bot/_shared/` never built** | No shared bot-core.mjs, rate-limiter.ts, circuit-breaker.ts, memory-blocks.ts, bonfire-writer.ts. The layer is absent. | `ls bot/_shared/ → not found` as of 2026-08-27 |
+| **ZOE grew from ~1.5K to 146 files / 32K+ lines** | Rather than extracting shared modules, ZOE accumulated functionality: agents/, advisors, backlog-grill, bonfire-queue/retry, brand-brain, build-candidate/intent, receipts, zaostock integrations, etc. Hermes coder/critic/runner is still a separate `bot/src/hermes/` module but is called BY ZOE, not deployed as a standalone bot. | `ls bot/src/zoe/` (146 entries) |
+| **ZAO Devz (new) added** | New dual-bot runner (`bot/src/devz/`) added since doc — two grammy bots (ZAODevzBot + a critic) in one Node process. This was not in the original fleet table. | `head -5 bot/src/devz/index.ts` |
+| **ZAOstockTeamBot (teams/) removed from this repo** | `bot/src/teams/` no longer exists. ZAOstock is graduating to its own repo (per CLAUDE.md); ZOE carries ZAOstock integrations (`zaostock-approvals-surface.ts`, `posts/zaostock-promo-calendar.ts`). | `ls bot/src/teams/ → not found` |
+| **Branded fleet decommissioned** | The openclaw 7-agent squad, Magnetiq, Research, WaveWarZ, AttaBotty, zao-team-bots — all decommissioned 2026-05-04 per doc 601. Were never built as proposed in doc 467. | CLAUDE.md decommissioned section |
+| **Hermes folded into ZOE** | Hermes no longer runs as standalone `@zoe_hermes_bot`. Its coder/critic/auto-PR code (`bot/src/hermes/`) is REUSED by ZOE, not a separate deployment. | CLAUDE.md; bot/src/hermes/runner.ts imports pattern |
+| **farscout zombie on VPS** | farscout (`bettercallzaal/farscout`) superseded by ZAOscout; was retired in writing but still running as `farscout.service` on VPS as of 2026-08-22, zero output, heartbeating "up". | CLAUDE.md |
+| **ZAOcoworkingBot status unclear** | No `bot/src/cowork*` in this repo; a `bot/src/lib/cowork.ts` + `bot/systemd/cowork-agent.service` + `bot/cowork-handoff/` remain, suggesting a separate agent was decommissioned or migrated. | Filesystem check 2026-08-27 |
+| **No unified agent_events table confirmed** | Proposed Cheap Win 3 (shared Supabase agent_events schema) — not confirmed shipped. No migration file found in `bot/migrations/` matching the 2026-05-20_agent_events_schema.sql name. | Unverified — needs Supabase query to confirm |
+
+**Updated fleet table (as of 2026-08-27):**
+
+| Bot | Location | Deployed? | Notes |
+|-----|----------|-----------|-------|
+| **ZOE** (`@zaoclaw_bot`) | `bot/src/zoe/` | YES (VPS) | Grew 20x; now absorbs concierge + Hermes auto-PR pipeline |
+| **ZAO Devz** (`@zaodevz_bot` + `@zoe_hermes_bot`) | `bot/src/devz/` | YES (VPS) | Dual-bot Coder+Critic in one process — NEW since doc |
+| **ZAOstock bot** (`@ZAOstockTeamBot`) | `bot/` root? (spinning out) | Planned → graduating | Spinning to own repo with ZAOstock 2026 |
+| **Trading Agents** (VAULT/BANKER/DEALER) | `src/lib/agents/` | YES (Vercel cron) | Unchanged |
+| **farscout** | `bettercallzaal/farscout` | zombie | 35+ days uptime, zero output; stop with `systemctl --user stop farscout` |
+| **ZAOscribe** | archived | NO | Still archived, Discord-based |
+| **All branded bots** | n/a | DECOMMISSIONED | Magnetiq, WaveWarZ, Research, AttaBotty, openclaw squad — killed 2026-05-04 |
+
+**The cheap-wins ship plan (Week 1-2 below) did NOT execute.** The `bot/_shared/` consolidation layer remains unbuilt. The consolidation that occurred was ZOE absorption, not module extraction. If the shared layer is still desired, it remains a valid future target — but the urgency "new bot ships in 15 min" is less relevant now that the branded fleet expansion was cancelled.
+
+Sources checked 2026-08-27: live filesystem (`ls bot/_shared/`, `ls bot/src/`, `ls bot/src/zoe/`, `ls bot/src/teams/`), `bot/package.json`, `bot/src/devz/index.ts` header, `bot/src/hermes/runner.ts`, CLAUDE.md decommissioned-bots section.
 
 ---
 

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-08-30
 related-docs: 684
 tier: STANDARD
 ---
@@ -52,6 +52,30 @@ ZAO's existing isolation is procedural: `.claude/rules/secret-hygiene.md` (stub 
 ## Community Signal
 
 Agent sandboxing is an active 2026 topic. A competing approach - **Elvean** (macOS-native AI client with a Linux sandbox via Apple's Containerization framework) - drew **66 upvotes / 15 comments** on r/ollama. Different stack (Apple Containerization vs Incus), same thesis: AI agents need a real isolated OS, not just a process jail. code-on-incus is the Linux/VPS-native answer; Elvean is the Mac-native one.
+
+## Updated 2026-08-30
+
+**code-on-incus has released 5 versions since this doc was written (v0.8.1, May 7 → v0.11.2, Aug 11, 2026). Key material changes:**
+
+| Release | Date | Notable Change |
+|---------|------|----------------|
+| v0.9.0 | Jun 17, 2026 | Feature release (minor) |
+| v0.10.0 | Jul 10, 2026 | Feature release |
+| v0.11.0 | Jul 29, 2026 | **Breaking change:** `model` config moved from top-level to `[tool.claude]` section; `coi close` alias; default profile via `[defaults] profile`; wall-clock startup profiler (`COI_TIMING_DEBUG`) |
+| v0.11.1 | Aug 11, 2026 | **OrbStack support** — improved UID-mapping for FUSE/9p filesystems; named sessions (attach-by-name rather than workspace path) |
+| v0.11.2 | Aug 11, 2026 | Firewall fix: firewalld veth zone bloat on NetworkManager hosts; IPv6 egress and orphan resource cleanup |
+
+Sources: https://github.com/mensfeld/code-on-incus/releases (fetched 2026-08-30, FULL)
+
+**OrbStack support (v0.11.1) is the most ZAO-relevant change.** OrbStack is a popular macOS Docker/Linux VM runner — this opens a cleaner path to running `coi` in a Mac-adjacent environment without a full bare-metal Linux VM or VPS. The previous doc noted "Linux-only; on Zaal's Mac it needs a Linux VM" — OrbStack is exactly that lightweight VM layer, now officially supported.
+
+**Config breaking change (v0.11.0):** Any future `coi` config in ZAO must put the Claude Code model reference under `[tool.claude]`, not at top-level.
+
+**New competitor: Docker Sandboxes** (launched Jan 30, 2026, now GA for Mac/Windows). Uses MicroVMs (hypervisor isolation) rather than Incus system containers (OS-level isolation). Supports Claude Code, Codex CLI, Gemini CLI, Kiro. Key tradeoff: MicroVM = stronger isolation boundary; Incus system container = lighter weight, full systemd/Docker-in-box. Docker Sandboxes is purpose-built for agent workflows and requires no Linux expertise. Sources: https://www.docker.com/blog/docker-sandboxes-run-claude-code-and-other-coding-agents-unsupervised-but-safely/ (fetched 2026-08-30, FULL)
+
+**Project traction:** 678 stars, accepted into awesome-claude-code list (issue #1265). More validated than in May.
+
+**ZAO recommendation update:** The decision in the Key Decisions table (investigate for Hermes on VPS) stands. OrbStack support weakens the "Mac needs a full VM" blocker — if Zaal runs OrbStack locally, `coi` is now viable on the Mac development machine, not only the VPS. Docker Sandboxes is a simpler alternative worth considering for a first spike if VPS deployment is too heavy.
 
 ## Staleness Notes
 

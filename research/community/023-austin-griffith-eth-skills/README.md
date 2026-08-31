@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-deep-dive
 > **status:** research-complete
-> **last-validated:** 2026-05-21
+> **last-validated:** 2026-08-31
 > **original-query:** Map Austin Griffith's builder tools, BuidlGuidl community model, and the broader onchain credentials/skills ecosystem (reconstructed)
 > **tier:** solid
 > **Date:** March 2026 (re-verified May 21, 2026)
@@ -387,3 +387,23 @@ If using AI agents (Claude) to build ZAO OS, ETHSkills.com provides curated skil
 - [Galxe](https://www.galxe.com/)
 - [Layer3](https://layer3.mirror.xyz/b-ZXfupfjV2wzcjJENSptZabRRDoTv9-hmC44W7TyEQ)
 - [Otterspace](https://www.otterspace.xyz/)
+
+---
+
+## Updated 2026-08-31
+
+Revalidated against live GitHub sources (full page fetches).
+
+**ETHSkills.com — new skills added since May 2026** (source: [github.com/austintgriffith/ethskills/commits/master](https://github.com/austintgriffith/ethskills/commits/master/)):
+
+- **July 21, 2026** — CROPS Review skill added (`crops: add deep CROPS Review skill and wire it into ship, qa, and the catalog #165`). CROPS is a code-quality/censorship-resistance review framework now integrated into ETHSkills' ship and QA flows. Skill catalog reorganized with "Why Ethereum" listed first across all indexes.
+- **August 20, 2026** — Robinhood Chain added to the L2s skill (`Add Robinhood Chain: l2s entry, verified addresses, CROPS forced-inclusion caveat #170`). This is a new L2 that post-dates the original doc; it includes verified addresses and a CROPS forced-inclusion caveat relevant to censorship resistance.
+
+ETHSkills repo now at **273 stars / 53 forks** (was not tracked in original doc).
+
+**Scaffold-ETH 2** (source: [github.com/scaffold-eth/scaffold-eth-2](https://github.com/scaffold-eth/scaffold-eth-2)):
+
+- Stars stable at ~2.0k; forks grew to **1.4k** (up from 1,338+).
+- No new formal release since v0.0.37 (April 2024) — project does rolling development.
+
+**No change:** Scaffold-ETH 1 star/fork counts, BuidlGuidl model, SpeedRunEthereum challenges, credentials landscape (EAS, Hats, Guild, Galxe, Otterspace) — not re-verified in this pass as those sections are stable.

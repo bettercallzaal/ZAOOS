@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-08-31 | Dcoop x Zaal - AV, travel and the artist rider | ZAOstock | Zaal, Dcoop, Matt | [2453](2453-dcoop-zaal-av-rider-aug31/) | 7 |
 | 2026-08-31 | ZAOstock Standup | ZAOstock | Zaal, Fellenz, Dcoop | [2452](2452-zaostock-standup-aug31/) | 12 |
 | 2026-08-31 | ZAOstock virtual side: on-the-go support, multi-Space plan | ZAOstock | Zaal, Iman Afrikah, Thy Revolution | [2451](2451-zaostock-virtual-iman-thyrev-aug31/) | 7 |
 | 2026-08-29 | ZABAL Gamez builder battle, Space 1 (opening) | ZABAL Gamez | Zaal, Candy, Thy Revolution, Iman Afrikah, paperhandpapi, jdwalka, ghostmintops, +6 | [2441](2441-zabal-gamez-builder-battle-space-1/) | 11 |

@@ -50,7 +50,22 @@ verified absent from the cowork project 2026-08-18. The vault is the system now.
    | Vault handoff | succession + founding state | task tracking |
    | Cowork board | task truth | knowledge storage |
    | Bonfire | knowledge, decisions, lore | operational state |
+   | Research library (`research/NNNN-slug/`) | findings + decisions + the why, with sources | current task state |
+   | Rules (`.claude/rules/*.md`) | operating policy binding every session | facts, task state |
+   | Skills (`~/.claude/skills/`) | repeatable procedures | policy, one-off notes |
+   | Agent memory (`~/.claude/projects/*/memory/`) | user + project facts needed at boot | operating lessons - those are rules |
+   | ICM boxes | brand truth - what a ZAO brand IS | operational state |
    Anything that matters lands in handoff/board/vault BEFORE it rides a message.
+
+   **Precedence, when two disagree:** ICM box (brand truth) > rules > skills >
+   research library > vault > board > agent memory. The point is not that lower
+   stores are less trustworthy - it is that recency alone must not decide, or a
+   superseded decision wins for being the most recently touched file. Use the
+   newest APPROVED information, not merely the newest file. If the answer is in
+   none of them, say what you could not find (`anti-fabrication.md`) rather than
+   filling the gap. The same table with each store's owner is in `CLAUDE.md`
+   ("Where Knowledge Lives"); routing a CORRECTION into the right one is
+   `agent-loops.md` rule 6.
 
 8. **Scratchpads hold nothing that outlives the session.** Anything a handoff,
    doc, or another session will reference lands in vault or repo before session

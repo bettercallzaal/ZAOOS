@@ -14,7 +14,18 @@ Durable operating rules for any autonomous /loop or agent building/deploying in 
 
 5. **Cost + iteration ceilings.** Every autonomous path needs a hard cap (daily item cap, budget cap, one-instance lock). Empty-queue = zero spend. Assume it stops when broke, not when done.
 
-6. **Persist lessons to the repo, not just memory.** A repeated bug/lesson lands in `.claude/rules/` or a skill and gets committed, so future loops read it. Memory = user/project facts; operating lessons = the repo.
+6. **Persist lessons to the repo, not just memory - and route each KIND of correction to the store that owns it.** A repeated bug/lesson lands in `.claude/rules/` or a skill and gets committed, so future loops read it. Memory = user/project facts; operating lessons = the repo. The two-way split above is the summary; the routing is six-way, and stating it means the destination stops being a judgement call made fresh every time:
+
+   | Correction type | Goes to | Concretely |
+   |---|---|---|
+   | Missing or outdated fact | the vault, or the ICM box if it is brand truth | `~/zao-vault/notes/`; the box wins for brand (`icm-grounding.md`) |
+   | New strategic choice | a decision note + a memory | `~/zao-vault/decisions/`, `project_*.md` |
+   | Repeated preference | a rule | `.claude/rules/*.md`, committed - this rule's own case |
+   | Proven technique | a skill | `~/.claude/skills/<name>/SKILL.md`, git-tracked (`vanishing-dependencies.md` rule 1) |
+   | Repeatable sequence | a worker | a ZOE module or a cron - **no new bots without a doc** (CLAUDE.md) |
+   | Dangerous action | a mechanical gate | a `.claude/settings.json` deny rule or a hook; `no-rm-rf.md` is the precedent - deny the command SHAPE, not a path allowlist |
+
+   Which store owns what, and which wins on conflict, is `handoff-discipline.md` rule 7. Honest gap worth naming: the source this table came from insists a correction is REVIEWED before it becomes shared knowledge, and ours are written by the session that learned the lesson with no second pass (doc 2421).
 
 7. **Subagents for bounded research/isolation; inline for the hot path.** Subagent for "research/audit/verify X" (context isolation, cheaper). Keep code -> verify -> commit inline. Don't grow one giant prompt.
 

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-08-22
+last-validated: 2026-08-26
 related-docs: "2318, 2036"
 original-query: "organize all of this so that i can just use obsidian and claude for everything - /zao-research this (Obsidian + Claude as the complete personal stack, from the OneNote consolidation session)"
 tier: STANDARD
@@ -69,6 +69,46 @@ The 2026-08-18 OneNote mirror already carries source/section/captured/routed; th
 ### 5. Obsidian itself (v1.13.7, from obsidian-releases desktop-releases.json)
 
 No native REST API, no native AI surface - community plugins only. Confirms the vault-is-just-markdown stance: Obsidian is the reading/linking UI, Claude operates on files, git is the transport. The two-surface goal is architecturally sound because neither surface depends on the other's runtime.
+
+### 6. Added since this doc was written (2026-08-26)
+
+- **`TOC.md` + `scripts/build-toc.py`** now exist in the vault - the whole vault
+  in one generated table (path, type, status, first-line hook). This doc's
+  structure section predates it; a generated index is the cheap version of the
+  "hierarchical folders + index files" convention it recommends, and it is
+  regenerated rather than maintained by hand.
+- **`~/zao-vault/README.md` gained a source-order block.** The vault is one of
+  seven stores, and until now nothing said what to believe when two disagreed.
+  Full division + precedence: `CLAUDE.md` ("Where Knowledge Lives") and
+  `handoff-discipline.md` rule 7. Motivation and measurement: doc 2421.
+- The doc's other decisions (Claude Code directly on the vault, git-only sync,
+  skip in-app AI plugins, obsidian-mcp only when concurrent writers appear) were
+  re-read on 2026-08-26 and all still hold.
+
+**A concurrent-writer race, observed the same day - worth recording because this
+doc deferred the obsidian-mcp decision until exactly this appeared.** The vault
+README commit above (`3baa919`) was made local-only, under an explicit
+instruction not to push. It reached `origin/main` anyway within the hour: a
+different lane working in the same vault clone committed its own work on top
+(`060a75e`, `5deab90`, `7eec30a`) and pushed the branch, carrying the unpushed
+commit out with it. Nothing failed and nothing warned - `git push` on a shared
+branch takes everything under HEAD, and the local branch simply read as 0 ahead
+of upstream afterwards.
+
+The content was correct, so it was left in place rather than reverted (Zaal's
+call, 2026-08-26). But note what the failure actually was: **not** a write
+conflict on one file, which is the case `obsidian-mcp`'s etag detection would
+catch. It was two writers sharing one branch, where a decision about one
+commit's visibility was silently overridden by another commit's push. An MCP
+server with conflict detection would not have prevented it. `agent-loops.md`
+rule 11 (git hygiene on a shared clone) and rule 25 (build in a worktree, never
+the shared working tree) are the rules that would have - the vault has no
+worktree discipline because until now it had one writer at a time.
+
+Open, not decided: whether vault edits from a lane should go through
+`git worktree add` the way ZAOOS edits already do. That buys isolation at the
+cost of making a two-line note edit ceremonial, which is most of what the vault
+is for.
 
 ## Also See
 

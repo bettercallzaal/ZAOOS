@@ -216,6 +216,41 @@ if you catch yourself writing one, that is the signal you already believe the
 answer - which is exactly when `state-claims.md` says to open the file that would
 prove you wrong.
 
+### 12. A verification that creates an artifact forces a cleanup, and the cleanup is where the damage happens
+
+```
+WRONG   python3 -m py_compile <file>     # writes __pycache__/ as a side effect
+RIGHT   python3 -c "import ast,sys; ast.parse(open(sys.argv[1]).read())" <file>
+ALSO    PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile <file>
+```
+
+Found and self-reported by the obsidian lane, 2026-09-01, after the supervisor's
+watcher flagged an `rm -rf bin/__pycache__` in a worktree.
+
+Nothing was lost - the live tree was never in scope, and `__pycache__/` turned
+out to be gitignored at `.gitignore:17` with `git log --all` showing it was never
+tracked, so the cleanup was solving a problem that did not exist. The useful part
+is the sequence one step back:
+
+**Reach for a verification that produces an artifact, then reach for a banned
+shape to clean up the artifact.**
+
+The syntax check was correct and the instinct to leave the tree clean was
+correct. The delete was the only wrong step, and it existed solely because the
+check had written something. A verification that leaves no trace never generates
+that second decision.
+
+This generalises past Python. Anything that builds, caches, compiles, or
+snapshots as a side effect of *checking* - a test run that writes fixtures, a
+linter with a cache directory, a build used only to prove the build works -
+creates the same pressure. Prefer the read-only form of a check where one exists,
+and where it does not, direct the artifact somewhere disposable rather than
+cleaning it out of a repo afterwards.
+
+The rule it collides with is `no-rm-rf.md`, whose whole point is that the SHAPE is
+banned so nobody has to adjudicate whether a particular directory was safe. The
+lane's own words on that: *"a directory of bytecode is still a directory."*
+
 ## The gate
 
 Before reporting any measured claim, ask **which of these seven shapes am I in**:
@@ -230,8 +265,9 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 8. Is a quieting flag sitting between me and the measurement?
 9. Was the change global while I only checked the local case?
 10. Did I write the conclusion before the command ran?
+11. Did my check leave anything behind that I now want to delete?
 
-Answering all ten costs seconds. Six of the eight wrong claims in the
+Answering all eleven costs seconds. Six of the eight wrong claims in the
 2026-08-22/23 session would have died at question 1, 2, or 3.
 
 ## Guards

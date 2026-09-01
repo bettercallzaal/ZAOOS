@@ -30,6 +30,7 @@ import {
   cmdCharter,
 } from './circles';
 import { cmdBoard } from './miniapp';
+import { containsAgentMarkup, stripAgentMarkupSafe } from './agent-markup';
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -74,6 +75,37 @@ bot.api.config.use(async (prev, method, payload) => {
     const chatId = typeof p.chat_id === 'number' ? p.chat_id : Number(p.chat_id);
     if (chatId === ZAO_FESTIVALS_CHAT_ID && (p.message_thread_id == null || Number.isNaN(p.message_thread_id))) {
       p.message_thread_id = OPS_TOPIC_ID;
+    }
+  }
+  return prev(method, payload);
+});
+
+// Agent-internal markup never reaches a human. ZAOOS#3383: on 2026-05-13 this
+// bot posted a raw <think> block into #marketing as the message body, and it sat
+// there as the channel preview for three and a half months. Nothing errored -
+// Telegram accepted it and returned 200 - so no automated check could have
+// caught it.
+//
+// The strip lives HERE, at the outbound boundary, rather than in each handler.
+// The regex already existed in src/actions.ts but only on the JSON-parsing path,
+// which is exactly how the one caller that mattered was missed. A boundary that
+// each caller has to remember is a boundary that gets forgotten.
+const MARKUP_FIELDS = { sendMessage: 'text', editMessageText: 'text', sendPhoto: 'caption', sendDocument: 'caption', sendVideo: 'caption', sendAnimation: 'caption' } as const;
+bot.api.config.use(async (prev, method, payload) => {
+  const field = MARKUP_FIELDS[method as keyof typeof MARKUP_FIELDS];
+  if (field) {
+    const p = payload as Record<string, unknown>;
+    const body = p[field];
+    if (typeof body === 'string' && containsAgentMarkup(body)) {
+      const cleaned = stripAgentMarkupSafe(body);
+      if (cleaned === null) {
+        // The body was ENTIRELY scratchpad. Sending '' is confusing and sending
+        // the original is the leak itself, so drop the send and say so loudly.
+        console.error('[agent-markup] BLOCKED a send whose body was entirely agent markup', { method, chat_id: p.chat_id });
+        return { ok: true, result: true } as never;
+      }
+      console.error('[agent-markup] stripped agent markup from an outbound message', { method, chat_id: p.chat_id });
+      p[field] = cleaned;
     }
   }
   return prev(method, payload);

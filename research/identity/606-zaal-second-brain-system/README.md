@@ -2,6 +2,7 @@
 topic: identity
 type: decision
 status: research-complete
+superseded-by: 2317 (partial - see note below)
 last-validated: 2026-05-21
 original-query: "Daily second-brain system (capture/process/resurface/output) on top of Bonfire + ZOE + research/ stack (reconstructed)"
 tier: STANDARD
@@ -9,6 +10,27 @@ related-docs: [309, 478, 549, 568, 569, 570, 574, 581, 601, 604, 605]
 ---
 
 # 606 - Zaal's second-brain operating system (May 2026)
+
+> **PARTIALLY SUPERSEDED 2026-08-31 - see doc 2317.** The tooling verdict in
+> this doc was reversed. It says "SKIP Obsidian, Logseq, Notion, Tana,
+> Capacities... adopting any of them = dual write + sync hell". In August the
+> estate adopted exactly that: doc 2317 (2026-08-22) makes an Obsidian vault
+> with Claude Code at its root the primary personal stack, and docs 2320, 2247
+> and 2448 all build on it. Anyone reading the row below as current will be
+> told to skip the tool the whole live stack now runs on.
+>
+> **What is reversed:** the "Rejected as primary tools" row, insofar as it
+> rejects Obsidian. The dual-write reasoning behind it was sound and simply lost
+> to a different constraint - agents read files far more cheaply than APIs.
+>
+> **What still stands:** everything else. The Capture / Process / Resurface /
+> Output loop, the daily 9pm and Sunday cadence, and the rule that every output
+> ends with "what fact in this output is worth re-ingesting?" are all still the
+> live design. Measured 2026-08-31: of those four moves only Capture is actually
+> running - `zao-morning` was scheduled that evening to restore Resurface.
+> Reconciliation of all eight second-brain docs:
+> `~/zao-vault/notes/second-brain-reconciliation-2026-08-31.md`.
+
 
 > **Goal:** Stop treating "second brain" as a tool pick. Define the daily SYSTEM (capture / process / resurface / output) sitting on top of the stack already shipped (Bonfire + ZOE + research/ + MEMORY.md), and the 2-3 AI-PKM tools that genuinely fill the remaining gaps.
 

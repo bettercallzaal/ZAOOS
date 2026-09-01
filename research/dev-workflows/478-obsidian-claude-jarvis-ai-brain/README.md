@@ -2,12 +2,32 @@
 topic: dev-workflows
 type: decision
 status: research-complete
+superseded-by: 2317 (partial - see note below)
 last-validated: 2026-05-21
 original-query: "Should Zaal adopt JARVIS/Cowork pattern with Obsidian + Claude Code as personal ops layer? (reconstructed)"
 tier: STANDARD
 ---
 
 # 478 — Obsidian + Claude Code as Personal AI Brain (JARVIS / Cowork Pattern)
+
+> **PARTIALLY SUPERSEDED 2026-08-31 - see doc 2317.** This doc and doc 606 were
+> both validated on 2026-05-21 and reach opposite conclusions: this one says USE
+> the Obsidian vault pattern, 606 says SKIP Obsidian entirely. Neither carried a
+> supersession marker until now, so both read as current.
+>
+> **This doc won on the main question** - doc 2317 (2026-08-22) adopts the
+> Obsidian + Claude Code pattern this doc recommended.
+>
+> **But its SYNC recommendation is reversed.** This doc says to put the vault on
+> Google Drive so it syncs across two machines, the VPS and the phone. Doc 2317
+> says "git only - never mix with Obsidian Sync or iCloud" and names mixing sync
+> layers as the single most-reported failure mode. The vault is git-backed to a
+> private GitHub repo; do not add a second sync layer. For mobile, 2317 points
+> at Working Copy rather than Obsidian Sync.
+>
+> Full reconciliation of the eight second-brain docs:
+> `~/zao-vault/notes/second-brain-reconciliation-2026-08-31.md`.
+
 
 > **Status:** Research complete
 > **Date:** 2026-04-23

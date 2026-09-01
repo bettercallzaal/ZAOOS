@@ -251,6 +251,50 @@ The rule it collides with is `no-rm-rf.md`, whose whole point is that the SHAPE 
 banned so nobody has to adjudicate whether a particular directory was safe. The
 lane's own words on that: *"a directory of bytecode is still a directory."*
 
+### 13. A plausible attribution is not a measured one - who said it is checkable
+
+```
+WRONG   "your --reachable point landed"        -> a different lane said it
+RIGHT   grep the transcript for the sentence before crediting it
+CHECK   could I quote the line, or am I recalling the gist?
+```
+
+Three instances in one session, 2026-09-01, all by the same agent and all of the
+same shape - a specific, checkable claim asserted from recall because it was
+plausible:
+
+| The claim | What checking showed |
+|---|---|
+| "~7 briefs produced a durable artifact" | **34** briefs, 88 references. Off by 5x, and stated as though counted |
+| "your `--reachable` point landed" (to the obsidian lane) | **zaostock** said it. obsidian had never mentioned it |
+| "(no output = not ignored)" and two more pre-written labels | trap 11 - the output contradicted the label |
+
+The middle one was caught by the lane it was wrongly credited to, whose reply is
+the best statement of the trap: *"if it came from a summary of my messages then
+the summary invented it. Worth chasing, because it is the same class as your '~7
+briefs' estimate: a plausible thing that no one actually said."*
+
+**Why it is distinct from ordinary sloppiness, and from trap 11.** Trap 11 is a
+verdict written before a command runs. This is a verdict written after reading -
+you did have the source, you just did not re-open it. Attribution and counts feel
+like memory rather than measurement, so the instinct to verify never fires. And
+both errors are *plausible by construction*: a summary invents the most likely
+sentence, and the most likely sentence is exactly the one that survives review.
+
+**Why it matters more in a multi-lane estate than it looks.** Crediting the wrong
+lane corrupts the record of who found what, which is the only signal for which
+lane to trust on what. It also wastes the wronged lane's turn correcting it. And
+`credit-attribution.md` makes naming the source an ethos rule, not a nicety -
+this is that rule failing inward, at teammates, rather than outward at an OSS
+author.
+
+**The rule.** Before crediting a person, a lane, or a source with a specific
+claim: quote it, or attribute it loosely. "Someone raised X" is honest.
+"Your point about X" names a person and is a factual claim about who said what -
+which is checkable, and therefore has to be checked. Same for any count, id, or
+name you are about to write into a message or a doc: if you could not point at
+where it came from, say so in the sentence.
+
 ## The gate
 
 Before reporting any measured claim, ask **which of these seven shapes am I in**:
@@ -266,8 +310,9 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 9. Was the change global while I only checked the local case?
 10. Did I write the conclusion before the command ran?
 11. Did my check leave anything behind that I now want to delete?
+12. Am I crediting a claim I could not quote?
 
-Answering all eleven costs seconds. Six of the eight wrong claims in the
+Answering all twelve costs seconds. Six of the eight wrong claims in the
 2026-08-22/23 session would have died at question 1, 2, or 3.
 
 ## Guards

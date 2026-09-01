@@ -2,9 +2,9 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-08-30
+last-validated: 2026-09-01
 superseded-by:
-related-docs: "2317, 2320, 2318, 2365, 1054, 026"
+related-docs: "2460, 2317, 2320, 2318, 2365, 1054, 026"
 original-query: "obsdidian plugins tooling tricks and tips for doing meoery with agents please"
 tier: STANDARD
 ---
@@ -12,6 +12,32 @@ tier: STANDARD
 # 2448 - Obsidian Plugins and Tooling for Agent Memory
 
 > **Goal:** Which Obsidian plugins and conventions actually improve an AGENT's memory (not a human's note-taking), and what ZAO should change in a vault that already has 831 markdown files but zero tags.
+
+> ## AMENDED 2026-09-01 by doc 2460. Read this before the table below.
+>
+> **The decision stands - install no community plugins - and the reasoning
+> below is right. The RULE as stated is a proxy that gets one case wrong in
+> each direction.**
+>
+> "No community plugins" wrongly PERMITS **Canvas**, which is a core plugin
+> whose connections are not stored on disk in any form an agent can read, and
+> wrongly FORBIDS **Bases**, which is core and whose data lives in YAML
+> frontmatter. The general form is: **nothing whose OUTPUT exists only at
+> render time may be a source of truth.** The line is drawn by where data is
+> stored, not by who shipped the code. Doc 2460 has the measured access table.
+>
+> **The tag finding below is WRONG and it drove this doc's top
+> recommendation.** "831 markdown files and ZERO containing a `#tag`" was
+> measured by grepping body text, which cannot see frontmatter tags - and
+> frontmatter is where this vault puts them. Re-measured across 860 files on
+> 2026-09-01: **139 files (16%) carry a frontmatter `tags:` property**, all in
+> correct list form, and 70 (8%) carry a body `#tag`. The vault was never at
+> zero.
+>
+> The real defect is the opposite of absence: **353 distinct tag values**
+> against a README specifying four, averaging 2.5 files per tag, so most tags
+> select nothing. 264 of them (75%) are used exactly once. The repair is nested
+> tags rather than a purge, because `file.hasTag("a")` matches `#a/b`.
 
 ## Key Decisions
 

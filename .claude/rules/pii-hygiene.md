@@ -60,6 +60,51 @@ If a query result ends up under the repo path by accident, it cannot be staged. 
 
 ### Rule 3 - PII patterns banned from any committed file
 
+> **AMENDED 2026-09-01 by Zaal: the private vault is a sanctioned home for
+> third-party contact data.** Everything else in this rule stands unchanged.
+>
+> **What happened.** Two vault files - a ZAOstock sponsor pipeline and a roster -
+> carried 23 phone numbers and 17 unique third-party email addresses for named people at
+> a chamber of commerce, a brewery, a bank and an insurer. A lane held them
+> uncommitted rather than commit them, citing this rule. Another lane had written
+> them believing the opposite, and said so in its own note: *"ZAOOS is PUBLIC.
+> Contact details go to the vault only."*
+>
+> Both readings were defensible, which is why it went to Zaal rather than being
+> settled quietly. He chose: the vault is the home, and this rule is what changes.
+>
+> **Why both readings were defensible.** This rule was written on 2026-05-23, the
+> day Gmail, Calendar, Drive and GitHub MCP servers were connected, and its whole
+> threat model is *query output leaking into public artifacts* - a research doc, a
+> PR body, a Telegram block, a knowledge-graph episode. `~/zao-vault` is a private
+> repo that did not exist in that form at the time. The rule never contemplated
+> it, so it neither permitted nor forbade it; it simply said "any committed file"
+> and meant the public ones.
+>
+> **The amended line: WHERE it is committed decides, not whether.**
+>
+> | Destination | Third-party contact data |
+> |---|---|
+> | `~/zao-vault` (private) | **PERMITTED.** It is the sanctioned home. |
+> | ZAOOS `research/`, any public repo | **BANNED.** ZAOOS is public. |
+> | PR bodies, commit messages, issue text | **BANNED.** Public even on a private repo, and permanent. |
+> | Chat output, Telegram blocks, clipboard | **BANNED** unless Zaal asked for that specific item (Rule 4). |
+> | Bonfire episodes | **BANNED.** Every agent reading the graph sees it. |
+> | Anything outbound | **BANNED.** |
+>
+> **Three things this does NOT change.** The `~/.zao/private/` destination in
+> Rule 1 for RAW query dumps stays - a Gmail thread dump is still not a vault
+> note. Rule 4's chat defaults stay. And a private repo is private, not secret:
+> the vault is now cloned to a phone that leaves the house, and its history is
+> permanent, so this permits recording a working contact list and not
+> accumulating one for its own sake.
+>
+> **If you are redacting for a public destination**, the patterns and the
+> allowlist below are still the tool for it. That is what the rest of this
+> section is for.
+
+
+
 These regex patterns must not appear in any file staged for commit (research docs, memories, PR descriptions, commit messages, recap docs). Scan before push.
 
 | Pattern | Regex | Notes |

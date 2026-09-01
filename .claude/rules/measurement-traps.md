@@ -178,6 +178,44 @@ geometry was wrong.
 checking the local thing in front of you proves nothing about the rest.** Ask
 what the blast radius of the change actually was, then enumerate that set.
 
+### 11. A pre-written label asserts the result before the command runs
+
+```
+WRONG   echo "(empty above = no reservation)"; git ls-remote --tags origin doc-2422
+RIGHT   run it, READ the output, then write the sentence
+CHECK   does my label survive the opposite result?
+```
+
+Hit **three times in one session** on 2026-09-01, by the same agent, inside the
+session that was writing the research doc about this exact failure class.
+
+| The label written in advance | What the command actually returned |
+|---|---|
+| `"(empty above = no reservation, which is the false positive)"` | a real tag, `refs/tags/doc-2422` - the reservation existed |
+| `"open-PR hits for 2443: none above = none"` | correct, but the paired branch grep returned **2**, one of them a commit SHA containing `2443` |
+| `"(no output = not ignored, which is why it keeps appearing)"` | `__pycache__/` was already ignored, at `.gitignore:17` |
+
+Each one shipped a conclusion into a durable artifact - a committed vault note in
+the first case, which then needed two corrections.
+
+**Why this is its own trap and not just carelessness.** The label is written at
+the moment you *choose* the command, when you already have a hypothesis and the
+output does not exist yet. It reads like part of the measurement and it is
+actually a prediction. Worse, it is printed *adjacent to* the real output, so a
+later reader - or a later you - sees an assertion and a result side by side and
+assumes the first describes the second.
+
+This is the mechanism behind trap 2 (a detector never run against a known-good
+input) pushed one step earlier: there, the detector was untested; here, the
+verdict was written before any detector ran at all.
+
+**The rule.** Never write `(empty means X)` or `(no output = Y)` next to a
+command whose output you have not seen. If a label is genuinely useful, write it
+*after* reading the result, when it is a description rather than a forecast. And
+if you catch yourself writing one, that is the signal you already believe the
+answer - which is exactly when `state-claims.md` says to open the file that would
+prove you wrong.
+
 ## The gate
 
 Before reporting any measured claim, ask **which of these seven shapes am I in**:
@@ -191,8 +229,9 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 7. Did I assert on content, or on a status code?
 8. Is a quieting flag sitting between me and the measurement?
 9. Was the change global while I only checked the local case?
+10. Did I write the conclusion before the command ran?
 
-Answering all nine costs seconds. Six of the eight wrong claims in the
+Answering all ten costs seconds. Six of the eight wrong claims in the
 2026-08-22/23 session would have died at question 1, 2, or 3.
 
 ## Guards

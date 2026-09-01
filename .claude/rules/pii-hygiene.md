@@ -64,7 +64,7 @@ If a query result ends up under the repo path by accident, it cannot be staged. 
 > third-party contact data.** Everything else in this rule stands unchanged.
 >
 > **What happened.** Two vault files - a ZAOstock sponsor pipeline and a roster -
-> carried 23 phone numbers and 20 third-party email addresses for named people at
+> carried 23 phone numbers and 17 unique third-party email addresses for named people at
 > a chamber of commerce, a brewery, a bank and an insurer. A lane held them
 > uncommitted rather than commit them, citing this rule. Another lane had written
 > them believing the opposite, and said so in its own note: *"ZAOOS is PUBLIC.

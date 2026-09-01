@@ -178,6 +178,79 @@ geometry was wrong.
 checking the local thing in front of you proves nothing about the rest.** Ask
 what the blast radius of the change actually was, then enumerate that set.
 
+### 11. A pre-written label asserts the result before the command runs
+
+```
+WRONG   echo "(empty above = no reservation)"; git ls-remote --tags origin doc-2422
+RIGHT   run it, READ the output, then write the sentence
+CHECK   does my label survive the opposite result?
+```
+
+Hit **three times in one session** on 2026-09-01, by the same agent, inside the
+session that was writing the research doc about this exact failure class.
+
+| The label written in advance | What the command actually returned |
+|---|---|
+| `"(empty above = no reservation, which is the false positive)"` | a real tag, `refs/tags/doc-2422` - the reservation existed |
+| `"open-PR hits for 2443: none above = none"` | correct, but the paired branch grep returned **2**, one of them a commit SHA containing `2443` |
+| `"(no output = not ignored, which is why it keeps appearing)"` | `__pycache__/` was already ignored, at `.gitignore:17` |
+
+Each one shipped a conclusion into a durable artifact - a committed vault note in
+the first case, which then needed two corrections.
+
+**Why this is its own trap and not just carelessness.** The label is written at
+the moment you *choose* the command, when you already have a hypothesis and the
+output does not exist yet. It reads like part of the measurement and it is
+actually a prediction. Worse, it is printed *adjacent to* the real output, so a
+later reader - or a later you - sees an assertion and a result side by side and
+assumes the first describes the second.
+
+This is the mechanism behind trap 2 (a detector never run against a known-good
+input) pushed one step earlier: there, the detector was untested; here, the
+verdict was written before any detector ran at all.
+
+**The rule.** Never write `(empty means X)` or `(no output = Y)` next to a
+command whose output you have not seen. If a label is genuinely useful, write it
+*after* reading the result, when it is a description rather than a forecast. And
+if you catch yourself writing one, that is the signal you already believe the
+answer - which is exactly when `state-claims.md` says to open the file that would
+prove you wrong.
+
+### 12. A verification that creates an artifact forces a cleanup, and the cleanup is where the damage happens
+
+```
+WRONG   python3 -m py_compile <file>     # writes __pycache__/ as a side effect
+RIGHT   python3 -c "import ast,sys; ast.parse(open(sys.argv[1]).read())" <file>
+ALSO    PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile <file>
+```
+
+Found and self-reported by the obsidian lane, 2026-09-01, after the supervisor's
+watcher flagged an `rm -rf bin/__pycache__` in a worktree.
+
+Nothing was lost - the live tree was never in scope, and `__pycache__/` turned
+out to be gitignored at `.gitignore:17` with `git log --all` showing it was never
+tracked, so the cleanup was solving a problem that did not exist. The useful part
+is the sequence one step back:
+
+**Reach for a verification that produces an artifact, then reach for a banned
+shape to clean up the artifact.**
+
+The syntax check was correct and the instinct to leave the tree clean was
+correct. The delete was the only wrong step, and it existed solely because the
+check had written something. A verification that leaves no trace never generates
+that second decision.
+
+This generalises past Python. Anything that builds, caches, compiles, or
+snapshots as a side effect of *checking* - a test run that writes fixtures, a
+linter with a cache directory, a build used only to prove the build works -
+creates the same pressure. Prefer the read-only form of a check where one exists,
+and where it does not, direct the artifact somewhere disposable rather than
+cleaning it out of a repo afterwards.
+
+The rule it collides with is `no-rm-rf.md`, whose whole point is that the SHAPE is
+banned so nobody has to adjudicate whether a particular directory was safe. The
+lane's own words on that: *"a directory of bytecode is still a directory."*
+
 ## The gate
 
 Before reporting any measured claim, ask **which of these seven shapes am I in**:
@@ -191,8 +264,10 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 7. Did I assert on content, or on a status code?
 8. Is a quieting flag sitting between me and the measurement?
 9. Was the change global while I only checked the local case?
+10. Did I write the conclusion before the command ran?
+11. Did my check leave anything behind that I now want to delete?
 
-Answering all nine costs seconds. Six of the eight wrong claims in the
+Answering all eleven costs seconds. Six of the eight wrong claims in the
 2026-08-22/23 session would have died at question 1, 2, or 3.
 
 ## Guards

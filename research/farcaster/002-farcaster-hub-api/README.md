@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-09-01
 related-docs: [017-neynar-onboarding, 173-farcaster-miniapps-integration]
 original-query: "What is the Farcaster Hub API and how do we connect to it for data reads and writes? (reconstructed)"
 tier: STANDARD
@@ -120,6 +120,27 @@ Other key gRPC calls: `getCastsByFid`, `getLinksByFid`, `getReactionsByFid`, `ge
 3. **Writes:** Never call submitMessage directly. Writes are Neynar managed signers only (see doc 017). ZAO SDK in `src/lib/neynar/managedSigner.ts` wraps `/v2/farcaster/signer` and `/v2/farcaster/cast` POST.
 
 4. **Self-hosted Future:** Shuttle (v0.9.6) available if ZAO runs a custom PostgreSQL-indexed feed. Currently unused.
+
+## Updated 2026-09-01
+
+Three material changes since last validation (2026-05-21):
+
+**1. @farcaster/hub-nodejs@0.17.0 — FIP-272 gasless signers (July 29, 2026)**
+
+The SDK now ships a native `gaslessKeys` module implementing FIP-272 (gasless key add/remove via EIP-712). New API surface:
+- `signKeyAdd`, `signKeyRemove`, `signGaslessKeyRequest`, `getGaslessSignedKeyRequestMetadata` on `Eip712Signer`
+- Builders: `makeKeyAddBody`, `makeKeyRemoveBody`, `makeKeyAdd`, `makeKeyRemove`, `makeKeyRemoveBodySelfRevoke`
+- Validators: `validateKeyAddBody`, `validateKeyRemoveBody`
+- **Breaking:** Any custom class extending `Eip712Signer` outside the repo must implement four new abstract methods.
+- ZAO Impact: Decision 4 (managed signers via Neynar) remains correct — but the SDK now supports gasless signer ops natively if ZAO ever needs lower-level control. Source: https://github.com/farcasterxyz/hub-monorepo/releases/tag/%40farcaster%2Fhub-nodejs%400.17.0 [FULL]
+
+**2. @farcaster/shuttle@1.0.x — major version (May 15 → 1.0.3 as of July 29, 2026)**
+
+Shuttle graduated from 0.9.6 (doc's reference point) to 1.0.0, adding `OnChainEventReconciliation` and `UsernameProofReconciliation` classes, typed `onchain_events` table exports, and optional `onDbMessage` callbacks. 1.0.2 fixed Postgres NUL / unpaired UTF-16 surrogates in message body JSON. The "Self-hosted Future" section should now reference v1.0.3. Source: https://github.com/farcasterxyz/hub-monorepo/releases [FULL]
+
+**3. Protocol governance risk — Neynar seeking a new operator (as of August 2026)**
+
+Neynar acquired Farcaster from Merkle in January 2026 (Merkle returned $180M to investors). By August 2026, Neynar began a public search for a new operator as protocol revenue fell from ~$35M Q1 2026 to ~$377K. No operator named, no deadline set as of 2026-08-18. The ZAO Application (section below) relies on Neynar v2 REST API and Neynar managed signers as the primary read/write path — this is operational risk if Neynar changes its developer API or pricing as part of the handoff. Track Neynar's operator announcement. Source: search results from coinspectator.com/cryptonews/2026/08/18/farcaster-seeks-new-operator-seven-months-after-sale/ [PARTIAL — domain blocked for full fetch]
 
 ## Sources
 

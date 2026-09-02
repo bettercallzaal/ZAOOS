@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-09-02 | Zaal, Iman and Jose - the content calendar and five acts confirmed verbally | ZAOstock | Zaal, Iman, Jose | [2464](2464-zaal-iman-jose-content-calendar-sep2/) | 12 |
 | 2026-08-31 | Zaal x Jose - marketing, audience and the production gaps | ZAOstock | Zaal, Jose | [2455](2455-zaal-jose-marketing-logistics-aug31/) | 8 |
 | 2026-08-31 | Dcoop x Zaal - AV, travel and the artist rider | ZAOstock | Zaal, Dcoop, Matt | [2453](2453-dcoop-zaal-av-rider-aug31/) | 7 |
 | 2026-08-31 | ZAOstock Standup | ZAOstock | Zaal, Fellenz, Dcoop | [2452](2452-zaostock-standup-aug31/) | 12 |

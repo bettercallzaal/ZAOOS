@@ -180,6 +180,7 @@ import { ackPush } from './proactive';
 import { touchLastSeen } from './events';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 import { installSendBudget, runWithSendClass } from './send-budget';
+import { stripMarkupInPlace } from '../agent-markup';
 import {
   fetchPending,
   removeFromQueue,
@@ -359,6 +360,22 @@ const zaalId = Number(zaalIdRaw);
 const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 
 const bot = new Bot(token);
+
+// Agent-internal markup never reaches a human. ZAOOS#3383 fixed this on the
+// ZAOstock bot only, and ZOE is the one that most needs it: `result.reply` is
+// the model's text verbatim whenever the turn carries no ops fence
+// (concierge.ts splitReplyAndOps), and which model answers is an env var -
+// OPENROUTER_MODEL / OPENROUTER_HIGH_MODEL, models/router.ts - so a reasoning
+// model that wraps its output in <think> can be selected without a code change.
+// Nothing errors when that leaks: Telegram accepts the send and returns 200.
+// Installed at the transformer, below the send budget, so ctx.reply and every
+// raw api call are both covered.
+bot.api.config.use(async (prev, method, payload) => {
+  if (stripMarkupInPlace(method, payload as Record<string, unknown>) === 'blocked') {
+    return { ok: true, result: true } as never;
+  }
+  return prev(method, payload);
+});
 
 // THE SEND BUDGET. Installed before anything registers a handler or a cron, so
 // every outbound Telegram send - routed, raw, or added tomorrow - passes the

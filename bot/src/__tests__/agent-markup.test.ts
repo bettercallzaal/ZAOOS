@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   stripAgentMarkup,
   stripAgentMarkupSafe,
   containsAgentMarkup,
+  stripMarkupInPlace,
   AgentMarkupOnlyError,
 } from '../agent-markup';
 
@@ -87,5 +88,71 @@ describe('when the body is ENTIRELY scratchpad', () => {
   it('the safe variant returns null instead of throwing', () => {
     expect(stripAgentMarkupSafe(allMarkup)).toBeNull();
     expect(stripAgentMarkupSafe(THE_ACTUAL_LEAK)).toBe('Got it, the poster is on the confirmed list.');
+  });
+});
+
+// The egress guard every bot installs. Pins the behaviour the transformer
+// depends on, so a bot wiring it in gets the same answers as the one that
+// already had it.
+describe('stripMarkupInPlace', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('cleans the text field of a sendMessage payload in place', () => {
+    const payload: Record<string, unknown> = { chat_id: 42, text: THE_ACTUAL_LEAK };
+    expect(stripMarkupInPlace('sendMessage', payload)).toBe('cleaned');
+    expect(payload.text).toBe('Got it, the poster is on the confirmed list.');
+  });
+
+  it('cleans the caption field on the media methods', () => {
+    for (const method of ['sendPhoto', 'sendDocument', 'sendVideo', 'sendAnimation']) {
+      const payload: Record<string, unknown> = { chat_id: 1, caption: THE_ACTUAL_LEAK };
+      expect(stripMarkupInPlace(method, payload)).toBe('cleaned');
+      expect(payload.caption).toBe('Got it, the poster is on the confirmed list.');
+    }
+  });
+
+  it('covers editMessageText, which rewrites a body a human is already reading', () => {
+    const payload: Record<string, unknown> = { chat_id: 1, text: THE_ACTUAL_LEAK };
+    expect(stripMarkupInPlace('editMessageText', payload)).toBe('cleaned');
+    expect(payload.text).toBe('Got it, the poster is on the confirmed list.');
+  });
+
+  it('blocks a body that was entirely scratchpad, and leaves it unsent', () => {
+    const payload: Record<string, unknown> = { chat_id: 7, text: '<think>only reasoning</think>' };
+    expect(stripMarkupInPlace('sendMessage', payload)).toBe('blocked');
+    // Unchanged: the caller must drop the send, never send a mangled body.
+    expect(payload.text).toBe('<think>only reasoning</think>');
+  });
+
+  it('passes clean text through untouched', () => {
+    const payload: Record<string, unknown> = { chat_id: 1, text: 'Poster is confirmed.' };
+    expect(stripMarkupInPlace('sendMessage', payload)).toBe('pass');
+    expect(payload.text).toBe('Poster is confirmed.');
+  });
+
+  it('ignores methods that carry no human-visible body', () => {
+    const payload: Record<string, unknown> = { chat_id: 1, text: THE_ACTUAL_LEAK };
+    expect(stripMarkupInPlace('answerCallbackQuery', payload)).toBe('pass');
+    expect(payload.text).toBe(THE_ACTUAL_LEAK);
+  });
+
+  it('ignores a non-string body rather than throwing on it', () => {
+    const payload: Record<string, unknown> = { chat_id: 1, text: undefined };
+    expect(stripMarkupInPlace('sendMessage', payload)).toBe('pass');
+  });
+
+  it('says what it did, because a silently reshaped send is the failure mode', () => {
+    const payload: Record<string, unknown> = { chat_id: 42, text: THE_ACTUAL_LEAK };
+    stripMarkupInPlace('sendMessage', payload);
+    expect(console.error).toHaveBeenCalledWith(
+      '[agent-markup] stripped agent markup from an outbound message',
+      { method: 'sendMessage', chat_id: 42 },
+    );
   });
 });

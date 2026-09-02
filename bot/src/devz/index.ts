@@ -20,6 +20,7 @@ loadEnv();
 
 import { Bot, Context } from 'grammy';
 import { dispatchHermesRun, type HermesNarrator } from '../hermes/runner';
+import { stripMarkupInPlace } from '../agent-markup';
 import { listOpenRuns, getRun } from '../hermes/db';
 import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
@@ -87,6 +88,20 @@ function buildBotNameFilter(holder: UsernameHolder) {
 
 const devz = new Bot<Context>(devzToken);
 const hermes = new Bot<Context>(hermesToken);
+
+// Agent-internal markup never reaches a human (ZAOOS#3383). Both narrators put
+// raw model output in the message body - onCriticDone sends the critic's
+// `feedback` string, onEscalated its last verdict - so a reasoning model that
+// wraps its answer in <think> would post the scratchpad into the ZAO Devz chat
+// and nothing would error.
+for (const b of [devz, hermes]) {
+  b.api.config.use(async (prev, method, payload) => {
+    if (stripMarkupInPlace(method, payload as Record<string, unknown>) === 'blocked') {
+      return { ok: true, result: true } as never;
+    }
+    return prev(method, payload);
+  });
+}
 
 // Wire the filter middleware FIRST so it runs before any command handlers
 // that get registered below. Holders are populated in boot() via getMe().

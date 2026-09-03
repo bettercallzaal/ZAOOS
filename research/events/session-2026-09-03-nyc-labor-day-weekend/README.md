@@ -1,170 +1,216 @@
-# NYC — NFT NYC tail + Labor Day Weekend
-**Thu 2026-09-03 → Mon 2026-09-07** · live working doc, updated as facts land
+# NYC — NFT NYC tail
+**Thu 2026-09-03 (land ~8pm) → Sun 2026-09-06 (depart ~noon)**
+Mode: **max events** · live working doc
 
 ---
 
-## ⚠️ Read this first — the frame changed
+## Base changes mid-trip — this is the defining constraint
 
-**NFT.NYC 2026 ran Tue Sep 1 – Thu Sep 3, at the Edison Ballroom (240 W 47th St,
-Times Square).** The main conference **ends tonight**, roughly when you land.
-
-So this weekend is **not** the conference. It's the side-event / afterparty tail
-plus Labor Day weekend. Which is fine — arguably better, since the side events are
-where the actual meetings happen. But if you were expecting sessions and a badge
-floor, that part is over.
-
-> Source: [Eventbrite listing](https://www.eventbrite.com/e/nftnyc-2026-tickets-1985747187292)
-> ("Tuesday, September 1–Thursday, September 3 • 6 PM–6 PM") and
-> [nft.nyc](https://www.nft.nyc/) via search. **PARTIAL** — `nft.nyc` itself is
-> blocked from this container, so this is from search results, not the official page.
-> Worth a 10-second confirm on your phone before you rely on it.
-
-**Also: Mon 2026-09-07 is Labor Day** (first Monday of September — arithmetic, not a
-source). Historically that means West Indian Day Parade + J'Ouvert in Crown Heights
-Monday morning, and Electric Zoo on Randall's Island. **UNVERIFIED for 2026** — but if
-either is on, Brooklyn transit Monday AM is a mess and you need to know before you
-plan a Monday morning anything.
-
----
-
-## Trip facts — ALL UNKNOWN, and these block the actual schedule
-
-| | |
-|---|---|
-| Arrive tonight | ❓ what time, and by what (train/plane changes the evening) |
-| Based / staying | ❓ **this is the big one** — every routing decision hangs off it |
-| Depart | ❓ Sunday night? Monday? Tuesday? |
-| Optimize for | ❓ max events / protect work time / people-first / loose |
-
----
-
-## The three luma links — UNREAD
-
-I could not open any of these. `luma.com`, `lu.ma`, and `x.com` are all blocked by
-this environment's egress proxy. Not a transient failure — a policy denial, retried
-via three separate routes.
-
-| Link | Person (inferred) | What / when / where |
+| Night | Based | Nearest transit |
 |---|---|---|
-| [luma.com/qa90cpzf](https://luma.com/qa90cpzf) | Shanel | **UNKNOWN — need title, date, start/end, venue** |
-| [luma.com/jrx3a8e4](https://luma.com/jrx3a8e4) | Make | **UNKNOWN** |
-| [luma.com/vvqq4lkn](https://luma.com/vvqq4lkn) | Christiano | **UNKNOWN** |
-| [x.com/art\_\_nyc post](https://x.com/art__nyc/status/2094814511874072977) | Art NYC | **UNKNOWN** |
+| **Thu 09-03** | Williamsburg, Brooklyn (waterfront) | Bedford Av (L) · North Williamsburg ferry |
+| **Fri 09-04** | **Jersey City** | PATH |
+| **Sat 09-05** | **Jersey City** | PATH |
+| Sun 09-06 | departing ~noon | — |
 
-> ⚠️ The person↔link pairing above is **inferred from the order you typed them**
-> (name, then link). I have not verified it and it could be off by one. Confirm
-> before I build a schedule on it.
-
-**Fastest unblock:** paste the title + date + time + venue for each. Or screenshot
-the luma pages. Either takes you under a minute and unblocks the whole itinerary.
+You are not in one city this weekend. You're in three transit regimes, and each
+one makes a *different* set of events cheap.
 
 ---
 
-## People to meet — 9
+## The shape (this holds no matter what the luma links turn out to be)
 
-Nobody here has a time or place attached yet. That's the real gap: a name with no
-event is a name that doesn't happen.
+**Thursday = your Brooklyn night. Use it or lose it.**
+You're sleeping in Williamsburg exactly once. Anything in Williamsburg, Bushwick,
+Greenpoint or DUMBO is nearly free tonight and expensive every other night. The LES
+and East Village are also cheap — one or two stops on the L from Bedford Av.
 
-| Person | Event attached | Status |
+**Friday + Saturday = Manhattan-biased, PATH-anchored.**
+From Jersey City, a Manhattan event near a PATH station is a 15–25 min ride home.
+A **Brooklyn** event on Friday or Saturday night is subway-to-Manhattan *then* PATH
+— realistically 75–90 minutes at 1am. That single fact should decide your Fri/Sat
+event list.
+
+**Cheap-to-get-home Manhattan zones from Jersey City** — the PATH stops are
+WTC, Christopher St, 9th St, 14th St, 23rd St, 33rd St. So:
+- ✅ FiDi, Tribeca, SoHo, West Village, Chelsea, Flatiron, Herald Sq
+- ⚠️ Midtown East, UES, UWS — walkable-ish to 33rd but adds 20–30 min
+- ❌ Brooklyn after midnight — costs you an hour you don't have
+
+**Saturday night has a soft curfew.** Noon Sunday departure means up by ~8–9am.
+Saturday is your last real night but it is not an all-nighter unless you're
+sacrificing the morning.
+
+---
+
+## ⚠️ The Friday luggage move — the thing that quietly eats a day
+
+Friday morning you have to get a bag from Williamsburg to Jersey City. That's
+roughly **55–75 minutes each way** (Bedford Av L → 14th St → PATH), and if you
+don't plan it, it lands in the middle of your best event window.
+
+**Recommendation: do it first thing Friday, before anything else.** Drop the bag in
+JC, then come back into Manhattan unencumbered. It costs you Friday *morning* —
+the cheapest hours of the weekend, since side events skew afternoon and evening.
+
+The alternative — carrying the bag into Manhattan and storing it — saves one leg
+but has you hauling luggage through daytime events. Worse trade for a max-events
+weekend.
+
+> Transit times above are estimates, not measured. Confirm in Maps on the day —
+> weekend track work is real and PATH weekend patterns changed in 2026.
+
+---
+
+## PATH reality check (Fri/Sat nights)
+
+2026 was a genuinely good year for this: **all PATH lines now run 7 days a week**,
+and Hoboken–WTC weekend service came back in May 2026 for the first time since 2001.
+
+The number that matters to you: **late Friday night, trains run every ~20 min
+between 11:30pm and 2am** (improved from every 40). After 1am generally, expect
+**20–30 minute gaps**.
+
+**So: missing a train costs 20–30 minutes.** Check the schedule before you leave a
+party, not on the platform. On a max-events weekend that's the difference between
+making one more room and standing under Sixth Ave.
+
+> Sources: [Port Authority weekend schedules](https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html) ·
+> [PATH 2026 upgrades](https://www.hobokengirl.com/path-upgrades-hoboken-jersey-city-2026/) ·
+> [CBS on service improvements](https://www.cbsnews.com/newyork/news/path-fare-hikes-service-improvements/).
+> **PARTIAL** — from search, official PATH site not fetchable here. Confirm live.
+
+---
+
+## The conference is over before you land
+
+**NFT.NYC 2026 ran Tue Sep 1 – Thu Sep 3** at the Edison Ballroom, Times Square.
+It ends roughly as you touch down. Your whole weekend is the **satellite/side-event
+tail** — which for meeting people is the better half anyway.
+
+Two official side-event listings exist and **both are blocked from this container**:
+- [luma.com/nft-nyc/map](https://luma.com/nft-nyc/map) — the official NFT.NYC luma calendar
+- [nft.nyc/events](https://www.nft.nyc/events) — Satellite Events page
+
+**Open these on your phone.** The luma map view is the single best tool for what
+you're doing — it shows side events *by location*, which is exactly the filter that
+matters given the Jersey City problem.
+
+> Sources: [Eventbrite listing](https://www.eventbrite.com/e/nftnyc-2026-tickets-1985747187292) ·
+> [nft.nyc](https://www.nft.nyc/). **PARTIAL** — via search only.
+
+---
+
+## Day plan
+
+### Thu 09-03 — land ~8pm · Williamsburg
+Realistically at the apartment ~9:15–9:45pm depending on airport, out the door by
+10pm at the earliest.
+
+- **One event, max.** Brooklyn or LES only. Anything in Midtown tonight is a waste
+  of your only Brooklyn night.
+- _Awaiting: which of the luma events (if any) is tonight._
+
+### Fri 09-04 — Jersey City base
+- **AM:** bag move Williamsburg → Jersey City. Non-negotiable, do it early.
+- **PM/EVE:** Manhattan, PATH-anchored. Your biggest day.
+- _Awaiting luma details._
+
+### Sat 09-05 — Jersey City base
+- Full day. Manhattan-biased.
+- **Soft curfew** — noon departure tomorrow.
+- _Awaiting luma details._
+
+### Sun 09-06 — depart ~noon
+- Buffer for the JC → airport leg. **Which airport?** Newark is ~25–35 min from JC;
+  JFK is 60–90 and would mean leaving JC around 9am.
+
+---
+
+## Events — UNREAD, blocked
+
+`luma.com`, `lu.ma`, `x.com`, `nft.nyc` and `forkoff.xyz` are all denied by this
+environment's egress proxy. Tried four routes. Not guessing at the contents.
+
+| Link | Person (inferred) | Need |
+|---|---|---|
+| [luma.com/qa90cpzf](https://luma.com/qa90cpzf) | Shanel | title · date · time · **venue/neighborhood** |
+| [luma.com/jrx3a8e4](https://luma.com/jrx3a8e4) | Make | same |
+| [luma.com/vvqq4lkn](https://luma.com/vvqq4lkn) | Christiano | same |
+| [Art NYC post](https://x.com/art__nyc/status/2094814511874072977) | — | same |
+
+> ⚠️ Person↔link pairing is **inferred from the order you typed them**. Unverified,
+> could be off by one.
+
+**Neighborhood is the field I most need.** With a neighborhood I can tell you
+whether an event is cheap or expensive on a given night, even without the exact time.
+
+---
+
+## People — 9
+
+| Person | Event | Status |
 |---|---|---|
 | McFly | — | no plan |
 | Stu Kwan | — | no plan |
 | Beamer | — | no plan |
 | Gabe Covington | — | no plan |
 | Jen "one love" | — | no plan |
-| Shanel | luma/qa90cpzf? | link unread |
+| Shanel | qa90cpzf? | link unread |
 | Lui | — | no plan |
-| Make | luma/jrx3a8e4? | link unread |
-| Christiano | luma/vvqq4lkn? | link unread |
+| Make | jrx3a8e4? | link unread |
+| Christiano | vvqq4lkn? | link unread |
 
-**The question that matters for each:** is this someone you'll *bump into* at an
-event you're already going to, or someone you need to *carve out a slot for*? Those
-are completely different scheduling problems. Six of these nine currently have
-neither.
+Six of nine have no time and no place. On a max-events weekend the risk isn't
+missing events — it's being in nine rooms and catching none of these people.
 
----
-
-## The two categories (the whole system)
-
-- **ANCHORS** — time-fixed, can't move, real loss to miss. Everything routes around these.
-- **FLOATERS** — worth doing, time is yours. Fill gaps, preferably near the anchor
-  on either side.
-
-The failure this prevents: treating a floater like an anchor, then zigzagging
-crosstown and losing 90 minutes you needed.
+**For each: bump-into, or carve-out?** Different scheduling problems entirely.
 
 ---
 
-## Day plan
+## Recurring constraints
 
-### Thu 09-03 — arrival
-_Blocked on arrival time. NFT.NYC closing-night parties are the likely play if you
-land early enough._
-
-### Fri 09-04
-_Blocked on the luma links._
-
-### Sat 09-05
-_Blocked._
-
-### Sun 09-06
-_Blocked._
-
-### Mon 09-07 — Labor Day
-_Blocked. Check parade/transit before planning anything in Brooklyn before 2pm._
-
----
-
-## Recurring constraints (these shape the day, not just fill it)
-
-- **Prayer** — you're bringing prayer stuff, so prayer times are fixed blocks that
-  events route around, not the reverse. Worth knowing which venues/neighborhoods have
-  a quiet option, especially for Maghrib, which lands right in the middle of evening
-  events. Tell me if you want these placed as real blocks in the schedule.
-- **Charge** — all-day event days kill a phone by 3pm. See packing.
+- **Prayer** — fixed blocks that events route around. Maghrib lands mid-evening,
+  right in the event window. Say the word and I'll place these as real blocks.
+- **Charge** — all-day event days kill a phone by 3pm.
 
 ---
 
 ## Packing
 
-**Your list:**
+**Yours:**
 - [ ] Phone stand
 - [ ] Jersey
 - [ ] Charger
 - [ ] Brush
 - [ ] Prayer stuff
-- [ ] **Shirt for Sam** ← this is a delivery to a person, not packing
+- [ ] **Shirt for Sam** ← a delivery, not packing
 
-> "Shirt for Sam" is the only item on this list that fails if you forget it *and*
-> someone else notices. Sam isn't on the people list above — is Sam in NYC this
-> weekend, and does a handoff need a time and place?
+> Sam isn't on the people list. Is Sam in NYC this weekend, and does the handoff
+> need a time and place? Right now this is the item most likely to come home with you.
 
-**High-regret additions (my suggestions, cut freely):**
-- [ ] **Battery pack** — a wall charger is useless at a 6-hour event. This is the
-      #1 miss for conference weekends.
-- [ ] **A way to exchange contact fast** — you're meeting 9 people. Your ICM box
-      (`zao-assistant`) as a QR on your lock screen beats typing handles into
-      Telegram nine times in loud rooms.
-- [ ] Shoes you can do 15k steps in.
+**High-regret additions:**
+- [ ] **Battery pack** — a wall charger is useless at a 6-hour event.
+- [ ] **Fast contact exchange** — 9 people, loud rooms. Your `zao-assistant` ICM box
+      as a QR on your lock screen beats typing handles nine times.
+- [ ] Shoes for 15k steps.
+- [ ] **Bag you can move in one leg** — you're relocating Friday morning.
 
 ---
 
 ## Drop list
 
-What gets cut first when running late — decided now, calmly, not on a subway
-platform at 9pm.
-
-1. _TBD once there's a schedule to cut from_
+1. **Any Brooklyn event Fri or Sat night** — first cut. Costs ~an hour of PATH.
+2. _TBD once events land._
 
 ---
 
 ## Open questions
 
-- [ ] Arrival time + mode tonight
-- [ ] Where you're staying (neighborhood)
-- [ ] Departure day
-- [ ] The 3 luma events: title / date / time / venue
-- [ ] Is the person↔link pairing right?
-- [ ] Which of the 9 people are "bump into" vs "carve out a slot"
-- [ ] Is Sam in NYC? Does the shirt handoff need a slot?
-- [ ] Should prayer times be placed as hard blocks?
+- [ ] **The 3 luma events + Art NYC: neighborhood at minimum**
+- [ ] Person↔link pairing correct?
+- [ ] Which airport Sunday, and is "noon" the flight or when you leave JC?
+- [ ] Bump-into vs carve-out for each of the 9
+- [ ] Is Sam in NYC? Shirt handoff slot?
+- [ ] Prayer times as hard blocks?
+- [ ] Thu night: is there anything in Brooklyn/LES, or is tonight a rest night?

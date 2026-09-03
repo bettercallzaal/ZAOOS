@@ -112,9 +112,31 @@ Realistically at the apartment ~9:15–9:45pm depending on airport, out the door
 - _Awaiting: which of the luma events (if any) is tonight._
 
 ### Fri 09-04 — Jersey City base
-- **AM:** bag move Williamsburg → Jersey City. Non-negotiable, do it early.
-- **PM/EVE:** Manhattan, PATH-anchored. Your biggest day.
+
+**🔒 ANCHOR — Solana offices with Gabe Covington. Early afternoon, exact time TBD by Gabe.**
+Confirmed over iMessage 2026-09-03 ~6:39pm. Gabe: *"Tomorrow is the only day. Weekend is
+closed."* and *"Tomorrow may be the early afternoon. Heading to events tonight."* Zaal:
+*"you tell me when I'll be there"* and *"I'll be in by Williamsburg bridge."*
+
+This is your **only hard Friday anchor and the only day it can happen.** It is also
+**time-unconfirmed and controlled by someone else**, which makes it the riskiest kind of
+anchor: it can move, and everything else has to stay flexible around it.
+
+- ⚠️ **It collides with the bag move.** "In by Williamsburg bridge" means coming from
+  Brooklyn. If you drop the bag in Jersey City first, you cross the river twice before
+  the meeting. Options: (a) take the bag to Solana and go to JC after, (b) drop in JC
+  early and come back, (c) leave the bag in Williamsburg and collect it later.
+  **Decide before you sleep tonight, not tomorrow morning.**
+- ⚠️ **Candy.** Zaal: *"Ill bring candy."* Not on the packing list. It is now a
+  commitment to a person.
+- **Gabe was 1 of the 9 with "no plan." He is now solved** — via iMessage, not any tool.
+
+- **EVE:** Manhattan, PATH-anchored, after Solana.
 - _Awaiting luma details._
+
+> Also from Gabe: a luma link titled **"Team1 x Taco Tech Tuesday."** You depart Sunday
+> noon. If that event is literally on Tuesday 09-08 you cannot attend it — confirm the
+> date before treating it as an option.
 
 ### Sat 09-05 — Jersey City base
 - Full day. Manhattan-biased.

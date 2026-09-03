@@ -1,0 +1,52 @@
+# ICM: ZAO NYC
+
+ZAO NYC is the New York City node of The ZAO - the decentralized impact network that returns profit margin, data, and IP rights to artists. It is not a new expansion. New York is where The ZAO's origin story begins, where it produced its first festival, and where it has returned every year since. Founded by Zaal Panthaki (BetterCallZaal).
+
+## What it is
+A city chapter, not a separate organization. Same network, same Respect, same Fractal governance - a city node does not fork the DAO. What NYC adds is the part a feed cannot do: rooms, introductions that stick, and artists meeting each other in person. The ZAO's priority stack is unchanged - music first, community second, technology third.
+
+## The origin is a New York musician
+The ZAO traces to JANGO UU (Django, `jangouuforever`), a New York City musician Zaal met in college in 2018/19. Zaal's own record of it: working with him "is what shifted Zaal toward thinking entrepreneurially about how to support independent artists. The seed of The ZAO origin story." And in May 2026: "been thinking about how every project i build now traces back to him."
+
+That makes NYC the first place, not a new one.
+
+## The NYC track record
+- **2018/19** - Zaal meets JANGO UU in New York. The seed of the origin story.
+- **2024-04-03 - ZAO-PALOOZA at NFT NYC.** 12 artists, organized in a 6-week lead time by a 6-person volunteer team, broke even financially. The ZAO's **first major IRL proof** that it could produce a web3-native live music event. JANGO UU performed and was featured on an official ZAO Card (Manifold).
+- **2025 - "Lil WaveWarZ Takeover" at NFT NYC.** An IRL battle, and the third consecutive IRL proof point - evidence WaveWarZ could export its battle format to a live room.
+- **2026-09 - NFT NYC weekend.** A third year at the same conference, this time building the chapter itself.
+
+New York is also the first of the four cities The ZAO has produced festivals in: New York (NFT NYC), Miami (Art Basel), Colorado (ETH Denver), and Maine (ZAOstock, October 2026).
+
+## The people are already here
+ZAO NYC does not start from zero. New York already holds, per the member roster:
+- **Candy (Samantha Denton-Kinney)** - ZAO Co-Founder and WaveWarZ Co-Founder, ZID 2. Based in New York, NY.
+- **Ohnahji University (OhnahjiU / ONJU)** - New York, NY.
+- **JANGO UU** - the origin figure. Inactive in ZAO work, actively making music.
+
+**Leadership (confirmed 2026-09-03):** Candy co-leads ZAO NYC with Zaal and is the local anchor in New York; Zaal sets direction from Ellsworth, Maine. Two ZAO co-founders, one of whom lives in the city.
+
+A ZAO co-founder already lives in the city. That is the difference between founding a chapter and organizing one.
+
+> Correction, 2026-09-03: earlier drafts of this box listed Tyler Stambaugh and Magnetiq's Proof of Meet as a live NYC asset, on the strength of the ETH Boulder collaboration in February 2026. **Tyler has since left Magnetiq and it is no longer active; ZAO is not using it for the foreseeable future.** Do not cite Magnetiq as a current ZAO surface.
+
+## What is true today (2026-09-03)
+Stated plainly so nothing here overclaims: ZAO NYC has **leadership and history, and does not yet have a roster, a recurring event, or a venue.** No members have been convened under the name and nothing recurring has happened yet. The history is real, the people are real, and the chapter itself is being formed in September 2026 out of conversations at NFT NYC week.
+
+## First product
+IRL event coordination. The problem is unglamorous and real: event links are opaque, the people worth meeting are not attached to the events where you would meet them, and where you sleep changes which events are reachable. Prototyped in the ZAO OS lab, for one person first, then a chapter.
+
+## How it graduates
+Incubated in ZAO OS (the lab and monorepo). It earns its own repo, database, and domain when there are members to serve - the same graduation rule every ZAO product follows.
+
+## Find it
+- thezao.xyz and zaoos.com
+- Farcaster: the /zao channel
+- ZAO-PALOOZA artifact: the JANGO UU ZAO Card on Manifold
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- ZAO Festivals (zao-festivals)
+- WaveWarZ (wavewarz)
+- ZAO Assistant (zao-assistant)

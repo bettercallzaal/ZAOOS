@@ -755,6 +755,9 @@ Latest release: **TSRCV2 EP, December 31, 2025** (5 tracks, incl. "ASHES 2 ASHES
 
 #### Confidence note - direct conflict, needs Zaal's call
 
+> **RESOLVED 2026-09-03 by Zaal, direct answer.** Status is **INACTIVE** - not alumni, not historical. His words: he is "working on his music actively but busy with life things." This supersedes doc 722f's "Incubator Alumni / Historical" classification for roster purposes. The research below is left unedited as the record of what was known before the answer.
+
+
 Doc 722f (the 2026-05-23 collaborator network audit) explicitly classifies JANGOUU under "Incubator Alumni" with status **Historical** - not core team, not active. This directly conflicts with treating him as a currently-active teammate. The evidence supports: musically active as recently as Dec 2025, but **zero documented ZAO-ecosystem activity in 2026**. His current "activity out of 10" in the ZAO specifically (as opposed to as a musician generally) is genuinely unclear from any external or internal record - this is the one profile in this batch that needs Zaal's direct, current answer rather than more research; external search is exhausted (two consecutive angles turned up nothing new).
 
 #### Sources

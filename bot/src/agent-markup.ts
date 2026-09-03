@@ -22,7 +22,17 @@
  *
  * DO NOT call this per-handler. It is applied at egress. Adding it at a call
  * site as well is harmless but is the pattern that caused the bug.
+ *
+ * INSTALL IT ON EVERY BOT IN THIS PROCESS TREE, via `installAgentMarkupGuard`.
+ * The first fix wired the transformer inline in `src/index.ts` only, so the
+ * ZOE bot in `src/zoe/index.ts` - the one Zaal actually DMs, and the one that
+ * fails over to OpenRouter / Surplus Intelligence when the Claude cap is spent -
+ * still had no strip on the path that sends a model reply to a human. Same bug
+ * class, different bot, and a per-file transformer is exactly the boundary
+ * nobody remembers. The installer exists so adding a bot cannot miss it.
  */
+
+import type { Bot, Context } from 'grammy';
 
 /** Tags reasoning models wrap their scratchpad in. Matched case-insensitively. */
 const MARKUP_TAGS = ['think', 'thinking', 'scratchpad', 'reasoning', 'reflection'] as const;
@@ -92,4 +102,71 @@ export function stripAgentMarkupSafe(text: string): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Bot API methods that carry human-visible text, and which payload field holds
+ * it. Anything not listed here passes through untouched.
+ */
+const MARKUP_FIELDS = {
+  sendMessage: 'text',
+  editMessageText: 'text',
+  sendPhoto: 'caption',
+  sendDocument: 'caption',
+  sendVideo: 'caption',
+  sendAnimation: 'caption',
+} as const;
+
+/** What the guard decided about one outbound payload. Pure, so it is testable. */
+export type MarkupGuardAction =
+  | { action: 'pass' }
+  | { action: 'rewrite'; field: string; text: string }
+  | { action: 'block' };
+
+/**
+ * Decide what to do with one outbound Bot API payload. Extracted from the
+ * transformer so the decision can be tested without a live grammy instance.
+ *
+ * `block` means the body was entirely scratchpad: sending '' posts a confusing
+ * blank message and sending the original is the leak itself, so the send is
+ * dropped and logged instead.
+ */
+export function guardOutboundPayload(
+  method: string,
+  payload: Record<string, unknown>,
+): MarkupGuardAction {
+  const field = MARKUP_FIELDS[method as keyof typeof MARKUP_FIELDS];
+  if (!field) return { action: 'pass' };
+  const body = payload[field];
+  if (typeof body !== 'string' || !containsAgentMarkup(body)) return { action: 'pass' };
+  const cleaned = stripAgentMarkupSafe(body);
+  if (cleaned === null) return { action: 'block' };
+  return { action: 'rewrite', field, text: cleaned };
+}
+
+/**
+ * Install the strip on a grammy bot's outbound API transformer. Call once per
+ * bot, at boot, before any handler or cron is registered - the same placement
+ * and the same reason as `installSendBudget`.
+ */
+export function installAgentMarkupGuard(bot: Bot<Context>): void {
+  bot.api.config.use(async (prev, method, payload, signal) => {
+    const p = payload as Record<string, unknown>;
+    const decision = guardOutboundPayload(method, p);
+    if (decision.action === 'block') {
+      console.error('[agent-markup] BLOCKED a send whose body was entirely agent markup', {
+        method,
+        chat_id: p.chat_id,
+      });
+      return { ok: true, result: true } as never;
+    }
+    if (decision.action === 'rewrite') {
+      console.error('[agent-markup] stripped agent markup from an outbound message', {
+        method,
+        chat_id: p.chat_id,
+      });
+      p[decision.field] = decision.text;
+    }
+    return prev(method, payload, signal);
+  });
 }

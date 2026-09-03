@@ -4,6 +4,8 @@ import {
   stripAgentMarkupSafe,
   containsAgentMarkup,
   AgentMarkupOnlyError,
+  installAgentMarkupGuard,
+  guardOutboundPayload,
 } from '../agent-markup';
 
 // The real leak, ZAOOS#3383: this reached Telegram #marketing on 2026-05-13 as
@@ -87,5 +89,105 @@ describe('when the body is ENTIRELY scratchpad', () => {
   it('the safe variant returns null instead of throwing', () => {
     expect(stripAgentMarkupSafe(allMarkup)).toBeNull();
     expect(stripAgentMarkupSafe(THE_ACTUAL_LEAK)).toBe('Got it, the poster is on the confirmed list.');
+  });
+});
+
+// --------------------------------------------------------------------------
+// The egress guard itself. ZAOOS#3383 was fixed by an inline transformer in
+// src/index.ts, which left the ZOE bot - the one Zaal DMs, and the one whose
+// cap-fallback runs on reasoning models - with no strip at all. These pin the
+// installer so a second bot cannot be added without it.
+// --------------------------------------------------------------------------
+
+type Call = { method: string; payload: Record<string, unknown> };
+
+function fakeBot() {
+  const calls: Call[] = [];
+  let transformer: (
+    prev: (m: string, p: Record<string, unknown>) => Promise<unknown>,
+    method: string,
+    payload: Record<string, unknown>,
+  ) => Promise<unknown>;
+  const bot = {
+    api: {
+      config: {
+        use: (t: typeof transformer) => {
+          transformer = t;
+        },
+      },
+    },
+  };
+  const send = async (method: string, payload: Record<string, unknown>) => {
+    const prev = async (m: string, p: Record<string, unknown>) => {
+      calls.push({ method: m, payload: p });
+      return { ok: true, result: { message_id: 1 } };
+    };
+    return transformer(prev, method, payload);
+  };
+  return { bot, calls, send };
+}
+
+describe('installAgentMarkupGuard', () => {
+  it('strips markup out of a sendMessage before it reaches Telegram', async () => {
+    const { bot, calls, send } = fakeBot();
+    installAgentMarkupGuard(bot as never);
+    await send('sendMessage', { chat_id: 1, text: THE_ACTUAL_LEAK });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toBe('Got it, the poster is on the confirmed list.');
+  });
+
+  it('blocks the send outright when the body is entirely scratchpad', async () => {
+    const { bot, calls, send } = fakeBot();
+    installAgentMarkupGuard(bot as never);
+    const res = await send('sendMessage', {
+      chat_id: 1,
+      text: '<think>stalling, no answer yet</think>',
+    });
+    expect(calls).toHaveLength(0);
+    expect(res).toEqual({ ok: true, result: true });
+  });
+
+  it('covers captions on media sends and editMessageText, not just sendMessage', async () => {
+    for (const [method, field] of [
+      ['editMessageText', 'text'],
+      ['sendPhoto', 'caption'],
+      ['sendDocument', 'caption'],
+      ['sendVideo', 'caption'],
+      ['sendAnimation', 'caption'],
+    ] as const) {
+      const { bot, calls, send } = fakeBot();
+      installAgentMarkupGuard(bot as never);
+      await send(method, { chat_id: 1, [field]: '<think>hidden</think>shown' });
+      expect(calls[0].payload[field]).toBe('shown');
+    }
+  });
+
+  it('leaves ordinary prose and unrelated methods untouched', async () => {
+    const { bot, calls, send } = fakeBot();
+    installAgentMarkupGuard(bot as never);
+    await send('sendMessage', { chat_id: 1, text: 'I think the poster looks great' });
+    await send('pinChatMessage', { chat_id: 1, message_id: 7 });
+    expect(calls[0].payload.text).toBe('I think the poster looks great');
+    expect(calls[1].method).toBe('pinChatMessage');
+  });
+});
+
+describe('guardOutboundPayload', () => {
+  it('passes a method that carries no human-visible body', () => {
+    expect(guardOutboundPayload('answerCallbackQuery', { text: '<think>x</think>y' }).action).toBe(
+      'pass',
+    );
+  });
+
+  it('passes a non-string body rather than throwing on it', () => {
+    expect(guardOutboundPayload('sendMessage', { text: 42 }).action).toBe('pass');
+  });
+
+  it('names the field it rewrote so the transformer writes back to the right one', () => {
+    expect(guardOutboundPayload('sendPhoto', { caption: '<think>a</think>b' })).toEqual({
+      action: 'rewrite',
+      field: 'caption',
+      text: 'b',
+    });
   });
 });

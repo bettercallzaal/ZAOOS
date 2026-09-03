@@ -1,0 +1,29 @@
+# ICM: ZAO NYC
+
+ZAO NYC is the New York City node of The ZAO - the decentralized impact network that returns profit margin, data, and IP rights to artists. Where The ZAO's existing surfaces are online (Farcaster, the weekly Fractal, WaveWarZ), ZAO NYC is where the network becomes rooms: shows, meetups, artist sessions, and the people you actually shake hands with. Founded by Zaal Panthaki (BetterCallZaal), founder of The ZAO.
+
+Status note: ZAO NYC is FORMING as of September 2026. This box states the thesis and what is true today - it deliberately claims no membership numbers, no events held, and no partnerships, because there are none yet. Facts get added as they become facts.
+
+## What it is
+A city chapter, not a separate organization. The ZAO's priority stack is unchanged - music first, community second, technology third - and ZAO NYC inherits all of it. What a city node adds is physical: New York is where the music industry, the crypto scene, and the art world already overlap in the same rooms on the same nights. The thesis is that a decentralized network still needs somewhere to be in person, and NYC is the highest-density place to try that.
+
+## Why a city node at all
+The ZAO works online and has for years - 100+ consecutive Fractal governance weeks, 157 verified on-chain Respect holders (2026-07-05), 1,245 WaveWarZ battles on Solana. None of that requires a city. What a city adds is the part the network cannot do over a feed: introductions that stick, artists meeting each other, and a room where showing up is the contribution.
+
+## What is true today (2026-09-03)
+- ZAO NYC is a thesis and a name. It has no members, no held events, and no venue.
+- Its founding moment is NFT.NYC week, September 2026, where the first conversations are happening in person.
+- It has no ICM box published yet - this is the draft.
+
+## First product
+IRL event coordination. The problem is real and unglamorous: event links are opaque, people are not attached to the events where you would actually meet them, and where you are sleeping changes which events are cheap to reach. The tool being prototyped in the ZAO OS lab solves that for one person first, then for a chapter.
+
+## How it relates to The ZAO
+- Same network, same Respect, same governance. A city node does not fork the DAO.
+- ZAO NYC is incubated in ZAO OS (the lab and monorepo) and graduates to its own repo, database, and domain only when there are members to serve - the same graduation rule every ZAO product follows.
+
+## Related boxes
+- The ZAO (thezao)
+- Zaal (zaal)
+- ZAO Assistant (zao-assistant)
+- WaveWarZ (wavewarz)

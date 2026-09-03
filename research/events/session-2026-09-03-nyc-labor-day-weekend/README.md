@@ -122,11 +122,23 @@ This is your **only hard Friday anchor and the only day it can happen.** It is a
 **time-unconfirmed and controlled by someone else**, which makes it the riskiest kind of
 anchor: it can move, and everything else has to stay flexible around it.
 
-- ⚠️ **It collides with the bag move.** "In by Williamsburg bridge" means coming from
-  Brooklyn. If you drop the bag in Jersey City first, you cross the river twice before
-  the meeting. Options: (a) take the bag to Solana and go to JC after, (b) drop in JC
-  early and come back, (c) leave the bag in Williamsburg and collect it later.
-  **Decide before you sleep tonight, not tomorrow morning.**
+- ✅ **BAG: DECIDED (Zaal, 2026-09-03).** Bag stays in Williamsburg; he collects it
+  Friday night on the way to Jersey City. Morning stays free and unencumbered — which is
+  the right call precisely because Gabe controls the Solana time and it could land
+  anywhere in the early afternoon. A morning JC round-trip would have been hostage to
+  a text that hasn't arrived.
+
+  **Consequence — Friday night flips.** Because he must return to Williamsburg anyway,
+  a **Brooklyn/Williamsburg event on Friday night is now CHEAP, not expensive.** This
+  reverses the general Fri/Sat rule for Friday only. Sequence it:
+  `Friday night event in Brooklyn → collect bag → PATH → Jersey City.`
+  A *Manhattan* Friday-night event costs an extra ~30-40 min of backtracking, because
+  he'd cross to Brooklyn and then back through Manhattan to reach JC.
+
+  ⚠️ **The risk in this plan is access, not transit.** "Swing by whenever" only holds if
+  he can actually get into the Williamsburg place Friday night — after checkout, late,
+  possibly after 1am. If it is a host's place or a lockbox with a Friday checkout,
+  "whenever" is not true. **Confirm tonight, with whoever holds the door.**
 - ⚠️ **Candy.** Zaal: *"Ill bring candy."* Not on the packing list. It is now a
   commitment to a person.
 - **Gabe was 1 of the 9 with "no plan." He is now solved** — via iMessage, not any tool.
@@ -222,7 +234,8 @@ missing events — it's being in nine rooms and catching none of these people.
 
 ## Drop list
 
-1. **Any Brooklyn event Fri or Sat night** — first cut. Costs ~an hour of PATH.
+1. **Any Brooklyn event on SATURDAY night** — first cut. Costs ~an hour of PATH.
+   (Friday night is now the exception: the bag pickup makes Brooklyn free that night.)
 2. _TBD once events land._
 
 ---

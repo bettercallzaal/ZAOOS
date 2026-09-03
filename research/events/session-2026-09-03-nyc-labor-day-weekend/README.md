@@ -143,7 +143,24 @@ anchor: it can move, and everything else has to stay flexible around it.
   commitment to a person.
 - **Gabe was 1 of the 9 with "no plan." He is now solved** — via iMessage, not any tool.
 
-- **EVE:** Manhattan, PATH-anchored, after Solana.
+- 📍 **Solana Labs is at 141 E Houston St** (Bowery - SoHo/East Village/LES corner).
+  One L stop from Williamsburg plus a short walk. ~20-25 min door to door.
+
+- **STRATEGY (Zaal, 2026-09-03): no cutoff. Float around events until Gabe texts.**
+  That works, and the geography is why - but it has one hard condition:
+
+  > **Friday before the Gabe text, stay inside the LES / East Village / SoHo /
+  > Lower Manhattan / Williamsburg corridor.** From anywhere in that zone you are
+  > under 25 minutes from 141 E Houston. Drift to Midtown or uptown and you are 40+,
+  > which is how a "come by now" text gets missed. The float strategy is not
+  > location-free; it is location-bounded.
+
+- 🎯 **Solana goals (all four selected):** hang/relationship, WaveWarZ conversation,
+  intros to specific people, plant the ZAO NYC flag.
+  ⚠️ **Intros do not happen by showing up.** They happen because you asked Gabe in
+  advance who to meet. That is a text tonight, not a question at the door.
+
+- **EVE:** after Solana. Brooklyn is cheap tonight only because of the bag pickup.
 - _Awaiting luma details._
 
 > Also from Gabe: a luma link titled **"Team1 x Taco Tech Tuesday."** You depart Sunday

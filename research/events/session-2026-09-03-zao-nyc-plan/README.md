@@ -19,9 +19,14 @@ chapter run by someone who moved to Maine in 2024. A co-founder already living
 in the city is the cheapest possible fix, and it was already true before anyone
 planned it.
 
-> ⚠️ **Candy has not been asked yet.** Everything below assumes a conversation
-> that has not happened. Until it does, this is Zaal's intent, not a commitment
-> she has made. That conversation is the first blocking step, not a formality.
+> ✅ **CONFIRMED 2026-09-03.** Zaal: *"candy is in she will help me run it."*
+> This is no longer intent - it is an agreement between two co-founders. ZAO NYC
+> has leadership.
+>
+> **Still to define, now that she has said yes:** what she is actually taking on.
+> "Help me run it" covers a wide range, from hosting a monthly session to owning
+> the roster and the calendar. Agreeing to co-lead and agreeing to a specific
+> load are different conversations, and the second one has not happened.
 
 ## Correction: Magnetiq is out
 
@@ -91,7 +96,7 @@ of year, that is roughly twelve months out, against a six-week build last time.
 
 | # | Blocker | Owner |
 |---|---|---|
-| 1 | **Ask Candy.** Everything assumes she says yes to co-leading. | Zaal |
+| 1 | ~~Ask Candy~~ **DONE 2026-09-03 - she is in.** Next: define her actual scope | Zaal + Candy |
 | 2 | NFT NYC 2027 dates - unknown; sets the Rung 4 clock | either |
 | 3 | Budget model for a revival. 2024 broke even; is that the bar again? | Zaal |
 | 4 | Is Tyler still in NYC / still a ZAO collaborator? | Zaal |

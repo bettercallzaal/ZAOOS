@@ -24,14 +24,14 @@ ZAO NYC does not start from zero. New York already holds, per the member roster:
 - **Ohnahji University (OhnahjiU / ONJU)** - New York, NY.
 - **JANGO UU** - the origin figure. Inactive in ZAO work, actively making music.
 
-**Leadership (2026-09-03):** Candy co-leads ZAO NYC with Zaal and is the local anchor; Zaal sets direction from Ellsworth, Maine.
+**Leadership (confirmed 2026-09-03):** Candy co-leads ZAO NYC with Zaal and is the local anchor in New York; Zaal sets direction from Ellsworth, Maine. Two ZAO co-founders, one of whom lives in the city.
 
 A ZAO co-founder already lives in the city. That is the difference between founding a chapter and organizing one.
 
 > Correction, 2026-09-03: earlier drafts of this box listed Tyler Stambaugh and Magnetiq's Proof of Meet as a live NYC asset, on the strength of the ETH Boulder collaboration in February 2026. **Tyler has since left Magnetiq and it is no longer active; ZAO is not using it for the foreseeable future.** Do not cite Magnetiq as a current ZAO surface.
 
 ## What is true today (2026-09-03)
-Stated plainly so nothing here overclaims: there are ZAO members in New York, but there is **no organized ZAO NYC chapter** - no roster convened under that name, no recurring event, no venue. The history is real, the people are real, and the chapter itself is being formed in September 2026 out of conversations at NFT NYC week.
+Stated plainly so nothing here overclaims: ZAO NYC has **leadership and history, and does not yet have a roster, a recurring event, or a venue.** No members have been convened under the name and nothing recurring has happened yet. The history is real, the people are real, and the chapter itself is being formed in September 2026 out of conversations at NFT NYC week.
 
 ## First product
 IRL event coordination. The problem is unglamorous and real: event links are opaque, the people worth meeting are not attached to the events where you would meet them, and where you sleep changes which events are reachable. Prototyped in the ZAO OS lab, for one person first, then a chapter.

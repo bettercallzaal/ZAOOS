@@ -118,7 +118,7 @@ The team is supported by a roster of independent artists, a network of mutual co
 - ZAO-PROS (ETH Denver 2025) — Conference activation
 - ZAO Stock (Maine, October 2026) — Planned recurring annual festival
 
-**ZABAL** — The coordination engine tying the ecosystem together. Connects [SongJam](https://www.songjam.space/) (voice verification + engagement tracking), [Magnetiq](https://www.magnetiq.xyz/) (Proof of Meet — IRL connection tokens exchanged when you meet someone, opening a relationship hub), and [Empire Builder](https://www.empirebuilder.world/) (Farcaster token rewards). ZABAL is how we track who's showing up, who's connecting, and who's contributing across every channel.
+**ZABAL** — The coordination engine tying the ecosystem together. Connects [SongJam](https://www.songjam.space/) (voice verification + engagement tracking) and [Empire Builder](https://www.empirebuilder.world/) (Farcaster token rewards). ZABAL is how we track who's showing up, who's connecting, and who's contributing across every channel.
 
 **[Let's Talk About Web3](https://pods.media/lets-talk-about-web3/)** — A weekly podcast with Ohnahji and EZ. 19+ episodes. Wednesdays 6 PM EST. Web3 builders, blockchain ecosystems, and the creator economy.
 
@@ -171,7 +171,7 @@ ZAO OS is organized around four meanings of the name. Each is a section of the a
 
 **Autonomous Organization (Governance)** — Because artists deserve a say in how their community is run, not just the people who invested the most money. Weekly Respect Game, soulbound $ZAO tokens, ZID membership numbers. Live. Hats Protocol roles and community treasury are next.
 
-**Operating System (Tools)** — Because artists need tools that work for them, not platforms that extract from them. ZID profiles, Proof of Meet via Magnetiq, cross-platform publishing, AI agent for music discovery. Partially built, expanding.
+**Operating System (Tools)** — Because artists need tools that work for them, not platforms that extract from them. ZID profiles, cross-platform publishing, AI agent for music discovery. Partially built, expanding.
 
 **Open Source (Contribute)** — Because the tools should belong to everyone. MIT-licensed codebase, `community.config.ts` for one-file forkability, [52 research documents](https://github.com/bettercallzaal/ZAOOS/tree/main/research) as public knowledge, AI + human coordination. Any community can fork ZAO OS and make it their own.
 
@@ -260,7 +260,6 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 - ZAO Festivals — [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA), [ZAO-CHELLA](https://www.instagram.com/reel/DDa-oPBJ7G7/), PROS, Stock
 - COC Concertz — [150+ weekly metaverse concerts](https://www.stilo.world/)
 - ZAOVille — Virginia collaboration (July 2026)
-- Proof of Meet — [IRL connection tokens via Magnetiq](https://www.magnetiq.xyz/)
 
 ---
 
@@ -290,7 +289,6 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 | [SongJam](https://www.songjam.space/) | Voice verification via zkProofs, engagement tracking, $SANG token |
 | [Ohnahji University](https://ohnahjiu.com/) | "Web3's First HBCU" — blockchain education for BIPOC communities |
 | COC | Community of Communities — 7 co-founders, cross-community events |
-| [Magnetiq](https://www.magnetiq.xyz/) | Proof of Meet — NFT memberships and IRL connection tokens on Flow |
 | [Quakey](https://www.quakeycoin.com/) | Solana music/gaming community — WaveWarZ mutual |
 | [Token Smart](https://www.tokensmart.co/) | 22K+ web3 creators since 2019 — Impact Concerts |
 | [UVR](https://raverrealm.xyz/) | Underground Violet Rave — 8 raves in 7 cities, Twitch community |
@@ -305,7 +303,6 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 |-------|------|-----|
 | **[Base](https://basescan.org/)** | Hats roles | Farcaster-aligned, low gas |
 | **[Solana](https://solscan.io/account/9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo)** | WaveWarZ battles | Speed for real-time trading |
-| **[Flow](https://www.magnetiq.xyz/)** | Magnetiq memberships | Consumer-friendly onboarding |
 | **[Optimism](https://optimistic.etherscan.io/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957)** | $ZAO Respect, Fractal governance (ORDAO) | Superchain alignment |
 
 **The challenge ahead:** Unified identity (ZID) across all chains. One membership number that resolves your Base wallet, Solana wallet, and Farcaster FID to a single ZAO identity. This is the problem ZAO OS is built to solve.

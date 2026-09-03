@@ -38,22 +38,39 @@ person for this specific chapter, and most of it was already true:
 - **She designed the last two ZAO festivals.** Visual design for both
   **ZAO-PALOOZA and ZAO-CHELLA**, plus print and digital community materials.
   The person co-leading the revival already art-directed the original.
-- **Sponsorship Administrator at Impact3.co** (Web3 product/marketing studio,
-  sister org to **Milk Road**) since 2023-10-30. Doc 229: *"Direct connections to
-  major Web3 brands and sponsorship budgets."*
+- ~~Sponsorship Administrator at Impact3.co~~ **NO LONGER TRUE.** Zaal,
+  2026-09-03: *"She doesn't work there anymore that's the past."* Doc 229 still
+  carries it as current. Another decayed fact on the same shelf as the Magnetiq
+  entry - and this one was used, briefly and wrongly, to argue the budget
+  question was solved.
 - **She owns all 16 WaveWarZ repos**, 557 contributions in the past year, and is
   writing the Solidity/Foundry contracts for WaveWarZ on Base L2.
 - **$LOANZ creator** - her token sponsored ZAO-CHELLA.
 - **City College of New York.** She is a New Yorker, not a transplant.
 
-**This changes the ladder's economics.** Rung 4 was open on budget: ZAO-PALOOZA
-2024 broke even, and it was unclear whether break-even was the bar again. The
-co-lead is a working sponsorship administrator with brand relationships. A funded
-2027 revival is a realistic ask rather than a hope, and it is her domain, not
-Zaal's.
+**Correction, same day.** This section originally argued that Candy's Impact3
+sponsorship role made a funded 2027 revival a realistic ask. **That was built on
+a stale fact and is withdrawn.** She does not work there anymore. Rung 4's budget
+question is still open and still unanswered - Zaal corrected the premise rather
+than answering it, so it stays on the blocker list.
 
-It also gives Rung 3 an owner: a WaveWarZ IRL needs the person writing WaveWarZ's
-contracts, and that is her.
+What survives is real and does not depend on that job: **she designed both prior
+festivals, and she owns all 16 WaveWarZ repos.** That gives Rung 3 a technical
+owner - a WaveWarZ IRL needs the person writing WaveWarZ's contracts, and that is
+her - and gives Rung 4 its art direction.
+
+**Rung 3 also has a second name: Hurric4n3IKE**, ZAO co-founder, based in Texas.
+Zaal 2026-09-03: *"he will be part of all wavewarz events."* Not a ZAO NYC lead,
+but present for the WaveWarZ rung.
+
+**The 12 artists are online at `zao.cards`** (Zaal, 2026-09-03). Blocked from this
+container; pull it on the Mac. That is the Rung 2 starting roster.
+
+> **Possible match worth checking:** "Jen one love" on Zaal's NFT NYC list may be
+> from **One Love Art DAO** - listed in the whitepaper's partner communities as
+> *"600+ artists, global nonprofit bridging traditional + digital art."* If so,
+> that is a Rung 2 conversation already on this weekend's calendar. UNVERIFIED -
+> the name match is suggestive, not confirmed.
 
 > ⚠️ One flag from the same doc, dated 2026-07-10: her **public** trail was quiet
 > (Medium last posted 2024; GitHub/X/LinkedIn were blocked to that research), so

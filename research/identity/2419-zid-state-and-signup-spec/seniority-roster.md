@@ -76,7 +76,7 @@ a confirmed identity. Confirming those is Zaal's.
 | 55 | 2024-09-27 | 76 | - | not in `users` | - | `0x81f2cb371985d4ecfe684011e489186bac647702` |
 | 56 | 2024-09-27 | 34 | vicidflow.eth | not in `users` | - | `0xf027828a6d9a0618a2f419ab71db39cf2295f027` |
 | 57 | 2024-09-27 | 10 | - | not in `users` | - | `0x8c44ba8c6d796d377ce13bc2b8c3def0939bbb4b` |
-| 58 | 2024-09-27 | 50 | dansingjoy.eth | not in `users` | - | `0xc11c6f47fe090a706ba82964b8a98f1682b244ff` |
+| 58 | 2024-09-27 | 50 | dansingjoy.eth | dansingjoy | - | `0xc11c6f47fe090a706ba82964b8a98f1682b244ff` |
 | 59 | 2024-09-27 | 10 | - | not in `users` | - | `0xab5a7891e95bd14ff7c3a35b47b8aeef562d1444` |
 | 60 | 2024-09-27 | 10 | - | not in `users` | - | `0xb940daa644b080087dd027c7e0cb68cb1ce22805` |
 | 61 | 2024-10-03 | 60 | - | not in `users` | - | `0x6bb1040cdc05dbb2b9db70bbbc0266e01c52b325` |
@@ -93,7 +93,7 @@ a confirmed identity. Confirming those is Zaal's.
 | 72 | 2024-12-24 | 105 | - | not in `users` | - | `0x0c4952550465840736f161d2d6878b8c3b31f330` |
 | 73 | 2024-12-24 | 33 | - | not in `users` | - | `0x444a327b63850aec4d9b7487d39ef4d3f3a7cdfd` |
 | 74 | 2025-01-03 | 75 | - | not in `users` | - | `0x1105f52b534faf048cf5b35ab2bf1b302b9d57d2` |
-| 75 | 2025-01-03 | 66 | - | not in `users` | - | `0xc79797f76f059753c57d931fec7961ba437b38a7` |
+| 75 | 2025-01-03 | 66 | - | mumbovibes | - | `0xc79797f76f059753c57d931fec7961ba437b38a7` |
 | 76 | 2025-01-05 | 300 | - | wallet-only row | - | `0x38fbf3294dc874ce52f306b1bcb745d61ef028eb` |
 | 77 | 2025-01-07 | 206 | - | visceralglitch | - | `0x3cc027125a697400b0c6255b3438f4bdbff9d7a6` |
 | 78 | 2025-01-07 | 150 | jpsjpegs.eth | not in `users` | - | `0xcc749c4b3585b8cbb244afbb6c4c790dab4204e0` |
@@ -126,7 +126,7 @@ a confirmed identity. Confirming those is Zaal's.
 | 105 | 2025-02-10 | 10 | - | not in `users` | - | `0x5ecc8a94c117eeb5c6233600927e941c2548d574` |
 | 106 | 2025-02-10 | 10 | - | not in `users` | - | `0x8504e1841e5c51a3f20a4f4aef2b4306f974fd52` |
 | 107 | 2025-02-10 | 10 | - | not in `users` | - | `0x85e767682094ace9b788597042c5bcdcfcf8a395` |
-| 108 | 2025-02-10 | 600 | jose.metagame.wtf | wallet-only row | - | `0x29185eb8cfd22aa719529217bfbade61677e0ad2` |
+| 108 | 2025-02-10 | 600 | jose.metagame.wtf | joseacabrerav | - | `0x29185eb8cfd22aa719529217bfbade61677e0ad2` |
 | 109 | 2025-02-17 | 25 | - | not in `users` | - | `0x9a499ed2f72f703655d4f4ac75afc072e4d519d4` |
 | 110 | 2025-03-04 | 50 | - | not in `users` | - | `0xd3390619331cbd1a0afb9f9bbb2177f69a8a13d5` |
 | 111 | 2025-03-13 | 25 | - | not in `users` | - | `0x161bf804f9e50ee203024335ce927dcb411ae946` |

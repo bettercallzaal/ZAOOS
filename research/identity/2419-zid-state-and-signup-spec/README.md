@@ -16,6 +16,11 @@ related-docs: [005, 158, 271, 191, 1200, 1201]
 > execution. Every number below was read from a live system on 2026-08-25 unless
 > it is explicitly labelled a prediction.
 
+**Companion:** [`allocation-policy.md`](./allocation-policy.md) takes the two
+decisions below that block other work - the reserved block size and how it gets
+filled - and works them through to an option set, a recommendation, and the
+mechanics. Written 2026-08-26.
+
 ## Executive summary
 
 Five things were unknown when this started. Four are now measured.
@@ -44,7 +49,9 @@ Five things were unknown when this started. Four are now measured.
    [`seniority-roster.md`](./seniority-roster.md).
 
 **Still genuinely open and still Zaal's:** who is ZID 0, how large the reserved
-block is, and whether that roster orders it at all.
+block is, and whether that roster orders it at all. The block-size question is
+worked through in [`allocation-policy.md`](./allocation-policy.md), which finds
+it is not blocking as previously assumed.
 
 And one correction that changes the shape of the remaining work:
 

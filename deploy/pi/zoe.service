@@ -1,0 +1,57 @@
+# zoe.service - ZOE (@zaoclaw_bot) as a systemd USER unit on the Pi (ansuz).
+#
+# Installed by deploy/pi/install.sh to ~/.config/systemd/user/zoe.service.
+# Derived from bot/systemd/zoe-bot.service (the VPS unit); differences are marked.
+#
+# ONE INSTANCE ONLY. Telegram long-poll allows a single consumer per bot token.
+# Before this unit is started, the VPS zoe-bot.service must be stopped + disabled
+# (deploy/pi/RUNBOOK.md section 3), or both bots 409-fight and eat updates.
+
+[Unit]
+Description=ZOE concierge bot (bot/src/zoe) - Pi deployment
+Documentation=file:%h/zao-bot-live/deploy/pi/RUNBOOK.md
+After=network-online.target
+Wants=network-online.target
+# Restart forever, but if it crashes 5 times inside 5 minutes stop trying so a
+# broken deploy is loud in `systemctl --user status zoe` instead of a silent loop.
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zao-bot-live/bot
+ExecStart=%h/zao-bot-live/bot/node_modules/.bin/tsx src/zoe/index.ts
+# Pi difference: Restart=always (VPS unit had on-failure). A clean exit(0) is
+# still a bot that is not polling, so it comes back either way.
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zoe
+
+# Secrets. NO leading "-": if the file is missing the unit FAILS to start, loudly,
+# instead of booting without a token and exiting 1 in a restart loop
+# (silent-failure-guard). Zaal writes this file by hand; see RUNBOOK section 2.
+EnvironmentFile=%h/.zao/zoe.env
+
+Environment=NODE_ENV=production
+# claude CLI lives in ~/.npm-global/bin on the Pi (start-fleet.sh adds it too).
+Environment=PATH=%h/.npm-global/bin:%h/bin:/usr/local/bin:/usr/bin:/bin
+# Pi difference: the code's default repo path is /home/zaal/zao-os (VPS). Point
+# every reader at the Pi clone. requirements.md section 4.4 lists who reads these.
+Environment=ZOE_REPO_DIR=%h/zao-bot-live
+Environment=COCKPIT_CWD=%h/zao-bot-live
+Environment=REPO_DIR=%h/zao-bot-live
+# systemd does not export HOSTNAME; heart-canary.ts + scheduler.ts label by it.
+Environment=HOSTNAME=ansuz
+
+# Resource guard: the Pi has 3.8 GB RAM, ~1.8 GB free, and its swap was FULL at
+# measurement (requirements.md section 3). Cap ZOE so a runaway cannot take ZOL
+# down with it. Raise deliberately if the journal shows OOM kills.
+MemoryMax=1200M
+# Never let a hung child (git, claude, node test runs) survive the unit.
+KillMode=control-group
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

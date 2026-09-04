@@ -99,3 +99,96 @@ URLs, EventMates, the Apify Luma/Partiful scraper, and the conference-side-event
 calendar pattern (EBC, Paris Blockchain Week, BuildWeek). All **PARTIAL** —
 surfaced via search, none independently fetched, because every one is blocked
 from this container.
+
+---
+
+# ADDENDUM — the actual scraping answer, and why the calendar is thin
+
+Zaal, 2026-09-04: *"honestly not a lot of web3 events there, please find better
+ways to scrape and search."*
+
+## 1. Luma has a public JSON API. No login, no cookies.
+
+This is the real unlock and it is better than the web UI.
+
+| Endpoint | Returns |
+|---|---|
+| `search_events` | Paginated listings filtered by **city name, custom coordinates, or Luma place ID** |
+| `get_event_details` | Host profiles, ticket availability, sold-out status, **full address**, ISO 8601 start/end |
+
+**Coordinate filtering is the feature the IRL tool needs.** "Events within N miles
+of where I am sleeping tonight" is a direct query against this, not something that
+has to be built. Same for the Jersey-City-vs-Brooklyn cost problem this trip ran
+into — that is a distance filter, and the API takes coordinates.
+
+Export formats reported: JSON, CSV, Excel, XML, HTML, RSS.
+
+> ⚠️ **The exact endpoint path is NOT verified.** Search results describe the API
+> and its two operations without giving the URL, and `lu.ma` is blocked from this
+> container so it could not be confirmed. **Do not write code against a guessed
+> path.** Confirm it from an unblocked machine first, or read it off one of the
+> wrappers below.
+
+**Wrappers that already do this** (all UNVERIFIED, surfaced via search 2026-09-04):
+- Apify: `matyascimbulka/luma-event-scraper`, `aitorsm/luma-events`,
+  `haketa/luma-event-scraper`, `scrapesage/luma-scraper`,
+  `lexis-solutions/lu-ma-scraper`
+- Parse.bot: "Lu.ma Events API - Discover Events by City", "Luma Events API -
+  Search & Browse"
+
+Five independent Apify actors for one site is a signal: the API is stable enough
+that people build on it, and the discovery layer of the IRL tool is a solved
+problem to buy rather than build.
+
+## 2. Telegram cannot be scraped, and that is the finding
+
+Where crypto side events actually get shared is private Telegram groups — and
+**private Telegram groups are not discoverable by in-app search and are not
+indexed anywhere.** Only the creator can invite. That is by design.
+
+So there is no clever query for this. The only route in is a person who is already
+in. **That converts a search problem into a one-line ask**, and there are three
+people to ask it of this weekend:
+
+> "What Telegram groups should I be in for NYC crypto/music events?"
+
+Gabe is the obvious first ask — he is already mid-conversation and was at events
+Thursday night.
+
+## 3. Why the calendar is genuinely thin — this is not a search failure
+
+Two things stack, and neither is fixable by better scraping:
+
+1. **NFT.NYC ended 2026-09-03.** Side events cluster on conference days and stop.
+2. **It is Labor Day weekend.** The city empties. Labor Day 2026 is Monday
+   2026-09-07 (first Monday of September, by arithmetic).
+
+A conference tail landing on a holiday weekend is close to the emptiest the NYC
+web3 calendar gets all year. **More scraping will keep confirming the same
+answer.**
+
+## 4. So invert it — this is the actual move
+
+There are 9-11 people in reach in a city with almost no competing events. That is
+not a bad weekend to find a room. **It is an unusually good weekend to be the
+room.**
+
+- Posting a small Luma or Partiful for Saturday costs nothing and takes minutes.
+- **It is literally Rung 1 of the ZAO NYC ladder** — a coworking day or meetup,
+  the rung whose entire job is to produce a roster — and it would happen this
+  weekend instead of "this month."
+- Zero competing events means the people you already invited have no better offer.
+- It gives every conversation from Friday a concrete second touch: *"come through
+  Saturday."*
+- And it is the first thing ZAO NYC ever does, with a co-lead who lives here.
+
+The counter-argument is real and should be said: a thin turnout at your own first
+event is worse than no event. Mitigation is to keep it small and unbranded as a
+"launch" — coffee, a table, a time, five people. Rung 1 is a roster-building
+exercise, not a debut.
+
+## Sources
+
+Search 2026-09-04 for the Luma API surface and wrappers; search 2026-09-04
+confirming private Telegram groups are non-indexed by design. All **PARTIAL** —
+every relevant host is blocked from this container.

@@ -11,9 +11,16 @@ import {
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 
 export async function POST(req: NextRequest) {
-  // Verify cron secret
+  // Verify cron secret. Fail CLOSED if it is unset - otherwise the comparison
+  // below is against the literal string "Bearer undefined", which any caller
+  // can send.
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  }
+
   const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

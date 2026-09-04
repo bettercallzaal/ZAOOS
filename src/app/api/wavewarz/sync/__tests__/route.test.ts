@@ -55,6 +55,14 @@ describe('POST /api/wavewarz/sync', () => {
     expect(res.status).toBe(401);
   });
 
+  it('fails closed with 500 when CRON_SECRET is unset', async () => {
+    delete process.env.CRON_SECRET;
+    // "Bearer undefined" is what an unset secret interpolates to - it must not pass.
+    const res = await POST(makeRequest('Bearer undefined'));
+    expect(res.status).toBe(500);
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+
   it('returns 500 when no admin user exists', async () => {
     mockSingle.mockResolvedValue({ data: null, error: null });
     const res = await POST(makeRequest('Bearer test-cron-secret'));

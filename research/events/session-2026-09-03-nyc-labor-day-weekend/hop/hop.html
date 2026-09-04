@@ -1,0 +1,421 @@
+<title>Hop — NYC Night Router</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#0a1628; --surface:#0d1b2a; --raised:#16283c; --line:#22384f;
+    --ink:#e8eff7; --ink-dim:#8ba3bc; --ink-faint:#5b768f;
+    --gold:#f5a623; --gold-soft:#3a2c12;
+    --cheap:#3fb950; --ok:#d29922; --far:#f85149;
+    --cheap-bg:#122b19; --ok-bg:#2e2411; --far-bg:#3a1618;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:15px; line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:20px 16px 96px}
+
+  header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  h1{
+    font-family:Archivo,"Helvetica Neue",Helvetica,sans-serif;font-weight:800;
+    font-size:30px;letter-spacing:-.02em;margin:0;color:var(--ink);text-wrap:balance;
+  }
+  .sub{color:var(--ink-dim);font-size:13px;margin:2px 0 18px}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  .lbl{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-dim);display:block;margin-bottom:7px;
+  }
+
+  .days{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+  .day{
+    flex:1 0 auto;min-width:72px;text-align:center;padding:9px 8px;border-radius:8px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;
+  }
+  .day b{display:block;font-size:15px;color:var(--ink);font-weight:600}
+  .day[aria-selected="true"]{background:var(--gold-soft);border-color:var(--gold);color:var(--gold)}
+  .day[aria-selected="true"] b{color:var(--gold)}
+
+  select,input,button{font-family:inherit;font-size:14px}
+  select,input[type=text],input[type=time]{
+    width:100%;background:var(--raised);border:1px solid var(--line);color:var(--ink);
+    border-radius:7px;padding:9px 10px;
+  }
+  input::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:8px}
+  .row>*{min-width:0}
+  .grow{flex:1}
+
+  .basebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .basebar .grow{min-width:150px}
+
+  button{cursor:pointer;border-radius:7px;border:1px solid var(--line);background:var(--raised);color:var(--ink);padding:9px 13px}
+  button:hover{border-color:var(--ink-dim)}
+  button:focus-visible,select:focus-visible,input:focus-visible,.day:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .primary{background:var(--gold);color:#1a1204;border-color:var(--gold);font-weight:600}
+  .primary:hover{background:#ffb733;border-color:#ffb733}
+  .ghost{background:transparent;color:var(--ink-dim);border-color:transparent;padding:6px 8px;font-size:13px}
+  .ghost:hover{color:var(--far);border-color:transparent}
+
+  /* ---- the line ---- */
+  .line{position:relative;margin:6px 0 0;padding-left:34px}
+  .line::before{
+    content:"";position:absolute;left:11px;top:12px;bottom:12px;width:3px;
+    background:var(--line);border-radius:2px;
+  }
+  .stop{position:relative;margin-bottom:2px}
+  .dot{
+    position:absolute;left:-34px;top:14px;width:19px;height:19px;border-radius:50%;
+    background:var(--ground);border:3px solid var(--ink-dim);
+  }
+  .stop.anchor .dot{border-color:var(--gold);background:var(--gold)}
+  .stop.base .dot{border-color:var(--ink-faint);width:13px;height:13px;left:-31px;top:16px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:12px 13px}
+  .stop.anchor .card{border-color:#43350f;background:#111f2e}
+  .cardtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .when{
+    font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--gold);
+    font-variant-numeric:tabular-nums;
+  }
+  .name{font-weight:600;font-size:16px;margin:1px 0 3px;line-height:1.3}
+  .where{color:var(--ink-dim);font-size:13px}
+  .who{color:var(--ink-dim);font-size:13px;margin-top:5px}
+  .who span{color:var(--ink)}
+
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;align-items:center}
+  .pill{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+    padding:3px 7px;border-radius:4px;text-transform:uppercase;white-space:nowrap;
+  }
+  .p-cheap{background:var(--cheap-bg);color:var(--cheap)}
+  .p-ok{background:var(--ok-bg);color:var(--ok)}
+  .p-far{background:var(--far-bg);color:var(--far)}
+  .p-anchor{background:var(--gold-soft);color:var(--gold)}
+  .p-plain{background:var(--raised);color:var(--ink-dim)}
+
+  .hop{
+    display:flex;align-items:center;gap:7px;padding:7px 0 7px 2px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-dim);
+  }
+  .hop .m{color:var(--ink);font-variant-numeric:tabular-nums}
+
+  .empty{color:var(--ink-dim);font-size:14px;padding:18px 2px;text-align:center}
+
+  .drop li{margin-bottom:7px}
+  .drop .why{color:var(--ink-dim);font-size:13px}
+  ol{margin:0;padding-left:20px}
+
+  .foot{color:var(--ink-faint);font-size:12px;line-height:1.55;margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
+  .foot code{font-family:"IBM Plex Mono",monospace;color:var(--ink-dim)}
+  .sync{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-faint);margin-left:auto}
+
+  details summary{cursor:pointer;color:var(--ink-dim);font-size:13px;padding:2px 0}
+  details[open] summary{margin-bottom:10px;color:var(--ink)}
+  .addgrid{display:flex;flex-direction:column;gap:8px}
+  .chk{display:flex;align-items:center;gap:7px;color:var(--ink-dim);font-size:13px;cursor:pointer}
+  .chk input{width:auto}
+  @media (prefers-reduced-motion:no-preference){
+    .card{transition:border-color .15s ease}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Hop</h1>
+    <span class="sync" id="sync">local</span>
+  </header>
+  <p class="sub">Your night, routed from where you're sleeping. NYC + Jersey City.</p>
+
+  <div class="days" id="days" role="tablist"></div>
+
+  <div class="panel">
+    <span class="lbl">Sleeping tonight in</span>
+    <div class="basebar">
+      <div class="grow"><select id="base"></select></div>
+      <div class="lbl" style="margin:0;letter-spacing:.08em">everything below is costed from here</div>
+    </div>
+  </div>
+
+  <div id="timeline"></div>
+
+  <div class="panel">
+    <details id="addbox">
+      <summary>+ Add a stop</summary>
+      <div class="addgrid">
+        <div class="row">
+          <input type="time" id="f-time" style="flex:0 0 120px" value="20:00">
+          <input type="text" id="f-name" class="grow" placeholder="What is it?">
+        </div>
+        <select id="f-hood"></select>
+        <input type="text" id="f-who" placeholder="Who's there? (optional)">
+        <div class="row" style="align-items:center">
+          <label class="chk"><input type="checkbox" id="f-anchor"> Anchor — can't move</label>
+          <button class="primary" id="add" style="margin-left:auto">Add stop</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="panel" id="droppanel" hidden>
+    <span class="lbl">Drop list — cut from the top when you're late</span>
+    <ol class="drop" id="drop"></ol>
+  </div>
+
+  <p class="foot">
+    Times are <strong>estimates</strong> from straight-line distance plus river-crossing and
+    late-night penalties — not live transit data. Check Maps before you commit to anything tight.
+    Hudson crossings (PATH) and Brooklyn&#8594;Jersey trips carry the biggest penalty, which is the
+    whole point: <code>an event is only cheap relative to where you sleep.</code>
+  </p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- neighborhoods: approx real coords, borough for crossing logic ----
+  var HOODS = [
+    ["FiDi",40.707,-74.011,"M"], ["Tribeca",40.717,-74.008,"M"], ["SoHo",40.723,-74.000,"M"],
+    ["Nolita / Bowery",40.722,-73.993,"M"], ["Lower East Side",40.718,-73.988,"M"],
+    ["East Village",40.727,-73.982,"M"], ["West Village",40.735,-74.003,"M"],
+    ["Chelsea",40.746,-74.001,"M"], ["Flatiron",40.740,-73.990,"M"],
+    ["Union Square",40.736,-73.990,"M"], ["Midtown",40.755,-73.985,"M"],
+    ["Times Square",40.758,-73.985,"M"], ["Upper East Side",40.773,-73.960,"M"],
+    ["Upper West Side",40.787,-73.975,"M"], ["Harlem",40.811,-73.946,"M"],
+    ["Williamsburg",40.714,-73.961,"B"], ["Greenpoint",40.730,-73.951,"B"],
+    ["Bushwick",40.694,-73.921,"B"], ["DUMBO",40.703,-73.989,"B"],
+    ["Bed-Stuy",40.687,-73.941,"B"], ["Park Slope",40.672,-73.978,"B"],
+    ["Crown Heights",40.669,-73.944,"B"],
+    ["Long Island City",40.745,-73.949,"Q"], ["Astoria",40.764,-73.923,"Q"],
+    ["Jersey City",40.719,-74.043,"J"], ["Hoboken",40.744,-74.032,"J"]
+  ];
+  var H = {};
+  HOODS.forEach(function(h){ H[h[0]] = {lat:h[1], lng:h[2], b:h[3]}; });
+
+  function km(a,b){
+    var R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+    var la=a.lat*Math.PI/180, lb=b.lat*Math.PI/180;
+    var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.sin(dLng/2)*Math.sin(dLng/2)*Math.cos(la)*Math.cos(lb);
+    return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+  }
+
+  // travel estimate in minutes, from -> to, at a given hour (0-23)
+  function mins(from,to,hour){
+    if(!from||!to||from===to) return 0;
+    var a=H[from], b=H[to];
+    if(!a||!b) return 0;
+    var d=km(a,b);
+    var t = 8 + (d/18)*60;              // 8 min door/platform + ~18km/h effective
+    var ab=a.b, bb=b.b;
+    if(ab!==bb){
+      var nj = (ab==="J") !== (bb==="J");
+      var eastRiver = (ab==="M"&&(bb==="B"||bb==="Q")) || (bb==="M"&&(ab==="B"||ab==="Q"));
+      if(nj){
+        t += 15;                         // Hudson / PATH
+        if(ab==="B"||bb==="B"||ab==="Q"||bb==="Q") t += 22; // Brooklyn/Queens -> NJ = two crossings
+      } else if(eastRiver){
+        t += 8;
+      } else {
+        t += 10;                         // Brooklyn <-> Queens etc
+      }
+    }
+    if(hour!==null && hour!==undefined && (hour>=0&&hour<5)) t += 12;  // late-night headways
+    else if(hour!==null && hour!==undefined && hour>=23) t += 7;
+    return Math.round(t);
+  }
+
+  function band(m){ return m<=25?"cheap" : m<=45?"ok" : "far"; }
+  function bandLabel(m){ return m<=25?"cheap" : m<=45?"ok" : "expensive"; }
+
+  // ---- days ----
+  var DAYS = [
+    {id:"thu", dow:"Thu", d:"Sep 3", base:"Williamsburg"},
+    {id:"fri", dow:"Fri", d:"Sep 4", base:"Jersey City"},
+    {id:"sat", dow:"Sat", d:"Sep 5", base:"Jersey City"},
+    {id:"sun", dow:"Sun", d:"Sep 6", base:"Jersey City"}
+  ];
+
+  // ---- seed: the real known trip state ----
+  var SEED = {
+    day:"fri",
+    bases:{thu:"Williamsburg", fri:"Jersey City", sat:"Jersey City", sun:"Jersey City"},
+    stops:{
+      thu:[],
+      fri:[
+        {id:"s1", t:"13:30", n:"Solana Labs — Gabe", h:"Nolita / Bowery", w:"Gabe Covington", a:true},
+        {id:"s2", t:"23:30", n:"Grab the bag", h:"Williamsburg", w:"", a:true}
+      ],
+      sat:[], sun:[]
+    }
+  };
+
+  var KEY="hop.nyc.2026-09";
+  var state = load();
+  var db = null;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ var p=JSON.parse(raw); if(p&&p.stops) return p; }
+    }catch(e){}
+    return JSON.parse(JSON.stringify(SEED));
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+    if(db){
+      try{ db.doc("data/hop/itinerary").set(JSON.parse(JSON.stringify(state))); }catch(e){}
+    }
+  }
+
+  // ---- render ----
+  var $ = function(id){ return document.getElementById(id); };
+
+  function fillHoods(sel, val){
+    sel.innerHTML = HOODS.map(function(h){
+      return '<option value="'+h[0]+'"'+(h[0]===val?' selected':'')+'>'+h[0]+'</option>';
+    }).join("");
+  }
+
+  function renderDays(){
+    $("days").innerHTML = DAYS.map(function(d){
+      return '<button class="day" role="tab" data-day="'+d.id+'" aria-selected="'+(d.id===state.day)+'">'+
+             '<b>'+d.dow+'</b>'+d.d+'</button>';
+    }).join("");
+  }
+
+  function hourOf(t){ return t? parseInt(t.split(":")[0],10) : 12; }
+  function fmt(t){
+    if(!t) return "";
+    var p=t.split(":"), h=parseInt(p[0],10), m=p[1];
+    var ap = h>=12?"pm":"am", hh = h%12; if(hh===0) hh=12;
+    return hh+":"+m+ap;
+  }
+
+  function render(){
+    renderDays();
+    var base = state.bases[state.day];
+    fillHoods($("base"), base);
+
+    var stops = (state.stops[state.day]||[]).slice().sort(function(a,b){
+      return (a.t||"").localeCompare(b.t||"");
+    });
+
+    var tl = $("timeline");
+    if(!stops.length){
+      tl.innerHTML = '<div class="panel"><div class="empty">No stops yet for '+
+        DAYS.filter(function(d){return d.id===state.day;})[0].dow+
+        '.<br>Add one below and it gets costed from '+base+'.</div></div>';
+      $("droppanel").hidden = true;
+      return;
+    }
+
+    var html = '<div class="panel"><div class="line">';
+    html += '<div class="stop base"><div class="dot"></div>'+
+            '<div class="hop" style="padding-top:0"><span>Start &mdash;</span><span class="m">'+base+'</span></div></div>';
+
+    stops.forEach(function(s, i){
+      var hr = hourOf(s.t);
+      var fromPrev = i===0 ? mins(base, s.h, hr) : mins(stops[i-1].h, s.h, hr);
+      var home = mins(s.h, base, hr>=20?Math.min(hr+3,26)%24:hr);
+      var bh = band(home);
+
+      html += '<div class="hop"><span>&#8595;</span><span class="m">'+fromPrev+' min</span>'+
+              '<span>'+(i===0?'from base':'from '+stops[i-1].h)+'</span></div>';
+
+      html += '<div class="stop'+(s.a?' anchor':'')+'"><div class="dot"></div><div class="card">'+
+        '<div class="cardtop"><div>'+
+          '<div class="when">'+fmt(s.t)+'</div>'+
+          '<div class="name">'+esc(s.n)+'</div>'+
+          '<div class="where">'+esc(s.h)+'</div>'+
+        '</div><button class="ghost" data-del="'+s.id+'" aria-label="Remove stop">remove</button></div>'+
+        (s.w? '<div class="who">with <span>'+esc(s.w)+'</span></div>':'')+
+        '<div class="tags">'+
+          (s.a?'<span class="pill p-anchor">anchor</span>':'<span class="pill p-plain">floater</span>')+
+          '<span class="pill p-'+bh+'">'+home+' min home &middot; '+bandLabel(home)+'</span>'+
+        '</div>'+
+      '</div></div>';
+    });
+
+    var last = stops[stops.length-1];
+    var lastHr = hourOf(last.t);
+    var back = mins(last.h, base, lastHr>=20?Math.min(lastHr+3,26)%24:lastHr);
+    html += '<div class="hop"><span>&#8595;</span><span class="m">'+back+' min</span><span>home to '+base+'</span></div>';
+    html += '<div class="stop base"><div class="dot"></div><div class="hop" style="padding-bottom:0"><span>Bed &mdash;</span><span class="m">'+base+'</span></div></div>';
+    html += '</div></div>';
+    tl.innerHTML = html;
+
+    // drop list: floaters, most expensive first
+    var floaters = stops.filter(function(s){ return !s.a; }).map(function(s){
+      var hr=hourOf(s.t);
+      return {s:s, home:mins(s.h, base, hr>=20?Math.min(hr+3,26)%24:hr)};
+    }).sort(function(a,b){ return b.home-a.home; });
+
+    if(floaters.length){
+      $("droppanel").hidden = false;
+      $("drop").innerHTML = floaters.map(function(f){
+        return '<li><strong>'+esc(f.s.n)+'</strong> <span class="why">&mdash; '+f.home+
+               ' min home from '+esc(f.s.h)+'</span></li>';
+      }).join("");
+    } else {
+      $("droppanel").hidden = true;
+    }
+  }
+
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  // ---- events ----
+  document.addEventListener("click", function(e){
+    var d = e.target.closest("[data-day]");
+    if(d){ state.day = d.getAttribute("data-day"); save(); render(); return; }
+    var del = e.target.closest("[data-del]");
+    if(del){
+      var id = del.getAttribute("data-del");
+      state.stops[state.day] = (state.stops[state.day]||[]).filter(function(s){ return s.id!==id; });
+      save(); render(); return;
+    }
+  });
+
+  $("base").addEventListener("change", function(){
+    state.bases[state.day] = this.value; save(); render();
+  });
+
+  $("add").addEventListener("click", function(){
+    var n = $("f-name").value.trim();
+    if(!n){ $("f-name").focus(); return; }
+    (state.stops[state.day] = state.stops[state.day] || []).push({
+      id: "s"+Date.now(),
+      t: $("f-time").value || "20:00",
+      n: n,
+      h: $("f-hood").value,
+      w: $("f-who").value.trim(),
+      a: $("f-anchor").checked
+    });
+    $("f-name").value=""; $("f-who").value=""; $("f-anchor").checked=false;
+    save(); render();
+  });
+
+  fillHoods($("f-hood"), "Lower East Side");
+  render();
+
+  // ---- optional cross-device sync; page works fully without it ----
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("db").then(function(x){
+      if(!x) return;
+      db = x;
+      $("sync").textContent = "synced";
+      return db.doc("data/hop/itinerary").get().then(function(doc){
+        if(doc && doc.stops){ state = doc; render(); }
+        else { save(); }
+      });
+    }).catch(function(){});
+  }
+})();
+</script>

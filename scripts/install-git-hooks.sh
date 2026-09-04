@@ -1,39 +1,14 @@
 #!/usr/bin/env bash
 # Wire the version-controlled .husky/ hooks into .git/hooks/ so git actually
-# runs them. Run once after cloning ZAOOS:  bash scripts/install-git-hooks.sh
+# runs them. Kept as the documented entry point (doc 683):
 #
-# Why this exists: core.hooksPath points at .git/hooks (not .husky), so the
-# .husky/ hooks are version-controlled but inert until delegated. This script
-# writes thin delegators into .git/hooks/. It does NOT touch git config.
+#   bash scripts/install-git-hooks.sh
 #
-# Each delegator is local-only (not committed); the real hook logic lives in
-# .husky/ and propagates through git. See doc 683.
+# The implementation moved to install-git-hooks.mjs on 2026-09-01 so that npm's
+# `prepare` script can run it on every platform - npm on Windows shells out to
+# cmd.exe, where `bash` may not be on PATH. Read that file's header for why the
+# hooks were inert for as long as they were. This is a one-line delegator so the
+# two entry points cannot drift.
 
 set -euo pipefail
-
-REPO="$(git rev-parse --show-toplevel)"
-HOOKS_DIR="$(git rev-parse --git-path hooks)"
-mkdir -p "$HOOKS_DIR"
-
-MARKER="# zaoos-husky-delegator"
-
-for hook in pre-commit; do
-  src="$REPO/.husky/$hook"
-  [[ -f "$src" ]] || continue
-  dst="$HOOKS_DIR/$hook"
-
-  if [[ -f "$dst" ]] && ! grep -q "$MARKER" "$dst" 2>/dev/null; then
-    cp "$dst" "$dst.bak.$(date +%s)"
-    echo "backed up existing $hook -> $dst.bak.*"
-  fi
-
-  cat > "$dst" <<EOF
-#!/usr/bin/env sh
-$MARKER - delegates to version-controlled .husky/$hook (scripts/install-git-hooks.sh)
-exec "$REPO/.husky/$hook" "\$@"
-EOF
-  chmod +x "$dst"
-  echo "wired .git/hooks/$hook -> .husky/$hook"
-done
-
-echo "done. pre-push is left as-is (safe-git-push wrapper, doc 461)."
+exec node "$(cd "$(dirname "$0")" && pwd)/install-git-hooks.mjs"

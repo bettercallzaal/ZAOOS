@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "patch-package && cp node_modules/@xmtp/wasm-bindings/dist/bindings_wasm_bg.wasm public/bindings_wasm_bg.wasm",
+    "prepare": "node scripts/install-git-hooks.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

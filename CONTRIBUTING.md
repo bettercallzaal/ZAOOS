@@ -12,6 +12,11 @@ cp .env.example .env.local    # fill in required env vars
 npm run dev                    # localhost:3000
 ```
 
+`npm install` also wires the version-controlled `.husky/` hooks into `.git/hooks`
+(via `scripts/install-git-hooks.mjs`), so the pre-commit secret and PII scans run
+on your commits. It prints a `[git-hooks]` line saying whether it wired them; if it
+says it did not, fix what it names and re-run `node scripts/install-git-hooks.mjs`.
+
 See [FORK.md](./FORK.md) for full setup instructions including database and app wallet.
 
 ## Development Workflow

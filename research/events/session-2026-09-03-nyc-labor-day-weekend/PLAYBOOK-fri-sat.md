@@ -131,3 +131,84 @@ The three luma events remain unread — `luma.com`, `x.com`, `zao.cards`,
 `nft.nyc` and `forkoff.xyz` are all blocked by this container's egress. Neighborhoods
 for those three are still the thing that turns this playbook into an hour-by-hour
 schedule.
+
+---
+
+# ADDENDUM 2026-09-04 — the satellite calendar is spent
+
+Zaal pasted Google results carrying an AI Overview of NFT.NYC 2026 satellite
+events. **Every listed event is Thursday 2026-09-03 — the day before this was
+written.**
+
+| Event | Host | When | Where |
+|---|---|---|---|
+| Collector Park | OpenSea & Pudgy Penguins | **Thu Sep 3**, 12:00 PM | Manhattan |
+| Good Company NFTNYC Close Out | — | **Thu Sep 3**, 12:00 PM | 219 Bowery |
+| The Meta Beast Roaming Party | Decentraland community | **Thu Sep 3**, 7:00 PM | SPIN New York Flatiron |
+| Beef Stew Radio pres. THE JEETSONS | Beef Stew Radio | **Thu Sep 3**, 7:00 PM | The Delancey Rooftop, LES |
+| Underground Sound | Yeti MOB & B Nice | **Thu Sep 3**, 11:00 PM | Bowery Palace |
+
+Source: Google AI Overview citing Luma, pasted 2026-09-04. **PARTIAL** - not
+independently fetched; `luma.com` and `nft.nyc` remain blocked from this
+container. The dates are internally consistent (Sep 3 2026 is a Thursday).
+
+## What this means, and it is not all bad
+
+**Stop hunting the NFT NYC satellite list.** It is over. Continuing to search it
+burns time on a spent resource - the search index will keep returning those five
+events because they are the ones that got indexed.
+
+**The people did not leave with the calendar.** Conference attendees who stayed
+through the weekend are, on Friday and Saturday, doing smaller and far higher
+quality things than a 300-person rooftop. For a founder trying to have real
+conversations and raise a small number, **the tail is better than the peak.** A
+party where you shout over music is worse for this than coffee with three people
+who stayed.
+
+**So the strategy inverts:** this weekend is not about finding events. It is about
+the eleven people already in reach - the nine on the list, Gabe, and Candy - plus
+whatever the three unread luma links turn out to be. Those three matter MORE now,
+not less, because they are personal invites for a weekend with no public calendar.
+
+## Where to actually look for what is live today
+
+- **`luma.com/discover/nyc/crypto`** - Luma's NYC crypto discovery page, which
+  lists what is on NOW rather than the spent NFT.NYC satellite page. This is the
+  right URL to open on the phone. Blocked from this container.
+- The three unread luma invites already in hand.
+- **Not** `nft.nyc/events` - that is the expired list.
+
+## For a future trip, noted
+
+**UN Blockchain Week runs Sep 10-19 2026 in NYC**, alongside UNGA and NYFW - ten
+days of programming. Zaal departs Sep 6, so it is out of reach this trip. Worth a
+calendar note: it is a second, larger NYC window three days after he leaves, and
+ZAO NYC now exists as a thing to show up with.
+Source: search result, 2026-09-04. **UNVERIFIED** - not independently fetched.
+
+## The X play, given the timing
+
+`x.com` is blocked from this container, so live posts cannot be read or found from
+here. But the timing observation stands on its own and is the useful part:
+
+**Friday after a conference is peak recap-post volume.** Everyone who attended is
+posting "great meeting everyone at NFT NYC" threads right now. That is the moment
+a reply gets seen, because the author is actively refreshing.
+
+**ZAO's hook is unusually strong and almost nobody else has it:** three
+consecutive years at this conference, starting with a festival. Reply from that,
+never from the ask.
+
+Reply shapes that work on a recap post:
+
+> "Third NFT NYC for us - we ran ZAO-PALOOZA here in 2024 with 12 artists.
+> Wild seeing how much the music side has grown. Who else is still in town
+> through the weekend?"
+
+> "Still here through Sunday if anyone wants to talk onchain music.
+> We've been running live music battles on Solana - about 1,300 of them."
+
+Rules for this: **lead with the history, ask a question, never open with the
+fundraise.** The ZAOstock ask belongs in the DM that follows, not the public
+reply. And per `agent-loops.md` rule 8 plus the ZAO persona, outbound is
+Zaal's - these are drafts, not posts.

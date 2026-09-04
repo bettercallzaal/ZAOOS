@@ -179,6 +179,7 @@ import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
 import { touchLastSeen } from './events';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
+import { installAgentMarkupGuard } from '../agent-markup';
 import { installSendBudget, runWithSendClass } from './send-budget';
 import {
   fetchPending,
@@ -365,6 +366,17 @@ const bot = new Bot(token);
 // same daily cap. See send-budget.ts for the measured reason (4,709 sends in
 // August against 12 replies) and for the four classes.
 installSendBudget(bot);
+
+// AGENT-INTERNAL MARKUP NEVER REACHES A HUMAN. ZAOOS#3383 fixed this for the
+// ZAOstock bot on 2026-09-01 and stopped there, so ZOE - the bot Zaal actually
+// DMs - still shipped raw model scratchpad. `runConciergeTurn` returns
+// `result.reply` straight from the model (splitReplyAndOps only removes the ops
+// fence) and it goes to Telegram via replyChunked with nothing in between. When
+// the Claude cap is spent, callCapFallback runs the turn on OpenRouter or
+// Surplus Intelligence, and those are exactly the reasoning models that wrap
+// their output in <think>. Same egress placement as the send budget above.
+installAgentMarkupGuard(bot);
+
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
 

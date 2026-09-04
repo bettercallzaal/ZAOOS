@@ -192,3 +192,61 @@ exercise, not a debut.
 Search 2026-09-04 for the Luma API surface and wrappers; search 2026-09-04
 confirming private Telegram groups are non-indexed by design. All **PARTIAL** —
 every relevant host is blocked from this container.
+
+---
+
+# RETRACTION 2026-09-04 — "the calendar is thin" was unfounded
+
+Zaal, looking at the live Luma page from his phone: *"no there's so many events
+wtf how are you even searching."*
+
+**He is right. The claim is withdrawn.**
+
+## What was claimed
+
+That the NYC web3 calendar was "genuinely thin," that this was caused by the
+conference ending plus Labor Day weekend, and that "more scraping will keep
+confirming the same answer." A whole strategic pivot (host your own event instead
+of finding one) was built on top of it.
+
+## Why it was wrong
+
+**Every one of those conclusions came from WebSearch, and WebSearch cannot see a
+live event calendar.** Search engines index pages that accumulate inbound links —
+conference homepages, press releases, listicles. Individual Luma listings created
+days ago by small hosts have no inbound links and are invisible to search
+essentially by construction.
+
+`luma.com` is blocked from this container. **The agent never loaded the page it was
+making claims about.** Five expired NFT.NYC satellite events kept coming back
+because those are exactly the ones with enough links to index — and that
+unrepresentative sample got treated as the population.
+
+This is `state-claims.md`'s "Silence is not evidence" and
+`confirm-before-claiming-absence.md`, committed inside a file whose own purpose is
+finding events. The absence claim needed proof of what was searched and how, and
+the honest version of the finding was always: *"WebSearch returns almost nothing
+for live listings, which tells you about WebSearch, not about New York."*
+
+It is also `measurement-traps.md` trap 2 in a new costume — a detector that had
+never been run against a known-good input. Nobody checked whether WebSearch could
+find a Luma event that definitely existed before trusting it to say none did.
+
+## The correction, and the actual division of labour
+
+- **Discovery is the human's.** Luma's map and city pages, opened on a phone, show
+  what genuinely exists. The agent cannot see any of it.
+- **Triage is the agent's**, and it is the harder half. Given a pasted list, the
+  agent can filter by base-for-the-night, travel time from the Solana anchor,
+  which of the nine people is likely to be there, and whether it suits the
+  ZAOstock ask.
+
+The earlier sections of this file stand — the Luma JSON API, the conference
+side-event slug pattern, the source ladder are all still correct and useful. **The
+"host your own instead" pivot is not withdrawn as an idea** — it may still be a
+good move on its own merits — but it must stop being justified by a thin calendar
+that was never measured.
+
+**Rule going forward: never characterise the volume, density or emptiness of a
+source this container cannot load.** Report what the search returned and say what
+that does not cover.

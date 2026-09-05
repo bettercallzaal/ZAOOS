@@ -34,6 +34,8 @@ import {
   sendsToday,
   stripSendClass,
   wasSendBlocked,
+  assertSendDelivered,
+  SendBlockedError,
   type SendClass,
 } from '../send-budget';
 
@@ -563,6 +565,30 @@ describe('wasSendBlocked - telling a blocked send from a real one', () => {
     await gated(1, 'burns the cap');
     expect(wasSendBlocked(await gated(1, 'over cap', { zoeSendClass: 'status' }))).toBe(true);
     expect(wasSendBlocked(await gated(1, 'held', { zoeSendClass: 'digest' }))).toBe(true);
+  });
+
+  it('assertSendDelivered throws on the drop and on the defer, naming the outcome', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+
+    const dropped = await gated(1, 'over cap', { zoeSendClass: 'status' });
+    expect(() => assertSendDelivered(dropped)).toThrow(SendBlockedError);
+    expect(() => assertSendDelivered(dropped)).toThrow(/dropped/);
+
+    const deferred = await gated(1, 'held', { zoeSendClass: 'digest' });
+    expect(() => assertSendDelivered(deferred)).toThrow(/deferred/);
+  });
+
+  it('assertSendDelivered returns a delivered send untouched', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '5';
+    const { send } = recordingSend();
+    const delivered = await gateSend(send)(1, 'under cap');
+    expect(assertSendDelivered(delivered)).toBe(delivered);
+    // And it is not fooled by a plain message_id 0 with no marker.
+    const bare = { message_id: 0 };
+    expect(assertSendDelivered(bare)).toBe(bare);
   });
 
   it('is false for a real Telegram Message, and for the empty answers', () => {

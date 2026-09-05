@@ -525,6 +525,36 @@ export function wasSendBlocked(result: unknown): boolean {
   );
 }
 
+/** Thrown by `assertSendDelivered` when the gate blocked the send. */
+export class SendBlockedError extends Error {
+  readonly outcome: SendOutcome;
+  constructor(outcome: SendOutcome) {
+    super(`send budget ${outcome} - the message never reached Telegram`);
+    this.name = 'SendBlockedError';
+    this.outcome = outcome;
+  }
+}
+
+/**
+ * Pass a delivered send through; THROW when the gate blocked it.
+ *
+ * For the large class of callers whose failure branch is already correct - a
+ * `catch` that logs and leaves the item unmarked so the next tick retries - the
+ * only thing missing is that a blocked send never enters that branch, because
+ * it resolves. Wrapping the send in this turns the gate's silent block into the
+ * failure those callers already handle, instead of a success they record
+ * durably for a message nobody received.
+ *
+ * Use it at the adapter that hands a send function to such a caller. Callers
+ * that want to branch rather than throw should use `wasSendBlocked` directly.
+ */
+export function assertSendDelivered<T>(result: T): T {
+  if (wasSendBlocked(result)) {
+    throw new SendBlockedError((result as { zoeSendBudget: SendOutcome }).zoeSendBudget);
+  }
+  return result;
+}
+
 export type RawSend = (chatId: number, text: string, opts?: Record<string, unknown>) => Promise<unknown>;
 
 /**

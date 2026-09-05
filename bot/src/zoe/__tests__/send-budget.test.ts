@@ -33,6 +33,7 @@ import {
   sendBudgetEnabled,
   sendsToday,
   stripSendClass,
+  wasSendBlocked,
   type SendClass,
 } from '../send-budget';
 
@@ -551,5 +552,25 @@ describe('deferred queue runaway guard', () => {
     expect(queued).toHaveLength(MAX_DEFERRED);
     // The newest survive; the oldest are the ones reported as dropped.
     expect(queued[queued.length - 1].text).toBe(`held ${MAX_DEFERRED + 4}`);
+  });
+});
+
+describe('wasSendBlocked - telling a blocked send from a real one', () => {
+  it('is true for the value gateSend resolves with on a drop, and on a defer', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    expect(wasSendBlocked(await gated(1, 'over cap', { zoeSendClass: 'status' }))).toBe(true);
+    expect(wasSendBlocked(await gated(1, 'held', { zoeSendClass: 'digest' }))).toBe(true);
+  });
+
+  it('is false for a real Telegram Message, and for the empty answers', () => {
+    // A delivered send returns whatever the API returned - never the sentinel.
+    expect(wasSendBlocked({ message_id: 42, chat: { id: 1 } })).toBe(false);
+    // message_id 0 alone is not the marker: the marker is the zoeSendBudget key.
+    expect(wasSendBlocked({ message_id: 0 })).toBe(false);
+    expect(wasSendBlocked(null)).toBe(false);
+    expect(wasSendBlocked(undefined)).toBe(false);
   });
 });

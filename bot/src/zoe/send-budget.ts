@@ -505,6 +505,26 @@ function blockedResult(outcome: SendOutcome): BlockedSendResult {
   return { message_id: 0, zoeSendBudget: outcome };
 }
 
+/**
+ * True when a send RESOLVED without reaching Telegram because this gate dropped
+ * or deferred it.
+ *
+ * A blocked send deliberately does not throw, so `try/catch` cannot see it and
+ * the resolved value is a non-null object - which means the ordinary
+ * "did the send work" test, `result != null`, now answers YES for a message
+ * that was never delivered. Any caller that writes durable state on the
+ * strength of a send (a dedup marker, a cursor, a pinned message id) MUST check
+ * this before recording delivery, or the gate turns a capped send into silent
+ * data loss.
+ */
+export function wasSendBlocked(result: unknown): boolean {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    typeof (result as { zoeSendBudget?: unknown }).zoeSendBudget === 'string'
+  );
+}
+
 export type RawSend = (chatId: number, text: string, opts?: Record<string, unknown>) => Promise<unknown>;
 
 /**

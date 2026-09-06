@@ -60,7 +60,14 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
-import { runWithSendClass, drainDeferred, renderDeferredBatch, wasSendBlocked } from './send-budget';
+import {
+  assertSendDelivered,
+  runWithSendClass,
+  drainDeferred,
+  requeueDeferred,
+  renderDeferredBatch,
+  wasSendBlocked,
+} from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -322,12 +329,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           try {
             const held = await drainDeferred();
             if (held.length > 0) {
-              await sendChunkedToTelegram(
+              const batchResult = await sendChunkedToTelegram(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
                 renderDeferredBatch(held),
               );
-              console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              if (batchResult == null) {
+                // Every chunk threw. sendChunkedToTelegram swallows those
+                // errors, so nothing reached Telegram and nothing threw here -
+                // without this the queue we just cleared is gone for good.
+                await requeueDeferred(held);
+                console.warn(
+                  `[zoe/scheduler] morning batch send failed - requeued ${held.length} deferred send(s)`,
+                );
+              } else if (wasSendBlocked(batchResult)) {
+                // The gate deferred the batch itself, which re-queues the text.
+                // Restoring here too would duplicate it.
+                console.warn('[zoe/scheduler] morning batch held by the send budget - stays queued');
+              } else {
+                console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              }
             }
           } catch (batchErr) {
             console.warn('[zoe/scheduler] deferred morning batch failed (nbd):', (batchErr as Error).message);
@@ -471,8 +492,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             join(ZOE_PATHS.home, 'pinned-brief.tick.lock'),
             async () =>
               runPinnedBriefTick({
+                // assertSendDelivered: this tick is NOT inside runWithSendClass,
+                // so its class resolves to the default `status`, whose overflow
+                // policy is `dropped`. A dropped send RESOLVES with
+                // { message_id: 0 }, and syncPinnedBrief writes whatever id it
+                // gets straight to pinned-brief.json - so the state file would
+                // record 0 as the live pinned message. Every later tick then
+                // edits message 0 (a 400 it swallows), re-sends, and re-writes 0,
+                // while featureRan reports `pinned 0` as a success. Throwing puts
+                // it in syncPinnedBrief's own catch, which returns
+                // { action: 'failed' } and writes NO state, so the next tick with
+                // budget left pins for real.
                 sendMessage: async (text) => {
-                  const m = await opts.bot.api.sendMessage(opts.zaalTgId, text);
+                  const m = assertSendDelivered(await opts.bot.api.sendMessage(opts.zaalTgId, text));
                   return { message_id: m.message_id };
                 },
                 pinMessage: (messageId) =>
@@ -880,9 +912,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // comment (thezao.xyz/board), so they see it without opening the board.
         // Best-effort - a no-op when the board or MENTION_NOTIFY_MAP is unset.
         try {
+          // assertSendDelivered: a send blocked by the daily budget RESOLVES, so
+          // without this the loop counts it as delivered and appends the
+          // (comment, handle) pair to its append-only seen file - which is the
+          // only dedup gate and is never re-evaluated, so the teammate's ping is
+          // gone for good. Throwing puts it in the module's own failure branch,
+          // which deliberately does not mark seen and retries next tick.
           const send = (chatId: number, text: string, o?: { threadId?: number }) =>
             opts.bot.api
               .sendMessage(chatId, text, o?.threadId ? { message_thread_id: o.threadId } : undefined)
+              .then(assertSendDelivered)
               .then(() => undefined);
           const mn = await runMentionNotify(send, opts.zaalTgId);
           if (mn.notified > 0) {
@@ -897,7 +936,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // answer back to the task. Best-effort - a no-op when board is unconfigured.
         try {
           const sendTg = async (chatId: number, text: string, o?: { replyToMessageId?: number }) => {
-            const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
+            // A blocked send resolves with message_id 0, and the caller's guard
+            // is `messageId !== null` - so without assertSendDelivered it would
+            // store a pending reply keyed on 0 (which no real reply can match)
+            // and mark the comment seen, after having already posted a public
+            // "noted" ack promising the teammate an answer.
+            const res = assertSendDelivered(
+              await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {}),
+            );
             return res.message_id ?? null;
           };
           const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId, fetch, opts.repoDir);

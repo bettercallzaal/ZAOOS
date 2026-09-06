@@ -60,7 +60,7 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
-import { runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
+import { assertSendDelivered, runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -880,9 +880,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // comment (thezao.xyz/board), so they see it without opening the board.
         // Best-effort - a no-op when the board or MENTION_NOTIFY_MAP is unset.
         try {
+          // assertSendDelivered: a send blocked by the daily budget RESOLVES, so
+          // without this the loop counts it as delivered and appends the
+          // (comment, handle) pair to its append-only seen file - which is the
+          // only dedup gate and is never re-evaluated, so the teammate's ping is
+          // gone for good. Throwing puts it in the module's own failure branch,
+          // which deliberately does not mark seen and retries next tick.
           const send = (chatId: number, text: string, o?: { threadId?: number }) =>
             opts.bot.api
               .sendMessage(chatId, text, o?.threadId ? { message_thread_id: o.threadId } : undefined)
+              .then(assertSendDelivered)
               .then(() => undefined);
           const mn = await runMentionNotify(send, opts.zaalTgId);
           if (mn.notified > 0) {
@@ -897,7 +904,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // answer back to the task. Best-effort - a no-op when board is unconfigured.
         try {
           const sendTg = async (chatId: number, text: string, o?: { replyToMessageId?: number }) => {
-            const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
+            // A blocked send resolves with message_id 0, and the caller's guard
+            // is `messageId !== null` - so without assertSendDelivered it would
+            // store a pending reply keyed on 0 (which no real reply can match)
+            // and mark the comment seen, after having already posted a public
+            // "noted" ack promising the teammate an answer.
+            const res = assertSendDelivered(
+              await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {}),
+            );
             return res.message_id ?? null;
           };
           const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId, fetch, opts.repoDir);

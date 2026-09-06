@@ -112,3 +112,25 @@ test('runMentionNotify does not mark seen when the send fails (retries next tick
   assert.equal(r2.notified, 1);
   assert.equal(sent.length, 1);
 });
+
+test('a send blocked by the daily budget does not mark seen either', async () => {
+  process.env.MENTION_NOTIFY_MAP = JSON.stringify({ iman: { chatId: 1 } });
+  const { assertSendDelivered } = await import('../send-budget');
+  // The scheduler's adapter shape. gateSend RESOLVES on a block, so without
+  // assertSendDelivered this send looks delivered and the pair is appended to
+  // the append-only seen file - the only dedup gate, never re-evaluated.
+  const blocked = async () => {
+    assertSendDelivered({ message_id: 0, zoeSendBudget: 'dropped' });
+  };
+  const tasks = [task('t1', '12', [{ id: 'c9', userId: 'zaal', content: '@iman ping' }])];
+  const r1 = await m.runMentionNotify(blocked, 1, fakeFetch(tasks));
+  assert.equal(r1.notified, 0);
+  // Tomorrow's reset (or any tick with budget left) still delivers it.
+  const sent: number[] = [];
+  const ok = async (chatId: number) => {
+    sent.push(chatId);
+  };
+  const r2 = await m.runMentionNotify(ok, 1, fakeFetch(tasks));
+  assert.equal(r2.notified, 1);
+  assert.equal(sent.length, 1);
+});

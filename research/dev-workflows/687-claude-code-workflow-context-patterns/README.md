@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-06
 related-docs: 684
 tier: STANDARD
 ---
@@ -91,13 +91,35 @@ All 5 items independently agree: **The bottleneck isn't AI capability. It's cont
 - Link doc 687 in ZAOOS CLAUDE.md as authoritative source for "why these 12 rules"
 - Keep cuzzo/clear retrospective link in /dev-workflows index - it's the canonical "how to verify LLM code actually works"
 
+## Updated 2026-09-06
+
+Three material developments since the 2026-05-20 validation:
+
+**1. Dynamic Workflows shipped May 28, 2026 (Max/Team/Enterprise)**
+Anthropic shipped Dynamic Workflows on 2026-05-28. Claude now writes its own orchestration scripts on the fly, spinning up parallel subagents (up to 16 concurrent, 1,000 per run) with adversarial verification baked in and checkpoint recovery on interruption. This directly supersedes the doc's QuadWork/Hermes recommendations: context-window orchestration is no longer the architecture — workflows produce a script that Claude writes fresh per task. ZAO runs on Max, so this is available now. The recommendation to "add checkpoint validation between coder+critic phase" (Next Actions table, row 4) is now better implemented as a Workflow script than as a manual phase gate. Source: search result summary (PARTIAL — anthropic.com/news blocked by proxy); see https://www.testingcatalog.com/anthropic-launches-dynamic-workflows-for-claude-code/ and https://explainx.ai/blog/claude-code-dynamic-workflows-2026.
+
+**2. CLAUDE.md size guidance has shifted — 80–120 lines is the current high-signal consensus**
+The 200-line ceiling in Key Decision 6 was the 2026 early guidance. By mid-2026, research and community consensus narrowed: recent studies show 80–120 lines is the practical high-signal limit; bloated CLAUDE.md files raised inference costs 20%+ without improving task success. The ZAOOS CLAUDE.md is at ~120 lines and sits at the right ceiling. The "add by Sept 2026" rules from the Next Actions table should be added to `.claude/rules/*.md` (already the practice) rather than into root CLAUDE.md. Separately: MEMORY.md (a different file) has a documented 200-line hard cap (GitHub issue #25006). Source: search result summary (PARTIAL — most blog domains blocked by proxy).
+
+**3. Karpathy's CLAUDE.md repo is now at 120,000 stars (as of search results, 2026-09-06)**
+The original doc noted it as a recent phenomenon. By Sept 2026 it is the fastest-growing single-file code repository of 2026. The 12-rule approach described in this doc is now mainstream — the use-4-rules-for-single-session / use-12-rules-for-multi-agent-chains guidance remains valid and is widely repeated. Source: search result synthesis (PARTIAL).
+
+**4. cuzzo/clear doc still live and unchanged**
+FULL fetch confirmed 2026-09-06. The signal-diversity retrospective at the URL below exists with the same content as originally cited. No new stars count found — the repo's star count may have grown but was not in search results.
+
+No changes to the core "Context Discipline" finding or the six-pattern Finding Table — all five source threads still support them and no contradictory evidence was found.
+
 ## Sources
 
 - [r/vibecoding: Anurag's 4-file context system (67 upvotes)](https://www.reddit.com/r/vibecoding/comments/1tg3182/stop_rebriefing_your_ai_every_session_the_4file/)
 - [r/AskVibecoders: Karpathy's 12-rule CLAUDE.md template (1126 upvotes)](https://www.reddit.com/r/AskVibecoders/comments/1ta7yr8/karpathys_claudemd_cuts_claude_mistakes_to_11/)
 - [r/ClaudeCode: HTML deliverable outputs over markdown (117 upvotes)](https://www.reddit.com/r/ClaudeCode/comments/1tf4exz/the_biggest_claude_code_workflow_upgrade_i_made/)
-- [GitHub cuzzo/clear: Signal diversity for vibe-code verification](https://github.com/cuzzo/clear/blob/master/docs/retrospective/how-to-vibe-code-something-that-actually-works.md)
+- [GitHub cuzzo/clear: Signal diversity for vibe-code verification](https://github.com/cuzzo/clear/blob/master/docs/retrospective/how-to-vibe-code-something-that-actually-works.md) — FULL fetch confirmed 2026-09-06
 - [r/ClaudeCode: claude-stash plugin for mid-task idea capture](https://www.reddit.com/r/ClaudeCode/comments/1thh501/built_a_claude_code_plugin_for_capturing_ideas/)
+- [Dynamic Workflows launch — testingcatalog.com](https://www.testingcatalog.com/anthropic-launches-dynamic-workflows-for-claude-code/) — PARTIAL (search result)
+- [Dynamic Workflows overview — explainx.ai](https://explainx.ai/blog/claude-code-dynamic-workflows-2026) — PARTIAL (search result)
+- [CLAUDE.md size guidance — claudefa.st](https://claudefa.st/blog/guide/mechanics/what-to-delete-from-claude-md) — PARTIAL (search result)
+- [MEMORY.md 200-line cap issue](https://github.com/anthropics/claude-code/issues/25006) — PARTIAL (search result)
 
 ## Next Actions
 

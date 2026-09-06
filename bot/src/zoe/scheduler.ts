@@ -37,7 +37,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
-import { sendChunkedToTelegram } from './tg-chunk';
+import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
 import {
   HeartFleet,
@@ -329,20 +329,34 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           try {
             const held = await drainDeferred();
             if (held.length > 0) {
-              const batchResult = await sendChunkedToTelegram(
+              // sendChunkedDetailed, not sendChunkedToTelegram: the batch is
+              // one line per held item and up to MAX_DEFERRED (200) of them, so
+              // it is routinely several chunks. The plain helper returns the
+              // last SUCCESSFUL send, which is truthy when chunk 1 arrived and
+              // chunk 2 threw - the queue is already cleared, so everything in
+              // the chunks that failed is gone, and the run logs "released N".
+              const batch = await sendChunkedDetailed(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
                 renderDeferredBatch(held),
               );
-              if (batchResult == null) {
-                // Every chunk threw. sendChunkedToTelegram swallows those
+              if (batch.sent === 0) {
+                // Every chunk threw. sendChunkedDetailed swallows those
                 // errors, so nothing reached Telegram and nothing threw here -
                 // without this the queue we just cleared is gone for good.
                 await requeueDeferred(held);
                 console.warn(
                   `[zoe/scheduler] morning batch send failed - requeued ${held.length} deferred send(s)`,
                 );
-              } else if (wasSendBlocked(batchResult)) {
+              } else if (batch.failed > 0) {
+                // Partial delivery. There is no chunk -> entry map, so restore
+                // the whole batch: the items in the delivered chunks arrive
+                // twice tomorrow, which beats losing the rest for good.
+                await requeueDeferred(held);
+                console.warn(
+                  `[zoe/scheduler] morning batch partially sent (${batch.sent}/${batch.total} chunks) - requeued all ${held.length} deferred send(s); delivered items may repeat`,
+                );
+              } else if (wasSendBlocked(batch.result)) {
                 // The gate deferred the batch itself, which re-queues the text.
                 // Restoring here too would duplicate it.
                 console.warn('[zoe/scheduler] morning batch held by the send budget - stays queued');

@@ -63,8 +63,21 @@ her - and gives Rung 4 its art direction.
 Zaal 2026-09-03: *"he will be part of all wavewarz events."* Not a ZAO NYC lead,
 but present for the WaveWarZ rung.
 
-**The 12 artists are online at `zao.cards`** (Zaal, 2026-09-03). Blocked from this
-container; pull it on the Mac. That is the Rung 2 starting roster.
+**The 12 artists are online at `zao.cards`** (Zaal, 2026-09-03). ~~Blocked from this
+container; pull it on the Mac.~~ **NOT BLOCKED - pulled 2026-09-05.** It 307-redirects to
+`manifold.gallery/the-zao/curation/ZAO-CARDS-ZAO-PALOOZA-EDITION` and resolves 200.
+**The series holds nine cards: ATTABOTTY, CHRISTIANO, HURRIC4N3IKE, JADYN VIOLET,
+JANGO UU, MAXWELL ADEN, MOJO THE GHOST, NE$$YTHERILLA, SMOKEWAVY.**
+
+> Nine cards is not a claim that there were nine artists - the whitepaper says twelve
+> performed, and a card series need not have a card per performer. Both can be true.
+
+> 🔴 **Rung 2 is further along than this doc thinks.** On **Thursday 2026-09-03**, four of
+> those nine were in the room with Zaal: **Attabotty** at the Canal Street Show, and
+> **Christiano, Mojo the Ghost and Ne$$ytherilla** at Underground Sound - which
+> **Christiano was hosting.** Rung 2's input is not a list to assemble. It is four artists
+> re-contacted in person by the person who booked them in 2024. See
+> `session-2026-09-03-nyc-labor-day-weekend/README.md`.
 
 > **Possible match worth checking:** "Jen one love" on Zaal's NFT NYC list may be
 > from **One Love Art DAO** - listed in the whitepaper's partner communities as
@@ -87,7 +100,8 @@ almost certainly holds all twelve names** - a roster of artists who already
 showed up for a ZAO event in New York.
 
 That is the warmest possible starting list for Rung 2, and it already exists.
-**Manifold is blocked from this container** - pull the series on the Mac.
+~~**Manifold is blocked from this container** - pull the series on the Mac.~~
+**Corrected 2026-09-05: Manifold is reachable and the series was pulled. Names above.**
 
 ## Also found: a fourth festival, and a stale whitepaper claim
 
@@ -159,9 +173,28 @@ strong: 2024 ran **12 artists on a 6-week lead time with a 6-person volunteer
 team and broke even.**
 *Needs:* everything above, plus a budget decision and a venue.
 
-**The runway is not the constraint.** If NFT NYC 2027 lands around the same time
-of year, that is roughly twelve months out, against a six-week build last time.
-**The constraint is roster, which is why Rung 1 starts now and not in spring.**
+**The runway is not the constraint - but the reasoning below it was wrong, corrected
+2026-09-05.** This previously read *"if NFT NYC 2027 lands around the same time of year,
+that is roughly twelve months out."* **NFT.NYC has not landed in the same window twice
+in the three years on record:**
+
+| Edition | When | Source |
+|---|---|---|
+| 2024 | **April 3-6** | luma nft-nyc calendar, 83 dated side events |
+| 2025 | **June 23-27** | same calendar; archived page copy says June 25-26 |
+| 2026 | **1-3 September** | NFT.NYC's own X bio, verbatim |
+
+It has moved later by roughly two and a half months each year, and **no 2027 date is
+announced anywhere reachable.** The honest planning range is **seven to fourteen months**,
+not "roughly twelve."
+
+**The conclusion survives.** Even at seven months that is far more than the six-week build
+that produced ZAO-PALOOZA 2024. **The constraint is roster, which is why Rung 1 starts now
+and not in spring.**
+
+**But blocker #2 is filed too lightly.** The 2027 date is the only Rung 4 input nobody in
+ZAO controls, and the record says it moves. Treat it as a watch item, not a lookup.
+Verified independently by the orchestrator seat, 2026-09-05.
 
 ---
 

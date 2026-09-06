@@ -147,6 +147,45 @@ The following Telegram handles are public ZAO bot identities and may appear unre
 
 Personal Telegram handles (e.g. `@some_person`) belonging to third parties get redacted to `@<redacted-handle>` in committed artifacts unless that person's handle has been explicitly cleared by Zaal for inclusion (e.g. ZAO Devz public team page, ZABAL Games mentor list).
 
+### Venue address allowlist (added 2026-09-06)
+
+The street-address pattern in Rule 3 cannot tell a person's home from a public
+business, so it fires on venues whose addresses are published by the venue itself.
+**A commercial venue's own published address is not third-party personal data** and
+may appear unredacted in committed artifacts when all three hold:
+
+1. It is a **business or public venue** - gallery, club, studio, office, theatre -
+   never a residence.
+2. The address is **published by the venue or the event**, on its own site, its
+   ticket or RSVP page, or its public listing. The doc should be able to name where
+   the address came from.
+3. It is being recorded as **where an event happened**, not as where a person lives
+   or can be found.
+
+A private residence stays banned no matter who published it. If the address is
+somebody's home, or a person is the reason the address matters, it gets redacted -
+including a venue address used to place an individual.
+
+Cleared under this rule (NYC, ART NYC and NFT.NYC week, 2026-09):
+
+```
+219 Bowery          TIME TO BE HAPPY Gallery
+327 Bowery          Bowery Palace
+300 Broome St       Heft Gallery
+91 Allen St         Cycol Gallery
+141 E Houston St    Solana / Skyline Tower
+247 W 30th St       American Whiskey
+48 E 23rd St        SPIN New York Flatiron
+```
+
+**Why this exists:** on 2026-09-06 the pre-commit scanner blocked the NYC weekend
+research doc over `300 Broome St` and `91 Allen St`, both art galleries whose
+addresses came off their own public event listings. Redacting them would have cost
+the doc its central geographic finding - that six venues sat inside one ten-minute
+walk - to protect nobody. Zaal's call, same day: allowlist rather than redact. The
+rule is narrowed to published commercial venues so it cannot be stretched to cover a
+person's address.
+
 ### Rule 4 - Default chat behavior when querying connected services
 
 When Claude runs a query against Gmail, Google Calendar, Google Drive, or any other PII-bearing connection:

@@ -13,10 +13,30 @@
  * "no buttons, lowest blast radius" pattern as posts/README.md v1. Best-effort
  * + de-duped via a last-seen file length, mirroring handoffs-surface.ts's
  * last-seen-timestamp approach for the same class of problem.
+ *
+ * THE CURSOR ONLY MOVES ON DELIVERED CONTENT. The last-seen length is a
+ * high-water mark over a file that only ever grows, so content the cursor skips
+ * past is never offered again - there is no second chance. Advancing it after a
+ * send that did not arrive is therefore permanent loss of an item that was, by
+ * construction, something the cloud loop could NOT act on alone. Two ways a send
+ * fails to arrive without throwing into the loop below:
+ *
+ *   - a Telegram error (429, network blip) - previously swallowed per-chunk by
+ *     a bare `.catch(() => {})`;
+ *   - the per-day send budget (send-budget.ts), which does not throw at all: a
+ *     dropped send RESOLVES with `{ message_id: 0, zoeSendBudget }`, so the
+ *     ordinary "it did not reject, so it worked" test says delivered.
+ *
+ * So each chunk is checked for BOTH, and the cursor is held where it is on the
+ * first failure. The next 10-minute tick re-reads the same new content and
+ * retries. That can re-post a chunk that did land before a later one failed;
+ * a duplicate approval card is cheap, a lost one is not.
  */
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+
+import { wasSendBlocked } from './send-budget';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const SEEN_PATH = join(ZOE_HOME, 'zaostock-approvals-seen.json');
@@ -98,7 +118,23 @@ export async function surfaceZaostockApprovals(
 
   for (let i = 0; i < chunks.length; i++) {
     const label = chunks.length > 1 ? `ZAOstock loop [${i + 1}/${chunks.length}]:\n\n` : 'ZAOstock loop - new item(s) need a look:\n\n';
-    await postToTarget(`${label}${chunks[i]}`).catch(() => {});
+    const where = `chunk ${i + 1}/${chunks.length}`;
+    try {
+      const result = await postToTarget(`${label}${chunks[i]}`);
+      if (wasSendBlocked(result)) {
+        // Blocked by the send budget. It resolved, so nothing threw - the only
+        // way to see it is to ask.
+        console.warn(
+          `[zoe/zaostock-approvals] ${where} blocked by the send budget - seen cursor held at ${seenLength}, retrying next tick`,
+        );
+        return i;
+      }
+    } catch (err) {
+      console.warn(
+        `[zoe/zaostock-approvals] ${where} failed to send (${(err as Error).message}) - seen cursor held at ${seenLength}, retrying next tick`,
+      );
+      return i;
+    }
   }
   await setLastSeenLength(content.length);
   return chunks.length;

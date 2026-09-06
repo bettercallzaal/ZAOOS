@@ -207,7 +207,33 @@ Verified independently by the orchestrator seat, 2026-09-05.
 | 3 | Budget model for a revival. 2024 broke even; is that the bar again? | Zaal |
 | 4 | Is Tyler still in NYC / still a ZAO collaborator? | Zaal |
 | 5 | Venue for anything recurring. Solana's free ecosystem coworking is worth asking about Friday | Zaal |
-| 6 | The FarCon 2025 question, still open - Zaal recalls FarCon 2025, the library records NFT NYC 2025 (Lil WaveWarZ Takeover) and dates FarCon to Rome, May 2026 | Zaal |
+| 6 | ~~The FarCon 2025 question~~ **HALF-RESOLVED 2026-09-06, see below** - FarCon NYC was real: 1-2 May 2025, Brooklyn. The remaining question is which conference the Lil WaveWarZ Takeover happened at | Zaal |
+
+### Blocker 6, half-resolved 2026-09-06
+
+The contradiction dissolves: **there were two different FarCons**, and both records were
+right.
+
+| Event | When | Where | Source |
+|---|---|---|---|
+| **FarCon NYC** | **1-2 May 2025** | Brooklyn, NY | Unlock Protocol event page: *"New York - MAY 2025"*, Builders Day 1 May, Summit 2 May |
+| FarCon | May 2026 | Rome | the library |
+| NFT.NYC 2025 | 23-27 June 2025 | New York | luma nft-nyc calendar |
+
+**Zaal's recollection of a FarCon 2025 was correct.** The library's Rome dating was also
+correct, for a later edition.
+
+> ⚠️ **The sharp question that remains, for Zaal only.** On 2026-09-06 he wrote *"my last
+> time in NYC for farcon."* If FarCon in **May 2025** was his last New York trip before
+> this weekend, then he was **not** in New York for NFT.NYC 2025 in June - and the
+> persona, the ICM box and doc 1231 all record **"Lil WaveWarZ Takeover at NFT NYC
+> (2025)"** as the third consecutive IRL proof point.
+>
+> Either that event was at **FarCon in May** and is mis-attributed to NFT.NYC in three
+> places, or he made **two NYC trips in 2025** and the phrasing was loose.
+>
+> **Do not edit the box, the persona or doc 1231 until he answers.** This is a published
+> brand claim about the chapter's own track record.
 
 ## Guards
 

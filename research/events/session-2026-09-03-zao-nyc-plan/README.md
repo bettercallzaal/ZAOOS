@@ -79,6 +79,13 @@ JANGO UU, MAXWELL ADEN, MOJO THE GHOST, NE$$YTHERILLA, SMOKEWAVY.**
 > re-contacted in person by the person who booked them in 2024. See
 > `session-2026-09-03-nyc-labor-day-weekend/README.md`.
 
+> ✅ **CONFIRMED 2026-09-06, Zaal direct.** "Jen one love" IS **One Love Art DAO**, and
+> **all of One Love's work is Jen's.** More than a name match: **ZAO worked with her
+> previously at ZAO-CHELLA**, and her work and her artists were displayed across New York
+> throughout the 2026-09 weekend. She is not a contact to make - she is a collaborator ZAO
+> already has, with 70+ global artists behind her. What follows was the original
+> unverified guess, kept for the record:
+>
 > **Possible match worth checking:** "Jen one love" on Zaal's NFT NYC list may be
 > from **One Love Art DAO** - listed in the whitepaper's partner communities as
 > *"600+ artists, global nonprofit bridging traditional + digital art."* If so,

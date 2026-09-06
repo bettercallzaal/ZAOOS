@@ -6,6 +6,7 @@ import { InlineKeyboard, type Context } from 'grammy';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
+import { assertSendDelivered } from '../send-budget';
 import { draftPost } from './drafters';
 import {
   clearPending,
@@ -55,7 +56,23 @@ export interface SendDraftOptions {
   isResend?: boolean;
 }
 
-/** Send a draft as 2 bubbles (label + bare text with keyboard) and persist pending. */
+/**
+ * Send a draft as 2 bubbles (label + bare text with keyboard) and persist pending.
+ *
+ * `zoeSendClass: 'gated'` is not decoration. This is an approval card - it is
+ * exactly what send-budget.ts calls `gated` ("a needs-you / approval / decision
+ * card"), so it always passes the daily cap and still counts. Without the tag
+ * the cron call sites (posts/scheduler.ts, fractal-promo.ts) send from outside
+ * any `runWithSendClass` context, the class defaults to `status`, and a card
+ * arriving after the 20th send of the day is DROPPED.
+ *
+ * `assertSendDelivered` closes the same hole from the other side. A blocked send
+ * resolves rather than throwing, so `savePending` below would record a draft as
+ * delivered-and-awaiting-Zaal for a message he never received - and with
+ * MAX_RESENDS = 0 it then expires on the 4h TTL unseen. Throwing puts it in the
+ * catch branch this function already has, which logs `send-error` and returns
+ * null, so the caller sees a failure instead of a phantom success.
+ */
 export async function sendDraftWithKeyboard(opts: SendDraftOptions): Promise<PendingDraft | null> {
   const existing = await loadPending();
   const id = existing?.id ?? newPendingId(opts.category);
@@ -63,10 +80,19 @@ export async function sendDraftWithKeyboard(opts: SendDraftOptions): Promise<Pen
     const headerSuffix = opts.isResend
       ? ` (resend ${(existing?.resendCount ?? 0) + 1}/3 - tap a button)`
       : ' - tap POST/REGEN/SKIP';
-    await opts.bot.sendMessage(opts.zaalTgId, `ZOE post draft (${opts.category})${headerSuffix}`);
-    const sent = await opts.bot.sendMessage(opts.zaalTgId, opts.text, {
-      reply_markup: buildKeyboard(id),
-    });
+    assertSendDelivered(
+      await opts.bot.sendMessage(
+        opts.zaalTgId,
+        `ZOE post draft (${opts.category})${headerSuffix}`,
+        { zoeSendClass: 'gated' } as never,
+      ),
+    );
+    const sent = assertSendDelivered(
+      await opts.bot.sendMessage(opts.zaalTgId, opts.text, {
+        reply_markup: buildKeyboard(id),
+        zoeSendClass: 'gated',
+      } as never),
+    );
     const now = new Date().toISOString();
     const pending: PendingDraft = {
       id,

@@ -60,7 +60,7 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
-import { runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
+import { runWithSendClass, drainDeferred, renderDeferredBatch, wasSendBlocked } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -1028,10 +1028,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
           // Nudges and reasoning decisions are status messages
-          if (opts.routingDeps) {
-            await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' });
-          } else {
-            await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          const sent = opts.routingDeps
+            ? await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' })
+            : await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          // This tick runs outside any runWithSendClass context, so its sends
+          // take the default `status` class, whose overflow policy is DROP. A
+          // dropped send RESOLVES (send-budget.ts returns
+          // `{ message_id: 0, zoeSendBudget }` rather than throwing), so the
+          // catch below never fires and the state writes underneath would run
+          // for a message Zaal never received: recordPush files an unacked push
+          // that throttles FUTURE pushes, markNudged bumps nudgeCount and
+          // restarts the thread's cooldown, and markNudgeSent starts the
+          // task-nudge cooldown. All three are the same permanent-loss shape
+          // fixed in relay-bridge.ts - the retry is suppressed by state written
+          // for a delivery that did not happen. Leave the state alone so the
+          // next tick re-decides. (silent-failure-guard rules 1 + 6.)
+          if (wasSendBlocked(sent)) {
+            console.warn(
+              `[zoe/scheduler] reasoning tick send blocked by the send budget (kind=${decision.candidate?.kind ?? 'n/a'}) - not recording the push`,
+            );
+            return;
           }
           if (decision.candidate) {
             await recordPush(decision.candidate);

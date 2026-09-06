@@ -63,6 +63,21 @@ her - and gives Rung 4 its art direction.
 Zaal 2026-09-03: *"he will be part of all wavewarz events."* Not a ZAO NYC lead,
 but present for the WaveWarZ rung.
 
+**The 12 artists are online at `zao.cards`** (Zaal, 2026-09-03). ~~Blocked from this
+container; pull it on the Mac.~~ **NOT BLOCKED - pulled 2026-09-05.** It 307-redirects to
+`manifold.gallery/the-zao/curation/ZAO-CARDS-ZAO-PALOOZA-EDITION` and resolves 200.
+**The series holds nine cards: ATTABOTTY, CHRISTIANO, HURRIC4N3IKE, JADYN VIOLET,
+JANGO UU, MAXWELL ADEN, MOJO THE GHOST, NE$$YTHERILLA, SMOKEWAVY.**
+
+> Nine cards is not a claim that there were nine artists - the whitepaper says twelve
+> performed, and a card series need not have a card per performer. Both can be true.
+
+> 🔴 **Rung 2 is further along than this doc thinks.** On **Thursday 2026-09-03**, four of
+> those nine were in the room with Zaal: **Attabotty** at the Canal Street Show, and
+> **Christiano, Mojo the Ghost and Ne$$ytherilla** at Underground Sound - which
+> **Christiano was hosting.** Rung 2's input is not a list to assemble. It is four artists
+> re-contacted in person by the person who booked them in 2024. See
+> `session-2026-09-03-nyc-labor-day-weekend/README.md`.
 **PULLED 2026-09-05 on the Mac, and the number was wrong.** `zao.cards` is NOT
 blocked - it returns a 307 to `manifold.gallery/ZAO-CARDS-ZAO-PALOOZA-EDITION`
 and resolves 200. The series holds **nine** cards, not twelve: **Attabotty,
@@ -94,6 +109,9 @@ one.
 The whitepaper says 12 artists and links a **ZAO Card series on Manifold**. This
 section predicted that the card series "almost certainly holds all twelve names".
 
+That is the warmest possible starting list for Rung 2, and it already exists.
+~~**Manifold is blocked from this container** - pull the series on the Mac.~~
+**Corrected 2026-09-05: Manifold is reachable and the series was pulled. Names above.**
 **Pulled 2026-09-05. It holds nine, and the inference was wrong.** Manifold is
 not blocked from the Mac; `zao.cards` 307s to the curation and resolves 200. The
 nine are Attabotty, Christiano, Hurric4n3Ike, Jadyn Violet, JANGO UU, Maxwell
@@ -175,9 +193,28 @@ strong: 2024 ran **12 artists on a 6-week lead time with a 6-person volunteer
 team and broke even.**
 *Needs:* everything above, plus a budget decision and a venue.
 
-**The runway is not the constraint.** If NFT NYC 2027 lands around the same time
-of year, that is roughly twelve months out, against a six-week build last time.
-**The constraint is roster, which is why Rung 1 starts now and not in spring.**
+**The runway is not the constraint - but the reasoning below it was wrong, corrected
+2026-09-05.** This previously read *"if NFT NYC 2027 lands around the same time of year,
+that is roughly twelve months out."* **NFT.NYC has not landed in the same window twice
+in the three years on record:**
+
+| Edition | When | Source |
+|---|---|---|
+| 2024 | **April 3-6** | luma nft-nyc calendar, 83 dated side events |
+| 2025 | **June 23-27** | same calendar; archived page copy says June 25-26 |
+| 2026 | **1-3 September** | NFT.NYC's own X bio, verbatim |
+
+It has moved later by roughly two and a half months each year, and **no 2027 date is
+announced anywhere reachable.** The honest planning range is **seven to fourteen months**,
+not "roughly twelve."
+
+**The conclusion survives.** Even at seven months that is far more than the six-week build
+that produced ZAO-PALOOZA 2024. **The constraint is roster, which is why Rung 1 starts now
+and not in spring.**
+
+**But blocker #2 is filed too lightly.** The 2027 date is the only Rung 4 input nobody in
+ZAO controls, and the record says it moves. Treat it as a watch item, not a lookup.
+Verified independently by the orchestrator seat, 2026-09-05.
 
 ---
 
@@ -190,7 +227,33 @@ of year, that is roughly twelve months out, against a six-week build last time.
 | 3 | Budget model for a revival. 2024 broke even; is that the bar again? | Zaal |
 | 4 | Is Tyler still in NYC / still a ZAO collaborator? | Zaal |
 | 5 | Venue for anything recurring. Solana's free ecosystem coworking is worth asking about Friday | Zaal |
-| 6 | The FarCon 2025 question, still open - Zaal recalls FarCon 2025, the library records NFT NYC 2025 (Lil WaveWarZ Takeover) and dates FarCon to Rome, May 2026 | Zaal |
+| 6 | ~~The FarCon 2025 question~~ **HALF-RESOLVED 2026-09-06, see below** - FarCon NYC was real: 1-2 May 2025, Brooklyn. The remaining question is which conference the Lil WaveWarZ Takeover happened at | Zaal |
+
+### Blocker 6, half-resolved 2026-09-06
+
+The contradiction dissolves: **there were two different FarCons**, and both records were
+right.
+
+| Event | When | Where | Source |
+|---|---|---|---|
+| **FarCon NYC** | **1-2 May 2025** | Brooklyn, NY | Unlock Protocol event page: *"New York - MAY 2025"*, Builders Day 1 May, Summit 2 May |
+| FarCon | May 2026 | Rome | the library |
+| NFT.NYC 2025 | 23-27 June 2025 | New York | luma nft-nyc calendar |
+
+**Zaal's recollection of a FarCon 2025 was correct.** The library's Rome dating was also
+correct, for a later edition.
+
+> ⚠️ **The sharp question that remains, for Zaal only.** On 2026-09-06 he wrote *"my last
+> time in NYC for farcon."* If FarCon in **May 2025** was his last New York trip before
+> this weekend, then he was **not** in New York for NFT.NYC 2025 in June - and the
+> persona, the ICM box and doc 1231 all record **"Lil WaveWarZ Takeover at NFT NYC
+> (2025)"** as the third consecutive IRL proof point.
+>
+> Either that event was at **FarCon in May** and is mis-attributed to NFT.NYC in three
+> places, or he made **two NYC trips in 2025** and the phrasing was loose.
+>
+> **Do not edit the box, the persona or doc 1231 until he answers.** This is a published
+> brand claim about the chapter's own track record.
 
 ## Guards
 

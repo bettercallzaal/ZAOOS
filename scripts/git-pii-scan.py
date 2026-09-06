@@ -49,6 +49,26 @@ EMAIL_ALLOW = {
     "hello@thezao.com",
     "support@thezao.com",
 }
+# From pii-hygiene.md's "Venue address allowlist" section (added 2026-09-06).
+# A commercial venue's OWN PUBLISHED address is not third-party personal data.
+# The street_address pattern cannot tell a gallery from a home, so it fired on
+# venues whose addresses came off their own public event listings and blocked a
+# research doc for protecting nobody.
+#
+# EXACT MATCH ONLY, and deliberately so. This does not loosen the pattern, does
+# not exempt a street, and does not exempt a number range. Every entry is a
+# business or public venue, published by the venue or its event, recorded as
+# where an event happened. A private residence is never eligible, and a venue
+# address used to place an INDIVIDUAL still gets redacted - the allowlist covers
+# the address, not the use.
+VENUE_ADDR_ALLOW = {
+    "300 broome st",   # Heft Gallery, NYC
+    "91 allen st",     # Cycol Gallery, NYC
+    "141 e houston st",  # Solana / Skyline Tower, NYC
+    "247 w 30th st",   # American Whiskey, NYC
+    "48 e 23rd st",    # SPIN New York Flatiron
+}
+
 # Public role-addresses on ZAO-controlled domains, per the same section.
 ROLE_PREFIXES = ("contact@", "team@", "info@", "hello@", "support@", "press@", "zoe@")
 ZAO_DOMAINS = ("thezao.com", "bettercallzaal.com", "zabalgamez.com", "zaofestivals.com")
@@ -92,6 +112,16 @@ PATTERNS: dict[str, tuple[str, bool]] = {
 }
 
 
+def venue_addr_allowed(addr: str) -> bool:
+    """True only for an exact match against VENUE_ADDR_ALLOW.
+
+    Normalises whitespace and case so "300  Broome  St" and "300 Broome St" are
+    the same entry. Does nothing else - no prefix matching, no street-level
+    wildcards. If it is not on the list character for character, it is blocked.
+    """
+    return " ".join(addr.split()).lower() in VENUE_ADDR_ALLOW
+
+
 def email_allowed(addr: str) -> bool:
     a = addr.lower()
     if a in EMAIL_ALLOW:
@@ -131,6 +161,8 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
                 text = m if isinstance(m, str) else m[0]
                 if kind == "email" and email_allowed(text):
                     continue
+                if kind == "street_address" and venue_addr_allowed(text):
+                    continue
                 found.append((kind, path, text, line.strip()[:100]))
     return found
 
@@ -151,7 +183,10 @@ def main() -> int:
         print(file=sys.stderr)
     print(
         "Third-party personal data must not be committed. Redact it, or add the\n"
-        "address to the allowlist in .claude/rules/pii-hygiene.md if it is a public\n"
+        "address to BOTH the allowlist section in .claude/rules/pii-hygiene.md AND\n"
+        "the matching set in this script (EMAIL_ALLOW / VENUE_ADDR_ALLOW) - the\n"
+        "markdown is documentation, the sets are what this scanner reads. A venue\n"
+        "address is eligible only if it is a published commercial venue; a home\n"
         "ZAO address. Raw query output belongs in ~/.zao/private/, never the repo.\n\n"
         "If this is a false positive, that is a bug in the scanner worth fixing -\n"
         "say so rather than bypassing, because a check people route around protects\n"

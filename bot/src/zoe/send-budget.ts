@@ -432,6 +432,39 @@ export async function drainDeferred(): Promise<DeferredSend[]> {
   return entries;
 }
 
+/**
+ * Put drained entries BACK on the queue after the batch send failed to leave
+ * the process.
+ *
+ * `drainDeferred` clears the file before the send, so the held entries exist
+ * only in the caller's local variable for the length of that one send. The
+ * batch goes out through `sendChunkedToTelegram`, which swallows a per-chunk
+ * error on purpose (one bad chunk must not drop the others) - so a Telegram
+ * 429 or a network blip does not throw, the caller's `catch` never runs, and
+ * the whole queue is gone with the run logged as a success. This is the undo.
+ *
+ * Restored entries go at the FRONT: they are older than anything queued since
+ * the drain, and `MAX_DEFERRED` trimming keeps the newest, same as `deferSend`.
+ */
+export async function requeueDeferred(entries: DeferredSend[]): Promise<void> {
+  if (entries.length === 0) return;
+  try {
+    await fs.mkdir(zoeHome(), { recursive: true });
+    const existing = await readDeferred();
+    const next = [...entries, ...existing];
+    if (next.length > MAX_DEFERRED) {
+      const lost = next.length - MAX_DEFERRED;
+      console.warn(
+        `[zoe/send-budget] requeue over ${MAX_DEFERRED} - dropped ${lost} oldest entries`,
+      );
+    }
+    const kept = next.slice(-MAX_DEFERRED);
+    await fs.writeFile(deferredFile(), kept.map((e) => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+  } catch (err) {
+    console.warn('[zoe/send-budget] could not requeue deferred sends:', (err as Error).message);
+  }
+}
+
 /** Render drained entries as one batched message body. */
 export function renderDeferredBatch(entries: DeferredSend[]): string {
   const head = `Held back yesterday (${entries.length} ${entries.length === 1 ? 'item' : 'items'}, over the daily send cap):`;

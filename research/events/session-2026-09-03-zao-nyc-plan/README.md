@@ -63,8 +63,18 @@ her - and gives Rung 4 its art direction.
 Zaal 2026-09-03: *"he will be part of all wavewarz events."* Not a ZAO NYC lead,
 but present for the WaveWarZ rung.
 
-**The 12 artists are online at `zao.cards`** (Zaal, 2026-09-03). Blocked from this
-container; pull it on the Mac. That is the Rung 2 starting roster.
+**PULLED 2026-09-05 on the Mac, and the number was wrong.** `zao.cards` is NOT
+blocked - it returns a 307 to `manifold.gallery/ZAO-CARDS-ZAO-PALOOZA-EDITION`
+and resolves 200. The series holds **nine** cards, not twelve: **Attabotty,
+Christiano, Hurric4n3Ike, Jadyn Violet, JANGO UU, Maxwell Aden, Mojo the Ghost,
+Ne$$ytherilla, Smokewavy.** That is the Rung 2 starting roster and it is now a
+list rather than a task.
+
+**Four of those nine were in two rooms on one block on Thursday 2026-09-03** -
+Attabotty, Christiano, Mojo the Ghost and Ne$$ytherilla - and Christiano was
+running one of the two events. Nobody organised that. It is the strongest
+evidence in this document that the chapter has a warm start rather than a cold
+one.
 
 > **Possible match worth checking:** "Jen one love" on Zaal's NFT NYC list may be
 > from **One Love Art DAO** - listed in the whitepaper's partner communities as
@@ -81,13 +91,19 @@ container; pull it on the Mac. That is the Rung 2 starting roster.
 
 ## The ZAO-PALOOZA 2024 lineup is a findable list
 
-The whitepaper says 12 artists and links a **ZAO Card series on Manifold**. The
-link is per-artist (`zao-card-jango-uu-ZAO-PALOOZA`), so **the card series
-almost certainly holds all twelve names** - a roster of artists who already
-showed up for a ZAO event in New York.
+The whitepaper says 12 artists and links a **ZAO Card series on Manifold**. This
+section predicted that the card series "almost certainly holds all twelve names".
 
-That is the warmest possible starting list for Rung 2, and it already exists.
-**Manifold is blocked from this container** - pull the series on the Mac.
+**Pulled 2026-09-05. It holds nine, and the inference was wrong.** Manifold is
+not blocked from the Mac; `zao.cards` 307s to the curation and resolves 200. The
+nine are Attabotty, Christiano, Hurric4n3Ike, Jadyn Violet, JANGO UU, Maxwell
+Aden, Mojo the Ghost, Ne$$ytherilla and Smokewavy.
+
+So the whitepaper's twelve and the card series' nine do not agree, and **three
+ZAO-PALOOZA artists have no card**. Which three is not answerable from the
+series alone and needs the original lineup; that is a real open question and it
+is smaller than the one this section thought it had. The nine are a roster today
+either way.
 
 ## Also found: a fourth festival, and a stale whitepaper claim
 

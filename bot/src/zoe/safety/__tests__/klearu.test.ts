@@ -205,6 +205,73 @@ describe('checkText — bare-label verdict via spawn', () => {
   });
 });
 
+// ── ran, exited 0, classified nothing ────────────────────────────────────────
+// The gate's contract is fail-CLOSED by default. These are the cases where the
+// classifier exits 0 and produces no usable verdict; each one used to return
+// safe=true, which is the gate silently off.
+
+describe('checkText — classifier ran but said nothing usable', () => {
+  beforeEach(() => { process.env.KLEARU_TEXT_CMD = 'klearu classify'; });
+
+  it('fails closed on empty stdout with exit 0', async () => {
+    spawnImpl = makeSpawn('');
+    const v = await checkText('anything');
+    expect(v.safe).toBe(false);
+    expect(v.reason).toContain('fail-closed');
+  });
+
+  it('fails closed on JSON with neither "safe" nor "label"', async () => {
+    spawnImpl = makeSpawn('{"error":"model not loaded"}');
+    const v = await checkText('anything');
+    expect(v.safe).toBe(false);
+    expect(v.label).toBe('unverified-block');
+  });
+
+  it('fails closed on a JSON scalar rather than a verdict object', async () => {
+    spawnImpl = makeSpawn('"unsafe"');
+    const v = await checkText('anything');
+    expect(v.safe).toBe(false);
+  });
+
+  it('fails closed on JSON null', async () => {
+    spawnImpl = makeSpawn('null');
+    const v = await checkText('anything');
+    expect(v.safe).toBe(false);
+  });
+
+  it('honours KLEARU_FAIL_MODE=open for the same unusable output', async () => {
+    process.env.KLEARU_FAIL_MODE = 'open';
+    spawnImpl = makeSpawn('{"error":"model not loaded"}');
+    const v = await checkText('anything');
+    expect(v.safe).toBe(true);
+    expect(v.label).toBe('unverified-allow');
+  });
+
+  it('still allows a present-but-unlisted label (classifier answered "clean")', async () => {
+    spawnImpl = makeSpawn('{"label":"clean"}');
+    const v = await checkText('good post');
+    expect(v.safe).toBe(true);
+    expect(v.reason).toBe('klearu-json');
+  });
+
+  it('still allows {safe:true} with no label at all', async () => {
+    spawnImpl = makeSpawn('{"safe":true}');
+    const v = await checkText('good post');
+    expect(v.safe).toBe(true);
+    expect(v.label).toBe('safe');
+  });
+});
+
+describe('checkCast — an unusable text verdict blocks the cast', () => {
+  beforeEach(() => { process.env.KLEARU_TEXT_CMD = 'klearu classify'; });
+
+  it('blocks when the classifier returns an error object on exit 0', async () => {
+    spawnImpl = makeSpawn('{"error":"model not loaded"}');
+    const v = await checkCast({ text: 'a draft cast' });
+    expect(v.safe).toBe(false);
+  });
+});
+
 describe('checkCast — early-exit on unsafe text', () => {
   beforeEach(() => { process.env.KLEARU_TEXT_CMD = 'klearu classify'; });
 

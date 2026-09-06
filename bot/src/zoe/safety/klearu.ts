@@ -61,22 +61,51 @@ function failVerdict(reason: string): SafetyVerdict {
   };
 }
 
+/**
+ * Turn the classifier's stdout into a verdict.
+ *
+ * A VERDICT ONLY COUNTS WHEN THE CLASSIFIER ACTUALLY SAID SOMETHING. Every
+ * other way this wrapper can fail - no command configured, non-zero exit,
+ * timeout, spawn error, EPIPE - routes through `failVerdict`, so
+ * `KLEARU_FAIL_MODE` decides and the default is to BLOCK. This function used to
+ * be the one path that did not, and it failed the other way:
+ *
+ *   - empty stdout on exit 0        -> label '', nothing matched -> safe: true
+ *   - `{"error":"model not loaded"}` -> no `safe`, no `label`     -> safe: true,
+ *                                       and `label` reported as 'safe'
+ *   - a JSON scalar (`"unsafe"`, `null`, `42`)                    -> safe: true
+ *
+ * So a classifier that ran, exited 0 and classified nothing returned an ALLOW
+ * that the caster then prints to Telegram as "safety safe" - a fabricated
+ * verdict for text nobody checked, on the gate that stands in front of
+ * autonomous casts (`caster/index.ts`) and agent triggers (`agents/guards.ts`).
+ * That is a gate that is off while looking on (silent-failure-guard.md rules 6
+ * and 7).
+ *
+ * A label that is present but simply not in KLEARU_BLOCK_LABELS is still SAFE -
+ * that is the classifier answering "clean", not failing to answer.
+ */
 function parseVerdict(stdout: string): SafetyVerdict {
   const raw = stdout.trim();
+  if (!raw) return failVerdict('klearu exited 0 but printed nothing');
+
   // Try JSON first.
   try {
-    const obj = JSON.parse(raw) as { label?: string; score?: number; safe?: boolean };
-    const label = (obj.label ?? '').toLowerCase();
-    const score = typeof obj.score === 'number' ? obj.score : null;
-    let safe: boolean;
-    if (typeof obj.safe === 'boolean') {
-      safe = obj.safe;
-    } else {
-      safe = !blockLabels().includes(label);
+    const parsed = JSON.parse(raw) as unknown;
+    if (typeof parsed !== 'object' || parsed === null) {
+      return failVerdict(`klearu output is not a verdict object: ${raw.slice(0, 80)}`);
     }
+    const obj = parsed as { label?: string; score?: number; safe?: boolean };
+    const label = (typeof obj.label === 'string' ? obj.label : '').toLowerCase();
+    const score = typeof obj.score === 'number' ? obj.score : null;
+    if (typeof obj.safe !== 'boolean' && !label) {
+      return failVerdict(`klearu JSON carried neither "safe" nor "label": ${raw.slice(0, 80)}`);
+    }
+    const safe = typeof obj.safe === 'boolean' ? obj.safe : !blockLabels().includes(label);
     return { safe, label: label || (safe ? 'safe' : 'unsafe'), score, reason: 'klearu-json', raw };
   } catch {
-    // Bare-label fallback.
+    // Bare-label fallback. `raw` is non-empty by the guard above, so this is a
+    // real label the classifier printed, not silence.
     const label = raw.toLowerCase();
     const safe = !blockLabels().some((b) => label.includes(b));
     return { safe, label: label.slice(0, 40), score: null, reason: 'klearu-bare-label', raw };

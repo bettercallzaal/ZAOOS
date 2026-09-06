@@ -471,8 +471,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             join(ZOE_PATHS.home, 'pinned-brief.tick.lock'),
             async () =>
               runPinnedBriefTick({
+                // assertSendDelivered: this tick is NOT inside runWithSendClass,
+                // so its class resolves to the default `status`, whose overflow
+                // policy is `dropped`. A dropped send RESOLVES with
+                // { message_id: 0 }, and syncPinnedBrief writes whatever id it
+                // gets straight to pinned-brief.json - so the state file would
+                // record 0 as the live pinned message. Every later tick then
+                // edits message 0 (a 400 it swallows), re-sends, and re-writes 0,
+                // while featureRan reports `pinned 0` as a success. Throwing puts
+                // it in syncPinnedBrief's own catch, which returns
+                // { action: 'failed' } and writes NO state, so the next tick with
+                // budget left pins for real.
                 sendMessage: async (text) => {
-                  const m = await opts.bot.api.sendMessage(opts.zaalTgId, text);
+                  const m = assertSendDelivered(await opts.bot.api.sendMessage(opts.zaalTgId, text));
                   return { message_id: m.message_id };
                 },
                 pinMessage: (messageId) =>

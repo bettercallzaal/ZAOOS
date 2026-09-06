@@ -432,6 +432,39 @@ export async function drainDeferred(): Promise<DeferredSend[]> {
   return entries;
 }
 
+/**
+ * Put drained entries BACK on the queue after the batch send failed to leave
+ * the process.
+ *
+ * `drainDeferred` clears the file before the send, so the held entries exist
+ * only in the caller's local variable for the length of that one send. The
+ * batch goes out through `sendChunkedToTelegram`, which swallows a per-chunk
+ * error on purpose (one bad chunk must not drop the others) - so a Telegram
+ * 429 or a network blip does not throw, the caller's `catch` never runs, and
+ * the whole queue is gone with the run logged as a success. This is the undo.
+ *
+ * Restored entries go at the FRONT: they are older than anything queued since
+ * the drain, and `MAX_DEFERRED` trimming keeps the newest, same as `deferSend`.
+ */
+export async function requeueDeferred(entries: DeferredSend[]): Promise<void> {
+  if (entries.length === 0) return;
+  try {
+    await fs.mkdir(zoeHome(), { recursive: true });
+    const existing = await readDeferred();
+    const next = [...entries, ...existing];
+    if (next.length > MAX_DEFERRED) {
+      const lost = next.length - MAX_DEFERRED;
+      console.warn(
+        `[zoe/send-budget] requeue over ${MAX_DEFERRED} - dropped ${lost} oldest entries`,
+      );
+    }
+    const kept = next.slice(-MAX_DEFERRED);
+    await fs.writeFile(deferredFile(), kept.map((e) => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+  } catch (err) {
+    console.warn('[zoe/send-budget] could not requeue deferred sends:', (err as Error).message);
+  }
+}
+
 /** Render drained entries as one batched message body. */
 export function renderDeferredBatch(entries: DeferredSend[]): string {
   const head = `Held back yesterday (${entries.length} ${entries.length === 1 ? 'item' : 'items'}, over the daily send cap):`;
@@ -503,6 +536,56 @@ export interface BlockedSendResult {
 
 function blockedResult(outcome: SendOutcome): BlockedSendResult {
   return { message_id: 0, zoeSendBudget: outcome };
+}
+
+/**
+ * True when a send RESOLVED without reaching Telegram because this gate dropped
+ * or deferred it.
+ *
+ * A blocked send deliberately does not throw, so `try/catch` cannot see it and
+ * the resolved value is a non-null object - which means the ordinary
+ * "did the send work" test, `result != null`, now answers YES for a message
+ * that was never delivered. Any caller that writes durable state on the
+ * strength of a send (a dedup marker, a cursor, a pinned message id) MUST check
+ * this before recording delivery, or the gate turns a capped send into silent
+ * data loss.
+ */
+export function wasSendBlocked(result: unknown): boolean {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    typeof (result as { zoeSendBudget?: unknown }).zoeSendBudget === 'string'
+  );
+}
+
+/** Thrown by `assertSendDelivered` when the gate blocked the send. */
+export class SendBlockedError extends Error {
+  readonly outcome: SendOutcome;
+  constructor(outcome: SendOutcome) {
+    super(`send budget ${outcome} - the message never reached Telegram`);
+    this.name = 'SendBlockedError';
+    this.outcome = outcome;
+  }
+}
+
+/**
+ * Pass a delivered send through; THROW when the gate blocked it.
+ *
+ * For the large class of callers whose failure branch is already correct - a
+ * `catch` that logs and leaves the item unmarked so the next tick retries - the
+ * only thing missing is that a blocked send never enters that branch, because
+ * it resolves. Wrapping the send in this turns the gate's silent block into the
+ * failure those callers already handle, instead of a success they record
+ * durably for a message nobody received.
+ *
+ * Use it at the adapter that hands a send function to such a caller. Callers
+ * that want to branch rather than throw should use `wasSendBlocked` directly.
+ */
+export function assertSendDelivered<T>(result: T): T {
+  if (wasSendBlocked(result)) {
+    throw new SendBlockedError((result as { zoeSendBudget: SendOutcome }).zoeSendBudget);
+  }
+  return result;
 }
 
 export type RawSend = (chatId: number, text: string, opts?: Record<string, unknown>) => Promise<unknown>;

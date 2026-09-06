@@ -26,6 +26,7 @@ import {
   readDeferred,
   readSendLog,
   renderDeferredBatch,
+  requeueDeferred,
   resetSendBudgetForTest,
   resolveSendClass,
   runWithSendClass,
@@ -33,6 +34,10 @@ import {
   sendBudgetEnabled,
   sendsToday,
   stripSendClass,
+  wasSendBlocked,
+  assertSendDelivered,
+  SendBlockedError,
+  type DeferredSend,
   type SendClass,
 } from '../send-budget';
 
@@ -398,6 +403,66 @@ describe('gateSend', () => {
     expect(await drainDeferred()).toEqual([]);
   });
 
+  it('requeues a drained batch when the morning send never left the process', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await gated(1, 'brief', { zoeSendClass: 'digest' });
+    await gated(1, 'digest', { zoeSendClass: 'digest' });
+
+    const held = await drainDeferred();
+    expect(await readDeferred()).toEqual([]); // the drain really did clear it
+
+    // The batch send failed. Without the restore these two are gone for good.
+    await requeueDeferred(held);
+    expect((await readDeferred()).map((e) => e.text)).toEqual(['brief', 'digest']);
+  });
+
+  it('puts a requeued batch ahead of anything deferred since the drain', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await gated(1, 'older', { zoeSendClass: 'digest' });
+
+    const held = await drainDeferred();
+    await gated(1, 'newer', { zoeSendClass: 'digest' });
+    await requeueDeferred(held);
+
+    expect((await readDeferred()).map((e) => e.text)).toEqual(['older', 'newer']);
+  });
+
+  it('requeueing nothing leaves the queue untouched', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await gated(1, 'still waiting', { zoeSendClass: 'digest' });
+
+    await requeueDeferred([]);
+    expect((await readDeferred()).map((e) => e.text)).toEqual(['still waiting']);
+  });
+
+  it('keeps the newest MAX_DEFERRED when a requeue overflows the queue', async () => {
+    const stale: DeferredSend[] = Array.from({ length: MAX_DEFERRED }, (_, i) => ({
+      at: '2026-09-05T10:00:00.000Z',
+      cls: 'digest' as SendClass,
+      chatId: 1,
+      text: `old-${i}`,
+    }));
+    await requeueDeferred(stale);
+
+    await requeueDeferred([
+      { at: '2026-09-04T10:00:00.000Z', cls: 'digest', chatId: 1, text: 'older-still' },
+    ]);
+
+    const queue = await readDeferred();
+    expect(queue).toHaveLength(MAX_DEFERRED);
+    expect(queue.some((e) => e.text === 'older-still')).toBe(false);
+    expect(queue[0].text).toBe('old-0');
+  });
+
   it('logs every drop and every deferral - nothing is silent', async () => {
     process.env.ZOE_DAILY_SEND_CAP = '1';
     const { send } = recordingSend();
@@ -551,5 +616,49 @@ describe('deferred queue runaway guard', () => {
     expect(queued).toHaveLength(MAX_DEFERRED);
     // The newest survive; the oldest are the ones reported as dropped.
     expect(queued[queued.length - 1].text).toBe(`held ${MAX_DEFERRED + 4}`);
+  });
+});
+
+describe('wasSendBlocked - telling a blocked send from a real one', () => {
+  it('is true for the value gateSend resolves with on a drop, and on a defer', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    expect(wasSendBlocked(await gated(1, 'over cap', { zoeSendClass: 'status' }))).toBe(true);
+    expect(wasSendBlocked(await gated(1, 'held', { zoeSendClass: 'digest' }))).toBe(true);
+  });
+
+  it('assertSendDelivered throws on the drop and on the defer, naming the outcome', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+
+    const dropped = await gated(1, 'over cap', { zoeSendClass: 'status' });
+    expect(() => assertSendDelivered(dropped)).toThrow(SendBlockedError);
+    expect(() => assertSendDelivered(dropped)).toThrow(/dropped/);
+
+    const deferred = await gated(1, 'held', { zoeSendClass: 'digest' });
+    expect(() => assertSendDelivered(deferred)).toThrow(/deferred/);
+  });
+
+  it('assertSendDelivered returns a delivered send untouched', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '5';
+    const { send } = recordingSend();
+    const delivered = await gateSend(send)(1, 'under cap');
+    expect(assertSendDelivered(delivered)).toBe(delivered);
+    // And it is not fooled by a plain message_id 0 with no marker.
+    const bare = { message_id: 0 };
+    expect(assertSendDelivered(bare)).toBe(bare);
+  });
+
+  it('is false for a real Telegram Message, and for the empty answers', () => {
+    // A delivered send returns whatever the API returned - never the sentinel.
+    expect(wasSendBlocked({ message_id: 42, chat: { id: 1 } })).toBe(false);
+    // message_id 0 alone is not the marker: the marker is the zoeSendBudget key.
+    expect(wasSendBlocked({ message_id: 0 })).toBe(false);
+    expect(wasSendBlocked(null)).toBe(false);
+    expect(wasSendBlocked(undefined)).toBe(false);
   });
 });

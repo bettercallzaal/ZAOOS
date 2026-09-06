@@ -25,6 +25,7 @@
 
 import { sendChunkedToTelegram } from './tg-chunk';
 import { featureRan } from './feature-ran';
+import { wasSendBlocked } from './send-budget';
 
 const HUB_LEGACY_ID = '9000';
 
@@ -249,7 +250,18 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // the only dedup gate and is never re-evaluated), and would also arm the
       // gesture-free reply path for a message Zaal never saw. Leave it unpushed
       // so the next tick retries. (silent-failure-guard rules 1 + 6.)
-      if (sent == null) continue;
+      //
+      // `wasSendBlocked` closes the second, quieter way a send can fail to
+      // arrive. The per-day send budget (send-budget.ts) wraps
+      // bot.api.sendMessage at boot, and a blocked send RESOLVES with
+      // `{ message_id: 0, zoeSendBudget }` rather than throwing or returning
+      // null - so `sent == null` is false and the catch never fires, and this
+      // loop would mark a never-delivered relay `tg_pushed`. This tick runs
+      // outside any runWithSendClass context, so its sends take the default
+      // `status` class, whose overflow policy is DROP: past the daily cap every
+      // inbound relay would be silently and permanently lost, since
+      // `tg_pushed` is the only dedup gate and is never re-evaluated.
+      if (sent == null || wasSendBlocked(sent)) continue;
       pushedTs.add(r.ts);
       // Register message_id -> rl-<lane> so a plain reply to THIS message routes
       // back to the lane (no button tap). Best-effort - never blocks the push.

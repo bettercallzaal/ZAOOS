@@ -9,6 +9,7 @@ import {
   type BriefInput,
   type PinDeps,
 } from '../pinned-brief';
+import { assertSendDelivered } from '../send-budget';
 
 const BASE: BriefInput = {
   needsYou: ['ZOE login revoked - ssh vps, claude, /login'],
@@ -155,6 +156,40 @@ describe('syncPinnedBrief', () => {
     });
     const r = await syncPinnedBrief('hello', d);
     expect(r).toEqual({ action: 'failed', reason: 'network down' });
+  });
+
+  it('persists NO pin state when the send fails, so the next tick pins for real', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const d = deps({
+      sendMessage: vi.fn(async () => {
+        throw new Error('network down');
+      }),
+    });
+    await syncPinnedBrief('hello', d);
+    // The half that matters: a failed send must not leave a message id behind.
+    // Anything written here is read back as "this is the live pinned message"
+    // by every later tick.
+    expect(await readPinState(statePath)).toBeNull();
+  });
+
+  it('treats a send blocked by the daily budget as a failure, not as message 0', async () => {
+    // scheduler.ts wires deps.sendMessage as
+    //   assertSendDelivered(await bot.api.sendMessage(...)) -> { message_id }
+    // A send past the daily cap does NOT throw: it resolves with
+    // { message_id: 0, zoeSendBudget }. Without assertSendDelivered that 0 is
+    // persisted as the live pinned message id, every later tick edits message 0
+    // and re-sends, and featureRan reports `pinned 0` as a success.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const blocked = { message_id: 0, zoeSendBudget: 'dropped' } as const;
+    const d = deps({
+      sendMessage: vi.fn(async () => {
+        const m = assertSendDelivered(blocked);
+        return { message_id: m.message_id };
+      }),
+    });
+    const r = await syncPinnedBrief('hello', d);
+    expect(r.action).toBe('failed');
+    expect(await readPinState(statePath)).toBeNull();
   });
 
   it('survives a corrupt state file by re-pinning', async () => {

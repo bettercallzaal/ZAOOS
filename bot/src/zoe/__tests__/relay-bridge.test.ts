@@ -214,4 +214,44 @@ describe('pushInboundRelays', () => {
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;
   });
+
+  it('does NOT mark pushed when only SOME chunks of a long relay arrived', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://x.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    // A relayed paste long enough to split into three Telegram messages. This is
+    // the case the module chunks for in the first place.
+    const long = 'x'.repeat(9000);
+    const hub = {
+      id: 'h1',
+      metadata: { relays: [rel({ from: 'cowork', to: 'zoe', ts: 'a', msg: long, tg_pushed: false })] },
+    };
+    const writes: string[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: { method?: string }) => {
+      if (init?.method === 'POST') writes.push(url);
+      return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    // Chunk 2 throws (a Telegram 429 mid-send); chunks 1 and 3 arrive. The
+    // keyboard rides the LAST chunk, so the helper returns a truthy Message -
+    // which used to read as "delivered" while a third of the relay was gone.
+    let call = 0;
+    const sendMessage = vi.fn(async () => {
+      call += 1;
+      if (call === 2) throw new Error('telegram 429');
+      return { message_id: 40 + call };
+    });
+    const recordContext = vi.fn(async () => {});
+    const armPending = vi.fn();
+    const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext, armPending });
+    expect(sendMessage).toHaveBeenCalledTimes(3);
+    // tg_pushed is the ONLY dedup gate and is never re-evaluated, so marking a
+    // half-delivered relay loses the missing chunks for good.
+    expect(n).toBe(0);
+    expect(writes).toEqual([]);
+    expect(recordContext).not.toHaveBeenCalled();
+    expect(armPending).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+    delete process.env.COWORK_TRACKER_URL;
+    delete process.env.COWORK_TRACKER_KEY;
+  });
 });

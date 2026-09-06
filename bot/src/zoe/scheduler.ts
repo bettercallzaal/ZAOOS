@@ -60,7 +60,14 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
-import { assertSendDelivered, runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
+import {
+  assertSendDelivered,
+  runWithSendClass,
+  drainDeferred,
+  requeueDeferred,
+  renderDeferredBatch,
+  wasSendBlocked,
+} from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -322,12 +329,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           try {
             const held = await drainDeferred();
             if (held.length > 0) {
-              await sendChunkedToTelegram(
+              const batchResult = await sendChunkedToTelegram(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
                 renderDeferredBatch(held),
               );
-              console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              if (batchResult == null) {
+                // Every chunk threw. sendChunkedToTelegram swallows those
+                // errors, so nothing reached Telegram and nothing threw here -
+                // without this the queue we just cleared is gone for good.
+                await requeueDeferred(held);
+                console.warn(
+                  `[zoe/scheduler] morning batch send failed - requeued ${held.length} deferred send(s)`,
+                );
+              } else if (wasSendBlocked(batchResult)) {
+                // The gate deferred the batch itself, which re-queues the text.
+                // Restoring here too would duplicate it.
+                console.warn('[zoe/scheduler] morning batch held by the send budget - stays queued');
+              } else {
+                console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              }
             }
           } catch (batchErr) {
             console.warn('[zoe/scheduler] deferred morning batch failed (nbd):', (batchErr as Error).message);

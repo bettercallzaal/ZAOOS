@@ -35,6 +35,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { parseQuestionCallback, encodeQuestion, type ParsedQuestion } from './questions';
 import { routeQuestionToTopic, resolveQuestionTopic, openQuestionCapReport } from './telegram-routing';
+import { wasSendBlocked } from './send-budget';
 import { pushRecent, ZOE_PATHS } from './memory';
 import { enqueueWork } from './work-loop';
 import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
@@ -601,7 +602,7 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           try {
             // Post into the question's topic (doc 2314 phase 1b): topic from the
             // qid prefix where one is encoded, Claude Code for neutral questions.
-            await routeQuestionToTopic(
+            const sent = await routeQuestionToTopic(
               {
                 sendMessage: deps.bot.api.sendMessage,
                 zaalId: deps.zaalTgId,
@@ -614,6 +615,22 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
                 options: action.nextQuestion.options,
               },
             );
+            // Everything below this line is durable state recorded on the
+            // strength of that send - the pending-answer arm, the nudge track,
+            // and (via `actioned`) the answer cursor. The send budget blocks by
+            // RESOLVING, not throwing, so the catch below never fires for a
+            // capped send: without this check the loop arms Zaal's next typed
+            // message against a question he never saw, starts a nudge ladder
+            // whose re-pings are capped too, and advances lastSeenTs past the
+            // answer that produced the follow-up - which is the only record
+            // that the follow-up is owed. Leave it unactioned and the next
+            // tick re-detects the same answer and retries the question.
+            if (wasSendBlocked(sent)) {
+              console.warn(
+                `[zoe/orchestrator] next question ${action.nextQuestion.qid} was blocked by the send budget - not armed, not nudged, cursor left for the next tick`,
+              );
+              break;
+            }
             // arm General: Zaal's next plain typed message answers this question
             armPendingAnswer(deps.groupId, action.nextQuestion.qid);
             // Nudge ladder: begin the escalating->decaying ping for this open question.

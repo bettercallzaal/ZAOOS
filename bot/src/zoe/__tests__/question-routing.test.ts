@@ -100,6 +100,15 @@ describe('routeQuestionToTopic', () => {
     expect(mockGetTopicThread).not.toHaveBeenCalled();
   });
 
+  it('returns the send result so a caller can test wasSendBlocked before recording delivery', async () => {
+    mockGetTopicThread.mockResolvedValue(12);
+    // What the send budget resolves with when it drops a send: not null, not a
+    // throw, so `res != null` and `try/catch` both say the question was posted.
+    const blocked = { message_id: 0, zoeSendBudget: 'dropped' };
+    const deps = makeDeps({ sendMessage: vi.fn().mockResolvedValue(blocked) });
+    await expect(routeQuestionToTopic(deps, 'ZABAL Games', q)).resolves.toBe(blocked);
+  });
+
   it('uses the reaction keyboard when options is empty', async () => {
     mockGetTopicThread.mockResolvedValue(12);
     const deps = makeDeps();

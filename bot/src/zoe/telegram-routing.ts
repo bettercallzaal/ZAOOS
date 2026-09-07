@@ -176,12 +176,21 @@ export interface TopicQuestion {
  * any unmapped topic both post to the group root so the question stays VISIBLE;
  * an unmapped topic additionally logs loud (stale topics.json - run /inittopics).
  * No groupId configured: falls back to Zaal's DM, same as sendToZaal.
+ *
+ * RETURNS THE SEND RESULT, for the same reason `sendToZaal` does: the send
+ * budget blocks by RESOLVING with `{ message_id: 0, zoeSendBudget }` rather
+ * than throwing, so a caller that returns `void` here leaves every caller
+ * structurally unable to tell a posted question from one nobody received. The
+ * callers of this function arm a pending-answer slot, start a nudge ladder and
+ * advance the answer cursor on the strength of this send - all of which are
+ * durable state for a question that was never delivered. Test with
+ * `wasSendBlocked(...)` before recording any of it.
  */
 export async function routeQuestionToTopic(
   deps: TelegramRoutingDeps,
   topicName: string,
   q: TopicQuestion,
-): Promise<void> {
+): Promise<unknown> {
   const keyboard = q.options.length
     ? questionKeyboard(q.qid, q.options, q.includeType ?? true)
     : reactionKeyboard(q.qid);
@@ -197,7 +206,7 @@ export async function routeQuestionToTopic(
       );
     }
   }
-  await deps.sendMessage(chatId, q.text, sendOpts);
+  return await deps.sendMessage(chatId, q.text, sendOpts);
 }
 
 /** One open (unanswered) needs-you question, for cap accounting. */

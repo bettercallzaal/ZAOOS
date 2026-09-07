@@ -292,6 +292,72 @@ describe('runOrchestratorTick', () => {
     );
   });
 
+  it('does NOT advance the answer cursor when the send budget blocked the next question', async () => {
+    process.env.ZOE_ORCHESTRATOR_ENABLED = 'true';
+
+    const statePath = join(testHome, 'orchestrator-state.json');
+    await fs.mkdir(testHome, { recursive: true });
+    await fs.writeFile(statePath, JSON.stringify({ lastSeenTs: '2026-01-01T00:00:00Z' }));
+
+    await fs.mkdir(testRecentDir, { recursive: true });
+    const recentPath = join(testRecentDir, '12345.json');
+    const turns = [
+      { from: 'zaal', text: '[answer:q-priority-what] Research', ts: '2026-01-02T00:00:00Z', sender: 'zaalbotz-btn' },
+    ];
+    await fs.writeFile(recentPath, JSON.stringify(turns));
+
+    // The send budget blocks by RESOLVING with this shape - it never throws and
+    // never returns null, so every ordinary "did the send work" test passes.
+    const mockBot = {
+      api: {
+        sendMessage: vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' }),
+      },
+    };
+
+    await runOrchestratorTick({
+      bot: mockBot as any,
+      groupId: 12345,
+      zaalTgId: 9876,
+      now: new Date(),
+    });
+
+    // The question was attempted...
+    expect(mockBot.api.sendMessage).toHaveBeenCalled();
+    // ...but nobody received it, so the answer that owes a follow-up must stay
+    // in front of the cursor for the next tick to retry.
+    const after = JSON.parse(await fs.readFile(statePath, 'utf8'));
+    expect(after.lastSeenTs).toBe('2026-01-01T00:00:00Z');
+  });
+
+  it('advances the answer cursor when the next question was delivered', async () => {
+    process.env.ZOE_ORCHESTRATOR_ENABLED = 'true';
+
+    const statePath = join(testHome, 'orchestrator-state.json');
+    await fs.mkdir(testHome, { recursive: true });
+    await fs.writeFile(statePath, JSON.stringify({ lastSeenTs: '2026-01-01T00:00:00Z' }));
+
+    await fs.mkdir(testRecentDir, { recursive: true });
+    const recentPath = join(testRecentDir, '12345.json');
+    const turns = [
+      { from: 'zaal', text: '[answer:q-priority-what] Research', ts: '2026-01-02T00:00:00Z', sender: 'zaalbotz-btn' },
+    ];
+    await fs.writeFile(recentPath, JSON.stringify(turns));
+
+    const mockBot = {
+      api: { sendMessage: vi.fn().mockResolvedValue({ message_id: 77 }) },
+    };
+
+    await runOrchestratorTick({
+      bot: mockBot as any,
+      groupId: 12345,
+      zaalTgId: 9876,
+      now: new Date(),
+    });
+
+    const after = JSON.parse(await fs.readFile(statePath, 'utf8'));
+    expect(after.lastSeenTs).toBe('2026-01-02T00:00:00Z');
+  });
+
   it('executes research action (enqueues work)', async () => {
     process.env.ZOE_ORCHESTRATOR_ENABLED = 'true';
     const enqueueSpy = vi.spyOn(workLoop, 'enqueueWork').mockResolvedValue({

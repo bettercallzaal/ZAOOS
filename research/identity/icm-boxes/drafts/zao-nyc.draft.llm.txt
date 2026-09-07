@@ -13,7 +13,9 @@ That makes NYC the first place, not a new one.
 ## The NYC track record
 - **2018/19** - Zaal meets JANGO UU in New York. The seed of the origin story.
 - **2024-04-03 - ZAO-PALOOZA at NFT NYC.** 12 artists, organized in a 6-week lead time by a 6-person volunteer team, broke even financially. The ZAO's **first major IRL proof** that it could produce a web3-native live music event. JANGO UU performed and was featured on an official ZAO Card (Manifold).
-- **2025-05 - "Lil WaveWarZ Takeover" at FarCon NYC.** An IRL battle, and the third consecutive IRL proof point - evidence WaveWarZ could export its battle format to a live room. FarCon NYC ran 1-2 May 2025 in Brooklyn. Corrected 2026-09-07: earlier drafts placed this at NFT NYC, which Zaal confirmed was wrong - his 2025 New York trip was FarCon, and he published four videos of it.
+- **2025-05 - FarCon NYC.** Zaal returned to New York for FarCon (Brooklyn, 1-2 May 2025), attending as a guest rather than producing. Onchain Builder House, House of Nouns, the FarCon Summit, The Forever Library. Documented in his own "Farcon NYC 2025" video playlist.
+
+> **RETRACTION, 2026-09-07.** Every earlier draft of this box listed a **"Lil WaveWarZ Takeover" at NFT NYC in 2025** as "the third consecutive IRL proof point." **That event never happened.** Zaal, 2026-09-07: *"It never happened since proposal didn't pass."* The claim originated in a HackMD team roster page which said he was *"leading the Lil WaveWarZ takeover @ NFT NYC"* - a forward-looking line about a plan - and doc 742 recorded it as **"Shipped."** From there it spread to doc 1231, this box, the persona, `docs/LADDER.md` and the published ZAO NYC card. **There are two NYC IRL productions, not three: ZAO-PALOOZA 2024 and ZAOstock is not NYC. Do not restore this claim.**
 - **2026-09 - NFT NYC weekend.** A third year at the same conference, this time building the chapter itself.
 
 New York is also the first of the four cities The ZAO has produced festivals in: New York (NFT NYC), Miami (Art Basel), Colorado (ETH Denver), and Maine (ZAOstock, October 2026).

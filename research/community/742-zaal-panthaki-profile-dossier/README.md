@@ -82,7 +82,7 @@ For the Alliance application Zaal upgrades the title to **"Director of Ecosystem
 | **Magnetiq / Proof of Meet** — Tyler Stambaugh collab, ZABAL Connector at ETH Boulder Feb 2026 | Shipped | Doc 050; memory `project_tyler_stambaugh` |
 | **Empire Builder v3 integration** — 6 PRs across docs 560-566, 582-585 | Live | memory `project_empire_builder_zabal_integration` |
 | **Arthur (Neynar) Base agentic build** — EVM dev brought in as ZABAL Games mentor + WaveWarZ integration | In progress | Doc 711; memory `project_arthur_neynar` |
-| **Lil WaveWarZ takeover @ NFT NYC** — Zaal led the IRL event | Shipped | HackMD team doc |
+| ~~**Lil WaveWarZ takeover @ NFT NYC**~~ **RETRACTED 2026-09-07 - NEVER HAPPENED** | **Not shipped. The proposal did not pass.** Zaal: *"It never happened since proposal didn't pass."* **This row is where the error entered the estate.** The HackMD source is a TEAM ROSTER that says Zaal is *"leading the Lil WaveWarZ takeover @ NFT NYC"* - a forward-looking line about a plan, not a record of an event. Reading it as "Shipped" turned an intention into history, and it propagated to doc 1231, the ZAO NYC ICM box, the persona, docs/LADDER.md and a published card. | HackMD team doc - a roster of a planned team, NOT an event record |
 
 **Public WaveWarZ testimonial (bettercallzaal.com):**
 

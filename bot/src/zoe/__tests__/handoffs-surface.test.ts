@@ -121,7 +121,32 @@ describe('surfaceNewHandoffs', () => {
     expect(url).toContain(encodeURIComponent(since));
   });
 
-  it('swallows postToTopic errors without stopping other posts', async () => {
+  // The cursor is a `created_at` high-water mark and the query is
+  // `created_at=gt.<since>`, so a row it skips is never fetched again. These
+  // pin that it only ever moves over rows that actually arrived.
+
+  it('holds the cursor and stops when a post throws', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
+    process.env.COWORK_TRACKER_KEY = 'test-key';
+    mockReadFile.mockRejectedValue(new Error('ENOENT'));
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    const rows = [
+      { title: 'A', legacy_source: 'handoff:a', created_at: '2026-07-17T09:00:00Z' },
+      { title: 'B', legacy_source: 'handoff:b', created_at: '2026-07-17T10:00:00Z' },
+    ];
+    stubFetch(rows);
+    const postToTopic = vi.fn().mockRejectedValueOnce(new Error('TG error'));
+    const result = await surfaceNewHandoffs(postToTopic);
+    // A landed for nobody, so it is not counted and B is not attempted -
+    // advancing to B's timestamp would strand A permanently.
+    expect(result).toBe(0);
+    expect(postToTopic).toHaveBeenCalledTimes(1);
+    expect(mockWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('advances the cursor only as far as the last delivered row', async () => {
+    vi.useFakeTimers({ now: new Date('2026-07-17T07:00:00Z') });
     process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
     process.env.COWORK_TRACKER_KEY = 'test-key';
     mockReadFile.mockRejectedValue(new Error('ENOENT'));
@@ -133,10 +158,29 @@ describe('surfaceNewHandoffs', () => {
     ];
     stubFetch(rows);
     const postToTopic = vi.fn()
-      .mockRejectedValueOnce(new Error('TG error')) // first fails
-      .mockResolvedValueOnce(undefined);             // second ok
+      .mockResolvedValueOnce(undefined)              // A lands
+      .mockRejectedValueOnce(new Error('TG error')); // B does not
     const result = await surfaceNewHandoffs(postToTopic);
-    expect(result).toBe(2); // still returns 2 (rows processed)
-    expect(postToTopic).toHaveBeenCalledTimes(2);
+    expect(result).toBe(1);
+    const written = mockWriteFile.mock.calls[mockWriteFile.mock.calls.length - 1][1];
+    expect(JSON.parse(written).at).toBe('2026-07-17T09:00:00Z'); // A's, not B's
+  });
+
+  it('treats a send-budget block as undelivered even though it resolves', async () => {
+    process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
+    process.env.COWORK_TRACKER_KEY = 'test-key';
+    mockReadFile.mockRejectedValue(new Error('ENOENT'));
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    const rows = [
+      { title: 'A', legacy_source: 'handoff:a', created_at: '2026-07-17T09:00:00Z' },
+    ];
+    stubFetch(rows);
+    // gateSend RESOLVES on a block, so nothing throws and the value is a
+    // non-null object - `result != null` says delivered.
+    const postToTopic = vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' });
+    const result = await surfaceNewHandoffs(postToTopic);
+    expect(result).toBe(0);
+    expect(mockWriteFile).not.toHaveBeenCalled();
   });
 });

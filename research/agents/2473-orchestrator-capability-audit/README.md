@@ -20,21 +20,25 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **Disable the six MCP servers with zero calls.** `serena`, `Linear`, `Notion`, `memory`, `sequential-thinking`, `TravExp` | Measured across **5,805 transcripts**: 4,049 MCP calls total, **zero** to any of these six. `serena`'s tool names appear **127,732 times** in transcript context and were never once invoked |
+| 1 | **Disable the six near-dead MCP servers.** `Linear`, `Notion`, `memory`, `sequential-thinking`, `TravExp` are at **zero**; `serena` is at **8** | Measured across **7,359 transcripts**: 4,269 MCP calls total. Between them these six carry **458,171 tool-name mentions in context for 8 calls**. `claude-in-chrome` does 2,415 calls on 156,062 mentions - the dead six cost **2.9x the context of the server doing 57% of the work** |
 | 2 | **Stop mandating `context7` first in `/zao-research`.** Replace with what the runs actually use | 3 calls all-time, last **2026-08-04**. The skill has told 122 research runs to reach for it first. Third instance of a dead mandate after doc 2411 |
 | 3 | **Prune the 52 never-invoked skills to a keep-list, don't delete blind** | 82 on disk, 54 used, **52 never invoked**, ~**220,684 tokens** of context cost that has never returned anything. But zero calls is not a verdict - age separates a dead skill from a new one |
 | 4 | **Close or claim the 18 lane briefs with real open work and no session** | 76 briefs, **13 live lanes**, 64 briefs with no lane. Around 18 of those are `ready`/`unconsumed` - real work nobody holds |
 | 5 | **The agenda stack is not missing, it is unreadable.** Fix `bucket()` first | 569 open cards. **286 match no brand at all** and **362 sit in no view**. You cannot prioritise across brands until the board can show them |
 | 6 | **`zao-wall.py` is not on `$PATH`.** The tool the board runs on cannot be run by name | Doc 2471's finding again, on the tool that answers "what work exists" |
 
-## Connectors: 22 in use, 6 dead, and one very expensive ghost
+## Connectors: 22 in use, 6 near-dead, and 458,171 mentions for 8 calls
 
 Measured 2026-09-07 by parsing `tool_use` blocks out of every transcript in
-`~/.claude/projects` - **5,805 files, 4,049 MCP calls**.
+`~/.claude/projects` - **7,359 files, 4,269 MCP calls**.
+
+**Read the correction at the end of this section before quoting any zero here.**
+The first pass walked only 5,805 files and reported six zeros. One of them was
+not a zero.
 
 | Server | Calls | Last used |
 |---|---:|---|
-| `claude-in-chrome` | **2,321** | 2026-09-07 |
+| `claude-in-chrome` | **2,415** | 2026-09-07 |
 | `supabase-cowork` | 889 | 2026-09-06 |
 | `gdocs` | 154 | 2026-09-07 |
 | `exa` | 144 | 2026-09-02 |
@@ -53,46 +57,74 @@ Measured 2026-09-07 by parsing `tool_use` blocks out of every transcript in
 | `blockscout` | 3 | 2026-08-21 |
 | `Slack`, `Dropbox`, `Descript` | 2 each | 2026-08-20/28 |
 | `Expedia` | 1 | 2026-08-07 |
-| **`serena`** | **0** | never |
+| **`serena`** | **8** | rare |
 | **`Linear`** | **0** | never |
 | **`Notion`** | **0** | never |
 | **`memory`** | **0** | never |
 | **`sequential-thinking`** | **0** | never |
 | **`TravExp`** | **0** | never |
 
-**One connector is 57% of all MCP usage.** `claude-in-chrome` at 2,321 calls does
+**One connector is 57% of all MCP usage.** `claude-in-chrome` at 2,415 calls does
 more than every other server combined. That is worth knowing before anyone
 proposes replacing it.
 
-### The serena ghost, and why it is the sharpest finding here
+### The context-to-call ratio, which is the finding
 
-`mcp__serena__*` appears **127,732 times across 3,269 transcripts** and has been
-invoked **zero** times.
+The six servers below are carried in every session's context and almost never
+called. Mentions are how many times their tool names appear across the
+transcript corpus; calls are actual `tool_use` invocations.
 
-Its server instructions are not shy about it either:
+| Server | Name-mentions | Calls | Mentions per call |
+|---|---:|---:|---:|
+| `serena` | 127,732 | **8** | ~15,967 |
+| `memory` | 123,585 | **0** | — |
+| `Linear` | 114,355 | **0** | — |
+| `Notion` | 72,534 | **0** | — |
+| `sequential-thinking` | 13,787 | **0** | — |
+| `TravExp` | 6,178 | **0** | — |
+| **Six total** | **458,171** | **8** | — |
+| `claude-in-chrome`, for scale | 156,062 | **2,415** | ~65 |
+
+**The six near-dead servers cost roughly 2.9x the context footprint of the one
+server that does 57% of all the work.**
+
+`serena` is the one worth reading twice. Its server instructions say:
 
 > "You have access to semantic coding tools upon which you rely heavily for all
 > your work... You avoid reading entire files unless it is absolutely necessary,
 > instead relying on intelligent step-by-step acquisition of information."
 
-Every session is told it relies heavily on a toolset it has never once called.
-That text, plus ~25 tool definitions, is loaded into context every time.
+Eight calls. Every session is told it relies heavily on a toolset it reaches for
+roughly once per thousand transcripts.
 
-**This is the exact shape doc 2411 measured** for `mcp__grep__searchGitHub` -
-mandated by a skill step, called zero times in 377 transcripts over 30 days. It
-is now three instances (`grep`, `context7`, `serena`), which makes it a pattern
-rather than an oversight, and the pattern has a name worth keeping:
+**This is the shape doc 2411 measured** for `mcp__grep__searchGitHub` - mandated
+by a skill step, called zero times in 377 transcripts. It is now three instances
+(`grep`, `context7`, `serena`), which makes it a pattern with a name:
 
 > **A mandate is not adoption.** Writing "use X first" into a skill produces
-> zero calls to X and a step everyone silently skips. Measure the call, not the
-> instruction.
+> near-zero calls to X and a step everyone silently skips. Measure the call, not
+> the instruction.
 
-**A correction on method, because it nearly produced a wrong number here.** A
-first pass at "which servers are unused" grepped with a glob zsh rejected, so
-`grep` never ran and every server came back `0`. A zero from a command that
-errored is not a zero. The counts above come from parsing `tool_use` blocks in
-JSON, and the 127,732 figure comes from a separate string count - two different
-questions, deliberately not conflated.
+### CORRECTION, same day: one of the six zeros was not a zero
+
+The first version of this document said `serena` had been invoked **zero** times
+and called it a ghost. **It has 8 calls.**
+
+The error was a denominator. `glob('*/*.jsonl')` matched **5,805** files at one
+directory depth; `find . -name '*.jsonl'` matches **7,359** - there are 1,318
+files at depth 4 and 236 at depth 6 that the first scan never walked. All eight
+`serena` calls live in those deeper files, and the corpus total moves from 4,049
+calls to 4,269.
+
+**A zero has to be complete to mean anything**, and this one was measured over
+79% of the corpus while being reported as if over all of it. The five remaining
+zeros were re-checked across all 7,359 files and hold.
+
+That makes two method failures in one audit, both in the same direction - a
+scan that silently under-covered, reported as a confident zero. The first was a
+glob zsh rejected so `grep` never ran. **The rule both point at: when a finding
+is an absence, prove the search covered everything before you publish the
+absence.**
 
 ## Skills: 82 carried, 52 never called, 220,684 tokens
 
@@ -220,7 +252,7 @@ Zaal-gated, and no lane at all.
 |---|---|---|---|
 | Give `zao-wall.py` a fourth bucket so no card is dropped — shipped when `--json` counts sum to `open` | @Zaal (obsidian lane) | PR | 2026-09-12 |
 | Copy `zao-wall.py` into `~/bin` — shipped when `which zao-wall.py` answers | @Zaal (seat) | Install | 2026-09-09 |
-| Disable `serena`, `Linear`, `Notion`, `memory`, `sequential-thinking`, `TravExp` — shipped when a fresh session's tool list no longer carries them | @Zaal | Config | 2026-09-10 |
+| Disable `Linear`, `Notion`, `memory`, `sequential-thinking`, `TravExp` (all at zero) and decide on `serena` (8 calls, 127,732 mentions) — shipped when a fresh session's tool list no longer carries the five | @Zaal | Config | 2026-09-10 |
 | Replace the `context7`-first mandate in `/zao-research` step 4 with the tools its 122 runs actually use — shipped when the skill text names them | @Zaal (seat drafts) | Skill edit | 2026-09-11 |
 | Archive the 12 zero-call skills older than 60 days, each with an archive-reason line — shipped when `zao-skill-audit` reports under 70 on disk | @Zaal (obsidian lane) | Cleanup | 2026-09-14 |
 | Triage the 18 orphan lane briefs to claimed / merged / closed — shipped when no brief is `ready` or `unconsumed` without a live lane or a closing note | @Zaal (seat) | Cleanup | 2026-09-14 |
@@ -228,7 +260,7 @@ Zaal-gated, and no lane at all.
 
 ## Sources
 
-- `~/.claude/projects/*/*.jsonl` — **[FULL]** 5,805 transcripts parsed for `tool_use` blocks 2026-09-07. The MCP call counts, the 4,049 total and every zero
+- `~/.claude/projects` — **[FULL]** all **7,359** `.jsonl` transcripts walked with `os.walk` and parsed for `tool_use` blocks 2026-09-07. The MCP call counts, the 4,269 total and the five surviving zeros. A first pass used `glob('*/*.jsonl')`, covered only 5,805, and produced a sixth zero that was wrong - see the correction in the connectors section
 - `zao-skill-audit` — **[FULL]** run 2026-09-07 15:54, 522 transcripts. The 82/54/52 split and the token figures are its output, not a recount
 - `zao-wall.py` against a live Supabase fetch — **[FULL]** 569 open cards, bucketed and brand-matched 2026-09-07
 - `~/zao-vault/handoffs/`, `scripts/rot-scan.py --dry-run` — **[FULL]** counted on disk 2026-09-07

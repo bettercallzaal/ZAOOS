@@ -257,3 +257,49 @@ Zaal's answers, 2026-09-03, during NFT NYC weekend. Library grounding: doc 1231
 (history timeline), doc 229 (member profiles/roster), doc 051 (whitepaper,
 festival cities). Siblings: `state-claims.md` (the Magnetiq entry is a dated
 fact that decayed), `code-restraint.md` (the incumbent-tool check, now moot).
+
+
+---
+
+# ✅ BLOCKER 6 CLOSED - the 2025 New York trip was FarCon
+
+**Zaal, 2026-09-07: "2025 was farcon"** - and he has the footage. Public YouTube playlist
+**"Farcon NYC 2025"**, four videos, all published by him:
+
+| Video | Title | ID |
+|---|---|---|
+| 1 | **Farcon Travel Day** | `dsxCmWLIdCQ` |
+| 2 | **FarCon NYC Day 1 - Onchain Builder House, House of Nouns, and more** | `wS7Md8HVFuI` |
+| 3 | **FarCon NYC Day 2 - Farcon Summit, House of Nouns and Big Builder Energy** | `EqrKEOs3y8s` |
+| 4 | **FarCon NYC Day 3 - The Forever Library, FarCon Open, and Bridge-Built Connections** | `RYktWkA31Lg` |
+
+Titles resolved via YouTube oEmbed, keyless, 2026-09-07. FarCon NYC dates: **1-2 May 2025,
+Brooklyn** (Unlock Protocol event page).
+
+**House of Nouns appears in two of the four titles**, which independently explains the
+noggles Zaal was given by **@ProfWerder** - a Nouns-affiliated account (`@nouncil`,
+`@FloriNouns`). Two separate sources agreeing without being asked to.
+
+## What this means for the "Lil WaveWarZ Takeover at NFT NYC 2025" claim
+
+Zaal's 2025 New York trip was **FarCon in May**, documented across four videos he published
+himself. **No NFT.NYC 2025 trip is evidenced anywhere**, and NFT.NYC 2025 ran 23-27 June.
+
+The persona, the ICM box and doc 1231 all record *"Lil WaveWarZ Takeover at NFT NYC
+(2025)"* as **"the third consecutive IRL proof point."** As established earlier in this
+doc, all three trace to one undated, unvenued row in doc 1231 with no `[VERIFY]` flag, and
+the phrase has no public footprint.
+
+> ⚠️ **STILL NOT EDITING THE BOX, THE PERSONA OR DOC 1231.** Zaal answered "which trip was
+> 2025", which is not the same question as "was there a Lil WaveWarZ Takeover, and if so
+> where". Those could both be true - a WaveWarZ moment could have happened AT FarCon and
+> been mis-attributed to NFT.NYC. **The remaining question is a yes/no for the grill:**
+> was the Lil WaveWarZ Takeover at FarCon, and may the three docs be corrected?
+
+## Trip 2 now has real content for the article
+
+Onchain Builder House · House of Nouns · FarCon Summit · The Forever Library · FarCon Open
+· "Bridge-Built Connections" · the noggles and the `/gmfarcaster` shirt from @ProfWerder.
+
+**The middle act of the three-trip story is no longer a hole.** It went from the emptiest
+section to the best-documented of the three, because Zaal filmed it.

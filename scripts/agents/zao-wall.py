@@ -89,7 +89,7 @@ def fetch_open(root, key):
     rows, offset = [], 0
     while True:
         h = headers(key, {"Range": f"{offset}-{offset + 999}"})
-        q = (f"{root}/rest/v1/tasks?select=id,title,status,priority,due,project,metadata"
+        q = (f"{root}/rest/v1/tasks?select=id,legacy_id,title,status,priority,due,project,metadata"
              f"&status=in.({','.join(OPEN_STATUSES)})&order=due.asc")
         try:
             with urllib.request.urlopen(urllib.request.Request(q, headers=h), timeout=30) as r:
@@ -221,10 +221,10 @@ def main():
             "on_wall": {k: [{"id": c["id"], "title": c.get("title"),
                              "due": c.get("due"), "priority": c.get("priority")}
                             for c in sorted(v, key=sort_key)] for k, v in on_wall.items()},
-            "unclaimed": [{"id": c["id"], "title": c.get("title"), "due": c.get("due"),
+            "unclaimed": [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"), "due": c.get("due"),
                            "priority": c.get("priority"), "project": c.get("project")}
                           for c in sorted(unclaimed, key=sort_key)],
-            "unrouted": {k: [{"id": c["id"], "title": c.get("title"), "due": c.get("due"),
+            "unrouted": {k: [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"), "due": c.get("due"),
                               "priority": c.get("priority"), "status": c.get("status")}
                              for c in sorted(v, key=sort_key)] for k, v in unrouted.items()},
             "counts": {"open": len(cards), "on_wall": sum(len(v) for v in on_wall.values()),

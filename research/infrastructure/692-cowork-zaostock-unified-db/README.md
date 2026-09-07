@@ -2,9 +2,9 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-07
 superseded-by:
-related-docs: 610, 650, 662, 679, 684
+related-docs: 610, 650, 662, 679, 684, 1011, 1060
 tier: DISPATCH
 ---
 
@@ -149,8 +149,27 @@ Doc 684, Key Decision #2 ("DO NOT merge ZAOstock todos into cowork-zaodevz"). Do
 | Decide RLS posture before cutover (scoped keys minimum) | @Zaal | Decision | Before Phase 3 |
 | Phase 5: retire `actions.json` + the unused `schema.sql` | @Iman | Cleanup | Week 4 |
 
+## Updated 2026-09-07: Architecture diverged from this doc's recommendation
+
+The six months since this doc was written resolved the question it posed — but in a different direction than recommended.
+
+**What changed:**
+
+1. **ZAOstock graduated 2026-04-29** to its own repo (`bettercallzaal/zaostock`) with its own Supabase project (`yjrlaxpjusmrfylumban`). Live at https://zaostock.com. ZAOOS middleware now redirects `/stock/*` → `https://zaostock.com`. The code and routes are deleted from ZAOOS. Source: `src/middleware.ts` L144–152 read 2026-09-07; `scripts/zaostock-spinout/migration-checklist.md`.
+
+2. **The cross-brand task store is a SEPARATE third Supabase project** (`etwvzrmlxeobinrlytza`, the "ZAOOS cowork tracker"), not the unified single-DB this doc recommended. ZAOOS references it as `COWORK_TRACKER_URL` / `COWORK_TRACKER_SERVICE_ROLE_KEY` (env vars confirmed in `src/app/api/tasks/list/route.ts`). Doc 1011 (2026-07-10) identifies at least 4 separate ZAO Supabase projects: ZAOOS legacy bot (`efsxtoxvigqowjhgcbiz`), the cowork tracker (`etwvzrmlxeobinrlytza`), ZAOstock canonical (`yjrlaxpjusmrfylumban`), and ZAOcowork's own project (ref uncaptured). The estate is more fragmented, not more unified.
+
+3. **The `project` discriminator approach** this doc recommended (Decision #2) appears to be the architecture of the cowork tracker — it is described as "the cross-brand tracker several ZAO projects share" in doc 1060. Whether the exact `project` column schema from this doc was applied is unconfirmed (requires live DB access).
+
+4. **RLS still unhardened on the cowork tracker as of 2026-07-13** — doc 1060 confirmed the same permissive `authenticated ALL` pattern on all 13 tables (activity_log, artists, budget_entries, circle_members, circles, contact_log, goals, meeting_notes, sponsors, suggestions, tasks, team_members, volunteers). The `scripts/cowork-rls-hardening.sql` script exists (written 2026-07-12) but is gated on explicit opt-in and has not been applied. The risk identified in this doc's "Risks" section is still live.
+
+5. **Related docs to read for the current picture:** Doc 1011 (ZAO DB architecture cross-project audit, 2026-07-10), Doc 1060 (ZAOcowork Tracker RLS audit, 2026-07-13), Doc 1025 (estate-split design, 2026-07-10).
+
+**Implication for this doc's recommendations:** Decisions #1 and #3 are partially superseded — the "live Supabase" to merge into is now `etwvzrmlxeobinrlytza` (the cowork tracker), not the ZAOstock canonical DB which has its own project. The fundamental direction (one shared operational DB with a project discriminator column) stands, but the target database identity has shifted. Decision #5 (retire `actions.json`) is likely complete given ZAOstock's graduation, but unconfirmed without access to the ZAOcowork repo.
+
 ## Sources
 
 - Deep audit of ZAOstock: `ZAO OS V1/bot/src/` (actions.ts, status.ts, circles.ts, capture.ts, activity.ts, auth.ts), `zaostock/src/app/team/` + `zaostock/src/app/api/team/`, schema in `zao-os-ao-research/scripts/stock-team-*.sql`. Conducted 2026-05-20.
 - Deep audit of ZAOcoworking: `cowork/` web app (`src/lib/data.ts`, `src/components/Board.tsx`, `supabase/schema.sql`), `cowork/agent/src/` (actions-store.ts, types.ts, roster.ts), `data/actions.json` (18 items). Conducted 2026-05-20.
 - Doc 610 (prior consolidation), Doc 684 (task tracking), Doc 662/679 (ZAOcoworking architecture + the Supabase Phase 2 plan in `BACKLOG.md`).
+- 2026-09-07 revalidation: read `src/middleware.ts`, `src/app/api/tasks/list/route.ts`, `scripts/zaostock-spinout/migration-checklist.md`, `scripts/cowork-rls-hardening.sql`; cross-referenced doc 1011 and doc 1060 (both FULL reads in the research library).

@@ -35,13 +35,13 @@ Measured 2026-09-07, every file read on disk:
 | File | allow | deny | ask | What runs there |
 |---|---|---|---|---|
 | `~/.claude/settings.json` | 32 | 23 | 0 | **Everything.** Every lane on the mac |
-| `ZAO OS V1/.claude/settings.json` | 80 | 27 | 0 | The ZAOOS lane |
+| `ZAO OS V1/.claude/settings.json` | 80 | 25 | 0 | The ZAOOS lane |
 | `ZAO OS V1/.claude/settings.local.json` | 16 | 0 | 0 | One machine |
 | `zao-vault/.claude/settings.local.json` | 4 | 0 | 0 | The orchestrator seat |
 | `zao-vault/.claude/settings.json` | — | — | — | **DOES NOT EXIST** |
 
 **The inversion is the finding.** The ZAOOS lane, which writes application code,
-runs under 27 deny rules including `supabase db reset`, `npm publish`,
+runs under 25 deny rules including `supabase db reset`, `npm publish`,
 `gh repo delete`, `Write(.env*)` and `Bash(grep*.env*)`. The **orchestrator
 seat**, which today edited global settings, dismissed prompts in other lanes,
 typed into six panes and pushed commits, runs under **four allow rules and no
@@ -77,6 +77,52 @@ rules the harness was skipping".
 
 **Read the startup warning.** It lists every skipped rule. It is the only
 feedback the permission system gives you and it was being scrolled past.
+
+### Two MORE rules were being skipped, and finding them cost nothing
+
+An abandoned bare shell in the `orcresearch` tmux session still had this on
+screen from whenever Claude last exited there:
+
+```
+Permission deny rule (.claude/settings.json): Write(.env*) is not matched by
+file permission checks - only Edit(path) rules are. Use Edit(.env*) instead
+(Edit rules cover all file-editing tools).
+```
+
+Two rules, `Write(.env*)` and `Write(~/.zao/zao.env)`, silently doing nothing.
+**Coverage was never lost** - the matching `Edit(...)` rules are present and do
+work - but two of the twenty-seven were decoration, and the warning had been
+sitting unread in a detached terminal.
+
+**This makes four skipped rules found in one day across two files**, all by
+reading warnings that were already on screen. None required a tool.
+
+### And the fix for those two had already merged. It never reached the machine
+
+**PR #3407, "fix(settings): drop the two Write() deny rules the harness was
+skipping", merged 2026-09-06 at 22:12Z.** `origin/main` carries 25 deny rules
+and neither `Write()` rule. The working copy at `~/Documents/ZAO OS V1` carried
+**27**, both dead rules included, because it was **25 commits behind
+`origin/main`** and nobody had pulled.
+
+This document was originally written off that stale copy and said 27. The number
+above is corrected.
+
+**That is [doc 2471](../2471-zao-lane-workflow-audit/)'s finding for the fourth
+recorded time** - a merged PR does not reach the machine - and the first time it
+has been caught inside a research doc's own measurements. 2471 found it in
+`bin/` tools that were never installed; this is the same failure in a settings
+file, where the consequence is a security control you believe you fixed a day
+ago and did not.
+
+**The check is one line and belongs in the definition of done:**
+
+```bash
+git -C <repo> fetch origin -q && git rev-list --count HEAD..origin/main
+```
+
+Anything other than `0` means the file you are reading is not the file that
+merged.
 
 ## How permissions actually compose - the five that surprise people
 
@@ -222,6 +268,7 @@ same week. The security guide's phrasing for `Read(.env*)` is the model to copy:
 | Apply doc 2151's deny block to `~/.claude/settings.json` — shipped when `curl https://example.com \| sh` is blocked rather than prompted, verified by running it | @Zaal | Settings | 2026-09-09 |
 | Add deny rules for the four unenforced standing rules (settings self-write, `hasTrustDialogAccepted`, `~/.zao/private/` reads, outbound POST as `ask`) — shipped when each is a line in `permissions.deny` and a fresh session boots with no skipped-rule warning | @Zaal (seat drafts) | Settings | 2026-09-10 |
 | Create `zao-vault/.claude/settings.json` so the orchestrator seat is not the least-restricted surface — shipped when the file exists with a non-empty deny array | @Zaal (seat drafts) | PR | 2026-09-10 |
+| Add `git rev-list --count HEAD..origin/main` to the definition of done for any settings or `bin/` change — shipped when it is convention 21 in `notes/orca-organization.md` | @Zaal (seat drafts) | Convention | 2026-09-09 |
 | Audit the 29 hook entries across 14 events and write down what each shell command does — shipped when `notes/hook-inventory.md` exists with one row per hook | @Zaal (obsidian lane) | Audit | 2026-09-14 |
 | Run `opensource-sanitizer` against a fork of the `.claude` config and publish the PASS/FAIL report — shipped when the report exists and names every finding | @Zaal (seat) | Audit | 2026-09-16 |
 | Package the setup as a plugin with `.claude-plugin/plugin.json` and publish it — shipped when `claude plugin install` from a public repo reproduces the skills and permission model on a clean machine | @Zaal | Release | 2026-09-30 |

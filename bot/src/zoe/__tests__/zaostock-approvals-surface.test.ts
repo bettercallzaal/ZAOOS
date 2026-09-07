@@ -98,6 +98,55 @@ describe('surfaceZaostockApprovals', () => {
     expect(postFn.mock.calls[0][0]).toContain('[1/');
   });
 
+  // The seen length is a high-water mark over a file that only grows, so
+  // advancing it past content that never reached Telegram loses that content
+  // permanently - the next tick sees "nothing new". Both ways a send can fail
+  // to arrive have to hold the cursor.
+  it('holds the seen cursor when a chunk send throws', async () => {
+    const seen = 'old approved stuff';
+    const newContent = '\n\nApproval that must not be lost.';
+    stubFetch(seen + newContent);
+    stubSeenLength(seen.length);
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    const postFn = vi.fn().mockRejectedValue(new Error('429 Too Many Requests'));
+    const count = await surfaceZaostockApprovals(postFn);
+    expect(count).toBe(0);
+    expect(postFn).toHaveBeenCalledOnce();
+    expect(mockWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('holds the seen cursor when the send budget blocks the chunk', async () => {
+    const seen = 'old approved stuff';
+    const newContent = '\n\nApproval that must not be lost.';
+    stubFetch(seen + newContent);
+    stubSeenLength(seen.length);
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    // What send-budget.ts returns for a dropped send: it RESOLVES, it does not
+    // throw, so `await` alone reads as success.
+    const postFn = vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' });
+    const count = await surfaceZaostockApprovals(postFn);
+    expect(count).toBe(0);
+    expect(mockWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('holds the seen cursor when a LATER chunk fails, so the whole batch retries', async () => {
+    const para = 'x'.repeat(3000);
+    stubFetch(`${para}\n\n${para}`);
+    stubNoSeen();
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    const postFn = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('network error'));
+    const count = await surfaceZaostockApprovals(postFn);
+    expect(count).toBe(1); // one chunk delivered
+    expect(postFn).toHaveBeenCalledTimes(2);
+    expect(mockWriteFile).not.toHaveBeenCalled();
+  });
+
   it('returns 0 and does not post when new content is only whitespace', async () => {
     const seen = 'old content';
     stubFetch(seen + '   \n   ');

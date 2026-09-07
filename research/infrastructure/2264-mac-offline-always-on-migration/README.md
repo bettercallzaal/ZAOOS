@@ -60,7 +60,7 @@ Every one of the eight panes reports a Claude Code version string as its current
 - **Fleet view and lane control:** `zj`, `ztui`, `zlane`, `zfleet`, `zx`, `zao-fleet`, `zao-loops`, `zao-tui`, `zao-hud`, `cockpit`, `zao-cockpit`, `status`, `zao-status`
 - **Relay:** `zao-relay`, `relay`, `lane-send`, `lane-read`, `lane-relay-daemon`, `relay-autopull.sh`
 - **Fetchers:** `zao-fetch-reddit.sh`, `zao-fetch-x.sh`, `zao-fetch-farcaster.sh`, `zao-ingest.sh`
-- **Spend and identity:** `zao-spend`, `zao-secrets`, `icm`, `zao-icm.py`, `zao-crm`
+- **Spend and identity:** `zao-spend`, `zao-secrets`, `icm` and `zao-icm.py` (absent from the mac and never git-tracked, card b96a4879 - nothing to migrate), `zao-crm`
 - **Statusline:** `zao-cc-statusline.sh`, `zao-cc-state.sh`, `zao-cc-activity.sh`
 
 The VPS's 91 unique tools are the other half of the same system - `loop-agent.sh`, `cheap-loop.sh`, `provider-health.sh`, `zoe-autodeploy.sh`, `bus-poll.py`, `fleet-*`. **Neither machine has the whole toolkit.** That is the honest finding, and it is worse than "the Mac has everything", because it means neither box can currently stand alone.

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { chunkForTelegram, sendChunkedToTelegram } from '../tg-chunk';
+import { chunkForTelegram, sendChunkedDetailed, sendChunkedToTelegram } from '../tg-chunk';
 
 describe('chunkForTelegram', () => {
   it('returns one chunk when under the limit', () => {
@@ -125,5 +125,75 @@ describe('sendChunkedToTelegram - opts, markup placement, return value', () => {
     );
     expect(n).toBeGreaterThan(1);
     expect((result as { message_id: number }).message_id).toBe(n);
+  });
+});
+
+describe('sendChunkedDetailed - partial delivery is visible', () => {
+  const longText = `${'A'.repeat(3900)}\n\n${'B'.repeat(2000)}`;
+
+  it('reports every chunk sent when all succeed', async () => {
+    const report = await sendChunkedDetailed(async () => ({ message_id: 1 }), 1, longText);
+    expect(report.total).toBeGreaterThan(1);
+    expect(report.sent).toBe(report.total);
+    expect(report.failed).toBe(0);
+  });
+
+  it('reports the failure count when only SOME chunks land, and still returns a truthy result', async () => {
+    let n = 0;
+    const report = await sendChunkedDetailed(
+      async () => {
+        n += 1;
+        if (n === 2) throw new Error('telegram 429');
+        return { message_id: n };
+      },
+      1,
+      longText,
+    );
+    expect(report.total).toBe(2);
+    expect(report.sent).toBe(1);
+    expect(report.failed).toBe(1);
+    // The trap this closes: the plain helper's return value is truthy here, so
+    // a caller gating on it treats a half-delivered message as fully sent.
+    expect(report.result).toBeTruthy();
+  });
+
+  it('reports sent 0 when every chunk fails', async () => {
+    const report = await sendChunkedDetailed(
+      async () => {
+        throw new Error('down');
+      },
+      1,
+      longText,
+    );
+    expect(report.sent).toBe(0);
+    expect(report.failed).toBe(report.total);
+    expect(report.result).toBeNull();
+  });
+
+  it('logs each failed chunk instead of swallowing it silently', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await sendChunkedDetailed(
+        async () => {
+          throw new Error('telegram 400');
+        },
+        42,
+        longText,
+      );
+      expect(warn).toHaveBeenCalled();
+      expect(warn.mock.calls.some((c) => String(c[0]).includes('[zoe/tg-chunk]'))).toBe(true);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('counts a budget-blocked chunk as sent, not failed (it resolves)', async () => {
+    const report = await sendChunkedDetailed(
+      async () => ({ message_id: 0, zoeSendBudget: 'deferred' }),
+      1,
+      longText,
+    );
+    expect(report.failed).toBe(0);
+    expect(report.sent).toBe(report.total);
   });
 });

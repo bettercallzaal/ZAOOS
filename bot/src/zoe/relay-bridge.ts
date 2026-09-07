@@ -23,8 +23,9 @@
  * is OFF unless ZOE_RELAY_TG_ENABLED === 'true'.
  */
 
-import { sendChunkedToTelegram } from './tg-chunk';
+import { sendChunkedDetailed } from './tg-chunk';
 import { featureRan } from './feature-ran';
+import { wasSendBlocked } from './send-budget';
 
 const HUB_LEGACY_ID = '9000';
 
@@ -237,19 +238,46 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // that traffic comes from a different, unmapped sender, and capping this
       // one would have throttled the wrong thing while the measured 75 kept
       // arriving. Left on the `status` default until an emitter is identified.
-      const sent = await sendChunkedToTelegram(
+      // sendChunkedDetailed, not sendChunkedToTelegram: this loop's success
+      // branch is DESTRUCTIVE (it sets tg_pushed, the only dedup gate), and the
+      // plain helper cannot express "some chunks arrived". It returns the send
+      // that carried the keyboard, or failing that the last successful one - so
+      // with `markupOn: 'last'`, chunk 2 of 3 throwing still returns a truthy
+      // Message from chunk 3. `sent == null` is false, `wasSendBlocked` is
+      // false, and the relay is marked pushed with a third of it missing and no
+      // way to ever get it back. `failed` is the only thing that answers "did
+      // ALL of it arrive", and a relayed paste is exactly the long text this
+      // module chunks for.
+      const report = await sendChunkedDetailed(
         (cid, t, o) => deps.sendMessage(cid, t, o as never),
         deps.chatId,
         formatInboundDm(r),
         { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
       );
-      // sendChunkedToTelegram swallows per-chunk send errors and returns null
-      // ONLY when every chunk failed - so the catch below never fires on a send
-      // failure. Marking tg_pushed there would permanently drop the relay (it is
-      // the only dedup gate and is never re-evaluated), and would also arm the
-      // gesture-free reply path for a message Zaal never saw. Leave it unpushed
-      // so the next tick retries. (silent-failure-guard rules 1 + 6.)
-      if (sent == null) continue;
+      const sent = report.result;
+      if (report.failed > 0) {
+        // Partial (or total) send failure. sendChunkedDetailed swallows the
+        // per-chunk errors on purpose - one bad chunk must not drop the others -
+        // so nothing throws here and the catch below never fires. Leave the
+        // relay unpushed so the next tick re-sends the whole thing: Zaal sees
+        // the delivered chunks twice, which beats losing the rest for good.
+        // (silent-failure-guard rules 1 + 6.)
+        console.warn(
+          `[zoe/relay-bridge] relay from ${r.from} sent ${report.sent}/${report.total} chunks - left unpushed for the next tick`,
+        );
+        continue;
+      }
+      // `wasSendBlocked` closes the second, quieter way a send can fail to
+      // arrive. The per-day send budget (send-budget.ts) wraps
+      // bot.api.sendMessage at boot, and a blocked send RESOLVES with
+      // `{ message_id: 0, zoeSendBudget }` rather than throwing or returning
+      // null - so `sent == null` is false and the catch never fires, and this
+      // loop would mark a never-delivered relay `tg_pushed`. This tick runs
+      // outside any runWithSendClass context, so its sends take the default
+      // `status` class, whose overflow policy is DROP: past the daily cap every
+      // inbound relay would be silently and permanently lost, since
+      // `tg_pushed` is the only dedup gate and is never re-evaluated.
+      if (sent == null || wasSendBlocked(sent)) continue;
       pushedTs.add(r.ts);
       // Register message_id -> rl-<lane> so a plain reply to THIS message routes
       // back to the lane (no button tap). Best-effort - never blocks the push.

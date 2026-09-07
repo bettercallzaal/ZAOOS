@@ -37,7 +37,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
-import { sendChunkedToTelegram } from './tg-chunk';
+import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
 import {
   HeartFleet,
@@ -60,7 +60,14 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
-import { runWithSendClass, drainDeferred, renderDeferredBatch } from './send-budget';
+import {
+  assertSendDelivered,
+  runWithSendClass,
+  drainDeferred,
+  requeueDeferred,
+  renderDeferredBatch,
+  wasSendBlocked,
+} from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
@@ -322,12 +329,40 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           try {
             const held = await drainDeferred();
             if (held.length > 0) {
-              await sendChunkedToTelegram(
+              // sendChunkedDetailed, not sendChunkedToTelegram: the batch is
+              // one line per held item and up to MAX_DEFERRED (200) of them, so
+              // it is routinely several chunks. The plain helper returns the
+              // last SUCCESSFUL send, which is truthy when chunk 1 arrived and
+              // chunk 2 threw - the queue is already cleared, so everything in
+              // the chunks that failed is gone, and the run logs "released N".
+              const batch = await sendChunkedDetailed(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
                 renderDeferredBatch(held),
               );
-              console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              if (batch.sent === 0) {
+                // Every chunk threw. sendChunkedDetailed swallows those
+                // errors, so nothing reached Telegram and nothing threw here -
+                // without this the queue we just cleared is gone for good.
+                await requeueDeferred(held);
+                console.warn(
+                  `[zoe/scheduler] morning batch send failed - requeued ${held.length} deferred send(s)`,
+                );
+              } else if (batch.failed > 0) {
+                // Partial delivery. There is no chunk -> entry map, so restore
+                // the whole batch: the items in the delivered chunks arrive
+                // twice tomorrow, which beats losing the rest for good.
+                await requeueDeferred(held);
+                console.warn(
+                  `[zoe/scheduler] morning batch partially sent (${batch.sent}/${batch.total} chunks) - requeued all ${held.length} deferred send(s); delivered items may repeat`,
+                );
+              } else if (wasSendBlocked(batch.result)) {
+                // The gate deferred the batch itself, which re-queues the text.
+                // Restoring here too would duplicate it.
+                console.warn('[zoe/scheduler] morning batch held by the send budget - stays queued');
+              } else {
+                console.log(`[zoe/scheduler] morning batch: released ${held.length} deferred send(s)`);
+              }
             }
           } catch (batchErr) {
             console.warn('[zoe/scheduler] deferred morning batch failed (nbd):', (batchErr as Error).message);
@@ -471,8 +506,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             join(ZOE_PATHS.home, 'pinned-brief.tick.lock'),
             async () =>
               runPinnedBriefTick({
+                // assertSendDelivered: this tick is NOT inside runWithSendClass,
+                // so its class resolves to the default `status`, whose overflow
+                // policy is `dropped`. A dropped send RESOLVES with
+                // { message_id: 0 }, and syncPinnedBrief writes whatever id it
+                // gets straight to pinned-brief.json - so the state file would
+                // record 0 as the live pinned message. Every later tick then
+                // edits message 0 (a 400 it swallows), re-sends, and re-writes 0,
+                // while featureRan reports `pinned 0` as a success. Throwing puts
+                // it in syncPinnedBrief's own catch, which returns
+                // { action: 'failed' } and writes NO state, so the next tick with
+                // budget left pins for real.
                 sendMessage: async (text) => {
-                  const m = await opts.bot.api.sendMessage(opts.zaalTgId, text);
+                  const m = assertSendDelivered(await opts.bot.api.sendMessage(opts.zaalTgId, text));
                   return { message_id: m.message_id };
                 },
                 pinMessage: (messageId) =>
@@ -880,9 +926,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // comment (thezao.xyz/board), so they see it without opening the board.
         // Best-effort - a no-op when the board or MENTION_NOTIFY_MAP is unset.
         try {
+          // assertSendDelivered: a send blocked by the daily budget RESOLVES, so
+          // without this the loop counts it as delivered and appends the
+          // (comment, handle) pair to its append-only seen file - which is the
+          // only dedup gate and is never re-evaluated, so the teammate's ping is
+          // gone for good. Throwing puts it in the module's own failure branch,
+          // which deliberately does not mark seen and retries next tick.
           const send = (chatId: number, text: string, o?: { threadId?: number }) =>
             opts.bot.api
               .sendMessage(chatId, text, o?.threadId ? { message_thread_id: o.threadId } : undefined)
+              .then(assertSendDelivered)
               .then(() => undefined);
           const mn = await runMentionNotify(send, opts.zaalTgId);
           if (mn.notified > 0) {
@@ -897,7 +950,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // answer back to the task. Best-effort - a no-op when board is unconfigured.
         try {
           const sendTg = async (chatId: number, text: string, o?: { replyToMessageId?: number }) => {
-            const res = await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {});
+            // A blocked send resolves with message_id 0, and the caller's guard
+            // is `messageId !== null` - so without assertSendDelivered it would
+            // store a pending reply keyed on 0 (which no real reply can match)
+            // and mark the comment seen, after having already posted a public
+            // "noted" ack promising the teammate an answer.
+            const res = assertSendDelivered(
+              await opts.bot.api.sendMessage(chatId, text, o?.replyToMessageId ? { reply_parameters: { message_id: o.replyToMessageId } } : {}),
+            );
             return res.message_id ?? null;
           };
           const ta = await runTaskTeammateAck(sendTg, opts.zaalTgId, fetch, opts.repoDir);
@@ -1028,10 +1088,26 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
           // Nudges and reasoning decisions are status messages
-          if (opts.routingDeps) {
-            await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' });
-          } else {
-            await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          const sent = opts.routingDeps
+            ? await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' })
+            : await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          // This tick runs outside any runWithSendClass context, so its sends
+          // take the default `status` class, whose overflow policy is DROP. A
+          // dropped send RESOLVES (send-budget.ts returns
+          // `{ message_id: 0, zoeSendBudget }` rather than throwing), so the
+          // catch below never fires and the state writes underneath would run
+          // for a message Zaal never received: recordPush files an unacked push
+          // that throttles FUTURE pushes, markNudged bumps nudgeCount and
+          // restarts the thread's cooldown, and markNudgeSent starts the
+          // task-nudge cooldown. All three are the same permanent-loss shape
+          // fixed in relay-bridge.ts - the retry is suppressed by state written
+          // for a delivery that did not happen. Leave the state alone so the
+          // next tick re-decides. (silent-failure-guard rules 1 + 6.)
+          if (wasSendBlocked(sent)) {
+            console.warn(
+              `[zoe/scheduler] reasoning tick send blocked by the send budget (kind=${decision.candidate?.kind ?? 'n/a'}) - not recording the push`,
+            );
+            return;
           }
           if (decision.candidate) {
             await recordPush(decision.candidate);

@@ -25,6 +25,7 @@ import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import * as http from 'node:http';
 import { startHeartbeat, startHeartbeatAs } from '../lib/cowork';
+import { installAgentMarkupGuard } from '../agent-markup';
 import { safeEqual, isValidDocPath } from './dispatch-auth';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
@@ -87,6 +88,16 @@ function buildBotNameFilter(holder: UsernameHolder) {
 
 const devz = new Bot<Context>(devzToken);
 const hermes = new Bot<Context>(hermesToken);
+
+// Strip agent-internal markup at the outbound boundary, on BOTH bots, before
+// any handler or narrator is wired. agent-markup.ts says to install this on
+// every bot in the process tree and these two were missed: the Critic's
+// `feedback` string is raw model output (critic.ts:168 puts the CLI's own text
+// straight into it when the JSON parse fails), and the narrator interpolates it
+// into onCriticDone / onRetry / onEscalated sends verbatim. That is the same
+// path as ZAOOS#3383, in the chat where reasoning-model output is most likely.
+installAgentMarkupGuard(devz);
+installAgentMarkupGuard(hermes);
 
 // Wire the filter middleware FIRST so it runs before any command handlers
 // that get registered below. Holders are populated in boot() via getMe().

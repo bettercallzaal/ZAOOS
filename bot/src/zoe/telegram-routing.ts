@@ -27,6 +27,12 @@ import { questionKeyboard, reactionKeyboard } from './questions';
 // boundary logic can never drift between the router and direct sends.
 import { chunkForTelegram } from './tg-chunk';
 
+// The per-day send budget wraps bot.api.sendMessage at boot and a blocked send
+// RESOLVES with `{ message_id: 0, zoeSendBudget }` instead of throwing. This
+// router is the chokepoint most callers send through, so it has to pass that
+// signal on - see the return contract on sendToZaal below.
+import { wasSendBlocked } from './send-budget';
+
 export type MessageKind = 'question' | 'status' | 'whisper';
 
 export interface SendToZaalOptions {
@@ -85,6 +91,8 @@ export async function sendToZaal(
   };
 
   // Send each chunk; apply reply_markup only to the first
+  let lastResult: unknown;
+  let blockedResult: unknown;
   for (let i = 0; i < chunks.length; i++) {
     const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
     const chunkText = prefix + chunks[i];
@@ -93,11 +101,22 @@ export async function sendToZaal(
       chunkOpts.reply_markup = opts.replyMarkup;
     }
     // eslint-disable-next-line no-await-in-loop
-    await deps.sendMessage(targetChatId, chunkText, chunkOpts);
+    const res = await deps.sendMessage(targetChatId, chunkText, chunkOpts);
+    lastResult = res;
+    if (blockedResult === undefined && wasSendBlocked(res)) blockedResult = res;
   }
 
-  // Return the result of the last message for consistency
-  return undefined;
+  // Return the send result so a caller can test `wasSendBlocked(...)` before it
+  // records delivery. This used to hard-return `undefined` under a comment that
+  // said it returned the last message, which made every caller downstream of
+  // this router structurally unable to tell a delivered message from one the
+  // send budget dropped - and several of them write durable state (a push
+  // record, a nudge cooldown, a dedup marker) on the strength of the send.
+  //
+  // A PARTIALLY blocked message is reported as blocked: if any chunk was
+  // dropped, Zaal did not receive the message, and recording delivery for the
+  // half he got is the same data loss in a smaller box.
+  return blockedResult ?? lastResult;
 }
 
 /**

@@ -529,10 +529,16 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
     // Stage 2: Process each new answer via action classification.
     // (Do NOT early-return on no answers - the relay push below must still run.)
     let actioned = 0;
+    // Index of the first answer whose handling FAILED in a way that must be
+    // retried (a send the budget blocked, a relay reply that did not go out).
+    // The cursor below stops in front of it, and the loop stops with it - see
+    // the write at the bottom for why both halves are needed.
+    let heldAt: number | null = null;
     if (answers.length === 0) {
       console.log('[zoe/orchestrator] no new answers');
     }
-    for (const answer of answers) {
+    for (let i = 0; i < answers.length; i++) {
+      const answer = answers[i];
       // Nudge ladder: Zaal answered this qid - kill any escalating ping for it.
       // Runs BEFORE the ping step below, so an answered question never gets a
       // stray re-ping in the same tick. No-op for untracked qids (relay replies).
@@ -547,7 +553,15 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           const body = answer.value === 'ack' ? '[acked by Zaal]' : answer.value;
           const ok = await sendRelayReply(replyLane, body, deps.now.toISOString());
           console.log(`[zoe/relay-bridge] reply -> ${replyLane}: ${ok ? 'sent' : 'FAILED'}`);
-          if (ok) actioned++; // advance the answer pointer so it is not re-sent next tick
+          if (!ok) {
+            // The lane never got Zaal's answer. `recent/<gid>.json` is the only
+            // record it was given, and the cursor is the only thing keeping it
+            // in view, so stop here rather than let a later answer carry the
+            // cursor over it.
+            heldAt = i;
+            break;
+          }
+          actioned++; // advance the answer pointer so it is not re-sent next tick
           continue;
         }
       }
@@ -629,6 +643,7 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
               console.warn(
                 `[zoe/orchestrator] next question ${action.nextQuestion.qid} was blocked by the send budget - not armed, not nudged, cursor left for the next tick`,
               );
+              heldAt = i;
               break;
             }
             // arm General: Zaal's next plain typed message answers this question
@@ -670,6 +685,11 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
           );
           break;
       }
+
+      // `break` inside the switch above only leaves the switch. Stop the batch
+      // too: everything after a held answer stays unprocessed so the cursor can
+      // sit in front of it without re-running work that already succeeded.
+      if (heldAt !== null) break;
     }
 
     // (Nudge re-pings run on their own faster 2-min cron via runNudgePing, so the
@@ -677,12 +697,33 @@ export async function runOrchestratorTick(deps: OrchestratorTickDeps): Promise<v
 
     const posted = actioned;
 
-    if (posted > 0) {
-      // Advance pointer to latest answer's timestamp
-      const latestTs = answers[answers.length - 1].ts;
+    // THE CURSOR MOVES OVER HANDLED ANSWERS ONLY, NOT OVER THE WHOLE BATCH.
+    //
+    // `lastSeenTs` is a high-water mark and `detectNewAnswers` filters on
+    // `ts > lastSeenTs`, so an answer the cursor passes is never seen again.
+    // Moving it to the LAST answer in the batch whenever ANY answer actioned
+    // was the bug: a batch of [blocked ask_next, research] left the question
+    // unarmed and unretried (its own `wasSendBlocked` branch is correct) while
+    // the research action carried the cursor past it anyway. The send budget
+    // is a DAILY cap, so once it blocks it keeps blocking - the follow-up was
+    // owed by nothing for the rest of the day, and then forever.
+    //
+    // `heldAt` is the first answer that must be retried, and the loop above
+    // stops at it. Stopping matters as much as the cursor: holding the cursor
+    // while continuing to process later answers would re-run those actions on
+    // every 5-minute tick until midnight, and `enqueueWork` does not dedupe -
+    // that trades silent loss for a duplicate-research runaway.
+    const upto = heldAt ?? answers.length;
+    if (posted > 0 && upto > 0) {
+      const latestTs = answers[upto - 1].ts;
       await writeState({ lastSeenTs: latestTs });
       await bumpToday(dateStr);
       console.log(`[zoe/orchestrator] tick: ${answers.length} answer(s), ${posted} action(s) executed`);
+    }
+    if (heldAt !== null) {
+      console.warn(
+        `[zoe/orchestrator] held at answer ${heldAt + 1}/${answers.length} (${answers[heldAt].qid}) - it and everything after it stay in front of the cursor for the next tick`,
+      );
     }
 
     // Relay-bridge: surface NEW inbound fleet relays (addressed to the `zoe` lane)

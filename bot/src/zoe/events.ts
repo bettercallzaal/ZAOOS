@@ -10,6 +10,21 @@
  * Dedup: a seen-events file (~/.zao/zoe/seen-events.json) keyed per event so the
  * same thing never pings twice (merged once ever; stale/ci once per day).
  *
+ * A KEY IS BURNED ON DELIVERY, NEVER ON GATHER. A tick gathers every candidate
+ * from every source and `pickBest` speaks AT MOST ONE of them. Marking a key
+ * seen while building the candidate therefore consumed the ones that lost the
+ * tick, that the threshold silenced, or that the self-throttle replaced with
+ * its dial-back notice - and the next gather filtered them out, so they never
+ * surfaced again. For a calendar reminder that loss is permanent and total: its
+ * key is (event id, start date), it only qualifies inside a 2h window, and two
+ * events in one window meant one reminder delivered and the other silently
+ * swallowed for good. Each candidate now carries a `dedupeKey` and the caller
+ * burns it after a CONFIRMED send (scheduler.ts, `markEventSeen`).
+ *
+ * The one deliberate exception is `graphcheck:<day>`, which gates the COST of
+ * the daily graph sweep rather than the delivery of its message. It is still
+ * written at gather time, on purpose.
+ *
  * v1 source: GitHub PRs across ALL Zaal's repos (gh authed as bettercallzaal).
  * Extensible: add graph-decision / stale-relationship sources the same way -
  * return Candidate[] and they compete in the gate.
@@ -61,6 +76,26 @@ async function writeSeen(seen: Record<string, number>, now: number = Date.now())
   await fs.writeFile(SEEN_FILE, JSON.stringify(pruned, null, 2), 'utf8');
 }
 
+/**
+ * Burn one candidate's dedup key, so THAT event never pings again inside its
+ * window. Call this only after the message actually reached Telegram - a send
+ * the budget gate blocked resolves rather than throwing, so check
+ * `wasSendBlocked` first (send-budget.ts).
+ *
+ * Best-effort: a write failure means the event may ping once more, which is the
+ * safe direction to fail in. It never throws.
+ */
+export async function markEventSeen(key: string, now: number = Date.now()): Promise<void> {
+  if (!key) return;
+  try {
+    const seen = await readSeen();
+    seen[key] = now;
+    await writeSeen(seen, now);
+  } catch (err) {
+    console.warn('[zoe/events] could not mark event seen (nbd):', (err as Error).message);
+  }
+}
+
 function repoName(pr: SearchPr): string {
   return pr.repository?.name ?? pr.repository?.nameWithOwner ?? 'repo';
 }
@@ -103,7 +138,6 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     // once per day per PR so a long-stale PR doesn't nag every hour
     const key = `stale:${repoName(pr)}#${pr.number}:${today}`;
     if (seen[key]) continue;
-    seen[key] = now;
 
     const days = Math.floor(ageHrs / 24);
     out.push({
@@ -111,6 +145,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
       score: 0.65, // actionable: clears the 0.6 bar, but a due commitment still outranks
       tier: 'standard',
       message: `[STALE PR] ${repoName(pr)} #${pr.number} has sat ${days}d with no movement: "${pr.title}". Merge it, close it, or want me to look?`,
+      dedupeKey: key,
     });
   }
 
@@ -123,16 +158,15 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     if (seen[key]) continue; // once per day per PR
     const failing = await ciIsFailing(slug, pr.number);
     if (!failing) continue;
-    seen[key] = now;
     out.push({
       kind: 'github-event',
       score: 0.82, // a broken build outranks a stale PR + most nudges
       tier: 'critical',
       message: `[CI FAIL] ${repoName(pr)} #${pr.number} has failing checks: "${pr.title}". Want me to look at what broke?`,
+      dedupeKey: key,
     });
   }
 
-  if (out.length > 0) await writeSeen(seen, now);
   return out;
 }
 
@@ -191,6 +225,9 @@ export async function gatherGraphCandidates(now: number = Date.now()): Promise<C
     if (!coldest || days > coldest.days) coldest = { topic, days };
   }
 
+  // Written at GATHER time on purpose - unlike the other sources' keys, this one
+  // gates the COST of the sweep (5 /delve calls) and not the delivery of a
+  // message, so it is correct to burn it whether or not the candidate is spoken.
   seen[`graphcheck:${today}`] = now; // mark the sweep done for today regardless
   await writeSeen(seen, now);
 
@@ -246,8 +283,6 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
   const today = new Date(now).toISOString().slice(0, 10);
   const key = `inactivity:${today}`;
   if (seen[key]) return [];
-  seen[key] = now;
-  await writeSeen(seen, now);
 
   const hrs = Math.floor(silentHrs);
   return [
@@ -256,6 +291,7 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
       score: 0.62, // just clears the 0.6 bar — lowest interrupt priority
       tier: 'signal',
       message: `You've been quiet for ${hrs}h. Everything on track, or anything stuck?`,
+      dedupeKey: key,
     },
   ];
 }
@@ -317,7 +353,6 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
 
           const key = `calendar:${ev.id ?? ev.summary}:${new Date(start).toISOString().slice(0, 10)}`;
           if (seen[key]) continue;
-          seen[key] = now;
 
           const minsAway = Math.round((start - now) / 60_000);
           out.push({
@@ -325,6 +360,7 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
             score: 0.72,
             tier: 'standard',
             message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
+            dedupeKey: key,
           });
         }
       }
@@ -342,7 +378,6 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
 
       const key = `calendar-zoe:${ev.id}:${ev.start.toISOString().slice(0, 10)}`;
       if (seen[key]) continue;
-      seen[key] = now;
 
       const minsAway = Math.round((ev.start.getTime() - now) / 60_000);
       out.push({
@@ -350,6 +385,7 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
         score: 0.72,
         tier: 'standard',
         message: `[CALENDAR] "${ev.title}" in ${minsAway}m${ev.location ? ` @ ${ev.location}` : ''}. Anything to prep?`,
+        dedupeKey: key,
       });
     }
   } catch (err) {
@@ -357,6 +393,5 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
     console.warn('[zoe/events] ZOE calendar check failed (nbd):', (err as Error).message);
   }
 
-  if (out.length > 0) await writeSeen(seen, now);
   return out;
 }

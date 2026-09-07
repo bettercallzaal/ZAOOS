@@ -68,6 +68,17 @@ export interface Candidate {
   message: string;
   /** Linked open thread, when the candidate came from one. */
   threadId?: string;
+  /**
+   * Dedup key to burn ONLY once this candidate has actually been delivered.
+   *
+   * A tick gathers many candidates and `pickBest` speaks at most ONE of them,
+   * so a source that marks its own key seen at gather time consumes every
+   * candidate it produced - including the ones that lost the tick and the ones
+   * the threshold silenced. The loser is then filtered out of the next gather
+   * and never surfaces again. The caller (scheduler) burns this key after a
+   * confirmed send instead. See `markEventSeen` in events.ts.
+   */
+  dedupeKey?: string;
 }
 
 /** A recorded proactive push, for the unacked self-throttle. */

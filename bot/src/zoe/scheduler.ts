@@ -69,7 +69,7 @@ import {
   wasSendBlocked,
 } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
+import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates, markEventSeen } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { flushQueue } from './bonfire-retry';
@@ -1111,6 +1111,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
           if (decision.candidate) {
             await recordPush(decision.candidate);
+            // Burn the event's dedup key HERE, not in the gatherer. A tick
+            // gathers many candidates and speaks one, so a gatherer that marked
+            // its own keys consumed every candidate that lost the tick - and a
+            // calendar reminder that loses is gone for good, since it only
+            // qualifies inside a 2h window. See events.ts.
+            if (decision.candidate.dedupeKey) await markEventSeen(decision.candidate.dedupeKey);
             if (decision.threadId) await markNudged(decision.threadId);
             if (decision.candidate.kind === 'task-nudge') await markNudgeSent();
           }

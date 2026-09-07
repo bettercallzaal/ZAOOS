@@ -58,6 +58,7 @@ import {
   gatherEventCandidates,
   gatherGraphCandidates,
   gatherInactivityCandidates,
+  markEventSeen,
   touchLastSeen,
 } from '../events';
 
@@ -184,19 +185,61 @@ describe('gatherEventCandidates', () => {
     expect(result.some((c) => c.message.includes('[CI FAIL]'))).toBe(false);
   });
 
-  it('writes the seen file after detecting new events', async () => {
+  // A tick gathers many candidates and speaks ONE. Burning the key here
+  // consumed every candidate that lost the tick, so the key is carried on the
+  // candidate and burned by the caller after a confirmed send instead.
+  it('does NOT write the seen file at gather time', async () => {
     const stalePr = makePr({ number: 7 });
     mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
     mockExecFileRaw.mockResolvedValue({ stdout: '{"statusCheckRollup":[]}' });
 
     await gatherEventCandidates(NOW);
-    expect(mockFsWriteFile).toHaveBeenCalled();
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('carries the dedupe key on the candidate so the caller can burn it', async () => {
+    const stalePr = makePr({ number: 7 });
+    mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
+    mockExecFileRaw.mockResolvedValue({ stdout: '{"statusCheckRollup":[]}' });
+
+    const result = await gatherEventCandidates(NOW);
+    expect(result[0].dedupeKey).toBe(`stale:repo#7:${TODAY}`);
   });
 
   it('does not write the seen file when no events are detected', async () => {
     mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([]) });
     await gatherEventCandidates(NOW);
     expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+});
+
+// ── markEventSeen ─────────────────────────────────────────────────────────────
+
+describe('markEventSeen', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFsReadFile.mockResolvedValue('{}');
+    mockFsWriteFile.mockResolvedValue(undefined);
+    mockFsMkdir.mockResolvedValue(undefined);
+  });
+
+  it('burns exactly the delivered key and leaves the others alone', async () => {
+    mockFsReadFile.mockResolvedValue(JSON.stringify({ 'stale:repo#1:2026-07-22': NOW - 1000 }));
+    await markEventSeen(`calendar-zoe:zoe-1:${TODAY}`, NOW);
+
+    const written = JSON.parse(mockFsWriteFile.mock.calls[0][1] as string) as Record<string, number>;
+    expect(written[`calendar-zoe:zoe-1:${TODAY}`]).toBe(NOW);
+    expect(written['stale:repo#1:2026-07-22']).toBe(NOW - 1000);
+  });
+
+  it('is a no-op on an empty key', async () => {
+    await markEventSeen('', NOW);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('never throws when the write fails', async () => {
+    mockFsWriteFile.mockRejectedValue(new Error('EACCES'));
+    await expect(markEventSeen('calendar:x:2026-07-22', NOW)).resolves.toBeUndefined();
   });
 });
 
@@ -444,6 +487,25 @@ describe('gatherCalendarCandidates', () => {
     expect(result).toHaveLength(1);
     expect(result[0].message).toContain('ZAO Stage Prep');
     expect(result[0].message).toContain('@ Discord');
+  });
+
+  // The permanent-loss case: two events inside the same 2h window, one tick,
+  // one message. Marking both seen at gather time swallowed the loser for good.
+  it('keeps BOTH events in the same window gatherable until one is delivered', async () => {
+    const soon = NOW + 30 * 60_000;
+    const later = NOW + 90 * 60_000;
+    mockGetCalendarEvents.mockResolvedValue([
+      { id: 'zoe-1', title: 'First Call', start: new Date(soon), end: new Date(soon) },
+      { id: 'zoe-2', title: 'Second Call', start: new Date(later), end: new Date(later) },
+    ]);
+
+    const result = await gatherCalendarCandidates(NOW);
+    expect(result).toHaveLength(2);
+    expect(result.map((c) => c.dedupeKey)).toEqual([
+      `calendar-zoe:zoe-1:${TODAY}`,
+      `calendar-zoe:zoe-2:${TODAY}`,
+    ]);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
   });
 
   it('deduplicates: same calendar event does not appear twice on the same day', async () => {

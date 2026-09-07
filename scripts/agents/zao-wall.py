@@ -8,6 +8,9 @@ be active."
     ON THE WALL  = autonomous. A lane owns it and is working it unattended.
     PICKED OFF   = active. Zaal has engaged it; it is his focus.
     UNCLAIMED    = agent-routable, nobody owns it. This is the failure state.
+    UNROUTED     = no lane, and a route that is neither agent nor human (prep,
+                   or none). Not a state anyone chose; the bucket exists so the
+                   count is printed instead of the cards vanishing (2026-09-07).
 
 `zj` already answers "what are the lanes doing" by walking tmux. This answers
 the other half - "what WORK is on the wall" - by reading the cowork board. The
@@ -86,7 +89,7 @@ def fetch_open(root, key):
     rows, offset = [], 0
     while True:
         h = headers(key, {"Range": f"{offset}-{offset + 999}"})
-        q = (f"{root}/rest/v1/tasks?select=id,title,status,priority,due,project,metadata"
+        q = (f"{root}/rest/v1/tasks?select=id,legacy_id,title,status,priority,due,project,metadata"
              f"&status=in.({','.join(OPEN_STATUSES)})&order=due.asc")
         try:
             with urllib.request.urlopen(urllib.request.Request(q, headers=h), timeout=30) as r:
@@ -144,8 +147,18 @@ def set_lane(root, key, card_id, lane):
 
 
 def bucket(cards):
-    """Split open cards into on-the-wall / unclaimed / needs-Zaal."""
+    """Split open cards into on-the-wall / unclaimed / needs-Zaal / unrouted.
+
+    Every open card lands in exactly one of the four, so the counts sum to
+    `open`. Until 2026-09-07 there was no fourth bucket: a card with no lane
+    whose route was not "agent" or "human" (route=prep, or no route at all)
+    fell out of the loop and out of every view. Measured that day: 362 of 569
+    open cards, 63%, including 13 in_progress - the board was showing a third
+    of the work and nothing said so. `unrouted` is keyed by the route value
+    the card carries ("prep", "none", ...) so the reason it is here is visible.
+    """
     on_wall, unclaimed, human = defaultdict(list), [], []
+    unrouted = defaultdict(list)
     for c in cards:
         route = meta(c, "route")
         lane = meta(c, "lane")
@@ -155,7 +168,15 @@ def bucket(cards):
             unclaimed.append(c)
         elif route == "human":
             human.append(c)
-    return on_wall, unclaimed, human
+        else:
+            unrouted[route or "none"].append(c)
+    return on_wall, unclaimed, human, unrouted
+
+
+def unrouted_summary(unrouted):
+    """'prep 240, none 129' - the route values that keep cards out of every bucket."""
+    return ", ".join(f"{k} {len(v)}" for k, v in
+                     sorted(unrouted.items(), key=lambda kv: -len(kv[1])))
 
 
 def line(c):
@@ -192,18 +213,24 @@ def main():
         return
 
     cards = fetch_open(root, key)
-    on_wall, unclaimed, human = bucket(cards)
+    on_wall, unclaimed, human, unrouted = bucket(cards)
+    n_unrouted = sum(len(v) for v in unrouted.values())
 
     if args.json:
         print(json.dumps({
             "on_wall": {k: [{"id": c["id"], "title": c.get("title"),
                              "due": c.get("due"), "priority": c.get("priority")}
                             for c in sorted(v, key=sort_key)] for k, v in on_wall.items()},
-            "unclaimed": [{"id": c["id"], "title": c.get("title"), "due": c.get("due"),
+            "unclaimed": [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"), "due": c.get("due"),
                            "priority": c.get("priority"), "project": c.get("project")}
                           for c in sorted(unclaimed, key=sort_key)],
+            "unrouted": {k: [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"), "due": c.get("due"),
+                              "priority": c.get("priority"), "status": c.get("status")}
+                             for c in sorted(v, key=sort_key)] for k, v in unrouted.items()},
             "counts": {"open": len(cards), "on_wall": sum(len(v) for v in on_wall.values()),
-                       "unclaimed": len(unclaimed), "needs_zaal": len(human)},
+                       "unclaimed": len(unclaimed), "needs_zaal": len(human),
+                       "unrouted": n_unrouted,
+                       "unrouted_by_route": {k: len(v) for k, v in unrouted.items()}},
         }, indent=2))
         return
 
@@ -232,8 +259,21 @@ def main():
 
     if not args.unclaimed:
         print(f"\nNEEDS ZAAL  ({len(human)})   - not wall work; these are picked off by definition")
+
+    # Printed on EVERY view, --unclaimed included: a bucket that only shows up
+    # on the full board is a bucket that goes unread.
+    in_prog = sum(1 for v in unrouted.values() for c in v if c.get("status") == "in_progress")
+    print(f"\nUNROUTED - no lane and no agent/human route, so in no bucket above  ({n_unrouted})"
+          f"{'   [' + unrouted_summary(unrouted) + ']' if unrouted else ''}")
+    if in_prog:
+        print(f"  {in_prog} of these are in_progress: someone is working a card no view showed.")
+    if not args.unclaimed:
+        for c in sorted((c for v in unrouted.values() for c in v), key=sort_key)[:12]:
+            print(line(c))
+
+    if not args.unclaimed:
         print(f"\nopen: {len(cards)}   on the wall: {sum(len(v) for v in on_wall.values())}   "
-              f"unclaimed: {len(unclaimed)}   needs Zaal: {len(human)}")
+              f"unclaimed: {len(unclaimed)}   needs Zaal: {len(human)}   unrouted: {n_unrouted}")
 
 
 if __name__ == "__main__":

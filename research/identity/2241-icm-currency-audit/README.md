@@ -16,7 +16,7 @@ tier: STANDARD
 
 ## Method (real fetches, 2026-08-07)
 
-Registry via `python3 ~/bin/zao-icm.py list` (23 live boxes; note: run from `$HOME` -
+Registry via `python3 ~/bin/zao-icm.py list` (TOOL ABSENT since at least 2026-08-19, card b96a4879 - read ids from `~/.zao/private/icm-registry.json` and fetch per `.claude/rules/icm-grounding.md`; 23 live boxes; note: run from `$HOME` -
 a worktree cwd breaks it). Each live box fetched from
 `useicm.com/api/objects/<id>/llm.txt` (public read). Diffed byte-exact against repo
 truth (`research/identity/icm-boxes/` + `drafts/` + `generated/` on main). All 23

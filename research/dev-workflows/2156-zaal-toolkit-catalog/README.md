@@ -71,7 +71,7 @@ The cheap-AI stack (OpenRouter/Ollama/Codex) is wired into `/zao-research` + `/a
 - **/graphify** (skill) - any input -> knowledge-graph episode (Bonfire).
 - **/cold-outreach** (skill) - research a target, draft a 50-100 word DM in ZAO voice, surface for approval, log to CRM.
 - **/fractal** (skill) - ingest fractal-governance resources; dedup, frontmatter, cross-link, fire the tracker.
-- **icm** / **zao-icm.py** (bin) - manage ICM boxes (list/get/check/create); registry at `~/.zao/private/icm-registry.json`.
+- **icm** / **zao-icm.py** (bin) - manage ICM boxes (list/get/check/create); registry at `~/.zao/private/icm-registry.json`. **Absent from this mac and never git-tracked (measured 2026-08-19, re-measured 2026-09-07, card b96a4879); use the raw API route in `.claude/rules/icm-grounding.md`.**
 - **zao-crm** (bin) - terminal lookup of the ~950-person Supabase contacts CRM by name/company/category/recent.
 
 ### Meetings & People

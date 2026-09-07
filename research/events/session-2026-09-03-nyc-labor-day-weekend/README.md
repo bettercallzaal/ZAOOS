@@ -969,3 +969,71 @@ name. **Do not overwrite the 16 with 20; they count different things.**
 
 Same failure mode as `@dr_bruce` and `@0xBeamer`: a plausible handle existing is not
 verification.
+
+
+---
+
+# 🔴 The "Lil WaveWarZ Takeover" claim is thinner than three documents make it look
+
+Researched 2026-09-07 while blocked on Zaal, to close a grill question without him.
+**It did not close.** But the claim is now measured rather than assumed, and it is weaker
+than its repetition suggests.
+
+## What the record actually says
+
+**Doc 1231, line 53, in full:**
+
+> `| 2025 | Zaal leads **"Lil WaveWarZ Takeover" at NFT NYC** (IRL battle). | Third consecutive IRL proof point. WaveWarZ can export its battle format to any physical venue. |`
+
+**Year only. No month. No venue. No artists. No result.**
+
+That is unusual for this doc. Its neighbours carry precise dates - `Jul 8, 2026`,
+`Jul 18, 2026`, `Jul 25, 2026`, `Oct 3, 2026` - and this row does not. Doc 1231's own
+purpose statement says facts come from *"verified research docs (621, 742, 1202) or
+confirmed Zaal statements"* and that anything needing confirmation is flagged `[VERIFY]`.
+**Line 53 carries no `[VERIFY]` flag**, so downstream docs treated it as settled.
+
+## Three docs, one source
+
+The persona, the ICM box and the plan doc all state it. **All three trace back to doc 1231
+line 53.** There is one source, not three, and the repetition creates a confidence the
+underlying row does not support.
+
+## No public footprint
+
+An exact-phrase web search for **"Lil WaveWarZ Takeover"** returns **no match anywhere**.
+
+> **What that does and does not mean.** It means the event name as recorded has no public
+> trace I can find. It does **NOT** mean the event did not happen - plenty of real IRL
+> gatherings leave no indexable footprint, and search is a poor instrument for this.
+> **Do not write "it did not happen."**
+
+## A name collision worth knowing about
+
+Doc 1231 line 72: `Jul 18, 2026 | COC Concertz #7 - WaveWarZ Takeover (4PM EST)`.
+
+So **"WaveWarZ Takeover" is a name ZAO has used for a COC Concertz livestream**, in 2026,
+not in New York and not IRL. Whether the 2025 NYC entry is a distinct event, or a
+mis-dated echo of this one, or genuinely separate, **cannot be settled from the library.**
+
+## The dates that bracket it
+
+| Event | When | Where | Source |
+|---|---|---|---|
+| **FarCon NYC** | **1-2 May 2025** | Brooklyn | Unlock Protocol event page. A **FarCon.NYC 2025** YouTube playlist also exists |
+| NFT.NYC 2025 | 23-27 June 2025 | New York | luma nft-nyc calendar |
+
+Zaal, 2026-09-06: *"my last time in NYC for farcon."*
+
+## Why this matters more than one line in a recap
+
+The ICM box calls it **"the third consecutive IRL proof point"** - a load-bearing claim
+about the chapter's own track record, used to argue NYC is proven ground. That claim
+currently rests on **one undated, unvenued internal row with no `[VERIFY]` flag and no
+public corroboration.**
+
+**Nothing has been edited.** The box, the persona and doc 1231 are untouched. This is a
+measurement of how strong the evidence is, and the answer is: weaker than it looked.
+
+**For the grill, unchanged:** which event was it, and was Zaal in New York once or twice
+in 2025? Only he can say.

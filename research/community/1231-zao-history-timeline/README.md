@@ -50,7 +50,7 @@ tier: STANDARD
 |---|---|---|
 | 2025 | **COC Concertz** launches as a monthly livestream series (Zaal as host/coordinator). | Onchain music performance + community gathering. Eventually spins out as its own brand while the ZAO livestreaming team continues to power it. Show #1 through #6 completed. |
 | 2025 | **WaveWarZ** crosses 1,000+ live battles on Solana. Daily X Spaces (Mon-Fri 11am EST), Sunday 8pm EST battles. | Velocity proof: fully automated real-time scoring and payouts, no team intervention required. |
-| 2025 | Zaal leads **"Lil WaveWarZ Takeover" at NFT NYC** (IRL battle). | Third consecutive IRL proof point. WaveWarZ can export its battle format to any physical venue. |
+| May 2025 | Zaal leads **"Lil WaveWarZ Takeover" at FarCon NYC** (IRL battle), Brooklyn, 1-2 May. | Third consecutive IRL proof point. WaveWarZ can export its battle format to any physical venue. **Corrected 2026-09-07:** this row previously read "at NFT NYC" with year only and no venue. Zaal confirmed his 2025 New York trip was FarCon and published four videos of it ("Farcon NYC 2025" playlist). |
 | 2025 | **ZAO Fractal governance** crosses 63 verified on-chain Respect settlements (doc 1202). | Data-backed governance integrity: not just a weekly meeting but an auditable onchain record of contribution-ranking. |
 | 2025 | BCZ YapZ reaches 20+ episodes on YouTube (Tuesday cadence). | 400+ newsletter editions across Year of the ZAO, Year of the ZABAL, ZTalent series. Build-in-public track record documented publicly. |
 

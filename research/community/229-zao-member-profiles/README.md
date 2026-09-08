@@ -22,7 +22,7 @@
 | **Maceo** | Podcast Co-Host, Media Production | — | Livestream operations, Let's Talk About Ethereum co-host |
 | **Hurric4n3Ike** (Ikechi Nwachukwu) | WaveWarZ Founder, Developer | Houston, TX | 2,740 Respect (#3), Anchor/Rust dev, 72.4% battle win rate |
 | **Tyler Stambaugh** | Magnetiq Co-Founder & COO | New York, NY | ZABAL Connector / Proof of Meet, Flow blockchain, $500K grant |
-| **Candy** (Samantha Denton-Kinney) | ZAO Co-Founder, WaveWarZ Co-Founder | New York, NY | ZID 2, Impact3/Milk Road sponsorship, 16 GitHub repos |
+| **Candy** (Samantha Denton-Kinney) | ZAO Co-Founder, WaveWarZ Co-Founder | New York, NY | ZID 2, 16 GitHub repos, ZAO NYC co-lead. ~~Impact3/Milk Road sponsorship~~ **ENDED - see below** |
 | **Swarthy Hatter** (Timothy) | Fractal Bridge, Product Design | — | Bridges Eden/Optimism/ZAO fractals, Nouns Builder contributor |
 | **DCoop** | Hip-Hop Artist, ZAOVille Organizer | Falls Church, VA | DMV emcee, WaveWarZ battler, founder of The VEC + DropDedGorgez NFT (Apr 2026) |
 | **Iman** | ZAO Devz Lead, VPS Owner | Zambia | Owns cowork-zaodevz bot + full VPS infra (ZOE, Farscout, all ecosystem bots), zero public social presence |
@@ -465,9 +465,14 @@ Key repos: `wavewarz-intelligence` (analytics dashboard), `wavewarz-base` (Base 
 
 Candy is a **Web3 Academy DAO Operator** and member of the Writers Guild. Runs the **Web3 Academy DAO DOers Newsletter** on Substack ([web3adao.substack.com](https://web3adao.substack.com/)).
 
-#### Sponsorship Admin — Impact3 / Milk Road
+#### ~~Sponsorship Admin — Impact3 / Milk Road~~ NO LONGER TRUE
 
-Sponsorship Administrator at Impact3.co (Web3 Product & Marketing Studio, sister organization to Milk Road) since October 30, 2023. Direct connections to major Web3 brands and sponsorship budgets.
+> **CORRECTED 2026-09-07, from Zaal direct on 2026-09-03:** *"She doesn't work there anymore that's the past."*
+> **Candy is not at Impact3.** Do not cite this as a current sponsorship route.
+
+Historically: Sponsorship Administrator at Impact3.co (Web3 Product & Marketing Studio, sister organization to Milk Road) from October 30, 2023. **That role has ended.**
+
+This mattered and was briefly used wrongly. On 2026-09-03 the ZAO NYC plan doc argued that Candy's Impact3 role made a funded 2027 ZAO-PALOOZA revival a realistic ask. **That argument was built on this stale line and was withdrawn the same day.** The budget question for a revival is still open and still unanswered.
 
 #### CC0 Art & Design
 
@@ -790,7 +795,7 @@ Doc 722f (the 2026-05-23 collaborator network audit) explicitly classifies JANGO
 | Livestream + Tech | Ohnahji + Maceo + Zaal | Confirmed |
 | Performing artist | DCoop / Hurric4n3Ike + roster | Confirmed |
 | Production support | AttaBotty (lead) + DCoop (support) | Confirmed |
-| Sponsorship outreach | Candy (Impact3/Milk Road connections) | Confirmed |
+| Sponsorship outreach | ~~Candy (Impact3/Milk Road connections)~~ **NOT AVAILABLE - she left Impact3, corrected 2026-09-07** | Retracted |
 
 ### Let's Talk About Web3 (LTAW3) — Full Episode List
 
@@ -808,7 +813,7 @@ ZAO Core
 ├── Candy (Co-Founder, ZID 2)
 │   ├── WaveWarZ (all 16 GitHub repos, smart contracts)
 │   ├── Student $LOANZ (creator)
-│   ├── Impact3/Milk Road (sponsorship)
+│   ├── Impact3/Milk Road (sponsorship) [ENDED - corrected 2026-09-07]
 │   └── Web3 Academy (writer/operator)
 │
 ├── Hurric4n3Ike (WaveWarZ Founder, #3 Respect)

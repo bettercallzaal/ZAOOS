@@ -47,6 +47,26 @@ a product constraint.
 GET https://hub.pinata.cloud/v1/castsByMention?fid=3338501&pageSize=50
 ```
 
+> **MEASURED CORRECTION, 2026-09-07 (zol lane).** Do not use
+> `hub.pinata.cloud` for this. It answers **HTTP 200 with an empty result**:
+>
+> ```
+> hub.pinata.cloud      200   {"messages":[],"nextPageToken":"W251bGwsbnVsbF0="}
+> haatz.quilibrium.com  200   13 real mention messages
+> hub-api.neynar.com    402   (keyed; needs the API key)
+> ```
+>
+> Implementing this spec verbatim gives you 200s forever, zero mentions, and the
+> conclusion that ZOL has no mentions. That is the same silent-empty failure that
+> caused ZOL's 114 fabricated casts, where a swallowed error was indistinguishable
+> from a quiet source - **an empty result is a thing to investigate, not a pass.**
+>
+> The shipped implementation is already correct and does not follow this line:
+> `zol-reply.js` uses a hub ladder of `haatz.quilibrium.com` + keyed
+> `hub-api.neynar.com`, having dropped pinata as stale in commit `d64b6c5`. The
+> endpoint PATH and response shape in this spec are right; only the host is wrong.
+
+
 - `fid=3338501` — ZOL's FID (ZOL's Farcaster identity, onchain Optimism)
 - `pageSize=50` — returns up to 50 mentions; ZOL's mention volume is low
 - Returns chronological list of casts that @mention FID 3338501

@@ -3,7 +3,7 @@ topic: farcaster
 type: implementation-brief
 status: research-complete
 last-validated: 2026-08-22
-superseded-by:
+superseded-by: 2387-zol-mention-polling-snapchain-spec
 related-docs: "892, 984, 1065, 2374, 910"
 original-query: "ZOL: add mention-listening (Neynar webhook POST /v2/bot/mentions -> fetch convo -> reply). Board task 9068."
 tier: STANDARD

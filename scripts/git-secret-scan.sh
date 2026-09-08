@@ -21,8 +21,19 @@ REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 [[ -z "$REPO" ]] && exit 0
 cd "$REPO" || exit 0
 
+# The filter must include R. `--diff-filter=ACM` means Added/Copied/Modified and
+# EXCLUDES Renamed, and git detects a rename by default (diff.renames is on since
+# 2.9). So `git mv old new` plus an edit in the same commit stages as a single R
+# entry that ACM drops entirely - the file is neither listed by --name-only nor
+# diffed by the content scan below, and the gate exits 0 having read nothing.
+# Measured: `git mv notes.md config/keys.md` + adding a line stages as R058, and
+# `git diff --cached --diff-filter=ACM -U0` prints nothing while the unfiltered
+# diff prints the added line. Renaming a file INTO `.env` is R100 and is invisible
+# to the check below for the same reason. D stays excluded on purpose: DELETING a
+# committed .env is the fix, not the offence.
+
 # 1. No real .env file staged (.env.example is allowed).
-ENV_STAGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null \
+ENV_STAGED=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null \
   | grep -E '(^|/)\.env($|\.local$|\.production$)' || true)
 if [[ -n "$ENV_STAGED" ]]; then
   echo "" >&2
@@ -33,7 +44,7 @@ if [[ -n "$ENV_STAGED" ]]; then
 fi
 
 # 2. Scan ADDED lines of the staged diff for secret patterns.
-DIFF=$(git diff --cached --diff-filter=ACM -U0 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+DIFF=$(git diff --cached --diff-filter=ACMR -U0 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)
 [[ -z "$DIFF" ]] && exit 0
 
 HITS=""

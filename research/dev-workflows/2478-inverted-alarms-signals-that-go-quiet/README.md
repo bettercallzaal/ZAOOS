@@ -68,7 +68,7 @@ Described as: a health check that `pgrep -f`s a pattern that also appears in its
 
 ## The audit
 
-For every check, monitor, guard and health endpoint reached in this pass: **if the thing it watches failed right now, would this get LOUDER or QUIETER?** 25 checks audited across four surfaces. Totals: **16 LOUDER, 6 QUIETER, 3 CANNOT TELL.**
+For every check, monitor, guard and health endpoint reached in this pass: **if the thing it watches failed right now, would this get LOUDER or QUIETER?** 27 checks audited across five surfaces (mac, VPS, ZAOOS API, ZAOOS GitHub Actions, ZAOstock GitHub Actions). Totals: **18 LOUDER, 6 QUIETER, 3 CANNOT TELL.**
 
 ### Local mac (`~/bin`) — all 6 LOUDER
 
@@ -117,9 +117,16 @@ Current crontab (`crontab -l`, read today) has 15 active lines plus 4 explicitly
 | `estate-health.yml` — PR guardrail ratchet | **QUIETER** | See Key Decision 4. `runOne()` converts any individual check's exception into `{status:'skipped', findings:[]}`. `scoreAndSummarize` only counts `findings`, so a crashed check contributes zero to `summary.fail` — identical, numerically, to a check that ran and found nothing wrong. The ratchet (`summary.fail > maxFails`) cannot see the difference, even though the PR comment does render a `SKIP` badge for a human who reads it closely. Supersedes the `estate-health.yml` finding in [`security/2093-silent-failure-sweep`](../../security/2093-silent-failure-sweep/) (finding 6, "/tmp file writes not verified"), which described an earlier version of this workflow before it was rewritten into the current control-plane form; that specific concern no longer applies to the file that exists today. |
 | `research-index.yml` (CI-owned backfill) | **QUIETER** | The commit-back step ends `git push \|\| echo "::warning::index backfill could not push (branch protection?) - nightly backfill will catch it"` — a push failure (a changed branch-protection rule, an auth problem) degrades to a warning and the job still exits `0`/green. A silently-stopped backfill and a genuinely-complete index render identically in the Actions tab. |
 
-### Scope not covered in this pass
+### ZAOstock / wavewarz — 2 audited: 2 LOUDER; no API health endpoint exists to audit
 
-ZAOstock, wavewarz and the other ZAODEVZ-owned repos' own Actions workflows and `/api/*health*` endpoints were not read for this audit; [`agents/2450-zao-bot-estate`](../../agents/2450-zao-bot-estate/) inventories `uptime.yml` (ZAOstock) and 15 other repo-level workflows as ALIVE without auditing their internal fail-open/fail-closed shape. That is a follow-up, not a finding either way — recorded as **CANNOT TELL** by omission rather than assumed clean.
+Added after the first pass above disclosed this as an open gap. `ZAODEVZ/ZAOstock` is the only WaveWarZ-family repo with any GitHub Actions at all — `bettercallzaal/wwbase`, `wavewarzapp` and `wavewarz-overlay` each return a 404 on `.github/workflows`, confirmed today, not assumed. ZAOstock's own `src/app/api/` has no `health` or `status`-named route (`admin`, `apply`, `artist-profile`, `cron/deactivate-inactive`, `cypher`, `events`, `musicians`, `suggestions`, `team` — checked by listing, not guessed), so there is no `/api/*health*` endpoint in this family to classify.
+
+| Workflow | Verdict | Why |
+|---|---|---|
+| [`uptime.yml`](https://github.com/ZAODEVZ/ZAOstock/blob/main/.github/workflows/uptime.yml) | LOUDER (exemplar) | Written explicitly against this exact failure class — its own header: *"A wrong-but-reachable database answers 200 with an empty array. That is the exact shape of the failure this is meant to catch, so an empty roster counts as down."* Asserts `/api/events` returns HTTP 200 **and** a non-empty `events` array; on failure it opens a de-duplicated GitHub issue (checks for an existing open one by title before filing another) rather than re-notifying every 10 minutes. States its own limits in the same file rather than implying more coverage than it has: best-effort cron, GitHub disables a quiet scheduled workflow after 60 days of no commits, and an opened issue is "not a pager." |
+| [`ci.yml`](https://github.com/ZAODEVZ/ZAOstock/blob/main/.github/workflows/ci.yml) | LOUDER | Plain `typecheck` / `lint` / `test` / `build` gate on every PR and push to `main`, no `\|\| true` anywhere in the file. |
+
+This closes the scope gap named in the original pass; no residual CANNOT TELL remains for ZAOstock/wavewarz as a result.
 
 ## Also See
 
@@ -140,7 +147,6 @@ ZAOstock, wavewarz and the other ZAODEVZ-owned repos' own Actions workflows and 
 | Change `research-index.yml`'s backfill-commit step from `git push \|\| echo "::warning..."` to a hard failure, or add a separate scheduled check that compares the index against disk and fails loud on drift — shipped when a simulated push failure (e.g. temporary branch protection) fails the workflow run instead of warning | Zaal | PR to ZAOOS | 2026-09-15 |
 | Point `fleet-health.sh` and `cost-of-pass-summary.sh --tg` at the same "check the Telegram response body" pattern `loops-report.sh` already uses — shipped when both scripts' code contains the `"ok":true` check instead of a bare `curl -s ... >/dev/null` | Zaal | Config (VPS `~/bin`) | 2026-09-15 |
 | Adopt `healthchecks.io` (or equivalent) as a dead-man's switch on the 9 mac crons and the active VPS crontab lines that pipe to `/dev/null`, per doc 2450's recommendation, starting with `stall-tripwire.py` and `cost-of-pass-summary.sh` — shipped when deliberately killing one of those two produces an email within its expected window | Zaal | Config | 2026-09-19 |
-| Audit ZAOstock/wavewarz Actions workflows and API health endpoints for the same LOUDER/QUIETER shape (scope not covered in this pass) — shipped when a follow-up doc classifies `uptime.yml` and the other ZAODEVZ-side detect workflows the way this doc classified ZAOOS's | Zaal | Research doc | 2026-09-19 |
 
 ## Sources
 
@@ -160,3 +166,4 @@ ZAOstock, wavewarz and the other ZAODEVZ-owned repos' own Actions workflows and 
 - [`agents/2450-zao-bot-estate`](../../agents/2450-zao-bot-estate/README.md) — [FULL, read on disk].
 - [`security/2093-silent-failure-sweep`](../../security/2093-silent-failure-sweep/README.md) — [FULL, read on disk].
 - `zao-research-index` dedup queries for "inverted alarm", "fleet-spend-guard", "pgrep self match", "silent-failure-guard rule", run 2026-09-08 — [FULL, executed].
+- [`ZAODEVZ/ZAOstock` — `.github/workflows/uptime.yml`](https://github.com/ZAODEVZ/ZAOstock/blob/main/.github/workflows/uptime.yml) and [`ci.yml`](https://github.com/ZAODEVZ/ZAOstock/blob/main/.github/workflows/ci.yml) — [FULL, method: `gh api repos/.../contents/... --jq .content | base64 -d`, 2026-09-08]. `gh api repos/bettercallzaal/{wwbase,wavewarzapp,wavewarz-overlay}/contents/.github/workflows` (all 404, confirmed absent) and `gh api repos/ZAODEVZ/ZAOstock/contents/src/app/api` (listed, no health/status route) — [FULL, executed 2026-09-08].

@@ -47,13 +47,15 @@ jobs:
         if: github.event_name == 'pull_request'
         run: git fetch --no-tags --depth=0 origin "${{ github.base_ref }}"
 
+      # The checker lives in this repo, next to the ledger it reads. The first
+      # version of this step curled it from zaal-dotfiles, which is PRIVATE, so
+      # it would have failed at install on every run - a workflow that can never
+      # pass. Vendoring it here also means CI does no network fetch at all.
       - name: Install the checker
         run: |
           set -euo pipefail
-          curl -fsSL \
-            https://raw.githubusercontent.com/bettercallzaal/zaal-dotfiles/main/bin/zao-claims-check \
-            -o /usr/local/bin/zao-claims-check
-          chmod +x /usr/local/bin/zao-claims-check
+          install -m 0755 research/identity/claims/zao-claims-check \
+            /usr/local/bin/zao-claims-check
           zao-claims-check --list | head -1
 
       # scope=all claims are FALSE and must not survive anywhere, so the whole

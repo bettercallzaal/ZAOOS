@@ -13,6 +13,10 @@ be active."
                    count is printed instead of the cards vanishing (2026-09-07).
     FLAGGED      = metadata.irreversible or metadata.decision is true. Lands in
                    NEEDS ZAAL whatever `route` or `lane` says (2026-09-08).
+    NEEDS ZAAL   = route=human with no lane, or flagged. The one destination
+                   that is a person, not a lane. `--to-zaal` writes it; until
+                   2026-09-08 nothing did, so a lane handing a card to Zaal had
+                   nowhere to put it (see WHY THE READ-BACK).
 
 `zj` already answers "what are the lanes doing" by walking tmux. This answers
 the other half - "what WORK is on the wall" - by reading the cowork board. The
@@ -33,14 +37,17 @@ USAGE
     zao-wall --unclaimed        only agent-routable work nobody owns
     zao-wall --lane <name>      what one lane owns
     zao-wall --claim <id> <lane>    stamp a lane onto a card
-    zao-wall --release <id>     put a card back on the wall, unclaimed
+    zao-wall --release <id>     put a card back on the wall (prints where it landed)
+    zao-wall --to-zaal <id> [--why "..."]   hand a card to Zaal: route=human, no lane
     zao-wall --flag <id> irreversible|decision   route it to Zaal, mechanically
     zao-wall --unflag <id> irreversible|decision
     zao-wall --json             machine-readable, for the TG/Discord views
 
 Reads SUPABASE_URL + SUPABASE_SERVICE_KEY from ~/.zao/zao.env. The board is the
-truth; this never writes anything but `metadata.lane`, `metadata.irreversible`
-and `metadata.decision`.
+truth; this never writes anything but `metadata.lane`, `metadata.irreversible`,
+`metadata.decision`, and (via --to-zaal only) `metadata.route` plus the
+`to_zaal_*` audit keys. Every write reads the card back and prints the bucket
+it is ACTUALLY in now, not the one the verb was named after.
 
 WHY THE FLAG. A card is a routing hint, not a spec. On 2026-09-07 card ef98e806
 ("teach ZOL to create a tokenless empire") carried route=agent and lane=zol
@@ -49,6 +56,16 @@ permanent - a profile-attached empire cannot be re-created. Measured that day:
 42 of 570 open agent/prep cards carry outward or decision words in the title,
 10 say "decision" outright. The fix is a flag `bucket()` honours before it
 looks at route or lane, so routing to Zaal does not depend on a lane noticing.
+
+WHY THE READ-BACK. On 2026-09-08 the zol lane refused ef98e806 and ran
+`--release`. The tool printed "released to unclaimed" - and the card was not
+in UNCLAIMED. Release only drops `lane`; the card's route was `prep`, so it
+fell to UNROUTED, one of 188 that morning, 5 of them in_progress. Two bugs,
+one path: the board had no human destination for a lane to hand a card to,
+and the success line named a destination from the verb instead of the card.
+Now every write verb re-reads the card and names the bucket it landed in, and
+a landing in UNROUTED exits 1 - a write that put a card in no view is not a
+success, whatever the verb was called.
 """
 
 import argparse
@@ -142,7 +159,9 @@ def patch_meta(root, key, card_id, edit):
     """Read metadata, apply `edit(md)`, PATCH it back. Preserves every other key.
 
     PostgREST replaces a jsonb column wholesale, so a blind PATCH of one key
-    would drop the rest - hence the GET first.
+    would drop the rest - hence the GET first. Returns the row PostgREST hands
+    back AFTER the write (Prefer: return=representation), so the caller reports
+    the card as stored, not as intended.
     """
     h = headers(key, {"Content-Type": "application/json", "Prefer": "return=representation"})
     q = f"{root}/rest/v1/tasks?id=eq.{card_id}&select=metadata,title"
@@ -151,14 +170,15 @@ def patch_meta(root, key, card_id, edit):
     if not current:
         sys.exit(f"zao-wall: card {card_id[:8]} not found")
     md = current[0].get("metadata") or {}
-    title = current[0].get("title") or ""
     edit(md)
     body = json.dumps({"metadata": md}).encode()
     req = urllib.request.Request(f"{root}/rest/v1/tasks?id=eq.{card_id}",
                                  data=body, headers=h, method="PATCH")
     with urllib.request.urlopen(req, timeout=20) as r:
-        json.load(r)
-    return title
+        rows = json.load(r)
+    if not rows:
+        sys.exit(f"zao-wall: PATCH on {card_id[:8]} returned no row - nothing written?")
+    return rows[0]
 
 
 def set_lane(root, key, card_id, lane):
@@ -181,6 +201,65 @@ def set_flag(root, key, card_id, flag, on):
         else:
             md.pop(flag, None)
     return patch_meta(root, key, card_id, edit)
+
+
+def hand_to_zaal(root, key, card_id, why):
+    """route=human, lane dropped, with an audit trail so the hand is reversible.
+
+    `route_prev` keeps what the card said before (prep, agent, ...) so Zaal can
+    put it back with one edit; `to_zaal_at`/`to_zaal_why` say when and why a
+    lane gave it up. Flags are NOT touched: a flag is a property of the card's
+    substance (permanent, a decision), a hand is an event.
+    """
+    def edit(md):
+        prev = md.get("route")
+        if prev != "human":
+            md["route_prev"] = prev
+        md["route"] = "human"
+        md.pop("lane", None)
+        md["to_zaal_at"] = _today()
+        if why:
+            md["to_zaal_why"] = why
+    return patch_meta(root, key, card_id, edit)
+
+
+def _today():
+    import datetime
+    return datetime.date.today().isoformat()
+
+
+def where(card):
+    """Name the bucket ONE card lands in, using the same bucket() the views use.
+
+    Returns (label, in_a_view). `in_a_view` is False only for UNROUTED, the
+    bucket that exists so a count is printed - no view lists its cards.
+    """
+    on_wall, unclaimed, human, unrouted = bucket([card])
+    if on_wall:
+        lane = next(iter(on_wall))
+        return f"ON THE WALL at {lane}", True
+    if unclaimed:
+        return "UNCLAIMED", True
+    if human:
+        why = "flagged" if flagged(card) else "route=human"
+        return f"NEEDS ZAAL ({why})", True
+    route = next(iter(unrouted))
+    return f"UNROUTED (route={route}) - no view lists it", False
+
+
+def report(verb, card, hint=""):
+    """Print where the card actually is after a write; exit 1 if that is nowhere.
+
+    The message comes from the card, never from the verb: `--release` used to
+    print "released to unclaimed" for a card that went to UNROUTED.
+    """
+    label, visible = where(card)
+    title = (card.get("title") or "")[:60]
+    print(f"{verb} {card['id'][:8]}  {title}\n  now in: {label}")
+    if not visible:
+        print(f"  {hint or 'use --to-zaal <id> to hand it to Zaal, or --claim <id> <lane>'}",
+              file=sys.stderr)
+        sys.exit(1)
 
 
 def flagged(card):
@@ -252,7 +331,9 @@ def main():
     ap.add_argument("--unclaimed", action="store_true", help="only agent work nobody owns")
     ap.add_argument("--lane", metavar="NAME", help="what one lane owns")
     ap.add_argument("--claim", nargs=2, metavar=("CARD", "LANE"), help="stamp a lane onto a card")
-    ap.add_argument("--release", metavar="CARD", help="put a card back on the wall")
+    ap.add_argument("--release", metavar="CARD", help="drop the lane; prints where the card lands")
+    ap.add_argument("--to-zaal", metavar="CARD", help="hand a card to Zaal: route=human, lane dropped")
+    ap.add_argument("--why", metavar="TEXT", help="with --to-zaal: why the lane is handing it over")
     ap.add_argument("--flag", nargs=2, metavar=("CARD", "FLAG"),
                     help="irreversible|decision - routes the card to Zaal regardless of route/lane")
     ap.add_argument("--unflag", nargs=2, metavar=("CARD", "FLAG"), help="drop the flag")
@@ -261,25 +342,30 @@ def main():
 
     root, key = load_env()
 
+    if args.why and not args.to_zaal:
+        sys.exit("zao-wall: --why only goes with --to-zaal")
     if args.claim:
         card, lane = args.claim
+        if lane.lower() in ("zaal", "human", "owner"):
+            sys.exit(f"zao-wall: {lane!r} is not a lane. Hand it over with --to-zaal {card}")
         cid = resolve(root, key, card)
-        title = set_lane(root, key, cid, lane)
-        print(f"on the wall at {lane}: {cid[:8]}  {title[:60]}")
+        report(f"claimed for {lane}:", set_lane(root, key, cid, lane))
         return
     if args.release:
         cid = resolve(root, key, args.release)
-        title = set_lane(root, key, cid, None)
-        print(f"released to unclaimed: {cid[:8]}  {title[:60]}")
+        report("released:", set_lane(root, key, cid, None))
+        return
+    if args.to_zaal:
+        cid = resolve(root, key, args.to_zaal)
+        report("handed to Zaal:", hand_to_zaal(root, key, cid, args.why))
         return
     if args.flag or args.unflag:
         card, flag = args.flag or args.unflag
         if flag not in FLAGS:  # before the network round-trip resolve() makes
             sys.exit(f"zao-wall: flag must be one of {', '.join(FLAGS)} - got {flag!r}")
         cid = resolve(root, key, card)
-        title = set_flag(root, key, cid, flag, on=bool(args.flag))
         verb = "flagged" if args.flag else "unflagged"
-        print(f"{verb} {flag}: {cid[:8]}  {title[:60]}")
+        report(f"{verb} {flag}:", set_flag(root, key, cid, flag, on=bool(args.flag)))
         return
 
     cards = fetch_open(root, key)

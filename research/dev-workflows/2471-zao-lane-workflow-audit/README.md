@@ -16,13 +16,58 @@ tier: STANDARD
 > the machine.** Four tools built this week are in git and not installed, including
 > the sweep the orchestrator seat uses to see its own lanes.
 
+## CORRECTION 2026-09-08 — decisions 2 and 3 are wrong, and decision 1 is right for the wrong reason
+
+> Measured by the `zj` lane, which was briefed from this doc and re-ran the check
+> before acting on it. **`~/bin` is a symlink to `~/zaal-dotfiles/bin`.**
+>
+> ```
+> lrwxr-xr-x  /Users/zaalpanthaki/bin -> /Users/zaalpanthaki/zaal-dotfiles/bin
+> 245201149 /Users/zaalpanthaki/bin/zao-sweep
+> 245201149 /Users/zaalpanthaki/zaal-dotfiles/bin/zao-sweep     # same inode
+> ```
+>
+> **`bootstrap.sh` had already been run**, on 2026-08-06 06:48 — the same minute
+> it linked `~/.claude/settings.json`. The estate has been on symlinks for a
+> month.
+>
+> **Where the measurement went wrong, because the observation was correct.** This
+> doc says (below): *"`~/bin/lane-send` is a regular file dated 2 September, not a
+> symlink."* **That is true.** `~/bin/lane-send` *is* a regular file. The symlink
+> is one level up, on the **directory**. Stat the file and you see a file; stat
+> the directory and you see the link. The reading was right and the inference from
+> it was wrong, which is why nothing about it looked doubtful for a month.
+>
+> **What follows for each decision:**
+>
+> - **Decision 2 is void.** `bootstrap.sh` cannot hide `ww-set-rpc` — that already
+>   happened, harmlessly. `ww-set-rpc` was never at risk: it sat untracked in the
+>   repo's own `bin/`, which is exactly why `git status` kept reporting it. It is
+>   tracked as of 2026-09-07 (`zaal-dotfiles` `b726ddd`).
+> - **Decision 3 is void, and `README.md:13` was right all along.** The estate does
+>   not run copies, so there is nothing to keep. The chezmoi argument may still be
+>   worth having on its merits, but it was not describing this machine.
+> - **Decision 1 stands, and matters more than it looked.** For this repo there is
+>   **no install step and no install gap**: anything merged into `bin/` is on
+>   `$PATH` the instant the pull lands. So all five recorded instances of the
+>   signature failure were **one** cause — nobody ran `git pull` — and the "install
+>   half" of the diagnosis was an artifact of never having checked the directory.
+>   `which <tool>` is still the proof; it just answers a moment after the pull.
+>
+> **The general lesson, which is the reason this correction is worth its length:**
+> this claim was asserted once here and then *cited* four times — into
+> `handoffs/zj.md` as measured fact — without anyone re-running a one-line check.
+> **An inherited measurement decays, and the cheaper it is to re-run, the less
+> excuse there is for citing it.** Written up as convention 21 in
+> `zao-vault/notes/orca-organization.md`.
+
 ## Key decisions
 
 | # | Decision | Why |
 |---|---|---|
 | 1 | **Add an install step to the definition of done for any `bin/` tool.** A tool is not shipped when its PR merges; it is shipped when `which <tool>` answers | Four tools merged this week, zero installed. Measured below |
-| 2 | **Do NOT run `bootstrap.sh` to fix it.** It symlinks `bin/` wholesale and would hide `~/bin/ww-set-rpc`, which exists only there | The documented mechanism is right in principle and destructive in this state. Zaal's call, not a lane's |
-| 3 | **Keep copies, not symlinks, and add a sync check** | chezmoi's argument applies here: this estate runs a mac, a Pi and a VPS with different tool sets, and a symlink farm assumes identical machines |
+| 2 | **[VOID 2026-09-08 — see correction above]** ~~Do NOT run `bootstrap.sh` to fix it.~~ It had already been run on 2026-08-06. It symlinks `bin/` wholesale and would hide `~/bin/ww-set-rpc`, which exists only there | The documented mechanism is right in principle and destructive in this state. Zaal's call, not a lane's |
+| 3 | **[VOID 2026-09-08 — see correction above]** ~~Keep copies, not symlinks~~ — `~/bin` IS a symlink. | chezmoi's argument applies here: this estate runs a mac, a Pi and a VPS with different tool sets, and a symlink farm assumes identical machines |
 | 4 | **Lane count is not the constraint. Idle capacity is** | 8 idle lanes measured, exactly 1 genuinely blocked. Adding or merging lanes changes nothing |
 | 5 | **The board must never drop a card silently** | 362 of 575 open cards appear in no view of the tool that exists to show them |
 
@@ -51,6 +96,12 @@ through the channel that persists.**
 `$PATH` contains `~/bin`. It does **not** contain `~/zaal-dotfiles/bin`. And
 `~/bin` is a real directory of **copies** — `~/bin/lane-send` is a regular file
 dated 2 September, not a symlink.
+
+> **CORRECTED 2026-09-08.** The observation is right and the conclusion is not.
+> `~/bin/lane-send` is indeed a regular file — but `~/bin` **itself** is a symlink
+> to `~/zaal-dotfiles/bin`, so the file it resolves to *is* the repo's file, same
+> inode. `$PATH` containing `~/bin` therefore **does** contain the repo's `bin/`.
+> Stat the directory, not the file.
 
 So the install path is manual, undocumented in practice, and nobody was doing it.
 Measured today, in the repo and **not installed**:

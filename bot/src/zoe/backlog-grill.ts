@@ -436,6 +436,26 @@ export const TERMINAL_VERDICT_RE =
   /(^|\n)\s*(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
 
 /**
+ * A card a lane owns, so the phone must not ask Zaal about it.
+ *
+ * Measured 2026-09-08 on the live state file: 117 of the 347 unanswered cards
+ * carried `metadata.route = "agent"` - triage had already said a lane does the
+ * work, and Zaal's own answer to such a card ("route to AGENT") is exactly the
+ * verdict reconcile already treats as terminal. Asking was a third of the pile.
+ *
+ * Same flag rule as zao-wall's bucket(): `metadata.irreversible` or
+ * `metadata.decision` equal to JSON `true` sends the card to Zaal whatever
+ * `route` says, so a flagged card is never lane-owned here either. Strict
+ * boolean - `decision: "approved"` exists on the board with the opposite sense.
+ */
+export function isLaneOwned(metadata: unknown): boolean {
+  if (!metadata || typeof metadata !== 'object') return false;
+  const md = metadata as Record<string, unknown>;
+  if (md.irreversible === true || md.decision === true) return false;
+  return md.route === 'agent';
+}
+
+/**
  * Classify one asked-entry's board row for reconcile.
  *
  *  - row missing (task deleted): 'board-closed' - there is nothing left to ask.
@@ -443,13 +463,19 @@ export const TERMINAL_VERDICT_RE =
  *    with it; the card must stop counting and stop re-asking.
  *  - still todo but notes carry a terminal verdict: 'verdict-synced' - Zaal
  *    already ruled on it in a terminal; asking again on the phone is a dupe.
+ *  - still todo, routed to an agent lane and not flagged: 'lane-owned' - the
+ *    work is a lane's, not a thumb's. The card stays open on the board; only
+ *    the ask is withdrawn, and reconcile revives it if the route ever changes.
  *  - otherwise null: a genuinely open card, leave it alone.
  */
 export function classifyReconcile(
-  row: { status?: string; archived_at?: string | null; notes?: string | null } | undefined,
-): 'board-closed' | 'verdict-synced' | null {
+  row:
+    | { status?: string; archived_at?: string | null; notes?: string | null; metadata?: unknown }
+    | undefined,
+): 'board-closed' | 'verdict-synced' | 'lane-owned' | null {
   if (!row) return 'board-closed';
   if (row.status !== 'todo' || row.archived_at) return 'board-closed';
   if (row.notes && TERMINAL_VERDICT_RE.test(row.notes)) return 'verdict-synced';
+  if (isLaneOwned(row.metadata)) return 'lane-owned';
   return null;
 }

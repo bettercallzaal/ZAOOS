@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   classifyReconcile,
+  isLaneOwned,
   DRIP_DEFAULT,
   parseVerdict,
   cardPosition,
@@ -346,6 +347,46 @@ describe('classifyReconcile - what the other end settled', () => {
   it('null for a genuinely open row - reconcile must be able to touch nothing', () => {
     expect(classifyReconcile({ status: 'todo', archived_at: null, notes: 'no ruling yet' })).toBeNull();
     expect(classifyReconcile({ status: 'todo', archived_at: null })).toBeNull();
+  });
+
+  // 2026-09-08: 117 of 347 unanswered phone cards were route=agent - a lane's
+  // work sitting in front of Zaal's thumb.
+  it('lane-owned for a still-todo row triage routed to an agent', () => {
+    expect(
+      classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'agent' } }),
+    ).toBe('lane-owned');
+    expect(isLaneOwned({ route: 'agent', lane: 'zol' })).toBe(true);
+  });
+
+  it('a card routed to a human, prep, or nothing is never lane-owned', () => {
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'human' } })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'prep' } })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: {} })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: null })).toBeNull();
+    expect(isLaneOwned(undefined)).toBe(false);
+    expect(isLaneOwned('agent')).toBe(false);
+  });
+
+  it('an irreversible or decision flag beats route=agent - same rule as zao-wall bucket()', () => {
+    expect(isLaneOwned({ route: 'agent', irreversible: true })).toBe(false);
+    expect(isLaneOwned({ route: 'agent', decision: true })).toBe(false);
+    // Strict boolean: decision="approved" means decided-proceed on the live board.
+    expect(isLaneOwned({ route: 'agent', decision: 'approved' })).toBe(true);
+    expect(isLaneOwned({ route: 'agent', irreversible: 'yes' })).toBe(true);
+  });
+
+  it('a closed or ruled-on card outranks lane-owned', () => {
+    expect(classifyReconcile({ status: 'done', archived_at: null, metadata: { route: 'agent' } })).toBe(
+      'board-closed',
+    );
+    expect(
+      classifyReconcile({
+        status: 'todo',
+        archived_at: null,
+        notes: 'GRILL 2026-09-08 (Zaal): keep.',
+        metadata: { route: 'agent' },
+      }),
+    ).toBe('verdict-synced');
   });
 });
 

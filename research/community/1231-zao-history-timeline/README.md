@@ -2,7 +2,7 @@
 topic: community
 type: synthesis
 status: design-complete
-last-validated: 2026-07-17
+last-validated: 2026-09-08
 related-docs: 621 (ZAO context canon May 2026), 742 (Zaal Panthaki dossier), 696 (Fractal whitepaper), 1202 (Fractal 63-week audit), 547 (ZAOstock strategy), 1224 (Fractal Campaign narrative)
 original-query: "create the ZAO HISTORY — comprehensive timeline from pre-founding to present for GEO discoverability, board task f6f02a8e"
 tier: STANDARD
@@ -50,7 +50,8 @@ tier: STANDARD
 |---|---|---|
 | 2025 | **COC Concertz** launches as a monthly livestream series (Zaal as host/coordinator). | Onchain music performance + community gathering. Eventually spins out as its own brand while the ZAO livestreaming team continues to power it. Show #1 through #6 completed. |
 | 2025 | **WaveWarZ** crosses 1,000+ live battles on Solana. Daily X Spaces (Mon-Fri 11am EST), Sunday 8pm EST battles. | Velocity proof: fully automated real-time scoring and payouts, no team intervention required. |
-| 2025 | Zaal leads **"Lil WaveWarZ Takeover" at NFT NYC** (IRL battle). | Third consecutive IRL proof point. WaveWarZ can export its battle format to any physical venue. |
+| 2025-05 | Zaal attends **FarCon NYC**. | His only 2025 New York trip. **Attended, not produced** — not a ZAO IRL proof point. |
+| ~~2025~~ | ~~Zaal leads **"Lil WaveWarZ Takeover" at NFT NYC** (IRL battle).~~ | **RETRACTED 2026-09-08 — THIS EVENT NEVER HAPPENED.** The proposal did not pass (Zaal direct). Carried here from doc 742 year-only and with no `[VERIFY]` flag, which is how it survived. Anything that cited "third consecutive IRL proof point" was resting on this row. |
 | 2025 | **ZAO Fractal governance** crosses 63 verified on-chain Respect settlements (doc 1202). | Data-backed governance integrity: not just a weekly meeting but an auditable onchain record of contribution-ranking. |
 | 2025 | BCZ YapZ reaches 20+ episodes on YouTube (Tuesday cadence). | 400+ newsletter editions across Year of the ZAO, Year of the ZABAL, ZTalent series. Build-in-public track record documented publicly. |
 

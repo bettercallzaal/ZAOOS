@@ -81,13 +81,16 @@ export async function GET(): Promise<NextResponse<FleetStatusResponse>> {
     // now reported the same way an actual HTTP error is: 502 + an explicit
     // `error`, never a silent empty array.
     if (!Array.isArray(data.bots)) {
-      console.error('[api/bots/status] cowork board returned 200 with a malformed body (bots is not an array)');
+      console.error(
+        '[api/bots/status] cowork board returned 200 with a malformed body (bots is not an array)',
+      );
       return NextResponse.json(
         {
           configured: true,
           fetchedAt: new Date().toISOString(),
           bots: [],
-          error: 'cowork board returned a malformed response (bots is not an array) — bots down and bots unreadable must not look the same',
+          error:
+            'cowork board returned a malformed response (bots is not an array) — bots down and bots unreadable must not look the same',
         },
         { status: 502 },
       );

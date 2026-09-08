@@ -1281,10 +1281,21 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // ZAALBOTS. Routes, does not ask (feedback_zoe_route_dont_ask). One error per
   // tick; the fix pipeline enforces the fleet daily cap. Silent when there is
   // nothing new or the group is not configured.
+  //
+  // runWithSendClass('alarm'): every message this tick can send is a production
+  // failure notice - "no auto-fix target", "fix pipeline errored, needs you",
+  // "could not auto-fix, needs you", or a fix PR waiting on his merge. Without
+  // the class it fell to the `status` default, which the send budget DROPS past
+  // the daily cap. The row is already marked 'escalated'/'fixed' in app_errors
+  // BEFORE the report goes out and nothing re-notifies, so a dropped report is
+  // an error permanently marked as handled that Zaal was never told about.
+  // Same reasoning as the watcher-anomaly alert above: a breakage notice is the
+  // one class the budget must not cut.
   tasks.push(
     cron.schedule(
       '*/10 * * * *',
-      async () => {
+      () =>
+        runWithSendClass('alarm', async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
@@ -1301,7 +1312,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.error('[zoe/scheduler] error-remediation tick failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );

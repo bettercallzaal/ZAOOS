@@ -422,9 +422,31 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // is reached, nothing when the queue is empty. The hour window and the
   // 2-minute spacing are gone with the drip - see BATCH_DEFAULT for why both
   // had to go, and why the cap did not.
+  // 09:03, NOT 09:00, AND THE THREE MINUTES ARE THE WHOLE FIX (2026-09-08).
+  //
+  // `zoe-autodeploy.sh` runs from cron every 10 minutes - :00, :10, :20 ... -
+  // and when it has something to deploy it does `systemctl --user restart
+  // zoe-bot` (line 86). The batch was on '0 9 * * *', the same minute.
+  //
+  // Measured 2026-09-08: the batch began at 09:00:0x, sent FOUR of its ten
+  // cards, and ExecMainStartTimestamp says the service restarted at 09:00:12 -
+  // nine seconds in. The batch died mid-flight. That is why only 4 went out
+  // with the cap at 200 and dailyBatchSize at 10, and why NO `batch: sent N`
+  // summary line was logged at all: the process was gone before it reached it.
+  // A silent truncation, and it reads exactly like a quiet day.
+  //
+  // It hid for weeks behind ZOE_GRILL_MAX_OUTSTANDING=1, which capped the batch
+  // at one card - one card sends in under a second, so it always finished
+  // before the restart landed. Raising the cap did not cause this; it revealed
+  // it.
+  //
+  // Three minutes clears every */10 boundary. It does not fix the underlying
+  // race - a deploy at 09:10 could still interrupt a long batch - so the real
+  // fix is a lock that makes autodeploy wait for an in-flight batch. This is
+  // the cheap half, and it is worth having on its own.
   tasks.push(
     cron.schedule(
-      '0 9 * * *',
+      '3 9 * * *',
       () =>
         runWithSendClass('gated', async () => {
         if (!(await claimFire('backlog-grill-batch'))) return;

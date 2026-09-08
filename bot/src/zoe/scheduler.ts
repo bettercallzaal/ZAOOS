@@ -55,7 +55,7 @@ import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
-import { runBacklogGrillBatch } from './backlog-grill-runner';
+import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
@@ -422,6 +422,45 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // is reached, nothing when the queue is empty. The hour window and the
   // 2-minute spacing are gone with the drip - see BATCH_DEFAULT for why both
   // had to go, and why the cap did not.
+  // RECONCILE EVERY 10 MINUTES, SEPARATELY FROM THE BATCH (2026-09-08).
+  //
+  // reconcileBacklogState was called from one place only - inside the daily
+  // batch - so a card closed on the board at 09:05 stayed counted as unanswered
+  // until the next morning. Up to 24 hours of a number wrong in the one
+  // direction that matters, upward.
+  //
+  // Zaal now works the backlog by hand from the obsidian lane, closing cards as
+  // he goes. The count is what tells him it is working, and it would not have
+  // moved until the following day. Measured 2026-09-08: 347 unanswered, of which
+  // ZERO were already closed - reconcile reclaims nothing retroactively, so
+  // every future closure IS the mechanism.
+  //
+  // SENDS NOTHING. runReconcileOnly does the read-and-settle half deliberately:
+  // no DM, no card selection, no cap, no hour window. That is what makes it safe
+  // at this cadence, and why it is not runBacklogGrillTick.
+  //
+  // 10 minutes, not 1: it fetches board rows for every pending card, and the
+  // thing being fixed is a 24-hour lag, not a 10-minute one.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      // NOT wrapped in runWithSendClass. That wrapper exists to budget SENDS,
+      // and this sends nothing - wrapping it would let a send budget throttle a
+      // reconcile that costs no sends, which is the opposite of what is wanted.
+      async () => {
+        if (!(await claimFire('backlog-grill-reconcile'))) return;
+        try {
+          await runReconcileOnly({});
+        } catch (err) {
+          // Never let reconcile take the scheduler down. A failed reconcile
+          // means a stale count, which is exactly what we already had.
+          console.error('[zoe/backlog-grill] reconcile failed:', err);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
   tasks.push(
     cron.schedule(
       '0 9 * * *',

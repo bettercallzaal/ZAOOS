@@ -46,7 +46,13 @@ jobs:
             # topic README), and a directory pathspec never walks the symlink.
             git add -u -- research
             git commit -m "chore(research): CI backfill folder index rows [skip ci]"
-            git push || echo "::warning::index backfill could not push (branch protection?) - nightly backfill will catch it"
+            # FIXED (ZAO research doc 2478, inverted alarm #6): this used to
+            # degrade a push failure to "::warning::" and still exit 0 - a
+            # stopped backfill (branch protection changed, auth expired) and a
+            # genuinely complete index rendered identically green in Actions.
+            # A push failure here means the index just fell behind disk with
+            # nobody told; that is a fail, not a warning.
+            git push || { echo "::error::index backfill commit could not be pushed (branch protection or auth failure) - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
           else
             echo "index already complete"
           fi

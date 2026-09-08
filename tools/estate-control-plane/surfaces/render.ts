@@ -2,7 +2,7 @@ import type { Report, CheckResult } from '../types';
 
 const STICKY_MARKER = '<!-- estate-control-plane -->';
 
-const statusEmoji: Record<string, string> = { ok: 'OK', warn: 'WARN', fail: 'FAIL', skipped: 'SKIP' };
+const statusEmoji: Record<string, string> = { ok: 'OK', warn: 'WARN', fail: 'FAIL', crashed: 'CRASH', skipped: 'SKIP' };
 
 function scoreColor(score: number): string {
   if (score >= 85) return '#3ECF8E';
@@ -43,10 +43,11 @@ export function renderDashboardHtml(report: Report): string {
   .card-h { font-weight:600; margin-bottom:6px; }
   ul { margin:8px 0 0; padding-left:18px; }
   li { margin:3px 0; }
-  .f-fail { color:#ff8c8c; } .f-warn { color:#ffd27a; } .f-info { color:#9fb3d0; }
+  .f-fail { color:#ff8c8c; } .f-warn { color:#ffd27a; } .f-info { color:#9fb3d0; } .f-crashed { color:#ff3b3b; font-weight:700; }
   .badge { font-size:11px; font-weight:700; padding:2px 7px; border-radius:5px; margin-right:6px; }
   .b-ok { background:#10351f; color:#3ECF8E; } .b-warn { background:#3a2e0e; color:#f5a623; }
   .b-fail { background:#3a1414; color:#ff5c5c; } .b-skipped { background:#1c2538; color:#7e8aa0; }
+  .b-crashed { background:#4a0f0f; color:#ff3b3b; }
 </style></head>
 <body><div class="wrap">
   <h1>ZAO Estate Health <span class="muted">/ ${esc(report.repo.split('/').pop() ?? '')}</span></h1>
@@ -84,8 +85,11 @@ export function renderPrComment(report: Report, baselineFails?: number): string 
         : `**Ratchet: ok** - no new failures vs base (${baselineFails}).`
       : '';
   const findingLines = report.checks
-    .flatMap((c) => c.findings.filter((f) => f.severity === 'fail'))
-    .map((f) => `- **${f.title}**${f.detail ? ` - ${f.detail}` : ''}${f.fixable ? ' _(auto-fixable)_' : ''}`)
+    .flatMap((c) => c.findings.filter((f) => f.severity === 'fail' || f.severity === 'crashed'))
+    .map(
+      (f) =>
+        `- ${f.severity === 'crashed' ? '**[CRASHED]** ' : ''}**${f.title}**${f.detail ? ` - ${f.detail}` : ''}${f.fixable ? ' _(auto-fixable)_' : ''}`,
+    )
     .join('\n');
 
   return `${STICKY_MARKER}

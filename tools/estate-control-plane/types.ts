@@ -1,8 +1,13 @@
 // Shared types for the ZAO Estate Control Plane.
 // See docs/superpowers/specs/2026-06-12-estate-control-plane-design.md
 
-export type Severity = 'fail' | 'warn' | 'info';
-export type CheckStatus = 'ok' | 'warn' | 'fail' | 'skipped';
+// 'crashed' (ZAO research doc 2478, inverted alarm #5): a check that THROWS is
+// not the same as a check that RAN and found nothing — a crash is not
+// evidence of health, it is an absence of measurement. It is scored above
+// 'fail' in scoreAndSummarize so a thrown check trips the PR ratchet instead
+// of contributing zero findings and scoring identically to a clean pass.
+export type Severity = 'crashed' | 'fail' | 'warn' | 'info';
+export type CheckStatus = 'ok' | 'warn' | 'fail' | 'crashed' | 'skipped';
 
 export interface Finding {
   check: string;
@@ -30,7 +35,7 @@ export interface Report {
   generatedAt: string;
   healthScore: number;
   checks: CheckResult[];
-  summary: { fail: number; warn: number; fixable: number };
+  summary: { fail: number; warn: number; fixable: number; crashed: number };
 }
 
 export interface DocPointer {

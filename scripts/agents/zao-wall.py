@@ -11,6 +11,8 @@ be active."
     UNROUTED     = no lane, and a route that is neither agent nor human (prep,
                    or none). Not a state anyone chose; the bucket exists so the
                    count is printed instead of the cards vanishing (2026-09-07).
+    FLAGGED      = metadata.irreversible or metadata.decision is true. Lands in
+                   NEEDS ZAAL whatever `route` or `lane` says (2026-09-08).
 
 `zj` already answers "what are the lanes doing" by walking tmux. This answers
 the other half - "what WORK is on the wall" - by reading the cowork board. The
@@ -32,10 +34,21 @@ USAGE
     zao-wall --lane <name>      what one lane owns
     zao-wall --claim <id> <lane>    stamp a lane onto a card
     zao-wall --release <id>     put a card back on the wall, unclaimed
+    zao-wall --flag <id> irreversible|decision   route it to Zaal, mechanically
+    zao-wall --unflag <id> irreversible|decision
     zao-wall --json             machine-readable, for the TG/Discord views
 
 Reads SUPABASE_URL + SUPABASE_SERVICE_KEY from ~/.zao/zao.env. The board is the
-truth; this never writes anything but `metadata.lane`.
+truth; this never writes anything but `metadata.lane`, `metadata.irreversible`
+and `metadata.decision`.
+
+WHY THE FLAG. A card is a routing hint, not a spec. On 2026-09-07 card ef98e806
+("teach ZOL to create a tokenless empire") carried route=agent and lane=zol
+while its own notes said OPEN DECISION and the source doc said the action is
+permanent - a profile-attached empire cannot be re-created. Measured that day:
+42 of 570 open agent/prep cards carry outward or decision words in the title,
+10 say "decision" outright. The fix is a flag `bucket()` honours before it
+looks at route or lane, so routing to Zaal does not depend on a lane noticing.
 """
 
 import argparse
@@ -48,6 +61,7 @@ from collections import defaultdict
 
 ENV_PATH = os.path.expanduser("~/.zao/zao.env")
 OPEN_STATUSES = ("todo", "in_progress")
+FLAGS = ("irreversible", "decision")
 
 
 def load_env():
@@ -124,8 +138,12 @@ def resolve(root, key, prefix):
     return hits[0]
 
 
-def set_lane(root, key, card_id, lane):
-    """Write metadata.lane, preserving every other metadata key."""
+def patch_meta(root, key, card_id, edit):
+    """Read metadata, apply `edit(md)`, PATCH it back. Preserves every other key.
+
+    PostgREST replaces a jsonb column wholesale, so a blind PATCH of one key
+    would drop the rest - hence the GET first.
+    """
     h = headers(key, {"Content-Type": "application/json", "Prefer": "return=representation"})
     q = f"{root}/rest/v1/tasks?id=eq.{card_id}&select=metadata,title"
     with urllib.request.urlopen(urllib.request.Request(q, headers=h), timeout=20) as r:
@@ -134,16 +152,47 @@ def set_lane(root, key, card_id, lane):
         sys.exit(f"zao-wall: card {card_id[:8]} not found")
     md = current[0].get("metadata") or {}
     title = current[0].get("title") or ""
-    if lane is None:
-        md.pop("lane", None)
-    else:
-        md["lane"] = lane
+    edit(md)
     body = json.dumps({"metadata": md}).encode()
     req = urllib.request.Request(f"{root}/rest/v1/tasks?id=eq.{card_id}",
                                  data=body, headers=h, method="PATCH")
     with urllib.request.urlopen(req, timeout=20) as r:
         json.load(r)
     return title
+
+
+def set_lane(root, key, card_id, lane):
+    """Write metadata.lane, preserving every other metadata key."""
+    def edit(md):
+        if lane is None:
+            md.pop("lane", None)
+        else:
+            md["lane"] = lane
+    return patch_meta(root, key, card_id, edit)
+
+
+def set_flag(root, key, card_id, flag, on):
+    """Write metadata.<flag> = true, or drop it. `flag` must be one of FLAGS."""
+    if flag not in FLAGS:
+        sys.exit(f"zao-wall: flag must be one of {', '.join(FLAGS)} - got {flag!r}")
+    def edit(md):
+        if on:
+            md[flag] = True
+        else:
+            md.pop(flag, None)
+    return patch_meta(root, key, card_id, edit)
+
+
+def flagged(card):
+    """True only when metadata.irreversible or metadata.decision is JSON true.
+
+    Strict on purpose. `decision` already exists on the board with the OPPOSITE
+    sense: five open cards carry decision="approved" (and one "3"), meaning the
+    decision was taken and the work may proceed. A truthiness test pulled all
+    five to Zaal on 2026-09-08 (measured before this line was written). Only
+    the boolean means "this needs Zaal's hand".
+    """
+    return any(meta(card, f) is True for f in FLAGS)
 
 
 def bucket(cards):
@@ -156,13 +205,21 @@ def bucket(cards):
     open cards, 63%, including 13 in_progress - the board was showing a third
     of the work and nothing said so. `unrouted` is keyed by the route value
     the card carries ("prep", "none", ...) so the reason it is here is visible.
+
+    A flagged card (metadata.irreversible or metadata.decision) goes to
+    needs-Zaal BEFORE lane or route is read. 2026-09-07: ef98e806, a permanent
+    on-chain action, sat at route=agent lane=zol with OPEN DECISION in its own
+    notes; 10 of 570 open cards say "decision" in the title. The flag is the
+    mechanical fix - it does not depend on the lane reading the record first.
     """
     on_wall, unclaimed, human = defaultdict(list), [], []
     unrouted = defaultdict(list)
     for c in cards:
         route = meta(c, "route")
         lane = meta(c, "lane")
-        if lane:
+        if flagged(c):
+            human.append(c)
+        elif lane:
             on_wall[lane].append(c)
         elif route == "agent":
             unclaimed.append(c)
@@ -182,7 +239,8 @@ def unrouted_summary(unrouted):
 def line(c):
     due = c.get("due") or "--------"
     pri = c.get("priority") or "--"
-    return f"  {due}  {pri:<2}  {c['id'][:8]}  {(c.get('title') or '')[:66]}"
+    tag = "".join(f" [{f.upper()}]" for f in FLAGS if meta(c, f) is True)
+    return f"  {due}  {pri:<2}  {c['id'][:8]}  {(c.get('title') or '')[:66]}{tag}"
 
 
 def sort_key(c):
@@ -195,6 +253,9 @@ def main():
     ap.add_argument("--lane", metavar="NAME", help="what one lane owns")
     ap.add_argument("--claim", nargs=2, metavar=("CARD", "LANE"), help="stamp a lane onto a card")
     ap.add_argument("--release", metavar="CARD", help="put a card back on the wall")
+    ap.add_argument("--flag", nargs=2, metavar=("CARD", "FLAG"),
+                    help="irreversible|decision - routes the card to Zaal regardless of route/lane")
+    ap.add_argument("--unflag", nargs=2, metavar=("CARD", "FLAG"), help="drop the flag")
     ap.add_argument("--json", action="store_true", help="machine-readable")
     args = ap.parse_args()
 
@@ -210,6 +271,15 @@ def main():
         cid = resolve(root, key, args.release)
         title = set_lane(root, key, cid, None)
         print(f"released to unclaimed: {cid[:8]}  {title[:60]}")
+        return
+    if args.flag or args.unflag:
+        card, flag = args.flag or args.unflag
+        if flag not in FLAGS:  # before the network round-trip resolve() makes
+            sys.exit(f"zao-wall: flag must be one of {', '.join(FLAGS)} - got {flag!r}")
+        cid = resolve(root, key, card)
+        title = set_flag(root, key, cid, flag, on=bool(args.flag))
+        verb = "flagged" if args.flag else "unflagged"
+        print(f"{verb} {flag}: {cid[:8]}  {title[:60]}")
         return
 
     cards = fetch_open(root, key)
@@ -227,8 +297,13 @@ def main():
             "unrouted": {k: [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"), "due": c.get("due"),
                               "priority": c.get("priority"), "status": c.get("status")}
                              for c in sorted(v, key=sort_key)] for k, v in unrouted.items()},
+            "flagged": [{"id": c["id"], "legacy_id": c.get("legacy_id"), "title": c.get("title"),
+                         "flags": [f for f in FLAGS if meta(c, f) is True],
+                         "route": meta(c, "route"), "lane": meta(c, "lane")}
+                        for c in sorted(human, key=sort_key) if flagged(c)],
             "counts": {"open": len(cards), "on_wall": sum(len(v) for v in on_wall.values()),
                        "unclaimed": len(unclaimed), "needs_zaal": len(human),
+                       "flagged": sum(1 for c in human if flagged(c)),
                        "unrouted": n_unrouted,
                        "unrouted_by_route": {k: len(v) for k, v in unrouted.items()}},
         }, indent=2))
@@ -259,6 +334,10 @@ def main():
 
     if not args.unclaimed:
         print(f"\nNEEDS ZAAL  ({len(human)})   - not wall work; these are picked off by definition")
+        # Only the flagged ones are listed: they were pulled here over their
+        # route/lane, so the reason has to be visible or the pull is silent.
+        for c in sorted((c for c in human if flagged(c)), key=sort_key):
+            print(line(c) + f"  (route={meta(c, 'route')} lane={meta(c, 'lane')})")
 
     # Printed on EVERY view, --unclaimed included: a bucket that only shows up
     # on the full board is a bucket that goes unread.

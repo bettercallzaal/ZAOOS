@@ -534,13 +534,22 @@ describe('POST /api/livepeer/clip', () => {
         endTime: 10,
       };
 
-      await POST(makePostRequest('/api/livepeer/clip', payload));
+      // The default name is `ZAO Clip ${Date.now()}`. A 1ms setTimeout did
+      // not reliably cross a millisecond boundary on the CI runner, so the
+      // two names collided and this test failed on PRs that never touched
+      // this route (run 34212982202, 2026-09-08). Pin the clock instead.
+      const now = vi
+        .spyOn(Date, 'now')
+        .mockReturnValueOnce(1_700_000_000_000)
+        .mockReturnValueOnce(1_700_000_000_001);
+
+      try {
+        await POST(makePostRequest('/api/livepeer/clip', payload));
+        await POST(makePostRequest('/api/livepeer/clip', payload));
+      } finally {
+        now.mockRestore();
+      }
       const firstCall = mockCreateClip.mock.calls[0]?.[0]?.name;
-
-      // Small delay to ensure different timestamp
-      await new Promise((resolve) => setTimeout(resolve, 1));
-
-      await POST(makePostRequest('/api/livepeer/clip', payload));
       const secondCall = mockCreateClip.mock.calls[1]?.[0]?.name;
 
       expect(firstCall).toMatch(/^ZAO Clip \d+$/);

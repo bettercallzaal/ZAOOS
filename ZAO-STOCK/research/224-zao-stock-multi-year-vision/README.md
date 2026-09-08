@@ -804,7 +804,7 @@ This is not hypothetical. These are the actual ZAO community members committed t
 | **Design + print materials** | Candy + DaNici | ✅ Covered |
 | **IRL connection tokens** | Tyler / Magnetiq | ✅ Covered |
 | **Performing artists** | Hurric4n3Ike + ZAOVille + ZAO roster | ✅ Covered |
-| **Sponsorship outreach** | Candy (Impact3/Milk Road connections) | ✅ Covered |
+| **Sponsorship outreach** | ~~Candy (Impact3/Milk Road connections)~~ **NOT A CURRENT ROUTE - she left Impact3.** Her relationships may persist; her employer access does not. | Retracted 2026-09-08 - NOT covered |
 | **Organization + planning** | FailOften + Zaal | ✅ Covered |
 | **Sound equipment (PA rental)** | TBD — local vendor in Ellsworth/Bangor | ⚠️ Need local hire |
 | **Permits + insurance** | Heart of Ellsworth connection | ⚠️ Need HoE partnership confirmed |

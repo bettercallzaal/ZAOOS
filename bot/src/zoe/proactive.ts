@@ -68,6 +68,17 @@ export interface Candidate {
   message: string;
   /** Linked open thread, when the candidate came from one. */
   threadId?: string;
+  /**
+   * Dedup key for candidates that are suppressed after being surfaced once
+   * (events.ts: `stale:...`, `cifail:...`, `calendar:...`, `inactivity:...`).
+   *
+   * The key is recorded ONLY once the message actually reached Zaal - see
+   * `markCandidateSurfaced` in events.ts. `pickBest` speaks at most one
+   * candidate per tick and the gate can still drop that one below the
+   * threshold or at the send budget, so a key burned at GATHER time
+   * suppresses a message nobody ever got.
+   */
+  dedupKey?: string;
 }
 
 /** A recorded proactive push, for the unacked self-throttle. */

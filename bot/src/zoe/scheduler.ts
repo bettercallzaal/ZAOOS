@@ -69,7 +69,7 @@ import {
   wasSendBlocked,
 } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
+import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates, markCandidateSurfaced } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { flushQueue } from './bonfire-retry';
@@ -1111,6 +1111,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
           if (decision.candidate) {
             await recordPush(decision.candidate);
+            // Burn the event dedup key HERE, not at gather time. Only one of the
+            // tick's candidates is ever spoken (pickBest), and this line is past
+            // both the threshold gate and wasSendBlocked - so the key is spent
+            // on a message that reached him, and every candidate that lost or
+            // was blocked is offered again next tick. (events.ts header.)
+            await markCandidateSurfaced(decision.candidate.dedupKey);
             if (decision.threadId) await markNudged(decision.threadId);
             if (decision.candidate.kind === 'task-nudge') await markNudgeSent();
           }

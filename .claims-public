@@ -1,0 +1,9 @@
+# Files in this repo that are PUBLIC COPY - what an outsider actually reads.
+# One glob per line. `zao-claims-check` enforces scope=public ledger rows here
+# and nowhere else.
+#
+# ICM boxes are brand surfaces that get published (publishing one is Zaal's
+# call, drafting is free), so a barred figure landing in a draft is a barred
+# figure one approval away from a page.
+research/identity/icm-boxes/*
+research/identity/icm-boxes/drafts/*

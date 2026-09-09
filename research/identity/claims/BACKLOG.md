@@ -16,39 +16,40 @@ what would promote it back to `scope=all`.
 
 ---
 
-## 1. `zaostock-budget` - 154 live hits - UNRESOLVED, NEEDS ZAAL
+## 1. `zaostock-budget` - ANSWERED 2026-09-08, and the answer was neither option
 
-<!-- measured 2026-09-08T19:20Z - zao-measure --verify "ZAOOS: live citations of the retracted $25K/$20K ZAOstock figure on origin-main" -->
+**Zaal, direct: "$5K PUBLIC, $25K INTERNAL ONLY."**
 
-**The count is 154, and it was written as 157 first.** 157 was the claims-check
-raw hit count, which uses different exclusions; 154 is the reproducible figure on
-`origin/main` with `_archive` and already-retracted lines excluded. Re-run it
-with the citation above rather than trusting this sentence - that is the whole
-point of the number carrying one.
+~$5K is the only ZAOstock number that goes outward - any public copy, post, deck
+or page. $25K stays in planning docs and never appears in public copy.
 
-**The contradiction.** `zaonyc/CLAUDE.md` says, verbatim:
+**Both options I put in front of him were wrong.** I asked "is $25K a live goal,
+or is ~$5K the only number allowed anywhere?" Selecting either would have
+recorded something he did not say, which is why the menu came back *escaped*
+rather than answered. The real rule is a **surface** rule, not a truth rule: the
+figure is correct and still barred from a page. **A number can be true and out
+of bounds.**
 
-> **ZAOstock budget: ~$5K target.** The $20K/$25K/$7K figures in doc 1013 are
-> explicitly retracted and must not be cited anywhere, public or internal.
+That also explains the 154, which never needed explaining as a contradiction.
+Those citations are in planning docs and skills - internal, where $25K belongs.
+Nothing was wrong with them, and mass-editing them would have destroyed a
+correct internal figure to satisfy a rule that was never about internal docs.
+Not editing them turned out to be right for a better reason than the one I gave.
 
-But 154 live places cite $25K as the goal, including surfaces that are clearly
-current, not archival:
+**The ledger could not express this.** `scope=all` means false everywhere,
+`scope=new` means true history that must not be written fresh. This is neither,
+so `scope=public` now exists: it fires only on paths a repo names in its own
+`.claims-public`, and a repo that declares none is **reported as unchecked**,
+never quietly passed.
 
-- `.claude/skills/zao-stock/zao-stock.md:22` - `| **Budget** | $5K minimum / $25K goal |`
-- `BRAIN/projects/zao-stock-2026-10-03.md:74` - `| Goal | $25K | project_zao_stock_confirmed.md |`
+Declared so far: `zao-nyc` (`card/*`, `hop/*` - both published as Artifacts).
+**Still undeclared: ZAOOS, zao-vault, zaoonparagraph-nyc.** Until each names its
+public copy, the rule does not bind there and the check says so on every run.
 
-**Why I did not just fix it.** 154 sites cannot all be wrong by accident, and the
-skill file states $5K and $25K together as floor and goal - which is coherent, and
-is not what "explicitly retracted" describes. Either the retraction is narrower
-than the rule states (it kills doc 1013's specific budget claim, not a $25K goal),
-or the estate never got the memo. Mass-editing 157 files on my reading of an
-ambiguous rule is the same class of error as the thing this whole check exists to
-prevent.
-
-**The question for Zaal, one line:** is $25K still a live ZAOstock goal, or is
-~$5K the only number that may appear anywhere?
-
-**Promote to `scope=all`** once he answers and the 154 are reconciled.
+Verified by outcome: planting `$25,000` into `card/zaonyc.html` fails the check
+and names the line; internal docs discussing the figure are untouched. Public
+surfaces in `zao-nyc` are clean today - the card says $5,000 and nothing else,
+and there is no barred figure in any newsletter or socials draft.
 
 ---
 

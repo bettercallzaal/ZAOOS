@@ -1,3 +1,10 @@
+# MIRROR - NOT CANONICAL as of 2026-09-08.
+# Canonical: ZAOOS research/identity/claims/retracted.tsv (see its README for why).
+# This copy is the last-resort fallback for checkouts without ZAOOS. Delete it
+# once bettercallzaal/ZAOOS#3460 merges. zao-claims-check warns loudly if the two
+# have drifted, because two AI-readable surfaces disagreeing is the worst
+# possible outcome. [re-check: 2026-09-15]
+#
 # zao retracted-claims ledger. One claim per line, TAB-separated, 6 fields.
 #
 # id	pattern	allow	scope	retracted_on	why
@@ -6,15 +13,14 @@
 # matches that row's `allow`, or carries a global exemption (struck, RETRACTED,
 # negated phrasing, or [CLAIM-OK: <id> <why>]).
 #
-# [re-check: YYYY-MM-DD] in the `why` marks a row whose PREMISE is provisional -
-# staged pending an answer, or resting on an external fact that can change. Surface
-# them with `zao-claims-check --due`. A ledger row is a record that shouts; one
-# that outlives its reason keeps shouting after it stops being true, which is the
-# mirror of an alarm that goes quiet when it should fire. Same cost, opposite shape.
-#
 # scope:
 #   all  - the claim is FALSE and must not survive anywhere. Enforced on every
 #          scanned file. Use when the thing did not happen or the number is wrong.
+#   public - the claim is TRUE but must not appear in PUBLIC COPY. Enforced only
+#            on paths the repo names in .claims-public (one glob per line). A
+#            repo declaring none is reported as unchecked, never passed quietly.
+#            From Zaal 2026-09-08: "$5K PUBLIC, $25K INTERNAL ONLY" - a number
+#            can be correct and still be barred from a page.
 #   new  - the claim is TRUE HISTORY but must not be written FRESH. Enforced only
 #          on staged/changed files (--staged). Use for retired partners: the
 #          instruction is "do not reference it again", not "scrub the archive",
@@ -27,7 +33,7 @@ third-consecutive-irl	third consecutive IRL|3rd consecutive IRL	 	all	2026-09-08
 third-year-conference	third (straight |consecutive )?year at (the same|this) conference	 	all	2026-09-08	False for the same reason. NFT NYC 2025 ran 23-27 June; Zaal was in New York in May, for FarCon. 2026 is the SECOND time at this conference, after 2024, and not consecutive.
 jango-alumni	JANGO ?UU[^.\n]{0,60}(alumni|former member|ex-member)|(alumni|former member)[^.\n]{0,40}JANGO ?UU	 	all	2026-09-03	Zaal direct: JANGO UU is INACTIVE in ZAO work, actively making music, busy with life. He is the ORIGIN figure, not an alumnus. Supersedes doc 722f.
 candy-impact3	candy[^.\n]{0,60}(is at|works at|role at|employed at|\(impact ?3)|impact ?3[^.\n]{0,25}(role|job|employer)[^.\n]{0,25}candy	~~|former|left Impact3	all	2026-09-03	Candy no longer works at Impact3, so she is not a current sponsorship route into it. NARROWED 2026-09-08: the first version of this pattern matched ANY co-occurrence of "Candy" and "Impact3" and produced 7 hits, most of which correctly said "Former Impact3/Milk Road". Connections outlast a job - what was corrected is present-tense employer access, not the relationship. The two docs that did assert a current route (ZAOOS 224 and 231) are fixed, so this is scope=all.
-zaostock-budget	\$2[05],?0{3}|\$25K|\$20K	figures in doc 1013|~\$5K	new	2026-09-03	ZAO NYC CLAUDE.md: ZAOstock budget is ~$5K and the $20K/$25K figures in doc 1013 are "explicitly retracted and must not be cited anywhere, public or internal". BUT 157 live places still cite $25K as the goal, including the zao-stock skill and BRAIN. Those cannot all be wrong by accident - either the retraction is narrower than the rule states, or the estate never got the memo. UNRESOLVED, needs Zaal. scope=new so it stops new citations while the contradiction is open. [re-check: 2026-09-15] - if Zaal confirms $25K is live, DELETE THIS ROW; if he confirms ~$5K only, promote to scope=all and reconcile the 154. A provisional row that outlives its question becomes a false alarm that keeps firing. See BACKLOG.md.
+zaostock-budget	[$]2[05],?0{3}|[$]25K|[$]20K|\b2[05],000\b	~[$]5K|internal	public	2026-09-08	ZAAL, 2026-09-08, ANSWERED DIRECTLY: "$5K PUBLIC, $25K INTERNAL ONLY." ~$5K is the only ZAOstock number that goes outward - any public copy, post, deck or page. $25K stays in planning docs and never appears in public copy. THIS IS A SURFACE RULE, NOT A TRUTH RULE, which is why it is scope=public and not all or new: the figure is CORRECT and still barred from a page. A row can be true and out of bounds. The question this replaced was "is $25K live?" - both answers I offered would have recorded something he did not say, so the menu was escaped rather than answered. Enforced only on paths a repo declares in .claims-public; a repo that declares none is REPORTED as unchecked, never silently passed.
 nyc-roster	ZAO NYC[^.\n]{0,50}(roster|chapter meet|recurring event|our venue)	there (are|is) none|no roster|\| none \||None of this	all	2026-09-03	Never claim a ZAO NYC roster, member count, recurring event, or venue. As of 2026-09-03 there are none - there is history and two co-leads.
-magnetiq-live	\bmagnetiq\b|proof of meet	retired|inactive|Tyler left|spelling kept|old docs	new	2026-07-31	Zaal: "no longer working with magnetiq please do not reference it again or songjam." Tyler left; not a live ZAO surface. scope=new because the historical library legitimately records the past collaboration. [re-check: 2026-12-01] - confirm the partnership is still ended before renewing another year of enforcement.
-songjam-live	\bsongjam\b|\bSANG\b	retired|spelling kept|old docs|token	new	2026-07-31	Out, same instruction. SANG was defined only as SongJam's token, so naming it names them. scope=new for the same reason as magnetiq-live. [re-check: 2026-12-01] - same.
+magnetiq-live	\bmagnetiq\b|proof of meet	retired|inactive|Tyler left|spelling kept|old docs	new	2026-07-31	Zaal: "no longer working with magnetiq please do not reference it again or songjam." Tyler left; not a live ZAO surface. scope=new because the historical library legitimately records the past collaboration.
+songjam-live	\bsongjam\b|\bSANG\b	retired|spelling kept|old docs|token	new	2026-07-31	Out, same instruction. SANG was defined only as SongJam's token, so naming it names them. scope=new for the same reason as magnetiq-live.

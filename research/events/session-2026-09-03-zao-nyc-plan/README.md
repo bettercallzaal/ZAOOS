@@ -256,7 +256,6 @@ correct, for a later edition.
 > **What was true:** FarCon NYC, May 2025, attended not produced. That was his only
 > 2025 New York trip, so 2026 is the **second** time at NFT NYC, after 2024 - not the
 > third, and not consecutive. Every "third consecutive IRL proof point" in the library [CLAIM-OK: third-consecutive-irl naming the retracted phrase in order to retract it]
-> third, and not consecutive. Every "third consecutive IRL proof point" in the library
 > was resting on the retracted row.
 >
 > **The hold is discharged.** Doc 742 (the origin), doc 1231, the ICM box draft, the

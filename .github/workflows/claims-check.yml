@@ -43,9 +43,13 @@ jobs:
         with:
           fetch-depth: 0   # --diff needs the merge base
 
+      # `--depth=0` is not "unshallow", it is invalid - git rejects it with
+      # "fatal: depth 0 is not a positive number". actions/checkout above
+      # already fetches full history (fetch-depth: 0), so this only needs to
+      # make the base ref available to --diff.
       - name: Fetch base
         if: github.event_name == 'pull_request'
-        run: git fetch --no-tags --depth=0 origin "${{ github.base_ref }}"
+        run: git fetch --no-tags origin "${{ github.base_ref }}"
 
       # The checker lives in this repo, next to the ledger it reads. The first
       # version of this step curled it from zaal-dotfiles, which is PRIVATE, so

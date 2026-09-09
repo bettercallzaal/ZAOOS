@@ -131,7 +131,7 @@ original-query: "Map every collaborator, advisor, and named-person who showed up
 | **Agent/infra partners** | 4 | Ryan Kagy, Tanja, Tom, Matteo |
 | **Community + governance** | 6 | Dan, Tadas, Jose, Defresh, Cannon, Onaji |
 | **External/advisors** | 5 | Cassie, Joshua, Sisla, Crypto Factor, yerbearzerker |
-| **Incubator alumni** | 3 | JANGOUU, Jadyn, Cipher |
+| **Incubator alumni** | 2 | Jadyn, Cipher — ~~JANGOUU~~ **RETRACTED 2026-09-03:** Zaal direct, JANGO UU is **INACTIVE**, not alumni and not historical. He is the ORIGIN figure of The ZAO. This row is where the "alumni/Historical" classification came from and doc 229 cites it; the correction was recorded in CLAUDE.md on 09-03 and never applied here until 09-08. |
 | **Status: Active** | 23 | Actively shipping or in meetings |
 | **Status: Advisor** | 5 | Active guidance, not daily shipping |
 | **Status: Dormant** | 2 | Maseo (removed), historical figures |

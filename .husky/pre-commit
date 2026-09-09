@@ -20,3 +20,25 @@ bash "$(git rev-parse --show-toplevel)/scripts/check-research-index.sh" || echo 
 #    on main before shipping. Fails closed: a security scan that passes on error
 #    is not a scan (silent-failure-guard rule 5).
 python3 "$(git rev-parse --show-toplevel)/scripts/git-pii-scan.py" || exit 1
+
+# 5. Block retracted claims in the staged diff (~/zao-vault/claims/retracted.tsv).
+#    From 2026-09-08: the "Lil WaveWarZ Takeover at NFT NYC 2025" never happened,
+#    a retraction was written up on 09-07 and REPORTED AS APPLIED, and a grep on
+#    09-08 found it still live in eight places across two repos including a
+#    published card. Nothing had been corrected. The same day also found doc 722f
+#    still classifying JANGO UU that way months after CLAUDE.md recorded that
+#    Zaal superseded it. (This hook is also why the check reads extensionless
+#    files: its first version scanned 0 of them, because "pre-commit" has no
+#    suffix - so the file installing the check was invisible to it.)
+#    Both defences were prose rules, and a prose rule is an honor system: the
+#    retraction report was itself a prose rule about the same claim.
+#    Advisory-if-absent by design: the ledger lives in ~/zao-vault, and blocking
+#    every commit on a machine that has not cloned the vault would get the hook
+#    deleted rather than fixed. Fails CLOSED whenever the tool is actually there.
+#    135 ms on this repo, inside this file's stated ~300ms budget.
+#    <!-- measured 2026-09-08T19:30Z - zao-measure --verify "zao-claims-check --staged latency in ZAOOS pre-commit" -->
+if command -v zao-claims-check >/dev/null 2>&1; then
+  zao-claims-check --staged || exit 1
+else
+  echo "[claims] note: zao-claims-check not on PATH - retracted-claim check skipped"
+fi

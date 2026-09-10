@@ -262,7 +262,7 @@ async function nextTask(
   // out of EVERY tier, not just the fresh one: a card that was asked before
   // triage routed it must stop re-asking too. It comes straight back the tick
   // the route changes, because this is a filter on the live row, not state.
-  const rows = board.filter((t) => !isLaneOwned(t.metadata));
+  const rows = board.filter((t) => !isLaneOwned(t.metadata, t.title));
   // A never-asked task whose notes already carry a terminal grill verdict was
   // ruled on from the other end - sending it a phone card would be the exact
   // both-ends dupe this card exists to kill (6b6875d1). It still shows up here
@@ -383,9 +383,10 @@ export async function reconcileBacklogState(
     const ids = pending.slice(i, i + CHUNK);
     const url =
       `${c.root}/rest/v1/tasks?id=in.(${ids.join(',')})` +
-      `&select=id,status,archived_at,notes,metadata`;
+      `&select=id,title,status,archived_at,notes,metadata`;
     let rows: Array<{
       id: string;
+      title?: string | null;
       status?: string;
       archived_at?: string | null;
       notes?: string | null;

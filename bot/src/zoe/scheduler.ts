@@ -422,9 +422,61 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // is reached, nothing when the queue is empty. The hour window and the
   // 2-minute spacing are gone with the drip - see BATCH_DEFAULT for why both
   // had to go, and why the cap did not.
+  // 09:03, NOT 09:00: THE BATCH SHARED ITS MINUTE WITH THE AUTODEPLOY RESTART
+  // AND WAS BEING KILLED BEFORE IT COULD QUEUE THE CARDS (2026-09-08).
+  //
+  // `zoe-autodeploy.sh` runs from cron every 10 minutes - :00, :10, :20 ... -
+  // and when it has something to deploy it does `systemctl --user restart
+  // zoe-bot` (line 86). The batch was on '0 9 * * *', the same minute.
+  //
+  // Measured 2026-09-08 from the service journal:
+  //
+  //   09:00:03  [zoe/ran] backlog-grill - Reach out to each judge and both...
+  //   09:00:12  Stopping zoe-bot.service ...
+  //   09:00:12  Main process exited, code=exited, status=143/n/a
+  //
+  // 143 is SIGTERM. The batch got nine seconds and died mid-flight.
+  //
+  // WHAT THAT COSTS, precisely. runBacklogGrillBatch calls appendGrillQueue on
+  // its LAST line, after the send loop. The process was gone before it got
+  // there, so the cards that had been sent went to Telegram and NOWHERE else:
+  // the VPS spool was never written (verified absent that night, while every
+  // prior morning that week wrote it), the grill lane never received them, and
+  // the summary line below - the one this file calls the ONLY evidence the
+  // batch happened - was never printed.
+  //
+  // That silence is why it went unexplained for weeks. A batch killed at second
+  // nine and a morning with nothing to say write exactly the same thing.
+  //
+  // NOT the card COUNT. An earlier version of this comment blamed the restart
+  // for a batch of four instead of ten. That was wrong: asked=601 against 582
+  // open cards, so the candidate pool is exhausted and the batch legitimately
+  // sends only what is new. The restart destroys the queue append, not the
+  // count.
+  //
+  // Compare the mornings that completed - Sep 02 through Sep 07 each logged
+  // `batch: sent 1, ... queue spool:1` at 09:00:04-06. Sep 08 logged no batch
+  // line at all.
+  //
+  // WHY THREE MINUTES IS STRUCTURAL AND NOT A GUESS. zoe-autodeploy.sh is on
+  // '*/10 * * * *', so restarts can only land on ten-minute boundaries - the
+  // preceding fortnight of `Started zoe-bot` stamps are 03:20, 19:50, 17:00,
+  // 22:40, 22:20, 21:50, 21:10, 20:10 and so on, every one at :x0. A batch on
+  // any minute not divisible by ten cannot share a minute with a deploy.
+  //
+  // It does not remove the underlying race - a deploy at 09:10 could still
+  // interrupt a batch that ran long, though these take three to six seconds.
+  // The durable fixes are a lock that makes autodeploy wait for an in-flight
+  // batch, or appending each card as it sends rather than all of them at the
+  // end. This is the cheap half and it stands alone.
+  //
+  // Frequency, stated honestly: one collision in fourteen days, only on
+  // mornings where a commit landed in the preceding ten minutes. That is worse
+  // than a constant failure, not better - it is silent, occasional loss that
+  // looks identical to a normal quiet day.
   tasks.push(
     cron.schedule(
-      '0 9 * * *',
+      '3 9 * * *',
       () =>
         runWithSendClass('gated', async () => {
         if (!(await claimFire('backlog-grill-batch'))) return;

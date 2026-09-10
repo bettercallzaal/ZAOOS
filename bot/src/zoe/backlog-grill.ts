@@ -454,6 +454,13 @@ export const TERMINAL_VERDICT_RE =
  * 2026-09-10 on the live backlog: of the 123 cards this rule selected without
  * it, 15 carried one of these in the title - one was "deploy the ZAI Discord
  * voice-capture bot", a deploy, unflagged.
+ *
+ * Some suffixes are DELIBERATELY loose (pay\w*, launch\w*): they also match
+ * "payload" and "launchd", so "check the payload shape" or "install the launchd
+ * agent" stay on Zaal's queue. That direction is safe - over-excluding keeps a
+ * card in front of him, it never removes one silently - so do not tighten
+ * these without knowing which way the risk runs. post and sign use explicit
+ * endings instead, which keeps "postpone" and "redesign" out (vault, measured).
  */
 export const ZAAL_ONLY_TITLE_RE =
   /\b(deploy\w*|merge\w*|publish\w*|post(s|ed|ing)?|send\w*|delet\w*|pay\w*|spend\w*|sign(s|ed|ing)?|launch\w*|migrat\w*|dns|cancel\w*|e-?mail\w*|dms?)\b/i;

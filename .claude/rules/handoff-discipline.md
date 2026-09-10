@@ -39,9 +39,10 @@ verified absent from the cowork project 2026-08-18. The vault is the system now.
    ready-list (briefs with `status: ready`) is the menu of attack sessions
    openable instantly. Lanes are ephemeral; briefs are the persistent identity.
 
-6. **Cross-lane map: `zao-vault/handoffs/IN-FLIGHT.md`.** One line per lane on
+6. **Cross-lane map: `zao-vault/BLACKBOARD.md`, section WORK PACKETS.** One line per lane on
    session start + major ship (lane, doing, claimed doc numbers/branches).
    Read it BEFORE claiming a doc number - two collisions on 2026-08-18 alone.
+   Was handoffs/IN-FLIGHT.md until 2026-09-10.
 
 7. **Surface boundaries (ends the ambiguity):**
    | Surface | Job | Never |

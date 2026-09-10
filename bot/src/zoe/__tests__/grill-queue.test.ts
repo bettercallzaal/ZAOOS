@@ -1,13 +1,28 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { homedir, tmpdir } from 'node:os';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   appendGrillQueue,
   nextItemNumber,
   renderQueueSection,
   type GrillQueueCard,
 } from '../grill-queue';
+
+describe('queuePath', () => {
+  it('defaults to BLACKBOARD.md at the vault root (plan 2, 2026-09-09)', async () => {
+    delete process.env.ZOE_GRILL_QUEUE_PATH;
+    const { queuePath } = await import('../grill-queue');
+    expect(queuePath()).toBe(join(homedir(), 'zao-vault', 'BLACKBOARD.md'));
+  });
+  it('honours ZOE_GRILL_QUEUE_PATH', async () => {
+    process.env.ZOE_GRILL_QUEUE_PATH = '/tmp/q.md';
+    vi.resetModules();
+    const { queuePath } = await import('../grill-queue');
+    expect(queuePath()).toBe('/tmp/q.md');
+    delete process.env.ZOE_GRILL_QUEUE_PATH;
+  });
+});
 
 const NOW = Date.parse('2026-08-26T12:00:00Z');
 

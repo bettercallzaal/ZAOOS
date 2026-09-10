@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   classifyReconcile,
+  isLaneOwned,
+  namesZaal,
+  ZAAL_ONLY_TITLE_RE,
   DRIP_DEFAULT,
   parseVerdict,
   cardPosition,
@@ -347,6 +350,46 @@ describe('classifyReconcile - what the other end settled', () => {
     expect(classifyReconcile({ status: 'todo', archived_at: null, notes: 'no ruling yet' })).toBeNull();
     expect(classifyReconcile({ status: 'todo', archived_at: null })).toBeNull();
   });
+
+  // 2026-09-08: 117 of 347 unanswered phone cards were route=agent - a lane's
+  // work sitting in front of Zaal's thumb.
+  it('lane-owned for a still-todo row triage routed to an agent', () => {
+    expect(
+      classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'agent' } }),
+    ).toBe('lane-owned');
+    expect(isLaneOwned({ route: 'agent', lane: 'zol' })).toBe(true);
+  });
+
+  it('a card routed to a human, prep, or nothing is never lane-owned', () => {
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'human' } })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: { route: 'prep' } })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: {} })).toBeNull();
+    expect(classifyReconcile({ status: 'todo', archived_at: null, metadata: null })).toBeNull();
+    expect(isLaneOwned(undefined)).toBe(false);
+    expect(isLaneOwned('agent')).toBe(false);
+  });
+
+  it('an irreversible or decision flag beats route=agent - same rule as zao-wall bucket()', () => {
+    expect(isLaneOwned({ route: 'agent', irreversible: true })).toBe(false);
+    expect(isLaneOwned({ route: 'agent', decision: true })).toBe(false);
+    // Strict boolean: decision="approved" means decided-proceed on the live board.
+    expect(isLaneOwned({ route: 'agent', decision: 'approved' })).toBe(true);
+    expect(isLaneOwned({ route: 'agent', irreversible: 'yes' })).toBe(true);
+  });
+
+  it('a closed or ruled-on card outranks lane-owned', () => {
+    expect(classifyReconcile({ status: 'done', archived_at: null, metadata: { route: 'agent' } })).toBe(
+      'board-closed',
+    );
+    expect(
+      classifyReconcile({
+        status: 'todo',
+        archived_at: null,
+        notes: 'GRILL 2026-09-08 (Zaal): keep.',
+        metadata: { route: 'agent' },
+      }),
+    ).toBe('verdict-synced');
+  });
 });
 
 /**
@@ -407,6 +450,64 @@ describe('renderCard - a prepped card asks a different question', () => {
     for (const v of VERDICTS) {
       expect(ready).toContain(`${v.n}. ${v.label}`);
       expect(plain).toContain(`${v.n}. ${v.label}`);
+    }
+  });
+});
+
+
+// 2026-09-10: the flag-only rule would have withdrawn 43 of Zaal's own asks.
+// Measured on the live backlog: 123 selected, 33 named Zaal as owner, 15 had an
+// escalation word in the title. These are the three real cards from the
+// five-card hand sample that were his; they must stay his.
+describe('isLaneOwned - a card that is Zaal\'s stays Zaal\'s', () => {
+  const agent = (extra: Record<string, unknown> = {}) => ({ route: 'agent', ...extra });
+
+  it('owner field naming Zaal keeps the ask', () => {
+    expect(isLaneOwned(agent({ next_owner: 'Zaal', lane: 'zao-newsletter' }),
+      'Inbox action: Wire the Paragraph MCP server - FIRST THING')).toBe(false);
+    expect(isLaneOwned(agent({ owner_label: 'Zaal' }),
+      'Inbox action: Review all 27 published artifacts, ranked most to least important')).toBe(false);
+  });
+
+  it('an escalation word in the title keeps the ask, even unflagged', () => {
+    expect(isLaneOwned(agent(),
+      'Inbox action: TOP BUILD: deploy the ZAI Discord voice-capture bot')).toBe(false);
+    for (const t of ['Merge PR 12', 'Publish the recap', 'Send the artist DMs', 'Delete the old repo',
+                     'Pay the venue', 'Launch the token', 'Run the migration', 'Cancel Webflow', 'Email the city']) {
+      expect(isLaneOwned(agent(), t)).toBe(false);
+    }
+  });
+
+  it('a genuine lane card is still lane-owned', () => {
+    expect(isLaneOwned(agent({ lane: 'zaostock' }), 'Add a Baraza partner button to the cowork board')).toBe(true);
+    expect(isLaneOwned(agent(), 'CRM: add Kaitlen Workman, Steve Trader, Rotary contacts')).toBe(true);
+  });
+
+  it('flags and route still decide first', () => {
+    expect(isLaneOwned(agent({ irreversible: true }), 'Tidy a README')).toBe(false);
+    expect(isLaneOwned({ route: 'human' }, 'Tidy a README')).toBe(false);
+    expect(isLaneOwned(null, 'Tidy a README')).toBe(false);
+  });
+
+  // vault's guard: whatever the rule selects must never name Zaal or carry an
+  // escalation word. A property over a mixed fixture, so a future edit that
+  // loosens either check fails here rather than silently on the live board.
+  it('PROPERTY: nothing selected names Zaal or matches the escalation words', () => {
+    const cards: Array<[Record<string, unknown>, string]> = [
+      [agent({ next_owner: 'Zaal' }), 'Wire the MCP server'],
+      [agent({ owner_label: 'zaal' }), 'Review artifacts'],
+      [agent({ owner: 'Iman' }), 'Draft the brief'],
+      [agent(), 'deploy the bot'],
+      [agent(), 'Post the recap to Farcaster'],
+      [agent(), 'Fix the broken footer link'],
+      [agent({ lane: 'wwtracker' }), 'Re-run the P&L check'],
+      [agent({ decision: true }), 'Pick a venue'],
+    ];
+    const selected = cards.filter(([md, t]) => isLaneOwned(md, t));
+    expect(selected.length).toBeGreaterThan(0);
+    for (const [md, t] of selected) {
+      expect(namesZaal(md)).toBe(false);
+      expect(ZAAL_ONLY_TITLE_RE.test(t)).toBe(false);
     }
   });
 });

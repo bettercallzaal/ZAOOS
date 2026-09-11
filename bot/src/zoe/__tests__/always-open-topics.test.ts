@@ -316,6 +316,58 @@ describe('refillOpenThings', () => {
     expect(result).toHaveProperty('errors');
   });
 
+  it('does NOT record an open item when the send budget blocked the send', async () => {
+    // Only "Coding" exists, so exactly one send is attempted and it is the
+    // coding_pr generator (a pure stub, no network).
+    const topicsPath = join(testHome, 'topics.json');
+    await fs.mkdir(join(testHome), { recursive: true });
+    await fs.writeFile(topicsPath, JSON.stringify({ Coding: 456 }));
+
+    // Verbatim shape returned by the send-budget gate when it caps a send:
+    // it RESOLVES (no throw) with a non-null object whose message_id is 0.
+    const bot = {
+      api: {
+        sendMessage: vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' }),
+      },
+    };
+
+    const result = await refillOpenThings({
+      bot: bot as any,
+      groupId: 12345,
+      now: new Date(),
+    });
+
+    expect(bot.api.sendMessage).toHaveBeenCalledTimes(1);
+    expect(result.refilled).toBe(0);
+
+    // The topic must stay refillable. Recording it here would wedge Coding
+    // forever: hasOpenItem has no expiry and only an ANSWER clears it.
+    const state = await readOpenThingsState();
+    expect(state.Coding).toBeUndefined();
+    expect(hasOpenItem('Coding', state)).toBe(false);
+  });
+
+  it('records the open item when the send actually reaches Telegram', async () => {
+    const topicsPath = join(testHome, 'topics.json');
+    await fs.mkdir(join(testHome), { recursive: true });
+    await fs.writeFile(topicsPath, JSON.stringify({ Coding: 456 }));
+
+    const bot = {
+      api: { sendMessage: vi.fn().mockResolvedValue({ message_id: 99 }) },
+    };
+
+    const result = await refillOpenThings({
+      bot: bot as any,
+      groupId: 12345,
+      now: new Date(),
+    });
+
+    expect(result.refilled).toBe(1);
+    const state = await readOpenThingsState();
+    expect(state.Coding?.threadId).toBe(456);
+    expect(state.Coding?.lastOpenQid).toMatch(/^coding-pr-review-/);
+  });
+
   it('records errors without crashing', async () => {
     const topicsPath = join(testHome, 'topics.json');
     await fs.mkdir(join(testHome), { recursive: true });

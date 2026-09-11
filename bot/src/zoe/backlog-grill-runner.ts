@@ -26,6 +26,7 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { wasSendBlocked } from './send-budget';
 import { homedir } from 'node:os';
 import { featureRan } from './feature-ran';
 import {
@@ -490,6 +491,10 @@ export async function runBacklogGrillTick(
   );
 
   const sent = await deps.sendDM(text, verdictButtons(next.task.id));
+  // Blocked by the send budget: the card never reached Zaal, so it must not be
+  // recorded as asked. It would climb the nag ladder unanswered and count
+  // against the batch, for a card nobody saw.
+  if (wasSendBlocked(sent)) return { sent: false, reason: 'send blocked by the budget; card left unasked' };
   const messageId = sent.message_id;
 
   // Rewritten wholesale, which clears any `requeuedAt`: it has now come round

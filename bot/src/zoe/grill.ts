@@ -22,6 +22,7 @@ import { join } from 'node:path';
 import { fetchCockpitTasks, fetchReviewPRs, needsYou, blocked, priorityRank } from '../cockpit/adapters';
 import type { CockpitTask, ReviewPR } from '../cockpit/types';
 import { getCalendarEvents } from './calendar';
+import { wasSendBlocked } from './send-budget';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -226,7 +227,12 @@ export function askCooldownMs(ageMs: number): number {
   return ASK_COOLDOWN_MS;
 }
 
-const DEFAULT_STATE: GrillState = { items: {}, activeKey: null, lastAskedAt: null, recentAnswered: {} };
+// A FUNCTION, not a shared constant. `{ ...DEFAULT_STATE }` is a shallow copy,
+// so every caller that read a missing or unreadable state file got the SAME
+// `items` and `recentAnswered` objects and wrote its cards into them. The next
+// read then inherited them and could persist cards from a tick that never
+// happened. Found by a test, 2026-09-11.
+const defaultState = (): GrillState => ({ items: {}, activeKey: null, lastAskedAt: null, recentAnswered: {} });
 const stateFile = () => join(homedir(), '.zao', 'zoe', 'grill_state.json');
 
 /** Prune answered cards older than 24h from the recentAnswered map. */
@@ -244,9 +250,9 @@ function pruneRecentAnswered(state: GrillState, now: number): void {
 export async function readGrillState(): Promise<GrillState> {
   try {
     const raw = await fs.readFile(stateFile(), 'utf8');
-    return { ...DEFAULT_STATE, ...JSON.parse(raw) };
+    return { ...defaultState(), ...JSON.parse(raw) };
   } catch {
-    return { ...DEFAULT_STATE };
+    return defaultState();
   }
 }
 
@@ -447,6 +453,14 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
 
   const { text, buttons, options } = formatGrill(item, remaining);
   const sent = (await deps.sendDM(text, buttons)) as { message_id?: number } | undefined;
+  // A card the budget blocked never reached Zaal, and this loop runs in the
+  // `gated` class, which the budget can drop. Recording it anyway marked an
+  // unseen card as asked, made it the ONE active question (so nothing else
+  // could be surfaced until it was answered) and burned a slot in the daily
+  // cap. Leave the state untouched and the next tick offers the same card.
+  // Same defect as #3449 and #3453: state saying delivered, Zaal hearing
+  // nothing.
+  if (wasSendBlocked(sent)) return { sent: false };
   const messageId = sent && typeof sent === 'object' ? sent.message_id : undefined;
 
   // Pin the new open question (silent) so it stays easy to find until answered.

@@ -121,6 +121,17 @@ export async function orchestrate(
   // an action slot + a draft). recentPosts records the trigger for dedup.
   r.lastActionMs = nowMs;
   r.actionsUsed += 1;
+  // The dedup list is only burned when Zaal actually got the approval card. A
+  // draft whose card the send budget blocked is not "handled": recording it
+  // here would retire the trigger for a cast nobody was ever offered. The cost
+  // counters above still tick, because the draft was generated either way.
+  if (result.status === 'undelivered') {
+    return {
+      picked: agent.agent_id,
+      fired: false,
+      detail: `${agent.agent_id}: approval card not delivered (send budget); trigger left for the next tick`,
+    };
+  }
   r.recentPosts.push(trigger.text.toLowerCase());
   if (r.recentPosts.length > 50) r.recentPosts.shift();
 

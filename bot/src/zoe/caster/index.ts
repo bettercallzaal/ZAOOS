@@ -16,6 +16,7 @@ import { checkCast, type SafetyVerdict } from '../safety/klearu';
 import { draftCast } from './reason';
 import { publishCast } from '../farcaster/write';
 import { ffxAvailable, executeActionOnFfx } from '../exec/ffx';
+import { wasSendBlocked } from '../send-budget';
 
 export interface CasterTrigger {
   /** which registry agent is acting */
@@ -62,7 +63,7 @@ export async function runCasterPipeline(
   bot: Bot,
   zaalId: number,
   trigger: CasterTrigger,
-): Promise<{ status: 'awaiting_approval' | 'blocked'; id?: string; verdict: SafetyVerdict }> {
+): Promise<{ status: 'awaiting_approval' | 'blocked' | 'undelivered'; id?: string; verdict: SafetyVerdict }> {
   gcPending();
 
   const draft = await draftCast({
@@ -92,12 +93,23 @@ export async function runCasterPipeline(
     .text('Reject', `cast-reject:${id}`)
     .text('Regen', `cast-regen:${id}`);
 
-  await bot.api.sendMessage(
+  const sent = await bot.api.sendMessage(
     zaalId,
     `[caster:${trigger.agentId}] proposed ${kind} (model ${draft.model}, safety ${verdict.label}):\n\n` +
       `${draft.text}\n\n(${draft.text.length}/320 chars)`,
     { reply_markup: kb },
   );
+
+  // The send budget wraps bot.api.sendMessage at boot and a blocked send
+  // RESOLVES, so this looked delivered. The approval card is the only way this
+  // draft can ever be published, so a blocked one left a pending cast nobody
+  // was shown (until the 30-minute TTL swept it) while the caller recorded the
+  // trigger as handled and would not offer it again. Drop the pending entry and
+  // say what happened.
+  if (wasSendBlocked(sent)) {
+    pending.delete(id);
+    return { status: 'undelivered', verdict };
+  }
 
   return { status: 'awaiting_approval', id, verdict };
 }

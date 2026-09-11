@@ -23,6 +23,7 @@ import {
   easternDay,
   gateSend,
   installSendBudget,
+  isBatchFragment,
   readDeferred,
   readSendLog,
   renderDeferredBatch,
@@ -599,6 +600,123 @@ describe('renderDeferredBatch', () => {
       { at: '2026-08-26T22:15:00.000Z', cls: 'digest', chatId: 1, text: 'just one' },
     ]);
     expect(out).toContain('1 item,');
+  });
+});
+
+describe('morning - the batch that drains the queue can never be queued', () => {
+  it('always passes and counts, even far over the cap', () => {
+    const d = decide('morning', 17, 3);
+    expect(d.allow).toBe(true);
+    expect(d.outcome).toBe('sent');
+    expect(d.counts).toBe(true);
+  });
+
+  it('is accepted as an explicit class hint', () => {
+    expect(resolveSendClass({ zoeSendClass: 'morning' })).toBe('morning');
+  });
+
+  it('a flush sent in the morning context over the cap is SENT, and nothing is re-queued', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await runWithSendClass('morning', () => gated(1, 'Held back yesterday (2 items, over the daily send cap):'));
+    expect(calls.map((c) => c.text)).toContain('Held back yesterday (2 items, over the daily send cap):');
+    expect(await readDeferred()).toEqual([]);
+  });
+
+  it('the same flush as a digest (the old context) is deferred - the bug this class fixes', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    await runWithSendClass('digest', () => gated(1, 'Held back yesterday (2 items, over the daily send cap):'));
+    expect((await readDeferred()).map((e) => e.text)).toEqual([
+      'Held back yesterday (2 items, over the daily send cap):',
+    ]);
+  });
+});
+
+describe('the scheduler drains the queue under the morning class', () => {
+  it('the job that calls drainDeferred() runs in runWithSendClass(\'morning\'), not digest', async () => {
+    // A source check, because the job is a cron closure with a dozen live
+    // dependencies. It pins the one line that decides whether the flush can
+    // defer itself: the nearest runWithSendClass before drainDeferred().
+    const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
+    const drainAt = src.indexOf('await drainDeferred()');
+    expect(drainAt).toBeGreaterThan(0);
+    const before = src.slice(0, drainAt);
+    const m = [...before.matchAll(/runWithSendClass\('([a-z]+)'/g)].pop();
+    expect(m?.[1]).toBe('morning');
+  });
+});
+
+describe('renderDeferredBatch - never nests, never repeats', () => {
+  const at = '2026-09-11T09:00:00.000Z';
+  const e = (text: string, cls: DeferredSend['cls'] = 'digest'): DeferredSend => ({ at, cls, chatId: 1, text });
+
+  it('recognises the fragments measured in the live queue on 2026-09-11', () => {
+    expect(isBatchFragment('(1/41) Held back yesterday (44 items, over the daily send cap):')).toBe(true);
+    expect(isBatchFragment('(2/41) - [09:00 digest] (2/38) - [09:00 digest] more')).toBe(true);
+    expect(isBatchFragment('Held back yesterday (3 items, over the daily send cap):')).toBe(true);
+  });
+
+  it('does not mistake a real chunked digest for a fragment', () => {
+    expect(isBatchFragment('(1/2) Cockpit - 2026-09-11\n104 open')).toBe(false);
+    expect(isBatchFragment('(2/2) NEEDS YOUR REVIEW (open PRs)')).toBe(false);
+    expect(isBatchFragment('Evening reflection - Thu Sep 10 9pm')).toBe(false);
+  });
+
+  it('leaves fragments out, says how many, and never nests them', () => {
+    const out = renderDeferredBatch([
+      e('(1/41) Held back yesterday (44 items, over the daily send cap):'),
+      e('(2/41) - [09:00 digest] (2/38) - [09:00 digest] old'),
+      e('Evening reflection - Thu Sep 10 9pm'),
+    ]);
+    expect(out).toContain('1 item,');
+    expect(out).toContain('2 pieces of earlier held-back batches left out');
+    expect(out).not.toContain('(2/41)');
+    expect(out).toContain('Evening reflection');
+  });
+
+  it('a chunk that starts MID-ITEM is still a fragment when its batch head was queued with it', () => {
+    const atMs = (ms: number) => new Date(Date.parse(at) + ms).toISOString();
+    const entries: DeferredSend[] = [
+      { at, cls: 'digest', chatId: 1, text: '(1/41) Held back yesterday (44 items, over the daily send cap):' },
+      { at: atMs(3000), cls: 'digest', chatId: 1, text: '(20/41) Reply with your call and I log it + move it off your plate.' },
+      { at: atMs(4000), cls: 'digest', chatId: 1, text: "(24/41) 1. What shipped today?\n2. What's stuck?" },
+      // A real chunked digest, hours away and a different N: kept.
+      { at: atMs(3 * 3600_000), cls: 'digest', chatId: 1, text: '(1/2) Cockpit - 2026-09-11' },
+      { at: atMs(3 * 3600_000 + 1000), cls: 'digest', chatId: 1, text: '(2/2) NEEDS YOUR REVIEW (open PRs)' },
+      // Same N as the batch but a day later: not the batch's chunk, kept.
+      { at: atMs(86_400_000), cls: 'digest', chatId: 1, text: '(7/41) an unrelated long digest' },
+    ];
+    const out = renderDeferredBatch(entries);
+    expect(out).toContain('3 pieces of earlier held-back batches left out');
+    expect(out).not.toContain('Reply with your call');
+    expect(out).not.toContain('What shipped today');
+    expect(out).toContain('(1/2) Cockpit');
+    expect(out).toContain('(2/2) NEEDS YOUR REVIEW');
+    expect(out).toContain('an unrelated long digest');
+    expect(out).toContain('3 items');
+  });
+
+  it('shows an identical held message once, with its count', () => {
+    const out = renderDeferredBatch([
+      e('Handoff: images/content lane PARKED', 'status'),
+      e('Handoff: images/content lane PARKED', 'status'),
+      e('Handoff: images/content lane PARKED', 'status'),
+      e('nightly recap'),
+    ]);
+    expect(out).toContain('4 items');
+    expect(out).toContain('(x3) Handoff: images/content lane PARKED');
+    expect(out.match(/Handoff: images/g)).toHaveLength(1);
+  });
+
+  it('a queue of nothing but fragments renders a head only, never an empty list', () => {
+    const out = renderDeferredBatch([e('(3/41) - [09:00 digest] x')]);
+    expect(out).toContain('0 items');
+    expect(out).toContain('1 piece of earlier held-back batches left out');
   });
 });
 

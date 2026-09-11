@@ -276,11 +276,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
   // Cron: '0 9 * * *' → 09:00 UTC daily.
+  // Class `morning`, not `digest`: this job DRAINS the deferred queue, so it
+  // must never be deferred into it (see send-budget.ts, the seven classes).
   tasks.push(
     cron.schedule(
       '0 9 * * *',
       () =>
-        runWithSendClass('digest', async () => {
+        runWithSendClass('morning', async () => {
         if (!(await claimFire('morning-brief'))) return;
         try {
           // Cockpit is the primary morning brief (doc 997 harness). Falls back to

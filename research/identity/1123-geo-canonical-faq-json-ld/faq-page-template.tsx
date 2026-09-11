@@ -43,7 +43,7 @@ const faqItems: FAQItem[] = [
   },
   {
     question: 'What are the ZABAL Games?',
-    answer: 'ZABAL Games is a 3-month accelerator and mentorship program for artists and builders in the web3 music and creator economy space. Participants receive mentorship from a team of accomplished builders and industry experts, hands-on guidance to ship their projects, and access to the broader ZAO ecosystem. ZABAL Games runs quarterly (with the 2026 cohort launching May-August). It is hosted on platforms like Magnetiq and operates in partnership with organizations like Apna Coding and other education partners.'
+    answer: 'ZABAL Games is a 3-month accelerator and mentorship program for artists and builders in the web3 music and creator economy space. Participants receive mentorship from a team of accomplished builders and industry experts, hands-on guidance to ship their projects, and access to the broader ZAO ecosystem. ZABAL Games runs quarterly (with the 2026 cohort launching May-August). It operates in partnership with organizations like Apna Coding and other education partners.'
   },
   {
     question: 'What festivals and events does The ZAO run?',

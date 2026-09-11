@@ -58,6 +58,7 @@ import {
   gatherEventCandidates,
   gatherGraphCandidates,
   gatherInactivityCandidates,
+  markCandidateSurfaced,
   touchLastSeen,
 } from '../events';
 
@@ -184,19 +185,111 @@ describe('gatherEventCandidates', () => {
     expect(result.some((c) => c.message.includes('[CI FAIL]'))).toBe(false);
   });
 
-  it('writes the seen file after detecting new events', async () => {
+  // The dedup key is burned on DELIVERY, not on gather. Gathering a candidate
+  // and then losing pickBest (or being dropped by the send budget) must leave
+  // the key unspent so the next hourly tick can offer it again.
+  it('does NOT write the seen file when it detects a new event', async () => {
     const stalePr = makePr({ number: 7 });
     mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
     mockExecFileRaw.mockResolvedValue({ stdout: '{"statusCheckRollup":[]}' });
 
-    await gatherEventCandidates(NOW);
-    expect(mockFsWriteFile).toHaveBeenCalled();
+    const result = await gatherEventCandidates(NOW);
+    expect(result).toHaveLength(1);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('carries the dedup key on the candidate so the caller can burn it', async () => {
+    const stalePr = makePr({ number: 7 });
+    mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
+    mockExecFileRaw.mockResolvedValue({ stdout: '{"statusCheckRollup":[]}' });
+
+    const result = await gatherEventCandidates(NOW);
+    expect(result[0].dedupKey).toBe(`stale:repo#7:${TODAY}`);
+  });
+
+  it('re-offers an undelivered PR on the next gather', async () => {
+    const stalePr = makePr({ number: 7 });
+    mockExecFileRaw.mockResolvedValue({ stdout: '{"statusCheckRollup":[]}' });
+
+    mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
+    const first = await gatherEventCandidates(NOW);
+    // Nothing recorded it as delivered, so the seen file is untouched.
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+
+    mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) });
+    const second = await gatherEventCandidates(NOW);
+    expect(second).toHaveLength(first.length);
+    expect(second[0].message).toBe(first[0].message);
   });
 
   it('does not write the seen file when no events are detected', async () => {
     mockExecFileRaw.mockResolvedValueOnce({ stdout: JSON.stringify([]) });
     await gatherEventCandidates(NOW);
     expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('[CI FAIL] carries its own dedup key', async () => {
+    const stalePr = makePr({ number: 99 });
+    mockExecFileRaw
+      .mockResolvedValueOnce({ stdout: JSON.stringify([stalePr]) })
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ statusCheckRollup: [{ conclusion: 'FAILURE' }] }),
+      });
+
+    const result = await gatherEventCandidates(NOW);
+    const cifail = result.find((c) => c.message.includes('[CI FAIL]'));
+    expect(cifail?.dedupKey).toBe(`cifail:repo#99:${TODAY}`);
+  });
+});
+
+// ── markCandidateSurfaced ─────────────────────────────────────────────────────
+
+describe('markCandidateSurfaced', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFsReadFile.mockResolvedValue('{}');
+    mockFsWriteFile.mockResolvedValue(undefined);
+    mockFsMkdir.mockResolvedValue(undefined);
+  });
+
+  it('writes the key to the seen file', async () => {
+    await markCandidateSurfaced(`calendar-zoe:zoe-1:${TODAY}`, NOW);
+    const written = JSON.parse(mockFsWriteFile.mock.calls[0][1] as string) as Record<string, number>;
+    expect(written[`calendar-zoe:zoe-1:${TODAY}`]).toBe(NOW);
+  });
+
+  it('is a no-op for a candidate with no dedup key', async () => {
+    await markCandidateSurfaced(undefined, NOW);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op when the key is already recorded', async () => {
+    mockFsReadFile.mockResolvedValue(JSON.stringify({ [`inactivity:${TODAY}`]: NOW - 1000 }));
+    await markCandidateSurfaced(`inactivity:${TODAY}`, NOW);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+  });
+
+  it('does not throw when the seen file cannot be written', async () => {
+    mockFsWriteFile.mockRejectedValue(new Error('EROFS'));
+    await expect(markCandidateSurfaced(`inactivity:${TODAY}`, NOW)).resolves.toBeUndefined();
+  });
+
+  it('suppresses the candidate on the next gather', async () => {
+    const longAgo = NOW - 5 * 3600_000;
+    mockFsReadFile.mockImplementation((path: string) => {
+      if ((path as string).endsWith('last-seen.txt')) return Promise.resolve(String(longAgo));
+      return Promise.resolve('{}');
+    });
+    const before = await gatherInactivityCandidates(NOW);
+    expect(before).toHaveLength(1);
+
+    // Delivered: the caller burns the key it was handed.
+    const seenAfter = { [before[0].dedupKey as string]: NOW };
+    mockFsReadFile.mockImplementation((path: string) => {
+      if ((path as string).endsWith('last-seen.txt')) return Promise.resolve(String(longAgo));
+      return Promise.resolve(JSON.stringify(seenAfter));
+    });
+    expect(await gatherInactivityCandidates(NOW)).toEqual([]);
   });
 });
 
@@ -457,5 +550,24 @@ describe('gatherCalendarCandidates', () => {
 
     const result = await gatherCalendarCandidates(NOW);
     expect(result).toEqual([]);
+  });
+
+  // The failure this guards: a tick that also produced a [CI FAIL] (0.82) sends
+  // only that one, and the calendar candidate (0.72) used to have its key burned
+  // anyway - so the reminder for a meeting starting inside the 2h lookahead was
+  // suppressed for the rest of the day and never fired.
+  it('does not burn the key at gather time, and carries it on the candidate', async () => {
+    const startIn30min = new Date(NOW + 30 * 60_000);
+    mockGetCalendarEvents.mockResolvedValue([
+      { id: 'zoe-1', title: 'Repeat Call', start: startIn30min, end: startIn30min },
+    ]);
+
+    const result = await gatherCalendarCandidates(NOW);
+    expect(result).toHaveLength(1);
+    expect(result[0].dedupKey).toBe(`calendar-zoe:zoe-1:${TODAY}`);
+    expect(mockFsWriteFile).not.toHaveBeenCalled();
+
+    // Still offered on the next tick, because nobody confirmed delivery.
+    expect(await gatherCalendarCandidates(NOW)).toHaveLength(1);
   });
 });

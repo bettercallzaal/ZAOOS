@@ -10,6 +10,29 @@
  * Dedup: a seen-events file (~/.zao/zoe/seen-events.json) keyed per event so the
  * same thing never pings twice (merged once ever; stale/ci once per day).
  *
+ * A DEDUP KEY IS BURNED ON DELIVERY, NOT ON GATHER. Every gather here used to
+ * write its keys to the seen file before returning, which is wrong on both
+ * sides of the gate that consumes them:
+ *
+ *   - `pickBest` (proactive.ts) speaks AT MOST ONE candidate per tick. A tick
+ *     that gathered a [CI FAIL] (0.82) and a [CALENDAR] (0.72) sent one and
+ *     marked both seen, so the calendar reminder for a meeting starting inside
+ *     the 2h window was suppressed for the rest of that day and never fired.
+ *   - even the winner may not arrive: it can fall under the self-throttled
+ *     threshold, or the per-day send budget can DROP it (send-budget.ts, class
+ *     `status`), which RESOLVES rather than throwing. scheduler.ts already
+ *     declines to record the push in that case - but the key had been burned
+ *     an await earlier, up here.
+ *
+ * So each candidate now carries its key as `dedupKey` and the caller calls
+ * `markCandidateSurfaced` only after the send is confirmed delivered. Nothing
+ * up here persists the seen file for a message-dedup key; the in-memory
+ * `seen` object is still mutated so one gather cannot emit the same key twice.
+ *
+ * The ONE exception is `graphcheck:<day>` in gatherGraphCandidates, which is a
+ * cost gate on the six /delve calls the sweep makes and not a message dedup -
+ * see the comment there.
+ *
  * v1 source: GitHub PRs across ALL Zaal's repos (gh authed as bettercallzaal).
  * Extensible: add graph-decision / stale-relationship sources the same way -
  * return Candidate[] and they compete in the gate.
@@ -66,6 +89,34 @@ function repoName(pr: SearchPr): string {
 }
 
 /**
+ * Record that a candidate's message ACTUALLY REACHED Zaal, so it is not
+ * gathered again inside its dedup window.
+ *
+ * Called by the reasoning tick (scheduler.ts) after the send is confirmed
+ * delivered - past both the threshold gate and `wasSendBlocked`. Candidates
+ * that were gathered and then not spoken keep their key unburned and are
+ * re-offered on the next hourly tick, which is the whole point.
+ *
+ * Best-effort and idempotent: a no-op for a candidate with no key or a key
+ * already present, and a write failure is logged rather than thrown, since the
+ * message did go out and losing the dedup only risks one repeat.
+ */
+export async function markCandidateSurfaced(
+  dedupKey: string | undefined,
+  now: number = Date.now(),
+): Promise<void> {
+  if (!dedupKey) return;
+  try {
+    const seen = await readSeen();
+    if (seen[dedupKey]) return;
+    seen[dedupKey] = now;
+    await writeSeen(seen, now);
+  } catch (err) {
+    console.warn('[zoe/events] could not mark candidate surfaced:', (err as Error).message);
+  }
+}
+
+/**
  * Detect notable GitHub events across Zaal's open PRs and return tagged
  * candidates. Best-effort: never throws (a gh failure -> []). Dedupes so a given
  * event only pings once per its window.
@@ -100,7 +151,9 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     if (ageHrs < STALE_PR_MIN_HOURS) continue; // not stuck long enough yet
     if (ageHrs / 24 > STALE_PR_MAX_DAYS) continue; // abandoned, not a nudge target
 
-    // once per day per PR so a long-stale PR doesn't nag every hour
+    // once per day per PR so a long-stale PR doesn't nag every hour. The key is
+    // burned on DELIVERY (markCandidateSurfaced); marking `seen` here only keeps
+    // one gather from emitting the same PR twice.
     const key = `stale:${repoName(pr)}#${pr.number}:${today}`;
     if (seen[key]) continue;
     seen[key] = now;
@@ -110,6 +163,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
       kind: 'github-event',
       score: 0.65, // actionable: clears the 0.6 bar, but a due commitment still outranks
       tier: 'standard',
+      dedupKey: key,
       message: `[STALE PR] ${repoName(pr)} #${pr.number} has sat ${days}d with no movement: "${pr.title}". Merge it, close it, or want me to look?`,
     });
   }
@@ -128,11 +182,15 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
       kind: 'github-event',
       score: 0.82, // a broken build outranks a stale PR + most nudges
       tier: 'critical',
+      dedupKey: key,
       message: `[CI FAIL] ${repoName(pr)} #${pr.number} has failing checks: "${pr.title}". Want me to look at what broke?`,
     });
   }
 
-  if (out.length > 0) await writeSeen(seen, now);
+  // No writeSeen here on purpose - see the header. An undelivered candidate must
+  // stay gatherable next tick. The cost is that a PR whose failure keeps losing
+  // pickBest is re-checked hourly instead of once a day, bounded by
+  // CI_CHECK_LIMIT gh calls per tick, which is what that limit is already for.
   return out;
 }
 
@@ -191,7 +249,15 @@ export async function gatherGraphCandidates(now: number = Date.now()): Promise<C
     if (!coldest || days > coldest.days) coldest = { topic, days };
   }
 
-  seen[`graphcheck:${today}`] = now; // mark the sweep done for today regardless
+  // Mark the SWEEP done for today regardless, and persist it. This is the one
+  // key in this file that is genuinely a cost gate rather than a message dedup:
+  // it bounds the WATCH_TOPICS graph lookups above to one round per day, and
+  // moving it to delivery would run them every hour. Consequence, stated so it
+  // is not mistaken for the bug fixed elsewhere here: a [GRAPH] nudge that
+  // loses pickBest is not re-offered until tomorrow. It is the lowest-scoring
+  // candidate ZOE emits (0.62) and the least time-critical, so it is the one
+  // place where paying the sweep again is not worth it.
+  seen[`graphcheck:${today}`] = now;
   await writeSeen(seen, now);
 
   if (!coldest) return [];
@@ -246,8 +312,6 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
   const today = new Date(now).toISOString().slice(0, 10);
   const key = `inactivity:${today}`;
   if (seen[key]) return [];
-  seen[key] = now;
-  await writeSeen(seen, now);
 
   const hrs = Math.floor(silentHrs);
   return [
@@ -255,6 +319,7 @@ export async function gatherInactivityCandidates(now: number = Date.now()): Prom
       kind: 'inactivity',
       score: 0.62, // just clears the 0.6 bar — lowest interrupt priority
       tier: 'signal',
+      dedupKey: key, // burned on delivery, not here - see the header
       message: `You've been quiet for ${hrs}h. Everything on track, or anything stuck?`,
     },
   ];
@@ -324,6 +389,7 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
             kind: 'calendar',
             score: 0.72,
             tier: 'standard',
+            dedupKey: key,
             message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
           });
         }
@@ -349,6 +415,7 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
         kind: 'calendar',
         score: 0.72,
         tier: 'standard',
+        dedupKey: key,
         message: `[CALENDAR] "${ev.title}" in ${minsAway}m${ev.location ? ` @ ${ev.location}` : ''}. Anything to prep?`,
       });
     }
@@ -357,6 +424,9 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
     console.warn('[zoe/events] ZOE calendar check failed (nbd):', (err as Error).message);
   }
 
-  if (out.length > 0) await writeSeen(seen, now);
+  // No writeSeen here on purpose - see the header. This is the sharpest case:
+  // the lookahead is 2h and the tick is hourly, so a calendar key burned by a
+  // gather the candidate then lost gives the reminder ONE chance, and a meeting
+  // that ZOE was supposed to flag passes in silence.
   return out;
 }

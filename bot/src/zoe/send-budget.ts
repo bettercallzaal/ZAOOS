@@ -87,8 +87,8 @@
  * budgeted at the escalation PRODUCER, never at build-candidate.ts. Capping
  * the button module would suppress the approval UI while the sends kept coming.
  *
- * THE SIX CLASSES
- * ---------------
+ * THE SEVEN CLASSES
+ * -----------------
  *   reply   a direct answer to something Zaal said. ALWAYS passes, and does
  *           NOT count. Solicited traffic is not the problem: 12 replies a
  *           month is not what buried him.
@@ -107,6 +107,16 @@
  *           competing on equal terms with traffic he answers. Dropped past
  *           that reserve - never queued, because re-sending tomorrow what he
  *           ignored 1,116 times is not a saving.
+ *   morning the ONE morning batch: the brief plus everything held since the
+ *           last batch. ALWAYS passes, and counts. Added 2026-09-11, measured:
+ *           with the cap at 3 and alarms + gated counting, the cap is spent
+ *           before 09:00 UTC, so the brief and the drain of held items ran as
+ *           `digest` and were DEFERRED - the flush queued itself, chunk by
+ *           chunk, into tomorrow's flush. The queue held 41 fragments of
+ *           "Held back yesterday (44 items)" nested in "(2/41) - [09:00
+ *           digest] (2/38) ...". The flush was capped by the budget it drains,
+ *           so nothing held ever reached Zaal. Brandon (DreamNet, 2026-09-11):
+ *           "Never let a general message quota suppress real alerts."
  *
  * NOTHING IS SILENT. Every drop and every deferral is logged twice - a
  * console line for journald and a JSONL row for counting later. A budget that
@@ -132,7 +142,7 @@ import { join } from 'node:path';
 // Types
 // ---------------------------------------------------------------------------
 
-export type SendClass = 'reply' | 'alarm' | 'gated' | 'status' | 'digest' | 'noise';
+export type SendClass = 'reply' | 'alarm' | 'gated' | 'status' | 'digest' | 'noise' | 'morning';
 
 export type SendOutcome = 'sent' | 'dropped' | 'deferred';
 
@@ -169,6 +179,8 @@ const POLICY: Record<SendClass, ClassPolicy> = {
   status: { alwaysPasses: false, counts: true, overflow: 'dropped' },
   digest: { alwaysPasses: false, counts: true, overflow: 'deferred' },
   noise: { alwaysPasses: false, counts: true, overflow: 'dropped' },
+  // The drain of the deferred queue can never be deferred INTO that queue.
+  morning: { alwaysPasses: true, counts: true, overflow: 'dropped' },
 };
 
 export const DEFAULT_DAILY_SEND_CAP = 20;
@@ -465,16 +477,51 @@ export async function requeueDeferred(entries: DeferredSend[]): Promise<void> {
   }
 }
 
-/** Render drained entries as one batched message body. */
+const BATCH_HEAD = 'Held back yesterday (';
+
+/**
+ * True for an entry that is a piece of an EARLIER batch rather than a held
+ * message: the batch head, or a chunk of one ("(2/41) - [09:00 digest] ...").
+ * Before the `morning` class existed the flush could be deferred, and each of
+ * its chunks was queued as a new entry - so a batch built from the queue
+ * nested the previous batch inside itself, and again the next day.
+ */
+export function isBatchFragment(text: string): boolean {
+  const t = text.replace(/^\(\d+\/\d+\) /, '');
+  return t.startsWith(BATCH_HEAD) || /^- \[\d{2}:\d{2} [a-z]+\] /.test(t);
+}
+
+/**
+ * Render drained entries as one batched message body.
+ *
+ * Two things the old version did not do, both measured on 2026-09-11:
+ *   - fragments of an earlier batch are LEFT OUT and counted, never nested;
+ *   - an identical held message appears once, with how many times it was
+ *     held ("Handoff: ... PARKED" was emitted every ten minutes).
+ */
 export function renderDeferredBatch(entries: DeferredSend[]): string {
-  const head = `Held back yesterday (${entries.length} ${entries.length === 1 ? 'item' : 'items'}, over the daily send cap):`;
-  const body = entries
-    .map((e) => {
-      const time = e.at.slice(11, 16);
-      return `- [${time} ${e.cls}] ${e.text}`;
+  const fragments = entries.filter((e) => isBatchFragment(e.text)).length;
+  const groups = new Map<string, { first: DeferredSend; n: number }>();
+  for (const e of entries) {
+    if (isBatchFragment(e.text)) continue;
+    const key = `${e.cls}\u0000${e.text}`;
+    const g = groups.get(key);
+    if (g) g.n += 1;
+    else groups.set(key, { first: e, n: 1 });
+  }
+  const items = [...groups.values()];
+  const held = items.reduce((sum, g) => sum + g.n, 0);
+  let head = `${BATCH_HEAD}${held} ${held === 1 ? 'item' : 'items'}, over the daily send cap):`;
+  if (fragments > 0) {
+    head += `\n(${fragments} ${fragments === 1 ? 'piece' : 'pieces'} of earlier held-back batches left out: copies of old digests the flush had re-queued.)`;
+  }
+  const body = items
+    .map(({ first, n }) => {
+      const time = first.at.slice(11, 16);
+      return `- [${time} ${first.cls}]${n > 1 ? ` (x${n})` : ''} ${first.text}`;
     })
     .join('\n\n');
-  return `${head}\n\n${body}`;
+  return body ? `${head}\n\n${body}` : head;
 }
 
 // ---------------------------------------------------------------------------
@@ -499,7 +546,7 @@ export function currentSendClass(): SendClass | undefined {
   return classStore.getStore();
 }
 
-const VALID: readonly SendClass[] = ['reply', 'alarm', 'gated', 'status', 'digest', 'noise'];
+const VALID: readonly SendClass[] = ['reply', 'alarm', 'gated', 'status', 'digest', 'noise', 'morning'];
 
 /**
  * Resolve the class for one send. Precedence:

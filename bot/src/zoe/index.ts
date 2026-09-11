@@ -181,6 +181,7 @@ import { touchLastSeen } from './events';
 import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOptions } from './telegram-routing';
 import { installAgentMarkupGuard } from '../agent-markup';
 import { installSendBudget, runWithSendClass } from './send-budget';
+import { readLaneSnapshot, renderLanes } from './lanes-board';
 import {
   fetchPending,
   removeFromQueue,
@@ -1074,6 +1075,16 @@ bot.command('board', async (ctx) => {
   }
   const { digest } = await runTeamDigest({ mirrorToBonfire: false });
   await replyChunked(ctx, digest);
+});
+
+// /lanes - the Mac's Claude Code lanes, from the snapshot zao-board-push
+// writes (Zaal 2026-09-11: "a combo of telegram message tailscale and maybe
+// an orca option"). Read-only, Zaal-only, on request only; says STALE rather
+// than showing an old snapshot as now. /board stays the team digest.
+bot.command('lanes', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const snap = await readLaneSnapshot();
+  await replyChunked(ctx, renderLanes(snap, Math.floor(Date.now() / 1000)));
 });
 
 // Write path: add a task to the team board. Usage:

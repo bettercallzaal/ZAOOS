@@ -179,7 +179,6 @@ async function runExtractor(
     appendSystemPrompt: buildSystemPrompt(spec, today),
     permissionMode: 'default',
     outputFormat: 'json',
-    bare: true,
     timeoutMs: EXTRACT_TIMEOUT_MS,
     maxBudgetUsd: EXTRACT_BUDGET_USD,
   });

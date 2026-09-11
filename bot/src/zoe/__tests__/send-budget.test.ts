@@ -679,6 +679,28 @@ describe('renderDeferredBatch - never nests, never repeats', () => {
     expect(out).toContain('Evening reflection');
   });
 
+  it('a chunk that starts MID-ITEM is still a fragment when its batch head was queued with it', () => {
+    const atMs = (ms: number) => new Date(Date.parse(at) + ms).toISOString();
+    const entries: DeferredSend[] = [
+      { at, cls: 'digest', chatId: 1, text: '(1/41) Held back yesterday (44 items, over the daily send cap):' },
+      { at: atMs(3000), cls: 'digest', chatId: 1, text: '(20/41) Reply with your call and I log it + move it off your plate.' },
+      { at: atMs(4000), cls: 'digest', chatId: 1, text: "(24/41) 1. What shipped today?\n2. What's stuck?" },
+      // A real chunked digest, hours away and a different N: kept.
+      { at: atMs(3 * 3600_000), cls: 'digest', chatId: 1, text: '(1/2) Cockpit - 2026-09-11' },
+      { at: atMs(3 * 3600_000 + 1000), cls: 'digest', chatId: 1, text: '(2/2) NEEDS YOUR REVIEW (open PRs)' },
+      // Same N as the batch but a day later: not the batch's chunk, kept.
+      { at: atMs(86_400_000), cls: 'digest', chatId: 1, text: '(7/41) an unrelated long digest' },
+    ];
+    const out = renderDeferredBatch(entries);
+    expect(out).toContain('3 pieces of earlier held-back batches left out');
+    expect(out).not.toContain('Reply with your call');
+    expect(out).not.toContain('What shipped today');
+    expect(out).toContain('(1/2) Cockpit');
+    expect(out).toContain('(2/2) NEEDS YOUR REVIEW');
+    expect(out).toContain('an unrelated long digest');
+    expect(out).toContain('3 items');
+  });
+
   it('shows an identical held message once, with its count', () => {
     const out = renderDeferredBatch([
       e('Handoff: images/content lane PARKED', 'status'),

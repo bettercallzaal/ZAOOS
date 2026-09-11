@@ -491,6 +491,38 @@ export function isBatchFragment(text: string): boolean {
   return t.startsWith(BATCH_HEAD) || /^- \[\d{2}:\d{2} [a-z]+\] /.test(t);
 }
 
+const CHUNK_PREFIX = /^\((\d+)\/(\d+)\) /;
+
+/**
+ * Indexes of every entry that belongs to an earlier batch. isBatchFragment
+ * alone is not enough: the chunker cuts at a blank line when it can, but at a
+ * newline or a space when an item is long, so a chunk can START MID-ITEM
+ * ("(20/41) Reply with your call and I log it..."). Measured on the live
+ * queue 2026-09-11: 35 of 43 entries matched the text rule and 6 more were
+ * such mid-item chunks. So a chunk "(k/N)" is also a fragment when a batch
+ * head "(1/N) Held back yesterday (" with the same N was queued within two
+ * minutes of it - the chunks of one send share its moment.
+ */
+export function batchFragmentIndexes(entries: DeferredSend[]): Set<number> {
+  const out = new Set<number>();
+  const heads: Array<{ n: string; ms: number }> = [];
+  entries.forEach((e, i) => {
+    if (!isBatchFragment(e.text)) return;
+    out.add(i);
+    const m = CHUNK_PREFIX.exec(e.text);
+    if (m && m[1] === '1' && e.text.slice(m[0].length).startsWith(BATCH_HEAD)) {
+      heads.push({ n: m[2], ms: Date.parse(e.at) });
+    }
+  });
+  entries.forEach((e, i) => {
+    const m = CHUNK_PREFIX.exec(e.text);
+    if (!m || out.has(i)) return;
+    const ms = Date.parse(e.at);
+    if (heads.some((h) => h.n === m[2] && Math.abs(h.ms - ms) <= 120_000)) out.add(i);
+  });
+  return out;
+}
+
 /**
  * Render drained entries as one batched message body.
  *
@@ -500,10 +532,11 @@ export function isBatchFragment(text: string): boolean {
  *     held ("Handoff: ... PARKED" was emitted every ten minutes).
  */
 export function renderDeferredBatch(entries: DeferredSend[]): string {
-  const fragments = entries.filter((e) => isBatchFragment(e.text)).length;
+  const frag = batchFragmentIndexes(entries);
+  const fragments = frag.size;
   const groups = new Map<string, { first: DeferredSend; n: number }>();
-  for (const e of entries) {
-    if (isBatchFragment(e.text)) continue;
+  for (const [i, e] of entries.entries()) {
+    if (frag.has(i)) continue;
     const key = `${e.cls}\u0000${e.text}`;
     const g = groups.get(key);
     if (g) g.n += 1;

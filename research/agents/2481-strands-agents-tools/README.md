@@ -56,7 +56,7 @@ The README's "Deprecations" section states the direction plainly: the SDK now
 reasons, injects context, manages memory and runs tools concurrently on its own.
 It also says an official vendor MCP server will track that vendor's API better
 than a wrapper can. The section says more tools will follow and ends: "this
-repository will eventually be archived".
+repository will eventually be archived". (In the README that sentence wraps across two lines, so a one-line grep for it finds nothing. Read the section, not the grep.)
 
 | Deprecated tool | What replaces it |
 |---|---|

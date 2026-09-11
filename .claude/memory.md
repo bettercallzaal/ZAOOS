@@ -126,7 +126,7 @@ Grep `research/{topic}/README.md` indexes before bulk reads.
 - Never use em dashes — hyphens only.
 - Document build steps (build-in-public).
 - Never generate personal wallet keys interactively.
-- Exact name spellings (The ZAO, WaveWarZ, COC Concertz, BetterCallZaal, Joseph Goats, Huöttöja, SongJam, ZABAL, SANG, ZOE, ZOLs, FISHBOWLZ, Stilo World, Tom Fellenz, Th Revolution, ArDrive).
+- Exact name spellings (The ZAO, WaveWarZ, COC Concertz, BetterCallZaal, Joseph Goats, Huöttöja, ZABAL, ZOE, ZOLs, FISHBOWLZ, Stilo World, Tom Fellenz, Th Revolution, ArDrive).
 
 ## Active Decisions (2026)
 

@@ -18,7 +18,7 @@ The voice is BetterCallZaal: calm confidence, cultural awareness, self-trust, an
 3. **No em dashes.** Use hyphens (-) instead. Never use the em dash character.
 4. **No corporate language.** No "excited to announce", no "thrilled", no "leveraging". Just say what happened.
 5. **No emojis.** No hashtags. Clean, simple, human.
-6. **References are casual.** The audience knows ZAO OS, WaveWarZ, ZABAL, fractals, and Songjam. New concepts get one line of context max.
+6. **References are casual.** The audience knows ZAO OS, WaveWarZ, ZABAL, and fractals. New concepts get one line of context max.
 7. **Momentum language.** "showed up", "locked in", "the quiet work compounds", "keep building", "consistency every day is the best you can do". Not hype - conviction.
 8. **Short paragraphs.** 1-3 sentences each. Readable aloud. Wall of text = wrong.
 9. **No extra headers** beyond the title/subtitle block. No ## in the body.

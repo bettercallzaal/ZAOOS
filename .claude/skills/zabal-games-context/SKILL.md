@@ -162,7 +162,6 @@ These spellings are non-negotiable. Auto-correcting them will be perceived as no
 | WaveWarZ | Wave Wars, Wavewarz, WaveWars | Always WaveWarZ |
 | BetterCallZaal | Bettercallzaal, Better Call Zaal | One word, camelCase |
 | Farcaster | Warpcast | Always Farcaster (Warpcast is just a client) |
-| Magnetiq | Magnetic, MagnetIQ | All-in-one event/launch platform at `magnetiq.io`. Tyler Stambaugh's company. ZABAL Games workshop library + portal runs here. |
 | Restream | restream, ReStream | Stream-to-multiple-platforms at `restream.io`. ZABAL Games workshops default streaming surface. |
 | Cal.com | Calcom, cal.com (in proper-noun position) | Open-source Calendly alt. ZABAL Games slot booker at `cal.com/bettercallzaal/zabal-games-workshop-slot`. |
 | Lu.ma | Luma, lu.ma | Event platform. Recently moved `lu.ma` -> `luma.com`. ZAO calendar at `luma.com/zao`. |
@@ -171,8 +170,6 @@ These spellings are non-negotiable. Auto-correcting them will be perceived as no
 | Joseph Goats | Jose Goats, Jose | Rebranded from Jose to Joseph Goats |
 | ZOLs | Zols, ZOL | ZAO contribution credits (governance token-adjacent unit) |
 | FISHBOWLZ | Fishbowlz, FishBowlz | All caps |
-| SongJam | Songjam, Song Jam | CamelCase |
-| SANG | Sang, sang | All caps, SongJam's token |
 | ZOE | Zoe, zoe | All caps. ZAO ecosystem concierge bot (`@zaoclaw_bot` on Telegram). |
 | ZABAL | Zabal, zabal | All caps. Umbrella brand (BetterCallZaal's solo projects, pre-incubation). |
 

@@ -82,4 +82,4 @@ After documenting, suggest:
 - ALWAYS ask about links — they make the content real
 - Keep Zaal's voice — this is build-in-public, not corporate PR
 - Say "Farcaster" not "Warpcast"
-- Empire Builder, SongJam, WaveWarZ, Incented, Artizen — always capitalize properly
+- Empire Builder, WaveWarZ, Incented, Artizen — always capitalize properly

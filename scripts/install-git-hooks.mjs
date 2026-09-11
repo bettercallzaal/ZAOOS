@@ -77,6 +77,12 @@ const PREREQS = {
  *
  * Missing hook is a FAIL, not a skip: a gate that vanishes should say so rather
  * than let the commit through quietly (silent-failure-guard rule 3).
+ *
+ * `[ "$hook" -ef "$0" ]` is not POSIX. If a shell lacked -ef, the test would
+ * error, the `if` would read false, and the delegator would fall straight back
+ * into the self-exec loop it guards against. Checked 2026-09-11 on every shell
+ * that runs it: macOS /bin/sh, /bin/dash, and the VPS /bin/sh (dash) all
+ * support it (vault, review of #3475).
  */
 function delegator(hook) {
   return `#!/usr/bin/env sh

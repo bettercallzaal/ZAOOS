@@ -311,3 +311,88 @@ describe('known false positives: a number freed in the same commit', () => {
     expect(res.stderr).toContain('this is a FALSE POSITIVE');
   });
 });
+
+/**
+ * A merge commit's index holds everything BOTH sides brought, so diffing it
+ * against HEAD alone reports every doc the other side added since the branch
+ * point as newly added. Measured on a branch 40 commits behind main: 5 claims
+ * seen, 0 genuinely new, and the commit was refused for numbers main already
+ * held. That made a conflicted merge impossible on any branch behind by doc
+ * work - the exact operation "merge, never rebase" requires.
+ *
+ * Two fixes were proposed and both were wrong. `git merge-base` does not help:
+ * the other side added those docs AFTER the branch point. And exiting early
+ * when MERGE_HEAD exists is FAIL-OPEN, because conflict resolution is an edit -
+ * a doc typed during a merge would skip the gate with no flag and no trace.
+ * The second test below is the one that tells those two apart, and it is why it
+ * is not optional. Fix shape from the dotfiles lane.
+ */
+describe('a merge commit claims only what neither parent already had', () => {
+  /** A conflicted merge where the other side also added a doc. */
+  function merging(): { dir: string; git: (...a: string[]) => string } {
+    const dir = mkdtempSync(join(tmpdir(), 'doc-merge-'));
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    mkdirSync(join(dir, 'research', 'business', '2400-seed'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'base\n');
+    git('add', '-A');
+    git('commit', '-qm', 'base');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+
+    // main adds a doc AFTER the branch point, and edits the shared file
+    mkdirSync(join(dir, 'research', 'agents', '2480-main-added'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'agents', '2480-main-added', 'README.md'), 'x\n');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'main\n');
+    git('add', '-A');
+    git('commit', '-qm', 'main adds 2480 and edits the seed');
+
+    // side edits the same file, so the merge conflicts
+    git('checkout', '-q', 'side');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'side\n');
+    git('add', '-A');
+    git('commit', '-qm', 'side edits the seed');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected: the merge conflicts */
+    }
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'resolved\n');
+    git('add', 'research/business/2400-seed/README.md');
+    return { dir, git };
+  }
+
+  it('does not claim a doc the other parent brought in', () => {
+    const { dir, git } = merging();
+    expect(git('rev-parse', '-q', '--verify', 'MERGE_HEAD').trim()).not.toBe('');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe('');
+    expect(runGate(dir).status).toBe(0);
+  });
+
+  // THE DISCRIMINATING CONTROL. A MERGE_HEAD early-exit passes the test above
+  // and fails this one, letting an unreserved number land during a merge.
+  it('still blocks a doc authored during the conflict resolution', () => {
+    const { dir, git } = merging();
+    mkdirSync(join(dir, 'research', 'business', '2999-authored-in-resolution'), {
+      recursive: true,
+    });
+    writeFileSync(
+      join(dir, 'research', 'business', '2999-authored-in-resolution', 'README.md'),
+      'x\n',
+    );
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe(
+      'research/business/2999-authored-in-resolution/',
+    );
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('not reserved: 2999');
+    // and it must NOT complain about the number the other parent brought
+    expect(res.stderr).not.toContain('2480');
+  });
+});

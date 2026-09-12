@@ -21,7 +21,7 @@
  * via bot/src/hermes/runner.ts dispatchHermesRun() not Task.
  */
 
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { ZOE_DEFAULT_MODEL, ZOE_HARD_MODEL, ZOE_QUICK_MODEL } from './types';
 import type { ZoeContext } from './types';
 
@@ -402,7 +402,7 @@ export async function decomposeGoal(opts: DecomposeOptions): Promise<Decompositi
   const model = pickModel(opts.goal, opts);
   const userPrompt = buildUserPrompt(opts.goal, opts.context);
 
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model,
     prompt: userPrompt,
     cwd: opts.context.workspace_dir,

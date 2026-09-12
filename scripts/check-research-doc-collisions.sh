@@ -108,6 +108,18 @@ if [[ -n "$COLLISIONS" ]]; then
   echo "[doc-collision-guard] BLOCKED - new doc number collides with existing research/:" >&2
   printf "$COLLISIONS\n" >&2
   echo "" >&2
+  # Existing numbers come from `git ls-tree -r HEAD` - the tree BEFORE this
+  # commit. Renames became visible to this gate on 2026-09-12, and that made a
+  # pre-existing assumption load-bearing: a commit that FREES a number and
+  # reuses it in the same commit now reads the freed number as still taken.
+  # Rare, and it fails loud rather than silent, which is the right direction -
+  # but an unexplained false positive is what gets a pre-commit gate commented
+  # out, so it prints its own cause. Found by the vault lane reviewing #3494.
+  echo "If this same commit FREES that number - deletes the doc holding it, or" >&2
+  echo "renames that doc away - this is a FALSE POSITIVE: existing numbers are" >&2
+  echo "read from HEAD, the tree before this commit. Commit the removal first," >&2
+  echo "or split the two changes." >&2
+  echo "" >&2
   echo "Pick the next free number. Recent ceiling:" >&2
   git ls-tree -r HEAD --name-only 2>/dev/null \
     | grep -E '^research/[^_/][^/]*/[0-9]+-' \

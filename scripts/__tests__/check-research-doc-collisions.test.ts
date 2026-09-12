@@ -254,3 +254,60 @@ describe("doc-new-claims.sh --range (the CI guard's selection)", () => {
     expect(claims(dir, '--range', 'main').stdout.trim()).toBe('research/business/2471-renumbered/');
   });
 });
+
+/**
+ * Known false positives this change CREATES, pinned deliberately.
+ *
+ * `EXISTING_NUMS` is read from `git ls-tree -r HEAD` - the tree BEFORE the
+ * commit. Renames were invisible to this gate until 2026-09-12, so that
+ * assumption was never load-bearing for them; making renames visible makes it
+ * load-bearing. A commit that FREES a number and reuses it in the same commit
+ * now reads the freed number as still taken.
+ *
+ * Shipped rather than fixed, on the vault lane's call reviewing #3494: the
+ * rename hole is the real bug, these commits are rare, and the gate fails LOUD
+ * with its own cause printed. These tests exist so the behaviour is documented
+ * rather than discovered, and so the proper fix - subtracting paths deleted or
+ * renamed-away in the same change from EXISTING_NUMS - has a place to flip.
+ * Found by review, not by me.
+ */
+describe('known false positives: a number freed in the same commit', () => {
+  it('blocks reusing a number the same commit deletes, and says why', () => {
+    const { dir, git } = repo();
+    reserve(git, '2400');
+    mkdirSync(join(dir, 'research', 'business', '2399-draft'), { recursive: true });
+    writeFileSync(
+      join(dir, 'research', 'business', '2399-draft', 'README.md'),
+      `${Array.from({ length: 40 }, (_, i) => `line ${i + 1} of the draft`).join('\n')}\n`,
+    );
+    git('add', '-A');
+    git('commit', '-qm', 'add draft');
+    git('rm', '-qr', 'research/business/2400-old-doc');
+    git('mv', 'research/business/2399-draft', 'research/business/2400-final');
+    git('add', '-A');
+
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain("doc 2400: new = 'final', existing = 'old-doc'");
+    // The false positive must carry its own cause. An unexplained one is what
+    // gets a pre-commit gate commented out.
+    expect(res.stderr).toContain('this is a FALSE POSITIVE');
+    expect(res.stderr).toContain('read from HEAD, the tree before this commit');
+  });
+
+  it('blocks a same-commit swap of two numbers, naming both', () => {
+    const { dir, git } = repo();
+    reserve(git, '2400');
+    reserve(git, '2471');
+    git('mv', 'research/business/2400-old-doc', 'research/business/2471-swapped');
+    git('mv', 'research/dev-workflows/2471-existing-doc', 'research/dev-workflows/2400-swapped');
+    git('add', '-A');
+
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    // Both directions read as taken, because both vacating docs are still at HEAD.
+    expect(res.stderr).toContain('doc 2400');
+    expect(res.stderr).toContain('doc 2471');
+    expect(res.stderr).toContain('this is a FALSE POSITIVE');
+  });
+});

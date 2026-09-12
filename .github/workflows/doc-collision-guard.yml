@@ -58,19 +58,25 @@ jobs:
           base="origin/${{ github.base_ref }}"
           git fetch origin "${{ github.base_ref }}" --quiet
 
-          # Only ADDED doc dirs can introduce a NEW collision. A modified doc
-          # cannot, and filtering to additions keeps renames from false-firing.
+          # Which dirs make a NEW CLAIM on a number - shared with the
+          # pre-commit gate, see scripts/doc-new-claims.sh.
           #
-          # Run the git command as its OWN step and check IT failed, so a git
-          # error aborts (fail closed) instead of yielding empty output that the
-          # guard reads as "nothing to check" and passes vacuously
-          # (silent-failure-guard rule 5). grep's expected no-match stays benign
-          # via the inner `|| true` on the grep pipe only.
-          added=$(git diff --name-only --diff-filter=A "$base"...HEAD) \
-            || { echo "::error title=doc-guard git diff failed::cannot compute added files - failing closed"; exit 1; }
-          newdirs=$(printf '%s\n' "$added" \
-            | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
-            | sort -u || true)
+          # This was `--diff-filter=A` inline, with the note "filtering to
+          # additions keeps renames from false-firing". The instinct was right
+          # and the filter was too blunt: a slug-only rename must not fire, but
+          # `git mv research/x/2400-old research/x/2471-new` renumbers a doc ONTO
+          # a taken number and IS a collision - and A drops it, because git
+          # scores it as one R entry. Measured 2026-09-12 on the pre-commit
+          # twin, which had the identical hole. doc-new-claims.sh keeps renames
+          # whose NUMBER changed and drops the ones where only the slug did, so
+          # both properties hold at once. It is unit-tested
+          # (scripts/__tests__/check-research-doc-collisions.test.ts) and one
+          # copy of the rule cannot drift from the other.
+          #
+          # It fails closed on a git error rather than yielding empty output the
+          # guard would read as "nothing to check" (silent-failure-guard rule 5).
+          newdirs=$(bash scripts/doc-new-claims.sh --range "$base") \
+            || { echo "::error title=doc-guard::doc-new-claims failed - cannot compute claimed dirs, failing closed"; exit 1; }
 
           if [ -z "$newdirs" ]; then
             echo "No new research doc directories in this PR. Nothing to check."

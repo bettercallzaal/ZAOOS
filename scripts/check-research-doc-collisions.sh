@@ -21,7 +21,24 @@ if [[ -z "$REPO" || ! -d "$REPO/research" ]]; then
   exit 0
 fi
 
-STAGED=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^research/[^_/][^/]*/[0-9]+-' | head -50)
+# A NEW CLAIM ON A NUMBER IS EITHER AN ADDITION OR A RENUMBERING RENAME.
+#
+# This was `git diff --cached --name-only --diff-filter=A` inline. git detects
+# renames by default, so `git mv research/x/2400-old research/x/2471-new`
+# staged as one R entry that A dropped, and a doc renumbered ONTO a taken
+# number passed this gate with exit 0 - measured 2026-09-12, the one thing the
+# gate exists to stop. The rule for what counts as a claim is shared with the
+# CI guard and lives in doc-new-claims.sh so the two cannot drift; see its
+# header for why this is not just `--diff-filter=ACMR`.
+#
+# It fails closed on a git error, so an empty STAGED means no claims and never
+# "I could not look".
+if ! STAGED=$("$(dirname "${BASH_SOURCE[0]}")/doc-new-claims.sh" --staged); then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - could not read the staged changes, so nothing was checked." >&2
+  exit 1
+fi
+STAGED=$(printf '%s\n' "$STAGED" | head -50)
 if [[ -z "$STAGED" ]]; then
   exit 0
 fi

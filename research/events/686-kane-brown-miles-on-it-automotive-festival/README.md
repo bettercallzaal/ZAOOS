@@ -2,7 +2,7 @@
 topic: events
 type: market-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-10
 related-docs: 547
 tier: STANDARD
 ---
@@ -54,6 +54,18 @@ The attendees are not spectators - they **bring their builds and compete**. The 
 1. **Participation beats spectation.** The strongest idea here is attendees-as-program. ZAO's community are builders; a future ZAO event could center a build/hack showcase where members bring work and compete - the music is the soundtrack, not the only act.
 2. **The founder as prize presenter is a real role.** Kane Brown is not on stage all day - he is the recurring presence handing out recognition. Zaal can occupy that exact role at a ZAO event without having to perform.
 3. **A passion adjacency can expand the audience.** Kane Brown reached gearheads via country music. ZAO's adjacency is the builder/web3/AI crowd - an event themed on that passion (not just music) widens the funnel beyond musicians, matching the doc 678/12-month "primitive toolkit for any digital creator" framing.
+
+## Updated 2026-09-10
+
+The automotive+music hybrid festival model described here has expanded materially since the May 2026 validation. Three parallel players confirm the model is now a mainstream event format, not an isolated Kane Brown experiment:
+
+- **FuelFest 2026 World Tour** - Most expansive calendar to date: new markets in Qatar, London, Southern California, and Chicago, plus six returning U.S. stops (New Jersey, Tampa, Bay Area, South Florida, and more). Celebrity appearances from Tyrese Gibson, Cody Walker, and Jason Statham; concert finale headlined by Busta Rhymes and Ludacris. Since 2018, FuelFest has raised $785,000+ for the Reach Out WorldWide charity. Source: [FuelFest 2026 press release](https://fuelfest.com/official-press-release-2026/), [NJMP listing](https://njmp.com/new-jersey-listed-on-the-fuelfest-2026-world-tour-schedule/), [Qatar Living](https://www.qatarliving.com/en/article/what-to-expect-at-fuelfest-qatar-2026)
+- **SEMA Fest 2026** - November 6, Las Vegas Convention Center. Headlined by The Offspring, with Jimmy Eat World, 311, and The Alive. Format: explore 2,000+ exhibitor SEMA Show floor → SEMA Cruise → motorsports demos → Fest Stage concert. All ages. Source: [SEMA press release](https://www.sema.org/news-media/press-release/sema-fest-announces-2026-musical-lineup-featuring-offspring-jimmy-eat), [Music Festival Wizard](https://www.musicfestivalwizard.com/festivals/sema-fest-2026/)
+- **Monterey Motorsports Festival** - August 15, 2026. Explicitly using viral social media celebrities (DJ duo SIDEQUEST) rather than mainstream artists, targeting younger demographics. Their stated framing: "the path to fandom no longer begins and ends with a wrench in hand or a poster on the wall." This is the most strategically relevant signal for ZAO: the model has already evolved toward creator/influencer talent as the draw, not just country stars. Source: [PR Newswire announcement](https://www.prnewswire.com/news-releases/monterey-motorsports-festival-announces-2026-entertainment-lineup-headlined-by-viral-dj-duo-sidequest-302810259.html)
+
+**No post-event recap or winner data found** for the Miles On It Tour itself (Apr 10-11, 2026). Coverage appears to have stayed on social channels (Instagram/Facebook). No 2027 edition has been announced as of 2026-09-10.
+
+**Strategic update for ZAO:** The Monterey Motorsports Festival's pivot to internet-native talent confirms that the creator/builder adjacency framing in this doc is not hypothetical - it is already the next stage of the model, actively running. The "ZAO builder/web3/AI community + creator talent" angle has a direct current-year analogue.
 
 ## Staleness Notes
 

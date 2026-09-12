@@ -21,6 +21,69 @@ REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 [[ -z "$REPO" ]] && exit 0
 cd "$REPO" || exit 0
 
+# MID-MERGE: A LINE IS NEWLY AUTHORED ONLY IF IT IS ABSENT FROM BOTH PARENTS.
+#
+# `git diff --cached` compares the index against HEAD alone. In a merge commit
+# the index holds everything BOTH sides brought, so every line the OTHER parent
+# contributed reads as newly added and this gate refuses the commit over content
+# already on main that nobody in the merge wrote.
+#
+# Same bug, same shape, as check-research-doc-collisions.sh (#3498) and
+# git-pii-scan.py (#3502). Found here the way both of those were found: by being
+# blocked by it. Third of five gates - zao-claims-check (zaal-dotfiles) and
+# check-research-index.sh still have it.
+#
+# Two fixes were tried on the doc gate and both were wrong, recorded so they are
+# not re-derived. `git merge-base` does not help: the other side added its content
+# AFTER the branch point, so it is in that diff too. And exiting early when
+# MERGE_HEAD exists is FAIL-OPEN - conflict resolution is an edit, so a secret
+# typed while resolving would skip a security gate entirely, which is
+# `--no-verify` with no flag and no trace.
+#
+# Intersecting the two parents' diffs is exact. The other side's content is in
+# MERGE_HEAD so it never enters that set; ours is in HEAD so it never enters the
+# first; content authored during the resolution is in neither, enters both, and
+# is still caught.
+MERGING=""
+if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then MERGING=1; fi
+
+# Added lines as PATH<TAB>LINE, so the intersection below compares a line IN THE
+# FILE IT BELONGS TO.
+#
+# HONEST SCOPE. I expected bare text to allow a false pass - the other parent's
+# `+FOO` in one file cancelling a genuinely new `+FOO` in another - and wrote a
+# control for it. THE CONTROL DID NOT GO RED: a file created during the
+# resolution is new relative to MERGE_HEAD as well, so its lines are always in
+# that set and cannot be cancelled. I could not construct a case where the two
+# spellings differ in outcome. Path-tagging is kept because comparing a line in
+# the file it belongs to is the right comparison and costs one awk, NOT because
+# it is a demonstrated guard. Stated here so nobody later reads it as one.
+added_rows() { # $@ = extra args to git diff (e.g. MERGE_HEAD)
+  git diff --cached --diff-filter=ACMR -U0 "$@" 2>/dev/null | awk '
+    /^\+\+\+ / { path = substr($0, 7); next }          # "+++ b/path"
+    /^\+/        { print path "\t" substr($0, 2) }
+  '
+}
+
+# Keep only what is also new relative to MERGE_HEAD.
+#
+# FAILS CLOSED, and this is the most important line in the file. If the
+# MERGE_HEAD read fails OR genuinely returns nothing, the input is returned
+# UNFILTERED - today's behaviour. An empty `theirs` intersected with anything is
+# empty, so treating a failed read as "the other parent added nothing" would pass
+# EVERY line, and a conflicted merge is exactly when git is likeliest to be in an
+# odd state. Erring this way can only ever over-report.
+narrow_to_both_parents() { # stdin = ours (already normalised); "$@" = theirs cmd
+  local ours theirs
+  ours=$(cat)
+  if [[ -z "$MERGING" || -z "$ours" ]]; then printf '%s\n' "$ours"; return 0; fi
+  if ! theirs=$("$@") || [[ -z "$theirs" ]]; then
+    printf '%s\n' "$ours"   # cannot tell "added nothing" from "read failed"
+    return 0
+  fi
+  comm -12 <(printf '%s\n' "$ours" | sort -u) <(printf '%s\n' "$theirs" | sort -u)
+}
+
 # The filter must include R. `--diff-filter=ACM` means Added/Copied/Modified and
 # EXCLUDES Renamed, and git detects a rename by default (diff.renames is on since
 # 2.9). So `git mv old new` plus an edit in the same commit stages as a single R
@@ -43,6 +106,8 @@ if ! STAGED_NAMES=$(git diff --cached --name-only --diff-filter=ACMR 2>&1); then
   echo "This gate fails CLOSED. Fix the repository state and commit again." >&2
   exit 1
 fi
+STAGED_NAMES=$(printf '%s\n' "$STAGED_NAMES" | narrow_to_both_parents \
+  git diff --cached --name-only --diff-filter=ACMR MERGE_HEAD)
 ENV_STAGED=$(printf '%s\n' "$STAGED_NAMES" \
   | grep -E '(^|/)\.env($|\.local$|\.production$)' || true)
 if [[ -n "$ENV_STAGED" ]]; then
@@ -65,7 +130,10 @@ if ! RAW_DIFF=$(git diff --cached --diff-filter=ACMR -U0 2>&1); then
   echo "This gate fails CLOSED. Fix the repository state and commit again." >&2
   exit 1
 fi
-DIFF=$(printf '%s\n' "$RAW_DIFF" | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+# Path-tagged on BOTH sides so the two sets are the same spelling of the same
+# thing, then the tag is stripped back off so the patterns below see plain lines
+# and cannot match a file path.
+DIFF=$(added_rows | narrow_to_both_parents added_rows MERGE_HEAD | cut -f2- || true)
 [[ -z "$DIFF" ]] && exit 0
 
 HITS=""

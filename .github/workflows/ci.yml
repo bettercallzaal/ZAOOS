@@ -93,6 +93,23 @@ jobs:
 
       - run: npm test
 
+      # `npm test` runs the ROOT vitest config, whose include is
+      # src/** plus scripts/** - so nothing under tools/ has ever been executed
+      # by CI. tools/estate-control-plane/__tests__/checks.test.ts was written,
+      # passing, and never run here; running it by hand was the only thing that
+      # had ever run it (zaoos-review, #3458 review).
+      #
+      # That matters most for the crash test added in #3458, whose entire job is
+      # to stop a future refactor silently restoring a check that scores clean
+      # when it could not run. A test nobody executes cannot stop anything, and
+      # this is silent-failure-guard's never-ran-tests incident in a new
+      # directory.
+      #
+      # It gets its own step rather than a widened root include because the tool
+      # has its own config: node environment, no jsdom setup file.
+      - name: Estate control plane tests (own vitest config, node env)
+        run: npx vitest run --config tools/estate-control-plane/vitest.config.ts
+
   bot-test:
     name: Bot Tests
     runs-on: ubuntu-latest

@@ -176,22 +176,42 @@ DROP POLICY IF EXISTS "volunteers_authenticated_all" ON volunteers;
 -- ============================================================================
 -- Verification: Policies after hardening
 -- ============================================================================
+-- COLUMN NAMES FIXED 2026-09-12. This read used table_name / policy_name /
+-- action. `pg_policies` has schemaname, tablename, policyname, permissive,
+-- roles, qual, with_check - measured against the live project, which answers
+-- `ERROR: 42703: column "table_name" does not exist`.
+--
+-- WHY THAT WAS NOT COSMETIC. The statement sits INSIDE the transaction opened
+-- above, after the 13 DROPs. A statement error aborts the transaction, so the
+-- COMMIT below became a ROLLBACK and NOT ONE POLICY WAS DROPPED - while the
+-- operator saw something that reads like a verification hiccup rather than a
+-- change that did not happen. Green while broken, in the script whose job is to
+-- close the hole. Found by the zaoos-review lane, confirmed by vault against
+-- the live project, re-granted by Zaal as "Fix it, review it, then apply".
+--
+-- STILL WORTH KNOWING, and deliberately NOT changed here because the grant is
+-- for a column-name fix: a verification query inside the transaction it
+-- verifies can only ever destroy what it was checking. Correct column names
+-- remove today's failure, not the shape of it. Moving this read AFTER the
+-- COMMIT would - the DROPs are `IF EXISTS`, so re-reading costs nothing. That
+-- is vault's argument and it is a separate decision.
 SELECT
-  table_name,
-  policy_name,
-  action,
+  tablename,
+  policyname,
+  cmd,
   roles,
   qual as using_clause,
   with_check
 FROM pg_policies
-WHERE table_name IN (
+WHERE schemaname = 'public'
+  AND tablename IN (
   'activity_log', 'artists', 'budget_entries', 'circle_members', 'circles',
   'contact_log', 'goals', 'meeting_notes', 'sponsors', 'suggestions',
   'tasks', 'team_members', 'volunteers'
 )
-ORDER BY table_name, action, policy_name;
+ORDER BY tablename, cmd, policyname;
 
--- Expected result: NO rows with action='ALL' and roles='authenticated' and qual='true'
+-- Expected result: NO rows with cmd='ALL' and roles={authenticated} and qual='true'
 -- (The hardening has removed those.) Remaining policies should be:
 -- - Service role full access (if kept) or
 -- - Scoped authenticated SELECT (if reads are needed)

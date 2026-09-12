@@ -193,7 +193,7 @@ describe("doc-new-claims.sh --range (the CI guard's selection)", () => {
 
     const res = claims(dir, '--range', 'main');
     expect(res.status).toBe(0);
-    expect(res.stdout.trim()).toBe('research/business/2471-renumbered/');
+    expect(res.stdout.trim()).toBe('research/business/2471-renumbered');
   });
 
   it('reports nothing for a slug-only rename', () => {
@@ -216,7 +216,7 @@ describe("doc-new-claims.sh --range (the CI guard's selection)", () => {
     git('commit', '-qm', 'add');
 
     const res = claims(dir, '--range', 'main');
-    expect(res.stdout.trim()).toBe('research/business/2500-new-doc/');
+    expect(res.stdout.trim()).toBe('research/business/2500-new-doc');
   });
 
   it('fails closed when git cannot answer, instead of printing nothing', () => {
@@ -251,7 +251,7 @@ describe("doc-new-claims.sh --range (the CI guard's selection)", () => {
     );
 
     expect(spawnSync('bash', [preFix, dir], { encoding: 'utf8' }).stdout.trim()).toBe('');
-    expect(claims(dir, '--range', 'main').stdout.trim()).toBe('research/business/2471-renumbered/');
+    expect(claims(dir, '--range', 'main').stdout.trim()).toBe('research/business/2471-renumbered');
   });
 });
 
@@ -313,7 +313,7 @@ describe('known false positives: a number freed in the same commit', () => {
 });
 
 /**
- * A numbered doc is a DIRECTORY, not a filename that starts with digits.
+ * A dated filename is not a doc number.
  *
  * The first version of doc-new-claims.sh excluded underscore META dirs
  * (research/_radar, _archive, _handoffs) but had no directory requirement, so
@@ -321,10 +321,12 @@ describe('known false positives: a number freed in the same commit', () => {
  * ordinary topic dir, nine of them on main - parsed as a claim on doc number
  * 2026 and the BLOCKING pre-commit gate refused the commit with "doc number(s)
  * not reserved: 2026". A false positive on the ordinary case, in a gate that
- * stops a commit. Regression introduced 2026-09-12 by #3494, found the same day
- * while chasing why every radar PR was being held.
+ * stops a commit. Regression introduced 2026-09-12 by #3494, found the same day.
+ *
+ * The first attempt at this fix required a DIRECTORY, which was true of the
+ * convention and false of main - see the bare-file describe below.
  */
-describe('a doc number comes from a directory, not from a dated filename', () => {
+describe('a dated filename is not a doc number', () => {
   it('does not claim a date-named file in an ordinary topic dir', () => {
     const { dir, git } = repo();
     mkdirSync(join(dir, 'research', 'inspiration'), { recursive: true });
@@ -356,7 +358,7 @@ describe('a doc number comes from a directory, not from a dated filename', () =>
     writeFileSync(join(dir, 'research', 'business', '2500-a-real-doc', 'README.md'), 'x\n');
     git('add', '-A');
 
-    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2500-a-real-doc/');
+    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2500-a-real-doc');
     const res = runGate(dir);
     expect(res.status).toBe(1);
     expect(res.stderr).toContain('not reserved: 2500');
@@ -371,6 +373,78 @@ describe('a doc number comes from a directory, not from a dated filename', () =>
     );
     git('add', '-A');
 
-    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2501-nested/');
+    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2501-nested');
+  });
+});
+
+/**
+ * Ten real numbered docs on main are bare FILES under ordinary topics, not
+ * directories - research/music/757-web3-audio-video-streaming-landscape.md and
+ * nine others. An earlier version of this fix required a directory, which
+ * skipped all ten: it closed a false positive by opening a FALSE NEGATIVE on
+ * the auto-merge path, where a missed claim merges a duplicate number with
+ * nobody present. 757 is already duplicated inside those ten
+ * (agents/757-poidh-sentinel and music/757-web3-audio), so a third claim on 757
+ * would have passed silently. Caught by the vault lane reviewing #3497.
+ */
+describe('a numbered doc may be a bare file, not only a directory', () => {
+  it('claims a bare-file doc under an ordinary topic', () => {
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'music'), { recursive: true });
+    writeFileSync(
+      join(dir, 'research', 'music', '757-web3-audio-video-streaming-landscape.md'),
+      'x\n',
+    );
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe(
+      'research/music/757-web3-audio-video-streaming-landscape.md',
+    );
+  });
+
+  it('still claims a doc numbered 2026 when its slug is not a date', () => {
+    // The date rule excludes a NAME shaped YYYY-MM-DD, not the number 2026.
+    // The library is past 2400, so it will reach 2026-as-a-doc-number.
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'business', '2026-a-real-doc-number'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'business', '2026-a-real-doc-number', 'README.md'), 'x\n');
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2026-a-real-doc-number');
+  });
+
+  /**
+   * The seam's output contract, asserted here rather than re-checked by each
+   * caller. docs-automerge.yml used to re-filter this output through a SECOND
+   * regex, and that duplicate is exactly what drifted - the two disagreed about
+   * whether research/_radar is a topic dir. A caller may now use what the seam
+   * says without restating the rule, because this is where the shape is held.
+   */
+  it('every emitted line is research/<topic>/<number>-<slug>, one per doc', () => {
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'music'), { recursive: true });
+    mkdirSync(join(dir, 'research', 'business', '2500-a-dir', 'assets'), { recursive: true });
+    mkdirSync(join(dir, 'research', '_radar'), { recursive: true });
+    mkdirSync(join(dir, 'research', 'inspiration'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'music', '651-a-bare-file.md'), 'x\n');
+    writeFileSync(join(dir, 'research', 'business', '2500-a-dir', 'README.md'), 'x\n');
+    writeFileSync(
+      join(dir, 'research', 'business', '2500-a-dir', 'assets', 'chart.svg'),
+      '<svg/>\n',
+    );
+    writeFileSync(join(dir, 'research', '_radar', '2026-09-12.md'), 'x\n');
+    writeFileSync(join(dir, 'research', 'inspiration', '2026-09-12.md'), 'x\n');
+    git('add', '-A');
+
+    const lines = claims(dir, '--staged').stdout.trim().split('\n').filter(Boolean);
+    for (const l of lines) {
+      expect(l).toMatch(/^research\/[^_/][^/]*\/[0-9]+-[^/]+$/);
+      expect(l).not.toMatch(/\/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
+    }
+    // the multi-file directory claims once, and the two dated files claim nothing
+    expect(lines.sort()).toEqual([
+      'research/business/2500-a-dir',
+      'research/music/651-a-bare-file.md',
+    ]);
   });
 });

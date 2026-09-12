@@ -524,7 +524,7 @@ describe('a merge commit claims only what neither parent already had', () => {
     git('add', '-A');
 
     expect(claims(dir, '--staged').stdout.trim()).toBe(
-      'research/business/2999-authored-in-resolution/',
+      'research/business/2999-authored-in-resolution',
     );
     const res = runGate(dir);
     expect(res.status).toBe(1);

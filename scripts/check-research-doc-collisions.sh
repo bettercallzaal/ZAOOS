@@ -39,6 +39,34 @@ if ! STAGED=$("$(dirname "${BASH_SOURCE[0]}")/doc-new-claims.sh" --staged); then
   exit 1
 fi
 STAGED=$(printf '%s\n' "$STAGED" | head -50)
+# A MERGE CAN CREATE A DUPLICATE THAT NEITHER SIDE AUTHORED.
+#
+# The checks above ask what THIS change claims, and a concurrent claim is
+# invisible to that question by construction: two branches each claim 2480 with
+# different slugs, each one's own pre-commit run correctly saw 2480 free, and the
+# merge is what puts both on disk. Absent from neither parent - present in both.
+#
+# Scoped to numbers this merge touched: 221 numbers on main already hold more
+# than one directory (the pre-band duplicates COLLISION_TOLERANCE.md tolerates),
+# so a whole-tree scan would fire on every commit and be ignored. Measured: an
+# inherited duplicate this merge did not touch is silent; the same number
+# touched by the merge speaks. Found by the vault lane reviewing #3498.
+if ! MERGE_DUPES=$("$(dirname "${BASH_SOURCE[0]}")/doc-new-claims.sh" --merge-duplicates); then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - could not check the merged result for duplicate numbers." >&2
+  exit 1
+fi
+if [[ -n "$MERGE_DUPES" ]]; then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - this merge puts one doc number on two docs:" >&2
+  printf '%s\n' "$MERGE_DUPES" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "Neither side is wrong: each claimed the number while it was free, and the" >&2
+  echo "merge is what created the duplicate. Renumber ONE of them - the later" >&2
+  echo "claim by convention - and rename its directory and its '# NNNN -' heading." >&2
+  exit 1
+fi
+
 if [[ -z "$STAGED" ]]; then
   exit 0
 fi

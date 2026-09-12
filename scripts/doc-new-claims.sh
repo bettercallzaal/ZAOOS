@@ -100,6 +100,93 @@ case "${1:-}" in
             if [[ -z "$base" ]]; then echo "doc-new-claims: --range needs a base ref" >&2; exit 2; fi
             NAME_ONLY=(git diff --name-only --diff-filter=A "$base...HEAD")
             NAME_STATUS=(git diff --name-status --diff-filter=R "$base...HEAD") ;;
+  --merge-duplicates)
+            # A THIRD QUESTION: what does the MERGED RESULT contain twice?
+            #
+            # "What did this commit author" is answered by --staged, and it
+            # cannot see this case. Two branches can each claim the same number
+            # independently, with different slugs, and each one's own pre-commit
+            # run correctly saw that number free at the time. Neither side is
+            # wrong; the MERGE creates the duplicate. So it is absent from
+            # neither parent - it is present in BOTH - and the intersection is
+            # empty by construction:
+            #
+            #   added vs HEAD        research/business/2480-main-thing/…
+            #   added vs MERGE_HEAD  research/business/2480-branch-thing/…
+            #   intersection         (empty)
+            #   merged index         BOTH directories, numbered 2480
+            #
+            # That is the case a reservation gate exists for - #1073 duplicating
+            # 964 is the same shape - and it is the one a merge uniquely
+            # produces. Found by the vault lane reviewing #3498.
+            #
+            # RESTRICTED TO NUMBERS THIS MERGE TOUCHED, deliberately. A
+            # whole-tree duplicate scan fires constantly: 221 numbers on main
+            # already have more than one directory, the pre-band duplicates that
+            # research/COLLISION_TOLERANCE.md exists to tolerate. A check that
+            # fires on every commit is a check nobody reads
+            # (noisy-signal-guard.md), so this looks only at numbers either side
+            # added in THIS merge.
+            #
+            # Silent when not merging, and silent on a single claim.
+            if [[ -z "$MERGING" ]]; then exit 0; fi
+
+            # SAME RULE AS --staged, BOTH TIMES. The two earlier bugs here were
+            # both this rule applied unevenly (zorca, reviewing #3500):
+            #
+            #  1. FALSE BLOCK. `nums` applied DOC_RE but not DATE_RE while the
+            #     claims path applied both, so the nine dated logs in
+            #     research/inspiration/2026-04-0*.md all read as doc 2026. Any
+            #     merge adding one more put 2026 in `touched`, found nine
+            #     "holders", and blocked a daily log with advice to renumber it.
+            #  2. FALSE PASS, and the worse one. `touched` came from
+            #     --diff-filter=A only, so two branches that each RENAMED a doc
+            #     onto 2480 produced an empty `touched` and a clean exit with two
+            #     2480 directories in the merged index. That is the rename
+            #     blindness #3444 and #3494 fixed elsewhere - and THE GATE'S OWN
+            #     REMEDIATION IS A RENAME, so two people following its advice on
+            #     the same number create exactly the input it cannot see.
+            #
+            # A claim against a parent is therefore an addition OR a rename whose
+            # NUMBER changed, date-named files excluded - identical to --staged.
+            claims_against() {
+              local base="$1" added renamed
+              added=$(git diff --cached --name-only --diff-filter=A "$base") || return 1
+              renamed=$(git diff --cached --name-status --diff-filter=R "$base") || return 1
+              printf '%s\n' "$added"
+              printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" -v dre="$DATE_RE" '
+                $3 ~ re && $3 !~ dre {
+                  newnum = $3; sub(/^research\/[^\/]+\//, "", newnum); sub(/-.*$/, "", newnum)
+                  oldnum = ""
+                  if ($2 ~ re && $2 !~ dre) {
+                    oldnum = $2; sub(/^research\/[^\/]+\//, "", oldnum); sub(/-.*$/, "", oldnum)
+                  }
+                  if (oldnum != newnum) print $3
+                }'
+            }
+            nums() { grep -E "$DOC_RE" | grep -vE "$DATE_RE" | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' | sort -u; }
+            if ! ours=$(claims_against HEAD) || ! theirs=$(claims_against MERGE_HEAD); then
+              echo "doc-new-claims: cannot read the merge diffs - failing closed" >&2
+              exit 1
+            fi
+            touched=$(printf '%s\n%s\n' "$ours" "$theirs" | nums)
+            [[ -z "$touched" ]] && exit 0
+            if ! tracked=$(git ls-files 2>&1); then
+              echo "doc-new-claims: cannot list the merged index - failing closed" >&2
+              exit 1
+            fi
+            identities=$(printf '%s\n' "$tracked" \
+              | grep -E "$DOC_RE" \
+              | grep -vE "$DATE_RE" \
+              | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
+              | sort -u)
+            for n in $touched; do
+              held=$(printf '%s\n' "$identities" | grep -E "^research/[^/]+/${n}-" | sort -u)
+              if [[ $(printf '%s\n' "$held" | grep -c .) -gt 1 ]]; then
+                printf 'DUPLICATE %s -> %s\n' "$n" "$(printf '%s\n' "$held" | tr '\n' ' ')"
+              fi
+            done
+            exit 0 ;;
   --existing)
             # WHAT NUMBERS ARE ALREADY TAKEN, read from a list of repo paths on
             # stdin. A SEPARATE QUESTION from "what does this change claim", and
@@ -123,7 +210,7 @@ case "${1:-}" in
               | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
               | sort -u
             exit 0 ;;
-  *)        echo "usage: doc-new-claims.sh --staged | --range <base> | --existing (paths on stdin)" >&2; exit 2 ;;
+  *)        echo "usage: doc-new-claims.sh --staged | --range <base> | --existing (paths on stdin) | --merge-duplicates" >&2; exit 2 ;;
 esac
 
 # Capture BEFORE filtering. Reading a status through `git ... | grep` reports

@@ -469,6 +469,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           // write back a count computed before the reconcile settled. A private
           // lock would make reconcile safe against itself and leave that race
           // open.
+          //
+          // THAT CHOICE DEPENDS ON A NUMBER, so here it is. tick-lock.ts has
+          // DEFAULT_STALE_MS = 30 minutes and NO HEARTBEAT: the lock is stamped
+          // once at acquisition (tick-lock.ts:144) and never refreshed while the
+          // callback runs, so "stale" means STARTED over 30 minutes ago, not
+          // dead. If the batch could ever run that long, a reconcile tick would
+          // break the lock and run beside a live batch - the exact lost update
+          // the shared lock was chosen to prevent, and WORSE than a private lock,
+          // because a private lock never claims to exclude the batch while a
+          // shared-but-breakable one does. Raised by the vault lane reviewing
+          // this PR; the failure would be silent and green, like the claimFire
+          // guard above it.
+          //
+          // Measured from the VPS journal, 2026-09-06 to 2026-09-12, batch start
+          // to "batch complete": 2s, 3s, 21s, 23s, 12s, 16s. WORST 23 SECONDS
+          // against an 1800-second window, ~78x margin. The four longest are all
+          // `sent 10`, which is the batch CAP - so the full-batch case is the
+          // worst SHAPE, not a lucky sample, and the runtime cannot grow with the
+          // backlog. Reconcile itself settled 27 board-closed + 15 verdict-synced
+          // in under a second on 2026-09-12.
+          //
+          // So the shared lock is safe today by a wide margin. What would change
+          // that is the CAP, not the queue: raise the batch cap far enough, or
+          // give a send a long retry, and this comment needs re-measuring. It is
+          // the cap that bounds it, which is why the number is written down here
+          // rather than left as "batches are quick".
           await withTickLock(join(ZOE_PATHS.home, 'backlog-grill.tick.lock'), async () =>
             runReconcileOnly({}),
           );

@@ -311,3 +311,75 @@ describe('known false positives: a number freed in the same commit', () => {
     expect(res.stderr).toContain('this is a FALSE POSITIVE');
   });
 });
+
+/**
+ * "What does this change CLAIM" and "what numbers ALREADY EXIST" are two
+ * questions that look like one, and answering them with a single rule is how 75
+ * taken numbers nearly got reported as free.
+ *
+ *   claims   - research/_archive/900-x is NOT a new claim. Moving a doc into
+ *              the archive reserves nothing.
+ *   existing - research/_archive/900-x DOES hold 900. An archived doc still
+ *              owns its number; 75 numbers on main are held ONLY by _archive.
+ *
+ * They agree on one thing: a date-named file is not a doc. Without that, 22
+ * research/_radar/YYYY-MM-DD paths and 3 _handoffs ones parse as doc number
+ * 2026, and a legitimate new doc claiming 2026 is refused - measured against
+ * the real main tree, and the reason this fix shipped rather than staying a
+ * finding.
+ */
+describe('doc-new-claims.sh --existing: what numbers are already taken', () => {
+  const existing = (paths: string[]) =>
+    spawnSync('bash', [SEAM, '--existing'], {
+      input: `${paths.join('\n')}\n`,
+      encoding: 'utf8',
+      timeout: 20000,
+    });
+
+  it('an ARCHIVED doc still holds its number', () => {
+    // The case that makes this a different question from claims. Excluding
+    // underscore topics here would report 001 as free and auto-merge a
+    // duplicate of the archived original.
+    const res = existing(['research/_archive/001-farcaster-protocol/README.md']);
+    expect(res.stdout.trim()).toBe('research/_archive/001-farcaster-protocol');
+  });
+
+  it('a date-named file in a meta dir holds no number', () => {
+    const res = existing([
+      'research/_radar/2026-09-12.md',
+      'research/_handoffs/2026-05-07-a-handoff.md',
+    ]);
+    expect(res.stdout.trim()).toBe('');
+  });
+
+  it('a date-named file in an ordinary topic holds no number either', () => {
+    expect(existing(['research/inspiration/2026-04-01.md']).stdout.trim()).toBe('');
+  });
+
+  it('a real doc holds its number whether it is a directory or a bare file', () => {
+    const res = existing([
+      'research/agents/2480-a-dir/README.md',
+      'research/music/757-a-bare-file.md',
+    ]);
+    expect(res.stdout.trim().split('\n').sort()).toEqual([
+      'research/agents/2480-a-dir',
+      'research/music/757-a-bare-file.md',
+    ]);
+  });
+
+  // The control that decides whether the fix was worth shipping: a new doc
+  // numbered 2026 is refused today purely because dated files pollute the set.
+  it('frees a number that only date-named files were holding', () => {
+    const polluted = [
+      'research/_radar/2026-07-15.md',
+      'research/_handoffs/2026-05-07-a-handoff.md',
+      'research/inspiration/2026-04-01.md',
+    ];
+    const held = existing(polluted).stdout.trim();
+    expect(held).toBe('');
+    // ...while a genuine holder of 2026 is still reported
+    expect(
+      existing([...polluted, 'research/business/2026-a-real-doc/README.md']).stdout.trim(),
+    ).toBe('research/business/2026-a-real-doc');
+  });
+});

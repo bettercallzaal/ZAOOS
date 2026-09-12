@@ -65,3 +65,64 @@ describe('readLaneSnapshot', () => {
     expect(await readLaneSnapshot(bad)).toBeNull();
   });
 });
+
+describe('a lane over the compact line wants Zaal whatever else it is doing', () => {
+  // 'ctx-critical' used to be a STATE and this renderer keyed off it.
+  // zaal-dotfiles #212 split criticality into its own field, and this file was
+  // the THIRD boundary the string crossed after the classifier and the push
+  // payload. Until all three moved, the phone silently stopped surfacing the
+  // lanes that most need him.
+  const snap = (rows: Partial<LaneRow>[]): LaneSnapshot => ({
+    at: 1_000_000,
+    host: 'mac',
+    rows: rows.map((r) => ({
+      rank: 0, state: 'waiting', title: 't', repo: 'r', ctx: null, question: '', ...r,
+    })) as LaneRow[],
+  });
+
+  it('surfaces a lane that is WAITING but critical', () => {
+    const out = renderLanes(snap([{ title: 'vault', state: 'waiting', ctx: 86, critical: true }]), 1_000_000);
+    expect(out).toContain('WANT YOU (1)');
+    expect(out).toContain('vault 86% [context full]');
+    expect(out).not.toContain('IDLE AT A PROMPT');
+  });
+
+  it('surfaces a lane that is WORKING but critical, and does not also list it as working', () => {
+    const out = renderLanes(snap([{ title: 'zorca', state: 'working', ctx: 92, critical: true }]), 1_000_000);
+    expect(out).toContain('WANT YOU (1)');
+    expect(out).not.toContain('WORKING (1)');
+  });
+
+  it('an asking lane keeps its own label rather than the critical one', () => {
+    const out = renderLanes(snap([
+      { title: 'fin', state: 'asked-question', ctx: 88, critical: true, question: 'which card?' },
+    ]), 1_000_000);
+    expect(out).toContain('fin 88% [asked]: which card?');
+  });
+
+  // The control: without this, every lane would look urgent.
+  it('a quiet lane below the line is not surfaced', () => {
+    const out = renderLanes(snap([{ title: 'calm', state: 'waiting', ctx: 40, critical: false }]), 1_000_000);
+    expect(out).toContain('Nothing is waiting on you.');
+    expect(out).toContain('IDLE AT A PROMPT (1)');
+  });
+
+  // THIS TEST WAS WRONG AND IT WAS THE ONE GUARDING THIS EXACT CASE.
+  // It used {state: 'waiting', ctx: 86, no critical} and called that "an older
+  // Mac". That is what an old Mac sends for a NON-critical lane. For a critical
+  // one a pre-#212 Mac sends state 'ctx-critical', because that is what the old
+  // classifier wrote and the payload passed through untouched. So the assertion
+  // was right about what it named and wrong about what it meant to check, and it
+  // wrote the silent loss down as correct behaviour (vault, #3496 review).
+  it('an OLD Mac sending state ctx-critical is still surfaced', () => {
+    const out = renderLanes(snap([{ title: 'vault', state: 'ctx-critical', ctx: 86 }]), 1_000_000);
+    expect(out).toContain('WANT YOU (1)');
+    expect(out).toContain('vault 86% [context full]');
+    expect(out).not.toContain('OTHER');
+  });
+
+  it('an old Mac sending a quiet lane is still not surfaced', () => {
+    const out = renderLanes(snap([{ title: 'old', state: 'waiting', ctx: 86 }]), 1_000_000);
+    expect(out).toContain('Nothing is waiting on you.');
+  });
+});

@@ -124,9 +124,42 @@ case "${1:-}" in
             #
             # Silent when not merging, and silent on a single claim.
             if [[ -z "$MERGING" ]]; then exit 0; fi
-            nums() { grep -E "$DOC_RE" | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' | sort -u; }
-            if ! ours=$(git diff --cached --name-only --diff-filter=A HEAD 2>&1) \
-               || ! theirs=$(git diff --cached --name-only --diff-filter=A MERGE_HEAD 2>&1); then
+
+            # SAME RULE AS --staged, BOTH TIMES. The two earlier bugs here were
+            # both this rule applied unevenly (zorca, reviewing #3500):
+            #
+            #  1. FALSE BLOCK. `nums` applied DOC_RE but not DATE_RE while the
+            #     claims path applied both, so the nine dated logs in
+            #     research/inspiration/2026-04-0*.md all read as doc 2026. Any
+            #     merge adding one more put 2026 in `touched`, found nine
+            #     "holders", and blocked a daily log with advice to renumber it.
+            #  2. FALSE PASS, and the worse one. `touched` came from
+            #     --diff-filter=A only, so two branches that each RENAMED a doc
+            #     onto 2480 produced an empty `touched` and a clean exit with two
+            #     2480 directories in the merged index. That is the rename
+            #     blindness #3444 and #3494 fixed elsewhere - and THE GATE'S OWN
+            #     REMEDIATION IS A RENAME, so two people following its advice on
+            #     the same number create exactly the input it cannot see.
+            #
+            # A claim against a parent is therefore an addition OR a rename whose
+            # NUMBER changed, date-named files excluded - identical to --staged.
+            claims_against() {
+              local base="$1" added renamed
+              added=$(git diff --cached --name-only --diff-filter=A "$base") || return 1
+              renamed=$(git diff --cached --name-status --diff-filter=R "$base") || return 1
+              printf '%s\n' "$added"
+              printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" -v dre="$DATE_RE" '
+                $3 ~ re && $3 !~ dre {
+                  newnum = $3; sub(/^research\/[^\/]+\//, "", newnum); sub(/-.*$/, "", newnum)
+                  oldnum = ""
+                  if ($2 ~ re && $2 !~ dre) {
+                    oldnum = $2; sub(/^research\/[^\/]+\//, "", oldnum); sub(/-.*$/, "", oldnum)
+                  }
+                  if (oldnum != newnum) print $3
+                }'
+            }
+            nums() { grep -E "$DOC_RE" | grep -vE "$DATE_RE" | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' | sort -u; }
+            if ! ours=$(claims_against HEAD) || ! theirs=$(claims_against MERGE_HEAD); then
               echo "doc-new-claims: cannot read the merge diffs - failing closed" >&2
               exit 1
             fi
@@ -138,6 +171,7 @@ case "${1:-}" in
             fi
             identities=$(printf '%s\n' "$tracked" \
               | grep -E "$DOC_RE" \
+              | grep -vE "$DATE_RE" \
               | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
               | sort -u)
             for n in $touched; do

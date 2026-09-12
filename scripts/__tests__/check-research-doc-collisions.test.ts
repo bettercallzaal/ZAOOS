@@ -658,6 +658,99 @@ describe('a merge can create a duplicate neither side authored', () => {
     expect(runGate(dir).status).toBe(0);
   });
 
+  // DEFECT 1, found by the zorca lane reading this independently (vault proposed
+  // the fix and this lane wrote it, so vault's approval was not a third read).
+  // `nums` applied DOC_RE but not DATE_RE while the claims path applied both, so
+  // the nine dated logs in research/inspiration/2026-04-0*.md all read as doc
+  // 2026 and any merge adding one more blocked a daily log.
+  it('does not fire on a dated log file in an ordinary topic dir', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'doc-dupe-dated-'));
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    mkdirSync(join(dir, 'research', 'inspiration'), { recursive: true });
+    mkdirSync(join(dir, 'research', 'business', '2400-seed'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'inspiration', '2026-04-01.md'), 'x\n');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'base\n');
+    git('add', '-A');
+    git('commit', '-qm', 'base');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'main\n');
+    git('add', '-A');
+    git('commit', '-qm', 'main edits');
+    git('checkout', '-q', 'side');
+    writeFileSync(join(dir, 'research', 'inspiration', '2026-04-02.md'), 'x\n');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'side\n');
+    git('add', '-A');
+    git('commit', '-qm', 'side adds a daily log');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected */
+    }
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'resolved\n');
+    git('add', 'research/business/2400-seed/README.md');
+
+    expect(claims(dir, '--merge-duplicates').stdout.trim()).toBe('');
+    expect(runGate(dir).status).toBe(0);
+  });
+
+  // DEFECT 2, the worse one, same reviewer. `touched` came from --diff-filter=A
+  // only, so two branches that each RENAMED a doc onto the same number produced
+  // an empty touched and a clean exit. The gate's OWN remediation is "renumber",
+  // which is a rename - so two people following its advice on the same number
+  // created exactly the input it could not see.
+  it('blocks when both sides RENAMED a doc onto the same number', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'doc-dupe-rename-'));
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    const body = `${Array.from({ length: 40 }, (_, i) => `line ${i + 1}`).join('\n')}\n`;
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    for (const [topic, slug] of [
+      ['agents', '2100-old-a'],
+      ['music', '2200-old-b'],
+    ]) {
+      mkdirSync(join(dir, 'research', topic, slug), { recursive: true });
+      writeFileSync(join(dir, 'research', topic, slug, 'README.md'), body);
+    }
+    mkdirSync(join(dir, 'research', 'business', '2400-seed'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'base\n');
+    git('add', '-A');
+    git('commit', '-qm', 'base');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+    git('mv', 'research/agents/2100-old-a', 'research/agents/2480-renamed-a');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'main\n');
+    git('add', '-A');
+    git('commit', '-qm', 'main renames onto 2480');
+    git('checkout', '-q', 'side');
+    git('mv', 'research/music/2200-old-b', 'research/music/2480-renamed-b');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'side\n');
+    git('add', '-A');
+    git('commit', '-qm', 'side renames onto 2480');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected */
+    }
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'resolved\n');
+    git('add', 'research/business/2400-seed/README.md');
+
+    // neither side ADDED anything - this is the input the old rule could not see
+    expect(git('diff', '--cached', '--name-only', '--diff-filter=A', 'HEAD').trim()).toBe('');
+
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('DUPLICATE 2480');
+    expect(res.stderr).toContain('2480-renamed-a');
+    expect(res.stderr).toContain('2480-renamed-b');
+  });
+
   it('says nothing when not merging at all', () => {
     const { dir } = repo();
     expect(claims(dir, '--merge-duplicates').stdout.trim()).toBe('');

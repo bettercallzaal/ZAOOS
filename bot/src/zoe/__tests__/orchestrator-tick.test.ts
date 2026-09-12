@@ -329,6 +329,55 @@ describe('runOrchestratorTick', () => {
     expect(after.lastSeenTs).toBe('2026-01-01T00:00:00Z');
   });
 
+  it('does NOT let a later answer carry the cursor over a blocked one', async () => {
+    // The single-answer case above is the easy half. The batch case is where
+    // the cursor was still lost: the blocked ask_next does not action, but a
+    // LATER answer that does would advance lastSeenTs to the end of the batch,
+    // past the question that was never sent.
+    process.env.ZOE_ORCHESTRATOR_ENABLED = 'true';
+    const enqueueSpy = vi.spyOn(workLoop, 'enqueueWork').mockResolvedValue({
+      id: 'wk-test',
+      kind: 'research' as const,
+      input: 'AI alignment best practices',
+      addedTs: new Date().toISOString(),
+    });
+
+    const statePath = join(testHome, 'orchestrator-state.json');
+    await fs.mkdir(testHome, { recursive: true });
+    await fs.writeFile(statePath, JSON.stringify({ lastSeenTs: '2026-01-01T00:00:00Z' }));
+
+    await fs.mkdir(testRecentDir, { recursive: true });
+    const recentPath = join(testRecentDir, '12345.json');
+    const turns = [
+      // ask_next - its follow-up question gets blocked by the send budget
+      { from: 'zaal', text: '[answer:q-priority-what] Research', ts: '2026-01-02T00:00:00Z', sender: 'zaalbotz-btn' },
+      // research - actions locally, so it used to make posted > 0
+      { from: 'zaal', text: '[answer:research-topic] AI alignment best practices', ts: '2026-01-03T00:00:00Z', sender: 'zaalbotz-btn' },
+    ];
+    await fs.writeFile(recentPath, JSON.stringify(turns));
+
+    const mockBot = {
+      api: {
+        sendMessage: vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' }),
+      },
+    };
+
+    await runOrchestratorTick({
+      bot: mockBot as any,
+      groupId: 12345,
+      zaalTgId: 9876,
+      now: new Date(),
+    });
+
+    // The cursor must stay behind the blocked answer, not jump to the batch tail.
+    const after = JSON.parse(await fs.readFile(statePath, 'utf8'));
+    expect(after.lastSeenTs).toBe('2026-01-01T00:00:00Z');
+    // ...and the batch stops at the held answer, so the later action is not run
+    // now and then re-run on every tick for the rest of the day (enqueueWork
+    // does not dedupe).
+    expect(enqueueSpy).not.toHaveBeenCalled();
+  });
+
   it('advances the answer cursor when the next question was delivered', async () => {
     process.env.ZOE_ORCHESTRATOR_ENABLED = 'true';
 

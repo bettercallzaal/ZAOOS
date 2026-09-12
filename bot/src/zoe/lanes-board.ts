@@ -44,6 +44,14 @@ export function snapshotPath(): string {
 }
 
 const WANTS: Record<string, string> = {
+  // KEEP THE OLD SPELLING. A pre-#212 Mac still classifies a critical lane as
+  // state 'ctx-critical' and the push payload passes it straight through, so
+  // dropping this row loses exactly the lane it was added to surface. THE
+  // RENDERER RUNS ON THE VPS AND THE PAYLOAD COMES FROM A MAC - the two are
+  // separately deployed, so version skew is the normal state, not an edge case.
+  // Proved on this machine the same morning: ~/bin sat two hours behind a
+  // merged main and every tool read the old board (vault, #3496 review).
+  'ctx-critical': 'context full',
   'choice-prompt': 'picker',
   'asked-question': 'asked',
 };

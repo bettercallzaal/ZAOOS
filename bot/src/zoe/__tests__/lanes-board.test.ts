@@ -107,8 +107,21 @@ describe('a lane over the compact line wants Zaal whatever else it is doing', ()
     expect(out).toContain('IDLE AT A PROMPT (1)');
   });
 
-  // An older Mac still pushing the six-field payload must render, not throw.
-  it('a payload with no critical field renders as before', () => {
+  // THIS TEST WAS WRONG AND IT WAS THE ONE GUARDING THIS EXACT CASE.
+  // It used {state: 'waiting', ctx: 86, no critical} and called that "an older
+  // Mac". That is what an old Mac sends for a NON-critical lane. For a critical
+  // one a pre-#212 Mac sends state 'ctx-critical', because that is what the old
+  // classifier wrote and the payload passed through untouched. So the assertion
+  // was right about what it named and wrong about what it meant to check, and it
+  // wrote the silent loss down as correct behaviour (vault, #3496 review).
+  it('an OLD Mac sending state ctx-critical is still surfaced', () => {
+    const out = renderLanes(snap([{ title: 'vault', state: 'ctx-critical', ctx: 86 }]), 1_000_000);
+    expect(out).toContain('WANT YOU (1)');
+    expect(out).toContain('vault 86% [context full]');
+    expect(out).not.toContain('OTHER');
+  });
+
+  it('an old Mac sending a quiet lane is still not surfaced', () => {
     const out = renderLanes(snap([{ title: 'old', state: 'waiting', ctx: 86 }]), 1_000_000);
     expect(out).toContain('Nothing is waiting on you.');
   });

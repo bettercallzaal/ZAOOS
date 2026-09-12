@@ -15,7 +15,7 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { ZOE_PATHS } from './memory';
 import { ZOE_DEFAULT_MODEL } from './types';
 import type { ZoeContext } from './types';
@@ -206,7 +206,7 @@ export async function runLearnCycle(opts: {
   if (runs.length < MIN_RUNS_FOR_LEARN) return empty;
 
   try {
-    const result = await callClaudeCli({
+    const result = await callClaudeCliCapAware({
       model: ZOE_DEFAULT_MODEL,
       prompt: buildLearnPrompt(summaries, runs.length),
       cwd: opts.context.workspace_dir,

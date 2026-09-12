@@ -3,7 +3,7 @@
 // tightening + Doc 558 Anbeeld AI-prose toolkit. Few-shot examples per
 // category to teach tone from examples, not rules alone (see Doc 659).
 
-import { callClaudeCli } from '../../hermes/claude-cli';
+import { callClaudeCliCapAware } from '../models/cli-cap-aware';
 import type { PostCategory, PostDraft, PostSourceSnapshot } from './types';
 
 const SHARED_VOICE = `You draft a single social post in Zaal's Year-of-the-ZABAL voice. Output channel: Firefly (cross-posts to Farcaster + X simultaneously, so the post must work on both).
@@ -129,7 +129,7 @@ export async function draftPost(
   // + few-shot examples without losing the actual content). Sonnet handles the
   // prompt budget at ~$0.005 per draft = ~$0.04/day at 7 pings.
   const model = opts.model ?? 'sonnet';
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model,
     prompt: userPrompt,
     cwd: opts.cwd,

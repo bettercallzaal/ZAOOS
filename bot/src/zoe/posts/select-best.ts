@@ -10,7 +10,7 @@
 // of a backlog to triage. Stale drafts (>24h) are dropped before judging so the
 // pick is always from fresh info.
 
-import { callClaudeCli } from '../../hermes/claude-cli';
+import { callClaudeCliCapAware } from '../models/cli-cap-aware';
 import type { QueuedDraft } from './drafts-queue';
 
 /** Drafts older than this are stale - dropped before judging. */
@@ -98,7 +98,7 @@ export async function pickBestDraft(
   }
 
   try {
-    const result = await callClaudeCli({
+    const result = await callClaudeCliCapAware({
       model: opts.model ?? 'haiku',
       prompt: buildJudgePrompt(pool),
       cwd: opts.cwd,

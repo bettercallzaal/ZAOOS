@@ -141,6 +141,72 @@ describe('git-pii-scan.py on a merge commit', () => {
     expect(res.stderr).toContain(TYPED_IN_RESOLUTION);
   });
 
+  /**
+   * THE CASE #3502 MISSED, and the reason "empty" and "failed" cannot share a
+   * branch. Resolve the conflict by taking the OTHER side wholesale - one of the
+   * commonest resolutions there is - and the index equals MERGE_HEAD for that
+   * file. Nothing is added against MERGE_HEAD while plenty is added against HEAD.
+   * #3502 read that empty result as "could not tell", returned the rows
+   * unfiltered, and blocked the commit over the other parent's address: the
+   * original bug, surviving inside its own fix.
+   */
+  it('does not flag inherited content when the resolution takes the other side wholesale', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'pii-wholesale-'));
+    const git: Git = (...a) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    writeFileSync(join(dir, 'shared.md'), 'base\n');
+    git('add', '-A');
+    git('commit', '-qm', 'base');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+
+    mkdirSync(join(dir, 'docs'), { recursive: true });
+    writeFileSync(join(dir, 'docs', 'sample.md'), `a sample\n\n\`\`\`javascript\n${FLAGGED}\n\`\`\`\n`);
+    writeFileSync(join(dir, 'shared.md'), 'main\n');
+    git('add', '-A');
+    git('commit', '-qm', 'main adds a doc and edits the shared file');
+
+    git('checkout', '-q', 'side');
+    writeFileSync(join(dir, 'shared.md'), 'side\n');
+    git('add', '-A');
+    git('commit', '-qm', 'side edits the shared file');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected: the merge conflicts */
+    }
+    // take MAIN's version exactly - the resolver types nothing of their own
+    writeFileSync(join(dir, 'shared.md'), 'main\n');
+    git('add', 'shared.md');
+
+    // the precondition that makes this case distinct: added-vs-HEAD is non-empty
+    // while added-vs-MERGE_HEAD is empty, and both reads SUCCEEDED.
+    const vsHead = git('diff', '--cached', '--unified=0', '--no-color');
+    const vsMerge = git('diff', '--cached', '--unified=0', '--no-color', 'MERGE_HEAD');
+    expect(vsHead.split('\n').filter((l) => l.startsWith('+')).length).toBeGreaterThan(0);
+    expect(vsMerge.split('\n').filter((l) => l.startsWith('+')).length).toBe(0);
+
+    const res = runScanner(dir);
+    expect(res.stderr).not.toContain(INHERITED);
+    expect(res.status).toBe(0);
+  });
+
+  /**
+   * THE FAIL-OPEN CONTROL. When the diff cannot be read at all, the previous
+   * version returned [] and main() read "no rows" as "nothing to scan", so the
+   * entire gate exited 0 having scanned nothing - green while broken, in a
+   * security gate.
+   */
+  it('blocks rather than passing when the staged diff cannot be read', () => {
+    const notARepo = mkdtempSync(join(tmpdir(), 'pii-norepo-'));
+    const res = runScanner(notARepo);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('nothing was scanned');
+  });
+
   it('passes a clean ordinary commit', () => {
     const dir = mkdtempSync(join(tmpdir(), 'pii-clean-'));
     const git: Git = (...a) =>

@@ -63,6 +63,12 @@ set -uo pipefail
 # the rule matched 2231 paths where the library holds about 2120 docs.
 DOC_RE='^research/[^_/][^/]*/[0-9]+-[^/]+'
 DATE_RE='^research/[^/]+/[0-9]{4}-[0-9]{2}-[0-9]{2}'
+# The EXISTING set keeps underscore topics; the CLAIMS set does not. Two
+# different questions that look like one - see the --existing block below.
+# An archived doc STILL HOLDS ITS NUMBER: 75 numbers on main are held only by
+# research/_archive/, and excluding underscore topics here would report every
+# one of them as free. They agree only that a date-named file is not a doc.
+EXISTING_RE='^research/[a-z_-]+/[0-9]+-'
 
 # MERGING: A PATH IS NEWLY AUTHORED ONLY IF IT IS ABSENT FROM BOTH PARENTS.
 #
@@ -181,7 +187,30 @@ case "${1:-}" in
               fi
             done
             exit 0 ;;
-  *)        echo "usage: doc-new-claims.sh --staged | --range <base> | --merge-duplicates" >&2; exit 2 ;;
+  --existing)
+            # WHAT NUMBERS ARE ALREADY TAKEN, read from a list of repo paths on
+            # stdin. A SEPARATE QUESTION from "what does this change claim", and
+            # conflating them is how 75 taken numbers nearly got freed.
+            #
+            #   claims   : research/_archive/900-x is NOT a new claim. Moving a
+            #              doc into the archive reserves nothing.
+            #   existing : research/_archive/900-x DOES hold 900. An archived doc
+            #              still owns its number, and 75 numbers on main are held
+            #              ONLY by the archive. Excluding underscore topics here
+            #              would have reported every one of them as free.
+            #
+            # So this keeps underscore topics and drops only date-named files.
+            # Measured 2026-09-12: without the date rule a legitimate new doc
+            # numbered 2026 is refused, because 22 research/_radar/YYYY-MM-DD
+            # files and 3 _handoffs ones parse as doc 2026. Caught by the vault
+            # lane, whose first version of this rule was the underscore
+            # exclusion it then retracted.
+            grep -E "$EXISTING_RE" \
+              | grep -vE "$DATE_RE" \
+              | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
+              | sort -u
+            exit 0 ;;
+  *)        echo "usage: doc-new-claims.sh --staged | --range <base> | --existing (paths on stdin) | --merge-duplicates" >&2; exit 2 ;;
 esac
 
 # Capture BEFORE filtering. Reading a status through `git ... | grep` reports

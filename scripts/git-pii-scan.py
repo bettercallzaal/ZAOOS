@@ -129,14 +129,12 @@ def email_allowed(addr: str) -> bool:
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 
 
-def staged_added_lines() -> list[tuple[str, str]]:
-    """[(file, added_line)] from the staged diff. Added lines only - context lines
-    are already committed, and re-flagging them would make every commit near an
-    old address impossible."""
-    out = subprocess.run(
-        ["git", "diff", "--cached", "--unified=0", "--no-color"],
-        capture_output=True, text=True, check=False,
-    )
+def _added_against(base: str | None) -> list[tuple[str, str]]:
+    """[(file, added_line)] from the staged diff against `base` (HEAD if None)."""
+    cmd = ["git", "diff", "--cached", "--unified=0", "--no-color"]
+    if base:
+        cmd.append(base)
+    out = subprocess.run(cmd, capture_output=True, text=True, check=False)
     rows: list[tuple[str, str]] = []
     current = "?"
     for line in out.stdout.splitlines():
@@ -145,6 +143,49 @@ def staged_added_lines() -> list[tuple[str, str]]:
         elif line.startswith("+") and not line.startswith("+++"):
             rows.append((current, line[1:]))
     return rows
+
+
+def _merging() -> bool:
+    return subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", "MERGE_HEAD"],
+        capture_output=True, text=True, check=False,
+    ).returncode == 0
+
+
+def staged_added_lines() -> list[tuple[str, str]]:
+    """[(file, added_line)] from the staged diff. Added lines only - context lines
+    are already committed, and re-flagging them would make every commit near an
+    old address impossible.
+
+    ON A MERGE COMMIT, "added" against HEAD is not the same as "authored here".
+    The index holds everything BOTH parents brought, so every line the other side
+    committed reads as new. Measured 2026-09-12 merging main into a 44-commit-stale
+    branch: this refused the commit over an address-shaped string that had been on
+    main since 2026-09-08, which nobody in the merge wrote. That is the same
+    principle the paragraph above already states, applied one level out - the line
+    is already committed, just on the other parent.
+
+    So mid-merge a line counts only if it is absent from BOTH parents: intersect
+    the two diffs. A line the other side brought is present in MERGE_HEAD and
+    never enters the second set; a line typed DURING the resolution is in neither
+    parent, enters both, and is still caught. That second case is the one this
+    must not lose, because it is a real address arriving through a merge.
+
+    FAILS CLOSED. If the MERGE_HEAD diff cannot be taken, the rows are left
+    unfiltered - which is exactly today's behaviour, so a broken read can only
+    over-report, never under-report, on a security gate.
+    """
+    rows = _added_against(None)
+    if not rows or not _merging():
+        return rows
+    theirs = _added_against("MERGE_HEAD")
+    if not theirs:
+        # Either the other parent genuinely added nothing, or the diff failed.
+        # Both are indistinguishable here, so do not filter. Over-reporting on a
+        # PII gate is recoverable; under-reporting is not.
+        return rows
+    theirs_set = set(theirs)
+    return [r for r in rows if r in theirs_set]
 
 
 def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:

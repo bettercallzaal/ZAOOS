@@ -532,6 +532,19 @@ describe('runBacklogGrillTick - a lane-owned card is never sent', () => {
     expect(result.title).toBe('Zaal job');
   });
 
+  it('a card the send budget blocked is not recorded as asked', async () => {
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 0, zoeSendBudget: 'dropped' }) as never,
+      localHour: 10,
+      now: NOW,
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(false);
+    expect(result.reason).toContain('send blocked');
+    const written = [...files.values()].join('');
+    expect(written).not.toContain('firstAskedAt'); // nothing climbed the nag ladder
+  });
+
   it('reports nothing to ask when every open card is a lane\'s', async () => {
     const onlyAgent = (async (url: string, init?: RequestInit) => {
       if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;

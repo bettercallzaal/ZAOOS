@@ -49,8 +49,12 @@ Use this skill when working on ZAO Stock pages, planning, outreach, sponsorship,
 | **AttaBotty + DaNici** | Style/culture curators, visual design |
 | **Hurric4n3Ike** | Performing artist, WaveWarZ LIVE |
 | **ZAOVille / DCoop** | Performing artist, running DMV satellite event |
-| **Tyler Stambaugh** | Magnetiq Proof of Meet (IRL connection tokens) |
 | **Fellenz, Tricky, John Blackwell** | General support |
+
+One row was removed on 2026-09-11: Zaal, asked directly, said the retired
+partner is out everywhere and that person is not involved anymore. This is the
+3 October ZAOstock team, so a stale row here is someone the day is counting on.
+The connector list itself lives with the zaostock lane, not here.
 
 ## Funding: New Media Commons / Fractured Atlas
 

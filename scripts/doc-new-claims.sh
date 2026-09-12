@@ -64,6 +64,29 @@ set -uo pipefail
 DOC_RE='^research/[^_/][^/]*/[0-9]+-[^/]+'
 DATE_RE='^research/[^/]+/[0-9]{4}-[0-9]{2}-[0-9]{2}'
 
+# MERGING: A PATH IS NEWLY AUTHORED ONLY IF IT IS ABSENT FROM BOTH PARENTS.
+#
+# The index of a merge commit contains everything both sides brought. Diffing it
+# against HEAD alone therefore reports every doc the OTHER side added since the
+# branch point as newly added - measured on a branch 40 commits behind main: 5
+# claims seen, 0 genuinely new, and the commit was refused for numbers main
+# already holds. That made a conflicted merge impossible on any branch behind by
+# doc work, which is exactly the operation `merge, never rebase` requires.
+#
+# Two fixes were considered and both were wrong. `git merge-base` does not help:
+# the other side added those docs AFTER the branch point, so they are in that
+# diff too. And exiting early when MERGE_HEAD exists is FAIL-OPEN - conflict
+# resolution is an edit, so a doc genuinely typed during a merge would skip the
+# gate entirely, which is `--no-verify` with no flag and no trace.
+#
+# Intersecting the two parents' diffs is exact. A doc from the other side is
+# present in MERGE_HEAD, so it never enters the second set. A doc from our side
+# is present in HEAD, so it never enters the first. A doc authored during the
+# resolution is in neither parent, enters both, and is still caught. Fix shape
+# from the dotfiles lane; controls below.
+MERGING=""
+if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then MERGING=1; fi
+
 case "${1:-}" in
   --staged) NAME_ONLY=(git diff --cached --name-only --diff-filter=A)
             NAME_STATUS=(git diff --cached --name-status --diff-filter=R) ;;
@@ -97,9 +120,29 @@ renamed_claims=$(printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" -v dre="$
   }')
 
 # Normalise both to the doc DIRECTORY, so a doc adding five files claims once.
-printf '%s\n%s\n' "$added" "$renamed_claims" \
+claims=$(printf '%s\n%s\n' "$added" "$renamed_claims" \
   | grep -E "$DOC_RE" \
   | grep -vE "$DATE_RE" \
   | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
-  | sort -u
+  | sort -u)
+
+# Mid-merge: keep only what the OTHER parent does not already have. The two
+# sides must be normalised IDENTICALLY - same DOC_RE, same DATE_RE, same sed -
+# or the intersection compares different spellings of the same doc and silently
+# returns nothing.
+if [[ -n "$MERGING" && "${1:-}" == "--staged" ]]; then
+  if ! theirs=$(git diff --cached --name-only --diff-filter=A MERGE_HEAD 2>&1); then
+    echo "doc-new-claims: git diff against MERGE_HEAD failed - failing closed:" >&2
+    printf '%s\n' "$theirs" | sed 's/^/  /' >&2
+    exit 1
+  fi
+  theirs_claims=$(printf '%s\n' "$theirs" \
+    | grep -E "$DOC_RE" \
+    | grep -vE "$DATE_RE" \
+    | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
+    | sort -u)
+  claims=$(comm -12 <(printf '%s\n' "$claims") <(printf '%s\n' "$theirs_claims"))
+fi
+
+printf '%s\n' "$claims" | grep -E "$DOC_RE" || true
 exit 0

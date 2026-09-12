@@ -33,7 +33,17 @@ cd "$REPO" || exit 0
 # committed .env is the fix, not the offence.
 
 # 1. No real .env file staged (.env.example is allowed).
-ENV_STAGED=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null \
+# NEVER READ THIS EXIT CODE THROUGH A PIPE. `git ... | grep` reports grep's
+# status, so a git that cannot read the index looks identical to a clean tree.
+# Capture first, check git, then filter.
+if ! STAGED_NAMES=$(git diff --cached --name-only --diff-filter=ACMR 2>&1); then
+  echo "" >&2
+  echo "[secret-scan] BLOCKED - cannot read the staged changes, so nothing was scanned:" >&2
+  printf '%s\n' "$STAGED_NAMES" | sed 's/^/    /' >&2
+  echo "This gate fails CLOSED. Fix the repository state and commit again." >&2
+  exit 1
+fi
+ENV_STAGED=$(printf '%s\n' "$STAGED_NAMES" \
   | grep -E '(^|/)\.env($|\.local$|\.production$)' || true)
 if [[ -n "$ENV_STAGED" ]]; then
   echo "" >&2
@@ -44,7 +54,18 @@ if [[ -n "$ENV_STAGED" ]]; then
 fi
 
 # 2. Scan ADDED lines of the staged diff for secret patterns.
-DIFF=$(git diff --cached --diff-filter=ACMR -U0 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+# Same rule again, and this is the one that mattered: `2>/dev/null || true`
+# turned "I could not look" into "nothing is staged", so a staged AWS key passed
+# with exit 0 on a corrupted index - measured, and the header above claims this
+# gate fails closed. An empty result must mean an empty diff and nothing else.
+if ! RAW_DIFF=$(git diff --cached --diff-filter=ACMR -U0 2>&1); then
+  echo "" >&2
+  echo "[secret-scan] BLOCKED - cannot read the staged diff, so nothing was scanned:" >&2
+  printf '%s\n' "$RAW_DIFF" | sed 's/^/    /' >&2
+  echo "This gate fails CLOSED. Fix the repository state and commit again." >&2
+  exit 1
+fi
+DIFF=$(printf '%s\n' "$RAW_DIFF" | grep -E '^\+' | grep -vE '^\+\+\+' || true)
 [[ -z "$DIFF" ]] && exit 0
 
 HITS=""

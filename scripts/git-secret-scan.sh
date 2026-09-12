@@ -77,8 +77,14 @@ narrow_to_both_parents() { # stdin = ours (already normalised); "$@" = theirs cm
   local ours theirs
   ours=$(cat)
   if [[ -z "$MERGING" || -z "$ours" ]]; then printf '%s\n' "$ours"; return 0; fi
-  if ! theirs=$("$@") || [[ -z "$theirs" ]]; then
-    printf '%s\n' "$ours"   # cannot tell "added nothing" from "read failed"
+  # EMPTY AND FAILED ARE DIFFERENT ANSWERS. Only a FAILED read is a reason not to
+  # filter; a genuinely empty one means the other parent added nothing here, and
+  # treating that as "do not filter" silently retains the very bug being fixed.
+  # That is not hypothetical: the identical shortcut in check-research-index.sh
+  # (#3504) reported every inherited doc, and its first control caught it.
+  # git distinguishes the two with an exit code, so read that, never emptiness.
+  if ! theirs=$("$@"); then
+    printf '%s\n' "$ours"   # the read FAILED - cannot narrow, so narrow nothing
     return 0
   fi
   comm -12 <(printf '%s\n' "$ours" | sort -u) <(printf '%s\n' "$theirs" | sort -u)

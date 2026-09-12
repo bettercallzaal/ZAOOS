@@ -2,7 +2,7 @@
 topic: governance
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-11
 superseded-by:
 related-docs: 56, 133, 572, 573, 567
 original-query: "avax and avalache ive wanted to do stuff with for a while [+ pasted Telegram conversation between Zaal and 'Matt | Crypto Factor' offering to build a fresh $ZAO token ecosystem dApp on Avalanche] heres a convo lets do a research doc on this and see what might make sense for us to do to bring the governance side to avax"
@@ -144,7 +144,7 @@ Why:
 | Snapshot (off-chain) | Yes (chain-agnostic) | Free, gasless | Mature, ~68% of DAO voting | Already usable; reads Optimism balances fine |
 | Aragon OSx | Yes | ~$0.01-0.15/vote | Mature | No advantage over Optimism deployment |
 | ORDAO / OREC (current) | Optimism only | Low | In use by ZAO | This is the system ZAO already runs |
-| Tally | Was adding Avax | n/a | Shut down 2025 | Do not build on it |
+| Tally | Was adding Avax | n/a | Shut down March 2026 | Do not build on it |
 | Snapshot X (on-chain) | No (Ethereum/OP/Arb/Polygon) | ~$0.02-0.10 | Emerging | Cannot read Avalanche state anyway |
 
 If ZAO ever genuinely needed Avalanche voters to participate, the answer is **Snapshot with storage proofs** reading Optimism Respect balances - free, gasless, ~2/10 difficulty, no contracts, no bridge, no migration. That option exists permanently and costs nothing to add later. It is not a reason to move anything now.
@@ -214,6 +214,21 @@ This is honest, keeps Crypto Factor engaged, surfaces the soulbound constraint i
 | Keep governance on Optimism - no migration; no config changes to `community.config.ts` respect block | @Zaal | Decision | Standing |
 | If Avax exposure still wanted, action Doc 573 (The Arena profiles for ZAO leaders + Cipher artists) | @Zaal | Separate track | Q3 2026 |
 | Re-validate this doc if Crypto Factor passes the hard gates or sends a non-template proposal | @Zaal | Doc update | On trigger |
+
+## Updated 2026-09-11
+
+Revalidated via radar (114 days since last check). Three material changes found; recommendations unchanged.
+
+**1. Tally shutdown date corrected.** The governance tool table said "Shut down 2025." Tally actually announced shutdown on March 17, 2026, citing reduced demand after the Digital Asset Clarity Act (CLARITY Act) lowered regulatory pressure. The recommendation ("Do not build on it") is unchanged — it's now fully offline.
+Sources checked: [cryptobriefing.com](https://cryptobriefing.com/tally-shuts-down-dao-tools/) `[FULL via search]`, [coinalertnews.com](https://coinalertnews.com/news/2026/03/17/tally-dao-platform-shuts-down) `[FULL via search]`
+
+**2. The Arena V2 (strengthens Doc 573 path).** The Arena launched V2 in May 2025, adding a bonding-curve launchpad and native DEX into the social feed. By mid-2025 it captured 32% of unique active wallets on Avalanche and was 4th by DEX volume ($284M/30-day swap volume). The original 200K+ user count (Oct 2024) is now stale — growth likely higher, though no fresh 2026 total found. The Doc 573 recommendation (ZAO leaders + Cipher artists onto The Arena for Avax exposure) is strengthened, not weakened.
+Sources checked: [avax.network blog](https://www.avax.network/about/blog/the-arenas-comeback-socialfi-app-on-avalanche-secures-2m-pre-seed-funding-and-plans-mainstream-expansion) `[BLOCKED by proxy - from search snippet]`, [outposts.io](https://outposts.io/article/the-arena-socialfi-app-dominates-avalanche-network-activity-ba3f890b-65ae-4fef-8e9c-138025bd143e) `[PARTIAL via search]`
+
+**3. CLARITY Act 2025 — new regulatory context.** The Digital Asset Market Clarity Act passed in 2025 narrows SEC authority over tokens, moving most blockchain-native tokens to CFTC jurisdiction. It explicitly clarifies that DAOs with genuine decentralization are not treated as a single controlling entity. This reduces the defensive-regulatory reason some projects had for DAO governance (Tally's exact thesis), but *supports* ZAO's approach: soulbound Respect is authentic governance, not a speculative instrument. No change to ZAO's governance architecture is warranted; the act may make ZAO's soulbound model even more clearly compliant.
+Sources checked: [carey.house.gov CLARITY Act summary](https://carey.house.gov/wp-content/uploads/2025/07/CLARITY-Act-Three-Pager.pdf) `[PARTIAL via search]`, [arnoldporter.com analysis](https://www.arnoldporter.com/en/perspectives/advisories/2025/08/clarifying-the-clarity-act) `[PARTIAL via search]`
+
+**4. Crypto Factor — no material change.** CFR token live on Polygon/QuickSwap per search results; docs site still up; direct site access blocked by proxy, no independent coverage or new client footprint found. The doc's verdict (unverifiable, medium scam risk, hard gates still apply) stands. The Part 3 hard gates (real names, video call, reference client, on-chain proof) have not been revisited publicly — no signal they passed.
 
 ## Sources
 

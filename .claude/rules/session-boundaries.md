@@ -1,8 +1,9 @@
 # Session Boundaries - one thread, one named session
 
 Established 2026-08-09 after a single session opened **25 PRs across two repos**
-and produced **seven confidently wrong claims**, none of which were caused by
-running out of context.
+and produced **six confidently wrong claims**, none of which were caused by
+running out of context. A seventh row stood here for a month and was the
+correction, not the error.
 
 ## What actually goes wrong (measured, not theorised)
 
@@ -17,9 +18,20 @@ fact was still in context:
 | "we are not using Obsidian" | `~/zao-vault` had been edited that morning |
 | "two relay daemons are running" | one. `pgrep` was matching its own command line |
 | "19 VPS lanes are dead" | `comm=` shows `bash` for an idle shell AND a running script |
-| "the collectible rail needs replacing" | Magnetiq stays; the retirement covered the partnership |
+| "the collectible rail needs replacing" | **This row was itself wrong. See the note below.** |
 | "the artist and creator tracks had no submissions" | still open, and expected to fill |
 | a commit message describing a revert | the revert had not been made |
+
+**The rail row, corrected 2026-09-11.** It used to name the retired partner and
+say the product stayed, filing the session's claim as an error. Zaal ruled the
+other way when asked directly: the retirement covers the product too, so the
+session that said the collectible rail needed replacing was right, and this table
+was the thing holding the stale state. That is the failure mode this file
+describes, written into the file that describes it, and it lasted a month because
+nobody re-asked the one person who could settle it. `zao-retired-names` held this
+line for Zaal on 2026-09-11 instead of freezing it, which is how it came back up.
+The retired name is not repeated here: the glossary in `~/.claude/CLAUDE.md` keeps
+the spelling so old documents can be read, and nothing new writes it.
 
 The reversals cluster in the back half, after the topic had changed four or five
 times. `confirm-before-claiming-absence.md` already required exhaustive

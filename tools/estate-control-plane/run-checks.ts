@@ -27,30 +27,56 @@ async function loadConfig(): Promise<EstateConfig> {
   return cfg;
 }
 
-function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 'summary'> {
+export function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 'summary'> {
   let penalty = 0;
   let fail = 0;
   let warn = 0;
   let fixable = 0;
+  let crashed = 0;
   for (const c of checks) {
     for (const f of c.findings) {
-      if (f.severity === 'fail') { penalty += 10; fail++; }
+      // 'crashed' scores ABOVE 'fail' (heavier penalty, and it still counts
+      // toward `fail` so the existing `summary.fail > maxFails` ratchet trips
+      // on it) — a check that could not run must never score as clean.
+      if (f.severity === 'crashed') { penalty += 15; fail++; crashed++; }
+      else if (f.severity === 'fail') { penalty += 10; fail++; }
       else if (f.severity === 'warn') { penalty += 3; warn++; }
       if (f.fixable) fixable++;
     }
   }
-  return { healthScore: Math.max(0, 100 - penalty), summary: { fail, warn, fixable } };
+  return { healthScore: Math.max(0, 100 - penalty), summary: { fail, warn, fixable, crashed } };
 }
 
-async function runOne(name: string, fn: () => Promise<CheckResult>): Promise<CheckResult> {
+// Exported for __tests__/checks.test.ts. This is the fix that decides whether
+// a broken check can pass CI, so it needs a test that fails on the old
+// behaviour rather than a throw added by hand and deleted before committing
+// (zaoos-review, #3458 review).
+//
+// FIXED (ZAO research doc 2478, inverted alarm #5): a check that threw used to
+// come back as {status:'skipped', findings:[]} — zero findings means zero
+// contribution to summary.fail, so a check that could not run scored exactly
+// as well as a check that ran clean, and the PR ratchet (summary.fail >
+// maxFails) could not see the difference. A thrown check is not an absence of
+// problems; it is an absence of measurement, and it must never be scored as
+// a pass. It now comes back as status 'crashed' carrying its own 'crashed'
+// severity finding, which scoreAndSummarize counts toward `fail`.
+export async function runOne(name: string, fn: () => Promise<CheckResult>): Promise<CheckResult> {
   try {
     return await fn();
   } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e);
     return {
       id: name,
-      status: 'skipped',
-      findings: [],
-      note: `check threw: ${e instanceof Error ? e.message : String(e)}`,
+      status: 'crashed',
+      findings: [
+        {
+          check: name,
+          severity: 'crashed',
+          title: `${name} check crashed instead of running`,
+          detail,
+        },
+      ],
+      note: `check threw: ${detail}`,
     };
   }
 }
@@ -91,10 +117,11 @@ async function main() {
   }
 
   // Human summary
-  const icon = (s: string) => (s === 'ok' ? '[OK]' : s === 'warn' ? '[WARN]' : s === 'fail' ? '[FAIL]' : '[SKIP]');
+  const icon = (s: string) =>
+    s === 'ok' ? '[OK]' : s === 'warn' ? '[WARN]' : s === 'fail' ? '[FAIL]' : s === 'crashed' ? '[CRASH]' : '[SKIP]';
   console.log(`\nZAO Estate Control Plane - health ${healthScore}/100`);
   console.log(`repo: ${cfg.repoRoot}`);
-  console.log(`fails: ${summary.fail}  warns: ${summary.warn}  fixable: ${summary.fixable}\n`);
+  console.log(`fails: ${summary.fail}  warns: ${summary.warn}  fixable: ${summary.fixable}  crashed: ${summary.crashed}\n`);
   for (const c of checks) {
     console.log(`${icon(c.status)} ${c.id}${c.note ? ` (${c.note})` : ''}`);
     for (const f of c.findings) {

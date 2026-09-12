@@ -311,3 +311,66 @@ describe('known false positives: a number freed in the same commit', () => {
     expect(res.stderr).toContain('this is a FALSE POSITIVE');
   });
 });
+
+/**
+ * A numbered doc is a DIRECTORY, not a filename that starts with digits.
+ *
+ * The first version of doc-new-claims.sh excluded underscore META dirs
+ * (research/_radar, _archive, _handoffs) but had no directory requirement, so
+ * `research/inspiration/2026-09-12.md` - a date-named FILE directly under an
+ * ordinary topic dir, nine of them on main - parsed as a claim on doc number
+ * 2026 and the BLOCKING pre-commit gate refused the commit with "doc number(s)
+ * not reserved: 2026". A false positive on the ordinary case, in a gate that
+ * stops a commit. Regression introduced 2026-09-12 by #3494, found the same day
+ * while chasing why every radar PR was being held.
+ */
+describe('a doc number comes from a directory, not from a dated filename', () => {
+  it('does not claim a date-named file in an ordinary topic dir', () => {
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'inspiration'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'inspiration', '2026-09-12.md'), 'a dated note\n');
+    git('add', '-A');
+
+    const res = claims(dir, '--staged');
+    expect(res.status).toBe(0);
+    expect(res.stdout.trim()).toBe('');
+    // and the gate lets the commit through
+    expect(runGate(dir).status).toBe(0);
+  });
+
+  it('does not claim a date-named file in an underscore meta dir', () => {
+    // Already correct before the directory requirement, pinned so the two
+    // exclusions cannot be collapsed into one and lose a case.
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', '_radar'), { recursive: true });
+    writeFileSync(join(dir, 'research', '_radar', '2026-09-12.md'), 'radar line\n');
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe('');
+    expect(runGate(dir).status).toBe(0);
+  });
+
+  it('still claims a real doc directory', () => {
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'business', '2500-a-real-doc'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'business', '2500-a-real-doc', 'README.md'), 'x\n');
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2500-a-real-doc/');
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('not reserved: 2500');
+  });
+
+  it('claims a doc directory however deep the changed file sits', () => {
+    const { dir, git } = repo();
+    mkdirSync(join(dir, 'research', 'business', '2501-nested', 'assets'), { recursive: true });
+    writeFileSync(
+      join(dir, 'research', 'business', '2501-nested', 'assets', 'chart.svg'),
+      '<svg/>\n',
+    );
+    git('add', '-A');
+
+    expect(claims(dir, '--staged').stdout.trim()).toBe('research/business/2501-nested/');
+  });
+});

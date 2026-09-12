@@ -39,7 +39,16 @@
 
 set -uo pipefail
 
-DOC_RE='^research/[^_/][^/]*/[0-9]+-'
+# A numbered doc is a DIRECTORY - research/<topic>/<number>-<slug>/<files>.
+# The trailing `[^/]+/` is what enforces that, and it is load-bearing: without
+# it, `research/inspiration/2026-09-12.md` (a date-named FILE directly under a
+# topic dir, 9 of them on main) parsed as a claim on doc number 2026 and the
+# pre-commit gate refused the commit with "doc number(s) not reserved: 2026".
+# Measured 2026-09-12; introduced by this script's first version, which excluded
+# underscore META dirs but not date-named files. `[^_/]` still skips
+# research/_radar, _archive, _handoffs; the directory requirement is what skips
+# a dated file in an ordinary topic dir.
+DOC_RE='^research/[^_/][^/]*/[0-9]+-[^/]+/'
 
 case "${1:-}" in
   --staged) NAME_ONLY=(git diff --cached --name-only --diff-filter=A)

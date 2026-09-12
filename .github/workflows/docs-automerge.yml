@@ -169,9 +169,26 @@ jobs:
             echo "collision=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          newdirs=$(printf '%s\n' "$newdirs" | sed 's:/*$::' | grep -E '^research/[a-z_-]+/[0-9]+-' | sort -u || true)
+          # No re-filter here. doc-new-claims.sh already emits exactly
+          # research/<topic>/<number>-<slug>/ and nothing else; re-checking its
+          # output against a SECOND regex is how the two copies drifted in the
+          # first place. This line used to read `^research/[a-z_-]+/[0-9]+-`,
+          # whose `[a-z_-]+` INCLUDES the underscore, so it disagreed with the
+          # seam about whether research/_radar/ and research/_archive/ are topic
+          # dirs. Strip the trailing slash and use what the seam said.
+          newdirs=$(printf '%s\n' "$newdirs" | sed 's:/*$::' | sort -u || true)
           if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
-          main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)
+          # The EXISTING set must use the same definition of a doc as the seam,
+          # or the comparison is between two different things. `[a-z_-]+`
+          # included the underscore, so 102 entries under research/_archive/,
+          # _handoffs/ and _radar/ were read as numbered docs - and a missing
+          # directory requirement meant a date-named file like
+          # research/inspiration/2026-04-01.md was read as doc 2026. Measured
+          # 2026-09-12: three phantom numbers (117, 229, 2026) already collide
+          # with real docs on main, so a PR claiming any of them would have been
+          # held for a collision that does not exist.
+          main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' \
+            | grep -oE '^research/[^_/][^/]*/[0-9]+-[^/]+/' | sed 's:/*$::' | sort -u)
           collision=false
           while IFS= read -r d; do
             num=$(basename "$d" | grep -oE '^[0-9]+')

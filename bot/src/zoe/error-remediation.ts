@@ -98,6 +98,12 @@ export interface RemediationOutbox {
  * depth and the age of the oldest item go into the tick's status line and into
  * mission control, and zao-selftest reads the file over ssh (vault, #3446
  * review).
+ *
+ * The mission-control emit lives HERE, not in the caller. It was in the tick,
+ * and the scheduler flushes first and returns early when anything is held - so
+ * the one state that needed announcing was the one state that reached only a
+ * console.error into journald, which nobody reads (vault, #3483 review). Any
+ * caller that flushes now announces a stall whether it remembers to or not.
  */
 export async function flushOutbox(deps: Pick<RemediationDeps, 'report' | 'outbox'>): Promise<OutboxItem[]> {
   const pending = await deps.outbox.load();
@@ -112,7 +118,11 @@ export async function flushOutbox(deps: Pick<RemediationDeps, 'report' | 'outbox
     sent += 1;
   }
   if (sent > 0) await deps.outbox.save(pending.slice(sent));
-  return pending.slice(sent);
+  const held = pending.slice(sent);
+  if (held.length > 0) {
+    mcEmit('error-remediation', 'zoe', 8, `reports undelivered: ${describeOutbox(held)}`);
+  }
+  return held;
 }
 
 /** "4 unsent, oldest 3h" - the sentence that turns a silent stall into a fact. */
@@ -213,9 +223,10 @@ export function buildIssueText(err: AppError): string {
 export async function runErrorRemediationTick(deps: RemediationDeps): Promise<string> {
   // Anything decided earlier and not yet told goes first. No new decisions
   // while Zaal cannot be told about the old ones.
+  // flushOutbox emits the priority-8 stall itself, so this path and the
+  // scheduler's early return announce the same thing.
   const unsent = await flushOutbox(deps);
   if (unsent.length > 0) {
-    mcEmit('error-remediation', 'zoe', 8, `reports undelivered: ${describeOutbox(unsent)}`);
     return `holding: ${describeOutbox(unsent)}, no new error claimed`;
   }
 

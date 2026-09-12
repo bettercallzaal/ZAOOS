@@ -1370,6 +1370,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           // Deliver first, and BEFORE the cost hard-stop: these are outcomes
           // already decided and already marked. A paused ZOE must not sit on
           // breakage notices (vault, #3446 review).
+          // flushOutbox raises the priority-8 mission-control stall itself, so
+          // returning here does not swallow the signal - which it did while the
+          // emit lived in the tick below (vault, #3483 review).
           const held = await flushOutbox(deps);
           if (held.length > 0) {
             console.error(`[zoe/scheduler] error-remediation reports ${describeOutbox(held)}`);

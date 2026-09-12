@@ -1,4 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
+
+// The priority-8 stall emit is the signal that has to survive the scheduler's
+// early return, so the test asserts on the emit itself, not on a status string
+// the scheduler never reads (vault, #3483 review).
+const emits: Array<[string, string, number, string]> = [];
+vi.mock('../mission-control', () => ({
+  mcEmit: (topic: string, actor: string, severity: number, text: string) => {
+    emits.push([topic, actor, severity, text]);
+  },
+}));
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -285,6 +295,41 @@ describe('the outbox: queue, mark, flush', () => {
     expect(describeOutbox([{ at: now - 3 * 3600_000, message: 'a' }, { at: now, message: 'b' }], now))
       .toBe('2 unsent, oldest 3h');
     expect(describeOutbox([{ at: now - 90_000, message: 'a' }], now)).toBe('1 unsent, oldest 2m');
+  });
+
+  it('a held outbox raises the priority-8 stall from flushOutbox itself, not from a caller', async () => {
+    // Regression, vault #3483 review: the emit used to sit in
+    // runErrorRemediationTick, and the scheduler flushes first and RETURNS when
+    // anything is held - so the only state that needed announcing reached
+    // nothing but a console.error. Emitting from flushOutbox is what makes the
+    // scheduler's path and the tick's path say the same thing.
+    emits.length = 0;
+    const kept: OutboxItem[] = [{ at: Date.now() - 90_000, message: 'undelivered report' }];
+    const outbox = {
+      load: async () => kept,
+      save: async () => {},
+    };
+    const held = await flushOutbox({
+      report: async () => {
+        throw new Error('send budget blocked');
+      },
+      outbox,
+    });
+    expect(held).toHaveLength(1);
+    const stalls = emits.filter((e) => e[2] === 8);
+    expect(stalls).toHaveLength(1);
+    expect(stalls[0][0]).toBe('error-remediation');
+    expect(stalls[0][3]).toBe('reports undelivered: 1 unsent, oldest 2m');
+  });
+
+  it('a flush that clears the outbox raises nothing', async () => {
+    emits.length = 0;
+    const held = await flushOutbox({
+      report: async () => {},
+      outbox: { load: async () => [{ at: Date.now(), message: 'a' }], save: async () => {} },
+    });
+    expect(held).toEqual([]);
+    expect(emits.filter((e) => e[2] === 8)).toHaveLength(0);
   });
 
   it('fileOutbox round-trips, treats a missing file as empty, and rethrows an unreadable one', async () => {

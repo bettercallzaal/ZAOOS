@@ -30,6 +30,33 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
+      # CHECKOUT IS WHAT MAKES THE COLLISION GATE CORRECT. This job had none, so
+      # the gate could only ask the GitHub API "what files were added", and a
+      # renumbering rename adds nothing - see the step below. With the repo on
+      # disk it calls the same shared rule the other two guards use.
+      # fetch-depth: 0 because that rule needs base...HEAD, not a shallow tip.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # PIN TO THE PR HEAD. With no `ref:`, checkout takes refs/pull/N/merge
+          # on a pull_request event, and GitHub regenerates that ref against
+          # whatever main is when the runner picks the job up. `base.sha` is main
+          # at EVENT time, so `base.sha...HEAD` would span the merge commit and
+          # attribute every doc that landed on main in between to this PR.
+          # Measured by vault with one unrelated doc merging while the job was
+          # queued: the merge ref claimed research/community/2999-someone-else/
+          # alongside this PR's own directory; pinned to the head it claims only
+          # its own.
+          #
+          # It fails closed, so it could never let a bad merge through - it could
+          # only HOLD a good PR, naming a doc the author never touched. That
+          # still matters here for two reasons: ZAOOS has 30+ pre-band duplicate
+          # numbers, so a contaminated directory whose number is duplicated on
+          # main reports a collision; and a gate that merges with nobody present
+          # has to give the SAME ANSWER TWICE, while the merge ref gives a
+          # different answer depending on when the runner started.
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Classify PR files
         id: classify
         env:
@@ -117,8 +144,32 @@ jobs:
           # (#1650/#1654/#1661/#1613) on edits they did not author. (Fixed 2026-07-17.)
           # --paginate for the same reason as the classifier: an added doc dir past
           # the first page would otherwise never be collision-checked.
-          files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" --jq '.[] | select(.status=="added") | .filename')
-          newdirs=$(echo "$files" | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u || true)
+          # THIS STEP USED TO DECIDE WITH NOBODY PRESENT, AND IT WAS BLIND.
+          # It selected `.status=="added"` from the API. A doc RENUMBERED onto a
+          # taken number is a rename - it adds no directory - so `newdirs` came
+          # back empty, the step wrote collision=false, and the PR proceeded
+          # toward an AUTOMATIC merge. Every other instance of this filter holds
+          # a PR for a human who can read the message; this one is the only
+          # place the estate merges with no human in the loop, which is why it
+          # is the one that matters (vault's sweep, 2026-09-12).
+          #
+          # The comment above about `status=="added"` being load-bearing was
+          # RIGHT and is why the fix is not a wider filter: folding in M would
+          # hold every ordinary edit to any of the 30+ pre-band duplicate
+          # numbers, which is what broke #1650/#1654/#1661/#1613 in July. The
+          # actual rule is "renames whose NUMBER changed", and it now lives in
+          # exactly one place, called by all three guards.
+          #
+          # FAILS CLOSED. If the rule cannot answer, this holds the PR rather
+          # than merging it. Empty output must mean "no claims" and never "I
+          # could not look" - the same confusion that let a staged secret
+          # through the scan gate in #3444.
+          if ! newdirs=$(bash scripts/doc-new-claims.sh --range "${{ github.event.pull_request.base.sha }}"); then
+            echo "::error::doc-new-claims.sh could not determine the claimed doc numbers - holding this PR rather than auto-merging it"
+            echo "collision=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          newdirs=$(printf '%s\n' "$newdirs" | sed 's:/*$::' | grep -E '^research/[a-z_-]+/[0-9]+-' | sort -u || true)
           if [ -z "$newdirs" ]; then echo "collision=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           main_dirs=$(gh api "repos/${{ github.repository }}/git/trees/main?recursive=1" --paginate --jq '.tree[].path' | grep -oE '^research/[a-z_-]+/[0-9]+-[^/]+' | sort -u)
           collision=false

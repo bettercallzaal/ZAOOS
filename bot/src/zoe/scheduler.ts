@@ -55,7 +55,7 @@ import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { surfaceGrill } from './grill';
-import { runBacklogGrillBatch } from './backlog-grill-runner';
+import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
@@ -424,6 +424,90 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // is reached, nothing when the queue is empty. The hour window and the
   // 2-minute spacing are gone with the drip - see BATCH_DEFAULT for why both
   // had to go, and why the cap did not.
+  // RECONCILE EVERY 10 MINUTES, SEPARATELY FROM THE BATCH (2026-09-08).
+  //
+  // reconcileBacklogState was called from one place only - inside the daily
+  // batch - so a card closed on the board at 09:05 stayed counted as unanswered
+  // until the next morning. Up to 24 hours of a number wrong in the one
+  // direction that matters, upward.
+  //
+  // Zaal now works the backlog by hand from the obsidian lane, closing cards as
+  // he goes. The count is what tells him it is working, and it would not have
+  // moved until the following day. Measured 2026-09-08: 347 unanswered, of which
+  // ZERO were already closed - reconcile reclaims nothing retroactively, so
+  // every future closure IS the mechanism.
+  //
+  // SENDS NOTHING. runReconcileOnly does the read-and-settle half deliberately:
+  // no DM, no card selection, no cap, no hour window. That is what makes it safe
+  // at this cadence, and why it is not runBacklogGrillTick.
+  //
+  // 10 minutes, not 1: it fetches board rows for every pending card, and the
+  // thing being fixed is a 24-hour lag, not a 10-minute one.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      // NOT wrapped in runWithSendClass. That wrapper exists to budget SENDS,
+      // and this sends nothing - wrapping it would let a send budget throttle a
+      // reconcile that costs no sends, which is the opposite of what is wanted.
+      async () => {
+        try {
+          // NOT claimFire. claimFire's sentinel path embeds the UTC date and it
+          // writes with flag 'wx', so it returns true exactly ONCE PER UTC DAY
+          // per trigger - correct for the daily batch it was built for, and the
+          // 24-hour lag this cron exists to remove. Guarding a */10 schedule
+          // with it means the 00:0x tick claims the day and every tick after it
+          // returns early, so the count would still be up to a day stale while
+          // the cron log said it ran 144 times.
+          //
+          // withTickLock is per-RUN mutual exclusion with a staleness timeout
+          // and a release in `finally`, which is the property actually wanted:
+          // never two at once, always the next one.
+          //
+          // On the BATCH'S OWN LOCK, deliberately, not a reconcile-only one.
+          // Both mutate the same backlog state, so a reconcile landing between
+          // the batch's read and its write is a lost update - the batch would
+          // write back a count computed before the reconcile settled. A private
+          // lock would make reconcile safe against itself and leave that race
+          // open.
+          //
+          // THAT CHOICE DEPENDS ON A NUMBER, so here it is. tick-lock.ts has
+          // DEFAULT_STALE_MS = 30 minutes and NO HEARTBEAT: the lock is stamped
+          // once at acquisition (tick-lock.ts:144) and never refreshed while the
+          // callback runs, so "stale" means STARTED over 30 minutes ago, not
+          // dead. If the batch could ever run that long, a reconcile tick would
+          // break the lock and run beside a live batch - the exact lost update
+          // the shared lock was chosen to prevent, and WORSE than a private lock,
+          // because a private lock never claims to exclude the batch while a
+          // shared-but-breakable one does. Raised by the vault lane reviewing
+          // this PR; the failure would be silent and green, like the claimFire
+          // guard above it.
+          //
+          // Measured from the VPS journal, 2026-09-06 to 2026-09-12, batch start
+          // to "batch complete": 2s, 3s, 21s, 23s, 12s, 16s. WORST 23 SECONDS
+          // against an 1800-second window, ~78x margin. The four longest are all
+          // `sent 10`, which is the batch CAP - so the full-batch case is the
+          // worst SHAPE, not a lucky sample, and the runtime cannot grow with the
+          // backlog. Reconcile itself settled 27 board-closed + 15 verdict-synced
+          // in under a second on 2026-09-12.
+          //
+          // So the shared lock is safe today by a wide margin. What would change
+          // that is the CAP, not the queue: raise the batch cap far enough, or
+          // give a send a long retry, and this comment needs re-measuring. It is
+          // the cap that bounds it, which is why the number is written down here
+          // rather than left as "batches are quick".
+          await withTickLock(join(ZOE_PATHS.home, 'backlog-grill.tick.lock'), async () =>
+            runReconcileOnly({}),
+          );
+        } catch (err) {
+          // Never let reconcile take the scheduler down. A failed reconcile
+          // means a stale count, which is exactly what we already had.
+          console.error('[zoe/backlog-grill] reconcile failed:', err);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
   // 09:03, NOT 09:00: THE BATCH SHARED ITS MINUTE WITH THE AUTODEPLOY RESTART
   // AND WAS BEING KILLED BEFORE IT COULD QUEUE THE CARDS (2026-09-08).
   //

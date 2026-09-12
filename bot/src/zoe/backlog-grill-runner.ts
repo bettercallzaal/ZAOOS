@@ -429,6 +429,51 @@ export async function reconcileBacklogState(
 }
 
 /**
+ * Reconcile ONLY. Reads the board, settles cards that are already closed, and
+ * SENDS NOTHING.
+ *
+ * WHY THIS EXISTS SEPARATELY. `reconcileBacklogState` was called from exactly
+ * one place - inside `runBacklogGrillTick`, which runs once a day. So a card
+ * closed on the board at 09:05 stayed in the unanswered count until the batch
+ * ran again the following morning: up to 24 hours of a number that is wrong in
+ * the one direction that matters, upward.
+ *
+ * That was tolerable while the grill was a background drip. It is not tolerable
+ * now: Zaal works the backlog from the obsidian lane directly (convention 27),
+ * closing cards by hand, and the only number telling him whether it is working
+ * would not move until the next morning. Measured 2026-09-08: 347 unanswered,
+ * of which ZERO were already-closed - so reconcile reclaims nothing
+ * retroactively and every future closure is the entire mechanism.
+ *
+ * Deliberately NOT `runBacklogGrillTick`: that one sends. This must be safe to
+ * run every few minutes, so it does the read-and-settle half and stops. No DM,
+ * no card selection, no cap, no hour window.
+ */
+export async function runReconcileOnly(
+  deps: { fetchImpl?: typeof fetch; now?: number } = {},
+): Promise<{ boardClosed: number; verdictSynced: number; pending: number }> {
+  const fetchImpl = deps.fetchImpl ?? fetch;
+  const now = deps.now ?? Date.now();
+  if (!cfg()) return { boardClosed: 0, verdictSynced: 0, pending: 0 };
+
+  const state = await readState();
+  const rec = await reconcileBacklogState(state, fetchImpl, now);
+  if (rec.boardClosed || rec.verdictSynced) {
+    await writeState(state);
+  }
+  const pending = Object.keys(state.asked).filter((id) => !state.answered[id]).length;
+
+  // Log every run, including the quiet ones. The count is the thing being
+  // watched fall, and a line that only appears when something changed cannot be
+  // told apart from a run that never happened.
+  console.log(
+    `[zoe/backlog-grill] reconcile: ${rec.boardClosed} board-closed, ` +
+      `${rec.verdictSynced} verdict-synced, ${pending} still unanswered`,
+  );
+  return { ...rec, pending };
+}
+
+/**
  * One tick. Sends at most ONE card, or nothing.
  *
  * Returns what it did so the scheduler can log it - a silent tick that did

@@ -93,6 +93,75 @@ is strictly stronger than "the builder self-verifies."
   evaluator (that would burn the cap for no gain - `claude-usage.md`); the A-F gate above is
   enough. Reserve the fresh-context evaluator for changes whose failure is expensive.
 
+## Review the direction the change was FOR, not only the direction you fear
+
+Added 2026-09-12 after a reviewer approved a security-gate fix, verified the
+dangerous direction correctly, and never checked the direction the fix existed
+for. The gate shipped still broken in exactly the case the PR was written to
+close, and stayed broken on main until someone hit it.
+
+Their own account, and the sentence is the rule:
+
+> I checked whether the fix could UNDER-report - the dangerous direction in a
+> security gate - and correctly found it could not. I never checked whether it
+> still OVER-reports in the case the PR existed to fix. **I verified the
+> direction I feared instead of the direction the change was for.**
+
+Both directions matter and they are different questions. A gate has a failure
+mode you are afraid of (it lets something through) and a failure mode that is
+the entire reason for the change (it blocks something it should not). Checking
+only the first is how a fix ships with its own purpose unmet, and it reads as a
+thorough review the whole way through, because the check that WAS run was real.
+
+### The mechanism that stops the second check: a coherent justification
+
+The line that was approved carried a comment explaining why the shortcut was
+safe:
+
+    # Either the other parent genuinely added nothing, or the diff failed.
+    # Both are indistinguishable here, so do not filter.
+
+They were never indistinguishable - the subprocess call discarded a returncode
+that says which. But the reasoning was RIGHT THERE and internally consistent, so
+the reviewer read it, found it sound, and stopped.
+
+> **A comment that explains why a shortcut is safe is the most effective thing
+> there is at stopping a reviewer checking**, because the reasoning is right
+> there and coherent. Coherent-and-false beats absent.
+
+An absent justification invites the question. A present, plausible, wrong one
+answers it before it is asked. So a comment asserting that something cannot be
+distinguished, cannot happen, or is safe by construction is the highest-value
+thing in a diff to verify, not the thing that lets you skip verifying.
+
+### What to do
+
+1. **Name both directions before reviewing a gate or filter.** Write down what
+   it must never let through AND what it must never block. Check each.
+2. **Test the case in the PR title.** If the PR says it fixes X, the review is
+   not done until X is demonstrated fixed - by a control that is red without the
+   change, not by reading the diff and agreeing with it.
+3. **Treat an impossibility claim in a comment as the thing to check.** "Both
+   are indistinguishable", "this cannot be empty", "safe because" - open the API
+   and confirm. Comments outlive the code they justify, and the next reader
+   inherits the assertion without the doubt.
+4. **When correcting such a comment, name the false claim rather than quietly
+   replacing it** - the next reader meets the correction where the mistake was
+   made. Prefer a signature that cannot express the confusion at all (a type
+   that returns `None` for "could not read" versus `[]` for "read, empty") over
+   a comment telling people not to make it.
+5. **A negative result is reported as a negative result.** "I could not
+   construct a case" is not "the problem is not there", and the weaker claim is
+   what leaves the door open for someone to check again. In this incident the
+   author said exactly that to a peer, went to build the peer's missing fixture,
+   and discovered the case WAS reachable - which is the only reason it was found.
+
+### Guard
+
+This does not mean re-review everything. It is two extra questions - which
+direction did I check, and which one was this change for - and one habit: the
+most confident sentence in the diff is the one to verify.
+
 ## Guards
 
 - This gate is PR-only. Passing the rubric earns a PR, never an auto-merge or a
@@ -115,3 +184,14 @@ existing PR-only harness. The default-FAIL fresh-context evaluator section was f
 in 2026-08-03 from Anthropic's `cwc-long-running-agents` harness (Default-FAIL Contract),
 verified FULL via the agent-tooling research task. Companion: `agent-loops.md`,
 `silent-failure-guard.md`, `anti-fabrication.md`, `code-restraint.md`, `workflow-discipline.md`.
+
+The "review the direction the change was FOR" section was added 2026-09-12 from
+ZAOOS #3502 (a security-gate fix that shipped still broken in the case it was
+written to close) and #3505 (the correction), across the zaoos-review, vault and
+dotfiles lanes. The reviewer who made the error diagnosed and reported it
+themselves after reproducing the defect independently; the "coherent-and-false
+beats absent" formulation is theirs. Siblings for that section:
+`noisy-signal-guard.md` (a check that cannot reach zero - this is a check that
+cannot fail, and a justification that discourages writing one),
+`confirm-before-claiming-absence.md` (a negative result is not an absence),
+`silent-failure-guard.md` rule 5 (a security scan that passes on error).

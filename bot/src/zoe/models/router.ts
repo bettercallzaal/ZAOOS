@@ -470,9 +470,17 @@ async function callOllama(systemPrompt: string, userMessage: string): Promise<Cl
     }
     const data = (await response.json()) as OpenAiResponse;
     const text = data.choices[0]?.message?.content ?? '';
-    // Same clause as Surplus: a 200 with an empty completion is a FAILED call,
-    // not an empty answer. A local model that is loaded but has no model pulled
-    // answers 200 with nothing, which is exactly the shape that must not pass.
+    // Same clause as Surplus: a 200 carrying an empty completion is a FAILED
+    // call, not an empty answer.
+    //
+    // The first version of this comment justified the clause with "a server
+    // with no model pulled answers 200 with nothing". Measured against the real
+    // servers on 2026-09-11, that is false: ollama answers a missing model with
+    // HTTP 404 and {"error":{"message":"model 'X' not found",...}}, which the
+    // !response.ok branch above already catches. The clause stays because an
+    // empty 200 is still not an answer - it just is not the missing-model case,
+    // and a reason nobody checked is how a guard ends up pointed at the wrong
+    // failure.
     if (!text.trim()) {
       throw new Error('Ollama returned empty completion');
     }
@@ -558,7 +566,12 @@ export async function callCapFallback(
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.warn(`[zoe/models/router] cap-fallback ${attempt.name} failed:`, msg);
-      errors.push(`${attempt.name}: ${msg.slice(0, 80)}`);
+      // 80 characters cut the local rung's most likely failure in half: a
+      // missing model reads "Ollama error 404: {"error":{"message":"model
+      // 'qwen3:4b-instr" and stops, so the one word that says what to do -
+      // the model name, and "not found" - never arrives. This error is what
+      // reaches Zaal; the console.warn above is what nobody reads.
+      errors.push(`${attempt.name}: ${msg.slice(0, 200)}`);
     }
   }
   throw new Error(`all cap-fallback providers failed [${errors.join(' | ')}]`);

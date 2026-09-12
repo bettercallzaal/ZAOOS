@@ -296,6 +296,24 @@ describe('the local rung: Ollama, last and keyless', () => {
     await expect(callCapFallback('sys', 'user')).rejects.toThrow(/empty completion/);
   });
 
+  it('a model that is not pulled is a 404 whose message names the model', async () => {
+    // Measured, not assumed. On 2026-09-11 the real servers were asked directly:
+    // the Mac (llama3.2 present) answered 200 with content, and the VPS, which
+    // has ollama running and NO model pulled, answered
+    //   HTTP 404 {"error":{"message":"model 'qwen3:4b-instruct' not found",...}}
+    // The comment in callOllama used to claim that case was a 200 with nothing.
+    // It is not, and the rung has to fail loudly with the model name in it, or
+    // a box one `ollama pull` short of working looks the same as a box that is
+    // configured wrong.
+    setEnv({ OLLAMA_ENABLED: '1' });
+    globalThis.fetch = vi.fn(async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '{"error":{"message":"model \'qwen3:4b-instruct\' not found","type":"not_found_error"}}',
+    })) as unknown as typeof fetch;
+    await expect(callCapFallback('sys', 'user')).rejects.toThrow(/qwen3:4b-instruct.*not found/);
+  });
+
   it('honours OLLAMA_URL and OLLAMA_MODEL so a remote box or a different model needs no deploy', async () => {
     setEnv({ OLLAMA_ENABLED: '1', OLLAMA_URL: 'http://100.72.152.63:11434', OLLAMA_MODEL: 'llama3.2' });
     let seen = '';

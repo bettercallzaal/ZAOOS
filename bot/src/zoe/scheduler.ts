@@ -35,7 +35,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
-import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
+import { runErrorRemediationTick, defaultRemediationDeps, flushOutbox, describeOutbox } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
 import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
@@ -1358,13 +1358,27 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         runWithSendClass('alarm', async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
-        if (shouldPauseAutonomousWork()) return; // cost hard-stop
         try {
           const deps = defaultRemediationDeps(
-            (text: string) => opts.bot.api.sendMessage(gid, text).then(() => {}),
+            // assertSendDelivered: a blocked send resolves, and the outbox only
+            // keeps a report whose send THROWS. Without it a budget block would
+            // read as delivered and be dropped from the outbox.
+            (text: string) => opts.bot.api.sendMessage(gid, text).then(assertSendDelivered).then(() => {}),
             opts.zaalTgId,
             gid,
           );
+          // Deliver first, and BEFORE the cost hard-stop: these are outcomes
+          // already decided and already marked. A paused ZOE must not sit on
+          // breakage notices (vault, #3446 review).
+          // flushOutbox raises the priority-8 mission-control stall itself, so
+          // returning here does not swallow the signal - which it did while the
+          // emit lived in the tick below (vault, #3483 review).
+          const held = await flushOutbox(deps);
+          if (held.length > 0) {
+            console.error(`[zoe/scheduler] error-remediation reports ${describeOutbox(held)}`);
+            return;
+          }
+          if (shouldPauseAutonomousWork()) return; // cost hard-stop
           const status = await runErrorRemediationTick(deps);
           if (status !== 'no new errors') {
             console.log(`[zoe/scheduler] error-remediation: ${status}`);

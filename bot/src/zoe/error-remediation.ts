@@ -13,12 +13,27 @@
  * One error per tick (bounded blast radius, agent-loops rule 5). The fix
  * pipeline (dispatchHermesRun) already enforces the fleet daily cap.
  *
+ * EVERY OUTCOME IS QUEUED BEFORE THE ROW IS MARKED (vault review of #3446,
+ * 2026-09-11). The row used to be marked 'fixed'/'escalated' and THEN reported,
+ * and fetchNewErrors only reads status='new'. So a report that threw - Telegram
+ * down, a bad group id, a blocked send - left an error permanently marked
+ * handled that Zaal was never told about, with one console line as the trace.
+ * Reporting first does not fix it: a failed report would leave the claim stuck
+ * in 'fixing', which nothing re-reads either. So the report goes into a durable
+ * outbox FIRST, then the row is marked, then the outbox is flushed. A crash
+ * anywhere in between leaves the message in the outbox; the next tick sends it
+ * before anything else, and claims no new error while one is still unsent. A
+ * duplicate report after a crash is cheap. A lost one is the bug.
+ *
  * Pure helpers (normalizeStack/stackHash/buildIssueText/repoToTarget/pickNext)
  * are unit-tested; runErrorRemediationTick takes injected deps so the routing
  * logic is testable without a DB or a live pipeline.
  */
 
 import { createHash } from 'node:crypto';
+import { promises as fs } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { mcEmit } from './mission-control';
 import type { HermesRepoTarget } from '../hermes/types';
 import { db } from '../supabase';
@@ -56,8 +71,97 @@ export interface RemediationDeps {
     issueText: string;
     targetRepo: HermesRepoTarget;
   }) => Promise<RemediationDispatchResult>;
-  /** Post a human-readable outcome (ZAALBOTS group). */
+  /** Post a human-readable outcome (ZAALBOTS group). Must THROW when the
+   *  message did not reach Telegram, including a budget block. */
   report: (message: string) => Promise<void>;
+  /** Durable queue of outcome reports not yet delivered, oldest first. */
+  outbox: RemediationOutbox;
+}
+
+/** One queued report. `at` is when it was queued, so a stall has an age. */
+export interface OutboxItem {
+  at: number;
+  message: string;
+}
+
+export interface RemediationOutbox {
+  load: () => Promise<OutboxItem[]>;
+  save: (pending: OutboxItem[]) => Promise<void>;
+}
+
+/**
+ * Send queued reports oldest first; stop at the first that fails and keep it
+ * and everything after it. Returns what is still unsent.
+ *
+ * A stall here stops remediation on purpose (see the tick), and the outbox is
+ * the one channel that cannot announce it - the send is what is broken. So the
+ * depth and the age of the oldest item go into the tick's status line and into
+ * mission control, and zao-selftest reads the file over ssh (vault, #3446
+ * review).
+ *
+ * The mission-control emit lives HERE, not in the caller. It was in the tick,
+ * and the scheduler flushes first and returns early when anything is held - so
+ * the one state that needed announcing was the one state that reached only a
+ * console.error into journald, which nobody reads (vault, #3483 review). Any
+ * caller that flushes now announces a stall whether it remembers to or not.
+ */
+export async function flushOutbox(deps: Pick<RemediationDeps, 'report' | 'outbox'>): Promise<OutboxItem[]> {
+  const pending = await deps.outbox.load();
+  let sent = 0;
+  for (const item of pending) {
+    try {
+      await deps.report(item.message);
+    } catch (err) {
+      console.error('[zoe/remediation] report not delivered, kept in the outbox:', (err as Error)?.message);
+      break;
+    }
+    sent += 1;
+  }
+  if (sent > 0) await deps.outbox.save(pending.slice(sent));
+  const held = pending.slice(sent);
+  if (held.length > 0) {
+    mcEmit('error-remediation', 'zoe', 8, `reports undelivered: ${describeOutbox(held)}`);
+  }
+  return held;
+}
+
+/** "4 unsent, oldest 3h" - the sentence that turns a silent stall into a fact. */
+export function describeOutbox(pending: OutboxItem[], now = Date.now()): string {
+  if (pending.length === 0) return 'outbox empty';
+  const oldestMs = now - Math.min(...pending.map((i) => i.at || now));
+  const age = oldestMs >= 3600_000 ? `${Math.round(oldestMs / 3600_000)}h`
+    : oldestMs >= 60_000 ? `${Math.round(oldestMs / 60_000)}m` : `${Math.round(oldestMs / 1000)}s`;
+  return `${pending.length} unsent, oldest ${age}`;
+}
+
+/**
+ * Record an outcome: queue the report, THEN mark the row, THEN try to send.
+ * If the outbox cannot be written, fall back to send-first: report, then mark,
+ * so a failure leaves the row unmarked rather than marked and unreported.
+ */
+async function settle(
+  deps: RemediationDeps,
+  message: string,
+  mark: () => Promise<void>,
+): Promise<'sent' | 'queued'> {
+  let queued = true;
+  try {
+    await deps.outbox.save([...(await deps.outbox.load()), { at: Date.now(), message }]);
+  } catch (err) {
+    queued = false;
+    console.error('[zoe/remediation] outbox unwritable, reporting before marking:', (err as Error)?.message);
+  }
+  if (!queued) {
+    await deps.report(message); // throws -> the row is never marked
+    await mark();
+    return 'sent';
+  }
+  // Queue, THEN mark. If the process dies in between, the row is still 'new',
+  // the next tick re-processes it, and Zaal gets the report twice. That is the
+  // direction to fail: a duplicate is cheap, a silent drop is the bug this
+  // exists to remove. Do not move the mark before the queue to "fix" it.
+  await mark();
+  return (await flushOutbox(deps)).length === 0 ? 'sent' : 'queued';
 }
 
 const SUPPORTED_TARGETS: readonly HermesRepoTarget[] = ['zaoos', 'zaostock', 'zaocowork'];
@@ -117,6 +221,15 @@ export function buildIssueText(err: AppError): string {
  * One remediation pass. Returns a short status string for logging.
  */
 export async function runErrorRemediationTick(deps: RemediationDeps): Promise<string> {
+  // Anything decided earlier and not yet told goes first. No new decisions
+  // while Zaal cannot be told about the old ones.
+  // flushOutbox emits the priority-8 stall itself, so this path and the
+  // scheduler's early return announce the same thing.
+  const unsent = await flushOutbox(deps);
+  if (unsent.length > 0) {
+    return `holding: ${describeOutbox(unsent)}, no new error claimed`;
+  }
+
   const errors = await deps.fetchNewErrors();
   const next = pickNext(errors);
   if (!next) return 'no new errors';
@@ -127,11 +240,12 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
 
   const target = repoToTarget(next.repo);
   if (!target) {
-    await deps.markEscalated(next.id, `unsupported repo '${next.repo}' - no fix target`);
-    await deps.report(
+    const how = await settle(
+      deps,
       `Error ${next.ref_code ?? next.id.slice(0, 8)} in '${next.repo}' needs you - no auto-fix target for that repo.`,
+      () => deps.markEscalated(next.id, `unsupported repo '${next.repo}' - no fix target`),
     );
-    return `escalated (unsupported repo ${next.repo})`;
+    return `escalated (unsupported repo ${next.repo}), report ${how}`;
   }
 
   let result: RemediationDispatchResult;
@@ -139,44 +253,76 @@ export async function runErrorRemediationTick(deps: RemediationDeps): Promise<st
     result = await deps.dispatchFix({ issueText: buildIssueText(next), targetRepo: target });
   } catch (err) {
     const reason = (err as Error)?.message ?? String(err);
-    await deps.markEscalated(next.id, `dispatch threw: ${reason}`);
-    await deps.report(
+    const how = await settle(
+      deps,
       `Error ${next.ref_code ?? next.id.slice(0, 8)} (${target}) - fix pipeline errored, needs you: ${reason}`,
+      () => deps.markEscalated(next.id, `dispatch threw: ${reason}`),
     );
-    return `escalated (dispatch threw)`;
+    return `escalated (dispatch threw), report ${how}`;
   }
 
   const tag = next.ref_code ?? next.id.slice(0, 8);
   if (result.kind === 'ready') {
-    await deps.markFixed(next.id, result.prUrl, result.runId);
     const prLabel = result.prNumber ? `PR #${result.prNumber}` : 'a PR';
-    await deps.report(
+    const ready = result;
+    const how = await settle(
+      deps,
       `Error ${tag} (${target}${next.brand ? `, brand ${next.brand}` : ''}): diagnosed -> fixed -> ${prLabel} open${result.prUrl ? ` ${result.prUrl}` : ''}. Ready for your merge.`,
+      () => deps.markFixed(next.id, ready.prUrl, ready.runId),
     );
     mcEmit('error-remediation', 'zoe', 5, `error ${tag} fixed -> ${result.prUrl ?? 'PR open'}`);
     featureRan('error-remediation', 'auto-fixed');
-    return `fixed -> ${result.prUrl ?? 'pr'}`;
+    return `fixed -> ${result.prUrl ?? 'pr'}, report ${how}`;
   }
 
-  await deps.markEscalated(next.id, `${result.kind}: ${result.reason}`);
-  await deps.report(
+  const failed = result;
+  const how = await settle(
+    deps,
     `Error ${tag} (${target}) - pipeline could not auto-fix (${result.kind}): ${result.reason}. Needs you.`,
+    () => deps.markEscalated(next.id, `${failed.kind}: ${failed.reason}`),
   );
   mcEmit('error-remediation', 'zoe', 8, `error ${tag} NEEDS ZAAL (${result.kind}): ${result.reason}`);
   featureRan('error-remediation', `escalated: ${result.kind}`);
-  return `escalated (${result.kind})`;
+  return `escalated (${result.kind}), report ${how}`;
 }
 
 /**
  * Wire the tick to the real cowork DB, the Hermes fix pipeline, and a report
  * sink. Not unit-tested (I/O); the routing logic it drives is (above).
  */
+/** The outbox as a JSON array under ZOE_HOME, written atomically. */
+export function fileOutbox(path: string = join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'),
+  'remediation-outbox.json')): RemediationOutbox {
+  return {
+    load: async () => {
+      try {
+        const parsed = JSON.parse(await fs.readFile(path, 'utf8'));
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .map((i) => (typeof i === 'string' ? { at: 0, message: i } : i))
+          .filter((i): i is OutboxItem => typeof i?.message === 'string')
+          .map((i) => ({ at: typeof i.at === 'number' ? i.at : 0, message: i.message }));
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') return [];
+        throw err; // unreadable is not empty: settle() falls back to send-first
+      }
+    },
+    save: async (pending: OutboxItem[]) => {
+      await fs.mkdir(dirname(path), { recursive: true });
+      const tmp = `${path}.${process.pid}.tmp`;
+      await fs.writeFile(tmp, JSON.stringify(pending), 'utf8');
+      await fs.rename(tmp, path);
+    },
+  };
+}
+
 export function defaultRemediationDeps(
   report: (message: string) => Promise<void>,
   triggeredByTelegramId: number,
   triggeredInChatId: number,
 ): RemediationDeps {
   return {
+    outbox: fileOutbox(),
     fetchNewErrors: async () => {
       const { data, error } = await db()
         .from('app_errors')

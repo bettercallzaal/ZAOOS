@@ -91,7 +91,6 @@ You have READ-ONLY access to the codebase plus web research:
 |----------|-----|--------------|
 | Incented | incented.co/organizations/zabal | New campaigns, protocol updates |
 | Empire Builder | empirebuilder.world | Empire features, Clanker integration |
-| MAGNETIQ | magnetiq.xyz | API release, POM updates |
 | Clanker | clanker.world | Protocol changes (now owned by Neynar) |
 
 (Add notes about new tools and sources as you discover them.)

@@ -395,7 +395,7 @@ describe('reconcileBacklogState - the terminal end settles phone cards', () => {
     });
 
   const boardWith =
-    (rows: Array<{ id: string; status?: string; archived_at?: string | null; notes?: string }>) =>
+    (rows: Array<{ id: string; status?: string; archived_at?: string | null; notes?: string; metadata?: unknown }>) =>
     (async () =>
       ({ ok: true, status: 200, json: async () => rows }) as unknown as Response) as unknown as typeof fetch;
 
@@ -417,7 +417,7 @@ describe('reconcileBacklogState - the terminal end settles phone cards', () => {
       ]),
       NOW,
     );
-    expect(rec).toEqual({ boardClosed: 1, verdictSynced: 1 });
+    expect(rec).toEqual({ boardClosed: 1, verdictSynced: 1, laneOwned: 0, revived: 0 });
     expect(s.answered.closed?.verdict).toBe('board-closed');
     expect(s.answered.ruled?.verdict).toBe('verdict-synced');
     expect(s.answered.open).toBeUndefined();
@@ -436,7 +436,7 @@ describe('reconcileBacklogState - the terminal end settles phone cards', () => {
     const s = askedThree();
     const failing = (async () => ({ ok: false, status: 500 }) as unknown as Response) as unknown as typeof fetch;
     const rec = await reconcileBacklogState(s, failing, NOW);
-    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0 });
+    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0, laneOwned: 0, revived: 0 });
     expect(Object.keys(s.answered)).toHaveLength(0);
     expect(outstandingCount(s, NOW)).toBe(3);
   });
@@ -448,6 +448,119 @@ describe('reconcileBacklogState - the terminal end settles phone cards', () => {
     await reconcileBacklogState(s, boardWith([{ id: 'parked', status: 'done', archived_at: null }]), NOW);
     expect(s.answered.parked?.verdict).toBe('board-closed');
     expect(s.asked.parked?.requeuedAt).toBeUndefined();
+  });
+
+  // 2026-09-08: a lane's card is not a thumb's card. The ask is withdrawn, the
+  // board row is untouched, and the withdrawal reverses itself if the route moves.
+  it('withdraws the ask on a card triage routed to an agent, and counts it', async () => {
+    const s = st({ asked: { lane: { at: new Date(NOW - 3_600_000).toISOString(), title: 'A lane job' } } });
+    expect(outstandingCount(s, NOW)).toBe(1);
+    const rec = await reconcileBacklogState(
+      s,
+      boardWith([{ id: 'lane', status: 'todo', archived_at: null, notes: '', metadata: { route: 'agent' } }]),
+      NOW,
+    );
+    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0, laneOwned: 1, revived: 0 });
+    expect(s.answered.lane?.verdict).toBe('lane-owned');
+    expect(outstandingCount(s, NOW)).toBe(0);
+  });
+
+  it('revives a lane-owned card whose route moved back to Zaal, and is idle otherwise', async () => {
+    const s = st({
+      asked: { lane: { at: new Date(NOW - 3_600_000).toISOString(), title: 'A lane job' } },
+      answered: { lane: { at: new Date(NOW - 60_000).toISOString(), verdict: 'lane-owned' } },
+    });
+    // Still lane-owned: nothing changes, nothing is counted.
+    let rec = await reconcileBacklogState(
+      s,
+      boardWith([{ id: 'lane', status: 'todo', archived_at: null, metadata: { route: 'agent' } }]),
+      NOW,
+    );
+    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0, laneOwned: 0, revived: 0 });
+    expect(s.answered.lane?.verdict).toBe('lane-owned');
+    // Route flipped to human: the answer is withdrawn and the card counts again.
+    rec = await reconcileBacklogState(
+      s,
+      boardWith([{ id: 'lane', status: 'todo', archived_at: null, metadata: { route: 'human' } }]),
+      NOW,
+    );
+    expect(rec).toEqual({ boardClosed: 0, verdictSynced: 0, laneOwned: 0, revived: 1 });
+    expect(s.answered.lane).toBeUndefined();
+    expect(outstandingCount(s, NOW)).toBe(1);
+  });
+
+  it('a lane-owned card the lane then closes becomes board-closed, not stuck', async () => {
+    const s = st({
+      asked: { lane: { at: new Date(NOW).toISOString(), title: 'A lane job' } },
+      answered: { lane: { at: new Date(NOW).toISOString(), verdict: 'lane-owned' } },
+    });
+    const rec = await reconcileBacklogState(s, boardWith([{ id: 'lane', status: 'done', archived_at: null }]), NOW);
+    expect(rec.boardClosed).toBe(1);
+    expect(s.answered.lane?.verdict).toBe('board-closed');
+  });
+});
+
+describe('runBacklogGrillTick - a lane-owned card is never sent', () => {
+  const NOW = Date.UTC(2026, 8, 8, 14, 0, 0);
+  const board = [
+    { id: 'agent1', title: 'Lane job', created_at: '2026-01-01T00:00:00Z', metadata: { route: 'agent' } },
+    { id: 'human1', title: 'Zaal job', created_at: '2026-01-02T00:00:00Z', metadata: { route: 'human' } },
+  ];
+  const f = (async (url: string, init?: RequestInit) => {
+    if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+    const u = String(url);
+    if (u.includes('order=created_at.asc')) {
+      return { ok: true, status: 200, json: async () => board } as unknown as Response;
+    }
+    return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+  }) as unknown as typeof fetch;
+
+  beforeEach(() => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+  });
+
+  it('skips the older route=agent card and sends the human one', async () => {
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: NOW,
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(true);
+    expect(result.title).toBe('Zaal job');
+  });
+
+  it('a card the send budget blocked is not recorded as asked', async () => {
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 0, zoeSendBudget: 'dropped' }) as never,
+      localHour: 10,
+      now: NOW,
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(false);
+    expect(result.reason).toContain('send blocked');
+    const written = [...files.values()].join('');
+    expect(written).not.toContain('firstAskedAt'); // nothing climbed the nag ladder
+  });
+
+  it('reports nothing to ask when every open card is a lane\'s', async () => {
+    const onlyAgent = (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+      if (String(url).includes('order=created_at.asc')) {
+        return { ok: true, status: 200, json: async () => [board[0]] } as unknown as Response;
+      }
+      return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+    }) as unknown as typeof fetch;
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: NOW,
+      fetchImpl: onlyAgent,
+    });
+    expect(result.sent).toBe(false);
+    expect(result.reason).toBe('nothing left to ask about');
   });
 });
 

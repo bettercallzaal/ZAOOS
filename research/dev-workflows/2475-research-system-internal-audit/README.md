@@ -199,12 +199,56 @@ duplicating it.
 The signature failure - *"a tool that exists, works, and runs nowhere"* - now has
 its **fifth and sixth** recorded instances, both found in this audit:
 
-| Tool | State |
+> **RESOLVED 2026-09-08 by the zj lane. Every row in the table below is now
+> false.** Struck in place rather than rewritten, because the point of the table
+> was that four instances coexisted and nobody could see them - deleting the
+> evidence would delete the finding. Re-measured state is in the second table.
+
+| Tool | State AS AUDITED 2026-09-07 (all four now fixed) |
 |---|---|
 | `zao-grill-queue-drain` | In `~/bin`, documented, **scheduled nowhere.** `GRILL-QUEUE.md` frozen since 2026-09-03 while the VPS spool holds 10 cards, oldest from 2026-08-16 |
 | `zao-vault-toc` | Its own header prescribes an hourly cron. **Never installed** - `~/.zao/vault-toc.txt` has never existed. Third recurrence, per the wrapper's own comments (2026-08-27, 2026-09-04) |
 | `zao-lane-watch-all` | Exists, is a `while True` daemon, **no such process running** |
 | `zao-lane-journal` | The free no-model overnight digest. **Last output 2026-09-02**, five days stale |
+
+**Re-measured 2026-09-08 22:1x, on the machine:**
+
+| Tool | Now | Evidence |
+|---|---|---|
+| `zao-grill-queue-drain` | hourly in cron, with a beat | `crontab -l` 1 line; beat 2026-09-08 21:52 |
+| `zao-vault-toc` | hourly in cron, with a beat | `crontab -l` 1 line; `~/.zao/vault-toc.txt` EXISTS |
+| `zao-lane-watch-all` | running under launchd | `launchctl list` -> pid 26674 |
+| `zao-lane-journal` | in cron, output current | newest `~/.zao/lane-journal/2026-09-08.md` |
+
+The VPS spool this table cites is also gone - `grill-queue-spool.jsonl` no longer
+exists, and the 10 cards it held were drained into `GRILL-QUEUE.md` on 2026-09-07.
+
+**Two things the fix changed that the audit could not have predicted.**
+
+First, **recommendation 6 was assigned to the wrong person, and the assignment
+was itself the blocker.** Both cron lines were routed to `@Zaal | Config` on the
+strength of `bin/zao-vault-toc`'s header - *"Zaal installs it; a script must not
+edit his crontab."* Asked directly on 2026-09-08 he answered **"lanes may install
+cron lines"**, and all of them went in within the hour. The header has been
+marked superseded and the rule is now convention 32 in
+`zao-vault/notes/orca-organization.md`. **launchd is unchanged and still his.**
+
+Second, **the class is now detected rather than audited by hand.** These four
+were found by a person reading `bin/`. `zao-selftest` now scans every tool for a
+five-field cron expression in its own header and compares it against the live
+crontab and installed launchd agents - and immediately found **two more nobody
+had listed**: `zao-tap-digest` (`0 7,17 * * *`, card 190a964e) and
+`zao-mirror-reconcile` (`30 3 * * *`, card b6690074), both approved 2026-08-19
+and never once executed in the twenty days since. `zao-tap-digest` is the digest
+that pages Zaal about lanes waiting on him.
+
+**One acceptance criterion in this doc cannot be met as written**, noted so the
+next reader does not chase it. Line ~250 says the drain is shipped *"when
+`GRILL-QUEUE.md` mtime is under 2h and the VPS spool is empty"*. Those two are
+only simultaneously true in the minutes after a drain that actually found cards:
+an empty spool means nothing to append, which means the mtime stays old. The
+honest test is the one now running - the cron line exists, the beat is fresh, and
+the spool is empty.
 
 And a delivery failure of the same shape: `zao-lane-watch` fired **573 alerts in
 25 days and delivered none of them**, because AppleScript-syntax leftovers fell

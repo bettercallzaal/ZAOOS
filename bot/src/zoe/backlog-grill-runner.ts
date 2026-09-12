@@ -26,10 +26,12 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { wasSendBlocked } from './send-budget';
 import { homedir } from 'node:os';
 import { featureRan } from './feature-ran';
 import {
   classifyReconcile,
+  isLaneOwned,
   TERMINAL_VERDICT_RE,
   BATCH_DEFAULT,
   cardPosition,
@@ -255,8 +257,13 @@ async function nextTask(
 ): Promise<{ task: BoardTask; remaining: number; unasked: number } | null> {
   const c = cfg();
   if (!c) return null;
-  const rows = await fetchTodoRows(c, fetchImpl);
-  if (!rows) return null;
+  const board = await fetchTodoRows(c, fetchImpl);
+  if (!board) return null;
+  // A lane-owned card (route=agent, unflagged - see isLaneOwned) is filtered
+  // out of EVERY tier, not just the fresh one: a card that was asked before
+  // triage routed it must stop re-asking too. It comes straight back the tick
+  // the route changes, because this is a filter on the live row, not state.
+  const rows = board.filter((t) => !isLaneOwned(t.metadata, t.title));
   // A never-asked task whose notes already carry a terminal grill verdict was
   // ruled on from the other end - sending it a phone card would be the exact
   // both-ends dupe this card exists to kill (6b6875d1). It still shows up here
@@ -344,6 +351,14 @@ function getOldestUnansweredTaskId(s: BacklogGrillState): string | null {
  * a parked card too) is checked against the board in chunks:
  *  - task closed / archived / deleted -> answered {verdict: 'board-closed'}
  *  - still todo but notes carry a terminal verdict -> {verdict: 'verdict-synced'}
+ *  - still todo, route=agent and unflagged -> {verdict: 'lane-owned'} (2026-09-08:
+ *    117 of 347 unanswered cards were a lane's work, not Zaal's)
+ *
+ * 'lane-owned' is the one verdict reconcile also UNDOES: an entry it settled
+ * that way is re-checked every pass, and if the row is no longer lane-owned
+ * (route changed, flag set) the answer is deleted so the card re-enters the
+ * re-ask tier. Nothing about the card itself changes - the board row is read,
+ * never written.
  *
  * A failed chunk fetch marks NOTHING from that chunk - a card we could not
  * check is a card we cannot prove is dealt with, and between over-counting and
@@ -354,11 +369,13 @@ export async function reconcileBacklogState(
   state: BacklogGrillState,
   fetchImpl: typeof fetch,
   now: number,
-): Promise<{ boardClosed: number; verdictSynced: number }> {
+): Promise<{ boardClosed: number; verdictSynced: number; laneOwned: number; revived: number }> {
   const c = cfg();
-  const result = { boardClosed: 0, verdictSynced: 0 };
+  const result = { boardClosed: 0, verdictSynced: 0, laneOwned: 0, revived: 0 };
   if (!c) return result;
-  const pending = Object.keys(state.asked).filter((id) => !state.answered[id]);
+  const pending = Object.keys(state.asked).filter(
+    (id) => !state.answered[id] || state.answered[id].verdict === 'lane-owned',
+  );
   if (pending.length === 0) return result;
 
   const at = new Date(now).toISOString();
@@ -367,8 +384,15 @@ export async function reconcileBacklogState(
     const ids = pending.slice(i, i + CHUNK);
     const url =
       `${c.root}/rest/v1/tasks?id=in.(${ids.join(',')})` +
-      `&select=id,status,archived_at,notes`;
-    let rows: Array<{ id: string; status?: string; archived_at?: string | null; notes?: string | null }>;
+      `&select=id,title,status,archived_at,notes,metadata`;
+    let rows: Array<{
+      id: string;
+      title?: string | null;
+      status?: string;
+      archived_at?: string | null;
+      notes?: string | null;
+      metadata?: unknown;
+    }>;
     try {
       const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
       if (!r.ok) continue;
@@ -379,14 +403,26 @@ export async function reconcileBacklogState(
     const byId = new Map(rows.map((row) => [row.id, row]));
     for (const id of ids) {
       const verdict = classifyReconcile(byId.get(id));
-      if (!verdict) continue;
+      const wasLaneOwned = state.answered[id]?.verdict === 'lane-owned';
+      if (wasLaneOwned && verdict === 'lane-owned') continue;
+      if (!verdict) {
+        // Only a lane-owned answer can be here unanswered-or-lane-owned and
+        // classify to null: the route moved back to Zaal. Withdraw the answer;
+        // the card is open and asked, so the re-ask ladder picks it up.
+        if (wasLaneOwned) {
+          delete state.answered[id];
+          result.revived++;
+        }
+        continue;
+      }
       state.answered[id] = { at, verdict };
       // A parked (requeued) card that the board settled is settled - clear the
       // park mark so applyBacklogAnswer's requeue bookkeeping never revives it.
       if (state.asked[id]?.requeuedAt) delete state.asked[id].requeuedAt;
       if (state.activeTaskId === id) state.activeTaskId = null;
       if (verdict === 'board-closed') result.boardClosed++;
-      else result.verdictSynced++;
+      else if (verdict === 'verdict-synced') result.verdictSynced++;
+      else result.laneOwned++;
     }
   }
   return result;
@@ -459,10 +495,11 @@ export async function runBacklogGrillTick(
   // actually still be sent, or a terminal sweep leaves the drip jammed on
   // cards the board already closed.
   const rec = await reconcileBacklogState(state, fetchImpl, now);
-  if (rec.boardClosed || rec.verdictSynced) {
+  if (rec.boardClosed || rec.verdictSynced || rec.laneOwned || rec.revived) {
     await writeState(state);
     console.log(
-      `[zoe/backlog-grill] reconciled: ${rec.boardClosed} board-closed, ${rec.verdictSynced} verdict-synced`,
+      `[zoe/backlog-grill] reconciled: ${rec.boardClosed} board-closed, ${rec.verdictSynced} verdict-synced, ` +
+        `${rec.laneOwned} lane-owned, ${rec.revived} revived`,
     );
   }
   const next = await nextTask(state, fetchImpl, now);
@@ -499,6 +536,10 @@ export async function runBacklogGrillTick(
   );
 
   const sent = await deps.sendDM(text, verdictButtons(next.task.id));
+  // Blocked by the send budget: the card never reached Zaal, so it must not be
+  // recorded as asked. It would climb the nag ladder unanswered and count
+  // against the batch, for a card nobody saw.
+  if (wasSendBlocked(sent)) return { sent: false, reason: 'send blocked by the budget; card left unasked' };
   const messageId = sent.message_id;
 
   // Rewritten wholesale, which clears any `requeuedAt`: it has now come round

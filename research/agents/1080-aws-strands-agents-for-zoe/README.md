@@ -10,6 +10,8 @@ tier: DEEP
 
 # 1080 — AWS Strands Agents: Framework Audit & Borrow Patterns for ZOE
 
+> **Correction 2026-09-11 (see [agents/2481](../2481-strands-agents-tools/)):** this doc says ZOE "uses OpenRouter/self-hosted". That is stale. ZOE's workers run through the Claude CLI on the subscription (`bot/src/hermes/claude-cli.ts`); OpenRouter is ZOL's path on the Pi. The SKIP call below still stands.
+
 > **Goal:** Evaluate AWS Strands Agents SDK against ZOE's hand-rolled agent orchestrator. Decide: adopt the framework, borrow specific patterns, or skip. Recommend concrete patterns ZOE should adopt incrementally without a rewrite.
 
 ## Key Decisions

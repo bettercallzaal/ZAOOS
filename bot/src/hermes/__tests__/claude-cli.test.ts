@@ -67,6 +67,28 @@ describe('callClaudeCli — happy paths', () => {
   });
 });
 
+describe('callClaudeCli — --bare needs an API key', () => {
+  // --bare skips credential reads, so on an OAuth-only host it always exits
+  // "Not logged in". Shipped three times (#512, #2859, 2026-09-11 probe).
+  const argsOf = () => mockSpawn.mock.calls[0][1] as string[];
+
+  it('drops --bare when no ANTHROPIC_API_KEY is set', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', '');
+    mockSpawn.mockReturnValue(makeSpawn('OK', '', 0));
+    await callClaudeCli({ ...BASE_OPTS, outputFormat: 'text' });
+    expect(argsOf()).not.toContain('--bare');
+    vi.unstubAllEnvs();
+  });
+
+  it('keeps --bare when an API key exists', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', 'sk-test-not-real');
+    mockSpawn.mockReturnValue(makeSpawn('OK', '', 0));
+    await callClaudeCli({ ...BASE_OPTS, outputFormat: 'text' });
+    expect(argsOf()).toContain('--bare');
+    vi.unstubAllEnvs();
+  });
+});
+
 // ── error paths ───────────────────────────────────────────────────────────────
 
 describe('callClaudeCli — error paths', () => {

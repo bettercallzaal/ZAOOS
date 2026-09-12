@@ -67,7 +67,7 @@ Three months at month granularity. Exact dates lock once cohort + mentor availab
 
 | Month | Phase | What runs |
 |-------|-------|-----------|
-| **June** | Prep | Recorded Far-Hack-style sessions. ZAO teachers cover governance, Respect, ZOLs, fractals. Vibe-coding instructors cover Claude Code, Cursor, MCP, agent harnesses. Tool walkthroughs: Empire Builder V3 (Jordan/yerbearzerker, confirmed June 1 6am EST), zlank.online, POIDH bounties, Juke, Songjam. Watchable live or after. THIS SKILL ships at the start of June. |
+| **June** | Prep | Recorded Far-Hack-style sessions. ZAO teachers cover governance, Respect, ZOLs, fractals. Vibe-coding instructors cover Claude Code, Cursor, MCP, agent harnesses. Tool walkthroughs: Empire Builder V3 (Jordan/yerbearzerker, confirmed June 1 6am EST), zlank.online, POIDH bounties, Juke. Watchable live or after. THIS SKILL ships at the start of June. |
 | **July** | Open build-a-thon | Anyone with the chops ships a build aligned to ZABAL / ZAO / WaveWarZ. The build IS the application. **Bar: live URL + open-source repo + 60s demo + cast on `/zabal`**. Every July submission that hits the bar earns Respect in ZAO governance - regardless of Finals selection. Mentors watch rolling. |
 | **August** | Finals | Mentor-champion pairs lock. Same Finals prompt for all. 24h build (mentor embedded as teammate) + 24h promote + 24h ZAO governance vote + live reveal stream. Finalists who want a token Ascend their Empire via Clanker with an airdrop. |
 
@@ -162,7 +162,6 @@ These spellings are non-negotiable. Auto-correcting them will be perceived as no
 | WaveWarZ | Wave Wars, Wavewarz, WaveWars | Always WaveWarZ |
 | BetterCallZaal | Bettercallzaal, Better Call Zaal | One word, camelCase |
 | Farcaster | Warpcast | Always Farcaster (Warpcast is just a client) |
-| Magnetiq | Magnetic, MagnetIQ | All-in-one event/launch platform at `magnetiq.io`. Tyler Stambaugh's company. ZABAL Games workshop library + portal runs here. |
 | Restream | restream, ReStream | Stream-to-multiple-platforms at `restream.io`. ZABAL Games workshops default streaming surface. |
 | Cal.com | Calcom, cal.com (in proper-noun position) | Open-source Calendly alt. ZABAL Games slot booker at `cal.com/bettercallzaal/zabal-games-workshop-slot`. |
 | Lu.ma | Luma, lu.ma | Event platform. Recently moved `lu.ma` -> `luma.com`. ZAO calendar at `luma.com/zao`. |
@@ -171,8 +170,6 @@ These spellings are non-negotiable. Auto-correcting them will be perceived as no
 | Joseph Goats | Jose Goats, Jose | Rebranded from Jose to Joseph Goats |
 | ZOLs | Zols, ZOL | ZAO contribution credits (governance token-adjacent unit) |
 | FISHBOWLZ | Fishbowlz, FishBowlz | All caps |
-| SongJam | Songjam, Song Jam | CamelCase |
-| SANG | Sang, sang | All caps, SongJam's token |
 | ZOE | Zoe, zoe | All caps. ZAO ecosystem concierge bot (`@zaoclaw_bot` on Telegram). |
 | ZABAL | Zabal, zabal | All caps. Umbrella brand (BetterCallZaal's solo projects, pre-incubation). |
 
@@ -264,7 +261,6 @@ The named 8-mentor roster from Doc 630 is REMOVED. Mentors are now openly recrui
 | Mentor | Role / company | Confirmed slot |
 |--------|---------------|----------------|
 | Jordan Oram (yerbearzerker) | Empire Builder | June 1 6am EST (recorded session) |
-| Tyler Stambaugh | Magnetiq | June 30-min pitch/workshop (date TBD - claim slot at `cal.com/bettercallzaal/zabal-games-workshop-slot`) |
 | Arthur (Neynar) | EVM smart-contract dev | Virtual presence; WaveWarZ Base contracts review |
 | kmac.eth | Farcaster Snaps + JFS | June workshop slot TBD |
 | Shriyash Soni | Apna Coding (India) | June 30-min slot on Apna Coding + agentic workflows |

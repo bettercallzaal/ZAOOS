@@ -150,7 +150,16 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
     if (opts.maxBudgetUsd !== undefined) {
       args.push('--max-budget-usd', String(opts.maxBudgetUsd));
     }
-    if (opts.bare) {
+    // --bare IS ONLY SAFE WITH AN API KEY. It skips keychain and credential
+    // reads, so on this host - Max-plan OAuth in ~/.claude, no
+    // ANTHROPIC_API_KEY - every --bare call exits "Not logged in", and it
+    // reads exactly like an expired login. This bug has shipped three times:
+    // dropped in #512, again for the verify-replan judge in #2859, and on
+    // 2026-09-11 it was back on the hourly auth probe (a false "OAuth expired"
+    // every hour since at least 09-09), the memory extractors and /resume.
+    // So the flag is dropped here unless a key exists, rather than trusting
+    // each caller to remember.
+    if (opts.bare && process.env.ANTHROPIC_API_KEY) {
       args.push('--bare');
     }
     args.push('--add-dir', opts.cwd);
@@ -343,7 +352,6 @@ export async function checkClaudeAuth(cwd: string = '/home/zaal/zao-os'): Promis
       allowedTools: [],
       disallowedTools: [],
       timeoutMs: 10_000,
-      bare: true,
       outputFormat: 'text',
     });
     // No record call here: this went through callClaudeCli, which already did it.

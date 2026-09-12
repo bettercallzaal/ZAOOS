@@ -101,7 +101,7 @@ Generate posts for ALL of these platforms in order:
 
 ### 2. X (Twitter) - Group Chat
 - Conversational and insider tone - like texting the crew
-- Assume readers already know ZAO, WaveWarZ, Songjam, and ongoing events
+- Assume readers already know ZAO, WaveWarZ, and ongoing events
 - Can be longer than main tweet - group chats aren't character-limited
 - No link needed unless it fits naturally
 - Reference inside jokes, shared context, recent events
@@ -110,11 +110,11 @@ Generate posts for ALL of these platforms in order:
 - Insider tone - like the X group chat but for the Farcaster crew
 - Everyone here is deep in the ZAO ecosystem already
 - Conversational, no explanation needed
-- Can reference fractals, Songjam, WaveWarZ, ZOE without context
+- Can reference fractals, WaveWarZ, ZOE without context
 - Append newsletter link
 
 <!-- NOTE: Farcaster Other Communities is paused for now but the channel list is preserved here for future use:
-  ZAO ecosystem: /songjam, /music, /base, /nouns
+  ZAO ecosystem: /music, /base, /nouns
   General: /build, /thecreators, /mindfulness, /philosophy, /farcaster, /founders
   When re-enabled: suggest 3-5 channels per post with custom 1-2 sentence posts native to each community's vibe -->
 

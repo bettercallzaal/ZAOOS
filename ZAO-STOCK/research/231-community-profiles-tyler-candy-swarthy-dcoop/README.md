@@ -452,7 +452,7 @@ ZAO Core
 | Media + documentation | Swarthy Hatter + Ohnahji + Maceo | Confirmed (3 people) |
 | Performing artist | DCoop / ZAOVille + Hurric4n3Ike + roster | Confirmed |
 | Production support | AttaBotty (lead) + DCoop (support) | Confirmed |
-| Sponsorship outreach | Candy (Impact3/Milk Road connections) | Confirmed |
+| Sponsorship outreach | ~~Candy (Impact3/Milk Road connections)~~ **NOT A CURRENT ROUTE - she left Impact3.** Her relationships may persist; her employer access does not. | Retracted 2026-09-08 |
 
 ---
 

@@ -21,7 +21,52 @@ if [[ -z "$REPO" || ! -d "$REPO/research" ]]; then
   exit 0
 fi
 
-STAGED=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^research/[^_/][^/]*/[0-9]+-' | head -50)
+# A NEW CLAIM ON A NUMBER IS EITHER AN ADDITION OR A RENUMBERING RENAME.
+#
+# This was `git diff --cached --name-only --diff-filter=A` inline. git detects
+# renames by default, so `git mv research/x/2400-old research/x/2471-new`
+# staged as one R entry that A dropped, and a doc renumbered ONTO a taken
+# number passed this gate with exit 0 - measured 2026-09-12, the one thing the
+# gate exists to stop. The rule for what counts as a claim is shared with the
+# CI guard and lives in doc-new-claims.sh so the two cannot drift; see its
+# header for why this is not just `--diff-filter=ACMR`.
+#
+# It fails closed on a git error, so an empty STAGED means no claims and never
+# "I could not look".
+if ! STAGED=$("$(dirname "${BASH_SOURCE[0]}")/doc-new-claims.sh" --staged); then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - could not read the staged changes, so nothing was checked." >&2
+  exit 1
+fi
+STAGED=$(printf '%s\n' "$STAGED" | head -50)
+# A MERGE CAN CREATE A DUPLICATE THAT NEITHER SIDE AUTHORED.
+#
+# The checks above ask what THIS change claims, and a concurrent claim is
+# invisible to that question by construction: two branches each claim 2480 with
+# different slugs, each one's own pre-commit run correctly saw 2480 free, and the
+# merge is what puts both on disk. Absent from neither parent - present in both.
+#
+# Scoped to numbers this merge touched: 221 numbers on main already hold more
+# than one directory (the pre-band duplicates COLLISION_TOLERANCE.md tolerates),
+# so a whole-tree scan would fire on every commit and be ignored. Measured: an
+# inherited duplicate this merge did not touch is silent; the same number
+# touched by the merge speaks. Found by the vault lane reviewing #3498.
+if ! MERGE_DUPES=$("$(dirname "${BASH_SOURCE[0]}")/doc-new-claims.sh" --merge-duplicates); then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - could not check the merged result for duplicate numbers." >&2
+  exit 1
+fi
+if [[ -n "$MERGE_DUPES" ]]; then
+  echo "" >&2
+  echo "[doc-collision-guard] BLOCKED - this merge puts one doc number on two docs:" >&2
+  printf '%s\n' "$MERGE_DUPES" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "Neither side is wrong: each claimed the number while it was free, and the" >&2
+  echo "merge is what created the duplicate. Renumber ONE of them - the later" >&2
+  echo "claim by convention - and rename its directory and its '# NNNN -' heading." >&2
+  exit 1
+fi
+
 if [[ -z "$STAGED" ]]; then
   exit 0
 fi
@@ -90,6 +135,18 @@ if [[ -n "$COLLISIONS" ]]; then
   echo "" >&2
   echo "[doc-collision-guard] BLOCKED - new doc number collides with existing research/:" >&2
   printf "$COLLISIONS\n" >&2
+  echo "" >&2
+  # Existing numbers come from `git ls-tree -r HEAD` - the tree BEFORE this
+  # commit. Renames became visible to this gate on 2026-09-12, and that made a
+  # pre-existing assumption load-bearing: a commit that FREES a number and
+  # reuses it in the same commit now reads the freed number as still taken.
+  # Rare, and it fails loud rather than silent, which is the right direction -
+  # but an unexplained false positive is what gets a pre-commit gate commented
+  # out, so it prints its own cause. Found by the vault lane reviewing #3494.
+  echo "If this same commit FREES that number - deletes the doc holding it, or" >&2
+  echo "renames that doc away - this is a FALSE POSITIVE: existing numbers are" >&2
+  echo "read from HEAD, the tree before this commit. Commit the removal first," >&2
+  echo "or split the two changes." >&2
   echo "" >&2
   echo "Pick the next free number. Recent ceiling:" >&2
   git ls-tree -r HEAD --name-only 2>/dev/null \

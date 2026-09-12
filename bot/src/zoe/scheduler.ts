@@ -35,7 +35,7 @@ import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
-import { runErrorRemediationTick, defaultRemediationDeps } from './error-remediation';
+import { runErrorRemediationTick, defaultRemediationDeps, flushOutbox, describeOutbox } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
 import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
@@ -69,7 +69,7 @@ import {
   wasSendBlocked,
 } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
+import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates, markCandidateSurfaced } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { flushQueue } from './bonfire-retry';
@@ -276,11 +276,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
 
   // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
   // Cron: '0 9 * * *' → 09:00 UTC daily.
+  // Class `morning`, not `digest`: this job DRAINS the deferred queue, so it
+  // must never be deferred into it (see send-budget.ts, the seven classes).
   tasks.push(
     cron.schedule(
       '0 9 * * *',
       () =>
-        runWithSendClass('digest', async () => {
+        runWithSendClass('morning', async () => {
         if (!(await claimFire('morning-brief'))) return;
         try {
           // Cockpit is the primary morning brief (doc 997 harness). Falls back to
@@ -448,9 +450,28 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       // and this sends nothing - wrapping it would let a send budget throttle a
       // reconcile that costs no sends, which is the opposite of what is wanted.
       async () => {
-        if (!(await claimFire('backlog-grill-reconcile'))) return;
         try {
-          await runReconcileOnly({});
+          // NOT claimFire. claimFire's sentinel path embeds the UTC date and it
+          // writes with flag 'wx', so it returns true exactly ONCE PER UTC DAY
+          // per trigger - correct for the daily batch it was built for, and the
+          // 24-hour lag this cron exists to remove. Guarding a */10 schedule
+          // with it means the 00:0x tick claims the day and every tick after it
+          // returns early, so the count would still be up to a day stale while
+          // the cron log said it ran 144 times.
+          //
+          // withTickLock is per-RUN mutual exclusion with a staleness timeout
+          // and a release in `finally`, which is the property actually wanted:
+          // never two at once, always the next one.
+          //
+          // On the BATCH'S OWN LOCK, deliberately, not a reconcile-only one.
+          // Both mutate the same backlog state, so a reconcile landing between
+          // the batch's read and its write is a lost update - the batch would
+          // write back a count computed before the reconcile settled. A private
+          // lock would make reconcile safe against itself and leave that race
+          // open.
+          await withTickLock(join(ZOE_PATHS.home, 'backlog-grill.tick.lock'), async () =>
+            runReconcileOnly({}),
+          );
         } catch (err) {
           // Never let reconcile take the scheduler down. A failed reconcile
           // means a stale count, which is exactly what we already had.
@@ -461,9 +482,61 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
+  // 09:03, NOT 09:00: THE BATCH SHARED ITS MINUTE WITH THE AUTODEPLOY RESTART
+  // AND WAS BEING KILLED BEFORE IT COULD QUEUE THE CARDS (2026-09-08).
+  //
+  // `zoe-autodeploy.sh` runs from cron every 10 minutes - :00, :10, :20 ... -
+  // and when it has something to deploy it does `systemctl --user restart
+  // zoe-bot` (line 86). The batch was on '0 9 * * *', the same minute.
+  //
+  // Measured 2026-09-08 from the service journal:
+  //
+  //   09:00:03  [zoe/ran] backlog-grill - Reach out to each judge and both...
+  //   09:00:12  Stopping zoe-bot.service ...
+  //   09:00:12  Main process exited, code=exited, status=143/n/a
+  //
+  // 143 is SIGTERM. The batch got nine seconds and died mid-flight.
+  //
+  // WHAT THAT COSTS, precisely. runBacklogGrillBatch calls appendGrillQueue on
+  // its LAST line, after the send loop. The process was gone before it got
+  // there, so the cards that had been sent went to Telegram and NOWHERE else:
+  // the VPS spool was never written (verified absent that night, while every
+  // prior morning that week wrote it), the grill lane never received them, and
+  // the summary line below - the one this file calls the ONLY evidence the
+  // batch happened - was never printed.
+  //
+  // That silence is why it went unexplained for weeks. A batch killed at second
+  // nine and a morning with nothing to say write exactly the same thing.
+  //
+  // NOT the card COUNT. An earlier version of this comment blamed the restart
+  // for a batch of four instead of ten. That was wrong: asked=601 against 582
+  // open cards, so the candidate pool is exhausted and the batch legitimately
+  // sends only what is new. The restart destroys the queue append, not the
+  // count.
+  //
+  // Compare the mornings that completed - Sep 02 through Sep 07 each logged
+  // `batch: sent 1, ... queue spool:1` at 09:00:04-06. Sep 08 logged no batch
+  // line at all.
+  //
+  // WHY THREE MINUTES IS STRUCTURAL AND NOT A GUESS. zoe-autodeploy.sh is on
+  // '*/10 * * * *', so restarts can only land on ten-minute boundaries - the
+  // preceding fortnight of `Started zoe-bot` stamps are 03:20, 19:50, 17:00,
+  // 22:40, 22:20, 21:50, 21:10, 20:10 and so on, every one at :x0. A batch on
+  // any minute not divisible by ten cannot share a minute with a deploy.
+  //
+  // It does not remove the underlying race - a deploy at 09:10 could still
+  // interrupt a batch that ran long, though these take three to six seconds.
+  // The durable fixes are a lock that makes autodeploy wait for an in-flight
+  // batch, or appending each card as it sends rather than all of them at the
+  // end. This is the cheap half and it stands alone.
+  //
+  // Frequency, stated honestly: one collision in fourteen days, only on
+  // mornings where a commit landed in the preceding ten minutes. That is worse
+  // than a constant failure, not better - it is silent, occasional loss that
+  // looks identical to a normal quiet day.
   tasks.push(
     cron.schedule(
-      '0 9 * * *',
+      '3 9 * * *',
       () =>
         runWithSendClass('gated', async () => {
         if (!(await claimFire('backlog-grill-batch'))) return;
@@ -1150,6 +1223,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           }
           if (decision.candidate) {
             await recordPush(decision.candidate);
+            // Burn the event dedup key HERE, not at gather time. Only one of the
+            // tick's candidates is ever spoken (pickBest), and this line is past
+            // both the threshold gate and wasSendBlocked - so the key is spent
+            // on a message that reached him, and every candidate that lost or
+            // was blocked is offered again next tick. (events.ts header.)
+            await markCandidateSurfaced(decision.candidate.dedupKey);
             if (decision.threadId) await markNudged(decision.threadId);
             if (decision.candidate.kind === 'task-nudge') await markNudgeSent();
           }
@@ -1320,19 +1399,44 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // ZAALBOTS. Routes, does not ask (feedback_zoe_route_dont_ask). One error per
   // tick; the fix pipeline enforces the fleet daily cap. Silent when there is
   // nothing new or the group is not configured.
+  //
+  // runWithSendClass('alarm'): every message this tick can send is a production
+  // failure notice - "no auto-fix target", "fix pipeline errored, needs you",
+  // "could not auto-fix, needs you", or a fix PR waiting on his merge. Without
+  // the class it fell to the `status` default, which the send budget DROPS past
+  // the daily cap. The row is already marked 'escalated'/'fixed' in app_errors
+  // BEFORE the report goes out and nothing re-notifies, so a dropped report is
+  // an error permanently marked as handled that Zaal was never told about.
+  // Same reasoning as the watcher-anomaly alert above: a breakage notice is the
+  // one class the budget must not cut.
   tasks.push(
     cron.schedule(
       '*/10 * * * *',
-      async () => {
+      () =>
+        runWithSendClass('alarm', async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
-        if (shouldPauseAutonomousWork()) return; // cost hard-stop
         try {
           const deps = defaultRemediationDeps(
-            (text: string) => opts.bot.api.sendMessage(gid, text).then(() => {}),
+            // assertSendDelivered: a blocked send resolves, and the outbox only
+            // keeps a report whose send THROWS. Without it a budget block would
+            // read as delivered and be dropped from the outbox.
+            (text: string) => opts.bot.api.sendMessage(gid, text).then(assertSendDelivered).then(() => {}),
             opts.zaalTgId,
             gid,
           );
+          // Deliver first, and BEFORE the cost hard-stop: these are outcomes
+          // already decided and already marked. A paused ZOE must not sit on
+          // breakage notices (vault, #3446 review).
+          // flushOutbox raises the priority-8 mission-control stall itself, so
+          // returning here does not swallow the signal - which it did while the
+          // emit lived in the tick below (vault, #3483 review).
+          const held = await flushOutbox(deps);
+          if (held.length > 0) {
+            console.error(`[zoe/scheduler] error-remediation reports ${describeOutbox(held)}`);
+            return;
+          }
+          if (shouldPauseAutonomousWork()) return; // cost hard-stop
           const status = await runErrorRemediationTick(deps);
           if (status !== 'no new errors') {
             console.log(`[zoe/scheduler] error-remediation: ${status}`);
@@ -1340,7 +1444,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           console.error('[zoe/scheduler] error-remediation tick failed:', (err as Error).message);
         }
-      },
+        }),
       { timezone: 'UTC' },
     ),
   );

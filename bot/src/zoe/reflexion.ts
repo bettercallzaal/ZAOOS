@@ -23,7 +23,7 @@
  *     code-fix side, eventually fed by Gap 5 learn.ts)
  */
 
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { ZOE_DEFAULT_MODEL, ZOE_HARD_MODEL } from './types';
 import type { ZoeContext } from './types';
 import { featureRan } from './feature-ran';
@@ -304,7 +304,7 @@ export async function runReflexion(input: ReflexionInput): Promise<ReflexionResu
   const model = input.voiceNoteTranscript ? ZOE_HARD_MODEL : ZOE_DEFAULT_MODEL;
   const userPrompt = buildUserPrompt(input);
 
-  const result = await callClaudeCli({
+  const result = await callClaudeCliCapAware({
     model,
     prompt: userPrompt,
     cwd: input.context.workspace_dir,

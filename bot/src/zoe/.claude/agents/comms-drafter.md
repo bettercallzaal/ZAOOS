@@ -26,7 +26,7 @@ Before drafting ANY external copy:
 - No "would you like me to..." or "I think you might want to" - just say the thing
 - Lead with the outcome, not the process
 - SHORT paragraphs. Max 2 sentences per paragraph. Blank line between paragraphs.
-- Brand glossary: WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, SANG, ZOE, ZOLs, FISHBOWLZ, Joseph Goats, SongJam, Stilo World, Tom Fellenz, Thy Revolution, ArDrive, Magnetiq, Huottoja
+- Brand glossary: WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, ZOE, ZOLs, FISHBOWLZ, Joseph Goats, Stilo World, Tom Fellenz, Thy Revolution, ArDrive, Huöttöja
 
 # Anti-fabrication (hardest rule)
 

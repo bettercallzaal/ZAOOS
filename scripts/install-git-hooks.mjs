@@ -21,7 +21,7 @@
  * production builds down to enforce one would be the worse trade.
  */
 import { execFileSync } from 'node:child_process';
-import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const MARKER = '# zaoos-husky-delegator';
@@ -77,6 +77,12 @@ const PREREQS = {
  *
  * Missing hook is a FAIL, not a skip: a gate that vanishes should say so rather
  * than let the commit through quietly (silent-failure-guard rule 3).
+ *
+ * `[ "$hook" -ef "$0" ]` is not POSIX. If a shell lacked -ef, the test would
+ * error, the `if` would read false, and the delegator would fall straight back
+ * into the self-exec loop it guards against. Checked 2026-09-11 on every shell
+ * that runs it: macOS /bin/sh, /bin/dash, and the VPS /bin/sh (dash) all
+ * support it (vault, review of #3475).
  */
 function delegator(hook) {
   return `#!/usr/bin/env sh
@@ -87,8 +93,25 @@ if [ ! -f "$hook" ]; then
   echo "[git-hooks] restore it, or bypass deliberately: git commit --no-verify" >&2
   exit 1
 fi
+if [ "$hook" -ef "$0" ]; then
+  echo "[git-hooks] $hook is this delegator itself - core.hooksPath points at .husky/." >&2
+  echo "[git-hooks] the ${hook} gates did NOT run. Restore it: git checkout -- .husky/${hook}" >&2
+  exit 1
+fi
 exec sh "$hook" "$@"
 `;
+}
+
+/** Same file on disk, symlinks resolved. A missing path compares by resolve(). */
+function samePath(a, b) {
+  const real = (p) => {
+    try {
+      return realpathSync(p);
+    } catch {
+      return resolve(p);
+    }
+  };
+  return real(a) === real(b);
 }
 
 try {
@@ -110,7 +133,29 @@ try {
       continue;
     }
 
+    // A delegator where the REAL hook should be: an earlier run of this script
+    // overwrote it (see below). Say so and point at the backup; never wire a
+    // delegator to a delegator.
+    if (readFileSync(src, 'utf8').includes(MARKER)) {
+      warn(`.husky/${hook} is a generated delegator, not the real hook - the ${hook} secret + PII`);
+      warn(`gates are NOT running. Restore it: git checkout -- .husky/${hook}   (an earlier copy may be`);
+      warn(`in .husky/${hook}.bak.*). Then re-run: node scripts/install-git-hooks.mjs`);
+      continue;
+    }
+
     const dst = join(hooksDir, hook);
+    // core.hooksPath already points git at .husky/ (husky's own setup, or a
+    // `git config core.hooksPath .husky`). `--git-path hooks` honours it, so
+    // dst IS src: git runs the real hook directly and there is nothing to wire.
+    // Writing here replaced the hook with a delegator that execs itself.
+    // Measured 2026-09-11 on the main clone: the secret + PII gates were
+    // overwritten on 09-09 22:07 (kept only as pre-commit.bak.<ts>), and every
+    // commit in that checkout would loop forever.
+    if (samePath(dst, src)) {
+      warn(`${hook}: core.hooksPath already runs .husky/ directly - nothing to wire`);
+      continue;
+    }
+
     if (existsSync(dst) && !readFileSync(dst, 'utf8').includes(MARKER)) {
       const backup = `${dst}.bak.${Date.now()}`;
       copyFileSync(dst, backup);

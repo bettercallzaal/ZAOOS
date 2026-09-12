@@ -31,7 +31,8 @@ LLM: Minimax (local API; see the `minimax` skill)
 | `zoe-bot` | **ZOE** — `@zaoclaw_bot`, the single concierge/dispatcher | `bot/src/zoe/` | `bot/src/index.ts` (`npm start` → `tsx src/index.ts`) |
 | `zao-devz-stack` | **ZAO Devz** — `@zaodevz_bot`, group dispatch + hourly tip | `bot/src/devz/` | `bot/src/devz/index.ts` |
 | `zaostock-bot` | **ZAOstock** — `@ZAOstockTeamBot`, festival team coordination | `bot/` (root) | `npm run start` |
-| `zao-team-bots` | Magnetiq + AttaBotty brand bots | `bot/src/teams/` | `bot/src/teams/index.ts` |
+
+`zao-team-bots` (the brand bots in `bot/src/teams/`) was retired 2026-06-29; brand voices are ZOE persona blocks now (CLAUDE.md, "Decommissioned"). If `systemctl --user list-units` still shows it, that is a leftover to report, not a live bot.
 
 Hermes (`@zoe_hermes_bot`, autonomous fix-PR pipeline) lives in `bot/src/hermes/` — confirm its unit name on the box before acting (`systemctl --user list-units '*hermes*'`); it is not in the committed `bot/systemd/` set.
 
@@ -48,7 +49,7 @@ ZOE reads/writes its memory under `~/.zao/zoe/` (`ZOE_HOME`, override via `$ZOE_
 ~/.zao/zoe/archive/<scope>/<yyyy-mm>.jsonl   rolled-off history
 ~/.zao/zoe/tasks.json          open task queue (global)
 ~/.zao/zoe/groups.json         configured groups (managed by /zoe-group-* commands)
-~/.zao/zoe/bootloader-template.md   child-bot seed (Magnetiq, AttaBotty, future brand bots)
+~/.zao/zoe/bootloader-template.md   child-bot seed (brand bots, if one is ever brought back)
 ```
 
 > **persona.md vs code.** A persona/human/tasks edit takes effect on ZOE's **next turn** automatically (these files are re-read per turn) — no restart. A **code** change (anything under `bot/src/`) needs `git pull` + `systemctl --user restart zoe-bot`.

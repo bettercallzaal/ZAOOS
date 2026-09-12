@@ -54,7 +54,8 @@ export interface GrillQueueResult {
 export function queuePath(): string {
   return (
     process.env.ZOE_GRILL_QUEUE_PATH ||
-    join(homedir(), 'zao-vault', 'handoffs', 'GRILL-QUEUE.md')
+    // The grill queue is the final, append-only section of BLACKBOARD.md since 2026-09-10 (zao-vault plan 2). The Mac drain (zaal-dotfiles bin/zao-grill-queue-drain) writes the same file.
+    join(homedir(), 'zao-vault', 'BLACKBOARD.md')
   );
 }
 

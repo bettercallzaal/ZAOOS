@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-25
+last-validated: 2026-09-08
 related-docs: "050, 051, 101, 180, 406, 608, 711, 723"
 original-query: "/zao-research zaal and bettercallzaal and all ive talked aobut in [this session, for the WaveWarZ Alliance accelerator hackathon submission brag paragraph]"
 tier: DISPATCH
@@ -82,7 +82,7 @@ For the Alliance application Zaal upgrades the title to **"Director of Ecosystem
 | **Magnetiq / Proof of Meet** — Tyler Stambaugh collab, ZABAL Connector at ETH Boulder Feb 2026 | Shipped | Doc 050; memory `project_tyler_stambaugh` |
 | **Empire Builder v3 integration** — 6 PRs across docs 560-566, 582-585 | Live | memory `project_empire_builder_zabal_integration` |
 | **Arthur (Neynar) Base agentic build** — EVM dev brought in as ZABAL Games mentor + WaveWarZ integration | In progress | Doc 711; memory `project_arthur_neynar` |
-| **Lil WaveWarZ takeover @ NFT NYC** — Zaal led the IRL event | Shipped | HackMD team doc |
+| ~~**Lil WaveWarZ takeover @ NFT NYC** — Zaal led the IRL event~~ | **RETRACTED 2026-09-08 — NEVER HAPPENED** | Zaal direct: "It never happened since proposal didn't pass." The HackMD team doc recorded a **plan**; this row read it as a shipped event. **This row is where the false claim entered the library** — it reached doc 1231, the zao-nyc ICM box, the chapter persona, LADDER Rung 3 and a published card before anyone checked. Kept, struck, rather than deleted, so the path stays visible. |
 
 **Public WaveWarZ testimonial (bettercallzaal.com):**
 

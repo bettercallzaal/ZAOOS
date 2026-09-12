@@ -181,10 +181,12 @@ It needs Candy leading and it needs Rung 1's names.
 *Produces:* an artist list - the input to Rungs 3 and 4.
 
 **Rung 3 - A WaveWarZ IRL.**
-The lowest-risk of the big formats because it has run twice in New York already:
-ZAO-PALOOZA 2024 and the Lil WaveWarZ Takeover 2025. Doc 1231: *"WaveWarZ can
-export its battle format to any physical venue."* Needs artists (Rung 2) and a
-room (Rung 1).
+The lowest-risk of the big formats because it has run in New York once already:
+ZAO-PALOOZA 2024. (This read "twice" until 2026-09-08, counting a Lil WaveWarZ
+Takeover 2025 that never happened - see the resolved question below. Doc 1231's
+*"WaveWarZ can export its battle format to any physical venue"* was drawn from
+that retracted row and is not evidence.) Needs artists (Rung 2) and a room
+(Rung 1).
 *Produces:* proof the format still works, with a current roster.
 
 **Rung 4 - ZAO-PALOOZA at NFT NYC 2027.**
@@ -243,17 +245,24 @@ right.
 **Zaal's recollection of a FarCon 2025 was correct.** The library's Rome dating was also
 correct, for a later edition.
 
-> ⚠️ **The sharp question that remains, for Zaal only.** On 2026-09-06 he wrote *"my last
-> time in NYC for farcon."* If FarCon in **May 2025** was his last New York trip before
-> this weekend, then he was **not** in New York for NFT.NYC 2025 in June - and the
-> persona, the ICM box and doc 1231 all record **"Lil WaveWarZ Takeover at NFT NYC
-> (2025)"** as the third consecutive IRL proof point.
+> **RESOLVED 2026-09-08. Neither branch was right, and the hold was correct.**
 >
-> Either that event was at **FarCon in May** and is mis-attributed to NFT.NYC in three
-> places, or he made **two NYC trips in 2025** and the phrasing was loose.
+> The question above offered two options - mis-attributed to the wrong event, or two
+> NYC trips. Zaal's answer was a third: **"It never happened since proposal didn't
+> pass."** The event does not exist. Asking "which trip was it on?" would have made a
+> false claim more specific rather than removing it, which is exactly what happened
+> once before it was caught.
 >
-> **Do not edit the box, the persona or doc 1231 until he answers.** This is a published
-> brand claim about the chapter's own track record.
+> **What was true:** FarCon NYC, May 2025, attended not produced. That was his only
+> 2025 New York trip, so 2026 is the **second** time at NFT NYC, after 2024 - not the
+> third, and not consecutive. Every "third consecutive IRL proof point" in the library [CLAIM-OK: third-consecutive-irl naming the retracted phrase in order to retract it]
+> was resting on the retracted row.
+>
+> **The hold is discharged.** Doc 742 (the origin), doc 1231, the ICM box draft, the
+> persona, this doc's Rung 3, and three sites in the `zao-nyc` repo including the
+> published card are all corrected as of 2026-09-08. Note the correction was written up
+> on 09-07 and reported as applied while every site was still live - the grep, not the
+> report, is what closed it.
 
 ## Guards
 

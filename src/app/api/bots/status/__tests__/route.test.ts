@@ -143,7 +143,11 @@ describe('GET /api/bots/status', () => {
       expect(body.error).toBeUndefined();
     });
 
-    it('coerces null bots to empty array', async () => {
+    // ZAO research doc 2478, inverted alarm #4: a 200 whose body has no
+    // bots array used to be coerced to `bots: []` with a 200, which is
+    // byte-for-byte a healthy empty fleet. These two tests pinned that
+    // inversion; they now pin the fix.
+    it('reports null bots as 502 with an error, not as an empty fleet', async () => {
       vi.mocked(global.fetch).mockResolvedValueOnce(
         new Response(JSON.stringify({ bots: null }), { status: 200 }),
       );
@@ -151,11 +155,13 @@ describe('GET /api/bots/status', () => {
       const res = await GET();
       const body = (await res.json()) as Record<string, unknown>;
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(502);
       expect(body.bots).toEqual([]);
+      expect(body.configured).toBe(true);
+      expect(body.error).toMatch(/malformed/);
     });
 
-    it('coerces missing bots field to empty array', async () => {
+    it('reports a missing bots field as 502 with an error, not as an empty fleet', async () => {
       vi.mocked(global.fetch).mockResolvedValueOnce(
         new Response(JSON.stringify({}), { status: 200 }),
       );
@@ -163,8 +169,22 @@ describe('GET /api/bots/status', () => {
       const res = await GET();
       const body = (await res.json()) as Record<string, unknown>;
 
+      expect(res.status).toBe(502);
+      expect(body.bots).toEqual([]);
+      expect(body.error).toMatch(/malformed/);
+    });
+
+    it('still returns 200 for a genuinely empty fleet', async () => {
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ bots: [] }), { status: 200 }),
+      );
+
+      const res = await GET();
+      const body = (await res.json()) as Record<string, unknown>;
+
       expect(res.status).toBe(200);
       expect(body.bots).toEqual([]);
+      expect(body.error).toBeUndefined();
     });
 
     it('strips trailing slash from COWORK_API_URL', async () => {

@@ -27,6 +27,7 @@ import { encodeQuestion, questionKeyboard, type ParsedQuestion } from './questio
 import { putDraft, draftKeyboard } from './drafts';
 import { getTopicThread, readTopics } from './topics';
 import { brandBoxFor, fetchIcmBrain } from './brand-brain';
+import { wasSendBlocked } from './send-budget';
 
 const OPEN_THINGS_STATE_PATH = (): string =>
   join(process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe'), 'open-things.json');
@@ -294,12 +295,12 @@ export async function refillOpenThings(deps: {
 
             // Post to topic thread with Approve/Skip/Edit buttons
             qid = draft.id;
-            await deps.bot.api.sendMessage(deps.groupId, draft.text, {
+            const sent = await deps.bot.api.sendMessage(deps.groupId, draft.text, {
               reply_markup: draftKeyboard(draft.id),
               message_thread_id: threadId,
             });
 
-            posted = true;
+            posted = !wasSendBlocked(sent);
             break;
           }
 
@@ -309,12 +310,12 @@ export async function refillOpenThings(deps: {
 
             // Encode topic name in qid prefix for later extraction by orchestrator
             qid = `${topicToQidPrefix(topicName)}-${q.qid}`;
-            await deps.bot.api.sendMessage(deps.groupId, q.text, {
+            const sent = await deps.bot.api.sendMessage(deps.groupId, q.text, {
               reply_markup: questionKeyboard(qid, ['Review next', 'Skip to backlog'], config.allowTypedReply),
               message_thread_id: threadId,
             });
 
-            posted = true;
+            posted = !wasSendBlocked(sent);
             break;
           }
 
@@ -324,12 +325,12 @@ export async function refillOpenThings(deps: {
 
             // Encode topic name in qid prefix
             qid = `${topicToQidPrefix(topicName)}-${q.qid}`;
-            await deps.bot.api.sendMessage(deps.groupId, q.text, {
+            const sent = await deps.bot.api.sendMessage(deps.groupId, q.text, {
               reply_markup: questionKeyboard(qid, ['Approve doc', 'Kick research', 'Skip'], config.allowTypedReply),
               message_thread_id: threadId,
             });
 
-            posted = true;
+            posted = !wasSendBlocked(sent);
             break;
           }
 
@@ -339,12 +340,12 @@ export async function refillOpenThings(deps: {
 
             // Encode topic name in qid prefix
             qid = `${topicToQidPrefix(topicName)}-${q.qid}`;
-            await deps.bot.api.sendMessage(deps.groupId, q.text, {
+            const sent = await deps.bot.api.sendMessage(deps.groupId, q.text, {
               reply_markup: questionKeyboard(qid, ['Post now', 'Skip'], config.allowTypedReply),
               message_thread_id: threadId,
             });
 
-            posted = true;
+            posted = !wasSendBlocked(sent);
             break;
           }
 
@@ -354,12 +355,12 @@ export async function refillOpenThings(deps: {
 
             // Encode topic name in qid prefix
             qid = `${topicToQidPrefix(topicName)}-${q.qid}`;
-            await deps.bot.api.sendMessage(deps.groupId, q.text, {
+            const sent = await deps.bot.api.sendMessage(deps.groupId, q.text, {
               reply_markup: questionKeyboard(qid, ['Start', 'Delegate', 'Skip'], config.allowTypedReply),
               message_thread_id: threadId,
             });
 
-            posted = true;
+            posted = !wasSendBlocked(sent);
             break;
           }
         }
@@ -368,7 +369,14 @@ export async function refillOpenThings(deps: {
         console.error(`[zoe/always-open] error refilling ${topicName}:`, err);
       }
 
-      // If posted, record state
+      // If posted, record state.
+      //
+      // `posted` is false when the send budget dropped or deferred the message
+      // instead of delivering it. That case MUST NOT record an open item:
+      // `hasOpenItem` is pure key-presence with no expiry, and the only thing
+      // that clears it is `clearOpenThing`, called when Zaal ANSWERS the qid.
+      // Recording a qid he never received wedges the topic permanently - it is
+      // skipped as "already open" on every later tick and can never refill.
       if (posted && qid) {
         state[topicName] = {
           threadId,
@@ -376,6 +384,12 @@ export async function refillOpenThings(deps: {
           lastOpenTs: deps.now.toISOString(),
         };
         refilled++;
+      } else if (qid) {
+        // The budget gate logs its own drop; say what it cost here, so the
+        // topic staying empty is not mistaken for "no material".
+        console.warn(
+          `[zoe/always-open] send for "${topicName}" did not reach Telegram - leaving the topic open to retry next tick`,
+        );
       }
     }
 

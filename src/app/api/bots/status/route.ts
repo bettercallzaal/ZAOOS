@@ -71,11 +71,35 @@ export async function GET(): Promise<NextResponse<FleetStatusResponse>> {
       );
     }
 
-    const data = (await res.json()) as { bots?: CoworkBot[] };
+    const data = (await res.json()) as { bots?: unknown };
+
+    // FIXED (ZAO research doc 2478, inverted alarm #4): a 200 with a malformed
+    // body (data.bots not an array — truncated response, upstream shape
+    // change) used to fall through to `bots: []` with no `error` field and a
+    // 200 status. That is byte-for-byte indistinguishable from a genuinely
+    // empty, healthy bot fleet on the /overview Bots tab. Malformed-but-200 is
+    // now reported the same way an actual HTTP error is: 502 + an explicit
+    // `error`, never a silent empty array.
+    if (!Array.isArray(data.bots)) {
+      console.error(
+        '[api/bots/status] cowork board returned 200 with a malformed body (bots is not an array)',
+      );
+      return NextResponse.json(
+        {
+          configured: true,
+          fetchedAt: new Date().toISOString(),
+          bots: [],
+          error:
+            'cowork board returned a malformed response (bots is not an array) — bots down and bots unreadable must not look the same',
+        },
+        { status: 502 },
+      );
+    }
+
     return NextResponse.json({
       configured: true,
       fetchedAt: new Date().toISOString(),
-      bots: Array.isArray(data.bots) ? data.bots : [],
+      bots: data.bots as CoworkBot[],
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'unknown error';

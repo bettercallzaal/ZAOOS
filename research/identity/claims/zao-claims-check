@@ -1,0 +1,523 @@
+#!/usr/bin/env python3
+"""zao-claims-check - make a retracted claim impossible to leave live.
+
+WHAT HAPPENED, 2026-09-08. The "Lil WaveWarZ Takeover at NFT NYC 2025" never
+happened - the proposal did not pass. A retraction was written up on 09-07,
+reported as applied, and believed. On 09-08 a grep found it still live in EIGHT
+places across two repos, including a published card. Nothing had been corrected.
+
+That was the fourth time in one day that work was reported as done without the
+artifact being read (two chat edits "landed" off a spinner, an email send
+claimed from an agent's phrasing, and this). The common shape is not laziness -
+it is that a claim about the world was sourced from a description of the world.
+
+WHY A LEDGER AND NOT A RULE. Every existing defence against these claims is
+prose in a CLAUDE.md: "never describe JANGO UU as alumni", "never cite Magnetiq
+as a live surface", "the $20K figure is retracted". Prose rules are an honor
+system, and an honor system is exactly what failed - the retraction report was
+itself a prose rule about the same claim. A pattern in this ledger cannot be
+satisfied by intending to have fixed it.
+
+HOW IT WORKS
+  - ~/zao-vault/claims/retracted.tsv holds one banned claim per row
+  - this scans git-tracked text files for those patterns
+  - a hit is allowed only if the LINE also carries an exemption (below)
+  - any un-exempt hit exits 1 and prints file:line
+
+EXEMPTIONS, deliberately line-scoped and not file-scoped, so retracting a claim
+in one paragraph never blesses it in the next:
+  - the entry's own `allow` regex (e.g. COC Concertz #7, a real event that
+    shares the words "WaveWarZ Takeover" with the retracted one)
+  - a line that is struck (~~...~~) or labelled RETRACTED - a correction must
+    be able to quote what it is correcting
+  - a line carrying `[CLAIM-OK: <id> <why>]` - a deliberate, documented,
+    reviewable escape hatch. It requires the id, so it cannot be a blanket mute.
+  - the ledger itself, and this file
+
+USAGE
+  zao-claims-check                 # scan the current git repo
+  zao-claims-check <path>...       # scan specific paths (files or dirs)
+  zao-claims-check --list          # show the ledger
+  zao-claims-check --staged        # scan only staged files (pre-commit use)
+"""
+from __future__ import annotations
+
+import argparse
+import functools
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+SELF = Path(__file__).resolve()
+
+# Ledger resolution, first hit wins. The canonical copy lives in ZAOOS because a
+# pre-commit hook only protects commits made locally by someone who ran
+# `git config core.hooksPath` - GitHub web edits, merge commits and fresh clones
+# all bypass it, and CI cannot read ~/zao-vault. zao-nyc/CLAUDE.md also settles
+# it: "ZAOOS is upstream ... two AI-readable surfaces disagreeing is the worst
+# possible outcome", so the ledger is referenced, never vendored per-repo.
+ZAOOS_REL = Path("research/identity/claims/retracted.tsv")
+# A repo declares which of its files are PUBLIC COPY - what an outsider reads.
+# One glob per line, # comments allowed. scope=public rows fire only on these.
+PUBLIC_DECL = ".claims-public"
+LEGACY_VAULT = Path.home() / "zao-vault" / "claims" / "retracted.tsv"
+
+
+def public_globs(root: Path | None) -> list[str]:
+    """Globs naming this repo's public-facing copy, or [] if it declares none."""
+    if root is None:
+        return []
+    f = root / PUBLIC_DECL
+    if not f.exists():
+        return []
+    out = []
+    for line in f.read_text().splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            out.append(line)
+    return out
+
+
+def git_root(start: Path) -> Path | None:
+    try:
+        r = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=start,
+                           capture_output=True, text=True, check=True)
+        return Path(r.stdout.strip())
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return None
+
+
+@functools.lru_cache(maxsize=1)
+def resolve_ledger() -> Path:
+    env = os.environ.get("ZAO_CLAIMS_LEDGER")
+    if env:
+        return Path(env).expanduser()
+    root = git_root(Path.cwd())
+    if root and (root / ZAOOS_REL).exists():
+        return root / ZAOOS_REL          # in-repo: this is how CI finds it
+    canonical = Path.home() / "Documents" / "ZAO OS V1" / ZAOOS_REL
+    if canonical.exists():
+        # Two AI-readable surfaces disagreeing is the worst possible outcome
+        # (zao-nyc/CLAUDE.md). If the legacy mirror still exists and has drifted
+        # from canonical, say so loudly rather than silently preferring one.
+        if LEGACY_VAULT.exists():
+            try:
+                if LEGACY_VAULT.read_bytes() != canonical.read_bytes():
+                    sys.stderr.write(
+                        f"zao-claims-check: WARNING - the legacy ledger at "
+                        f"{LEGACY_VAULT} has DRIFTED from canonical "
+                        f"{canonical}. Using canonical. Delete the legacy copy "
+                        f"or reconcile it.\n")
+            except OSError:
+                pass
+        return canonical
+    return LEGACY_VAULT
+
+
+LEDGER = resolve_ledger()
+
+
+def warn_if_self_drifted() -> None:
+    """The checker now exists in two places, so it gets the same rule as the ledger.
+
+    Canonical is ZAOOS research/identity/claims/zao-claims-check - it lives next
+    to the ledger it reads and, unlike zaal-dotfiles, that repo is PUBLIC, which
+    is what CI needs. The dotfiles copy is what ~/bin points at. Two copies of an
+    enforcement tool silently disagreeing is the same failure as two copies of a
+    fact, so say it out loud rather than preferring one quietly.
+    """
+    canon = (Path.home() / "Documents" / "ZAO OS V1"
+             / "research" / "identity" / "claims" / "zao-claims-check")
+    try:
+        if canon.exists() and canon.resolve() != SELF \
+                and canon.read_bytes() != SELF.read_bytes():
+            sys.stderr.write(
+                f"zao-claims-check: WARNING - this copy ({SELF}) differs from "
+                f"canonical ({canon}). Reconcile them; CI runs canonical.\n")
+    except OSError:
+        pass
+
+# A line already doing the right thing: striking the claim, labelling it, or
+# STATING THE PROHIBITION. That last one matters more than it looks - the first
+# run of this check flagged CLAUDE.md's own "Never describe JANGO UU as a former
+# member or alumni", i.e. the rule banning the claim was reported as the claim.
+# A check that fails on its own rulebook gets switched off, and a check people
+# route around protects nobody. Negated and retracting phrasings are exempt; an
+# ASSERTION of the claim carries none of these words, which is what the real
+# failures looked like ("Zaal led the IRL event | Shipped").
+GLOBAL_ALLOW = re.compile(
+    r"~~|RETRACTED|NEVER HAPPENED|\[CLAIM-OK:"
+    r"|\bnever\b|\bdo not\b|\bdon't\b|\bmust not\b|\bno longer\b"
+    r"|\bis not\b|\bwas not\b|\bnot a\b|\bINACTIVE\b|\bsupersed"
+    r"|\bcorrect(ed|ion)\b|\bretract",
+    re.I,
+)
+# A line can legitimately quote TWO retracted claims - a sentence naming both a
+# retracted event and the count that rested on it needs an id for each. Reading
+# only the first marker made the second claim unexemptable.
+CLAIM_OK = re.compile(r"\[CLAIM-OK:\s*([\w-]+)", re.I)
+
+
+def claim_ok_ids(line: str) -> set[str]:
+    return {m.group(1).lower() for m in CLAIM_OK.finditer(line)}
+
+TEXT_EXT = {
+    ".md", ".txt", ".html", ".htm", ".json", ".yml", ".yaml", ".ts", ".tsx",
+    ".js", ".jsx", ".py", ".sh", ".css", ".csv", ".tsv", ".llm",
+}
+SKIP_DIRS = {".git", "node_modules", ".next", "dist", "build", ".venv",
+             "venv", "__pycache__", ".serena", "coverage",
+             # An archive is a record of what was believed, not a live claim.
+             # `reaped` holds session bundles written by a hook, not a model:
+             # they carry the COMMIT SUBJECTS of the very commits that did the
+             # retracting, they are regenerated, so a marker written into one
+             # would be overwritten, and rewriting a commit subject to please a
+             # linter would falsify the history the bundle exists to record.
+             "_archive", "reaped"}
+
+
+class Entry:
+    __slots__ = ("id", "pat", "allow", "scope", "date", "why")
+
+    def __init__(self, cid, pat, allow, scope, date, why):
+        self.id = cid
+        self.pat = re.compile(pat, re.I)
+        self.allow = re.compile(allow, re.I) if allow.strip() else None
+        self.scope = scope if scope in ("all", "new", "public") else "all"
+        self.date = date
+        self.why = why
+
+
+def load_ledger(path: Path) -> list[Entry]:
+    if not path.exists():
+        sys.stderr.write(f"zao-claims-check: no ledger at {path}\n")
+        sys.exit(2)
+    out = []
+    for n, raw in enumerate(path.read_text().splitlines(), 1):
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        parts = raw.split("\t")
+        if len(parts) < 6:
+            sys.stderr.write(
+                f"zao-claims-check: {path}:{n} needs 6 tab-separated fields, "
+                f"got {len(parts)} - row ignored\n")
+            continue
+        cid, pat, allow, scope, date, why = (p.strip() for p in parts[:6])
+        try:
+            out.append(Entry(cid, pat, allow, scope, date, why))
+        except re.error as e:
+            sys.stderr.write(f"zao-claims-check: {path}:{n} bad regex ({e})\n")
+            sys.exit(2)
+    return out
+
+
+def git_files(root: Path, staged: bool, diff_base: str | None = None) -> list[Path]:
+    if diff_base:
+        cmd = ["git", "diff", "--name-only", "--diff-filter=ACMR",
+               f"{diff_base}...HEAD"]
+    elif staged:
+        cmd = ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"]
+    else:
+        cmd = ["git", "ls-files"]
+    try:
+        r = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
+                           check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+    return [root / p for p in r.stdout.splitlines() if p]
+
+
+def added_lines(root: Path, staged: bool, diff_base: str | None
+                ) -> dict[Path, list[tuple[int, str]]]:
+    """Lines this change ADDS, as {path: [(lineno, text)]}.
+
+    scope=new means "do not write this fresh". The first version of --diff
+    listed changed FILES and scanned them whole, so a one-line edit to a
+    900-line historical doc flagged every pre-existing mention in it - the same
+    unusable-check failure that scope=new was invented to avoid, reintroduced
+    one layer up. Only added lines can be freshly written.
+    """
+    if diff_base:
+        cmd = ["git", "diff", "-U0", "--diff-filter=ACMR", f"{diff_base}...HEAD"]
+    elif staged:
+        cmd = ["git", "diff", "-U0", "--cached", "--diff-filter=ACMR"]
+    else:
+        return {}
+    try:
+        r = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
+                           check=True, errors="replace")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return {}
+    out: dict[Path, list[tuple[int, str]]] = {}
+    cur: Path | None = None
+    lineno = 0
+    hunk = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
+    for line in r.stdout.splitlines():
+        if line.startswith("+++ b/"):
+            cur = root / line[6:]
+            out.setdefault(cur, [])
+        elif line.startswith("@@"):
+            m = hunk.match(line)
+            lineno = int(m.group(1)) if m else 0
+        elif line.startswith("+") and not line.startswith("+++") and cur:
+            out[cur].append((lineno, line[1:]))
+            lineno += 1
+    return {k: v for k, v in out.items() if v}
+
+
+def walk(paths: list[Path]) -> list[Path]:
+    out = []
+    for p in paths:
+        if p.is_file():
+            out.append(p)
+        elif p.is_dir():
+            for dirpath, dirnames, filenames in os.walk(p):
+                dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+                out.extend(Path(dirpath) / f for f in filenames)
+    return out
+
+
+MAX_BYTES = 2_000_000  # a claim lives in prose; anything larger is data
+
+
+def looks_textual(p: Path) -> bool:
+    """Extensionless files (hooks, Makefile, LICENSE) still carry prose.
+
+    Skipping them silently was a real gap: the first commit of the pre-commit
+    hook that RUNS this check scanned 0 files, because `.husky/pre-commit` has
+    no suffix. Sniff instead of guessing from the name.
+    """
+    try:
+        if p.stat().st_size > MAX_BYTES:
+            return False
+        with p.open("rb") as fh:
+            return b"\0" not in fh.read(8192)
+    except OSError:
+        return False
+
+
+def scannable(p: Path) -> bool:
+    try:
+        rp = p.resolve()
+    except OSError:
+        return False
+    if rp == SELF:
+        return False
+    # The ledger AND its own documentation are exempt. A ledger that cannot name
+    # the claims it bans is not documentable, and the alternative - an inline
+    # [CLAIM-OK] on every line of its README - is noise that teaches people the
+    # escape hatch is routine.
+    try:
+        ledger_dir = resolve_ledger().resolve().parent
+        if rp == resolve_ledger().resolve() or ledger_dir in rp.parents or rp.parent == ledger_dir:
+            return False
+    except OSError:
+        pass
+    if any(part in SKIP_DIRS for part in p.parts):
+        return False
+    if not p.is_file():
+        return False
+    if p.suffix.lower() in TEXT_EXT:
+        return True
+    return p.suffix == "" and looks_textual(p)
+
+
+def main() -> int:
+    warn_if_self_drifted()
+    ap = argparse.ArgumentParser(add_help=True, description=__doc__.split("\n")[0])
+    ap.add_argument("paths", nargs="*", type=Path)
+    ap.add_argument("--staged", action="store_true",
+                    help="scan only staged files (pre-commit)")
+    ap.add_argument("--diff", metavar="BASE",
+                    help="scan only files this branch changes vs BASE, and "
+                         "enforce scope=new rows on them (CI: --diff origin/main)")
+    ap.add_argument("--list", action="store_true", help="print the ledger")
+    ap.add_argument("--due", action="store_true",
+                    help="rows whose [re-check: DATE] has passed - a provisional "
+                         "row that outlives its question is a false alarm that "
+                         "keeps firing")
+    ap.add_argument("--ledger", type=Path, default=None)
+    args = ap.parse_args()
+
+    ledger = args.ledger or resolve_ledger()
+    entries = load_ledger(ledger)
+
+    if args.list:
+        print(f"{len(entries)} retracted claims in {ledger}\n")
+        for e in entries:
+            print(f"  {e.id}  (retracted {e.date}, scope={e.scope})")
+            print(f"    pattern: {e.pat.pattern}")
+            if e.allow:
+                print(f"    allow:   {e.allow.pattern}")
+            print(f"    why:     {e.why}\n")
+        return 0
+
+    if args.due:
+        import datetime
+        today = datetime.date.today()
+        rx = re.compile(r"\[re-check:\s*(\d{4})-(\d{2})-(\d{2})\]")
+        due, pending, undated = [], [], []
+        for e in entries:
+            m = rx.search(e.why)
+            if not m:
+                undated.append(e)
+                continue
+            d = datetime.date(*(int(g) for g in m.groups()))
+            (due if d <= today else pending).append((d, e))
+        for d, e in sorted(due, key=lambda t: (t[0], t[1].id)):
+            print(f"DUE      {d}  {e.id} (scope={e.scope})\n         {e.why}\n")
+        for d, e in sorted(pending, key=lambda t: (t[0], t[1].id)):
+            print(f"pending  {d}  {e.id} (scope={e.scope})")
+        if undated:
+            print("\nno re-check date (fine for rows whose premise cannot change): "
+                  + ", ".join(e.id for e in undated))
+        return 1 if due else 0
+
+    if args.paths:
+        files = walk([p for p in args.paths])
+    else:
+        root = Path.cwd()
+        files = git_files(root, args.staged, args.diff)
+        if not files and not args.staged and not args.diff:
+            files = walk([root])
+
+    files = [f for f in files if scannable(f)]
+
+    # scope=new claims are true history that must not be written FRESH, so they
+    # only apply to what is actually being added. Enforcing them across a whole
+    # tree flags the archive that legitimately records them.
+    # scope=new bites on what is being ADDED - staged locally, or changed vs the
+    # PR base in CI. Enforcing it across a whole tree flags the archive that
+    # legitimately records it.
+    incoming = bool(args.staged or args.diff)
+    scope_all = [e for e in entries if e.scope == "all"]
+    scope_new = [e for e in entries if e.scope == "new"] if incoming else []
+
+    # scope=public: some numbers are TRUE but barred from what outsiders read.
+    # Zaal, 2026-09-08: "$5K PUBLIC, $25K INTERNAL ONLY" - a figure can be
+    # correct and still not belong on a page. That is neither "false" (all) nor
+    # "do not write fresh" (new), so it is its own axis.
+    root_for_pub = git_root(Path.cwd())
+    globs = public_globs(root_for_pub)
+    scope_pub = [e for e in entries if e.scope == "public"]
+    undeclared = bool(scope_pub) and not globs
+
+    # Count only what was genuinely NOT looked at: scope=new rows when this is
+    # not an incoming-change run, and scope=public rows when the repo declares
+    # no public paths. Counting a row that WAS checked as skipped understates
+    # the coverage and is its own small lie.
+    n_new_total = sum(1 for e in entries if e.scope == "new")
+    skipped = (n_new_total - len(scope_new)) + (0 if globs else len(scope_pub))
+    entries = scope_all
+
+    hits = []
+
+    if scope_pub and globs and root_for_pub:
+        import fnmatch
+        for f in files:
+            try:
+                rel = f.resolve().relative_to(root_for_pub.resolve()).as_posix()
+            except (ValueError, OSError):
+                continue
+            if not any(fnmatch.fnmatch(rel, g) for g in globs):
+                continue
+            try:
+                flines = f.read_text(errors="replace").splitlines()
+            except OSError:
+                continue
+            for e in scope_pub:
+                for i, line in enumerate(flines, 1):
+                    if not e.pat.search(line):
+                        continue
+                    if e.allow and e.allow.search(line):
+                        continue
+                    if GLOBAL_ALLOW.search(line):
+                        ids = claim_ok_ids(line)
+                        if not ids or e.id.lower() in ids:
+                            continue
+                    hits.append((e, f, i, line.strip()))
+
+    # scope=new: only lines this change ADDS. Scanning whole changed files here
+    # would flag the archive a one-line edit happens to touch.
+    if scope_new:
+        root_ = Path.cwd()
+        for f, lines in added_lines(root_, args.staged, args.diff).items():
+            if not scannable(f):
+                continue
+            for e in scope_new:
+                for ln, text in lines:
+                    if not e.pat.search(text):
+                        continue
+                    if e.allow and e.allow.search(text):
+                        continue
+                    if GLOBAL_ALLOW.search(text):
+                        ids = claim_ok_ids(text)
+                        if not ids or e.id.lower() in ids:
+                            continue
+                    hits.append((e, f, ln, text.strip()))
+    for f in files:
+        try:
+            text = f.read_text(errors="replace")
+        except OSError:
+            continue
+        lines = None
+        for e in entries:
+            if not e.pat.search(text):
+                continue  # cheap whole-file reject before per-line work
+            if lines is None:
+                lines = text.splitlines()
+            for i, line in enumerate(lines, 1):
+                if not e.pat.search(line):
+                    continue
+                if e.allow and e.allow.search(line):
+                    continue
+                if GLOBAL_ALLOW.search(line):
+                    ids = claim_ok_ids(line)
+                    # an escape hatch naming only OTHER claims does not cover this one
+                    if not ids or e.id.lower() in ids:
+                        continue
+                hits.append((e, f, i, line.strip()))
+
+    if not hits:
+        bits = []
+        if skipped:
+            bits.append(f"{skipped} scoped rows not checked")
+        if undeclared:
+            # Silence here would be a check reporting green having checked
+            # nothing - say it out loud instead.
+            bits.append(f"{len(scope_pub)} scope=public NOT CHECKED: this repo "
+                        f"declares no {PUBLIC_DECL}")
+        note = f" ({'; '.join(bits)})" if bits else ""
+        print(f"zao-claims-check: OK - {len(files)} files, "
+              f"{len(entries)} retracted claims, 0 live{note}")
+        return 0
+
+    by_id: dict[str, list] = {}
+    for e, f, i, line in hits:
+        by_id.setdefault(e.id, []).append((e, f, i, line))
+
+    print(f"zao-claims-check: FAIL - {len(hits)} live occurrence(s) of "
+          f"{len(by_id)} retracted claim(s)\n")
+    cwd = Path.cwd()
+    for cid, group in by_id.items():
+        e = group[0][0]
+        print(f"  [{cid}]  retracted {e.date}")
+        print(f"  {e.why}")
+        for _, f, i, line in group:
+            try:
+                rel = f.relative_to(cwd)
+            except ValueError:
+                rel = f
+            print(f"    {rel}:{i}: {line[:150]}")
+        print()
+    print("Fix the text. If an occurrence is legitimate - quoting the claim in "
+          "order to correct it, or a different thing that shares the words - "
+          "strike it (~~...~~), label the line RETRACTED, or add "
+          f"[CLAIM-OK: {next(iter(by_id))} <why>] to that line.")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

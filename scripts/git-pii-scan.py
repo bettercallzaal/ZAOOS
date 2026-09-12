@@ -129,14 +129,28 @@ def email_allowed(addr: str) -> bool:
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 
 
-def staged_added_lines() -> list[tuple[str, str]]:
-    """[(file, added_line)] from the staged diff. Added lines only - context lines
-    are already committed, and re-flagging them would make every commit near an
-    old address impossible."""
-    out = subprocess.run(
-        ["git", "diff", "--cached", "--unified=0", "--no-color"],
-        capture_output=True, text=True, check=False,
-    )
+class DiffUnreadable(RuntimeError):
+    """The staged diff could not be read, so nothing was scanned."""
+
+
+def _added_against(base: str | None) -> list[tuple[str, str]] | None:
+    """[(file, added_line)] from the staged diff against `base` (HEAD if None).
+
+    RETURNS None WHEN THE DIFF COULD NOT BE READ, which is NOT the same as an
+    empty list. This distinction is the whole point of the function's signature.
+    Conflating the two is what let a merge that takes the other side wholesale
+    trip this gate on the other parent's content (below), and the same shortcut
+    in check-research-index.sh reported every inherited doc. git reports the
+    difference in its exit status; the previous version ran with check=False and
+    discarded it, then wrote a comment saying the two were indistinguishable.
+    They never were.
+    """
+    cmd = ["git", "diff", "--cached", "--unified=0", "--no-color"]
+    if base:
+        cmd.append(base)
+    out = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        return None
     rows: list[tuple[str, str]] = []
     current = "?"
     for line in out.stdout.splitlines():
@@ -145,6 +159,65 @@ def staged_added_lines() -> list[tuple[str, str]]:
         elif line.startswith("+") and not line.startswith("+++"):
             rows.append((current, line[1:]))
     return rows
+
+
+def _merging() -> bool:
+    return subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", "MERGE_HEAD"],
+        capture_output=True, text=True, check=False,
+    ).returncode == 0
+
+
+def staged_added_lines() -> list[tuple[str, str]]:
+    """[(file, added_line)] from the staged diff. Added lines only - context lines
+    are already committed, and re-flagging them would make every commit near an
+    old address impossible.
+
+    ON A MERGE COMMIT, "added" against HEAD is not the same as "authored here".
+    The index holds everything BOTH parents brought, so every line the other side
+    committed reads as new. Measured 2026-09-12 merging main into a 44-commit-stale
+    branch: this refused the commit over an address-shaped string that had been on
+    main since 2026-09-08, which nobody in the merge wrote. That is the same
+    principle the paragraph above already states, applied one level out - the line
+    is already committed, just on the other parent.
+
+    So mid-merge a line counts only if it is absent from BOTH parents: intersect
+    the two diffs. A line the other side brought is present in MERGE_HEAD and
+    never enters the second set; a line typed DURING the resolution is in neither
+    parent, enters both, and is still caught. That second case is the one this
+    must not lose, because it is a real address arriving through a merge.
+
+    FAILS CLOSED. If the MERGE_HEAD diff cannot be taken, the rows are left
+    unfiltered - which is exactly today's behaviour, so a broken read can only
+    over-report, never under-report, on a security gate.
+    """
+    rows = _added_against(None)
+    if rows is None:
+        # THE GATE CANNOT RUN, SO THE GATE MUST NOT PASS. The previous version
+        # returned [] here, main() read "no rows" as "nothing to scan", and the
+        # whole PII check exited 0 having read nothing - green while broken, in a
+        # security gate (silent-failure-guard.md rule 5).
+        raise DiffUnreadable("git diff --cached failed")
+    if not rows or not _merging():
+        return rows
+    theirs = _added_against("MERGE_HEAD")
+    if theirs is None:
+        # The READ failed. Cannot narrow, so narrow nothing: rows are returned
+        # unfiltered, which is today's behaviour and can only over-report.
+        return rows
+    # A genuinely EMPTY result is meaningful and must filter to nothing. A line
+    # typed during the resolution is in NEITHER parent, so it is always on the
+    # MERGE_HEAD side; an empty side means the resolver typed nothing new.
+    #
+    # THIS IS REACHABLE AND WAS MEASURED, 2026-09-12. Resolve a conflict by
+    # taking the other side wholesale - one of the commonest resolutions there
+    # is - and the index equals MERGE_HEAD for that file, so nothing is added
+    # against it while plenty is added against HEAD. Measured on a throwaway
+    # repo: 8 added lines vs HEAD, 0 vs MERGE_HEAD, and #3502's version blocked
+    # the commit over the other parent's address. So this is not a tidy-up of a
+    # theoretical branch; it is the fix for a case #3502 missed.
+    theirs_set = set(theirs)
+    return [r for r in rows if r in theirs_set]
 
 
 def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
@@ -168,7 +241,16 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
 
 
 def main() -> int:
-    rows = staged_added_lines()
+    try:
+        rows = staged_added_lines()
+    except DiffUnreadable as err:
+        print(
+            f"COMMIT BLOCKED - {err}, so nothing was scanned.\n\n"
+            "This gate fails CLOSED: an unreadable diff is not a clean one.\n"
+            "Fix the repository state and commit again.",
+            file=sys.stderr,
+        )
+        return 1
     if not rows:
         return 0
     found = scan(rows)

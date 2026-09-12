@@ -436,6 +436,59 @@ export const TERMINAL_VERDICT_RE =
   /(^|\n)\s*(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
 
 /**
+ * A card a lane owns, so the phone must not ask Zaal about it.
+ *
+ * Measured 2026-09-08 on the live state file: 117 of the 347 unanswered cards
+ * carried `metadata.route = "agent"` - triage had already said a lane does the
+ * work, and Zaal's own answer to such a card ("route to AGENT") is exactly the
+ * verdict reconcile already treats as terminal. Asking was a third of the pile.
+ *
+ * Same flag rule as zao-wall's bucket(): `metadata.irreversible` or
+ * `metadata.decision` equal to JSON `true` sends the card to Zaal whatever
+ * `route` says, so a flagged card is never lane-owned here either. Strict
+ * boolean - `decision: "approved"` exists on the board with the opposite sense.
+ */
+/**
+ * Words that make a card Zaal's to see whatever its route says: GENESIS's
+ * escalation classes (money, outbound, irreversible infra, identity). Measured
+ * 2026-09-10 on the live backlog: of the 123 cards this rule selected without
+ * it, 15 carried one of these in the title - one was "deploy the ZAI Discord
+ * voice-capture bot", a deploy, unflagged.
+ *
+ * Some suffixes are DELIBERATELY loose (pay\w*, launch\w*): they also match
+ * "payload" and "launchd", so "check the payload shape" or "install the launchd
+ * agent" stay on Zaal's queue. That direction is safe - over-excluding keeps a
+ * card in front of him, it never removes one silently - so do not tighten
+ * these without knowing which way the risk runs. post and sign use explicit
+ * endings instead, which keeps "postpone" and "redesign" out (vault, measured).
+ */
+export const ZAAL_ONLY_TITLE_RE =
+  /\b(deploy\w*|merge\w*|publish\w*|post(s|ed|ing)?|send\w*|delet\w*|pay\w*|spend\w*|sign(s|ed|ing)?|launch\w*|migrat\w*|dns|cancel\w*|e-?mail\w*|dms?)\b/i;
+
+/** The card's own owner field names Zaal. 33 of those 123 did (2026-09-10). */
+export function namesZaal(md: Record<string, unknown>): boolean {
+  const owner = String(md.next_owner ?? md.owner_label ?? md.owner ?? '');
+  return /\bzaal\b/i.test(owner);
+}
+
+/**
+ * A lane's card, not Zaal's thumb: route=agent AND nothing says it is his.
+ * The flags alone could not carry this - measured 2026-09-10, a five-card
+ * sample of the flag-only selection had three that named Zaal as owner. So a
+ * card is NOT lane-owned if it is flagged irreversible/decision, if its owner
+ * field names Zaal, or if its title carries an escalation word.
+ */
+export function isLaneOwned(metadata: unknown, title?: string | null): boolean {
+  if (!metadata || typeof metadata !== 'object') return false;
+  const md = metadata as Record<string, unknown>;
+  if (md.irreversible === true || md.decision === true) return false;
+  if (md.route !== 'agent') return false;
+  if (namesZaal(md)) return false;
+  if (title && ZAAL_ONLY_TITLE_RE.test(title)) return false;
+  return true;
+}
+
+/**
  * Classify one asked-entry's board row for reconcile.
  *
  *  - row missing (task deleted): 'board-closed' - there is nothing left to ask.
@@ -443,13 +496,19 @@ export const TERMINAL_VERDICT_RE =
  *    with it; the card must stop counting and stop re-asking.
  *  - still todo but notes carry a terminal verdict: 'verdict-synced' - Zaal
  *    already ruled on it in a terminal; asking again on the phone is a dupe.
+ *  - still todo, routed to an agent lane and not flagged: 'lane-owned' - the
+ *    work is a lane's, not a thumb's. The card stays open on the board; only
+ *    the ask is withdrawn, and reconcile revives it if the route ever changes.
  *  - otherwise null: a genuinely open card, leave it alone.
  */
 export function classifyReconcile(
-  row: { status?: string; archived_at?: string | null; notes?: string | null } | undefined,
-): 'board-closed' | 'verdict-synced' | null {
+  row:
+    | { status?: string; archived_at?: string | null; notes?: string | null; metadata?: unknown; title?: string | null }
+    | undefined,
+): 'board-closed' | 'verdict-synced' | 'lane-owned' | null {
   if (!row) return 'board-closed';
   if (row.status !== 'todo' || row.archived_at) return 'board-closed';
   if (row.notes && TERMINAL_VERDICT_RE.test(row.notes)) return 'verdict-synced';
+  if (isLaneOwned(row.metadata, row.title)) return 'lane-owned';
   return null;
 }

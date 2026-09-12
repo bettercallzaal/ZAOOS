@@ -1,0 +1,86 @@
+name: Retracted claims guard
+
+# WHY THIS EXISTS
+#
+# On 2026-09-08 a retraction that had been written up the day before, and
+# reported as applied, was found still live in eight places across two repos -
+# including a published card. The event (ledger id: takeover-2025) never
+# happened; the proposal did not pass. The same grep found doc 722f still
+# carrying the classification in ledger id jango-alumni, months after it was
+# recorded as superseded, and a Candy/Impact3 sponsorship route (candy-impact3)
+# corrected in doc 229 and left standing in two other docs.
+#
+# Those ids are used instead of the claim text on purpose: this file is scanned
+# by the check it installs, and its first draft was rejected for quoting them.
+#
+# Every defence against those claims was prose in a CLAUDE.md. Prose is an honor
+# system, and the honor system is what failed - the retraction report was itself
+# a prose rule about the same claim, and it was believed rather than checked.
+#
+# WHY A HOOK IS NOT ENOUGH, which .github/workflows/doc-collision-guard.yml
+# already learned the hard way: .husky/pre-commit only runs on a local commit,
+# on a clone that ran `npm install`, and `--no-verify` bypasses it. GitHub web
+# edits and merge commits never touch it at all. This is server-side, so it
+# applies to every author - human, loop, or agent.
+#
+# NO `paths:` FILTER, for the reason doc-collision-guard.yml gives: a required
+# check that does not report leaves a PR blocked forever rather than failing it,
+# so a path-filtered check can never be made mandatory.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  claims:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # --diff needs the merge base
+
+      # `--depth=0` is not "unshallow", it is invalid - git rejects it with
+      # "fatal: depth 0 is not a positive number". actions/checkout above
+      # already fetches full history (fetch-depth: 0), so this only needs to
+      # make the base ref available to --diff.
+      - name: Fetch base
+        if: github.event_name == 'pull_request'
+        run: git fetch --no-tags origin "${{ github.base_ref }}"
+
+      # The checker lives in this repo, next to the ledger it reads. The first
+      # version of this step curled it from zaal-dotfiles, which is PRIVATE, so
+      # it would have failed at install on every run - a workflow that can never
+      # pass. Vendoring it here also means CI does no network fetch at all.
+      - name: Install the checker
+        run: |
+          set -euo pipefail
+          install -m 0755 research/identity/claims/zao-claims-check \
+            /usr/local/bin/zao-claims-check
+          zao-claims-check --list | head -1
+
+      # scope=all claims are FALSE and must not survive anywhere, so the whole
+      # tree is audited - not just the diff. This passes on main today; if it
+      # ever fails on an untouched file, something reintroduced a retracted
+      # claim through a path this workflow did not see.
+      - name: Whole tree - claims that must not survive anywhere
+        run: zao-claims-check
+
+      # scope=new claims are TRUE HISTORY that must not be written FRESH
+      # (retired partners: "do not reference it again", not "scrub the
+      # archive"). Matched against ADDED LINES only. Scanning changed files
+      # whole would flag every pre-existing mention in any historical doc a PR
+      # happens to touch - which is how this check first made itself unusable.
+      - name: Added lines - claims that must not be written fresh
+        if: github.event_name == 'pull_request'
+        run: zao-claims-check --diff "origin/${{ github.base_ref }}"
+
+      # Advisory. A provisional row that outlives the question it was staged
+      # against becomes a record that keeps shouting after it stops being true -
+      # the mirror of an alarm that goes quiet when it should fire.
+      - name: Provisional rows past their re-check date
+        continue-on-error: true
+        run: zao-claims-check --due

@@ -70,7 +70,6 @@ npm run lint         # ESLint
 |----------|-----|------|
 | Incented | `incented.co/organizations/zabal` | Community campaigns |
 | Empire Builder | `empirebuilder.world/profile/0x7234c...` | Token empire |
-| MAGNETIQ | `app.magnetiq.xyz` | Proof of Meet hub |
 | Clanker | `clanker.world` | $ZABAL token launcher |
 
 ## Memory

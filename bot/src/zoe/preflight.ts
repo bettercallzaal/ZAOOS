@@ -56,6 +56,49 @@ export const CAPABILITIES: Capability[] = [
   },
 ];
 
+/**
+ * The cap-fallback ladder, as env alone can see it. Kept here rather than
+ * imported from the router so preflight stays pure and testable with a fake
+ * env; the router owns the same order at call time.
+ *
+ * DEPTH is the thing worth reporting. A boolean ("is there a fallback?") reads
+ * the same at one rung as at four, and one rung is not a fallback - it is a
+ * second single point of failure. On 2026-08-21 the ladder was OpenRouter then
+ * Grok, OpenRouter ran out of credits, and 17 loops went silent. On 2026-09-11
+ * the live VPS had exactly one rung again. Zaal: "i odnt wanna have openrouter
+ * be the only backup".
+ */
+export const FALLBACK_RUNGS: Array<{ name: string; when: (env: Record<string, string | undefined>) => boolean }> = [
+  { name: 'openrouter', when: (e) => Boolean(e.OPENROUTER_API_KEY?.trim()) },
+  { name: 'surplus', when: (e) => Boolean(e.SURPLUS_API_KEY?.trim()) },
+  { name: 'grok', when: (e) => Boolean(e.XAI_API_KEY?.trim()) },
+  { name: 'gpt', when: (e) => Boolean(e.OPENAI_API_KEY?.trim()) },
+  // Keyless and local, so it is the one rung an expired card cannot take out.
+  { name: 'ollama', when: (e) => e.OLLAMA_ENABLED?.trim() === '1' },
+];
+
+/** The rungs configured in this env, in the order the router would try them. */
+export function fallbackLadder(env: Record<string, string | undefined>): string[] {
+  return FALLBACK_RUNGS.filter((r) => r.when(env)).map((r) => r.name);
+}
+
+/**
+ * One line about the ladder, or null when it is deep enough to be worth the
+ * name. Two is the floor: one paid provider plus anything that does not fail
+ * with it.
+ */
+export function formatFallbackDepth(env: Record<string, string | undefined>): string | null {
+  const rungs = fallbackLadder(env);
+  if (rungs.length >= 2) return null;
+  if (rungs.length === 0) {
+    return 'CAP FALLBACK: no rungs. A Claude cap is a hard stop for every judgment call. '
+      + 'Set OPENROUTER_API_KEY, or OLLAMA_ENABLED=1 on a box with a model pulled.';
+  }
+  return `CAP FALLBACK: one rung (${rungs[0]}). One rung is not a fallback, it is a second single `
+    + 'point of failure - on 2026-08-21 the top rung ran out of credits and 17 loops went silent. '
+    + 'Add a second: SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1 (keyless, local).';
+}
+
 export interface CapabilityResult {
   name: string;
   ok: boolean;
@@ -82,9 +125,14 @@ export function checkCapabilities(
  * Human-readable report. Returns null when everything is healthy, so callers
  * can stay silent on a clean boot and only speak up when something is wrong.
  */
-export function formatPreflightReport(results: CapabilityResult[]): string | null {
+export function formatPreflightReport(
+  results: CapabilityResult[],
+  env?: Record<string, string | undefined>,
+): string | null {
   const broken = results.filter((r) => !r.ok);
-  if (broken.length === 0) return null;
+  const depth = env ? formatFallbackDepth(env) : null;
+  if (broken.length === 0 && !depth) return null;
+  if (broken.length === 0 && depth) return ['ZOE preflight: capabilities are configured, with one warning.', '', depth].join('\n');
   const critical = broken.filter((r) => r.severity === 'critical');
   const degraded = broken.filter((r) => r.severity === 'degraded');
   const lines: string[] = ['ZOE preflight: some capabilities are DISABLED (missing config).'];
@@ -94,6 +142,7 @@ export function formatPreflightReport(results: CapabilityResult[]): string | nul
   for (const r of degraded) {
     lines.push('', `DEGRADED - ${r.name}: missing ${r.missing.join(', ')}`, `  -> ${r.impact}`);
   }
+  if (depth) lines.push('', depth);
   lines.push('', 'Add the missing vars to the bot .env and restart. Until then those paths fail silently.');
   return lines.join('\n');
 }
@@ -112,13 +161,17 @@ export async function runPreflight(
   env: Record<string, string | undefined> = process.env,
 ): Promise<CapabilityResult[]> {
   const results = checkCapabilities(env);
-  const report = formatPreflightReport(results);
+  const report = formatPreflightReport(results, env);
   if (!report) {
-    console.log('[zoe/preflight] all capabilities configured');
+    console.log(`[zoe/preflight] all capabilities configured; cap-fallback ladder: ${fallbackLadder(env).join(' -> ')}`);
     return results;
   }
   console.error(`[zoe/preflight] ${report}`);
-  if (alert) {
+  // A shallow ladder is LOGGED, never alerted on its own. Every restart would
+  // send the same message, and a warning that arrives on every boot is a
+  // warning nobody reads by the third one. Missing config still alerts.
+  const configMissing = results.some((r) => !r.ok);
+  if (alert && configMissing) {
     try {
       await alert(report);
     } catch (err) {

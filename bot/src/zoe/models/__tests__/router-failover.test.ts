@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   hasCapFallbackProvider,
+  capFallbackProviders,
   callCapFallback,
   routeAndCall,
   OPENROUTER_HIGH_MODEL,
@@ -17,7 +18,7 @@ import {
  * (openrouter fails -> grok succeeds) without hitting any provider.
  */
 
-const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL', 'SURPLUS_API_KEY', 'SURPLUS_BASE_URL', 'SURPLUS_MODEL'];
+const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL', 'SURPLUS_API_KEY', 'SURPLUS_BASE_URL', 'SURPLUS_MODEL', 'OLLAMA_ENABLED', 'OLLAMA_URL', 'OLLAMA_MODEL'];
 const saved: Record<string, string | undefined> = {};
 const realFetch = globalThis.fetch;
 
@@ -250,5 +251,87 @@ describe('surplus intelligence fallback rung', () => {
 
     await callCapFallback('sys', 'hello');
     expect(called).toBe('https://example.test/v9/chat/completions');
+  });
+});
+
+describe('the local rung: Ollama, last and keyless', () => {
+  it('counts as a fallback provider on its own, with no key anywhere', () => {
+    expect(hasCapFallbackProvider()).toBe(false);
+    setEnv({ OLLAMA_ENABLED: '1' });
+    expect(hasCapFallbackProvider()).toBe(true);
+    expect(capFallbackProviders()).toEqual(['ollama']);
+  });
+
+  it('is OFF unless OLLAMA_ENABLED is exactly 1, so no cap pays a localhost timeout', () => {
+    setEnv({ OLLAMA_ENABLED: 'true' });
+    expect(capFallbackProviders()).toEqual([]);
+    setEnv({ OLLAMA_ENABLED: '0' });
+    expect(capFallbackProviders()).toEqual([]);
+  });
+
+  it('sits LAST: it serves only when every paid rung has failed', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or', OLLAMA_ENABLED: '1' });
+    expect(capFallbackProviders()).toEqual(['openrouter', 'ollama']);
+    const tried: string[] = [];
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      const u = String(url);
+      if (u.includes('openrouter.ai')) {
+        tried.push('openrouter');
+        return { ok: false, status: 402, text: async () => 'out of credits' } as unknown as Response;
+      }
+      tried.push('ollama');
+      return okResponse('served locally');
+    }) as unknown as typeof fetch;
+    const { result, provider } = await callCapFallback('sys', 'user');
+    expect(tried).toEqual(['openrouter', 'ollama']);
+    expect(provider).toBe('ollama');
+    expect(result.text).toBe('served locally');
+    expect(result.totalCostUsd).toBe(0);
+    expect(result.model).toBe('ollama/qwen3:4b-instruct');
+  });
+
+  it('a 200 with an empty completion is a FAILURE, not an empty answer', async () => {
+    setEnv({ OLLAMA_ENABLED: '1' });
+    globalThis.fetch = vi.fn(async () => okResponse('   ')) as unknown as typeof fetch;
+    await expect(callCapFallback('sys', 'user')).rejects.toThrow(/empty completion/);
+  });
+
+  it('a model that is not pulled is a 404 whose message names the model', async () => {
+    // Measured, not assumed. On 2026-09-11 the real servers were asked directly:
+    // the Mac (llama3.2 present) answered 200 with content, and the VPS, which
+    // has ollama running and NO model pulled, answered
+    //   HTTP 404 {"error":{"message":"model 'qwen3:4b-instruct' not found",...}}
+    // The comment in callOllama used to claim that case was a 200 with nothing.
+    // It is not, and the rung has to fail loudly with the model name in it, or
+    // a box one `ollama pull` short of working looks the same as a box that is
+    // configured wrong.
+    setEnv({ OLLAMA_ENABLED: '1' });
+    globalThis.fetch = vi.fn(async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '{"error":{"message":"model \'qwen3:4b-instruct\' not found","type":"not_found_error"}}',
+    })) as unknown as typeof fetch;
+    await expect(callCapFallback('sys', 'user')).rejects.toThrow(/qwen3:4b-instruct.*not found/);
+  });
+
+  it('honours OLLAMA_URL and OLLAMA_MODEL so a remote box or a different model needs no deploy', async () => {
+    setEnv({ OLLAMA_ENABLED: '1', OLLAMA_URL: 'http://100.72.152.63:11434', OLLAMA_MODEL: 'llama3.2' });
+    let seen = '';
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      seen = String(url);
+      return okResponse('remote answer');
+    }) as unknown as typeof fetch;
+    const { result } = await callCapFallback('sys', 'user');
+    expect(seen).toBe('http://100.72.152.63:11434/v1/chat/completions');
+    expect(result.model).toBe('ollama/llama3.2');
+  });
+
+  it('reports ladder DEPTH, because one rung is a second single point of failure', () => {
+    setEnv({ OPENROUTER_API_KEY: 'or' });
+    expect(capFallbackProviders()).toEqual(['openrouter']); // what the estate had on 2026-09-11
+    setEnv({ OLLAMA_ENABLED: '1' });
+    expect(capFallbackProviders()).toEqual(['openrouter', 'ollama']);
+    setEnv({ XAI_API_KEY: 'x' });
+    expect(capFallbackProviders()).toEqual(['openrouter', 'grok', 'ollama']);
   });
 });

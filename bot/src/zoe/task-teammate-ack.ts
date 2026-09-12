@@ -25,7 +25,7 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { callClaudeCli } from '../hermes/claude-cli';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import { ZOE_DEFAULT_MODEL } from './types';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
@@ -234,7 +234,7 @@ Team member's question: "${question}"
 
 Draft a brief answer (as Zaal would respond). Keep it short and grounded in the context + linked content above.`;
 
-    const result = await callClaudeCli({
+    const result = await callClaudeCliCapAware({
       model: ZOE_DEFAULT_MODEL,
       prompt,
       cwd: workspace_dir,

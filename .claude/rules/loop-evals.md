@@ -156,6 +156,27 @@ thing in a diff to verify, not the thing that lets you skip verifying.
    author said exactly that to a peer, went to build the peer's missing fixture,
    and discovered the case WAS reachable - which is the only reason it was found.
 
+### Its twin lives in another repo, and they must be edited together
+
+`~/zao-vault/AGENTS.md` **rule 10** is the same lesson stated from the other
+side: *"a selector that is right about what it names can still be wrong about
+what you wanted"*, and *"before trusting a count, state what it would read IF
+THE THING YOU FEAR HAD HAPPENED. If that value is the same as the pass value,
+the count is not a check."*
+
+That last sentence is this section's subject in different words - a check that
+cannot come out differently, and a review that only exercises the direction you
+were already worried about, are the same failure wearing two hats. The two files
+were written the same afternoon by lanes talking to each other and **neither
+pointed at the other until it was noticed**, which is the drift this very rule
+describes, occurring inside the rules. Vault added their half in `c6b0a38`; this
+is the reciprocal, because a one-way pointer is half a link.
+
+Deliberately a CROSS-REFERENCE rather than a merge: the audiences differ.
+`.claude/rules/*.md` auto-loads into every session in this repo; `AGENTS.md` is
+read by lanes doing ZAO work across the estate. **Editing either means checking
+the other.**
+
 ### Guard
 
 This does not mean re-review everything. It is two extra questions - which
@@ -194,4 +215,6 @@ beats absent" formulation is theirs. Siblings for that section:
 `noisy-signal-guard.md` (a check that cannot reach zero - this is a check that
 cannot fail, and a justification that discourages writing one),
 `confirm-before-claiming-absence.md` (a negative result is not an absence),
-`silent-failure-guard.md` rule 5 (a security scan that passes on error).
+`silent-failure-guard.md` rule 5 (a security scan that passes on error), and its
+cross-repo twin `~/zao-vault/AGENTS.md` rule 10 (pointer added there in
+c6b0a38 - edit either and check the other).

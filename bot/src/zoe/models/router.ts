@@ -99,6 +99,20 @@ function hasOpenRouterApiKey(): boolean {
 }
 
 /**
+ * The local rung. Ollama needs no key and no network, which is the point: every
+ * other rung on this ladder is a paid API reachable over the internet, so one
+ * bad night for a card, a bill or a route takes all of them at once. Zaal,
+ * 2026-09-11: "i odnt wanna have openrouter be the only backup".
+ *
+ * Opt-in via OLLAMA_ENABLED=1 rather than probing, because an unreachable
+ * localhost port on every cap-fallback would add a timeout to the slowest path
+ * in the system. Set it on a box where `ollama list` shows a model.
+ */
+function hasOllama(): boolean {
+  return process.env.OLLAMA_ENABLED?.trim() === '1';
+}
+
+/**
  * Generic OpenAI-compatible chat completion request.
  */
 interface OpenAiRequest {
@@ -422,6 +436,71 @@ async function callSurplus(
 }
 
 /**
+ * Call a local Ollama model - no key, no network, no bill.
+ *
+ * It is LAST on the ladder on purpose: a 4B-class local model is weaker than
+ * every paid rung above it, so it should serve a turn only when nothing else
+ * can. Weaker and served beats correct and never sent - but only in that order.
+ */
+async function callOllama(systemPrompt: string, userMessage: string): Promise<ClaudeCliResult> {
+  if (!hasOllama()) {
+    throw new Error('OLLAMA_ENABLED is not 1');
+  }
+  const baseUrl = process.env.OLLAMA_URL?.trim() || 'http://127.0.0.1:11434';
+  const model = process.env.OLLAMA_MODEL?.trim() || 'qwen3:4b-instruct';
+  const startMs = Date.now();
+  try {
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+        temperature: 1,
+        max_tokens: FALLBACK_MAX_TOKENS,
+        stream: false,
+      } satisfies OpenAiRequest & { stream: boolean }),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ollama error ${response.status}: ${errorText.slice(0, 300)}`);
+    }
+    const data = (await response.json()) as OpenAiResponse;
+    const text = data.choices[0]?.message?.content ?? '';
+    // Same clause as Surplus: a 200 carrying an empty completion is a FAILED
+    // call, not an empty answer.
+    //
+    // The first version of this comment justified the clause with "a server
+    // with no model pulled answers 200 with nothing". Measured against the real
+    // servers on 2026-09-11, that is false: ollama answers a missing model with
+    // HTTP 404 and {"error":{"message":"model 'X' not found",...}}, which the
+    // !response.ok branch above already catches. The clause stays because an
+    // empty 200 is still not an answer - it just is not the missing-model case,
+    // and a reason nobody checked is how a guard ends up pointed at the wrong
+    // failure.
+    if (!text.trim()) {
+      throw new Error('Ollama returned empty completion');
+    }
+    return {
+      text,
+      inputTokens: data.usage?.prompt_tokens ?? 0,
+      outputTokens: data.usage?.completion_tokens ?? 0,
+      totalCostUsd: 0,
+      model: `ollama/${model}`,
+      durationMs: Date.now() - startMs,
+      numTurns: 1,
+      isError: false,
+      sessionId: `ollama-${startMs}`,
+    };
+  } catch (error: unknown) {
+    throw new Error(`Ollama call failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
  * CAP FALLBACK: the Claude CLI is rate-limited or over its weekly cap, so run
  * this concierge turn on the best available non-Claude provider instead of
  * failing. Order: OpenRouter, then Surplus Intelligence, then Grok, then GPT.
@@ -431,11 +510,30 @@ async function callSurplus(
  * rung was Grok, which is neither cheap nor always configured. A cheap provider
  * needs a cheap provider behind it, or an outage at the top is an outage for
  * everything.
+ * Ollama is LAST and local: no key, no network, no bill. Every paid rung above
+ * it fails together on one bad card or one bad route, so the ladder ends
+ * somewhere that does not depend on either.
  * Throws only if NO non-Claude provider is configured (then the caller surfaces
  * the original Claude error).
  */
 export function hasCapFallbackProvider(): boolean {
-  return hasOpenRouterApiKey() || hasSurplusApiKey() || hasGrokApiKey() || hasGptApiKey();
+  return capFallbackProviders().length > 0;
+}
+
+/**
+ * The rungs configured RIGHT NOW, in the order they would be tried. Exported so
+ * a health check can report the DEPTH of the ladder rather than a boolean: one
+ * rung is not a fallback, it is a second single point of failure, and a boolean
+ * cannot tell those apart (zj + Zaal, 2026-09-11).
+ */
+export function capFallbackProviders(): string[] {
+  const names: string[] = [];
+  if (hasOpenRouterApiKey()) names.push('openrouter');
+  if (hasSurplusApiKey()) names.push('surplus');
+  if (hasGrokApiKey()) names.push('grok');
+  if (hasGptApiKey()) names.push('gpt');
+  if (hasOllama()) names.push('ollama');
+  return names;
 }
 
 export async function callCapFallback(
@@ -453,9 +551,10 @@ export async function callCapFallback(
   if (hasSurplusApiKey()) attempts.push({ name: 'surplus', fn: () => callSurplus(systemPrompt, userMessage) });
   if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
   if (hasGptApiKey()) attempts.push({ name: 'gpt', fn: () => callGpt(systemPrompt, userMessage) });
+  if (hasOllama()) attempts.push({ name: 'ollama', fn: () => callOllama(systemPrompt, userMessage) });
 
   if (attempts.length === 0) {
-    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, or OPENAI_API_KEY)');
+    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
   }
 
   const errors: string[] = [];
@@ -467,7 +566,12 @@ export async function callCapFallback(
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.warn(`[zoe/models/router] cap-fallback ${attempt.name} failed:`, msg);
-      errors.push(`${attempt.name}: ${msg.slice(0, 80)}`);
+      // 80 characters cut the local rung's most likely failure in half: a
+      // missing model reads "Ollama error 404: {"error":{"message":"model
+      // 'qwen3:4b-instr" and stops, so the one word that says what to do -
+      // the model name, and "not found" - never arrives. This error is what
+      // reaches Zaal; the console.warn above is what nobody reads.
+      errors.push(`${attempt.name}: ${msg.slice(0, 200)}`);
     }
   }
   throw new Error(`all cap-fallback providers failed [${errors.join(' | ')}]`);

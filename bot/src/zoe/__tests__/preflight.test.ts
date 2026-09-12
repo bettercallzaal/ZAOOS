@@ -5,6 +5,8 @@ import {
   hasCriticalFailure,
   runPreflight,
   CAPABILITIES,
+  fallbackLadder,
+  formatFallbackDepth,
   type Capability,
 } from '../preflight';
 
@@ -111,5 +113,64 @@ describe('runPreflight', () => {
   it('works with no alert channel wired', async () => {
     const { SUPABASE_URL, ...broken } = FULL_ENV;
     await expect(runPreflight(undefined, broken)).resolves.toBeDefined();
+  });
+});
+
+describe('cap-fallback ladder depth', () => {
+  it('lists the rungs in the order the router tries them', () => {
+    expect(fallbackLadder({ OPENROUTER_API_KEY: 'a', XAI_API_KEY: 'b', OLLAMA_ENABLED: '1' }))
+      .toEqual(['openrouter', 'grok', 'ollama']);
+  });
+
+  it('two rungs or more is quiet', () => {
+    expect(formatFallbackDepth({ OPENROUTER_API_KEY: 'a', OLLAMA_ENABLED: '1' })).toBeNull();
+  });
+
+  it('ONE rung warns and names it - the live VPS on 2026-09-11', () => {
+    const line = formatFallbackDepth({ OPENROUTER_API_KEY: 'a' });
+    expect(line).toContain('one rung (openrouter)');
+    expect(line).toContain('second single point of failure');
+    expect(line).toContain('OLLAMA_ENABLED=1');
+  });
+
+  it('no rungs says a cap is a hard stop', () => {
+    expect(formatFallbackDepth({})).toContain('no rungs');
+  });
+
+  it('an empty or whitespace key is not a rung', () => {
+    expect(fallbackLadder({ OPENROUTER_API_KEY: '   ', OLLAMA_ENABLED: '1' })).toEqual(['ollama']);
+  });
+
+  it('OLLAMA_ENABLED counts only when it is exactly 1', () => {
+    expect(fallbackLadder({ OLLAMA_ENABLED: 'true' })).toEqual([]);
+  });
+
+  it('the depth warning reaches the preflight report even when every capability is configured', () => {
+    const env = { ...FULL_ENV };
+    const report = formatPreflightReport(checkCapabilities(env), env);
+    expect(report).toContain('one rung (openrouter)');
+  });
+
+  it('a shallow ladder is logged, never alerted: it would fire on every restart', async () => {
+    const alert = vi.fn(async () => {});
+    await runPreflight(alert, { ...FULL_ENV });
+    expect(alert).not.toHaveBeenCalled();
+  });
+
+  it('but missing config still alerts, and carries the ladder line with it', async () => {
+    const sent: string[] = [];
+    const alert = vi.fn(async (m: string) => {
+      sent.push(m);
+    });
+    const env = { ...FULL_ENV } as Record<string, string | undefined>;
+    delete env.ZAAL_BOTZ_GROUP_ID;
+    await runPreflight(alert, env);
+    expect(alert).toHaveBeenCalledTimes(1);
+    expect(sent[0]).toContain('one rung (openrouter)');
+  });
+
+  it('and the report is still null when the ladder is deep and nothing is missing', () => {
+    const env = { ...FULL_ENV, OLLAMA_ENABLED: '1' };
+    expect(formatPreflightReport(checkCapabilities(env), env)).toBeNull();
   });
 });

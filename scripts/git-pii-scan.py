@@ -129,12 +129,28 @@ def email_allowed(addr: str) -> bool:
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 
 
-def _added_against(base: str | None) -> list[tuple[str, str]]:
-    """[(file, added_line)] from the staged diff against `base` (HEAD if None)."""
+class DiffUnreadable(RuntimeError):
+    """The staged diff could not be read, so nothing was scanned."""
+
+
+def _added_against(base: str | None) -> list[tuple[str, str]] | None:
+    """[(file, added_line)] from the staged diff against `base` (HEAD if None).
+
+    RETURNS None WHEN THE DIFF COULD NOT BE READ, which is NOT the same as an
+    empty list. This distinction is the whole point of the function's signature.
+    Conflating the two is what let a merge that takes the other side wholesale
+    trip this gate on the other parent's content (below), and the same shortcut
+    in check-research-index.sh reported every inherited doc. git reports the
+    difference in its exit status; the previous version ran with check=False and
+    discarded it, then wrote a comment saying the two were indistinguishable.
+    They never were.
+    """
     cmd = ["git", "diff", "--cached", "--unified=0", "--no-color"]
     if base:
         cmd.append(base)
     out = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        return None
     rows: list[tuple[str, str]] = []
     current = "?"
     for line in out.stdout.splitlines():
@@ -176,14 +192,30 @@ def staged_added_lines() -> list[tuple[str, str]]:
     over-report, never under-report, on a security gate.
     """
     rows = _added_against(None)
+    if rows is None:
+        # THE GATE CANNOT RUN, SO THE GATE MUST NOT PASS. The previous version
+        # returned [] here, main() read "no rows" as "nothing to scan", and the
+        # whole PII check exited 0 having read nothing - green while broken, in a
+        # security gate (silent-failure-guard.md rule 5).
+        raise DiffUnreadable("git diff --cached failed")
     if not rows or not _merging():
         return rows
     theirs = _added_against("MERGE_HEAD")
-    if not theirs:
-        # Either the other parent genuinely added nothing, or the diff failed.
-        # Both are indistinguishable here, so do not filter. Over-reporting on a
-        # PII gate is recoverable; under-reporting is not.
+    if theirs is None:
+        # The READ failed. Cannot narrow, so narrow nothing: rows are returned
+        # unfiltered, which is today's behaviour and can only over-report.
         return rows
+    # A genuinely EMPTY result is meaningful and must filter to nothing. A line
+    # typed during the resolution is in NEITHER parent, so it is always on the
+    # MERGE_HEAD side; an empty side means the resolver typed nothing new.
+    #
+    # THIS IS REACHABLE AND WAS MEASURED, 2026-09-12. Resolve a conflict by
+    # taking the other side wholesale - one of the commonest resolutions there
+    # is - and the index equals MERGE_HEAD for that file, so nothing is added
+    # against it while plenty is added against HEAD. Measured on a throwaway
+    # repo: 8 added lines vs HEAD, 0 vs MERGE_HEAD, and #3502's version blocked
+    # the commit over the other parent's address. So this is not a tidy-up of a
+    # theoretical branch; it is the fix for a case #3502 missed.
     theirs_set = set(theirs)
     return [r for r in rows if r in theirs_set]
 
@@ -209,7 +241,16 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
 
 
 def main() -> int:
-    rows = staged_added_lines()
+    try:
+        rows = staged_added_lines()
+    except DiffUnreadable as err:
+        print(
+            f"COMMIT BLOCKED - {err}, so nothing was scanned.\n\n"
+            "This gate fails CLOSED: an unreadable diff is not a clean one.\n"
+            "Fix the repository state and commit again.",
+            file=sys.stderr,
+        )
+        return 1
     if not rows:
         return 0
     found = scan(rows)

@@ -52,7 +52,7 @@ export function renderDashboardHtml(report: Report): string {
 <body><div class="wrap">
   <h1>ZAO Estate Health <span class="muted">/ ${esc(report.repo.split('/').pop() ?? '')}</span></h1>
   <div class="score">${report.healthScore}<span style="font-size:24px;color:#7e8aa0">/100</span></div>
-  <div class="meta">${report.summary.fail} fails &middot; ${report.summary.warn} warns &middot; ${report.summary.fixable} auto-fixable &middot; generated ${esc(report.generatedAt)}</div>
+  <div class="meta">${report.summary.fail} fails${report.summary.crashed ? ` (${report.summary.crashed} CRASHED)` : ''} &middot; ${report.summary.warn} warns &middot; ${report.summary.fixable} auto-fixable &middot; generated ${esc(report.generatedAt)}</div>
   ${checkCards}
   <p class="muted" style="margin-top:24px;font-size:12px">ZAO Estate Control Plane &middot; propose-don't-act &middot; tools/estate-control-plane</p>
 </div></body></html>`;
@@ -62,7 +62,7 @@ export function renderDashboardHtml(report: Report): string {
 export function renderDigest(report: Report): string {
   const lines = [
     `ZAO Estate Health: ${report.healthScore}/100`,
-    `${report.summary.fail} fails, ${report.summary.warn} warns, ${report.summary.fixable} auto-fixable`,
+    `${report.summary.fail} fails${report.summary.crashed ? ` (${report.summary.crashed} crashed, i.e. never ran)` : ''}, ${report.summary.warn} warns, ${report.summary.fixable} auto-fixable`,
     '',
   ];
   for (const c of report.checks) {

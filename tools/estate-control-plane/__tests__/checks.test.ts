@@ -6,6 +6,7 @@ import type { EstateConfig } from '../types';
 import { driftCheck, measureLiveCounts } from '../checks/drift';
 import { zombieCheck } from '../checks/zombie';
 import { countUntestedDomains, qualityCheck } from '../checks/quality';
+import { runOne, scoreAndSummarize } from '../run-checks';
 
 let root: string;
 
@@ -129,5 +130,42 @@ describe('quality check', () => {
   it('warns when untested domains exceed the baseline', async () => {
     const res = await qualityCheck(cfg()); // baseline untestedDomains=0, actual=1
     expect(res.findings.some((f) => f.title.includes('untested API domains'))).toBe(true);
+  });
+});
+
+describe('a check that crashes is never scored as clean', () => {
+  // This is the fix that decides whether a broken check can pass CI, and its
+  // only proof was a `throw` added to driftCheck by hand, run once, and deleted
+  // before committing (zaoos-review, #3458 review). A demonstration that leaves
+  // nothing behind cannot stop the next refactor of runOne from restoring
+  // {status:'skipped', findings:[]} and turning CI green on a check that never
+  // ran. Both assertions below fail on that old behaviour.
+
+  it('runOne turns a thrown check into status crashed with a crashed finding', async () => {
+    const res = await runOne('drift', async () => {
+      throw new Error('boom');
+    });
+    expect(res.status).toBe('crashed');            // was 'skipped'
+    expect(res.findings).toHaveLength(1);          // was 0, which is why it scored clean
+    expect(res.findings[0].severity).toBe('crashed');
+    expect(res.findings[0].detail).toContain('boom');
+  });
+
+  it('a crashed check counts toward summary.fail, so the ratchet can see it', async () => {
+    const crashed = await runOne('drift', async () => {
+      throw new Error('boom');
+    });
+    const { summary, healthScore } = scoreAndSummarize([crashed]);
+    expect(summary.fail).toBe(1);      // the ratchet reads this; zero findings made it 0
+    expect(summary.crashed).toBe(1);
+    expect(healthScore).toBeLessThan(100);
+  });
+
+  it('a check that runs clean still scores clean - the control that keeps the pair honest', async () => {
+    const ok = await runOne('drift', async () => ({ id: 'drift', status: 'ok', findings: [] }));
+    const { summary, healthScore } = scoreAndSummarize([ok]);
+    expect(summary.fail).toBe(0);
+    expect(summary.crashed).toBe(0);
+    expect(healthScore).toBe(100);
   });
 });

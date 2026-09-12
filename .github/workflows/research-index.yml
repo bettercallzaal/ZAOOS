@@ -28,7 +28,7 @@ jobs:
       - name: Backfill missing folder-index rows
         run: bash scripts/backfill-research-index.sh
 
-      - name: Commit backfilled rows (main only, never fatal)
+      - name: Commit backfilled rows (main only, FATAL if the push fails)
         if: github.event_name == 'push'
         run: |
           if ! git diff --quiet -- research; then
@@ -52,7 +52,26 @@ jobs:
             # genuinely complete index rendered identically green in Actions.
             # A push failure here means the index just fell behind disk with
             # nobody told; that is a fail, not a warning.
-            git push || { echo "::error::index backfill commit could not be pushed (branch protection or auth failure) - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
+            # A HARD FAIL MUST NOT FIRE ON THE NORMAL CASE. Losing a
+            # fast-forward race with a concurrent merge is routine here and is
+            # not a fault: measured on origin/main over 30 days, 266 commits
+            # touched the paths that trigger this workflow and 26 consecutive
+            # pairs landed within 120 seconds of each other, 54 within 300. The
+            # job checks out, backfills, commits and pushes inside that window,
+            # so about a tenth of triggering merges would red main for losing a
+            # race. A check that fires on the ordinary case is ignored by the
+            # time it fires on the real one, and this one fires on main
+            # (`noisy-signal-guard.md`; zaoos-review, #3458 review).
+            #
+            # So: rebase onto whatever landed and try once more. Branch
+            # protection and an expired token still fail, because a rebase does
+            # not make either of them push. Only the race is absorbed.
+            if ! git push; then
+              echo "::notice::push rejected, rebasing onto origin/main and retrying once"
+              git fetch origin main
+              git rebase origin/main || { echo "::error::index backfill could not rebase onto origin/main - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
+              git push || { echo "::error::index backfill commit could not be pushed after a rebase (branch protection or auth failure, not a race) - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
+            fi
           else
             echo "index already complete"
           fi

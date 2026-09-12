@@ -27,7 +27,7 @@ async function loadConfig(): Promise<EstateConfig> {
   return cfg;
 }
 
-function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 'summary'> {
+export function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 'summary'> {
   let penalty = 0;
   let fail = 0;
   let warn = 0;
@@ -47,6 +47,11 @@ function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 
   return { healthScore: Math.max(0, 100 - penalty), summary: { fail, warn, fixable, crashed } };
 }
 
+// Exported for __tests__/checks.test.ts. This is the fix that decides whether
+// a broken check can pass CI, so it needs a test that fails on the old
+// behaviour rather than a throw added by hand and deleted before committing
+// (zaoos-review, #3458 review).
+//
 // FIXED (ZAO research doc 2478, inverted alarm #5): a check that threw used to
 // come back as {status:'skipped', findings:[]} — zero findings means zero
 // contribution to summary.fail, so a check that could not run scored exactly
@@ -55,7 +60,7 @@ function scoreAndSummarize(checks: CheckResult[]): Pick<Report, 'healthScore' | 
 // problems; it is an absence of measurement, and it must never be scored as
 // a pass. It now comes back as status 'crashed' carrying its own 'crashed'
 // severity finding, which scoreAndSummarize counts toward `fail`.
-async function runOne(name: string, fn: () => Promise<CheckResult>): Promise<CheckResult> {
+export async function runOne(name: string, fn: () => Promise<CheckResult>): Promise<CheckResult> {
   try {
     return await fn();
   } catch (e) {

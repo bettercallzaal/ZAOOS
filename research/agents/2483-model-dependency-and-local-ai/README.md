@@ -19,14 +19,39 @@ tier: STANDARD
 > not that a second path has to be built. It is that the one we have was never
 > turned on or measured.
 
+## CORRECTION, 2026-09-11, same evening
+
+**This doc's first version said the fallback "does not exist in production". That
+was wrong, and the error was mine: I measured the wrong half.** Kept here rather
+than rewritten, because a doc that quietly becomes right teaches nobody.
+
+Two different features share the word fallback:
+
+| | What it is | State in production |
+|---|---|---|
+| `MODEL_ROUTING_ENABLED` | per-task routing: send code tasks to Grok, X-context to Grok, strategy to Claude | **OFF**, and `XAI_API_KEY` / `OPENAI_API_KEY` are unset, so it has nothing to route to |
+| `callCapFallback` + `callClaudeCliCapAware` | when Claude hits its weekly cap, run the same prompt on a non-Claude provider | **LIVE.** `OPENROUTER_API_KEY` is set, the ladder is openrouter -> surplus -> grok -> gpt, and it is tested (`cli-cap-aware.test.ts` 5 cases, `router-failover.test.ts` including a ladder-failure case) |
+
+So the estate is less exposed than this doc first said. What was true is the
+coverage gap: **14 files called `callClaudeCli` directly and none imported the
+cap-aware wrapper**, including `learn` and `reflexion`, which the wrapper's own
+docstring names as its callers. A cap killed those turns outright while the
+fallback sat one import away. Six of them are fixed in ZAOOS #3488, with a repo
+invariant test so the next one fails CI rather than a live turn.
+
+Also corrected: the first version checked `GROK_API_KEY`. The router reads
+`XAI_API_KEY`. Both are unset on the VPS, so the conclusion held, but the check
+was looking at a name the code never reads - the kind of near-miss that makes a
+measurement worthless when it happens to matter.
+
 ## Key Decisions
 
 | # | Decision | Call | Why (evidence) |
 |---|---|---|---|
 | 1 | The 10 repos in the post | **SKIP as a plan, KEEP 2 as reference** | They are learning courses, not stack choices. Only `rasbt/LLMs-from-scratch` (Apache 2.0, read from LICENSE.txt) and `microsoft/ai-agents-for-beginners` (MIT) touch what we build. Nothing there reduces a Claude dependency. |
-| 2 | Turn on the router we already have | **YES, behind a measurement** | `bot/src/zoe/models/router.ts` dispatches to Claude, Grok or GPT when `MODEL_ROUTING_ENABLED=1`. Measured on the live VPS: `MODEL_ROUTING_ENABLED` unset, `GROK_API_KEY` unset, `OPENAI_API_KEY` unset. So the fallback the code advertises does not exist in production. |
+| 2 | Turn on per-task routing (`MODEL_ROUTING_ENABLED`) | **NOT YET - it is the smaller half** | Measured on the live VPS: the flag is unset and `XAI_API_KEY` / `OPENAI_API_KEY` are unset, so enabling it would route everything back to Claude anyway. The cap fallback, which is the part that protects against an outage, is already live on OpenRouter. Routing is an optimisation; failover is the safety net, and the safety net exists. |
 | 3 | Local models (Ollama) as the answer to reliance | **NO for anything that reviews or decides; YES for a narrow list** | Ollama is installed on the Mac (one model, `llama3.2:latest`, 2 GB, last touched 7 months ago) and on the VPS (`ollama list` returns NO models, service inactive). It is installed in two places and used in zero. A 3B-class local model cannot do what the critics do. It can do classification, redaction checks and offline triage. |
-| 4 | What actually reduces the risk first | **Make the failure visible, then make it survivable** | The single point of failure is not "Claude" in the abstract, it is the weekly cap on one subscription with 29 call sites behind it and no key-backed fallback. A cap today degrades the fleet silently. |
+| 4 | What actually reduces the risk first | **Close the coverage gap, not the vendor question** | The single point of failure is the weekly cap on one subscription with 29 call sites behind it. The fallback exists; it was wired into 5 surfaces and missing from 14. Fixed for the six text-only callers in ZAOOS #3488, with an invariant test. The agentic callers cannot fall back to a text model and must defer instead. |
 | 5 | Rewriting the stack to be model-agnostic | **NO** | The abstraction already exists (`ClaudeCliResult`-compatible wrappers in the router, plus `bot/src/hermes/codex-cli.ts` as a second CLI). Adding a framework to solve a configuration problem is the mistake doc 2481 refused this week. |
 
 ## What the link actually is
@@ -75,7 +100,7 @@ API field is a classifier and it was wrong on both.
   and the review discipline that produced 15 merged PRs tonight is one vendor
   deep.
 
-### The second path exists and is switched off
+### The second path exists, and only its optimisation half is switched off
 
 `bot/src/zoe/models/router.ts` is a real multi-model router: Claude for deep
 agentic work, Grok for fast code generation, GPT for structured reasoning, each
@@ -96,8 +121,13 @@ So the router is off, and even if it were on, two of its three providers have no
 key. The one configured non-Claude provider is OpenRouter, which serves the
 caster's draft step (`bot/src/zoe/caster/reason.ts`), not the fleet.
 
-**The fallback direction is also backwards for this problem.** The router falls
-back TO Claude. Nothing falls back FROM it.
+**Read `selectBestModel` and `callCapFallback` as two different things.**
+`selectBestModel` falls back TO Claude when a provider key is missing, which is
+what a router should do. `callCapFallback` is the one that goes the other way,
+and it is live: `hasCapFallbackProvider()` is true on the VPS because
+`OPENROUTER_API_KEY` is set, and five production surfaces already use it
+(hermes/critic, concierge, critics/types, repo-improver and repo-improver-io).
+The gap was never the direction; it was how few callers used it.
 
 ### Local AI: installed twice, used zero times
 
@@ -137,8 +167,9 @@ failing over, so it is a fallback that has only ever agreed with us.
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Measure the dependency's cost before changing it: read `bot/src/zoe/cost-ledger.ts` output for the last 30 days and record calls per day, per surface, and how many hit the weekly cap. Shipped when the numbers are in this doc | @zj | Measurement | 2026-09-19 |
-| Prove the router fails over rather than assuming it: with `MODEL_ROUTING_ENABLED=1` and one non-Claude key, force a Claude failure and assert the reply comes from the other provider, with a test that goes red without the fallback. Shipped when that test exists in `bot/src/zoe/models/__tests__/` | @zj | PR (ZAOOS) | 2026-09-26 |
-| Decide the second provider and put ONE key behind it, so the fallback is real: Grok, GPT or OpenRouter-for-everything. Shipped when the key is in the VPS env and the router is enabled | @Zaal | Decision + credential | 2026-09-19 |
+| DONE 2026-09-11: close the cap-aware coverage gap - six text-only callers wired, agentic ones exempted by name, and a repo invariant test that fails when the next one is added. Shipped as ZAOOS #3488 | @zj | PR (ZAOOS) | 2026-09-11 |
+| Watch the fallback serve a real turn, not a test: after the next cap, read the `[zoe/cli-cap-aware] cap-fallback served by <provider>` line out of the live logs and record which provider carried it. Shipped when that line is quoted in this doc | @zj | Measurement | 2026-10-11 |
+| Decide whether per-task routing is wanted at all, now that failover is covered: it needs a Grok or OpenAI key to do anything, and its value is speed and cost, not resilience. Shipped when the flag is set with a key behind it, or the idea is closed | @Zaal | Decision + credential | 2026-09-26 |
 | Pull one current local model on the VPS (`ollama pull qwen3:4b-instruct`, ~2.5 GB) and wire it to exactly one job: the pre-send credential and PII scan. Shipped when a send is blocked by the local model in a test | @zj | PR (ZAOOS) | 2026-10-03 |
 | Refresh or remove the 7-month-old `llama3.2` on the Mac; an unused model that old is a claim about capability nobody has checked | @zj | Chore | 2026-09-26 |
 | No adoption work from the polydao list | @zj | wontfix | wontfix |

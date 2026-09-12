@@ -21,7 +21,15 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// These cases run REAL git in throwaway repos - a merge fixture needs ten
+// process spawns before the gate is even called. vitest's 5s default is tight
+// for that on any loaded machine, so it is raised here on its own merits. It is
+// NOT covering for a slow suite: CI's Test job passes this file green, and the
+// local timeouts that prompted a look were a saturated laptop (load average
+// 143) rather than anything about the code.
+vi.setConfig({ testTimeout: 30_000, hookTimeout: 30_000 });
 
 const GATE = resolve(__dirname, '..', 'check-research-doc-collisions.sh');
 
@@ -394,5 +402,127 @@ describe('a merge commit claims only what neither parent already had', () => {
     expect(res.stderr).toContain('not reserved: 2999');
     // and it must NOT complain about the number the other parent brought
     expect(res.stderr).not.toContain('2480');
+  });
+});
+
+/**
+ * A THIRD question: what does the MERGED RESULT contain twice?
+ *
+ * "What did this commit author" cannot see a concurrent claim, by construction.
+ * Two branches each claim 2480 with different slugs; each one's own pre-commit
+ * run correctly saw 2480 free at the time; the MERGE is what puts both on disk.
+ * So it is absent from neither parent - present in both - and the intersection
+ * added in #3498 is empty. Measured: the gate passed and two directories
+ * numbered 2480 landed. That is the case a reservation gate exists for, and the
+ * one a merge uniquely produces. Found by the vault lane reviewing #3498.
+ *
+ * Scoped to numbers THIS MERGE touched. 221 numbers on main already hold more
+ * than one directory - the pre-band duplicates COLLISION_TOLERANCE.md tolerates
+ * - so a whole-tree scan would fire on every commit and be ignored
+ * (noisy-signal-guard.md). The second test is what proves the scoping, and it
+ * inherits its duplicate from the base commit rather than staging one, which is
+ * the distinction that makes it a real control.
+ */
+describe('a merge can create a duplicate neither side authored', () => {
+  /** base -> both sides claim `num` with different slugs -> conflicted merge. */
+  function concurrentClaim(num: string): { dir: string; git: (...a: string[]) => string } {
+    const dir = mkdtempSync(join(tmpdir(), 'doc-dupe-'));
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    mkdirSync(join(dir, 'research', 'business', '2400-seed'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'base\n');
+    git('add', '-A');
+    git('commit', '-qm', 'base');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+
+    const claim = (slug: string, body: string) => {
+      mkdirSync(join(dir, 'research', 'business', `${num}-${slug}`), { recursive: true });
+      writeFileSync(join(dir, 'research', 'business', `${num}-${slug}`, 'README.md'), 'x\n');
+      writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), `${body}\n`);
+      git('add', '-A');
+      git('commit', '-qm', `${body} claims ${num}`);
+    };
+    claim('main-thing', 'main');
+    git('checkout', '-q', 'side');
+    claim('branch-thing', 'side');
+    git('tag', '-a', `doc-${num}`, '-m', 'reserved');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected */
+    }
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'resolved\n');
+    git('add', 'research/business/2400-seed/README.md');
+    return { dir, git };
+  }
+
+  it('blocks a number both sides claimed independently', () => {
+    const { dir } = concurrentClaim('2480');
+    // The claim set is empty - neither side authored it relative to the other.
+    expect(claims(dir, '--staged').stdout.trim()).toBe('');
+
+    const res = runGate(dir);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('this merge puts one doc number on two docs');
+    expect(res.stderr).toContain('DUPLICATE 2480');
+    expect(res.stderr).toContain('2480-branch-thing');
+    expect(res.stderr).toContain('2480-main-thing');
+  });
+
+  // THE SCOPING CONTROL. Without it the check would fire on all 221 pre-band
+  // duplicates and be ignored. The duplicate here is INHERITED from the base
+  // commit, not staged, which is what makes this a control rather than a
+  // restatement.
+  it('stays silent on a duplicate inherited from the base commit', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'doc-dupe-old-'));
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: dir, encoding: 'utf8', stdio: 'pipe' });
+    git('init', '-q');
+    git('config', 'user.email', 't@t');
+    git('config', 'user.name', 'T');
+    for (const p of [
+      ['agents', '900-alpha'],
+      ['music', '900-beta'],
+      ['business', '2400-seed'],
+    ]) {
+      mkdirSync(join(dir, 'research', p[0], p[1]), { recursive: true });
+      writeFileSync(join(dir, 'research', p[0], p[1], 'README.md'), 'x\n');
+    }
+    git('add', '-A');
+    git('commit', '-qm', 'base already holds a 900 duplicate');
+    git('branch', '-M', 'main');
+    git('branch', 'side');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'main\n');
+    git('add', '-A');
+    git('commit', '-qm', 'main edits');
+    git('checkout', '-q', 'side');
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'side\n');
+    git('add', '-A');
+    git('commit', '-qm', 'side edits');
+    try {
+      git('merge', 'main', '--no-edit', '-q');
+    } catch {
+      /* expected */
+    }
+    writeFileSync(join(dir, 'research', 'business', '2400-seed', 'README.md'), 'resolved\n');
+    git('add', 'research/business/2400-seed/README.md');
+
+    // the duplicate really is still there, inherited by both parents
+    expect(
+      git('ls-files')
+        .split('\n')
+        .filter((l) => l.includes('900-')).length,
+    ).toBe(2);
+    expect(claims(dir, '--merge-duplicates').stdout.trim()).toBe('');
+    expect(runGate(dir).status).toBe(0);
+  });
+
+  it('says nothing when not merging at all', () => {
+    const { dir } = repo();
+    expect(claims(dir, '--merge-duplicates').stdout.trim()).toBe('');
   });
 });

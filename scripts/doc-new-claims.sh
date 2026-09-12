@@ -71,7 +71,60 @@ case "${1:-}" in
             if [[ -z "$base" ]]; then echo "doc-new-claims: --range needs a base ref" >&2; exit 2; fi
             NAME_ONLY=(git diff --name-only --diff-filter=A "$base...HEAD")
             NAME_STATUS=(git diff --name-status --diff-filter=R "$base...HEAD") ;;
-  *)        echo "usage: doc-new-claims.sh --staged | --range <base>" >&2; exit 2 ;;
+  --merge-duplicates)
+            # A THIRD QUESTION: what does the MERGED RESULT contain twice?
+            #
+            # "What did this commit author" is answered by --staged, and it
+            # cannot see this case. Two branches can each claim the same number
+            # independently, with different slugs, and each one's own pre-commit
+            # run correctly saw that number free at the time. Neither side is
+            # wrong; the MERGE creates the duplicate. So it is absent from
+            # neither parent - it is present in BOTH - and the intersection is
+            # empty by construction:
+            #
+            #   added vs HEAD        research/business/2480-main-thing/…
+            #   added vs MERGE_HEAD  research/business/2480-branch-thing/…
+            #   intersection         (empty)
+            #   merged index         BOTH directories, numbered 2480
+            #
+            # That is the case a reservation gate exists for - #1073 duplicating
+            # 964 is the same shape - and it is the one a merge uniquely
+            # produces. Found by the vault lane reviewing #3498.
+            #
+            # RESTRICTED TO NUMBERS THIS MERGE TOUCHED, deliberately. A
+            # whole-tree duplicate scan fires constantly: 221 numbers on main
+            # already have more than one directory, the pre-band duplicates that
+            # research/COLLISION_TOLERANCE.md exists to tolerate. A check that
+            # fires on every commit is a check nobody reads
+            # (noisy-signal-guard.md), so this looks only at numbers either side
+            # added in THIS merge.
+            #
+            # Silent when not merging, and silent on a single claim.
+            if [[ -z "$MERGING" ]]; then exit 0; fi
+            nums() { grep -E "$DOC_RE" | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' | sort -u; }
+            if ! ours=$(git diff --cached --name-only --diff-filter=A HEAD 2>&1) \
+               || ! theirs=$(git diff --cached --name-only --diff-filter=A MERGE_HEAD 2>&1); then
+              echo "doc-new-claims: cannot read the merge diffs - failing closed" >&2
+              exit 1
+            fi
+            touched=$(printf '%s\n%s\n' "$ours" "$theirs" | nums)
+            [[ -z "$touched" ]] && exit 0
+            if ! tracked=$(git ls-files 2>&1); then
+              echo "doc-new-claims: cannot list the merged index - failing closed" >&2
+              exit 1
+            fi
+            identities=$(printf '%s\n' "$tracked" \
+              | grep -E "$DOC_RE" \
+              | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
+              | sort -u)
+            for n in $touched; do
+              held=$(printf '%s\n' "$identities" | grep -E "^research/[^/]+/${n}-" | sort -u)
+              if [[ $(printf '%s\n' "$held" | grep -c .) -gt 1 ]]; then
+                printf 'DUPLICATE %s -> %s\n' "$n" "$(printf '%s\n' "$held" | tr '\n' ' ')"
+              fi
+            done
+            exit 0 ;;
+  *)        echo "usage: doc-new-claims.sh --staged | --range <base> | --merge-duplicates" >&2; exit 2 ;;
 esac
 
 # Capture BEFORE filtering. Reading a status through `git ... | grep` reports

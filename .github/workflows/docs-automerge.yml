@@ -38,6 +38,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # PIN TO THE PR HEAD. With no `ref:`, checkout takes refs/pull/N/merge
+          # on a pull_request event, and GitHub regenerates that ref against
+          # whatever main is when the runner picks the job up. `base.sha` is main
+          # at EVENT time, so `base.sha...HEAD` would span the merge commit and
+          # attribute every doc that landed on main in between to this PR.
+          # Measured by vault with one unrelated doc merging while the job was
+          # queued: the merge ref claimed research/community/2999-someone-else/
+          # alongside this PR's own directory; pinned to the head it claims only
+          # its own.
+          #
+          # It fails closed, so it could never let a bad merge through - it could
+          # only HOLD a good PR, naming a doc the author never touched. That
+          # still matters here for two reasons: ZAOOS has 30+ pre-band duplicate
+          # numbers, so a contaminated directory whose number is duplicated on
+          # main reports a collision; and a gate that merges with nobody present
+          # has to give the SAME ANSWER TWICE, while the merge ref gives a
+          # different answer depending on when the runner started.
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Classify PR files
         id: classify

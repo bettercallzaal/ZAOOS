@@ -23,6 +23,12 @@ export interface LaneRow {
   repo: string;
   ctx: number | null;
   question: string;
+  /**
+   * Over the compact line. OPTIONAL because an older Mac still pushes the six-
+   * field payload, and an absent flag must read as false rather than break the
+   * render - a phone showing nothing is worse than a phone missing one badge.
+   */
+  critical?: boolean;
 }
 
 export interface LaneSnapshot {
@@ -38,10 +44,33 @@ export function snapshotPath(): string {
 }
 
 const WANTS: Record<string, string> = {
+  // KEEP THE OLD SPELLING. A pre-#212 Mac still classifies a critical lane as
+  // state 'ctx-critical' and the push payload passes it straight through, so
+  // dropping this row loses exactly the lane it was added to surface. THE
+  // RENDERER RUNS ON THE VPS AND THE PAYLOAD COMES FROM A MAC - the two are
+  // separately deployed, so version skew is the normal state, not an edge case.
+  // Proved on this machine the same morning: ~/bin sat two hours behind a
+  // merged main and every tool read the old board (vault, #3496 review).
   'ctx-critical': 'context full',
   'choice-prompt': 'picker',
   'asked-question': 'asked',
 };
+
+/**
+ * A lane wants Zaal if it is asking, OR if it is over the compact line whatever
+ * else it is doing.
+ *
+ * 'ctx-critical' used to be a STATE and this map keyed off it. zaal-dotfiles
+ * #212 correctly split criticality into its own field - a lane waiting at 86%
+ * now reports state 'waiting' with critical true - and this renderer is the
+ * THIRD boundary that string crossed, after the classifier and the push
+ * payload. Until all three moved, the phone silently stopped surfacing exactly
+ * the lanes that most need him.
+ */
+function wants(r: LaneRow): string | null {
+  if (r.state in WANTS) return WANTS[r.state];
+  return r.critical ? 'context full' : null;
+}
 
 function name(r: LaneRow): string {
   const ctx = typeof r.ctx === 'number' ? ` ${r.ctx}%` : '';
@@ -71,15 +100,16 @@ export function renderLanes(snap: LaneSnapshot | null, nowS: number): string {
   }
   lines.push(`Lanes at ${when} ET (${ago(age)} ago, ${snap.host})`);
 
-  const want = snap.rows.filter((r) => r.state in WANTS);
-  const working = snap.rows.filter((r) => r.state === 'working');
-  const waiting = snap.rows.filter((r) => r.state === 'waiting');
-  const other = snap.rows.filter((r) => !(r.state in WANTS) && r.state !== 'working' && r.state !== 'waiting');
+  const want = snap.rows.filter((r) => wants(r) !== null);
+  const rest = snap.rows.filter((r) => wants(r) === null);
+  const working = rest.filter((r) => r.state === 'working');
+  const waiting = rest.filter((r) => r.state === 'waiting');
+  const other = rest.filter((r) => r.state !== 'working' && r.state !== 'waiting');
 
   if (want.length) {
     lines.push('', `WANT YOU (${want.length}):`);
     for (const r of want) {
-      lines.push(`- ${name(r)} [${WANTS[r.state]}]${r.question ? `: ${r.question}` : ''}`);
+      lines.push(`- ${name(r)} [${wants(r)}]${r.question ? `: ${r.question}` : ''}`);
     }
   } else {
     lines.push('', 'Nothing is waiting on you.');

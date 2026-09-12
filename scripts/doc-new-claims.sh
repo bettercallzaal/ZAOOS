@@ -39,13 +39,35 @@
 
 set -uo pipefail
 
-DOC_RE='^research/[^_/][^/]*/[0-9]+-'
-# A date-named file is not a doc. research/_radar/2026-09-12.md and
-# research/inspiration/2026-04-01.md both parse as doc number 2026 under a
-# pattern that only looks for digits-dash. 34 such paths on main.
+# WHAT COUNTS AS A NUMBERED DOC. Two exclusions doing two different jobs.
+#
+# `[^_/]` skips the META dirs - research/_radar, _archive, _handoffs - whose
+# files are dated or non-numbered and are not collision-eligible.
+#
+# DATE_RE then skips a date-named file in an ORDINARY topic dir.
+# research/inspiration/2026-09-12.md (9 such on main) parsed as a claim on doc
+# number 2026, and the BLOCKING pre-commit gate refused the commit with "doc
+# number(s) not reserved: 2026". Measured 2026-09-12; introduced by this
+# script's first version.
+#
+# THE FIX IS NOT "A DOC IS A DIRECTORY", WHICH IS TRUE OF THE CONVENTION AND
+# FALSE OF MAIN. Ten real numbered docs are bare FILES under ordinary topics -
+# research/music/757-web3-audio-video-streaming-landscape.md and nine others -
+# and a directory requirement skips all ten. That trades a false positive for a
+# FALSE NEGATIVE, and this rule feeds the auto-merge path: a false positive
+# blocks a commit and is visible, a false negative merges a duplicate number
+# with nobody present. 757 is ALREADY duplicated inside those ten
+# (agents/757-poidh-sentinel and music/757-web3-audio), so under a directory
+# rule a third claim on 757 would pass silently. Caught by the vault lane
+# reviewing #3497; the diagnostic that would have caught it earlier is a COUNT -
+# the rule matched 2231 paths where the library holds about 2120 docs.
+DOC_RE='^research/[^_/][^/]*/[0-9]+-[^/]+'
 DATE_RE='^research/[^/]+/[0-9]{4}-[0-9]{2}-[0-9]{2}'
 # The EXISTING set keeps underscore topics; the CLAIMS set does not. Two
 # different questions that look like one - see the --existing block below.
+# An archived doc STILL HOLDS ITS NUMBER: 75 numbers on main are held only by
+# research/_archive/, and excluding underscore topics here would report every
+# one of them as free. They agree only that a date-named file is not a doc.
 EXISTING_RE='^research/[a-z_-]+/[0-9]+-'
 
 case "${1:-}" in
@@ -95,8 +117,8 @@ if ! renamed=$("${NAME_STATUS[@]}" 2>&1); then
 fi
 
 # `R<score>\told\tnew`. Keep the new path only when the number actually moved.
-renamed_claims=$(printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" '
-  $3 ~ re {
+renamed_claims=$(printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" -v dre="$DATE_RE" '
+  $3 ~ re && $3 !~ dre {
     newnum = $3; sub(/^research\/[^\/]+\//, "", newnum); sub(/-.*$/, "", newnum)
     oldnum = ""
     if ($2 ~ re) { oldnum = $2; sub(/^research\/[^\/]+\//, "", oldnum); sub(/-.*$/, "", oldnum) }
@@ -106,6 +128,7 @@ renamed_claims=$(printf '%s\n' "$renamed" | awk -F'\t' -v re="$DOC_RE" '
 # Normalise both to the doc DIRECTORY, so a doc adding five files claims once.
 printf '%s\n%s\n' "$added" "$renamed_claims" \
   | grep -E "$DOC_RE" \
-  | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1/|' \
+  | grep -vE "$DATE_RE" \
+  | sed -E 's|^(research/[^/]+/[0-9]+-[^/]+)(/.*)?$|\1|' \
   | sort -u
 exit 0

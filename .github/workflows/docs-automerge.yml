@@ -1,7 +1,9 @@
 name: Auto-merge safe PRs
 
 # Safe categories self-merge once CI is green:
-#   docs    — research/** and docs/** only (with doc-number collision guard)
+#   docs    — research/** and docs/** only (with doc-number collision guard, and
+#             held for review when an added line concludes about a licence or
+#             reuse permission - see "Hold licence and permission conclusions")
 #   tests   — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
 #   scripts — NEWLY-ADDED standalone tools under scripts/**/*.py|*.sh (may ride
 #             alongside docs). Safe because: (a) additive only — a *modified*
@@ -125,6 +127,49 @@ jobs:
           fi
           echo "category=${category}" >> "$GITHUB_OUTPUT"
 
+      - name: Hold licence and permission conclusions
+        if: steps.classify.outputs.category == 'docs'
+        id: licence
+        run: |
+          # Zaal, 2026-09-13: research docs keep auto-merging "as long as we have
+          # simple safeguards for security". Review-after-merge is fine for a doc
+          # that is wrong in a way that costs nothing until someone reads it. It
+          # is NOT fine for a licence or reuse-permission conclusion: a doc that
+          # wrongly says ZAO may copy code sits on main saying so until the
+          # post-merge review lands (zaoos-review's note on #3510-#3512, where
+          # 64 of 81 SongjamSpace repos had no LICENSE and the only permission
+          # was verbal). So any ADDED line that touches licensing holds the PR.
+          #
+          # Deliberately broad: a false hold costs one review, a miss costs a
+          # period of wrong permission on main. Added lines only, so editing
+          # an unrelated part of a doc that already discusses licences does
+          # not hold it.
+          #
+          # FAILS CLOSED, like the collision gate: if the diff cannot be read,
+          # hold rather than treat "no output" as "no licence talk".
+          if ! added=$(git diff --unified=0 "${{ github.event.pull_request.base.sha }}...HEAD" -- research docs); then
+            echo "::error title=licence-hold::could not read the PR diff - holding this PR rather than auto-merging it"
+            echo "hold=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          pattern='\blicen[cs](e|es|ed|ing)\b|\bunlicen[cs]ed\b|\bcopyright\b|\bclean[- ]?room\b|\bSPDX\b|\b(A|L)?GPL(v?[23])?\b|\bMIT\b|\bApache[- ]2(\.0)?\b|\bBSD\b|\bMPL\b|\bpermission to (re)?use\b|\breuse (the |their )?(code|source)\b|\bverbal (ok|okay|permission)\b'
+          hits=$(printf '%s\n' "$added" | grep -E '^\+' | grep -vE '^\+\+\+ ' | grep -iE "$pattern" | head -5 || true)
+          if [ -n "$hits" ]; then
+            echo "hold=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "Auto-merge held: this PR adds lines about licensing or reuse permission, which get a review before merge (Zaal, 2026-09-13). First matches:"
+              echo '```'
+              printf '%s\n' "$hits" | cut -c1-200
+              echo '```'
+            } > licence-hold.md
+            gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+              -F body=@licence-hold.md >/dev/null
+          else
+            echo "hold=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Block doc-number collisions
         if: steps.classify.outputs.category == 'docs'
         id: collide
@@ -228,7 +273,7 @@ jobs:
       # schedule + workflow_dispatch so main's real state stays observable.
       - name: Enable auto-merge (squash)
         if: |
-          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||
+          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
           steps.classify.outputs.category == 'tests' ||
           steps.classify.outputs.category == 'scripts'
         env:

@@ -1,7 +1,9 @@
 name: Auto-merge safe PRs
 
 # Safe categories self-merge once CI is green:
-#   docs    — research/** and docs/** only (with doc-number collision guard)
+#   docs    — research/** and docs/** only (with doc-number collision guard, and
+#             held for review when an added line concludes about a licence or
+#             reuse permission - see "Hold licence and permission conclusions")
 #   tests   — *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, __tests__/**
 #   scripts — NEWLY-ADDED standalone tools under scripts/**/*.py|*.sh (may ride
 #             alongside docs). Safe because: (a) additive only — a *modified*
@@ -56,6 +58,16 @@ jobs:
           # has to give the SAME ANSWER TWICE, while the merge ref gives a
           # different answer depending on when the runner started.
           ref: ${{ github.event.pull_request.head.sha }}
+
+      # A licence hold is cleared by an independent reviewer lane, not by Zaal
+      # (licence-clear.yml). The clearance is tied to the label AND the head SHA,
+      # and the label is removed on EVERY push first, so a clearance given for one
+      # head can never carry over to a later push.
+      - name: Reset licence hold label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X DELETE "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/hold:licence" >/dev/null 2>&1 || true
 
       - name: Classify PR files
         id: classify
@@ -124,6 +136,60 @@ jobs:
             category="unsafe"
           fi
           echo "category=${category}" >> "$GITHUB_OUTPUT"
+
+      - name: Hold licence and permission conclusions
+        if: steps.classify.outputs.category == 'docs'
+        id: licence
+        run: |
+          # Zaal, 2026-09-13: research docs keep auto-merging "as long as we have
+          # simple safeguards for security". He then asked that the hold NOT land
+          # on him: measured over the last 21 docs-only PRs it fires on 8 (38%),
+          # all real licence conclusions, because credit-attribution.md makes docs
+          # name the licence of what we build on. So a hold is a queue for an
+          # INDEPENDENT REVIEWER LANE, which clears it in licence-clear.yml; Zaal
+          # is only needed when that reviewer refuses. Review-after-merge is fine for a doc
+          # that is wrong in a way that costs nothing until someone reads it. It
+          # is NOT fine for a licence or reuse-permission conclusion: a doc that
+          # wrongly says ZAO may copy code sits on main saying so until the
+          # post-merge review lands (zaoos-review's note on #3510-#3512, where
+          # 64 of 81 SongjamSpace repos had no LICENSE and the only permission
+          # was verbal). So any ADDED line that touches licensing holds the PR.
+          #
+          # Deliberately broad: a hold costs one agent review, a miss costs a
+          # period of wrong permission on main. It is a word net, not a proof: "Adam
+          # said we can use their repo" has no licence word and gets through.
+          # ALL added lines in the PR, not only research/ and docs/: a docs-category
+          # PR can carry a test or additive script whose added lines hold the
+          # conclusion (zaoos-review, #3513). Added lines only, so editing
+          # an unrelated part of a doc that already discusses licences does
+          # not hold it.
+          #
+          # FAILS CLOSED, like the collision gate: if the diff cannot be read,
+          # hold rather than treat "no output" as "no licence talk".
+          if ! added=$(git diff --unified=0 "${{ github.event.pull_request.base.sha }}...HEAD"); then
+            echo "::error title=licence-hold::could not read the PR diff - holding this PR rather than auto-merging it"
+            echo "hold=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          pattern='\blicen[cs](e|es|ed|ing)\b|\bunlicen[cs]ed\b|\bcopyright\b|\bclean[- ]?room\b|\bSPDX\b|\b(A|L)?GPL(v?[23])?\b|\bMIT\b|\bApache[- ]2(\.0)?\b|\bBSD\b|\bMPL\b|\bpermission to (re)?use\b|\breuse (the |their )?(code|source)\b|\bverbal (ok|okay|permission)\b'
+          hits=$(printf '%s\n' "$added" | grep -E '^\+' | grep -vE '^\+\+\+ ' | grep -iE "$pattern" | head -5 || true)
+          if [ -n "$hits" ]; then
+            echo "hold=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "Auto-merge held: this PR adds lines about licensing or reuse permission, which get a review before merge (Zaal, 2026-09-13). First matches:"
+              echo '```'
+              printf '%s\n' "$hits" | cut -c1-200
+              echo '```'
+              echo
+              echo "To clear: a reviewer lane that did NOT write or propose this doc checks every licence and permission claim against its source (the LICENSE file, the repo, the written permission) and posts its findings. The lane that holds merges then reads them and comments exactly \`licence-verified: <full 40-char head SHA>\`, never on a PR it wrote or proposed. licence-clear.yml merges that SHA and nothing later. If a claim does not check out, or the merge-holding lane proposed this doc, Zaal clears it."
+            } > licence-hold.md
+            gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+              -F body=@licence-hold.md >/dev/null
+          else
+            echo "hold=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Block doc-number collisions
         if: steps.classify.outputs.category == 'docs'
@@ -208,6 +274,40 @@ jobs:
           done <<< "$newdirs"
           echo "collision=$collision" >> "$GITHUB_OUTPUT"
 
+      # Only a PR whose ONLY obstacle is the licence hold is handed to the
+      # reviewer queue. A doc-number collision still needs a renumber, not a
+      # licence review, so it does not get the label.
+      - name: Queue licence hold for reviewer clearance
+        if: |
+          steps.classify.outputs.category == 'docs' &&
+          steps.licence.outputs.hold == 'true' &&
+          steps.collide.outputs.collision == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The label is for people. The MARKER is what licence-clear.yml trusts:
+          # it is posted by github-actions[bot], which no lane can post as (every
+          # lane comments as Zaal), and it names the exact head this run judged -
+          # docs-only, no collision, licence hold only. A race where a push lands
+          # before this run removes the old label cannot be cleared, because the
+          # new head has no marker until its own run writes one.
+          #
+          # The marker is the ENTIRE comment body and spelled LICENCE_HOLD_HEAD=,
+          # which the licence pattern cannot match (`_` is a word character, so
+          # \blicen[cs]e\b does not fire). Both matter: the hold comment above
+          # echoes attacker-chosen doc lines as github-actions[bot], and a doc
+          # line reading like a marker was blocked only by the leading `+` of
+          # the diff (zaoos-review found it, #3513). Now it is blocked twice,
+          # neither time by formatting.
+          #
+          # THE UNDERSCORES ARE LOAD-BEARING. `\b` treats `_` as part of a word and
+          # `-` as a break, so LICENCE-HOLD-HEAD= or licence-hold-head: would match
+          # the pattern again. Do not "tidy" the spelling.
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels" \
+            -f 'labels[]=hold:licence' >/dev/null
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -f body="LICENCE_HOLD_HEAD=${{ github.event.pull_request.head.sha }}" >/dev/null
+
       # KNOWN GAP - this merge produces a main commit that CI never runs on.
       #
       # GitHub does not start a workflow run for a push made with the automatic
@@ -228,7 +328,7 @@ jobs:
       # schedule + workflow_dispatch so main's real state stays observable.
       - name: Enable auto-merge (squash)
         if: |
-          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true') ||
+          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
           steps.classify.outputs.category == 'tests' ||
           steps.classify.outputs.category == 'scripts'
         env:

@@ -1,0 +1,118 @@
+name: Clear licence hold
+
+# WHY THIS EXISTS
+#
+# docs-automerge.yml holds any research doc that adds licence or reuse-permission
+# lines. Measured over the last 21 docs-only PRs that is 8 holds (38%), all real
+# licence conclusions, because credit-attribution.md requires docs to name the
+# licence of what we build on. Zaal, 2026-09-13, asked that this NOT come back to
+# him: "Let's improve the barrier that the agents can ship thru".
+#
+# So the hold goes to the lanes, in two steps kept apart: a REVIEWER lane that did
+# not write or propose the doc checks every licence and permission claim against
+# its source and posts its findings; the lane that HOLDS MERGES (zj) reads those
+# findings and comments `licence-verified: <full head SHA>`. Reviewer lanes never
+# post the clearance line, because it enables a merge. This workflow merges
+# exactly that SHA. Zaal is needed only when the findings do not check out.
+#
+# WHAT IT TRUSTS, AND WHAT IT DOES NOT
+#
+# In one line: MACHINE-CHECKED SCOPE, HONOUR-CHECKED REVIEW. Code proves the
+# clearance names a judged, current, docs-only head. Nothing proves anyone read
+# the doc - any lane can type the clearance line, and the authoring lane is the
+# one most motivated to. That the clearer never clears its own PR, and clears
+# only on written findings, is a lane rule, not code. When the merge-holding
+# lane proposed the doc (it dispatched the writer), no lane is independent
+# enough to clear it, and Zaal clears it.
+#
+# - It does NOT trust the comment author. Every lane comments as Zaal's account,
+#   so author identity proves nothing about which lane wrote it.
+# - It DOES trust a marker comment whose ENTIRE body is `LICENCE_HOLD_HEAD=<sha>`,
+#   posted by github-actions[bot], which no lane can post as. docs-automerge.yml writes it
+#   only for a head it judged docs-only with no doc-number collision. The
+#   clearance SHA must equal that marker AND the PR's current head, so a
+#   clearance can never merge a later push or a head that was never judged.
+# - It re-lists the files and refuses anything outside research/ and docs/, in
+#   case a runtime file arrived between the judgement and the comment.
+# - The merge is pinned with --match-head-commit, so a push racing the merge
+#   is refused by GitHub, not by this script.
+#
+# issue_comment runs the DEFAULT-BRANCH copy of this file, so a PR cannot weaken
+# its own clearing rules by editing it. Do not move this to pull_request_target
+# or pull_request "for consistency" - that property is the point.
+#
+# Comment text reaches the script only through an env var, never through ${{ }}
+# interpolation, because an issue_comment body is attacker-controlled input.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  clear:
+    if: github.event.issue.pull_request && contains(github.event.comment.body, 'licence-verified:')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify clearance and merge the verified head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.issue.number }}
+          BODY: ${{ github.event.comment.body }}
+          COMMENT_URL: ${{ github.event.comment.html_url }}
+        run: |
+          set -euo pipefail
+          say() { gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$1" >/dev/null; }
+
+          sha=$(printf '%s\n' "$BODY" | grep -oE '^licence-verified: [0-9a-f]{40}\s*$' | head -1 | awk '{print $2}' || true)
+          if [ -z "$sha" ]; then
+            say "licence-clear: ignored $COMMENT_URL - it must be a line reading exactly \`licence-verified: <full 40-char head SHA>\`."
+            exit 0
+          fi
+
+          pr=$(gh api "repos/$REPO/pulls/$PR")
+          head=$(printf '%s' "$pr" | jq -r .head.sha)
+          state=$(printf '%s' "$pr" | jq -r .state)
+          same_repo=$(printf '%s' "$pr" | jq -r '.head.repo.full_name == .base.repo.full_name')
+          expected=$(printf '%s' "$pr" | jq -r .changed_files)
+
+          if [ "$state" != "open" ] || [ "$same_repo" != "true" ]; then
+            say "licence-clear: not merging - PR is $state or from a fork."; exit 0
+          fi
+          if [ "$sha" != "$head" ]; then
+            say "licence-clear: not merging - the clearance names $sha but the head is now $head. Verify the new head and clear that."; exit 0
+          fi
+
+          # The bot marker for THIS head. Author login is checked, not the text alone.
+          # One JSON array of COMPLETE bodies (one array per page, then merged), so
+          # the comparison below is whole-body: a line inside the bot's hold
+          # comment, which quotes doc text, can never equal the marker.
+          if ! markers_json=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100" \
+                --jq '[.[] | select(.user.login == "github-actions[bot]") | .body]' | jq -s 'add // []'); then
+            say "licence-clear: not merging - could not read the PR comments to find the hold marker."; exit 0
+          fi
+          if ! printf '%s' "$markers_json" | jq -e --arg want "LICENCE_HOLD_HEAD=$head" 'any(.[]; . == $want)' >/dev/null; then
+            say "licence-clear: not merging - docs-automerge has not judged head $head as a licence-only hold (no LICENCE_HOLD_HEAD marker for it). Only a docs-only PR with no doc-number collision can be cleared here."; exit 0
+          fi
+
+          # Re-list the files: fail closed on anything but research/ and docs/.
+          if ! files=$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[].filename'); then
+            say "licence-clear: not merging - could not list the PR files."; exit 0
+          fi
+          seen=$(printf '%s\n' "$files" | grep -c . || true)
+          if [ "$seen" != "$expected" ]; then
+            say "licence-clear: not merging - saw $seen of $expected changed files."; exit 0
+          fi
+          other=$(printf '%s\n' "$files" | grep -vE '^(research|docs)/' || true)
+          if [ -n "$other" ]; then
+            say "licence-clear: not merging - files outside research/ and docs/: $(printf '%s' "$other" | head -5 | tr '\n' ' ')"; exit 0
+          fi
+
+          gh pr merge "$PR" --repo "$REPO" --squash --auto --match-head-commit "$head"
+          gh api -X DELETE "repos/$REPO/issues/$PR/labels/hold:licence" >/dev/null 2>&1 || true
+          say "licence-clear: licence hold cleared by $COMMENT_URL for $head. Auto-merge enabled for that commit only; it still waits on required checks."

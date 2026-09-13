@@ -59,6 +59,16 @@ jobs:
           # different answer depending on when the runner started.
           ref: ${{ github.event.pull_request.head.sha }}
 
+      # A licence hold is cleared by an independent reviewer lane, not by Zaal
+      # (licence-clear.yml). The clearance is tied to the label AND the head SHA,
+      # and the label is removed on EVERY push first, so a clearance given for one
+      # head can never carry over to a later push.
+      - name: Reset licence hold label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X DELETE "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/hold:licence" >/dev/null 2>&1 || true
+
       - name: Classify PR files
         id: classify
         env:
@@ -132,7 +142,12 @@ jobs:
         id: licence
         run: |
           # Zaal, 2026-09-13: research docs keep auto-merging "as long as we have
-          # simple safeguards for security". Review-after-merge is fine for a doc
+          # simple safeguards for security". He then asked that the hold NOT land
+          # on him: measured over the last 21 docs-only PRs it fires on 8 (38%),
+          # all real licence conclusions, because credit-attribution.md makes docs
+          # name the licence of what we build on. So a hold is a queue for an
+          # INDEPENDENT REVIEWER LANE, which clears it in licence-clear.yml; Zaal
+          # is only needed when that reviewer refuses. Review-after-merge is fine for a doc
           # that is wrong in a way that costs nothing until someone reads it. It
           # is NOT fine for a licence or reuse-permission conclusion: a doc that
           # wrongly says ZAO may copy code sits on main saying so until the
@@ -140,8 +155,10 @@ jobs:
           # 64 of 81 SongjamSpace repos had no LICENSE and the only permission
           # was verbal). So any ADDED line that touches licensing holds the PR.
           #
-          # Deliberately broad: a false hold costs one review, a miss costs a
-          # period of wrong permission on main. Added lines only, so editing
+          # Deliberately broad: a hold costs one agent review, a miss costs a
+          # period of wrong permission on main. It is a word net, not a proof: "Adam
+          # said we can use their repo" has no licence word and gets through.
+          # Added lines only, so editing
           # an unrelated part of a doc that already discusses licences does
           # not hold it.
           #
@@ -161,6 +178,8 @@ jobs:
               echo '```'
               printf '%s\n' "$hits" | cut -c1-200
               echo '```'
+              echo
+              echo "To clear: a reviewer lane that did NOT write or propose this doc checks every licence and permission claim against its source (the LICENSE file, the repo, the written permission), then comments exactly \`licence-verified: <full 40-char head SHA>\`. licence-clear.yml then merges that SHA and nothing later. If a claim does not check out, comment the finding instead and it waits for Zaal."
             } > licence-hold.md
             gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
               -F body=@licence-hold.md >/dev/null
@@ -252,6 +271,28 @@ jobs:
             fi
           done <<< "$newdirs"
           echo "collision=$collision" >> "$GITHUB_OUTPUT"
+
+      # Only a PR whose ONLY obstacle is the licence hold is handed to the
+      # reviewer queue. A doc-number collision still needs a renumber, not a
+      # licence review, so it does not get the label.
+      - name: Queue licence hold for reviewer clearance
+        if: |
+          steps.classify.outputs.category == 'docs' &&
+          steps.licence.outputs.hold == 'true' &&
+          steps.collide.outputs.collision == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The label is for people. The MARKER is what licence-clear.yml trusts:
+          # it is posted by github-actions[bot], which no lane can post as (every
+          # lane comments as Zaal), and it names the exact head this run judged -
+          # docs-only, no collision, licence hold only. A race where a push lands
+          # before this run removes the old label cannot be cleared, because the
+          # new head has no marker until its own run writes one.
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels" \
+            -f 'labels[]=hold:licence' >/dev/null
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -f body="licence-hold-head: ${{ github.event.pull_request.head.sha }} (docs-only, no doc-number collision; waiting for an independent reviewer's licence-verified comment)" >/dev/null
 
       # KNOWN GAP - this merge produces a main commit that CI never runs on.
       #

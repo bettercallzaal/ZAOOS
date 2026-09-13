@@ -21,7 +21,9 @@ name: Clear licence hold
 # clearance names a judged, current, docs-only head. Nothing proves anyone read
 # the doc - any lane can type the clearance line, and the authoring lane is the
 # one most motivated to. That the clearer never clears its own PR, and clears
-# only on written findings, is a lane rule, not code.
+# only on written findings, is a lane rule, not code. When the merge-holding
+# lane proposed the doc (it dispatched the writer), no lane is independent
+# enough to clear it, and Zaal clears it.
 #
 # - It does NOT trust the comment author. Every lane comments as Zaal's account,
 #   so author identity proves nothing about which lane wrote it.

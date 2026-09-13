@@ -8,18 +8,25 @@ name: Clear licence hold
 # licence of what we build on. Zaal, 2026-09-13, asked that this NOT come back to
 # him: "Let's improve the barrier that the agents can ship thru".
 #
-# So the hold is cleared by an INDEPENDENT REVIEWER LANE: one that did not write
-# or propose the doc checks every licence and permission claim against its source
-# and comments `licence-verified: <full head SHA>`. This workflow merges exactly
-# that SHA. Zaal is needed only when the reviewer refuses.
+# So the hold goes to the lanes, in two steps kept apart: a REVIEWER lane that did
+# not write or propose the doc checks every licence and permission claim against
+# its source and posts its findings; the lane that HOLDS MERGES (zj) reads those
+# findings and comments `licence-verified: <full head SHA>`. Reviewer lanes never
+# post the clearance line, because it enables a merge. This workflow merges
+# exactly that SHA. Zaal is needed only when the findings do not check out.
 #
 # WHAT IT TRUSTS, AND WHAT IT DOES NOT
 #
+# In one line: MACHINE-CHECKED SCOPE, HONOUR-CHECKED REVIEW. Code proves the
+# clearance names a judged, current, docs-only head. Nothing proves anyone read
+# the doc - any lane can type the clearance line, and the authoring lane is the
+# one most motivated to. That the clearer never clears its own PR, and clears
+# only on written findings, is a lane rule, not code.
+#
 # - It does NOT trust the comment author. Every lane comments as Zaal's account,
-#   so author identity proves nothing about which lane wrote it. Author != reviewer
-#   stays a lane rule, the same honor-system rule the rest of review runs on.
-# - It DOES trust a `licence-hold-head: <sha>` marker posted by
-#   github-actions[bot], which no lane can post as. docs-automerge.yml writes it
+#   so author identity proves nothing about which lane wrote it.
+# - It DOES trust a marker comment whose ENTIRE body is `LICENCE_HOLD_HEAD=<sha>`,
+#   posted by github-actions[bot], which no lane can post as. docs-automerge.yml writes it
 #   only for a head it judged docs-only with no doc-number collision. The
 #   clearance SHA must equal that marker AND the PR's current head, so a
 #   clearance can never merge a later push or a head that was never judged.
@@ -27,6 +34,10 @@ name: Clear licence hold
 #   case a runtime file arrived between the judgement and the comment.
 # - The merge is pinned with --match-head-commit, so a push racing the merge
 #   is refused by GitHub, not by this script.
+#
+# issue_comment runs the DEFAULT-BRANCH copy of this file, so a PR cannot weaken
+# its own clearing rules by editing it. Do not move this to pull_request_target
+# or pull_request "for consistency" - that property is the point.
 #
 # Comment text reaches the script only through an env var, never through ${{ }}
 # interpolation, because an issue_comment body is attacker-controlled input.
@@ -76,12 +87,15 @@ jobs:
           fi
 
           # The bot marker for THIS head. Author login is checked, not the text alone.
-          if ! markers=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100" \
-                --jq '.[] | select(.user.login == "github-actions[bot]") | .body'); then
+          # One JSON array of COMPLETE bodies (one array per page, then merged), so
+          # the comparison below is whole-body: a line inside the bot's hold
+          # comment, which quotes doc text, can never equal the marker.
+          if ! markers_json=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100" \
+                --jq '[.[] | select(.user.login == "github-actions[bot]") | .body]' | jq -s 'add // []'); then
             say "licence-clear: not merging - could not read the PR comments to find the hold marker."; exit 0
           fi
-          if ! printf '%s\n' "$markers" | grep -qE "^licence-hold-head: $head( |$)"; then
-            say "licence-clear: not merging - docs-automerge has not judged head $head as a licence-only hold (no licence-hold-head marker for it). Only a docs-only PR with no doc-number collision can be cleared here."; exit 0
+          if ! printf '%s' "$markers_json" | jq -e --arg want "LICENCE_HOLD_HEAD=$head" 'any(.[]; . == $want)' >/dev/null; then
+            say "licence-clear: not merging - docs-automerge has not judged head $head as a licence-only hold (no LICENCE_HOLD_HEAD marker for it). Only a docs-only PR with no doc-number collision can be cleared here."; exit 0
           fi
 
           # Re-list the files: fail closed on anything but research/ and docs/.

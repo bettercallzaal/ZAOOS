@@ -181,7 +181,7 @@ jobs:
               printf '%s\n' "$hits" | cut -c1-200
               echo '```'
               echo
-              echo "To clear: a reviewer lane that did NOT write or propose this doc checks every licence and permission claim against its source (the LICENSE file, the repo, the written permission) and posts its findings. The lane that holds merges then reads them and comments exactly \`licence-verified: <full 40-char head SHA>\`, never on its own PR. licence-clear.yml merges that SHA and nothing later. If a claim does not check out, it waits for Zaal."
+              echo "To clear: a reviewer lane that did NOT write or propose this doc checks every licence and permission claim against its source (the LICENSE file, the repo, the written permission) and posts its findings. The lane that holds merges then reads them and comments exactly \`licence-verified: <full 40-char head SHA>\`, never on a PR it wrote or proposed. licence-clear.yml merges that SHA and nothing later. If a claim does not check out, or the merge-holding lane proposed this doc, Zaal clears it."
             } > licence-hold.md
             gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
               -F body=@licence-hold.md >/dev/null
@@ -299,6 +299,10 @@ jobs:
           # line reading like a marker was blocked only by the leading `+` of
           # the diff (zaoos-review found it, #3513). Now it is blocked twice,
           # neither time by formatting.
+          #
+          # THE UNDERSCORES ARE LOAD-BEARING. `\b` treats `_` as part of a word and
+          # `-` as a break, so LICENCE-HOLD-HEAD= or licence-hold-head: would match
+          # the pattern again. Do not "tidy" the spelling.
           gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels" \
             -f 'labels[]=hold:licence' >/dev/null
           gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \

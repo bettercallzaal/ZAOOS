@@ -56,4 +56,14 @@ describe('sendToZaal surfaces the send-budget verdict', () => {
     const res = await sendToZaal(depsWith(send), 'nudge', { kind: 'status' });
     expect(wasSendBlocked(res)).toBe(false);
   });
+
+  it('forwards zoeSendClass down to the underlying sendMessage options', async () => {
+    const send = vi.fn().mockResolvedValue(DELIVERED);
+    await sendToZaal(depsWith(send), 'morning brief', { kind: 'status', zoeSendClass: 'gated' });
+    expect(send).toHaveBeenCalledWith(
+      111,
+      'morning brief',
+      expect.objectContaining({ zoeSendClass: 'gated' }),
+    );
+  });
 });

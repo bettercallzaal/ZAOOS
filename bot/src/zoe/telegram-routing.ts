@@ -42,6 +42,11 @@ export interface SendToZaalOptions {
    * brief to surface tap-to-veto buttons. Passed through to sendMessage.
    */
   replyMarkup?: { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> };
+  /**
+   * Explicit send-budget class hint ('alarm' | 'gated' | 'status' | 'digest' | 'reply').
+   * Passed through to the underlying sendMessage options so the send-budget gate respects it.
+   */
+  zoeSendClass?: string;
 }
 
 export interface TelegramRoutingDeps {
@@ -97,6 +102,9 @@ export async function sendToZaal(
     const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
     const chunkText = prefix + chunks[i];
     const chunkOpts = messageOpts(targetChatId);
+    if (opts.zoeSendClass) {
+      chunkOpts.zoeSendClass = opts.zoeSendClass;
+    }
     if (i === 0 && opts.replyMarkup) {
       chunkOpts.reply_markup = opts.replyMarkup;
     }

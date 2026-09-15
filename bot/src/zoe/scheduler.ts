@@ -310,14 +310,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             vetoKeyboard = undefined;
           }
 
-          // Route the morning brief as a status message (with veto keyboard if available)
+          // Route the morning brief (with veto keyboard if available).
+          // Guaranteed delivery: morning brief is P2 Operational; tag as gated so general
+          // status caps cannot suppress the primary daily cockpit brief (Brandon 2026-09-11).
           if (opts.routingDeps) {
-            await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status', replyMarkup: vetoKeyboard });
+            await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status', replyMarkup: vetoKeyboard, zoeSendClass: 'gated' });
           } else {
             // Brief is LLM-generated and can exceed 4096 - chunk the fallback
             // send too (the routed path already chunks). Keyboard on chunk 1.
             await sendChunkedToTelegram(
-              (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+              (cid, t, o) => opts.bot.api.sendMessage(cid, t, { ...o, zoeSendClass: 'gated' } as never),
               opts.zaalTgId,
               brief,
               vetoKeyboard ? { replyMarkup: vetoKeyboard } : undefined,
@@ -337,10 +339,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               // last SUCCESSFUL send, which is truthy when chunk 1 arrived and
               // chunk 2 threw - the queue is already cleared, so everything in
               // the chunks that failed is gone, and the run logs "released N".
-              const batch = await sendChunkedDetailed(
-                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
-                opts.zaalTgId,
-                renderDeferredBatch(held),
+              // Run flush under 'gated' so the batch send is never deferred by the cap it drains.
+              const batch = await runWithSendClass('gated', () =>
+                sendChunkedDetailed(
+                  (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                  opts.zaalTgId,
+                  renderDeferredBatch(held),
+                ),
               );
               if (batch.sent === 0) {
                 // Every chunk threw. sendChunkedDetailed swallows those

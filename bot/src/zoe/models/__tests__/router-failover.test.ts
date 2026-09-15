@@ -6,6 +6,7 @@ import {
   callCapFallback,
   routeAndCall,
   OPENROUTER_HIGH_MODEL,
+  resetProviderHealth,
 } from '../router';
 
 /**
@@ -45,6 +46,7 @@ function okResponse(content: string) {
 beforeEach(() => {
   for (const k of KEYS) saved[k] = process.env[k];
   for (const k of KEYS) delete process.env[k];
+  resetProviderHealth();
 });
 
 afterEach(() => {

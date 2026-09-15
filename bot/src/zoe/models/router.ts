@@ -14,6 +14,26 @@
  */
 
 import type { ClaudeCliResult } from '../../hermes/claude-cli';
+import {
+  prioritizeProviders,
+  recordProviderSuccess,
+  recordProviderFailure,
+  getProviderHealth,
+  getAllProviderHealth,
+  resetProviderHealth,
+  isProviderAvailableForCall,
+  type ProviderHealthRecord,
+  type ProviderHealthState,
+} from './provider-health';
+
+export {
+  getProviderHealth,
+  getAllProviderHealth,
+  resetProviderHealth,
+  isProviderAvailableForCall,
+  type ProviderHealthRecord,
+  type ProviderHealthState,
+};
 
 /**
  * Output-token cap for the fallback API providers (Grok/GPT/OpenRouter). The
@@ -557,13 +577,20 @@ export async function callCapFallback(
     throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
   }
 
+  const prioritizedNames = prioritizeProviders(attempts.map((a) => a.name));
+  const orderedAttempts = prioritizedNames
+    .map((name) => attempts.find((a) => a.name === name))
+    .filter((a): a is { name: string; fn: () => Promise<ClaudeCliResult> } => Boolean(a));
+
   const errors: string[] = [];
-  for (const attempt of attempts) {
+  for (const attempt of orderedAttempts) {
     try {
       const result = await attempt.fn();
+      recordProviderSuccess(attempt.name);
       console.log('[zoe/models/router] cap-fallback succeeded via', attempt.name);
       return { result, provider: attempt.name };
     } catch (error: unknown) {
+      recordProviderFailure(attempt.name, error);
       const msg = error instanceof Error ? error.message : String(error);
       console.warn(`[zoe/models/router] cap-fallback ${attempt.name} failed:`, msg);
       // 80 characters cut the local rung's most likely failure in half: a

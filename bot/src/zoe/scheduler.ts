@@ -310,7 +310,18 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             vetoKeyboard = undefined;
           }
 
-          // Route the morning brief as a status message (with veto keyboard if available)
+          // Route the morning brief (with veto keyboard if available).
+          // DELIBERATELY UNTAGGED. This whole job already runs inside
+          // runWithSendClass('morning') (opened ~line 285), and POLICY.morning is
+          // { alwaysPasses: true } - so the brief cannot be dropped or deferred by a
+          // status cap already. Tagging it 'gated' here would not add any delivery
+          // guarantee (POLICY.gated is byte-identical to POLICY.morning); it would only
+          // OVERRIDE the enclosing class, because resolveSendClass puts an explicit
+          // zoeSendClass hint ABOVE the runWithSendClass context. The cost of that
+          // override is measurement: 'gated' is documented as "a needs-you / approval /
+          // decision card ... the traffic the budget is protecting, so it has to be
+          // visible in the number", and folding the daily brief into that number is
+          // exactly the signal loss the 'morning' class was added on 2026-09-11 to stop.
           if (opts.routingDeps) {
             await sendToZaalRouted(opts.routingDeps, brief, { kind: 'status', replyMarkup: vetoKeyboard });
           } else {
@@ -337,6 +348,14 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               // last SUCCESSFUL send, which is truthy when chunk 1 arrived and
               // chunk 2 threw - the queue is already cleared, so everything in
               // the chunks that failed is gone, and the run logs "released N".
+              // NOT re-wrapped in runWithSendClass here. The enclosing
+              // runWithSendClass('morning') already covers this flush, and
+              // POLICY.morning is { alwaysPasses: true, overflow: 'dropped' } - which is
+              // precisely "the drain of the deferred queue can never be deferred INTO
+              // that queue", the sentence that class was written for. A nested
+              // runWithSendClass('gated') would replace 'morning' with a policy that is
+              // identical in behaviour and wrong in name, and would book a 41-chunk
+              // flush against the approval-card count.
               const batch = await sendChunkedDetailed(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,

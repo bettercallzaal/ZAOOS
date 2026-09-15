@@ -499,8 +499,8 @@ function grillResolvedText(original: string | undefined, outcome: string): strin
   return `${lead}\n\n-> ${outcome}`;
 }
 
-// /grill - surface the next item that needs you, on demand (also runs on a cron).
-bot.command('grill', async (ctx) => {
+// /grill & /needsme - surface the next item that needs you, on demand (also runs on a cron).
+bot.command(['grill', 'needsme'], async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
@@ -1529,7 +1529,10 @@ bot.on('message:text', async (ctx) => {
   // and route each to its existing action. Zaal-only + private chat.
   if (isFromZaal(ctx) && ctx.chat.type === 'private' && isBarLabel(text)) {
     try {
-      if (text === 'Agenda') {
+      if (text === 'Needs Me') {
+        const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
+        if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
+      } else if (text === 'Agenda') {
         await sendAgenda(ctx);
       } else if (text === 'Budget') {
         await ctx.reply(formatSpendStatus(false));

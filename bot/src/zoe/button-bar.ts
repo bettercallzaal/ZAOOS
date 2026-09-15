@@ -16,22 +16,23 @@
 
 import { Keyboard } from 'grammy';
 
-/** The five bar labels. index.ts checks membership before treating text as chat. */
-export const BAR_LABELS = ['Agenda', 'Focus', 'Budget', 'Note', 'Board'] as const;
+/** The six bar labels. index.ts checks membership before treating text as chat. */
+export const BAR_LABELS = ['Needs Me', 'Agenda', 'Focus', 'Board', 'Budget', 'Note'] as const;
 export type BarLabel = (typeof BAR_LABELS)[number];
 
 export function isBarLabel(text: string): text is BarLabel {
   return (BAR_LABELS as readonly string[]).includes(text);
 }
 
-/** The persistent, auto-resized reply keyboard. Two rows. */
+/** The persistent, auto-resized reply keyboard. Two rows of three. */
 export const BUTTON_BAR = new Keyboard()
+  .text('Needs Me')
   .text('Agenda')
   .text('Focus')
-  .text('Budget')
   .row()
-  .text('Note')
   .text('Board')
+  .text('Budget')
+  .text('Note')
   .resized()
   .persistent();
 
@@ -41,6 +42,7 @@ export const BUTTON_BAR = new Keyboard()
  */
 export const ZOE_COMMANDS = [
   { command: 'menu', description: 'Show the tap-first cockpit bar' },
+  { command: 'needsme', description: 'Surface what needs your decision right now' },
   { command: 'focus', description: 'Toggle hyperfocus (queue non-urgent pings)' },
   { command: 'agenda', description: 'Show the board - all open items' },
   { command: 'budget', description: "Today's spend + headroom" },

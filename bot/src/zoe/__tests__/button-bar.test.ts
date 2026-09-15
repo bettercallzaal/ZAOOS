@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { BUTTON_BAR, ZOE_COMMANDS, BAR_LABELS, isBarLabel } from '../button-bar';
 
 describe('button-bar', () => {
-  it('is a persistent, resized reply keyboard with the five labels', () => {
+  it('is a persistent, resized reply keyboard with the six labels', () => {
     const kb = BUTTON_BAR.build();
     const flat = kb.flat().map((b) => (b as { text: string }).text);
-    expect(flat).toEqual(['Agenda', 'Focus', 'Budget', 'Note', 'Board']);
+    expect(flat).toEqual(['Needs Me', 'Agenda', 'Focus', 'Board', 'Budget', 'Note']);
     // grammy Keyboard options
     expect((BUTTON_BAR as unknown as { is_persistent?: boolean }).is_persistent).toBe(true);
     expect((BUTTON_BAR as unknown as { resize_keyboard?: boolean }).resize_keyboard).toBe(true);
@@ -26,5 +26,6 @@ describe('button-bar', () => {
     }
     expect(ZOE_COMMANDS.map((c) => c.command)).toContain('focus');
     expect(ZOE_COMMANDS.map((c) => c.command)).toContain('menu');
+    expect(ZOE_COMMANDS.map((c) => c.command)).toContain('needsme');
   });
 });

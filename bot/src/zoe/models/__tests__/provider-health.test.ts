@@ -136,6 +136,46 @@ describe("provider-health state machine", () => {
     });
   });
 
+  describe("red controls - the two holes found in review 2026-09-15", () => {
+    // A fatal trip skips DEGRADED and SUSPECT and pulls the provider for a whole
+    // cooldown. Under includes("402") every one of these tripped a HEALTHY
+    // provider out of the ladder on a single ordinary error.
+    it("does not fast-trip on digits that merely contain 401/402", () => {
+      expect(isFatalProviderError(new Error("prompt is 1402 tokens, over the limit"))).toBe(false);
+      expect(isFatalProviderError(new Error("request req_a402f timed out"))).toBe(false);
+      expect(isFatalProviderError(new Error("model qwen3-401b unavailable"))).toBe(false);
+      expect(isFatalProviderError(new Error("timed out after 1401ms"))).toBe(false);
+    });
+
+    it("still fast-trips on a real 401 or 402", () => {
+      expect(isFatalProviderError(new Error("HTTP 402: insufficient credits"))).toBe(true);
+      expect(isFatalProviderError(new Error("HTTP 401 Unauthorized"))).toBe(true);
+      expect(isFatalProviderError(new Error("OpenRouter API error 402"))).toBe(true);
+      expect(isFatalProviderError(new Error("quota exceeded"))).toBe(true);
+      expect(isFatalProviderError(new Error("rate limited 429"))).toBe(false);
+    });
+
+    // The headline feature of this module is hysteresis. A success while
+    // UNAVAILABLE used to return HEALTHY directly, skipping RECOVERING and the
+    // recoverySuccessThreshold - so one in-flight call resolving after the trip
+    // restored full traffic mid-outage.
+    it("a success while UNAVAILABLE enters RECOVERING, it does not jump to HEALTHY", () => {
+      const t0 = 1000;
+      let rec = createInitialRecord("openrouter", t0);
+      rec = transitionOnFailure(rec, new Error("HTTP 402: insufficient credits"), t0);
+      expect(rec.state).toBe("UNAVAILABLE");
+
+      rec = transitionOnSuccess(rec, t0 + 10);
+      expect(rec.state).toBe("RECOVERING");
+      expect(rec.consecutiveSuccesses).toBe(1);
+
+      // and it still has to earn HEALTHY the normal way
+      rec = transitionOnSuccess(rec, t0 + 20);
+      expect(rec.state).toBe("HEALTHY");
+      expect(rec.consecutiveSuccesses).toBe(2);
+    });
+  });
+
   describe("registry and router prioritization", () => {
     it("tracks provider health dynamically", () => {
       expect(isProviderAvailableForCall("openrouter")).toBe(true);

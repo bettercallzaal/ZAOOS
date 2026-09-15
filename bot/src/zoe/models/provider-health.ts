@@ -94,9 +94,18 @@ export function createInitialRecord(provider: string, nowMs: number = Date.now()
 export function isFatalProviderError(error: unknown): boolean {
   if (!error) return false;
   const msg = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  // \b, not includes(). A bare substring test for "401"/"402" fires on any error
+  // string that happens to contain those digits, and provider errors are full of
+  // digits: "prompt is 1402 tokens", "request req_a402f timed out", "model
+  // qwen3-401b unavailable", "timed out after 1401ms" - all four measured
+  // tripping on 2026-09-15. A fatal trip skips DEGRADED and SUSPECT and takes the
+  // provider out of the ladder for a full cooldown, so a false positive here is
+  // the most expensive mistake this module can make: it removes a HEALTHY
+  // provider on one unlucky error message, which is the exact flapping the
+  // hysteresis in this file exists to prevent.
+  const httpCode = /\b(401|402)\b/.test(msg);
   return (
-    msg.includes("401") ||
-    msg.includes("402") ||
+    httpCode ||
     msg.includes("unauthorized") ||
     msg.includes("insufficient credits") ||
     msg.includes("out of credits") ||
@@ -154,16 +163,47 @@ export function transitionOnSuccess(
     };
   }
 
-  // Already HEALTHY or UNAVAILABLE (manual override)
+  // UNAVAILABLE. A success arriving here is an in-flight call that resolved after
+  // the trip, or a probe during cooldown - NOT proof the outage is over. Sending
+  // it straight to HEALTHY was the hole in the hysteresis: it skipped RECOVERING
+  // and the recoverySuccessThreshold entirely, so one lucky response during an
+  // ongoing outage restored full traffic immediately, which is precisely the
+  // flapping this module is named for. It enters RECOVERING instead and still has
+  // to earn HEALTHY the same way every other recovery does.
+  if (record.state === "UNAVAILABLE") {
+    if (consecutiveSuccesses >= config.recoverySuccessThreshold) {
+      return {
+        ...record,
+        state: "HEALTHY",
+        totalSuccesses,
+        consecutiveSuccesses,
+        consecutiveFailures,
+        lastSuccessAtMs: nowMs,
+        stateChangedAtMs: nowMs,
+        currentCooldownMs: config.baseCooldownMs,
+      };
+    }
+    return {
+      ...record,
+      state: "RECOVERING",
+      totalSuccesses,
+      consecutiveSuccesses,
+      consecutiveFailures,
+      lastSuccessAtMs: nowMs,
+      stateChangedAtMs: nowMs,
+    };
+  }
+
+  // Already HEALTHY.
   return {
     ...record,
-    state: record.state === "UNAVAILABLE" ? "HEALTHY" : record.state,
+    state: record.state,
     totalSuccesses,
     consecutiveSuccesses,
     consecutiveFailures,
     lastSuccessAtMs: nowMs,
-    stateChangedAtMs: record.state === "UNAVAILABLE" ? nowMs : record.stateChangedAtMs,
-    currentCooldownMs: record.state === "UNAVAILABLE" ? config.baseCooldownMs : record.currentCooldownMs,
+    stateChangedAtMs: record.stateChangedAtMs,
+    currentCooldownMs: record.currentCooldownMs,
   };
 }
 

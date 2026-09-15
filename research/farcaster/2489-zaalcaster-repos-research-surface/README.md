@@ -26,6 +26,18 @@ tier: STANDARD
 | 7 | "Make that part of Farcaster" | **Share-to-cast is a Compose PREFILL with the repo or doc URL as the embed. Never an Action, never automatic.** | The standing no-autopost rule. The marketplace action `farcaster-cast-github-action` (cast on release via a Neynar signer) has 1 star, no LICENSE file (all rights reserved), last activity 2024-05-11. GitCast, the closest prior art for "GitHub inside Farcaster", has no DNS A record today; its MIT server repo last moved 2025-08-29. Both are patterns to read, not dependencies to take. |
 | 8 | Token | **Set a read-only `GITHUB_TOKEN` in Vercel for `api/view.js`.** Unauthenticated `api.github.com` is 60 req/hr per IP (header `x-ratelimit-limit: 60` measured); a fine-grained token with no repo permissions gets 5,000/hr on public data and unlocks code search. | One env var, same pattern as `EMPIRE_BUILDER_API_KEY` and `JUKE_API_KEY`. |
 
+## Update, same day (2026-09-15, after Zaal pointed at zao-repos)
+
+**The ledger renderer already exists and this doc missed it.** `bettercallzaal/zao-repos` (created 2026-09-12, https://bettercallzaal.github.io/zao-repos) is a GitHub Pages dashboard rebuilt hourly (`cron: 17 * * * *`, default `GITHUB_TOKEN`, GraphQL pinned to `privacy:PUBLIC`) over `bettercallzaal`, `ZAODEVZ` and `ZAO-DEVZ`. It publishes `docs/data.json`: 281,403 bytes, 130 repos, `access-control-allow-origin: *`, `cache-control: max-age=600`, generated 2026-09-15T22:14Z. Per repo it already carries stars, forks, commits at 30/90/365 days, contributors, languages, topics, licence, README/LICENSE/.gitignore/.env.example/CLAUDE.md presence, CI workflow names, last run conclusion, package.json framework, a homepage liveness probe (`{status, finalUrl, checkedAt}`, 68 of 71 probed at 200, 3 at 404), a `staleness` label (21 hot, 55 active, 26 cooling, 18 warm, 10 dormant), a 7-check `hygiene` score, and a `brand` label derived from a name regex in `scripts/fetch.mjs` (20 lines: ZAO Core 20, Experiments 16, Client Work 12, Agents & Bots 11, Fractal 11, ZABAL 8, WaveWarZ 6...). It was not in the research library, the tracker, or CLAUDE.md, and the repo has no LICENSE file.
+
+What changes above:
+
+- **Decision 3 (generate `docs/REPOS.md`)**: SUPERSEDED. The Portfolio tab is that ledger. The Next Actions row for it is withdrawn below.
+- **Decision 6 (`kind=repos` calls the GitHub API)**: CHANGED. `kind=repos` fetches `data.json` from the Pages host instead: one request, no token, every field the Brands hub needs. The GitHub token is now only for `kind=research_search` (code search).
+- **Decision 2 (topics)**: STRENGTHENED, not replaced. The dashboard measures **129 of 130 repos with no topics** and its own hygiene check fails them for it. Its `brand` regex misfiles by name (zaalcaster lands in `Personal`, commits30 reads 1), which is exactly what an explicit `brand-*` topic fixes. Once topics exist, `fetch.mjs` should prefer a `brand-*` topic over the regex (one `if` before the regex loop).
+- **Decision 5 (research index)**: unchanged; zao-repos is repos only.
+- zaalcaster row in the dashboard: brand `Personal`, hygiene 71/100, staleness `hot`, homepage probed at `zaalcaster.vercel.app` (the GitHub `homepage` field predates z.thezao.xyz).
+
 ## Findings
 
 ### 1. The estate, measured 2026-09-15
@@ -123,7 +135,9 @@ brand overlay (existing)              new sections (read-only)
 | `zao-research-index --rebuild` writes valid `research/search-index.json` (quoted `num`, 2,209 rows) and the doc-shipping skill commits it with each doc; shipped = file on `main` parses with `python3 -c "json.load"` and row count equals the doc count | dotfiles lane (owns `~/bin`) | PR to zaal-dotfiles + ZAOOS | 2026-09-19 |
 | Apply topics to the ~25 canonical repos from doc 998 with `gh api -X PUT repos/{o}/{r}/topics`; public metadata write, so Zaal runs or approves the script; shipped = `gh search repos --owner=bettercallzaal --owner=ZAODEVZ --topic status-canonical` returns the list | @Zaal | Script run | 2026-09-19 |
 | Add `kind=research_search` (GitHub code search behind the token) once the token is live; shipped = a query for "SIWN" scoped to `farcaster/` returns the 11 known paths from inside zaalcaster | zaalcaster lane | PR | 2026-09-22 |
-| Generate `docs/REPOS.md` in ZAOOS from topics as the no-app fallback; shipped = file lists every `status-canonical` repo grouped by `brand-*` | dotfiles lane | PR | 2026-09-22 |
+| ~~Generate `docs/REPOS.md`~~ WITHDRAWN 2026-09-15: zao-repos Portfolio tab is the ledger | - | - | wontfix |
+| `scripts/fetch.mjs` in zao-repos prefers a `brand-*` topic over the name regex when present, and the repo gets a LICENSE (MIT, it is Zaal's); shipped = zaalcaster row shows brand ZAO or BetterCallZaal after tagging | whoever owns zao-repos (built 2026-09-12 by a lane; Zaal names the owner) | PR | 2026-09-22 |
+| Add zao-repos to CLAUDE.md Map and to `infrastructure/2245-zaoos-surface-map`; shipped = both mention the URL and the hourly rebuild | zaalcaster lane | Doc PR | 2026-09-18 |
 
 ## Sources
 
@@ -150,3 +164,6 @@ Prior art:
 - gitcast.dev - `[FAILED: curl returned HTTP 000, `dig` shows no A record, Wayback availability API answered 429]`
 - [therealharpaljadeja/farcaster-cast-github-action](https://github.com/therealharpaljadeja/farcaster-cast-github-action) and its [Marketplace listing](https://github.com/marketplace/actions/cast-to-farcaster) - snapshot taken (1 star, no LICENSE file, last activity 2024-05-11) - `[FULL, official API + exa highlights]`
 - [BuildCast](https://buildcast.app/) - `[PARTIAL, exa search highlights of the marketing page]`
+
+Added same day:
+- [bettercallzaal/zao-repos](https://github.com/bettercallzaal/zao-repos) - README, `scripts/fetch.mjs` (500 lines), `.github/workflows/sync.yml`, commit history via `gh api`; `docs/data.json` fetched with `curl -D` from the Pages host and parsed (130 repos); snapshot taken with `zao-research-snapshot` (no LICENSE file, last activity 2026-09-15) - `[FULL, official API + raw fetch]`

@@ -637,6 +637,14 @@ describe('morning - the batch that drains the queue can never be queued', () => 
   });
 });
 
+// Both source checks below scan CODE, not prose. Without this they also match
+// the comments that explain them - which is how the first draft of these very
+// tests failed: the comment warning about zoeSendClass tripped the guard
+// looking for zoeSendClass.
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
 describe('the scheduler drains the queue under the morning class', () => {
   it('the job that calls drainDeferred() runs in runWithSendClass(\'morning\'), not digest', async () => {
     // A source check, because the job is a cron closure with a dozen live
@@ -648,6 +656,42 @@ describe('the scheduler drains the queue under the morning class', () => {
     const before = src.slice(0, drainAt);
     const m = [...before.matchAll(/runWithSendClass\('([a-z]+)'/g)].pop();
     expect(m?.[1]).toBe('morning');
+  });
+
+  // The check above only looks BEFORE drainDeferred(), so it cannot see an
+  // override placed AFTER it - and on 2026-09-15 exactly that got through
+  // review: a nested runWithSendClass('gated') wrapping the flush send itself,
+  // plus zoeSendClass:'gated' on the brief. Both sit downstream of the line the
+  // test above reads, both silently replaced 'morning', and it stayed green.
+  // These two close that gap from the other side.
+  it('nothing inside the morning job re-tags the send class', async () => {
+    const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
+    const morningAt = src.indexOf("runWithSendClass('morning'");
+    const flushEnd = src.indexOf('renderDeferredBatch(held)');
+    expect(morningAt).toBeGreaterThan(0);
+    expect(flushEnd).toBeGreaterThan(morningAt);
+    const job = stripComments(src.slice(morningAt, flushEnd));
+
+    // Exactly one runWithSendClass in the whole job: the 'morning' that opens it.
+    // A nested one REPLACES the class for everything it wraps.
+    const wrappers = [...job.matchAll(/runWithSendClass\('([a-z]+)'/g)].map((x) => x[1]);
+    expect(wrappers).toEqual(['morning']);
+  });
+
+  it('the morning brief carries no explicit zoeSendClass hint', async () => {
+    const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
+    const morningAt = src.indexOf("runWithSendClass('morning'");
+    const flushEnd = src.indexOf('renderDeferredBatch(held)');
+    const job = stripComments(src.slice(morningAt, flushEnd));
+
+    // resolveSendClass ranks an explicit hint ABOVE the enclosing context, so a
+    // zoeSendClass anywhere in here overrides 'morning' - and because
+    // POLICY.gated is byte-identical to POLICY.morning, it does so with zero
+    // behavioural difference and no test failure. The only thing it changes is
+    // which counter the daily brief and a 41-chunk flush are booked against,
+    // which is the number the 2026-09-11 work existed to make readable.
+    const hints = job.match(/zoeSendClass/g) ?? [];
+    expect(hints).toEqual([]);
   });
 });
 

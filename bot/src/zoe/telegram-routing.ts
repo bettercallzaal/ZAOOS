@@ -31,7 +31,7 @@ import { chunkForTelegram } from './tg-chunk';
 // RESOLVES with `{ message_id: 0, zoeSendBudget }` instead of throwing. This
 // router is the chokepoint most callers send through, so it has to pass that
 // signal on - see the return contract on sendToZaal below.
-import { wasSendBlocked } from './send-budget';
+import { wasSendBlocked, type SendClass } from './send-budget';
 
 export type MessageKind = 'question' | 'status' | 'whisper';
 
@@ -43,10 +43,17 @@ export interface SendToZaalOptions {
    */
   replyMarkup?: { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> };
   /**
-   * Explicit send-budget class hint ('alarm' | 'gated' | 'status' | 'digest' | 'reply').
-   * Passed through to the underlying sendMessage options so the send-budget gate respects it.
+   * Explicit send-budget class hint. Passed through to the underlying sendMessage
+   * options so the send-budget gate respects it.
+   *
+   * Typed as SendClass, not string, on purpose. resolveSendClass validates the hint
+   * against VALID and SILENTLY falls back to 'status' on anything it does not
+   * recognise - so under `string` a typo ('gatd') does not fail, it downgrades the
+   * send to the one capped-and-dropped class this option exists to escape, with no
+   * error anywhere. The compiler is the only thing that catches that, and only if
+   * the type is narrow.
    */
-  zoeSendClass?: string;
+  zoeSendClass?: SendClass;
 }
 
 export interface TelegramRoutingDeps {

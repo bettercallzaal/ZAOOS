@@ -25,7 +25,7 @@
 
 import { sendChunkedDetailed } from './tg-chunk';
 import { featureRan } from './feature-ran';
-import { wasSendBlocked } from './send-budget';
+import { wasSendBlocked, deferSend, runWithSendClass } from './send-budget';
 
 const HUB_LEGACY_ID = '9000';
 
@@ -249,7 +249,7 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // ALL of it arrive", and a relayed paste is exactly the long text this
       // module chunks for.
       const report = await sendChunkedDetailed(
-        (cid, t, o) => deps.sendMessage(cid, t, o as never),
+        (cid, t, o) => runWithSendClass('digest', () => deps.sendMessage(cid, t, o as never)),
         deps.chatId,
         formatInboundDm(r),
         { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },
@@ -277,7 +277,23 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // `status` class, whose overflow policy is DROP: past the daily cap every
       // inbound relay would be silently and permanently lost, since
       // `tg_pushed` is the only dedup gate and is never re-evaluated.
-      if (sent == null || wasSendBlocked(sent)) continue;
+      if (sent != null && wasSendBlocked(sent)) {
+        const outcome = (sent as { zoeSendBudget?: string }).zoeSendBudget;
+        if (outcome !== 'deferred') {
+          await deferSend({
+            at: deps.now(),
+            cls: 'digest',
+            chatId: deps.chatId,
+            text: formatInboundDm(r),
+          });
+        }
+        console.warn(
+          `[zoe/relay-bridge] relay from ${r.from} deferred by send budget - marked pushed for morning delivery`,
+        );
+        pushedTs.add(r.ts);
+        continue;
+      }
+      if (sent == null) continue;
       pushedTs.add(r.ts);
       // Register message_id -> rl-<lane> so a plain reply to THIS message routes
       // back to the lane (no button tap). Best-effort - never blocks the push.

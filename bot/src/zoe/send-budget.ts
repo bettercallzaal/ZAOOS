@@ -395,7 +395,7 @@ export interface DeferredSend {
   text: string;
 }
 
-async function deferSend(entry: DeferredSend): Promise<void> {
+export async function deferSend(entry: DeferredSend): Promise<void> {
   try {
     await fs.mkdir(zoeHome(), { recursive: true });
     const existing = await readDeferred();

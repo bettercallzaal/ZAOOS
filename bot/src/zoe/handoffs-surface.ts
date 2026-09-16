@@ -32,7 +32,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { wasSendBlocked } from './send-budget';
+import { wasSendBlocked, deferSend, runWithSendClass } from './send-budget';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const SEEN_PATH = join(ZOE_HOME, 'handoffs-seen.json');
@@ -100,14 +100,25 @@ export async function surfaceNewHandoffs(
     const line = (r.title ?? 'Handoff').slice(0, 300);
     const where = `handoff ${delivered + 1}/${rows.length} (${r.legacy_source ?? 'unknown'})`;
     try {
-      const result = await postToTopic(line);
+      const result = await runWithSendClass('digest', () => postToTopic(line));
       if (wasSendBlocked(result)) {
-        // Blocked by the send budget. It resolved, so nothing threw - the only
-        // way to see it is to ask.
+        // Blocked by the send budget. Defer once into the morning batch if not
+        // already deferred by gateSend, and advance the cursor so we do not
+        // retry the same handoff every tick.
+        const outcome = (result as { zoeSendBudget?: string }).zoeSendBudget;
+        if (outcome !== 'deferred') {
+          await deferSend({
+            at: new Date().toISOString(),
+            cls: 'digest',
+            chatId: 0,
+            text: line,
+          });
+        }
         console.warn(
-          `[zoe/handoffs-surface] ${where} blocked by the send budget - seen cursor held at ${maxAt}, retrying next tick`,
+          `[zoe/handoffs-surface] ${where} deferred by send budget - advancing cursor past ${r.created_at ?? maxAt}, will deliver in morning batch`,
         );
-        break;
+        if (r.created_at && r.created_at > maxAt) maxAt = r.created_at;
+        continue;
       }
     } catch (err) {
       console.warn(
@@ -118,8 +129,9 @@ export async function surfaceNewHandoffs(
     delivered++;
     if (r.created_at && r.created_at > maxAt) maxAt = r.created_at;
   }
-  // Nothing landed: leave the cursor untouched so the whole batch is re-fetched.
-  if (delivered === 0) return 0;
-  await setLastSeen(maxAt);
+  // Advance cursor if any rows were delivered or deferred past `since`.
+  if (maxAt > since) {
+    await setLastSeen(maxAt);
+  }
   return delivered;
 }

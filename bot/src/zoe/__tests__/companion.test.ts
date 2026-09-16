@@ -151,7 +151,25 @@ describe('companion: generateCompanionCheckin', () => {
     const now = new Date('2026-09-15T19:00:00Z').getTime();
     const lastSeen = now - 4 * 3_600_000;
     await fs.writeFile(join(tmpDir, 'last-seen.txt'), String(lastSeen), 'utf8');
-    const cand = await generateCompanionCheckin(now);
+    // A check-in needs a source. This test passed on CI at a0da5c9 only
+    // because the empty fallback used to invent one; on a host with no vault
+    // and no snapshot the honest answer is null (see the blind-pulse tests).
+    // Give it a vault.
+    await fs.writeFile(
+      join(tmpDir, 'BLACKBOARD.md'),
+      [
+        '# BLACKBOARD',
+        '## WORK PACKETS',
+        '| Lane | What is claimed | Where | When |',
+        '|---|---|---|---|',
+        '| zaostock (tmux) | WORKING on the artist pages | ZAOstock | 2026-09-15 |',
+        '## WAITING FOR ZAAL',
+        '- sign the insurance certificate',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+    const cand = await generateCompanionCheckin(now, tmpDir);
     expect(cand).not.toBeNull();
     expect(cand?.kind).toBe('companion-pulse');
     expect(cand?.score).toBe(0.65);

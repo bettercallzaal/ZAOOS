@@ -166,7 +166,8 @@ describe('surfaceNewHandoffs', () => {
     expect(JSON.parse(written).at).toBe('2026-07-17T09:00:00Z'); // A's, not B's
   });
 
-  it('treats a send-budget block as undelivered even though it resolves', async () => {
+  it('defers a send-budget blocked handoff once and advances the cursor, not retrying on next tick', async () => {
+    vi.useFakeTimers({ now: new Date('2026-07-17T07:00:00Z') });
     process.env.COWORK_TRACKER_URL = 'https://tracker.example.com';
     process.env.COWORK_TRACKER_KEY = 'test-key';
     mockReadFile.mockRejectedValue(new Error('ENOENT'));
@@ -177,10 +178,13 @@ describe('surfaceNewHandoffs', () => {
     ];
     stubFetch(rows);
     // gateSend RESOLVES on a block, so nothing throws and the value is a
-    // non-null object - `result != null` says delivered.
-    const postToTopic = vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'dropped' });
+    // non-null object. Blocked send is deferred and cursor advances.
+    const postToTopic = vi.fn().mockResolvedValue({ message_id: 0, zoeSendBudget: 'deferred' });
     const result = await surfaceNewHandoffs(postToTopic);
     expect(result).toBe(0);
-    expect(mockWriteFile).not.toHaveBeenCalled();
+    expect(mockWriteFile).toHaveBeenCalled();
+    const lastWrite = mockWriteFile.mock.calls[mockWriteFile.mock.calls.length - 1][1];
+    expect(JSON.parse(lastWrite).at).toBe('2026-07-17T09:00:00Z');
   });
+
 });

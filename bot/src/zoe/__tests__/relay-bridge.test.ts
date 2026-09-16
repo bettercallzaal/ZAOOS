@@ -188,7 +188,7 @@ describe('pushInboundRelays', () => {
     delete process.env.COWORK_TRACKER_KEY;
   });
 
-  it('does NOT mark pushed when the send budget dropped the send', async () => {
+  it('defers a send-budget blocked relay once and marks pushed, not retrying on next tick', async () => {
     process.env.COWORK_TRACKER_URL = 'https://x.test';
     process.env.COWORK_TRACKER_KEY = 'k';
     const hub = { id: 'h1', metadata: { relays: [rel({ from: 'cowork', to: 'zoe', ts: 'a', tg_pushed: false })] } };
@@ -198,18 +198,18 @@ describe('pushInboundRelays', () => {
       return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
     });
     vi.stubGlobal('fetch', fetchMock);
-    // The exact value gateSend() resolves with when a send is over the cap:
-    // it neither throws nor returns null, which is what made this a silent drop.
-    const sendMessage = vi.fn(async () => ({ message_id: 0, zoeSendBudget: 'dropped' }));
+    // The exact value gateSend() resolves with when a send is over the cap.
+    // Defer once and mark pushed so it does not retry every tick.
+    const sendMessage = vi.fn(async () => ({ message_id: 0, zoeSendBudget: 'deferred' }));
     const recordContext = vi.fn(async () => {});
     const armPending = vi.fn();
     const n = await pushInboundRelays({ chatId: 999, sendMessage, now: () => 't', recordContext, armPending });
-    // tg_pushed is the ONLY dedup gate and is never re-evaluated - marking it
-    // here would lose the relay for good. Leave it pending for the next tick.
-    expect(n).toBe(0);
-    expect(writes).toEqual([]);
-    expect(recordContext).not.toHaveBeenCalled();
-    expect(armPending).not.toHaveBeenCalled();
+    expect(n).toBe(1);
+    expect(writes.length).toBeGreaterThan(0);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/rpc/relay_hub_merge'),
+      expect.anything(),
+    );
     vi.unstubAllGlobals();
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;
@@ -254,4 +254,5 @@ describe('pushInboundRelays', () => {
     delete process.env.COWORK_TRACKER_URL;
     delete process.env.COWORK_TRACKER_KEY;
   });
+
 });

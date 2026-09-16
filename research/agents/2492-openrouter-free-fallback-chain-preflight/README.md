@@ -20,7 +20,7 @@ tier: STANDARD
 | 1 | **Never implement `fallback-chain-openrouter-free.md` as written.** | Its `hermes config set` line, the part anyone copies, is **0 of 15** live model IDs. Its table is 8 of 15. The two lists share one model, `openai/gpt-oss-20b:free`, which is itself dead. |
 | 2 | **The corrected 12-model chain is live in Hermes now.** | `hermes config get model.fallback` returns it, applied by `zao-openrouter-preflight --apply` (dotfiles #238, merged `e6734e6`). Primary stays `nvidia/nemotron-3-ultra-550b-a55b:free`, verified live. |
 | 3 | **The list is not the fix; the preflight is.** Run it on a schedule with the drop alerts routed to Telegram. | Free IDs on OpenRouter turned over almost completely in seven weeks (July doc to 15 Sep). The corrected list will rot the same way; a catalogue check that drops dead entries loudly is what survives. |
-| 4 | **Reply to attabotty with the corrected chain and the preflight offer.** Clip drafted; Zaal sends. | The July list came from attabotty. The doc cites `~/Documents/Hermes docs/Fall back chain instructions.rtf`, which does not exist on this Mac, so the chain cannot be re-derived from its stated source. |
+| 4 | **Ask attabotty how he keeps his chain current and what he runs now; implement his answer.** attabotty is the mentor on this stack and Zaal follows him (Zaal, 2026-09-15: "we should just be asking questions and implementing"). The first draft of this row offered him our script; that inverted the relationship and was corrected the same evening. Clip drafted; Zaal sends. | The July list came from attabotty. The doc cites `~/Documents/Hermes docs/Fall back chain instructions.rtf`, which does not exist on this Mac, so the chain cannot be re-derived from its stated source - which is itself the first question for him. |
 | 5 | **Antigravity's thinking level for this class of work is `medium`** - see doc 2490. | Same session, same finding: the models research sits in `agents/2490-gemini-3-8-flash-high-effort-agent-driving`. |
 
 ## What attabotty shared
@@ -57,7 +57,7 @@ Primary `nvidia/nemotron-3-ultra-550b-a55b:free` (1,000,000 ctx). Fallback, in o
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Schedule `zao-openrouter-preflight --from-hermes --apply` weekly (launchd, Sunday 08:00 ET) with DROPPED lines posted to the ZAO Orchestration Bot; shipped = plist committed in dotfiles `launchd/` and one logged run | @Zaal (zj lane builds, Zaal loads the plist) | PR + launchd | 2026-09-21 |
-| Send attabotty the reply in `clip-20260915-195818-attabotty-fallback-chain-0915`; shipped = sent, noted here | @Zaal | DM | 2026-09-17 |
+| Send attabotty the four questions in `clip-20260915-201649-attabotty-fallback-questions-0915` (how he keeps the chain current, what he runs now, cooldowns, a newer doc); shipped = sent, his answers pasted into this doc as an update, and the chain re-cut to match | @Zaal | DM | 2026-09-17 |
 | Re-validate this doc's 12 IDs against the catalogue and update the corrected file; shipped = `last-validated` bumped, any drop recorded | @Zaal (zj) | Re-research | 2026-10-13 |
 
 ## Sources

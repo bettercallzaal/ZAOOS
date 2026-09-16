@@ -183,7 +183,7 @@ import { installAgentMarkupGuard } from '../agent-markup';
 import { installSendBudget, runWithSendClass } from './send-budget';
 import { readLaneSnapshot, renderLanes } from './lanes-board';
 import { getCompanionPulse, renderCompanionOverview } from './companion';
-import { detectDelegationIntent, dispatchDelegatedTask } from './agent-delegation';
+import { detectDelegationIntent, dispatchDelegatedTask, delegationAllowed } from './agent-delegation';
 import {
   fetchPending,
   removeFromQueue,
@@ -2474,7 +2474,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // Active agent delegation: natural-language delegation in DMs
   // ("look into X", "investigate Y", "draft a brief on Z").
   const delegation = detectDelegationIntent(text);
-  if (delegation.isDelegated) {
+  if (delegation.isDelegated && delegationAllowed({ fromId: ctx.from?.id, zaalId, chatType: ctx.chat?.type })) {
     await dispatchDelegatedTask(delegation.cleanTask, delegation.kind, {
       sendAck: (ack: string) => ctx.reply(ack).catch(() => {}),
       workDeps: {
@@ -2883,7 +2883,9 @@ async function dispatchConcierge(
       blocks.open_threads = renderOpenThreadsBlock();
       try {
         const pulse = await getCompanionPulse();
-        blocks.companion_presence = renderCompanionOverview(pulse);
+        // A pulse with no source is not presence; do not put it in the prompt
+        // as if it were measured (VPS has no vault and no snapshot today).
+        if (pulse.source !== 'fallback') blocks.companion_presence = renderCompanionOverview(pulse);
       } catch {
         // best-effort
       }

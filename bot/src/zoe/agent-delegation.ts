@@ -10,6 +10,17 @@
 
 import { enqueueWork, runWorkTick, type WorkItem, type WorkTickDeps } from "./work-loop";
 
+/**
+ * Who may delegate. Kept pure so index.ts cannot forget it and a test can
+ * prove it. Measured 2026-09-15 before this existed: handlePrivateMessage is
+ * reached from the brand group path too (index.ts, the brandContext call), so
+ * without this a stranger in a brand chat typing "look into X" enqueued
+ * autonomous work under Zaal's deps and kicked the work loop.
+ */
+export function delegationAllowed(a: { fromId?: number; zaalId: number; chatType?: string }): boolean {
+  return a.fromId === a.zaalId && a.chatType === "private";
+}
+
 export interface DelegationIntent {
   isDelegated: boolean;
   cleanTask: string;

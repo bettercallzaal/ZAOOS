@@ -123,8 +123,14 @@ export function parseBlackboardPulse(content: string): {
  * Resolve the path to BLACKBOARD.md across typical environment locations.
  */
 export async function findBlackboardPath(customVaultDir?: string): Promise<string | null> {
+  // An explicit vault dir means that dir, not "that dir, then every place on
+  // Zaal's Mac". The Mac fallback below is why a test for the VPS's blind
+  // state could not go blind on the Mac (2026-09-15).
+  if (customVaultDir) {
+    const only = join(customVaultDir, "BLACKBOARD.md");
+    try { await fs.access(only); return only; } catch { return null; }
+  }
   const candidates = [
-    customVaultDir ? join(customVaultDir, "BLACKBOARD.md") : null,
     process.env.ZAO_VAULT_DIR ? join(process.env.ZAO_VAULT_DIR, "BLACKBOARD.md") : null,
     "/Users/zaalpanthaki/zao-vault/BLACKBOARD.md",
     join(homedir(), "zao-vault", "BLACKBOARD.md"),
@@ -224,6 +230,18 @@ export async function getCompanionPulse(
  */
 export function renderCompanionOverview(pulse: EstatePulse): string {
   const lines: string[] = [];
+  // Blind says blind. On the VPS there is no vault and no board snapshot
+  // (measured 2026-09-15), so before this the overview reported "Clean. No
+  // blocking items" from an empty fallback - a false statement on Zaal's
+  // phone, the exact shape of silent-failure-guard rule 6.
+  if (pulse.source === "fallback") {
+    lines.push(
+      `ZOE Companion Pulse: ${pulse.zaostockCountdownDays} days until ZAOstock (Oct 3, 2026). Rhythm: ${pulse.timeOfDay} (${pulse.timeString} ET).`,
+      "",
+      "ESTATE VIEW UNAVAILABLE ON THIS HOST: no BLACKBOARD.md (set ZAO_VAULT_DIR) and no board snapshot. Lanes, blockers and the waiting list are not known here, not clean.",
+    );
+    return lines.join("\n");
+  }
   lines.push(
     `ZOE Companion Pulse: ${pulse.zaostockCountdownDays} days until ZAOstock (Oct 3, 2026). Rhythm: ${pulse.timeOfDay} (${pulse.timeString} ET).`,
   );
@@ -297,6 +315,9 @@ export async function generateCompanionCheckin(
   if (seen[key]) return null;
 
   const pulse = await getCompanionPulse(now, customVaultDir);
+  // No source, no check-in. "Everything on track?" built on no data is a
+  // question ZOE cannot honestly ask.
+  if (pulse.source === "fallback") return null;
   const activeCount = pulse.activeLanes.length;
   const blockerCount = pulse.blockers.length + pulse.waitingCount;
 

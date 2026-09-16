@@ -160,3 +160,42 @@ describe('companion: generateCompanionCheckin', () => {
     expect(cand?.message).toContain('Everything on track');
   });
 });
+describe('companion: a pulse with no source is blind, and says so', () => {
+  // Red controls for 2026-09-15. On the VPS there is no vault and no snapshot,
+  // so every pulse there was source "fallback" - and the overview said
+  // "Clean. No blocking items" while the check-in asked "Everything on track?".
+  const blind: EstatePulse = {
+    now: Date.parse('2026-09-15T20:00:00Z'),
+    timeOfDay: 'midday-flow',
+    timeString: '16:00',
+    zaostockCountdownDays: 18,
+    activeLanes: [],
+    blockers: [],
+    waitingCount: 0,
+    source: 'fallback',
+  };
+
+  it('the overview names the missing sources instead of reporting clean', () => {
+    const out = renderCompanionOverview(blind);
+    expect(out).toContain('ESTATE VIEW UNAVAILABLE ON THIS HOST');
+    expect(out).toContain('ZAO_VAULT_DIR');
+    expect(out).not.toContain('Clean');
+    expect(out).not.toContain('No blocking items');
+  });
+
+  it('generateCompanionCheckin returns null when the pulse would be fallback', async () => {
+    const dir = await fs.mkdtemp(join(tmpdir(), 'zoe-companion-blind-'));
+    const savedHome = ZOE_PATHS.home;
+    (ZOE_PATHS as { home: string }).home = dir;
+    try {
+      // silent for a day, no dedup entry, daytime EDT - every other gate open
+      const now = Date.parse('2026-09-15T18:00:00Z');
+      await fs.writeFile(join(dir, 'last-seen.txt'), String(now - 24 * 3_600_000));
+      const cand = await generateCompanionCheckin(now, join(dir, 'no-vault-here'));
+      expect(cand).toBeNull();
+    } finally {
+      (ZOE_PATHS as { home: string }).home = savedHome;
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  });
+});

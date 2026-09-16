@@ -3,6 +3,7 @@ import {
   detectDelegationIntent,
   formatDelegationAck,
   dispatchDelegatedTask,
+  delegationAllowed,
 } from '../agent-delegation';
 import type { WorkItem } from '../work-loop';
 
@@ -117,5 +118,21 @@ describe('agent-delegation: dispatchDelegatedTask', () => {
     expect(item.input).toBe('Investigate sound gear in Ellsworth');
     expect(mockSendAck).toHaveBeenCalledTimes(1);
     expect(sentMessages[0]).toContain('Investigation delegated to autonomous agent');
+  });
+});
+describe('agent-delegation: delegationAllowed - the gate index.ts must call', () => {
+  // Red control for 2026-09-15: without this gate a brand-chat stranger's
+  // "look into X" reached dispatchDelegatedTask with Zaal's deps.
+  it('allows Zaal in a private chat', () => {
+    expect(delegationAllowed({ fromId: 19640, zaalId: 19640, chatType: 'private' })).toBe(true);
+  });
+  it('refuses anyone who is not Zaal, even in a private chat', () => {
+    expect(delegationAllowed({ fromId: 4050, zaalId: 19640, chatType: 'private' })).toBe(false);
+  });
+  it('refuses Zaal outside a private chat (brand groups reach the same handler)', () => {
+    expect(delegationAllowed({ fromId: 19640, zaalId: 19640, chatType: 'supergroup' })).toBe(false);
+  });
+  it('refuses a missing sender', () => {
+    expect(delegationAllowed({ zaalId: 19640, chatType: 'private' })).toBe(false);
   });
 });

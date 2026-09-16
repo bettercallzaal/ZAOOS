@@ -105,4 +105,51 @@ describe('crash-guard', () => {
 
     cleanup();
   });
+
+  it('sends emergency alert and exits 1 on unhandledRejection', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+    const mockExit = vi.fn();
+    const cleanup = installCrashGuard({
+      botToken: 'fake-token-123',
+      zaalId: 999888,
+      fetchFn: mockFetch as any,
+      onExit: mockExit,
+    });
+
+    const fatalRejection = new Error('Unhandled promise failure');
+    process.emit('unhandledRejection', fatalRejection, Promise.resolve());
+
+    await vi.waitFor(() => {
+      expect(mockExit).toHaveBeenCalledWith(1);
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.telegram.org/botfake-token-123/sendMessage',
+      expect.objectContaining({
+        method: 'POST',
+      }),
+    );
+
+    cleanup();
+  });
+
+  it('exits 1 on unhandledRejection even if emergency alert fails', async () => {
+    const mockFetch = vi.fn().mockRejectedValue(new Error('Telegram API unreachable'));
+    const mockExit = vi.fn();
+    const cleanup = installCrashGuard({
+      botToken: 'fake-token-123',
+      zaalId: 999888,
+      fetchFn: mockFetch as any,
+      onExit: mockExit,
+    });
+
+    const fatalRejection = new Error('Unhandled network timeout');
+    process.emit('unhandledRejection', fatalRejection, Promise.resolve());
+
+    await vi.waitFor(() => {
+      expect(mockExit).toHaveBeenCalledWith(1);
+    });
+
+    cleanup();
+  });
 });

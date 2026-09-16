@@ -79,9 +79,13 @@ export function installCrashGuard(deps: CrashGuardDeps = {}): () => void {
   };
 
   const onUnhandledRejection = (reason: unknown) => {
+    if (isExiting) return;
+    isExiting = true;
     console.error('[zoe/crash-guard] unhandledRejection:', reason);
     const alertText = formatCrashAlert(reason);
-    void sendEmergencyAlert(alertText, deps);
+    void sendEmergencyAlert(alertText, deps).finally(() => {
+      exitFn(1);
+    });
   };
 
   const onSigterm = () => {

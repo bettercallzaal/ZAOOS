@@ -73,6 +73,18 @@ PREV=$(git rev-parse HEAD)
 git checkout --quiet main 2>/dev/null || git checkout --quiet -B main origin/main
 git merge --ff-only --quiet origin/main 2>/dev/null || git reset --hard origin/main --quiet 2>/dev/null
 npm install --no-audit --no-fund --silent >/dev/null 2>&1
+
+# --- install updated systemd user unit if changed -----------------------
+UNIT_SRC="$LIVE/bot/systemd/zoe-bot.service"
+UNIT_DST="$HOME/.config/systemd/user/zoe-bot.service"
+if [ -f "$UNIT_SRC" ]; then
+  mkdir -p "$HOME/.config/systemd/user"
+  if ! cmp -s "$UNIT_SRC" "$UNIT_DST" 2>/dev/null; then
+    cp "$UNIT_SRC" "$UNIT_DST"
+    systemctl --user daemon-reload
+  fi
+fi
+
 systemctl --user restart zoe-bot
 sleep 12
 if systemctl --user is-active zoe-bot >/dev/null 2>&1 && ! journalctl --user -u zoe-bot --since "20 seconds ago" --no-pager 2>/dev/null | grep -qiE 'TransformError|Error \[|crash'; then

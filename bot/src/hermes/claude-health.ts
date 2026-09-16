@@ -44,9 +44,13 @@ export interface ClaudeHealth {
   /** Why it failed, from classifyClaudeError. Only 'auth' is treated as actionable. */
   lastFailKind: ClaudeErrorKind | null;
   lastFailHint: string | null;
+  /** Parsed reset time if usage_limit/quota. */
+  lastFailReset?: string | null;
 }
 
-const EMPTY: ClaudeHealth = { lastOkMs: null, lastFailMs: null, lastFailKind: null, lastFailHint: null };
+const EMPTY: ClaudeHealth = { lastOkMs: null, lastFailMs: null, lastFailKind: null, lastFailHint: null, lastFailReset: null };
+
+let cachedHealth: ClaudeHealth = { ...EMPTY };
 
 /**
  * A success older than this stops counting as proof of health. The probe runs
@@ -58,12 +62,15 @@ export const STALE_AFTER_MS = 3 * 60 * 60 * 1000;
 export async function readClaudeHealth(path: string = CLAUDE_HEALTH_PATH): Promise<ClaudeHealth> {
   try {
     const parsed = JSON.parse(await fs.readFile(path, 'utf8')) as Partial<ClaudeHealth>;
-    return {
+    const res: ClaudeHealth = {
       lastOkMs: typeof parsed.lastOkMs === 'number' ? parsed.lastOkMs : null,
       lastFailMs: typeof parsed.lastFailMs === 'number' ? parsed.lastFailMs : null,
       lastFailKind: (parsed.lastFailKind as ClaudeErrorKind) ?? null,
       lastFailHint: typeof parsed.lastFailHint === 'string' ? parsed.lastFailHint : null,
+      lastFailReset: typeof parsed.lastFailReset === 'string' ? parsed.lastFailReset : null,
     };
+    cachedHealth = res;
+    return res;
   } catch {
     return { ...EMPTY };
   }
@@ -81,7 +88,13 @@ async function write(next: ClaudeHealth, path: string): Promise<void> {
 /** Record a clean Claude call. This is the ONLY thing that proves reachability. */
 export async function recordClaudeOk(nowMs: number = Date.now(), path: string = CLAUDE_HEALTH_PATH): Promise<void> {
   const cur = await readClaudeHealth(path);
-  await write({ ...cur, lastOkMs: nowMs }, path);
+  const next: ClaudeHealth = { ...cur, lastOkMs: nowMs };
+  cachedHealth = next;
+  await write(next, path);
+  try {
+    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
+    await fs.writeFile(fleetStatePath, "ok\n", "utf8");
+  } catch {}
 }
 
 /** Record a failed Claude call, keeping why. */
@@ -90,9 +103,23 @@ export async function recordClaudeFailure(
   hint: string,
   nowMs: number = Date.now(),
   path: string = CLAUDE_HEALTH_PATH,
+  resetTime?: string | null,
 ): Promise<void> {
   const cur = await readClaudeHealth(path);
-  await write({ ...cur, lastFailMs: nowMs, lastFailKind: kind, lastFailHint: hint || null }, path);
+  const next: ClaudeHealth = {
+    ...cur,
+    lastFailMs: nowMs,
+    lastFailKind: kind,
+    lastFailHint: hint || null,
+    lastFailReset: resetTime ?? null,
+  };
+  cachedHealth = next;
+  await write(next, path);
+  try {
+    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
+    const val = kind === "auth" ? "down\n" : kind === "usage_limit" ? "cap\n" : "down\n";
+    await fs.writeFile(fleetStatePath, val, 'utf8');
+  } catch {}
 }
 
 function ago(ms: number): string {
@@ -126,6 +153,14 @@ export function claudeBriefLines(
     };
   }
 
+  if (failing && h.lastFailKind === 'usage_limit') {
+    const reset = h.lastFailReset;
+    return {
+      alert: null,
+      status: ['claude', reset ? `capped until ${reset}` : 'capped'],
+    };
+  }
+
   // A non-auth failure (rate limit, timeout) is real but usually self-clearing,
   // so it is reported without pulling Zaal in.
   if (failing) return { alert: null, status: ['claude', `${h.lastFailKind ?? 'error'}`] };
@@ -136,4 +171,19 @@ export function claudeBriefLines(
   if (age > staleAfterMs) return { alert: null, status: ['claude', `last ok ${ago(age)} ago`] };
 
   return { alert: null, status: ['claude', 'ok'] };
+}
+
+export function getClaudeHeartbeatStatus(h: ClaudeHealth = cachedHealth): string {
+  const failing = h.lastFailMs !== null && (h.lastOkMs === null || h.lastFailMs > h.lastOkMs);
+  if (failing && h.lastFailKind === 'usage_limit') {
+    return h.lastFailReset ? `Claude capped until ${h.lastFailReset}` : 'Claude capped';
+  }
+  if (failing && h.lastFailKind === 'auth') {
+    return 'Claude auth failed';
+  }
+  if (failing) {
+    return `Claude ${h.lastFailKind ?? 'error'}`;
+  }
+  if (h.lastOkMs === null) return 'Claude not checked';
+  return 'Claude ok';
 }

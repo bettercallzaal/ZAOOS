@@ -92,6 +92,20 @@ describe('callClaudeCli — --bare needs an API key', () => {
 // ── error paths ───────────────────────────────────────────────────────────────
 
 describe('callClaudeCli — error paths', () => {
+  it("rejects with CliError classifying usage_limit and parsed reset time on weekly limit", async () => {
+    mockSpawn.mockReturnValue(makeSpawn("You've hit your weekly limit · resets Sep 17, 10am (UTC)", "", 1));
+    let caught: CliError | null = null;
+    try {
+      await callClaudeCli(BASE_OPTS);
+    } catch (e) {
+      caught = e as CliError;
+    }
+    expect(caught).toBeInstanceOf(CliError);
+    expect(caught?.kind).toBe("usage_limit");
+    expect(caught?.resetTime).toBe("Sep 17, 10am (UTC)");
+    expect(caught?.hint).toBe("Claude capped until Sep 17, 10am (UTC)");
+  });
+
   it('rejects with CliError when spawn exits non-zero', async () => {
     mockSpawn.mockReturnValue(makeSpawn('some error', '', 1));
     await expect(callClaudeCli(BASE_OPTS)).rejects.toBeInstanceOf(CliError);

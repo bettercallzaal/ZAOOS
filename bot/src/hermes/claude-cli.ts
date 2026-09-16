@@ -63,7 +63,12 @@ export class CliAuthError extends Error {
  * might just need a retry).
  */
 export class CliError extends Error {
-  constructor(message: string, public kind: ClaudeErrorKind = 'unknown', public hint: string = '') {
+  constructor(
+    message: string,
+    public kind: ClaudeErrorKind = 'unknown',
+    public hint: string = '',
+    public resetTime?: string,
+  ) {
     super(message);
     this.name = 'CliError';
   }
@@ -76,13 +81,33 @@ export class CliError extends Error {
  * (2026-06-23): the Max-plan OAuth token expired and every failure looked the
  * same. Pure + exported for unit testing.
  */
-export function classifyClaudeError(text: string): { kind: ClaudeErrorKind; hint: string } {
+export interface ClaudeErrorClassification {
+  kind: ClaudeErrorKind;
+  hint: string;
+  resetTime?: string;
+}
+
+export function extractResetTime(text: string): string | undefined {
+  const m = (text || '').match(/resets?\s+(?:at\s+|on\s+)?([^\n\r"']+)/i);
+  if (!m) return undefined;
+  let res = m[1].trim();
+  res = res.split(/[·\n\r]/)[0].trim();
+  res = res.replace(/[."']+$/, '').trim();
+  return res || undefined;
+}
+
+export function classifyClaudeError(text: string): ClaudeErrorClassification {
   const t = (text || '').toLowerCase();
   if (/\b401\b|invalid authentication|unauthorized|not logged in|please run.*\/login|oauth token (expired|revoked)|authentication_error/.test(t)) {
     return { kind: 'auth', hint: 'claude login/OAuth expired - run `claude` then /login on the host' };
   }
-  if (/usage limit|quota exceeded|out of credit|insufficient.*credit|plan limit reached/.test(t)) {
-    return { kind: 'usage_limit', hint: 'plan usage/quota reached - check the Claude plan' };
+  if (/\b(weekly|daily|monthly|usage)\s+limit\b|hit your .*limit|quota exceeded|out of credit|insufficient.*credit|plan limit reached|api_error_status:\s*429/i.test(text || '')) {
+    const resetTime = extractResetTime(text || '');
+    return {
+      kind: 'usage_limit',
+      hint: resetTime ? `Claude capped until ${resetTime}` : 'plan usage/quota reached - check the Claude plan',
+      resetTime,
+    };
   }
   if (/\b429\b|\b529\b|rate.?limit|too many requests|overloaded/.test(t)) {
     return { kind: 'rate_limit', hint: 'rate-limited/overloaded - retry shortly' };
@@ -110,7 +135,7 @@ export async function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliRe
     return result;
   } catch (err: unknown) {
     if (err instanceof CliAuthError) await recordClaudeFailure('auth', err.hint);
-    else if (err instanceof CliError) await recordClaudeFailure(err.kind, err.hint);
+    else if (err instanceof CliError) await recordClaudeFailure(err.kind, err.hint, Date.now(), undefined, err.resetTime);
     throw err;
   }
 }
@@ -219,7 +244,7 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
         const cls = classifyClaudeError(combined);
         const err = cls.kind === 'auth'
           ? new CliAuthError(`claude CLI exited ${code}: ${combined.slice(0, 400)}`, cls.hint)
-          : new CliError(`claude CLI exited ${code} [${cls.kind}: ${cls.hint}]. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`, cls.kind, cls.hint);
+          : new CliError(`claude CLI exited ${code} [${cls.kind}: ${cls.hint}]. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`, cls.kind, cls.hint, cls.resetTime);
         reject(err);
         return;
       }
@@ -230,7 +255,7 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
         const clsEmpty = classifyClaudeError(stderr);
         const err = clsEmpty.kind === 'auth'
           ? new CliAuthError(`claude CLI returned empty stdout`, clsEmpty.hint)
-          : new CliError(`claude CLI returned empty stdout [${clsEmpty.kind}: ${clsEmpty.hint}]. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`, clsEmpty.kind, clsEmpty.hint);
+          : new CliError(`claude CLI returned empty stdout [${clsEmpty.kind}: ${clsEmpty.hint}]. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`, clsEmpty.kind, clsEmpty.hint, clsEmpty.resetTime);
         reject(err);
         return;
       }
@@ -254,7 +279,7 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
             const clsErr = classifyClaudeError(parsed.result ?? '');
             const err = clsErr.kind === 'auth'
               ? new CliAuthError(`claude CLI reported is_error=true: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`, clsErr.hint)
-              : new CliError(`claude CLI reported is_error=true [${clsErr.kind}: ${clsErr.hint}]: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`, clsErr.kind, clsErr.hint);
+              : new CliError(`claude CLI reported is_error=true [${clsErr.kind}: ${clsErr.hint}]: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`, clsErr.kind, clsErr.hint, clsErr.resetTime);
             reject(err);
             return;
           }
@@ -343,6 +368,7 @@ export async function checkClaudeAuth(cwd: string = '/home/zaal/zao-os'): Promis
   ok: boolean;
   kind?: ClaudeErrorKind;
   hint?: string;
+  resetTime?: string;
 }> {
   try {
     const result = await callClaudeCli({
@@ -363,7 +389,7 @@ export async function checkClaudeAuth(cwd: string = '/home/zaal/zao-os'): Promis
     }
     if (err instanceof CliError) {
       console.warn('[hermes/claude-cli] healthcheck non-auth failure:', (err as Error).message);
-      return { ok: false, kind: (err as CliError).kind, hint: (err as CliError).hint };
+      return { ok: false, kind: (err as CliError).kind, hint: (err as CliError).hint, resetTime: (err as CliError).resetTime };
     }
     console.error('[hermes/claude-cli] healthcheck unexpected error:', err);
     return { ok: false, kind: 'unknown' };

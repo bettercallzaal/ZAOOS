@@ -171,6 +171,7 @@ import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { shadowSummary } from '../hermes/critic';
+import { getClaudeHeartbeatStatus, readClaudeHealth } from '../hermes/claude-health';
 import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback, parseReactionCallback } from './questions';
@@ -3892,10 +3893,12 @@ async function main(): Promise<void> {
 
   // Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
   // metaFn enriches each heartbeat with live detail for the board's per-bot panel.
+  void readClaudeHealth();
   startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' }, () => ({
     current_task: coworkTask,
     last_error: coworkLastError,
     uptime_s: Math.round((Date.now() - COWORK_BOOT_TS) / 1000),
+    claude: getClaudeHeartbeatStatus(),
   }));
 
   // Phases 2-4 Control/Task/Converse: pull + execute commands from the board.

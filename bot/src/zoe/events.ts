@@ -430,3 +430,21 @@ export async function gatherCalendarCandidates(now: number = Date.now()): Promis
   // that ZOE was supposed to flag passes in silence.
   return out;
 }
+
+
+// ---- companion candidates --------------------------------------------------
+
+/**
+ * Gather proactive companion candidates (situational estate awareness,
+ * active lanes check, countdown, blockers, time of day rhythm).
+ */
+export async function gatherCompanionCandidates(now: number = Date.now()): Promise<Candidate[]> {
+  try {
+    const { generateCompanionCheckin } = await import("./companion");
+    const cand = await generateCompanionCheckin(now);
+    return cand ? [cand] : [];
+  } catch (err) {
+    console.warn("[zoe/events] gatherCompanionCandidates failed (nbd):", (err as Error).message);
+    return [];
+  }
+}

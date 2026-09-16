@@ -415,6 +415,8 @@ export interface MemoryBlocks {
   /** Live "who is on what" from the cowork board, so ZOE reasons with team state
    *  (doc 2201). Cached 5min; undefined when the tracker is unconfigured/empty. */
   team?: string;
+  /** Live companion presence: estate pulse, active lanes, countdown, blockers. */
+  companion_presence?: string;
   chat_scope: ChatScope;
   chat_title?: string;
 }

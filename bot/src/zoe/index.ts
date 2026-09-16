@@ -182,6 +182,8 @@ import { sendToZaal as sendToZaalRouted, constructRoutingDeps, type SendToZaalOp
 import { installAgentMarkupGuard } from '../agent-markup';
 import { installSendBudget, runWithSendClass } from './send-budget';
 import { readLaneSnapshot, renderLanes } from './lanes-board';
+import { getCompanionPulse, renderCompanionOverview } from './companion';
+import { detectDelegationIntent, dispatchDelegatedTask } from './agent-delegation';
 import {
   fetchPending,
   removeFromQueue,
@@ -1081,6 +1083,13 @@ bot.command('board', async (ctx) => {
 // writes (Zaal 2026-09-11: "a combo of telegram message tailscale and maybe
 // an orca option"). Read-only, Zaal-only, on request only; says STALE rather
 // than showing an old snapshot as now. /board stays the team digest.
+// /companion - active companion overview: estate pulse, countdown, active lanes, blockers
+bot.command('companion', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const pulse = await getCompanionPulse();
+  await replyChunked(ctx, renderCompanionOverview(pulse));
+});
+
 bot.command('lanes', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const snap = await readLaneSnapshot();
@@ -2462,6 +2471,25 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // waiting y/n approval (plan/learn/reflexion/bonfire), but an unanswered
   // evening reflection IS superseded - a fresh agent request means Zaal moved
   // on, so we clear it and dispatch rather than swallow the request.
+  // Active agent delegation: natural-language delegation in DMs
+  // ("look into X", "investigate Y", "draft a brief on Z").
+  const delegation = detectDelegationIntent(text);
+  if (delegation.isDelegated) {
+    await dispatchDelegatedTask(delegation.cleanTask, delegation.kind, {
+      sendAck: (ack: string) => ctx.reply(ack).catch(() => {}),
+      workDeps: {
+        sendToZaal: (t: string) => sendToZaalRouted(routingDeps, t, { kind: 'status' }),
+        sendToChat: (chatId: number, threadId: number | undefined, t: string) =>
+          bot.api.sendMessage(chatId, t, threadId ? { message_thread_id: threadId } : {}),
+        defaultResearchTarget: researchTopicTarget(),
+        zaalTgId: zaalId,
+        repoDir,
+        currentDate: currentDateString(),
+      },
+    });
+    return;
+  }
+
   if (shouldDecompose(text)) {
     const blocking = getPending('private');
     if (!blocking || blocking.kind === 'await-reflection') {
@@ -2851,7 +2879,15 @@ async function dispatchConcierge(
     const blocks = await buildMemoryBlocks(scope, chatTitle);
     // doc 796 Move 2: surface live commitment threads so the concierge can
     // resolve/snooze/drop them by id (DMs with Zaal only).
-    if (scope === 'private') blocks.open_threads = renderOpenThreadsBlock();
+    if (scope === 'private') {
+      blocks.open_threads = renderOpenThreadsBlock();
+      try {
+        const pulse = await getCompanionPulse();
+        blocks.companion_presence = renderCompanionOverview(pulse);
+      } catch {
+        // best-effort
+      }
+    }
 
     // Pull relevant prior context from the ZABAL knowledge graph (Bonfire) via
     // recall()/delve and inject it into the turn. DMs only + substantive

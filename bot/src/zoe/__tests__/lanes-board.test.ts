@@ -3,7 +3,7 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { readLaneSnapshot, renderLanes, STALE_AFTER_S, type LaneSnapshot } from '../lanes-board';
+import { readLaneSnapshot, renderLanes, STALE_AFTER_S, type LaneSnapshot, type LaneRow } from '../lanes-board';
 
 const AT = 1789140600; // 2026-09-11 15:30 UTC = 11:30 ET
 

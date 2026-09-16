@@ -49,6 +49,25 @@ permission outage.
    returns 200 without checking the DB / the key's real scope / the queue is
    theater. Check the actual capability the check claims to prove.
 
+8. **An escape hatch keyed on ABSENT configuration is dead on the deploy
+   target.** "SESSION_SECRET unset = no auth, trust everyone" is fine for a
+   local CLI and is the default state of every fresh deployment, so it is
+   the branch that ships unless someone remembers a manual step. Any such
+   branch asserts it is not on the deploy target (`VERCEL`, `CI`, a hostname)
+   and fails closed there - for reads as well as writes. Added 2026-09-15:
+   z.thezao.xyz ran 63 days with anonymous owner-level write access because
+   the hatch documented as "local CLI unchanged" had no host check
+   (ZAOOS issue: "a security gate is off on the deployed host", 2nd instance;
+   the 1st is case 1 above).
+
+9. **"Fixed and live" is proven by a refused request to the deployed URL,
+   pasted into the doc.** Reading the code proves the code; running the tests
+   proves the tests; neither proves the deployment, whose configuration lives
+   somewhere they never look. The July audit of zaalcaster wrote "This is
+   FIXED and LIVE" from the source and was right about the case it named and
+   blind to the one that was deployed. A gate claim carries the `curl` and
+   its 401.
+
 ## Before marking any check "done"
 
 - Did I assert the real effect, or just an exit code / status?

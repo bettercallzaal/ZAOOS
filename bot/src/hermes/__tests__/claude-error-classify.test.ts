@@ -28,6 +28,26 @@ describe('classifyClaudeError', () => {
     expect(classifyClaudeError('').kind).toBe('unknown');
   });
 
+
+  it("classifies weekly limit and extracts reset time (measured VPS failure)", () => {
+    const r1 = classifyClaudeError("You've hit your weekly limit · resets 10am (UTC)");
+    expect(r1.kind).toBe("usage_limit");
+    expect(r1.resetTime).toBe("10am (UTC)");
+    expect(r1.hint).toBe("Claude capped until 10am (UTC)");
+
+    const r2 = classifyClaudeError("You've hit your weekly limit · resets Sep 17, 10am (UTC)");
+    expect(r2.kind).toBe("usage_limit");
+    expect(r2.resetTime).toBe("Sep 17, 10am (UTC)");
+    expect(r2.hint).toBe("Claude capped until Sep 17, 10am (UTC)");
+  });
+
+  it("classifies api_error_status 429 usage limit with reset time", () => {
+    const r = classifyClaudeError('api_error_status: 429 "You\'ve hit your usage limit" · resets 10am (UTC)');
+    expect(r.kind).toBe("usage_limit");
+    expect(r.resetTime).toBe("10am (UTC)");
+    expect(r.hint).toBe("Claude capped until 10am (UTC)");
+  });
+
   it('always returns a non-empty actionable hint', () => {
     for (const s of ['401', 'usage limit', '429', 'timeout', 'weird']) {
       expect(classifyClaudeError(s).hint.length).toBeGreaterThan(0);

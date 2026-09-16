@@ -30,6 +30,7 @@ const health = (over: Partial<ClaudeHealth> = {}): ClaudeHealth => ({
   lastFailMs: null,
   lastFailKind: null,
   lastFailHint: null,
+  lastFailReset: null,
   ...over,
 });
 
@@ -77,6 +78,21 @@ describe('claudeBriefLines', () => {
     const r = claudeBriefLines(health({ lastOkMs: T - HOUR, lastFailMs: T - MIN, lastFailKind: 'rate_limit' }), T);
     expect(r.alert).toBeNull();
     expect(r.status).toEqual(['claude', 'rate_limit']);
+  });
+
+
+  it("carries reset time into the brief status when usage_limit", () => {
+    const r = claudeBriefLines(
+      health({
+        lastOkMs: T - HOUR,
+        lastFailMs: T - MIN,
+        lastFailKind: "usage_limit",
+        lastFailReset: "Sep 17, 10am (UTC)",
+      }),
+      T,
+    );
+    expect(r.alert).toBeNull();
+    expect(r.status).toEqual(["claude", "capped until Sep 17, 10am (UTC)"]);
   });
 
   it('treats an equal-timestamp tie as still failing, not recovered', () => {

@@ -55,7 +55,7 @@ export const UNACKED_LIMIT = 3;
 export const UNACKED_WINDOW_MS = 24 * 60 * 60 * 1000;
 const THRESHOLD_STEP = 0.1;
 
-export type CandidateKind = 'thread-nudge' | 'thread-decision' | 'task-nudge' | 'inactivity' | 'calendar' | 'github-event' | 'graph-event';
+export type CandidateKind = 'thread-nudge' | 'thread-decision' | 'task-nudge' | 'inactivity' | 'calendar' | 'github-event' | 'graph-event' | 'companion-pulse' | 'blocker-alert';
 export type CandidateTier = 'critical' | 'standard' | 'signal';
 
 export interface Candidate {

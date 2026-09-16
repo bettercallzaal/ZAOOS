@@ -69,7 +69,7 @@ import {
   wasSendBlocked,
 } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates, markCandidateSurfaced } from './events';
+import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates, gatherCompanionCandidates, markCandidateSurfaced } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 import { flushQueue } from './bonfire-retry';
@@ -1211,6 +1211,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           // Graph-staleness nudges (doc 859): cold watched fronts. Daily-gated.
           try {
             cands.push(...(await gatherGraphCandidates()));
+          } catch {
+            // best-effort
+          }
+          // Proactive companion pulse check-in.
+          try {
+            cands.push(...(await gatherCompanionCandidates()));
           } catch {
             // best-effort
           }

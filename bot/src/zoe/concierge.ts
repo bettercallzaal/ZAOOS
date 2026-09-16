@@ -118,6 +118,9 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
           ...(blocks.team
             ? ['', `<team_board>`, blocks.team, `</team_board>`]
             : []),
+          ...(blocks.companion_presence
+            ? ["", "<companion_presence>", blocks.companion_presence, "</companion_presence>"]
+            : []),
         ]),
     ...recallBlock,
     ...brandBlock,

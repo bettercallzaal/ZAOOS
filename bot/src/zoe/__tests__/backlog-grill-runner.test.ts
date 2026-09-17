@@ -239,6 +239,105 @@ describe('applyBacklogAnswer - the answer follows the card, not the cursor', () 
   });
 });
 
+describe('tracker parity (dotfiles #247) - one PATCH per answer with note + status', () => {
+  const TASK_ID = 'task-ruling-parity';
+  const patched: Array<{ url: string; body: any }> = [];
+
+  const mockFetch = (existingNotes = 'HISTORICAL LINE 1\n\nHISTORICAL LINE 2') =>
+    (async (url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        patched.push({ url: String(url), body: JSON.parse(String(init.body)) });
+        return { ok: true, status: 200 } as unknown as Response;
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => [
+          {
+            id: TASK_ID,
+            title: 'Test Task',
+            status: 'todo',
+            notes: existingNotes,
+            metadata: { route: 'agent' },
+          },
+        ],
+      } as unknown as Response;
+    }) as unknown as typeof fetch;
+
+  beforeEach(async () => {
+    files.clear();
+    patched.length = 0;
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    await writeState(
+      st({
+        asked: { [TASK_ID]: { at: '2026-09-17T00:00:00Z', title: 'Test Task' } },
+        activeTaskId: TASK_ID,
+      }),
+    );
+  });
+
+  it('work verdict writes status in_progress AND prepends GRILL note in one PATCH', async () => {
+    const r = await applyBacklogAnswer('work', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    expect(patched).toHaveLength(1);
+    const body = patched[0].body;
+    expect(body.status).toBe('in_progress');
+    expect(body.notes).toBeDefined();
+    expect(body.notes).toMatch(/GRILL \d{4}-\d{2}-\d{2} \(Telegram\): sent to be worked on/);
+    expect(body.notes).toMatch(/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}\] GRILL/);
+    expect(body.notes).toContain('HISTORICAL LINE 1');
+    const lines = body.notes.split('\n');
+    expect(lines[0]).toMatch(/GRILL \d{4}-\d{2}-\d{2}/);
+  });
+
+  it('done verdict writes status done, completed_at, AND prepends GRILL note in one PATCH', async () => {
+    const r = await applyBacklogAnswer('done', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    expect(patched).toHaveLength(1);
+    const body = patched[0].body;
+    expect(body.status).toBe('done');
+    expect(body.completed_at).toBeDefined();
+    expect(body.notes).toMatch(/GRILL \d{4}-\d{2}-\d{2} \(Telegram\): confirmed done/);
+    expect(body.notes).toMatch(/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}\] GRILL/);
+    const lines = body.notes.split('\n');
+    expect(lines[0]).toMatch(/GRILL \d{4}-\d{2}-\d{2}/);
+  });
+
+  it('keep verdict writes one PATCH prepending GRILL note without changing status', async () => {
+    const r = await applyBacklogAnswer('keep', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    expect(patched).toHaveLength(1);
+    const body = patched[0].body;
+    expect(body.status).toBeUndefined();
+    expect(body.notes).toMatch(/GRILL \d{4}-\d{2}-\d{2} \(Telegram\): still wanted - kept open/);
+    expect(body.notes).toMatch(/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}\] GRILL/);
+    const lines = body.notes.split('\n');
+    expect(lines[0]).toMatch(/GRILL \d{4}-\d{2}-\d{2}/);
+  });
+
+  it('park verdict writes one PATCH prepending GRILL note without changing status', async () => {
+    const r = await applyBacklogAnswer('park', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    expect(patched).toHaveLength(1);
+    const body = patched[0].body;
+    expect(body.status).toBeUndefined();
+    expect(body.notes).toMatch(/GRILL \d{4}-\d{2}-\d{2} \(Telegram\): parked - stays on the board, resurfaces later/);
+    expect(body.notes).toMatch(/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}\] GRILL/);
+    const lines = body.notes.split('\n');
+    expect(lines[0]).toMatch(/GRILL \d{4}-\d{2}-\d{2}/);
+  });
+
+  it('red control: a tap that writes a note without status on work/done must fail status lie check', async () => {
+    const r = await applyBacklogAnswer('work', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    const body = patched[0].body;
+    expect(body).toHaveProperty('status', 'in_progress');
+    expect(body).toHaveProperty('notes');
+    expect(body.notes).toContain('sent to be worked on');
+  });
+});
+
 /**
  * The bug this guards: cards go out oldest-first, so the card just skipped was
  * the oldest one. Un-asking it made it the oldest UNASKED one too, and the next

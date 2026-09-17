@@ -672,49 +672,55 @@ export async function applyBacklogAnswer(
   if (!v) return { ok: false, message: 'could not read that answer' };
 
   let message = '';
-  if (v.closesTask) {
-    const cur = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=notes`, {
-      headers: c.headers,
-    });
-    // Closing is a read-modify-write on a text column, and the PATCH below
-    // REPLACES `notes` wholesale. If the read fails we do not know what was in
-    // there, so writing anyway swaps the task's entire note history for one
-    // grill line - silently, because the PATCH still succeeds and Zaal is told
-    // "Closed." A 429 or a 5xx on the read is enough to do it.
-    //
-    // Fail closed instead: the card stays open and unanswered, so the next tap
-    // (or a typed answer) retries it. A close that has to be repeated is much
-    // cheaper than notes that cannot be recovered.
-    if (!cur.ok) return { ok: false, message: `could not read that task (${cur.status}) - not closing` };
-    const rows = (await cur.json()) as Array<{ notes?: string }>;
-    const notes = `${(rows[0]?.notes || '').trim()}\n\n${verdictNote(v, new Date().toISOString().slice(0, 10))}`.trim();
-    // 'done', never 'completed' - tasks.status has a CHECK constraint that 400s
-    // on anything else, and the rejection reads as "nothing to close".
+  if (v.key === 'skip') {
+    message = 'Skipped - it returns later.';
+  } else {
+    // Parity with zao-tracker ruling (dotfiles #247): one PATCH per answer carrying
+    // [YYYY-MM-DD HH:MM] GRILL <date> (Telegram): <base> prepended to notes,
+    // plus status change (done -> done + completed_at, work -> in_progress, keep/park -> untouched).
+    const cur = await fetchImpl(
+      `${c.root}/rest/v1/tasks?id=eq.${taskId}&select=title,metadata,notes`,
+      { headers: c.headers },
+    );
+    if (!cur.ok) {
+      const action = v.closesTask ? 'closing' : v.key === 'park' ? 'parking' : 'updating';
+      return { ok: false, message: `could not read that task (${cur.status}) - not ${action}` };
+    }
+    const rows = (await cur.json()) as Array<{
+      title?: string;
+      metadata?: Record<string, unknown>;
+      notes?: string;
+    }>;
+    const task = rows[0];
+    const existingNotes = (task?.notes || '').trim();
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toISOString().slice(11, 16);
+    const rulingLine = verdictNote(v, dateStr, timeStr);
+    const notes = existingNotes ? `${rulingLine}\n\n${existingNotes}` : rulingLine;
+
+    const patchBody: Record<string, unknown> = { notes };
+    if (v.closesTask) {
+      patchBody.status = 'done';
+      patchBody.completed_at = now.toISOString();
+    } else if (v.key === 'work') {
+      patchBody.status = 'in_progress';
+    }
+
     const patch = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
       method: 'PATCH',
-      headers: { ...c.headers, Prefer: 'return=minimal' },
-      body: JSON.stringify({ status: 'done', notes }),
+      headers: { ...c.headers, Prefer: 'return=minimal', 'Content-Type': 'application/json' },
+      body: JSON.stringify(patchBody),
     });
-    if (!patch.ok) return { ok: false, message: `close failed (${patch.status})` };
-    message = v.key === 'done' ? 'Closed.' : 'Dropped.';
-  } else if (v.key === 'work') {
-    // Feature 2: "Work on it" visible effect - set status to in_progress
-    const taskRead = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=title,metadata`, {
-      headers: c.headers,
-    });
-    if (taskRead.ok) {
-      const rows = (await taskRead.json()) as Array<{ title?: string; metadata?: Record<string, unknown> }>;
-      const task = rows[0];
+    if (!patch.ok) {
+      const action = v.closesTask ? 'close' : v.key === 'park' ? 'park' : 'ruling';
+      return { ok: false, message: `${action} failed (${patch.status})` };
+    }
+
+    if (v.closesTask) {
+      message = v.key === 'done' ? 'Closed.' : 'Dropped.';
+    } else if (v.key === 'work') {
       const route = task?.metadata?.route as string | undefined;
-
-      // Set status to in_progress
-      await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
-        method: 'PATCH',
-        headers: { ...c.headers, Prefer: 'return=minimal', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'in_progress' }),
-      }).catch(() => {});
-
-      // Build response message with task title and route meaning
       const routeMeaning =
         route === 'agent'
           ? 'flagged for the fleet - a lane picks it up from the in_progress queue'
@@ -727,31 +733,11 @@ export async function applyBacklogAnswer(
       message = v.note
         ? `On it: ${v.note.slice(0, 60)}. ${routeMeaning}`
         : `Working on: ${task?.title ? task.title.slice(0, 50) : 'the task'}. ${routeMeaning}`;
+    } else if (v.key === 'park') {
+      message = 'Parked - stays on the board, resurfaces later.';
     } else {
-      message = v.note ? `On it: ${v.note.slice(0, 80)}` : 'On it - it comes back at the end for confirmation.';
+      message = 'Kept open.';
     }
-  } else if (v.key === 'skip') {
-    message = 'Skipped - it returns later.';
-  } else if (v.key === 'park') {
-    // Park (card 1b7fe7c9): the task stays OPEN on the board - only a resurface
-    // note is appended. Same read-modify-write + fail-closed guard as the close
-    // path: notes are replaced wholesale by PATCH, so writing over a failed
-    // read would destroy the task's note history.
-    const cur = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}&select=notes`, {
-      headers: c.headers,
-    });
-    if (!cur.ok) return { ok: false, message: `could not read that task (${cur.status}) - not parking` };
-    const rows = (await cur.json()) as Array<{ notes?: string }>;
-    const notes = `${(rows[0]?.notes || '').trim()}\n\n${verdictNote(v, new Date().toISOString().slice(0, 10))}`.trim();
-    const patch = await fetchImpl(`${c.root}/rest/v1/tasks?id=eq.${taskId}`, {
-      method: 'PATCH',
-      headers: { ...c.headers, Prefer: 'return=minimal' },
-      body: JSON.stringify({ notes }),
-    });
-    if (!patch.ok) return { ok: false, message: `park failed (${patch.status})` };
-    message = 'Parked - stays on the board, resurfaces later.';
-  } else {
-    message = 'Kept open.';
   }
 
   state.answered[taskId] = {

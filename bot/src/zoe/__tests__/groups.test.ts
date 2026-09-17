@@ -15,6 +15,7 @@ vi.mock('node:fs', () => ({
 
 import {
   addAllowlistMember,
+  autoRegisterGroup,
   getGroupConfig,
   isBotMentioned,
   readGroups,
@@ -229,6 +230,25 @@ describe('shouldRespond', () => {
     const ctx = makeCtx({ fromId: 42, messageText: 'random chat', entities: [] });
     expect(shouldRespond(BASE_CONFIG, ctx).allow).toBe(false);
   });
+  it("returns allow=true for mode=mention when member_allowlist is empty and bot is @-mentioned", () => {
+    const cfg = { ...BASE_CONFIG, member_allowlist: [] };
+    const ctx = makeCtx({
+      fromId: 999,
+      messageText: "hey @zoebot what?",
+      entities: [{ type: "mention", offset: 4, length: 7 }],
+    });
+    expect(shouldRespond(cfg, ctx).allow).toBe(true);
+  });
+
+  it("returns allow=true for mode=mention when member_allowlist has wildcard -1 and bot is @-mentioned", () => {
+    const cfg = { ...BASE_CONFIG, member_allowlist: [-1] };
+    const ctx = makeCtx({
+      fromId: 999,
+      messageText: "hey @zoebot what?",
+      entities: [{ type: "mention", offset: 4, length: 7 }],
+    });
+    expect(shouldRespond(cfg, ctx).allow).toBe(true);
+  });
 });
 
 // ── isBotMentioned ────────────────────────────────────────────────────────────
@@ -252,5 +272,22 @@ describe('isBotMentioned', () => {
       entities: [{ type: 'mention', offset: 4, length: 9 }],
     });
     expect(isBotMentioned(ctx)).toBe(false);
+  });
+});
+
+
+// ── autoRegisterGroup ─────────────────────────────────────────────────────────
+
+describe("autoRegisterGroup", () => {
+  it("creates group with mode=mention and wildcard -1 allowlist", async () => {
+    mockReadFile.mockRejectedValue(Object.assign(new Error("ENOENT"), { code: "ENOENT" }));
+    mockMkdir.mockResolvedValue(undefined);
+    mockWriteFile.mockResolvedValue(undefined);
+    const cfg = await autoRegisterGroup(555, "Auto Group", 888);
+    expect(cfg.chat_id).toBe(555);
+    expect(cfg.chat_title).toBe("Auto Group");
+    expect(cfg.mode).toBe("mention");
+    expect(cfg.member_allowlist).toContain(-1);
+    expect(cfg.member_allowlist).toContain(888);
   });
 });

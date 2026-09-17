@@ -19,7 +19,7 @@ import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
-import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
+import { BUTTON_BAR, PRIVATE_COMMANDS, GROUP_COMMANDS, isBarLabel } from './button-bar';
 import {
   surfaceGrill,
   applyGrillAction,
@@ -100,7 +100,9 @@ import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile }
 import { captureResume, looksLikeResume } from './resume';
 import {
   addAllowlistMember,
+  autoRegisterGroup,
   getGroupConfig,
+  isBotMentioned,
   removeAllowlistMember,
   setGroupMode,
   upsertGroup,
@@ -476,6 +478,75 @@ bot.command('menu', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
 });
+
+// /help - overview of assistant commands in DMs and groups
+bot.command("help", async (ctx) => {
+  const isPrivate = ctx.chat.type === "private";
+  if (isPrivate && isFromZaal(ctx)) {
+    const helpText = [
+      "ZOE Operator Cockpit Commands:",
+      "",
+      "/cockpit - Daily operator brief and priorities",
+      "/needsme - Items and decisions awaiting your ruling",
+      "/grill - Answer pending decision cards",
+      "/board - Show all open cards and active lanes",
+      "/working - Tasks currently in progress",
+      "/pulse - Health, models, and spend snapshot",
+      "/companion - Live companion pulse and countdown",
+      "/focus - Toggle hyperfocus mode",
+      "/agenda - Scheduled priorities",
+      "/menu - Show persistent cockpit button bar",
+      "/zg - Manage group permissions and modes",
+      "",
+      "You can also speak or type naturally to delegate tasks, ask questions, or record notes.",
+    ].join("\n");
+    await ctx.reply(helpText);
+    return;
+  }
+
+  // Group help
+  const groupHelp = [
+    "ZOE Assistant in Groups:",
+    "",
+    "• Tag @zaoclaw_bot with your question or reply directly to any message from ZOE.",
+    "• Or use `/ask <question>` to prompt directly.",
+    "• ZOE can answer questions about ZAO, ZAOstock schedules, tasks, and project updates.",
+  ].join("\n");
+  await ctx.reply(groupHelp);
+});
+
+// /ask - ask ZOE a question directly in groups or DMs
+bot.command("ask", async (ctx) => {
+  const chatId = ctx.chat?.id;
+  if (!chatId) return;
+  const prompt = (ctx.match ?? "").toString().trim();
+  if (!prompt) {
+    await ctx.reply("Usage: `/ask <your question>` or simply tag @zaoclaw_bot with your question.");
+    return;
+  }
+  const chatType = ctx.chat.type;
+  if (chatType === "private") {
+    await dispatchConcierge(ctx, prompt, "private", senderLabel(ctx));
+    return;
+  }
+  const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+  const cfg = (await getGroupConfig(chatId)) ?? (await autoRegisterGroup(chatId, title, ctx.from?.id));
+  const gate = shouldRespond(cfg, {
+    fromId: ctx.from?.id ?? 0,
+    botUsername: usernameHolder.value,
+    botId: botIdHolder.value,
+    messageText: prompt,
+    entities: [],
+  });
+  if (!gate.allow) {
+    console.log(`[zoe/groups] /ask in ${chatId} skipped: ${gate.reason}`);
+    return;
+  }
+  enqueueTurn(chatId, () => handleGroupMessage(ctx, prompt, String(chatId))).catch((e) =>
+    console.error("[zoe/index] /ask turn failed:", (e as Error)?.message),
+  );
+});
+
 
 // The agent's proactive grill deps: DM Zaal the next thing that needs him, one at
 // a time, to his DM (never a group). PIN the open question (and unpin the prior
@@ -1512,10 +1583,49 @@ bot.command('list', async (ctx) => {
 // is silently ignored by shouldRespond (sender not in allowlist) - so "add a
 // person to the chat" would not work. Only fires for groups ZOE already knows
 // (getGroupConfig != null), never for random chats; bots are skipped.
-bot.on('message:new_chat_members', async (ctx) => {
+// When ZOE itself is added to a group/channel (my_chat_member status transition):
+bot.on("my_chat_member", async (ctx) => {
+  const update = ctx.myChatMember;
+  if (!update) return;
+  const newStatus = update.new_chat_member.status;
+  if (newStatus !== "member" && newStatus !== "administrator") return;
+
+  const chatId = update.chat.id;
+  const title = "title" in update.chat ? (update.chat.title ?? "(untitled)") : "(untitled)";
+  const addedBy = update.from?.id;
+
+  try {
+    const existing = await getGroupConfig(chatId);
+    if (!existing) {
+      await autoRegisterGroup(chatId, title, addedBy);
+      console.log(`[zoe/groups] auto-registered group ${chatId} ("${title}") via my_chat_member`);
+      await ctx.api.sendMessage(
+        chatId,
+        `Hello! I am ZOE, Zaal's AI assistant. In this group, I'm active on mentions: tag @${usernameHolder.value || "zaoclaw_bot"} or reply to any of my messages to ask questions, check festival schedules, pull up project info, or delegate tasks.`,
+      ).catch(() => undefined);
+    }
+  } catch (err) {
+    console.error("[zoe/groups] my_chat_member registration failed:", (err as Error).message);
+  }
+});
+
+bot.on("message:new_chat_members", async (ctx) => {
   const chatId = ctx.chat?.id;
   if (chatId === undefined) return;
-  const cfg = await getGroupConfig(chatId);
+  const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+  const newMembers = ctx.message?.new_chat_members ?? [];
+  const isBotAdded = newMembers.some((m) => m.id === botIdHolder.value || (m.is_bot && m.username?.toLowerCase() === usernameHolder.value?.toLowerCase()));
+
+  let cfg = await getGroupConfig(chatId);
+  if (!cfg && isBotAdded) {
+    cfg = await autoRegisterGroup(chatId, title, ctx.from?.id);
+    const threadId = ctx.message?.message_thread_id;
+    await ctx.reply(
+      `Hello! I am ZOE, Zaal's AI assistant. In this group, I'm active on mentions: tag @${usernameHolder.value || "zaoclaw_bot"} or reply to any of my messages to ask questions, check festival schedules, pull up project info, or delegate tasks.`,
+      threadId ? { message_thread_id: threadId } : {},
+    ).catch(() => undefined);
+    return;
+  }
   if (!cfg) return;
   const added: string[] = [];
   for (const member of ctx.message?.new_chat_members ?? []) {
@@ -2056,17 +2166,38 @@ bot.on('message:text', async (ctx) => {
   const fromId = ctx.from?.id;
   if (!fromId) return;
 
-  const cfg = await getGroupConfig(chatId);
+  let cfg = await getGroupConfig(chatId);
   if (!cfg) {
-    // Unconfigured group: log non-Zaal sender id for bootstrap discoverability.
-    if (fromId !== zaalId) {
-      console.log(
-        `[zoe/groups] unconfigured chat ${chatId} ("${
-          'title' in ctx.chat ? ctx.chat.title : ''
-        }") msg from ${fromId} (@${ctx.from?.username ?? '?'}) — Zaal: run \`/zg enable\` here to start`,
-      );
+    // If the message is from Zaal or mentions ZOE, auto-register the group on the fly!
+    const entities = (ctx.message.entities ?? []) as ReadonlyArray<{
+      type: string;
+      offset: number;
+      length: number;
+      user?: { id: number };
+    }>;
+    const mentioned = isBotMentioned({
+      fromId,
+      botUsername: usernameHolder.value,
+      botId: botIdHolder.value,
+      messageText: text,
+      replyToFromId: ctx.message.reply_to_message?.from?.id,
+      entities,
+    });
+    const isReplyToBot = botIdHolder.value !== null && ctx.message.reply_to_message?.from?.id === botIdHolder.value;
+    if (fromId === zaalId || mentioned || isReplyToBot) {
+      const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+      cfg = await autoRegisterGroup(chatId, title, fromId);
+      console.log(`[zoe/groups] auto-registered chat ${chatId} ("${title}") from mention/Zaal`);
+    } else {
+      if (fromId !== zaalId) {
+        console.log(
+          `[zoe/groups] unconfigured chat ${chatId} ("${
+            "title" in ctx.chat ? ctx.chat.title : ""
+          }") msg from ${fromId} (@${ctx.from?.username ?? "?"}) — Zaal: run \`/zg enable\` here to start`,
+        );
+      }
+      return;
     }
-    return;
   }
 
   const gate = shouldRespond(cfg, {
@@ -3891,9 +4022,12 @@ async function main(): Promise<void> {
     console.error('[zoe/index] getMe failed:', (err as Error).message);
   }
 
-  // Register the `/` command menu so the underused commands are discoverable.
-  await bot.api.setMyCommands(ZOE_COMMANDS).catch((err: unknown) => {
-    console.error('[zoe/index] setMyCommands failed:', (err as Error).message);
+  // Register the `/` command menus: private cockpit commands for Zaal, assistant commands for groups.
+  await bot.api.setMyCommands(PRIVATE_COMMANDS, { scope: { type: "all_private_chats" } }).catch((err: unknown) => {
+    console.error("[zoe/index] setMyCommands private failed:", (err as Error).message);
+  });
+  await bot.api.setMyCommands(GROUP_COMMANDS, { scope: { type: "all_group_chats" } }).catch((err: unknown) => {
+    console.error("[zoe/index] setMyCommands group failed:", (err as Error).message);
   });
 
   startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });

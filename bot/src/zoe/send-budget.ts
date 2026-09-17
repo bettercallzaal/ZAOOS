@@ -119,7 +119,9 @@
  *           "Never let a general message quota suppress real alerts."
  *
  * NOTHING IS SILENT. Every drop and every deferral is logged twice - a
- * console line for journald and a JSONL row for counting later. A budget that
+ * console line for journald and a JSONL row for counting later. Every
+ * delivered send gets a JSONL row too (outcome `sent`), so the file counts
+ * what arrived as well as what did not. A budget that
  * quietly eats messages is a worse failure than the volume it fixes
  * (silent-failure-guard.md rule 6: a soft-fail must be LOUD).
  *
@@ -356,13 +358,19 @@ export interface SendLogRow {
   reason: string;
   /** First 120 chars, so the log is greppable without becoming a transcript. */
   preview: string;
+  /** On a `sent` row: whether it counted against the cap (replies do not). */
+  counted?: boolean;
 }
 
 async function logDecision(row: SendLogRow): Promise<void> {
-  // journald first: this is the line a human greps when ZOE goes quiet.
-  console.warn(
-    `[zoe/send-budget] ${row.outcome} ${row.cls} -> chat ${row.chatId}: ${row.reason} | ${row.preview}`,
-  );
+  // journald first: this is the line a human greps when ZOE goes quiet. Only
+  // for a block - a delivered send is the normal case and gets the JSONL row
+  // alone, so journald stays a list of what did NOT arrive.
+  if (row.outcome !== 'sent') {
+    console.warn(
+      `[zoe/send-budget] ${row.outcome} ${row.cls} -> chat ${row.chatId}: ${row.reason} | ${row.preview}`,
+    );
+  }
   try {
     await fs.mkdir(zoeHome(), { recursive: true });
     await fs.appendFile(logFile(), `${JSON.stringify(row)}\n`, 'utf8');
@@ -725,6 +733,22 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
       cached = { day: state.day, counted: state.counted + 1 };
       await writeState(cached);
     }
+    // A delivered send is logged too. Until 2026-09-17 only blocks were, so the
+    // log could show everything the budget stopped and nothing it let through:
+    // success was invisible and failure was loud, and a reader counting the
+    // file concluded ZOE delivered nothing (doc 2432 follow-through). The
+    // "under 5 a day" target cannot be checked without this row.
+    await logDecision({
+      at,
+      outcome: 'sent',
+      cls: decision.cls,
+      chatId,
+      countBefore: decision.countBefore,
+      cap: decision.cap,
+      reason: decision.reason,
+      preview: text.slice(0, 120),
+      counted: decision.counts,
+    });
     return result;
   };
 }

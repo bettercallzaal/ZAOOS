@@ -223,7 +223,8 @@ describe('noise - the eight zero-reply types, cut first', () => {
     await gated(1, 'another watchdog restart', { zoeSendClass: 'noise' });
     await gated(1, 'an ordinary status');
     expect(calls.map((c) => c.text)).toEqual(['watchdog restarted a lane', 'an ordinary status']);
-    const log = await readSendLog();
+    // Delivered sends are logged as `sent` too; this test is about what was cut.
+    const log = (await readSendLog()).filter((r) => r.outcome !== 'sent');
     expect(log).toHaveLength(1);
     expect(log[0].cls).toBe('noise');
     expect(log[0].outcome).toBe('dropped');
@@ -316,6 +317,49 @@ describe('classification', () => {
 // ---------------------------------------------------------------------------
 // The gate on the wire
 // ---------------------------------------------------------------------------
+
+describe('the send log counts what arrived, not only what was stopped', () => {
+  const logRows = readSendLog;
+
+  it('writes a sent row for a delivered status send, marked counted', async () => {
+    const { send } = recordingSend();
+    await gateSend(send)(1, 'hello');
+    const rows = await logRows();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ outcome: 'sent', cls: 'status', chatId: 1, counted: true, preview: 'hello' });
+  });
+
+  it('writes a sent row for a reply too, marked not counted', async () => {
+    const { send } = recordingSend();
+    await runWithSendClass('reply', () => gateSend(send)(1, 'answer'));
+    expect((await logRows())[0]).toMatchObject({ outcome: 'sent', cls: 'reply', counted: false });
+  });
+
+  it('a whole day reads back as sent and dropped rows in order', async () => {
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'one');
+    await gated(1, 'two');
+    expect((await logRows()).map((r) => r.outcome)).toEqual(['sent', 'dropped']);
+  });
+
+  it('a send that throws leaves no sent row', async () => {
+    const boom = async () => {
+      throw new Error('telegram 500');
+    };
+    await expect(gateSend(boom as never)(1, 'x')).rejects.toThrow('telegram 500');
+    expect(await logRows()).toEqual([]);
+  });
+
+  it('keeps journald for blocks only - a delivered send prints nothing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { send } = recordingSend();
+    await gateSend(send)(1, 'hello');
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
 
 describe('gateSend', () => {
   it('passes a send through under the cap and returns the real result', async () => {
@@ -472,7 +516,7 @@ describe('gateSend', () => {
     await gated(1, 'a status nobody will see');
     await gated(1, 'a brief held for morning', { zoeSendClass: 'digest' });
 
-    const log = await readSendLog();
+    const log = (await readSendLog()).filter((r) => r.outcome !== 'sent');
     expect(log.map((r) => r.outcome)).toEqual(['dropped', 'deferred']);
     expect(log[0].preview).toContain('a status nobody will see');
     expect(log[0].cap).toBe(1);

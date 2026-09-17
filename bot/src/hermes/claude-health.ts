@@ -26,7 +26,16 @@
  * permanent warning is not a warning.
  *
  * Writes are best-effort and never throw. A health file that cannot be written
- * must not take down the call it was observing.
+ * must not take down the call it was observing. *
+ * THIS MODULE DOES NOT WRITE ~/.config/fleet-claude-auth.state. That file has
+ * ONE owner, infra/vps/claude-auth-check.sh (fleet-claude-auth.timer, every 10
+ * min), which classifies, debounces and alerts on transitions it reads back
+ * from the file. #3531 added a second writer here on 2026-09-16 and the two
+ * disagreed overnight: `down` at 02:12 UTC (the script, 02:12:41 run), `cap`
+ * at 03:07 (this module's hourly :07 probe). Worse than the flapping, a
+ * non-owner `down` makes the owner read prev=down and skip its auth alert.
+ * ZOE's own view lives in CLAUDE_HEALTH_PATH. The owner now writes the state
+ * file mode 0444, so a write from here would fail with EACCES rather than win.
  */
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
@@ -91,10 +100,6 @@ export async function recordClaudeOk(nowMs: number = Date.now(), path: string = 
   const next: ClaudeHealth = { ...cur, lastOkMs: nowMs };
   cachedHealth = next;
   await write(next, path);
-  try {
-    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
-    await fs.writeFile(fleetStatePath, "ok\n", "utf8");
-  } catch {}
 }
 
 /** Record a failed Claude call, keeping why. */
@@ -115,11 +120,6 @@ export async function recordClaudeFailure(
   };
   cachedHealth = next;
   await write(next, path);
-  try {
-    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
-    const val = kind === "auth" ? "down\n" : kind === "usage_limit" ? "cap\n" : "down\n";
-    await fs.writeFile(fleetStatePath, val, 'utf8');
-  } catch {}
 }
 
 function ago(ms: number): string {

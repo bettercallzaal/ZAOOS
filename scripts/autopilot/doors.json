@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "about": "The one-way doors an unattended lane must stop at, as data. door-check.mjs only looks facts up in this file; it holds no judgement of its own. Change the list here, by reviewed PR, never in the code.",
+  "sources": [
+    "agents/DOCTRINE.md, Escalation classes",
+    "~/zao-vault/GENESIS.md, Authority",
+    "~/zaal-dotfiles/claude/autopilot.md, Stop at one-way doors, every time"
+  ],
+  "doors": [
+    {
+      "id": "money",
+      "label": "Money or on-chain: any spend, transaction, trading-parameter change or contract call",
+      "source": "DOCTRINE, GENESIS, autopilot.md",
+      "tools": ["wallet", "transfer", "swap", "payment", "checkout", "x402", "stripe"],
+      "commands": ["\\bcast\\s+send\\b", "\\bforge\\s+script\\b.*--broadcast", "\\bzao-spend\\b", "\\bstripe\\s"],
+      "paths": []
+    },
+    {
+      "id": "outbound",
+      "label": "Publishing or sending to anyone outside ZAO: posts, DMs, email, public pages. Drafts are fine; sending is the door",
+      "source": "DOCTRINE, GENESIS, autopilot.md",
+      "tools": [
+        "Gmail__(send_message|reply|forward)$",
+        "Slack__slack_(send_message|schedule_message)$",
+        "Calendly__.*(create_invitee|cancel_event|create_share|create_organization_invitation)",
+        "Google_Drive__share_file$",
+        "gdocs__(set_drive_file_permissions|manage_drive_access)$",
+        "Canva__.*publish",
+        "github__(create_issue|add_issue_comment)$"
+      ],
+      "commands": [
+        "api\\.telegram\\.org/bot",
+        "\\bzol\\b.*\\b(post|reply)\\b",
+        "\\bneynar\\b",
+        "\\bgh\\s+(issue\\s+create|issue\\s+comment|release\\s+create)\\b",
+        "\\bgh\\s+repo\\s+edit\\b.*--visibility"
+      ],
+      "paths": []
+    },
+    {
+      "id": "deploy",
+      "label": "Deploys to production, merges that autodeploy, and restarting live services",
+      "source": "DOCTRINE (deploys to prod), GENESIS (deploys), autopilot.md (production deploys; never merge your own PR)",
+      "tools": ["merge_pull_request$", "merge_diff$"],
+      "commands": [
+        "\\bvercel\\b.*--prod",
+        "\\bgh\\s+pr\\s+merge\\b",
+        "\\bzao-merge\\b",
+        "\\bgit\\s+push\\b.*\\s(\\S+:)?(main|master)(\\s|$)",
+        "\\bsystemctl\\b.*\\b(restart|start|stop|enable|disable)\\b",
+        "\\bfly\\s+deploy\\b"
+      ],
+      "paths": []
+    },
+    {
+      "id": "migration",
+      "label": "Applying a database migration or schema change. Writing the .sql file in a PR is a two-way door; running it is not",
+      "source": "DOCTRINE (DB migrations, schema changes), GENESIS (migrations)",
+      "tools": ["apply_migration$", "execute_sql$"],
+      "commands": [
+        "\\bsupabase\\s+(db\\s+push|migration\\s+up|db\\s+reset)\\b",
+        "\\bpsql\\b.*\\s-f\\s",
+        "\\b(ALTER|CREATE|DROP)\\s+TABLE\\b"
+      ],
+      "paths": []
+    },
+    {
+      "id": "delete",
+      "label": "Deleting data, files, branches or history. Zaal's standing rule is never delete: supersede, mark or move",
+      "source": "DOCTRINE (deleting data), GENESIS (deletes), autopilot.md (deletes)",
+      "tools": ["delete", "trash", "archiveDashboard$"],
+      "commands": [
+        "\\brm\\s+-[a-zA-Z]*r",
+        "\\bgit\\s+push\\b.*(--force|\\s-f\\b|--delete|\\s:\\S)",
+        "\\bgit\\s+branch\\s+-D\\b",
+        "\\bgit\\s+reset\\s+--hard\\b",
+        "\\bgh\\s+repo\\s+(delete|archive)\\b",
+        "\\b(TRUNCATE|DELETE\\s+FROM)\\b"
+      ],
+      "unless_commands": ["\\brm\\s+-[a-zA-Z]*r[a-zA-Z]*\\s+(\"?\\$TMPDIR|\"?/tmp/|\"?/private/tmp/)\\S*\\s*$"],
+      "paths": []
+    },
+    {
+      "id": "settings",
+      "label": "Env, secret, permission, settings or hook changes",
+      "source": "DOCTRINE (env-var changes), GENESIS (env or permission changes), autopilot.md (permission or settings changes)",
+      "tools": [],
+      "commands": [
+        "\\bvercel\\s+env\\s+(add|rm|pull)\\b",
+        "\\bgh\\s+secret\\s+(set|delete)\\b",
+        "\\bsupabase\\s+secrets\\s+set\\b",
+        "\\bzao-env\\s+set\\b"
+      ],
+      "paths": ["(^|/)\\.env(\\.[^/]*)?$", "(^|/)\\.claude/settings(\\.local)?\\.json$", "(^|/)claude/settings\\.json$", "(^|/)\\.claude/hooks/", "(^|/)\\.git/hooks/"]
+    },
+    {
+      "id": "identity",
+      "label": "Constitution and identity files, and adding a new bot or autonomous loop",
+      "source": "DOCTRINE (Constitution / identity; no new bots without a doc), GENESIS (SOUL.md, its header, DOCTRINE, new bot or loop)",
+      "tools": [],
+      "commands": ["\\bsystemctl\\b.*\\benable\\b", "\\bcrontab\\s+(-e|-r|\\S+\\.cron|-)"],
+      "paths": [
+        "(^|/)SOUL\\.md$",
+        "(^|/)agents/DOCTRINE\\.md$",
+        "(^|/)GENESIS\\.md$",
+        "(^|/)community\\.config\\.ts$",
+        "\\.(service|timer)$"
+      ]
+    }
+  ],
+  "grants": [
+    {
+      "door": "outbound",
+      "decision": "~/zao-vault/decisions/autopilot-may-email-venus-only.md",
+      "decided": "2026-09-11",
+      "scope": "Email to Venus (Artizen), corresponding to improve the ZAO site and Artizen materials",
+      "not_covered": "Publishing her or Artizen's data, committing money, promises on Zaal's behalf, any other recipient",
+      "tools": ["Gmail__(send_message|reply)$"],
+      "recipient": "^venus\\b"
+    }
+  ]
+}

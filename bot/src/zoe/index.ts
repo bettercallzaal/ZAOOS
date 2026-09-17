@@ -172,6 +172,7 @@ import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { shadowSummary } from '../hermes/critic';
 import { getClaudeHeartbeatStatus, readClaudeHealth } from '../hermes/claude-health';
+import { installCrashGuard } from './crash-guard';
 import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback, parseReactionCallback } from './questions';
@@ -362,6 +363,10 @@ if (!zaalIdRaw) {
 
 const zaalId = Number(zaalIdRaw);
 const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
+
+// Fail-loud crash guard: catches uncaught exceptions & unhandled rejections,
+// pings Zaal on Telegram before dying, and exits 0 on SIGTERM/SIGINT.
+installCrashGuard({ botToken: token, zaalId });
 
 const bot = new Bot(token);
 

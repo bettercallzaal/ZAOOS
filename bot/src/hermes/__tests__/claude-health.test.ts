@@ -172,3 +172,35 @@ describe('the health file', () => {
     expect(await readClaudeHealth(path)).toEqual(health());
   });
 });
+
+
+describe('fleet-claude-auth.state writer (card 9772)', () => {
+  let tempDir: string;
+  let fleetStateFile: string;
+
+  beforeEach(async () => {
+    tempDir = await mkdtemp(join(tmpdir(), 'fleet-auth-test-'));
+    fleetStateFile = join(tempDir, 'fleet-claude-auth.state');
+    process.env.FLEET_CLAUDE_AUTH_STATE = fleetStateFile;
+  });
+
+  afterEach(async () => {
+    delete process.env.FLEET_CLAUDE_AUTH_STATE;
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  it('recordClaudeOk writes "ok\\n" to fleet-claude-auth.state', async () => {
+    await recordClaudeOk(T, join(tempDir, 'health.json'));
+    expect(await readFile(fleetStateFile, 'utf8')).toBe('ok\n');
+  });
+
+  it('recordClaudeFailure with usage_limit writes "cap\\n" to fleet-claude-auth.state', async () => {
+    await recordClaudeFailure('usage_limit', 'capped', T, join(tempDir, 'health.json'), '10am');
+    expect(await readFile(fleetStateFile, 'utf8')).toBe('cap\n');
+  });
+
+  it('recordClaudeFailure with auth writes "down\\n" to fleet-claude-auth.state', async () => {
+    await recordClaudeFailure('auth', 'run /login', T, join(tempDir, 'health.json'));
+    expect(await readFile(fleetStateFile, 'utf8')).toBe('down\n');
+  });
+});

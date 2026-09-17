@@ -92,7 +92,7 @@ export async function recordClaudeOk(nowMs: number = Date.now(), path: string = 
   cachedHealth = next;
   await write(next, path);
   try {
-    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
+    const fleetStatePath = process.env.FLEET_CLAUDE_AUTH_STATE ?? join(homedir(), '.config/fleet-claude-auth.state');
     await fs.writeFile(fleetStatePath, "ok\n", "utf8");
   } catch {}
 }
@@ -116,7 +116,7 @@ export async function recordClaudeFailure(
   cachedHealth = next;
   await write(next, path);
   try {
-    const fleetStatePath = join(homedir(), '.config/fleet-claude-auth.state');
+    const fleetStatePath = process.env.FLEET_CLAUDE_AUTH_STATE ?? join(homedir(), '.config/fleet-claude-auth.state');
     const val = kind === "auth" ? "down\n" : kind === "usage_limit" ? "cap\n" : "down\n";
     await fs.writeFile(fleetStatePath, val, 'utf8');
   } catch {}

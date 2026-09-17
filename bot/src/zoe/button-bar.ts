@@ -14,7 +14,7 @@
  * lives in index.ts where the action functions are in scope.
  */
 
-import { Keyboard } from "grammy";
+import { Keyboard, InlineKeyboard } from "grammy";
 
 /** The six bar labels. index.ts checks membership before treating text as chat. */
 export const BAR_LABELS = ["Needs Me", "Agenda", "Focus", "Board", "Budget", "Note"] as const;
@@ -64,3 +64,19 @@ export const GROUP_COMMANDS = [
 
 /** Backward compatibility alias for any caller expecting ZOE_COMMANDS */
 export const ZOE_COMMANDS = PRIVATE_COMMANDS;
+
+/**
+ * Interactive inline keyboard for the /cockpit brief.
+ * Enables one-tap refresh, drill-down into pending decisions, agenda, board, pulse, and focus.
+ */
+export function buildCockpitKeyboard(focusActive = false): InlineKeyboard {
+  return new InlineKeyboard()
+    .text("Refresh", "cp:refresh")
+    .text("Needs Me", "cp:needsme")
+    .row()
+    .text("Agenda", "cp:agenda")
+    .text("Board", "cp:board")
+    .row()
+    .text("Pulse", "cp:pulse")
+    .text(focusActive ? "Unfocus" : "Focus", "cp:focus");
+}

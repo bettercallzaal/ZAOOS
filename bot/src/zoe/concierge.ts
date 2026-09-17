@@ -27,8 +27,9 @@ const ZOE_VERSION = '0.2.0';
  * The user's message is passed separately as `prompt`.
  */
 export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean): string {
+  const isPrivate = blocks.chat_scope === 'private';
   const chatLine =
-    blocks.chat_scope === 'private'
+    isPrivate
       ? 'Chat: DM with Zaal'
       : `Chat: group "${blocks.chat_title ?? blocks.chat_scope}" (id ${blocks.chat_scope})`;
 
@@ -90,20 +91,29 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
     blocks.persona,
     `</persona>`,
     ``,
-    `<human>`,
-    blocks.human,
-    `</human>`,
-    ``,
+    ...(isPrivate
+      ? [
+          `<human>`,
+          blocks.human,
+          `</human>`,
+          ``,
+        ]
+      : blocks.group_context
+      ? [
+          `<group_context>`,
+          blocks.group_context,
+          `</group_context>`,
+          ``,
+        ]
+      : []),
     `<working_memory>`,
     chatLine,
     blocks.working,
     `</working_memory>`,
     ``,
-    // For conversational turns (short chat, no work keywords) skip the heavy
-    // task/quest/thread context — it's irrelevant overhead and slows the reply.
-    ...(conversational
-      ? []
-      : [
+    // Private DM context only (suppressed in group chats to protect privacy)
+    ...(isPrivate && !conversational
+      ? [
           `<tasks>`,
           blocks.tasks,
           `</tasks>`,
@@ -121,7 +131,8 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
           ...(blocks.companion_presence
             ? ["", "<companion_presence>", blocks.companion_presence, "</companion_presence>"]
             : []),
-        ]),
+        ]
+      : []),
     ...recallBlock,
     ...brandBlock,
     ...linkResearchBlock,

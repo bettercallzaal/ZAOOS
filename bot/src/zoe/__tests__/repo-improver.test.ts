@@ -6,6 +6,7 @@ import {
   parseVerdict,
   runRepoImproverScout,
   reviewProposedImprovements,
+  shouldRaiseAlarm,
   SCOUT_REPOS,
   type ScoutDeps,
   type ReviewDeps,
@@ -171,8 +172,48 @@ describe('reviewProposedImprovements (ZOE self-gate + learn)', () => {
     expect(d.markStatus).toHaveBeenCalledWith('imp-1', 'escalated', expect.anything());
     expect(status).toContain('reviewed 1');
   });
+  it('dispatch throw -> goes out as an ALARM, not a status log, and is counted as errored', async () => {
+    // Verbatim error from journald 2026-09-16 21:30:10.
+    const msg = "createRun failed: Could not find the table 'public.hermes_runs' in the schema cache";
+    const alarm = vi.fn(async () => {});
+    const d = deps({ alarm, dispatchFix: vi.fn(async () => { throw new Error(msg); }) });
+    const status = await reviewProposedImprovements(d);
+    expect(alarm).toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+    expect(d.log).not.toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+    expect(status).toContain('1 errored');
+  });
+  it('dispatch throw without an alarm sink still reaches the log', async () => {
+    const d = deps({ dispatchFix: vi.fn(async () => { throw new Error('boom'); }) });
+    await reviewProposedImprovements(d);
+    expect(d.log).toHaveBeenCalledWith(expect.stringContaining('boom'));
+  });
+  it('a successful fix reports 0 errored', async () => {
+    expect(await reviewProposedImprovements(deps())).toContain('0 errored');
+  });
   it('nothing to review is a no-op', async () => {
     const d = deps({ fetchProposed: vi.fn(async () => []) });
     expect(await reviewProposedImprovements(d)).toBe('nothing to review');
+  });
+});
+
+describe('shouldRaiseAlarm', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  it('raises the first time a key is seen', () => {
+    expect(shouldRaiseAlarm('k', new Map(), 1000)).toBe(true);
+  });
+  it('suppresses a repeat inside the window', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('k', m, 0);
+    expect(shouldRaiseAlarm('k', m, DAY - 1)).toBe(false);
+  });
+  it('raises again once the window has passed', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('k', m, 0);
+    expect(shouldRaiseAlarm('k', m, DAY)).toBe(true);
+  });
+  it('keys are independent', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('a', m, 0);
+    expect(shouldRaiseAlarm('b', m, 1)).toBe(true);
   });
 });

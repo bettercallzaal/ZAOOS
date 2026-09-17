@@ -241,9 +241,12 @@ function heart(): HeartFleet {
  * its own copy of the lease dance. Two hand-written copies is how the resource-id
  * bug reached both of them (code-restraint rung 2: reuse beats rewrite).
  */
-async function runRepoImproverScout(log: (m: string) => Promise<void>): Promise<ExecuteOutcome<void>> {
+async function runRepoImproverScout(
+  log: (m: string) => Promise<void>,
+  alarm: (m: string) => Promise<void>,
+): Promise<ExecuteOutcome<void>> {
   return runTickLeased('repo-improver-scout', repoImproverLeaseEnabled(), 120, () =>
-    runRepoImproverTick(log),
+    runRepoImproverTick(log, alarm),
   );
 }
 
@@ -1518,9 +1521,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // Chunk the send: audits routinely exceed Telegram's 4096-char limit and
         // were getting truncated mid-sentence (tg-chunk.ts). Never raw-send long text.
         try {
-          await runRepoImproverScout(async (text: string) => {
-            await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
-          });
+          await runRepoImproverScout(
+            async (text: string) => {
+              await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
+            },
+            // A broken fix pipeline is an alarm, not a status: status sends are
+            // dropped once the day's cap is spent, which is how the missing
+            // hermes_runs table went unheard (journald, 2026-09-16).
+            async (text: string) => {
+              await runWithSendClass('alarm', () =>
+                sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text),
+              );
+            },
+          );
         } catch (err) {
           console.error('[zoe/scheduler] repo-improver scout failed:', (err as Error).message);
         }

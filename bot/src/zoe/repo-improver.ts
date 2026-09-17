@@ -215,6 +215,35 @@ export interface ReviewDeps {
   }) => Promise<{ kind: 'ready' | 'failed' | 'escalated'; prUrl: string | null; runId: string; reason?: string }>;
   /** Status log to the group (not a question) + the durable learning log. */
   log: (message: string) => Promise<void>;
+  /**
+   * An INFRASTRUCTURE failure - the fix pipeline itself is broken, not a
+   * judgement call. Sent as an alarm, never a status. Falls back to `log`.
+   *
+   * Why it exists: the pipeline threw "Could not find the table
+   * 'public.hermes_runs'" on every approved fix, and that line went out through
+   * `log` as a status send, which the send budget DROPS once the day's cap is
+   * spent ("cap spent (23/3) - dropped", journald 2026-09-16 03:30 and 21:30).
+   * The failure was reported every time and delivered never.
+   */
+  alarm?: (message: string) => Promise<void>;
+}
+
+/**
+ * Should an alarm with this key go out now? At most once per key per window,
+ * so a pipeline that stays broken is announced daily rather than every tick
+ * (noisy-signal-guard.md: a repeating alarm stops being read). Pure: the
+ * caller owns the map. Records the send when it returns true.
+ */
+export function shouldRaiseAlarm(
+  key: string,
+  lastRaised: Map<string, number>,
+  now: number,
+  windowMs: number = 24 * 60 * 60 * 1000,
+): boolean {
+  const prev = lastRaised.get(key);
+  if (prev !== undefined && now - prev < windowMs) return false;
+  lastRaised.set(key, now);
+  return true;
 }
 
 /**
@@ -226,6 +255,7 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
   if (rows.length === 0) return 'nothing to review';
   let approved = 0;
   let rejected = 0;
+  let errored = 0;
 
   for (const row of rows) {
     const verdict = parseVerdict(
@@ -267,7 +297,10 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
       result = await deps.dispatchFix({ issueText, targetRepo: target });
     } catch (err) {
       await deps.markStatus(row.id, 'escalated', { zoe_reasoning: verdict.reasoning });
-      await deps.log(`[repo-improver] ${row.repo} - fix pipeline errored: ${(err as Error)?.message ?? err}`);
+      errored++;
+      await (deps.alarm ?? deps.log)(
+        `[repo-improver] ${row.repo} - fix pipeline errored: ${(err as Error)?.message ?? err}`,
+      );
       continue;
     }
 
@@ -284,5 +317,5 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
     }
   }
 
-  return `reviewed ${rows.length}: ${approved} approved, ${rejected} rejected`;
+  return `reviewed ${rows.length}: ${approved} approved, ${rejected} rejected, ${errored} errored`;
 }

@@ -26,6 +26,7 @@ import {
   nextRepoIndex,
   runRepoImproverScout,
   reviewProposedImprovements,
+  shouldRaiseAlarm,
   type ScoutRepo,
   type ScoutDeps,
   type ReviewDeps,
@@ -115,7 +116,10 @@ function defaultScoutDeps(): ScoutDeps {
   };
 }
 
-function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
+function defaultReviewDeps(
+  log: (m: string) => Promise<void>,
+  alarm?: (m: string) => Promise<void>,
+): ReviewDeps {
   return {
     fetchProposed: async (): Promise<ImprovementRow[]> => {
       const { data, error } = await db()
@@ -172,7 +176,42 @@ function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
       return { kind: res.kind, prUrl: null, runId: res.run.id, reason: res.reason };
     },
     log,
+    alarm,
   };
+}
+
+/** Process-lifetime record of when each alarm key last went out. */
+const lastAlarm = new Map<string, number>();
+
+/**
+ * Wrap a raw alarm sender so each distinct message goes out at most once a
+ * day, and every suppressed repeat still leaves a journald line.
+ */
+function dedupedAlarm(send: (m: string) => Promise<void>): (m: string) => Promise<void> {
+  return async (message: string) => {
+    if (!shouldRaiseAlarm(message, lastAlarm, Date.now())) {
+      console.error(`[repo-improver] alarm suppressed (already raised within 24h): ${message}`);
+      return;
+    }
+    console.error(`[repo-improver] ALARM: ${message}`);
+    await send(message);
+  };
+}
+
+/**
+ * Can the fix pipeline write its run log at all? The pipeline only touches
+ * hermes_runs when ZOE approves a finding for a repo with a fix target, which
+ * on the live rotation is a few ticks a week - so without this probe a missing
+ * table is only discovered by the rare tick that needs it. Returns the error
+ * text, or null when the table answers.
+ */
+async function probeHermesRuns(): Promise<string | null> {
+  try {
+    const { error } = await db().from('hermes_runs').select('id', { count: 'exact', head: true }).limit(1);
+    return error ? error.message : null;
+  } catch (err) {
+    return (err as Error)?.message ?? String(err);
+  }
 }
 
 /**
@@ -180,11 +219,23 @@ function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
  * proposed findings (its own gate) and route approved fixes. `log` posts status
  * to the group (not a question) and is the durable learning trail.
  */
-export async function runRepoImproverTick(log: (m: string) => Promise<void>): Promise<void> {
+export async function runRepoImproverTick(
+  log: (m: string) => Promise<void>,
+  alarm?: (m: string) => Promise<void>,
+): Promise<void> {
+  const raise = alarm ? dedupedAlarm(alarm) : undefined;
   try {
+    const probe = await probeHermesRuns();
+    if (probe) {
+      const message =
+        `[repo-improver] fix pipeline cannot run: hermes_runs is unreachable (${probe}). ` +
+        'Every approved fix will fail until it answers. The migration is bot/migrations/hermes_runs.sql - applying it is Zaal\'s.';
+      if (raise) await raise(message);
+      else console.error(message);
+    }
     const scoutStatus = await runRepoImproverScout(defaultScoutDeps());
     console.log(`[repo-improver] scout: ${scoutStatus}`);
-    const reviewStatus = await reviewProposedImprovements(defaultReviewDeps(log));
+    const reviewStatus = await reviewProposedImprovements(defaultReviewDeps(log, raise));
     console.log(`[repo-improver] review: ${reviewStatus}`);
   } catch (err) {
     console.error('[repo-improver] tick failed:', (err as Error)?.message ?? err);

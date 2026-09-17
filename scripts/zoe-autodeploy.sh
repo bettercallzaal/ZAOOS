@@ -87,7 +87,7 @@ fi
 
 systemctl --user restart zoe-bot
 sleep 12
-if systemctl --user is-active zoe-bot >/dev/null 2>&1 && ! journalctl --user -u zoe-bot --since "20 seconds ago" --no-pager 2>/dev/null | grep -qiE 'TransformError|Error \[|crash'; then
+if systemctl --user is-active zoe-bot >/dev/null 2>&1 && ! journalctl --user -u zoe-bot --since "20 seconds ago" --no-pager 2>/dev/null | grep -v 'shutting down cleanly' | grep -qiE 'TransformError|Error \[|crash'; then
   ~/bin/zao-status "autodeploy OK: ZOE live on $(git rev-parse --short HEAD) - $(git log -1 --format=%s | cut -c1-55)" 2>/dev/null
 else
   git checkout --quiet "$PREV" 2>/dev/null

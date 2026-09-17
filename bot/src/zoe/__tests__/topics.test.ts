@@ -20,6 +20,7 @@ import {
   readTopics,
   STANDARD_TOPICS,
   writeTopics,
+  resolveForumThread,
 } from '../topics';
 
 afterEach(() => vi.clearAllMocks());
@@ -119,5 +120,49 @@ describe('getTopicThread', () => {
   it('returns undefined for an unknown topic', async () => {
     mockReadFile.mockResolvedValue(JSON.stringify({ Research: 101 }));
     expect(await getTopicThread('Unknown')).toBeUndefined();
+  });
+});
+
+
+// ── resolveForumThread ────────────────────────────────────────────────────────
+
+describe("resolveForumThread", () => {
+  const origEnv = process.env;
+
+  beforeEach(() => {
+    process.env = { ...origEnv };
+  });
+
+  afterEach(() => {
+    process.env = origEnv;
+  });
+
+  it("returns number when envSpec is a positive number", async () => {
+    expect(await resolveForumThread(42)).toBe(42);
+  });
+
+  it("returns number from process.env string spec", async () => {
+    process.env.TEST_THREAD = "99";
+    expect(await resolveForumThread("TEST_THREAD")).toBe(99);
+  });
+
+  it("returns number from first matching env var in string array", async () => {
+    process.env.ALT_THREAD = "105";
+    expect(await resolveForumThread(["UNSET_THREAD", "ALT_THREAD"])).toBe(105);
+  });
+
+  it("falls back to topic name when env is unset", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ Coding: 19 }));
+    expect(await resolveForumThread("UNSET_THREAD", "Coding")).toBe(19);
+  });
+
+  it("skips GENERAL_THREAD_SENTINEL (0) fallback and returns undefined or next topic", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ General: 0, "Claude Code": 14 }));
+    expect(await resolveForumThread(undefined, "General", "Claude Code")).toBe(14);
+  });
+
+  it("returns undefined when no env and no topic match", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ Other: 5 }));
+    expect(await resolveForumThread("UNSET_THREAD", "NonExistent")).toBeUndefined();
   });
 });

@@ -46,6 +46,29 @@ export const ZAAL_BOTZ_RESEARCH_THREAD = numOf(
   "ZAALBOTS_STATUS_THREAD_ID",
 );
 
+/** The Handoffs forum topic id within the group. */
+export const ZAAL_BOTZ_HANDOFFS_THREAD = numOf(
+  "ZAAL_BOTZ_HANDOFFS_THREAD",
+  "ZAALBOTS_HANDOFFS_THREAD_ID",
+);
+
+/** The Claude Code / Questions forum topic id within the group. */
+export const ZAAL_BOTZ_QUESTIONS_THREAD = numOf(
+  "ZAAL_BOTZ_QUESTIONS_THREAD",
+  "ZAAL_BOTZ_CLAUDE_CODE_THREAD",
+);
+
+/** The Coding / Engineering forum topic id within the group. */
+export const ZAAL_BOTZ_CODING_THREAD = numOf(
+  "ZAAL_BOTZ_CODING_THREAD",
+);
+
+/** The ZAO / ZAOstock forum topic id within the group. */
+export const ZAAL_BOTZ_ZAOSTOCK_THREAD = numOf(
+  "ZAAL_BOTZ_ZAOSTOCK_THREAD",
+  "ZAAL_BOTZ_THE_ZAO_THREAD",
+);
+
 interface EnvSpec {
   label: string;
   value: number | string | undefined;
@@ -57,6 +80,10 @@ const SPECS: EnvSpec[] = [
   { label: "ZAAL_DM_ID", value: ZAAL_DM_ID, required: true, aliases: "ZAAL_TELEGRAM_ID | ZAAL_DM_ID | ZAAL_CHAT_ID" },
   { label: "ZAAL_BOTZ_GROUP_ID", value: ZAAL_BOTZ_GROUP_ID, required: false, aliases: "ZAAL_BOTZ_GROUP_ID | ZAALBOTS_GROUP_CHAT_ID" },
   { label: "ZAAL_BOTZ_RESEARCH_THREAD", value: ZAAL_BOTZ_RESEARCH_THREAD, required: false, aliases: "ZAAL_BOTZ_RESEARCH_THREAD | ZAALBOTS_STATUS_THREAD_ID" },
+  { label: "ZAAL_BOTZ_HANDOFFS_THREAD", value: ZAAL_BOTZ_HANDOFFS_THREAD, required: false, aliases: "ZAAL_BOTZ_HANDOFFS_THREAD | ZAALBOTS_HANDOFFS_THREAD_ID" },
+  { label: "ZAAL_BOTZ_QUESTIONS_THREAD", value: ZAAL_BOTZ_QUESTIONS_THREAD, required: false, aliases: "ZAAL_BOTZ_QUESTIONS_THREAD | ZAAL_BOTZ_CLAUDE_CODE_THREAD" },
+  { label: "ZAAL_BOTZ_CODING_THREAD", value: ZAAL_BOTZ_CODING_THREAD, required: false, aliases: "ZAAL_BOTZ_CODING_THREAD" },
+  { label: "ZAAL_BOTZ_ZAOSTOCK_THREAD", value: ZAAL_BOTZ_ZAOSTOCK_THREAD, required: false, aliases: "ZAAL_BOTZ_ZAOSTOCK_THREAD | ZAAL_BOTZ_THE_ZAO_THREAD" },
 ];
 
 /**

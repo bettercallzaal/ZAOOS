@@ -58,3 +58,33 @@ export async function writeTopics(map: TopicMap): Promise<void> {
 export async function getTopicThread(name: string): Promise<number | undefined> {
   return (await readTopics())[name];
 }
+
+/**
+ * Resolve a forum thread ID for a category in ZAAL BOTZ.
+ * Checks an explicit env var or pre-parsed value first, then falls back to topics.json lookup,
+ * returning undefined if none match or if resolved to GENERAL_THREAD_SENTINEL.
+ */
+export async function resolveForumThread(
+  envSpec?: string | string[] | number,
+  ...topicNameFallbacks: string[]
+): Promise<number | undefined> {
+  if (typeof envSpec === "number" && envSpec > 0) {
+    return envSpec;
+  }
+  if (typeof envSpec === "string") {
+    const val = Number(process.env[envSpec] ?? 0);
+    if (val > 0) return val;
+  } else if (Array.isArray(envSpec)) {
+    for (const v of envSpec) {
+      const val = Number(process.env[v] ?? 0);
+      if (val > 0) return val;
+    }
+  }
+  for (const name of topicNameFallbacks) {
+    const thread = await getTopicThread(name);
+    if (thread !== undefined && thread !== GENERAL_THREAD_SENTINEL) {
+      return thread;
+    }
+  }
+  return undefined;
+}

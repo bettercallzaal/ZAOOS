@@ -13,7 +13,7 @@ import { buildCockpitBrief, formatCockpitBrief, formatCockpitBriefCli, saveBrief
 import type { CockpitBrief, CockpitMode } from './types';
 
 const COCKPIT_MODEL = 'sonnet'; // episode: Sonnet is the operational harness model - fast, capable, cheap
-const COCKPIT_BUDGET_USD = 0.1;
+export const COCKPIT_BUDGET_USD = 0.5; // Raised from 0.1: on large estates (100+ cards), Sonnet context creation exceeds 0.1
 const COCKPIT_TIMEOUT_MS = 120_000;
 const REPO_DIR = process.env.COCKPIT_CWD || '/home/zaal/zao-os';
 

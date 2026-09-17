@@ -107,6 +107,16 @@ describe('standing grants are data too', () => {
   });
 });
 
+describe('the list says where it came from', () => {
+  it('every door names its sources and states where they disagree', () => {
+    for (const door of list.doors) {
+      expect(door.named_by.length, door.id).toBeGreaterThan(0);
+      expect(String(door.sources_disagree ?? '').length, door.id).toBeGreaterThan(20);
+    }
+    expect(list.not_encodable).toContain('anything irreversible');
+  });
+});
+
 describe('the list is data, not code judgement (red control on a different artifact)', () => {
   it('removing a door from the JSON flips its verdict, with no code change', () => {
     const dir = mkdtempSync(join(tmpdir(), 'doors-'));

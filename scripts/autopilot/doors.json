@@ -11,9 +11,28 @@
       "id": "money",
       "label": "Money or on-chain: any spend, transaction, trading-parameter change or contract call",
       "source": "DOCTRINE, GENESIS, autopilot.md",
-      "tools": ["wallet", "transfer", "swap", "payment", "checkout", "x402", "stripe"],
-      "commands": ["\\bcast\\s+send\\b", "\\bforge\\s+script\\b.*--broadcast", "\\bzao-spend\\b", "\\bstripe\\s"],
-      "paths": []
+      "tools": [
+        "wallet",
+        "transfer",
+        "swap",
+        "payment",
+        "checkout",
+        "x402",
+        "stripe"
+      ],
+      "commands": [
+        "\\bcast\\s+send\\b",
+        "\\bforge\\s+script\\b.*--broadcast",
+        "\\bzao-spend\\b",
+        "\\bstripe\\s"
+      ],
+      "paths": [],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS",
+        "autopilot.md"
+      ],
+      "sources_disagree": "Agree. Only DOCTRINE spells out trading-parameter changes and contract calls."
     },
     {
       "id": "outbound",
@@ -35,13 +54,22 @@
         "\\bgh\\s+(issue\\s+create|issue\\s+comment|release\\s+create)\\b",
         "\\bgh\\s+repo\\s+edit\\b.*--visibility"
       ],
-      "paths": []
+      "paths": [],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS",
+        "autopilot.md"
+      ],
+      "sources_disagree": "DISAGREE on scope. DOCTRINE and GENESIS: reaching anyone OUTSIDE ZAO. autopilot.md: 'anything outbound (messages, emails, posts, public pages)', with no inside/outside split. This list follows autopilot.md, the stricter one: a Telegram bot send is a door even to a ZAO group."
     },
     {
       "id": "deploy",
       "label": "Deploys to production, merges that autodeploy, and restarting live services",
       "source": "DOCTRINE (deploys to prod), GENESIS (deploys), autopilot.md (production deploys; never merge your own PR)",
-      "tools": ["merge_pull_request$", "merge_diff$"],
+      "tools": [
+        "merge_pull_request$",
+        "merge_diff$"
+      ],
       "commands": [
         "\\bvercel\\b.*--prod",
         "\\bgh\\s+pr\\s+merge\\b",
@@ -50,25 +78,43 @@
         "\\bsystemctl\\b.*\\b(restart|start|stop|enable|disable)\\b",
         "\\bfly\\s+deploy\\b"
       ],
-      "paths": []
+      "paths": [],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS",
+        "autopilot.md"
+      ],
+      "sources_disagree": "All three name deploys (DOCTRINE and autopilot.md say production). NONE of the three door lists names merges or service restarts. 'gh pr merge' / 'zao-merge' come from autopilot.md step 3 ('never merge your own PR') and zj holding merges; systemctl restart/stop was added by this lane as deploy-equivalent on the VPS. Both are this file's reading, not a source's."
     },
     {
       "id": "migration",
       "label": "Applying a database migration or schema change. Writing the .sql file in a PR is a two-way door; running it is not",
       "source": "DOCTRINE (DB migrations, schema changes), GENESIS (migrations)",
-      "tools": ["apply_migration$", "execute_sql$"],
+      "tools": [
+        "apply_migration$",
+        "execute_sql$"
+      ],
       "commands": [
         "\\bsupabase\\s+(db\\s+push|migration\\s+up|db\\s+reset)\\b",
         "\\bpsql\\b.*\\s-f\\s",
         "\\b(ALTER|CREATE|DROP)\\s+TABLE\\b"
       ],
-      "paths": []
+      "paths": [],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS"
+      ],
+      "sources_disagree": "autopilot.md does not name migrations; it is covered there only by 'anything irreversible'. DOCTRINE adds schema changes."
     },
     {
       "id": "delete",
       "label": "Deleting data, files, branches or history. Zaal's standing rule is never delete: supersede, mark or move",
       "source": "DOCTRINE (deleting data), GENESIS (deletes), autopilot.md (deletes)",
-      "tools": ["delete", "trash", "archiveDashboard$"],
+      "tools": [
+        "delete",
+        "trash",
+        "archiveDashboard$"
+      ],
       "commands": [
         "\\brm\\s+-[a-zA-Z]*r",
         "\\bgit\\s+push\\b.*(--force|\\s-f\\b|--delete|\\s:\\S)",
@@ -77,8 +123,16 @@
         "\\bgh\\s+repo\\s+(delete|archive)\\b",
         "\\b(TRUNCATE|DELETE\\s+FROM)\\b"
       ],
-      "unless_commands": ["\\brm\\s+-[a-zA-Z]*r[a-zA-Z]*\\s+(\"?\\$TMPDIR|\"?/tmp/|\"?/private/tmp/)\\S*\\s*$"],
-      "paths": []
+      "unless_commands": [
+        "\\brm\\s+-[a-zA-Z]*r[a-zA-Z]*\\s+(\"?\\$TMPDIR|\"?/tmp/|\"?/private/tmp/)\\S*\\s*$"
+      ],
+      "paths": [],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS",
+        "autopilot.md"
+      ],
+      "sources_disagree": "DOCTRINE says 'deleting data'; GENESIS and autopilot.md say 'deletes' of anything. This list follows the wider reading (files, branches, history). 'git reset --hard' was added by this lane as irreversible, not named by any source."
     },
     {
       "id": "settings",
@@ -91,21 +145,41 @@
         "\\bsupabase\\s+secrets\\s+set\\b",
         "\\bzao-env\\s+set\\b"
       ],
-      "paths": ["(^|/)\\.env(\\.[^/]*)?$", "(^|/)\\.claude/settings(\\.local)?\\.json$", "(^|/)claude/settings\\.json$", "(^|/)\\.claude/hooks/", "(^|/)\\.git/hooks/"]
+      "paths": [
+        "(^|/)\\.env(\\.[^/]*)?$",
+        "(^|/)\\.claude/settings(\\.local)?\\.json$",
+        "(^|/)claude/settings\\.json$",
+        "(^|/)\\.claude/hooks/",
+        "(^|/)\\.git/hooks/"
+      ],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS",
+        "autopilot.md"
+      ],
+      "sources_disagree": "DISAGREE on what is covered. DOCTRINE: env-var changes only. GENESIS: env or permission changes. autopilot.md: permission or settings changes, not env. This list is the union: env, secrets, permissions, settings and hooks."
     },
     {
       "id": "identity",
       "label": "Constitution and identity files, and adding a new bot or autonomous loop",
       "source": "DOCTRINE (Constitution / identity; no new bots without a doc), GENESIS (SOUL.md, its header, DOCTRINE, new bot or loop)",
       "tools": [],
-      "commands": ["\\bsystemctl\\b.*\\benable\\b", "\\bcrontab\\s+(-e|-r|\\S+\\.cron|-)"],
+      "commands": [
+        "\\bsystemctl\\b.*\\benable\\b",
+        "\\bcrontab\\s+(-e|-r|\\S+\\.cron|-)"
+      ],
       "paths": [
         "(^|/)SOUL\\.md$",
         "(^|/)agents/DOCTRINE\\.md$",
         "(^|/)GENESIS\\.md$",
         "(^|/)community\\.config\\.ts$",
         "\\.(service|timer)$"
-      ]
+      ],
+      "named_by": [
+        "DOCTRINE",
+        "GENESIS"
+      ],
+      "sources_disagree": "DISAGREE. DOCTRINE lists community.config.ts (under irreversible infra), its own file, SOUL.md and new bots/loops. GENESIS lists SOUL.md, its own header, agents/DOCTRINE.md and new bots/loops, and does not name community.config.ts. autopilot.md names none of this class. Unit files (.service/.timer) and crontab edits stand in for 'adding a new bot or autonomous loop'."
     }
   ],
   "grants": [
@@ -115,8 +189,11 @@
       "decided": "2026-09-11",
       "scope": "Email to Venus (Artizen), corresponding to improve the ZAO site and Artizen materials",
       "not_covered": "Publishing her or Artizen's data, committing money, promises on Zaal's behalf, any other recipient",
-      "tools": ["Gmail__(send_message|reply)$"],
+      "tools": [
+        "Gmail__(send_message|reply)$"
+      ],
       "recipient": "^venus\\b"
     }
-  ]
+  ],
+  "not_encodable": "autopilot.md also stops at 'anything irreversible'. That is a judgement, not a pattern, and no data file can hold it: a lane still owes it after door-check says two-way."
 }

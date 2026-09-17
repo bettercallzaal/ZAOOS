@@ -27,6 +27,7 @@ import { generateEveningReflection } from './reflect';
 import { generateNightlyRecap } from './recap';
 import { persistDailyDigest } from './afferent-digest';
 import { rolloverNotes } from './daily-note';
+import { runNeedsZaalDigest } from './needs-zaal-digest';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
@@ -957,6 +958,58 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.error('[zoe/scheduler] daily note rollover failed:', (err as Error).message);
         }
       },
+      { timezone: 'America/New_York' },
+    ),
+  );
+
+  // Needs Zaal Digest (Morning) — 08:00 ET (America/New_York)
+  // Built from open tracker cards, lane ## for the grill sections, and cards due <48h.
+  tasks.push(
+    cron.schedule(
+      '0 8 * * *',
+      () =>
+        runWithSendClass('digest', async () => {
+          if (!(await claimFire('needs-zaal-morning'))) return;
+          try {
+            const res = await runNeedsZaalDigest({
+              botApi: opts.bot.api,
+              zaalTgId: opts.zaalTgId,
+              timeSlot: 'morning',
+            });
+            console.log(
+              `[zoe/scheduler] morning needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+            );
+          } catch (err) {
+            await releaseFire('needs-zaal-morning');
+            console.error('[zoe/scheduler] morning needs-zaal digest failed:', (err as Error).message);
+          }
+        }),
+      { timezone: 'America/New_York' },
+    ),
+  );
+
+  // Needs Zaal Digest (Evening) — 20:00 ET (America/New_York)
+  // Second daily sweep so Zaal catches evening lane handoffs and night deadlines.
+  tasks.push(
+    cron.schedule(
+      '0 20 * * *',
+      () =>
+        runWithSendClass('digest', async () => {
+          if (!(await claimFire('needs-zaal-evening'))) return;
+          try {
+            const res = await runNeedsZaalDigest({
+              botApi: opts.bot.api,
+              zaalTgId: opts.zaalTgId,
+              timeSlot: 'evening',
+            });
+            console.log(
+              `[zoe/scheduler] evening needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+            );
+          } catch (err) {
+            await releaseFire('needs-zaal-evening');
+            console.error('[zoe/scheduler] evening needs-zaal digest failed:', (err as Error).message);
+          }
+        }),
       { timezone: 'America/New_York' },
     ),
   );

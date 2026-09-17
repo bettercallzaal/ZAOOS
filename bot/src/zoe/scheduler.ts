@@ -37,6 +37,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps, flushOutbox, describeOutbox } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
+import { asAlarmSend } from './repo-improver';
 import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
 import {
@@ -1528,11 +1529,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             // A broken fix pipeline is an alarm, not a status: status sends are
             // dropped once the day's cap is spent, which is how the missing
             // hermes_runs table went unheard (journald, 2026-09-16).
-            async (text: string) => {
-              await runWithSendClass('alarm', () =>
-                sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text),
-              );
-            },
+            asAlarmSend(async (text: string) => {
+              await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
+            }),
           );
         } catch (err) {
           console.error('[zoe/scheduler] repo-improver scout failed:', (err as Error).message);

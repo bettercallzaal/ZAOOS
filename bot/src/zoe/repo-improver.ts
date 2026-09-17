@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { mcEmit } from './mission-control';
 import type { HermesRepoTarget } from '../hermes/types';
 import { featureRan } from './feature-ran';
+import { runWithSendClass } from './send-budget';
 
 /** The repos the scout rotates through. hermesTarget=null => surface-only (no auto-fix target yet). */
 export interface ScoutRepo {
@@ -244,6 +245,59 @@ export function shouldRaiseAlarm(
   if (prev !== undefined && now - prev < windowMs) return false;
   lastRaised.set(key, now);
   return true;
+}
+
+/**
+ * Wrap a raw alarm sender so each distinct message goes out at most once per
+ * window, and every suppressed repeat still leaves a journald line.
+ */
+export function dedupeAlarm(
+  send: (message: string) => Promise<void>,
+  lastRaised: Map<string, number>,
+  now: () => number = () => Date.now(),
+  trail: (line: string) => void = (line) => console.error(line),
+): (message: string) => Promise<void> {
+  return async (message: string) => {
+    if (!shouldRaiseAlarm(message, lastRaised, now())) {
+      trail(`[repo-improver] alarm suppressed (already raised within 24h): ${message}`);
+      return;
+    }
+    trail(`[repo-improver] ALARM: ${message}`);
+    await send(message);
+  };
+}
+
+/**
+ * Make a sender an alarm sender: every send inside it is classed `alarm`, which
+ * the send budget always passes and never queues. Without the class a send
+ * defaults to `status`, and status is what was dropped past the cap.
+ */
+export function asAlarmSend(send: (message: string) => Promise<void>): (message: string) => Promise<void> {
+  return (message: string) => runWithSendClass('alarm', () => send(message));
+}
+
+export const HERMES_RUNS_MIGRATION = 'bot/migrations/hermes_runs.sql';
+
+/**
+ * Probe the fix pipeline's run log before the tick does anything else, and
+ * raise an alarm when it does not answer. The pipeline only touches hermes_runs
+ * when ZOE approves a finding for a repo with a fix target - a few ticks a week
+ * - so without the probe a missing table is only found by the rare tick that
+ * needs it. Returns true when the pipeline is reachable.
+ */
+export async function announcePipelineHealth(
+  probe: () => Promise<string | null>,
+  alarm: ((message: string) => Promise<void>) | undefined,
+  fallback: (line: string) => void = (line) => console.error(line),
+): Promise<boolean> {
+  const error = await probe();
+  if (!error) return true;
+  const message =
+    `[repo-improver] fix pipeline cannot run: hermes_runs is unreachable (${error}). ` +
+    `Every approved fix will fail until it answers. The migration is ${HERMES_RUNS_MIGRATION} - applying it is Zaal's.`;
+  if (alarm) await alarm(message);
+  else fallback(message);
+  return false;
 }
 
 /**

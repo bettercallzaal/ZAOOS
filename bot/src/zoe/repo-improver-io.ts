@@ -26,7 +26,8 @@ import {
   nextRepoIndex,
   runRepoImproverScout,
   reviewProposedImprovements,
-  shouldRaiseAlarm,
+  announcePipelineHealth,
+  dedupeAlarm,
   type ScoutRepo,
   type ScoutDeps,
   type ReviewDeps,
@@ -184,21 +185,6 @@ function defaultReviewDeps(
 const lastAlarm = new Map<string, number>();
 
 /**
- * Wrap a raw alarm sender so each distinct message goes out at most once a
- * day, and every suppressed repeat still leaves a journald line.
- */
-function dedupedAlarm(send: (m: string) => Promise<void>): (m: string) => Promise<void> {
-  return async (message: string) => {
-    if (!shouldRaiseAlarm(message, lastAlarm, Date.now())) {
-      console.error(`[repo-improver] alarm suppressed (already raised within 24h): ${message}`);
-      return;
-    }
-    console.error(`[repo-improver] ALARM: ${message}`);
-    await send(message);
-  };
-}
-
-/**
  * Can the fix pipeline write its run log at all? The pipeline only touches
  * hermes_runs when ZOE approves a finding for a repo with a fix target, which
  * on the live rotation is a few ticks a week - so without this probe a missing
@@ -223,16 +209,9 @@ export async function runRepoImproverTick(
   log: (m: string) => Promise<void>,
   alarm?: (m: string) => Promise<void>,
 ): Promise<void> {
-  const raise = alarm ? dedupedAlarm(alarm) : undefined;
+  const raise = alarm ? dedupeAlarm(alarm, lastAlarm) : undefined;
   try {
-    const probe = await probeHermesRuns();
-    if (probe) {
-      const message =
-        `[repo-improver] fix pipeline cannot run: hermes_runs is unreachable (${probe}). ` +
-        'Every approved fix will fail until it answers. The migration is bot/migrations/hermes_runs.sql - applying it is Zaal\'s.';
-      if (raise) await raise(message);
-      else console.error(message);
-    }
+    await announcePipelineHealth(probeHermesRuns, raise);
     const scoutStatus = await runRepoImproverScout(defaultScoutDeps());
     console.log(`[repo-improver] scout: ${scoutStatus}`);
     const reviewStatus = await reviewProposedImprovements(defaultReviewDeps(log, raise));

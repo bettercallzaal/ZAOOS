@@ -2783,6 +2783,8 @@ async function handleGroupMessage(
             description: `Group escalation from ${label} (ID: ${ctx.from?.id}) in ${chatTitle}: "${escalation.note}"`,
             priority: 'high',
             status: 'pending',
+            source: 'group-escalation',
+            notes: [`Received in ${chatTitle} from ${label}`],
           },
         },
       ]).catch((err) => console.error('[zoe/index] failed to mirror escalation to tasks:', err));

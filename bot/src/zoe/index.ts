@@ -19,7 +19,7 @@ import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
-import { BUTTON_BAR, PRIVATE_COMMANDS, GROUP_COMMANDS, isBarLabel } from './button-bar';
+import { BUTTON_BAR, PRIVATE_COMMANDS, GROUP_COMMANDS, isBarLabel, buildCockpitKeyboard } from './button-bar';
 import {
   surfaceGrill,
   applyGrillAction,
@@ -101,6 +101,7 @@ import { captureResume, looksLikeResume } from './resume';
 import {
   addAllowlistMember,
   autoRegisterGroup,
+  detectGroupEscalation,
   getGroupConfig,
   isBotMentioned,
   removeAllowlistMember,
@@ -286,16 +287,18 @@ Action: ssh VPS then run 'claude' and /login.`;
 async function replyChunked(
   ctx: Context,
   text: string,
-  opts: { replyToMessageId?: number } = {},
+  opts: { replyToMessageId?: number; replyMarkup?: InlineKeyboard } = {},
 ): Promise<void> {
   const chunks = chunkMessage(text);
   for (let i = 0; i < chunks.length; i++) {
     const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
+    const isLast = i === chunks.length - 1;
     await ctx.reply(prefix + chunks[i], {
       reply_parameters:
         i === 0 && opts.replyToMessageId
           ? { message_id: opts.replyToMessageId }
           : undefined,
+      reply_markup: isLast && opts.replyMarkup ? opts.replyMarkup : undefined,
     });
   }
 }
@@ -506,11 +509,12 @@ bot.command("help", async (ctx) => {
 
   // Group help
   const groupHelp = [
-    "ZOE Assistant in Groups:",
+    "ZOE Group Assistant:",
     "",
     "• Tag @zaoclaw_bot with your question or reply directly to any message from ZOE.",
     "• Or use `/ask <question>` to prompt directly.",
-    "• ZOE can answer questions about ZAO, ZAOstock schedules, tasks, and project updates.",
+    "• ZOE can answer questions about The ZAO, COC Concertz, music collaborations, and roadmap.",
+    "• To leave a message for Zaal: \"Please let Zaal know...\" and ZOE will deliver it to his priority inbox.",
   ].join("\n");
   await ctx.reply(groupHelp);
 });
@@ -752,6 +756,59 @@ bot.on('callback_query:data', async (ctx, next) => {
   if (!isFromZaal(ctx)) {
     await ctx.answerCallbackQuery();
     return;
+  }
+  const data = ctx.callbackQuery.data ?? '';
+  if (data.startsWith('cp:')) {
+    const action = data.slice(3);
+    if (action === 'refresh') {
+      await ctx.answerCallbackQuery({ text: 'Refreshing cockpit...' });
+      try {
+        const run = await runCockpit('brief');
+        const focus = await isFocusMode();
+        const keyboard = buildCockpitKeyboard(focus);
+        await ctx.editMessageText(run.message, { reply_markup: keyboard });
+      } catch (err) {
+        await ctx.reply(`Cockpit refresh failed: ${(err as Error)?.message}`);
+      }
+      return;
+    }
+    if (action === 'needsme') {
+      await ctx.answerCallbackQuery();
+      const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
+      if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
+      return;
+    }
+    if (action === 'agenda') {
+      await ctx.answerCallbackQuery();
+      await sendAgenda(ctx);
+      return;
+    }
+    if (action === 'board') {
+      await ctx.answerCallbackQuery();
+      const boardUrl = process.env.COWORK_BOARD_URL || 'https://cowork.zaoos.com';
+      await ctx.reply(`Active board: ${boardUrl}`);
+      return;
+    }
+    if (action === 'pulse') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply(formatSpendStatus(false));
+      return;
+    }
+    if (action === 'focus') {
+      const active = await isFocusMode();
+      if (active) {
+        const released = await endFocus();
+        await ctx.answerCallbackQuery({ text: 'Focus mode OFF' });
+        await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
+      } else {
+        await startFocus();
+        await ctx.answerCallbackQuery({ text: 'Focus mode ON' });
+        await ctx.reply('Focus ON. Non-urgent pings queue until you tap Focus again.');
+      }
+      const newFocus = await isFocusMode();
+      await ctx.editMessageReplyMarkup({ reply_markup: buildCockpitKeyboard(newFocus) }).catch(() => {});
+      return;
+    }
   }
   // Orchestrator question buttons ("q:<qid>:<b64>") - the one-question-at-a-time
   // loop. A tap (or the Type button) logs the answer to recent/ so the open
@@ -1115,12 +1172,25 @@ bot.command('loop', async (ctx) => {
 // any time (e.g. from the car). Read-only. /cockpit
 bot.command('cockpit', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  await ctx.reply('Building your cockpit...');
+  const statusMsg = await ctx.reply('Building your cockpit...');
   try {
     const run = await runCockpit('brief');
-    await replyChunked(ctx, run.message);
+    const focus = await isFocusMode();
+    const keyboard = buildCockpitKeyboard(focus);
+    if (run.message.length <= 4000) {
+      await ctx.api.editMessageText(ctx.chat.id, statusMsg.message_id, run.message, {
+        reply_markup: keyboard,
+      });
+    } else {
+      await ctx.api.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(() => {});
+      await replyChunked(ctx, run.message, { replyMarkup: keyboard });
+    }
   } catch (e) {
-    await ctx.reply(`Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`);
+    await ctx.api.editMessageText(
+      ctx.chat.id,
+      statusMsg.message_id,
+      `Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`,
+    );
   }
 });
 
@@ -2695,6 +2765,38 @@ async function handleGroupMessage(
     }
     return;
   }
+
+  // Group assistant escalation: when a group member asks ZOE to tell/notify/ask Zaal
+  if (!isFromZaal(ctx)) {
+    const escalation = detectGroupEscalation(text);
+    if (escalation.isEscalation && escalation.note) {
+      const chatTitle = ctx.chat && 'title' in ctx.chat ? (ctx.chat.title ?? scope) : scope;
+      const dmNotice = `[Group Message - ${chatTitle}]\nFrom: ${label}\n"${escalation.note}"`;
+      await bot.api.sendMessage(zaalId, dmNotice).catch((err) => {
+        console.error('[zoe/index] failed to send group escalation DM to Zaal:', err);
+      });
+      await applyTaskOps([
+        {
+          op: 'add',
+          task: {
+            title: `[Group ${chatTitle}] ${label}: ${escalation.note.slice(0, 60)}`,
+            description: `Group escalation from ${label} (ID: ${ctx.from?.id}) in ${chatTitle}: "${escalation.note}"`,
+            priority: 'high',
+            status: 'pending',
+            source: 'group-escalation',
+            notes: [`Received in ${chatTitle} from ${label}`],
+          },
+        },
+      ]).catch((err) => console.error('[zoe/index] failed to mirror escalation to tasks:', err));
+
+      await ctx.reply(`Noted. I have passed this message directly to Zaal's priority inbox.`, {
+        reply_parameters: ctx.message?.message_id ? { message_id: ctx.message.message_id } : undefined,
+      });
+      console.log(`[zoe/index] group escalation from ${label} in ${chatTitle} delivered to Zaal: "${escalation.note}"`);
+      return;
+    }
+  }
+
   await dispatchConcierge(ctx, text, scope, label);
 }
 

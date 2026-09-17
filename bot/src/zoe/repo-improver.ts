@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { mcEmit } from './mission-control';
 import type { HermesRepoTarget } from '../hermes/types';
 import { featureRan } from './feature-ran';
+import { runWithSendClass } from './send-budget';
 
 /** The repos the scout rotates through. hermesTarget=null => surface-only (no auto-fix target yet). */
 export interface ScoutRepo {
@@ -215,6 +216,88 @@ export interface ReviewDeps {
   }) => Promise<{ kind: 'ready' | 'failed' | 'escalated'; prUrl: string | null; runId: string; reason?: string }>;
   /** Status log to the group (not a question) + the durable learning log. */
   log: (message: string) => Promise<void>;
+  /**
+   * An INFRASTRUCTURE failure - the fix pipeline itself is broken, not a
+   * judgement call. Sent as an alarm, never a status. Falls back to `log`.
+   *
+   * Why it exists: the pipeline threw "Could not find the table
+   * 'public.hermes_runs'" on every approved fix, and that line went out through
+   * `log` as a status send, which the send budget DROPS once the day's cap is
+   * spent ("cap spent (23/3) - dropped", journald 2026-09-16 03:30 and 21:30).
+   * The failure was reported every time and delivered never.
+   */
+  alarm?: (message: string) => Promise<void>;
+}
+
+/**
+ * Should an alarm with this key go out now? At most once per key per window,
+ * so a pipeline that stays broken is announced daily rather than every tick
+ * (noisy-signal-guard.md: a repeating alarm stops being read). Pure: the
+ * caller owns the map. Records the send when it returns true.
+ */
+export function shouldRaiseAlarm(
+  key: string,
+  lastRaised: Map<string, number>,
+  now: number,
+  windowMs: number = 24 * 60 * 60 * 1000,
+): boolean {
+  const prev = lastRaised.get(key);
+  if (prev !== undefined && now - prev < windowMs) return false;
+  lastRaised.set(key, now);
+  return true;
+}
+
+/**
+ * Wrap a raw alarm sender so each distinct message goes out at most once per
+ * window, and every suppressed repeat still leaves a journald line.
+ */
+export function dedupeAlarm(
+  send: (message: string) => Promise<void>,
+  lastRaised: Map<string, number>,
+  now: () => number = () => Date.now(),
+  trail: (line: string) => void = (line) => console.error(line),
+): (message: string) => Promise<void> {
+  return async (message: string) => {
+    if (!shouldRaiseAlarm(message, lastRaised, now())) {
+      trail(`[repo-improver] alarm suppressed (already raised within 24h): ${message}`);
+      return;
+    }
+    trail(`[repo-improver] ALARM: ${message}`);
+    await send(message);
+  };
+}
+
+/**
+ * Make a sender an alarm sender: every send inside it is classed `alarm`, which
+ * the send budget always passes and never queues. Without the class a send
+ * defaults to `status`, and status is what was dropped past the cap.
+ */
+export function asAlarmSend(send: (message: string) => Promise<void>): (message: string) => Promise<void> {
+  return (message: string) => runWithSendClass('alarm', () => send(message));
+}
+
+export const HERMES_RUNS_MIGRATION = 'bot/migrations/hermes_runs.sql';
+
+/**
+ * Probe the fix pipeline's run log before the tick does anything else, and
+ * raise an alarm when it does not answer. The pipeline only touches hermes_runs
+ * when ZOE approves a finding for a repo with a fix target - a few ticks a week
+ * - so without the probe a missing table is only found by the rare tick that
+ * needs it. Returns true when the pipeline is reachable.
+ */
+export async function announcePipelineHealth(
+  probe: () => Promise<string | null>,
+  alarm: ((message: string) => Promise<void>) | undefined,
+  fallback: (line: string) => void = (line) => console.error(line),
+): Promise<boolean> {
+  const error = await probe();
+  if (!error) return true;
+  const message =
+    `[repo-improver] fix pipeline cannot run: hermes_runs is unreachable (${error}). ` +
+    `Every approved fix will fail until it answers. The migration is ${HERMES_RUNS_MIGRATION} - applying it is Zaal's.`;
+  if (alarm) await alarm(message);
+  else fallback(message);
+  return false;
 }
 
 /**
@@ -226,6 +309,7 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
   if (rows.length === 0) return 'nothing to review';
   let approved = 0;
   let rejected = 0;
+  let errored = 0;
 
   for (const row of rows) {
     const verdict = parseVerdict(
@@ -267,7 +351,10 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
       result = await deps.dispatchFix({ issueText, targetRepo: target });
     } catch (err) {
       await deps.markStatus(row.id, 'escalated', { zoe_reasoning: verdict.reasoning });
-      await deps.log(`[repo-improver] ${row.repo} - fix pipeline errored: ${(err as Error)?.message ?? err}`);
+      errored++;
+      await (deps.alarm ?? deps.log)(
+        `[repo-improver] ${row.repo} - fix pipeline errored: ${(err as Error)?.message ?? err}`,
+      );
       continue;
     }
 
@@ -284,5 +371,5 @@ export async function reviewProposedImprovements(deps: ReviewDeps): Promise<stri
     }
   }
 
-  return `reviewed ${rows.length}: ${approved} approved, ${rejected} rejected`;
+  return `reviewed ${rows.length}: ${approved} approved, ${rejected} rejected, ${errored} errored`;
 }

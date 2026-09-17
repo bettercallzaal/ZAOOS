@@ -26,6 +26,8 @@ import {
   nextRepoIndex,
   runRepoImproverScout,
   reviewProposedImprovements,
+  announcePipelineHealth,
+  dedupeAlarm,
   type ScoutRepo,
   type ScoutDeps,
   type ReviewDeps,
@@ -115,7 +117,10 @@ function defaultScoutDeps(): ScoutDeps {
   };
 }
 
-function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
+function defaultReviewDeps(
+  log: (m: string) => Promise<void>,
+  alarm?: (m: string) => Promise<void>,
+): ReviewDeps {
   return {
     fetchProposed: async (): Promise<ImprovementRow[]> => {
       const { data, error } = await db()
@@ -172,7 +177,27 @@ function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
       return { kind: res.kind, prUrl: null, runId: res.run.id, reason: res.reason };
     },
     log,
+    alarm,
   };
+}
+
+/** Process-lifetime record of when each alarm key last went out. */
+const lastAlarm = new Map<string, number>();
+
+/**
+ * Can the fix pipeline write its run log at all? The pipeline only touches
+ * hermes_runs when ZOE approves a finding for a repo with a fix target, which
+ * on the live rotation is a few ticks a week - so without this probe a missing
+ * table is only discovered by the rare tick that needs it. Returns the error
+ * text, or null when the table answers.
+ */
+async function probeHermesRuns(): Promise<string | null> {
+  try {
+    const { error } = await db().from('hermes_runs').select('id', { count: 'exact', head: true }).limit(1);
+    return error ? error.message : null;
+  } catch (err) {
+    return (err as Error)?.message ?? String(err);
+  }
 }
 
 /**
@@ -180,11 +205,16 @@ function defaultReviewDeps(log: (m: string) => Promise<void>): ReviewDeps {
  * proposed findings (its own gate) and route approved fixes. `log` posts status
  * to the group (not a question) and is the durable learning trail.
  */
-export async function runRepoImproverTick(log: (m: string) => Promise<void>): Promise<void> {
+export async function runRepoImproverTick(
+  log: (m: string) => Promise<void>,
+  alarm?: (m: string) => Promise<void>,
+): Promise<void> {
+  const raise = alarm ? dedupeAlarm(alarm, lastAlarm) : undefined;
   try {
+    await announcePipelineHealth(probeHermesRuns, raise);
     const scoutStatus = await runRepoImproverScout(defaultScoutDeps());
     console.log(`[repo-improver] scout: ${scoutStatus}`);
-    const reviewStatus = await reviewProposedImprovements(defaultReviewDeps(log));
+    const reviewStatus = await reviewProposedImprovements(defaultReviewDeps(log, raise));
     console.log(`[repo-improver] review: ${reviewStatus}`);
   } catch (err) {
     console.error('[repo-improver] tick failed:', (err as Error)?.message ?? err);

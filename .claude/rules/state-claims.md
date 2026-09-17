@@ -125,6 +125,61 @@ Before reporting that a feature is or is not running:
 3. **Say which you measured.** "No `[zoe/ran]` line since the last boot" is a
    fact. "It is not running" is an inference, and only sound once (1) holds.
 
+## A process needs a heartbeat before its silence means anything (added 2026-09-17)
+
+Rule 5 says "merged" is not "running", and *Silence is not evidence* says you
+cannot conclude a FEATURE did not run unless you first prove it can log. Both
+are about code inside a service that is up. This is the level below: **a
+long-running process that is not up at all.**
+
+`fleet-watch.py` is the zorca lane's supervisor. On 2026-09-14 seven detector
+faults were found in it and fixed, each with a red control, ending at 151
+passing assertions. On 2026-09-17 `pgrep` showed **the process was not running
+and had not been since the session that started it closed.** Not one of those
+fixes had ever executed against a live board - including an alarm written
+specifically because a pane sat on one picker for seven hours with 13 messages
+queued behind it while an artist page served a public 404.
+
+Every verification that week was against CODE: the suite passes, the guard fails
+without its fix, the function returns the right value. **Code cannot report
+whether a process is running.**
+
+### Why nobody noticed for three days
+
+The estate already had the answer and it was invisible by construction.
+`~/.zao/beats/` held **23 heartbeat files**, one per durable job, and
+`fleet-watch` was the only supervisor that had never written one. An unread
+heartbeat looks like a problem. **A heartbeat that was never written looks like
+nothing at all** - there is no stale file to notice, no gap to measure, no row
+missing from a list, because the job was never in the list.
+
+That is the difference from the sections above. They ask "is this log line
+present?". This asks "is there anywhere a log line COULD be?" - and a `no`
+answers itself silently.
+
+### The gate
+
+Before claiming a fix to a long-running process is in effect:
+
+1. **Name the process, not the code.** `pgrep -fl <thing>` or `launchctl list |
+   grep <label>`. A green suite is evidence about a file.
+2. **Point at the surface the process itself writes.** A beat file, a log line
+   with a timestamp from this boot, a pid. If you cannot name one, stop - the
+   fix is not verified and cannot be.
+3. **If no such surface exists, adding one IS the first fix**, before the
+   behaviour change. It is one line (`open(beats/<name>, "w").close()` per
+   cycle) and it converts an invisible absence into a stale file someone trips
+   over.
+4. **Killing it is the only proof it restarts.** `kill -9` the pid and watch for
+   a different one. A plist saying `KeepAlive` is a claim about intent; a new
+   pid and `last-exit -9` is the behaviour.
+
+### The tell
+
+You are in this failure whenever the sentence is *"the fix is in"* and the
+evidence offered is a test result. Tests describe a file. The question was about
+a process.
+
 ## A claim carries its DATE as well as its source (added 2026-08-23)
 
 The rule above says name the source. Its twin: **a claim about a moving fact is

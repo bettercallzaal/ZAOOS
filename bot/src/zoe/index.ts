@@ -37,7 +37,9 @@ import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
-import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { join, basename } from 'node:path';
+import { processInboundMedia } from './inbound-media';
 import { detectBuildIntent } from './build-intent';
 import { applyBacklogAnswer } from './backlog-grill-runner';
 import { parseBusReply } from './bus-bridge';
@@ -2193,6 +2195,39 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     await ctx.reply(`Could not fetch that ${label} - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
+
+  // Ingest inbound media into vault at inbox/-/ with pre-commit secret & PII screening
+  let mimeType = 'application/octet-stream';
+  if (ctx.message.photo?.length) {
+    mimeType = 'image/jpeg';
+  } else if (ctx.message.document?.mime_type) {
+    mimeType = ctx.message.document.mime_type;
+  }
+
+  let vaultMediaSaved = false;
+  try {
+    const buffer = await fs.readFile(savedPath);
+    const mediaResult = await processInboundMedia({
+      filename: preferName || basename(savedPath),
+      mimeType,
+      buffer,
+      caption,
+    });
+
+    if (!mediaResult.ok) {
+      await ctx.reply(mediaResult.message).catch(() => {});
+      return;
+    }
+
+    if (mediaResult.savedPath) {
+      const vaultDir = process.env.VAULT_DIR ?? join(homedir(), 'zao-vault');
+      savedPath = join(vaultDir, mediaResult.savedPath);
+      vaultMediaSaved = true;
+    }
+  } catch (err) {
+    console.error('[zoe/index] inbound-media vault ingest error:', (err as Error)?.message);
+  }
+
   // FEATURE 2: FILE/PHOTO/LINK AUTO-ROUTE
   // Classify the intent based on caption + media type, then log and reply
   const hasPhoto = !!ctx.message.photo;
@@ -2214,7 +2249,8 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     }
   }
 
-  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`} - ${autoRouteGuess}looking at it...`).catch(() => {});
+  const vaultNote = vaultMediaSaved ? ` (vault: \`${basename(savedPath)}\`)` : '';
+  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`}${vaultNote} - ${autoRouteGuess}looking at it...`).catch(() => {});
   const note = caption ? `${caption}\n\n` : '';
   const turnText = `${note}[Zaal sent ${label === 'image' ? 'an image' : `a file named ${label}`}, saved at ${savedPath}. Use the Read tool to view it, then respond to ${caption ? 'the message above' : 'what it contains'}.]`;
   enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnText), {

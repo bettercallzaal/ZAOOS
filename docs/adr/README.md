@@ -19,7 +19,7 @@ When a research doc leads to a real architectural commitment, write an ADR point
 | [001](./001-ecc-path-b-plugin-install.md) | ECC Path B: full plugin install over cherry-pick | Accepted | 2026-04-20 |
 | [002](./002-silent-failure-audit-trail-drop-pattern.md) | Silent-failure CRITICAL audit-trail drop pattern | Accepted | 2026-04-20 |
 | [003](./003-failure-sends-declare-alarm-class.md) | Failure sends declare their class at the sink, not by lint | Proposed | 2026-09-17 |
-| [004](./004-autopilot-acts-on-reversible-work.md) | Autopilot acts on reversible work and stops at the one-way doors | Accepted (relayed) | 2026-09-17 |
+| [004](./004-autopilot-acts-on-reversible-work.md) | Autopilot acts on reversible work and stops at the one-way doors | Accepted (by selection) | 2026-09-17 |
 
 ## Format
 

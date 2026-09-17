@@ -1,6 +1,6 @@
 # ADR-004: Autopilot acts on reversible work and stops at the one-way doors
 
-**Status:** Accepted (relayed ruling; Zaal's verbatim wording not yet on file, see below)
+**Status:** Accepted (by selection from a four-option prompt; scope wording is the seat's, see below)
 **Date:** 2026-09-17
 **Deciders:** Zaal, relayed by the seat (dotfiles lane); recorded by the antigravity-automation lane
 **Tags:** autonomy, agents, autopilot, escalation
@@ -16,11 +16,13 @@ ZAOOS #3542 built both: `scripts/autopilot/doors.json` holds the list, and `scri
 
 ## Decision
 
-Zaal ruled on 2026-09-17, as relayed by the seat:
+Zaal ruled on 2026-09-17 by **selecting one option of four** in a prompt the seat wrote. He did not type a sentence.
 
-> "turn it on for reversible work only. Lanes stop asking about copy edits, formatting and non-breaking refactors. Money, outbound messages, deletes, deploys and settings changes still stop dead. Every auto-decision writes what it chose and why."
+- **Label, the only words that are his** (by choosing them): "Turn it on for reversible work only".
+- **Description, written by the seat and accepted by his selection:** "Lanes stop asking about copy edits, formatting and non-breaking refactors. Money, outbound messages, deletes, deploys and settings changes still stop dead. Every auto-decision writes what it chose and why."
+- **The alternatives he passed over:** turn it on after the festival; keep every decision coming to him; write his own. He chose this over "keep every decision coming to me", so it was not a default.
 
-**This is the seat's relay, not Zaal's verbatim words.** They are not recorded anywhere this lane could find. The claude/autopilot.md standard for a standing permission is his exact words, the date, the scope and what it does not cover. The canonical record is the vault decision file `decisions/autopilot-acts-on-reversible-work-2026-09-17.md`. Its status is RELAYED, NOT DIRECTLY CONFIRMED, and it carries a NEEDS-ZAAL line to confirm the wording.
+A selected option is stronger than a relay and weaker than his own sentence. Because the scope wording is the seat's, a lane must not stretch it past the description. The canonical record, vault `decisions/autopilot-acts-on-reversible-work-2026-09-17.md`, keeps the status RELAYED, NOT DIRECTLY CONFIRMED and carries a NEEDS-ZAAL line to confirm the wording in his own words.
 
 In practice:
 
@@ -40,7 +42,7 @@ In practice:
 
 - Positive: lanes stop spending Zaal's attention on copy edits and formatting. Every auto-decision can be audited line by line afterwards.
 - Negative: the list catches only facts a lane declares. A lane that runs a command it did not declare bypasses the check. Closing that gap takes a PreToolUse hook, which is a settings change, so it is its own one-way-door decision.
-- Neutral: until Zaal confirms the wording, this ADR and the vault record both say the ruling is relayed.
+- Neutral: until Zaal confirms the wording in his own words, this ADR and the vault record both say the ruling came by selection.
 
 ## Alternatives Considered
 

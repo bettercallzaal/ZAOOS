@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 // @ts-expect-error - plain .mjs so it runs with bare node on any host
-import { assess, dryRun, getJson, render, CHECKS } from '../autopilot/dispatch-dry-run.mjs';
+import { assess, dryRun, fieldGaps, getJson, render, CHECKS, FIX } from '../autopilot/dispatch-dry-run.mjs';
 
 type Card = Record<string, unknown>;
 
@@ -69,6 +69,24 @@ describe('dryRun and render', () => {
     expect(text).toMatch(/^DRY RUN - nothing was claimed, written or spawned\. 3 /);
     expect(text).toContain('WOULD TAKE 1. WOULD SKIP 2.');
     expect(text).toContain('Near misses - one check from being taken: 2');
+    expect(text).toContain('needs: set metadata.repo to owner/name');
+  });
+
+  it('field gaps count live cards only, most common first, archived listed apart', () => {
+    const lines = fieldGaps(
+      dryRun([
+        card({}, { repo: undefined }),
+        card({ notes: 'short' }, { repo: undefined }),
+        card({ archived_at: '2026-08-04' }, { repo: undefined }),
+      ]),
+    );
+    expect(lines[0]).toContain('2 live cards');
+    expect(lines[1]).toMatch(/^\s+2\s+has-repo/);
+    expect(lines.at(-1)).toContain('plus 1 archived');
+  });
+
+  it('every check has a fix a person can do', () => {
+    for (const [id] of CHECKS) expect(FIX[id]).toBeTruthy();
   });
 
   it('every check in the table appears in the report, even at zero', () => {

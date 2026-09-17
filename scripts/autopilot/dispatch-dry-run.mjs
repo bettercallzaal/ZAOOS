@@ -84,6 +84,34 @@ export function dryRun(cards) {
   return { total: cards.length, take: rows.filter((r) => r.take).length, byCheck, failing, rows };
 }
 
+/** What a person does to a card to clear each check. The report is a to-do list for the board. */
+export const FIX = {
+  'not-archived': 'close it: archived_at is set but status is still todo',
+  'agent-owned': 'set metadata.next_owner to "agent", or route it away from agents',
+  'has-repo': 'set metadata.repo to owner/name',
+  'has-done-when': 'set metadata.done_when to the observable result that proves it finished',
+  'has-brief': 'write notes an agent can act on (80+ chars: what, where, why)',
+  'no-one-way-door': 'split out the one-way step (send, post, pay, deploy...) as a card for Zaal',
+};
+
+/**
+ * Among cards that are NOT archived (archived rows need closing, not fields),
+ * how many lack each field, most often first. This is the board-quality view:
+ * the bottleneck a dispatcher cannot fix.
+ */
+export function fieldGaps(result) {
+  const live = result.rows.filter((r) => !r.failures.some((f) => f.id === 'not-archived'));
+  const counts = CHECKS.map(([id]) => id)
+    .filter((id) => id !== 'not-archived')
+    .map((id) => [id, live.filter((r) => r.failures.some((f) => f.id === id)).length])
+    .sort((a, b) => b[1] - a[1]);
+  const lines = [`Field gaps on the ${live.length} live cards (not archived), most common first:`];
+  for (const [id, n] of counts) lines.push(`  ${String(n).padStart(4)}  ${id} - fix: ${FIX[id]}`);
+  const archived = result.rows.length - live.length;
+  if (archived) lines.push(`  plus ${archived} archived cards still status todo - fix: ${FIX['not-archived']}`);
+  return lines;
+}
+
 export function render(result) {
   const out = [];
   out.push(`DRY RUN - nothing was claimed, written or spawned. ${result.total} route:agent todo cards read.`);
@@ -91,10 +119,12 @@ export function render(result) {
   out.push('');
   out.push('Per check: stopped here first / fail it at all');
   for (const [id] of CHECKS) out.push(`  ${String(result.byCheck[id] ?? 0).padStart(4)} / ${String(result.failing[id] ?? 0).padStart(4)}  ${id}`);
+  out.push('');
+  out.push(...fieldGaps(result));
   const near = result.rows.filter((x) => !x.take && x.failures.length === 1);
   out.push('');
   out.push(`Near misses - one check from being taken: ${near.length}`);
-  for (const r of near) out.push(`  #${r.card.legacy_id ?? '-'} [${r.check}] ${r.card.title}`);
+  for (const r of near) out.push(`  #${r.card.legacy_id ?? '-'} needs: ${FIX[r.check]} | ${r.card.title}`);
   out.push('');
   for (const r of result.rows.filter((x) => x.take)) {
     out.push(`TAKE  #${r.card.legacy_id ?? '-'} ${r.card.title}`);

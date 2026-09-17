@@ -7,10 +7,11 @@
  * the state is constructed directly instead, which is also the only way to test
  * "four days ago" without waiting four days.
  */
+import { promises as fsPromises } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   claudeBriefLines,
   readClaudeHealth,
@@ -170,5 +171,29 @@ describe('the health file', () => {
     await recordClaudeOk(T, path);
     await (await import('node:fs/promises')).writeFile(path, '{ not json', 'utf8');
     expect(await readClaudeHealth(path)).toEqual(health());
+  });
+});
+
+describe('fleet-claude-auth.state has one owner, and it is not this module', () => {
+  it('recording an ok or a failure never writes fleet-claude-auth.state', async () => {
+    // Spy on the write rather than redirect HOME: vitest runs files in worker
+    // threads, where process.env is a copy and os.homedir() never sees a
+    // change to it - the first version of this test passed against the
+    // two-writer code and wrote the real ~/.config file while doing so.
+    const writes: string[] = [];
+    const spy = vi.spyOn(fsPromises, 'writeFile').mockImplementation(async (file) => {
+      writes.push(String(file));
+    });
+    try {
+      const healthPath = join(tmpdir(), 'claude-health-owner-test.json');
+      await recordClaudeFailure('auth', 'x', 1, healthPath);
+      await recordClaudeFailure('usage_limit', 'x', 2, healthPath);
+      await recordClaudeFailure('unknown', 'x', 3, healthPath);
+      await recordClaudeOk(4, healthPath);
+      expect(writes).toContain(healthPath);
+      expect(writes.filter((w) => w.includes('fleet-claude-auth'))).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

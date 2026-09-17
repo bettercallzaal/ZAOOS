@@ -1,4 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { currentSendClass } from '../send-budget';
 import {
   nextRepoIndex,
   repoToHermesTarget,
@@ -6,6 +9,11 @@ import {
   parseVerdict,
   runRepoImproverScout,
   reviewProposedImprovements,
+  shouldRaiseAlarm,
+  dedupeAlarm,
+  asAlarmSend,
+  announcePipelineHealth,
+  HERMES_RUNS_MIGRATION,
   SCOUT_REPOS,
   type ScoutDeps,
   type ReviewDeps,
@@ -171,8 +179,102 @@ describe('reviewProposedImprovements (ZOE self-gate + learn)', () => {
     expect(d.markStatus).toHaveBeenCalledWith('imp-1', 'escalated', expect.anything());
     expect(status).toContain('reviewed 1');
   });
+  it('dispatch throw -> goes out as an ALARM, not a status log, and is counted as errored', async () => {
+    // Verbatim error from journald 2026-09-16 21:30:10.
+    const msg = "createRun failed: Could not find the table 'public.hermes_runs' in the schema cache";
+    const alarm = vi.fn(async () => {});
+    const d = deps({ alarm, dispatchFix: vi.fn(async () => { throw new Error(msg); }) });
+    const status = await reviewProposedImprovements(d);
+    expect(alarm).toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+    expect(d.log).not.toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+    expect(status).toContain('1 errored');
+  });
+  it('dispatch throw without an alarm sink still reaches the log', async () => {
+    const d = deps({ dispatchFix: vi.fn(async () => { throw new Error('boom'); }) });
+    await reviewProposedImprovements(d);
+    expect(d.log).toHaveBeenCalledWith(expect.stringContaining('boom'));
+  });
+  it('a successful fix reports 0 errored', async () => {
+    expect(await reviewProposedImprovements(deps())).toContain('0 errored');
+  });
   it('nothing to review is a no-op', async () => {
     const d = deps({ fetchProposed: vi.fn(async () => []) });
     expect(await reviewProposedImprovements(d)).toBe('nothing to review');
+  });
+});
+
+describe('shouldRaiseAlarm', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  it('raises the first time a key is seen', () => {
+    expect(shouldRaiseAlarm('k', new Map(), 1000)).toBe(true);
+  });
+  it('suppresses a repeat inside the window', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('k', m, 0);
+    expect(shouldRaiseAlarm('k', m, DAY - 1)).toBe(false);
+  });
+  it('raises again once the window has passed', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('k', m, 0);
+    expect(shouldRaiseAlarm('k', m, DAY)).toBe(true);
+  });
+  it('keys are independent', () => {
+    const m = new Map<string, number>();
+    shouldRaiseAlarm('a', m, 0);
+    expect(shouldRaiseAlarm('b', m, 1)).toBe(true);
+  });
+});
+
+describe('announcePipelineHealth (probe runs every tick)', () => {
+  const missing = "Could not find the table 'public.hermes_runs' in the schema cache";
+  it('an unreachable hermes_runs raises an alarm naming the table and the migration', async () => {
+    const alarm = vi.fn(async () => {});
+    expect(await announcePipelineHealth(async () => missing, alarm)).toBe(false);
+    expect(alarm).toHaveBeenCalledTimes(1);
+    expect(alarm).toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+    expect(alarm).toHaveBeenCalledWith(expect.stringContaining(HERMES_RUNS_MIGRATION));
+  });
+  it('a reachable table raises nothing', async () => {
+    const alarm = vi.fn(async () => {});
+    expect(await announcePipelineHealth(async () => null, alarm)).toBe(true);
+    expect(alarm).not.toHaveBeenCalled();
+  });
+  it('with no alarm sink the failure still reaches the fallback line', async () => {
+    const fallback = vi.fn();
+    await announcePipelineHealth(async () => missing, undefined, fallback);
+    expect(fallback).toHaveBeenCalledWith(expect.stringContaining('hermes_runs'));
+  });
+});
+
+describe('asAlarmSend (the class is what gets past the send budget)', () => {
+  it('sends inside the alarm class, not the status default', async () => {
+    let seen: string | undefined;
+    await asAlarmSend(async () => { seen = currentSendClass(); })('x');
+    expect(seen).toBe('alarm');
+  });
+});
+
+describe('dedupeAlarm', () => {
+  it('sends a message once per day and leaves a trail line for the repeat', async () => {
+    const send = vi.fn(async () => {});
+    const trail = vi.fn();
+    let t = 0;
+    const raise = dedupeAlarm(send, new Map(), () => t, trail);
+    await raise('m');
+    t = 1000;
+    await raise('m');
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(trail).toHaveBeenCalledWith(expect.stringContaining('suppressed'));
+    t = 24 * 60 * 60 * 1000;
+    await raise('m');
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('scheduler wiring (source-level: there is no scheduler harness)', () => {
+  it('the repo-improver cron hands its alarm sink through asAlarmSend', () => {
+    const src = readFileSync(join(__dirname, '..', 'scheduler.ts'), 'utf8');
+    const call = src.slice(src.indexOf('await runRepoImproverScout('));
+    expect(call.slice(0, call.indexOf('} catch'))).toContain('asAlarmSend(');
   });
 });

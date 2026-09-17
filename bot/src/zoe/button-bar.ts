@@ -1,6 +1,6 @@
 /**
  * button-bar - a persistent Telegram reply keyboard (the tap-first cockpit bar)
- * + the `/` command menu registration.
+ * + the \`/\` command menu registration with scoped commands.
  *
  * ZOE used inline buttons + reactions but had NO persistent reply keyboard, so
  * every quick action meant typing or scrolling back to an old message. This
@@ -10,14 +10,14 @@
  * (Agenda -> sendAgenda, Budget -> formatSpendStatus, Focus -> focus toggle,
  * Note -> capture prompt, Board -> the board link).
  *
- * Boundary: this module only DEFINES the keyboard + command list. The routing
+ * Boundary: this module only DEFINES the keyboard + command lists. The routing
  * lives in index.ts where the action functions are in scope.
  */
 
-import { Keyboard } from 'grammy';
+import { Keyboard, InlineKeyboard } from "grammy";
 
 /** The six bar labels. index.ts checks membership before treating text as chat. */
-export const BAR_LABELS = ['Needs Me', 'Agenda', 'Focus', 'Board', 'Budget', 'Note'] as const;
+export const BAR_LABELS = ["Needs Me", "Agenda", "Focus", "Board", "Budget", "Note"] as const;
 export type BarLabel = (typeof BAR_LABELS)[number];
 
 export function isBarLabel(text: string): text is BarLabel {
@@ -26,27 +26,57 @@ export function isBarLabel(text: string): text is BarLabel {
 
 /** The persistent, auto-resized reply keyboard. Two rows of three. */
 export const BUTTON_BAR = new Keyboard()
-  .text('Needs Me')
-  .text('Agenda')
-  .text('Focus')
+  .text("Needs Me")
+  .text("Agenda")
+  .text("Focus")
   .row()
-  .text('Board')
-  .text('Budget')
-  .text('Note')
+  .text("Board")
+  .text("Budget")
+  .text("Note")
   .resized()
   .persistent();
 
 /**
- * The `/` command menu (setMyCommands). Only the commands Zaal actually uses -
- * the ones the usage audit flagged as high-leverage-but-invisible.
+ * The \`/\` command menu (setMyCommands) for private DMs with Zaal.
  */
-export const ZOE_COMMANDS = [
-  { command: 'menu', description: 'Show the tap-first cockpit bar' },
-  { command: 'needsme', description: 'Surface what needs your decision right now' },
-  { command: 'focus', description: 'Toggle hyperfocus (queue non-urgent pings)' },
-  { command: 'agenda', description: 'Show the board - all open items' },
-  { command: 'budget', description: "Today's spend + headroom" },
-  { command: 'shadow', description: 'Critic panel vs single-critic eval' },
-  { command: 'checkpoint', description: 'Save a breadcrumb note' },
-  { command: 'audit', description: 'Scan for fallen tasks / captures' },
+export const PRIVATE_COMMANDS = [
+  { command: "cockpit", description: "Daily operator brief and priorities" },
+  { command: "needsme", description: "Surface what needs your decision right now" },
+  { command: "grill", description: "Answer pending decision cards" },
+  { command: "board", description: "Show the board - all open items" },
+  { command: "working", description: "Tasks currently in progress" },
+  { command: "pulse", description: "Today's spend, health and models" },
+  { command: "companion", description: "Live companion pulse and countdown" },
+  { command: "focus", description: "Toggle hyperfocus (queue non-urgent pings)" },
+  { command: "agenda", description: "Scheduled tasks and priorities" },
+  { command: "menu", description: "Show the tap-first cockpit bar" },
+  { command: "help", description: "Show overview of all commands" },
 ];
+
+/**
+ * The \`/\` command menu for groups (e.g. COC, ZAO Civilization).
+ */
+export const GROUP_COMMANDS = [
+  { command: "ask", description: "Ask ZOE a question (or tag @zaoclaw_bot)" },
+  { command: "help", description: "How to use ZOE in this group" },
+  { command: "zg", description: "Group admin status and mode (Zaal only)" },
+];
+
+/** Backward compatibility alias for any caller expecting ZOE_COMMANDS */
+export const ZOE_COMMANDS = PRIVATE_COMMANDS;
+
+/**
+ * Interactive inline keyboard for the /cockpit brief.
+ * Enables one-tap refresh, drill-down into pending decisions, agenda, board, pulse, and focus.
+ */
+export function buildCockpitKeyboard(focusActive = false): InlineKeyboard {
+  return new InlineKeyboard()
+    .text("Refresh", "cp:refresh")
+    .text("Needs Me", "cp:needsme")
+    .row()
+    .text("Agenda", "cp:agenda")
+    .text("Board", "cp:board")
+    .row()
+    .text("Pulse", "cp:pulse")
+    .text(focusActive ? "Unfocus" : "Focus", "cp:focus");
+}

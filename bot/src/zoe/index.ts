@@ -19,7 +19,7 @@ import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
-import { BUTTON_BAR, ZOE_COMMANDS, isBarLabel } from './button-bar';
+import { BUTTON_BAR, PRIVATE_COMMANDS, GROUP_COMMANDS, isBarLabel, buildCockpitKeyboard } from './button-bar';
 import {
   surfaceGrill,
   applyGrillAction,
@@ -37,7 +37,9 @@ import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
-import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { join, basename } from 'node:path';
+import { processInboundMedia } from './inbound-media';
 import { detectBuildIntent } from './build-intent';
 import { applyBacklogAnswer } from './backlog-grill-runner';
 import { parseBusReply } from './bus-bridge';
@@ -98,7 +100,10 @@ import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile }
 import { captureResume, looksLikeResume } from './resume';
 import {
   addAllowlistMember,
+  autoRegisterGroup,
+  detectGroupEscalation,
   getGroupConfig,
+  isBotMentioned,
   removeAllowlistMember,
   setGroupMode,
   upsertGroup,
@@ -282,16 +287,18 @@ Action: ssh VPS then run 'claude' and /login.`;
 async function replyChunked(
   ctx: Context,
   text: string,
-  opts: { replyToMessageId?: number } = {},
+  opts: { replyToMessageId?: number; replyMarkup?: InlineKeyboard } = {},
 ): Promise<void> {
   const chunks = chunkMessage(text);
   for (let i = 0; i < chunks.length; i++) {
     const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
+    const isLast = i === chunks.length - 1;
     await ctx.reply(prefix + chunks[i], {
       reply_parameters:
         i === 0 && opts.replyToMessageId
           ? { message_id: opts.replyToMessageId }
           : undefined,
+      reply_markup: isLast && opts.replyMarkup ? opts.replyMarkup : undefined,
     });
   }
 }
@@ -474,6 +481,76 @@ bot.command('menu', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
 });
+
+// /help - overview of assistant commands in DMs and groups
+bot.command("help", async (ctx) => {
+  const isPrivate = ctx.chat.type === "private";
+  if (isPrivate && isFromZaal(ctx)) {
+    const helpText = [
+      "ZOE Operator Cockpit Commands:",
+      "",
+      "/cockpit - Daily operator brief and priorities",
+      "/needsme - Items and decisions awaiting your ruling",
+      "/grill - Answer pending decision cards",
+      "/board - Show all open cards and active lanes",
+      "/working - Tasks currently in progress",
+      "/pulse - Health, models, and spend snapshot",
+      "/companion - Live companion pulse and countdown",
+      "/focus - Toggle hyperfocus mode",
+      "/agenda - Scheduled priorities",
+      "/menu - Show persistent cockpit button bar",
+      "/zg - Manage group permissions and modes",
+      "",
+      "You can also speak or type naturally to delegate tasks, ask questions, or record notes.",
+    ].join("\n");
+    await ctx.reply(helpText);
+    return;
+  }
+
+  // Group help
+  const groupHelp = [
+    "ZOE Group Assistant:",
+    "",
+    "• Tag @zaoclaw_bot with your question or reply directly to any message from ZOE.",
+    "• Or use `/ask <question>` to prompt directly.",
+    "• ZOE can answer questions about The ZAO, COC Concertz, music collaborations, and roadmap.",
+    "• To leave a message for Zaal: \"Please let Zaal know...\" and ZOE will deliver it to his priority inbox.",
+  ].join("\n");
+  await ctx.reply(groupHelp);
+});
+
+// /ask - ask ZOE a question directly in groups or DMs
+bot.command("ask", async (ctx) => {
+  const chatId = ctx.chat?.id;
+  if (!chatId) return;
+  const prompt = (ctx.match ?? "").toString().trim();
+  if (!prompt) {
+    await ctx.reply("Usage: `/ask <your question>` or simply tag @zaoclaw_bot with your question.");
+    return;
+  }
+  const chatType = ctx.chat.type;
+  if (chatType === "private") {
+    await dispatchConcierge(ctx, prompt, "private", senderLabel(ctx));
+    return;
+  }
+  const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+  const cfg = (await getGroupConfig(chatId)) ?? (await autoRegisterGroup(chatId, title, ctx.from?.id));
+  const gate = shouldRespond(cfg, {
+    fromId: ctx.from?.id ?? 0,
+    botUsername: usernameHolder.value,
+    botId: botIdHolder.value,
+    messageText: prompt,
+    entities: [],
+  });
+  if (!gate.allow) {
+    console.log(`[zoe/groups] /ask in ${chatId} skipped: ${gate.reason}`);
+    return;
+  }
+  enqueueTurn(chatId, () => handleGroupMessage(ctx, prompt, String(chatId))).catch((e) =>
+    console.error("[zoe/index] /ask turn failed:", (e as Error)?.message),
+  );
+});
+
 
 // The agent's proactive grill deps: DM Zaal the next thing that needs him, one at
 // a time, to his DM (never a group). PIN the open question (and unpin the prior
@@ -679,6 +756,59 @@ bot.on('callback_query:data', async (ctx, next) => {
   if (!isFromZaal(ctx)) {
     await ctx.answerCallbackQuery();
     return;
+  }
+  const data = ctx.callbackQuery.data ?? '';
+  if (data.startsWith('cp:')) {
+    const action = data.slice(3);
+    if (action === 'refresh') {
+      await ctx.answerCallbackQuery({ text: 'Refreshing cockpit...' });
+      try {
+        const run = await runCockpit('brief');
+        const focus = await isFocusMode();
+        const keyboard = buildCockpitKeyboard(focus);
+        await ctx.editMessageText(run.message, { reply_markup: keyboard });
+      } catch (err) {
+        await ctx.reply(`Cockpit refresh failed: ${(err as Error)?.message}`);
+      }
+      return;
+    }
+    if (action === 'needsme') {
+      await ctx.answerCallbackQuery();
+      const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
+      if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
+      return;
+    }
+    if (action === 'agenda') {
+      await ctx.answerCallbackQuery();
+      await sendAgenda(ctx);
+      return;
+    }
+    if (action === 'board') {
+      await ctx.answerCallbackQuery();
+      const boardUrl = process.env.COWORK_BOARD_URL || 'https://cowork.zaoos.com';
+      await ctx.reply(`Active board: ${boardUrl}`);
+      return;
+    }
+    if (action === 'pulse') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply(formatSpendStatus(false));
+      return;
+    }
+    if (action === 'focus') {
+      const active = await isFocusMode();
+      if (active) {
+        const released = await endFocus();
+        await ctx.answerCallbackQuery({ text: 'Focus mode OFF' });
+        await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
+      } else {
+        await startFocus();
+        await ctx.answerCallbackQuery({ text: 'Focus mode ON' });
+        await ctx.reply('Focus ON. Non-urgent pings queue until you tap Focus again.');
+      }
+      const newFocus = await isFocusMode();
+      await ctx.editMessageReplyMarkup({ reply_markup: buildCockpitKeyboard(newFocus) }).catch(() => {});
+      return;
+    }
   }
   // Orchestrator question buttons ("q:<qid>:<b64>") - the one-question-at-a-time
   // loop. A tap (or the Type button) logs the answer to recent/ so the open
@@ -1042,12 +1172,25 @@ bot.command('loop', async (ctx) => {
 // any time (e.g. from the car). Read-only. /cockpit
 bot.command('cockpit', async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  await ctx.reply('Building your cockpit...');
+  const statusMsg = await ctx.reply('Building your cockpit...');
   try {
     const run = await runCockpit('brief');
-    await replyChunked(ctx, run.message);
+    const focus = await isFocusMode();
+    const keyboard = buildCockpitKeyboard(focus);
+    if (run.message.length <= 4000) {
+      await ctx.api.editMessageText(ctx.chat.id, statusMsg.message_id, run.message, {
+        reply_markup: keyboard,
+      });
+    } else {
+      await ctx.api.deleteMessage(ctx.chat.id, statusMsg.message_id).catch(() => {});
+      await replyChunked(ctx, run.message, { replyMarkup: keyboard });
+    }
   } catch (e) {
-    await ctx.reply(`Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`);
+    await ctx.api.editMessageText(
+      ctx.chat.id,
+      statusMsg.message_id,
+      `Cockpit failed: ${e instanceof Error ? e.message : 'unknown error'}`,
+    );
   }
 });
 
@@ -1510,10 +1653,49 @@ bot.command('list', async (ctx) => {
 // is silently ignored by shouldRespond (sender not in allowlist) - so "add a
 // person to the chat" would not work. Only fires for groups ZOE already knows
 // (getGroupConfig != null), never for random chats; bots are skipped.
-bot.on('message:new_chat_members', async (ctx) => {
+// When ZOE itself is added to a group/channel (my_chat_member status transition):
+bot.on("my_chat_member", async (ctx) => {
+  const update = ctx.myChatMember;
+  if (!update) return;
+  const newStatus = update.new_chat_member.status;
+  if (newStatus !== "member" && newStatus !== "administrator") return;
+
+  const chatId = update.chat.id;
+  const title = "title" in update.chat ? (update.chat.title ?? "(untitled)") : "(untitled)";
+  const addedBy = update.from?.id;
+
+  try {
+    const existing = await getGroupConfig(chatId);
+    if (!existing) {
+      await autoRegisterGroup(chatId, title, addedBy);
+      console.log(`[zoe/groups] auto-registered group ${chatId} ("${title}") via my_chat_member`);
+      await ctx.api.sendMessage(
+        chatId,
+        `Hello! I am ZOE, Zaal's AI assistant. In this group, I'm active on mentions: tag @${usernameHolder.value || "zaoclaw_bot"} or reply to any of my messages to ask questions, check festival schedules, pull up project info, or delegate tasks.`,
+      ).catch(() => undefined);
+    }
+  } catch (err) {
+    console.error("[zoe/groups] my_chat_member registration failed:", (err as Error).message);
+  }
+});
+
+bot.on("message:new_chat_members", async (ctx) => {
   const chatId = ctx.chat?.id;
   if (chatId === undefined) return;
-  const cfg = await getGroupConfig(chatId);
+  const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+  const newMembers = ctx.message?.new_chat_members ?? [];
+  const isBotAdded = newMembers.some((m) => m.id === botIdHolder.value || (m.is_bot && m.username?.toLowerCase() === usernameHolder.value?.toLowerCase()));
+
+  let cfg = await getGroupConfig(chatId);
+  if (!cfg && isBotAdded) {
+    cfg = await autoRegisterGroup(chatId, title, ctx.from?.id);
+    const threadId = ctx.message?.message_thread_id;
+    await ctx.reply(
+      `Hello! I am ZOE, Zaal's AI assistant. In this group, I'm active on mentions: tag @${usernameHolder.value || "zaoclaw_bot"} or reply to any of my messages to ask questions, check festival schedules, pull up project info, or delegate tasks.`,
+      threadId ? { message_thread_id: threadId } : {},
+    ).catch(() => undefined);
+    return;
+  }
   if (!cfg) return;
   const added: string[] = [];
   for (const member of ctx.message?.new_chat_members ?? []) {
@@ -2054,17 +2236,38 @@ bot.on('message:text', async (ctx) => {
   const fromId = ctx.from?.id;
   if (!fromId) return;
 
-  const cfg = await getGroupConfig(chatId);
+  let cfg = await getGroupConfig(chatId);
   if (!cfg) {
-    // Unconfigured group: log non-Zaal sender id for bootstrap discoverability.
-    if (fromId !== zaalId) {
-      console.log(
-        `[zoe/groups] unconfigured chat ${chatId} ("${
-          'title' in ctx.chat ? ctx.chat.title : ''
-        }") msg from ${fromId} (@${ctx.from?.username ?? '?'}) — Zaal: run \`/zg enable\` here to start`,
-      );
+    // If the message is from Zaal or mentions ZOE, auto-register the group on the fly!
+    const entities = (ctx.message.entities ?? []) as ReadonlyArray<{
+      type: string;
+      offset: number;
+      length: number;
+      user?: { id: number };
+    }>;
+    const mentioned = isBotMentioned({
+      fromId,
+      botUsername: usernameHolder.value,
+      botId: botIdHolder.value,
+      messageText: text,
+      replyToFromId: ctx.message.reply_to_message?.from?.id,
+      entities,
+    });
+    const isReplyToBot = botIdHolder.value !== null && ctx.message.reply_to_message?.from?.id === botIdHolder.value;
+    if (fromId === zaalId || mentioned || isReplyToBot) {
+      const title = "title" in ctx.chat ? (ctx.chat.title ?? "(untitled)") : "(untitled)";
+      cfg = await autoRegisterGroup(chatId, title, fromId);
+      console.log(`[zoe/groups] auto-registered chat ${chatId} ("${title}") from mention/Zaal`);
+    } else {
+      if (fromId !== zaalId) {
+        console.log(
+          `[zoe/groups] unconfigured chat ${chatId} ("${
+            "title" in ctx.chat ? ctx.chat.title : ""
+          }") msg from ${fromId} (@${ctx.from?.username ?? "?"}) — Zaal: run \`/zg enable\` here to start`,
+        );
+      }
+      return;
     }
-    return;
   }
 
   const gate = shouldRespond(cfg, {
@@ -2193,6 +2396,39 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     await ctx.reply(`Could not fetch that ${label} - ${sanitizeErrorForUser(err, { log: true })}`).catch(() => {});
     return;
   }
+
+  // Ingest inbound media into vault at inbox/-/ with pre-commit secret & PII screening
+  let mimeType = 'application/octet-stream';
+  if (ctx.message.photo?.length) {
+    mimeType = 'image/jpeg';
+  } else if (ctx.message.document?.mime_type) {
+    mimeType = ctx.message.document.mime_type;
+  }
+
+  let vaultMediaSaved = false;
+  try {
+    const buffer = await fs.readFile(savedPath);
+    const mediaResult = await processInboundMedia({
+      filename: preferName || basename(savedPath),
+      mimeType,
+      buffer,
+      caption,
+    });
+
+    if (!mediaResult.ok) {
+      await ctx.reply(mediaResult.message).catch(() => {});
+      return;
+    }
+
+    if (mediaResult.savedPath) {
+      const vaultDir = process.env.VAULT_DIR ?? join(homedir(), 'zao-vault');
+      savedPath = join(vaultDir, mediaResult.savedPath);
+      vaultMediaSaved = true;
+    }
+  } catch (err) {
+    console.error('[zoe/index] inbound-media vault ingest error:', (err as Error)?.message);
+  }
+
   // FEATURE 2: FILE/PHOTO/LINK AUTO-ROUTE
   // Classify the intent based on caption + media type, then log and reply
   const hasPhoto = !!ctx.message.photo;
@@ -2214,7 +2450,8 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     }
   }
 
-  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`} - ${autoRouteGuess}looking at it...`).catch(() => {});
+  const vaultNote = vaultMediaSaved ? ` (vault: \`${basename(savedPath)}\`)` : '';
+  await ctx.reply(`Got the ${label === 'image' ? 'image' : `file (${label})`}${vaultNote} - ${autoRouteGuess}looking at it...`).catch(() => {});
   const note = caption ? `${caption}\n\n` : '';
   const turnText = `${note}[Zaal sent ${label === 'image' ? 'an image' : `a file named ${label}`}, saved at ${savedPath}. Use the Read tool to view it, then respond to ${caption ? 'the message above' : 'what it contains'}.]`;
   enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnText), {
@@ -2528,6 +2765,38 @@ async function handleGroupMessage(
     }
     return;
   }
+
+  // Group assistant escalation: when a group member asks ZOE to tell/notify/ask Zaal
+  if (!isFromZaal(ctx)) {
+    const escalation = detectGroupEscalation(text);
+    if (escalation.isEscalation && escalation.note) {
+      const chatTitle = ctx.chat && 'title' in ctx.chat ? (ctx.chat.title ?? scope) : scope;
+      const dmNotice = `[Group Message - ${chatTitle}]\nFrom: ${label}\n"${escalation.note}"`;
+      await bot.api.sendMessage(zaalId, dmNotice).catch((err) => {
+        console.error('[zoe/index] failed to send group escalation DM to Zaal:', err);
+      });
+      await applyTaskOps([
+        {
+          op: 'add',
+          task: {
+            title: `[Group ${chatTitle}] ${label}: ${escalation.note.slice(0, 60)}`,
+            description: `Group escalation from ${label} (ID: ${ctx.from?.id}) in ${chatTitle}: "${escalation.note}"`,
+            priority: 'high',
+            status: 'pending',
+            source: 'group-escalation',
+            notes: [`Received in ${chatTitle} from ${label}`],
+          },
+        },
+      ]).catch((err) => console.error('[zoe/index] failed to mirror escalation to tasks:', err));
+
+      await ctx.reply(`Noted. I have passed this message directly to Zaal's priority inbox.`, {
+        reply_parameters: ctx.message?.message_id ? { message_id: ctx.message.message_id } : undefined,
+      });
+      console.log(`[zoe/index] group escalation from ${label} in ${chatTitle} delivered to Zaal: "${escalation.note}"`);
+      return;
+    }
+  }
+
   await dispatchConcierge(ctx, text, scope, label);
 }
 
@@ -3855,9 +4124,12 @@ async function main(): Promise<void> {
     console.error('[zoe/index] getMe failed:', (err as Error).message);
   }
 
-  // Register the `/` command menu so the underused commands are discoverable.
-  await bot.api.setMyCommands(ZOE_COMMANDS).catch((err: unknown) => {
-    console.error('[zoe/index] setMyCommands failed:', (err as Error).message);
+  // Register the `/` command menus: private cockpit commands for Zaal, assistant commands for groups.
+  await bot.api.setMyCommands(PRIVATE_COMMANDS, { scope: { type: "all_private_chats" } }).catch((err: unknown) => {
+    console.error("[zoe/index] setMyCommands private failed:", (err as Error).message);
+  });
+  await bot.api.setMyCommands(GROUP_COMMANDS, { scope: { type: "all_group_chats" } }).catch((err: unknown) => {
+    console.error("[zoe/index] setMyCommands group failed:", (err as Error).message);
   });
 
   startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });

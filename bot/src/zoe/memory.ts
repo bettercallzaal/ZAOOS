@@ -419,6 +419,8 @@ export interface MemoryBlocks {
   companion_presence?: string;
   chat_scope: ChatScope;
   chat_title?: string;
+  /** Sanitized group context for public/partner groups (e.g. COC). */
+  group_context?: string;
 }
 
 export async function ensureZoeHome(): Promise<void> {
@@ -792,20 +794,55 @@ export async function appendTriageContext(
  *
  * Block strings are kept short by design — no dumping full graph context.
  */
+
+/**
+ * Build sanitized context for groups (e.g. COC, ZAO Civilization), ensuring
+ * private human profiles, private tasks, and internal decisions are never leaked.
+ */
+export function buildGroupContext(chatId: string, chatTitle?: string): string {
+  const title = chatTitle || '(unnamed group)';
+  const isCoc =
+    chatId === '-1001609766705' ||
+    /community\s+of\s+communities/i.test(title) ||
+    /\bcoc\b/i.test(title);
+
+  const partnerContext = isCoc
+    ? [
+        'Group Profile: Community of Communities (COC)',
+        'Key Partners: Craig (@thyrevolution) and core COC collaborators.',
+        'Alliance: Co-producers of COC Concertz, web3 music & culture movement in close collaboration with The ZAO.',
+        'Focus Areas: Music events, COC Concertz, community empowerment, artist collaborations.',
+      ].join('\n')
+    : `Group Profile: ${title}`;
+
+  return [
+    `Group: "${title}" (ID: ${chatId})`,
+    partnerContext,
+    '',
+    'Role & Boundaries:',
+    "- You are ZOE, Zaal's executive assistant and concierge for The ZAO.",
+    '- In this group, you represent Zaal and The ZAO. Be professional, concise, direct, and warm.',
+    '- You can answer questions about The ZAO, COC Concertz, music collaborations, and roadmap.',
+    "- Privacy: Do not share Zaal's private schedule, personal credentials, financial figures, or internal system configurations.",
+    "- Escalation: If a group member asks you to pass a message or note to Zaal, or asks for Zaal's input, acknowledge it clearly and let them know you will pass the message directly to Zaal.",
+  ].join('\n');
+}
+
 export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
 ): Promise<MemoryBlocks> {
+  const isPrivate = scope === 'private';
   const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
     readPersona(),
-    readHuman(),
+    isPrivate ? readHuman() : Promise.resolve(''),
     readRecent(scope),
-    readTasks(),
-    buildQuestsBlock(),
-    readDecisions(5),
-    readBuildState(5),
-    readInboxContext(6),
-    getTeamContextBlock(Date.now()),
+    isPrivate ? readTasks() : Promise.resolve([]),
+    isPrivate ? buildQuestsBlock() : Promise.resolve(''),
+    isPrivate ? readDecisions(5) : Promise.resolve([]),
+    isPrivate ? readBuildState(5) : Promise.resolve([]),
+    isPrivate ? readInboxContext(6) : Promise.resolve([]),
+    isPrivate ? getTeamContextBlock(Date.now()) : Promise.resolve(undefined),
   ]);
 
   const working =
@@ -846,7 +883,8 @@ export async function buildMemoryBlocks(
       ? undefined
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
-  return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle };
+  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle);
+  return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
 }
 
 /**
@@ -857,6 +895,17 @@ export function renderConciergePrompt(blocks: MemoryBlocks, senderLabel: string,
     blocks.chat_scope === 'private'
       ? 'Chat: DM with Zaal'
       : `Chat: group "${blocks.chat_title ?? blocks.chat_scope}" (id ${blocks.chat_scope})`;
+
+  if (blocks.chat_scope !== 'private') {
+    const lines = [
+      `<persona>\n${blocks.persona}\n</persona>`,
+      `<group_context>\n${blocks.group_context ?? chatLine}\n</group_context>`,
+      `<working_memory>\n${chatLine}\n${blocks.working}\n</working_memory>`,
+      '',
+      `${senderLabel}: ${userMessage}`,
+    ];
+    return lines.join('\n\n');
+  }
   const lines = [
     `<persona>\n${blocks.persona}\n</persona>`,
     `<human>\n${blocks.human}\n</human>`,

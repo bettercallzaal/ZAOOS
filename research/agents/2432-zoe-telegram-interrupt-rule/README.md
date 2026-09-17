@@ -325,8 +325,53 @@ from 08-27 stands: cut the feed, leave breakage and answers alone.
 | Re-measure seven days after the crontab edit: export or `journalctl` count of DM sends per day; target under 5/day excluding replies. Shipped = a dated follow-through note appended here | @Zaal (a lane) | Verify | 2026-09-06 |
 | Run `zao-morning-sweep.sh` once by hand; if the `~/zao-os/bot` path is gone, delete the cron line | @Zaal | Verify | 2026-08-29 |
 
+## Follow-through 2026-09-17: the send budget, re-measured (owed 2026-09-06)
+
+The re-measure in Next Actions was due 2026-09-06 and was never written. This note fills it, and only measures. It does not propose a fix. Every number below comes from `~/.zao/zoe/send-budget-log.jsonl` on the VPS (3,625 rows, 2026-08-29 to 2026-09-17), read-only over `ssh vps`. Counts only: previews are handoff and relay text and do not belong in a public repo.
+
+**What the log can and cannot say.** `send-budget.ts` writes a row only for a send it BLOCKS (dropped or deferred). A send that passes increments the day counter and writes nothing. So neither this log nor journald can count deliveries. A journald grep that finds no "sent" lines means nothing was logged, not that nothing was delivered. The one delivery signal is the counter in each block line: `cap spent (21/3)` means 21 counted sends had already gone out that day. Counted sends include `alarm`, `gated` and `morning`, which always pass. Replies are not counted at all.
+
+**The cap of 3 is deliberate.** Row 5 above: "Ship the send budget ... at a cap of 3 ... Zaal said 2-4." `ZOE_DAILY_SEND_CAP=3` was set on the live box after #3357. The code default is 20.
+
+**Blocked sends, 7 days before #3530 (2026-09-09 16:00Z to 2026-09-16 16:00Z):**
+
+| | count |
+|---|---|
+| blocked, total | 2,560 |
+| dropped (`status`) | 2,455 |
+| deferred (`digest`) | 105 |
+| distinct messages among them | 176 |
+
+For 2026-09-10 to 2026-09-16 alone: 2,318 dropped sends, only **76 distinct**, by sender:
+
+| sender (preview prefix) | dropped sends | distinct messages |
+|---|---|---|
+| `Relay from ...` (relay-bridge) | 1,296 | 10 |
+| `Handoff: ...` | 957 | 9 |
+| `Work-loop: ...` | 37 | 35 |
+| `[repo-improver] ...` | 21 | 16 |
+| other | 7 | 6 |
+
+**97% of the volume was 19 messages retried.** The most-repeated single relay was dropped 227 times between 2026-09-15 21:05Z and 2026-09-16 16:10Z. This was not ZOE producing ~300 new messages a day. It was a small set of blocked messages retried on every tick, because the sender held its cursor when the budget blocked a send.
+
+**That retry loop was fixed by #3530** ("budget-blocked handoffs and relays held cursor at 2026-09-09 and retried every tick"), merged 2026-09-16 16:05Z. After it deployed (2026-09-16 17:00Z to 2026-09-17 09:30Z, the last row):
+
+| | count |
+|---|---|
+| blocked, total | 24 |
+| deferred to the morning batch (`digest`) | 23 |
+| dropped | 1 |
+| distinct messages | 24 |
+
+The one drop was a `[repo-improver] ... fix pipeline errored` status line (2026-09-16 21:30Z). #3538 now sends that class of line as `alarm`, which always passes.
+
+**Still open, measured, not acted on:**
+- **Target against measurement.** The doc's target was "under 5/day excluding replies". Deliveries cannot be counted from this log (see above), so whether the target is met is still UNVERIFIED. The instrument this re-measure lacked is a row for each send that passes.
+- **Time-sensitive items in the digest.** Handoffs deferred to the morning batch include time-sensitive ones: a "ROTATE NOW" handoff at 02:00Z, and reservations and money items at 09:30Z. A deferred handoff arrives next morning, which is correct for a digest and wrong for anything with a deadline. Classifying handoffs is out of scope for this note.
+
 ## Sources
 
+- [FULL - read over `ssh vps` 2026-09-17] `~/.zao/zoe/send-budget-log.jsonl` (3,625 rows; counts by outcome, class, day and preview prefix; previews not copied), `bot/src/zoe/{send-budget,relay-bridge,handoffs-surface}.ts` on main, PRs #3357 and #3530.
 - [FULL - read on disk 2026-08-28] `~/Documents/zorca/zoe-analysis-2026-08-27.md` (the 151-day classification, 34 types, bands, reply-rate ceiling/floor) and `~/Documents/zorca/docs/zoe-send-site-labels.md` (171 lines, matchers per zero-reply type, UNMAPPED flags).
 - [FULL - computed 2026-08-28] `~/.zao/telegram-exports/zoe/result.json`, 10,142 messages; per-day and per-hour counts in this doc are from a python pass over that file using the label file's regexes.
 - [FULL - read over `ssh vps` 2026-08-28] `crontab -l` (19 lines), `~/bin/{affirmation.sh,fleet,fleet-health.sh,loops-report.sh,cost-of-pass-summary.sh,fleet-spend-guard.sh,fleet-brain-check.sh,routine.sh,stall-tripwire.py,bus-poll-run.sh,zao-escalate,zao-ask,zao-morning-sweep.sh,zao-daily-agent-tip.sh}` (send lines and chat-id variable names; values not copied), `systemctl --user cat zoe-bot`, `git -C ~/zao-bot-live log -1`, `journalctl --user -u zoe-bot --since "7 days ago"` (module-tag counts), `~/.zao/loop-watchdog.log` tail.

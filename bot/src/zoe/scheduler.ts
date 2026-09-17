@@ -27,6 +27,7 @@ import { generateEveningReflection } from './reflect';
 import { generateNightlyRecap } from './recap';
 import { persistDailyDigest } from './afferent-digest';
 import { rolloverNotes } from './daily-note';
+import { runNeedsZaalDigest } from './needs-zaal-digest';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
@@ -37,6 +38,7 @@ import { healFleet } from './fleet-health';
 import { runWorkTick } from './work-loop';
 import { runErrorRemediationTick, defaultRemediationDeps, flushOutbox, describeOutbox } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
+import { asAlarmSend } from './repo-improver';
 import { sendChunkedDetailed, sendChunkedToTelegram } from './tg-chunk';
 import { heartCanaryEnabled, runHeartFleetCanary } from './heart-canary';
 import {
@@ -54,6 +56,8 @@ import { surfaceNewHandoffs } from './handoffs-surface';
 import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
+import { resolveForumThread } from './topics';
+import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING_THREAD, ZAAL_BOTZ_ZAOSTOCK_THREAD } from './env';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
@@ -241,9 +245,12 @@ function heart(): HeartFleet {
  * its own copy of the lease dance. Two hand-written copies is how the resource-id
  * bug reached both of them (code-restraint rung 2: reuse beats rewrite).
  */
-async function runRepoImproverScout(log: (m: string) => Promise<void>): Promise<ExecuteOutcome<void>> {
+async function runRepoImproverScout(
+  log: (m: string) => Promise<void>,
+  alarm: (m: string) => Promise<void>,
+): Promise<ExecuteOutcome<void>> {
   return runTickLeased('repo-improver-scout', repoImproverLeaseEnabled(), 120, () =>
-    runRepoImproverTick(log),
+    runRepoImproverTick(log, alarm),
   );
 }
 
@@ -961,6 +968,58 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
+  // Needs Zaal Digest (Morning) — 08:00 ET (America/New_York)
+  // Built from open tracker cards, lane ## for the grill sections, and cards due <48h.
+  tasks.push(
+    cron.schedule(
+      '0 8 * * *',
+      () =>
+        runWithSendClass('digest', async () => {
+          if (!(await claimFire('needs-zaal-morning'))) return;
+          try {
+            const res = await runNeedsZaalDigest({
+              botApi: opts.bot.api,
+              zaalTgId: opts.zaalTgId,
+              timeSlot: 'morning',
+            });
+            console.log(
+              `[zoe/scheduler] morning needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+            );
+          } catch (err) {
+            await releaseFire('needs-zaal-morning');
+            console.error('[zoe/scheduler] morning needs-zaal digest failed:', (err as Error).message);
+          }
+        }),
+      { timezone: 'America/New_York' },
+    ),
+  );
+
+  // Needs Zaal Digest (Evening) — 20:00 ET (America/New_York)
+  // Second daily sweep so Zaal catches evening lane handoffs and night deadlines.
+  tasks.push(
+    cron.schedule(
+      '0 20 * * *',
+      () =>
+        runWithSendClass('digest', async () => {
+          if (!(await claimFire('needs-zaal-evening'))) return;
+          try {
+            const res = await runNeedsZaalDigest({
+              botApi: opts.bot.api,
+              zaalTgId: opts.zaalTgId,
+              timeSlot: 'evening',
+            });
+            console.log(
+              `[zoe/scheduler] evening needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+            );
+          } catch (err) {
+            await releaseFire('needs-zaal-evening');
+            console.error('[zoe/scheduler] evening needs-zaal digest failed:', (err as Error).message);
+          }
+        }),
+      { timezone: 'America/New_York' },
+    ),
+  );
+
   // Clean-curator Telegram topic posting — 08:00 UTC daily (one hour before
   // morning brief). Posts curated digests to the ZAO group forum topics
   // (newsletter, github, artizen, recommendations, general). Disabled by default
@@ -1467,12 +1526,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         runWithSendClass('alarm', async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
+        const thread = await resolveForumThread(ZAAL_BOTZ_CODING_THREAD, "Coding");
         try {
           const deps = defaultRemediationDeps(
             // assertSendDelivered: a blocked send resolves, and the outbox only
             // keeps a report whose send THROWS. Without it a budget block would
             // read as delivered and be dropped from the outbox.
-            (text: string) => opts.bot.api.sendMessage(gid, text).then(assertSendDelivered).then(() => {}),
+            (text: string) =>
+              opts.bot.api.sendMessage(gid, text, thread ? { message_thread_id: thread } : undefined)
+                .then(assertSendDelivered)
+                .then(() => {}),
             opts.zaalTgId,
             gid,
           );
@@ -1515,12 +1578,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         if (!gid) return; // not configured
         if (!process.env.OPENROUTER_API_KEY?.trim()) return; // scout needs the cheap model
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
+        const thread = await resolveForumThread(ZAAL_BOTZ_CODING_THREAD, "Coding", "Research");
+        const chunkOpts = thread ? { baseOpts: { message_thread_id: thread } } : undefined;
         // Chunk the send: audits routinely exceed Telegram's 4096-char limit and
         // were getting truncated mid-sentence (tg-chunk.ts). Never raw-send long text.
         try {
-          await runRepoImproverScout(async (text: string) => {
-            await sendChunkedToTelegram((cid, t) => opts.bot.api.sendMessage(cid, t), gid, text);
-          });
+          await runRepoImproverScout(
+            async (text: string) => {
+              await sendChunkedToTelegram(
+                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                gid,
+                text,
+                chunkOpts,
+              );
+            },
+            // A broken fix pipeline is an alarm, not a status: status sends are
+            // dropped once the day's cap is spent, which is how the missing
+            // hermes_runs table went unheard (journald, 2026-09-16).
+            asAlarmSend(async (text: string) => {
+              await sendChunkedToTelegram(
+                (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
+                gid,
+                text,
+                chunkOpts,
+              );
+            }),
+          );
         } catch (err) {
           console.error('[zoe/scheduler] repo-improver scout failed:', (err as Error).message);
         }
@@ -1566,7 +1649,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       '*/10 * * * *',
       async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
-        const thread = Number(process.env.ZAAL_BOTZ_HANDOFFS_THREAD ?? 0);
+        const thread = await resolveForumThread(ZAAL_BOTZ_HANDOFFS_THREAD, "Handoffs");
         if (!gid || !thread) return; // not configured
         try {
           const n = await surfaceNewHandoffs((text: string) =>
@@ -1596,10 +1679,16 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '*/10 * * * *',
       async () => {
+        const isDedicated = Boolean(process.env.ZAOSTOCK_TEAM_GROUP_ID);
         const gid = Number(process.env.ZAOSTOCK_TEAM_GROUP_ID ?? process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
+        const thread = isDedicated
+          ? undefined
+          : await resolveForumThread(ZAAL_BOTZ_ZAOSTOCK_THREAD, "The ZAO", "Claude Code");
         try {
-          const n = await surfaceZaostockApprovals((text: string) => opts.bot.api.sendMessage(gid, text));
+          const n = await surfaceZaostockApprovals((text: string) =>
+            opts.bot.api.sendMessage(gid, text, thread ? { message_thread_id: thread } : undefined),
+          );
           if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} ZAOstock approval-queue item(s)`);
         } catch (err) {
           console.warn('[zoe/scheduler] ZAOstock approvals surface failed (nbd):', (err as Error).message);
@@ -1663,8 +1752,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
         if (!gid) return; // not configured
+        const thread = await resolveForumThread(ZAAL_BOTZ_QUESTIONS_THREAD, "Claude Code");
         try {
-          await surfaceNudges((text: string) => opts.bot.api.sendMessage(gid, text));
+          await surfaceNudges((text: string) =>
+            opts.bot.api.sendMessage(gid, text, thread ? { message_thread_id: thread } : undefined),
+          );
         } catch (err) {
           console.warn('[zoe/scheduler] nudge surface failed (nbd):', (err as Error).message);
         }

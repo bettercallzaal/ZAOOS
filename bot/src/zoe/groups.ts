@@ -129,14 +129,40 @@ export async function setGroupMode(chatId: number, mode: GroupMode): Promise<Gro
   return g;
 }
 
+/**
+ * Automatically register a group when ZOE is added or activated.
+ * Defaults to mode="mention" with wildcard -1 allowlist so any member
+ * can mention the bot, while keeping Zaal recognized.
+ */
+export async function autoRegisterGroup(
+  chatId: number,
+  chatTitle: string,
+  addedByUserId?: number,
+): Promise<GroupConfig> {
+  const allowlist: number[] = [-1];
+  const zaalId = Number(process.env.ZAAL_TELEGRAM_ID ?? process.env.ZAAL_DM_ID ?? 1447437687);
+  if (zaalId) allowlist.push(zaalId);
+  if (addedByUserId && !allowlist.includes(addedByUserId)) {
+    allowlist.push(addedByUserId);
+  }
+  return upsertGroup({
+    chat_id: chatId,
+    chat_title: chatTitle,
+    mode: "mention",
+    member_allowlist: allowlist,
+  });
+}
+
 export function shouldRespond(config: GroupConfig | null, gctx: GateContext): GateResult {
   if (!config) return { allow: false, reason: 'group not configured (default silent)' };
   if (config.mode === 'silent') return { allow: false, reason: 'group mode=silent' };
-  if (!config.member_allowlist.includes(gctx.fromId)) {
+  const isRestricted =
+    config.member_allowlist.length > 0 && !config.member_allowlist.includes(-1);
+  if (isRestricted && !config.member_allowlist.includes(gctx.fromId)) {
     return { allow: false, reason: `sender ${gctx.fromId} not in member_allowlist` };
   }
   if (config.mode === 'all') {
-    return { allow: true, reason: 'mode=all + sender allowlisted' };
+    return { allow: true, reason: 'mode=all' };
   }
   // mode === 'mention'
   const mentioned = isBotMentioned(gctx);
@@ -154,4 +180,18 @@ export function isBotMentioned(gctx: GateContext): boolean {
     const slice = gctx.messageText.slice(e.offset, e.offset + e.length).toLowerCase();
     return slice === handle;
   });
+}
+
+/**
+ * Detect requests in groups aimed at escalating to Zaal (e.g. "tell Zaal...", "ask Zaal...", "note for Zaal...").
+ */
+export function detectGroupEscalation(text: string): { isEscalation: boolean; note?: string } {
+  const cleaned = text.replace(/@\w+\b/g, '').trim();
+  const match =
+    /(?:please\s+)?(?:tell|ask|let|pass|notify|inform)\s+zaal(?:\s+know)?(?:\s+that|\s+to|\s*[:,])?\s*(.+)/i.exec(cleaned) ||
+    /(?:message|note)\s+for\s+zaal(?:\s*[:,])?\s*(.+)/i.exec(cleaned);
+  if (match && match[1]?.trim()) {
+    return { isEscalation: true, note: match[1].trim() };
+  }
+  return { isEscalation: false };
 }

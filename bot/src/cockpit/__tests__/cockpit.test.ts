@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { topThree, needsYou, blocked, findStale, buildProposals, priorityRank, daysSince, STALE_DAYS, filterReviewPRs, isHandoff, partitionHandoffs, toHandoff, isCapture, partitionCaptures, toCapture, CAPTURE_STALE_DAYS } from '../adapters';
 import { formatCockpitBrief } from '../brief';
+import { COCKPIT_BUDGET_USD } from '../cockpit';
 import type { CockpitTask, CockpitBrief } from '../types';
 
 const DAY = 86_400_000;
@@ -234,5 +235,12 @@ describe('filterReviewPRs', () => {
     const out = filterReviewPRs(rows);
     expect(out.map((p) => p.number)).toEqual([20, 10]); // draft + WIP dropped, newest first
     expect(out[0].repo).toBe('ZAODEVZ/ZAOcowork');
+  });
+});
+
+
+describe("COCKPIT_BUDGET_USD", () => {
+  it("is at least 0.5 USD to prevent error_max_budget_usd on large estates", () => {
+    expect(COCKPIT_BUDGET_USD).toBeGreaterThanOrEqual(0.5);
   });
 });

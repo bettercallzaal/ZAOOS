@@ -31,6 +31,14 @@ const nextConfig: NextConfig = {
         destination: 'https://zabal.art/:path*',
         permanent: true,
       },
+      // The partner embed at this route is retired (Zaal, 2026-09-17). 301, not
+      // `permanent: true` (which sends 308): old links and search results land
+      // on the spaces list instead of breaking.
+      {
+        source: '/spaces/songjam', // [CLAIM-OK: songjam-live the retired URL, kept only so old links redirect]
+        destination: '/spaces',
+        statusCode: 301,
+      },
     ]
   },
 

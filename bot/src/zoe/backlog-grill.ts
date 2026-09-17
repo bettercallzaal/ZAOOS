@@ -406,7 +406,7 @@ export function shouldSendNext(input: DripInput): { send: boolean; reason: strin
 }
 
 /** What gets written into the task's notes, so every close explains itself. */
-export function verdictNote(v: Verdict, date: string): string {
+export function verdictNote(v: Verdict, date: string, time?: string): string {
   const base = {
     done: 'confirmed done',
     keep: 'still wanted - kept open',
@@ -414,8 +414,9 @@ export function verdictNote(v: Verdict, date: string): string {
     park: 'parked - stays on the board, resurfaces later',
     skip: 'skipped for now',
   }[v.key];
-  const note = v.note ? ` Zaal added: "${v.note}"` : '';
-  return `GRILL ${date} (Telegram): ${base}.${note}`;
+  const note = v.note ? ` Note: "${v.note}"` : '';
+  const stamp = time ? `[${date} ${time}] ` : '';
+  return `${stamp}GRILL ${date} (Telegram): ${base}.${note}`;
 }
 
 // ── reconcile (grill unification, card 6b6875d1) ────────────────────────────

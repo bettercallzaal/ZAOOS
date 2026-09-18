@@ -11,6 +11,7 @@
  * lookup off topics.json, so index.ts owns all the bot/api side-effects and the
  * routing table stays unit-testable.
  */
+import { groupIds } from './env';
 import { readTopics } from './topics';
 
 /** What ZOE does with a plain message dropped into a topic. */
@@ -80,7 +81,7 @@ export async function topicNameForThread(
   threadId: number | undefined,
 ): Promise<string | undefined> {
   if (!threadId) return undefined;
-  const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+  const researchThread = groupIds().researchThread;
   if (researchThread && threadId === researchThread) return 'Research';
   const topics = await readTopics().catch(() => ({}) as Record<string, number>);
   for (const [name, id] of Object.entries(topics)) {

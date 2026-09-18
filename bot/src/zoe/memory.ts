@@ -799,7 +799,7 @@ export async function appendTriageContext(
  * Build sanitized context for groups (e.g. COC, ZAO Civilization), ensuring
  * private human profiles, private tasks, and internal decisions are never leaked.
  */
-export function buildGroupContext(chatId: string, chatTitle?: string): string {
+export function buildGroupContext(chatId: string, chatTitle?: string, personaOverride?: string): string {
   const title = chatTitle || '(unnamed group)';
   const isCoc =
     chatId === '-1001609766705' ||
@@ -825,12 +825,20 @@ export function buildGroupContext(chatId: string, chatTitle?: string): string {
     '- You can answer questions about The ZAO, COC Concertz, music collaborations, and roadmap.',
     "- Privacy: Do not share Zaal's private schedule, personal credentials, financial figures, or internal system configurations.",
     "- Escalation: If a group member asks you to pass a message or note to Zaal, or asks for Zaal's input, acknowledge it clearly and let them know you will pass the message directly to Zaal.",
+    // Per-group persona, set by Zaal with `/zg persona <text>`. It is APPENDED
+    // after the boundaries so it can shape tone and focus but never remove the
+    // privacy or escalation rules. Measured 2026-09-18: groups.ts stored this
+    // field and nothing read it.
+    ...(personaOverride && personaOverride.trim()
+      ? ['', 'Group persona, set by Zaal for this group:', personaOverride.trim()]
+      : []),
   ].join('\n');
 }
 
 export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
+  personaOverride?: string,
 ): Promise<MemoryBlocks> {
   const isPrivate = scope === 'private';
   const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
@@ -883,7 +891,7 @@ export async function buildMemoryBlocks(
       ? undefined
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
-  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle);
+  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride);
   return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
 }
 

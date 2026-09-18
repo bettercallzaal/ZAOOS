@@ -30,6 +30,7 @@ import {
 } from 'discord.js';
 import { runConciergeTurn } from './concierge';
 import { buildMemoryBlocks } from './memory';
+import { communityAskOutcome, discordScopeFor } from './discord-scope';
 import { config as loadEnv } from 'dotenv';
 
 loadEnv();
@@ -167,7 +168,17 @@ export async function bootDiscordClient(): Promise<Client | null> {
 
       await message.channel.sendTyping();
 
-      const blocks = await buildMemoryBlocks('private');
+      // Scope the memory to the surface. 'private' only for Zaal's own DM; a
+      // guild channel or a member's DM gets the sanitized group path, the same
+      // one Telegram groups use. See discord-scope.ts for the 2026-09-18 finding.
+      const scope = discordScopeFor({
+        isDM: message.channel.isDMBased(),
+        authorId: message.author.id,
+        channelId: message.channel.id,
+        ownerId: DISCORD_ZAAL_ID,
+      });
+      const chatTitle = 'name' in message.channel && typeof message.channel.name === 'string' ? message.channel.name : undefined;
+      const blocks = await buildMemoryBlocks(scope, chatTitle);
       const currentDate = new Date().toLocaleString('en-US', {
         timeZone: 'America/New_York',
         weekday: 'short',
@@ -208,19 +219,23 @@ export async function bootDiscordClient(): Promise<Client | null> {
         });
 
         const sent = await sendCommunityAskForApproval(client, token, senderLabel, messageText, replyText);
-        if (sent) {
+        const outcome = communityAskOutcome(sent);
+        if (outcome === 'queued') {
           await message.reply({
-            content: `Got it, ${senderLabel} — ZOE is reviewing your question and will reply shortly.`,
+            content: `Got it, ${senderLabel}. ZOE is reviewing your question and will reply shortly.`,
             allowedMentions: { repliedUser: false },
           });
+          console.log(`[zoe/discord] community-ask from ${senderLabel} queued for approval (token=${token})`);
         } else {
-          // Fallback: send directly if Zaal DM fails.
-          const chunks = chunkMessage(replyText);
-          for (const chunk of chunks) {
-            await message.reply({ content: chunk, allowedMentions: { repliedUser: false } });
-          }
+          // Zaal could not be asked, so the draft is HELD. It used to be sent
+          // unapproved here, which is the one case the approval flow exists for.
+          pendingCommunityMessages.delete(token);
+          await message.reply({
+            content: `Got it, ${senderLabel}. ZOE will come back to you once Zaal has had a look.`,
+            allowedMentions: { repliedUser: false },
+          });
+          console.error(`[zoe/discord] community-ask from ${senderLabel} HELD: could not reach Zaal for approval`);
         }
-        console.log(`[zoe/discord] community-ask from ${senderLabel} queued for approval (token=${token})`);
         return;
       }
 

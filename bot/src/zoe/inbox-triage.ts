@@ -47,7 +47,6 @@ const ZAO_PROJECTS = [
   'COC Concertz',
   'ZOL',
   'POIDH',
-  'Magnetiq',
   'ZAO Music',
   'BCZ Strategies',
   'Fractal',

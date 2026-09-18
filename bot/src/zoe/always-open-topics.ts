@@ -54,7 +54,6 @@ const TOPIC_OPEN_THING_CONFIGS: Record<string, TopicOpenThingConfig> = {
   'ZABAL Games': { type: 'brand_draft', allowTypedReply: true },
   'The ZAO': { type: 'brand_draft', allowTypedReply: true },
   BetterCallZaal: { type: 'brand_draft', allowTypedReply: true },
-  Magnetiq: { type: 'brand_draft', allowTypedReply: true },
   ZAOstock: { type: 'brand_draft', allowTypedReply: true },
   ZAOlingo: { type: 'brand_draft', allowTypedReply: true },
   // Other topics: buttons only (no typed-reply)

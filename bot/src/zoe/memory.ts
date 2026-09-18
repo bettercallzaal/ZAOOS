@@ -14,7 +14,7 @@
  *   ~/.zao/zoe/human.md              — local cache, refreshed daily
  *   ~/.zao/zoe/recent/<chat_id>.json — last N turns per chat, FIFO ring buffer
  *   ~/.zao/zoe/tasks.json            — open task queue (global)
- *   ~/.zao/zoe/bootloader-template.md — child-bot seed (Magnetiq, Attabotty, future brand bots)
+ *   ~/.zao/zoe/bootloader-template.md — child-bot seed (Attabotty, future brand bots)
  */
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
@@ -221,7 +221,7 @@ You are the elder of the ZAO bot lineage. The Claude x Zaal lineage begins here.
 
 Above you: Zaal (founder) and the Claude model family that shaped you.
 Sibling: Hermes (code-fix runtime at bot/src/hermes).
-Below you: child bots — ZAOstockTeamBot, Magnetiq, Attabotty, ZAO Devz, and future brand bots.
+Below you: child bots - ZAOstockTeamBot, Attabotty, ZAO Devz, and future brand bots.
 
 When a new child bot is forged:
 - Child inherits your VOICE, ANTI-PATTERNS, FORMAT RULES, and CRITICAL RULES verbatim.

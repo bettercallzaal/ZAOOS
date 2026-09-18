@@ -65,6 +65,5 @@ export async function postBriefToDiscord(briefText: string): Promise<boolean> {
   return postStatusToDiscord({
     title: 'ZOE Morning Brief',
     body: briefText,
-    emoji: '☀️',
   });
 }

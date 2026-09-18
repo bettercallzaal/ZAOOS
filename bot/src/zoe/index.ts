@@ -1641,6 +1641,20 @@ bot.command('agenda', async (ctx) => {
   await sendAgenda(ctx);
 });
 
+// /focus was in the command menu and in /help with no handler behind it
+// (measured 2026-09-18: typing it did nothing). Same toggle the Focus
+// keyboard label and the cockpit button already run.
+bot.command('focus', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (await isFocusMode()) {
+    const released = await endFocus();
+    await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
+  } else {
+    await startFocus();
+    await ctx.reply('Focus ON. Non-urgent pings queue until you send /focus again.');
+  }
+});
+
 bot.command('list', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   // /list is an alias for /agenda (show all items).

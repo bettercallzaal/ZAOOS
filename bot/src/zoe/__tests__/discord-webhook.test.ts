@@ -111,11 +111,11 @@ describe('postBriefToDiscord', () => {
     mockFetch.mockReset();
   });
 
-  it('posts with morning brief title and sunrise emoji', async () => {
+  it('posts with the morning brief title and no emoji (brand.md: no emojis ever)', async () => {
     await postBriefToDiscord('Good morning!');
     const [, opts] = mockFetch.mock.calls[0];
     const payload = JSON.parse((opts as RequestInit).body as string);
-    expect(payload.embeds[0].title).toBe('☀️ ZOE Morning Brief');
+    expect(payload.embeds[0].title).toBe('ZOE Morning Brief');
     expect(payload.embeds[0].description).toBe('Good morning!');
   });
 

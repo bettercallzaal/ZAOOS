@@ -24,7 +24,7 @@ const BRAND_BRAINS: Record<string, string> = {
   WaveWarZ: 'icm_RxT9r-_IjG1U9kxOniSzFQ', // owned
   'The ZAO': 'icm_ohb0F_XOYDz9Tw_w4yX3PA', // owned, verified live
   BetterCallZaal: 'icm_r1ZHKeAdS9UNt4oz7n6HRA', // owned, filled 2026-07-12 (was empty)
-  Magnetiq: 'icm_ObVlvn960SvOLc-W-IV3wQ', // owned, minted 2026-07-12
+  // Magnetiq: retired 2026-07-31 (Zaal). Its ICM box id stays in git history only.
   ZAOstock: 'icm_lda7p0d9o_Ysg-SYZOIWjw', // owned, minted 2026-07-12
   ZAOlingo: 'icm_47k0vjXyDz23p8qi4spyJA', // owned, minted 2026-07-12
 };

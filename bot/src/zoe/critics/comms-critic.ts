@@ -53,9 +53,9 @@ VOICE RULES (from bot/src/zoe/brand.md - NON-NEGOTIABLE):
 - Phone-readable
 
 BRAND GLOSSARY (must respect exact spelling):
-- WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, SANG, ZOE, ZOLs
-- FISHBOWLZ, Joseph Goats, SongJam, Stilo World, Tom Fellenz, Thy Revolution
-- ArDrive, Magnetiq, Huottoja
+- WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, ZOE, ZOLs
+- FISHBOWLZ, Joseph Goats, Stilo World, Tom Fellenz, Thy Revolution
+- ArDrive, Huöttöja
 - Say "Farcaster" never "Warpcast"
 
 ANTI-FABRICATION (HARDEST RULE):
@@ -90,7 +90,7 @@ Score MUST drop below 70 if:
 - Banned marketing word present (3+ word penalty per word)
 - Em dash present
 - Emoji present
-- Wrong brand spelling (e.g. "Warpcast" instead of "Farcaster", "Magnetic" instead of "Magnetiq")
+- Wrong brand spelling (e.g. "Warpcast" instead of "Farcaster", "Wave Wars" instead of "WaveWarZ")
 - Marketing-passive voice instead of active
 
 OUTPUT FORMAT (exact JSON, no prose, no code fences):

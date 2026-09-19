@@ -982,8 +982,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               zaalTgId: opts.zaalTgId,
               timeSlot: 'morning',
             });
+            // "sent" only when it reached Telegram. The send budget defers past the
+            // daily cap and the gated send resolves either way, so say which happened.
             console.log(
-              `[zoe/scheduler] morning needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+              `[zoe/scheduler] morning needs-zaal digest ${res.delivered ? 'sent' : 'DEFERRED by the send budget, NOT sent'} (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
             );
           } catch (err) {
             await releaseFire('needs-zaal-morning');
@@ -1008,8 +1010,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               zaalTgId: opts.zaalTgId,
               timeSlot: 'evening',
             });
+            // "sent" only when it reached Telegram. The send budget defers past the
+            // daily cap and the gated send resolves either way, so say which happened.
             console.log(
-              `[zoe/scheduler] evening needs-zaal digest sent (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
+              `[zoe/scheduler] evening needs-zaal digest ${res.delivered ? 'sent' : 'DEFERRED by the send budget, NOT sent'} (due=${res.dueCount}, lane=${res.laneCount}, decisions=${res.decisionCount})`,
             );
           } catch (err) {
             await releaseFire('needs-zaal-evening');

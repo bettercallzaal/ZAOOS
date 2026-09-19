@@ -16,6 +16,7 @@ import { fetchCockpitTasks } from '../cockpit/adapters';
 import type { CockpitTask } from '../cockpit/types';
 import { VERDICTS, type VerdictKey, verdictButtons } from './backlog-grill';
 import { refreshVault, vaultFreshnessLine, type VaultFreshness } from './vault-freshness';
+import { wasSendBlocked } from './send-budget';
 
 export interface LaneGrillItem {
   lane: string;
@@ -356,7 +357,14 @@ export async function runNeedsZaalDigest(opts: {
   // First line, always: how old is the copy this was built from. Plain text, so it
   // cannot break the Markdown parse below.
   const withAge = `${vaultFreshnessLine(vault)}\n\n${digestText}`;
-  await opts.botApi.sendMessage(opts.zaalTgId, withAge, { parse_mode: 'Markdown' });
+  // The gated sendMessage RESOLVES when the send budget defers or drops a message:
+  // it returns a marker object instead of throwing. Until 2026-09-19 this function
+  // ignored that and returned delivered: true, so the scheduler logged "digest sent"
+  // 45 times in three days for digests that were deferred into the next morning
+  // batch ("cap spent (35/3)"). A log line that prints either way cannot report the
+  // state it names. Measured: zao-vault notes/zoe-digest-deferred-not-sent-2026-09-19.md
+  const overview = await opts.botApi.sendMessage(opts.zaalTgId, withAge, { parse_mode: 'Markdown' });
+  const blocked = wasSendBlocked(overview);
 
   const interactiveCandidates = [...decisions, ...dueSoon.filter((t) => !decisions.some((d) => d.id === t.id))].slice(0, 3);
 
@@ -375,7 +383,7 @@ export async function runNeedsZaalDigest(opts: {
   }
 
   return {
-    delivered: true,
+    delivered: !blocked,
     dueCount: dueSoon.length,
     laneCount: laneAsks.length,
     decisionCount: decisions.length,

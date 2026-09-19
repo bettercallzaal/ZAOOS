@@ -276,6 +276,29 @@ More notes here.
       expect(sentMessages[0].chatId).toBe(12345678);
     });
 
+    it('reports delivered: false when the send budget defers the overview, instead of claiming it was sent', async () => {
+      // The gated bot.api.sendMessage resolves with this marker when it defers or
+      // drops; it does not throw. 2026-09-19: the scheduler logged "digest sent"
+      // 45 times in three days for digests that never left the VPS that day.
+      const api = { sendMessage: async () => ({ zoeSendBudget: 'deferred' }) };
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      const result = await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'morning', vaultDir: '/nonexistent/vault',
+        now: new Date('2026-09-19T12:00:00Z'),
+      });
+      expect(result.delivered).toBe(false);
+    });
+
+    it('still reports delivered: true for a real Telegram message', async () => {
+      const api = { sendMessage: async () => ({ message_id: 7 }) };
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      const result = await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'morning', vaultDir: '/nonexistent/vault',
+        now: new Date('2026-09-19T12:00:00Z'),
+      });
+      expect(result.delivered).toBe(true);
+    });
+
     const mkApi = () => {
       const sent: { text: string }[] = [];
       return { sent, api: { sendMessage: async (_c: number, text: string) => { sent.push({ text }); return { message_id: sent.length }; } } };

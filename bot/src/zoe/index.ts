@@ -14,6 +14,7 @@
  *   pnpm tsx src/zoe/index.ts
  *   OR: systemd user unit zoe-bot.service
  */
+import { groupIds } from './env';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
@@ -463,8 +464,8 @@ async function replyAdminOnly(ctx: Context): Promise<void> {
 /** The ZAAL BOTZ Research topic as a work-loop reply target (env config), or
  * undefined if not configured - then research falls back to Zaal's DM. */
 function researchTopicTarget(): { chatId: number; threadId: number } | undefined {
-  const g = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
-  const t = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+  const g = groupIds().zaalBotzGroup;
+  const t = groupIds().researchThread;
   return g && t ? { chatId: g, threadId: t } : undefined;
 }
 
@@ -654,14 +655,14 @@ bot.command('chatid', async (ctx) => {
 bot.command('inittopics', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const chatId = ctx.chat.id;
-  const groupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const groupId = groupIds().zaalBotzGroup;
   if (!groupId || chatId !== groupId) {
     await ctx.reply('Run /inittopics inside the ZAAL BOTZ group.');
     return;
   }
   const topics = await readTopics();
   // Seed Research from env so ZOE does not create a duplicate of the manual one.
-  const researchThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+  const researchThread = groupIds().researchThread;
   if (researchThread && !topics.Research) topics.Research = researchThread;
 
   const results: string[] = [];
@@ -718,8 +719,8 @@ bot.command('zoldraft', async (ctx) => {
     await ctx.reply('Usage: /zoldraft <cast text>');
     return;
   }
-  const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
-  const zolThread = Number(process.env.ZOL_THREAD ?? 0);
+  const gid = groupIds().zaalBotzGroup;
+  const zolThread = groupIds().zolThread;
   if (!gid || !zolThread) {
     await ctx.reply('ZOL topic not configured (need ZAAL_BOTZ_GROUP_ID + ZOL_THREAD).');
     return;
@@ -815,7 +816,7 @@ bot.on('callback_query:data', async (ctx, next) => {
   // Claude Code session reads it via the bridge and posts the next question.
   const q = parseQuestionCallback(ctx.callbackQuery.data);
   if (q) {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     // Unpin the question once Zaal engages with it (zao-ask pins each question so
     // open ones stay easy to find; answering clears it from the pin list).
     const pinnedMid = ctx.callbackQuery.message?.message_id;
@@ -873,7 +874,7 @@ bot.on('callback_query:data', async (ctx, next) => {
   // detection needs no second path.
   const r = parseReactionCallback(ctx.callbackQuery.data);
   if (r) {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     await ctx.answerCallbackQuery({ text: 'Got it.' });
     await ctx
       .editMessageText(`Answered (${r.qid}): ${r.reaction}`, {
@@ -1548,14 +1549,29 @@ bot.command('zg', async (ctx) => {
         }
         const lines = groups.map(
           (g) =>
-            `${g.chat_id} "${g.chat_title}" mode=${g.mode} members=${g.member_allowlist.length}`,
+            `${g.chat_id} "${g.chat_title}" mode=${g.mode} members=${g.member_allowlist.length}${g.persona_override?.trim() ? ' persona=set' : ''}`,
         );
         await ctx.reply(lines.join('\n'));
         return;
       }
+      case 'persona': {
+        // `/zg persona <text>` sets this group's persona line; `/zg persona clear`
+        // removes it. Appended after the boundaries in buildGroupContext, never
+        // in place of them.
+        const text = rest.join(' ').trim();
+        if (!text) {
+          const cur = (await getGroupConfig(chatId))?.persona_override?.trim();
+          await ctx.reply(cur ? `Persona for this group:\n${cur}` : 'No persona set for this group. Usage: /zg persona <text> | /zg persona clear');
+          return;
+        }
+        const value = text.toLowerCase() === 'clear' ? '' : text;
+        await upsertGroup({ chat_id: chatId, persona_override: value });
+        await ctx.reply(value ? 'Persona set for this group. It applies from the next reply.' : 'Persona cleared for this group.');
+        return;
+      }
       default:
         await ctx.reply(
-          'Usage: /zg [status|enable [mode]|mode <m>|add <id>|remove <id>|list]. Modes: silent, mention, all.',
+          'Usage: /zg [status|enable [mode]|mode <m>|add <id>|remove <id>|list|persona <text>|persona clear]. Modes: silent, mention, all.',
         );
     }
   } catch (err) {
@@ -1639,6 +1655,20 @@ async function sendAgenda(ctx: Context): Promise<void> {
 bot.command('agenda', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   await sendAgenda(ctx);
+});
+
+// /focus was in the command menu and in /help with no handler behind it
+// (measured 2026-09-18: typing it did nothing). Same toggle the Focus
+// keyboard label and the cockpit button already run.
+bot.command('focus', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (await isFocusMode()) {
+    const released = await endFocus();
+    await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
+  } else {
+    await startFocus();
+    await ctx.reply('Focus ON. Non-urgent pings queue until you send /focus again.');
+  }
 });
 
 bot.command('list', async (ctx) => {
@@ -1797,7 +1827,7 @@ bot.on('message:text', async (ctx) => {
       // "what do I press to resolve" answer - a reply IS the resolve.
       const gr = await resolveGrillByReply(replyToId, text.trim());
       if (gr) {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         await pushRecent(
           { from: 'zaal', text: `[grill-resolve] ${gr.title ?? gr.key}: ${gr.value}`, sender: 'grill' },
           String(gid || zaalId),
@@ -1942,7 +1972,7 @@ bot.on('message:text', async (ctx) => {
             ctx.api.unpinChatMessage(zaalId, messageId),
           );
           if (r.key) {
-            const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+            const gid = groupIds().zaalBotzGroup;
             await pushRecent(
               { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${matched}`, sender: 'grill' },
               String(gid || zaalId),
@@ -2017,7 +2047,7 @@ bot.on('message:text', async (ctx) => {
   // his messages here like a DM (ZOE responds), and grammy auto-threads the
   // reply back into the same topic. The group id is env config (private-instance
   // per doc 1025) so it stays out of the repo. No @-tag needed.
-  const zaalBotzGroupId = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const zaalBotzGroupId = groupIds().zaalBotzGroup;
   if (zaalBotzGroupId && chatId === zaalBotzGroupId && isFromZaal(ctx)) {
     const threadId = ctx.message.message_thread_id;
 
@@ -2304,7 +2334,7 @@ bot.on('message:text', async (ctx) => {
 // through the exact same turn path as a typed message. Lets Zaal voice-answer.
 bot.on(['message:voice', 'message:audio'], async (ctx) => {
   if (!isFromZaal(ctx)) return;
-  const zaalBotzGroupIdV = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+  const zaalBotzGroupIdV = groupIds().zaalBotzGroup;
   const isZaalBotzV = zaalBotzGroupIdV !== 0 && ctx.chat.id === zaalBotzGroupIdV;
   // Voice is handled in Zaal's DM and in the ZAAL BOTZ group (voice-answer a
   // question / voice-drop into a topic). Ignore any other chat.
@@ -3151,7 +3181,8 @@ async function dispatchConcierge(
       ctx.chat && 'title' in ctx.chat ? ctx.chat.title : undefined;
     await pushRecent({ from: label === 'Zaal' ? 'zaal' : 'other', text, sender: label }, scope);
 
-    const blocks = await buildMemoryBlocks(scope, chatTitle);
+    const groupCfg = scope === 'private' ? null : await getGroupConfig(chatId);
+    const blocks = await buildMemoryBlocks(scope, chatTitle, groupCfg?.persona_override);
     // doc 796 Move 2: surface live commitment threads so the concierge can
     // resolve/snooze/drop them by id (DMs with Zaal only).
     if (scope === 'private') {
@@ -3907,7 +3938,7 @@ bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
     })
     .catch(() => {});
   if (r.key) {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     await pushRecent(
       { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${value}`, sender: 'grill' },
       String(gid || zaalId),
@@ -4009,7 +4040,7 @@ bot.callbackQuery('grill:multisend', async (ctx) => {
     })
     .catch(() => {});
   if (r.key) {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     await pushRecent(
       { from: 'zaal', text: `[grill-answer] ${r.title ?? r.key}: ${r.value}`, sender: 'grill' },
       String(gid || zaalId),
@@ -4039,7 +4070,7 @@ bot.callbackQuery('grill:approve', async (ctx) => {
     })
     .catch(() => {});
   if (r.key) {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     await pushRecent(
       { from: 'zaal', text: `[grill-approve] ${r.title ?? r.key}: approved`, sender: 'grill' },
       String(gid || zaalId),

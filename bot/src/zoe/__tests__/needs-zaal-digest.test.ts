@@ -275,5 +275,63 @@ More notes here.
       expect(sentMessages[0].text).toContain('Needs Zaal Digest');
       expect(sentMessages[0].chatId).toBe(12345678);
     });
+
+    const mkApi = () => {
+      const sent: { text: string }[] = [];
+      return { sent, api: { sendMessage: async (_c: number, text: string) => { sent.push({ text }); return { message_id: sent.length }; } } };
+    };
+    const stale = {
+      state: 'STALE' as const, behind: 64, ahead: 0, dirty: true, pulled: 0,
+      headCommittedAt: new Date('2026-09-17T07:52:00Z'), reason: 'the copy has uncommitted changes, so it was not moved',
+    };
+
+    it('puts the age of the vault copy on the FIRST line, before the digest, when it is stale', async () => {
+      const { sent, api } = mkApi();
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      const result = await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'evening', vaultDir: '/nonexistent/vault',
+        now: new Date('2026-09-17T20:00:00Z'), refresh: async () => stale,
+      });
+      const first = sent[0].text.split('\n')[0];
+      expect(first).toContain('64 commits BEHIND');
+      expect(first).toMatch(/may be out of date/);
+      expect(sent[0].text.indexOf('vault copy:')).toBeLessThan(sent[0].text.indexOf('Needs Zaal Digest'));
+      expect(result.vault.state).toBe('STALE');
+    });
+
+    it('says current and does not warn when the copy is fresh', async () => {
+      const { sent, api } = mkApi();
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'evening', vaultDir: '/nonexistent/vault',
+        refresh: async () => ({ ...stale, state: 'FRESH' as const, behind: 0, dirty: false, pulled: 3, reason: '' }),
+      });
+      expect(sent[0].text.split('\n')[0]).toBe('vault copy: current, pulled 3 new commits just now');
+      expect(sent[0].text).not.toMatch(/may be out of date/);
+    });
+
+    it('calls the refresh BEFORE it reads the vault, and with the vault dir', async () => {
+      const { api } = mkApi();
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      const calls: string[] = [];
+      await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'morning', vaultDir: '/some/vault',
+        refresh: async (dir) => { calls.push(dir); return { ...stale, state: 'FRESH' as const, behind: 0, reason: '' }; },
+      });
+      expect(calls).toEqual(['/some/vault']);
+    });
+
+    it('still delivers the digest when the freshness check THROWS, and says the age is UNKNOWN', async () => {
+      const { sent, api } = mkApi();
+      const { runNeedsZaalDigest } = await import('../needs-zaal-digest');
+      const result = await runNeedsZaalDigest({
+        botApi: api, zaalTgId: 1, timeSlot: 'morning', vaultDir: '/nonexistent/vault',
+        refresh: async () => { throw new Error('git exploded'); },
+      });
+      expect(result.delivered).toBe(true);
+      expect(sent[0].text.split('\n')[0]).toContain('age UNKNOWN');
+      expect(sent[0].text).toContain('Needs Zaal Digest');
+      expect(result.vault.state).toBe('UNKNOWN');
+    });
   });
 });

@@ -65,3 +65,23 @@ describe('renderConciergePrompt & buildSystemBlocks privacy gating', () => {
     expect(sys).not.toContain('<companion_presence>');
   });
 });
+
+describe('buildGroupContext persona override (2026-09-18: the stored field nothing read)', () => {
+  it('appends the persona after the boundaries and keeps every boundary line', () => {
+    const ctx = buildGroupContext('-1009999999', 'ZAO Devz', 'Talk like a builder. Short. Point at the repo.');
+    expect(ctx).toContain('Group persona, set by Zaal for this group:');
+    expect(ctx).toContain('Talk like a builder. Short. Point at the repo.');
+    expect(ctx).toMatch(/Privacy: Do not share/);
+    expect(ctx).toMatch(/Escalation:/);
+    expect(ctx.indexOf('Escalation:')).toBeLessThan(ctx.indexOf('Group persona, set by Zaal'));
+  });
+  it('an empty or whitespace persona adds nothing', () => {
+    const plain = buildGroupContext('-1009999999', 'ZAO Devz');
+    expect(buildGroupContext('-1009999999', 'ZAO Devz', '')).toBe(plain);
+    expect(buildGroupContext('-1009999999', 'ZAO Devz', '   ')).toBe(plain);
+  });
+  it('flows through buildMemoryBlocks into group_context', async () => {
+    const blocks = await buildMemoryBlocks('-1009999999', 'ZAO Devz', 'Answer in one line.');
+    expect(blocks.group_context).toContain('Answer in one line.');
+  });
+});

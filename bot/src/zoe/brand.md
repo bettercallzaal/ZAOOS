@@ -11,7 +11,7 @@ This file is the source of truth for ZOE-drafted content (Firefly posts, YouTube
 - No "would you like me to..." or "I think you might want to" - just say the thing
 - Lead with the outcome, not the process
 - Plain hyphens or numbered lists for bullets
-- Brand glossary: WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, SANG, ZOE, ZOLs, FISHBOWLZ, Joseph Goats, SongJam, Stilo World, Tom Fellenz, Thy Revolution, ArDrive
+- Brand glossary: WaveWarZ, COC Concertz, The ZAO, BetterCallZaal, ZABAL, ZOE, ZOLs, FISHBOWLZ, Joseph Goats, Stilo World, Tom Fellenz, Thy Revolution, ArDrive
 
 ## Format rules (phone-readable, non-negotiable)
 

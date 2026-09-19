@@ -15,6 +15,7 @@ import { join, basename } from 'node:path';
 import { fetchCockpitTasks } from '../cockpit/adapters';
 import type { CockpitTask } from '../cockpit/types';
 import { VERDICTS, type VerdictKey, verdictButtons } from './backlog-grill';
+import { refreshVault, vaultFreshnessLine, type VaultFreshness } from './vault-freshness';
 
 export interface LaneGrillItem {
   lane: string;
@@ -305,9 +306,24 @@ export async function runNeedsZaalDigest(opts: {
   timeSlot: 'morning' | 'evening';
   vaultDir?: string;
   now?: Date;
-}): Promise<{ delivered: boolean; dueCount: number; laneCount: number; decisionCount: number }> {
+  /** Injectable so tests do not shell out to git. Defaults to the real refresh. */
+  refresh?: (dir: string) => Promise<VaultFreshness>;
+}): Promise<{ delivered: boolean; dueCount: number; laneCount: number; decisionCount: number; vault: VaultFreshness }> {
   const now = opts.now ?? new Date();
   const vaultDir = opts.vaultDir ?? process.env.VAULT_DIR ?? join(homedir(), 'zao-vault');
+
+  // Pull BEFORE the read. This digest is built from a copy of the vault, and on
+  // 2026-09-17 that copy was 64 commits behind with nothing refreshing it. A refresh
+  // that fails must not stop the digest; it changes the first line instead.
+  let vault: VaultFreshness;
+  try {
+    vault = await (opts.refresh ?? refreshVault)(vaultDir);
+  } catch (err) {
+    vault = {
+      state: 'UNKNOWN', behind: null, ahead: null, dirty: null, pulled: 0, headCommittedAt: null,
+      reason: `the freshness check itself failed (${(err as Error).message})`,
+    };
+  }
 
   const laneAsks = parseLaneGrillSections(vaultDir);
 
@@ -337,7 +353,10 @@ export async function runNeedsZaalDigest(opts: {
     decisions,
   });
 
-  await opts.botApi.sendMessage(opts.zaalTgId, digestText, { parse_mode: 'Markdown' });
+  // First line, always: how old is the copy this was built from. Plain text, so it
+  // cannot break the Markdown parse below.
+  const withAge = `${vaultFreshnessLine(vault)}\n\n${digestText}`;
+  await opts.botApi.sendMessage(opts.zaalTgId, withAge, { parse_mode: 'Markdown' });
 
   const interactiveCandidates = [...decisions, ...dueSoon.filter((t) => !decisions.some((d) => d.id === t.id))].slice(0, 3);
 
@@ -360,5 +379,6 @@ export async function runNeedsZaalDigest(opts: {
     dueCount: dueSoon.length,
     laneCount: laneAsks.length,
     decisionCount: decisions.length,
+    vault,
   };
 }

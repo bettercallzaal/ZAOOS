@@ -69,6 +69,33 @@ export const ZAAL_BOTZ_ZAOSTOCK_THREAD = numOf(
   "ZAAL_BOTZ_THE_ZAO_THREAD",
 );
 
+/**
+ * Group and thread ids resolved AT CALL TIME, for the readers that used to do
+ * `Number(process.env.X ?? 0)` inline. Measured 2026-09-18 (zj audit): 25
+ * such reads across index.ts, scheduler.ts and topic-router.ts, none of which
+ * got the alias tolerance this file exists for. Call-time rather than
+ * module-time so a test can stub the environment after import, which is how
+ * the scheduler tests already work. `?? 0` semantics preserved: a missing or
+ * non-numeric value is 0, never NaN.
+ */
+export function groupIds(): {
+  zaalBotzGroup: number;
+  researchThread: number;
+  zolThread: number;
+  zaoGroup: number;
+  zaostockTeamGroup: number;
+  devzChat: number;
+} {
+  return {
+    zaalBotzGroup: numOf("ZAAL_BOTZ_GROUP_ID", "ZAALBOTS_GROUP_CHAT_ID") ?? 0,
+    researchThread: numOf("ZAAL_BOTZ_RESEARCH_THREAD", "ZAALBOTS_STATUS_THREAD_ID") ?? 0,
+    zolThread: numOf("ZOL_THREAD") ?? 0,
+    zaoGroup: numOf("ZAO_GROUP_ID") ?? 0,
+    zaostockTeamGroup: numOf("ZAOSTOCK_TEAM_GROUP_ID") ?? 0,
+    devzChat: numOf("ZAO_DEVZ_CHAT_ID") ?? 0,
+  };
+}
+
 interface EnvSpec {
   label: string;
   value: number | string | undefined;
@@ -84,6 +111,10 @@ const SPECS: EnvSpec[] = [
   { label: "ZAAL_BOTZ_QUESTIONS_THREAD", value: ZAAL_BOTZ_QUESTIONS_THREAD, required: false, aliases: "ZAAL_BOTZ_QUESTIONS_THREAD | ZAAL_BOTZ_CLAUDE_CODE_THREAD" },
   { label: "ZAAL_BOTZ_CODING_THREAD", value: ZAAL_BOTZ_CODING_THREAD, required: false, aliases: "ZAAL_BOTZ_CODING_THREAD" },
   { label: "ZAAL_BOTZ_ZAOSTOCK_THREAD", value: ZAAL_BOTZ_ZAOSTOCK_THREAD, required: false, aliases: "ZAAL_BOTZ_ZAOSTOCK_THREAD | ZAAL_BOTZ_THE_ZAO_THREAD" },
+  { label: "ZOL_THREAD", value: numOf("ZOL_THREAD"), required: false, aliases: "ZOL_THREAD" },
+  { label: "ZAO_GROUP_ID", value: numOf("ZAO_GROUP_ID"), required: false, aliases: "ZAO_GROUP_ID" },
+  { label: "ZAOSTOCK_TEAM_GROUP_ID", value: numOf("ZAOSTOCK_TEAM_GROUP_ID"), required: false, aliases: "ZAOSTOCK_TEAM_GROUP_ID" },
+  { label: "ZAO_DEVZ_CHAT_ID", value: numOf("ZAO_DEVZ_CHAT_ID"), required: false, aliases: "ZAO_DEVZ_CHAT_ID" },
 ];
 
 /**

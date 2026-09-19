@@ -57,7 +57,7 @@ import { surfaceZaostockApprovals } from './zaostock-approvals-surface';
 import { runOrchestratorTick, runNudgePing } from './orchestrator-tick';
 import { surfaceNudges } from './nudge';
 import { resolveForumThread } from './topics';
-import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING_THREAD, ZAAL_BOTZ_ZAOSTOCK_THREAD } from './env';
+import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING_THREAD, ZAAL_BOTZ_ZAOSTOCK_THREAD, groupIds } from './env';
 import { surfaceGrill } from './grill';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
@@ -271,7 +271,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // logs past) is the failure mode this exists to kill. Fire-and-forget - a
   // preflight problem must never stop the scheduler from starting.
   void runPreflight(async (report: string) => {
-    const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+    const gid = groupIds().zaalBotzGroup;
     const target = gid || opts.zaalTgId;
     // Preflight only speaks when something is broken - that is an alarm, not a
     // status report, and it must not be capped or queued behind a busy day.
@@ -1030,7 +1030,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       async () => {
         if (!(await claimFire('curator-tick'))) return;
         try {
-          const zaoGroupId = Number(process.env.ZAO_GROUP_ID ?? 0);
+          const zaoGroupId = groupIds().zaoGroup;
           if (!zaoGroupId) {
             console.log('[zoe/scheduler] curator: ZAO_GROUP_ID not configured, skipping');
             await releaseFire('curator-tick');
@@ -1479,8 +1479,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             console.log('[zoe/scheduler] work-loop tick skipped (cost hard-stop at 95%+)');
             return;
           }
-          const rGid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
-          const rThread = Number(process.env.ZAAL_BOTZ_RESEARCH_THREAD ?? 0);
+          const rGid = groupIds().zaalBotzGroup;
+          const rThread = groupIds().researchThread;
           await runTickLeased('work-loop', loopLeasesEnabled(), 600, () => runWorkTick({
             sendToZaal: (t: string) => {
               // Work-loop messages are status messages
@@ -1524,7 +1524,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       '*/10 * * * *',
       () =>
         runWithSendClass('alarm', async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         if (!gid) return; // not configured
         const thread = await resolveForumThread(ZAAL_BOTZ_CODING_THREAD, "Coding");
         try {
@@ -1574,7 +1574,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '30 */3 * * *',
       async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         if (!gid) return; // not configured
         if (!process.env.OPENROUTER_API_KEY?.trim()) return; // scout needs the cheap model
         if (shouldPauseAutonomousWork()) return; // cost hard-stop
@@ -1626,7 +1626,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           // Pass a send + target so the canary can exercise the transactional
           // outbox end-to-end when ZOE_OUTBOX_DEMO is also on (still no-op when
           // that flag is off). Target = the ZAAL BOTZ ops group (internal).
-          const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+          const gid = groupIds().zaalBotzGroup;
           await runHeartFleetCanary(undefined, {
             groupId: gid || undefined,
             send: gid
@@ -1648,7 +1648,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '*/10 * * * *',
       async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         const thread = await resolveForumThread(ZAAL_BOTZ_HANDOFFS_THREAD, "Handoffs");
         if (!gid || !thread) return; // not configured
         try {
@@ -1679,8 +1679,8 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '*/10 * * * *',
       async () => {
-        const isDedicated = Boolean(process.env.ZAOSTOCK_TEAM_GROUP_ID);
-        const gid = Number(process.env.ZAOSTOCK_TEAM_GROUP_ID ?? process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const isDedicated = groupIds().zaostockTeamGroup !== 0;
+        const gid = (groupIds().zaostockTeamGroup || groupIds().zaalBotzGroup);
         if (!gid) return; // not configured
         const thread = isDedicated
           ? undefined
@@ -1707,7 +1707,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // so the phase-1 burst hits the full 5-in-10-min. No-op unless ZOE_NUDGE_LADDER=1.
   tasks.push(
     cron.schedule('*/2 * * * *', async () => {
-      const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+      const gid = groupIds().zaalBotzGroup;
       if (!gid) return;
       try {
         await runNudgePing({ bot: opts.bot, groupId: gid, now: new Date() });
@@ -1721,7 +1721,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '*/5 * * * *',
       async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         if (!gid) return; // not configured
         try {
           if (shouldPauseAutonomousWork()) {
@@ -1750,7 +1750,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '30 6 * * *',
       async () => {
-        const gid = Number(process.env.ZAAL_BOTZ_GROUP_ID ?? 0);
+        const gid = groupIds().zaalBotzGroup;
         if (!gid) return; // not configured
         const thread = await resolveForumThread(ZAAL_BOTZ_QUESTIONS_THREAD, "Claude Code");
         try {

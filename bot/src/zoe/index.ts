@@ -15,6 +15,7 @@
  *   OR: systemd user unit zoe-bot.service
  */
 import { groupIds } from './env';
+import { OWNER_ONLY_LINE, newOwnerOnlyState, shouldSendOwnerOnlyLine } from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
@@ -430,6 +431,20 @@ function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
 }
 
+// Owner-only commands used to fall silent for anyone else. Now one plain line,
+// once per user per hour (Zaal, 2026-09-18, by picker). Returns true when the
+// caller is Zaal, so `if (!(await ownerOnly(ctx))) return;` reads as the old
+// gate did. See owner-only.ts.
+const ownerOnlyState = newOwnerOnlyState();
+async function ownerOnly(ctx: Context): Promise<boolean> {
+  if (isFromZaal(ctx)) return true;
+  const uid = ctx.from?.id;
+  if (uid !== undefined && shouldSendOwnerOnlyLine(ownerOnlyState, uid, Date.now())) {
+    await ctx.reply(OWNER_ONLY_LINE).catch(() => undefined);
+  }
+  return false;
+}
+
 // ZOE anchors all reasoning to Eastern time (Zaal's tz). Shared by the
 // concierge turn and the decompose path so the model never sees a UTC date.
 function currentDateString(): string {
@@ -470,7 +485,7 @@ function researchTopicTarget(): { chatId: number; threadId: number } | undefined
 }
 
 bot.command('start', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   await ctx.reply(
     'ZOE online. Hermes runtime, Sonnet/Opus brain via Max plan. Memory blocks loaded (persona/human/working/tasks). Send anything.',
     { reply_markup: BUTTON_BAR },
@@ -479,7 +494,7 @@ bot.command('start', async (ctx) => {
 
 // /menu - (re)show the persistent tap-first cockpit bar at the bottom of the DM.
 bot.command('menu', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   await ctx.reply('Cockpit bar ready - tap below.', { reply_markup: BUTTON_BAR });
 });
 
@@ -587,14 +602,14 @@ function grillResolvedText(original: string | undefined, outcome: string): strin
 
 // /grill & /needsme - surface the next item that needs you, on demand (also runs on a cron).
 bot.command(['grill', 'needsme'], async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
 });
 
 // /working - list tasks currently in_progress with how long they've been in that state
 bot.command('working', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   try {
     const base = process.env.COWORK_TRACKER_URL;
     const apiKey = process.env.COWORK_TRACKER_KEY;
@@ -638,7 +653,7 @@ bot.command('working', async (ctx) => {
 // Zaal can wire a group + topics without a third-party id bot. Works in DMs,
 // groups, and topics; commands reach the bot even in privacy mode.
 bot.command('chatid', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const chatId = ctx.chat.id;
   const title = 'title' in ctx.chat ? ctx.chat.title : '(dm)';
   const threadId = ctx.message?.message_thread_id;
@@ -653,7 +668,7 @@ bot.command('chatid', async (ctx) => {
 // admin) and stores each name -> thread id in topics.json. Run it inside the
 // group. Skips topics already known (e.g. Research), so it is safe to re-run.
 bot.command('inittopics', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const chatId = ctx.chat.id;
   const groupId = groupIds().zaalBotzGroup;
   if (!groupId || chatId !== groupId) {
@@ -697,7 +712,7 @@ bot.command('inittopics', async (ctx) => {
 // Zaal can tap-test the approve flow. Real drafts (ZOL casts etc.) reuse the
 // same putDraft + draftKeyboard + callback handler below.
 bot.command('draftdemo', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const id = 'demo-' + Date.now().toString(36);
   const body = 'Demo draft. Tap Post to confirm, Skip to drop, Edit to revise.';
   putDraft('demo', body, id);
@@ -713,7 +728,7 @@ bot.command('draftdemo', async (ctx) => {
 // marks the draft posted - wiring it to actually cast (ZOL identity on the Pi,
 // or ZOE's caster) is a follow-up that needs Zaal's call on the posting identity.
 bot.command('zoldraft', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const text = (ctx.match ?? '').toString().trim();
   if (!text) {
     await ctx.reply('Usage: /zoldraft <cast text>');
@@ -1124,7 +1139,7 @@ bot.on('message_reaction', async (ctx) => {
   }
 });
 bot.command('tasks', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
 });
@@ -1132,7 +1147,7 @@ bot.command('tasks', async (ctx) => {
 // Fleet loop status (Zaal P1, 2026-07-17). /loops = all loops; /loop <name> = one.
 // Reads the keepalive supervisor's /tmp/fleet-status.json. Read-only, Zaal-only.
 bot.command('loops', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const data = await readFleetStatus();
   await replyChunked(ctx, formatLoopsStatus(data, Date.now()));
 });
@@ -1140,7 +1155,7 @@ bot.command('loops', async (ctx) => {
 // Critic-panel shadow eval (doc 2215): panel-vs-single-critic agreement on
 // today's Hermes reviews. Read-only, Zaal-only. /shadow [YYYY-MM-DD].
 bot.command('shadow', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const day = (ctx.match ?? '').toString().trim() || undefined;
   const s = day ? shadowSummary(day) : shadowSummary();
   if (s.total === 0) {
@@ -1163,7 +1178,7 @@ bot.command('shadow', async (ctx) => {
 });
 
 bot.command('loop', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const name = (ctx.match ?? '').toString().trim();
   const data = await readFleetStatus();
   await replyChunked(ctx, formatLoopDetail(data, name, Date.now()));
@@ -1172,7 +1187,7 @@ bot.command('loop', async (ctx) => {
 // On-demand operator cockpit: the same brief the 5am cron sends, triggerable
 // any time (e.g. from the car). Read-only. /cockpit
 bot.command('cockpit', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const statusMsg = await ctx.reply('Building your cockpit...');
   try {
     const run = await runCockpit('brief');
@@ -1196,7 +1211,7 @@ bot.command('cockpit', async (ctx) => {
 });
 
 bot.command('team', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   if (!teamTrackerConfigured()) {
     await ctx.reply(
       'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
@@ -1211,7 +1226,7 @@ bot.command('team', async (ctx) => {
 // now"), built for Zaal to forward to the team for coordination (doc 2201).
 // Read-only, Zaal-only. Does NOT mirror to Bonfire (that's the scheduled run).
 bot.command('board', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   if (!teamTrackerConfigured()) {
     await ctx.reply(
       'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
@@ -1235,13 +1250,13 @@ bot.command('board', async (ctx) => {
 // than showing an old snapshot as now. /board stays the team digest.
 // /companion - active companion overview: estate pulse, countdown, active lanes, blockers
 bot.command('companion', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const pulse = await getCompanionPulse();
   await replyChunked(ctx, renderCompanionOverview(pulse));
 });
 
 bot.command('lanes', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const snap = await readLaneSnapshot();
   await replyChunked(ctx, renderLanes(snap, Math.floor(Date.now() / 1000)));
 });
@@ -1250,7 +1265,7 @@ bot.command('lanes', async (ctx) => {
 //   /teamadd <title>                 -> project defaults to zaodevz
 //   /teamadd <project> | <title>     -> explicit project
 bot.command('teamadd', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   if (!teamTrackerConfigured()) {
     await ctx.reply('Team tracker not wired up - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY.');
     return;
@@ -1268,7 +1283,7 @@ bot.command('teamadd', async (ctx) => {
 });
 
 bot.command('seed', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const result = await seedInitialTasks();
   await ctx.reply(
     result.seeded > 0
@@ -1278,13 +1293,13 @@ bot.command('seed', async (ctx) => {
 });
 
 bot.command('quest', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const block = await buildQuestsBlock();
   await replyChunked(ctx, block);
 });
 
 bot.command('quests', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const list = await formatQuestList();
   await replyChunked(ctx, list);
 });
@@ -1298,7 +1313,7 @@ bot.command(['voicememo', 'vm'], async (ctx) => {
 // /resume <thing> (or /cv) - capture a resume/bio credential -> resume.md + Bonfire.
 // Voice notes that start with "add to my resume ..." route here too (see voice handler).
 bot.command(['resume', 'cv'], async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   await ctx.reply(await captureResume(ctx.message?.text ?? ''));
 });
 
@@ -1306,7 +1321,7 @@ bot.command(['resume', 'cv'], async (ctx) => {
 // draft into the existing POST/REGEN/SKIP review flow. One at a time: if a
 // review is already in flight, ask Zaal to disposition it first.
 bot.command('drafts', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const inFlight = await loadPostsPending();
   if (inFlight && inFlight.state === 'pending') {
     await ctx.reply('A draft is already up for review - tap POST/REGEN/SKIP on it first, then /drafts for the next.');
@@ -1417,7 +1432,7 @@ bot.callbackQuery(/^post-(approve|regen|skip):/, async (ctx) => {
 // v1 steward gate = Zaal's DM (the only allowed DM); BONFIRE_STEWARD_FIDS is the
 // forward-looking multi-steward list. Surfaces one pending item; reply y/n.
 bot.command('bonfire', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   if (!queueConfigured()) {
     await ctx.reply(
       'Bonfire queue not configured — set ZG_UPSTASH_REST_URL + ZG_UPSTASH_REST_TOKEN.',
@@ -1428,7 +1443,7 @@ bot.command('bonfire', async (ctx) => {
 });
 
 bot.command('notes', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   try {
     const raw = await fs.readFile(CLAUDE_NOTES_FILE, 'utf8');
     const blocks = raw
@@ -1585,7 +1600,7 @@ bot.command('zg', async (ctx) => {
 // FEATURE 5: BOT COMMANDS (/pulse /agenda /list)
 // Mirror board state via REST API (Supabase or cowork tracker).
 bot.command('pulse', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   try {
     const supaUrl = process.env.SUPABASE_URL;
     const supaKey = process.env.SUPABASE_ANON_KEY;
@@ -1653,7 +1668,7 @@ async function sendAgenda(ctx: Context): Promise<void> {
 }
 
 bot.command('agenda', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   await sendAgenda(ctx);
 });
 
@@ -1661,7 +1676,7 @@ bot.command('agenda', async (ctx) => {
 // (measured 2026-09-18: typing it did nothing). Same toggle the Focus
 // keyboard label and the cockpit button already run.
 bot.command('focus', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   if (await isFocusMode()) {
     const released = await endFocus();
     await ctx.reply(`Focus OFF. ${released.length} queued ping${released.length === 1 ? '' : 's'} released.`);
@@ -1672,7 +1687,7 @@ bot.command('focus', async (ctx) => {
 });
 
 bot.command('list', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   // /list is an alias for /agenda (show all items).
   await sendAgenda(ctx);
 });
@@ -1957,7 +1972,7 @@ bot.on('message:text', async (ctx) => {
 
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
-    if (!isFromZaal(ctx)) return;
+    if (!(await ownerOnly(ctx))) return;
     // #51 typed-answer capture: a PLAIN typed message that is option-shaped for
     // the active grill decision ("2", "map", "1 and 3") resolves it directly -
     // previously only button taps and exact swipe-replies registered, so a
@@ -2333,7 +2348,7 @@ bot.on('message:text', async (ctx) => {
 // Voice / audio intake (Zaal DM only): transcribe via Groq Whisper, then run it
 // through the exact same turn path as a typed message. Lets Zaal voice-answer.
 bot.on(['message:voice', 'message:audio'], async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const zaalBotzGroupIdV = groupIds().zaalBotzGroup;
   const isZaalBotzV = zaalBotzGroupIdV !== 0 && ctx.chat.id === zaalBotzGroupIdV;
   // Voice is handled in Zaal's DM and in the ZAAL BOTZ group (voice-answer a
@@ -3926,7 +3941,7 @@ async function applyLearnProposals(
 // the buttons ARE the options. Tapping records the answer, logs the decision so
 // ZOE's brain + loops act on it, then surfaces the next item.
 bot.callbackQuery(/^grill:ans:(.+)$/, async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const value = ctx.match[1];
   const r = await applyGrillAnswer(value, undefined, (messageId) =>
     ctx.api.unpinChatMessage(zaalId, messageId),
@@ -3989,7 +4004,7 @@ bot.callbackQuery(/^bg:(done|keep|work|park|drop|skip)(?::(.+))?$/, async (ctx) 
 });
 
 bot.callbackQuery('grill:multi', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const active = await getActiveGrill();
   if (!active) {
     await ctx.answerCallbackQuery({ text: 'Nothing active.' }).catch(() => {});
@@ -4002,7 +4017,7 @@ bot.callbackQuery('grill:multi', async (ctx) => {
 });
 
 bot.callbackQuery(/^grill:tog:(.+)$/, async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const r = await toggleGrillMulti(ctx.match[1]);
   if (!r) {
     await ctx.answerCallbackQuery({ text: 'Nothing active.' }).catch(() => {});
@@ -4015,7 +4030,7 @@ bot.callbackQuery(/^grill:tog:(.+)$/, async (ctx) => {
 });
 
 bot.callbackQuery('grill:multicancel', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const active = await getActiveGrill();
   await ctx.answerCallbackQuery().catch(() => {});
   if (!active) return;
@@ -4027,7 +4042,7 @@ bot.callbackQuery('grill:multicancel', async (ctx) => {
 });
 
 bot.callbackQuery('grill:multisend', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const r = await commitGrillMulti();
   if (!r) {
     await ctx.answerCallbackQuery({ text: 'Toggle at least one option first.' }).catch(() => {});
@@ -4059,7 +4074,7 @@ bot.callbackQuery('grill:multisend', async (ctx) => {
 // board's needs-you queue, then advances. This is what "resolve" means for an
 // item that has no clean 1/2/3 options.
 bot.callbackQuery('grill:approve', async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const r = await applyGrillAnswer('approved', undefined, (messageId) =>
     ctx.api.unpinChatMessage(zaalId, messageId),
   );
@@ -4087,7 +4102,7 @@ bot.callbackQuery('grill:approve', async (ctx) => {
 // Grill buttons (Done / Skip / Later) act on the active grill item, then the
 // next item pops immediately - the "answer and the next one comes" behavior.
 bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
-  if (!isFromZaal(ctx)) return;
+  if (!(await ownerOnly(ctx))) return;
   const action = ctx.match[1] as 'done' | 'skip' | 'snooze';
   const note = await applyGrillAction(action, undefined, (messageId) =>
     ctx.api.unpinChatMessage(zaalId, messageId),

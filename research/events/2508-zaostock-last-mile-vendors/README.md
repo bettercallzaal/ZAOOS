@@ -9,7 +9,7 @@ original-query: "Keep working on open things that need research"
 tier: STANDARD
 ---
 
-# 2508 — ZAOstock Last-Mile Vendors: Porta Potties, Banners, Crew Sweatshirts + Merch Store, Wristbands
+# 2508 - ZAOstock Last-Mile Vendors: Porta Potties, Banners, Crew Sweatshirts + Merch Store, Wristbands
 
 > **Goal:** Four open, dated ZAOstock line items - portable restrooms (Zaal emailed at 08:42 today, no answer, Steve Peer has been waiting), three banners (artwork due ~20-22 Sept, in hand by Fri 2 Oct), 15 crew sweatshirts + a print-on-demand merch showcase store (Eric Marichal offered to help, 19 Sept), and crew/artist wristbands (vault found ~$16/500 Tyvek, unconfirmed) - each closed out with real, fetched vendors, a price range, and a decide-by date inside the 14-day window to 3 October 2026.
 >
@@ -136,11 +136,11 @@ Fetched today, each vendor's own pricing page:
 
 ## Also See
 
-- [Doc 1071 — ZAOstock Vendor Sourcing: Porta-Potty, Radios, First Aid](../1071-zaostock-vendor-sourcing-sanitation-radio-firstaid/) — the July 2026 first pass on the same Ray Plumbing/Casella vendors; this doc re-fetches and updates pricing status (now unpublished on-site) and adds two more vendors plus the sizing-chart citation
-- [Doc 1046 — ZAOstock Accessibility Plan](../1046-zaostock-accessibility-plan/) — source of the one-ADA-unit-per-cluster guidance this doc's restroom count follows
-- [Doc 1032 — ZAOstock Day-of Operations Plan](../1032-zaostock-day-of-operations-plan/) — source of the Chapter 14 mass-gathering permit context and the original (500-person-scale) restroom cluster plan this doc re-sizes for the actual 200-250 expected turnout
-- [Doc events/1326 — ZAOstock Ticketing + Attendance Strategy](../1326-zaostock-ticketing-attendance-strategy-jul2026/) — source of the "~30 wristbands, 2 per artist + 2 per crew" figure this doc confirms is still the right scale (doc number 1326 is ambiguous in this library; this is the `events/` document, not `business/1326-culture-coins-meme-engine-sparkz-synthesis`)
-- [Doc 2488 — DJ + Sound/AV Vendor Hit List Near Ellsworth, Maine](../2488-dj-sound-vendors-ellsworth/) — same methodology (genuinely-local vendors, ruled-out false positives named explicitly, contact details left off body text for the same PII-hygiene reason) applied to a different ZAOstock vendor gap
+- [Doc 1071 - ZAOstock Vendor Sourcing: Porta-Potty, Radios, First Aid](../1071-zaostock-vendor-sourcing-sanitation-radio-firstaid/) - the July 2026 first pass on the same Ray Plumbing/Casella vendors; this doc re-fetches and updates pricing status (now unpublished on-site) and adds two more vendors plus the sizing-chart citation
+- [Doc 1046 - ZAOstock Accessibility Plan](../1046-zaostock-accessibility-plan/) - source of the one-ADA-unit-per-cluster guidance this doc's restroom count follows
+- [Doc 1032 - ZAOstock Day-of Operations Plan](../1032-zaostock-day-of-operations-plan/) - source of the Chapter 14 mass-gathering permit context and the original (500-person-scale) restroom cluster plan this doc re-sizes for the actual 200-250 expected turnout
+- [Doc events/1326 - ZAOstock Ticketing + Attendance Strategy](../1326-zaostock-ticketing-attendance-strategy-jul2026/) - source of the "~30 wristbands, 2 per artist + 2 per crew" figure this doc confirms is still the right scale (doc number 1326 is ambiguous in this library; this is the `events/` document, not `business/1326-culture-coins-meme-engine-sparkz-synthesis`)
+- [Doc 2488 - DJ + Sound/AV Vendor Hit List Near Ellsworth, Maine](../2488-dj-sound-vendors-ellsworth/) - same methodology (genuinely-local vendors, ruled-out false positives named explicitly, contact details left off body text for the same PII-hygiene reason) applied to a different ZAOstock vendor gap
 
 ## Next Actions
 
@@ -156,31 +156,31 @@ Fetched today, each vendor's own pricing page:
 
 ## Sources
 
-- [Ray Plumbing & Heating — Portable Toilets for Event Planning](https://www.rayplumbing.com/portable-toilets/event-planning/) — [FULL, fetched 2026-09-19]
-- [Ray Plumbing & Heating — FAQs](https://www.rayplumbing.com/faqs/) — [FULL, fetched 2026-09-19]
-- [Casella — Portable Toilets in Ellsworth, ME](https://local.casella.com/portable-toilet/ME/Ellsworth-ME) — [FULL, fetched 2026-09-19]
-- [Ellsworth Porta Potty Rentals](https://www.ellsworthportapotty.com/) — [FULL, fetched 2026-09-19]
-- [City of Ellsworth — Permits](https://www.ellsworthmaine.gov/services/permits/) — [FULL, fetched 2026-09-19]
-- [City of Ellsworth — Public Restrooms Update](https://www.ellsworthmaine.gov/public-restrooms-update/) — [FULL, fetched 2026-09-19; the post itself is dated 2025-05-01, so October-2026 status is unconfirmed]
-- [Downeast Graphics & Printing — Wide-Format](https://www.downeastgraphics.com/wide-format) — [FULL, fetched 2026-09-19]
-- [Downeast Graphics & Printing — About Us](https://www.downeastgraphics.com/who-we-are) — [FULL, fetched 2026-09-19]
-- [Print Bangor — Signs & Banners](https://printbangor.com/product-category/signs/) — [FULL, fetched 2026-09-19]
-- [Print Bangor — Vinyl Banners category (empty)](https://printbangor.com/product-category/signs/signs-vinyl-banners/) — [FULL - confirms no published SKU, fetched 2026-09-19]
-- [Print Bangor — FAQs](https://printbangor.com/faqs/) — [FULL, fetched 2026-09-19]
-- [Bar Harbor Chamber of Commerce — Creative Print Services listing](https://www.visitbarharbor.com/list/member/creative-print-services-625) — [FULL, fetched 2026-09-19; confirms Bangor location, not Bar Harbor]
-- [Brewer Sign Studio (brewersigns.com) — Banners](https://www.brewersigns.com/banners.asp) — [FULL, fetched 2026-09-19; confirms Lakewood, CA location — ruled out]
-- [48HourPrint.com — Vinyl Banner Printing](https://www.48hourprint.com/vinyl-banner-printing.html) — [FULL, fetched 2026-09-19]
-- [Signs.com — Banners](https://www.signs.com/banners/) — [FULL, fetched 2026-09-19]
-- [Commercial Screenprint & Embroidery, Inc.](https://www.commercialscreenprint.com/) — [FULL, fetched 2026-09-19]
-- [Wight's Sporting Goods — Screen Printing & Embroidery](https://www.wightssportinggoods.com/screen-printing-and-embroidery/) — [FAILED - 404 on direct fetch, fetched 2026-09-19; business confirmed via other listings only]
-- [Maine Camp Outfitters — Contact](https://www.maine-camp.com/contact.php) — [FULL, fetched 2026-09-19]
-- [Maine Promotional Products](https://www.mainepromotional.com/) — [FULL, fetched 2026-09-19]
-- [Printful — Pricing](https://www.printful.com/pricing) — [FULL for plans, PARTIAL for per-SKU hoodie price, fetched 2026-09-19]
-- [Printify — Pricing](https://printify.com/pricing) — [FULL for plans, PARTIAL for hoodie-specific fulfillment cost, fetched 2026-09-19]
-- [Fourthwall — Pricing](https://fourthwall.com/pricing) — [PARTIAL - Free plan fully confirmed, Pro plan detail cut off by JS rendering, fetched 2026-09-19]
-- [Bonfire — How It Works](https://www.bonfire.com/how-it-works/) — [FULL, fetched 2026-09-19]
-- [Shopify — Pricing](https://www.shopify.com/pricing) — [FULL, fetched 2026-09-19]
-- [WristCo — 3/4" Solid Color Tyvek Wristbands](https://www.wristco.com/products/3-4-solid-color-tyvek-wristbands) — [FULL, fetched 2026-09-19]
-- [Wristband Resources — 3/4" Solid Color Tyvek Wristbands](https://www.wristband.com/products/3-4-solid-color-tyvek-wristbands) — [FULL, fetched 2026-09-19]
-- [Artemax, Inc. — About Us](https://www.artemax.com/about-us/) — [FULL, confirms WristCo/Wristband Resources common ownership, fetched 2026-09-19]
-- [ID&C — Tyvek Wristbands, Plain, Box of 1000](https://www.idcband.com/en-us/tyvek-wristbands-plain-1000-box/) — [FULL, price read from embedded page data, fetched 2026-09-19]
+- [Ray Plumbing & Heating - Portable Toilets for Event Planning](https://www.rayplumbing.com/portable-toilets/event-planning/) - [FULL, fetched 2026-09-19]
+- [Ray Plumbing & Heating - FAQs](https://www.rayplumbing.com/faqs/) - [FULL, fetched 2026-09-19]
+- [Casella - Portable Toilets in Ellsworth, ME](https://local.casella.com/portable-toilet/ME/Ellsworth-ME) - [FULL, fetched 2026-09-19]
+- [Ellsworth Porta Potty Rentals](https://www.ellsworthportapotty.com/) - [FULL, fetched 2026-09-19]
+- [City of Ellsworth - Permits](https://www.ellsworthmaine.gov/services/permits/) - [FULL, fetched 2026-09-19]
+- [City of Ellsworth - Public Restrooms Update](https://www.ellsworthmaine.gov/public-restrooms-update/) - [FULL, fetched 2026-09-19; the post itself is dated 2025-05-01, so October-2026 status is unconfirmed]
+- [Downeast Graphics & Printing - Wide-Format](https://www.downeastgraphics.com/wide-format) - [FULL, fetched 2026-09-19]
+- [Downeast Graphics & Printing - About Us](https://www.downeastgraphics.com/who-we-are) - [FULL, fetched 2026-09-19]
+- [Print Bangor - Signs & Banners](https://printbangor.com/product-category/signs/) - [FULL, fetched 2026-09-19]
+- [Print Bangor - Vinyl Banners category (empty)](https://printbangor.com/product-category/signs/signs-vinyl-banners/) - [FULL - confirms no published SKU, fetched 2026-09-19]
+- [Print Bangor - FAQs](https://printbangor.com/faqs/) - [FULL, fetched 2026-09-19]
+- [Bar Harbor Chamber of Commerce - Creative Print Services listing](https://www.visitbarharbor.com/list/member/creative-print-services-625) - [FULL, fetched 2026-09-19; confirms Bangor location, not Bar Harbor]
+- [Brewer Sign Studio (brewersigns.com) - Banners](https://www.brewersigns.com/banners.asp) - [FULL, fetched 2026-09-19; confirms Lakewood, CA location - ruled out]
+- [48HourPrint.com - Vinyl Banner Printing](https://www.48hourprint.com/vinyl-banner-printing.html) - [FULL, fetched 2026-09-19]
+- [Signs.com - Banners](https://www.signs.com/banners/) - [FULL, fetched 2026-09-19]
+- [Commercial Screenprint & Embroidery, Inc.](https://www.commercialscreenprint.com/) - [FULL, fetched 2026-09-19]
+- [Wight's Sporting Goods - Screen Printing & Embroidery](https://www.wightssportinggoods.com/screen-printing-and-embroidery/) - [FAILED - 404 on direct fetch, fetched 2026-09-19; business confirmed via other listings only]
+- [Maine Camp Outfitters - Contact](https://www.maine-camp.com/contact.php) - [FULL, fetched 2026-09-19]
+- [Maine Promotional Products](https://www.mainepromotional.com/) - [FULL, fetched 2026-09-19]
+- [Printful - Pricing](https://www.printful.com/pricing) - [FULL for plans, PARTIAL for per-SKU hoodie price, fetched 2026-09-19]
+- [Printify - Pricing](https://printify.com/pricing) - [FULL for plans, PARTIAL for hoodie-specific fulfillment cost, fetched 2026-09-19]
+- [Fourthwall - Pricing](https://fourthwall.com/pricing) - [PARTIAL - Free plan fully confirmed, Pro plan detail cut off by JS rendering, fetched 2026-09-19]
+- [Bonfire - How It Works](https://www.bonfire.com/how-it-works/) - [FULL, fetched 2026-09-19]
+- [Shopify - Pricing](https://www.shopify.com/pricing) - [FULL, fetched 2026-09-19]
+- [WristCo - 3/4" Solid Color Tyvek Wristbands](https://www.wristco.com/products/3-4-solid-color-tyvek-wristbands) - [FULL, fetched 2026-09-19]
+- [Wristband Resources - 3/4" Solid Color Tyvek Wristbands](https://www.wristband.com/products/3-4-solid-color-tyvek-wristbands) - [FULL, fetched 2026-09-19]
+- [Artemax, Inc. - About Us](https://www.artemax.com/about-us/) - [FULL, confirms WristCo/Wristband Resources common ownership, fetched 2026-09-19]
+- [ID&C - Tyvek Wristbands, Plain, Box of 1000](https://www.idcband.com/en-us/tyvek-wristbands-plain-1000-box/) - [FULL, price read from embedded page data, fetched 2026-09-19]

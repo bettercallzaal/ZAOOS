@@ -648,11 +648,26 @@ describe('renderDeferredBatch', () => {
 });
 
 describe('morning - the batch that drains the queue can never be queued', () => {
-  it('always passes and counts, even far over the cap', () => {
+  it('always passes and does NOT count, even far over the cap', () => {
     const d = decide('morning', 17, 3);
     expect(d.allow).toBe(true);
     expect(d.outcome).toBe('sent');
-    expect(d.counts).toBe(true);
+    // 2026-09-19: the drain of yesterday's queue must not spend today's budget.
+    expect(d.counts).toBe(false);
+  });
+
+  it('a 19-chunk morning drain leaves the day budget untouched, so the 08:00 digest still sends', async () => {
+    // Measured on the VPS 2026-09-19: 19 counted 'morning' chunks before 05:01 ET
+    // against a cap of 3, and every digest that day was deferred.
+    process.env.ZOE_DAILY_SEND_CAP = '3';
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await runWithSendClass('morning', async () => {
+      for (let i = 1; i <= 19; i++) await gated(1, `Held back yesterday, chunk ${i} of 19`);
+    });
+    await runWithSendClass('digest', () => gated(1, 'Needs Zaal Digest, morning'));
+    expect(calls.map((c) => c.text)).toContain('Needs Zaal Digest, morning');
+    expect(await readDeferred()).toEqual([]);
   });
 
   it('is accepted as an explicit class hint', () => {

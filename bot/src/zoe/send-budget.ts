@@ -108,7 +108,15 @@
  *           that reserve - never queued, because re-sending tomorrow what he
  *           ignored 1,116 times is not a saving.
  *   morning the ONE morning batch: the brief plus everything held since the
- *           last batch. ALWAYS passes, and counts. Added 2026-09-11, measured:
+ *           last batch. ALWAYS passes, and does NOT count (changed 2026-09-19,
+ *           Zaal: "Yes, stop counting it"). It used to count, and the drain goes
+ *           out in chunks: 15 counted sends on 09-18 and 19 on 09-19, all before
+ *           05:01 ET, against a cap of 3. Clearing YESTERDAY's queue spent
+ *           TODAY's whole budget, so every digest that day was deferred into
+ *           tomorrow's batch, which made tomorrow's batch bigger. 45 deferrals in
+ *           three days, measured in send-budget-log.jsonl on the VPS. A drain is
+ *           not new traffic; it is yesterday's, already paid for by being held.
+ *           Added 2026-09-11, measured:
  *           with the cap at 3 and alarms + gated counting, the cap is spent
  *           before 09:00 UTC, so the brief and the drain of held items ran as
  *           `digest` and were DEFERRED - the flush queued itself, chunk by
@@ -182,7 +190,7 @@ const POLICY: Record<SendClass, ClassPolicy> = {
   digest: { alwaysPasses: false, counts: true, overflow: 'deferred' },
   noise: { alwaysPasses: false, counts: true, overflow: 'dropped' },
   // The drain of the deferred queue can never be deferred INTO that queue.
-  morning: { alwaysPasses: true, counts: true, overflow: 'dropped' },
+  morning: { alwaysPasses: true, counts: false, overflow: 'dropped' },
 };
 
 export const DEFAULT_DAILY_SEND_CAP = 20;

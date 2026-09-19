@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** research-signal-aggregation
 > **status:** research-complete
-> **last-validated:** 2026-05-21
+> **last-validated:** 2026-09-19
 > **original-query:** What AI and creator economy signals from March 2026 are relevant to ZAO OS product roadmap, governance, and artist support infrastructure? (reconstructed)
 > **tier:** primary
 > **Date:** March 28, 2026
@@ -215,6 +215,34 @@ These eleven signals connect to specific parts of the codebase and roadmap:
 - **7 countries** — viewer reach for Filmporte's "Onobiren" screening
 - **10 people** — Filmporte team size
 - **2024** — Owlcat Games first disclosed AI prototyping usage
+
+## Updated 2026-09-19
+
+**Suno v6 launched September 9, 2026 — first model family trained on licensed music.**
+
+This is material to the doc's "TRACK but DO NOT integrate — if Suno releases an API, it becomes a 10th source" recommendation.
+
+Key developments since last-validated (2026-05-21):
+
+1. **Suno v6 family shipped (September 9, 2026).** Three models simultaneously: **v6** (flagship, Pro/Premier users — precision, reliability), **v6-wild** (Pro/Premier — exploratory, unpredictable, creative variation), **v6-mini** (lightweight/fast, available on all tiers including Free). This is the first Suno release to ship multiple models at once.
+
+2. **First Suno model trained on LICENSED music.** v6 was built from the ground up on licensed data from **Warner Music Group**, **BMG**, and **Believe** (a major independent distributor). Previous versions v3–v5.5 were trained without label licenses. New capabilities include plain-language editing of individual sections/lyrics, mashups from multiple songs, and multi-modal inputs (text, audio, images, video).
+
+3. **Copyright lawsuits resolved (Warner 2025, BMG August 2026).** Warner Music dropped its lawsuit against Suno in 2025 in exchange for a licensing agreement giving Warner artists "full control" over how their voices and music are used. BMG — which had not sued but was at risk — signed a licensing deal in August 2026 covering both its recordings catalog and its publishing catalog. These settlements address the primary legal risk flagged in the doc's "TRACK but DO NOT integrate" stance.
+
+4. **Still no public self-serve API.** In July 2026 Suno confirmed it was exploring a developer API beginning with a curated group of partners but had not published endpoints, general-access pricing, documentation, or a launch date. The 10th-platform integration scenario remains blocked on API access.
+
+**Updated recommendation:** The copyright risk that justified "DO NOT integrate" has substantially reduced with the Warner + BMG licensing deals. Continue TRACK posture, upgrade to MONITOR for developer API access. When a public API ships, v6-mini is the candidate for ZAO artist demo creation workflows given its speed and free-tier availability.
+
+**No material changes found for Botto, Mosaic/Creators Guild, NVIDIA Agent Toolkit, or ECF** (all March 2026 facts verified as current through search cross-check; search snippets match the doc's figures).
+
+Sources (2026-09-19 update):
+- [Suno v6 launches with licensed music — The Decoder](https://the-decoder.com/suno-launches-v6-music-models-built-with-warner-bmg-and-believe/) [PARTIAL — search snippet, domain blocked for full fetch]
+- [Suno trained v6 with Warner and BMG — Engadget](https://www.engadget.com/2251539/suno-trained-its-v6-ai-music-models-with-help-from-warner-and-bmg/) [PARTIAL — search snippet]
+- [Suno v6: AI Music Models With Warner Music — Rolling Stone](https://www.rollingstone.com/music/music-news/suno-new-model-v6-warner-music-group-1235623431/) [PARTIAL — search snippet]
+- [Suno replaces models with licensed version — TechCrunch](https://techcrunch.com/2026/09/09/suno-replaces-its-ai-models-with-a-new-one-trained-on-licensed-music-as-copyright-suits-pile-up/) [PARTIAL — search snippet]
+- [Suno v6 release — Music Ally](https://musically.com/2026/09/09/suno-launches-its-v6-ai-music-models-heres-what-you-need-to-know/) [PARTIAL — search snippet, domain blocked]
+- [Suno API status guide 2026](https://gptproto.com/blog/suno-api) [PARTIAL — search snippet, domain blocked]
 
 ## Sources
 

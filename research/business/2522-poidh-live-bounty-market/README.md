@@ -22,7 +22,9 @@ tier: STANDARD
 | 3 | **PUT A DEADLINE IN EVERY ROUND. 81% of the market does not.** | 19 of 99 open bounties carry a parseable deadline and poidh's native `deadline` field is set on **zero** of them. A dated round is legible in a market where four out of five are not. |
 | 4 | **SET `issuer_wallet` IN `org.config.json`.** | It is unset today, so any competitive query that filters "our bounties" returns an empty list that reads as a confident zero. Found while writing this doc. |
 | 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **Re-read from chain here and confirmed to the wei on both ETH chains: 201 on Base + 24 on Arbitrum holding `0.606612841471201010 ETH`, worth $1,597 against a visible market of $3,181.** Every other figure in this doc describes the 99 reachable ones. |
-| 6 | **TELL KENNY, WITH THE VERIFICATION.** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. |
+| 6 | **TELL KENNY, WITH THE VERIFICATION.** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. **Sent 2026-09-20.** |
+| 7 | **PUT A DATE ON EVERY BOUNTY, AND SAY SO ON poidhz.** | A stated deadline is the strongest lever measured here: entries roughly double in every prize band and the effect survives controlling for format. 81% of the market does not do it. This is the single most useful thing poidhz can tell an issuer, and the thing the site is already built around. |
+| 8 | **COUNT PEOPLE, NOT JUST FUNDS, WHEN THIS IS DISCUSSED PUBLICLY.** | 306 wallets have stranded work on Base and 87 issuers have stranded bounties. "$1,374 locked" is an accounting line; "306 people did work nobody can see" is what it actually is. |
 
 ## The market, measured
 
@@ -188,6 +190,17 @@ submissions; bounty 911 holds 0.0533 ETH and carries 69.
 > It is not abandoned money. It is unpaid work, and the people who did it cannot show it to
 > the person who owes them.
 
+**306 distinct wallets have work stranded on Base**, across **87 distinct issuers**. Median
+one claim each, so this is mostly 306 individual people who entered one bounty and heard
+nothing, not a handful of prolific hunters. The claimant address is word 1 of each `Claim`
+struct, confirmed against word 2, which carries the bounty id and matched the bounty being
+queried on every element read.
+
+**One of the 306 is Kenny.** Wallet `0x10fc964e...`, fid 2210, the founder and the largest
+issuer on the platform, has **10 stranded claims of his own** on contracts his own app can no
+longer read. He is not only the person who can fix this; he is one of the people it happened
+to.
+
 The 66 on bounty 934 were verified two ways on the same payload before being written down:
 the ABI array-length word reads 66, and exactly 66 strictly-increasing element offsets follow
 it. `cast` could not decode the struct array with a guessed signature, so the count comes
@@ -196,6 +209,62 @@ from the encoding itself rather than from a type that happened to parse.
 **This is the strongest available argument for what poidhz should build next**, and it is in
 Next Actions below: poidh cannot render these bounties or their claims, the contracts answer
 fine, and the scan takes about four seconds per contract.
+
+## The strongest lever measured: a stated deadline roughly doubles entries
+
+Raw: **14/19 = 74%** of bounties with a parseable deadline have submissions, against
+**38/79 = 48%** without. That is a bigger gap than format and far bigger than prize, so it
+was tested against the two confounds that killed the last candidate.
+
+**It is not the cheap-photo group in disguise.** The deadline group's median prize is
+**$17.05** against **$8.92** without, and it skews toward `build`, the harder format. If
+anything it is the more demanding half of the market.
+
+**Controlled within format:**
+
+| Format | With deadline | Without |
+|---|---|---|
+| build | **7/8 = 88%** | 9/25 = 36% |
+| photo | **5/5 = 100%** | 8/14 = 57% |
+| code | **2/3 = 67%** | 4/11 = 36% |
+| clip | 0/1 | 7/10 = 70% |
+| unclassified | 0/1 | 9/17 = 53% |
+
+**Controlled within prize band:**
+
+| Band | With deadline | Without |
+|---|---|---|
+| under $5 | **3/3 = 100%** | 19/29 = 66% |
+| $5-50 | **8/11 = 73%** | 16/41 = 39% |
+| $50+ | **3/5 = 60%** | 3/9 = 33% |
+
+**Every prize band roughly doubles.** Three independent bands moving the same way is what
+makes this worth acting on, rather than one ratio.
+
+**Two honest limits, and the second is the one that matters.**
+
+The `clip` and `unclassified` rows are `n=1`. They are printed rather than hidden, but they
+say nothing. Several other cells are `n=3` to `n=5`.
+
+And **a deadline may be a proxy for an issuer who cares.** Someone who bothers to write a
+date probably also writes a clearer brief, picks a realistic ask and tells people the bounty
+exists. Nothing here can separate "the deadline caused entries" from "the kind of issuer who
+writes deadlines causes entries". The advice is the same either way - write the date - but
+the mechanism is not established, and this doc has an interest in the deadline mattering,
+since a deadline calendar is what poidhz is. Stated so a reader can discount it.
+
+## A confound that nearly shipped as a finding
+
+`is_multiplayer: false` bounties show **12/14 = 86%** with submissions against 48% for
+multiplayer, which reads as "SOLO beats OPEN" and would have argued against R8 being an OPEN
+bounty.
+
+It is not a finding. Those 14 are almost all **$2.62 photo and IRL bounties**, several of
+them literal duplicates - "Show this code in public" three times, "Random Act of Kindness"
+three times, "Ramus Grove Stewardship" twice. Their median prize is $2.62 against $14.16 for
+the rest. It is the cheap-photo effect wearing a different label, and the only reason it was
+caught is that it contradicted a decision already made, which is a bad reason to check
+something and the reason it got checked.
 
 ## Who is actually issuing, and it changes the picture
 

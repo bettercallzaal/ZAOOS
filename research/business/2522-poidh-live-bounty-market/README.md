@@ -21,7 +21,8 @@ tier: STANDARD
 | 2 | **DO NOT raise the R6 or R7 prize to attract entries. Prize size does not buy them.** | The $50+ band is 43% with-submission - nearly the worst of the four bands - while under-$5 runs 69%. BCZ's own rounds took 8 to 11 claims each at $27 to $66, so our entry rate comes from format and distribution, not from the pot. |
 | 3 | **PUT A DEADLINE IN EVERY ROUND. 81% of the market does not.** | 19 of 99 open bounties carry a parseable deadline and poidh's native `deadline` field is set on **zero** of them. A dated round is legible in a market where four out of five are not. |
 | 4 | **SET `issuer_wallet` IN `org.config.json`.** | It is unset today, so any competitive query that filters "our bounties" returns an empty list that reads as a confident zero. Found while writing this doc. |
-| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents **450 open, funded bounties holding 0.6066 ETH + 10,044 DEGEN** on pre-v3 contracts the app no longer reads. Every figure in this doc describes the 99 reachable ones. |
+| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **Re-read from chain here and confirmed to the wei on both ETH chains: 201 on Base + 24 on Arbitrum holding `0.606612841471201010 ETH`, worth $1,597 against a visible market of $3,181.** Every other figure in this doc describes the 99 reachable ones. |
+| 6 | **TELL KENNY, WITH THE VERIFICATION.** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. |
 
 ## The market, measured
 
@@ -73,6 +74,44 @@ Issue [#1459](https://github.com/picsoritdidnthappen/poidh-app/issues/1459), fil
 Read from the contracts directly on 2026-08-28: Base `0xb502c585...` holds 201 open and funded of 990; Arbitrum `0x0Aa50ce0...` 24 of 180; four Degen contracts 225 between them. So the reachable open market measured here, 99 bounties and $3,181, sits beside roughly **450 stranded bounties holding more ETH than the entire visible market is worth**.
 
 The issue's author found it the same way this doc's numbers are built - "I found this while fixing the same bug in my own page, which read one contract per chain and called it every bounty."
+
+### Independently verified on 2026-09-20, to the wei
+
+The issue has sat 23 days with no reply, so rather than repeat it this doc re-read the
+contracts directly: `bounties(uint256)` over every id, open = zero `claimer`, funded =
+nonzero `amount`, via batched `eth_call` against public RPCs.
+
+| Chain | Contract | Ids read | Open + funded | ETH held | Issue #1459 says |
+|---|---|---:|---:|---|---|
+| Base | `0xb502c5856f7244dccdd0264a541cc25675353d39` | 990/990 | **201** | `0.581754831471201010` | 201, same to the wei |
+| Arbitrum | `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d` | 180/180 | **24** | `0.024858010000000000` | 24, same to the wei |
+| Degen (4 contracts) | - | **0** | **UNVERIFIED** | - | 225, 10,044 DEGEN |
+
+**225 of the claimed 450 are confirmed. The two ETH chains match exactly**, including the
+combined `0.606612841471201010 ETH` headline. The Degen half is **FAILED, not refuted**:
+`rpc.degen.tips` returns Cloudflare error 1016 and `degen.calderachain.xyz` and
+`rpc-degen-mainnet-1.t.conduit.xyz` both return empty, so it could not be read from here.
+At $0.00108907 the Degen side is worth about $11 regardless; the money is on the ETH chains.
+
+**Scale, at the $2,633.31 ETH price used by the dashboard on the same day:**
+
+> The stranded ETH is worth **$1,597.40**. The entire visible open market is **$3,180.82**.
+> **Half as much value again is sitting in bounties nobody can reach as in every bounty
+> poidh can show you.**
+
+The Base stranded set was **created between 2024-05-28 and 2026-04-03** - so this is not an
+artifact of one bad migration week. The newest one had been funded and unreachable for over
+five months before the issue was filed.
+
+One more thing the direct read settles: **`createdAt` is stored on chain** as the seventh
+struct member, and is populated. The API returns it empty on all 99 live rows, which is why
+the prize-band table above cannot be controlled for age. The data exists; the surface drops
+it.
+
+**Correction worth recording.** The first pass of this verification reported
+`0.581754831471200995` against the issue's `...201010` and looked like a real discrepancy in
+the last few wei. It was not - it was `sum(int) / 1e18` in float. Recomputed with exact
+integer arithmetic it matches digit for digit. A float divide is not a measurement.
 
 ## The submission-count bug, tested rather than assumed
 
@@ -134,7 +173,8 @@ The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.war
 | Set `issuer_wallet` in `zpoidh/org.config.json` so competitive queries stop returning a false zero - merged PR, `check-site-claims.py` green | @Zaal | PR | 2026-09-27 |
 | Keep R6 and R7 as clip rounds at their current 0.0125 ETH pot; do not raise the prize to chase entries - decision recorded in `rounds/r6/README.md` | @Zaal | PR | 2026-10-03 |
 | Re-measure the R7 Twitch archive claim, whose re-check date passed 2026-09-13, before R7 casts - date moved in `rounds/r7/README.md` | @Zaal | PR | 2026-09-27 |
-| Comment on poidh-app #1459 offering the zpoidh multi-contract scan, since the issue has sat 23 days with zero replies - comment posted | @Zaal | Outbound | 2026-09-27 |
+| Send Kenny the #1459 verification: 225 of 450 confirmed from chain to the wei, $1,597 stranded against a $3,181 visible market, plus the scanner - message sent | @Zaal | Outbound | 2026-09-27 |
+| Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |
 | Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days | @Zaal | PR | 2026-10-20 |
 
 ## Sources
@@ -146,5 +186,7 @@ The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.war
 - [picsoritdidnthappen/poidh-app](https://github.com/picsoritdidnthappen/poidh-app) - **[FULL, method: `gh api` + `zao-research-snapshot`]** 37 stars / 63 forks / 23 issues / 26 contributors; LICENSE read as MIT from the file
 - [Farcaster /poidh channel](https://farcaster.xyz/~/channel/poidh) - **[FULL, method: keyless `api.warpcast.com/v2/all-channels`]** 5,681 followers
 - [Hacker News Algolia](https://hn.algolia.com/api/v1/search?query=%22poidh%22) - **[FULL, method: keyless API]** 0 exact-title hits. Negative signal, recorded deliberately
+- poidh pre-v3 contracts, read directly - **[FULL, method: batched `eth_call` on `bounties(uint256)` via `base-rpc.publicnode.com` and `arb1.arbitrum.io/rpc`, 990/990 and 180/180 ids, 2026-09-20]** Base `0xb502c5856f7244dccdd0264a541cc25675353d39`, Arbitrum `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d`
+- Degen pre-v3 contracts - **[FAILED - `rpc.degen.tips` returns Cloudflare 1016; `degen.calderachain.xyz/http` and `rpc-degen-mainnet-1.t.conduit.xyz` both return empty. 225 of the claimed 450 remain unverified from this machine]**
 - [poidh.xyz](https://poidh.xyz) - **[PARTIAL - JS app shell, 197 characters of text after stripping; not escalated because the tRPC API above is the same data at the source]**
 - `zpoidh/data/bounty-dashboard.json`, `data/rounds-live.json`, `org.config.json` - **[FULL]** local, regenerated 2026-09-20

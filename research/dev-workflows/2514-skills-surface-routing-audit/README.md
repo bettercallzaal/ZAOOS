@@ -295,6 +295,61 @@ Two things cut against reading that straight across to skills:
 
 The one hard production limit that is not in dispute: a 44-skill bundle was rejected by Claude Cowork outright, and the cause was a single `description` at roughly 2,241 characters against the documented 1,024 cap (coleschaffer/dtc-copywriting-skills#1). That is the failure mode our hidden-mirror `gstack` entry is one skill away from, at 1,966.
 
+### 7. Auditing everything-claude-code, and the bigger thing it found
+
+Zaal's instruction on 2026-09-20 was not "update or unroute" but "review it and audit it so we can use them." This is that audit.
+
+**It is additive, not conflicting.** 183 skills, 183 distinct names, and **exactly one collides with a name we already have**: `deep-research`. So the objection to keeping it was never namespace damage.
+
+**Scored against the stack this estate actually runs.** Measured across 56 repos with a `package.json`: typescript 53, react 50, vitest 48, `@supabase/supabase-js` 47, next 47, **viem 46**, tailwind 45, zod 43. File counts under `~/Documents`: 249 `.ts`, 88 `.py`, 23 `.tsx`, and **zero** `.go`, `.rs`, `.java`, `.kt`, `.swift`, `.rb`, `.php`, `.pl`, `.cs`, `.cpp`, `.dart`.
+
+| bucket | count | share |
+|---|---|---|
+| candidate for us | 123 | 67.2% |
+| stack we do not run | 43 | 23.5% |
+| industry we are not in | 17 | 9.3% |
+
+The 43 are the `kotlin-*`, `springboot-*`, `laravel-*`, `perl-*`, `swift*`, `golang-*`, `rust-*`, `cpp-*`, `django-*` families. The 17 are `healthcare-*`, `hipaa-compliance`, `customs-trade-compliance`, `energy-procurement`, `inventory-demand-planning`, `returns-reverse-logistics` and similar. **This filter is a name-substring match and it is not perfect**: `android-clean-architecture` scored as a candidate and should not have. Treat 123 as an upper bound.
+
+**The usable core is the meta cluster, and it is ahead of our own tooling.** All present on disk and substantial:
+
+| skill | bytes | what it does |
+|---|---|---|
+| `rules-distill` | 9,479 | extract cross-cutting principles from skills into rules |
+| `skill-stocktake` | 7,785 | audit skills and commands for quality |
+| `eval-harness` | 6,494 | formal evaluation framework for sessions |
+| `ecc-tools-cost-audit` | 6,484 | evidence-first burn and billing audit |
+| `token-budget-advisor` | 6,105 | |
+| `context-budget` | 5,695 | audits context consumption across agents, skills, MCP, rules |
+| `workspace-surface-audit` | 5,151 | audit repo, MCP servers, plugins, connectors, env surfaces |
+| `agent-eval` | 4,526 | head-to-head comparison of coding agents |
+| `skill-comply` | 2,356 | visualise whether skills and rules are actually followed |
+
+`context-budget` instructs: "Check for duplicate copies in `.agents/skills/` - skip identical copies to avoid double-counting." **That is the exact defect Finding 3a spent this audit discovering**, already written down in a skill we have had installed and never opened. `zao-skill-audit` does not do it.
+
+### 7a. Using one of them immediately found a larger cost than this whole doc had been measuring
+
+`context-budget` also says to count MCP servers and "estimate schema overhead at ~500 tokens per tool", and to flag "servers with >20 tools". Nothing in this estate had measured that. Measured 2026-09-20 from this session's own tool list:
+
+| | count |
+|---|---|
+| MCP tools available | **497** |
+| distinct servers | 27 |
+| servers over the >20-tool flag | **10** |
+
+Largest: `Linear` 66, `Notion` 45, `gdocs` 37, `Calendly` 36, `Canva` 34, `dune` 33, `Gmail` 30, `github` 26, `claude-in-chrome` 22, `playwright` 21.
+
+| surface | resident cost | if fully loaded |
+|---|---|---|
+| 428 skill names + descriptions | ~28,782 tokens | same, it is already the short form |
+| 497 MCP tools | **~4,986 tokens** (names only, deferred) | **~248,500 tokens** at 500/tool |
+
+So **the deferred-tool mechanism is avoiding roughly 243,500 tokens, which is 8.6 times the entire skill-description surface this doc has been arguing about.** Decisions 1 and 3 of doc 2496, and Finding 2 here, all reason about the skill side. The skill side is the smaller lever by almost an order of magnitude, and it was the only one anyone had counted.
+
+Two honest limits on that. The 500-tokens-per-tool figure is `context-budget`'s estimate, not a measurement of our schemas; the real number needs a count of the actual JSON, which this audit did not take, so treat 248,500 as that skill's arithmetic rather than ours. And the 497 is what this one session was offered, which depends on connectors enabled for this account; another session may see a different set.
+
+**Recommendation.** Do not unroute everything-claude-code and do not update it. Harvest it: the nine meta skills above are usable today, they cost their descriptions either way, and one of them has already paid for the whole plugin by finding a cost 8.6 times larger than the one we were optimising. The 43 dead-stack and 17 wrong-industry skills are the honest candidates for unrouting if the surface ever needs cutting, and they are 33 percent of it.
+
 ## Sources
 
 Local measurement, all taken 2026-09-20 on this Mac:

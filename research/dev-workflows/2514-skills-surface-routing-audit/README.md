@@ -194,6 +194,55 @@ Doc 2496 measured 62 of 93 invoked over 3,986 transcripts. This run sees 63 dist
 
 **The 63-of-428 ratio must not be read as "365 dead skills."** A large share of the plugin entries are subagents, reached through the `Agent` tool rather than `Skill`, so counting them with a `Skill`-only filter would repeat exactly the error Finding 1 is about. Measured separately: **2,086 `Agent` calls across 22 distinct subagent types.** The `everything-claude-code` agents account for roughly 17 of those 2,086, under one percent, spread over 8 of its ~40 agent types. So the plugin is genuinely lightly used, but it is lightly used at 0.8 percent of agent calls, not at zero.
 
+### 5a. Yield per source varies twentyfold, and the two largest sources are the two least used
+
+Added 2026-09-20 to answer the plugin-pin question in Next Action 5. Skill-tool calls over 11,293 Claude transcripts, matched against `orca skills installed` with namespace-aware names:
+
+| source | skills | share of surface | invoked | Claude calls | calls per installed skill |
+|---|---|---|---|---|---|
+| Claude plugin superpowers | 14 | 3% | 9 | 81 | **5.8** |
+| Claude home | 116 | 27% | 33 | 600 | **5.2** |
+| Claude plugin everything-claude-code | 183 | **43%** | 3 | 47 | **0.26** |
+| Agent skills home | 7 | 2% | 1 | 1 | 0.14 |
+| Hermes home | 71 | **17%** | 0 | 0 | see below |
+| Codex plugin cache | 20 | 5% | 0 | 0 | see below |
+| Codex home bundled | 6 | 1% | 0 | 0 | see below |
+| Claude plugin caveman | 5 | 1% | 0 | 0 | **see below, this one is wrong** |
+| Antigravity home | 3 | <1% | 0 | 0 | see below |
+| Claude plugin oh-my-mermaid | 3 | <1% | 0 | 0 | see below |
+
+The two most-used sources are the smallest: `superpowers` at 14 skills and our own `Claude home` at 116 carry 681 of 729 measured calls. `everything-claude-code` is **43 percent of the routed surface for 6 percent of the calls**, and its subagents account for **18 of 2,086 Agent calls, 0.86 percent**, across 8 of its roughly 40 agent types.
+
+**The zeros in that table are not all the same kind of zero, and one of them is provably wrong.**
+
+`caveman` reads 0 Skill-tool calls and **is active in the session that wrote this sentence**, declared by a SessionStart hook. It was never going to appear: its activation path is not the `Skill` tool. `superpowers:using-superpowers` loads the same way. So the column measures one activation path among several, and any source whose skills activate by hook reads 0 by construction. This was caught because the instrument's own output contradicted the session running it, which is the cheapest positive control there is.
+
+`Hermes home` and the Codex sources are a different zero again: those are **other harnesses**, and this corpus is `~/.claude/projects` only. Checked before concluding: `~/.hermes` is 4.1GB but `~/.hermes/sessions` holds **3 files, all `request_dump_*` error dumps**, no transcripts; its single cron job names skill `hermes-agent` and is `enabled: false`. `~/.codex/sessions` holds 41 jsonl files that record tool calls (`exec`, `apply_patch`, `exec_command`) but **never a skill name**; none of the 20 routed Codex-plugin-cache names appears in them. The `"skill":` keys found under both trees sit in test files, a cron config and a template registry, not in session history.
+
+So for those 100 skills the honest reading is: **0 invocations from Claude, and UNKNOWN from their own harness, because neither harness records skill activation anywhere this audit could find.** Not zero. Not dead.
+
+What survives all those caveats is the one number the pin question needs: **`everything-claude-code` is measured on the harness it is routed into, by the mechanism its skills actually use, and it returns 3 of 183.**
+
+### 5b. The pin: updating buys a refresh of the least-used source, at 387,213 lines
+
+`git rev-list --count HEAD..origin/main` on our clone: **2,796 commits.** The diff:
+
+| | count |
+|---|---|
+| files changed | 2,674 |
+| insertions | **387,213** |
+| deletions | 17,688 |
+| skill files touched | 496 |
+| agent files touched | 68 |
+
+Authorship of those 2,796: Affaan Mustafa 1,606, haelyra 189, dependabot 64, then a tail; two of the top eight are bots.
+
+Upstream is alive and pushed 2026-09-19. Our clone is pinned at 2026-04-19. Nothing in `orca skills installed` or any listing says which.
+
+Set against Finding 5a, updating means pulling **387,213 lines of unreviewed third-party content, which route into every session on this Mac, to refresh the source with the lowest yield in the estate.** The recommendation this doc makes is therefore not "update" or "pin" but a third option: **decide whether to route it at all.** Unrouting 183 skills costs 3 invocations across 11,293 transcripts and removes 43 percent of the surface. That is a decision for Zaal, and it now has numbers under it.
+
+The licence question stands separately and is unaffected by any of this: `awesome-claude-plugins` carries no licence, which is all rights reserved.
+
 ### 6. The plugin cache is a pin nobody set
 
 Every marketplace clone under `~/.claude/plugins/marketplaces/` last committed in April 2026. My first reading of that was "the ecosystem is stale." Checking upstream corrected it:
@@ -291,7 +340,7 @@ Not verified, listed as leads only, do not cite: dsiddharth2/plug#36, piercebogg
 | 2 | Add `.gstack/` to zorca's `.gitignore` | zorca | 2026-09-22 |
 | 3 | Re-scope `zao-skill-audit` to every source `orca skills installed` reports, and make it print the source count it scanned so an exclusion cannot grow quietly | zorca | 2026-09-26 |
 | 4 | Re-open doc 1485: its execution plan targets `/home/zaal/`, which does not exist here. Either fix the paths and run it, or mark the eight live skills KEEP with a reason | zorca | 2026-09-27 |
-| 5 | Decide the plugin-cache pin: update `everything-claude-code` from 2,796 commits behind, or record the April pin deliberately | Zaal decides | 2026-09-30 |
+| 5 | Decide `everything-claude-code`: update (387,213 lines unreviewed), keep the April pin, or **unroute it** (183 skills, 3 ever invoked, 0.86 percent of Agent calls). Numbers in Findings 5a and 5b | Zaal decides | 2026-09-30 |
 | 6 | Measure the resident description cost inside a live session, which this doc lists as UNKNOWN | zorca | 2026-10-03 |
 | 7 | Raise the `awesome-claude-plugins` licence question (none, all rights reserved) before anything from it is redistributed | Zaal decides | 2026-10-03 |
 

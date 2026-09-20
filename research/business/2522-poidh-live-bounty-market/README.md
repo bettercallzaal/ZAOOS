@@ -210,6 +210,44 @@ from the encoding itself rather than from a type that happened to parse.
 Next Actions below: poidh cannot render these bounties or their claims, the contracts answer
 fine, and the scan takes about four seconds per contract.
 
+### The money is recoverable, and that changes what the page should say
+
+Read from Blockscout on 2026-09-20, the last 50 transactions sent to the pre-v3 Base
+contract. Two things fall out, and the second is the important one.
+
+**The contract went quiet on 2026-04-21.** Its final transactions were two `createClaim`
+calls from `0x342567eB63`, five months ago. The 50 most recent transactions span 2025-12-07
+to 2026-04-21 and there is nothing since. So **nobody is still submitting work into the
+void** - the harm is historical, it is just unresolved. The last two people to enter did so
+in April and have heard nothing in five months. Kenny's own wallet appears in that tail,
+calling `createOpenBounty` and `cancelOpenBounty` on 2026-04-01, three weeks before the
+contract stopped being used.
+
+**The funds are not lost. They are unreachable through the app and fully reachable from the
+contract.** The method mix in those 50 transactions shows the escape hatches all working in
+production before the cutover:
+
+| Method | Times used |
+|---|---|
+| `cancelOpenBounty` | 14 |
+| `createClaim` | 9 |
+| `submitClaimForVote` | 8 |
+| `createOpenBounty` | 6 |
+| `voteClaim` / `resolveVote` | 3 / 3 |
+| `acceptClaim` | 1 |
+| `cancelSoloBounty`, `withdrawFromOpenBounty`, `joinOpenBounty` | 1 each |
+
+So an issuer with a stranded bounty has two real options today, neither of which requires
+poidh to ship anything: **`acceptClaim`** pays the person who did the work, and
+**`cancelOpenBounty`** refunds the issuer. Both are direct contract calls.
+
+**That is the difference between a graveyard and a lost-property office**, and it is what
+`/lost` should be. Not "here is money nobody can reach" but "here is your bounty, here are
+the 66 people who entered it, and here is the call that pays one of them or returns your
+funds." The tension is real and the page must state it: cancelling refunds the issuer and
+leaves the claimants with nothing, which is exactly the outcome 306 people are already
+living with.
+
 ## The strongest lever measured: a stated deadline roughly doubles entries
 
 Raw: **14/19 = 74%** of bounties with a parseable deadline have submissions, against
@@ -363,7 +401,8 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 | Set `issuer_wallet` in `zpoidh/org.config.json` so competitive queries stop returning a false zero - merged PR, `check-site-claims.py` green | @Zaal | PR | 2026-09-27 |
 | Keep R6 and R7 as clip rounds at their current 0.0125 ETH pot; do not raise the prize to chase entries - decision recorded in `rounds/r6/README.md` | @Zaal | PR | 2026-10-03 |
 | Re-measure the R7 Twitch archive claim, whose re-check date passed 2026-09-13, before R7 casts - date moved in `rounds/r7/README.md` | @Zaal | PR | 2026-09-27 |
-| BUILD `poidhz.com/lost` - the stranded bounties and their claims, which poidh cannot render and we can. 201 Base bounties, 96 with work on them, 492 claims. Page live with a 6h refresh | @Zaal | PR | 2026-10-11 |
+| BUILD `poidhz.com/lost` - the stranded bounties, their claims, AND the recovery call per bounty (`acceptClaim` to pay the worker, `cancelOpenBounty` to refund the issuer). 201 Base bounties, 96 with work, 492 claims, 306 people. Page live with a 6h refresh | @Zaal | PR | 2026-10-11 |
+| Tell the 87 issuers with stranded bounties that their funds are recoverable by direct contract call - a cast naming the count and linking `/lost`, not 87 DMs | @Zaal | Outbound | 2026-10-18 |
 | Follow up to Kenny once he replies with the claims finding, which #1459 does not cover: 492 submissions stranded, 90% of the locked value on bounties where the work is done - message sent | @Zaal | Outbound | 2026-10-04 |
 | Send Kenny the #1459 verification: 225 of 450 confirmed from chain to the wei, $1,597 stranded against a $3,181 visible market, plus the scanner - SENT 2026-09-20 | @Zaal | Outbound | DONE |
 | Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |

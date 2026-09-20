@@ -18,7 +18,7 @@ tier: DEEP
 | # | Decision | Because | Evidence |
 |---|---|---|---|
 | 1 | **Re-scope `zao-skill-audit` to every source the router reads, not `~/.claude/skills` alone.** | Its `SKILLS_DIRS = [Path.home()/".claude/skills"]` is one directory, one level. That single line is why doc 2496 reported 93 skills and 7,939 always-on tokens when the routed surface is 428 skills and ~28,782 characters' worth of name plus description. | `bin/zao-skill-audit:35`; `orca skills installed --json`, 2026-09-20 |
-| 2 | **Fix `gstack`'s description before anything else in the library.** | It is the only skill of 428 that breaks the documented 1,024-character cap, at 1,966 characters, and its text opens with `browse`'s description verbatim, giving a 0.988 similarity to a skill invoked 23 times. Doc 1485 voted it ARCHIVE in July. | this doc, Finding 3 |
+| 2 | **Stop routing hidden directories under `~/.claude/skills`.** | 22 of the 126 SKILL.md files there sit in hidden dirs: a 21-file `.agents/` mirror of the whole gstack bundle, and a `.trash/` holding a deleted skill that is still routed. The mirror is where the only over-cap description in the estate lives, at 1,966 characters. | this doc, Findings 3 and 3a |
 | 3 | **Do not archive on idleness. Archive on ambiguity.** | 365 of 428 skills have never been invoked and cost about 70 tokens each while idle. 13 duplicated names carry divergent descriptions and cost a wrong route. Doc 2496 reached the same conclusion on the smaller denominator and it survives the larger one. | this doc, Findings 2 and 3; doc 2496 decision 3 |
 | 4 | **Treat the plugin marketplace cache as a pinned dependency and say which pin.** | Our `everything-claude-code` clone supplies 183 of 428 routed skills and sits 2,796 commits behind its origin. It is not a dead project - upstream pushed today - it is our copy that is frozen at 2026-04-19. | `git rev-list --count HEAD..origin/main`, 2026-09-20 |
 | 5 | **Gitignore `.gstack/` in zorca.** | `browse` writes a network log into every repo it runs in. Eleven of the twelve repos carrying one already ignore it. zorca is the exception, so a `git add -A` there would commit it. | `git check-ignore` across 12 repos, 2026-09-20 |
@@ -91,13 +91,48 @@ Seven pairs of **differently named** skills have descriptions more than 72 perce
 0.988  browse  <->  gstack
 ```
 
-`gstack`'s description is 1,966 characters and opens with `browse`'s text word for word:
+That pair is **not** the primary `gstack` skill. `~/.claude/skills/gstack/SKILL.md` carries a 363-character description and is under every cap. The 1,966-character entry is a second copy at `~/.claude/skills/gstack/.agents/skills/gstack/SKILL.md`, and it is the one that opens with `browse`'s text word for word:
 
 > "Fast headless browser for QA testing and site dogfooding. Navigate any URL, interact with elements, verify page state, diff before/after actions, take annotated screenshots, check responsive layouts, test forms and uploads, handle dialogs, and assert element states. ~100ms per command."
 
 So the skill presenting itself to the router as a headless browser is `gstack`, a workflow product doc 1485 voted to ARCHIVE on 2026-07-18. Measured over 11,293 transcripts, `browse` has 23 invocations and `gstack` has 0, so the router has been picking correctly. The exposure is that it has had no help doing so.
 
 Against the documented 1,024-character `description` cap, **exactly one skill of 428 exceeds it, and it is `gstack`**. Doc 2496 checked against a 500-character guidance and reported zero exceeding, which is true of the 114 it could see; 35 of 428 exceed 500. The 1,024 figure is the enforced limit in Anthropic's spec and is the one that matters, because a real bundle was rejected outright for breaching it (source 12).
+
+### 3a. Twenty-two of the 126 local SKILL.md files are in hidden directories, and they route
+
+This was found while preparing the cleanup, after the first version of this doc was written, and it corrects the version above (see the CORRECTION note at the end).
+
+`~/.claude/skills` holds **126 SKILL.md files**; orca routes **116** of them. Hidden directories inside that tree:
+
+| path | SKILL.md | what it is |
+|---|---|---|
+| `gstack/.agents/skills/` | 21 | a complete mirror of the gstack bundle. Directories are prefixed `gstack-*`, but the `name:` frontmatter keeps the ORIGINAL name, so each one routes under the same name as its twin. |
+| `.trash/1789673156360-65582-Qqg9lG/` | 1 | `setup-writing-style`, in a trash folder, **and routed** (454-character description in orca's listing). |
+
+The mirror is why `careful`, `guard`, `freeze`, `unfreeze` and 17 others each appear exactly twice under "Claude home" while existing at what looked like one path. It is also where the estate's only over-cap description lives.
+
+A deleted skill that still routes is the sharper of the two. Deletion moved the directory; it did not remove it from the surface the router reads. Nothing in `orca skills installed` marks it as trashed.
+
+Also inside the live skills tree: `gstack/node_modules` at **22MB**, and `~/.claude/skills/.gstack` at 104KB. The gstack directory is **138MB** in total, inside the tree that is symlinked into `~/zaal-dotfiles` and is therefore live config for every lane on this Mac.
+
+### 3b. The four safety skills live inside the bundle doc 1485 voted to archive
+
+Doc 1485 marked `gstack` **ARCHIVE** and, in the same table, marked `careful`, `guard`, `freeze` and `unfreeze` **KEEP**, with `careful` annotated "Operational safety tool - do not archive."
+
+Measured 2026-09-20: **all four exist only at `~/.claude/skills/gstack/<name>/` and its `.agents` mirror. There is no top-level copy of any of them.**
+
+| skill | top-level copy | invocations |
+|---|---|---|
+| `careful` | no | 0 |
+| `guard` | no | 0 |
+| `freeze` | no | 0 |
+| `unfreeze` | no | 0 |
+| `browse` | yes | 23 |
+| `review` | yes | 8 |
+| `design-review` | yes | 2 |
+
+So executing doc 1485 as written would have removed the destructive-command guardrails it told the reader to keep. The doc treated a 22-skill bundle as one skill. This is the second way that July plan could not have been run correctly, and it is a worse one than the `/home/zaal/` path, because the path error fails loudly and this one does not.
 
 ### 4. Doc 1485's July verdicts were never executed, and could not have been
 
@@ -190,7 +225,7 @@ Two things cut against reading that straight across to skills:
 
 **No benchmark was found measuring Agent-Skills-style name-and-description dispatch accuracy at scale, 50 skills against 500.** That number is **UNKNOWN**. The searches run were arXiv, GitHub and HN Algolia; Semantic Scholar and ACL Anthology were not searched, so this is a bounded gap and not a proof of absence. Likewise, no benchmark was found for classify-to-specialist-role routing specifically; RouterBench (arXiv:2403.12031) routes between **models**, which is a different question.
 
-The one hard production limit that is not in dispute: a 44-skill bundle was rejected by Claude Cowork outright, and the cause was a single `description` at roughly 2,241 characters against the documented 1,024 cap (coleschaffer/dtc-copywriting-skills#1). That is the failure mode our `gstack` entry is one skill away from, at 1,966.
+The one hard production limit that is not in dispute: a 44-skill bundle was rejected by Claude Cowork outright, and the cause was a single `description` at roughly 2,241 characters against the documented 1,024 cap (coleschaffer/dtc-copywriting-skills#1). That is the failure mode our hidden-mirror `gstack` entry is one skill away from, at 1,966.
 
 ## Sources
 
@@ -233,7 +268,7 @@ Not verified, listed as leads only, do not cite: dsiddharth2/plug#36, piercebogg
 
 | # | Action | Owner | Due |
 |---|---|---|---|
-| 1 | Cut `gstack`'s description to under 1,024 characters and strip the copied `browse` text, or archive the skill per doc 1485 | zorca | 2026-09-22 |
+| 1 | Stop routing hidden dirs under `~/.claude/skills`: the 21-file `gstack/.agents/` mirror and the routed `.trash/` entry. Raise with the skills owner before moving anything, since the tree is live config for every lane | zorca proposes, Zaal decides | 2026-09-22 |
 | 2 | Add `.gstack/` to zorca's `.gitignore` | zorca | 2026-09-22 |
 | 3 | Re-scope `zao-skill-audit` to every source `orca skills installed` reports, and make it print the source count it scanned so an exclusion cannot grow quietly | zorca | 2026-09-26 |
 | 4 | Re-open doc 1485: its execution plan targets `/home/zaal/`, which does not exist here. Either fix the paths and run it, or mark the eight live skills KEEP with a reason | zorca | 2026-09-27 |
@@ -249,3 +284,15 @@ Not verified, listed as leads only, do not cite: dsiddharth2/plug#36, piercebogg
 - `dev-workflows/946-zao-claude-code-kit` - the 60-skill era this grew out of.
 - `dev-workflows/507` - "no more than 3 skills without measurable lift", the rule the estate grew past.
 - Tracker task src=research-doc:2496, status todo, due 2026-09-20 - the review that surfaced this.
+
+## CORRECTION, 2026-09-20, after first publication
+
+The first version of this doc said "`gstack`'s description is 1,966 characters and opens with `browse`'s text word for word," and Key Decision 2 said to fix that description.
+
+**Both the location and the fix were wrong.** `~/.claude/skills/gstack/SKILL.md` carries a **363-character** description and breaches no cap. The 1,966-character entry belongs to `~/.claude/skills/gstack/.agents/skills/gstack/SKILL.md`, a hidden mirror copy.
+
+The measurable claim survives: exactly one of 428 routed descriptions exceeds the documented 1,024-character cap, at 1,966, and it is a `gstack` entry. What changes is what to do about it. Editing the skill would not have touched the offending file, and would have left 21 duplicate routed entries and a routed trash folder in place.
+
+**Cause:** the first pass read orca's listing, which reports a name and a description but not a path, and I attributed the longer of two same-named entries to the file I had on disk. A listing that does not carry a path cannot answer "which file is this," and I reported its answer as though it had. That is the `surface-cannot-report-state` shape, logged the same day, third instance in this one audit.
+
+Findings 3a and 3b were added as a result, and Next Action 1 was rewritten. No other number in this doc changed.

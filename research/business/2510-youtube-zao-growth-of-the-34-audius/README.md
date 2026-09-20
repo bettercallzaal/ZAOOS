@@ -1,7 +1,7 @@
 ---
 topic: business
 type: market-research
-status: research-complete
+status: draft
 last-validated: 2026-09-20
 superseded-by:
 related-docs:
@@ -13,7 +13,7 @@ tier: STANDARD
 
 > Drafted by ZOE's research-worker from "YouTube/ZAO growth: Of the 34 Audius-rostered WaveWarZ artists, which have channels with real audience overlap and 50-200% subscriber fit with BetterCallZaal, and what order should they be approached in for Collaboration-tagged uploads?". Auto-committed to main for durability; review + deepen as needed.
 
-Budget is critically low. I have enough internal data to synthesize an honest answer. Writing the findings now.
+> **INCOMPLETE, needs redispatch (seat review, 2026-09-19).** The question asked which of 34 artists have a YouTube channel with 50 to 200 percent subscriber fit. This run made 0 external fetches: no subscriber count exists here for anyone, including the baseline channel. The tier list below ranks by WaveWarZ battle activity, an untested stand-in for having a channel. It is NOT a YouTube ranking. Do not act on the ordering until the lookups in Recommended Action have been run.
 
 ---
 
@@ -54,15 +54,15 @@ The remaining 24 artists - especially those with fewer than 5 battles - are less
 
 2. **Run a batch YouTube search on Tier 1 and Tier 2 artists in the order listed above.** Search YouTube for each Audius handle by name. For any channel found, compare subscriber count to the baseline. Tier 1 takes priority because two artists (Kata7yst, XTinct_official) already have confirmed YouTube video presence and are most likely to have channels worth comparing.
 
-3. **For Collaboration-tagged upload outreach, sequence on fit score, not on battle rank.** An artist with 10,000 subscribers vs BetterCallZaal at 6,000 (167% fit) is a better first collab than a platform-dominant artist with 500K subscribers. The 50-200% band exists to match audience sizes for cross-promotion - outside that band, the collab is asymmetric and the smaller channel gains nothing visible.
+3. **For Collaboration-tagged upload outreach, sequence on fit score, not on battle rank.** With the baseline written as B (unknown until step 1), an artist at 1.67 x B is a better first collab than a platform-dominant artist at 80 x B. The 50-200% band exists to match audience sizes for cross-promotion - outside that band, the collab is asymmetric and the smaller channel gains nothing visible.
 
 ---
 
 ## Sources
 
-- [FULL] Doc 1214 - WaveWarZ Creative Ecosystem: Artists, Music, and IP Assets (Jul 2026) - `/home/zaal/zao-os/research/wavewarz/1214-wavewarz-creative-ecosystem-jul2026/README.md` (liveness-verified-on-2026-09-20, read this run)
-- [FULL] Doc 2501 - YouTube/ZAO Growth: WaveWarZ Short format research - `/home/zaal/zao-os/research/business/2501-youtube-zao-growth-which-wavewarz-short-format/README.md` (liveness-verified-on-2026-09-20, read this run)
-- [FULL] WaveWarZ research index (134 docs) - `/home/zaal/zao-os/research/wavewarz/README.md` (liveness-verified-on-2026-09-20, read this run)
+- [FULL] Doc 1214 - WaveWarZ Creative Ecosystem: Artists, Music, and IP Assets (Jul 2026) - `research/wavewarz/1214-wavewarz-creative-ecosystem-jul2026/README.md` (liveness-verified-on-2026-09-20, read this run)
+- [FULL] Doc 2501 - YouTube/ZAO Growth: WaveWarZ Short format research - `research/business/2501-youtube-zao-growth-which-wavewarz-short-format/README.md` (liveness-verified-on-2026-09-20, read this run)
+- [FULL] WaveWarZ research index (134 docs) - `research/wavewarz/README.md` (liveness-verified-on-2026-09-20, read this run)
 - [FAILED - budget exhausted] BetterCallZaal YouTube channel subscriber count - no external fetch executed
 - [FAILED - budget exhausted] Individual WaveWarZ artist YouTube channel lookups - no external fetches executed
 

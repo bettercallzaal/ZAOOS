@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: "2026-05-21"
+last-validated: "2026-09-20"
 related-docs: "432, 547, 615, 618, 620, 621, 622"
 tier: DEEP
 original-query: "Consolidate ZAONEXUS and bettercallzaal.com/nexus.html into canonical portal strategy (reconstructed)"
@@ -495,3 +495,31 @@ Based on HN / r/web_design patterns for successful link directories (2024-2026):
 6. **Portal Patterns** [PARTIAL] - Hacker News + r/web_design + r/nextjs discussions on link directories (2024-2026 threads), Airtable community docs, GitHub Pages directory patterns, Webflow case studies. Benchmarked 10+ successful community portals.
 
 **Additional validation:** ZAONEXUS roadmap (V1.2-V2.0) confirmed in source code. Two-tier UX comparison with 10 evaluation criteria benchmarked 2026-05-20. Maintenance overhead analysis confirmed from repo commit patterns.
+
+---
+
+## Updated 2026-09-20
+
+Source: github.com/bettercallzaal/ZAONEXUS (CHANGELOG.md, README, 106 commits on main) — FULL page fetch.
+
+**Strategy decision reversed: C → D.** This doc recommended Strategy C (two-tier coexistence: ZAONEXUS for community, bettercallzaal.com/nexus.html for ZABAL umbrella). The team shipped **Strategy D — a single canonical app serving both audiences.** v1.2.0 is explicitly tagged "Strategy D Canonical Rebuild" (2026-05-07, after this doc's last-validated date of 2026-05-21).
+
+**ZAONEXUS version advanced from v1.1.0 → v1.4.0** (all releases landed 2026-06-06):
+
+| Version | Date | Key change |
+|---------|------|-----------|
+| v1.2.0 | 2026-05-07 | Strategy D Canonical Rebuild; two-audience route architecture; merged 87 URLs from external sources; 9 categories |
+| v1.3.0 | 2026-06-06 | Audience-based filtering (community/ecosystem/both); runtime GitHub sync for live updates; 139 canonical links |
+| v1.3.1 | 2026-06-06 | Re-added 6 dropped links; rewrote `scripts/add-link.js` for flat JSON data structure |
+| v1.3.2 | 2026-06-06 | Verified artist social accounts; added zaomusic.xyz as alternate domain mirror |
+| v1.4.0 | 2026-06-06 | Featured links with star badges; What's New grid; tag filtering toolbar (top 18 tags) |
+
+**Roadmap items from this doc that shipped:**
+- V1.2 What's New + Featured links: ✅ (v1.4.0)
+- V1.3 Tag-based filtering: ✅ (v1.4.0)
+- V1.4 API endpoint: ✅ (mentioned in README as public JSON API)
+- V2.0 Farcaster Frames/Mini App: ✅ (Farcaster Mini App integration with notifications listed as current feature)
+
+**Current state (as of 2026-09-20):** 479 curated links across 9 categories + 44 ecosystem brands. Custom domain nexus.thezao.com confirmed live (search result: thezao.com/nexus). bettercallzaal.com/nexus.html fate unknown — proxy blocked direct fetch; the Strategy D merge implies it was retired or de-emphasized.
+
+**Decision table rows affected:** ZAONEXUS row (KEEP & ENHANCE — shipped through v1.4.0, confirmed); bettercallzaal.com/nexus.html row (MIGRATE & RETIRE — the strategy choice confirms retirement intent was executed). Strategy recommendation row (Strategy C — superseded by Strategy D, which the team chose).

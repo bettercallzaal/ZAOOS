@@ -134,6 +134,25 @@ Measured 2026-09-20: **all four exist only at `~/.claude/skills/gstack/<name>/` 
 
 So executing doc 1485 as written would have removed the destructive-command guardrails it told the reader to keep. The doc treated a 22-skill bundle as one skill. This is the second way that July plan could not have been run correctly, and it is a worse one than the `/home/zaal/` path, because the path error fails loudly and this one does not.
 
+### 3c. The good description is a hand-edit, and an upgrade would have reverted it
+
+Followed up 2026-09-20 while acting on Finding 3a. The two divergent-description skills under Claude home are `gstack` and `design-review`, and they have **one shared cause**: both were hand-edited in the generated file and never ported to the template that generates it.
+
+Regenerated in a scratch copy of the gstack tree with `bun run scripts/gen-skill-docs.ts`:
+
+| file | live, hand-edited | what regeneration produces |
+|---|---|---|
+| `gstack/SKILL.md` | 363 | **2,042** |
+| `gstack/design-review/SKILL.md` | 290 | **562** |
+
+Of 22 SKILL.md files in the bundle, **exactly 2 differ from their templates, and they are exactly the 2 route forks.** The other 20 regenerate byte-identical.
+
+The live 363-character description is a repair made on 2026-09-11 by another lane, which moved a 1,968-character routing table out of the frontmatter and into the body, and left the reason in the file: "which loads into every session on this machine whether gstack is used or not." That is correct, and it is exactly the progressive-disclosure design Anthropic's spec describes. **It was also one `/gstack-upgrade` away from being undone**, which would have put the main Claude routing path at 2,042 characters, double the documented cap.
+
+So the risk here was never the 1,966-character mirror sitting idle. It was that the repair was unprotected. Fixed in `zaal-dotfiles` PR #315: both short descriptions ported into the templates, the routing table moved into the template body, outputs regenerated for both hosts and verified byte-identical across two consecutive runs. The codex mirror description drops from 1,966 to 367, which removes the estate's only over-cap description.
+
+**The wider point for this doc.** gstack put a 27-row skill-routing table inside a `description` field that the spec says is read at startup at roughly 100 tokens. That is an agent dispatcher implemented in always-on metadata: the exact pattern the Reddit post advocates, built in the one place that makes its cost unconditional. The post's rule and this estate's measurement agree, and the failure was not the routing idea but where it was stored.
+
 ### 4. Doc 1485's July verdicts were never executed, and could not have been
 
 Nine skills were marked ARCHIVE on 2026-07-18. Re-measured 2026-09-20 with `-L`:
@@ -268,7 +287,7 @@ Not verified, listed as leads only, do not cite: dsiddharth2/plug#36, piercebogg
 
 | # | Action | Owner | Due |
 |---|---|---|---|
-| 1 | Stop routing hidden dirs under `~/.claude/skills`: the 21-file `gstack/.agents/` mirror and the routed `.trash/` entry. Raise with the skills owner before moving anything, since the tree is live config for every lane | zorca proposes, Zaal decides | 2026-09-22 |
+| 1 | DONE 2026-09-20. `.trash/` moved to `~/.claude/_trash-archive/`, nothing deleted, routed count 428 to 427 verified from orca. Template fix shipped as dotfiles PR #315. The `.agents/` mirror is Codex host output and is KEPT: Codex reads it, and 27 of 29 duplicate names carry identical text, so it costs tokens and not correctness | zorca | done |
 | 2 | Add `.gstack/` to zorca's `.gitignore` | zorca | 2026-09-22 |
 | 3 | Re-scope `zao-skill-audit` to every source `orca skills installed` reports, and make it print the source count it scanned so an exclusion cannot grow quietly | zorca | 2026-09-26 |
 | 4 | Re-open doc 1485: its execution plan targets `/home/zaal/`, which does not exist here. Either fix the paths and run it, or mark the eight live skills KEEP with a reason | zorca | 2026-09-27 |

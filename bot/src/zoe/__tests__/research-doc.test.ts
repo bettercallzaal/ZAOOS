@@ -196,6 +196,11 @@ describe('assessFindings', () => {
     expect(assessFindings('ZAO is a music DAO.').complete).toBe(false);
   });
 
+  it('counts marks in a numbered source list as well as a bulleted one', () => {
+    const r = assessFindings('1. [FULL] Source A\n2) [FULL] Source B\n3. [PARTIAL - summary] Source C');
+    expect(r).toMatchObject({ complete: true, full: 2, partial: 1, failed: 0 });
+  });
+
   it('counts a mark only at the start of a list item, not a mention in prose', () => {
     expect(assessFindings('The worker said [FULL] access was unavailable.').full).toBe(0);
   });

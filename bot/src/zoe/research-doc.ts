@@ -95,9 +95,14 @@ export interface DocReadiness { complete: boolean; full: number; partial: number
 // FULL sources and ended "Shipping blocker ... not resolved". Both went to main
 // marked complete. This reads the marks the worker already writes; it judges
 // nothing the text does not say. Each rule below traces to one of those docs.
+// Known limits, on purpose: findings with no source marks at all are held (a
+// doc that cites nothing is not complete), and a worker that admits it is
+// unfinished in words other than the two phrases below still passes if it has
+// a FULL source and no FAILED one. A wrong hold costs one review; a wrong pass
+// publishes. Widening the phrase list is a follow-up, not a reason to wait.
 export function assessFindings(findings: string): DocReadiness {
   const marks = (tag: string): number =>
-    (findings.match(new RegExp(`^\\s*[-*]\\s*\\[${tag}\\b`, 'gmi')) ?? []).length;
+    (findings.match(new RegExp(`^\\s*(?:[-*]|\\d{1,3}[.)])\\s*\\[${tag}\\b`, 'gmi')) ?? []).length;
   const full = marks('FULL'), partial = marks('PARTIAL'), failed = marks('FAILED');
   const reasons: string[] = [];
   if (full === 0) reasons.push('no source marked FULL');
@@ -136,7 +141,10 @@ export async function commitResearchDoc(opts: { question: string; findings: stri
     await git(['push', '-u', 'origin', branch, '--quiet']);
     const { stdout } = await exec('gh', ['api', '-X', 'POST', 'repos/bettercallzaal/ZAOOS/pulls',
       '-f', `title=doc ${num}: ${title} (ZOE research${ready.complete ? '' : ', DRAFT - not complete'})`, '-f', `head=${branch}`, '-f', 'base=main',
-      // A draft PR cannot be auto-merged, so docs-automerge.yml leaves it for a person.
+      // GitHub refuses to enable auto-merge on a draft, so docs-automerge.yml cannot
+      // merge it; the workflow has no draft check of its own. Seen on #3582
+      // (docs-only, opened as a draft 2026-09-19): auto_merge stayed null and the
+      // workflow's automerge job went red. Expect that red check on held docs.
       '-F', `draft=${ready.complete ? 'false' : 'true'}`,
       '-f', `body=Auto-drafted by ZOE's research-worker from: ${opts.question}\n\n${ready.complete ? 'Review + deepen as needed.' : `HELD AS DRAFT: ${ready.reasons.join('; ')}. Sources: ${ready.full} FULL, ${ready.partial} PARTIAL, ${ready.failed} FAILED.`}`, '--jq', '.html_url'],
       { cwd: REPO, maxBuffer: 1024 * 1024 });

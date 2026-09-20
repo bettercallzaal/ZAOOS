@@ -85,6 +85,28 @@ async function nextDocNum(): Promise<number> {
   return max + 1;
 }
 
+export interface DocReadiness { complete: boolean; full: number; partial: number; failed: number; reasons: string[]; }
+
+// Does the worker's OWN text support calling this doc complete? Until
+// 2026-09-20 every doc was stamped `status: research-complete` and its PR was
+// auto-merged to public main by docs-automerge.yml, whatever the findings said.
+// Two docs in one night said of themselves that they were not done: 2510 opened
+// with "Budget is critically low" and made 0 external fetches; 2511 listed 0
+// FULL sources and ended "Shipping blocker ... not resolved". Both went to main
+// marked complete. This reads the marks the worker already writes; it judges
+// nothing the text does not say. Each rule below traces to one of those docs.
+export function assessFindings(findings: string): DocReadiness {
+  const marks = (tag: string): number =>
+    (findings.match(new RegExp(`^\\s*[-*]\\s*\\[${tag}\\b`, 'gmi')) ?? []).length;
+  const full = marks('FULL'), partial = marks('PARTIAL'), failed = marks('FAILED');
+  const reasons: string[] = [];
+  if (full === 0) reasons.push('no source marked FULL');
+  if (failed > 0) reasons.push(`${failed} source(s) marked FAILED`);
+  if (/shipping blocker/i.test(findings)) reasons.push('the findings name an unresolved shipping blocker');
+  if (/budget is (critically )?low/i.test(findings)) reasons.push('the worker said its budget ran low');
+  return { complete: reasons.length === 0, full, partial, failed, reasons };
+}
+
 export async function commitResearchDoc(opts: { question: string; findings: string; topic?: string }): Promise<ResearchDocResult> {
   try {
     const topic = pickTopic(opts.topic);
@@ -93,7 +115,10 @@ export async function commitResearchDoc(opts: { question: string; findings: stri
     const slug = slugify(opts.question);
     const dir = join(REPO, 'research', topic, `${num}-${slug}`);
     const today = new Date().toISOString().slice(0, 10);
-    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: research-complete\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: STANDARD\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". Auto-committed to main for durability; review + deepen as needed.\n\n${opts.findings.trim()}\n`;
+    const ready = assessFindings(opts.findings);
+    const status = ready.complete ? 'research-complete' : 'draft';
+    const banner = ready.complete ? '' : `> **HELD AS DRAFT, not complete.** ${ready.reasons.join('; ')}. Sources: ${ready.full} FULL, ${ready.partial} PARTIAL, ${ready.failed} FAILED. Needs a person or a redispatch before it is cited.\n\n`;
+    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: ${status}\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: STANDARD\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". ${ready.complete ? 'Auto-committed to main for durability; review + deepen as needed.' : 'Opened as a DRAFT pull request; it does not merge itself.'}\n\n${banner}${opts.findings.trim()}\n`;
 
     await git(['checkout', 'main']); await git(['pull', '--quiet']);
     const branch = `ws/zoe-research-${num}`;
@@ -110,8 +135,10 @@ export async function commitResearchDoc(opts: { question: string; findings: stri
     await git(['commit', '--quiet', '-m', `docs: ${topic} research doc ${num} (ZOE auto-research, tier:STANDARD)\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`]);
     await git(['push', '-u', 'origin', branch, '--quiet']);
     const { stdout } = await exec('gh', ['api', '-X', 'POST', 'repos/bettercallzaal/ZAOOS/pulls',
-      '-f', `title=doc ${num}: ${title} (ZOE research)`, '-f', `head=${branch}`, '-f', 'base=main',
-      '-f', `body=Auto-drafted by ZOE's research-worker from: ${opts.question}\n\nReview + deepen as needed.`, '--jq', '.html_url'],
+      '-f', `title=doc ${num}: ${title} (ZOE research${ready.complete ? '' : ', DRAFT - not complete'})`, '-f', `head=${branch}`, '-f', 'base=main',
+      // A draft PR cannot be auto-merged, so docs-automerge.yml leaves it for a person.
+      '-F', `draft=${ready.complete ? 'false' : 'true'}`,
+      '-f', `body=Auto-drafted by ZOE's research-worker from: ${opts.question}\n\n${ready.complete ? 'Review + deepen as needed.' : `HELD AS DRAFT: ${ready.reasons.join('; ')}. Sources: ${ready.full} FULL, ${ready.partial} PARTIAL, ${ready.failed} FAILED.`}`, '--jq', '.html_url'],
       { cwd: REPO, maxBuffer: 1024 * 1024 });
     await git(['checkout', 'main']);
     return { ok: true, num, prUrl: stdout.trim() };

@@ -18,7 +18,7 @@ vi.mock('node:fs', () => ({
   },
 }));
 
-import { commitResearchDoc } from '../research-doc';
+import { assessFindings, commitResearchDoc } from '../research-doc';
 
 afterEach(() => vi.clearAllMocks());
 
@@ -135,5 +135,94 @@ describe('commitResearchDoc', () => {
     expect(content).toContain('What is ZAO?');
     expect(content).toContain('ZAO is a music DAO that');
     expect(content).toContain('topic: business'); // fallback topic
+  });
+});
+
+// -- assessFindings + the draft hold --
+// Fixtures are the shapes of two real docs from 2026-09-20 that reached public
+// main stamped research-complete while saying of themselves they were not.
+
+const DOC_2511_SHAPE = [
+  'Some findings.',
+  '',
+  '## Sources',
+  '- [PARTIAL - WebFetch returns model summary, not raw text] "Do Faces Help" - https://example.com/a',
+  '- [PARTIAL - search result summary only, not fetched] "Best Practices" - https://example.com/b',
+  '- [FAILED - no direct community thread found within budget] Community source. **Shipping blocker per learning 2026-07-12 not resolved.**',
+].join('\n');
+
+const DOC_2510_SHAPE = [
+  'Budget is critically low. I have enough internal data to synthesize an honest answer.',
+  '',
+  '## Sources',
+  '- [FULL] Doc 1214 - internal doc, read this run',
+  '- [FULL] Doc 2501 - internal doc, read this run',
+].join('\n');
+
+const GOOD_DOC = [
+  'Findings with evidence.',
+  '',
+  '## Sources',
+  '- [FULL] Official docs - https://example.com/docs',
+  '- [FULL] GitHub README - https://example.com/readme',
+  '- [PARTIAL - summary only] A blog - https://example.com/blog',
+].join('\n');
+
+function prCreateArgs(): string[] {
+  const call = mockExec.mock.calls.find(([cmd, args]) => cmd === 'gh' && (args as string[]).includes('-X'));
+  return (call?.[1] as string[]) ?? [];
+}
+
+describe('assessFindings', () => {
+  it('holds the doc 2511 shape: no FULL source, a FAILED one, a named shipping blocker', () => {
+    const r = assessFindings(DOC_2511_SHAPE);
+    expect(r.complete).toBe(false);
+    expect(r).toMatchObject({ full: 0, partial: 2, failed: 1 });
+    expect(r.reasons).toHaveLength(3);
+  });
+
+  it('holds the doc 2510 shape: FULL sources present, but the worker said its budget ran low', () => {
+    const r = assessFindings(DOC_2510_SHAPE);
+    expect(r.complete).toBe(false);
+    expect(r.full).toBe(2);
+    expect(r.reasons).toEqual(['the worker said its budget ran low']);
+  });
+
+  it('passes a doc with a FULL source, nothing FAILED and no stated blocker', () => {
+    expect(assessFindings(GOOD_DOC)).toMatchObject({ complete: true, full: 2, partial: 1, failed: 0, reasons: [] });
+  });
+
+  it('holds findings that carry no source marks at all', () => {
+    expect(assessFindings('ZAO is a music DAO.').complete).toBe(false);
+  });
+
+  it('counts a mark only at the start of a list item, not a mention in prose', () => {
+    expect(assessFindings('The worker said [FULL] access was unavailable.').full).toBe(0);
+  });
+});
+
+describe('commitResearchDoc holds an incomplete doc as a draft', () => {
+  it('writes status: draft with a banner, and opens the PR with draft=true', async () => {
+    setupHappyPath();
+    const r = await commitResearchDoc({ question: 'Thumbnails?', findings: DOC_2511_SHAPE });
+    expect(r.ok).toBe(true);
+    const content: string = mockWriteFile.mock.calls[0][1];
+    expect(content).toContain('status: draft');
+    expect(content).not.toContain('status: research-complete');
+    expect(content).toContain('HELD AS DRAFT');
+    expect(content).toContain('0 FULL, 2 PARTIAL, 1 FAILED');
+    const args = prCreateArgs();
+    expect(args).toContain('draft=true');
+    expect(args.find((a) => a.startsWith('title='))).toContain('DRAFT');
+  });
+
+  it('still stamps research-complete and opens a normal PR when the evidence is there', async () => {
+    setupHappyPath();
+    const r = await commitResearchDoc({ question: 'Evidence?', findings: GOOD_DOC });
+    expect(r.ok).toBe(true);
+    const content: string = mockWriteFile.mock.calls[0][1];
+    expect(content).toContain('status: research-complete');
+    expect(content).not.toContain('HELD AS DRAFT');
+    expect(prCreateArgs()).toContain('draft=false');
   });
 });

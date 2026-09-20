@@ -85,13 +85,30 @@ nonzero `amount`, via batched `eth_call` against public RPCs.
 |---|---|---:|---:|---|---|
 | Base | `0xb502c5856f7244dccdd0264a541cc25675353d39` | 990/990 | **201** | `0.581754831471201010` | 201, same to the wei |
 | Arbitrum | `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d` | 180/180 | **24** | `0.024858010000000000` | 24, same to the wei |
-| Degen (4 contracts) | - | **0** | **UNVERIFIED** | - | 225, 10,044 DEGEN |
+| Degen (4 contracts) | - | **0** | **UNREADABLE** | - | 225, 10,044 DEGEN |
 
 **225 of the claimed 450 are confirmed. The two ETH chains match exactly**, including the
-combined `0.606612841471201010 ETH` headline. The Degen half is **FAILED, not refuted**:
-`rpc.degen.tips` returns Cloudflare error 1016 and `degen.calderachain.xyz` and
-`rpc-degen-mainnet-1.t.conduit.xyz` both return empty, so it could not be read from here.
-At $0.00108907 the Degen side is worth about $11 regardless; the money is on the ETH chains.
+combined `0.606612841471201010 ETH` headline.
+
+**The Degen half is FAILED, not refuted - and the reason is its own finding.** Six public
+endpoints across five providers were tried on 2026-09-20 and none could execute a call:
+
+| Endpoint | Result |
+|---|---|
+| `rpc.degen.tips` | Cloudflare error 1016 |
+| `degen.calderachain.xyz/http` | empty response |
+| `rpc-degen-mainnet-1.t.conduit.xyz` | empty response |
+| `degen.rpc.thirdweb.com` | `-32001 Invalid chain` |
+| `666666666.rpc.thirdweb.com` | answers `eth_chainId` only; `eth_call`, `eth_blockNumber` and `eth_getBalance` all return `-32603` |
+| `rpc.ankr.com/degen` | key-gated |
+| `explorer.degen.tips` / `degen.blockscout.com` | empty / 404 |
+
+So **225 stranded bounties and all 10,044 DEGEN sit on a chain that cannot currently be
+audited from standard public infrastructure.** That is worse than the funds being
+unreachable through the app: from this machine today they cannot be counted at all. At
+$0.00108907 the DEGEN is worth about $11, so this costs almost nothing in money and
+everything in verifiability. Claim scoped honestly: unreachable *from here, today, on those
+endpoints* - not a claim that the chain is down.
 
 **Scale, at the $2,633.31 ETH price used by the dashboard on the same day:**
 
@@ -150,6 +167,44 @@ So BCZ is paying four to six times the market median and getting entries that th
 
 **BCZ has zero bounties open today** - R1, R2, R3 and R5 settled, R4 canceled, R6 and R7 uncast. Read from `data/rounds-live.json`, not from an issuer filter, because `issuer_wallet` is unset in `org.config.json` and that filter returns `[]`.
 
+## Who is actually issuing, and it changes the picture
+
+The top issuer by count is **Kenny, the founder**. The fourth is **poidhbot, the platform's
+own bot**.
+
+Identity confirmed from two independent sources before being written down: `api.web3.bio`
+returns `farcaster:kenny` for `0x10fc964e...`, and Farcaster's own
+`api.warpcast.com/fc/primary-address` for **fid 2210 (`kenny`, 20,695 followers)** returns
+`0x10Fc964Ef70C8467CD8c53e9eD9347422AdF96A8` - the same wallet.
+
+| Issuer | Open | Value | With submissions | Mix |
+|---|---:|---:|---:|---|
+| **kenny** (fid 2210) | 21 | $554.81 | 48% | 8 unclassified, 5 photo, 4 build; 3 chains |
+| `0xc45d767e...` | 12 | $31.56 | 33% | 12 build, ~$2.63 each |
+| `0x77c6235e...` | 7 | $108.24 | **14%** | 7 code |
+| **poidhbot** | 5 | $323.38 | 20% | 2 clip, 1 social |
+| `0xe35cea16...` | 4 | $10.52 | **100%** | 3 clip |
+| `0xd109bdda...` | 3 | $7.89 | **100%** | 3 photo |
+
+**Kenny and poidhbot together are 26 of 99 bounties (26%) and $878 of $3,181 (28%).** A
+quarter of what looks like a live market is the founder and the platform's own bot seeding
+it. The genuinely third-party market is 73 bounties, not 99.
+
+**And the seeded bounties underperform the organic ones:**
+
+> Excluding kenny and poidhbot: **43/73 = 59% with submissions.**
+> Kenny and poidhbot's own: **11/26 = 42%.**
+
+The last two rows of the issuer table are the format finding restated at issuer level, and
+they are the sharpest version of it in this doc: **one issuer's 7 code bounties at $108
+total draw 14%, while another's 3 photo bounties at $7.89 total draw 100%.** Fourteen times
+the money, a seventh of the response rate.
+
+**What this means for BCZ specifically.** The largest issuer on the platform is the same
+person who endorsed @wimpydwi on 2026-09-02 and believes R5 closed cleanly. Our standing
+with the biggest account on poidh is currently gated behind a winner announcement that has
+not gone out (`zpoidh/rounds/r5/winner-announce.md`, unsent since 2026-09-05).
+
 ## The funnel
 
 The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.warpcast.com/v2/all-channels`, 2026-09-20; channel created 2024-02-06). That community supports **46 distinct issuers** and 99 open bounties. Roughly one issuer per 123 followers.
@@ -185,6 +240,9 @@ The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.war
 - [poidh-app PR #1467](https://github.com/picsoritdidnthappen/poidh-app/pull/1467) - **[FULL, method: `gh api`]** `hasClaims` `_count` fix, unmerged since 2026-08-30
 - [picsoritdidnthappen/poidh-app](https://github.com/picsoritdidnthappen/poidh-app) - **[FULL, method: `gh api` + `zao-research-snapshot`]** 37 stars / 63 forks / 23 issues / 26 contributors; LICENSE read as MIT from the file
 - [Farcaster /poidh channel](https://farcaster.xyz/~/channel/poidh) - **[FULL, method: keyless `api.warpcast.com/v2/all-channels`]** 5,681 followers
+- Farcaster `user-by-username` + `fc/primary-address` - **[FULL, method: keyless `api.warpcast.com`]** fid 2210 `kenny`, 20,695 followers, primary address `0x10Fc964Ef70C8467CD8c53e9eD9347422AdF96A8`
+- [api.web3.bio](https://api.web3.bio/profile/0x10fc964ef70c8467cd8c53e9ed9347422adf96a8) - **[FULL, method: keyless JSON API]** independent second source for the same wallet-to-identity mapping, and for `poidhbot`
+- Degen public RPC and explorer endpoints - **[FAILED - six endpoints across five providers on 2026-09-20, table in the body; none could execute eth_call]**
 - [Hacker News Algolia](https://hn.algolia.com/api/v1/search?query=%22poidh%22) - **[FULL, method: keyless API]** 0 exact-title hits. Negative signal, recorded deliberately
 - poidh pre-v3 contracts, read directly - **[FULL, method: batched `eth_call` on `bounties(uint256)` via `base-rpc.publicnode.com` and `arb1.arbitrum.io/rpc`, 990/990 and 180/180 ids, 2026-09-20]** Base `0xb502c5856f7244dccdd0264a541cc25675353d39`, Arbitrum `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d`
 - Degen pre-v3 contracts - **[FAILED - `rpc.degen.tips` returns Cloudflare 1016; `degen.calderachain.xyz/http` and `rpc-degen-mainnet-1.t.conduit.xyz` both return empty. 225 of the claimed 450 remain unverified from this machine]**

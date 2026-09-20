@@ -11,6 +11,38 @@ tier: STANDARD
 
 # 2522 - What is actually happening on poidh right now
 
+> ## CORRECTION, 2026-09-20, AND IT IS THE HEADLINE
+>
+> **The pre-v3 contracts are EMPTY. This doc originally said they hold
+> `0.606612841471201010 ETH` and that the figure was "confirmed to the wei". The confirmation
+> was real and the conclusion was wrong.**
+>
+> `eth_getBalance` returns **exactly zero** on Base `0xb502c5856f7244dccdd0264a541cc25675353d39`
+> and on Arbitrum `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d`, checked against two independent
+> RPC providers with a positive control proving the call works.
+>
+> **Why the verification failed.** `bounties(uint256)` returns a RECORDED amount - a struct
+> field written when a bounty is created and never zeroed when the contract was drained. The
+> money is the contract's balance. This doc read the field, summed it, found the sum matched
+> poidh-app issue #1459 to the wei, and treated agreement as proof. Two sources agreed with
+> each other about the same stale field. **Neither had asked the chain how much money was
+> there,** and one `eth_getBalance` call was available the whole time.
+>
+> Poidh's founder said it plainly in Telegram on 2026-09-20 - "the v2 contracts are completely
+> drained" - and that is what sent me to check. He also said "degen chain is completely ded",
+> which independently explains the six dead Degen endpoints recorded further down as merely
+> unreachable.
+>
+> **What survives:** the 225 bounty records, the 542 claims, the 323 distinct claimants and the
+> 100 issuers are all real and still readable on chain. The work happened. **What dies:** every
+> dollar figure below that describes these bounties as holding money, the comparison against the
+> live market's $3,181, and the entire "recoverable by direct contract call" section. There is
+> nothing to recover.
+>
+> The sections below are left standing with this correction on top rather than quietly edited,
+> because the mistake is more instructive than the finding was. Read every figure about the
+> pre-v3 contracts as **recorded, not held**.
+
 > **Goal:** Measure the live poidh open-bounty market from chain and API, not from memory, and say what it means for how BCZ prices and formats R6 and R7.
 
 ## Key Decisions
@@ -21,8 +53,8 @@ tier: STANDARD
 | 2 | **DO NOT raise the R6 or R7 prize to attract entries. Prize size does not buy them.** | The $50+ band is 43% with-submission - nearly the worst of the four bands - while under-$5 runs 69%. BCZ's own rounds took 8 to 11 claims each at $27 to $66, so our entry rate comes from format and distribution, not from the pot. |
 | 3 | **PUT A DEADLINE IN EVERY ROUND. 81% of the market does not.** | 19 of 99 open bounties carry a parseable deadline and poidh's native `deadline` field is set on **zero** of them. A dated round is legible in a market where four out of five are not. |
 | 4 | **SET `issuer_wallet` IN `org.config.json`.** | It is unset today, so any competitive query that filters "our bounties" returns an empty list that reads as a confident zero. Found while writing this doc. |
-| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **Re-read from chain here and confirmed to the wei on both ETH chains: 201 on Base + 24 on Arbitrum holding `0.606612841471201010 ETH`, worth $1,597 against a visible market of $3,181.** Every other figure in this doc describes the 99 reachable ones. |
-| 6 | **TELL KENNY, WITH THE VERIFICATION.** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. **Sent 2026-09-20.** |
+| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **CORRECTED: those contracts hold ZERO. The 225 records are real; the `0.606612841471201010 ETH` is a sum of stale struct fields, not money. See the correction at the top.** Every other figure in this doc describes the 99 reachable ones. |
+| 6 | **~~TELL KENNY, WITH THE VERIFICATION~~ - HE CORRECTED US INSTEAD.** Sent 2026-09-20; he replied that the v2 contracts are completely drained and was right. The lesson stands in the other direction: he had the answer in one sentence and we had a day of arithmetic. **Original text:** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. **Sent 2026-09-20.** |
 | 7 | **PUT A DATE ON EVERY BOUNTY, AND SAY SO ON poidhz.** | A stated deadline is the strongest lever measured here: entries roughly double in every prize band and the effect survives controlling for format. 81% of the market does not do it. This is the single most useful thing poidhz can tell an issuer, and the thing the site is already built around. |
 | 8 | **COUNT PEOPLE, NOT JUST FUNDS, WHEN THIS IS DISCUSSED PUBLICLY.** | 306 wallets have stranded work on Base and 87 issuers have stranded bounties. "$1,374 locked" is an accounting line; "306 people did work nobody can see" is what it actually is. |
 

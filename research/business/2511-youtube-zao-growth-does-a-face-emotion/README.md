@@ -1,7 +1,7 @@
 ---
 topic: business
 type: market-research
-status: research-complete
+status: draft
 last-validated: 2026-09-20
 superseded-by:
 related-docs:
@@ -13,7 +13,7 @@ tier: STANDARD
 
 > Drafted by ZOE's research-worker from "YouTube/ZAO growth: Does a face+emotion thumbnail template outperform an artist/action-focused template specifically for live-competition content like WaveWarZ, and does that same packaging transfer to build-in-public founder videos, or do the two content types need separate thumbnail systems on the same channel?". Auto-committed to main for durability; review + deepen as needed.
 
-Budget nearly exhausted. Synthesizing from fetched data now.
+> **HELD AS DRAFT, not complete (seat review, 2026-09-20).** This doc reached main marked research-complete through the docs auto-merge. Its own source list says otherwise: 0 sources marked FULL, 4 PARTIAL (three are search-result summaries that were never fetched), 1 FAILED, and its last line names a shipping blocker that was not resolved. The worker also opened with "Budget nearly exhausted". Treat every figure below as unverified until a redispatch fetches the sources. The worker was fixed the same night (ZAOOS #3585): a doc like this is now opened as a draft and does not merge itself.
 
 ---
 

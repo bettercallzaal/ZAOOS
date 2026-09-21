@@ -160,3 +160,14 @@ Conventions inside `bot/`:
 - Persona is a RUNTIME file at `~/.zao/zoe/persona.md` (+ `~/.zao/zoe/human.md`), seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts` - there is no committed `bot/src/zoe/persona.md`
 - Hermes pattern documented in [research doc 613](./research/agents/613-hermes-canonical-agent-framework/)
 - No new bots without a numbered research doc + Zaal sign-off (CLAUDE.md "Primary Surfaces")
+
+## ZAO shared reality (2026-09-10, plan 5)
+
+Before agentic work in this repo, read `~/zao-vault/GENESIS.md` (the
+constitution), `~/zao-vault/BLACKBOARD.md` (live state) and
+`~/zao-vault/AGENTS.md` (registry and the one-screen checklist).
+`~/zao-vault/SYSTEM_MAP.md` says what exists; `~/zao-vault/DECISIONS.md` says
+what is already decided. Antigravity workspace rules for this repo live at
+`.agents/rules/zao.md`; the `/grill-me` workflow is generated, never
+hand-edited (`zao-vault/scripts/render-antigravity-workflows.sh --check`).
+Spec: `zao-vault/projects/agentic-infrastructure-spec-2026-09-09.md`.

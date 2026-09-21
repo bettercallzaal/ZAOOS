@@ -11,6 +11,38 @@ tier: STANDARD
 
 # 2522 - What is actually happening on poidh right now
 
+> ## CORRECTION, 2026-09-20, AND IT IS THE HEADLINE
+>
+> **The pre-v3 contracts are EMPTY. This doc originally said they hold
+> `0.606612841471201010 ETH` and that the figure was "confirmed to the wei". The confirmation
+> was real and the conclusion was wrong.**
+>
+> `eth_getBalance` returns **exactly zero** on Base `0xb502c5856f7244dccdd0264a541cc25675353d39`
+> and on Arbitrum `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d`, checked against two independent
+> RPC providers with a positive control proving the call works.
+>
+> **Why the verification failed.** `bounties(uint256)` returns a RECORDED amount - a struct
+> field written when a bounty is created and never zeroed when the contract was drained. The
+> money is the contract's balance. This doc read the field, summed it, found the sum matched
+> poidh-app issue #1459 to the wei, and treated agreement as proof. Two sources agreed with
+> each other about the same stale field. **Neither had asked the chain how much money was
+> there,** and one `eth_getBalance` call was available the whole time.
+>
+> Poidh's founder said it plainly in Telegram on 2026-09-20 - "the v2 contracts are completely
+> drained" - and that is what sent me to check. He also said "degen chain is completely ded",
+> which independently explains the six dead Degen endpoints recorded further down as merely
+> unreachable.
+>
+> **What survives:** the 225 bounty records, the 542 claims, the 323 distinct claimants and the
+> 100 issuers are all real and still readable on chain. The work happened. **What dies:** every
+> dollar figure below that describes these bounties as holding money, the comparison against the
+> live market's $3,181, and the entire "recoverable by direct contract call" section. There is
+> nothing to recover.
+>
+> The sections below are left standing with this correction on top rather than quietly edited,
+> because the mistake is more instructive than the finding was. Read every figure about the
+> pre-v3 contracts as **recorded, not held**.
+
 > **Goal:** Measure the live poidh open-bounty market from chain and API, not from memory, and say what it means for how BCZ prices and formats R6 and R7.
 
 ## Key Decisions
@@ -21,8 +53,10 @@ tier: STANDARD
 | 2 | **DO NOT raise the R6 or R7 prize to attract entries. Prize size does not buy them.** | The $50+ band is 43% with-submission - nearly the worst of the four bands - while under-$5 runs 69%. BCZ's own rounds took 8 to 11 claims each at $27 to $66, so our entry rate comes from format and distribution, not from the pot. |
 | 3 | **PUT A DEADLINE IN EVERY ROUND. 81% of the market does not.** | 19 of 99 open bounties carry a parseable deadline and poidh's native `deadline` field is set on **zero** of them. A dated round is legible in a market where four out of five are not. |
 | 4 | **SET `issuer_wallet` IN `org.config.json`.** | It is unset today, so any competitive query that filters "our bounties" returns an empty list that reads as a confident zero. Found while writing this doc. |
-| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **Re-read from chain here and confirmed to the wei on both ETH chains: 201 on Base + 24 on Arbitrum holding `0.606612841471201010 ETH`, worth $1,597 against a visible market of $3,181.** Every other figure in this doc describes the 99 reachable ones. |
-| 6 | **TELL KENNY, WITH THE VERIFICATION.** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. |
+| 5 | **TREAT `bounties.fetchAll` AS THE REACHABLE MARKET, NOT THE MARKET.** | Issue #1459 on poidh-app documents 450 open, funded bounties on pre-v3 contracts the app no longer reads. **CORRECTED: those contracts hold ZERO. The 225 records are real; the `0.606612841471201010 ETH` is a sum of stale struct fields, not money. See the correction at the top.** Every other figure in this doc describes the 99 reachable ones. |
+| 6 | **~~TELL KENNY, WITH THE VERIFICATION~~ - HE CORRECTED US INSTEAD.** Sent 2026-09-20; he replied that the v2 contracts are completely drained and was right. The lesson stands in the other direction: he had the answer in one sentence and we had a day of arithmetic. **Original text:** | #1459 has sat 23 days with zero replies. We can now confirm half of it independently from chain and hand over the scanner that did it. That is a better first message than a new bounty round. **Sent 2026-09-20.** |
+| 7 | **PUT A DATE ON EVERY BOUNTY, AND SAY SO ON poidhz.** | A stated deadline is the strongest lever measured here: entries roughly double in every prize band and the effect survives controlling for format. 81% of the market does not do it. This is the single most useful thing poidhz can tell an issuer, and the thing the site is already built around. |
+| 8 | **COUNT PEOPLE, NOT JUST FUNDS, WHEN THIS IS DISCUSSED PUBLICLY.** | 306 wallets have stranded work on Base and 87 issuers have stranded bounties. "$1,374 locked" is an accounting line; "306 people did work nobody can see" is what it actually is. |
 
 ## The market, measured
 
@@ -167,6 +201,141 @@ So BCZ is paying four to six times the market median and getting entries that th
 
 **BCZ has zero bounties open today** - R1, R2, R3 and R5 settled, R4 canceled, R6 and R7 uncast. Read from `data/rounds-live.json`, not from an issuer filter, because `issuer_wallet` is unset in `org.config.json` and that filter returns `[]`.
 
+## The stranded funds are mostly unpaid work, which #1459 does not say
+
+Issue #1459 counts money. It does not ask whether anyone had already done the work. They had.
+
+`getClaimsByBountyId(uint256)` still answers on the pre-v3 Base contract, so the claims are
+readable even though the app cannot show them. Read across all 201 stranded Base bounties on
+2026-09-20:
+
+| | Bounties | ETH | USD at $2,633.31 |
+|---|---:|---|---:|
+| Stranded on Base | 201 | `0.581754831471201010` | $1,531.94 |
+| **Of those, with work already submitted** | **96** | `0.521890950410101000` | **$1,374.30** |
+
+**492 claims are sitting on bounties nobody can reach.** Median 2 per bounty, and the largest
+single pile is **69 claims on one bounty**. Bounty 934 holds 0.17081 ETH and carries 66
+submissions; bounty 911 holds 0.0533 ETH and carries 69.
+
+> **90% of the stranded value is on bounties where the work is already done.**
+> It is not abandoned money. It is unpaid work, and the people who did it cannot show it to
+> the person who owes them.
+
+**306 distinct wallets have work stranded on Base**, across **87 distinct issuers**. Median
+one claim each, so this is mostly 306 individual people who entered one bounty and heard
+nothing, not a handful of prolific hunters. The claimant address is word 1 of each `Claim`
+struct, confirmed against word 2, which carries the bounty id and matched the bounty being
+queried on every element read.
+
+**One of the 306 is Kenny.** Wallet `0x10fc964e...`, fid 2210, the founder and the largest
+issuer on the platform, has **10 stranded claims of his own** on contracts his own app can no
+longer read. He is not only the person who can fix this; he is one of the people it happened
+to.
+
+The 66 on bounty 934 were verified two ways on the same payload before being written down:
+the ABI array-length word reads 66, and exactly 66 strictly-increasing element offsets follow
+it. `cast` could not decode the struct array with a guessed signature, so the count comes
+from the encoding itself rather than from a type that happened to parse.
+
+**This is the strongest available argument for what poidhz should build next**, and it is in
+Next Actions below: poidh cannot render these bounties or their claims, the contracts answer
+fine, and the scan takes about four seconds per contract.
+
+### The money is recoverable, and that changes what the page should say
+
+Read from Blockscout on 2026-09-20, the last 50 transactions sent to the pre-v3 Base
+contract. Two things fall out, and the second is the important one.
+
+**The contract went quiet on 2026-04-21.** Its final transactions were two `createClaim`
+calls from `0x342567eB63`, five months ago. The 50 most recent transactions span 2025-12-07
+to 2026-04-21 and there is nothing since. So **nobody is still submitting work into the
+void** - the harm is historical, it is just unresolved. The last two people to enter did so
+in April and have heard nothing in five months. Kenny's own wallet appears in that tail,
+calling `createOpenBounty` and `cancelOpenBounty` on 2026-04-01, three weeks before the
+contract stopped being used.
+
+**The funds are not lost. They are unreachable through the app and fully reachable from the
+contract.** The method mix in those 50 transactions shows the escape hatches all working in
+production before the cutover:
+
+| Method | Times used |
+|---|---|
+| `cancelOpenBounty` | 14 |
+| `createClaim` | 9 |
+| `submitClaimForVote` | 8 |
+| `createOpenBounty` | 6 |
+| `voteClaim` / `resolveVote` | 3 / 3 |
+| `acceptClaim` | 1 |
+| `cancelSoloBounty`, `withdrawFromOpenBounty`, `joinOpenBounty` | 1 each |
+
+So an issuer with a stranded bounty has two real options today, neither of which requires
+poidh to ship anything: **`acceptClaim`** pays the person who did the work, and
+**`cancelOpenBounty`** refunds the issuer. Both are direct contract calls.
+
+**That is the difference between a graveyard and a lost-property office**, and it is what
+`/lost` should be. Not "here is money nobody can reach" but "here is your bounty, here are
+the 66 people who entered it, and here is the call that pays one of them or returns your
+funds." The tension is real and the page must state it: cancelling refunds the issuer and
+leaves the claimants with nothing, which is exactly the outcome 306 people are already
+living with.
+
+## The strongest lever measured: a stated deadline roughly doubles entries
+
+Raw: **14/19 = 74%** of bounties with a parseable deadline have submissions, against
+**38/79 = 48%** without. That is a bigger gap than format and far bigger than prize, so it
+was tested against the two confounds that killed the last candidate.
+
+**It is not the cheap-photo group in disguise.** The deadline group's median prize is
+**$17.05** against **$8.92** without, and it skews toward `build`, the harder format. If
+anything it is the more demanding half of the market.
+
+**Controlled within format:**
+
+| Format | With deadline | Without |
+|---|---|---|
+| build | **7/8 = 88%** | 9/25 = 36% |
+| photo | **5/5 = 100%** | 8/14 = 57% |
+| code | **2/3 = 67%** | 4/11 = 36% |
+| clip | 0/1 | 7/10 = 70% |
+| unclassified | 0/1 | 9/17 = 53% |
+
+**Controlled within prize band:**
+
+| Band | With deadline | Without |
+|---|---|---|
+| under $5 | **3/3 = 100%** | 19/29 = 66% |
+| $5-50 | **8/11 = 73%** | 16/41 = 39% |
+| $50+ | **3/5 = 60%** | 3/9 = 33% |
+
+**Every prize band roughly doubles.** Three independent bands moving the same way is what
+makes this worth acting on, rather than one ratio.
+
+**Two honest limits, and the second is the one that matters.**
+
+The `clip` and `unclassified` rows are `n=1`. They are printed rather than hidden, but they
+say nothing. Several other cells are `n=3` to `n=5`.
+
+And **a deadline may be a proxy for an issuer who cares.** Someone who bothers to write a
+date probably also writes a clearer brief, picks a realistic ask and tells people the bounty
+exists. Nothing here can separate "the deadline caused entries" from "the kind of issuer who
+writes deadlines causes entries". The advice is the same either way - write the date - but
+the mechanism is not established, and this doc has an interest in the deadline mattering,
+since a deadline calendar is what poidhz is. Stated so a reader can discount it.
+
+## A confound that nearly shipped as a finding
+
+`is_multiplayer: false` bounties show **12/14 = 86%** with submissions against 48% for
+multiplayer, which reads as "SOLO beats OPEN" and would have argued against R8 being an OPEN
+bounty.
+
+It is not a finding. Those 14 are almost all **$2.62 photo and IRL bounties**, several of
+them literal duplicates - "Show this code in public" three times, "Random Act of Kindness"
+three times, "Ramus Grove Stewardship" twice. Their median prize is $2.62 against $14.16 for
+the rest. It is the cheap-photo effect wearing a different label, and the only reason it was
+caught is that it contradicted a decision already made, which is a bad reason to check
+something and the reason it got checked.
+
 ## Who is actually issuing, and it changes the picture
 
 The top issuer by count is **Kenny, the founder**. The fourth is **poidhbot, the platform's
@@ -213,6 +382,42 @@ The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.war
 
 **poidh has no Hacker News presence.** An exact-title search returns **0 hits**; the 1,565 fuzzy hits are all "Podhoretz" and "Podhound". Recorded as a negative signal: the conversation about poidh happens on Farcaster and in the repo, nowhere else that is publicly indexed.
 
+## What to build on poidhz.com next, ranked by what the data supports
+
+Asked 2026-09-20 while waiting on Kenny's reply. Ranked by how much each is something
+**only poidhz can do**, since anything poidh.xyz already does better is not an upgrade.
+
+**1. `/lost` - the bounties poidh cannot show you.** The 201 stranded Base bounties, the 96
+with work on them, and the 492 claims. Nobody else has this: poidh's own app reads the wrong
+contracts and its API returns nothing for them. We have the scanner, it runs in about four
+seconds per contract, and `getClaimsByBountyId` answers, so we can show the submissions too.
+It serves the two people most harmed - an issuer who does not know 66 people entered, and a
+hunter who did the work and got nothing. It is also the single best demonstration that
+poidhz is a real client rather than a calendar.
+
+**2. `/stats` - what actually gets entries.** Everything in the two tables above, regenerated
+on the 6h cron: submission rate by format and by prize band, the count of bounties with no
+deadline, the median prize. Every issuer on the platform is guessing at this, and we are
+already computing it to write this document. Cheap: the numbers exist in
+`data/bounty-dashboard.json` today and nothing renders them.
+
+**3. Issuer pages.** 46 distinct issuers, and the top three hold 40% of the bounties. A page
+per issuer - what they post, how often, what share gets entries, whether they pay - makes
+poidhz the place you check before entering someone's bounty. The data is in the same file.
+
+**4. Render `data/health.json`.** It is generated every 6h and nothing reads it. It carries
+promises owed, re-check dates that have passed, and which drafts are gated. Putting it on
+`/about` would make this programme's own unkept promises public, which is a decision about
+how we talk about ourselves in public and therefore Zaal's, not a build task.
+
+**5. Surface past-deadline-but-still-open bounties.** `scan-poidh-deadlines.py` already tags
+these `deadline_status: past`. They are the most confusing thing on poidh for a newcomer - a
+bounty that says it closed last month and still accepts claims - and explaining it is the
+kind of thing a client is for.
+
+**Not worth building:** anything that duplicates poidh's own create-bounty flow, or a second
+leaderboard. `/hub` already covers the second and poidh does the first well.
+
 ## Also See
 
 - [business/2466-poidhz-platform-honest-audit](../2466-poidhz-platform-honest-audit/) - the internal audit of our own platform against the live poidh data
@@ -228,7 +433,10 @@ The Farcaster `/poidh` channel has **5,681 followers** (keyless read of `api.war
 | Set `issuer_wallet` in `zpoidh/org.config.json` so competitive queries stop returning a false zero - merged PR, `check-site-claims.py` green | @Zaal | PR | 2026-09-27 |
 | Keep R6 and R7 as clip rounds at their current 0.0125 ETH pot; do not raise the prize to chase entries - decision recorded in `rounds/r6/README.md` | @Zaal | PR | 2026-10-03 |
 | Re-measure the R7 Twitch archive claim, whose re-check date passed 2026-09-13, before R7 casts - date moved in `rounds/r7/README.md` | @Zaal | PR | 2026-09-27 |
-| Send Kenny the #1459 verification: 225 of 450 confirmed from chain to the wei, $1,597 stranded against a $3,181 visible market, plus the scanner - message sent | @Zaal | Outbound | 2026-09-27 |
+| BUILD `poidhz.com/lost` - the stranded bounties, their claims, AND the recovery call per bounty (`acceptClaim` to pay the worker, `cancelOpenBounty` to refund the issuer). 201 Base bounties, 96 with work, 492 claims, 306 people. Page live with a 6h refresh | @Zaal | PR | 2026-10-11 |
+| Tell the 87 issuers with stranded bounties that their funds are recoverable by direct contract call - a cast naming the count and linking `/lost`, not 87 DMs | @Zaal | Outbound | 2026-10-18 |
+| Follow up to Kenny once he replies with the claims finding, which #1459 does not cover: 492 submissions stranded, 90% of the locked value on bounties where the work is done - message sent | @Zaal | Outbound | 2026-10-04 |
+| Send Kenny the #1459 verification: 225 of 450 confirmed from chain to the wei, $1,597 stranded against a $3,181 visible market, plus the scanner - SENT 2026-09-20 | @Zaal | Outbound | DONE |
 | Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |
 | Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days | @Zaal | PR | 2026-10-20 |
 

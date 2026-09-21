@@ -2,9 +2,9 @@
 topic: events
 type: leads-tiering
 status: draft-for-zaal
-last-validated: 2026-08-20
+last-validated: 2026-09-21
 board-task: b80026fc
-related-docs: "2325, 2310, 2279, 2295, 1079, 1334, 1361, 1539, 1562, 1659, 1031, 610"
+related-docs: "2325, 2310, 2279, 2295, 1079, 1334, 1361, 1539, 1562, 1659, 1031, 610, 1045"
 original-query: "Sponsor leads doc: cold/warm/hot tiers + discount authority - pairs with the pitch deck (doc 2325); outreach starts once the deck exists"
 tier: STANDARD
 ---
@@ -16,6 +16,19 @@ tier: STANDARD
 > teammate can close a conversation without coming back to him. Card b80026fc (P1, due
 > 2026-08-21). Pairs with doc 2325 (the deck). **Nothing here is sent until Zaal says the
 > deck exists (his 8/19 gate).**
+
+> **Updated 2026-09-21.** Zaal asked to update this list "on all the businesses in
+> Ellsworth" against a separate Chamber-directory pull
+> (`zao-vault/archive/repos-2026-08-27/finance-hq/capital/ellsworth-full-directory-sponsors.md`,
+> pulled 2026-07-22, ranked purely on sponsor-fit heuristics - budget, category, visibility -
+> with no cross-check against this doc). Checking its 16-business "strongest candidates"
+> table against the tiers below: **6 were already accounted for at a HOTTER tier than the
+> Chamber pull implied** - Star 97.7 is HOT, Bangor Federal Credit Union and Machias Savings
+> Bank are WARM, Bangor Savings Bank/Fogtown/Airline Brewery are already COLD/WARM here. A
+> heuristic ranking with no memory of prior outreach will keep re-surfacing leads that are
+> already further along; this doc is the one with that memory. The other 10 were genuinely
+> net-new and are appended to COLD below, each verified live today (own-site fetch or a
+> corrected URL where the directory's guess 404'd/DNS-failed).
 
 ## Zaal's definitions (verbatim, 8/17 transcript)
 
@@ -90,6 +103,34 @@ Splice; Base.
 People, not brands: three colleges' AV students (mass cold DM with Dcoop, card 901324ef);
 Nextdoor (installed 8/17) for AV help + local promo.
 
+### Net-new from the 2026-09-21 Chamber-directory check
+
+Not previously in this doc at any tier. Each verified live today - own-site fetch, or a
+corrected URL where the source directory's guessed URL 404'd or DNS-failed (Star 97.7,
+Bangor Federal Credit Union, Airline Brewing and Bangor Savings Bank's guessed URLs were
+all wrong; corrected and already accounted for above at HOT/WARM/COLD, not repeated here).
+
+Contact numbers/emails intentionally omitted here - ZAOOS is a public repo and this
+project's PII rule (`.claude/rules/pii-hygiene.md` Rule 3, amended 2026-09-01) bans
+third-party phone/email contact data from any public-repo commit regardless of
+business-vs-personal; the vault (`zao-vault`, private) is the sanctioned home for that.
+Every general-line number for the businesses below is already in the source pull
+(`zao-vault/archive/repos-2026-08-27/finance-hq/capital/ellsworth-full-directory-sponsors.md`)
+- pull that file, don't re-type numbers into this doc.
+
+| Business | Category | Verified |
+|---|---|---|
+| Atlantic Brewing Company | Brewery | `atlanticbrewing.com` 200 |
+| Stanley Subaru | Automotive | `stanleysubaru.com` confirmed via search (own-fetch 403'd, Cloudflare bot-block, not a down signal) |
+| Witham Family Hotels | Lodging | `withamhotels.com` confirmed via search (own-fetch 403'd, same bot-block pattern) |
+| Bar Harbor Bank & Trust | Financial | `bhbt.com` 200 |
+| Camden National Bank | Financial | `camdennational.com` 200 |
+| Discover Maine Magazine | Media | `discovermainemagazine.com` 200 |
+| Townsquare Media | Media/Advertising | `townsquaremedia.com` 200 |
+| Hollywood Casino Bangor | Entertainment | `hollywoodcasinobangor.com` confirmed via search (own-fetch 403'd) - runs a real charitable-giving program, but **requires 501(c)(3) status to apply** (`hollywoodcasinobangor.com/charitable-giving`). ZAO does not hold that status directly - the fiscal-sponsor path runs through Fractured Atlas / New Media Commons (doc 1045); route this ask through NMC or skip |
+| Rooster Brother | Retail | `roosterbrother.com` 200 |
+| Marden's | Retail | `mardenssurplus.com` 200 |
+
 ## In-kind is its own track (doc 1079 finding 3)
 
 Pitch these for things, not cash - florists, bakeries, restaurants, printers say yes to
@@ -152,6 +193,7 @@ Katina (local intros they offer). Everyone else routes to Zaal.
 | Zaal | Facebook event (unblocks Chesnee's calendar listing) | Chesnee | card cc314651 |
 | Dcoop | first touches on Keith Berry / humanoids once authorized | Zaal | after decision 5 |
 | zaostock lane | reconcile this list into the `sponsors` table when keys are reachable | board | next session with keys |
+| Zaal | pick 2-3 of the 10 net-new COLD leads and start outreach - event is 12 days out (Oct 3) | the leads | 2026-09-28 |
 
 ## Sources
 
@@ -162,3 +204,4 @@ Katina (local intros they offer). Everyone else routes to Zaal.
 - OneNote archive `~/zao-vault/onenote/local-impact/{zao-stock,promotion,ellsworth-m}.md` sponsor lines - FULL
 - Memory: project_zao_stock_team (Web3Metal), project_zao_stock_confirmed, the 8/18 handoff (Bar Harbor cluster, Bendigo)
 - ZAO STOCK Supabase `sponsors` table - NOT READ (no keys on this Mac)
+- 2026-09-21 update: `zao-vault/archive/repos-2026-08-27/finance-hq/capital/ellsworth-full-directory-sponsors.md` (2026-07-22 Chamber-directory pull) cross-checked against this doc's tiers - FULL. Each of the 10 net-new COLD candidates verified live via direct site fetch (`curl`) where it returned 200, or WebSearch confirmation where the fetch 403'd on bot-protection (Stanley Subaru, Witham Family Hotels, Hollywood Casino Bangor) - marked PARTIAL, method noted per-row, escalation via WebSearch judged sufficient for an existence/contact-info check on a local business (not a quoted claim). Doc 1045 (fiscal sponsorship / insurance) - FULL, for the Hollywood Casino 501(c)(3) constraint.

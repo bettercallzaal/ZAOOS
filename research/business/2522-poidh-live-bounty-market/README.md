@@ -105,6 +105,11 @@ Issue [#1459](https://github.com/picsoritdidnthappen/poidh-app/issues/1459), fil
 
 > 450 bounties that are still open and still hold funds live on poidh main contracts the app no longer reads. Combined, they hold 0.606612841471201010 ETH and 10044.182045344343434440 DEGEN. There is no path to them in the UI or through `bounties.fetchAll`, so neither the issuer who funded one nor a claimer who wants to submit to one can reach it from poidh.xyz.
 
+**That quote is wrong about the funds and is reproduced here only because it is what the issue
+says.** "Still hold funds" and "they hold 0.606612841471201010 ETH" describe struct fields.
+`eth_getBalance` returns zero on both contracts. The unreachability it describes is real; the
+money is not.
+
 Read from the contracts directly on 2026-08-28: Base `0xb502c585...` holds 201 open and funded of 990; Arbitrum `0x0Aa50ce0...` 24 of 180; four Degen contracts 225 between them. So the reachable open market measured here, 99 bounties and $3,181, sits beside roughly **450 stranded bounties holding more ETH than the entire visible market is worth**.
 
 The issue's author found it the same way this doc's numbers are built - "I found this while fixing the same bug in my own page, which read one contract per chain and called it every bounty."
@@ -115,14 +120,22 @@ The issue has sat 23 days with no reply, so rather than repeat it this doc re-re
 contracts directly: `bounties(uint256)` over every id, open = zero `claimer`, funded =
 nonzero `amount`, via batched `eth_call` against public RPCs.
 
-| Chain | Contract | Ids read | Open + funded | ETH held | Issue #1459 says |
-|---|---|---:|---:|---|---|
-| Base | `0xb502c5856f7244dccdd0264a541cc25675353d39` | 990/990 | **201** | `0.581754831471201010` | 201, same to the wei |
-| Arbitrum | `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d` | 180/180 | **24** | `0.024858010000000000` | 24, same to the wei |
-| Degen (4 contracts) | - | **0** | **UNREADABLE** | - | 225, 10,044 DEGEN |
+| Chain | Contract | Ids read | Open records | ETH **recorded** (NOT held) | **Actual balance** | Issue #1459 says |
+|---|---|---:|---:|---|---|---|
+| Base | `0xb502c5856f7244dccdd0264a541cc25675353d39` | 990/990 | **201** | `0.581754831471201010` | **`0`** | 201, same to the wei |
+| Arbitrum | `0x0Aa50ce0d724cc28f8F7aF4630c32377B4d5c27d` | 180/180 | **24** | `0.024858010000000000` | **`0`** | 24, same to the wei |
+| Degen (4 contracts) | - | **0** | **UNREADABLE** | - | - | 225, 10,044 DEGEN |
 
-**225 of the claimed 450 are confirmed. The two ETH chains match exactly**, including the
-combined `0.606612841471201010 ETH` headline.
+**Read the last two columns together or not at all.** The recorded column is a struct field.
+The balance column is the money. They differ by the entire amount, and every conclusion this
+section originally drew came from reading the first and calling it the second.
+
+**CORRECTED 2026-09-20: what matches is the arithmetic, not the claim.** The 225 open
+*records* are confirmed and the struct sums reproduce issue #1459's
+`0.606612841471201010 ETH` exactly - but `eth_getBalance` returns **zero** on both contracts,
+so the issue's headline and this section's original conclusion are both wrong. Two independent
+readings of the same stale field agreeing is not verification. See the correction at the top
+of this document.
 
 **The Degen half is FAILED, not refuted - and the reason is its own finding.** Six public
 endpoints across five providers were tried on 2026-09-20 and none could execute a call:
@@ -146,7 +159,11 @@ endpoints* - not a claim that the chain is down.
 
 **Scale, at the $2,633.31 ETH price used by the dashboard on the same day:**
 
-> The stranded ETH is worth **$1,597.40**. The entire visible open market is **$3,180.82**.
+> ~~The stranded ETH is worth **$1,597.40**. The entire visible open market is **$3,180.82**.~~
+>
+> **WRONG, and this was the most quotable sentence in the document.** There is no stranded
+> ETH. The contracts hold zero; $1,597.40 was a struct sum priced in dollars, which made a
+> bookkeeping artifact look like a treasury. The $3,180.82 live-market figure stands.
 > **Half as much value again is sitting in bounties nobody can reach as in every bounty
 > poidh can show you.**
 
@@ -436,7 +453,7 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 | BUILD `poidhz.com/lost` - the stranded bounties, their claims, AND the recovery call per bounty (`acceptClaim` to pay the worker, `cancelOpenBounty` to refund the issuer). 201 Base bounties, 96 with work, 492 claims, 306 people. Page live with a 6h refresh | @Zaal | PR | 2026-10-11 |
 | Tell the 87 issuers with stranded bounties that their funds are recoverable by direct contract call - a cast naming the count and linking `/lost`, not 87 DMs | @Zaal | Outbound | 2026-10-18 |
 | Follow up to Kenny once he replies with the claims finding, which #1459 does not cover: 492 submissions stranded, 90% of the locked value on bounties where the work is done - message sent | @Zaal | Outbound | 2026-10-04 |
-| Send Kenny the #1459 verification: 225 of 450 confirmed from chain to the wei, $1,597 stranded against a $3,181 visible market, plus the scanner - SENT 2026-09-20 | @Zaal | Outbound | DONE |
+| ~~Send Kenny the #1459 verification~~ **SENT 2026-09-20 WITH A WRONG FIGURE.** It claimed $1,597 stranded; the contracts hold zero. Kenny corrected it himself within the hour. The sent copy is corrected at the top of `zpoidh/docs/outreach/kenny-poidhz-bundle.md` rather than deleted | @Zaal | Outbound | DONE |
 | Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |
 | Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days | @Zaal | PR | 2026-10-20 |
 

@@ -1,8 +1,13 @@
-# 1627 — ZAO Visual Identity Spec (Jul 2026)
+# 1627 - ZAO Visual Identity Spec (Jul 2026)
 
 **Type:** BRAND-REFERENCE  
 **Topic:** Brand  
-**Status:** ACTIVE — Reference for ZAOstock flyers, press kits, ZOE post graphics, ZABAL materials, and all ZAO-branded collateral. Update when the visual identity is deliberately changed. Zaal owns all final approval on brand-adjacent design; ZOE uses this doc to brief designers (e.g., Iman for PizzaDAO/Zambia flyers — doc 1593).
+**Status:** SUPERSEDED FOR PARENT BRAND / PARTIALLY ACTIVE FOR WAVEWARZ AND EVENT COLLATERAL
+
+> **HISTORICAL / SCOPING NOTICE (Updated 2026-09-21):**
+> This document was authored in July 2026 around WaveWarZ battles, ZAOstock collateral, and designer briefs.
+> 1. Parent Brand Canon: For core ZAO parent brand assets, website, and decks, this document is SUPERSEDED by zao-brand/brand-pack.md and zao-brand/visual/palette.md. The parent brand uses Deep Navy (#022449) and Gold (#fec107) on a deep-navy (#03182f) background, and is referred to as "The ZAO" standalone.
+> 2. Sub-Brand Functional Palette: The colors below (WaveWarZ Blue #0047FF, Battle Red #FF2D2D, Earn Green #00CC66, ZAO Black #0A0A0A, ZAO White #F5F5F5, and Solana Purple #9945FF) are NOT retired. They are actively scoped to WaveWarZ, live battle states, and streaming collateral.
 
 ---
 

@@ -9,7 +9,7 @@ original-query: "STANDARD tier. Capturing Serato DJ Lite audio into OBS on Windo
 tier: STANDARD
 ---
 
-# 2526 - Serato DJ Lite audio into OBS on Windows (DDJ-SB3)
+# 2537 - Serato DJ Lite audio into OBS on Windows (DDJ-SB3)
 
 > **Goal:** Get the DDJ-SB3's master mix into OBS as its own audio source, keep headphone cue working, spend nothing. Answer why every OBS-side capture failed and what the vendor-documented route is.
 

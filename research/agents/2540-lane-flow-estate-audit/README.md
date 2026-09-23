@@ -151,6 +151,24 @@ Walden Yan's *Don't Build Multi-Agents* (Cognition, 2025-06-12) argues two princ
 
 The honest synthesis: **keep the lanes, and make overlap detectable.** Two lanes reading the same file is the event worth catching, and nothing catches it today.
 
+### 9. UPDATE, same morning: the overlap failure happened three times, not once
+
+Finding 7 was written from one incident. **By 07:40 the same morning there were three**, all on 2026-09-23, all between different pairs of lanes, and **all caught by one lane gossiping to another rather than by any mechanism.**
+
+| # | Artifact | The disagreement | How it surfaced | What it cost |
+|---|---|---|---|---|
+| 1 | `STREAMING-BACKEND.md` | Seat treated a proposal as a decision; baraza lane already knew it was never committed | Relayed through a third lane | Zaal was asked to choose between four options built on a false premise |
+| 2 | `instagram.com/zaofestivals` | Seat's socials inventory said the bio still read ZAO-CHELLA / ART BASEL '24; Zaal had already fixed it | Seat re-measured by chance while answering an unrelated question | A grill question was queued asking Zaal to decide about something already done |
+| 3 | ZAO Festivals page admin | Seat proposed asking Zaal who holds the logins; the zaostock lane had his ruling from that evening's grill - invite access, not full admin | Peer message crossed mid-flight | A second question to Zaal on a closed matter, nearly asked |
+
+**Incident 2 is the one that should worry a reader most**, because it is the cheapest to have caught and nothing caught it. The Instagram bio is a public HTTP GET. Any lane could verify it in one second. It went stale because **the inventory was written once and then quoted repeatedly**, and quoting is not measuring.
+
+**A fourth near-miss, same morning, different shape and worth recording because the mechanism that saved it was luck.** Zaal re-authed Supabase and said "mcp done". The seat's connector resolved to `etwvzrmlxeobinrlytza` - the cowork tracker, **not** ZAOstock's `yjrlaxpjusmrfylumban`. That project contains a table named `artists` with **zero rows**. Every `UPDATE ... WHERE name = 'Acadia Rising'` would have run cleanly, matched nothing, and returned success. **A decoy table with the right name in the wrong project produces a green result and no change**, and the only reason it was caught is that the seat checked `get_project_url` before pasting.
+
+That is `surface-cannot-report-state` - the estate's most-recorded shape at 23 entries - arriving through a connector rather than a script.
+
+**What this changes in the recommendations: nothing, and that is the point.** Decision 5 already said lanes must exchange traces where domains overlap, and Next Action 6 already proposed the overlap index. **Three incidents in one morning move that from the most speculative item on the list to the most urgent one.** A reviewer who reads only one row of the Next Actions table should read that one.
+
 ## Comparison: three ways to fix agreement
 
 | Approach | What it costs | What it buys | Verdict |

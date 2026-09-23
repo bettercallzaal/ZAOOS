@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-23
 related-docs: 674, 683, 690, 691
 tier: STANDARD
 ---
@@ -71,6 +71,21 @@ Applied to `~/.claude/skills/zao-research/SKILL.md` in this session:
 2. **Rewritten MCP Tool Order** - firecrawl removed; exa web_fetch + Playwright + Wayback put in its place, with a per-source-type escalation ladder (Notion/JS -> exa fetch or Playwright; X articles -> Playwright; dead URLs -> Wayback; Reddit -> full comment tree; media -> Playwright or metadata search).
 3. **New Hard Requirement #11** - Sources section marks each source `[FULL]`, `[PARTIAL - what is missing]`, or `[FAILED - what was tried]`.
 4. **Depth rule** added to tier guidance - a high-signal single source is not compressed into a synthesis-table row.
+
+## Updated 2026-09-23
+
+**Decision 1 (DELETE firecrawl) is now outdated — Firecrawl is available as an official Claude Code plugin.** As of 2026, Firecrawl ships as an installable plugin for Claude Code with a free tier. Installation: search "firecrawl" in the Claude Code plugin system, or run `claude plugin install firecrawl@claude-plugins-official`. Capabilities include JS-rendering page scrape, site mapping, full-site crawl, and remote Playwright browser sessions. AGPL-3.0 license, requires a Firecrawl API key. The tool chain table in this doc should now list Firecrawl as an available option rather than marking it NOT installed. The /zao-research skill recommendation to delete firecrawl references should be reconsidered — the plugin now fulfils exactly the role that was missing.
+
+**Exa 2.0 launched (date unconfirmed from snippets — PARTIAL):** Exa released an Exa 2.0 API with two new endpoints: "Instant" (<180ms) for speed and "Deep" (~3.5s P50) for quality. Exa also launched "Exa Agent" — a single API endpoint for autonomous multi-page web research combining search, fetch, and synthesis. Exa raised $250M at $2.2B valuation (as of ~May 2026 per search snippet — PARTIAL, could not fetch siliconangle.com full article).
+
+**Benchmark context (PARTIAL — from search snippet, not full fetch):** An independent benchmark found Firecrawl at 77.2% coverage / 0.638 F1 vs Exa at 69.2% / 0.508 F1 for deep content retrieval. Treat as directional, not authoritative — source URL (apigene.ai) was blocked by egress proxy.
+
+**Playwright MCP widely adopted in 2026:** Microsoft's `@playwright/mcp` package is the standard for browser-control in Claude Code agentic workflows. Uses the accessibility tree (not screenshots), making it fast and token-efficient. Setup: `claude mcp add` command. This validates the doc's existing Playwright recommendation.
+
+Sources checked 2026-09-23:
+- [Firecrawl Claude Plugin (GitHub, FULL)](https://github.com/firecrawl/firecrawl-claude-plugin) — confirms availability and capabilities
+- [Playwright MCP Claude Code (WebSearch snippets, PARTIAL)](https://playwright.dev/docs/getting-started-mcp) — confirms widespread adoption
+- [Exa 2.0 / Exa Agent (WebSearch snippets, PARTIAL)](https://exa.ai/blog/exa-api-2-0) — new endpoints; exa.ai blocked by egress proxy
 
 ## Sources
 

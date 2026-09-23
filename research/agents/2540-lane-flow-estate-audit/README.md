@@ -20,7 +20,7 @@ Recommendations first. Every one is backed by a count in Findings.
 | # | Decision | Because |
 |---|---|---|
 | **1** | **ENFORCE or DELETE `done.json`. Do not leave it optional.** | 12 of 90 briefs have one, and **1 of 66 items has ever been flipped to `done`**. 11 of the 12 lists have never been touched. A state contract with 1% adoption is not a contract. |
-| **2** | **COLLAPSE the brief `status:` vocabulary to the two values `lane-init` defines.** | **17 distinct values** are in use across 90 briefs, and **13 briefs carry no `status:` field at all**. Nothing can route on a field with 17 values and a 14% null rate. |
+| **2** | **ENFORCE the five values `TEMPLATE.md` already defines. Do not invent a new vocabulary.** | **17 distinct values** are in use across 90 briefs, and **13 briefs carry no `status:` field at all**. Nothing can route on a field with 17 values and a 14% null rate. |
 | **3** | **DATE-STAMP `BLACKBOARD.md` CURRENT MISSION and fail a check when it ages past 72 hours.** | Read on 2026-09-23, it says the reveal "is Sunday 13 September, three days out". **That reveal was 10 days ago.** The live-state file is describing a future that is past. |
 | **4** | **FIX `zao-lanes` before trusting any lane count, including this doc's.** | It reports **11 lanes while `ListAgents` reports 28 sessions**, and one row reads **"20719d ago"** - a Unix epoch-0 timestamp rendered as an age. The instrument that measures the fleet is itself producing a false measurement. |
 | **5** | **When two lanes read the same artifact, they must exchange traces, not conclusions.** | Measured live this morning: two lanes read the same repo and reached opposite conclusions about whether a decision existed. Cognition's Principle 2 exactly, and the only reason it surfaced was a third lane relaying gossip. |
@@ -54,13 +54,19 @@ The cheap read is "remind lanes to update it". That has been the standing instru
 
 ### 2. The status field has 17 values and a 14% null rate
 
-`lane-init` Step 5 defines exactly two: a brief lands `unconsumed` and the lane flips it to `consumed` **on read, not on boot**.
+**CORRECTED 2026-09-23 10:00, by the dotfiles2 lane, on an open PR.** This finding originally said the contract defines **two** values, citing `lane-init` Step 5, where a brief lands `unconsumed` and the lane flips it to `consumed` **on read, not on boot**. That is what the SKILL says.
+
+**It is not the contract the briefs actually use.** `~/zao-vault/handoffs/TEMPLATE.md` line 5 reads `status: unconsumed           # one of FIVE values - see the table below this block`, and line 12 is a heading: `## status: - the five values, and nothing else`. The five are `unconsumed`, `consumed`, `ready`, `closed`, `superseded`, with Zaal's own definition of `ready` recorded in the file from 2026-09-01: *"ready should mean ready to move forward to next task."*
+
+**So the seat audited the estate against the wrong document** - the skill that writes briefs rather than the template briefs are written from - and reported a denominator of 2 where it is 5. **The direction of the finding is unchanged and the fix is cheaper than stated**: the answer is to enforce five values that already exist, not to design a vocabulary. Two of the 17 observed values, `ready` and `superseded`, were counted as drift and are legal.
+
+Recorded rather than silently edited because **this doc's entire argument is that lanes re-derive state from prose and disagree**, and this is the doc doing it. It was caught in under three hours by a lane reading the source instead of the citation.
 
 In practice, `grep -h "^status:" handoffs/*.md` returns **17 distinct values**, among them `active`, `consumed`, `current`, `handed-off`, `held`, `new`, `pending`, `ready`, `standing`, `superseded`, `surface-complete`, `unconsumed`, `unlabelled`, plus free-text like `complete - all 6 batches applied 2026-09-08; 366 of 366 routed; 0 cards closed`. A further **13 briefs have no `status:` line at all**.
 
-Counts by the two canonical values: **16 `consumed`, 11 `unconsumed`**. That is 27 of 90 briefs using the defined vocabulary - **30%**.
+Counts by the canonical values: **16 `consumed`, 11 `unconsumed`**, plus **9 `ready`** and **6 `superseded`**, which the correction above establishes are legal. That is **42 of 90 briefs using the defined vocabulary - 47%**, not the 30% first reported. Still under half.
 
-The vocabulary did not drift because people were careless. It drifted because **the two defined values cannot express the real states**, which include "written but the lane never booted", "booted and abandoned", "superseded by a newer brief" and "standing, never completes". A vocabulary that cannot say what is true gets extended at the point of writing, silently, by whoever is writing.
+The vocabulary still drifted, and not because people were careless. It drifted because **even five defined values cannot express the real states**, which include "written but the lane never booted", "booted and abandoned", "superseded by a newer brief" and "standing, never completes". A vocabulary that cannot say what is true gets extended at the point of writing, silently, by whoever is writing.
 
 ### 3. The live-state file is describing a past future
 

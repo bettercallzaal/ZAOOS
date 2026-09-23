@@ -21,8 +21,35 @@ tier: STANDARD
 | **2** | **BUT a second copy exists and it has DIVERGED. Fix that before adding any feature.** | `bettercallzaal/zaostock-bot` duplicates twelve filenames from `ZAOOS/bot/src/`. Measured by SHA-256: `index.ts` is **708 lines vs 361**, `group.ts` **89 vs 76**, `capture.ts` same length but a different hash, `supabase.ts` identical. |
 | **3** | **DO NOT build a new capture bot. Add capture to the monorepo, behind a per-chat flag.** | The routing layer already exists - `group.ts` registers chats into `stock_bot_chats` with a `mode` column. What is missing is one insert on a message handler. |
 | **4** | **The consolidation recommendation is 4 months old and was never executed. Treat "decide again" as the failure mode, not the fix.** | `dev-workflows/688` said it in May: *"Consolidate to one bot framework... 1 strong tool + 1 cheap async = beats 5 mediocre ones."* `agents/460` said *"USE Telegram-to-ZOE as default human entry."* Both stand; neither landed. |
-| **5** | **RECONCILE THE RUNNING SNAPSHOT FIRST. It is the registry's own number-one risk and it is now 107 days old.** | `REGISTRY.md`: *"`zaostock-bot` and `zao-devz-stack`/`hermes` run from `~/zaostock-bot`, which is **not a git repo** - control-plane code there was hand-patched, so it can drift from `main` and isn't reproducible."* |
+| **5** | ~~RECONCILE THE RUNNING SNAPSHOT FIRST~~ **CORRECTED 2026-09-23 16:21 - ALREADY DONE. The registry is wrong, not the VPS.** | Probed over ssh rather than inferred: **`~/zaostock-bot` IS a git repo**, first commit `a83ec3e` reading *"source of truth was the VPS disk until 2026-09-09"*. And `~/zao-os` is on **`main`**, not the feature branch the registry names. Both were listed as open risks from 2026-06-08 - **107 days stale.** This doc cited the first as a live blocker an hour before the probe. |
 | **6** | **Do not count repos to measure the fleet. Count running units.** | 19 repos match `bot`; 10 are archived. The registry names **6 bots** and **3 systemd units**. Repo count overstates the fleet by a factor of three. |
+
+## CORRECTION, 2026-09-23 16:21 - two of this doc's premises were already fixed
+
+**Decision 5 above said to reconcile the running snapshot first, citing `REGISTRY.md`'s
+number-one risk. Both of that registry's oldest risks are already resolved**, and the
+only reason this doc repeated them is that nobody had run `ssh` before writing it.
+
+Probed directly:
+
+- **`~/zaostock-bot` is a git repo.** First commit `a83ec3e`: *"zaostock-bot: first
+  commit of the VPS working copy (ZAOstock Team Telegram Bot + devz), source of truth
+  was the VPS disk until 2026-09-09."* So it was reconciled two weeks ago.
+- **`~/zao-os` is on `main`**, not `claude/gifted-euler-bYhl7`.
+- **Six services are running**, including `cowork-agent` whose unit description reads
+  *"migrated from 187.77.3.104"* - so the cowork VPS the registry describes as a
+  separate machine has also moved.
+
+**What survives unchanged:** the fork between `bettercallzaal/zaostock-bot` and
+`ZAOOS/bot/src` is measured by SHA-256 and is real. What does NOT survive is the claim
+that the running code is untracked and unreproducible. **It is tracked. The drift is
+between two git repos, not between git and a hand-patched directory** - which is a
+smaller and more tractable problem than this doc first described.
+
+**Recorded rather than silently edited**, because the cause is the shape this session
+logged three times in one hour: an inconvenient access assumed out of reach. The VPS was
+never probed; one `ssh` disproved the premise and also revealed 107 days of stale
+registry rows.
 
 ## The one-sentence finding
 

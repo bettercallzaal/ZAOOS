@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-09-24
 superseded-by:
 related-docs: 56, 58, 102, 103, 104, 109, 114, 115, 184, 285, 306, 346, 498
 original-query: "prepare a full summary of respect zao fractal edenfractal optimsm fractal fractally etc"
@@ -96,7 +96,7 @@ The fractal that carried the model from EOS to Ethereum.
 
 ZAO's own weekly fractal - the only music-focused fractal in the entire ecosystem.
 
-**Origin & cadence.** Started Q2/Q3 2024 (around August 2024). Running 100+ continuous weeks as of July 2026 - the longest unbroken streak of any fractal. Meets **Mondays 6pm EST**; can also run any time with 4+ members who have not yet played that week.
+**Origin & cadence.** Started Q2/Q3 2024 (around August 2024). Running ~112+ continuous weeks as of September 2026 - the longest unbroken streak of any fractal. Meets **Mondays 6pm EST**; can also run any time with 4+ members who have not yet played that week.
 
 **Where it runs.** Today the primary surface is a **Discord bot** (`fractalbotmarch2026` - Python, 52 slash commands, hosted on bot-hosting.net). The ZAO OS app has a `/fractals` page intended to become the long-term hub ("one place for all data"), with both Discord and app working in a dual mode.
 
@@ -139,7 +139,7 @@ The software layer, all built by **Optimystics** (GitHub org, ~16 repos, mostly 
 
 **Repos and tooling:**
 - `ordao` - the core monorepo (OREC contracts, `orclient`, `ornode`, `ortypes`, GUI, console). Upstream dev repo is `sim31/ordao` (254+ commits, Tadas).
-- `orclient` - the SDK, published on npm as `@ordao/orclient` (v1.4.3, Feb 2026). Built on ethers v6 + zod. Functions: `proposeBreakoutResult()`, `vote()`, `execute()`, `getRespectOf()`, etc.
+- `orclient` - the SDK, published on npm as `@ordao/orclient` (v1.4.4, Apr 2026). Built on ethers v6 + zod. Functions: `proposeBreakoutResult()`, `vote()`, `execute()`, `getRespectOf()`, etc.
 - `ornode` - Node/Express + MongoDB backend storing off-chain proposal content. ZAO's instance (`zao-ornode.frapps.xyz`) is currently down - reads now go straight to the OREC contract.
 - `frapps` - the "fractal apps" deployment platform. Each fractal gets a subdomain: `zao.frapps.xyz`, `of.frapps.xyz`, `eden-fractal.frapps.xyz`.
 - `orfrapps` - a newer (April 2026) separate repo for production deployment and multi-instance configuration, with a 9-command CLI.
@@ -227,6 +227,13 @@ Related inter-DAO work: **Fractal Nouns** (a cross-chain governance bridge exper
 | Unify OG + ZOR ledgers into one Supabase view (Doc 115 plan) | @Zaal | Build | Future sprint |
 | Open OREC submission to all members via ZAO OS UI (removes the 2-wallet bottleneck) | @Zaal | Build | Future sprint |
 | Stand `ornode` back up or formally retire it in favor of direct-contract reads | @Zaal | Infra | Next infra session |
+
+## Updated 2026-09-24
+
+- **orclient v1.4.4** (released 2026-04-02): `@ordao/orclient` bumped from v1.4.3 (Feb 2026) to v1.4.4 (Apr 2026), confirmed via `npm view @ordao/orclient version`. Version history: 1.4.1 (2026-01-26) → 1.4.2 (2026-01-28) → 1.4.3 (2026-02-18) → 1.4.4 (2026-04-02). Source: npm registry (FULL).
+- **ZAO Fractal week count**: Updated estimate to ~112+ weeks as of September 2026 (started ~August 2024, 25+ months). Previously stated "100+ as of July 2026".
+- **Optimism Fractal**: No evidence of resumption found (search results still show paused status, Jan 2026 decision stands as documented).
+- **Eden Fractal**: Season 12 started January 15, 2026 per prior search. Current season beyond that could not be confirmed via direct fetch (edenfractal.com egress-blocked); the season number in the timeline section remains as documented.
 
 ## Sources
 

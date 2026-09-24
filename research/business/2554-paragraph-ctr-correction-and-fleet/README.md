@@ -19,6 +19,7 @@ tier: STANDARD
 |----------|----------------|
 | **THE 0.00% CTR CLAIM IS FALSE. Stop citing it.** | Measured today against Paragraph's own analytics warehouse: **351 clicks across 291 link rows on 28 posts**, most recent **2026-09-24 02:29 UTC**. Last 30 days alone: **3,779 sends, 804 opened (21.3%), 55 clicks**. That is roughly **1.5% of sends and 6.8% of opens**, not zero. Docs 944, 2547 and 2549 all carry the 0.00% figure and all need correcting. |
 | **Where the 0.00% came from, most likely** | The in-app Newsletter tab, read once and believed since. Whatever it displays, the warehouse behind it disagrees with it. We have never cross-checked a dashboard number against the tables until today. Treat the in-app rate as a display, not a measurement. |
+| **AND THE CORRECTION NEEDS A CORRECTION: unique clickers, not clicks** | Clicks flatter the channel because a few readers click many links. Counted by PEOPLE instead: last 21 days, every edition had **0, 1 or 2 unique clickers out of 419 sends**, and Day 246's 33 clicks came from **6 people, three of whom clicked 9 links each**. So "0.00%" was false as a number and roughly right as a description. The honest sentence is: the list opens at 17 to 25 percent and almost nobody clicks, and both halves need saying. |
 | **What the real numbers say to do** | Open rate is 17-25% per edition and stable. Clicks per edition run 0 to 6 - EXCEPT Day 246, which took **33 clicks on its own**, five times any other edition in the window. One edition doing 5x the rest is the most useful fact in this doc, and nobody has ever looked at why. READ DAY 246 before writing another CTA. |
 | **The most-clicked links are not the ones we push** | Lifetime top URLs: the ZAO coin page (25), the publication home (19), a poidh bounty (12), zaostock.com (11), ZABAL Gamez recordings pages (8 each). Readers click the THING, not the festival's RSVP. |
 | **Article 2 is the actionable one: Search & AI** | Paragraph now records **21 AI crawlers from 12 companies** at the edge, labelled by intent (training, search, assistant), plus visits from **11 AI assistants** and **11 search engines**, and a most-crawled-posts list. "Neither needs a paid plan." Crawler tracking requires a live Paragraph-served website, which @thezao has. This is a surface nobody in the estate has opened. |
@@ -65,6 +66,26 @@ What to use:
 
 **Why it matters here:** 29,849 page views on this publication carry no utm source at all, against 276 from email. Whatever is driving the reading, it is not the send. The Search & AI tab is the first surface that can name part of that.
 
+## 3b. Clicks versus clickers, measured
+
+| Edition | Sends | Opened | Unique clickers |
+|---|---|---|---|
+| Day 266 | 419 | 76 (18.1%) | 1 |
+| Day 265 | 419 | 83 (19.8%) | 1 |
+| Day 264 | 419 | 89 (21.2%) | 1 |
+| Day 263 | 419 | 99 (23.6%) | 0 |
+| Day 260 | 419 | 72 (17.2%) | 1 |
+| Day 259 | 419 | 78 (18.6%) | 1 |
+| Day 258 | 420 | 102 (24.3%) | 2 |
+| Day 250 | 420 | 104 (24.8%) | 2 |
+| Day 246 | 422 | 99 (23.5%) | **6** |
+
+Thirty-day totals: 9 editions, 3,779 sends, 804 opened, **15 unique clickers**, 55 clicks. That is 1.7 clickers per edition.
+
+Day 246's outlier is six people, not a crowd: three clicked 9 links each, one clicked 4, two clicked 1. Its links were the festival site, the RSVP, an Audius track and the post's own support and share links, across 6 distinct URLs. The lesson is not "that edition worked", it is that at this list size a single engaged reader moves the whole number, so per-edition click rates are noise and only the trend in OPENS is stable enough to steer by.
+
+Also measured: 2,092 sends in the last 7 days all read `SENT` with 3 `PENDING` and zero unsubscribes.
+
 ## 4. What this costs the existing docs
 
 | Doc | What to change |
@@ -87,7 +108,8 @@ What to use:
 | Read Day 246 and find what earned it 33 clicks against a 0-to-6 baseline; write the finding into the newsletter craft rules | zaoonparagraph lane | PR | 2026-09-26 |
 | Correct the 0.00% CTR line in docs 944, 2547 and 2549 with the measured rates and the query | zaoonparagraph lane | PR | 2026-09-26 |
 | Open Analytics, then Search & AI, and record which crawlers and assistants are reading @thezao and which posts they take | @Zaal | Measurement | 2026-09-26 |
-| Add a weekly analytics query to the lane's routine so a dashboard number is never trusted alone again | zaoonparagraph lane | PR | 2026-09-30 |
+| `automation/analytics.sh` shipped: one command for the 30-day read, the per-edition table, top links and traffic by source, plus `--sql` for ad-hoc queries | zaoonparagraph lane | DONE 2026-09-24 | done |
+| Run `analytics.sh` every Monday and paste the per-edition table into the lane's status file, so a dashboard number is never trusted alone again | zaoonparagraph lane | Routine | 2026-09-28 |
 | Point the Brand agent at zaostock.com so covers and social cards read the real stylesheets | @Zaal | Paragraph config | 2026-09-26 |
 
 ## Sources

@@ -2,8 +2,9 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-09-24
 original-query: What are the complete best practices for building, structuring, and optimizing Claude Code custom skills? (reconstructed)
+re-researched: "2026-09-24, triggered by https://www.reddit.com/r/ClaudeCode/s/RV1d1S3qhg - CC's most underrated feature: Dynamic Context Injection"
 tier: STANDARD
 ---
 
@@ -86,6 +87,31 @@ Skills support dynamic placeholders replaced before Claude sees the content:
 
 ## Dynamic Context Injection (Shell Execution in Skills)
 
+> **RE-RESEARCHED 2026-09-24. Every syntax claim below was re-verified against
+> `code.claude.com/docs/en/skills` today and still holds. What changed is not the
+> feature - it is that we documented this on 2026-05-21 and have adopted it in
+> nothing.**
+>
+>     SKILL.md files on this Mac        136
+>     using !`cmd` injection              0
+>     using `arguments:`                  0
+>     using `allowed-tools:`             38
+>
+> Measured with `find -L ~/.claude/skills -name SKILL.md`, red-controlled (135 of
+> 136 contain `description:`, so the grep works). **126 days, zero adoption.**
+>
+> **The cost is measurable and it is not hypothetical.** On 2026-09-24 the vault
+> lane sent a peer a brief naming 150 untyped tracker cards. Another lane had
+> typed 45 of them while the brief was being written; the live number was 105.
+> The brief was stale before it arrived and had to be corrected in a second
+> message. A skill that injected `!`zao-tracker types`` instead of a typed
+> number could not have been stale, because there would have been no number to
+> type.
+>
+> That is the whole argument for this feature in this estate. Not token
+> efficiency - **a figure a human types is a figure that can rot, and a figure a
+> command produces at render time cannot.**
+
 Skills can execute shell commands whose output replaces placeholders before Claude sees anything.
 
 **Inline syntax:**
@@ -106,6 +132,44 @@ git status --short
 Commands run **before** Claude processes the skill. Output replaces the command block. Claude only sees the rendered result.
 
 Disable with `"disableSkillShellExecution": true` in settings. Affects user/project/plugin skills only; bundled skills are unaffected.
+
+### What the official docs have gained since 2026-05-21
+
+All verified today by `curl` + HTML strip against `code.claude.com/docs/en/skills`
+(HTTP 200, 84,244 chars of text). None of this was in the 2026-05 version of
+this doc:
+
+| Behaviour | What the docs now say |
+|---|---|
+| `shell:` frontmatter key | Picks the tool that runs injected commands. `shell: powershell` uses the PowerShell tool; `shell: bash` where bash is absent **fails the invocation before any command runs** (Windows without Git Bash). |
+| Working directory | Commands run in the session shell's CWD, **which moves when Claude runs `cd`**. Use `${CLAUDE_SKILL_DIR}` or `${CLAUDE_PROJECT_DIR}` for paths that must resolve the same way every time. |
+| stderr | With the default bash shell, **stderr is merged into stdout** and appears in the injected text. |
+| Timeout | Each command runs under the Bash tool's default **2-minute timeout**. If the tool backgrounds a timed-out command, the skill still renders and the injected text reports the move. |
+| Permissions | Injected commands **never prompt**. A deny rule aborts the invocation. Outside auto mode, anything that is not `allow` aborts - including a rule that would normally ask. Pre-approve with `allowed-tools`; **deny and ask still override it**. In auto mode the skill loads and Claude is told to run the command instead. |
+
+### The traps, from a practitioner writing on 2026-09-23
+
+From `r/ClaudeCode`, u/brocef ([thread](https://www.reddit.com/r/ClaudeCode/comments/1wpcirc/ccs_most_underrated_feature_dynamic_context/)).
+**Score 1, one comment, and that comment is AutoModerator** - so this is one
+practitioner's experience with no community validation behind it. Treated as a
+lead, and every claim below was checked against the official docs.
+
+- **A non-zero exit code makes the skill fail to load.** Hence `command || true`
+  throughout. Carve-out: exit 1 from search and comparison commands like `grep`
+  is treated as a normal result. CONFIRMED in substance by the docs' permission
+  and failure sections.
+- **`command || echo "..."`** is the better pattern when you want Claude to know
+  its instructions were incomplete, rather than silently rendering nothing.
+- **The `!` must start a line or follow whitespace.** `KEY=!`cmd`` does not run.
+- **Not portable.** Injection, skill arguments and `allowed-tools` are Claude
+  Code-specific. Codex and anything following the [agentskills spec](https://agentskills.io/home)
+  ignore them, and they do not work in claude.ai chat or through the API. **This
+  matters directly for ZAO**, which has an explicit goal of skills that work
+  across agents - a skill built on injection is a skill that only runs here.
+- **Verification is genuinely hard.** No hook exposes the expanded skill
+  contents. `UserPromptExpansion` shows manual invocations and `PreToolUse` shows
+  `Skill()` calls, but neither shows the rendered result. You have to read the
+  session transcript `.jsonl` under `~/.claude/projects/`.
 
 ---
 
@@ -309,7 +373,20 @@ The Obra Superpowers project (42,000+ stars, MIT, Anthropic marketplace) demonst
 
 ---
 
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Convert ONE skill to dynamic context injection as a proof - `zao-status` or the grill's card-count line, whichever reads a number a human currently types. Shipped when its SKILL.md contains a `` !`cmd` `` line and `allowed-tools` naming that command | @Zaal | PR | 2026-10-08 |
+| Decide whether injection is allowed in skills that must also run under Codex, given it is Claude Code-only. Shipped when the answer is written in `.claude/rules/` | @Zaal | Decision | 2026-10-08 |
+| Re-run the adoption count after the first conversion; it is 0 of 136 today | @Zaal | Measurement | 2026-10-15 |
+
 ## Sources
+
+- [CC's most underrated feature: Dynamic Context Injection](https://www.reddit.com/r/ClaudeCode/comments/1wpcirc/ccs_most_underrated_feature_dynamic_context/) - u/brocef, r/ClaudeCode, posted 2026-09-23 - [FULL, method: `zao-fetch-reddit.sh` via Arctic Shift; post body and all 1 comment retrieved. **Score 1, and the single comment is AutoModerator** - no community validation. Scores from Arctic Shift lag reddit.]
+- [Extend Claude with skills - official docs](https://code.claude.com/docs/en/skills) - [FULL, method: `curl` + Python HTML strip, HTTP 200, 1,118,460 bytes raw, 84,244 chars text, read 2026-09-24. Every syntax and permission claim in this doc was re-verified against it today.]
+- [TCW](https://github.com/brocef/TCW) - the post author's CLI - [NOT FETCHED. Named here because the post promotes it; this lane did not open it and makes no claim about it.]
+- Local skill census - [FULL, method: `find -L ~/.claude/skills -name SKILL.md` then `grep`, red-controlled at 135 of 136 for `description:`]
 
 - [Extend Claude with Skills — Official Docs](https://code.claude.com/docs/en/skills)
 - [Agent Skills Overview — Claude API Docs](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)

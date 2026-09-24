@@ -74,10 +74,28 @@ six weeks.
 **Two things about these numbers do not sit right, and both are recorded as
 questions rather than accusations:**
 
-1. **Watchers are 16 against 5,481 stars, a ratio of 0.3%.** Watchers usually run
-   one to two percent of stars. A low ratio is consistent with stars arriving
-   faster than genuine adopters, though it is also consistent with a project
-   people bookmark and never follow.
+1. **Watchers are 16 against 5,486 stars, a ratio of 0.3%.** There is no norm to
+   assert here, so instead a five-repo sample measured 2026-09-24, using
+   `subscribers_count`:
+
+   | Repo | Stars | Subscribers | Ratio |
+   |---|---|---|---|
+   | `vastsa/PI-Desktop` | 5,486 | 16 | **0.3%** |
+   | `ComposioHQ/awesome-claude-skills` | 75,577 | 461 | 0.6% |
+   | `microsoft/vscode` | 192,842 | 3,542 | 1.8% |
+   | `facebook/react` | 250,680 | 6,599 | 2.6% |
+   | `anthropics/anthropic-sdk-python` | 3,916 | 182 | 4.6% |
+
+   PI-Desktop is the lowest in the sample, and the next lowest is the
+   star-farmed awesome-list this library has already flagged as near-abandoned.
+   Against maintained projects it is six to fifteen times below. **Five repos is
+   a sample, not a norm** - the point is only that 0.3% sits outside everything
+   else measured, which does not require knowing what typical is.
+
+   **Use `subscribers_count`, not `watchers_count`.** The REST API's
+   `watchers_count` is a legacy alias for stars and reads 5,486 here, identical
+   to `stargazers_count`. Anyone reproducing this with the obvious field name
+   gets the wrong number and sees no anomaly.
 2. **The repo was created 2023-03-22**, three years before an AI agent desktop
    would plausibly have started, and the README contains **zero** mentions of a
    rename or former name. A `until=2023-06-01` commit query returned nothing. So

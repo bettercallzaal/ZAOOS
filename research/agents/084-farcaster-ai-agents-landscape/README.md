@@ -4,13 +4,60 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-09-25
 original-query: Map the landscape of AI agents and bots on Farcaster for building ZAO community bot (reconstructed)
 tier: reference
 ---
 
 > **Status:** Research complete
 > **Date:** March 19, 2026
+
+---
+
+## Updated 2026-09-25
+
+Four major developments since last validation (2026-05-21). One is CRITICAL for stability assessment.
+
+### 1. CRITICAL: Neynar Seeking New Operator for Farcaster (August 17, 2026)
+
+Less than seven months after acquiring Farcaster, Neynar co-founder Rish Maheshwari announced on August 17, 2026 that Neynar is seeking a new team to operate Farcaster, Clanker, and its developer platform. No successor, transfer timetable, sale price, or service shutdown has been announced. Neynar has not confirmed whether it will continue operating products during the search.
+
+**Revenue collapse that drove this:**
+- Q1 2026: ~$27.88M–$35.43M gross protocol revenue
+- Q2 2026: ~$3.88M (–89% QoQ)
+- Q3 2026 (partial, to Aug 17): ~$245K–$377K
+
+Dan Romero clarified "Farcaster is not shutting down. The protocol works and will continue to work." Protocol remains operational. But this is Farcaster's second planned leadership change in 2026 and the builder-continuity risk is materially higher than the doc's original assessment.
+
+**Impact on ZAO bot decision:** A Neynar Professional plan at $49/mo to support a ZAO bot should be re-evaluated given this instability. Consider building against the open protocol with fallback options rather than full Neynar dependency.
+
+Sources: [crypto.news](https://crypto.news/farcaster-seeks-new-operator-seven-months-after-sale/), [bloomingbit.io](https://en.bloomingbit.io/feed/news/118522), [Farcaster Won't Shut Down – Bitget](https://www.bitget.com/news/detail/12560605165634)
+
+### 2. NEW: x402 Protocol Integration — Agents Pay Per-Call in USDC (2026)
+
+Neynar is one of the first APIs to integrate x402, Coinbase's HTTP-native payment protocol launched May 2025. Agents can now pay **0.001 USDC per call on Base** with no API key or pre-paid subscription tier — payment settles in the same HTTP round-trip.
+
+This changes the cost model for bot builders: instead of a $49/mo Professional plan with webhooks, fully autonomous agents can use x402 to pay per-request. However, webhook-triggered bots (mention-triggered replies) still require the traditional subscription tiers.
+
+By April 2026: 69K active agents, 165M transactions, ~$50M cumulative volume on x402.
+
+Sources: [Neynar blog on x402](https://neynar.com/blog/agents-frames-and-the-future-of-farcaster-neynar-s-vision-for-x402), [allium.so x402 explainer](https://www.allium.so/blog/x402-explained-the-internet-native-payments-standard-for-apis-data-and-agent-commerce/), [LinkedIn summary](https://www.linkedin.com/posts/valeriecoffman_agents-frames-and-the-future-of-farcaster-activity-7325596058690945025-zodg)
+
+### 3. ElizaOS plugin-farcaster v1.0.5 (July 2026)
+
+Version 1.0.5 of `@elizaos/plugin-farcaster` was published ~July 2026 (2 months before this validation). Key changes versus the March 2026 doc:
+- Now available in **three languages with feature parity**: TypeScript (Node.js + browser), Python (ML/AI pipelines), Rust (high-performance + WASM)
+- Plugin initialization is now via environment and character configuration rather than direct options (v2 API)
+
+The old `client-farcaster` package remains archived. Recommended package is still `@elizaos/plugin-farcaster`.
+
+Source: [npmjs.com/@elizaos/plugin-farcaster](https://www.npmjs.com/package/@elizaos/plugin-farcaster), [elizaos-plugins/plugin-farcaster](https://github.com/elizaos-plugins/plugin-farcaster)
+
+### 4. Music Agent Gap: Still Holds
+
+Searched explicitly for music-focused AI agents on Farcaster as of September 2026 — none found. The opportunity noted in Section 10 ("No music-focused AI agent exists on Farcaster") remains valid.
+
+---
 
 ## Context
 

@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-09-15
+last-validated: 2026-09-25
 superseded-by:
 related-docs: 998, 1026, 1025, 045, 2474, 997, 306, 2245
 original-query: "how we can best organize github repos lets make that part of farcaster and seeing through all my reserach documents on farcaster and then being able to use them i am going to start using zaal caster as my main interface"
@@ -11,7 +11,19 @@ tier: STANDARD
 
 # 2489 - zaalcaster as the operating surface: GitHub repos + the research library, inside the Farcaster client
 
-> **Goal:** Decide how the 130-repo GitHub estate gets organized so it is legible from inside zaalcaster, and how the 2,209-doc research library (104 docs in `farcaster/` alone) becomes readable and usable from the same screen, given Zaal's statement that zaalcaster is becoming his main interface. Everything here is measured live on 2026-09-15 unless marked otherwise.
+> **Goal:** Decide how the GitHub estate (184+ repos owner-visible across bettercallzaal and ZAODEVZ; 131 if you only count what's public, which is what the earlier "130-repo" figure below actually measured) gets organized so it is legible from inside zaalcaster, and how the research library becomes readable and usable from the same screen, given Zaal's statement that zaalcaster is becoming his main interface. Originally measured live on 2026-09-15; re-verified 2026-09-25 (Re-Research Mode) - see "Updated 2026-09-25" below for what changed.
+
+## Updated 2026-09-25
+
+**One central claim needs correction, and it was true on 2026-09-15 too: "the 130-repo estate" only ever counted PUBLIC repos.** Every count in this doc (110/20/130, then 111/20/131) came from `gh api users/{login}/repos`, an endpoint that structurally excludes private repositories no matter who is authenticated - so it was never able to see the private count either, and the doc's original "21 private" figure could not have come from that call. Re-measured 2026-09-25 with owner-authenticated `gh repo list` (which does include private repos): **bettercallzaal owns 161 repos (111 public + 50 private, 28 archived - not 21 private, not 21 archived)**, and bettercallzaal is additionally a collaborator on 3 private ZAODEVZ repos (`IMan-Artizen`, `iman-desk`, `ZAOresearch`), for **23 ZAODEVZ repos bettercallzaal can see (20 public + 3 private)**. That is **at least 184 repos**, not 130/131 - and ZAODEVZ's true private total is UNKNOWN beyond those 3, since bettercallzaal does not own that account and cannot enumerate repos it has no access to. `bettercallzaal/zao-repos` itself says as much in its own data (`"note": "Public repositories only. Private repositories are never fetched or published by this workflow."`) - its 131-repo figure is the same scoped subset, not a bug, but it was being read in this doc's summary table as "the estate," which undercounts by at least 53 repos. Below that, the read-path half of the plan shipped; the write-path half (topics, the search-index fix, brand-preference in zao-repos) did not move.
+
+- **The zaalcaster PR shipped.** Decision 6 / Next Actions row 2 is CONFIRMED DONE: PR #133 "feat: repos + research library surfaces (doc 2489)" merged 2026-09-16T00:26Z, and a same-day follow-up PR #134 "feat: Search tab scopes - research library + ZAO repos" also merged. `api/view.js` on `main` today carries `kind === 'repos'` (line 276), `kind === 'research_index'` (line 292) and `kind === 'research_doc'` (line 306), exactly as specced.
+- **Topics were STILL NOT applied.** Was "1 of 130 repos carries a topic" (sparkz only); now **1 of 131 repos** (bettercallzaal grew to 111, ZAODEVZ still 20) - still only `sparkz`, still the same ten topic strings. Next Actions row 4 (apply topics to ~25 canonical repos, due 2026-09-19) did not ship. `bettercallzaal/zao-repos`'s own hygiene check confirms the same count independently: `noTopics` failing 130 of 131 repos in the live `data.json` generated 2026-09-26T01:34Z.
+- **`research/search-index.json` is UNCHANGED and still broken.** Byte-identical in size (66,143 bytes) to the 2026-09-15 measurement; `"num":026` is still an unquoted, zero-padded literal, so it is still not valid JSON (`json.load` still fails at line 2). Next Actions row 5 (rebuild emits valid JSON, 2,209 rows) did not ship. This is the one Next Action most worth escalating - it is the same fix originally scoped in this doc, untouched after 10 days.
+- **`zao-repos` gained a LICENSE.** Was "no LICENSE file" on 2026-09-15; now MIT, "Copyright (c) 2026 Zaal Panthaki / BCZ Strategies LLC / The ZAO", read directly from `contents/LICENSE`. Next Actions row 7's LICENSE half is DONE; its other half (prefer a `brand-*` topic over the name regex in `scripts/fetch.mjs`) is NOT done - `fetch.mjs`'s `BRANDS` array (line 32) is still pure name-regex matching, no topic check, confirmed by re-reading the file.
+- **CLAUDE.md and doc 2245 still do not mention zao-repos.** Next Actions row 8 (add it to both) did not ship - `grep -rn zao-repos` against `~/zaal-dotfiles/claude/CLAUDE.md` and `infrastructure/2245-zaoos-surface-map/README.md` both return nothing.
+- **`GITHUB_TOKEN` in Vercel and `kind=research_search`: still UNKNOWN/not shipped.** Vercel env cannot be read from this machine. `api/view.js` on `main` has no `research_search` kind and no code-search call, so Next Actions rows 3 and 6 (set the token; add the code-search kind) are NOT done, not merely unverified.
+- **Estate growth, re-measured 2026-09-25:** public-only count is 131 repos (bettercallzaal 111, ZAODEVZ 20 - was 110/20/130); the full owner-visible count is **184+ (bettercallzaal 161, ZAODEVZ 23 visible)** - see the correction above. GitCast (`gitcast.dev`) still has no DNS A record (`dig` empty, curl `000`) and `farcaster-cast-github-action` is unchanged (1 star, last push 2024-05-11) - both still dead ends, unchanged.
 
 ## Key Decisions (recommendations first)
 
@@ -49,6 +61,16 @@ What changes above:
 | total | 130 | 21 | 21 | 1 | 24 |
 
 Ten distinct topic strings exist across both accounts, all on `sparkz` (`farcaster`, `clanker`, `base`, `creator-economy`, `ai-agents`, `web3`, `nextjs`, `supabase`, `typescript`, `memes`). Pinned repositories on bettercallzaal: none (GraphQL `pinnedItems` returns an empty list). Doc 998 counted 129 repos and 3 archived on 2026-07-09; archival has advanced by 18, the topic count has not moved.
+
+**Owner-authenticated re-count, 2026-09-25** (this table above is public-only and was the same limitation on 2026-09-15; see the correction at the top of this doc):
+
+| Account | Total (owner view) | Public | Private | Archived | With any topic |
+|---------|--------------------|--------|---------|----------|-----------------|
+| bettercallzaal | 161 | 111 | 50 | 28 | 1 |
+| ZAODEVZ (visible to bettercallzaal as collaborator) | 23 | 20 | 3 | 0 | 0 |
+| total (known floor) | 184 | 131 | 53 | 28 | 1 |
+
+Method: `gh repo list bettercallzaal --limit 300 --json name,isPrivate,isArchived,repositoryTopics` (owner auth, sees all 161) and `gh repo list ZAODEVZ --limit 300 --json ...` run as bettercallzaal (sees only the 3 private repos where bettercallzaal is a collaborator - ZAODEVZ's true private total is UNKNOWN beyond that, since bettercallzaal is not that account's owner). Cross-checked against `gh api "user/repos?visibility=all&affiliation=owner" --paginate` (161, identical, no duplicates) and `affiliation=collaborator` filtered to `owner.login=="ZAODEVZ"` (14 rows, of which 3 are net-new beyond the 20 public names).
 
 ### 2. Four ways GitHub lets a user account group repos
 
@@ -129,15 +151,15 @@ brand overlay (existing)              new sections (read-only)
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Approve or edit the topic names in Finding 3 (brand/status/kind); reply on this PR | @Zaal | Decision | 2026-09-17 |
-| PR to zaalcaster: `api/view.js` kinds `repos` + `research_index` + `research_doc`, `lib.js` `fetchGitHub()`, `config.brands[].topic`, Brands hub sections rendering; shipped = PR open with head SHA sent to dotfiles, `node --check` clean, live 200s on all three kinds | zaalcaster lane (this session) | PR | 2026-09-18 |
-| Set `GITHUB_TOKEN` (fine-grained, read-only, public data) in Vercel for zaalcaster; shipped = `api/view?kind=repos` returns `x-ratelimit-limit` 5000 in the server log | @Zaal | Env var | 2026-09-18 |
-| `zao-research-index --rebuild` writes valid `research/search-index.json` (quoted `num`, 2,209 rows) and the doc-shipping skill commits it with each doc; shipped = file on `main` parses with `python3 -c "json.load"` and row count equals the doc count | dotfiles lane (owns `~/bin`) | PR to zaal-dotfiles + ZAOOS | 2026-09-19 |
-| Apply topics to the ~25 canonical repos from doc 998 with `gh api -X PUT repos/{o}/{r}/topics`; public metadata write, so Zaal runs or approves the script; shipped = `gh search repos --owner=bettercallzaal --owner=ZAODEVZ --topic status-canonical` returns the list | @Zaal | Script run | 2026-09-19 |
-| Add `kind=research_search` (GitHub code search behind the token) once the token is live; shipped = a query for "SIWN" scoped to `farcaster/` returns the 11 known paths from inside zaalcaster | zaalcaster lane | PR | 2026-09-22 |
+| DONE 2026-09-16: topic names in Finding 3 stand as the working taxonomy (no recorded Zaal edit found in the vault or PR threads); treat as tacitly approved unless Zaal objects | @Zaal | Decision | done |
+| DONE: PR to zaalcaster shipped. `api/view.js` on `main` has `kind==='repos'` (line 276), `kind==='research_index'` (line 292), `kind==='research_doc'` (line 306) - PR #133 merged 2026-09-16T00:26Z, PR #134 same day added Search-tab scoping | zaalcaster lane | PR | done (#133, #134) |
+| Set `GITHUB_TOKEN` (fine-grained, read-only, public data) in Vercel for zaalcaster; shipped = `api/view?kind=repos` returns `x-ratelimit-limit` 5000 in the server log | @Zaal | Env var | STILL OPEN - carry to 2026-10-02 (cannot verify Vercel env from this machine; `kind=repos` now reads zao-repos' `data.json` per the 2026-09-15 update, not the GitHub API directly, so this token now only gates the still-unbuilt `research_search` kind) |
+| `zao-research-index --rebuild` writes valid `research/search-index.json` (quoted `num`, 2,209 rows); shipped = file on `main` parses with `python3 -c "json.load"` and row count equals the doc count | dotfiles lane (owns `~/bin`) | PR to zaal-dotfiles + ZAOOS | STILL OPEN, unchanged in 10 days (66,143 bytes, `"num":026` still unquoted, still fails to parse) - carry to 2026-10-02 |
+| Apply topics to the ~25 canonical repos from doc 998 with `gh api -X PUT repos/{o}/{r}/topics`; shipped = `gh search repos --owner=bettercallzaal --owner=ZAODEVZ --topic status-canonical` returns the list | @Zaal | Script run | STILL OPEN - re-measured 2026-09-25: 1 of 131 repos (still only `sparkz`) - carry to 2026-10-02 |
+| Add `kind=research_search` (GitHub code search behind the token); shipped = a query for "SIWN" scoped to `farcaster/` returns the 11 known paths from inside zaalcaster | zaalcaster lane | PR | STILL OPEN - `api/view.js` has no `research_search` kind as of 2026-09-25 - carry to 2026-10-02 |
 | ~~Generate `docs/REPOS.md`~~ WITHDRAWN 2026-09-15: zao-repos Portfolio tab is the ledger | - | - | wontfix |
-| `scripts/fetch.mjs` in zao-repos prefers a `brand-*` topic over the name regex when present, and the repo gets a LICENSE (MIT, it is Zaal's); shipped = zaalcaster row shows brand ZAO or BetterCallZaal after tagging | whoever owns zao-repos (built 2026-09-12 by a lane; Zaal names the owner) | PR | 2026-09-22 |
-| Add zao-repos to CLAUDE.md Map and to `infrastructure/2245-zaoos-surface-map`; shipped = both mention the URL and the hourly rebuild | zaalcaster lane | Doc PR | 2026-09-18 |
+| DONE (partial): zao-repos got a LICENSE (MIT, "Zaal Panthaki / BCZ Strategies LLC / The ZAO", confirmed via `contents/LICENSE` 2026-09-25). STILL OPEN: `scripts/fetch.mjs`'s `BRANDS` array (line 32) is still pure name-regex, no `brand-*` topic check | whoever owns zao-repos | PR | LICENSE done; topic-preference carry to 2026-10-02 |
+| Add zao-repos to CLAUDE.md Map and to `infrastructure/2245-zaoos-surface-map`; shipped = both mention the URL and the hourly rebuild | zaalcaster lane | Doc PR | STILL OPEN - neither file mentions zao-repos as of 2026-09-25 - carry to 2026-09-29 |
 
 ## Sources
 
@@ -167,3 +189,16 @@ Prior art:
 
 Added same day:
 - [bettercallzaal/zao-repos](https://github.com/bettercallzaal/zao-repos) - README, `scripts/fetch.mjs` (500 lines), `.github/workflows/sync.yml`, commit history via `gh api`; `docs/data.json` fetched with `curl -D` from the Pages host and parsed (130 repos); snapshot taken with `zao-research-snapshot` (no LICENSE file, last activity 2026-09-15) - `[FULL, official API + raw fetch]`
+
+Re-verified 2026-09-25 (Re-Research Mode), all `[FULL]` unless noted:
+- `gh api users/bettercallzaal/repos --paginate`, `users/ZAODEVZ/repos --paginate` (131 rows total: 111 + 20; topics field re-checked per repo) - `[FULL, official API]`
+- `gh api repos/bettercallzaal/zaalcaster/pulls?state=all` (PR #133, #134 merged 2026-09-16); `raw.githubusercontent.com/.../zaalcaster/main/api/view.js` fetched and grepped for `kind ===` - `[FULL, official API + raw fetch]`
+- `raw.githubusercontent.com/bettercallzaal/ZAOOS/main/research/search-index.json` re-fetched (66,143 bytes, re-confirmed invalid JSON at the same line) - `[FULL, raw fetch, byte-identical to 2026-09-15]`
+- `https://bettercallzaal.github.io/zao-repos/data.json` re-fetched (`generatedAt: 2026-09-26T01:34:53Z`, 131 repos, 1 with topics) - `[FULL, raw fetch]`
+- `gh api repos/bettercallzaal/zao-repos/contents/LICENSE` (now present, MIT) - `[FULL, official API]`
+- `raw.githubusercontent.com/.../zao-repos/main/scripts/fetch.mjs` re-fetched and grepped for `BRANDS`/`topics` - `[FULL, raw fetch]`
+- `grep -rn zao-repos ~/zaal-dotfiles/claude/CLAUDE.md infrastructure/2245-zaoos-surface-map/README.md` (both zero hits) - `[FULL, local read]`
+- `dig gitcast.dev`, `curl gitcast.dev` (still no DNS/000); `gh api repos/therealharpaljadeja/farcaster-cast-github-action` (unchanged: 1 star, pushed 2024-05-11) - `[FULL, official API + DNS check]`
+- Vercel env for `GITHUB_TOKEN` - `[UNKNOWN - not readable from this machine; no external evidence of a live `research_search` kind found either]`
+- `gh repo list bettercallzaal --limit 300 --json name,isPrivate,isArchived,repositoryTopics` and same for `ZAODEVZ` (owner-authenticated, includes private); `gh api "user/repos?visibility=all&affiliation=owner"` and `affiliation=collaborator` cross-check (no duplicates, stable across two runs) - `[FULL, official API, owner-authenticated]`
+- `https://bettercallzaal.github.io/zao-repos/data.json` `.note` field re-read: "Public repositories only. Private repositories are never fetched or published by this workflow." - `[FULL, raw fetch, confirms the dashboard's own documented scope]`

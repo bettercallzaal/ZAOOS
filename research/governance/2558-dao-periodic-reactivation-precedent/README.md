@@ -2,7 +2,7 @@
 topic: governance
 type: comparison
 status: draft
-last-validated: 2026-09-25
+last-validated: 2026-09-26
 superseded-by:
 related-docs: "governance/056-ordao-respect-system, governance/059-hats-tree-integration, governance/075-hats-protocol-v2-updates, community/1441-zao-lapsed-member-reengagement-jul2026, business/863-unlock-protocol-event-ticketing, business/1039-research, governance/1207-zao-improvement-proposals-framework"
 original-query: "DEEP: How other DAOs and member orgs run periodic (monthly) re-activation of voting rights - precedent for The ZAO Season 3's active pool. Cover: orgs that require a recurring signal to stay in the voting pool (re-signature, check-in, attendance, dues, staking renewal, expiring keys/memberships); how they avoid burning membership or points when someone lapses; auto-activation by participation; how re-signing updated terms is handled; observed effects on turnout, capture and quorum. Include Optimism/Hats/Unlock/Moloch/Nouns/1Hive/Gitcoin/Eden and non-crypto precedents (unions, co-ops, professional bodies, clubs). Output feeds ZIP-2 (merged Draft at zips/zip-0002-season-3.md) Rationale and the manifesto framing. Flag anything that contradicts decisions in ~/zao-vault/projects/zao-membership-brainstorm-2026-09-11.md."
@@ -66,6 +66,8 @@ Three things follow for Season 3.
 **The closest living precedent is harsher than what Season 3 proposes.** Optimism removes the badge - the membership artifact - from a citizen who casts zero votes in a round. Season 3 removes only the month's vote weight and keeps the hat, the Respect and the history. The ZIP can say plainly that it is adopting the milder end of an already-practiced spectrum.
 
 **Decay systems decay the WEIGHT, never the record.** Colony halves reputation while leaving the token balance untouched; Gardens decays conviction on a proposal while leaving reputation intact; Coordinape resets GIVE each epoch while GET history persists. This is the same separation as Season 3's "the pool changes, nothing burns" and it is the dominant design where periodicity exists at all.
+
+**Fractally's own design loses membership at 12 weeks of non-attendance, which is the closest thing to a precedent for the 90-day window.** From the same addendum, verbatim: "Note that after 12 weeks of non-attendance someone would cease to be a member and their income would fall to 0." Twelve weeks is 84 days. The rolling 90-day window ruled for Season 3 on 2026-09-26 sits just outside that, and it is milder in what it costs: fractally drops membership, Season 3 drops only the vote. The protocol The ZAO's fractal descends from already treats roughly a quarter-year of absence as the point where participation stops counting, which is independent support for the window Zaal chose over the calendar month in ZIP-2.
 
 **Nobody found does what Season 3 needs per-member.** The absence is real, not a search failure: the Nouns contracts were read directly and have no time or activity dimension in delegation. This corroborates the ZIP-2 and season3-hats-protocol-research finding that the activation wrapper is a genuine build gap rather than a wheel already invented.
 
@@ -140,7 +142,8 @@ And the case for having no quorum at all, from a live governance forum rather th
 
 - **No study found on signature-gated periodic activation specifically.** Griefing, forgetting to activate and deadline clustering are unmeasured for this mechanism. They are named risks, not quantified ones.
 - **No controlled study** on whether a recurring re-activation requirement raises or lowers turnout against a default-active design. Neither direction is established.
-- **Whether Respect decays between rounds in the Eden Fractal / Respect Game model is unverified.** respectgame.com is a JS shell and fractally.com/whitepaper 404s.
+- **RESOLVED 2026-09-26, from the primary source.** The fractal lane pointed at Larimer's "Fractally White Paper Addendum 1" (hive.blog, 2022-07-15); this session fetched the raw post body through the Hive API (`condenser_api.get_content`, 13,728 chars) rather than the JS page. Verbatim: "The average is calculated as NEW_AVERAGE = (CURRENT_AVERAGE * 5 + NEW_LEVEL)/6. This moving weighted average is an approximation that is easy to calculate". So what decays is the **moving average of your weekly Level**, the input used to compute each week's fresh distribution - not the Respect balance itself. The distinction is exactly the one Season 3 draws: the weight moves, the record does not.
+  Two corrections to the summary this arrived in, both made against the fetched text: the identifiers are `NEW_AVERAGE`/`CURRENT_AVERAGE`, and the half-life is **~3.8 weeks**, not 34. A 5/6 weekly retention gives ln(0.5)/ln(5/6) = 3.80 weeks; the post itself states only that "a pure moving window average would go from 0 to max in just 6 weeks", and names no half-life. The claim that neither ZAO ledger has ever run a decay (zero OG burns; ZOR's only burns a 2025-10-24 correction of periods 67-70) is the fractal lane's own measurement, cited here as theirs, not re-verified by this session.
 - **Compound's "10% quorum then lowered to 4%" history is NOT verified.** Only the current 4% constant is, from the contract source. The history is excluded from this doc rather than repeated.
 - **Union and co-op turnout figures could not be raw-fetched** (DOL page Akamai-blocked, Co-operatives UK PDF behind Cloudflare). No turnout percentage from those sectors is asserted here.
 
@@ -196,7 +199,8 @@ DAO mechanics
 - [docs.coordinape.com epochs](https://docs.coordinape.com/get-started/epochs) - 1 to 100 day epochs, GIVE resets, GET persists. [FULL - curl + strip]
 - [nounsDAO/nouns-monorepo NounsDAOVotes.sol](https://github.com/nounsDAO/nouns-monorepo) - `getPriorVotes(voter, proposal.startBlock)`, no staleness dimension. [FULL - gh api]
 - [gov.gitcoin.co topics 13462, 16302, 11639](https://gov.gitcoin.co/t/16302) - Citizen Rounds are retro funding, not voting renewal. [FULL - Discourse JSON API]
-- respectgame.com and fractally.com/whitepaper - Respect decay between rounds. [FAILED - JS shell and 404; claim left unverified]
+- [Fractally White Paper Addendum 1, Larimer, 2022-07-15](https://hive.blog/fractally/@dan/fractally-white-paper-addendum-1) - `NEW_AVERAGE = (CURRENT_AVERAGE * 5 + NEW_LEVEL)/6`; "after 12 weeks of non-attendance someone would cease to be a member". [FULL - Hive API `condenser_api.get_content`, raw post body, 13,728 chars; the hive.blog page itself is a JS shell returning 513 chars and was NOT the source]
+- respectgame.com and fractally.com/whitepaper. [FAILED - JS shell and 404; superseded by the Hive API fetch above]
 
 Tooling
 - [unlock-protocol/unlock IPublicLockV15.sol](https://github.com/unlock-protocol/unlock) - `grantKeys`, `renewMembershipFor`, `extend`, `grantKeyExtension`, non-expiring keys via `type(uint).max`. [FULL - gh api + base64]

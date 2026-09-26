@@ -2,7 +2,7 @@
 topic: events
 type: event-research
 status: research-complete
-last-validated: 2026-06-29
+last-validated: 2026-09-26
 superseded-by:
 related-docs: 364, 846, 850, 476
 original-query: "research on zaofestivals specifically ZAO-PALOOZA from 2024 April and ZAO-CHELLA from 2024 December Miami - use zao-scrape-x-timeline.sh to hunt PALOOZA/CHELLA posts across @zaofestivals @bettercallzaal @WaveWarZ"
@@ -50,11 +50,11 @@ What is NOT recorded anywhere internal: a schedule, a venue name, a sponsor, pho
 | **Name** | ZAO-CHELLA \| ART BASEL '24 | high |
 | **Date** | December 6, 2024 | high (Doc 364) |
 | **Location** | Wynwood, Miami (during Art Basel Miami) | high |
-| **Format** | 10 Web3 musicians, AR art, trading cards | high |
-| **Schedule** | 4pm networking, 6pm WaveWarZ LIVE rematch, 7pm performances, 11pm close | high (Doc 364) |
+| **Format** | 16+ musicians, 100+ visual artists, AR art, trading cards | high (Zaal, 2026-09-26, asked directly; he was there). **Corrected 2026-09-26: this row said "10 Web3 musicians" from 2026-06-29 until today, and the Day 263 newsletter drafts of 2026-09-19 carried 16+; the 10 was never published anywhere.** |
+| **Schedule** | 4pm networking, 6pm WaveWarZ live on stage (first live battle, a rematch), 7pm performances, 11pm close | high (Doc 364; WaveWarZ framing per Zaal 2026-09-26) |
 | **Organized by** | AttaBotty + DaNici | high |
 | **Sponsor** | Student $LOANZ Token (Gold Sponsor) | high |
-| **Cross-community** | WaveWarZ ran a LIVE rematch on stage | high |
+| **Cross-community** | WaveWarZ played the first battle it had ever run live on a stage, a rematch of one fought online | high (Zaal, 2026-09-26: both are true, rematch and first live) |
 | **Instagram** | [@zaofestivals](https://www.instagram.com/zaofestivals/) - profile bio still set to "ZAO-CHELLA \| ART BASEL '24" | high |
 | **Instagram reel** | [ZAO-CHELLA 2024 Miami](https://www.instagram.com/reel/DDa-oPBJ7G7/) | high (link), engagement FAILED (login wall) |
 | **@zaofestivals IG profile** | 246 followers, 46 following, 65 posts (as of 2026-06-29) | high (og meta) |

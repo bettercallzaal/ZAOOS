@@ -3,6 +3,7 @@ topic: governance
 type: audit
 status: research-complete
 last-validated: 2026-09-26
+corrections: "section 3b, 2026-09-26: IRespect zero was repo-scoped; ZOR measured as an existing OREC drop-in"
 superseded-by:
 related-docs: "governance/703-zao-fractal-current-state-may-2026, governance/1312-zao-fractal-respect-governance-deepdive-jul2026, governance/2301-zao-fractal-weekly-record, governance/2558-dao-periodic-reactivation-precedent, governance/188-zao-fractal-bot-process, governance/103-fractal-governance-ecosystem, governance/1772-eden-fractal-lineage, governance/109-optimystics-tooling-ecosystem, governance/115-zao-data-reconciliation"
 original-query: "everything about fractals and where we are at and what we need to build"
@@ -69,9 +70,35 @@ This is not in ZIP-2. ZIP-2 section 3 describes the wrapper as answering "is thi
 | Manifesto Hat on tree 226 | `ZAOOS/src/lib/hats/constants.ts` has `TREE_ID = 226` and project hat IDs | **Zero for the manifesto itself.** 0 hits for "manifesto" across ZAOOS src, against a 29-file control for "hats" |
 | Gasless Privy join at fractal.thezao.com | Privy exists in ZAOOS only for agent wallets (`src/lib/agents/wallet.ts`); the live join is `src/app/onboard/page.tsx`, an allowlist check with a placeholder signature | **Zero.** No DNS for the subdomain. The existing onboard path is one of the five conflicting member definitions ZIP-2 exists to replace |
 | Monthly (now rolling 90-day) activation signal | nearest neighbour is `zao-fractal-bot/src/lib/asyncEligibility.ts` | **Zero** |
-| `IRespect` wrapper OREC reads | nowhere; no `.sol` in either repo | **Zero.** No reviewer assigned (ZIP-2 Open Item 2) |
+| `IRespect` wrapper OREC reads | **CORRECTED 2026-09-26, see below.** `bettercallzaal/zaofractal-contracts` (PRIVATE, last pushed 2026-07-22) holds `src/IRespect.sol` and `src/ZAORespect.sol`, a soulbound ERC-20 written as an OREC drop-in | **Partial, not zero.** The activation-gating wrapper still does not exist, but the IRespect-shaped token template does. No reviewer assigned (ZIP-2 Open Item 2) |
 | Public points page | `ZAOfractal/dao/` React app reading static `data/*.json`; `ZAOOS/src/app/(auth)/zao-leaderboard/` is auth-gated | **Partial.** Neither is public and live against onchain state |
 | @-able bot | `zao-fractal-bot` is slash-command and Supabase-queue driven; 0 mention listeners; `src/lib/fractalKnowledge.ts` is the nearest building block | **Partial** |
+
+### 3b. Two corrections to this doc, made the same day it shipped
+
+**The IRespect zero was scoped too narrowly.** Section 3 above originally read "nowhere; no `.sol`
+in either repo". That search covered `ZAOOS` and `zao-fractal-bot` only. `bettercallzaal/zaofractal-contracts`
+is a **private** repo, last pushed 2026-07-22, and it holds `src/IRespect.sol` and `src/ZAORespect.sol` -
+a soulbound ERC-20 with `respectOf() = balanceOf()`, `MINTER_ROLE`, and batch minting, described in the
+repo's own metadata as a drop-in for OREC. The activation gate is still unwritten, but the template
+under it exists and did not need discovering. Stated as a lesson rather than an excuse: a zero is only
+as wide as the repo list behind it, and private repos were not in that list.
+
+**ZOR is already an OREC drop-in, measured.** `OREC.respectOf()` branches at set-time on
+`supportsInterface(type(IRespect).interfaceId)`, using `IRespect.respectOf` when true and falling back
+to `IERC20.balanceOf` when false. Verified by this session on 2026-09-26: the IRespect interface id is
+`0x58970ca8` (a single-function interface, so the id equals the `respectOf(address)` selector), and
+`ZOR.supportsInterface(0x58970ca8)` returns **true**, against an ERC-1155 control (`0xd9b67a26`) that
+also returns true. `ZOR.respectOf(0x7234c36A71ec237c2Ae7698e8916e0735001E9Af)` returns **842** right now.
+
+The consequence is concrete: **repointing OREC's vote weight from the frozen OG ledger to the live ZOR
+ledger requires no new contract at all.** It is one passed proposal calling
+`setRespectContract(0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c)`, plus almost certainly a
+`setMinWeight` recalibration in the same proposal, since OG and ZOR are not on the same scale. Both are
+`onlyOwner` and OREC owns itself, so neither can be called any other way than by a passed proposal.
+That does not decide Key Decision 1 - what OREC *should* read is still Zaal's ruling, and the
+2026-09-26 grill pointed at OG-as-achievements plus per-project ledgers, which needs an aggregator -
+but it removes "we would have to build something first" as a reason for the current state to persist.
 
 ### 4. How a session actually runs, and where it breaks
 

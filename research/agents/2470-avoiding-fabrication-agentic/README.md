@@ -2,8 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-09-06
-related-docs: 2469, 2468, 2467
+last-validated: 2026-09-25
+related-docs: "agents/2469-loops-graphs-mini-swe-agent, cross-platform/2468-x-analytics-authenticity, dev-workflows/2467-agent-skill-collections, agents/2103-grounding-beats-guessing, dev-workflows/2105-fact-vs-assertion-grounding-discipline"
 original-query: "How do we /zao-research on how to avoid fabrication more with agentic systems"
 tier: STANDARD
 ---
@@ -12,6 +12,36 @@ tier: STANDARD
 
 > **Goal:** We produced 114 fabricated public-facing casts this year and root-caused
 > them today. Decide what generalises, and check it against the outside literature.
+
+**Updated 2026-09-25 (re-research, no central claim overturned):** the root
+cause, the four rules, and the "we agree/disagree with the literature" table all
+still hold. What changed is the evidence quality and the generalization status.
+All four previously-**PARTIAL** literature sources (Hard Requirement 11 was
+unmet in the 2026-09-06 version - two blog posts and two arXiv papers were never
+escalated past a search snippet or an abstract) are now **FULL**, fetched raw via
+`curl` + HTML-strip (blogs) and `curl` + `pdftotext` (papers). Reading the full
+papers surfaced one genuine nuance the abstracts hid - see "Where we agree" below.
+On generalization: `.claude/rules/anti-fabrication.md` and
+`.claude/rules/research-grounding.md` now exist in this repo and enforce the
+same "claim traces to evidence or is UNVERIFIED" principle **for research
+subagents and orchestrator loops** - a real, estate-wide instance of Decision 3
+and Next Action 1, but for a different fabrication surface (research claims, not
+ZOL's public casts specifically). No evidence was found that Next Action 2 (a
+grounding gate on ZOE's own public-posting pipeline, before it gains capability)
+has shipped as its own artifact distinct from `zol-grounding.js`, which already
+existed on 2026-09-06 as the fix for ZOL specifically. One adjacent surface was
+found: `bot/src/zoe/bus-bridge.ts` has a `buildReplyContext(msg, grounding)`
+function that separates "verified, cite these" facts from open questions for
+drafted replies (the Brandon back-and-forth email flow) - the same discipline
+Next Action 2 asked for, on a different code path than `zol-grounding.js`, not
+verified to cover every ZOE surface. Next Action 3 (publish the mixed-output
+finding outward) is not yet due (2026-09-27) and no publication was found as of
+this pass. Also re-confirmed via `gh api repos/bettercallzaal/ZAOOS/pulls/3426`:
+`merged: true`, `merged_at: 2026-09-06T19:09:40Z` - the Klearu safety-gate PR
+referenced under Rule 1 really did merge same-day as claimed, no drift. Left
+explicitly unchecked this pass: whether fabrication has recurred on ZOL since
+2026-09-06 - `~/zol/daily.log` lives on the Pi (`ansuz`) and this session had no
+SSH access to it; that is an open question, not a confirmed zero.
 
 ## Key Decisions
 
@@ -121,10 +151,10 @@ uniformly one kind. No source found states this.
 
 | Their finding | Ours |
 |---|---|
-| Grounding + strict citation contract with abstain is the most reliable single strategy | **Agree.** Independently built and backtested |
-| Constrained decoding enforces structure without training | **Agree, and stronger.** Return an index, not a validated string |
-| Generator/critic split where the critic sees data the generator did not | **Agree.** Our claim gate reads the evidence block |
-| Layered guardrails cut hallucination 71-89% | **Not our target.** For public claims about named people, a 71-89% reduction is still a libel every few days. Refusal beats reduction |
+| Grounding + strict citation contract with abstain is the most reliable single strategy | **Agree.** Independently built and backtested. Zep's full piece (re-fetched raw, 2026-09-25) ranks this the top of 5 stacked controls and cites Artificial Analysis's AA-Omniscience benchmark: even the best frontier model (a Claude Opus 4.8 reasoning config) scores ~40/100 on its reliability Index, and most models cluster at or below 0 - hallucination-by-guessing is the default at the frontier, not a weak-model problem |
+| Constrained decoding enforces structure without training | **Agree for our use case, with a real caveat the abstract hid.** Full read of arXiv:2604.06066 (2026-09-25) shows constrained decoding has its own failure mode, "structure snowballing": on an 8B model doing open-ended self-correction/reflection, forcing strict output structure consumed the model's capacity on formatting compliance and caused it to miss semantic errors ("formatting traps and death loops"). This does not contradict `zol-pick.js` - ours is a closed-set index-selection task, not open-ended structured reflection - but it means "constrained decoding is strictly safer" does not generalize to every use of the technique, and is worth flagging before anyone reaches for it on a harder task |
+| Generator/critic split where the critic sees data the generator did not | **Agree.** Our claim gate reads the evidence block. Full read of arXiv:2507.15903 (2026-09-25) describes the same shape as a general pattern - HalMit, a black-box "watchdog" that models an agent's generalization bound from outside and flags responses that fall outside it, without needing the generator's internals |
+| Layered guardrails cut hallucination 71-89% | **Not our target.** For public claims about named people, a 71-89% reduction is still a libel every few days. Refusal beats reduction. Lakera's full text (re-fetched 2026-09-25) cites the concrete version of that risk: *Mata v. Avianca* (2023), a lawyer sanctioned for a legal brief containing fabricated ChatGPT citations - the same shape of harm as a public cast naming a fake artist, just in a courtroom instead of a feed |
 | Prompt-level instruction helps | **Disagree, with production evidence.** Three explicit instructions, 114 fabrications |
 
 **The gap in the literature:** every source treats fabrication as a property of
@@ -145,17 +175,20 @@ been laundered into an empty string.
 
 ## Sources
 
-- **[FULL]** Primary: `~/zol/daily.log` on ansuz (204 casts), `zol-daily.js` source, live `/delve` timing (55.5s, 52 episodes), `recent-casts.json`, and the `zol` lane's 56-test backtest. Measured 2026-09-06
-- [Reducing LLM Hallucinations - Zep](https://www.getzep.com/ai-agents/reducing-llm-hallucinations/) - **[PARTIAL]** via WebSearch summary, not fetched raw; cited for the citation-contract and abstain framing only
-- [Guide to Hallucinations in LLMs - Lakera](https://www.lakera.ai/blog/guide-to-hallucinations-in-large-language-models) - **[PARTIAL]** same method
-- [From Hallucination to Structure Snowballing: constrained decoding](https://arxiv.org/pdf/2604.06066) - **[PARTIAL]** title and abstract framing only
-- [Mitigation of Hallucination for LLM-empowered Agents](https://arxiv.org/pdf/2507.15903) - **[PARTIAL]** same
-- **[FULL]** `gh search repos` for grounding/hallucination tooling: top result **6 stars**. The OSS tooling space is empty; there is nothing to glue
+- **[FULL]** Primary: `~/zol/daily.log` on ansuz (204 casts), `zol-daily.js` source, live `/delve` timing (55.5s, 52 episodes), `recent-casts.json`, and the `zol` lane's 56-test backtest. Measured 2026-09-06. Not re-fetched this pass (the Pi-side log is not what changed; this doc's own claims about it are unchanged) - carried forward
+- [How to Reduce LLM Hallucinations - Zep](https://www.getzep.com/ai-agents/reducing-llm-hallucinations/) - **[FULL - upgraded from PARTIAL]** re-fetched raw via `curl` + HTML-strip, 2026-09-25 (HTTP 200, page dated "Last updated: June 15, 2026"). Confirms the citation-contract/abstain framing and adds the AA-Omniscience reliability-Index figures used above
+- [LLM Hallucinations in 2026: How to Understand and Tackle AI's Most Persistent Quirk - Lakera](https://www.lakera.ai/blog/guide-to-hallucinations-in-large-language-models) - **[FULL - upgraded from PARTIAL]** re-fetched raw via `curl` + HTML-strip, 2026-09-25 (HTTP 200, dated April 20, 2026). Corroborates the incentive-to-guess framing (OpenAI Sept 2025 paper) and adds that refusal can be trained via steered internal "concept vectors" (Anthropic's Tracing the Thoughts of a Large Language Model), not only prompted
+- [From Hallucination to Structure Snowballing: The Alignment Tax of Constrained Decoding in LLM Reflection, arXiv:2604.06066](https://arxiv.org/pdf/2604.06066) - **[FULL - upgraded from PARTIAL]** re-fetched raw via `curl` + `pdftotext -layout`, 2026-09-25 (7 pages, Qwen3-8B). Full read surfaced "structure snowballing" - the caveat now folded into "Where we agree" above; this was NOT visible from the title/abstract alone
+- [Towards Mitigation of Hallucination for LLM-empowered Agents: Progressive Generalization Bound Exploration and Watchdog Monitor, arXiv:2507.15903](https://arxiv.org/pdf/2507.15903) - **[FULL - upgraded from PARTIAL]** re-fetched raw via `curl` + `pdftotext -layout`, 2026-09-25 (8 pages). Describes HalMit, the black-box watchdog/generalization-bound framework cited above
+- **[FULL]** `gh search repos` for grounding/hallucination tooling: top result **6 stars** (2026-09-06). Not re-run this pass; the OSS-tooling-space-is-empty finding is not the kind of fact that moves in 19 days
+- `.claude/rules/anti-fabrication.md`, `.claude/rules/research-grounding.md` - **[FULL]** read directly, 2026-09-25. Confirms an estate-wide generalization of "claim traces to evidence or is UNVERIFIED" exists, for research/subagent loops specifically
+- `zao-research-index "grounding gate ZOE"` / `"mixed output fabrication review"` / `"mixed output defeats human review published"` - **[FULL]** run 2026-09-25; surfaced docs 2103 and 2105 (pre-dating this doc, general grounding-discipline writing) but no doc or artifact recording a ZOE-public-pipeline-specific grounding gate or a publication of the mixed-output finding
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Grep the estate for failure-to-value handlers (`catch { return '' }` and kin) and list them ranked by whether the value feeds a model prompt. Shipped when that list exists | orchestrator seat | Note | 2026-09-13 |
-| Apply the grounding-gate rule to ZOE before it gains capability - it names people and posts to Telegram. Shipped when a gate exists or a doc says why not | a lane | PR | 2026-09-20 |
-| Publish the mixed-output finding outward. It is ours, it cost 114 casts, and no source states it | @Zaal | Post | 2026-09-27 |
+| DONE (generalized differently than specified) - `.claude/rules/anti-fabrication.md` + `.claude/rules/research-grounding.md` now enumerate failure-to-value / unverified-claim patterns for research and subagent loops. A literal grep ranked by "value feeds a model prompt" was not found as its own artifact | orchestrator seat | Note | 2026-09-13 (confirmed 2026-09-25) |
+| STILL OPEN - no evidence found of a grounding gate on ZOE's own public-posting pipeline distinct from `zol-grounding.js` (which is ZOL-specific and pre-dates this doc). Re-check next pass whether ZOE (not just ZOL) posts publicly and needs the same gate | a lane | PR | 2026-10-09 |
+| STILL OPEN, not yet due - publish the mixed-output finding outward. Deadline is 2026-09-27, two days from this re-research | @Zaal | Post | 2026-09-27 |
+| Check `~/zol/daily.log` on ansuz for any fabrication recurrence since 2026-09-06 and record the answer either way - not checked this pass (no Pi/SSH access this session) | whoever next has Pi access | Measurement | 2026-10-02 |

@@ -2,9 +2,9 @@
 topic: cross-platform
 type: decision
 status: research-complete
-last-validated: 2026-09-06
+last-validated: 2026-09-25
 superseded-by:
-related-docs: "183, 355, 873"
+related-docs: "cross-platform/183-social-connections-x-integration, cross-platform/355-autonomous-social-distribution-2026, cross-platform/873-best-free-way-read-x-article"
 original-query: "Let's keep on diving deeper into ways we can improve Zaal's x account analytics without sacrificing the authenticity /zao-research this" + "https://farcaster.xyz/gokhan/0xa8158740 also /zao-research this"
 tier: DEEP
 ---
@@ -14,6 +14,31 @@ tier: DEEP
 > **Goal:** Measure the account from data it already owns, ship the engagement
 > pipeline that is already written and running nowhere, and close the 16 apps
 > that can post as him - without adopting a single tool that games engagement.
+
+> **Updated 2026-09-25 (re-research, no central claim overturned):** the
+> pipeline is STILL unscheduled 19 days later - confirmed by direct read of
+> `vercel.json` (still 5 crons, `engagement-collect` absent) and by
+> `gh api repos/bettercallzaal/ZAOOS/commits?path=vercel.json` (no commit
+> since touched it for this reason). Two of six Next Actions shipped since
+> 2026-09-06: the handoff correction and the `x.md` best-performing-examples
+> fill. Three did not: the cron is not scheduled, the spend cap is not set,
+> and the 16/6 app-revoke has not happened (unverifiable either way this pass
+> - see below). The **primary data source, `~/Desktop/twitterzip.zip`, no
+> longer exists on disk** - it is not on the Desktop or in Downloads. This
+> means the 28-connected-app / 45,760-tweet statistics in Findings 2-3 could
+> NOT be re-fetched or re-confirmed this pass; they are carried forward
+> unchanged from 2026-09-06 and are now unverified pending a fresh archive
+> request (the doc's own Next Action for 2026-10-06). Doc 355 was
+> disambiguated: it is now ambiguous in the library (2 docs share the
+> number) and this doc's citation resolves to
+> `cross-platform/355-autonomous-social-distribution-2026`. X API pricing was
+> re-fetched live from `docs.x.com/x-api/getting-started/pricing`
+> (2026-09-25) and the Owned Reads ($0.001/resource) and general Post-read
+> ($0.005/resource, capped 3M/month) figures are unchanged and re-confirmed
+> FULL against the live page, not just corroborated as before. The cited
+> Farcaster cast was re-fetched live and is still up, text unchanged; its like
+> count moved 5 -> 7 in the 19 days since first citation, which is normal
+> post-publish accrual, not a correction.
 
 ## Key Decisions
 
@@ -173,12 +198,14 @@ API is the automated top-up. Three sources, one of them free and already owned.
 
 ### 6. The Farcaster cast Zaal sent
 
-Gökhan Turhan, 2026-09-06, 5 likes / 1 recast / 0 replies
-([cast](https://farcaster.xyz/gokhan/0xa8158740)):
+Gökhan Turhan, 2026-09-06, originally 5 likes / 1 recast / 0 replies, re-fetched
+2026-09-25 at 7 likes / 1 recast / 0 replies
+([cast](https://farcaster.xyz/gokhan/0xa8158740), re-confirmed live via
+`api.farcaster.xyz/v2/user-cast`, hash `0xa8158740c7d2dd66f77bba84e06a7545b13c4f00`):
 
-> deployed a plaintext "decentralized" bulletin platform and only one guy
-> showed up ... monetizing every logic gate is the biggest stupidity the
-> blockchain rails offered
+> i actually did deploy a plaintext "decentralized" bulletin platform and only
+> one guy showed up ... it's because monetizing every logic gate is the
+> biggest stupidity the blockchain rails offered
 
 Two things make this worth citing rather than decorative.
 
@@ -187,11 +214,14 @@ for - posted by someone who kept the receipt instead of deleting it. That is the
 behaviour this doc is arguing for. An account that can say "one guy showed up"
 is an account whose good numbers mean something.
 
-**Two:** the cast itself has 5 likes. Against this archive's median of 0 for
-original posts, 5 is a good post. **The unit of comparison has to be your own
-distribution, not an imagined one.** Every recommendation here is calibrated
-against Zaal's own median, which is why "3.13 mean likes in 2026Q3" reads as
-real progress rather than a small number.
+**Two:** the cast itself has 7 likes as of this update (was 5, 19 days ago -
+engagement accrues after posting, same as any other post; this is not a
+correction, it is the "look again a day later" behaviour the skill itself
+prescribes). Against this archive's median of 0 for original posts, 7 is still
+a good post. **The unit of comparison has to be your own distribution, not an
+imagined one.** Every recommendation here is calibrated against Zaal's own
+median, which is why "3.13 mean likes in 2026Q3" reads as real progress rather
+than a small number.
 
 The warning against "monetizing every logic gate" is the same argument applied
 to measurement: instrumenting every interaction changes what you post. Measure
@@ -209,28 +239,31 @@ the account, not each post.
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Revoke `tweethunter [X]`, `Fedica`, `SongjamSpace`, the duplicate `MediaPilot`/`MediaPilotApp`, and `1917251619592318976bettercallz` at x.com/settings/connected_apps - shipped when the connected-apps list shows 23 or fewer | @Zaal | Account security (his hands only) | 2026-09-08 |
-| Widen `engagement-collect` beyond `publish_log` so it measures iPhone posts, then add `{"path":"/api/cron/engagement-collect","schedule":"0 5 * * *"}` to `vercel.json` - shipped when `engagement_metrics` has rows with `platform='x'` | @Zaal | PR to ZAOOS | 2026-09-13 |
-| Set an X API spend cap of $5/month and confirm owned-read billing is active - shipped when the developer portal shows a non-zero cap | @Zaal | Config | 2026-09-13 |
-| Fill `Current goals` and `Best-performing examples` in `~/.claude/skills/platform/profiles/x.md`, using the top-10 posts in Finding 2 as the examples - shipped when neither field reads "TO FILL" | @Zaal | Doc edit | 2026-09-08 |
-| Correct `handoffs/bczximprovement.md` job 4: `x-insights.ts` IS read by the cron; the defect is that the cron is unscheduled - shipped when the brief says so | @Zaal (Claude) | Vault edit | 2026-09-06 |
-| Hold original posts to 3-10/day for 30 days, then re-run the quarterly table against a fresh archive - shipped when 2026Q4 has a row in Finding 2 | @Zaal | Behaviour + measurement | 2026-10-06 |
+| Revoke `tweethunter [X]`, `Fedica`, `SongjamSpace`, the duplicate `MediaPilot`/`MediaPilotApp`, and `1917251619592318976bettercallz` at x.com/settings/connected_apps - shipped when the connected-apps list shows 23 or fewer | @Zaal | Account security (his hands only) | 2026-09-30 |
+| Widen `engagement-collect` beyond `publish_log` so it measures iPhone posts, then add `{"path":"/api/cron/engagement-collect","schedule":"0 5 * * *"}` to `vercel.json` - shipped when `engagement_metrics` has rows with `platform='x'` - STILL OPEN, re-confirmed absent 2026-09-25 | @Zaal | PR to ZAOOS | 2026-09-30 |
+| Set an X API spend cap of $5/month and confirm owned-read billing is active - shipped when the developer portal shows a non-zero cap | @Zaal | Config | 2026-09-30 |
+| Fill `Current goals` and `Best-performing examples` in `~/.claude/skills/platform/profiles/x.md` - **Best-performing examples DONE** (confirmed filled 2026-09-25); `Current goals` still reads "TO FILL" | @Zaal | Doc edit | 2026-09-30 |
+| Correct `handoffs/bczximprovement.md` job 4: `x-insights.ts` IS read by the cron; the defect is that the cron is unscheduled - **DONE**, confirmed present in the handoff at line 280 as of 2026-09-21 | @Zaal (Claude) | Vault edit | 2026-09-06 (shipped) |
+| Re-request the X data archive (the 2026-07-22 export no longer exists at `~/Desktop/twitterzip.zip`) and re-run the quarterly table + connected-apps count against it - shipped when 2026Q4 has a row in Finding 2 and the app count is re-confirmed | @Zaal | Behaviour + measurement | 2026-10-06 |
 
 ## Sources
 
-**Primary data (this account's own, highest confidence):**
+**Primary data (this account's own, highest confidence) - carried forward from 2026-09-06, NOT re-fetchable this pass:**
 
-- `~/Desktop/twitterzip.zip` `data/tweets.js` - 45,760 tweets, 2023-04-01 to 2026-07-22 — **[FULL]** — method: `unzip` + `json.loads`, all statistics computed locally
-- `~/Desktop/twitterzip.zip` `data/connected-application.js` - 28 apps with permission arrays — **[FULL]** — method: same
-- `~/Desktop/twitterzip.zip` `data/following.js` + `follower.js` — **[FULL]** — method: same
+- `~/Desktop/twitterzip.zip` `data/tweets.js` - 45,760 tweets, 2023-04-01 to 2026-07-22 — **[FAILED on re-fetch, 2026-09-25 - file no longer exists at this path or anywhere on Desktop/Downloads]** — the 2026-09-06 numbers are carried forward as historical fact (they were FULL then) but cannot be re-verified or extended to 2026Q4 until Zaal re-requests the archive
+- `~/Desktop/twitterzip.zip` `data/connected-application.js` - 28 apps with permission arrays — **[FAILED on re-fetch, 2026-09-25 - same reason]** — the 16-write/6-DM app count is UNVERIFIED as of this update; treat as last-known, not current
+- `~/Desktop/twitterzip.zip` `data/following.js` + `follower.js` — **[FAILED on re-fetch, 2026-09-25 - same reason]**
 
-**Codebase (ZAO OS V1):**
+**Codebase (ZAO OS V1) - re-verified live 2026-09-25:**
 
-- `src/lib/publish/x-insights.ts`, `src/app/api/cron/engagement-collect/route.ts`, `vercel.json`, `scripts/archive/migrations-run/create-engagement-metrics.sql` — **[FULL]** — method: direct read
+- `src/lib/publish/x-insights.ts`, `src/app/api/cron/engagement-collect/route.ts`, `vercel.json`, `scripts/archive/migrations-run/create-engagement-metrics.sql` — **[FULL]** — method: direct read, re-confirmed 2026-09-25: `vercel.json` still lists exactly 5 crons and `engagement-collect` is still absent; `route.ts` still queries only `publish_log`
+- `gh api repos/bettercallzaal/ZAOOS/commits?path=vercel.json` — **[FULL]** — method: `gh api`, confirms no commit has touched `vercel.json` for this reason since 2026-09-06
+- `~/zao-vault/handoffs/bczximprovement.md` (2026-09-21 revision) — **[FULL]** — method: direct read; confirms the doc's line-280 correction was applied and the cron remains unscheduled per that lane's own notes
+- `~/.claude/skills/platform/profiles/x.md` — **[FULL]** — method: direct read; `Best-performing examples` filled, `Current goals` still "TO FILL"
 
 **Official docs:**
 
-- [X API pricing](https://docs.x.com/x-api/getting-started/pricing) — **[FULL]** — method: subagent fetch
+- [X API pricing](https://docs.x.com/x-api/getting-started/pricing) — **[FULL]** — method: `curl` + HTML-strip, re-fetched live 2026-09-25; Owned Reads $0.001/resource and Post-read $0.005/resource (3M/month cap) both re-confirmed verbatim on the live page
 - [X API data dictionary](https://docs.x.com/x-api/fundamentals/data-dictionary) — **[FULL]** — confirms all 6 `public_metrics` fields
 - [X API owned-reads pricing change, 2026-04-20](https://devcommunity.x.com/t/x-api-pricing-update-owned-reads-now-0-001-other-changes-effective-april-20-2026/263025) — **[FAILED - HTTP 403]** — the $0.001 figure is corroborated by the docs.x.com pricing page above, not taken from this URL
 - [X post activity dashboard help](https://business.x.com/en/help/campaign-measurement-and-analytics/tweet-activity-dashboard) — **[PARTIAL - 403 on direct fetch, content via search result]**
@@ -238,7 +271,7 @@ the account, not each post.
 
 **Community:**
 
-- [Gökhan Turhan, Farcaster, 2026-09-06](https://farcaster.xyz/gokhan/0xa8158740) — **[FULL]** — method: `api.farcaster.xyz/v2/user-cast?username=gokhan&hashPrefix=0xa8158740`, raw JSON
+- [Gökhan Turhan, Farcaster, 2026-09-06](https://farcaster.xyz/gokhan/0xa8158740) — **[FULL]** — method: `api.farcaster.xyz/v2/user-cast?username=gokhan&hashPrefix=0xa8158740`, raw JSON, re-fetched live 2026-09-25 (same endpoint) - cast still live, text unchanged, reaction count moved 5 -> 7 likes
 - [HN: New Twitter API pricing starts at $42,000/month](https://news.ycombinator.com/item?id=35094729) - 47pts, 23 comments, 2023-03-10 — **[FULL]** — method: HN Algolia API. Dated; cited only for the Enterprise floor
 - [HN: Filter out engagement bait on your X feed](https://news.ycombinator.com/item?id=42609151) - 71pts, 128 comments, 2025-01-06 — **[FULL]** — method: HN Algolia API
 - [HN: Vanity metrics](https://news.ycombinator.com/item?id=14167843) - 79pts, 2017 — **[FULL]** — method: HN Algolia API
@@ -259,3 +292,13 @@ the account, not each post.
   project (tasks, meetings, contacts), not ZAOOS, and returned zero rows for
   both names - that is the wrong database, **not** evidence the tables are
   missing. The schema file is the evidence they were created.
+- **NEW 2026-09-25: primary-source gap.** `~/Desktop/twitterzip.zip`, the sole
+  source for Findings 2 and 3 (engagement stats, connected-app count), is gone
+  from disk. Those numbers are not confirmed wrong - nothing suggests they
+  changed - but they are also not re-confirmed. Do not cite the 28-app /
+  16-write figure past this date as current without a fresh archive pull.
+- **doc 355 is now ambiguous** in the research library (2 documents share the
+  number as of 2026-09-25: `cross-platform/355-autonomous-social-distribution-2026`
+  and `dev-workflows/355-harness-engineering-creao-ai-first`). This doc's
+  citation resolves to the cross-platform one; use the full path, not the
+  bare number.

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-09-17
+last-validated: 2026-09-25
 superseded-by:
 related-docs: "461, 2105, 2292, 2367, 2462"
 original-query: "STANDARD - Why written lessons do not hold for coding agents, and what mechanisms do: the surface-cannot-report-state failure shape (10 instances in our estate, graduated to a law in claude/autopilot.md this morning, recurred twice since). Focus: enforcement mechanisms at the point of failure (hooks, gates, wrappers, typed instruments) versus prose rules; evidence from agent-harness practice; what to build so an instrument cannot answer a question it does not measure."
@@ -15,77 +15,92 @@ tier: STANDARD
 > graduated to a law and recurred the same day, and specify the one mechanism that would have
 > caught both recurrences.
 
+> **UPDATED 2026-09-25 (re-research, 8 days after last validation).** The central numbers in
+> this doc were stale by roughly 5x. `surface-cannot-report-state` is not "10 instances,
+> recurred twice" - it is **28 instances, 20 recurrences since graduation**, measured today by
+> `zao-mistake due` reading `~/zao-vault/MISTAKES.md` directly. A SECOND shape,
+> `unmeasured-prediction-in-a-record`, has since graduated into a law (2026-09-20, into
+> `claude/CLAUDE.md`) and is **also** marked `LAW NOT HOLDING` (5 recurrences since its own
+> graduation). The PreToolUse hook this doc called for is built, tested (44/44) and merged
+> (dotfiles PR #306, 2026-09-19) - but still not wired into `settings.json`, which every
+> deadline in the original Next Actions table assumed would happen by 2026-09-22. See
+> Findings 1-2 for the lead facts and Next Actions for what is actually still open.
+
 ## Key Decisions
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **BUILD the trigger field before the hook** (tracker card 9819). A `trigger:` / `pattern:` line per MISTAKES.md entry, matched against the tool call the agent is about to make. | Zaal already approved the hook. Without a machine-matchable field the hook is a no-op: 12 of 29 entries carry no shape at all and none carries a pattern. |
-| 2 | **ENFORCE at the instrument, not at the lookup.** Ship `zao-measure`-style wrappers that refuse to answer a question they do not measure: a comparison names its reference file and prints that file's size and key-count; an "exists nowhere" check refuses a two-dot range. | Both recurrences today were a correct command answering a question nobody asked it. A MISTAKES.md lookup before the call would not have fired, because neither call was destructive. |
-| 3 | **KEEP graduation, DROP the belief that graduation is enforcement.** A law in `claude/autopilot.md` is a prompt; it competes for attention with everything else in context. | Measured here: shape graduated 2026-09-17, recurred twice the same day, tool now prints `LAW NOT HOLDING`. |
-| 4 | **COPY the ANMA result, not its product:** simple, boundary-shaped checks beat complex semantic ones. | Its own benchmark: cheap model ignored architecture rules **13 of 19 runs** with prose, **0 of 20** with contracts plus hooks plus CI. |
-| 5 | **DO NOT build a state machine for this** (Statewright, 491 stars). It constrains which step runs next; our failure is inside one step that ran correctly. | Wrong layer for this shape. Re-evaluate for the work-loop, not for measurement. |
+| 1 | **STILL BUILD the trigger field** (`zao-mistake add --trigger`, card 9819's other half). It does not exist as of 2026-09-25: `zao-mistake add --help` has no `--trigger` flag, and `grep -c '^trigger:' MISTAKES.md` is 0. | The consuming hook (`bin/zao-mistake-hook`) was merged 2026-09-19 and already reads an optional `trigger:` line - "the hook just becomes more useful, with no code change, the day `zao-mistake add --trigger` ships it" (its own design note). Eight days on, nothing writes that field. |
+| 2 | **WIRE `settings.json` now.** The code is built, tested, merged. The only gap is one paste into a file only Zaal edits, and that paste has not happened. | Re-confirmed 2026-09-25: `~/.claude/settings.json` (symlinked to `zaal-dotfiles/claude/settings.json`) has 13 registered `PreToolUse` entries and none references `zao-mistake`. A 2026-09-23 grill decision explicitly kept this a standing checkpoint - "he specifically did NOT take the option to retire the note" - even after noting three other dotfiles PRs (#234, #337, #340) had self-wired their own hooks without waiting for his hand. |
+| 3 | **TRACK the second graduated law, not just the first.** `unmeasured-prediction-in-a-record` graduated 2026-09-20 into `claude/CLAUDE.md` and already shows 5 recurrences since. | This doc's thesis - graduation is not enforcement - is no longer a one-shape claim. Two shapes, graduated eight days apart, both print `LAW NOT HOLDING` from the same tool. That is a pattern, not an incident. |
+| 4 | **UPGRADE `LAW NOT HOLDING` from a manual lookup to a red `zao-selftest` check.** `zao-mistake due` already computes it; `zao-selftest` (re-read today, 40 registered checks) has none named `mistake` or `law`. | This is the cheapest remaining piece of the original plan - a few lines wiring an existing command into an existing check runner - and its 2026-09-24 deadline has already passed. |
+| 5 | **KEEP the ANMA and Statewright comparisons**, re-confirmed unchanged in substance: ANMA still 2 stars/Apache-2.0, static since June; Statewright still ships with no LICENSE file, now 492 stars/22 forks after a push made **today** (2026-09-25). | The evidentiary comparison (contracts+hooks+CI beat prose; a harness constrains step order, not in-step measurement) has not moved. Re-evaluate the state-machine layer only if the work-loop, not the measurement layer, becomes the object of study. |
 
-## The failure, measured
+## The failure, measured (re-measured 2026-09-25)
 
-The shape is `surface-cannot-report-state`: an instrument is run that cannot report the state being
-asked about, and its answer is reported as that state.
+The shape is `surface-cannot-report-state`: an instrument is run that cannot report the state
+being asked about, and its answer is reported as that state.
 
-| Fact | Value |
-|---|---|
-| Instances in `MISTAKES.md` | **10** (of 29 entries; 17 shaped, 12 UNCOUNTED) |
-| Graduated to a law in `claude/autopilot.md` | 2026-09-17, morning |
-| Recurrences after graduation, same day | **2** (`zao-mistake due` prints `LAW NOT HOLDING`) |
-| Agents caught by it in ~30 hours | 4 (three lanes and the seat, twice) |
+| Fact | Value on 2026-09-17 (original) | Value on 2026-09-25 (today) |
+|---|---|---|
+| Total entries in `MISTAKES.md` | 29 | **141** |
+| Shaped (carry a `shape:` line) | 17 | **125** |
+| UNCOUNTED (no shape line) | 12 | **16** (11% of total, vs 41% at original count) |
+| Instances of `surface-cannot-report-state` | 10 | **28** |
+| Graduated to a law | 2026-09-17, `claude/autopilot.md` | unchanged - same event |
+| Recurrences after graduation | 2, same day | **20**, per `zao-mistake due`'s own count (8 struck as pre-graduation evidence, 20 since) |
+| Second graduated law | none yet | **`unmeasured-prediction-in-a-record`**, graduated 2026-09-20 into `claude/CLAUDE.md`; 12 entries, 7 struck, **5 since** - also `LAW NOT HOLDING` |
+| Agents caught by the original shape in ~30 hours | 4 | not re-measured (would require a fresh transcript sweep; out of scope for this pass) |
 
-**Recurrence 1 (mine, 19:0x).** Asked "do these 18 secrets exist anywhere else?", compared against
-`~/zao-bot-live/.env` — a **94-byte** file — instead of `~/zao-bot-live/bot/.env` (**2197 bytes**).
-Reported 12 of 18 names as unique. Truth, re-measured on the host: **18 of 18 present, 18 identical
-values, 0 unique**. Consequence: Zaal was one paste from writing a 19th copy of live secrets to
-preserve nothing.
+Command that produced today's counts, run directly against the live file:
 
-**Recurrence 2 (mine, same message).** Asked "does anything exist only in this checkout?", ran
-`git rev-list origin/main..HEAD` = 0 and reported "no unpushed commits". That range answers whether
-**main** is ahead. `git rev-list --branches --not --remotes` returns **15**, and a per-SHA lookup
-against the GitHub API 404s for **6** of them — a hotfix, 26 vitest cases, three documents, existing
-on that box and nowhere else. Consequence: archiving on that basis destroys them.
+    zao-mistake due
+    141 entries, 125 shaped, 16 UNCOUNTED (no shape line, so no shape is assumed)
+       28  surface-cannot-report-state  GRADUATED 2026-09-17 -> claude/autopilot.md  (8 struck, 20 since)  LAW NOT HOLDING
+       12  unmeasured-prediction-in-a-record  GRADUATED 2026-09-20 -> claude/CLAUDE.md  (7 struck, 5 since)  LAW NOT HOLDING
 
-**Both commands were correct. Both answered a question I did not ask.** That is why a rule saying
-"verify your instrument" does not bite: at the moment of the call, the command looks like the right
-command, and nothing in the loop disagrees.
+**Both original recurrences (VPS `.env` size mismatch, two-dot `git rev-list` misread) are
+still in the file, unchanged in substance.** What changed is everything around them: the
+estate produced 18 more instances of the same shape in eight days, and a second, unrelated-in-
+surface-but-identical-in-mechanism shape (predicting or asserting a state instead of
+measuring it) graduated and is repeating too.
 
 ## Findings
 
 | # | Finding | Evidence |
 |---|---|---|
-| 1 | **"Instructions are not guarantees" is the industry's phrasing of our own result.** A security engineer put the same guidance in CLAUDE.md, AGENTS.md, memory files, MCP descriptions and tool docs; the agent still grepped the whole repo and used deprecated APIs. His conclusion: prompts and rules solve different problems. | HN 48558502 (Show HN, policy gate before tool calls) |
-| 2 | **The only hard number found says gates work and prose does not.** ANMA benchmarked Haiku 4.5 on architecture rules: **13 of 19 runs violated** with prose rules, **0 of 20** with YAML contracts + hooks + CI. | HN 48623765; repo `anma-labs/anma`, Apache-2.0, 2 stars, last push 2026-06-13 |
-| 3 | **Keep the checks dumb.** ANMA's author, asked how contracts stay strict without becoming brittle: module-boundary checks such as "accounts is not allowed to import billing", not semantic code checks. | HN 48623765 comment thread |
-| 4 | **The harness, not the model, is where reliability is bought.** Statewright's author (20+ years, ex-NVIDIA/AMD) built visual state machines so smaller models stay inside a smaller solution space: "the models are good enough, the harness operating them is what's holding things back". 491 stars, 236 commits by one author, **no licence file (all rights reserved)**. | HN 48108778 (126 pts, 59 comments); `gh api`, LICENSE absent |
-| 5 | **Our own library said this in May and it did not transfer.** `dev-workflows/461` chose mechanism over memory for pushes ("Memory is loaded but not consulted at push time"); `dev-workflows/2105` made it a rule ("USE hooks, not prompt instructions, for anything load-bearing. A hook executes at the system level regardless of what the model attends to"). Both are correct and neither stopped today's two. | Local docs, read 2026-09-17 |
-| 6 | **The gap is coverage, not conviction.** Our hooks guard *destructive or outbound* actions (`.husky/pre-commit`, `bin/zao-no-picker-guard`, the SendMessage SHA check that blocked a message in this same session). Nothing guards a **read** that will be reported as a fact, and every instance of this shape is a read. | `scripts/agents/zao-wall.py`, `.husky/pre-commit`, settings hook list |
-| 7 | **Claude Code's hook contract is strong enough to do it.** `PreToolUse` reads the call on stdin and returns `permissionDecision: "deny"` with a reason, or exits 2 to block; the deny reason is shown to the model. That is the same mechanism the picker guard uses. | docs.claude.com/en/docs/claude-code/hooks, fetched raw 2026-09-17 |
-| 8 | **A lookup-shaped hook would not have caught either recurrence.** Card 9819 proposes checking MISTAKES.md before *destructive* actions. Today's two were `grep` and `git rev-list`. The check has to sit on the instrument, not on the danger. | Card 9819; this doc's two recurrences |
+| 1 | **The doc's own headline numbers were stale by roughly 5x, in the direction of understating the problem.** 141 entries, not 29; 28 of the target shape, not 10; 20 recurrences since graduation, not 2. | `grep -cE "^## " MISTAKES.md` = 141; `zao-mistake due` run 2026-09-25, quoted above |
+| 2 | **A second law has graduated from the same failure family and is also not holding.** `unmeasured-prediction-in-a-record` graduated 2026-09-20 into `claude/CLAUDE.md` - visible today as the live global CLAUDE.md's "Before you write down what you did not see" section - with 12 entries, 7 struck, 5 recurrences since. Two graduated laws, eight days apart, both `LAW NOT HOLDING` from the same tool. | `zao-mistake due` output; the live `~/.claude/CLAUDE.md` section itself, dated 2026-09-19/approved |
+| 3 | **The trigger field (card 9819's other half) still does not exist.** `zao-mistake add --help` has no `--trigger` argument. `grep -c '^trigger:' MISTAKES.md` = 0. The consuming hook already reads an optional `trigger:` line and needs no code change once the field ships. | `~/bin/zao-mistake` argparse dump, 2026-09-25; `~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md` |
+| 4 | **The PreToolUse hook is built, tested and merged - but deliberately not wired.** `bin/zao-mistake-hook` and its test suite merged as dotfiles PR #306 at commit `efdb007f` on 2026-09-19 (44/44 assertions green, advisory-only output via `additionalContext`, never `permissionDecision`). It is absent from all 13 `PreToolUse` entries in the live `settings.json`. A 2026-09-23 grill decision explicitly kept "Zaal's hand" as the wiring checkpoint, even after noting three other dotfiles PRs had self-wired. | Direct read of `zaal-dotfiles/claude/settings.json` (the file `~/.claude/settings.json` symlinks to); `~/zao-vault/handoffs/status/zj.md` 2026-09-19 entries; `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md` |
+| 5 | **The reference-file assertion shipped, but as a different tool than specified, and it does not do the exact comparison asked for.** The original doc asked for it "in the comparison path of `zao-measure`"; `zao-measure`'s source has no reference-file/size/key-count comparison logic. What shipped instead, 2026-09-20, is `zao-assert` - `exists` (prints size), `none` (refuses an empty/all-missing path set), `count` (refuses a zero denominator, prints `UNKNOWN`) - now quoted directly in the live global CLAUDE.md. It generalizes the *vacuous-claim* problem rather than building the specific two-file size/key-count check this doc named. | `~/bin/zao-measure` source (no match for "reference"/"size"/"key-count" comparison logic); `~/bin/zao-assert --help`, built 2026-09-20 per file mtime |
+| 6 | **`zao-mistake due` still is not in `zao-selftest`.** `zao-selftest` was itself edited as recently as this morning (2026-09-25, unrelated fixes) and registers 40 named checks; none references `mistake` or `zao-mistake` in any form. | `grep -in "mistake" ~/bin/zao-selftest` → no output; `main()`'s check-registration list read in full |
+| 7 | **Card 9819 is still open in the tracker, five days past its own due date.** `zao-tracker search "9819"` returns one row: status `todo`, due `2026-09-20`. | `~/bin/zao-tracker search "9819" --limit 5`, run 2026-09-25 |
+| 8 | **ANMA and Statewright, re-measured, do not change the comparison.** `anma-labs/anma`: 2 stars, 0 forks, Apache-2.0, last push unchanged at 2026-06-13. `statewright/statewright`: 492 stars (+1), 22 forks (+1), pushed **2026-09-25** (today - the repo is active, not stale), LICENSE still absent (404) = still all rights reserved. | `gh api repos/anma-labs/anma` and `gh api repos/statewright/statewright/contents/LICENSE` (404), both run 2026-09-25 |
+| 9 | **HN sources re-verified, frozen as expected.** 48108778: 126 points / 59 comments (nested-tree count matches Algolia's own `num_comments` search field exactly). 48623765: 3 points, 2 nested comments; the "13 of 19 violated / 0 of 20" figures and the module-boundary quote ("accounts is not allowed to import billing") both re-read verbatim from the raw story/comment JSON. 48558502: 1 point, 0 comments - a low-engagement Show HN whose citation rests on its own story text, not on discussion, and that has not changed. | `hn.algolia.com/api/v1/items/<id>`, all three, run 2026-09-25 |
+| 10 | **"Instructions are not guarantees" and "keep checks dumb" still stand, unchanged**; this pass found no contradicting evidence. | Same HN sources, re-read, not just re-counted |
 
-## What to build, concretely
+## What to build, concretely (unchanged from original, still not built)
 
-**A. Trigger fields (card 9819, unblocks the approved hook).** Each MISTAKES.md entry gains
-`trigger:` — a regex over the command about to run. The two from today:
+**A. Trigger fields (card 9819, unblocks the already-merged hook).** Each MISTAKES.md entry
+gains `trigger:` - a regex over the command about to run. Still not shipped as of 2026-09-25.
 
     trigger: git rev-list [^|]*\.\.(HEAD|origin/)   # two-dot range answering "exists anywhere?"
     trigger: (grep|comm|diff)[^|]*\.env             # comparing against an env file
 
-**B. A reference-file assertion in the wrapper.** Before any "is X in Y" comparison, the wrapper
-prints Y's size and key-count and requires them to be plausible. A 94-byte file claiming to be an
-estate env fails that assertion, and the 2197-byte file passes it. This is the check that would
-have stopped recurrence 1 at the moment it happened, with no rule to remember.
+**B. A reference-file assertion in the wrapper.** Still not built as the doc specified it
+(section, above, Finding 5). `zao-assert` covers the *set-is-empty* and *file-is-missing*
+vacuous cases; it does not print a reference file's own size/key-count before an "is X in Y"
+comparison the way this doc asked for.
 
-**C. One banned-range check.** `git rev-list A..B` may not be used to answer "does this commit exist
-anywhere else"; the hook answers with the two commands that do (`--branches --not --remotes`, then a
-per-SHA remote lookup). This is a five-line matcher and it is the whole of recurrence 2.
+**C. One banned-range check.** `git rev-list A..B` may not be used to answer "does this commit
+exist anywhere else." Built into `bin/zao-mistake-hook`'s ancestry trigger (merged, gated on a
+live `git rev-parse --is-shallow-repository` check so it stays silent on non-shallow clones) -
+this piece IS shipped, in code, and only awaits the `settings.json` paste to take effect.
 
-**D. Report the law's health where it is read.** `zao-mistake due` already prints `LAW NOT HOLDING`
-with a recurrence count. Put that line in `zao-selftest` so a law that is being broken is a red
-check rather than a number nobody runs.
+**D. Report the law's health where it is read.** `zao-mistake due` already prints
+`LAW NOT HOLDING` with a recurrence count for BOTH graduated shapes now. Still not present in
+`zao-selftest`'s output as of 2026-09-25.
 
 ## Also See
 
@@ -94,25 +109,28 @@ check rather than a number nobody runs.
 - [security/2292](../../security/2292-agent-guardrail-tools-landscape/) — guardrail tooling landscape
 - [agents/2367](../../agents/2367-false-green-truth-lifecycle/) — false green, and why a rule beat a monitor there
 - [dev-workflows/2462](../2462-claudecode-subreddit-two-month-scan/) — the graduation rule this doc tests
+- Tracker card 9819 (status `todo`, due 2026-09-20, past due) — the settings.json wiring this doc still waits on
+- `~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md` — the built hook's own design note and coverage table (8 of 13 caught, by mechanism)
+- `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md` — Zaal's ruling that keeps settings.json wiring as his own checkpoint
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Add `trigger:` to `zao-mistake add` (required for new entries, optional for the 12 UNCOUNTED) and backfill the 10 `surface-cannot-report-state` entries; shipped when `zao-mistake due` prints a trigger count | @Zaal (dotfiles lane) | dotfiles PR | 2026-09-20 |
-| Ship the PreToolUse matcher for the two triggers in section A and C; shipped when a `git rev-list main..HEAD` in a lane is denied with the two correct commands in the reason | @Zaal (dotfiles lane) | dotfiles PR | 2026-09-22 |
-| Wire the hook into settings.json (permission surface, Zaal's hand) ; shipped when a red control in a scratch repo is denied | @Zaal | settings.json paste | 2026-09-22 |
-| Add the reference-file assertion (section B) to the comparison path of `zao-measure`; shipped when comparing against a 94-byte file fails loudly | @Zaal (dotfiles lane) | dotfiles PR | 2026-09-24 |
-| Add `zao-mistake due` to `zao-selftest` so `LAW NOT HOLDING` is a red check; shipped when selftest reports it | @Zaal (dotfiles lane) | dotfiles PR | 2026-09-24 |
-| Re-measure this shape's recurrence count 14 days after the hook lands; shipped when this doc's `last-validated` is updated with the number | @Zaal | Re-research | 2026-10-06 |
+| Add `--trigger` to `zao-mistake add`, required for new entries, optional for the 16 UNCOUNTED; backfill the 28 live `surface-cannot-report-state` entries; shipped when `grep -c '^trigger:' MISTAKES.md` is greater than 0 | @Zaal (dotfiles lane) | dotfiles PR | 2026-10-02 |
+| Paste the built, tested, merged `PreToolUse` stanza (dotfiles PR #306, commit `efdb007f`) into `settings.json`; shipped when `grep zao-mistake ~/.claude/settings.json` returns a match and a scratch-repo `git rev-list origin/main..HEAD` fires the advisory | @Zaal (his hand, per the 2026-09-23 ruling) | settings.json paste | 2026-09-27 |
+| Build the reference-file size/key-count assertion as originally specified (a comparison path, not just an existence check); shipped when comparing against a 94-byte file fails loudly from the tool itself, not from advisory prose | @Zaal (dotfiles lane) | dotfiles PR | 2026-10-02 |
+| Wire `zao-mistake due`'s output into `zao-selftest` as a named check; shipped when `zao-selftest`'s check list includes one referencing `mistake` and it prints `LAW NOT HOLDING` as a red row when either shape is due | @Zaal (dotfiles lane) | dotfiles PR | 2026-10-01 |
+| Close or re-date tracker card 9819 to match reality (it is 5 days past its 2026-09-20 due date and the code half is done); shipped when `zao-tracker search "9819"` shows a due date at or after today | @Zaal | tracker edit | 2026-09-26 |
+| Re-measure both shapes' recurrence counts and update this doc's `last-validated`; shipped when the doc states the then-current `zao-mistake due` numbers for both `surface-cannot-report-state` and `unmeasured-prediction-in-a-record` | @Zaal | Re-research | 2026-10-06 |
 
 ## Sources
 
-- [HN 48558502 — Show HN: A policy gate that runs before your AI coding agent's tool calls](https://news.ycombinator.com/item?id=48558502) — **[FULL, method: hn.algolia.com API]** verified 2026-09-17
-- [HN 48623765 — Show HN: ANMA, boundary contracts for cheaper AI coding agents](https://news.ycombinator.com/item?id=48623765) — **[FULL, method: hn.algolia.com API, post + comment tree]** verified 2026-09-17
-- [HN 48108778 — Show HN: Statewright](https://news.ycombinator.com/item?id=48108778) — **[FULL, method: hn.algolia.com API, post + 5 comments]** verified 2026-09-17
-- [github.com/anma-labs/anma](https://github.com/anma-labs/anma) — **[FULL, method: gh api + LICENSE file read]** Apache-2.0, 2 stars, pushed 2026-06-13
-- [github.com/statewright/statewright](https://github.com/statewright/statewright) — **[FULL, method: gh api + zao-research-snapshot]** 491 stars, 21 forks, no LICENSE file = all rights reserved, pushed 2026-09-16
-- [Claude Code hooks reference](https://docs.claude.com/en/docs/claude-code/hooks) — **[FULL, method: curl + HTML strip, 212,575 chars]** `PreToolUse`, `permissionDecision: deny`, exit code 2 semantics verified 2026-09-17
-- r/ClaudeAI and r/ClaudeCode on this topic — **[FAILED, method: `zao-fetch-reddit.sh --selftest` 2026-09-17: token endpoint 401 (no creds), OAuth API 403, public `.json` returns text/html, 0 of 3 redlib instances answered]** Not substituted with search snippets. The Chrome route in the skill was not attempted this run.
-- Local, read directly: `MISTAKES.md` (29 entries), `~/bin/zao-mistake`, `bin/zao-no-picker-guard`, `.husky/pre-commit`, `scripts/agents/zao-wall.py`, tracker card 9819 — **[FULL]**
+- [HN 48558502 — Show HN: A policy gate that runs before your AI coding agent's tool calls](https://news.ycombinator.com/item?id=48558502) — **[FULL, method: hn.algolia.com API]** re-verified 2026-09-25: 1 point, 0 comments, frozen since original 2026-09-17 read
+- [HN 48623765 — Show HN: ANMA, boundary contracts for cheaper AI coding agents](https://news.ycombinator.com/item?id=48623765) — **[FULL, method: hn.algolia.com API, post + comment tree]** re-verified 2026-09-25: 3 points, 2 nested comments; "13 of 19 violated / 0 of 20" and the module-boundary quote re-read verbatim, unchanged
+- [HN 48108778 — Show HN: Statewright](https://news.ycombinator.com/item?id=48108778) — **[FULL, method: hn.algolia.com API, post + nested comment count cross-checked against Algolia's `num_comments` search field]** re-verified 2026-09-25: 126 points, 59 comments, exact match to original citation
+- [github.com/anma-labs/anma](https://github.com/anma-labs/anma) — **[FULL, method: gh api + LICENSE file read]** re-verified 2026-09-25: Apache-2.0, 2 stars, 0 forks, pushed 2026-06-13 - unchanged
+- [github.com/statewright/statewright](https://github.com/statewright/statewright) — **[FULL, method: gh api + LICENSE-path 404 check]** re-verified 2026-09-25: 492 stars (was 491), 22 forks (was 21), pushed **2026-09-25** (today), no LICENSE file = all rights reserved, unchanged
+- [Claude Code hooks reference](https://docs.claude.com/en/docs/claude-code/hooks) — **[FULL, carried forward]** not re-fetched this pass; independently re-confirmed against Claude Code 2.1.278 by a separate local artifact (`~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md`) on 2026-09-19, and nothing found this pass contradicts `PreToolUse` / `permissionDecision` / exit-code semantics
+- r/ClaudeAI and r/ClaudeCode on this topic — **[NOT RE-ATTEMPTED 2026-09-25]** this doc cites no live Reddit thread and the fetch-quality gate treats this as optional when there is nothing to re-fetch; original 2026-09-17 attempt remains **[FAILED, method: `zao-fetch-reddit.sh --selftest`: token endpoint 401, OAuth API 403, public `.json` returned text/html, 0 of 3 redlib instances answered]**
+- Local, read/run directly 2026-09-25: `~/zao-vault/MISTAKES.md` (141 entries, up from 29), `~/bin/zao-mistake` (source + `due` output), `~/bin/zao-mistake-hook` (exists, built 2026-09-19, not wired), `~/bin/zao-assert` (built 2026-09-20, help text), `~/bin/zao-measure` (source, no reference-file comparison), `~/bin/zao-selftest` (source, 40 registered checks, none named `mistake`), `~/.claude/settings.json` / `zaal-dotfiles/claude/settings.json` (symlink confirmed, 13 `PreToolUse` entries, none is `zao-mistake`), `~/bin/zao-tracker search "9819"`, `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md`, `~/zao-vault/handoffs/status/zj.md` (PR #306 merge detail) — **[FULL]**

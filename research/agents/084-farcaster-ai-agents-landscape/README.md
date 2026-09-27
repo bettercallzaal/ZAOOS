@@ -5,6 +5,7 @@ topic: agents
 type: research
 status: research-complete
 last-validated: 2026-09-25
+last-validated: 2026-09-27
 original-query: Map the landscape of AI agents and bots on Farcaster for building ZAO community bot (reconstructed)
 tier: reference
 ---
@@ -62,6 +63,46 @@ Searched explicitly for music-focused AI agents on Farcaster as of September 202
 ## Context
 
 Deep research on the full landscape of AI agents, bots, and automated accounts on Farcaster as of March 2026. Conducted for building a ZAO community bot.
+
+---
+
+## Updated 2026-09-27
+
+**ATTENTION: Platform risk has materially increased.** Three significant developments since May 2026 affect every claim in this doc about Neynar reliability and bot cost model.
+
+### 1. Neynar seeking a new operator (August 17, 2026) — HIGH IMPACT
+
+Neynar co-founder Rish announced on 2026-08-17 that Neynar has "started a process to look for a new home / team to run the products going forward," covering Farcaster, Clanker, and the developer platform. This is the second leadership change in 2026 (Merkle → Neynar in January; Neynar → unknown in progress). Revenue has collapsed sharply:
+
+| Quarter | Gross protocol revenue (Farcaster + Clanker) |
+|---|---|
+| Q1 2026 | ~$27.9M |
+| Q2 2026 | ~$3.9M |
+| Q3 2026 (partial) | ~$246K |
+
+The protocol remains operational and has NOT shut down (Dan Romero: "Farcaster is not shutting down"). Merkle returned $180M in investor capital at time of the January acquisition. Neynar has stated no price, structure, timetable, or criteria for the handoff.
+
+**Impact on Section 4 (Neynar) and Section 10 (ZAO Bot Recommendation):** The doc's recommendation to use Neynar Professional ($49/mo) and rely on Neynar-managed signers carries substantially more platform risk now. Bot builders should monitor for a new operator announcement or plan for protocol-level alternatives.
+
+- Sources (PARTIAL — search summaries; all direct-fetch domains blocked by network proxy): https://x.com/rish_neynar/status/2089417144861688052; https://crypto.news/farcaster-seeks-new-operator-seven-months-after-sale/; https://en.bloomingbit.io/feed/news/118522
+
+### 2. x402 Payment Protocol for agents — MEDIUM IMPACT
+
+Neynar integrated x402 (Coinbase's HTTP-native payment protocol) prior to the operator announcement. Agents can pay 0.001 USDC/call on Base with no API key or subscription — payment settles in the same HTTP round-trip. This is an alternative to the subscription tiers documented in Section 4.
+
+**Impact on Section 7 (Cost Structure):** The $49/mo Professional plan for webhooks remains the simplest path for ZAO, but x402 micropayment billing is now available for fully autonomous agents, potentially lowering minimum cost for lower-volume bots.
+
+- Sources (PARTIAL): https://neynar.com/blog/agents-frames-and-the-future-of-farcaster-neynar-s-vision-for-x402
+
+### 3. ElizaOS plugin-farcaster v1.0.5 — LOW IMPACT
+
+ElizaOS `@elizaos/plugin-farcaster` reached v1.0.5 in July 2026 with multi-language support: TypeScript (existing), Python (ML/AI pipelines), and Rust (high-performance + WASM). The package remains actively maintained.
+
+**Impact on Section 5 (Frameworks):** No breaking changes; the ElizaOS recommendation still holds. The Python/Rust additions are relevant if ZAO moves toward a Python-based agent stack.
+
+- Sources (PARTIAL): https://www.npmjs.com/package/@elizaos/plugin-farcaster; https://github.com/elizaos-plugins/plugin-farcaster
+
+---
 
 ---
 

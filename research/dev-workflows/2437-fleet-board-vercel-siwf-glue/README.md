@@ -2,12 +2,64 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-08-28
+last-validated: 2026-09-25
 superseded-by:
-related-docs: 2313, 2419, 2420, 2423, 2429, 2433, 2435
+related-docs: "farcaster/2313-farcaster-auth-primitives-sparkz, identity/2419-zid-state-and-signup-spec, agents/2420-zorca-gui-redesign, agents/2423-vault-as-transport-inter-terminal-context, dev-workflows/2429-githubprojects-top-100-glue-scored, dev-workflows/2433-mcp-connectors-together, agents/2435-ng-openworker-vs-our-stack"
 original-query: "/glue evaluate \"fleet board web app on Vercel with SIWE/Farcaster sign-in\" - Zaal 2026-08-27 21:4x \"a full fleet board on a website on Vercel, locked, and partial in some places\"; 22:0x \"Fleet board auth: Sign-in with Ethereum / Farcaster - the first ZID use (two-week lane, /glue evaluate first)\". Produce the rung ladder for the board, the rung ladder for the lock, the public/locked split, a verdict per rung, the two-week pilot plan, and the board.jsonl field spec measured from orca terminal list --json and DONE.md."
 tier: STANDARD
 ---
+
+> ## RE-RESEARCHED 2026-09-25. The pilot in this doc was never built. A different fix shipped instead, and it is also dormant. Read this before the tables below.
+>
+> The two-week pilot (Mon 2026-08-31 to Fri 2026-09-11) called for a Vercel
+> static page in a `board/` folder of `bettercallzaal/zorca`, rendering
+> `~/zao-vault/handoffs/board.jsonl`, locked first by Vercel Authentication
+> and then by Sign In With Farcaster. **None of it exists.** Measured today:
+> `gh api repos/bettercallzaal/zorca/contents/` lists no `board/` directory;
+> `~/zao-vault/handoffs/board.jsonl` has never existed (`git log --all
+> --follow -- handoffs/board.jsonl` in the vault returns nothing); no Vercel
+> project named `zorca-board` was found in a cross-repo `gh search code` for
+> `board.jsonl`/`zorca-board`/`api/board.js` (only this research doc's own
+> text matches). PR #3358 that merged 2026-08-28 was the research doc's own
+> PR, not a pilot PR - there was never a PR 1 or PR 2.
+>
+> **On 2026-09-11 - the pilot's own deadline day - Zaal asked for something
+> different**, and it shipped as something different: not a Vercel web page
+> at all. `zaal-dotfiles` PR #187 (merged 2026-09-11T15:42:42Z) and PR #213
+> (merged 2026-09-12T13:08:58Z) added `bin/zao-board-push`, a script whose
+> own header states the reason - Zaal, 2026-09-11: *"Can we do a combo of
+> telegram message tailscale and maybe an orca option"* - it pushes an
+> `orca-board --json` snapshot from the Mac to the VPS over SSH, and ZOE's
+> Telegram bot answers `/board` from it. This is decision 1's rung 4 answer
+> (`orca-board --json` as the source) surviving, but decisions 2, 3, 7 and 8
+> (Vercel, the lock ladder, the launchd carrier, the zorca repo) are all
+> moot - there is no web page to lock and no `board.jsonl` file to carry.
+>
+> **The replacement is itself dormant.** `zao-board-push` is wired into
+> `~/zaal-dotfiles/cron/mac.proposed` (a five-minute job) but that file is a
+> *proposal* file, not the live crontab - `crontab -l` today has no
+> `zao-board-push` line, `~/.zao/beats/zao-board-push` does not exist, and
+> `~/.zao/zao-board-push.log` does not exist. It has never run in production.
+> So as of 2026-09-25, thirty-nine days after Zaal asked for a fleet board on
+> Vercel and fourteen days after he asked for a Telegram alternative instead,
+> **neither exists as a running surface.** The read-only status board he
+> asked for twice is still not live.
+>
+> **A second, independent break:** the `handoffs/board.jsonl` field spec in
+> section 2 named `handoffs/needs-zaal.md` as the source of the `needs_zaal`
+> field. That file was retired 2026-09-10 ("RETIRED 2026-09-10 - Moved into
+> ../BLACKBOARD.md, section 'WAITING FOR ZAAL'... nothing reads this file").
+> Any future build of either board reads `BLACKBOARD.md`'s "WAITING FOR ZAAL"
+> section, not `needs-zaal.md`.
+>
+> **What did NOT move:** SIWN's page now titles itself "Sign In With Neynar
+> is deprecated" (re-fetched today; was a deprecation banner before) - the
+> verdict against it only hardens. `@farcaster/auth-kit` and
+> `@farcaster/auth-client` are still at 0.8.2 / 0.7.1 on the npm registry
+> (checked today) - no version bump, the lifted-code plan in decision 3 is
+> unaffected if anyone builds it. The rung ladder, licence reads and
+> nothing-fits reasoning in sections 3-4 hold up as analysis; they were just
+> never acted on.
 
 # 2437 - Fleet board on Vercel, locked with Sign In With Farcaster: the glue ladder, measured
 
@@ -33,8 +85,8 @@ no Orca setting was changed. Figures Zaal has not typed are **UNSET**.
 | 4 | Where SIWE sits | **Second button, not first.** ZAOOS already has the pattern (`src/app/api/auth/siwe/route.ts`, 180 lines, `viem/siwe` - no `siwe` npm dep). Use it only if a wallet-only reader needs in. | `spruceid/siwe` 3.0.0 was published 2025-01-21, **0 commits in 180 days**, dual LICENSE-APACHE / LICENSE-MIT files at the repo root (glue-check reported "NO LICENSE FILE" because it looks for `LICENSE`; the files exist under the two names). Stable, not alive. `viem/siwe` is the maintained path and it is already a ZAOOS dependency (`viem` 2.47.2). |
 | 5 | Privy / Dynamic | **SKIP for this board.** | Both are hosted identity vendors: Privy free to 500 MAU then $299/month (raw pricing page); Dynamic free to 1,000 MAU then $249 (raw). A one-reader board does not need a vendor in the login path, and the identity must land in ZID, not in a vendor's user table. Docs 282-284 keep them on the table for FISHBOWLZ-shaped products. |
 | 6 | The board's only input | **`~/zao-vault/handoffs/board.jsonl` - one JSON line per pane per tick, fields in section 2, written by the organizer tick.** The board renders nothing else. | The tick already writes `organizer-inbox.md` every 5 minutes (automation `001be940` `organizer-tick`, `enabled`, next run `19:00Z`), and `orca-board --json` already emits the 9 fields that matter. The vault repo is **private** (`gh api repos/bettercallzaal/zao-vault --jq .private` = `true`). |
-| 7 | The carrier (the gap) | **Nothing pushes the vault today.** The tick's NEVER list contains `git push`; `zao-vault-log` (hourly cron) commits and never pushes; `zorca-bundle` "Never pushes" (its header, line 4). A 5-minute launchd job that pushes ONLY `handoffs/board.jsonl` to the vault is the ~20-line rung-4 carrier, and it is a Zaal tap because it is a new push authority. | Measured: vault at 1 commit ahead of origin, 27 dirty files, last push-able commit 11:49. Without a carrier the Vercel board renders a file that never moves. |
-| 8 | Repo | **A `board/` folder in `bettercallzaal/zorca` (MIT, public, already home to `gui/zorca-gui` and `gui/zorca-gui2`), Vercel project root directory = `board`.** No new repo. | glue-first section 1: no new home when one exists. Data never enters zorca: the page fetches `board.jsonl` from the private vault by GitHub token at request time. Reversible - a `git mv` to a ZAODEVZ repo later costs nothing. Logged here as an auto-proceed per `lane-autonomy.md`; Zaal overrides at the Monday tap. |
+| 7 | The carrier (the gap) | **SUPERSEDED BY EVENTS (2026-09-25).** Nothing pushed the vault at the time this was written, and no launchd carrier for `board.jsonl` was ever built. Instead, on 2026-09-11 Zaal redirected the whole approach to a Mac-to-VPS SSH push (`bin/zao-board-push`) feeding a Telegram bot, not a vault file feeding a web page. That script merged (zaal-dotfiles PR #187, #213) but sits only in `cron/mac.proposed`, unscheduled - no beat file, no log, not in the live crontab as of today. | Original measurement: vault at 1 commit ahead of origin, 27 dirty files. Today: `handoffs/board.jsonl` has never existed in vault git history; `~/.zao/beats/zao-board-push` and `~/.zao/zao-board-push.log` do not exist. Neither the original carrier nor its replacement is live. |
+| 8 | Repo | **NOT BUILT (2026-09-25).** No `board/` folder exists in `bettercallzaal/zorca` - `gh api repos/bettercallzaal/zorca/contents/` lists `.github .gitignore .handoffs .serena LICENSE PLAYBOOK.md README.md ZOE-CENTER.md docs gui zoe-analysis-2026-08-27.md` and nothing else. No Vercel project called `zorca-board` was found by any means available in this session (no Vercel API creds this round; a repo-wide `gh search code` for `board.jsonl`, `zorca-board`, `api/board.js` across both owners returns only this research doc's own text). | glue-first section 1 reasoning (no new repo home) is unaffected if the Vercel path is ever revived; it was simply never executed. |
 | 9 | ZID | **The pilot needs nothing from ZID. The second PR makes the first ZID use a READ: after SIWF, look up `users.zid` by fid and print "ZID 1" in the header.** No writes, no sequence, no reserved-block decision required. | Doc 2419: `users.zid` is live, Zaal is **ZID 1** in production (fid 19640), `assign_next_zid` has never run, and the open decisions (ZID 0, block size, ordering) are all writes. A read of one row by fid is independent of every one of them. |
 
 ## 1. What exists today (measured 2026-08-28)
@@ -77,7 +129,7 @@ and the six ids are Orca-internal handles the board never needs.
 | `question` | string or null | `orca-board --json` `.question` (first 200 chars) | no |
 | `last_output_at` | ISO-8601 | `.lastOutputAt` (epoch ms today, e.g. `1787942790604`) | no |
 | `done` | object or null | last `.handoffs/DONE.md` line for this lane: `{date, tag, doc, pr, text}` | `pr` only |
-| `needs_zaal` | string or null | matching `NEEDS-ZAAL:` line from `handoffs/needs-zaal.md` | no |
+| `needs_zaal` | string or null | ~~matching `NEEDS-ZAAL:` line from `handoffs/needs-zaal.md`~~ **BROKEN as written, 2026-09-25: `needs-zaal.md` was retired 2026-09-10** ("Moved into ../BLACKBOARD.md, section 'WAITING FOR ZAAL'... nothing reads this file"). If this field is ever built, the source is `~/zao-vault/BLACKBOARD.md`'s "WAITING FOR ZAAL" section, rewritten between markers by `scripts/build-needs-zaal.py`. | no |
 
 Example (a real pane from today, `preview` and path removed):
 
@@ -247,19 +299,41 @@ the Windows / VPS / Pi hosts (they have no organizer yet), SIWE button, any ZID 
 
 ## Next Actions
 
+All five original pilot actions below are **CLOSED, unshipped, superseded by
+the 2026-09-11 redirect** - kept struck through for the record rather than
+deleted, per standing rule (supersede, never delete). Replaced by the three
+live actions that follow.
+
+| Action | Owner | Type | By When | Status 2026-09-25 |
+|---|---|---|---|---|
+| ~~Tap: confirm `board/` in zorca...~~ | @Zaal | Orca settings | 2026-08-31 | Superseded 2026-09-11 |
+| ~~Ship `com.zao.board-push` launchd carrier...~~ | @Zaal | PR (zaal-dotfiles) | 2026-09-01 | Superseded 2026-09-11 |
+| ~~PR 1: `board/index.html` + `board/api/board.js`...~~ | fleet-board lane | PR (zorca) | 2026-09-02 | Never opened |
+| ~~PR 2: SIWF lock...~~ | fleet-board lane | PR (zorca) | 2026-09-09 | Never opened |
+| ~~Append the follow-through note...~~ | fleet-board lane | doc edit | 2026-09-11 | This edit is that note |
+
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Tap: confirm `board/` in zorca (or name a ZAODEVZ repo), and add "also write `handoffs/board.jsonl` from `orca-board --json`" to automation `001be940`'s prompt - shipped when `git log -1 -- handoffs/board.jsonl` exists in the vault | @Zaal | Orca settings + one prompt line | 2026-08-31 |
-| Ship `com.zao.board-push` launchd carrier (push one path every 5 min) in `zaal-dotfiles`, git-tracked - shipped when origin's `board.jsonl` is under 10 min old at any check | @Zaal (push authority) with the fleet-board lane drafting the PR | PR (zaal-dotfiles) | 2026-09-01 |
-| PR 1: `board/index.html` + `board/api/board.js` in zorca, Vercel project `zorca-board` with Vercel Authentication = All Deployments ON before first deploy - shipped when logged-out = 401 and logged-in renders the same row count as `orca-board --json` | fleet-board lane, Zaal merges | PR (zorca) | 2026-09-02 |
-| PR 2: SIWF lock (nonce + verify lifted from `src/app/api/auth/verify/route.ts`), `/` public strip, `/board` locked to fid 19640, header reads `ZID 1` from `users` - shipped when a second fid gets 403 and the header string is verified by screenshot | fleet-board lane, Zaal merges | PR (zorca) | 2026-09-09 |
-| Append the follow-through note to this doc (what the board caught, waiting% delta) - shipped when the note carries a date and two numbers | fleet-board lane | doc edit | 2026-09-11 |
-| Record the adoption line "auth-kit + auth-client for the board lock" in `~/zao-vault/notes/adoption-candidates.md` (vault is the orchestrator's - row text is in DONE.md) | @Zaal / orchestrator | vault note | 2026-08-31 |
+| Wire `bin/zao-board-push` from `cron/mac.proposed` into the live schedule (launchd, per the 2026-08-31 cron-to-launchd migration convention, not raw crontab) - shipped when `~/.zao/beats/zao-board-push` exists and updates every 5 minutes | @Zaal | zaal-dotfiles PR or settings change | 2026-10-02 |
+| Decide, explicitly, whether the Vercel/SIWF board is still wanted at all now that a Telegram/VPS path exists and is merged - shipped when a decision note lands in `~/zao-vault/decisions/` | @Zaal | Decision | 2026-10-02 |
+| If the Vercel path is revived, source `needs_zaal`-equivalent data from `~/zao-vault/BLACKBOARD.md`'s "WAITING FOR ZAAL" section, not the retired `needs-zaal.md` - shipped when the field spec in section 2 is corrected in code, not just in this doc | fleet-board lane | Code + doc edit | On revival |
 
 ## Sources
 
 Method key: `raw` = curl with a browser user-agent + HTML strip, quoted from the text
 file; `api` = a JSON endpoint; `local` = a command on this Mac; `file` = a file read.
+
+**Re-research pass, 2026-09-25, added below the original 2026-08-28 list:**
+
+- [Neynar - SIWN](https://docs.neynar.com/docs/how-to-let-users-connect-farcaster-accounts-with-write-access-for-free-using-sign-in-with-neynar-siwn) - **FULL**, raw, re-fetched; page now titles the section "Sign In With Neynar is deprecated" (was a banner sentence before). No new content beyond the harder framing.
+- npm registry JSON for `@farcaster/auth-kit` and `@farcaster/auth-client` - **FULL**, api; both still at `0.8.2` / `0.7.1`, unchanged since 2026-08-28.
+- `gh api repos/bettercallzaal/zorca/contents/` - **FULL**, api; confirms no `board/` directory exists.
+- `gh search code "zorca-board"` / `"api/board.js"` / `"board.jsonl"` `--owner=bettercallzaal --owner=ZAODEVZ` - **FULL**, api; only this research doc's own text matches, in ZAOOS.
+- `git -C ~/zao-vault log --all --follow -- handoffs/board.jsonl` - **FULL**, local; empty result, the file has never existed in vault git history.
+- `~/zao-vault/handoffs/needs-zaal.md` - **FULL**, file; reads "RETIRED 2026-09-10 ... Moved into ../BLACKBOARD.md, section 'WAITING FOR ZAAL' ... nothing reads this file."
+- `~/zaal-dotfiles/bin/zao-board-push` and its git history (`git log --oneline --follow`) - **FULL**, local/file; header quotes Zaal 2026-09-11 verbatim; two merged PRs (#187 2026-09-11T15:42:42Z, #213 2026-09-12T13:08:58Z) via `gh pr view`.
+- `~/zaal-dotfiles/cron/mac.proposed`, `crontab -l`, `~/.zao/beats/`, `~/.zao/zao-board-push.log` - **FULL**, local; the replacement script is merged but not scheduled anywhere live.
+- Vercel team plan / API (`GET /v2/teams`) - **FAILED - not re-attempted this round**, no Vercel CLI/API credential available in this session; carried forward from 2026-08-28 unverified rather than restated as current fact.
 
 - [Vercel - Deployment Protection](https://vercel.com/docs/deployment-protection) - **FULL**, raw, 18,328 chars; quotes on scope and plan.
 - [Vercel - Vercel Authentication](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication) - **FULL**, raw, 13,135 chars; "available on all plans", Hobby "one external user".

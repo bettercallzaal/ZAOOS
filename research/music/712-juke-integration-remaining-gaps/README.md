@@ -2,120 +2,84 @@
 topic: music
 type: decision
 status: research-complete
-last-validated: 2026-05-22
+last-validated: 2026-09-25
 superseded-by:
-related-docs: 695, 710, 662
+related-docs: "music/695-juke-integration-zao, music/710-juke-path-b-architecture, music/662-fishbowlz-revival-juke-mute-lockout"
 original-query: "keep researching what else is needed [for the Juke integration after Path B] - space lifecycle, allow_agents, recurring-event scheduling, recording, Path D chat"
 tier: STANDARD
 ---
 
 # 712 - Juke Integration: Remaining Gaps After Path B
 
-> **Goal:** Path B is built (PR #608, #613) and doc 710 covers how to operate it. This doc answers "what else is needed" to call the Juke integration complete - the five things that came up as loose ends: space lifecycle (knowing when a space ended), the `allow_agents` flag, recurring-event scheduling, recording, and Path D chat. The headline: **most of what's missing is blocked on Juke, not on ZAO.** Juke's developer API documents no webhooks, no agent API, and no recording control. ZAO's own remaining buildable surface is small and clear.
+> **Goal:** Path B is built (PR #608, #613) and doc [music/710-juke-path-b-architecture](../710-juke-path-b-architecture/) covers how to operate it. This doc answers "what else is needed" to call the Juke integration complete - the five things that came up as loose ends: space lifecycle (knowing when a space ended), the `allow_agents` flag, recurring-event scheduling, recording, and Path D chat.
+
+**CENTRAL CLAIM WAS WRONG, AND WRONG WITHIN A DAY OF PUBLICATION.** The 2026-05-22 version's headline was "most of what's missing is blocked on Juke, not on ZAO" because Juke's API had "no webhooks, no agent API, and no recording control." Juke shipped webhooks and agent-join on 2026-05-23 and a force-end endpoint on 2026-05-24 (all three dated precisely in Juke's own `changelog.json` release feed, re-fetched live 2026-09-25). Recording start/stop is also developer-API-callable today, but its exact ship date is UNKNOWN - Juke's changelog only goes back to 2026-05-23 (its earliest entry) and carries no recording-start/stop entry at all, so this may have shipped without a changelog record, or predates the changelog itself. Do not read the 2026-05-23 and 2026-05-24 dates above as covering recording. ZAO then built the entire integration surface against the new API: webhook registration + verification, agent-join, recording toggle, an authoritative stale-room cron, and a recurring-event script. As of today only one of the five original gaps has a genuinely open item left (ZOE auto-join is built but switched off, waiting on a UX flag from Juke), and Path D remains exactly where doc 695 left it - a separate, not-yet-started workstream.
 
 ## Key Decisions
 
-| Gap | Verdict | Why |
+| Gap | 2026-05-22 Verdict | 2026-09-25 Status | Why |
+|---|---|---|---|
+| Knowing when a space ended | Poll `GET /v1/rooms/{spaceId}` for `room.status` (no webhook existed) | **CLOSED.** Juke shipped `room.finished` webhooks (2026-05-23) plus `POST /v1/developer/spaces/{id}/end` for immediate host/API-triggered end (2026-05-24, Juke PR #174). ZAO's `src/app/api/cron/juke-stale-rooms/route.ts` now treats `GET /v1/developer/spaces/{id}` as authoritative and only falls back to the polling heuristic when `JUKE_API_KEY` is absent. | Juke's own changelog + `src/lib/spaces/juke-api-reads.ts` (ships `GET /v1/developer/spaces/{id}` + `GET /v1/developer/webhooks/{id}` in one client, 2026-05-25). |
+| Build a Juke webhook receiver | NO - Juke documented zero webhooks | **REVERSED. YES, and it is built and live.** `POST/GET/DELETE /v1/developer/webhooks` shipped 2026-05-23. ZAO registered a subscription (`src/app/api/juke/admin/register-webhook/route.ts`) and verifies inbound HMAC signatures in `src/lib/spaces/jukeWebhookVerify.ts` / handles them in `jukeWebhookHandlers.ts`. Events: `room.started`, `room.finished`, `participant.joined/left`, `recording.ready`. Native (Farcaster) rooms do NOT fire `participant.*` or `recording.ready` - those still require polling `GET /v1/developer/spaces/{id}`. | juke.audio/SKILL.md "Outbound webhooks" section, re-fetched 2026-09-25 (`curl`, FULL) |
+| ZOE / an AI agent inside a Juke room | NOT YET - "agent access is a separate future surface," build nothing | **PARTIALLY REVERSED - built, gated off.** `POST /v1/developer/rooms/{roomId}/agent-join` (free, partner-scoped, own rooms only) shipped 2026-05-23. ZAO's `src/lib/spaces/jukeAgentJoin.ts` calls it and is wired to an auto-join hook on `room.started` webhooks, but the hook is gated behind `ZAO_AUTO_AGENT_JOIN=true` (default off) pending Juke's issue #190 - an agent-visibility flag to hide ZOE from the iframe's participant/avatar bar. Agents publish DATA only in v1 (no audio-publish yet; that is still on Juke's roadmap, unchanged). | `src/lib/spaces/jukeAgentJoin.ts` (code, FULL); Juke SKILL.md "Agents" section (FULL); ZAO manifest `open_asks[].id === 'agent-visibility-flag'` (code, FULL) |
+| Recording ZAO events | Host toggles it in the iOS app; ZAO can only READ `room.recording` | **REVERSED.** `POST /v1/rooms/{spaceId}/recording/start\|stop` and `GET /v1/recordings/{spaceId}` (presigned URL) are now developer-API callable, confirmed live in the current SKILL.md. ZAO's `createJukeSpace` now sends a `record` flag on create, defaults it ON in the UI ("Go Live" modal, PR merged 2026-05-26 per `git log`), and stores `recording_url` on `juke_spaces` for the `/live/recordings` shelf. | Juke SKILL.md "Can users record the space?" (FULL, re-fetched 2026-09-25); `src/lib/spaces/juke-api.ts` doc-comment on the `record` field (code, FULL); `src/app/live/recordings/page.tsx` (code, FULL) |
+| Recurring-event auto-creation | Build a cron after `juke_spaces` exists; confirm scheduled-space behaviour with nickysap first | **CLOSED.** `scripts/schedule-zao-recurring.ts` pre-creates ZAO's weekly spaces (fractal call, ZAOstock standups) from `scripts/zao-recurring-events.json`, is idempotent (dedupes against `juke_spaces.scheduled_at +/- 30min`), and is "safe to wire into a weekly cron" per its own doc-comment. Pre-start behaviour is now documented: `GET /v1/rooms/{spaceId}` before `scheduled_at` returns `status: "scheduled"` with metadata only, no LiveKit token; the hosted embed renders a live countdown. | `src/lib/spaces/jukeIntegrationManifest.ts` shipped-feature entry `recurring-schedule-script` (code, FULL); Juke SKILL.md "How do I schedule a space?" (FULL) |
+| Path D - FIP-2 chat | Separate workstream, not blocked on the Juke key, track under doc 695 | **UNCHANGED - still not started.** Doc [music/695-juke-integration-zao](../695-juke-integration-zao/) still lists it as a scoped-but-unstarted spike ("refactor `src/app/api/spaces/chat` toward the FIP-2 reply-tree pattern"). No new commits found touching `src/app/api/spaces/chat` toward this pattern. | `gh search code` across bettercallzaal/ZAOOS for FIP-2/reply-tree chat work (zero hits); doc 695 body, re-read 2026-09-25 |
+
+## What Is Already Built (Codebase Ground Truth, re-verified 2026-09-25)
+
+| Piece | Path | Notes |
 |---|---|---|
-| Knowing when a space ended | **Poll `GET /v1/rooms/{spaceId}` and read `room.status`.** | Juke exposes no webhook. `room.status` is a real field (`'active'` is confirmed verbatim in Juke's docs). The `juke_spaces` table (doc 710) marks a space closed when its status leaves `active`. |
-| Build a Juke webhook receiver | **NO - do not build one.** | Juke's developer API documents zero webhooks. LiveKit, Juke's transport, has `room_finished` and 11 other events - but that surface belongs to Juke's LiveKit project, not ZAO's. Polling is the only path open to ZAO. |
-| ZOE / an AI agent inside a Juke room | **NOT YET. Keep sending `allow_agents`, build nothing.** | Juke's own docs say verbatim: "agent access is a separate future surface." The flag is a forward-declaration for a feature Juke has not shipped. Building ZOE-in-Juke now is building against vapor. |
-| Recording ZAO events | **The host toggles it in the Juke iOS app. ZAO can READ `room.recording`, not control it.** | `room.recording` is a host-side room setting the API surfaces read-only. There is no ZAO-callable record / replay / clip endpoint. |
-| Recurring-event auto-creation | **Build a cron AFTER the `juke_spaces` table - pre-create the Mon/Tue standup + fractal spaces with `scheduled_at`. Confirm pre-start behaviour with nickysap first.** | `scheduled_at` accepts a future ISO timestamp, but whether listeners can join early or see metadata before start is undocumented. |
-| Path D - FIP-2 chat | **Separate workstream. Not blocked on the Juke key. Track it under doc 695 Path D.** | Juke's chat is a Farcaster reply tree fed by an ephemeral Neynar webhook - a pattern ZAO can steal into its own Spaces chat with zero Juke dependency. |
-
-## What Is Already Built (Codebase Ground Truth)
-
-| Piece | Path | PR |
-|---|---|---|
-| Juke developer client | `src/lib/spaces/juke-api.ts` | #608, #613 |
-| Create route (admin OR password) | `src/app/api/juke/space/route.ts` | #608, #613 |
-| Web creator | `src/app/live/create/page.tsx` | #613 |
-| Path A embed | `src/lib/spaces/juke.ts`, `src/components/spaces/JukeEmbed.tsx`, `src/app/live/[spaceId]/page.tsx` | #595, #598 |
-| `/juke` bot command | `agent/src/juke-commands.ts` (repo `ZAODEVZ/ZAOcowork`) | ZAOcowork PR #3 |
-| Architecture / operations | `research/music/710-juke-path-b-architecture` | #616 |
-
-## The Five Gaps
-
-### 1. Space lifecycle - knowing when a space ended
-
-Juke's developer API documents **no webhooks**. There is no `space.ended` callback ZAO can subscribe to. Searched `juke.audio/llms.txt` and `/SKILL.md` in full - zero mention of webhooks, callbacks, or event subscriptions.
-
-What Juke *does* expose: `GET /v1/rooms/{spaceId}` returns a room object with a **`room.status`** field. Juke's own embed docs check `room.status === 'active'` verbatim, which confirms the field exists and that `'active'` is one of its values (the ended/scheduled values are not documented - ask nickysap).
-
-So ZAO's only lifecycle mechanism is **polling**: when the `juke_spaces` table from doc 710 exists, a light poller reads `GET /v1/rooms/{id}` for each space still marked open and closes any whose status has left `'active'`. At ZAO's volume (single digits of spaces a week) a poll every few minutes for only the open rows is trivial - no cron storm, no rate-limit concern.
-
-Contrast for context: **LiveKit, the SFU Juke runs on, has a complete webhook surface** - `room_started`, `room_finished`, `participant_joined`, `participant_left`, `egress_started`/`egress_ended`, and 6 more, delivered as POSTs with `Content-Type: application/webhook+json`. LiveKit's own field guide calls webhooks "ideal for maintaining a 'room state' model outside of LiveKit." The lifecycle signal physically exists one layer down - Juke simply has not re-exposed it in its developer API. This is a clean, specific ask for nickysap: surface `room_finished` (and `participant_*`) as a developer webhook.
-
-### 2. AI agents - the `allow_agents` flag
-
-`createJukeSpace` already sends `allow_agents` in the create body. But Juke's docs are explicit, verbatim: **"Do not treat MCP or agent participation as part of the normal embed path. Agent access is a separate future surface."**
-
-So `allow_agents: true` is a forward-declaration. There is no agent SDK, no agent join flow, no documented behaviour. **Do not build ZOE-into-a-Juke-room yet** - there is nothing to build against. Keep passing `allow_agents` (harmless, and it future-proofs the create call). Revisit when Juke ships the agent surface.
-
-For reference, LiveKit again has the mature pattern here (an Agents framework, an `AgentDispatchService` API for dispatching agents to rooms) - so when Juke opens its agent surface it will likely resemble LiveKit's. A ZAO agent-in-Juke is a real future capability, just not a now-capability.
-
-### 3. Recording ZAO events
-
-`room.recording` exists as a **host-side setting** on the room; Juke's docs say "the embed surfaces it as read-only metadata." There is no ZAO-callable endpoint to start/stop a recording, and no documented replay or clip API (Juke lists recordings/replays/clipping as planned *host-premium* features, not developer-API features).
-
-Practical consequence for ZAO events (fractal calls, standups worth keeping): **the host enables recording inside the Juke iOS app** when they start the space. ZAO's only API role is to *read* `room.recording` and, if it wants, show a "recording" badge on `/live/{id}`. Do not plan an auto-record pipeline - the control surface does not exist.
-
-### 4. Recurring-event auto-creation
-
-ZAO's audio-worthy recurring events are concrete: the ZAOstock Monday 11:30am cobuild + Tuesday 10am standup, the weekly fractal call (Mondays 6pm EST), COC Concertz nights. The create body already accepts `scheduled_at` (a future ISO timestamp).
-
-So a cron *could* pre-create each week's spaces and post the links to Telegram. But two unknowns block a clean build: (a) what `room.status` a not-yet-started scheduled space reports, and (b) whether listeners can join, or see metadata, before `scheduled_at`. Both are undocumented. **Sequence: ship the `juke_spaces` table first, confirm scheduled-space behaviour with nickysap, then add the cron.** Not before - a cron that creates spaces nobody can see early is worse than on-demand creation.
-
-### 5. Path D - FIP-2 chat
-
-Doc 695's Path D - adopting Juke's chat pattern (a Farcaster cast's reply tree as the chat layer, fed by an ephemeral Neynar webhook) into ZAO OS Spaces - is **independent of everything in Path B**. It needs no Juke key, no Juke API. It is its own workstream and should stay tracked under doc 695, not folded into the Path B punch list. Flagged here only so it is not forgotten: it remains the highest-leverage *idea* from the Juke research and ZAO already runs Neynar.
+| Juke developer API client | `src/lib/spaces/juke-api.ts` | Now documents the `record` flag; still defensive about the undocumented create-space response shape |
+| Webhook registration (admin) | `src/app/api/juke/admin/register-webhook/route.ts`, `.../delete-webhook/route.ts` | Wraps Juke's `POST/DELETE /v1/developer/webhooks`; the one-time secret must be copied into `JUKE_WEBHOOK_SECRET` on Vercel by hand |
+| Webhook receiver + verification | `src/app/api/juke/webhooks/route.ts`, `src/lib/spaces/jukeWebhookVerify.ts`, `jukeWebhookHandlers.ts` | HMAC verification present; handler updated 2026-05-24 for Juke's shipped payload shape (`event_type`/`event_id` top-level, `data.room_id`) |
+| Agent-join client + auto-join hook | `src/lib/spaces/jukeAgentJoin.ts` | Gated by `ZAO_AUTO_AGENT_JOIN` (default off) |
+| Authoritative stale-room cron | `src/app/api/cron/juke-stale-rooms/route.ts` | Runs every 30 min (Vercel cron); prefers `GET /v1/developer/spaces/{id}` over webhook timeline; falls back to a heuristic when `JUKE_API_KEY` is absent |
+| Recurring-space script | `scripts/schedule-zao-recurring.ts`, `scripts/zao-recurring-events.json` | Idempotent; not yet confirmed wired into an actual cron trigger (see Next Actions) |
+| Public integration surfaces | `/juke-status` (HTML), `/api/juke/status` (JSON), `/juke-integration.md` (LLM-readable) | Single source of truth is `src/lib/spaces/jukeIntegrationManifest.ts`; it also diffs Juke's own `https://juke.audio/changelog.json` against `open_asks[].id` to auto-resolve closed asks |
+| Bot command | `agent/src/juke-commands.ts` (repo `ZAODEVZ/ZAOcowork`) | Not re-verified this pass (out of scope; no evidence it changed) |
 
 ## Findings
 
 | # | Finding | Source |
 |---|---|---|
-| 1 | Juke's developer API documents zero webhooks - no space-lifecycle event delivery exists for ZAO to consume | juke.audio/llms.txt + /SKILL.md |
-| 2 | `room.status` is a real field on `GET /v1/rooms/{spaceId}`; `'active'` is a confirmed value - polling it is the only end-detection path | juke.audio/SKILL.md (verbatim `room.status === 'active'`) |
-| 3 | Agent access is explicitly "a separate future surface" - `allow_agents` is a flag for an unreleased feature | juke.audio/SKILL.md (verbatim) |
-| 4 | `room.recording` is a host-side toggle exposed read-only; no developer record/replay/clip API | juke.audio/SKILL.md |
-| 5 | LiveKit (Juke's transport) has 12 webhook event types incl. `room_finished` - the lifecycle signal exists one layer below Juke's API | LiveKit WebhookEventNames + field guide |
-| 6 | `scheduled_at` accepts a future timestamp; pre-start behaviour (early join, metadata visibility) is undocumented | juke.audio/llms.txt |
-| 7 | `sim.jukeaudio.com` is an unrelated multi-zone-audio hardware company - not nickysap's Juke; do not confuse the two when searching | WebSearch (juke.audio is the correct Farcaster Juke) |
-
-## Questions For nickysap
-
-1. Will Juke surface a developer **webhook** for `room_finished` / `participant_*`? (LiveKit already emits these underneath.)
-2. What are the full set of `room.status` values - what does an ended space, and a not-yet-started scheduled space, report?
-3. For a `scheduled_at` space: can listeners join before start? Is metadata public before start?
-4. When does the **agent surface** open, and what will it look like?
-5. Is there any plan for a developer-controllable **recording/clip** API, or will recording stay host-app-only?
-
-(These join the doc 710 question on `JUKE_USER_TOKEN` lifetime - all to be asked alongside the API key request.)
+| 1 | Juke shipped a full developer webhook surface (`POST/GET/DELETE /v1/developer/webhooks`, events `room.started`, `room.finished`, `participant.joined/left`, `recording.ready`, HMAC-signed, 4 retries, auto-disable after 10 consecutive failures) on 2026-05-23 - the exact capability the 2026-05-22 doc said did not exist and would not be built for | juke.audio/SKILL.md, `curl`-fetched 2026-09-25 [FULL] |
+| 2 | Native (Farcaster-hosted) rooms do NOT fire `participant.*` or `recording.ready` webhooks - only `room.started`/`room.finished`. Polling `GET /v1/developer/spaces/{room_id}` is still required for those two signals on native rooms specifically | juke.audio/SKILL.md, "Webhooks for native rooms" [FULL] |
+| 3 | Agent-join now exists as two paths: a paid x402 path (`POST /v1/rooms/{spaceId}/agent-join`, any room with `allow_agents=true`) and a free partner path scoped to an app's own rooms (`POST /v1/developer/rooms/{roomId}/agent-join`, rate-limited 10/min + 100/day, 5 concurrent agents per room, 429 past cap) | juke.audio/SKILL.md "Agents" section [FULL] |
+| 4 | Agents still publish data only in v1 - audio-publishing agents (a "speaker" agent role) remain on Juke's roadmap, unchanged since May | juke.audio/SKILL.md [FULL] |
+| 5 | Recording is now a developer-callable pair, `POST /v1/rooms/{spaceId}/recording/start\|stop`, plus `GET /v1/recordings/{spaceId}` returning a short-lived presigned `recording_url` - this reverses the 2026-05-22 finding that recording was host-app-only | juke.audio/SKILL.md [FULL] |
+| 6 | Juke publishes a structured, CORS-open `changelog.json` feed (`id`, `shipped_at`, `endpoints`, `docs_section`, `resolves[]`) specifically so partners can auto-detect when an open ask has been closed - ZAO's own `/juke-status` page already diffs against it | juke.audio/SKILL.md "Release feed for partner manifests" [FULL]; `src/app/juke-status/page.tsx` (`buildResolutionIndex(changelog)`) [FULL, code] |
+| 7 | ZAO's own integration manifest (`jukeIntegrationManifest.ts`) still lists "agents" as an open ask with text written as if agent-join were still unbuilt ("llms.txt + the 2026-05-23 PR still flag agents as a future surface") - that text is now stale; the actual blocker has narrowed to the agent-visibility flag (Juke issue #190), not the join capability itself | `src/lib/spaces/jukeIntegrationManifest.ts`, code read 2026-09-25 [FULL] |
+| 8 | Force-ending a room from the server (`POST /v1/developer/spaces/{room_id}/end`) shipped 2026-05-24 as Juke's PR #174, confirmed by Nicky the same day per ZAO's own manifest notes, closing the original webhook-never-fires blind spot from host-side ends | `src/lib/spaces/jukeIntegrationManifest.ts` open-ask history entry, code read 2026-09-25 [FULL] |
+| 9 | No evidence found that Path D (FIP-2 reply-tree chat) has moved since doc 695's 2026-05-20 validation - `gh search code` across bettercallzaal/ZAOOS + ZAODEVZ for reply-tree/FIP-2 chat work in `src/app/api/spaces/chat` returned zero relevant hits | `gh search code`, run 2026-09-25 [FULL] |
+| 10 | `sim.jukeaudio.com` remains an unrelated multi-zone-audio hardware company, not nickysap's Juke (`juke.audio`) - still worth flagging for anyone searching cold | Carried forward from 2026-05-22 pass; not re-tested this round |
 
 ## Also See
 
-- [Doc 710](../710-juke-path-b-architecture/) - how to operate Path B (token lifecycle, bot auth, the `juke_spaces` table)
-- [Doc 695](../695-juke-integration-zao/) - the five-path Juke integration map; Path D lives here
-- [Doc 662](../662-fishbowlz-revival-juke-mute-lockout/) - FISHBOWLZ-on-Juke; shares the native-vs-web caveat
+- [music/710-juke-path-b-architecture](../710-juke-path-b-architecture/) - how to operate Path B (token lifecycle, bot auth, the `juke_spaces` table)
+- [music/695-juke-integration-zao](../695-juke-integration-zao/) - the five-path Juke integration map; Path D lives here, still unstarted as of this pass
+- [music/662-fishbowlz-revival-juke-mute-lockout](../662-fishbowlz-revival-juke-mute-lockout/) - FISHBOWLZ-on-Juke; shares the native-vs-web caveat
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Add the 5 questions above to the nickysap message (with the doc 710 token-TTL question) | @Zaal | Message | With the API key request |
-| Ship the `juke_spaces` Supabase table (doc 710) - prerequisite for lifecycle polling + the cron | @Zaal | PR (needs migration approval) | After Path B proven live |
-| Add a lightweight poller: read `room.status` for open `juke_spaces` rows, close any not `active` | @Zaal | PR | After the table lands |
-| Show a read-only "recording" badge on `/live/{id}` from `room.recording` | @Zaal | PR | Optional, low priority |
-| Recurring-event cron (`scheduled_at` for Mon/Tue standup + fractal) | @Zaal | PR | After nickysap confirms scheduled-space behaviour |
-| Keep Path D (FIP-2 chat) tracked under doc 695 - do not fold into Path B | @Zaal | Doc | Ongoing |
+| Update `src/lib/spaces/jukeIntegrationManifest.ts`'s `agents` open-ask text to reflect that agent-join is built and gated on Juke's visibility flag (#190), not on the join capability itself - ship as a small PR | @Zaal | PR (manifest text fix) | 2026-10-03 |
+| Confirm whether Juke's issue #190 (agent-visibility flag) has shipped; if yes, flip `ZAO_AUTO_AGENT_JOIN=true` in production | @Zaal | Env var flip + verify | 2026-10-10 |
+| Confirm `scripts/schedule-zao-recurring.ts` is actually wired into a live Vercel cron (not just present as a runnable script) - add the cron entry to `vercel.json` if missing | @Zaal | PR (cron wiring) | 2026-10-03 |
+| Scope and start the Path D (FIP-2 chat) spike tracked in doc 695 - currently zero commits toward it | @Zaal | Investigation, new doc | 2026-10-17 |
+| Re-validate this doc's webhook/agent/recording claims once Juke's `changelog.json` shows another developer-facing release (poll or one-off re-check) | @Zaal | Doc re-check | 2026-12-01 |
 
 ## Sources
 
-- [Juke developer docs - juke.audio/llms.txt](https://juke.audio/llms.txt) - [FULL] fetched in full; confirmed no webhooks, `scheduled_at` field, agent surface deferred
-- [Juke embed/API reference - juke.audio/SKILL.md](https://juke.audio/SKILL.md) - [FULL] fetched in full; `room.status === 'active'`, `room.recording` read-only, "agent access is a separate future surface" verbatim
-- [LiveKit Webhooks & events](https://docs.livekit.io/intro/basics/rooms-participants-tracks/webhooks-events.md) - [PARTIAL - exa highlights; used only to establish LiveKit has a webhook surface, a non-load-bearing comparison]
-- [LiveKit WebhookEventNames (server SDK, GitHub-published)](https://docs.livekit.io/reference/server-sdk-js/types/WebhookEventNames.html) - [FULL] the complete 12-event list read verbatim from the exa result
-- [LiveKit - Best practices for managing webhook event streams](https://livekit.io/field-guides/guide/managing-webhook-event-streams) - [PARTIAL - exa highlights; corroborates the "maintain room state outside the SFU" purpose, no unique claim depends on it]
-- [LiveKit JS Server SDK (livekit/server-sdk-js, GitHub)](https://docs.livekit.io/server-sdk-js) - [FULL] community/code source; `WebhookReceiver` usage + `application/webhook+json` content type read in full from the exa result
-- WebSearch "Juke audio Farcaster nickysap developer API agents" - [FULL] result list reviewed; surfaced the `sim.jukeaudio.com` false-match (unrelated hardware vendor) - no usable Juke-specific page beyond the docs already cited
+- [Juke developer docs - juke.audio/llms.txt](https://juke.audio/llms.txt) - [FULL] re-fetched via `curl` 2026-09-25 (HTTP 200, 915 lines); confirms webhooks, agent-join, recording start/stop, `scheduled_at` behaviour all now documented
+- [Juke embed/API reference - juke.audio/SKILL.md](https://juke.audio/SKILL.md) - [FULL] re-fetched via `curl` 2026-09-25 (HTTP 200, 643 lines); the primary source for every reversal in the Key Decisions table above - webhook events list, agent-join constraints and rate limits, recording endpoints, native-room webhook caveats, force-end endpoint
+- [ZAO codebase: `src/lib/spaces/juke-api.ts`](file:///Users/zaalpanthaki/Documents/ZAO%20OS%20V1/src/lib/spaces/juke-api.ts) - [FULL] read directly
+- [ZAO codebase: `src/lib/spaces/jukeAgentJoin.ts`](file:///Users/zaalpanthaki/Documents/ZAO%20OS%20V1/src/lib/spaces/jukeAgentJoin.ts) - [FULL] read directly
+- [ZAO codebase: `src/app/api/juke/admin/register-webhook/route.ts`](file:///Users/zaalpanthaki/Documents/ZAO%20OS%20V1/src/app/api/juke/admin/register-webhook/route.ts) - [FULL] read directly
+- [ZAO codebase: `src/lib/spaces/jukeIntegrationManifest.ts`](file:///Users/zaalpanthaki/Documents/ZAO%20OS%20V1/src/lib/spaces/jukeIntegrationManifest.ts) - [FULL] read directly; source of the shipped-feature dates and open-ask text quoted above
+- [ZAO codebase: `src/app/api/cron/juke-stale-rooms/route.ts`](file:///Users/zaalpanthaki/Documents/ZAO%20OS%20V1/src/app/api/cron/juke-stale-rooms/route.ts) - [FULL] read directly
+- `git log` on `bettercallzaal/ZAOOS` for the Juke-touching files (`jukeAgentJoin.ts`, `register-webhook/route.ts`, `juke-api.ts`) - [FULL] local git history read directly; confirms shipped-date claims (2026-05-24 to 2026-05-26 range)
+- `gh search code` across `bettercallzaal` + `ZAODEVZ` for FIP-2 / reply-tree chat work - [FULL - zero relevant hits, treated as a negative finding, not a failed fetch]
+- [Doc music/695-juke-integration-zao](../695-juke-integration-zao/) - [FULL] re-read directly for Path D status
+- LiveKit webhook sources cited in the prior version (docs.livekit.io) - not re-fetched this pass; retained only as background context, no longer load-bearing since Juke's own webhook surface now supersedes the "steal it from LiveKit" argument entirely

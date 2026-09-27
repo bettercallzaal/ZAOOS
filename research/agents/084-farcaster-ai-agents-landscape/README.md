@@ -12,11 +12,11 @@ tier: reference
 > **Status:** Research complete
 > **Date:** March 19, 2026
 
+---
+
 ## Context
 
 Deep research on the full landscape of AI agents, bots, and automated accounts on Farcaster as of March 2026. Conducted for building a ZAO community bot.
-
----
 
 ## Updated 2026-09-27
 
@@ -53,6 +53,14 @@ ElizaOS `@elizaos/plugin-farcaster` reached v1.0.5 in July 2026 with multi-langu
 **Impact on Section 5 (Frameworks):** No breaking changes; the ElizaOS recommendation still holds. The Python/Rust additions are relevant if ZAO moves toward a Python-based agent stack.
 
 - Sources (PARTIAL): https://www.npmjs.com/package/@elizaos/plugin-farcaster; https://github.com/elizaos-plugins/plugin-farcaster
+
+### 4. Music agent gap: still holds (checked 2026-09-25)
+
+Searched explicitly for music-focused AI agents on Farcaster as of September
+2026 - none found. The opportunity noted in Section 10 ("No music-focused AI
+agent exists on Farcaster") remains valid. Carried forward from the 2026-09-25
+radar pass, whose other three findings are covered above in newer words; the
+pass itself is recorded in research/_radar/2026-09-25.md.
 
 ---
 

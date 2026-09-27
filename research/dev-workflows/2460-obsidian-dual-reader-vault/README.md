@@ -2,12 +2,55 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-09-01
+last-validated: 2026-09-25
 superseded-by:
-related-docs: "2448, 2317, 2320, 2459, 2365, 2421, 2423"
+related-docs: "dev-workflows/2448-obsidian-plugins-agent-memory, dev-workflows/2317-obsidian-claude-personal-os-stack, dev-workflows/2320-logging-obsidian-capture-completeness, dev-workflows/2459-handoff-artifacts-that-get-consumed, dev-workflows/2365-agent-memory-management, dev-workflows/2421-company-brain-hq-vs-zao-vault, agents/2423-vault-as-transport-inter-terminal-context"
 original-query: "can we keep improving the docuemntation on obsidian please go /zao-research and then deep resaerch more of what we can do with obsidian to make it work better for us and our agents"
 tier: DEEP
 ---
+
+> ## RE-RESEARCHED 2026-09-25. Bases was adopted. The tag repair was not, and sprawl is worse. Read this before Finding 1.
+>
+> **Decision 2 (adopt Bases) shipped, and further than the single trial asked
+> for.** The Next Action wanted one `.base` file over `projects/` as a trial.
+> Measured today: **3 `.base` files exist** - `notes/types.base`,
+> `people/People.base`, `projects/Projects.base`. Bases is in active use, not
+> just trialled.
+>
+> **Decision 5 (fix sprawl with nested tags) did not ship, and the problem it
+> was written to fix has grown.** Doc 2448's original count (0 tags) was wrong;
+> this doc's correction (139 files, 353 distinct values) was right for
+> 2026-09-01. Re-measured today across a vault that grew from 860 to **2,069**
+> markdown files: **272 files (13%) carry frontmatter `tags:`**, and there are
+> now **approximately 586 distinct tag values** (own script, both inline
+> `[a, b]` and YAML block-list forms parsed) - up from 353, not collapsed
+> toward the "under 40" target. The diagnosis in Decision 4 ("sprawl, not
+> absence") is more true now than when written, and nobody has run the repair.
+>
+> **The stale cross-reference is fixed:** PR #3386 (bettercallzaal/ZAOOS),
+> which this doc described as "not merged yet" when it wanted to link doc
+> `dev-workflows/2459-handoff-artifacts-that-get-consumed`, **merged
+> 2026-09-01T11:10:39Z** - the same day this doc was originally validated. The
+> link is corrected in Also See below.
+>
+> **Three of the six remaining Next Actions shipped; one is confirmed
+> unverifiable as stated:** the singular `tag:` key migration mostly happened
+> (11 files down to 1 across the whole vault, not just `archive/gme-origin-story/`);
+> 19 files now carry `aliases:` (the specific 25-link mismatch this doc named
+> was not independently re-checked - flagged, not claimed fixed); and the vault
+> README now states the subfolder-scoping convention verbatim ("Point a session
+> at the folder it is working on, not at the vault root," `README.md:141`) -
+> Next Action 6 shipped. The dev-workflows index defect this doc found while
+> writing (a phantom 2447 row) is gone - checked, no longer present.
+>
+> **Not independently re-verified this pass:** the MCP-server skip decision
+> (6) and the access-table rule (1) are unchanged in substance; current star
+> counts for the three MCP candidates and Obsidian's own version (now 1.14.2,
+> released 2026-09-15, three releases ahead of the 1.13.3 this doc cited) are
+> refreshed below, with no evidence found of a breaking change to Bases syntax
+> or the tag/property model in that span (Obsidian's own changelog pages for
+> 1.14.0/1.14.1/1.14.2 render almost no static text to a plain fetch - PARTIAL,
+> not escalated further this pass; nothing here depends on their content).
 
 # 2460 - Obsidian for two readers: what the vault should adopt, and the rule that replaces "no plugins"
 
@@ -92,34 +135,38 @@ Two operational cautions, both measured:
 ### Finding 3 - This vault's tag reality, and the correction to doc 2448
 
 Doc 2448's headline finding was *"831 markdown files and ZERO containing a
-`#tag`"*, which made tags its number-one recommendation. Re-measured today across
-860 files:
+`#tag`"*, which made tags its number-one recommendation. Re-measured on
+2026-09-01 across 860 files, and again on 2026-09-25 across a vault that has
+since grown to 2,069 files:
 
-| | Count | Share |
+| | 2026-09-01 (860 files) | 2026-09-25 (2,069 files) |
 |---|---|---|
-| Files with a frontmatter `tags:` property | **139** | 16% |
-| Files with a `#tag` in body text | 70 | 8% |
-| **Distinct tag values in use** | **353** | - |
-| Files with any frontmatter at all | 512 of 652 live | 79% |
+| Files with a frontmatter `tags:` property | 139 (16%) | **272 (13%)** |
+| Files with a `#tag` in body text | 70 (8%) | not re-measured this pass |
+| **Distinct tag values in use** | 353 | **~586** |
+| Files with any frontmatter at all | 512 of 652 live (79%) | **1,646 (80%)**, per doc 2448's parallel re-measurement |
+| Files still using the removed singular `tag:` key | 11 (`archive/gme-origin-story/`) | **1**, vault-wide |
 
-All 139 use the correct inline-list form. So the vault was never at zero - 2448's
-grep pattern could not see frontmatter tags, which is where this vault puts them.
+All 139 (now 272) use the correct inline-list form. So the vault was never at
+zero - 2448's original grep pattern could not see frontmatter tags, which is
+where this vault puts them. **Updated 2026-09-25:** the tag-key migration
+(singular `tag:` to list `tags:`) is nearly done - 11 down to 1, vault-wide, not
+just the one archive folder - but the sprawl this doc actually flagged as the
+defect got worse, not better: 586 distinct values is up from 353, and the share
+of tagged files fell slightly (16% to 13%) even as the raw count grew, meaning
+tag adoption is not keeping pace with the vault's growth.
 
-The genuine defect is the 353. The vault README specifies four tags
-(`#decision`, `#blocked`, `#waiting`, `#idea`); the top of the actual
-distribution is `zaostock` 23, `zabal-gamez` 14, `x-spaces` 12, `decision` 10,
-`wavewarz` 10, `transcript` 10. A vocabulary of 353 across 139 files averages
-2.5 files per tag, which means **most tags select nothing**. A tag that returns
-one note is a filename with extra steps.
+The genuine defect is the 586 (was 353). The vault README specifies four tags
+(`#decision`, `#blocked`, `#waiting`, `#idea`); the top of the distribution on
+2026-09-01 was `zaostock` 23, `zabal-gamez` 14, `x-spaces` 12, `decision` 10,
+`wavewarz` 10, `transcript` 10 - not re-ranked this pass, but a vocabulary of
+586 across 272 files averages roughly 2.1 files per tag, which is worse than
+the 2.5 files/tag measured on 2026-09-01: **most tags still select nothing,
+and the average is dropping.**
 
-Nested tags are the repair, per Decision 5. `#zaostock/sponsors`,
-`#zaostock/roster` and `#zaostock/lineup` all answer `file.hasTag("zaostock")`.
-
-**Also found: 11 files still use the removed singular `tag:` key** (all under
-`archive/gme-origin-story/`). Obsidian removed `tag`, `alias` and `cssclass` in
-favour of the list-valued `tags`, `aliases`, `cssclasses`, and ships a Format
-converter option to migrate them. Those 11 are currently invisible to every tag
-query.
+Nested tags remain the repair, per Decision 5, and remain undone. `#zaostock/sponsors`,
+`#zaostock/roster` and `#zaostock/lineup` all still answer `file.hasTag("zaostock")` -
+no vault-wide collapse has been attempted.
 
 ### Finding 4 - The silent-truncation failure mode
 
@@ -173,27 +220,36 @@ commit.
 
 ## Next Actions
 
+Status column added 2026-09-25. Unshipped items kept, not deleted, per standing
+rule (supersede, never delete).
+
+| Action | Owner | Type | By When | Status 2026-09-25 |
+|--------|-------|------|---------|---|
+| Restate doc 2448's rule with the access table | @Zaal | PR to ZAOOS | 2026-09-08 | **Shipped** - folded into 2448's body directly on this same re-research pass, not just an amendment |
+| Build one `.base` file over `projects/` as the trial | @Zaal | PR to zao-vault | 2026-09-05 | **Shipped and exceeded** - 3 `.base` files exist (`notes/types.base`, `people/People.base`, `projects/Projects.base`) |
+| Collapse tag values to nested roots, under 40 distinct | @Zaal | PR to zao-vault | 2026-09-15 | **Not shipped.** Distinct count grew to ~586 (from 353) |
+| Migrate the singular `tag:` key files | @Zaal | PR to zao-vault | 2026-09-08 | **Mostly shipped** - 11 down to 1, vault-wide |
+| Add `aliases:` to the named mismatches | @Zaal | PR to zao-vault | 2026-09-08 | **Partially shipped** - 19 files now carry `aliases:` vault-wide; the specific 25-link mismatch was not independently re-checked this pass |
+| Record the subfolder-scoping convention in the vault README | @Zaal | PR to zao-vault | 2026-09-08 | **Shipped** - `README.md:141`, "Point a session at the folder it is working on, not at the vault root" |
+
+New action, replacing the closed tag-sprawl item above with a harder target
+given the numbers moved the wrong way:
+
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Restate doc 2448's rule as "nothing whose output exists only at render time is a source of truth", with the access table - shipped when 2448 carries the amendment and names Canvas as failing it | @Zaal | PR to ZAOOS | 2026-09-08 |
-| Build one `.base` file over `projects/` filtered on `status` and `type`, as the trial - shipped when it renders on desktop AND the phone, and `git status` shows one new `.base` file and no note bodies changed | @Zaal | PR to zao-vault | 2026-09-05 |
-| Collapse the 353 tag values to nested roots under the four standard tags plus `zaostock`, `zabal-gamez`, `wavewarz` - shipped when distinct tag count is under 40 and `file.hasTag("zaostock")` returns every ZAOstock note | @Zaal | PR to zao-vault | 2026-09-15 |
-| Migrate the 11 files still using the removed singular `tag:` key under `archive/gme-origin-story/` - shipped when a vault-wide grep for `^tag:` returns zero | @Zaal | PR to zao-vault | 2026-09-08 |
-| Add `aliases:` to the notes behind the ZABAL Gamez / Brandon / Coop mismatches (25 links) - shipped when those links resolve with no file renamed | @Zaal | PR to zao-vault | 2026-09-08 |
-| Record in the vault README that a lane auditing one folder is pointed AT that folder, not the vault root, citing the silent-truncation finding - shipped when the Conventions section says so | @Zaal | PR to zao-vault | 2026-09-08 |
+| Run the nested-tag collapse now that the sprawl is 586 values, not 353 - a hook or a one-time script, since two "collapse it" Next Actions in a row (this doc's and doc 2448's) have not moved the number - shipped when distinct tag count is under 60 | @Zaal | PR to zao-vault | 2026-10-09 |
 
 ## Also See
 
-- [Doc 2448](../2448-obsidian-plugins-agent-memory/) - the standing no-plugins decision this doc restates and whose tag measurement it corrects
-- [Doc 2317](../2317-obsidian-claude-personal-os-stack/) - the stack decision
-- **Doc 2459** - handoff artifacts that get consumed. Its Finding 4 established that agents grep rather than traverse; this doc gives the storage-level reason. **Not linked because it is not merged yet** - it is in ZAOOS PR #3386, so `../2459-*/` does not resolve on main today. Link it when that PR lands.
-- [Doc 2320](../2320-logging-obsidian-capture-completeness/) - capture conventions
-- [Doc 2421](../2421-company-brain-hq-vs-zao-vault/) - vault scope
+- [`dev-workflows/2448-obsidian-plugins-agent-memory`](../2448-obsidian-plugins-agent-memory/) - the standing no-plugins decision this doc restates and whose tag measurement it corrects; re-researched in the same pass as this doc on 2026-09-25
+- [`dev-workflows/2317-obsidian-claude-personal-os-stack`](../2317-obsidian-claude-personal-os-stack/) - the stack decision
+- [`dev-workflows/2459-handoff-artifacts-that-get-consumed`](../2459-handoff-artifacts-that-get-consumed/) - **link fixed 2026-09-25**: PR #3386 merged 2026-09-01T11:10:39Z, so this now resolves on main. Its Finding 4 established that agents grep rather than traverse; this doc gives the storage-level reason.
+- [`dev-workflows/2320-logging-obsidian-capture-completeness`](../2320-logging-obsidian-capture-completeness/) - capture conventions
+- [`dev-workflows/2421-company-brain-hq-vs-zao-vault`](../2421-company-brain-hq-vs-zao-vault/) - vault scope
 
-**Index defect found while writing this:** the `dev-workflows/README.md` index
-row for **2447** links to `./2447-obsidian-plugins-agent-memory/`, a directory
-that does not exist. 2447 and 2448 carry identical titles and summaries in the
-index; only 2448 is real.
+**Index defect found while writing the original version of this doc: FIXED.**
+The `dev-workflows/README.md` index no longer carries a phantom **2447** row -
+checked 2026-09-25, only the real 2448 row is present.
 
 ## Sources
 
@@ -209,10 +265,13 @@ index; only 2448 is real.
 - [Tags](https://obsidian.md/help/tags) - Obsidian Help. `[FULL - METHOD: exa web_fetch]` Nested tags, `file.hasTag("a")` matching `#a/b`, case-insensitivity, the YAML list form.
 - [Claude Code 1.x Inside Your Obsidian Vault: What Actually Changes](https://www.scoding.kr/2026/07/claude-code-1x-inside-your-obsidian.html) - 2026-07-29. `[FULL - METHOD: exa web_fetch]` The access table, the silent-truncation failure mode, the MOC finding, the abbreviation/text-search failure.
 - [HN 44945532 - Obsidian Bases](https://news.ycombinator.com/item?id=44945532) - 695 points, 132 substantive comments harvested. `[FULL - METHOD: hn.algolia.com/api/v1/items JSON, full comment tree walked]` Community source: the 90%-replacement read, the git-plugin danger, the manual-diff-review convergence.
-- [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) `[FULL - METHOD: gh api + LICENSE file read, not the API licence field]` MIT, 1,644 stars, pushed 2026-08-31.
-- [marcelmarais/obsidian-mcp-server](https://github.com/marcelmarais/obsidian-mcp-server) `[FULL - METHOD: gh api contents listing]` **No licence file at root** - all rights reserved despite directory listings.
-- [otaviocc/ObsidianMCPServer](https://github.com/otaviocc/ObsidianMCPServer) `[FULL - METHOD: gh api + LICENSE file read]` MIT, 16 stars.
+- [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) `[FULL - METHOD: gh api + LICENSE file read, re-fetched 2026-09-25]` MIT, **1,673 stars** (was 1,644), pushed **2026-09-21**.
+- [marcelmarais/obsidian-mcp-server](https://github.com/marcelmarais/obsidian-mcp-server) `[FULL - METHOD: gh api contents listing, re-fetched 2026-09-25]` **Still no licence file at root** despite directory listings - all rights reserved, unchanged. Now 31 stars, pushed 2026-05-10 (stale).
+- [otaviocc/ObsidianMCPServer](https://github.com/otaviocc/ObsidianMCPServer) `[FULL - METHOD: gh api + LICENSE file read, re-fetched 2026-09-25]` MIT, **17 stars** (was 16), pushed 2026-05-19 (stale).
 - Obsidian 2026 release coverage `[PARTIAL - METHOD: WebSearch result summaries; the changelog pages themselves were not fetched]` Removal of singular `tag`/`alias`/`cssclass`, the Footnotes view core plugin, Format converter migration option. The removal claim is corroborated by the Properties doc read FULL above, which lists only `tags`, `cssclasses`, `aliases` as defaults.
+- [Obsidian changelog](https://obsidian.md/changelog/) `[PARTIAL - METHOD: curl + HTML strip, 2026-09-25]` Confirms current version **1.14.2** (September 15, 2026, "Mobile catalyst" release train), three releases past the 1.13.3 this doc originally cited (1.13.7 Aug 12, 1.13.8 Aug 20, 1.14.0 Sep 2, 1.14.1 Sep 8, 1.14.2 Sep 15). Per-version changelog detail pages render almost no static text to a plain fetch (JS-rendered app shell) - not escalated further since nothing in this doc's decisions depends on the delta between 1.13.3 and 1.14.2, only on the fact that no Bases-breaking change surfaced in searching for one.
 - Obsidian MCP server landscape `[PARTIAL - METHOD: WebSearch result summaries]` Used only to enumerate candidates; every licence and star count above was then read from the GitHub API and the licence files directly.
 - Reddit `[FAILED - METHOD: not attempted]` - walled from this machine per doc 2282. No Reddit claim appears in this doc.
-- Local measurement `[FULL - METHOD: python over ~/zao-vault, 860 files, 2026-09-01]` All tag, frontmatter and property counts.
+- Local measurement `[FULL - METHOD: python over ~/zao-vault, 860 files, 2026-09-01]` Original tag, frontmatter and property counts.
+- Local re-measurement `[FULL - METHOD: python over ~/zao-vault, 2,069 files, 2026-09-25]` Updated tag (272 files/~586 values), frontmatter, `aliases:` (19 files), singular `tag:` key (1 file remaining), `.base` file count (3), README convention line, and dev-workflows index-defect checks.
+- `gh pr view 3386 --repo bettercallzaal/ZAOOS` `[FULL - METHOD: gh api, 2026-09-25]` Confirms merged 2026-09-01T11:10:39Z, fixing the stale "not merged yet" cross-reference to doc 2459.

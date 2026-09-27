@@ -27,7 +27,7 @@ private chat content. Builds on [community/2566](../2566-iman-overnight-loop/)
 |---|---|---|
 | Telegram to desk capture | **BUILD, issues not files, token first** | 1 |
 | Board (thezao.xyz/today) | **KEEP the card job; BUILD the missing answer path** | 2 |
-| Vault decisions to desk | pending | - |
+| Vault decisions to desk | **DETECT unrelayed rulings; do not auto-post** | 3 |
 | zao-tracker | pending | - |
 | ZOE | pending | - |
 | Postiz | pending | - |
@@ -149,6 +149,56 @@ line: "Answer by replying to the ZAO desk bot with numbers". Owner: Zaal's
 iman-desk lane, in the same PR as section 1. The card text change goes to the
 Dotfiles lane.
 
+## 3. Vault decisions to the desk
+
+**How it moves today.** By hand. When Zaal rules in a grill, the lane that ran
+it writes `zao-vault/decisions/grill-<date>-<seat>-<slot>.md`. If the ruling
+concerns Iman, some lane then comments on a `for-iman` issue, or opens an
+"Answered <date>" issue, quoting it. No link between the two surfaces is
+machine-checked. The 15 Sept review named this F1 and F2: two ledgers that
+never touch, and a ruling that dies in the room it was made in.
+
+**Measured, 13 to 27 Sept.**
+
+| Measure | Value | Surface |
+|---|---|---|
+| Decision files in the window | 59 | `ls decisions/` |
+| Of those, mentioning Iman or iman-desk | 24 | `grep -l -i -w iman` |
+| Of those 24, cited by path on the desk | 4 | every desk issue body and comment by bettercallzaal, `gh api` |
+| Uncited, with a line directing Iman ("Iman should", "for Iman", ...) | 8 of the 20 | pattern count per file |
+
+**Citation undercounts delivery, and that matters for the fix.** A sample of 5
+uncited files split three ways. One reached the desk under another name: the
+21 Sept afternoon grill says its answers were "posted as iman-desk#11". One was
+superseded by a later ruling: 23 Sept "invite access instead" of admin, then
+admin on 27 Sept. One had **not reached the desk at all**: 27 Sept batch 5,
+"Iman gets admin on both" Facebook Pages (ZAOstock and the new ZAO Ellsworth).
+The desk said one Page. That one was relayed to desk #13 during this pass. So
+the honest number is 4 cited, at least 1 more delivered, at least 1 missed,
+and the other 14 unknown without reading each. No surface today can answer
+"has this ruling reached Iman", which is the finding.
+
+**Why not auto-post.** A script that copies decision lines onto the desk
+would post superseded rulings, like the 23 Sept one. It would also post
+rulings meant for other lanes that only mention Iman in passing ("Iman has the
+same link"), and anything quoted in a decision that should never reach a
+repo. Relaying needs judgement. Detecting a missed relay needs none.
+
+**Build step.** A `desk:` line in the decision file, and a checker.
+
+1. **Convention (the grill skills):** a ruling that Iman must act on carries
+   one line, `desk: #<issue>` once relayed or `desk: pending` until then. The
+   `five-minute-grill` and `quick-grill` skills add it when they write the file.
+2. **Checker (dotfiles cron, next to the morning card):** `zao-desk-relay-check`
+   lists every decision file from the last 7 days with `desk: pending`, or
+   with a directive Iman line and no `desk:` line at all. It adds one board
+   card, "N rulings not yet on Iman's desk", with the file names. It never
+   posts to the desk itself.
+
+Done when the checker, run on 27 Sept data, names the batch-5 file (before
+this pass relayed it) and nothing already relayed. Owner: the Dotfiles lane
+for the checker, the skills owner for the convention.
+
 ## Also See
 
 - [community/2566 - The overnight loop](../2566-iman-overnight-loop/)
@@ -163,9 +213,13 @@ Dotfiles lane.
 | Create the bot and add `TELEGRAM_BOT_TOKEN` to iman-desk Actions secrets via `/secret`; done when the secret is listed in repo settings | @Zaal | Setup | 2026-09-30 |
 | Add the numbered-reply rule to `tg-to-issue` (answers become a comment on the Tonight issue); done when a Telegram reply "1 yes" lands on the issue | Zaal's iman-desk lane | PR | 2026-09-30 |
 | Put the morning card at the top of ON A CLOCK TODAY and add the answer-by-bot line; done when Monday's card shows both | Dotfiles lane | PR | 2026-09-29 |
+| Build `zao-desk-relay-check` and add the `desk:` line to the grill skills; done when a 27 Sept dry run names the batch-5 file and no relayed file | Dotfiles lane | PR | 2026-10-01 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 
 ## Sources
+
+- `zao-vault/decisions/` 13 to 27 Sept `[FULL]`, method: `ls`, `grep`, and five files read in full for the sample.
+- ZAODEVZ/iman-desk issue bodies and comments by bettercallzaal `[FULL]`, method: `gh api .../issues/comments --paginate`, `gh issue list --state all`.
 
 - `bettercallzaal/zaal-dotfiles` `bin/zao-iman-morning-card`, PRs #379 and #381, `cron/mac.cron` `[FULL]`, method: read locally at `ace8e45`; test run PASS; `crontab -l`, `pmset -g`.
 - Vault `TODAY.md` card counts `[FULL]`, method: `grep -c` on open and done checkboxes.

@@ -26,7 +26,7 @@ The pattern: **Monorepo as Lab.**
 | Directory | What | When to Read |
 |-----------|------|-------------|
 | `src/app/api/` | 324 route handlers across 62 domains | Working on backend |
-| `src/components/` | 296 components by feature | Working on UI |
+| `src/components/` | 295 components by feature | Working on UI |
 | `src/hooks/` | 18 custom hooks (useAuth, useChat, useRadio, etc.) | Working on state |
 | `src/lib/` | Utils across 58 domains: auth, db, farcaster, music, publish, agents | Working on business logic |
 | `src/lib/agents/` | VAULT/BANKER/DEALER autonomous trading bots | Working on agents |

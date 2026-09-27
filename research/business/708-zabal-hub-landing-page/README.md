@@ -7,7 +7,14 @@ related-docs: 624, 649, 626, 665, 707
 tier: STANDARD
 ---
 
-# 708 — ZABAL Hub: zaoos.com/zabal as the canonical ZABAL landing page
+> **HISTORICAL ARCHITECTURE NOTICE (Updated 2026-09-21):**
+> This document was authored on 2026-05-22 during the Jan-May 2026 phase when ZABAL was explored as an umbrella brand.
+> That framing was formally superseded in July 2026 by Doc 842 (research/business/842-zao-org-chart-brand-hierarchy) and re-confirmed by Zaal:
+> 1. The ZAO is the sole root idea, community, and parent umbrella.
+> 2. ZABAL is an incubated builder project UNDER The ZAO (not an umbrella over it, and not an external sibling).
+> 3. Zaal is the owner and team member of ZABAL specifically, and a contributor to other ZAO incubated projects.
+
+# 708 - ZABAL Hub: zaoos.com/zabal as the canonical ZABAL landing page
 
 > **Goal:** Page architecture + section spec to grow `zaoos.com/zabal` from a voting app into the canonical ZABAL landing page - the umbrella hub over BCZ, The ZAO, WaveWarZ, ZAO Festivals, incubated projects, and the $ZABAL token. One page: identity + live weekly vote + token + ecosystem portals + about + socials.
 

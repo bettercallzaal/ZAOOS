@@ -9,7 +9,7 @@ original-query: "Let's keep on diving deeper into ways we can improve Zaal's x a
 tier: DEEP
 ---
 
-# 2468 — X analytics for @bettercallzaal without sacrificing authenticity
+# 2468 - X analytics for @bettercallzaal without sacrificing authenticity
 
 > **Goal:** Measure the account from data it already owns, ship the engagement
 > pipeline that is already written and running nowhere, and close the 16 apps
@@ -250,33 +250,33 @@ the account, not each post.
 
 **Primary data (this account's own, highest confidence) - carried forward from 2026-09-06, NOT re-fetchable this pass:**
 
-- `~/Desktop/twitterzip.zip` `data/tweets.js` - 45,760 tweets, 2023-04-01 to 2026-07-22 — **[FAILED on re-fetch, 2026-09-25 - file no longer exists at this path or anywhere on Desktop/Downloads]** — the 2026-09-06 numbers are carried forward as historical fact (they were FULL then) but cannot be re-verified or extended to 2026Q4 until Zaal re-requests the archive
-- `~/Desktop/twitterzip.zip` `data/connected-application.js` - 28 apps with permission arrays — **[FAILED on re-fetch, 2026-09-25 - same reason]** — the 16-write/6-DM app count is UNVERIFIED as of this update; treat as last-known, not current
-- `~/Desktop/twitterzip.zip` `data/following.js` + `follower.js` — **[FAILED on re-fetch, 2026-09-25 - same reason]**
+- `~/Desktop/twitterzip.zip` `data/tweets.js` - 45,760 tweets, 2023-04-01 to 2026-07-22 - **[FAILED on re-fetch, 2026-09-25 - file no longer exists at this path or anywhere on Desktop/Downloads]** - the 2026-09-06 numbers are carried forward as historical fact (they were FULL then) but cannot be re-verified or extended to 2026Q4 until Zaal re-requests the archive
+- `~/Desktop/twitterzip.zip` `data/connected-application.js` - 28 apps with permission arrays - **[FAILED on re-fetch, 2026-09-25 - same reason]** - the 16-write/6-DM app count is UNVERIFIED as of this update; treat as last-known, not current
+- `~/Desktop/twitterzip.zip` `data/following.js` + `follower.js` - **[FAILED on re-fetch, 2026-09-25 - same reason]**
 
 **Codebase (ZAO OS V1) - re-verified live 2026-09-25:**
 
-- `src/lib/publish/x-insights.ts`, `src/app/api/cron/engagement-collect/route.ts`, `vercel.json`, `scripts/archive/migrations-run/create-engagement-metrics.sql` — **[FULL]** — method: direct read, re-confirmed 2026-09-25: `vercel.json` still lists exactly 5 crons and `engagement-collect` is still absent; `route.ts` still queries only `publish_log`
-- `gh api repos/bettercallzaal/ZAOOS/commits?path=vercel.json` — **[FULL]** — method: `gh api`, confirms no commit has touched `vercel.json` for this reason since 2026-09-06
-- `~/zao-vault/handoffs/bczximprovement.md` (2026-09-21 revision) — **[FULL]** — method: direct read; confirms the doc's line-280 correction was applied and the cron remains unscheduled per that lane's own notes
-- `~/.claude/skills/platform/profiles/x.md` — **[FULL]** — method: direct read; `Best-performing examples` filled, `Current goals` still "TO FILL"
+- `src/lib/publish/x-insights.ts`, `src/app/api/cron/engagement-collect/route.ts`, `vercel.json`, `scripts/archive/migrations-run/create-engagement-metrics.sql` - **[FULL]** - method: direct read, re-confirmed 2026-09-25: `vercel.json` still lists exactly 5 crons and `engagement-collect` is still absent; `route.ts` still queries only `publish_log`
+- `gh api repos/bettercallzaal/ZAOOS/commits?path=vercel.json` - **[FULL]** - method: `gh api`, confirms no commit has touched `vercel.json` for this reason since 2026-09-06
+- `~/zao-vault/handoffs/bczximprovement.md` (2026-09-21 revision) - **[FULL]** - method: direct read; confirms the doc's line-280 correction was applied and the cron remains unscheduled per that lane's own notes
+- `~/.claude/skills/platform/profiles/x.md` - **[FULL]** - method: direct read; `Best-performing examples` filled, `Current goals` still "TO FILL"
 
 **Official docs:**
 
-- [X API pricing](https://docs.x.com/x-api/getting-started/pricing) — **[FULL]** — method: `curl` + HTML-strip, re-fetched live 2026-09-25; Owned Reads $0.001/resource and Post-read $0.005/resource (3M/month cap) both re-confirmed verbatim on the live page
-- [X API data dictionary](https://docs.x.com/x-api/fundamentals/data-dictionary) — **[FULL]** — confirms all 6 `public_metrics` fields
-- [X API owned-reads pricing change, 2026-04-20](https://devcommunity.x.com/t/x-api-pricing-update-owned-reads-now-0-001-other-changes-effective-april-20-2026/263025) — **[FAILED - HTTP 403]** — the $0.001 figure is corroborated by the docs.x.com pricing page above, not taken from this URL
-- [X post activity dashboard help](https://business.x.com/en/help/campaign-measurement-and-analytics/tweet-activity-dashboard) — **[PARTIAL - 403 on direct fetch, content via search result]**
-- [How to download your X archive](https://help.x.com/en/managing-your-account/how-to-download-your-x-archive) — **[FAILED - HTTP 403]** — archive contents verified against the actual file instead, which is stronger
+- [X API pricing](https://docs.x.com/x-api/getting-started/pricing) - **[FULL]** - method: `curl` + HTML-strip, re-fetched live 2026-09-25; Owned Reads $0.001/resource and Post-read $0.005/resource (3M/month cap) both re-confirmed verbatim on the live page
+- [X API data dictionary](https://docs.x.com/x-api/fundamentals/data-dictionary) - **[FULL]** - confirms all 6 `public_metrics` fields
+- [X API owned-reads pricing change, 2026-04-20](https://devcommunity.x.com/t/x-api-pricing-update-owned-reads-now-0-001-other-changes-effective-april-20-2026/263025) - **[FAILED - HTTP 403]** - the $0.001 figure is corroborated by the docs.x.com pricing page above, not taken from this URL
+- [X post activity dashboard help](https://business.x.com/en/help/campaign-measurement-and-analytics/tweet-activity-dashboard) - **[PARTIAL - 403 on direct fetch, content via search result]**
+- [How to download your X archive](https://help.x.com/en/managing-your-account/how-to-download-your-x-archive) - **[FAILED - HTTP 403]** - archive contents verified against the actual file instead, which is stronger
 
 **Community:**
 
-- [Gökhan Turhan, Farcaster, 2026-09-06](https://farcaster.xyz/gokhan/0xa8158740) — **[FULL]** — method: `api.farcaster.xyz/v2/user-cast?username=gokhan&hashPrefix=0xa8158740`, raw JSON, re-fetched live 2026-09-25 (same endpoint) - cast still live, text unchanged, reaction count moved 5 -> 7 likes
-- [HN: New Twitter API pricing starts at $42,000/month](https://news.ycombinator.com/item?id=35094729) - 47pts, 23 comments, 2023-03-10 — **[FULL]** — method: HN Algolia API. Dated; cited only for the Enterprise floor
-- [HN: Filter out engagement bait on your X feed](https://news.ycombinator.com/item?id=42609151) - 71pts, 128 comments, 2025-01-06 — **[FULL]** — method: HN Algolia API
-- [HN: Vanity metrics](https://news.ycombinator.com/item?id=14167843) - 79pts, 2017 — **[FULL]** — method: HN Algolia API
+- [Gökhan Turhan, Farcaster, 2026-09-06](https://farcaster.xyz/gokhan/0xa8158740) - **[FULL]** - method: `api.farcaster.xyz/v2/user-cast?username=gokhan&hashPrefix=0xa8158740`, raw JSON, re-fetched live 2026-09-25 (same endpoint) - cast still live, text unchanged, reaction count moved 5 -> 7 likes
+- [HN: New Twitter API pricing starts at $42,000/month](https://news.ycombinator.com/item?id=35094729) - 47pts, 23 comments, 2023-03-10 - **[FULL]** - method: HN Algolia API. Dated; cited only for the Enterprise floor
+- [HN: Filter out engagement bait on your X feed](https://news.ycombinator.com/item?id=42609151) - 71pts, 128 comments, 2025-01-06 - **[FULL]** - method: HN Algolia API
+- [HN: Vanity metrics](https://news.ycombinator.com/item?id=14167843) - 79pts, 2017 - **[FULL]** - method: HN Algolia API
 
-**Third-party tool survey** — **[FULL]** — [Brand24](https://brand24.com/blog/twitter-analytics-tools/), [Sprout Social](https://sproutsocial.com/insights/twitter-analytics-tools/), [iTechGuides 2026](https://www.itechguides.com/13-best-free-twitter-x-analytics-tools-in-2026-whats-actually-free/)
+**Third-party tool survey** - **[FULL]** - [Brand24](https://brand24.com/blog/twitter-analytics-tools/), [Sprout Social](https://sproutsocial.com/insights/twitter-analytics-tools/), [iTechGuides 2026](https://www.itechguides.com/13-best-free-twitter-x-analytics-tools-in-2026-whats-actually-free/)
 
 ### Flags
 

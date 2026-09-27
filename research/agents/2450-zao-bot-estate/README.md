@@ -9,7 +9,7 @@ original-query: "other bots: what bots and automation agents exist across the ZA
 tier: STANDARD
 ---
 
-# 2450 — The ZAO Bot Estate, Measured
+# 2450 - The ZAO Bot Estate, Measured
 
 > **Goal:** Count every bot, cron, watcher and CI job actually running across the ZAO estate, say which are alive, and name the open-source projects worth adopting instead of the ones we hand-built.
 
@@ -58,7 +58,7 @@ tier: STANDARD
 
 This is a bigger, more instrumented estate than the one this doc audited in August, not a smaller or simpler one.
 
-### The Pi (ansuz, 100.117.191.11) — ZOL
+### The Pi (ansuz, 100.117.191.11) - ZOL
 
 ```
 zol-reply.js      UP - exactly one live process (pid 63135)
@@ -139,20 +139,20 @@ Licence column is read from the LICENSE file, never the API field. Stars and pus
 | [renovatebot/renovate](https://github.com/renovatebot/renovate) | 22,592 (was 22,379) | 2026-09-25 | AGPL-3.0 | SKIP, unchanged. Dependabot still enabled and working; its share did not grow enough to strain (Finding 5). |
 | [activepieces/activepieces](https://github.com/activepieces/activepieces) | 24,730 (was 24,144) | 2026-09-25 | MIT core, `packages/ee/` commercial | HOLD, unchanged. |
 | [upptime/uptime-monitor](https://github.com/upptime/uptime-monitor) | 315 (was 312) | 2026-09-21 | MIT | SKIP, unchanged. |
-| [n8n-io/n8n](https://github.com/n8n-io/n8n) | 205,984 (was 202,945) | 2026-09-25 | **Sustainable Use License — still not open source** | **REJECT on licence, unchanged.** Checked for a fully-open-source fork gaining ground; found none material. |
+| [n8n-io/n8n](https://github.com/n8n-io/n8n) | 205,984 (was 202,945) | 2026-09-25 | **Sustainable Use License - still not open source** | **REJECT on licence, unchanged.** Checked for a fully-open-source fork gaining ground; found none material. |
 
 ## Also See
 
-- [Doc 2478](../../dev-workflows/2478-inverted-alarms-signals-that-go-quiet/) — Inverted Alarms; independently arrives at the same healthchecks.io recommendation on 2026-09-08 (also now overdue, also superseded in practice by Plan 7)
-- [Doc 2456](../../agents/2456-orchestrator-practice/) — cites the dead-man's-switch pattern and SRE's "every page must be actionable" rule; conceptually related, does not supersede this doc
-- [Doc 2292](../../security/2292-agent-guardrail-tools-landscape/) — agent guardrail tooling
-- [Doc 2360](../../identity/2360-which-agent-gets-the-legal-body/) — which agent gets the legal body
-- [Doc 581](../../identity/581-bonfire-graph-wipe-bot-hygiene/) — bot hygiene (581 is an ambiguous number across the library; this is the identity-folder doc, resolved via `zao-research-health --resolve`)
-- [Doc 726](../../identity/726-bonfires-teaching-another-bot/) — teaching another bot (726 is also ambiguous; same resolution note)
-- [Doc 543](../../identity/543-bonfires-bot-shipping-questions/) — bot shipping questions (543 is also ambiguous; same resolution note)
-- `.claude/rules/silent-failure-guard.md` — green while broken
-- ZAOOS#3056 — the founding four-instances-in-24-hours issue
-- `zao-vault/projects/agentic-infrastructure-plan-2026-09-10-7-alert-routing.md` — "Plan 7," the homegrown mechanism that closed Finding 1's gap
+- [Doc 2478](../../dev-workflows/2478-inverted-alarms-signals-that-go-quiet/) - Inverted Alarms; independently arrives at the same healthchecks.io recommendation on 2026-09-08 (also now overdue, also superseded in practice by Plan 7)
+- [Doc 2456](../../agents/2456-orchestrator-practice/) - cites the dead-man's-switch pattern and SRE's "every page must be actionable" rule; conceptually related, does not supersede this doc
+- [Doc 2292](../../security/2292-agent-guardrail-tools-landscape/) - agent guardrail tooling
+- [Doc 2360](../../identity/2360-which-agent-gets-the-legal-body/) - which agent gets the legal body
+- [Doc 581](../../identity/581-bonfire-graph-wipe-bot-hygiene/) - bot hygiene (581 is an ambiguous number across the library; this is the identity-folder doc, resolved via `zao-research-health --resolve`)
+- [Doc 726](../../identity/726-bonfires-teaching-another-bot/) - teaching another bot (726 is also ambiguous; same resolution note)
+- [Doc 543](../../identity/543-bonfires-bot-shipping-questions/) - bot shipping questions (543 is also ambiguous; same resolution note)
+- `.claude/rules/silent-failure-guard.md` - green while broken
+- ZAOOS#3056 - the founding four-instances-in-24-hours issue
+- `zao-vault/projects/agentic-infrastructure-plan-2026-09-10-7-alert-routing.md` - "Plan 7," the homegrown mechanism that closed Finding 1's gap
 
 ## Next Actions
 
@@ -169,24 +169,24 @@ Licence column is read from the LICENSE file, never the API field. Stars and pus
 
 ## Sources
 
-- [GitGuardian — Renovate and Dependabot: The New Malware Delivery System](https://blog.gitguardian.com/renovate-dependabot-the-new-malware-delivery-system/) — **[FULL, method: curl + HTML strip, re-read 2026-08-31, not re-fetched this pass since its claim is historical/dated and unchanged; incident list unaffected by time]**
-- ZAODEVZ/ZAOstock branch protection — **[FULL, method: `gh api repos/ZAODEVZ/ZAOstock/branches/main/protection`, run 2026-09-25, returned 404]**
-- ZAODEVZ/ZAOstock PRs #74, #76-#80, #111, #186 — **[FULL, method: `gh api repos/ZAODEVZ/ZAOstock/pulls/<N>` and `.../issues/<N>/timeline`, run 2026-09-25]**
-- ZAODEVZ/ZAOstock `rider/route.ts` + `package.json` current source — **[FULL, method: `gh api repos/.../contents/<path>` + base64 decode of raw content, run 2026-09-25]**
-- PR authorship share (8,053 total, 25 Dependabot) — **[FULL, method: `gh api search/issues` with `user:` qualifiers (not `org:`, which 404s on these two USER accounts), run 2026-09-25]**
-- ansuz (100.117.191.11) process tree — **[FULL, method: `ssh zaal@100.117.191.11 'ps -ef' / 'tmux list-panes -a' / 'tmux list-sessions'`, run 2026-09-25]**
-- VPS 31.97.148.88 — **[PARTIAL, method: `nc -z -v` (succeeded, port 22 open) + `ssh -o PreferredAuthentications=none` (got a real SSH auth-denied banner, proving the host is live); no credential exists to go further, so bot inventory on it is still FAILED/UNMEASURED]**
-- Tailnet state — **[FULL, method: `tailscale status` + `tailscale ping`, run 2026-09-25]**
-- `~/.zao/selftest.log` current tail — **[FULL, method: direct file read + a fresh `zao-selftest --quiet` run, 2026-09-25]**
-- `zao-job` source — **[FULL, method: direct file read of `~/bin/zao-job`, 2026-09-25]**
-- `zao-alert-route` source + Plan 7 doc — **[FULL, method: direct file read of `~/bin/zao-alert-route` and `~/zao-vault/projects/agentic-infrastructure-plan-2026-09-10-7-alert-routing.md`, 2026-09-25]**
-- [healthchecks/healthchecks](https://github.com/healthchecks/healthchecks) — **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** 10,366 stars, BSD-3-Clause.
-- [n8n-io/n8n](https://github.com/n8n-io/n8n) — **[FULL, method: gh api + LICENSE.md file read, re-run 2026-09-25]** Sustainable Use License re-confirmed from file.
-- [activepieces/activepieces](https://github.com/activepieces/activepieces) — **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT core, `packages/ee/` commercial, unchanged.
-- [renovatebot/renovate](https://github.com/renovatebot/renovate) — **[FULL, method: `gh api repos/.../contents/license` (lowercase filename) raw content read, re-run 2026-09-25]** AGPL-3.0 confirmed from the licence body directly.
-- [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma) — **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT.
-- [upptime/uptime-monitor](https://github.com/upptime/uptime-monitor) — **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT.
-- ZAODEVZ workflow inventory — **[FULL, method: `gh api repos/ZAODEVZ/<repo>/contents/.github/workflows` across all 23 current repos, run 2026-09-25]**
-- Local estate (cron/launchd) — **[FULL, method: `crontab -l`, `ls ~/Library/LaunchAgents`, `launchctl list`, run 2026-09-25]**
-- `zao-research-index "bot estate"` / `"dead man's switch"` — **[FULL, method: FTS5 index search, run 2026-09-25]** No doc supersedes 2450; doc 2478 independently recommends the same superseded action.
-- `~/bin/zao-tracker search` — **[FULL, method: tracker query, run 2026-09-25]** Surfaced the still-open tracker rows for the healthchecks.io action and doc 2478's parallel ask, both closed as wontfix in this pass.
+- [GitGuardian - Renovate and Dependabot: The New Malware Delivery System](https://blog.gitguardian.com/renovate-dependabot-the-new-malware-delivery-system/) - **[FULL, method: curl + HTML strip, re-read 2026-08-31, not re-fetched this pass since its claim is historical/dated and unchanged; incident list unaffected by time]**
+- ZAODEVZ/ZAOstock branch protection - **[FULL, method: `gh api repos/ZAODEVZ/ZAOstock/branches/main/protection`, run 2026-09-25, returned 404]**
+- ZAODEVZ/ZAOstock PRs #74, #76-#80, #111, #186 - **[FULL, method: `gh api repos/ZAODEVZ/ZAOstock/pulls/<N>` and `.../issues/<N>/timeline`, run 2026-09-25]**
+- ZAODEVZ/ZAOstock `rider/route.ts` + `package.json` current source - **[FULL, method: `gh api repos/.../contents/<path>` + base64 decode of raw content, run 2026-09-25]**
+- PR authorship share (8,053 total, 25 Dependabot) - **[FULL, method: `gh api search/issues` with `user:` qualifiers (not `org:`, which 404s on these two USER accounts), run 2026-09-25]**
+- ansuz (100.117.191.11) process tree - **[FULL, method: `ssh zaal@100.117.191.11 'ps -ef' / 'tmux list-panes -a' / 'tmux list-sessions'`, run 2026-09-25]**
+- VPS 31.97.148.88 - **[PARTIAL, method: `nc -z -v` (succeeded, port 22 open) + `ssh -o PreferredAuthentications=none` (got a real SSH auth-denied banner, proving the host is live); no credential exists to go further, so bot inventory on it is still FAILED/UNMEASURED]**
+- Tailnet state - **[FULL, method: `tailscale status` + `tailscale ping`, run 2026-09-25]**
+- `~/.zao/selftest.log` current tail - **[FULL, method: direct file read + a fresh `zao-selftest --quiet` run, 2026-09-25]**
+- `zao-job` source - **[FULL, method: direct file read of `~/bin/zao-job`, 2026-09-25]**
+- `zao-alert-route` source + Plan 7 doc - **[FULL, method: direct file read of `~/bin/zao-alert-route` and `~/zao-vault/projects/agentic-infrastructure-plan-2026-09-10-7-alert-routing.md`, 2026-09-25]**
+- [healthchecks/healthchecks](https://github.com/healthchecks/healthchecks) - **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** 10,366 stars, BSD-3-Clause.
+- [n8n-io/n8n](https://github.com/n8n-io/n8n) - **[FULL, method: gh api + LICENSE.md file read, re-run 2026-09-25]** Sustainable Use License re-confirmed from file.
+- [activepieces/activepieces](https://github.com/activepieces/activepieces) - **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT core, `packages/ee/` commercial, unchanged.
+- [renovatebot/renovate](https://github.com/renovatebot/renovate) - **[FULL, method: `gh api repos/.../contents/license` (lowercase filename) raw content read, re-run 2026-09-25]** AGPL-3.0 confirmed from the licence body directly.
+- [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma) - **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT.
+- [upptime/uptime-monitor](https://github.com/upptime/uptime-monitor) - **[FULL, method: gh api + LICENSE file read, re-run 2026-09-25]** MIT.
+- ZAODEVZ workflow inventory - **[FULL, method: `gh api repos/ZAODEVZ/<repo>/contents/.github/workflows` across all 23 current repos, run 2026-09-25]**
+- Local estate (cron/launchd) - **[FULL, method: `crontab -l`, `ls ~/Library/LaunchAgents`, `launchctl list`, run 2026-09-25]**
+- `zao-research-index "bot estate"` / `"dead man's switch"` - **[FULL, method: FTS5 index search, run 2026-09-25]** No doc supersedes 2450; doc 2478 independently recommends the same superseded action.
+- `~/bin/zao-tracker search` - **[FULL, method: tracker query, run 2026-09-25]** Surfaced the still-open tracker rows for the healthchecks.io action and doc 2478's parallel ask, both closed as wontfix in this pass.

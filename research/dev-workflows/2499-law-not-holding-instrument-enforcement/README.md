@@ -9,7 +9,7 @@ original-query: "STANDARD - Why written lessons do not hold for coding agents, a
 tier: STANDARD
 ---
 
-# 2499 — A law that graduated this morning broke twice by evening: enforce at the instrument, not in prose
+# 2499 - A law that graduated this morning broke twice by evening: enforce at the instrument, not in prose
 
 > **Goal:** Say why writing a failure down as a rule does not stop it, using a shape that
 > graduated to a law and recurred the same day, and specify the one mechanism that would have
@@ -104,14 +104,14 @@ this piece IS shipped, in code, and only awaits the `settings.json` paste to tak
 
 ## Also See
 
-- [dev-workflows/461](../461-push-to-merged-pr-failure-fix/) — mechanism over memory, for pushes
-- [dev-workflows/2105](../2105-fact-vs-assertion-grounding-discipline/) — hooks over prompts for anything load-bearing
-- [security/2292](../../security/2292-agent-guardrail-tools-landscape/) — guardrail tooling landscape
-- [agents/2367](../../agents/2367-false-green-truth-lifecycle/) — false green, and why a rule beat a monitor there
-- [dev-workflows/2462](../2462-claudecode-subreddit-two-month-scan/) — the graduation rule this doc tests
-- Tracker card 9819 (status `todo`, due 2026-09-20, past due) — the settings.json wiring this doc still waits on
-- `~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md` — the built hook's own design note and coverage table (8 of 13 caught, by mechanism)
-- `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md` — Zaal's ruling that keeps settings.json wiring as his own checkpoint
+- [dev-workflows/461](../461-push-to-merged-pr-failure-fix/) - mechanism over memory, for pushes
+- [dev-workflows/2105](../2105-fact-vs-assertion-grounding-discipline/) - hooks over prompts for anything load-bearing
+- [security/2292](../../security/2292-agent-guardrail-tools-landscape/) - guardrail tooling landscape
+- [agents/2367](../../agents/2367-false-green-truth-lifecycle/) - false green, and why a rule beat a monitor there
+- [dev-workflows/2462](../2462-claudecode-subreddit-two-month-scan/) - the graduation rule this doc tests
+- Tracker card 9819 (status `todo`, due 2026-09-20, past due) - the settings.json wiring this doc still waits on
+- `~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md` - the built hook's own design note and coverage table (8 of 13 caught, by mechanism)
+- `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md` - Zaal's ruling that keeps settings.json wiring as his own checkpoint
 
 ## Next Actions
 
@@ -126,11 +126,11 @@ this piece IS shipped, in code, and only awaits the `settings.json` paste to tak
 
 ## Sources
 
-- [HN 48558502 — Show HN: A policy gate that runs before your AI coding agent's tool calls](https://news.ycombinator.com/item?id=48558502) — **[FULL, method: hn.algolia.com API]** re-verified 2026-09-25: 1 point, 0 comments, frozen since original 2026-09-17 read
-- [HN 48623765 — Show HN: ANMA, boundary contracts for cheaper AI coding agents](https://news.ycombinator.com/item?id=48623765) — **[FULL, method: hn.algolia.com API, post + comment tree]** re-verified 2026-09-25: 3 points, 2 nested comments; "13 of 19 violated / 0 of 20" and the module-boundary quote re-read verbatim, unchanged
-- [HN 48108778 — Show HN: Statewright](https://news.ycombinator.com/item?id=48108778) — **[FULL, method: hn.algolia.com API, post + nested comment count cross-checked against Algolia's `num_comments` search field]** re-verified 2026-09-25: 126 points, 59 comments, exact match to original citation
-- [github.com/anma-labs/anma](https://github.com/anma-labs/anma) — **[FULL, method: gh api + LICENSE file read]** re-verified 2026-09-25: Apache-2.0, 2 stars, 0 forks, pushed 2026-06-13 - unchanged
-- [github.com/statewright/statewright](https://github.com/statewright/statewright) — **[FULL, method: gh api + LICENSE-path 404 check]** re-verified 2026-09-25: 492 stars (was 491), 22 forks (was 21), pushed **2026-09-25** (today), no LICENSE file = all rights reserved, unchanged
-- [Claude Code hooks reference](https://docs.claude.com/en/docs/claude-code/hooks) — **[FULL, carried forward]** not re-fetched this pass; independently re-confirmed against Claude Code 2.1.278 by a separate local artifact (`~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md`) on 2026-09-19, and nothing found this pass contradicts `PreToolUse` / `permissionDecision` / exit-code semantics
-- r/ClaudeAI and r/ClaudeCode on this topic — **[NOT RE-ATTEMPTED 2026-09-25]** this doc cites no live Reddit thread and the fetch-quality gate treats this as optional when there is nothing to re-fetch; original 2026-09-17 attempt remains **[FAILED, method: `zao-fetch-reddit.sh --selftest`: token endpoint 401, OAuth API 403, public `.json` returned text/html, 0 of 3 redlib instances answered]**
-- Local, read/run directly 2026-09-25: `~/zao-vault/MISTAKES.md` (141 entries, up from 29), `~/bin/zao-mistake` (source + `due` output), `~/bin/zao-mistake-hook` (exists, built 2026-09-19, not wired), `~/bin/zao-assert` (built 2026-09-20, help text), `~/bin/zao-measure` (source, no reference-file comparison), `~/bin/zao-selftest` (source, 40 registered checks, none named `mistake`), `~/.claude/settings.json` / `zaal-dotfiles/claude/settings.json` (symlink confirmed, 13 `PreToolUse` entries, none is `zao-mistake`), `~/bin/zao-tracker search "9819"`, `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md`, `~/zao-vault/handoffs/status/zj.md` (PR #306 merge detail) — **[FULL]**
+- [HN 48558502 - Show HN: A policy gate that runs before your AI coding agent's tool calls](https://news.ycombinator.com/item?id=48558502) - **[FULL, method: hn.algolia.com API]** re-verified 2026-09-25: 1 point, 0 comments, frozen since original 2026-09-17 read
+- [HN 48623765 - Show HN: ANMA, boundary contracts for cheaper AI coding agents](https://news.ycombinator.com/item?id=48623765) - **[FULL, method: hn.algolia.com API, post + comment tree]** re-verified 2026-09-25: 3 points, 2 nested comments; "13 of 19 violated / 0 of 20" and the module-boundary quote re-read verbatim, unchanged
+- [HN 48108778 - Show HN: Statewright](https://news.ycombinator.com/item?id=48108778) - **[FULL, method: hn.algolia.com API, post + nested comment count cross-checked against Algolia's `num_comments` search field]** re-verified 2026-09-25: 126 points, 59 comments, exact match to original citation
+- [github.com/anma-labs/anma](https://github.com/anma-labs/anma) - **[FULL, method: gh api + LICENSE file read]** re-verified 2026-09-25: Apache-2.0, 2 stars, 0 forks, pushed 2026-06-13 - unchanged
+- [github.com/statewright/statewright](https://github.com/statewright/statewright) - **[FULL, method: gh api + LICENSE-path 404 check]** re-verified 2026-09-25: 492 stars (was 491), 22 forks (was 21), pushed **2026-09-25** (today), no LICENSE file = all rights reserved, unchanged
+- [Claude Code hooks reference](https://docs.claude.com/en/docs/claude-code/hooks) - **[FULL, carried forward]** not re-fetched this pass; independently re-confirmed against Claude Code 2.1.278 by a separate local artifact (`~/zao-vault/notes/mistake-check-hook-design-2026-09-19.md`) on 2026-09-19, and nothing found this pass contradicts `PreToolUse` / `permissionDecision` / exit-code semantics
+- r/ClaudeAI and r/ClaudeCode on this topic - **[NOT RE-ATTEMPTED 2026-09-25]** this doc cites no live Reddit thread and the fetch-quality gate treats this as optional when there is nothing to re-fetch; original 2026-09-17 attempt remains **[FAILED, method: `zao-fetch-reddit.sh --selftest`: token endpoint 401, OAuth API 403, public `.json` returned text/html, 0 of 3 redlib instances answered]**
+- Local, read/run directly 2026-09-25: `~/zao-vault/MISTAKES.md` (141 entries, up from 29), `~/bin/zao-mistake` (source + `due` output), `~/bin/zao-mistake-hook` (exists, built 2026-09-19, not wired), `~/bin/zao-assert` (built 2026-09-20, help text), `~/bin/zao-measure` (source, no reference-file comparison), `~/bin/zao-selftest` (source, 40 registered checks, none named `mistake`), `~/.claude/settings.json` / `zaal-dotfiles/claude/settings.json` (symlink confirmed, 13 `PreToolUse` entries, none is `zao-mistake`), `~/bin/zao-tracker search "9819"`, `~/zao-vault/decisions/grill-2026-09-23-seat-midmorning.md`, `~/zao-vault/handoffs/status/zj.md` (PR #306 merge detail) - **[FULL]**

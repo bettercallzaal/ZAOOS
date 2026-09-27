@@ -100,6 +100,10 @@ That does not decide Key Decision 1 - what OREC *should* read is still Zaal's ru
 2026-09-26 grill pointed at OG-as-achievements plus per-project ledgers, which needs an aggregator -
 but it removes "we would have to build something first" as a reason for the current state to persist.
 
+| `IRespect` wrapper OREC reads | nowhere; no `.sol` in either repo | **Zero.** No reviewer assigned (ZIP-2 Open Item 2) |
+| Public points page | `ZAOfractal/dao/` React app reading static `data/*.json`; `ZAOOS/src/app/(auth)/zao-leaderboard/` is auth-gated | **Partial.** Neither is public and live against onchain state |
+| @-able bot | `zao-fractal-bot` is slash-command and Supabase-queue driven; 0 mention listeners; `src/lib/fractalKnowledge.ts` is the nearest building block | **Partial** |
+
 ### 4. How a session actually runs, and where it breaks
 
 The live code is `bettercallzaal/zao-fractal-bot`, a TypeScript rebuild. Docs 188, 1619, 1684 and 1706 describe an older Python bot and a Telegram and ZOE flow that **does not exist in the current codebase** - treat those four docs as historical.

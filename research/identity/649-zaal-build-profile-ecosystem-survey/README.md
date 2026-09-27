@@ -8,7 +8,11 @@ tier: DISPATCH
 related-docs: [432, 570, 647, 648]
 ---
 
-# 649 — Zaal Build Profile + ZAO Ecosystem Survey
+> **HISTORICAL ARCHITECTURE NOTICE (Updated 2026-09-21):**
+> This survey was conducted on 2026-05-21 and reflects the Jan-May 2026 architectural exploration where ZABAL was modeled as an overarching umbrella.
+> For canonical brand and organizational hierarchy, refer to Doc 842 (research/business/842-zao-org-chart-brand-hierarchy) and the 2026-09-21 audit: The ZAO is the root umbrella, and ZABAL is an incubated builder project under The ZAO.
+
+# 649 - Zaal Build Profile + ZAO Ecosystem Survey
 
 > **Goal:** Survey all 84 of Zaal's GitHub repos + ZAOOS commit history to build a load-bearing profile of who Zaal is as a builder and how the ecosystem actually fits together. Feeds ZOE's `human.md` and the soul bootloader.
 

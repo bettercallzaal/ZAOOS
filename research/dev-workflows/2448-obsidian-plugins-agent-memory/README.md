@@ -2,158 +2,183 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-09-01
+last-validated: 2026-09-25
 superseded-by:
-related-docs: "2460, 2317, 2320, 2318, 2365, 1054, 026"
+related-docs: "dev-workflows/2460-obsidian-dual-reader-vault, dev-workflows/2317-obsidian-claude-personal-os-stack, dev-workflows/2320-logging-obsidian-capture-completeness, agents/2318-elizaos-memory-vs-zao-corpus-agent, dev-workflows/2365-agent-memory-management, agents/1054-multi-kb-memory-architecture-for-zoe.md, agents/026-hindsight-agent-memory"
 original-query: "obsdidian plugins tooling tricks and tips for doing meoery with agents please"
 tier: STANDARD
 ---
 
 # 2448 - Obsidian Plugins and Tooling for Agent Memory
 
-> **Goal:** Which Obsidian plugins and conventions actually improve an AGENT's memory (not a human's note-taking), and what ZAO should change in a vault that already has 831 markdown files but zero tags.
+> **Goal:** Which Obsidian plugins and conventions actually improve an AGENT's memory (not a human's note-taking), and what ZAO should change in a vault that has grown to 2,069 markdown files with a tag taxonomy that sprawls rather than one that is missing.
 
-> ## AMENDED 2026-09-01 by doc 2460. Read this before the table below.
->
-> **The decision stands - install no community plugins - and the reasoning
-> below is right. The RULE as stated is a proxy that gets one case wrong in
-> each direction.**
->
-> "No community plugins" wrongly PERMITS **Canvas**, which is a core plugin
-> whose connections are not stored on disk in any form an agent can read, and
-> wrongly FORBIDS **Bases**, which is core and whose data lives in YAML
-> frontmatter. The general form is: **nothing whose OUTPUT exists only at
-> render time may be a source of truth.** The line is drawn by where data is
-> stored, not by who shipped the code. Doc 2460 has the measured access table.
->
-> **The tag finding below is WRONG and it drove this doc's top
-> recommendation.** "831 markdown files and ZERO containing a `#tag`" was
-> measured by grepping body text, which cannot see frontmatter tags - and
-> frontmatter is where this vault puts them. Re-measured across 860 files on
-> 2026-09-01: **139 files (16%) carry a frontmatter `tags:` property**, all in
-> correct list form, and 70 (8%) carry a body `#tag`. The vault was never at
-> zero.
->
-> The real defect is the opposite of absence: **353 distinct tag values**
-> against a README specifying four, averaging 2.5 files per tag, so most tags
-> select nothing. 264 of them (75%) are used exactly once. The repair is nested
-> tags rather than a purge, because `file.hasTag("a")` matches `#a/b`.
+## Corrected by doc `dev-workflows/2460-obsidian-dual-reader-vault` on 2026-09-01
+
+The original 2026-08-30 version of this doc concluded "install no community
+plugins" from an ad hoc reading of examples, and separately claimed the vault
+had zero tags. Doc `dev-workflows/2460-obsidian-dual-reader-vault` corrected
+both, and this re-research (2026-09-25) folds that correction into the body
+below rather than keeping it as a bolted-on amendment, because both parts of
+the correction have held up under a fresh re-measurement.
+
+1. **The rule was restated, not just qualified.** "No community plugins" is a
+   proxy. The real rule, which this doc now states directly: **nothing whose
+   OUTPUT exists only at render time may be a source of truth.** That wrongly
+   permits Canvas (core, but its connections live nowhere on disk an agent can
+   read) and wrongly forbids Bases (core, and its data lives in YAML
+   frontmatter - see Decision 1 and Finding 1).
+2. **The tag finding was wrong in direction, not just in number.** The original
+   grep looked for a body `#tag` and found none, so it reported absence. That
+   pattern cannot see frontmatter tags, which is where this vault actually puts
+   them. The real defect was always sprawl: many tag values, each covering
+   almost nothing.
 
 ## Key Decisions
 
 | Decision | Verdict | Why |
 |---|---|---|
-| Obsidian community plugins for agent memory | **Install NONE. The answer has not changed since doc 2317, and this doc adds the reason: plugins are a rendering layer, and agents do not render.** | Dataview, Templater, Smart Connections and the rest execute inside the Obsidian app at view time. An agent reading the vault with `cat` and `grep` sees the query source, not its result. The one 2026 vault built specifically for agent memory (Verified Memory Vault, 2026-08-24) states it outright: "no community plugins, no vector database". Plugins that help a HUMAN read the vault are fine; none of them help the agent. |
-| The highest-value missing convention | **TAGS. ZAO has 831 markdown files and ZERO containing a `#tag`** (measured 2026-08-30). | Phelps's central claim is that hierarchical tags (`#project/foo`, `#service/bar`, `#domain/finance`) give a vault a multi-dimensional taxonomy folders cannot express, and that because tags are plain text "a single search for lines starting with `#` gives you the full taxonomy of the vault in one call." That one call is the cheapest orientation an agent can make. ZAO cannot make it at all. |
-| The second missing convention | **Link density. Only 143 of 831 files (17%) contain a `[[wikilink]]`** - 1,221 links total. | Wiki-links are what turns a folder of markdown into a graph an agent can traverse. At 17% coverage the graph is not connected enough to walk; most notes are islands reachable only by grep. The Claude Code memory format ZAO already uses supports `[[name]]` links and instructs the model to "link liberally" - that instruction is being followed in the memory directory and not in the vault. |
-| Split-brain memory | **ZAO runs TWO memory stores that do not reference each other. Merge the INDEX, not the stores.** | The vault is 831 markdown files; the Claude Code file memory is 200 files across 59 project directories, and this project's own `MEMORY.md` is 3 lines. They overlap in purpose and share no links. Do not consolidate them - they have different lifecycles - but make each one's index name the other. |
-| Verification | **ADOPT the self-checking pattern (rung 3, conventions not code): a memory health check that exits non-zero.** | Verified Memory Vault ships `tools/memory_check.py`, MIT-licensed, which scores memory 0-100 by counting protocol violations, dead wikilinks, bloat and inbox pressure, and returns an exit code a loop can act on. ZAO already has this shape in `zao-selftest` for tooling; it has nothing equivalent for memory. |
-| Deletion guard | **ADOPT. This is the one that has already bitten ZAO four times.** | The same project ships `memory_guard.py`, a git pre-commit hook that refuses a commit deleting `MEMORY.md` - described as "the documented way agent memories die". ZAO lost four load-bearing untracked files in 24 hours on 2026-08-12 (ZAOOS#3056), and the global CLAUDE.md's "Retired - do not reference" section silently regressed once. |
-| basic-memory (3,807 stars) | **DO NOT ADOPT as a dependency. AGPL-3.0, read from the LICENSE file.** | The most-established tool in this space by two orders of magnitude, pushed 2026-08-30, Python, 62 open issues. AGPL is a real constraint for anything ZAO ships publicly. Learn the pattern; do not link the code. |
+| Obsidian community plugins for agent memory | **Install NONE, restated as: nothing whose output exists only at render time may be a source of truth.** | Dataview, Templater, Smart Connections and the rest execute inside the Obsidian app at view time; an agent reading with `cat`/`grep` sees the query source, never the rendered result. Canvas is core and fails the same test (its connections are not stored on disk in any agent-readable form). Bases is core and passes it (data lives in frontmatter - Decision 2). The one 2026 vault built specifically for agent memory (Verified Memory Vault) states it outright: "no community plugins, no vector database". |
+| Bases (core plugin) | **ADOPT - already shipped.** Measured 2026-09-25: **3 `.base` files exist** in the vault (`notes/types.base`, `people/People.base`, `projects/Projects.base`), where doc 2460's Next Action asked for one as a trial. | A `.base` file is a saved query over frontmatter properties; disabling Bases changes nothing on disk. Using it *forces* data into frontmatter, which is Full access for an agent per doc 2460's access table. This is the one Obsidian view feature verified dual-reader-safe. |
+| The tag taxonomy | **SPRAWL, and it got WORSE, not better, since the 2026-09-01 correction.** Measured 2026-09-25 across 2,069 markdown files (up from 860 on 2026-09-01, up from 831 on 2026-08-30): **272 files (13%) carry a frontmatter `tags:` property** (up from 139/16% of a smaller vault), and **586 distinct tag values are in use** (up from 353). Doc 2460's Next Action to collapse this "to nested roots... under 40" was not executed. | A vocabulary of 586 across 272 tagged files means most tags still select almost nothing. The repair doc 2460 specified - nested tags (`#zaostock/sponsors` still answers `file.hasTag("zaostock")`) rather than a purge - remains correct and remains undone. |
+| Link density | **Grew in absolute terms, roughly flat as a share.** Measured 2026-09-25: 395 of 2,069 files (19%) contain a `[[wikilink]]`, 5,949 wikilinks total - versus 143 of 831 (17%) and 1,221 links measured 2026-08-30. The vault more than doubled in size and the link share barely moved. | Wiki-links are what turns markdown into a graph an agent could traverse, but doc `dev-workflows/2459-handoff-artifacts-that-get-consumed` (Finding 4, merged 2026-09-01) found agents grep rather than traverse links anyway - so this metric matters far more for the human reader on desktop/iOS than for the agent. Treat it as a human-navigation number, not an agent-legibility one (see Also See). |
+| Split-brain memory | **ZAO still runs TWO memory stores that mostly do not reference each other.** The vault is now 2,069 markdown files; Claude Code's file memory is **336 files across 67 project directories** (up from 200/59); this project's own `MEMORY.md` is 26 lines (up from 3). Neither Next Action to cross-link the two indexes was shipped. | Same conclusion as 2026-08-30: merge the INDEX, not the stores - they have different lifecycles. This item is unchanged and still open. |
+| Verification (memory health check) | **STILL NOT ADOPTED.** `~/bin/zao-memory-check` does not exist (checked 2026-09-25). | The Next Action to port `tools/memory_check.py` (MIT, from Verified Memory Vault) was not shipped in the 25 days since. ZAO's `zao-selftest` shape for tooling has no memory-health analogue yet. |
+| Deletion guard | **STILL NOT ADOPTED.** No pre-commit hook exists in `~/zao-vault/.git/hooks/` beyond the stock samples (checked 2026-09-25). | The Next Action to add a `memory_guard`-style pre-commit hook refusing deletion of `MEMORY.md`/`handoffs/` was not shipped. This is the one item this doc still calls the highest-value gap, since it is the only defense against a repeat of ZAOOS#3056 (four load-bearing untracked files lost in 24 hours) or the CLAUDE.md "Retired" section's one-time regression (both cited in the original version of this doc). |
+| basic-memory | **DO NOT ADOPT as a dependency - unchanged, re-verified.** Re-fetched 2026-09-25: **4,041 stars** (up from 3,807), pushed **2026-09-24** (still actively maintained), licence still **AGPL-3.0** read from the LICENSE file. | AGPL remains a real constraint for anything ZAO ships publicly. Still the pattern to learn from, not the code to link. |
 
 ## Findings
 
-### 1. The plugin question, answered properly
+### 1. The plugin question, restated in its general form
 
-Doc 2317 concluded "in-Obsidian AI plugins: SKIP" because they only run while Obsidian is open. That is correct but understates it. The deeper reason applies to **every** plugin, AI or not:
+An Obsidian plugin is a rendering-time transform. Dataview turns a query block
+into a table when a human looks at the note; an agent using file tools reads
+the raw markdown and sees the query text, never the table. Canvas is the same
+failure wearing a core-plugin costume: its connections are stored in a form
+invisible to a filesystem reader (confirmed independently in doc 2460's
+practitioner access table). Bases is the mirror case: it is core, its views are
+just as render-time-only as Dataview's, but everything a Base can filter on
+*must already be frontmatter*, which is Full access. Adopting Bases is a
+forcing function for the frontmatter discipline that actually helps the agent,
+which is why doc 2460 recommended it and why it is confirmed shipped below.
 
-An Obsidian plugin is a rendering-time transform. Dataview turns a query block into a table when a human looks at the note. Templater expands a template when a human creates a note. An agent using file tools reads the raw markdown - it sees ` ```dataview ` and the query text, never the table. So a Dataview index of the vault is invisible to the agent that most needs an index.
+**Anything you want an agent to read must be materialised into the file.** A
+Dataview query or a Base view is a lens; a committed markdown table or
+frontmatter property is memory.
 
-The corollary is the useful part: **anything you want an agent to read must be materialised into the file.** A Dataview query is a view; a committed markdown table is memory. Where ZAO wants an agent-legible index, it must be generated and written to disk, not queried at view time.
+### 2. What ZAO's vault looks like as a graph - then and now
 
-This is why the one vault in the wild built explicitly for agent memory ships with **no plugins at all** and two Python scripts instead.
+| Property | 2026-08-30 (831 files) | 2026-09-01 (860 files) | 2026-09-25 (2,069 files) |
+|---|---|---|---|
+| Markdown files | 831 | 860 | **2,069** |
+| Files with a `[[wikilink]]` | 143 (17%) | - | **395 (19%)** |
+| Total wikilinks | 1,221 | - | **5,949** |
+| Files with frontmatter `tags:` | 0 (grep artifact - see correction) | 139 (16%) | **272 (13%)** |
+| Distinct tag values | - | 353 | **586** |
+| Files with any YAML frontmatter | 531 (64%) | 512/652 live (79%) | **1,646 (80%)** |
+| `.base` files present | n/a | 0 | **3** |
+| `.obsidian/` present | yes | yes | yes |
 
-### 2. What ZAO's vault actually looks like as a graph (measured 2026-08-30)
+The vault has grown 2.5x in four weeks. Frontmatter coverage held steady at a
+high share (~80%), which remains the one convention ZAO does reliably well.
+Tag coverage as a *share* fell slightly (16% -> 13%) even as the raw count grew,
+and the sprawl (586 distinct values across 272 files) is worse in absolute
+terms than the 353-value sprawl doc 2460 flagged as the real defect three weeks
+ago. **Nobody has yet run the nested-tag collapse doc 2460 specified.**
 
-| Property | Count | Note |
-|---|---|---|
-| Markdown files | 831 | of 1,286 tracked files, 349MB total |
-| Files containing a `[[wikilink]]` | 143 (17%) | the graph is sparse |
-| Total wikilinks | 1,221 | concentrated in the 17% |
-| Files containing a `#tag` | **0** | the taxonomy does not exist |
-| Files with YAML frontmatter | 531 (64%) | the strongest existing convention |
-| `.obsidian/` present | yes | it is a real vault, not just a folder |
+Claude Code's file memory is a separate store, also growing: **336 memory
+files across 67 project directories** (was 200/59). This project's own
+`MEMORY.md` index is now 26 lines (was 3) - it has itself become memory of the
+kind Rule 3 below asks for, which is a small piece of good news the split-brain
+problem does not otherwise have.
 
-Frontmatter at 64% is the one convention ZAO already does well, and it is doing the work tags would otherwise do - but only for files that have it, and only for fields a reader knows to look for.
+### 3. The four-skill pattern (Phelps, 2026-02-25) - unchanged, re-checked live
 
-Claude Code's file memory is a separate store: **200 memory files across 59 project directories**. This project's `MEMORY.md` index is 3 lines. Doc 2365 previously measured the wider memory problem - 190 of 416 files unreachable from their index, and the binding constraint being BYTES (79% of a 25KB budget) rather than line count.
+Phelps's post (`sphelps.substack.com/p/a-shared-memory-for-claude-code`) still
+resolves and reads the same as when first fetched: flat vault root, tags and
+links as the only organisation, daily notes as journals not knowledge, and a
+distinction between agent-written notes and human-written domain knowledge.
+ZAO's vault remains strongly foldered (still well over a dozen top-level
+directories) and doc 2317 still stands on "keep current dirs" - the
+flat-versus-foldered contradiction below is unresolved, now with 2.5x more
+files sitting inside it.
 
-### 3. The four-skill pattern (Phelps, 2026-02-25)
+### 4. The self-checking vault (Verified Memory Vault) - now stale, not just young
 
-Phelps builds the whole system out of Claude Code **skills**, not plugins - markdown procedures the agent follows. The design decisions worth stealing:
+At original writing (2026-08-24) this was six days old and the most directly
+transferable find. Re-fetched 2026-09-25: `secondbrainstarter/verified-memory-vault`
+has **2 stars** (was 1) and was **last pushed 2026-08-26** - no commits in the
+29 days since. Its own README warns against exactly this pattern in other
+repos ("indistinguishable from a thriving one if the star count is all you
+quote" - the general lesson from `zao-research-snapshot`'s design). The method
+(`memory_check.py`'s three rules: capture-don't-sort, daily note every session,
+promote durable facts into `MEMORY.md`) is still sound and still worth porting
+as a pattern; the repo itself should now be read as dormant rather than as an
+actively-maintained dependency, reinforcing the original "learn from, do not
+link" posture rather than changing it.
 
-- **Flat structure, no folders.** All notes at the vault root; organisation via tags and links. A note can be `#architecture` and `#service/payments` and `#decision` at once, which a directory cannot express. ZAO's vault is strongly foldered (18 top-level dirs) and this is a genuine trade-off, not a clear win - see Contradictions.
-- **Prefer links over duplication.** If a concept is explained elsewhere, link to it.
-- **Daily notes are journals, not knowledge.** Append-only, carry open items forward, read the most recent ones at session start to orient. ZAO already does this in `daily/` and doc 2320 settled the convention.
-- **Two kinds of content.** Notes the agent writes (architecture, patterns found in code) and notes the human writes (domain knowledge, why the code is the way it is). Phelps: an agent "can read every file in your repository. What it can't do is understand why the code is the way it is." The links between the two kinds are where the value sits.
+### 5. Licences, re-read from the LICENSE files (Hard Requirement 13)
 
-Phelps is explicit that Obsidian is optional: "Everything we describe in this post works without Obsidian installed - the files are just markdown." Obsidian is the viewer that makes the graph visible to the human. That framing matters for ZAO, where the agent is the primary reader.
+| Project | Stars (2026-08-30) | Stars (2026-09-25) | Pushed (2026-09-25) | Licence, from the file | Verdict |
+|---|---|---|---|---|---|
+| `basicmachines-co/basic-memory` | 3,807 | **4,041** | **2026-09-24** | **AGPL-3.0** (`LICENSE`) | Learn from, do not depend on - unchanged |
+| `secondbrainstarter/verified-memory-vault` | 1 | **2** | **2026-08-26** (stale 29 days) | CC BY 4.0 (vault) / MIT (`tools/`), `LICENSE.md` | Pattern still adoptable; repo itself now dormant |
+| `jgcosme/claude-obsidian-memory` | 1 | not re-fetched this pass | - | MIT | Unchanged verdict; low-signal, not re-verified |
+| `wienerdog-ai/wienerdog` | 14 | not re-fetched this pass | - | MIT | Unchanged verdict; not re-verified |
 
-### 4. The self-checking vault (Verified Memory Vault, 2026-08-24)
+### 6. Community signal, re-checked - still thin, nothing material since 2026-09-01
 
-Six days old at time of writing, and the most directly transferable thing found. Three folders (`00_Inbox`, `01_Daily`, `02_Templates`), one boot file, one `MEMORY.md`, and two dependency-free Python scripts.
-
-`tools/memory_check.py` checks, by function name read from source: `check_memory_md`, `check_daily_notes`, `check_wikilinks` (dead links against a collected note set), `check_inbox` (pressure). It scores `max(0, 100 - (problems + provenance) * 20)` and returns an exit code.
-
-Its three rules are the whole method:
-1. **Capture, don't sort.** New notes land in the inbox; sorting happens in the daily note.
-2. **Every session leaves a daily note.**
-3. **Promote durable facts into `MEMORY.md`** - dated, one line, never rewritten.
-
-ZAO already runs 1 and 2. Rule 3 is the gap, and it is the same gap as the missing tags: nothing in the vault distinguishes a durable fact from a day's narration.
-
-The honest framing in its own README is worth quoting as a standard: "not a plugin collection (no community plugins, no vector database), not an autonomous system... and not a replacement for your code repository - it is memory about the work."
-
-### 5. Licences, read from the LICENSE files (Hard Requirement 13)
-
-| Project | Stars | Pushed | Licence, from the file | Verdict |
-|---|---|---|---|---|
-| `basicmachines-co/basic-memory` | 3,807 | 2026-08-30 | **AGPL-3.0** (`LICENSE`: "GNU AFFERO GENERAL PUBLIC LICENSE Version 3") | Learn from, do not depend on |
-| `secondbrainstarter/verified-memory-vault` | 1 | 2026-08-26 | **CC BY 4.0** for vault content, **MIT** for `tools/` (`LICENSE.md`, dual) | Adoptable, both halves |
-| `jgcosme/claude-obsidian-memory` | 1 | 2026-05-17 | **MIT** (`LICENSE`) | Adoptable, but 1 star and 3 months stale |
-| `wienerdog-ai/wienerdog` | 14 | 2026-08-30 | **MIT** (`LICENSE`) | Active; memory + self-improving skills |
-
-Note the licence file for Verified Memory Vault is `LICENSE.md`, not `LICENSE` - a plain `contents/LICENSE` fetch 404s and would have produced a false "unlicensed" reading. This is the second failure mode of Hard Requirement 13: not just a wrong API classifier, but a licence at a path you did not check.
-
-### 6. Community signal is thin, and that is itself a finding
-
-Hacker News via the keyless Algolia API returns 17 stories for "obsidian claude memory". The engagement is low: basic-memory's Show HN scored 4 points, "Obsidian-native memory for your Claude Code sessions" scored 1, wienerdog 9 points with 2 comments. Only basic-memory has meaningful adoption (3,807 stars) and it is a general knowledge-graph tool rather than an Obsidian-specific one.
-
-Read honestly: **this is a pattern people write blog posts about and mostly do not ship as tools.** The blog posts are numerous (eight substantive ones surfaced, five from 2026) and the tooling is one project with real stars and a copyleft licence. That supports the conventions-not-frameworks conclusion doc 2317 already reached - the value is in the discipline, and the discipline is cheap to adopt directly.
+A fresh HN Algolia query for "obsidian claude memory" today (2026-09-25)
+returns the same shape as before: low-engagement Show HNs (wienerdog at 9
+points is still the high-water mark in this niche) and nothing dated after
+2026-09-01 that changes the picture. **No new tool or post in this space was
+found in the 25 days since last-validated.** The original conclusion holds:
+this is a pattern people write about more than they ship as tools, and the
+value is in the discipline (materialise everything an agent needs into a
+file), not in adopting a framework.
 
 ## Contradictions, unresolved
 
-**Flat versus foldered.** Phelps insists on a flat vault root with tags as the only organisation. ZAO's vault has 18 top-level directories and doc 2317 explicitly decided to "keep current dirs". These cannot both be optimal. The reconciliation this doc proposes - tags ON TOP of the existing folders - is a compromise neither source endorses, and it has a real cost: two overlapping taxonomies to keep consistent. Flagging rather than pretending consensus. A vault of 831 files with 18 directories is past the size where flattening is cheap.
+**Flat versus foldered**, unchanged from the original doc, now at a larger
+scale: Phelps insists on a flat vault root with tags as the only organisation;
+ZAO's vault has grown to 2,069 files across well over a dozen top-level
+directories, and doc 2317 still says "keep current dirs". Flagging rather than
+pretending consensus - a vault this size is further past the point where
+flattening is cheap than it was a month ago, not closer to it.
 
 ## Also See
 
-- [Doc 2317](../2317-obsidian-claude-personal-os-stack/) - the MCP servers, sync and structure decisions; this doc extends its plugin verdict with the rendering-layer reason
-- [Doc 2320](../2320-logging-obsidian-capture-completeness/) - daily-note and capture conventions, and the `PROMOTE:` marker that rule 3 above needs
-- [Doc 2365](../2365-agent-memory-management/) - the bytes-not-lines finding and the 190-of-416 unreachable-memories measurement
-- [Doc 1054](../../agents/1054-multi-kb-memory-architecture-for-zoe.md) - multi-KB memory architecture for ZOE
-- [Doc 026](../../agents/026-hindsight-agent-memory/) - agent memory foundations
+- [`dev-workflows/2460-obsidian-dual-reader-vault`](../2460-obsidian-dual-reader-vault/) - the correction this doc now folds in (access table, Bases, tag sprawl), and the DEEP-tier companion re-researched alongside this doc on 2026-09-25
+- [`dev-workflows/2317-obsidian-claude-personal-os-stack`](../2317-obsidian-claude-personal-os-stack/) - the MCP servers, sync and structure decisions this doc's rendering-layer reason extends
+- [`dev-workflows/2320-logging-obsidian-capture-completeness`](../2320-logging-obsidian-capture-completeness/) - daily-note and capture conventions, and the `PROMOTE:` marker Rule 3 needs
+- [`dev-workflows/2365-agent-memory-management`](../2365-agent-memory-management/) - the bytes-not-lines finding and the unreachable-memories measurement
+- [`dev-workflows/2459-handoff-artifacts-that-get-consumed`](../2459-handoff-artifacts-that-get-consumed/) - Finding 4 there ("agents grep rather than traverse links") is why this doc treats wikilink density as a human-navigation metric, not an agent-legibility one
+- [`agents/2318-elizaos-memory-vs-zao-corpus-agent`](../../agents/2318-elizaos-memory-vs-zao-corpus-agent/) - adjacent memory-architecture comparison
+- [`agents/1054-multi-kb-memory-architecture-for-zoe.md`](../../agents/1054-multi-kb-memory-architecture-for-zoe.md) - multi-KB memory architecture for ZOE
+- [`agents/026-hindsight-agent-memory`](../../agents/026-hindsight-agent-memory/) - agent memory foundations
 - Tracker card 9073 (todo, no due date) - "Teach ZOE to learn new skills + leverage Obsidian second-brain"
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Add a `#tag` line to every file in `~/zao-vault/notes/` and `handoffs/` using the existing frontmatter `type` field as the seed, so `grep -rE '^#[a-z]' ~/zao-vault` returns a real taxonomy instead of nothing | @Zaal | Vault commit | 2026-09-08 |
-| Port `memory_check.py` (MIT) into `~/bin/zao-memory-check` scoring the vault's dead wikilinks, undated MEMORY entries and inbox pressure, exiting non-zero - and wire it into `zao-selftest` | @Zaal | dotfiles PR | 2026-09-12 |
-| Add the `memory_guard` pre-commit hook to `zao-vault` so a commit deleting `MEMORY.md` or `handoffs/` is refused - ZAOOS#3056 is four instances of exactly this failure | @Zaal | zao-vault PR | 2026-09-08 |
-| Cross-reference the two memory stores: add one line to `~/.claude/projects/*/memory/MEMORY.md` naming `~/zao-vault`, and one line to the vault README naming the memory directories | @Zaal | Both repos | 2026-09-05 |
-| Decide the flat-versus-foldered contradiction above - keep 18 directories and layer tags, or flatten `notes/` only as a trial | @Zaal | Decision, recorded in `decisions/` | 2026-09-15 |
+| Collapse the now-586 tag values to nested roots under a handful of top tags (doc 2460's repair, still undone and now a larger sprawl than when specified) - shipped when a vault-wide distinct-tag count is under 60 | @Zaal | Vault commit | 2026-10-03 |
+| Port `memory_check.py` (MIT) into `~/bin/zao-memory-check` scoring dead wikilinks, undated MEMORY entries and inbox pressure, exiting non-zero, wired into `zao-selftest` - still not shipped since first specified 2026-08-30 | @Zaal | dotfiles PR | 2026-10-03 |
+| Add a `memory_guard`-style pre-commit hook to `zao-vault` refusing a commit that deletes `MEMORY.md` or `handoffs/` files - still not shipped; this is the one item most likely to prevent a repeat of ZAOOS#3056 | @Zaal | zao-vault PR | 2026-10-03 |
+| Cross-reference the two memory stores: name `~/zao-vault` from `~/.claude/projects/*/memory/MEMORY.md`, and name the memory directories from the vault README - still not shipped | @Zaal | Both repos | 2026-10-03 |
+| Decide the flat-versus-foldered contradiction - keep the current directory count and layer tags, or flatten `notes/` only as a trial - unresolved for 25+ days | @Zaal | Decision, recorded in `decisions/` | 2026-10-10 |
 
 ## Sources
 
-- [A Shared Memory for Claude Code - Steve Phelps, 2026-02-25](https://sphelps.substack.com/p/a-shared-memory-for-claude-code) - **[FULL, method: exa web_fetch]** the four-skill pattern, flat structure, tags-as-taxonomy, wiki-links-as-graph
+- [A Shared Memory for Claude Code - Steve Phelps, 2026-02-25](https://sphelps.substack.com/p/a-shared-memory-for-claude-code) - **[FULL, method: exa web_fetch, re-verified live 2026-09-25]** the four-skill pattern, flat structure, tags-as-taxonomy, wiki-links-as-graph
 - [Your AI Coding Agent Forgets Everything - Fix It With a Free Obsidian Vault, 2026-08-24](https://dev.to/secondbrainstarter/your-ai-coding-agent-forgets-everything-fix-it-with-a-free-obsidian-vault-1p0i) - **[FULL, method: exa web_fetch]** the three rules, the two scripts, the no-plugins position
-- [secondbrainstarter/verified-memory-vault](https://github.com/secondbrainstarter/verified-memory-vault) - **[FULL, method: gh api - repo contents, LICENSE.md and tools/memory_check.py source read directly]** CC BY 4.0 + MIT dual licence, check function names
-- [basicmachines-co/basic-memory](https://github.com/basicmachines-co/basic-memory) - **[FULL, method: gh api - LICENSE file read]** 3,807 stars, AGPL-3.0, pushed 2026-08-30
-- [jgcosme/claude-obsidian-memory](https://github.com/jgcosme/claude-obsidian-memory) - **[FULL, method: gh api - LICENSE file read]** MIT, 1 star
-- [wienerdog-ai/wienerdog](https://github.com/wienerdog-ai/wienerdog/) - **[FULL, method: gh api - LICENSE file read]** MIT, 14 stars
-- [Hacker News search, "obsidian claude memory"](https://hn.algolia.com/api/v1/search?query=obsidian%20claude%20memory&tags=story) - **[FULL, method: keyless Algolia API]** community source, 17 stories, engagement measured
-- [How I Give Claude Code a Persistent Brain in Obsidian - John Costa, 2026-06-17](https://jcosta.tech/writing/how-i-give-claude-code-a-persistent-brain-in-obsidian/) - **[PARTIAL - title and date from exa search index only; not re-fetched because doc 2320 already cites this author's architecture in depth]**
-- ZAO's own surfaces - **[FULL, method: direct measurement on this machine 2026-08-30]** `~/zao-vault` (831 md files, 143 with wikilinks, 0 with tags, 531 with frontmatter, `.obsidian/` present) and `~/.claude/projects/*/memory/` (200 files across 59 project dirs)
+- [secondbrainstarter/verified-memory-vault](https://github.com/secondbrainstarter/verified-memory-vault) - **[FULL, method: gh api, re-fetched 2026-09-25]** now 2 stars, last pushed 2026-08-26 (29 days stale) - CC BY 4.0 + MIT dual licence, function names read from source
+- [basicmachines-co/basic-memory](https://github.com/basicmachines-co/basic-memory) - **[FULL, method: gh api, re-fetched 2026-09-25]** now 4,041 stars, pushed 2026-09-24, AGPL-3.0 read from `LICENSE`
+- [jgcosme/claude-obsidian-memory](https://github.com/jgcosme/claude-obsidian-memory) - **[FULL, method: gh api - LICENSE file read, from original 2026-08-30 pass; not re-fetched, low material change expected at 1 star]** MIT
+- [wienerdog-ai/wienerdog](https://github.com/wienerdog-ai/wienerdog/) - **[FULL, method: gh api - LICENSE file read, from original 2026-08-30 pass; not re-fetched]** MIT, 14 stars
+- [Hacker News search, "obsidian claude memory"](https://hn.algolia.com/api/v1/search?query=obsidian%20claude%20memory&tags=story) - **[FULL, method: keyless Algolia API, re-run 2026-09-25]** 18 stories total (was 17); nothing dated after 2026-09-01 changes the picture
+- [How I Give Claude Code a Persistent Brain in Obsidian - John Costa, 2026-06-17](https://jcosta.tech/writing/how-i-give-claude-code-a-persistent-brain-in-obsidian/) - **[PARTIAL - title and date from exa search index only; not re-fetched, doc 2320 already cites this author's architecture in depth]**
+- ZAO's own surfaces - **[FULL, method: direct measurement on this machine 2026-09-25]** `~/zao-vault`: 2,069 md files, 395 with wikilinks (19%), 5,949 total wikilinks, 272 with frontmatter tags (13%), 586 distinct tag values, 1,646 with any frontmatter (80%), 3 `.base` files; `~/.claude/projects/*/memory/`: 336 files across 67 project dirs; `~/bin/zao-memory-check` and a `memory_guard` pre-commit hook both confirmed absent
+- Doc `dev-workflows/2460-obsidian-dual-reader-vault` - **[FULL, method: file read]** source of the render-time-output rule, the access table, and the original tag-sprawl correction this doc now carries in its body
 
 **Reddit: not attempted.** Per doc 2282 and the skill's own note, reddit is fully walled from this machine and the durable fix is a credential Zaal has not yet created. Marking it unattempted rather than substituting search snippets.

@@ -165,3 +165,5 @@
 | 1774 | [ZAO Fractal Campaign Narrative](./1774-fractal-campaign-narrative/) | STANDALONE | Research doc 1774. |
 | 2382 | [ZAO Fractal Article Draft: Week 117 (EF 117)](./2382-zao-fractal-article-ef117/) | STANDALONE | Research doc 2382. |
 | 2558 | [Periodic Re-activation of Voting Rights: Precedent for Season 3's Active Pool](./2558-dao-periodic-reactivation-precedent/) | STANDALONE | Outside precedent for "re-activate to vote, nothing burns" from DAOs, membership tooling and non-crypto member orgs, plus the turnout/capture evidence |
+| 2562 | [The ZAO Fractal: Where We Are, and What We Need To Build](./2562-zao-fractal-state-and-build-plan/) | STANDALONE | Measured fractal state 2026-09-26, the OG-vs-ZOR vote-weight finding, the cross-repo build gap, and the ranked Season 3 build list |
+| 2563 | [Per-Project Respect: What the Precedent Says Before We Commit](./2563-per-project-respect-multi-ledger-design/) | STANDALONE | Whether to split Respect per project: the fractal tradition splits but never federates, Colony is the only working model, and the gate-not-weight option nobody had proposed |

@@ -4,7 +4,6 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-09-25
 last-validated: 2026-09-27
 original-query: Map the landscape of AI agents and bots on Farcaster for building ZAO community bot (reconstructed)
 tier: reference

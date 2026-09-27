@@ -28,7 +28,7 @@ private chat content. Builds on [community/2566](../2566-iman-overnight-loop/)
 | Telegram to desk capture | **BUILD, issues not files, token first** | 1 |
 | Board (thezao.xyz/today) | **KEEP the card job; BUILD the missing answer path** | 2 |
 | Vault decisions to desk | **DETECT unrelayed rulings; do not auto-post** | 3 |
-| zao-tracker | pending | - |
+| zao-tracker | **STOP defaulting PR test cards to Iman; mirror only his real open cards to the desk** | 4 |
 | ZOE | pending | - |
 | Postiz | pending | - |
 | Uptime and claims guards | pending | - |
@@ -199,6 +199,70 @@ Done when the checker, run on 27 Sept data, names the batch-5 file (before
 this pass relayed it) and nothing already relayed. Owner: the Dotfiles lane
 for the checker, the skills owner for the convention.
 
+## 4. zao-tracker (the cowork board's task table)
+
+**What it is.** `~/bin/zao-tracker` writes and reads the ZAO cowork tracker
+(Supabase `public.tasks`), the board ZAOcowork renders. Lanes create cards
+through it: `pr`, `research`, `inbox`, `meeting`, `handoff`, `action`. Its
+usage line reads `zao-tracker pr <pr-num> "<title>" [owner=Iman]`: **a PR
+test-plan card is owned by Iman unless the caller says otherwise.** ZAOcowork's
+`auto-close.yml` closes a card when its PR merges.
+
+**Measured, 27 Sept 19:3x ET** (`zao-tracker list`, counts from its own header):
+
+| Status | All cards | Owned by Iman |
+|---|---|---|
+| todo | 207 | 1 |
+| in_progress | 119 | 3 |
+| blocked | 0 | 0 |
+| done | 1,000 | 271 |
+
+| Of Iman's 271 done cards | Count |
+|---|---|
+| "Test plan: PR #..." (created by `zao-tracker pr`) | 130 |
+| "Inbox action: ..." | 15 |
+| "Test PR ..." | 8 |
+| Everything else | 118 |
+
+**Three findings.**
+
+1. **The tracker's Iman column is mostly machine-made.** Nearly half his done
+   cards are PR test plans a lane opened in his name and a workflow closed on
+   merge. The newest three are ZAOOS research-doc PRs (#3663, #3665, #3666). The
+   board shows 271 done for Iman, and a large share of that is not his work.
+2. **His real work is not on it.** The desk has 15+ open `for-iman` issues
+   (Postiz #30, the festival run sheet #29, the revenue plan #28 and more).
+   `zao-tracker search "iman-desk"` finds 2 cards, both owned by Zaal (the
+   Telegram token, and a drafts ruling). None of Iman's desk work is on the
+   board.
+3. **His 4 open tracker cards are old and re-dated.** Card ids 1282, 1370 and
+   1386 (in progress) and 10077 (todo) are all due 2026-10-06. That looks like
+   a bulk re-date rather than four live deadlines. One of them is "STANDING
+   DAILY: Iman reviews every open PR", and that standing duty is how the
+   PR cards land on him.
+
+So there are three ledgers of Iman's work: the desk (his, current), the
+tracker (a stale column plus auto-generated review chores), and the vault
+(rulings). Section 3 covers the vault. This section is the tracker.
+
+**Build step.** Two small changes, neither of them new tooling.
+
+1. **`zao-tracker pr` default owner: Iman to the PR's author**, or unset. A
+   test-plan card for a ZAOOS research doc belongs to whoever reviews ZAOOS,
+   and during festival week that is not Iman. Done when the next
+   `zao-tracker pr` without an owner argument creates an unowned card, and
+   Iman's open count stops rising from PR cards. Owner: Dotfiles lane (the
+   script lives in `~/bin`).
+2. **Retire or mirror his 4 open cards.** Close the three in-progress ones,
+   plus the standing "review every open PR" card, as superseded by the desk.
+   Anything still real becomes a `for-iman` issue. Done when
+   `zao-tracker list --owner iman --status in_progress` returns 0, or each card
+   links a desk issue. Owner: Zaal's iman-desk lane proposes, Zaal rules (it
+   retires a standing duty).
+
+The desk stays Iman's ledger. The tracker should not grow a second, silent
+copy of his work.
+
 ## Also See
 
 - [community/2566 - The overnight loop](../2566-iman-overnight-loop/)
@@ -214,9 +278,13 @@ for the checker, the skills owner for the convention.
 | Add the numbered-reply rule to `tg-to-issue` (answers become a comment on the Tonight issue); done when a Telegram reply "1 yes" lands on the issue | Zaal's iman-desk lane | PR | 2026-09-30 |
 | Put the morning card at the top of ON A CLOCK TODAY and add the answer-by-bot line; done when Monday's card shows both | Dotfiles lane | PR | 2026-09-29 |
 | Build `zao-desk-relay-check` and add the `desk:` line to the grill skills; done when a 27 Sept dry run names the batch-5 file and no relayed file | Dotfiles lane | PR | 2026-10-01 |
+| Change `zao-tracker pr`'s default owner from Iman to unset; done when a PR card created without an owner argument is unowned | Dotfiles lane | PR | 2026-10-01 |
+| Put retiring Iman's 4 open tracker cards (incl. the standing PR-review duty) to Zaal; done when each is closed or links a desk issue | Zaal's iman-desk lane | Ruling | 2026-10-06 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 
 ## Sources
+
+- `~/bin/zao-tracker` usage and `list`/`search` output, 27 Sept `[FULL]`, method: ran the CLI; counts from its own `tasks (N)` header, not line counts.
 
 - `zao-vault/decisions/` 13 to 27 Sept `[FULL]`, method: `ls`, `grep`, and five files read in full for the sample.
 - ZAODEVZ/iman-desk issue bodies and comments by bettercallzaal `[FULL]`, method: `gh api .../issues/comments --paginate`, `gh issue list --state all`.

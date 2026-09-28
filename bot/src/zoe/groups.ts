@@ -184,12 +184,14 @@ export function isBotMentioned(gctx: GateContext): boolean {
 
 /**
  * Detect requests in groups aimed at escalating to Zaal (e.g. "tell Zaal...", "ask Zaal...", "note for Zaal...").
+ * The `s` flag keeps every line of a multi-line note: without it `.` stops at
+ * the first newline and Zaal received only line one (doc 2570).
  */
 export function detectGroupEscalation(text: string): { isEscalation: boolean; note?: string } {
   const cleaned = text.replace(/@\w+\b/g, '').trim();
   const match =
-    /(?:please\s+)?(?:tell|ask|let|pass|notify|inform)\s+zaal(?:\s+know)?(?:\s+that|\s+to|\s*[:,])?\s*(.+)/i.exec(cleaned) ||
-    /(?:message|note)\s+for\s+zaal(?:\s*[:,])?\s*(.+)/i.exec(cleaned);
+    /(?:please\s+)?(?:tell|ask|let|pass|notify|inform)\s+zaal(?:\s+know)?(?:\s+that|\s+to|\s*[:,])?\s*(.+)/is.exec(cleaned) ||
+    /(?:message|note)\s+for\s+zaal(?:\s*[:,])?\s*(.+)/is.exec(cleaned);
   if (match && match[1]?.trim()) {
     return { isEscalation: true, note: match[1].trim() };
   }

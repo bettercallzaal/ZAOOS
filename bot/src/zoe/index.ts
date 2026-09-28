@@ -2819,12 +2819,16 @@ async function handleGroupMessage(
       const header = `[Group Message - ${chatTitle}]\nFrom: ${label}\n`;
       // Telegram rejects messages over 4096 chars, and a rejected DM means Zaal
       // gets nothing. Cut long notes and point at the group for the rest.
-      const room = 4000 - header.length;
+      // The cut-off suffix carries the group title (up to 128 chars), so size it
+      // first; a flat allowance let a long title push the DM past 4096.
+      const suffix = `\n(cut here, full text in ${chatTitle})`;
+      const room = 4000 - header.length - 2; // 2 for the quotes around the note
       const note =
         escalation.note.length > room
-          ? `${escalation.note.slice(0, room - 40)}\n(cut here, full text in ${chatTitle})`
+          ? `${escalation.note.slice(0, Math.max(0, room - suffix.length))}${suffix}`
           : escalation.note;
-      const dmNotice = `${header}"${note}"`;
+      // Hard cap as a last line of defence, whatever header and label hold.
+      const dmNotice = `${header}"${note}"`.slice(0, 4096);
       await bot.api.sendMessage(zaalId, dmNotice).catch((err) => {
         console.error('[zoe/index] failed to send group escalation DM to Zaal:', err);
       });

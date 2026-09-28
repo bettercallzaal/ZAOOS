@@ -15,6 +15,8 @@ tier: STANDARD
 
 > **Viral claim:** A post attributed to 0x_rody claiming a Google engineer says "Prompting is going away. Delete everything, keep Graph" with 44k views and a "full guide" in replies. **Actual source:** Andrew Ng (Google Brain founder) gave a 2-hour Stanford course (July 2026) on graph engineering for agentic AI, advocating graphs as an evolution from loops. **ZAO angle:** Does this approach suggest concrete upgrades to Bonfire or ZOE?
 
+> **WRONG - see [doc 2573](../2573-graph-engineering-course-provenance/). Not Ng, not 2026, not a 2-hour Stanford course: it is "AI Agents in LangGraph", DeepLearning.AI, taught by Harrison Chase and Rotem Weiss, 1h42m, announced by Ng on 2024-06-05.**
+
 ## Key Decisions (recommendations first)
 
 | # | Decision | Why | Owner |
@@ -24,6 +26,8 @@ tier: STANDARD
 | 3 | **"Prompting is going away" is overstated marketing; the real story is architectural evolution.** Prompting doesn't vanish — it evolves from crafting instructions to designing schemas, tool APIs, and eval suites (see dev.to article). Graph systems scale this by adding persistent multi-agent state and cross-session reasoning. | The hype claims a zero-sum replacement; the reality is layering. Ng's course actually teaches a *progression*: 1-shot prompt → single-turn agent loop → persistent agent graph. Each stage reuses the previous one; prompting is the foundation, not a dead technology. The ZAO position (doc 2131) already reflects this: use loops for simple tasks, graphs for complex ones. | @Zaal |
 
 ## What's REAL: Andrew Ng's Graph Engineering (grounded in actual fetches)
+
+> **WRONG - see [doc 2573](../2573-graph-engineering-course-provenance/). Not Ng, not 2026, not a 2-hour Stanford course: it is "AI Agents in LangGraph", DeepLearning.AI, taught by Harrison Chase and Rotem Weiss, 1h42m, announced by Ng on 2024-06-05.**
 
 **Source credibility:** Andrew Ng (Google Brain founder, AI educator, Stanford affiliation) released a 2-hour course on graph engineering in July 2026. The course is documented across multiple sources (Mahax, Movez, 0xRafy on X; explainx.ai blog; YouTube). The claim is real, not invented.
 
@@ -41,6 +45,8 @@ tier: STANDARD
 **Key insight from the course:** "Graphs earn themselves only when you have genuinely independent parallel work that needs to merge back (fan-out/fan-in). Otherwise a loop is simpler and cheaper."
 
 **Examples from the course:**
+> **WRONG - see doc 2573. The Zig to Rust example is not in the course: "zig" and "rust" occur 0 times in a full transcript of the video ("LangGraph" and its mis-transcriptions occur 9 times, so the search works).**
+
 - Zig→Rust port (750k lines, Anthropic): hundreds of parallel file auditors (fan-out) → independent reviewers (separate node context) → merge → synthesize. This is a graph that justifies itself.
 - Single sequential task: still a loop, even if it's an "agentic" loop with retries.
 
@@ -57,7 +63,7 @@ tier: STANDARD
 **"Prompting is going away"** - true in the sense that naive instruction-tweaking is obsolete, false if interpreted as "stop sending text to LLMs." Every agent still starts with a prompt; the prompt is just not the load-bearing component anymore (tools, schemas, evals are).
 
 **The "full guide" promise** - searched extensively; no single canonical "full guide" surfaced. The guides that exist are either:
-- Andrew Ng's YouTube course (2 hours of video, not a written guide)
+- Andrew Ng's YouTube course (2 hours of video, not a written guide) **(WRONG - see [doc 2573](../2573-graph-engineering-course-provenance/). Not Ng, not 2026, not a 2-hour Stanford course: it is "AI Agents in LangGraph", DeepLearning.AI, taught by Harrison Chase and Rotem Weiss, 1h42m, announced by Ng on 2024-06-05.)**
 - Blog posts interpreting Ng's approach (explainx.ai, alphamatch.ai, aibuilderclub.com)
 - Nebulous LLM-generated summaries claiming Ng's insights but lacking citation
 
@@ -121,7 +127,7 @@ Then bind confidence ceiling to tier at ingest, so recall can say "this is tier:
 
 | Source | Grade | Evidence |
 |---|---|---|
-| Andrew Ng, Stanford 2-hour graph engineering course (July 2026) | FULL | YouTube video link confirmed; timestamps match course structure (9:14 "first agent", 33:11 "loop engineering", 1:02:46 "graph engineering", 1:30:15 "agents that rewrite themselves", 1:49:05 "full system"). Documented across Mahax, Movez, 0xRafy X posts; explainx.ai blog post "Graphs vs Loops"; multiple interpretations converge on shared architecture. |
+| **WRONG, see doc 2573: not a Stanford course, not 2026, not by Ng; graded FULL with no transcript. The timestamps are the reposts' invented chapter titles.** Andrew Ng, Stanford 2-hour graph engineering course (July 2026) | FULL | YouTube video link confirmed; timestamps match course structure (9:14 "first agent", 33:11 "loop engineering", 1:02:46 "graph engineering", 1:30:15 "agents that rewrite themselves", 1:49:05 "full system"). Documented across Mahax, Movez, 0xRafy X posts; explainx.ai blog post "Graphs vs Loops"; multiple interpretations converge on shared architecture. |
 | dev.to article, "Prompt Engineering Is Mostly Dead in 2026" (Gabriela Naia, FULL fetch) | FULL | Direct quote on prompt engineering evolution: "Structured Output", "Tool Calling", "Context Engineering", "Evaluation Suites", "Self-Correcting Agents". Explicitly states "The loop is boring code. The prompt is gone" (tool calling context). |
 | explainx.ai blog post, "Graphs vs. Loops: Agentic AI Orchestration Debate 2026" (FULL fetch) | FULL | Concrete distinction: loops (imperative, sequential), graphs (nodes/edges, state machine). Decision tree (when to use each). LangGraph, Linear Loops, Anthropic Workflow tool named as graph frameworks. |
 | alphamatch.ai blog post, "Andrew Ng's Knowledge Graphs in AI Engineering" (FULL fetch) | FULL | Knowledge graph definition ("map intricate relationships between entities"), integration with RAG, Neo4j storage, multi-agent extraction. Benefits: accuracy, relationship awareness. |
@@ -133,10 +139,11 @@ Then bind confidence ceiling to tier at ingest, so recall can say "this is tier:
 
 **Overall verdict: REAL TECHNIQUE (architecture is sound), HYPED FRAMING (marketing oversells the replacement story).**
 
+**WRONG, see doc 2573: Ng did not give this course; it was not transcribed, so Confidence 1.0 was unfounded.**
 - **What's certain (Confidence 1.0):** Andrew Ng gave the course; graph orchestration (nodes/edges) is a real abstraction; knowledge graphs require auditable provenance; ZAO already has the control-flow graph primitives.
 - **What's actionable for ZAO (Confidence 0.85):** Provenance tiers in Bonfire will improve graph reliability (doc 798 recommended this independently; Ng's architecture validates it). Implementing this closes the gap between "we have a graph" and "our graph is trustworthy."
 - **What's marketing (Confidence 0.5):** The "prompting is going away" framing sells more than it describes. Accurate: instruction-tuning is obsolete. Misleading: prompting as a modality is foundational, not dying.
 
 ---
 
-**Session metadata:** Research completed 2026-08-17. Original viral post: x.com/0x_rody/status/2089067631269789996 (44k views, claimed "full guide" in replies). Actual source traced to Andrew Ng's July 2026 Stanford course. ZAO assessment: confirms prior architecture decisions (doc 2131), highlights one concrete gap (Bonfire provenance tiers), no new tools needed.
+**WRONG provenance, see doc 2573 (the course is the 2024 DeepLearning.AI LangGraph course, not Ng's July 2026 Stanford course).** **Session metadata:** Research completed 2026-08-17. Original viral post: x.com/0x_rody/status/2089067631269789996 (44k views, claimed "full guide" in replies). Actual source traced to Andrew Ng's July 2026 Stanford course. ZAO assessment: confirms prior architecture decisions (doc 2131), highlights one concrete gap (Bonfire provenance tiers), no new tools needed.

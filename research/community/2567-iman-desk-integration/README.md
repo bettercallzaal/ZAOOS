@@ -342,7 +342,7 @@ design, and Zaal decides any removal.
 | Build `zao-desk-relay-check` and add the `desk:` line to the grill skills; done when a 27 Sept dry run names the batch-5 file and no relayed file | Dotfiles lane | PR | 2026-10-01 |
 | Change `zao-tracker pr`'s default owner from Iman to unset; done when a PR card created without an owner argument is unowned | Dotfiles lane | PR | 2026-10-01 |
 | Put retiring Iman's 4 open tracker cards (incl. the standing PR-review duty) to Zaal; done when each is closed or links a desk issue | Zaal's iman-desk lane | Ruling | 2026-10-06 |
-| If ZOE: add `iman-answers.ts` to ZOE; done when a typed "1 yes" in ZAAL BOTZ General lands on the Tonight issue | ZOE/ZAOOS lane | PR | 2026-10-01 |
+| Extend ZOE `pending-answers` to take a numbered list and post it on the Tonight issue; done when "1 yes, 2 no" typed in General lands as one comment | ZOE/ZAOOS lane | PR | 2026-10-10 |
 | Banner the never-imported `teammate-heartbeat.ts` (never ran, 10-20 CAT window contradicts the overnight loop, date); done when the banner is on main | ZOE/ZAOOS lane | PR | 2026-10-06 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 

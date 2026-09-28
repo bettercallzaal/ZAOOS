@@ -35,6 +35,24 @@ tier: STANDARD
 
 ## Findings
 
+### Towns Of walkthrough (2026-09-28, logged in as info@thezao.com via Claude in Chrome; logged-out view via gstack browse)
+
+| Area | Found | Why it matters |
+|------|-------|----------------|
+| Orgs | Two: **The ZAO** (Maine) with Events, Audience, Roles, Tickets, Insights, Display, Forms; **ZAO Festivals** (Ellsworth) with only Events, Audience, Display | ZAO Festivals looks unapproved; The ZAO has the full toolset |
+| ZAOstock event | Exists under ZAO Festivals, Public, 0 RSVPs, tags Music / Community / Family Friendly / Outdoors, share link `share.townsof.com/e/hhcp82bwk0n` | Live to logged-out visitors with a One-click RSVP button, so it can split RSVPs from Luma |
+| Location | "No location set" in manager, "TBD" on the public page | Fix before sharing: Franklin Street Parklet, Ellsworth |
+| Description | Renders, but the closing date / place / URL lines collapse into one line | Cosmetic; zaostock.com is not a link |
+| Invites | Three sources: Your Community, Past Events, Add Emails (paste or CSV import). No send limit shown in the UI | The "re-invite past guests" pitch is real in the product; limit unverified |
+| Export | Audience tab has "Download community list" | Guest list is portable |
+| Registration | Name + email required, custom questions, saveable templates, community forms | |
+| Tickets | Free or paid tiers via Stripe, coupon codes; homepage says 0% fees | |
+| Embed | iframe `townsof.com/embed/e/<id>`, 560px, card + RSVP button | Could sit on a zaostock.com page |
+| Collab | Add Collaborator (another community), Add Host, Transfer event between orgs | The ZAO could co-host ZAO Festivals events |
+| Roles (The ZAO) | Owner info@thezao.com; Manager role available | Iman can be added as Manager |
+| Insights (The ZAO) | Events, RSVPs, ticket sales, 7-day page views; all 0 | |
+| Discover | States: NJ, PA, MA, NY, TN, GA, RI, plus "Suggest a location". **No Maine** | Discovery brings no Ellsworth audience today |
+
 ### What Luma actually limits (measured 2026-09-28)
 
 | Plan | Weekly invite + newsletter sends | Price | Notes |
@@ -75,6 +93,8 @@ HN comments place Luma and Partiful as the default for new community events ([37
 |--------|-------|------|---------|
 | DONE 2026-09-28 - call held; Towns Of adopted alongside Luma, ZAOstock RSVP stays on Luma. | @Zaal | Call | 2026-09-28 |
 | Send Towns Of a written feature-request list (branded link / custom domain, CSV export, discovery rules when also on Luma). Shipped = list sent in the DM. | @Zaal | DM | 2026-10-10 |
+| Decide the ZAOstock Towns Of listing: either set location + point RSVP to ticket.zaostock.com, or set it unlisted, so RSVPs do not split from Luma. Shipped = listing shows Franklin Street Parklet and one RSVP path. | @Zaal | Task | 2026-09-29 |
+| Ask Towns Of to add Maine to Discover and approve ZAO Festivals. Shipped = Maine chip live on /discover. | @Zaal | DM | 2026-10-10 |
 | Run the first post-festival ZAO event on Towns Of and compare RSVPs from its discovery vs Luma. Shipped = RSVP counts noted in this doc. | @Zaal | Event | 2026-10-31 |
 | Export ZAOstock Luma guest list to CSV and store it in the vault (not a public repo). Shipped = CSV file exists in vault. | @Zaal | Task | 2026-09-30 |
 | Confirm the ZAO Luma calendar is verified (500/week, not 15). Shipped = verified badge seen in Calendar settings. | @Zaal | Task | 2026-09-30 |

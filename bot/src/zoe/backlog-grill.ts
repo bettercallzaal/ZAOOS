@@ -490,6 +490,45 @@ export function isLaneOwned(metadata: unknown, title?: string | null): boolean {
 }
 
 /**
+ * THE FOCUS HORIZON (2026-09-28). The phone asks only what the terminal counts.
+ *
+ * Measured 2026-09-28: ZOE's batch of ten jammed the phone for 10.4 hours, and
+ * all ten were cards the terminal's own count (`zao-todo-week`, dotfiles #391)
+ * deliberately leaves out - nine `review` cards and one `build`, every one
+ * parked to 2026-10-06 when Zaal ruled festival week ZAOstock-only. A simulation
+ * over the live board the same day: this rule holds all ten, and of 125 cards
+ * the old filters let through, 3 remain, the same 3 the terminal counts.
+ *
+ * The rule is zao-todo-week's, copied so the two cannot disagree: a card is
+ * asked only if it is due on or before the horizon (undated counts) AND its
+ * `card_type` puts it in his hand (hand, decision, ask) - or, untyped, it is not
+ * a lane's own handoff. build, review and record are lane work; they come back
+ * as a PR or a ruling, which is a new card. Edit one, edit the other.
+ *
+ * Like isLaneOwned it filters the live row, not state: move a card's due date
+ * back inside the horizon and it is asked on the next tick.
+ */
+const HIS_HAND = new Set(['hand', 'decision', 'ask']);
+
+export function focusHorizon(nowMs: number, focusDate: string | undefined): string {
+  if (focusDate && /^\d{4}-\d{2}-\d{2}$/.test(focusDate) && Number.isFinite(Date.parse(focusDate))) {
+    return focusDate;
+  }
+  return new Date(nowMs + 6 * 86_400_000).toISOString().slice(0, 10);
+}
+
+export function isOffClock(
+  row: { due?: string | null; metadata?: unknown; legacy_source?: string | null },
+  horizon: string,
+): boolean {
+  if (row.due && row.due.slice(0, 10) > horizon) return true;
+  const md = row.metadata && typeof row.metadata === 'object' ? (row.metadata as Record<string, unknown>) : {};
+  const t = typeof md.card_type === 'string' ? md.card_type : '';
+  if (t) return !HIS_HAND.has(t);
+  return String(row.legacy_source ?? '').startsWith('handoff:');
+}
+
+/**
  * Classify one asked-entry's board row for reconcile.
  *
  *  - row missing (task deleted): 'board-closed' - there is nothing left to ask.

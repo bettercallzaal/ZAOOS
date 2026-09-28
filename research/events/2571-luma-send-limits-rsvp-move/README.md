@@ -1,7 +1,7 @@
 ---
 topic: events
 type: decision
-status: research-complete
+status: decided
 last-validated: 2026-09-28
 superseded-by:
 related-docs: "events/901-luma-july-build-days, infrastructure/2099-one-event-three-surfaces"
@@ -13,7 +13,14 @@ tier: STANDARD
 
 > **Goal:** Check the "$70/month to re-invite past guests" claim from a vendor DM, and decide what (if anything) moves off Luma, given ZAOstock is on Oct 3, 2026.
 
-**Vendor is unnamed.** The pasted DM thread (2026-09-28) does not name the platform pitching the move. Everything below about Luma is measured; nothing below evaluates the vendor itself. That evaluation needs its name.
+## Outcome (2026-09-28, after the call)
+
+**The vendor is Towns Of** (townsof.com, Instagram @towns_of). Zaal had the call and decided: **use Towns Of alongside Luma, not instead of it**, to grow future events. In Zaal's words it is "basically a free luma", and the founder offered to hear ZAO feature requests.
+
+- Org created: townsof.com/org/zao-festivals (organizer review was pending at creation).
+- ZAOstock Oct 3 RSVP stays on Luma via `ticket.zaostock.com`. Decision 1 below holds.
+- Open item from the onboarding screens: discovery is "only offered to event hosts who exclusively run their registration through our platform". Running both means ZAO events may not appear in Towns Of discovery. Confirm per-event vs per-org.
+- Towns Of pricing was not published on its site (JS shell, curl 2026-09-28); "free" is from the call, not a page.
 
 ## Key Decisions
 
@@ -66,10 +73,11 @@ HN comments place Luma and Partiful as the default for new community events ([37
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Tell the vendor the ZAOstock RSVP stays on Luma through Oct 3; move talk is for post-festival events. Shipped = message sent. | @Zaal | DM | 2026-09-28 |
+| DONE 2026-09-28 - call held; Towns Of adopted alongside Luma, ZAOstock RSVP stays on Luma. | @Zaal | Call | 2026-09-28 |
+| Send Towns Of a written feature-request list (branded link / custom domain, CSV export, discovery rules when also on Luma). Shipped = list sent in the DM. | @Zaal | DM | 2026-10-10 |
+| Run the first post-festival ZAO event on Towns Of and compare RSVPs from its discovery vs Luma. Shipped = RSVP counts noted in this doc. | @Zaal | Event | 2026-10-31 |
 | Export ZAOstock Luma guest list to CSV and store it in the vault (not a public repo). Shipped = CSV file exists in vault. | @Zaal | Task | 2026-09-30 |
 | Confirm the ZAO Luma calendar is verified (500/week, not 15). Shipped = verified badge seen in Calendar settings. | @Zaal | Task | 2026-09-30 |
-| Get the vendor's name + answers to the 5 call questions, then re-research as a 3-way compare (Luma free / Luma Plus / vendor). Shipped = doc 2571 updated with the comparison. | @Zaal | Doc | 2026-10-10 |
 
 ## Sources
 
@@ -80,5 +88,8 @@ HN comments place Luma and Partiful as the default for new community events ([37
 - [Luma Help - Inviting and Adding Guests](https://help.luma.com/p/inviting-and-adding-guests-to-your-event) [FULL, curl] - invite by contact tags
 - [HN comment 37758449](https://news.ycombinator.com/item?id=37758449) [FULL, HN Algolia API] - Luma + Partiful as default
 - [HN comment 40731834](https://news.ycombinator.com/item?id=40731834) [FULL, HN Algolia API] - repeat attendance unsolved
-- Pasted DM thread from Zaal, 2026-09-28 [FULL as pasted; vendor name absent]
+- Pasted DM thread from Zaal, 2026-09-28 [FULL as pasted]
+- Towns Of onboarding screens, screenshots from Zaal 2026-09-28 [FULL as shown] - org dashboard, CSV + past-event invites, discovery exclusivity rule, organizer review
+- [townsof.com](https://townsof.com) [FAILED - curl returns a JS shell with title only; no pricing page readable]
+- Call outcome, Zaal in chat 2026-09-28 [FULL as reported]
 - Monthly Luma Plus price [PARTIAL - $69 derived from $59 and "save 14%"; the monthly figure sits behind a JS toggle and was not read directly]

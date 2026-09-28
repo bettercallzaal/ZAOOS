@@ -2816,10 +2816,27 @@ async function handleGroupMessage(
     const escalation = detectGroupEscalation(text);
     if (escalation.isEscalation && escalation.note) {
       const chatTitle = ctx.chat && 'title' in ctx.chat ? (ctx.chat.title ?? scope) : scope;
-      const dmNotice = `[Group Message - ${chatTitle}]\nFrom: ${label}\n"${escalation.note}"`;
+      const header = `[Group Message - ${chatTitle}]\nFrom: ${label}\n`;
+      // Telegram rejects messages over 4096 chars, and a rejected DM means Zaal
+      // gets nothing. Cut long notes and point at the group for the rest.
+      const room = 4000 - header.length;
+      const note =
+        escalation.note.length > room
+          ? `${escalation.note.slice(0, room - 40)}\n(cut here, full text in ${chatTitle})`
+          : escalation.note;
+      const dmNotice = `${header}"${note}"`;
       await bot.api.sendMessage(zaalId, dmNotice).catch((err) => {
         console.error('[zoe/index] failed to send group escalation DM to Zaal:', err);
       });
+      // Remember the relay in the group and in Zaal's DM. This path returns
+      // before dispatchConcierge, so without these ZOE cannot answer a
+      // follow-up about the message in either place (doc 2570).
+      await pushRecent({ from: 'other', text, sender: label }, scope).catch((e) =>
+        console.error('[zoe/index] escalation group log failed:', (e as Error)?.message),
+      );
+      await pushRecent({ from: 'zoe', text: dmNotice }, 'private').catch((e) =>
+        console.error('[zoe/index] escalation DM log failed:', (e as Error)?.message),
+      );
       await applyTaskOps([
         {
           op: 'add',

@@ -8,6 +8,14 @@ describe('detectGroupEscalation', () => {
     expect(res.note).toBe('the soundcheck is at 5pm');
   });
 
+  it('keeps every line of a multi-line note', () => {
+    const res = detectGroupEscalation(
+      '@zaoclaw_bot tell Zaal: from IMan, the list for today.\n\nMINE:\n1. Chamber poster\n2. Poidh day 2',
+    );
+    expect(res.isEscalation).toBe(true);
+    expect(res.note).toBe('from IMan, the list for today.\n\nMINE:\n1. Chamber poster\n2. Poidh day 2');
+  });
+
   it('detects mentions followed by tell zaal', () => {
     const res = detectGroupEscalation('@zaoclaw_bot tell Zaal to check Telegram');
     expect(res.isEscalation).toBe(true);

@@ -1,31 +1,17 @@
-# ICM: Zaal Panthaki (BetterCallZaal)
+# BetterCallZaal
 
-Identifier: zaal (aka bettercallzaal)
-Role: Founder of The ZAO. Builder, connector, and operator across web3, music, and community.
+BetterCallZaal is the personal brand and operator layer of Zaal Panthaki, founder of The ZAO. It is one word, camelCase, and it is where his build-in-public practice, consulting, and web3-music work live under a single name. The legal entity behind it is BCZ Strategies LLC.
 
-## Who
-Zaal Panthaki, known as BetterCallZaal. Founder of The ZAO (ZAO = ZTalent Artist Organization), a decentralized impact network bringing the profit margin, data, and IP rights back to artists using emerging technology like blockchain and AI. Electrical engineer (BS EE, RIT 2022). Maine-based. Builds in public.
+## What it is
 
-## What he runs
-- The ZAO - the impact network (music first, community second, technology third)
-- BetterCallZaal Strategies LLC - his operating and consulting entity
-- COC Concertz - live concert series
-- ZABAL Games - a 3-month build-a-thon for artists, builders, and creators
-- The ZAO festivals - ZAOstock and ZAOville
-- WaveWarZ - live-traded music battles, part of the ZAO ecosystem
+Zaal builds at the intersection of music, culture, and emerging technology, using blockchain and AI as means rather than headlines. BetterCallZaal is the layer that ships that work. Through it he founded and runs The ZAO, a decentralized impact network that returns profit margin, data, and IP rights to artists, with music as its first artist domain. The same operator layer runs WaveWarZ, ZABAL Gamez, and the ZAOstock festival.
 
-## How he works
-- Ships MVP-first and iterates. Builds in public and documents the journey.
-- Mobile-first, dark theme. Farcaster-native. Uses Claude Code heavily.
-- Prefers open-source and owned distribution over rented platforms.
+BetterCallZaal is also an agency. It advises and builds for other founders and communities moving into web3 and AI, with a strong bias toward open source and shipping in public rather than pitching decks. The working style is direct, builder-first, and allergic to hype.
 
-## Find him
-- Farcaster: @zaal (also posts as @bettercallzaal)
-- X and YouTube: @bettercallzaal
-- GitHub: github.com/bettercallzaal
-- Sites: bettercallzaal.com, thezao.xyz, zaoos.com
+## How to reach it
 
-## Related boxes
-- The ZAO (thezao)
-- ZABAL Games (zabalgamez)
-- WaveWarZ (wavewarz)
+Farcaster @zaal, X and YouTube @bettercallzaal, and the site bettercallzaal.com. Zaal wakes early and builds in focused blocks, documenting the process as he goes.
+
+## Related
+
+The ZAO, WaveWarZ, ZABAL Gamez, ZAOstock, Fractal.

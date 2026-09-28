@@ -26,5 +26,5 @@ The ZAO assistant is the AI operator layer for Zaal (BetterCallZaal) and The ZAO
 ## Related boxes
 - Zaal (bettercallzaal)
 - The ZAO (thezao)
-- ZABAL Games (zabalgamez)
+- ZABAL Gamez (zabalgamez)
 - WaveWarZ (wavewarz)

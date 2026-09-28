@@ -1,44 +1,40 @@
 # ICM: WaveWarZ
 
-WaveWarZ is live-traded music battles on Solana: artists battle, fans trade positions and earn. Part of The ZAO (ZTalent Artist Organization) ecosystem. A proof that a DAO can build and ship a revenue-generating product.
+WaveWarZ is live-traded music battles: two artists battle, fans trade predictions on the outcome and earn in real time. Part of The ZAO ecosystem.
 
 ## What it is
-- A prediction-market-style music battle platform on Solana mainnet
-- Quick battles run on weekdays; main events run on Sundays; community battles run as booked
-- Artists compete; fans trade positions on outcomes and earn SOL on correct picks
-- 100% of artist payouts settle automatically on-chain — no intermediaries
-- On-chain program ID: 9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo (Solana mainnet)
+- A prediction-market-style music battle platform on Solana mainnet, with a Base testnet (Base Sepolia, live Feb 2026) and a Base-to-Solana bridge so Base users can join.
+- Two artists go head-to-head; fans buy into the outcome on a bonding curve.
+- Settlement: a 2-of-3 judging system (human judge + X poll + on-chain SOL vote). Quick battles use poll + charts + an AI judge.
+- Artists earn ~1% per trade, paid instantly; the platform keeps a small fee and most value stays in the ecosystem.
 
-## Live traction (verified 2026-07-16 · wavewarz.info/api/public/stats)
-- **1,245 total battles** (1,047 Quick + 162 Main Battles + 50 Main Events + 36 Community)
-- **524.15 SOL lifetime volume** (~$39K at $75.29/SOL, 2026-07-17)
-- **9.07 SOL paid to artists** (automatic, on-chain)
-- **17.44 SOL platform revenue**
-- **127.34 SOL paid to winning traders**
+## Cadence
+- Main events: artist vs artist, multi-round, streamed (X Spaces + YouTube + Retake).
+- Quick battles: song vs song, weekdays (Mon-Fri ~8:30pm EST); special events + tournaments on Sundays.
 
-## Community and charity impact
-- Two PolyRaiders charity benefit battles raised **~$1,497 total for HuRya Empowerment Foundation**:
-  - Holiday Heat (Dec 12 2024): ~$270
-  - Love Song Benefit (Feb 13 2025): ~$1,221
-- 8,500+ beneficiaries globally (4,000+ girls received sanitary pads; 4,500+ children received school supplies)
-- Platform fees waived for both charity rounds — 100% went to the cause
+## Team
+- Hurric4n3ike - founder / dev / MC
+- Candytoybox (Samantha) - design / marketing / CC0 art
+- Zaal (BetterCallZaal) - ecosystem strategy + partnerships
 
-## IRL events featuring WaveWarZ
-- ZAO-CHELLA (Art Basel, Wynwood, Miami — December 6 2024): first IRL WaveWarZ event
-- ZAOstock (Franklin St Parklet, Ellsworth ME — October 3 2026): ZAO flagship annual festival
+## Role in The ZAO
+- WaveWarZ is the always-on "front door / gravity well" for fans and players: outsiders (often founders with their own ecosystems) come to The ZAO and discover WaveWarZ. It is a top-of-funnel magnet, not a deal-closer or rails product.
+- ZABAL Gamez is the parallel front door for builders; both feed the ZAO community.
+- Distribution partners include Coinflow, Juke, Empire Builder, Neynar, RAM/SongChain, and Privy.
 
-## In the ZAO ecosystem
-- Built and governed by The ZAO (ZTalent Artist Organization), 100+ consecutive Fractal governance weeks
-- One of the ZAO production lanes alongside ZABAL Games and the festivals
-- Analytics tracked publicly at wwtracker.vercel.app (open-source fan dashboard)
+## Traction (as of May 2026, snapshot)
+- ~980 battles run; ~458 SOL cumulative volume; artist payouts flowing. Figures are a point-in-time snapshot - verify current numbers on the dashboards.
+
+## In design: the 24h protocol
+An always-on model: a ~23-hour entry queue plus a short live settlement each cycle, enterable by a person or an AI agent (via x402 on Base). Not yet live.
 
 ## Find it
-- wavewarz.com
-- API: wavewarz.info/api/public/stats (public, no auth, 60s cache)
+- wavewarz.com; intelligence + analytics dashboards linked from there
 - X: @WaveWarZ
-- Farcaster: /wavewarz channel on Warpcast
+- Farcaster: the /wavewarz channel
+- Embedded in ZAO OS at /wavewarz
 
 ## Related boxes
 - The ZAO (thezao)
 - Zaal (zaal)
-- ZABAL Games (zabalgamez)
+- ZABAL Gamez (zabalgamez)

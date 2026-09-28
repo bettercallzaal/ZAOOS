@@ -25,11 +25,11 @@ private chat content. Builds on [community/2566](../2566-iman-overnight-loop/)
 
 | Integration point | Call | Section |
 |---|---|---|
-| Telegram to desk capture | **BUILD, issues not files, token first** | 1 |
+| Telegram to desk capture | **Built as desk PR #31, now ON HOLD: section 5 found a route with no new token** | 1, 5 |
 | Board (thezao.xyz/today) | **KEEP the card job; BUILD the missing answer path** | 2 |
 | Vault decisions to desk | **DETECT unrelayed rulings; do not auto-post** | 3 |
 | zao-tracker | **STOP defaulting PR test cards to Iman; mirror only his real open cards to the desk** | 4 |
-| ZOE | pending | - |
+| ZOE | **PREFER ZOE for the answer path (no new bot, no token); hold the desk bot #31; delete the dead heartbeat** | 5 |
 | Postiz | pending | - |
 | Uptime and claims guards | pending | - |
 | Iman's other ZAODEVZ repos | pending | - |
@@ -263,6 +263,54 @@ tracker (a stale column plus auto-generated review chores), and the vault
 The desk stays Iman's ledger. The tracker should not grow a second, silent
 copy of his work.
 
+## 5. ZOE
+
+**What ZOE is.** ZAO's Telegram agent. Its code is `bot/src/` in ZAOOS (157
+files under `bot/src/zoe/`), and it runs on the VPS, deployed from ZAOOS main
+(SYSTEM_MAP). Zaal already talks to it daily in the ZAAL BOTZ group.
+
+**Measured on ZAOOS origin/main, 27 Sept.**
+
+| Question | Answer | Where |
+|---|---|---|
+| Files in ZOE's code that mention `iman-desk` | **0** | `grep -rli iman-desk bot/src` |
+| Can Zaal answer ZOE by just typing? | **Yes.** ZAAL BOTZ General is the "gesture-free ANSWER surface": ZOE arms a question id when it pushes, and Zaal's next plain message there routes back as `[answer:<qid>]` | `bot/src/zoe/pending-answers.ts`, used by `index.ts` and `orchestrator-tick.ts` |
+| Can ZOE write to GitHub? | **Yes, via the gh CLI**, "authenticated on the VPS - the bot has no GITHUB_TOKEN env" | `bot/src/cockpit/adapters.ts` |
+| Is the Iman heartbeat running? | **No.** `teammate-heartbeat.ts` (#2991, 8 Aug) has **zero importers**, so it has never run | `grep -rl teammate-heartbeat bot/src` |
+| Does the heartbeat match today's rules? | **No.** It schedules Iman 10:00 to 20:00 CAT, every 4 hours. The overnight loop (27 Sept) runs him 06:00 to 11:00 CAT | `IMAN_DEFAULT` in the same file |
+
+**What this changes.** Sections 1 and 2 recommended a new Telegram bot for the
+desk, and it was built as iman-desk PR #31. It needs a new bot, a token in
+repo secrets and a four-step setup by Zaal (card 10135, due 28 Sept). ZOE
+already has the two halves of the same job: a place where Zaal answers by
+typing, and a signed-in GitHub CLI. The cheaper design uses the bot Zaal
+already talks to:
+
+1. When Iman's Morning report lands (or the morning card job sees it), ZOE
+   pushes the numbered questions to ZAAL BOTZ General and arms the answer.
+2. Zaal types "1 yes, 2 no: use B".
+3. ZOE posts it on the Tonight issue as **Answers from Zaal**, the same shape
+   the desk already expects (CLAUDE.md, the overnight loop).
+
+That needs no new secret, no new bot and no setup by Zaal. It also puts the
+question where he already answers ZOE, not in a second bot chat.
+
+**Unverified, and it decides whether this works:** which GitHub account `gh`
+is signed into on the VPS. If it is Zaal's, comments land as him. If it is a
+bot or another account, the comment must say "Answers from Zaal" in its first
+line so Iman's Claude reads it the same way.
+
+**Build step.**
+1. **Hold** iman-desk PR #31 and card 10135. Neither is needed if the ZOE route
+   works. Done when Zaal rules ZOE or bot. Routed to Vault on 27 Sept.
+2. **If ZOE:** a ZAOOS PR adding `bot/src/zoe/iman-answers.ts`, which pushes
+   the Morning report questions to General and posts the typed reply to the
+   Tonight issue through the existing `gh` path. Done when a typed "1 yes"
+   in General appears on the Tonight issue. Owner: the ZOE/ZAOOS lane.
+3. **Delete `teammate-heartbeat.ts`** and its test. It never ran, and it
+   encodes a schedule that contradicts the overnight loop. Done when the file
+   is gone and nothing breaks. Owner: the ZOE/ZAOOS lane.
+
 ## Also See
 
 - [community/2566 - The overnight loop](../2566-iman-overnight-loop/)
@@ -273,16 +321,21 @@ copy of his work.
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Build `telegram-to-issue` on iman-desk; done when a message from Zaal's id becomes a `for-iman` issue and a tokenless run skips green | Zaal's iman-desk lane | PR | 2026-09-30 |
+| ON HOLD (section 5): build `telegram-to-issue` on iman-desk; done when a message from Zaal's id becomes a `for-iman` issue and a tokenless run skips green | Zaal's iman-desk lane | PR | 2026-09-30 |
 | Create the bot and add `TELEGRAM_BOT_TOKEN` to iman-desk Actions secrets via `/secret`; done when the secret is listed in repo settings | @Zaal | Setup | 2026-09-30 |
 | Add the numbered-reply rule to `tg-to-issue` (answers become a comment on the Tonight issue); done when a Telegram reply "1 yes" lands on the issue | Zaal's iman-desk lane | PR | 2026-09-30 |
 | Put the morning card at the top of ON A CLOCK TODAY and add the answer-by-bot line; done when Monday's card shows both | Dotfiles lane | PR | 2026-09-29 |
 | Build `zao-desk-relay-check` and add the `desk:` line to the grill skills; done when a 27 Sept dry run names the batch-5 file and no relayed file | Dotfiles lane | PR | 2026-10-01 |
 | Change `zao-tracker pr`'s default owner from Iman to unset; done when a PR card created without an owner argument is unowned | Dotfiles lane | PR | 2026-10-01 |
 | Put retiring Iman's 4 open tracker cards (incl. the standing PR-review duty) to Zaal; done when each is closed or links a desk issue | Zaal's iman-desk lane | Ruling | 2026-10-06 |
+| Rule ZOE route vs desk bot #31 for Zaal's phone answers; done when Zaal picks one and the other is closed | @Zaal (via Vault) | Ruling | 2026-09-28 |
+| If ZOE: add `iman-answers.ts` to ZOE; done when a typed "1 yes" in ZAAL BOTZ General lands on the Tonight issue | ZOE/ZAOOS lane | PR | 2026-10-01 |
+| Delete the never-imported `teammate-heartbeat.ts`; done when removed with tests green | ZOE/ZAOOS lane | PR | 2026-10-06 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 
 ## Sources
+
+- ZAOOS `bot/src/zoe/pending-answers.ts`, `teammate-heartbeat.ts`, `bot/src/cockpit/adapters.ts` on origin/main `[FULL]`, method: read at the worktree, importers counted with `grep -rl`.
 
 - `~/bin/zao-tracker` usage and `list`/`search` output, 27 Sept `[FULL]`, method: ran the CLI; counts from its own `tasks (N)` header, not line counts.
 

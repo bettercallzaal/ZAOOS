@@ -1,7 +1,8 @@
 ---
 topic: agents
 type: research
-status: research-complete
+status: superseded
+superseded-by: 2573
 last-validated: 2026-08-17
 related-docs: "2131, 2127, 798, 1021"
 original-query: "x.com/0x_rody/status/2089067631269789996 (viral claim: 'Prompting is going away. Delete everything, keep Graph')"
@@ -9,6 +10,8 @@ tier: STANDARD
 ---
 
 # 2293 - Andrew Ng's Graph Engineering: What's Real, What's Hype, What ZAO Already Has
+
+> **SUPERSEDED 2026-09-28 by [doc 2573](../2573-graph-engineering-course-provenance/). The provenance below is wrong.** The video is the DeepLearning.AI short course "AI Agents in LangGraph", taught by Harrison Chase and Rotem Weiss, published 2024-06-05. Andrew Ng announced it; he did not teach it, and it is not a July 2026 Stanford course. The chapter titles quoted here were invented by the reposts and do not match the video. The "Confidence 1.0" and "FULL" grades below were given without a transcript. The Bonfire provenance-tier recommendations are unaffected. Text left as written so the error stays visible.
 
 > **Viral claim:** A post attributed to 0x_rody claiming a Google engineer says "Prompting is going away. Delete everything, keep Graph" with 44k views and a "full guide" in replies. **Actual source:** Andrew Ng (Google Brain founder) gave a 2-hour Stanford course (July 2026) on graph engineering for agentic AI, advocating graphs as an evolution from loops. **ZAO angle:** Does this approach suggest concrete upgrades to Bonfire or ZOE?
 

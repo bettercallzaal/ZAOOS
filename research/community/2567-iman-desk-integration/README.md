@@ -1,7 +1,7 @@
 ---
 topic: community
 type: audit
-status: draft
+status: research-complete
 last-validated: 2026-09-27
 superseded-by:
 related-docs: "2566, 2253, 2090, 2244"
@@ -31,8 +31,8 @@ private chat content. Builds on [community/2566](../2566-iman-overnight-loop/)
 | zao-tracker | **STOP defaulting PR test cards to Iman; mirror only his real open cards to the desk** | 4 |
 | ZOE | **Desk bot #31 now (answers a list in one message); ZOE route after 3 Oct as a build; banner the dead heartbeat, do not delete** | 5 |
 | Postiz | **Iman drafts in Postiz, Zaal's approval = draft to schedule; desk drafts become Postiz drafts after #30; do not reuse the autocliper stub** | 6 |
-| Uptime and claims guards | pending | - |
-| Iman's other ZAODEVZ repos | pending | - |
+| Uptime and claims guards | **Both merged on the desk (#33, #35); point the wording check at the ZAOOS canonical ledger instead of a desk copy** | 7 |
+| Iman's other ZAODEVZ repos | **Add an open-PRs block to the Tonight queue (ZAOstock has 17, 15 from outside contributors)** | 8 |
 
 ## The map (measured 27 Sept)
 
@@ -372,6 +372,83 @@ missing key has to be a visible failure, or the morning report will say
 3. **No stub successes.** Whatever calls Postiz for the desk fails loudly when
    the key is absent, and the Morning report says "not posted, no key".
 
+## 7. Uptime and wording guards
+
+**Built and merged on the desk, 27 Sept.** `live-check.yml` (#35) reads the
+README's "Live now" section and checks every address every 6 hours. The first
+run, by hand, read **0 of 14 down**. `retracted-wording.yml` (#33) fails a push
+that adds ruled-out wording to a changed draft, using `scripts/retracted.tsv`
+(13 phrasings).
+
+| Guard | Runs so far (27 Sept, 21:0x ET) |
+|---|---|
+| never-commit | 8 PR, 12 push, all green |
+| retracted-wording | 1 PR green, 3 push green, 1 push red |
+| live-check | 1 manual, green |
+
+**The one red run** was the first push of the PR's own branch. With no
+"before" commit the workflow fell back to a full scan and hit the 7
+known lines in older drafts. Pushes to `main` have all passed. It is a small
+flaw: a new branch touching `scripts/retracted*` always shows red once.
+
+**The real finding: the desk list duplicates a canonical one.** ZAOOS already
+holds the estate's retracted-claims ledger at
+`research/identity/claims/retracted.tsv` (6 fields: id, pattern, allow,
+scope, retracted_on, why), checked by `zao-claims-check` in ZAOOS CI and in
+zao-nyc. Its README says why there is one file: "Vendoring a copy of the
+ledger into each repo would build exactly that", meaning two AI-readable
+surfaces that disagree. The desk's `scripts/retracted.tsv` is that copy,
+built without reading the ledger first. The desk's entries are mostly
+different in kind (brand spellings, one approved sentence), but the rule
+holds.
+
+**Build step.** A desk PR that makes `retracted-wording.yml` fetch the
+canonical ledger (ZAOOS is public, so a raw fetch needs no token) and run
+`zao-claims-check` on changed drafts. The desk-only entries move into the
+canonical ledger with a `scope` that names the desk. The desk's
+`scripts/retracted.tsv` gets a MIRROR banner, the same shape the vault copy
+already carries, and is not deleted. Done when a draft carrying a canonical
+retracted claim fails the desk check, and the desk file says MIRROR at the
+top. Owner: Zaal's iman-desk lane (desk PR), ZAOOS for the ledger rows.
+
+## 8. Iman's other ZAODEVZ repos
+
+**Measured, 27 Sept.** ZAODEVZ has 23 unarchived repos, and 9 were pushed in
+the last 30 days. The desk README names some of them by repo name and others
+only by their live address (`za-oartizen.vercel.app`, `zabalgamez.com`),
+so a name count undercounts and is not reported here. The number that
+matters is open pull requests:
+
+| Repo | Open PRs | Note |
+|---|---|---|
+| ZAOstock | **17** | 15 from outside accounts (poidh round 5 agents and others), 2 from bettercallzaal; oldest three from 26 Sept |
+| iman-desk | 4 | Zaal-side PRs waiting on Iman (#31, #32, #34, #37) |
+| ZAOfractal | 2 | both from bettercallzaal, 26 Sept |
+| the other 6 active repos | 0 | |
+
+On the 27 Sept call Zaal asked Iman to read the poidh round 5 PRs and report
+how his agent is doing (desk updates, direction 7). **None of the 17 appear in
+the Tonight queue**, which lists only `for-iman` issues on the desk. So the
+biggest review backlog Iman owns is invisible from his own nightly list.
+
+**Build step.** Extend `scripts/tonight-queue.py` with a block called "PRs
+open on your repos": count per ZAODEVZ repo, the oldest PR's age, and a link.
+It uses the search API (`is:pr is:open user:ZAODEVZ`, public repos, readable
+with the Actions token). Done when tonight's issue shows ZAOstock 17 with its
+oldest age. Owner: Zaal's iman-desk lane. It touches the same file as #37, so
+it goes after #37 merges.
+
+## Closing note
+
+Every integration point now has a section. The pattern across all eight:
+most of what the desk needs already exists somewhere in the estate. The ZOE
+answer surface, the Postiz client, the claims ledger, the capture bot and
+the board card were all found, not invented. Each one was missing either
+a setup step (the Telegram token, 37 of 37 failed runs) or a connection
+(nothing checks whether a ruling reached the desk). Where a copy was built
+anyway (the desk's retracted list), the fix is to point back at the
+original, not to keep two.
+
 ## Also See
 
 - [community/2566 - The overnight loop](../2566-iman-overnight-loop/)
@@ -393,9 +470,15 @@ missing key has to be a visible failure, or the morning report will say
 | Banner the never-imported `teammate-heartbeat.ts` (never ran, 10-20 CAT window contradicts the overnight loop, date); done when the banner is on main | ZOE/ZAOOS lane | PR | 2026-10-06 |
 | Desk drafts to Postiz drafts (workflow, retracted-wording check first, key from Iman); done when a pushed draft file appears as a Postiz draft | Zaal's iman-desk lane | PR | 2026-10-06 |
 | Approve Postiz drafts from /zaal/ (draft to schedule); done when a tap schedules a real draft | Zaal's iman-desk lane | PR | 2026-10-08 |
+| Point the desk wording check at the ZAOOS canonical ledger, MIRROR banner on the desk copy; done when a canonical retracted claim fails the desk check | Zaal's iman-desk lane | PR | 2026-10-06 |
+| Add "PRs open on your repos" to the Tonight queue; done when tonight's issue shows ZAOstock's count and oldest age | Zaal's iman-desk lane | PR | 2026-10-01 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 
 ## Sources
+
+- ZAOOS `research/identity/claims/README.md` and `retracted.tsv` at origin/main `[FULL]`, method: `git show`.
+- ZAODEVZ repo list and open PRs per repo `[FULL]`, method: `gh repo list`, `gh pr list` per repo, 27 Sept 21:0x ET.
+- iman-desk Actions runs per workflow `[FULL]`, method: `gh run list`, failed log read.
 
 - [Postiz public API: introduction](https://docs.postiz.com/public-api/introduction), [create post](https://docs.postiz.com/public-api/posts/create), [change status](https://docs.postiz.com/public-api/posts/change-status) `[FULL]`, method: curl plus HTML strip, 27 Sept.
 - ZAOOS `src/lib/autocliper/postiz-api.ts` and `config.ts` at origin/main `[FULL]`, method: `gh search code` then read.

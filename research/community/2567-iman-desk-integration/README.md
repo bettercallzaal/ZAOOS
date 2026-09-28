@@ -30,7 +30,7 @@ private chat content. Builds on [community/2566](../2566-iman-overnight-loop/)
 | Vault decisions to desk | **DETECT unrelayed rulings; do not auto-post** | 3 |
 | zao-tracker | **STOP defaulting PR test cards to Iman; mirror only his real open cards to the desk** | 4 |
 | ZOE | **Desk bot #31 now (answers a list in one message); ZOE route after 3 Oct as a build; banner the dead heartbeat, do not delete** | 5 |
-| Postiz | pending | - |
+| Postiz | **Iman drafts in Postiz, Zaal's approval = draft to schedule; desk drafts become Postiz drafts after #30; do not reuse the autocliper stub** | 6 |
 | Uptime and claims guards | pending | - |
 | Iman's other ZAODEVZ repos | pending | - |
 
@@ -325,6 +325,53 @@ design, and Zaal decides any removal.
 3. **Banner `teammate-heartbeat.ts`** as above. Done when the banner is on
    main. Owner: the ZOE/ZAOOS lane. Any removal is Zaal's.
 
+## 6. Postiz
+
+**Where it stands.** Zaal ruled Postiz Iman's top priority on 27 Sept, and
+told him to use it for posting (desk #30, decisions items 13 to 15). Iman had
+posted 0 comments on #30 by 20:40 ET the same day. The overnight loop puts
+it first on that night's Tonight issue.
+
+**What the API gives, read from Postiz's own docs** (docs.postiz.com, 27 Sept):
+
+| Capability | Detail |
+|---|---|
+| Auth | an API key in the `Authorization` header; base `https://api.postiz.com/public/v1` |
+| Create a post | `POST /posts` with a top-level `type` of **`now`**, **`schedule`** (with an ISO `date`) or **`draft`** |
+| Approve a draft | `PUT /posts/{id}/status` with `{"status": "schedule"}` |
+| Channels | `GET /integrations` lists the connected accounts; each post names one and carries a per-platform `settings.__type` (25 platforms have custom settings) |
+| Rate limit | 90 create-post calls an hour (100 on cloud), and one call can carry several posts |
+
+**Why this matters for the desk.** "Drafts only, Zaal publishes" (item 2)
+maps one to one onto Postiz. Iman creates a `draft`, and Zaal's approval is a
+status change from draft to schedule. Nothing about the approval needs Zaal
+at a computer. A button on `/zaal/` (desk #32) or a Telegram reply (desk #31)
+can make that one call.
+
+**What already exists, and one trap in it.** ZAOOS has a Postiz client for
+the clip engine, `src/lib/autocliper/postiz-api.ts` (84 lines, last changed
+14 Jul). With `POSTIZ_API_KEY` unset, it does not fail. It returns
+`status: 'scheduled'` for every platform with a `stub-` id. That is a
+success-shaped answer for a post that never left. It predates the 7 Aug
+"posting stays sovereign" decision and is not wired to the desk. Copy its
+per-platform `__type` settings if useful, **not** its stub behaviour: a
+missing key has to be a visible failure, or the morning report will say
+"posted" about nothing.
+
+**Build step** (after Iman has Postiz running and an API key, #30).
+1. **Desk drafts become Postiz drafts.** A file in `drafts/social/` with a
+   short header (network, when) is pushed as a Postiz `draft` by a desk
+   workflow. The retracted-wording check (desk #33, merged) runs on it first.
+   The key is `POSTIZ_API_KEY` in desk Actions secrets, from Iman's Postiz
+   account. Done when a pushed draft file shows up as a draft in Postiz and its
+   id is written back on the file's PR. Owner: Zaal's iman-desk lane builds;
+   Iman adds the key.
+2. **Approve from the phone.** `/zaal/` lists the pending Postiz drafts with an
+   Approve button (`PUT /posts/{id}/status` to `schedule`). Done when a tap
+   schedules a real draft. Depends on #32 being set up.
+3. **No stub successes.** Whatever calls Postiz for the desk fails loudly when
+   the key is absent, and the Morning report says "not posted, no key".
+
 ## Also See
 
 - [community/2566 - The overnight loop](../2566-iman-overnight-loop/)
@@ -344,9 +391,14 @@ design, and Zaal decides any removal.
 | Put retiring Iman's 4 open tracker cards (incl. the standing PR-review duty) to Zaal; done when each is closed or links a desk issue | Zaal's iman-desk lane | Ruling | 2026-10-06 |
 | Extend ZOE `pending-answers` to take a numbered list and post it on the Tonight issue; done when "1 yes, 2 no" typed in General lands as one comment | ZOE/ZAOOS lane | PR | 2026-10-10 |
 | Banner the never-imported `teammate-heartbeat.ts` (never ran, 10-20 CAT window contradicts the overnight loop, date); done when the banner is on main | ZOE/ZAOOS lane | PR | 2026-10-06 |
+| Desk drafts to Postiz drafts (workflow, retracted-wording check first, key from Iman); done when a pushed draft file appears as a Postiz draft | Zaal's iman-desk lane | PR | 2026-10-06 |
+| Approve Postiz drafts from /zaal/ (draft to schedule); done when a tap schedules a real draft | Zaal's iman-desk lane | PR | 2026-10-08 |
 | Make ZAOartizen's capture skip while the token is unset; done when its next scheduled run is green | Zaal's iman-desk lane | PR | 2026-10-06 |
 
 ## Sources
+
+- [Postiz public API: introduction](https://docs.postiz.com/public-api/introduction), [create post](https://docs.postiz.com/public-api/posts/create), [change status](https://docs.postiz.com/public-api/posts/change-status) `[FULL]`, method: curl plus HTML strip, 27 Sept.
+- ZAOOS `src/lib/autocliper/postiz-api.ts` and `config.ts` at origin/main `[FULL]`, method: `gh search code` then read.
 
 - ZAOOS `bot/src/zoe/pending-answers.ts`, `teammate-heartbeat.ts`, `bot/src/cockpit/adapters.ts` on origin/main `[FULL]`, method: read at the worktree, importers counted with `grep -rl`.
 

@@ -2,7 +2,7 @@
 topic: business
 type: audit
 status: research-complete
-last-validated: 2026-07-09
+last-validated: 2026-09-28
 superseded-by:
 related-docs: "990, 960, 967, 868"
 original-query: "zaofestivals - DEEP tier requested explicitly by user (\"deep research on zaofestivals\")"
@@ -68,6 +68,7 @@ Targeted searches for "ZAO-CHELLA," "ZAO-PALOOZA," and "zaofestivals" on both `s
 
 ## Also See
 
+- [Doc 2569 - ZAOstock SEO/GEO/Socials: T-5 Days Sync](../2569-zaostock-seo-geo-socials-t5-sync/) - re-verifies this doc's social-account findings against the live accounts 2026-09-28, T-5 days before the event: Instagram's bio is fixed, Facebook and TikTok are still stale, and LinkedIn + Farcaster surfaced as gaps this doc didn't check
 - [Doc 990 — ZAOstock SEO Audit](../990-zaostock-seo-audit/) — the sibling audit of zaostock.com itself; this doc extends it to the zaofestivals.com/socials/history layer
 - [Doc 960 — What regional Maine press outlets can pitch ZAOstock](../960-seo-web-presence-what-regional-maine-press/) — press angle, complements the social-presence findings here
 - [Doc 967 — Should ZAO consolidate nexus.thezao.com, zao-101.vercel.app, zaoos.com](../967-repo-web-improvement-should-zao-consolidate-nexus/) — directly relevant to Finding 5/6 (link and domain fragmentation)

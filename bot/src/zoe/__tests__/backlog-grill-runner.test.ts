@@ -836,3 +836,40 @@ describe('runBacklogGrillTick - carries the prep-done stamp onto the card', () =
     expect(body).not.toContain('someone should do this');
   });
 });
+
+describe('runBacklogGrillTick - an off-clock card is never sent (2026-09-28)', () => {
+  // Shaped like the ten that jammed the phone: oldest first, parked or lane work.
+  const NOW = Date.UTC(2026, 8, 28, 15, 0, 0);
+  const board = [
+    { id: 'parked', title: 'Review research doc 2525', created_at: '2026-01-01T00:00:00Z', due: '2026-10-06T00:00:00+00:00', metadata: { card_type: 'review' } },
+    { id: 'build', title: 'Ship polish items', created_at: '2026-01-02T00:00:00Z', due: '2026-09-30T00:00:00+00:00', metadata: { card_type: 'build' } },
+    { id: 'hand', title: 'Tell IMan about the X login', created_at: '2026-01-03T00:00:00Z', due: '2026-09-28T00:00:00+00:00', metadata: {} },
+  ];
+  const f = (async (url: string, init?: RequestInit) => {
+    if (init?.method === 'PATCH') return { ok: true, status: 200 } as unknown as Response;
+    const u = String(url);
+    if (u.includes('order=created_at.asc')) {
+      expect(u).toContain('due'); // the fetch must carry the field the rule reads
+      return { ok: true, status: 200, json: async () => board } as unknown as Response;
+    }
+    return { ok: true, status: 200, json: async () => [{ notes: '' }] } as unknown as Response;
+  }) as unknown as typeof fetch;
+
+  beforeEach(() => {
+    files.clear();
+    process.env.COWORK_TRACKER_URL = 'https://tracker.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    delete process.env.ZAO_FOCUS_DATE;
+  });
+
+  it('skips the older parked and lane-work cards and sends the one in his hand', async () => {
+    const result = await runBacklogGrillTick({
+      sendDM: async () => ({ message_id: 1 }),
+      localHour: 10,
+      now: NOW,
+      fetchImpl: f,
+    });
+    expect(result.sent).toBe(true);
+    expect(result.title).toBe('Tell IMan about the X login');
+  });
+});

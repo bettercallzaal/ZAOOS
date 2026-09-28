@@ -32,6 +32,8 @@ import { featureRan } from './feature-ran';
 import {
   classifyReconcile,
   isLaneOwned,
+  isOffClock,
+  focusHorizon,
   TERMINAL_VERDICT_RE,
   BATCH_DEFAULT,
   cardPosition,
@@ -165,6 +167,8 @@ interface BoardTask {
   notes?: string;
   legacy_id?: string;
   metadata?: Record<string, unknown> | null;
+  due?: string | null;
+  legacy_source?: string | null;
 }
 
 function cfg(): { root: string; headers: Record<string, string> } | null {
@@ -236,7 +240,7 @@ async function fetchTodoRows(
   for (let page = 0; page < BOARD_MAX_PAGES; page++) {
     const url =
       `${c.root}/rest/v1/tasks?status=eq.todo&archived_at=is.null` +
-      `&select=id,legacy_id,title,created_at,notes,metadata&order=created_at.asc` +
+      `&select=id,legacy_id,title,created_at,notes,metadata,due,legacy_source&order=created_at.asc` +
       `&limit=${BOARD_PAGE}&offset=${page * BOARD_PAGE}`;
     const r = await fetchImpl(url, { headers: c.headers, cache: 'no-store' });
     if (!r.ok) return null;
@@ -263,7 +267,12 @@ async function nextTask(
   // out of EVERY tier, not just the fresh one: a card that was asked before
   // triage routed it must stop re-asking too. It comes straight back the tick
   // the route changes, because this is a filter on the live row, not state.
-  const rows = board.filter((t) => !isLaneOwned(t.metadata, t.title));
+  // Off-clock cards (due past the focus horizon, or lane work by type) are held
+  // back from every tier the same way - see isOffClock for the measurement.
+  const horizon = focusHorizon(now, process.env.ZAO_FOCUS_DATE);
+  const rows = board.filter(
+    (t) => !isLaneOwned(t.metadata, t.title) && !isOffClock(t, horizon),
+  );
   // A never-asked task whose notes already carry a terminal grill verdict was
   // ruled on from the other end - sending it a phone card would be the exact
   // both-ends dupe this card exists to kill (6b6875d1). It still shows up here

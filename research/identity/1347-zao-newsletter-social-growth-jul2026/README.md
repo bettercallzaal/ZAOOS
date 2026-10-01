@@ -29,6 +29,16 @@ owner: Zaal + ZOE
 
 The ZAOstock window (Aug 1–Oct 3) is 63 days. If every tactic in this doc is executed, realistic add: +250 newsletter, +300 X, +100 Farcaster followers.
 
+### 2026-09-30 refresh - T-3 days before ZAOstock
+
+Checked this baseline against live accounts 2 months into the ZAOstock window, dedup pass on top of this doc rather than a new one. Not a full re-audit - see what's verified vs. not below.
+
+- **Farcaster @bettercallzaal: 3,200 followers, verified live via a direct fetch of farcaster.xyz/zaal (not a mirror).** Up from the Jul baseline of ~2,000 - **the Dec 2026 target of 3,000 is already exceeded**, three months early. One conflicting figure exists (5,114, cited in ZAOOS `wwbase` repo's README, undated within that doc) - not reconciled; the 3,200 above is the one with a same-day, first-party source.
+- **X @wavewarz: could not verify cleanly this pass.** Three sources checked, all disagree and none is a confident live pull: an Instalker mirror page showed "15K followers" in UI chrome that may not even be this account's own stat block (treated as unreliable, not cited); doc 1385 (Jul 2026, this same ecosystem) still lists it as "TBD (fill from account)" as of July; this doc's own Jul baseline says ~400. Needs a direct logged-in X check, not another mirror attempt.
+- **Farcaster /wavewarz channel (a different surface from X @wavewarz): also conflicting - 410 followers via web3.bio, 197 via a direct farcaster.xyz/wavewarz fetch.** Different fetch times likely explain some of the gap; not reconciled this pass.
+- **Farcaster /zao channel: not re-checked this pass.** The Jul baseline (~93) stands unverified either way.
+- **Newsletter (Paragraph) subscriber count: intentionally not updated here.** Per Zaal's ruling on doc 2559 (zaoonparagraph lane, 2026-09-27 - "accept history, keep the old branch," full counts kept in the vault, ZAOOS carries a zero-count stub) and the agent rule "no subscriber, send, open or click figure in any post or public PR body," the current exact count lives in the vault only: `zao-vault/projects/newsletter-metrics-doc-2559-2026-09-25.md`. Read it there, don't cite a figure here.
+
 ---
 
 ## Part 2: Newsletter Growth (Paragraph)

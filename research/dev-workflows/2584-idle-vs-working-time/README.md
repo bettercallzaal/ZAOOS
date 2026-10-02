@@ -19,7 +19,7 @@ Written by the context lane on the night of 1 to 2 Oct, on the seat's assignment
 
 | # | Decision | Evidence | Confidence | Owner, by when |
 |---|---|---|---|---|
-| 1 | **The fleet worked for about 1 hour in every 10 it was open on 1 Oct, and three instruments that share no code agree on that.** Waiting is not idle in the sense of wasted compute: 11 of 14 lanes spent most of the day holding a pane with nothing to do and nothing queued. | zao-waiting (state transitions): 95.3 percent waiting, 218.09 wait h vs 10.75 work h over 14 lanes. Transcript minute buckets: 1,056 active minutes of 10,339 span minutes, 10.2 percent. fleet-health hourly snapshots: 9 of 294 lane-samples "ok", 3 percent | A | Record; the number to beat is 10 percent |
+| 1 | **The fleet worked for about 1 hour in every 10 it was open on 1 Oct, and three instruments that share no code agree on that.** Waiting is not idle in the sense of wasted compute: 11 of 14 lanes spent most of the day holding a pane with nothing to do and nothing queued. | zao-waiting (state transitions): 95.3 percent waiting, 218.09 wait h vs 10.75 work h over 14 lanes. Transcript minute buckets: 1,036 active minutes of 9,497 span minutes over the 14 lanes, 10.9 percent. fleet-health hourly snapshots: 9 of 294 lane-samples "ok", 3 percent | A | Record; the number to beat is 10 percent |
 | 2 | **Waiting on Zaal is a quarter of the waiting, not the whole of it.** The fleet-health instrument splits the non-working samples into `waiting` (nothing queued) and `ASKED` (holding a question): 202 to 79. One lane, zao-vault, holds 62 of the 79 ASKED samples, so without it ASKED is 17 of 225, 8 percent. | 23 snapshots, 04:20Z to 03:20Z next day, hourly; `git log -- BLACKBOARD.md` on origin plus the clone | A | The fix is not "answer faster"; it is "fewer open panes with nothing queued" |
 | 3 | **ADOPT, after 4 Oct: a lane that has stamped HANDOFF-READY and has no queued step closes its pane instead of holding it.** The data: 8 of 14 lanes have under 1 hour of work in 12 to 24 open hours; `zao-waiting`'s own 1800-second tail cap exists because dead WAITING sessions would otherwise accrue forever, which is the shape of a pane that should have closed. Mechanism: `lane-watch` already reads the stamp; the close is a `claude` exit the lane does itself after the stamp, with the seat's `census` confirming the status file is on origin. | zao-waiting per lane; doc 2444 KD4 "one always-on process, many disposable sessions, state in vault files"; `.claude/rules/handoff-discipline.md` | B | Dotfiles, after 4 Oct; the context lane measures the before and after with the same three instruments |
 | 4 | **ADOPT, after 4 Oct: the seat wakes a lane by envelope only when it has an unblocked step for it; no "are you there" ticks.** The seat's own ledger shows its ticks are not the waste: 24 of 25 ticks moved something. The waste is the 13 lanes being open to receive a tick that comes to two of them an hour. | `projects/seat-loop-ledger.md`, 25 rows; the context lane's 16 census ticks cost about 75 active minutes over a 12.4-hour span | B | Seat, after 4 Oct; needs the envelope-plus-relaunch path (`claude --resume` from the vault, doc 2444 KD4), already measured to work |
@@ -51,6 +51,8 @@ Three instruments. None samples the others' data.
 | zao-icm | 90.6 | 19.97 | 2.06 |
 | **FLEET** | **95.3** | **218.09** | **10.75** |
 
+Reconciliation, after review by the Dotfiles lane: the 14 lane rows sum to 10.57 work hours and the FLEET row says 10.75. The FLEET row also counts three non-lane working directories the hook stamps (`web` 0.15 h, `/` 0.01 h, `scratch` 0.00 h), which account for 0.16 of the 0.18 gap, and the remaining 0.02 is rounding across 14 rows. The window is a rolling 24 hours, so a rerun drifts by a few hundredths; the table is the 00:1x run.
+
 **Instrument B, transcript minute buckets.** Every event in `~/.claude/projects/*/*.jsonl` with a timestamp on 1 Oct, bucketed to the minute and keyed by the event's `cwd`; a minute with any event is active. Span is first to last event that day, so a lane open before 1 Oct is measured from its first event, not from midnight. Event-level, not sampled.
 
 | lane | active min | span min | active percent |
@@ -68,7 +70,10 @@ Three instruments. None samples the others' data.
 | poidhz-radio-bounty | 38 | 746 | 5.1 |
 | zaoonparagraph | 35 | 255 | 13.7 |
 | orca-research | 34 | 815 | 4.2 |
-| **14 lanes** | **1,056** | **10,339** | **10.2** |
+| zao-fractal-bot | 4 | 5 | 80.0 |
+| **14 lanes** | **1,036** | **9,497** | **10.9** |
+
+Corrected after review by the Dotfiles lane: the first version printed the script's 19-key total (1,056 of 10,339, 10.2 percent), which included five non-lane working directories (`web`, `scratch`, `research`, `clips` and a blank cwd), and omitted the zao-fractal-bot row. The table and total above are the 14 lane rows only. zao-fractal-bot's 80 percent is 4 active minutes in a 5-minute span: one short visit, not a busy lane.
 
 **Instrument C, fleet-health hourly snapshots.** The ACTIVE AGENTS block in `BLACKBOARD.md`, one commit an hour at :20, read from origin and from the shared clone's local history; 23 distinct stamps from 04:20Z on 1 Oct to 03:20Z on 2 Oct. Hourly sample, so a state that lasted 10 minutes between two samples is invisible.
 

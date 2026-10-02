@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: comparison
 status: research-complete
-last-validated: 2026-10-01
+last-validated: 2026-10-02
 superseded-by:
 related-docs: "2456, 2423, 2407, 2461, 2497, 2444, 2513"
 original-query: "deep research what others do with orca to improve - how other teams use Orca (Stably AI, com.stablyai.orca, CLI 1.4.218) to run agents, measured against how ZAO runs it, ending in a ranked adopt/keep/both list split before and after Oct 4"
@@ -20,6 +20,14 @@ tier: DEEP
 | Where are Orca's public docs, and is there a community? | Docs at `https://www.onorca.dev/docs`, source in `docs/site/content/docs/` of `stablyai/orca` (MIT, 82,852 stars, 5,368 forks, created 2026-03-17, pushed 2026-10-01). Discord `discord.gg/fzjDKHxv8Q`. GitHub Discussions on (89 threads). | `gh api repos/stablyai/orca`, `curl` of onorca.dev, GraphQL discussions count |
 | Is `orchestration` messaging durable, and does it mark relayed claims? | **Durable: yes.** SQLite at `~/Library/Application Support/orca/orchestration.db` (WAL), 26 tables. **Provenance: no.** The `messages` table has `type` (9 values), `priority`, `thread_id`, `payload`, `read`, `delivered_at`, `sender_pane_key` - no basis, source or evidence column anywhere in the schema (`.schema` grepped for `basis|provenance|measured|relayed|evidence|source`: only `archive_source` on worker terminals). So the seat's provenance layer in `agent-msg.py` is not a duplicate; the drop-box half of it is. | `sqlite3 "file:orchestration.db?mode=ro"` on 2026-10-01 |
 | Does `orca search` index the sessions the vault archives? | It indexes **this machine's agent transcripts**: 9,512 files, 421,338 messages, 9,467 Claude / 26 Codex / 4 Cursor sessions, `phase: current`, last reconcile 2026-10-01 13:46 UTC. A query for this lane's own brief returned this session. The vault archives handoffs and status, a different corpus, so the two are complementary and neither replaces the other. | `orca search --index-status --json`; `orca search "orca-research lane brief" --since 2026-10-01` |
+
+## Updated 2026-10-02 - decision 1 built, and the hook state was stale on its first live run
+
+Zaal, 2026-10-02 morning grill, on who builds the `worktree ps` source and when: "Let's do it now" (`~/zao-vault/decisions/grill-2026-10-02-orca-research-morning.md`). Built the same day as a zaal-dotfiles PR: `zao-lanes` and `orca-board` read `orca worktree ps --json`; `fleet-watch.py` inherits the fields through `orca-board --json`.
+
+**The first live run contradicted this doc's framing of the source.** Decision 1 called the hook state "the exact gap herdr priced, already on the machine." Measured at 2026-10-02 10:3x EDT: of the three worktrees whose hook state read `working`, two were stale - `dotfiles` for 824 minutes and `icm` for 567 - while both screens said `[WAITING FOR YOU]` and `claude agents --json` said idle. The Stop event had not reached Orca. Orca's own sidebar showed the same stale `working`. So the hook state is a third instrument, not the authority: it is believed when `claude agents` corroborates it, or when it is younger than 20 minutes; a `working` older than that which `claude agents` calls idle is reported as STALE, and `claude agents` decides. `waiting` is believed unless `claude agents` says busy. In `orca-board` a fresh hook overrides only a screen that shows agent chrome and no marker; `[WAITING FOR YOU]`, pickers and questions keep the screen's word.
+
+What the source still adds, and this held: the running tool and how long the state has held ("orca hooks: working (Bash, 8m)"), a `waiting` event that `claude agents` cannot distinguish from idle, and one call for every worktree. Decision 1 stands with the corroboration rule; decision 2 of doc 2583 (gate sends on hook-reported idle) now depends on the same rule and is held until after Saturday on the seat's request. An upstream issue to `stablyai/orca` for the stale `working` state is public and outbound, so it is Zaal's; the measurement above is the body of it.
 
 ## Key Decisions (recommendations first)
 

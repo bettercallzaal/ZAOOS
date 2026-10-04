@@ -27,9 +27,13 @@ Written by the context lane. Every local number comes from a command run on 2026
 | 6 | **Compactions here happen at a median of 839,434 tokens, deep inside the range where recall has already degraded. KEEP the 1M window, ADD a focus line to every manual compact.** `/compact <what to keep>` is free and 50 of 85 compactions were manual with the instruction left empty by default. | preTokens n=85: median 839,434, max 967,402, min 98,120. `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=90`. Docs: "The summary keeps what you choose instead of what the automatic pass guesses is important"; a PreCompact hook receives `custom_instructions`, null when nothing is passed | B | /precompact skill text: emit the `/compact focus ...` line as its last output. Dotfiles, 2026-10-10 |
 | 7 | **SKIP building a memory service, a vector store or a "context manager" lane.** The documented survivors are files: root CLAUDE.md, unscoped rules, auto memory and the plan are re-injected from disk. Put what must survive in those and keep them small. | `~/.claude/CLAUDE.md` 131 lines, 11,161 bytes; auto memory `MEMORY.md` 44 lines, 9,431 bytes against the 200-line or 25KB load limit; vault `AGENTS.md` 705 lines, 83,925 bytes on origin, where the docs say "files over 200 lines consume more context and may reduce adherence" | A | No build. AGENTS.md split is a separate card, vault lane |
 
-## One live defect found on the way
+## One live defect found on the way, since fixed
 
-`~/zao-vault/AGENTS.md` in the shared clone is **0 bytes**, modified and uncommitted since 1 Oct 12:12 (`ls -la`, `git status --porcelain -- AGENTS.md` prints ` M AGENTS.md`). Origin holds 83,925 bytes. Any session whose working directory is the shared clone, and Antigravity through its `~/.gemini/AGENTS.md` symlink, has been loading an empty rules file for three days. This is the forward risk `~/.claude/CLAUDE.md` describes for the dotfiles tree, on a different tree. Reported to the seat; not fixed here, because the vault lane owns the clone and the reconcile (card 10208) has not run.
+When this doc was measured (Sun 4 Oct, about 01:2x EDT) `~/zao-vault/AGENTS.md` in the shared clone was **0 bytes**, modified and uncommitted since 1 Oct 12:12 (`ls -la`; `git status --porcelain -- AGENTS.md` printed ` M AGENTS.md`). Origin held 83,925 bytes. For those three days any session whose working directory was the shared clone, and Antigravity through its `~/.gemini/AGENTS.md` symlink, loaded an empty rules file.
+
+**Restored at 01:43 EDT the same night** by the context lane on Zaal's typed word ("fix the agents.md in the vault clone"), with `git restore --worktree -- AGENTS.md` from the clone's own HEAD, which was byte-identical to origin. After: 83,925 bytes, `git status` prints nothing for the path, and the symlink reads 83,925 bytes. It was the only emptied tracked file in the clone. What emptied it is UNKNOWN; `scripts/build-agents-md.py` is the likely writer (tracker card 10195) and was not investigated here.
+
+It stays in this doc because it is the same shape as the forward risk `~/.claude/CLAUDE.md` describes for the dotfiles tree: a shared working tree is live configuration, and nothing reported that the rules file was empty.
 
 ## What survives a compaction (Claude Code docs, quoted)
 
@@ -96,7 +100,7 @@ Stated limits: the precompact detector reads one segment back from each boundary
 | `zao-status-append` and `/precompact` keep a resume block of at most 5,000 tokens at the top of the status file; shipped when `head -c 20000` of a status file contains the newest HANDOFF-READY stamp | Dotfiles lane (zj) | Dotfiles PR | 2026-10-10 |
 | Move the Hard Requirements of `zao-research` and the stamp rules of `handoff` into the first 5,000 tokens; shipped when both files' first 20,000 chars contain them | Dotfiles lane (zj) | Dotfiles PR | 2026-10-12 |
 | Run `/skill-doctor` and `/context` in a fresh session and paste both into the tracker card; shipped when the card holds the Skills row and the never-invoked list | Zaal | Hand | 2026-10-07 |
-| Restore the shared clone's `AGENTS.md` from origin as part of the 10208 reconcile; shipped when `wc -c ~/zao-vault/AGENTS.md` is not 0 | vault lane | Reconcile | 2026-10-05 |
+| DONE 2026-10-04 01:43: shared clone's `AGENTS.md` restored. Remaining: confirm `wc -c ~/zao-vault/AGENTS.md` still reads 83,925 after the 10208 reconcile, and find what emptied it (card 10195) | vault lane | Reconcile check | 2026-10-05 |
 | Save `compact_summary` from the existing PostCompact hook next to the precompact bundle; shipped when a bundle directory holds the summary text | Dotfiles lane (zj) | Dotfiles PR | 2026-10-12 |
 
 ## Sources

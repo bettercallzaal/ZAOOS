@@ -95,7 +95,7 @@ export function PhoneShell({
               <UnreadWidget size="small" onExpand={() => router.push('/messages')} />
             </Suspense>
             <Suspense fallback={<div className="h-14 animate-pulse rounded-2xl bg-white/5" />}>
-              <AgentStatusWidget size="small" onExpand={() => router.push('/admin')} />
+              <AgentStatusWidget size="small" onExpand={() => router.push('/os/agents')} />
             </Suspense>
           </div>
         </div>

@@ -90,6 +90,19 @@ export function LikeButton({
     }
   }, [liked, likeCount, loading, songUrl]);
 
+  // Global event listener for keyboard shortcut ('L')
+  useEffect(() => {
+    if (!songUrl) return;
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<{ url?: string }>;
+      if (!customEvent.detail?.url || customEvent.detail.url === songUrl) {
+        handleToggle();
+      }
+    };
+    window.addEventListener('zao:toggle-like', handler);
+    return () => window.removeEventListener('zao:toggle-like', handler);
+  }, [songUrl, handleToggle]);
+
   // Build the "Liked by..." text for non-compact mode
   const likedByText = (() => {
     if (compact || likeCount === 0) return null;
@@ -129,6 +142,7 @@ export function LikeButton({
   return (
     <div className={`inline-flex items-center ${compact ? '' : 'flex-col items-start'}`}>
       <button
+        type="button"
         onClick={(e) => {
           e.stopPropagation();
           handleToggle();
@@ -144,6 +158,7 @@ export function LikeButton({
       >
         {/* Heart icon */}
         <svg
+          aria-hidden="true"
           className={compact ? 'w-4 h-4' : 'w-5 h-5'}
           viewBox="0 0 24 24"
           fill={liked ? 'currentColor' : 'none'}

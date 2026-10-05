@@ -452,12 +452,38 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             dispatch({ type: 'SET_VOLUME', payload: v });
           }
           break;
+        case 's':
+        case 'S':
+          if (!e.metaKey && !e.ctrlKey) {
+            dispatch({ type: 'TOGGLE_SHUFFLE' });
+          }
+          break;
+        case 'r':
+        case 'R':
+          if (!e.metaKey && !e.ctrlKey) {
+            dispatch({ type: 'CYCLE_REPEAT' });
+          }
+          break;
+        case 'l':
+        case 'L':
+          if (!e.metaKey && !e.ctrlKey && state.metadata?.url) {
+            window.dispatchEvent(
+              new CustomEvent('zao:toggle-like', { detail: { url: state.metadata.url } }),
+            );
+          }
+          break;
+        case 'q':
+        case 'Q':
+          if (!e.metaKey && !e.ctrlKey) {
+            window.dispatchEvent(new CustomEvent('zao:toggle-queue'));
+          }
+          break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally watching specific state slices
-  }, [state.status, state.metadata?.type, state.position, state.volume, dispatch]);
+  }, [state.status, state.metadata?.type, state.metadata?.url, state.position, state.volume]);
 
   // Wake Lock — keep screen on during playback
   useEffect(() => {

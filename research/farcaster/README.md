@@ -109,3 +109,4 @@
 | 2388 | [ZAOstock Oct 3 Tech Readiness Brief](./2388-zaostock-oct3-tech-readiness-brief/) | STANDALONE | Research doc 2388. |
 | 2389 | [Farcaster Miniapp Ecosystem Survey (Aug 2026)](./2389-farcaster-miniapp-ecosystem-aug2026/) | STANDALONE | Research doc 2389. |
 | 2390 | [ZAO Farcaster Distribution Strategy Update (Aug 2026)](./2390-zao-farcaster-distribution-strategy-update/) | STANDALONE | Research doc 2390. |
+| 2595 | [Farcaster Mini App Wallet-Native Collect: Wagmi Approve-Then-Mint Architecture](./2595-farcaster-miniapp-wallet-native-collect-music-minting/) | GUIDE | Study sweetmantech in_process PR #1525 removing smart-wallet balance topups, evaluate native host wallet context, and define wagmi collect patterns for WaveWarZ and ZAO OS. |

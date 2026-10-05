@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
+import { SignerConnect } from '@/components/chat/SignerConnect';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { LazySolanaWalletConnect } from '@/components/solana/LazySolanaWalletConnect';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
@@ -364,10 +365,6 @@ function StreamOverlays({ fid }: { fid: number }) {
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
   const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContextSafe();
-  const [signerStatus, setSignerStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const [signerError, setSignerError] = useState<string | null>(null);
-  const [scriptError, setScriptError] = useState(false);
-  const signerContainerRef = useRef<HTMLDivElement>(null);
 
   // Messaging preferences
   const [msgPrefs, setMsgPrefs] = useState<MessagingPrefs>(PREFS_DEFAULTS);
@@ -563,63 +560,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   }, [zaoFields]);
 
   const hasSigner = !!session?.signerUuid;
-
-  const handleSignerSuccess = useCallback(
-    async (data: { signer_uuid: string; fid: string }) => {
-      setSignerStatus('saving');
-      setSignerError(null);
-      try {
-        const res = await fetch('/api/auth/signer/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            signerUuid: data.signer_uuid,
-            fid: parseInt(data.fid),
-          }),
-        });
-        if (res.ok) {
-          setSignerStatus('success');
-          refetch();
-        } else {
-          setSignerStatus('error');
-          setSignerError('Failed to save signer. Try again.');
-        }
-      } catch {
-        setSignerStatus('error');
-        setSignerError('Network error. Try again.');
-      }
-    },
-    [refetch],
-  );
-
-  // Register the global callback for Neynar SIWN
-  useEffect(() => {
-    window.onSIWNSuccess = handleSignerSuccess;
-    return () => {
-      delete window.onSIWNSuccess;
-    };
-  }, [handleSignerSuccess]);
-
-  // Load the Neynar SIWN script after the div is in the DOM
-  useEffect(() => {
-    if (hasSigner) return;
-    const container = signerContainerRef.current;
-    if (!container) return;
-
-    const SIWN_URL = 'https://neynarxyz.github.io/siwn/raw/1.2.0/index.js';
-    const existing = document.querySelector(`script[src="${SIWN_URL}"]`);
-    if (existing) existing.remove();
-
-    const script = document.createElement('script');
-    script.src = SIWN_URL;
-    script.async = true;
-    script.onerror = () => setScriptError(true);
-    document.body.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
-  }, [hasSigner]);
 
   // Solana wallet state
   const [solanaWallet, setSolanaWallet] = useState(profile?.solana_wallet || null);
@@ -1311,40 +1251,9 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 </span>
               </div>
             ) : (
-              <div>
-                {signerStatus === 'success' && (
-                  <div className="px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-xs text-green-400 font-medium mb-3">
-                    Signer connected successfully!
-                  </div>
-                )}
-                {signerStatus === 'error' && signerError && (
-                  <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400 mb-3">
-                    {signerError}
-                  </div>
-                )}
-                {signerStatus === 'saving' && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#f5a623]/5 text-xs text-[#f5a623] mb-3">
-                    <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
-                    Saving signer...
-                  </div>
-                )}
-
-                {scriptError ? (
-                  <p className="text-xs text-red-400">
-                    Failed to load signer script. Please refresh.
-                  </p>
-                ) : (
-                  <div ref={signerContainerRef}>
-                    <div
-                      className="neynar_signin"
-                      data-client_id={process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID}
-                      data-success-callback="onSIWNSuccess"
-                      data-theme="dark"
-                    />
-                  </div>
-                )}
-
-                <p className="text-[10px] text-gray-600 mt-2">
+              <div className="py-2">
+                <SignerConnect onSuccess={refetch} />
+                <p className="text-[10px] text-gray-500 mt-2 px-4">
                   This approves a managed signer for your Farcaster account via Neynar. ZAO OS never
                   has access to your personal wallet keys.
                 </p>

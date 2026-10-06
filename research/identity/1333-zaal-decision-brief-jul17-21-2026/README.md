@@ -136,7 +136,7 @@ Stay tuned. 🎤
 **Source: Doc 1324**
 
 **Target: Cherie Hu (Water & Music)**
-- Email: cherie@waterandmusic.com
+- Email: <redacted-email>
 - Template: Tier 1 research template in doc 1324
 - This is the highest-citability target in the entire ZAO academic outreach strategy
 

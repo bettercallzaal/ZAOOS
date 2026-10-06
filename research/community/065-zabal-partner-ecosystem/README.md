@@ -18,7 +18,7 @@
 | Decision | Recommendation |
 |----------|----------------|
 | **Partner hub page** | BUILD a `/partners` or `/ecosystem` page in ZAO OS showing all ZABAL partner platforms with direct links, descriptions, and embedded feeds where possible |
-| **MAGNETIQ** | LINK to the Zabal Connector hub + explain Proof of Meet. No API available — link-only integration for now. Contact tyler@magnetiq.xyz for API access. |
+| **MAGNETIQ** | LINK to the Zabal Connector hub + explain Proof of Meet. No API available — link-only integration for now. Contact <redacted-email> for API access. | [CLAIM-OK: magnetiq-live historical record; line touched only to redact contact data, card 10141]
 | **SongJam** | EMBED the ZABAL leaderboard (`songjam.space/zabal`) via iframe or link card. Contact Adam Place for API access to pull leaderboard data natively. |
 | **Empire Builder** | LINK to ZABAL's empire profile. Farcaster-native, same stack as ZAO OS. Contact @glankerempire for API docs. |
 | **Clanker** | DISPLAY $ZABAL token info (price, holders) via Clanker/Uniswap data. Clanker is now part of Farcaster (Neynar acquisition). |
@@ -87,7 +87,7 @@ Zaal used MAGNETIQ at ETH Boulder (web3 conference) to create the **Zabal Connec
 | Person | Role | Contact |
 |--------|------|---------|
 | Kaylan Sliney | Co-founder & CEO | Venture lawyer, blockchain since 2017 |
-| Tyler Stambaugh | Co-founder & COO | tyler@magnetiq.xyz |
+| Tyler Stambaugh | Co-founder & COO | <redacted-email> |
 | Shashank Singla | CTO | Ex-Goldman, IIT Delhi, 350M+ daily requests at paytunes |
 
 ### Technical Details
@@ -108,7 +108,7 @@ Zaal used MAGNETIQ at ETH Boulder (web3 conference) to create the **Zabal Connec
 |--------|--------|-----|
 | Link card on `/contribute` + `/ecosystem` | 30 min | `<a href="https://app.magnetiq.xyz">` to Zabal Connector |
 | Display POM badges in member profiles | Requires API | Need Flow blockchain read + MAGNETIQ API access |
-| Contact tyler@magnetiq.xyz for API partnership | 1 email | Ask about API, embedding, cross-chain (Flow → Optimism) |
+| Contact <redacted-email> for API partnership | 1 email | Ask about API, embedding, cross-chain (Flow → Optimism) |
 
 **Gap:** MAGNETIQ is on Flow blockchain; ZAO OS is Ethereum/Optimism/Base. No native cross-chain bridge. Integration is link-based unless MAGNETIQ adds EVM support.
 
@@ -305,7 +305,7 @@ partners: {
     name: 'MAGNETIQ',
     description: 'Proof of Meet — IRL connection badges',
     url: 'https://app.magnetiq.xyz', // Zabal Connector hub
-    contact: 'tyler@magnetiq.xyz',
+    contact: '<redacted-email>',
   },
   songjam: {
     name: 'SongJam',
@@ -359,7 +359,7 @@ In `community.config.ts` nav pillars, add an "Ecosystem" section:
 | **2 (now)** | Add partner link cards to existing `/contribute` page | 1 hour |
 | **3 (this week)** | Build `/ecosystem` page with partner cards + $ZABAL stats | 1 day |
 | **4 (next week)** | Embed SongJam leaderboard iframe | 2 hours |
-| **5 (outreach)** | Contact tyler@magnetiq.xyz, Adam @adam_songjam, @glankerempire for API access | 3 emails |
+| **5 (outreach)** | Contact <redacted-email>, Adam @adam_songjam, @glankerempire for API access | 3 emails |
 | **6 (with APIs)** | Native leaderboard, campaign feed, POM badge display | 1-2 weeks |
 
 ---

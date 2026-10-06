@@ -67,7 +67,7 @@ Coordination: the 188 ZAO members buy + boost each other's Artifacts (community 
 1. **Submit** a project to the season (artizen.fund/submit). Description aligned to "frontier of art / culture / tech."
 2. **Clear the curation gate** - community votes; only the **top ~30%** advance to competition. Voting power = profile (100 pts) + $1 spent = 10 votes, time-weighted (manual clicks, anti-whale). ZAO's 188 members are the lever here.
 3. **Sell Artifacts** - $10 open-edition NFTs. Best-practice artwork: **video/GIF, no text**, plus a clean pitch deck. Every $1 sold unlocks $1 from each backing fund.
-4. **Pitch on Artizen LIVE** - the weekly livestream (formerly "Showcase"), 5-min pitch/performance slots, $120k+ awarded live across the season. Produced by Wadooah Wali / New Canvas (wadooah@newcanvas.co per René's email). A ZAO music act performing live = perfect fit.
+4. **Pitch on Artizen LIVE** - the weekly livestream (formerly "Showcase"), 5-min pitch/performance slots, $120k+ awarded live across the season. Produced by Wadooah Wali / New Canvas (<redacted-email> per René's email). A ZAO music act performing live = perfect fit.
 5. **Earn a newsletter feature** - René's newsletter (~13k subs) is the main amplifier; he personally reviews standouts. Traction + a strong narrative = editorial pickup.
 6. **Win the prize** - top seller per fund takes the 10% cash prize; Boost Score (raised x boosts) ranks the leaderboard.
 
@@ -123,5 +123,5 @@ Coordination: the 188 ZAO members buy + boost each other's Artifacts (community 
 - [FULL] [René Pinnell LinkedIn](https://www.linkedin.com/in/rjpinnell/) + [Nate Van Cleve LinkedIn](https://www.linkedin.com/in/nathanielvancleve/) + [@ArtizenFund](https://twitter.com/ArtizenFund) - team + channels
 - [FULL] [Bubble Artizen case study](https://bubble.io/blog/artizen/) - $2.3M awarded, scale, Gaia Sound Temple multi-season alumni
 - [PARTIAL] [help.artizen.fund submit-projects](https://help.artizen.fund/en/collections/2702056-submit-projects) - submission flow (some help pages 404'd)
-- [PARTIAL] Artizen LIVE booking via Wadooah Wali / New Canvas - producer confirmed, public booking page not found (use wadooah@newcanvas.co from René's email)
+- [PARTIAL] Artizen LIVE booking via Wadooah Wali / New Canvas - producer confirmed, public booking page not found (use <redacted-email> from René's email)
 - [FAILED] Exact current S7 season dates + Console join flow specifics - verify directly on artizen.fund/submit + console.xyz before acting.

@@ -685,7 +685,7 @@ Research found social profiles for key artists — these are outreach channels:
 |--------|----------------|
 | **APORKALYPSE** | SoundCloud, Instagram (@aporkalypsenownola), Apple Music, Facebook, X (@Aporkalypse504) |
 | **Hurric4n3Ike** | BeatStars (hurric4n3ike.beatstars.com), Spotify (FireWavez), X (@hurric4n3ike), GitHub |
-| **LUI** | SoundCloud (luijoseph), Instagram (@LuiJoseph__), email: LUIJOSEPHIII@gmail.com |
+| **LUI** | SoundCloud (luijoseph), Instagram (@LuiJoseph__), email: <redacted-email> |
 | **STILO English** | SoundCloud (stilosd — Suspekt Stilo), official site (stilosd.com), iTunes |
 | **BennyJ504** | X (@bennyj504) |
 | **DCoopOfficial** | Linked to Coop Records on Farcaster (onchain record label — github.com/Coop-Records/sonata) |

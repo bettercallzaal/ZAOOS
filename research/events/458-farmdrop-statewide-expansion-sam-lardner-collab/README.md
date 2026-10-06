@@ -74,7 +74,7 @@ Total: **32+ community markets** (network-wide).
 - **Partners:** Portland Public Health (Riley Richardson, HEAL Program), Maine DOE (Ali Mediate, Local Foods Coordinator), Youth and Family Outreach, Opportunity Alliance Central Kitchen, YMCA Youth Development
 - **Southern Maine team:** Rich Lee (Tender Soles Farm), Keena Tracy (Little Ridge Farm), George Wilmerding, Louis Ricou (COA '25), Hannah Semler (CEO oversight)
 - **Distribution:** Friday distro to Lisbon, Richmond, Freeport, Prouts Neck. Springworks Newport↔Lisbon ends Jul 18 — new Portland route required
-- **PPS contact:** jwinarta@portlandmaine.gov, 207-669-6779
+- **PPS contact:** <redacted-email>,<redacted-phone>
 - **Future partners under discussion:** Rosemont Markets, Jordan's Farm, Locker Project, Fork Food Lab, Farms for Food Equity, Fresh Frozen, Harvest Maine
 
 ### Proposal 3 — Northern Maine / Aroostook County

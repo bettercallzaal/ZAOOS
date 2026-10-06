@@ -49,7 +49,7 @@ ZAO/WaveWarZ hits three of those pillars simultaneously:
 | **Cherie Hu** | Founder + Editor | Direct email; cite specific W&M articles her work influenced |
 | **W&M Contributors** | Staff writers | LinkedIn or Twitter DM if Cherie doesn't respond in 7 days |
 
-**Cherie's public email:** cherie@waterandmusic.com (from doc 1324)
+**Cherie's public email:** <redacted-email> (from doc 1324)
 
 ---
 

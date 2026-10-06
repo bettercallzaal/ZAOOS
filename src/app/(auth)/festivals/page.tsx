@@ -23,8 +23,7 @@ const UPCOMING: FestivalEvent[] = [
     name: 'ZAOville 2027',
     date: 'Summer 2027',
     location: 'Maine',
-    description:
-      'Headline multi-day community music gathering and decentralized artist showcase.',
+    description: 'Headline multi-day community music gathering and decentralized artist showcase.',
     href: null,
     highlight: true,
     badge: 'Headline 2027',

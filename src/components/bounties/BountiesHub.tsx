@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface Bounty {
   id: string;
@@ -136,8 +136,9 @@ export function BountiesHub() {
               Create, Edit, and Earn with Proof of Ink DAO
             </h2>
             <p className="text-sm text-white/70 mt-2 leading-relaxed">
-              We empower our global community to edit videos, design marks, and build software on Base.
-              Download raw festival assets directly, produce your best work, and submit verifiable proof on POIDH.
+              We empower our global community to edit videos, design marks, and build software on
+              Base. Download raw festival assets directly, produce your best work, and submit
+              verifiable proof on POIDH.
             </p>
           </div>
 
@@ -239,8 +240,8 @@ export function BountiesHub() {
                     Submission Criteria:
                   </div>
                   <ul className="space-y-1.5 text-xs text-white/70">
-                    {bounty.requirements.map((req, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
+                    {bounty.requirements.map((req) => (
+                      <li key={req} className="flex items-start gap-2">
                         <span className="text-[#f5a623] font-bold">&bull;</span>
                         <span>{req}</span>
                       </li>

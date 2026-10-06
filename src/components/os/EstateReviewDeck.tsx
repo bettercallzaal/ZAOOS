@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 
 export interface ReviewItem {
   id: string;
@@ -23,7 +22,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Fleet Context, 50% Auto-Compact, Review Dispatch Tool',
     repoOrLocation: 'bettercallzaal/zaal-dotfiles #423',
     status: 'merged',
-    summary: 'Auto lane-context injection on session start in any Orca worktree, proactive auto-compaction at 50% context, and zao-review-dispatch CLI.',
+    summary:
+      'Auto lane-context injection on session start in any Orca worktree, proactive auto-compaction at 50% context, and zao-review-dispatch CLI.',
     primaryActionUrl: 'https://github.com/bettercallzaal/zaal-dotfiles/pull/423',
     primaryActionLabel: 'View PR #423',
     badge: 'MERGED & LIVE',
@@ -35,7 +35,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'POIDH Video Bounties: Community Edits from Raw Footage',
     repoOrLocation: 'poidh.com / Base & zaoos.com/bounties',
     status: 'ready',
-    summary: 'Distribute raw 4K ground footage and drone footage to poidhz and the community with Base bounties for the best recap videos and artist reels.',
+    summary:
+      'Distribute raw 4K ground footage and drone footage to poidhz and the community with Base bounties for the best recap videos and artist reels.',
     primaryActionUrl: '/bounties',
     primaryActionLabel: 'Open Bounties Hub',
     badge: 'POIDH BOUNTY',
@@ -47,7 +48,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Daily Content Drip: Share Ready Clips & Photos',
     repoOrLocation: 'Desktop/zaostock-content & Socials',
     status: 'ready',
-    summary: 'Post existing photos and raw stage cuts daily across Farcaster, X, and Instagram so momentum continues steadily.',
+    summary:
+      'Post existing photos and raw stage cuts daily across Farcaster, X, and Instagram so momentum continues steadily.',
     primaryActionLabel: 'Ready to Post',
     badge: 'DAILY DRIP',
     updatedAt: 'Daily Cadence',
@@ -58,7 +60,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Crown Vics 20-Second Teaser Video Drafts',
     repoOrLocation: 'Google Drive / 10-teasers-and-recap-drafts',
     status: 'ready',
-    summary: 'Rendered teasers in both 9x16 vertical (Reels/TikTok) and 16x9 horizontal (YouTube/X) featuring "She Said Yeah" live performance.',
+    summary:
+      'Rendered teasers in both 9x16 vertical (Reels/TikTok) and 16x9 horizontal (YouTube/X) featuring "She Said Yeah" live performance.',
     primaryActionUrl: 'https://drive.google.com/drive/folders/1SNKFMJBxIEs5lZG4dAcEy4gJb6CLZXbg',
     primaryActionLabel: 'Inspect Video Drafts',
     badge: 'READY FOR REVIEW',
@@ -70,7 +73,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Day 276 Newsletter: ZAOstock Festival Recap',
     repoOrLocation: 'bettercallzaal/zaoonparagraph #118',
     status: 'merged',
-    summary: 'Daily newsletter celebration post with attendee numbers, confirmed artist lineup, and community reflection.',
+    summary:
+      'Daily newsletter celebration post with attendee numbers, confirmed artist lineup, and community reflection.',
     primaryActionUrl: 'https://github.com/bettercallzaal/zaoonparagraph/pull/118',
     primaryActionLabel: 'View Edition',
     badge: 'MERGED & PUBLISHED',
@@ -82,7 +86,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'ZAOstock Lineup Confirmation & 2027 Festival Direction',
     repoOrLocation: 'ZAODEVZ/ZAOstock #448 & #450',
     status: 'merged',
-    summary: 'Locked public copy to 7 performing acts; established ZAOville and ZAOstock as the two headline festivals for 2027.',
+    summary:
+      'Locked public copy to 7 performing acts; established ZAOville and ZAOstock as the two headline festivals for 2027.',
     primaryActionUrl: 'https://github.com/ZAODEVZ/ZAOstock/pull/450',
     primaryActionLabel: 'View Site Changes',
     badge: 'MERGED & DEPLOYED',
@@ -94,7 +99,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'DownEast ZAO Promoter Platform & Outreach Prospects',
     repoOrLocation: 'bettercallzaal/downeast-zao #2, #3, #4',
     status: 'merged',
-    summary: 'Overnight research covering 90-day promoter starter plan, artist fee splits, venue directory across Hancock County, and grant opportunities.',
+    summary:
+      'Overnight research covering 90-day promoter starter plan, artist fee splits, venue directory across Hancock County, and grant opportunities.',
     primaryActionUrl: 'https://github.com/bettercallzaal/downeast-zao',
     primaryActionLabel: 'View DownEast Repo',
     badge: 'MERGED INTO MAIN',
@@ -106,7 +112,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Convert Twitch Festival Broadcasts to Permanent Highlights',
     repoOrLocation: 'twitch.tv/zaofestivals',
     status: 'waiting_zaal',
-    summary: 'The 6 festival live stream VODs expire in ~11 days under Twitch standard 14-day retention. Convert to Highlights to prevent deletion.',
+    summary:
+      'The 6 festival live stream VODs expire in ~11 days under Twitch standard 14-day retention. Convert to Highlights to prevent deletion.',
     primaryActionUrl: 'https://dashboard.twitch.tv/u/zaofestivals/content/video-producer',
     primaryActionLabel: 'Open Twitch Manager',
     badge: 'ACTION: ZAAL',
@@ -118,7 +125,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Sync 8.6 GB Drone Footage from ZUSB Flash Drive',
     repoOrLocation: 'Local Hardware (ZUSB)',
     status: 'waiting_zaal',
-    summary: 'Plug the ZUSB drive at work to copy the 43 drone clips into Drive folder 02-drone, unblocking Maceo message M2 and final reel assembly.',
+    summary:
+      'Plug the ZUSB drive at work to copy the 43 drone clips into Drive folder 02-drone, unblocking Maceo message M2 and final reel assembly.',
     badge: 'HARDWARE: PLUG USB',
     updatedAt: 'Pending Arrival',
   },
@@ -128,7 +136,8 @@ const DEFAULT_REVIEW_ITEMS: ReviewItem[] = [
     title: 'Proof of Ink DAO: Community Vote Spec & Round Drafts',
     repoOrLocation: 'bettercallzaal/poidhz #220, #221',
     status: 'in_progress',
-    summary: 'Active specifications for community voting thresholds and drafts for upcoming round releases.',
+    summary:
+      'Active specifications for community voting thresholds and drafts for upcoming round releases.',
     primaryActionUrl: 'https://github.com/bettercallzaal/poidhz/pull/221',
     primaryActionLabel: 'Inspect Spec PR #221',
     badge: 'IN PROGRESS',
@@ -182,7 +191,8 @@ export function EstateReviewDeck({
             </span>
           </div>
           <p className="text-xs text-white/50 mt-1">
-            Review staged media, verify code pull requests, and resolve active human decision gates across BetterCallZaal.
+            Review staged media, verify code pull requests, and resolve active human decision gates
+            across BetterCallZaal.
           </p>
         </div>
 
@@ -248,10 +258,10 @@ export function EstateReviewDeck({
                 isAction
                   ? 'border-amber-500/40 bg-amber-500/[0.03] hover:bg-amber-500/[0.06]'
                   : isReady
-                  ? 'border-emerald-500/30 bg-emerald-500/[0.02] hover:bg-emerald-500/[0.05]'
-                  : isMerged
-                  ? 'border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]'
-                  : 'border-purple-500/30 bg-purple-500/[0.02] hover:bg-purple-500/[0.05]'
+                    ? 'border-emerald-500/30 bg-emerald-500/[0.02] hover:bg-emerald-500/[0.05]'
+                    : isMerged
+                      ? 'border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]'
+                      : 'border-purple-500/30 bg-purple-500/[0.02] hover:bg-purple-500/[0.05]'
               }`}
             >
               <div>
@@ -261,10 +271,10 @@ export function EstateReviewDeck({
                       isAction
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                         : isReady
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : isMerged
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                        : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : isMerged
+                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                     }`}
                   >
                     {item.badge}

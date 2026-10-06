@@ -8,6 +8,7 @@
 
 import { postCast } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import { checkAutoCastCap } from './auto-cast-cap';
 
 const CHANNEL = 'zao';
 const MAX_CAST_LENGTH = 320;
@@ -24,6 +25,13 @@ export async function autoCastToZao(text: string, embedUrl?: string): Promise<st
   const apiKey = process.env.ZAO_OFFICIAL_NEYNAR_API_KEY;
 
   if (!signerUuid || !apiKey) {
+    return null;
+  }
+
+  // Runaway guard, default OFF (see auto-cast-cap.ts). With the flag unset this
+  // returns immediately and nothing changes.
+  const cap = await checkAutoCastCap(CHANNEL);
+  if (!cap.allowed) {
     return null;
   }
 

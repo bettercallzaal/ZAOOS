@@ -43,3 +43,4 @@
 | 1587 | [Craig Bot: Automatic Audio Archive for Fractal Democracy Sessions](./1587-craig-bot-fractal-democracy-recording/) | STANDALONE | (no Goal line in doc) |
 | 1590 | [RSVPizza Repo + Dashboard Dive: ZAO Events Integration](./1590-rsvpizza-zao-events-integration/) | STANDALONE | (no Goal line in doc) |
 | 2238 | [Fleet research digest, August 2026](./2238-fleet-research-digest-aug2026/) | STANDALONE | Ten research briefs answered via fleet relay 2026-08-05 to 08-07, preserved here so the work is greppable instead of chat-only. Each brief was web-gro |
+| 2610 | [Decentralized Multi-Rail Audio Storage: IPFS, Filecoin, and Arweave Tiered Redundancy Architecture for ZAO Release Pipelines](./2610-decentralized-multi-rail-audio-storage-ipfs-filecoin-arweave/) | STANDALONE | Tri-rail tiered audio storage topology: Cloudflare R2 38ms hot edge delivery, Pinata/Filecoin IPFS pinning, Arweave Turbo permanent endowment, and presigned upload pipelines. |

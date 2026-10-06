@@ -100,21 +100,21 @@ Re-researched against full GitHub clones (Items 1, 2) and search snippets for Z.
 
 **Item 2 - fruteroclub/intern-os (FULL fetch, commit 4d9646f6):**
 - **Graduated to stable v1.0.0** (2026-07-24) and **v1.1.0** (2026-08-16). Was 0.x alpha in May.
-- v1.1.0 adds **git-worktree support** (`worktree.sh`, `BRIEF.md worktrees:` binding, registry awareness) — directly relevant to ZAO's `ws/` branch convention.
+- v1.1.0 adds **git-worktree support** (`worktree.sh`, `BRIEF.md worktrees:` binding, registry awareness) - directly relevant to ZAO's `ws/` branch convention.
 - **Org rename 2026-08-16:** Internal identity shifted from `fruteroclub` → `poktalabs`; repo still at fruteroclub GitHub URL but README/install commands now reference `poktalabs/intern-os`.
 - Post-v1.1 additions: per-execution cost tracker in `session-wrap` skill (v0.4.0, Sep 2026), `checkpoint` companion skill (v0.1.0, Sep 2026).
 - AGPL v3 + commercial license terms unchanged. Contact hola@frutero.club for B2B use.
 - Upgrade WATCH to **WATCH (higher relevance)**: stable, git-worktree support relevant to ZAO fleet worktree patterns.
 - Sources: https://github.com/fruteroclub/intern-os (cloned, FULL)
 
-**Item 4 - Z.ai / GLM-5 (search snippets only — PARTIAL, treat as UNVERIFIED until direct fetch confirmed):**
+**Item 4 - Z.ai / GLM-5 (search snippets only - PARTIAL, treat as UNVERIFIED until direct fetch confirmed):**
 - Zhipu AI **IPO'd January 8, 2026** (China's first public AI company per multiple sources).
 - Rapid model releases since May 2026:
   - **GLM-5.1** (Apr 8, 2026): open-source release
   - **GLM-5.2** (Jun 13, 2026): 744B MoE, **1M-token context**, MIT license, SWE-bench Pro 62.1%
   - **GLM-5.3** (Aug 14, 2026): image input added, 1M context / 128K output, reasoning with effort tiers; open weights released ~Aug 28; current default on chat.z.ai
-- WATCH decision stands. GLM-5.3's MIT open-weights + 1M context window is a meaningful development for cost-sensitive VPS deployments. Q3 2026 eval milestone from May is now overdue — recommend pricing the API against current Anthropic budget.
-- Sources: search snippets only (direct fetches to chat.z.ai, zhipuai.cn, docs.z.ai blocked by egress proxy — PARTIAL). Key snippet sources: emergent.sh/news/glm-53-officially-launched, presenc.ai/research/zhipu-glm-model-lineage-2026.
+- WATCH decision stands. GLM-5.3's MIT open-weights + 1M context window is a meaningful development for cost-sensitive VPS deployments. Q3 2026 eval milestone from May is now overdue - recommend pricing the API against current Anthropic budget.
+- Sources: search snippets only (direct fetches to chat.z.ai, zhipuai.cn, docs.z.ai blocked by egress proxy - PARTIAL). Key snippet sources: emergent.sh/news/glm-53-officially-launched, presenc.ai/research/zhipu-glm-model-lineage-2026.
 
 ## Sources
 

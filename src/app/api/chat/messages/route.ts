@@ -72,9 +72,11 @@ async function refreshFromNeynar(channel: string): Promise<Cast[]> {
     }));
 
     // Await the DB write so data is consistent for subsequent reads
+    // ignoreDuplicates: true ensures ON CONFLICT (hash) DO NOTHING, avoiding rewriting
+    // all 20 rows and re-indexing the GIN search vector every 15 seconds.
     const { error: upsertErr } = await supabaseAdmin
       .from('channel_casts')
-      .upsert(rows, { onConflict: 'hash' });
+      .upsert(rows, { onConflict: 'hash', ignoreDuplicates: true });
     if (upsertErr) logger.error('[messages] upsert error:', upsertErr);
   }
 

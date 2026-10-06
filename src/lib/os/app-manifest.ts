@@ -147,11 +147,10 @@ const zoeDashboard: AppManifest = {
   category: 'tools',
   type: 'full-app',
   description: 'Agent command center',
-  externalUrl: 'https://zoe.zaoos.com',
+  route: '/os/agents',
   requiresAuth: true,
   requiresGate: 'allowlist',
 };
-
 
 // ─── Micro-Apps ───────────────────────────────────────────────────
 

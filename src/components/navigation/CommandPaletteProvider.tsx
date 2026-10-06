@@ -37,8 +37,14 @@ export function CommandPaletteProvider() {
       }
     };
 
+    const handleOpenEvent = () => setIsOpen(true);
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('command-palette:open', handleOpenEvent);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('command-palette:open', handleOpenEvent);
+    };
   }, []);
 
   return <CommandPalette isOpen={isOpen} onClose={close} />;

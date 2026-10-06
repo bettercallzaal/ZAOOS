@@ -39,11 +39,11 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           <Suspense fallback={null}>
             <LazyGlobalSearch />
           </Suspense>
-          <CommandPaletteProvider />
           <PersistentPlayerWithRadio />
           <BottomNav />
           <PWAInstallPrompt />
         </HideOnOS>
+        <CommandPaletteProvider />
         <OSBackButton />
       </div>
     </AuthAudioProviders>

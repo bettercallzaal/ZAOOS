@@ -1,9 +1,41 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { Cast } from '@/types';
 
-const POLL_INTERVAL = 15_000; // 15 s — balance between freshness and Neynar credit usage
+// Fallback polling interval: 60s when Realtime is active, 30s when inactive
+const REALTIME_POLL_INTERVAL = 60_000;
+const FALLBACK_POLL_INTERVAL = 30_000;
+
+function rowToCast(row: Record<string, unknown>): Cast {
+  const reactions = (row.reactions ?? {}) as {
+    likes_count?: number;
+    recasts_count?: number;
+    likes?: { fid: number }[];
+    recasts?: { fid: number }[];
+  };
+  return {
+    hash: (row.hash as string) || '',
+    author: {
+      fid: (row.fid as number) || 0,
+      username: (row.author_username as string) || '',
+      display_name: (row.author_display as string) || '',
+      pfp_url: (row.author_pfp as string) || '',
+    },
+    text: (row.text as string) || '',
+    timestamp: (row.timestamp as string) || new Date().toISOString(),
+    replies: { count: (row.replies_count as number) || 0 },
+    reactions: {
+      likes_count: reactions.likes_count ?? 0,
+      recasts_count: reactions.recasts_count ?? 0,
+      likes: reactions.likes ?? [],
+      recasts: reactions.recasts ?? [],
+    },
+    parent_hash: (row.parent_hash as string) || null,
+    embeds: (row.embeds as Cast['embeds']) || [],
+  };
+}
 
 export function useChat(channel: string = 'zao') {
   const [messages, setMessages] = useState<Cast[]>([]);
@@ -13,6 +45,7 @@ export function useChat(channel: string = 'zao') {
   const [sendError, setSendError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isRealtime, setIsRealtime] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const firstHashRef = useRef<string | null>(null); // dedup: skip setState if top cast unchanged
   const abortRef = useRef<AbortController | null>(null);
@@ -48,6 +81,65 @@ export function useChat(channel: string = 'zao') {
     } finally {
       setLoading(false);
     }
+  }, [channel]);
+
+  // Realtime subscription for instant live updates via Supabase
+  useEffect(() => {
+    let supabase: ReturnType<typeof getSupabaseBrowser> | null = null;
+    try {
+      supabase = getSupabaseBrowser();
+    } catch {
+      // Missing env vars or test environment — graceful fallback to polling
+      setIsRealtime(false);
+    }
+
+    if (!supabase) return;
+
+    const channelSub = supabase
+      .channel(`chat-casts-${channel}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'channel_casts',
+          filter: `channel_id=eq.${channel}`,
+        },
+        (payload) => {
+          const row = payload.new as Record<string, unknown>;
+          if (!row?.hash) return;
+          const newCast = rowToCast(row);
+          setMessages((prev) => {
+            if (prev.some((m) => m.hash === newCast.hash)) return prev;
+            return [newCast, ...prev];
+          });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'channel_casts',
+          filter: `channel_id=eq.${channel}`,
+        },
+        (payload) => {
+          const row = payload.new as Record<string, unknown>;
+          if (!row?.hash) return;
+          const updated = rowToCast(row);
+          setMessages((prev) =>
+            prev.map((m) => (m.hash === updated.hash ? { ...m, ...updated } : m)),
+          );
+        },
+      )
+      .subscribe((status) => {
+        setIsRealtime(status === 'SUBSCRIBED');
+      });
+
+    return () => {
+      setIsRealtime(false);
+      supabase?.removeChannel(channelSub);
+    };
   }, [channel]);
 
   const loadMore = useCallback(async () => {
@@ -87,7 +179,9 @@ export function useChat(channel: string = 'zao') {
     setHasMore(true);
     firstHashRef.current = null;
     fetchMessages();
-    intervalRef.current = setInterval(fetchMessages, POLL_INTERVAL);
+
+    const intervalTime = isRealtime ? REALTIME_POLL_INTERVAL : FALLBACK_POLL_INTERVAL;
+    intervalRef.current = setInterval(fetchMessages, intervalTime);
 
     // Resume polling immediately when tab becomes visible again
     const handleVisibility = () => {
@@ -100,7 +194,7 @@ export function useChat(channel: string = 'zao') {
       abortRef.current?.abort();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [fetchMessages]);
+  }, [fetchMessages, isRealtime]);
 
   const clearSendError = useCallback(() => setSendError(null), []);
 
@@ -197,5 +291,6 @@ export function useChat(channel: string = 'zao') {
     loadMore,
     hasMore,
     loadingMore,
+    isRealtime,
   };
 }

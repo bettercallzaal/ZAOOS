@@ -250,7 +250,8 @@ Minor: it says `emitReceipt` has 6 call sites; there are 7 (section G). It cites
 
 ### UNSUPPORTED (attribution needs confirming)
 
-- **"Zaal rule 1" to "Zaal rule 4"**, including "Sparkz is paused per Zaal rule 2" quoted as "User rule 2 mandates". These are the constraints in the Antigravity wrapper prompt, which the vault note says the orchestrator seat wrote. They may well reflect Zaal's wishes, but the doc presents them as Zaal's own rulings, and nothing here shows they are his words. Treat them as the seat's wrapper until Zaal confirms.
+- **"Zaal rule 1" to "Zaal rule 4"**, quoted as "User rule 2 mandates". Per the orchestrator seat (message to this lane, 2026-10-06), it drafted the wrapper rules (1-8), and Zaal read them and sent them to Antigravity as his own message, opening "these are my rules". So the accurate attribution is: **rules Zaal set for this mission, drafted by the orchestrator seat and sent by Zaal on 2026-10-06.** Doc 2621 states them as Zaal's own rulings with no drafting credit.
+- **"Sparkz is paused."** The orchestrator places Zaal's statement on the 2026-10-05 call with Arun (vault `meetings/2026-10-05-zaal-x-arun.md`, Gemini notes). That note on vault `origin/main` (105 lines) has **no mention of Sparkz**: a case-insensitive grep for "spark" returns 0 lines. The source may be the raw Gemini notes rather than the vault summary, but it was not located here. The wrapper repeats the claim. Sparkz's own repo shows active Milestone 1 work (last push 2026-09-28).
 - "Warpcast Replicate stream" as a fallback source: not checked.
 - ZAOscout state file names (`state/seen.json`, `state/memory.json`): this lane's read of ZAOscout found theme and per-mode seen files instead (PARTIAL on both sides; not settled).
 

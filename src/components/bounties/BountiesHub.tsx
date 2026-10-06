@@ -39,11 +39,24 @@ function formatDate(iso: string) {
   });
 }
 
+// The feed is fetched from another site, so its url is not trusted as an
+// href: anything that is not an https link on poidh.xyz is rebuilt from the
+// bounty id, which rules out javascript: and look-alike hosts.
+function bountyHref(bounty: OnchainBounty) {
+  try {
+    const u = new URL(bounty.url);
+    if (u.protocol === 'https:' && u.hostname === 'poidh.xyz') return u.toString();
+  } catch {
+    // fall through to the rebuilt link
+  }
+  return `https://poidh.xyz/base/bounty/${Number(bounty.id)}`;
+}
+
 function BountyRow({ bounty }: { bounty: OnchainBounty }) {
   const live = bounty.status !== 'closed';
   return (
     <a
-      href={bounty.url}
+      href={bountyHref(bounty)}
       target="_blank"
       rel="noopener noreferrer"
       className={`rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
@@ -122,8 +135,8 @@ export function BountiesHub({ feed }: { feed: ZaoBountiesFeed | null }) {
 
       <main className="max-w-4xl mx-auto px-4 py-8 sm:px-6 flex-1 w-full flex flex-col gap-8">
         <p className="text-sm text-white/70 leading-relaxed">
-          ZAO bounties on poidh, on Base. This list is read from the chain, so every row links to
-          a real bounty on poidh.xyz. Rules, deadlines and how to enter are in each bounty and on{' '}
+          ZAO bounties on poidh, on Base. This list is read from the chain, so every row links to a
+          real bounty on poidh.xyz. Rules, deadlines and how to enter are in each bounty and on{' '}
           <a href="https://poidhz.com" className="text-[#f5a623] underline">
             poidhz.com
           </a>

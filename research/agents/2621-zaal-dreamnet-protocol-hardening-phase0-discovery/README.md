@@ -15,6 +15,16 @@ tier: DEEP
 >
 > **Goal:** Execute Phase 0 discovery across the Zaal ecosystem to integrate DreamNet protocol-hardening capabilities into existing Zaal architecture without replacing working systems or creating unnecessary parallel infrastructure. Produce the complete integration map (`EXISTING COMPONENT -> GAP -> PROPOSED HARDENING -> FILES/SERVICES AFFECTED`) and stop for review by Brandon Ducar and Zaal Panthaki before any implementation.
 
+> **CORRECTIONS 2026-10-06 (dreamnet lane).** Every claim in this doc was re-checked against the code, and the full check is in `research/agents/2622-dreamnet-hardening-phase0-ground-truth-and-verification/` (section 13). Twelve claims were confirmed. The text below is left as it was written, and these corrections apply to it:
+>
+> 1. **Neynar webhooks have no `signer.added` or `signer.revoked` events.** The subscribable types are `cast.created`/`deleted`, `follow.created`/`deleted`, `reaction.created`/`deleted`, `trade.created` and `user.created`/`updated` (raw fetch of `docs.neynar.com/reference/publish-webhook.md`). Map row 1 and grill question 1 are wrong on signer events. Revocation has to be detected another way: polling signer status (`src/lib/farcaster/neynar.ts:261`) or on-chain key events. `cast.deleted` is real.
+> 2. **Juke recap retries do not double-cast.** The Juke route records each event and drops replays by signature hash before any handler runs (`src/app/api/juke/webhooks/route.ts:62-79`). The smaller real risk is that `room.finished` and `room.ended` share one recap branch.
+> 3. **Sparkz auth is server-side and fails closed.** Writes are gated on a `SPARKZ_ADMIN_TOKEN` cookie (`bettercallzaal/sparkz src/lib/auth.ts`). There are no client-side session checks. The local path cited, `/Users/zaalpanthaki/zao-workspace/repos/sparkz`, is a symlink to a directory that does not exist.
+> 4. **`src/lib/agents/control-plane.ts` is types only.** Its only importer is its own test. The receipts that actually run are `bot/src/zoe/receipts.ts` on `scripts/1410-agent-control-plane.sql`.
+> 5. **Attribution.** "Zaal rule 1-4" means *rules Zaal set for this mission, drafted by the orchestrator seat and sent by Zaal on 2026-10-06*. "Sparkz is paused" comes from Gemini's third-person paraphrase of Zaal on the 2026-10-05 Arun call (vault `meetings/2026-10-05-zaal-x-arun-gemini-notes.md`, line 46). Per that note, the dedicated infrastructure is paused and the core concept is not.
+> 6. **Missed.** The user-signer path, which is FC-EVAL-001's central case: it is checked once and then only for presence in a 7-day cookie. Also missed: the existing `EventEnvelope` in `src/lib/ears/types.ts:19-31`, which should be extended instead of adding `src/lib/farcaster/envelope.ts`; Spore's `RevocationResolver` and the unread `revocationRef`; and the Bonfire memory stores.
+> 7. **Number.** 2621 had already been reserved by another lane (`refs/tags/doc-2621`, 16:43Z). This doc keeps the number now that it is merged, and the other doc moved to 2622.
+
 ## Key Decisions
 
 | # | Decision | Why |

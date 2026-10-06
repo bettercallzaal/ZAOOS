@@ -141,11 +141,17 @@ export function buildWavewarzOutcomeReceipt(
 ): BuildResult {
   const parsedEvent = wavewarzEventSchema.safeParse(event);
   if (!parsedEvent.success) {
-    return { ok: false, error: `invalid event: ${parsedEvent.error.issues[0]?.message ?? 'unknown'}` };
+    return {
+      ok: false,
+      error: `invalid event: ${parsedEvent.error.issues[0]?.message ?? 'unknown'}`,
+    };
   }
   const parsedCtx = federationContextSchema.safeParse(context);
   if (!parsedCtx.success) {
-    return { ok: false, error: `invalid context: ${parsedCtx.error.issues[0]?.message ?? 'unknown'}` };
+    return {
+      ok: false,
+      error: `invalid context: ${parsedCtx.error.issues[0]?.message ?? 'unknown'}`,
+    };
   }
   const e = parsedEvent.data;
   const c = parsedCtx.data;
@@ -171,5 +177,9 @@ export function buildWavewarzOutcomeReceipt(
   const receipt_hash = outcomeReceiptHash(body);
 
   if (!sign) return { ok: true, signed: false, draft: { ...body, receipt_hash } };
-  return { ok: true, signed: true, receipt: { ...body, receipt_hash, observer_signature: sign(receipt_hash) } };
+  return {
+    ok: true,
+    signed: true,
+    receipt: { ...body, receipt_hash, observer_signature: sign(receipt_hash) },
+  };
 }

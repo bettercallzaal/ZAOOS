@@ -28,7 +28,10 @@ const event = {
   ],
 };
 
-const sign: ReceiptSigner = (hash) => ({ observer_office: 'test-office', signature_digest: `sig:${hash}` });
+const sign: ReceiptSigner = (hash) => ({
+  observer_office: 'test-office',
+  signature_digest: `sig:${hash}`,
+});
 
 describe('outcomeReceiptId', () => {
   it('matches the schema pattern and sanitizes other characters', () => {
@@ -94,7 +97,8 @@ describe('buildWavewarzOutcomeReceipt', () => {
   it('does not let the signature change the hash', () => {
     const draft = buildWavewarzOutcomeReceipt(event, context);
     const signed = buildWavewarzOutcomeReceipt(event, context, sign);
-    if (!draft.ok || draft.signed || !signed.ok || !signed.signed) throw new Error('unexpected shape');
+    if (!draft.ok || draft.signed || !signed.ok || !signed.signed)
+      throw new Error('unexpected shape');
     expect(signed.receipt.receipt_hash).toBe(draft.draft.receipt_hash);
     const { receipt_hash: _h, observer_signature: _s, ...body } = signed.receipt;
     expect(outcomeReceiptHash(body)).toBe(signed.receipt.receipt_hash);

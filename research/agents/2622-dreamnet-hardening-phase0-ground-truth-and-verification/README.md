@@ -13,7 +13,7 @@ tier: DEEP
 
 > **Goal:** Before anything is built for Brandon Ducar's "ZAAL x DREAMNET PROTOCOL HARDENING" spec (revoke-safe Farcaster memory, a signer/authority gate, receipts, adversarial eval FC-EVAL-001 "signer revocation / ghost memory"), establish from the code what ZAOOS and the satellite repos actually do today. This is the independent map that Antigravity's Phase 0 integration map is checked against.
 
-**Credit:** the spec, its threat model and the FC-EVAL-001 eval are Brandon Ducar's (DreamNet). This doc only measures the ground those sit on. The spec itself is summarised in `zao-vault notes/brandon-dreamnet-protocol-hardening-mission-2026-10-06.md`; the full text lives in the orchestrator transcript and with Brandon, and is not quoted here.
+**Credit:** the spec, its threat model and the FC-EVAL-001 eval are Brandon Ducar's (DreamNet). This doc only measures the ground those sit on. The full spec text is in the vault at `notes/brandon-dreamnet-protocol-hardening-mission-2026-10-06-RAW.md` (zao-vault d737368d); it is not quoted here.
 
 **Measured against:** ZAOOS `origin/main` at `0d0a8156c` (2026-10-06 10:48 EDT), plus `gh api` reads of the satellite repos the same day. Nothing was run against production. Every "exists" carries a file:line; every "absent" carries the search that was run.
 
@@ -281,7 +281,7 @@ Minor: it says `emitReceipt` has 6 call sites; there are 7 (section G). It cites
 | `bettercallzaal/zol`, `bettercallzaal/zorca`, `bettercallzaal/sparkz`, `bettercallzaal/zabalbot` | `gh api` tree and file reads by this lane | FULL for counts and paths quoted; PARTIAL for subagent-only details |
 | `ZAODEVZ/ZAOscout` | subagent `gh api` reads | PARTIAL |
 | Docs `agents/2170`, `2171`, `2175`, `882`; vault `notes/brandon-dreamnet-review-2026-10-06.md` and `notes/brandon-dreamnet-protocol-hardening-mission-2026-10-06.md` | read in full | FULL |
-| Brandon Ducar's spec text | not read directly; vault summary only | PARTIAL |
+| Brandon Ducar's spec text | vault `notes/brandon-dreamnet-protocol-hardening-mission-2026-10-06-RAW.md` (zao-vault d737368d, 131 lines), read; section names A-H in this doc match it | FULL |
 | Antigravity's doc 2621 (ZAOOS PR #3755, commit c71d26a21) | `git show` of the PR branch, read in full | FULL |
 | Neynar webhook event types | `curl -sL https://docs.neynar.com/reference/publish-webhook.md`, raw text grep | FULL |
 | Juke webhook dedup | `sed -n 60,95p src/app/api/juke/webhooks/route.ts` | FULL |
@@ -292,6 +292,5 @@ Minor: it says `emitReceipt` has 6 call sites; there are 7 (section G). It cites
 |---|---|---|---|
 | Correct doc 2621's five WRONG items, or mark them in place, after it merges | Antigravity or dreamnet lane | Edit | after #3755 merges |
 | Confirm whether the "Zaal rule 1-4" wording in doc 2621 is Zaal's | Zaal (via grill) | Confirm | before Brandon reads it |
-| Get the full spec text to quote section names exactly | orchestrator / Zaal | Read | before any build |
 | Decide whether the 7 joins in section 8 become a build plan | Zaal (grill) | Decision | after Brandon reviews Phase 0 |
 | Archive `bettercallzaal/farscout` so it stops being named | Zaal | Repo admin | any time |

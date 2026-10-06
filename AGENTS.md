@@ -39,8 +39,8 @@ npx biome check src/lib/agents        # lint specific module
 ## Project Structure
 
 ```
-src/app/api/         # 324 route handlers across 62 domains: /api/[feature]/[action]/route.ts
-src/components/      # 295 components organized by feature
+src/app/api/         # 325 route handlers across 62 domains: /api/[feature]/[action]/route.ts
+src/components/      # 308 components organized by feature
 src/hooks/           # 18 custom hooks (useAuth, useChat, useRadio, etc.)
 src/lib/             # Utilities across 42 domains (auth, db, farcaster, music, publish, agents)
 src/providers/       # React providers (audio player, contexts)

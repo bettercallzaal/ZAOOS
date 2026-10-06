@@ -8,7 +8,7 @@ describe('EstateReviewDeck', () => {
 
     expect(screen.getByText('Estate Review & Approvals Cockpit')).toBeInTheDocument();
     expect(screen.getByText('ORCHESTRATOR LIVE')).toBeInTheDocument();
-    expect(screen.getByText('ZAOstock 75-Second Multi-Act Recap Reel Plan')).toBeInTheDocument();
+    expect(screen.getByText('POIDH Video Bounties: Community Edits from Raw Footage')).toBeInTheDocument();
     expect(screen.getByText('Crown Vics 20-Second Teaser Video Drafts')).toBeInTheDocument();
   });
 
@@ -26,7 +26,7 @@ describe('EstateReviewDeck', () => {
 
     // Media item should be filtered out
     expect(
-      screen.queryByText('ZAOstock 75-Second Multi-Act Recap Reel Plan'),
+      screen.queryByText('Crown Vics 20-Second Teaser Video Drafts'),
     ).not.toBeInTheDocument();
   });
 

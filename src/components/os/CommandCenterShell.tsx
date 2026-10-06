@@ -9,6 +9,7 @@ import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { APP_REGISTRY, getApp } from '@/lib/os/app-manifest';
 import type { AppCategory, AppManifest, ShellId } from '@/lib/os/types';
 import { usePlayerContext } from '@/providers/audio/PlayerProvider';
+import { EstateReviewDeck } from './EstateReviewDeck';
 
 interface CommandCenterShellProps {
   pinnedApps: string[];
@@ -48,6 +49,7 @@ export function CommandCenterShell({
   const [timeZone, setTimeZone] = useState<'EST' | 'UTC'>('EST');
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string>('');
+  const [showReviewDeck, setShowReviewDeck] = useState(false);
   const unreadCount = 0;
 
   // Clock tick
@@ -373,6 +375,21 @@ export function CommandCenterShell({
               Tasks
             </Link>
 
+            {/* Estate Review Queue Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowReviewDeck((prev) => !prev)}
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors flex items-center gap-1.5 ${
+                showReviewDeck
+                  ? 'bg-[#f5a623] text-[#070e18] font-bold border-[#f5a623]'
+                  : 'bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 border-[#f5a623]/30'
+              }`}
+              title="Toggle Estate Review Queue"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-[#f5a623] animate-pulse" />
+              <span>Review Queue</span>
+            </button>
+
             {/* User Pill */}
             {userName && (
               <span className="hidden xl:inline text-xs font-mono text-[#f5a623]/90 bg-[#f5a623]/10 px-2 py-0.5 rounded border border-[#f5a623]/20">
@@ -637,10 +654,13 @@ export function CommandCenterShell({
             </div>
           </aside>
 
-          {/* ── CENTER PANEL: APPLICATION WORKSPACES (5 cols) ─────────── */}
+          {/* ── CENTER PANEL: APPLICATION WORKSPACES OR REVIEW DECK (5 cols) ─────────── */}
           <section className="lg:col-span-5 flex flex-col gap-4">
-            <div className="rounded-xl border border-white/[0.08] bg-[#0c192d] p-4 flex-1 flex flex-col">
-              {/* Category selector + Search */}
+            {showReviewDeck ? (
+              <EstateReviewDeck onDismiss={() => setShowReviewDeck(false)} />
+            ) : (
+              <div className="rounded-xl border border-white/[0.08] bg-[#0c192d] p-4 flex-1 flex flex-col">
+                {/* Category selector + Search */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pb-3 border-b border-white/[0.06]">
                 <div className="flex gap-1 overflow-x-auto pb-1 sm:pb-0">
                   {CATEGORIES.map((cat) => (
@@ -749,7 +769,8 @@ export function CommandCenterShell({
                 </div>
               </div>
             </div>
-          </section>
+          )}
+        </section>
 
           {/* ── RIGHT PANEL: TRIAGE & MEDIA DECK (3 cols) ────────────── */}
           <aside className="lg:col-span-3 flex flex-col gap-4">
@@ -843,6 +864,25 @@ export function CommandCenterShell({
                     </div>
                     <span className="text-xs font-mono text-emerald-400">Live</span>
                   </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewDeck((prev) => !prev)}
+                    className="w-full text-left p-2.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 flex items-center justify-between transition-colors block"
+                  >
+                    <div>
+                      <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <span>Estate Review Deck</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30">
+                          Active
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-white/40">PRs, Media Staging, Zaal Gates</div>
+                    </div>
+                    <span className="text-xs font-mono text-amber-400">
+                      {showReviewDeck ? 'Active' : 'Open &rarr;'}
+                    </span>
+                  </button>
 
                   <Link
                     href="/overview"

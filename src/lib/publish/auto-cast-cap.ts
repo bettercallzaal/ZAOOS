@@ -11,14 +11,25 @@
  * database read, so behaviour is unchanged until the flag is set.
  *
  * WHAT IT COUNTS. Rows in the existing `channel_casts` table for this channel
- * authored by `ZAO_OFFICIAL_FID` since 00:00 UTC. No new table. That table is
- * fed by the Neynar webhook, so the count can lag a post by a few seconds and
- * it includes official casts made by hand. Both push the cap toward posting
- * LESS, which is the safe direction for a runaway guard.
+ * authored by `ZAO_OFFICIAL_FID` since 00:00 UTC. No new table.
  *
- * FAILS CLOSED. With the cap on, a count that cannot be read (no official fid
- * configured, a query error) blocks the cast: a guard that waves posts through
- * when it cannot see is not a guard. With the cap off nothing can block.
+ * `autoCastToZao` RECORDS ITS OWN POST there (recordOfficialCast, below) the
+ * moment Neynar accepts it, the same write-through `/api/chat/send` does. So
+ * the count includes everything this function sent, immediately, whether or
+ * not the Neynar webhook is delivering. An earlier version of this file
+ * counted only webhook-delivered rows: lag then let a fast loop post MORE, and
+ * a webhook that was not delivering read as 0 and the cap never fired.
+ *
+ * What still depends on the webhook: official casts made BY HAND, outside this
+ * function. If the webhook misses those, the cap undercounts them and allows
+ * that many more. Two more honest limits: concurrent requests can each read
+ * the count before either records, so a burst can overshoot by the number of
+ * parallel callers; and if the record write itself fails after a post, that one
+ * post is not counted (it is logged at error level).
+ *
+ * FAILS CLOSED on what it can see. With the cap on, a count that cannot be
+ * read (no official fid configured, a query error) blocks the cast. With the
+ * cap off nothing can block.
  */
 import { logger } from '@/lib/logger';
 
@@ -96,5 +107,58 @@ export async function checkAutoCastCap(
   } catch (err: unknown) {
     logger.error('[auto-cast] daily cap count failed - blocking the cast:', err);
     return { allowed: false, capped: true, reason: 'count failed', cap };
+  }
+}
+
+/** Writes one official cast row. Injected in tests; the default upserts to Supabase. */
+export type OfficialCastRecorder = (row: {
+  hash: string;
+  channel_id: string;
+  fid: number;
+  text: string;
+  timestamp: string;
+  embeds: unknown[];
+}) => Promise<void>;
+
+const supabaseRecorder: OfficialCastRecorder = async (row) => {
+  const { supabaseAdmin } = await import('@/lib/db/supabase');
+  const { error } = await supabaseAdmin.from('channel_casts').upsert([row], { onConflict: 'hash' });
+  if (error) throw new Error(error.message);
+};
+
+/**
+ * Record a cast this function just sent, so the next cap check counts it
+ * without waiting for the webhook. Does nothing when the cap is off. Never
+ * throws: the cast is already public, so a failed write is logged, not raised.
+ * Returns whether the row was written.
+ */
+export async function recordOfficialCast(
+  channelId: string,
+  cast: { hash: string | null; text: string; embeds?: unknown[] },
+  opts: { now?: Date; recorder?: OfficialCastRecorder } = {},
+): Promise<boolean> {
+  if (autoCastDailyCap() === null) return false;
+  const fidRaw = process.env.ZAO_OFFICIAL_FID;
+  const fid = fidRaw && /^\d+$/.test(fidRaw.trim()) ? Number(fidRaw.trim()) : null;
+  if (fid === null || !cast.hash) {
+    logger.error(
+      '[auto-cast] daily cap is on but a sent cast could not be recorded (no fid or no hash) - the cap will undercount by one',
+    );
+    return false;
+  }
+  try {
+    const record = opts.recorder ?? supabaseRecorder;
+    await record({
+      hash: cast.hash,
+      channel_id: channelId,
+      fid,
+      text: cast.text,
+      timestamp: (opts.now ?? new Date()).toISOString(),
+      embeds: cast.embeds ?? [],
+    });
+    return true;
+  } catch (err: unknown) {
+    logger.error('[auto-cast] recording a sent cast failed - the cap will undercount by one:', err);
+    return false;
   }
 }

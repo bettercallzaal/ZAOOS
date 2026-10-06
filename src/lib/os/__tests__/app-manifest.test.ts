@@ -22,8 +22,8 @@ describe('APP_REGISTRY', () => {
     expect(APP_REGISTRY.length).toBeGreaterThanOrEqual(10);
   });
 
-  it('has exactly 18 apps', () => {
-    expect(APP_REGISTRY).toHaveLength(18);
+  it('has exactly 21 apps', () => {
+    expect(APP_REGISTRY).toHaveLength(21);
   });
 
   it('has no duplicate app IDs', () => {

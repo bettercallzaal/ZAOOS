@@ -20,8 +20,8 @@ export const SHELLS: Record<ShellId, ShellDefinition> = {
   },
   dashboard: {
     id: 'dashboard',
-    name: 'Dashboard',
-    description: 'Sidebar navigation with main content area',
+    name: 'Command Center',
+    description: 'Mission control cockpit for agent fleet, telemetry & apps',
     icon: '📊',
   },
   feed: {

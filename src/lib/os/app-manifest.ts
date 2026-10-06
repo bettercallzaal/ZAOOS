@@ -138,6 +138,43 @@ const admin: AppManifest = {
   requiresGate: 'allowlist',
 };
 
+const poidh: AppManifest = {
+  id: 'poidh',
+  name: 'POIDH Bounties',
+  icon: '✦',
+  category: 'earn',
+  type: 'full-app',
+  description: 'Proof of Ink DAO video, creative, and code bounties on Base',
+  route: '/bounties',
+  externalUrl: 'https://poidhz.com',
+  requiresAuth: false,
+  defaultPinned: true,
+};
+
+const festivals: AppManifest = {
+  id: 'festivals',
+  name: 'Festivals',
+  icon: '▲',
+  category: 'music',
+  type: 'full-app',
+  description: 'ZAOstock 2026 archives, live stream replays, and 2027 season',
+  route: '/festivals',
+  requiresAuth: false,
+  defaultPinned: true,
+};
+
+const dispatch: AppManifest = {
+  id: 'dispatch',
+  name: 'Daily Dispatch',
+  icon: '◆',
+  category: 'social',
+  type: 'full-app',
+  description: 'Daily community newsletter on Paragraph',
+  externalUrl: 'https://paragraph.xyz/@thezao',
+  requiresAuth: false,
+  defaultPinned: false,
+};
+
 // ─── External Apps (agent dashboards) ─────────────────────────────
 
 const zoeDashboard: AppManifest = {
@@ -147,11 +184,10 @@ const zoeDashboard: AppManifest = {
   category: 'tools',
   type: 'full-app',
   description: 'Agent command center',
-  externalUrl: 'https://zoe.zaoos.com',
+  route: '/os/agents',
   requiresAuth: true,
   requiresGate: 'allowlist',
 };
-
 
 // ─── Micro-Apps ───────────────────────────────────────────────────
 
@@ -243,6 +279,9 @@ export const APP_REGISTRY: AppManifest[] = [
   wavewarz,
   social,
   admin,
+  poidh,
+  festivals,
+  dispatch,
   // External apps
   zoeDashboard,
   // Micro-apps

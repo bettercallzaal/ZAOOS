@@ -818,7 +818,7 @@ Separate sound vendor needed (not Wallace Events). Options:
 
 | Vendor | Location | Capacity | Contact | Notes |
 |--------|----------|----------|---------|-------|
-| **DRD Audio/Visual** | Fort Fairfield, ME | Up to 32-channel 6,000W full stage setup, indoor/outdoor. 35+ years. Serves fairs/festivals statewide | (207) 472-3900, david@drdaudiovisual.com | Largest in Northern Maine. Festival-experienced. Includes stage power distribution + lighting + rigging |
+| **DRD Audio/Visual** | Fort Fairfield, ME | Up to 32-channel 6,000W full stage setup, indoor/outdoor. 35+ years. Serves fairs/festivals statewide | <redacted-phone>, <redacted-email> | Largest in Northern Maine. Festival-experienced. Includes stage power distribution + lighting + rigging |
 | **Maine Audio Visual** | Statewide | Professional PA, wireless mics, audio mixers, band backline, DJ gear, stages | maineaudiovisual.com | Full-service statewide coverage |
 | **Bronson AV** | Bangor, ME | Event services, sound systems | bronsonav.com | Local to Bangor (~30 min from Ellsworth) |
 | **Northeast Event Design** | Maine | Sound + lighting rentals, AV production | northeasteventdesign.com | Full production company |

@@ -221,7 +221,7 @@ Would you be open to a 15-minute conversation this week? I'm happy to come to yo
 Best,  
 Zaal Panthaki  
 ZAOstock Organizer | The ZAO  
-bettercallzaal@gmail.com  
+<redacted-email>  
 zaoos.com/stock
 
 ---

@@ -121,7 +121,7 @@ The ZAOstock event brought WaveWarZ's cumulative statistics to:
 ### Sep 1 — Lineup Reveal PR
 
 **Mandatory:**
-- [ ] Hypebot: bhoughton@hypebot.com (or direct DM)
+- [ ] Hypebot: <redacted-email> (or direct DM)
 - [ ] Bangor Daily News: tips@bangordailynews.com
 - [ ] Ellsworth American: editor@ellsworthamerican.com
 

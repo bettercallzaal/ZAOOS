@@ -18,7 +18,7 @@ Pre-revenue or early-revenue (unconfirmed in transcripts). Zaal has access to Ty
 | Person | Role | Contact |
 |--------|------|---------|
 | Kaylan Sliney | Co-founder & CEO | (not on bot) |
-| Tyler Stambaugh | Co-founder & COO | tyler@magnetiq.xyz (on Magnetiq group chat) |
+| Tyler Stambaugh | Co-founder & COO | <redacted-email> (on Magnetiq group chat) | [CLAIM-OK: magnetiq-live historical record; line touched only to redact contact data, card 10141]
 | Caitlin | Tyler's collaborator | Not yet on group; noted in persona as "may join later" |
 
 ---

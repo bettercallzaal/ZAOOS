@@ -11,7 +11,7 @@
 **Publication:** Hypebot (hypebot.com)  
 **Contact:** Bruce Houghton (founder) and/or staff writers  
 **X handle:** @hypebot  
-**Best pitch channel:** Email (contact@hypebot.com or bruce@hypebot.com) — confirmed active
+**Best pitch channel:** Email (<redacted-email> or <redacted-email>) — confirmed active
 
 **Who reads Hypebot:**
 - Independent artists and managers

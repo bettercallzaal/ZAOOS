@@ -83,7 +83,7 @@ Save these for when you have more team bandwidth, a track record, and bigger ven
 | Workshop count | 11 concurrent | 4-6 (smaller venue, smaller team) |
 | Live music acts | 2 bands + 1 DJ | 10 artists (already planned) |
 | Evening barn capacity | 40 seats | Parklet capacity TBD — confirm with Wallace Events |
-| Contact / organizer | Harry Greene, 978-501-3888 | Zaal, already set |
+| Contact / organizer | Harry Greene,<redacted-phone> | Zaal, already set |
 
 ## ZAO Ecosystem Integration
 
@@ -99,7 +99,7 @@ Save these for when you have more team bandwidth, a track record, and bigger ven
 The ZAO has a similar dual identity: The ZAO (the community / brand) runs ZAOstock (the event) at a physical venue (Franklin St Parklet). Same structure as Propagate (tech co) → Ramble On (physical farm) → Birding Man (annual festival). Use this framing in pitch decks: "ZAOstock is produced by The ZAO in partnership with Art of Ellsworth at Franklin Street Parklet."
 
 **Potential outreach:**
-Harry Greene (Ramble On / Propagate) is reachable at 978-501-3888. Worth a 15-min call to compare notes on small community festival logistics, sliding-scale ticketing, sponsor recruitment. Add as sponsor-outreach-adjacent todo.
+Harry Greene (Ramble On / Propagate) is reachable at<redacted-phone>. Worth a 15-min call to compare notes on small community festival logistics, sliding-scale ticketing, sponsor recruitment. Add as sponsor-outreach-adjacent todo.
 
 ## Partner / Sponsor Strategy Lessons
 

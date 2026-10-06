@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-06
 related-docs: 661, 663
 tier: STANDARD
 ---
@@ -328,3 +328,19 @@ Package includes:
 Doc 663 already surveyed 30+ repos, graded them, and identified stale ones (mixer, fractalbotmarch2026, ZAOFlights, duodo-snap, nouns-snap). This doc (683c) builds on that inventory and focuses narrowly on code/config **reuse** + **automation**. No source code modifications; purely structural consolidation.
 
 The monorepo-as-lab doctrine (from ZAOOS CLAUDE.md) says: "each graduate stands alone." These templates + shared packages honor that — they enable independence while reducing duplication.
+
+---
+
+## Updated 2026-10-06
+
+Revalidated by ZAO Research Radar. Key external stack changes since 2026-05-20:
+
+**Implementation status (as of 2026-10-06):** None of the proposed items — `zao-template` repo, `@zaos/pre-commit-hooks` package, `ecosystem.json` + GitHub Actions sync, `scripts/graduate-project.sh` — are present in ZAOOS. The proposals remain unbuilt; all are still valid opportunities.
+
+**Next.js 16.3 released (August 2026):** Instant Navigations shipped — two config flags (`cacheComponents: true`, `partialPrefetching: true`) enable SPA-like immediate link-click responses without sacrificing Server Components. The stack alignment target in the Opportunities table above (`Next.js 16` → all repos) should be updated to `16.3`. Additionally, July 2026 monthly security releases patched 4 HIGH + 5 MEDIUM severity vulnerabilities (fixed in 16.2.11); a critical-severity fix shipped in 16.3.2. ZAOOS is on `^16.2.9` (semver auto-resolves 16.2.x patches) but does NOT automatically receive 16.3.x security fixes — the template proposal should pin to `>=16.3.2`. Source: https://nextjs.org/blog/next-16-3
+
+**Biome 2.5.x (latest 2.5.6–2.5.8, August 2026):** Major new capabilities since the doc was written: type-aware linting rules (first JS linter that doesn't rely on the TS compiler), plugin support, multi-file analysis, HTML formatting, and revamped import sorting. ZAOOS is on `^2.4.12`. The `@zaos/pre-commit-hooks` template proposal and the shared `biome.json` in `zao-template` should target `^2.5` to use plugins + type-aware rules. Source: https://socket.dev/npm/package/@biomejs/biome/overview/2.5.6
+
+**React 19 security patch (January 2026):** CVE-2025-55182 and related vulnerabilities were patched for React 19.0.0–19.2.2. ZAOOS is on `19.2.3` which is unaffected, but any graduated repo still on 19.0.x–19.2.2 needs upgrading. Source: https://makerkit.dev/blog/tutorials/react-19-2
+
+**Pre-commit hooks tooling:** Lefthook (Go, parallel execution, ~10x faster than Husky for large repos, single `lefthook.yml` config) has emerged as the leading alternative to Husky in 2026. The `@zaos/pre-commit-hooks` proposal could adopt Lefthook instead of Husky to reduce install overhead. Source: https://www.pkgpulse.com/guides/husky-vs-lefthook-vs-lint-staged-git-hooks-nodejs-2026

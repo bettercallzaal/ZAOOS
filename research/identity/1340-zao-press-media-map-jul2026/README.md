@@ -69,7 +69,7 @@ COC Concertz threads (@wavewarz X), ZAOstock Farcaster announcement (/zao), ZABA
 
 | Outlet | Contact | Angle | Status |
 |--------|---------|-------|--------|
-| **Water & Music** | cherie@waterandmusic.com | Artist economics; "loser-earns" mechanic + AI tournament hook | PITCH JUL 24 — template in doc 1324 + Angle 0 |
+| **Water & Music** | <redacted-email> | Artist economics; "loser-earns" mechanic + AI tournament hook | PITCH JUL 24 — template in doc 1324 + Angle 0 |
 | **Music Business Worldwide** | Editorial (no direct contact) | Post-ZAOstock: "Maine DAO pays artists onchain night-of" | COLD — pitch Oct 4 |
 | **Hypebot** | tips@hypebot.com | "WaveWarZ pays artists 1% of every bet — 13.39 SOL paid so far" | COLD — pitch Aug 1 |
 | **Ari's Take** | ariherstand.com/contact | ZAOstock: "how a DAO booked 8 artists via onchain battle history" | PITCH JUL 31 — template in doc 1328 |

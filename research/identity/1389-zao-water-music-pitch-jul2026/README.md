@@ -36,7 +36,7 @@ owner: Zaal (send email) + ZOE (follow-up reminder +10 days)
 
 ## The Pitch Email (Send Jul 24)
 
-**To:** cheriehu42@gmail.com (or use contact form at waterandmusic.com if no public email)
+**To:** <redacted-email> (or use contact form at waterandmusic.com if no public email)
 **CC:** none
 **Subject:** WaveWarZ data: 1,289 battles, loser-earns economics, community governance — available for research
 

@@ -77,7 +77,7 @@ Stephen already emailed Zaal 2026-04-18 — warm lead, replied "let me know what
 | Business type | Multidisciplinary landscape design + construction firm |
 | Address | 61 Beech Hill Cross Road, Mount Desert, ME |
 | Phone | (207) 951-2525 |
-| Email | cameron@riversidegroupme.com |
+| Email | <redacted-email> |
 | Founded | 2013 (13 years in business) |
 | Team size | 6 (Cameron owner, Archer equipment op, Daniel PM, Tim + Keith carpentry, Phil landscape tech) |
 | Market | High-end: "private gardens and coastal estates", "luxury rental market" |

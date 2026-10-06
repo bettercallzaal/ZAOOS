@@ -34,7 +34,7 @@ owner: Zaal
 
 | Show | Why | Contact |
 |------|-----|---------|
-| **Water & Music** (Cherie Hu) | Canonical onchain music research — a citation from here = academic weight. Also Tier 1 in doc 1324 outreach. | cherie@waterandmusic.com (from doc 1324) |
+| **Water & Music** (Cherie Hu) | Canonical onchain music research — a citation from here = academic weight. Also Tier 1 in doc 1324 outreach. | <redacted-email> (from doc 1324) |
 | **Mint Season** (Adam Levy) | Web3 creator economy focus; regularly covers music + DAOs. | Twitter/X DM @adam_levy_v |
 | **Crypto Music (CMX)** | Dedicated onchain music pod — WaveWarZ is a perfect fit. | @CMXmusic / cmxmusic.xyz contact |
 | **BASS DROP** (Sound.xyz) | Sound's native pod; cross-promotion opportunity even as competitor. | @soundxyz_io DM |

@@ -314,7 +314,7 @@ No other festival combines:
 - **Address:** 1 Printing House Square, Ellsworth
 - **Phone:** (207) 667-2576
 - **News email:** news@ellsworthamerican.com
-- **Reporters:** Emily Niedermeyer (eniedermeyer@ellsworthamerican.com), Sarah Halberstadt (Ellsworth Reporter)
+- **Reporters:** Emily Niedermeyer (<redacted-email>), Sarah Halberstadt (Ellsworth Reporter)
 - **Action:** Email 8 weeks before event (August) with press release
 
 ### Bangor Daily News

@@ -18,10 +18,10 @@ tier: STANDARD
 | # | Decision | Why |
 |---|---|---|
 | 1 | **SAVE THE SIX STREAM RECORDINGS BEFORE SAT 10 OCT.** USE Twitch Highlights (Twitch keeps them indefinitely, no disk) or a local download (about 4.8 GB at 720p, the source quality). | twitch.tv/zaofestivals is neither Affiliate nor Partner (Twitch GQL, 2026-10-05), so past broadcasts are kept 7 days. All six were broadcast 3 Oct, so they are due to be deleted around 10 Oct unless the broadcasting account has Prime or Turbo, which is not publicly visible. Every footage bounty needs them. |
-| 2 | **BORROW AUDIENCES; do not count on our own.** Every owned channel is small: Instagram @zaofestivals 258 followers, Twitch 4 followers, Farcaster /zao 120 followers, the six recordings 104 views between them. | A bounty that ends with an entrant posting to their own account reaches 9 to 178 views per post (round four entrants on X, rounds/daily/d04/PICK.md in bettercallzaal/poidhz). The audiences that are bigger than ours belong to the eight acts, Star 97.7, and Ellsworth. |
+| 2 | **BORROW AUDIENCES; do not count on our own.** Every owned channel is small: Instagram @zaofestivals 258 followers, Twitch 4 followers, Farcaster /zao 120 followers, the six recordings 104 views between them. | A bounty that ends with an entrant posting to their own account reaches 9 to 178 views per post (round four entrants on X, rounds/daily/d04/PICK.md in bettercallzaal/poidhz). The audiences that are bigger than ours belong to the seven acts, Star 97.7, and Ellsworth. |
 | 3 | **USE Instagram Collab posts as the delivery mechanism.** Each bounty asks the entrant to post a Reel and invite @zaofestivals and the act as collaborators. | Instagram's own help: an accepted collab post "will also show on their profile and be distributed to their followers in Instagram feed". Up to five collaborators. Instagram also names follower count as a ranking signal, which is exactly what a 258-follower account lacks. |
-| 4 | **ONE BOUNTY PER ACT for eight of the ten.** "Best clip of [act]'s set", each sent to that act. | Gives each act a reason to share the bounty itself and the winning clip. YouTube's music blog (Jan 2023): fan-created Shorts raised the average artist's unique-viewer audience by more than 80%. |
-| 5 | **COLLECT THE ACTS' INSTAGRAM HANDLES FIRST.** Only 2 of 8 are on file. | ZAODEVZ/ZAOstock `src/lib/lineup-fallback.ts`: Acadia Rising (instagram.com/acadia.rising) and DCoop (@dcoopofficial) have handles; The Crown Vics, OPEN X, Grass Rug, Michael Anderson, LyonsDen Rez Muzik and Tom Fellenz do not. Without a handle, the collab lever does not exist. |
+| 4 | **ONE BOUNTY PER ACT for seven of the ten.** "Best clip of [act]'s set", each sent to that act. | Gives each act a reason to share the bounty itself and the winning clip. YouTube's music blog (Jan 2023): fan-created Shorts raised the average artist's unique-viewer audience by more than 80%. |
+| 5 | **COLLECT THE ACTS' INSTAGRAM HANDLES FIRST.** Only 1 of 7 is on file. | ZAODEVZ/ZAOstock `src/lib/lineup-fallback.ts`: DCoop (@dcoopofficial) has one; The Crown Vics, OPEN X, Grass Rug, Michael Anderson, LyonsDen Rez Muzik and Tom Fellenz do not. Without a handle, the collab lever does not exist. |
 | 6 | **POST TO TIKTOK AND YOUTUBE SHORTS AS WELL as Reels, and SKIP picking one "best" platform.** | The 2026 benchmarks contradict each other for small accounts (Findings, section 3). TikTok and Shorts both push to non-followers; Reels leans on followers. Cross-posting costs one upload. |
 | 7 | **KEEP $10, and spend the effort on a boost instead.** | Our own record: on poidh, prize size showed no effect and $6 to $15 is the weakest band (33% drew entries, n=21), while a pot boosted by someone other than the issuer drew a median 5.5 entries against 1.5 (n=552). Ask Kenny and the acts to add to the pots. |
 
@@ -67,11 +67,13 @@ All require: vertical, under 90 s, captions, posted as an Instagram Collab invit
 
 | # | Closes | Ask |
 |---|---|---|
-| 1 to 8 | 12 Oct for four acts, 19 Oct for four | Best clip of one act's set, one bounty per act, sent to that act |
-| 9 | 19 Oct | The whole day in 90 seconds |
-| 10 | 2 Nov | The worst possible ad for ZAOstock 2027 (an inverted ask; Hivemind's worst-ad bounty drew 66 entries, n=1) |
+| 1 to 7 | 12 Oct for four acts, 19 Oct for three | Best clip of one act's set, one bounty per act, sent to that act |
+| 8 | 11 Oct (cast as round nine) | The whole day in 90 seconds |
+| 9 | 2 Nov | The worst possible ad for ZAOstock 2027 (an inverted ask; Hivemind's worst-ad bounty drew 66 entries, n=1) |
 
 The footage rounds close first because of section 2, even with the recordings saved.
+
+**Updated 2026-10-05, same day:** seven acts played on 3 Oct, not eight. Per Zaal's ruling that day, the act that did not show is not named or counted here; zaostock.com/artists lists seven. The slate is now seven per-act bounties, the recap (cast as round nine, closing Sun 11 Oct) and the worst-ad round.
 
 ## Also See
 
@@ -86,10 +88,10 @@ The footage rounds close first because of section 2, even with the recordings sa
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Save all six 3 Oct recordings: Highlights created on twitch.tv/zaofestivals, or the 720p files downloaded and copied off the Mac; shipped when six files or six Highlights exist | Zaal | Task | 2026-10-08 |
-| Get Instagram handles for the six acts with none on file, written into ZAODEVZ/ZAOstock `lineup-fallback.ts` socials; shipped when 8 of 8 have one | Zaal | PR | 2026-10-07 |
+| Get Instagram handles for the six acts with none on file, written into ZAODEVZ/ZAOstock `lineup-fallback.ts` socials; shipped when 7 of 7 have one | Zaal | PR | 2026-10-07 |
 | Cut or approve the ten-bounty slate above; shipped when Zaal names the list in the poidhz pane | Zaal | Decision | 2026-10-05 |
 | Write the approved bounty texts through the poidhz checks (validate-bounty-description.py) and put each on a cast page; shipped when every text passes and the cast page is on the clipboard | poidhz lane | PR | 2026-10-06 |
-| Message each act the link to its own bounty after casting; shipped when eight messages are sent | Zaal | Task | 2026-10-07 |
+| Message each act the link to its own bounty after casting; shipped when seven messages are sent | Zaal | Task | 2026-10-07 |
 
 ## Sources
 

@@ -17,9 +17,10 @@
 #    neither, so every Orca lane was 'unknown' - and a pane on a machine where
 #    some OTHER tmux server was running got that server's session name, which
 #    is worse. Now: ZAO_LANE; tmux only when this shell is inside tmux ($TMUX);
-#    else the working directory, the way zaal-dotfiles bin/zao-lane-context.sh
-#    resolves it at session start. A git worktree is resolved through its main
-#    checkout, so an Orca worktree with any directory name finds its lane.
+#    else the name of the checkout the working directory is in (its git top
+#    level, so a subdirectory resolves like its root), mapped the way
+#    zaal-dotfiles bin/zao-lane-context.sh maps it at session start. A linked
+#    worktree is named by its OWN directory, never by its main checkout's.
 #    When nothing resolves it says UNKNOWN. It never prints a guessed name.
 #
 # 2. THE SURFACE. It looked for ~/zao-vault/handoffs/<lane>.md in the working
@@ -82,15 +83,18 @@ elif [ -n "${TMUX:-}" ]; then
   LANE=$(tmux display-message -p '#S' 2>/dev/null || true); HOW="tmux session"
 fi
 if [ -z "$LANE" ]; then
-  LANE=$(lane_for_dir "$(basename "$CWD")"); HOW="directory $(basename "$CWD")"
-fi
-if [ -z "$LANE" ]; then
-  # A git worktree (Orca makes these with any name): ask git for the main checkout.
-  COMMON=$(git -C "$CWD" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
-  if [ -n "$COMMON" ]; then
-    MAIN_DIR=$(basename "$(dirname "$COMMON")")
-    LANE=$(lane_for_dir "$MAIN_DIR"); HOW="main checkout $MAIN_DIR of this worktree"
-  fi
+  # The session's cwd can be a subdirectory (.../dreamnet/bot), so name the
+  # checkout it is in, not the folder it happens to stand in.
+  TOP=$(git -C "$CWD" rev-parse --show-toplevel 2>/dev/null || true)
+  NAME=$(basename "${TOP:-$CWD}")
+  LANE=$(lane_for_dir "$NAME"); HOW="directory $NAME"
+  # NO FALLBACK TO THE MAIN CHECKOUT, on purpose. The first version of this fix
+  # mapped a linked worktree whose own name did not resolve to its main
+  # checkout's lane. Every Orca worktree of ZAOOS has the main checkout
+  # "ZAO OS V1", so every such pane became 'zaoos' - a guessed name - and when
+  # zaoos had a fresh record, a lane with no handoff at all was told "fresh
+  # enough" (dreamnet lane's review of #3773, 2026-10-06). A worktree is its
+  # own lane or it is UNKNOWN.
 fi
 
 if [ -z "$LANE" ]; then

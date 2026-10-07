@@ -100,18 +100,46 @@ describe('precompact-handoff-guard: which lane is this', { timeout: 30_000 }, ()
     expect(r.code).toBe(0);
   });
 
-  it('resolves a git worktree with an arbitrary name through its main checkout', () => {
+  it('resolves a subdirectory like the root of the checkout it is in', () => {
     const w = world();
-    w.commit('handoffs/status/zaostock.md', 2);
-    const main = dir(w.home, 'zaostock');
+    w.commit('handoffs/status/dreamnet.md', 1);
+    const main = dir(w.home, 'ZAO OS V1');
     git(main, ['init', '-q', '-b', 'main']);
     git(main, ['commit', '-q', '--allow-empty', '-m', 'init']);
-    const wt = join(w.home, 'work', 'orca-7f3a91');
+    const wt = join(w.home, 'work', 'dreamnet');
     git(main, ['worktree', 'add', '-q', '--detach', wt]);
-    const r = run(w.home, wt);
-    expect(r.out).toContain("lane 'zaostock'");
-    expect(r.out).toContain('main checkout zaostock of this worktree');
+    mkdirSync(join(wt, 'bot'));
+    const r = run(w.home, join(wt, 'bot'), { check: true });
+    expect(r.out).toContain("lane 'dreamnet' (from directory dreamnet)");
     expect(r.out).toContain('fresh enough');
+    expect(r.code).toBe(0);
+    // and a subdirectory of the MAIN checkout is the main checkout's lane
+    mkdirSync(join(main, 'src'));
+    w.commit('handoffs/status/zaoos.md', 1);
+    expect(run(w.home, join(main, 'src')).out).toContain("lane 'zaoos' (from directory ZAO OS V1)");
+  });
+
+  it("never gives a linked worktree its main checkout's lane", () => {
+    // The dangerous case from the review of this fix: the main checkout's lane
+    // has a FRESH record and the lane actually running has none. Borrowing the
+    // name told a lane with no handoff that it was fine.
+    const w = world();
+    w.commit('handoffs/status/zaoos.md', 0);
+    const main = dir(w.home, 'ZAO OS V1');
+    git(main, ['init', '-q', '-b', 'main']);
+    git(main, ['commit', '-q', '--allow-empty', '-m', 'init']);
+    for (const name of ['review-deck', 'orca-7f3a91']) {
+      const wt = join(w.home, 'work', name);
+      git(main, ['worktree', 'add', '-q', '--detach', wt]);
+      mkdirSync(join(wt, 'bot'));
+      for (const cwd of [wt, join(wt, 'bot')]) {
+        const r = run(w.home, cwd, { check: true });
+        expect(r.out).not.toContain("lane 'zaoos'");
+        expect(r.out).not.toContain('fresh enough');
+        expect(r.out).toContain("this pane's lane is UNKNOWN");
+        expect(r.code).toBe(2);
+      }
+    }
   });
 
   it('accepts an unmapped directory name only when origin holds a record for it', () => {

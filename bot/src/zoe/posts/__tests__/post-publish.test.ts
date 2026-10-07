@@ -243,7 +243,13 @@ describe('POST button -> /api/publish/compose (flag ZOE_POST_PUBLISH)', () => {
     await handlePostCallback({ ctx: ctx as never, repoDir: '/tmp/repo', zaalTgId: 1, fetchImpl });
     const texts = sendMessage.mock.calls.map((c) => String(c[1]));
     expect(texts).not.toContain(DRAFT.text);
-    expect(texts.some((t) => /UNKNOWN/.test(t) && /check before reposting/i.test(t) && /farcaster/i.test(t))).toBe(true);
+    const unknownLine = texts.find((t) => /UNKNOWN/.test(t)) ?? '';
+    expect(unknownLine).toMatch(/check before reposting/i);
+    // Where the route posts, per src/lib/publish/auto-cast.ts (/zao as @thezao)
+    // and src/lib/publish/x.ts (tweet URLs are x.com/thezao/...). Never Zaal's personal X.
+    expect(unknownLine).toMatch(/\/zao on Farcaster/);
+    expect(unknownLine).toMatch(/x\.com\/thezao/);
+    expect(unknownLine).not.toMatch(/bettercallzaal/i);
     const events = mockAppendFile.mock.calls.map((c) => JSON.parse(String(c[1])).event);
     expect(events).toContain('publish-unknown');
     expect(events).not.toContain('publish-error');

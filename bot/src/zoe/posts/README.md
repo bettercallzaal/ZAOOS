@@ -130,6 +130,7 @@ does what it always did: approve and resend the text to paste into Firefly. Four
 results: published; partial (something is live, text NOT resent); failed (4xx or
 a pre-connect error, nothing can be live, text resent with the reason on top);
 UNKNOWN (30 s abort, 5xx, unreadable body - the route casts to Farcaster first,
-so this may be a live cast; text NOT resent, Zaal checks before reposting). Module:
+so this may be a live cast; text NOT resent, Zaal checks /zao and x.com/thezao
+before reposting). Module:
 `publish.ts`; tests: `__tests__/post-publish.test.ts`. Research: doc 2244
 (the echo root cause), doc 2239 section 5.

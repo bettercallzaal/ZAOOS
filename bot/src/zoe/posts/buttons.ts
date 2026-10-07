@@ -231,7 +231,10 @@ async function handleClaimedPostCallback(
           await opts.ctx.api.sendMessage(
             opts.zaalTgId,
             `Publish result UNKNOWN - ${result.summary}\n` +
-              'Check before reposting: the /zao channel on Farcaster for the cast, @bettercallzaal on X for the tweet. ' +
+              // Where the route actually posts, read from its publishers: auto-cast.ts
+              // casts to /zao as the @thezao official account; x.ts returns
+              // https://x.com/thezao/status/<id>. Not Zaal's personal X.
+              'Check before reposting: /zao on Farcaster (posted as @thezao) for the cast, x.com/thezao for the tweet. ' +
               'Text not resent on purpose.',
           );
         } catch {

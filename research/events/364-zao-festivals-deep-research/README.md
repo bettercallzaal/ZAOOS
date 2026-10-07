@@ -314,7 +314,7 @@ No other festival combines:
 - **Address:** 1 Printing House Square, Ellsworth
 - **Phone:** (207) 667-2576
 - **News email:** news@ellsworthamerican.com
-- **Reporters:** Emily Niedermeyer (eniedermeyer@ellsworthamerican.com), Sarah Halberstadt (Ellsworth Reporter)
+- **Reporters:** Emily Niedermeyer (<redacted-email>), Sarah Halberstadt (Ellsworth Reporter)
 - **Action:** Email 8 weeks before event (August) with press release
 
 ### Bangor Daily News
@@ -331,7 +331,6 @@ No other festival combines:
 
 ---
 
-<<<<<<< HEAD
 ## Artist Travel Costs (Flights to Bangor)
 
 | Route | Roundtrip Range | Notes |
@@ -367,7 +366,6 @@ Hybrid model unique to ZAOstock:
 3. Onchain transparency - all income/expenses visible
 4. Fractured Atlas for tax-deductible traditional finance
 5. Year 2+: community votes on lineup, budget, vendors
-=======
 ---
 
 ## OUTREACH LIST: People + Organizations to Connect With
@@ -443,21 +441,11 @@ Hybrid model unique to ZAOstock:
 | **Maine Community Foundation** | Varies | Already funded HoE | Via Cara Romano |
 | **Bangor Savings Bank** | $1,000 | Monthly review, logo visibility | Apply NOW |
 | **Fractured Atlas emergency funds** | Small | Fiscal sponsor benefits | Check eligibility |
->>>>>>> main
 
 ---
 
 ## Next Research Targets
 
-<<<<<<< HEAD
-- Maine Craft Weekend statewide attendance (ask Cara Romano)
-- ZAO-CHELLA Instagram metrics (need screenshots from Zaal)
-- Wallace Events tent quote (call 207-667-6000)
-- Ellsworth Business Development Corporation support
-- Bar Harbor Chamber tourism angle
-- Maine Brewers Guild via Fogtown for beer partnership
-- OnChain Music licensing for live performance recordings
-=======
 - Maine Craft Weekend statewide attendance data (ask Cara Romano directly)
 - ZAO-CHELLA Instagram engagement metrics (need screenshots from Zaal)
 - Specific Airbnb pricing for October 2026 in Ellsworth
@@ -469,7 +457,6 @@ Hybrid model unique to ZAOstock:
 - Bar Harbor Chamber of Commerce - tourism angle
 - Maine Brewers Guild - Fogtown connection for beer partner
 - OnChain Music licensing terms for live performance recordings
->>>>>>> main
 
 ---
 

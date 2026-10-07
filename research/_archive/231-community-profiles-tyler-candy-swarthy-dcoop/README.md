@@ -17,7 +17,7 @@
 | **Title** | Co-Founder & COO (also referenced as Co-Founder & Chief Product Officer) |
 | **Company** | MAGNETIQ, Inc. |
 | **Location** | New York, NY |
-| **Email** | tyler@magnetiq.xyz |
+| **Email** | <redacted-email> |
 | **LinkedIn** | [linkedin.com/in/tyler-c-stambaugh-18020060](https://www.linkedin.com/in/tyler-c-stambaugh-18020060/) |
 | **Polywork** | [polywork.com/tyler_stambaugh](https://www.polywork.com/tyler_stambaugh) |
 | **Twitter** | @magnetiq_xyz (company account) |
@@ -131,7 +131,7 @@ Magnetiq uses **QR codes** (not NFC) as the primary interaction mechanism:
 
 ### Technical Gap
 
-Magnetiq is on **Flow blockchain**; ZAO OS is on **Ethereum/Base/Optimism**. No native cross-chain bridge exists. Current integration is link-based. No public API. Contact tyler@magnetiq.xyz for API partnership.
+Magnetiq is on **Flow blockchain**; ZAO OS is on **Ethereum/Base/Optimism**. No native cross-chain bridge exists. Current integration is link-based. No public API. Contact <redacted-email> for API partnership.
 
 ---
 

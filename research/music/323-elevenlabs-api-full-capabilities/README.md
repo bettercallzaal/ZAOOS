@@ -190,7 +190,7 @@ Build voice agents that speak with Zaal's voice:
 | Language | English / American |
 | Plan | Creator ($22/mo or $11/mo annual) |
 | Monthly Allowance | 100,000 characters TTS, 50 min dubbing |
-| Account | On Logesh's workspace (logesh@songam.space) |
+| Account | On Logesh's workspace (<redacted-email>) |
 
 ## What We Can Build in ZAO OS
 

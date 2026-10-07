@@ -15,7 +15,7 @@ owner: Zaal (sends pitch) + ZOE (follow-up tracking)
 >
 > **When to send:** Aug 15. Send to Hypebot first (Aug 1–8). If Hypebot says yes → Ari's Take becomes secondary. If Hypebot says no → Ari's Take becomes the primary target Aug 15.
 >
-> **Send address:** ari@arisake.com (his newsletter contact) or Twitter DM @ArisTake; check current contact on aritak.com/about.
+> **Send address:** <redacted-email> (his newsletter contact) or Twitter DM @ArisTake; check current contact on aritak.com/about.
 
 ---
 

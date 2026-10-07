@@ -104,4 +104,4 @@ Zaal plans Claude Code community on Whop (digital creators). Greg Gonzales is th
 - Call transcript 2026-05-11 (Zaal + Tyler Stambaugh), via Otter.ai
 - Doc 65 — ZABAL Partner Ecosystem (Magnetiq background, Proof of Meet, Tyler contact)
 - Memory: `project_hermes_canonical` (Hermes-brain bot pattern for ZAO)
-- Magnetiq background from Doc 65: Flow blockchain, Dapper Wallet, POM badges, tyler@magnetiq.xyz
+- Magnetiq background from Doc 65: Flow blockchain, Dapper Wallet, POM badges, <redacted-email> [CLAIM-OK: magnetiq-live historical record; line touched only to redact contact data, card 10141]

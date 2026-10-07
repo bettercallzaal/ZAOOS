@@ -44,7 +44,7 @@ related-docs: [523, 524, 527, 529, 531, 539, 541, 542]
 
 This is a 10-question operational gap analysis for Zaal's active Genesis tier Bonfire bot. Doc 542 approved the STRATEGIC fit (knowledge graph for ZABAL umbrella). This doc drills into the BUILDER questions: can agent write mid-chat? What's the schema? How do we namespace 8 ecosystems? What does ERC-8004 actually buy? Rate limits? Export path?
 
-**Unknowns requiring email to joshua@desci.world (highest priority):**
+**Unknowns requiring email to <redacted-email> (highest priority):**
 1. Conversational write API (does /ingest_content fire in agent chat?)
 2. MCP write tools (or write-only REST?)
 3. Rate limits + Genesis cost

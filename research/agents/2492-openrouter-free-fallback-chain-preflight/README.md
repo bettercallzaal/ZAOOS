@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-09-15
+last-validated: 2026-09-23
 superseded-by:
 related-docs: 2490, 2210, 761
 original-query: "wheres our research on the models and what attabotty shared with us fallback-chain-openrouter-free.md whats next on this"
@@ -40,7 +40,7 @@ Dead from the table: `qwen/qwen3-coder:free`, `tencent/hy3:free`, `poolside/lagu
 
 ## The corrected chain (12, plus primary)
 
-Primary `nvidia/nemotron-3-ultra-550b-a55b:free` (1,000,000 ctx). Fallback, in order: `thinkingmachines/inkling:free` (1,048,576), `nvidia/nemotron-3.5-lightning:free` (1,000,000), `nvidia/nemotron-3-super-120b-a12b:free` (262,144), `poolside/laguna-s-2.1:free`, `poolside/laguna-xs-2.1:free`, `google/gemma-4-31b-it:free`, `google/gemma-4-26b-a4b-it:free`, `nex-agi/nex-n2.5-pro:free` (all 262,144), `cohere/north-mini-code:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256,000), `thinkingmachines/inkling-small:free` (1,048,576), `openrouter/free` (safety net). Cooldown tiers carried over unchanged. Left out on purpose: `inclusionai/ling-3.0-flash-sante` and `-fin` (domain variants by their slugs - inference, not measured), `nvidia/nemotron-3.5-content-safety` (moderation), `dots-studio/dots-3-note-preview` (preview), `liquid/lfm-2.5-2.6b` (65k) and `z-ai/glm-5.2` (32k) (too small). Full file: `~/Downloads/fallback-chain-openrouter-free-CORRECTED-2026-09-15.md`.
+Primary `nvidia/nemotron-3-ultra-550b-a55b:free` (1,000,000 ctx). Fallback, in order: `thinkingmachines/inkling:free` (1,048,576), `nvidia/nemotron-3.5-lightning:free` (1,000,000), `nvidia/nemotron-3-super-120b-a12b:free` (262,144), `poolside/laguna-s-2.1:free`, `poolside/laguna-xs-2.1:free`, `google/gemma-4-31b-it:free`, `google/gemma-4-26b-a4b-it:free`, `nex-agi/nex-n2.5-pro:free` (all 262,144), `cohere/north-mini-code:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256,000), `thinkingmachines/inkling-small:free` (1,048,576), `openrouter/free` (safety net). Cooldown tiers carried over unchanged. Left out on purpose: `inclusionai/ling-3.0-flash-sante:free` and `-fin` (domain variants by their slugs - inference, not measured), `nvidia/nemotron-3.5-content-safety` (moderation), `dots-studio/dots-3-note-preview:free` (preview), `liquid/lfm-2.5-2.6b:free` (65k) and `z-ai/glm-5.2` (32k) (too small). Full file: `~/Downloads/fallback-chain-openrouter-free-CORRECTED-2026-09-15.md`.
 
 ## The preflight
 

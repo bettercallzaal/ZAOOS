@@ -5,6 +5,7 @@
 import { InlineKeyboard, type Context } from 'grammy';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { featureRan } from '../feature-ran';
 import { ZOE_PATHS } from '../memory';
 import { assertSendDelivered } from '../send-budget';
 import { draftPost } from './drafters';
@@ -15,6 +16,7 @@ import {
   savePending,
   type PendingDraft,
 } from './pending';
+import { isPostPublishEnabled, publishApprovedDraft } from './publish';
 import {
   gatherBuildSignals,
   gatherEcosystemSignals,
@@ -123,7 +125,18 @@ export interface CallbackHandlerOptions {
   ctx: Context;
   repoDir: string;
   zaalTgId: number;
+  /** injected for tests; the publish call uses global fetch otherwise */
+  fetchImpl?: typeof fetch;
 }
+
+/**
+ * Drafts claimed by a tap in THIS process. The pending file is only cleared
+ * after an awaited Telegram call (the keyboard strip), so two fast taps on
+ * POST could both read the draft as pending. Before the publish wiring that
+ * meant a duplicate echo; with it, a duplicate public post. The claim is
+ * synchronous, before any await, so the second tap sees it.
+ */
+const claimedDraftIds = new Set<string>();
 
 export async function handlePostCallback(opts: CallbackHandlerOptions): Promise<void> {
   const data = opts.ctx.callbackQuery?.data ?? '';
@@ -133,6 +146,25 @@ export async function handlePostCallback(opts: CallbackHandlerOptions): Promise<
     return;
   }
   const [, action, id] = match;
+  if (claimedDraftIds.has(id)) {
+    await opts.ctx.answerCallbackQuery('already handled');
+    return;
+  }
+  claimedDraftIds.add(id);
+  try {
+    await handleClaimedPostCallback(opts, action, id);
+  } finally {
+    // The claim covers only the await window; once the handler has run the
+    // pending file is cleared, so a later tap fails as "no longer pending".
+    claimedDraftIds.delete(id);
+  }
+}
+
+async function handleClaimedPostCallback(
+  opts: CallbackHandlerOptions,
+  action: string,
+  id: string,
+): Promise<void> {
   const pending = await loadPending();
   if (!pending || pending.id !== id) {
     await opts.ctx.answerCallbackQuery('this draft is no longer pending');
@@ -161,7 +193,45 @@ export async function handlePostCallback(opts: CallbackHandlerOptions): Promise<
     await savePending(pending);
     await clearPending();
     await appendLog({ event: 'approved', category: pending.category, id });
-    await opts.ctx.answerCallbackQuery('approved - paste it');
+
+    // Flag-gated (ZOE_POST_PUBLISH=1, default OFF): POST publishes through
+    // /api/publish/compose instead of echoing the text (doc 2244's root cause,
+    // doc 2239 section 5 fix 1). OFF keeps the exact copy-target behaviour below.
+    if (isPostPublishEnabled()) {
+      await opts.ctx.answerCallbackQuery('publishing...');
+      const result = await publishApprovedDraft({ text: pending.text, fetchImpl: opts.fetchImpl });
+      if (result.ok) {
+        featureRan('post-publish', `${pending.category} ${id}`);
+        await appendLog({ event: 'published', category: pending.category, id, outcomes: result.outcomes });
+        try {
+          await opts.ctx.api.sendMessage(opts.zaalTgId, `Published:\n${result.summary}`);
+        } catch {
+          // best effort
+        }
+        return;
+      }
+      await appendLog({ event: 'publish-error', category: pending.category, id, error: result.error ?? result.summary, outcomes: result.outcomes });
+      const partlyLive = result.outcomes.some((o) => o.ok && !o.simulated);
+      if (partlyLive) {
+        // Something IS live (e.g. the cast went out, X failed). Do not resend the
+        // text as a paste target - that invites a duplicate of the part that worked.
+        try {
+          await opts.ctx.api.sendMessage(opts.zaalTgId, `Partly published:\n${result.summary}\nNot resending the text - the part that worked is live.`);
+        } catch {
+          // best effort
+        }
+        return;
+      }
+      // Nothing went out: fall through to the copy-target resend, with the
+      // reason on top so the next move is obvious.
+      try {
+        await opts.ctx.api.sendMessage(opts.zaalTgId, `Not published - ${result.summary}\nText below to paste by hand.`);
+      } catch {
+        // best effort
+      }
+    } else {
+      await opts.ctx.answerCallbackQuery('approved - paste it');
+    }
     // Resend the bare text one more time as a clean copy-target without buttons.
     try {
       await opts.ctx.api.sendMessage(opts.zaalTgId, pending.text);

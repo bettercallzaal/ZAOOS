@@ -119,3 +119,42 @@ describe('appendGrillQueue', () => {
     expect(r).toMatchObject({ wrote: 'nothing', count: 0 });
   });
 });
+
+describe('ZOE_GRILL_QUEUE_SPOOL_ONLY - a vault checkout nothing pushes is not a destination', () => {
+  // Measured 2026-10-07 on the VPS: ~/zao-vault exists there now (it did not on
+  // 2026-08-26), 2,512 commits behind, and BLACKBOARD.md carried 20 grill
+  // batches, 646 lines, uncommitted. No cron pulls or pushes that checkout, so
+  // every one of those cards reached Telegram and nobody else. The spool is the
+  // path the mac drain (zao-grill-queue-drain) actually reads.
+  afterEach(() => {
+    delete process.env.ZOE_GRILL_QUEUE_SPOOL_ONLY;
+  });
+
+  async function vaultWithQueue(): Promise<{ path: string; spool: string }> {
+    const vault = join(dir, 'zao-vault');
+    await fs.mkdir(vault);
+    const path = join(vault, 'BLACKBOARD.md');
+    await fs.writeFile(path, '# BLACKBOARD\n\n7. seven\n');
+    return { path, spool: join(dir, 'spool.jsonl') };
+  }
+
+  it('flag 1: spools and leaves the existing queue file untouched', async () => {
+    process.env.ZOE_GRILL_QUEUE_SPOOL_ONLY = '1';
+    const { path, spool } = await vaultWithQueue();
+    const r = await appendGrillQueue(cards, { now: NOW, path, spool });
+    expect(r.wrote).toBe('spool');
+    expect(r.path).toBe(spool);
+    expect(await fs.readFile(path, 'utf8')).toBe('# BLACKBOARD\n\n7. seven\n');
+    expect((await fs.readFile(spool, 'utf8')).trim().split('\n')).toHaveLength(2);
+  });
+
+  it.each([undefined, '0', 'true', ''])('flag %s: appends to the queue exactly as before', async (v) => {
+    if (v === undefined) delete process.env.ZOE_GRILL_QUEUE_SPOOL_ONLY;
+    else process.env.ZOE_GRILL_QUEUE_SPOOL_ONLY = v;
+    const { path, spool } = await vaultWithQueue();
+    const r = await appendGrillQueue(cards, { now: NOW, path, spool });
+    expect(r.wrote).toBe('queue');
+    expect(r.numbers).toEqual([8, 9]);
+    await expect(fs.stat(spool)).rejects.toThrow();
+  });
+});

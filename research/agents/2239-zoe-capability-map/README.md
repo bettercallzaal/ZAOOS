@@ -2,8 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-10-04
-related-docs: "2235, 2438, 2432, 2191, 770, 899, 875, 547, 632"
+last-validated: 2026-10-07
+related-docs: "2235, 2438, 2432, 2191, 770, 899, 875, 547, 632, 2244, 2586, 2628"
 original-query: "Research our zoe - ZOE, The ZAO's assistant: what it is today, measured (where it runs, what it does, what is live vs dead, what it costs, what breaks), how it fits with the Claude Code lanes and the orchestrator seat, and what to keep, fix or retire"
 tier: STANDARD
 ---
@@ -17,6 +17,141 @@ tier: STANDARD
 
 Re-research of doc 2239 in place (number and folder preserved). Written Sun 4 Oct 2026
 23:37 EDT (clock from `date`). `original-query` is the verbatim request.
+
+## Re-validated 2026-10-07: ZOE today, measured from the VPS
+
+Written Tue 7 Oct 2026, 12:04 to 12:3x EDT (clock from `date`), by the zoe lane
+opened that morning on Zaal's word "lets make one for the ZOE". The 2026-10-04
+body below could not read the VPS; this pass did, read-only, over `ssh vps`
+(`systemctl --user`, `journalctl --user -u zoe-bot` for 7 days, `~/.zao/zoe/`,
+flag NAMES in `~/zao-bot-live/bot/.env`, values never printed) plus
+`scripts/agents/zoe-liveness.py --remote` run from the ZAOOS repo. Nothing on the
+VPS was restarted, pulled, deployed or flipped. Where a number below changes a
+2026-10-04 finding, the change is named.
+
+### 1. Live, as of 16:04 UTC
+
+| Claim | Measured | Surface |
+|---|---|---|
+| ZOE is up | `zoe-bot.service` active since 13:30:05 UTC, PID 3759190, 531 MB | `systemctl --user status zoe-bot` |
+| It runs today's main | live checkout `~/zao-bot-live` at 97ada3c0 (#3772, merged 09:22 EDT); `zoe-liveness` says `behind=0` | `git -C ~/zao-bot-live log -1`, liveness table |
+| Autodeploy restarts it on every merge | 49 Stopped/Started pairs in 7 days, all on :X0 ticks; four between 13:00 and 13:30 UTC today | `journalctl` Started lines |
+| The handle | `getMe` on the live token returns `zaoclaw_bot`. **Closes the Findings 4 contradiction: the AGENTS.md `@zaoos_bot` row is wrong.** | Telegram `getMe`, username field only |
+| Features that ran | 82 `[zoe/ran]` lines in 24 h across 15 features; 18 features over 7 days: tick-lock, pinned-brief, pinned-brief-tick, orchestrator-tick (49 boots each), claude-auth-probe 27, auto-close 23, receipts 9, repo-improver-scout 8, mission-control 8, backlog-grill 7, afferent-digest 6, reflect 5, recap 5, and once each: work-loop, reflexion, guardrails, dispatch, build-intent. `featureRan` prints once per boot, so these count boots in which a feature ran, not executions. | `journalctl` grep `zoe/ran` |
+| Flags ON in `.env` | ZOE_ORCHESTRATOR_ENABLED, ZOE_RELAY_TG_ENABLED, ZOE_NUDGE_LADDER, ZOE_CRITIC_PANEL_SHADOW, ZOE_CRITIC_HIGH_TIER, ZOE_DM_BUILD, ZOE_GUARDRAILS, ZOE_MEMORY_GIT, ZOE_MISSION_CONTROL, ZOE_TASK_COMPLEXITY_ROUTING. **Closes two UNKNOWNs: `ZOE_MEMORY_GIT` is set, and doc 2438's unset `ZOE_TASK_COMPLEXITY_ROUTING` is now set.** | `.env` names, liveness table |
+| Spend | 2026-10-07 so far 0.63 USD (2 calls); 2026-10-05 2.20 USD (4 calls, one opus at 1.87); 2026-10-03 and 10-04 files are 128 bytes each (no calls); no file for 10-01, 10-02 or 10-06 in the listing. **Closes the Findings 3 UNKNOWN.** | `~/.zao/zoe/cost/*.md` |
+| Send budget since 2026-09-30 | 333 sent, 141 deferred, 21 dropped. Every drop sampled is class `status` (cap 3 a day). **The 79 percent all-time drop rate in Findings 4 is history; this week it is 4 percent.** | `~/.zao/zoe/send-budget-log.jsonl` |
+| Worker runs | `~/.zao/zoe/runs/` has files for 09-22 to 09-28 and 10-07, none for 09-29 to 10-06 | `ls` |
+| Repo checkout used for research PRs | `~/zao-os` on the VPS sits at 17dff0be (2026-09-28), 9 days behind main; `ZOE_REPO_DIR` is set in `.env` (value not read) | `git -C ~/zao-os log -1` |
+
+### 2. Merged but not running (flags OFF or unset)
+
+| Flag | State on the VPS | What it gates | Whose flip |
+|---|---|---|---|
+| `ZOE_REPO_IMPROVER_LEASES` | `false` (set) | repo-improver under a Heart lease; every scheduler tick logs `(lease disabled)` | Zaal ruled 2026-10-06 "switch it on and then close" (card 9076, `decisions/grill-2026-10-06-dreamnet-evening.md` item 4); the dreamnet lane owes the steps page; the flip is Zaal's hands |
+| `ZOE_LOOP_LEASES` | `false` (set) | work-loop and orchestrator under Heart leases | same ruling, "Both" |
+| `ZOE_HEART_FLEET_CANARY` | unset | Heart fleet canary | grill item, per memory `project_brandon_two_plane_architecture` |
+| `CASTER_ENABLED`, `ZOE_CASTER_GUARDS`, `FARCASTER_AUTOCAST_DAILY_CAP` | unset | today's #3772: caster guards and the auto-cast cap | Zaal, after the PR's own test plan |
+| `ZOE_USE_CLI` | unset | the concierge's CLI route (the API-key route runs) | nobody has asked for it |
+| `ZOE_CRITIC_PANEL`, `ZOE_OUTBOX_DEMO` | unset | multi-critic panel; outbox demo beat | none pending |
+
+The code on main reads 57 distinct `ZOE_*` names (`git grep` of `env.ZOE_` under
+`bot/src/zoe` and `bot/src/hermes`); `.env` sets 20 of them.
+
+### 3. What broke in the last 7 days (journal, newest first)
+
+1. **Claude CLI `error_max_budget_usd`, 5 times, labelled `unknown`.** Four
+   landed in 7 seconds at 2026-10-05 20:55 UTC, right after a DM recall
+   ("No I'm talking about poidhz"), which is the shape of `extractors.ts` (four
+   cheap readers at `EXTRACT_BUDGET_USD = 0.05`); one at 2026-10-07 14:01 UTC,
+   the same minute the work-loop research "Investigate sound gear in Ellsworth"
+   failed as `claude CLI exited 1 [unknown: unclassified claude CLI failure]`.
+   Each payload reads `num_turns: 1, duration_api_ms: 0`: the CLI refused before
+   its first API call. `claude-health.json` says `lastFailKind: "unknown"`. The
+   cause: on a non-zero exit, `bot/src/hermes/claude-cli.ts` classifies stderr
+   (empty here) and never reads the `subtype` in the stdout JSON. This is the
+   2026-08-17 brief's open thread, now with a name.
+2. **The failure report was dropped.** The work-loop failure line went to the
+   ops chat as class `status` at 16/3 and was dropped by `send-budget.ts:189`
+   (`status: overflow 'dropped'`). Zaal ruled 2026-10-06 (same file, item 7):
+   "make the status send class hold instead of drop, before ZOE becomes the
+   single route." Not yet built.
+3. **`exit_code= 143` seven times**: SIGTERM from the autodeploy restart while a
+   CLI call was in flight. 49 `[zoe/crash-guard] SIGTERM received` lines equal
+   the 49 restarts. Not a CLI fault; a call that straddles a deploy dies.
+4. **OpenRouter 429 once**; one repo-improver tick failed with "all cap-fallback
+   providers failed". **Bonfire delve timed out twice**, falling to
+   "manual-relay fallback".
+5. **The VPS vault checkout is dead and `grill-queue.ts` still writes to it.**
+   `~/zao-vault` on the VPS exists, is 2,425 commits behind origin/main, last
+   commit 2026-09-17, one modified path (not read). `grill-queue.ts:58` appends
+   to `~/zao-vault/BLACKBOARD.md` when that path exists, so it does. The
+   2026-09-27 finding is NOT closed.
+6. **Token hygiene unchanged.** `systemctl --user show zoe-bot` still lists
+   `COWORK_BOT_TOKEN` on the `Environment=` line (value not printed here), and
+   six `.env.bak-*` files sit beside `.env`. Rotation (cards 9809, 9371) is due
+   2026-10-09; whether the token VALUE was rotated was not measured from here.
+7. **No heartbeat file.** `~/.zao/beats` does not exist on the VPS. ZOE's
+   liveness surfaces are the unit, `[zoe/ran]` and the board heartbeat
+   (`index.ts:4238`, "dormant unless COWORK_API_URL/TOKEN set"; both are set).
+
+### 4. What Zaal can do from the DM right now, and what he cannot
+
+**Can (code on main, flag state measured):** 31 slash commands are registered
+in `index.ts`: agenda, board, bonfire, chatid, cockpit, companion, draftdemo,
+drafts, focus, grill, inittopics, lanes, list, loop, loops, menu, notes, pulse,
+quest, quests, resume, seed, shadow, start, tasks, team, teamadd, voicememo,
+working, zg, zoldraft. Plain text goes to the concierge (talk, capture); voice
+notes transcribe (Groq Whisper); photos and PDFs ingest to the vault inbox;
+grill cards answer by button; drafts take POST, REGEN, SKIP.
+
+**Build from the DM, the measure in `feedback_zoe_measured_by_telegram_build`:**
+the path is wired and ON. `ZOE_DM_BUILD=1` is set; `index.ts:3142` routes a
+private-scope message through `detectBuildIntent` to `startDmBuild`, with a
+"Want me to build that?" button for borderline asks and mid-run steering. In 7
+days `build-intent` ran in one boot of 49 and `dm-build` ran in none: the
+classifier was reached at least once, and zero builds started. No DM in the
+journal reads as a build ask, so this is "not exercised", not "broken". A grade
+on the 1-to-10 scale needs Zaal to type one build ask; the lane cannot do that
+for him. What would kill a build if he did: item 1 above (a budget refusal that
+reads as `unknown`) plus item 2 (its report dropped).
+
+**Cannot:**
+
+- **Publish.** POST on a draft marks it approved and resends the bare text
+  (`bot/src/zoe/posts/buttons.ts:164`); `/api/publish/compose` exists, is
+  admin-session gated, and was proven deployed by its 401 on 2026-08-20
+  (vault `notes/publish-test-postiz-borker-2026-08-20.md`). ZOE has no session
+  and no bearer path into it. Doc 2244's "wire the POST button" row is still
+  open, 61 days on.
+- **Reach the Orca lanes.** No `/lane` command is registered (grep of
+  `bot.command(` in `index.ts`); `/lanes` reads a Mac snapshot. Doc 2625 D1
+  ("finish the bridge") is unbuilt.
+- **See why a build or research run failed.** Item 1 plus item 2.
+- **Restart, deploy, or flip a flag.** By rule, and those stay his.
+
+### 5. Three fixes proposed, PR-only, each behind a flag that defaults OFF, each with a red control
+
+Sent to the orchestrator seat before any code; built only on Zaal's word.
+
+| # | Fix | Flag (default OFF) | Red control | Why first |
+|---|---|---|---|---|
+| 1 | POST button calls `POST /api/publish/compose` with `dryRun:false` for the draft's platforms, instead of resending text. Needs a bot bearer on the compose route (new env on both sides, ask-first) because the route is iron-session admin only. | `ZOE_POST_PUBLISH=1` | Unit test on `handlePostCallback`: flag unset, `sendMessage` called and `fetch` never; flag set, `fetch` called once with the draft text and `dryRun:false`. Route test: wrong bearer returns 401. First live tap and the flag flip are Zaal's. | The known 61-day gap (doc 2244); turns the DM into a publish surface |
+| 2 | `status` class overflow becomes `deferred` (joins the morning drain) instead of `dropped`. | `ZOE_STATUS_HOLD=1` | Test: over cap with flag set, outcome `deferred` and a row in `send-deferred.jsonl`; flag unset, `dropped` as today. | Zaal ruled it 2026-10-06 item 7; a one-line policy change at `send-budget.ts:189` |
+| 3 | On a non-zero CLI exit, parse the stdout JSON and map `subtype` (`error_max_budget_usd`, `error_max_turns`, `error_during_execution`) to a named kind with the cap in the hint; `claude-health.json` and the work-loop failure message stop saying `unknown`. | `ZOE_CLI_RESULT_CLASSIFY=1` | Test feeds the verbatim 2026-10-07 14:01 payload: today classifies `unknown`, with the fix `budget`. | Every build and research failure since 2026-08-17 has worn this label |
+
+Not a PR, Zaal's hands: flip `ZOE_REPO_IMPROVER_LEASES` and `ZOE_LOOP_LEASES`
+(already ruled), rotate the token by 2026-10-09, and either fetch or remove the
+dead `~/zao-vault` checkout on the VPS so grill cards stop landing in it.
+
+### Sources for this section
+
+- VPS 31.97.148.88 over `ssh vps`, 2026-10-07 16:04 to 16:2x UTC: `systemctl --user status/show zoe-bot`, `journalctl --user -u zoe-bot --since "7 days ago"`, `~/.zao/zoe/{cost,runs,send-budget-log.jsonl,claude-health.json}`, `.env` key names via `grep -oE '^[A-Z0-9_]+='`, Telegram `getMe` username field, `git` on `~/zao-bot-live`, `~/zao-os`, `~/zao-vault`. [FULL, method: ssh, read-only]
+- `python3 scripts/agents/zoe-liveness.py --remote` from ZAOOS at 9ed2e9c44. [FULL]
+- ZAOOS origin/main 97ada3c05: `bot/src/zoe/index.ts`, `posts/buttons.ts`, `send-budget.ts`, `grill-queue.ts`, `scheduler.ts`, `extractors.ts`, `bot/src/hermes/claude-cli.ts`, `src/app/api/publish/compose/route.ts`. [FULL, method: git show and sed]
+- zao-vault origin/main via `git -C ~/zao-vault-worktrees/seat show`: `decisions/grill-2026-10-06-dreamnet-evening.md`, `notes/brandon-dreamnet-review-2026-10-06.md`, `notes/publish-test-postiz-borker-2026-08-20.md`, `handoffs/status/orchestration.md`. [FULL]
+- Library: `cross-platform/2244-posting-platform-decision` (re-validated 2026-10-07 in #3775), `agents/2586-orchestrator-seat-outside-view` (#3776), `cross-platform/2628-creator-os-automate-friction-not-creativity` (open PR #3777, not on main). [FULL]
+- Not read: Telegram chat bodies, BotFather, the token values, the one modified path in the VPS vault checkout, Vercel and OpenRouter billing.
 
 ## Key decisions
 

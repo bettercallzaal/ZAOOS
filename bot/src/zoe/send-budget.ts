@@ -186,6 +186,7 @@ const POLICY: Record<SendClass, ClassPolicy> = {
   // breakage notice to the morning batch is the same as losing it.
   alarm: { alwaysPasses: true, counts: true, overflow: 'dropped' },
   gated: { alwaysPasses: true, counts: true, overflow: 'dropped' },
+  // `overflow` here is the default; ZOE_STATUS_HOLD=1 turns it into 'deferred' (policyFor).
   status: { alwaysPasses: false, counts: true, overflow: 'dropped' },
   digest: { alwaysPasses: false, counts: true, overflow: 'deferred' },
   noise: { alwaysPasses: false, counts: true, overflow: 'dropped' },
@@ -256,8 +257,28 @@ export function easternDay(now: Date = new Date()): string {
  * Decide what happens to a send, given how many counted sends have already
  * gone out today. Pure: same inputs, same answer, no clock, no disk.
  */
+/**
+ * ZOE_STATUS_HOLD=1 (default OFF): `status` overflows into the morning batch
+ * instead of being dropped. Zaal, 2026-10-06: "make the status send class hold
+ * instead of drop, before ZOE becomes the single route." Measured 2026-10-07:
+ * the work-loop's own "claude CLI exited 1" report was the 16th status of the
+ * day against a cap of 3 and was dropped - the one line saying the research
+ * pipeline was broken never reached the phone. Read per call, not at module
+ * load, so a running bot picks the flag up on restart and tests can toggle it.
+ * Doc 2239 section 5, fix 2.
+ */
+export function statusHoldEnabled(): boolean {
+  return process.env.ZOE_STATUS_HOLD === '1';
+}
+
+function policyFor(cls: SendClass): ClassPolicy {
+  const base = POLICY[cls];
+  if (cls === 'status' && statusHoldEnabled()) return { ...base, overflow: 'deferred' };
+  return base;
+}
+
 export function decide(cls: SendClass, countedToday: number, cap: number): SendDecision {
-  const policy = POLICY[cls];
+  const policy = policyFor(cls);
   // `noise` runs out of budget early by design; every other class sees the
   // whole cap. Report the effective number so the log says what really bound.
   const limit = effectiveCap(cls, cap);

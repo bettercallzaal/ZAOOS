@@ -42,12 +42,23 @@ for r in $(git remote 2>/dev/null); do
 $r/$head_ref"
 done
 
+# ONLY A CONFIGURED REMOTE COUNTS. `git branch -r` lists everything under
+# refs/remotes/, and a ref can sit there with no remote behind it. Measured
+# 2026-10-07 in the shared clone: refs/remotes/pr/3653 and refs/remotes/pr/3781
+# were review pins made by hand (`git fetch origin pull/N/head:refs/remotes/pr/N`),
+# and "pr" is in no `git remote -v`. A pin of a PR's head contains that PR's own
+# commits, so the author's first push read as inherited and needed the skip.
+# A pin is not another lane's branch; drop anything not under a real remote.
+remote_re=$(git remote 2>/dev/null | sed 's/[][\.*^$]/\\&/g' | paste -sd'|' -)
+[ -z "$remote_re" ] && exit 0   # no remote at all: nothing to inherit from
+
 found=""
 for c in $mine; do
   # every remote branch containing this commit, except the base, this branch's
   # own remote counterpart on any remote, and its configured upstream
   others=$(git branch -r --contains "$c" 2>/dev/null \
     | sed 's/^[* ]*//' | grep -v '\->' \
+    | grep -E "^($remote_re)/" \
     | grep -v -x "${BASE#refs/remotes/}" \
     | { [ -n "$upstream" ] && grep -v -x "$upstream" || cat; } \
     | grep -v -x -F "$(printf '%s' "$self_remote" | sed '/^$/d')" \

@@ -43,7 +43,57 @@ const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 min
  *
  * Returns the assistant's final text result + usage stats (parsed from --output-format json).
  */
-export type ClaudeErrorKind = 'auth' | 'usage_limit' | 'rate_limit' | 'timeout' | 'unknown';
+export type ClaudeErrorKind =
+  | 'auth'
+  | 'usage_limit'
+  | 'rate_limit'
+  | 'timeout'
+  // The three below come from the CLI's own result JSON `subtype` and are only
+  // produced when ZOE_CLI_RESULT_CLASSIFY=1 (default OFF: they read as 'unknown').
+  | 'budget'
+  | 'max_turns'
+  | 'execution'
+  | 'unknown';
+
+/**
+ * ZOE_CLI_RESULT_CLASSIFY=1 (default OFF): read the CLI's own verdict.
+ *
+ * Measured 2026-10-07 on the VPS (doc 2239, section 3 item 1): all 5 claude
+ * CLI failures in the 7-day journal were exit 1, EMPTY stderr, and a stdout
+ * result of subtype "error_max_budget_usd" - four in 7 s after a DM (the
+ * extractors' four readers at 0.05 USD each), one that killed a work-loop
+ * research run. Every one was logged `[unknown: unclassified claude CLI
+ * failure]`, which is the 2026-08-17 brief's open thread. The non-zero-exit
+ * branch already hands this function stderr + stdout; it had no rule for the
+ * subtype field. Flag-gated so the deployed labels do not change until Zaal
+ * sets it; the kinds are additive and every consumer that switches on kind
+ * (concierge, cli-cap-aware) only names the existing ones.
+ */
+export function cliResultClassifyEnabled(): boolean {
+  return process.env.ZOE_CLI_RESULT_CLASSIFY === '1';
+}
+
+function classifyResultSubtype(text: string): ClaudeErrorClassification | null {
+  const m = text.match(/"subtype"\s*:\s*"(error_[a-z_]+)"/);
+  if (!m) return null;
+  switch (m[1]) {
+    case 'error_max_budget_usd': {
+      const refusedBeforeApi = /"duration_api_ms"\s*:\s*0\b/.test(text);
+      return {
+        kind: 'budget',
+        hint: refusedBeforeApi
+          ? 'per-call budget cap (--max-budget-usd) refused before the first API call - the caller\'s maxBudgetUsd is below the minimum cost of its own prompt'
+          : 'per-call budget cap (--max-budget-usd) hit mid-run - raise the caller\'s maxBudgetUsd or shrink the task',
+      };
+    }
+    case 'error_max_turns':
+      return { kind: 'max_turns', hint: 'the CLI hit its max-turns limit before finishing - the result is partial' };
+    case 'error_during_execution':
+      return { kind: 'execution', hint: 'the CLI reported an error during execution - read the result body' };
+    default:
+      return null;
+  }
+}
 
 /**
  * Typed error for Claude CLI authentication failures. Callers can catch and
@@ -97,6 +147,11 @@ export function extractResetTime(text: string): string | undefined {
 }
 
 export function classifyClaudeError(text: string): ClaudeErrorClassification {
+  if (cliResultClassifyEnabled()) {
+    // The CLI's own verdict beats a regex guess over its prose.
+    const bySubtype = classifyResultSubtype(text || '');
+    if (bySubtype) return bySubtype;
+  }
   const t = (text || '').toLowerCase();
   if (/\b401\b|invalid authentication|unauthorized|not logged in|please run.*\/login|oauth token (expired|revoked)|authentication_error/.test(t)) {
     return { kind: 'auth', hint: 'claude login/OAuth expired - run `claude` then /login on the host' };
@@ -288,7 +343,10 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
           // the finish_reason-equivalent - never treat a truncated run as done.
           if (parsed.subtype && parsed.subtype !== 'success') {
             console.error('[hermes/claude-cli] non-success subtype:', parsed.subtype, JSON.stringify(parsed).slice(0, 800));
-            reject(new CliError(`claude CLI did not finish cleanly (subtype=${parsed.subtype}) - output may be truncated, not treating as done. turns=${parsed.num_turns}`, 'unknown'));
+            // Same rule as the non-zero-exit branch: under the flag the subtype
+            // names the kind; without it this stays 'unknown' as before.
+            const clsSub = cliResultClassifyEnabled() ? classifyResultSubtype(stdout) : null;
+            reject(new CliError(`claude CLI did not finish cleanly (subtype=${parsed.subtype}) - output may be truncated, not treating as done. turns=${parsed.num_turns}`, clsSub?.kind ?? 'unknown', clsSub?.hint));
             return;
           }
           if (!parsed.result || !parsed.result.trim()) {

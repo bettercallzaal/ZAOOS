@@ -70,6 +70,18 @@ describe('classifyClaudeError - result subtype (ZOE_CLI_RESULT_CLASSIFY)', () =>
     expect(classifyClaudeError('something else entirely').kind).toBe('unknown');
   });
 
+  it('flag set: a budget subtype whose text also carries 429 stays usage_limit (the failover kinds win)', () => {
+    process.env.ZOE_CLI_RESULT_CLASSIFY = '1';
+    const mixed = `${PAYLOAD_1401} api_error_status: 429 rate limit`;
+    expect(classifyClaudeError(mixed).kind).toBe('usage_limit');
+  });
+
+  it('flag set: a budget subtype whose text also says /login stays auth (cli-cap-aware fails over on it)', () => {
+    process.env.ZOE_CLI_RESULT_CLASSIFY = '1';
+    const mixed = `${PAYLOAD_1401} Please run /login`;
+    expect(classifyClaudeError(mixed).kind).toBe('auth');
+  });
+
   it('flag set: a subtype of "success" is not an error kind', () => {
     process.env.ZOE_CLI_RESULT_CLASSIFY = '1';
     expect(classifyClaudeError('{"type":"result","subtype":"success","is_error":false}').kind).toBe('unknown');

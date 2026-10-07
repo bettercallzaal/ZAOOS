@@ -147,11 +147,6 @@ export function extractResetTime(text: string): string | undefined {
 }
 
 export function classifyClaudeError(text: string): ClaudeErrorClassification {
-  if (cliResultClassifyEnabled()) {
-    // The CLI's own verdict beats a regex guess over its prose.
-    const bySubtype = classifyResultSubtype(text || '');
-    if (bySubtype) return bySubtype;
-  }
   const t = (text || '').toLowerCase();
   if (/\b401\b|invalid authentication|unauthorized|not logged in|please run.*\/login|oauth token (expired|revoked)|authentication_error/.test(t)) {
     return { kind: 'auth', hint: 'claude login/OAuth expired - run `claude` then /login on the host' };
@@ -169,6 +164,16 @@ export function classifyClaudeError(text: string): ClaudeErrorClassification {
   }
   if (/timed out|timeout|etimedout/.test(t)) {
     return { kind: 'timeout', hint: 'model call timed out' };
+  }
+  // The subtype is the FALLBACK, after every rule above. auth, usage_limit
+  // and rate_limit are what concierge.ts and cli-cap-aware.ts fail over on;
+  // an error_* result whose text also says "/login" or "429" must keep that
+  // kind, or a failover would become a plain error (zaoos-35 review of #3781,
+  // 2026-10-07). Whether the CLI emits that combination is UNVERIFIED; the
+  // order is right either way.
+  if (cliResultClassifyEnabled()) {
+    const bySubtype = classifyResultSubtype(text || '');
+    if (bySubtype) return bySubtype;
   }
   return { kind: 'unknown', hint: 'unclassified claude CLI failure - check logs' };
 }

@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-07
 original-query: "ZAO decentralized identity layer wrapping Farcaster FIDs with music profile and community context (reconstructed)"
 tier: STANDARD
 related-docs: [271, 051, 158]
@@ -29,6 +29,8 @@ related-docs: [271, 051, 158]
 | Neynar acquired Farcaster Jan 21 2026 (CONFIRMED); Merkle returns $180M to investors; Farcaster continues under Neynar operations | [Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster) + [CoinDesk](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app) + [Neynar Docs](https://docs.neynar.com/docs/integrate-managed-signers) | Managed signers sponsor on-chain fees by default; Neynar Data Oracle brings FID metadata (score, followers, verified addresses, badges) into onchain policies; 250K MAU + 100K funded wallets as of Dec 2025 |
 | Hats Protocol tree structure enables hierarchical roles with accountability edges | [Hats Docs](https://docs.hatsprotocol.xyz/) + [MCP Server available](https://www.pulsemcp.com/servers/hats-protocol) | ERC-1155 hat tokens; 15+ pre-built automations; supports Base, Optimism, Arbitrum, Polygon; role composition (admin, accountability) for org accountability |
 | Quilibrium privacy layer designed for oblivious hypergraph (node operators can't see stored data); Mainnet v2.1 LIVE (as of Nov 2025) | [Quilibrium Docs](https://docs.quilibrium.com/docs/discover/q-story/) + [Quilibrium FAQs](https://docs.quilibrium.com/docs/discover/FAQ/) + [BSC News](https://bsc.news/post/quilibrium-crypto-guide-analysis) | Q v2.1 live mainnet with Proof of Meaningful Work; QNS + Quorum Messenger deployed; E1 2026 final stealth mode + full multi-sharding; Equinox/Event Horizon roadmap (ETA TBD) for AI training + streaming; 4 active regions + 60K+ node operators as of Nov 2025 |
+
+**Updated 2026-10-07:** SIWN (Sign In With Neynar) was retired on **August 14, 2026**. As of that date, the Neynar-hosted popup returns "has been retired" and new SIWN connections are no longer issued. ZAO's response is documented in **doc 2498** (merged PR #3555, 2026-09-17): relay-based SIWF (Farcaster AuthKit) replaces SIWN for authentication; the existing Neynar managed signer is kept for writes; Quick Auth is planned for the in-app path. The Finding in this doc that reads "Managed signers sponsor on-chain fees by default" remains accurate as the replacement path. Sources checked 2026-10-07: [Neynar SIWN docs](https://docs.neynar.com/docs/how-to-let-users-connect-farcaster-accounts-with-write-access-for-free-using-sign-in-with-neynar-siwn) (PARTIAL - egress-blocked, confirmed via search), [Neynar managed signers guide](https://docs.neynar.com/docs/write-to-farcaster-with-neynar-managed-signers) (PARTIAL - egress-blocked, confirmed via search), [doc 2498 / PR #3555](https://github.com/bettercallzaal/ZAOOS/pull/3555) (FULL). EAS contracts: no new release since v1.4.0 (January 2025) per [GitHub tags](https://github.com/ethereum-attestation-service/eas-contracts/tags) (FULL). Hats Protocol and Quilibrium: no material 2026 updates found.
 
 ## ZAO Application
 

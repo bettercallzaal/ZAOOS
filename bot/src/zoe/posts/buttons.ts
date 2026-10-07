@@ -210,11 +210,10 @@ async function handleClaimedPostCallback(
         }
         return;
       }
-      await appendLog({ event: 'publish-error', category: pending.category, id, error: result.error ?? result.summary, outcomes: result.outcomes });
-      const partlyLive = result.outcomes.some((o) => o.ok && !o.simulated);
-      if (partlyLive) {
+      if (result.state === 'partial') {
         // Something IS live (e.g. the cast went out, X failed). Do not resend the
         // text as a paste target - that invites a duplicate of the part that worked.
+        await appendLog({ event: 'publish-error', category: pending.category, id, error: result.error ?? result.summary, outcomes: result.outcomes });
         try {
           await opts.ctx.api.sendMessage(opts.zaalTgId, `Partly published:\n${result.summary}\nNot resending the text - the part that worked is live.`);
         } catch {
@@ -222,8 +221,27 @@ async function handleClaimedPostCallback(
         }
         return;
       }
-      // Nothing went out: fall through to the copy-target resend, with the
-      // reason on top so the next move is obvious.
+      if (result.state === 'unknown') {
+        // The request went out and no trustworthy answer came back. The route
+        // casts to Farcaster FIRST, so this is exactly what a live cast plus a
+        // slow X call looks like. Resending the text here is how a duplicate
+        // public post happens (zaoos-35 review of #3782).
+        await appendLog({ event: 'publish-unknown', category: pending.category, id, error: result.error ?? result.summary });
+        try {
+          await opts.ctx.api.sendMessage(
+            opts.zaalTgId,
+            `Publish result UNKNOWN - ${result.summary}\n` +
+              'Check before reposting: the /zao channel on Farcaster for the cast, @bettercallzaal on X for the tweet. ' +
+              'Text not resent on purpose.',
+          );
+        } catch {
+          // best effort
+        }
+        return;
+      }
+      // state 'failed': nothing can be live. Fall through to the copy-target
+      // resend, with the reason on top so the next move is obvious.
+      await appendLog({ event: 'publish-error', category: pending.category, id, error: result.error ?? result.summary, outcomes: result.outcomes });
       try {
         await opts.ctx.api.sendMessage(opts.zaalTgId, `Not published - ${result.summary}\nText below to paste by hand.`);
       } catch {

@@ -233,10 +233,55 @@ describe('POST button -> /api/publish/compose (flag ZOE_POST_PUBLISH)', () => {
     expect(answers).toContain('already handled');
   });
 
+  it('a 30 s abort after the request went out is UNKNOWN: no resend, says to check before reposting', async () => {
+    process.env.ZOE_POST_PUBLISH = '1';
+    process.env.ZOE_PUBLISH_BEARER = 'h'.repeat(40);
+    const abort = new Error('This operation was aborted');
+    abort.name = 'AbortError';
+    const fetchImpl = vi.fn().mockRejectedValue(abort);
+    const { ctx, sendMessage } = makeCtx();
+    await handlePostCallback({ ctx: ctx as never, repoDir: '/tmp/repo', zaalTgId: 1, fetchImpl });
+    const texts = sendMessage.mock.calls.map((c) => String(c[1]));
+    expect(texts).not.toContain(DRAFT.text);
+    expect(texts.some((t) => /UNKNOWN/.test(t) && /check before reposting/i.test(t) && /farcaster/i.test(t))).toBe(true);
+    const events = mockAppendFile.mock.calls.map((c) => JSON.parse(String(c[1])).event);
+    expect(events).toContain('publish-unknown');
+    expect(events).not.toContain('publish-error');
+  });
+
+  it('a 5xx is UNKNOWN too (the route may have cast before it died): no resend', async () => {
+    process.env.ZOE_POST_PUBLISH = '1';
+    process.env.ZOE_PUBLISH_BEARER = 'i'.repeat(40);
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 502, json: async () => ({}) });
+    const { ctx, sendMessage } = makeCtx();
+    await handlePostCallback({ ctx: ctx as never, repoDir: '/tmp/repo', zaalTgId: 1, fetchImpl });
+    const texts = sendMessage.mock.calls.map((c) => String(c[1]));
+    expect(texts).not.toContain(DRAFT.text);
+    expect(texts.some((t) => /UNKNOWN/.test(t) && /502/.test(t))).toBe(true);
+  });
+
+  it('a 2xx whose body cannot be read is UNKNOWN: no resend', async () => {
+    process.env.ZOE_POST_PUBLISH = '1';
+    process.env.ZOE_PUBLISH_BEARER = 'j'.repeat(40);
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => {
+        throw new Error('terminated');
+      },
+    });
+    const { ctx, sendMessage } = makeCtx();
+    await handlePostCallback({ ctx: ctx as never, repoDir: '/tmp/repo', zaalTgId: 1, fetchImpl });
+    const texts = sendMessage.mock.calls.map((c) => String(c[1]));
+    expect(texts).not.toContain(DRAFT.text);
+    expect(texts.some((t) => /UNKNOWN/.test(t))).toBe(true);
+  });
+
   it('a thrown fetch (network down) is an error outcome, not an exception out of the button handler', async () => {
     process.env.ZOE_POST_PUBLISH = '1';
     process.env.ZOE_PUBLISH_BEARER = 'd'.repeat(40);
-    const fetchImpl = vi.fn().mockRejectedValue(new Error('ECONNREFUSED'));
+    // pre-connect failure: nothing can have been published, so the resend is safe
+    const fetchImpl = vi.fn().mockRejectedValue(Object.assign(new TypeError('fetch failed'), { cause: { code: 'ECONNREFUSED' } }));
     const { ctx, sendMessage } = makeCtx();
     await expect(
       handlePostCallback({ ctx: ctx as never, repoDir: '/tmp/repo', zaalTgId: 1, fetchImpl }),

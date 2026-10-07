@@ -201,7 +201,8 @@ import {
   queueConfigured,
 } from './bonfire-queue';
 import type { PendingBonfireSubmission } from './approvals';
-import { attachCaster, runCasterPipeline } from './caster';
+import { attachCaster } from './caster';
+import { handleCastTrigger } from './caster/trigger';
 import { subscribeToCasts } from './farcaster/event-stream';
 import {
   getPendingReply,
@@ -4213,11 +4214,10 @@ async function main(): Promise<void> {
         // Fire-and-forget per cast (the pipeline self-gates + returns a verdict
         // we don't consume here). Wrapped so the callback returns void — unbreaks
         // the bot typecheck after #729. See doc 770/773.
-        void runCasterPipeline(bot, zaalId, {
-          agentId: 'caster',
-          persona,
-          context: `Someone cast (fid ${cast.fid}): "${cast.text}". Draft a reply.`,
-          parent: { fid: cast.fid, hash: cast.hash },
+        // handleCastTrigger calls runCasterPipeline exactly as before unless
+        // ZOE_CASTER_GUARDS=true, in which case the guard battery runs first.
+        void handleCastTrigger(bot, zaalId, cast, persona).catch((err: unknown) => {
+          console.error('[zoe/index] caster trigger failed:', (err as Error).message);
         });
       });
       console.log('[zoe/index] caster event stream subscribed');

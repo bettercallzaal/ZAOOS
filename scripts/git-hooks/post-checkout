@@ -1,0 +1,10 @@
+#!/bin/sh
+# post-checkout - tell you immediately when a new branch inherited another lane's work.
+# $3 == 1 means a branch checkout (not a file checkout).
+[ "${3:-0}" = "1" ] || exit 0
+[ "${ZAO_SKIP_INHERIT_CHECK:-}" = "1" ] && exit 0
+# NEVER blocks: post-checkout's exit status does not stop anything, and this hook
+# must not become a reason to delete the hooks directory. It only tells you, at
+# the moment you could still fix it in one command, instead of at CI time.
+sh "$(dirname "$0")/inherited-work-check.sh" || true
+exit 0

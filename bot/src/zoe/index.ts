@@ -201,7 +201,8 @@ import {
   queueConfigured,
 } from './bonfire-queue';
 import type { PendingBonfireSubmission } from './approvals';
-import { attachCaster, runCasterPipeline } from './caster';
+import { attachCaster } from './caster';
+import { handleCastTrigger } from './caster/trigger';
 import { subscribeToCasts } from './farcaster/event-stream';
 import {
   getPendingReply,
@@ -2816,10 +2817,31 @@ async function handleGroupMessage(
     const escalation = detectGroupEscalation(text);
     if (escalation.isEscalation && escalation.note) {
       const chatTitle = ctx.chat && 'title' in ctx.chat ? (ctx.chat.title ?? scope) : scope;
-      const dmNotice = `[Group Message - ${chatTitle}]\nFrom: ${label}\n"${escalation.note}"`;
+      const header = `[Group Message - ${chatTitle}]\nFrom: ${label}\n`;
+      // Telegram rejects messages over 4096 chars, and a rejected DM means Zaal
+      // gets nothing. Cut long notes and point at the group for the rest.
+      // The cut-off suffix carries the group title (up to 128 chars), so size it
+      // first; a flat allowance let a long title push the DM past 4096.
+      const suffix = `\n(cut here, full text in ${chatTitle})`;
+      const room = 4000 - header.length - 2; // 2 for the quotes around the note
+      const note =
+        escalation.note.length > room
+          ? `${escalation.note.slice(0, Math.max(0, room - suffix.length))}${suffix}`
+          : escalation.note;
+      // Hard cap as a last line of defence, whatever header and label hold.
+      const dmNotice = `${header}"${note}"`.slice(0, 4096);
       await bot.api.sendMessage(zaalId, dmNotice).catch((err) => {
         console.error('[zoe/index] failed to send group escalation DM to Zaal:', err);
       });
+      // Remember the relay in the group and in Zaal's DM. This path returns
+      // before dispatchConcierge, so without these ZOE cannot answer a
+      // follow-up about the message in either place (doc 2570).
+      await pushRecent({ from: 'other', text, sender: label }, scope).catch((e) =>
+        console.error('[zoe/index] escalation group log failed:', (e as Error)?.message),
+      );
+      await pushRecent({ from: 'zoe', text: dmNotice }, 'private').catch((e) =>
+        console.error('[zoe/index] escalation DM log failed:', (e as Error)?.message),
+      );
       await applyTaskOps([
         {
           op: 'add',
@@ -4192,11 +4214,10 @@ async function main(): Promise<void> {
         // Fire-and-forget per cast (the pipeline self-gates + returns a verdict
         // we don't consume here). Wrapped so the callback returns void — unbreaks
         // the bot typecheck after #729. See doc 770/773.
-        void runCasterPipeline(bot, zaalId, {
-          agentId: 'caster',
-          persona,
-          context: `Someone cast (fid ${cast.fid}): "${cast.text}". Draft a reply.`,
-          parent: { fid: cast.fid, hash: cast.hash },
+        // handleCastTrigger calls runCasterPipeline exactly as before unless
+        // ZOE_CASTER_GUARDS=true, in which case the guard battery runs first.
+        void handleCastTrigger(bot, zaalId, cast, persona).catch((err: unknown) => {
+          console.error('[zoe/index] caster trigger failed:', (err as Error).message);
         });
       });
       console.log('[zoe/index] caster event stream subscribed');

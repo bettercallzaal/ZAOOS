@@ -381,7 +381,7 @@ GitHub repo "ZoundZ 1/1 marketplace x mini-app" written in Solidity. Appears to 
 | **Title** | Co-Founder & COO (also referenced as Co-Founder & Chief Product Officer) |
 | **Company** | MAGNETIQ, Inc. |
 | **Location** | New York, NY |
-| **Email** | tyler@magnetiq.xyz |
+| **Email** | <redacted-email> |
 | **LinkedIn** | [linkedin.com/in/tyler-c-stambaugh-18020060](https://www.linkedin.com/in/tyler-c-stambaugh-18020060/) |
 | **Twitter** | @magnetiq_xyz (company account) |
 

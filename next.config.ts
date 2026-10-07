@@ -9,6 +9,13 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // A retired partner page (Zaal, 2026-10-05): zaoos.com/artizen is
+      // gone. Send old links home rather than 404.
+      {
+        source: '/artizen',
+        destination: '/',
+        permanent: false,
+      },
       {
         source: '/bcz-yapz',
         destination: 'https://bczyapz.com',

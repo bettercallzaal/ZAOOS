@@ -81,7 +81,7 @@ ZOE sends this via email on Sep 1. Send to all outlets in this order:
 | Outlet | Contact | Method | Angle to use |
 |--------|---------|--------|-------------|
 | Hypebot | articles@hypebot.com or @brucehoughton X DM | Email | Music industry + loser-earns economics |
-| Water & Music | cheriehu42@gmail.com | Email | Music economics research angle |
+| Water & Music | <redacted-email> | Email | Music economics research angle |
 | Ari's Take | Contact via aristaketake.com | Email | Independent artist economics |
 | Music Business Worldwide | contact via musicbusinessworldwide.com | Email | Global music industry |
 | Decrypt | tips@decrypt.co | Email | Crypto + culture angle |

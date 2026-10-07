@@ -21,7 +21,7 @@ parent-doc: 676
 | Decision | Verdict | Why | Unlock Path |
 |---|---|---|---|
 | **@zabal_bonfire as team Telegram bot** | YES | Already deployed to ZABAL Telegram group + Zaal's DMs (per doc 665). Team should use it NOW as: `@zabal_bonfire What do we know about ZAOstock sponsors?` Returns graph-derived synthesis. No setup needed for Telegram access. | STATUS: LIVE. Docs: DM @zabal_bonfire directly, or `@zabal_bonfire query` in group. Uses bonfires-sdk `agents.sync()` under the hood. |
-| **Enable `/paid/agents/{id}/chat` for team** | REQUIRES Joshua email | Endpoint is currently admin-gated for non-admin API keys. This is the REST API (REST latency ~100-200ms vs Telegram ~2-5s). Zaal may not want to push the unlock (team preference for Telegram is OK). | ACTION: Email joshua@desci.world: "Can we add a team-tier API key for the ZABAL Bonfire agent (69ef871f0d22ed7e6f2b243c) that lets Iman/ThyRev/Samantha call /paid/agents/{id}/chat with ~10 req/day?" Pricing TBD. |
+| **Enable `/paid/agents/{id}/chat` for team** | REQUIRES Joshua email | Endpoint is currently admin-gated for non-admin API keys. This is the REST API (REST latency ~100-200ms vs Telegram ~2-5s). Zaal may not want to push the unlock (team preference for Telegram is OK). | ACTION: Email <redacted-email>: "Can we add a team-tier API key for the ZABAL Bonfire agent (69ef871f0d22ed7e6f2b243c) that lets Iman/ThyRev/Samantha call /paid/agents/{id}/chat with ~10 req/day?" Pricing TBD. |
 | **Team search surface (pick 1)** | RECOMMEND: /search command in cowork-zaodevz bot | Native to team's workflow (Telegram). Lower friction than web dashboard. Instant recall. Outputs 3-5 results with source links. Build time: 4-6 hours (wraps bonfire delve endpoint). | SEE BELOW: Build spec + code sketch. |
 | **Web search page (zaoos.com/search)** | OPTIONAL - post-MVP | Pretty UI, graph visualization, bookmark-able URLs (for sharing findings), open to non-team. Requires Clerk/Supabase auth (who can search). Full build: ~16 hours. | DEFER: Ship /search command first, prove uptake. Add web page if team asks "can I share this search with others?" |
 | **Dashboard access for team** | SKIP for now | bonfires.ai dashboard (graph.bonfires.ai) requires Genesis NFT holder auth + separate Clerk account. Seats are NOT metered per Bonfires pricing docs. Cost: $0. Access: Zaal can add team emails to the Genesis wallet's Clerk org. | IF team needs visual graph browsing: ask Zaal to add team emails to Bonfires Clerk org. Easy 1-click, but not urgent (Telegram + web search cover daily use). |
@@ -71,7 +71,7 @@ parent-doc: 676
 - This is intentional: "Telegram free, REST API paid" model.
 
 **Unlock steps:**
-1. Zaal emails joshua@desci.world: "We have a team (Iman, ThyRev, Samantha) who need to programmatically query the ZABAL Bonfire agent. Can we add a team-tier API key with ~10 reqs/day? What's the cost?"
+1. Zaal emails <redacted-email>: "We have a team (Iman, ThyRev, Samantha) who need to programmatically query the ZABAL Bonfire agent. Can we add a team-tier API key with ~10 reqs/day? What's the cost?"
 2. Joshua either:
    - a) Grants permission on Zaal's existing key (cost: $0 if one of Genesis benefits)
    - b) Issues new scoped keys for team (cost: TBD, probably $50-200/mo if Bonfire scales like Mem0)

@@ -60,8 +60,8 @@ Respond with EXACTLY this structure. Total output MUST be under 300 words.
 - **Verdict: {✅ GOOD TO CLOSE / ⚠️ NOT YET — [list reasons]}**
 
 ### Quick Actions
-- `/catchup` for full context restore
-- `/standup` for build-in-public note
+- `/handoff` to save or restore session context
+- `/socials` for a build-in-public note
 - `npm run build` to check for errors
 ```
 

@@ -75,7 +75,7 @@ Agents can handle voice, text, or both simultaneously. Define once, deploy as vo
 | Training Data | 1 hour 21 minutes (8 audio files, 842.9 MB) |
 | Quality Tier | "Better" (Good=30min, Better=1hr, Best=2hr) |
 | Language | English / American |
-| Account | On Logesh's workspace (logesh@songam.space) |
+| Account | On Logesh's workspace (<redacted-email>) |
 
 ### Voice Models for Agents
 
@@ -506,7 +506,7 @@ This is the exact pattern for ZAO - Zaal's voice answering community questions 2
 
 ## 13. Existing Agents on the Account
 
-Six agents are already configured on the ElevenLabs account (logesh@songam.space):
+Six agents are already configured on the ElevenLabs account (<redacted-email>):
 
 | Agent | Likely Purpose |
 |-------|----------------|

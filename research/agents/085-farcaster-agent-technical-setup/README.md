@@ -4,8 +4,9 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-09-25
 original-query: Step-by-step guide to creating, configuring, and deploying an AI agent on Farcaster using Neynar API (reconstructed)
+re-researched: "2026-09-25. Trigger: @zolbot (FID 3338501) was built from this guide on 2026-06-24 and the estate can no longer control it. This doc told three ways to create an agent account and zero ways to keep one."
 tier: reference
 ---
 
@@ -30,11 +31,119 @@ tier: reference
 
 ---
 
+## 0. READ THIS FIRST: the custody key IS the account
+
+> **This section was added 2026-09-25, after an account built from this guide
+> became permanently unrecoverable. Everything below it was written 2026-05-21
+> and is unchanged except where marked.**
+
+### What happened
+
+`@zolbot`, FID 3338501, was registered on 2026-06-24 following this document.
+On 2026-09-24 the estate could not sign in as it, could not approve a partner's
+request from it, and could not cast from it.
+
+Measured directly against the IdRegistry on Optimism
+(`0x00000000Fc6c5F01Fc30151999387Bb99A9f489b`):
+
+    custodyOf(3338501)   0x5a3f9a4f20e602eeaa03019f863fca249f452d22
+    recoveryOf(3338501)  0x5a3f9a4f20e602eeaa03019f863fca249f452d22
+                         ^^ the SAME address
+
+Red control: `custodyOf(3)` returns a different address, so the call resolves
+per-FID rather than echoing its input.
+
+**Farcaster has exactly one way to recover an account without the custody key**,
+and `@zolbot` does not have it.
+
+### The one mechanism, and why it did not apply
+
+From the IdRegistry contract reference:
+
+> `recover(address from, address to, uint256 deadline, bytes sig)` - Transfer an
+> fid to a new address if caller is the recovery address.
+
+**That call needs no involvement from the custody key at all.** The recovery
+address transfers the FID to a new owner; the new owner signs an EIP-712 message
+accepting it. It is a complete, protocol-level second door.
+
+`changeRecoveryAddress(address recovery)` is callable **only by the current
+custody address**. So the recovery address is *only settable while you still hold
+the thing it insures you against losing.* Set it at creation or you cannot set it
+at all.
+
+`@zolbot`'s recovery address points at its own custody address. The second door
+opens into the same locked room.
+
+### What this doc did not say, and should have
+
+Measured across this document (878 lines) and
+`agents/925-zol-free-cast-posting-build-guide` (705 lines), 1,583 lines of
+Farcaster agent documentation written by this estate:
+
+    "back up"          0 occurrences
+    "backup"           0
+    "irrecoverable"    0
+    "cannot recover"   0
+    "recovery" (925)   0
+
+Red control: `signer` appears 41 times in this doc and 34 in 925, so the grep
+works. **The zeros are real.**
+
+The word "custody" appears six times in this doc and never once alongside a
+warning. The closest thing to guidance is one table cell: *"Secure Storage:
+Neynar handles / Neynar handles / You handle."*
+
+**So this was not carelessness by whoever ran it.** Someone followed an 878-line
+internal playbook, written a month earlier, that documented three ways to create
+an agent account and zero ways to keep one. That is a documentation failure and
+this section is the fix.
+
+### The rule
+
+**Every agent account this estate creates sets a recovery address, at creation,
+to a wallet the estate controls and which is NOT the custody address.**
+
+- Custody and recovery must be two different keys. One key with two jobs is one
+  key.
+- Both go into the password manager before the account casts once.
+- The FID, the custody address and the recovery address go into the estate's
+  wallet record - **addresses only, never key material**, per the vault rule.
+- A signer is not a backup. Signers can cast and react and nothing else; they
+  cannot add signers, change recovery, or transfer the FID. Only custody can.
+
+### What the forensics say, for the next person
+
+The registration is public and worth reading, because it rules things out:
+
+    2026-06-24 02:01  IN   0.001000 ETH  from 0x7234c36a71...  (Zaal's own wallet, fid 19640)
+    2026-06-24 02:03  OUT  0.000170 ETH  -> IdGateway          (FID registered)
+    2026-06-24 02:03  OUT       0 ETH    -> KeyRegistry        (signer added)
+    2026-06-24 02:04  OUT  0.000850 ETH  -> 0x7234c36a71...    (change swept back)
+
+**The custody address paid its own gas.** That means it was NOT created by
+Warpcast's one-click flow and NOT by Neynar's one-click "Create Agent" button -
+both would show a different sender. A private key existed locally on 2026-06-24
+and signed these transactions. Nonce is 5; the address still holds 0.001 ETH.
+
+So the key was generated on a machine that night, used, and never recorded. The
+searchable space is small and time-bounded: a `.env` written around 02:00 that
+night, shell history from that window, or a scratch generator script. **This
+guide is why nobody knew to save it.**
+
 ## 1. Creating a Farcaster Account for the Bot (New FID)
 
 There are two paths: manual (Warpcast app) or programmatic (Neynar API).
 
 ### Option A: Manual — Create via Warpcast
+
+> **SUPERSEDED 2026-09-25 as the default recommendation.** Farcaster's own docs
+> say the official client "uses a separate Ethereum account to sign transactions"
+> - a custody key generated inside the app. **Whether that client ever exports
+> the custody key to the operator is UNKNOWN**; neither docs.farcaster.xyz nor
+> docs.neynar.com describes its key-export UX. Do not use this path for an agent
+> account unless you have confirmed you can export both the custody key and set a
+> separate recovery address. See section 0.
 
 1. Download Warpcast on a phone
 2. Create a new account with a dedicated email/phone for the bot
@@ -43,6 +152,14 @@ There are two paths: manual (Warpcast app) or programmatic (Neynar API).
 5. Fund the custody wallet with a small amount of ETH on Optimism for storage
 
 ### Option B: Programmatic — Neynar API
+
+> **This is the path to use, and 2026-09-25 verification adds one thing it was
+> missing.** In this flow the operator generates the mnemonic locally, derives
+> `requested_user_custody_address` from it, and signs the EIP-712 acceptance
+> before Neynar is called - Neynar's `x-wallet-id` only pays gas. **The operator
+> holds the custody key by construction.** Add one step after registration:
+> `changeRecoveryAddress()` to a second wallet you control. Section 0 explains
+> why it cannot be added later.
 
 **Prerequisites:**
 - Neynar API key (from dev.neynar.com)
@@ -845,6 +962,36 @@ pm2 logs zao-agent
 | **Total** | **~$14-44/month** |
 
 ---
+
+## What 2026-09-25 verification changed
+
+Re-read against official sources today. Figures below are quoted with their source.
+
+| Claim | Status |
+|---|---|
+| SIWF authenticates against the **custody address** | CONFIRMED. FIP-11, Finalized: *"A user must produce an EIP-4361 Sign in With Ethereum message signed by the custody address."* So a bot can sign into a miniapp only if you hold its custody key. |
+| SIWF grants write access | **FALSE.** FIP-11's author, asked directly: *"To cast on a user's behalf you need a signer, which already exists. This is just to verify ownership."* |
+| Signers can recover an account | **FALSE.** Signers authorize casts, reactions and verifications. They cannot add signers, change recovery, or transfer the FID. |
+| **Sign In With Neynar (SIWN)** | **DEPRECATED.** Neynar's docs: new SIWN connections stopped being issued after 2026-08-14. Today is after that. Use Neynar-managed signers. |
+| Neynar plan tiers | **CHANGED since this doc.** Per Neynar's rate-limit page (June 2026 update, read 2026-09-25): Starter $9/mo and Growth $49/mo **no longer offered to new customers**. New: Free (10M credits/mo, 600 RPM) or Scale $249/mo (60M credits/mo, 1200 RPM). |
+| FID registration cost | Neynar's own table: ~$0.20 registration, ~$0.05 add signer, **~$0.50 all-in**, budget $1. The protocol price is a live `IdGateway.price()` read, set in USD by admins and converted via Chainlink - **no static figure is published**, so treat any fixed number as approximate. |
+| Storage unit | *"A storage unit lets you store 5000 casts, 2500 reactions and 2500 links"* for one year. |
+
+**Not established, and it matters for the next account:** whether Neynar's
+one-click "Create Agent" button in the dev portal ever surfaces the custody key
+to the developer, or generates and retains it server-side. No page on
+docs.farcaster.xyz or docs.neynar.com states it either way. Their app-wallets are
+documented as *"managed by Neynar for security"* with no withdrawal path, which
+is suggestive and is not proof. **Resolve this before using that button.**
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Timebox one hour to search for `@zolbot`'s custody key - shell history and any `.env` around 2026-06-24 02:00, plus the password manager. Shipped when the key is found OR the search is recorded as exhausted in this doc | @Zaal | Measurement | 2026-09-26 |
+| Reply to cashlessman.eth that `@zolbot` cannot approve from that account because custody and recovery are the same wallet and it is not held. Shipped when the message is sent | @Zaal | Outbound | 2026-09-25 |
+| Create the replacement agent account via Option B, then call `changeRecoveryAddress()` to a second wallet. Shipped when `recoveryOf(newFid) != custodyOf(newFid)` reads true on-chain | @Zaal | Build | 2026-10-10 |
+| Record FID, custody address and recovery address (addresses only, never key material) in the estate wallet record | @Zaal | Record | 2026-10-10 |
 
 ## Sources
 

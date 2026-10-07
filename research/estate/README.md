@@ -15,6 +15,12 @@ This is the hub. Detailed findings live in numbered research docs (linked below)
 | 5 | **Naming chaos** - ZAO-Video-Editor vs ZAOVideoEditor, zao-101/ZAO101, zao-stock/zaostock/ZAOstock, ZAOscout x3 | Doc 998 | Needs a naming convention + canonical-repo ledger (REPOS.md) | @Zaal |
 | 6 | **Repo bloat** - 6 repos >150MB (chat 206MB, songjam-site 165MB, eliza1 158MB, zaloraV1 155MB, newsletter-bot-1 155MB) committing node_modules/media | Doc 998 | Archive the dead ones; .gitignore node_modules on any kept | @Zaal |
 
+## Docs in this folder
+
+| # | Doc | Tier | What it establishes |
+|---|-----|------|---------------------|
+| 2526 | [The ZAO estate, measured](./2526-zao-estate-census-and-crm-reconciliation/) | STANDARD | 240 repos across six owners; WalkerEnterprise holds no work of ours; four CRM surfaces that do not reconcile; ZAOOS has no graph; 216 doc numbers resolve to more than one document, with the full inventory |
+
 ## Artifacts
 - **Archive script:** `archive-repos.sh` (in the session scratchpad; `bash archive-repos.sh` dry-runs, `--go` archives the 58 safe repos; 14 review-first printed). Reversible via `gh repo unarchive`.
 - **Doc 998** - full estate audit with keep/consolidate/archive tables.

@@ -2,7 +2,7 @@
 topic: business
 type: audit
 status: research-complete
-last-validated: 2026-07-07
+last-validated: 2026-09-28
 superseded-by:
 related-docs: "960, 967, 868"
 original-query: "zaostock all over the internet in terms of SEO audit"
@@ -69,6 +69,7 @@ None of this is wrong on its own, but it means the domain that most needs search
 
 ## Also See
 
+- [Doc 2569 - ZAOstock SEO/GEO/Socials: T-5 Days Sync](../2569-zaostock-seo-geo-socials-t5-sync/) - re-verifies this doc's findings against the live site 2026-09-28, T-5 days before the event: the Search Console/sitemap fix is still unshipped, the sitemap/robots/schema.org fixes below are now shipped and confirmed live
 - [Doc 960 - What regional Maine press outlets can pitch ZAOstock](../960-seo-web-presence-what-regional-maine-press/) - press/outreach angle on visibility; this doc covers the technical + domain-authority angle instead
 - [Doc 967 - Should ZAO consolidate nexus.thezao.com, zao-101.vercel.app, zaoos.com](../967-repo-web-improvement-should-zao-consolidate-nexus/) - directly relevant to Finding 7/8 (link-equity fragmentation across ZAO domains)
 - [Doc 868 - Brand Weakness Audit](../868-brand-weakness-audit-zoe-agent-status/) - broader brand-clarity findings this doc's Finding 6 (name collision) extends

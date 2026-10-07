@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-05
 related-docs: 661, 663, 676, 676c, 533, 620, 673
 tier: STANDARD
 ---
@@ -320,3 +320,42 @@ tier: STANDARD
 ---
 
 **Status:** Research complete. Ready for Zaal green-light on cheap-win Phase 1. No blocking dependencies.
+
+---
+
+## Updated 2026-10-05
+
+### Codebase delta (since 2026-05-20)
+
+Checked `bot/src/zoe/` against the doc's proposed deliverables:
+
+| Proposed | Status |
+|---|---|
+| `bot/src/zoe/voice/index.ts` — centralized voice rules | **Not built.** Voice rules remain inline per-drafter. `SHARED_VOICE` const exists in `drafters.ts` but is not a standalone shared module. |
+| `bot/src/zoe/agents/newsletter.ts` | **Built, but differently.** Implements `@newsletter` as a "Year of the ZABAL" daily personal chronicle, not the weekly bonfire-digest proposed here. Mode: draft/edit cycle with Bonfire recall. Scope is personal voice (BetterCallZaal), not a community digest. The weekly digest use case is still unaddressed. |
+| `bot/src/zoe/posts/link-check.ts` | **Not built.** |
+| `~/.claude/skills/newsletter/` | **Not present locally.** |
+
+### Farcaster platform: material change — ATTENTION
+
+**Neynar acquired Farcaster** from Merkle Manufactory in January 2026. Dan Romero and Varun Srinivasan stepped back; Merkle returned $180M to investors.
+
+**Neynar is now seeking a new owner** for Farcaster, Clanker, and its own developer platform (announced ~August 2026, seven months post-acquisition). Neynar said it would return its remaining balance sheet and disband its team, requiring a buyer to keep the protocol, app, and Clanker running.
+
+**Protocol fee collapse (search snippets, PARTIAL — not fetched directly):**
+- Q1 2026: $35.43M
+- Q2 2026: $4.67M
+- Jul 1–Aug 17, 2026: $376K (down ~99% from Q1 peak)
+
+The protocol remains open-source and permissionless per Neynar's statements; no shutdown announced. Farcaster MAU cited at 250K in post-acquisition reporting.
+
+**Implications for this doc:**
+- Opportunity 6 (Bonfire analytics → Neynar webhook) carries platform-stability risk until new ownership is confirmed. Neynar's own developer platform is also in flux.
+- Firefly cross-posting (used in current workflow) depends on Farcaster infra continuing; worth monitoring over the next 30–60 days.
+- The core social stack (ZOE posts → Firefly → Farcaster + X) continues to work today; the risk is medium-term continuity, not immediate breakage.
+
+Sources (search snippet quality, not full fetches — mark PARTIAL):
+- https://www.theblock.co/post/386549/haun-backed-neynar-acquires-farcaster-after-founders-pivot-to-wallet-app (PARTIAL — blocked)
+- https://thedefiant.io/news/nfts-and-web3/neynar-seeks-new-owner-farcaster-clanker (PARTIAL — blocked)
+- https://www.techflowpost.com/en-US/newsletter/132361 (PARTIAL — blocked)
+- https://blockeden.xyz/forum/t/neynar-acquired-farcaster-for-free-while-returning-180m-to-investors-dan-romero-is-building-a-wallet-and-the-protocol-has-no-token-is-decentralized-social-media-dead-or-just-getting-started/492 (PARTIAL)

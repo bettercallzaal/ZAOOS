@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-10-04
+last-validated: 2026-10-07
 superseded-by:
 related-docs: "agents/2456-orchestrator-practice, agents/2444-always-on-orchestrator, agents/2423-vault-as-transport-inter-terminal-context, agents/2474-agentic-lane-throughput-and-research-retrieval, agents/2480-zorca-lock-lease-hierarchy, dev-workflows/2471-zao-lane-workflow-audit"
 original-query: "[DEEP] How do other people run an orchestrator agent over many parallel Claude Code / coding-agent sessions? What does the orchestrator session do and not do, where does it live (which repo/dir), how does it hold state and route work, how do teams avoid it becoming a bottleneck or doing the work itself?"
@@ -12,6 +12,157 @@ tier: DEEP
 # 2586 - The orchestrator seat, outside view: it routes, it does not build, and its state lives in files it does not own
 
 > **Goal:** Test The ZAO's one-seat-plus-lanes setup (measured in the seat session 2026-10-04) against what Anthropic, the Claude Code docs, tool authors, HN and r/ClaudeAI report, and end with a concrete setup for Monday's single orchestrator terminal.
+
+## Re-validated 2026-10-07: where Zaal's time goes, and three changes that cut it
+
+Zaal, 2026-10-07 about 09:0x, typed (voice note) in the orchestrator pane:
+"the orchestration agent should be the input terminal where I talk to it, and it
+talks to all the other terminals ... The [grill] terminal is the output terminal
+for questions you have for me. So we should make things like that and learn more
+about how we can be more efficient in working with [the agents]." Recorded at
+zao-vault `decisions/grill-2026-10-07-seat-morning.md` item 10. It restates his
+6 Oct ruling (`decisions/grill-2026-10-06-icm.md`, "Orchestrator pane: input vs
+output") and asks one question. This section answers it from two days of records.
+The 2026-10-04 body below stands; where today's numbers change one of its
+decisions, the change is named here.
+
+### What was measured, and from which surface
+
+All counts are from zao-vault origin/main, read 2026-10-07 09:0x EDT:
+`decisions/grill-2026-10-06-icm.md`, `-06-dreamnet-evening.md`,
+`-06-seat-evening.md`, `-07-grill-morning.md`, `-07-seat-morning.md`,
+`handoffs/status/orchestration.md`, `notes/orchestrator-improvements-2026-10-06.md`.
+Session counts are from `ListAgents` in this session at 09:05 EDT. Counts are by
+hand from those files; where a file did not say typed or tapped, the item is
+left out of that count.
+
+**1. Answering is fast. The queue is not.**
+
+| Grill window | Answers by Zaal | Minutes | Source |
+|---|---|---|---|
+| dreamnet pane, 6 Oct | 8 | about 10 (17:46 to 17:56) | dreamnet-evening |
+| seat pane, 6 Oct | 8 | about 12 (17:46 to 17:58) | seat-evening items 1-8 |
+| grill pane, 7 Oct | 2 | - | grill-morning |
+| seat pane, 7 Oct | 7 asked and answered, plus 4 directions he typed unprompted | about 75 (07:51 to 09:0x) | seat-morning |
+
+When he sits down to answer, he clears an item a minute or faster. But by 14:1x on
+6 Oct the day had 16 rulings against **84 open queue lines** (improvements note,
+proposal 9), and the 06:18 morning section of `orchestration.md` carries **15
+items still waiting on him** from the night before. The constraint is how many
+questions reach him, not how fast he answers them.
+
+**2. More than half the time, none of the options fit.**
+
+Of the 25 questions above that he answered (dreamnet 8, seat-evening 8,
+grill-morning 2, seat-morning 7), he tapped an offered option **12** times and
+typed his own answer **13** times (52 percent). A typed answer often picks
+something no option offered: a new design (seat-evening 1 to 2), a different ask
+(grill-morning 1, "ask them if they are interested in joining our telegram"), a
+new surface (seat-morning 8b, "appriove in dotfiles"). **4 of the 13** typed
+answers needed a follow-up question before a lane could act (seat-evening 1 and
+3, grill-morning 1, seat-morning 8).
+
+**3. Some questions reached him twice.**
+
+- "Share with Brandon first" was asked in the dreamnet pane and in the seat pane
+  in the same 10 minutes on 6 Oct (dreamnet-evening item 1, seat-evening item 7).
+- The 21 uncommitted `zao-auto-resolve` lines were asked in the grill pane (he
+  tapped "Discard both", 37feaa62) and again in the seat pane, where he doubted
+  the premise (seat-evening items 3-4). Two answers, one question, a hold until
+  the next morning (seat-morning item 7).
+- Two of the Grill's 29 auto-proceeded defaults were withdrawn because a newer
+  word from him already existed (item 56, desk #66 "Don't change anything yet")
+  or because the default would have made private files public (S2)
+  (`decisions/grill-2026-10-06-icm.md`, both corrections).
+
+**4. A ruling reaches action in minutes, unless it needs his hands.**
+
+| Ruling | Ruled | Lane acted | Gap |
+|---|---|---|---|
+| seat-morning 4, back up 4 files | tapped about 08:0x | pushed 08:00 | under 5 min |
+| seat-morning 7, discard 21 lines | tapped about 08:1x | done and re-measured 08:14 | under 5 min |
+| 6 Oct P2, merge #3754 | about 13:28 | verified live about 13:40 | about 12 min (improvements, proposal 8) |
+| seat-morning 8, merge eleven PRs | tapped about 08:3x | routed 08:35, **blocked 08:37**, re-routed after his 8b answer, new pane 08:44 | 9 min lost, plus one extra question |
+| iman-desk #30, set up Postiz | 27 Sept | first post 30 Sept | 3 days, waiting on his payment (#40) |
+
+Routing is not where the time goes. The slow cases are the ones where a ruling
+said WHAT but not HOW, and the HOW became a second question (8 to 8b, and
+6 Oct item 7: "pay now ... ill continue this there").
+
+**5. The sort-before-asking ruling works, and its safety net worked once.**
+
+The Grill's first sort on 6 Oct (his "Yes, sort first", dreamnet-evening item 5)
+put **29 items** on the auto-proceeded list and about **44** on the gated list.
+So about 40 percent of what would have been questions never reached him. Two of
+the 29 were wrong (7 percent), both in classes `lane-autonomy.md` already gates
+(a setting, and public content), and both were caught by the receiving lane, not
+by the sort. Seat proposal 10 adds the two checks that would have caught them
+first. Proposals 9 and 10 are still unruled, like all 12 in that note.
+
+**6. Sessions: 13 open against a cap of 8.**
+
+`ListAgents` at 09:05 EDT listed 12 peer sessions plus this one, all
+interactive: 1 busy, 12 idle. The 2026-10-04 Key Decision 7 set the cap at 8 hot
+panes. Idle is not the same as waiting on him, and `ListAgents` does not show
+which is which. The seat reported at 08:59 that nine lanes were waiting on him
+and none on each other. I did not re-measure that split, so it is the seat's
+number, not mine.
+
+### The outside source, checked
+
+Anthropic's "Effective harnesses for long-running agents" (Nov 26, 2025),
+fetched raw this run. Its fix for agents that lose track across sessions is that
+each session leaves "clear artifacts for the next session" and works "on only one
+feature at a time". The post is about agents, not about the human, so it does not
+measure what to ask a person. The part that carries over: **an answer is an
+artifact**. A ruling recorded once, and read before anyone asks again, is the
+"progress file" for questions. Points 3 and 5 above are what happens when the
+asker does not read it first.
+
+### Three changes that would cut the most
+
+1. **Sort every question before it reaches him, with two holds.** This is
+   `lane-autonomy.md` (adopted 2026-08-19) applied at the seat, which his 6 Oct
+   "Yes, sort first" already approved for the Grill. Add proposal 10's two holds:
+   anything that changes a setting, and anything that makes content public,
+   stays gated. Measured effect: about 40 percent fewer questions on 6 Oct, with
+   both of the wrong defaults falling inside the holds.
+2. **Read the records before asking.** Before any question goes to him, in any
+   pane, the asker searches today's and yesterday's `decisions/` files and the
+   lane's issue thread for the same subject. If he has already answered, cite the
+   answer and do not ask. This needs no new tool: `git grep` on vault origin
+   finds it. It would have stopped all four repeats in point 3.
+3. **Fixed routes for the gated actions that recur.** A merge goes to the
+   dotfiles pane, where he approves each prompt (his 8b answer). A payment goes to
+   the Finance hq pane (his 6 Oct item 7). A post goes to him via Firefly or
+   Postiz. With the route fixed, a ruling only needs the WHAT, and the "how do
+   you want to do it" question that cost 9 minutes this morning disappears.
+
+Considered and not in the three: changing how questions are worded. Typed answers
+are 52 percent, but the record shows his typed answers often carry the best
+information (new options nobody offered). Fewer questions beats different
+questions.
+
+### Next Actions (2026-10-07, all reversible)
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Rule seat proposals 9 and 10 together as one Grill item: sort before asking, with the settings and public holds | Zaal | Decision (one tap) | 2026-10-08 |
+| Before asking any question, search today's and yesterday's `decisions/` files and the item's issue thread; when an answer exists, cite it and do not ask | grill lane, and the seat for questions it asks itself | Habit, written into each one's status file | 2026-10-08 |
+| Write the three fixed routes (merge, payment, post) into `handoffs/status/orchestration.md` as standing routes, citing seat-morning 8b and 6 Oct item 7 | seat | Vault edit | 2026-10-08 |
+| Bring hot sessions back to 8: list the 13 open sessions with a close-with-handoff recommendation for each idle one, for one tap | seat proposes, Zaal taps | Decision | 2026-10-07 |
+| At each status check, report two numbers: questions answered today and questions waiting. If waiting grows two checks in a row, send batches only (proposal 9.2) | seat | Habit | 2026-10-08 |
+
+### Sources for this section
+
+- Anthropic, [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), published 2025-11-26 [FULL, curl with a browser User-Agent, HTML stripped, quotes from raw text, 2026-10-07]
+- zao-vault origin/main: the five `decisions/grill-2026-10-0{6,7}-*.md` files, `handoffs/status/orchestration.md`, `notes/orchestrator-improvements-2026-10-06.md` (the seat's 12 proposals) [FULL, `git show`]
+- ZAODEVZ/iman-desk issues #30 and #40 [FULL, `gh issue view`]
+- `.claude/rules/lane-autonomy.md` and `.claude/rules/agent-spend.md` in ZAOOS [FULL, loaded this session]
+- `ListAgents` output, 2026-10-07 09:05 EDT [FULL, this session]
+- The seat's 08:59 pane review (nine lanes waiting on him) [UNVERIFIED by this lane; relayed by the orchestrator]
+
+---
 
 ## Key Decisions (recommendations first)
 

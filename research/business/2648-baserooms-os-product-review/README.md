@@ -258,6 +258,30 @@ Source: `https://baserooms.io/agent/openapi.json` (OpenAPI, 53 operations), the 
 
 **What this changes.** It confirms decision 2 (MCP only in a sandbox, minimal scopes) and adds one line to that trial plan: leave `tools` scope on but **do not call `skill_use`**, or treat its output as untrusted data, not instructions.
 
+### 2026-10-08, tick 6: the builder's track record on Farcaster
+
+Source: the 100 most recent casts by @slavanova (fid 1046957) from the Farcaster index (`/v2/farcaster/feed/user/casts`, one page; more pages exist and were not read), plus the profile record. Only public, product-related casts are summarised here.
+
+**Timeline.**
+
+| Date | What the casts show |
+|---|---|
+| 2025-07-24 | Farcaster account registered |
+| 2025-12-23 to 2026-01-16 | Shipping small vibe-coded Base mini apps on ohara.ai: a Polymarket-on-Base app ("Powered by polymarket with a bridge from base"), an "Appcoin Market", an AI agent mini app. Fixing in public ("Shipping some fixes today. Broke it last night") |
+| 2026-01-21 | **Base Rooms starts as coworking calls**: "https://meet.baserooms.io/based Cowork, Collab, Connect - we are live!", repeated 01-27 and 01-28 ("Building on base? Lets cowork and connect") |
+| 2026-03-12 | "Baserooms.io for main site. The link for based room is meet.baserooms.io/based" |
+| 2026-09-29 | The OS launches: "Been working on a fun os for us on base with a buddy to help" |
+| 2026-10-04 onward | Invite and referral posts, Buddy #0001, "fully onchain" explainer |
+| 2026-10-08 | BRTC buddies with MCP pairing and a shared workspace |
+
+Across those 100 casts, "baserooms" appears 17 times and ohara.ai 7 times. There are no posts about other tokens launched and abandoned, and no posts about The ZAO, WaveWarZ or Audius.
+
+**What this means.**
+
+1. **Base Rooms is nine months old, not one week.** It began in January 2026 as a coworking Jitsi room for Base builders. The ZAO's own Monday cobuilds have run on `meet.baserooms.io/zaal` since at least May 2026, so **we were early users of Slava's first product**. That is a real, existing relationship to build on if Zaal makes the radio ask (Key Decision 4).
+2. **Small, steady releases by one person.** The record is a solo builder shipping often, fixing in public and talking to users, before adding a token in late September. That fits the onchain picture from ticks 1 to 4: one owner key, a modest treasury, the launch allocation mostly locked.
+3. **No GitHub in the public record.** Nothing in these casts links to a code repository, which matches the closed-source finding in section 2.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -310,6 +334,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl + HTML strip] Treasury token transfers, 212 rows: https://basescan.org/tokentxns?a=0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce (pages 1-3, ps=100)
 - [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
 - [FULL - curl] OpenAPI chat set: https://baserooms.io/agent/openapi.json?set=chat (200, 31,240 bytes, 30 operations)
+- [PARTIAL - Farcaster index API, community] @slavanova casts: https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1046957&limit=150 (most recent 100 of more; older pages not read)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

@@ -59,6 +59,7 @@ import { surfaceNudges } from './nudge';
 import { resolveForumThread } from './topics';
 import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING_THREAD, ZAAL_BOTZ_ZAOSTOCK_THREAD, groupIds } from './env';
 import { surfaceGrill } from './grill';
+import { sendTerminalsDigest } from './terminals-digest';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
@@ -765,6 +766,37 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       { timezone: 'UTC' },
     ),
   );
+
+  // Terminals digest (terminals-digest.ts), Zaal 2026-10-07: "share with me how
+  // all terminals are doing". Scheduled only when ZOE_TERMINALS_DIGEST=1 AND
+  // ZOE_TERMINALS_DIGEST_CRON holds a valid cron expression (UTC); held while
+  // the grill is stopped. /terminals works without the schedule.
+  const termCron = process.env.ZOE_TERMINALS_DIGEST_CRON?.trim();
+  if (termCron && process.env.ZOE_TERMINALS_DIGEST === '1') {
+    if (!cron.validate(termCron)) {
+      console.warn(`[zoe/scheduler] ZOE_TERMINALS_DIGEST_CRON is not a valid cron expression, not scheduled: ${termCron}`);
+    } else {
+      tasks.push(
+        cron.schedule(
+          termCron,
+          () =>
+            runWithSendClass('gated', async () => {
+              try {
+                const r = await sendTerminalsDigest({
+                  send: (text) => opts.bot.api.sendMessage(opts.zaalTgId, text),
+                  scheduled: true,
+                });
+                console.log(`[zoe/scheduler] terminals digest: ${r}`);
+                if (r === 'sent') featureRan('terminals-digest', 'scheduled');
+              } catch (err) {
+                console.warn('[zoe/scheduler] terminals digest failed (nbd):', (err as Error).message);
+              }
+            }),
+          { timezone: 'UTC' },
+        ),
+      );
+    }
+  }
 
   // Doc 989 (backlog #2): escalation resend. Every 30 min, re-ping any
   // super-important message Zaal hasn't acknowledged past the window. Standalone

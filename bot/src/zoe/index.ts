@@ -35,6 +35,7 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
+import { sendTerminalsDigest, terminalsDigestEnabled } from './terminals-digest';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
@@ -614,6 +615,16 @@ bot.command(['grill', 'needsme'], async (ctx) => {
     return;
   }
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
+});
+
+// /terminals - how every Orca terminal is doing, from the seat's vault page
+// (terminals-digest.ts). Flag off: falls through to the next handler exactly as
+// before, so the command word is not swallowed.
+bot.command('terminals', async (ctx, next) => {
+  if (!terminalsDigestEnabled()) return next();
+  if (!(await ownerOnly(ctx))) return;
+  const r = await sendTerminalsDigest({ send: (text) => ctx.reply(text), scheduled: false });
+  if (r === 'sent') featureRan('terminals-digest', 'command');
 });
 
 // /working - list tasks currently in_progress with how long they've been in that state

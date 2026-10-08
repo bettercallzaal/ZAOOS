@@ -35,7 +35,9 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
-import { sendTerminalsDigest, terminalsDigestEnabled } from './terminals-digest';
+import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
+import { captureTerminalTypedReply, formatTerminalCard, nextTerminalItem, readTerminalGrillState, recordTerminalAnswer, setPendingType, terminalGrillEnabled } from './terminal-grill';
+import { isGrillPaused } from './grill-pause';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
@@ -605,8 +607,71 @@ function grillResolvedText(original: string | undefined, outcome: string): strin
 }
 
 // /grill & /needsme - surface the next item that needs you, on demand (also runs on a cron).
+// The seat's "Waiting on Zaal" items, one at a time, before the board cards
+// (terminal-grill.ts, ZOE_GRILL_TERMINALS). Returns true when it sent a card.
+async function sendNextTerminalItem(): Promise<boolean> {
+  if (!terminalGrillEnabled()) return false;
+  if (await isGrillPaused()) return false;
+  try {
+    const { text } = await readTerminalsPage(terminalsVaultDir());
+    const page = parseTerminalsPage(text);
+    const next = nextTerminalItem(page, await readTerminalGrillState());
+    if (!next) return false;
+    const card = formatTerminalCard(next, page.stamp);
+    await bot.api.sendMessage(zaalId, card.text, { reply_markup: { inline_keyboard: toGrammyRows(card.buttons) } });
+    featureRan('terminal-grill', 'card');
+    return true;
+  } catch (e) {
+    console.error('[zoe/terminal-grill] could not read or send the next item:', (e as Error)?.message);
+    return false;
+  }
+}
+
+// After a terminal answer: the next terminal item, else the board grill as before.
+async function advanceAfterTerminalAnswer(): Promise<void> {
+  if (await sendNextTerminalItem()) return;
+  await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true }).catch((e) =>
+    console.error('[zoe/grill] advance failed:', (e as Error)?.message),
+  );
+}
+
+bot.callbackQuery(/^tw:([0-9a-z]+):([A-Za-z0-9_-]+):([A-D]|done|skip|type)$/, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  if (!terminalGrillEnabled()) {
+    await ctx.answerCallbackQuery({ text: 'Terminal grill is off.' }).catch(() => {});
+    return;
+  }
+  const [, sk, id, choice] = ctx.match;
+  try {
+    const page = parseTerminalsPage((await readTerminalsPage(terminalsVaultDir())).text);
+    if (choice === 'type') {
+      const ask = await ctx.reply(`Type your answer to ${id} as a reply to this message. It goes to the seat word for word.`, {
+        reply_markup: { force_reply: true, selective: true },
+      });
+      await setPendingType(ask.message_id, id, page.stamp);
+      await ctx.answerCallbackQuery().catch(() => {});
+      return;
+    }
+    const r = await recordTerminalAnswer({ page, id, choice, tapStampKey: sk });
+    const note =
+      r === 'recorded' ? `${id}: ${choice === 'skip' ? 'skipped' : choice === 'done' ? 'done' : choice} - sent to the seat`
+      : r === 'already-answered' ? `${id} is already answered for this page.`
+      : r === 'stale' ? 'That card is from an older seat page. /grill shows the current one.'
+      : `${id} is not on the seat page any more.`;
+    await ctx.answerCallbackQuery({ text: note }).catch(() => {});
+    if (r !== 'recorded') return;
+    featureRan('terminal-grill', 'answer');
+    await ctx.editMessageText(`${ctx.callbackQuery.message?.text ?? id}\n\n-> ${note}`, { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+    await advanceAfterTerminalAnswer();
+  } catch (e) {
+    console.error('[zoe/terminal-grill] tap failed:', (e as Error)?.message);
+    await ctx.answerCallbackQuery({ text: 'Could not record that - nothing was sent to the seat.' }).catch(() => {});
+  }
+});
+
 bot.command(['grill', 'needsme'], async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
+  if (await sendNextTerminalItem()) return;
   const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
   if (r.paused) {
     await ctx.reply('The grill is stopped. Tap Resume to turn it back on.', {
@@ -1785,6 +1850,38 @@ bot.on("message:new_chat_members", async (ctx) => {
 bot.on('message:text', async (ctx) => {
   const text = ctx.message.text;
   if (text.startsWith('/')) return; // commands handled above
+
+  // FIRST: a typed answer to a terminal grill item (terminal-grill.ts). The
+  // bar-label and batch-answer branches below match "<word>: ..." and return,
+  // so "A: Ryan Miller" was logged as a batch answer and never reached the seat
+  // (dreamnet-54 on #3807). The most specific route goes first
+  // (first-handler-wins.md); every other message falls through untouched.
+  if (ctx.chat.type === 'private' && isFromZaal(ctx)) {
+    try {
+      const tg = await captureTerminalTypedReply({
+        replyToId: ctx.message.reply_to_message?.message_id,
+        text,
+        readPage: async () => parseTerminalsPage((await readTerminalsPage(terminalsVaultDir())).text),
+      });
+      if (tg.handled) {
+        await ctx.reply(
+          tg.outcome === 'recorded' ? `${tg.id}: sent to the seat, word for word.`
+          : tg.outcome === 'already-answered' ? `${tg.id} was already answered for this page; this reply was not sent.`
+          : tg.outcome === 'stale' ? 'The seat page changed since that card; this reply was not sent. /grill shows the current item.'
+          : `${tg.id} is not on the seat page any more; this reply was not sent.`,
+        );
+        if (tg.outcome === 'recorded') {
+          featureRan('terminal-grill', 'typed');
+          await advanceAfterTerminalAnswer();
+        }
+        return;
+      }
+    } catch (e) {
+      console.error('[zoe/terminal-grill] typed answer failed:', (e as Error)?.message);
+      await ctx.reply('Could not record that reply - nothing was sent to the seat.').catch(() => {});
+      return;
+    }
+  }
 
   // Cockpit button-bar taps arrive as plain text (a reply keyboard sends the
   // label). Intercept them BEFORE the concierge treats them as conversation,

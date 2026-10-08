@@ -41,12 +41,22 @@
  *                      idempotency_key: <s>  -> a retry returns the first id, no duplicate
  *   hop cap: a reply chain deeper than BUS_MAX_HOPS (default 8) is refused (409).
  *     This is the loop brake: two agents answering each other stop at the cap.
+ *   no dodging the cap: an internal agent that has an unread message waiting
+ *     from the agent it is writing to must answer with reply_to (409 if not),
+ *     and every pair of internal agents shares a budget of BUS_PAIR_PER_HOUR
+ *     messages an hour in both directions (default 60, 429 after that).
  *   rate limit: BUS_RATE_PER_MIN sends per sender per minute (default 30) -> 429;
  *     the same from/to/body inside 60s is not stored twice.
  *   receipts: GET /bus/messages/:id/receipt -> {delivered_at, read_at}
  *     delivered = the recipient listed it; read = the recipient PATCHed it.
  *   audit: every send/deliver/read appends one JSON line to audit.log
- *     (ids, names, sizes, never bodies).
+ *     (ids, names, sizes, never bodies). Past BUS_AUDIT_MAX_BYTES (default
+ *     5 MB) it rotates to audit.log.1, keeping one older generation.
+ *   only the recipient (or the admin) can mark a message read, so a sender
+ *     cannot hide its own message from the recipient's status=new poll.
+ *   names: an agent token whose name is "coordinator", the guest agent or a
+ *     partner is ignored (that token gets 401), so no mistyped env line can
+ *     hand an agent someone else's thread.
  *
  * Env: BUS_PORT (default 3099), BUS_DATA_DIR (default ./bus-data).
  * DEPLOY IS GATED - running this on the VPS behind nginx is Zaal's step.
@@ -65,6 +75,8 @@ const RING_MAX = 200; // keep the last N messages; partners keep their own copy
 const DEDUP_WINDOW_MS = 60 * 1000;
 function maxHops() { return Number(process.env.BUS_MAX_HOPS || 8); }
 function ratePerMin() { return Number(process.env.BUS_RATE_PER_MIN || 30); }
+function pairPerHour() { return Number(process.env.BUS_PAIR_PER_HOUR || 60); }
+function auditMaxBytes() { return Number(process.env.BUS_AUDIT_MAX_BYTES || 5 * 1024 * 1024); }
 
 function dataDir() {
   return process.env.BUS_DATA_DIR || path.join(process.cwd(), 'bus-data');
@@ -90,6 +102,8 @@ function saveJson(p, val) {
 }
 function audit(event, fields) {
   try {
+    const st = fs.statSync(auditPath(), { throwIfNoEntry: false });
+    if (st && st.size > auditMaxBytes()) fs.renameSync(auditPath(), `${auditPath()}.1`); // one older generation
     fs.appendFileSync(auditPath(), `${JSON.stringify({ at: new Date().toISOString(), event, ...fields })}\n`);
   } catch { /* the audit log never blocks a message */ }
 }
@@ -104,12 +118,23 @@ function overRate(agent, now) {
   return false;
 }
 
-/** Internal agent names: the guest agent plus every BUS_AGENT_TOKEN_<NAME>. */
+function guestAgent() { return (process.env.BUS_GUEST_AGENT || 'zoe').toLowerCase(); }
+/** Names an agent token may NOT take: the coordinator, the guest agent, every partner. */
+function reservedNames() {
+  const names = new Set(['coordinator', guestAgent()]);
+  for (const key of Object.keys(process.env)) {
+    const m = /^BUS_GUEST_TOKEN_([A-Z0-9]+)$/.exec(key);
+    if (m && process.env[key]) names.add(m[1].toLowerCase());
+  }
+  return names;
+}
+/** Internal agent names: the guest agent plus every BUS_AGENT_TOKEN_<NAME> that is not reserved. */
 function internalAgents() {
-  const names = new Set([(process.env.BUS_GUEST_AGENT || 'zoe').toLowerCase()]);
+  const reserved = reservedNames();
+  const names = new Set([guestAgent()]);
   for (const key of Object.keys(process.env)) {
     const m = /^BUS_AGENT_TOKEN_([A-Z0-9]+)$/.exec(key);
-    if (m && process.env[key]) names.add(m[1].toLowerCase());
+    if (m && process.env[key] && !reserved.has(m[1].toLowerCase())) names.add(m[1].toLowerCase());
   }
   return names;
 }
@@ -129,7 +154,10 @@ function resolveAuth(header) {
     const m = /^BUS_GUEST_TOKEN_([A-Z0-9]+)$/.exec(key); // A-Z0-9 ONLY (tasern gotcha)
     if (m && val && token === val) return { role: 'partner', agent: m[1].toLowerCase() };
     const a = /^BUS_AGENT_TOKEN_([A-Z0-9]+)$/.exec(key);
-    if (a && val && token === val) return { role: 'agent', agent: a[1].toLowerCase() };
+    if (a && val && token === val) {
+      if (reservedNames().has(a[1].toLowerCase())) return null; // name collision: refuse, never share a thread
+      return { role: 'agent', agent: a[1].toLowerCase() };
+    }
   }
   return null;
 }
@@ -249,6 +277,25 @@ function handler(req, res) {
         }
       }
 
+      // between internal agents: answer what is waiting with reply_to, and share a pair budget
+      const internal = internalAgents();
+      if (auth.role !== 'admin' && internal.has(from) && internal.has(to)) {
+        const waiting = messages.some((m) => m.from === to && m.to === from && m.status === 'new');
+        if (waiting && !replyTo) {
+          audit('refused_unthreaded', { from, to });
+          sendJson(res, 409, { error: `${to} has an unread message waiting for you; answer it with reply_to` });
+          return;
+        }
+        const hourAgo = nowMs - 60 * 60 * 1000;
+        const pairCount = messages.filter((m) => ((m.from === from && m.to === to) || (m.from === to && m.to === from))
+          && Date.parse(m.created) > hourAgo).length;
+        if (pairCount >= pairPerHour()) {
+          audit('refused_pair_budget', { from, to, count: pairCount });
+          sendJson(res, 429, { error: `pair budget: ${pairPerHour()} messages an hour between ${from} and ${to}` });
+          return;
+        }
+      }
+
       if (overRate(from, nowMs)) {
         audit('refused_rate', { from, to });
         sendJson(res, 429, { error: `rate limit: ${ratePerMin()} sends per minute` });
@@ -333,8 +380,9 @@ function handler(req, res) {
       const messages = loadJson(messagesPath(), []);
       const msg = messages.find((m) => m.id === patchMatch[1]);
       if (!msg) { sendJson(res, 404, { error: 'not found' }); return; }
-      if ((auth.role === 'partner' || auth.role === 'agent') && msg.to !== auth.agent && msg.from !== auth.agent) {
-        sendJson(res, 403, { error: 'not your thread' });
+      if (auth.role !== 'admin' && msg.to !== auth.agent) {
+        // only the recipient marks read; a sender could otherwise hide its own message
+        sendJson(res, 403, { error: msg.from === auth.agent ? 'only the recipient can mark a message read' : 'not your thread' });
         return;
       }
       msg.status = 'read';

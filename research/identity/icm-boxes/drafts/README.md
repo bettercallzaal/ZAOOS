@@ -37,3 +37,17 @@ Written in the overnight build loop 2026-07-30. Source lines are in each draft.
   `../zol.draft.llm.txt`) verified still repo-only (registry = 23 live boxes,
   none of the three present) and fact-checked 2026-08-20; publish-ready as
   written. Approval sheet: zao-vault notes/icm-approval-sheet.md.
+
+## Added 2026-10-08 (Zaal's ruling "A for icm", seat pane 11:0x ET)
+
+- `zabalgamez.draft.llm.txt` is SUPERSEDED by `../zabalgamez.llm.txt`, which is now
+  the MASTER (repo copy wins; live is published FROM it after Zaal approves the
+  text). The live box (2139 bytes, fetched 2026-10-08, archived at
+  `../live-snapshots/zabalgamez.llm.txt`) still carried two retired names (lines
+  11, 16 and 24 of the live text; glossary rows in ~/.claude/CLAUDE.md), the
+  pre-finals August language, and "Games" in the title and body. The master
+  writes Season 1 as complete from zabalgamez.com as fetched 2026-10-08 (home and
+  /finals: six finalists, three battles, champions n3m, ghostmintops and
+  uniquebeing404; 31 workshops, 31 projects, 15 people). No prize figures: the
+  site shows two different USDC totals (home 450, finals 500), left for the site
+  owner. /enter now redirects to /leaderboard, so the entry line names no path.

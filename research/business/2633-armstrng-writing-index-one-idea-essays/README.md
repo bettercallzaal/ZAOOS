@@ -80,7 +80,7 @@ The site does not publish metrics beyond "900+ readers" and a Hacker News badge.
 | Option | What it is | Evidence | Fit for The ZAO |
 |---|---|---|---|
 | A. Essay index (armstr.ng) | 5 posts, subtitle + read time, grouped by year | https://armstr.ng/writing | Use for the archive page, not the daily edition |
-| B. Daily-3 (current zaoonparagraph) | 3 items per day, 390 posts | `/Users/zaalpanthaki/Documents/repos/zaoonparagraph/published/` (23 records) | Keep; add one-line subtitle per edition |
+| B. Daily-3 (current zaoonparagraph) | 3 items per day, 390 posts | `bettercallzaal/zaoonparagraph`, folder `published/` (23 records) | Keep; add one-line subtitle per edition |
 | C. Deep-dive essay | 3 to 6 min, one claim, honest limit | Worth building, Wallets | Add one per week as the "idea of the week" edition |
 
 ## Next Actions

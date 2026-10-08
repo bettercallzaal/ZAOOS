@@ -16,6 +16,8 @@
 #     on its OK notice.
 #   - a line that opens "<word> OK" (for example "autodeploy OK: ...") never tags: an OK is
 #     not an ask, whatever words follow it.
+# ROLLED BACK joined the alarm words on 2026-10-08: a boot-crash rollback reached the group
+# untagged, and that is the one deploy notice he must see.
 # ZAO_STATUS_DRY_RUN=1 prints the message that would be sent and sends nothing (tests).
 set -uo pipefail
 if [ $# -ge 1 ]; then MSG="$1"; else MSG="$(cat)"; fi
@@ -27,7 +29,7 @@ msg = os.environ["_ZS_MSG"]
 import re as _re
 TAG = "@" + "bettercallzaal"
 no_tag = os.environ.get("ZAO_STATUS_NO_TAG") == "1" or _re.match(r"^[\w-]+ OK\b", msg)
-if not no_tag and _re.search(r"(?i)\b(ALERT|BLOCKED|needs a human|DECISION NEEDED|action required|FAILED|URGENT|needs you|approve|awaiting)\b", msg) and TAG not in msg:
+if not no_tag and _re.search(r"(?i)\b(ALERT|BLOCKED|ROLLED BACK|needs a human|DECISION NEEDED|action required|FAILED|URGENT|needs you|approve|awaiting)\b", msg) and TAG not in msg:
     msg = TAG + " " + msg
 if os.environ.get("ZAO_STATUS_DRY_RUN") == "1":
     print(msg); raise SystemExit(0)

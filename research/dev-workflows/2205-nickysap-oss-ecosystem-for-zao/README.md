@@ -13,6 +13,8 @@ tier: STANDARD
 
 > **Goal:** Survey nickysap's (nick / @nickysap / FID 269091 / github.com/99darwin) public repos beyond `orchestrator` (doc 2204) and name what ZAO adopts. Headline: his `farcaster-audio` is the full OSS Juke engine, which can unblock **Zuke** (ZAO's audio-spaces surface at zuke.thezao.com, built on Juke).
 
+> **Correction, 2026-10-08.** Rows 2 and 3 below call `juke-space-recap` and `geo` "MIT". Read on 2026-10-08, neither repo has a LICENSE file at its root (`gh api repos/99darwin/<repo>/contents`), and the GitHub API reports no licence for either. Without a licence they can be read for ideas but not copied or adapted. `farcaster-audio` and `obsidian-vault-scaffolder` do carry MIT LICENSE files. The original rows are left as written. Full licence table: doc 2643 (ZAOOS PR #3819).
+
 ## Key Decisions (adopt-list, recommendations first)
 
 | # | ADOPT from nickysap | What it is (FULL-read README) | ZAO fit + status | Grade |

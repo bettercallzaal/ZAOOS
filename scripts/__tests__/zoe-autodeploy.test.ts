@@ -195,3 +195,65 @@ describe('zoe-autodeploy v4: reconciled, and quiet on non-bot merges', () => {
     expect(src).toContain('--packages=external --metafile="$V/.zoe-meta.json"');
   });
 });
+
+// The boot-verify, measured 2026-10-08: with --external:'*' esbuild treats EVERY
+// import as external, relative ones included, so its metafile lists index.ts alone
+// and a syntax error in any imported file passes the verify. ZOE_AUTODEPLOY_VERIFY_GRAPH=1
+// (default 0) verifies with --packages=external instead: npm packages stay external,
+// every relative import is bundled and parsed.
+describe('zoe-autodeploy boot-verify covers the import graph (ZOE_AUTODEPLOY_VERIFY_GRAPH)', () => {
+  const scriptPath = path.resolve(__dirname, '../zoe-autodeploy.sh');
+  const src = fs.readFileSync(scriptPath, 'utf8');
+  const esb = path.resolve(__dirname, '../../node_modules/.bin/esbuild');
+  const proj = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-graph-'));
+  fs.mkdirSync(path.join(proj, 'bot/src/zoe'), { recursive: true });
+  fs.writeFileSync(
+    path.join(proj, 'bot/src/zoe/index.ts'),
+    "import { x } from './broken';\nimport { z } from 'grammy';\nconsole.log(x, z);\n",
+  );
+  fs.writeFileSync(path.join(proj, 'bot/src/zoe/broken.ts'), 'export const x = {;\n');
+  // The script's own decision: the same grep the script applies to esbuild's output.
+  const blocks = (flags: string) => {
+    let out = '';
+    try {
+      out = execSync(
+        `${JSON.stringify(esb)} bot/src/zoe/index.ts --bundle --platform=node --format=esm --outfile=/dev/null ${flags} 2>&1`,
+        {
+          cwd: proj,
+          shell: '/bin/bash',
+          encoding: 'utf8',
+        },
+      );
+    } catch (e) {
+      out = String((e as { stdout?: string }).stdout ?? '');
+    }
+    return /error|unexpected/i.test(out);
+  };
+
+  it("red control: the current verify (--external:'*') passes a syntax error in an imported file", () => {
+    expect(blocks("--external:'*'")).toBe(false);
+  });
+  it('the graph verify (--packages=external) blocks it', () => {
+    expect(blocks('--packages=external')).toBe(true);
+  });
+  it('the script selects the graph verify only when the flag is 1, and keeps the old one by default', () => {
+    expect(src).toContain("VERIFY_FLAGS=(--external:'*')");
+    expect(src).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: bash expansion, not a template
+      '[ "${ZOE_AUTODEPLOY_VERIFY_GRAPH:-0}" = 1 ] && VERIFY_FLAGS=(--packages=external)',
+    );
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: bash expansion, not a template
+    expect(src).toContain('--outfile=/dev/null "${VERIFY_FLAGS[@]}" 2>&1)');
+  });
+  it('the real bot passes the graph verify on this commit, so turning it on does not block a good deploy', () => {
+    expect(() =>
+      execSync(
+        `${JSON.stringify(esb)} bot/src/zoe/index.ts --bundle --platform=node --format=esm --outfile=/dev/null --packages=external`,
+        {
+          cwd: path.resolve(__dirname, '../..'),
+          stdio: 'pipe',
+        },
+      ),
+    ).not.toThrow();
+  });
+});

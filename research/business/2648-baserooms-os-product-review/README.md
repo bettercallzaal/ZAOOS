@@ -15,6 +15,28 @@ tier: STANDARD
 
 All figures are as of 2026-10-08, measured between 16:30 and 17:00 UTC. Every claim below comes from a raw fetch (curl, the public Base RPC, the GitHub API, the Farcaster index). Nothing was signed, connected, minted or paired by this lane.
 
+## Bottom line (updated 2026-10-08 after 25 loop ticks)
+
+Base Rooms OS is a careful, nine-month-old solo build by @slavanova. It started in January 2026 as the Jitsi coworking room The ZAO already uses, and became an onchain desktop on 2026-09-29.
+
+Its own contracts are verified, MIT, and not upgradeable. Its disclosures are unusually honest. No third-party trackers were found. Its revenue so far is about 2,600 USDC of Buddy mints.
+
+The risks sit in three places:
+
+1. **One key.** A single EIP-7702-delegated EOA owns both contracts, can change the Buddy art and the mint rules, and receives every fee.
+2. **The agent pairing.** The Claude Code hooks snippet hands a third-party server our prompts, our tool inputs, and the power to approve and rewrite commands. It fails open.
+3. **The outside venues.** Veranta's perps contracts are upgradeable, behind a 3-of-5 Safe.
+
+For The ZAO, that adds up to:
+
+- keep using Rooms
+- ask for a WaveWarZ radio station
+- copy the approval-hold idea into our own bridge
+- do not pair agents through hooks
+- keep any treasury out of BRTC, the vault and the perps
+
+**Small audience, small company.** It has about 350 X followers, 156 Telegram members, 134 BRTC holders and 60 Buddy holders, with no terms of service or named legal entity. A partnership is a goodwill arrangement, not a contract.
+
 ## Key Decisions
 
 | # | Decision | Why |
@@ -608,6 +630,10 @@ Source: a search of the homepage HTML and all 185 JS chunks for 16 analytics and
 **The Art Gallery** ("Your NFTs and art on Base and Ethereum") loads holdings through Base Rooms' own `/api/nfts/held` route and resolves images through the `https://ipfs.io/ipfs/` gateway. It links out to OpenSea and the Zora explorer. A guessed `addr` parameter returned `400 {"error":"unknown parameter: addr"}`, so the route validates its inputs. The real parameter name was not pursued.
 
 **What this means.** Nothing to adopt and nothing to flag. The absence of trackers is worth one line in the review's overall verdict: Base Rooms does not appear to sell its users' attention to analytics vendors.
+
+### 2026-10-08, tick 25: bottom line added
+
+No new fetch. A short "Bottom line" section now sits above Key Decisions, summarising the review and ticks 1 to 24 in one place for a reader with two minutes. Every figure in it is cited in a section or tick below.
 
 ## Comparison: how to use it
 

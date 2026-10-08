@@ -282,6 +282,24 @@ Across those 100 casts, "baserooms" appears 17 times and ohara.ai 7 times. There
 2. **Small, steady releases by one person.** The record is a solo builder shipping often, fixing in public and talking to users, before adding a token in late September. That fits the onchain picture from ticks 1 to 4: one owner key, a modest treasury, the launch allocation mostly locked.
 3. **No GitHub in the public record.** Nothing in these casts links to a code repository, which matches the closed-source finding in section 2.
 
+### 2026-10-08, tick 7: anything else like it?
+
+Source: GitHub repository search (sorted by stars) for "onchain desktop", "onchain os base", "web3 desktop os", "windows 95 crypto" and "agent approval mcp hooks claude code"; Farcaster cast search for "onchain os", "onchain desktop" and "desktop on base"; LICENSE files read via the GitHub API.
+
+**Nothing comparable at Base Rooms' scope turned up.** The browser-desktop-for-crypto idea exists elsewhere only as small or stale projects: `deokman420/KasOS` ("Web3-enabled desktop OS in your browser", MIT, 6 stars, last push 2025-10-21) and `0xPr0f/retroOS-arcade` (0 stars). "Onchain OS" repos on Base (`axtion-oss/axtion`, `gnanam1990/base-agent-os-argus`, `satohubai/sato-os`) are agent dashboards or portfolio tools with 0 to 2 stars. On Farcaster, the same search terms return Base Rooms' own invite posts plus a run of throwaway `$DESKTOP`, `$OS` and `$Agent OS` token launches from bot accounts in August and September 2026. That is noise, not competition. This is a search of two indexes with five and three queries, not a market map: a closed-source competitor with no GitHub presence would not show up here.
+
+**The one relevant find is for the agent-approval idea, not the desktop.** `Asugawara/ukagai` ("Agents ask. Humans decide.", MIT, created 2026-10-08, 1 star) catches Claude Code's `AskUserQuestion` and plan approvals with hooks and shows them in **one localhost GUI**, with the agent's own explanation beside each choice. It solves the same problem as Base Rooms' Buddy approval hold, with the opposite data path: everything stays on the machine.
+
+| | Base Rooms Buddy pairing | ukagai | Our `zao-ask-check` bridge |
+|---|---|---|---|
+| Where approvals are shown | A pixel pet on baserooms.io | A local web page | Telegram, via ZOE |
+| Where the hook data goes | A third-party Cloudflare Worker | localhost only | Our own bot |
+| Can it auto-approve or rewrite tool calls remotely | Yes, by design of HTTP hooks (T2, T3) | Not remotely; the server runs locally | Not applicable |
+| Licence | Closed (app) | MIT | Ours |
+| Maturity | Live product | One day old, 1 star | In use |
+
+**What this changes.** Key Decision 5 (adopt the pattern, extend our own bridge) stands, and now has a second reference. ukagai is MIT, so when the `zao-ask-check` extension is built, its "one inbox with the agent's reasons next to the options" design can be borrowed with credit (`credit-attribution.md`). It is too new to install, and its installer pipes a remote script to `sh`, which our own gate list would flag.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -335,6 +353,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
 - [FULL - curl] OpenAPI chat set: https://baserooms.io/agent/openapi.json?set=chat (200, 31,240 bytes, 30 operations)
 - [PARTIAL - Farcaster index API, community] @slavanova casts: https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1046957&limit=150 (most recent 100 of more; older pages not read)
+- [FULL - GitHub API] Repo searches for comparable products; LICENSE files of Asugawara/ukagai (MIT), deokman420/KasOS (MIT); ukagai README
+- [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

@@ -515,6 +515,18 @@ Source: the same reads as earlier sections, repeated at 18:42 UTC (block 52,347,
 
 **At this pace the product is quiet.** In about two hours there were two mints, one new holder at most, no new stake, and no reward claims. That matches the audience size in tick 16. Nothing in the day's movement changes a Key Decision.
 
+### 2026-10-08, tick 18: findings folded into Next Actions
+
+No new fetch this tick. The loop findings that call for action were added to the Next Actions table above:
+
+- the radio ask made specific (tick 9), with the legal-party and data questions (tick 14) and the Jitsi `localhost` note (tick 12)
+- ukagai credited in the `zao-ask-check` extension (tick 7)
+- the o1 note for doc 2634's owner (tick 13)
+- a `RendererSet` watch (tick 10)
+- a re-check when the vault ends on 2026-12-07 (ticks 3 and 4)
+
+The Key Decisions table is unchanged: none of ticks 1 to 17 reversed or weakened a decision.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -541,10 +553,13 @@ Source: the same reads as earlier sections, repeated at 18:42 UTC (block 52,347,
 |---|---|---|---|
 | Decide whether to ask @slavanova for a WaveWarZ / ZAO radio station; done when Zaal says yes or no in the grill | Zaal | Decision | 2026-10-15 |
 | If yes: Zaal sends the ask (outbound is his tap); done when the message is sent | Zaal | Outbound | 2026-10-17 |
+| If yes, the ask is specific (ticks 9, 14, 16): a pinned WaveWarZ / The ZAO radio row built from the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts; plus two questions, who the contracting party is and what happens to stored messages and Farcaster notification tokens if the service closes; plus a one-line note that `meet.baserooms.io` still allows `localhost` framing (tick 12). Done when the draft is in the grill for Zaal | baserooms lane drafts, Zaal sends | Draft | 2026-10-15 |
 | Add a "no third-party HTTP hooks in ~/.claude/settings.json" line to `.claude/rules/secret-hygiene.md` and set `allowedHttpHookUrls` to an explicit list in dotfiles; done when the PR is merged | baserooms lane, reviewed by dotfiles lane | PR | 2026-10-12 |
-| Extend `zao-ask-check` with a named risky-action list (git-push, git-rewrite, rm-rf, publish, deploy, database, pipe-shell, onchain, sudo, env), credited to Base Rooms OS as the pattern source; done when the PR is open | baserooms lane | PR | 2026-10-15 |
+| Extend `zao-ask-check` with a named risky-action list (git-push, git-rewrite, rm-rf, publish, deploy, database, pipe-shell, onchain, sudo, env), credited to Base Rooms OS as the pattern source, and the "agent's reasons next to the options" layout credited to `Asugawara/ukagai` (MIT, tick 7); done when the PR is open | baserooms lane | PR | 2026-10-15 |
 | Sandboxed MCP trial (separate macOS user, `status`/`talk`/`approve` scopes only, stub-server red control run first); done when a follow-up doc records the red-control result | Zaal approves, baserooms lane runs | Decision then test | 2026-10-22 or wontfix |
-| Re-validate fees, contract owners and the treasury holdings in this doc; done when `last-validated` is bumped | baserooms lane | Re-research | 2026-11-08 |
+| Suggest to doc 2634's owner that o1 Launchpad be added as a fifth rail column, with the stock-pairing caveat (tick 13); done when the note is posted on the 2634 board card or PR | baserooms lane | Note | 2026-10-12 |
+| Re-validate fees, contract owners and the treasury holdings in this doc, and check for a `RendererSet` event on the Buddies contract (tick 10); done when `last-validated` is bumped | baserooms lane | Re-research | 2026-11-08 |
+| Re-check the vault when it ends: rewards paid, treasury stake withdrawn or not (tick 3, tick 4); done when a dated follow-up line is added | baserooms lane | Re-research | 2026-12-08 |
 
 ## Sources
 

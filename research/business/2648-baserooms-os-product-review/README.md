@@ -561,6 +561,22 @@ Source: `traitsOf(252)`, `bootedAt(252)` and `tokenURI(252)` on the Buddies cont
 2. **Progress is public.** The progress endpoint answers without any key, for any Buddy id. So anyone can see how active a given Buddy's owner has been on Base Rooms (active days, streak, care stats), and since ownership is public onchain, that ties back to a wallet. That is a small, real privacy point. It belongs in the same outreach note as the `localhost` framing (Next Actions), and anyone at The ZAO who would rather not publish their activity pattern should know it.
 3. **Level-ups need "real" actions.** `real: 0` and the Disclosures' "4+ fee-paying actions" for the LV5 swap discount line up: XP from care is capped (`care.cap` 24), and the higher levels and the fee discount need actions that pay Base Rooms a fee. That is the business model, shown in one JSON field.
 
+### 2026-10-08, tick 21: the skills catalog and scheduled tasks
+
+Source: `POST /agent/tools/skills_list` without a key (401), `GET https://brtc-os.slavamushyakov.workers.dev/skills` three times (401, `{"error":...}`, 25 bytes each), `GET` of `/agent/skills`, `/skills` and `/agent/skills.json` on baserooms.io (404 each), and the skills and workspace code in the site bundle.
+
+**The skills catalog is not public.** Both the agent tool and the Worker's `/skills` route answer 401 without a signed-in wallet or a key. So the skill text that `skill_use` hands an agent (tick 5) cannot be reviewed from outside before pairing. That is worth knowing, because those texts are instructions the agent is told to follow.
+
+**Users can write their own skills, in a SKILL.md format.** The bundle calls `POST /skills/mine` with a `skillmd` body ("import"), `GET /skills/<id>/md` ("export" and "from"), and `DELETE /skills/mine/<id>`. Imported skills are merged into the list as `minStage: 1`. So a Buddy's skills can be text its owner pasted in, possibly copied from someone else. An agent calling `skill_use` on such a Buddy reads whatever that text says.
+
+**Workspaces can run tasks on a schedule.** The workspace board posts to `/workspaces/<id>/schedules` with `every` and `weekday` fields, can "run now" through `/workspaces/<id>/tasks/<id>/run`, and lists and stops `/jobs`. A task can name a `skill` and a target Buddy. Put together: an owner can schedule a recurring task, with a skill, for the agent paired to a Buddy.
+
+**What this changes.**
+
+1. **Threat T5 (context injection) gets one more path**: a user-imported or shared SKILL.md, delivered by `skill_use` and acted on by a paired agent. The trial rule from tick 5 ("do not call `skill_use`, or treat its output as data") now also covers anything imported.
+2. **A paired agent can be woken on a timer.** For a coding agent on our machines that means turns, and therefore spend (`agent-spend.md`: about a dollar a turn), triggered by a schedule on someone else's server. The sandbox trial must not grant whatever scope lets scheduled tasks reach the agent. Which scope that is was not visible from outside (tick 5 lists `memory` for the workspace tools); it is UNVERIFIED, and the first trial should leave workspace and memory scopes off entirely.
+3. **The SKILL.md idea itself is familiar ground.** It is the same shape as Claude Code skills. If The ZAO ever wants member-authored playbooks for ZOE, this is a live example of the format traveling between tools. That is a pattern note, not a dependency.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -634,6 +650,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
 - [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
 - [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
+- [FULL - curl, 3 runs] Worker /skills (401); agent tool skills_list without key (401); /agent/skills, /skills, /agent/skills.json on baserooms.io (404); skills import/export and workspace schedule code paths in the bundle
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

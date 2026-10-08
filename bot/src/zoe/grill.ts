@@ -57,6 +57,9 @@ export interface GrillItemState {
    * which is the question the cooldown needs (see askCooldownMs).
    */
   firstAskedAt?: string;
+  /** How many times this card has been pushed. Drives the ZOE_GRILL_BACKOFF ladder.
+   * Absent on state written before 2026-10-08; read as 1 when the card exists. */
+  askCount?: number;
 }
 
 export interface GrillState {
@@ -231,6 +234,33 @@ export function askCooldownMs(ageMs: number): number {
   return ASK_COOLDOWN_MS;
 }
 
+/**
+ * ZOE_GRILL_BACKOFF=1 (default off): the re-ask ladder Zaal ruled on seat item
+ * 52 (vault ref 5cdacb05, 2026-10-08). Ask a card once; unanswered, ask again
+ * one day later, then three days after that, then a week after that. After the
+ * fourth ask it is never pushed again: it stays on the board and the 08:00 and
+ * 20:00 needs-Zaal digest lists it with the other open decisions.
+ *
+ * SUPERSEDES askCooldownMs above for every card, including his 2026-08-11
+ * "older cards must nag MORE frequently" rule that gave a card over seven days
+ * old a 45-minute cooldown. Measured on 2026-10-07: that made one card, first
+ * raised 2026-09-26, the most urgent item at every hourly tick, so it took all
+ * five daily push slots. Item 52 replaces it; with the flag off it still runs.
+ */
+export function grillBackoffEnabled(): boolean {
+  return process.env.ZOE_GRILL_BACKOFF === '1';
+}
+
+/** Wait after the Nth ask before the next one: 1 day, 3 days, 7 days. */
+const BACKOFF_AFTER_ASK_MS = [1 * DAY_MS, 3 * DAY_MS, 7 * DAY_MS];
+
+/** May a card asked `askCount` times, last at `askedAt`, be pushed again now? */
+export function backoffAllows(askCount: number, askedAt: string, now: number): boolean {
+  const wait = BACKOFF_AFTER_ASK_MS[askCount - 1];
+  if (wait === undefined) return false; // asked four times: digest only
+  return now - Date.parse(askedAt) >= wait;
+}
+
 // A FUNCTION, not a shared constant. `{ ...DEFAULT_STATE }` is a shallow copy,
 // so every caller that read a missing or unreadable state file got the SAME
 // `items` and `recentAnswered` objects and wrote its cards into them. The next
@@ -316,6 +346,12 @@ export function pickNext(queue: GrillItem[], state: GrillState, now: number): Gr
     if (!s) return item; // never asked
     if (s.status === 'done') continue;
     if (s.status === 'snoozed' && s.snoozeUntil && Date.parse(s.snoozeUntil) > now) continue;
+    if (grillBackoffEnabled() && (s.status === 'asked' || s.status === 'skipped')) {
+      // A skipped card waits on the same ladder; otherwise Skip sends it
+      // straight back into the next slot.
+      if (!backoffAllows(s.askCount ?? 1, s.askedAt, now)) continue;
+      return item;
+    }
     if (s.status === 'asked') {
       // Age is measured from the FIRST ask, not the last one. Falling back to
       // askedAt keeps every pre-existing state file working - an item written
@@ -515,16 +551,7 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   // Pin the new open question (silent) so it stays easy to find until answered.
   if (deps.pin && messageId) await deps.pin(messageId).catch(() => {});
 
-  // firstAskedAt survives every re-ask - it is what makes an old item nag harder.
-  // Writing the whole object fresh (rather than spreading the old one) is on
-  // purpose: a re-ask must clear a stale snoozeUntil/answer. Only the age carries.
-  const prior = state.items[item.key];
-  const askedAt = new Date(now).toISOString();
-  state.items[item.key] = {
-    askedAt,
-    status: 'asked',
-    firstAskedAt: prior?.firstAskedAt ?? prior?.askedAt ?? askedAt,
-  };
+  recordAsk(state, item, now);
   state.activeKey = item.key;
   state.activeTitle = item.title;
   state.activeKind = item.kind;
@@ -535,6 +562,23 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.daySurfaced = { date: today, count: day.count + 1 };
   await writeGrillState(state);
   return { sent: true, item };
+}
+
+/**
+ * Record that `item` was pushed at `now`. firstAskedAt survives every re-ask -
+ * it is what makes an old item nag harder under the old cooldown. Writing the
+ * whole object fresh (rather than spreading the old one) is on purpose: a
+ * re-ask must clear a stale snoozeUntil/answer. Only the age and the count carry.
+ */
+export function recordAsk(state: GrillState, item: GrillItem, now: number): void {
+  const prior = state.items[item.key];
+  const askedAt = new Date(now).toISOString();
+  state.items[item.key] = {
+    askedAt,
+    status: 'asked',
+    firstAskedAt: prior?.firstAskedAt ?? prior?.askedAt ?? askedAt,
+    askCount: (prior ? (prior.askCount ?? 1) : 0) + 1,
+  };
 }
 
 /** Apply a button action to the currently-active grill item. */

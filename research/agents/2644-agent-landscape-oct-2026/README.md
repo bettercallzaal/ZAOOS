@@ -18,7 +18,7 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **We are not behind on capability. USE that as the answer to the feeling.** | 124 ZAOOS PRs merged in the 7 days to 2026-10-08, 146 ZOE modules, 38 operating rules, a seat orchestrator plus PR lead plus lanes. The field's headline launches this month (always-on agents, memory "dreaming", multi-agent orchestration) are things the estate already runs in home-built form. |
+| 1 | **We are not behind on capability. USE that as the answer to the feeling.** | 124 ZAOOS PRs merged in the 7 days to 2026-10-08, 146 top-level ZOE modules (380 .ts files counted recursively), 38 operating rules, a seat orchestrator plus PR lead plus lanes. The field's headline launches this month (always-on agents, memory "dreaming", multi-agent orchestration) are things the estate already runs in home-built form. |
 | 2 | **The real gap is security, and it is urgent.** Audit plugin auto-update and repo trust this week. | September's attacks hit exactly how we work: a booby-trapped repo ran code in Claude Code before any prompt, and trojanized plugin updates took over all 7 harnesses tested, Claude Code included, at up to 92.5% success. The estate runs many lanes in bypass mode with third-party plugins installed. |
 | 3 | **USE Claude Haiku 5.5 for ZOE's cheap classify and triage calls.** | Launched 2026-10-07 at $0.10 in / $0.50 out per Mtok with 1M context. Cheaper than most of the OpenRouter fallback chain, and on the same Anthropic account. |
 | 4 | **Claim the Max plan's monthly API credits, if not already claimed.** | Release notes: "Claude Max and Team plans now include monthly API credits." Whether Zaal has claimed them is his fact; this doc could not check it. |
@@ -46,21 +46,23 @@ tier: STANDARD
 
 ### The architecture the field converged on
 
-Anthropic's Managed Agents engineering post (summarised by bex.co, 2026-09-23) splits an agent into three parts:
+Anthropic's own engineering post, "Scaling Managed Agents: Decoupling the brain from the hands" (published 2026-04-08), states it directly:
 
-- a **session**, which is an append-only event log;
-- a **harness**, which is the loop that calls the model;
-- a **sandbox**, which is where code runs.
+> "We virtualized the components of an agent: a session (the append-only log of everything that happened), a harness (the loop that calls Claude and routes Claude's tool calls to the relevant infrastructure), and a sandbox (an execution environment where Claude can run code and edit files)."
 
-If the harness crashes, a new one calls `wake(sessionId)` and replays the log.
+On a harness crash, the same post says:
 
-The estate already has rough versions of all three:
+> "When one fails, a new one can be rebooted with wake(sessionId), use getSession(id) to get back the event log, and resume from the last event."
+
+It also keeps credentials out of reach: "the tokens are never reachable from the sandbox where Claude's generated code runs."
+
+The estate already has rough versions of all three parts:
 
 | Part | Our version | Weakness |
 |---|---|---|
 | Session | Vault briefs and PR history | Not a replayable log |
 | Harness | Lanes and the seat | Lives in Mac terminals |
-| Sandbox | Git worktrees | Not isolation from a hostile repo |
+| Sandbox | Git worktrees | Not isolation from a hostile repo, and our tokens are reachable from them |
 
 The gap is durability and isolation, not the idea.
 
@@ -121,7 +123,8 @@ The visible feed (funding rounds, Dots, Muse, a 64.8% Terminal-Bench score) is p
 - [Claude Platform release notes](https://platform.claude.com/docs/en/release-notes/overview) [FULL - curl + HTML strip, 2026-10-08]
 - [Claude Code CHANGELOG.md](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md) [FULL - raw file, 2026-10-08]
 - [Adversa: AI coding agent vulnerabilities, October 2026](https://adversa.ai/blog/top-ai-coding-agent-security-resources-october-2026/) [FULL - curl + strip; the underlying papers were not individually opened]
-- [bex.co: Anthropic split the agent's brain from its hands (2026-09-23)](https://bex.co/blog/2026/09/23/anthropic-managed-agents-brain-hands-infrastructure-bottleneck) [FULL - curl + strip; a secondary summary of Anthropic's post, which was not opened directly]
+- [Anthropic Engineering: Scaling Managed Agents, decoupling the brain from the hands (2026-04-08)](https://www.anthropic.com/engineering/managed-agents) [FULL - curl + HTML strip, 2026-10-08; the quotes above are verbatim]
+- [bex.co: Anthropic split the agent's brain from its hands (2026-09-23)](https://bex.co/blog/2026/09/23/anthropic-managed-agents-brain-hands-infrastructure-bottleneck) [PARTIAL - a secondary summary. My curl with a desktop UA on 2026-10-08 returned the full article text, but a reviewer's fresh fetch got a JavaScript shell, so it is not relied on]
 - [AI Agents News Brief, 2026-10-07](https://aiagentsdirectory.com/news/ai-agents-news-brief-october-7-2026) [FULL - curl + strip]
 - [AI Brief, 2026-10-05 (Sourcegraph on agents eroding codebases)](https://artificiallyintimidating.com/p/ai-brief-october-5-2026) [FULL - curl + strip]
 - [HN: Dots: Always-on agents](https://news.ycombinator.com/item?id=49896604) [FULL - Algolia items API, top 5 comment threads read]
@@ -129,4 +132,4 @@ The visible feed (funding rounds, Dots, Muse, a 64.8% Terminal-Bench score) is p
 - [HN Algolia search, agents, last 30 days, over 150 points](https://hn.algolia.com/api/v1/search?query=agents&tags=story) [FULL - API, 44 hits]
 - [Morph: best AI coding agents, October 2026](https://www.morphllm.com/best-ai-coding-agents-2026) [FAILED - HTTP 429. The Terminal-Bench figures (Opus 5.5 at 64.8%) come only from a search snippet and are not load-bearing here]
 - [Medium: AI coding sessions 4 to 23 minutes](https://blurbrahlab.medium.com/ai-coding-sessions-jumped-from-4-to-23-minutes-top-10-ai-flutter-news-october-4-2026-652a259333df) [FAILED - HTTP 403, not used]
-- In-repo: `bot/src/zoe/` (146 .ts files on origin/main), `.claude/rules/` (38 files), `gh api search` (124 ZAOOS PRs merged in the 7 days to 2026-10-08) [FULL]
+- In-repo: `bot/src/zoe/` (146 top-level .ts files, 380 recursive, on origin/main), `.claude/rules/` (38 files), `gh api search` (124 ZAOOS PRs merged in the 7 days to 2026-10-08) [FULL]

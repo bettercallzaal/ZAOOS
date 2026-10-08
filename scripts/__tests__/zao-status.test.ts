@@ -29,10 +29,10 @@ describe('zao-status tagging', () => {
     expect(run('autodeploy BLOCKED: origin/main FAILS boot-verify')).toBe(
       `${TAG} autodeploy BLOCKED: origin/main FAILS boot-verify`,
     );
-    // Not a tag today, before or after this change: "ROLLED BACK" is not an alarm
-    // word. Recorded as a known gap in the PR, not changed here.
+    // A crash rollback is exactly the alarm. It did not tag before 2026-10-08,
+    // because "ROLLED BACK" was not on the list (seat ruling, same day).
     expect(run('autodeploy ROLLED BACK: new code crashed at boot')).toBe(
-      'autodeploy ROLLED BACK: new code crashed at boot',
+      `${TAG} autodeploy ROLLED BACK: new code crashed at boot`,
     );
   });
   it('ZAO_STATUS_NO_TAG=1 never tags', () => {

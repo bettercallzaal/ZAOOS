@@ -15,6 +15,28 @@ tier: STANDARD
 
 All figures are as of 2026-10-08, measured between 16:30 and 17:00 UTC. Every claim below comes from a raw fetch (curl, the public Base RPC, the GitHub API, the Farcaster index). Nothing was signed, connected, minted or paired by this lane.
 
+## Bottom line (updated 2026-10-08 after 25 loop ticks)
+
+Base Rooms OS is a careful, nine-month-old solo build by @slavanova. It started in January 2026 as the Jitsi coworking room The ZAO already uses, and became an onchain desktop on 2026-09-29.
+
+Its own contracts are verified, MIT, and not upgradeable. Its disclosures are unusually honest. No third-party trackers were found. Its revenue so far is about 2,600 USDC of Buddy mints.
+
+The risks sit in three places:
+
+1. **One key.** A single EIP-7702-delegated EOA owns both contracts, can change the Buddy art and the mint rules, and receives every fee.
+2. **The agent pairing.** The Claude Code hooks snippet hands a third-party server our prompts, our tool inputs, and the power to approve and rewrite commands. It fails open.
+3. **The outside venues.** Veranta's perps contracts are upgradeable, behind a 3-of-5 Safe.
+
+For The ZAO, that adds up to:
+
+- keep using Rooms
+- ask for a WaveWarZ radio station
+- copy the approval-hold idea into our own bridge
+- do not pair agents through hooks
+- keep any treasury out of BRTC, the vault and the perps
+
+**Small audience, small company.** It has about 350 X followers, 156 Telegram members, 134 BRTC holders and 60 Buddy holders, with no terms of service or named legal entity. A partnership is a goodwill arrangement, not a contract.
+
 ## Key Decisions
 
 | # | Decision | Why |
@@ -118,12 +140,16 @@ The Buddies window offers pairing for Claude (app and Code), ChatGPT, Le Chat, C
 | T6 | **Machine-wide blast radius** | The snippet says to add it to `~/.claude/settings.json`. On this Mac that file is a symlink into `~/zaal-dotfiles`, loaded by every lane (`vanishing-dependencies.md`). One paste reaches every session. | HIGH for us specifically |
 | T7 | **Key leakage** | The `brk_` key in an env var or settings file is a bearer secret. With `act` scopes it can put payment cards on Zaal's Buddy (still needs his signature), and with `memory` it can read and write the shared workspace. | LOW to MEDIUM |
 | T8 | **Data at rest on their server** | Instant Messenger is stored on their server, "not end-to-end encrypted" (their words). Memory and workspace tools store notes there. | LOW for chat; MEDIUM if agents write ZAO notes into `memory_remember` |
+| T9 | **Server-authored and user-imported playbooks** (added by loop ticks 5 and 21) | `skill_use` returns instructions and tells the agent "Then do it". The catalog is auth-only, so it cannot be reviewed before pairing, and owners can import any SKILL.md text, including text copied from others. `workspace_task` lets other paired agents hand tasks over. | MEDIUM |
+| T10 | **Agent woken on someone else's schedule** (added by loop tick 21) | Workspaces post recurring `schedules` (`every`, `weekday`) and "run now" jobs that target a Buddy's paired agent. For a coding agent, each wake is turns and spend. | MEDIUM for cost; which scope gates it is UNVERIFIED |
+| T11 | **Activity is public by Buddy id** (added by loop tick 20) | The Worker's `/units/progress?ids=` answers without a key: level, XP, streak, active days, care stats. Buddy ownership is onchain, so this maps activity to a wallet. | LOW |
+| T12 | **Notification tokens held off-site** (added by loop tick 8) | The messenger stores browser push and Farcaster notification tokens (`push`, `fcpush`) on a self-run Ubuntu host. | LOW |
 
 **Mitigations if a trial is ever approved.**
 
 1. Never the hooks method on a ZAO machine. MCP only.
 2. Run it in a throwaway environment: a separate macOS user or a container, with no `~/.claude` symlink into dotfiles, no ZAO repos, no `~/.zao`.
-3. Grant only `status`, `talk` and `approve` scopes first. No `memory`, no `act`.
+3. Grant only `status`, `talk` and `approve` scopes first. No `memory`, no `act`, no `tools` calls to `skill_use`, and no workspace access (T9, T10).
 4. If hooks are ever trialled anyway, set `allowedHttpHookUrls` to an explicit list so no other host can be added silently, and keep the deny rules in place, since the docs say deny rules are evaluated regardless of what a hook returns.
 5. Red control before trusting the gate: point a test session at a stub server that answers `allow` with an `updatedInput`, and confirm what our deny rules still stop. The trial is not "safe" until that has run (`loop-evals.md`, review the direction the change was for).
 
@@ -561,6 +587,67 @@ Source: `traitsOf(252)`, `bootedAt(252)` and `tokenURI(252)` on the Buddies cont
 2. **Progress is public.** The progress endpoint answers without any key, for any Buddy id. So anyone can see how active a given Buddy's owner has been on Base Rooms (active days, streak, care stats), and since ownership is public onchain, that ties back to a wallet. That is a small, real privacy point. It belongs in the same outreach note as the `localhost` framing (Next Actions), and anyone at The ZAO who would rather not publish their activity pattern should know it.
 3. **Level-ups need "real" actions.** `real: 0` and the Disclosures' "4+ fee-paying actions" for the LV5 swap discount line up: XP from care is capped (`care.cap` 24), and the higher levels and the fee discount need actions that pay Base Rooms a fee. That is the business model, shown in one JSON field.
 
+### 2026-10-08, tick 21: the skills catalog and scheduled tasks
+
+Source: `POST /agent/tools/skills_list` without a key (401), `GET https://brtc-os.slavamushyakov.workers.dev/skills` three times (401, `{"error":...}`, 25 bytes each), `GET` of `/agent/skills`, `/skills` and `/agent/skills.json` on baserooms.io (404 each), and the skills and workspace code in the site bundle.
+
+**The skills catalog is not public.** Both the agent tool and the Worker's `/skills` route answer 401 without a signed-in wallet or a key. So the skill text that `skill_use` hands an agent (tick 5) cannot be reviewed from outside before pairing. That is worth knowing, because those texts are instructions the agent is told to follow.
+
+**Users can write their own skills, in a SKILL.md format.** The bundle calls `POST /skills/mine` with a `skillmd` body ("import"), `GET /skills/<id>/md` ("export" and "from"), and `DELETE /skills/mine/<id>`. Imported skills are merged into the list as `minStage: 1`. So a Buddy's skills can be text its owner pasted in, possibly copied from someone else. An agent calling `skill_use` on such a Buddy reads whatever that text says.
+
+**Workspaces can run tasks on a schedule.** The workspace board posts to `/workspaces/<id>/schedules` with `every` and `weekday` fields, can "run now" through `/workspaces/<id>/tasks/<id>/run`, and lists and stops `/jobs`. A task can name a `skill` and a target Buddy. Put together: an owner can schedule a recurring task, with a skill, for the agent paired to a Buddy.
+
+**What this changes.**
+
+1. **Threat T5 (context injection) gets one more path**: a user-imported or shared SKILL.md, delivered by `skill_use` and acted on by a paired agent. The trial rule from tick 5 ("do not call `skill_use`, or treat its output as data") now also covers anything imported.
+2. **A paired agent can be woken on a timer.** For a coding agent on our machines that means turns, and therefore spend (`agent-spend.md`: about a dollar a turn), triggered by a schedule on someone else's server. The sandbox trial must not grant whatever scope lets scheduled tasks reach the agent. Which scope that is was not visible from outside (tick 5 lists `memory` for the workspace tools); it is UNVERIFIED, and the first trial should leave workspace and memory scopes off entirely.
+3. **The SKILL.md idea itself is familiar ground.** It is the same shape as Claude Code skills. If The ZAO ever wants member-authored playbooks for ZOE, this is a live example of the format traveling between tools. That is a pattern note, not a dependency.
+
+### 2026-10-08, tick 22: threat model brought up to date
+
+No new fetch this tick. Rows T9 to T12 were added to the threat table in section 6, from ticks 5, 8, 20 and 21, and mitigation 3 was tightened to exclude `skill_use` and workspace access. The severity of T1 to T8 is unchanged. None of the new rows is above MEDIUM, and none changes Key Decisions 1 or 2: hooks stay SKIP, and MCP stays SKIP unless trialled in a sandbox.
+
+### 2026-10-08, tick 23: Telegram alerts and what the account stores
+
+Source: the account and alerts code paths in the site bundle (the `linkCode`, `digest`, `alerts`, `notes`, `layout` and `watchlist` client calls, and the Settings "Account" card). No account was created and no bot was messaged.
+
+**How Telegram linking works.** Signed in, the app asks the Worker for `/telegram/link-code`, then shows a button to `https://t.me/<bot>?start=<code>` and the instruction "send /start <code>". The bot's username comes from the server response; it is not hard-coded in the bundle, so this review cannot name it. One-time-code linking is the standard pattern, and the code is what ties a Telegram chat to a wallet.
+
+**What alerts can do.** Price, odds and wallet alerts fire on the Buddy and, if linked, in Telegram. A "stop" alert does not sell by itself. In the app's words: "A stop doesn't sell for you: when it fires, your buddy and Telegram open a pre-filled Sell that you confirm." There is also an optional daily `digest` (`/me/digest`, on or off).
+
+**What the server keeps, in its own words** (Settings, Account card): "The server keeps your address, your Telegram chat (if linked), alert rules, journal notes and one daily value snapshot. No keys, no funds." The client also syncs `watchlist`, `notes` and `layout` to the server. This matches the homepage Disclosures (section 8) and adds one item the homepage does not list: **one daily value snapshot**, a daily record of the wallet's value.
+
+**What this means for The ZAO.** Linking Telegram ties a Telegram identity to a wallet address on Base Rooms' server, and the daily snapshot builds a value history for that wallet there. Both go away with "delete my data" (per the Disclosures). Neither matters for a personal trial. Both are reasons not to link a ZAO operational wallet or a shared ZAO Telegram account.
+
+### 2026-10-08, tick 24: tracking, games and the gallery
+
+Source: a search of the homepage HTML and all 185 JS chunks for 16 analytics and tracking markers (`posthog`, `google-analytics`, `googletagmanager`, `gtag(`, `@vercel/analytics`, `_vercel/insights`, `va.vercel`, `sentry`, `mixpanel`, `amplitude`, `segment.io`, `hotjar`, `plausible`, `umami`, `clarity.ms`, `datadog`); the window definitions for the Games and Art Gallery windows; and one call to `/api/nfts/held`.
+
+**No third-party analytics or tracking found.** None of the 16 markers appears in the HTML or in any chunk. Combined with the CSP `report-uri /api/csp-report` (tick 12), the only telemetry visible from outside goes to Base Rooms' own endpoints. That is a good sign for a crypto front end, and it is limited to what the bundle shows: server-side logging on Vercel or the Worker cannot be seen from here.
+
+**Games are client-side.** Snake, Solitaire, 2048, Minesweeper and "Pump or Dump" are `kind: "client"` windows, so they run in the browser. "Pump or Dump" uses "real candles, hidden future: call the next one up or down", so it reads market data, but nothing in its definition stakes or bets money.
+
+**The Art Gallery** ("Your NFTs and art on Base and Ethereum") loads holdings through Base Rooms' own `/api/nfts/held` route and resolves images through the `https://ipfs.io/ipfs/` gateway. It links out to OpenSea and the Zora explorer. A guessed `addr` parameter returned `400 {"error":"unknown parameter: addr"}`, so the route validates its inputs. The real parameter name was not pursued.
+
+**What this means.** Nothing to adopt and nothing to flag. The absence of trackers is worth one line in the review's overall verdict: Base Rooms does not appear to sell its users' attention to analytics vendors.
+
+### 2026-10-08, tick 25: bottom line added
+
+No new fetch. A short "Bottom line" section now sits above Key Decisions, summarising the review and ticks 1 to 24 in one place for a reader with two minutes. Every figure in it is cited in a section or tick below.
+
+### 2026-10-08, tick 26: the swap fee, checked in a live quote
+
+Source: `GET https://baserooms.io/api/trade/quotes` with the parameters the site itself sends when no wallet is connected (`from=0x...dEaD`, `slippage=50`), at about 19:00 UTC. Two quotes: 100 USDC to WETH, and 0.1 MSTR to BRTC. No order was placed.
+
+| Pair | Routes quoted | `feeBps` on every route | Best output |
+|---|---|---|---|
+| 100 USDC to WETH | CoW, KyberSwap, LI.FI | **10** (0.1%) | KyberSwap, 0.040831 WETH (about $99.88 by the quote's own `outUsd`) |
+| 0.1 MSTR to BRTC | KyberSwap, CoW, LI.FI | **0** | KyberSwap, about 397,187 BRTC |
+
+**The quote API matches the Disclosures exactly.** Any-token swaps carry the 0.1% Base Rooms fee on every route, and BRTC swaps routed through an aggregator carry none ("routed via Kyber, CoW or LI.FI, Base Rooms OS takes nothing"). The fee is a field in every quote, so the UI can show it before signing, as the Disclosures promise. Each route also reports its own `spender` (KyberSwap `0x6131...37b5`, LI.FI `0x1231...4EaE`) and gas in USD, and the CoW route is gasless.
+
+**One detail worth knowing.** The direct o1 route for BRTC, where Base Rooms is the 0.2% referrer, did not appear in this quote set. So whether Base Rooms earns on a given BRTC swap depends on which route the UI picks. Either way, the user pays no Base Rooms fee on BRTC.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -634,6 +721,10 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
 - [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
 - [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
+- [FULL - curl, 3 runs] Worker /skills (401); agent tool skills_list without key (401); /agent/skills, /skills, /agent/skills.json on baserooms.io (404); skills import/export and workspace schedule code paths in the bundle
+- [FULL - bundle read] Account, Telegram link-code, alerts, digest, notes, layout and watchlist client code in the site JS chunks
+- [FULL - bundle and HTML search] 16 analytics/tracking markers across the homepage HTML and 185 JS chunks (none found); Games and Art Gallery window definitions; /api/nfts/held input check (400 on unknown parameter)
+- [FULL - curl] Public swap quotes: https://baserooms.io/api/trade/quotes (USDC to WETH, MSTR to BRTC), about 19:00 UTC
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

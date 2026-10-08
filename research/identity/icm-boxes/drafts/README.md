@@ -51,3 +51,14 @@ PUT to useicm.com and re-fetched and byte-compared. Order is worst first.
   from zaostock.com as fetched 2026-10-08 (home: "ZAOstock 2026 is a wrap"; the
   lineup API and /artists: seven acts in running order). No dollar figures, no
   internal operations, no reviewer notes. The act that did not play is not named.
+- `zabalgamez.draft.llm.txt` is SUPERSEDED by `../zabalgamez.llm.txt`, which is now
+  the MASTER (repo copy wins; live is published FROM it after Zaal approves the
+  text). The live box (2139 bytes, fetched 2026-10-08, archived at
+  `../live-snapshots/zabalgamez.llm.txt`) still carried two retired names (lines
+  11, 16 and 24 of the live text; glossary rows in ~/.claude/CLAUDE.md), the
+  pre-finals August language, and "Games" in the title and body. The master
+  writes Season 1 as complete from zabalgamez.com as fetched 2026-10-08 (home and
+  /finals: six finalists, three battles, champions n3m, ghostmintops and
+  uniquebeing404; 31 workshops, 31 projects, 15 people). No prize figures: the
+  site shows two different USDC totals (home 450, finals 500), left for the site
+  owner. /enter now redirects to /leaderboard, so the entry line names no path.

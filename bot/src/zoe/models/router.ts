@@ -456,6 +456,83 @@ async function callSurplus(
 }
 
 /**
+ * Direct Anthropic API rung, paid from the Max plan's monthly API credits
+ * (research doc 2646: $100 or $200 a month, no rollover, API only - Claude
+ * Code is not covered). API billing is separate from the subscription cap the
+ * Claude CLI hits, so this rung does not re-hit the cap that sent us here.
+ *
+ * OFF unless ZOE_ANTHROPIC_API_RUNG=1, and it reads its OWN key variable,
+ * never ANTHROPIC_API_KEY: that name changes how the claude CLI subprocess
+ * authenticates (see hermes/claude-cli.ts, the --bare guard), so setting it
+ * for this rung would silently move every CLI call onto API billing.
+ */
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+
+export function hasAnthropicCreditsRung(): boolean {
+  return process.env.ZOE_ANTHROPIC_API_RUNG === '1' && Boolean(process.env.ZOE_ANTHROPIC_CREDITS_KEY?.trim());
+}
+
+interface AnthropicMessagesResponse {
+  content?: Array<{ type: string; text?: string }>;
+  usage?: { input_tokens?: number; output_tokens?: number };
+}
+
+async function callAnthropicCredits(systemPrompt: string, userMessage: string): Promise<ClaudeCliResult> {
+  if (!hasAnthropicCreditsRung()) {
+    throw new Error('Anthropic credits rung not enabled');
+  }
+  const model = process.env.ZOE_ANTHROPIC_API_MODEL?.trim() || 'claude-haiku-5-5';
+  const startMs = Date.now();
+  try {
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ZOE_ANTHROPIC_CREDITS_KEY?.trim() ?? '',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: FALLBACK_MAX_TOKENS,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Anthropic API error ${response.status}: ${errorText.slice(0, 300)}`);
+    }
+
+    const data = (await response.json()) as AnthropicMessagesResponse;
+    // Haiku 5.5 thinks adaptively by default, so a reply can open with
+    // thinking blocks. Only text blocks are the answer.
+    const text = (data.content ?? [])
+      .filter((b) => b.type === 'text' && typeof b.text === 'string')
+      .map((b) => b.text)
+      .join('');
+    // A 200 with no text is a failed call, not an empty answer.
+    if (!text.trim()) {
+      throw new Error('Anthropic API returned no text');
+    }
+
+    return {
+      text,
+      inputTokens: data.usage?.input_tokens ?? 0,
+      outputTokens: data.usage?.output_tokens ?? 0,
+      totalCostUsd: 0,
+      model: `anthropic/${model}`,
+      durationMs: Date.now() - startMs,
+      numTurns: 1,
+      isError: false,
+      sessionId: `anthropic-credits-${startMs}`,
+    };
+  } catch (error: unknown) {
+    throw new Error(`Anthropic credits call failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
  * Call a local Ollama model - no key, no network, no bill.
  *
  * It is LAST on the ladder on purpose: a 4B-class local model is weaker than
@@ -548,6 +625,8 @@ export function hasCapFallbackProvider(): boolean {
  */
 export function capFallbackProviders(): string[] {
   const names: string[] = [];
+  // Prepaid credits first: they cost nothing until the month's credit is spent.
+  if (hasAnthropicCreditsRung()) names.push('anthropic-credits');
   if (hasOpenRouterApiKey()) names.push('openrouter');
   if (hasSurplusApiKey()) names.push('surplus');
   if (hasGrokApiKey()) names.push('grok');
@@ -567,6 +646,7 @@ export async function callCapFallback(
   // cheapest. Grok/GPT direct paths are unchanged.
   const orModel = opts?.tier === 'high' ? OPENROUTER_HIGH_MODEL : undefined;
   const attempts: Array<{ name: string; fn: () => Promise<ClaudeCliResult> }> = [];
+  if (hasAnthropicCreditsRung()) attempts.push({ name: 'anthropic-credits', fn: () => callAnthropicCredits(systemPrompt, userMessage) });
   if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage, orModel) });
   if (hasSurplusApiKey()) attempts.push({ name: 'surplus', fn: () => callSurplus(systemPrompt, userMessage) });
   if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
@@ -574,7 +654,7 @@ export async function callCapFallback(
   if (hasOllama()) attempts.push({ name: 'ollama', fn: () => callOllama(systemPrompt, userMessage) });
 
   if (attempts.length === 0) {
-    throw new Error('no cap-fallback provider configured (set OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
+    throw new Error('no cap-fallback provider configured (set ZOE_ANTHROPIC_API_RUNG=1 + ZOE_ANTHROPIC_CREDITS_KEY, OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
   }
 
   const prioritizedNames = prioritizeProviders(attempts.map((a) => a.name));

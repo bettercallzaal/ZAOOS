@@ -104,7 +104,8 @@ message id, not skip-repeats.** The PR lead read two days of transcripts:
 This doc's seat figure kept the FIRST line per id. On the seat that made no
 difference, because 0 of its 805 repeats differed, so $760.97 stands. In other
 transcripts, though, first-seen would undercount output. Keep-last is right
-everywhere, and the PR lead is writing that `zao-spend` fix.
+everywhere. The PR lead's fix is zaal-dotfiles #471 ("zao-spend: count each API
+message once, keeping its last usage snapshot").
 
 `agent-spend.md`'s "cost = turns x ~$1.01" was measured with this same tool on
 2026-08-10. Its dollar totals are probably inflated by the same mechanism. Its main

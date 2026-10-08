@@ -300,6 +300,27 @@ Source: GitHub repository search (sorted by stars) for "onchain desktop", "oncha
 
 **What this changes.** Key Decision 5 (adopt the pattern, extend our own bridge) stands, and now has a second reference. ukagai is MIT, so when the `zao-ask-check` extension is built, its "one inbox with the agent's reasons next to the options" design can be borrowed with credit (`credit-attribution.md`). It is too new to install, and its installer pipes a remote script to `sh`, which our own gate list would flag.
 
+### 2026-10-08, tick 8: the Instant Messenger, from the outside
+
+Source: the IM client code in the site bundle (the `useImConnection` hook, the same code in 10 chunks), response headers of `im.baserooms.io` and `baserooms.io`, and `GET https://im.baserooms.io/health` three times. No socket was opened and no sign-in was attempted.
+
+**Three hosts, three operators.** The pieces of Base Rooms run in different places:
+
+| Piece | Host | Seen as |
+|---|---|---|
+| The site and `/api/*` | baserooms.io | `server: Vercel` |
+| Agent hooks, sessions, tickets | brtc-os.slavamushyakov.workers.dev | Cloudflare Workers |
+| Instant Messenger | im.baserooms.io | `server: nginx/1.24.0 (Ubuntu)`, a self-run Linux box |
+| Video Rooms | meet.baserooms.io | Jitsi Meet |
+
+**How the messenger connects.** It only connects when a wallet is signed in. The client first asks the Worker for a one-time `ticket` for that wallet address, then opens `wss://im.baserooms.io/ws?t=<ticket>`. Reconnects back off exponentially up to 30 seconds. A close code of 4003 makes the client stop retrying for good, which reads as "this wallet is not allowed".
+
+**What it can do.** Message types in the client: `send`, `history`, `read`, `add`, `delete`, `clear`, `away`, `who`, `listed`, `vis` (tab visible or hidden), `ping`, and two pairs for notifications, `push` / `unpush` (browser web push) and `fcpush` / `unfcpush` (a Farcaster notification token). So the messenger server can hold a Farcaster notification token for your account and notify you through Farcaster. That is a convenience, and it is one more credential sitting on their server. It is covered by their "deleting your data erases them" line.
+
+**What is public without signing in.** Only a count. `/health` returned `{"ok":true,"users":6,"sockets":7}` three times in a row at about 18:2x UTC, so six wallets were connected to the messenger at that moment. No user list, no addresses. That matches the disclosure that messages are stored on their server and are not end-to-end encrypted.
+
+**What this means for The ZAO.** Nothing to adopt: our members already have Farcaster DMs and XMTP in ZAO OS (`src/` XMTP stack). Treat Base Rooms IM like any unencrypted chat: fine for "are you on the call", not for anything private. And since it runs on a separate, self-run Ubuntu box, its uptime and patching are separate from the Vercel site's.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -355,6 +376,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [PARTIAL - Farcaster index API, community] @slavanova casts: https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1046957&limit=150 (most recent 100 of more; older pages not read)
 - [FULL - GitHub API] Repo searches for comparable products; LICENSE files of Asugawara/ukagai (MIT), deokman420/KasOS (MIT); ukagai README
 - [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
+- [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

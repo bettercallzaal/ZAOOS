@@ -173,6 +173,22 @@ Source: `src/BaseRoomsUnits.sol` from Sourcify (exact match, 442 lines), plus `c
 
 **What this changes.** Nothing in the Key Decisions. It corrects one fact (the contract licence) and confirms two site claims (stake-gated mint, onchain art). It also sharpens the single-key point: that one EOA can change the price, the eligibility rule, the art and the royalty.
 
+### 2026-10-08, tick 2: Buddy Evolutions, what the signer key controls
+
+Source: `src/BuddyEvolutions.sol` read from the Basescan verified-source page (the Sourcify API returned 400 for this address), constructor arguments from the same page, and `cast call` on the Base RPC.
+
+**Licence.** The source opens `// SPDX-License-Identifier: MIT`, the same as the Buddies contract.
+
+**How publishing works.** A Buddy's "evolution" (stage, form, grade, level, active days, real actions, bond) is computed off chain by Base Rooms. To publish one, the owner's wallet calls `publish(voucher, signature)`. The contract checks that the voucher is unexpired, not already published for that (buddyId, seq), and signed by the `signer` address under EIP-712. It then takes the voucher's `price` in BRTC from the caller and sends it to the treasury, and writes an EAS attestation from the contract itself, chained to the Buddy's previous one through `refUID`.
+
+**The EAS schema** (read from the Base schema registry `0x4200...0020`): `uint256 buddyId, uint32 seq, uint8 stage, string form, string grade, uint16 level, uint32 activeDays, uint32 realActions, uint8 bond, address buddies`. It has no resolver and is not revocable.
+
+**What the signer controls.** The signer is `0x0242...46A2`, an EOA (no code, nonce 0, so it has never sent a transaction itself). That is consistent with a server hot key that only signs vouchers off chain. Whoever holds it decides what every published evolution says, and what price each one charges, because `price` lives inside the signed voucher rather than in the contract. The owner (the treasury EOA) can replace the signer at any time with `setSigner`. The contract cannot mint, move or burn Buddies. Its only power over a holder is the BRTC price on a voucher that the holder chooses to submit.
+
+**What this means for "level" claims.** A published level is an attestation by Base Rooms' own key about activity on Base Rooms' own server. It is a record of what the service says, not an independent proof of activity. That is fine for a game. It means a Buddy's level should not be treated as reputation outside Base Rooms.
+
+**Adoption so far.** `lastOf(1)` (the builder's own Buddy) and `lastOf(252)` (Zaal's) both return zero, so neither has published an evolution yet. The total count of attestations under this schema is **UNKNOWN**. The EAS GraphQL query was blocked locally by the secrets guard, which reads a 64-hex schema id as a possible key. A 900,000-block log query was refused by the public RPC ("Archive requests require a personal token").
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -217,6 +233,9 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl, 3 runs each] Public tool routes: `/api/gas`, `/api/safety`, `/api/wallet`, `/api/holders`, `/api/contract`, `/api/scan`, `/api/radio/browse`
 - [FULL - Sourcify API] Buddies source: https://sourcify.dev/server/v2/contract/8453/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b?fields=sources (exact match). Evolutions, the o1 vault and the renderer returned 400 (not on Sourcify)
 - [FULL - cast call, Base RPC] Buddies live state at block 52,346,706: mintOpen, publicMint, eligibilityRoot, staking, vaults, royaltyInfo, license, drawn, totalSupply, tokenSVG(1), tokenURI(1)
+- [FULL - curl + HTML strip] BuddyEvolutions source and constructor args: https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0
+- [FULL - cast call, Base RPC] EAS schema record from the schema registry 0x4200000000000000000000000000000000000020; signer code and nonce; lastOf(1), lastOf(252)
+- [FAILED - EAS GraphQL https://base.easscan.org/graphql] blocked locally by the secrets guard (64-hex id); [FAILED - eth_getLogs over 900k blocks] refused by publicnode, archive token required
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

@@ -108,8 +108,33 @@ export function assessFindings(findings: string): DocReadiness {
   if (full === 0) reasons.push('no source marked FULL');
   if (failed > 0) reasons.push(`${failed} source(s) marked FAILED`);
   if (/shipping blocker/i.test(findings)) reasons.push('the findings name an unresolved shipping blocker');
-  if (/budget is (critically )?low/i.test(findings)) reasons.push('the worker said its budget ran low');
+  // Wordings seen in real worker output: doc 2510 "Budget is critically low",
+  // doc 2539 "Budget nearly exhausted" (the second slipped past the first
+  // version of this pattern and was held only because it also had a FAILED source).
+  if (/budget (is )?((critically|nearly|almost|very) )?(low|exhausted)|budget (is )?running (low|out)|ran out of budget/i.test(findings)) {
+    reasons.push('the worker said its budget ran low');
+  }
+  // Doc 2510 cited 0 URLs. A doc stamped tier STANDARD that links nothing cannot
+  // be checked by anyone, whatever its marks say (card 9907, 2026-09-23).
+  if (!/https?:\/\/\S+/i.test(findings)) reasons.push('the findings cite no URLs');
   return { complete: reasons.length === 0, full, partial, failed, reasons };
+}
+
+// The worker's own chatter before its first heading ("Budget is critically
+// low. I have enough...", "Budget nearly exhausted. Synthesizing...") landed
+// verbatim at the top of docs 2510 and 2539 (card 9907). Drop it - but only
+// when it is plainly chatter: a SHORT leading block, and the first heading is
+// not a Sources/References list. A worker that writes its findings as prose and
+// then "## Sources" would otherwise lose its findings. Anything the chatter said
+// that matters (a budget warning) is judged on the FULL text before this runs,
+// and reported in the draft banner. When in doubt, keep the text whole.
+const PREAMBLE_MAX = 400;
+export function stripPreamble(findings: string): string {
+  const m = /^#{1,6}\s+(.*)$/m.exec(findings);
+  if (!m) return findings.trim();
+  const lead = findings.slice(0, m.index).trim();
+  if (lead.length > PREAMBLE_MAX || /^(sources?|references?)\b/i.test(m[1].trim())) return findings.trim();
+  return findings.slice(m.index).trim();
 }
 
 export async function commitResearchDoc(opts: { question: string; findings: string; topic?: string }): Promise<ResearchDocResult> {
@@ -120,10 +145,12 @@ export async function commitResearchDoc(opts: { question: string; findings: stri
     const slug = slugify(opts.question);
     const dir = join(REPO, 'research', topic, `${num}-${slug}`);
     const today = new Date().toISOString().slice(0, 10);
+    // Judge the FULL text (a budget warning often lives in the preamble), then
+    // publish only the document part of it.
     const ready = assessFindings(opts.findings);
     const status = ready.complete ? 'research-complete' : 'draft';
     const banner = ready.complete ? '' : `> **HELD AS DRAFT, not complete.** ${ready.reasons.join('; ')}. Sources: ${ready.full} FULL, ${ready.partial} PARTIAL, ${ready.failed} FAILED. Needs a person or a redispatch before it is cited.\n\n`;
-    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: ${status}\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: STANDARD\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". ${ready.complete ? 'Auto-committed to main for durability; review + deepen as needed.' : 'Opened as a DRAFT pull request; it does not merge itself.'}\n\n${banner}${opts.findings.trim()}\n`;
+    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: ${status}\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: STANDARD\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". ${ready.complete ? 'Auto-committed to main for durability; review + deepen as needed.' : 'Opened as a DRAFT pull request; it does not merge itself.'}\n\n${banner}${stripPreamble(opts.findings)}\n`;
 
     await git(['checkout', 'main']); await git(['pull', '--quiet']);
     const branch = `ws/zoe-research-${num}`;

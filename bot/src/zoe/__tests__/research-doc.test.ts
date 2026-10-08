@@ -18,7 +18,7 @@ vi.mock('node:fs', () => ({
   },
 }));
 
-import { assessFindings, commitResearchDoc } from '../research-doc';
+import { assessFindings, commitResearchDoc, stripPreamble } from '../research-doc';
 
 afterEach(() => vi.clearAllMocks());
 
@@ -185,7 +185,8 @@ describe('assessFindings', () => {
     const r = assessFindings(DOC_2510_SHAPE);
     expect(r.complete).toBe(false);
     expect(r.full).toBe(2);
-    expect(r.reasons).toEqual(['the worker said its budget ran low']);
+    // Doc 2510 also cited no URLs at all, which is now its own reason (card 9907).
+    expect(r.reasons).toEqual(['the worker said its budget ran low', 'the findings cite no URLs']);
   });
 
   it('passes a doc with a FULL source, nothing FAILED and no stated blocker', () => {
@@ -197,12 +198,85 @@ describe('assessFindings', () => {
   });
 
   it('counts marks in a numbered source list as well as a bulleted one', () => {
-    const r = assessFindings('1. [FULL] Source A\n2) [FULL] Source B\n3. [PARTIAL - summary] Source C');
+    const r = assessFindings('1. [FULL] Source A - https://a.example\n2) [FULL] Source B - https://b.example\n3. [PARTIAL - summary] Source C');
     expect(r).toMatchObject({ complete: true, full: 2, partial: 1, failed: 0 });
   });
 
   it('counts a mark only at the start of a list item, not a mention in prose', () => {
     expect(assessFindings('The worker said [FULL] access was unavailable.').full).toBe(0);
+  });
+});
+
+// Card 9907, the remaining half of the doc-2510 fix. Shapes are the real ones:
+// doc 2539 (PR #3628) opened "Budget nearly exhausted. Synthesizing from
+// verified fetches." then "---" then "## Findings".
+const DOC_2539_SHAPE = [
+  'Budget nearly exhausted. Synthesizing from verified fetches.',
+  '',
+  '---',
+  '',
+  '## Findings',
+  '',
+  '**Eligibility confirmed.** Body text.',
+  '',
+  '## Sources',
+  '- [FULL, liveness-verified-2026-09-23] [YouTube Help](https://support.google.com/youtube/answer/9277801)',
+  '- [FULL] [Tools](https://example.com/tools)',
+].join('\n');
+
+describe('card 9907: zero-URL docs, budget wordings, and the preamble', () => {
+  it('holds a doc that cites no URLs even with FULL marks', () => {
+    const r = assessFindings('## Sources\n- [FULL] Doc 1214 - internal\n- [FULL] Doc 2501 - internal');
+    expect(r.complete).toBe(false);
+    expect(r.reasons).toContain('the findings cite no URLs');
+  });
+
+  it('catches "Budget nearly exhausted" (doc 2539), which the first pattern missed', () => {
+    expect(assessFindings(DOC_2539_SHAPE).reasons).toContain('the worker said its budget ran low');
+  });
+
+  it.each([
+    'Budget is critically low.',
+    'Budget nearly exhausted.',
+    'budget almost exhausted, wrapping up',
+    'Budget is running out.',
+    'I ran out of budget.',
+  ])('reads %j as a budget warning', (line) => {
+    expect(assessFindings(`${line}\n- [FULL] x - https://x.example`).reasons).toContain('the worker said its budget ran low');
+  });
+
+  it('does not read ordinary prose about budgets as a warning', () => {
+    const r = assessFindings('The festival budget is $5k.\n- [FULL] x - https://x.example');
+    expect(r.reasons).not.toContain('the worker said its budget ran low');
+  });
+
+  it('strips the chatter before the first heading (doc 2539 shape)', () => {
+    const out = stripPreamble(DOC_2539_SHAPE);
+    expect(out.startsWith('## Findings')).toBe(true);
+    expect(out).not.toContain('Budget nearly exhausted');
+  });
+
+  it('keeps findings written as prose before a "## Sources" heading', () => {
+    expect(stripPreamble(GOOD_DOC)).toContain('Findings with evidence.');
+  });
+
+  it('keeps a long leading block: that is content, not chatter', () => {
+    const long = `${'Real finding sentence. '.repeat(30)}\n\n## Detail\nmore`;
+    expect(stripPreamble(long).startsWith('Real finding')).toBe(true);
+  });
+
+  it('keeps text with no heading at all', () => {
+    expect(stripPreamble('Just prose, no heading.')).toBe('Just prose, no heading.');
+  });
+
+  it('the written doc omits the chatter and the banner still names the budget', async () => {
+    setupHappyPath();
+    await commitResearchDoc({ question: 'Super Chat?', findings: DOC_2539_SHAPE });
+    const content: string = mockWriteFile.mock.calls[0][1];
+    expect(content).not.toContain('Synthesizing from verified fetches');
+    expect(content).toContain('## Findings');
+    expect(content).toContain('HELD AS DRAFT');
+    expect(content).toContain('the worker said its budget ran low');
   });
 });
 

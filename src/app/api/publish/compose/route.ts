@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
@@ -39,6 +40,33 @@ const composeSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
+/**
+ * Bot bearer for ZOE's POST button (doc 2239 section 5, fix 1).
+ *
+ * ZOE runs on the VPS with no iron-session, so the only way its POST button can
+ * reach this route is a shared secret. PUBLISH_BOT_TOKEN, when set and at least
+ * 32 characters, is accepted as admin-equivalent on THIS route only. Unset or
+ * short means the header is ignored and the session path decides, which is the
+ * exact behaviour before this change. The compare is constant-time so a wrong
+ * token cannot be guessed byte by byte, and nothing about the token is logged.
+ */
+const MIN_BOT_TOKEN_LENGTH = 32;
+
+function bearerMatchesBotToken(req: NextRequest): boolean {
+  // Trimmed on BOTH sides: a token pasted into an env UI with a trailing
+  // newline would otherwise never match and the feature would fail closed
+  // without saying why (security review finding 1, 2026-10-07).
+  const expected = (process.env.PUBLISH_BOT_TOKEN ?? '').trim();
+  if (expected.length < MIN_BOT_TOKEN_LENGTH) return false;
+  const header = req.headers.get('authorization') ?? '';
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  if (!match) return false;
+  const given = Buffer.from(match[1].trim(), 'utf8');
+  const want = Buffer.from(expected, 'utf8');
+  if (given.length !== want.length) return false;
+  return timingSafeEqual(given, want);
+}
+
 /** Per-platform hard limits, checked before anything is sent. */
 const LIMITS: Record<Platform, number> = {
   farcaster: 320,
@@ -58,13 +86,20 @@ export interface PlatformOutcome {
 
 export async function POST(req: NextRequest) {
   try {
-    // Admin only - this publishes to ZAO's official accounts.
-    const session = await getSessionData();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!session.isAdmin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    // Admin only - this publishes to ZAO's official accounts. ZOE's POST button
+    // passes with the bot bearer instead of a session (see bearerMatchesBotToken).
+    const viaBot = bearerMatchesBotToken(req);
+    if (viaBot) {
+      // Audit marker: a publish with no session is the bot, never an admin.
+      logger.info('publish/compose: authenticated via PUBLISH_BOT_TOKEN bearer (ZOE)');
+    } else {
+      const session = await getSessionData();
+      if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (!session.isAdmin) {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+      }
     }
 
     const parsed = composeSchema.safeParse(await req.json().catch(() => null));

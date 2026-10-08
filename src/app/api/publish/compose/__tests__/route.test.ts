@@ -4,7 +4,7 @@
  * NOTHING, auth is enforced, and over-limit text is caught before any send.
  */
 import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getSessionData: vi.fn(),
@@ -20,8 +20,20 @@ vi.mock('@/lib/publish/x', () => ({ publishToX: mocks.publishToX }));
 vi.mock('@/lib/publish/bluesky', () => ({ publishToBluesky: mocks.publishToBluesky }));
 vi.mock('@/lib/publish/broadcast', () => ({ broadcastToChannels: mocks.broadcastToChannels }));
 vi.mock('@/lib/publish/normalize', () => ({
-  normalizeForX: (i: { text: string; castHash: string }) => ({ ...i, images: [], embeds: [], attribution: '', castUrl: '' }),
-  normalizeForBluesky: (i: { text: string; castHash: string }) => ({ ...i, images: [], embeds: [], attribution: '', castUrl: '' }),
+  normalizeForX: (i: { text: string; castHash: string }) => ({
+    ...i,
+    images: [],
+    embeds: [],
+    attribution: '',
+    castUrl: '',
+  }),
+  normalizeForBluesky: (i: { text: string; castHash: string }) => ({
+    ...i,
+    images: [],
+    embeds: [],
+    attribution: '',
+    castUrl: '',
+  }),
 }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn() } }));
 
@@ -41,7 +53,11 @@ describe('POST /api/publish/compose', () => {
     mocks.getSessionData.mockResolvedValue({ isAdmin: true, fid: 19640 });
     mocks.autoCastToZao.mockResolvedValue('0xcast');
     mocks.publishToX.mockResolvedValue({ tweetId: '1', tweetUrl: 'https://x.com/p/1' });
-    mocks.publishToBluesky.mockResolvedValue({ uri: 'at://1', cid: 'c', postUrl: 'https://bsky/p/1' });
+    mocks.publishToBluesky.mockResolvedValue({
+      uri: 'at://1',
+      cid: 'c',
+      postUrl: 'https://bsky/p/1',
+    });
     mocks.broadcastToChannels.mockResolvedValue({
       telegram: { success: true },
       discord: { success: true },
@@ -146,5 +162,74 @@ describe('POST /api/publish/compose', () => {
   it('400s on an empty platform list or empty text', async () => {
     expect((await POST(req({ text: 'hi', platforms: [] }))).status).toBe(400);
     expect((await POST(req({ text: '', platforms: ['x'] }))).status).toBe(400);
+  });
+});
+
+/**
+ * Bot bearer (ZOE's POST button, doc 2239 fix 1). The bot runs on the VPS with
+ * no iron-session, so a shared secret in PUBLISH_BOT_TOKEN lets it through as
+ * admin-equivalent on THIS route only. Red controls: the bearer is accepted
+ * only when the env is set AND matches; an unset env means the header is
+ * ignored and the session path decides, exactly as before this change.
+ */
+describe('POST /api/publish/compose - PUBLISH_BOT_TOKEN bearer', () => {
+  const TOKEN = 'z'.repeat(48);
+  const saved = process.env.PUBLISH_BOT_TOKEN;
+
+  function bearerReq(token: string, body: unknown): NextRequest {
+    return new NextRequest('http://localhost/api/publish/compose', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getSessionData.mockResolvedValue(null); // no session: only the bearer can pass
+    mocks.autoCastToZao.mockResolvedValue('0xcast');
+    process.env.PUBLISH_BOT_TOKEN = TOKEN;
+  });
+  afterEach(() => {
+    if (saved === undefined) delete process.env.PUBLISH_BOT_TOKEN;
+    else process.env.PUBLISH_BOT_TOKEN = saved;
+  });
+
+  it('a matching bearer passes with no session and the call is reported as the bot', async () => {
+    const res = await POST(bearerReq(TOKEN, { text: 'hi', platforms: ['farcaster'] }));
+    expect(res.status).toBe(200);
+    expect((await res.json()).data.dryRun).toBe(true);
+  });
+
+  it('a wrong bearer with no session is 401 and publishes nothing', async () => {
+    const res = await POST(
+      bearerReq('y'.repeat(48), { text: 'hi', platforms: ['farcaster'], dryRun: false }),
+    );
+    expect(res.status).toBe(401);
+    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+  });
+
+  it('with PUBLISH_BOT_TOKEN unset the header is ignored: no session means 401 even with the right-looking bearer', async () => {
+    delete process.env.PUBLISH_BOT_TOKEN;
+    const res = await POST(
+      bearerReq(TOKEN, { text: 'hi', platforms: ['farcaster'], dryRun: false }),
+    );
+    expect(res.status).toBe(401);
+    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+  });
+
+  it('a PUBLISH_BOT_TOKEN saved with a trailing newline still matches (trimmed on both sides)', async () => {
+    process.env.PUBLISH_BOT_TOKEN = `${TOKEN}\n`;
+    const res = await POST(bearerReq(TOKEN, { text: 'hi', platforms: ['farcaster'] }));
+    expect(res.status).toBe(200);
+  });
+
+  it('a short PUBLISH_BOT_TOKEN (under 32 chars) is treated as unset', async () => {
+    process.env.PUBLISH_BOT_TOKEN = 'short';
+    const res = await POST(
+      bearerReq('short', { text: 'hi', platforms: ['farcaster'], dryRun: false }),
+    );
+    expect(res.status).toBe(401);
+    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
   });
 });

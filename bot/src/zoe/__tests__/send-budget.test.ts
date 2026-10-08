@@ -883,3 +883,76 @@ describe('wasSendBlocked - telling a blocked send from a real one', () => {
     expect(wasSendBlocked(undefined)).toBe(false);
   });
 });
+
+/**
+ * ZOE_STATUS_HOLD (doc 2239 section 5, fix 2). Zaal, 2026-10-06
+ * (decisions/grill-2026-10-06-dreamnet-evening.md item 7): "make the status
+ * send class hold instead of drop, before ZOE becomes the single route."
+ * Measured the day after: the work-loop's own failure report ("claude CLI
+ * exited 1") went out as `status` at 16/3 and was DROPPED - the one line that
+ * said the research pipeline was broken never reached the phone.
+ *
+ * Red controls: with the flag unset, `status` over cap is dropped exactly as
+ * before (the existing tests above pin that too); with ZOE_STATUS_HOLD=1 it is
+ * deferred into the morning batch and lands in send-deferred.jsonl. Nothing
+ * else in the policy table moves: alarm still never queues, noise still drops.
+ */
+describe('ZOE_STATUS_HOLD - status holds for the morning instead of dropping', () => {
+  it('flag unset: status over cap is dropped, as today', () => {
+    delete process.env.ZOE_STATUS_HOLD;
+    const d = decide('status', 20, 20);
+    expect(d.outcome).toBe('dropped');
+    expect(d.allow).toBe(false);
+  });
+
+  it('flag set: status over cap is deferred, not allowed, not counted, and says so', () => {
+    process.env.ZOE_STATUS_HOLD = '1';
+    const d = decide('status', 20, 20);
+    expect(d.outcome).toBe('deferred');
+    expect(d.allow).toBe(false);
+    expect(d.counts).toBe(false);
+    expect(d.reason).toContain('morning batch');
+  });
+
+  it('flag set: status under cap still sends normally', () => {
+    process.env.ZOE_STATUS_HOLD = '1';
+    expect(decide('status', 2, 20).allow).toBe(true);
+  });
+
+  it('flag set: alarm still never queues and noise still drops', () => {
+    process.env.ZOE_STATUS_HOLD = '1';
+    expect(decide('alarm', 50, 20).outcome).toBe('sent');
+    expect(decide('noise', 5, 20).outcome).toBe('dropped');
+  });
+
+  it('flag set: a held status report reaches send-deferred.jsonl through gateSend', async () => {
+    process.env.ZOE_STATUS_HOLD = '1';
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    const held = (await gated(1, 'Work-loop: research failed - claude CLI exited 1', {
+      zoeSendClass: 'status',
+    })) as { zoeSendBudget: string };
+    expect(calls).toHaveLength(1);
+    expect(held.zoeSendBudget).toBe('deferred');
+    const queued = await readDeferred();
+    expect(queued).toHaveLength(1);
+    expect(queued[0].cls).toBe('status');
+    expect(queued[0].text).toContain('claude CLI exited 1');
+  });
+
+  it('flag unset: the same report through gateSend is dropped and the queue stays empty', async () => {
+    delete process.env.ZOE_STATUS_HOLD;
+    process.env.ZOE_DAILY_SEND_CAP = '1';
+    const { send, calls } = recordingSend();
+    const gated = gateSend(send);
+    await gated(1, 'burns the cap');
+    const dropped = (await gated(1, 'Work-loop: research failed', { zoeSendClass: 'status' })) as {
+      zoeSendBudget: string;
+    };
+    expect(calls).toHaveLength(1);
+    expect(dropped.zoeSendBudget).toBe('dropped');
+    expect(await readDeferred()).toHaveLength(0);
+  });
+});

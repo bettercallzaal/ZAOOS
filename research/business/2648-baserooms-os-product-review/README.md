@@ -321,6 +321,27 @@ Source: the IM client code in the site bundle (the `useImConnection` hook, the s
 
 **What this means for The ZAO.** Nothing to adopt: our members already have Farcaster DMs and XMTP in ZAO OS (`src/` XMTP stack). Treat Base Rooms IM like any unencrypted chat: fine for "are you on the call", not for anything private. And since it runs on a separate, self-run Ubuntu box, its uptime and patching are separate from the Vercel site's.
 
+### 2026-10-08, tick 9: how findable ZAO music is on the radio
+
+Source: `GET https://baserooms.io/api/radio/browse?source=audius&q=<term>` once per term, `?source=soma`, and `GET /api/radio/resolve?url=<link>` with four test links. The search results were stable across three runs in section 7; these terms were run once each.
+
+| Search term | Tracks returned | ZAO-related artists in the results |
+|---|---|---|
+| `wavewarz` | 30 (the cap) | BetterCallZaal, WaveWarZ Africa, BennyJ504, plus HOODRAT, JetDigital321, SteveStrange, Stormbourne, SweetBiddiMcGee |
+| `bettercallzaal` | 4 | BetterCallZaal ("WaveWarZ, the electric vibez", "UVR Anthem 1" and "2"), The ZAO ("BetterCallZaal by IMan Afrikah") |
+| `thezao` | 2 | The ZAO (`audius.co/thezaodao`): "BetterCallZaal" and "COC V2", both by IMan Afrikah |
+| `stilo` | 24 | Stilo World, Dope Stilo Music Club, BennyJ504 |
+| `dopestilo` | 18 | Stilo World, BennyJ504 |
+| `zao`, `zabal` | 30 each | Mostly unrelated artists whose names or tags contain the letters |
+| `coc concertz`, `joseph goats`, `huottoja` | 0 | none |
+
+SomaFM returned 46 stations, all live.
+
+**What it means.**
+
+1. **Search works by Audius account, not by brand.** Anyone who types `wavewarz`, `bettercallzaal`, `thezao` or `stilo` hears our people inside Base Rooms today, with Audius plays credited to their accounts through `app_name=baserooms`. Brand names that are not Audius handles (`COC Concertz`, Joseph Goats, Huöttöja) return nothing. Whether those artists publish on Audius under another handle was not checked here.
+2. **There is no "add a station" path for us.** The `resolve` endpoint, which turns a pasted link into something playable, accepts only `on.soundcloud.com` links: an Audius track, an Audius profile, a SomaFM page and a plain `.mp3` URL all came back `400 {"error":"an on.soundcloud.com link is required"}`. So a ZAO or WaveWarZ station on the radio's front page is something only Slava can add. That supports making Key Decision 4 a direct ask, and makes it specific: a pinned WaveWarZ (or The ZAO) row backed by the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -377,6 +398,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - GitHub API] Repo searches for comparable products; LICENSE files of Asugawara/ukagai (MIT), deokman420/KasOS (MIT); ukagai README
 - [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
 - [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
+- [FULL - urllib GET] Radio browse for 10 search terms and SomaFM; radio resolve with 4 test links (all 400, SoundCloud short links only)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

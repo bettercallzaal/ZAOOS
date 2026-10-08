@@ -7,9 +7,15 @@
  *
  * What was taken: the layered dedup (URL, then exact title, then arXiv id, then
  * content-word Jaccard and title-entity overlap) and the source-adapter shape.
- * What is stricter than nexus: different arXiv ids never merge, and the entity
- * rule needs 3 shared names (or 2 with a dollar amount) after a generic-word
- * filter (review of #3821).
+ * What is stricter than nexus (two reviews of #3821):
+ *  - different arXiv ids never merge;
+ *  - shared names NEVER drop an item. nexus merged on 2 shared capitalised words;
+ *    that collapsed distinct stories ("Python Rust Golang Compared" vs "...Weekly
+ *    News", "OpenAI raises $5B in debt" vs "OpenAI acquires startup for $5B"), and
+ *    no word list or title-similarity threshold separated them from true repeats.
+ *    So a name match is reported in `possible` and the item is KEPT;
+ *  - the content (Jaccard) layer only runs when both items carry at least
+ *    MIN_CONTENT_WORDS significant words, so two short titles cannot merge on it.
  * What was left out, on Zaal's 2026-10-08 ruling (vault item 64): nexus's paid
  * TypeSafe/Jev classifier, its Postgres tables, and its X API adapter. This file
  * is pure: no database, no network, no clock. Callers pass in what was seen.
@@ -41,20 +47,21 @@ export interface RadarSourceAdapter {
   poll(signal?: AbortSignal): Promise<RadarItem[]>;
 }
 
-export type DupReason = 'url' | 'title' | 'arxiv' | 'content' | 'entities';
+export type DupReason = 'url' | 'title' | 'arxiv' | 'content';
 
 export interface DedupResult {
   kept: RadarItem[];
   dropped: Array<{ item: RadarItem; reason: DupReason; duplicateOf: string }>;
+  /** Kept, but shares names with an earlier item: a human or model decides. */
+  possible: Array<{ item: RadarItem; duplicateOf: string; shared: string[] }>;
 }
 
 // Content Jaccard above 0.6 is kept from nexus.
 export const CONTENT_SIMILARITY_THRESHOLD = 0.6;
-// STRICTER than nexus (which merged on any 2 shared capitalised words): the review
-// of #3821 showed "Language Models are Few-Shot Learners" merging with "Language
-// Models for Protein Folding", and two different OpenAI/Anthropic stories merging.
-// So: 3+ shared entities, or 2+ when one of them is a dollar amount, after dropping
-// capitalised words that are generic in tech titles (TITLE_GENERIC_WORDS).
+// Ours: the content layer needs this many significant words on BOTH sides.
+export const MIN_CONTENT_WORDS = 8;
+// Flag-only (never drop): 3+ shared names, or 2+ when one is a dollar amount,
+// after dropping capitalised words that are generic in tech titles.
 export const MIN_ENTITY_OVERLAP = 3;
 export const MIN_ENTITY_OVERLAP_WITH_MONEY = 2;
 // nexus caps the O(n^2) pass at 200 items; so do we.
@@ -136,10 +143,12 @@ function sharedEntities(a: string[], b: string[]): string[] {
   return a.filter((e) => setB.has(e));
 }
 
-function entitiesMatch(a: string[], b: string[]): boolean {
+/** Shared names when they are enough to flag a possible duplicate, else null. */
+function entitiesFlag(a: string[], b: string[]): string[] | null {
   const shared = sharedEntities(a, b);
-  if (shared.length >= MIN_ENTITY_OVERLAP) return true;
-  return shared.length >= MIN_ENTITY_OVERLAP_WITH_MONEY && shared.some((e) => e.startsWith('$'));
+  if (shared.length >= MIN_ENTITY_OVERLAP) return shared;
+  if (shared.length >= MIN_ENTITY_OVERLAP_WITH_MONEY && shared.some((e) => e.startsWith('$'))) return shared;
+  return null;
 }
 
 /**
@@ -180,8 +189,8 @@ function matchReason(a: Seen, b: Seen): DupReason | null {
   // Two different arXiv ids are two different papers, whatever the titles or text say.
   if (a.arxiv && b.arxiv) return a.arxiv === b.arxiv ? 'arxiv' : null;
   if (a.titleKey && a.titleKey === b.titleKey) return 'title';
-  if (jaccardSimilarity(a.fp, b.fp) > CONTENT_SIMILARITY_THRESHOLD) return 'content';
-  if (entitiesMatch(a.entities, b.entities)) return 'entities';
+  if (a.fp.length >= MIN_CONTENT_WORDS && b.fp.length >= MIN_CONTENT_WORDS
+    && jaccardSimilarity(a.fp, b.fp) > CONTENT_SIMILARITY_THRESHOLD) return 'content';
   return null;
 }
 
@@ -189,12 +198,14 @@ function matchReason(a: Seen, b: Seen): DupReason | null {
  * Keep the first of each group of duplicates, within the batch and against items
  * already seen (for example, recent radar items or existing research docs).
  * Order is kept. Every drop says why and what it duplicated, so nothing vanishes
- * silently. Items past MAX_DEDUP_BATCH are kept unchecked, never dropped.
+ * silently. A name-only match is never a drop: it is listed in `possible` and kept.
+ * Items past MAX_DEDUP_BATCH are kept unchecked, never dropped.
  */
 export function dedupeRadarItems(items: RadarItem[], alreadySeen: RadarItem[] = []): DedupResult {
   const seen: Seen[] = alreadySeen.slice(0, MAX_DEDUP_BATCH).map(fingerprint);
   const kept: RadarItem[] = [];
   const dropped: DedupResult['dropped'] = [];
+  const possible: DedupResult['possible'] = [];
   items.forEach((item, i) => {
     if (i >= MAX_DEDUP_BATCH) { kept.push(item); return; }
     const f = fingerprint(item);
@@ -202,8 +213,12 @@ export function dedupeRadarItems(items: RadarItem[], alreadySeen: RadarItem[] = 
       const reason = matchReason(f, s);
       if (reason) { dropped.push({ item, reason, duplicateOf: s.url }); return; }
     }
+    for (const s of seen) {
+      const shared = entitiesFlag(f.entities, s.entities);
+      if (shared) { possible.push({ item, duplicateOf: s.url, shared }); break; }
+    }
     seen.push(f);
     kept.push(item);
   });
-  return { kept, dropped };
+  return { kept, dropped, possible };
 }

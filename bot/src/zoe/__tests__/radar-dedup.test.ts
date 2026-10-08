@@ -38,13 +38,25 @@ describe('radar-dedup: duplicates collapse', () => {
     expect(r.dropped[0].reason).toBe('arxiv');
   });
 
-  it('the same story in different words collapses (entities)', () => {
+  it('the same story in different words is KEPT and flagged as possible, never dropped on names', () => {
     const r = dedupeRadarItems([
       item('https://a.com/x', 'OpenAI raises $40B led by SoftBank'),
       item('https://b.com/y', 'SoftBank leads $40 billion OpenAI round'),
     ]);
+    expect(r.kept).toHaveLength(2);
+    expect(r.dropped).toHaveLength(0);
+    expect(r.possible).toHaveLength(1);
+    expect(r.possible[0].shared.sort()).toEqual(['$40b', 'openai', 'softbank']);
+  });
+
+  it('the same article reposted with a new title collapses on its long text (content)', () => {
+    const body = 'Telegram Bot API version ten lets bots read messages from other bots in groups when both enable the mode in BotFather';
+    const r = dedupeRadarItems([
+      item('https://a.com/tg', 'Telegram bots can now talk to each other', body),
+      item('https://b.com/tg2', 'Bot-to-bot messaging arrives on Telegram', body),
+    ]);
     expect(r.kept).toHaveLength(1);
-    expect(r.dropped[0].reason).toBe('entities');
+    expect(r.dropped[0].reason).toBe('content');
   });
 
   it('an item already seen elsewhere is dropped, and the drop says what it matched', () => {
@@ -116,6 +128,41 @@ describe('radar-dedup: distinct items stay', () => {
       item('https://arxiv.org/abs/2401.22222', 'Paper B', body),
     ]);
     expect(r.kept).toHaveLength(2);
+  });
+
+  // Second review of #3821: names alone (even 3, or 2 with money) must not drop.
+  it('review 2: "Python Rust Golang Compared" vs "...Weekly News" stay separate', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/cmp', 'Python Rust Golang Compared'),
+      item('https://b.com/news', 'Python Rust Golang Weekly News'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('review 2: "Transformers Diffusion Mamba Survey" vs "...Benchmark" stay separate', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/s', 'Transformers Diffusion Mamba Survey'),
+      item('https://b.com/b', 'Transformers Diffusion Mamba Benchmark'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('two short titles sharing most words do not merge on the content layer', () => {
+    // 4 of 6 words shared = 0.67 Jaccard, above 0.6: only the length gate keeps these apart
+    const r = dedupeRadarItems([
+      item('https://a.com/c', 'Python Rust Golang Zig Compared'),
+      item('https://b.com/n', 'Python Rust Golang Zig News'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('review 2: "OpenAI raises $5B in debt" vs "OpenAI acquires startup for $5B" stay separate', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/debt', 'OpenAI raises $5B in debt'),
+      item('https://b.com/acq', 'OpenAI acquires startup for $5B'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+    expect(r.dropped).toHaveLength(0);
   });
 
   it('items past the batch cap are kept unchecked, never dropped', () => {

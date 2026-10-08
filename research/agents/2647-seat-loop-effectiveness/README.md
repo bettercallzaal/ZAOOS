@@ -95,6 +95,17 @@ every JSONL line and never deduplicates by message id. On the seat this
 overcounted by **1.87x**. The ratio elsewhere depends on how many content blocks
 each message has, and **was not measured for other lanes**.
 
+**Correction, 2026-10-08 (from the PR lead's measurement): the fix is keep-LAST per
+message id, not skip-repeats.** The PR lead read two days of transcripts:
+- 19,608 of 38,871 usage lines repeat an id within their file.
+- **270 of those repeats are not identical.** They are streaming snapshots, and the
+  last line holds the final `output_tokens` (for example 8, then 415).
+
+This doc's seat figure kept the FIRST line per id. On the seat that made no
+difference, because 0 of its 805 repeats differed, so $760.97 stands. In other
+transcripts, though, first-seen would undercount output. Keep-last is right
+everywhere, and the PR lead is writing that `zao-spend` fix.
+
 `agent-spend.md`'s "cost = turns x ~$1.01" was measured with this same tool on
 2026-08-10. Its dollar totals are probably inflated by the same mechanism. Its main
 finding, that cost per turn is flat over a long session, is a ratio, so it may still
@@ -266,7 +277,7 @@ Re-measure with the fixed `zao-spend` one full day after the change.
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Fix `zao-spend` to deduplicate usage by `message.id`, add a test with a two-block message, and re-print the 24h by-lane table. Shipped = merged zaal-dotfiles PR with before and after figures. | zaal-dotfiles-fc | PR | 2026-10-09 |
+| Fix `zao-spend` to keep the LAST usage line per `message.id` (streaming snapshots differ; see the correction in Part 1), add a test with a two-block message, and re-print the 24h by-lane table. Shipped = merged zaal-dotfiles PR with before and after figures. | zaal-dotfiles-fc | PR | 2026-10-09 |
 | Re-measure `agent-spend.md`'s per-turn figure with the fixed tool and correct the rule if it moved | zaal-dotfiles-fc | PR | 2026-10-10 |
 | DONE 2026-10-08: the seat adopted the reporting norm (gates, blockers, Zaal's words, Needs only) | seat | Decision | 2026-10-08 |
 | Write `seat-digest` in zaal-dotfiles `bin`, read-only, with a red control. Shipped = merged PR. | zaoos-35 (Claude) | PR | 2026-10-09 |

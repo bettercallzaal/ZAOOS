@@ -21,7 +21,7 @@ import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
-import { BUTTON_BAR, PRIVATE_COMMANDS, GROUP_COMMANDS, isBarLabel, buildCockpitKeyboard } from './button-bar';
+import { BUTTON_BAR, GROUP_COMMANDS, privateCommandMenu, isBarLabel, buildCockpitKeyboard } from './button-bar';
 import {
   surfaceGrill,
   applyGrillAction,
@@ -4235,7 +4235,7 @@ async function main(): Promise<void> {
   }
 
   // Register the `/` command menus: private cockpit commands for Zaal, assistant commands for groups.
-  await bot.api.setMyCommands(PRIVATE_COMMANDS, { scope: { type: "all_private_chats" } }).catch((err: unknown) => {
+  await bot.api.setMyCommands(privateCommandMenu(), { scope: { type: "all_private_chats" } }).catch((err: unknown) => {
     console.error("[zoe/index] setMyCommands private failed:", (err as Error).message);
   });
   await bot.api.setMyCommands(GROUP_COMMANDS, { scope: { type: "all_group_chats" } }).catch((err: unknown) => {

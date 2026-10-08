@@ -62,6 +62,22 @@ export const GROUP_COMMANDS = [
   { command: "zg", description: "Group admin status and mode (Zaal only)" },
 ];
 
+/**
+ * The private menu as set at boot. /terminals (terminals-digest.ts) is listed
+ * only while ZOE_TERMINALS_DIGEST=1: with the flag off its handler falls through,
+ * and a menu entry that does nothing is worse than none. The menu is set once at
+ * boot, so a flag change shows up after the restart that applies it.
+ * Zaal 2026-10-08: "doesnt show up as acommadn".
+ */
+export function privateCommandMenu(): { command: string; description: string }[] {
+  if (process.env.ZOE_TERMINALS_DIGEST !== '1') return PRIVATE_COMMANDS;
+  return [
+    PRIVATE_COMMANDS[0],
+    { command: "terminals", description: "How every terminal is doing" },
+    ...PRIVATE_COMMANDS.slice(1),
+  ];
+}
+
 /** Backward compatibility alias for any caller expecting ZOE_COMMANDS */
 export const ZOE_COMMANDS = PRIVATE_COMMANDS;
 

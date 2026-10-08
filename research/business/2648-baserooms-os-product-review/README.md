@@ -585,6 +585,18 @@ Source: `POST /agent/tools/skills_list` without a key (401), `GET https://brtc-o
 
 No new fetch this tick. Rows T9 to T12 were added to the threat table in section 6, from ticks 5, 8, 20 and 21, and mitigation 3 was tightened to exclude `skill_use` and workspace access. The severity of T1 to T8 is unchanged. None of the new rows is above MEDIUM, and none changes Key Decisions 1 or 2: hooks stay SKIP, and MCP stays SKIP unless trialled in a sandbox.
 
+### 2026-10-08, tick 23: Telegram alerts and what the account stores
+
+Source: the account and alerts code paths in the site bundle (the `linkCode`, `digest`, `alerts`, `notes`, `layout` and `watchlist` client calls, and the Settings "Account" card). No account was created and no bot was messaged.
+
+**How Telegram linking works.** Signed in, the app asks the Worker for `/telegram/link-code`, then shows a button to `https://t.me/<bot>?start=<code>` and the instruction "send /start <code>". The bot's username comes from the server response; it is not hard-coded in the bundle, so this review cannot name it. One-time-code linking is the standard pattern, and the code is what ties a Telegram chat to a wallet.
+
+**What alerts can do.** Price, odds and wallet alerts fire on the Buddy and, if linked, in Telegram. A "stop" alert does not sell by itself. In the app's words: "A stop doesn't sell for you: when it fires, your buddy and Telegram open a pre-filled Sell that you confirm." There is also an optional daily `digest` (`/me/digest`, on or off).
+
+**What the server keeps, in its own words** (Settings, Account card): "The server keeps your address, your Telegram chat (if linked), alert rules, journal notes and one daily value snapshot. No keys, no funds." The client also syncs `watchlist`, `notes` and `layout` to the server. This matches the homepage Disclosures (section 8) and adds one item the homepage does not list: **one daily value snapshot**, a daily record of the wallet's value.
+
+**What this means for The ZAO.** Linking Telegram ties a Telegram identity to a wallet address on Base Rooms' server, and the daily snapshot builds a value history for that wallet there. Both go away with "delete my data" (per the Disclosures). Neither matters for a personal trial. Both are reasons not to link a ZAO operational wallet or a shared ZAO Telegram account.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -659,6 +671,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
 - [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
 - [FULL - curl, 3 runs] Worker /skills (401); agent tool skills_list without key (401); /agent/skills, /skills, /agent/skills.json on baserooms.io (404); skills import/export and workspace schedule code paths in the bundle
+- [FULL - bundle read] Account, Telegram link-code, alerts, digest, notes, layout and watchlist client code in the site JS chunks
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

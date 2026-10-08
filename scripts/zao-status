@@ -1,0 +1,61 @@
+#!/bin/bash
+# zao-status "<message>"  OR  echo "message" | zao-status
+# Post a status line to the ZAALBOTS group (status channel; questions go via zao-ask-dm).
+# Robust: reads stdin when no arg (quote-safe for any content), chunks messages >4000
+# chars into multiple sends (Telegram hard limit 4096), works on Mac + VPS (tries
+# ~/.zao/private/tg.env first, then ~/zao-os/bot/.env for the VPS).
+#
+# CANONICAL SOURCE, tracked in ZAOOS scripts/ from 2026-10-08. Until then it existed only
+# at ~/bin/zao-status on the VPS (written 2026-07-20, in no repo), while zoe-autodeploy.sh
+# depended on it (vanishing-dependencies.md rule 1). Install: cp scripts/zao-status ~/bin/
+#
+# WHEN IT TAGS ZAAL. A message is prefixed with his handle when it contains an alarm word
+# (ALERT, BLOCKED, FAILED, needs you, approve, ...). Two exceptions, added 2026-10-08 after
+# a routine deploy of a doc titled "how ZAO holders can approve a ZIP" tagged him:
+#   - ZAO_STATUS_NO_TAG=1 in the caller's environment: never tag. zoe-autodeploy.sh sets it
+#     on its OK notice.
+#   - a line that opens "<word> OK" (for example "autodeploy OK: ...") never tags: an OK is
+#     not an ask, whatever words follow it.
+# ROLLED BACK joined the alarm words on 2026-10-08: a boot-crash rollback reached the group
+# untagged, and that is the one deploy notice he must see.
+# ZAO_STATUS_DRY_RUN=1 prints the message that would be sent and sends nothing (tests).
+set -uo pipefail
+if [ $# -ge 1 ]; then MSG="$1"; else MSG="$(cat)"; fi
+[ -z "$MSG" ] && { echo 'usage: zao-status "<message>"  (or pipe via stdin)'; exit 1; }
+export _ZS_MSG="$MSG"
+python3 - <<'PY'
+import os, json, urllib.request, urllib.parse
+msg = os.environ["_ZS_MSG"]
+import re as _re
+TAG = "@" + "bettercallzaal"
+no_tag = os.environ.get("ZAO_STATUS_NO_TAG") == "1" or _re.match(r"^[\w-]+ OK\b", msg)
+if not no_tag and _re.search(r"(?i)\b(ALERT|BLOCKED|ROLLED BACK|needs a human|DECISION NEEDED|action required|FAILED|URGENT|needs you|approve|awaiting)\b", msg) and TAG not in msg:
+    msg = TAG + " " + msg
+if os.environ.get("ZAO_STATUS_DRY_RUN") == "1":
+    print(msg); raise SystemExit(0)
+env = {}
+for p in ("~/.zao/private/tg.env", "~/zao-os/bot/.env", "~/.zao/zao.env"):
+    fp = os.path.expanduser(p)
+    if os.path.exists(fp):
+        for l in open(fp):
+            l = l.strip()
+            if "=" in l and not l.startswith("#"):
+                k, v = l.split("=", 1)
+                env.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+token = env.get("ZOE_BOT_TOKEN") or env.get("TELEGRAM_BOT_TOKEN")
+gid = env.get("ZAAL_BOTZ_GROUP_ID") or env.get("ZAALBOTS_GROUP_CHAT_ID")
+if not token or not gid:
+    print("zao-status: no bot token or group id found in tg.env/bot/.env"); raise SystemExit(1)
+chunks = [msg[i:i+4000] for i in range(0, len(msg), 4000)] or [msg]
+ok = 0
+for c in chunks:
+    body = urllib.parse.urlencode({"chat_id": gid, "text": c}).encode()
+    try:
+        r = json.load(urllib.request.urlopen(urllib.request.Request(
+            f"https://api.telegram.org/bot{token}/sendMessage", data=body), timeout=15))
+        ok += 1 if r.get("ok") else 0
+        if not r.get("ok"): print("FAIL:", r.get("description"))
+    except Exception as e:
+        print("ERR:", e)
+print(f"status sent ({ok}/{len(chunks)} chunks)")
+PY

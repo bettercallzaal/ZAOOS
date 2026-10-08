@@ -361,6 +361,34 @@ The Worker URL is a `constant` in the renderer (`WORKER = "https://brtc-os.slava
 2. **Viewing a Buddy on a marketplace that runs `animation_url` sends a request to Base Rooms' Worker** with that Buddy's id, so the Worker's logs can see the viewer's IP address. That is normal for web content and small, and it is worth knowing before embedding Buddies on a ZAO page.
 3. **This is a good pattern to copy for ZAO collectibles.** The page has no external images, uses a CSP allowlist of two hosts, and keeps the art in contract bytecode and SSTORE2. It is MIT. If The ZAO ever makes onchain collectibles, `UnitRenderer` is a clean reference, credited per `credit-attribution.md`.
 
+### 2026-10-08, tick 11: who holds BRTC and Buddies
+
+Source: `GET https://baserooms.io/api/holders?ca=<BRTC>` (top 50 holders with a `kind` label), the Basescan token page for the Buddies contract, and tick 4's `getUserState` reading.
+
+**BRTC: 134 holders.** By kind, across the top 50 listed:
+
+| Kind | Share of supply |
+|---|---|
+| Uniswap v4 pool manager | 33.2% |
+| Contracts (almost all the o1 staking vault) | 32.2% |
+| Plain wallets in the top 50 (48 wallets) | 34.1% |
+
+The largest single plain wallet holds 4.84%. The ten largest plain wallets together hold 22.96%.
+
+**Three "top 10" figures, three definitions.** These are now all measured, so the inconsistency flagged in section 8 can be settled:
+
+- The homepage's **54.06%** counts the top 10 holders of any kind, including the pool and the vault.
+- The safety tool's **9.1%** counts only the plain wallets that make it into the overall top 10.
+- **22.96%** (this tick) is the ten largest plain wallets, wherever they rank.
+
+**For the concentration question that matters, use 22.96%.** It is the share that ten individuals could sell into the pool.
+
+**The treasury's stake does not appear as a wallet.** Its 122.1M BRTC sits inside the vault contract, so the vault's 32.2% is mostly the project's own launch allocation (tick 4: 38% of the vault).
+
+**Buddies: 266 minted, 60 holders** (Basescan, 2026-10-08), so about 4.4 per holder on average. The contract caps minting at 10 per wallet, but transfers are unrestricted, so a holder can own more.
+
+**Overlap with ZAO members: not measured.** Answering it needs the ZAO member wallet list, which lives in our Supabase allowlist. Matching a third-party holder list against it would produce a per-person result that does not belong in a public research doc (`pii-hygiene.md`). If Zaal wants the number, it should be computed privately and only the count reported.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -419,6 +447,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
 - [FULL - urllib GET] Radio browse for 10 search terms and SomaFM; radio resolve with 4 test links (all 400, SoundCloud short links only)
 - [FULL - curl + HTML strip] UnitRenderer verified source (9 files, MIT): https://basescan.org/address/0xad2343637ef688b6cc3a106092a941ffcb5834ac ; pet page rebuilt from the SSTORE2 hex parts in UnitPet.sol
+- [FULL - urllib GET] BRTC top-50 holders with kind labels: https://baserooms.io/api/holders?ca=0xB200000000000000000000856A95738C92fEed01
+- [FULL - curl + HTML strip] Buddies token page (supply 266, holders 60): https://basescan.org/token/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

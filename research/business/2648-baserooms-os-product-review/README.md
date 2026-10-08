@@ -597,6 +597,18 @@ Source: the account and alerts code paths in the site bundle (the `linkCode`, `d
 
 **What this means for The ZAO.** Linking Telegram ties a Telegram identity to a wallet address on Base Rooms' server, and the daily snapshot builds a value history for that wallet there. Both go away with "delete my data" (per the Disclosures). Neither matters for a personal trial. Both are reasons not to link a ZAO operational wallet or a shared ZAO Telegram account.
 
+### 2026-10-08, tick 24: tracking, games and the gallery
+
+Source: a search of the homepage HTML and all 185 JS chunks for 16 analytics and tracking markers (`posthog`, `google-analytics`, `googletagmanager`, `gtag(`, `@vercel/analytics`, `_vercel/insights`, `va.vercel`, `sentry`, `mixpanel`, `amplitude`, `segment.io`, `hotjar`, `plausible`, `umami`, `clarity.ms`, `datadog`); the window definitions for the Games and Art Gallery windows; and one call to `/api/nfts/held`.
+
+**No third-party analytics or tracking found.** None of the 16 markers appears in the HTML or in any chunk. Combined with the CSP `report-uri /api/csp-report` (tick 12), the only telemetry visible from outside goes to Base Rooms' own endpoints. That is a good sign for a crypto front end, and it is limited to what the bundle shows: server-side logging on Vercel or the Worker cannot be seen from here.
+
+**Games are client-side.** Snake, Solitaire, 2048, Minesweeper and "Pump or Dump" are `kind: "client"` windows, so they run in the browser. "Pump or Dump" uses "real candles, hidden future: call the next one up or down", so it reads market data, but nothing in its definition stakes or bets money.
+
+**The Art Gallery** ("Your NFTs and art on Base and Ethereum") loads holdings through Base Rooms' own `/api/nfts/held` route and resolves images through the `https://ipfs.io/ipfs/` gateway. It links out to OpenSea and the Zora explorer. A guessed `addr` parameter returned `400 {"error":"unknown parameter: addr"}`, so the route validates its inputs. The real parameter name was not pursued.
+
+**What this means.** Nothing to adopt and nothing to flag. The absence of trackers is worth one line in the review's overall verdict: Base Rooms does not appear to sell its users' attention to analytics vendors.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -672,6 +684,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
 - [FULL - curl, 3 runs] Worker /skills (401); agent tool skills_list without key (401); /agent/skills, /skills, /agent/skills.json on baserooms.io (404); skills import/export and workspace schedule code paths in the bundle
 - [FULL - bundle read] Account, Telegram link-code, alerts, digest, notes, layout and watchlist client code in the site JS chunks
+- [FULL - bundle and HTML search] 16 analytics/tracking markers across the homepage HTML and 185 JS chunks (none found); Games and Art Gallery window definitions; /api/nfts/held input check (400 on unknown parameter)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

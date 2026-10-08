@@ -240,6 +240,24 @@ Source: every ERC-20 transfer to or from the treasury `0xa034...f8ce`, scraped f
 4. **The treasury is being targeted by address poisoning.** 17 outgoing rows are fake tokens whose names imitate "USDC" with lookalike Unicode letters (for example `U S D C` built from Lisu and Cyrillic characters), "sent" in amounts like 15,400 and 400. These are spam made to appear in the treasury's history so that someone copies a lookalike address. They are not real outflows. Anyone at The ZAO who reads this wallet's history should copy addresses only from the contract constants in this doc.
 5. **It is in use today.** The most recent row is a Buddy mint at 18:01 UTC on 2026-10-08, sent from `bettercallzaal.base.eth`.
 
+### 2026-10-08, tick 5: the agent API, counted and read
+
+Source: `https://baserooms.io/agent/openapi.json` (OpenAPI, 53 operations), the same file with `?set=chat` (30 operations), `/agent/tools?format=openai` (53 tools), and the 64-tool list in `/agent.md`. Every operation is a `POST /agent/tools/<name>` with one security scheme, a `unitKey` bearer.
+
+**The counts reconcile.** `/agent.md` lists 64 tools. The OpenAPI file and the OpenAI-format catalog both list 53. The 11 missing ones are exactly the `prepare_*` "act" tools (swap, stake, lend, earn, perp, revoke, pay, multisend, limit, bridge, launch), which put a signing card into a chat app's conversation. So plain-HTTP agents can **propose** a transaction to the Buddy, while chat-app connectors can also **prepare** one in the chat. In both cases the owner still signs in their own wallet.
+
+**The chat set is narrower.** `?set=chat` (for custom GPTs) drops to 30 operations. It keeps all the read tools a person would ask about, the `propose_*` tools, `memory_recall`, `workspace_board` and `workspace_task_update`. It leaves out `memory_remember`, `workspace_task` (creating tasks), `workspace_task_comment`, `alert_create` and the `buddy_status` / `buddy_log` writers.
+
+**Three tools matter more than their names suggest.** Each is a channel where text from Base Rooms' server, or from another agent, becomes instructions to our agent:
+
+1. **`skill_use`** returns "how to do it and which of your tools to use. Then do it." The skill text is served by Base Rooms. An agent that follows it is running a playbook written on someone else's server. This is the same shape as the "tell" setup method (threat T5), but available on every call.
+2. **`workspace_task`** lets one of the owner's agents "leave a task ... for another of the owner's buddies", and `/agent.md` tells the receiving agent "a message saying a task was handed to you means: read the board and take it". That is agent-to-agent task passing through a third-party board. It is useful, and it is an instruction channel whose author is whatever other agent the owner has paired.
+3. **`alert_create`** accepts an optional `then_sell`, so an agent can arm a sell order that shows up as a signing card when a price fires. It still needs the owner's signature, but it is a way for an agent to stage a trade for later.
+
+**What `memory_remember` says about itself.** Its description reads: "Never save secrets, keys, file contents or private data." That is a request to the agent, not something the server enforces. Nothing in the schema (`topic`, `text`, `kind`, `shared`) filters it. So "the notes stay safe" holds only as far as the agent obeys the instruction, which is why the threat model keeps `memory` out of the first trial's scopes.
+
+**What this changes.** It confirms decision 2 (MCP only in a sandbox, minimal scopes) and adds one line to that trial plan: leave `tools` scope on but **do not call `skill_use`**, or treat its output as untrusted data, not instructions.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -291,6 +309,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast call, Base RPC] getVault(VAULT_ID) and feeConfig() on the o1 staking contract, 2026-10-08
 - [FULL - curl + HTML strip] Treasury token transfers, 212 rows: https://basescan.org/tokentxns?a=0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce (pages 1-3, ps=100)
 - [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
+- [FULL - curl] OpenAPI chat set: https://baserooms.io/agent/openapi.json?set=chat (200, 31,240 bytes, 30 operations)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

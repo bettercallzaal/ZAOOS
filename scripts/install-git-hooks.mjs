@@ -26,6 +26,9 @@ import { join, resolve } from 'node:path';
 
 const MARKER = '# zaoos-husky-delegator';
 const HOOKS = ['pre-commit'];
+// The check script first: if a copy fails partway, a hook is never left
+// pointing at a check that is not there yet.
+const GUARD_FILES = ['inherited-work-check.sh', 'pre-push', 'post-checkout'];
 
 const warn = (msg) => console.warn(`[git-hooks] ${msg}`);
 
@@ -168,6 +171,46 @@ try {
   }
 
   if (wired > 0) warn(`wired ${wired} hook(s) from .husky/ into ${hooksDir}`);
+
+  // THE INHERIT GUARD (scripts/git-hooks/). pre-push refuses a branch that
+  // carries another lane's commits, post-checkout warns about it, and both call
+  // inherited-work-check.sh beside them. From 2026-09-20 to 2026-10-07 these
+  // three existed only in one clone's .git/hooks, tracked in no repo, so a
+  // fresh clone had no guard and a lost hooks dir could not be restored.
+  //
+  // COPIED, not delegated like pre-commit above. A delegator resolves its
+  // target in the current checkout, and every worktree shares this hooks dir:
+  // a worktree on a branch older than scripts/git-hooks/ would find no target,
+  // and the guard would stop running exactly where stale branches live. A copy
+  // is what the hand-installed version was, and it runs for every worktree.
+  // The price is that an edit to scripts/git-hooks/ lands on the next install.
+  const guardDir = join(top, 'scripts', 'git-hooks');
+  if (!existsSync(guardDir)) {
+    // an old checkout, or the test fixture: nothing to install, nothing to say
+  } else if (samePath(hooksDir, join(top, '.husky'))) {
+    warn('inherit guard NOT installed: core.hooksPath points at .husky/, and copying');
+    warn('there would add untracked files to the repo. pre-push will not refuse inherited work here.');
+  } else {
+    let copied = 0;
+    for (const name of GUARD_FILES) {
+      const src = join(guardDir, name);
+      if (!existsSync(src)) {
+        warn(`inherit guard: scripts/git-hooks/${name} is missing - NOT installed`);
+        continue;
+      }
+      const dst = join(hooksDir, name);
+      if (existsSync(dst)) {
+        if (readFileSync(dst).equals(readFileSync(src))) continue;
+        const backup = `${dst}.bak.${Date.now()}`;
+        copyFileSync(dst, backup);
+        warn(`backed up your existing ${name} -> ${backup}`);
+      }
+      copyFileSync(src, dst);
+      chmodSync(dst, 0o755);
+      copied += 1;
+    }
+    if (copied > 0) warn(`installed ${copied} inherit-guard file(s) from scripts/git-hooks/ into ${hooksDir}`);
+  }
 } catch (err) {
   warn(`could not install hooks: ${err instanceof Error ? err.message : String(err)}`);
   warn('the pre-commit secret + PII scans will NOT run here.');

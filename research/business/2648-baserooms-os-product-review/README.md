@@ -547,6 +547,20 @@ The Pyth fee is charged per **request**, not per Buddy, and grows only with the 
 
 Steps 1 and 2 are where a newcomer's money is at risk: BRTC exposure, and a lock with no early exit. The 10 USDC goes straight to the treasury and comes back to the holder only by reselling the Buddy.
 
+### 2026-10-08, tick 20: Zaal's own Buddy, read from the outside
+
+Source: `traitsOf(252)`, `bootedAt(252)` and `tokenURI(252)` on the Buddies contract, and `GET https://brtc-os.slavamushyakov.workers.dev/units/progress?ids=252` three times, with no key (the same call the onchain pet page makes, tick 10). Buddy #0252 is the one Zaal announced on Farcaster at 2026-10-08 13:32 UTC.
+
+**Onchain, permanent:** Buddy #0252, Class B. Traits: Paint INK, Chassis ATM, Face `^^`, Top HARD HAT, Gear SUNGLASSES; Points 4; Generation Genesis. It was revealed (booted) at unix 1791466183, which matches the time of his cast.
+
+**Off chain, on Base Rooms' Worker:** level 1 "Boot", 36 XP of 100 to the next level, streak 1, 1 active day, 0 "real" actions, bond 56, mood "thriving". Needs: fuel 90, fun 87, clean 94, energy 92. The next stage is "Beta" at level 3, after 2 active days. The response was identical three times.
+
+**What it shows.**
+
+1. **The split from tick 10, on a real token.** The look is onchain and permanent. The progress is a JSON document on Base Rooms' server.
+2. **Progress is public.** The progress endpoint answers without any key, for any Buddy id. So anyone can see how active a given Buddy's owner has been on Base Rooms (active days, streak, care stats), and since ownership is public onchain, that ties back to a wallet. That is a small, real privacy point. It belongs in the same outreach note as the `localhost` framing (Next Actions), and anyone at The ZAO who would rather not publish their activity pattern should know it.
+3. **Level-ups need "real" actions.** `real: 0` and the Disclosures' "4+ fee-paying actions" for the LV5 swap discount line up: XP from care is capped (`care.cap` 24), and the higher levels and the fee discount need actions that pay Base Rooms a fee. That is the business model, shown in one JSON field.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -619,6 +633,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl + HTML strip, community] Telegram group page https://t.me/brtc_base (156 members), read twice; /s/ preview redirects (group, no public history)
 - [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
 - [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
+- [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

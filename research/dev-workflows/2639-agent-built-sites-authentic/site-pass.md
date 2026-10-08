@@ -30,15 +30,24 @@ If no spec exists, the pass covers steps 0.5, 1, 2, 5, 7 and 8, and the visual l
 
 ## 0.5 Is the live site up?
 
+Measure from two places, this machine and an outside vantage (the VPS), and read both before saying anything:
+
 ```bash
-curl -sS -o /dev/null -w '%{http_code} %{ssl_verify_result}\n' -m 15 "$LIVE_URL"
+probe='curl -sS -o /dev/null -w "%{http_code} %{ssl_verify_result}" -m 15'
+echo "local:   $(sh -c "$probe '$LIVE_URL'" 2>&1)"
+echo "outside: $(ssh -o ConnectTimeout=8 -o BatchMode=yes vps "$probe '$LIVE_URL'" 2>&1)"
 ```
 
-Anything but a 2xx or 3xx with `ssl_verify_result` 0 means the live site is down or broken. North Creek, 2026-10-08: TLS reset for its own name while the same IP served `*.vercel.app`.
+| local | outside | What it means | What to do |
+|---|---|---|---|
+| 2xx/3xx, verify 0 | 2xx/3xx, verify 0 | Up | Carry on |
+| fails | 2xx/3xx, verify 0 | **Local network filter, not an outage** | Audit a local copy. Report it as this machine's network. Not to Zaal, not as a Vercel problem |
+| fails | fails | Down from both | Report to the orchestrator with both readings. Domains and Vercel are Zaal's; do not touch them |
+| any | could not run (no ssh, timeout) | **UNKNOWN** | Say UNKNOWN. A failure seen from one machine is never "down" |
 
-In that case:
-- Audit a local copy instead.
-- Report the outage to the orchestrator. Domains and Vercel are Zaal's, so do not touch them.
+Why both: on 2026-10-08 the north-creek lane saw a TLS reset for northcreek.art from this Mac and reported the site down. Its controls were other hostnames from the same Mac, so they could not rule out a local filter. The same minute the VPS got `200 0`, and the skills lane re-measured `200 0` from the VPS and `000 1` from the Mac. The site was never down.
+
+In every case other than "up", audit a local copy for the rest of the pass.
 
 ## 1. Subject
 

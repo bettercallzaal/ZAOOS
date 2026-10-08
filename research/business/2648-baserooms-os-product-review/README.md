@@ -215,6 +215,31 @@ Source: `src/O1Staking.sol` and `src/interfaces/IO1Staking.sol` from the Basesca
 
 **What this means for anyone at The ZAO who stakes.** Staked BRTC cannot come out early, at any price. The longest a new deposit can be locked is one 14-day epoch plus the wait until it becomes eligible, and never past 2026-12-07. Staking is also the only way to qualify to mint a Buddy today (tick 1), so "stake to mint" means "lock BRTC for up to about four weeks".
 
+### 2026-10-08, tick 4: what has actually flowed through the treasury
+
+Source: every ERC-20 transfer to or from the treasury `0xa034...f8ce`, scraped from Basescan's token-transfer pages (`/tokentxns?a=...`, 3 pages, 212 rows, 2026-09-06 20:30 to 2026-10-08 18:01 UTC), aggregated by token, direction and method. Plus `getUserState` on the o1 vault. ETH transfers and swap-fee legs paid in other assets were not added up, so this is a floor, not the full P&L.
+
+| Flow | Rows | Amount |
+|---|---|---|
+| USDC in via `Mint` and `Mint With Permit` (Buddy mints sent directly) | 61 | 1,090 USDC |
+| USDC in via `Handle Ops` / `Execute` (smart-wallet and batched transactions, mostly mints by size) | 55 | 1,480 USDC |
+| USDC in, other (market-order fees, a delegation redeem) | 3 | about 30 USDC |
+| USDC out | 6 | 2,430.5 USDC |
+| MSTR in via `Claim` / `Claim For` (o1 creator fees on BRTC trading) | 3 | 7.13 MSTR |
+| MSTR out via `Create Vault` (tick 3's vault, 3 MSTR + 10% o1 fee) | 1 | 3.3 MSTR |
+| BRTC in at launch (`Create Launch`) | 1 | 126,130,781 BRTC |
+| BRTC out via `Deposit` into its own vault | 2 | 122,130,781 BRTC |
+| BRTC out via `Fund Reward Pool` | 2 | 4,000,000 BRTC |
+| BRTC in via `Publish` (one Buddy evolution paid) | 1 | 5,863 BRTC |
+
+**What the numbers say.**
+
+1. **Revenue so far is Buddy mints.** About 2,600 USDC came in, which lines up with the 266 Buddies minted at 10 USDC (about 2,660). The 0.1% swap, earn and lend fees do not show up as a visible USDC stream yet. That is consistent with low volume (BRTC did $6.2K of volume that day), not proof that they are not charged.
+2. **The treasury is the largest staker in its own vault.** `getUserState` returns 122,130,781 BRTC staked by the treasury, **38% of the 321.8M total**. Rewards are paid pro rata, so the per-token yield in tick 3 still holds for an outside staker. But about 38% of each epoch's MSTR flows back to the treasury, so the vault's net cost to Base Rooms is closer to $330 than $500. It also means a big part of the "32.2% of supply staked" figure is the project's own launch allocation.
+3. **The builder took a launch allocation and locked almost all of it.** 126.1M BRTC (12.6% of supply) arrived at launch; 122.1M went into the vault (locked until at most 2026-12-07) and 4M into a reward pool. That is a reasonable look for a solo launch, and it unlocks in December.
+4. **The treasury is being targeted by address poisoning.** 17 outgoing rows are fake tokens whose names imitate "USDC" with lookalike Unicode letters (for example `U S D C` built from Lisu and Cyrillic characters), "sent" in amounts like 15,400 and 400. These are spam made to appear in the treasury's history so that someone copies a lookalike address. They are not real outflows. Anyone at The ZAO who reads this wallet's history should copy addresses only from the contract constants in this doc.
+5. **It is in use today.** The most recent row is a Buddy mint at 18:01 UTC on 2026-10-08, sent from `bettercallzaal.base.eth`.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -264,6 +289,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FAILED - EAS GraphQL https://base.easscan.org/graphql] blocked locally by the secrets guard (64-hex id); [FAILED - eth_getLogs over 900k blocks] refused by publicnode, archive token required
 - [FULL - curl + HTML strip] O1Staking and IO1Staking source: https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4
 - [FULL - cast call, Base RPC] getVault(VAULT_ID) and feeConfig() on the o1 staking contract, 2026-10-08
+- [FULL - curl + HTML strip] Treasury token transfers, 212 rows: https://basescan.org/tokentxns?a=0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce (pages 1-3, ps=100)
+- [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

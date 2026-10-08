@@ -389,6 +389,40 @@ The largest single plain wallet holds 4.84%. The ten largest plain wallets toget
 
 **Overlap with ZAO members: not measured.** Answering it needs the ZAO member wallet list, which lives in our Supabase allowlist. Matching a third-party holder list against it would produce a per-person result that does not belong in a public research doc (`pii-hygiene.md`). If Zaal wants the number, it should be computed privately and only the count reported.
 
+### 2026-10-08, tick 12: security headers, read from the outside
+
+Source: response headers from one `GET` each to `baserooms.io/`, `/api/gas`, `/mcp`, `/agent.md`, the Worker's `/hook/inbox`, `im.baserooms.io/health` and `meet.baserooms.io/`. This was a header read, not a scan, and no request was repeated to probe limits.
+
+**The main site is well configured.** Every `baserooms.io` response carries:
+
+- `strict-transport-security: max-age=31536000; includeSubDomains`
+- `x-content-type-options: nosniff`
+- `referrer-policy: strict-origin-when-cross-origin`
+- a `permissions-policy` that grants camera, microphone and screen capture only to itself and `meet.baserooms.io`
+- a full Content-Security-Policy with `object-src 'none'`, `base-uri 'self'`, `form-action 'self'` and a `report-uri`
+
+`frame-ancestors https://farcaster.xyz https://*.farcaster.xyz` means it is built to run as a Farcaster mini app and cannot be framed anywhere else.
+
+**Where it is loose, and why.**
+
+- `script-src` includes `'unsafe-inline'`. That is common with Next.js, and it weakens the CSP as a defence against injected scripts.
+- `connect-src 'self' https: wss:` lets the page talk to any HTTPS or WSS host. That fits a DeFi front end calling many APIs, and it means a CSP would not stop data leaving if a script were ever injected.
+- `img-src` and `media-src` allow any `https:` source. That is needed for token icons and the radio streams.
+
+**The other hosts.**
+
+| Host | What the headers show |
+|---|---|
+| Worker `/hook/inbox` without a key | `401 {"error":"unknown or revoked key"}`, with no security headers (a JSON API, so that is expected) |
+| `im.baserooms.io/health` | 200, no security headers |
+| `meet.baserooms.io` | HSTS for 2 years; `frame-ancestors https://baserooms.io https://www.baserooms.io http://localhost:3000 http://localhost:3100` |
+
+The two `localhost` entries on the Jitsi host are development leftovers. They let any page served on those local ports frame the video room. It is low risk, because only someone running a page on their own machine benefits, and it is worth a one-line mention to Slava if Zaal contacts him.
+
+**Rate limits.** None of the responses carried `RateLimit-*` or `Retry-After` headers. That does not mean there are no limits; Vercel and Cloudflare can throttle silently. It was not tested, deliberately, because testing limits means hammering their API.
+
+**What this means.** It confirms the review's tone: this is a careful solo build. The open items are the ones already named. No new risk changes a Key Decision.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -449,6 +483,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl + HTML strip] UnitRenderer verified source (9 files, MIT): https://basescan.org/address/0xad2343637ef688b6cc3a106092a941ffcb5834ac ; pet page rebuilt from the SSTORE2 hex parts in UnitPet.sol
 - [FULL - urllib GET] BRTC top-50 holders with kind labels: https://baserooms.io/api/holders?ca=0xB200000000000000000000856A95738C92fEed01
 - [FULL - curl + HTML strip] Buddies token page (supply 266, holders 60): https://basescan.org/token/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b
+- [FULL - curl -D] Response headers of baserooms.io (/, /api/gas, /mcp, /agent.md), the Worker /hook/inbox, im.baserooms.io/health and meet.baserooms.io, one request each
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

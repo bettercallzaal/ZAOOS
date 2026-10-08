@@ -191,6 +191,8 @@ Lighthouse 12.8.2 (`npx`), mobile form factor, headless Chrome, against `python3
 
 Flags that come from the local test server, not the site: no text compression, short cache TTL, and a trailing-slash redirect on `/afterparty` (Python's server adds it; Vercel with `cleanUrls` does not). Lighthouse could not score the 404 page locally because the Python server does not serve `404.html`; the live 404 was checked by curl on 2026-10-07 (Finding 5).
 
+**Vantage rule (added 2026-10-08):** check public reachability from an outside vantage (the VPS) before calling a site down. On 2026-10-08 this lane reported northcreek.art down because HTTPS reset with SNI northcreek.art from this Mac's network. From the VPS at about 08:15 EDT (measured by the orchestrator) the site returned 200, with the Vercel domain attached and certs valid. Controls run from the same Mac against other hostnames did not rule out a local filter.
+
 Not covered by Lighthouse. Zoom figures are computed from the `clamp()` values in `site/style.css`, not measured in a zoomed browser:
 - Zoom: body text at 200% browser zoom on a 1280px window renders at about 1.9x its unzoomed size, because the fluid step shrinks as the CSS viewport narrows; at 300% it passes 2x. The h1 grows about 1.5x at 200%, which Roselli's guidance accepts for decorative display type with a rem minimum.
 - Target size: nav links are about 29px tall, above the 24px WCAG 2.5.8 minimum.

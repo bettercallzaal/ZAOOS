@@ -65,8 +65,9 @@ Three more things from the same docs:
 
 `/api/v1/models` returns 468 models. 20 of them are free:
 
-- 18 `:free` IDs;
+- 16 `:free` IDs;
 - `openrouter/free`;
+- `inclusionai/ling-3.1-flash`, zero-priced without a `:free` suffix;
 - 2 zero-priced Lyria previews, which are not text.
 
 The usable large-context ones, all with tool calling, are:
@@ -122,5 +123,5 @@ The default is the most expensive row in the table, and it is the first rung ZOE
 - [OpenRouter data collection](https://openrouter.ai/docs/guides/privacy/data-collection.md) and [provider logging](https://openrouter.ai/docs/guides/privacy/logging.md) [FULL - raw markdown]
 - [OpenRouter models catalogue](https://openrouter.ai/api/v1/models) [FULL - JSON API, 468 models, 2026-10-08]
 - [Claude Platform release notes](https://platform.claude.com/docs/en/release-notes/overview) [FULL - Haiku 5.5 pricing and launch, 2026-10-07]
-- Community: [HN, "Dots: Always-on agents"](https://news.ycombinator.com/item?id=49896604). The top comment complains that subscription limits get cut once users switch over, which argues for using credits while they are offered. [FULL - Algolia items API]
+- Community: [HN, "Dots: Always-on agents"](https://news.ycombinator.com/item?id=49896604). One comment (the reply-count leader among the top-level threads, not the top comment) complains that subscription limits get cut once users switch over, which argues for using credits while they are offered. [FULL - Algolia items API]
 - In-repo: `bot/src/zoe/models/router.ts` (the cap-fallback ladder, default `deepseek/deepseek-chat`), `zao-openrouter-preflight --from-hermes` output, `launchctl list` [FULL]

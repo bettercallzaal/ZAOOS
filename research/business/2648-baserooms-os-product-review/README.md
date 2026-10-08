@@ -460,6 +460,28 @@ Source: `GET` of `/privacy`, `/terms`, `/tos` and `/legal` on baserooms.io (each
 1. **No agreement exists between a user and Base Rooms.** Anything The ZAO does with it (a partnership, a station, an embed) rests on goodwill, not on terms anyone can point to. That is normal for a solo crypto project and it matters if money or member data is ever involved.
 2. **Before any formal partnership**, the questions to raise are who the contracting party is, and what happens to stored messages and Farcaster notification tokens (tick 8) if the service closes. This belongs in the same gated outreach as Key Decision 4. It is not a reason to stop using Rooms for calls.
 
+### 2026-10-08, tick 15: the two outside venues, Veranta perps and Limitless predictions
+
+Source: the Veranta and Limitless code paths in the site bundle; Basescan pages for the three Veranta addresses; EIP-1967 admin and implementation slots, the admin's `owner()`, and that owner's `getThreshold()` / `getOwners()` / `VERSION()` via `cast` on the Base RPC.
+
+**Veranta (perps).** Base Rooms' Perps window trades on Veranta (`https://www.veranta.xyz/trade`), with USDC collateral on Base. Its market list maps names like GOLD, SILVER, OIL, NASDAQ and S&P to `XAU`, `XAG`, `WTI`/`BRENT`, `US100` and `US500`, so this is leveraged exposure to commodities and indexes as well as crypto. The site hard-codes three Veranta addresses:
+
+| Role in the code | Address | What it is onchain |
+|---|---|---|
+| `router` ("Veranta trading router") | `0x4491...1d4e` | `TransparentUpgradeableProxy` |
+| `storage` ("Veranta trading", deposits) | `0x8a31...422d` | `TransparentUpgradeableProxy` |
+| `builderCode` ("Veranta builder fees") | `0xeDA8...9975` | `TransparentUpgradeableProxy` |
+
+All three share one proxy admin (`0x2d89...e8bb`), whose `owner()` is `0x3775...0288`, a **Safe 1.3.0 multisig with a threshold of 3 of 5 owners**.
+
+**This is the opposite trust model to Base Rooms' own contracts.** Base Rooms' contracts are not upgradeable and sit behind one key. Veranta's can be upgraded at any time, behind a 3-of-5 multisig. A user who opens a perp through Base Rooms is trusting Veranta's multisig with their USDC collateral, not Slava. The 0.05% builder fee (section 4) is how Base Rooms earns from it.
+
+**One protective detail.** The bundle checks token approvals against a list of known spenders. For Veranta, an approval is accepted only if the spender is the `storage` or `builderCode` address; anything else is flagged "unexpected spender". That matches the Disclosures line "every routed transaction and signature is checked against known contracts".
+
+**Limitless (predictions).** Markets are shown in an iframe from `https://embed.limitless.exchange/e/v1/market/<id>?...&via=<ref>`, sandboxed with `allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms`. Trades settle in USDC on Base from the user's own wallet. The app's own copy: "Base Rooms OS earns a share of Limitless's fee through its referral, at no extra cost to you." There is also an odds-alert feature tied to Limitless markets.
+
+**What this means for The ZAO.** Neither venue belongs anywhere near a ZAO treasury, and nothing here changes the Key Decisions. If a member asks whether "perps on Base Rooms" is safe, the honest answer is: Base Rooms only routes the trade and takes 0.05%. The custody and the upgrade risk sit with Veranta's 3-of-5 Safe.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -523,6 +545,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl -D] Response headers of baserooms.io (/, /api/gas, /mcp, /agent.md), the Worker /hook/inbox, im.baserooms.io/health and meet.baserooms.io, one request each
 - [FULL - curl + HTML strip] o1 docs: https://docs.o1.exchange/launchpad/how-it-works , https://docs.o1.exchange/launchpad/create/stock-paired-launches , https://docs.o1.exchange/launchpad/staking/overview
 - [FULL - curl] /privacy, /terms, /tos, /legal on baserooms.io (all 404); bundle search across 185 chunks for terms, privacy and jurisdiction strings
+- [FULL - curl + HTML strip] Basescan pages for Veranta router, storage and builderCode (all TransparentUpgradeableProxy)
+- [FULL - cast, Base RPC] EIP-1967 admin and implementation slots of the three Veranta proxies; admin owner is a Safe 1.3.0, threshold 3, 5 owners
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

@@ -175,3 +175,32 @@ describe('crash guard feeds the crash before it exits', () => {
     expect(Date.now() - t0).toBeLessThan(2000);
   });
 });
+
+// Follow-ups from dreamnet-54's review of #3802.
+describe('(A) UUID-format keys and short bearer tokens are redacted', () => {
+  // Built at runtime: none of these is a real credential.
+  const uuidKey = ['8f3c2a1e', '4b6d', '4e2f', '9a1b', '0c3d5e7f9a2b'].join('-');
+  const shortBearer = 'Bearer ' + 'abc' + '12345';
+  it.each([
+    ['a UUID-format API key', `neynar 401 with key ${uuidKey}`, uuidKey],
+    ['a short bearer token', `request failed: Authorization: ${shortBearer}`, 'abc12345'],
+    ['a token query parameter', 'GET https://api.example/x?token=' + 'q1w2e3' + '&page=2', 'q1w2e3'],
+    ['an api_key query parameter', 'GET https://api.example/x?api_key=' + 'z9y8x7' + '&page=2', 'z9y8x7'],
+  ])('%s', (_name, input, secret) => {
+    const out = redactForErrorRow(input);
+    expect(out).not.toContain(secret);
+    expect(out).toContain('[REDACTED]');
+  });
+  it('file paths still survive', () => {
+    expect(redactForErrorRow('at handler (~/zao-bot-live/bot/src/zoe/index.ts:10:5)')).toContain('~/zao-bot-live/bot/src/zoe/index.ts');
+  });
+});
+
+describe('(C) a value that cannot be turned into a string never throws out of reportOwnError', () => {
+  it('a null-prototype object', async () => {
+    process.env.ZOE_OWN_ERRORS_FEED = '1';
+    const weird = Object.create(null) as object;
+    const { store } = fakeStore();
+    await expect(reportOwnError(weird, 'x', { store })).resolves.toBe('failed');
+  });
+});

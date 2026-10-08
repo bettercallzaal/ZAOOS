@@ -16,6 +16,8 @@ process.env.BUS_ADMIN_TOKEN = 'admin-token-test';
 process.env.BUS_GUEST_TOKEN = 'guest-token-test';
 process.env.BUS_GUEST_AGENT = 'zoe';
 process.env.BUS_GUEST_TOKEN_JIM = 'jim-token-test';
+process.env.BUS_AGENT_TOKEN_ZOL = 'zol-token-test';
+process.env.BUS_AGENT_TOKEN_HERMES = 'hermes-token-test';
 
 const { createBus, resolveAuth, sanitizeFilename } = require('./bus.js');
 
@@ -152,4 +154,114 @@ test('admin can delete a file; partner cannot delete others files', async () => 
   assert.strictEqual(deny.status, 403);
   const ok = await req('DELETE', '/bus/files/internal.md', { token: 'admin-token-test' });
   assert.strictEqual(ok.status, 200);
+});
+
+// ---- doc 2638 extensions: internal agents, threads, hop cap, rate, receipts, audit
+
+test('internal agent: from forced, may reach zoe and coordinator, never a partner', async () => {
+  assert.deepStrictEqual(resolveAuth('Bearer zol-token-test'), { role: 'agent', agent: 'zol' });
+  const ok = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'zoe', body: 'zol to zoe', from: 'coordinator' } });
+  assert.strictEqual(ok.status, 200);
+  const { id } = await ok.json();
+  const all = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+  assert.strictEqual(all.messages.find((m) => m.id === id).from, 'zol', 'spoofed from ignored');
+  const toPartner = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'jim', body: 'straight to a partner' } });
+  assert.strictEqual(toPartner.status, 403);
+  const toUnknown = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'stranger', body: 'who' } });
+  assert.strictEqual(toUnknown.status, 403);
+});
+
+test('internal agent reads its own thread only', async () => {
+  const list = await (await req('GET', '/bus/messages', { token: 'zol-token-test' })).json();
+  assert.ok(list.messages.length > 0);
+  for (const m of list.messages) assert.ok(m.to === 'zol' || m.from === 'zol', `leaked: ${m.from}->${m.to}`);
+});
+
+test('base wire object stays exact when no extension is used', async () => {
+  const r = await req('POST', '/bus/send', { token: 'hermes-token-test', body: { to: 'coordinator', body: 'plain hermes note' } });
+  const { id } = await r.json();
+  const list = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+  const msg = list.messages.find((m) => m.id === id);
+  assert.deepStrictEqual(Object.keys(msg).sort(), ['body', 'created', 'from', 'id', 'status', 'subject', 'to']);
+});
+
+test('loop brake: two agents answering each other stop at the hop cap', async () => {
+  process.env.BUS_MAX_HOPS = '4';
+  try {
+    const first = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'hermes', body: 'loop start' } });
+    let last = (await first.json()).id;
+    const tokens = ['hermes-token-test', 'zol-token-test'];
+    const targets = ['zol', 'hermes'];
+    let refusedAt = null;
+    for (let i = 0; i < 10; i++) {
+      const r = await req('POST', '/bus/send', { token: tokens[i % 2], body: { to: targets[i % 2], body: `loop reply ${i}`, reply_to: last } });
+      if (r.status === 409) { refusedAt = i + 1; break; }
+      assert.strictEqual(r.status, 200);
+      last = (await r.json()).id;
+    }
+    assert.strictEqual(refusedAt, 5, 'replies 1-4 pass, the 5th is refused');
+    const list = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+    const chain = list.messages.filter((m) => m.body.startsWith('loop'));
+    assert.ok(chain.every((m) => m.thread === chain[0].id || m.id === chain[0].id), 'one thread');
+    assert.strictEqual(Math.max(...chain.map((m) => m.hops || 0)), 4);
+  } finally { delete process.env.BUS_MAX_HOPS; }
+});
+
+test('reply_to outside your thread is refused', async () => {
+  const r = await req('POST', '/bus/send', { token: 'guest-token-test', body: { to: 'coordinator', body: 'zoe private to coordinator' } });
+  const { id } = await r.json();
+  const bad = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'hijack', reply_to: id } });
+  assert.strictEqual(bad.status, 403);
+});
+
+test('idempotency key: a retry returns the first id and stores one message', async () => {
+  const send = () => req('POST', '/bus/send', { token: 'hermes-token-test', body: { to: 'zoe', body: `retry body ${Math.random()}`, idempotency_key: 'k-123' } });
+  const a = await (await send()).json();
+  const b = await (await send()).json();
+  assert.strictEqual(b.id, a.id);
+  assert.strictEqual(b.duplicate, true);
+  const all = JSON.parse(fs.readFileSync(path.join(TMP, 'messages.json'), 'utf8'));
+  assert.strictEqual(all.filter((m) => m.idempotency_key === 'k-123').length, 1);
+});
+
+test('the same from/to/body inside a minute is stored once', async () => {
+  const a = await (await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'echo echo' } })).json();
+  const b = await (await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'echo echo' } })).json();
+  assert.strictEqual(b.id, a.id);
+  assert.strictEqual(b.duplicate, true);
+});
+
+test('rate limit: over the per-minute cap returns 429', async () => {
+  process.env.BUS_RATE_PER_MIN = '3';
+  process.env.BUS_AGENT_TOKEN_RATEY = 'ratey-token-test';
+  try {
+    const codes = [];
+    for (let i = 0; i < 5; i++) {
+      codes.push((await req('POST', '/bus/send', { token: 'ratey-token-test', body: { to: 'coordinator', body: `burst ${i}` } })).status);
+    }
+    assert.deepStrictEqual(codes, [200, 200, 200, 429, 429]);
+  } finally { delete process.env.BUS_RATE_PER_MIN; delete process.env.BUS_AGENT_TOKEN_RATEY; }
+});
+
+test('receipts: delivered when the recipient lists it, read when it PATCHes', async () => {
+  const { id } = await (await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'hermes', body: 'receipt me' } })).json();
+  let r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'zol-token-test' })).json();
+  assert.deepStrictEqual([r.delivered_at, r.read_at], [null, null]);
+  await req('GET', '/bus/messages?status=new', { token: 'hermes-token-test' });
+  r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'zol-token-test' })).json();
+  assert.ok(r.delivered_at && !r.read_at, 'delivered, not read');
+  await req('PATCH', `/bus/messages/${id}`, { token: 'hermes-token-test', body: { status: 'read' } });
+  r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'zol-token-test' })).json();
+  assert.ok(r.read_at, 'read');
+  const outsider = await req('GET', `/bus/messages/${id}/receipt`, { token: 'jim-token-test' });
+  assert.strictEqual(outsider.status, 403);
+});
+
+test('audit log records events without message bodies; no temp files left behind', async () => {
+  await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'SECRET-BODY-MARKER' } });
+  const log = fs.readFileSync(path.join(TMP, 'audit.log'), 'utf8');
+  assert.match(log, /"event":"send"/);
+  assert.match(log, /"event":"refused_hops"/);
+  assert.ok(!log.includes('SECRET-BODY-MARKER'), 'bodies never logged');
+  assert.deepStrictEqual(fs.readdirSync(TMP).filter((f) => f.endsWith('.tmp')), []);
 });

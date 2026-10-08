@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: research-complete
-last-validated: 2026-10-07
+last-validated: 2026-10-08
 superseded-by:
 related-docs: 2635, 2629
 original-query: "DJ Aquavantes is differetn than Oven Baked Beats add diff lines we also gotta relly research website design and go all night on research then spend the rest of the time building it and improving its abiltiyes"
@@ -14,6 +14,8 @@ tier: DISPATCH
 > **Goal:** Decide the visual design system and the next abilities for northcreek.art (repo bettercallzaal/north-creek, `site/`), a static two-page band site with almost no band-supplied content. Doc 2635 already covered the feature checklist and the members record; this doc is the design and build layer on top of it.
 
 **Read this first.** Four research agents ran in parallel on 2026-10-07 (exemplar sites, type/color/layout, static abilities, community sentiment). No agent could render a page: the Playwright bridge timed out, so every exemplar-site claim comes from markup, not pixels. Fonts were identified from raw HTML; where none appeared the font is UNKNOWN. Hex colors of exemplar sites are UNKNOWN throughout.
+
+**Follow-through, 2026-10-08 05:22 EDT:** the rendering gap is now partly closed. Headless Chrome (the Chrome app on this Mac, `--headless=new`, 1280x900, 8 second virtual time budget) rendered 14 exemplar homepages on 2026-10-08; see Finding 7. The redesign built from this doc (north-creek PR #9) was audited with Lighthouse 12.8.2; see Finding 8.
 
 ## Key Decisions
 
@@ -155,6 +157,45 @@ Draft security headers (NOT in any PR; held for Zaal per Decision 8):
 
 Inline JSON-LD is a data block, not executed script, so `script-src 'self'` does not block it. `site/` has no inline `style=` attributes (grep, 2026-10-07), so `style-src 'self'` holds.
 
+### 7. Exemplar sites, rendered (2026-10-08)
+
+Screenshots of the first 1280x900 viewport, headless Chrome, 2026-10-08 around 05:20 EDT. One viewport per site; nothing below the fold was scrolled.
+
+| Site | What the first screen shows | Note for North Creek |
+|---|---|---|
+| gregoryalanisakov.com | Cream paper ground, small serif title, a collage of vintage photos whose pieces are the nav (lyrics, tour, music, contact) | Cream paper plus serif reads as folk; the same ground as #9's light mode |
+| bigthief.net | Full-bleed band photo, hand-drawn logo top right, hamburger menu only | Needs a band photo; none exists |
+| waxahatchee.com | Full-bleed photo, thin wide wordmark over it, two buttons (purchase, stream), cookie banner | Photo-led |
+| mjlenderman.com | Full-bleed photo with a subscribe modal over it on first load, plus a cookie banner | Anti-pattern: a modal before the visitor sees anything |
+| thebeths.com | Dark ground, hand-made illustrated logo and album title, two buttons, a row of illustrated icons | Illustration carries the page without photos |
+| alcestmusic.com | Black screen, tiny "Alcest" loader; nothing else rendered in 8 seconds | FAILED render: a loader gate hides the site from a quick visit |
+| sierrahull.com | Script logo, full-bleed portrait, two-row nav | Photo-led |
+| paulkalkbrenner.net | White page, giant black grotesque wordmark, tiny nav, "Now playing" and "Sound OFF" at the foot | The one type-only hero in the set; closest to #9's approach |
+| sylvanesso.com | Cream ground, orange blob shapes, black outline illustration, "out now" headline | Cream, orange-red and black: the same family as the flyer palette in #9 |
+| arresteddevelopmentmusic.com | Live photo grid, consent dialog covering half the screen | Consent dialogs are the norm on label sites; North Creek has no tracking, so needs none |
+| inherited.band | Near-black red photo, nav text barely visible | Anti-pattern: very low contrast |
+| thetwangbangers.com | Logo on black left, AI-style render right, small nav | Closest scale to North Creek |
+| wilcoworld.com | A domain-for-sale parking page | Lapsed or moved domain observed 2026-10-08; whether Wilco moved elsewhere was not checked |
+| fleetfoxes.com | Muted sea photo, plain serif nav, "There are no upcoming events." and a "Follow Fleet Foxes" button | A famous band shows the empty state honestly and pairs it with one follow action. That is Decision 9's pattern |
+
+What changed versus the markup-only read in Finding 2: 11 of the 14 first screens are photo-led or illustration-led; the 3 that are not are paulkalkbrenner.net (type only), the alcestmusic.com loader and the wilcoworld.com parking page. Type-only heroes are rare. North Creek has no photos on record, so a type-led page (#9) is the honest choice now, and a band photo is the highest-value asset to ask for. Two of the 14 (fleetfoxes.com, wilcoworld.com) confirm the empty-state and lapsed-domain findings visually.
+
+### 8. Audit of the redesign, north-creek PR #9 (2026-10-08)
+
+Lighthouse 12.8.2 (`npx`), mobile form factor, headless Chrome, against `python3 -m http.server` serving `site/` at PR #9 head aa96d7e.
+
+| Page | Performance | Accessibility | Best practices | SEO | LCP | CLS | Weight |
+|---|---|---|---|---|---|---|---|
+| `/` | 100 | 100 | 100 | 100 | 1.1 s | 0 | 22 KiB |
+| `/afterparty` | 100 | 100 | 100 | 100 | 1.2 s | 0 | 102 KiB |
+
+Flags that come from the local test server, not the site: no text compression, short cache TTL, and a trailing-slash redirect on `/afterparty` (Python's server adds it; Vercel with `cleanUrls` does not). Lighthouse could not score the 404 page locally because the Python server does not serve `404.html`; the live 404 was checked by curl on 2026-10-07 (Finding 5).
+
+Not covered by Lighthouse. Zoom figures are computed from the `clamp()` values in `site/style.css`, not measured in a zoomed browser:
+- Zoom: body text at 200% browser zoom on a 1280px window renders at about 1.9x its unzoomed size, because the fluid step shrinks as the CSS viewport narrows; at 300% it passes 2x. The h1 grows about 1.5x at 200%, which Roselli's guidance accepts for decorative display type with a rem minimum.
+- Target size: nav links are about 29px tall, above the 24px WCAG 2.5.8 minimum.
+- Font fallback: the metric override targets Impact, which macOS and Windows ship; Android does not, so Android falls back to sans-serif without the override. Lighthouse emulated mobile on macOS, so CLS 0 does not prove Android. UNKNOWN until checked on an Android device.
+
 ### 6. Build order
 
 1. PR #8: 404, sitemap, robots (open).
@@ -178,7 +219,9 @@ Inline JSON-LD is a data block, not executed script, so `script-src 'self'` does
 | Rule whether `vercel.json` headers count as "stuff with vercel" | Zaal | Decision | Open |
 | Confirm the flyer-derived palette, or name band colors | Zaal or the band | Decision | Before the design PR merges |
 | Ask the band for contact, one live video, music links, bio, photos | Zaal via eties | Ask | Open since doc 2635 |
-| After each merge, view a bad URL to confirm the 404 page is served | anyone, viewing only | Check | After #8 deploys |
+| After each merge, view a bad URL to confirm the 404 page is served | anyone, viewing only | Check | DONE 2026-10-07 21:26 EDT: 404 with the custom page |
+| Ask the band for one photo before any other asset (Finding 7) | Zaal via eties | Ask | Open |
+| Check #9 on an Android phone for font-swap layout shift (Finding 8) | anyone with Android | Check | Before #9 merges |
 
 ## Sources
 

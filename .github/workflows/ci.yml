@@ -110,6 +110,22 @@ jobs:
       - name: Estate control plane tests (own vitest config, node env)
         run: npx vitest run --config tools/estate-control-plane/vitest.config.ts
 
+  bus-test:
+    # infra/bus (the agent bus, doc 2638) uses node --test, not vitest, so no
+    # other job ever ran it: 0 of 8 workflows touched infra/bus before this
+    # (dreamnet review of #3806). Node 20 on purpose: it is what the VPS runs.
+    name: Bus Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bus tests (node --test, no dependencies)
+        run: node --test infra/bus/*.test.js
+
   bot-test:
     name: Bot Tests
     runs-on: ubuntu-latest

@@ -140,3 +140,55 @@ describe('flag', () => {
     delete process.env.ZOE_GRILL_TERMINALS;
   });
 });
+
+// dreamnet-54's review of #3807: the force-reply check ran
+// AFTER the batch-answer branch in message:text, which matches "<word>: ..." and
+// returns, so "A: Ryan Miller" was logged as a batch answer and never reached the
+// seat. first-handler-wins.md: the specific route goes first. Verbatim replies:
+describe('a typed reply to the Type-an-answer prompt is captured, verbatim, before any other route', () => {
+  const pageW2 = { ...page, waiting: [{ id: 'W2', item: 'Which Ryan leads design: A Ryan Miller (OPEN X) / B someone else (name)' }] };
+  it.each(['A: Ryan Miller', 'yes: un-draft it', '1: yes'])('"%s"', async (reply) => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const { captureTerminalTypedReply, setPendingType, readTerminalGrillState } = await import('../terminal-grill');
+    await setPendingType(4242, 'W2', pageW2.stamp);
+    const r = await captureTerminalTypedReply({ replyToId: 4242, text: reply, readPage: async () => pageW2 });
+    expect(r).toEqual({ handled: true, id: 'W2', outcome: 'recorded' });
+    const row = JSON.parse((await fs.readFile(join(dir, 'terminal-answers.jsonl'), 'utf8')).trim());
+    expect(row).toMatchObject({ id: 'W2', choice: 'typed', answer: reply });
+    expect((await readTerminalGrillState()).pendingType).toBeNull();
+    delete process.env.ZOE_GRILL_TERMINALS;
+  });
+
+  it('a reply to any other message is left for the other routes', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const { captureTerminalTypedReply, setPendingType } = await import('../terminal-grill');
+    await setPendingType(4242, 'W2', pageW2.stamp);
+    expect(await captureTerminalTypedReply({ replyToId: 999, text: 'A: Ryan Miller', readPage: async () => pageW2 })).toEqual({ handled: false });
+    expect(await captureTerminalTypedReply({ replyToId: undefined, text: 'A: Ryan Miller', readPage: async () => pageW2 })).toEqual({ handled: false });
+    delete process.env.ZOE_GRILL_TERMINALS;
+  });
+
+  it('flag off: never handled', async () => {
+    const { captureTerminalTypedReply, setPendingType } = await import('../terminal-grill');
+    await setPendingType(4242, 'W2', pageW2.stamp);
+    expect(await captureTerminalTypedReply({ replyToId: 4242, text: 'A: Ryan Miller', readPage: async () => pageW2 })).toEqual({ handled: false });
+  });
+});
+
+describe('routing order in index.ts source (read as text, never imported - agent-loops rule 21)', () => {
+  it('the terminal typed-reply capture runs before the bar-label and batch-answer branches', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { fileURLToPath } = await import('node:url');
+    const src = readFileSync(fileURLToPath(new URL('../index.ts', import.meta.url)), 'utf8');
+    const handler = src.indexOf("bot.on('message:text'");
+    const capture = src.indexOf('captureTerminalTypedReply(', handler);
+    const bar = src.indexOf('isBarLabel(text)', handler);
+    const batch = src.indexOf('from batch', handler);
+    expect(handler).toBeGreaterThan(-1);
+    expect(capture).toBeGreaterThan(handler);
+    expect(bar).toBeGreaterThan(-1);
+    expect(batch).toBeGreaterThan(-1);
+    expect(capture).toBeLessThan(bar);
+    expect(capture).toBeLessThan(batch);
+  });
+});

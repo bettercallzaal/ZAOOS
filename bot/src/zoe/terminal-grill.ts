@@ -164,3 +164,25 @@ export async function recordTerminalAnswer(opts: {
   await writeState(s);
   return 'recorded';
 }
+
+/**
+ * A reply to the "Type an answer" prompt, recorded verbatim. Called FIRST in the
+ * DM text handler, above the bar-label and batch-answer branches: those match
+ * "<word>: ..." and return, so "A: Ryan Miller" was swallowed as a batch answer
+ * and never reached the seat (dreamnet-54 on #3807; first-handler-wins.md).
+ * Returns handled:false for any reply that is not to the pending prompt, so the
+ * other routes see it exactly as before.
+ */
+export async function captureTerminalTypedReply(opts: {
+  replyToId: number | undefined;
+  text: string;
+  readPage: () => Promise<TerminalsPage>;
+}): Promise<{ handled: false } | { handled: true; id: string; outcome: RecordOutcome }> {
+  if (!terminalGrillEnabled() || opts.replyToId === undefined) return { handled: false };
+  const s = await readTerminalGrillState();
+  const p = s.pendingType;
+  if (!p || p.messageId !== opts.replyToId) return { handled: false };
+  const page = await opts.readPage();
+  const outcome = await recordTerminalAnswer({ page, id: p.id, choice: 'typed', text: opts.text, tapStampKey: p.stampKey });
+  return { handled: true, id: p.id, outcome };
+}

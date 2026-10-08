@@ -36,7 +36,7 @@ import {
 } from './grill';
 import { featureRan } from './feature-ran';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
-import { formatTerminalCard, nextTerminalItem, readTerminalGrillState, recordTerminalAnswer, setPendingType, terminalGrillEnabled } from './terminal-grill';
+import { captureTerminalTypedReply, formatTerminalCard, nextTerminalItem, readTerminalGrillState, recordTerminalAnswer, setPendingType, terminalGrillEnabled } from './terminal-grill';
 import { isGrillPaused } from './grill-pause';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
@@ -1851,6 +1851,38 @@ bot.on('message:text', async (ctx) => {
   const text = ctx.message.text;
   if (text.startsWith('/')) return; // commands handled above
 
+  // FIRST: a typed answer to a terminal grill item (terminal-grill.ts). The
+  // bar-label and batch-answer branches below match "<word>: ..." and return,
+  // so "A: Ryan Miller" was logged as a batch answer and never reached the seat
+  // (dreamnet-54 on #3807). The most specific route goes first
+  // (first-handler-wins.md); every other message falls through untouched.
+  if (ctx.chat.type === 'private' && isFromZaal(ctx)) {
+    try {
+      const tg = await captureTerminalTypedReply({
+        replyToId: ctx.message.reply_to_message?.message_id,
+        text,
+        readPage: async () => parseTerminalsPage((await readTerminalsPage(terminalsVaultDir())).text),
+      });
+      if (tg.handled) {
+        await ctx.reply(
+          tg.outcome === 'recorded' ? `${tg.id}: sent to the seat, word for word.`
+          : tg.outcome === 'already-answered' ? `${tg.id} was already answered for this page; this reply was not sent.`
+          : tg.outcome === 'stale' ? 'The seat page changed since that card; this reply was not sent. /grill shows the current item.'
+          : `${tg.id} is not on the seat page any more; this reply was not sent.`,
+        );
+        if (tg.outcome === 'recorded') {
+          featureRan('terminal-grill', 'typed');
+          await advanceAfterTerminalAnswer();
+        }
+        return;
+      }
+    } catch (e) {
+      console.error('[zoe/terminal-grill] typed answer failed:', (e as Error)?.message);
+      await ctx.reply('Could not record that reply - nothing was sent to the seat.').catch(() => {});
+      return;
+    }
+  }
+
   // Cockpit button-bar taps arrive as plain text (a reply keyboard sends the
   // label). Intercept them BEFORE the concierge treats them as conversation,
   // and route each to its existing action. Zaal-only + private chat.
@@ -1920,31 +1952,6 @@ bot.on('message:text', async (ctx) => {
   // handle either the legacy "what should I reply?" flow or the new draft-approval flow.
   if (chatType === 'private' && isFromZaal(ctx) && ctx.message.reply_to_message?.message_id) {
     const replyToId = ctx.message.reply_to_message.message_id;
-    // A typed answer to a terminal grill item (terminal-grill.ts): his words, as
-    // written, to the seat. Checked first because it is the most specific reply.
-    if (terminalGrillEnabled()) {
-      const tg = await readTerminalGrillState().catch(() => null);
-      if (tg?.pendingType && tg.pendingType.messageId === replyToId) {
-        try {
-          const page = parseTerminalsPage((await readTerminalsPage(terminalsVaultDir())).text);
-          const r = await recordTerminalAnswer({ page, id: tg.pendingType.id, choice: 'typed', text, tapStampKey: tg.pendingType.stampKey });
-          await ctx.reply(
-            r === 'recorded' ? `${tg.pendingType.id}: sent to the seat, word for word.`
-            : r === 'already-answered' ? `${tg.pendingType.id} was already answered for this page; this reply was not sent.`
-            : r === 'stale' ? 'The seat page changed since that card; this reply was not sent. /grill shows the current item.'
-            : `${tg.pendingType.id} is not on the seat page any more; this reply was not sent.`,
-          );
-          if (r === 'recorded') {
-            featureRan('terminal-grill', 'typed');
-            await advanceAfterTerminalAnswer();
-          }
-        } catch (e) {
-          console.error('[zoe/terminal-grill] typed answer failed:', (e as Error)?.message);
-          await ctx.reply('Could not record that reply - nothing was sent to the seat.').catch(() => {});
-        }
-        return;
-      }
-    }
     try {
       // Resolve-by-reply: if Zaal replied to the pinned OPEN grill question, his
       // text is the resolution. Record it, move the source task off the board's

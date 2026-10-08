@@ -17,6 +17,7 @@ import type { CockpitTask } from '../cockpit/types';
 import { VERDICTS, type VerdictKey, verdictButtons } from './backlog-grill';
 import { refreshVault, vaultFreshnessLine, type VaultFreshness } from './vault-freshness';
 import { wasSendBlocked } from './send-budget';
+import { RESUME_ROW, isGrillPaused } from './grill-pause';
 
 export interface LaneGrillItem {
   lane: string;
@@ -244,6 +245,8 @@ export function formatNeedsZaalDigest(opts: {
   dueSoon: NeedsZaalTask[];
   laneAsks: LaneGrillItem[];
   decisions: NeedsZaalTask[];
+  /** Zaal tapped Stop grill: questions are counted, not shown, and no cards follow. */
+  grillPaused?: boolean;
 }): string {
   const slotLabel = opts.timeSlot === 'morning' ? '08:00 ET (Morning)' : '20:00 ET (Evening)';
   const total = opts.dueSoon.length + opts.laneAsks.length + opts.decisions.length;
@@ -268,6 +271,12 @@ export function formatNeedsZaalDigest(opts: {
       }
     }
     lines.push('');
+  }
+
+  if (opts.grillPaused) {
+    const held = opts.laneAsks.length + opts.decisions.length;
+    lines.push(`Grill paused: ${held} question${held === 1 ? '' : 's'} held (${opts.laneAsks.length} from lanes, ${opts.decisions.length} board decisions). Tap Resume grill to see them again.`);
+    return lines.join('\n');
   }
 
   if (opts.laneAsks.length > 0) {
@@ -309,8 +318,12 @@ export async function runNeedsZaalDigest(opts: {
   now?: Date;
   /** Injectable so tests do not shell out to git. Defaults to the real refresh. */
   refresh?: (dir: string) => Promise<VaultFreshness>;
-}): Promise<{ delivered: boolean; dueCount: number; laneCount: number; decisionCount: number; vault: VaultFreshness }> {
+}): Promise<{ delivered: boolean; dueCount: number; laneCount: number; decisionCount: number; vault: VaultFreshness; grillPaused: boolean }> {
   const now = opts.now ?? new Date();
+  // Stop grill (grill-pause.ts, #3793) covers the grill questions inside this
+  // digest too: dreamnet-54 found it sent them, with verdict buttons, while the
+  // grill was stopped. The digest itself still goes; its questions do not.
+  const grillPaused = await isGrillPaused();
   const vaultDir = opts.vaultDir ?? process.env.VAULT_DIR ?? join(homedir(), 'zao-vault');
 
   // Pull BEFORE the read. This digest is built from a copy of the vault, and on
@@ -352,6 +365,7 @@ export async function runNeedsZaalDigest(opts: {
     dueSoon,
     laneAsks,
     decisions,
+    grillPaused,
   });
 
   // First line, always: how old is the copy this was built from. Plain text, so it
@@ -363,10 +377,18 @@ export async function runNeedsZaalDigest(opts: {
   // 45 times in three days for digests that were deferred into the next morning
   // batch ("cap spent (35/3)"). A log line that prints either way cannot report the
   // state it names. Measured: zao-vault notes/zoe-digest-deferred-not-sent-2026-09-19.md
-  const overview = await opts.botApi.sendMessage(opts.zaalTgId, withAge, { parse_mode: 'Markdown' });
+  const overview = await opts.botApi.sendMessage(
+    opts.zaalTgId,
+    withAge,
+    grillPaused
+      ? { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [RESUME_ROW.map((b) => ({ text: b.text, callback_data: b.data }))] } }
+      : { parse_mode: 'Markdown' },
+  );
   const blocked = wasSendBlocked(overview);
 
-  const interactiveCandidates = [...decisions, ...dueSoon.filter((t) => !decisions.some((d) => d.id === t.id))].slice(0, 3);
+  const interactiveCandidates = grillPaused
+    ? []
+    : [...decisions, ...dueSoon.filter((t) => !decisions.some((d) => d.id === t.id))].slice(0, 3);
 
   for (const card of interactiveCandidates) {
     const cardText = `⚡️ **${card.title}**\n${card.notes ? card.notes.slice(0, 140) + '\n' : ''}${card.recommended ? `👉 *Recommended:* ${card.recommended}\n` : ''}Rule with one tap:`;
@@ -388,5 +410,6 @@ export async function runNeedsZaalDigest(opts: {
     laneCount: laneAsks.length,
     decisionCount: decisions.length,
     vault,
+    grillPaused,
   };
 }

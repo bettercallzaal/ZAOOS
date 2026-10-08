@@ -72,7 +72,7 @@ Zaal has already used it: his cast at 2026-10-08 13:32 UTC reads "Just booted Bu
 ### 2. Open source and licence
 
 - **App: closed source.** No repository is linked from the site, and none was found in the searches above. With no LICENSE file to read, the default is all rights reserved (`credit-attribution.md`). We cannot fork or vendor any of it.
-- **Contracts: source is public; the Buddies contract is MIT.** All three contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. That field is wrong for the Buddies contract: its source on Sourcify (exact match) opens `// SPDX-License-Identifier: MIT` in both `src/BaseRoomsUnits.sol` and `src/generated/UnitPool.sol` (corrected 2026-10-08 by loop tick 1). Evolutions and the o1 staking vault are not on Sourcify, so their licence is still unread.
+- **Contracts: source is public; the Buddies contract is MIT.** All three contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. That field is wrong for the Buddies contract: its source on Sourcify (exact match) opens `// SPDX-License-Identifier: MIT` in both `src/BaseRoomsUnits.sol` and `src/generated/UnitPool.sol` (corrected 2026-10-08 by loop tick 1). Evolutions and the o1 staking vault are not on Sourcify; their Basescan source shows Evolutions is also MIT (tick 2) and o1's staking contract is GPL-3.0-only (tick 3).
 - **Buddy art: CC0 per the site.** The homepage says "NFTs on Base whose art and pet are fully onchain (CC0)". This is the site's own claim; the contract source on Basescan was not read for a licence string.
 - **The one file we can read in full is `https://baserooms.io/unit.mjs`** (6,905 bytes, Node 18+, no dependencies). It is served publicly with no licence header.
 
@@ -88,7 +88,7 @@ Addresses come from the site's own JS constants (`UNITS`, `EVOLUTIONS`, `STAKING
 | BRTC token | `0xB200000000000000000000856A95738C92fEed01` | Basescan lists it as a system contract ("Contract Creator: N/A (System Contract)") | Ownership renounced per Base Rooms' own safety scan | n/a | o1 "B20" native token, 1,000,000,000 fixed supply, paired with the tokenized MSTR stock. |
 | Treasury / referrer / fee recipient | `0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce` | n/a | n/a | n/a | An EOA with an EIP-7702 delegation (code is `0xef0100` followed by `63c0c19a282a1b52b07dd5a65b58948a07dae32b`). The delegate was not identified. Held about $835 across tokens on 2026-10-08. |
 
-**What the contract rows mean for a holder.** Nothing is upgradeable, which is good: the code you read is the code that runs. But one key, the treasury EOA, owns both Base Rooms contracts and receives every fee. That key can change the mint price, point the Buddies at a different renderer (so "fully onchain art" is fixed only as long as the owner does not call `setRenderer`), and withdraw the contract's balance. That is normal for a solo project and is a single point of failure, not a red flag. The renderer contract (`0xad23...34ac`) did not answer `owner()`; its own mutability was not checked.
+**What the contract rows mean for a holder.** Nothing is upgradeable, which is good: the code you read is the code that runs. But one key, the treasury EOA, owns both Base Rooms contracts and receives every fee. That key can change the mint price, point the Buddies at a different renderer (so "fully onchain art" is fixed only as long as the owner does not call `setRenderer`), and withdraw the contract's balance. That is normal for a solo project and is a single point of failure, not a red flag. The renderer contract (`0xad23...34ac`) did not answer `owner()` because it has no owner (tick 10: "No owner. Output depends only on the token id..."), so the art can only change through `setRenderer` on the Buddies contract.
 
 ### 4. Fees (from the Disclosures section of the homepage)
 
@@ -177,7 +177,7 @@ Every call below ran three times on 2026-10-08 against public data, with no wall
 | Scam check | `/api/scan?q=DEGEN` | **400** "paste a link or a 0x address" | BREAKS on a ticker; works with an address (200, "no-flags", "Named DegenToken on Sourcify") |
 | Agent tools without a key | `POST /agent/tools/token_safety` | `{"ok":false,"error":"missing or malformed agent key"}` | Expected: the documented API is key-only |
 
-**One inconsistency worth flagging.** The homepage says "TOP-10 HOLDERS CONTROL 54.06% OF SUPPLY". The safety tool says "Top 10 wallets hold 9.1%" of plain wallets and "82% of supply including pools, burn and contracts". These are three different definitions of the same number on the same site. None is wrong, but a reader will take the homepage figure as the concentration risk, and it is neither the plain-wallet figure nor the all-holders figure.
+**One inconsistency worth flagging.** The homepage says "TOP-10 HOLDERS CONTROL 54.06% OF SUPPLY". The safety tool says "Top 10 wallets hold 9.1%" of plain wallets and "82% of supply including pools, burn and contracts". These are three different definitions of the same number on the same site. None is wrong, but a reader will take the homepage figure as the concentration risk, and it is neither the plain-wallet figure nor the all-holders figure. (Settled in tick 11: the three figures use three different definitions, and 22.96% for the ten largest plain wallets is the one to use.)
 
 Not tested, on purpose: anything behind the wallet sign-in (Messenger, Rooms inside the OS, Buddies, Swap quotes tied to a wallet). Those are gated for this lane.
 
@@ -647,6 +647,16 @@ Source: `GET https://baserooms.io/api/trade/quotes` with the parameters the site
 **The quote API matches the Disclosures exactly.** Any-token swaps carry the 0.1% Base Rooms fee on every route, and BRTC swaps routed through an aggregator carry none ("routed via Kyber, CoW or LI.FI, Base Rooms OS takes nothing"). The fee is a field in every quote, so the UI can show it before signing, as the Disclosures promise. Each route also reports its own `spender` (KyberSwap `0x6131...37b5`, LI.FI `0x1231...4EaE`) and gas in USD, and the CoW route is gasless.
 
 **One detail worth knowing.** The direct o1 route for BRTC, where Base Rooms is the 0.2% referrer, did not appear in this quote set. So whether Base Rooms earns on a given BRTC swap depends on which route the UI picks. Either way, the user pays no Base Rooms fee on BRTC.
+
+### 2026-10-08, tick 27: self-audit of the doc
+
+No new fetch. A pass for figures and open questions in the original sections that later ticks answered. Three lines were updated in place, each pointing at the tick that settled it:
+
+1. Section 2: the licences of the Evolutions contract (MIT, tick 2) and o1's staking contract (GPL-3.0-only, tick 3).
+2. Section 3: why the renderer did not answer `owner()` (it has none, tick 10).
+3. Section 8: the three "top 10 holders" figures (settled in tick 11).
+
+Moving figures carry their own time stamps and were left alone, because each was true when read: Buddies 264 in section 3, then 266 in ticks 1 and 17; holders 133 on the homepage, then 134 in the API. No Key Decision depended on a stale line.
 
 ## Comparison: how to use it
 

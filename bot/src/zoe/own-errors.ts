@@ -51,6 +51,9 @@ export function isOpsFailure(err: unknown): boolean {
 export function redactForErrorRow(text: string): string {
   return text
     .replace(/\/(?:home|Users)\/[^/\s)]+\//g, '~/') // home directory, names the user; first, so paths stay readable
+    .replace(/\b(Bearer|Basic|Token)\s+[A-Za-z0-9._~+/=-]+/gi, '$1 [REDACTED]') // auth header value, any length
+    .replace(/([?&](?:token|access_token|api_?key|apikey|key|secret|signature|sig|auth)=)[^&\s#]+/gi, '$1[REDACTED]') // secret query params
+    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, '[REDACTED]') // UUID-format keys (Neynar and others)
     .replace(/\b\d{6,}:[A-Za-z0-9_-]{30,}\b/g, '[REDACTED]') // Telegram bot token
     .replace(/\bsk-[A-Za-z0-9_-]{16,}/g, '[REDACTED]') // Anthropic / OpenAI style keys
     .replace(/\bgh[pousr]_[A-Za-z0-9]{20,}/g, '[REDACTED]') // GitHub tokens
@@ -128,12 +131,14 @@ export async function reportOwnError(
   deps: { store?: OwnErrorStore; now?: number } = {},
 ): Promise<OwnErrorOutcome> {
   if (!ownErrorsFeedEnabled()) return 'off';
-  if (isOpsFailure(err)) return 'skipped-ops';
-  const now = deps.now ?? Date.now();
-  if (now - window.start >= 3_600_000) window = { start: now, n: 0 };
-  if (window.n >= CAP_PER_HOUR) return 'capped';
-  window.n++;
+  // Everything that reads `err` sits inside the try: String() on a
+  // null-prototype object throws, and this must never throw (review of #3802).
   try {
+    if (isOpsFailure(err)) return 'skipped-ops';
+    const now = deps.now ?? Date.now();
+    if (now - window.start >= 3_600_000) window = { start: now, n: 0 };
+    if (window.n >= CAP_PER_HOUR) return 'capped';
+    window.n++;
     const store = deps.store ?? supabaseStore();
     const row = buildOwnErrorRow(err, source);
     const found = await store.find(row.stack_hash);

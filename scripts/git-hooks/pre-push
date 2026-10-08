@@ -1,0 +1,14 @@
+#!/bin/sh
+# pre-push - refuse to push a branch carrying another lane's commits.
+# This is the enforcing half. post-checkout can only warn, because git has no
+# pre-checkout hook; pushing is the moment the mistake becomes everyone else's.
+[ "${ZAO_SKIP_INHERIT_CHECK:-}" = "1" ] && exit 0
+if ! sh "$(dirname "$0")/inherited-work-check.sh"; then
+  printf '%s\n' "" >&2
+  printf '%s\n' "  Refusing the push. If you are certain this is intended:" >&2
+  printf '%s\n' "    ZAO_SKIP_INHERIT_CHECK=1 git push ..." >&2
+  printf '%s\n' "  Installed 2026-09-20 with Zaal's approval, after this happened twice" >&2
+  printf '%s\n' "  in one day in this checkout. Remove with: rm .git/hooks/pre-push" >&2
+  exit 1
+fi
+exit 0

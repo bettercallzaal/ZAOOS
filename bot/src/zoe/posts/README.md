@@ -120,3 +120,17 @@ Healthy first-boot log lines:
 ## Spec source
 
 Grill answers from Zaal on 2026-05-16, summarized in commit body for PR.
+
+## POST publishes for real, behind a flag (2026-10-07)
+
+`ZOE_POST_PUBLISH=1` makes POST call `POST /api/publish/compose` (ZAOOS, #2946)
+with `dryRun:false` for `ZOE_PUBLISH_PLATFORMS` (default `farcaster,x`), using
+`ZOE_PUBLISH_BEARER` which must equal the app's `PUBLISH_BOT_TOKEN`. Unset, POST
+does what it always did: approve and resend the text to paste into Firefly. Four
+results: published; partial (something is live, text NOT resent); failed (4xx or
+a pre-connect error, nothing can be live, text resent with the reason on top);
+UNKNOWN (30 s abort, 5xx, unreadable body - the route casts to Farcaster first,
+so this may be a live cast; text NOT resent, Zaal checks /zao and x.com/thezao
+before reposting). Module:
+`publish.ts`; tests: `__tests__/post-publish.test.ts`. Research: doc 2244
+(the echo root cause), doc 2239 section 5.

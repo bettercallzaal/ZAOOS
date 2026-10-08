@@ -48,7 +48,7 @@ VPS was restarted, pulled, deployed or flipped. Where a number below changes a
 
 | Flag | State on the VPS | What it gates | Whose flip |
 |---|---|---|---|
-| `ZOE_REPO_IMPROVER_LEASES` | `false` (set) | repo-improver under a Heart lease; every scheduler tick logs `(lease disabled)` | Zaal ruled 2026-10-06 "switch it on and then close" (card 9076, `decisions/grill-2026-10-06-dreamnet-evening.md` item 4); the dreamnet lane owes the steps page; the flip is Zaal's hands |
+| `ZOE_REPO_IMPROVER_LEASES` | `false` (set) | repo-improver under a Heart lease; every scheduler tick logs `(lease disabled)` | Zaal ruled 2026-10-06 "switch it on and then close" (card 9076, `decisions/grill-2026-10-06-dreamnet-evening.md` item 4); the steps page is on vault main at 70a84ecd (`inbox/clips/clip-20261006-175855-zoe-stage0-lease-flag-vps-steps.md`); the flip is Zaal's hands |
 | `ZOE_LOOP_LEASES` | `false` (set) | work-loop and orchestrator under Heart leases | same ruling, "Both" |
 | `ZOE_HEART_FLEET_CANARY` | unset | Heart fleet canary | grill item, per memory `project_brandon_two_plane_architecture` |
 | `CASTER_ENABLED`, `ZOE_CASTER_GUARDS`, `FARCASTER_AUTOCAST_DAILY_CAP` | unset | today's #3772: caster guards and the auto-cast cap | Zaal, after the PR's own test plan |
@@ -97,11 +97,13 @@ The code on main reads 57 distinct `ZOE_*` names (`git grep` of `env.ZOE_` under
 
 ### 4. What Zaal can do from the DM right now, and what he cannot
 
-**Can (code on main, flag state measured):** 31 slash commands are registered
-in `index.ts`: agenda, board, bonfire, chatid, cockpit, companion, draftdemo,
-drafts, focus, grill, inittopics, lanes, list, loop, loops, menu, notes, pulse,
-quest, quests, resume, seed, shadow, start, tasks, team, teamadd, voicememo,
-working, zg, zoldraft. Plain text goes to the concierge (talk, capture); voice
+**Can (code on main, flag state measured):** 36 slash commands are registered
+in `index.ts`: agenda, ask, board, bonfire, chatid, cockpit, companion, cv,
+draftdemo, drafts, focus, grill, help, inittopics, lanes, list, loop, loops,
+menu, needsme, notes, pulse, quest, quests, resume, seed, shadow, start, tasks,
+team, teamadd, vm, voicememo, working, zg, zoldraft. (Corrected 2026-10-07 from
+31 after the dreamnet review: the first grep caught only single-quoted names;
+`help` and `ask` are double-quoted and `cv`, `needsme`, `vm` sit in arrays.) Plain text goes to the concierge (talk, capture); voice
 notes transcribe (Groq Whisper); photos and PDFs ingest to the vault inbox;
 grill cards answer by button; drafts take POST, REGEN, SKIP.
 

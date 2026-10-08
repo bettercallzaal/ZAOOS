@@ -3,6 +3,24 @@ import { runCmd, verifyRemoteBranch } from './git';
 export interface OpenedPR {
   number: number;
   url: string;
+  /** True only when ZOE_FIX_PR_LABEL is set and gh applied it. */
+  labelled: boolean;
+}
+
+/**
+ * The review label for ZOE's fix PRs, or null (ZOE_FIX_PR_LABEL, default unset).
+ *
+ * Zaal, 2026-10-07: ZOE's overnight fixes go through the same path as every
+ * other PR - the estate's reviewer finds them, the dotfiles merge terminal
+ * merges on a CLEAN verdict. ZOE opens; it never merges, deploys or sets a flag
+ * (pr-review-label.test.ts reads this pipeline's source for those calls).
+ * The label must already exist in the target repo; gh refuses an unknown one,
+ * and that refusal is logged, never allowed to lose the PR. Only plain label
+ * characters are accepted, so the value cannot become a gh flag.
+ */
+export function fixPrLabel(): string | null {
+  const v = process.env.ZOE_FIX_PR_LABEL?.trim();
+  return v && /^[A-Za-z0-9][A-Za-z0-9 :._-]{0,49}$/.test(v) ? v : null;
 }
 
 /**
@@ -57,5 +75,12 @@ export async function openPullRequest(opts: {
   if (!number) {
     throw new Error(`gh pr create succeeded but no PR number parsed from: ${r.stdout}`);
   }
-  return { number, url };
+  const label = fixPrLabel();
+  let labelled = false;
+  if (label) {
+    const l = await runCmd('gh', ['pr', 'edit', String(number), '--add-label', label], opts.workdir);
+    labelled = l.exitCode === 0;
+    if (!labelled) console.warn(`[hermes/pr] PR #${number} opened but label "${label}" not applied: ${l.stderr.slice(0, 200)}`);
+  }
+  return { number, url, labelled };
 }

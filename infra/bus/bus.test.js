@@ -1,6 +1,6 @@
 /**
  * zao-bus tests - the tasern wire contract, enforced.
- * Run: node --test infra/bus/
+ * Run: node --test infra/bus/*.test.js
  */
 'use strict';
 const { test, before, after } = require('node:test');
@@ -16,6 +16,12 @@ process.env.BUS_ADMIN_TOKEN = 'admin-token-test';
 process.env.BUS_GUEST_TOKEN = 'guest-token-test';
 process.env.BUS_GUEST_AGENT = 'zoe';
 process.env.BUS_GUEST_TOKEN_JIM = 'jim-token-test';
+process.env.BUS_AGENT_TOKEN_ZOL = 'zol-token-test';
+process.env.BUS_AGENT_TOKEN_HERMES = 'hermes-token-test';
+process.env.BUS_AGENT_TOKEN_ALPHA = 'alpha-token-test';
+process.env.BUS_AGENT_TOKEN_BETA = 'beta-token-test';
+process.env.BUS_AGENT_TOKEN_GAMMA = 'gamma-token-test';
+process.env.BUS_AGENT_TOKEN_DELTA = 'delta-token-test';
 
 const { createBus, resolveAuth, sanitizeFilename } = require('./bus.js');
 
@@ -152,4 +158,167 @@ test('admin can delete a file; partner cannot delete others files', async () => 
   assert.strictEqual(deny.status, 403);
   const ok = await req('DELETE', '/bus/files/internal.md', { token: 'admin-token-test' });
   assert.strictEqual(ok.status, 200);
+});
+
+// ---- doc 2638 extensions: internal agents, threads, hop cap, rate, receipts, audit
+
+test('internal agent: from forced, may reach zoe and coordinator, never a partner', async () => {
+  assert.deepStrictEqual(resolveAuth('Bearer zol-token-test'), { role: 'agent', agent: 'zol' });
+  const ok = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'zoe', body: 'zol to zoe', from: 'coordinator' } });
+  assert.strictEqual(ok.status, 200);
+  const { id } = await ok.json();
+  const all = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+  assert.strictEqual(all.messages.find((m) => m.id === id).from, 'zol', 'spoofed from ignored');
+  const toPartner = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'jim', body: 'straight to a partner' } });
+  assert.strictEqual(toPartner.status, 403);
+  const toUnknown = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'stranger', body: 'who' } });
+  assert.strictEqual(toUnknown.status, 403);
+});
+
+test('internal agent reads its own thread only', async () => {
+  const list = await (await req('GET', '/bus/messages', { token: 'zol-token-test' })).json();
+  assert.ok(list.messages.length > 0);
+  for (const m of list.messages) assert.ok(m.to === 'zol' || m.from === 'zol', `leaked: ${m.from}->${m.to}`);
+});
+
+test('base wire object stays exact when no extension is used', async () => {
+  const r = await req('POST', '/bus/send', { token: 'hermes-token-test', body: { to: 'coordinator', body: 'plain hermes note' } });
+  const { id } = await r.json();
+  const list = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+  const msg = list.messages.find((m) => m.id === id);
+  assert.deepStrictEqual(Object.keys(msg).sort(), ['body', 'created', 'from', 'id', 'status', 'subject', 'to']);
+});
+
+test('loop brake: two agents answering each other stop at the hop cap', async () => {
+  process.env.BUS_MAX_HOPS = '4';
+  try {
+    const first = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'hermes', body: 'loop start' } });
+    let last = (await first.json()).id;
+    const tokens = ['hermes-token-test', 'zol-token-test'];
+    const targets = ['zol', 'hermes'];
+    let refusedAt = null;
+    for (let i = 0; i < 10; i++) {
+      const r = await req('POST', '/bus/send', { token: tokens[i % 2], body: { to: targets[i % 2], body: `loop reply ${i}`, reply_to: last } });
+      if (r.status === 409) { refusedAt = i + 1; break; }
+      assert.strictEqual(r.status, 200);
+      last = (await r.json()).id;
+    }
+    assert.strictEqual(refusedAt, 5, 'replies 1-4 pass, the 5th is refused');
+    const list = await (await req('GET', '/bus/messages', { token: 'admin-token-test' })).json();
+    const chain = list.messages.filter((m) => m.body.startsWith('loop'));
+    assert.ok(chain.every((m) => m.thread === chain[0].id || m.id === chain[0].id), 'one thread');
+    assert.strictEqual(Math.max(...chain.map((m) => m.hops || 0)), 4);
+  } finally { delete process.env.BUS_MAX_HOPS; }
+});
+
+test('reply_to outside your thread is refused', async () => {
+  const r = await req('POST', '/bus/send', { token: 'guest-token-test', body: { to: 'coordinator', body: 'zoe private to coordinator' } });
+  const { id } = await r.json();
+  const bad = await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'hijack', reply_to: id } });
+  assert.strictEqual(bad.status, 403);
+});
+
+test('idempotency key: a retry returns the first id and stores one message', async () => {
+  const send = () => req('POST', '/bus/send', { token: 'hermes-token-test', body: { to: 'zoe', body: `retry body ${Math.random()}`, idempotency_key: 'k-123' } });
+  const a = await (await send()).json();
+  const b = await (await send()).json();
+  assert.strictEqual(b.id, a.id);
+  assert.strictEqual(b.duplicate, true);
+  const all = JSON.parse(fs.readFileSync(path.join(TMP, 'messages.json'), 'utf8'));
+  assert.strictEqual(all.filter((m) => m.idempotency_key === 'k-123').length, 1);
+});
+
+test('the same from/to/body inside a minute is stored once', async () => {
+  const a = await (await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'echo echo' } })).json();
+  const b = await (await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'echo echo' } })).json();
+  assert.strictEqual(b.id, a.id);
+  assert.strictEqual(b.duplicate, true);
+});
+
+test('rate limit: over the per-minute cap returns 429', async () => {
+  process.env.BUS_RATE_PER_MIN = '3';
+  process.env.BUS_AGENT_TOKEN_RATEY = 'ratey-token-test';
+  try {
+    const codes = [];
+    for (let i = 0; i < 5; i++) {
+      codes.push((await req('POST', '/bus/send', { token: 'ratey-token-test', body: { to: 'coordinator', body: `burst ${i}` } })).status);
+    }
+    assert.deepStrictEqual(codes, [200, 200, 200, 429, 429]);
+  } finally { delete process.env.BUS_RATE_PER_MIN; delete process.env.BUS_AGENT_TOKEN_RATEY; }
+});
+
+test('receipts: delivered when the recipient lists it, read when it PATCHes', async () => {
+  const { id } = await (await req('POST', '/bus/send', { token: 'alpha-token-test', body: { to: 'beta', body: 'receipt me' } })).json();
+  let r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'alpha-token-test' })).json();
+  assert.deepStrictEqual([r.delivered_at, r.read_at], [null, null]);
+  await req('GET', '/bus/messages?status=new', { token: 'beta-token-test' });
+  r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'alpha-token-test' })).json();
+  assert.ok(r.delivered_at && !r.read_at, 'delivered, not read');
+  await req('PATCH', `/bus/messages/${id}`, { token: 'beta-token-test', body: { status: 'read' } });
+  r = await (await req('GET', `/bus/messages/${id}/receipt`, { token: 'alpha-token-test' })).json();
+  assert.ok(r.read_at, 'read');
+  const outsider = await req('GET', `/bus/messages/${id}/receipt`, { token: 'jim-token-test' });
+  assert.strictEqual(outsider.status, 403);
+});
+
+test('audit log records events without message bodies; no temp files left behind', async () => {
+  await req('POST', '/bus/send', { token: 'zol-token-test', body: { to: 'coordinator', body: 'SECRET-BODY-MARKER' } });
+  const log = fs.readFileSync(path.join(TMP, 'audit.log'), 'utf8');
+  assert.match(log, /"event":"send"/);
+  assert.match(log, /"event":"refused_hops"/);
+  assert.ok(!log.includes('SECRET-BODY-MARKER'), 'bodies never logged');
+  assert.deepStrictEqual(fs.readdirSync(TMP).filter((f) => f.endsWith('.tmp')), []);
+});
+
+// ---- review gaps (dreamnet review of #3806)
+
+test('gap 1: an agent cannot dodge the hop cap by dropping reply_to', async () => {
+  const first = await (await req('POST', '/bus/send', { token: 'gamma-token-test', body: { to: 'delta', body: 'gap1 start' } })).json();
+  const dodge = await req('POST', '/bus/send', { token: 'delta-token-test', body: { to: 'gamma', body: 'gap1 fresh thread, no reply_to' } });
+  assert.strictEqual(dodge.status, 409, 'unread message waiting: must use reply_to');
+  const threaded = await req('POST', '/bus/send', { token: 'delta-token-test', body: { to: 'gamma', body: 'gap1 proper reply', reply_to: first.id } });
+  assert.strictEqual(threaded.status, 200);
+});
+
+test('gap 1: a pair of agents shares an hourly budget', async () => {
+  process.env.BUS_PAIR_PER_HOUR = '4';
+  process.env.BUS_AGENT_TOKEN_EPS = 'eps-token-test';
+  process.env.BUS_AGENT_TOKEN_ZETA = 'zeta-token-test';
+  try {
+    const codes = [];
+    for (let i = 0; i < 6; i++) {
+      const r = await req('POST', '/bus/send', { token: 'eps-token-test', body: { to: 'zeta', body: `pair ${i}` } });
+      codes.push(r.status);
+    }
+    assert.deepStrictEqual(codes, [200, 200, 200, 200, 429, 429]);
+  } finally { delete process.env.BUS_PAIR_PER_HOUR; delete process.env.BUS_AGENT_TOKEN_EPS; delete process.env.BUS_AGENT_TOKEN_ZETA; }
+});
+
+test('gap 2: a sender cannot mark its own message read to hide it', async () => {
+  const { id } = await (await req('POST', '/bus/send', { token: 'gamma-token-test', body: { to: 'coordinator', body: 'gap2 hide me' } })).json();
+  const hide = await req('PATCH', `/bus/messages/${id}`, { token: 'gamma-token-test', body: { status: 'read' } });
+  assert.strictEqual(hide.status, 403);
+  const list = await (await req('GET', '/bus/messages?status=new', { token: 'admin-token-test' })).json();
+  assert.ok(list.messages.some((m) => m.id === id), 'still new for the recipient');
+});
+
+test('gap 3: an agent token named like the coordinator, the guest or a partner is refused', () => {
+  process.env.BUS_AGENT_TOKEN_JIM = 'fake-jim-agent';
+  process.env.BUS_AGENT_TOKEN_COORDINATOR = 'fake-coord-agent';
+  process.env.BUS_AGENT_TOKEN_ZOE = 'fake-zoe-agent';
+  try {
+    assert.strictEqual(resolveAuth('Bearer fake-jim-agent'), null);
+    assert.strictEqual(resolveAuth('Bearer fake-coord-agent'), null);
+    assert.strictEqual(resolveAuth('Bearer fake-zoe-agent'), null);
+    assert.deepStrictEqual(resolveAuth('Bearer jim-token-test'), { role: 'partner', agent: 'jim' }, 'the real partner token still works');
+  } finally { delete process.env.BUS_AGENT_TOKEN_JIM; delete process.env.BUS_AGENT_TOKEN_COORDINATOR; delete process.env.BUS_AGENT_TOKEN_ZOE; }
+});
+
+test('gap 3: audit.log rotates to audit.log.1 past its size cap', async () => {
+  process.env.BUS_AUDIT_MAX_BYTES = '200';
+  try {
+    for (let i = 0; i < 4; i++) await req('POST', '/bus/send', { token: 'guest-token-test', body: { to: 'coordinator', body: `rotate ${i}` } });
+    assert.ok(fs.existsSync(path.join(TMP, 'audit.log.1')), 'older generation kept');
+    assert.ok(fs.statSync(path.join(TMP, 'audit.log')).size < 1000, 'current log restarted small');
+  } finally { delete process.env.BUS_AUDIT_MAX_BYTES; }
 });

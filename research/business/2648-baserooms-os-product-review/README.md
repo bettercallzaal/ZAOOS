@@ -50,7 +50,7 @@ Zaal has already used it: his cast at 2026-10-08 13:32 UTC reads "Just booted Bu
 ### 2. Open source and licence
 
 - **App: closed source.** No repository is linked from the site, and none was found in the searches above. With no LICENSE file to read, the default is all rights reserved (`credit-attribution.md`). We cannot fork or vendor any of it.
-- **Contracts: source is public, licence not declared.** All three Base Rooms contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. Readable is not the same as reusable.
+- **Contracts: source is public; the Buddies contract is MIT.** All three contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. That field is wrong for the Buddies contract: its source on Sourcify (exact match) opens `// SPDX-License-Identifier: MIT` in both `src/BaseRoomsUnits.sol` and `src/generated/UnitPool.sol` (corrected 2026-10-08 by loop tick 1). Evolutions and the o1 staking vault are not on Sourcify, so their licence is still unread.
 - **Buddy art: CC0 per the site.** The homepage says "NFTs on Base whose art and pet are fully onchain (CC0)". This is the site's own claim; the contract source on Basescan was not read for a licence string.
 - **The one file we can read in full is `https://baserooms.io/unit.mjs`** (6,905 bytes, Node 18+, no dependencies). It is served publicly with no licence header.
 
@@ -155,6 +155,91 @@ Every call below ran three times on 2026-10-08 against public data, with no wall
 
 Not tested, on purpose: anything behind the wallet sign-in (Messenger, Rooms inside the OS, Buddies, Swap quotes tied to a wallet). Those are gated for this lane.
 
+## Loop findings
+
+### 2026-10-08, tick 1: the Buddies mint path and the art
+
+Source: `src/BaseRoomsUnits.sol` from Sourcify (exact match, 442 lines), plus `cast call` against `https://mainnet.base.org` at block 52,346,706.
+
+**Who can mint.** `eligible()` returns true if public mint is on, or the wallet has any BRTC principal staked in one of the o1 vaults the owner listed, or the wallet is in a Merkle snapshot. Live state: `mintOpen` true, `publicMint` false, `eligibilityRoot` zero (no snapshot), `staking` is the o1 vault contract `0x6f25...dB4`, with one vault id (`0x4254...cbd5`, the same `VAULT_ID` the site uses). So today **the only way to mint is to have staked some BRTC first**, which matches the site copy. The contract checks "any amount": one wei of staked principal qualifies.
+
+**What a mint costs and where it goes.** `price` is 10 USDC per Buddy, at most 10 per wallet (`MAX_PER_WALLET`). The USDC goes straight from the minter to the treasury in the same call (`safeTransferFrom(usdc, msg.sender, treasury, price * qty)`); the contract never holds it. On top, the minter pays a small ETH fee to Pyth Entropy V2 for randomness (`quote(qty)` returns both). `totalSupply` was 266 at that block, so at list price the mint has sent about 2,660 USDC to the treasury so far, less any change in price over time (not measured).
+
+**How traits are assigned.** Traits come from a fixed pool of 8,888 stored with SSTORE2 at deploy, drawn without replacement (a lazy Fisher-Yates shuffle) using Pyth's random number, revealed in a later callback. If Pyth does not answer within an hour, anyone can pay for a retry. This is a fair-launch design: the owner cannot choose who gets which traits.
+
+**Is the art really onchain?** Yes, with one caveat. `tokenSVG(1)` returns a 2,921-byte SVG straight from the contract, and `tokenURI(1)` returns a base64 JSON data URI (44,933 bytes decoded) whose only external URL is `https://baserooms.io` as the project link. No IPFS, no image server. The caveat is in the contract itself: `setRenderer` carries the comment "It is never frozen, so the art can keep evolving", and the owner key can point every Buddy at a new renderer at any time. "Fully onchain" here means "stored onchain", not "immutable".
+
+**Licence and royalty.** `license()` returns `"CC0-1.0"` for the art. Default royalty is 5% (500 bps) to the treasury.
+
+**What this changes.** Nothing in the Key Decisions. It corrects one fact (the contract licence) and confirms two site claims (stake-gated mint, onchain art). It also sharpens the single-key point: that one EOA can change the price, the eligibility rule, the art and the royalty.
+
+### 2026-10-08, tick 2: Buddy Evolutions, what the signer key controls
+
+Source: `src/BuddyEvolutions.sol` read from the Basescan verified-source page (the Sourcify API returned 400 for this address), constructor arguments from the same page, and `cast call` on the Base RPC.
+
+**Licence.** The source opens `// SPDX-License-Identifier: MIT`, the same as the Buddies contract.
+
+**How publishing works.** A Buddy's "evolution" (stage, form, grade, level, active days, real actions, bond) is computed off chain by Base Rooms. To publish one, the owner's wallet calls `publish(voucher, signature)`. The contract checks that the voucher is unexpired, not already published for that (buddyId, seq), and signed by the `signer` address under EIP-712. It then takes the voucher's `price` in BRTC from the caller and sends it to the treasury, and writes an EAS attestation from the contract itself, chained to the Buddy's previous one through `refUID`.
+
+**The EAS schema** (read from the Base schema registry `0x4200...0020`): `uint256 buddyId, uint32 seq, uint8 stage, string form, string grade, uint16 level, uint32 activeDays, uint32 realActions, uint8 bond, address buddies`. It has no resolver and is not revocable.
+
+**What the signer controls.** The signer is `0x0242...46A2`, an EOA (no code, nonce 0, so it has never sent a transaction itself). That is consistent with a server hot key that only signs vouchers off chain. Whoever holds it decides what every published evolution says, and what price each one charges, because `price` lives inside the signed voucher rather than in the contract. The owner (the treasury EOA) can replace the signer at any time with `setSigner`. The contract cannot mint, move or burn Buddies. Its only power over a holder is the BRTC price on a voucher that the holder chooses to submit.
+
+**What this means for "level" claims.** A published level is an attestation by Base Rooms' own key about activity on Base Rooms' own server. It is a record of what the service says, not an independent proof of activity. That is fine for a game. It means a Buddy's level should not be treated as reputation outside Base Rooms.
+
+**Adoption so far.** `lastOf(1)` (the builder's own Buddy) and `lastOf(252)` (Zaal's) both return zero, so neither has published an evolution yet. The total count of attestations under this schema is **UNKNOWN**. The EAS GraphQL query was blocked locally by the secrets guard, which reads a 64-hex schema id as a possible key. A 900,000-block log query was refused by the public RPC ("Archive requests require a personal token").
+
+### 2026-10-08, tick 3: the BRTC staking vault, measured
+
+Source: `src/O1Staking.sol` and `src/interfaces/IO1Staking.sol` from the Basescan verified-source page, and `getVault` / `feeConfig` via `cast call` on the Base RPC. Times are converted from the onchain values.
+
+**Licence.** o1's staking contract is `GPL-3.0-only`. It belongs to o1 Launchpad, not to Base Rooms. Base Rooms created one vault on it.
+
+**The vault's fixed rules.** Every value below is fixed at creation; the contract has no function to change a vault after it is created.
+
+| Field | Value |
+|---|---|
+| Creator | `0xa034...f8ce` (the Base Rooms treasury) |
+| Stakes | BRTC; pays out MSTR (the tokenized Strategy stock) |
+| Deposits opened | 2026-08-31 19:13 UTC |
+| Epoch 0 started | 2026-09-14 19:13 UTC |
+| Epochs | 6 epochs of 14 days each (84 days), ending 2026-12-07 19:13 UTC |
+| Reward | 0.5 MSTR per epoch, 3 MSTR in total, funded up front |
+| Reward left | 2.53088657 MSTR (as read 2026-10-08) |
+| Total staked | 321,780,602 BRTC (32.2% of supply) |
+| Early exit | **FORBIDDEN**, penalty 0. A deposit is locked until one epoch after it becomes eligible, capped at the vault's end |
+
+**What it pays, in plain numbers.** At the homepage prices of 2026-10-08 (MSTR $150.47, BRTC $0.00003732), one epoch's reward is worth about $75. It is shared by about $12,000 of staked BRTC. That works out to roughly 16% a year in USD terms, **if both prices held**. They will not: MSTR fell 6.25% that day, and BRTC is down 68.8% from its high measured in MSTR. The homepage's "APY 6088%" is trading turnover, not this yield, and the site says so.
+
+**Cost to the treasury.** o1 charges a protocol fee on vault funding. `feeConfig()` returns 1,000 bps (10%), paid to `0x1cAa...1C90`, fee config version 3. So 3 MSTR of rewards cost the treasury about 3.3 MSTR, roughly $500 at that day's price. By the end of the vault, the program will have cost Base Rooms about $500 in MSTR to keep about a third of BRTC supply locked and to gate the Buddy mint.
+
+**What this means for anyone at The ZAO who stakes.** Staked BRTC cannot come out early, at any price. The longest a new deposit can be locked is one 14-day epoch plus the wait until it becomes eligible, and never past 2026-12-07. Staking is also the only way to qualify to mint a Buddy today (tick 1), so "stake to mint" means "lock BRTC for up to about four weeks".
+
+### 2026-10-08, tick 4: what has actually flowed through the treasury
+
+Source: every ERC-20 transfer to or from the treasury `0xa034...f8ce`, scraped from Basescan's token-transfer pages (`/tokentxns?a=...`, 3 pages, 212 rows, 2026-09-06 20:30 to 2026-10-08 18:01 UTC), aggregated by token, direction and method. Plus `getUserState` on the o1 vault. ETH transfers and swap-fee legs paid in other assets were not added up, so this is a floor, not the full P&L.
+
+| Flow | Rows | Amount |
+|---|---|---|
+| USDC in via `Mint` and `Mint With Permit` (Buddy mints sent directly) | 61 | 1,090 USDC |
+| USDC in via `Handle Ops` / `Execute` (smart-wallet and batched transactions, mostly mints by size) | 55 | 1,480 USDC |
+| USDC in, other (market-order fees, a delegation redeem) | 3 | about 30 USDC |
+| USDC out | 6 | 2,430.5 USDC |
+| MSTR in via `Claim` / `Claim For` (o1 creator fees on BRTC trading) | 3 | 7.13 MSTR |
+| MSTR out via `Create Vault` (tick 3's vault, 3 MSTR + 10% o1 fee) | 1 | 3.3 MSTR |
+| BRTC in at launch (`Create Launch`) | 1 | 126,130,781 BRTC |
+| BRTC out via `Deposit` into its own vault | 2 | 122,130,781 BRTC |
+| BRTC out via `Fund Reward Pool` | 2 | 4,000,000 BRTC |
+| BRTC in via `Publish` (one Buddy evolution paid) | 1 | 5,863 BRTC |
+
+**What the numbers say.**
+
+1. **Revenue so far is Buddy mints.** About 2,600 USDC came in, which lines up with the 266 Buddies minted at 10 USDC (about 2,660). The 0.1% swap, earn and lend fees do not show up as a visible USDC stream yet. That is consistent with low volume (BRTC did $6.2K of volume that day), not proof that they are not charged.
+2. **The treasury is the largest staker in its own vault.** `getUserState` returns 122,130,781 BRTC staked by the treasury, **38% of the 321.8M total**. Rewards are paid pro rata, so the per-token yield in tick 3 still holds for an outside staker. But about 38% of each epoch's MSTR flows back to the treasury, so the vault's net cost to Base Rooms is closer to $330 than $500. It also means a big part of the "32.2% of supply staked" figure is the project's own launch allocation.
+3. **The builder took a launch allocation and locked almost all of it.** 126.1M BRTC (12.6% of supply) arrived at launch; 122.1M went into the vault (locked until at most 2026-12-07) and 4M into a reward pool. That is a reasonable look for a solo launch, and it unlocks in December.
+4. **The treasury is being targeted by address poisoning.** 17 outgoing rows are fake tokens whose names imitate "USDC" with lookalike Unicode letters (for example `U S D C` built from Lisu and Cyrillic characters), "sent" in amounts like 15,400 and 400. These are spam made to appear in the treasury's history so that someone copies a lookalike address. They are not real outflows. Anyone at The ZAO who reads this wallet's history should copy addresses only from the contract constants in this doc.
+5. **It is in use today.** The most recent row is a Buddy mint at 18:01 UTC on 2026-10-08, sent from `bettercallzaal.base.eth`.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -197,6 +282,15 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl] OAuth metadata: https://baserooms.io/.well-known/oauth-authorization-server, https://baserooms.io/.well-known/oauth-protected-resource
 - [FULL - curl] Site JS bundle, 185 chunks under https://baserooms.io/_next/static/immutable/chunks/ (pairing presets, `setupFor`, hook blocks, contract constants, fee constants)
 - [FULL - curl, 3 runs each] Public tool routes: `/api/gas`, `/api/safety`, `/api/wallet`, `/api/holders`, `/api/contract`, `/api/scan`, `/api/radio/browse`
+- [FULL - Sourcify API] Buddies source: https://sourcify.dev/server/v2/contract/8453/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b?fields=sources (exact match). Evolutions, the o1 vault and the renderer returned 400 (not on Sourcify)
+- [FULL - cast call, Base RPC] Buddies live state at block 52,346,706: mintOpen, publicMint, eligibilityRoot, staking, vaults, royaltyInfo, license, drawn, totalSupply, tokenSVG(1), tokenURI(1)
+- [FULL - curl + HTML strip] BuddyEvolutions source and constructor args: https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0
+- [FULL - cast call, Base RPC] EAS schema record from the schema registry 0x4200000000000000000000000000000000000020; signer code and nonce; lastOf(1), lastOf(252)
+- [FAILED - EAS GraphQL https://base.easscan.org/graphql] blocked locally by the secrets guard (64-hex id); [FAILED - eth_getLogs over 900k blocks] refused by publicnode, archive token required
+- [FULL - curl + HTML strip] O1Staking and IO1Staking source: https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4
+- [FULL - cast call, Base RPC] getVault(VAULT_ID) and feeConfig() on the o1 staking contract, 2026-10-08
+- [FULL - curl + HTML strip] Treasury token transfers, 212 rows: https://basescan.org/tokentxns?a=0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce (pages 1-3, ps=100)
+- [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

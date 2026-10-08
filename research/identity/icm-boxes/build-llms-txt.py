@@ -76,7 +76,7 @@ DOMAIN_MAP = {
     },
     "zabalgamez.com": {
         "box": "zabalgamez.llm.txt",
-        "name": "ZABAL Games",
+        "name": "ZABAL Gamez",
         "url": "https://zabalgamez.com",
         "sameAs": [],
         "priority": False,

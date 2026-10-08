@@ -342,6 +342,146 @@ SomaFM returned 46 stations, all live.
 1. **Search works by Audius account, not by brand.** Anyone who types `wavewarz`, `bettercallzaal`, `thezao` or `stilo` hears our people inside Base Rooms today, with Audius plays credited to their accounts through `app_name=baserooms`. Brand names that are not Audius handles (`COC Concertz`, Joseph Goats, Huöttöja) return nothing. Whether those artists publish on Audius under another handle was not checked here.
 2. **There is no "add a station" path for us.** The `resolve` endpoint, which turns a pasted link into something playable, accepts only `on.soundcloud.com` links: an Audius track, an Audius profile, a SomaFM page and a plain `.mp3` URL all came back `400 {"error":"an on.soundcloud.com link is required"}`. So a ZAO or WaveWarZ station on the radio's front page is something only Slava can add. That supports making Key Decision 4 a direct ask, and makes it specific: a pinned WaveWarZ (or The ZAO) row backed by the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts.
 
+### 2026-10-08, tick 10: the renderer and the onchain pet page
+
+Source: the verified source of `UnitRenderer` at `0xad23...34ac` from its Basescan page (exact match; files `src/UnitRenderer.sol`, `src/UnitCollection.sol`, `src/generated/UnitArt.sol`, `src/generated/UnitPet.sol`, all `SPDX-License-Identifier: MIT`). The pet page was rebuilt by hex-decoding the four `SSTORE2.write(hex"...")` parts in `UnitPet.sol` (27,943 characters of HTML) and read for network calls.
+
+**The renderer itself has no owner.** Its own header says "No owner. Output depends only on the token id, its traits, its reveal time and the units address." That is why `owner()` returned nothing in section 3. So the art cannot be changed inside this renderer. It can only be changed by the Buddies contract owner pointing `setRenderer` at a different contract (tick 1). Holders who want to know whether their art changed only need to watch for a `RendererSet` event on the Buddies contract.
+
+**The pet page is onchain, but it calls home.** Every Buddy's `animation_url` is a self-contained HTML page stored onchain, with a strict Content-Security-Policy: no images except `data:` URLs, and network access allowed only to two hosts, `https://mainnet.base.org` and `https://brtc-os.slavamushyakov.workers.dev`. The page makes two kinds of call:
+
+1. `eth_call` reads against the public Base RPC (a 4-second timeout), to read the Buddy's own onchain state.
+2. `GET <worker>/units/progress?ids=<id>`, which returns "level, xp, streak, specialty" from Base Rooms' server.
+
+The Worker URL is a `constant` in the renderer (`WORKER = "https://brtc-os.slavamushyakov.workers.dev"`). It is written into every token's metadata and cannot be changed without deploying a new renderer.
+
+**What this means.**
+
+1. **The picture and traits are permanent; the pet's progress is not.** If the Worker goes away, the SVG art and traits still render from chain. The pet's level and XP panel would come back empty, because that data lives only on Base Rooms' server (consistent with tick 2: levels are Base Rooms' own claims).
+2. **Viewing a Buddy on a marketplace that runs `animation_url` sends a request to Base Rooms' Worker** with that Buddy's id, so the Worker's logs can see the viewer's IP address. That is normal for web content and small, and it is worth knowing before embedding Buddies on a ZAO page.
+3. **This is a good pattern to copy for ZAO collectibles.** The page has no external images, uses a CSP allowlist of two hosts, and keeps the art in contract bytecode and SSTORE2. It is MIT. If The ZAO ever makes onchain collectibles, `UnitRenderer` is a clean reference, credited per `credit-attribution.md`.
+
+### 2026-10-08, tick 11: who holds BRTC and Buddies
+
+Source: `GET https://baserooms.io/api/holders?ca=<BRTC>` (top 50 holders with a `kind` label), the Basescan token page for the Buddies contract, and tick 4's `getUserState` reading.
+
+**BRTC: 134 holders.** By kind, across the top 50 listed:
+
+| Kind | Share of supply |
+|---|---|
+| Uniswap v4 pool manager | 33.2% |
+| Contracts (almost all the o1 staking vault) | 32.2% |
+| Plain wallets in the top 50 (48 wallets) | 34.1% |
+
+The largest single plain wallet holds 4.84%. The ten largest plain wallets together hold 22.96%.
+
+**Three "top 10" figures, three definitions.** These are now all measured, so the inconsistency flagged in section 8 can be settled:
+
+- The homepage's **54.06%** counts the top 10 holders of any kind, including the pool and the vault.
+- The safety tool's **9.1%** counts only the plain wallets that make it into the overall top 10.
+- **22.96%** (this tick) is the ten largest plain wallets, wherever they rank.
+
+**For the concentration question that matters, use 22.96%.** It is the share that ten individuals could sell into the pool.
+
+**The treasury's stake does not appear as a wallet.** Its 122.1M BRTC sits inside the vault contract, so the vault's 32.2% is mostly the project's own launch allocation (tick 4: 38% of the vault).
+
+**Buddies: 266 minted, 60 holders** (Basescan, 2026-10-08), so about 4.4 per holder on average. The contract caps minting at 10 per wallet, but transfers are unrestricted, so a holder can own more.
+
+**Overlap with ZAO members: not measured.** Answering it needs the ZAO member wallet list, which lives in our Supabase allowlist. Matching a third-party holder list against it would produce a per-person result that does not belong in a public research doc (`pii-hygiene.md`). If Zaal wants the number, it should be computed privately and only the count reported.
+
+### 2026-10-08, tick 12: security headers, read from the outside
+
+Source: response headers from one `GET` each to `baserooms.io/`, `/api/gas`, `/mcp`, `/agent.md`, the Worker's `/hook/inbox`, `im.baserooms.io/health` and `meet.baserooms.io/`. This was a header read, not a scan, and no request was repeated to probe limits.
+
+**The main site is well configured.** Every `baserooms.io` response carries:
+
+- `strict-transport-security: max-age=31536000; includeSubDomains`
+- `x-content-type-options: nosniff`
+- `referrer-policy: strict-origin-when-cross-origin`
+- a `permissions-policy` that grants camera, microphone and screen capture only to itself and `meet.baserooms.io`
+- a full Content-Security-Policy with `object-src 'none'`, `base-uri 'self'`, `form-action 'self'` and a `report-uri`
+
+`frame-ancestors https://farcaster.xyz https://*.farcaster.xyz` means it is built to run as a Farcaster mini app and cannot be framed anywhere else.
+
+**Where it is loose, and why.**
+
+- `script-src` includes `'unsafe-inline'`. That is common with Next.js, and it weakens the CSP as a defence against injected scripts.
+- `connect-src 'self' https: wss:` lets the page talk to any HTTPS or WSS host. That fits a DeFi front end calling many APIs, and it means a CSP would not stop data leaving if a script were ever injected.
+- `img-src` and `media-src` allow any `https:` source. That is needed for token icons and the radio streams.
+
+**The other hosts.**
+
+| Host | What the headers show |
+|---|---|
+| Worker `/hook/inbox` without a key | `401 {"error":"unknown or revoked key"}`, with no security headers (a JSON API, so that is expected) |
+| `im.baserooms.io/health` | 200, no security headers |
+| `meet.baserooms.io` | HSTS for 2 years; `frame-ancestors https://baserooms.io https://www.baserooms.io http://localhost:3000 http://localhost:3100` |
+
+The two `localhost` entries on the Jitsi host are development leftovers. They let any page served on those local ports frame the video room. It is low risk, because only someone running a page on their own machine benefits, and it is worth a one-line mention to Slava if Zaal contacts him.
+
+**Rate limits.** None of the responses carried `RateLimit-*` or `Retry-After` headers. That does not mean there are no limits; Vercel and Cloudflare can throttle silently. It was not tested, deliberately, because testing limits means hammering their API.
+
+**What this means.** It confirms the review's tone: this is a careful solo build. The open items are the ones already named. No new risk changes a Key Decision.
+
+### 2026-10-08, tick 13: o1 Launchpad as a fifth rail next to doc 2634
+
+Source: o1 docs pages `launchpad/how-it-works`, `launchpad/create/stock-paired-launches`, `launchpad/staking/overview` and `launchpad/trading/fees-referrals` (curl + HTML strip), tick 3's onchain vault read, and the rails table in [business/2634](../2634-memecoin-idea-ground-truth/). This adds o1 to that comparison. It is not a recommendation to launch anything; that decision stays with doc 2634 and Zaal.
+
+| | o1 Launchpad (BRTC's rail) | Clanker (from doc 2634) |
+|---|---|---|
+| Chains | Base, Robinhood, BSC, X Layer | Base |
+| Creation fee | 0.001 ETH on Base, plus gas | not listed in 2634 |
+| Trading fee and split | 1% per trade: creator 50%, platform 30%, referrer 20% (unused referral share goes to the platform) | creator 1% + protocol 0.2% = 1.2% |
+| Anti-snipe | Total fee starts at 99%, falls linearly to 1% over 20 seconds | not covered in 2634 |
+| Liquidity | Full supply seeded into a token-only Uniswap v4 position that "cannot be removed" | not covered in 2634 |
+| Pair asset | Crypto, or a **tokenized stock** (MSTR and others); fees are then paid in the stock token | ETH-style pairs |
+| Staking | Separate, permissionless vaults with rules fixed at creation; o1 takes 10% of the reward funding (tick 3) | Creator vault share and days set at deploy (per 2634's dry-run row) |
+
+**What is different about o1.**
+
+1. **Stock pairing is the distinctive feature, and it cuts both ways.** A stock-paired token is priced in the stock. BRTC's own page shows the effect: down 68.8% from its high **measured in MSTR**, while MSTR itself fell 6.25% on 2026-10-08. A holder carries the meme's risk and the stock's at once. For The ZAO, pairing anything with a stock would also put a public company's ticker next to our brand, which is a legal-framing question for doc 1108 (`business/1108`, cited in 2634) before anything else.
+2. **The staking product is the part worth knowing about**, even without launching on o1. Any token on a supported chain can get a fixed, fully funded, time-weighted reward vault that nobody can change after creation. That is a cleaner "reward holders for a season" tool than ad-hoc airdrops. It costs a 10% fee on the reward budget.
+3. **Fee split versus Clanker.** At 1% total, o1's creator share (0.5% of each trade) is smaller than Clanker's creator 1% in doc 2634. Base Rooms earns as the referrer (0.2%) on BRTC trades routed through o1.
+
+**Next Actions addition (for doc 2634's owner, not this lane).** Add o1 as a fifth column to 2634's rails table, with the stock-pairing caveat. This lane will not edit 2634 itself.
+
+### 2026-10-08, tick 14: terms, privacy and the legal surface
+
+Source: `GET` of `/privacy`, `/terms`, `/tos` and `/legal` on baserooms.io (each returned 404); a search of all 185 site JS chunks for "Privacy Policy", "Terms of", "terms of service", "jurisdiction", "governing law", "liability", "sanction", "OFAC" and "restricted countr"; and the app's window list in the bundle.
+
+**There is no Terms of Service and no Privacy Policy.** All four URLs return 404. The only "terms of service" and "privacy policy" strings in the bundle sit inside the Reown AppKit wallet-connect library, as templates shown only if the app passes `termsConditionsUrl` / `privacyPolicyUrl`. A search for where the app sets those two options found nothing outside the library, so the wallet sign-in shows neither link. "Governing law", "jurisdiction", "OFAC" and "sanction" do not appear anywhere in the app code.
+
+**What exists instead is two in-OS documents.** `README.txt` ("What Base Rooms OS is: the buddies, BRTC and every tool") and `Disclosures.txt` ("Fees, risks and what Base Rooms OS stores", tagged with the keyword `terms`). Both are the plain-language text this review quotes in sections 4 and 8. They are thorough on fees and on what is stored, and they name no legal entity, no governing law and no contact address.
+
+**The only geographic rule** is in the referral section: "Not offered to UK consumers."
+
+**What this means for The ZAO.**
+
+1. **No agreement exists between a user and Base Rooms.** Anything The ZAO does with it (a partnership, a station, an embed) rests on goodwill, not on terms anyone can point to. That is normal for a solo crypto project and it matters if money or member data is ever involved.
+2. **Before any formal partnership**, the questions to raise are who the contracting party is, and what happens to stored messages and Farcaster notification tokens (tick 8) if the service closes. This belongs in the same gated outreach as Key Decision 4. It is not a reason to stop using Rooms for calls.
+
+### 2026-10-08, tick 15: the two outside venues, Veranta perps and Limitless predictions
+
+Source: the Veranta and Limitless code paths in the site bundle; Basescan pages for the three Veranta addresses; EIP-1967 admin and implementation slots, the admin's `owner()`, and that owner's `getThreshold()` / `getOwners()` / `VERSION()` via `cast` on the Base RPC.
+
+**Veranta (perps).** Base Rooms' Perps window trades on Veranta (`https://www.veranta.xyz/trade`), with USDC collateral on Base. Its market list maps names like GOLD, SILVER, OIL, NASDAQ and S&P to `XAU`, `XAG`, `WTI`/`BRENT`, `US100` and `US500`, so this is leveraged exposure to commodities and indexes as well as crypto. The site hard-codes three Veranta addresses:
+
+| Role in the code | Address | What it is onchain |
+|---|---|---|
+| `router` ("Veranta trading router") | `0x4491...1d4e` | `TransparentUpgradeableProxy` |
+| `storage` ("Veranta trading", deposits) | `0x8a31...422d` | `TransparentUpgradeableProxy` |
+| `builderCode` ("Veranta builder fees") | `0xeDA8...9975` | `TransparentUpgradeableProxy` |
+
+All three share one proxy admin (`0x2d89...e8bb`), whose `owner()` is `0x3775...0288`, a **Safe 1.3.0 multisig with a threshold of 3 of 5 owners**.
+
+**This is the opposite trust model to Base Rooms' own contracts.** Base Rooms' contracts are not upgradeable and sit behind one key. Veranta's can be upgraded at any time, behind a 3-of-5 multisig. A user who opens a perp through Base Rooms is trusting Veranta's multisig with their USDC collateral, not Slava. The 0.05% builder fee (section 4) is how Base Rooms earns from it.
+
+**One protective detail.** The bundle checks token approvals against a list of known spenders. For Veranta, an approval is accepted only if the spender is the `storage` or `builderCode` address; anything else is flagged "unexpected spender". That matches the Disclosures line "every routed transaction and signature is checked against known contracts".
+
+**Limitless (predictions).** Markets are shown in an iframe from `https://embed.limitless.exchange/e/v1/market/<id>?...&via=<ref>`, sandboxed with `allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms`. Trades settle in USDC on Base from the user's own wallet. The app's own copy: "Base Rooms OS earns a share of Limitless's fee through its referral, at no extra cost to you." There is also an odds-alert feature tied to Limitless markets.
+
+**What this means for The ZAO.** Neither venue belongs anywhere near a ZAO treasury, and nothing here changes the Key Decisions. If a member asks whether "perps on Base Rooms" is safe, the honest answer is: Base Rooms only routes the trade and takes 0.05%. The custody and the upgrade risk sit with Veranta's 3-of-5 Safe.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -399,6 +539,14 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
 - [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
 - [FULL - urllib GET] Radio browse for 10 search terms and SomaFM; radio resolve with 4 test links (all 400, SoundCloud short links only)
+- [FULL - curl + HTML strip] UnitRenderer verified source (9 files, MIT): https://basescan.org/address/0xad2343637ef688b6cc3a106092a941ffcb5834ac ; pet page rebuilt from the SSTORE2 hex parts in UnitPet.sol
+- [FULL - urllib GET] BRTC top-50 holders with kind labels: https://baserooms.io/api/holders?ca=0xB200000000000000000000856A95738C92fEed01
+- [FULL - curl + HTML strip] Buddies token page (supply 266, holders 60): https://basescan.org/token/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b
+- [FULL - curl -D] Response headers of baserooms.io (/, /api/gas, /mcp, /agent.md), the Worker /hook/inbox, im.baserooms.io/health and meet.baserooms.io, one request each
+- [FULL - curl + HTML strip] o1 docs: https://docs.o1.exchange/launchpad/how-it-works , https://docs.o1.exchange/launchpad/create/stock-paired-launches , https://docs.o1.exchange/launchpad/staking/overview
+- [FULL - curl] /privacy, /terms, /tos, /legal on baserooms.io (all 404); bundle search across 185 chunks for terms, privacy and jurisdiction strings
+- [FULL - curl + HTML strip] Basescan pages for Veranta router, storage and builderCode (all TransparentUpgradeableProxy)
+- [FULL - cast, Base RPC] EIP-1967 admin and implementation slots of the three Veranta proxies; admin owner is a Safe 1.3.0, threshold 3, 5 owners
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

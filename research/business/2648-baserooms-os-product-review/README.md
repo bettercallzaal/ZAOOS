@@ -189,6 +189,32 @@ Source: `src/BuddyEvolutions.sol` read from the Basescan verified-source page (t
 
 **Adoption so far.** `lastOf(1)` (the builder's own Buddy) and `lastOf(252)` (Zaal's) both return zero, so neither has published an evolution yet. The total count of attestations under this schema is **UNKNOWN**. The EAS GraphQL query was blocked locally by the secrets guard, which reads a 64-hex schema id as a possible key. A 900,000-block log query was refused by the public RPC ("Archive requests require a personal token").
 
+### 2026-10-08, tick 3: the BRTC staking vault, measured
+
+Source: `src/O1Staking.sol` and `src/interfaces/IO1Staking.sol` from the Basescan verified-source page, and `getVault` / `feeConfig` via `cast call` on the Base RPC. Times are converted from the onchain values.
+
+**Licence.** o1's staking contract is `GPL-3.0-only`. It belongs to o1 Launchpad, not to Base Rooms. Base Rooms created one vault on it.
+
+**The vault's fixed rules.** Every value below is fixed at creation; the contract has no function to change a vault after it is created.
+
+| Field | Value |
+|---|---|
+| Creator | `0xa034...f8ce` (the Base Rooms treasury) |
+| Stakes | BRTC; pays out MSTR (the tokenized Strategy stock) |
+| Deposits opened | 2026-08-31 19:13 UTC |
+| Epoch 0 started | 2026-09-14 19:13 UTC |
+| Epochs | 6 epochs of 14 days each (84 days), ending 2026-12-07 19:13 UTC |
+| Reward | 0.5 MSTR per epoch, 3 MSTR in total, funded up front |
+| Reward left | 2.53088657 MSTR (as read 2026-10-08) |
+| Total staked | 321,780,602 BRTC (32.2% of supply) |
+| Early exit | **FORBIDDEN**, penalty 0. A deposit is locked until one epoch after it becomes eligible, capped at the vault's end |
+
+**What it pays, in plain numbers.** At the homepage prices of 2026-10-08 (MSTR $150.47, BRTC $0.00003732), one epoch's reward is worth about $75. It is shared by about $12,000 of staked BRTC. That works out to roughly 16% a year in USD terms, **if both prices held**. They will not: MSTR fell 6.25% that day, and BRTC is down 68.8% from its high measured in MSTR. The homepage's "APY 6088%" is trading turnover, not this yield, and the site says so.
+
+**Cost to the treasury.** o1 charges a protocol fee on vault funding. `feeConfig()` returns 1,000 bps (10%), paid to `0x1cAa...1C90`, fee config version 3. So 3 MSTR of rewards cost the treasury about 3.3 MSTR, roughly $500 at that day's price. By the end of the vault, the program will have cost Base Rooms about $500 in MSTR to keep about a third of BRTC supply locked and to gate the Buddy mint.
+
+**What this means for anyone at The ZAO who stakes.** Staked BRTC cannot come out early, at any price. The longest a new deposit can be locked is one 14-day epoch plus the wait until it becomes eligible, and never past 2026-12-07. Staking is also the only way to qualify to mint a Buddy today (tick 1), so "stake to mint" means "lock BRTC for up to about four weeks".
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -236,6 +262,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl + HTML strip] BuddyEvolutions source and constructor args: https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0
 - [FULL - cast call, Base RPC] EAS schema record from the schema registry 0x4200000000000000000000000000000000000020; signer code and nonce; lastOf(1), lastOf(252)
 - [FAILED - EAS GraphQL https://base.easscan.org/graphql] blocked locally by the secrets guard (64-hex id); [FAILED - eth_getLogs over 900k blocks] refused by publicnode, archive token required
+- [FULL - curl + HTML strip] O1Staking and IO1Staking source: https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4
+- [FULL - cast call, Base RPC] getVault(VAULT_ID) and feeConfig() on the o1 staking contract, 2026-10-08
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

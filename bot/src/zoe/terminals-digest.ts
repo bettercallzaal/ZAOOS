@@ -37,7 +37,12 @@ export interface TerminalsPage {
   waiting: { id: string; item: string }[];
   running: { id: string; item: string; who: string }[];
   terminals: { tab: string; role: string; next: string }[];
+  /** Why the Terminals table could not be read, or null. A drifted table must say
+   * so, never read as "0 terminals" (2026-10-08 06:11 EDT, seat item). */
+  terminalsProblem: string | null;
 }
+
+export const TERMINALS_COLUMNS = ['Tab', 'Session', 'Role', 'Next'];
 
 function cellsOf(line: string): string[] {
   return line.split('|').slice(1, -1).map((c) => c.replace(/\*\*/g, '').trim());
@@ -61,15 +66,30 @@ export function parseTerminalsPage(md: string): TerminalsPage {
     stamp,
     waiting: tableRows(find(/^Waiting on Zaal/i)).map((c) => ({ id: c[0], item: c[1] ?? '' })),
     running: tableRows(find(/^Running now/i)).map((c) => ({ id: c[0], item: c[1] ?? '', who: c[2] ?? '' })),
-    terminals: tableRows(find(/^Terminals/i)).map((c) => ({ tab: c[0], role: c[2] ?? '', next: c[3] ?? '' })),
+    ...readTerminals(find(/^Terminals/i)),
   };
+}
+
+function readTerminals(section: string): Pick<TerminalsPage, 'terminals' | 'terminalsProblem'> {
+  if (!section) return { terminals: [], terminalsProblem: null };
+  const expected = TERMINALS_COLUMNS.join(' | ');
+  const headerLine = section.split('\n').find((l) => l.trim().startsWith('|'));
+  const header = headerLine ? cellsOf(headerLine) : [];
+  const rows = tableRows(section);
+  if (!rows.length) {
+    return { terminals: [], terminalsProblem: `Terminals table found but no rows matched ${expected}` };
+  }
+  if (header.join(' | ').toLowerCase() !== expected.toLowerCase()) {
+    return { terminals: [], terminalsProblem: `Terminals table found but its columns are ${header.join(' | ')}, not ${expected}` };
+  }
+  return { terminals: rows.map((c) => ({ tab: c[0], role: c[2] ?? '', next: c[3] ?? '' })), terminalsProblem: null };
 }
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 3)}...` : s);
 
 /** Pure. Wants-from-you first, then the active terminals, then counts. */
 export function formatTerminalsDigest(p: TerminalsPage, opts: { fetched: boolean }): string {
-  if (!p.waiting.length && !p.terminals.length) {
+  if (!p.waiting.length && !p.terminals.length && !p.terminalsProblem) {
     return 'Terminals: could not read the terminals page in the vault (no Waiting on Zaal or Terminals table found). Nothing to report until the seat writes it.';
   }
   const head = [`Terminals - seat page stamped ${p.stamp ?? 'with no stamp'}`];
@@ -86,7 +106,10 @@ export function formatTerminalsDigest(p: TerminalsPage, opts: { fetched: boolean
     roles.set(k, (roles.get(k) ?? 0) + 1);
   }
   const count = [`${p.terminals.length} terminals: ${['active', 'next', 'side', 'later', 'other'].filter((k) => roles.get(k)).map((k) => `${roles.get(k)} ${k}`).join(', ')}`];
-  const parts = [head.join('\n'), wants.join('\n'), act.join('\n'), [...run, ...count].join('\n')];
+  const tail = p.terminalsProblem
+    ? [`${p.terminalsProblem}. The page format drifted; the seat should fix the table.`, ...run]
+    : [...run, ...count];
+  const parts = [head.join('\n'), wants.join('\n'), ...(p.terminalsProblem ? [] : [act.join('\n')]), tail.join('\n')];
   let text = parts.join('\n\n');
   // Over one Telegram message: drop wants lines from the end, and say so.
   while (text.length > MAX_LEN && wants.length > 2) {

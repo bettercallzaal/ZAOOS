@@ -109,3 +109,28 @@ describe('sendTerminalsDigest - flag and Stop grill', () => {
     expect(await sendTerminalsDigest({ send, read, scheduled: false })).toBe('sent');
   });
 });
+
+// 2026-10-08 06:11 EDT: the seat's morning page used other columns, and the
+// digest read "Active: none listed. 0 terminals:" - a format drift that looked
+// like an empty estate. Drift must be loud.
+describe('a Terminals table in the wrong shape is reported, not counted as zero', () => {
+  const head = '# p\n\nStamp: 2026-10-08 05:46 EDT\n\n## Waiting on Zaal\n\n| # | Item | Why |\n|---|---|---|\n| Z1 | One | w |\n\n';
+  it('heading present, no rows', () => {
+    const p = parseTerminalsPage(head + '## Terminals\n\nNothing tabled this morning.\n');
+    const t = formatTerminalsDigest(p, { fetched: true });
+    expect(t).toContain('Terminals table found but no rows matched Tab | Session | Role | Next');
+    expect(t).not.toMatch(/0 terminals/);
+    expect(t).toContain('Z1 One');
+  });
+  it('heading present, rows under other columns', () => {
+    const p = parseTerminalsPage(head + '## Terminals (3)\n\n| Lane | State | Note |\n|---|---|---|\n| a | busy | x |\n| b | idle | y |\n| c | idle | z |\n');
+    const t = formatTerminalsDigest(p, { fetched: true });
+    expect(t).toContain('Terminals table found but its columns are Lane | State | Note, not Tab | Session | Role | Next');
+    expect(t).not.toMatch(/Active: none listed/);
+    expect(t).not.toMatch(/\d+ terminals:/);
+  });
+  it('the right shape still reads normally', () => {
+    const p = parseTerminalsPage(PAGE);
+    expect(p.terminalsProblem).toBeNull();
+  });
+});

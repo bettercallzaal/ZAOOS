@@ -658,6 +658,16 @@ No new fetch. A pass for figures and open questions in the original sections tha
 
 Moving figures carry their own time stamps and were left alone, because each was true when read: Buddies 264 in section 3, then 266 in ticks 1 and 17; holders 133 on the homepage, then 134 in the API. No Key Decision depended on a stale line.
 
+### 2026-10-08, tick 28: o1's own API, and the creator-fee cross-check
+
+Source: o1 docs `launchpad/api/authentication.md` and `launchpad/api/read-endpoints.md` (curl, raw markdown), and three calls to `https://api.launch.o1.exchange/v1` at 19:04 UTC.
+
+**o1's launchpad API is key-only, apart from health.** The docs say: "All read endpoints except `/health` require an API key", sent as `x-api-key: o1_launch_<prefix>_<secret>`. `/health` returned `{"status":"ok","api_version":"v1",...}`. `/config` and `/tokens/8453/<BRTC>` returned `401 missing_api_key`. Getting a key means signing up with o1, which is outside this lane's read-only scope, so o1's own fee figures for BRTC were **not read**.
+
+**A cross-check from data already in this doc.** The homepage reports "Creator fees earned 8.890 MSTR" for BRTC. Tick 4's transfer list shows the treasury received 7.13 MSTR through `Claim` / `Claim For`. If both figures are right, about 1.76 MSTR of creator fees were earned but not yet claimed as of 2026-10-08. That is an inference from two sources, not a measurement, and is marked UNVERIFIED until it is read from o1's `/wallets/{address}/fee-claims` with a key.
+
+**What it shows about the creator economics.** On BRTC's own trading, Base Rooms has earned about 8.9 MSTR (about $1,340 at that day's $150.47) as the creator, against about 2,600 USDC from Buddy mints (tick 4). So the token has earned the builder roughly half as much as the collectibles.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -735,6 +745,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - bundle read] Account, Telegram link-code, alerts, digest, notes, layout and watchlist client code in the site JS chunks
 - [FULL - bundle and HTML search] 16 analytics/tracking markers across the homepage HTML and 185 JS chunks (none found); Games and Art Gallery window definitions; /api/nfts/held input check (400 on unknown parameter)
 - [FULL - curl] Public swap quotes: https://baserooms.io/api/trade/quotes (USDC to WETH, MSTR to BRTC), about 19:00 UTC
+- [FULL - curl, raw markdown] o1 API docs: https://docs.o1.exchange/launchpad/api/authentication.md , https://docs.o1.exchange/launchpad/api/read-endpoints.md ; [FAILED - 401 missing_api_key] https://api.launch.o1.exchange/v1/config and /tokens/8453/<BRTC> (key-only; /health 200)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

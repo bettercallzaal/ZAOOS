@@ -635,6 +635,19 @@ Source: a search of the homepage HTML and all 185 JS chunks for 16 analytics and
 
 No new fetch. A short "Bottom line" section now sits above Key Decisions, summarising the review and ticks 1 to 24 in one place for a reader with two minutes. Every figure in it is cited in a section or tick below.
 
+### 2026-10-08, tick 26: the swap fee, checked in a live quote
+
+Source: `GET https://baserooms.io/api/trade/quotes` with the parameters the site itself sends when no wallet is connected (`from=0x...dEaD`, `slippage=50`), at about 19:00 UTC. Two quotes: 100 USDC to WETH, and 0.1 MSTR to BRTC. No order was placed.
+
+| Pair | Routes quoted | `feeBps` on every route | Best output |
+|---|---|---|---|
+| 100 USDC to WETH | CoW, KyberSwap, LI.FI | **10** (0.1%) | KyberSwap, 0.040831 WETH (about $99.88 by the quote's own `outUsd`) |
+| 0.1 MSTR to BRTC | KyberSwap, CoW, LI.FI | **0** | KyberSwap, about 397,187 BRTC |
+
+**The quote API matches the Disclosures exactly.** Any-token swaps carry the 0.1% Base Rooms fee on every route, and BRTC swaps routed through an aggregator carry none ("routed via Kyber, CoW or LI.FI, Base Rooms OS takes nothing"). The fee is a field in every quote, so the UI can show it before signing, as the Disclosures promise. Each route also reports its own `spender` (KyberSwap `0x6131...37b5`, LI.FI `0x1231...4EaE`) and gas in USD, and the CoW route is gasless.
+
+**One detail worth knowing.** The direct o1 route for BRTC, where Base Rooms is the 0.2% referrer, did not appear in this quote set. So whether Base Rooms earns on a given BRTC swap depends on which route the UI picks. Either way, the user pays no Base Rooms fee on BRTC.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -711,6 +724,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl, 3 runs] Worker /skills (401); agent tool skills_list without key (401); /agent/skills, /skills, /agent/skills.json on baserooms.io (404); skills import/export and workspace schedule code paths in the bundle
 - [FULL - bundle read] Account, Telegram link-code, alerts, digest, notes, layout and watchlist client code in the site JS chunks
 - [FULL - bundle and HTML search] 16 analytics/tracking markers across the homepage HTML and 185 JS chunks (none found); Games and Art Gallery window definitions; /api/nfts/held input check (400 on unknown parameter)
+- [FULL - curl] Public swap quotes: https://baserooms.io/api/trade/quotes (USDC to WETH, MSTR to BRTC), about 19:00 UTC
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

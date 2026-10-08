@@ -26,7 +26,19 @@ When the build needs a visual decision nobody has made, that is a question for t
 
 Write one line into the PR body or lane report: `site-pass: look owned by <name>, spec at <path or link>`.
 
-If no spec exists, the pass covers steps 1, 2, 5 and 8 only, and the visual layer stays as it is.
+If no spec exists, the pass covers steps 0.5, 1, 2, 5, 7 and 8, and the visual layer stays as it is. In that case step 7 item 2 still runs. Its list goes to the owner as **inherited defaults**: styling that predates the owner, or that an agent made, for them to keep or change. On North Creek, 2026-10-08, it found an all-caps eyebrow over every h2 and an "A · B" meta string on the show card.
+
+## 0.5 Is the live site up?
+
+```bash
+curl -sS -o /dev/null -w '%{http_code} %{ssl_verify_result}\n' -m 15 "$LIVE_URL"
+```
+
+Anything but a 2xx or 3xx with `ssl_verify_result` 0 means the live site is down or broken. North Creek, 2026-10-08: TLS reset for its own name while the same IP served `*.vercel.app`.
+
+In that case:
+- Audit a local copy instead.
+- Report the outage to the orchestrator. Domains and Vercel are Zaal's, so do not touch them.
 
 ## 1. Subject
 
@@ -43,7 +55,7 @@ Gather the actual copy, live data, links, lore and photos into one file in the r
 - quotes
 - photos
 
-If something is missing, show the honest empty state: one plain sentence plus one action, like fleetfoxes.com's "There are no upcoming events" (doc 2637 Finding 7).
+If something is missing, show the honest empty state: one plain sentence, plus one action when an action exists, like fleetfoxes.com's "There are no upcoming events" (doc 2637 Finding 7). If no action exists yet (no follow link on record), the missing action is a gap for the content owner, not something to invent.
 
 **Copy rules:**
 - Write for the visitor, not about the system.
@@ -84,15 +96,29 @@ Until an answer arrives, render the gap in the most neutral way the existing tok
 
 ## 6. Screenshot loop
 
-Render at 390x844 and 1280x900 and read the images. Keep every iteration as `shots/<n>-<width>.png` in the scratchpad. A middle iteration is sometimes the best.
+Render at 390, 320 (for the 1.4.10 reflow check) and 1280 wide, and read the images. Keep every iteration as `shots/<n>-<width>.png` in the scratchpad. A middle iteration is sometimes the best.
+
+**`--window-size` cannot make a narrow viewport.** Measured by the north-creek lane, 2026-10-08: headless Chrome on this Mac with `--window-size=390,844` renders at `innerWidth` 500. A "390" shot made that way is really 500 wide and hides overflow. For narrow widths, frame the page in an iframe of the exact width:
 
 ```bash
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-"$CHROME" --headless=new --hide-scrollbars --window-size=390,844 --virtual-time-budget=8000 --screenshot="$OUT/1-390.png" "$URL"
+for W in 390 320; do
+  printf '<!doctype html><body style="margin:0"><iframe src="%s" style="width:%spx;height:844px;border:0"></iframe>' "$URL" "$W" > "$OUT/frame-$W.html"
+  "$CHROME" --headless=new --hide-scrollbars --window-size=600,844 --virtual-time-budget=8000 --screenshot="$OUT/1-$W.png" "file://$OUT/frame-$W.html"
+done
 "$CHROME" --headless=new --hide-scrollbars --window-size=1280,900 --virtual-time-budget=8000 --screenshot="$OUT/1-1280.png" "$URL"
+for f in "$OUT"/1-*.png; do test -s "$f" || echo "NO SCREENSHOT: $f"; done
 ```
 
-Alternatives are gstack `browse` (`~/.claude/skills/gstack/browse/dist/browse`) or the Playwright CLI. Serve a static site with `python3 -m http.server`, and a Next app with `npm run dev`.
+Re-measured by the skills lane on 2026-10-08: `--window-size=390,844` gave `innerWidth` 500 in 3 of 3 runs, and the iframe frame gave 390. The shot is 600 wide, with the page in its left 390 pixels. A site that sends `X-Frame-Options` or `frame-ancestors` will not frame; use device emulation for it.
+
+**Check every PNG exists and is not empty.** Chrome exits 0 and writes no file when the page load fails (north-creek lane, `net::ERR_CONNECTION_RESET`). A missing shot is a failed step, not a pass.
+
+Other routes to a true narrow viewport:
+- Device emulation: Lighthouse `--screenEmulation`, or CDP `Emulation.setDeviceMetricsOverride`.
+- gstack `browse` (`~/.claude/skills/gstack/browse/dist/browse`).
+
+Serve a static site with `python3 -m http.server`, and a Next app with `npm run dev`.
 
 ## 7. Grade with a fresh agent (never your own work)
 
@@ -122,6 +148,14 @@ npx lighthouse@12.8.2 "$URL" --form-factor=mobile --screenEmulation.mobile --chr
 - 2.4.7: focus visible.
 - 2.4.11: focus not hidden by sticky headers or banners.
 - 2.5.8: targets at least 24x24 CSS px.
+
+**Landmarks, checked by reading the HTML.** Lighthouse scored 100 for accessibility on North Creek pages that put `<nav>` and `<footer>` inside `<main>`, so the score does not cover this. `header` and `nav` come before `main`, `footer` comes after it, and there is exactly one `main`.
+
+**Head and data:**
+- Link-preview tags are present: `og:title`, `og:description`, `og:image` (an image the owner made) and `twitter:card`.
+- JSON-LD parses (`python3 -c 'import json,sys; json.loads(sys.stdin.read())'` on each block) and agrees with the visible page. Doc 2637 has a band site whose JSON-LD listed 4 members while the page showed 11.
+- `sitemap.xml` and `robots.txt` exist and point at the right domain.
+- The live 404 returns a real 404 status with a useful page.
 
 **Also:**
 - `prefers-reduced-motion` is respected.

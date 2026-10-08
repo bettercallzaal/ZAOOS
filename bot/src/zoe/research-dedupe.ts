@@ -6,6 +6,11 @@
  * if not found or on any IO error, return false (fail-open).
  *
  * Pure functions with injected fs for testability.
+ *
+ * ZOE_RESEARCH_DEDUP_ARXIV=1 (default off) also treats two arXiv links as the
+ * same paper when they share an id, whatever the form (abs/pdf/html, any vN).
+ * The id matching is adapted from 99darwin/nexus (Nexus Contributors, MIT License),
+ * https://github.com/99darwin/nexus - see ./radar-dedup.ts and ./third_party/nexus/.
  */
 
 /**
@@ -90,6 +95,15 @@ export async function wasResearched(
     const normalized = normalizeUrl(url);
     if (!normalized) return false; // Empty normalized URL can't match
 
+    // Flag, default off: also match the same arXiv paper across abs/pdf/version links.
+    // Adapted from 99darwin/nexus (Nexus Contributors, MIT License), https://github.com/99darwin/nexus
+    let targetArxiv: string | null = null;
+    let arxivIdOf: ((text: string) => string | null) | null = null;
+    if (process.env.ZOE_RESEARCH_DEDUP_ARXIV === '1') {
+      arxivIdOf = (await import('./radar-dedup')).extractArxivId;
+      targetArxiv = arxivIdOf(url);
+    }
+
     // Use injected or default fs functions
     const readFile = readFileImpl || (async (p: string) => {
       const { promises: fs } = await import('node:fs');
@@ -132,6 +146,9 @@ export async function wasResearched(
           for (const foundUrl of urlMatches) {
             if (normalizeUrl(foundUrl) === normalized) {
               return true; // URL found in this doc
+            }
+            if (targetArxiv && arxivIdOf && arxivIdOf(foundUrl) === targetArxiv) {
+              return true; // same arXiv paper, different link form (flagged)
             }
           }
 

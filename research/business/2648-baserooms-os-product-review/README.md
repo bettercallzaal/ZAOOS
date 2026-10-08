@@ -445,6 +445,21 @@ Source: o1 docs pages `launchpad/how-it-works`, `launchpad/create/stock-paired-l
 
 **Next Actions addition (for doc 2634's owner, not this lane).** Add o1 as a fifth column to 2634's rails table, with the stock-pairing caveat. This lane will not edit 2634 itself.
 
+### 2026-10-08, tick 14: terms, privacy and the legal surface
+
+Source: `GET` of `/privacy`, `/terms`, `/tos` and `/legal` on baserooms.io (each returned 404); a search of all 185 site JS chunks for "Privacy Policy", "Terms of", "terms of service", "jurisdiction", "governing law", "liability", "sanction", "OFAC" and "restricted countr"; and the app's window list in the bundle.
+
+**There is no Terms of Service and no Privacy Policy.** All four URLs return 404. The only "terms of service" and "privacy policy" strings in the bundle sit inside the Reown AppKit wallet-connect library, as templates shown only if the app passes `termsConditionsUrl` / `privacyPolicyUrl`. A search for where the app sets those two options found nothing outside the library, so the wallet sign-in shows neither link. "Governing law", "jurisdiction", "OFAC" and "sanction" do not appear anywhere in the app code.
+
+**What exists instead is two in-OS documents.** `README.txt` ("What Base Rooms OS is: the buddies, BRTC and every tool") and `Disclosures.txt` ("Fees, risks and what Base Rooms OS stores", tagged with the keyword `terms`). Both are the plain-language text this review quotes in sections 4 and 8. They are thorough on fees and on what is stored, and they name no legal entity, no governing law and no contact address.
+
+**The only geographic rule** is in the referral section: "Not offered to UK consumers."
+
+**What this means for The ZAO.**
+
+1. **No agreement exists between a user and Base Rooms.** Anything The ZAO does with it (a partnership, a station, an embed) rests on goodwill, not on terms anyone can point to. That is normal for a solo crypto project and it matters if money or member data is ever involved.
+2. **Before any formal partnership**, the questions to raise are who the contracting party is, and what happens to stored messages and Farcaster notification tokens (tick 8) if the service closes. This belongs in the same gated outreach as Key Decision 4. It is not a reason to stop using Rooms for calls.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -507,6 +522,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl + HTML strip] Buddies token page (supply 266, holders 60): https://basescan.org/token/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b
 - [FULL - curl -D] Response headers of baserooms.io (/, /api/gas, /mcp, /agent.md), the Worker /hook/inbox, im.baserooms.io/health and meet.baserooms.io, one request each
 - [FULL - curl + HTML strip] o1 docs: https://docs.o1.exchange/launchpad/how-it-works , https://docs.o1.exchange/launchpad/create/stock-paired-launches , https://docs.o1.exchange/launchpad/staking/overview
+- [FULL - curl] /privacy, /terms, /tos, /legal on baserooms.io (all 404); bundle search across 185 chunks for terms, privacy and jurisdiction strings
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

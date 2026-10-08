@@ -7,6 +7,9 @@
  *
  * What was taken: the layered dedup (URL, then exact title, then arXiv id, then
  * content-word Jaccard and title-entity overlap) and the source-adapter shape.
+ * What is stricter than nexus: different arXiv ids never merge, and the entity
+ * rule needs 3 shared names (or 2 with a dollar amount) after a generic-word
+ * filter (review of #3821).
  * What was left out, on Zaal's 2026-10-08 ruling (vault item 64): nexus's paid
  * TypeSafe/Jev classifier, its Postgres tables, and its X API adapter. This file
  * is pure: no database, no network, no clock. Callers pass in what was seen.
@@ -45,9 +48,15 @@ export interface DedupResult {
   dropped: Array<{ item: RadarItem; reason: DupReason; duplicateOf: string }>;
 }
 
-// Thresholds kept from nexus: content Jaccard above 0.6, or 2+ shared title entities.
+// Content Jaccard above 0.6 is kept from nexus.
 export const CONTENT_SIMILARITY_THRESHOLD = 0.6;
-export const MIN_ENTITY_OVERLAP = 2;
+// STRICTER than nexus (which merged on any 2 shared capitalised words): the review
+// of #3821 showed "Language Models are Few-Shot Learners" merging with "Language
+// Models for Protein Folding", and two different OpenAI/Anthropic stories merging.
+// So: 3+ shared entities, or 2+ when one of them is a dollar amount, after dropping
+// capitalised words that are generic in tech titles (TITLE_GENERIC_WORDS).
+export const MIN_ENTITY_OVERLAP = 3;
+export const MIN_ENTITY_OVERLAP_WITH_MONEY = 2;
 // nexus caps the O(n^2) pass at 200 items; so do we.
 export const MAX_DEDUP_BATCH = 200;
 
@@ -71,7 +80,15 @@ const TITLE_COMMON_WORDS = new Set([
   'year', 'today',
 ]);
 
-/** Proper nouns and dollar amounts in a title (nexus extractTitleEntities). */
+// Ours, not nexus's: capitalised words that name a field, not a story.
+const TITLE_GENERIC_WORDS = new Set([
+  'language', 'languages', 'model', 'models', 'large', 'learning', 'learner', 'learners', 'deep', 'neural',
+  'network', 'networks', 'agent', 'agents', 'ai', 'llm', 'llms', 'paper', 'study', 'survey', 'towards',
+  'benchmark', 'benchmarks', 'open', 'source', 'show', 'ask', 'hn', 'data', 'system', 'systems', 'framework',
+  'approach', 'method', 'methods', 'analysis', 'introducing', 'release', 'released', 'version',
+]);
+
+/** Proper nouns and dollar amounts in a title (nexus extractTitleEntities, plus our generic-word filter). */
 export function extractTitleEntities(title: string): string[] {
   const entities: string[] = [];
   for (const match of title.matchAll(/\$\s*([\d,.]+)\s*(b|m|k|billion|million|thousand)?/gi)) {
@@ -84,7 +101,8 @@ export function extractTitleEntities(title: string): string[] {
   }
   for (const word of title.split(/[^a-zA-Z0-9]+/)) {
     if (word.length < 2) continue;
-    if (/^[A-Z]/.test(word) && !TITLE_COMMON_WORDS.has(word.toLowerCase())) entities.push(word.toLowerCase());
+    const w = word.toLowerCase();
+    if (/^[A-Z]/.test(word) && !TITLE_COMMON_WORDS.has(w) && !TITLE_GENERIC_WORDS.has(w)) entities.push(w);
   }
   return [...new Set(entities)];
 }
@@ -112,10 +130,16 @@ export function jaccardSimilarity(a: string[], b: string[]): number {
   return union === 0 ? 0 : intersection / union;
 }
 
-function entityOverlap(a: string[], b: string[]): number {
-  if (a.length === 0 || b.length === 0) return 0;
+function sharedEntities(a: string[], b: string[]): string[] {
+  if (a.length === 0 || b.length === 0) return [];
   const setB = new Set(b);
-  return a.filter((e) => setB.has(e)).length;
+  return a.filter((e) => setB.has(e));
+}
+
+function entitiesMatch(a: string[], b: string[]): boolean {
+  const shared = sharedEntities(a, b);
+  if (shared.length >= MIN_ENTITY_OVERLAP) return true;
+  return shared.length >= MIN_ENTITY_OVERLAP_WITH_MONEY && shared.some((e) => e.startsWith('$'));
 }
 
 /**
@@ -153,10 +177,11 @@ function fingerprint(item: RadarItem): Seen {
 
 function matchReason(a: Seen, b: Seen): DupReason | null {
   if (a.urlKey && a.urlKey === b.urlKey) return 'url';
+  // Two different arXiv ids are two different papers, whatever the titles or text say.
+  if (a.arxiv && b.arxiv) return a.arxiv === b.arxiv ? 'arxiv' : null;
   if (a.titleKey && a.titleKey === b.titleKey) return 'title';
-  if (a.arxiv && a.arxiv === b.arxiv) return 'arxiv';
   if (jaccardSimilarity(a.fp, b.fp) > CONTENT_SIMILARITY_THRESHOLD) return 'content';
-  if (entityOverlap(a.entities, b.entities) >= MIN_ENTITY_OVERLAP) return 'entities';
+  if (entitiesMatch(a.entities, b.entities)) return 'entities';
   return null;
 }
 

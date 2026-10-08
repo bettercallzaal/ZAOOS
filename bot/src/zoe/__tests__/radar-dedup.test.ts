@@ -84,6 +84,40 @@ describe('radar-dedup: distinct items stay', () => {
     expect(r.kept).toHaveLength(2);
   });
 
+  // The three pairs the #3821 evaluator merged wrongly. Each must stay separate.
+  it('review pair 1: two different papers sharing "Language Models" stay separate', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/gpt3', 'Language Models are Few-Shot Learners'),
+      item('https://b.com/fold', 'Language Models for Protein Folding'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('three shared generic words (Large Language Models) are not a story match', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/code', 'Large Language Models for Code Review'),
+      item('https://b.com/music', 'Large Language Models in Music Composition'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('review pair 2: two different stories about the same two companies stay separate', () => {
+    const r = dedupeRadarItems([
+      item('https://a.com/price', 'OpenAI Anthropic compete on pricing'),
+      item('https://b.com/pact', 'OpenAI Anthropic sign safety pact'),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
+  it('review pair 3: papers with different arXiv ids never merge, even with near-identical text', () => {
+    const body = 'We study scaling laws for transformer training on synthetic reasoning tasks at small scale';
+    const r = dedupeRadarItems([
+      item('https://arxiv.org/abs/2401.11111', 'Paper A', body),
+      item('https://arxiv.org/abs/2401.22222', 'Paper B', body),
+    ]);
+    expect(r.kept).toHaveLength(2);
+  });
+
   it('items past the batch cap are kept unchecked, never dropped', () => {
     const many = Array.from({ length: 205 }, () => item('https://same.com/x', 'Same'));
     const r = dedupeRadarItems(many);

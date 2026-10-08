@@ -22,6 +22,9 @@ Credit line, used at each use site (ZAOOS doc 2643, rank 3):
 
 - Left out, on Zaal's 2026-10-08 ruling (vault item 64): the paid TypeSafe/Jev
   classifier, the Postgres tables, and the X API adapter.
+- Stricter than nexus (review of #3821): two different arXiv ids never merge;
+  the title-entity rule needs 3 shared names, or 2 with a dollar amount, after
+  dropping capitalised generic words (Language, Models, Agents...).
 - Changed: pure functions with no database. The caller passes the items already
   seen. Every drop records its reason and what it duplicated. arXiv ids are also
   read from the url, with the version suffix ignored.

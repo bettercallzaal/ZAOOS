@@ -1,6 +1,6 @@
 ---
 name: site-pass
-description: DRAFT (doc 2639, not yet installed as a skill). One pass over a ZAO website so it reads as made by people and meets a measured quality floor. The agent does content, data, structure, code and QA; the look comes from the designer (Ryan leads all ZAO design, rulings 53 and 54). Use for "make this site better", "build the page from Ryan's spec", "does this look AI-made", or before shipping any public page.
+description: DRAFT (doc 2639, not yet installed as a skill). One pass over a ZAO website so it reads as made by people and meets a measured quality floor. The agent does content, data, structure, code and QA; the look comes from a human designer (Brian for North Creek; rulings 53, 54 and 61). Use for "make this site better", "build the page from Brian's spec", "does this look AI-made", or before shipping any public page.
 ---
 
 # site-pass
@@ -9,7 +9,7 @@ Built from ZAOOS doc 2639. The generic-tells list is quoted from Anthropic's `fr
 
 ## The line
 
-**On a ZAO public surface the agent never originates visual design.** That covers palette, typeface, imagery, illustration, poster, share card, layout mood and motion style. Ryan leads all design (zao-vault `decisions/grill-2026-10-07-seat-morning.md`, items 53 and 54).
+**On a ZAO public surface the agent never originates visual design.** That covers palette, typeface, imagery, illustration, poster, share card, layout mood and motion style. The look comes from a human designer (zao-vault `decisions/grill-2026-10-07-seat-morning.md`, items 53 and 54). For North Creek that is Brian: item 53 was relayed as "Ryan", and Zaal corrected it in item 61, verbatim "no no no brian from north creek handles design". For any other site, ask Zaal who owns the look. Do not assume Brian, and do not guess his surname or handle.
 
 The agent's work is everything else:
 - content
@@ -30,15 +30,24 @@ If no spec exists, the pass covers steps 0.5, 1, 2, 5, 7 and 8, and the visual l
 
 ## 0.5 Is the live site up?
 
+Measure from two places, this machine and an outside vantage (the VPS), and read both before saying anything:
+
 ```bash
-curl -sS -o /dev/null -w '%{http_code} %{ssl_verify_result}\n' -m 15 "$LIVE_URL"
+probe='curl -sS -o /dev/null -w "%{http_code} %{ssl_verify_result}" -m 15'
+echo "local:   $(sh -c "$probe '$LIVE_URL'" 2>&1)"
+echo "outside: $(ssh -o ConnectTimeout=8 -o BatchMode=yes vps "$probe '$LIVE_URL'" 2>&1)"
 ```
 
-Anything but a 2xx or 3xx with `ssl_verify_result` 0 means the live site is down or broken. North Creek, 2026-10-08: TLS reset for its own name while the same IP served `*.vercel.app`.
+| local | outside | What it means | What to do |
+|---|---|---|---|
+| 2xx/3xx, verify 0 | 2xx/3xx, verify 0 | Up | Carry on |
+| fails | 2xx/3xx, verify 0 | **Local network filter, not an outage** | Audit a local copy. Report it as this machine's network. Not to Zaal, not as a Vercel problem |
+| fails | fails | Down from both | Report to the orchestrator with both readings. Domains and Vercel are Zaal's; do not touch them |
+| any | could not run (no ssh, timeout) | **UNKNOWN** | Say UNKNOWN. A failure seen from one machine is never "down" |
 
-In that case:
-- Audit a local copy instead.
-- Report the outage to the orchestrator. Domains and Vercel are Zaal's, so do not touch them.
+Why both: on 2026-10-08 the north-creek lane saw a TLS reset for northcreek.art from this Mac and reported the site down. Its controls were other hostnames from the same Mac, so they could not rule out a local filter. The same minute the VPS got `200 0`, and the skills lane re-measured `200 0` from the VPS and `000 1` from the Mac. The site was never down.
+
+In every case other than "up", audit a local copy for the rest of the pass.
 
 ## 1. Subject
 

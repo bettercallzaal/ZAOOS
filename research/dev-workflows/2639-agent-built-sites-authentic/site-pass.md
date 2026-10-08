@@ -1,6 +1,6 @@
 ---
 name: site-pass
-description: DRAFT (doc 2639, not yet installed as a skill). One pass over a ZAO website so it reads as made by people and meets a measured quality floor. The agent does content, data, structure, code and QA; the look comes from the designer (Ryan leads all ZAO design, rulings 53 and 54). Use for "make this site better", "build the page from Ryan's spec", "does this look AI-made", or before shipping any public page.
+description: DRAFT (doc 2639, not yet installed as a skill). One pass over a ZAO website so it reads as made by people and meets a measured quality floor. The agent does content, data, structure, code and QA; the look comes from the designer (Brian leads all ZAO design, rulings 53 and 54). Use for "make this site better", "build the page from Brian's spec", "does this look AI-made", or before shipping any public page.
 ---
 
 # site-pass
@@ -9,7 +9,7 @@ Built from ZAOOS doc 2639. The generic-tells list is quoted from Anthropic's `fr
 
 ## The line
 
-**On a ZAO public surface the agent never originates visual design.** That covers palette, typeface, imagery, illustration, poster, share card, layout mood and motion style. Ryan leads all design (zao-vault `decisions/grill-2026-10-07-seat-morning.md`, items 53 and 54).
+**On a ZAO public surface the agent never originates visual design.** That covers palette, typeface, imagery, illustration, poster, share card, layout mood and motion style. Brian leads all design (zao-vault `decisions/grill-2026-10-07-seat-morning.md`, items 53 and 54). Item 53 recorded the name as "Ryan"; Zaal corrected it to Brian, of North Creek, in item 61.
 
 The agent's work is everything else:
 - content

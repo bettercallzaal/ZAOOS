@@ -50,7 +50,7 @@ Zaal has already used it: his cast at 2026-10-08 13:32 UTC reads "Just booted Bu
 ### 2. Open source and licence
 
 - **App: closed source.** No repository is linked from the site, and none was found in the searches above. With no LICENSE file to read, the default is all rights reserved (`credit-attribution.md`). We cannot fork or vendor any of it.
-- **Contracts: source is public, licence not declared.** All three Base Rooms contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. Readable is not the same as reusable.
+- **Contracts: source is public; the Buddies contract is MIT.** All three contracts are "Source Code Verified (Exact Match)" on Basescan, which shows "License: -NA-" for each. That field is wrong for the Buddies contract: its source on Sourcify (exact match) opens `// SPDX-License-Identifier: MIT` in both `src/BaseRoomsUnits.sol` and `src/generated/UnitPool.sol` (corrected 2026-10-08 by loop tick 1). Evolutions and the o1 staking vault are not on Sourcify, so their licence is still unread.
 - **Buddy art: CC0 per the site.** The homepage says "NFTs on Base whose art and pet are fully onchain (CC0)". This is the site's own claim; the contract source on Basescan was not read for a licence string.
 - **The one file we can read in full is `https://baserooms.io/unit.mjs`** (6,905 bytes, Node 18+, no dependencies). It is served publicly with no licence header.
 
@@ -155,6 +155,24 @@ Every call below ran three times on 2026-10-08 against public data, with no wall
 
 Not tested, on purpose: anything behind the wallet sign-in (Messenger, Rooms inside the OS, Buddies, Swap quotes tied to a wallet). Those are gated for this lane.
 
+## Loop findings
+
+### 2026-10-08, tick 1: the Buddies mint path and the art
+
+Source: `src/BaseRoomsUnits.sol` from Sourcify (exact match, 442 lines), plus `cast call` against `https://mainnet.base.org` at block 52,346,706.
+
+**Who can mint.** `eligible()` returns true if public mint is on, or the wallet has any BRTC principal staked in one of the o1 vaults the owner listed, or the wallet is in a Merkle snapshot. Live state: `mintOpen` true, `publicMint` false, `eligibilityRoot` zero (no snapshot), `staking` is the o1 vault contract `0x6f25...dB4`, with one vault id (`0x4254...cbd5`, the same `VAULT_ID` the site uses). So today **the only way to mint is to have staked some BRTC first**, which matches the site copy. The contract checks "any amount": one wei of staked principal qualifies.
+
+**What a mint costs and where it goes.** `price` is 10 USDC per Buddy, at most 10 per wallet (`MAX_PER_WALLET`). The USDC goes straight from the minter to the treasury in the same call (`safeTransferFrom(usdc, msg.sender, treasury, price * qty)`); the contract never holds it. On top, the minter pays a small ETH fee to Pyth Entropy V2 for randomness (`quote(qty)` returns both). `totalSupply` was 266 at that block, so at list price the mint has sent about 2,660 USDC to the treasury so far, less any change in price over time (not measured).
+
+**How traits are assigned.** Traits come from a fixed pool of 8,888 stored with SSTORE2 at deploy, drawn without replacement (a lazy Fisher-Yates shuffle) using Pyth's random number, revealed in a later callback. If Pyth does not answer within an hour, anyone can pay for a retry. This is a fair-launch design: the owner cannot choose who gets which traits.
+
+**Is the art really onchain?** Yes, with one caveat. `tokenSVG(1)` returns a 2,921-byte SVG straight from the contract, and `tokenURI(1)` returns a base64 JSON data URI (44,933 bytes decoded) whose only external URL is `https://baserooms.io` as the project link. No IPFS, no image server. The caveat is in the contract itself: `setRenderer` carries the comment "It is never frozen, so the art can keep evolving", and the owner key can point every Buddy at a new renderer at any time. "Fully onchain" here means "stored onchain", not "immutable".
+
+**Licence and royalty.** `license()` returns `"CC0-1.0"` for the art. Default royalty is 5% (500 bps) to the treasury.
+
+**What this changes.** Nothing in the Key Decisions. It corrects one fact (the contract licence) and confirms two site claims (stake-gated mint, onchain art). It also sharpens the single-key point: that one EOA can change the price, the eligibility rule, the art and the royalty.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -197,6 +215,8 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl] OAuth metadata: https://baserooms.io/.well-known/oauth-authorization-server, https://baserooms.io/.well-known/oauth-protected-resource
 - [FULL - curl] Site JS bundle, 185 chunks under https://baserooms.io/_next/static/immutable/chunks/ (pairing presets, `setupFor`, hook blocks, contract constants, fee constants)
 - [FULL - curl, 3 runs each] Public tool routes: `/api/gas`, `/api/safety`, `/api/wallet`, `/api/holders`, `/api/contract`, `/api/scan`, `/api/radio/browse`
+- [FULL - Sourcify API] Buddies source: https://sourcify.dev/server/v2/contract/8453/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b?fields=sources (exact match). Evolutions, the o1 vault and the renderer returned 400 (not on Sourcify)
+- [FULL - cast call, Base RPC] Buddies live state at block 52,346,706: mintOpen, publicMint, eligibilityRoot, staking, vaults, royaltyInfo, license, drawn, totalSupply, tokenSVG(1), tokenURI(1)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

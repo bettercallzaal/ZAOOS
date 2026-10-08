@@ -100,6 +100,31 @@ each message has, and **was not measured for other lanes**.
 finding, that cost per turn is flat over a long session, is a ratio, so it may still
 hold. Both are UNVERIFIED until it is re-measured with the fix.
 
+**Note (seat, 2026-10-08):** the `zao-spend` dedup fix changes `agent-spend.md`'s
+"$1 per turn" figure. Its "turn" was a transcript line, and a line is not an API
+call. Re-measuring and correcting that rule is the PR lead's job, not this doc's.
+
+### What the seat adopted, 2026-10-08
+
+- **Reporting norm, adopted from this doc's proposal.** Lanes SendMessage the seat
+  only for:
+  - gates;
+  - blockers;
+  - Zaal's words for the record;
+  - Needs lines.
+
+  A routine "done, PR head X" no longer goes to the seat.
+- **`seat-digest` commissioned.** It lives in zaal-dotfiles `bin`. Wiring it as a
+  Monitor on the seat is the seat's own step after it merges.
+
+**A gap found while building it.** The proposed mailbox, `orca orchestration
+inbox`, held 60 messages on 2026-10-08, and the newest was from 2026-08-27. Lanes
+talk to the seat through Claude Code's SendMessage, not Orca's orchestration
+mailbox, so the digest's inbox source watches a channel nobody currently writes to.
+For FYI reports to land there, lanes would have to use `orca orchestration send`.
+Otherwise the seat needs a different mailbox (one vault file) or relies on PR state
+alone.
+
 ## Part 2. Script or judgment, per step of a tick
 
 | Step | Same judgment every time? | Belongs in |
@@ -240,8 +265,10 @@ Re-measure with the fixed `zao-spend` one full day after the change.
 |---|---|---|---|
 | Fix `zao-spend` to deduplicate usage by `message.id`, add a test with a two-block message, and re-print the 24h by-lane table. Shipped = merged zaal-dotfiles PR with before and after figures. | zaal-dotfiles-fc | PR | 2026-10-09 |
 | Re-measure `agent-spend.md`'s per-turn figure with the fixed tool and correct the rule if it moved | zaal-dotfiles-fc | PR | 2026-10-10 |
-| Adopt or decline the reporting norm: SendMessage the seat only for gates, blockers and Needs; everything else to the mailbox | seat | Decision | 2026-10-09 |
-| Write `seat-digest`, read-only and git-tracked, with a red control (one fake change must print one line). Shipped = merged PR. | zaoos-35 (Claude), if the seat adopts it | PR | 2026-10-10 |
+| DONE 2026-10-08: the seat adopted the reporting norm (gates, blockers, Zaal's words, Needs only) | seat | Decision | 2026-10-08 |
+| Write `seat-digest` in zaal-dotfiles `bin`, read-only, with a red control. Shipped = merged PR. | zaoos-35 (Claude) | PR | 2026-10-09 |
+| Pick the FYI mailbox: lanes use `orca orchestration send`, or one vault file, or PR state only | seat | Decision | 2026-10-09 |
+| Wire `seat-digest --watch` as a Monitor on the seat | seat | Setup | after the PR merges |
 | Run the seat for one day with the Monitor plus the boundary restarts, then re-measure $/day | seat | Trial | 2026-10-11 |
 
 ## Sources

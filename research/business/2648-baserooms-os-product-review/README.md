@@ -497,6 +497,24 @@ Source: the FxTwitter API profile for `@baserooms` (read twice today, at about 1
 
 **What it means.** The audience is small and spread across three places: about 350 on X, about 150 in Telegram, and about 1,100 following the builder on Farcaster. That matches the onchain picture of 134 BRTC holders and 60 Buddy holders. On those numbers, The ZAO is not a small partner to Base Rooms. A WaveWarZ or ZAO radio station (Key Decision 4) would put our artists in front of the whole active user base at once, and it would also be one of the bigger things to happen to Base Rooms that week. That is useful framing for how Zaal makes the ask, and it is not something to say in public.
 
+### 2026-10-08, tick 17: what moved during the day
+
+Source: the same reads as earlier sections, repeated at 18:42 UTC (block 52,347,792): `totalSupply()` on the Buddies contract, USDC `balanceOf(treasury)`, `getVault`, `im.baserooms.io/health` and `/api/holders`. The "earlier" column cites the section where each figure was first measured, at about 16:30 to 16:45 UTC.
+
+| Measure | Earlier | 18:42 UTC | Change |
+|---|---|---|---|
+| Buddies minted | 264 (section 3) | 266 | +2 |
+| Treasury USDC | 249.995 (section 8, wallet lookup) | 269.995 | +20.000 |
+| BRTC staked in the vault | 321,780,602 (tick 3) | 321,780,602 | none |
+| Vault reward left | 2.53088657 MSTR (tick 3) | 2.53088657 MSTR | none (no claims) |
+| BRTC holders | 133 (homepage) / 134 (holders API) | 134 | +1 at most |
+| BRTC price (USD) | $0.00003732 (homepage) | $0.00003799 | +1.8% |
+| Messenger users online | 6 (tick 8) | 7 | +1 |
+
+**The two new mints account for the treasury change exactly.** That is two Buddies at 10 USDC, +20.000 USDC, which independently confirms tick 4's finding that mint revenue flows straight to the treasury. One of the two is the 18:01 UTC mint from `bettercallzaal.base.eth` seen in tick 4's transfer list.
+
+**At this pace the product is quiet.** In about two hours there were two mints, one new holder at most, no new stake, and no reward claims. That matches the audience size in tick 16. Nothing in the day's movement changes a Key Decision.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -564,6 +582,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast, Base RPC] EIP-1967 admin and implementation slots of the three Veranta proxies; admin owner is a Safe 1.3.0, threshold 3, 5 owners
 - [FULL - FxTwitter API, community] https://api.fxtwitter.com/baserooms profile stats, read twice
 - [FULL - curl + HTML strip, community] Telegram group page https://t.me/brtc_base (156 members), read twice; /s/ preview redirects (group, no public history)
+- [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

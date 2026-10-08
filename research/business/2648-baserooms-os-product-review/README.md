@@ -527,6 +527,26 @@ No new fetch this tick. The loop findings that call for action were added to the
 
 The Key Decisions table is unchanged: none of ticks 1 to 17 reversed or weakened a decision.
 
+### 2026-10-08, tick 19: what one Buddy really costs
+
+Source: `quote(qty)` on the Buddies contract for 1, 5 and 10, and ETH/USD plus the generic "Mint NFT" gas estimate from `/api/gas` (ETH $2,445.37 at about 18:46 UTC).
+
+| Mint size | USDC to treasury | Pyth Entropy fee (ETH) | Pyth fee (USD) |
+|---|---|---|---|
+| 1 | 10 | 0.000015 | about $0.037 |
+| 5 | 50 | 0.000015 | about $0.037 |
+| 10 | 100 | 0.0000186 | about $0.045 |
+
+The Pyth fee is charged per **request**, not per Buddy, and grows only with the callback gas for the batch. So batching is almost free: ten Buddies cost about 1.2 times the randomness fee of one. Network gas is extra; the site's own generic "Mint NFT" estimate is about $0.0023. The Buddies mint does more work than a plain NFT mint (permit, USDC transfer, entropy request), so its real gas is higher, but it was not measured here because measuring it needs a transaction.
+
+**The cost a newcomer actually pays.** Because the mint is stake-gated (tick 1), the first Buddy for someone holding no BRTC costs:
+
+1. a swap into BRTC (1% o1 pool fee on the direct route, or 0.1% Base Rooms fee plus the aggregator's on routed swaps)
+2. a stake of any amount in the o1 vault, locked for up to about four weeks and never past 2026-12-07 (tick 3)
+3. 10 USDC, plus about $0.04 of ETH for randomness, plus gas
+
+Steps 1 and 2 are where a newcomer's money is at risk: BRTC exposure, and a lock with no early exit. The 10 USDC goes straight to the treasury and comes back to the holder only by reselling the Buddy.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -598,6 +618,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - FxTwitter API, community] https://api.fxtwitter.com/baserooms profile stats, read twice
 - [FULL - curl + HTML strip, community] Telegram group page https://t.me/brtc_base (156 members), read twice; /s/ preview redirects (group, no public history)
 - [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
+- [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

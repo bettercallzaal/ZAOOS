@@ -1,0 +1,53 @@
+# ZAOstock
+
+ZAOstock is The ZAO's flagship in-real-life music festival: a free, community-built outdoor showcase for independent artists in Ellsworth, Maine. It is where a network that mostly builds online shows up in person.
+
+## 2026 - the first one
+
+- **Date:** Saturday, October 3, 2026
+- **Time:** 12 PM to 6 PM
+- **Venue:** Franklin Street Parklet, downtown Ellsworth, Maine
+- **Admission:** free to attend, with an optional pro ticket that supports the festival
+- **Format:** one stage, all day. Independent artists perform live sets with DJs between every act. The lineup is announced once every set is locked.
+- **Official status:** part of the 9th Annual Art of Ellsworth during Maine Craft Weekend, with statewide promotion.
+- **Venue partner:** Heart of Ellsworth.
+
+## What it is
+
+ZAOstock is the flagship live moment for The ZAO (ZTalent Artist Organization), a decentralized impact network that returns profit, data, and rights to artists. The festival takes that idea off the internet and puts it on one stage for a day: independent musicians, an open sidewalk in downtown Ellsworth, and a town that every car heading to Acadia passes through.
+
+It is music-first and community-run. Anyone can attend free; the optional pro ticket, sponsorship, and volunteering are how it is paid for and staffed.
+
+## In the ZAO ecosystem
+
+ZAOstock sits under the ZAO Festivals umbrella, alongside COC Concertz. It is the annual anchor that ties the online network - The ZAO, WaveWarZ, ZABAL Games - to a real place on a real date.
+
+## Find it
+
+- Festival site: https://zaostock.com
+- RSVP and tickets: https://ticket.zaostock.com
+
+## Related
+
+The ZAO, ZAO Festivals, WaveWarZ, COC Concertz, BetterCallZaal.
+
+---
+
+## Reviewer notes - decisions for Zaal, not part of the box text
+
+**1. Two things in the LIVE box that this draft deliberately REMOVES.** Both are internal operations detail sitting in public brand context, which the original draft's own guardrail already ruled out ("internal team roles/logistics stay out of the box"):
+
+- *"coordinated through a dedicated team bot and tracker, covering artists, sponsors, volunteers, site and safety leads, sound, and livestream"* - publishes our internal org chart and tooling to anyone who fetches the box.
+- *"it is graduating into its own repository and operations as it matures from a ZAOOS experiment into a standalone production"* - a repo-spinout detail that means nothing to a public reader and reads oddly in a festival description.
+
+Say the word if you want either kept.
+
+**2. "Year 1", not "the 2026 edition".** The live box says "The 2026 edition", and the July draft called it "the flagship **annual** festival". The site says **Year 1** - this is the first one. The text above says "the first one" and calls it the annual anchor going forward. Correct that if the framing is wrong.
+
+**3. The $50 pro ticket price is omitted on purpose.** Your rule is no dollar figures in public box content. That rule is about the internal budget, and this number is already public on zaostock.com - so it is arguably fine. I left it out and am asking rather than deciding. One-word change if you want it in.
+
+**4. `https://thezao.com/zaostock` is NOT included - it 404s** (checked 2026-08-13). `zaostock.com` (200, "ZAOstock | Community Music Festival") and `ticket.zaostock.com` (200) both resolve.
+
+**5. Kept out entirely:** budget and funding status, the weather-backup tent vendor, and named team members. All internal.
+
+**6. Unverified by me:** nothing in the box text above is unsourced - every fact traces to the fetched site or the confirmed-details memory. The lineup is deliberately not named because the site says it is announced only once every set is locked.

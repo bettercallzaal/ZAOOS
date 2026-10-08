@@ -37,3 +37,17 @@ Written in the overnight build loop 2026-07-30. Source lines are in each draft.
   `../zol.draft.llm.txt`) verified still repo-only (registry = 23 live boxes,
   none of the three present) and fact-checked 2026-08-20; publish-ready as
   written. Approval sheet: zao-vault notes/icm-approval-sheet.md.
+
+## Added 2026-10-08 (Zaal's ruling "A for icm", seat pane 11:0x ET)
+
+The repo copy in `research/identity/icm-boxes/` is now the MASTER for every box: a
+lane drafts each corrected box as a ZAOOS PR, Zaal approves the text, then it is
+PUT to useicm.com and re-fetched and byte-compared. Order is worst first.
+
+- `zaostock.draft.llm.txt` is SUPERSEDED by `../zaostock.llm.txt`. The live box
+  (3718 bytes, fetched 2026-10-08, archived at `../live-snapshots/zaostock.llm.txt`)
+  carried this draft's "Reviewer notes - decisions for Zaal" section in public and
+  still described the festival as upcoming. The master rewrites it as a past event
+  from zaostock.com as fetched 2026-10-08 (home: "ZAOstock 2026 is a wrap"; the
+  lineup API and /artists: seven acts in running order). No dollar figures, no
+  internal operations, no reviewer notes. The act that did not play is not named.

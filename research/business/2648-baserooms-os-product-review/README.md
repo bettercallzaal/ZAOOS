@@ -668,6 +668,24 @@ Source: o1 docs `launchpad/api/authentication.md` and `launchpad/api/read-endpoi
 
 **What it shows about the creator economics.** On BRTC's own trading, Base Rooms has earned about 8.9 MSTR (about $1,340 at that day's $150.47) as the creator, against about 2,600 USDC from Buddy mints (tick 4). So the token has earned the builder roughly half as much as the collectibles.
 
+### 2026-10-08, tick 29: evening re-measure
+
+Source: the same reads as tick 17, repeated at 20:18 UTC (block 52,350,675), plus the Telegram page and the X profile.
+
+| Measure | 18:42 UTC (tick 17) | 20:18 UTC | Change |
+|---|---|---|---|
+| Buddies minted | 266 | 266 | none |
+| Treasury USDC | 269.995 | 269.995 | none |
+| BRTC staked in the vault | 321,780,602 | 321,780,602 | none |
+| Vault reward left | 2.53088657 MSTR | 2.53088657 MSTR | none |
+| BRTC holders | 134 | 134 | none |
+| BRTC price | $0.00003799 | $0.00003799 | none at the precision shown |
+| Messenger users online | 7 | 5 | -2 |
+| Telegram members | 156 (tick 16) | 155 | -1 |
+| X followers | 353 (tick 16) | 354 | +1 |
+
+**Nothing onchain moved in about 1.5 hours.** There were no mints, no stake changes, no reward claims and no new holders. Activity off chain drifted by one or two people. This confirms the reading in ticks 16 and 17 that the product is small and quiet at this stage. It is also the signal for this loop: repeat measurements now return the same numbers, so further delta ticks add cost and no information.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -746,6 +764,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - bundle and HTML search] 16 analytics/tracking markers across the homepage HTML and 185 JS chunks (none found); Games and Art Gallery window definitions; /api/nfts/held input check (400 on unknown parameter)
 - [FULL - curl] Public swap quotes: https://baserooms.io/api/trade/quotes (USDC to WETH, MSTR to BRTC), about 19:00 UTC
 - [FULL - curl, raw markdown] o1 API docs: https://docs.o1.exchange/launchpad/api/authentication.md , https://docs.o1.exchange/launchpad/api/read-endpoints.md ; [FAILED - 401 missing_api_key] https://api.launch.o1.exchange/v1/config and /tokens/8453/<BRTC> (key-only; /health 200)
+- [FULL - cast + curl] Evening re-measure at 20:18 UTC, block 52,350,675: Buddies totalSupply, treasury USDC, getVault, IM health, BRTC holders API, Telegram page, FxTwitter profile
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

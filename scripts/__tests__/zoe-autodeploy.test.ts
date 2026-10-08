@@ -257,3 +257,51 @@ describe('zoe-autodeploy boot-verify covers the import graph (ZOE_AUTODEPLOY_VER
     ).not.toThrow();
   });
 });
+
+// zao-evaluate on #3818: with the graph flag on, a verify that esbuild could not
+// finish (killed, out of memory, timed out) printed nothing that matched
+// 'error|unexpected', and the deploy went ahead. The script's own lines are read
+// out of the source and run against a fake esbuild.
+describe('boot-verify fails on a non-zero esbuild exit when the graph flag is on', () => {
+  const scriptPath = path.resolve(__dirname, '../zoe-autodeploy.sh');
+  const lines = fs.readFileSync(scriptPath, 'utf8').split('\n');
+  const pick = (re: RegExp) => {
+    const l = lines.find((x) => re.test(x));
+    if (!l) throw new Error(`no line matching ${re}`);
+    return l;
+  };
+  const flagsDefault = pick(/^VERIFY_FLAGS=\(/);
+  const flagsGraph = pick(/ZOE_AUTODEPLOY_VERIFY_GRAPH:-0}" = 1 \] && VERIFY_FLAGS=/);
+  const errLine = pick(/^ERR=\$\("\$ESB" bot\/src\/zoe\/index\.ts/);
+  const rcLine = pick(/^ESB_RC=\$\?/);
+  const cond = pick(/^if \[ -n "\$ERR" \] && echo "\$ERR" \| grep -qiE/).replace(/; then\s*$/, '');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fake-esb-'));
+  const fake = (name: string, body: string) => {
+    const f = path.join(dir, name);
+    fs.writeFileSync(f, `#!/bin/bash\n${body}\n`);
+    fs.chmodSync(f, 0o755);
+    return f;
+  };
+  const silentKill = fake('killed', 'exit 1');
+  const realError = fake('error', 'echo "X [ERROR] Expected identifier but found ;"; exit 1');
+  const ok = fake('ok', 'exit 0');
+  const verdict = (esb: string, graph: string) =>
+    execSync(
+      `ESB=${JSON.stringify(esb)}; ZOE_AUTODEPLOY_VERIFY_GRAPH=${graph}; ${flagsDefault}; ${flagsGraph}; ${errLine}; ${rcLine}; ${cond}; then echo BLOCK; else echo PASS; fi`,
+      { cwd: dir, shell: '/bin/bash', encoding: 'utf8' },
+    ).trim();
+
+  it('flag on: esbuild exits 1 and prints nothing -> the verify fails', () => {
+    expect(verdict(silentKill, '1')).toBe('BLOCK');
+  });
+  it('flag on: a real esbuild error -> the verify fails', () => {
+    expect(verdict(realError, '1')).toBe('BLOCK');
+  });
+  it('flag on: a clean exit -> the verify passes', () => {
+    expect(verdict(ok, '1')).toBe('PASS');
+  });
+  it('flag off: exactly as on main, an exit 1 with no output still passes (the known gap, unchanged by default)', () => {
+    expect(verdict(silentKill, '0')).toBe('PASS');
+    expect(verdict(realError, '0')).toBe('BLOCK');
+  });
+});

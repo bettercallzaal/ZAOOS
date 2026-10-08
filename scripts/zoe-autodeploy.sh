@@ -116,6 +116,10 @@ fi
 VERIFY_FLAGS=(--external:'*')
 [ "${ZOE_AUTODEPLOY_VERIFY_GRAPH:-0}" = 1 ] && VERIFY_FLAGS=(--packages=external)
 ERR=$("$ESB" bot/src/zoe/index.ts --bundle --platform=node --format=esm --outfile=/dev/null "${VERIFY_FLAGS[@]}" 2>&1)
+ESB_RC=$?
+# With the graph flag on, a non-zero exit fails the verify even when esbuild printed
+# nothing that matches below: killed, out of memory, timed out (zao-evaluate on
+# #3818). With the flag off the check is exactly as before.
 # v4: what the bot READS, from esbuild's own metafile for the commit being deployed.
 # bot/ alone is not enough: scheduler.ts, heart-canary.ts and heart-run.ts import
 # ../../../packages/heart-fleet (seat evaluator on #3817). A SEPARATE build, because
@@ -140,8 +144,8 @@ PY
   [ "$META_OK" = 1 ] && [ -n "$META_LIST" ] && mapfile -t EXTRA <<< "$META_LIST"
 fi
 git -C "$LIVE" worktree remove --force "$V" 2>/dev/null
-if [ -n "$ERR" ] && echo "$ERR" | grep -qiE 'error|unexpected'; then
-  ~/bin/zao-status "autodeploy BLOCKED: origin/main FAILS boot-verify. Bot stays on $LOCAL. First error: $(echo "$ERR" | grep -iE 'error|unexpected' | head -1 | cut -c1-90)" 2>/dev/null
+if [ -n "$ERR" ] && echo "$ERR" | grep -qiE 'error|unexpected' || { [ "${ZOE_AUTODEPLOY_VERIFY_GRAPH:-0}" = 1 ] && [ "$ESB_RC" -ne 0 ]; }; then
+  ~/bin/zao-status "autodeploy BLOCKED: origin/main FAILS boot-verify (esbuild exit $ESB_RC). Bot stays on $LOCAL. First error: $(echo "$ERR" | grep -iE 'error|unexpected' | head -1 | cut -c1-90)" 2>/dev/null
   exit 1
 fi
 

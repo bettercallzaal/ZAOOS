@@ -482,6 +482,85 @@ All three share one proxy admin (`0x2d89...e8bb`), whose `owner()` is `0x3775...
 
 **What this means for The ZAO.** Neither venue belongs anywhere near a ZAO treasury, and nothing here changes the Key Decisions. If a member asks whether "perps on Base Rooms" is safe, the honest answer is: Base Rooms only routes the trade and takes 0.05%. The custody and the upgrade risk sit with Veranta's 3-of-5 Safe.
 
+### 2026-10-08, tick 16: audience size on X and Telegram
+
+Source: the FxTwitter API profile for `@baserooms` (read twice today, at about 16:40 and 18:40 UTC), and the public page `https://t.me/brtc_base` (read twice). `https://t.me/s/brtc_base` redirects to the plain page, which means it is a group, not a channel, so no public message history can be read.
+
+| Surface | Measure | Value |
+|---|---|---|
+| X `@baserooms` | followers | 352, then 353 two hours later |
+| | posts | 1,110 since joining 2025-10-03 |
+| | following / likes / media | 147 / 1,372 / 209 |
+| Telegram `brtc_base` (group) | members | 156 |
+| | online at read time | 39, both reads |
+| Farcaster `@slavanova` (tick 6) | followers | 1,117 |
+
+**What it means.** The audience is small and spread across three places: about 350 on X, about 150 in Telegram, and about 1,100 following the builder on Farcaster. That matches the onchain picture of 134 BRTC holders and 60 Buddy holders. On those numbers, The ZAO is not a small partner to Base Rooms. A WaveWarZ or ZAO radio station (Key Decision 4) would put our artists in front of the whole active user base at once, and it would also be one of the bigger things to happen to Base Rooms that week. That is useful framing for how Zaal makes the ask, and it is not something to say in public.
+
+### 2026-10-08, tick 17: what moved during the day
+
+Source: the same reads as earlier sections, repeated at 18:42 UTC (block 52,347,792): `totalSupply()` on the Buddies contract, USDC `balanceOf(treasury)`, `getVault`, `im.baserooms.io/health` and `/api/holders`. The "earlier" column cites the section where each figure was first measured, at about 16:30 to 16:45 UTC.
+
+| Measure | Earlier | 18:42 UTC | Change |
+|---|---|---|---|
+| Buddies minted | 264 (section 3) | 266 | +2 |
+| Treasury USDC | 249.995 (section 8, wallet lookup) | 269.995 | +20.000 |
+| BRTC staked in the vault | 321,780,602 (tick 3) | 321,780,602 | none |
+| Vault reward left | 2.53088657 MSTR (tick 3) | 2.53088657 MSTR | none (no claims) |
+| BRTC holders | 133 (homepage) / 134 (holders API) | 134 | +1 at most |
+| BRTC price (USD) | $0.00003732 (homepage) | $0.00003799 | +1.8% |
+| Messenger users online | 6 (tick 8) | 7 | +1 |
+
+**The two new mints account for the treasury change exactly.** That is two Buddies at 10 USDC, +20.000 USDC, which independently confirms tick 4's finding that mint revenue flows straight to the treasury. One of the two is the 18:01 UTC mint from `bettercallzaal.base.eth` seen in tick 4's transfer list.
+
+**At this pace the product is quiet.** In about two hours there were two mints, one new holder at most, no new stake, and no reward claims. That matches the audience size in tick 16. Nothing in the day's movement changes a Key Decision.
+
+### 2026-10-08, tick 18: findings folded into Next Actions
+
+No new fetch this tick. The loop findings that call for action were added to the Next Actions table above:
+
+- the radio ask made specific (tick 9), with the legal-party and data questions (tick 14) and the Jitsi `localhost` note (tick 12)
+- ukagai credited in the `zao-ask-check` extension (tick 7)
+- the o1 note for doc 2634's owner (tick 13)
+- a `RendererSet` watch (tick 10)
+- a re-check when the vault ends on 2026-12-07 (ticks 3 and 4)
+
+The Key Decisions table is unchanged: none of ticks 1 to 17 reversed or weakened a decision.
+
+### 2026-10-08, tick 19: what one Buddy really costs
+
+Source: `quote(qty)` on the Buddies contract for 1, 5 and 10, and ETH/USD plus the generic "Mint NFT" gas estimate from `/api/gas` (ETH $2,445.37 at about 18:46 UTC).
+
+| Mint size | USDC to treasury | Pyth Entropy fee (ETH) | Pyth fee (USD) |
+|---|---|---|---|
+| 1 | 10 | 0.000015 | about $0.037 |
+| 5 | 50 | 0.000015 | about $0.037 |
+| 10 | 100 | 0.0000186 | about $0.045 |
+
+The Pyth fee is charged per **request**, not per Buddy, and grows only with the callback gas for the batch. So batching is almost free: ten Buddies cost about 1.2 times the randomness fee of one. Network gas is extra; the site's own generic "Mint NFT" estimate is about $0.0023. The Buddies mint does more work than a plain NFT mint (permit, USDC transfer, entropy request), so its real gas is higher, but it was not measured here because measuring it needs a transaction.
+
+**The cost a newcomer actually pays.** Because the mint is stake-gated (tick 1), the first Buddy for someone holding no BRTC costs:
+
+1. a swap into BRTC (1% o1 pool fee on the direct route, or 0.1% Base Rooms fee plus the aggregator's on routed swaps)
+2. a stake of any amount in the o1 vault, locked for up to about four weeks and never past 2026-12-07 (tick 3)
+3. 10 USDC, plus about $0.04 of ETH for randomness, plus gas
+
+Steps 1 and 2 are where a newcomer's money is at risk: BRTC exposure, and a lock with no early exit. The 10 USDC goes straight to the treasury and comes back to the holder only by reselling the Buddy.
+
+### 2026-10-08, tick 20: Zaal's own Buddy, read from the outside
+
+Source: `traitsOf(252)`, `bootedAt(252)` and `tokenURI(252)` on the Buddies contract, and `GET https://brtc-os.slavamushyakov.workers.dev/units/progress?ids=252` three times, with no key (the same call the onchain pet page makes, tick 10). Buddy #0252 is the one Zaal announced on Farcaster at 2026-10-08 13:32 UTC.
+
+**Onchain, permanent:** Buddy #0252, Class B. Traits: Paint INK, Chassis ATM, Face `^^`, Top HARD HAT, Gear SUNGLASSES; Points 4; Generation Genesis. It was revealed (booted) at unix 1791466183, which matches the time of his cast.
+
+**Off chain, on Base Rooms' Worker:** level 1 "Boot", 36 XP of 100 to the next level, streak 1, 1 active day, 0 "real" actions, bond 56, mood "thriving". Needs: fuel 90, fun 87, clean 94, energy 92. The next stage is "Beta" at level 3, after 2 active days. The response was identical three times.
+
+**What it shows.**
+
+1. **The split from tick 10, on a real token.** The look is onchain and permanent. The progress is a JSON document on Base Rooms' server.
+2. **Progress is public.** The progress endpoint answers without any key, for any Buddy id. So anyone can see how active a given Buddy's owner has been on Base Rooms (active days, streak, care stats), and since ownership is public onchain, that ties back to a wallet. That is a small, real privacy point. It belongs in the same outreach note as the `localhost` framing (Next Actions), and anyone at The ZAO who would rather not publish their activity pattern should know it.
+3. **Level-ups need "real" actions.** `real: 0` and the Disclosures' "4+ fee-paying actions" for the LV5 swap discount line up: XP from care is capped (`care.cap` 24), and the higher levels and the fee discount need actions that pay Base Rooms a fee. That is the business model, shown in one JSON field.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -508,10 +587,13 @@ All three share one proxy admin (`0x2d89...e8bb`), whose `owner()` is `0x3775...
 |---|---|---|---|
 | Decide whether to ask @slavanova for a WaveWarZ / ZAO radio station; done when Zaal says yes or no in the grill | Zaal | Decision | 2026-10-15 |
 | If yes: Zaal sends the ask (outbound is his tap); done when the message is sent | Zaal | Outbound | 2026-10-17 |
+| If yes, the ask is specific (ticks 9, 14, 16): a pinned WaveWarZ / The ZAO radio row built from the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts; plus two questions, who the contracting party is and what happens to stored messages and Farcaster notification tokens if the service closes; plus a one-line note that `meet.baserooms.io` still allows `localhost` framing (tick 12). Done when the draft is in the grill for Zaal | baserooms lane drafts, Zaal sends | Draft | 2026-10-15 |
 | Add a "no third-party HTTP hooks in ~/.claude/settings.json" line to `.claude/rules/secret-hygiene.md` and set `allowedHttpHookUrls` to an explicit list in dotfiles; done when the PR is merged | baserooms lane, reviewed by dotfiles lane | PR | 2026-10-12 |
-| Extend `zao-ask-check` with a named risky-action list (git-push, git-rewrite, rm-rf, publish, deploy, database, pipe-shell, onchain, sudo, env), credited to Base Rooms OS as the pattern source; done when the PR is open | baserooms lane | PR | 2026-10-15 |
+| Extend `zao-ask-check` with a named risky-action list (git-push, git-rewrite, rm-rf, publish, deploy, database, pipe-shell, onchain, sudo, env), credited to Base Rooms OS as the pattern source, and the "agent's reasons next to the options" layout credited to `Asugawara/ukagai` (MIT, tick 7); done when the PR is open | baserooms lane | PR | 2026-10-15 |
 | Sandboxed MCP trial (separate macOS user, `status`/`talk`/`approve` scopes only, stub-server red control run first); done when a follow-up doc records the red-control result | Zaal approves, baserooms lane runs | Decision then test | 2026-10-22 or wontfix |
-| Re-validate fees, contract owners and the treasury holdings in this doc; done when `last-validated` is bumped | baserooms lane | Re-research | 2026-11-08 |
+| Suggest to doc 2634's owner that o1 Launchpad be added as a fifth rail column, with the stock-pairing caveat (tick 13); done when the note is posted on the 2634 board card or PR | baserooms lane | Note | 2026-10-12 |
+| Re-validate fees, contract owners and the treasury holdings in this doc, and check for a `RendererSet` event on the Buddies contract (tick 10); done when `last-validated` is bumped | baserooms lane | Re-research | 2026-11-08 |
+| Re-check the vault when it ends: rewards paid, treasury stake withdrawn or not (tick 3, tick 4); done when a dated follow-up line is added | baserooms lane | Re-research | 2026-12-08 |
 
 ## Sources
 
@@ -547,6 +629,11 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - curl] /privacy, /terms, /tos, /legal on baserooms.io (all 404); bundle search across 185 chunks for terms, privacy and jurisdiction strings
 - [FULL - curl + HTML strip] Basescan pages for Veranta router, storage and builderCode (all TransparentUpgradeableProxy)
 - [FULL - cast, Base RPC] EIP-1967 admin and implementation slots of the three Veranta proxies; admin owner is a Safe 1.3.0, threshold 3, 5 owners
+- [FULL - FxTwitter API, community] https://api.fxtwitter.com/baserooms profile stats, read twice
+- [FULL - curl + HTML strip, community] Telegram group page https://t.me/brtc_base (156 members), read twice; /s/ preview redirects (group, no public history)
+- [FULL - cast + curl] Re-measure at 18:42 UTC, block 52,347,792: Buddies totalSupply, treasury USDC balanceOf, getVault, IM health, BRTC holders API
+- [FULL - cast call, Base RPC] quote(1), quote(5), quote(10) on the Buddies contract; ETH/USD and gas estimates from https://baserooms.io/api/gas
+- [FULL - cast call + curl, 3 runs] Buddy #0252 traitsOf, bootedAt, tokenURI; Worker /units/progress?ids=252 (public, no key)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

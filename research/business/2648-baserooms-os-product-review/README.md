@@ -423,6 +423,28 @@ The two `localhost` entries on the Jitsi host are development leftovers. They le
 
 **What this means.** It confirms the review's tone: this is a careful solo build. The open items are the ones already named. No new risk changes a Key Decision.
 
+### 2026-10-08, tick 13: o1 Launchpad as a fifth rail next to doc 2634
+
+Source: o1 docs pages `launchpad/how-it-works`, `launchpad/create/stock-paired-launches`, `launchpad/staking/overview` and `launchpad/trading/fees-referrals` (curl + HTML strip), tick 3's onchain vault read, and the rails table in [business/2634](../2634-memecoin-idea-ground-truth/). This adds o1 to that comparison. It is not a recommendation to launch anything; that decision stays with doc 2634 and Zaal.
+
+| | o1 Launchpad (BRTC's rail) | Clanker (from doc 2634) |
+|---|---|---|
+| Chains | Base, Robinhood, BSC, X Layer | Base |
+| Creation fee | 0.001 ETH on Base, plus gas | not listed in 2634 |
+| Trading fee and split | 1% per trade: creator 50%, platform 30%, referrer 20% (unused referral share goes to the platform) | creator 1% + protocol 0.2% = 1.2% |
+| Anti-snipe | Total fee starts at 99%, falls linearly to 1% over 20 seconds | not covered in 2634 |
+| Liquidity | Full supply seeded into a token-only Uniswap v4 position that "cannot be removed" | not covered in 2634 |
+| Pair asset | Crypto, or a **tokenized stock** (MSTR and others); fees are then paid in the stock token | ETH-style pairs |
+| Staking | Separate, permissionless vaults with rules fixed at creation; o1 takes 10% of the reward funding (tick 3) | Creator vault share and days set at deploy (per 2634's dry-run row) |
+
+**What is different about o1.**
+
+1. **Stock pairing is the distinctive feature, and it cuts both ways.** A stock-paired token is priced in the stock. BRTC's own page shows the effect: down 68.8% from its high **measured in MSTR**, while MSTR itself fell 6.25% on 2026-10-08. A holder carries the meme's risk and the stock's at once. For The ZAO, pairing anything with a stock would also put a public company's ticker next to our brand, which is a legal-framing question for doc 1108 (`business/1108`, cited in 2634) before anything else.
+2. **The staking product is the part worth knowing about**, even without launching on o1. Any token on a supported chain can get a fixed, fully funded, time-weighted reward vault that nobody can change after creation. That is a cleaner "reward holders for a season" tool than ad-hoc airdrops. It costs a 10% fee on the reward budget.
+3. **Fee split versus Clanker.** At 1% total, o1's creator share (0.5% of each trade) is smaller than Clanker's creator 1% in doc 2634. Base Rooms earns as the referrer (0.2%) on BRTC trades routed through o1.
+
+**Next Actions addition (for doc 2634's owner, not this lane).** Add o1 as a fifth column to 2634's rails table, with the stock-pairing caveat. This lane will not edit 2634 itself.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -484,6 +506,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - urllib GET] BRTC top-50 holders with kind labels: https://baserooms.io/api/holders?ca=0xB200000000000000000000856A95738C92fEed01
 - [FULL - curl + HTML strip] Buddies token page (supply 266, holders 60): https://basescan.org/token/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b
 - [FULL - curl -D] Response headers of baserooms.io (/, /api/gas, /mcp, /agent.md), the Worker /hook/inbox, im.baserooms.io/health and meet.baserooms.io, one request each
+- [FULL - curl + HTML strip] o1 docs: https://docs.o1.exchange/launchpad/how-it-works , https://docs.o1.exchange/launchpad/create/stock-paired-launches , https://docs.o1.exchange/launchpad/staking/overview
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

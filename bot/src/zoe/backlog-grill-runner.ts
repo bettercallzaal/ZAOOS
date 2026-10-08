@@ -49,6 +49,7 @@ import {
   type Verdict,
 } from './backlog-grill';
 import { appendGrillQueue, type GrillQueueCard } from './grill-queue';
+import { isGrillPaused, withStopRow } from './grill-pause';
 // IMPORTED, never copied. There is exactly one re-ask ladder and grill.ts owns
 // it. The last time this policy got a second implementation - the status line's
 // inline copy of outstandingCount - the copy silently drifted from the original
@@ -497,6 +498,8 @@ export async function runBacklogGrillTick(
   // file and shadowing it here silently turned the guard below into a call on
   // a config object.
   const gateCfg = deps.cfg ?? DRIP_DEFAULT;
+  // Zaal's Stop grill button, checked before the board is read or a card sent.
+  if (await isGrillPaused()) return { sent: false, reason: 'grill paused by Zaal' };
   if (!cfg()) return { sent: false, reason: 'tracker not configured' };
 
   const state = await readState();
@@ -544,7 +547,7 @@ export async function runBacklogGrillTick(
     now,
   );
 
-  const sent = await deps.sendDM(text, verdictButtons(next.task.id));
+  const sent = await deps.sendDM(text, withStopRow(verdictButtons(next.task.id)));
   // Blocked by the send budget: the card never reached Zaal, so it must not be
   // recorded as asked. It would climb the nag ladder unanswered and count
   // against the batch, for a card nobody saw.

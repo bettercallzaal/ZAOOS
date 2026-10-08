@@ -23,6 +23,7 @@ import { fetchCockpitTasks, fetchReviewPRs, needsYou, blocked, priorityRank } fr
 import type { CockpitTask, ReviewPR } from '../cockpit/types';
 import { getCalendarEvents } from './calendar';
 import { wasSendBlocked } from './send-budget';
+import { isGrillPaused, withStopRow } from './grill-pause';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -125,9 +126,12 @@ function parseOptionsBody(body: string): { value: string; label: string }[] {
       opts.push({ value: v, label: label ? `${v}: ${label}` : v });
       continue;
     }
-    const word = part.replace(/[()]/g, '').trim();
+    // With lettered options on, "wait (recommended)" is an option carrying a
+    // mark, not a 16-character word that fails the length check.
+    const rec = grillAbcdEnabled() && REC_MARK.test(part);
+    const word = (rec ? part.replace(REC_MARK, '') : part).replace(/[()]/g, '').trim();
     if (/^[A-Za-z][A-Za-z0-9 -]{0,13}$/.test(word)) {
-      opts.push({ value: word.toLowerCase().split(' ')[0], label: word });
+      opts.push({ value: word.toLowerCase().split(' ')[0], label: rec ? `${word} (recommended)` : word });
       continue;
     }
     return []; // a part did not parse cleanly -> generic buttons
@@ -194,7 +198,7 @@ export function multiKeyboard(
     { text: `Send${selected.length ? ` (${selected.length})` : ''}`, data: 'grill:multisend' },
     { text: 'Cancel', data: 'grill:multicancel' },
   ]);
-  return rows;
+  return withStopRow(rows);
 }
 
 const ASK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // don't re-surface a still-open item within 3h
@@ -324,6 +328,41 @@ export function pickNext(queue: GrillItem[], state: GrillState, now: number): Gr
   return null;
 }
 
+/**
+ * Lettered options, recommendation first (ZOE_GRILL_ABCD=1, default off).
+ *
+ * Zaal, 2026-10-07: grill questions arrive as A, B, C, D with the recommendation
+ * first and a button per option. The asker writes the recommendation first by
+ * convention; an option carrying "(recommended)" or "(rec)" is moved to the
+ * front so either way A is the recommended one. Values are unchanged, so the
+ * tap records exactly what it recorded before.
+ */
+export function grillAbcdEnabled(): boolean {
+  return process.env.ZOE_GRILL_ABCD === '1';
+}
+
+const REC_MARK = /\s*\((recommended|rec)\)\s*$/i;
+
+export function letterOptions(
+  options: { value: string; label: string }[],
+): { value: string; label: string; letter: string; text: string; recommended: boolean }[] {
+  const clean = options.map((o) => {
+    const marked = REC_MARK.test(o.label);
+    const bare = o.label.replace(REC_MARK, '').replace(/^\d+:\s*/, '').trim();
+    const value = marked ? o.value.replace(REC_MARK, '').trim() : o.value;
+    return { value, label: o.label, text: bare || value, marked };
+  });
+  const idx = clean.findIndex((o) => o.marked);
+  if (idx > 0) clean.unshift(...clean.splice(idx, 1));
+  return clean.map((o, i) => ({
+    value: o.value,
+    label: o.label,
+    letter: 'ABCD'[i],
+    text: o.text,
+    recommended: i === 0,
+  }));
+}
+
 /** Format the DM text + inline buttons for one grill item. Pure. */
 export function formatGrill(
   item: GrillItem,
@@ -361,7 +400,15 @@ export function formatGrill(
   // button (Approve/Reviewed/Unblock) that actually acts, + Skip/Later.
   const options = item.kind === 'decision' ? parseOptions(item.title) : [];
   let buttons: { text: string; data: string }[][];
-  if (options.length >= 2) {
+  let abcdText = '';
+  if (options.length >= 2 && grillAbcdEnabled()) {
+    const lettered = letterOptions(options);
+    abcdText = '\n\n' + lettered.map((o) => `${o.letter}) ${o.text}${o.recommended ? ' (recommended)' : ''}`).join('\n');
+    const answerRow = lettered.map((o) => ({ text: `${o.letter}: ${o.text}`.slice(0, 28), data: `grill:ans:${o.value}`.slice(0, 60) }));
+    const tailRow = [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }];
+    if (options.length >= 3) tailRow.unshift({ text: 'Pick multiple', data: 'grill:multi' });
+    buttons = [answerRow, tailRow];
+  } else if (options.length >= 2) {
     const answerRow = options.map((o) => ({ text: o.label.slice(0, 28), data: `grill:ans:${o.value}`.slice(0, 60) }));
     const tailRow = [{ text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }];
     // 3+ options: offer multi-select ("1 and 3"), single taps still instant.
@@ -381,7 +428,7 @@ export function formatGrill(
             : { text: 'Approve', data: 'grill:approve' };
     buttons = [[resolveBtn, { text: 'Skip', data: 'grill:skip' }, { text: 'Later', data: 'grill:snooze' }]];
   }
-  return { text: `${lead}${context}${link}${resolveHint}${tail}`, buttons, options };
+  return { text: `${lead}${abcdText}${context}${link}${resolveHint}${tail}`, buttons: withStopRow(buttons), options };
 }
 
 export interface SurfaceGrillDeps {
@@ -425,7 +472,9 @@ export async function todaysGrillEvents(now = Date.now()): Promise<GrillEvent[]>
 }
 
 /** One proactive tick: DM Zaal the next item that needs him. Returns what it did. */
-export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: boolean; item?: GrillItem }> {
+export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: boolean; item?: GrillItem; paused?: boolean }> {
+  // Zaal's Stop grill button: checked before anything is fetched or sent.
+  if (await isGrillPaused()) return { sent: false, paused: true };
   const now = deps.now ?? Date.now();
   const tasks = await (deps.fetchTasks ?? fetchCockpitTasks)();
   const prs = await (deps.fetchPRs ?? fetchReviewPRs)().catch(() => [] as ReviewPR[]);

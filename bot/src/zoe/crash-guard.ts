@@ -9,11 +9,31 @@
  *    exits 0, preventing systemd from reporting status 143 as an exit-code failure.
  */
 
+import { reportOwnError } from './own-errors';
+
 export interface CrashGuardDeps {
   botToken?: string;
   zaalId?: number;
   onExit?: (code: number) => void;
   fetchFn?: typeof fetch;
+  /** Record the crash in app_errors (own-errors.ts, ZOE_OWN_ERRORS_FEED). Injectable for tests. */
+  reportError?: (err: unknown, source: string) => Promise<unknown>;
+  /** Longest the exit waits on that record. Default 4000 ms. */
+  reportTimeoutMs?: number;
+}
+
+/**
+ * Send the alert and record the crash side by side, then exit. The record is
+ * capped by a timeout so a slow database can never hold a crashed process up;
+ * a record that fails or times out is dropped, the alert still goes.
+ */
+function alertRecordExit(err: unknown, source: string, deps: CrashGuardDeps, exitFn: (code: number) => void): void {
+  const report = deps.reportError ?? reportOwnError;
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, deps.reportTimeoutMs ?? 4000));
+  const recorded = Promise.race([Promise.resolve().then(() => report(err, source)).catch(() => undefined), timeout]);
+  void Promise.allSettled([sendEmergencyAlert(formatCrashAlert(err), deps), recorded]).finally(() => {
+    exitFn(1);
+  });
 }
 
 export function formatCrashAlert(err: unknown, unit = 'zoe-bot'): string {
@@ -72,20 +92,14 @@ export function installCrashGuard(deps: CrashGuardDeps = {}): () => void {
     if (isExiting) return;
     isExiting = true;
     console.error('[zoe/crash-guard] uncaughtException:', err);
-    const alertText = formatCrashAlert(err);
-    void sendEmergencyAlert(alertText, deps).finally(() => {
-      exitFn(1);
-    });
+    alertRecordExit(err, 'uncaughtException', deps, exitFn);
   };
 
   const onUnhandledRejection = (reason: unknown) => {
     if (isExiting) return;
     isExiting = true;
     console.error('[zoe/crash-guard] unhandledRejection:', reason);
-    const alertText = formatCrashAlert(reason);
-    void sendEmergencyAlert(alertText, deps).finally(() => {
-      exitFn(1);
-    });
+    alertRecordExit(reason, 'unhandledRejection', deps, exitFn);
   };
 
   const onSigterm = () => {

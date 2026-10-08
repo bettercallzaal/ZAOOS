@@ -732,7 +732,9 @@ export async function applyBacklogAnswer(
       const route = task?.metadata?.route as string | undefined;
       const routeMeaning =
         route === 'agent'
-          ? 'flagged for the fleet - a lane picks it up from the in_progress queue'
+          ? // The orchestrator seat reads in_progress route=agent cards each tick
+          // (zao-work-queue) and hands them to a lane. Zaal, seat item 51.
+          'Sent to the orchestrator; a lane gets it on the next check, usually within the hour'
           : route === 'prep'
             ? 'marked in progress on your board - the prep side lands with your next fleet dispatch'
             : route === 'human'

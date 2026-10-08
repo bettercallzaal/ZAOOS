@@ -277,6 +277,17 @@ describe('tracker parity (dotfiles #247) - one PATCH per answer with note + stat
     );
   });
 
+  // Zaal ruled A on seat item 51 (vault ref 93487963): "Work on it now" must
+  // start real work. The old reply promised that "a lane picks it up from the
+  // in_progress queue", and nothing read that queue. The orchestrator now
+  // routes these cards, so the reply names who actually picks it up.
+  it('work on a route=agent card says the orchestrator routes it, not a queue nobody reads', async () => {
+    const r = await applyBacklogAnswer('work', mockFetch(), TASK_ID);
+    expect(r.ok).toBe(true);
+    expect(r.message).toContain('Sent to the orchestrator; a lane gets it on the next check, usually within the hour');
+    expect(r.message).not.toMatch(/in_progress queue/);
+  });
+
   it('work verdict writes status in_progress AND prepends GRILL note in one PATCH', async () => {
     const r = await applyBacklogAnswer('work', mockFetch(), TASK_ID);
     expect(r.ok).toBe(true);

@@ -125,6 +125,9 @@ For FYI reports to land there, lanes would have to use `orca orchestration send`
 Otherwise the seat needs a different mailbox (one vault file) or relies on PR state
 alone.
 
+**The seat's choice, 2026-10-08: PR state only.** No new habits for lanes. The
+inbox source stays in `seat-digest`, off by default.
+
 ## Part 2. Script or judgment, per step of a tick
 
 | Step | Same judgment every time? | Belongs in |
@@ -267,7 +270,7 @@ Re-measure with the fixed `zao-spend` one full day after the change.
 | Re-measure `agent-spend.md`'s per-turn figure with the fixed tool and correct the rule if it moved | zaal-dotfiles-fc | PR | 2026-10-10 |
 | DONE 2026-10-08: the seat adopted the reporting norm (gates, blockers, Zaal's words, Needs only) | seat | Decision | 2026-10-08 |
 | Write `seat-digest` in zaal-dotfiles `bin`, read-only, with a red control. Shipped = merged PR. | zaoos-35 (Claude) | PR | 2026-10-09 |
-| Pick the FYI mailbox: lanes use `orca orchestration send`, or one vault file, or PR state only | seat | Decision | 2026-10-09 |
+| DONE 2026-10-08: the seat chose PR state only. `seat-digest` ships with the inbox source off by default (`--inbox` turns it on) | seat | Decision | 2026-10-08 |
 | Wire `seat-digest --watch` as a Monitor on the seat | seat | Setup | after the PR merges |
 | Run the seat for one day with the Monitor plus the boundary restarts, then re-measure $/day | seat | Trial | 2026-10-11 |
 

@@ -118,12 +118,16 @@ The Buddies window offers pairing for Claude (app and Code), ChatGPT, Le Chat, C
 | T6 | **Machine-wide blast radius** | The snippet says to add it to `~/.claude/settings.json`. On this Mac that file is a symlink into `~/zaal-dotfiles`, loaded by every lane (`vanishing-dependencies.md`). One paste reaches every session. | HIGH for us specifically |
 | T7 | **Key leakage** | The `brk_` key in an env var or settings file is a bearer secret. With `act` scopes it can put payment cards on Zaal's Buddy (still needs his signature), and with `memory` it can read and write the shared workspace. | LOW to MEDIUM |
 | T8 | **Data at rest on their server** | Instant Messenger is stored on their server, "not end-to-end encrypted" (their words). Memory and workspace tools store notes there. | LOW for chat; MEDIUM if agents write ZAO notes into `memory_remember` |
+| T9 | **Server-authored and user-imported playbooks** (added by loop ticks 5 and 21) | `skill_use` returns instructions and tells the agent "Then do it". The catalog is auth-only, so it cannot be reviewed before pairing, and owners can import any SKILL.md text, including text copied from others. `workspace_task` lets other paired agents hand tasks over. | MEDIUM |
+| T10 | **Agent woken on someone else's schedule** (added by loop tick 21) | Workspaces post recurring `schedules` (`every`, `weekday`) and "run now" jobs that target a Buddy's paired agent. For a coding agent, each wake is turns and spend. | MEDIUM for cost; which scope gates it is UNVERIFIED |
+| T11 | **Activity is public by Buddy id** (added by loop tick 20) | The Worker's `/units/progress?ids=` answers without a key: level, XP, streak, active days, care stats. Buddy ownership is onchain, so this maps activity to a wallet. | LOW |
+| T12 | **Notification tokens held off-site** (added by loop tick 8) | The messenger stores browser push and Farcaster notification tokens (`push`, `fcpush`) on a self-run Ubuntu host. | LOW |
 
 **Mitigations if a trial is ever approved.**
 
 1. Never the hooks method on a ZAO machine. MCP only.
 2. Run it in a throwaway environment: a separate macOS user or a container, with no `~/.claude` symlink into dotfiles, no ZAO repos, no `~/.zao`.
-3. Grant only `status`, `talk` and `approve` scopes first. No `memory`, no `act`.
+3. Grant only `status`, `talk` and `approve` scopes first. No `memory`, no `act`, no `tools` calls to `skill_use`, and no workspace access (T9, T10).
 4. If hooks are ever trialled anyway, set `allowedHttpHookUrls` to an explicit list so no other host can be added silently, and keep the deny rules in place, since the docs say deny rules are evaluated regardless of what a hook returns.
 5. Red control before trusting the gate: point a test session at a stub server that answers `allow` with an `updatedInput`, and confirm what our deny rules still stop. The trial is not "safe" until that has run (`loop-evals.md`, review the direction the change was for).
 
@@ -576,6 +580,10 @@ Source: `POST /agent/tools/skills_list` without a key (401), `GET https://brtc-o
 1. **Threat T5 (context injection) gets one more path**: a user-imported or shared SKILL.md, delivered by `skill_use` and acted on by a paired agent. The trial rule from tick 5 ("do not call `skill_use`, or treat its output as data") now also covers anything imported.
 2. **A paired agent can be woken on a timer.** For a coding agent on our machines that means turns, and therefore spend (`agent-spend.md`: about a dollar a turn), triggered by a schedule on someone else's server. The sandbox trial must not grant whatever scope lets scheduled tasks reach the agent. Which scope that is was not visible from outside (tick 5 lists `memory` for the workspace tools); it is UNVERIFIED, and the first trial should leave workspace and memory scopes off entirely.
 3. **The SKILL.md idea itself is familiar ground.** It is the same shape as Claude Code skills. If The ZAO ever wants member-authored playbooks for ZOE, this is a live example of the format traveling between tools. That is a pattern note, not a dependency.
+
+### 2026-10-08, tick 22: threat model brought up to date
+
+No new fetch this tick. Rows T9 to T12 were added to the threat table in section 6, from ticks 5, 8, 20 and 21, and mitigation 3 was tightened to exclude `skill_use` and workspace access. The severity of T1 to T8 is unchanged. None of the new rows is above MEDIUM, and none changes Key Decisions 1 or 2: hooks stay SKIP, and MCP stays SKIP unless trialled in a sandbox.
 
 ## Comparison: how to use it
 

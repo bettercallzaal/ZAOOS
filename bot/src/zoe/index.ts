@@ -34,6 +34,8 @@ import {
   commitGrillMulti,
   multiKeyboard,
 } from './grill';
+import { featureRan } from './feature-ran';
+import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
@@ -605,6 +607,12 @@ function grillResolvedText(original: string | undefined, outcome: string): strin
 bot.command(['grill', 'needsme'], async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
   const r = await surfaceGrill({ ...grillDeps(zaalId), bypassCap: true });
+  if (r.paused) {
+    await ctx.reply('The grill is stopped. Tap Resume to turn it back on.', {
+      reply_markup: { inline_keyboard: toGrammyRows([RESUME_ROW]) },
+    });
+    return;
+  }
   if (!r.sent) await ctx.reply('Nothing needs you right now - the queue is clear.');
 });
 
@@ -4060,7 +4068,30 @@ bot.callbackQuery('grill:multicancel', async (ctx) => {
   const answerRow = active.options.map((o) => ({ text: o.label.slice(0, 28), callback_data: `grill:ans:${o.value}`.slice(0, 60) }));
   const tailRow = [{ text: 'Skip', callback_data: 'grill:skip' }, { text: 'Later', callback_data: 'grill:snooze' }];
   if (active.options.length >= 3) tailRow.unshift({ text: 'Pick multiple', callback_data: 'grill:multi' });
-  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [answerRow, tailRow] } }).catch(() => {});
+  const rows = [answerRow, tailRow];
+  if (grillStopEnabled()) rows.push(toGrammyRows([STOP_ROW])[0]);
+  await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: rows } }).catch(() => {});
+});
+
+// gpause:stop / gpause:resume - Zaal's Stop grill button (grill-pause.ts).
+// The pause is a file, read before every grill send, so it holds across restarts.
+bot.callbackQuery(/^gpause:(stop|resume)$/, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  const stop = ctx.match[1] === 'stop';
+  try {
+    await setGrillPaused(stop);
+  } catch (e) {
+    console.error('[zoe/grill-pause] could not store the pause:', (e as Error)?.message);
+    await ctx.answerCallbackQuery({ text: 'Could not save that - the grill state did not change.' }).catch(() => {});
+    return;
+  }
+  featureRan('grill-pause', stop ? 'stopped' : 'resumed');
+  console.log(`[zoe/grill-pause] ${stop ? 'stopped' : 'resumed'} by Zaal`);
+  await ctx.answerCallbackQuery({ text: stop ? 'Grill stopped.' : 'Grill back on.' }).catch(() => {});
+  await ctx.reply(
+    stop ? 'Grill stopped. No grill messages until you tap Resume.' : 'Grill back on. The next question comes on its usual schedule, or now with /grill.',
+    stop ? { reply_markup: { inline_keyboard: toGrammyRows([RESUME_ROW]) } } : {},
+  );
 });
 
 bot.callbackQuery('grill:multisend', async (ctx) => {

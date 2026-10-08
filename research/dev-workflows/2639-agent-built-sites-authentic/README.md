@@ -23,7 +23,7 @@ tier: STANDARD
 - performance
 - QA
 
-The look comes from a person. Brian leads all ZAO design (ruling 53). On a ZAO public surface an agent never picks a palette, a typeface, imagery or a poster. It implements the designer's spec, and it turns every visual question the spec leaves open into a question for the designer.
+The look comes from a person, the site's designer. For North Creek that is Brian (Zaal, vault item 61: "no no no brian from north creek handles design"). Whether Brian also leads design beyond North Creek is Zaal's to say and is not assumed here. On a ZAO public surface an agent never picks a palette, a typeface, imagery or a poster. It implements the designer's spec, and it turns every visual question the spec leaves open into a question for the designer.
 
 **Why both halves matter.**
 - A one-shot site is generic in two ways: an invented look, and invented or missing content. Anthropic's name for the first is "distributional convergence" (Sources 2): unguided, the model samples the middle of its training data. Taking the look from a human designer removes it at the root.
@@ -38,12 +38,12 @@ At ZAO the grader checks two things: fidelity to the designer's spec, and the qu
 | Recommendation | Owner |
 |---|---|
 | Use `site-pass.md` for any ZAO site change; mode is always spec-led on a public surface | every site lane |
-| Keep the official `frontend-design` plugin OFF. Its job is choosing a look, which ruling 53 gives to Brian. Its catalogue of generic tells is reused here as a QA lens | nobody needs to act; it is already off |
+| Keep the official `frontend-design` plugin OFF. Its job is choosing a look, which ruling 53 gives to a human designer. Its catalogue of generic tells is reused here as a QA lens | nobody needs to act; it is already off |
 | Promote `site-pass.md` to `~/.claude/skills/site-pass/` after one run each on poidhz and North Creek | skills lane, zaal-dotfiles PR |
 
 ## Key Decisions
 
-1. **On a ZAO public surface the design source is a person: Brian, of North Creek.** Item 53 recorded the name as "Ryan"; Zaal corrected it to Brian on 2026-10-08 (vault item 61). Every mention in this doc was corrected then.
+1. **On a ZAO public surface the design source is a person: the site's human designer.** For North Creek that is Brian. Item 53 was relayed as "Ryan"; Zaal corrected it on 2026-10-08 (vault item 61, verbatim: "no no no brian from north creek handles design"), and every mention here was corrected then. Brian's surname and handle, and whether his remit goes beyond North Creek, are Zaal's facts and are not filled in.
    - Allowed: an agent writes HTML, CSS, components, content structure and data wiring.
    - Not allowed: it originates colour, type, imagery, layout mood, posters or share cards (rulings 53, 54; memory `feedback_no_ai_in_public_design`).
 2. **"The spec is silent" is a question, not a choice.** Whenever the build needs a visual decision the designer did not make, the agent lists it and asks. Gap-filling is how a generic default enters a spec-led site without anyone choosing it.
@@ -108,7 +108,7 @@ Structure is shared ground. The order of content, which items form a sequence, a
 
 | Step | Who | What |
 |---|---|---|
-| 0. Owner | agent writes it down | Name the person who owns the look (Brian for North Creek and, per ruling 53, all ZAO design) |
+| 0. Owner | agent writes it down | Name the person who owns the look (Brian for North Creek; for any other site, ask Zaal who it is) |
 | 1. Subject | agent proposes, owner confirms | One sentence each: subject, audience, the page's one job (Sources 3) |
 | 2. Real content | agent | Actual copy, live data, lore, links and honest empty states, gathered into the repo before layout work. For poidhz: live bounties and the poidh lore from Zaal's Space with Kenny |
 | 3. Spec intake | agent reads, owner supplies | Copy the designer's tokens into CSS custom properties verbatim, with the source named |
@@ -165,7 +165,7 @@ Read on 2026-10-08 from `~/.claude/skills`, ZAOOS `.claude/skills`, `~/.claude/p
 
 ### 5. A question this raises, not answered here
 
-The poidhz lane took poidhz's theme from poidh.xyz. Whether an agent-applied theme taken from the brand's own site counts as "AI-made design" under ruling 53 is Zaal's or Brian's to say. This doc does not rule on it; it is passed to the poidhz lane and the orchestrator.
+The poidhz lane took poidhz's theme from poidh.xyz. Whether an agent-applied theme taken from the brand's own site counts as "AI-made design" under ruling 53 is Zaal's to say, or a designer he names for poidhz. This doc does not rule on it; it is passed to the poidhz lane and the orchestrator.
 
 ## Also See
 

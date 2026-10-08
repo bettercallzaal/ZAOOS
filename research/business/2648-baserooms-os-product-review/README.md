@@ -240,6 +240,108 @@ Source: every ERC-20 transfer to or from the treasury `0xa034...f8ce`, scraped f
 4. **The treasury is being targeted by address poisoning.** 17 outgoing rows are fake tokens whose names imitate "USDC" with lookalike Unicode letters (for example `U S D C` built from Lisu and Cyrillic characters), "sent" in amounts like 15,400 and 400. These are spam made to appear in the treasury's history so that someone copies a lookalike address. They are not real outflows. Anyone at The ZAO who reads this wallet's history should copy addresses only from the contract constants in this doc.
 5. **It is in use today.** The most recent row is a Buddy mint at 18:01 UTC on 2026-10-08, sent from `bettercallzaal.base.eth`.
 
+### 2026-10-08, tick 5: the agent API, counted and read
+
+Source: `https://baserooms.io/agent/openapi.json` (OpenAPI, 53 operations), the same file with `?set=chat` (30 operations), `/agent/tools?format=openai` (53 tools), and the 64-tool list in `/agent.md`. Every operation is a `POST /agent/tools/<name>` with one security scheme, a `unitKey` bearer.
+
+**The counts reconcile.** `/agent.md` lists 64 tools. The OpenAPI file and the OpenAI-format catalog both list 53. The 11 missing ones are exactly the `prepare_*` "act" tools (swap, stake, lend, earn, perp, revoke, pay, multisend, limit, bridge, launch), which put a signing card into a chat app's conversation. So plain-HTTP agents can **propose** a transaction to the Buddy, while chat-app connectors can also **prepare** one in the chat. In both cases the owner still signs in their own wallet.
+
+**The chat set is narrower.** `?set=chat` (for custom GPTs) drops to 30 operations. It keeps all the read tools a person would ask about, the `propose_*` tools, `memory_recall`, `workspace_board` and `workspace_task_update`. It leaves out `memory_remember`, `workspace_task` (creating tasks), `workspace_task_comment`, `alert_create` and the `buddy_status` / `buddy_log` writers.
+
+**Three tools matter more than their names suggest.** Each is a channel where text from Base Rooms' server, or from another agent, becomes instructions to our agent:
+
+1. **`skill_use`** returns "how to do it and which of your tools to use. Then do it." The skill text is served by Base Rooms. An agent that follows it is running a playbook written on someone else's server. This is the same shape as the "tell" setup method (threat T5), but available on every call.
+2. **`workspace_task`** lets one of the owner's agents "leave a task ... for another of the owner's buddies", and `/agent.md` tells the receiving agent "a message saying a task was handed to you means: read the board and take it". That is agent-to-agent task passing through a third-party board. It is useful, and it is an instruction channel whose author is whatever other agent the owner has paired.
+3. **`alert_create`** accepts an optional `then_sell`, so an agent can arm a sell order that shows up as a signing card when a price fires. It still needs the owner's signature, but it is a way for an agent to stage a trade for later.
+
+**What `memory_remember` says about itself.** Its description reads: "Never save secrets, keys, file contents or private data." That is a request to the agent, not something the server enforces. Nothing in the schema (`topic`, `text`, `kind`, `shared`) filters it. So "the notes stay safe" holds only as far as the agent obeys the instruction, which is why the threat model keeps `memory` out of the first trial's scopes.
+
+**What this changes.** It confirms decision 2 (MCP only in a sandbox, minimal scopes) and adds one line to that trial plan: leave `tools` scope on but **do not call `skill_use`**, or treat its output as untrusted data, not instructions.
+
+### 2026-10-08, tick 6: the builder's track record on Farcaster
+
+Source: the 100 most recent casts by @slavanova (fid 1046957) from the Farcaster index (`/v2/farcaster/feed/user/casts`, one page; more pages exist and were not read), plus the profile record. Only public, product-related casts are summarised here.
+
+**Timeline.**
+
+| Date | What the casts show |
+|---|---|
+| 2025-07-24 | Farcaster account registered |
+| 2025-12-23 to 2026-01-16 | Shipping small vibe-coded Base mini apps on ohara.ai: a Polymarket-on-Base app ("Powered by polymarket with a bridge from base"), an "Appcoin Market", an AI agent mini app. Fixing in public ("Shipping some fixes today. Broke it last night") |
+| 2026-01-21 | **Base Rooms starts as coworking calls**: "https://meet.baserooms.io/based Cowork, Collab, Connect - we are live!", repeated 01-27 and 01-28 ("Building on base? Lets cowork and connect") |
+| 2026-03-12 | "Baserooms.io for main site. The link for based room is meet.baserooms.io/based" |
+| 2026-09-29 | The OS launches: "Been working on a fun os for us on base with a buddy to help" |
+| 2026-10-04 onward | Invite and referral posts, Buddy #0001, "fully onchain" explainer |
+| 2026-10-08 | BRTC buddies with MCP pairing and a shared workspace |
+
+Across those 100 casts, "baserooms" appears 17 times and ohara.ai 7 times. There are no posts about other tokens launched and abandoned, and no posts about The ZAO, WaveWarZ or Audius.
+
+**What this means.**
+
+1. **Base Rooms is nine months old, not one week.** It began in January 2026 as a coworking Jitsi room for Base builders. The ZAO's own Monday cobuilds have run on `meet.baserooms.io/zaal` since at least May 2026, so **we were early users of Slava's first product**. That is a real, existing relationship to build on if Zaal makes the radio ask (Key Decision 4).
+2. **Small, steady releases by one person.** The record is a solo builder shipping often, fixing in public and talking to users, before adding a token in late September. That fits the onchain picture from ticks 1 to 4: one owner key, a modest treasury, the launch allocation mostly locked.
+3. **No GitHub in the public record.** Nothing in these casts links to a code repository, which matches the closed-source finding in section 2.
+
+### 2026-10-08, tick 7: anything else like it?
+
+Source: GitHub repository search (sorted by stars) for "onchain desktop", "onchain os base", "web3 desktop os", "windows 95 crypto" and "agent approval mcp hooks claude code"; Farcaster cast search for "onchain os", "onchain desktop" and "desktop on base"; LICENSE files read via the GitHub API.
+
+**Nothing comparable at Base Rooms' scope turned up.** The browser-desktop-for-crypto idea exists elsewhere only as small or stale projects: `deokman420/KasOS` ("Web3-enabled desktop OS in your browser", MIT, 6 stars, last push 2025-10-21) and `0xPr0f/retroOS-arcade` (0 stars). "Onchain OS" repos on Base (`axtion-oss/axtion`, `gnanam1990/base-agent-os-argus`, `satohubai/sato-os`) are agent dashboards or portfolio tools with 0 to 2 stars. On Farcaster, the same search terms return Base Rooms' own invite posts plus a run of throwaway `$DESKTOP`, `$OS` and `$Agent OS` token launches from bot accounts in August and September 2026. That is noise, not competition. This is a search of two indexes with five and three queries, not a market map: a closed-source competitor with no GitHub presence would not show up here.
+
+**The one relevant find is for the agent-approval idea, not the desktop.** `Asugawara/ukagai` ("Agents ask. Humans decide.", MIT, created 2026-10-08, 1 star) catches Claude Code's `AskUserQuestion` and plan approvals with hooks and shows them in **one localhost GUI**, with the agent's own explanation beside each choice. It solves the same problem as Base Rooms' Buddy approval hold, with the opposite data path: everything stays on the machine.
+
+| | Base Rooms Buddy pairing | ukagai | Our `zao-ask-check` bridge |
+|---|---|---|---|
+| Where approvals are shown | A pixel pet on baserooms.io | A local web page | Telegram, via ZOE |
+| Where the hook data goes | A third-party Cloudflare Worker | localhost only | Our own bot |
+| Can it auto-approve or rewrite tool calls remotely | Yes, by design of HTTP hooks (T2, T3) | Not remotely; the server runs locally | Not applicable |
+| Licence | Closed (app) | MIT | Ours |
+| Maturity | Live product | One day old, 1 star | In use |
+
+**What this changes.** Key Decision 5 (adopt the pattern, extend our own bridge) stands, and now has a second reference. ukagai is MIT, so when the `zao-ask-check` extension is built, its "one inbox with the agent's reasons next to the options" design can be borrowed with credit (`credit-attribution.md`). It is too new to install, and its installer pipes a remote script to `sh`, which our own gate list would flag.
+
+### 2026-10-08, tick 8: the Instant Messenger, from the outside
+
+Source: the IM client code in the site bundle (the `useImConnection` hook, the same code in 10 chunks), response headers of `im.baserooms.io` and `baserooms.io`, and `GET https://im.baserooms.io/health` three times. No socket was opened and no sign-in was attempted.
+
+**Three hosts, three operators.** The pieces of Base Rooms run in different places:
+
+| Piece | Host | Seen as |
+|---|---|---|
+| The site and `/api/*` | baserooms.io | `server: Vercel` |
+| Agent hooks, sessions, tickets | brtc-os.slavamushyakov.workers.dev | Cloudflare Workers |
+| Instant Messenger | im.baserooms.io | `server: nginx/1.24.0 (Ubuntu)`, a self-run Linux box |
+| Video Rooms | meet.baserooms.io | Jitsi Meet |
+
+**How the messenger connects.** It only connects when a wallet is signed in. The client first asks the Worker for a one-time `ticket` for that wallet address, then opens `wss://im.baserooms.io/ws?t=<ticket>`. Reconnects back off exponentially up to 30 seconds. A close code of 4003 makes the client stop retrying for good, which reads as "this wallet is not allowed".
+
+**What it can do.** Message types in the client: `send`, `history`, `read`, `add`, `delete`, `clear`, `away`, `who`, `listed`, `vis` (tab visible or hidden), `ping`, and two pairs for notifications, `push` / `unpush` (browser web push) and `fcpush` / `unfcpush` (a Farcaster notification token). So the messenger server can hold a Farcaster notification token for your account and notify you through Farcaster. That is a convenience, and it is one more credential sitting on their server. It is covered by their "deleting your data erases them" line.
+
+**What is public without signing in.** Only a count. `/health` returned `{"ok":true,"users":6,"sockets":7}` three times in a row at about 18:2x UTC, so six wallets were connected to the messenger at that moment. No user list, no addresses. That matches the disclosure that messages are stored on their server and are not end-to-end encrypted.
+
+**What this means for The ZAO.** Nothing to adopt: our members already have Farcaster DMs and XMTP in ZAO OS (`src/` XMTP stack). Treat Base Rooms IM like any unencrypted chat: fine for "are you on the call", not for anything private. And since it runs on a separate, self-run Ubuntu box, its uptime and patching are separate from the Vercel site's.
+
+### 2026-10-08, tick 9: how findable ZAO music is on the radio
+
+Source: `GET https://baserooms.io/api/radio/browse?source=audius&q=<term>` once per term, `?source=soma`, and `GET /api/radio/resolve?url=<link>` with four test links. The search results were stable across three runs in section 7; these terms were run once each.
+
+| Search term | Tracks returned | ZAO-related artists in the results |
+|---|---|---|
+| `wavewarz` | 30 (the cap) | BetterCallZaal, WaveWarZ Africa, BennyJ504, plus HOODRAT, JetDigital321, SteveStrange, Stormbourne, SweetBiddiMcGee |
+| `bettercallzaal` | 4 | BetterCallZaal ("WaveWarZ, the electric vibez", "UVR Anthem 1" and "2"), The ZAO ("BetterCallZaal by IMan Afrikah") |
+| `thezao` | 2 | The ZAO (`audius.co/thezaodao`): "BetterCallZaal" and "COC V2", both by IMan Afrikah |
+| `stilo` | 24 | Stilo World, Dope Stilo Music Club, BennyJ504 |
+| `dopestilo` | 18 | Stilo World, BennyJ504 |
+| `zao`, `zabal` | 30 each | Mostly unrelated artists whose names or tags contain the letters |
+| `coc concertz`, `joseph goats`, `huottoja` | 0 | none |
+
+SomaFM returned 46 stations, all live.
+
+**What it means.**
+
+1. **Search works by Audius account, not by brand.** Anyone who types `wavewarz`, `bettercallzaal`, `thezao` or `stilo` hears our people inside Base Rooms today, with Audius plays credited to their accounts through `app_name=baserooms`. Brand names that are not Audius handles (`COC Concertz`, Joseph Goats, Huöttöja) return nothing. Whether those artists publish on Audius under another handle was not checked here.
+2. **There is no "add a station" path for us.** The `resolve` endpoint, which turns a pasted link into something playable, accepts only `on.soundcloud.com` links: an Audius track, an Audius profile, a SomaFM page and a plain `.mp3` URL all came back `400 {"error":"an on.soundcloud.com link is required"}`. So a ZAO or WaveWarZ station on the radio's front page is something only Slava can add. That supports making Key Decision 4 a direct ask, and makes it specific: a pinned WaveWarZ (or The ZAO) row backed by the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -291,6 +393,12 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - cast call, Base RPC] getVault(VAULT_ID) and feeConfig() on the o1 staking contract, 2026-10-08
 - [FULL - curl + HTML strip] Treasury token transfers, 212 rows: https://basescan.org/tokentxns?a=0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce (pages 1-3, ps=100)
 - [FULL - cast call, Base RPC] getUserState(VAULT_ID, treasury) on the o1 vault
+- [FULL - curl] OpenAPI chat set: https://baserooms.io/agent/openapi.json?set=chat (200, 31,240 bytes, 30 operations)
+- [PARTIAL - Farcaster index API, community] @slavanova casts: https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1046957&limit=150 (most recent 100 of more; older pages not read)
+- [FULL - GitHub API] Repo searches for comparable products; LICENSE files of Asugawara/ukagai (MIT), deokman420/KasOS (MIT); ukagai README
+- [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
+- [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
+- [FULL - urllib GET] Radio browse for 10 search terms and SomaFM; radio resolve with 4 test links (all 400, SoundCloud short links only)
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

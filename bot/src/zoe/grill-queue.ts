@@ -66,6 +66,21 @@ export function spoolPath(): string {
 }
 
 /**
+ * Spool even when the queue's directory exists.
+ *
+ * The header above says the VPS has no vault. That stopped being true: measured
+ * 2026-10-07, /home/zaal/zao-vault is a checkout there, 2,512 commits behind
+ * origin with no cron pulling or pushing it, and its BLACKBOARD.md held 20
+ * grill batches (646 lines) uncommitted. "The directory already exists" was
+ * standing in for "this file reaches someone", and on that box it does not.
+ * The spool is the path zao-grill-queue-drain reads. Off unless set to '1', so
+ * the mac, where the vault is real, behaves as before.
+ */
+export function spoolOnly(): boolean {
+  return process.env.ZOE_GRILL_QUEUE_SPOOL_ONLY === '1';
+}
+
+/**
  * The next item number to use.
  *
  * The file's own numbering is not a clean sequence - batch 1 wrote 1-7, the
@@ -152,7 +167,7 @@ export async function appendGrillQueue(
     haveVault = false;
   }
 
-  if (haveVault) {
+  if (haveVault && !spoolOnly()) {
     try {
       let existing = '';
       try {

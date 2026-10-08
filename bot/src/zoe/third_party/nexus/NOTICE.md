@@ -13,20 +13,21 @@ Credit line, used at each use site (ZAOOS doc 2643, rank 3):
 
 ## What was taken
 
-- The layered dedup: URL, exact title, arXiv id, content-word Jaccard above 0.6,
-  or two or more shared title entities (proper nouns and dollar amounts). The
-  stop-word and common-word lists and the 200-item cap are nexus's.
+- The dedup layers: URL, exact title, arXiv id, content-word Jaccard above 0.6,
+  and shared title entities (proper nouns and dollar amounts). The stop-word and
+  common-word lists and the 200-item cap are nexus's.
 - The source-adapter interface (name, priority, `poll(signal)`).
 
 ## What was changed or left out
 
 - Left out, on Zaal's 2026-10-08 ruling (vault item 64): the paid TypeSafe/Jev
   classifier, the Postgres tables, and the X API adapter.
-- Stricter than nexus (two reviews of #3821): two different arXiv ids never
-  merge; shared names never drop an item (a name match is reported as a
-  possible duplicate and kept), because no word list or title-similarity
-  threshold separated distinct stories from true repeats; the content layer
-  needs at least 8 significant words on both sides.
+- Stricter than nexus (three reviews of #3821): items are DROPPED only on exact
+  identifiers (same link, same normalised title, same arXiv id), and two
+  different arXiv ids never merge. Content similarity and shared names are
+  reported as possible duplicates and the item is kept, because neither a word
+  list nor a similarity threshold separated distinct items from true repeats.
+  Content is compared only when both items have at least 8 significant words.
 - Changed: pure functions with no database. The caller passes the items already
   seen. Every drop records its reason and what it duplicated. arXiv ids are also
   read from the url, with the version suffix ignored.

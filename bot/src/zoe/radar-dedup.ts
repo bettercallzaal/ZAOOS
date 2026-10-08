@@ -14,8 +14,12 @@
  *    News", "OpenAI raises $5B in debt" vs "OpenAI acquires startup for $5B"), and
  *    no word list or title-similarity threshold separated them from true repeats.
  *    So a name match is reported in `possible` and the item is KEPT;
- *  - the content (Jaccard) layer only runs when both items carry at least
- *    MIN_CONTENT_WORDS significant words, so two short titles cannot merge on it.
+ *  - similar content never drops either (third review: two different 16-word
+ *    template summaries scored 0.737). Content Jaccard > 0.6 is reported in
+ *    `possible`, and only when both items carry at least MIN_CONTENT_WORDS
+ *    significant words, so two short titles are not even flagged on it.
+ * Net rule: DROP only on exact identifiers (same link, same normalised title,
+ * same arXiv id). Everything softer is a flag. No item is ever lost.
  * What was left out, on Zaal's 2026-10-08 ruling (vault item 64): nexus's paid
  * TypeSafe/Jev classifier, its Postgres tables, and its X API adapter. This file
  * is pure: no database, no network, no clock. Callers pass in what was seen.
@@ -47,13 +51,13 @@ export interface RadarSourceAdapter {
   poll(signal?: AbortSignal): Promise<RadarItem[]>;
 }
 
-export type DupReason = 'url' | 'title' | 'arxiv' | 'content';
+export type DupReason = 'url' | 'title' | 'arxiv';
 
 export interface DedupResult {
   kept: RadarItem[];
   dropped: Array<{ item: RadarItem; reason: DupReason; duplicateOf: string }>;
-  /** Kept, but shares names with an earlier item: a human or model decides. */
-  possible: Array<{ item: RadarItem; duplicateOf: string; shared: string[] }>;
+  /** Kept, but similar to an earlier item (names or content): a human or model decides. */
+  possible: Array<{ item: RadarItem; duplicateOf: string; why: 'content' | 'entities'; shared?: string[]; similarity?: number }>;
 }
 
 // Content Jaccard above 0.6 is kept from nexus.
@@ -189,8 +193,6 @@ function matchReason(a: Seen, b: Seen): DupReason | null {
   // Two different arXiv ids are two different papers, whatever the titles or text say.
   if (a.arxiv && b.arxiv) return a.arxiv === b.arxiv ? 'arxiv' : null;
   if (a.titleKey && a.titleKey === b.titleKey) return 'title';
-  if (a.fp.length >= MIN_CONTENT_WORDS && b.fp.length >= MIN_CONTENT_WORDS
-    && jaccardSimilarity(a.fp, b.fp) > CONTENT_SIMILARITY_THRESHOLD) return 'content';
   return null;
 }
 
@@ -198,7 +200,7 @@ function matchReason(a: Seen, b: Seen): DupReason | null {
  * Keep the first of each group of duplicates, within the batch and against items
  * already seen (for example, recent radar items or existing research docs).
  * Order is kept. Every drop says why and what it duplicated, so nothing vanishes
- * silently. A name-only match is never a drop: it is listed in `possible` and kept.
+ * silently. Similar names or content is never a drop: it is listed in `possible` and kept.
  * Items past MAX_DEDUP_BATCH are kept unchecked, never dropped.
  */
 export function dedupeRadarItems(items: RadarItem[], alreadySeen: RadarItem[] = []): DedupResult {
@@ -214,8 +216,15 @@ export function dedupeRadarItems(items: RadarItem[], alreadySeen: RadarItem[] = 
       if (reason) { dropped.push({ item, reason, duplicateOf: s.url }); return; }
     }
     for (const s of seen) {
+      if (f.fp.length >= MIN_CONTENT_WORDS && s.fp.length >= MIN_CONTENT_WORDS) {
+        const similarity = jaccardSimilarity(f.fp, s.fp);
+        if (similarity > CONTENT_SIMILARITY_THRESHOLD) {
+          possible.push({ item, duplicateOf: s.url, why: 'content', similarity: Math.round(similarity * 100) / 100 });
+          break;
+        }
+      }
       const shared = entitiesFlag(f.entities, s.entities);
-      if (shared) { possible.push({ item, duplicateOf: s.url, shared }); break; }
+      if (shared) { possible.push({ item, duplicateOf: s.url, why: 'entities', shared }); break; }
     }
     seen.push(f);
     kept.push(item);

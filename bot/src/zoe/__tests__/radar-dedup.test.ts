@@ -46,17 +46,20 @@ describe('radar-dedup: duplicates collapse', () => {
     expect(r.kept).toHaveLength(2);
     expect(r.dropped).toHaveLength(0);
     expect(r.possible).toHaveLength(1);
-    expect(r.possible[0].shared.sort()).toEqual(['$40b', 'openai', 'softbank']);
+    expect(r.possible[0].why).toBe('entities');
+    expect((r.possible[0].shared ?? []).sort()).toEqual(['$40b', 'openai', 'softbank']);
   });
 
-  it('the same article reposted with a new title collapses on its long text (content)', () => {
+  it('a repost with a new title and similar long text is KEPT and flagged possible (content)', () => {
     const body = 'Telegram Bot API version ten lets bots read messages from other bots in groups when both enable the mode in BotFather';
     const r = dedupeRadarItems([
       item('https://a.com/tg', 'Telegram bots can now talk to each other', body),
       item('https://b.com/tg2', 'Bot-to-bot messaging arrives on Telegram', body),
     ]);
-    expect(r.kept).toHaveLength(1);
-    expect(r.dropped[0].reason).toBe('content');
+    expect(r.kept).toHaveLength(2);
+    expect(r.dropped).toHaveLength(0);
+    expect(r.possible).toHaveLength(1);
+    expect(r.possible[0].why).toBe('content');
   });
 
   it('an item already seen elsewhere is dropped, and the drop says what it matched', () => {
@@ -147,13 +150,24 @@ describe('radar-dedup: distinct items stay', () => {
     expect(r.kept).toHaveLength(2);
   });
 
-  it('two short titles sharing most words do not merge on the content layer', () => {
-    // 4 of 6 words shared = 0.67 Jaccard, above 0.6: only the length gate keeps these apart
+  it('two short titles sharing most words are not even flagged on content', () => {
+    // 4 of 6 words shared = 0.67 Jaccard, above 0.6: only the length gate keeps this off the list
     const r = dedupeRadarItems([
       item('https://a.com/c', 'Python Rust Golang Zig Compared'),
       item('https://b.com/n', 'Python Rust Golang Zig News'),
     ]);
     expect(r.kept).toHaveLength(2);
+    expect(r.possible.filter((p) => p.why === 'content')).toHaveLength(0);
+  });
+
+  it('review 3: two different long template summaries are both kept', () => {
+    const t = (x: string) => `This week in open source tooling the team shipped updates to the ${x} package with fixes and docs`;
+    const r = dedupeRadarItems([
+      item('https://a.com/w1', 'Weekly tooling update one', t('router')),
+      item('https://b.com/w2', 'Weekly tooling update two', t('scheduler')),
+    ]);
+    expect(r.kept).toHaveLength(2);
+    expect(r.dropped).toHaveLength(0);
   });
 
   it('review 2: "OpenAI raises $5B in debt" vs "OpenAI acquires startup for $5B" stay separate', () => {

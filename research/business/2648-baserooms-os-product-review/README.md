@@ -342,6 +342,25 @@ SomaFM returned 46 stations, all live.
 1. **Search works by Audius account, not by brand.** Anyone who types `wavewarz`, `bettercallzaal`, `thezao` or `stilo` hears our people inside Base Rooms today, with Audius plays credited to their accounts through `app_name=baserooms`. Brand names that are not Audius handles (`COC Concertz`, Joseph Goats, Huöttöja) return nothing. Whether those artists publish on Audius under another handle was not checked here.
 2. **There is no "add a station" path for us.** The `resolve` endpoint, which turns a pasted link into something playable, accepts only `on.soundcloud.com` links: an Audius track, an Audius profile, a SomaFM page and a plain `.mp3` URL all came back `400 {"error":"an on.soundcloud.com link is required"}`. So a ZAO or WaveWarZ station on the radio's front page is something only Slava can add. That supports making Key Decision 4 a direct ask, and makes it specific: a pinned WaveWarZ (or The ZAO) row backed by the `thezaodao`, `bettercallzaal`, WaveWarZ Africa and Stilo World Audius accounts.
 
+### 2026-10-08, tick 10: the renderer and the onchain pet page
+
+Source: the verified source of `UnitRenderer` at `0xad23...34ac` from its Basescan page (exact match; files `src/UnitRenderer.sol`, `src/UnitCollection.sol`, `src/generated/UnitArt.sol`, `src/generated/UnitPet.sol`, all `SPDX-License-Identifier: MIT`). The pet page was rebuilt by hex-decoding the four `SSTORE2.write(hex"...")` parts in `UnitPet.sol` (27,943 characters of HTML) and read for network calls.
+
+**The renderer itself has no owner.** Its own header says "No owner. Output depends only on the token id, its traits, its reveal time and the units address." That is why `owner()` returned nothing in section 3. So the art cannot be changed inside this renderer. It can only be changed by the Buddies contract owner pointing `setRenderer` at a different contract (tick 1). Holders who want to know whether their art changed only need to watch for a `RendererSet` event on the Buddies contract.
+
+**The pet page is onchain, but it calls home.** Every Buddy's `animation_url` is a self-contained HTML page stored onchain, with a strict Content-Security-Policy: no images except `data:` URLs, and network access allowed only to two hosts, `https://mainnet.base.org` and `https://brtc-os.slavamushyakov.workers.dev`. The page makes two kinds of call:
+
+1. `eth_call` reads against the public Base RPC (a 4-second timeout), to read the Buddy's own onchain state.
+2. `GET <worker>/units/progress?ids=<id>`, which returns "level, xp, streak, specialty" from Base Rooms' server.
+
+The Worker URL is a `constant` in the renderer (`WORKER = "https://brtc-os.slavamushyakov.workers.dev"`). It is written into every token's metadata and cannot be changed without deploying a new renderer.
+
+**What this means.**
+
+1. **The picture and traits are permanent; the pet's progress is not.** If the Worker goes away, the SVG art and traits still render from chain. The pet's level and XP panel would come back empty, because that data lives only on Base Rooms' server (consistent with tick 2: levels are Base Rooms' own claims).
+2. **Viewing a Buddy on a marketplace that runs `animation_url` sends a request to Base Rooms' Worker** with that Buddy's id, so the Worker's logs can see the viewer's IP address. That is normal for web content and small, and it is worth knowing before embedding Buddies on a ZAO page.
+3. **This is a good pattern to copy for ZAO collectibles.** The page has no external images, uses a CSP allowlist of two hosts, and keeps the art in contract bytecode and SSTORE2. It is MIT. If The ZAO ever makes onchain collectibles, `UnitRenderer` is a clean reference, credited per `credit-attribution.md`.
+
 ## Comparison: how to use it
 
 | Option | Risk | Value to ZAO | Verdict |
@@ -399,6 +418,7 @@ Method is stated for each, per `research-grounding.md`. No WebFetch was used for
 - [FULL - Farcaster index API, community] Cast searches "onchain os", "onchain desktop", "desktop on base"
 - [FULL - curl, 3 runs] IM health: https://im.baserooms.io/health ; response headers of im.baserooms.io and baserooms.io
 - [FULL - urllib GET] Radio browse for 10 search terms and SomaFM; radio resolve with 4 test links (all 400, SoundCloud short links only)
+- [FULL - curl + HTML strip] UnitRenderer verified source (9 files, MIT): https://basescan.org/address/0xad2343637ef688b6cc3a106092a941ffcb5834ac ; pet page rebuilt from the SSTORE2 hex parts in UnitPet.sol
 - [FULL - curl] Jitsi: https://meet.baserooms.io/ (200, title "Jitsi Meet")
 - [FULL - curl + HTML strip] Basescan address pages: https://basescan.org/address/0x2B48fFaa0c453786EBF1a786c6f2e21Dcb97f29b , https://basescan.org/address/0x5b42A7f7c3d27EA76EdAb4BfF7d27497D35420F0 , https://basescan.org/address/0x6f25a9e1e677616c1bF7ab54b470b0c82839Adb4 , https://basescan.org/address/0xB200000000000000000000856A95738C92fEed01 , https://basescan.org/address/0xA034E1CDb0dd2D94ea4689940F5db2Dd677Df8ce
 - [FAILED - curl] base.blockscout.com API: Cloudflare "Just a moment" challenge; replaced by Basescan pages plus RPC

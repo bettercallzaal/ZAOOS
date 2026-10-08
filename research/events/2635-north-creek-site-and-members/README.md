@@ -43,6 +43,8 @@ tier: DEEP
 | Flyer | 1125x1500 JPEG, 356,547 bytes | `site/afterparty/flyer.jpg` |
 | Contact, mailing list, music | none | read of both HTML files |
 
+**Follow-through, 2026-10-07 20:19 EDT:** northcreek.art is live since this evening. Zaal attached it to Vercel himself; `curl` returns 200 and `dig` resolves to 216.150.1.1. The Porkbun-parking row above and decision 8 describe the state at 20:02 EDT.
+
 ### 2. Ranked recommendations
 
 | # | Recommendation | Effort | Needs band content |

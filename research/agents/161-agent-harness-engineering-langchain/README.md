@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-09
 original-query: Analyze agent harness engineering framework (LangChain DeepAgents) and extract patterns for ZAO OS agent roadmap (reconstructed)
 tier: reference
 ---
@@ -236,3 +236,5 @@ Don't just "add an AI agent." Design the harness:
 - [Viv Trivedy (@vtrivedy10) on X](https://x.com/Vtrivedy10)
 
 Updated 2026-05-21: LangChain's breakthrough results confirmed - 52.8% to 66.5% improvement on Terminal Bench 2.0 (gpt-5.2-codex) through harness engineering alone. Three key improvements: system prompts with self-verification loops, enhanced tools + context injection, middleware hooks for doom-loop detection (PreCompletionChecklistMiddleware). Validates that agent infrastructure design rivals model selection in importance.
+
+Updated 2026-10-09: Three material changes since last validation — (1) **DeepAgents v0.7** (released July–August 2026): 65% reduction in base input tokens (~6,000 → ~2,000) with no quality regression on GPT-5.6, Claude Opus 4.8, and GLM 5.2 evals; base system prompt shipped empty, tool descriptions trimmed 43%, and the todo middleware made opt-in after LangChain's own evals found it added cost/latency with no accuracy benefit. (2) **Model-specific harness profiles** (v0.6 era, May 2026): named, versionable units for per-model overrides; LangChain reports 10–20 point jump on tau2-bench for Anthropic, OpenAI, and Google models. (3) **Managed Deep Agents public beta** (August 7, 2026): one-command deployment (`mda deploy`) to LangSmith Cloud (US only); managed runtime owns backend, store, checkpointer, memory, and skills — those fields must not be set in the agent definition. Also: a TypeScript/JS variant (`langchain-ai/deepagentsjs`) was published. The doc's core pattern (Model + Harness, Ralph Loop, virtual filesystems) remains current; the todo-list pattern is now opt-in rather than default. Sources: search summaries from langchain.com blog and docs (direct fetch blocked by proxy — PARTIAL); https://langchain.com/blog/managed-deep-agents-is-now-in-public-beta [PARTIAL via search snippet].

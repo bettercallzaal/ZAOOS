@@ -204,7 +204,7 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 - Composio AO orchestrator
 - ZOE v2 / Agent Zero migration plan
 - 10-bot branded fleet ([retired partner]/Research/WaveWarZ/POIDH as own bots) — folds into ZOE memory blocks
-- zao-team-bots (Magnetiq + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
+- zao-team-bots ([retired partner] + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
 - Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
 - **farscout** — superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). **STILL RUNNING as `farscout.service` on the VPS as of 2026-08-22** — 35 days uptime, 0.0% CPU, zero journald entries, zero files written in 30 days, while heartbeating `up` to the bots board. A zombie that reports healthy. Stopping it is Zaal's (`systemctl --user stop farscout && systemctl --user disable farscout`) — do not treat its heartbeat as evidence the fleet is working. Prior docs: 774 (what it was), 864 (board integration).

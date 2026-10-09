@@ -10,7 +10,7 @@ fully root-caused a month in, before anyone wrote it down.
 ## The three instances (all confirmed, ZAOOS#3065)
 
 `gstack browse` - the headless browser the fleet uses for client-rendered pages.
-All three were hit by the zao-artizen lane, in `ZAOartizen/scripts/refresh-fund.mjs`.
+All three were hit by the [retired partner] lane, in `[retired partner]/scripts/refresh-fund.mjs`.
 
 1. **2026-07-13.** `browse restart` on an already-healthy session repeatedly
     triggered "crashed twice in a row". Worked around at the call site:
@@ -80,7 +80,7 @@ a number someone will act on, treat `length == 0` (or below a sane floor) as a
 hard failure. The guard is one line and it is correct regardless of cause.
 
 Honest scope: on 2026-08-17 one lane observed a zero-length 200 from
-`artizen.fund` and **could not reproduce it in six subsequent runs across three
+`[retired partner]` and **could not reproduce it in six subsequent runs across three
 configurations**, while a second lane never reproduced it at all. So this is
 **not** recorded as a property of that site - it is recorded because the guard
 costs nothing and the failure mode is real wherever it occurs.
@@ -97,7 +97,7 @@ Investigating instance 3, the two lanes produced **one unreproduced one-off
 each**, and each was caught only because the other lane re-ran the measurement
 instead of accepting the report:
 
-- zao-artizen reported a zero-length 200 as site behavior. One observation. Six
+- [retired partner] reported a zero-length 200 as site behavior. One observation. Six
   later runs across three configs: not reproducible.
 - ignite-radio reported that a desktop-UA recipe yielded **41% more content**,
   superseded their own published advice on it, and credited the other lane. One
@@ -137,7 +137,7 @@ convergence is not proof (`research-grounding.md` rule 3).
 
 ## Source
 
-Written 2026-08-17 by the zao-artizen lane at ignite-radio's request, after that
+Written 2026-08-17 by the [retired partner] lane at ignite-radio's request, after that
 lane root-caused the bug on 2026-08-14 and then stopped for a fleet refresh.
 Three instances, fully root-caused a month in, and still zero rules - which is
 exactly the failure `agentic-issue` exists to prevent, recurring inside the

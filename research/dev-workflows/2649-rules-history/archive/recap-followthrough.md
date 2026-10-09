@@ -21,7 +21,7 @@ honoured, and it is the record everyone reaches for.**
 | 947 Marie | 2026-06-22 | 2026-07-03 | 59 days | fund-vote add, an introduction, a URL |
 | 866 Thy Revolution | 2026-06-17 | none | 64 days | $100 into a Giveth, two calls to schedule |
 | 940 Sistla | 2026-06-25 | 2026-06-25 | 56 days | the product link, compute credits |
-| William / Artizen | 2026-07-22 | - | ~28 days at check | read docs, sign up, submit |
+| William / [retired partner] | 2026-07-22 | - | ~28 days at check | read docs, sign up, submit |
 
 Doc 947 is the sharpest case: it was validated **eleven days after the call and
 before the Wednesday deadline it tracks could resolve**. The validation stamp

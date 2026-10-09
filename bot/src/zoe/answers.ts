@@ -67,11 +67,26 @@ export async function recordAnswer(
   scope: ChatScope,
 ): Promise<AnswerRecord> {
   const rec: AnswerRecord = { qid, value, sender, scope: String(scope), ts: new Date().toISOString() };
-  const path = answersPath();
-  await fs.mkdir(dirname(path), { recursive: true });
-  await fs.appendFile(path, `${JSON.stringify(rec)}\n`, 'utf8');
-  // Same ts in both stores, so detectNewAnswers can dedupe on qid + ts.
-  await pushRecent({ from: 'zaal', text: answerText(qid, value), sender, ts: rec.ts }, scope);
+  // Both stores are attempted even when one fails: an answer that reaches only
+  // the ring buffer is still readable for a while, and one that reaches only the
+  // index is still readable by qid. Only when BOTH writes fail does this throw,
+  // so the caller's catch logs a real loss and not a half one.
+  const failures: string[] = [];
+  try {
+    const path = answersPath();
+    await fs.mkdir(dirname(path), { recursive: true });
+    await fs.appendFile(path, `${JSON.stringify(rec)}\n`, 'utf8');
+  } catch (e) {
+    failures.push(`answers.jsonl: ${(e as Error)?.message ?? String(e)}`);
+  }
+  try {
+    // Same ts in both stores, so detectNewAnswers can dedupe on qid + ts.
+    await pushRecent({ from: 'zaal', text: answerText(qid, value), sender, ts: rec.ts }, scope);
+  } catch (e) {
+    failures.push(`recent/: ${(e as Error)?.message ?? String(e)}`);
+  }
+  if (failures.length === 2) throw new Error(`recordAnswer(${qid}) reached neither store: ${failures.join('; ')}`);
+  if (failures.length === 1) console.error(`[zoe/answers] ${qid} reached one store only: ${failures[0]}`);
   return rec;
 }
 

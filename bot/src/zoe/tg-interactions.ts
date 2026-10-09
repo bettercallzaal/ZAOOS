@@ -16,6 +16,7 @@
 import { Context } from 'grammy';
 import type { Message } from 'grammy/types';
 import { pushRecent, readHuman, type ChatScope } from './memory';
+import { answerText, recordAnswer } from './answers';
 import { transcribeTelegramFile } from './transcribe';
 import { parseQuestionCallback, TYPE_SENTINEL, encodeQuestion } from './questions';
 import type { ParsedQuestion } from './questions';
@@ -81,16 +82,12 @@ export async function handleVoiceAnswer(
 
   const qid = awaitingQid || 'voice-reply';
 
-  // Log as [answer:qid] in the same format as button answers
-  const logText = `[answer:${qid}] ${transcript}`;
   const scope: ChatScope = deps.chatId > 0 ? 'private' : `group-${deps.chatId}`;
 
   try {
-    // Log to recent/ so orchestrator session picks it up
-    await pushRecent(
-      { from: 'zaal', text: logText, sender: 'voice-answer' },
-      String(deps.zaalBotzGroupId ?? deps.chatId),
-    );
+    // answers.jsonl first, then the recent/ bridge line, same shape as button
+    // answers (answers.ts). Was a pushRecent-only write until 2026-10-08.
+    await recordAnswer(qid, transcript, 'voice-answer', String(deps.zaalBotzGroupId ?? deps.chatId));
   } catch {
     // continue even if log fails (best-effort)
   }
@@ -318,12 +315,11 @@ export async function handleReplyRoute(
       if (await tryInstantRelayReply(context.qid, text, new Date().toISOString())) {
         return { handled: true, contextType: 'question', id: context.qid };
       }
-      const logText = `[answer:${context.qid}] ${text}`;
+      // answers.jsonl first, then the recent/ bridge line (answers.ts). This was
+      // the one answer path still writing the 8-turn ring buffer alone after
+      // the 2026-10-08 fix; a reply-to-question answer rolled off like the rest.
       try {
-        await pushRecent(
-          { from: 'zaal', text: logText, sender: 'reply-thread' },
-          String(ctx.chat?.id),
-        );
+        await recordAnswer(context.qid, text, 'reply-thread', String(ctx.chat?.id));
       } catch {
         // best effort
       }
@@ -502,9 +498,9 @@ export async function handleBatchAnswer(
 
       const q = deps.openQuestions[qIndex];
 
-      // Log the answer
-      const logText = `[answer:${q.qid}] ${answer.value}`;
-      await deps.log(logText);
+      // Log the answer in the one bridge shape (answers.ts owns it); the
+      // injected log is the caller's recordAnswer-backed writer.
+      await deps.log(answerText(q.qid, answer.value));
     } catch (err) {
       errors.push((err instanceof Error ? err.message : String(err)).slice(0, 100));
     }

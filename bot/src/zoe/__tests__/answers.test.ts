@@ -27,6 +27,7 @@ const TEST_HOME = vi.hoisted(() => {
 import { answerText, answersPath, findAnswer, parseAnswerText, readAnswers, recordAnswer } from '../answers';
 import { pushRecent, readRecent } from '../memory';
 import { detectNewAnswers } from '../orchestrator-tick';
+import { handleReplyRoute } from '../tg-interactions';
 
 const GROUP = -1003813973176;
 const SCOPE = String(GROUP);
@@ -143,5 +144,96 @@ describe('detectNewAnswers reads the durable index (RED without the fix)', () =>
     );
     const found = await detectNewAnswers('2026-10-08T00:00:00Z', legacyGroup);
     expect(found.map((a) => [a.qid, a.value])).toEqual([['g1008-legacy', 'b']]);
+  });
+});
+
+describe('reply-to-question answers (handleReplyRoute) use the same durable index', () => {
+  // Reviewer finding on #3840: handleReplyRoute wrote [answer:qid] with pushRecent
+  // alone, so an answer given by replying to the question still rolled off.
+  it('33 replies to 33 questions are all findable and all returned by the tick', async () => {
+    const group = -1003813973177;
+    const map = new Map<number, { qid?: string }>();
+    for (const [i, qid] of QIDS.entries()) map.set(5000 + i, { qid });
+    for (const [i, qid] of QIDS.entries()) {
+      const ctx = {
+        chat: { id: group, type: 'supergroup' },
+        message: { message_id: 9000 + i, text: `reply ${qid}`, reply_to_message: { message_id: 5000 + i } },
+      } as unknown as Parameters<typeof handleReplyRoute>[0];
+      const r = await handleReplyRoute(ctx, { isFromZaal: true, messageIdToContext: map });
+      expect(r).toMatchObject({ handled: true, contextType: 'question', id: qid });
+    }
+    for (const qid of QIDS) {
+      const rec = await findAnswer(qid);
+      // findAnswer returns the newest record for the qid: the reply, not the earlier tap.
+      expect(rec?.sender).toBe('reply-thread');
+      expect(rec?.value).toBe(`reply ${qid}`);
+    }
+    const found = await detectNewAnswers('2026-10-08T00:00:00Z', group);
+    expect(found.filter((a) => a.qid.startsWith('g1008-')).length).toBe(33);
+    // And the ring buffer for that group still holds only the last 8.
+    expect(await readRecent(String(group))).toHaveLength(8);
+  });
+
+  it('ignores a reply from someone who is not Zaal, and a reply to an unknown message', async () => {
+    const ctx = {
+      chat: { id: 1, type: 'private' },
+      message: { message_id: 1, text: 'x', reply_to_message: { message_id: 777777 } },
+    } as unknown as Parameters<typeof handleReplyRoute>[0];
+    expect(await handleReplyRoute(ctx, { isFromZaal: false })).toEqual({ handled: false });
+    expect(await handleReplyRoute(ctx, { isFromZaal: true, messageIdToContext: new Map() })).toEqual({ handled: false });
+  });
+});
+
+describe('recordAnswer reaches the store that still works when the other fails', () => {
+  it('writes the ring-buffer line when answers.jsonl cannot be appended', async () => {
+    // A directory where the file should be makes appendFile throw EISDIR.
+    const brokenHome = `${TEST_HOME}-broken`;
+    await fs.mkdir(join(brokenHome, 'answers.jsonl'), { recursive: true });
+    const saved = process.env.ZOE_HOME;
+    process.env.ZOE_HOME = brokenHome; // answersPath() reads it at call time; memory.ts keeps TEST_HOME
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const scope = `${SCOPE}-broken`;
+      const rec = await recordAnswer('g1008-broken', 'a', 'zaalbotz-btn', scope);
+      const recent = await readRecent(scope);
+      expect(recent.map((t) => t.text)).toEqual([answerText('g1008-broken', 'a')]);
+      expect(recent[0].ts).toBe(rec.ts);
+      expect(errors).toHaveBeenCalledWith(expect.stringContaining('reached one store only'));
+    } finally {
+      errors.mockRestore();
+      process.env.ZOE_HOME = saved;
+      await fs.rm(brokenHome, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('no answer writer bypasses answers.ts', () => {
+  // Structural guard: the reviewer of #3840 found a sixth writer (handleReplyRoute)
+  // after five had been routed, and a sweep then found two more (voice-note and
+  // batch answers). The bridge shape `[answer:<qid>]` is built in exactly one
+  // place; any other file building it is a path that will roll off the ring buffer.
+  it('only answers.ts builds the [answer:<qid>] template literal', async () => {
+    const { readdirSync, readFileSync, statSync } = await import('node:fs');
+    const { join: j } = await import('node:path');
+    const root = j(__dirname, '..');
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        const p = j(dir, name);
+        if (statSync(p).isDirectory()) {
+          if (name !== '__tests__') walk(p);
+          continue;
+        }
+        if (!name.endsWith('.ts') || name === 'answers.ts') continue;
+        const src = readFileSync(p, 'utf8');
+        src.split('\n').forEach((line, i) => {
+          const t = line.trim();
+          if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) return; // prose, not a writer
+          if (line.includes('`[answer:')) offenders.push(`${p.slice(root.length + 1)}:${i + 1}`);
+        });
+      }
+    };
+    walk(root);
+    expect(offenders).toEqual([]);
   });
 });

@@ -99,7 +99,7 @@ From the WaveWarZ Intelligence dashboard (wavewarz.info, live July 2026) and Dun
 
 The data shows platform revenue (16.81 SOL) running approximately **1.9x higher** than artist payouts (8.82 SOL). This looks like a contradiction of the "artist-favored" fee model.
 
-**Why this happens:** The trading/settlement fees (0.495% per trade + 3% loser pool) are only part of platform revenue. Battle-launch fees — a fixed charge per battle creation — are a separate revenue stream that the "98.5%" claim does not address.
+**Why this happens:** The trading/settlement fees (0.495% per trade + 3% loser pool) are only part of platform revenue. Battle-launch fees - a fixed charge per battle creation - are a separate revenue stream that the "98.5%" claim does not address.
 
 - Trading fees alone at 0.495% of 498.88 SOL volume ≈ 2.47 SOL
 - Artist trading fees (1.005%) ≈ 5.01 SOL
@@ -134,7 +134,7 @@ Per-artist average: with ~15-20 regularly battling artists (estimate from the ve
 
 **Scale math:** At $1M trading volume, the same fee model pays artists ~$10,050 from the 1.005% trading fee, plus about $35k from 7% of loser pools (a loser pool is roughly half of trading volume, so 7% × $500k). The model works at scale; the current numbers reflect early adoption.
 
-**COC #7 angle:** Tonight's show (Jul 18 4PM EST) is the first COC Concertz × WaveWarZ pilot. If the show drives even 10 SOL of WaveWarZ battle volume, artists earn about 0.1 SOL (0.1005 at 1.005%, ~$7.80) instantly. The pilot tests whether a live event format accelerates trading volume — that is the key metric for the Saturday morning pilot report.
+**COC #7 angle:** Tonight's show (Jul 18 4PM EST) is the first COC Concertz × WaveWarZ pilot. If the show drives even 10 SOL of WaveWarZ battle volume, artists earn about 0.1 SOL (0.1005 at 1.005%, ~$7.80) instantly. The pilot tests whether a live event format accelerates trading volume - that is the key metric for the Saturday morning pilot report.
 
 ---
 
@@ -173,7 +173,7 @@ The battle account layout is confirmed from the IDL (private repo `hurric4n3ike/
 
 The pilot show is tonight (Jul 18 4PM EST). If Zaal is asked about WaveWarZ economics on stream or in post-show coverage, these are the verified talking points:
 
-1. **"98.5% of every trade stays with artists and traders."** — True on the per-trade mechanics. Platform takes 0.495%, artists get 1.005%, 98.5% stays in the tradeable pool. Verified on-chain via Dune.
+1. **"98.5% of every trade stays with artists and traders."** - True on the per-trade mechanics. Platform takes 0.495%, artists get 1.005%, 98.5% stays in the tradeable pool. Verified on-chain via Dune.
 
 2. **"Artist payments are instant and automatic."** True. The 1.005% per trade (written here as 1.0% until 2026-10-08; see the correction under the fee table) goes to the artist wallet immediately at settlement. No claims needed; the bonding curve math handles it.
 

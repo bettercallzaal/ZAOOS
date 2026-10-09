@@ -22,7 +22,7 @@ This claim is **accurate on the trading mechanics** but requires context:
 
 | What it covers | What it does NOT cover |
 |---|---|
-| Per-trade platform fee = 0.5% (98.5% stays in pool) | Battle-launch fees (paid per battle creation) |
+| Per-trade platform fee = 0.495% (98.5% stays in pool) | Battle-launch fees (paid per battle creation) |
 | At settlement, traders + artists keep 97% of loser pool | The gap between total platform revenue and artist payouts |
 
 **Verified via Dune** (Solana instruction_calls, program `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo`, snapshot 2026-06-14): discriminators for all six instructions matched cleanly, confirming the fee percentages below are live, not just documented.
@@ -41,16 +41,15 @@ Every time a trader buys or sells on the bonding curve:
 | Artist (instant, automatic) | 1.005% |
 | Platform treasury | 0.495% |
 
-> **Corrected 2026-10-08.** This table said artist **1.0%** and platform **0.5%**.
-> The program prints its own split: the 1.5% fee divides 67/33, so on a 0.05 SOL
-> buy it pays the artist 502,500 lamports and the platform 247,500 of 750,000 -
-> **1.005% and 0.495% of volume**. Measured in doc 2525 (section 5). The 1.0% /
-> 0.5% figures elsewhere in this doc, and the totals computed from them (the
-> ~4.99 SOL artist trading fees, the ~$10,000 at $1M), carry the same rounding:
-> the artist share is 0.5% higher than they state and the platform share 1% lower.
-> They are left as written so the arithmetic can be traced; read them as approximate.
+> **Corrected 2026-10-08.** This doc said artist **1.0%** and platform **0.5%**
+> throughout. The program prints its own split: the 1.5% fee divides 67/33, so on
+> a 0.05 SOL buy it pays the artist 502,500 lamports and the platform 247,500 of
+> 750,000 - **1.005% and 0.495% of volume**. Measured in doc 2525 (section 5).
+> Every figure below now uses the measured split, and the totals computed from it
+> were redone: platform trading fees 2.49 -> 2.47 SOL, artist trading fees
+> 4.99 -> 5.01 SOL, and ~$10,000 -> ~$10,050 at $1M.
 
-**What this means for the claim:** On the trading mechanics, 99.5% of every dollar stays with traders and artists — the platform takes only 0.5%. The "98.5%" figure refers to what stays directly tradeable in the pool.
+**What this means for the claim:** On the trading mechanics, 99.505% of every dollar stays with traders and artists; the platform takes only 0.495%. The "98.5%" figure refers to what stays directly tradeable in the pool.
 
 ### At settlement (endBattle — loser pool distribution only)
 
@@ -100,16 +99,16 @@ From the WaveWarZ Intelligence dashboard (wavewarz.info, live July 2026) and Dun
 
 The data shows platform revenue (16.81 SOL) running approximately **1.9x higher** than artist payouts (8.82 SOL). This looks like a contradiction of the "artist-favored" fee model.
 
-**Why this happens:** The trading/settlement fees (0.5% per trade + 3% loser pool) are only part of platform revenue. Battle-launch fees — a fixed charge per battle creation — are a separate revenue stream that the "98.5%" claim does not address.
+**Why this happens:** The trading/settlement fees (0.495% per trade + 3% loser pool) are only part of platform revenue. Battle-launch fees — a fixed charge per battle creation — are a separate revenue stream that the "98.5%" claim does not address.
 
-- Trading fees alone at 0.5% of 498.88 SOL volume ≈ 2.49 SOL
-- Artist trading fees (1.0%) ≈ 4.99 SOL
+- Trading fees alone at 0.495% of 498.88 SOL volume ≈ 2.47 SOL
+- Artist trading fees (1.005%) ≈ 5.01 SOL
 - Settlement fees (3% of each loser pool) — harder to isolate without per-battle settlement data
 - **Gap = battle-launch queue fees**, paid by the team per battle creation
 
-The 8.82 SOL in artist payouts comes from two sources: (1) 1.0% per trade (≈4.99 SOL at current volume), and (2) 5%+2% = 7% of each loser pool. The settlement component is smaller because it is 7% of only the loser pool, not the full trading pool.
+The 8.82 SOL in artist payouts comes from two sources: (1) 1.005% per trade (≈5.01 SOL at current volume), and (2) 5%+2% = 7% of each loser pool. The settlement component is smaller because it is 7% of only the loser pool, not the full trading pool.
 
-**Bottom line:** On the per-trade and per-settlement mechanics, the economics favor artists over the platform (artists get 1.0% vs platform's 0.5% per trade; artists get 7% of loser pool vs platform's 3%). The aggregate revenue gap comes from battle-launch pricing, not from extractive trading mechanics. This distinction matters for the COC #7 pilot narrative.
+**Bottom line:** On the per-trade and per-settlement mechanics, the economics favor artists over the platform (artists get 1.005% vs platform's 0.495% per trade; artists get 7% of loser pool vs platform's 3%). The aggregate revenue gap comes from battle-launch pricing, not from extractive trading mechanics. This distinction matters for the COC #7 pilot narrative.
 
 ---
 
@@ -133,9 +132,9 @@ The 8.82 SOL paid to artists (~$688) across 1,200 battles and 498.88 SOL of volu
 
 Per-artist average: with ~15-20 regularly battling artists (estimate from the verified artist list), this is roughly $35-45 per artist over 10 months, or ~$3-4/month. That number is small not because the fee percentage is low, but because the total volume ($38,900) is early-stage.
 
-**Scale math:** At $1M trading volume, the same fee model pays artists ~$10,000 (1.0% trading + 7% of loser pools — loser pool is approximately half of trading volume, so 7% × $500k = $35k). The model works at scale; the current numbers reflect early adoption.
+**Scale math:** At $1M trading volume, the same fee model pays artists ~$10,050 from the 1.005% trading fee, plus about $35k from 7% of loser pools (a loser pool is roughly half of trading volume, so 7% × $500k). The model works at scale; the current numbers reflect early adoption.
 
-**COC #7 angle:** Tonight's show (Jul 18 4PM EST) is the first COC Concertz × WaveWarZ pilot. If the show drives even 10 SOL of WaveWarZ battle volume, artists earn 0.1 SOL (~$7.80) instantly. The pilot tests whether a live event format accelerates trading volume — that is the key metric for the Saturday morning pilot report.
+**COC #7 angle:** Tonight's show (Jul 18 4PM EST) is the first COC Concertz × WaveWarZ pilot. If the show drives even 10 SOL of WaveWarZ battle volume, artists earn about 0.1 SOL (0.1005 at 1.005%, ~$7.80) instantly. The pilot tests whether a live event format accelerates trading volume — that is the key metric for the Saturday morning pilot report.
 
 ---
 
@@ -174,9 +173,9 @@ The battle account layout is confirmed from the IDL (private repo `hurric4n3ike/
 
 The pilot show is tonight (Jul 18 4PM EST). If Zaal is asked about WaveWarZ economics on stream or in post-show coverage, these are the verified talking points:
 
-1. **"98.5% of every trade stays with artists and traders."** — True on the per-trade mechanics. Platform takes 0.5%, artists get 1.0%, 98.5% stays in the tradeable pool. Verified on-chain via Dune.
+1. **"98.5% of every trade stays with artists and traders."** — True on the per-trade mechanics. Platform takes 0.495%, artists get 1.005%, 98.5% stays in the tradeable pool. Verified on-chain via Dune.
 
-2. **"Artist payments are instant and automatic."** — True. The 1.005% per trade (written here as 1.0% until 2026-10-08; see the correction under the fee table) goes to the artist wallet immediately at settlement. No claims needed; the bonding curve math handles it.
+2. **"Artist payments are instant and automatic."** True. The 1.005% per trade (written here as 1.0% until 2026-10-08; see the correction under the fee table) goes to the artist wallet immediately at settlement. No claims needed; the bonding curve math handles it.
 
 3. **"The platform has run 1,200 battles and paid $688 to artists over 10 months."** — True. Small in absolute terms, but the model is proven. $1M volume = $10-45k to artists.
 

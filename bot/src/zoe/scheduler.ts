@@ -30,14 +30,7 @@ import { rolloverNotes } from './daily-note';
 import { runNeedsZaalDigest } from './needs-zaal-digest';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nextNudgeDetailed, nudgeKeyboard, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
-import {
-  attentionEnabled,
-  computeAttention,
-  readAttention,
-  renderHeldDigest,
-  showAllKeyboard,
-  writeHeldFull,
-} from './attention';
+import { attentionEnabled, computeAttention, prepareMorningBatch } from './attention';
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
@@ -78,7 +71,6 @@ import {
   runWithSendClass,
   drainDeferred,
   requeueDeferred,
-  renderDeferredBatch,
   wasSendBlocked,
 } from './send-budget';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
@@ -376,23 +368,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               // digest; measured 2026-10-09 09:00 UTC as 29 sends in a minute).
               // The full list is kept for the Show all button. If keeping it
               // fails, fall back to the full batch so nothing becomes unreachable.
-              let batchText = renderDeferredBatch(held);
-              let batchOpts: { replyMarkup?: ReturnType<typeof showAllKeyboard> } | undefined;
-              if (attentionEnabled()) {
-                try {
-                  await writeHeldFull(batchText);
-                  batchText = renderHeldDigest(held, await readAttention());
-                  batchOpts = { replyMarkup: showAllKeyboard() };
-                  featureRan('attention-digest', `${held.length} held`);
-                } catch (err) {
-                  console.warn('[zoe/scheduler] attention digest failed, sending the full batch:', (err as Error).message);
-                }
-              }
+              const prepared = await prepareMorningBatch(held);
+              if (prepared.digest) featureRan('attention-digest', `${held.length} held`);
               const batch = await sendChunkedDetailed(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
-                batchText,
-                batchOpts,
+                prepared.text,
+                prepared.opts,
               );
               if (batch.sent === 0) {
                 // Every chunk threw. sendChunkedDetailed swallows those

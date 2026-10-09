@@ -726,7 +726,9 @@ describe('the scheduler drains the queue under the morning class', () => {
   it('nothing inside the morning job re-tags the send class', async () => {
     const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
     const morningAt = src.indexOf("runWithSendClass('morning'");
-    const flushEnd = src.indexOf('renderDeferredBatch(held)');
+    // The flush body is built by prepareMorningBatch(held) (attention.ts), which
+    // calls renderDeferredBatch inside it; the job ends at that line.
+    const flushEnd = src.indexOf('prepareMorningBatch(held)');
     expect(morningAt).toBeGreaterThan(0);
     expect(flushEnd).toBeGreaterThan(morningAt);
     const job = stripComments(src.slice(morningAt, flushEnd));
@@ -740,7 +742,12 @@ describe('the scheduler drains the queue under the morning class', () => {
   it('the morning brief carries no explicit zoeSendClass hint', async () => {
     const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
     const morningAt = src.indexOf("runWithSendClass('morning'");
-    const flushEnd = src.indexOf('renderDeferredBatch(held)');
+    // The flush body is built by prepareMorningBatch(held) (attention.ts), which
+    // calls renderDeferredBatch inside it; the job ends at that line.
+    const flushEnd = src.indexOf('prepareMorningBatch(held)');
+    // A missing marker would make the slice run to the end of the file and the
+    // check below pass or fail on unrelated jobs. Pin it, as the test above does.
+    expect(flushEnd).toBeGreaterThan(morningAt);
     const job = stripComments(src.slice(morningAt, flushEnd));
 
     // resolveSendClass ranks an explicit hint ABOVE the enclosing context, so a

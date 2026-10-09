@@ -188,6 +188,7 @@ import { installCrashGuard } from './crash-guard';
 import { logTopicThreadId } from './curator';
 import { putDraft, getDraft, removeDraft, draftKeyboard, parseDraftCallback } from './drafts';
 import { parseQuestionCallback, parseReactionCallback } from './questions';
+import { recordAnswer } from './answers';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
@@ -960,10 +961,11 @@ bot.on('callback_query:data', async (ctx, next) => {
       if (pinnedMid) {
         await ctx.api.unpinChatMessage(gid, pinnedMid).catch(() => {});
       }
-      await pushRecent(
-        { from: 'zaal', text: `[answer:${q.qid}] ${q.value}`, sender: 'zaalbotz-btn' },
-        String(gid),
-      ).catch((e) => console.error('[zoe/index] q-answer log failed:', (e as Error)?.message));
+      // answers.jsonl first (durable, findable by qid), then the recent/ bridge line.
+      // 2026-10-08: 33 answers in ten minutes left eight readable in the ring buffer.
+      await recordAnswer(q.qid, q.value, 'zaalbotz-btn', String(gid)).catch((e) =>
+        console.error('[zoe/index] q-answer log failed:', (e as Error)?.message),
+      );
     }
     return;
   }
@@ -985,10 +987,9 @@ bot.on('callback_query:data', async (ctx, next) => {
     if (mid) {
       await ctx.api.unpinChatMessage(gid, mid).catch(() => {});
     }
-    await pushRecent(
-      { from: 'zaal', text: `[answer:${r.qid}] ${r.reaction}`, sender: 'zaalbotz-btn' },
-      String(gid),
-    ).catch((e) => console.error('[zoe/index] r-answer log failed:', (e as Error)?.message));
+    await recordAnswer(r.qid, r.reaction, 'zaalbotz-btn', String(gid)).catch((e) =>
+      console.error('[zoe/index] r-answer log failed:', (e as Error)?.message),
+    );
     return;
   }
 
@@ -2228,10 +2229,9 @@ bot.on('message:text', async (ctx) => {
           .catch(() => {});
         return;
       }
-      await pushRecent(
-        { from: 'zaal', text: `[answer:${awaitingQid}] ${text}`, sender: 'zaalbotz-type' },
-        String(zaalBotzGroupId),
-      ).catch((e) => console.error('[zoe/index] type-answer log failed:', (e as Error)?.message));
+      await recordAnswer(awaitingQid, text, 'zaalbotz-type', String(zaalBotzGroupId)).catch((e) =>
+        console.error('[zoe/index] type-answer log failed:', (e as Error)?.message),
+      );
       await ctx
         .reply(`Got your answer for "${awaitingQid}".`, threadId ? { message_thread_id: threadId } : {})
         .catch(() => {});
@@ -2253,10 +2253,9 @@ bot.on('message:text', async (ctx) => {
           await ctx.reply(`Sent to ${armedQid.replace(/^rl-/, '')}.`).catch(() => {});
           return;
         }
-        await pushRecent(
-          { from: 'zaal', text: `[answer:${armedQid}] ${text}`, sender: 'zaalbotz-general' },
-          String(zaalBotzGroupId),
-        ).catch((e) => console.error('[zoe/index] general-answer log failed:', (e as Error)?.message));
+        await recordAnswer(armedQid, text, 'zaalbotz-general', String(zaalBotzGroupId)).catch((e) =>
+          console.error('[zoe/index] general-answer log failed:', (e as Error)?.message),
+        );
         await ctx.reply(`Got your answer for "${armedQid}".`).catch(() => {});
         return;
       }
@@ -2500,10 +2499,9 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
     const replyOpt = threadId ? { message_thread_id: threadId } : {};
     if (awaitingQid) {
       pendingTypeAnswers.delete(chatId);
-      await pushRecent(
-        { from: 'zaal', text: `[answer:${awaitingQid}] ${transcript}`, sender: 'zaalbotz-voice' },
-        String(zaalBotzGroupIdV),
-      ).catch((e) => console.error('[zoe/index] voice-answer log failed:', (e as Error)?.message));
+      await recordAnswer(awaitingQid, transcript, 'zaalbotz-voice', String(zaalBotzGroupIdV)).catch((e) =>
+        console.error('[zoe/index] voice-answer log failed:', (e as Error)?.message),
+      );
       await ctx
         .reply(`Got your voice answer for "${awaitingQid}": "${transcript.slice(0, 200)}"`, replyOpt)
         .catch(() => {});

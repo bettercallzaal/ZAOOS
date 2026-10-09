@@ -562,11 +562,14 @@ export async function readArchive(
 }
 
 export async function pushRecent(
-  turn: { from: 'zaal' | 'zoe' | 'other'; text: string; sender?: string },
+  turn: { from: 'zaal' | 'zoe' | 'other'; text: string; sender?: string; ts?: string },
   scope: ChatScope = 'private',
 ): Promise<void> {
   await ensureZoeHome();
-  const stamped: RecentTurn = { ...turn, ts: new Date().toISOString() };
+  // A caller that already stamped the turn (answers.ts, which writes the same
+  // answer to answers.jsonl first) passes its ts so the two stores agree to the
+  // millisecond; readers dedupe on qid + ts. Everyone else is stamped here.
+  const stamped: RecentTurn = { ...turn, ts: turn.ts ?? new Date().toISOString() };
 
   // Permanent append-only archive first - this must not be lost even if the
   // ring-buffer write below fails.

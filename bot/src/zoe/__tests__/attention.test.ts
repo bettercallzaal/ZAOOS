@@ -252,3 +252,42 @@ describe('entry points used by index.ts and scheduler.ts', () => {
     expect(await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).not.toContain('old2');
   });
 });
+
+describe('pruneTaps is crash-safe and does not race recordTap', () => {
+  it('a tap recorded while a prune runs is kept', async () => {
+    const { pruneTaps } = await import('../attention');
+    const now = new Date('2026-10-10T00:00:00Z');
+    for (let k = 0; k < 50; k++) await recordTap('old', new Date('2026-07-01T00:00:00Z'));
+    // Fire both without awaiting the prune first: the append must not land
+    // between the prune's read and its rename.
+    const [removed] = await Promise.all([pruneTaps(now), recordTap('bg', new Date('2026-10-09T23:00:00Z'))]);
+    expect(removed).toBe(50);
+    const left = (await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).trim().split('\n');
+    expect(left).toHaveLength(1);
+    expect(left[0]).toContain('"bg"');
+  });
+
+  it('writes through a temp file and leaves none behind', async () => {
+    const { pruneTaps } = await import('../attention');
+    await recordTap('old', new Date('2026-07-01T00:00:00Z'));
+    await recordTap('bg', new Date('2026-10-09T00:00:00Z'));
+    await pruneTaps(new Date('2026-10-10T00:00:00Z'));
+    const names = await fs.readdir(tmp);
+    expect(names).toContain('taps.jsonl');
+    expect(names).not.toContain('taps.jsonl.tmp');
+  });
+
+  it('a failed write leaves the original file intact', async () => {
+    const { pruneTaps } = await import('../attention');
+    await recordTap('old', new Date('2026-07-01T00:00:00Z'));
+    await recordTap('bg', new Date('2026-10-09T00:00:00Z'));
+    const before = await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8');
+    // A directory where the temp file goes makes the write fail.
+    await fs.mkdir(join(tmp, 'taps.jsonl.tmp'));
+    await expect(pruneTaps(new Date('2026-10-10T00:00:00Z'))).rejects.toThrow();
+    expect(await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).toBe(before);
+    // The queue is not wedged by the failure.
+    await recordTap('after', new Date('2026-10-09T01:00:00Z'));
+    expect(await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).toContain('"after"');
+  });
+});

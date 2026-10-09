@@ -246,14 +246,29 @@ export function tapFamily(data: string): string {
   return fam.length > 0 && fam.length <= 32 ? fam : 'unknown';
 }
 
+/**
+ * Every taps.jsonl write goes through this queue, so an append can never land
+ * between pruneTaps' read and its rename (which would drop the tap). It covers
+ * one process; ZOE runs as exactly one process (agent-loops rule 9), and no
+ * other writer touches this file.
+ */
+let tapsQueue: Promise<unknown> = Promise.resolve();
+function withTapsLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = tapsQueue.then(fn, fn);
+  tapsQueue = run.catch(() => undefined);
+  return run;
+}
+
 /** Append one tap. Best-effort: a failed write never blocks the button. */
 export async function recordTap(family: string, now: Date = new Date()): Promise<void> {
-  try {
-    await fs.mkdir(zoeHome(), { recursive: true });
-    await fs.appendFile(tapsFile(), `${JSON.stringify({ ts: now.toISOString(), family })}\n`, 'utf8');
-  } catch (err) {
-    console.warn('[zoe/attention] could not record tap:', (err as Error).message);
-  }
+  await withTapsLock(async () => {
+    try {
+      await fs.mkdir(zoeHome(), { recursive: true });
+      await fs.appendFile(tapsFile(), `${JSON.stringify({ ts: now.toISOString(), family })}\n`, 'utf8');
+    } catch (err) {
+      console.warn('[zoe/attention] could not record tap:', (err as Error).message);
+    }
+  });
 }
 
 async function readJsonl<T>(file: string): Promise<T[]> {
@@ -384,6 +399,10 @@ export const TAPS_KEEP_DAYS = 30;
  * forever. Torn lines are dropped. Returns how many lines were removed.
  */
 export async function pruneTaps(now: Date = new Date(), keepDays: number = TAPS_KEEP_DAYS): Promise<number> {
+  return withTapsLock(() => pruneTapsUnlocked(now, keepDays));
+}
+
+async function pruneTapsUnlocked(now: Date, keepDays: number): Promise<number> {
   const since = now.getTime() - keepDays * 24 * 60 * 60 * 1000;
   let raw: string;
   try {
@@ -400,6 +419,11 @@ export async function pruneTaps(now: Date = new Date(), keepDays: number = TAPS_
     }
   });
   if (kept.length === lines.length) return 0;
-  await fs.writeFile(tapsFile(), kept.length ? `${kept.join('\n')}\n` : '', 'utf8');
+  // Write a temp file and rename it over the original: a crash mid-write leaves
+  // the old taps.jsonl intact instead of a truncated one. rename is atomic on
+  // the same filesystem, and the temp file sits beside the original.
+  const tmp = `${tapsFile()}.tmp`;
+  await fs.writeFile(tmp, kept.length ? `${kept.join('\n')}\n` : '', 'utf8');
+  await fs.rename(tmp, tapsFile());
   return lines.length - kept.length;
 }

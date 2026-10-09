@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   ageWarning,
   buildReplyPrompt,
@@ -270,5 +272,57 @@ describe('runDesk', () => {
 
   it('loadCard refuses a non-numeric id (no path escape)', async () => {
     expect(await loadCard('../secrets')).toBeNull();
+  });
+});
+
+describe('the DM gate (claimXLink) and its wiring in index.ts', () => {
+  const LINK = 'https://x.com/someone/status/1234567890';
+  const idle = { pendingArmed: false, whyArmed: false };
+
+  it('flag unset: a pasted X link is NOT claimed, so it takes the pre-desk path', async () => {
+    const { claimXLink } = await import('../x-desk');
+    expect(claimXLink(LINK, idle, {})).toBeNull();
+    expect(claimXLink(`${LINK} reply to this`, idle, { ZOE_X_DESK: 'true' })).toBeNull();
+  });
+
+  it('flag on: claimed, unless a pending answer or an Add-a-why reply is armed', async () => {
+    const { claimXLink } = await import('../x-desk');
+    const on = { ZOE_X_DESK: '1' };
+    expect(claimXLink(LINK, idle, on)?.id).toBe('1234567890');
+    expect(claimXLink(LINK, { pendingArmed: true, whyArmed: false }, on)).toBeNull();
+    expect(claimXLink(LINK, { pendingArmed: false, whyArmed: true }, on)).toBeNull();
+    expect(claimXLink('no link at all', idle, on)).toBeNull();
+  });
+
+  // index.ts cannot be imported in a test (it boots a live poller), so the
+  // wiring is pinned in its source, the same way swallow-registry does it.
+  const src = readFileSync(fileURLToPath(new URL('../index.ts', import.meta.url)), 'utf8');
+
+  it('the DM branch goes through claimXLink, with the pending state read correctly', () => {
+    const at = src.indexOf('const xLink = claimXLink(text, {');
+    expect(at).toBeGreaterThan(-1);
+    const call = src.slice(at, at + 400);
+    // getPending returns undefined when idle: a `!== null` check would read
+    // "armed" forever and the desk would never fire.
+    expect(call).toContain("pendingArmed: Boolean(getPending('private'))");
+    expect(call).toContain('whyArmed: pendingWhyReplies.has(dmChatId)');
+  });
+
+  it('the branch sits after the pending block and before the generic handlers', () => {
+    const claim = src.indexOf('const xLink = claimXLink(text, {');
+    const pendingBlock = src.indexOf("const pending = getPending('private');");
+    const nudgeToggle = src.indexOf('const nudgeToggle = /^(stop|pause|disable)');
+    const concierge = src.indexOf("await dispatchConcierge(ctx, text, 'private'");
+    expect(pendingBlock).toBeGreaterThan(-1);
+    expect(claim).toBeGreaterThan(pendingBlock);
+    expect(claim).toBeLessThan(nudgeToggle);
+    expect(concierge === -1 || claim < concierge).toBe(true);
+  });
+
+  it('no other DM path can start the desk: sendXDeskCard runs only from the gate and the Redo button', () => {
+    const calls = src.split('sendXDeskCard(').length - 1;
+    // the definition + the gated DM call + the Redo callback
+    expect(calls).toBe(3);
+    expect(src).not.toMatch(/\bparseXLink\(/);
   });
 });

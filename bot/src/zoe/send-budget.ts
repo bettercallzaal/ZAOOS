@@ -212,12 +212,14 @@ export const MAX_DEFERRED = 200;
 //
 // Active when ZOE_ATTENTION=1 or ZOE_GATED_HOURLY_CAP is set, so turning this
 // on does not change today's grill-card behaviour (grill cards are gated too)
-// until one of those is chosen. The window is in-process: a restart resets it,
-// which is fine for a runaway guard (a crash loop is not a send flood).
+// until one of those is chosen. The window is PERSISTED in send-budget.json
+// beside the daily counter (gatedAt). An in-process window was the first
+// version and was wrong: a crash-restart loop would get 20 fresh gated sends
+// per boot, and the relay dedupe (tg_pushed) is written after the send, so the
+// same relay could go out once per restart (orchestrator2 review of #3866).
 
 export const DEFAULT_GATED_HOURLY_CAP = 20;
 const HOUR_MS = 60 * 60 * 1000;
-const gatedSentAt: number[] = [];
 
 /** The ceiling, or null when it is not active. */
 export function gatedHourlyCap(env: NodeJS.ProcessEnv = process.env): number | null {
@@ -230,19 +232,9 @@ export function gatedHourlyCap(env: NodeJS.ProcessEnv = process.env): number | n
   return env.ZOE_ATTENTION === '1' ? DEFAULT_GATED_HOURLY_CAP : null;
 }
 
-/** Gated sends delivered in the last hour by this process. Prunes as it reads. */
-export function gatedInLastHour(nowMs: number): number {
-  while (gatedSentAt.length > 0 && nowMs - gatedSentAt[0] >= HOUR_MS) gatedSentAt.shift();
-  return gatedSentAt.length;
-}
-
-function noteGatedSent(nowMs: number): void {
-  gatedSentAt.push(nowMs);
-}
-
-/** Test seam: clear the in-process window. */
-export function resetGatedWindowForTests(): void {
-  gatedSentAt.length = 0;
+/** The gated send times still inside the last hour (pure). */
+export function pruneGatedWindow(gatedAt: readonly number[], nowMs: number): number[] {
+  return gatedAt.filter((t) => Number.isFinite(t) && t <= nowMs && nowMs - t < HOUR_MS);
 }
 
 /**
@@ -392,6 +384,8 @@ export function decide(cls: SendClass, countedToday: number, cap: number): SendD
 interface BudgetState {
   day: string;
   counted: number;
+  /** Epoch ms of gated sends in the last hour (the hourly ceiling). Survives a restart. */
+  gatedAt: number[];
 }
 
 let cached: BudgetState | null = null;
@@ -399,18 +393,26 @@ let cached: BudgetState | null = null;
 async function readState(now: Date): Promise<BudgetState> {
   const today = easternDay(now);
   if (cached && cached.day === today) return cached;
+  // The gated window does NOT reset at midnight: an hour that straddles the day
+  // boundary is still one hour. Only the daily counter follows the day.
+  const carried = cached ? cached.gatedAt : null;
   try {
     const raw = await fs.readFile(stateFile(), 'utf8');
     const parsed = JSON.parse(raw) as Partial<BudgetState>;
+    const gatedAt = pruneGatedWindow(
+      carried ?? (Array.isArray(parsed.gatedAt) ? parsed.gatedAt.filter((t) => typeof t === 'number') : []),
+      now.getTime(),
+    );
     if (parsed.day === today && typeof parsed.counted === 'number' && parsed.counted >= 0) {
-      cached = { day: today, counted: parsed.counted };
+      cached = { day: today, counted: parsed.counted, gatedAt };
       return cached;
     }
+    cached = { day: today, counted: 0, gatedAt };
+    return cached;
   } catch {
     // Missing or corrupt file is the normal first-run case, not an incident.
-    // A new day also lands here via the day mismatch above.
   }
-  cached = { day: today, counted: 0 };
+  cached = { day: today, counted: 0, gatedAt: carried ? pruneGatedWindow(carried, now.getTime()) : [] };
   return cached;
 }
 
@@ -794,7 +796,7 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
       state = await readState(at);
       decision = applyGatedCeiling(
         decide(resolveSendClass(opts), state.counted, dailySendCap()),
-        gatedInLastHour(at.getTime()),
+        pruneGatedWindow(state.gatedAt, at.getTime()).length,
         gatedHourlyCap(),
       );
     } catch (err) {
@@ -823,9 +825,14 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     }
 
     const result = await passThrough(chatId, text, clean);
-    if (decision.cls === 'gated') noteGatedSent(Date.parse(at));
-    if (decision.counts) {
-      cached = { day: state.day, counted: state.counted + 1 };
+    const sentMs = Date.parse(at);
+    const isGated = decision.cls === 'gated';
+    if (decision.counts || isGated) {
+      cached = {
+        day: state.day,
+        counted: decision.counts ? state.counted + 1 : state.counted,
+        gatedAt: isGated ? [...pruneGatedWindow(state.gatedAt, sentMs), sentMs] : state.gatedAt,
+      };
       await writeState(cached);
     }
     // A delivered send is logged too. Until 2026-09-17 only blocks were, so the

@@ -89,6 +89,29 @@ def git_root(start: Path) -> Path | None:
         return None
 
 
+def ledger_from_origin(repo: Path) -> Path | None:
+    """The ledger as merged on origin/main in `repo`, as a file; None if unreadable."""
+    try:
+        r = subprocess.run(["git", "-C", str(repo), "rev-parse", f"origin/main:{ZAOOS_REL}"],
+                           capture_output=True, text=True, timeout=15)
+        blob = r.stdout.strip()
+        if r.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40,64}", blob):
+            return None
+        cache = Path(os.environ.get("TMPDIR") or "/tmp") / "zao-claims-ledger" / f"{blob}.tsv"
+        if not cache.exists():
+            body = subprocess.run(["git", "-C", str(repo), "cat-file", "blob", blob],
+                                  capture_output=True, timeout=15)
+            if body.returncode != 0:
+                return None
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            tmp = cache.with_suffix(f".{os.getpid()}.part")
+            tmp.write_bytes(body.stdout)
+            os.replace(tmp, cache)       # one file per ledger version; never deleted
+        return cache
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
 @functools.lru_cache(maxsize=1)
 def resolve_ledger() -> Path:
     env = os.environ.get("ZAO_CLAIMS_LEDGER")
@@ -97,8 +120,22 @@ def resolve_ledger() -> Path:
     root = git_root(Path.cwd())
     if root and (root / ZAOOS_REL).exists():
         return root / ZAOOS_REL          # in-repo: this is how CI finds it
-    canonical = Path.home() / "Documents" / "ZAO OS V1" / ZAOOS_REL
-    if canonical.exists():
+    # OUTSIDE ZAOOS, READ THE LEDGER AS MERGED (2026-10-09). This used to return
+    # the file in the ~/Documents/ZAO OS V1 working tree. That checkout is shared
+    # and moves between ws/ branches (249 commits behind origin/main that day),
+    # so a row merged since its branch point would silently not be enforced in
+    # any other repo. Same fix as warn_if_self_drifted: `git show origin/main`,
+    # written once per ledger version to $TMPDIR/zao-claims-ledger/<blob>.tsv.
+    # If origin/main cannot be read, fall back to the working-tree file, and
+    # say so, rather than to nothing.
+    repo = Path(os.environ.get("ZAO_OS_REPO") or (Path.home() / "Documents" / "ZAO OS V1"))
+    canonical = ledger_from_origin(repo)
+    if canonical is None and (repo / ZAOOS_REL).exists():
+        canonical = repo / ZAOOS_REL
+        sys.stderr.write(
+            f"zao-claims-check: note - could not read the ledger at origin/main in "
+            f"{repo}; using its working tree, which may be behind.\n")
+    if canonical is not None and canonical.exists():
         # Two AI-readable surfaces disagreeing is the worst possible outcome
         # (zao-nyc/CLAUDE.md). If the legacy mirror still exists and has drifted
         # from canonical, say so loudly rather than silently preferring one.

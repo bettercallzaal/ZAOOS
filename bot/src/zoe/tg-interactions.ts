@@ -447,6 +447,17 @@ export function isCommandPrefixed(text: string): boolean {
   return m ? COMMAND_PREFIXES.has(m[1].toLowerCase()) : false;
 }
 
+/**
+ * Does this text open with a URL ("https://...", "http://...")? A URL scheme is
+ * letters plus a colon, which is exactly the batch-answer key shape, so until
+ * 2026-10-09 a DM that started with a link was logged as answer "https" and
+ * returned before anything else ran: "Logged 1 answer from batch." for every
+ * pasted link (first-handler-wins.md, the same shape that ate `build:`).
+ */
+export function isUrlLed(text: string): boolean {
+  return /^\s*[a-z][a-z0-9+.-]*:\/\//i.test(text);
+}
+
 export function parseBatchAnswer(text: string): BatchAnswer[] {
   // A command is not an answer. Bail before parsing so a build request can
   // reach the classifier that is supposed to handle it.
@@ -456,6 +467,8 @@ export function parseBatchAnswer(text: string): BatchAnswer[] {
   const lines = text.split('\n').filter((l) => l.trim());
 
   for (const line of lines) {
+    // A line that is a link is not "key: value" (see isUrlLed).
+    if (isUrlLed(line)) continue;
     const match = line.match(/^(\d+|[a-z]+):(.+)$/i);
     if (!match) continue;
 

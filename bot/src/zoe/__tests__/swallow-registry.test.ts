@@ -109,15 +109,15 @@ const SWALLOW_REGISTRY: SwallowEntry[] = [
     why: 'First half of the batch-answer gate. Any message containing a colon is a batch-answer candidate, which is broad enough to have eaten the entire build vocabulary once.',
     returns: true,
     broad: true,
-    excludes: ['isCommandPrefixed'],
+    excludes: ['isCommandPrefixed', 'isUrlLed'],
   },
   {
     matcher: '/^\\d+:|^[a-z]+:/i.test(',
     occurrences: 1,
-    why: 'Second half of the batch-answer gate. THIS IS THE ONE that made `build:` unreachable on 2026-08-08 - every command prefix is lowercase letters plus a colon. It must stay excluded by isCommandPrefixed.',
+    why: 'Second half of the batch-answer gate. THIS IS THE ONE that made `build:` unreachable on 2026-08-08 - every command prefix is lowercase letters plus a colon. It must stay excluded by isCommandPrefixed. It also matched every URL ("https:"), so a DM that opened with a link was logged as a batch answer until 2026-10-09; isUrlLed excludes those.',
     returns: true,
     broad: true,
-    excludes: ['isCommandPrefixed'],
+    excludes: ['isCommandPrefixed', 'isUrlLed'],
   },
   {
     matcher: '/^\\s*([1-5]|done|keep|work|drop|skip)\\s*$/i.test(',

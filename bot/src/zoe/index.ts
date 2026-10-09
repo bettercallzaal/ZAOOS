@@ -35,6 +35,18 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
+import { callClaudeCliCapAware } from './models/cli-cap-aware';
+import {
+  loadCard,
+  parseXLink,
+  recordUsed,
+  renderCard,
+  runDesk,
+  XD_CALLBACK,
+  xDeskEnabled,
+  type DeskCard,
+  type XLink,
+} from './x-desk';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
 import { captureTerminalTypedReply, formatTerminalCard, nextTerminalItem, readTerminalGrillState, recordTerminalAnswer, setPendingType, terminalGrillEnabled } from './terminal-grill';
 import { isGrillPaused } from './grill-pause';
@@ -149,7 +161,7 @@ import {
   formatPulse,
   formatAgenda,
   parseBatchAnswer,
-  classifyIntent, isCommandPrefixed } from './tg-interactions';
+  classifyIntent, isCommandPrefixed, isUrlLed } from './tg-interactions';
 import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
@@ -643,6 +655,74 @@ async function advanceAfterTerminalAnswer(): Promise<void> {
     console.error('[zoe/grill] advance failed:', (e as Error)?.message),
   );
 }
+
+// X desk (x-desk.ts, doc 2651): read an X post, draft three replies, send one
+// card. The model call is the same cap-aware CLI route the post drafters use.
+const xDeskDraft = async (system: string, prompt: string): Promise<string> =>
+  (
+    await callClaudeCliCapAware({
+      model: 'sonnet',
+      prompt,
+      cwd: repoDir,
+      appendSystemPrompt: system,
+      permissionMode: 'default',
+      bare: false,
+      timeoutMs: 120_000,
+    })
+  ).text;
+
+async function sendXDeskCard(chatId: number, link: XLink): Promise<void> {
+  const result = await runDesk(link, { draft: xDeskDraft });
+  if (!result.ok) {
+    await bot.api.sendMessage(chatId, result.message, { link_preview_options: { is_disabled: true } });
+    return;
+  }
+  const card = renderCard(result.card);
+  await bot.api.sendMessage(chatId, card.text, {
+    reply_markup: { inline_keyboard: card.keyboard as never },
+    link_preview_options: { is_disabled: true },
+  });
+  featureRan('x-desk', `post ${result.card.postId}, ${result.card.drafts.length} drafts`);
+}
+
+bot.callbackQuery(XD_CALLBACK, async (ctx) => {
+  if (!isFromZaal(ctx)) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  const [, action, n, postId] = ctx.match;
+  const card: DeskCard | null = await loadCard(postId);
+  if (!card) {
+    await ctx.answerCallbackQuery({ text: 'That card expired - send the link again.' });
+    return;
+  }
+  if (action === 'used') {
+    const draft = card.drafts[Number(n) - 1];
+    if (!draft) {
+      await ctx.answerCallbackQuery({ text: 'No such draft.' });
+      return;
+    }
+    try {
+      await recordUsed(postId, draft);
+      await ctx.answerCallbackQuery({ text: `Logged draft ${n}. Next drafts lean on it.` });
+    } catch (e) {
+      console.error('[zoe/x-desk] could not record a used draft:', (e as Error)?.message);
+      await ctx.answerCallbackQuery({ text: 'Could not log that one.' });
+    }
+    return;
+  }
+  if (action === 'skip') {
+    await ctx.answerCallbackQuery({ text: 'Skipped.' });
+    return;
+  }
+  // redo
+  await ctx.answerCallbackQuery({ text: 'Drafting three new ones...' });
+  const chatId = ctx.chat?.id;
+  if (chatId === undefined) return;
+  await sendXDeskCard(chatId, { url: card.url, handle: card.author, id: card.postId, note: card.note }).catch((e) =>
+    console.error('[zoe/x-desk] redo failed:', (e as Error)?.message),
+  );
+});
 
 bot.callbackQuery(/^tw:([0-9a-z]+):([A-Za-z0-9_-]+):([A-D]|done|skip|type)$/, async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
@@ -1942,6 +2022,7 @@ bot.on('message:text', async (ctx) => {
     isFromZaal(ctx) &&
     text.includes(':') &&
     !isCommandPrefixed(text) &&
+    !isUrlLed(text) &&
     /^\d+:|^[a-z]+:/i.test(text.trim())
   ) {
     const answers = parseBatchAnswer(text);
@@ -2674,6 +2755,28 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
         await runReflexionFlow(ctx, pending.answers, text);
         return;
       }
+    }
+  }
+
+  // X desk (ZOE_X_DESK=1): a DM carrying an x.com / twitter.com post link gets
+  // three reply drafts. Placed AFTER the pending block so a waiting answer
+  // (reflection, approval, reflexion) always wins, and skipped while a pending
+  // item is still armed or an "Add a why" reply is expected, so a link typed as
+  // that answer reaches it. Ahead of delegation, decompose, the DM build
+  // classifier and the concierge, any of which would otherwise claim
+  // "<link> reply to this" (first-handler-wins.md).
+  const dmChatId = ctx.chat?.id;
+  if (dmChatId !== undefined && xDeskEnabled() && !getPending('private') && !pendingWhyReplies.has(dmChatId)) {
+    const xLink = parseXLink(text);
+    if (xLink) {
+      await ctx.reply('Reading the post and drafting 3 replies...');
+      try {
+        await sendXDeskCard(dmChatId, xLink);
+      } catch (e) {
+        console.error('[zoe/x-desk] failed:', (e as Error)?.message);
+        await ctx.reply('The X desk hit an error drafting that one. Send the link again in a minute.');
+      }
+      return;
     }
   }
 

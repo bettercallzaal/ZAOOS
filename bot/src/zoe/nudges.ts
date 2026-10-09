@@ -196,3 +196,38 @@ export async function markNudgeSent(now: number = Date.now()): Promise<void> {
     // best-effort
   }
 }
+
+/** The callback pattern the nudge buttons use; index.ts registers it. */
+export const NUDGE_CALLBACK = /^nudge:(now|later|shelve)(?::(.+))?$/;
+
+/**
+ * What a nudge button does, separated from index.ts so it can be tested
+ * without importing the bot entrypoint (agent-loops rule 21). Returns the
+ * text for answerCallbackQuery. With a task id, Later and Shelve snooze THAT
+ * task (4h / 7d). Without one (older buttons), they snooze the whole stream
+ * for the cooldown window, as the handler always did. Never throws.
+ */
+export async function applyNudgeAction(
+  action: string,
+  taskId?: string,
+  now: number = Date.now(),
+): Promise<string> {
+  if (taskId && (action === 'later' || action === 'shelve')) {
+    try {
+      await snoozeTask(taskId, action === 'later' ? SNOOZE_LATER_MS : SNOOZE_SHELVE_MS, now);
+      return action === 'later' ? 'Snoozed 4h.' : 'Shelved for 7 days.';
+    } catch (e) {
+      console.error('[zoe/nudges] task snooze failed:', e);
+      return 'Could not snooze - it may nudge again.';
+    }
+  }
+  if (action === 'later' || action === 'shelve') {
+    try {
+      await markNudgeSent(now);
+    } catch (e) {
+      console.error('[zoe/nudges] nudge snooze failed:', e);
+    }
+  }
+  const acted: Record<string, string> = { now: 'On it.', later: 'Snoozed for now.', shelve: 'Shelved for now.' };
+  return acted[action] ?? 'Got it.';
+}

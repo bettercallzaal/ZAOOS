@@ -88,12 +88,41 @@ describe('nudgeKeyboard', () => {
     expect(row.map((b) => b.callback_data)).toEqual(['nudge:now', 'nudge:later', 'nudge:shelve']);
   });
 
-  it('matches the handler pattern in index.ts', () => {
-    const handler = /^nudge:(now|later|shelve)(?::(.+))?$/;
+  it('matches the handler pattern in index.ts', async () => {
+    const handler = (await import('../nudges')).NUDGE_CALLBACK;
     for (const b of nudgeKeyboard('inbox-1760000000000-abc123').inline_keyboard[0]) {
       const m = handler.exec(b.callback_data);
       expect(m?.[2]).toBe('inbox-1760000000000-abc123');
     }
     expect(handler.exec('nudge:later')?.[2]).toBeUndefined();
+  });
+});
+
+describe('applyNudgeAction (the nudge button handler logic)', () => {
+  it('Later and Shelve with a task id snooze that task', async () => {
+    const { applyNudgeAction } = await import('../nudges');
+    const now = Date.parse('2026-10-09T12:00:00Z');
+    expect(await applyNudgeAction('later', 't1', now)).toBe('Snoozed 4h.');
+    expect(await applyNudgeAction('shelve', 't2', now)).toBe('Shelved for 7 days.');
+    const stored = JSON.parse(files.get('/tmp/zoe-snooze-test/nudge-snooze.json') ?? '{}');
+    expect(Date.parse(stored.t1) - now).toBe(SNOOZE_LATER_MS);
+    expect(Date.parse(stored.t2) - now).toBe(SNOOZE_SHELVE_MS);
+  });
+
+  it('id-less Later snoozes the whole stream (old behaviour), Now only acknowledges', async () => {
+    const { applyNudgeAction } = await import('../nudges');
+    const now = Date.parse('2026-10-09T12:00:00Z');
+    expect(await applyNudgeAction('later', undefined, now)).toBe('Snoozed for now.');
+    expect(files.get('/tmp/zoe-snooze-test/nudge-last-sent.txt')).toBe(new Date(now).toISOString());
+    files.clear();
+    expect(await applyNudgeAction('now', 't1', now)).toBe('On it.');
+    expect(files.size).toBe(0);
+  });
+
+  it('NUDGE_CALLBACK is the pattern the keyboard emits', async () => {
+    const { NUDGE_CALLBACK } = await import('../nudges');
+    expect(NUDGE_CALLBACK.exec('nudge:shelve:t9')?.slice(1, 3)).toEqual(['shelve', 't9']);
+    expect(NUDGE_CALLBACK.exec('nudge:later')?.[2]).toBeUndefined();
+    expect(NUDGE_CALLBACK.test('nudge:delete:t9')).toBe(false);
   });
 });

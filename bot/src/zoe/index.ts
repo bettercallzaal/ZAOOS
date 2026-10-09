@@ -101,15 +101,14 @@ import {
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import {
+  applyNudgeAction,
   disableNudges,
   enableNudges,
   nudgesEnabled,
   markNudgeSent,
-  snoozeTask,
-  SNOOZE_LATER_MS,
-  SNOOZE_SHELVE_MS,
+  NUDGE_CALLBACK,
 } from './nudges';
-import { attentionEnabled, readHeldFull, recordTap, tapFamily, SHOW_ALL_CALLBACK } from './attention';
+import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -4292,43 +4291,20 @@ bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   );
 });
 
-bot.callbackQuery(/^nudge:(now|later|shelve)(?::(.+))?$/, async (ctx) => {
+bot.callbackQuery(NUDGE_CALLBACK, async (ctx) => {
   const action = ctx.match[1];
   const taskId = ctx.match[2];
-  // Buttons with a task id (nudges.ts nudgeKeyboard, ZOE_ATTENTION) snooze
-  // THAT task: Later 4h, Shelve 7d. Other tasks keep their turn.
-  if (taskId && (action === 'later' || action === 'shelve')) {
-    try {
-      await snoozeTask(taskId, action === 'later' ? SNOOZE_LATER_MS : SNOOZE_SHELVE_MS);
-      await ctx.answerCallbackQuery({ text: action === 'later' ? 'Snoozed 4h.' : 'Shelved for 7 days.' });
-    } catch (e) {
-      console.error('[zoe/index] nudge task snooze failed:', e);
-      await ctx.answerCallbackQuery({ text: 'Could not snooze - it may nudge again.' });
-    }
-    console.log(`[zoe/index] nudge ${action} task=${taskId}`);
-    return;
-  }
-  // Previously this only acked + logged - the button was a no-op, so "later"
-  // still nudged again on the next tick. "later"/"shelve" now actually snooze
-  // the nudge stream for the cooldown window (markNudgeSent resets it); "now"
-  // just acknowledges (Zaal is acting on it). Confirm the real effect to Zaal.
-  const acted: Record<string, string> = { now: 'On it.', later: 'Snoozed for now.', shelve: 'Shelved for now.' };
-  if (action === 'later' || action === 'shelve') {
-    try {
-      await markNudgeSent();
-    } catch (e) {
-      console.error('[zoe/index] nudge snooze failed:', e);
-    }
-  }
-  await ctx.answerCallbackQuery({ text: acted[action] ?? 'Got it.' });
-  console.log(`[zoe/index] nudge ${action} (snoozed=${action !== 'now'})`);
+  // Logic lives in nudges.ts applyNudgeAction (tested there): Later/Shelve
+  // snooze the named task, or the whole stream for id-less buttons.
+  const answer = await applyNudgeAction(action, taskId);
+  await ctx.answerCallbackQuery({ text: answer });
+  console.log(`[zoe/index] nudge ${action}${taskId ? ` task=${taskId}` : ''}`);
 });
 
-// Show all on the one-message morning digest (attention.ts): sends the full
-// held list that was kept when the digest was rendered.
+// Show all on the one-message morning digest (attention.ts showAllAction).
 bot.callbackQuery(SHOW_ALL_CALLBACK, async (ctx) => {
-  const full = await readHeldFull();
-  await ctx.answerCallbackQuery({ text: full ? 'Sending the full list.' : 'Nothing kept.' });
+  const { answer, full } = await showAllAction();
+  await ctx.answerCallbackQuery({ text: answer });
   if (!full || ctx.chat?.id === undefined) return;
   await sendChunkedToTelegram((cid, t, o) => bot.api.sendMessage(cid, t, o as never), ctx.chat.id, full);
 });

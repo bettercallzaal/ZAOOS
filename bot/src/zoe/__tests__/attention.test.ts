@@ -196,3 +196,59 @@ describe('taps and consolidation', () => {
     expect(line).toBe('Last 7 days: you tapped bg 5, post 2; never answered: lane handoffs 22.');
   });
 });
+
+describe('entry points used by index.ts and scheduler.ts', () => {
+  it('showAllAction: nothing kept, then the kept list', async () => {
+    expect(await (await import('../attention')).showAllAction()).toEqual({ answer: 'Nothing kept.', full: null });
+    await writeHeldFull('the full list');
+    expect(await (await import('../attention')).showAllAction()).toEqual({
+      answer: 'Sending the full list.',
+      full: 'the full list',
+    });
+  });
+
+  it('prepareMorningBatch flag off: the old full batch, no button, nothing kept', async () => {
+    const { prepareMorningBatch } = await import('../attention');
+    const day = measuredDay();
+    const b = await prepareMorningBatch(day, {});
+    expect(b).toEqual({ text: renderDeferredBatch(day), digest: false });
+    expect(await readHeldFull()).toBeNull();
+  });
+
+  it('prepareMorningBatch flag on: one-message digest, Show all, full list kept', async () => {
+    const { prepareMorningBatch } = await import('../attention');
+    const day = measuredDay();
+    const b = await prepareMorningBatch(day, { ZOE_ATTENTION: '1' });
+    expect(b.digest).toBe(true);
+    expect(chunkForTelegram(b.text)).toHaveLength(1);
+    expect(b.opts?.replyMarkup.inline_keyboard[0][0].callback_data).toBe('held:all');
+    expect(await readHeldFull()).toBe(renderDeferredBatch(day));
+  });
+
+  it('prepareMorningBatch falls back to the full batch when the list cannot be kept', async () => {
+    const { prepareMorningBatch } = await import('../attention');
+    // A FILE where the ZOE home directory should be makes mkdir/writeFile fail.
+    const blocker = join(tmp, 'not-a-dir');
+    await fs.writeFile(blocker, 'x');
+    vi.stubEnv('ZOE_HOME', blocker);
+    const day = measuredDay();
+    const b = await prepareMorningBatch(day, { ZOE_ATTENTION: '1' });
+    expect(b).toEqual({ text: renderDeferredBatch(day), digest: false });
+  });
+
+  it('pruneTaps keeps the last 30 days and drops torn lines; computeAttention prunes', async () => {
+    const { pruneTaps } = await import('../attention');
+    const now = new Date('2026-10-10T00:00:00Z');
+    await recordTap('bg', new Date('2026-10-09T00:00:00Z'));
+    await recordTap('old', new Date('2026-08-01T00:00:00Z'));
+    await fs.appendFile(join(tmp, 'taps.jsonl'), '{torn\n');
+    expect(await pruneTaps(now)).toBe(2);
+    const left = (await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).trim().split('\n');
+    expect(left).toHaveLength(1);
+    expect(left[0]).toContain('"bg"');
+    expect(await pruneTaps(now)).toBe(0);
+    await recordTap('old2', new Date('2026-07-01T00:00:00Z'));
+    await computeAttention(now);
+    expect(await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).not.toContain('old2');
+  });
+});

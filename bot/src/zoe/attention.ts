@@ -28,7 +28,7 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { batchFragmentIndexes, type DeferredSend } from './send-budget';
+import { batchFragmentIndexes, renderDeferredBatch, type DeferredSend } from './send-budget';
 
 export function attentionEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
   return env.ZOE_ATTENTION === '1';
@@ -280,6 +280,12 @@ async function readJsonl<T>(file: string): Promise<T[]> {
  * ZOE already writes (taps.jsonl, send-budget-log.jsonl).
  */
 export async function computeAttention(now: Date = new Date()): Promise<AttentionSnapshot> {
+  try {
+    const removed = await pruneTaps(now);
+    if (removed > 0) console.log(`[zoe/attention] pruned ${removed} taps older than ${TAPS_KEEP_DAYS} days`);
+  } catch (err) {
+    console.warn('[zoe/attention] could not prune taps.jsonl:', (err as Error).message);
+  }
   const since = now.getTime() - WINDOW_DAYS * 24 * 60 * 60 * 1000;
   const taps: Record<string, number> = {};
   for (const t of await readJsonl<{ ts: string; family: string }>(tapsFile())) {
@@ -329,4 +335,71 @@ export function formatAttentionLine(att: AttentionSnapshot): string {
   if (tapped.length > 0) bits.push(`you tapped ${tapped.join(', ')}`);
   if (silent.length > 0) bits.push(`never answered: ${silent.join(', ')}`);
   return `Last ${att.windowDays} days: ${bits.join('; ')}.`;
+}
+
+// ---------------------------------------------------------------------------
+// Entry points used by index.ts and scheduler.ts (kept here so they are
+// tested without importing the bot entrypoint - agent-loops rule 21)
+// ---------------------------------------------------------------------------
+
+/** What the Show all button answers, and the text to send (null: nothing kept). */
+export async function showAllAction(): Promise<{ answer: string; full: string | null }> {
+  const full = await readHeldFull();
+  return { answer: full ? 'Sending the full list.' : 'Nothing kept.', full };
+}
+
+export interface MorningBatch {
+  text: string;
+  opts?: { replyMarkup: ReturnType<typeof showAllKeyboard> };
+  /** true when the one-message digest was used, false for the full batch */
+  digest: boolean;
+}
+
+/**
+ * The morning release body. Flag off: the full batch, exactly as before.
+ * Flag on: keep the full batch for Show all, then render the one-message
+ * digest. If keeping the full list fails, send the full batch instead, so a
+ * Show all button never points at nothing.
+ */
+export async function prepareMorningBatch(
+  held: DeferredSend[],
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<MorningBatch> {
+  const full = renderDeferredBatch(held);
+  if (!attentionEnabled(env)) return { text: full, digest: false };
+  try {
+    await writeHeldFull(full);
+  } catch (err) {
+    console.warn('[zoe/attention] could not keep the full held list, sending it whole:', (err as Error).message);
+    return { text: full, digest: false };
+  }
+  return { text: renderHeldDigest(held, await readAttention()), opts: { replyMarkup: showAllKeyboard() }, digest: true };
+}
+
+export const TAPS_KEEP_DAYS = 30;
+
+/**
+ * Bound taps.jsonl: keep the last TAPS_KEEP_DAYS days. Called by the nightly
+ * consolidation, so the file holds about a month of taps rather than growing
+ * forever. Torn lines are dropped. Returns how many lines were removed.
+ */
+export async function pruneTaps(now: Date = new Date(), keepDays: number = TAPS_KEEP_DAYS): Promise<number> {
+  const since = now.getTime() - keepDays * 24 * 60 * 60 * 1000;
+  let raw: string;
+  try {
+    raw = await fs.readFile(tapsFile(), 'utf8');
+  } catch {
+    return 0;
+  }
+  const lines = raw.split('\n').filter((l) => l.trim().length > 0);
+  const kept = lines.filter((l) => {
+    try {
+      return Date.parse((JSON.parse(l) as { ts: string }).ts) >= since;
+    } catch {
+      return false;
+    }
+  });
+  if (kept.length === lines.length) return 0;
+  await fs.writeFile(tapsFile(), kept.length ? `${kept.join('\n')}\n` : '', 'utf8');
+  return lines.length - kept.length;
 }

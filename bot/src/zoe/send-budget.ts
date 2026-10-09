@@ -200,6 +200,67 @@ export const DEFAULT_DAILY_SEND_CAP = 20;
 export const MAX_DEFERRED = 200;
 
 // ---------------------------------------------------------------------------
+// Hourly ceiling on `gated`
+// ---------------------------------------------------------------------------
+//
+// `gated` always passes the daily cap, which is right for a handful of sends
+// that need Zaal and wrong for a loop. Under ZOE_ATTENTION his lane relays run
+// as `gated` (attention.ts needsZaalSendClass), and the relay path is ON on
+// the VPS (ZOE_RELAY_TG_ENABLED=true, read 2026-10-09T21:56Z), so a relay loop
+// would have no limiter at all. Past the ceiling a gated send is DEFERRED to
+// the morning batch, never dropped: it is still something Zaal needs.
+//
+// Active when ZOE_ATTENTION=1 or ZOE_GATED_HOURLY_CAP is set, so turning this
+// on does not change today's grill-card behaviour (grill cards are gated too)
+// until one of those is chosen. The window is in-process: a restart resets it,
+// which is fine for a runaway guard (a crash loop is not a send flood).
+
+export const DEFAULT_GATED_HOURLY_CAP = 20;
+const HOUR_MS = 60 * 60 * 1000;
+const gatedSentAt: number[] = [];
+
+/** The ceiling, or null when it is not active. */
+export function gatedHourlyCap(env: NodeJS.ProcessEnv = process.env): number | null {
+  const raw = env.ZOE_GATED_HOURLY_CAP;
+  if (raw !== undefined && raw !== '') {
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_GATED_HOURLY_CAP;
+  }
+  // Read directly rather than importing attention.ts, which imports this file.
+  return env.ZOE_ATTENTION === '1' ? DEFAULT_GATED_HOURLY_CAP : null;
+}
+
+/** Gated sends delivered in the last hour by this process. Prunes as it reads. */
+export function gatedInLastHour(nowMs: number): number {
+  while (gatedSentAt.length > 0 && nowMs - gatedSentAt[0] >= HOUR_MS) gatedSentAt.shift();
+  return gatedSentAt.length;
+}
+
+function noteGatedSent(nowMs: number): void {
+  gatedSentAt.push(nowMs);
+}
+
+/** Test seam: clear the in-process window. */
+export function resetGatedWindowForTests(): void {
+  gatedSentAt.length = 0;
+}
+
+/**
+ * Pure: turn an allowed `gated` decision into a deferral once the hourly
+ * ceiling is reached. Every other decision passes through untouched.
+ */
+export function applyGatedCeiling(decision: SendDecision, gatedLastHour: number, hourlyCap: number | null): SendDecision {
+  if (hourlyCap === null || decision.cls !== 'gated' || !decision.allow || gatedLastHour < hourlyCap) return decision;
+  return {
+    ...decision,
+    outcome: 'deferred',
+    allow: false,
+    counts: false,
+    reason: `gated hourly ceiling (${gatedLastHour}/${hourlyCap}) - queued for the next morning batch`,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
@@ -731,7 +792,11 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     try {
       const at = now();
       state = await readState(at);
-      decision = decide(resolveSendClass(opts), state.counted, dailySendCap());
+      decision = applyGatedCeiling(
+        decide(resolveSendClass(opts), state.counted, dailySendCap()),
+        gatedInLastHour(at.getTime()),
+        gatedHourlyCap(),
+      );
     } catch (err) {
       // Fail OPEN, loudly. Never let a broken budget mute ZOE.
       console.warn('[zoe/send-budget] gate failed open:', (err as Error).message);
@@ -758,6 +823,7 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     }
 
     const result = await passThrough(chatId, text, clean);
+    if (decision.cls === 'gated') noteGatedSent(Date.parse(at));
     if (decision.counts) {
       cached = { day: state.day, counted: state.counted + 1 };
       await writeState(cached);

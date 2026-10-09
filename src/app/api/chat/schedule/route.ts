@@ -4,6 +4,7 @@ import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -127,6 +128,8 @@ export async function PATCH() {
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'cast');
+  if (signerRefusal) return signerRefusal;
 
   try {
     // Find due casts for this user

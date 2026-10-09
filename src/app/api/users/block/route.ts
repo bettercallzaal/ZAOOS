@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { blockUser, unblockUser } from '@/lib/farcaster/neynar';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 
 const blockSchema = z.object({
@@ -13,6 +14,8 @@ export async function POST(request: NextRequest) {
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'other');
+  if (signerRefusal) return signerRefusal;
 
   const body = await request.json();
   const parsed = blockSchema.safeParse(body);
@@ -37,6 +40,8 @@ export async function DELETE(request: NextRequest) {
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'other');
+  if (signerRefusal) return signerRefusal;
 
   const body = await request.json();
   const parsed = blockSchema.safeParse(body);

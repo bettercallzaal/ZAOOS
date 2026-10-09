@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 
 const LikeSchema = z.object({
@@ -13,6 +14,8 @@ export async function POST(req: NextRequest) {
     if (!session?.signerUuid) {
       return NextResponse.json({ error: 'Unauthorized — no signer' }, { status: 401 });
     }
+    const signerRefusal = await guardSignerWrite(session, 'reaction');
+    if (signerRefusal) return signerRefusal;
 
     const body = await req.json();
     const parsed = LikeSchema.safeParse(body);

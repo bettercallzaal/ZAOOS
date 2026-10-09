@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { touchActivity } from '@/lib/db/activity';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 import { extractAndSaveSongs } from '@/lib/music/library';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
+  const signerRefusal = await guardSignerWrite(session, 'cast');
+  if (signerRefusal) return signerRefusal;
 
   try {
     const body = await req.json();

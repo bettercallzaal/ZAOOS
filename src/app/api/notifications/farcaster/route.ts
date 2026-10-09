@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getNotifications, markNotificationsSeen } from '@/lib/farcaster/neynar';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
@@ -30,6 +31,8 @@ export async function POST() {
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'other');
+  if (signerRefusal) return signerRefusal;
 
   try {
     await markNotificationsSeen(session.signerUuid);

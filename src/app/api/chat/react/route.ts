@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 import { createInAppNotification } from '@/lib/notifications';
 import { castHashSchema } from '@/lib/validation/schemas';
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
   if (!session.signerUuid) {
     return NextResponse.json({ error: 'No signer. Connect write access first.' }, { status: 400 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'reaction');
+  if (signerRefusal) return signerRefusal;
 
   try {
     const body = await req.json().catch(() => null);
@@ -91,6 +94,8 @@ export async function DELETE(req: NextRequest) {
   if (!session.signerUuid) {
     return NextResponse.json({ error: 'No signer' }, { status: 400 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'delete-reaction');
+  if (signerRefusal) return signerRefusal;
 
   try {
     const body = await req.json().catch(() => null);

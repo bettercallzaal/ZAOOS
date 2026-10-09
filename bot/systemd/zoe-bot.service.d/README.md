@@ -20,6 +20,14 @@ only the owner can read.
 A botched move does not crash ZOE, it quietly unplugs her from the board. So step
 5 checks the running process positively, not just "the bot started".
 
+For the same reason the drop-in's `EnvironmentFile=` deliberately has no leading
+`-`: if `~/.zao/private/zoe-cowork.env` is missing, zoe-bot fails to start
+(loud) instead of starting dormant (silent). The trade: a missing file stops
+all of ZOE, not only the board link. So step 2 must succeed before step 4, and
+anyone who moves or deletes that file must expect ZOE to stop at the next
+restart or deploy. If Zaal prefers ZOE to stay up without the board, add the
+`-` and rely on step 5's check instead.
+
 ## Steps
 
 1. **Back up the current drop-in** (copy, never delete):

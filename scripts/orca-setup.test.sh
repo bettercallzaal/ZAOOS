@@ -98,6 +98,49 @@ make_ws "$T/elsewhere" pinned LOCK-A live
 run "$R5/new" ORCA_SEED="$T/elsewhere/pinned"
 if grep -q "^ORCA-SETUP SEED:.*/elsewhere/pinned$" "$T/out"; then pass "case5 ORCA_SEED honoured"; else fail "case5: $(cat "$T/out") $(cat "$T/err")"; fi
 
+# --- Case 6: seed's node_modules is a symlink -> refused as a seed -------
+R6="$T/case6"
+make_ws "$T/outside6" real LOCK-A live
+make_ws "$R6" linked LOCK-A
+ln -s "$T/outside6/real/node_modules" "$R6/linked/node_modules"
+make_ws "$R6" new LOCK-A
+: > "$NPM_LOG"
+run "$R6/new"
+if grep -q "^ORCA-SETUP SKIP-SEED: .*/case6/linked has a symlinked node_modules$" "$T/err"; then pass "case6 symlinked seed node_modules skipped"; else fail "case6 stderr: $(cat "$T/err")"; fi
+if [ ! -e "$R6/new/node_modules" ] && [ ! -L "$R6/new/node_modules" ]; then pass "case6 nothing cloned"; else fail "case6 new node_modules exists: $(ls -l "$R6/new")"; fi
+if grep -q "^ORCA-SETUP FALLBACK: no live workspace" "$T/err" && grep -q "^npm install in .*/case6/new$" "$NPM_LOG"; then pass "case6 plain npm install ran"; else fail "case6 fallback/npm"; fi
+
+# --- Case 7: sibling candidate is a symlink to a dir outside the root ----
+R7="$T/case7"
+make_ws "$T/outside7" real LOCK-A live
+mkdir -p "$R7"
+ln -s "$T/outside7/real" "$R7/sneaky"
+make_ws "$R7" new LOCK-A
+: > "$NPM_LOG"
+run "$R7/new"
+if grep -q "^ORCA-SETUP SKIP-SEED: .*/case7/sneaky resolves to .*/outside7/real, outside " "$T/err"; then pass "case7 outside-root candidate skipped"; else fail "case7 stderr: $(cat "$T/err")"; fi
+if [ ! -e "$R7/new/node_modules" ]; then pass "case7 nothing cloned"; else fail "case7 cloned from outside the root"; fi
+
+# --- Case 8: new workspace's node_modules is a dangling symlink -> REFUSED
+R8="$T/case8"
+make_ws "$R8" seed LOCK-A live
+make_ws "$R8" new LOCK-A
+ln -s "$T/nowhere8" "$R8/new/node_modules"
+: > "$NPM_LOG"
+run "$R8/new"; rc=$?
+if [ "$rc" -eq 2 ] && grep -q "^ORCA-SETUP REFUSED: .*/case8/new/node_modules is a symlink" "$T/err"; then pass "case8 dangling symlink refused, exit 2"; else fail "case8 rc=$rc stderr: $(cat "$T/err")"; fi
+if [ ! -s "$NPM_LOG" ] && [ ! -e "$T/nowhere8" ]; then pass "case8 npm not run, nothing written through the link"; else fail "case8 npm ran or link target created"; fi
+
+# --- Case 9: leftover .orca-setup-tmp from a failed clone -> left alone --
+R9="$T/case9"
+make_ws "$R9" seed LOCK-A live
+make_ws "$R9" new LOCK-A
+mkdir -p "$R9/new/.orca-setup-tmp/node_modules"; echo partial > "$R9/new/.orca-setup-tmp/node_modules/x"
+: > "$NPM_LOG"
+run "$R9/new"
+if grep -q "^ORCA-SETUP FALLBACK: .*already exists, probably from an earlier failed clone.*delete .* by hand" "$T/err" && [ "$(cat "$R9/new/.orca-setup-tmp/node_modules/x")" = partial ]; then pass "case9 leftover temp dir named and untouched"; else fail "case9 stderr: $(cat "$T/err")"; fi
+if grep -q "^npm install in .*/case9/new$" "$NPM_LOG"; then pass "case9 plain npm install ran"; else fail "case9 npm log"; fi
+
 echo "fixtures left at $T (not removed, no-rm-rf.md)"
 if [ "$fails" -gt 0 ]; then echo "$fails FAILED" >&2; exit 1; fi
 echo "all passed"

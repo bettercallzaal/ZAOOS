@@ -127,16 +127,33 @@ def warn_if_self_drifted() -> None:
     is what CI needs. The dotfiles copy is what ~/bin points at. Two copies of an
     enforcement tool silently disagreeing is the same failure as two copies of a
     fact, so say it out loud rather than preferring one quietly.
+
+    COMPARE WITH CANONICAL AS MERGED, NOT WITH A WORKING TREE (2026-10-09).
+    This used to read the file in the ~/Documents/ZAO OS V1 working tree. That
+    checkout is shared and moves between ws/ branches; on 2026-10-09 it sat 249
+    commits behind origin/main, before #3625, while both repos' origin/main
+    copies were byte-identical. So every push in two lanes warned about a drift
+    that did not exist on any branch CI runs. The warning now reads
+    `git show origin/main:<path>` in that clone: what is merged as of its last
+    fetch. Unreadable (no clone, no ref, git fails) prints nothing: the drift
+    test (zaal-dotfiles bin/zao-claims-check-test) is the loud check, and a
+    warning that fires on a stale reference is noise nobody reads.
     """
-    canon = (Path.home() / "Documents" / "ZAO OS V1"
-             / "research" / "identity" / "claims" / "zao-claims-check")
+    repo = Path(os.environ.get("ZAO_OS_REPO") or (Path.home() / "Documents" / "ZAO OS V1"))
+    rel = "research/identity/claims/zao-claims-check"
     try:
-        if canon.exists() and canon.resolve() != SELF \
-                and canon.read_bytes() != SELF.read_bytes():
+        if (repo / rel).resolve() == SELF:
+            return                     # this IS the canonical file
+        r = subprocess.run(["git", "-C", str(repo), "show", f"origin/main:{rel}"],
+                           capture_output=True, timeout=15)
+        if r.returncode != 0 or not r.stdout:
+            return
+        if r.stdout != SELF.read_bytes():
             sys.stderr.write(
                 f"zao-claims-check: WARNING - this copy ({SELF}) differs from "
-                f"canonical ({canon}). Reconcile them; CI runs canonical.\n")
-    except OSError:
+                f"canonical at ZAOOS origin/main ({repo}, as of its last fetch). "
+                f"Reconcile them; CI runs canonical.\n")
+    except (OSError, subprocess.SubprocessError):
         pass
 
 # A line already doing the right thing: striking the claim, labelling it, or

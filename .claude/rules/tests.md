@@ -1,3 +1,8 @@
+---
+description: Rules for test files
+globs: "**/*.test.ts,**/*.test.tsx"
+---
+
 # Test Conventions
 
 - Use Vitest: `describe`, `it`, `expect`. Do not use Jest globals.

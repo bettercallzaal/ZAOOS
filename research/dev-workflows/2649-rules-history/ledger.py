@@ -1,5 +1,6 @@
 """Map every sentence of each archived rule file to where it now lives.
-usage: ledger.py <worktree> <out.md> <review.txt>"""
+usage (from the repo root): python3 -I research/dev-workflows/2649-rules-history/ledger.py . <out.md> <review.txt>
+W is the repo root (or a worktree of it); archive/ is read from W."""
 import re, sys, os, difflib
 W, OUT, REV = sys.argv[1:4]
 A = os.path.join(W, 'research/dev-workflows/2649-rules-history/archive')

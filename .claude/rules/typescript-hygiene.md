@@ -1,3 +1,8 @@
+---
+description: TypeScript hygiene rules merged from ECC rules/typescript/ (doc 441/442)
+globs: "**/*.ts,**/*.tsx"
+---
+
 # TypeScript Hygiene
 
 From `affaan-m/everything-claude-code` `rules/typescript/` at SHA `8bdf88e5` (doc 441). Examples: `research/dev-workflows/2649-rules-history/archive/typescript-hygiene.md`.

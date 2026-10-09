@@ -12,7 +12,7 @@ Before writing new code, run the ladder and stop at the first rung that works. S
 
 The ladder runs AFTER you understand the problem: read the code the change touches and trace the real flow first.
 
-- **Rung 2 outranks rungs 3-4.** Reuse a ZAO component/hook/lib helper before a stdlib or native primitive. Never swap a ZAO component, a `community.config.ts` value, or a Tailwind convention for a raw `<input>`, inline style, or one-off.
-- **Restraint never cuts safety.** Zod validation, session/auth checks, error handling and accessibility stay.
-- **Decide the rung once, at plan time** - not every turn.
-- Does not apply to research docs, tests, or clarity-serving comments. If a bigger change is genuinely simpler than patch-on-patch, take it.
+- **Rung 2 outranks rungs 3-4.** Reuse a ZAO component/hook/lib helper before a stdlib or native primitive. Never swap a ZAO component, a `community.config.ts` value, or a Tailwind convention for a raw `<input>`, inline style, or one-off. Respect `components.md` + `typescript-hygiene.md`.
+- **Restraint never cuts safety.** Zod validation, session/auth checks, error handling and accessibility stay (`api-routes.md`, `secret-hygiene.md`, `pii-hygiene.md` still bind).
+- **Decide the rung once, at plan time** - not every turn (re-deliberating burns the cap, `claude-usage.md`).
+- Does not apply to research docs, tests, or clarity-serving comments. If a bigger change is genuinely simpler than patch-on-patch (`agent-loops.md` elegance check), take it - restraint is the minimum that WORKS, not the minimum diff.

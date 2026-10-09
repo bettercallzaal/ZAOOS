@@ -1,3 +1,8 @@
+---
+description: Secret hygiene guards for agent ship pipelines, adapted from clawdbotatg/fifth-builder (doc 473)
+globs: "scripts/**,infra/**,.github/workflows/**,*.sh,*.mjs"
+---
+
 # Secret Hygiene
 
 Five guards on every autonomous ship pipeline, PR creation, or agent-driven commit. Adopted from `github.com/clawdbotatg/fifth-builder` (doc 473) after an agent leaked a deployer key into a public audit report. History: `research/dev-workflows/2649-rules-history/archive/secret-hygiene.md`.

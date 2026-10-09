@@ -25,15 +25,15 @@ Measured with `wc -c` on the files Claude Code loads into every ZAOOS session.
 The total includes the user-level `~/.claude/CLAUDE.md` (12,445 bytes), because
 it loads on every turn alongside the repo files, as the brief's 236,635 figure
 did. The repo-only figure, `cat .claude/rules/*.md CLAUDE.md | wc -c`, is
-**225,217 before and 89,446 after**; the two totals differ by exactly that
+**225,217 before and 90,327 after**; the two totals differ by exactly that
 12,445.
 
 | Surface | Before (bytes) | After (bytes) |
 |---|---|---|
-| 38 `.claude/rules/*.md` | 209,815 | 75,321 |
+| 38 `.claude/rules/*.md` | 209,815 | 76,202 |
 | `CLAUDE.md` (repo root) | 15,402 | 14,125 |
 | `~/.claude/CLAUDE.md` (zaal-dotfiles, not in this PR) | 12,445 | 12,445 |
-| **Total per turn** | **237,662** | **101,891** |
+| **Total per turn** | **237,662** | **102,772** |
 
 At roughly 4 bytes per token that is about 59k tokens before and 25k after. The
 brief's figure of 236,635 bytes was taken at 06:30, before #3842 added about 1 kB
@@ -46,38 +46,38 @@ Per-file bytes (archive = the original, core = the new rule file):
 | `agent-loops.md` | 14678 | 8390 |
 | `agent-spend.md` | 4521 | 1171 |
 | `anti-fabrication.md` | 4189 | 2209 |
-| `api-routes.md` | 751 | 671 |
+| `api-routes.md` | 751 | 749 |
 | `capture-quality.md` | 1921 | 1026 |
 | `claude-usage.md` | 3673 | 1367 |
 | `code-over-inference.md` | 5673 | 1544 |
-| `code-restraint.md` | 3045 | 1304 |
-| `components.md` | 625 | 543 |
+| `code-restraint.md` | 3045 | 1568 |
+| `components.md` | 625 | 623 |
 | `confirm-before-claiming-absence.md` | 7094 | 1956 |
 | `credit-attribution.md` | 3895 | 1455 |
 | `documentation-in-repo.md` | 4883 | 1264 |
-| `dreamnet-communication-standard.md` | 5154 | 2306 |
+| `dreamnet-communication-standard.md` | 5154 | 2385 |
 | `first-handler-wins.md` | 5024 | 1461 |
 | `handoff-discipline.md` | 5711 | 3389 |
 | `icm-grounding.md` | 3252 | 1550 |
 | `idle-lane-audit.md` | 5661 | 1592 |
 | `lane-autonomy.md` | 2519 | 1094 |
-| `liveness-probe-guard.md` | 8262 | 1676 |
+| `liveness-probe-guard.md` | 8292 | 1676 |
 | `loop-evals.md` | 13549 | 3665 |
 | `measurement-traps.md` | 16895 | 3804 |
 | `no-rm-rf.md` | 2895 | 1432 |
 | `noisy-signal-guard.md` | 4108 | 1274 |
 | `pii-hygiene.md` | 13750 | 4663 |
 | `pre-merge-security-and-suite.md` | 4020 | 1189 |
-| `recap-followthrough.md` | 4324 | 1021 |
+| `recap-followthrough.md` | 4334 | 1021 |
 | `research-grounding.md` | 5371 | 2101 |
-| `secret-hygiene.md` | 3329 | 2335 |
+| `secret-hygiene.md` | 3329 | 2515 |
 | `session-boundaries.md` | 5551 | 1234 |
 | `silent-failure-guard.md` | 4795 | 2057 |
 | `skill-enhancements.md` | 4119 | 4117 |
 | `state-claims.md` | 14798 | 3538 |
-| `tests.md` | 848 | 767 |
+| `tests.md` | 848 | 846 |
 | `thread-discipline.md` | 4122 | 1059 |
-| `typescript-hygiene.md` | 2832 | 1243 |
+| `typescript-hygiene.md` | 2832 | 1364 |
 | `vanishing-dependencies.md` | 5241 | 1303 |
 | `workflow-discipline.md` | 2914 | 1227 |
 | `worktree-handoff.md` | 5823 | 1324 |
@@ -85,6 +85,13 @@ Per-file bytes (archive = the original, core = the new rule file):
 
 `skill-enhancements.md`, `api-routes.md`, `components.md` and `tests.md` were
 already pure instruction; they changed only by an em dash becoming a hyphen.
+
+Five files carry YAML frontmatter with `globs:` scoping (`api-routes`,
+`components`, `secret-hygiene`, `tests`, `typescript-hygiene`). It is kept
+byte-identical to the originals. The first draft dropped it, because it was
+written from the rules as loaded into a session, where frontmatter is already
+stripped; the seat's review caught it. The byte totals count these five files
+as loaded on every turn, the same way the before figure does.
 
 ## How the split was made
 
@@ -164,10 +171,10 @@ turn should not assert a stale fact as now:
   history: the "regressed once and was restored" note on the retired-names
   section and the 2026-09-17 / 09-19 incident paragraphs. The same split would
   apply there, in the zaal-dotfiles repo, as its own PR.
-- **`paths:` frontmatter** on `api-routes.md`, `components.md`, `tests.md` and
-  `typescript-hygiene.md` would load them only when a session touches matching
-  files. That saves about 3 kB more but changes when those rules are seen, so it
-  is a decision, not a cleanup.
+- **Check the `globs:` frontmatter actually scopes loading.** Five rule files
+  carry `globs:`; whether this Claude Code version honours that key (its
+  documented key is `paths:`) was not measured here. If it does not, those five
+  load every turn. Testing that is the next step, not a change made here.
 - **A size guard**: a CI check that fails when `.claude/rules` grows past a
   ceiling, so the weight does not creep back. Proposed, not built.
 

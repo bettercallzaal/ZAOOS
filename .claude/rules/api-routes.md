@@ -1,3 +1,8 @@
+---
+description: Rules for API route handlers
+globs: src/app/api/**/*.ts
+---
+
 # API Route Conventions
 
 - Validate ALL input with Zod `safeParse` before processing. Return 400 with error details on failure.

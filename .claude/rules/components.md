@@ -1,3 +1,8 @@
+---
+description: Rules for React components
+globs: src/components/**/*.tsx
+---
+
 # Component Conventions
 
 - Add `"use client"` directive at top of any component that uses hooks, event handlers, or browser APIs.

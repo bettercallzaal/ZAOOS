@@ -17,6 +17,7 @@
  *  - the watcher (watcher.ts) independently flags cost/quality anomalies.
  */
 import { promises as fs } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import { acquireTickLock, releaseTickLock } from './tick-lock';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
@@ -90,7 +91,11 @@ export async function enqueueWork(
 ): Promise<WorkItem> {
   const q = await readQueue();
   const item: WorkItem = {
-    id: 'wk-' + Date.now().toString(36),
+    // Time plus randomness. Time alone collided: two items queued in the same
+    // millisecond shared an id, and the queue is filtered by id when an item
+    // finishes, so finishing one silently removed the other (found 2026-10-10
+    // by the #3868 review; work-loop-id.test.ts).
+    id: `wk-${Date.now().toString(36)}-${randomBytes(3).toString('hex')}`,
     kind,
     input: input.trim(),
     addedTs: new Date().toISOString(),

@@ -37,13 +37,12 @@ import {
 import { featureRan } from './feature-ran';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import {
+  claimXLink,
   loadCard,
-  parseXLink,
   recordUsed,
   renderCard,
   runDesk,
   XD_CALLBACK,
-  xDeskEnabled,
   type DeskCard,
   type XLink,
 } from './x-desk';
@@ -2767,8 +2766,12 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // classifier and the concierge, any of which would otherwise claim
   // "<link> reply to this" (first-handler-wins.md).
   const dmChatId = ctx.chat?.id;
-  if (dmChatId !== undefined && xDeskEnabled() && !getPending('private') && !pendingWhyReplies.has(dmChatId)) {
-    const xLink = parseXLink(text);
+  if (dmChatId !== undefined) {
+    const xLink = claimXLink(text, {
+      // getPending returns undefined (not null) when nothing is armed.
+      pendingArmed: Boolean(getPending('private')),
+      whyArmed: pendingWhyReplies.has(dmChatId),
+    });
     if (xLink) {
       await ctx.reply('Reading the post and drafting 3 replies...');
       try {

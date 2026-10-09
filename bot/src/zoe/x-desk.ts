@@ -59,6 +59,23 @@ export interface XLink {
 const STATUS_RE =
   /https?:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/([A-Za-z0-9_]{1,15})\/status(?:es)?\/(\d{1,25})\S*/i;
 
+/**
+ * The DM gate in one place, so it is tested without importing index.ts
+ * (agent-loops rule 21). The desk claims a DM only when the flag is on, no
+ * pending answer is armed (a waiting reflection or approval must win), and no
+ * "Add a why" reply is expected; then only if the text carries a post link.
+ * With the flag off this returns null for every input, so a pasted link takes
+ * the path it took before the desk existed.
+ */
+export function claimXLink(
+  text: string,
+  state: { pendingArmed: boolean; whyArmed: boolean },
+  env: NodeJS.ProcessEnv = process.env,
+): XLink | null {
+  if (!xDeskEnabled(env) || state.pendingArmed || state.whyArmed) return null;
+  return parseXLink(text);
+}
+
 /** The first x.com / twitter.com post link in a message, or null. */
 export function parseXLink(text: string): XLink | null {
   const m = STATUS_RE.exec(text);

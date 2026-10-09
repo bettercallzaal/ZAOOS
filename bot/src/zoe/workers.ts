@@ -122,7 +122,40 @@ const READ_ONLY_DISALLOW = [
 ];
 
 /** Floor below which a revision pass isn't worth launching (doc 770 MED). */
-const MIN_REVISION_BUDGET_USD = 0.05;
+// Card 10319. This was 0.05, below what one revision turn actually costs, so
+// every revision the floor let through was refused by the CLI itself. Measured
+// on the VPS journal 2026-10-01..09: 18 `error_max_budget_usd` results, the
+// Sonnet ones at $0.267-0.277 on turn ONE (about 69k cache-write tokens of
+// system context before the model says anything), the quick-model ones at
+// about $0.10. A revision with less than this left cannot finish a turn, so it
+// is skipped and the first pass is kept (needs-revision).
+export const MIN_REVISION_BUDGET_USD = 0.3;
+
+/** Whether the remaining budget can pay for at least one revision turn. */
+export function shouldRevise(remainingUsd: number): boolean {
+  return remainingUsd >= MIN_REVISION_BUDGET_USD;
+}
+
+/**
+ * Run the revision pass, but never let its failure cost the first pass. Before
+ * card 10319 a revision that threw (in practice always the budget refusal)
+ * reached the outer catch and returned status 'failed' with output '', so a
+ * paid first pass was discarded and the work item was parked as an error.
+ * Auth errors still propagate: those mean the host is logged out, not that one
+ * call was too expensive.
+ */
+export async function attemptRevision<T>(
+  run: () => Promise<T>,
+  onSkip: (message: string) => void = () => {},
+): Promise<T | null> {
+  try {
+    return await run();
+  } catch (err) {
+    if (err instanceof CliAuthError) throw err;
+    onSkip((err as Error).message);
+    return null;
+  }
+}
 
 const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'research-worker': {
@@ -402,8 +435,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       // a fresh full cap, so a failing critique silently doubled the ceiling to
       // ~2×maxBudget. Now total worker spend stays under cfg.maxBudgetUsd.
       const remaining = revisionBudget(cfg.maxBudgetUsd, cost);
-      if (remaining >= MIN_REVISION_BUDGET_USD) {
-        revised = true;
+      if (shouldRevise(remaining)) {
         // When the critique came from a DIFFERENT model family (doc 2204), frame
         // its findings as hypotheses to fact-check, not orders to blind-apply -
         // otherwise cross-family review just launders one model's mistakes through
@@ -419,15 +451,21 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
             `Score ${critique.score}/100: ${critique.summary}`,
             ...critique.issues.map((i) => `- [${i.severity}] ${i.location ?? ''} ${i.issue}`),
           ].join('\n');
-        const second = await call(feedback, remaining);
-        output = second.text;
-        inTok += second.inputTokens;
-        outTok += second.outputTokens;
-        cost += second.totalCostUsd;
-        dur += second.durationMs;
-        trace.begin('critic', 'critic', Date.now());
-        critique = await runCriticFor(cfg.critic, args, output);
-        trace.end(Date.now(), 'ok', { score: critique?.score });
+        const second = await attemptRevision(
+          () => call(feedback, remaining),
+          (m) => console.warn(`[zoe/workers] ${worker} revision failed, keeping the first pass: ${m.slice(0, 200)}`),
+        );
+        if (second) {
+          revised = true;
+          output = second.text;
+          inTok += second.inputTokens;
+          outTok += second.outputTokens;
+          cost += second.totalCostUsd;
+          dur += second.durationMs;
+          trace.begin('critic', 'critic', Date.now());
+          critique = await runCriticFor(cfg.critic, args, output);
+          trace.end(Date.now(), 'ok', { score: critique?.score });
+        }
       }
     }
 

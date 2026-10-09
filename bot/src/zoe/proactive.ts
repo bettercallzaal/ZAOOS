@@ -68,6 +68,8 @@ export interface Candidate {
   message: string;
   /** Linked open thread, when the candidate came from one. */
   threadId?: string;
+  /** Inline buttons sent with the message (task-nudge snooze buttons under ZOE_ATTENTION). */
+  replyMarkup?: { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> };
   /**
    * Dedup key for candidates that are suppressed after being surfaced once
    * (events.ts: `stale:...`, `cifail:...`, `calendar:...`, `inactivity:...`).

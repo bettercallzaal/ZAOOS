@@ -29,6 +29,7 @@ import { verifyReplanResearch } from './verify-replan';
 import { parkWork, resumeWork, type ParkReason } from './work-park';
 import type { ZoeContext } from './types';
 import { featureRan } from './feature-ran';
+import { attentionEnabled } from './attention';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
 const QUEUE = (): string => join(dir(), 'work-queue.json');
@@ -191,9 +192,14 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       ambiguities: [],
     };
 
-    await reportFor(item, deps)(
-      `Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`,
-    ).catch(() => {});
+    // ZOE_ATTENTION: a progress ping is not news (openclaw heartbeat: "reply
+    // NO_REPLY when nothing needs attention"). Only the result or the failure
+    // below is sent. Measured 2026-10-09: 10 of the 52 held items were this line.
+    if (!attentionEnabled()) {
+      await reportFor(item, deps)(
+        `Work-loop: researching "${item.input.slice(0, 80)}" (${q.length} queued)`,
+      ).catch(() => {});
+    }
 
     try {
       // A single research-worker pass that returns its output (used for the

@@ -29,7 +29,15 @@ import { persistDailyDigest } from './afferent-digest';
 import { rolloverNotes } from './daily-note';
 import { runNeedsZaalDigest } from './needs-zaal-digest';
 import { ZOE_PATHS } from './memory';
-import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
+import { nextNudge, nextNudgeDetailed, nudgeKeyboard, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
+import {
+  attentionEnabled,
+  computeAttention,
+  readAttention,
+  renderHeldDigest,
+  showAllKeyboard,
+  writeHeldFull,
+} from './attention';
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
@@ -364,10 +372,27 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               // runWithSendClass('gated') would replace 'morning' with a policy that is
               // identical in behaviour and wrong in name, and would book a 41-chunk
               // flush against the approval-card count.
+              // ZOE_ATTENTION: one message, not a 16-part dump (doc 2432's one
+              // digest; measured 2026-10-09 09:00 UTC as 29 sends in a minute).
+              // The full list is kept for the Show all button. If keeping it
+              // fails, fall back to the full batch so nothing becomes unreachable.
+              let batchText = renderDeferredBatch(held);
+              let batchOpts: { replyMarkup?: ReturnType<typeof showAllKeyboard> } | undefined;
+              if (attentionEnabled()) {
+                try {
+                  await writeHeldFull(batchText);
+                  batchText = renderHeldDigest(held, await readAttention());
+                  batchOpts = { replyMarkup: showAllKeyboard() };
+                  featureRan('attention-digest', `${held.length} held`);
+                } catch (err) {
+                  console.warn('[zoe/scheduler] attention digest failed, sending the full batch:', (err as Error).message);
+                }
+              }
               const batch = await sendChunkedDetailed(
                 (cid, t, o) => opts.bot.api.sendMessage(cid, t, o as never),
                 opts.zaalTgId,
-                renderDeferredBatch(held),
+                batchText,
+                batchOpts,
               );
               if (batch.sent === 0) {
                 // Every chunk threw. sendChunkedDetailed swallows those
@@ -827,6 +852,19 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       () =>
         runWithSendClass('digest', async () => {
         if (!(await claimFire('evening-reflect'))) return;
+        if (attentionEnabled()) {
+          // ZOE_ATTENTION: the reflection becomes a quiet consolidation step
+          // (letta sleep-time pattern) instead of a question. Doc 2432: 854
+          // scheduled messages over 151 days drew zero replies.
+          try {
+            const snap = await computeAttention();
+            featureRan('attention-consolidate', `${Object.keys(snap.taps).length} tap families`);
+          } catch (err) {
+            await releaseFire('evening-reflect');
+            console.error('[zoe/scheduler] attention consolidation failed:', (err as Error).message);
+          }
+          return;
+        }
         try {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
           // Evening reflection is a question for Zaal - route as 'question'
@@ -1331,6 +1369,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           try {
             if (!(await nudgesEnabled())) return cands;
             if (!(await nudgeCooldownElapsed())) return cands;
+            if (attentionEnabled()) {
+              // Only high-priority tasks interrupt, and the nudge carries
+              // per-task Doing it / Later / Shelve buttons (nudges.ts).
+              const n = await nextNudgeDetailed({ highOnly: true });
+              if (!n) return cands;
+              cands.push({
+                kind: 'task-nudge',
+                tier: 'standard',
+                score: 0.6,
+                message: n.text,
+                replyMarkup: nudgeKeyboard(n.taskId),
+              });
+              return cands;
+            }
             const nudge = await nextNudge();
             if (!nudge) return cands;
             // Score at the default threshold: it can fire when nothing outranks
@@ -1346,9 +1398,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
           // Nudges and reasoning decisions are status messages
+          const markup = decision.candidate?.replyMarkup;
           const sent = opts.routingDeps
-            ? await sendToZaalRouted(opts.routingDeps, decision.message, { kind: 'status' })
-            : await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+            ? await sendToZaalRouted(opts.routingDeps, decision.message, {
+                kind: 'status',
+                ...(markup ? { replyMarkup: markup } : {}),
+              })
+            : markup
+              ? await opts.bot.api.sendMessage(opts.zaalTgId, decision.message, { reply_markup: markup })
+              : await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
           // This tick runs outside any runWithSendClass context, so its sends
           // take the default `status` class, whose overflow policy is DROP. A
           // dropped send RESOLVES (send-budget.ts returns

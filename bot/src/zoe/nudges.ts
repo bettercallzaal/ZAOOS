@@ -29,9 +29,32 @@ function priorityRank(p: string): number {
  * because an empty ping is worse than no ping.
  */
 export async function nextNudge(): Promise<string | null> {
+  const n = await nextNudgeDetailed();
+  return n ? n.text : null;
+}
+
+export interface NudgeDetail {
+  text: string;
+  taskId: string;
+  priority: 'high' | 'med' | 'low';
+}
+
+/**
+ * The nudge plus the task it names, so the caller can attach per-task buttons.
+ * `highOnly` (ZOE_ATTENTION): only high-priority tasks may interrupt; med and
+ * low wait for Zaal to open his queue. Snoozed tasks are skipped either way
+ * (an empty snooze file skips nothing, so flag-off behaviour is unchanged).
+ */
+export async function nextNudgeDetailed(
+  opts: { highOnly?: boolean; now?: number } = {},
+): Promise<NudgeDetail | null> {
+  const now = opts.now ?? Date.now();
+  const snoozed = await readSnoozes();
   const tasks = await readTasks();
   const open = tasks
     .filter((t) => t.status === 'pending' || t.status === 'in_progress')
+    .filter((t) => !opts.highOnly || t.priority === 'high')
+    .filter((t) => !(snoozed[t.id] && Date.parse(snoozed[t.id]) > now))
     .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
   if (open.length === 0) return null;
 
@@ -52,7 +75,7 @@ export async function nextNudge(): Promise<string | null> {
   }
 
   const firstLine = task.description.split('\n')[0].slice(0, 180).trim();
-  return [
+  const text = [
     `Next move - [${task.priority}] ${task.title}`,
     firstLine ? firstLine : '',
     ``,
@@ -60,6 +83,61 @@ export async function nextNudge(): Promise<string | null> {
   ]
     .filter((line) => line !== '')
     .join('\n');
+  return { text, taskId: task.id, priority: task.priority };
+}
+
+// ---------------------------------------------------------------------------
+// Per-task snooze (pattern from elizaOS plugin-assistant followUp.ts, MIT:
+// snooze is recorded state, not a re-send). The nudge:later / nudge:shelve
+// buttons carry the task id; the handler in index.ts calls snoozeTask.
+// ---------------------------------------------------------------------------
+
+const SNOOZE_FILE = join(ZOE_PATHS.home, 'nudge-snooze.json');
+export const SNOOZE_LATER_MS = 4 * 60 * 60 * 1000;
+export const SNOOZE_SHELVE_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function readSnoozes(): Promise<Record<string, string>> {
+  try {
+    const parsed = JSON.parse(await fs.readFile(SNOOZE_FILE, 'utf8')) as unknown;
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Snooze one task's nudges until now + ms. Expired entries are pruned on write. */
+export async function snoozeTask(taskId: string, ms: number, now: number = Date.now()): Promise<void> {
+  const current = await readSnoozes();
+  const kept: Record<string, string> = {};
+  for (const [id, until] of Object.entries(current)) {
+    if (Date.parse(until) > now) kept[id] = until;
+  }
+  kept[taskId] = new Date(now + ms).toISOString();
+  await fs.mkdir(ZOE_PATHS.home, { recursive: true });
+  await fs.writeFile(SNOOZE_FILE, JSON.stringify(kept, null, 2), 'utf8');
+}
+
+/**
+ * Buttons for a task nudge. Telegram caps callback_data at 64 bytes; a task id
+ * too long to fit gets the id-less buttons, which snooze the whole stream as
+ * the handler always did.
+ */
+export function nudgeKeyboard(taskId: string): {
+  inline_keyboard: Array<Array<{ text: string; callback_data: string }>>;
+} {
+  const withId = (a: string) => {
+    const d = `nudge:${a}:${taskId}`;
+    return Buffer.byteLength(d, 'utf8') <= 64 ? d : `nudge:${a}`;
+  };
+  return {
+    inline_keyboard: [
+      [
+        { text: 'Doing it', callback_data: withId('now') },
+        { text: 'Later (4h)', callback_data: withId('later') },
+        { text: 'Shelve (7d)', callback_data: withId('shelve') },
+      ],
+    ],
+  };
 }
 
 export async function nudgesEnabled(): Promise<boolean> {

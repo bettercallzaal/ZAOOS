@@ -3,6 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { communityConfig } from '@/../community.config';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import {
+  castTombstoneEnabled,
+  parseDeletedCastHash,
+  tombstoneDeletedCast,
+} from '@/lib/farcaster/cast-tombstone';
 import { logger } from '@/lib/logger';
 import { moderateContent } from '@/lib/moderation/moderate';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
@@ -74,6 +79,22 @@ export async function POST(req: NextRequest) {
     payload = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  // A cast its author deleted: hide our copy (flag NEYNAR_CAST_DELETED_TOMBSTONE,
+  // default off; see src/lib/farcaster/cast-tombstone.ts). Off, this is ignored
+  // exactly as before. A failed write returns 500 so Neynar delivers it again.
+  if (payload.type === 'cast.deleted' && castTombstoneEnabled()) {
+    const hash = parseDeletedCastHash(payload);
+    if (!hash) {
+      logger.warn('[webhook/neynar] cast.deleted without a valid cast hash, ignored');
+      return NextResponse.json({ ok: true });
+    }
+    const result = await tombstoneDeletedCast(hash);
+    if (result.status === 'error') {
+      return NextResponse.json({ error: 'Tombstone failed' }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, tombstone: result.status });
   }
 
   // Only handle new casts

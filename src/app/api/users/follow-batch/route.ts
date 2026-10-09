@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { followUser } from '@/lib/farcaster/neynar';
+import { guardSignerWrite } from '@/lib/farcaster/write-authority';
 import { logger } from '@/lib/logger';
 
 const schema = z.object({
@@ -17,6 +18,8 @@ export async function POST(request: NextRequest) {
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
+  const signerRefusal = await guardSignerWrite(session, 'other');
+  if (signerRefusal) return signerRefusal;
 
   const body = await request.json();
   const parsed = schema.safeParse(body);

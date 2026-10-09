@@ -1,0 +1,254 @@
+# PII Hygiene
+
+Rules for working with personal data from connected services (Gmail, Google Calendar, Google Drive, GitHub, etc.). Sibling to `secret-hygiene.md` - that file covers API keys / tokens / PEM blocks; this file covers personal contact data, calendar attendees, email bodies, and any third-party human information that surfaces through MCP queries.
+
+Established 2026-05-23 when Zaal connected Gmail / GCal / Drive / GitHub MCP servers to Claude.
+
+## Threat model
+
+The risk is not credential theft (that's `secret-hygiene.md`). The risk is **leakage of third-party personal data** through:
+
+1. **Git commit** - PII written into a research doc, recap, or memory file that lands on a public repo.
+2. **PR description / commit message** - email addresses, attendee names, phone numbers pasted into commit text.
+3. **Chat output** - Claude reads a 200-email batch and the raw bodies end up in a Telegram block or clipboard skill output that Zaal forwards somewhere.
+4. **Bonfire / knowledge-graph episode** - episode body contains a real email or attendee name, gets POSTed to a graph that other agents can query.
+5. **Public artifacts** - a synthesized "what people said about X" doc accidentally names individuals who did not consent to being quoted.
+
+The blast radius is reputational + relational, not financial. The fix is **default-private**: query output stays off-repo, summaries omit names unless authorized, and the perimeter catches accidents before push.
+
+## The perimeter (4 rules)
+
+### Rule 1 - All raw query output writes to `~/.zao/private/`
+
+Never write a raw Gmail thread, calendar event with attendees, Drive document, or GitHub private-repo content inside the repo working tree. The canonical off-repo location is:
+
+```
+~/.zao/private/
+```
+
+This mirrors the existing `~/.zao/` skill convention (`gpt-loop/`, `clipboard/`, `diarization-models/` all live there, all outside the repo).
+
+Naming convention for dumps:
+
+```
+~/.zao/private/gmail-<query-slug>-<YYYYMMDD>.json
+~/.zao/private/gcal-<calendar>-<YYYYMMDD>.json
+~/.zao/private/gdrive-<folder-slug>-<YYYYMMDD>.json
+~/.zao/private/github-<repo>-<query-slug>-<YYYYMMDD>.json
+```
+
+A dump file is re-readable across sessions for follow-up queries without re-hitting the API.
+
+### Rule 2 - `.gitignore` blocks the leak path
+
+These patterns are in `.gitignore` (verified 2026-05-23 commit):
+
+```
+**/.private/
+**/private-queries/
+**/.zao-private/
+*.private.json
+*.gmail.json
+*.gcal.json
+*.gdrive.json
+*.contacts.json
+.claude/.private/
+.claude/private-queries/
+```
+
+If a query result ends up under the repo path by accident, it cannot be staged. Belt + suspenders for Rule 1.
+
+### Rule 3 - PII patterns banned from any committed file
+
+> **AMENDED 2026-09-01 by Zaal: the private vault is a sanctioned home for
+> third-party contact data.** Everything else in this rule stands unchanged.
+>
+> **What happened.** Two vault files - a ZAOstock sponsor pipeline and a roster -
+> carried 23 phone numbers and 17 unique third-party email addresses for named people at
+> a chamber of commerce, a brewery, a bank and an insurer. A lane held them
+> uncommitted rather than commit them, citing this rule. Another lane had written
+> them believing the opposite, and said so in its own note: *"ZAOOS is PUBLIC.
+> Contact details go to the vault only."*
+>
+> Both readings were defensible, which is why it went to Zaal rather than being
+> settled quietly. He chose: the vault is the home, and this rule is what changes.
+>
+> **Why both readings were defensible.** This rule was written on 2026-05-23, the
+> day Gmail, Calendar, Drive and GitHub MCP servers were connected, and its whole
+> threat model is *query output leaking into public artifacts* - a research doc, a
+> PR body, a Telegram block, a knowledge-graph episode. `~/zao-vault` is a private
+> repo that did not exist in that form at the time. The rule never contemplated
+> it, so it neither permitted nor forbade it; it simply said "any committed file"
+> and meant the public ones.
+>
+> **The amended line: WHERE it is committed decides, not whether.**
+>
+> | Destination | Third-party contact data |
+> |---|---|
+> | `~/zao-vault` (private) | **PERMITTED.** It is the sanctioned home. |
+> | ZAOOS `research/`, any public repo | **BANNED.** ZAOOS is public. |
+> | PR bodies, commit messages, issue text | **BANNED.** Public even on a private repo, and permanent. |
+> | Chat output, Telegram blocks, clipboard | **BANNED** unless Zaal asked for that specific item (Rule 4). |
+> | Bonfire episodes | **BANNED.** Every agent reading the graph sees it. |
+> | Anything outbound | **BANNED.** |
+>
+> **Three things this does NOT change.** The `~/.zao/private/` destination in
+> Rule 1 for RAW query dumps stays - a Gmail thread dump is still not a vault
+> note. Rule 4's chat defaults stay. And a private repo is private, not secret:
+> the vault is now cloned to a phone that leaves the house, and its history is
+> permanent, so this permits recording a working contact list and not
+> accumulating one for its own sake.
+>
+> **If you are redacting for a public destination**, the patterns and the
+> allowlist below are still the tool for it. That is what the rest of this
+> section is for.
+
+
+
+These regex patterns must not appear in any file staged for commit (research docs, memories, PR descriptions, commit messages, recap docs). Scan before push.
+
+| Pattern | Regex | Notes |
+|---------|-------|-------|
+| Email address | `[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}` | Allowlist below |
+| US phone | `\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b` | All formats |
+| International phone | `\+\d{1,3}\s*\d{6,}` | Loose pattern |
+| Street address (US) | `\d{1,5}\s+\w+\s+(St|Ave|Blvd|Rd|Dr|Ln|Way|Pl|Ct|Pkwy)\b` | Common suffixes |
+| Full birthdate | `\b(0?[1-9]\|1[012])[-/](0?[1-9]\|[12]\d\|3[01])[-/](19\|20)\d{2}\b` | MM/DD/YYYY etc. |
+| Credit-card-ish | `\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b` | Luhn check separately if needed |
+| Telegram handle | `@\w+` outside the project allowlist | See allowlist |
+
+### Email allowlist (these may appear in commits)
+
+The following email addresses are already public and may appear in research docs, recap docs, and commit messages without redaction:
+
+```
+zaal@thezao.com
+zaalp99@gmail.com
+zaal@bettercallzaal.com
+zoe-zao@agentmail.to
+hello@thezao.com
+support@thezao.com
+```
+
+Public role-emails belonging to ZAO/BCZ entities (`contact@<zao-brand>.com`, `team@<zao-brand>.com`) may also appear. Personal emails of third parties (anyone NOT on this list) get redacted to `<redacted-email>` in any committed artifact.
+
+### Telegram handle allowlist
+
+The following Telegram handles are public ZAO bot identities and may appear unredacted:
+
+```
+@zaoclaw_bot
+@zoe_hermes_bot
+@zaodevz_bot
+@zabal_bonfire
+@ZAOstockTeamBot
+@ZAOcoworkingBot
+```
+
+Personal Telegram handles (e.g. `@some_person`) belonging to third parties get redacted to `@<redacted-handle>` in committed artifacts unless that person's handle has been explicitly cleared by Zaal for inclusion (e.g. ZAO Devz public team page, ZABAL Games mentor list).
+
+### Venue address allowlist (added 2026-09-06)
+
+The street-address pattern in Rule 3 cannot tell a person's home from a public
+business, so it fires on venues whose addresses are published by the venue itself.
+**A commercial venue's own published address is not third-party personal data** and
+may appear unredacted in committed artifacts when all three hold:
+
+1. It is a **business or public venue** - gallery, club, studio, office, theatre -
+   never a residence.
+2. The address is **published by the venue or the event**, on its own site, its
+   ticket or RSVP page, or its public listing. The doc should be able to name where
+   the address came from.
+3. It is being recorded as **where an event happened**, not as where a person lives
+   or can be found.
+
+A private residence stays banned no matter who published it. If the address is
+somebody's home, or a person is the reason the address matters, it gets redacted -
+including a venue address used to place an individual.
+
+Cleared under this rule (NYC, ART NYC and NFT.NYC week, 2026-09):
+
+```
+219 Bowery          TIME TO BE HAPPY Gallery
+327 Bowery          Bowery Palace
+300 Broome St       Heft Gallery
+91 Allen St         Cycol Gallery
+141 E Houston St    Solana / Skyline Tower
+247 W 30th St       American Whiskey
+48 E 23rd St        SPIN New York Flatiron
+```
+
+**Why this exists:** on 2026-09-06 the pre-commit scanner blocked the NYC weekend
+research doc over `300 Broome St` and `91 Allen St`, both art galleries whose
+addresses came off their own public event listings. Redacting them would have cost
+the doc its central geographic finding - that six venues sat inside one ten-minute
+walk - to protect nobody. Zaal's call, same day: allowlist rather than redact. The
+rule is narrowed to published commercial venues so it cannot be stretched to cover a
+person's address.
+
+### Rule 4 - Default chat behavior when querying connected services
+
+When Claude runs a query against Gmail, Google Calendar, Google Drive, or any other PII-bearing connection:
+
+1. **Write the full raw response to `~/.zao/private/<service>-<slug>-<date>.json`** (Rule 1 location).
+2. **Surface only the synthesized answer in chat** - the specific facts the query asked about, with personal data redacted per the allowlists.
+3. **Never paste raw email bodies, attendee lists, or contact data into chat unless explicitly requested.** Even then, ask before doing so a second time in the same session - context-window leakage is a quieter version of the commit leak.
+4. **Never include raw PII in any research doc, recap doc, memory file, PR description, commit message, Bonfire episode, or Telegram block** without an explicit go-ahead from Zaal for that specific item.
+
+If Zaal asks "show me the raw response," surface it in chat (he sees it, no commit happens). If he then asks "save that to a doc," redact PII per Rule 3 before writing.
+
+## Pre-flight checks (before commit)
+
+Manual checklist - run before `git commit` on any branch that touched query output:
+
+```bash
+# 1. Confirm no private-data file is staged
+git diff --cached --name-only | grep -E '\.(gmail|gcal|gdrive|contacts|private)\.json$' && echo "BLOCK: private file staged" || echo "ok"
+
+# 2. Scan staged content for email addresses outside allowlist
+git diff --cached -G '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' --no-color \
+  | grep -oE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' \
+  | sort -u
+
+# Compare the output to the allowlist in this file. Any address not on the
+# allowlist must be redacted before commit.
+
+# 3. Scan staged content for phone numbers
+git diff --cached -G '\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b' --no-color \
+  | grep -oE '\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b'
+
+# 4. If any check fires, abort the commit. Redact, re-stage, re-run.
+```
+
+A pre-commit hook automating step 2+3 is a worthwhile follow-up (see Next Steps below). Until that ships, this is a manual discipline.
+
+## Bonfire / knowledge-graph specifics
+
+Bonfire episode bodies are searchable across all agents that read the graph. PII in an episode body is the highest-leakage case in the ZAO stack.
+
+Rules:
+
+- **Meeting recap Bonfire episodes** (per `/meeting` skill) - attendee names of ZAO ecosystem people are OK (Zaal, Iman, Tyler, etc.). Names of intro-call counterparties (e.g. Shriyash Soni) are OK after first explicit Zaal confirmation that they consent to graph inclusion (the act of choosing to write a recap = implicit consent for ZAO-internal graph use; explicit consent needed for public outputs).
+- **Never** include a counterparty's personal email, personal phone, home address, or unredacted Telegram handle in a Bonfire episode body.
+- **Never** dump raw email or calendar invite content into a Bonfire episode. Episode bodies are natural-language prose summaries, not data dumps.
+- The `BonfireMemory` adapter in `hermes-orchestrator` (doc 734) already secret-scans for API keys / tokens. It does NOT currently scan for PII patterns. **Open follow-up:** add PII regex to the adapter's pre-POST scan.
+
+## Skill defaults to update
+
+The following skills currently have no PII default. They need a one-line "outputs to `~/.zao/private/` by default" update:
+
+- `/meeting` - already writes meeting transcripts to `/tmp/` which is fine for transcription scratch; but any raw Google Calendar attendee dump must go to `~/.zao/private/` not `/tmp`.
+- `/inbox` (zoe-zao AgentMail) - whitelisted sender chain limits inbound to forwards from Zaal, but the message bodies often contain third-party content. Synthesis goes in chat; raw stays in AgentMail itself (already off-repo by design).
+- Future: any Gmail / GCal / GDrive querying skill must declare its output path before first use.
+
+## Source
+
+- Established 2026-05-23 in response to Zaal connecting Gmail / GCal / GDrive / GitHub MCP servers.
+- Sibling to `.claude/rules/secret-hygiene.md` (API keys / tokens / PEM blocks).
+- Allowlists above are the working set; update via PR when new public emails / bot handles enter the ZAO ecosystem.
+
+## Next steps (deferred to follow-up PRs)
+
+1. **Pre-commit hook** that runs the "Pre-flight checks" section automatically and aborts on any non-allowlisted PII match. Wire into `.husky/pre-commit` or `.claude/settings.json` PreToolUse on `Bash(git commit*)`.
+2. **PII scanner in `BonfireMemory` adapter** (`hermes-orchestrator` doc 734) - extend the existing secret-scan regex list with the PII patterns from this file. Episodes containing matches get SKIPPED (same best-effort pattern as the secret scan).
+3. **Allowlist file format** - if the allowlists grow past ~20 entries each, extract to `.claude/rules/pii-allowlist.yaml` and have skills read it directly.

@@ -4,7 +4,7 @@
 
 When the `superpowers:brainstorming` skill is active, during the "Ask clarifying questions" phase, start with reverse prompting before asking individual questions:
 
-> "Before I start asking questions one at a time, let me gather broad context first. Tell me everything relevant about this idea — who it's for, what success looks like, what you've already tried, any constraints. Or if you'd prefer, I'll ask you 10-20 targeted questions to gather all the context I need before proposing anything."
+> "Before I start asking questions one at a time, let me gather broad context first. Tell me everything relevant about this idea - who it's for, what success looks like, what you've already tried, any constraints. Or if you'd prefer, I'll ask you 10-20 targeted questions to gather all the context I need before proposing anything."
 
 This aligns with Zaal's preference to brainstorm together before Claude drafts anything.
 

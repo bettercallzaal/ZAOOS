@@ -39,9 +39,7 @@ The pattern: **Monorepo as Lab.**
 
 ## Where Knowledge Lives (the division)
 
-ZAOOS is not the only store, and this file was silent about that until 2026-08-26
-while five rules files already depended on the vault. Seven stores, each owning
-one thing. When two disagree, the one higher in this table wins.
+Seven stores, each owning one thing. When two disagree, the one higher in this table wins.
 
 | Store | Where | Owns | Never holds |
 |---|---|---|---|
@@ -53,10 +51,8 @@ one thing. When two disagree, the one higher in this table wins.
 | Cowork board | Supabase, via `~/bin/zao-tracker` | Task truth - what is open, who owns it, when | Knowledge |
 | Agent memory | `~/.claude/projects/*/memory/` | User + project facts an agent needs at boot | Operating lessons - those go to `.claude/rules/` |
 
-Precedence exists because a superseded decision otherwise wins an argument on
-recency alone. Two more rules go with it: use the newest APPROVED information,
-not merely the newest file; and if the answer is missing from all seven, say
-what you could not find rather than filling the gap (`anti-fabrication.md`).
+Use the newest APPROVED information, not merely the newest file; if the answer
+is missing from all seven, say what you could not find (`anti-fabrication.md`).
 
 Routing a correction to the right store is `agent-loops.md` rule 6. Which
 surface may carry state at all is `handoff-discipline.md` rule 7.
@@ -168,15 +164,8 @@ github.com/garrytan/gstack), vendored so any teammate cloning ZAOOS gets it.
 For web browsing, prefer the `/browse` skill from gstack when
 its binary is built; fall back to `mcp__claude-in-chrome__*` when it is not.
 
-> **BOTH ARE ALLOWED - changed 2026-08-24 by Zaal ("allow both").** This rule
-> previously read "never `mcp__claude-in-chrome__*`". It was measured and the ban
-> was not holding: over 30 days and 377 transcripts, `claude-in-chrome` was called
-> **1,786 times**, the most-used MCP by a factor of two, because
-> `gstack/browse/dist/` has never been built and `/browse` therefore cannot run
-> (see `idle-lane-audit.md`, and doc 2411). A rule that mandates a broken tool does
-> not get followed - it gets routed around silently. So: check whether `/browse`
-> works, use it if it does, and reach for `claude-in-chrome` without ceremony if
-> it does not.
+Both are allowed (Zaal 2026-08-24): check whether `/browse` works, use it if
+it does, and reach for `claude-in-chrome` without ceremony if it does not.
 
 Available gstack skills: `/office-hours`, `/plan-ceo-review`,
 `/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`,
@@ -198,25 +187,16 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 | **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
 | **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
 
-**Decommissioned 2026-05-04 — do NOT propose, build, or restart:**
+**Decommissioned 2026-05-04 - do NOT propose, build, or restart:**
 
-- openclaw container + 7-agent squad (ZOEY/BUILDER/SCOUT/WALLET/FISHBOWLZ/CASTER) — source of "·" pings
+- openclaw container + 7-agent squad (ZOEY/BUILDER/SCOUT/WALLET/FISHBOWLZ/CASTER) - source of "·" pings
 - Composio AO orchestrator
 - ZOE v2 / Agent Zero migration plan
-- 10-bot branded fleet (Magnetiq/Research/WaveWarZ/POIDH as own bots) — folds into ZOE memory blocks
-- zao-team-bots (Magnetiq + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
-- Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
-- FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
-- **farscout** — superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). **STILL RUNNING as `farscout.service` on the VPS as of 2026-08-22** — 35 days uptime, 0.0% CPU, zero journald entries, zero files written in 30 days, while heartbeating `up` to the bots board. A zombie that reports healthy. Stopping it is Zaal's (`systemctl --user stop farscout && systemctl --user disable farscout`) — do not treat its heartbeat as evidence the fleet is working. Prior docs: 774 (what it was), 864 (board integration).
-
-> **Corrected 2026-08-22.** This row previously read "Group dispatch + hourly
-> learning tip." Both halves were wrong, verified against the deployed code and
-> git history: the module is a dual-bot Coder/Critic runner (`bot/src/devz/index.ts`
-> header), and the **hourly tip was a ZOE feature that was REPLACED on 2026-05-14**
-> by forward-nudges-from-task-queue (`64a2a398`, "replace hourly tips with forward
-> nudges from task queue", PR #519). Exhaustive grep of the whole 3-file devz module
-> on both the VPS and in this repo finds zero hourly/cron/setInterval/tip logic. The
-> table documented a removed feature, attributed to the wrong bot, for three months.
+- 10-bot branded fleet (a retired partner, Research, WaveWarZ and POIDH as own bots) - folds into ZOE memory blocks
+- zao-team-bots (a retired partner's bot + AttaBotty brand bots) - retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
+- Hermes as a SEPARATE bot (`@zoe_hermes_bot`) - adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
+- FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 - Juke partnership stands)
+- **farscout** - superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). Was still running as `farscout.service` on the VPS as of 2026-08-22, a zombie heartbeating `up` while doing nothing - do not treat its heartbeat as evidence the fleet is working. Stopping it is Zaal's (`systemctl --user stop farscout && systemctl --user disable farscout`). Prior docs: 774, 864.
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = a persona block in ZOE's runtime memory at `~/.zao/zoe/persona.md` / `~/.zao/zoe/human.md` (seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`; content voice lives in `bot/src/zoe/brand.md`), NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
 
@@ -228,3 +208,7 @@ The ZAO ecosystem has permanent AI-readable context boxes on useicm.com - fetch 
 - Human directory: https://thezao.xyz/list
 - Start here: **zao-assistant** (`icm_-hsPHePpqX01RovoB_SEqA`) - the operator layer; it links to the rest (thezao, bettercallzaal, zabalgamez, wavewarz, farcaster, fractal, poidh, zuke, zao-festivals, coc-concertz, zao-newsletter, loop-engineering, milk-road).
 - Source of truth for box content: `research/identity/icm-boxes/`. Owner keys live at `~/.zao/private/icm-keys.json` (never commit).
+
+## Rules archive
+
+`.claude/rules/*.md` carry only binding instructions. The incidents, measurements and sources behind each rule (and the pre-2026-10-09 full text of every rule file and this file) live in [doc 2649](research/dev-workflows/2649-rules-history/). Read the archive before changing a rule.

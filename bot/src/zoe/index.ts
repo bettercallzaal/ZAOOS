@@ -100,7 +100,16 @@ import {
 } from './reflexion';
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
-import { disableNudges, enableNudges, nudgesEnabled, markNudgeSent } from './nudges';
+import {
+  disableNudges,
+  enableNudges,
+  nudgesEnabled,
+  markNudgeSent,
+  snoozeTask,
+  SNOOZE_LATER_MS,
+  SNOOZE_SHELVE_MS,
+} from './nudges';
+import { attentionEnabled, readHeldFull, recordTap, tapFamily, SHOW_ALL_CALLBACK } from './attention';
 import { mirrorTurn, recall } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -860,6 +869,9 @@ bot.on('callback_query:data', async (ctx, next) => {
     return;
   }
   const data = ctx.callbackQuery.data ?? '';
+  // ZOE_ATTENTION: every tap from Zaal is the signal for what he acts on
+  // (attention.ts). Recorded before routing so no handler can skip it.
+  if (attentionEnabled()) void recordTap(tapFamily(data));
   if (data.startsWith('cp:')) {
     const action = data.slice(3);
     if (action === 'refresh') {
@@ -2760,6 +2772,7 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
   // Best-effort; the concierge still handles the content (e.g. "done with X"
   // emits a resolve thread_op).
   await ackPush().catch(() => {});
+  if (attentionEnabled()) void recordTap('reply');
 
   // Note: capture path
   const noteMatch = NOTE_PREFIX.exec(text);
@@ -4279,8 +4292,22 @@ bot.callbackQuery(/^grill:(done|skip|snooze)$/, async (ctx) => {
   );
 });
 
-bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
+bot.callbackQuery(/^nudge:(now|later|shelve)(?::(.+))?$/, async (ctx) => {
   const action = ctx.match[1];
+  const taskId = ctx.match[2];
+  // Buttons with a task id (nudges.ts nudgeKeyboard, ZOE_ATTENTION) snooze
+  // THAT task: Later 4h, Shelve 7d. Other tasks keep their turn.
+  if (taskId && (action === 'later' || action === 'shelve')) {
+    try {
+      await snoozeTask(taskId, action === 'later' ? SNOOZE_LATER_MS : SNOOZE_SHELVE_MS);
+      await ctx.answerCallbackQuery({ text: action === 'later' ? 'Snoozed 4h.' : 'Shelved for 7 days.' });
+    } catch (e) {
+      console.error('[zoe/index] nudge task snooze failed:', e);
+      await ctx.answerCallbackQuery({ text: 'Could not snooze - it may nudge again.' });
+    }
+    console.log(`[zoe/index] nudge ${action} task=${taskId}`);
+    return;
+  }
   // Previously this only acked + logged - the button was a no-op, so "later"
   // still nudged again on the next tick. "later"/"shelve" now actually snooze
   // the nudge stream for the cooldown window (markNudgeSent resets it); "now"
@@ -4295,6 +4322,15 @@ bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   }
   await ctx.answerCallbackQuery({ text: acted[action] ?? 'Got it.' });
   console.log(`[zoe/index] nudge ${action} (snoozed=${action !== 'now'})`);
+});
+
+// Show all on the one-message morning digest (attention.ts): sends the full
+// held list that was kept when the digest was rendered.
+bot.callbackQuery(SHOW_ALL_CALLBACK, async (ctx) => {
+  const full = await readHeldFull();
+  await ctx.answerCallbackQuery({ text: full ? 'Sending the full list.' : 'Nothing kept.' });
+  if (!full || ctx.chat?.id === undefined) return;
+  await sendChunkedToTelegram((cid, t, o) => bot.api.sendMessage(cid, t, o as never), ctx.chat.id, full);
 });
 
 // Final callback fallback: registered LAST, so it only runs when a callback

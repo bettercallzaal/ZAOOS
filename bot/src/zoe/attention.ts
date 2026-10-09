@@ -34,6 +34,19 @@ export function attentionEnabled(env: NodeJS.ProcessEnv = process.env): boolean 
   return env.ZOE_ATTENTION === '1';
 }
 
+/**
+ * The send class for messages that exist BECAUSE Zaal is needed: his own
+ * relays from the lanes (relay-bridge.ts) and the 08:00 / 20:00 needs-Zaal
+ * digests. They ran as `digest`, which defers once the daily cap is spent;
+ * with the VPS cap at 3, measured 2026-10-08 to 10-09, two of his relays and
+ * the morning needs-Zaal digest waited until the next morning. Under
+ * ZOE_ATTENTION they run as `gated`, which always passes and is still counted
+ * (send-budget.ts POLICY). Flag off: `digest`, unchanged.
+ */
+export function needsZaalSendClass(env: NodeJS.ProcessEnv = process.env): 'gated' | 'digest' {
+  return attentionEnabled(env) ? 'gated' : 'digest';
+}
+
 function zoeHome(): string {
   return process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 }

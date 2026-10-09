@@ -291,3 +291,23 @@ describe('pruneTaps is crash-safe and does not race recordTap', () => {
     expect(await fs.readFile(join(tmp, 'taps.jsonl'), 'utf8')).toContain('"after"');
   });
 });
+
+describe('needsZaalSendClass: what needs Zaal is not held by the cap', () => {
+  it('gated under ZOE_ATTENTION, digest (unchanged) without it', async () => {
+    const { needsZaalSendClass } = await import('../attention');
+    expect(needsZaalSendClass({ ZOE_ATTENTION: '1' })).toBe('gated');
+    expect(needsZaalSendClass({})).toBe('digest');
+  });
+
+  it('the scheduler runs both needs-Zaal digests under it, and nothing else', async () => {
+    const src = await fs.readFile(join(__dirname, '..', 'scheduler.ts'), 'utf8');
+    for (const slot of ['morning', 'evening']) {
+      const fire = src.indexOf(`claimFire('needs-zaal-${slot}')`);
+      expect(fire).toBeGreaterThan(-1);
+      const before = src.slice(0, fire);
+      const m = [...before.matchAll(/runWithSendClass\(([^,]+),/g)].pop();
+      expect(m?.[1]).toBe('needsZaalSendClass()');
+    }
+    expect(src.split('runWithSendClass(needsZaalSendClass()').length - 1).toBe(2);
+  });
+});

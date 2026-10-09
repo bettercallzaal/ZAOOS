@@ -26,6 +26,7 @@
 import { sendChunkedDetailed } from './tg-chunk';
 import { featureRan } from './feature-ran';
 import { wasSendBlocked, deferSend, runWithSendClass } from './send-budget';
+import { needsZaalSendClass } from './attention';
 
 const HUB_LEGACY_ID = '9000';
 
@@ -249,7 +250,9 @@ export async function pushInboundRelays(deps: RelayBridgeDeps): Promise<number> 
       // ALL of it arrive", and a relayed paste is exactly the long text this
       // module chunks for.
       const report = await sendChunkedDetailed(
-        (cid, t, o) => runWithSendClass('digest', () => deps.sendMessage(cid, t, o as never)),
+        // needsZaalSendClass: `gated` under ZOE_ATTENTION so his relays are not held
+        // overnight by the daily cap; `digest` (as before) with the flag off.
+        (cid, t, o) => runWithSendClass(needsZaalSendClass(), () => deps.sendMessage(cid, t, o as never)),
         deps.chatId,
         formatInboundDm(r),
         { replyMarkup: replyKeyboard(r.from), markupOn: 'last' },

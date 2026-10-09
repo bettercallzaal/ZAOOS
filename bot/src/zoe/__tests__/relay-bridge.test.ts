@@ -124,6 +124,46 @@ describe('tryInstantRelayReply', () => {
   });
 });
 
+describe('pushInboundRelays send class (ZOE_ATTENTION)', () => {
+  async function classOfOneRelay(): Promise<string | undefined> {
+    process.env.COWORK_TRACKER_URL = 'https://x.test';
+    process.env.COWORK_TRACKER_KEY = 'k';
+    const hub = { id: 'h1', metadata: { relays: [rel({ from: 'cowork', to: 'zoe', ts: 'a', tg_pushed: false })] } };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: { method?: string }) => {
+        if (init?.method === 'PATCH') return { ok: true, text: async () => '' } as unknown as Response;
+        return { ok: true, text: async () => JSON.stringify([hub]) } as unknown as Response;
+      }),
+    );
+    const { currentSendClass } = await import('../send-budget');
+    let seen: string | undefined;
+    const sendMessage = vi.fn(async () => {
+      seen = currentSendClass();
+      return { message_id: 7 };
+    });
+    await pushInboundRelays({ chatId: 1, sendMessage, now: () => 't' });
+    vi.unstubAllGlobals();
+    delete process.env.COWORK_TRACKER_URL;
+    delete process.env.COWORK_TRACKER_KEY;
+    return seen;
+  }
+
+  it('red control: flag off, a relay is sent as digest (held once the cap is spent)', async () => {
+    delete process.env.ZOE_ATTENTION;
+    expect(await classOfOneRelay()).toBe('digest');
+  });
+
+  it('flag on, a relay is sent as gated (always passes)', async () => {
+    process.env.ZOE_ATTENTION = '1';
+    try {
+      expect(await classOfOneRelay()).toBe('gated');
+    } finally {
+      delete process.env.ZOE_ATTENTION;
+    }
+  });
+});
+
 describe('pushInboundRelays', () => {
   it('returns 0 and never sends when unconfigured (no creds)', async () => {
     const prevUrl = process.env.COWORK_TRACKER_URL;

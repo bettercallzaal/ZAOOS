@@ -30,7 +30,7 @@ import { rolloverNotes } from './daily-note';
 import { runNeedsZaalDigest } from './needs-zaal-digest';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nextNudgeDetailed, nudgeKeyboard, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
-import { attentionEnabled, computeAttention, prepareMorningBatch } from './attention';
+import { attentionEnabled, computeAttention, needsZaalSendClass, prepareMorningBatch } from './attention';
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
@@ -1026,7 +1026,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '0 8 * * *',
       () =>
-        runWithSendClass('digest', async () => {
+        // needsZaalSendClass (attention.ts): `gated` under ZOE_ATTENTION, so the
+        // digest that lists what needs Zaal is never deferred past the cap.
+        runWithSendClass(needsZaalSendClass(), async () => {
           if (!(await claimFire('needs-zaal-morning'))) return;
           try {
             const res = await runNeedsZaalDigest({
@@ -1054,7 +1056,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '0 20 * * *',
       () =>
-        runWithSendClass('digest', async () => {
+        // needsZaalSendClass (attention.ts): `gated` under ZOE_ATTENTION, so the
+        // digest that lists what needs Zaal is never deferred past the cap.
+        runWithSendClass(needsZaalSendClass(), async () => {
           if (!(await claimFire('needs-zaal-evening'))) return;
           try {
             const res = await runNeedsZaalDigest({

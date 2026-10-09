@@ -1,0 +1,230 @@
+# CLAUDE.md - ZAOOS
+
+## Session Start
+
+**Invoke `/worksession`** before any work. Each terminal gets its own `ws/` branch.
+
+## What This Is
+
+**ZAOOS is the lab.** Where new ZAO-ecosystem things get prototyped before they earn their own home.
+
+The repo started as a gated Farcaster social client for **The ZAO** (188 members on Base) and grew into a monorepo where many ZAO experiments live side-by-side. Some have already graduated to their own repos (COC Concertz). Some are graduating now (ZAOstock 2026, Wed 2026-04-29). Some are paused (FISHBOWLZ). The rest are still being figured out.
+
+The pattern: **Monorepo as Lab.**
+
+- A thing graduates when it's ready for production + ready to share publicly + ready to attract new users.
+- On graduation: own repo, own DB, own domain. Code is **deleted** from ZAOOS so there's no drift. Routes redirect.
+- Sharing model: clone, no deps. Each graduate stands alone.
+- Research stays in ZAOOS forever - it's the institutional memory across every product.
+
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, the orchestrator), music player components, and the research library. Counts of routes, components, hooks and docs are deliberately not repeated here - they go stale the week they are written. The live census is [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/); the doc count is whatever `research/README.md` indexes today.
+
+**Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
+
+## Project Map
+
+| Directory | What | When to Read |
+|-----------|------|-------------|
+| `src/app/api/` | 325 route handlers across 62 domains | Working on backend |
+| `src/components/` | 308 components by feature | Working on UI |
+| `src/hooks/` | 18 custom hooks (useAuth, useChat, useRadio, etc.) | Working on state |
+| `src/lib/` | Utils across 58 domains: auth, db, farcaster, music, publish, agents | Working on business logic |
+| `src/lib/agents/` | VAULT/BANKER/DEALER autonomous trading bots | Working on agents |
+| `src/lib/publish/` | Cross-platform posting (Farcaster, X, Bluesky) | Working on distribution |
+| `src/providers/` | Audio player, contexts | Working on player |
+| `community.config.ts` | All branding, channels, admin FIDs, contract addresses, nav | Forking or configuring |
+| `research/` | The numbered research library - count lives in `research/README.md`, never here | Use grep, not bulk reads |
+| `scripts/` | SQL migrations, wallet generation, webhook setup | DB or infra work |
+| `~/zao-vault/` | NOT in this repo - Zaal's vault: lane briefs, decisions, people, daily notes | Starting a lane, writing a handoff |
+
+## Where Knowledge Lives (the division)
+
+ZAOOS is not the only store, and this file was silent about that until 2026-08-26
+while five rules files already depended on the vault. Seven stores, each owning
+one thing. When two disagree, the one higher in this table wins.
+
+| Store | Where | Owns | Never holds |
+|---|---|---|---|
+| ICM boxes | useicm.com, bodies in `research/identity/icm-boxes/` | Brand truth - what a ZAO brand IS | Operational state |
+| Rules | `.claude/rules/*.md` | Operating policy that binds every session | Facts, task state |
+| Skills | `~/.claude/skills/<name>/` | Repeatable procedures | Policy, one-off notes |
+| Research library | `research/<topic>/NNNN-slug/` | Findings, decisions, the why, with sources | Current task state |
+| Vault | `~/zao-vault/` | Zaal's own thinking, lane briefs, people, decisions-with-why | Anything another store owns (its own rule) |
+| Cowork board | Supabase, via `~/bin/zao-tracker` | Task truth - what is open, who owns it, when | Knowledge |
+| Agent memory | `~/.claude/projects/*/memory/` | User + project facts an agent needs at boot | Operating lessons - those go to `.claude/rules/` |
+
+Precedence exists because a superseded decision otherwise wins an argument on
+recency alone. Two more rules go with it: use the newest APPROVED information,
+not merely the newest file; and if the answer is missing from all seven, say
+what you could not find rather than filling the gap (`anti-fabrication.md`).
+
+Routing a correction to the right store is `agent-loops.md` rule 6. Which
+surface may carry state at all is `handoff-discipline.md` rule 7.
+
+## Quick Start
+
+```bash
+npm install          # postinstall: patch-package + XMTP WASM copy
+npm run dev          # Turbopack
+npm run build        # production build
+npm run typecheck    # tsc --noEmit
+npm run test         # vitest
+npm run lint:biome   # biome check
+```
+
+Env vars: see `.env.example`. App wallet: `npx tsx scripts/generate-wallet.ts`.
+
+## Security (Non-Negotiable)
+
+- **NEVER** expose `SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY` to browser
+- **NEVER** use `dangerouslySetInnerHTML`
+- **NEVER** ask for user wallet private keys
+- All user input: Zod `safeParse` before processing
+- Supabase RLS on all tables. Service role = server-side only
+- XMTP keys are app-specific burner keys, never personal wallet keys
+
+## Boundaries
+
+> Mirrors [AGENTS.md](./AGENTS.md) Boundaries. **AGENTS.md is the source of truth** - if these drift, update AGENTS.md first then sync here.
+
+**Always do:**
+- Validate inputs with Zod, check session, return `NextResponse.json`
+- Use `@/` import alias
+- Mobile-first, dark theme (navy `#0a1628`, gold `#f5a623`)
+- Use `Promise.allSettled` for parallel fault-tolerant operations
+- Create PRs to main (never push directly)
+
+**Ask first:**
+- Database migrations or schema changes
+- New dependencies
+- Env var changes
+- Changes to `community.config.ts`
+- Changes to agent trading parameters
+
+**Never do:**
+- Commit secrets or `.env` files
+- Skip Zod validation on API routes
+- Use Redux/Zustand (we use React hooks + react-query)
+- Use CSS modules or inline styles (Tailwind only)
+- Pre-read large directories (spaces/ music/ governance/ zounz/) unless task requires it
+
+## Workflow Orchestration
+
+1. **Plan first.** For any task with 3+ steps or architectural decisions, enter plan mode (or use `/plan-eng-review` / `/plan-ceo-review`). Never start a non-trivial task without a plan visible to Zaal.
+2. **Subagents over inline work.** Offload research, code search, and multi-file analysis to Task/Agent tools. Keep main context for synthesis + decisions.
+3. **Self-improvement loop.** When Zaal corrects an approach, save the pattern to `~/.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/feedback_*.md`. Re-read relevant feedback memories at session start.
+4. **Verification before "done".** Never mark a task complete without proof: tests pass, build green, screenshot of UI, or explicit Zaal approval. Run `/qa` for UI features, `npm run typecheck` for code.
+5. **Elegance check on non-trivial changes.** Before committing, ask: "is there a simpler way?" Skip for trivial fixes.
+6. **Autonomous bug fixing.** Given a bug report, fix it without asking permission for each step. Use `/investigate` for root cause; only escalate if blocked.
+
+## Per-File Commands
+
+| File Pattern | Test | Lint |
+|-------------|------|------|
+| `src/app/api/**/*.ts` | `npx vitest run src/app/api/<feature>` | `npx biome check src/app/api/<feature>` |
+| `src/components/**/*.tsx` | `npx vitest run src/components/<feature>` | `npx biome check src/components/<feature>` |
+| `src/lib/**/*.ts` | `npx vitest run src/lib/<domain>` | `npx biome check src/lib/<domain>` |
+| Any file | `npm run typecheck` | `npm run lint:biome` |
+
+## Key Files
+
+- `community.config.ts` - branding, channels, contracts, nav
+- `src/middleware.ts` - rate limiting, CORS
+- `src/lib/auth/session.ts` - iron-session config
+- `src/lib/db/supabase.ts` - Supabase client
+- `src/lib/agents/runner.ts` - shared agent trading logic
+- `src/lib/agents/types.ts` - tokens, contracts, agent types
+- `SECURITY.md` - full security policy
+
+## Token Budget
+
+- Use `/compact` every 15-20 messages
+- Use grep on `research/*/README.md`, not bulk reads
+- Don't pre-read `src/components/spaces/` (40+), `music/` (30+), `governance/`, `zounz/`
+- Batch related questions into single messages
+- Surface tiering (which surface for which task; reserve the Claude Code weekly cap for grounded live-code): `.claude/rules/claude-usage.md`
+
+## Style
+
+- Say "Farcaster" not "Warpcast"
+- Mobile-first, desktop as enhancement
+- Document build steps (build-in-public)
+- Never generate wallet keys interactively
+
+## Skills
+
+See [Doc 154](research/154-skills-commands-master-reference/) for complete reference. Key commands: `/worksession`, `/z`, `/qa`, `/ship`, `/review`, `/zao-research`, `/autoresearch`, `/vps`.
+
+## MCP Tooling (see Doc 801 audit, Doc 802 starter guide)
+
+- **context7 (auto):** Always use context7 for library/API docs, code generation, setup, or config steps on Next.js, React, Wagmi, Viem, Supabase, or Tailwind - without being asked. Query it like a search ("Next.js 16 App Router middleware matcher config"), not a library name. Kills hallucinated APIs on the fast-moving stack.
+- **Serena for code edits:** Use Serena's symbol tools (`find_symbol`, `replace_symbol_body`, `find_referencing_symbols`, `rename_symbol`) for editing/refactoring ZAOOS code instead of whole-file Read/Edit - 60-80% fewer tokens, reference-safe renames. Use native Read/Grep only for quick read-only lookups.
+- **Disabled (do not propose):** gitnexus, ECC memory, sequential-thinking - 0 use, pure context cost.
+
+## gstack (Claude Code skill pack, vendored)
+
+`.claude/skills/gstack/` is Garry Tan's open-source gstack toolkit (MIT,
+github.com/garrytan/gstack), vendored so any teammate cloning ZAOOS gets it.
+For web browsing, prefer the `/browse` skill from gstack when
+its binary is built; fall back to `mcp__claude-in-chrome__*` when it is not.
+
+> **BOTH ARE ALLOWED - changed 2026-08-24 by Zaal ("allow both").** This rule
+> previously read "never `mcp__claude-in-chrome__*`". It was measured and the ban
+> was not holding: over 30 days and 377 transcripts, `claude-in-chrome` was called
+> **1,786 times**, the most-used MCP by a factor of two, because
+> `gstack/browse/dist/` has never been built and `/browse` therefore cannot run
+> (see `idle-lane-audit.md`, and doc 2411). A rule that mandates a broken tool does
+> not get followed - it gets routed around silently. So: check whether `/browse`
+> works, use it if it does, and reach for `claude-in-chrome` without ceremony if
+> it does not.
+
+Available gstack skills: `/office-hours`, `/plan-ceo-review`,
+`/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`,
+`/ship`, `/browse`, `/qa`, `/qa-only`, `/design-review`,
+`/setup-browser-cookies`, `/retro`, `/investigate`, `/document-release`,
+`/codex`, `/careful`, `/freeze`, `/guard`, `/unfreeze`, `/gstack-upgrade`.
+
+If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup`
+to build the binary and register skills (requires `bun`).
+
+## Primary Surfaces (post-doc-601 cleanup, 2026-05-04)
+
+ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into ZOE (its coder/critic/auto-PR brain is now ZOE's, not a separate bot). When proposing automation or new bots, check this list first.
+
+| Surface | What | Source of truth |
+|---------|------|-----------------|
+| **ZOE** (`@zaoclaw_bot`) | The orchestrator. Concierge (tasks, captures, brief/reflect, recall) + the autonomous fix-PR pipeline (coder + critic + auto-PR) folded in from Hermes | `bot/src/zoe/` + reuses `bot/src/hermes/` coder/critic/pr modules |
+| **ZAO Devz** (`@zaodevz_bot` + `@zoe_hermes_bot`) | **Dual-bot Coder + Critic runner** - boots two grammY bots in one process that narrate Hermes phases as distinct identities in the ZAO Devz chat, so the conversation reads like two agents checking each other's work. `/fix` runs Coder | `bot/src/devz/` (3 files; fold-in to ZOE as a group context pending) |
+| **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
+| **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
+
+**Decommissioned 2026-05-04 — do NOT propose, build, or restart:**
+
+- openclaw container + 7-agent squad (ZOEY/BUILDER/SCOUT/WALLET/FISHBOWLZ/CASTER) — source of "·" pings
+- Composio AO orchestrator
+- ZOE v2 / Agent Zero migration plan
+- 10-bot branded fleet ([retired partner]/Research/WaveWarZ/POIDH as own bots) — folds into ZOE memory blocks
+- zao-team-bots ([retired partner] + AttaBotty brand bots) — retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
+- Hermes as a SEPARATE bot (`@zoe_hermes_bot`) — adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
+- FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
+- **farscout** — superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). **STILL RUNNING as `farscout.service` on the VPS as of 2026-08-22** — 35 days uptime, 0.0% CPU, zero journald entries, zero files written in 30 days, while heartbeating `up` to the bots board. A zombie that reports healthy. Stopping it is Zaal's (`systemctl --user stop farscout && systemctl --user disable farscout`) — do not treat its heartbeat as evidence the fleet is working. Prior docs: 774 (what it was), 864 (board integration).
+
+> **Corrected 2026-08-22.** This row previously read "Group dispatch + hourly
+> learning tip." Both halves were wrong, verified against the deployed code and
+> git history: the module is a dual-bot Coder/Critic runner (`bot/src/devz/index.ts`
+> header), and the **hourly tip was a ZOE feature that was REPLACED on 2026-05-14**
+> by forward-nudges-from-task-queue (`64a2a398`, "replace hourly tips with forward
+> nudges from task queue", PR #519). Exhaustive grep of the whole 3-file devz module
+> on both the VPS and in this repo finds zero hourly/cron/setInterval/tip logic. The
+> table documented a removed feature, attributed to the wrong bot, for three months.
+
+**Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = a persona block in ZOE's runtime memory at `~/.zao/zoe/persona.md` / `~/.zao/zoe/human.md` (seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`; content voice lives in `bot/src/zoe/brand.md`), NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
+
+## ICM Context Boxes (AI-readable ZAO context)
+
+The ZAO ecosystem has permanent AI-readable context boxes on useicm.com - fetch one to load grounded context on any project or person:
+
+- Fetch: `curl -s https://useicm.com/api/objects/<id>/llm.txt`
+- Human directory: https://thezao.xyz/list
+- Start here: **zao-assistant** (`icm_-hsPHePpqX01RovoB_SEqA`) - the operator layer; it links to the rest (thezao, bettercallzaal, zabalgamez, wavewarz, farcaster, fractal, poidh, zuke, zao-festivals, coc-concertz, zao-newsletter, loop-engineering, milk-road).
+- Source of truth for box content: `research/identity/icm-boxes/`. Owner keys live at `~/.zao/private/icm-keys.json` (never commit).

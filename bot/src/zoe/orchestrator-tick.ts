@@ -37,6 +37,7 @@ import { parseQuestionCallback, encodeQuestion, type ParsedQuestion } from './qu
 import { routeQuestionToTopic, resolveQuestionTopic, openQuestionCapReport } from './telegram-routing';
 import { wasSendBlocked } from './send-budget';
 import { pushRecent, ZOE_PATHS } from './memory';
+import { readAnswers } from './answers';
 import { enqueueWork } from './work-loop';
 import { pushInboundRelays, sendRelayReply, laneFromReplyQid } from './relay-bridge';
 import { recordMessageContext } from './message-context';
@@ -282,10 +283,45 @@ async function releaseLock(): Promise<void> {
 }
 
 /**
- * Read the group's recent/<gid>.json (where callback-button answers are logged).
- * Return only Zaal's [answer:qid] lines with ts > lastSeenTs, excluding system senders.
+ * Return Zaal's answers with ts > lastSeenTs for this group.
+ *
+ * Reads answers.jsonl first (answers.ts): one line per answer, never truncated.
+ * Then the group's recent/<gid>.json ring buffer, which is what every answer
+ * used to be written to and the only place a pre-upgrade answer can still be.
+ * Measured 2026-10-08: recent/ holds RECENT_MAX = 8 turns, so 33 answers in
+ * ten minutes left eight for a tick that runs every five; the rest were gone
+ * before anything read them. Deduped on qid + ts so an answer present in both
+ * stores is reported once.
  */
 export async function detectNewAnswers(
+  lastSeenTs: string,
+  groupId: number,
+): Promise<Array<{ qid: string; value: string; ts: string }>> {
+  const seen = new Set<string>();
+  const out: Array<{ qid: string; value: string; ts: string }> = [];
+  for (const rec of await readAnswers({ since: lastSeenTs })) {
+    if (rec.scope !== String(groupId)) continue;
+    const key = `${rec.qid}|${rec.ts}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ qid: rec.qid, value: rec.value, ts: rec.ts });
+  }
+  for (const a of await detectNewAnswersFromRecent(lastSeenTs, groupId)) {
+    const key = `${a.qid}|${a.ts}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(a);
+  }
+  out.sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+  return out;
+}
+
+/**
+ * The pre-2026-10-08 reader, kept for answers that only exist in the ring
+ * buffer: the group's recent/<gid>.json, Zaal's [answer:qid] lines with
+ * ts > lastSeenTs, excluding system senders.
+ */
+async function detectNewAnswersFromRecent(
   lastSeenTs: string,
   groupId: number,
 ): Promise<Array<{ qid: string; value: string; ts: string }>> {

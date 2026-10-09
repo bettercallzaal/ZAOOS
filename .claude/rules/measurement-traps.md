@@ -70,6 +70,25 @@ RIGHT   ps -o pid=,lstart=,command= -p <pid> -> one is pgrep itself
 
 Produced a confident "two daemons are running, split-brain" report. There was one.
 
+**Second instance, 2026-10-09: a lane prompt is a command line too.**
+
+```
+WRONG   pgrep -f zao-auto-resolve                -> 2 PIDs, "it is running"
+RIGHT   zao-assert procs zao-auto-resolve        -> 0 running, 2 excluded:
+                                                    Claude sessions whose prompt names it
+```
+
+At 06:28 both hits were Claude Code lane sessions (the Grill, postiz). A
+`claude` process's argv IS its prompt, and lane prompts here routinely name the
+jobs they must not touch. So on this Mac any `-f` match is suspect, in both
+directions: it finds a job that is off, and a count of N can be N prompts.
+
+`zao-assert procs <regex>` (zaal-dotfiles, `bin/zao-assert`) matches like
+`pgrep -f`, then excludes a process whose own program is `claude` and its own
+process chain. It prints each exclusion and the unfiltered count beside its own,
+so the gap is visible. Exit 0 running, 1 not, 2 when `ps` cannot answer. The
+06:28 table is its red control (`bin/zao-assert-test`).
+
 ### 5. A stopped process is not stopped if a supervisor exists
 
 ```
@@ -302,7 +321,7 @@ Before reporting any measured claim, ask **which of these seven shapes am I in**
 1. Is this figure an average over a lifetime, or an interval?
 2. Have I run my detector against a known-good input?
 3. Am I reading source, or runtime?
-4. Could my search be matching itself?
+4. Could my search be matching itself, or a Claude prompt that names it?
 5. Is something supervising the thing I just changed?
 6. Does this provider actually observe what I am asking it to attribute?
 7. Did I assert on content, or on a status code?

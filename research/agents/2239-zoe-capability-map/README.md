@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-10-07
+last-validated: 2026-10-09
 related-docs: "2235, 2438, 2432, 2191, 770, 899, 875, 547, 632, 2244, 2586, 2628"
 original-query: "Research our zoe - ZOE, The ZAO's assistant: what it is today, measured (where it runs, what it does, what is live vs dead, what it costs, what breaks), how it fits with the Claude Code lanes and the orchestrator seat, and what to keep, fix or retire"
 tier: STANDARD
@@ -17,6 +17,27 @@ tier: STANDARD
 
 Re-research of doc 2239 in place (number and folder preserved). Written Sun 4 Oct 2026
 23:37 EDT (clock from `date`). `original-query` is the verbatim request.
+
+## First flag data point, 2026-10-09 (read-only from the VPS, 13:43 UTC by `date -u`)
+
+Two of the three flags from 2026-10-07 are ON. `bot/.env` on the live checkout
+reads `ZOE_STATUS_HOLD=1` and `ZOE_CLI_RESULT_CLASSIFY=1`; `ZOE_POST_PUBLISH` is
+absent (count 0). The file was last written 2026-10-08 10:10 UTC (`stat` mtime,
+a write time, not proof of when each line was added). zoe-bot active on
+`65a97a75`, 0 commits behind origin/main.
+
+| Flag | Measured effect | Surface |
+|---|---|---|
+| `ZOE_STATUS_HOLD` | Overflow now waits instead of dropping: `[zoe/scheduler] morning batch: released 52 deferred send(s)` at 2026-10-09 09:00:25 (one release line since 2026-10-08 10:00). Not checked: whether Zaal received that as one message or 52. | zoe-bot journal, 1,809 lines since 2026-10-08 10:00 |
+| `ZOE_CLI_RESULT_CLASSIFY` | The label stopped saying `unknown`: `lastFailKind: budget` at 2026-10-09 10:02 UTC, hint "per-call budget cap (--max-budget-usd) refused before the first API call - the caller's maxBudgetUsd is below the minimum cost of its own prompt". | `~/.zao/zoe/claude-health.json` |
+| `ZOE_POST_PUBLISH` | Not set; no data. | `bot/.env` count |
+
+**New finding from the classify flag:** the 10:02 failure is not a spend overrun.
+Some caller's `maxBudgetUsd` is below what its own prompt costs, so that call can
+never succeed. Which caller was not determined here; the hint text alone does not
+name it. Neither feature emits a `featureRan` line (only `post-publish` does,
+`bot/src/zoe/posts/buttons.ts:204`), so these effects were read from the
+scheduler log and the health file, not from `[zoe/ran]`.
 
 ## Re-validated 2026-10-07: ZOE today, measured from the VPS
 

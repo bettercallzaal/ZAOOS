@@ -62,6 +62,7 @@ import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING
 import { surfaceGrill } from './grill';
 import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
+import { quietEnabled, releaseQuietQueue } from './quiet-window';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
@@ -771,6 +772,32 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.warn('[zoe/scheduler] grill tick failed (nbd):', (err as Error).message);
         }
         }),
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Quiet window release (quiet-window.ts), Zaal 2026-10-10, seat grill items
+  // 94 and 95. Every five minutes: once the window is over, send what was held
+  // overnight, oldest first, each as itself with its buttons. A no-op inside
+  // the window, with an empty queue, or unless ZOE_QUIET=1. Each message keeps
+  // the class it was raised with, so the budget and the @ tag treat it as they
+  // would have at the time.
+  tasks.push(
+    cron.schedule(
+      '*/5 * * * *',
+      async () => {
+        if (!quietEnabled()) return;
+        try {
+          const r = await releaseQuietQueue({
+            send: (chatId, text, o) => opts.bot.api.sendMessage(chatId, text, o as never),
+            isBlocked: wasSendBlocked,
+          });
+          if (r.sent || r.kept) console.log(`[zoe/scheduler] quiet window: released ${r.sent}, kept ${r.kept}`);
+          if (r.sent) featureRan('quiet-window', `released ${r.sent}`);
+        } catch (err) {
+          console.error('[zoe/scheduler] quiet release failed:', (err as Error).message);
+        }
+      },
       { timezone: 'UTC' },
     ),
   );

@@ -147,6 +147,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { holdSend, shouldHold, stripOutageHint } from './quiet-window';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -855,10 +856,32 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     clean === undefined ? raw(chatId, text) : raw(chatId, text, clean);
 
   return async (chatId, rawText, opts) => {
-    const clean = stripSendClass(opts);
+    const clean = stripOutageHint(stripSendClass(opts));
     // Tag before anything else reads the text, so the budget log, a deferred
     // copy and the delivered message all carry the same words.
     const text = tagForZaal(rawText, resolveSendClass(opts), chatId);
+
+    // THE QUIET WINDOW (quiet-window.ts), before the budget and independent of
+    // it: at night a send is held with its buttons and sent in the morning. A
+    // held send resolves exactly like a budget-deferred one, so every caller
+    // that already checks wasSendBlocked does the right thing unchanged. If
+    // the queue cannot be written, holdSend says so and the message goes out.
+    const cls = resolveSendClass(opts);
+    if (shouldHold(cls, opts, now())) {
+      if (await holdSend({ at: now().toISOString(), cls, chatId, text, ...(clean ? { opts: clean } : {}) })) {
+        await logDecision({
+          at: now().toISOString(),
+          outcome: 'deferred',
+          cls,
+          chatId,
+          countBefore: 0,
+          cap: 0,
+          reason: 'quiet window - held until morning',
+          preview: text.slice(0, 120),
+        }).catch(() => {});
+        return blockedResult('deferred');
+      }
+    }
     if (!sendBudgetEnabled()) return passThrough(chatId, text, clean);
 
     let decision: SendDecision;

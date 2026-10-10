@@ -37,7 +37,10 @@ import {
   pickRunnable,
   resourceDocQuestion,
   resourcesRunToday,
+  parseResourceLink,
   selfUpgradeDailyCap,
+  selfUpgradeSnapshotEnabled,
+  takeResourceSnapshot,
 } from './self-upgrade';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
@@ -193,8 +196,27 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
     }
     const item = q[idx];
     const isResource = item.kind === 'resource';
+    // Stage 3 (doc 2652): snapshot the repo before the fit check. Fail closed:
+    // a missing tool or vault parks the item before any spend, naming what is
+    // missing, rather than running a fit check that silently lacks it.
+    let snapshot: string | undefined;
+    const link = isResource ? parseResourceLink(item.input) : null;
+    if (link && selfUpgradeSnapshotEnabled()) {
+      const snap = await takeResourceSnapshot(link);
+      if (!snap.ok) {
+        console.error(`[zoe/work-loop] self-upgrade snapshot unavailable: ${snap.reason}`);
+        await parkWork(item, 'needs-input', { stage: 'research', error: `snapshot: ${snap.reason}` });
+        await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
+        await reportFor(item, deps)(
+          `Self-upgrade: ${link.owner}/${link.repo} parked before the fit check - ${snap.reason}. Fix that, or set ZOE_SELF_UPGRADE_SNAPSHOT=0, then resume it.`,
+        ).catch(() => {});
+        return;
+      }
+      snapshot = snap.text;
+      featureRan('self-upgrade-snapshot', `${link.owner}/${link.repo}`);
+    }
     // The worker's goal: the input itself, or the fit-check brief for a resource.
-    const goal = isResource ? buildFitCheckGoal(item.input) : item.input;
+    const goal = isResource ? buildFitCheckGoal(item.input, snapshot) : item.input;
     // Captured from the research-doc hook so the receipt can point at the PR (R1b).
     let evidenceUrl: string | null = null;
     // The worker's own failure text. Without this, a FAILED worker and a

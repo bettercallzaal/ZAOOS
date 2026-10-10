@@ -13,6 +13,13 @@
  * with "recheck". The research path has had this guard since wasResearched;
  * the resource path skipped it until this change.
  *
+ * Stage 3 (snapshot, doc 2652): with ZOE_SELF_UPGRADE_SNAPSHOT=1 the work loop
+ * runs `zao-research-snapshot owner/repo` (zaal-dotfiles bin/, git-tracked)
+ * before the fit check and hands its figures to the worker. It FAILS CLOSED:
+ * if the tool or the vault clone it writes into is missing on this host, the
+ * item parks with a message naming what is missing, and the fit check does not
+ * run without it (Zaal, 2026-10-09 grill item 57).
+ *
  * Not in this PR, on purpose:
  *   - the build stage (doc 2652 stage 5: Hermes coder with a declared write-set).
  *     Doc 2652's gate table routes changes to bot/src/hermes to Zaal, so that is
@@ -23,9 +30,10 @@
  * resources run per day (default 2, doc 2652 Key Decision 8), inside the work
  * loop's own daily cap; one instance per resource via the work-loop lock.
  */
+import { execFile } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { delimiter, join } from 'node:path';
 
 export function selfUpgradeEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
   return env.ZOE_SELF_UPGRADE === '1';
@@ -141,12 +149,15 @@ export function resourceInput(link: ResourceLink): string {
  * Doc 2652's process note is why "origin/main, not a local copy" is spelled
  * out: a stale clone produced a confident wrong absence the day it was written.
  */
-export function buildFitCheckGoal(input: string): string {
+export function buildFitCheckGoal(input: string, snapshot?: string): string {
   const link = parseResourceLink(input);
   const target = link ? link.url : input;
   const steer = link?.note ? `\nZAAL'S STEER: ${link.note}\n` : '';
+  const snap = snapshot
+    ? `\nSNAPSHOT (zao-research-snapshot, taken by ZOE just now; quote these figures, do not re-derive them):\n${snapshot}\n`
+    : '';
   return `SELF-UPGRADE FIT CHECK for ${target}
-${steer}
+${steer}${snap}
 Goal: decide what ZOE (bot/src/zoe in bettercallzaal/ZAOOS) should take from this repo, grounded in OUR live code.
 
 Do, in order:
@@ -204,4 +215,94 @@ export async function bumpResourcesToday(date: string): Promise<void> {
  */
 export function pickRunnable(kinds: Array<'research' | 'resource'>, resourcesToday: number, cap: number): number {
   return kinds.findIndex((k) => k !== 'resource' || resourcesToday < cap);
+}
+
+// ---------------------------------------------------------------------------
+// Stage 3: the snapshot, taken before the fit check
+// ---------------------------------------------------------------------------
+
+export function selfUpgradeSnapshotEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_SELF_UPGRADE_SNAPSHOT === '1';
+}
+
+export const SNAPSHOT_BIN = 'zao-research-snapshot';
+const SNAPSHOT_TIMEOUT_MS = 120_000;
+/** The worker prompt carries the snapshot; one repo's output is ~15 lines. */
+const SNAPSHOT_MAX_CHARS = 3000;
+
+export type SnapshotResult = { ok: true; text: string } | { ok: false; reason: string };
+
+/**
+ * Where the tool would run from: every PATH entry, then ~/bin. The systemd
+ * user unit's PATH does not normally include ~/bin, which is where the
+ * dotfiles bin lands, so it is searched explicitly rather than assumed.
+ */
+export function snapshotBinCandidates(env: NodeJS.ProcessEnv = process.env, home: string = homedir()): string[] {
+  const dirs = (env.PATH ?? '').split(delimiter).filter(Boolean);
+  const bin = join(home, 'bin');
+  if (!dirs.includes(bin)) dirs.push(bin);
+  return dirs.map((d) => join(d, SNAPSHOT_BIN));
+}
+
+async function isExecutable(path: string): Promise<boolean> {
+  try {
+    await fs.access(path, 1 /* X_OK */);
+    return (await fs.stat(path)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Run the snapshot for one repo. Never throws; a failure says what failed.
+ *
+ * The vault check comes first and is why this is fail-closed rather than
+ * best-effort: the tool appends to ~/zao-vault/projects/*.csv, and with no
+ * clone there it would create a fresh directory nobody reads, report success,
+ * and every snapshot would fall on the floor (the grill-queue.ts lesson).
+ */
+export async function takeResourceSnapshot(
+  link: ResourceLink,
+  env: NodeJS.ProcessEnv = process.env,
+  home: string = homedir(),
+): Promise<SnapshotResult> {
+  const vault = join(home, 'zao-vault');
+  try {
+    await fs.stat(join(vault, '.git'));
+  } catch {
+    return { ok: false, reason: `no vault clone at ${vault} (the snapshot writes projects/research-snapshots.csv there)` };
+  }
+  const candidates = snapshotBinCandidates(env, home);
+  let bin: string | null = null;
+  for (const c of candidates) {
+    if (await isExecutable(c)) {
+      bin = c;
+      break;
+    }
+  }
+  if (!bin) {
+    const dirs = candidates.map((c) => c.slice(0, -SNAPSHOT_BIN.length - 1));
+    return { ok: false, reason: `${SNAPSHOT_BIN} is not on this host (searched ${dirs.join(', ')})` };
+  }
+  const found = bin;
+  return new Promise((resolve) => {
+    execFile(
+      found,
+      [`${link.owner}/${link.repo}`],
+      { timeout: SNAPSHOT_TIMEOUT_MS, env: { ...env, HOME: home }, maxBuffer: 1024 * 1024 },
+      (err, stdout, stderr) => {
+        if (err) {
+          const why = String(stderr || err.message).trim().split('\n').slice(-3).join(' | ');
+          resolve({ ok: false, reason: `${SNAPSHOT_BIN} failed: ${why.slice(0, 300)}` });
+          return;
+        }
+        const text = String(stdout).trim();
+        if (!text) {
+          resolve({ ok: false, reason: `${SNAPSHOT_BIN} printed nothing for ${link.owner}/${link.repo}` });
+          return;
+        }
+        resolve({ ok: true, text: text.slice(0, SNAPSHOT_MAX_CHARS) });
+      },
+    );
+  });
 }

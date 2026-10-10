@@ -112,6 +112,29 @@ describe('runAnswerLoopTick', () => {
     expect(s.sent).toHaveLength(1);
   });
 
+  it('an outcome replies under the answer it followed, not a later re-ask', async () => {
+    const outcomes = join(tmp, 'answer-outcomes.jsonl');
+    const answers = join(tmp, 'answers.jsonl');
+    await fs.writeFile(
+      answers,
+      `${JSON.stringify({ ...ans('q1', '2026-10-10T01:00:00Z', 'first'), messageId: 1 })}\n` +
+        `${JSON.stringify({ ...ans('q1', '2026-10-10T05:00:00Z', 'second'), messageId: 2 })}\n`,
+    );
+    await fs.writeFile(outcomes, `${JSON.stringify(out('q1', '2026-10-10T03:00:00Z', 'acted on first'))}\n`);
+    const s = sender();
+    await runAnswerLoopTick({ send: s.send, defaultChat: '-999', now: morning });
+    expect(s.sent[0]).toMatchObject({ replyTo: 1 });
+    expect(s.sent[0].text).toContain('You answered: first');
+  });
+
+  it('an outcome older than every answer goes to the default chat, unlinked', async () => {
+    await fs.writeFile(join(tmp, 'answers.jsonl'), `${JSON.stringify({ ...ans('q1', '2026-10-10T05:00:00Z'), messageId: 2 })}\n`);
+    await fs.writeFile(join(tmp, 'answer-outcomes.jsonl'), `${JSON.stringify(out('q1', '2026-10-10T03:00:00Z'))}\n`);
+    const s = sender();
+    await runAnswerLoopTick({ send: s.send, defaultChat: '-999', now: morning });
+    expect(s.sent[0]).toMatchObject({ chat: '-999', replyTo: undefined });
+  });
+
   it('a failed send is retried next tick, not marked reported', async () => {
     await recordOutcome('q1', 'merged', 'seat');
     const s = sender([false, true]);

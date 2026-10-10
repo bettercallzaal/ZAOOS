@@ -125,6 +125,20 @@ function latestAnswers(answers: AnswerRecord[]): Map<string, AnswerRecord> {
   return m;
 }
 
+/**
+ * The answer an outcome reports on: the newest answer for its qid at or before
+ * the outcome. Not simply the newest answer - a question re-asked under the same
+ * qid would otherwise collect a late outcome meant for the earlier ask.
+ */
+export function answerForOutcome(answers: AnswerRecord[], o: OutcomeRecord): AnswerRecord | undefined {
+  let best: AnswerRecord | undefined;
+  for (const a of answers) {
+    if (a.qid !== o.qid || a.ts > o.ts) continue;
+    if (!best || a.ts >= best.ts) best = a;
+  }
+  return best;
+}
+
 export function formatReport(o: OutcomeRecord, answer?: AnswerRecord): string {
   const lines = [`Done (${o.qid}): ${o.text}`];
   if (answer) lines.push(`You answered: ${answer.value}`);
@@ -197,13 +211,12 @@ export interface AnswerLoopResult {
 export async function runAnswerLoopTick(deps: AnswerLoopDeps): Promise<AnswerLoopResult> {
   const [answers, outcomes, state] = await Promise.all([readAnswers(), readOutcomes(), readState()]);
   const done = new Set(state.reported);
-  const latest = latestAnswers(answers);
   let reported = 0;
   let dirty = false;
   for (const o of outcomes) {
     const key = outcomeKey(o);
     if (done.has(key)) continue;
-    const a = latest.get(o.qid);
+    const a = answerForOutcome(answers, o);
     const chat = a && a.scope && a.scope !== 'private' ? a.scope : deps.defaultChat;
     const ok = await deps.send(chat, formatReport(o, a), a?.messageId).catch(() => false);
     if (!ok) continue;

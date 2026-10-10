@@ -836,7 +836,18 @@ describe('deferred queue runaway guard', () => {
     const { send } = recordingSend();
     const gated = gateSend(send);
     await gated(1, 'burns the cap');
-    for (let i = 0; i < MAX_DEFERRED + 5; i++) {
+    // Seed a full queue on disk, then push 5 more through the gate. Until
+    // 2026-10-10 this made 205 sequential gated sends; on CI (ZAOOS #3870)
+    // the loop stalled near 181, hit the 5s timeout, and kept running after
+    // it, writing into the NEXT test's ZOE_HOME (zoeHome() is read per call)
+    // and failing that test too. Five sends cover the same trim path.
+    await fs.writeFile(
+      join(home, 'send-deferred.jsonl'),
+      Array.from({ length: MAX_DEFERRED }, (_, i) =>
+        JSON.stringify({ at: 'x', cls: 'digest', chatId: 1, text: `held ${i}` }),
+      ).join('\n') + '\n',
+    );
+    for (let i = MAX_DEFERRED; i < MAX_DEFERRED + 5; i++) {
       // eslint-disable-next-line no-await-in-loop
       await gated(1, `held ${i}`, { zoeSendClass: 'digest' });
     }
@@ -844,6 +855,7 @@ describe('deferred queue runaway guard', () => {
     expect(queued).toHaveLength(MAX_DEFERRED);
     // The newest survive; the oldest are the ones reported as dropped.
     expect(queued[queued.length - 1].text).toBe(`held ${MAX_DEFERRED + 4}`);
+    expect(queued[0].text).toBe('held 5');
   });
 });
 

@@ -150,7 +150,7 @@ Design a minimal experiment that definitively proves or disproves the hypothesis
 **Experiment rules:**
 - ONE experiment per iteration (atomic — know exactly what you tested)
 - Record the exact command/action and its output
-- If experiment is destructive, git stash first
+- If experiment is destructive, run it in a throwaway worktree, or make a WIP commit first with `git add -A` so untracked files are included (see Differential Debugging below)
 - Timeout: if an experiment takes >30 seconds, it's too complex — simplify
 
 ## Phase 5: Classify — What Did We Learn?
@@ -248,9 +248,21 @@ Comment out half the suspicious code. If bug disappears, it's in that half. Repe
 
 ### Differential Debugging
 Compare working state vs broken state:
-- `git stash` to test clean state
+- A clean state to test against: `git worktree add --detach <path> HEAD` gives a tree with no untracked files. To clean the current tree in place, make a WIP commit with `git add -A`, then run `git status --porcelain` and see it print NOTHING
 - `git bisect` to find exact breaking commit
 - Environment variables diff between working/failing environments
+
+> **Superseded 2026-10-10.** This step used to say `git stash`, and the
+> experiment rule above said "git stash first". Plain `git stash` does not stash
+> untracked files, so the "clean state" it produces still holds every artifact
+> the last run wrote, and the next measurement is contaminated by the previous
+> one. `zao-instruments --scan` flags it as a surface that cannot answer "a
+> working tree was reverted" (research doc 2496, Finding 4). The dotfiles copy
+> of this file was corrected on 2026-09-17 to `git stash -u`; this copy uses a
+> worktree or a WIP commit instead, because in this estate the stash stack is
+> shared by every worktree of the repo and another session can pop an entry it
+> did not push. Whichever form you use, the check is the same: `git status
+> --porcelain` must print nothing before you call the tree clean.
 
 ### Minimal Reproduction
 Strip away everything until you have the smallest possible case that reproduces the bug. Fewer moving parts = clearer cause.

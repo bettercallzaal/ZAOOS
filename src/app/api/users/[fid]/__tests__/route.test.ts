@@ -737,7 +737,7 @@ describe('GET /api/users/[fid]', () => {
         params: Promise.resolve({ fid: '999' }),
       });
 
-      expect(activityChain.chain.select).toHaveBeenCalledWith('reactions, replies_count');
+      expect(activityChain.chain.select).toHaveBeenCalledWith('hash, reactions, replies_count');
       expect(activityChain.chain.eq).toHaveBeenCalledWith('fid', 999);
       expect(activityChain.chain.order).toHaveBeenCalledWith('timestamp', { ascending: false });
       expect(activityChain.chain.limit).toHaveBeenCalledWith(200);

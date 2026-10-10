@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
 import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
@@ -189,8 +190,8 @@ export async function GET(req: NextRequest) {
           )
           .order('timestamp', { ascending: false })
           .limit(perSource)
-          .then(({ data: casts }) => {
-            for (const c of casts || []) {
+          .then(async ({ data: casts }) => {
+            for (const c of await dropHiddenCasts(casts || [], 'activity-feed')) {
               const preview =
                 (c.text || '').slice(0, 80) + ((c.text || '').length > 80 ? '...' : '');
               activities.push({

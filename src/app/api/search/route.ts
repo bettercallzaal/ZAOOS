@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
 import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -124,7 +125,7 @@ export async function GET(req: NextRequest) {
             .limit(limit);
 
           if (data) {
-            for (const row of data) {
+            for (const row of await dropHiddenCasts(data, 'search')) {
               results.push({
                 type: 'cast',
                 id: row.hash,

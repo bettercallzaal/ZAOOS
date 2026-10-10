@@ -60,6 +60,7 @@ import { surfaceNudges } from './nudge';
 import { resolveForumThread } from './topics';
 import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING_THREAD, ZAAL_BOTZ_ZAOSTOCK_THREAD, groupIds } from './env';
 import { surfaceGrill } from './grill';
+import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
@@ -1772,6 +1773,45 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           if (n > 0) console.log(`[zoe/scheduler] surfaced ${n} ZAOstock approval-queue item(s)`);
         } catch (err) {
           console.warn('[zoe/scheduler] ZAOstock approvals surface failed (nbd):', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Answer loop (answer-loop.ts) - every 10 min, reply under each answered
+  // question with what the answer changed, and once a day list answers nobody
+  // reported back on. No-op unless ZOE_ANSWER_LOOP=1. Status class, so
+  // ZOE_ATTENTION folds it into the digest like any other status line.
+  tasks.push(
+    cron.schedule(
+      '*/10 * * * *',
+      async () => {
+        if (!answerLoopEnabled()) return;
+        const gid = groupIds().zaalBotzGroup;
+        if (!gid) return;
+        try {
+          await runWithSendClass('status', () =>
+            runAnswerLoopTick({
+              defaultChat: String(gid),
+              now: new Date(),
+              // A budget-dropped send RESOLVES (send-budget.ts gateSend), so the
+              // result is read rather than trusted: dropped = not sent, retried
+              // next tick; deferred = held for the digest, counted as handed off.
+              send: async (chatId, text, replyTo) => {
+                const r = await opts.bot.api.sendMessage(
+                  chatId,
+                  text,
+                  replyTo
+                    ? { reply_parameters: { message_id: replyTo, allow_sending_without_reply: true } }
+                    : {},
+                );
+                return !wasSendBlocked(r) || (r as { zoeSendBudget?: string }).zoeSendBudget === 'deferred';
+              },
+            }),
+          );
+        } catch (err) {
+          console.error('[zoe/scheduler] answer loop failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

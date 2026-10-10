@@ -1061,7 +1061,7 @@ bot.on('callback_query:data', async (ctx, next) => {
       }
       // answers.jsonl first (durable, findable by qid), then the recent/ bridge line.
       // 2026-10-08: 33 answers in ten minutes left eight readable in the ring buffer.
-      await recordAnswer(q.qid, q.value, 'zaalbotz-btn', String(gid)).catch((e) =>
+      await recordAnswer(q.qid, q.value, 'zaalbotz-btn', String(gid), { messageId: pinnedMid }).catch((e) =>
         console.error('[zoe/index] q-answer log failed:', (e as Error)?.message),
       );
     }
@@ -1085,7 +1085,7 @@ bot.on('callback_query:data', async (ctx, next) => {
     if (mid) {
       await ctx.api.unpinChatMessage(gid, mid).catch(() => {});
     }
-    await recordAnswer(r.qid, r.reaction, 'zaalbotz-btn', String(gid)).catch((e) =>
+    await recordAnswer(r.qid, r.reaction, 'zaalbotz-btn', String(gid), { messageId: mid }).catch((e) =>
       console.error('[zoe/index] r-answer log failed:', (e as Error)?.message),
     );
     return;

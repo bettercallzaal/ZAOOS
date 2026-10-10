@@ -34,6 +34,9 @@ export interface AnswerRecord {
   scope: string;
   /** ISO timestamp, written by this module from the clock. */
   ts: string;
+  /** The question's Telegram message id, when the answer came from its button.
+   *  answer-loop.ts replies to it so the result sits under the question. */
+  messageId?: number;
 }
 
 /** Resolved at call time, like orchestrator-tick, so a test can point ZOE_HOME
@@ -65,8 +68,16 @@ export async function recordAnswer(
   value: string,
   sender: string,
   scope: ChatScope,
+  opts: { messageId?: number } = {},
 ): Promise<AnswerRecord> {
-  const rec: AnswerRecord = { qid, value, sender, scope: String(scope), ts: new Date().toISOString() };
+  const rec: AnswerRecord = {
+    qid,
+    value,
+    sender,
+    scope: String(scope),
+    ts: new Date().toISOString(),
+    ...(opts.messageId ? { messageId: opts.messageId } : {}),
+  };
   // Both stores are attempted even when one fails: an answer that reaches only
   // the ring buffer is still readable for a while, and one that reaches only the
   // index is still readable by qid. Only when BOTH writes fail does this throw,

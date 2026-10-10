@@ -18,10 +18,10 @@ lane: zao-core
 | # | Decision | Recommendation | Why |
 |---|----------|----------------|-----|
 | 1 | One definition of Respect weight everywhere | **Respect weight = whole OG + ZOR, read live from Optimism, truncated to integers.** Every surface prints the two balances and the sum, and names the ledger it read | Item 78 (grill 2026-10-10). OG is an 18-decimal ERC-20, ZOR an integer ERC-1155; zingfisher PR #2 fixes the fork to this (pinned: Zaal 3,094 + 858 = 3,952). ZAO OS already does it (`src/lib/respect/voteWeight.ts`). The Snapshot space already does it (doc 2642). OREC does not yet (reads frozen OG) and is the one surface that needs a proposal, not code |
-| 2 | Gate access with CharmVerse's own token gates, not a parallel gate | **USE `TokenGate` + `TokenGateToRole`** (`packages/lib/src/tokenGates/`) for "who may see or do what". Keep `respectGate.ts` only for weight and display | CharmVerse gates already evaluate ERC20 with on-chain `decimals()`, ERC1155 by token id, and **Hats** by `isWearerOfHat` (`validateTokenGateCondition.ts:42-60, 76`), and map a passing gate to a Role. The fork's `ZaoMemberGate` duplicates a subset of this, still says "$ZABAL (Base)" against item 3, and gates one page (`pages/learn.tsx:71`) |
+| 2 | Gate access with CharmVerse's own token gates, not a parallel gate | **USE `TokenGate` + `TokenGateToRole`** (`packages/lib/src/tokenGates/`) for "who may see or do what". Keep `respectGate.ts` only for weight and display | CharmVerse gates already evaluate ERC20 with on-chain `decimals()` (`packages/lib/src/tokenGates/validateTokenGateCondition.ts:42-54` at zingfisher a8214a99), **Hats** through the Hats contract's `balanceOf` (same file, 56-67), and ERC1155 by token id (76-87), and map a passing gate to a Role. The fork's `ZaoMemberGate` duplicates a subset of this, still says "$ZABAL (Base)" at lines 12, 40 and 41 against 09-22 morning item 6, and gates one page (`pages/learn.tsx:71`) |
 | 3 | Roles come from Hats, rights come from Respect | **A hat is a role; Respect is standing.** Tree 226 hats map to CharmVerse roles through the Hats gate type. No hat grants vote weight or proposal power until Season 3's Manifesto Hat ships | Grill 2026-09-22 afternoon item 18: org chart only. ZIP-2 section 5: achievements, titles and roles through Hats after a human-checked phase. Hats voting modules are flat per hat and never balance-weighted (season3-hats-protocol-research Q6), so weight stays with the token |
 | 4 | The fractal is the only mint path for governance Respect | **Nothing in zingfisher or Hats creates Respect.** The weekly game ranks, OREC mints ZOR; one-time achievements become OG through OREC custom transactions (09-26 r1); festivals and sub-DAOs get their own ledgers (09-26 r2) | Grill 2026-09-22 item 26, verbatim: "the only way to get governance in the zao is participating in fractals". ZIP-2 section 2: existing holders keep every point; nothing burns (09-26 r6) |
-| 5 | Three gates, not one | **Read: anyone. Comment: any member (ZID). Endorse and vote: Respect > 0. Publish: 1,000 peer Respect behind the draft.** Weight at vote: OG + ZOR snapshotted at proposal open | Grill 2026-09-22 items 2, 3, 15 and 09-22 morning item 4. Zero-Respect members read and comment (item 15), which keeps the 1,000 peer bar meaningful |
+| 5 | Three gates, not one | **Read: anyone. Comment: any member (ZID). Endorse and vote: Respect > 0. Publish: 1,000 peer Respect behind the draft.** Weight at vote: OG + ZOR snapshotted at proposal open | Grill 2026-09-22 morning items 1 (weight), 2 (any Respect drafts; 1,000 peer Respect publishes), 3 (snapshot at open) and 15 (zero-Respect members read and comment), which keeps the 1,000 peer bar meaningful |
 | 6 | Vote strategy inside CharmVerse | **Extend the `token` vote strategy to carry two Snapshot strategies** (`erc20-balance-of` on OG with decimals 18, `erc1155-balance-of` on ZOR id 0) at `blockNumber`; or use the `snapshot` strategy and let the Snapshot space do the sum | CharmVerse `Vote.strategy` is `regular`, `token` or `snapshot` (`schema.prisma:280-284`); `token` calls `score.snapshot.org get_vp` with one `erc20-balance-of` strategy (`packages/lib/src/snapshot/getTokenAmountOnBlockNumber.ts`). The Snapshot space `zaal.eth` already carries both strategies, so the sum is one payload change, not a new scorer. Item 79: holder votes on ZIPs run in Snapshot; zingfisher's vote is advisory |
 
 ## What Respect does, surface by surface
@@ -60,11 +60,11 @@ lane: zao-core
 |---|---|---|---|
 | Read any proposal or page | Anyone with the link | None | Item 15 |
 | Comment, discuss | Any member with a ZID | CharmVerse space membership | Items 12, 15 |
-| Draft a proposal | Respect weight > 0 | TokenGate ERC20 OG OR ERC1155 ZOR, quantity 1, mapped to role "Respect holder" | 09-22 morning item 4 |
-| Endorse a draft | Respect weight > 0; endorsement carries the endorser's weight | Role "Respect holder"; sum of endorsers' weights | Item 4, item 15 |
-| Publish to vote | 1,000 Respect from peers (author excluded, open question in the spec) | Sum reaches 1,000 | Item 4 verbatim: "publish get to 1000 respect from peers" |
-| Vote | Respect weight > 0 at proposal open | `Vote.strategy = token`, `blockNumber` = open block, two Snapshot strategies | Items 1, 3, 6 |
-| Pass | 72 h vote then 72 h veto | Vote deadline + a second evaluation step | Item 6: "match orec for now" |
+| Draft a proposal | Respect weight > 0 | TokenGate ERC20 OG OR ERC1155 ZOR, quantity 1, mapped to role "Respect holder" | 09-22 morning item 2 |
+| Endorse a draft | Respect weight > 0; endorsement carries the endorser's weight | Role "Respect holder"; sum of endorsers' weights | Items 2 and 15 |
+| Publish to vote | 1,000 Respect from peers (author excluded, open question in the spec) | Sum reaches 1,000 | Item 2 verbatim: "publish get to 1000 respect from peers" |
+| Vote | Respect weight > 0 at proposal open | `Vote.strategy = token`, `blockNumber` = open block, two Snapshot strategies | Items 1 and 3 |
+| Pass | 72 h vote then 72 h veto | Vote deadline + a second evaluation step | Item 4: "match orec for now" |
 | Execute | Nobody automatically | Advisory record; OREC by hand; ZIP approval on Snapshot | Item 7, item 79 |
 | Hold a role | Wearer of the hat | TokenGate type Hats, tree 226 hat id | Item 18, doc 059 |
 | Earn Respect | Fractal participants only | Not in the platform | Item 26 |
@@ -73,7 +73,7 @@ lane: zao-core
 
 - A new token, a bridge, or any mint from the platform (item 26; 09-22 item 10 reading: specs, never mints).
 - Hat-weighted votes. No found mechanism multiplies a hat by a balance; flat-per-hat voting would contradict item 78.
-- $ZABAL anywhere in the gate (09-22 morning item 3). The fork's `ZaoMemberGate.tsx:9-11, 32-34` copy still names it.
+- $ZABAL anywhere in the gate (09-22 morning item 6). The fork's `ZaoMemberGate.tsx` still names it at lines 12, 40 and 41 (zingfisher a8214a99).
 - A second gate implementation. CharmVerse's `TokenGate` covers ERC20, ERC1155 and Hats on any EVM chain id; the fork's `PARENT_ZAO_GATES` becomes seed data for two `TokenGate` rows, not a competing system.
 
 ## Also See

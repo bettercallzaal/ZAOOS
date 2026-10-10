@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-09-25
+last-validated: 2026-10-10
 superseded-by:
 related-docs: 507, 2467, 552, 137, 2411, 2276
 original-query: "/zao-research claude skills"
@@ -22,6 +22,47 @@ tier: STANDARD
 | 3 | **Audit skills for WRONG INSTRUCTIONS, not for unused ones.** | Re-confirmed 2026-09-25: 29 of 64 real on-disk skills have never been invoked across 4,125 transcripts and cost nothing while idle (unchanged shape from the original 31-of-93 finding). One skill with a wrong verification step still costs more than a shelf of unused ones. | `zao-skill-audit --json`, re-run 2026-09-25; doc 2276 |
 | 4 | **Every verification step names the surface that can answer it.** | Nine of ten failures in eight hours were one shape: a surface was checked that could not report the state asked about. The registry has grown since - 27 claims now (was 18) - but the SAME broken instruction (`git stash` without `-u`) that was fixed in the dotfiles copy on 2026-09-17 is still live, unfixed, in the ZAOOS copy of the same file, and the Next Action to scan and fix it (due 2026-09-24) is now overdue. | `claude/instruments.md`, `bin/zao-instruments --scan` re-run 2026-09-25 |
 | 5 | **A lesson recorded in a comment must become a test.** | Updated 2026-09-25: 69 executables now record a lesson (was 50), 43 carry a test (was 23), 26 are on the debt list (was 27) - the raw debt count barely moved, but that number hides the real result: `zao-lesson-has-test --json` reports zero new lessons added without a test since the gate shipped, so the entire 26-item debt is pre-gate legacy and none of the growth from 50 to 69 added new debt. | `bin/zao-lesson-has-test --json`, re-run 2026-09-25 |
+
+## Re-validation 2026-10-10
+
+Every figure below was measured on 2026-10-10 on this Mac, with `~/zaal-dotfiles` on branch `main` (`git branch --show-current`). Where a number differs from the 2026-09-25 text further down, this section is the current one. The older text is kept as the record of what was true then.
+
+| Measure | 2026-09-25 | 2026-10-10 | Source |
+|---|---|---|---|
+| transcripts scanned | 4,125 | 4,630 | `zao-skill-audit --json` |
+| skills with a `SKILL.md` | 64 | 57 | glob of `~/.claude/skills/*/SKILL.md`; the audit's on-disk rows match the same 57 names |
+| on-disk skills invoked at least once | 35 | 34 | `zao-skill-audit --json`, rows filtered to the 57 |
+| on-disk skills never invoked | 29 | 23 | same |
+| audit rows in total (raw, unfiltered) | 101 | 102 (75 invoked, 27 never) | same |
+| name plus description chars | 22,501 | 21,099 | YAML parse of each frontmatter block, single-line fallback |
+| strict-YAML frontmatter failures | 7 | 7, the same seven | `yaml.safe_load` |
+| skills with no frontmatter | 1 (`tclip`) | 0 | same; `tclip` now carries `name:` and `description:` |
+| descriptions over 500 chars | 3 | 3: `claude-creativity` 642, `drunk-claude` 598, `seat` 541 | same |
+| `claude/instruments.md` claims | 27 | 27 | `zao-instruments --json --list` |
+| lessons recorded | 69 | 83 | `zao-lesson-has-test --json` |
+| lesson debt (no test) | 26 | 24 | same; `new_without_test` is empty |
+
+Top invoked, ranking unchanged: `zao-research` 262 (was 218), `handoff` 112 (was 82), `clipboard` 77 (was 60), `quick-grill` 60 (was 57).
+
+**What changed in substance.**
+
+1. **The three largest never-invoked skills are gone from the tree.** `last30days`, `tutorial-creator` and `graphify` no longer have a directory under `~/.claude/skills` (`ls -d` on each returns "No such file or directory"). The largest never-invoked on-disk skills are now `gstack` (6,600 estimated tokens), `audit-skill` (4,599) and `seat` (2,839). Whether doc 2276's table records the cut was not checked in this pass.
+2. **The dotfiles instrument scan, clean on 2026-09-25, now fails.** `zao-instruments --scan` exits 1 with two steps, both in `claude/skills/vw/SKILL.md` (lines 55 and 67): each greps a curled page for `href="..."` to claim a link is present, which is the href-only link sweep this doc lists in Finding 3. New since the last validation.
+3. **The ZAOOS copy of the `git stash` instruction is still unfixed.** `zao-instruments --scan` against `~/Documents/ZAO OS V1/.claude/skills` still fails on `autoresearch/references/debug-workflow.md:251`, and `git grep` on ZAOOS `origin/main` shows the same line. Due 2026-09-24, then 2026-09-29; overdue twice.
+4. **The always-on ratio.** Name plus description chars are 21,099 against 665,373 chars for the 57 whole `SKILL.md` files, about 3.2 percent. The 2026-09-25 row reported 925,802 "skill-body chars" without saying whether frontmatter was counted, so the two percentages are not a like-for-like trend. Decision 2 still holds on either reading: a few percent is not the binding constraint.
+5. **The future-dated `last_used` anomaly did not recur.** The latest `last_used` in this run is 2026-10-10, the day of the run.
+
+**Next Actions from 2026-09-25, checked:**
+
+| Row | State on 2026-10-10 |
+|---|---|
+| Fix the ZAOOS `git stash` line | NOT DONE (item 3 above) |
+| Cut or justify `last30days`, `tutorial-creator`, `graphify` | Cut from the tree; doc 2276 not checked |
+| Fix frontmatter on 8 skills | 1 of 8: `tclip` fixed, the seven unquoted-colon descriptions unchanged |
+| Trim three descriptions to 500 chars | NOT DONE (642, 598, 541) |
+| Lesson debt to 21 or lower | NOT MET: 24 |
+
+**Not re-measured in this pass:** the `zao-research-snapshot anthropics/skills` diff (the repo's headline numbers were re-read with `gh api`, see Sources), and Findings 3, 5 and 7, which are a historical account of 2026-09-16/17.
 
 ## Findings
 
@@ -153,9 +194,17 @@ All six related-doc numbers above were resolved with `zao-research-health --reso
 | Fix frontmatter on the 8 skills found broken 2026-09-25: `tclip` has no frontmatter at all; `audit-skill`, `autoresearch`, `capture`, `design-review`, `gstack`, `orchestration`, `platform` fail strict YAML parsing on an unquoted colon in `description:` | @Zaal | PR to dotfiles | 2026-10-02 |
 | Trim `claude-creativity` (642 chars), `drunk-claude` (598), and `seat` (540) to at or under the 500-character description guidance | @Zaal | PR to dotfiles | 2026-10-02 |
 | Shrink the lesson-debt census from 26 by writing tests for the 5 most-invoked tools still on it; `zao-lesson-has-test --json` debt must read 21 or lower | @Zaal | PR to dotfiles | 2026-10-08 |
-| Re-validate this doc again: fresh `zao-skill-audit --json` run, fresh `zao-research-snapshot anthropics/skills` diff, and check whether the five rows above shipped | @Zaal | Research | 2026-10-25 |
+| DONE 2026-10-10 (card 10305), except the snapshot diff: fresh `zao-skill-audit --json` run and the five rows above checked - see "Re-validation 2026-10-10" | @Zaal | Research | Done 2026-10-10 |
+| Replace the two href-only greps in `claude/skills/vw/SKILL.md` (lines 55 and 67) so `zao-instruments --scan` prints OK on the dotfiles tree again | @Zaal | PR to dotfiles | 2026-10-17 |
+| Re-validate this doc again: fresh `zao-skill-audit --json` run, the `zao-research-snapshot anthropics/skills` diff skipped on 2026-10-10, and the open rows above | @Zaal | Research | 2026-11-10 |
 
 ## Sources
+
+- **This estate, measured 2026-10-10** - **[FULL, METHOD: local commands]** `zao-skill-audit --json` (4,630 transcripts); `zao-instruments --scan` on the dotfiles tree and on `~/Documents/ZAO OS V1/.claude/skills`; `zao-instruments --json --list`; `zao-lesson-has-test --json`; a `yaml.safe_load` parse of the 57 `~/.claude/skills/*/SKILL.md` frontmatter blocks; `git grep` on ZAOOS `origin/main` for the `git stash` line.
+- [anthropics/skills](https://github.com/anthropics/skills) - **[FULL, METHOD: gh api, 2026-10-10]** 180,335 stars (was 178,344), 21,342 forks, 1,116 watchers, 1,396 open issues, last push 2026-10-09. `.license` is still `null` and `contents/LICENSE` still returns 404.
+- [Extend Claude with skills - Claude Code docs](https://code.claude.com/docs/en/skills) - **[FULL, METHOD: curl, raw HTML searched, 2026-10-10]** http 200. Still carries "a skill's body loads only when it's used, so long reference material costs almost nothing until you need it" and "Keep SKILL.md under 500 lines."
+
+The entries below are the 2026-09-25 source list, unchanged.
 
 - [Extend Claude with skills - Claude Code docs](https://code.claude.com/docs/en/skills) - **[FULL, METHOD: curl + HTML strip]** re-checked 2026-09-25, http 200. Source of the load-on-use and 500-line claims; unchanged from 2026-09-17.
 - [Agent Skills specification](https://agentskills.io/specification) - **[FULL, METHOD: curl + HTML strip]** verified 2026-09-17, not re-fetched this pass (static spec page, low churn risk; the two required frontmatter fields it documents are unaffected by anything measured here).

@@ -2,7 +2,7 @@
 topic: security
 type: guide
 status: research-complete
-last-validated: 2026-09-20
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "2433, 2412, 2411, 2473"
 original-query: "Research the Canva Connect API's authorization and permission model. STANDARD-to-DEEP depth. Core question: why can an authenticated Canva integration READ a design that was shared with it by link, but be refused when it tries to open an edit transaction, copy the design, or export it? Measured facts from a live session 2026-09-20, design id DAG9Qtzie0M: read-design succeeds via the full share URL; open-editing-transaction, copy-design and get-export-formats all fail with permission_denied / \"Not allowed to access design\"; copy-design and export-design accept only a bare 11-char design id and reject a full URL. Cover the OAuth/PKCE flow and full scope list, design ACL model (owner/team/shared/anyone-with-link), whether a grant needs acceptance and whether it propagates immediately, Enterprise vs Pro/Free gating for brand kits/templates/Autofill, the Connect API vs Canva MCP server distinction, and rate limits/export polling."
@@ -22,7 +22,7 @@ tier: DEEP
 | 3 | Even once "Can edit" is granted, **do not assume copy or download/export will start working for a non-owner, non-team guest.** Canva's own Help Center states that under a "Can edit" collaboration link, guests explicitly cannot "Make a copy of the design," "Publish," or "Download the design" — those are separate, higher-tier permissions (team membership or ownership), not unlocked by "Can edit." |
 | 4 | **Editing transactions do not exist in the public REST Connect API at all** — confirmed by enumerating all 111 `/docs/connect/*` and 18 `/docs/mcp/*` URLs in Canva's own sitemap. `start-editing-transaction` / `perform-editing-operations` / `commit-editing-transaction` / `cancel-editing-transaction` are MCP-only tools (`docs/mcp/tools/*`), not REST endpoints (`docs/connect/api-reference/*`). No Connect API access token, however scoped, can open one outside the MCP surface. |
 | 5 | `copy-design` is also MCP-only — it is listed in the MCP tools rate-limit table (`docs/mcp/tools/`, 20 req/min, all plans) but there is **no `/v1/designs/{id}/copy` or `create-design-copy` REST endpoint** in the Connect API reference. This is exactly why the design-id-only regex in the failing tool call exists — there was never a URL-shaped parameter to accept, because the underlying Canva-side call is not a public REST endpoint. |
-| 6 | For ZAO's own Canva brand kits (used today for `generate-design`/`export-design`): **`brand_template` capability requires Canva Pro, Teams, or Enterprise** (any paid plan with brand template access); **`autofill` capability and `get-brand-template-dataset` require Canva Enterprise specifically.** Confirmed identically in two independent Canva doc pages (capabilities appendix and MCP tools/rate-limits page) — do not conflate the two tiers when scoping future Autofill work. |
+| 6 | For ZAO's own Canva brand kits (used today for `generate-design`/`export-design`): **`brand_template` capability requires Canva Pro, Teams, or Enterprise** (any paid plan with brand template access); **`autofill` capability and `get-brand-template-dataset` require Canva Enterprise specifically.** Confirmed identically in two independent Canva doc pages (capabilities appendix and MCP tools/rate-limits page) — do not conflate the two tiers when scoping future Autofill work. **Superseded 2026-10-10:** Canva opened Autofill to Pro and Teams on 2026-09-21, so both capabilities now sit at the same tier - see the note at the end of Finding 5. |
 
 ## Findings
 
@@ -112,7 +112,7 @@ The MCP editing-transaction flow itself (three tools, all fetched in full): `sta
 | Capability | Required for | Who has it |
 |---|---|---|
 | `analytics` | Design analytics APIs | Canva Enterprise org members only |
-| `autofill` | Autofill APIs | Canva Enterprise org members only |
+| `autofill` | Autofill APIs | Canva Pro, Canva Teams, or Canva Enterprise (changed by Canva 2026-09-21; was Enterprise only when this doc was written on 2026-09-20) |
 | `brand_template` | Brand template APIs | Canva Pro, Canva Teams, **or** Canva Enterprise |
 | `export_png_transparency` | Transparent-background PNG export | Any paid Canva plan (e.g. Pro) |
 | `resize` | Design resize jobs | Canva plan with premium features (e.g. Pro) |
@@ -124,8 +124,8 @@ The MCP editing-transaction flow itself (three tools, all fetched in full): `sta
 |---|---|---|
 | `search-brand-templates`, `list-brand-kits` | 100 req/min | Pro and above |
 | `create-design-from-brand-template` | 20 req/min | Pro and above |
-| `autofill-design` | 60 req/min | **Enterprise only** |
-| `get-brand-template-dataset` | 100 req/min | **Enterprise only** |
+| `autofill-design` | 60 req/min | Pro and above (changed 2026-09-21; was Enterprise only on 2026-09-20) |
+| `get-brand-template-dataset` | 100 req/min | Pro and above (changed 2026-09-21; was Enterprise only on 2026-09-20) |
 | `resize-design` | 20 req/min | Pro and above |
 | `copy-design` | 20 req/min | All plans |
 | `export-design` | 20 req/min | All plans* (quality varies: free = standard, Pro+ = lossless PNG/transparent bg/premium elements; any plan can hit `license_required` if the design has premium elements) |
@@ -133,7 +133,16 @@ The MCP editing-transaction flow itself (three tools, all fetched in full): `sta
 | `start/perform/commit/cancel-editing-transaction` | 20/50/20/20 req/min | All plans |
 | `upload-asset-from-url` | 30 req/min | All plans |
 
-**Precise answer to the task's tier question:** brand template *browsing/using* is not Enterprise-gated — it's Pro-and-above. Only Autofill (`autofill-design`) and reading a template's fillable-field dataset (`get-brand-template-dataset`) require Enterprise specifically. This is a meaningful distinction for ZAO's own Canva usage (doc 2433 confirmed ZAO has 16 brand kits and used `export-design` against the `Paragraph` brand kit `kAG4P6WcbYY`, so ZAO is at minimum on a Pro-tier-equivalent seat for brand_template capability to have worked there).
+**Precise answer to the task's tier question (as of 2026-09-20; the Enterprise half was superseded on 2026-09-21, see the note below):** brand template *browsing/using* is not Enterprise-gated — it's Pro-and-above. Only Autofill (`autofill-design`) and reading a template's fillable-field dataset (`get-brand-template-dataset`) require Enterprise specifically. This is a meaningful distinction for ZAO's own Canva usage (doc 2433 confirmed ZAO has 16 brand kits and used `export-design` against the `Paragraph` brand kit `kAG4P6WcbYY`, so ZAO is at minimum on a Pro-tier-equivalent seat for brand_template capability to have worked there).
+
+**Re-validated 2026-10-10 against Canva's changelog (card 10305). Two rows in the tables above changed; the scope table did not.**
+
+- **Scopes: unchanged.** The scopes page still lists 18 scopes and the names match this doc's table exactly (set comparison of the fetched page against the table: nothing only in the doc, nothing only on the page). `design:permission:read` and `design:permission:write` still do not exist. No changelog entry from August 10 to October 1, 2026 mentions a scope.
+- **Autofill is no longer Enterprise-only.** Changelog, September 21, 2026: "The Autofill APIs are now available to apps acting on behalf of users on a Canva Pro or Canva Teams plan, in addition to Canva Enterprise." The capability reference now reads: "`autofill`: Capability required to call autofill APIs. Users on a Canva plan with access to autofill (such as Canva Pro, Canva Teams, or Canva Enterprise) have this capability." The MCP tools table lists `autofill-design` (60 req/min) and `get-brand-template-dataset` (100 req/min) as "Pro and above", with the legend "Feature is available to Canva Pro, Business, and Enterprise plans". The two table cells above are corrected in place and marked.
+- **The capability enum grew from 6 to 9.** New since 2026-09-20: `background_removal` (premium plans such as Pro), `design_generation` (feature eligibility and team permissions), `image_to_design_imports` (team permission for Magic Layers). `analytics` and `team_restricted_app` are unchanged.
+- **Every other MCP rate limit and plan in the table above still matches** the live page, row for row. Tools on the page that this table never listed (for example `get-design-dataset`, `create-brand-template-draft`, `generate-image`, `merge-designs`) were not added here.
+- **Pages moved.** `docs/mcp/tools/` now redirects to `docs/apps/mcp/tools/`, and the get-user-capabilities reference to `docs/apps/rest-apis/reference/users/get-user-capabilities/`. Canva's banner: "The Canva Apps SDK, Connect APIs, and MCP are now unified in the Canva Developers SDK." The old URLs still resolve.
+- **Not re-checked:** Findings 1 (OAuth flow), 2, 3, 4 and 6, and the 111/18 sitemap counts. This pass covered the scope table and the two tier tables only.
 
 ### 6. Rate limits and export-job polling
 
@@ -166,10 +175,13 @@ The MCP editing-transaction flow itself (three tools, all fetched in full): `sta
 |--------|-------|------|---------|
 | When re-sharing DAG9Qtzie0M (or any future Canva design meant for API edit/copy/export), confirm the owner sets link permission to "Can edit" AND adds the integration's Canva account to the owning team — "Can edit" alone on a link does not unlock copy/download per Finding 2 | Zaal | Manual Canva share-settings change | 2026-09-22 |
 | Correct any ZAO doc or prompt that lists `design:permission:read`/`design:permission:write` as real Canva scopes (none found in a `grep -ri "design:permission" research/` sweep during this doc's writing, but flag if one surfaces) | Zaal | Doc edit | wontfix (no instance found yet; revisit if one appears) |
-| Re-validate this doc's scope table and tier table against `docs/connect/changelog/` (not fetched this pass) before citing it past 30 days | Zaal | Re-research doc 2515 | 2026-10-20 |
+| DONE 2026-10-10 (card 10305) - scope table unchanged, Autofill tier changed 2026-09-21; see the re-validation note at the end of Finding 5 | Zaal | Re-research doc 2515 | Done 2026-10-10 |
+| Re-validate the scope and tier tables against the changelog again; Canva shipped six changelog entries between 2026-09-17 and 2026-10-01 | Zaal | Re-research doc 2515 | 2026-11-10 |
 
 ## Sources
 
+- [Changelog - Canva Developers SDK Documentation](https://www.canva.dev/docs/connect/changelog/) - FULL, curl + HTML strip, 2026-10-10. Entries read from October 1, 2026 back to August 10, 2026.
+- Re-fetched 2026-10-10, FULL, curl + HTML strip: the Scopes, Capabilities, Get user capabilities, MCP tools and rate limits, Create design autofill job, Autofill guide and Get brand template dataset pages. The other sources below were not re-fetched and stand as read on 2026-09-20.
 - [Authentication - Canva Connect APIs Documentation](https://www.canva.dev/docs/connect/authentication/) — FULL, curl + HTML strip
 - [Scopes - Canva Connect APIs Documentation](https://www.canva.dev/docs/connect/appendix/scopes/) — FULL, curl + HTML strip
 - [Capabilities - Canva Connect APIs Documentation](https://www.canva.dev/docs/connect/capabilities/) — FULL, curl + HTML strip

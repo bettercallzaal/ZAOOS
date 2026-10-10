@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-10
 related-docs: 154, 312, 491, 506
 tier: STANDARD
 original-query: Out of 1,116 Claude Code skills in the ecosystem, which ~15 are worth installing for ZAO OS, BCZ, and the agent fleet? (reconstructed)
@@ -129,6 +129,59 @@ Publishing 1-2 of these to a public skills repo is the same lift as a Doc 491 (Q
 
 Star counts moved 1-30% upward in days/weeks. Use as proxy for "ecosystem still hot" not absolute ranking.
 
+## Re-validation 2026-10-10
+
+Card 10305. This doc's `last-validated` had stood at 2026-05-21, twenty weeks. What was re-measured, and what was not:
+
+**ZAO's own skill count (measured 2026-10-10, this Mac).** `~/.claude/skills/*/SKILL.md` matches 57 files. The April text says "~32 user skills + ECC plugin (200+)"; how that 32 was counted is not recorded, so 32 to 57 is not a clean trend. Five plugins are installed per `~/.claude/plugins/installed_plugins.json`: caveman, connect-apps, everything-claude-code, oh-my-mermaid, superpowers. Doc 2496 holds the measured usage: 34 of the 57 have been invoked at least once across 4,630 transcripts, 23 never.
+
+**The "Already Installed" table has drifted.** `graphify` and `caveman` no longer have a directory under `~/.claude/skills` (caveman is now a plugin; graphify is in neither list). `autoresearch` is still there.
+
+**The Install picks, five months on.** Searched `~/.claude/skills` by directory name only, not the plugin caches:
+
+| Pick | Found on 2026-10-10 |
+|---|---|
+| supabase/agent-skills | YES - `supabase` and `supabase-postgres-best-practices` (frontmatter `author: supabase`) |
+| trailofbits/skills | no matching directory |
+| mattpocock/skills | no matching directory |
+| hamelsmu/evals-skills | no matching directory |
+| fal-ai-community/skills | no matching directory |
+
+One of the three "strongest fits" from the first Next Action is installed. No record was found of the before-and-after trial that row asked for; the places searched were this doc and doc 2496.
+
+**Star counts (`gh api repos/<owner>/<repo>`, 2026-10-10)** against the 2026-04-24 snapshot above:
+
+| Repo | 2026-04-24 | 2026-10-10 |
+|---|---|---|
+| anthropics/skills | 123,450 | 180,335 |
+| obra/superpowers | 166,781 | 297,208 |
+| supabase/agent-skills | 1,995 | 2,708 |
+| cloudflare/skills | 1,268 | 3,028 |
+| trailofbits/skills | 4,783 | 7,465 |
+| MicrosoftDocs/Agent-Skills | 509 | 776 |
+| wshobson/agents | 34,245 | 40,335 |
+| alirezarezvani/claude-skills | 12,618 | 27,968 |
+| VoltAgent/awesome-agent-skills | 18,607 | 35,473 |
+| mattpocock/skills | 18,217 | 284,320 |
+| K-Dense-AI/scientific-agent-skills | 19,357 | 48,289 |
+| safishamsi/graphify | 34,323 | 125,286 (repo now resolves to `Graphify-Labs/graphify`) |
+| forrestchang/andrej-karpathy-skills | 83,697 | 218,186 (now resolves to `multica-ai/andrej-karpathy-skills`; last push 2026-04-20) |
+| shareAI-lab/learn-claude-code | 56,267 | 78,316 |
+| coreyhaines31/marketingskills | 24,490 | 54,053 |
+| phuryn/pm-skills | 10,608 | 26,868 |
+| hamelsmu/evals-skills | 1,183 | 1,676 |
+| ComposioHQ/awesome-claude-skills | 58.4K (May) | 76,808 |
+| fal-ai-community/skills | 77 | 251 |
+| EveryInc/charlie-cfo-skill | 202 | 324 |
+
+The mattpocock/skills figure is a 15x rise and is what the API returned; it was read once and not cross-checked against a second source.
+
+**Hallucinations, re-checked.** `hashicorp/skills` and `snyk/snyk-fix` still return 404. `firecrawl/firecrawl-claude-plugin` exists at 237 stars (58 in April), so the tweet's "3,000+" is still wrong. The better-auth claim was not re-checked.
+
+**Not re-measured.** The ecosystem total ("1,116", "1,100+", "no consolidation"): no catalog was re-counted in this pass, so those lines are carried forward from May and are UNVERIFIED as of today. The ten May 2026 sources below were not re-fetched. The Stack Gaps table was not re-checked against the current catalogs.
+
+**Does the verdict hold?** The decision to skip the full catalog and install a handful still stands on this evidence. The stated reason has since been measured against: doc 2496 found the always-on cost of an idle skill is about 70 tokens of description, so the "no more than 3 skills" rule of thumb this doc inherits is aimed at the wrong cost. The better cut is by wrong instructions, not by count. See [doc 2496](../2496-claude-skills-mechanisms-measured/).
+
 ## Sources (May 2026 Validation)
 
 [FULL]
@@ -157,7 +210,8 @@ Ecosystem remains at 1,100+ skills. No consolidation. Re-validate monthly as chu
 | Build + publish `farcaster-protocol` skill from ZAO's signer + Neynar + mini-app code. Same lift as Doc 491 (QuadWork OSS). | @Zaal / Quad | New OSS repo | Mid-May 2026 |
 | Build + publish `xmtp-encrypted-messaging` skill from ZAO's burner-key pattern | @Zaal / Quad | New OSS repo | Phase 2 (after Farcaster skill ships) |
 | Update Doc 154 (skills master reference) to add new picks once installed and validated | @Zaal | Doc edit | Rolling |
-| Re-validate this doc by 2026-05-24 - ecosystem high-churn | Claude | Audit | 2026-05-24 |
+| DONE 2026-10-10 (card 10305) - local skill count, install picks, star counts and hallucinations re-measured; ecosystem total not re-counted | Claude | Audit | Done 2026-10-10 |
+| Re-count the ecosystem total from a live catalog, or drop the "1,100+" line | Claude | Audit | 2026-11-10 |
 
 ## Also See
 

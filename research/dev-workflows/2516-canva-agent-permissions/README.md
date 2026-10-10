@@ -30,6 +30,8 @@ This is the hub of a DISPATCH run. Two sub-docs carry the detail:
 | 6 | **For recurring, automatable card series, RENDER FROM THE DESIGN KIT rather than driving Canva.** The number is already in our code. | `getDaysUntilZaostock()` at `bot/src/zoe/companion.ts:62` already computes the countdown from `ZAOSTOCK_TARGET_DATE = "2026-10-03T00:00:00-04:00"`. `ZAODEVZ/ZAOstock:src/content/design-kit.ts` already holds every token and font the cards use. We are hand-editing a design fourteen times to display an integer our own code computes from data we already own. |
 | 7 | **Branch from `origin/main` in a fresh worktree. NEVER branch from the ZAOOS main checkout.** | Measured today, twice, by this lane's own subagents. See section 5 - this is the most generally applicable finding in the doc and it is not about Canva. |
 
+> **Update 2026-10-10 (card 10305): decision 4 was true on 2026-09-20 and stopped being true on 2026-09-21.** Canva's Connect changelog for September 21, 2026: "The Autofill APIs are now available to apps acting on behalf of users on a Canva Pro or Canva Teams plan, in addition to Canva Enterprise." The create-design-autofill-job page now reads "available when your app acts on behalf of a user on Canva Pro (including Canva Education and Canva for Nonprofits), Canva Teams, or Canva Enterprise", and the autofill guide's prerequisite is "Be on a Canva plan that includes Autofill, such as Canva Pro, Canva Teams, or Canva Enterprise." So the "BLOCKED. Right tool, wrong tier" row in the options table below is superseded: per Canva's docs the tier is no longer the blocker. Whether an autofill call works from ZAO's seat was not tested. Decisions 5 and 6 were not re-checked and do not depend on this. The correction is now also written into doc 2433. Source: `canva.dev/docs/connect/changelog/`, fetched raw 2026-10-10.
+
 ## 1. What was measured, and on which account
 
 Everything below was run on **2026-09-20** from a Claude session authenticated as **info@thezao.com**, against design `DAG9Qtzie0M`.
@@ -131,7 +133,7 @@ The failure shape is **a real measurement from surface A cited as if taken on su
 | Accept the Canva invite on `DAG9Qtzie0M` from a session signed in as info@thezao.com, so the Can-edit grant takes effect | @Zaal | Canva UI | 2026-09-21 |
 | Produce the 14 countdown cards via Bulk Create from a 14-row CSV, rather than 14 agent edits | @Zaal | Canva UI | 2026-09-23 |
 | Decide who owns ZAO's Canva assets - they sit on zaalp99@gmail.com inside the team "Samantha aka Candy on Canva". Move nothing until decided | @Zaal | Decision | 2026-09-27 |
-| Write the Enterprise-gate correction INTO doc 2433's Canva rows, so a reader who finds 2433 first is not misled | @Zaal | PR | 2026-09-24 |
+| DONE 2026-10-10 (card 10305) - the tier note is in doc 2433, written as Canva's 2026-09-21 change rather than as the Enterprise gate, which no longer applies | @Zaal | PR | Done 2026-10-10 |
 | Add "branch from origin/main in a fresh worktree, never from the main checkout" to `.claude/rules/agent-loops.md` | @Zaal | PR | 2026-09-24 |
 | Resolve DAY 263 (page 1) vs DAY 103 (page 2) in `ZABAL Daily Designs` - same layout, one is stale | @Zaal | Canva UI | 2026-09-27 |
 | Test whether a named guest with accepted edit access can actually export, closing the open contradiction in section 3 | @Zaal | Measurement | 2026-09-23 |

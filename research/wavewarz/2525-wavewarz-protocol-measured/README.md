@@ -2,7 +2,7 @@
 topic: wavewarz
 type: audit
 status: research-complete
-last-validated: 2026-09-20
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "1237, 1644, 1785"
 original-query: "WaveWarZ protocol: what the deployed program actually does, measured 2026-09-20 - the bonding curve constant correction (fitted 4.993e8 was wrong, exactly 5e8 with 100,000-token steps floored per trade), the fee split and the lamport that does not sum, the buy/sell slippage asymmetry (buy floor of 0 rejected, sell floor of 0 accepted, live client sends 0 on 92 of 92 sampled sells), settlement by larger pool with ties to B, the six-instruction set including the previously undocumented initializeMints, the account layout with two duplicate pool field pairs, the dust floor, and live validation of 38+ real trades predicted exactly during the finals. Depth: STANDARD."

@@ -48,7 +48,7 @@ tier: STANDARD
 > Same surface, same script: `bounties.fetchAll` via `zpoidh/scripts/build-bounty-dashboard.py`, cron build
 > `2026-10-10T13:53:09Z`, 114 open bounties (Base 101, Arbitrum 9, mainnet 4), priced at ETH $2,497.25 and
 > DEGEN $0.000997 (CoinGecko at build time). Every row, with the raw flag and the corrected one, is in
-> [`zpoidh/docs/doc-2522-remeasure-2026-10-10.json`](https://github.com/bettercallzaal/poidhz/blob/main/docs/doc-2522-remeasure-2026-10-10.json). Re-measured by the poidhz lane; tracker card 10304, LIST 6.
+> [`poidhz/docs/doc-2522-remeasure-2026-10-10.json`](https://github.com/bettercallzaal/poidhz/blob/main/docs/doc-2522-remeasure-2026-10-10.json). Re-measured by the poidhz lane; tracker card 10304, LIST 6.
 >
 > | Measure | 2026-09-09 | 2026-09-20 | **2026-10-10** |
 > |---|---|---|---|
@@ -65,14 +65,14 @@ tier: STANDARD
 > **1. The submission-count bug reproduced this time.** All 65 zero-flag bounties were re-read through
 > `claims.fetchBountyClaims` (positive control first: our 1330 returned 9, our 1166 returned 8). **Five of
 > the 65 have claims the flag hides: 295 (19 claims), 235 (13), 35 (1), 296 (1), 305 (1). 35 claims on
-> five bounties.** On 2026-09-20 the same test on 15 of 45 found none. Upstream fix PR #1467 on
-> poidh-app: see the line printed above this block at build time, or re-check. Every rate in this
+> five bounties.** On 2026-09-20 the same test on 15 of 45 found none. Upstream fix: poidh-app pull request #1467 (a PR, not an issue) is open and
+> unmerged, last updated 2026-08-30, verified 2026-10-10. Every rate in this
 > block uses the corrected flag (API flag OR real claims > 0); the 20 Sep column could not be
 > corrected retroactively and is the flag as it stood.
 >
 > **2. Format: build collapsed, and it is one issuer.** `0xf19f11de...` (no ENS, Farcaster or X on
 > web3.bio) posted **22 identical $7.49 "Recruit a verified Muse agent to musemaxxing" build bounties
-> 12 days before the read, 3 of 22 with a claim.** They are 22 of the 55 open builds and 22 of the 49
+> about 13 days before the read (12.9 to 12.97 days on every row), 3 of 22 with a claim.** They are 22 of the 55 open builds and 22 of the 49
 > bounties in the $5-15 band. With them, build is 29%; without, 39%, and the whole market is 55%, which
 > is exactly the 20 Sep figure. **A format table can be moved by one wallet in one afternoon, so the
 > next re-measure reports formats with issuers deduplicated as well as raw.**
@@ -552,7 +552,7 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 
 ## Sources
 
-- [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `zpoidh/docs/doc-2522-remeasure-2026-10-10.json`
+- [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `poidhz/docs/doc-2522-remeasure-2026-10-10.json`
 - [poidh tRPC `claims.fetchBountyClaims`](https://poidh.xyz/api/trpc/claims.fetchBountyClaims) - **[FULL, method: `zpoidh/scripts/query-bounty.py` on all 65 zero-flag bounties plus positive controls 1330 and 1166, 2026-10-10 16:2x to 16:4xZ]** 5 bounties with 35 hidden claims
 - [api.web3.bio](https://api.web3.bio/profile/0xf19f11dee16a341671e6ed3e209b704c1bbc3e57) - **[FULL, 2026-10-10]** the 22-bounty issuer resolves to no identity; `0x4200ac33...` resolves to farcaster:poidhbot
 

@@ -798,6 +798,48 @@ export function assertSendDelivered<T>(result: T): T {
 export type RawSend = (chatId: number, text: string, opts?: Record<string, unknown>) => Promise<unknown>;
 
 /**
+ * ZOE_TAG_ZAAL=1 (default off): put Zaal's @handle on a group message that is
+ * important or needs his reply, so Telegram notifies him as a mention.
+ *
+ * Zaal, 2026-10-10 (seat grill item 76): "alwasy @ me if its imrpoant ro i
+ * want a reply to it in telegram". "Important or wants a reply" is already a
+ * fact the sender states: class `alarm` (something broke) and class `gated`
+ * (needs Zaal). Status, digest and noise are not tagged, or the mention stops
+ * meaning anything (noisy-signal-guard). A DM is never tagged: it already
+ * notifies, and a mention of yourself in your own DM is noise.
+ *
+ * The handle is ZOE_ZAAL_TG_HANDLE, default `bettercallzaal`. Plain text, so it
+ * is safe under both Markdown and HTML parse modes.
+ */
+export function tagZaalEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_TAG_ZAAL === '1';
+}
+
+export function zaalTgHandle(env: NodeJS.ProcessEnv = process.env): string {
+  const h = (env.ZOE_ZAAL_TG_HANDLE ?? '').trim().replace(/^@/, '');
+  return /^[A-Za-z0-9_]{4,32}$/.test(h) ? h : 'bettercallzaal';
+}
+
+const TG_MAX_MESSAGE = 4096;
+const TAGGED_CLASSES: ReadonlySet<SendClass> = new Set<SendClass>(['alarm', 'gated']);
+
+export function tagForZaal(
+  text: string,
+  cls: SendClass,
+  chatId: number | string,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  if (!tagZaalEnabled(env) || !TAGGED_CLASSES.has(cls)) return text;
+  if (!(Number(chatId) < 0)) return text; // groups and supergroups have negative ids
+  const handle = `@${zaalTgHandle(env)}`;
+  if (text.toLowerCase().includes(handle.toLowerCase())) return text;
+  // Telegram rejects a message over 4096 characters. A message that only fits
+  // untagged goes out untagged: delivered beats mentioned.
+  if (text.length + handle.length + 1 > TG_MAX_MESSAGE) return text;
+  return `${handle} ${text}`;
+}
+
+/**
  * Wrap a raw send with the budget. The returned function has the same shape,
  * so it can be dropped in anywhere `bot.api.sendMessage` was used.
  *
@@ -812,8 +854,11 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
   const passThrough = (chatId: number, text: string, clean?: Record<string, unknown>) =>
     clean === undefined ? raw(chatId, text) : raw(chatId, text, clean);
 
-  return async (chatId, text, opts) => {
+  return async (chatId, rawText, opts) => {
     const clean = stripSendClass(opts);
+    // Tag before anything else reads the text, so the budget log, a deferred
+    // copy and the delivered message all carry the same words.
+    const text = tagForZaal(rawText, resolveSendClass(opts), chatId);
     if (!sendBudgetEnabled()) return passThrough(chatId, text, clean);
 
     let decision: SendDecision;

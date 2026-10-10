@@ -24,6 +24,7 @@ import type { CockpitTask, ReviewPR } from '../cockpit/types';
 import { getCalendarEvents } from './calendar';
 import { wasSendBlocked } from './send-budget';
 import { isGrillPaused, withStopRow } from './grill-pause';
+import { featureRan } from './feature-ran';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -46,8 +47,12 @@ export interface GrillItem {
 
 export interface GrillItemState {
   askedAt: string;
-  status: 'asked' | 'done' | 'skipped' | 'snoozed';
+  status: 'asked' | 'done' | 'skipped' | 'snoozed' | 'expired';
   snoozeUntil?: string;
+  /** Set when status is 'expired' (expireStale). 'gone': the thing it asked
+   * about left the live queue. 'age': unanswered past the cutoff. */
+  expiredAt?: string;
+  expiredReason?: 'gone' | 'age';
   /** The one-click answer Zaal chose, if any. */
   answer?: string;
   /**
@@ -261,6 +266,68 @@ export function backoffAllows(askCount: number, askedAt: string, now: number): b
   return now - Date.parse(askedAt) >= wait;
 }
 
+/**
+ * ZOE_GRILL_EXPIRE=1 (default off): stale asks stop counting as open.
+ *
+ * Zaal, 2026-10-10 (seat grill item 72), after 47 asks sat as 'asked' in
+ * grill_state.json, the oldest 76 days: expire an ask whose event date has
+ * passed, whose PR is merged or closed, or whose card is done, plus an age
+ * cutoff. The queue is rebuilt from the cockpit every tick, so all three of
+ * the first kind show up the same way: the item's key is no longer in the
+ * queue. That is reason 'gone'. Reason 'age' is an item still in the queue but
+ * unanswered for ZOE_GRILL_EXPIRE_DAYS (default 30; he picked no number).
+ *
+ * This REVERSES his 2026-08-11 "older cards must nag MORE frequently, not
+ * expire" for the age case, on his own word. Nothing is deleted: the record
+ * stays with its first-asked date, and
+ *   - a 'gone' item that comes back into the queue is asked again, as new;
+ *   - an 'age' item is never pushed unprompted again, but /grill (bypassCap)
+ *     still offers it, and the board card it came from is untouched.
+ */
+export function grillExpireEnabled(): boolean {
+  return process.env.ZOE_GRILL_EXPIRE === '1';
+}
+
+export const DEFAULT_GRILL_EXPIRE_DAYS = 30;
+
+export function grillExpireDays(env: NodeJS.ProcessEnv = process.env): number {
+  const n = Number(env.ZOE_GRILL_EXPIRE_DAYS);
+  return Number.isFinite(n) && n >= 1 ? n : DEFAULT_GRILL_EXPIRE_DAYS;
+}
+
+/**
+ * Mark stale 'asked' / 'skipped' items expired. Mutates `state`; pure otherwise.
+ *
+ * `queueComplete` must be true only when every source of the queue was read
+ * successfully. A failed fetch yields a short queue, and a short queue would
+ * mark every missing item 'gone': the difference between "resolved" and "could
+ * not read" is not in the queue itself, so the caller has to say which.
+ * The active question is never expired from under its own pinned message.
+ */
+export function expireStale(
+  state: GrillState,
+  queueKeys: ReadonlySet<string>,
+  now: number,
+  opts: { queueComplete: boolean; maxAgeMs: number },
+): { gone: number; aged: number } {
+  let gone = 0;
+  let aged = 0;
+  const expiredAt = new Date(now).toISOString();
+  for (const [key, s] of Object.entries(state.items)) {
+    if (s.status !== 'asked' && s.status !== 'skipped') continue;
+    if (key === state.activeKey) continue;
+    if (!queueKeys.has(key)) {
+      if (!opts.queueComplete) continue;
+      state.items[key] = { ...s, status: 'expired', expiredAt, expiredReason: 'gone' };
+      gone++;
+    } else if (now - Date.parse(s.firstAskedAt ?? s.askedAt) >= opts.maxAgeMs) {
+      state.items[key] = { ...s, status: 'expired', expiredAt, expiredReason: 'age' };
+      aged++;
+    }
+  }
+  return { gone, aged };
+}
+
 // A FUNCTION, not a shared constant. `{ ...DEFAULT_STATE }` is a shallow copy,
 // so every caller that read a missing or unreadable state file got the SAME
 // `items` and `recentAnswered` objects and wrote its cards into them. The next
@@ -340,11 +407,22 @@ export function toQueue(tasks: CockpitTask[], prs: ReviewPR[], events: GrillEven
 }
 
 /** Pick the next item to grill: most urgent that is not done and not on cooldown/snooze. */
-export function pickNext(queue: GrillItem[], state: GrillState, now: number): GrillItem | null {
+export function pickNext(
+  queue: GrillItem[],
+  state: GrillState,
+  now: number,
+  opts: { includeAged?: boolean } = {},
+): GrillItem | null {
   for (const item of queue) {
     const s = state.items[item.key];
     if (!s) return item; // never asked
     if (s.status === 'done') continue;
+    if (s.status === 'expired') {
+      // 'gone' and back in the queue: the thing reopened, so it is asked again.
+      // 'age': only when Zaal asks for it himself (/grill), never pushed.
+      if (s.expiredReason === 'gone' || opts.includeAged) return item;
+      continue;
+    }
     if (s.status === 'snoozed' && s.snoozeUntil && Date.parse(s.snoozeUntil) > now) continue;
     if (grillBackoffEnabled() && (s.status === 'asked' || s.status === 'skipped')) {
       // A skipped card waits on the same ladder; otherwise Skip sends it
@@ -513,10 +591,32 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   if (await isGrillPaused()) return { sent: false, paused: true };
   const now = deps.now ?? Date.now();
   const tasks = await (deps.fetchTasks ?? fetchCockpitTasks)();
-  const prs = await (deps.fetchPRs ?? fetchReviewPRs)().catch(() => [] as ReviewPR[]);
-  const events = await (deps.fetchEvents ?? (() => todaysGrillEvents(now)))().catch(() => [] as GrillEvent[]);
+  let sourcesOk = true;
+  const prs = await (deps.fetchPRs ?? fetchReviewPRs)().catch(() => {
+    sourcesOk = false;
+    return [] as ReviewPR[];
+  });
+  const events = await (deps.fetchEvents ?? (() => todaysGrillEvents(now)))().catch(() => {
+    sourcesOk = false;
+    return [] as GrillEvent[];
+  });
   const queue = toQueue(tasks, prs, events);
   const state = await readGrillState();
+
+  if (grillExpireEnabled()) {
+    // An empty task list is treated as a failed read, not as "everything is
+    // done": the cockpit adapter returns [] on error, and the board has never
+    // been empty.
+    const r = expireStale(state, new Set(queue.map((q) => q.key)), now, {
+      queueComplete: sourcesOk && tasks.length > 0,
+      maxAgeMs: grillExpireDays() * DAY_MS,
+    });
+    if (r.gone || r.aged) {
+      await writeGrillState(state);
+      console.log(`[zoe/grill] expired ${r.gone} gone, ${r.aged} aged (cutoff ${grillExpireDays()}d)`);
+      featureRan('grill-expire', `${r.gone} gone, ${r.aged} aged`);
+    }
+  }
 
   // Daily push cap: ZOE surfaces at most DAILY_PUSH_CAP items/day unsolicited, so
   // it drives the top few instead of firehosing all 88. /grill + post-answer
@@ -525,12 +625,12 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   const day = state.daySurfaced?.date === today ? state.daySurfaced : { date: today, count: 0 };
   if (!deps.bypassCap && day.count >= DAILY_PUSH_CAP) return { sent: false };
 
-  const item = pickNext(queue, state, now);
+  const item = pickNext(queue, state, now, { includeAged: deps.bypassCap === true });
   if (!item) return { sent: false };
 
   const remaining = queue.filter((q) => {
     const s = state.items[q.key];
-    return q.key !== item.key && (!s || s.status !== 'done');
+    return q.key !== item.key && (!s || (s.status !== 'done' && s.status !== 'expired'));
   }).length;
 
   // Unpin the previous open question so at most ONE question is ever pinned.
@@ -571,7 +671,10 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
  * re-ask must clear a stale snoozeUntil/answer. Only the age and the count carry.
  */
 export function recordAsk(state: GrillState, item: GrillItem, now: number): void {
-  const prior = state.items[item.key];
+  // A 'gone' item that came back is a new question: its old age and count do
+  // not carry, or it would be aged out again on the next tick.
+  const was = state.items[item.key];
+  const prior = was?.status === 'expired' && was.expiredReason === 'gone' ? undefined : was;
   const askedAt = new Date(now).toISOString();
   state.items[item.key] = {
     askedAt,

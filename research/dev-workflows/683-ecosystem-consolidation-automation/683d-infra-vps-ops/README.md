@@ -472,21 +472,21 @@ jobs:
 
 ### VPS Landscape -- Significantly Different
 
-- **The openclaw container + 7-agent squad was decommissioned** 2026-05-04 (CLAUDE.md). This was a Docker-based workload that ran on the old imanagent box (187.77.3.104); it was not a separate physical VPS. The "VPS 2 (openclaw)" label in this original doc was a misnomer -- openclaw was a container environment, not a second machine.
-- **One VPS remains: 31.97.148.88** (Hostinger KVM 2, Ubuntu 24.04, user zaal). Confirmed as the live box by `.claude/skills/vps/SKILL.md`. The original doc's "VPS 1 (imanagent, 187.77.3.104)" was the old hostname/IP now retired. Bots were migrated off 187.77.3.104: `farscout.service` and `cowork-agent.service` both carry "migrated from 187.77.3.104" in their descriptions.
-- The VPS consolidation question (Opportunity #5) is moot -- there is only one VPS.
-- **farscout.service is still in the repo but is a zombie.** CLAUDE.md (2026-08-22) noted farscout was still running as `farscout.service` on the VPS, heartbeating `up` while doing nothing. Decommissioning it (`systemctl --user stop farscout && systemctl --user disable farscout`) is Zaal's action. The service file at `bot/systemd/farscout.service` should be deleted from the repo once the VPS unit is stopped.
+- **The openclaw container + 7-agent squad was decommissioned 2026-05-04** (`CLAUDE.md:190-192`, which names the container and the squad and no VPS or IP). That container ran on 31.97.148.88, the box this doc labelled "VPS 2 (openclaw)" (this doc, lines 12, 30 and 402). What was decommissioned is the workload, not a machine. An earlier revision of this section (PR #3894, commit 8e5b63b) placed the container on 187.77.3.104; no surface supports that, and the three lines above contradict it.
+- **31.97.148.88 is the one live VPS** (Hostinger KVM 2, Ubuntu 24.04, user zaal): `.claude/skills/vps/SKILL.md:12` ("direct SSH access as `zaal@31.97.148.88`") and `:19`; vault `SYSTEM_MAP.md:83` ("VPS 31.97.148.88: ZOE bot"). The box this doc labelled "VPS 1 (imanagent, 187.77.3.104)" is the retired one: `bot/systemd/cowork-agent.service:2` and `bot/systemd/farscout.service:2` both read "migrated from 187.77.3.104", and the vault bots review clip of 2026-09-15 (`inbox/clips/clip-20260915-085340-antigravity-bots-review-0915.md:24`) records 187.77.3.104 as decommissioned since 2026-07-18.
+- **Opportunity #5 (consolidate VPS 1 + VPS 2 into one box) happened.** This doc's line 93 proposed moving the openclaw services to "VPS 1", which lines 12 and 402 identify as 187.77.3.104 (line 93's own parenthetical calls that box "KVM 2", the label lines 12 and 402 give to 31.97.148.88, so the original was inconsistent about which box was which). What happened: the cowork and farscout workloads moved from 187.77.3.104 onto 31.97.148.88 (the two service descriptions above), and 187.77.3.104 was retired. One VPS, so the consolidation questions in this doc are closed, not open.
+- **farscout.service is still in the repo but is a zombie.** `CLAUDE.md:199` (dated 2026-08-22) noted farscout was still running as `farscout.service` on the VPS, heartbeating `up` while doing nothing. Decommissioning it (`systemctl --user stop farscout && systemctl --user disable farscout`) is Zaal's action. The service file at `bot/systemd/farscout.service` should be deleted from the repo once the VPS unit is stopped.
 
 ### Systemd Unit Count: 2 -> 12
 
-The original audit found 2 hardcoded `.service` files. As of 2026-10-10 there are 12 (9 services, 3 timers):
+The original audit found 2 hardcoded `.service` files. As of 2026-10-10 (`ls bot/systemd` at origin/main `f7161271`) there are 12 unit files, 9 `.service` and 3 `.timer` (`zoe-bot.service.d/` is a drop-in directory, not a unit):
 `cowork-agent.service`, `ecosystem-watch.service`, `ecosystem-watch.timer`, `farscout.service` (zombie), `fleet-claude-auth.service`, `fleet-claude-auth.timer`, `fleet-heartbeat.service`, `fleet-heartbeat.timer`, `zao-devz-stack.service`, `zao-fleet-agent.service` (STAGED, NOT ENABLED), `zaostock-bot.service`, `zoe-bot.service`.
 
 This makes the systemd unit templating recommendation (Opportunity #3) more urgent -- each new bot adds another hardcoded file.
 
 ### ZOE Bot Working Directory Changed
 
-The ZOE bot service now uses `WorkingDirectory=%h/zao-bot-live/bot` and `ExecStart=%h/zao-bot-live/bot/...`. The original doc documented `~/zao-os/` as the primary clone for ZOE. The deploy directory has been renamed or relocated. Any deploy automation targeting ZOE must reference `zao-bot-live/` not `zao-os/`. Other units (`zao-fleet-agent.service`, `zao-devz-stack.service`, etc.) still reference `%h/zao-os/bot` or other directories -- only `zoe-bot.service` has been updated to `zao-bot-live/`.
+The ZOE bot service now uses `WorkingDirectory=%h/zao-bot-live/bot` and `ExecStart=%h/zao-bot-live/bot/...` (`bot/systemd/zoe-bot.service:9-10`; `EnvironmentFile` at `:16`). The original doc documented `~/zao-os/` as the primary clone for ZOE. Deploy automation targeting the ZOE unit must reference `zao-bot-live/`, not `zao-os/`; the other units do not share that path and must not be rewritten to it. Measured at origin/main `f7161271`: only `zao-fleet-agent.service:22-23` still references `%h/zao-os/bot`; `cowork-agent.service:7-8` and `farscout.service:7-8` use `%h/migrated-cowork/...`; `zao-devz-stack.service:7-8` and `zaostock-bot.service:8` use `%h/zaostock-bot`; `fleet-heartbeat.service:5` and `fleet-claude-auth.service:5` use `%h/fleet-heartbeat/`; `ecosystem-watch.service:6` runs `/home/zaal/ecosystem-watch.py`.
 
 ### Fleet-Agent Control Plane (New Architecture)
 
@@ -513,6 +513,8 @@ A pattern called `oidc-ssh-ca` allows GitHub Actions to deploy via short-lived S
 
 - Repo: `bot/systemd/` tree, `.github/workflows/` tree -- FULL (direct file reads)
 - Repo: CLAUDE.md Primary Surfaces section, farscout/zombie note -- FULL
+- Repo (correction pass, 2026-10-10): `CLAUDE.md:190-192,199`, `.claude/skills/vps/SKILL.md:12,19`, `bot/systemd/cowork-agent.service:2,7-8`, `bot/systemd/farscout.service:2,7-8`, `bot/systemd/zoe-bot.service:9-10,16`, `bot/systemd/zao-fleet-agent.service:22-23`, this doc lines 12, 30, 93, 402 - FULL (direct file reads at origin/main `f7161271`)
+- Vault (private, not in this repo): `SYSTEM_MAP.md:83`; `inbox/clips/clip-20260915-085340-antigravity-bots-review-0915.md:24` (187.77.3.104 decommissioned since 2026-07-18) - FULL
 - WebSearch: "GitHub Actions deploy VPS SSH 2026" -- standard, links retrieved, individual pages unreachable (proxy limits); summary used as directional
 - WebSearch: "Doppler secrets management vs GitHub Actions Secrets VPS 2026" -- standard, directional
 - WebSearch: "Infisical open source secrets manager VPS self-hosted 2026" -- standard, directional

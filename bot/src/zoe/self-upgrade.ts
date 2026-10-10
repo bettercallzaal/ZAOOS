@@ -7,6 +7,12 @@
  * whether we EXTEND a named file, build NEW, or SKIP it, with evidence. The
  * output is a numbered research doc plus PR, the same as any work-loop item.
  *
+ * Stage 2 (dedupe, doc 2652): before queueing, `resourceDecision` checks the
+ * work queue and the research library. A repo already queued is not queued
+ * twice; a repo a doc already covers is not re-run unless the message starts
+ * with "recheck". The research path has had this guard since wasResearched;
+ * the resource path skipped it until this change.
+ *
  * Not in this PR, on purpose:
  *   - the build stage (doc 2652 stage 5: Hermes coder with a declared write-set).
  *     Doc 2652's gate table routes changes to bot/src/hermes to Zaal, so that is
@@ -50,6 +56,8 @@ const NON_REPO_OWNERS = new Set([
   'orgs', 'settings', 'marketplace', 'features', 'topics', 'collections', 'sponsors', 'apps', 'login', 'notifications',
 ]);
 
+const RECHECK_RE = /^\s*recheck\b[:\s]*/i;
+
 const REPO_RE = /https?:\/\/(?:www\.)?github\.com\/([A-Za-z0-9-]{1,39})\/([A-Za-z0-9._-]{1,100})(?:[/?#]\S*)?/i;
 
 /**
@@ -62,7 +70,7 @@ export function parseResourceLink(text: string): ResourceLink | null {
   const owner = m[1];
   const repo = m[2].replace(/\.git$/i, '');
   if (NON_REPO_OWNERS.has(owner.toLowerCase()) || !repo || repo === '.' || repo === '..') return null;
-  const note = text.replace(m[0], ' ').replace(/\s+/g, ' ').trim();
+  const note = text.replace(m[0], ' ').replace(RECHECK_RE, '').replace(/\s+/g, ' ').trim();
   return { url: `https://github.com/${owner}/${repo}`, owner, repo, note };
 }
 
@@ -79,6 +87,43 @@ export function claimResourceLink(
 ): ResourceLink | null {
   if (!selfUpgradeEnabled(env) || state.pendingArmed || state.whyArmed) return null;
   return parseResourceLink(text);
+}
+
+/** True when Zaal asked for a fresh fit check on a repo a doc already covers. */
+export function isRecheck(text: string): boolean {
+  return RECHECK_RE.test(text);
+}
+
+// ---------------------------------------------------------------------------
+// Stage 2: dedupe against the work queue and the research library
+// ---------------------------------------------------------------------------
+
+/** Matches a link to this repo in any form: root, tree, blob, issues, .git. */
+export function repoMentionTest(link: ResourceLink): (content: string) => boolean {
+  const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`github\\.com/${esc(link.owner)}/${esc(link.repo)}(?:\\.git)?(?![A-Za-z0-9_-]|\\.[A-Za-z0-9])`, 'i');
+  return (content: string) => re.test(content);
+}
+
+export type ResourceDecision =
+  | { kind: 'queue' }
+  | { kind: 'queued' }
+  | { kind: 'researched'; docs: string[] };
+
+/**
+ * What the DM intake does with a resource link. Queue first: an item already
+ * waiting would run the same fit check twice, and "recheck" does not override
+ * that. Then the library: a doc that already names the repo is pointed at
+ * instead of re-run, unless `recheck` is set.
+ */
+export function resourceDecision(
+  link: ResourceLink,
+  state: { queuedInputs: string[]; docs: string[]; recheck: boolean },
+): ResourceDecision {
+  const key = link.url.toLowerCase();
+  if (state.queuedInputs.some((input) => parseResourceLink(input)?.url.toLowerCase() === key)) return { kind: 'queued' };
+  if (!state.recheck && state.docs.length > 0) return { kind: 'researched', docs: state.docs };
+  return { kind: 'queue' };
 }
 
 /** What a queued resource item's input looks like: the repo URL, then the steer. */

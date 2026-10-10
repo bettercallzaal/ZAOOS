@@ -115,7 +115,7 @@ describe('index.ts wiring, pinned in source (index.ts cannot be imported)', () =
     const at = src.indexOf('const resource = claimResourceLink(text, {');
     expect(at).toBeGreaterThan(-1);
     expect(src.slice(at, at + 300)).toContain("pendingArmed: Boolean(getPending('private'))");
-    expect(src.slice(at, at + 900)).toContain("await enqueueWork(resourceInput(resource), { chatId: dmChatId }, 'resource');");
+    expect(src.slice(at, at + 2500)).toContain("await enqueueWork(resourceInput(resource), { chatId: dmChatId }, 'resource');");
   });
   it('it sits after the pending block and before the nudge toggle', () => {
     const claim = src.indexOf('const resource = claimResourceLink(text, {');

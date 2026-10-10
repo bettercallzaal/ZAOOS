@@ -120,6 +120,11 @@ function reportFor(item: WorkItem, deps: WorkTickDeps): (text: string) => Promis
   return deps.sendToZaal;
 }
 
+/** The inputs waiting in the queue, optionally of one kind (self-upgrade dedupe). */
+export async function queuedInputs(kind?: WorkItem['kind']): Promise<string[]> {
+  return (await readQueue()).filter((i) => !kind || (i.kind ?? 'research') === kind).map((i) => i.input);
+}
+
 export async function queueDepth(): Promise<number> {
   return (await readQueue()).length;
 }

@@ -162,6 +162,14 @@ import {
   parseBatchAnswer,
   classifyIntent, isCommandPrefixed, isUrlLed } from './tg-interactions';
 import { recordMessageContext, getMessageContext, clearMessageContext } from './message-context';
+import {
+  SLEEP_CALLBACK,
+  parseSleepCallback,
+  recordSleepTap,
+  sleepCardText,
+  sleepCheckinEnabled,
+  sleepKeyboard,
+} from './sleep-checkin';
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
 import { commitResearchDoc } from './research-doc';
@@ -729,6 +737,33 @@ bot.callbackQuery(XD_CALLBACK, async (ctx) => {
   await sendXDeskCard(chatId, { url: card.url, handle: card.author, id: card.postId, note: card.note }).catch((e) =>
     console.error('[zoe/x-desk] redo failed:', (e as Error)?.message),
   );
+});
+
+// Sleep check-in taps ("sl:h:7:2026-10-13" / "sl:e:3:2026-10-13", sleep-checkin.ts).
+// Registered with the other exact-prefix handlers, above the generic
+// callback_query:data router, and no other handler reads "sl:".
+bot.callbackQuery(SLEEP_CALLBACK, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  if (!sleepCheckinEnabled()) {
+    await ctx.answerCallbackQuery({ text: 'Sleep check-in is off.' }).catch(() => {});
+    return;
+  }
+  const tap = parseSleepCallback(ctx.callbackQuery.data);
+  if (!tap) {
+    await ctx.answerCallbackQuery({ text: 'That button is not a valid check-in value.' }).catch(() => {});
+    return;
+  }
+  try {
+    const day = await recordSleepTap(tap);
+    featureRan('sleep-checkin', 'tap');
+    await ctx.answerCallbackQuery({ text: `${tap.field === 'hours' ? 'Hours' : 'Energy'}: ${tap.value}` }).catch(() => {});
+    await ctx
+      .editMessageText(sleepCardText(tap.date, day), { reply_markup: sleepKeyboard(tap.date, day) })
+      .catch(() => {});
+  } catch (e) {
+    console.error('[zoe/sleep-checkin] tap failed:', (e as Error)?.message);
+    await ctx.answerCallbackQuery({ text: 'Could not save that - nothing was logged. Tap again.' }).catch(() => {});
+  }
 });
 
 bot.callbackQuery(/^tw:([0-9a-z]+):([A-Za-z0-9_-]+):([A-D]|done|skip|type)$/, async (ctx) => {

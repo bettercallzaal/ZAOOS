@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-09-20
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "2515, 2517, 2433, 2412, 2411, 2473"
 original-query: "can u go /zao-research and deep resaerhc about suing canva with agents"
@@ -30,7 +30,7 @@ This is the hub of a DISPATCH run. Two sub-docs carry the detail:
 | 6 | **For recurring, automatable card series, RENDER FROM THE DESIGN KIT rather than driving Canva.** The number is already in our code. | `getDaysUntilZaostock()` at `bot/src/zoe/companion.ts:62` already computes the countdown from `ZAOSTOCK_TARGET_DATE = "2026-10-03T00:00:00-04:00"`. `ZAODEVZ/ZAOstock:src/content/design-kit.ts` already holds every token and font the cards use. We are hand-editing a design fourteen times to display an integer our own code computes from data we already own. |
 | 7 | **Branch from `origin/main` in a fresh worktree. NEVER branch from the ZAOOS main checkout.** | Measured today, twice, by this lane's own subagents. See section 5 - this is the most generally applicable finding in the doc and it is not about Canva. |
 
-> **Update 2026-10-10 (card 10305): decision 4 was true on 2026-09-20 and stopped being true on 2026-09-21.** Canva's Connect changelog for September 21, 2026: "The Autofill APIs are now available to apps acting on behalf of users on a Canva Pro or Canva Teams plan, in addition to Canva Enterprise." The create-design-autofill-job page now reads "available when your app acts on behalf of a user on Canva Pro (including Canva Education and Canva for Nonprofits), Canva Teams, or Canva Enterprise", and the autofill guide's prerequisite is "Be on a Canva plan that includes Autofill, such as Canva Pro, Canva Teams, or Canva Enterprise." So the "BLOCKED. Right tool, wrong tier" row in the options table below is superseded: per Canva's docs the tier is no longer the blocker. Whether an autofill call works from ZAO's seat was not tested. Decisions 5 and 6 were not re-checked and do not depend on this. The correction is now also written into doc 2433. Source: `canva.dev/docs/connect/changelog/`, fetched raw 2026-10-10.
+> **Update 2026-10-10 (card 10305): decision 4 was true on 2026-09-20 and stopped being true on 2026-09-21.** Canva's Connect changelog for September 21, 2026: "The Autofill APIs are now available to apps acting on behalf of users on a Canva Pro or Canva Teams plan, in addition to Canva Enterprise." The create-design-autofill-job page now reads "available when your app acts on behalf of a user on Canva Pro (including Canva Education and Canva for Nonprofits), Canva Teams, or Canva Enterprise", and the autofill guide's prerequisite is "Be on a Canva plan that includes Autofill, such as Canva Pro, Canva Teams, or Canva Enterprise." So the "BLOCKED. Right tool, wrong tier" row in the options table below is superseded: per Canva's docs the tier is no longer the blocker. Whether an autofill call works from ZAO's seat was not tested. Only decision 4 was re-checked on 2026-10-10, and the new `last-validated` date covers that alone; decisions 1 to 3 and 5 to 7 stand as written on 2026-09-20. The correction is now also written into doc 2433. Source: `canva.dev/docs/connect/changelog/`, fetched raw 2026-10-10.
 
 ## 1. What was measured, and on which account
 

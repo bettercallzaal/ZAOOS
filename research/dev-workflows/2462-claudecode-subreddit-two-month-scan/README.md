@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-09-25
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "2459, 2460, 2448, 2282, 2317, 2373"
 original-query: "lets /zao-research this add it to our log and then just review the top 50 posts in the past 2 months"
@@ -130,7 +130,9 @@ The 208-point multi-agent guide and the 190-point hooks post are the two most
 relevant to this estate after MISTAKES.md, and neither was read in full here -
 see Sources.
 
-Update 2026-10-10: both have since been read in full (the multi-agent guide on
+Update 2026-10-10 (the only thing re-checked on that date; the 2026-10-10
+`last-validated` covers this source and nothing else in the doc): both have
+since been read in full (the multi-agent guide on
 2026-09-25, the hooks post on 2026-10-10) - see Sources.
 
 ### Finding 4 - What the Bug/Issue and Rant flairs are for

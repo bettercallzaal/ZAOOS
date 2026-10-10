@@ -165,7 +165,7 @@ import { recordMessageContext, getMessageContext, clearMessageContext } from './
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
 import { commitResearchDoc } from './research-doc';
-import { extractFirstUrl, isFollowUpNotResearch, wasResearched } from './research-dedupe';
+import { extractFirstUrl, findDocsMatching, isFollowUpNotResearch, wasResearched } from './research-dedupe';
 import { enqueueTurn } from './turn-queue';
 import {
   getPending,
@@ -188,8 +188,15 @@ import {
   isZoeCommand,
 } from './commands';
 import { formatSpendStatus } from './cost-governance';
-import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
-import { claimResourceLink, resourceInput, selfUpgradeDailyCap } from './self-upgrade';
+import { enqueueWork, queueDepth, queuedInputs, runWorkTick } from './work-loop';
+import {
+  claimResourceLink,
+  isRecheck,
+  repoMentionTest,
+  resourceDecision,
+  resourceInput,
+  selfUpgradeDailyCap,
+} from './self-upgrade';
 import {
   GENERAL_THREAD_SENTINEL,
   GENERAL_TOPIC,
@@ -2791,6 +2798,25 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
       whyArmed: pendingWhyReplies.has(dmChatId),
     });
     if (resource) {
+      // Stage 2 dedupe (doc 2652). Both reads fail open: an unreadable queue or
+      // library queues the link rather than dropping it.
+      const decision = resourceDecision(resource, {
+        queuedInputs: await queuedInputs('resource').catch(() => []),
+        docs: await findDocsMatching(join(repoDir, 'research'), repoMentionTest(resource)).catch(() => []),
+        recheck: isRecheck(text),
+      });
+      if (decision.kind === 'queued') {
+        await ctx.reply(`${resource.owner}/${resource.repo} is already in the work queue for a fit check. Nothing added.`);
+        featureRan('self-upgrade-dedupe', `queued ${resource.owner}/${resource.repo}`);
+        return;
+      }
+      if (decision.kind === 'researched') {
+        await ctx.reply(
+          `Already covered: ${decision.docs.map((d) => `research/${d}`).join(', ')}. Send "recheck ${resource.url}" for a fresh fit check against today's code.`,
+        );
+        featureRan('self-upgrade-dedupe', `researched ${resource.owner}/${resource.repo}`);
+        return;
+      }
       await enqueueWork(resourceInput(resource), { chatId: dmChatId }, 'resource');
       const depth = await queueDepth().catch(() => 0);
       await ctx.reply(

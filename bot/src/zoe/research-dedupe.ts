@@ -173,3 +173,48 @@ export async function wasResearched(
     return false;
   }
 }
+
+/**
+ * Up to `limit` research doc paths (`<category>/<num>-<slug>`) whose README
+ * passes `test`. Same walk as wasResearched, but it says WHICH docs matched,
+ * so a caller can point Zaal at them. Fail-open: an unreadable tree is [].
+ */
+export async function findDocsMatching(
+  researchDir: string,
+  test: (content: string) => boolean,
+  limit = 3,
+  readFileImpl?: (path: string, encoding: string) => Promise<string>,
+  readdirImpl?: (path: string) => Promise<string[]>,
+): Promise<string[]> {
+  const { promises: fs } = await import('node:fs');
+  const readFile = readFileImpl || ((p: string) => fs.readFile(p, 'utf8'));
+  const readdir = readdirImpl || ((p: string) => fs.readdir(p));
+  const hits: string[] = [];
+  let categories: string[] = [];
+  try {
+    categories = await readdir(researchDir);
+  } catch {
+    return hits;
+  }
+  for (const category of categories) {
+    if (category.startsWith('_') || category.startsWith('.')) continue;
+    let entries: string[] = [];
+    try {
+      entries = await readdir(`${researchDir}/${category}`);
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!/^\d+-/.test(entry)) continue;
+      try {
+        if (test(await readFile(`${researchDir}/${category}/${entry}/README.md`, 'utf8'))) {
+          hits.push(`${category}/${entry}`);
+          if (hits.length >= limit) return hits;
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+  return hits;
+}

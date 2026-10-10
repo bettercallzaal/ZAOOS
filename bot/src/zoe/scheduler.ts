@@ -63,6 +63,7 @@ import { surfaceGrill } from './grill';
 import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
 import { sendThezaoDaily } from './thezao-daily';
+import { runSleepCheckinTick } from './sleep-checkin';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
@@ -818,6 +819,33 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       );
     }
   }
+
+  // Sleep check-in (sleep-checkin.ts), Zaal 2026-10-10, seat grill items 88,
+  // 91 and 93. Ticks every five minutes; the module decides whether today's
+  // card is due from a per-weekday table in Eastern time, and sends it once.
+  // No-op unless ZOE_SLEEP_CHECKIN=1. His DM, or ZOE_SLEEP_CHECKIN_CHAT when
+  // that names a group. Class `gated`: it wants two taps from him.
+  tasks.push(
+    cron.schedule(
+      '*/5 * * * *',
+      () => {
+        if (process.env.ZOE_SLEEP_CHECKIN !== '1') return;
+        const sleepChat = Number(process.env.ZOE_SLEEP_CHECKIN_CHAT) || opts.zaalTgId;
+        return runWithSendClass('gated', async () => {
+          try {
+            const r = await runSleepCheckinTick({
+              send: (text, keyboard) => opts.bot.api.sendMessage(sleepChat, text, { reply_markup: keyboard }),
+            });
+            if (r !== 'not-due') console.log(`[zoe/scheduler] sleep check-in: ${r}`);
+            if (r === 'sent') featureRan('sleep-checkin', 'scheduled');
+          } catch (err) {
+            console.warn('[zoe/scheduler] sleep check-in failed (nbd):', (err as Error).message);
+          }
+        });
+      },
+      { timezone: 'UTC' },
+    ),
+  );
 
   // Terminals digest (terminals-digest.ts), Zaal 2026-10-07: "share with me how
   // all terminals are doing". Scheduled only when ZOE_TERMINALS_DIGEST=1 AND

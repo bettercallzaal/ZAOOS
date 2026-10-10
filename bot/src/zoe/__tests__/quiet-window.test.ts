@@ -222,13 +222,51 @@ describe('gateSend with the window', () => {
     expect(s.calls).toEqual([]);
   });
 
-  it('fails open: if the queue cannot be written, the message is sent', async () => {
+  it('queue unwritable, an ALARM: sent anyway, with a loud error that names it', async () => {
     process.env.ZOE_QUIET = '1';
     await fs.mkdir(quietQueuePath()); // a directory where the file should be
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     const s = sender(NIGHT);
     const r = await runWithSendClass('alarm', () => s.send(DM, 'something broke'));
     expect(wasSendBlocked(r)).toBe(false);
     expect(s.calls).toHaveLength(1);
+    const line = err.mock.calls.map((c) => String(c[0])).join('\n');
+    expect(line).toContain('QUEUE UNWRITABLE');
+    expect(line).toContain('class=alarm');
+    expect(line).toContain(`chat=${DM}`);
+    expect(line).toContain('something broke');
+  });
+
+  it.each(['gated', 'status', 'digest', 'noise'] as const)(
+    'queue unwritable, class %s: NOT sent at night, parked whole, error names it',
+    async (cls) => {
+      process.env.ZOE_QUIET = '1';
+      await fs.mkdir(quietQueuePath());
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const s = sender(NIGHT);
+      const r = await runWithSendClass(cls, () => s.send(GROUP, 'pick A or B', { message_thread_id: 3 }));
+      expect(s.calls).toEqual([]);
+      expect(r).toEqual({ message_id: 0, zoeSendBudget: 'dropped' });
+      const parked = JSON.parse((await fs.readFile(unreadablePath(), 'utf8')).trim());
+      expect(parked).toMatchObject({ cls, chatId: GROUP, text: 'pick A or B' });
+      expect(typeof parked.parked).toBe('string');
+      const line = err.mock.calls.map((c) => String(c[0])).join('\n');
+      expect(line).toContain('NOT sent, parked');
+      expect(line).toContain(`class=${cls}`);
+      expect(line).toContain(`chat=${GROUP}`);
+      expect(line).toContain('pick A or B');
+    },
+  );
+
+  it('queue AND park file unwritable: still not sent, and the error says LOST', async () => {
+    process.env.ZOE_QUIET = '1';
+    await fs.mkdir(quietQueuePath());
+    await fs.mkdir(unreadablePath());
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const s = sender(NIGHT);
+    await runWithSendClass('gated', () => s.send(DM, 'pick A or B'));
+    expect(s.calls).toEqual([]);
+    expect(err.mock.calls.map((c) => String(c[0])).join('\n')).toContain('LOST: class=gated');
   });
 
   it('the tag is applied before holding, so the held text is what arrives', async () => {

@@ -2,7 +2,7 @@
 topic: infrastructure
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-10
 related-docs: 661, 663, 677
 tier: STANDARD
 ---
@@ -463,4 +463,58 @@ jobs:
 | Test Win 1 (deploy workflow) on test bot | Next session | Integration | 2026-05-28 |
 | Merge all 5 wins into main | Next session | QA | 2026-05-31 |
 | Plan VPS consolidation for Q3 | @Zaal + ops | Design | 2026-06-30 |
+
+---
+
+## Updated 2026-10-10: Material Changes Found (Radar Revalidation)
+
+**What changed since 2026-05-20:**
+
+### VPS Landscape -- Significantly Different
+
+- **The openclaw container + 7-agent squad was decommissioned** 2026-05-04 (CLAUDE.md). This was a Docker-based workload that ran on the old imanagent box (187.77.3.104); it was not a separate physical VPS. The "VPS 2 (openclaw)" label in this original doc was a misnomer -- openclaw was a container environment, not a second machine.
+- **One VPS remains: 31.97.148.88** (Hostinger KVM 2, Ubuntu 24.04, user zaal). Confirmed as the live box by `.claude/skills/vps/SKILL.md`. The original doc's "VPS 1 (imanagent, 187.77.3.104)" was the old hostname/IP now retired. Bots were migrated off 187.77.3.104: `farscout.service` and `cowork-agent.service` both carry "migrated from 187.77.3.104" in their descriptions.
+- The VPS consolidation question (Opportunity #5) is moot -- there is only one VPS.
+- **farscout.service is still in the repo but is a zombie.** CLAUDE.md (2026-08-22) noted farscout was still running as `farscout.service` on the VPS, heartbeating `up` while doing nothing. Decommissioning it (`systemctl --user stop farscout && systemctl --user disable farscout`) is Zaal's action. The service file at `bot/systemd/farscout.service` should be deleted from the repo once the VPS unit is stopped.
+
+### Systemd Unit Count: 2 -> 12
+
+The original audit found 2 hardcoded `.service` files. As of 2026-10-10 there are 12 (9 services, 3 timers):
+`cowork-agent.service`, `ecosystem-watch.service`, `ecosystem-watch.timer`, `farscout.service` (zombie), `fleet-claude-auth.service`, `fleet-claude-auth.timer`, `fleet-heartbeat.service`, `fleet-heartbeat.timer`, `zao-devz-stack.service`, `zao-fleet-agent.service` (STAGED, NOT ENABLED), `zaostock-bot.service`, `zoe-bot.service`.
+
+This makes the systemd unit templating recommendation (Opportunity #3) more urgent -- each new bot adds another hardcoded file.
+
+### ZOE Bot Working Directory Changed
+
+The ZOE bot service now uses `WorkingDirectory=%h/zao-bot-live/bot` and `ExecStart=%h/zao-bot-live/bot/...`. The original doc documented `~/zao-os/` as the primary clone for ZOE. The deploy directory has been renamed or relocated. Any deploy automation targeting ZOE must reference `zao-bot-live/` not `zao-os/`. Other units (`zao-fleet-agent.service`, `zao-devz-stack.service`, etc.) still reference `%h/zao-os/bot` or other directories -- only `zoe-bot.service` has been updated to `zao-bot-live/`.
+
+### Fleet-Agent Control Plane (New Architecture)
+
+A new `zao-fleet-agent.service` was added (STAGED, not yet enabled) implementing a whitelisted start/stop/restart controller for the cowork control plane (doc 800 Phase 2). This adds a new security constraint for deploy automation: the fleet-agent only allows `systemctl --user {start,stop,restart}` on `{zoe-bot, zao-devz-stack, zaostock-bot}`. Any deploy pipeline must account for this gatekeeper rather than SSHing directly to systemctl.
+
+### Cheap Wins Status (as of 2026-10-10)
+
+Verified against repo state 2026-10-10 (grep of `.github/workflows/`, `scripts/`, `bot/systemd/`):
+- Win 1 (GitHub Actions deploy-on-push): **NOT DONE** -- no deploy-*.yml in `.github/workflows/`
+- Win 2 (secret scan in CI): **NOT DONE** -- no secret-scan.yml; `secret_scan.py` not in `.github/`
+- Win 3 (systemd unit template): **NOT DONE** -- no `.service.template` file; all units remain hardcoded
+- Win 4 (scripts/deploy.sh): **PARTIAL** -- `scripts/zoe-deploy.sh` and `scripts/zoe-autodeploy.sh` exist for ZOE but no general `deploy.sh` covering all bots
+- Win 5 (env guard in sync-supabase-env.sh): STATUS UNKNOWN -- `sync-supabase-env.sh` not checked this run
+
+### Secrets Management -- New Option Available
+
+As of 2026, **Infisical** (MIT-licensed, self-hostable) is a stronger match than Doppler for the ZAO stack, given the VPS-first deployment model. Doppler is cloud-only; Infisical runs as a Docker container on VPS 1 with Postgres + Redis backend. It supports GitHub Actions via OIDC or service tokens. The original doc's recommendation to use GitHub Secrets as the migration target remains valid as a simpler first step. Infisical is the upgrade path if a central secrets store is needed across multiple bots. Source: pkgpulse.com comparison (standard search result, UNVERIFIED full fetch due to proxy limits -- directional only).
+
+### OIDC-SSH-CA Pattern (New)
+
+A pattern called `oidc-ssh-ca` allows GitHub Actions to deploy via short-lived SSH certificates instead of a stored key pair. The workflow generates an ephemeral key on each run, proves identity via GitHub's OIDC token, and receives a cert valid for a few minutes. The server trusts only the CA public key, so no `authorized_keys` management is needed. This is more secure than the static `DEPLOY_SSH_KEY_IMANAGENT` approach in Opportunity #1. However, this is a third-party project (not GitHub-native for VPS targets). Vet before adopting. Source: WebSearch result, readthedocs URL unreachable this run -- directional only.
+
+### Sources (this revalidation)
+
+- Repo: `bot/systemd/` tree, `.github/workflows/` tree -- FULL (direct file reads)
+- Repo: CLAUDE.md Primary Surfaces section, farscout/zombie note -- FULL
+- WebSearch: "GitHub Actions deploy VPS SSH 2026" -- standard, links retrieved, individual pages unreachable (proxy limits); summary used as directional
+- WebSearch: "Doppler secrets management vs GitHub Actions Secrets VPS 2026" -- standard, directional
+- WebSearch: "Infisical open source secrets manager VPS self-hosted 2026" -- standard, directional
+- WebSearch: "GitHub Actions OIDC keyless deployment VPS 2026" -- standard, directional
 

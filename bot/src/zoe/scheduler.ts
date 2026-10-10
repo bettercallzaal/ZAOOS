@@ -62,6 +62,7 @@ import { ZAAL_BOTZ_HANDOFFS_THREAD, ZAAL_BOTZ_QUESTIONS_THREAD, ZAAL_BOTZ_CODING
 import { surfaceGrill } from './grill';
 import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
+import { sendThezaoDaily } from './thezao-daily';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
 import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
@@ -774,6 +775,36 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       { timezone: 'UTC' },
     ),
   );
+
+  // test.thezao.com morning message (thezao-daily.ts), Zaal 2026-10-10, seat
+  // grill item 84. Scheduled only when ZOE_THEZAO_DAILY=1 AND
+  // ZOE_THEZAO_DAILY_CRON holds a valid cron expression (UTC). Goes to his DM,
+  // or to ZOE_THEZAO_DAILY_CHAT when that names a group. Class `gated`: it asks
+  // for his review, and in a group that is what makes ZOE_TAG_ZAAL mention him.
+  const dailyCron = process.env.ZOE_THEZAO_DAILY_CRON?.trim();
+  if (dailyCron && process.env.ZOE_THEZAO_DAILY === '1') {
+    if (!cron.validate(dailyCron)) {
+      console.warn(`[zoe/scheduler] ZOE_THEZAO_DAILY_CRON is not a valid cron expression, not scheduled: ${dailyCron}`);
+    } else {
+      const dailyChat = Number(process.env.ZOE_THEZAO_DAILY_CHAT) || opts.zaalTgId;
+      tasks.push(
+        cron.schedule(
+          dailyCron,
+          () =>
+            runWithSendClass('gated', async () => {
+              try {
+                const r = await sendThezaoDaily({ send: (text) => opts.bot.api.sendMessage(dailyChat, text) });
+                console.log(`[zoe/scheduler] thezao daily: ${r}`);
+                if (r === 'sent' || r === 'partial') featureRan('thezao-daily', `scheduled, ${r}`);
+              } catch (err) {
+                console.warn('[zoe/scheduler] thezao daily failed (nbd):', (err as Error).message);
+              }
+            }),
+          { timezone: 'UTC' },
+        ),
+      );
+    }
+  }
 
   // Terminals digest (terminals-digest.ts), Zaal 2026-10-07: "share with me how
   // all terminals are doing". Scheduled only when ZOE_TERMINALS_DIGEST=1 AND

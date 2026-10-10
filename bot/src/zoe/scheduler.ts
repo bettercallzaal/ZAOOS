@@ -98,6 +98,9 @@ const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
+/** The morning brief and the backlog batch run on Zaal's clock, not UTC. */
+export const MORNING_TZ = 'America/New_York';
+
 function sentinelPath(trigger: string): string {
   const today = new Date().toISOString().slice(0, 10);
   return join(SENTINEL_DIR, `${trigger}-${today}.flag`);
@@ -284,13 +287,20 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       );
   });
 
-  // Morning brief — 09:00 UTC = 05:00 EDT, 04:00 EST. We anchor to UTC; Zaal in EST/EDT.
-  // Cron: '0 9 * * *' → 09:00 UTC daily.
+  // Morning brief - 05:00 America/New_York, every day of the year.
+  //
+  // It used to be '0 9 * * *' in UTC: 05:00 in daylight time and 04:00 once the
+  // clocks go back (1 November 2026). 04:00 is inside the quiet window, which
+  // ends at 04:45 (quiet-window.ts, seat grill items 94 and 95), and this class
+  // is not held by that window. Anchoring to his own clock keeps the brief at
+  // 05:00 on both sides of the change. node-cron resolves the zone itself.
+  // The once-a-day sentinel is keyed on the UTC date; 05:00 Eastern is 09:00 or
+  // 10:00 UTC, the same UTC day as before, so the claim is unaffected.
   // Class `morning`, not `digest`: this job DRAINS the deferred queue, so it
   // must never be deferred into it (see send-budget.ts, the seven classes).
   tasks.push(
     cron.schedule(
-      '0 9 * * *',
+      '0 5 * * *',
       () =>
         runWithSendClass('morning', async () => {
         if (!(await claimFire('morning-brief'))) return;
@@ -431,7 +441,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
         }
         }),
-      { timezone: 'UTC' },
+      { timezone: MORNING_TZ },
     ),
   );
 
@@ -451,7 +461,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   //
   // Zaal, 2026-08-26: one batch a day at his wake time, and every card into
   // the orchestrator grill lane rather than only Telegram. So this cron is now
-  // the brief's own '0 9 * * *' - if he is reading anything, he is reading it
+  // the brief's own minute (then '0 9 * * *' UTC) - if he is reading anything, he is reading it
   // then - and runBacklogGrillBatch also appends the batch to GRILL-QUEUE.md,
   // where the grill lane can clear the reversible ones under his standing rule
   // without waiting for a thumb.
@@ -598,7 +608,10 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // looks identical to a normal quiet day.
   tasks.push(
     cron.schedule(
-      '3 9 * * *',
+      // Three minutes after the brief, in the brief's own zone, so the two stay
+      // together when the clocks change (the reasoning above is about the
+      // minute, :03 against autodeploy's :x0, and that is unchanged).
+      '3 5 * * *',
       () =>
         runWithSendClass('gated', async () => {
         if (!(await claimFire('backlog-grill-batch'))) return;
@@ -656,7 +669,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.warn('[zoe/backlog-grill] batch failed (nbd):', (err as Error).message);
         }
         }),
-      { timezone: 'UTC' },
+      { timezone: MORNING_TZ },
     ),
   );
 

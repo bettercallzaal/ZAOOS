@@ -47,8 +47,8 @@ tier: STANDARD
 >
 > Same surface, same script: `bounties.fetchAll` via `zpoidh/scripts/build-bounty-dashboard.py`, cron build
 > `2026-10-10T13:53:09Z`, 114 open bounties (Base 101, Arbitrum 9, mainnet 4), priced at ETH $2,497.25 and
-> DEGEN $0.000997 (CoinGecko at build time). Every row is in `remeasure-2026-10-10.json` beside this file,
-> with the raw flag and the corrected one. Re-measured by the poidhz lane; tracker card 10304, LIST 6.
+> DEGEN $0.000997 (CoinGecko at build time). Every row, with the raw flag and the corrected one, is in
+> [`zpoidh/docs/doc-2522-remeasure-2026-10-10.json`](https://github.com/bettercallzaal/poidhz/blob/main/docs/doc-2522-remeasure-2026-10-10.json). Re-measured by the poidhz lane; tracker card 10304, LIST 6.
 >
 > | Measure | 2026-09-09 | 2026-09-20 | **2026-10-10** |
 > |---|---|---|---|
@@ -552,7 +552,7 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 
 ## Sources
 
-- [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `remeasure-2026-10-10.json`
+- [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `zpoidh/docs/doc-2522-remeasure-2026-10-10.json`
 - [poidh tRPC `claims.fetchBountyClaims`](https://poidh.xyz/api/trpc/claims.fetchBountyClaims) - **[FULL, method: `zpoidh/scripts/query-bounty.py` on all 65 zero-flag bounties plus positive controls 1330 and 1166, 2026-10-10 16:2x to 16:4xZ]** 5 bounties with 35 hidden claims
 - [api.web3.bio](https://api.web3.bio/profile/0xf19f11dee16a341671e6ed3e209b704c1bbc3e57) - **[FULL, 2026-10-10]** the 22-bounty issuer resolves to no identity; `0x4200ac33...` resolves to farcaster:poidhbot
 

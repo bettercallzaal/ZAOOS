@@ -96,8 +96,20 @@ jobs:
           # including one that landed on main after this branch was cut.
           basetree=$(git ls-tree -r --name-only "$base") \
             || { echo "::error title=doc-guard git ls-tree failed::cannot read base tree - failing closed"; exit 1; }
+          #
+          # The exclusion only works if both sides spell the path the same way.
+          # The comment above said "excluding the exact same path" did this; it
+          # did not. doc-new-claims.sh prints the directory WITHOUT a trailing
+          # slash and this grep kept it WITH one, so `grep -vxF "$d"` never
+          # matched and a PR that ADDED a file inside an existing doc directory
+          # collided with itself (ZAOOS #3881 and #3882, 2026-10-10: doc 2522
+          # gained remeasure-2026-10-10.json and the guard named 2522 as taken
+          # by research/business/2522-poidh-live-bounty-market/). Strip the
+          # slash here so the two lists are byte-comparable. A renumber onto a
+          # taken number still fails: the paths differ, so -vxF keeps the hit.
           existingdirs=$(printf '%s\n' "$basetree" \
             | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' \
+            | sed 's|/$||' \
             | sort -u || true)
 
           # ALSO compare against every OTHER OPEN PR's added doc dirs.
@@ -123,7 +135,9 @@ jobs:
             for n in $others; do
               files=$(gh api "repos/${{ github.repository }}/pulls/$n/files?per_page=100" \
                 --jq '.[] | select(.status=="added") | .filename' 2>/dev/null) || continue
-              d=$(printf '%s\n' "$files" | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' | sort -u || true)
+              # Same spelling as $newdirs (no trailing slash), or `grep -v "^${d}#"`
+              # below never excludes this PR's own directory either.
+              d=$(printf '%s\n' "$files" | grep -oE '^research/[^_/][^/]*/[0-9]{3,4}-[^/]+/' | sed 's|/$||' | sort -u || true)
               [ -n "$d" ] && otherdirs=$(printf '%s\n%s' "$otherdirs" "$d#$n")
             done
           else

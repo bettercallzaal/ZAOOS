@@ -865,21 +865,24 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     // it: at night a send is held with its buttons and sent in the morning. A
     // held send resolves exactly like a budget-deferred one, so every caller
     // that already checks wasSendBlocked does the right thing unchanged. If
-    // the queue cannot be written, holdSend says so and the message goes out.
+    // the queue cannot be written, only an alarm goes out; anything else is
+    // parked and reported as dropped, because it will not be released.
     const cls = resolveSendClass(opts);
     if (shouldHold(cls, opts, now())) {
-      if (await holdSend({ at: now().toISOString(), cls, chatId, text, ...(clean ? { opts: clean } : {}) })) {
+      const held = await holdSend({ at: now().toISOString(), cls, chatId, text, ...(clean ? { opts: clean } : {}) });
+      if (held !== 'send') {
+        const outcome: SendOutcome = held === 'held' ? 'deferred' : 'dropped';
         await logDecision({
           at: now().toISOString(),
-          outcome: 'deferred',
+          outcome,
           cls,
           chatId,
           countBefore: 0,
           cap: 0,
-          reason: 'quiet window - held until morning',
+          reason: held === 'held' ? 'quiet window - held until morning' : 'quiet window - queue unwritable, parked, not sent',
           preview: text.slice(0, 120),
         }).catch(() => {});
-        return blockedResult('deferred');
+        return blockedResult(outcome);
       }
     }
     if (!sendBudgetEnabled()) return passThrough(chatId, text, clean);

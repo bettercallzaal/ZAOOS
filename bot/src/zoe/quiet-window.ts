@@ -51,8 +51,14 @@
  * window ends could append after the last read; the zao-ask script opens,
  * writes and closes in one step, and only writes while the window is on.
  *
- * Fails OPEN: if the queue cannot be written the message is sent. A night ping
- * is a smaller harm than a lost alarm.
+ * WHEN THE QUEUE CANNOT BE WRITTEN. Only an alarm is sent anyway. Everything
+ * else fails CLOSED: it is parked in quiet-queue.unreadable.jsonl, whole, and
+ * logged at error level with its class, chat and a preview. A broken queue then
+ * costs him a message he reads in the morning, not a ping at 11 pm; the first
+ * version sent every class and logged one warn line that named only the error
+ * (seat evaluator on #3890, silent-failure-guard rule 6). Parked messages are
+ * not released automatically: the error line is the signal, and the file is
+ * where a person finds them.
  */
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
@@ -179,23 +185,40 @@ const sameSend = (a: QuietEntry, b: QuietEntry): boolean =>
   a.cls === b.cls &&
   JSON.stringify(a.opts ?? {}) === JSON.stringify(b.opts ?? {});
 
-/**
- * Hold one send. Resolves true when it is in the queue (or already was), false
- * when it could not be written - the caller then sends it instead.
- */
-export function holdSend(entry: QuietEntry): Promise<boolean> {
+/** 'held': in the queue, released in the morning. 'parked': the queue could
+ *  not be written, so it is in the unreadable file and will NOT be released.
+ *  'send': an alarm the queue could not take; the caller sends it now. */
+export type HoldOutcome = 'held' | 'parked' | 'send';
+
+/** Hold one send. Never throws. */
+export function holdSend(entry: QuietEntry): Promise<HoldOutcome> {
   return locked(async () => {
+    const who = `class=${entry.cls} chat=${entry.chatId} preview=${JSON.stringify(entry.text.slice(0, 80))}`;
     try {
-      const line = JSON.stringify(entry); // throws on a cyclic option: then it is sent
+      const line = JSON.stringify(entry); // throws on a cyclic option
       const existing = await readQuietQueue();
-      if (existing.some((e) => sameSend(e, entry))) return true;
+      if (existing.some((e) => sameSend(e, entry))) return 'held';
       await fs.mkdir(zoeHome(), { recursive: true });
       // APPEND, never rewrite: the VPS zao-ask script appends to this same file.
       await fs.appendFile(quietQueuePath(), `${line}\n`, { mode: 0o600 });
-      return true;
+      return 'held';
     } catch (e) {
-      console.warn('[zoe/quiet] could not hold a send, sending it instead:', (e as Error)?.message);
-      return false;
+      const why = (e as Error)?.message;
+      if (entry.cls === 'alarm') {
+        console.error(`[zoe/quiet] QUEUE UNWRITABLE (${why}) - sending this alarm now, in the quiet window: ${who}`);
+        return 'send';
+      }
+      // Options are left out of the parked copy: an option that cannot be
+      // serialised is one way to get here, and the text is what must survive.
+      const parked = { at: entry.at, cls: entry.cls, chatId: entry.chatId, text: entry.text, parked: why };
+      try {
+        await fs.mkdir(zoeHome(), { recursive: true });
+        await fs.appendFile(unreadablePath(), `${JSON.stringify(parked)}\n`, { mode: 0o600 });
+        console.error(`[zoe/quiet] QUEUE UNWRITABLE (${why}) - NOT sent, parked in ${unreadablePath()}: ${who}`);
+      } catch (e2) {
+        console.error(`[zoe/quiet] QUEUE UNWRITABLE (${why}) and the park file too (${(e2 as Error)?.message}) - NOT sent, LOST: ${who}`);
+      }
+      return 'parked';
     }
   });
 }

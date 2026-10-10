@@ -2,7 +2,7 @@
 topic: wavewarz
 type: audit
 status: research-complete
-last-validated: 2026-09-20
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "1237, 1644, 1785"
 original-query: "WaveWarZ protocol: what the deployed program actually does, measured 2026-09-20 - the bonding curve constant correction (fitted 4.993e8 was wrong, exactly 5e8 with 100,000-token steps floored per trade), the fee split and the lamport that does not sum, the buy/sell slippage asymmetry (buy floor of 0 rejected, sell floor of 0 accepted, live client sends 0 on 92 of 92 sampled sells), settlement by larger pool with ties to B, the six-instruction set including the previously undocumented initializeMints, the account layout with two duplicate pool field pairs, the dust floor, and live validation of 38+ real trades predicted exactly during the finals. Depth: STANDARD."
@@ -173,6 +173,35 @@ These are trades other people made, with their own money, through the live
 client. Every earlier verification in this estate was of a transaction we had
 built ourselves.
 
+### 8. The finals, final trade counts (appended 2026-10-10)
+
+The live watcher above read 38 trades part-way through the first final. The full
+counts come from the chain snapshot wavewarz-protocol committed on 2026-10-08
+(`data/chain-snapshot-2026-09-27/trades.json`, every trade on the program through
+2026-09-27, sha256-recorded in that repo's PR #49), read offline on 2026-10-10. The
+three finals are the three battles that started between 23:48 UTC on 2026-09-20 and
+00:49 UTC on 2026-09-21, each 900 seconds, all settled.
+
+| Battle | Start (UTC) | Buys | Sells | Trades | Claims | Traders | Volume (SOL) |
+|---|---|---|---|---|---|---|---|
+| 1789948124 | 2026-09-20 23:48 | 33 | 16 | **49** | 7 | 10 | 8.8350 |
+| 1789949789 | 2026-09-21 00:16 | 37 | 18 | **55** | 9 | 12 | 9.3375 |
+| 1789951764 | 2026-09-21 00:49 | 32 | 8 | **40** | 7 | 11 | 15.5804 |
+| **All three** | | **102** | **42** | **144** | **23** | | **33.7529** |
+
+Trades are buys plus sells; claims are listed separately. Volume is buy plus sell
+lamports. The buy counts, 33, 37 and 32, are the same three figures wwtracker's
+`scripts/ww-verify-battle.ts` already carries in its comments as the finals' form
+scores, which is the cross-check that these are the right three battles.
+
+**What this does and does not close.** The trade count the Next Actions row asked
+for is appended here, from the snapshot, with no RPC call. The other half of that row,
+re-running `ww-verify-battle.ts` against the three settled battles so every one of
+the 144 trades is compared to the corrected model rather than the 38 the watcher saw,
+still needs a keyed RPC endpoint, and where that key lives is still BLOCKED (vault
+`handoffs/wavewarz-protocol.md`). Until it runs, "38 of 38 predicted exactly" is the
+measured claim and 144 is only the count.
+
 ## Also See
 
 - [research/wavewarz/1237-wavewarz-onchain-economics](../1237-wavewarz-onchain-economics/) — carries the "1.0% to the artist" figure this doc corrects to 1.005%
@@ -186,7 +215,8 @@ built ourselves.
 | Correct "1.0% per trade to the artist" to 1.005% in doc 1237 | @Zaal | PR to ZAOOS | 2026-09-27 |
 | Send Candy the sell-side slippage finding (92 of 92 carry no floor) and ask whether it is deliberate | @Zaal | Message | 2026-09-22 |
 | Merge wwtracker #333 so `/finals` and the diagnose tooling are on main behind `WW_FINALS` | @Zaal | PR merge | 2026-09-21 |
-| Re-run `scripts/ww-verify-battle.ts` against the finals battles once settled, and append the final trade count to this doc | @Zaal | Script + doc edit | 2026-09-22 |
+| ~~Append the final trade count to this doc~~ DONE 2026-10-10, section 8, from the committed 09-27 snapshot: 49 / 55 / 40, 144 trades across the three finals | lane | doc edit | 2026-10-10 |
+| Re-run `scripts/ww-verify-battle.ts` against the three settled finals so all 144 trades are checked against the model, not the 38 the watcher saw | @Zaal (the keyed RPC endpoint) | Script | when the Helius key location is known |
 
 ## Sources
 

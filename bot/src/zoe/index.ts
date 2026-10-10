@@ -189,6 +189,7 @@ import {
 } from './commands';
 import { formatSpendStatus } from './cost-governance';
 import { enqueueWork, queueDepth, runWorkTick } from './work-loop';
+import { claimResourceLink, resourceInput, selfUpgradeDailyCap } from './self-upgrade';
 import {
   GENERAL_THREAD_SENTINEL,
   GENERAL_TOPIC,
@@ -2779,6 +2780,23 @@ async function handlePrivateMessage(ctx: Context, text: string, brandContext?: s
         console.error('[zoe/x-desk] failed:', (e as Error)?.message);
         await ctx.reply('The X desk hit an error drafting that one. Send the link again in a minute.');
       }
+      return;
+    }
+    // Self-upgrade intake (ZOE_SELF_UPGRADE=1, self-upgrade.ts, doc 2652): a
+    // GitHub repo link is queued as a `resource` for a fit check against live
+    // code. Same gate shape as the X desk: pending answers and an expected
+    // "Add a why" reply win. The work loop runs it; the result is a doc + PR.
+    const resource = claimResourceLink(text, {
+      pendingArmed: Boolean(getPending('private')),
+      whyArmed: pendingWhyReplies.has(dmChatId),
+    });
+    if (resource) {
+      await enqueueWork(resourceInput(resource), { chatId: dmChatId }, 'resource');
+      const depth = await queueDepth().catch(() => 0);
+      await ctx.reply(
+        `Queued ${resource.owner}/${resource.repo} for a self-upgrade fit check: what we would EXTEND, build NEW, or SKIP, checked against our live code. It lands as a research doc + PR (${depth} in the work queue, at most ${selfUpgradeDailyCap()} resources a day).`,
+      );
+      featureRan('self-upgrade-intake', `${resource.owner}/${resource.repo}`);
       return;
     }
   }

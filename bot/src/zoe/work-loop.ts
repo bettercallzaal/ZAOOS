@@ -17,6 +17,7 @@
  *  - the watcher (watcher.ts) independently flags cost/quality anomalies.
  */
 import { promises as fs } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import { acquireTickLock, releaseTickLock } from './tick-lock';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
@@ -30,6 +31,14 @@ import { parkWork, resumeWork, type ParkReason } from './work-park';
 import type { ZoeContext } from './types';
 import { featureRan } from './feature-ran';
 import { attentionEnabled } from './attention';
+import {
+  bumpResourcesToday,
+  buildFitCheckGoal,
+  pickRunnable,
+  resourceDocQuestion,
+  resourcesRunToday,
+  selfUpgradeDailyCap,
+} from './self-upgrade';
 
 const dir = (): string => process.env.ZOE_HOME || join(homedir(), '.zao', 'zoe');
 const QUEUE = (): string => join(dir(), 'work-queue.json');
@@ -40,7 +49,8 @@ const DAILY_CAP = Math.max(1, Number(process.env.ZOE_WORKLOOP_DAILY ?? 6));
 
 export interface WorkItem {
   id: string;
-  kind: 'research';
+  /** `resource`: a shared repo link run as a self-upgrade fit check (self-upgrade.ts, doc 2652). */
+  kind: 'research' | 'resource';
   input: string;
   addedTs: string;
   /** Where to report the result. When set (e.g. a request from the Research
@@ -77,11 +87,16 @@ async function writeQueue(q: WorkItem[]): Promise<void> {
 export async function enqueueWork(
   input: string,
   replyTarget?: { chatId: number; threadId?: number },
+  kind: WorkItem['kind'] = 'research',
 ): Promise<WorkItem> {
   const q = await readQueue();
   const item: WorkItem = {
-    id: 'wk-' + Date.now().toString(36),
-    kind: 'research',
+    // Time plus randomness. Time alone collided: two items queued in the same
+    // millisecond shared an id, and the queue is filtered by id when an item
+    // finishes, so finishing one silently removed the other (found 2026-10-10
+    // by the #3868 review; work-loop-id.test.ts).
+    id: `wk-${Date.now().toString(36)}-${randomBytes(3).toString('hex')}`,
+    kind,
     input: input.trim(),
     addedTs: new Date().toISOString(),
     ...(replyTarget ? { replyTarget } : {}),
@@ -159,7 +174,22 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
   }
 
   try {
-    const item = q[0];
+    // A resource item runs only while today's self-upgrade cap has room; a
+    // capped one waits for tomorrow without blocking research behind it.
+    const resourcesToday = await resourcesRunToday(deps.currentDate);
+    const idx = pickRunnable(
+      q.map((x) => x.kind),
+      resourcesToday,
+      selfUpgradeDailyCap(),
+    );
+    if (idx === -1) {
+      console.log(`[zoe/work-loop] only capped self-upgrade resources queued (${q.length}) - waiting for tomorrow`);
+      return;
+    }
+    const item = q[idx];
+    const isResource = item.kind === 'resource';
+    // The worker's goal: the input itself, or the fit-check brief for a resource.
+    const goal = isResource ? buildFitCheckGoal(item.input) : item.input;
     // Captured from the research-doc hook so the receipt can point at the PR (R1b).
     let evidenceUrl: string | null = null;
     // The worker's own failure text. Without this, a FAILED worker and a
@@ -238,7 +268,7 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
         return out;
       };
 
-      const firstOutput = await runResearch(item.input);
+      const firstOutput = await runResearch(goal);
       // The receipt used to say 'success' unconditionally, including when
       // research returned nothing and when the doc failed to commit. It now
       // reports what actually happened (doc 2272).
@@ -263,12 +293,15 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
           });
           return r.text;
         };
-        const { output: finalOutput, retries } = await verifyReplanResearch(item.input, firstOutput, {
+        const { output: finalOutput, retries } = await verifyReplanResearch(goal, firstOutput, {
           research: runResearch,
           judge,
           log: (m) => console.log(`[zoe/work-loop] ${m}`),
         });
-        const doc = await commitResearchDoc({ question: item.input, findings: finalOutput });
+        const doc = await commitResearchDoc({
+          question: isResource ? resourceDocQuestion(item.input) : item.input,
+          findings: finalOutput,
+        });
         if (doc.ok) evidenceUrl = doc.prUrl ?? null;
         await reportFor(item, deps)(
           doc.ok
@@ -307,6 +340,7 @@ export async function runWorkTick(deps: WorkTickDeps): Promise<void> {
       }
       await writeQueue((await readQueue()).filter((x) => x.id !== item.id));
       await bumpToday(deps.currentDate);
+      if (isResource) await bumpResourcesToday(deps.currentDate);
       // A tick reached the end of an item. resultType distinguishes a committed
       // doc from a parked failure - both are 'it ran', only one is 'it worked'.
       featureRan('work-loop', resultType);

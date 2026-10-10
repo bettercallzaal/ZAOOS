@@ -45,6 +45,9 @@ describe('parseDatedLines', () => {
       { date: TODAY, text: 'd' },
     ]);
   });
+  it('a timestamp is not a dated line (the date must end at a space or separator)', () => {
+    expect(parseDatedLines('2026-10-11T09:00 The page loads.\n2026-10-111 x\n2026-10-11x y')).toEqual([]);
+  });
   it('a date with no text is not a line', () => {
     expect(parseDatedLines('2026-10-11\n2026-10-11   ')).toEqual([]);
   });
@@ -146,6 +149,32 @@ describe('sendThezaoDaily', () => {
     expect(await sendThezaoDaily({ send: s.send, now: NOW, read: read(CHANGES, INVITE), recordContext: ctx })).toBe('blocked');
     expect(s.sent).toHaveLength(1);
     expect(ctx).not.toHaveBeenCalled();
+  });
+
+  it('invite blocked after the main message went out: partial, never sent', async () => {
+    vi.stubEnv('ZOE_THEZAO_DAILY', '1');
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const sent: string[] = [];
+    const send = async (text: string) => {
+      sent.push(text);
+      return sent.length === 1 ? { message_id: 1 } : { message_id: 0, zoeSendBudget: 'dropped' };
+    };
+    const r = await sendThezaoDaily({ send, now: NOW, read: read(CHANGES, INVITE), recordContext: vi.fn(async () => undefined) });
+    expect(r).toBe('partial');
+    vi.restoreAllMocks();
+  });
+
+  it('invite send throws after the main message went out: partial, not a throw', async () => {
+    vi.stubEnv('ZOE_THEZAO_DAILY', '1');
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    let n = 0;
+    const send = async () => {
+      if (++n === 2) throw new Error('Telegram unavailable');
+      return { message_id: 1 };
+    };
+    const r = await sendThezaoDaily({ send, now: NOW, read: read(CHANGES, INVITE), recordContext: vi.fn(async () => undefined) });
+    expect(r).toBe('partial');
+    vi.restoreAllMocks();
   });
 
   it('a vault that cannot be read is reported, not silent', async () => {

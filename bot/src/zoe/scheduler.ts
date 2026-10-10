@@ -795,7 +795,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               try {
                 const r = await sendThezaoDaily({ send: (text) => opts.bot.api.sendMessage(dailyChat, text) });
                 console.log(`[zoe/scheduler] thezao daily: ${r}`);
-                if (r === 'sent') featureRan('thezao-daily', 'scheduled');
+                if (r === 'sent' || r === 'partial') featureRan('thezao-daily', `scheduled, ${r}`);
               } catch (err) {
                 console.warn('[zoe/scheduler] thezao daily failed (nbd):', (err as Error).message);
               }

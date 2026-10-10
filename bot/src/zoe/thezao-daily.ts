@@ -63,7 +63,9 @@ export interface DatedLine {
 export function parseDatedLines(text: string): DatedLine[] {
   const out: DatedLine[] = [];
   for (const raw of text.split('\n')) {
-    const m = /^\s*(?:[-*]\s+)?(\d{4}-\d{2}-\d{2})\s*[:|-]?\s*(.*\S)\s*$/.exec(raw);
+    // The date must END there: a space or a separator follows it. Without that,
+    // "2026-10-11T09:00 text" read as the date plus the text "T09:00 text".
+    const m = /^\s*(?:[-*]\s+)?(\d{4}-\d{2}-\d{2})(?:\s*[:|]\s*|\s+-\s+|\s+)(\S.*?)\s*$/.exec(raw);
     if (!m) continue;
     out.push({ date: m[1], text: m[2] });
   }
@@ -121,7 +123,8 @@ export function formatDaily(p: DailyParts, today: string, opts: { fetched: boole
   return lines.join('\n');
 }
 
-export type DailyResult = 'off' | 'sent' | 'blocked' | 'failed';
+/** 'partial': the main message went out and the invite it promised did not. */
+export type DailyResult = 'off' | 'sent' | 'blocked' | 'failed' | 'partial';
 
 export interface DailyDeps {
   /** Send one message; resolves with Telegram's result (message_id when sent). */
@@ -156,6 +159,21 @@ export async function sendThezaoDaily(deps: DailyDeps): Promise<DailyResult> {
       console.error('[zoe/thezao-daily] could not record reply context:', (e as Error)?.message),
     );
   }
-  if (parts.invite) await deps.send(parts.invite);
+  if (parts.invite) {
+    // The main message has already promised this one. If it is blocked or
+    // throws, say so in the log and in the result: 'sent' would be a lie, and
+    // a throw here would lose the fact that the main message did go out.
+    let invite: unknown;
+    try {
+      invite = await deps.send(parts.invite);
+    } catch (error: unknown) {
+      console.error('[zoe/thezao-daily] the invite sentence failed to send:', (error as Error)?.message);
+      return 'partial';
+    }
+    if (wasSendBlocked(invite)) {
+      console.error('[zoe/thezao-daily] the invite sentence was blocked by the send budget');
+      return 'partial';
+    }
+  }
   return 'sent';
 }

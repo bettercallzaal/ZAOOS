@@ -2,8 +2,10 @@ name: Research index (CI-owned)
 # CI OWNS the research folder index so PRs never hand-edit the shared
 # research/<topic>/README.md (which made concurrent doc PRs collide and stall).
 #
-# - On push to main: backfill any missing index rows and commit them back
-#   ([skip ci] so it does not loop). The index self-heals; PRs do not touch it.
+# - On push to main: backfill any missing index rows and open a PR with them
+#   (branch ci/research-index-backfill-<run_id>; the commit is tagged [skip ci]
+#   so the backfill branch does not loop). main is protected, so the job never
+#   pushes to main. The index self-heals one merge later; PRs do not touch it.
 # - On a PR: advisory only. It reports unindexed docs as a warning but NEVER
 #   blocks - the merge will backfill them. This replaces the old blocking
 #   check-research-index guard that forced every PR to add its own row.
@@ -23,55 +25,69 @@ permissions:
 jobs:
   research-index:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - name: Backfill missing folder-index rows
         run: bash scripts/backfill-research-index.sh
 
-      - name: Commit backfilled rows (main only, FATAL if the push fails)
+      - name: Open a PR with backfilled rows (main only, FATAL if it cannot)
         if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          BRANCH: ci/research-index-backfill-${{ github.run_id }}
         run: |
+          set -euo pipefail
           if ! git diff --quiet -- research; then
             git config user.name "zao-index-bot"
             git config user.email "zao-index-bot@users.noreply.github.com"
-            # `git add research/*/README.md` died here: the shell glob expands
-            # to research/314-music-metadata-isrc-ai-distribution/README.md,
-            # which sits behind a TRACKED SYMLINK (research/314-... ->
-            # music/314-...), and git refuses a pathspec that traverses a
-            # symlink ("fatal: ... is beyond a symbolic link", exit 128). The
-            # step is `bash -e`, so the job died and the backfill was thrown
-            # away on every run that actually had rows to commit.
-            # `-u` stages modifications to already-tracked files under
-            # research/ (all this script ever does is append to an existing
-            # topic README), and a directory pathspec never walks the symlink.
+            # Run 38062695645 (after doc PR #3876 merged at da4f1d20) pushed this
+            # commit to main and GitHub refused it twice: "GH006: Protected branch
+            # update failed for refs/heads/main - Changes must be made through a
+            # pull request." Branch protection is not a race, so the job no longer
+            # pushes to main. It writes the rows to a branch and opens a PR, so the
+            # index is one PR away, not behind disk.
+            #
+            # `git add research/*/README.md` died once: the glob expands to a path
+            # behind a TRACKED SYMLINK (research/314-... -> music/314-...), and git
+            # refuses a pathspec that traverses a symlink (exit 128). `-u` stages
+            # modifications to already-tracked files under research/ (this script
+            # only appends to existing topic READMEs). Keep it.
+            #
+            # Idempotence: a PR already open for this branch is printed and reused.
+            existing=$(gh api "repos/$REPO/pulls?head=$OWNER:$BRANCH&state=open" --jq '.[0].html_url // empty') || { echo "::error::index backfill could not query open PRs for $BRANCH - the research index is NOT reporting success"; exit 1; }
+            if [ -n "$existing" ]; then
+              echo "backfill PR already open: $existing"
+              exit 0
+            fi
+            git checkout -b "$BRANCH"
             git add -u -- research
             git commit -m "chore(research): CI backfill folder index rows [skip ci]"
-            # FIXED (ZAO research doc 2478, inverted alarm #6): this used to
-            # degrade a push failure to "::warning::" and still exit 0 - a
-            # stopped backfill (branch protection changed, auth expired) and a
-            # genuinely complete index rendered identically green in Actions.
-            # A push failure here means the index just fell behind disk with
-            # nobody told; that is a fail, not a warning.
-            # A HARD FAIL MUST NOT FIRE ON THE NORMAL CASE. Losing a
-            # fast-forward race with a concurrent merge is routine here and is
-            # not a fault: measured on origin/main over 30 days, 266 commits
-            # touched the paths that trigger this workflow and 26 consecutive
-            # pairs landed within 120 seconds of each other, 54 within 300. The
-            # job checks out, backfills, commits and pushes inside that window,
-            # so about a tenth of triggering merges would red main for losing a
-            # race. A check that fires on the ordinary case is ignored by the
-            # time it fires on the real one, and this one fires on main
-            # (`noisy-signal-guard.md`; zaoos-review, #3458 review).
-            #
-            # So: rebase onto whatever landed and try once more. Branch
-            # protection and an expired token still fail, because a rebase does
-            # not make either of them push. Only the race is absorbed.
-            if ! git push; then
-              echo "::notice::push rejected, rebasing onto origin/main and retrying once"
-              git fetch origin main
-              git rebase origin/main || { echo "::error::index backfill could not rebase onto origin/main - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
-              git push || { echo "::error::index backfill commit could not be pushed after a rebase (branch protection or auth failure, not a race) - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
-            fi
+            # FATAL on failure, never `|| true`. A rejected push means the index
+            # fell behind disk with nobody told; that is a fail, not a warning.
+            git push origin "HEAD:refs/heads/$BRANCH" || { echo "::error::index backfill could not push branch $BRANCH - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
+            body_file="$RUNNER_TEMP/research-index-backfill-body.md"
+            {
+              echo "Automated folder-index backfill from the research-index workflow (run ${GITHUB_RUN_ID})."
+              echo
+              echo "The job runs on push to main. It found research docs with no row in their"
+              echo "topic folder README and wrote the rows here instead of pushing to main,"
+              echo "because main is protected (GH006 on run 38062695645)."
+              echo
+              echo "Only index rows change. The commit is tagged [skip ci] so this branch does"
+              echo "not trigger another backfill. Merge it to clear the index drift."
+            } > "$body_file"
+            pr_url=$(gh api -X POST "repos/$REPO/pulls" \
+              -f title="chore(research): CI backfill folder index rows (run ${GITHUB_RUN_ID})" \
+              -f head="$BRANCH" \
+              -f base=main \
+              -F body=@"$body_file" \
+              --jq '.html_url') || { echo "::error::index backfill pushed $BRANCH but could not open a PR (check that Actions may create pull requests in repo settings) - the research index is now behind disk and this job is NOT reporting success"; exit 1; }
+            echo "backfill PR opened: $pr_url"
           else
             echo "index already complete"
           fi

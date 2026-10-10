@@ -131,6 +131,37 @@ function gitIn(dir: string): GitRun {
     });
 }
 
+/**
+ * Fetch, then read vault files from origin/main (never the working tree, see
+ * the header). A failed fetch reads the last ref and says so. A path that does
+ * not exist on the ref comes back as null, so a caller can tell "not written
+ * yet" from "could not read git at all", which still throws.
+ */
+export async function readVaultFiles(
+  dir: string,
+  paths: string[],
+  run: GitRun = gitIn(dir),
+): Promise<{ files: Record<string, string | null>; fetched: boolean }> {
+  let fetched = true;
+  try {
+    await run(['fetch', '-q', 'origin', 'main']);
+  } catch (error: unknown) {
+    fetched = false;
+    console.warn('[zoe/vault] fetch failed, reading the last ref:', (error as Error)?.message);
+  }
+  // Proves the ref itself is readable; a missing file below is then only that.
+  await run(['rev-parse', '--verify', '-q', 'origin/main']);
+  const files: Record<string, string | null> = {};
+  for (const p of paths) {
+    try {
+      files[p] = await run(['show', `origin/main:${p}`]);
+    } catch {
+      files[p] = null;
+    }
+  }
+  return { files, fetched };
+}
+
 /** Fetch, then read the page from origin/main. A failed fetch reads the last ref and says so. */
 export async function readTerminalsPage(dir: string, run: GitRun = gitIn(dir)): Promise<{ text: string; fetched: boolean }> {
   let fetched = true;

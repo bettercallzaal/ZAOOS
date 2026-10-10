@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-08-28
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "2412, 2411, 2317, 2421, 2402, 2348, 2352, 2401, 2432"
 original-query: "i wanna use our connectors more and first to gain context can we /zao-research how to use linear notion obsidian and canva and the rest of our mcp set togetehr and find if we could connect to more mcps to give our agentic infra a level up and be more autonomous"
@@ -24,6 +24,10 @@ tier: DEEP
 | 5 | **Add exactly two things, both rung 1 (platform-native, hosted, OAuth): Cal.com's hosted MCP (`https://mcp.cal.com/mcp`) and, when Zaal is ready to create a second bot token, Anthropic's own Telegram channel plugin as the Mac-side sender the ZOE loop is missing (daily item 20).** Everything else scored below is WATCH or NOT-FOR-US. | Cal.com is already the ZABAL Gamez booker (glossary) and doc 2412's overdue scheduler decision resolves toward it; the hosted server needs no key. The Telegram channel plugin is Apache-2.0 in `anthropics/claude-plugins-official` (34,858 stars, pushed 2026-08-28), and the only blocker for the loop's DM step is a sender on the Mac. Discord's channel plugin from the same repo is the read-path fallback if ZOE's own `discord.ts` is not flagged. |
 | 6 | **Drop the ECC `server-github@2025.4.8` entry; do not add GitHub's official MCP.** | `gh` (`/opt/homebrew/bin/gh`) is rung 1 and every lane uses it; the ECC server was called **5 times in 30 days** (doc 2411). `github/github-mcp-server` (MIT LICENSE read, 32,576 stars, 100+ contributors, pushed 2026-08-28) is excellent and duplicates a CLI we already run from scripts for free (`code-over-inference.md`). |
 | 7 | **Obsidian: doc 2317's verdict holds. File tools on `~/zao-vault`; `StevenStavrakis/obsidian-mcp` is still the adopt-later pick and is still alive.** | LICENSE read (MIT), 729 stars, 5 contributors, pushed 2026-08-27. The larger `jacksteamdev/obsidian-mcp-tools` (832 stars) is **archived**. Nothing in this week's dailies needed a vault MCP. |
+
+> **Canva tier note, added 2026-10-10 (card 10305).** The 2026-10-10 `last-validated` date covers the Canva tier rows only; every other measurement in this doc stands as taken on 2026-08-28 and was not re-run. Doc 2516 found on 2026-09-20 that Canva's Autofill API, the supported route for generating a card series from a brand template, was Canva Enterprise only on both the developer's and the user's side, and asked for that correction to be written here. **Canva changed the gate the next day.** Its Connect changelog entry for September 21, 2026 reads: "The Autofill APIs are now available to apps acting on behalf of users on a Canva Pro or Canva Teams plan, in addition to Canva Enterprise." Re-read on 2026-10-10, the capability reference, the autofill guide and the MCP tools table all say Pro, Teams or Enterprise (`autofill-design` and `get-brand-template-dataset` are listed "Pro and above").
+>
+> What that means for the Canva rows in this doc: the tools the two loops below actually name, `generate-design` and `export-design`, are listed "All plans" and were never Enterprise-gated. Autofill, which this doc does not use, was gated from at least 2026-09-20 until 2026-09-21 and per Canva's docs no longer is. Not measured here: which plan ZAO's Canva seat is on, and whether an autofill call succeeds from it - no autofill call was made. Sources and the full tier table: [doc 2515](../../security/2515-canva-connect-api-authz/) and [doc 2516](../2516-canva-agent-permissions/).
 
 ## 1. Measured inventory, from this lane, 2026-08-28
 
@@ -73,7 +77,7 @@ Notion adds nothing here: the team reads Google Docs, the fleet reads the vault,
 2. **Google Drive** `ZAOstock/Artists/<act>` folders (created 2026-08-24) - press kits, stage plots, riders per act.
 3. **Gmail** `create_draft` - outreach to Steve, sponsors, the Chamber. 133 drafts already sit in the account. **Gate:** send.
 4. **Google Calendar** - standups (the 08-24 one is recorded), the PA deadline 2026-09-11 (daily 08-28).
-5. **Canva** `generate-design` with brand kit `ZAO STOCK` (`kAHTOce5OAk`), then `export-design` to PNG/PDF and `create_file` into the Drive `ZAOstock` folder - poster, sponsor one-pager, deck. The `ZAO-CHELLA Event Deck` (31 pages) and `Sponsor NFT` (11 pages) are the templates to fork. **Gate:** anything printed or posted.
+5. *(Tier: see the Canva tier note under Key Decisions, added 2026-10-10.)* **Canva** `generate-design` with brand kit `ZAO STOCK` (`kAHTOce5OAk`), then `export-design` to PNG/PDF and `create_file` into the Drive `ZAOstock` folder - poster, sponsor one-pager, deck. The `ZAO-CHELLA Event Deck` (31 pages) and `Sponsor NFT` (11 pages) are the templates to fork. **Gate:** anything printed or posted.
 6. **supabase-cowork** - `sponsors`, `artists`, `volunteers`, `budget_entries` tables exist and hold **0 rows each**; the board still runs on `tasks`. Filling those four tables is a data decision for Zaal, not a connector question.
 
 File of record: the organizing doc for the team, the repo plan for the fleet. Canva improves this loop; Notion would duplicate the organizing doc.

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-09-25
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "2459, 2460, 2448, 2282, 2317, 2373"
 original-query: "lets /zao-research this add it to our log and then just review the top 50 posts in the past 2 months"
@@ -130,6 +130,11 @@ The 208-point multi-agent guide and the 190-point hooks post are the two most
 relevant to this estate after MISTAKES.md, and neither was read in full here -
 see Sources.
 
+Update 2026-10-10 (the only thing re-checked on that date; the 2026-10-10
+`last-validated` covers this source and nothing else in the doc): both have
+since been read in full (the multi-agent guide on
+2026-09-25, the hooks post on 2026-10-10) - see Sources.
+
 ### Finding 4 - What the Bug/Issue and Rant flairs are for
 
 Thirteen Bug/Issue posts and 22 Rants in 60 days, and the highest-scoring
@@ -199,7 +204,7 @@ retracted or rebutted. See Key Decision 5.
 |--------|-------|------|---------|
 | DONE - `~/zao-vault/MISTAKES.md` exists and is actively written to (196KB as of 2026-09-25); CLAUDE.md names it | @Zaal | PR to zao-vault | Shipped by 2026-09-04 (confirmed 2026-09-25) |
 | DONE - graduation rule is live: CLAUDE.md enforces "REPEAT AFTER GRADUATION" once a shape hits 4 occurrences | @Zaal | PR to zao-vault | Shipped by 2026-09-04 (confirmed 2026-09-25) |
-| Fetch the hooks post ("Hooks are the one feature worth learning", ~190 pts, 2026-08-08) FULL via Arctic Shift title search - shipped when it reads FULL in this doc's Sources | @Zaal | Research | 2026-10-09 |
+| DONE 2026-10-10 (card 10305) - the hooks post reads FULL in Sources (id 1vizi2d; found by date window, not title search) | @Zaal | Research | Done 2026-10-10 |
 | Decide whether a PreToolUse hook should check MISTAKES.md before destructive actions, per the 52-point comment - shipped when the hook exists or the decision is recorded against it | @Zaal | Decision | 2026-10-09 |
 | Re-run the flair-distribution scan (Finding 1 / Finding 4) once a working score-sorted "top" route exists (browser route is now blocked; Arctic Shift has no score sort) - shipped when the 60-day flair table is refreshed with a live source | @Zaal | Research | 2026-10-09 |
 | DONE - confirmed no lane has adopted `fast-jev-compaction`/`jev-pruner`: `grep -rl "jev-pruner\|fast-jev-compaction"` across ZAOOS, zaal-dotfiles and zao-vault returns zero hits (2026-09-25); a positive control (`grep -rl "MISTAKES.md" ~/zao-vault`) confirms the grep itself works, so the zero is real, not a broken pattern | @Zaal | Grep + note | Shipped 2026-09-25 |
@@ -218,7 +223,7 @@ retracted or rebutted. See Key Decision 5.
 - [The sqlit workflow post, id 1w51sws](https://www.reddit.com/r/ClaudeCode/comments/1w51sws/) - 19 points, 4 comments. `[FULL - same browser method, 2026-09-02, not re-fetched this pass - low-stakes, no claim rests on its score]` The thread Zaal sent that opened this scan; written up separately in `zao-vault/notes/sqlit-vibe-coding-workflow-2026-09-02.md`.
 - [10k-token tip, id 1w2ja43](https://www.reddit.com/r/ClaudeCode/comments/1w2ja43/) "Tip: Instantly save 10k tokens on every new session" `[FULL - METHOD: Arctic Shift, 2026-09-25 - upgraded from PARTIAL]`. Now 1,007 points, 124 comments. Body read in full: disabling the `Artifact` tool definition (`enableArtifact: false` in settings.json, `--disallowed-tools Artifact`, or `CLAUDE_CODE_DISABLE_ARTIFACT=1`) saves ~10k of the ~20k-token default system-tool overhead. No contradiction with this doc's prior treatment; content confirms it belongs in Finding 3 as read, not just scored.
 - [Multi-agent workflows guide, id 1vphazv](https://www.reddit.com/r/ClaudeCode/comments/1vphazv/) "A humble guide to the multi-agent workflows I use every day" `[FULL - METHOD: Arctic Shift, 2026-09-25 - upgraded from PARTIAL]`. Now 190 points, 31 comments (down from the 208/34 read off the listing on 2026-09-02 - same lag caveat as above). Body read in full: driver/reviewer pairing of Claude Code + Codex, a per-task folder with Sources-of-Truth files and a shared "Room" where agents post timestamped .md reports - the same shared-context-file pattern [dev-workflows/2467-agent-skill-collections](../2467-agent-skill-collections/) independently recommended adopting from the marketingskills repo. Worth a cross-link if that doc is revisited.
-- Hooks post, "Hooks are the one feature worth learning" (~190 pts per the 2026-09-02 listing) `[FAILED - METHOD: Arctic Shift title-keyword search attempted twice on 2026-09-25 (`title=hooks`), one call timed out ("Timeout. Maybe slow down a bit"), the retry returned two hits and neither title-matched. No post ID was ever recorded for this source in the original scan, so it cannot be looked up directly. Still unread; carried to Next Actions.]`
+- [Hooks post, id 1vizi2d](https://www.reddit.com/r/ClaudeCode/comments/1vizi2d/hook_is_really_one_feature_worth_learning/) "Hook is really one feature worth learning" by u/Middle_Key8737, flair Tips & Workflows `[FULL - METHOD: Arctic Shift, 2026-10-10 - upgraded from FAILED]`. Found by paging `posts/search` for r/ClaudeCode over 2026-08-08 to 2026-08-09 UTC (299 posts, three pages) and filtering titles for "hook", after the title-keyword search that failed on 2026-09-25 failed again (a multi-word `title=` returns http 422). The real title differs from the one recorded off the 2026-09-02 listing ("Hooks are the one feature worth learning"), which is why a title match never hit. Arctic Shift reads 182 points, 20 comments (28 comment rows retrieved), against 190 / 25 on the listing - the same index-lag caveat as the entries above. Body read in full (829 chars). Its argument is this estate's `code-over-inference` rule in one line: "scripts and cpu run-time are cheap, while tokens are expensive. Hooks can allow you to place a massive deterministic script to run at a certain AI workflow stage so that you won't need AI to trigger a certain skill". Named uses: lint, tool update, data file preparation; in a reply the author adds preparing authentication before a test tool runs. Top comments: a hook that saves each plan into the repo on plan-mode exit (24 points); a SessionStart hook that appends a gitignored `.workflow.local.md` for instructions that are both personal and project-scoped (5 points); hooks on `/compact`, `/clear` and `/exit` that sync work to an Obsidian vault (4 points). Nothing in it contradicts Key Decision 3; it is a short endorsement post, not a how-to, and adds no technique this estate does not already run.
 - [r/ClaudeCode, 6-day sample (2026-09-19 to 2026-09-25)](https://arctic-shift.photon-reddit.com/api/posts/search) `[FULL - METHOD: Arctic Shift `posts/search`, `created_utc`-ordered, paginated 11x in up to 100-post pages, deduplicated by post id, sorted by score client-side - 2026-09-25]` 1,096 raw posts (every submission, not Reddit's curated "top"). Backs Finding 5's flair table and the Opus 5.5 dominance claim.
 - [Instant Claude Code compaction is my favorite use of Jev so far, id 1wkjnrz](https://www.reddit.com/r/ClaudeCode/comments/1wkjnrz/instant_claude_code_compaction_is_my_favorite_use/) `[FULL - METHOD: Arctic Shift, post body plus 100 of 111 comments with scores, 2026-09-25]` 438 points. Backs Finding 5 and Key Decision 5 (SKIP `fast-jev-compaction`).
 - `zao-fetch-reddit.sh --selftest`, re-run 2026-09-25 `[FULL]` - the OAuth/redlib/public-json ladder is still dead, unchanged from 2026-09-02. Arctic Shift (no selftest coverage yet) is the route that actually worked this pass.

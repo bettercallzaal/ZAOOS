@@ -495,7 +495,26 @@ export interface DeferredSend {
   text: string;
 }
 
-export async function deferSend(entry: DeferredSend): Promise<void> {
+/**
+ * Every read-modify-write of the deferred file goes through this chain, so two
+ * writers in this process never interleave. Without it, ten digests deferred in
+ * the same tick each read the same file and each wrote it back with only their
+ * own entry added: one survived, nine were lost with no warning (measured
+ * 2026-10-10, send-budget-deferred-lock.test.ts). drainDeferred had the same
+ * gap between its read and its clear. Same shape as attention.ts withTapsLock.
+ */
+let deferredQueue: Promise<unknown> = Promise.resolve();
+function withDeferredLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = deferredQueue.then(fn, fn);
+  deferredQueue = run.catch(() => undefined);
+  return run;
+}
+
+export function deferSend(entry: DeferredSend): Promise<void> {
+  return withDeferredLock(() => deferSendUnlocked(entry));
+}
+
+async function deferSendUnlocked(entry: DeferredSend): Promise<void> {
   try {
     await fs.mkdir(zoeHome(), { recursive: true });
     const existing = await readDeferred();
@@ -533,7 +552,11 @@ export async function readDeferred(): Promise<DeferredSend[]> {
  * and sends the result as ONE message - the whole point is that yesterday's
  * deferred digests arrive as a single batch, not as the drip that caused this.
  */
-export async function drainDeferred(): Promise<DeferredSend[]> {
+export function drainDeferred(): Promise<DeferredSend[]> {
+  return withDeferredLock(drainDeferredUnlocked);
+}
+
+async function drainDeferredUnlocked(): Promise<DeferredSend[]> {
   const entries = await readDeferred();
   if (entries.length === 0) return [];
   try {
@@ -558,7 +581,11 @@ export async function drainDeferred(): Promise<DeferredSend[]> {
  * Restored entries go at the FRONT: they are older than anything queued since
  * the drain, and `MAX_DEFERRED` trimming keeps the newest, same as `deferSend`.
  */
-export async function requeueDeferred(entries: DeferredSend[]): Promise<void> {
+export function requeueDeferred(entries: DeferredSend[]): Promise<void> {
+  return withDeferredLock(() => requeueDeferredUnlocked(entries));
+}
+
+async function requeueDeferredUnlocked(entries: DeferredSend[]): Promise<void> {
   if (entries.length === 0) return;
   try {
     await fs.mkdir(zoeHome(), { recursive: true });

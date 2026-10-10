@@ -13,7 +13,7 @@ tier: STANDARD
 
 > **Goal:** Decide what ZOE takes from Atticus (SaarthurR/atticus-mac, a Mac voice assistant that runs on `claude -p`): a pre-warmed `claude -p` over stream-json, and learned-shortcut graduation. Decide whether the app itself goes on the Mac.
 
-> **Zaal's ruling (2026-10-10, quoted from the lane brief, decision note grill-2026-10-09-seat-morning.md item 45; the note is not on disk in this lane, so the wording is UNVERIFIED on disk):** "a sounds good for pnow lets focus on my zao things". Read as: A = this doc plus one board card; do NOT install Atticus on the Mac.
+> **Zaal's ruling (2026-10-10, zao-vault decisions/grill-2026-10-09-seat-morning.md item 45, vault commit ac70d25d, verified by the seat against the file):** "a sounds good for pnow lets focus on my zao things". Read as: A = this doc plus one board card; do NOT install Atticus on the Mac.
 
 ## Key Decisions
 
@@ -102,8 +102,8 @@ The 2278 doc's title already sets the direction for voice: "build capture, not c
 3. The exfiltration path in Finding 4. Traced from code, not run.
 4. Whether `claude -p` headless is "explicitly permitted" under the subscription terms.
 5. Caleb Writes Code as the origin of the name "Atticus" (the code says so at `atticus.py:2`; not fetched).
-6. The zao-vault decision note for item 45 is not on disk in this lane. The ruling is quoted from the lane brief.
-7. Whether the ten `bot/src/zoe/` files matching "replay" or "shortcut" contain any learned-command code. Not opened.
+6. RESOLVED by the seat 2026-10-10: the decision note exists at zao-vault decisions/grill-2026-10-09-seat-morning.md item 45 (vault commit ac70d25d) and the quote above matches it.
+7. RESOLVED by the seat 2026-10-10: `grep -rn -i replay bot/src/zoe --include='*.ts'` outside tests hits `receipt-envelope.ts:18,19,159` (receipt replay detection), `golden-eval.ts:5,17,94` (re-running golden cases), `board-command-executor.ts:94,226-228` (idempotency guard) and `bonfire-retry.ts:5` (queue replay on recovery). None saves a successful command list for later replay, so no learned-command code exists in `bot/src/zoe/` as of this grep.
 8. Whether `research/agents/2652-self-upgrade-shared-resources-ingest` resolves in the canonical resolver. It exists on this branch; the resolver reported "no directory found" for 2652 on this lane.
 
 ## Also See

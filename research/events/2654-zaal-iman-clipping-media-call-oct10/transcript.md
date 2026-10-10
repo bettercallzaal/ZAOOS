@@ -99,7 +99,6 @@ Give me a sec bro.
 Yeah, no worries.
 I have time today.
 This is the best time, actually.
-My fiance will probably not be up for three hours,
 so I want to stream me DJing, and I want your help.
 Well, all right.
 But we need to get through the real work first,

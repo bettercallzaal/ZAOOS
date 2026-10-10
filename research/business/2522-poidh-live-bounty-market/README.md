@@ -2,7 +2,7 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-09-20
+last-validated: 2026-10-10
 superseded-by:
 related-docs: "business/2466-poidhz-platform-honest-audit, business/759-poidh-history-origin-to-2026, wavewarz/2356-wavewarz-clip-bounty-grounding, technology/1534-zao-devz-bounty-campaign"
 original-query: "[STANDARD] What is actually happening on poidh right now - the live open-bounty market, issuer concentration, what predicts submissions (format vs prize size), and what it implies for BCZ round pricing and format for R6/R7"
@@ -42,6 +42,98 @@ tier: STANDARD
 > The sections below are left standing with this correction on top rather than quietly edited,
 > because the mistake is more instructive than the finding was. Read every figure about the
 > pre-v3 contracts as **recorded, not held**.
+
+> ## RE-MEASURED 2026-10-10, twenty days on - the market grew, the entry rate fell, and one issuer moved the format table
+>
+> Same surface, same script: `bounties.fetchAll` via `zpoidh/scripts/build-bounty-dashboard.py`, cron build
+> `2026-10-10T13:53:09Z`, 114 open bounties (Base 101, Arbitrum 9, mainnet 4), priced at ETH $2,497.25 and
+> DEGEN $0.000997 (CoinGecko at build time). Every row, with the raw flag and the corrected one, is in
+> [`poidhz/docs/doc-2522-remeasure-2026-10-10.json`](https://github.com/bettercallzaal/poidhz/blob/main/docs/doc-2522-remeasure-2026-10-10.json). Re-measured by the poidhz lane; tracker card 10304, LIST 6.
+>
+> | Measure | 2026-09-09 | 2026-09-20 | **2026-10-10** |
+> |---|---|---|---|
+> | open, all chains | 89 | 99 | **114** |
+> | with at least one submission, as the API flag says | 52% | 55% (54/99) | 43% (49/114) |
+> | with at least one submission, **corrected** (below) | - | 55% | **47% (54/114)** |
+> | median prize | $10.94 | $11.59 | **$7.49** |
+> | parseable deadline | 17% | 19% (19/99) | **18% (20/114)** |
+> | distinct issuers | - | 46 | **49** |
+> | total open value | - | $3,181 | **$7,548**, of which one mainnet code bounty (id 31, kenny, $3,813) is half; $3,735 without it |
+> | `created_at` populated | - | 0 of 99 | **114 of 114** (unix seconds), so the age control this doc could not run is run below |
+> | native `deadline` field set | - | 0 | not carried by the dashboard; UNMEASURED today |
+>
+> **1. The submission-count bug reproduced this time.** All 65 zero-flag bounties were re-read through
+> `claims.fetchBountyClaims` (positive control first: our 1330 returned 9, our 1166 returned 8). **Five of
+> the 65 have claims the flag hides: 295 (19 claims), 235 (13), 35 (1), 296 (1), 305 (1). 35 claims on
+> five bounties.** On 2026-09-20 the same test on 15 of 45 found none. Upstream fix: poidh-app pull request #1467 (a PR, not an issue) is open and
+> unmerged, last updated 2026-08-30, verified 2026-10-10. Every rate in this
+> block uses the corrected flag (API flag OR real claims > 0); the 20 Sep column could not be
+> corrected retroactively and is the flag as it stood.
+>
+> **2. Format: build collapsed, and it is one issuer.** `0xf19f11de...` (no ENS, Farcaster or X on
+> web3.bio) posted **22 identical $7.49 "Recruit a verified Muse agent to musemaxxing" build bounties
+> about 13 days before the read (12.9 to 12.97 days on every row), 3 of 22 with a claim.** They are 22 of the 55 open builds and 22 of the 49
+> bounties in the $5-15 band. With them, build is 29%; without, 39%, and the whole market is 55%, which
+> is exactly the 20 Sep figure. **A format table can be moved by one wallet in one afternoon, so the
+> next re-measure reports formats with issuers deduplicated as well as raw.**
+>
+> | Task type | Open | With submissions, corrected | 20 Sep | Median prize |
+> |---|---:|---:|---:|---:|
+> | photo | 12 | **10/12 = 83%** | 68% | $2.50 |
+> | clip | 9 | **6/9 = 67%** | 64% | $19.98 |
+> | social | 6 | 4/6 = 67% | 33% (n=3) | $28.72 |
+> | code | 19 | 11/19 = 58% | 43% | $24.47 |
+> | unclassified | 13 | 7/13 = 54% | 53% | $10.99 |
+> | build | 55 | **16/55 = 29%** (13/33 = 39% without the flood) | 52% | $7.49 |
+>
+> Photo and clip are still the top two. Decision 1 (keep clip rounds) stands. Code moved from the
+> bottom to the middle on 19 bounties, 7 of 8 young ones with claims; one read is not a trend.
+>
+> **3. Prize band, and the age control changes the reading.**
+>
+> | Band | Corrected | 20 Sep | Under 30 days old | 30 days or older |
+> |---|---:|---:|---:|---:|
+> | under $5 | 16/27 = 59% | 69% | **0/3** | 16/24 = 67% |
+> | $5-15 | 14/49 = 29% | 42% | 10/36 = 28% (7/14 = 50% without the flood) | 4/13 = 31% |
+> | $15-50 | 15/23 = 65% | 56% | 7/9 = 78% | 8/14 = 57% |
+> | $50+ | 9/15 = 60% | 43% | **6/7 = 86%** | 3/8 = 38% |
+>
+> Every under-$5 bounty with a claim is at least a month old. The "cheap bounties draw more" pattern
+> this doc carried with a caveat is, on this read, an age effect: cheap bounties are the old ones, and
+> old ones have had time. Among bounties under 30 days old the two upper bands lead. **Decision 2 is
+> narrowed, not reversed: a bigger pot does not buy entries on its own, and the evidence that a small
+> one does is gone.** The $5-15 dead band is still dead at every age, flood or no flood.
+>
+> **4. The deadline lever is weaker on the whole set and strong where it should be, on young bounties.**
+> Raw: with a parseable deadline **13/20 = 65%**, without **41/94 = 44%** (20 Sep: 74% against 48%).
+> Within format it holds for build (40% against 28%) and code (86% against 42%) and is flat for clip,
+> social and photo at n of 1 to 3. Within band it holds for $5-15 (80% against 23%) and $50+ (67%
+> against 56%) and reverses for $15-50 (56% against 71%). The new control is age:
+>
+> | Age | Open | With deadline | Without deadline |
+> |---|---:|---:|---:|
+> | under 7 days | 15 | 6/8 = 75% | 1/7 = 14% |
+> | 7 to 30 days | 40 | **6/6 = 100%** | 10/34 = 29% |
+> | 30 to 90 days | 12 | 1/4 = 25% | 6/8 = 75% |
+> | 90 days and older | 47 | 0/2 = 0% | 24/45 = 53% |
+>
+> Under 30 days old, a stated deadline runs **12/14 = 86% against 11/41 = 27%**. Past 30 days it
+> reverses on six bounties, which is what an expired deadline nobody met looks like, left open because
+> poidh never closes anything. The confound named on 20 Sep (a deadline may be a proxy for an issuer
+> who cares) is untouched by this. Decision 3 (put a date on every round) stands, and the 20 Sep claim
+> that it "roughly doubles entries in every prize band" is now "triples among bounties under a month old,
+> and is not visible on the old stock".
+>
+> **5. The seeded-market finding is gone.** Kenny (`0x10fc964e...`, 15 open, $4,022, 5/15 = 33%) and
+> poidhbot (`0x4200ac33...`, 6 open, $316, 5/6 = 83%) together: **10/21 = 48%, against 44/93 = 47% for
+> everyone else.** On 20 Sep the seeded set ran 42% against 59%. Concentration flipped the other way too:
+> the top three issuers by count hold 49 of 114 bounties (43%) **and $4,217 (56%) of the value**, because
+> one of them is kenny's $3,813 mainnet bounty. Read the market total with that one line removed.
+>
+> **What changed for the decisions, in one line each.** 1 stands. 2 narrowed (the small-pot half of
+> the evidence was age). 3 stands and is better supported than before, on the young subset. 4
+> (`issuer_wallet`) is unverified here. 5 stands. 7 stands. 8 stands. New: dedupe issuers before
+> reading a format table.
 
 > **Goal:** Measure the live poidh open-bounty market from chain and API, not from memory, and say what it means for how BCZ prices and formats R6 and R7.
 
@@ -455,9 +547,14 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 | Follow up to Kenny once he replies with the claims finding, which #1459 does not cover: 492 submissions stranded, 90% of the locked value on bounties where the work is done - message sent | @Zaal | Outbound | 2026-10-04 |
 | ~~Send Kenny the #1459 verification~~ **SENT 2026-09-20 WITH A WRONG FIGURE.** It claimed $1,597 stranded; the contracts hold zero. Kenny corrected it himself within the hour. The sent copy is corrected at the top of `zpoidh/docs/outreach/kenny-poidhz-bundle.md` rather than deleted | @Zaal | Outbound | DONE |
 | Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |
-| Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days | @Zaal | PR | 2026-10-20 |
+| ~~Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days~~ **DONE 2026-10-10**, re-measure block at the top; 99 to 114 open, entry rate 55% to 47% corrected, build moved by one issuer | @Zaal | PR | DONE |
+| Re-measure again with issuers deduplicated before the format table, and re-test the `hasClaims` flag on every zero-flag bounty; add the column to `build-bounty-dashboard.py` so the cron carries the corrected rate | @Zaal | PR | 2026-11-10 |
 
 ## Sources
+
+- [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `poidhz/docs/doc-2522-remeasure-2026-10-10.json`
+- [poidh tRPC `claims.fetchBountyClaims`](https://poidh.xyz/api/trpc/claims.fetchBountyClaims) - **[FULL, method: `zpoidh/scripts/query-bounty.py` on all 65 zero-flag bounties plus positive controls 1330 and 1166, 2026-10-10 16:2x to 16:4xZ]** 5 bounties with 35 hidden claims
+- [api.web3.bio](https://api.web3.bio/profile/0xf19f11dee16a341671e6ed3e209b704c1bbc3e57) - **[FULL, 2026-10-10]** the 22-bounty issuer resolves to no identity; `0x4200ac33...` resolves to farcaster:poidhbot
 
 - [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: direct JSON API via `scripts/build-bounty-dashboard.py`]** 99 open bounties, 4 pages, 2026-09-20T20:59Z
 - [poidh tRPC `claims.fetchBountyClaims`](https://poidh.xyz/api/trpc/claims.fetchBountyClaims) - **[FULL, method: direct JSON API]** used for the 15-bounty false-negative test and the positive control

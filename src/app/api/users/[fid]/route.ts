@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
@@ -37,7 +38,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       // Get this user's casts from cached channel_casts to tally engagement
       supabaseAdmin
         .from('channel_casts')
-        .select('reactions, replies_count')
+        .select('hash, reactions, replies_count')
         .eq('fid', targetFid)
         .order('timestamp', { ascending: false })
         .limit(200),
@@ -58,7 +59,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     let castCount = 0;
 
     if (activityResult.data) {
-      for (const row of activityResult.data) {
+      for (const row of await dropHiddenCasts(activityResult.data, 'user-profile')) {
         castCount++;
         const reactions = row.reactions as { likes_count?: number; recasts_count?: number } | null;
         totalLikes += reactions?.likes_count ?? 0;

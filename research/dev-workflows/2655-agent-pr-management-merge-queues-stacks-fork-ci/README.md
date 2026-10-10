@@ -26,7 +26,7 @@ Verdicts: USE = adopt now, KEEP = ZAO practice already right, SKIP = do not adop
 | USE | Keep GitHub's documented fork-CI procedure: a maintainer reviews the diff and taps "Approve workflows to run". Put the approval on a card with a date, because unapproved runs expire after 30 days. | 4 (ZAOstock #378, #432 are fork PRs, run in action_required) | Fork approval and 30-day expiry (gh-fork.txt). Verified: ZAOstock #378 and #432 are open with head.repo.fork=true (gh api, 2026-10-10). ZAO fix dotfiles #497 (Vercel placeholder) is still OPEN. |
 | USE | Stacked PRs: after a base squash, re-create each dependent PR as a fresh branch off main and close the old one as superseded (the lane did this for ZAOOS #3864 to #3867 and wavewarz #52-55 to #57). Do not hand-merge the top of a stack. | 3 (wavewarz #56 squashed #52, #53, #55, #56 into one commit) | Verified: ZAOOS #3864 CLOSED unmerged, #3867 MERGED; wavewarz #56 MERGED, #57 OPEN. Rule 19 of agent-loops.md already says rebase onto a NEW branch. Graphite restack behaviour NOT verified (fetch FAILED, see Sources). |
 | INVESTIGATE | Whether a GitHub native merge queue (or Mergify) would replace the pin lane. It needs `merge_group` triggers in every workflow and a queue-owner setting. Check on one private repo before deciding. | 1, 2 | GitHub: without the `merge_group` event "status checks will not be triggered ... The merge will fail" (gh-mq.txt). Costs CI runs per group, which is the wrong direction for item 26. Owner decision: Zaal. |
-| SKIP | Auto-merge on green with no evaluator (what 99darwin's README and doc 2204 imply). | 6 | The 99darwin/orchestrator repo at HEAD has no merge step: its tree is README, LICENSE, two agent/command files and skills/orchestrator/SKILL.md, and grep of SKILL.md finds no merge, PR or push step (gh api git/trees, 2026-10-10). Doc 2204's "auto-merge in 99darwin/orchestrator" is NOT supported by the code we can read. |
+| SKIP | Auto-merge on green with no evaluator (an earlier seat summary described 99darwin/orchestrator this way; doc 2204 does not, it says cross-family verify is gating, not autonomous action). | 6 | The 99darwin/orchestrator repo at HEAD has no merge step: its tree is README, LICENSE, two agent/command files and skills/orchestrator/SKILL.md, and grep of SKILL.md finds no merge, PR or push step (gh api git/trees, 2026-10-10). Doc 2204's "auto-merge in 99darwin/orchestrator" is NOT supported by the code we can read. |
 | SKIP | Any `--head-red-ok` style bypass, or a lane asking another lane to merge for it. | 2 (classifier denied --head-red-ok on vault #127; the lane asked the seat to merge, refused) | The denial is the control working. zao-merge's own refusal text names the override (zao-merge.txt:442-447); the answer is to fix CI or get the required check green, not to route around it. |
 | KEEP | Lane roles as split today: build agent opens, seat evaluator grades, merge lane executes from a pin, Zaal approves fork CI, flips settings, and owns billing. | 5 (usage limit, dispatcher misroute to dreamnet) | See the role table below. Fix the dispatcher ranking (dotfiles #495 OPEN) rather than the role split. |
 
@@ -85,7 +85,7 @@ One list of every open PR across the ZAO repos, with columns: repo, PR, head SHA
 - Refreshed by a loop that only reads (gh api and zao-merge --claims-only). It never merges and never flips a draft. Agent-spend rule: no polling for human actions; refresh on change, back off on quiet.
 - The orchestrator pane is the channel for now (rule 36: a message is transport, not the record).
 - A vault file is the record (rule 36 and handoff-discipline rule 6). Proposed path: zao-vault notes/merge-channel.md, one row per PR, rewritten by the loop.
-- Scope: the list covers the repos named in this doc (ZAOOS, zaal-dotfiles, zao-vault, wavewarz-protocol, ZAOstock, ZAODEVZ/ZAOartizen). It is not a dashboard.
+- Scope: the list covers the repos named in this doc (ZAOOS, zaal-dotfiles, zao-vault, wavewarz-protocol, ZAOstock, and the archived-site repo). It is not a dashboard.
 
 ## Next Actions
 
@@ -94,7 +94,6 @@ One list of every open PR across the ZAO repos, with columns: repo, PR, head SHA
 | Approve the ZAOstock #378 fork run 37993135800 (BLACKBOARD card 149), and re-check the 30-day expiry for #432 | Zaal | Gated tap | 2026-10-12 |
 | Merge zaal-dotfiles #496 (zao-pr-open: same gates at PR-open time), once its head is pinned and green | Zaal | PR merge (dotfiles) | 2026-10-14 |
 | Make the seat evaluator verdict a required status in rulesets for ZAOOS and zaal-dotfiles; disable docs automerge until it is set | Zaal | Settings change (gated) | 2026-10-17 |
-| Correct doc 2204: the 99darwin/orchestrator repo at HEAD has no auto-merge step (tree and SKILL.md read 2026-10-10). Open a ZAOOS PR with the fix | Zaal (reviews the PR) | PR (ZAOOS) | 2026-10-16 |
 | INVESTIGATE: try a GitHub native merge queue on one private repo (zao-vault) to see whether merge_group triggers fix item 26 cost | Zaal | Decision | 2026-10-24 |
 | Settle the stacked-PR question: fetch the Graphite restack docs (FAILED here) and write the result into this doc as a follow-up | Zaal (reviews) | Research PR (ZAOOS) | 2026-10-24 |
 | Build the merge-channel file and refresh loop from the proposal above; first version read-only | Zaal (assigns the seat lane) | PR (vault and ZAOOS) | 2026-10-17 |
@@ -145,7 +144,7 @@ Method key: curl = curl with a browser user agent, then Python tag strip (raw te
 
 ## Also See
 
-- [Doc 2204 - cross-family verification and 99darwin orchestrator](../../agents/2204-cross-family-verification-99darwin-orchestrator/) (its auto-merge claim is corrected above)
+- [Doc 2204 - cross-family verification and 99darwin orchestrator](../../agents/2204-cross-family-verification-99darwin-orchestrator/) (it says verify is observation plus gating, not autonomous action; it makes no auto-merge claim)
 - [Doc 2214 - multi-model code review panel](../../agents/2214-multimodel-code-review-panel/)
 - [Doc 497 (agents) - quad workflow deep dive](../../agents/497-quad-workflow-deep-dive/) (note: doc 497 is ambiguous; this is the agents one, cited by path)
 - [Doc 1006 - agentic coding weaknesses](../1006-agentic-coding-weaknesses-easy-fixes/)
@@ -155,6 +154,6 @@ Method key: curl = curl with a browser user agent, then Python tag strip (raw te
 
 - Homu (rust-lang/homu, MIT, Copyright 2015 Barosl Lee; LICENSE read): the "only merge what was tested against the current main" idea. Not adopted as code.
 - Kodiak (chdsbd/kodiak, AGPL-3.0; LICENSE read): the automerge-label pattern is described, not copied. AGPL means no code is taken.
-- 99darwin/orchestrator (MIT, Copyright 2026 Nick; LICENSE read): cited as the orchestrator example. Its merge claim in doc 2204 is corrected above, not adopted.
+- 99darwin/orchestrator (MIT, Copyright 2026 Nick; LICENSE read): cited as the orchestrator example. It has no merge step at HEAD; the auto-merge idea came from an earlier seat summary, not from doc 2204, and is not adopted.
 - Mergify docs: two-step CI idea, described; no code or product adopted.
 - HN commenters on items 49104747 and 47520220: quoted by username only as sources for the framing.

@@ -249,6 +249,28 @@ $0.00108907 the DEGEN is worth about $11, so this costs almost nothing in money 
 everything in verifiability. Claim scoped honestly: unreachable *from here, today, on those
 endpoints* - not a claim that the chain is down.
 
+**The Degen half, closed 2026-10-10: the chain is down, for good.** Degen Chain was sunset on
+**2026-08-31**. Alchemy's deprecation notice: "Alchemy ended support for Degen Chain
+(`degen-mainnet` and `degen-sepolia`) on August 31, 2026 ... because the Degen team is
+sunsetting Degen Chain to focus on social products within the Base ecosystem", and "the
+network itself has been shut down". L2BEAT's project page carries "This project is archived
+and no longer maintained" and "Degen Chain is sunsetting on August 31, 2026", with "Total
+Value Secured: No data". Re-probed from this machine at 21:41:33Z on 2026-10-10, twelve
+endpoints: `666666666.rpc.thirdweb.com` answers `eth_chainId` (`0x27bc86aa`) and
+`net_version` and refuses `eth_blockNumber`, `eth_gasPrice` and every state call with
+`-32603`; `rpc.degen.tips` is Cloudflare 1016; nine others are empty, 404 or key-gated
+(the full table is `poidhz/docs/degen-rpc-probe-2026-10-10T214133Z.txt`). `degen.tips` and
+`bridge.degen.tips` still serve pages; `explorer.degen.tips` does not answer.
+
+Two consequences for this doc. First, issue #1459 was filed on 2026-08-28, three days before
+the sunset, so its Degen count (225 bounties, 10,044 DEGEN) was true for three days and then
+became unreadable rather than wrong; nobody can now confirm or refute it from chain. Second,
+the "once a working RPC is found" row is closed as **will not happen**, not as done: the 225
+records and the DEGEN on those four contracts are UNKNOWN from here and will stay so unless
+someone with an archived node of the chain reads them. At $0.000997 per DEGEN (the re-measure
+price above) that is about $10, and it was about $11 when this section was written. The
+verifiability finding stands and is now permanent.
+
 **Scale, at the $2,633.31 ETH price used by the dashboard on the same day:**
 
 > ~~The stranded ETH is worth **$1,597.40**. The entire visible open market is **$3,180.82**.~~
@@ -541,18 +563,22 @@ leaderboard. `/hub` already covers the second and poidh does the first well.
 |--------|-------|------|---------|
 | Set `issuer_wallet` in `zpoidh/org.config.json` so competitive queries stop returning a false zero - merged PR, `check-site-claims.py` green | @Zaal | PR | 2026-09-27 |
 | Keep R6 and R7 as clip rounds at their current 0.0125 ETH pot; do not raise the prize to chase entries - decision recorded in `rounds/r6/README.md` | @Zaal | PR | 2026-10-03 |
-| Re-measure the R7 Twitch archive claim, whose re-check date passed 2026-09-13, before R7 casts - date moved in `rounds/r7/README.md` | @Zaal | PR | 2026-09-27 |
+| ~~Re-measure the R7 Twitch archive claim, whose re-check date passed 2026-09-13, before R7 casts~~ **DONE 2026-10-10** (poidhz #248): Twitch GQL at 21:41Z, channel still not Affiliate or Partner (43 followers), 4 archive VODs (3 to 10 Oct), oldest 7.84 days and still listed; the 7-day constraint holds, the 2026-09-05 numbers are gone. `rounds/r7/README.md` note 2 now says re-check before any cast, whatever the date; R7 still DRAFT | @Zaal | PR | DONE |
 | BUILD `poidhz.com/lost` - the stranded bounties, their claims, AND the recovery call per bounty (`acceptClaim` to pay the worker, `cancelOpenBounty` to refund the issuer). 201 Base bounties, 96 with work, 492 claims, 306 people. Page live with a 6h refresh | @Zaal | PR | 2026-10-11 |
 | Tell the 87 issuers with stranded bounties that their funds are recoverable by direct contract call - a cast naming the count and linking `/lost`, not 87 DMs | @Zaal | Outbound | 2026-10-18 |
 | Follow up to Kenny once he replies with the claims finding, which #1459 does not cover: 492 submissions stranded, 90% of the locked value on bounties where the work is done - message sent | @Zaal | Outbound | 2026-10-04 |
 | ~~Send Kenny the #1459 verification~~ **SENT 2026-09-20 WITH A WRONG FIGURE.** It claimed $1,597 stranded; the contracts hold zero. Kenny corrected it himself within the hour. The sent copy is corrected at the top of `zpoidh/docs/outreach/kenny-poidhz-bundle.md` rather than deleted | @Zaal | Outbound | DONE |
-| Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225 - numbers added to this doc | @Zaal | PR | 2026-10-04 |
+| ~~Read the Degen half of #1459 once a working Degen RPC is found, closing the remaining 225~~ **CLOSED 2026-10-10, UNREADABLE FOR GOOD**: Degen Chain was sunset on 2026-08-31 (Alchemy deprecation notice; L2BEAT "archived and no longer maintained"). 12 endpoints probed at 21:41Z, one answers `eth_chainId` and `net_version` only. No working RPC will be found; the 225 records and 10,044 DEGEN cannot be counted from public infrastructure. See "The Degen half, closed" below | @Zaal | PR | DONE |
 | ~~Re-run this doc's measurements and update `last-validated`; the market moved 89 to 99 open in 11 days~~ **DONE 2026-10-10**, re-measure block at the top; 99 to 114 open, entry rate 55% to 47% corrected, build moved by one issuer | @Zaal | PR | DONE |
 | Re-measure again with issuers deduplicated before the format table, and re-test the `hasClaims` flag on every zero-flag bounty; add the column to `build-bounty-dashboard.py` so the cron carries the corrected rate | @Zaal | PR | 2026-11-10 |
 
 ## Sources
 
 - [poidh tRPC `bounties.fetchAll`](https://poidh.xyz/api/trpc/bounties.fetchAll) - **[FULL, method: `zpoidh/scripts/build-bounty-dashboard.py` cron build 2026-10-10T13:53:09Z]** 114 open bounties; rows in `poidhz/docs/doc-2522-remeasure-2026-10-10.json`
+- Twitch GQL, `user(login:"wavewarzofficial")` roles, followers and archive videos - **[FULL, method: one query with the public web client id read off the channel page, 2026-10-10T21:41:16Z]** raw answer in `poidhz/rounds/r7/twitch-archive-2026-10-10T214116Z.json` (poidhz #248)
+- Twelve Degen RPC and explorer endpoints, `eth_chainId` then `eth_blockNumber`, `net_version`, `eth_gasPrice` on the one that answered - **[FULL, method: curl, 2026-10-10T21:41:33Z]** table in `poidhz/docs/degen-rpc-probe-2026-10-10T214133Z.txt`
+- [Alchemy, Degen Chain deprecation notice](https://www.alchemy.com/docs/reference/degen-deprecation-notice) - **[FULL, read 2026-10-10]** support ended 2026-08-31 because the team is sunsetting the chain
+- [L2BEAT, Degen Chain](https://l2beat.com/layer2s/projects/degen) - **[FULL, read 2026-10-10]** archived and no longer maintained; sunsetting on 2026-08-31; TVS no data
 - [poidh tRPC `claims.fetchBountyClaims`](https://poidh.xyz/api/trpc/claims.fetchBountyClaims) - **[FULL, method: `zpoidh/scripts/query-bounty.py` on all 65 zero-flag bounties plus positive controls 1330 and 1166, 2026-10-10 16:2x to 16:4xZ]** 5 bounties with 35 hidden claims
 - [api.web3.bio](https://api.web3.bio/profile/0xf19f11dee16a341671e6ed3e209b704c1bbc3e57) - **[FULL, 2026-10-10]** the 22-bounty issuer resolves to no identity; `0x4200ac33...` resolves to farcaster:poidhbot
 

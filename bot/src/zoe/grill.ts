@@ -25,6 +25,7 @@ import { getCalendarEvents } from './calendar';
 import { wasSendBlocked } from './send-budget';
 import { isGrillPaused, withStopRow } from './grill-pause';
 import { featureRan } from './feature-ran';
+import { inQuietWindow, quietEnabled } from './quiet-window';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -590,6 +591,10 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   // Zaal's Stop grill button: checked before anything is fetched or sent.
   if (await isGrillPaused()) return { sent: false, paused: true };
   const now = deps.now ?? Date.now();
+  // The quiet window: do not even try. A held card resolves as "not sent", so
+  // this loop would offer the same card every tick all night. /grill
+  // (bypassCap) is him asking, and still answers.
+  if (!deps.bypassCap && quietEnabled() && inQuietWindow(new Date(now))) return { sent: false };
   const tasks = await (deps.fetchTasks ?? fetchCockpitTasks)();
   let sourcesOk = true;
   const prs = await (deps.fetchPRs ?? fetchReviewPRs)().catch(() => {

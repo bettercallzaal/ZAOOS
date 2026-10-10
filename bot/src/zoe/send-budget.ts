@@ -147,6 +147,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { holdSend, shouldHold, stripOutageHint } from './quiet-window';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -855,10 +856,35 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     clean === undefined ? raw(chatId, text) : raw(chatId, text, clean);
 
   return async (chatId, rawText, opts) => {
-    const clean = stripSendClass(opts);
+    const clean = stripOutageHint(stripSendClass(opts));
     // Tag before anything else reads the text, so the budget log, a deferred
     // copy and the delivered message all carry the same words.
     const text = tagForZaal(rawText, resolveSendClass(opts), chatId);
+
+    // THE QUIET WINDOW (quiet-window.ts), before the budget and independent of
+    // it: at night a send is held with its buttons and sent in the morning. A
+    // held send resolves exactly like a budget-deferred one, so every caller
+    // that already checks wasSendBlocked does the right thing unchanged. If
+    // the queue cannot be written, only an alarm goes out; anything else is
+    // parked and reported as dropped, because it will not be released.
+    const cls = resolveSendClass(opts);
+    if (shouldHold(cls, opts, now())) {
+      const held = await holdSend({ at: now().toISOString(), cls, chatId, text, ...(clean ? { opts: clean } : {}) });
+      if (held !== 'send') {
+        const outcome: SendOutcome = held === 'held' ? 'deferred' : 'dropped';
+        await logDecision({
+          at: now().toISOString(),
+          outcome,
+          cls,
+          chatId,
+          countBefore: 0,
+          cap: 0,
+          reason: held === 'held' ? 'quiet window - held until morning' : 'quiet window - queue unwritable, parked, not sent',
+          preview: text.slice(0, 120),
+        }).catch(() => {});
+        return blockedResult(outcome);
+      }
+    }
     if (!sendBudgetEnabled()) return passThrough(chatId, text, clean);
 
     let decision: SendDecision;

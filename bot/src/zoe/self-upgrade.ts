@@ -66,7 +66,9 @@ const NON_REPO_OWNERS = new Set([
 
 const RECHECK_RE = /^\s*recheck\b[:\s]*/i;
 
-const REPO_RE = /https?:\/\/(?:www\.)?github\.com\/([A-Za-z0-9-]{1,39})\/([A-Za-z0-9._-]{1,100})(?:[/?#]\S*)?/i;
+// GitHub owners never start with a hyphen; refusing one keeps a crafted
+// "-x/repo" from reaching a CLI's argv as something flag-shaped.
+const REPO_RE = /https?:\/\/(?:www\.)?github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9._-]{1,100})(?:[/?#]\S*)?/i;
 
 /**
  * The first github.com repo link in a message, or null. A link into a repo

@@ -78,6 +78,19 @@ describe('takeResourceSnapshot fails closed', () => {
     if (!r.ok) expect(r.reason).toContain('no vault clone');
   });
 
+  it('a vault directory that is not a git clone is refused', async () => {
+    await fs.mkdir(join(home, 'zao-vault', 'projects'), { recursive: true });
+    await fakeTool('echo should-not-run');
+    const r = await takeResourceSnapshot(link(), { PATH: binDir }, home);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toContain('no vault clone');
+  });
+
+  it('an owner with a leading hyphen is not a resource link', () => {
+    expect(parseResourceLink('https://github.com/-rf/repo')).toBeNull();
+    expect(parseResourceLink('https://github.com/a-b/repo')?.owner).toBe('a-b');
+  });
+
   it('no tool: names the dirs it searched', async () => {
     await fakeVault();
     const r = await takeResourceSnapshot(link(), { PATH: binDir }, home);

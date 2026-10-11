@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { type NextRequest, NextResponse } from 'next/server';
+import { after, type NextRequest, NextResponse } from 'next/server';
 import { communityConfig } from '@/../community.config';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
@@ -8,6 +8,7 @@ import {
   parseDeletedCastHash,
   tombstoneDeletedCast,
 } from '@/lib/farcaster/cast-tombstone';
+import { recordCastSigner, signerIngestEnabled } from '@/lib/farcaster/signer-ingest';
 import { logger } from '@/lib/logger';
 import { moderateContent } from '@/lib/moderation/moderate';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
@@ -120,6 +121,15 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     logger.error('[webhook/neynar] DB insert error:', err);
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
+  }
+
+  // Record which key signed this cast (flag FARCASTER_SIGNER_PROVENANCE_INGEST,
+  // default off; see src/lib/farcaster/signer-ingest.ts). Runs after the
+  // response is sent, so a slow hub never delays or fails the webhook.
+  if (signerIngestEnabled()) {
+    after(async () => {
+      await recordCastSigner(castRow.fid, castRow.hash);
+    });
   }
 
   // ── AI Content Moderation (fire-and-forget) ──────────────────────

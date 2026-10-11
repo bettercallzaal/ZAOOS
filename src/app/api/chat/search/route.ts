@@ -3,6 +3,7 @@ import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
 import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
@@ -133,7 +134,13 @@ export async function GET(req: NextRequest) {
       .in('cast_hash', hashes.length > 0 ? hashes : ['none']);
 
     const hidden = new Set((hiddenData || []).map((h: { cast_hash: string }) => h.cast_hash));
-    const results = merged.filter((r) => !hidden.has(r.hash)).slice(0, SEARCH_LIMIT);
+    const results = (
+      await dropCastsBySignerAuthority(
+        merged.filter((r) => !hidden.has(r.hash)),
+        'chat-search',
+        { unknown: 'keep' },
+      )
+    ).slice(0, SEARCH_LIMIT);
 
     return NextResponse.json({ results });
   } catch (error) {

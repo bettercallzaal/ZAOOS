@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
+import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
 import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
@@ -191,7 +192,11 @@ export async function GET(req: NextRequest) {
           .order('timestamp', { ascending: false })
           .limit(perSource)
           .then(async ({ data: casts }) => {
-            for (const c of await dropHiddenCasts(casts || [], 'activity-feed')) {
+            for (const c of await dropCastsBySignerAuthority(
+              await dropHiddenCasts(casts || [], 'activity-feed'),
+              'activity-feed',
+              { unknown: 'keep' },
+            )) {
               const preview =
                 (c.text || '').slice(0, 80) + ((c.text || '').length > 80 ? '...' : '');
               activities.push({

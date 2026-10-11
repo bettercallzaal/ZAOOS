@@ -8,7 +8,12 @@
  */
 import type Anthropic from '@anthropic-ai/sdk';
 
-export const DEFAULT_MODEL = 'claude-opus-5-5';
+/**
+ * The smallest current model. This job is reading three short files back to
+ * one person, and at the default cap the largest model costs about forty times
+ * as much a month. HELPER_MODEL overrides it.
+ */
+export const DEFAULT_MODEL = 'claude-haiku-5-5';
 
 /** Turns kept per chat, in memory only, so "what next?" has something to follow. */
 export const MAX_HISTORY = 6;

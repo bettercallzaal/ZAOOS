@@ -13,12 +13,16 @@
  * keys: its own bot token, one model key, and the settings below.
  *
  *   HELPER_ENABLED        must be 1, or the process exits without polling
- *   HELPER_BOT_TOKEN      its own token from BotFather; never another bot's
- *   HELPER_ALLOWED_IDS    comma-separated numeric Telegram user ids
+ *   HELPER_BOT_TOKEN      its own token from BotFather
+ *   HELPER_BOT_ID         the numeric id of that bot; the token must be for it
+ *   HELPER_ALLOWED_IDS    comma-separated numeric Telegram user ids, at least one
  *   HELPER_DOCS_DIR       directory holding AGENT.md, README.md, WALKTHROUGH.md
- *   HELPER_MODEL          default claude-opus-5-5
- *   HELPER_DAILY_CAP      default 40 questions a day
  *   ANTHROPIC_API_KEY     the model key
+ *   HELPER_MODEL          optional, default claude-opus-5-5
+ *   HELPER_DAILY_CAP      optional, default 40 questions a day
+ *
+ * Every required setting that is unset, empty or malformed is a refusal to
+ * start. Nothing here defaults to "allow".
  *
  * Run: npm run start:helper, or the nc-helper systemd user unit.
  */
@@ -35,28 +39,44 @@ import { newOwnerOnlyState } from '../zoe/owner-only';
 import { acquireTickLock, releaseTickLock } from '../zoe/tick-lock';
 import { DEFAULT_MODEL } from './answer';
 import { buildSystemPrompt, loadDocs } from './docs';
-import { parseAllowedIds, parseCap, tokenCollision, type CapState } from './gate';
-import { handleMessage, type HelperDeps } from './handle';
+import {
+  checkIdentity,
+  holderAlive,
+  identityProblem,
+  parseAllowedIds,
+  parseBotId,
+  parseCap,
+  parseCapState,
+  pollIsFresh,
+  type CapRead,
+} from './gate';
+import { handleMessage, logLine, type HelperDeps } from './handle';
 
 const STATE_DIR = join(process.env.HOME ?? '.', '.zao', 'nc-helper');
 const LOCK_PATH = join(STATE_DIR, 'lock');
+const PID_PATH = join(STATE_DIR, 'lock.pid');
 const CAP_PATH = join(STATE_DIR, 'cap.json');
 const BEAT_PATH = join(process.env.HOME ?? '.', '.zao', 'beats', 'nc-helper');
 const BEAT_MS = 60_000;
 /** A lock not refreshed for this long belongs to a dead process. */
 const LOCK_STALE_MS = 3 * BEAT_MS;
+/** One model call may take this long, then the user gets the error line. */
+const MODEL_TIMEOUT_MS = 60_000;
 
 function fail(message: string): never {
   console.error(`[helper] not starting: ${message}`);
   process.exit(1);
 }
 
-async function readCap(): Promise<CapState | null> {
+/** No file yet is the first question ever. Any other failure is 'unreadable'. */
+async function readCap(): Promise<CapRead> {
+  let text: string;
   try {
-    return JSON.parse(await fs.readFile(CAP_PATH, 'utf8')) as CapState;
-  } catch {
-    return null;
+    text = await fs.readFile(CAP_PATH, 'utf8');
+  } catch (err: unknown) {
+    return (err as NodeJS.ErrnoException).code === 'ENOENT' ? null : 'unreadable';
   }
+  return parseCapState(text);
 }
 
 async function main(): Promise<void> {
@@ -67,74 +87,118 @@ async function main(): Promise<void> {
 
   const token = process.env.HELPER_BOT_TOKEN?.trim();
   if (!token) fail('HELPER_BOT_TOKEN is not set');
-  const clash = tokenCollision(process.env, token);
-  if (clash) fail(`HELPER_BOT_TOKEN equals ${clash}; this bot must have its own token`);
+  const botId = parseBotId(process.env.HELPER_BOT_ID);
+  if (!botId.ok) fail(botId.why);
+  // Before any network call: is this token even for the bot we were told to be?
+  const mismatch = identityProblem(botId.value, token);
+  if (mismatch) fail(mismatch);
   if (!process.env.ANTHROPIC_API_KEY) fail('ANTHROPIC_API_KEY is not set');
 
-  // An empty list is allowed on purpose: the first run exists to hand a
-  // stranger his own id. Nobody reaches the model until one is added.
   const allowed = parseAllowedIds(process.env.HELPER_ALLOWED_IDS);
+  if (!allowed.ok) fail(allowed.why);
+  const cap = parseCap(process.env.HELPER_DAILY_CAP);
+  if (!cap.ok) fail(cap.why);
   const docsDir = process.env.HELPER_DOCS_DIR;
   if (!docsDir) fail('HELPER_DOCS_DIR is not set');
   const docs = await loadDocs(docsDir).catch((err: unknown) =>
     fail(`cannot read the handoff files: ${err instanceof Error ? err.message : String(err)}`),
   );
   const model = process.env.HELPER_MODEL?.trim() || DEFAULT_MODEL;
-  const cap = parseCap(process.env.HELPER_DAILY_CAP);
 
+  // A cap file that is already damaged is found at boot, not at the first question.
+  if ((await readCap()) === 'unreadable') fail(`${CAP_PATH} exists but cannot be read as a cap state`);
+
+  const bot = new Bot(token);
+  // Strips model scratchpad tags at egress, as on every bot in this tree.
+  installAgentMarkupGuard(bot);
+
+  // getMe, once, before polling: Telegram's own word on which bot this token
+  // is. A mismatch or a failed call is a refusal to start.
+  const wrongBot = await checkIdentity(botId.value, token, async () => {
+    await bot.init();
+    return bot.botInfo;
+  });
+  if (wrongBot) fail(wrongBot);
+
+  // One instance per host, judged two ways. The pid file says whether the last
+  // holder is still running; the lock's timestamp covers a pid file that was
+  // lost. A live holder blocks us however old its timestamp; a dead one is
+  // cleared at once instead of after the stale window.
+  const pidText = await fs.readFile(PID_PATH, 'utf8').catch(() => null);
+  const alive = holderAlive(pidText, (pid) => {
+    if (pid === process.pid) return false;
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (err: unknown) {
+      // EPERM means it exists and is not ours to signal: still alive.
+      return (err as NodeJS.ErrnoException).code === 'EPERM';
+    }
+  });
+  if (alive) fail(`another instance is running (${PID_PATH})`);
+  if (pidText !== null) await releaseTickLock(LOCK_PATH);
+  // Taken last, so no refusal above leaves a lock behind.
   const lock = await acquireTickLock(LOCK_PATH, { staleMs: LOCK_STALE_MS });
   if (!lock.acquired) fail(`another instance holds ${LOCK_PATH} (${lock.reason})`);
+  await fs.writeFile(PID_PATH, String(process.pid));
 
+  // The heartbeat follows the polling loop, not the process: it is written only
+  // while getUpdates keeps succeeding. The lock is refreshed either way, because
+  // the lock means "this process exists".
+  let lastPollOk: number | null = null;
+  bot.api.config.use(async (prev, method, payload, signal) => {
+    const res = await prev(method, payload, signal);
+    if (method === 'getUpdates' && res.ok) lastPollOk = Date.now();
+    return res;
+  });
   await fs.mkdir(dirname(BEAT_PATH), { recursive: true });
-  const beat = async (): Promise<void> => {
-    const stamp = String(Date.now());
-    await fs.writeFile(BEAT_PATH, stamp).catch(() => undefined);
-    await fs.writeFile(LOCK_PATH, stamp).catch(() => undefined);
+  const tick = async (): Promise<void> => {
+    const now = Date.now();
+    await fs.writeFile(LOCK_PATH, String(now)).catch(() => undefined);
+    if (pollIsFresh(lastPollOk, now)) await fs.writeFile(BEAT_PATH, String(now)).catch(() => undefined);
   };
-  await beat();
-  const beatTimer = setInterval(() => void beat(), BEAT_MS);
+  const beatTimer = setInterval(() => void tick(), BEAT_MS);
 
   for (const d of docs) console.log(`[helper] loaded ${d.name} sha256 ${d.sha256.slice(0, 12)}`);
-  console.log(`[helper] model ${model}, cap ${cap} a day, ${allowed.length} allowed id(s)`);
+  console.log(`[helper] model ${model}, cap ${cap.value} a day, ${allowed.value.length} allowed id(s)`);
 
   const deps: HelperDeps = {
-    allowed,
+    allowed: allowed.value,
     system: buildSystemPrompt(docs),
     model,
-    cap,
-    client: new Anthropic(),
+    cap: cap.value,
+    client: new Anthropic({ timeout: MODEL_TIMEOUT_MS, maxRetries: 1 }),
     readCap,
     writeCap: (state) => fs.writeFile(CAP_PATH, JSON.stringify(state)),
     now: () => new Date(),
     refusals: newOwnerOnlyState(),
     history: new Map(),
+    recent: new Map(),
   };
-  const bot = new Bot(token);
-  // Strips model scratchpad tags at egress, as on every bot in this tree.
-  installAgentMarkupGuard(bot);
   let announced = false;
+
+  // One message at a time, whatever the poller does: the cap is read, checked
+  // and written as one step, so two questions can never share a count.
+  let queue: Promise<unknown> = Promise.resolve();
+  const inTurn = <T>(work: () => Promise<T>): Promise<T> => {
+    const run = queue.then(work, work);
+    queue = run.catch(() => undefined);
+    return run;
+  };
 
   bot.on('message:text', async (ctx) => {
     const fromId = ctx.from?.id;
     const text = ctx.message.text;
-    const out = await handleMessage(deps, { chatType: ctx.chat.type, fromId, text });
+    const out = await inTurn(() => handleMessage(deps, { chatType: ctx.chat.type, fromId, text }));
     if (out.kind === 'ignored') return;
     if (out.reply) await ctx.reply(out.reply).catch(() => undefined);
 
-    // Message text is never logged: ids, sizes and counts only.
-    if (out.kind === 'answered' || out.kind === 'declined') {
-      console.log(
-        `[helper] ${out.kind} user ${fromId}: ${text.length} chars in, ` +
-          `${out.inputTokens} + ${out.outputTokens} tokens, ${out.countToday} of ${cap} today`,
-      );
-      if (!announced && out.kind === 'answered') {
-        announced = true;
-        console.log(`[helper/ran] first answer since boot - model ${model}`);
-      }
-    } else if (out.kind === 'failed') {
-      console.error(`[helper] model call failed for user ${fromId}: ${out.what}`);
-    } else if (out.kind !== 'refused' || out.reply) {
-      console.log(`[helper] ${out.kind} user ${fromId}`);
+    // Ids, sizes and counts only. logLine is never given the text.
+    const line = logLine(out, fromId, text.length, cap.value);
+    if (line) (out.kind === 'failed' || out.kind === 'cap-unreadable' ? console.error : console.log)(line);
+    if (!announced && out.kind === 'answered') {
+      announced = true;
+      console.log(`[helper/ran] first answer since boot - model ${model}`);
     }
   });
 
@@ -146,6 +210,7 @@ async function main(): Promise<void> {
     clearInterval(beatTimer);
     await bot.stop().catch(() => undefined);
     await releaseTickLock(LOCK_PATH);
+    await fs.unlink(PID_PATH).catch(() => undefined);
     process.exit(0);
   };
   process.on('SIGTERM', () => void shutdown());
@@ -153,7 +218,7 @@ async function main(): Promise<void> {
 
   await bot.start({
     allowed_updates: ['message'],
-    onStart: (me) => console.log(`[helper] polling as @${me.username}`),
+    onStart: (me) => console.log(`[helper] polling as @${me.username} (id ${me.id})`),
   });
 }
 

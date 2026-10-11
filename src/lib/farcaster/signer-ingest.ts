@@ -31,7 +31,7 @@
  *
  * SECOND HUB. One mirror is not an authoritative resolver. When
  * `FARCASTER_SIGNER_SECOND_HUB` is exactly `1`, the signer and its authority
- * are accepted only when two hubs run by different operators agree (see the
+ * are accepted only when two hubs on different hostnames agree (see the
  * cross-check functions in `signer-provenance.ts`). A disagreement, or one hub
  * down, resolves to unknown: no provenance row, and no change to a stored
  * authority. Default OFF, and it does nothing unless the ingest flag is on too.

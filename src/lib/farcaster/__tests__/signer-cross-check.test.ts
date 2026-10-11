@@ -51,7 +51,7 @@ const opts = (fetcher: ReturnType<typeof hubs>) => ({
 });
 
 describe('the default pair of hubs', () => {
-  it('is two different operators', () => {
+  it('is two different hostnames', () => {
     expect(SECOND_HUB_URL).not.toBe(DEFAULT_HUB_URL);
     expect(new URL(SECOND_HUB_URL).hostname).not.toBe(new URL(DEFAULT_HUB_URL).hostname);
   });

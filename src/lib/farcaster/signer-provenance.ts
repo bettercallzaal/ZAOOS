@@ -228,9 +228,12 @@ export async function checkSignerAuthority(
 // ---------------------------------------------------------------------------
 
 /**
- * A second hub run by a different operator than the Haatz mirror: a Snapchain
- * node on farcaster.xyz. Checked live on 2026-10-11: keyless, and its
- * `castById` and `onChainSignersByFid` answers for FID 3 matched Haatz's.
+ * A second hub on a different hostname from the Haatz mirror: a Snapchain
+ * node on farcaster.xyz. WHO OPERATES IT IS UNCONFIRMED: its `/v1/info` and the
+ * Snapchain docs, fetched 2026-10-11, do not name an operator, so the two hubs
+ * being independent of each other is an assumption, not an established fact.
+ * Checked live on 2026-10-11: keyless, and its `castById` and
+ * `onChainSignersByFid` answers for FID 3 matched Haatz's.
  */
 export const SECOND_HUB_URL = 'https://snap.farcaster.xyz:3381';
 
@@ -246,7 +249,7 @@ function twoHubs(opts: CrossCheckOptions): readonly [string, string] {
 }
 
 /**
- * The key that signed a cast, accepted only when two independent hubs name the
+ * The key that signed a cast, accepted only when two different hubs name the
  * same key. One mirror is not an authoritative resolver: if the hubs disagree,
  * or only one answers, the result is `unknown`, and the reason says which.
  * Never picks a side. Never throws. Same return type as `fetchCastSigner`, so
@@ -301,7 +304,7 @@ function sameEvent(a: SignerAuthority['event'], b: SignerAuthority['event']): bo
 
 /**
  * Authority of ONE (FID, key) pair, accepted as `active` or `removed` only
- * when two independent hubs give the same status resting on the same
+ * when two different hubs give the same status resting on the same
  * KeyRegistry event. Anything else is `unknown`: the hubs disagree, they
  * agree on the status but cite different events, or one did not answer.
  *

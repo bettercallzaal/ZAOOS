@@ -17,8 +17,9 @@
  * TRUST. A hub response is external data: every field is Zod-validated and
  * any failure, timeout or malformed body resolves to `unknown`, never to
  * "removed". A timeout is not proof of revocation (decision 2). One mirror is
- * also not an authoritative resolver on its own; the hub URL is a parameter so
- * a second hub can cross-check later.
+ * also not an authoritative resolver on its own, so the hub URL is a parameter
+ * and `crossCheckCastSigner` / `crossCheckSignerAuthority` at the bottom of
+ * this file ask two hubs and accept only what both say.
  *
  * NOT COVERED: signers that are not on-chain (Brandon's "gasless" signers)
  * resolve to `unknown` with reason `no-onchain-record`, which keeps them out of
@@ -220,4 +221,132 @@ export async function checkSignerAuthority(
   } catch (err: unknown) {
     return unknown(`hub-unreachable: ${errorText(err)}`);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Second-hub cross-check
+// ---------------------------------------------------------------------------
+
+/**
+ * A second hub run by a different operator than the Haatz mirror: a Snapchain
+ * node on farcaster.xyz. Checked live on 2026-10-11: keyless, and its
+ * `castById` and `onChainSignersByFid` answers for FID 3 matched Haatz's.
+ */
+export const SECOND_HUB_URL = 'https://snap.farcaster.xyz:3381';
+
+type CrossCheckOptions = {
+  /** The two hubs to compare. They must differ. */
+  hubUrls?: readonly [string, string];
+  fetcher?: Fetcher;
+  now?: () => Date;
+};
+
+function twoHubs(opts: CrossCheckOptions): readonly [string, string] {
+  return opts.hubUrls ?? [DEFAULT_HUB_URL, SECOND_HUB_URL];
+}
+
+/**
+ * The key that signed a cast, accepted only when two independent hubs name the
+ * same key. One mirror is not an authoritative resolver: if the hubs disagree,
+ * or only one answers, the result is `unknown`, and the reason says which.
+ * Never picks a side. Never throws. Same return type as `fetchCastSigner`, so
+ * a caller can swap one for the other.
+ */
+export async function crossCheckCastSigner(
+  fid: number,
+  hash: string,
+  opts: CrossCheckOptions = {},
+): Promise<CastSigner> {
+  const [hubA, hubB] = twoHubs(opts);
+  const hubUrl = `${hubA},${hubB}`;
+  const observedAt = (opts.now ?? (() => new Date()))().toISOString();
+  const unknown = (reason: string): CastSigner => ({
+    status: 'unknown',
+    fid,
+    hash,
+    reason,
+    hubUrl,
+    observedAt,
+  });
+  if (hubA === hubB) return unknown('cross-check-needs-two-hubs');
+
+  const one = { fetcher: opts.fetcher, now: opts.now };
+  const [a, b] = await Promise.all([
+    fetchCastSigner(fid, hash, { ...one, hubUrl: hubA }),
+    fetchCastSigner(fid, hash, { ...one, hubUrl: hubB }),
+  ]);
+
+  if (a.status === 'found' && b.status === 'found') {
+    if (a.signer !== b.signer) return unknown('hubs-disagree-on-signer');
+    return { status: 'found', fid, hash, signer: a.signer, hubUrl, observedAt };
+  }
+  if (a.status === 'unknown' && b.status === 'unknown') {
+    return unknown(
+      a.reason === b.reason ? a.reason : `both-hubs-unknown: ${a.reason}; ${b.reason}`,
+    );
+  }
+  const missing = a.status === 'unknown' ? a : (b as Extract<CastSigner, { status: 'unknown' }>);
+  return unknown(`unconfirmed-by-${missing.hubUrl}: ${missing.reason}`);
+}
+
+function sameEvent(a: SignerAuthority['event'], b: SignerAuthority['event']): boolean {
+  if (a === null || b === null) return a === b;
+  return (
+    a.chainId === b.chainId &&
+    a.blockNumber === b.blockNumber &&
+    a.logIndex === b.logIndex &&
+    a.transactionHash.toLowerCase() === b.transactionHash.toLowerCase()
+  );
+}
+
+/**
+ * Authority of ONE (FID, key) pair, accepted as `active` or `removed` only
+ * when two independent hubs give the same status resting on the same
+ * KeyRegistry event. Anything else is `unknown`: the hubs disagree, they
+ * agree on the status but cite different events, or one did not answer.
+ *
+ * A removal reported by one hub alone is NOT treated as a removal. That hub
+ * may simply be ahead, but it may also be wrong, and a single mirror being
+ * able to revoke a key is the thing this check exists to prevent. The caller
+ * keeps whatever status it already holds and asks again later.
+ *
+ * Never throws. Same return type as `checkSignerAuthority`.
+ */
+export async function crossCheckSignerAuthority(
+  fid: number,
+  signer: string,
+  opts: CrossCheckOptions = {},
+): Promise<SignerAuthority> {
+  const [hubA, hubB] = twoHubs(opts);
+  const checkedAt = (opts.now ?? (() => new Date()))().toISOString();
+  const base = { fid, signer: signer.toLowerCase(), hubUrl: `${hubA},${hubB}`, checkedAt };
+  const unknown = (reason: string): SignerAuthority => ({
+    ...base,
+    status: 'unknown',
+    reason,
+    event: null,
+  });
+  if (hubA === hubB) return unknown('cross-check-needs-two-hubs');
+
+  const one = { fetcher: opts.fetcher, now: opts.now };
+  const [a, b] = await Promise.all([
+    checkSignerAuthority(fid, signer, { ...one, hubUrl: hubA }),
+    checkSignerAuthority(fid, signer, { ...one, hubUrl: hubB }),
+  ]);
+
+  if (a.status === 'unknown' && b.status === 'unknown') {
+    return unknown(
+      a.reason === b.reason ? a.reason : `both-hubs-unknown: ${a.reason}; ${b.reason}`,
+    );
+  }
+  if (a.status === 'unknown' || b.status === 'unknown') {
+    const missing = a.status === 'unknown' ? a : b;
+    const other = a.status === 'unknown' ? b : a;
+    return unknown(
+      `unconfirmed-by-${missing.hubUrl}: ${missing.reason} (other hub: ${other.status})`,
+    );
+  }
+  if (a.status !== b.status) return unknown(`hubs-disagree-on-status: ${a.status} vs ${b.status}`);
+  if (!sameEvent(a.event, b.event)) return unknown(`hubs-disagree-on-event: both ${a.status}`);
+  return { ...base, status: a.status, reason: a.reason, event: a.event };
 }

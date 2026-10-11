@@ -272,7 +272,7 @@ Execute a simulation of the ship action without side effects.
 
 | Type | Dry-Run Action |
 |------|---------------|
-| code-pr | `gh pr create --draft` or preview PR diff |
+| code-pr | `zao-pr-open --dry-run` (every gate, no push, no PR) or preview PR diff. Never a draft PR. |
 | code-release | Create tag locally (don't push), preview changelog |
 | deployment | Build Docker image, run health checks locally |
 | content | Preview render, check all links resolve |

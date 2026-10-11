@@ -1,0 +1,30 @@
+# North Creek helper: a question-answering Telegram bot for one outside
+# collaborator. Design: research/agents/2661-north-creek-helper-telegram-bot.
+#
+# NOT ENABLED BY THE REPO. Installing and starting this unit is Zaal's step,
+# after he has made the bot in BotFather and written the env file below.
+# The process also exits at once unless HELPER_ENABLED=1 is in that file.
+#
+# It reads its OWN env file, never the bot/.env that ZOE uses, so it holds
+# none of ZOE's keys.
+[Unit]
+Description=North Creek helper Telegram bot (question answering only, doc 2661)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zao-bot-live/bot
+EnvironmentFile=%h/.zao/private/nc-helper.env
+ExecStart=/usr/bin/env npm run start:helper
+# on-failure, so the flag-off exit (code 0) is not restarted. 30 seconds, so a
+# restart after a crash waits out part of the 3 minute stale-lock window.
+Restart=on-failure
+RestartSec=30
+MemoryMax=300M
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

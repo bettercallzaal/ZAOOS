@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
 import { getUserByFid } from '@/lib/farcaster/neynar';
+import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
 import { logger } from '@/lib/logger';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ fid: string }> }) {
@@ -59,7 +60,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     let castCount = 0;
 
     if (activityResult.data) {
-      for (const row of await dropHiddenCasts(activityResult.data, 'user-profile')) {
+      for (const row of await dropCastsBySignerAuthority(
+        await dropHiddenCasts(activityResult.data, 'user-profile'),
+        'user-profile',
+        { unknown: 'keep' },
+      )) {
         castCount++;
         const reactions = row.reactions as { likes_count?: number; recasts_count?: number } | null;
         totalLikes += reactions?.likes_count ?? 0;

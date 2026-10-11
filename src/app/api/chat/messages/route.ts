@@ -3,6 +3,7 @@ import { communityConfig } from '@/../community.config';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getChannelFeed } from '@/lib/farcaster/neynar';
+import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
 import { logger } from '@/lib/logger';
 import type { Cast } from '@/types';
 
@@ -201,7 +202,11 @@ export async function GET(req: NextRequest) {
       (hiddenResult.data || []).map((h: { cast_hash: string }) => h.cast_hash),
     );
 
-    const visibleCasts = casts.filter((c) => !hiddenHashes.has(c.hash));
+    const visibleCasts = await dropCastsBySignerAuthority(
+      casts.filter((c) => !hiddenHashes.has(c.hash)),
+      'chat-messages',
+      { unknown: 'keep' },
+    );
 
     let zidMap = new Map<number, number>();
     if (zidResult.data) {

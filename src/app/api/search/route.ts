@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { dropHiddenCasts } from '@/lib/farcaster/hidden-casts';
+import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
 import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -125,7 +126,11 @@ export async function GET(req: NextRequest) {
             .limit(limit);
 
           if (data) {
-            for (const row of await dropHiddenCasts(data, 'search')) {
+            for (const row of await dropCastsBySignerAuthority(
+              await dropHiddenCasts(data, 'search'),
+              'search',
+              { unknown: 'keep' },
+            )) {
               results.push({
                 type: 'cast',
                 id: row.hash,

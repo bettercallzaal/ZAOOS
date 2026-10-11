@@ -1,6 +1,6 @@
 # Resource Release - whatever a run creates, the same file says how it is released
 
-Three measured leaks (136 tabs, 50 sessions on 40 panes, 26 worktrees that filled the disk on 2026-10-10). Instances, what this does not ask for, and sources: `research/dev-workflows/2649-rules-history/archive/resource-release.md`.
+Three measured leaks (136 tabs, 50 sessions on 40 panes, 26 leftover worktrees on a disk that hit ENOSPC on 2026-10-10). Instances, what this does not ask for, and sources: `research/dev-workflows/2649-rules-history/archive/resource-release.md`.
 
 1. **The file that creates a per-run resource names its release, next to the create.** Not in a README, not in a cleanup script somebody runs later.
 2. **Release at the natural boundary, not at the end of the session**: when the thing it was for is safe somewhere else.

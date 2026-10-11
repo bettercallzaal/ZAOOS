@@ -4,8 +4,8 @@
  * DreamNet Phase 1 step 2 (Brandon's contract decision 3, 2026-10-09): a cast
  * existing in our store is historical truth; whether it may be returned now
  * depends on the current authority of the key that signed it. The ingestion
- * writer (`signer-ingest.ts`) records the signer and its authority. This is
- * the read side.
+ * writer (PR #3904) records the signer and its authority. This is the read
+ * side.
  *
  * A cast's STANDING is worked out from `cast_signer_provenance` joined to
  * `farcaster_signer_authority` on (fid, signer):
@@ -81,6 +81,10 @@ export async function dropCastsBySignerAuthority<T extends { hash: string }>(
       const { data: authorityData, error: authorityError } = await supabaseAdmin
         .from('farcaster_signer_authority')
         .select('fid, signer, status')
+        // Scoped to the FIDs and keys on this page, so the read is bounded by the
+        // page and cannot be cut short by a row cap (a truncated read would turn
+        // a removed key into an unknown one, which the display routes keep).
+        .in('fid', [...new Set(provenance.map((p) => p.fid))])
         .in('signer', [...new Set(provenance.map((p) => p.signer))]);
       if (authorityError) throw authorityError;
 

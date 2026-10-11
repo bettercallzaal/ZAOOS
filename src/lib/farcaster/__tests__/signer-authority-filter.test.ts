@@ -7,10 +7,14 @@ vi.mock('@/lib/logger', () => ({
 
 const mockProvenanceIn = vi.hoisted(() => vi.fn());
 const mockAuthorityIn = vi.hoisted(() => vi.fn());
+// The authority read is .in('fid', ...).in('signer', ...): two links, both recorded.
+const mockAuthorityFidIn = vi.hoisted(() => vi.fn(() => ({ in: mockAuthorityIn })));
 const mockFrom = vi.hoisted(() =>
   vi.fn().mockImplementation((table: string) => {
     if (table === 'cast_signer_provenance') return { select: () => ({ in: mockProvenanceIn }) };
-    if (table === 'farcaster_signer_authority') return { select: () => ({ in: mockAuthorityIn }) };
+    if (table === 'farcaster_signer_authority') {
+      return { select: () => ({ in: mockAuthorityFidIn }) };
+    }
     throw new Error(`unexpected table ${table}`);
   }),
 );
@@ -143,6 +147,18 @@ describe('dropCastsBySignerAuthority', () => {
       await dropCastsBySignerAuthority([{ hash: upper }], 'test', { unknown: 'keep' }),
     ).toEqual([]);
     expect(mockProvenanceIn).toHaveBeenCalledWith('cast_hash', [C1]);
+  });
+
+  it('reads authority only for the FIDs and keys on this page', async () => {
+    process.env[FLAG] = '1';
+    store(
+      [prov(C1, KEY_A), prov(C2, KEY_B, 7), prov(C3, KEY_A)],
+      [auth(KEY_A, 'active'), auth(KEY_B, 'removed', 7)],
+    );
+    const out = await dropCastsBySignerAuthority(rows, 'test', { unknown: 'keep' });
+    expect(hashes(out)).toEqual([C1, C3]);
+    expect(mockAuthorityFidIn).toHaveBeenCalledWith('fid', [FID, 7]);
+    expect(mockAuthorityIn).toHaveBeenCalledWith('signer', [KEY_A, KEY_B]);
   });
 
   it('with no provenance at all, asks nothing of the authority table', async () => {

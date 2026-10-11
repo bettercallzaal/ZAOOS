@@ -82,8 +82,9 @@ const cast = (hash: string, text: string) => ({
   replies_count: 2,
 });
 
-function wireTables() {
+function wireTables(broken?: 'cast_signer_provenance' | 'farcaster_signer_authority') {
   mockFrom.mockImplementation((table: string) => {
+    if (table === broken) return chain({ data: null, error: { message: 'read failed' } });
     if (table === 'channel_casts') {
       return chain({
         data: [
@@ -182,6 +183,18 @@ describe('signer authority on the five surfaces that read channel_casts', () => 
       expect(mockFrom).not.toHaveBeenCalledWith('farcaster_signer_authority');
     });
 
+    it.each([
+      ['cast_signer_provenance' as const],
+      ['farcaster_signer_authority' as const],
+    ])('flag on, %s unreadable: answers 200 with no casts at all', async (broken) => {
+      process.env[FLAG] = '1';
+      wireTables(broken);
+      const body = await call();
+      expect(body).not.toContain(ACTIVE);
+      expect(body).not.toContain(REMOVED);
+      expect(body).not.toContain(UNKNOWN);
+    });
+
     it('flag on: drops the removed-signer cast, keeps the active and the unknown one', async () => {
       process.env[FLAG] = '1';
       const body = await call();
@@ -204,6 +217,15 @@ describe('signer authority on the five surfaces that read channel_casts', () => 
     it('flag off: counts all three casts and never reads the signer tables', async () => {
       expect(await userBody()).toContain('"casts":3');
       expect(mockFrom).not.toHaveBeenCalledWith('cast_signer_provenance');
+    });
+
+    it.each([
+      ['cast_signer_provenance' as const],
+      ['farcaster_signer_authority' as const],
+    ])('flag on, %s unreadable: answers 200 and counts no casts', async (broken) => {
+      process.env[FLAG] = '1';
+      wireTables(broken);
+      expect(await userBody()).toContain('"casts":0');
     });
 
     it('flag on: counts the active and the unknown cast, not the removed one', async () => {

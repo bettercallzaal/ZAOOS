@@ -16,7 +16,8 @@ const mockFrom = vi.hoisted(() =>
 );
 vi.mock('@/lib/db/supabase', () => ({ supabaseAdmin: { from: mockFrom } }));
 
-import { recordCastSigner, signerIngestEnabled } from '../signer-ingest';
+import { recordCastSigner, signerIngestEnabled, signerSecondHubEnabled } from '../signer-ingest';
+import { DEFAULT_HUB_URL, SECOND_HUB_URL } from '../signer-provenance';
 
 // Real values from the Haatz Snapchain mirror, fetched 2026-10-09 for FID 3
 // (public on-chain data); the same fixtures signer-provenance.test.ts uses.
@@ -57,6 +58,7 @@ const opts = (fetcher: ReturnType<typeof hub>) => ({ hubUrl: HUB, fetcher, now: 
 afterEach(() => {
   vi.clearAllMocks();
   delete process.env.FARCASTER_SIGNER_PROVENANCE_INGEST;
+  delete process.env.FARCASTER_SIGNER_SECOND_HUB;
 });
 
 describe('signerIngestEnabled - default off', () => {
@@ -241,6 +243,104 @@ describe('recordCastSigner', () => {
       status: 'error',
       hash: CAST_HASH,
       error: 'connection reset',
+    });
+  });
+});
+
+describe('signerSecondHubEnabled - default off', () => {
+  it.each([
+    [undefined, false],
+    ['', false],
+    ['0', false],
+    ['true', false],
+    ['1', true],
+  ])('FARCASTER_SIGNER_SECOND_HUB=%s -> %s', (value, want) => {
+    if (value !== undefined) process.env.FARCASTER_SIGNER_SECOND_HUB = value;
+    expect(signerSecondHubEnabled()).toBe(want);
+  });
+});
+
+describe('recordCastSigner with the second hub', () => {
+  const ADD_A = event(KEY_A, 'SIGNER_EVENT_TYPE_ADD', 111898433);
+  const REMOVE_A = event(KEY_A, 'SIGNER_EVENT_TYPE_REMOVE', 140000000);
+  const BOTH = `${DEFAULT_HUB_URL},${SECOND_HUB_URL}`;
+
+  /** Each default hub answers castById and onChainSignersByFid with its own bodies. */
+  function twoHubs(
+    first: { cast: unknown; events: unknown },
+    second: { cast: unknown; events: unknown },
+  ) {
+    return vi.fn((url: string | URL | Request) => {
+      const u = String(url);
+      const mine = u.startsWith(SECOND_HUB_URL) ? second : first;
+      const body = u.includes('/v1/castById') ? mine.cast : mine.events;
+      if (body instanceof Error) return Promise.reject(body);
+      return Promise.resolve(new Response(JSON.stringify(body), { status: 200 }));
+    });
+  }
+  const asked = (fetcher: ReturnType<typeof twoHubs>) =>
+    fetcher.mock.calls.map((c) => String(c[0]));
+
+  it('flag off: only the one hub is asked', async () => {
+    mockProvenanceUpsert.mockResolvedValueOnce({ error: null });
+    mockAuthorityUpsert.mockResolvedValueOnce({ error: null });
+    const same = { cast: hubCast(), events: { events: [ADD_A] } };
+    const fetcher = twoHubs(same, same);
+    await recordCastSigner(FID, CAST_HASH, { fetcher, now: NOW });
+    expect(asked(fetcher).some((u) => u.startsWith(SECOND_HUB_URL))).toBe(false);
+    expect(mockProvenanceUpsert.mock.calls[0][0]).toMatchObject({ hub_url: DEFAULT_HUB_URL });
+  });
+
+  it('flag on, hubs agree: recorded, and the row names both hubs', async () => {
+    process.env.FARCASTER_SIGNER_SECOND_HUB = '1';
+    mockProvenanceUpsert.mockResolvedValueOnce({ error: null });
+    mockAuthorityUpsert.mockResolvedValueOnce({ error: null });
+    const same = { cast: hubCast(), events: { events: [ADD_A] } };
+    const fetcher = twoHubs(same, same);
+    const r = await recordCastSigner(FID, CAST_HASH, { fetcher, now: NOW });
+    expect(r).toMatchObject({ status: 'recorded', signer: KEY_A, authority: 'active' });
+    expect(asked(fetcher).some((u) => u.startsWith(SECOND_HUB_URL))).toBe(true);
+    expect(mockProvenanceUpsert.mock.calls[0][0]).toMatchObject({ signer: KEY_A, hub_url: BOTH });
+    expect(mockAuthorityUpsert.mock.calls[0][0]).toMatchObject({ status: 'active', hub_url: BOTH });
+    expect(mockAuthorityUpsert.mock.calls[0][1]).toMatchObject({ ignoreDuplicates: false });
+  });
+
+  it('flag on, hubs name different signers: nothing is written', async () => {
+    process.env.FARCASTER_SIGNER_SECOND_HUB = '1';
+    const fetcher = twoHubs(
+      { cast: hubCast(KEY_A), events: { events: [ADD_A] } },
+      { cast: hubCast(KEY_B), events: { events: [ADD_A] } },
+    );
+    const r = await recordCastSigner(FID, CAST_HASH, { fetcher, now: NOW });
+    expect(r).toMatchObject({ status: 'signer-unknown', reason: 'hubs-disagree-on-signer' });
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+
+  it('flag on, the second hub is down: nothing is written', async () => {
+    process.env.FARCASTER_SIGNER_SECOND_HUB = '1';
+    const fetcher = twoHubs(
+      { cast: hubCast(), events: { events: [ADD_A] } },
+      { cast: new Error('timeout'), events: new Error('timeout') },
+    );
+    const r = await recordCastSigner(FID, CAST_HASH, { fetcher, now: NOW });
+    expect(r.status).toBe('signer-unknown');
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+
+  it('flag on, only one hub reports a removal: stored as unknown, never over a stored status', async () => {
+    process.env.FARCASTER_SIGNER_SECOND_HUB = '1';
+    mockProvenanceUpsert.mockResolvedValueOnce({ error: null });
+    mockAuthorityUpsert.mockResolvedValueOnce({ error: null });
+    const fetcher = twoHubs(
+      { cast: hubCast(), events: { events: [ADD_A, REMOVE_A] } },
+      { cast: hubCast(), events: { events: [ADD_A] } },
+    );
+    const r = await recordCastSigner(FID, CAST_HASH, { fetcher, now: NOW });
+    expect(r).toMatchObject({ status: 'recorded', authority: 'unknown' });
+    expect(mockAuthorityUpsert.mock.calls[0][0]).toMatchObject({ status: 'unknown' });
+    expect(mockAuthorityUpsert.mock.calls[0][1]).toEqual({
+      onConflict: 'fid,signer',
+      ignoreDuplicates: true,
     });
   });
 });

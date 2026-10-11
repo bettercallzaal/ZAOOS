@@ -28,10 +28,21 @@
  *   refresh in `/api/chat/messages` also write `channel_casts` and do not.
  * - No backfill. Casts stored before the flag is on, and casts the mirror had
  *   not seen when the webhook fired, have no row until something re-runs this.
- * - One hub. A second hub as a cross-check is a separate step.
+ *
+ * SECOND HUB. One mirror is not an authoritative resolver. When
+ * `FARCASTER_SIGNER_SECOND_HUB` is exactly `1`, the signer and its authority
+ * are accepted only when two hubs run by different operators agree (see the
+ * cross-check functions in `signer-provenance.ts`). A disagreement, or one hub
+ * down, resolves to unknown: no provenance row, and no change to a stored
+ * authority. Default OFF, and it does nothing unless the ingest flag is on too.
  */
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { checkSignerAuthority, fetchCastSigner } from '@/lib/farcaster/signer-provenance';
+import {
+  checkSignerAuthority,
+  crossCheckCastSigner,
+  crossCheckSignerAuthority,
+  fetchCastSigner,
+} from '@/lib/farcaster/signer-provenance';
 import { logger } from '@/lib/logger';
 
 /** True only when the flag is exactly '1'. */
@@ -49,6 +60,11 @@ export type SignerIngestResult =
   | { status: 'signer-unknown'; hash: string; reason: string }
   | { status: 'error'; hash: string; error: string };
 
+/** True only when the flag is exactly '1'. Only read when ingestion itself is on. */
+export function signerSecondHubEnabled(): boolean {
+  return process.env.FARCASTER_SIGNER_SECOND_HUB === '1';
+}
+
 type HubOptions = Parameters<typeof fetchCastSigner>[2];
 
 /** Reads the cast's signer from a hub and stores it with the key's authority. Never throws. */
@@ -60,7 +76,12 @@ export async function recordCastSigner(
   // The tables accept lowercase hex only.
   const hash = typeof castHash === 'string' ? castHash.toLowerCase() : String(castHash);
   try {
-    const cast = await fetchCastSigner(fid, hash, opts);
+    const twoHubs = signerSecondHubEnabled();
+    // The cross-check picks its own pair of hubs; a single `hubUrl` does not apply.
+    const shared = { fetcher: opts?.fetcher, now: opts?.now };
+    const cast = twoHubs
+      ? await crossCheckCastSigner(fid, hash, shared)
+      : await fetchCastSigner(fid, hash, opts);
     if (cast.status === 'unknown') {
       logger.info(`[signer-ingest] ${hash} signer unknown (${cast.reason}), nothing written`);
       return { status: 'signer-unknown', hash, reason: cast.reason };
@@ -79,7 +100,9 @@ export async function recordCastSigner(
     );
     if (provenanceError) throw provenanceError;
 
-    const authority = await checkSignerAuthority(fid, cast.signer, opts);
+    const authority = twoHubs
+      ? await crossCheckSignerAuthority(fid, cast.signer, shared)
+      : await checkSignerAuthority(fid, cast.signer, opts);
     const { error: authorityError } = await supabaseAdmin.from('farcaster_signer_authority').upsert(
       {
         fid,

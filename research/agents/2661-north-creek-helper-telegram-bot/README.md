@@ -5,7 +5,7 @@ status: research-complete
 last-validated: 2026-10-11
 superseded-by:
 related-docs: "601, 650, 1023"
-original-query: "Zaal's ruling, vault decisions item 166: B, a brand-new Telegram bot for Brian (North Creek), not the ZOE guest mode. Write the numbered research doc the no-new-bots rule requires: what the bot is, what it must never do, who may talk to it, the daily cap, the one-instance guard and heartbeat, where it runs and what a sixth process costs, the model and cost per question, how it is stopped, and why it is a separate bot."
+original-query: "Zaal's ruling, vault decisions item 166: B, a brand-new Telegram bot for the North Creek collaborator (named in the request; name removed here), not the ZOE guest mode. Write the numbered research doc the no-new-bots rule requires: what the bot is, what it must never do, who may talk to it, the daily cap, the one-instance guard and heartbeat, where it runs and what a sixth process costs, the model and cost per question, how it is stopped, and why it is a separate bot."
 tier: STANDARD
 ---
 
@@ -21,7 +21,7 @@ tier: STANDARD
 |---|---|---|
 | 1 | BUILD a separate bot, working name `nc-helper`, in `bot/src/helper/`. Not a ZOE mode. | Zaal chose it: vault decisions item 166, verbatim "B". |
 | 2 | The model call carries NO tools. The process has no repo access and its env file holds two secrets only: its own bot token and one model key. | A helper with nothing to call cannot be talked into calling it. OWASP LLM01 says to "restrict the model's access privileges to the minimum necessary". |
-| 3 | An allowlist of numeric Telegram user ids, set in the env file: Brian's and Zaal's. Everyone else gets one refusal line and no model call. Private chats only. | Usernames can change hands; ids do not. No model call for strangers means no spend and no surface. |
+| 3 | An allowlist of numeric Telegram user ids, set in the env file: the collaborator's and Zaal's. Everyone else gets one refusal line and no model call. Private chats only. | Usernames can change hands; ids do not. No model call for strangers means no spend and no surface. |
 | 4 | Three limits live in CODE, not in the prompt: the daily cap, the footer "I cannot commit Zaal to anything.", and a refusal to forward a message that looks like a password or key. | A prompt is a request. This estate measures prose rules at 3 to 40 percent compliance and mechanical ones at about 100. |
 | 5 | It reads the three files from a plain directory on the host, set by `HELPER_DOCS_DIR`. It never fetches them from GitHub. | The files are moving to a new site-only repo (item 165). A local copy means the bot needs no GitHub credential and does not break when the repo moves. |
 | 6 | Model is one env var, `HELPER_MODEL`. Default `claude-opus-5-5`. Zaal can set `claude-haiku-5-5` and pay about one fortieth. | Cost is his call, not this lane's. Both prices are in the table below. |
@@ -30,15 +30,15 @@ tier: STANDARD
 
 ## What it is
 
-A Telegram bot that Brian, who leads design for North Creek, can message with questions about changing and publishing his website. It answers from three files written by lane 8 and nothing else:
+A Telegram bot that the North Creek collaborator, the collective's design lead, can message with questions about changing and publishing his website. It answers from three files written by lane 8 and nothing else:
 
-- `handoff/AGENT.md` (3,904 bytes): the helper's brief. Who Brian is, how to answer, what it must not do.
+- `handoff/AGENT.md` (3,904 bytes): the helper's brief. Who the collaborator is, how to answer, what it must not do.
 - `handoff/README.md` (5,175 bytes): the instruction sheet.
 - `handoff/WALKTHROUGH.md` (5,086 bytes): the GitHub and Vercel walk-through.
 
 Total 14,165 bytes, measured 2026-10-11 from the north-creek repo, PR #18, head `619b35ed`. That PR is a draft and the files are moving to a new site-only repo (item 165, decided the same afternoon).
 
-One wrinkle to settle at build time: `AGENT.md` says "Give the helper this file and `handoff/README.md`. It answers from those two files." The seat's instruction names three. This design loads all three, because the walk-through is what Brian will ask about. If lane 8 meant two, dropping one is a one-line change.
+One wrinkle to settle at build time: `AGENT.md` says "Give the helper this file and `handoff/README.md`. It answers from those two files." The seat's instruction names three. This design loads all three, because the walk-through is what he will ask about. If lane 8 meant two, dropping one is a one-line change.
 
 Each question is one model call: system prompt = the brief plus the files, messages = the last few turns of this chat plus the new question. No tools, no search, no file writes.
 
@@ -59,8 +59,8 @@ A community case for why the footer and the "ask Zaal" rule matter: in 2024 a tr
 
 ## Who may talk to it
 
-- `HELPER_ALLOWED_IDS`: a comma-separated list of numeric Telegram user ids. Brian's and Zaal's.
-- Telegram bots cannot message a person first; the person has to open the chat. So Brian messages it once, is refused, and the refusal line tells him his own id: "This helper is private. Your id is N. Send that number to Zaal." Zaal adds the id to the env file and restarts. That is the whole onboarding, and it means nobody has to look up an id by hand.
+- `HELPER_ALLOWED_IDS`: a comma-separated list of numeric Telegram user ids. The collaborator's and Zaal's.
+- Telegram bots cannot message a person first; the person has to open the chat. So the collaborator messages it once, is refused, and the refusal line tells him his own id: "This helper is private. Your id is N. Send that number to Zaal." Zaal adds the id to the env file and restarts. That is the whole onboarding, and it means nobody has to look up an id by hand.
 - The refusal is sent at most once per user per hour (the pattern already in `bot/src/zoe/owner-only.ts`), so the bot cannot be used to spam.
 - Private chats only. If added to a group it answers nothing.
 
@@ -129,17 +129,17 @@ What the choice buys, measured against the option this lane first recommended:
 
 | | A: guest mode in ZOE | B: separate bot (chosen) | C: no build |
 |---|---|---|---|
-| Brian can message it privately | No, a three-person group | Yes | n/a |
+| The collaborator can message it privately | No, a three-person group | Yes | n/a |
 | Shares a process with ZOE's tools and memory | Yes, kept apart only by code | No, a different process and a different env file | n/a |
 | A mistake in the guard exposes | ZOE's memory, tools, Zaal's facts | Three files about his own website | nothing |
 | New token, process and doc needed | No | Yes | No |
-| Can be handed to Brian or shut off without touching ZOE | No | Yes | n/a |
+| Can be handed to the collaborator or shut off without touching ZOE | No | Yes | n/a |
 
 The standing rule is `CLAUDE.md`, "Rule: no new bots without doc": a numbered research doc plus explicit Zaal approval, with new brand voices going into ZOE as persona blocks. This is not a brand voice. It is a walled-off helper for someone outside The ZAO, and the wall is the point. The rule's other half is this doc. The cleanup decision behind the rule is `agents/601-agent-stack-cleanup-decision`.
 
 ## Risks that remain
 
-- **Prompt injection still works on the words.** Brian, or anyone who gets his phone, can try to make it say something silly. With no tools and no secrets in reach, the worst case is an embarrassing sentence, and the footer is on it. See `security/1023-prompt-injection-threat-landscape-2026`.
+- **Prompt injection still works on the words.** The collaborator, or anyone who gets his phone, can try to make it say something silly. With no tools and no secrets in reach, the worst case is an embarrassing sentence, and the footer is on it. See `security/1023-prompt-injection-threat-landscape-2026`.
 - **The files can go stale.** They are a copy. When the site-only repo changes them, someone has to copy them again and restart. The bot logs a hash of each file at boot so a stale copy can be seen.
 - **Wrong answers about GitHub and Vercel.** Both move their buttons. The brief tells the helper to ask what he sees. Nothing checks its answers.
 - **A sixth thing to keep alive.** The heartbeat makes a dead one visible; nothing restarts or pages on it yet.
@@ -160,7 +160,7 @@ The standing rule is `CLAUDE.md`, "Rule: no new bots without doc": a numbered re
 | Decide the model (`HELPER_MODEL`) and whether the new SDK dependency is accepted. Shipped when he says which. | Zaal | Decision | With the build PR review; no date set by this lane |
 | Create the bot in BotFather, store its token and a model key through the secrets flow. Shipped when the env file exists on the VPS. | Zaal | His hand | After the build PR merges; no date set by this lane |
 | Copy the three files to `HELPER_DOCS_DIR` from the site-only repo once lane 8 has created it. Shipped when the bot's boot log prints three hashes. | lane 8, then Zaal | Ops | After item 165's repo exists; no date set by this lane |
-| Start the unit, have Brian message it, add his id. Shipped when a `[helper/ran]` line is in the journal. | Zaal | His hand | After all of the above; not possible for 2026-10-12 unless they land first |
+| Start the unit, have the collaborator message it, add his id. Shipped when a `[helper/ran]` line is in the journal. | Zaal | His hand | After all of the above; not possible for 2026-10-12 unless they land first |
 
 ## Sources
 

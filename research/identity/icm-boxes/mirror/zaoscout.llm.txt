@@ -1,0 +1,11 @@
+# ZAOscout
+
+ZAOscout is a toolkit of no-login scrapers extracted from ZAO OS. It pulls public data without requiring accounts or API keys.
+
+## What it is
+
+ZAOscout fetches X tweets and Articles, X timelines, Farcaster history, WaveWarZ stats and battles, and bettercallzaal.com content, all without logging in. It was pulled out of the main ZAO OS monorepo as a standalone data-gathering layer, the kind of reusable building block the ZAO reuses across its agents and research. It embodies the ZAO pattern of open, composable, no-friction tooling.
+
+## Related
+
+The ZAO, WaveWarZ, Farcaster, BetterCallZaal.

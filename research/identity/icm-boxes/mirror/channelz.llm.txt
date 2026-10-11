@@ -1,0 +1,11 @@
+# channelz
+
+channelz is a lightweight Farcaster client from the ZAO ecosystem, built for people who want their channels their way.
+
+## What it is
+
+Where most Farcaster clients push one algorithmic feed, channelz puts channel control back in the user's hands: it sorts and filters your channels by favorites, chronological order, and custom filters, stripping the experience down to something clean and fast. It is a focused, single-purpose tool rather than a full social platform, and it reflects the ZAO preference for lightweight open builds over heavy all-in-one apps. Live at channelz-lilac.vercel.app.
+
+## Related
+
+The ZAO, Farcaster, BetterCallZaal.

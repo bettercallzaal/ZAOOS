@@ -1,12 +1,66 @@
 # ICM boxes - AI-readable context for the ZAO ecosystem
 
-ICM (useicm.com) gives every person/project a permanent, AI-readable address holding an
-`llm.txt`-style plain-text context that any assistant (ChatGPT, Claude, Cursor) can fetch.
-These are the ZAO ecosystem's context boxes - source of truth kept here, pasted into
-useicm.com to mint each box. Cousin of our GEO / llms.txt work (own the AI answer for
-"what is The ZAO").
+**This folder is no longer the source of truth.** Zaal ruled on 2026-10-11 (zao-vault
+`decisions/grill-2026-10-09-seat-morning.md`, item 135) that the master copy of every context
+box is the [zao-icm](https://github.com/bettercallzaal/zao-icm) repo, folder `boxes/`. The
+same text is served at `https://context.thezao.com/<name>`. useicm.com is being frozen.
 
-## Boxes
+To change a box, open a PR in zao-icm. Do not edit box text here.
+
+## What is in this folder now
+
+| Path | What it is | Edit here? |
+|------|------------|------------|
+| `mirror/` | Generated copy of zao-icm `boxes/`, byte for byte, with `MANIFEST.json` (sha256 per box, source commit). Written by zao-icm `bin/mirror-to-zaoos.py` | No. Regenerate it |
+| `*.llm.txt` in this folder | The hand-kept copies from before the ruling. Superseded. Kept for now, see below | No |
+| `*.draft.llm.txt` and `drafts/` | Drafts for boxes that are not in zao-icm yet | Yes, until each moves to zao-icm |
+| `live-snapshots/` | What useicm.com served on the day each file was taken. History | No |
+| `build-llms-txt.py` and `generated/` | Per-domain `llms.txt` built from the hand-kept copies. See below | See below |
+
+### Refreshing the mirror
+
+From a zao-icm checkout on `main`, against a ZAOOS branch (never the shared checkout):
+
+```bash
+python3 bin/mirror-to-zaoos.py --zaoos <path to this repo> --check   # compare only
+python3 bin/mirror-to-zaoos.py --zaoos <path to this repo>           # write mirror/
+```
+
+Then open a PR here. The script writes only inside `mirror/` and never commits or pushes.
+
+### The hand-kept copies: kept, not deleted, and why
+
+Measured 2026-10-11 against zao-icm `fd1dac8`. Two of the nine hand-kept boxes are identical to
+the master. Seven differ, and three of those are longer here than in the master, so they may
+hold text the master lacks. Deleting them now could lose it.
+
+| Hand-kept file | Master file | State | Bytes here / master | Last changed here |
+|----------------|-------------|-------|---------------------|-------------------|
+| `zabalgamez.llm.txt` | `zabalgamez.llm.txt` | identical | 2,380 / 2,380 | - |
+| `zaostock.llm.txt` | `zaostock.llm.txt` | identical | 2,152 / 2,152 | - |
+| `fractal.llm.txt` | `fractal.llm.txt` | differs | 3,772 / 1,247 | 2026-07-17 |
+| `poidh.llm.txt` | `poidh.llm.txt` | differs | 3,432 / 2,062 | 2026-08-05 |
+| `sparkz.llm.txt` | `sparkz.llm.txt` | differs | 5,059 / 3,934 | 2026-07-21 |
+| `thezao.llm.txt` | `thezao.llm.txt` | differs | 2,222 / 2,039 | 2026-07-17 |
+| `wavewarz.llm.txt` | `wavewarz.llm.txt` | differs | 2,152 / 2,097 | 2026-07-17 |
+| `zaal.llm.txt` | `bettercallzaal.llm.txt` | differs | 1,383 / 1,260 | 2026-07-08 |
+| `zao-assistant.llm.txt` | `zao-assistant.llm.txt` | differs, same size | 2,631 / 2,631 | 2026-07-10 |
+
+What happens to them, in order:
+
+1. Each differing file is read against the master. Text worth keeping goes into zao-icm by PR;
+   the rest is dropped. `fractal.llm.txt` is first, and must take the rulings since it was
+   written (vote weight is OG plus ZOR, Season 3 starts 1 December 2026, no decay).
+   `thezao.llm.txt` in the master keeps 156 holders (governance/2562, Key Decision 5).
+2. `build-llms-txt.py` is pointed at `mirror/` (its `zaal.llm.txt` entry becomes
+   `bettercallzaal.llm.txt`) and `generated/` is rebuilt. Until then it still reads the
+   hand-kept copies, which is the second reason they stay.
+3. Then the hand-kept copies are removed in their own PR.
+
+The three `*.draft.llm.txt` files in this folder (`zai`, `zoe`, `zol`) have no master
+counterpart and are untouched.
+
+## Boxes (the hand-kept copies, as they were described before the ruling)
 
 | File | Box | Covers |
 |------|-----|--------|
@@ -26,6 +80,10 @@ useicm.com to mint each box. Cousin of our GEO / llms.txt work (own the AI answe
 - Keep each box tight and composable; link related boxes at the bottom.
 
 ## GEO: llms.txt generation (single source, no drift)
+
+> As of 2026-10-11 the "boxes above" this section reads from are the superseded hand-kept
+> copies, not the master. See step 2 under "The hand-kept copies". `--check` passed on
+> 2026-10-11, so `generated/` matches the hand-kept copies, not necessarily the master.
 
 Doc 1107's GEO plan calls for `llms.txt` on the ZAO domains (`thezao.com`,
 `bettercallzaal.com`, `wavewarz.com/.well-known/llms.txt`). But the ICM boxes above

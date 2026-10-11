@@ -1,0 +1,140 @@
+{
+  "generated_by": "zao-icm bin/mirror-to-zaoos.py",
+  "source_repo": "https://github.com/bettercallzaal/zao-icm",
+  "source_commit": "fd1dac84eb0ee40b8ee2d3a5f368baec434844ab",
+  "edge": "https://context.thezao.com",
+  "boxes": [
+    {
+      "name": "bettercallzaal",
+      "file": "bettercallzaal.llm.txt",
+      "bytes": 1260,
+      "sha256": "c0c060094f3b8342384d4220cedb5241c99bd4edd2e173684364c0ed730e54ee"
+    },
+    {
+      "name": "channelz",
+      "file": "channelz.llm.txt",
+      "bytes": 655,
+      "sha256": "371598346c1b973e0d337c6198c0d15141ead02c2ce20714b60a4fa1feab373c"
+    },
+    {
+      "name": "coc-concertz",
+      "file": "coc-concertz.llm.txt",
+      "bytes": 1504,
+      "sha256": "e41d5d00fc905b08fcb2869a0c43de1b9c8c40690d822e87dce16be1a2fc8db5"
+    },
+    {
+      "name": "farcaster",
+      "file": "farcaster.llm.txt",
+      "bytes": 2509,
+      "sha256": "bb1a6ac5bf211888c1bdf7be6c100bc921c8d3633adb1ead0ab1f4efe8b08a78"
+    },
+    {
+      "name": "fractal",
+      "file": "fractal.llm.txt",
+      "bytes": 1247,
+      "sha256": "00c2c4a05ed016d9272581fc6d9ca8470ebe938c1ef9565f2173e3fae4f70af0"
+    },
+    {
+      "name": "gmfarcaster",
+      "file": "gmfarcaster.llm.txt",
+      "bytes": 1464,
+      "sha256": "eac234170a80583954cb9c5b1f2dd47e4d95e287524be0a16a726a2a3ac780fc"
+    },
+    {
+      "name": "loop-engineering",
+      "file": "loop-engineering.llm.txt",
+      "bytes": 3700,
+      "sha256": "d30a43b0efeccd33f7acc1fca2f15a79878b2f8840aae4423735736563af92c0"
+    },
+    {
+      "name": "milk-road",
+      "file": "milk-road.llm.txt",
+      "bytes": 1560,
+      "sha256": "722a2ad636cfd6e2403ac63963a7057995b2eca19f50419ead5d94d43ec0e835"
+    },
+    {
+      "name": "poidh",
+      "file": "poidh.llm.txt",
+      "bytes": 2062,
+      "sha256": "f763870df06a0d0a6f09edc5a4ed5748ba5e48d25cd54d3680a5b011fddc92f6"
+    },
+    {
+      "name": "sparkz",
+      "file": "sparkz.llm.txt",
+      "bytes": 3934,
+      "sha256": "4fab8feded8651d907d05ea8d220ebc631b76a3d9eb4ccc06d3ec17a943cdab0"
+    },
+    {
+      "name": "thezao",
+      "file": "thezao.llm.txt",
+      "bytes": 2039,
+      "sha256": "c50e1b38fef20c19a7b8ecdc89257ee5b8aee257ce467ea3646f74356f97de7c"
+    },
+    {
+      "name": "wavewarz",
+      "file": "wavewarz.llm.txt",
+      "bytes": 2097,
+      "sha256": "52bba306fcbbc8bad4514e9f00c740f06a5f392d29c1cb41a3da20228cb7102a"
+    },
+    {
+      "name": "zabalgamez",
+      "file": "zabalgamez.llm.txt",
+      "bytes": 2380,
+      "sha256": "45df87c9b6fe0b5b010ad165bb471b80d3a81bb947e9bc884b402d5d9fa7b0ae"
+    },
+    {
+      "name": "zao-assistant",
+      "file": "zao-assistant.llm.txt",
+      "bytes": 2631,
+      "sha256": "5a9e7be42f6bf254c27ada71beab6fa4abd3241013c6be12db36d1c145a7d2f5"
+    },
+    {
+      "name": "zao-festivals",
+      "file": "zao-festivals.llm.txt",
+      "bytes": 978,
+      "sha256": "42e8d0eab61eb1b49fec64f6741d94db376573f73af9bea7da43c8ec042275ec"
+    },
+    {
+      "name": "zao-newsletter",
+      "file": "zao-newsletter.llm.txt",
+      "bytes": 1364,
+      "sha256": "e5e65ffade7c34e0d4c30091109ed1c6d82875e2d1b3761b546211a503088c1f"
+    },
+    {
+      "name": "zao-video-editor",
+      "file": "zao-video-editor.llm.txt",
+      "bytes": 506,
+      "sha256": "07159d7e797a315ef9d14f4e59920ef71196aa7da0f57f445a983751a44cff54"
+    },
+    {
+      "name": "zaolingo",
+      "file": "zaolingo.llm.txt",
+      "bytes": 992,
+      "sha256": "69f70ebc95b25b60267416ce97b65dfea8732d55781ae0e254323a98df4bb44c"
+    },
+    {
+      "name": "zaoscout",
+      "file": "zaoscout.llm.txt",
+      "bytes": 606,
+      "sha256": "c5a1fb05fcbff0dce074d8d2f643da4bcbd403ecdeeea939ab0277bdacb2a69b"
+    },
+    {
+      "name": "zaostock",
+      "file": "zaostock.llm.txt",
+      "bytes": 2152,
+      "sha256": "5ccdf5574fdc9994b0a1695beaa5b48e5dd7ba29ec0367ba2e094b1391cd7f4d"
+    },
+    {
+      "name": "zlank",
+      "file": "zlank.llm.txt",
+      "bytes": 551,
+      "sha256": "02d186a52016efed0e2381b5b42044deb7b68c2ef87f38117f446b7c4a7088de"
+    },
+    {
+      "name": "zuke",
+      "file": "zuke.llm.txt",
+      "bytes": 925,
+      "sha256": "63005ada705e8e4f12ff5fae0ac5c0f7a203d8198584729e4f0fffcfbce4c66c"
+    }
+  ]
+}

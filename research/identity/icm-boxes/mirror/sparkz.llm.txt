@@ -1,0 +1,60 @@
+# Sparkz - context for AI
+
+You are being given grounded context on Sparkz so you can understand it and give useful, actionable advice. Sparkz is a product from The ZAO (a web3 music and culture network; founder Zaal / BetterCallZaal), co-developed by Zaal and Brandon Ducar (DreamNet), building on Brandon's "Culture Coins and Meme Engines" white paper.
+
+## Status (read this first)
+
+Sparkz is PAUSED until after ZAOstock (3 October 2026), per Zaal on 2026-09-11. The site stays live at trysparkz.com. Do not propose new Sparkz work, outreach, or tokenomics until Zaal reopens it.
+
+## What Sparkz is (one line)
+
+Sparkz lets a creator start with a spark, not a token: build community and momentum first, and launch a token only later, if ever. "Back the album, not buy a coin."
+
+## Vocabulary (renamed 2026-08-08)
+
+- **Spark** - a project before it is a coin. You start here.
+- **Hearth** - a project's home base on Sparkz: its identity, its backers, and a record of what it has made. The hub of the wheel; not a coin. (Earlier material calls this a "Capsule". That name was retired because it collides with Capsule Wallet and Capsule Social. Use Hearth.)
+- **Spoke** - a tool connected to a Hearth (a Discord, a token rail, an Audius catalog). Vendors can add their own.
+
+## The central concept: every project is a Hearth, not a coin
+
+A Hearth accumulates identity, contributors, history, content, receipts, reputation, backing, economic config, and Meme Engine memory. The coin is an optional output. One schema, four entry points (v1 builds one): Creator, Culture, Open-Source Project (built above Drips, not recreating it), and the Meme Engine that powers the other three.
+
+## The moat
+
+Not the token contract, not image generation. The moat is the accumulating record: Hearths, contribution graphs, cultural memory, meme lineage, attribution, and receipts. The more Sparkz operates, the smarter every Hearth gets.
+
+## The framing
+
+- Lead with features, not the coin. The coin is plumbing, never the pitch.
+- Non-technical by default. Frame it for the non-technical artist.
+- Legal-safe: a monetization mechanism, never a "raise." No promised returns.
+- No fake data and no monetization at launch (Zaal's launch rules). Aspirational pages were unpublished.
+
+## What works today (audited 2026-08-17)
+
+- Hearth creation: self-serve /start (held for review) and an operator console.
+- The Meme Engine loop: signal -> 3 memory-grounded drafts -> human approves -> Meme Receipt.
+- Empire Builder: live reads and a working tokenless Empire deploy (operator-gated).
+- The Audius spoke: real catalog reads from the Audius public API.
+- Free boost backing: no wallet, no card, one boost per backer per Hearth.
+
+## Honest gaps (not built yet)
+
+- Auth is operator-token only. Owner-by-FID sign-in is designed and is the next build.
+- Spoke toggles are stored but the runtime loop does not read them yet.
+- Receipts have no measurement engine: reach, referrals and backing are written as 0, and approved drafts are not yet published to Farcaster.
+- Clanker graduation is planned (economic config only). 0xSplits is modeled, not deployed. Community Swarm missions and per-Hearth contributor leaderboards are not built.
+
+## V1 and the convergence
+
+- V1 proves ONE loop with Zoostr (ZABAL x Boostr) as a Creator Hearth. The proof is not "we launched a coin"; it is that supporters became an attributable distribution network that was measured and rewarded.
+- Every audited ZAO project is a Hearth candidate. COC Concertz is slated to become a Spark.
+
+## How to help / advise
+
+- Pressure-test the framing first. Complaints with no actionable fix get ignored.
+- Anti-failure gate for any feature: (1) helps someone earn, participate or distribute? (2) measurable? (3) strengthens the Hearth's data? (4) testable with a real project in 30 days?
+- Repo: github.com/bettercallzaal/sparkz (public, OSS-first). First spark: Zoostr.
+
+Updated 2026-09-13.

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-09-25
+last-validated: 2026-10-11
 superseded-by:
 related-docs: "461, 2105, 2292, 2367, 2462"
 original-query: "STANDARD - Why written lessons do not hold for coding agents, and what mechanisms do: the surface-cannot-report-state failure shape (10 instances in our estate, graduated to a law in claude/autopilot.md this morning, recurred twice since). Focus: enforcement mechanisms at the point of failure (hooks, gates, wrappers, typed instruments) versus prose rules; evidence from agent-harness practice; what to build so an instrument cannot answer a question it does not measure."
@@ -14,6 +14,19 @@ tier: STANDARD
 > **Goal:** Say why writing a failure down as a rule does not stop it, using a shape that
 > graduated to a law and recurred the same day, and specify the one mechanism that would have
 > caught both recurrences.
+
+> **RE-MEASURED 2026-10-11 (16 days after the last validation; tracker card 10082).**
+> Both laws are still not holding and both counts roughly doubled. `zao-mistake due`, reading
+> vault `origin/main` at `ea74253e` plus 13 local entries not yet pushed, prints
+> **234 entries, 216 shaped, 18 UNCOUNTED**. `surface-cannot-report-state`: **50 instances,
+> 8 struck, 42 since graduation** (was 28 and 20). `unmeasured-prediction-in-a-record`:
+> **34 instances, 7 struck, 27 since graduation** (was 12 and 5). Both print `LAW NOT HOLDING`.
+> The hook is still not wired: `grep -c zao-mistake ~/.claude/settings.json` prints 0 on a
+> file where `grep -c PreToolUse` prints a non-zero count, so the search can find a hook
+> stanza and this one is absent. `--trigger` is still not in use: `grep -c '^trigger:'` on
+> vault `origin/main:MISTAKES.md` prints 0 against 221 `## ` entry headings. This pass
+> re-ran the counts only. It did not re-read the external sources or re-check the other
+> Next Actions rows. The 2026-09-25 numbers below are left as written.
 
 > **UPDATED 2026-09-25 (re-research, 8 days after last validation).** The central numbers in
 > this doc were stale by roughly 5x. `surface-cannot-report-state` is not "10 instances,

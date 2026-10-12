@@ -20,6 +20,12 @@ name: CI
 #
 # This does not fix the cause. The cause is the token, and fixing it needs a PAT
 # or GitHub App token in docs-automerge.yml - see the note there.
+#
+# Since 2026-10-11 the dispatch is also sent automatically: ci-after-automerge.yml
+# runs after each pull-request CI run and dispatches this workflow on main when
+# the tip of main has no run. workflow_dispatch is the one event the automatic
+# token may start a run with, so that needed no new credential. The schedule
+# stays as the backstop for a merge it was too early to see.
 
 on:
   push:

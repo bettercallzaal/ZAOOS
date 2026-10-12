@@ -1,0 +1,68 @@
+name: CI on main after a bot merge
+
+# WHY THIS EXISTS
+#
+# docs-automerge.yml merges with the automatic GITHUB_TOKEN, and GitHub does not
+# start a workflow run for a push made with that token. So every bot-merged PR
+# lands on main with no CI run on the result. Measured 2026-10-11 over the 12
+# newest commits on main: 8 merged by a user, 8 with a push run; 4 merged by
+# github-actions[bot], 0 with a push run (board card 10373). The seat had been
+# dispatching ci.yml by hand after each one.
+#
+# workflow_dispatch is the one event that same token may start a run with, so no
+# new credential is needed: this job sends that dispatch.
+#
+# WHEN IT RUNS
+#
+# The bot's merge happens when the PR's last required check passes, and all
+# three required checks are jobs of the CI workflow. So this runs each time a
+# pull-request CI run completes, waits a minute for the merge to land, and asks
+# one question: does the commit at the tip of main have a CI run? If not, it
+# dispatches one. It asks about main, not about the PR, so a merge it was too
+# early to see is caught by the next PR's CI run, and by ci.yml's daily schedule
+# at the latest.
+#
+# WHAT IT MAY DO
+#
+# workflow_run runs the DEFAULT-BRANCH copy of this file with a write token, so
+# a PR cannot change it for its own run. It checks out main, never the PR. No
+# value from the triggering run (branch name, title, author) reaches the shell;
+# the only input is the repository name. The token may read contents and write
+# actions, nothing else, and nothing is printed but commit ids and counts.
+#
+# The run it starts is a workflow_dispatch run, and the `if` below takes only
+# pull_request runs, so it cannot trigger itself.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  # One at a time, and never cancel one that is mid-dispatch. A newer event
+  # waiting behind it asks the same question about a newer main.
+  group: ci-after-automerge
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: scripts/ci-on-main.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Dispatch CI on main if its tip has no run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SETTLE_SECONDS: '60'
+        run: bash scripts/ci-on-main.sh "$REPO"

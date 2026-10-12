@@ -13,7 +13,7 @@ tier: STANDARD
 
 > **Goal:** One table that says who merges what, and on what evidence, so a lane does not have to choose between five older texts that disagree. Every row names the ruling it rests on. Where Zaal's words do not settle a row, it is marked OPEN for him and not decided here.
 
-**This doc changes no setting.** No ruleset, branch protection, workflow, runner, billing or permission was touched to write it. The three items under "Proposals" are for Zaal to accept or refuse. Everything under "Measured" was read on 2026-10-12 with the command named beside it.
+**This doc changes no setting.** No ruleset, branch protection, workflow, runner, billing or permission was touched to write it. Under "Proposals and remaining steps", items (b) and (c) are for Zaal to accept or refuse; item (a), the runner, is already ruled and that section lists what is left to do. Everything under "Measured" was read on 2026-10-12 with the command named beside it.
 
 **Zaal said this policy is "only for now".** Item 34a, verbatim: "if u think its good to go it is and when things go wrong i will correect adn we need to really keep that in mind this is only for now too". The table is the current state, to be revisited when he says.
 
@@ -113,16 +113,16 @@ Both owners are user accounts, not organizations (`gh api users/ZAODEVZ` returns
 
 zaal-dotfiles and zao-vault have the runner switch written but not merged: zaal-dotfiles #492 and zao-vault #122 are both OPEN and both still drafts.
 
-## Proposals for Zaal
+## Proposals and remaining steps
 
-None of these is done. Each needs his hand in GitHub settings or on the machine.
+None of these is done. Each needs his hand in GitHub settings or on the machine. (a) is a ruling with steps remaining; (b) and (c) are proposals.
 
 ### (a) Self-hosted runner for the three private repos: ruled, not yet done
 
 **This is already ruled, including where it runs. What is left is doing it.** Four items of the same decisions file, in order:
 - Item 46 (2026-10-10): "a plus b works", A being a self-hosted runner.
 - Item 69 (2026-10-10): "I Dont wanna spend money on actions", then "a". The Actions budget stays at zero and the self-hosted runner is the path for every private repo.
-- Item 70 (2026-10-10): he asked whether an older machine of his could become the runner host; the seat owns the steps, with a recipe in the vault.
+- Item 70 (2026-10-10): he asked about a different machine as the runner host; the seat owns the steps, with a recipe in the vault.
 - Item 179, point 8 (recorded 2026-10-11): names the host and says "Nothing is registered; registration needs a token from repo settings and is his tap. This answers the open runner question from items 69 and 70". **This is the current ruling.** Its standing, as the file itself states: it was relayed to the seat by another lane, not typed in the seat's pane.
 
 The first version of this doc cited only items 46 and 69 and treated the host as an open choice. That was wrong: my search for later rulings used the words merge, tier and auto-merge, not runner. Which host item 179 names is not repeated here, because this repo is public; it is in the decisions file and in the private vault note named below.
@@ -140,7 +140,7 @@ So the rest of this section is not a case for the runner. It is what the GitHub 
 - "there is no way to guarantee that a self-hosted runner only runs one job. Some jobs will use secrets as command-line arguments which can be seen by another job running on the same runner".
 - Just-in-time runners "perform at most one job before being automatically removed".
 
-**What that means here.** Collaborator counts (measured, `gh api repos/.../collaborators`, 2026-10-12): zaal-dotfiles 2, zao-vault 1, wavewarz-protocol 2, the owner included in each. All three have 0 forks. So the outside-contributor risk is two accounts. The larger exposure is our own: every lane pushes as the same GitHub user, all three workflows run on `pull_request`, and on a pull request from a branch in the same repo the run uses that branch's version of the workflow file (GitHub's behaviour as I understand it; not one of the lines quoted above). So any agent branch runs its code on the runner machine before any review. That makes the docs' question the one that decides the host: "What sensitive information resides on the machine configured as a self-hosted runner?"
+**What that means here.** Collaborator counts (measured, `gh api repos/.../collaborators`, 2026-10-12): zaal-dotfiles 2, zao-vault 1, wavewarz-protocol 2, the owner included in each. All three have 0 forks. So the outside-contributor risk is two accounts. The larger exposure is our own: every lane pushes as the same GitHub user, all three workflows run on `pull_request`, and on a pull request from a branch in the same repo the run uses that branch's version of the workflow file (GitHub's behaviour as I understand it; not one of the lines quoted above). So any agent branch runs its code on the runner machine before any review. That makes the docs' question the one to answer for the ruled host before a runner is registered on it: "What sensitive information resides on the machine configured as a self-hosted runner?"
 
 Runner host: ruled in item 179 point 8, and not named in this public repo. The host-specific detail, and what the docs' question means for that particular machine, is in the private vault note `notes/runner-host-detail-2026-10-12.md` (zao-vault PR 141, open and not merged as of 2026-10-12).
 

@@ -55,7 +55,7 @@ Sunday 19:00 UTC, scheduler cron
   -> filter and rank           plain code, rules below
   -> first repo that is not already queued and not already in the research library
   -> enqueue ONE `resource` item (the same call the DM intake makes)
-  -> status line to Zaal: "Scouting <owner/repo> this week. Reply skip to drop it."
+  -> status line to Zaal: "Scouting <owner/repo> this week." No reply is needed or read.
 The existing work loop does the rest: fit check, research doc, PR.
 ```
 
@@ -123,7 +123,7 @@ Never:
 |---|---|
 | Fit-check docs auto-merge with nobody reading them first | They are research docs, PR-only, one a week. A doc that concludes about a licence is already held for a reviewer by the docs automerge. Since 2026-10-11 a `hold` label can stop any one of them. |
 | A candidate's README tries to instruct the research worker | The worker is read-only and the fit-check brief already tells it to write no code and send nothing. The scout passes only the repo URL, never the description text, into the queue. |
-| Noise: a weak candidate burns a run | One a week; the name filter; and the weekly status line lets Zaal reply skip. |
+| Noise: a weak candidate burns a run | One a week, and the name filter. There is no skip reply in this version: the status line tells Zaal what was picked, and the flag is the off switch. |
 | The search returns nothing usable | Nothing is queued and nothing is sent. The log line says how many were seen and dropped per rule. |
 | It quietly stops | It prints a `[zoe/ran]` line on a successful queue (`featureRan`), so a silent month is visible in the journal. |
 

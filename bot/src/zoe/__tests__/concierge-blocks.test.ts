@@ -211,3 +211,39 @@ describe('buildSystemBlocks — conversational mode', () => {
     expect(outDefault).toContain(BASE_BLOCKS.tasks);
   });
 });
+
+// ── capability gap block (capability-gaps.ts) ────────────────────────────────
+
+describe('buildSystemBlocks — capability gap block', () => {
+  const withGap = (blocks: MemoryBlocks, gapLog?: boolean) =>
+    buildSystemBlocks(blocks, DATE, undefined, undefined, undefined, undefined, gapLog);
+
+  it('is absent unless the caller asks for it', () => {
+    expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('<capability_gap>');
+    expect(withGap(BASE_BLOCKS, false)).not.toContain('<capability_gap>');
+  });
+
+  it('is absent with only the env flag set: the flag alone must not add it', () => {
+    const before = process.env.ZOE_GAP_LOG;
+    process.env.ZOE_GAP_LOG = '1';
+    try {
+      expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('<capability_gap>');
+    } finally {
+      if (before === undefined) delete process.env.ZOE_GAP_LOG;
+      else process.env.ZOE_GAP_LOG = before;
+    }
+  });
+
+  it('is present in the DM when asked for, between capabilities and tone', () => {
+    const out = withGap(BASE_BLOCKS, true);
+    const at = out.indexOf('<capability_gap>');
+    expect(at).toBeGreaterThan(out.indexOf('</capabilities>'));
+    expect(out.indexOf('<tone>')).toBeGreaterThan(at);
+    expect(out).toContain('GAP: <what he wanted');
+  });
+
+  it('is never added to a group chat, asked for or not', () => {
+    const blocks: MemoryBlocks = { ...BASE_BLOCKS, chat_scope: '100', chat_title: 'ZAO HQ' };
+    expect(withGap(blocks, true)).not.toContain('<capability_gap>');
+  });
+});

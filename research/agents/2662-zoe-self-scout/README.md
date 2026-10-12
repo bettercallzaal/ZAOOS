@@ -18,6 +18,7 @@ tier: QUICK
 - Recommended: **yes**, at one a week, with the flag left off until you say so.
 - If yes: the code is built behind `ZOE_SELF_SCOUT`, default off. Turning it on is one line in the VPS env and a restart, and it is yours.
 - If no: nothing changes. The code can sit merged and off, or stay unmerged.
+- If there is no answer: the same as no. The flag stays off and the code PR (ZAOOS #3920) stays on hold. Nothing runs by default and nothing times out into a yes.
 
 This is a new autonomous step, so the repo rule applies: a numbered doc and your explicit yes before it runs. Your "have it find ways to improve itself" on 2026-10-11 is taken as direction to write this, not as that yes.
 
@@ -66,10 +67,19 @@ Filter rules, in order. A repo is dropped when any is true:
 3. Fewer than 200 stars.
 4. GitHub's licence field is empty. This is only a cheap pre-filter. The fit check still reads the LICENSE file itself, because the field is wrong often (doc 2652; the sample below shows `NOASSERTION` on 3 of 20).
 5. Its name or description marks it as a list, a course or a book (`awesome`, `tutorial`, `course`, `book`, `roadmap`, `interview`).
-6. It is on a small denylist kept in the file, for names this estate has retired.
+6. It is on the deny list (an env value, described below).
 7. It is already in the work queue, or a research doc already names it (the existing `resourceDecision`).
 
-The query list is a constant in the file, 6 to 8 entries, each a pair of GitHub topics about agents, memory, Telegram bots and assistants. Changing it is a PR.
+The query list is a constant in the file, one used per week in rotation. As built in ZAOOS #3920 it is these six pairs, and changing it is a PR:
+
+1. `topic:telegram-bot topic:ai-agent`
+2. `topic:personal-assistant topic:llm`
+3. `topic:agent-memory topic:llm`
+4. `topic:claude-code topic:agent`
+5. `topic:ai-agent topic:self-improving`
+6. `topic:telegram-bot topic:llm`
+
+The deny list, as built, is not in the file. It is read from the env value `ZOE_SELF_SCOUT_DENY`: comma-separated owners or `owner/name` pairs, compared in lower case, empty by default. Two limits of that, both found in review of #3920: a mistyped entry matches nothing and so lets the repo through, and nothing checks the value's shape.
 
 ### Sample run, measured 2026-10-11
 
@@ -124,6 +134,9 @@ Never:
 | Fit-check docs auto-merge with nobody reading them first | They are research docs, PR-only, one a week. A doc that concludes about a licence is already held for a reviewer by the docs automerge. Since 2026-10-11 a `hold` label can stop any one of them. |
 | A candidate's README tries to instruct the research worker | The worker is read-only and the fit-check brief already tells it to write no code and send nothing. The scout passes only the repo URL, never the description text, into the queue. |
 | Noise: a weak candidate burns a run | One a week, and the name filter. There is no skip reply in this version: the status line tells Zaal what was picked, and the flag is the off switch. |
+| A licence that forbids reuse passes the filter | Rule 4 checks only that GitHub shows some licence. Whether we may take anything is decided in the fit check, which reads the LICENSE file, and by the docs automerge's licence hold. The scout itself copies nothing. |
+| A fit-check doc still in an open PR is not on main yet, so the same repo can look new | It can be picked a second time until that doc merges. Cost: one repeated run. Not fixed in #3920. |
+| With the flag on, nobody picks the repo, and the fit check reads a stranger's README and writes a doc the bot can merge | This is the real change the yes buys. The worker is read-only and told to write no code; the doc is PR-only; one a week. It is still an outside text steering what a doc says, with no person in between. |
 | The search returns nothing usable | Nothing is queued and nothing is sent. The log line says how many were seen and dropped per rule. |
 | It quietly stops | It prints a `[zoe/ran]` line on a successful queue (`featureRan`), so a silent month is visible in the journal. |
 
@@ -155,7 +168,7 @@ No community source was read for this doc. It is a QUICK-tier design decision ab
 | Action | Owner | State |
 |---|---|---|
 | Answer the question at the top | Zaal | Open |
-| Build the scout behind `ZOE_SELF_SCOUT`, default off, as its own code PR | zoe lane | Next, the same night |
+| Build the scout behind `ZOE_SELF_SCOUT`, default off, as its own code PR | zoe lane | Done: ZAOOS #3920, reviewed clean as code with flags off, on hold for this answer |
 | If yes: add the flag on the VPS and restart ZOE | Zaal | Waits on the answer |
 | After 4 weeks on: count fit checks that answered EXTEND or NEW against SKIP, and keep, tune or turn off | zoe lane | Waits on it being on |
 

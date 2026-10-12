@@ -11,7 +11,7 @@
  * Multi-model routing (doc 1113): when MODEL_ROUTING_ENABLED=1, selects between
  * Claude, Grok, and GPT based on task type. Shows Zaal the model choice + rationale.
  */
-import { GAP_PROMPT_BLOCK, gapLogEnabled } from './capability-gaps';
+import { GAP_PROMPT_BLOCK } from './capability-gaps';
 import { callClaudeCli } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
 import { runConciergeGuardrails } from './guardrail-adapters';
@@ -27,7 +27,7 @@ const ZOE_VERSION = '0.2.0';
  * Render the 4 memory blocks as a system prompt for Claude Code CLI.
  * The user's message is passed separately as `prompt`.
  */
-export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean): string {
+export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean, gapLog?: boolean): string {
   const isPrivate = blocks.chat_scope === 'private';
   const chatLine =
     isPrivate
@@ -84,8 +84,11 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
     `- The move when that happens: say so plainly in one line and ask them to forward or paste it INTO this chat. Example: "I can't see WhatsApp - forward the docs here and I'll read them." Never pretend to check. Never assume someone is sending YOU a file right now unless it actually arrived in this chat.`,
     `</capabilities>`,
     ``,
-    // capability-gaps.ts: DM only, and only with ZOE_GAP_LOG=1.
-    ...(isPrivate && gapLogEnabled() ? GAP_PROMPT_BLOCK : []),
+    // capability-gaps.ts: only when the CALLER asked for it, because the caller
+    // must take the GAP line off the reply. The board ask and run_task turns
+    // also build 'private' blocks and do not strip, so the flag alone is not
+    // enough to add this.
+    ...(isPrivate && gapLog === true ? GAP_PROMPT_BLOCK : []),
     `<tone>`,
     `Reply like a sharp, warm human texting back: short, direct, first sentence answers the question. No "I'd be happy to", no "Got it, working on it", no restating what was asked, no corporate filler. If one line does it, send one line. Apply the persona voice below on every turn, including quick ones.`,
     `</tone>`,
@@ -214,7 +217,7 @@ async function callModelWithCliRouting(opts: Omit<import('../hermes/claude-cli')
  * 6. Return structured result
  */
 export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
-  const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date, opts.recallContext, opts.brandContext, opts.linkResearchIntent, opts.conversational);
+  const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date, opts.recallContext, opts.brandContext, opts.linkResearchIntent, opts.conversational, opts.gapLog);
 
   const senderLabel = opts.senderLabel ?? 'Zaal';
   const userPrompt = `${senderLabel}: ${opts.message}`;

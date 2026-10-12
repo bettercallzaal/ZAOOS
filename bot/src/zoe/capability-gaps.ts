@@ -12,7 +12,8 @@
  * ended in the chat and nothing kept it.
  *
  * HOW IT WORKS
- * 1. With ZOE_GAP_LOG=1 the DM system prompt gains one short block: when you
+ * 1. With ZOE_GAP_LOG=1 the main DM turn asks concierge.ts for one extra prompt
+ *    block (the `gapLog` option; no other turn sets it): when you
  *    have no ability to do what was asked, answer normally and end with a line
  *    `GAP: <what he wanted>`.
  * 2. index.ts takes that line off the reply before Zaal sees it and appends

@@ -162,6 +162,9 @@ export interface ConciergeOptions {
   linkResearchIntent?: boolean;
   /** True for casual back-and-forth (short, no URLs, no work keywords). Skips task/quest/thread blocks. */
   conversational?: boolean;
+  /** Ask for a final `GAP:` line (capability-gaps.ts). Set ONLY by a caller that
+   * takes that line off the reply before using it. */
+  gapLog?: boolean;
 }
 
 export interface ConciergeResult {

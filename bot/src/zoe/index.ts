@@ -3566,6 +3566,7 @@ async function dispatchConcierge(
       }
     }
 
+    const gapLog = gapLogEnabled() && blocks.chat_scope === 'private';
     const result = await runConciergeTurn({
       message: text,
       blocks,
@@ -3578,6 +3579,8 @@ async function dispatchConcierge(
       linkResearchIntent: wantsLinkResearch(text),
       // Conversational turns skip task/quest/thread context blocks (irrelevant overhead).
       conversational,
+      // capability-gaps.ts: this call site strips the GAP line just below.
+      gapLog,
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
@@ -3589,7 +3592,7 @@ async function dispatchConcierge(
     // a final `GAP:` line when she had no way to do what was asked. Take it off
     // before anything below can send the reply, then keep the want. A failed
     // write must not cost him the answer.
-    if (gapLogEnabled() && blocks.chat_scope === 'private') {
+    if (gapLog) {
       const extracted = extractGap(result.reply);
       result.reply = extracted.reply;
       if (extracted.gap) {

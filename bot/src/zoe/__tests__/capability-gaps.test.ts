@@ -228,16 +228,29 @@ describe('the wiring', () => {
   it('takes the GAP line off the DM reply right after the turn, before anything else reads it', () => {
     const index = src('index.ts');
     const turn = index.indexOf('const result = await runConciergeTurn({');
+    const gate = index.indexOf('if (gapLog) {', turn);
     const strip = index.indexOf('result.reply = extracted.reply;');
     const firstUse = index.indexOf('if (result.task_ops.length > 0) {', turn);
     expect(turn).toBeGreaterThan(0);
-    expect(strip).toBeGreaterThan(turn);
-    expect(firstUse).toBeGreaterThan(strip);
-    const gate = index.indexOf("if (gapLogEnabled() && blocks.chat_scope === 'private') {", turn);
     expect(gate).toBeGreaterThan(turn);
     expect(strip).toBeGreaterThan(gate);
+    expect(firstUse).toBeGreaterThan(strip);
     // Nothing between the turn and the gate reads the reply.
     expect(index.slice(turn, gate)).not.toContain('result.reply');
+  });
+
+  it('asks for the GAP line from exactly one turn, the one that strips it', () => {
+    const index = src('index.ts');
+    expect(index).toContain("const gapLog = gapLogEnabled() && blocks.chat_scope === 'private';");
+    const turns = index.split('runConciergeTurn({').slice(1);
+    expect(turns.length).toBeGreaterThanOrEqual(3);
+    const asking = turns.filter((t) => /^\s*gapLog,?$/m.test(t.slice(0, t.indexOf('});'))));
+    expect(asking).toHaveLength(1);
+    expect(index.match(/extractGap\(/g)).toHaveLength(1);
+    // concierge.ts adds the block from the option, never from the env flag.
+    const concierge = src('concierge.ts');
+    expect(concierge).toContain('...(isPrivate && gapLog === true ? GAP_PROMPT_BLOCK : []),');
+    expect(concierge).not.toContain('gapLogEnabled');
   });
 
   it('runs the weekly digest only with the log on, and queues only behind the second flag', () => {

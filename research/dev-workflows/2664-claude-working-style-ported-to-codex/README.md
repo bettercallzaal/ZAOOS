@@ -4,7 +4,7 @@ type: decision
 status: research-complete
 last-validated: 2026-10-12
 superseded-by:
-related-docs: "2663, 2655, 2649, 2483"
+related-docs: "2655, 2649, 2483"
 original-query: "Zaal's 'sounds good' to option A, vault grill item 185 (2026-10-12): port his Claude working style to Codex. One numbered doc with the mapping table (behaviour, Claude carrier, Codex carrier, ports / shim / does not port), measured facts with dates, what does not port and the bridge proposed, and a short Gemini CLI and Antigravity section marked by what was and was not fetched."
 tier: STANDARD
 ---
@@ -13,7 +13,7 @@ tier: STANDARD
 
 > **Goal:** Say, behaviour by behaviour, how the way Zaal works with Claude Code on his Mac is carried into Codex: what moves as it is, what needs a shim, and what does not move. Everything measured carries its date and the surface it was read from.
 
-**Nothing in this doc is switched on.** The files are in zaal-dotfiles PR 517 (open, not merged). Installing them is one command and trusting the hook is one screen inside Codex; both are Zaal's steps and are written out at the end.
+**Nothing in this doc is switched on.** The files are in zaal-dotfiles PR 517 (open and not merged as of 2026-10-12). Installing them is one command and trusting the hook is one screen inside Codex; both are Zaal's steps and are written out at the end.
 
 ## Key Decisions
 
@@ -21,7 +21,7 @@ tier: STANDARD
 |---|---|---|
 | 1 | PORT the three guards as one Codex PreToolUse hook that runs the existing guard programs unchanged. | Codex sends a PreToolUse hook the same JSON fields the guards already read, and accepts the same deny shape. Proven live for two of the three (below). |
 | 2 | One adapter, not three hook entries. | Codex trusts a hook by the hash of its definition and skips it until reviewed. One entry is one review. And Codex runs the command when a hook answers "ask", so the adapter turns ask into deny. |
-| 3 | EXTEND our own bootstrap for the rules. Do not adopt Ruler or rulesync. | One source file, one target. Both tools are MIT and both are Node CLIs with their own source tree; that is more surface than a 60-line generator. Credit below. |
+| 3 | EXTEND our own bootstrap for the rules. Do not adopt Ruler or rulesync. | One source file, one target. Both tools are MIT and both are Node CLIs with their own source tree; that is more surface than one generator script of our own (169 lines, 141 without comments and blanks, at the PR 517 head). Credit below. |
 | 4 | The binding rules reach Codex as a generated override file built from the global CLAUDE.md. | Measured live: Codex did not have them. With the override it does. |
 | 5 | Skills: no change. Stop and report. | The shared skills folder already holds seven directories that are not ours. Bootstrap links shared skills by name, on purpose. |
 | 6 | A read-only evaluator agent is defined. Whether Codex spawns it correctly is NOT verified. | The file format is documented and the file parses. No live spawn was run. |
@@ -33,11 +33,11 @@ All on 2026-10-12, on Zaal's Mac, codex-cli 0.153.4 (`codex --version`).
 
 **1. The Codex home a pane uses is not `~/.codex`.** Orca starts Codex with CODEX_HOME pointing at a directory of its own under its application support folder, marked with a file named `.orca-managed-home`. Read from the environment of a running codex process. That home's `AGENTS.md` is a link to `~/.codex/AGENTS.md`, which is a link to the vault rulebook. Its `hooks.json` is written by Orca and holds nine hooks, one per lifecycle event, that report pane state back to Orca. None is a guard. Orca also records trust for its own hooks in that home's config.
 
-The brief for this work said `~/.codex/hooks.json` is empty, so the live panes have no enforcement. The file is empty (read today: `{"hooks": {}}`). The conclusion holds. The reason is different: the panes do not read that file at all.
+The brief for this work said `~/.codex/hooks.json` is empty, so the live panes have no enforcement. The file is empty (read 2026-10-12: `{"hooks": {}}`). The conclusion holds. The reason is different: the panes do not read that file at all.
 
 **2. The binding rules were not reaching Codex.** The global CLAUDE.md carries the rules Zaal wrote for every session: no emoji, no em dash, the name glossary, the retired partners, the three measurement sections. A search of the vault rulebook, which is what Codex is given, for "emoji", "em dash", "Retired" and "zao-assert" found none of them. Confirmed live: `codex exec`, read-only, in a throwaway home whose only global file was that rulebook, was asked whether the exact phrase "Never use emojis" was in its instructions. It answered "no". With the generated override linked beside it, the same question got "yes".
 
-**3. A claim I nearly shipped, and the run that killed it.** The vault rulebook is 83,925 bytes on disk. Codex documents a limit, `project_doc_max_bytes`, "32 KiB by default". I had written, in a tool comment and in a status line, that Codex therefore loads 39 percent of the rulebook and never sees rules 14 and 15. Then the live run above was asked for the highest rule number it could see and the last ten words of its instructions. It answered rule 15 and quoted the file's real final words ("...on ZAODEVZ/iman-desk | 62 agents. comms_surfaces populated from seed."). So the whole global file was loaded. The limit did not cut it. Whether the limit applies to project-level files was not tested. The override is still built under 32,768 bytes (14,910) so that it fits wherever the limit does apply.
+**3. A claim I nearly shipped, and the run that killed it.** The vault rulebook is 83,925 bytes on disk. Codex documents a limit, `project_doc_max_bytes`, "32 KiB by default". I had written, in a tool comment and in a status line, that Codex therefore loads 39 percent of the rulebook and never sees rules 14 and 15. Then the live run above was asked for the highest rule number it could see and the last ten words of its instructions. It answered rule 15 and quoted the file's real final words. So the whole global file was loaded. The limit did not cut it. Whether the limit applies to project-level files was not tested. The override is still built under 32,768 bytes (14,910) so that it fits wherever the limit does apply.
 
 **4. Codex honours the hook. Live, for two guards of three.** One `codex exec` in a throwaway home holding only our hook, asked to run four commands and not to retry a refusal:
 
@@ -87,16 +87,16 @@ Codex's own caution applies to every PORTS row about hooks, quoted from its hook
 | Option | What it is | Licence | Verdict |
 |---|---|---|---|
 | Our bootstrap plus one generator | `bin/zao-codex-rules` builds the Codex file from the global CLAUDE.md and refuses if a binding line is missing, the file is stale, or it passes the byte cap | ours | USE |
-| [Ruler](https://github.com/intellectronica/ruler) | "apply the same rules to all coding agents". A Node CLI; rules live in a `.ruler/` directory and `ruler apply` writes each tool's file. Its README lists Codex CLI among its targets. | MIT, copyright 2025 Eleanor Berger (repo LICENSE, read via the GitHub API 2026-10-12) | SKIP for now |
+| [Ruler](https://github.com/intellectronica/ruler) | "apply the same rules to all coding agents" (its repo description). A Node CLI; rules live in a `.ruler/` directory and `ruler apply` writes each tool's file. Its README lists Codex CLI among its targets. | MIT, copyright 2025 Eleanor Berger (repo LICENSE, read via the GitHub API 2026-10-12) | SKIP for now |
 | [rulesync](https://github.com/dyoshikawa/rulesync) | "A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files" | MIT, copyright 2024 dyoshikawa (same method) | SKIP for now |
 
-The brief said rulesync's licence was unverified. It is MIT. Neither tool's code is used, so no licence text is carried; they are credited here and in the generator's own header because they are the prior art for the idea. The case for adopting one later is if the number of targets grows past two or three. Today it is one.
+The brief said rulesync's licence was unverified. It is MIT (read 2026-10-12). Neither tool's code is used, so no licence text is carried; they are credited here and in the generator's own header because they are the prior art for the idea. The case for adopting one later is if the number of targets grows past two or three. Today it is one.
 
 ## Skills
 
-Read today: the shared skills folder (`~/.agents/skills`) holds eight entries. One is a link into zaal-dotfiles (grill-me). Seven are not ours: tool-installed skill folders, each with a lock entry naming its upstream repo, and one dated backup. The brief's instruction for this case was to report and stop, and that is what happened.
+Read 2026-10-12: the shared skills folder (`~/.agents/skills`) holds eight entries. One is a link into zaal-dotfiles (grill-me). Seven are not ours: tool-installed skill folders, each with a lock entry naming its upstream repo, and one dated backup. The brief's instruction for this case was to report and stop, and that is what happened.
 
-It is also already handled. Bootstrap links shared skills into that folder one by one from a named list, and its comment says why it does not link the whole skills tree: it would shadow the other tools' folders, and it would show Codex skills that call Claude-only tools. The list has one name today. Growing it is a per-skill judgement of whether the skill runs without Claude's tools, and nobody has made that pass.
+It is also already handled. Bootstrap links shared skills into that folder one by one from a named list, and its comment says why it does not link the whole skills tree: it would shadow the other tools' folders, and it would show Codex skills that call Claude-only tools. The list had one name on 2026-10-12. Growing it is a per-skill judgement of whether the skill runs without Claude's tools, and nobody has made that pass.
 
 ## Gemini CLI and Antigravity
 
@@ -141,7 +141,7 @@ What is not known about the last command: whether Orca keeps an entry it did not
 ## Sources
 
 - Codex documentation, fetched by curl 2026-10-12T17:53Z, HTTP 200 each, FULL: [hooks](https://developers.openai.com/codex/hooks), [skills](https://developers.openai.com/codex/skills), [subagents](https://developers.openai.com/codex/subagents), [AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md), [non-interactive mode](https://developers.openai.com/codex/noninteractive), [config reference](https://developers.openai.com/codex/config-reference). Quotes are from the page text with markup removed.
-- [Ruler](https://github.com/intellectronica/ruler) and [rulesync](https://github.com/dyoshikawa/rulesync): README (raw) and licence (GitHub API), 2026-10-12.
+- [Ruler](https://github.com/intellectronica/ruler) and [rulesync](https://github.com/dyoshikawa/rulesync): README (raw), repo description and licence (GitHub API), 2026-10-12.
 - Gemini CLI docs source: [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) at 9b6e0265d16b, `docs/hooks/index.md`, `docs/hooks/reference.md`, `docs/cli/gemini-md.md`, `docs/cli/skills.md`, `docs/core/subagents.md`.
 - Local reads on the Mac, 2026-10-12: the two Codex homes, the shared skills folder, zaal-dotfiles `bootstrap.sh` and the three guards, and four `codex exec` runs (two for the hook, two for the rules).
 - zao-vault `decisions/grill-2026-10-09-seat-morning.md` item 185 (private; relayed by the seat, not read by me in the file).

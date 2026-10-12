@@ -36,7 +36,16 @@ import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runWatcherTick, renderWatcherAlerts } from './watcher';
 import { healFleet } from './fleet-health';
-import { runWorkTick } from './work-loop';
+import { enqueueWork, runWorkTick } from './work-loop';
+import {
+  buildGapGoal,
+  formatGapDigest,
+  gapLogEnabled,
+  gapUpgradeEnabled,
+  pickUpgrade,
+  readGaps,
+  summarizeGaps,
+} from './capability-gaps';
 import { runErrorRemediationTick, defaultRemediationDeps, flushOutbox, describeOutbox } from './error-remediation';
 import { runRepoImproverTick } from './repo-improver-io';
 import { asAlarmSend } from './repo-improver';
@@ -1552,6 +1561,41 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         } catch (err) {
           await releaseFire('learn-cycle');
           console.error('[zoe/scheduler] learn cycle failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Capability gaps (capability-gaps.ts) - Sunday 18:30 UTC, half an hour after
+  // the learn cycle. Reads the week's `GAP:` lines, tells Zaal the top few as a
+  // status message, and with ZOE_GAP_UPGRADE=1 queues ONE fit check for the
+  // most-asked. Nothing recorded = nothing sent and nothing queued.
+  tasks.push(
+    cron.schedule(
+      '30 18 * * 0',
+      async () => {
+        if (!gapLogEnabled()) return;
+        if (!(await claimFire('capability-gaps'))) return;
+        try {
+          const { rows, skipped } = await readGaps();
+          const groups = summarizeGaps(rows, new Date());
+          console.log(
+            `[zoe/scheduler] capability gaps: ${rows.length} rows on file, ${skipped} unreadable, ${groups.length} groups this week`,
+          );
+          if (groups.length === 0) return;
+          const upgrade = gapUpgradeEnabled() ? pickUpgrade(groups) : null;
+          if (upgrade) await enqueueWork(buildGapGoal(upgrade));
+          const digest = formatGapDigest(groups, upgrade);
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, digest, { kind: 'status' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, digest);
+          }
+          featureRan('capability-gap-digest', `${groups.length} groups${upgrade ? ', 1 upgrade check queued' : ''}`);
+        } catch (err) {
+          await releaseFire('capability-gaps');
+          console.error('[zoe/scheduler] capability gaps failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

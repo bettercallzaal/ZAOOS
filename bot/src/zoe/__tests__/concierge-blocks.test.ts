@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Tests for buildSystemBlocks — the pure prompt-assembly function in concierge.ts.
 // No mocks needed: function is purely functional (string in → string out).
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildSystemBlocks } from '../concierge';
 import type { MemoryBlocks } from '../memory';
 
@@ -209,5 +209,31 @@ describe('buildSystemBlocks — conversational mode', () => {
     expect(outFalse).toContain('<open_threads>');
     expect(outFalse).toContain(BASE_BLOCKS.tasks);
     expect(outDefault).toContain(BASE_BLOCKS.tasks);
+  });
+});
+
+// ── capability gap block (capability-gaps.ts, ZOE_GAP_LOG) ───────────────────
+
+describe('buildSystemBlocks — capability gap block', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('is absent by default', () => {
+    vi.stubEnv('ZOE_GAP_LOG', '');
+    expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('<capability_gap>');
+  });
+
+  it('is present in the DM when ZOE_GAP_LOG=1, between capabilities and tone', () => {
+    vi.stubEnv('ZOE_GAP_LOG', '1');
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE);
+    const at = out.indexOf('<capability_gap>');
+    expect(at).toBeGreaterThan(out.indexOf('</capabilities>'));
+    expect(out.indexOf('<tone>')).toBeGreaterThan(at);
+    expect(out).toContain('GAP: <what he wanted');
+  });
+
+  it('is never added to a group chat, flag on or not', () => {
+    vi.stubEnv('ZOE_GAP_LOG', '1');
+    const blocks: MemoryBlocks = { ...BASE_BLOCKS, chat_scope: '100', chat_title: 'ZAO HQ' };
+    expect(buildSystemBlocks(blocks, DATE)).not.toContain('<capability_gap>');
   });
 });

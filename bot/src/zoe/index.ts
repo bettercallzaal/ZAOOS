@@ -197,6 +197,7 @@ import {
 } from './commands';
 import { formatSpendStatus } from './cost-governance';
 import { enqueueWork, queueDepth, queuedInputs, runWorkTick } from './work-loop';
+import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import {
   claimResourceLink,
   isRecheck,
@@ -3583,6 +3584,22 @@ async function dispatchConcierge(
         current_date: currentDateString(),
       },
     });
+
+    // Capability gaps (ZOE_GAP_LOG=1, capability-gaps.ts): the DM prompt asks for
+    // a final `GAP:` line when she had no way to do what was asked. Take it off
+    // before anything below can send the reply, then keep the want. A failed
+    // write must not cost him the answer.
+    if (gapLogEnabled() && blocks.chat_scope === 'private') {
+      const extracted = extractGap(result.reply);
+      result.reply = extracted.reply;
+      if (extracted.gap) {
+        try {
+          if (await appendGap(extracted.gap)) featureRan('capability-gap-log', 'a gap was recorded');
+        } catch (err) {
+          console.error('[zoe/index] capability gap not recorded:', (err as Error).message);
+        }
+      }
+    }
 
     if (result.task_ops.length > 0) {
       const { added } = await applyTaskOps(result.task_ops);

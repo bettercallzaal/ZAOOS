@@ -36,6 +36,8 @@ name: Clear licence hold
 #   case a runtime file arrived between the judgement and the comment.
 # - The merge is pinned with --match-head-commit, so a push racing the merge
 #   is refused by GitHub, not by this script.
+# - It refuses a PR carrying the `hold` label, and treats labels it cannot read
+#   as a hold.
 #
 # issue_comment runs the DEFAULT-BRANCH copy of this file, so a PR cannot weaken
 # its own clearing rules by editing it. Do not move this to pull_request_target
@@ -111,6 +113,16 @@ jobs:
           other=$(printf '%s\n' "$files" | grep -vE '^(research|docs)/' || true)
           if [ -n "$other" ]; then
             say "licence-clear: not merging - files outside research/ and docs/: $(printf '%s' "$other" | head -5 | tr '\n' ' ')"; exit 0
+          fi
+
+          # The `hold` label stops every automatic merge of a PR, this one
+          # included (docs-automerge.yml). Read last, right before the merge
+          # call, and an unreadable label list counts as held.
+          if ! labels=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
+            say "licence-clear: not merging - could not read the PR labels to check for a hold."; exit 0
+          fi
+          if printf '%s\n' "$labels" | grep -Fxq 'hold'; then
+            say "licence-clear: not merging - this PR carries the hold label. Remove the label, then post the clearance line again."; exit 0
           fi
 
           gh pr merge "$PR" --repo "$REPO" --squash --auto --match-head-commit "$head"

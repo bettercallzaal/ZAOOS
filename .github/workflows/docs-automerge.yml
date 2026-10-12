@@ -18,10 +18,21 @@ name: Auto-merge safe PRs
 # No fallback merge without CI receipt — the || bypass is intentionally removed.
 # Mix rule: any combination of docs + tests + additive scripts auto-merges (none is
 # runtime); any runtime/config/CI file makes the whole PR unsafe (waits for Zaal).
+#
+# THE `hold` LABEL TURNS ALL OF THE ABOVE OFF FOR ONE PR (2026-10-11).
+# This workflow never reads a PR body, so a docs PR that said "wait" in its first
+# line merged anyway. A PR carrying the label `hold` is not armed, and any
+# auto-merge already armed on it is disabled - whoever armed it, in any category.
+# Removing the label re-judges the PR from scratch. The label only ever STOPS a
+# merge, and an unreadable label list counts as held. licence-clear.yml refuses a
+# held PR too.
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    # labeled / unlabeled are here for the `hold` label only; the job `if` drops
+    # every other label event, so labelling a PR for any other reason does not
+    # re-run the judgement (which would re-post the licence hold comment).
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   contents: write
@@ -29,9 +40,55 @@ permissions:
 
 jobs:
   automerge:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
+      github.event.label.name == 'hold')
     runs-on: ubuntu-latest
     steps:
+      # FIRST, before checkout, so a held PR is disarmed even when a later step
+      # fails. It runs for every category: `hold` means no auto-merge at all.
+      #
+      # Auto-merge armed on an earlier run stays armed across later pushes by
+      # anyone with write access, so "do not arm" is not enough for a label added
+      # after the PR opened - the earlier arming has to be taken off.
+      #
+      # FAILS CLOSED. If the labels cannot be read the PR is treated as held, and
+      # if auto-merge cannot be confirmed off the step fails, which skips the arm
+      # step below. Label names are data here: they are only ever compared with
+      # grep -Fx, never expanded into a command.
+      - name: Respect the hold label
+        id: hold
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          held=false
+          if ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
+            echo "::error title=hold::could not read the labels on this PR - treating it as held"
+            held=true
+          elif printf '%s\n' "$names" | grep -Fxq 'hold'; then
+            held=true
+          fi
+          echo "held=$held" >> "$GITHUB_OUTPUT"
+          if [ "$held" != "true" ]; then
+            echo "hold: no hold label on this PR"
+            exit 0
+          fi
+          off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          if [ "$off" != "true" ]; then
+            # The exit status of --disable-auto is not the evidence; the re-read
+            # of the PR on the next line is.
+            gh pr merge "$PR" --repo "$REPO" --disable-auto || true
+            off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          fi
+          if [ "$off" != "true" ]; then
+            echo "::error title=hold::this PR is held but auto-merge could not be confirmed off - turn it off by hand"
+            exit 1
+          fi
+          echo "::notice title=hold::held by the hold label - auto-merge is off and stays off until the label is removed"
+
       # CHECKOUT IS WHAT MAKES THE COLLISION GATE CORRECT. This job had none, so
       # the gate could only ask the GitHub API "what files were added", and a
       # renumbering rename adds nothing - see the step below. With the repo on
@@ -326,13 +383,33 @@ jobs:
       # `github.token` on this step only. That is a Zaal action because it means
       # creating and storing a credential. Until then, ci.yml carries a daily
       # schedule + workflow_dispatch so main's real state stays observable.
+      #
+      # `steps.hold.outputs.held == 'false'` is an exact match on purpose: a hold
+      # step that never ran or wrote nothing leaves it empty, and empty is not
+      # 'false'. The script then reads the labels AGAIN, immediately before the
+      # merge call, so a label added while the steps above were running is seen.
       - name: Enable auto-merge (squash)
         if: |
+          steps.hold.outputs.held == 'false' && (
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
           steps.classify.outputs.category == 'tests' ||
-          steps.classify.outputs.category == 'scripts'
+          steps.classify.outputs.category == 'scripts')
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HELD: ${{ steps.hold.outputs.held }}
         run: |
-          gh pr merge ${{ github.event.pull_request.number }} \
-            --repo "${{ github.repository }}" --squash --auto
+          if [ "$HELD" != "false" ]; then
+            echo "::error title=hold::hold state is '$HELD', not 'false' - not arming auto-merge"
+            exit 1
+          fi
+          if ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
+            echo "::error title=hold::could not re-read the labels on this PR - not arming auto-merge"
+            exit 1
+          fi
+          if printf '%s\n' "$names" | grep -Fxq 'hold'; then
+            echo "::notice title=hold::the hold label arrived during this run - not arming auto-merge"
+            exit 0
+          fi
+          gh pr merge "$PR" --repo "$REPO" --squash --auto

@@ -25,7 +25,7 @@ tier: STANDARD
 | 2 | "CI never ran" is not green and is not a failed test. A head in that state does not meet tier 2. It goes to Zaal's hand until CI can run. | Items 26b, 26c and 110 of the same file. The merge tool names the state as of zaal-dotfiles PR 516 (open, not merged). |
 | 3 | Seven older texts are superseded, narrowed or left standing, each named below with path and date. None is edited by this PR. | Section "Older texts". |
 | 4 | Five points could not be reconciled from his words and are OPEN. Until he answers, each takes the stricter reading, which is the one that waits for him. | Section "OPEN for Zaal". |
-| 5 | Rulesets, the self-hosted runner and the stack rule are PROPOSALS. | Item 182: "Rulesets, runner and stack rule go in as proposals for him." |
+| 5 | Rulesets and the stack rule are PROPOSALS. The self-hosted runner is NOT a proposal: it is ruled, host included (item 179 point 8), and this doc only lists what remains to do. | Item 182: "Rulesets, runner and stack rule go in as proposals for him." Item 182 was written a day after item 179 point 8 and does not withdraw it. |
 
 ## The rulings, quoted
 
@@ -117,9 +117,17 @@ zaal-dotfiles and zao-vault have the runner switch written but not merged: zaal-
 
 None of these is done. Each needs his hand in GitHub settings or on the machine.
 
-### (a) Self-hosted runner for the three private repos
+### (a) Self-hosted runner for the three private repos: ruled, not yet done
 
-He already ruled the direction twice: item 46 ("a plus b works", A being the self-hosted runner) and item 69 ("I Dont wanna spend money on actions", then "a"). What follows is what the GitHub docs say about doing it, read from the docs source at github/docs main (commit dbd054791b6d, fetched raw 2026-10-12T17:03Z), not from a summary.
+**This is already ruled, including where it runs. What is left is doing it.** Four items of the same decisions file, in order:
+- Item 46 (2026-10-10): "a plus b works", A being a self-hosted runner.
+- Item 69 (2026-10-10): "I Dont wanna spend money on actions", then "a". The Actions budget stays at zero and the self-hosted runner is the path for every private repo.
+- Item 70 (2026-10-10): he asked whether an older machine of his could become the runner host; the seat owns the steps, with a recipe in the vault.
+- Item 179, point 8 (recorded 2026-10-11): names the host and says "Nothing is registered; registration needs a token from repo settings and is his tap. This answers the open runner question from items 69 and 70". **This is the current ruling.** Its standing, as the file itself states: it was relayed to the seat by another lane, not typed in the seat's pane.
+
+The first version of this doc cited only items 46 and 69 and treated the host as an open choice. That was wrong: my search for later rulings used the words merge, tier and auto-merge, not runner. Which host item 179 names is not repeated here, because this repo is public; it is in the decisions file and in the private vault note named below.
+
+So the rest of this section is not a case for the runner. It is what the GitHub docs say about the step that remains. What follows is what the GitHub docs say about doing it, read from the docs source at github/docs main (commit dbd054791b6d, fetched raw 2026-10-12T17:03Z), not from a summary.
 
 **Cost.** `content/billing/concepts/product-billing/github-actions.md`: "GitHub Actions usage is **free** for **self-hosted runners** and for **public repositories** that use standard GitHub-hosted runners." `content/actions/concepts/runners/self-hosted-runners.md`: self-hosted runners "Are free to use with GitHub Actions, but you are responsible for the cost of maintaining your runner machines." Not checked: the GitHub changelog for any announced future charge on self-hosted minutes. The docs at that commit name none.
 
@@ -134,9 +142,9 @@ He already ruled the direction twice: item 46 ("a plus b works", A being the sel
 
 **What that means here.** Collaborator counts (measured, `gh api repos/.../collaborators`, 2026-10-12): zaal-dotfiles 2, zao-vault 1, wavewarz-protocol 2, the owner included in each. All three have 0 forks. So the outside-contributor risk is two accounts. The larger exposure is our own: every lane pushes as the same GitHub user, all three workflows run on `pull_request`, and on a pull request from a branch in the same repo the run uses that branch's version of the workflow file (GitHub's behaviour as I understand it; not one of the lines quoted above). So any agent branch runs its code on the runner machine before any review. That makes the docs' question the one that decides the host: "What sensitive information resides on the machine configured as a self-hosted runner?"
 
-Runner host: Zaal's choice. The host-specific detail is kept out of this public repo. It is in the private vault note `notes/runner-host-detail-2026-10-12.md` (zao-vault PR 141, open and not merged when this was written).
+Runner host: ruled in item 179 point 8, and not named in this public repo. The host-specific detail, and what the docs' question means for that particular machine, is in the private vault note `notes/runner-host-detail-2026-10-12.md` (zao-vault PR 141, open and not merged as of 2026-10-12).
 
-**Recommendation, his call.** Yes to the runner, with four conditions, in this order:
+**What remains under that ruling, in this order.** None of it reopens the choice of host; the first step is about how the runner is set up on it:
 1. A dedicated OS user with no sudo, whose home is the only thing it can write, and which cannot read any other service's env files or any SSH key on that machine. Verify by trying to read them as that user before registering anything.
 2. Never on a public repo. The docs line is "self-hosted runners should almost never be used for public repositories". ZAOOS, ZAOstock and wwtracker stay on GitHub-hosted runners, which are free for public repos.
 3. Register on one repo first and watch one job start and finish. That is also the test of whether the billing block lets self-hosted jobs run, which is unverified above.
@@ -171,7 +179,7 @@ Proposal, the seat's draft from its build brief to this lane on 2026-10-12, whic
 
 ## Sources
 
-- zao-vault `decisions/grill-2026-10-09-seat-morning.md`, items 5, 9, 14, 26b, 26c, 28, 34, 34a, 44, 46, 69, 110, 182 (private repo; read on origin/main 2026-10-12).
+- zao-vault `decisions/grill-2026-10-09-seat-morning.md`, items 5, 9, 14, 26b, 26c, 28, 34, 34a, 44, 46, 69, 70, 110, 179 point 8, 182 (private repo; read on origin/main 2026-10-12).
 - zao-vault `decisions/zj-merges-on-review-approval-non-zaostock.md` and `AGENTS.md` rule 7 (same).
 - ZAOOS `.github/workflows/docs-automerge.yml`, `.claude/rules/agent-loops.md` rules 35 and 38, research docs 2655 and 2661 (origin/main at 1d028fd13).
 - zaal-dotfiles `claude/memory/zaoos/` files named above (origin/main at 9120986), and PR 516.

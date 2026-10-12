@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-12
 related-docs: 154, 661, 663, 676, 677
 tier: STANDARD
 ---
@@ -282,6 +282,27 @@ This way, when Zaal asks "what do we know about X?" or a new agent joins, **one 
 2. **This week:** Cheap win #5 (labeling trigger) + verify doc 663 collision guard is live — 1 hour
 3. **Next sprint:** C1 (research + social pipeline to Bonfire) — 6-8 hours, high leverage
 4. **Parallel:** Wave 2 of 676 (A3: /search command, fractal digest, cross-bot KG module) — 6-8 hours
+
+---
+
+## Updated 2026-10-12
+
+Four material changes since the 2026-05-20 audit:
+
+1. **Newsletter — SHIPPED.** Doc said "newsletter missing entirely". As of 2026-08-09, `bot/src/zoe/agents/newsletter.ts` implements `@newsletter` in ZOE, assembling daily "Year of the ZABAL" entries from today's commits, PRs, captures, and Bonfire KG context. A `/newsletter` skill also exists in `.claude/skills/`. Sources: `bot/src/zoe/agents/newsletter.ts` (read directly).
+
+2. **Bonfire retry queue — SHIPPED (P1 fix).** The doc warned that team-tracker.ts and afferent-digest.ts dropped failed Bonfire writes silently. `bot/src/zoe/bonfire-retry.ts` (added 2026-08-09 per file comment) generalises the thread-memory retry pattern across ALL Bonfire writes, preventing silent data loss on approved community submissions. Sources: `bot/src/zoe/bonfire-retry.ts` (read directly).
+
+3. **Bonfire write surfaces expanded.** Was 2 (ZOE mirrorTurn, ZAOcoworkingBot /add). Now 4+: additionally `bonfire-queue.ts` drains ZABAL Gamez community submissions from an Upstash queue (Phase 2 of doc 781), and `recall.remember` is a shared write module reused across agents. Sources: `bot/src/zoe/bonfire-queue.ts`, `bot/src/zoe/recall.ts` (read directly).
+
+4. **Skills grew from 44 to 49.** New skills since audit: `newsletter`, `inbox`, `lean`, `onepager`, `team-setup`, `z`, `zabal-games-context`, `zao-bench`, `evals`. Sources: `.claude/skills/` directory listing (2026-10-12).
+
+**Still open (unchanged):**
+- A1/A2 cheap wins (pre-push + pre-commit git hooks) — `.git/hooks/` is still empty; `secret_scan.py` not in `.claude/scripts/`. These remain unimplemented as of 2026-10-12.
+- C3: Planning skills not consolidated — plan-ceo-review, plan-eng-review, plan-design-review still separate.
+- C4: Research skills not consolidated — autoresearch and zao-research still separate.
+
+**External:** Claude Code lifecycle hooks now number 27+ events (vs fewer at audit time), with `async: true` support added in January 2026 and new events `PostToolBatch`, `PermissionRequest`, `Setup`. This makes A1/A2's hook-based enforcement easier — the missing piece remains someone actually wiring it. Sources: WebSearch results from kjetilfuras.com, pilot-shell.com (PARTIAL — blog posts, not official docs; treat counts as unverified).
 
 ---
 

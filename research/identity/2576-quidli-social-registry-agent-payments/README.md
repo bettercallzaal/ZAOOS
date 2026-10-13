@@ -106,6 +106,104 @@ wallets.
   earlier lookup created `0x4238...3E76`. Whether that was this run or an earlier
   one is unknown.
 
+### Overnight follow-up, 2026-10-12: the hypothesis checked against public sources
+
+**Verdict: very likely a Privy wallet that Quidli generated in advance for the
+Farcaster identity `zaal`, which Zaal can claim by signing in.** It is not a wrong
+match against someone else's wallet. This rests on four public sources that agree,
+not on Quidli saying so in words:
+
+1. **Quidli's own API spec has the field that the first pass said was missing.**
+   `RecipientWithWalletDto` in `https://api.connect.quid.li/openapi.json`
+   (Quidli Connect API 1.0.0) has `did`: *"Privy DID when the recipient has a
+   Connect account"*. **Zaal's lookup result carried no `did`.** By the spec's
+   own words, then, the identity has no Connect account, and the address came
+   from somewhere other than a user who signed up. This **corrects the HEADLINE
+   section above**, which says *"The response carries no field distinguishing the
+   two cases."* There is a weak one: an absent `did` means "no Connect account".
+   It still does not say "this address is the user's own wallet", so the
+   practical risk in Key Decision 1 stands.
+2. **Quidli runs on Privy.** The same spec says `/drop`, `/trust` and the revoke
+   routes accept *"Privy Bearer token (Connect member with registered Smart Send
+   signer)"*. `/drop/balance` reads *"the API key owner embedded wallet"*. The
+   repo's `docs/skills/connect-trust/SKILL.md` says *"Unknown socials are
+   provisioned the same way lookup/drop provision them"*.
+3. **Privy's documented pregeneration flow is this behaviour.**
+   `https://docs.privy.io/recipes/pregenerate-wallets.md`: *"you can pregenerate
+   non-custodial Ethereum and Solana wallets for existing users, or create a new
+   user with other login methods ... without requiring the user to login. You can
+   even send assets to the wallet before the user logs in"* and *"Once the user
+   associated with the account logs in, they will be able to access the
+   pregenerated wallet and any assets sent to them."*
+4. **Quidli's homepage describes the claim step.** `https://quidli.xyz` playground
+   copy: *"Tokens sent! Now notify your recipient so they know to claim them."*
+
+**Who holds the key.** Privy calls pregenerated wallets non-custodial, and the
+user gets access by signing in with the linked account, here Farcaster. **The
+open question is what other signers there are.** Privy's pregenerate API lets
+the creating app attach `additional_signers` and policies to each wallet. No
+public Quidli source says whether Quidli adds itself as a signer on the wallets
+it generates. **UNKNOWN, not "no".**
+
+**How Zaal would claim it, and in doing so settle this for good.** Sign in at
+`connect.quid.li` with the Farcaster account `zaal`, then see whether the
+dashboard shows `0x4238...3E76` as his wallet. That creates an account, which is
+his call, and it is the only step that turns "very likely" into "measured".
+
+**What still holds after this.** For an account with 6 verified wallets, Quidli's
+payout address for that handle is a fresh wallet the person must find out about
+and claim, not any wallet they already use. That is fine for onboarding someone
+with no wallet. It is wrong for paying someone who has one, and the caller cannot
+tell the two cases apart from the address.
+
+### Each of the 14 tools against a concrete ZAO use
+
+| Tool | Spends? | ZAO use |
+|---|---|---|
+| `connect_get_price` | no | Check reads are still free before a try-out. Trivial |
+| `connect_get_chains` | no | No use. ZAO already knows its chains |
+| `connect_lookup` | no for caller, **provisions a wallet for the recipient** | **No use for payouts** (Key Decision 1). Only Zaal on his own handles |
+| `connect_lookup_exposed` | no (may charge x402 if the owner sets a price) | **The one consent-based read.** It lists only what a person chose to expose. Possible use: an artist who says "find me on Quidli" can be checked here. Otherwise no use |
+| `connect_scores_batch`, `connect_scores_by_account` | no | No use. Key Decision 3: the score mostly tracks Ethos. ZAO already reads the Neynar score directly |
+| `connect_scores_by_username` | no | No use (Connect usernames only) |
+| `connect_me` | no, API key | No use without an account |
+| `connect_drop` | **YES, sends tokens. Zaal-only** | **No use.** Not for WaveWarZ payouts and not for artist pay (Key Decisions 1-2) |
+| `connect_drop_balance` | no, API key | No use without `connect_drop` |
+| `connect_trust_create` | **YES, EAS attestation on Base, gas. Zaal-only** | No use now. An on-chain "ZAO vouches for this artist" is a public, irreversible statement, and it also provisions a wallet for the target |
+| `connect_trust_revoke` | **YES, gas. Zaal-only** | No use (pairs with create) |
+| `connect_trust_check`, `connect_trust_graph` | no | No use until someone ZAO trusts has attested on it. Nothing to read today |
+
+**Net: one tool with a narrow consent-based use (`lookup_exposed`), one trivial
+(`get_price`), twelve with no ZAO use.**
+
+### Paying artists by handle: Quidli against the doc 2577 alternatives
+
+| Path | Artist has a verified wallet | Artist has a wallet, linked nowhere | Artist has no wallet | Artist has no handle | Cost |
+|---|---|---|---|---|---|
+| **Farcaster hub verifications** (keyless, used in this delta) or Neynar | **Pays the artist's own verified wallet** | No answer, so ask them | No answer | No answer | Free (hub). Neynar key already held |
+| **Lens** (doc 2577, keyless) | Same, Lens accounts only | No answer | No answer | No answer | Free |
+| **Quidli `connect_lookup`** | **Measured here: may return a fresh generated wallet instead of the verified one** | Returns a generated wallet, not theirs | Returns a claimable generated wallet, which is its real strength | No answer | Reads free now. Payment needs an API key or x402 |
+| **Ask the artist for an address** | Their choice of wallet | Works | They would need a wallet first | Works with fiat details | Free, one DM each |
+| **Fiat rails** (ACH, Venmo, Zelle, check) | Works | Works | Works | Works | Rail fees, and KYC and reporting apply either way (Key Decision 5) |
+
+**Recommendation, unchanged in direction and sharper in reason.** For artists on
+Farcaster, read their hub-verified addresses (free, provable, their own wallet)
+and confirm with them. For everyone else, ask or use fiat. Quidli's one real
+advantage, a wallet for an artist with none, is an onboarding flow. It needs the
+artist told and walked through claiming, and that is better done openly than as
+a side effect of a payout.
+
+### Sources for this delta (all fetched 2026-10-12, keyless)
+
+- `https://mcp.connect.quid.li/` - **[FULL, method: curl JSON-RPC]** `initialize`, `tools/list`, `tools/call`
+- `https://api.connect.quid.li/openapi.json` - **[FULL, method: curl, JSON parsed]** 49,006 bytes, `RecipientWithWalletDto.did`, route descriptions. `/docs`, `/swagger.json`, `/api-docs` returned 404
+- `https://quidli.xyz` - **[FULL, method: curl + HTML strip]** the "claim them" playground copy
+- `https://docs.quid.li` - **[FAILED, HTTP 403]**
+- `https://docs.privy.io/recipes/pregenerate-wallets.md` - **[FULL, method: curl of the raw markdown, found via `https://docs.privy.io/llms.txt`]**
+- `github.com/Quidli/connect-mcp` main, v0.6.5 - **[FULL, method: codeload tarball]** `README.md`, `LICENSE` (MIT, Copyright (c) 2026 Quidli), `src/tools/register.ts`, `src/x402-fetch.ts`, `src/hosted-gate.ts`, `docs/skills/connect-trust/SKILL.md`
+- `https://haatz.quilibrium.com/v1/verificationsByFid` and `/userNameProofByName` - **[FULL, method: curl, JSON]**
+- `mainnet.base.org`, `ethereum-rpc.publicnode.com` - **[FULL, method: JSON-RPC]**
+
 ## THE HEADLINE, AND IT IS NOT IN ANY DOCUMENTATION
 
 `POST https://api.connect.quid.li/lookup` needs **no API key and no auth**. So it

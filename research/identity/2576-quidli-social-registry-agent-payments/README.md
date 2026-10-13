@@ -2,7 +2,7 @@
 topic: identity
 type: decision
 status: research-complete
-last-validated: 2026-09-29
+last-validated: 2026-10-12
 superseded-by:
 related-docs: "891, 316, 291, 2181, 2230"
 original-query: "/zao-research https://farcaster.xyz/ahn.eth/0xafbc3695"
@@ -31,6 +31,80 @@ from the documentation. What changed is marked throughout.
 | 4 | **SKIP it for Farcaster resolution.** ZAO already has that. | Its own response labels the sources: `neynar`, `lens`, `ethos`. ZAO holds a Neynar key and used it inside this research run. |
 | 5 | **The cast's premise does not survive its reply thread, and ZAO should not repeat it.** | `@unify34`: *"Unfortunately by law in certain places a KYC is required"*, unanswered. Removing a platform's KYC demand on a recipient does not remove ZAO's obligation as a payer. |
 | 6 | **Treat this as a funded 2018 company on its seventh positioning, not a new protocol.** It is not vapour and it is not new. | **QUIDLI SARL, France, SIREN 844760272, incorporated 2018-11-29**, plus **QUIDLI INC.** in Delaware (file 7066264). Same CEO, same GitHub org since 2018-03-21, and **seven distinct taglines** on `quid.li` between 2018 and 2025. Backed by **Tachyon (ConsenSys Ventures) from Q3 2018**. |
+
+## Delta, 2026-10-12: re-run on Zaal's own handle, nothing spent
+
+This is the re-run the Next Actions table asked for, done on the evening of
+2026-10-12 for a try-it guide (vault `notes/quidli-try-it-2026-10-13.md`). The
+only identity looked up was Zaal's own (`farcaster/zaal`, FID 19640). His X and
+GitHub handles were scored, not looked up, because `connect_lookup` now says it
+provisions a wallet for anyone who has none. **The Key Decisions above stand
+unchanged.**
+
+**What was measured.** Each item was run once unless a count is given.
+
+| Check | Result | Method |
+|---|---|---|
+| Hosted MCP, no key | `initialize` returned server `quidli-connect` **0.6.5**. `tools/list` returned **14 tools**, 3 marked `destructiveHint: true` (`connect_drop`, `connect_trust_create`, `connect_trust_revoke`) | curl JSON-RPC to `https://mcp.connect.quid.li/` |
+| `connect_lookup` farcaster/zaal | ETH `0x4238...3E76`, status `completed`. **The same address on 3 calls** over about 6 minutes | the same |
+| Is it one of his verified addresses? | **No.** FID 19640 has 6 verifications (4 ETH, 2 SOL), and the returned ETH and SOL addresses match none of them | `haatz.quilibrium.com/v1/verificationsByFid`, keyless |
+| Hub instrument control | The control FID from the original pass does list, in its own verifications, the address Quidli returned for it on 2026-09-29. So the hub read can find a match when one exists | the same endpoint |
+| Is `0x4238...3E76` used? | **nonce 0** on Base and on Ethereum, **0 bytes of code** on Base | `mainnet.base.org`, `ethereum-rpc.publicnode.com`. Control: a known-active public address returns nonce 70 on Base and 5,969 on Ethereum on the same endpoints |
+| `connect_lookup_exposed` farcaster/zaal | `accountCount: 0`, `hasWallets: false` | hosted MCP |
+| `connect_scores_by_account` | farcaster/zaal **98** (Neynar 0.98, Lens 0.8, Ethos wallet 1234). twitter/bettercallzaal `null` (Ethos 1234 only). github/bettercallzaal `null`, no categories | hosted MCP |
+| `/price` | lookup 0, scores 0. Still free | hosted MCP |
+
+**What changed in the client since v0.6.3** (codeload tarball of `main`, repo
+pushed 2026-10-07):
+
+- The README now documents all 14 tools. Source audit point 1 above, "the README
+  documents 10 tools, the code registers 14", is **no longer true** as of v0.6.5.
+- The `connect_lookup` tool description now says, verbatim: *"Resolving a
+  recipient who has no wallet provisions one for them, so this is read-only for
+  the caller but not for the recipient."* That disclosure is new and to their
+  credit.
+- Unchanged: `x402-fetch.ts` still calls `wrapFetchWithPayment(fetch, client)`
+  with no maximum. There is still no spend cap.
+
+### The likely explanation, stated as a hypothesis
+
+**Hypothesis:** `0x4238...3E76` is a wallet Quidli generated and holds for the
+`farcaster/zaal` identity, not a wrong match against somebody else's wallet. The
+README says Connect *"generates a wallet for people who have never used
+Quidli"*, the new tool description says lookup provisions one, and the address
+is stable across calls, which fits a stored record. A wallet with 0 code and
+nonce 0 also fits a smart-account address that has been computed but not yet
+deployed, which is the usual shape for a generated custodial or claimable wallet.
+
+**This is not established.** What the measurement does show: for an active
+Farcaster account with 6 verified addresses, Quidli returned a payment
+destination the account holder has never used, with no field saying so. That
+holds under either explanation, so it is the finding, and it strengthens Key
+Decision 1. The first pass saw generated-looking wallets only for handles with no
+Farcaster wallet. Here it happens for a Farcaster handle that has verified
+wallets.
+
+**What would settle it:**
+
+- **Proves "generated for Zaal":** Zaal signs in to `connect.quid.li` with his
+  own Farcaster account and the dashboard shows `0x4238...3E76` as his Quidli
+  wallet, or the wallet can be claimed or exported from there. This is Zaal's
+  action, since account creation is his. Or Quidli adds a provenance field to
+  `/lookup` that marks it generated.
+- **Proves "wrong match":** the address turns up as a verified or custody
+  address of a different Farcaster account, or as a wallet some other person
+  controls. A reverse lookup by address needs a keyed API such as Neynar
+  bulk-by-address, so it was not run here.
+- **Not enough on its own:** another nonce check. A generated wallet and a
+  never-used wallet of someone else both read nonce 0.
+
+### Scope limits of this delta
+
+- No lookup of anyone but Zaal. No API key, no wallet, no x402, no
+  `connect_drop`, and nothing changed in any MCP config.
+- The provisioning side effect cuts both ways. If the hypothesis is right, an
+  earlier lookup created `0x4238...3E76`. Whether that was this run or an earlier
+  one is unknown.
 
 ## THE HEADLINE, AND IT IS NOT IN ANY DOCUMENTATION
 

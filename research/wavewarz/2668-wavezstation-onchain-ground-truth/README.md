@@ -21,9 +21,9 @@ All figures were read on **2026-10-13 between 19:25 and 19:55 UTC**. WaveZStatio
 |---|---|---|
 | 1 | USE the `AccessPurchased` event as the only proof of a purchase. Do NOT verify by `tx.to` or `tx.from`. | 111 of 234 buys were sent through the ERC-4337 EntryPoint, 30 through a router contract and 11 through a third relay. Only 123 of 234 call the contract directly. The event is emitted on all 234. Section 5 has the exact fragment. |
 | 2 | CORRECT the round-ten memo before any buy is planned: the site's "pool" figure is gross sales, not 45% of sales. | Saturday in LA has sold **370.80 USDC**, not about 802. Read from the contract's own `getSong` and matched by summing 33 buy events. |
-| 3 | TREAT a $1,000 buy on the top song as a **$792 net cost that returns 20.8% to the buyer's own wallet**, because that wallet already holds 46% of the song's shares. | Section 4. The 45% fan share is paid to earlier buyers pro rata, and the buying wallet is the largest earlier buyer. |
+| 3 | DESCRIBE a buy as three flows, not one: 10% platform, 45% creator wallets, 45% to whoever already holds the song, the buyer included. | Section 4.1. A wallet that already holds shares gets part of its own fan share back, so "45% goes to the artist and the rest is spent" is not what the contract does. |
 | 4 | SAY "45% to the artist" only with the wallet list beside it. | The 45% goes to the song's creator wallets, split by the song's own basis points. Saturday in LA has two wallets at 50/50, and one of them is also the third-largest buyer on the whole platform. |
-| 5 | ASK Zaal three facts before any revenue plan is written (section 7.6): which payout wallet is his, how WaveZStation's USDC reaches the SOL treasury, and whether the 10 October transfer is a recurring cost. | None of the three is on any surface searched. Guessing any of them would invent a number. |
+| 5 | ASK Zaal three facts before any revenue plan is written (section 6.6): which payout wallet is his, how WaveZStation's USDC reaches the SOL treasury, and whether the 10 October transfer is a recurring cost. | None of the three is on any surface searched. Guessing any of them would invent a number. |
 | 6 | PLAN revenue around paid entries and main events, not around trade volume. | In the last three weeks about 0.68 of 0.81 SOL of treasury income was flat per-entry fees. The trade fee on 52.24 SOL of 30-day volume is 0.26 SOL. |
 | 7 | SKIP Dune for this work until the account is upgraded. | The Dune MCP answered every query with "Your account is read-only. Upgrade to create content or run queries." Everything here came from public RPCs instead. |
 
@@ -32,7 +32,7 @@ All figures were read on **2026-10-13 between 19:25 and 19:55 UTC**. WaveZStatio
 | Source | What it said | Status after today |
 |---|---|---|
 | `wavezstation.com/docs` (raw HTML, read today) | Every sale: 45% fan pool, 45% artist and collaborators, 10% platform. Fans earn "proportionally to how much each fan contributed to the pool". | CONFIRMED on all 234 buys, to the micro-USDC. |
-| Round-ten research memo, public `bettercallzaal/poidhz` `rounds/daily/d10/RESEARCH.md`, 2026-10-10 | Base, USDC, contract not verified, 45% paid in the same transaction. Also: pool = 45% of sales, so the top song had "about 801.78 USDC of cumulative sales". | Chain, verification and split CONFIRMED. The 801.78 is WRONG: pool total is gross sales (section 3.3). Its estimate that about $95 of a $1,000 buy returns to Zaal is also wrong for the same reason; the figure is $207.52. |
+| Round-ten research memo, public `bettercallzaal/poidhz` `rounds/daily/d10/RESEARCH.md`, 2026-10-10 | Base, USDC, contract not verified, 45% paid in the same transaction. Also: pool = 45% of sales, so the top song had "about 801.78 USDC of cumulative sales". | Chain, verification and split CONFIRMED. The 801.78 is WRONG: pool total is gross sales (section 3.3), and every figure the memo derived from it needs redoing. |
 | ZAOOS docs `wavewarz/743-wavewarz-whitepaper-v2-deep-dive`, `wavewarz/1343-wavewarz-partner-activation-jul2026`, `business/406-coinflow-isv-deep-dive-wavewarz-zao` | "wavestation" appears only as a Coinflow merchant ID for WaveWarZ fiat on-ramp. | UNRELATED to this contract. Same word, different thing. Do not cite these three for the Base product. |
 | ZAOOS doc `business/2634-memecoin-idea-ground-truth` | A WaveStation quest verifies a submitted transaction hash. | Still the design. Section 5 is what that verifier needs. |
 | WaveWarZ ICM box, `research/identity/icm-boxes/wavewarz.llm.txt` | 2,152 bytes, 9 mentions of WaveWarZ. | Says nothing about WaveZStation (0 matches for "station", in a file that does match "wavewarz"). The box has a gap. |
@@ -68,13 +68,13 @@ So there is no published source and no published ABI. Everything below about fun
 | Fact | Value | How read |
 |---|---|---|
 | Deploy block | 49,105,370, 2026-07-25 17:21:27 UTC | binary search on `eth_getCode`; code empty at block 30,000,000 as the control |
-| Deploy transaction | `0x867d3cfea77e6c6c4044b206963df294180b89890278290fe9b100e17eb683ed` | receipt `contractAddress` equals the contract |
-| Deployer | `0xF3aFf958fbA167bAb80e515AbC8d7077DEED886a` | same receipt |
+| Deploy transaction | `0x867d3cfe...83ed` | receipt `contractAddress` equals the contract |
+| Deployer | `0xF3aF...886a` | same receipt |
 | `owner()` today | the deployer, a single key. `pendingOwner()` is zero. | `eth_call` |
 | `paused()` | false | `eth_call` |
 | `usdc()` | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` (Base USDC) | `eth_call` |
 | Proxy | not a proxy (EIP-1967 implementation slot is zero) | `eth_getStorageAt` |
-| Fee wallet `0xd974...8E72` | a Safe (SafeProxy 0.7.6 build to SafeL2), **1 owner, threshold 1**, owner `0x29F5DeE65E1Fb856B816EaB4f0B702c10e5Eaa34`, nonce 7. Deployed at block 42,202,825, before the contract. | Sourcify record, `getOwners()`, `getThreshold()` |
+| Fee wallet `0xd974...8E72` | a Safe (SafeProxy 0.7.6 build to SafeL2), **1 owner, threshold 1**, owner `0x29F5...aa34`, nonce 7. Deployed at block 42,202,825, before the contract. | Sourcify record, `getOwners()`, `getThreshold()` |
 
 Who controls the deployer key and the Safe owner key is not a chain fact and is not recorded here.
 
@@ -98,7 +98,7 @@ Names marked "matched" were recovered by hashing a guessed signature and getting
 | `0x7f197734` | name not recovered | | the address's share of the song in basis points (returned 4611 for 171 of 370.8) |
 | `0x12446ebc`, `0x5f3f6946` | `setSongPaused(bytes32,bool)`, `updateSongMinAmount(bytes32,uint256)` | matched | owner controls per song |
 | `0x8456cb59`, `0x3f4ba83a` | `pause()`, `unpause()` | 4byte | owner can stop all buys |
-| `0xe8e561f9` | `setAuthorizedPayer(address,bool)` | 4byte | used once, block 52,181,230 (2026-10-04), to authorise router `0x25dfc610e9ef62b79ead0ba4abb5d02fbc63e8a0` |
+| `0xe8e561f9` | `setAuthorizedPayer(address,bool)` | 4byte | used once, block 52,181,230 (2026-10-04), to authorise router `0x25df...e8a0` |
 | `0x1171bda9` | `recoverERC20(address,address,uint256)` | 4byte | owner token rescue, see 2.5 |
 | topic `0x91d2571f...d1ad` | `AccessPurchased(bytes32 indexed songId, address indexed payer, address indexed buyer, uint256 amount, uint256 fanAmount, uint256 creatorAmount, uint256 platformAmount)` | matched | one per buy |
 | topic `0xfec539b3...01c7` | `RewardsClaimed(bytes32 indexed songId, address indexed user, uint256 amount)` | matched | one per claim |
@@ -112,7 +112,7 @@ Simulated only (`eth_call`, nothing sent). `recoverERC20(USDC, owner, 1)` called
 
 ## 3. Activity since deploy
 
-Method: every log emitted by the contract and by the fee wallet from block 49,105,370 to 52,565,323, pulled in 1,000-block windows from the Tenderly public Base RPC (3,460 windows), then the receipt and input of every one of the 415 transactions. Control: a window containing a known buy returned that buy. Basescan reports "263 transactions" to the contract; the difference from 415 is the relayed buys and the fee wallet's own transactions, which Basescan does not count as transactions to the contract. Evidence files: `data/buys.csv`, `data/claims.csv`, `data/scan-logs.py`.
+Method: every log emitted by the contract and by the fee wallet from block 49,105,370 to 52,565,323, pulled in 1,000-block windows from the Tenderly public Base RPC (3,460 windows), then the receipt and input of every one of the 415 transactions. Control: a window containing a known buy returned that buy. Basescan reports "263 transactions" to the contract; the difference from 415 is the relayed buys and the fee wallet's own transactions, which Basescan does not count as transactions to the contract. The scanner is `data/scan-logs.py`; run it and decode the three topics in section 2.4 to rebuild every figure here. The per-buy and per-claim tables are public chain data but they are a list of 35 buyers' wallets, so they are kept in the private companion note and not in this repo.
 
 ### 3.1 Totals
 
@@ -120,7 +120,7 @@ Method: every log emitted by the contract and by the fee wallet from block 49,10
 |---|---|---|
 | Buys | **234** | 0 failed transactions in the set |
 | Gross paid in | **1,956.30 USDC** | USDC `Transfer` into the contract sums to 1,956.30 |
-| To the platform Safe | **195.63 USDC, 10.00%** | 0 of 234 buys deviate; the Safe's only USDC inflow is these transfers |
+| To the platform Safe | **195.63 USDC, 10.00%** | 0 of 234 buys deviate |
 | To creator wallets, same transaction | **880.34 USDC, 45.00%** | 0 of 234 deviate; transfers out to non-fee addresses minus claims equal 880.34 |
 | To the fan pool | **880.34 USDC, 45.00%** | 0 of 234 deviate |
 | Fan earnings claimed | 514.40 USDC in 139 claims by 15 wallets | |
@@ -162,7 +162,7 @@ By ISO week from the first week of September: 216.00, 185.80, 126.00, **816.00**
 | Wallet | Gross USDC | Share of all volume | Note |
 |---|---|---|---|
 | `0x6c1dd135...6ae8` | 492.00 | 25.1% | |
-| `0x7234c36a...e9af` | 252.00 | 12.9% | the wallet already published as Zaal's issuer wallet in the round-ten memo; 24 buys across 20 songs, 171.00 of it on Saturday in LA |
+| `0x7234...e9af` | 252.00 | 12.9% | 24 buys across 20 songs |
 | `0x7e1e8ed4...a811` | 207.00 | 10.6% | **one of the two creator wallets of Saturday in LA**; 107.00 of it into that same song |
 | `0xf8ac6bbe...edee` | 113.00 | 5.8% | also the largest claimer, 137.57 |
 | `0xa3641168...6810` | 103.00 | 5.3% | |
@@ -170,21 +170,20 @@ By ISO week from the first week of September: 216.00, 185.80, 126.00, **816.00**
 
 - Buys where the buyer is a creator wallet of that same song: **18 buys, 206.00 USDC**.
 - Buys by any wallet that is a creator wallet of some song: **52 buys, 350.00 USDC (17.9% of volume)**.
-- Volume excluding the `0x7234` wallet: 1,704.30.
-- The Safe owner key bought once (1.00) and is itself a creator wallet on a song. The deployer key never bought (0 buys; the same filter finds 24 for the `0x7234` wallet, so the zero is real).
+- The Safe owner key bought once (1.00) and is itself a creator wallet on a song. The deployer key never bought (0 buys; the same filter finds 24 for the second wallet in the table, so the zero is real).
 
-These are wallet facts. Which person holds which wallet is not established here, except where a public repo already says so.
+These are wallet facts from public chain data, shown truncated. Which person holds which wallet is not established in this doc.
 
 ### 3.5 The fee wallet's flows
 
 | Direction | Amount | Detail |
 |---|---|---|
 | In | 195.63 USDC | 234 transfers from the contract, nothing else |
-| Out | 15.85 USDC | six payments to `0x9c780e530f8fcdfb8c71680c87d2ae0573070164` (an EOA): 0.16, 2.57, 1.78, 1.00, 7.20, 3.14 |
-| Out | 100.00 USDC | one payment to `0xd026cf3ef95c3061a95bc2e0fb4cfe71f0872a12`, block 52,428,298, 2026-10-10 15:25 UTC |
-| Balance | **80.88 USDC**, 0.00043 ETH | `balanceOf` |
+| Out | 15.85 USDC | six payments to `0x9c78...0164` (an EOA): 0.16, 2.57, 1.78, 1.00, 7.20, 3.14 |
+| Out | 100.00 USDC | one payment to `0xd026...2a12`, block 52,428,298, 2026-10-10 15:25 UTC |
+| Balance | **81.18 USDC** at block 52,565,323 (80.88 at block 52,565,290, before the last buy in the set added 0.30), 0.00043 ETH | `balanceOf` at a named block, same answer from the Tenderly gateway and from mainnet.base.org |
 
-Scope: the Safe's logs were scanned only from the contract's deploy block. Anything the Safe did between its own creation in February and 25 July was not read.
+Scope, and one gap it leaves: 195.63 in minus 115.85 out is 79.78, and the Safe holds 81.18. The other 1.40 USDC reached it by a path this scan cannot see. The scan reads the Safe's own logs and the transactions that touched the contract, from the contract's deploy block; a plain USDC transfer into the Safe from a third party, or anything before 25 July, leaves no log on either address. So "the contract is its only source of USDC" is true of the scanned transactions and not proven beyond them.
 
 ## 3.6 Where the artist share goes
 
@@ -204,40 +203,41 @@ To the wallets in the song's own `creator_wallets` list, in the song's own `crea
 
 **How it relates to WaveWarZ battles.** Same team, different product, different chain. WaveWarZ is on Solana: two tracks, a timed battle, traders buy and sell on a bonding curve, a winner is decided, fees are about 1.5% of trade volume. WaveZStation is on Base: one song, no end date, no selling, and 55% of every dollar leaves the buyer for good (45 to the artist, 10 to the platform). The artists overlap; the wallets and the ledgers do not.
 
-## 4.1 The $1,000 buy, with real numbers
+## 4.1 What a 1,000 USDC buy does, as contract behaviour
 
-Zaal's idea, as published in the round-ten memo: a 1,000 buy on the best artist, making them the first artist with four figures, "which 45% would immediately go to you".
+The idea on the table, as published in the round-ten memo: a 1,000 buy on the best artist, making them the first artist with four figures, "which 45% would immediately go to you". This section says what the contract does with such a buy. It is not a plan, and the figures for any particular wallet are in the private companion note.
 
-State at block 52,565,323: Saturday in LA has 370.80 shares. The `0x7234` wallet holds 171.00 of them (46.12%, and the contract's own view returns 4611 basis points). That wallet holds 3.43 USDC, so the money is not in it today.
+State at block 52,565,323: the top song, Saturday in LA, has 370.80 shares held by 14 wallets. The largest holder has 46.1%, a creator wallet of the song has 28.9%, a third wallet 16.7%, and the other 11 together 8.3%.
 
-**One buy of 1,000 USDC on Saturday in LA:**
+**One buy of 1,000 USDC on that song:**
 
 | Where it goes | USDC | When |
 |---|---|---|
 | Platform Safe | 100.00 | same transaction |
-| Creator wallet `0x7e1e...a811` | 225.00 | same transaction |
-| Creator wallet `0x73A8...0c5b` | 225.00 | same transaction |
-| Fan share to the buying wallet itself (171.00 / 370.80) | **207.52** | claimable at once |
-| Fan share to `0x7e1e...a811`, which also holds 107.00 shares | 129.85 | claimable |
-| Fan share to `0xb79c...7932` (62.00 shares) | 75.24 | claimable |
-| Fan share to the other 11 holders (30.80 shares) | 37.39 | claimable |
+| Creator wallet 1 | 225.00 | same transaction |
+| Creator wallet 2 | 225.00 | same transaction |
+| Fan share to the largest existing holder (46.1%) | 207.52 | claimable at once |
+| Fan share to the creator wallet that also holds shares (28.9%) | 129.85 | claimable |
+| Fan share to the third holder (16.7%) | 75.24 | claimable |
+| Fan share to the other 11 holders | 37.39 | claimable |
 
-- **What the artist side receives:** 450.00 as creators. Wallet `0x7e1e` receives 225.00 plus 129.85, so **354.85 to one wallet and 225.00 to the other**. "The artist gets 45%" is true of the creator split; one creator wallet gets more because it bought its own song.
-- **Price impact:** none. There is no price. The only thing that moves is ownership of future fan share.
-- **What Zaal's wallet holds after:** 1,171.00 of 1,370.80 shares, **85.4%** of the song. Claimable on that song: the 65.93 already there plus 207.52, so 273.45. Claimable across all 20 songs it holds: 96.20 today, 303.72 after. Net cost of the buy after claiming its own fan share: **792.48 USDC**.
-- **What it earns later:** 38.4 cents of each later dollar on that song at first, falling as others buy. To recover 792.48 from later buyers takes about **4,797 USDC of further sales on that one song** (about 2,062 if its share never diluted, which it would). The song has sold 370.80 in 34 days. The whole platform has sold 1,956.30 in 80 days.
-- **The two headline claims:** both hold today. No buy has ever exceeded 100.00, and no song has reached 1,000 in sales, so this would be the first four-figure buy and the first four-figure song (1,370.80).
-- **Order of buys changes the split.** Because a wallet's earlier shares earn from its own later buys, the same 1,000 sent as two buys of 500 returns 277.14 to the buyer instead of 207.52, and as ten buys 323.10 (limit 332.44). Every dollar of that difference comes out of the other 13 holders' share. It is a property of the contract, stated so nobody is surprised by it.
-- **A song with no buyers** behaves differently again: the first buyer gets their own 45% back, so 1,000 there is 450 to the artist, 100 to the platform, 450 back, and 100% of the shares.
+- **If the buyer holds no shares in the song,** all 1,000 leaves them: 450 to creators, 100 to the platform, 450 to earlier holders. They end with 1,000 of 1,370.80 shares (72.9%).
+- **If the buyer already holds shares,** their own slice of the 450 comes back to them. For the largest holder that is 207.52, a net cost of 792.48 and 85.4% of the shares afterwards.
+- **What the artist side receives:** 450.00 as creators. Because one creator wallet also bought its own song, it receives 225.00 plus 129.85, so 354.85 to one wallet and 225.00 to the other.
+- **Price impact:** none. There is no price. The only thing that moves is who owns the future fan share.
+- **What a holder earns later:** their share of 45 cents on each later dollar, falling as others buy. A holder at 85.4% would need about 4,797 USDC of further sales on that one song to take 792.48 back out (about 2,062 if the share never diluted, which it would). The song has sold 370.80 in 34 days and the whole platform 1,956.30 in 80.
+- **The two headline claims:** both hold today. No buy has ever exceeded 100.00 and no song has reached 1,000 in sales, so any 1,000 buy would be the first four-figure buy, and on this song it would make the first four-figure song (1,370.80).
+- **Earlier shares earn from later buys by the same wallet.** This follows from the rule in section 4 and it means the result of several buys is not the same as one buy of the same total. Anyone designing a quest or a promotion on top of this contract should know it; section 5 covers the quest side.
+- **A song with no buyers** is the special case from section 4: the first buyer's own 45% is credited back to them.
 
-**Risks, as facts:**
+**Properties that matter to anyone buying, as facts:**
 
 1. The money cannot be withdrawn or sold. The only way back is other people buying the same song.
 2. The contract is unverified. The split is observed, not read. One owner key can pause all buys or one song. The owner's USDC rescue reverted in simulation, which is reassuring and is not an audit.
 3. The platform fee Safe is 1 of 1.
-4. Concentration. After the buy the `0x7234` wallet would be 42% of all volume ever (1,252 of 2,956.30). The "first four-figure artist" line would describe a purchase by a team member, and a reader with a block explorer can see that in one click.
-5. A creator wallet of the target song is already its second-largest holder. 28.9% of the fan share of any buy goes back to that wallet on top of the creator split. Who holds the two creator wallets is unconfirmed.
-6. Top spot is close: the second song is 106.80 behind. The target should be fixed at the moment of the buy.
+4. Volume is concentrated: one wallet is 25.1% of everything ever bought and the top five are 59.7%. A single 1,000 buy would be a third of all volume to date, and anyone with a block explorer can see which wallet made it.
+5. A creator wallet of the top song is its second-largest holder, so 28.9% of the fan share of any buy there goes to that wallet on top of the creator split.
+6. The top spot is close: the second song is 106.80 behind.
 7. Tax and securities treatment of fan-share earnings is not assessed here.
 
 ## 5. Verifying a purchase (for the quest verifier)
@@ -281,7 +281,7 @@ The buyer first approves USDC to the contract, then calls `buyAccess`. `buyAcces
 
 **Which song, release or collection.** The chain knows only songs: one bytes32 `songId` per song, no album or collection id. Anything wider is grouped off chain. The site API gives each song an `artist_id` and an `artist` name, so "any song by artist Y" is the set of `wavestation_song_id` values sharing one `artist_id`, and "any song" is every id for which `songExists` is true. A quest is valid when the event's `songId` is in the allowed set, its `buyer` is the user's wallet, its `amount` is at least the minimum, and its block time is inside the window.
 
-**Worked example,** the transaction shared as the reference, `0xdc2945a75e914bf93356dbf6735d895989e7653103eddfee4c0cb91bc586a7c9`: one `AccessPurchased`, buyer `0x7234c36a71ec237c2ae7698e8916e0735001e9af`, song `0x5ede9f12d38a2ed1c0cc618fc206d16dbd8067751ac5ab2a9a830d2994d0b97c` (AI LUI - The Album), amount 1.000000 USDC, 2026-09-20 20:53 UTC.
+**Worked example,** the transaction shared as the reference, `0xdc2945a7...a7c9`: one `AccessPurchased`, buyer `0x7234...e9af`, song `0x5ede9f12d38a2ed1c0cc618fc206d16dbd8067751ac5ab2a9a830d2994d0b97c` (AI LUI - The Album), amount 1.000000 USDC, 2026-09-20 20:53 UTC.
 
 **Read functions, no ABI file needed:**
 
@@ -385,7 +385,7 @@ For scale: WaveWarZ did 52.24 SOL in the last 30 days and 380.95 SOL in its best
 | Quick battles are a floor, not growth | 18 to 35 SOL a month every month since January; October to date 4.40 with no main event |
 | Paid entries | 46 transfers of 0.005 or 0.02 SOL in 20.5 days (10 of them one wallet's round trip) produced more treasury income than all trade fees. Count of entries, not SOL traded, is what the baseline income tracks |
 | A 10% sale beats a 0.5% trade | WaveZStation's fee on 1,527.50 USDC out-earned WaveWarZ's trade fee on 52.24 SOL (about 5,600 dollars) by 5.5 times |
-| WaveZStation's one spike | week of 21 September, 816.00 USDC: the daily-quest work started that week, and three wallets (`0x6c1d`, `0xccf2`, `0x7234`) account for most of the large buys. A quarter of all WaveZStation volume is one wallet |
+| WaveZStation's one spike | week of 21 September, 816.00 USDC: the daily-quest work started that week, and three wallets account for most of the large buys. A quarter of all WaveZStation volume is one wallet |
 
 No lever here is a recommendation to trade. They are what the record shows moved the number.
 
@@ -411,11 +411,11 @@ No lever here is a recommendation to trade. They are what the record shows moved
 |---|---|---|---|---|
 | 1 | Send the section 5 fragment to the quest builder | Zaal (his message to send) | outbound, his tap | the verifier reads `AccessPurchased` instead of `tx.to` |
 | 2 | Answer the four questions in 6.6 | Zaal | his facts | each has a wallet or a yes/no beside it |
-| 3 | Correct the 801.78 figure and the $95 estimate in the round-ten memo and plan | poidhz lane | PR | the memo says 370.80 and 207.52 with this doc as the source |
+| 3 | Correct the 801.78 sales figure in the round-ten memo and anything derived from it | poidhz lane | PR | the memo says 370.80 with this doc as the source |
 | 4 | Ask the WaveZStation operator to verify the contract on Basescan | Zaal to the team | outbound, his tap | the Contract tab shows source; section 5's ABI can be replaced with the official one |
 | 5 | Add WaveZStation to the WaveWarZ ICM box, or give it its own | Zaal-gated box edit | box PUT | the box names the chain, the contract and the 45/45/10 split |
 | 6 | Fill `lib/distributions.ts` in wwtracker with the 28 September distribution and the recipient wallets once question 1 is answered | wavewarz lane | PR | four TBD rows replaced by measured ones |
-| 7 | Re-run `data/scan-logs.py` before any buy is made, and re-read the target song's shares | whoever plans the buy | script | the numbers in 4.1 carry that day's block |
+| 7 | Re-run `data/scan-logs.py` whenever these figures are quoted again | whoever quotes them | script | the figures carry that day's block |
 
 ## Sources
 

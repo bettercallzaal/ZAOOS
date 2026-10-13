@@ -79,7 +79,7 @@ Not read: the `/share/buy/<tx>` pages that buyers post after a purchase. Whether
 | Sitting unclaimed | **365.94 USDC**, spread over 182 holder-song positions |
 | Buyers who have never claimed | 20 of 35 |
 | Claimers who bought again after their first claim | **12 of 15** |
-| One early buyer of one song | put in 7.00, has 45.44 waiting |
+| Unclaimed as a share of the fan share generated | 41.6% |
 
 Claiming and re-buying go together in this data: four of five people who have claimed came back and bought. Twenty wallets have money waiting and have never pressed the button. Whether they know is UNKNOWN; the site has a "Cash out" control, and nothing in the pages read shows a notification.
 

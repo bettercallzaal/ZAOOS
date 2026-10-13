@@ -170,6 +170,7 @@ import {
   sleepCheckinEnabled,
   sleepKeyboard,
 } from './sleep-checkin';
+import { FA_CALLBACK, FA_FINISHED_TEXT, faKeyboard, faStepText, faWalkthroughEnabled, nextStep, parseFaCallback } from './fa-walkthrough';
 import { takePendingAnswer } from './pending-answers';
 import { tryInstantRelayReply } from './relay-bridge';
 import { commitResearchDoc } from './research-doc';
@@ -737,6 +738,45 @@ bot.callbackQuery(XD_CALLBACK, async (ctx) => {
   if (chatId === undefined) return;
   await sendXDeskCard(chatId, { url: card.url, handle: card.author, id: card.postId, note: card.note }).catch((e) =>
     console.error('[zoe/x-desk] redo failed:', (e as Error)?.message),
+  );
+});
+
+// Fractured Atlas walkthrough (fa-walkthrough.ts): /fa sends step 1, and the
+// buttons ("fa:3:done" / "fa:3:back") swap the message for the next step. No
+// other handler reads "fa:", and /fa is a command, so the generic text router
+// below never sees it.
+bot.command('fa', async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  if (!faWalkthroughEnabled()) {
+    await ctx.reply('The Fractured Atlas walkthrough is off.').catch(() => {});
+    return;
+  }
+  featureRan('fa-walkthrough', 'start');
+  await ctx.reply(faStepText(0), { reply_markup: faKeyboard(0) }).catch((e) =>
+    console.error('[zoe/fa-walkthrough] send failed:', (e as Error)?.message),
+  );
+});
+
+bot.callbackQuery(FA_CALLBACK, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  if (!faWalkthroughEnabled()) {
+    await ctx.answerCallbackQuery({ text: 'The Fractured Atlas walkthrough is off.' }).catch(() => {});
+    return;
+  }
+  const tap = parseFaCallback(ctx.callbackQuery.data);
+  if (!tap) {
+    await ctx.answerCallbackQuery({ text: 'That step no longer exists. Type /fa to start again.' }).catch(() => {});
+    return;
+  }
+  const next = nextStep(tap);
+  await ctx.answerCallbackQuery().catch(() => {});
+  if (next === 'finished') {
+    featureRan('fa-walkthrough', 'finished');
+    await ctx.editMessageText(FA_FINISHED_TEXT).catch(() => {});
+    return;
+  }
+  await ctx.editMessageText(faStepText(next), { reply_markup: faKeyboard(next) }).catch((e) =>
+    console.error('[zoe/fa-walkthrough] edit failed:', (e as Error)?.message),
   );
 });
 

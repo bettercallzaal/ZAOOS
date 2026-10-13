@@ -2,7 +2,7 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-07-01
+last-validated: 2026-10-13
 superseded-by:
 related-docs:
 original-query: "Bonfire knowledge-graph admin labeling - what unblocks agent writes (recurring blocker across docs)"
@@ -22,7 +22,7 @@ I have comprehensive data from both the codebase and web sources. Now I have eve
 topic: Bonfire knowledge-graph admin labeling - what unblocks agent writes
 type: blocker-analysis
 status: partially-resolved
-last-validated: 2026-07-01
+last-validated: 2026-10-13
 related-docs: 722i, 807, 620, 717, 754, 620d
 original-query: "Bonfire knowledge-graph admin labeling - what unblocks agent writes (recurring blocker across docs)"
 ---
@@ -103,3 +103,23 @@ Docs 722, 722i, 620, 754, 807, and the ecosystem-monitor all flag the same issue
 ---
 
 **Summary:** Agent writes to Bonfire were never actually blocked - only reads were gated behind `/labeling/hybrid` (403 for non-admin keys). As of 2026-06-25, the `/delve` endpoint provides non-admin read access and is verified working. The remaining unblock is a single escalation to Joshua.eth to run admin labeling, which re-enables `/vector_store/search` for semantic recall. The blocker recurred across docs because the `/delve` workaround was found in June without retroactively updating May-era docs. **Next: message Joshua.eth.**
+
+---
+
+## Updated 2026-10-13
+
+**ATTENTION: bonfires.ai domain is now unreachable.** DNS lookup for both `bonfires.ai` and `www.bonfires.ai` failed on 2026-10-13 (ENOTFOUND). The Obsidian Publish docs at `publish.obsidian.md/bonfires/` are also unreachable. This may indicate the platform is down, rebranded, or shut down. ZOE's integration points at `https://tnt-v2.api.bonfires.ai` (the API subdomain) which was not independently tested in this pass — ZOE could still function if only the marketing site is down. Recommend verifying the API endpoint is live and asking Carlos/Joshua for status.
+
+**Graphiti (underlying engine) reached v0.30.2.** Releases since the prior validation:
+- v0.29.3 (2026-07-27): FalkorDB routing fixes, no breaking changes
+- v0.30.0/v0.30.1 (2026-09-01): **Breaking** — Neo4j queries now run against the configured database (default `neo4j`). Affects self-hosted Neo4j Enterprise with non-default databases. Standard setups unaffected.
+- v0.30.2 (2026-09-08): FalkorDB fulltext search perf fix; saga node bug fix
+
+ZOE's `/delve` + `/knowledge_graph/episode/create` integration is unchanged in the live codebase (confirmed in `bot/src/zoe/recall.ts` and `scripts/ecosystem-monitor/to-bonfire.sh`). The `/vector_store/search` admin-labeling gap remains unresolved — no evidence Joshua.eth escalation was completed.
+
+Sources:
+- [FULL] GitHub getzep/graphiti releases — https://github.com/getzep/graphiti/releases (fetched 2026-10-13)
+- [FAILED] bonfires.ai — DNS ENOTFOUND (2026-10-13)
+- [FAILED] publish.obsidian.md/bonfires/ — DNS ENOTFOUND (2026-10-13)
+- [FULL - codebase] bot/src/zoe/recall.ts — /delve still primary; confirmed unchanged
+- [FULL - codebase] scripts/ecosystem-monitor/to-bonfire.sh — API URL still tnt-v2.api.bonfires.ai

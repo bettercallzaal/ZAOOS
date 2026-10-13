@@ -22,7 +22,7 @@ Every fetch below was made on **2026-10-13 between 22:55 and 23:00 UTC** with cu
 | 1 | USE **WaveWarZ** and **WaveZStation**, exactly, everywhere. | Those are the spellings in each site's own title and visible text. Section 2 has the wrong-spellings list. |
 | 2 | COPY what wavewarz.info already does onto wavewarz.com and wavezstation.com. | The team's own analytics site has a sitemap, crawler rules, an llms.txt, a canonical tag and structured data. The two product sites have none of them. The know-how is in the house. |
 | 3 | SHIP an llms.txt and a real robots.txt on both product sites first. | Four files, no design work. Both sites return 404 for llms.txt and sitemap.xml today; one has a robots file with no rules and the other has no robots file. |
-| 4 | PUT TEXT in the wavewarz.com homepage. | The page a crawler receives has a title, a description and **zero characters of visible body text**. Its /how-it-works and /docs pages return 200 and carry only the site title. |
+| 4 | PUT TEXT in the wavewarz.com homepage. | The page a crawler receives has a title, a description and **zero characters of visible body text**. Its /how-it-works and /docs pages return 200 and their bodies are also empty; the only words on them are the site title in the `<title>` tag. |
 | 5 | ASK the team one question about the "WARZ" token before publishing any "no token" line, then ask Bitget to correct its listing if the answer is what the team's site says. | Bitget describes a native WARZ token with a market cap. The team's site says "no platform token". The token address Bitget gives exists on Solana and has a supply of zero. |
 | 6 | TREAT the audit's search-ranking and competitor claims as UNVERIFIED. | They rest on search result pages that were not re-run here. |
 
@@ -31,16 +31,16 @@ Every fetch below was made on **2026-10-13 between 22:55 and 23:00 UTC** with cu
 | Name | What it is, in one sentence | Chain and money | Site | Who runs it |
 |---|---|---|---|---|
 | **WaveWarZ** | Live music battles: two artists or two songs go head to head and fans trade short-lived battle tokens on who wins, with the artist paid on every trade. | Solana, SOL | wavewarz.com | Hurric4n3Ike (founder, developer, MC), Candytoybox (design, marketing), Zaal (ecosystem, partnerships), per the WaveWarZ ICM box |
-| **WaveZStation** | Buy into a song instead of streaming it: every purchase pays the artist 45%, earlier buyers of that song 45% and the platform 10%. | Base, USDC | wavezstation.com | the same team; the site's builder is the WaveWarZ developer |
-| **WaveWarZ Intelligence** | The scoreboard: every battle, volume, payout and leaderboard, read from the chain, with a free public API. | reads Solana | wavewarz.info | the WaveWarZ team. Which member deploys it is not stated on the site |
+| **WaveZStation** | Buy into a song instead of streaming it: every purchase pays the artist 45%, earlier buyers of that song 45% and the platform 10%. | Base, USDC | wavezstation.com | the WaveWarZ team, with the WaveWarZ developer building the site and listing the songs: as stated by Zaal, 2026-10-13. The site itself names no team. |
+| **WaveWarZ Intelligence** | The scoreboard: every battle, volume, payout and leaderboard, read from the chain, with a free public API. | reads Solana | wavewarz.info | WaveWarZ, per the site: its footer reads "2026 WaveWarZ. All rights reserved." and its llms.txt names wavewarz.com as the main platform. Which team member deploys it is not stated on the site. |
 | **wwtracker** | The lab: an open-source tracker of the treasury, the fee model and the decoded program, where new views are prototyped before they move to the main sites. | reads Solana | wwtracker.vercel.app, repo bettercallzaal/wwtracker (MIT) | Zaal |
 | **The protocol and SDK** | The written standard for what a "battle" and a "song" are across the products, plus read-only code to query them. | n/a | not public yet | Zaal |
 | **WaveWarZ Africa** | Per-country battle leagues run with a partner network. | Solana | appears on wavewarz.info as the handle WaveWarzAfrica | announced 4 May 2026 with RAM SongChain ([doc 608](../../events/608-wavewarz-africa-ram-songchain-may4/)); the partner's own spelling of its name is to be confirmed |
-| **The AI Tournament** | A bracket of AI artists battling on WaveWarZ. | Solana, SOL | on wavewarz.info when live | the WaveWarZ team. In the public battle data, the series on 19 and 20 July 2026 is the largest two days in the platform's history (342 SOL) |
+| **The AI Tournament** | A bracket of AI artists battling on WaveWarZ. | Solana, SOL | on wavewarz.info when live | a WaveWarZ event: [doc 743](../743-wavewarz-whitepaper-v2-deep-dive/) records registration for an 8 or 16 slot AI Artist Tournament on the WaveWarZ roadmap. Who organises it is not separately sourced here. In the public battle data, the series on 19 and 20 July 2026 is the largest two days in the platform's history (342 SOL). |
 
 How they relate: WaveWarZ is the event, WaveZStation is the catalogue, Intelligence is the record, wwtracker is the workshop, the protocol is the grammar they are meant to share. The artists overlap across the first two; the wallets and ledgers do not, because they are on different chains.
 
-Two things the map cannot say from public sources: whether a company stands behind the products, and who deploys wavewarz.info. Both are questions for the team.
+What is and is not sourced in the last column: the WaveWarZ row comes from the ICM box, the Intelligence row from the site's own footer and llms.txt, the WaveZStation row from Zaal's statement, and the tournament row from doc 743. Two things no source here says: whether a company stands behind the products, and who deploys wavewarz.info. Both are questions for the team.
 
 ## 2. Naming
 
@@ -70,7 +70,7 @@ The audit was a crawler's-eye read of wavewarz.com dated 10 October. Each claim 
 | /sitemap.xml is 404 | **CONFIRMED** | 404, an HTML error page |
 | robots.txt has no directives | **CONFIRMED** | 200, 1,248 bytes, every line a comment (a content-signals preamble). Lines starting with User-agent, Allow, Disallow, Sitemap or Content-Signal: **0**. Control: the same count on wavewarz.info's robots.txt is 69. |
 | /llms.txt is 404 | **CONFIRMED** | 404 |
-| No FAQ, how-it-works or about page | **PARTLY, and worse than stated** | /about and /faq are 404. /how-it-works and /docs return **200** but their visible text is only the words "WaveWarZ Music Battles" (22 and 24 characters). A crawler sees pages that exist and say nothing. |
+| No FAQ, how-it-works or about page | **PARTLY, and worse than stated** | /about and /faq are 404. /how-it-works and /docs return **200** with **0 characters** of visible text in the body. The only words on either page are "WaveWarZ Music Battles" in the `<title>` tag. A crawler sees pages that exist and say nothing. (Corrected 2026-10-13: this row first said 22 and 24 characters of visible text; that count had included the title.) |
 | Best content lives off-domain (litepaper, artist form) | NOT RE-CHECKED | the litepaper and the form were not fetched |
 | Brand query not owned; competitors rank on category terms | **UNVERIFIED** | search result pages were not re-run |
 | Litepaper figures (800 to 2,500 dollars a match, 50+ artists), a 16,000 dollar clip | **UNVERIFIED** | not fetched. Measured instead: the median Sunday main-event day in 2026 did 5.14 SOL |

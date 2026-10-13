@@ -19,7 +19,7 @@ All figures were read on **2026-10-13 between 19:25 and 19:55 UTC**. WaveZStatio
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | USE the `AccessPurchased` event as the only proof of a purchase. Do NOT verify by `tx.to` or `tx.from`. | 111 of 234 buys were sent through the ERC-4337 EntryPoint, 30 through a router contract and 11 through a third relay. Only 123 of 234 call the contract directly. The event is emitted on all 234. Section 5 has the exact fragment. |
+| 1 | USE the `AccessPurchased` event as the only proof of a purchase. Do NOT verify by `tx.to` or `tx.from`. | 111 of 234 buys do not call the contract directly: 74 were sent through the ERC-4337 EntryPoint, 30 through a router contract and 7 through another relay. Only 123 of 234 call it directly. (Corrected 2026-10-13: this row first said 111, 30 and 11, which counted claim transactions with the buys. The 123 and the 47% were right.) The event is emitted on all 234. Section 5 has the exact fragment. |
 | 2 | CORRECT the round-ten memo before any buy is planned: the site's "pool" figure is gross sales, not 45% of sales. | Saturday in LA has sold **370.80 USDC**, not about 802. Read from the contract's own `getSong` and matched by summing 33 buy events. |
 | 3 | DESCRIBE a buy as three flows, not one: 10% platform, 45% creator wallets, 45% to whoever already holds the song, the buyer included. | Section 4.1. A wallet that already holds shares gets part of its own fan share back, so "45% goes to the artist and the rest is spent" is not what the contract does. |
 | 4 | SAY "45% to the artist" only with the wallet list beside it. | The 45% goes to the song's creator wallets, split by the song's own basis points. Saturday in LA has two wallets at 50/50, and one of them is also the third-largest buyer on the whole platform. |
@@ -242,7 +242,7 @@ State at block 52,565,323: the top song, Saturday in LA, has 370.80 shares held 
 
 ## 5. Verifying a purchase (for the quest verifier)
 
-The single reference transaction was not enough because buys reach the contract three ways. A verifier that checks `tx.to == contract` or `tx.from == user` misses 47% of real buys.
+The single reference transaction was not enough because buys reach the contract four ways (direct, ERC-4337 EntryPoint, the router, one other relay). A verifier that checks `tx.to == contract` or `tx.from == user` misses 47% of real buys.
 
 **Contract that records purchases (Base, chain 8453):** `0x6EEe0a8ebd1446a3a77a8F720bF37232fD88b255`. One contract for all songs.
 

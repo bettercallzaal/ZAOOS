@@ -49,11 +49,15 @@ Nothing defaults to "allow". The process refuses to start when the bot token, th
    ANTHROPIC_API_KEY=<a model key>
    HELPER_DOCS_DIR=/home/zaal/.zao/nc-helper/docs
    HELPER_ALLOWED_IDS=<your own numeric Telegram id; it will not start without at least one>
-   # optional: HELPER_MODEL=claude-opus-5-5 (default is claude-haiku-5-5, the smallest)   HELPER_DAILY_CAP=40
+   # optional: HELPER_MODEL=claude-opus-5-5 (default is claude-haiku-5-5, the smallest)
+   # optional: HELPER_DAILY_CAP=40
    ```
 
-3. Copy `AGENT.md`, `README.md` and `WALKTHROUGH.md` from the site repo's
-   `handoff/` folder into `HELPER_DOCS_DIR`.
+3. Copy the three files into `HELPER_DOCS_DIR`. They live in two repos:
+   `AGENT.md` and `WALKTHROUGH.md` from `handoff/` in `bettercallzaal/north-creek`,
+   and `README.md` from the root of `north-creek-site` (his instruction sheet;
+   there is no `handoff/README.md`). After the site repo moves to his account,
+   take `README.md` from his copy.
 4. Install and start the unit:
    `cp bot/systemd/nc-helper.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now nc-helper`
 5. Have the collaborator message the bot. It refuses and tells him his id. Add that id

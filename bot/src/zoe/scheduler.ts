@@ -20,6 +20,10 @@ import cron from 'node-cron';
 type ScheduledTask = { stop: () => void };
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import { denyList, runSelfScout, scoutLogLine, scoutStatusLine, searchRepos, selfScoutEnabled } from './self-scout';
+import { repoMentionTest } from './self-upgrade';
+import { findDocsMatching } from './research-dedupe';
+import { enqueueWork as enqueueScoutWork, queuedInputs as queuedWorkInputs } from './work-loop';
 import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
 import { runCockpit } from '../cockpit/cockpit';
@@ -1510,6 +1514,51 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           );
         } catch (err) {
           console.error('[zoe/scheduler] reasoning tick failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Self-scout (self-scout.ts, doc 2662) - Sunday 19:00 UTC. NOT APPROVED TO RUN:
+  // it returns at once unless ZOE_SELF_UPGRADE=1 and ZOE_SELF_SCOUT=1, and the
+  // second flag waits on Zaal's answer to doc 2662. One GitHub search, at most
+  // ONE `resource` item queued, one status line. No model call here.
+  tasks.push(
+    cron.schedule(
+      '0 19 * * 0',
+      async () => {
+        if (!selfScoutEnabled()) return;
+        if (!(await claimFire('self-scout'))) return;
+        try {
+          const researchDir = join(opts.repoDir, 'research');
+          const out = await runSelfScout({
+            now: new Date(),
+            search: (url) => searchRepos(url),
+            queuedInputs: () => queuedWorkInputs('resource'),
+            findDocs: async (link) => {
+              // findDocsMatching answers [] for an unreadable tree, which would
+              // make every repo look new. Prove the library is there first.
+              if ((await fs.readdir(researchDir)).length === 0) throw new Error('research library is empty');
+              return findDocsMatching(researchDir, repoMentionTest(link));
+            },
+            enqueue: (input) => enqueueScoutWork(input, undefined, 'resource'),
+            deny: denyList(),
+          });
+          console.log(`[zoe/scheduler] self-scout: ${scoutLogLine(out)}`);
+          if (out.kind !== 'queued') return;
+          featureRan('self-scout', `${out.link.owner}/${out.link.repo}`);
+          const line = scoutStatusLine(out.link);
+          if (opts.routingDeps) {
+            await sendToZaalRouted(opts.routingDeps, line, { kind: 'status' });
+          } else {
+            await opts.bot.api.sendMessage(opts.zaalTgId, line);
+          }
+        } catch (err) {
+          // The sentinel is NOT released: a failed pass waits for next week
+          // rather than retrying into the same failure, and an item that was
+          // queued before a failed send must not be queued a second time.
+          console.error('[zoe/scheduler] self-scout failed, nothing more this week:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

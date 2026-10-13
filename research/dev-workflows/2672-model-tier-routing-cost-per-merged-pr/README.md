@@ -19,22 +19,22 @@ tier: STANDARD
 
 | # | Decision | The number behind it |
 |---|---|---|
-| 1 | **FIX the meter first.** `zao-spend` prices every Opus message at Opus 4.1 rates and counts PRs in the wrong repos. | Its rate table gives **$1,606** for 12 Oct. At Anthropic's current list prices the same tokens cost **$338.65**, so the meter reads **4.74x high**. Its 24-hour run at 19:27 ET on 13 Oct printed $2,179.93 and "$198.18 per PR", counting 11 PRs opened in 6 hard-coded repos. PRs actually merged: **41 on 12 Oct, across 8 repos, 1 of which (ZAOOS) is on the meter's list**. Real cost: **$8.26 per merged PR** on 12 Oct, **$13.25** on 13 Oct (28 merged by 19:33 ET). |
+| 1 | **FIX the meter first.** `zao-spend` prices every Opus message at Opus 4.1 rates and counts PRs in the wrong repos. | Its rate table gives **$1,606** for 12 Oct. At Anthropic's current list prices the same tokens cost **$338.65**, so the meter reads **4.74x high**. Its 24-hour run at 19:27 ET on 13 Oct printed $2,179.93 and "$198.18 per PR", counting 11 PRs opened in 6 hard-coded repos. PRs actually merged across both owner accounts: **55 on 12 Oct, across 13 repos, 1 of which (ZAOOS) is on the meter's list**, and 33 on 13 Oct by 19:33 ET. Real cost: **$6.16 per merged PR** on 12 Oct, **$11.24** on 13 Oct. This doc's first count made the meter's own mistake (see "A fault in this doc's first count"). |
 | 2 | **KEEP the evaluator gate. Run it as one fresh session per PR instead of one long session.** | The evaluator lane cost **$89.58 (26% of 12 Oct) and $84.07 (23% of 13 Oct)**, the single largest or second largest lane both days. It earns its place: 47 PRs updated since 12 Oct carry a `NEEDS_WORK` comment against 82 with `PASS` (GitHub search; rough, see Method). A long-lived evaluator re-reads everything it has ever reviewed on each message. |
-| 3 | **CUT wake-ups of idle sessions with a large context.** Close the lane with a handoff instead (`.claude/rules/session-boundaries.md` already says this). | Messages that rewrote more than half of a context over 100k tokens: **47 on 12 Oct ($65.46, 19% of the day) and 58 on 13 Oct ($125.64, 34% of the day)**. One rewrite of a 640k context costs about $5 at the 1-hour cache-write rate. This is the largest single avoidable item found. |
-| 4 | **CUT lanes that hold a session open without merging.** | Shipping lanes in repos with **no PR merged that day** cost **$29.87 (8.8%) on 12 Oct and $63.96 (17.2%) on 13 Oct**. Some of that produced non-PR work (content, notes), so read it as a ceiling. Lane count did not move the coordination share: 29 working directories and 23 both ran at 51 to 54% coordination. |
+| 3 | **CUT wake-ups of idle sessions with a large context.** Close the lane with a handoff instead (`.claude/rules/session-boundaries.md` already says this). | Messages that rewrote more than half of a context over 100k tokens: **47 on 12 Oct ($65.46, 19% of the day) and 58 on 13 Oct ($125.64, 34% of the day)**. That definition catches any large rewrite whatever its cause, so the gap before each one was measured: **29 of the 47 ($41.85, 12% of the day) and 49 of the 58 ($108.86, 29% of the day) came after 60 minutes or more of silence in that session**, which is the cache's 1-hour lifetime. The rest followed shorter gaps or opened a transcript, and their cause (compaction, cleared tool results, a resumed session) was not separated. One rewrite of a 640k context costs about $5. This is the largest single avoidable item found. |
+| 4 | **CUT lanes that hold a session open without merging.** | Shipping lanes whose own repo had **no PR merged that day** cost **$29.87 (8.8%) on 12 Oct and $63.96 (17.2%) on 13 Oct**. Some of that produced non-PR work (content, notes), and a lane can merge in a repo other than its own, so read it as a ceiling. Lane count did not move the coordination share: 29 working directories and 23 both ran at 51 to 54% coordination. |
 | 5 | **ROUTE at the spawn boundary, never mid-session.** Research fetching and summarising go to Sonnet subagents; mechanical cleanup to the Haiku `zao-formatter` agent or a script; well-specified mechanical code to Codex. | Only **6.9% and 1.6%** of spend ran on Sonnet, and under 1% on Haiku, although `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` is set and `.claude/agents/zao-builder.md`, `zao-evaluator.md` (both `model: sonnet`) and `zao-formatter.md` (`model: haiku`) exist. **The tiers are configured and barely used.** |
-| 6 | **TRIAL the coordination lanes (orchestrator, evaluator, merge, grill) on Sonnet 5.5 with an Opus advisor.** Measure before adopting. | They were **54.0% and 51.1%** of spend. Re-priced at Sonnet 5.5 rates, token for token, that is **$78.82 and $93.44 a day less (23.3% and 25.2%)**. That is an upper bound that assumes the same message count and no loss in judgment, which is unmeasured. Anthropic documents this pairing: "Sonnet handles routine work and escalates planning, ambiguous failures, and completion checks to Opus". |
+| 6 | **TRIAL the coordination lanes (orchestrator, evaluator, merge, grill) on Sonnet 5.5 with an Opus advisor.** Measure before adopting. | Those working directories were **54.0% and 51.1%** of spend (a measure of where sessions ran, not of what they did). Re-priced at Sonnet 5.5 rates, token for token, that is **$78.82 and $93.44 a day less (23.3% and 25.2%)**. That is an upper bound that assumes the same message count and no loss in judgment, which is unmeasured. Anthropic documents this pairing: "Sonnet handles routine work and escalates planning, ambiguous failures, and completion checks to Opus". |
 | 7 | **SKIP Jev and third-party routers for now.** | Jev is a real product (below), but the routers built on it switch tier per turn, which is exactly the cache hazard, and they send prompts to a third party. Our spend is not a which-model-answers-this-turn problem. |
 
-**Money context, in general terms.** Tooling runs to roughly $826 a month and income is the constraint. On a subscription these list-price dollars are a consumption meter, not an invoice; the binding limit is the weekly cap, which the seat reported at 97% on 13 Oct. Everything below is a way to spend less of that cap per merged PR.
+Every dollar figure here is a list-price meter reading on a subscription, not an invoice.
 
 ## What the post actually shows
 
 The post is a 19-second video with no text body (Reddit `1x3abfq`, u/KazuKazu_hyperbowl, score 24). The brief summarised it as a cheap-model summarise, big-model solve, cheap-model format pipeline. **That is the poster's comment, not the video.** The frames show a terminal titled "AGENT STACK - OPUS PLANS - SONNET RUNS - FABLE WATCHES":
 
 - **Opus 5.5 main session**: "plans + ships the final code", effort high.
-- **"JEV - fork layer"**: answers small questions such as "file exists?", "which tool?", "keep going?" with a confidence score (0.97, 0.86, 0.85). "sharp -> stays in code, split -> up to opus". The footer reads "jev: 1,344 forks resolved without opus" and "stop paying opus prices to decide if a file exists".
+- **"JEV - fork layer"**: answers small questions such as "file exists?", "which tool?", "keep going?" with a confidence score that changes frame to frame (0.97, 0.86, 0.85 in one frame; 0.94, 0.90, 0.83 in another). "sharp -> stays in code, split -> up to opus". The footer reads "jev: 1,344 forks resolved without opus" and "stop paying opus prices to decide if a file exists".
 - **Three Sonnet 5.5 subagents**: worker ("edits + tests"), explorer ("reads codebase"), researcher ("pulls the docs").
 - **Fable 5.1 as `/advisor`**: "reads every turn, every tool call, every result", "says nothing unless it's actually wrong", "never writes code". The counter shows about 322k tokens read.
 - The command shown is `claude --advisor fable`. The watermark is **@alfa123gg**, so the Reddit poster is probably not the author of the animation.
@@ -67,27 +67,20 @@ All figures are list price at Anthropic's published rates on 2026-10-13, compute
 | API messages | 4,076 | 2,650 |
 | Median context per message | 168,459 tokens | 270,289 tokens |
 | Messages over 200k context | 39% | 68% |
-| Coordination lanes (orchestrator, evaluator, merge, grill, finance seat) | $183.03 (54.0%) | $189.55 (51.1%) |
-| Full-context cache rewrites | 47 msgs, $65.46 | 58 msgs, $125.64 |
-| PRs merged, all lane repos | 41 | 28 |
-| **Cost per merged PR, all-in** | **$8.26** | **$13.25** |
-| Cost per merged PR, shipping lanes only | $3.80 | $6.48 |
+| Coordination lanes (orchestrator, evaluator, merge, grill, one admin seat) | $183.03 (54.0%) | $189.55 (51.1%) |
+| Full-context cache rewrites, any cause | 47 msgs, $65.46 | 58 msgs, $125.64 |
+| of which after 60+ minutes of silence | 29 msgs, $41.85 | 49 msgs, $108.86 |
+| PRs merged, both owner accounts | 55 (13 repos) | 33 (10 repos) |
+| **Cost per merged PR, all-in** | **$6.16** | **$11.24** |
+| Cost per merged PR, shipping lanes only | $2.83 | $5.50 |
 
-**Cost per merged PR by repo** (shipping lanes whose working directory is in that repo, divided by PRs merged in it that day):
+**Per-repo figures are not published here.** Several of the repos are private, so the per-repo table (a day's spend beside each repo) is kept in a private note. In aggregate: among repos that had both a lane and a merge, cost per merged PR ran from under $1 to about $11 across the two days.
 
-| Repo | 12 Oct | 13 Oct |
-|---|---|---|
-| `bettercallzaal/ZAOOS` | $31.05 / 9 = **$3.45** | $59.75 / 7 = **$8.54** |
-| `bettercallzaal/zaal-dotfiles` | $44.83 / 10 = **$4.48** | $2.74 / 6 = **$0.46** |
-| `bettercallzaal/wavewarz-protocol` | $19.13 / 5 = **$3.83** | $12.33, none merged |
-| `ZAODEVZ/ZAOstock` | $13.51 / 8 = **$1.69** | no lane |
-| `bettercallzaal/north-creek` | $4.37 / 2 = **$2.19** | $7.86 / 3 = **$2.62** |
-| `bettercallzaal/zao-fractal-bot` | $11.38 / 1 = **$11.38** | $13.29, none merged |
-| `bettercallzaal/zingfisher` | $0.97, none merged | $12.24 / 2 = **$6.12** |
-| `bettercallzaal/zao-papers` | $1.47 / 2 = **$0.74** | 1 merged, no lane cost |
-| `bettercallzaal/zao-media` | $4.67, none merged | $24.56, none merged |
+**Limits.** A lane was assigned to the repo of its working directory, and lanes do work outside it. A merged PR is not a unit of value: a one-line index row and a protocol change each count as one. The both-accounts count can include a PR no lane made, so $6.16 and $11.24 are, if anything, slightly low. Two days are two data points.
 
-**Limits of this table.** A lane is assigned to the repo of its working directory, and lanes do work outside it (this lane wrote notes to another repo during the window). A merged PR is not a unit of value: one-line index rows and a protocol change both count as one. Two days are two data points. The table is good for spotting a lane that spends without merging, and weak for ranking lanes against each other.
+### A fault in this doc's first count
+
+The first version of this doc counted merged PRs in **the 14 repos the lanes' working directories resolve to** and reported 41 and 28, giving $8.26 and $13.25. That is the same fault it names in the meter: a fixed repo list returns the same number however many PRs merge elsewhere. The evaluator's review caught it. A search of both owner accounts (`is:pr is:merged user:<owner> merged:<window>`, Eastern-time windows, GitHub search API, re-run by this lane) returns **55 and 33**. The 14 and 5 that were missed sit in six repos outside the list, and some were opened by the same lanes working outside their own directory.
 
 **Seven days.** `zao-spend --days 7` reads $14,367 across 584 sessions. At the 4.74x overstatement measured above that is about **$3,030** at current list price. That is an estimate: it assumes the week's model mix matches these two days.
 
@@ -95,7 +88,7 @@ All figures are list price at Anthropic's published rates on 2026-10-13, compute
 
 **1. Context is the cost.** With the median message carrying 168k to 270k tokens of context, each message pays to read it back (Opus 5.5 cache read, $0.20 per million) and each wake-up after an hour pays to write it again ($8 per million). Summed, cache was 85% and 89% of spend. A pipeline that hands the "easy" step to a cheaper model does nothing about this unless that step runs in its own small context.
 
-**2. Half the spend is coordination.** The orchestrator and the evaluator alone were $160 of 12 Oct's $339 and $169 of 13 Oct's $371. `agents/2353-model-tiering-and-escalation` found the same shape on 2026-08-20: "The real lever is SESSION LENGTH, not model", with one orchestrator session at 69% of that day.
+**2. Half the spend ran in coordination sessions.** "Coordination" here is **where a session ran, not what it did**: it is the spend of five working directories, and some of what ran there was research or building done in place.  The orchestrator and the evaluator alone were $160 of 12 Oct's $339 and $169 of 13 Oct's $371. `agents/2353-model-tiering-and-escalation` found the same shape on 2026-08-20: "The real lever is SESSION LENGTH, not model", with one orchestrator session at 69% of that day.
 
 **3. The Sonnet floor from doc 2353 is not what is running.** That doc's decision 1 was "Sonnet is the floor for lanes". On 2026-10-13 `~/.claude/settings.json` reads `model: claude-opus-5-5`. A search of the ZAOOS research library for the decision to change it found none; other stores were not searched. Opus 5.5 now lists at $4/$20 per million, about a quarter of the Opus 4.1 rate the meter still uses, which may be why it was raised.
 
@@ -127,7 +120,7 @@ The Trello pattern is close to what this estate already has: a board as task tru
 
 - **Quality.** No measurement here says a Sonnet evaluator catches what an Opus one does. Decision 6 is a trial for that reason.
 - **The cap.** Anthropic's docs say subscription limits are "shared across all models". How the weekly cap weights Opus against Sonnet tokens is not in any page fetched, so "X% fewer dollars" is not proven to be "X% less of the cap".
-- **Cause of the 13 Oct rise.** Per-PR cost rose from $8.26 to $13.25. Rewrites nearly doubled, median context rose 60%, and the day is partial. Which of those drove it was not separated.
+- **Cause of the 13 Oct rise.** Per-PR cost rose from $6.16 to $11.24. Rewrites nearly doubled, median context rose 60%, and the day is partial. Which of those drove it was not separated.
 - **`.claude/rules/agent-spend.md` says "a turn is a dollar"**, measured 2026-08-10 with the same rate table found stale here. At current prices an API message averaged $0.08 on 12 Oct and $0.14 on 13 Oct. A message is not a turn, so this does not refute the rule; it means the rule's dollar figure needs re-measuring.
 
 ## Also See
@@ -142,7 +135,7 @@ The Trello pattern is close to what this estate already has: a board as task tru
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Fix `zao-spend`: price by model id at current rates (Opus 5.5 4/20/5/8/0.20, Sonnet 5.5 2/10/2.5/4/0.10, Haiku 5.5 tiered), count MERGED PRs, and derive the repo list from lane working directories. SHIPPED = a merged zaal-dotfiles PR whose test reprices a fixed transcript | Claude Code lane | PR | 2026-10-16 |
+| Fix `zao-spend`: price by model id at current rates (Opus 5.5 4/20/5/8/0.20, Sonnet 5.5 2/10/2.5/4/0.10, Haiku 5.5 tiered), count MERGED PRs, and derive the repo list from lane working directories. SHIPPED = a merged PR in the dotfiles repo whose test reprices a fixed transcript | Claude Code lane | PR | 2026-10-16 |
 | Evaluator runs as one fresh session per PR. SHIPPED = the evaluate skill starts a new session for each PR and a week of `zao-spend` shows the evaluator lane under 15% of spend | @Zaal to approve, lane to build | PR | 2026-10-20 |
 | Close-not-wake: a lane idle over an hour with more than 200k context gets a handoff and a fresh session. SHIPPED = full-context rewrites under 10% of a day's spend on the fixed meter | Seat | Rule + check | 2026-10-20 |
 | Trial one coordination lane on Sonnet 5.5 with an Opus advisor for 3 days; compare its `NEEDS_WORK` catches on the same PRs against the Opus evaluator. **Stop condition:** it misses a defect the Opus run caught. SHIPPED = a result table appended here | @Zaal | Trial | 2026-10-24 |
@@ -153,11 +146,11 @@ The Trello pattern is close to what this estate already has: a board as task tru
 
 - **Spend.** Three scripts read every `~/.claude/projects/**/*.jsonl` touched since 2026-10-12 00:00 ET (130 files), keep the last usage record per API message id (the same de-duplication `zao-spend` uses), and bucket by Eastern-time day, working directory and model. Prices by model id from Anthropic's pricing page; Haiku 5.5 priced by prompt length. 1-hour and 5-minute cache writes are read from `usage.cache_creation`.
 - **Model ids.** 5,256 messages on `claude-opus-5-5`, 1,081 on `claude-sonnet-5-5`, 385 on `claude-haiku-5-5` over the two days.
-- **Merged PRs.** `gh api repos/<repo>/pulls?state=closed`, two pages of 100 per repo, for the 14 repos the lanes' working directories resolve to, filtered on `merged_at` inside each Eastern-time day. Ten of the 14 had a merge on one of the two days. Bot merges count.
-- **Coordination lanes** are the working directories named orchestrator2, evaluator, merge, grill and seat-finance. Everything else is a shipping lane.
-- **A full-context rewrite** is an Opus message with context over 100k tokens where more than half the context was written to the cache.
+- **Merged PRs.** GitHub search API, `is:pr is:merged user:<owner> merged:<start>..<end>`, for both owner accounts, with Eastern-time windows (12 Oct: 04:00Z to 03:59:59Z the next day; 13 Oct: 04:00Z to 23:33Z). Bot merges count, and so does any PR merged in those accounts that no lane made. The first version of this doc used a fixed list of 14 repos and undercounted; see "A fault in this doc's first count".
+- **Coordination lanes** are five working directories: the orchestrator's, the evaluator's, merge, grill and one admin seat, **including their sub-directories** (on 12 Oct, $37.98 of the orchestrator's figure ran in a sub-directory of its workspace; by top-level directory name alone coordination is 42.8% that day). Everything else is a shipping lane. The label says where a session ran, not what it did.
+- **A full-context rewrite** is an Opus message with context over 100k tokens where more than half the context was written to the cache. The definition does not look at cause. The idle gap is the time since the previous API message in the same transcript file.
 - **Evaluator verdict counts** are GitHub issue search for the words `NEEDS_WORK` and `PASS` in comments on PRs updated since 2026-10-12, for both owner accounts. The search matches the word anywhere in a comment and a PR can carry both, so the counts are a rough signal, not a defect count.
-- **Not measured:** time spent, weekly-cap percentage (reported by the seat, not read by this lane), Codex or other non-Claude spend.
+- **Not measured:** time spent, subscription-limit consumption, Codex or other non-Claude spend.
 
 ## Sources
 
@@ -168,7 +161,7 @@ The Trello pattern is close to what this estate already has: a board as task tru
 - [Anthropic: Pricing](https://platform.claude.com/docs/en/about-claude/pricing) and [Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) - **[FULL for the price table and the long-context section, method: curl of the raw markdown]**
 - [Claude Code: Manage costs](https://code.claude.com/docs/en/costs), [Subagents](https://code.claude.com/docs/en/sub-agents), [Advisor tool](https://code.claude.com/docs/en/advisor) - **[PARTIAL - the sections on limits, model choice, subagent `model` and advisor pairings and cost were read by line range, not the whole pages; method: curl of the raw markdown]**
 - [Hacker News: Show HN: Smart model routing directly in Claude, Codex and Cursor](https://news.ycombinator.com/item?id=48688700) - **[FULL for the 25 comments matching cache, cost or eval terms, method: keyless Algolia items API]**
-- Estate transcripts, `zao-spend` source (`bin/zao-spend` in zaal-dotfiles, 338 lines), `~/.claude/settings.json` model keys, `.claude/agents/*.md` model lines - **[FULL, method: local read]**
+- Estate transcripts, `zao-spend` source (`bin/zao-spend` in the dotfiles repo, 338 lines), `~/.claude/settings.json` model keys, `.claude/agents/*.md` model lines - **[FULL, method: local read]**
 - `agents/2353-model-tiering-and-escalation`, `agents/2188-cheap-fleet-premium-escalation`, `dev-workflows/2664-claude-working-style-ported-to-codex` - **[PARTIAL - frontmatter and Key Decisions read from origin/main]**
 
 Credit: the Jev router is by Satvik Sinha and its fork authors (MIT); the animation carries an @alfa123gg watermark; quoted commenters are named by their public handles.

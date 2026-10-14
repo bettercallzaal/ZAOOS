@@ -17,7 +17,7 @@ tier: STANDARD
 
 | # | Borrow | From | Surface it touches | Effort |
 |---|---|---|---|---|
-| 1 | Descriptive, searchable YouTube titles with a series suffix: "<what the episode is about> - BCZ YapZ with <guest>". BuidlGuidl's uploads use exactly this ("Building a Prediction Market: From Theory to Implementation", "... - BuidlGuidl's Builder Bootcamp") and get a median of 105 views on their last 15; ours get 17, Shaw's raw streams 16. | Austin (BuidlGuidl) | @bettercallzaal YouTube Studio | S |
+| 1 | Descriptive, searchable YouTube titles with a series suffix: "<what the episode is about> - BCZ YapZ with <guest>". BuidlGuidl's uploads use exactly this ("Building a Prediction Market: From Theory to Implementation", "... - BuidlGuidl's Builder Bootcamp"). Their last 15 have a median of 105 views against our 17, but 14 of those 15 went up on 2025-12-04 and the 15th on 2025-11-14, so they have had ten months to collect views and ours a few days: the gap is mostly age and does not prove the titles work. The case for descriptive titles is that a search can find them; measure it on our own uploads (the 30-day comparison in Next Actions). | Austin (BuidlGuidl) | @bettercallzaal YouTube Studio | S |
 | 2 | One idea per Sunday: a short personal argument (300 to 500 words) in Zaal's own words, opening with his own story, inside the roundup. Nicky's essays do this at about 1,000 words, twice a month. | Nicky Sap | Sunday roundup, a new "One idea" section; written with the `zaal-voice` skill from Zaal's rough words | M |
 | 3 | Name one flagship build and report its progress every Sunday ("what I built this week": one repo, one PR, one link). Shaw's reach rests on one project others build on: elizaOS, 19,600 GitHub stars. Zaal ships more new repos than either Shaw or Austin, but nothing tells the story of one. | Shaw | Sunday roundup, a "Built this week" line; GitHub | S |
 | 4 | End every BCZ YapZ episode block with one "try this" action: play the Monday Fractal, try the guest's product, open a bounty. Austin turned his teaching into products a learner can act on (SpeedrunEthereum for people, ETHSkills for agents). | Austin | the episode block from doc 2674, bczyapz.com | S |
@@ -37,8 +37,8 @@ tier: STANDARD
 | Flagship code | Juke (doc 792) | elizaOS: 19,600 stars, 5,816 forks | scaffold-eth-2: 2,055 stars, 1,359 forks | ZAO OS and 100+ repos |
 | New non-fork repos since 2026-07-14 | not measured (GitHub handle not found) | 5 | 7 | 14 |
 | GitHub public events, last 300 | - | 300 in 3 days (111 pushes, 87 PR events) | 247 across 20 active days since 2026-09-20 (218 pushes) | 300 in 5 days (118 PR events, 106 comments) |
-| YouTube | none found | 7.17K subscribers; last upload 2026-03-23; median 16 views | BuidlGuidl channel 568 subscribers, median 105 views; no channel at @austingriffith (404) | 66 subscribers, median 17 views |
-| Substack engagement | 1 to 13 reactions per post | - | - | Paragraph: 585 subscribers |
+| YouTube | none found | 7.17K subscribers; last upload 2026-03-23; median 16 views | BuidlGuidl channel 568 subscribers, median 105 views on uploads from 2025-11-14 and 2025-12-04 (ten months old); no channel at @austingriffith (404) | 66 subscribers, median 17 views |
+| Substack engagement | 1 to 18 reactions per post | - | - | Paragraph: 585 subscribers |
 
 Two things stand out. Zaal is not short on output: he posts more on X than any of the three and created more new repos than Shaw or Austin since July. What he does not have is a single thread a reader can follow (Nicky's argument, Shaw's elizaOS, Austin's "learn to build here"). And reach on X is not the same as reach on YouTube: Shaw has 163K X followers and a YouTube median of 16.
 
@@ -59,9 +59,10 @@ Two things stand out. Zaal is not short on output: he posts more on X than any o
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Add a "One idea" section and a "Built this week" line to the Sunday roundup structure; done when vault drafts/newsletter-2026-10-18-sunday-roundup.md carries both | paragraph lane | Draft | 2026-10-16 |
+| Add a "One idea" section and a "Built this week" line to the Sunday roundup structure; done when the lane's Sunday 18 Oct roundup draft carries both | paragraph lane | Draft | 2026-10-16 |
 | Give the lane two or three rough sentences for the first "One idea" (anything on his mind this week); done when they are in the Sunday draft's daily log | @Zaal | Input | 2026-10-17 |
 | Retitle the Gabriel and SLAVA uploads in the "<topic> - BCZ YapZ with <guest>" form; done when the YouTube RSS shows the new titles | @Zaal | YouTube Studio | 2026-10-21 |
+| Compare views on the retitled uploads at 30 days against the last 15 before them, same age; done when the numbers are in the Sunday roundup notes | paragraph lane | Measurement | 2026-11-20 |
 | Add a "try this" line to the episode block in the Sunday prompt template; done when the template carries it | paragraph lane | Draft | 2026-10-16 |
 
 ## Sources

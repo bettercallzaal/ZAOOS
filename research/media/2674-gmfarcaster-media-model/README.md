@@ -17,7 +17,7 @@ tier: DEEP
 
 | # | Decision | Recommendation | Serves |
 |---|---|---|---|
-| 1 | Newsletter cadence and shape | USE a weekly roundup with a hook title, "The ZAO last week: <hook>", published on a fixed day, with the same section order every week. GM Farcaster has published 143 posts since 2023-11-10, and 83 of them went out on a Sunday (UTC). Ours is titled daily ("Year of the ZABAL - Day N") but shipped 30 posts in January 2026, 1 in May and 3 so far in October. A reliable weekly beats an unreliable daily. This changes the Year of the ZABAL series, so it is Zaal's call. | The ZAO |
+| 1 | Newsletter cadence and shape | USE a weekly roundup with a hook title, "The ZAO last week: <hook>", published on a fixed day, with the same section order every week. GM Farcaster has published 143 posts since 2023-11-10, and 83 of them went out on a Sunday (UTC). Their format is steady but their 2026 cadence is not: 25 issues so far (2, 3, 4, 4, 2, 1, 4, 2, 1, 2 per month), a median of 9 days apart and a longest gap of 27 days. Ours is titled daily ("Year of the ZABAL - Day N") but shipped 30 posts in January 2026, 1 in May and 3 so far in October. What to copy is the fixed weekly shape, which survives missed weeks; a title that promises daily does not. This changes the Year of the ZABAL series, so it is Zaal's call. | The ZAO |
 | 2 | Every BCZ YapZ episode gets an episode block | USE their per-episode block in the newsletter and the YouTube description: hook title, one-line TLDR, a two-sentence summary, the YouTube embed, chapter timestamps. bczyapz.com already holds chapters and topic tags for episodes (EP19: 12 chapters), so the data exists. | YouTube |
 | 3 | YouTube packaging | USE hook titles in their pattern ("Hook, Hook & Hook: BCZ YapZ ep21 with <guest>") instead of "BCZ YAPZ w/Gabriel from Found Some", and cut 3 to 4 topic clips plus a teaser from each long episode. On 2026-10-05 GM Farcaster put out the Splits episode plus 4 topic clips and 1 teaser. Our last 15 uploads have no clips, and three titles appear twice (the Gabriel and Danny episodes each twice on one day, JANGO UU on consecutive days). | YouTube |
 | 4 | Fixed "Coming up this week" block | USE a schedule block in every issue: day, time Eastern, show, and where to watch live (twitch.tv/bettercallzaal) or later (youtube.com/@bettercallzaal). GM Farcaster's block sits in every recent issue sampled. | YouTube, The ZAO |
@@ -33,7 +33,7 @@ tier: DEEP
 |---|---|---|---|
 | Newsletter subscribers | 1,230 | 585 | Paragraph public subscriber-count endpoint |
 | Posts on Paragraph | 143 since 2023-11-10 | 391 since 2023-08-24 | Paragraph public posts endpoint, paged |
-| Newsletter rhythm | Weekly roundup, 83 of 143 on Sunday UTC | "Daily" title; 2026: 30, 26, 18, 8, 1, 10, 6, 4, 13, 3 per month Jan to Oct | same |
+| Newsletter rhythm | Weekly roundup shape, 83 of 143 on Sunday UTC; 2026 so far 25 issues (2, 3, 4, 4, 2, 1, 4, 2, 1, 2 per month), median 9 days apart, longest gap 27 days | "Daily" title; 2026: 30, 26, 18, 8, 1, 10, 6, 4, 13, 3 per month Jan to Oct | same |
 | Title pattern | "GM Farcaster last week: <hook>" + subtitle naming the guest | "Year of the ZABAL - Day N", usually no hook | same |
 | Posts with a cover | 142 of 143 | 262 of 391 | same |
 | Posts with a post coin | 53 of 143 | 140 of 391 | same (`coinId`) |
@@ -75,7 +75,7 @@ The YouTube row is the surprise. GM Farcaster's per-video views are low too, med
 
 | Their practice | Call | Why |
 |---|---|---|
-| Weekly hook-titled roundup | COPY | It is the one shape they kept for three years, and they have twice our subscribers |
+| Weekly hook-titled roundup | COPY | The title and section shape have held since the "this week" issues of January 2026, even though the cadence slips (25 issues in 2026, gaps up to 27 days); they have twice our subscribers |
 | Episode block with chapters | COPY | The chapter data already exists on bczyapz.com |
 | Topic clips and teasers | COPY | It is how a 30-view channel still shows up in several feeds |
 | Schedule block, support list | COPY | Costs one paragraph each, points at YouTube |

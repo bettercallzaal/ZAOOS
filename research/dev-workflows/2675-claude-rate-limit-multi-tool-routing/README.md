@@ -13,7 +13,7 @@ tier: STANDARD
 
 > **Goal:** Say what the Claude weekly cap counts, how to run two Max $100 plans side by side on one Mac, which lane work goes to which other tool (with the command to start it), and three tooling changes.
 
-Asked by Zaal on 2026-10-13, relayed by the orchestrator2 seat. Current as of 2026-10-14. Two Claude Max $100 plans (zao, zaalp), Codex on the $20 ChatGPT plan, Google AI $20, OpenRouter, Ollama (vault decisions item 78, recorded in agent memory `feedback_use_codex_and_google_suite_more`).
+Asked by Zaal on 2026-10-13, relayed by the orchestrator2 seat. Current as of 2026-10-14. Two Claude Max $100 plans (zao, zaalp), Codex on the $20 ChatGPT plan, Google AI $20, OpenRouter, Ollama (per a ruling by Zaal on 2026-10-10).
 
 ## Key Decisions
 

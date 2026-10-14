@@ -5,15 +5,15 @@ status: research-complete
 last-validated: 2026-10-14
 superseded-by:
 related-docs: "2672, 2353, 2188"
-original-query: "check out the next best practices to keep coding even when at rate limit for claude since im down to 2 100$ plans now we gotta make best use of the other tools"
+original-query: "check out the next best practices to keep coding even when at rate limit for claude since im down to 2 [price withheld] plans now we gotta make best use of the other tools"
 tier: STANDARD
 ---
 
 # 2675 - Working through Claude rate limits with two Max plans, Codex, Gemini, OpenRouter and Ollama
 
-> **Goal:** Say what the Claude weekly cap counts, how to run two Max $100 plans side by side on one Mac, which lane work goes to which other tool (with the command to start it), and three tooling changes.
+> **Goal:** Say what the Claude weekly cap counts, how to run two Claude Max plans side by side on one Mac, which lane work goes to which other tool (with the command to start it), and three tooling changes.
 
-Asked by Zaal on 2026-10-13, relayed by the orchestrator2 seat. Current as of 2026-10-14. Two Claude Max $100 plans (zao, zaalp), Codex on the $20 ChatGPT plan, Google AI $20, OpenRouter, Ollama (per a ruling by Zaal on 2026-10-10).
+Asked by Zaal on 2026-10-13, relayed by the orchestrator2 seat. Current as of 2026-10-14. Two Claude Max plans (zao, zaalp), a Codex plan, a Google AI plan, OpenRouter and Ollama (per a ruling by Zaal on 2026-10-10).
 
 ## Key Decisions
 
@@ -54,7 +54,7 @@ What `/usage` in Claude Code shows on a subscription (Claude Code docs, costs): 
 |---|---|---|---|
 | Editing live code with verify and PR; anything that needs this repo's rules, hooks and skills | Claude Code | `claude` in an Orca pane on the lane's assigned plan | The only tier here that loads `.claude/rules`, the hooks and the skills (`.claude/rules/claude-usage.md`). |
 | Well-specified mechanical code; read-only inventory with known paths; a second-model check of a count | Codex CLI 0.153.4, `gpt-5.6-terra`, reasoning low (`~/.codex/config.toml`) | `codex exec "<spec with file list>"` in the lane's worktree, or `codex` for the TUI | Measured 2026-10-11 in agent memory: strong at inventory with clear paths, weak at finding files or judging done-ness (it reported 0 cards done where 10 were). Check what it returns. |
-| Research triage, reading long documents, Google Docs and Sheets output | Gemini CLI (not installed yet) | `brew install gemini-cli`, then `gemini` and choose Sign in with Google | 1,000 requests/day on a personal Google account (README). The Google AI $20 plan already pays for the Docs and Sheets side. |
+| Research triage, reading long documents, Google Docs and Sheets output | Gemini CLI (not installed yet) | `brew install gemini-cli`, then `gemini` and choose Sign in with Google | 1,000 requests/day on a personal Google account (README). The Google AI plan already pays for the Docs and Sheets side. |
 | Bulk summarising and classifying inside ZOE loops | OpenRouter, through ZOE's router | Already wired: `bot/src/zoe/models/cli-cap-aware.ts` falls back to a non-Claude provider on `usage_limit`, `rate_limit` or `auth` | Text jobs only. The file says editing jobs must wait for the reset, because a text provider cannot edit files. |
 | Offline or private small jobs; a Claude Code front end on a non-Claude model | Ollama 0.40.3 | `ollama launch claude --model <model>`; models here: `llama3.2` (local, 2.0 GB), `minimax-m2.7:cloud`, `nemotron-3-super:cloud` | `llama3.2` is too small for repo work. The `:cloud` models run on Ollama's servers, so they are not private. ZOE's router uses Ollama only with `OLLAMA_ENABLED=1`. |
 

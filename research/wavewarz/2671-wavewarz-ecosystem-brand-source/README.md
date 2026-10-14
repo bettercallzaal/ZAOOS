@@ -2,7 +2,7 @@
 topic: wavewarz
 type: audit
 status: research-complete
-last-validated: 2026-10-13
+last-validated: 2026-10-14
 superseded-by:
 related-docs: "743, 2668, 2670, 608, 711"
 original-query: "lets make a side part of the wavezstation terminal bringing together the branding of the wavewarz ecosystem. One brand source for the WaveWarZ ecosystem: the family map, the one spelling for each name, a re-verification with real fetches of the 10 Oct SEO and GEO gap audit of wavewarz.com (empty homepage body, sitemap 404, robots, llms.txt 404, the Bitget listing and its WARZ token claim) and the same checks for wavezstation.com, drafts the team can ship, and the audit's 8 fixes ranked by effort."

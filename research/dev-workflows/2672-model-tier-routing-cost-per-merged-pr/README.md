@@ -116,6 +116,8 @@ The Trello pattern is close to what this estate already has: a board as task tru
 | D. Coordination lanes on Sonnet 5.5 with an Opus advisor | Rate paid on half the spend | Up to 23 to 25% of the day, quality unmeasured | **TRIAL** on one lane with a catch-rate comparison |
 | E. Fewer lanes | Sessions held open | 8.8% and 17.2% of spend in repos with nothing merged; coordination share unchanged between 29 and 23 lanes | **USE** for lanes with no merge in a day; do not expect it to shrink coordination |
 
+**Addendum, 2026-10-14: `opusplan` is option A built in.** Anthropic's model-config page documents `claude --model opusplan` as a mode that "uses `opus` during plan mode, then switches to `sonnet` for execution", so it is a mid-session model switch at every plan/execute boundary. Because the prompt cache is per model (the router README quoted above), each switch writes the conversation into the other model's cache, which at this estate's median context of 168k to 270k tokens is a full-context rewrite every time. The page's `opusplan` section does not mention the cache at all (its only two cache mentions are the `/effort` warning and the TTL setting), so the same verdict applies: use it only in short sessions, and prefer a fresh session or subagent per tier.
+
 ## What this does not show
 
 - **Quality.** No measurement here says a Sonnet evaluator catches what an Opus one does. Decision 6 is a trial for that reason.
@@ -160,6 +162,7 @@ The Trello pattern is close to what this estate already has: a board as task tru
 - [yibie/awesome-jev](https://github.com/yibie/awesome-jev) README - **[PARTIAL - first 45 lines of 25,995 words read, enough to identify Jev; no LICENSE file returned at the repo root]**
 - [Anthropic: Pricing](https://platform.claude.com/docs/en/about-claude/pricing) and [Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) - **[FULL for the price table and the long-context section, method: curl of the raw markdown]**
 - [Claude Code: Manage costs](https://code.claude.com/docs/en/costs), [Subagents](https://code.claude.com/docs/en/sub-agents), [Advisor tool](https://code.claude.com/docs/en/advisor) - **[PARTIAL - the sections on limits, model choice, subagent `model` and advisor pairings and cost were read by line range, not the whole pages; method: curl of the raw markdown]**
+- [Claude Code: Model configuration, `opusplan` model setting](https://code.claude.com/docs/en/model-config) - **[PARTIAL - the `opusplan` section and alias table read in full, the whole page searched for "cache" (2 hits); method: curl of the raw markdown `model-config.md`, HTTP 200, 116,645 bytes, 2026-10-14]**
 - [Hacker News: Show HN: Smart model routing directly in Claude, Codex and Cursor](https://news.ycombinator.com/item?id=48688700) - **[FULL for the 25 comments matching cache, cost or eval terms, method: keyless Algolia items API]**
 - Estate transcripts, `zao-spend` source (`bin/zao-spend` in the dotfiles repo, 338 lines), `~/.claude/settings.json` model keys, `.claude/agents/*.md` model lines - **[FULL, method: local read]**
 - `agents/2353-model-tiering-and-escalation`, `agents/2188-cheap-fleet-premium-escalation`, `dev-workflows/2664-claude-working-style-ported-to-codex` - **[PARTIAL - frontmatter and Key Decisions read from origin/main]**

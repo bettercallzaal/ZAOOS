@@ -77,6 +77,33 @@ export async function getChannelFeed(channelId: string, cursor?: string, limit =
   return res.json();
 }
 
+/**
+ * Home feed: casts from the accounts `fid` follows, newest first.
+ * docs.neynar.com/reference/fetch-user-following-feed (fetched 2026-10-15):
+ * `fid` required, `viewer_fid` applies the viewer's mutes and blocks,
+ * `limit` 1-100, returns `{ casts, next: { cursor } }`.
+ */
+export async function getFollowingFeed(fid: number, cursor?: string, limit = 25) {
+  const params = new URLSearchParams({
+    fid: String(fid),
+    viewer_fid: String(fid),
+    limit: String(limit),
+    with_recasts: 'true',
+  });
+  if (cursor) params.set('cursor', cursor);
+
+  const res = await fetchWithFailover(`/feed/following?${params}`, {
+    headers: readHeaders(),
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar following feed error ${res.status}: ${body.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export async function postCast(
   signerUuid: string,
   text: string,

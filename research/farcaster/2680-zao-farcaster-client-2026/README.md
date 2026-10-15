@@ -24,7 +24,7 @@ Written Thu 15 Oct 2026, 16:2x to 17:3x EDT (clock from `date`), in one hour, by
 | 4 | **Do NOT copy zingfisher code into the client. Call it across an API.** zingfisher is a CharmVerse fork; its LICENSE is CharmVerse's dual licence: GNU AGPL v3, or a paid commercial licence. Copying its code into ZAOOS (MIT) makes the copied parts AGPL. ZIDs, member profiles and roles cross the boundary as data. | zingfisher `LICENSE`, read this run. |
 | 5 | **KEEP Neynar for the first 30 days, and keep the hub fallback warm.** Neynar's team mostly joins Network School; whether the Neynar API product continues as is was not stated by anyone today. ZAOOS already reads from the Haatz public hub as a fallback (doc 2666). Free tier today: 10M credits a month, 600 requests a minute per endpoint. | Neynar's rate-limits doc (raw markdown), the announcement cast, doc 2666. |
 | 6 | **Make "real people" the ZAO client's feature, not a bolt-on.** Network School's stated direction is proof of humanity and moderation. A members-only client gated by ZAO membership (ZID, Respect) already answers that question for our community. | Balaji, 2026-02-18: "Would like to see a Farcaster client with pangram.com and proof of human integrated." The moderation and rebrand details are single-sourced (decision 7). |
-| 7 | **Treat the rebrand and the new rules as UNVERIFIED until Balaji posts them.** One outlet says Farcaster becomes "Network State Protocol" with AI moderation, proof of humanity and a Singapore-style code of conduct, and that users will vote and get an NFT. The announcing cast says only "Balaji will share more on this." His last 10 X posts (newest 12:48 UTC) and his casts (newest 30 Aug) do not mention it. | Cryptobriefing article (one source), FxTwitter, hub. |
+| 7 | **Treat the rebrand and the new rules as UNVERIFIED until Balaji posts them.** One outlet says Farcaster becomes "Network State Protocol" with AI moderation, proof of humanity and a Singapore-style code of conduct, and that users will vote and get an NFT. The announcing cast says only "Balaji will share more on this." His last 10 X posts (newest 12:48 UTC) and his casts (newest 2026-08-30) do not mention it. | Cryptobriefing article (one source), FxTwitter, hub. |
 
 ## 1. The acquisition, from primary sources
 
@@ -38,7 +38,7 @@ Written Thu 15 Oct 2026, 16:2x to 17:3x EDT (clock from `date`), in one hour, by
 | Terms and price: not disclosed. | the cast and the article | FULL |
 | Rename to "Network State Protocol", AI moderation, proof of humanity, Singapore-modelled conduct code, a user vote with an onchain NFT for those who opt in; protocol "expected to stay open and permissionless". | cryptobriefing.com, 2026-10-15 | PARTIAL: one secondary outlet, not in any primary post read |
 | The previous owner: Neynar bought Farcaster from Merkle Manufactory on 2026-01-21, including the protocol, the official client and Clanker. | Neynar's blog index ("Neynar will maintain Farcaster protocol, run the Farcaster client and operate Clanker"); cryptobriefing; @neynar cast 0x3a4612cc ("since january 21, 2026") | FULL |
-| Balaji's last Farcaster cast on Farcaster itself, 2026-04-28: "Farcaster is still the best protocol of its kind. Much potential remains." On 2026-01-22: "I want to see the Farcaster protocol grow". | hub, FID 37 | FULL |
+| Balaji on Farcaster: 2026-04-28, "Farcaster is still the best protocol of its kind. Much potential remains."; 2026-01-22, "I want to see the Farcaster protocol grow". His newest cast, 2026-08-30, is unrelated (a link about Hollywood). | hub, FID 37 | FULL |
 
 **What changes for a third-party client, as of today:** nothing has changed yet, and nothing was announced for third-party clients. The app, the protocol repositories and "related products" move; the hubs (Snapchain) are a network, not a product, and the transfer does not mention them. Whether Neynar's API, signer sponsorship and the mini app catalogue stay where they are is UNKNOWN. That is the main risk below.
 
@@ -49,7 +49,7 @@ Written Thu 15 Oct 2026, 16:2x to 17:3x EDT (clock from `date`), in one hour, by
 | Neynar plans | **Free**: 10M credits a month, 10 webhooks, 5 apps, 600 requests a minute (10 a second) per endpoint. **Scale**: $249 a month, 60M credits, 1,200 a minute. **Enterprise**: custom. Starter ($9) and Growth ($49) "no longer offered to new customers" since June 2026. | docs.neynar.com rate-limits page, raw markdown | FULL |
 | Neynar reach claim | "2.6M+ accounts, thousands of developers and agents, and $500M+ in connected wallets" | neynar.com home | FULL (their claim) |
 | Sign In With Farcaster | Auth Kit is "a React library that lets users log in to your app with a Farcaster account": a button, a QR scan or tap to approve in Farcaster, a signature verified by the app. Sign In With Neynar was retired 2026-08-14 (doc 2498). | docs.farcaster.xyz/auth-kit/introduction | FULL |
-| Writing as the user | Managed signers: the app registers a signer for each user; generating one "requires paying onchain fees", sponsored by the developer account (`FARCASTER_DEVELOPER_MNEMONIC` in Neynar's guide). ZAOOS does this as FID 19640 with `APP_SIGNER_PRIVATE_KEY`. | docs.neynar.com managed signers; `src/app/api/auth/signer/route.ts:1-5` | FULL |
+| Writing as the user | Managed signers: the app registers a signer for each user; generating one "requires paying onchain fees", sponsored by the developer account (`FARCASTER_DEVELOPER_MNEMONIC` in Neynar's guide). ZAOOS does this as FID 19640 with `APP_SIGNER_PRIVATE_KEY`. | docs.neynar.com managed signers; `src/app/api/auth/signer/route.ts:10-13` and `:44` | FULL |
 | Mini apps | `@farcaster/create-mini-app`, the SDK with Quick Auth, Ethereum and Solana wallets, manifests; developer mode for previews. | miniapps.farcaster.xyz getting started | FULL |
 | The network | Snapchain, "the decentralized, peer-to-peer network that powers the Farcaster social network"; read nodes anyone can run; HTTP and gRPC APIs. The Hypersnap hard fork is a separate track (doc 2666). | snapchain.farcaster.xyz | FULL |
 
@@ -63,7 +63,6 @@ Written Thu 15 Oct 2026, 16:2x to 17:3x EDT (clock from `date`), in one hour, by
 | `farcasterxyz/miniapps` | 2026-08-04 | MIT | Mini app SDK. |
 | `neynarxyz/farcaster-examples` | 2026-07-31 | MIT | Signer and webhook examples. |
 | `bettercallzaal/zaalcaster` (ours) | 2026-09-21 | MIT | Unanswered inbox, channel feeds, reply drafts. |
-| `bettercallzaal/channelz` (ours, private) | 2026-10-08 | no LICENSE file | Channels sorted by favourites; Neynar proxied server-side. |
 
 ## 3. Community clients in the last month (GitHub, pushed since 2026-09-01)
 
@@ -125,6 +124,6 @@ Neynar's CEO, today: "opus 5.5 one shots a client with docs.neynar". Building a 
 - [FULL] https://docs.neynar.com/reference/what-are-the-rate-limits-on-neynar-apis.md (raw markdown); https://neynar.com/ (home, reach claim).
 - [FAILED] https://neynar.com/pricing (404); [PARTIAL] https://dev.neynar.com/pricing (script-rendered, one line).
 - [FULL] https://docs.neynar.com/docs/integrate-managed-signers; https://docs.farcaster.xyz/auth-kit/introduction; https://miniapps.farcaster.xyz/docs/getting-started; https://snapchain.farcaster.xyz/. Method: curl, stripped.
-- [FULL] GitHub REST: LICENSE files and READMEs of farcasterxyz/client, hub-monorepo, auth-monorepo, miniapps, neynarxyz/farcaster-examples, bettercallzaal/zingfisher, zaalcaster, channelz; repository search for Farcaster clients pushed since 2026-09-01; zingfisher pulls #1 to #9.
+- [FULL] GitHub REST: LICENSE files and READMEs of farcasterxyz/client, hub-monorepo, auth-monorepo, miniapps, neynarxyz/farcaster-examples, bettercallzaal/zingfisher, zaalcaster, and one private ZAO repo (not named here); repository search for Farcaster clients pushed since 2026-09-01; zingfisher pulls #1 to #9.
 - [FULL] Community source: the Farcaster casts above are the community record; the open question about Neynar's APIs came from a community member's cast.
 - [FULL] ZAOOS at origin/main fa8791d7 era, read this run: `package.json`, `src/lib/farcaster/`, `src/app/api/auth/`, `community.config.ts`, `LICENSE` (MIT).

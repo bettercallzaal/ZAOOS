@@ -8,10 +8,10 @@
 import { describe, expect, it } from 'vitest';
 import { redact, remaining } from '../zoe/nightly-redact.mjs';
 
-const KEY_LINE = '- [ ] **AgentMail env var - Day 149** - `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`. Key in 1Password "ZOE AgentMail".';
+const KEY_LINE = '- [ ] **AgentMail env var - Day 149** - `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`. Key in 1Password "Example Item".';
 const DASH_LINE = '- AgentMail inbox inaccessible — Day 149. One-command fix: `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`';
-const PAY_LINE = '- [ ] **Jose $100 USDC - Day 90+** - One action.';
-const HEADER_LINE = '*Processed by ZOE Nightly ~22:00 EST. AgentMail inbox: BLOCKED (Day 149 — `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`, key in 1Password "ZOE AgentMail")*';
+const PAY_LINE = '- [ ] **Sam $100 USDC - Day 90+** - One action.';
+const HEADER_LINE = '*Processed by ZOE Nightly ~22:00 EST. AgentMail inbox: BLOCKED (Day 149 — `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`, key in 1Password "Example Item")*';
 
 describe('the four classes, verbatim', () => {
   it('a command that writes under ~/.zao and the 1Password item name', () => {
@@ -31,7 +31,7 @@ describe('the four classes, verbatim', () => {
   it('a payment line about a named person keeps the name, hides the amount', () => {
     expect(remaining(PAY_LINE)).toEqual(['name-amount']);
     const { text } = redact(PAY_LINE);
-    expect(text).toBe('- [ ] **Jose (amount in the vault) - Day 90+** - One action.');
+    expect(text).toBe('- [ ] **Sam (amount in the vault) - Day 90+** - One action.');
     expect(remaining(text)).toEqual([]);
   });
   it('the captures header carries three classes at once', () => {
@@ -60,6 +60,34 @@ describe('only some classes', () => {
     expect(text).toBe('- AgentMail inbox inaccessible — Day 149. One-command fix: `<command in the vault>`');
     expect(counts.dash).toBe(0);
     expect(remaining(text)).toEqual(['dash']);
+  });
+});
+
+describe('the shapes that slipped the first sweep (evaluator on #3957); names and items are stand-ins', () => {
+  it('1Password under "<item>"', () => {
+    const line = 'Resolution path: `<command in the vault>` - key is in 1Password under "Example Item".';
+    expect(remaining(line)).toEqual(['1password-item']);
+    expect(redact(line).text).toBe('Resolution path: `<command in the vault>` - key is in 1Password (item in the vault).');
+  });
+  it('<name> next $<amt> USDC', () => {
+    const line = '- **Jul 1** - Sam next $100 USDC';
+    expect(remaining(line)).toEqual(['name-amount']);
+    expect(redact(line).text).toBe('- **Jul 1** - Sam next (amount in the vault)');
+  });
+  it('<full name> - next $<amt> USDC', () => {
+    const line = '- **July 1 (14 days)** - Sam Example - next $100 USDC';
+    expect(remaining(line)).toEqual(['name-amount']);
+    expect(redact(line).text).toBe('- **July 1 (14 days)** - Sam Example - next (amount in the vault)');
+  });
+  it('a dotenv under a home folder, a ~/.claude path, and an absolute home path with the username', () => {
+    for (const p of ['~/n8n/.env', '~/.claude/projects/*/memory/*.md', '/Users/someone/Documents/repo/x.md', '$HOME/.claude/skills/x/SKILL.md']) {
+      expect(redact(`see ${p} now`).text).toBe('see <private path> now');
+    }
+    expect(redact('see /usr/local/bin/gh now').text).toBe('see /usr/local/bin/gh now');
+  });
+  it('--check honours --only', () => {
+    expect(remaining('a — b with 1Password "Example Item"', ['dash'])).toEqual(['dash']);
+    expect(remaining('a — b', ['1password-item'])).toEqual([]);
   });
 });
 

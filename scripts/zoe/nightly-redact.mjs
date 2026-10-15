@@ -38,11 +38,23 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const PRIVATE_PATH = /(?:~|\$HOME|\/home\/[A-Za-z0-9_.-]+|\/Users\/[A-Za-z0-9_.-]+)\/\.zao(?:\/[A-Za-z0-9_.-]+)*/g;
-const BACKTICK_WITH_PATH = /`[^`\n]*(?:~|\$HOME|\/home\/[A-Za-z0-9_.-]+|\/Users\/[A-Za-z0-9_.-]+)\/\.zao[^`\n]*`/g;
-const OP_ITEM = /1Password\s+(?:item\s+)?["“][^"”\n]+["”]|1Password\s+item\s+[A-Za-z0-9 _-]+|op:\/\/[^\s)]+/g;
-// A capitalised word (a name), optional verb, then an amount with a currency sign or code.
-const NAME_AMOUNT = /\b([A-Z][a-z]{2,})(\s+(?:owes|owed|paid|pay|payment|payout|invoice|to)?\s*)(?:\$\s?\d[\d,]*(?:\.\d+)?(?:\s*(?:USDC|USD|ETH|SOL|k))?|\d[\d,]*(?:\.\d+)?\s*(?:USDC|USD|ETH|SOL))\b/g;
+// A private path: anything under ~/.zao or ~/.claude, a dotenv file in a home
+// subfolder (~/n8n/.env), or any absolute path under /Users/<name> or
+// /home/<name>, which carries the machine's username (evaluator on #3957).
+const HOME = '(?:~|\\$HOME)';
+const SEG = '[A-Za-z0-9_.*-]+';
+const PRIVATE_PATH = new RegExp(
+  `${HOME}\\/(?:\\.zao|\\.claude|${SEG}\\/\\.env)(?:\\/${SEG})*|\\/(?:Users|home)\\/[A-Za-z0-9_.-]+(?:\\/${SEG})*`,
+  'g',
+);
+const BACKTICK_WITH_PATH = new RegExp(`\`[^\`\\n]*(?:${PRIVATE_PATH.source})[^\`\\n]*\``, 'g');
+// A 1Password item: quoted after "1Password", with or without a word between
+// ("1Password under "X"", "in", "at", "item", "entry"), an unquoted "1Password
+// item X", or an op:// reference.
+const OP_ITEM = /1Password\s+(?:(?:item|under|in|at|entry|as)\s+)?["“][^"”\n]+["”]|1Password\s+item\s+[A-Za-z0-9 _-]+|op:\/\/[^\s)]+/g;
+// A name (one or two capitalised words), then up to one short word ("next",
+// "owes", "paid", "- next"), then an amount with a currency sign or code.
+const NAME_AMOUNT = /\b([A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})?)(\s+(?:-\s+)?(?:owes|owed|paid|pay|payment|payout|invoice|to|next|gets|get|receives|due)?\s*)(?:\$\s?\d[\d,]*(?:\.\d+)?(?:\s*(?:USDC|USD|ETH|SOL|k))?|\d[\d,]*(?:\.\d+)?\s*(?:USDC|USD|ETH|SOL))\b/g;
 // Capitalised words that sit next to an amount without being a person: sentence
 // starts, quantities, products and chains. Measured on main's 546 daily docs
 // 2026-10-15: without this list "Next $100 on July 1", "Under $5/day",
@@ -50,7 +62,7 @@ const NAME_AMOUNT = /\b([A-Z][a-z]{2,})(\s+(?:owes|owed|paid|pay|payment|payout|
 const NAME_STOP = new Set([
   'The', 'This', 'That', 'Day', 'Days', 'Pool', 'Total', 'Gross', 'Net', 'Sales', 'Price', 'Pay', 'Fee', 'Fees',
   'Week', 'Month', 'Season', 'Next', 'Under', 'Over', 'About', 'Around', 'Min', 'Max', 'One', 'Two', 'Three', 'Per',
-  'Send', 'Sent', 'Entry', 'Cost', 'Costs', 'Budget', 'Spend', 'Revenue', 'Prize', 'Prizes', 'Bounty', 'Tier', 'Plan', 'Target', 'Cap',
+  'Send', 'Sent', 'Entry', 'Jul', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Cost', 'Costs', 'Budget', 'Spend', 'Revenue', 'Prize', 'Prizes', 'Bounty', 'Tier', 'Plan', 'Target', 'Cap',
   'Stripe', 'Neynar', 'Vercel', 'Claude', 'Anthropic', 'OpenRouter', 'Ollama', 'Base', 'Solana', 'Ethereum', 'Farcaster',
   'Supabase', 'Hostinger', 'Luma', 'Paragraph', 'Bonfire', 'Artizen', 'Grant', 'Grants', 'Match', 'Deal', 'Deals',
 ]);
@@ -80,7 +92,7 @@ export function redact(text, only = CLASSES) {
     return '1Password (item in the vault)';
   });
   if (on.has('name-amount')) out = out.replace(NAME_AMOUNT, (m, name, sep) => {
-    if (NAME_STOP.has(name)) return m;
+    if (NAME_STOP.has(name.split(/\s+/)[0])) return m;
     counts['name-amount'] += 1;
     return `${name}${sep}(amount in the vault)`;
   });
@@ -101,14 +113,15 @@ export function redact(text, only = CLASSES) {
 }
 
 /** Pure. The classes still present in a text, for --check. */
-export function remaining(text) {
+export function remaining(text, only = CLASSES) {
+  const on = new Set(only);
   const found = [];
-  if (BACKTICK_WITH_PATH.test(text) || PRIVATE_PATH.test(text)) found.push('private-path');
-  if (OP_ITEM.test(text)) found.push('1password-item');
-  const nm = [...text.matchAll(NAME_AMOUNT)].filter((m) => !NAME_STOP.has(m[1]));
-  if (nm.length) found.push('name-amount');
-  if (/[—–]/.test(text)) found.push('dash');
-  if ([...text.matchAll(EMAIL)].some((m) => thirdPartyEmail(m[0]))) found.push('email');
+  if (on.has('private-path') && (BACKTICK_WITH_PATH.test(text) || PRIVATE_PATH.test(text))) found.push('private-path');
+  if (on.has('1password-item') && OP_ITEM.test(text)) found.push('1password-item');
+  const nm = [...text.matchAll(NAME_AMOUNT)].filter((m) => !NAME_STOP.has(m[1].split(/\s+/)[0]));
+  if (on.has('name-amount') && nm.length) found.push('name-amount');
+  if (on.has('dash') && /[—–]/.test(text)) found.push('dash');
+  if (on.has('email') && [...text.matchAll(EMAIL)].some((m) => thirdPartyEmail(m[0]))) found.push('email');
   // The regexes above carry the g flag; reset so a second call starts clean.
   for (const re of [BACKTICK_WITH_PATH, PRIVATE_PATH, OP_ITEM, NAME_AMOUNT, EMAIL]) re.lastIndex = 0;
   return found;
@@ -135,7 +148,7 @@ function main(argv) {
   for (const f of files) {
     const text = readFileSync(f, 'utf8');
     if (check) {
-      const left = remaining(text);
+      const left = remaining(text, only);
       if (left.length) {
         dirty += 1;
         console.log(`${f}: ${left.join(', ')}`);

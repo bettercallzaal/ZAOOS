@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-15
 related-docs: 693
 tier: DISPATCH
 ---
@@ -93,6 +93,20 @@ Full triage for every one of the 649 docs is in this folder:
 - `research/_archive/` (80 docs) was excluded by design.
 - Verdicts are a fast scan, not a deep re-read - a doc marked RE-RESEARCH might just need its frontmatter fixed; confirm per-doc before redoing.
 - The audit agents themselves did NOT re-fetch sources - they judged from each doc's own text. A FINE verdict means "looks solid", not "every cited URL re-verified live."
+
+## Updated 2026-10-15
+
+The library has grown massively since this audit. Key changes verified against the live repo on 2026-10-15:
+
+- **Doc count:** 649 live docs → 2,435 live docs (excluding `_archive/`, `_radar/`, `_graph/`, `_handoffs/`). Nearly 4× growth in ~5 months.
+- **Folder structure reorganized:** `community` split into separate `community/`, `governance/`, `identity/`, `security/` folders. `business` separated from `identity`. New folders added: `brand`, `cross-platform`, `estate`, `infrastructure`, `inspiration`, `media`, `technology`, `wavewarz`, `zabal`.
+- **Archive:** still 80 docs (Decision 3 from this audit — move 12 ARCHIVE docs — was not completed as a batch; archive count unchanged).
+- **P0 security doc 471 (Vercel OAuth breach):** researched and marked `research-complete` (last-validated 2026-05-21). Incident resolved; moved to `research/security/` folder.
+- **Newer comprehensive audit exists:** [Doc 2475](../2475-research-system-internal-audit/) (research-system-internal-audit, last-validated 2026-09-07) supersedes this doc as the ground-truth library health measurement. It covers the 2,205-doc library as of that date and identifies 693 docs with no `last-validated`, 383 docs (20.7%) never cited by another doc, and 218 doc-number collisions (resolved 2026-09-08).
+- **Research README:** claims "~1,700+ active docs" as of 2026-07-25 snapshot — now stale, current live count is 2,435+.
+- **This doc's HIGH-priority re-research list and folder density figures are outdated** — the farcaster/, dev-workflows/, community/ doc counts have all roughly doubled since May 2026. Use doc 2475 for current library health.
+
+Sources checked (internal, no external fetch required): `find research -name README.md` count; `research/README.md` index; `research/dev-workflows/2475-research-system-internal-audit/README.md` (FULL, on disk).
 
 ## Sources
 

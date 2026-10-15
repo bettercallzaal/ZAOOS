@@ -15,6 +15,7 @@ import { useChat } from '@/hooks/useChat';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useMobile } from '@/hooks/useMobile';
 import { useWalletXMTP } from '@/hooks/useWalletXMTP';
+import { followingFeedEnabled } from '@/lib/farcaster/following-feed-flag';
 import type { QuotedCastData } from '@/types';
 import { ComposeBar, type ComposeBarHandle, type ReplyContext } from './ComposeBar';
 import { type ContentFilter, FeedFilters, filterAndSortCasts, type SortMode } from './FeedFilters';
@@ -25,6 +26,10 @@ import { ThreadDrawer } from './ThreadDrawer';
 
 const TrendingFeed = dynamic(
   () => import('./TrendingFeed').then((m) => ({ default: m.TrendingFeed })),
+  { ssr: false },
+);
+const FollowingFeed = dynamic(
+  () => import('./FollowingFeed').then((m) => ({ default: m.FollowingFeed })),
   { ssr: false },
 );
 const SearchDialog = dynamic(
@@ -63,6 +68,9 @@ export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
   const [isTrending, setIsTrending] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const showFollowingTab = followingFeedEnabled();
+  const inChannel = !isTrending && !isFollowing;
   const {
     messages,
     loading,
@@ -103,7 +111,13 @@ export function ChatRoom() {
   // XMTP context
   const xmtp = useXMTPContext();
   const walletXmtp = useWalletXMTP();
-  const viewMode = xmtp.activeConversationId ? 'xmtp' : isTrending ? 'trending' : 'channel';
+  const viewMode = xmtp.activeConversationId
+    ? 'xmtp'
+    : isTrending
+      ? 'trending'
+      : isFollowing
+        ? 'following'
+        : 'channel';
   const activeXmtpConversation =
     xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
 
@@ -134,6 +148,7 @@ export function ChatRoom() {
     (ch: string) => {
       setActiveChannel(ch);
       setIsTrending(false);
+      setIsFollowing(false);
       xmtp.selectConversation(null);
       setSelectedThreadHash(null);
       setSidebarOpen(false);
@@ -141,8 +156,17 @@ export function ChatRoom() {
     [xmtp],
   );
 
+  const handleFollowingSelect = useCallback(() => {
+    setIsFollowing(true);
+    setIsTrending(false);
+    xmtp.selectConversation(null);
+    setSelectedThreadHash(null);
+    setSidebarOpen(false);
+  }, [xmtp]);
+
   const handleTrendingSelect = useCallback(() => {
     setIsTrending(true);
+    setIsFollowing(false);
     xmtp.selectConversation(null);
     setSelectedThreadHash(null);
     setSidebarOpen(false);
@@ -468,6 +492,11 @@ export function ChatRoom() {
                   </div>
                 </div>
               </div>
+            ) : isFollowing ? (
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-sm text-white">Following</h2>
+                <p className="text-[10px] text-gray-600 -mt-0.5">People you follow on Farcaster</p>
+              </div>
             ) : isTrending ? (
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-sm text-white flex items-center gap-1.5">
@@ -490,7 +519,7 @@ export function ChatRoom() {
               </div>
             )}
 
-            {(viewMode === 'channel' || viewMode === 'trending') && (
+            {(viewMode === 'channel' || viewMode === 'trending' || viewMode === 'following') && (
               <>
                 {/* Search */}
                 <button
@@ -600,14 +629,29 @@ export function ChatRoom() {
                 aria-label="Channels"
                 className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0"
               >
+                {showFollowingTab && (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={isFollowing}
+                    onClick={handleFollowingSelect}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      isFollowing
+                        ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                        : 'text-gray-500 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Following
+                  </button>
+                )}
                 {communityConfig.farcaster.channels.map((ch) => (
                   <button
                     key={ch}
                     role="tab"
-                    aria-selected={!isTrending && activeChannel === ch}
+                    aria-selected={inChannel && activeChannel === ch}
                     onClick={() => handleChannelSelect(ch)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      !isTrending && activeChannel === ch
+                      inChannel && activeChannel === ch
                         ? 'bg-[#f5a623]/10 text-[#f5a623]'
                         : 'text-gray-500 hover:text-white hover:bg-white/5'
                     }`}
@@ -632,7 +676,25 @@ export function ChatRoom() {
                 </button>
               </div>
 
-              {isTrending ? (
+              {isFollowing ? (
+                <FollowingFeed
+                  isAdmin={user.isAdmin}
+                  currentFid={user.fid}
+                  hasSigner={hasSigner}
+                  onHide={hideMessage}
+                  onOpenThread={(hash) => setSelectedThreadHash(hash)}
+                  onQuote={(cast) => {
+                    setQuotedCast(cast);
+                    setSelectedThreadHash(null);
+                  }}
+                  onOpenProfile={(fid) => setProfileFid(fid)}
+                  onReply={(hash, authorName, text) => {
+                    setReplyTo({ hash, authorName, text });
+                    setQuotedCast(null);
+                    composeRef.current?.focus();
+                  }}
+                />
+              ) : isTrending ? (
                 <TrendingFeed
                   isAdmin={user.isAdmin}
                   currentFid={user.fid}

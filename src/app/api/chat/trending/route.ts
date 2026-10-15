@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { neynarCastToCast } from '@/lib/farcaster/cast-mapper';
 import { getTrendingFeed } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 import { fetchSophaFeed, type SophaCast } from '@/lib/sopha/client';
@@ -26,31 +27,7 @@ let cachedData: { casts: TrendingCast[]; fetchedAt: number } | null = null;
 const CACHE_TTL = 5 * 60 * 1000;
 
 function neynarToCast(c: Record<string, unknown>): TrendingCast {
-  const author = c.author as Record<string, unknown> | undefined;
-  const reactions = c.reactions as Record<string, unknown> | undefined;
-  const replies = c.replies as Record<string, unknown> | undefined;
-
-  return {
-    hash: c.hash as string,
-    author: {
-      fid: (author?.fid as number) || 0,
-      username: (author?.username as string) || '',
-      display_name: (author?.display_name as string) || '',
-      pfp_url: (author?.pfp_url as string) || '',
-    },
-    text: (c.text as string) || '',
-    timestamp: (c.timestamp as string) || '',
-    replies: { count: (replies?.count as number) || 0 },
-    reactions: {
-      likes_count: (reactions?.likes_count as number) || 0,
-      recasts_count: (reactions?.recasts_count as number) || 0,
-      likes: (reactions?.likes as { fid: number }[]) || [],
-      recasts: (reactions?.recasts as { fid: number }[]) || [],
-    },
-    parent_hash: (c.parent_hash as string) || null,
-    embeds: (c.embeds as Cast['embeds']) || [],
-    _source: 'neynar',
-  };
+  return { ...neynarCastToCast(c), _source: 'neynar' };
 }
 
 export async function GET(req: NextRequest) {

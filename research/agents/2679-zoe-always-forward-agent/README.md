@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-10-14
+last-validated: 2026-10-15
 related-docs: "2239, 2625, 2432, 2623, 2444, 2199, 601"
 original-query: "please help me upgrade the zoe agent to be more of our always moving forward agent (Zaal, seat pane, 2026-10-14 20:00 EDT). Lane brief: (a) what ZOE already does that moves things forward on its own, with file:line; (b) what the seat did by hand today that ZOE should do (morning WAITING ON YOU push at 5:15 AM with buttons; one gated question at a time, re-ranked after each answer; auto-proceed logging; the queue item picker; evening cutoff); (c) the gap list, each marked EXTEND <file> or NEW; (d) a 3-PR plan, smallest first, each flag-gated and reversible; (e) what NOT to build."
 tier: STANDARD
@@ -111,6 +111,20 @@ Order: 1 then 3 then 2. PR 2 is the one with judgment in it (what counts as gate
 | Seat page last written on vault origin/main | 2026-10-11 08:44 EDT, 26 lines | `git show origin/main:<page>`, 2026-10-14 |
 | node-cron pinned | `^3.0.3` | `bot/package.json:29` |
 
+## Addendum 2026-10-15, item 228: the daily totals that come back until zero
+
+Zaal, 2026-10-14 (seat item 228): "Research this and make my Zoe better what's it gonna ping me about it should daily give me my total grill and todo items and keep bugging me til nothings in my inbox", with a Reddit link, and then "Push all PRs to this". Written Thu 15 Oct 2026, 01:xx EDT (clock from `date`).
+
+**The source: FAILED.** The link is a Reddit share redirect. Six routes were tried from this Mac on 2026-10-15 between 00:5x and 01:1x EDT and none returned the post: `curl -sIL` with a browser User-Agent (HTTP 403 on the redirect itself); `zao-fetch-reddit.sh` (exit 2, no OAuth credentials on this machine); Chrome through the browser tool (two browsers are connected and the pick is Zaal's); Playwright MCP (no bridge extension installed); the gstack `browse` binary (present, but its Playwright browsers are not installed); a reader proxy (403, the domain blocked until 02:01 UTC) and the exa fetcher (CRAWL_LIVECRAWL_TIMEOUT twice). What the post describes is therefore UNKNOWN here. The one route left is Zaal opening the link in Chrome and pasting the post id, after which `https://arctic-shift.photon-reddit.com/api/posts/ids?ids=<id>` returns it as JSON. Nothing below rests on the post.
+
+**What ZOE already had for this** (section 1): the 08:00 and 20:00 needs-Zaal digests with recommended-first buttons (`needs-zaal-digest.ts`), the per-question nudge ladder (`nudge-ladder.ts:72-80`, 5 pings in 10 minutes then decaying, `ZOE_NUDGE_LADDER`), the one-resend escalation for critical pings (`escalation.ts:27`), the forward nudge every 4h (`nudges.ts`), and the quiet window. None of them carries a TOTAL, none repeats on a day-level backoff, and none says "clear" when the count hits zero.
+
+**What was built, ZAOOS #3953 (PR 2, `ZOE_INBOX_NUDGE`, flag OFF):** `bot/src/zoe/inbox-nudge.ts`. The total is four counts from sources that already exist: lanes (`parseLaneGrillSections`, the same bullets `zao-lanegrill-count` counts; 118 LIVE and 11 STALE on vault origin/main at 00:5x EDT), the seat page's Waiting on Zaal rows (`terminals-digest.ts`), board decisions and due-soon cards (`filterNeedsZaalTasks`), and open non-draft PRs by the review owners without the `hold` label (`cockpit/adapters.ts` `fetchReviewPRs`, labels now carried). Mail is not counted: `inbox-ingest.ts` keeps no pending number. `decide()` is pure: nothing in the quiet window or before 05:15 Eastern; the first totals at the first tick after it; repeats after 2h, 4h, 8h only when the total changed; then the 20:00 digest; at zero one "Inbox clear" line a day, only after something was sent. Buttons: the next seat card (the #3952 sender) and one button per PR that answers with the one-line merge command as text. Nothing merges or answers for him. 23 tests.
+
+**What was not built:** no mail count (it would be invented), no auto-merge state per PR (one API call each, not worth a daily count; stated in the module header), no second ladder (the per-question one stays for single critical asks), no new bot, nothing outbound.
+
+**The flag flip waits on** the seat page being written by code (dotfiles #531, merged 2026-10-15) and the two fragment filters (dotfiles #532 in the scribe, and orca-board `classify()` after #528), because a fragment row would reach his phone as a card he cannot answer.
+
 ## Also See
 
 - [Doc 2239](../2239-zoe-capability-map/) - the living capability map; read before claiming anything is missing.
@@ -137,6 +151,6 @@ Order: 1 then 3 then 2. PR 2 is the one with judgment in it (what counts as gate
 - [FULL] `research/agents/2239-zoe-capability-map/README.md` (flag tables, lines 24-92), `2625-zoe-main-point-of-contact-design/README.md` (release table, lines 110-124), `2432-zoe-telegram-interrupt-rule/README.md` (per-class table, lines 103-126). Numbers resolved with `zao-research-health --resolve`.
 - [FULL] The seat's terminals page and BLACKBOARD on the vault's origin/main, read with `git show origin/main:` 2026-10-14 (page dated 2026-10-11 08:44 EDT; BLACKBOARD last commit 2026-10-14 06:11 EDT, its WAITING FOR ZAAL list built 2026-09-27).
 - [FULL] [openclaw heartbeat doc](https://raw.githubusercontent.com/openclaw/openclaw/main/docs/gateway/heartbeat.md) - raw, 200, 40,884 bytes; line 100 carries the NO_REPLY rule `attention.ts` credits. Method: curl.
-- [PARTIAL - README is for v4, the bot pins ^3.0.3] [node-cron README, "Timezones and DST"](https://raw.githubusercontent.com/node-cron/node-cron/master/README.md) - raw, 200: "Schedules match wall-clock time in the task's timezone". The zone claim this doc relies on rests on the repo's own `scheduler.ts:1107` usage, not on this README. Method: curl.
+- [PARTIAL - README is for v4, the bot pins ^3.0.3] [node-cron README, "Timezones and DST"](https://raw.githubusercontent.com/node-cron/node-cron/master/README.md) - raw, 200: "Schedules match wall-clock time in the task's timezone". The zone claim this doc relies on rests on the repo's own `scheduler.ts:1106` usage, not on this README. Method: curl.
 - [FULL] Community: [node-cron issue #124, "is there a list of the timezone names?"](https://github.com/node-cron/node-cron/issues/124) - 13 comments, found with `gh api search/issues` this run; the IANA name `America/New_York` used in `scheduler.ts` is the form that thread settles on. Method: GitHub REST.
 - [FULL] [elizaOS/eliza](https://github.com/elizaOS/eliza) and [letta-ai/learning-sdk](https://github.com/letta-ai/learning-sdk) - 200 each, repo pages only; the pattern credits are `attention.ts:21-29`'s, not re-verified at file level here. Method: curl HEAD.

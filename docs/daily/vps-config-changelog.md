@@ -4,14 +4,14 @@
 
 ### OpenClaw Config (openclaw.json)
 - `nativeSkills: false` -- disables OpenClaw intercepting /slash commands so they pass through to M2.7 as regular messages. ZOE reads COMMANDS.md to handle them.
-- Location: `/home/zaal/openclaw/openclaw.json` (host) mounted to `/home/node/.openclaw/openclaw.json` (container)
+- Location: `<command in the vault>` (host) mounted to `<command in the vault>` (container)
 - Host dir owned by `ubuntu` (uid 1000), `zaal` (uid 1001) needs docker volume mount to edit
 
 ### Files Deployed to Container
 - `SOUL.md` -- Updated: added Commands section (references COMMANDS.md), proactive behavior rules, task CRUD instructions
 - `AGENTS.md` -- Updated: replaced DND windows with proactive ping rules, always-available policy, max 3-4 pings/day, task management role
 - `COMMANDS.md` -- NEW: 16 Telegram slash commands (tasks, add, done, next, carry, priorities, status, inbox, brief, newsletter, idea, research, bookmark, commands, schedule, week)
-- Location: `/home/node/openclaw-workspace/` (container), mounted from `/home/zaal/openclaw-workspace/` (host)
+- Location: `<command in the vault>` (container), mounted from `<command in the vault>` (host)
 
 ### Scheduled Triggers (RemoteTrigger API)
 | Trigger | ID | Cron (UTC) | EST | What |

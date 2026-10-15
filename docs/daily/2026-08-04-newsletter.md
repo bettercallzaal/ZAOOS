@@ -26,4 +26,4 @@ The intention for Tuesday: pick one open PR and close it clean. The CI symlink f
 
 ---
 
-*Tomorrow's priorities: Merge PR #2786 (CI — 53 red runs), Jose $100 USDC (Day 32+), Begin fleet terminal build for one brand (doc 2182 spec ready).*
+*Tomorrow's priorities: Merge PR #2786 (CI — 53 red runs), Jose (amount in the vault) (Day 32+), Begin fleet terminal build for one brand (doc 2182 spec ready).*

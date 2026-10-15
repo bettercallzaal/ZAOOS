@@ -26,4 +26,4 @@ The intention for the week: before adding a new organ, name the ones you already
 
 ---
 
-*Tomorrow's priorities: Fractal meeting (6pm EST), Merge PR #2786 (CI fix — 53 straight red runs), Confirm GEO kit live, Jose $100 USDC (Day 31+).*
+*Tomorrow's priorities: Fractal meeting (6pm EST), Merge PR #2786 (CI fix — 53 straight red runs), Confirm GEO kit live, Jose (amount in the vault) (Day 31+).*

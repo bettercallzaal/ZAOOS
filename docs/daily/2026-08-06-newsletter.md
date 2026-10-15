@@ -49,4 +49,4 @@ These aren't small things anymore. They're the symlink path.
 
 ---
 
-*Tomorrow's priorities: Jose $100 USDC (Day 34+). VPS deploy (Day 93+ — unlocks everything). Proof Drops one-pager connecting PR #2817 to doc 2190. A-Corp Colorado (6 days to effective date).*
+*Tomorrow's priorities: Jose (amount in the vault) (Day 34+). VPS deploy (Day 93+ — unlocks everything). Proof Drops one-pager connecting PR #2817 to doc 2190. A-Corp Colorado (6 days to effective date).*

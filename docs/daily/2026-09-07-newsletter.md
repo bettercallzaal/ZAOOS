@@ -10,7 +10,7 @@ Sunday closed with three code fixes landing quietly — the send-budget bug that
 
 T-28 starts now. The deal memos for the five verbal confirms have been sitting drafted all week — Crown Vics, Acadia Rising, Dcoop, Fellenz, Michael Anderson. Artist cutoff passed September 3. The research that produced those confirmations is documented in doc 2464. The gap between "documented and confirmed" and "contracted" is a send. This week that gap closes. Same with the sponsor email (Day 13 overdue) and the Steve Peer call. These aren't hard problems. They're the execution work that comes after the clarity work, and the last two weeks were clarity.
 
-Monday is also Fractal day (6pm EST). The week has a natural rhythm: close the paper gaps in the morning, build toward the call in the afternoon, use the Fractal conversation to sharpen what comes next. The env var that's been missing for 121 days is also on this week's list — one line in `~/.zao/zao.env` and the inbox comes back online. It's been on the list long enough to be embarrassing.
+Monday is also Fractal day (6pm EST). The week has a natural rhythm: close the paper gaps in the morning, build toward the call in the afternoon, use the Fractal conversation to sharpen what comes next. The env var that's been missing for 121 days is also on this week's list — one line in `<command in the vault>` and the inbox comes back online. It's been on the list long enough to be embarrassing.
 
 ---
 

@@ -28,4 +28,4 @@ Friday intention: bring one thing from this week to someone who wasn't in the ro
 
 ---
 
-*Tomorrow's priorities: Weekly recap due 4:30pm. Jose $100 USDC (Day 35+). VPS deploy (Day 94+). A-Corp Colorado prep (5 days to Aug 12). Proof Drops one-pager.*
+*Tomorrow's priorities: Weekly recap due 4:30pm. Jose (amount in the vault) (Day 35+). VPS deploy (Day 94+). A-Corp Colorado prep (5 days to Aug 12). Proof Drops one-pager.*

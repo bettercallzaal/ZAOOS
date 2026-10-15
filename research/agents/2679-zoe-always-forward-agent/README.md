@@ -124,7 +124,7 @@ Order: 1 then 3 then 2. PR 2 is the one with judgment in it (what counts as gate
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| PR 1: scheduled first waiting card (`ZOE_WAITING_PUSH`), flag OFF, hold label until the seat page is in shape | 5 queue lane | PR | opened 2026-10-14, see the lane report |
+| PR 1: scheduled first waiting card (`ZOE_WAITING_PUSH`), flag OFF, hold label until the seat page is in shape | 5 queue lane | PR | ZAOOS #3952, opened 2026-10-14; this doc is #3951 |
 | Seat writes the terminals page in the parsed shape (`Stamp:` line, `## Waiting on Zaal` table) on every tick | orchestrator seat | Mac lane | before PR 1's flag is set |
 | Flip `ZOE_GRILL_TERMINALS`, `ZOE_WAITING_PUSH`, `ZOE_WAITING_PUSH_CRON` on the VPS | Zaal (settings) | gated tap | after the page is fresh |
 | PR 3: tail question on DM replies (`ZOE_TAIL_QUESTION`) | ZOE lane | PR | after PR 1 merges |

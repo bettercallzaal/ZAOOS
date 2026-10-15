@@ -18,7 +18,7 @@ vi.mock('@/lib/db/supabase', () => ({
   supabaseAdmin: { from: mockFrom },
 }));
 
-import { checkAllowlist } from '../allowlist';
+import { AllowlistLookupError, checkAllowlist } from '../allowlist';
 
 const MOCK_ENTRY = {
   id: 'entry-uuid-1',
@@ -105,7 +105,7 @@ describe('wallet lookup', () => {
 
   it('checks custody_address when primary wallet misses', async () => {
     mockMiss(); // primary wallet miss
-    mockHit();  // custody match
+    mockHit(); // custody match
     const result = await checkAllowlist(undefined, '0xcustody');
     expect(result.allowed).toBe(true);
     expect(chain.eq).toHaveBeenCalledWith('custody_address', '0xcustody');
@@ -114,7 +114,7 @@ describe('wallet lookup', () => {
   it('checks verified_addresses JSONB array when primary and custody miss', async () => {
     mockMiss(); // primary wallet miss
     mockMiss(); // custody miss
-    mockHit();  // verified_addresses match
+    mockHit(); // verified_addresses match
     const result = await checkAllowlist(undefined, '0xverified');
     expect(result.allowed).toBe(true);
     expect(chain.contains).toHaveBeenCalledWith('verified_addresses', ['0xverified']);
@@ -150,5 +150,35 @@ describe('combined FID + wallet', () => {
     expect(result.allowed).toBe(true);
     // Only the allowlist FID query should have run
     expect(chain.eq).not.toHaveBeenCalledWith('wallet_address', expect.anything());
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A database error is UNKNOWN, never "not a member"
+// supabase-js resolves { data: null, error } instead of throwing; reading that
+// as a miss would downgrade a member to a visitor when the front door is open.
+// ---------------------------------------------------------------------------
+describe('database errors', () => {
+  const DB_ERROR = { data: null, error: { message: 'connection refused', code: '08006' } };
+
+  it('throws AllowlistLookupError when the FID lookup returns an error result', async () => {
+    chain.maybeSingle.mockResolvedValueOnce(DB_ERROR);
+    await expect(checkAllowlist(12345)).rejects.toBeInstanceOf(AllowlistLookupError);
+  });
+
+  it('throws when an error comes later, after earlier lookups missed', async () => {
+    mockMiss(); // allowlist FID: completed, no row
+    chain.maybeSingle.mockResolvedValueOnce(DB_ERROR); // users fallback errors
+    await expect(checkAllowlist(12345)).rejects.toBeInstanceOf(AllowlistLookupError);
+  });
+
+  it('throws on an error in the wallet path', async () => {
+    chain.maybeSingle.mockResolvedValueOnce(DB_ERROR);
+    await expect(checkAllowlist(undefined, '0xABC')).rejects.toBeInstanceOf(AllowlistLookupError);
+  });
+
+  it('still resolves { allowed: false } when every lookup completed and missed', async () => {
+    for (let i = 0; i < 6; i++) mockMiss();
+    await expect(checkAllowlist(12345, '0xabc')).resolves.toEqual({ allowed: false });
   });
 });

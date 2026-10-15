@@ -1,5 +1,5 @@
 /**
- * The open front door (vault decisions, gate ruling 2026-10-15, option A):
+ * The open front door (gate decision 2026-10-15):
  * any verified Farcaster account may sign in and READ the ZAO channel feeds as
  * a visitor. Posting into ZAO channels and every member feature stay
  * members-only, enforced server-side by getSessionData() returning null for

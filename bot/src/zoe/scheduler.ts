@@ -77,6 +77,7 @@ import { quietEnabled, releaseQuietQueue } from './quiet-window';
 import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
 import { WAITING_PUSH_ZONE, sendNextTerminalCard, waitingPushCronAllowed, waitingPushEnabled } from './terminal-grill';
+import { inboxNudgeEnabled, runInboxNudgeTick } from './inbox-nudge';
 import { sendThezaoDaily } from './thezao-daily';
 import { runSleepCheckinTick } from './sleep-checkin';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
@@ -929,6 +930,44 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       );
     }
   }
+
+  // Inbox nudge (inbox-nudge.ts, doc 2679 PR 2). Zaal, 2026-10-14, item 228:
+  // "it should daily give me my total grill and todo items and keep bugging me
+  // til nothings in my inbox". Every 30 minutes the module decides: nothing in
+  // the quiet window or before ZOE_INBOX_NUDGE_FROM, the first totals at the
+  // first tick after it, repeats on the backoff only when the total changed,
+  // one "clear" line the day it reaches zero. Off unless ZOE_INBOX_NUDGE=1;
+  // the flag is read inside the module, and a sub-daily cron is never
+  // claimFire-guarded (scheduler-cron-guards.test.ts). Class `gated`.
+  tasks.push(
+    cron.schedule(
+      '*/30 * * * *',
+      () => {
+        if (!inboxNudgeEnabled()) return;
+        return runWithSendClass('gated', async () => {
+          try {
+            const lock = await withTickLock(join(ZOE_PATHS.home, 'inbox-nudge.tick.lock'), () =>
+              runInboxNudgeTick({
+                send: (text, buttons) =>
+                  opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                    reply_markup: {
+                      inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
+                    },
+                  }),
+              }),
+            );
+            if (!lock.ran) return; // another tick holds the lock; the next one runs
+            const r = lock.value;
+            if (r !== 'quiet' && r !== 'before-from' && r !== 'not-due') console.log(`[zoe/scheduler] inbox nudge: ${r}`);
+            if (r === 'send' || r === 'clear') featureRan('inbox-nudge', r);
+          } catch (err) {
+            console.warn('[zoe/scheduler] inbox nudge failed (nbd):', (err as Error).message);
+          }
+        });
+      },
+      { timezone: 'UTC' },
+    ),
+  );
 
   // Doc 989 (backlog #2): escalation resend. Every 30 min, re-ping any
   // super-important message Zaal hasn't acknowledged past the window. Standalone

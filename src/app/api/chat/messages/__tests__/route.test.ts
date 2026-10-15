@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   makeGetRequest,
   mockAuthenticatedSession,
@@ -15,8 +15,18 @@ const { mockGetChannelFeed } = vi.hoisted(() => ({
   mockGetChannelFeed: vi.fn(),
 }));
 
+const { mockGetReaderSession, mockRateLimit } = vi.hoisted(() => ({
+  mockGetReaderSession: vi.fn(),
+  mockRateLimit: vi.fn(),
+}));
+
 vi.mock('@/lib/auth/session', () => ({
   getSessionData: () => mockGetSessionData(),
+  getReaderSession: () => mockGetReaderSession(),
+}));
+
+vi.mock('@/lib/rate-limit', () => ({
+  rateLimit: (...args: unknown[]) => mockRateLimit(...args),
 }));
 
 vi.mock('@/lib/db/supabase', () => ({
@@ -796,5 +806,69 @@ describe('GET /api/chat/messages', () => {
       expect(body.casts).toEqual([]);
       expect(body.hasMore).toBe(false);
     });
+  });
+});
+
+describe('GET /api/chat/messages - visitors (open front door)', () => {
+  const VISITOR = { fid: 555, username: 'v', displayName: 'V', pfpUrl: '', role: 'visitor' };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSessionData.mockResolvedValue(null);
+    mockGetReaderSession.mockResolvedValue(VISITOR);
+    mockRateLimit.mockResolvedValue({ success: true, remaining: 19 });
+    mockFrom.mockReturnValue(chainMock({ data: [mockCastRow()], error: null, count: 0 }));
+    mockGetChannelFeed.mockResolvedValue(mockNeynarFeed([]));
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('flag off: a visitor gets 401 and the reader session is never consulted', async () => {
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    expect(res.status).toBe(401);
+    expect(mockGetReaderSession).not.toHaveBeenCalled();
+  });
+
+  it('flag on: a visitor can read an allowed ZAO channel, rate-limited by FID', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    expect(res.status).toBe(200);
+    expect(mockRateLimit).toHaveBeenCalledWith('visitor-read:555', 20, 60_000);
+  });
+
+  it('flag on: a visitor gets no ZIDs (member data) and the users table is not queried', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    const body = await res.json();
+    expect(body.casts.every((c: { author: { zid: unknown } }) => c.author.zid === null)).toBe(true);
+    expect(mockFrom).not.toHaveBeenCalledWith('users');
+  });
+
+  it('flag on: a visitor still cannot read a channel outside the allowlist', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=random'));
+    expect(res.status).toBe(400);
+  });
+
+  it('flag on: 429 when the visitor is over the limit', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    mockRateLimit.mockResolvedValue({ success: false, remaining: 0 });
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    expect(res.status).toBe(429);
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+
+  it('flag on: 401 when there is no reader session at all', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    mockGetReaderSession.mockResolvedValue(null);
+    const res = await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    expect(res.status).toBe(401);
+  });
+
+  it('members are not rate-limited by the visitor limit', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    mockGetSessionData.mockResolvedValue(mockAuthenticatedSession());
+    await GET(makeGetRequest('/api/chat/messages?channel=zao'));
+    expect(mockRateLimit).not.toHaveBeenCalled();
+    expect(mockGetReaderSession).not.toHaveBeenCalled();
   });
 });

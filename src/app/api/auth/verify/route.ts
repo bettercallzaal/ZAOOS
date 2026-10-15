@@ -3,10 +3,11 @@ import crypto from 'crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { communityConfig } from '@/../community.config';
-import { saveSession } from '@/lib/auth/session';
+import { saveSession, saveVisitorSession } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { checkAllowlist } from '@/lib/gates/allowlist';
+import { openFrontDoorEnabled } from '@/lib/gates/front-door';
 import { logger } from '@/lib/logger';
 import { createInAppNotification } from '@/lib/notifications';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
@@ -165,6 +166,36 @@ export async function POST(req: NextRequest) {
     }
 
     if (!gateResult?.allowed) {
+      // Only a COMPLETED "not a member" answer makes a visitor. If the FID
+      // lookup itself failed, a member could be on the list by FID alone, so
+      // do not downgrade them to a visitor on a database error.
+      if (openFrontDoorEnabled() && gateByFidResult.status === 'rejected') {
+        logger.error('[Auth] Allowlist FID lookup failed; refusing to downgrade FID', fid);
+        return NextResponse.json(
+          { error: 'Could not verify membership. Please try again.' },
+          { status: 502 },
+        );
+      }
+      if (openFrontDoorEnabled()) {
+        // Open front door: a verified Farcaster account that is not a member
+        // gets a read-only visitor session. No admin, no signer, no user row,
+        // no welcome cast.
+        try {
+          await saveVisitorSession({
+            fid,
+            username: user.username,
+            displayName: user.display_name,
+            pfpUrl: user.pfp_url,
+          });
+        } catch (sessionErr) {
+          logger.error('[Auth] Failed to save visitor session for FID', fid, sessionErr);
+          return NextResponse.json(
+            { error: 'Could not create session. Please try again.' },
+            { status: 500 },
+          );
+        }
+        return NextResponse.json({ success: true, role: 'visitor', redirect: '/feed' });
+      }
       return NextResponse.json(
         { error: 'Not on allowlist', redirect: '/not-allowed' },
         { status: 403 },

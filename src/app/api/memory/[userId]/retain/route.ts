@@ -24,7 +24,7 @@ export async function POST(
 ) {
   try {
     const session = await getSession();
-    if (!session?.fid) {
+    if (!session?.fid || session.isMember === false) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

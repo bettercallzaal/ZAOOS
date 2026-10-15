@@ -15,7 +15,7 @@ const querySchema = z.object({
 export async function GET(req: Request) {
   try {
     const session = await getSession();
-    if (!session.fid) {
+    if (!session.fid || session.isMember === false) {
       return NextResponse.json({ success: false, error: 'unauthorized' }, { status: 401 });
     }
 

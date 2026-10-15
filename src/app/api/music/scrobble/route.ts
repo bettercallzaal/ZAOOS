@@ -16,7 +16,7 @@ const ScrobbleSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
-    if (!session?.fid) {
+    if (!session?.fid || session.isMember === false) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

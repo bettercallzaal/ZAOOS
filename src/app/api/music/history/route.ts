@@ -13,7 +13,7 @@ const HistorySchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
-    if (!session?.fid && !session?.walletAddress) {
+    if ((!session?.fid && !session?.walletAddress) || session.isMember === false) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

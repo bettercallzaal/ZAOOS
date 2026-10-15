@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { LoginButton } from '@/components/gate/LoginButton';
-import { getSessionData } from '@/lib/auth/session';
+import { getReaderSession, getSessionData } from '@/lib/auth/session';
+import { openFrontDoorEnabled } from '@/lib/gates/front-door';
 
 export const metadata: Metadata = {
   title: 'ZAO OS — The ZAO Community',
@@ -26,6 +27,9 @@ export default async function LandingPage() {
   const session = await getSessionData();
   if (session) {
     redirect('/os');
+  }
+  if (openFrontDoorEnabled() && (await getReaderSession())?.role === 'visitor') {
+    redirect('/feed');
   }
 
   return (

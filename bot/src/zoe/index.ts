@@ -47,8 +47,7 @@ import {
   type XLink,
 } from './x-desk';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
-import { captureTerminalTypedReply, formatTerminalCard, nextTerminalItem, readTerminalGrillState, recordTerminalAnswer, setPendingType, terminalGrillEnabled } from './terminal-grill';
-import { isGrillPaused } from './grill-pause';
+import { captureTerminalTypedReply, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
@@ -648,21 +647,14 @@ function grillResolvedText(original: string | undefined, outcome: string): strin
 // The seat's "Waiting on Zaal" items, one at a time, before the board cards
 // (terminal-grill.ts, ZOE_GRILL_TERMINALS). Returns true when it sent a card.
 async function sendNextTerminalItem(): Promise<boolean> {
-  if (!terminalGrillEnabled()) return false;
-  if (await isGrillPaused()) return false;
-  try {
-    const { text } = await readTerminalsPage(terminalsVaultDir());
-    const page = parseTerminalsPage(text);
-    const next = nextTerminalItem(page, await readTerminalGrillState());
-    if (!next) return false;
-    const card = formatTerminalCard(next, page.stamp);
-    await bot.api.sendMessage(zaalId, card.text, { reply_markup: { inline_keyboard: toGrammyRows(card.buttons) } });
-    featureRan('terminal-grill', 'card');
-    return true;
-  } catch (e) {
-    console.error('[zoe/terminal-grill] could not read or send the next item:', (e as Error)?.message);
-    return false;
-  }
+  // The sender lives in terminal-grill.ts so the ZOE_WAITING_PUSH cron sends
+  // the same card (doc 2679 PR 1). 'off', 'paused', 'empty' and 'failed' all
+  // mean "nothing sent" here; the cron logs which.
+  const r = await sendNextTerminalCard({
+    send: (text, buttons) => bot.api.sendMessage(zaalId, text, { reply_markup: { inline_keyboard: toGrammyRows(buttons) } }),
+  });
+  if (r === 'sent') featureRan('terminal-grill', 'card');
+  return r === 'sent';
 }
 
 // After a terminal answer: the next terminal item, else the board grill as before.

@@ -27,8 +27,8 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { TerminalsPage } from './terminals-digest';
-import { withStopRow, type Button } from './grill-pause';
+import { parseTerminalsPage, readTerminalsPage, vaultDir, type TerminalsPage } from './terminals-digest';
+import { isGrillPaused, withStopRow, type Button } from './grill-pause';
 
 export function terminalGrillEnabled(): boolean {
   return process.env.ZOE_GRILL_TERMINALS === '1';
@@ -120,6 +120,64 @@ export function formatTerminalCard(w: { id: string; item: string }, stamp: strin
     text: head,
     buttons: withStopRow([[{ text: 'Done', data: d('done') }, { text: 'Skip', data: d('skip') }, { text: 'Type an answer', data: d('type') }]]),
   };
+}
+
+export type SendCardOutcome = 'off' | 'paused' | 'empty' | 'sent' | 'failed';
+
+/**
+ * Send the first unanswered seat item as a card. One sender for /grill, the
+ * advance-after-answer path (index.ts) and the ZOE_WAITING_PUSH cron
+ * (scheduler.ts, doc 2679 PR 1), so the scheduled card is byte-for-byte the
+ * card /grill sends. Says what happened instead of throwing: a cron that
+ * cannot read the page logs 'failed' and sends nothing, never a half card.
+ */
+export async function sendNextTerminalCard(deps: {
+  send: (text: string, buttons: Button[][]) => Promise<unknown>;
+  read?: () => Promise<{ text: string }>;
+}): Promise<SendCardOutcome> {
+  if (!terminalGrillEnabled()) return 'off';
+  if (await isGrillPaused()) return 'paused';
+  try {
+    const { text } = await (deps.read ?? (() => readTerminalsPage(vaultDir())))();
+    const page = parseTerminalsPage(text);
+    const next = nextTerminalItem(page, await readTerminalGrillState());
+    if (!next) return 'empty';
+    const card = formatTerminalCard(next, page.stamp);
+    await deps.send(card.text, card.buttons);
+    return 'sent';
+  } catch (e) {
+    console.error('[zoe/terminal-grill] could not read or send the next item:', (e as Error)?.message);
+    return 'failed';
+  }
+}
+
+/**
+ * The morning Waiting-on-Zaal push (doc 2679 PR 1). Zaal, 2026-10-14: the seat
+ * sent his WAITING ON YOU list by hand at 5:15 with buttons; with
+ * ZOE_WAITING_PUSH=1 and a cron expression in ZOE_WAITING_PUSH_CRON, read on
+ * his clock (America/New_York), ZOE sends the first seat item itself.
+ */
+export function waitingPushEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_WAITING_PUSH === '1';
+}
+export const WAITING_PUSH_ZONE = 'America/New_York';
+
+/**
+ * Pure. True only for a cron that fires at most once an hour: the minute field
+ * is ONE number (no list, range, step or '*'), and the hour field is a number or
+ * a list of numbers ('8,20' is two sends a day, '*' or '*\/2' is not). The sender
+ * always picks the FIRST unanswered item, so anything firing twice in an hour
+ * would re-send the same card until he answered it, and doc 2432's rule is one
+ * interrupt, not a stream. The first version let a minute LIST through
+ * ('0,30 5 * * *'), caught by the evaluator on #3952. The five-field shape is
+ * checked here; cron.validate in the scheduler checks the rest.
+ */
+export function waitingPushCronAllowed(expr: string): boolean {
+  const f = expr.trim().split(/\s+/);
+  if (f.length !== 5) return false;
+  const oneMinute = /^[0-9]{1,2}$/.test(f[0]);
+  const fixedHours = /^[0-9]{1,2}(,[0-9]{1,2})*$/.test(f[1]);
+  return oneMinute && fixedHours;
 }
 
 export type RecordOutcome = 'recorded' | 'already-answered' | 'stale' | 'invalid' | 'unknown-item';

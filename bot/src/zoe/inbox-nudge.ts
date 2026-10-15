@@ -34,6 +34,12 @@
  *     needs-Zaal digest is the next word
  *   - total 0: one "clear" message, once a day, and only if something above
  *     zero was sent that day; then silence until tomorrow
+ *   - a PARTIAL read (any source failed) never says clear and never counts as
+ *     a change: the tick returns 'unread' and the state is untouched. The one
+ *     exception is the day's first send, which still goes out with the failed
+ *     sources named, so a source that is down all day is seen rather than
+ *     silently making the day quiet. (Evaluator on #3953: every source down
+ *     after the morning send read as total 0 and spent the day's clear.)
  * Buttons: "Next card" sends the first seat item (terminal-grill.ts
  * sendNextTerminalCard, the same card the waiting push sends); "PR merge
  * commands" lists the PRs, one button each, and a tap answers with the
@@ -99,7 +105,8 @@ export type Decision =
   | { action: 'not-due'; dueAt: string }
   | { action: 'exhausted' }
   | { action: 'clear' }
-  | { action: 'silent' };
+  | { action: 'silent' }
+  | { action: 'unread' };
 
 /** "YYYY-MM-DD" in America/New_York, the day the state is keyed on. */
 export function easternDay(now: Date): string {
@@ -108,11 +115,24 @@ export function easternDay(now: Date): string {
 
 export const emptyState = (day: string): NudgeState => ({ day, sends: [], clearSaidAt: null });
 
-/** Pure. What this tick should do, from the state, the clock and the total. */
-export function decide(state: NudgeState, now: Date, total: number, cfg: NudgeConfig, quiet: boolean = inQuietWindow(now)): Decision {
+/** Pure. What this tick should do, from the state, the clock, the total and
+ *  whether every source was read (`partial` = at least one failed). */
+export function decide(
+  state: NudgeState,
+  now: Date,
+  total: number,
+  cfg: NudgeConfig,
+  quiet: boolean = inQuietWindow(now),
+  partial = false,
+): Decision {
   if (quiet) return { action: 'quiet' };
   if (easternMinute(now) < cfg.fromMinute) return { action: 'before-from' };
   const last = state.sends[state.sends.length - 1];
+  if (partial) {
+    // A number with a hole in it is not a count: no clear, no "it changed".
+    if (!last && total > 0) return { action: 'send', nth: 1 };
+    return { action: 'unread' };
+  }
   if (total === 0) {
     if (state.sends.length && !state.clearSaidAt) return { action: 'clear' };
     return { action: 'silent' };
@@ -275,7 +295,7 @@ export async function runInboxNudgeTick(deps: {
   const pre = decide(state, now, 1, nudgeConfig(env));
   if (pre.action === 'quiet' || pre.action === 'before-from') return pre.action;
   const totals = await readTotals(deps.sources);
-  const d = decide(state, now, totals.total, nudgeConfig(env));
+  const d = decide(state, now, totals.total, nudgeConfig(env), inQuietWindow(now), totals.failed.length > 0);
   if (d.action === 'send') {
     const { text, buttons } = formatTotals(totals, d.nth, now);
     await deps.send(text, buttons);

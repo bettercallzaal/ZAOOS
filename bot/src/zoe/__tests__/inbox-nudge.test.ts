@@ -70,6 +70,13 @@ describe('decide - when the totals go out', () => {
     expect(decide({ ...s, clearSaidAt: at('09:00').toISOString() }, at('09:30'), 0, cfg, false)).toEqual({ action: 'silent' });
     expect(decide(emptyState('2026-10-14'), at('09:00'), 0, cfg, false)).toEqual({ action: 'silent' });
   });
+  it('a partial read never clears and never counts as a change; the first send of the day still goes', () => {
+    const s: NudgeState = { day: '2026-10-14', sends: [sent('05:15', 9)], clearSaidAt: null };
+    expect(decide(s, at('09:00'), 0, cfg, false, true)).toEqual({ action: 'unread' });
+    expect(decide(s, at('12:00'), 3, cfg, false, true)).toEqual({ action: 'unread' });
+    expect(decide(emptyState('2026-10-14'), at('09:00'), 0, cfg, false, true)).toEqual({ action: 'unread' });
+    expect(decide(emptyState('2026-10-14'), at('09:00'), 4, cfg, false, true)).toEqual({ action: 'send', nth: 1 });
+  });
   it('a count that comes back after a clear is sent again on the ladder', () => {
     const s: NudgeState = { day: '2026-10-14', sends: [sent('05:15', 9)], clearSaidAt: at('09:00').toISOString() };
     expect(decide(s, at('12:00'), 3, cfg, false)).toEqual({ action: 'send', nth: 2 });
@@ -199,6 +206,21 @@ describe('runInboxNudgeTick - sources, state file, sends', () => {
     expect(r).toBe('send');
     expect(sends[0].text).toContain('Could not read: board (counted as 0)');
     expect(sends[0].text).toContain('Waiting on you today: 6');
+  });
+  it('every source down after the morning send: unread, nothing sent, the clear is not spent', async () => {
+    await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });
+    const down = async (): Promise<never> => {
+      throw new Error('down');
+    };
+    const allDown = { lanes: down, page: down, board: down, prs: down };
+    expect(await runInboxNudgeTick({ send, env, now: at('09:00'), sources: allDown })).toBe('unread');
+    expect(sends).toHaveLength(1);
+    const s = await readState('2026-10-14');
+    expect(s.clearSaidAt).toBeNull();
+    expect(s.sends).toHaveLength(1);
+    // The next full read with a real zero still gets its clear.
+    const zero = sources({ lanes: async () => 0, page: async () => 0, board: async () => 0, prs: async () => [] } as never);
+    expect(await runInboxNudgeTick({ send, env, now: at('09:30'), sources: zero })).toBe('clear');
   });
   it('zero after a send: one clear line, then silence for the day', async () => {
     await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });

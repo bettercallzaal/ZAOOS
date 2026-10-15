@@ -77,7 +77,7 @@ export interface ReviewPR {
   url: string;
   draft: boolean;
   createdAt: string | null;
-  /** Label names, lower case as GitHub gives them; absent on rows read before this field existed. */
+  /** Label names as GitHub gives them (their case kept); absent on rows read before this field existed. */
   labels?: string[];
 }
 

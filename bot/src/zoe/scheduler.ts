@@ -897,11 +897,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   // 2026-10-14: the seat pushed his WAITING ON YOU list by hand at 5:15 with
   // buttons. This sends the first seat item as the card /grill sends, on his
   // clock. Scheduled only when ZOE_WAITING_PUSH=1 AND ZOE_WAITING_PUSH_CRON is
-  // a valid, non-repeating cron expression, read in America/New_York (the
-  // quiet window ends 04:45 there, so '15 5 * * *' clears it). The sender
-  // itself needs ZOE_GRILL_TERMINALS=1 or it returns 'off'. An empty page
-  // sends nothing. Class `gated`: it asks for his tap. Daily, not claimFire-
-  // guarded: a repeating expression is refused before it is scheduled.
+  // a valid cron expression with ONE minute and fixed hours, read in
+  // America/New_York (the quiet window ends 04:45 there, so '15 5 * * *'
+  // clears it). The sender itself needs ZOE_GRILL_TERMINALS=1 or it returns
+  // 'off'. An empty page sends nothing. Class `gated`: it asks for his tap.
+  // At most once an hour by the guard, so no claimFire: a minute list, range,
+  // step or '*' is refused before it is scheduled (waitingPushCronAllowed).
   const waitingCron = process.env.ZOE_WAITING_PUSH_CRON?.trim();
   if (waitingCron && waitingPushEnabled()) {
     if (!cron.validate(waitingCron) || !waitingPushCronAllowed(waitingCron)) {

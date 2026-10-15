@@ -163,18 +163,21 @@ export function waitingPushEnabled(env: NodeJS.ProcessEnv = process.env): boolea
 export const WAITING_PUSH_ZONE = 'America/New_York';
 
 /**
- * Pure. True only for a cron that fires at most once an hour on fixed minutes
- * and hours: a '*' or a step in the minute or hour field is refused. The sender
- * always picks the FIRST unanswered item, so a repeating schedule would re-send
- * the same card every tick until he answered it, and doc 2432's rule is one
- * interrupt, not a stream. The five-field shape is checked here; cron.validate
- * in the scheduler checks the rest.
+ * Pure. True only for a cron that fires at most once an hour: the minute field
+ * is ONE number (no list, range, step or '*'), and the hour field is a number or
+ * a list of numbers ('8,20' is two sends a day, '*' or '*\/2' is not). The sender
+ * always picks the FIRST unanswered item, so anything firing twice in an hour
+ * would re-send the same card until he answered it, and doc 2432's rule is one
+ * interrupt, not a stream. The first version let a minute LIST through
+ * ('0,30 5 * * *'), caught by the evaluator on #3952. The five-field shape is
+ * checked here; cron.validate in the scheduler checks the rest.
  */
 export function waitingPushCronAllowed(expr: string): boolean {
   const f = expr.trim().split(/\s+/);
   if (f.length !== 5) return false;
-  const fixed = (x: string) => /^[0-9]{1,2}(,[0-9]{1,2})*$/.test(x);
-  return fixed(f[0]) && fixed(f[1]);
+  const oneMinute = /^[0-9]{1,2}$/.test(f[0]);
+  const fixedHours = /^[0-9]{1,2}(,[0-9]{1,2})*$/.test(f[1]);
+  return oneMinute && fixedHours;
 }
 
 export type RecordOutcome = 'recorded' | 'already-answered' | 'stale' | 'invalid' | 'unknown-item';

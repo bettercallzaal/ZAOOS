@@ -299,10 +299,14 @@ describe('waitingPushEnabled / waitingPushCronAllowed - the flag and the once-a-
     expect(waitingPushEnabled({ ZOE_WAITING_PUSH: 'true' })).toBe(false);
     expect(waitingPushEnabled({ ZOE_WAITING_PUSH: '1' })).toBe(true);
   });
-  it('allows fixed minute and hour, refuses any repeating field', () => {
+  it('allows one minute and fixed hours, refuses any field that fires twice an hour', () => {
     expect(waitingPushCronAllowed('15 5 * * *')).toBe(true);
     expect(waitingPushCronAllowed('0 8,20 * * *')).toBe(true);
     expect(waitingPushCronAllowed('15 5 * * 1-5')).toBe(true);
+    // Evaluator on #3952: a minute LIST passed the first guard and cron.validate.
+    expect(waitingPushCronAllowed('0,30 5 * * *')).toBe(false);
+    expect(waitingPushCronAllowed('0,15,30,45 5 * * *')).toBe(false);
+    expect(waitingPushCronAllowed('0-30 5 * * *')).toBe(false);
     expect(waitingPushCronAllowed('*/10 * * * *')).toBe(false);
     expect(waitingPushCronAllowed('0 * * * *')).toBe(false);
     expect(waitingPushCronAllowed('0 */2 * * *')).toBe(false);

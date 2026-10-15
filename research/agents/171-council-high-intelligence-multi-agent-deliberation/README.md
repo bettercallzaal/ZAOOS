@@ -19,7 +19,7 @@ tier: reference
 
 | Decision | Recommendation |
 |----------|----------------|
-| **Install the Council** | YES — MIT license (was CC0), low risk. Install to `~/.claude/agents/` + `~/.claude/skills/council/`. **Review before installing** — v1.2.0 fixed a shell-injection surface; verify you're on ≥v1.2.0. |
+| **Install the Council** | YES — MIT license (misrecorded as CC0; MIT since first release), low risk. Install to `~/.claude/agents/` + `~/.claude/skills/council/`. **Review before installing** - v1.2.0 fixed a shell-injection surface; verify you're on >=v1.2.0. |
 | **Don't replace autoresearch:predict** | Council is for *strategic decisions*. `/autoresearch:predict` is for *code analysis*. Different tools, different jobs. Keep both. |
 | **Use triads, not full council** | 3-member triads for daily decisions ($0.50-1.00). Reserve `--full` (11 members) for irreversible architecture decisions ($3-5). |
 | **Add ZAO-specific triads** | Create 3 custom triads for ZAO's unique decision types: governance design, music platform, community growth. |
@@ -30,7 +30,7 @@ tier: reference
 ## What Is the Council?
 
 **Source:** [@nyk_builderz, March 19, 2026](https://x.com/nyk_builderz/status/2034492549180625316) — 184 likes, 83.8K views
-**Repo:** [github.com/0xNyk/council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) — 28 stars, CC0 (public domain), 9 commits, 100% Shell
+**Repo:** [github.com/0xNyk/council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) — 28 stars, MIT license, 9 commits, 100% Shell
 
 A Claude Code skill that convenes 11 subagents — each modeled on a historical thinker with declared analytical methods AND declared blind spots — into a structured 3-round deliberation protocol. The key insight: **LLMs simulate one coherent viewpoint per generation.** The Council externalizes the disagreement layer by running multiple independent agents with opposing intellectual traditions.
 
@@ -233,8 +233,8 @@ Revalidated against GitHub repo and changelogs. Material changes since last-vali
 
 **council-of-high-intelligence (0xNyk):**
 - **Stars:** 28 → **4.6k** (164× growth); **Forks:** 0 → 437; **Commits:** 9 → 78
-- **License correction:** The original doc stated CC0 — the repo is licensed **MIT** (confirmed from GitHub page, October 2026)
-- **v1.2.0 (2026-07-04):** Confidence-weighted vote tally (vote weight = base × confidence factor; hesitant councils escalate); per-member `reasoning_method` declared and enforced in Round 1 prompts; project-level `.council.yaml` overrides (pin profile/triad/members/chairman/models); **Cursor CLI** added as a 6th dispatch provider; Claude Code plugin-marketplace support; **security fix** — dispatch templates had a shell-injection surface and API keys appeared in process-visible argv (fixed in v1.2.0 via quoted heredocs); `classic` profile corrected (was wrongly documenting 11 members — roster is 18)
+- **License note:** The repo has been **MIT** since the first release (misrecorded as CC0 in the original doc; LICENSE file initial commit 2026-03-02)
+- **v1.2.0 (2026-07-04):** Confidence-weighted vote tally (vote weight = base × confidence factor; hesitant councils escalate); per-member `reasoning_method` declared and enforced in Round 1 prompts; project-level `.council.yaml` overrides (pin profile/triad/members/chairman/models); **Cursor CLI** added as a 6th dispatch provider; Claude Code plugin-marketplace support; **security fix** - dispatch templates had a shell-injection surface and API keys appeared in process-visible argv (fixed in v1.2.0 via quoted heredocs); `classic` profile corrected (was wrongly documenting 11 members - roster is 18)
 - **Unreleased (2026-07-06):** Roster validation drift guard (`scripts/validate-roster.py`, 166 CI checks); polarity pair corrections in SKILL.md
 - Sources: [CHANGELOG.md](https://raw.githubusercontent.com/0xNyk/council-of-high-intelligence/main/CHANGELOG.md) [FULL], [GitHub repo](https://github.com/0xNyk/council-of-high-intelligence) [FULL]
 
@@ -242,7 +242,7 @@ Revalidated against GitHub repo and changelogs. Material changes since last-vali
 - **Stars:** 6.7k → **25.5k**; **Forks:** → 4.4k
 - Source: [GitHub repo](https://github.com/karpathy/llm-council) [FULL]
 
-**Note on the doc's council member count:** The doc body says "11 members" throughout. The v1.0.0 release (March 30, 2026) already shipped 18 personas — the original research on March 28 pre-dates the tag. All references to "11 members" in the analysis below apply to the pre-v1.0.0 snapshot.
+**Note on the doc's council member count:** The doc body says "11 members" throughout. The v1.0.0 release (March 30, 2026) already shipped 18 personas - the original research on March 28 pre-dates the tag. All references to "11 members" in the analysis below apply to the pre-v1.0.0 snapshot.
 
 ---
 
@@ -250,22 +250,22 @@ Revalidated against GitHub repo and changelogs. Material changes since last-vali
 
 | Project | Stars | License | Approach | Members | Cross-Provider |
 |---------|-------|---------|----------|---------|---------------|
-| [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) | **4.6k** (was 28) | **MIT** (was CC0) | Historical thinkers, polarity pairs | **18** (was 11) | Yes (6 providers) |
-| [karpathy/llm-council](https://github.com/karpathy/llm-council) | **25.5k** (was 6.7k) | MIT | Anonymous model deliberation, chairman synthesis | 3+ | Yes (any LLM) |
+| [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) | **4.6k** (was 28) | MIT (misrecorded as CC0; MIT since first release) | Historical thinkers, polarity pairs | **18** (was 11) | Yes (6 providers) |
+| [karpathy/llm-council](https://github.com/karpathy/llm-council) | **25.5k** (was 6.7k) | none stated (no LICENSE file) | Anonymous model deliberation, chairman synthesis | 3+ | Yes (any LLM) |
 | [adversarial-review](https://github.com/alecnielsen/adversarial-review) | 4 | MIT | Claude + Codex adversarial debate | 2 | Yes (Claude + Codex) |
 | [claude-octopus](https://deepwiki.com/nyldn/claude-octopus/10.1-ai-debate-system) | ~50 | MIT | Claude + Codex + Gemini debate | 3 | Yes (3 providers) |
 | MCP Deliberation Protocol | N/A | N/A | Specialist agents (MCP market) | 3-5 | No |
 | MCP Debate Workflow | N/A | N/A | Researcher + Critic + Synthesizer | 3 | No |
 | `/autoresearch:predict` (our installed) | N/A | MIT | Virtual personas, same context | 3-8 | No |
 
-**Winner for ZAO: Council** — most structured, most diverse perspectives (11 vs 2-3), anti-recursion safeguards, CC0 license, and pre-built triads that map to our decision types. The others are good for code review (adversarial-review) or quick analysis (predict) but not for strategic deliberation.
+**Winner for ZAO: Council** — most structured, most diverse perspectives (11 vs 2-3), anti-recursion safeguards, MIT license, and pre-built triads that map to our decision types. The others are good for code review (adversarial-review) or quick analysis (predict) but not for strategic deliberation.
 
 ---
 
 ## Karpathy's LLM Council vs Nyk's Council of High Intelligence
 
 **Source:** [@itsolelehmann, March 30, 2026](https://x.com/itsolelehmann/status/2038661433626333649) — applying Karpathy's LLM Council method to Claude advice
-**Repo:** [github.com/karpathy/llm-council](https://github.com/karpathy/llm-council) — 6.7k+ stars, MIT license, "99% vibe coded"
+**Repo:** [github.com/karpathy/llm-council](https://github.com/karpathy/llm-council) — 6.7k+ stars, no LICENSE file ("99% vibe coded")
 
 Karpathy's LLM Council predates Nyk's and inspired the whole category. The core idea is the same: poll multiple models, have them judge each other, compile a verdict. But the implementations differ in key ways:
 
@@ -309,7 +309,7 @@ Both councils serve different purposes:
 | Code architecture decisions | Nyk's Council triads |
 | "Should I trust this cast/proposal?" | Karpathy's LLM Council (simpler, faster) |
 
-Both are MIT/CC0 licensed. ZAO should install Karpathy's alongside Nyk's and route questions to the right tool.
+Nyk's Council is MIT licensed; Karpathy's has no LICENSE file - check before reuse. ZAO should install Karpathy's alongside Nyk's and route questions to the right tool.
 
 ---
 
@@ -343,7 +343,7 @@ Both are MIT/CC0 licensed. ZAO should install Karpathy's alongside Nyk's and rou
 - [Nyk — "Agreement is a bug"](https://x.com/nyk_builderz/status/2034492549180625316) — March 19, 2026
 - [0xNyk/council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) — CC0, 28 stars, 9 commits
 - [Ole Lehmann — "How to finally trust Claude's advice (Karpathy LLM Council)"](https://x.com/itsolelehmann/status/2038661433626333649) — March 30, 2026
-- [karpathy/llm-council](https://github.com/karpathy/llm-council) — MIT, 6.7k+ stars, 99% vibe coded
+- [karpathy/llm-council](https://github.com/karpathy/llm-council) — no LICENSE file, 6.7k+ stars, 99% vibe coded
 - [alecnielsen/adversarial-review](https://github.com/alecnielsen/adversarial-review) — MIT, 4 stars
 - [nyldn/claude-octopus — AI Debate System](https://deepwiki.com/nyldn/claude-octopus/10.1-ai-debate-system)
 - [MindStudio — Agent Chat Rooms](https://www.mindstudio.ai/blog/agent-chat-rooms-multi-agent-debate-claude-code)

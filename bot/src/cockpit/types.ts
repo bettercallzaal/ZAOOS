@@ -77,6 +77,8 @@ export interface ReviewPR {
   url: string;
   draft: boolean;
   createdAt: string | null;
+  /** Label names, lower case as GitHub gives them; absent on rows read before this field existed. */
+  labels?: string[];
 }
 
 /** The fixed cockpit brief shape. */

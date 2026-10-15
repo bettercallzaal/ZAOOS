@@ -48,6 +48,7 @@ import {
 } from './x-desk';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
 import { captureTerminalTypedReply, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
+import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
@@ -831,6 +832,45 @@ bot.callbackQuery(/^tw:([0-9a-z]+):([A-Za-z0-9_-]+):([A-D]|done|skip|type)$/, as
     console.error('[zoe/terminal-grill] tap failed:', (e as Error)?.message);
     await ctx.answerCallbackQuery({ text: 'Could not record that - nothing was sent to the seat.' }).catch(() => {});
   }
+});
+
+// Inbox nudge buttons (inbox-nudge.ts, doc 2679 PR 2). "Next card" sends the
+// first seat item, the same card /grill sends; "PR merge commands" lists the
+// PRs on his hand with one button each; a PR tap answers with the one-line gh
+// command as text. Nothing here merges or answers anything for him.
+bot.callbackQuery(/^inb:(next|prs)$/, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  if (!inboxNudgeEnabled()) {
+    await ctx.answerCallbackQuery({ text: 'Inbox nudge is off.' }).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery().catch(() => {});
+  try {
+    if (ctx.match[1] === 'next') {
+      if (!(await sendNextTerminalItem())) await ctx.reply('No seat card is waiting right now.');
+      return;
+    }
+    const totals = await readTotals();
+    const { text, buttons } = formatPrList(totals.prList, new Date());
+    await ctx.reply(text, { reply_markup: { inline_keyboard: toGrammyRows(buttons) } });
+    featureRan('inbox-nudge', 'pr list');
+  } catch (e) {
+    console.error('[zoe/inbox-nudge] button failed:', (e as Error)?.message);
+    await ctx.reply('Could not read that right now; nothing was changed.').catch(() => {});
+  }
+});
+
+bot.callbackQuery(/^inb:cmd:/, async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  const pr = parsePrCallback(ctx.callbackQuery.data ?? '');
+  if (!pr) {
+    await ctx.answerCallbackQuery({ text: 'That button is not a PR.' }).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery().catch(() => {});
+  // Plain text, no parse mode, so the line pastes as it reads (feedback: phone copyable text).
+  await ctx.reply(`${pr.repo} #${pr.number}, your call, run it yourself:\n${mergeCommand({ repo: pr.repo, number: pr.number, title: '', url: '', draft: false, createdAt: null })}`).catch(() => {});
+  featureRan('inbox-nudge', 'merge command');
 });
 
 bot.command(['grill', 'needsme'], async (ctx) => {

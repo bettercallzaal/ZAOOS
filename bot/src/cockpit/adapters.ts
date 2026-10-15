@@ -100,6 +100,7 @@ interface RawPR {
   html_url?: string;
   draft?: boolean;
   created_at?: string;
+  labels?: { name?: string }[];
 }
 
 /** Pure: turn raw gh search rows into review PRs, dropping drafts + 'do not merge', newest first. */
@@ -114,6 +115,7 @@ export function filterReviewPRs(rows: RawPR[]): ReviewPR[] {
       url: r.html_url ?? '',
       draft: false,
       createdAt: r.created_at ?? null,
+      labels: (r.labels ?? []).map((l) => l?.name ?? '').filter(Boolean),
     }))
     .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
 }

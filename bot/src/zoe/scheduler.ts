@@ -76,6 +76,7 @@ import { surfaceGrill } from './grill';
 import { quietEnabled, releaseQuietQueue } from './quiet-window';
 import { answerLoopEnabled, runAnswerLoopTick } from './answer-loop';
 import { sendTerminalsDigest } from './terminals-digest';
+import { WAITING_PUSH_ZONE, sendNextTerminalCard, waitingPushCronAllowed, waitingPushEnabled } from './terminal-grill';
 import { sendThezaoDaily } from './thezao-daily';
 import { runSleepCheckinTick } from './sleep-checkin';
 import { runBacklogGrillBatch, runReconcileOnly } from './backlog-grill-runner';
@@ -887,6 +888,42 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               }
             }),
           { timezone: 'UTC' },
+        ),
+      );
+    }
+  }
+
+  // Morning Waiting-on-Zaal push (terminal-grill.ts, doc 2679 PR 1). Zaal,
+  // 2026-10-14: the seat pushed his WAITING ON YOU list by hand at 5:15 with
+  // buttons. This sends the first seat item as the card /grill sends, on his
+  // clock. Scheduled only when ZOE_WAITING_PUSH=1 AND ZOE_WAITING_PUSH_CRON is
+  // a valid, non-repeating cron expression, read in America/New_York (the
+  // quiet window ends 04:45 there, so '15 5 * * *' clears it). The sender
+  // itself needs ZOE_GRILL_TERMINALS=1 or it returns 'off'. An empty page
+  // sends nothing. Class `gated`: it asks for his tap. Daily, not claimFire-
+  // guarded: a repeating expression is refused before it is scheduled.
+  const waitingCron = process.env.ZOE_WAITING_PUSH_CRON?.trim();
+  if (waitingCron && waitingPushEnabled()) {
+    if (!cron.validate(waitingCron) || !waitingPushCronAllowed(waitingCron)) {
+      console.warn(`[zoe/scheduler] ZOE_WAITING_PUSH_CRON must be a valid cron with fixed minute and hour, not scheduled: ${waitingCron}`);
+    } else {
+      tasks.push(
+        cron.schedule(
+          waitingCron,
+          () =>
+            runWithSendClass('gated', async () => {
+              const r = await sendNextTerminalCard({
+                send: (text, buttons) =>
+                  opts.bot.api.sendMessage(opts.zaalTgId, text, {
+                    reply_markup: {
+                      inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))),
+                    },
+                  }),
+              });
+              console.log(`[zoe/scheduler] waiting push: ${r}`);
+              if (r === 'sent') featureRan('terminal-grill', 'scheduled card');
+            }),
+          { timezone: WAITING_PUSH_ZONE },
         ),
       );
     }

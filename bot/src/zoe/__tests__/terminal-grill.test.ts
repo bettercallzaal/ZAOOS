@@ -9,8 +9,12 @@ import {
   parseItemOptions,
   readTerminalGrillState,
   recordTerminalAnswer,
+  sendNextTerminalCard,
   stampKey,
+  waitingPushCronAllowed,
+  waitingPushEnabled,
 } from '../terminal-grill';
+import { parseTerminalsPage } from '../terminals-digest';
 
 // Zaal, 2026-10-08: "can i do a /grill command aswell so that i can click
 // through the todos for terminals". Rows below are verbatim Item cells from
@@ -190,5 +194,119 @@ describe('routing order in index.ts source (read as text, never imported - agent
     expect(batch).toBeGreaterThan(-1);
     expect(capture).toBeLessThan(bar);
     expect(capture).toBeLessThan(batch);
+  });
+});
+
+// doc 2679 PR 1: the one sender behind /grill and the ZOE_WAITING_PUSH cron.
+// The page below is the shape terminals-digest.ts parses (Stamp line, a
+// Waiting on Zaal table); the item cell is the seat's own A/B shape.
+const PAGE = [
+  '# Orca terminals',
+  'Stamp: 2026-10-14 05:10 EDT',
+  '',
+  '## Waiting on Zaal',
+  '| Id | Item |',
+  '|---|---|',
+  '| w1 | Which Ryan leads design: A Ryan Miller (OPEN X) / B someone else (name) |',
+  '| w2 | Approve the poster copy |',
+  '',
+  '## Terminals',
+  '| Tab | Session | Role | Next |',
+  '|---|---|---|---|',
+  '| 1 | zoe | lane | PR |',
+].join('\n');
+
+describe('sendNextTerminalCard - the scheduled card is the /grill card', () => {
+  const sent: { text: string; buttons: { text: string; data: string }[][] }[] = [];
+  const send = async (text: string, buttons: { text: string; data: string }[][]) => {
+    sent.push({ text, buttons });
+  };
+  beforeEach(() => {
+    sent.length = 0;
+    delete process.env.ZOE_GRILL_TERMINALS;
+    delete process.env.ZOE_GRILL_PAUSE_PATH;
+  });
+  afterEach(() => {
+    delete process.env.ZOE_GRILL_TERMINALS;
+    delete process.env.ZOE_GRILL_PAUSE_PATH;
+  });
+
+  it('flag off: nothing is read and nothing is sent', async () => {
+    let reads = 0;
+    const read = async () => {
+      reads++;
+      return { text: PAGE };
+    };
+    expect(await sendNextTerminalCard({ send, read })).toBe('off');
+    expect(reads).toBe(0);
+    expect(sent).toEqual([]);
+  });
+
+  it('paused: nothing is sent while Zaal has the grill stopped', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    process.env.ZOE_GRILL_STOP = '1';
+    process.env.ZOE_GRILL_PAUSE_PATH = join(__dirname, 'fixtures', 'paused.json');
+    expect(await sendNextTerminalCard({ send, read: async () => ({ text: PAGE }) })).toBe('paused');
+    expect(sent).toEqual([]);
+  });
+
+  it('sent: the first unanswered item, with its lettered buttons', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    expect(await sendNextTerminalCard({ send, read: async () => ({ text: PAGE }) })).toBe('sent');
+    expect(sent).toHaveLength(1);
+    expect(sent[0].text).toContain('w1 - waiting on you (seat page 2026-10-14 05:10 EDT)');
+    expect(sent[0].text).toContain('A) Ryan Miller (OPEN X)');
+    expect(sent[0].buttons[0].map((b) => b.data)).toEqual([`tw:${stampKey('2026-10-14 05:10 EDT')}:w1:A`, `tw:${stampKey('2026-10-14 05:10 EDT')}:w1:B`]);
+  });
+
+  it('empty: a page with no unanswered item sends nothing (the NO_REPLY rule)', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const page = PAGE.replace(/\| w1 .*\n/, '').replace(/\| w2 .*\n/, '');
+    expect(await sendNextTerminalCard({ send, read: async () => ({ text: page }) })).toBe('empty');
+    expect(sent).toEqual([]);
+  });
+
+  it('empty: the stale page on the vault (one heading, no table) sends nothing', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const stale = '# Orca terminals, latest tick\n\nTick: 2026-10-11 08:44 EDT. FINAL tick of the loop.\n\n| Lane | Tab title |\n|---|---|\n| 1 zoe | x |\n';
+    expect(await sendNextTerminalCard({ send, read: async () => ({ text: stale }) })).toBe('empty');
+    expect(sent).toEqual([]);
+  });
+
+  it('failed: a page that cannot be read sends nothing and does not throw', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const read = async (): Promise<{ text: string }> => {
+      throw new Error('git show failed');
+    };
+    expect(await sendNextTerminalCard({ send, read })).toBe('failed');
+    expect(sent).toEqual([]);
+  });
+
+  it('after an answer is recorded, the next card is the next item', async () => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+    const read = async () => ({ text: PAGE });
+    expect(await sendNextTerminalCard({ send, read })).toBe('sent');
+    const page = parseTerminalsPage(PAGE);
+    expect(await recordTerminalAnswer({ page, id: 'w1', choice: 'A', tapStampKey: stampKey(page.stamp) })).toBe('recorded');
+    expect(await sendNextTerminalCard({ send, read })).toBe('sent');
+    expect(sent[1].text).toContain('w2 - waiting on you');
+  });
+});
+
+describe('waitingPushEnabled / waitingPushCronAllowed - the flag and the once-a-day guard', () => {
+  it('flag reads 1 only', () => {
+    expect(waitingPushEnabled({})).toBe(false);
+    expect(waitingPushEnabled({ ZOE_WAITING_PUSH: 'true' })).toBe(false);
+    expect(waitingPushEnabled({ ZOE_WAITING_PUSH: '1' })).toBe(true);
+  });
+  it('allows fixed minute and hour, refuses any repeating field', () => {
+    expect(waitingPushCronAllowed('15 5 * * *')).toBe(true);
+    expect(waitingPushCronAllowed('0 8,20 * * *')).toBe(true);
+    expect(waitingPushCronAllowed('15 5 * * 1-5')).toBe(true);
+    expect(waitingPushCronAllowed('*/10 * * * *')).toBe(false);
+    expect(waitingPushCronAllowed('0 * * * *')).toBe(false);
+    expect(waitingPushCronAllowed('0 */2 * * *')).toBe(false);
+    expect(waitingPushCronAllowed('15 5 * *')).toBe(false);
+    expect(waitingPushCronAllowed('')).toBe(false);
   });
 });

@@ -27,7 +27,7 @@ Written Wed 14 Oct 2026, 20:0x to 21:xx EDT (clock from `date`), by the "5 queue
 
 ## 1. What ZOE already does that moves things forward on its own
 
-Read from the module headers (every file in `bot/src/zoe/` was listed and its first comment line read; 60-plus modules) and from the cron table in `scheduler.ts`, which registers 36 `cron.schedule` calls (grep count, 2026-10-14).
+Read from the module headers (every file in `bot/src/zoe/` was listed and its first comment line read; 60-plus modules) and from the cron table in `scheduler.ts`, which registers 35 `cron.schedule` calls (grep count, 2026-10-14).
 
 | Behaviour | Where | Cadence and gate | State on the VPS |
 |---|---|---|---|
@@ -82,7 +82,7 @@ The seat's practices were read from the memory notes written that day (decide-mo
 
 | PR | Flag | What it does | Reversible how | Verify |
 |---|---|---|---|---|
-| 1. Scheduled waiting card | `ZOE_WAITING_PUSH=1` and `ZOE_WAITING_PUSH_CRON` (recommended `15 5 * * *`, zone America/New_York; the scheduler already passes `{ timezone: 'America/New_York' }` at `scheduler.ts:1107`) | At the cron, if the grill is not paused and `ZOE_GRILL_TERMINALS=1`, send the first unanswered seat item with its buttons. Empty page = no message (the NO_REPLY rule). Class `gated`. The quiet window ends 04:45, so 05:15 clears it. | unset the flag; no state file is added, the existing `terminal-grill` state is reused | `tsc --noEmit` 0, `vitest run` green, esbuild bundle, a unit test on the pure sender with an injected page reader: off, paused, empty, sent, failed |
+| 1. Scheduled waiting card | `ZOE_WAITING_PUSH=1` and `ZOE_WAITING_PUSH_CRON` (recommended `15 5 * * *`, zone America/New_York; the scheduler already passes `{ timezone: 'America/New_York' }` at `scheduler.ts:1106`) | At the cron, if the grill is not paused and `ZOE_GRILL_TERMINALS=1`, send the first unanswered seat item with its buttons. Empty page = no message (the NO_REPLY rule). Class `gated`. The quiet window ends 04:45, so 05:15 clears it. | unset the flag; no state file is added, the existing `terminal-grill` state is reused | `tsc --noEmit` 0, `vitest run` green, esbuild bundle, a unit test on the pure sender with an injected page reader: off, paused, empty, sent, failed |
 | 2. Gate sort | `ZOE_GRILL_GATE_SORT=1` | Before a card reaches his DM, classify it: gated words or a `needs: zaal` marker keep it; everything else is spooled to the grill-queue with the recommended option as the logged default. One line per auto-proceeded card in the spool, so the grill lane and he can override. | unset the flag; spooled lines are append-only | tests on the classifier with the seat's own 2026-10-14 items as fixtures; a count of cards per day before and after, reported |
 | 3. Tail question | `ZOE_TAIL_QUESTION=1` | After any DM reply from the concierge, append the PR 1 card if one is open and was not sent in the last N minutes. | unset the flag | tests on the cooldown guard; manual DM check by Zaal |
 
@@ -102,11 +102,11 @@ Order: 1 then 3 then 2. PR 2 is the one with judgment in it (what counts as gate
 | Measure | Value | Surface |
 |---|---|---|
 | Modules in `bot/src/zoe/` with a header read | 60-plus `.ts` files (174 directory entries including tests and subfolders) | `ls`, `head -8` per file, 2026-10-14 |
-| `cron.schedule` calls in `scheduler.ts` | 36 | grep, 2026-10-14 |
+| `cron.schedule` calls in `scheduler.ts` | 35 | grep, 2026-10-14 |
 | `ZOE_*` flag names read by the code vs set on the VPS | 57 vs 20 | doc 2239, 2026-10-07 |
 | ZOE sends vs Zaal replies, August 2026 | 4,709 vs 12 | `send-budget.ts:5-8` |
 | Quiet window | 20:30 to 04:45 America/New_York | `quiet-window.ts:72-73` |
-| Needs-Zaal digests | 08:00 and 20:00 America/New_York | `scheduler.ts:1116, 1146` |
+| Needs-Zaal digests | 08:00 and 20:00 America/New_York | `scheduler.ts:1114, 1144` |
 | Morning brief | 05:00 America/New_York | `scheduler.ts:318` |
 | Seat page last written on vault origin/main | 2026-10-11 08:44 EDT, 26 lines | `git show origin/main:<page>`, 2026-10-14 |
 | node-cron pinned | `^3.0.3` | `bot/package.json:29` |

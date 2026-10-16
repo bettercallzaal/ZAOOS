@@ -11,9 +11,6 @@
  * Multi-model routing (doc 1113): when MODEL_ROUTING_ENABLED=1, selects between
  * Claude, Grok, and GPT based on task type. Shows Zaal the model choice + rationale.
  */
-import { mkdtempSync, rmdirSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { GAP_PROMPT_BLOCK } from './capability-gaps';
 import { callClaudeCli } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
@@ -241,15 +238,10 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     }
   }
 
-  // A talk-only turn runs in an empty directory, so no CLAUDE.md or project
-  // settings near it load and nothing is in reach (scope-lock.ts).
-  const talkOnlyDir = opts.toolPolicy === 'none' ? makeTalkOnlyDir() : null;
-  const turnDir = talkOnlyDir ?? opts.context.workspace_dir;
-  try {
-    return await runConciergeTurnIn(opts, systemBlocks, userPrompt, turnDir);
-  } finally {
-    if (talkOnlyDir) removeTalkOnlyDir(talkOnlyDir);
-  }
+  // A talk-only turn (scope-lock.ts) gets its own fresh empty directory, made
+  // and removed by callClaudeCli itself (hermes/claude-cli.ts), so every
+  // talk-only call in the bot gets the same treatment, not only this one.
+  return runConciergeTurnIn(opts, systemBlocks, userPrompt, opts.context.workspace_dir);
 }
 
 async function runConciergeTurnIn(
@@ -363,21 +355,6 @@ async function runConciergeTurnIn(
     model: selectedModel,
     durationMs: result.durationMs,
   };
-}
-
-/** A fresh empty directory per talk-only turn, outside every repo. */
-export function makeTalkOnlyDir(): string {
-  return mkdtempSync(join(tmpdir(), 'zoe-talk-only-'));
-}
-
-/** Remove that one directory by its exact path. Non-recursive: if anything was
- *  written into it, it stays and the line says so (no-rm-rf.md). */
-export function removeTalkOnlyDir(dir: string): void {
-  try {
-    rmdirSync(dir);
-  } catch (err) {
-    console.warn(`[zoe/concierge] talk-only dir not removed (${dir}):`, (err as Error).message);
-  }
 }
 
 /**

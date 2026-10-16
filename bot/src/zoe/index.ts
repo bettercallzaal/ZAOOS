@@ -35,6 +35,7 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
+import { isZaoMember, memberDmEnabled, memberDmPerHour, newMemberDmLimiter, runMemberDmTurn } from './member-dm';
 import { stripOpsOutsidePrivate, toolPolicyForScope } from './scope-lock';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import {
@@ -2301,7 +2302,20 @@ bot.on('message:text', async (ctx) => {
 
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
-    if (!(await ownerOnly(ctx))) return;
+    if (!isFromZaal(ctx)) {
+      // ZOE_MEMBER_DM=1 (member-dm.ts, default OFF): a ZAO member gets a
+      // talk-only turn in their own scope. Never the private scope, never a
+      // tool. Everyone else, and everyone while the flag is off, gets the
+      // owner-only line exactly as before.
+      if (memberDmEnabled() && ctx.from && isZaoMember(ctx.from.id, await readGroups().catch(() => []))) {
+        enqueueTurn(chatId, () => handleMemberDm(ctx, text)).catch((e) =>
+          console.error('[zoe/index] member DM turn failed:', (e as Error)?.message),
+        );
+        return;
+      }
+      await ownerOnly(ctx);
+      return;
+    }
     // #51 typed-answer capture: a PLAIN typed message that is option-shaped for
     // the active grill decision ("2", "map", "1 and 3") resolves it directly -
     // previously only button taps and exact swipe-replies registered, so a
@@ -2831,6 +2845,53 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
     },
   }).catch((e) => console.error('[zoe/index] media turn failed:', (e as Error)?.message));
 });
+
+const memberDmLimiter = newMemberDmLimiter();
+
+/**
+ * A member's DM turn (member-dm.ts). Deliberately NOT dispatchConcierge: that
+ * function is the shared turn path for every scope. This one is talk-only
+ * (scope-lock.ts: no tools, fresh empty dir per turn) and keeps only the
+ * reply text.
+ */
+async function handleMemberDm(ctx: Context, text: string): Promise<void> {
+  if (!ctx.chat || !ctx.from) return;
+  const chatId = ctx.chat.id;
+  const name = ctx.from.first_name || ctx.from.username || 'a member';
+  const progress = startProgressNarration(ctx, chatId, { first: null });
+  try {
+    const outcome = await runMemberDmTurn(
+      {
+        buildBlocks: (scope) => buildMemoryBlocks(scope, `DM with ${name}`),
+        runTurn: async (blocks, message, senderLabel) => {
+          const r = await runConciergeTurn({
+            message,
+            blocks,
+            senderLabel,
+            model: ZOE_QUICK_MODEL,
+            conversational: true,
+            // talk-only: concierge.ts runs it in a fresh empty dir and removes
+            // it after, so workspace_dir is never used for this turn.
+            toolPolicy: 'none',
+            context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
+          });
+          return { reply: r.reply };
+        },
+        remember: (turn, scope) => pushRecent(turn, scope),
+        reply: async (answer) => {
+          if (!(await progress.deliver(answer))) await replyChunked(ctx, answer);
+        },
+      },
+      { userId: ctx.from.id, name, text, nowMs: Date.now(), limiter: memberDmLimiter, perHour: memberDmPerHour() },
+    );
+    if (outcome === 'answered') featureRan('member-dm', `user ${ctx.from.id}`);
+  } catch (err) {
+    console.error('[zoe/index] member DM failed:', err instanceof Error ? err.message : String(err));
+    await ctx.reply("Something went wrong on my side. Try again in a bit.").catch(() => {});
+  } finally {
+    progress.stop();
+  }
+}
 
 async function handlePrivateMessage(ctx: Context, text: string, brandContext?: string): Promise<void> {
   // Track activity for inactivity detection (best-effort: never blocks the handler).

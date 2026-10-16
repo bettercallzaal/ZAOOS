@@ -15,7 +15,7 @@
  *   OR: systemd user unit zoe-bot.service
  */
 import { groupIds } from './env';
-import { OWNER_ONLY_LINE, newOwnerOnlyState, shouldSendOwnerOnlyLine } from './owner-only';
+import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine } from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
@@ -590,6 +590,8 @@ bot.command("ask", async (ctx) => {
   }
   const chatType = ctx.chat.type;
   if (chatType === "private") {
+    // Same gate as a plain DM: only Zaal reaches the private scope.
+    if (!(await ownerOnly(ctx))) return;
     await dispatchConcierge(ctx, prompt, "private", senderLabel(ctx));
     return;
   }
@@ -3464,6 +3466,15 @@ async function dispatchConcierge(
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
+
+  // The private scope is Zaal's alone. Every caller already gates on that; this
+  // is the second lock, so a new entry point that forgets its gate still cannot
+  // open the private scope to anyone else (first-handler-wins.md rule 2).
+  if (!privateScopeAllowed(scope, isFromZaal(ctx))) {
+    console.error(`[zoe/index] refused private concierge scope for non-owner ${ctx.from?.id ?? '?'}`);
+    await ownerOnly(ctx);
+    return;
+  }
 
   // BUILD FROM THE DM, AND BE ABLE TO TALK TO IT WHILE IT RUNS.
   //

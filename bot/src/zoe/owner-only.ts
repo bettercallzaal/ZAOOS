@@ -38,3 +38,13 @@ export function shouldSendOwnerOnlyLine(state: OwnerOnlyState, userId: number, n
   }
   return true;
 }
+
+/**
+ * The private concierge scope carries Zaal's memory, the DM build and the bus
+ * reply path. Only Zaal may enter it, whatever command or handler leads there.
+ * A non-owner in a private chat gets the owner-only line, the same answer a
+ * plain DM from them already gets (index.ts message:text, ownerOnly gate).
+ */
+export function privateScopeAllowed(scope: string, fromZaal: boolean): boolean {
+  return scope !== 'private' || fromZaal;
+}

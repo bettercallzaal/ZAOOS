@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { makePostRequest } from '@/test-utils/api-helpers';
 
 // FIFO chain: queries pop results from a queue in order.
@@ -64,8 +64,11 @@ vi.mock('@/lib/db/supabase', () => ({
   }),
 }));
 
+const mockSaveVisitorSession = vi.hoisted(() => vi.fn());
+
 vi.mock('@/lib/auth/session', () => ({
   saveSession: mockSaveSession,
+  saveVisitorSession: mockSaveVisitorSession,
 }));
 
 vi.mock('@/lib/farcaster/neynar', () => ({
@@ -922,5 +925,97 @@ describe('GET /api/auth/verify', () => {
     const res = await GET();
 
     expect(res.headers.get('content-type')).toContain('application/json');
+  });
+});
+
+describe('POST /api/auth/verify - open front door (FARCASTER_OPEN_FRONT_DOOR)', () => {
+  const NON_MEMBER = {
+    fid: 12345,
+    username: 'nonmember',
+    display_name: 'Non Member',
+    pfp_url: 'https://example.com/pfp.jpg',
+    custody_address: '0x1234567890abcdef1234567890abcdef12345678',
+    verified_addresses: { eth_addresses: [] },
+    profile: { bio: { text: 'A non-member' } },
+  };
+
+  function signIn() {
+    mockGetSupabaseAdmin.mockReturnValue(
+      createSupabaseMock([[{ data: { nonce: 'valid-nonce' }, error: null }]]),
+    );
+    mockVerifySignInMessage.mockResolvedValue({ isError: false, success: true, fid: 12345 });
+    mockGetUserByFid.mockResolvedValue(NON_MEMBER);
+    mockCheckAllowlist.mockResolvedValue({ allowed: false });
+    return POST(
+      makePostRequest('/api/auth/verify', {
+        message: 'farcaster.com wants you to sign in...',
+        signature: '0x123',
+        nonce: 'valid-nonce',
+        domain: 'localhost:3000',
+      }),
+    );
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSaveVisitorSession.mockResolvedValue(undefined);
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it.each([
+    '',
+    '0',
+    'true',
+  ])('flag %j: a non-member still gets 403 and no session', async (flag) => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', flag);
+    const res = await signIn();
+    expect(res.status).toBe(403);
+    expect(mockSaveVisitorSession).not.toHaveBeenCalled();
+    expect(mockSaveSession).not.toHaveBeenCalled();
+  });
+
+  it('flag on: a non-member gets a visitor session, never a member one, and goes to /feed', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    const res = await signIn();
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ success: true, role: 'visitor', redirect: '/feed' });
+    expect(mockSaveVisitorSession).toHaveBeenCalledWith({
+      fid: 12345,
+      username: 'nonmember',
+      displayName: 'Non Member',
+      pfpUrl: 'https://example.com/pfp.jpg',
+    });
+    expect(mockSaveSession).not.toHaveBeenCalled();
+    expect(mockAutoCastToZao).not.toHaveBeenCalled();
+    expect(mockCreateInAppNotification).not.toHaveBeenCalled();
+  });
+
+  it('flag on: a failed FID allowlist lookup is a 502, never a downgrade to visitor', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    mockGetSupabaseAdmin.mockReturnValue(
+      createSupabaseMock([[{ data: { nonce: 'valid-nonce' }, error: null }]]),
+    );
+    mockVerifySignInMessage.mockResolvedValue({ isError: false, success: true, fid: 12345 });
+    mockGetUserByFid.mockResolvedValue(NON_MEMBER);
+    mockCheckAllowlist
+      .mockRejectedValueOnce(new Error('db down'))
+      .mockResolvedValue({ allowed: false });
+    const res = await POST(
+      makePostRequest('/api/auth/verify', {
+        message: 'farcaster.com wants you to sign in...',
+        signature: '0x123',
+        nonce: 'valid-nonce',
+        domain: 'localhost:3000',
+      }),
+    );
+    expect(res.status).toBe(502);
+    expect(mockSaveVisitorSession).not.toHaveBeenCalled();
+  });
+
+  it('flag on: returns 500 when the visitor session cannot be saved', async () => {
+    vi.stubEnv('FARCASTER_OPEN_FRONT_DOOR', '1');
+    mockSaveVisitorSession.mockRejectedValue(new Error('cookie store down'));
+    const res = await signIn();
+    expect(res.status).toBe(500);
   });
 });

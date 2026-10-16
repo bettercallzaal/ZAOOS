@@ -1,10 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { communityConfig } from '@/../community.config';
-import { getSessionData } from '@/lib/auth/session';
+import { getReaderSession, getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { dropCastsBySignerAuthority } from '@/lib/farcaster/signer-authority-filter';
+import { openFrontDoorEnabled, VISITOR_READS_PER_MINUTE } from '@/lib/gates/front-door';
 import { logger } from '@/lib/logger';
+import { rateLimit } from '@/lib/rate-limit';
 import type { Cast } from '@/types';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -86,8 +88,19 @@ async function refreshFromNeynar(channel: string): Promise<Cast[]> {
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
+  // A visitor reads casts but not member data (ZIDs say who is a member).
+  const isVisitor = !session;
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Open front door: a visitor (verified Farcaster, not a member) may READ the
+    // ZAO channel feeds, under its own per-FID limit on top of the per-IP one.
+    const reader = openFrontDoorEnabled() ? await getReaderSession() : null;
+    if (!reader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const limited = await rateLimit(`visitor-read:${reader.fid}`, VISITOR_READS_PER_MINUTE, 60_000);
+    if (!limited.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
   }
 
   const channel = req.nextUrl.searchParams.get('channel') || 'zao';
@@ -189,7 +202,7 @@ export async function GET(req: NextRequest) {
         .from('hidden_messages')
         .select('cast_hash')
         .in('cast_hash', castHashes.length > 0 ? castHashes : ['none']),
-      authorFids.length > 0
+      authorFids.length > 0 && !isVisitor
         ? supabaseAdmin
             .from('users')
             .select('fid, zid')

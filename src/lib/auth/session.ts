@@ -17,6 +17,27 @@ export interface SessionPayload {
   pfpUrl?: string;
   signerUuid?: string | null;
   isAdmin?: boolean;
+  /**
+   * false = a VISITOR: a verified Farcaster account that is not a ZAO member,
+   * let in by the open front door (src/lib/gates/front-door.ts). Absent = member:
+   * every session created before this field existed came through an allowlist
+   * gate (verify, siwe, miniapp/auth-context all call checkAllowlist).
+   */
+  isMember?: boolean;
+}
+
+/** A session that may only READ: members and visitors both qualify. */
+export interface ReaderSession {
+  fid: number;
+  username: string;
+  displayName: string;
+  pfpUrl: string;
+  role: 'member' | 'visitor';
+}
+
+/** True unless the session was explicitly created as a visitor. */
+export function isMemberSession(session: { isMember?: boolean }): boolean {
+  return session.isMember !== false;
 }
 
 // SameSite=None is REQUIRED for the session cookie to be sent in third-party
@@ -46,6 +67,10 @@ export const getSessionData = cache(async (): Promise<SessionData | null> => {
   const session = await getSession();
   // Valid session: has either FID or wallet address
   if (!session.fid && !session.walletAddress) return null;
+  // Visitors are NOT members. Returning null here keeps every route that calls
+  // getSessionData() members-only without touching it; visitor reads go through
+  // getReaderSession() on the few routes that opt in.
+  if (!isMemberSession(session)) return null;
   return {
     fid: session.fid || 0,
     walletAddress: session.walletAddress || null,
@@ -84,6 +109,7 @@ export async function saveSession(
   session.displayName = data.displayName;
   session.pfpUrl = data.pfpUrl;
   session.signerUuid = data.signerUuid || null;
+  session.isMember = true;
   session.isAdmin =
     allowAdmin &&
     (ADMIN_FIDS.includes(data.fid) ||
@@ -107,10 +133,56 @@ export async function saveWalletSession(data: {
     data.displayName || data.walletAddress.slice(0, 6) + '...' + data.walletAddress.slice(-4);
   session.pfpUrl = data.pfpUrl || '';
   session.signerUuid = null;
+  session.isMember = true;
   session.isAdmin =
     (data.fid ? ADMIN_FIDS.includes(data.fid) : false) ||
     ADMIN_WALLETS.includes(data.walletAddress.toLowerCase());
   await session.save();
+}
+
+/**
+ * A verified Farcaster account that is not on the allowlist. Never admin, never
+ * a signer, no wallet: it can read, and nothing else.
+ */
+export async function saveVisitorSession(data: {
+  fid: number;
+  username: string;
+  displayName: string;
+  pfpUrl: string;
+}): Promise<void> {
+  const session = await getSession();
+  session.fid = data.fid;
+  session.username = data.username;
+  session.displayName = data.displayName;
+  session.pfpUrl = data.pfpUrl;
+  session.authMethod = 'farcaster';
+  session.walletAddress = undefined;
+  session.signerUuid = null;
+  session.isAdmin = false;
+  session.isMember = false;
+  await session.save();
+}
+
+/**
+ * For read-only routes that visitors may use. A visitor session counts only
+ * while the open front door is on, so turning the flag off shuts visitors out
+ * of every route at once.
+ */
+export async function getReaderSession(): Promise<ReaderSession | null> {
+  const session = await getSession();
+  if (!session.fid) return null;
+  const member = isMemberSession(session);
+  if (!member) {
+    const { openFrontDoorEnabled } = await import('@/lib/gates/front-door');
+    if (!openFrontDoorEnabled()) return null;
+  }
+  return {
+    fid: session.fid,
+    username: session.username || '',
+    displayName: session.displayName || '',
+    pfpUrl: session.pfpUrl || '',
+    role: member ? 'member' : 'visitor',
+  };
 }
 
 export async function clearSession() {

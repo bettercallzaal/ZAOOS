@@ -36,7 +36,7 @@ export interface ClaudeCliOptions {
   maxBudgetUsd?: number;                          // hard cap per invocation
   timeoutMs?: number;                             // wall clock kill
   bare?: boolean;                                 // skip hooks/CLAUDE.md auto-discovery
-  talkOnly?: boolean;                             // no tools of any kind; default true when allowedTools is [] (isTalkOnly)
+  talkOnly?: boolean;                             // no tools of any kind; default true unless allowedTools is non-empty (isTalkOnly)
 }
 
 /**
@@ -63,15 +63,20 @@ export function talkOnlyArgs(): string[] {
 }
 
 /**
- * Talk-only is the DEFAULT whenever a caller passes an empty allow list. An
- * empty `allowedTools` used to mean "allow nothing" to every caller that wrote
- * it (decompose, learn, reflexion, critics, teammate-ack, cockpit, resume) but
- * it was never put on the argv (the `length > 0` guard), so the host's settings
- * still decided. `talkOnly: false` opts out explicitly; nothing does today.
+ * Talk-only is the DEFAULT: a call gets tools only when it names them in a
+ * non-empty `allowedTools`. Two shapes used to fall through to the host's own
+ * settings (which allow Bash(*) and more on the VPS):
+ *   - an EMPTY list, written as "allow nothing" by decompose, learn,
+ *     reflexion, the critics, teammate-ack, cockpit and resume, was never put
+ *     on the argv at all (the `length > 0` guard);
+ *   - NO list, as in the X desk drafter (a fetched post), brief, recap,
+ *     reflect, extractors, the work-loop judge and the post drafters, which
+ *     all answer from context they were handed.
+ * `talkOnly: false` opts out explicitly; nothing does today.
  */
 export function isTalkOnly(opts: Pick<ClaudeCliOptions, 'talkOnly' | 'allowedTools'>): boolean {
   if (opts.talkOnly !== undefined) return opts.talkOnly;
-  return Array.isArray(opts.allowedTools) && opts.allowedTools.length === 0;
+  return !(Array.isArray(opts.allowedTools) && opts.allowedTools.length > 0);
 }
 
 /**

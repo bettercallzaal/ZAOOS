@@ -1,9 +1,9 @@
 // @vitest-environment node
 /**
- * Talk-only is the default for an empty allow list (finding A, 2026-10-16).
+ * Talk-only is the default unless a call names its tools (finding A, 2026-10-16).
  *
- * An empty `allowedTools` was never put on the argv, so it meant "whatever the
- * host's settings allow", not "nothing". These tests pin what a talk-only
+ * An empty `allowedTools` was never put on the argv, and a missing one never
+ * was either, so both meant "whatever the host's settings allow". These tests pin what a talk-only
  * spawn actually gets: the argv, the working directory, the environment and
  * the system line. And the other direction: a call that names its tools is
  * untouched.
@@ -53,7 +53,8 @@ afterEach(() => {
 describe('isTalkOnly', () => {
   it.each([
     [{ allowedTools: [] }, true],
-    [{}, false],
+    [{}, true],
+    [{ allowedTools: undefined }, true],
     [{ allowedTools: ['Read'] }, false],
     [{ allowedTools: [], talkOnly: false }, false],
     [{ allowedTools: ['Read'], talkOnly: true }, true],
@@ -103,6 +104,28 @@ describe('an empty allow list spawns talk-only', () => {
     const cwd = (mockSpawn.mock.calls[0][2] as { cwd: string }).cwd;
     expect(cwd).toContain('zoe-talk-only-');
     expect(existsSync(cwd)).toBe(false);
+  });
+});
+
+describe('a call with NO allowedTools spawns talk-only too', () => {
+  it('the X desk shape: no list, a repo cwd, fetched text - still talk-only', async () => {
+    process.env.ZOE_TEST_SECRET = 'must-not-reach-the-child';
+    mockSpawn.mockReturnValue(fakeChild(OK));
+    await callClaudeCli({ model: 'sonnet', prompt: 'fetched post text', cwd: '/home/zaal/zao-os', appendSystemPrompt: 'draft', permissionMode: 'default', bare: false });
+    const { args, cwd, env } = spawned();
+    expect(args[args.indexOf('--tools') + 1]).toBe('');
+    expect(args).toContain('--strict-mcp-config');
+    expect(args).not.toContain('--add-dir');
+    expect(cwd).toContain('zoe-talk-only-');
+    expect(env.ZOE_TEST_SECRET).toBeUndefined();
+  });
+
+  it("the concierge's private default still names its tools, so it keeps them", async () => {
+    const { toolsFor } = await import('../../zoe/concierge');
+    const def = toolsFor('default');
+    expect(def.allowedTools.length).toBeGreaterThan(0);
+    expect(isTalkOnly(def)).toBe(false);
+    expect(isTalkOnly(toolsFor('none'))).toBe(true);
   });
 });
 

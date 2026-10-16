@@ -1,16 +1,14 @@
-# Claude Usage - surface tiering
+# Tool Routing
 
-**Match each task to the cheapest surface that can do it well, and reserve the Claude Code weekly cap for grounded live-code work.** Origin and rationale: `research/dev-workflows/2649-rules-history/archive/claude-usage.md`.
+Route work to the surface that can complete it with the least unnecessary premium-model use. Source: `research/dev-workflows/2675-claude-rate-limit-multi-tool-routing/`.
 
-| Task | Surface |
-|------|---------|
-| Architecture, approach, spec-writing | Claude chat / plan mode |
-| Research, docs, summaries, drafts, classification | OpenRouter (DeepSeek) / Ollama via the fleet loops |
-| Well-specified, low-judgment mechanical code | Codex when available |
-| Grounded edits + verify + PR on live code | Claude Code (spend the cap HERE) |
+| Work | Use | Boundary |
+|---|---|---|
+| Grounded live-code edits, verification, and PRs | Claude Code | Use the repository's rules, hooks, skills, and current implementation. |
+| Well-specified mechanical code with a file list and acceptance criteria | Codex exec | Check its result against the repository; do not delegate ambiguous discovery or completion judgment blindly. |
+| Research triage; Google Docs and Sheets output | Gemini CLI | Treat fetched sources, not summaries, as evidence. |
+| Small private/offline text transformations | Ollama local | Local models only; cloud-tagged Ollama models are not private. |
 
-When Claude Code is capped the fleet fails over claude -> codex -> openrouter -> ollama.
-
-- **Plan in chat, hand the agent the spec + file list.** For a live codebase, let the agent write the code grounded in the repo; do not paste code written blind. Prewriting in chat is fine for greenfield or small standalone files.
-- **Do not spend the cap on:** reading whole files/dirs each pass (open only what the task touches; grep `research/*/README.md`, never bulk-read), research a cheaper tier can do, long exploratory sessions, re-deriving established context (read the session state / progress note, do not re-explore).
-- **Do spend it on:** grounded multi-file edits with verify + PR, and subagents for bounded research/audit/parallel work.
+- One lane keeps its assigned Claude account for its lifetime. Do not switch accounts inside a running lane.
+- Claude Code fallback models do not cover a usage cap. On a cap, update the lane brief and continue from it on the routed surface.
+- Plan in chat and provide the agent a concrete spec and file list. Grounded repository edits stay grounded in the repository.

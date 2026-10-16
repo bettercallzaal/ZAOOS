@@ -46,6 +46,7 @@ import {
   formatGapDigest,
   gapLogEnabled,
   gapUpgradeEnabled,
+  gapWeekKey,
   pickUpgrade,
   readGaps,
   summarizeGaps,
@@ -1710,7 +1711,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             `[zoe/scheduler] capability gaps: ${rows.length} rows on file, ${skipped} unreadable, ${groups.length} groups this week`,
           );
           if (groups.length === 0) return;
-          const upgrade = gapUpgradeEnabled() ? pickUpgrade(groups) : null;
+          // One upgrade check per week, under its own sentinel that is never
+          // released: a failure later in this job must not let a re-run queue a
+          // second item (Evaluator, #3918). Already queued this week = the digest
+          // does not claim it again.
+          const candidate = gapUpgradeEnabled() ? pickUpgrade(groups) : null;
+          const upgrade =
+            candidate && (await claimFire(`capability-gaps-upgrade-${gapWeekKey(new Date())}`)) ? candidate : null;
           if (upgrade) await enqueueWork(buildGapGoal(upgrade));
           const digest = formatGapDigest(groups, upgrade);
           if (opts.routingDeps) {

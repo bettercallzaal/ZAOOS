@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, promises as fs, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -18,6 +18,8 @@ import {
   pickUpgrade,
   readGaps,
   summarizeGaps,
+  MAX_GAP_FILE_BYTES,
+  gapWeekKey,
 } from '../capability-gaps';
 
 const NOW = new Date('2026-10-18T18:30:00Z');
@@ -222,6 +224,70 @@ describe('appendGap and readGaps', () => {
   });
 });
 
+describe('marker spellings a model plausibly writes (Evaluator, #3918)', () => {
+  it.each([
+    ['gap: set a reminder at 3pm'],
+    ['Gap: set a reminder at 3pm'],
+    ['GAP : set a reminder at 3pm'],
+    ['**GAP:** set a reminder at 3pm'],
+    ['**GAP: set a reminder at 3pm**'],
+    ['__GAP__: set a reminder at 3pm'],
+    ['> GAP: set a reminder at 3pm'],
+    ['- GAP: set a reminder at 3pm'],
+    ['* GAP: set a reminder at 3pm'],
+    ['1. GAP: set a reminder at 3pm'],
+  ])('%j is stripped and recorded', (marker) => {
+    const r = extractGap(`Sure, here is what I can do.\n${marker}`);
+    expect(r.reply).toBe('Sure, here is what I can do.');
+    expect(r.gap).toBe('set a reminder at 3pm');
+  });
+
+  it('a carriage-return line end is handled', () => {
+    const r = extractGap('Here you go.\r\nGAP: send an email\r\n');
+    expect(r.reply).toBe('Here you go.');
+    expect(r.gap).toBe('send an email');
+  });
+
+  it('a marker alone inside a code fence leaves no empty fence behind', () => {
+    const r = extractGap('Answer first.\n\n```\nGAP: speak the reply aloud\n```');
+    expect(r.reply).toBe('Answer first.');
+    expect(r.gap).toBe('speak the reply aloud');
+  });
+
+  it('the word inside a sentence is still left alone and not recorded', () => {
+    const r = extractGap('There is a gap: the venue closes at 9.');
+    expect(r).toEqual({ reply: 'There is a gap: the venue closes at 9.', gap: null });
+  });
+});
+
+describe('gapWeekKey', () => {
+  it.each([
+    ['2026-10-18T18:30:00Z', '2026-10-18'], // Sunday itself
+    ['2026-10-19T09:00:00Z', '2026-10-18'], // Monday after
+    ['2026-10-24T23:59:00Z', '2026-10-18'], // Saturday after
+    ['2026-10-25T00:00:00Z', '2026-10-25'], // next Sunday
+  ])('%s -> %s', (iso, key) => {
+    expect(gapWeekKey(new Date(iso))).toBe(key);
+  });
+});
+
+describe('the gap file', () => {
+  it('is written owner-only and stops growing at the cap', async () => {
+    const dir = await fs.mkdtemp(join(tmpdir(), 'zoe-gaps-'));
+    const path = join(dir, 'capability-gaps.jsonl');
+    try {
+      expect(await appendGap('send an email', new Date('2026-10-18T10:00:00Z'), path)).toBe(true);
+      expect((await fs.stat(path)).mode & 0o777).toBe(0o600);
+      await fs.writeFile(path, 'x'.repeat(MAX_GAP_FILE_BYTES));
+      expect(await appendGap('another want', new Date(), path)).toBe(false);
+      expect((await fs.stat(path)).size).toBe(MAX_GAP_FILE_BYTES);
+    } finally {
+      await fs.rm(path, { force: true });
+      await fs.rmdir(dir);
+    }
+  });
+});
+
 describe('the wiring', () => {
   const src = (name: string) => readFileSync(join(__dirname, '..', name), 'utf8');
 
@@ -244,8 +310,16 @@ describe('the wiring', () => {
     expect(index).toContain("const gapLog = gapLogEnabled() && blocks.chat_scope === 'private';");
     const turns = index.split('runConciergeTurn({').slice(1);
     expect(turns.length).toBeGreaterThanOrEqual(3);
-    const asking = turns.filter((t) => /^\s*gapLog,?$/m.test(t.slice(0, t.indexOf('});'))));
+    // Any spelling of the option counts: shorthand, `gapLog: true`, `gapLog: x`.
+    // The first version matched the shorthand only, so a second call site
+    // written `gapLog: true` would have passed (Evaluator, #3918).
+    const asking = turns.filter((t) => /\bgapLog\b\s*[:,}\n]/.test(t.slice(0, t.indexOf('});'))));
     expect(asking).toHaveLength(1);
+    // And no other file that runs a concierge turn passes it at all.
+    for (const other of ['discord.ts', 'concierge.ts']) {
+      const calls = src(other).split('runConciergeTurn({').slice(1);
+      for (const t of calls) expect(t.slice(0, t.indexOf('});')), other).not.toMatch(/\bgapLog\b\s*[:,}\n]/);
+    }
     expect(index.match(/extractGap\(/g)).toHaveLength(1);
     // concierge.ts adds the block from the option, never from the env flag.
     const concierge = src('concierge.ts');
@@ -261,9 +335,21 @@ describe('the wiring', () => {
     const flagCheck = block.indexOf('if (!gapLogEnabled()) return;');
     expect(flagCheck).toBeGreaterThan(0);
     expect(flagCheck).toBeLessThan(block.indexOf("claimFire('capability-gaps')"));
-    expect(block).toContain('const upgrade = gapUpgradeEnabled() ? pickUpgrade(groups) : null;');
+    expect(block).toContain('const candidate = gapUpgradeEnabled() ? pickUpgrade(groups) : null;');
     expect(block).toContain('if (upgrade) await enqueueWork(buildGapGoal(upgrade));');
     expect(block).toContain('if (groups.length === 0) return;');
     expect(block.match(/enqueueWork\(/g)).toHaveLength(1);
+  });
+
+  it('queues at most one upgrade per week: its own sentinel, claimed before the queue, never released', () => {
+    const scheduler = src('scheduler.ts');
+    const at = scheduler.indexOf("'30 18 * * 0'");
+    const block = scheduler.slice(at, scheduler.indexOf('{ timezone:', at));
+    const claim = block.indexOf('claimFire(`capability-gaps-upgrade-${gapWeekKey(new Date())}`)');
+    expect(claim).toBeGreaterThan(0);
+    expect(claim).toBeLessThan(block.indexOf('enqueueWork('));
+    // The only release in the job is the digest's own; the upgrade claim stays.
+    expect(block).not.toMatch(/releaseFire\(`capability-gaps-upgrade/);
+    expect(block.match(/releaseFire\(/g)).toHaveLength(1);
   });
 });

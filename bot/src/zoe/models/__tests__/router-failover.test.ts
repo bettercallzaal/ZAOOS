@@ -7,6 +7,7 @@ import {
   routeAndCall,
   OPENROUTER_HIGH_MODEL,
   resetProviderHealth,
+  isFreeTierModel,
 } from '../router';
 
 /**
@@ -335,5 +336,42 @@ describe('the local rung: Ollama, last and keyless', () => {
     expect(capFallbackProviders()).toEqual(['openrouter', 'ollama']);
     setEnv({ XAI_API_KEY: 'x' });
     expect(capFallbackProviders()).toEqual(['openrouter', 'grok', 'ollama']);
+  });
+});
+
+describe('free-tier models never receive this path\'s traffic', () => {
+  it.each([
+    ['nvidia/nemotron-3-super-120b-a12b:free', true],
+    ['google/gemma-4-31b-it:FREE ', true],
+    ['deepseek/deepseek-chat', false],
+    ['openai/gpt-5.5', false],
+    ['vendor/free-model', false],
+  ])('isFreeTierModel(%j) is %s', (id, want) => {
+    expect(isFreeTierModel(id)).toBe(want);
+  });
+
+  it('a :free OPENROUTER_MODEL sends nothing to OpenRouter and falls through to the next rung', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'test', OPENROUTER_MODEL: 'poolside/laguna-s-2.1:free', XAI_API_KEY: 'test' });
+    const urls: string[] = [];
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      urls.push(String(url));
+      return okResponse('from-grok');
+    }) as unknown as typeof fetch;
+    const { provider, result } = await callCapFallback('sys', 'private DM text');
+    expect(provider).toBe('grok');
+    expect(result.text).toBe('from-grok');
+    expect(urls.some((u) => u.includes('openrouter.ai'))).toBe(false);
+  });
+
+  it('a :free OPENROUTER_HIGH_MODEL is refused on the high tier too', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'test' });
+    vi.resetModules();
+    process.env.OPENROUTER_HIGH_MODEL = 'nvidia/nemotron-3-super-120b-a12b:free';
+    const fresh = await import('../router');
+    fresh.resetProviderHealth();
+    const fetchMock = vi.fn(async () => okResponse('should not be called'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await expect(fresh.callCapFallback('sys', 'private', { tier: 'high' })).rejects.toThrow(/refusing free-tier model/);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -92,7 +92,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       if (msg.tabId === tabId) return;
 
       if (msg.type === 'ping') {
-        // Another tab is opening — respond so they know we exist
+        // Another tab is opening - respond so they know we exist
         channel.postMessage({ type: 'pong', tabId });
         return;
       }

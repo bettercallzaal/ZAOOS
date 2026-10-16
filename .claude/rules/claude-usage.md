@@ -7,6 +7,7 @@ Route work to the surface that can complete it with the least unnecessary premiu
 | Grounded live-code edits, verification, and PRs | Claude Code | Use the repository's rules, hooks, skills, and current implementation. |
 | Well-specified mechanical code with a file list and acceptance criteria | Codex exec | Check its result against the repository; do not delegate ambiguous discovery or completion judgment blindly. |
 | Research triage; Google Docs and Sheets output | Gemini CLI | Treat fetched sources, not summaries, as evidence. |
+| Bulk summarising and classifying inside ZOE loops | OpenRouter through ZOE's router | Text jobs only; file-editing work waits for a grounded coding surface. |
 | Small private/offline text transformations | Ollama local | Local models only; cloud-tagged Ollama models are not private. |
 
 - One lane keeps its assigned Claude account for its lifetime. Do not switch accounts inside a running lane.

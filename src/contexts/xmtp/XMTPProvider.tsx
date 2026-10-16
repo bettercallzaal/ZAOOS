@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { z } from 'zod';
 import { useConnection } from '@/contexts/xmtp/connection';
 import { useConversations } from '@/contexts/xmtp/conversations';
 import { useGroups } from '@/contexts/xmtp/groups';
@@ -25,6 +26,13 @@ import type {
 } from '@/contexts/xmtp/types';
 import { PREFS_DEFAULTS } from '@/contexts/xmtp/types';
 import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
+
+// ── Tab lock messages (BroadcastChannel 'zao-xmtp-tab-lock') ─────────
+
+const tabLockMessageSchema = z.object({
+  type: z.enum(['ping', 'pong', 'bye']),
+  tabId: z.string().min(1).max(64),
+});
 
 // ── Context ─────────────────────────────────────────────────────────
 
@@ -66,26 +74,43 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   // Multi-tab OPFS lock detection — XMTP browser SDK uses OPFS which doesn't support concurrent access
   const [tabLocked, setTabLocked] = useState(false);
+  // Protocol: a new tab pings; existing tabs pong and are remembered as peers.
+  // A peer that closes (or unloads, via pagehide) sends `bye`, which releases the lock.
   useEffect(() => {
     if (typeof BroadcastChannel === 'undefined') return;
     const channel = new BroadcastChannel('zao-xmtp-tab-lock');
     const tabId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const peers = new Set<string>();
 
     // Announce presence
     channel.postMessage({ type: 'ping', tabId });
 
-    channel.onmessage = (event) => {
-      if (event.data.type === 'ping' && event.data.tabId !== tabId) {
-        // Another tab is active — respond so they know we exist
+    channel.onmessage = (event: MessageEvent<unknown>) => {
+      const parsed = tabLockMessageSchema.safeParse(event.data);
+      if (!parsed.success) return;
+      const msg = parsed.data;
+      if (msg.tabId === tabId) return;
+
+      if (msg.type === 'ping') {
+        // Another tab is opening - respond so they know we exist
         channel.postMessage({ type: 'pong', tabId });
+        return;
       }
-      if (event.data.type === 'pong' && event.data.tabId !== tabId) {
+      if (msg.type === 'pong') {
         // We detected another tab — block XMTP connection
-        setTabLocked(true);
+        peers.add(msg.tabId);
+      } else {
+        peers.delete(msg.tabId);
       }
+      setTabLocked(peers.size > 0);
     };
 
+    const announceBye = () => channel.postMessage({ type: 'bye', tabId });
+    window.addEventListener('pagehide', announceBye);
+
     return () => {
+      window.removeEventListener('pagehide', announceBye);
+      announceBye();
       channel.close();
     };
   }, []);

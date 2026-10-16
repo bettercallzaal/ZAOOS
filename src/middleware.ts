@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
+import { xmtpAutoConnectEnabled } from '@/lib/xmtp/auto-connect-flag';
 
 const MINUTE = 60_000;
 
@@ -85,6 +86,16 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   return null;
 }
 
+// Pages that mount <XMTPProvider>. The XMTP browser SDK stores its database in
+// OPFS, which needs cross-origin isolation.
+// /messages always carries it (unchanged from main).
+// /chat carries it only with NEXT_PUBLIC_XMTP_AUTO_CONNECT on: COOP same-origin cuts
+// window.opener, which breaks the wagmi coinbaseWallet popup on the flag-off wallet path.
+export function isCrossOriginIsolatedPath(pathname: string): boolean {
+  if (pathname.startsWith('/messages')) return true;
+  return xmtpAutoConnectEnabled() && (pathname === '/chat' || pathname.startsWith('/chat/'));
+}
+
 function generateNonce(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
@@ -95,7 +106,9 @@ function generateNonce(): string {
 function buildCspHeader(nonce: string): string {
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
+    // 'wasm-unsafe-eval' lets the XMTP browser SDK compile its WASM bindings. It
+    // allows WebAssembly compilation only; it does not allow eval() or new Function().
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https:",
@@ -159,7 +172,7 @@ export async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-nonce', nonce);
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    if (pathname.startsWith('/messages')) {
+    if (isCrossOriginIsolatedPath(pathname)) {
       response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
       response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     }

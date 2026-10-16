@@ -11,7 +11,17 @@
 # its decision so the build log shows WHY it built or skipped. (Its fallback
 # to diffing the commit itself was removed on 2026-10-16; see step 2.)
 
-BUILD_PATHS=(src public package.json package-lock.json next.config.ts tsconfig.json community.config.ts vercel.json scripts/vercel-ignore.sh)
+# Everything the production build reads. packages/ is imported from src (for
+# example src/lib/heart/lease-manager.ts), patches/ is applied by patch-package
+# on install, and the root instrumentation, Sentry and PostCSS configs are
+# loaded by Next. A change only in one of those used to skip production.
+BUILD_PATHS=(
+  src public packages patches
+  package.json package-lock.json next.config.ts tsconfig.json community.config.ts
+  instrumentation.ts instrumentation-client.ts sentry.edge.config.ts sentry.server.config.ts
+  postcss.config.mjs
+  vercel.json scripts/vercel-ignore.sh
+)
 
 # 1. Only ever build production. Preview/branch deploys skip entirely - saves
 #    the Vercel spend and stops failing-preview emails.

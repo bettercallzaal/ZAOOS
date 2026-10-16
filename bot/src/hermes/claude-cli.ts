@@ -33,6 +33,30 @@ export interface ClaudeCliOptions {
   maxBudgetUsd?: number;                          // hard cap per invocation
   timeoutMs?: number;                             // wall clock kill
   bare?: boolean;                                 // skip hooks/CLAUDE.md auto-discovery
+  talkOnly?: boolean;                             // no tools of any kind: see talkOnlyArgs
+}
+
+/**
+ * The argv that turns a CLI call into talk only. An allow list alone does not:
+ * an EMPTY allow list is not passed at all (see the `length > 0` guard below),
+ * and a deny list leaves every tool it does not name, plus the host's MCP
+ * servers, skills and settings allow rules. Probed with the installed CLI from
+ * an empty directory on 2026-10-16 (Mac 2.1.301, VPS 2.1.167): with these four
+ * flags the init event lists tools [], mcp_servers [], slash_commands [] and
+ * skills [], and the model still answers. Each flag exists in both versions'
+ * `claude --help`.
+ */
+export const TALK_ONLY_ARGS: readonly string[] = [
+  '--tools',
+  '', // "" disables every built-in tool
+  '--strict-mcp-config', // with no --mcp-config: no MCP server at all
+  '--disable-slash-commands', // no skills
+  '--setting-sources',
+  '', // no user, project or local settings: no host allow rules, no hooks
+];
+
+export function talkOnlyArgs(): string[] {
+  return [...TALK_ONLY_ARGS];
 }
 
 const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 min
@@ -224,6 +248,9 @@ function callClaudeCliInner(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
     }
     if (opts.permissionMode) {
       args.push('--permission-mode', opts.permissionMode);
+    }
+    if (opts.talkOnly) {
+      args.push(...talkOnlyArgs());
     }
     // NOTE: intentionally NOT forwarding `opts.jsonSchema` to the CLI.
     // `--json-schema` enforces strict structured output, which prevents the

@@ -11,6 +11,9 @@
  * Multi-model routing (doc 1113): when MODEL_ROUTING_ENABLED=1, selects between
  * Claude, Grok, and GPT based on task type. Shows Zaal the model choice + rationale.
  */
+import { mkdtempSync, rmdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { GAP_PROMPT_BLOCK } from './capability-gaps';
 import { callClaudeCli } from '../hermes/claude-cli';
 import { recordCall } from './cost-ledger';
@@ -238,6 +241,24 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     }
   }
 
+  // A talk-only turn runs in an empty directory, so no CLAUDE.md or project
+  // settings near it load and nothing is in reach (scope-lock.ts).
+  const talkOnlyDir = opts.toolPolicy === 'none' ? makeTalkOnlyDir() : null;
+  const turnDir = talkOnlyDir ?? opts.context.workspace_dir;
+  try {
+    return await runConciergeTurnIn(opts, systemBlocks, userPrompt, turnDir);
+  } finally {
+    if (talkOnlyDir) removeTalkOnlyDir(talkOnlyDir);
+  }
+}
+
+async function runConciergeTurnIn(
+  opts: ConciergeOptions,
+  systemBlocks: string,
+  userPrompt: string,
+  turnDir: string,
+): Promise<ConciergeResult> {
+
   let result: import('../hermes/claude-cli').ClaudeCliResult;
   let selectedModel: string;
   let modelRationale: string | undefined;
@@ -262,10 +283,9 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
         result = await callModelWithCliRouting({
           model: selectedModel,
           prompt: userPrompt,
-          cwd: opts.context.workspace_dir,
+          cwd: turnDir,
           appendSystemPrompt: systemBlocks,
-          allowedTools: getDefaultTools(),
-          disallowedTools: getDefaultDisallowedTools(),
+          ...toolsFor(opts.toolPolicy),
           permissionMode: 'default',
           outputFormat: 'json',
           bare: false,
@@ -279,10 +299,9 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       result = await callModelWithCliRouting({
         model: selectedModel,
         prompt: userPrompt,
-        cwd: opts.context.workspace_dir,
+        cwd: turnDir,
         appendSystemPrompt: systemBlocks,
-        allowedTools: getDefaultTools(),
-        disallowedTools: getDefaultDisallowedTools(),
+        ...toolsFor(opts.toolPolicy),
         permissionMode: 'default',
         outputFormat: 'json',
         bare: false,
@@ -296,10 +315,9 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     result = await callModelWithCliRouting({
       model: selectedModel,
       prompt: userPrompt,
-      cwd: opts.context.workspace_dir,
+      cwd: turnDir,
       appendSystemPrompt: systemBlocks,
-      allowedTools: getDefaultTools(),
-      disallowedTools: getDefaultDisallowedTools(),
+      ...toolsFor(opts.toolPolicy),
       permissionMode: 'default',
       outputFormat: 'json',
       bare: false,
@@ -346,6 +364,69 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     durationMs: result.durationMs,
   };
 }
+
+/** A fresh empty directory per talk-only turn, outside every repo. */
+export function makeTalkOnlyDir(): string {
+  return mkdtempSync(join(tmpdir(), 'zoe-talk-only-'));
+}
+
+/** Remove that one directory by its exact path. Non-recursive: if anything was
+ *  written into it, it stays and the line says so (no-rm-rf.md). */
+export function removeTalkOnlyDir(dir: string): void {
+  try {
+    rmdirSync(dir);
+  } catch (err) {
+    console.warn(`[zoe/concierge] talk-only dir not removed (${dir}):`, (err as Error).message);
+  }
+}
+
+/**
+ * The tool flags for one turn. 'none' sets talkOnly, which is the lock that
+ * holds (claude-cli.ts TALK_ONLY_ARGS: no built-in tool, no MCP server, no
+ * skill, no host settings). The deny list behind it is a second layer only;
+ * on its own a deny list was measured to leave most tools callable.
+ */
+export function toolsFor(policy: 'default' | 'none' = 'default'): {
+  allowedTools: string[];
+  disallowedTools: string[];
+  talkOnly?: boolean;
+} {
+  if (policy === 'none') {
+    return { allowedTools: [], disallowedTools: NO_TOOLS_DENY, talkOnly: true };
+  }
+  return { allowedTools: getDefaultTools(), disallowedTools: getDefaultDisallowedTools() };
+}
+
+export const NO_TOOLS_DENY: string[] = [
+  'Read',
+  'Glob',
+  'Grep',
+  'Bash',
+  'Edit',
+  'Write',
+  'NotebookEdit',
+  'WebFetch',
+  'WebSearch',
+  'Task',
+  'Agent',
+  'TodoWrite',
+  'Skill',
+  'mcp__playwright',
+  'mcp__scout',
+  'mcp__context7',
+  'mcp__serena',
+  'mcp__claude_ai_Gmail',
+  'mcp__claude_ai_Google_Calendar',
+  'mcp__claude_ai_Google_Drive',
+  'mcp__claude_ai_Slack',
+  'mcp__claude_ai_Notion',
+  'mcp__claude_ai_Dropbox',
+  'mcp__claude_ai_Calendly',
+  'mcp__claude_ai_Claude_Docs',
+  'mcp__claude_ai_Linear',
+  'mcp__claude_ai_Canva',
+  'mcp__claude_ai_TravExp',
+];
 
 /**
  * Default allowed tools for concierge calls.

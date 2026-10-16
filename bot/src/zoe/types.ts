@@ -165,6 +165,9 @@ export interface ConciergeOptions {
   /** Ask for a final `GAP:` line (capability-gaps.ts). Set ONLY by a caller that
    * takes that line off the reply before using it. */
   gapLog?: boolean;
+  /** 'none' = talk only: no tools, no MCP, empty working dir (scope-lock.ts).
+   * Default: the concierge's usual set. */
+  toolPolicy?: 'default' | 'none';
 }
 
 export interface ConciergeResult {

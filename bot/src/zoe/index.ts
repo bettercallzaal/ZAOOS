@@ -35,6 +35,7 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
+import { stripOpsOutsidePrivate, toolPolicyForScope } from './scope-lock';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import {
   claimXLink,
@@ -3709,12 +3710,19 @@ async function dispatchConcierge(
       conversational,
       // capability-gaps.ts: this call site strips the GAP line just below.
       gapLog,
+      // scope-lock.ts: only Zaal's private turn gets tools; every other scope talks.
+      toolPolicy: toolPolicyForScope(scope),
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
         current_date: currentDateString(),
       },
     });
+
+    // scope-lock.ts: outside the private scope no op the model returns is
+    // applied, mirrored or summarised. Cleared here, before anything reads one.
+    const droppedOps = stripOpsOutsidePrivate(result, scope);
+    if (droppedOps > 0) console.log(`[zoe/index] ${droppedOps} op(s) dropped outside the private scope (${scope})`);
 
     // Capability gaps (ZOE_GAP_LOG=1, capability-gaps.ts): the DM prompt asks for
     // a final `GAP:` line when she had no way to do what was asked. Take it off
@@ -4757,6 +4765,10 @@ async function main(): Promise<void> {
         message: prompt,
         blocks,
         senderLabel: 'Board',
+        // Board commands run as Zaal's private scope, as before this lock: the
+        // cowork board is the team's own control plane, not a chat. Named
+        // here so the choice is visible (scope-lock.ts).
+        toolPolicy: toolPolicyForScope('private'),
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
       coworkTask = 'idle (polling)';
@@ -4775,6 +4787,10 @@ async function main(): Promise<void> {
           `Do what you can from here and summarize the outcome concisely.`,
         blocks,
         senderLabel: 'Board',
+        // Board commands run as Zaal's private scope, as before this lock: the
+        // cowork board is the team's own control plane, not a chat. Named
+        // here so the choice is visible (scope-lock.ts).
+        toolPolicy: toolPolicyForScope('private'),
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
       if (result.task_ops.length > 0) {

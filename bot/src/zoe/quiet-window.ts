@@ -124,6 +124,28 @@ export function stripOutageHint(opts?: Record<string, unknown>): Record<string, 
   return rest;
 }
 
+/**
+ * Card 10414. A held send was already decided at night: the budget saw it then
+ * and the quiet window kept it. The morning release marks each one with this
+ * hint so the budget lets it through as a delivery of an old decision, not as
+ * new spend. Without it, a day whose cap was spent before the release stopped
+ * the queue at its first message forever, and each 5-minute retry deferred a
+ * fresh copy into the morning batch until that queue overflowed and dropped
+ * its oldest entries (VPS journal, 2026-10-16: "released 0, kept 14").
+ */
+export const HELD_RELEASE_HINT = 'zoeHeldRelease';
+
+export function isHeldRelease(opts?: Record<string, unknown>): boolean {
+  return opts?.[HELD_RELEASE_HINT] === true;
+}
+
+/** Options minus the release hint, so Telegram never sees it. */
+export function stripHeldRelease(opts?: Record<string, unknown>): Record<string, unknown> | undefined {
+  if (!opts || !(HELD_RELEASE_HINT in opts)) return opts;
+  const { [HELD_RELEASE_HINT]: _drop, ...rest } = opts;
+  return rest;
+}
+
 export interface QuietEntry {
   at: string;
   cls: SendClass;
@@ -267,7 +289,11 @@ export function releaseQuietQueue(deps: {
     for (const entry of batch) {
       let ok = false;
       try {
-        const r = await deps.send(entry.chatId, entry.text, { ...(entry.opts ?? {}), zoeSendClass: entry.cls });
+        const r = await deps.send(entry.chatId, entry.text, {
+          ...(entry.opts ?? {}),
+          zoeSendClass: entry.cls,
+          [HELD_RELEASE_HINT]: true,
+        });
         ok = !deps.isBlocked(r);
       } catch (e) {
         console.error('[zoe/quiet] a held message failed to send, kept for the next tick:', (e as Error)?.message);

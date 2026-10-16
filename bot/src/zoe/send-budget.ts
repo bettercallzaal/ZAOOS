@@ -147,7 +147,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { holdSend, shouldHold, stripOutageHint } from './quiet-window';
+import { holdSend, isHeldRelease, shouldHold, stripHeldRelease, stripOutageHint } from './quiet-window';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -856,7 +856,8 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     clean === undefined ? raw(chatId, text) : raw(chatId, text, clean);
 
   return async (chatId, rawText, opts) => {
-    const clean = stripOutageHint(stripSendClass(opts));
+    const heldRelease = isHeldRelease(opts);
+    const clean = stripHeldRelease(stripOutageHint(stripSendClass(opts)));
     // Tag before anything else reads the text, so the budget log, a deferred
     // copy and the delivered message all carry the same words.
     const text = tagForZaal(rawText, resolveSendClass(opts), chatId);
@@ -868,7 +869,7 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
     // the queue cannot be written, only an alarm goes out; anything else is
     // parked and reported as dropped, because it will not be released.
     const cls = resolveSendClass(opts);
-    if (shouldHold(cls, opts, now())) {
+    if (!heldRelease && shouldHold(cls, opts, now())) {
       const held = await holdSend({ at: now().toISOString(), cls, chatId, text, ...(clean ? { opts: clean } : {}) });
       if (held !== 'send') {
         const outcome: SendOutcome = held === 'held' ? 'deferred' : 'dropped';
@@ -886,6 +887,25 @@ export function gateSend(raw: RawSend, now: () => Date = () => new Date()): RawS
       }
     }
     if (!sendBudgetEnabled()) return passThrough(chatId, text, clean);
+
+    // The morning release of a send held overnight (card 10414): already
+    // decided, so it is delivered and logged, never charged or deferred again.
+    if (heldRelease) {
+      const releasedAt = now().toISOString();
+      const result = await passThrough(chatId, text, clean);
+      await logDecision({
+        at: releasedAt,
+        outcome: 'sent',
+        cls,
+        chatId,
+        countBefore: 0,
+        cap: 0,
+        reason: 'quiet window release - held overnight, not new spend',
+        preview: text.slice(0, 120),
+        counted: false,
+      }).catch(() => {});
+      return result;
+    }
 
     let decision: SendDecision;
     let state: BudgetState;

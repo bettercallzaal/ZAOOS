@@ -85,6 +85,16 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   return null;
 }
 
+// Pages that mount <XMTPProvider>. The XMTP browser SDK stores its database in
+// OPFS, which needs cross-origin isolation. Both XMTP surfaces must carry it.
+const CROSS_ORIGIN_ISOLATED_PREFIXES = ['/messages', '/chat'] as const;
+
+export function isCrossOriginIsolatedPath(pathname: string): boolean {
+  return CROSS_ORIGIN_ISOLATED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 function generateNonce(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
@@ -95,7 +105,9 @@ function generateNonce(): string {
 function buildCspHeader(nonce: string): string {
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
+    // 'wasm-unsafe-eval' lets the XMTP browser SDK compile its WASM bindings. It
+    // allows WebAssembly compilation only; it does not allow eval() or new Function().
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https:",
@@ -159,7 +171,7 @@ export async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-nonce', nonce);
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    if (pathname.startsWith('/messages')) {
+    if (isCrossOriginIsolatedPath(pathname)) {
       response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
       response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     }

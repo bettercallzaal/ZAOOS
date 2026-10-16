@@ -89,8 +89,11 @@ export function useMembers(
               }
             }
           }
-        } catch (err) {
+        } catch (err: unknown) {
           console.error('[XMTP] canMessage check failed:', err);
+          showActionError(
+            'Could not check which members can receive messages. Refresh to try again.',
+          );
         }
       }
 
@@ -205,6 +208,7 @@ export function useMembers(
     zaoMembersRef,
     setZaoMembers,
     setLoadingMembers,
+    showActionError,
     loadAllConversations,
   ]);
 

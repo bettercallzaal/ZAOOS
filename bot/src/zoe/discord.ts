@@ -17,6 +17,7 @@
  * - Direct Messages
  */
 
+import { toolPolicyForScope } from './scope-lock';
 import {
   Client,
   GatewayIntentBits,
@@ -204,6 +205,8 @@ export async function bootDiscordClient(): Promise<Client | null> {
           workspace_dir: process.env.ZOE_REPO_DIR ?? '/home/zaal/zao-os',
         },
         senderLabel,
+        // scope-lock.ts: only Zaal's own DM gets tools; every other scope talks.
+        toolPolicy: toolPolicyForScope(scope),
       });
 
       const replyText = result.reply ?? 'I could not generate a response.';

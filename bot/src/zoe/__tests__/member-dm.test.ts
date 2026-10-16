@@ -92,6 +92,9 @@ describe('toolsFor', () => {
   it("'none' allows nothing and denies every built-in tool the default set uses", () => {
     const none = toolsFor('none');
     expect(none.allowedTools).toEqual([]);
+    // The lock that holds is the argv (claude-cli.ts TALK_ONLY_ARGS, tested in
+    // scope-lock.test.ts); the deny list below is the second layer.
+    expect(none.talkOnly).toBe(true);
     const def = toolsFor('default');
     for (const t of def.allowedTools) {
       const base = t.replace(/\(.*$/, '');

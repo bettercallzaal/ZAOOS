@@ -36,6 +36,7 @@ import {
 } from './grill';
 import { featureRan } from './feature-ran';
 import { isZaoMember, memberDmEnabled, memberDmPerHour, newMemberDmLimiter, runMemberDmTurn } from './member-dm';
+import { stripOpsOutsidePrivate, toolPolicyForScope } from './scope-lock';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import {
   claimXLink,
@@ -56,8 +57,8 @@ import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
 import type { Client } from 'discord.js';
 import { bootDiscordClient } from './discord';
 import { startHeartbeat, reportEvent, startCommandPoller, markDone, updateItem, type TaskStatus } from '../lib/cowork';
-import { mkdirSync, promises as fs } from 'node:fs';
-import { homedir, tmpdir } from 'node:os';
+import { promises as fs } from 'node:fs';
+import { homedir } from 'node:os';
 import { join, basename } from 'node:path';
 import { processInboundMedia } from './inbound-media';
 import { detectBuildIntent } from './build-intent';
@@ -2847,18 +2848,11 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
 
 const memberDmLimiter = newMemberDmLimiter();
 
-/** An empty directory outside every repo, so a member turn has nothing near it to read. */
-function memberDmWorkdir(): string {
-  const dir = join(tmpdir(), 'zoe-member-dm');
-  mkdirSync(dir, { recursive: true, mode: 0o700 });
-  return dir;
-}
-
 /**
  * A member's DM turn (member-dm.ts). Deliberately NOT dispatchConcierge: that
- * function runs the concierge with its tools and applies every op the model
- * returns. This one denies every tool, runs in an empty directory, and keeps
- * only the reply text.
+ * function is the shared turn path for every scope. This one is talk-only
+ * (scope-lock.ts: no tools, fresh empty dir per turn) and keeps only the
+ * reply text.
  */
 async function handleMemberDm(ctx: Context, text: string): Promise<void> {
   if (!ctx.chat || !ctx.from) return;
@@ -2876,8 +2870,10 @@ async function handleMemberDm(ctx: Context, text: string): Promise<void> {
             senderLabel,
             model: ZOE_QUICK_MODEL,
             conversational: true,
+            // talk-only: concierge.ts runs it in a fresh empty dir and removes
+            // it after, so workspace_dir is never used for this turn.
             toolPolicy: 'none',
-            context: { zaal_tg_id: zaalId, workspace_dir: memberDmWorkdir(), current_date: currentDateString() },
+            context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
           });
           return { reply: r.reply };
         },
@@ -3775,12 +3771,19 @@ async function dispatchConcierge(
       conversational,
       // capability-gaps.ts: this call site strips the GAP line just below.
       gapLog,
+      // scope-lock.ts: only Zaal's private turn gets tools; every other scope talks.
+      toolPolicy: toolPolicyForScope(scope),
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
         current_date: currentDateString(),
       },
     });
+
+    // scope-lock.ts: outside the private scope no op the model returns is
+    // applied, mirrored or summarised. Cleared here, before anything reads one.
+    const droppedOps = stripOpsOutsidePrivate(result, scope);
+    if (droppedOps > 0) console.log(`[zoe/index] ${droppedOps} op(s) dropped outside the private scope (${scope})`);
 
     // Capability gaps (ZOE_GAP_LOG=1, capability-gaps.ts): the DM prompt asks for
     // a final `GAP:` line when she had no way to do what was asked. Take it off
@@ -4823,6 +4826,10 @@ async function main(): Promise<void> {
         message: prompt,
         blocks,
         senderLabel: 'Board',
+        // Board commands run as Zaal's private scope, as before this lock: the
+        // cowork board is the team's own control plane, not a chat. Named
+        // here so the choice is visible (scope-lock.ts).
+        toolPolicy: toolPolicyForScope('private'),
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
       coworkTask = 'idle (polling)';
@@ -4841,6 +4848,10 @@ async function main(): Promise<void> {
           `Do what you can from here and summarize the outcome concisely.`,
         blocks,
         senderLabel: 'Board',
+        // Board commands run as Zaal's private scope, as before this lock: the
+        // cowork board is the team's own control plane, not a chat. Named
+        // here so the choice is visible (scope-lock.ts).
+        toolPolicy: toolPolicyForScope('private'),
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
       if (result.task_ops.length > 0) {

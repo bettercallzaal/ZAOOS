@@ -5,10 +5,10 @@ status: review-pending
 last-validated: 2026-10-16
 related-docs: "2664, 2672, 2675"
 original-query: "moving work to the Codex 20 dollar plan: its real limits from OpenAI's pricing and docs pages, codex exec non-interactive mode, AGENTS.md, MCP, worktrees, what the community reports works and fails on that tier (Reddit, HN, GitHub issues), the lane tasks of the last 7 days (gh pr list across bettercallzaal and ZAODEVZ repos) with which ones Codex could have done, and a routing rule proposal."
-tier: STANDARD
+tier: QUICK
 ---
 
-# 2681 — Routing ZAO work to the Codex plan
+# 2681 - Routing ZAO work to the Codex plan
 
 > **Goal:** Decide which bounded lane tasks move to Codex without treating it as a replacement for grounded repository work.
 
@@ -32,7 +32,7 @@ tier: STANDARD
 
 ## Community signal
 
-GitHub issues show users reporting both productive unattended `exec` usage and configuration/MCP startup failures. The local failure reproduced the latter: a deleted application path produced `MCP startup failed: No such file or directory`; removing the stale entry made `codex exec` start cleanly. Community anecdotes do not establish plan limits, so they are not used to set capacity.
+The GitHub issue index was fetched, but no individual issue was read. It is therefore not evidence for a community claim. The local failure was measured directly: a deleted application path produced `MCP startup failed: No such file or directory`; removing the stale entry made `codex exec` start cleanly.
 
 The requested seven-day PR inventory could not be obtained: GitHub's owner-repo pagination returned no rows on 2026-10-16. This is an instrument result, not evidence that there were zero PRs. Re-run it with authenticated REST pagination before assigning a percentage of lane work.
 

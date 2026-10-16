@@ -2,17 +2,21 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useXMTPContext } from '@/contexts/XMTPContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { useWalletXMTP } from '@/hooks/useWalletXMTP';
+import { xmtpAutoConnectEnabled } from '@/lib/xmtp/auto-connect-flag';
 import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 import { ConnectXMTP } from './ConnectXMTP';
 import { ConversationList } from './ConversationList';
 import { MessageCompose } from './MessageCompose';
 import { MessageThread } from './MessageThread';
 import { NewConversationDialog } from './NewConversationDialog';
+
+// Delays before retrying a failed FID auto-connect. Tab-lock waits do not consume these.
+const AUTO_CONNECT_RETRY_DELAYS_MS = [5_000, 15_000, 30_000] as const;
 
 export function MessagesRoom() {
   const { user } = useAuth();
@@ -28,7 +32,8 @@ export function MessagesRoom() {
     activeConversationId,
     messages,
     loadingMessages,
-    /* connectedWallets and autoConnect available via useXMTPContext when needed */
+    tabLocked,
+    autoConnect,
     selectConversation,
     sendMessage,
     createDm,
@@ -61,8 +66,40 @@ export function MessagesRoom() {
     await handleConnect();
   }, [handleConnect]);
 
-  // Auto-connect XMTP only if user previously connected (has saved wallets in localStorage)
+  // Flag-gated FID auto-connect (NEXT_PUBLIC_XMTP_AUTO_CONNECT). Connects once per mount
+  // with the session's XMTP-only key, so no wallet signature is needed.
+  const autoConnectEnabled = xmtpAutoConnectEnabled();
+  const sessionFid = user?.fid ?? null;
+  const autoConnectStartedRef = useRef(false);
+  const autoConnectRetriesRef = useRef(0);
+
   useEffect(() => {
+    if (!autoConnectEnabled || sessionFid === null || autoConnectStartedRef.current) return;
+    autoConnectStartedRef.current = true;
+    void autoConnect(sessionFid);
+  }, [autoConnectEnabled, sessionFid, autoConnect]);
+
+  // Bounded retry after a failure, so a transient error does not permanently skip auto-connect.
+  useEffect(() => {
+    if (isConnected) autoConnectRetriesRef.current = 0;
+  }, [isConnected]);
+
+  useEffect(() => {
+    if (!autoConnectEnabled || sessionFid === null) return;
+    if (isConnected || isConnecting || !error || tabLocked) return;
+    const attempt = autoConnectRetriesRef.current;
+    if (attempt >= AUTO_CONNECT_RETRY_DELAYS_MS.length) return;
+    const timer = setTimeout(() => {
+      autoConnectRetriesRef.current = attempt + 1;
+      void autoConnect(sessionFid);
+    }, AUTO_CONNECT_RETRY_DELAYS_MS[attempt]);
+    return () => clearTimeout(timer);
+  }, [autoConnectEnabled, sessionFid, isConnected, isConnecting, error, tabLocked, autoConnect]);
+
+  // Auto-connect XMTP only if user previously connected (has saved wallets in localStorage).
+  // When the FID auto-connect flag is on, that path owns connection and this one stands aside.
+  useEffect(() => {
+    if (autoConnectEnabled) return;
     if (!user || isConnected || isConnecting || error) return;
     const hasPreviousConnection =
       typeof window !== 'undefined' && localStorage.getItem('zaoos-xmtp-wallets');

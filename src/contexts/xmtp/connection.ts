@@ -40,6 +40,7 @@ export function useConnection(
     setMessages,
     setReconnecting,
     tabLocked,
+    showActionError,
   } = state;
 
   /** Fetch user's messaging preferences from the API */
@@ -54,6 +55,29 @@ export function useConnection(
       /* use defaults */
     }
   }, [messagingPrefsRef]);
+
+  /**
+   * Save the XMTP address so other members can discover us. Non-fatal: a failure
+   * is logged and shown as a toast, because the connection itself still works.
+   */
+  const publishXmtpAddress = useCallback(
+    async (address: string) => {
+      try {
+        const res = await fetch('/api/users/xmtp-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ xmtpAddress: address }),
+        });
+        if (!res.ok) throw new Error(`xmtp-address responded ${res.status}`);
+      } catch (err: unknown) {
+        console.error('[XMTP] Failed to save XMTP address:', err);
+        showActionError(
+          'Messaging is on, but your address could not be saved. Other members may not find you yet.',
+        );
+      }
+    },
+    [showActionError],
+  );
 
   /**
    * Auto-connect using a ZAO-generated XMTP-only key (no MetaMask needed).
@@ -95,13 +119,7 @@ export function useConnection(
         setConnectedWallets(Array.from(walletsRef.current.keys()));
 
         // Persist XMTP address to DB so other members can discover us
-        fetch('/api/users/xmtp-address', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ xmtpAddress: address }),
-        }).catch(() => {
-          /* non-critical */
-        });
+        void publishXmtpAddress(address);
 
         // Seed last message cache, load conversations, resolve members, then re-load to apply profiles
         await seedLastMessages();
@@ -135,6 +153,7 @@ export function useConnection(
       setConnectingWallet,
       setError,
       fetchMessagingPrefs,
+      publishXmtpAddress,
       seedLastMessages,
       loadAllConversations,
       checkZaoMembers,
@@ -175,13 +194,7 @@ export function useConnection(
         setConnectedWallets(Array.from(walletsRef.current.keys()));
 
         // Persist XMTP address to DB so other members can discover us
-        fetch('/api/users/xmtp-address', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ xmtpAddress: normalized }),
-        }).catch(() => {
-          /* non-critical */
-        });
+        void publishXmtpAddress(normalized);
 
         // Full initialization: seed, load, check members, re-load with profiles, start streams
         await seedLastMessages();
@@ -212,6 +225,7 @@ export function useConnection(
       setConnectingWallet,
       setError,
       fetchMessagingPrefs,
+      publishXmtpAddress,
       seedLastMessages,
       loadAllConversations,
       checkZaoMembers,

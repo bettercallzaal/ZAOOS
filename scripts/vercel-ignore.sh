@@ -14,10 +14,12 @@
 # Everything the production build reads. packages/ is imported from src (for
 # example src/lib/heart/lease-manager.ts), patches/ is applied by patch-package
 # on install, and the root instrumentation, Sentry and PostCSS configs are
-# loaded by Next. A change only in one of those used to skip production.
+# loaded by Next. scripts/apo-prompts/ is read at request time by the admin
+# APO routes, and .npmrc (legacy-peer-deps) changes the install. A change only
+# in one of those used to skip production.
 BUILD_PATHS=(
-  src public packages patches
-  package.json package-lock.json next.config.ts tsconfig.json community.config.ts
+  src public packages patches scripts/apo-prompts
+  package.json package-lock.json .npmrc next.config.ts tsconfig.json community.config.ts
   instrumentation.ts instrumentation-client.ts sentry.edge.config.ts sentry.server.config.ts
   postcss.config.mjs
   vercel.json scripts/vercel-ignore.sh

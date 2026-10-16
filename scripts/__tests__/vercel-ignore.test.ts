@@ -78,6 +78,8 @@ describe('scripts/vercel-ignore.sh', { timeout: 30_000 }, () => {
     ['sentry.edge.config.ts', 'sentry.edge.config.ts'],
     ['sentry.server.config.ts', 'sentry.server.config.ts'],
     ['postcss.config.mjs', 'postcss.config.mjs'],
+    ['scripts/apo-prompts/', 'scripts/apo-prompts/system.json'],
+    ['.npmrc', '.npmrc'],
   ])('builds a change only in %s', (_label, path) => {
     const { cwd, base } = newRepo();
     commit(cwd, [path], 'build input');

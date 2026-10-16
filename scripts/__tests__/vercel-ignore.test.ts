@@ -10,7 +10,11 @@ import { describe, expect, it } from 'vitest';
 
 const SCRIPT = join(process.cwd(), 'scripts/vercel-ignore.sh');
 // Isolate from the machine's git config and hooks so the test is deterministic.
-const GIT_ENV = { GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', NODE_ENV: 'test' as const };
+const GIT_ENV = {
+  GIT_CONFIG_GLOBAL: '/dev/null',
+  GIT_CONFIG_NOSYSTEM: '1',
+  NODE_ENV: 'test' as const,
+};
 const ABSENT = '0123456789abcdef0123456789abcdef01234567';
 
 function git(cwd: string, ...args: string[]): string {
@@ -64,6 +68,23 @@ describe('scripts/vercel-ignore.sh', { timeout: 30_000 }, () => {
     const { cwd, base } = newRepo();
     commit(cwd, ['src/app/page.tsx'], 'code');
     expect(decide(cwd, { VERCEL_GIT_PREVIOUS_SHA: base }).code).toBe(1);
+  });
+
+  it.each([
+    ['packages/', 'packages/heart-fleet/src/index.ts'],
+    ['patches/', 'patches/some-lib+1.0.0.patch'],
+    ['instrumentation.ts', 'instrumentation.ts'],
+    ['instrumentation-client.ts', 'instrumentation-client.ts'],
+    ['sentry.edge.config.ts', 'sentry.edge.config.ts'],
+    ['sentry.server.config.ts', 'sentry.server.config.ts'],
+    ['postcss.config.mjs', 'postcss.config.mjs'],
+    ['scripts/apo-prompts/', 'scripts/apo-prompts/system.json'],
+    ['.npmrc', '.npmrc'],
+  ])('builds a change only in %s', (_label, path) => {
+    const { cwd, base } = newRepo();
+    commit(cwd, [path], 'build input');
+    const r = decide(cwd, { VERCEL_GIT_PREVIOUS_SHA: base });
+    expect(r.code, r.log).toBe(1);
   });
 
   it('builds markdown under public/, which is served', () => {

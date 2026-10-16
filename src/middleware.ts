@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
+import { xmtpAutoConnectEnabled } from '@/lib/xmtp/auto-connect-flag';
 
 const MINUTE = 60_000;
 
@@ -86,13 +87,13 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
 }
 
 // Pages that mount <XMTPProvider>. The XMTP browser SDK stores its database in
-// OPFS, which needs cross-origin isolation. Both XMTP surfaces must carry it.
-const CROSS_ORIGIN_ISOLATED_PREFIXES = ['/messages', '/chat'] as const;
-
+// OPFS, which needs cross-origin isolation.
+// /messages always carries it (unchanged from main).
+// /chat carries it only with NEXT_PUBLIC_XMTP_AUTO_CONNECT on: COOP same-origin cuts
+// window.opener, which breaks the wagmi coinbaseWallet popup on the flag-off wallet path.
 export function isCrossOriginIsolatedPath(pathname: string): boolean {
-  return CROSS_ORIGIN_ISOLATED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  if (pathname.startsWith('/messages')) return true;
+  return xmtpAutoConnectEnabled() && (pathname === '/chat' || pathname.startsWith('/chat/'));
 }
 
 function generateNonce(): string {

@@ -14,6 +14,7 @@
  */
 
 import type { ClaudeCliResult } from '../../hermes/claude-cli';
+import { assertNotFreeTier } from './free-tier';
 import {
   prioritizeProviders,
   recordProviderSuccess,
@@ -299,6 +300,8 @@ async function callGpt(systemPrompt: string, userMessage: string): Promise<Claud
  */
 export const OPENROUTER_HIGH_MODEL = process.env.OPENROUTER_HIGH_MODEL ?? 'openai/gpt-5.5';
 
+export { isFreeTierModel } from './free-tier';
+
 async function callOpenRouter(
   systemPrompt: string,
   userMessage: string,
@@ -313,6 +316,8 @@ async function callOpenRouter(
   // the same Anthropic cap that triggered it. Override via OPENROUTER_MODEL, or
   // pass modelOverride for a high-stakes escalation (OPENROUTER_HIGH_MODEL).
   const model = modelOverride ?? process.env.OPENROUTER_MODEL ?? 'deepseek/deepseek-chat';
+  // Refuse before any request leaves the box; the ladder then tries the next rung.
+  assertNotFreeTier(model);
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   const request: OpenAiRequest = {

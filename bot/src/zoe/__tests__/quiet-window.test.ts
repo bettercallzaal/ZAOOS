@@ -17,7 +17,7 @@ import {
   shouldHold,
   unreadablePath,
 } from '../quiet-window';
-import { gateSend, resetSendBudgetForTest, runWithSendClass, wasSendBlocked } from '../send-budget';
+import { gateSend, readDeferred, resetSendBudgetForTest, runWithSendClass, wasSendBlocked } from '../send-budget';
 
 const at = (iso: string) => new Date(iso);
 const B = { from: 20 * 60 + 30, until: 4 * 60 + 45 };
@@ -320,8 +320,8 @@ describe('releaseQuietQueue', () => {
     const c = collect();
     expect(await releaseQuietQueue({ send: c.send, now: MORNING, isBlocked: wasSendBlocked })).toEqual({ sent: 3, kept: 0 });
     expect(c.sent.map((m) => m.text)).toEqual(['msg 1', 'msg 2', 'msg 3']);
-    expect(c.sent[0].opts).toEqual({ reply_markup: keyboard, zoeSendClass: 'gated' });
-    expect(c.sent[1].opts).toEqual({ zoeSendClass: 'alarm' });
+    expect(c.sent[0].opts).toEqual({ reply_markup: keyboard, zoeSendClass: 'gated', zoeHeldRelease: true });
+    expect(c.sent[1].opts).toEqual({ zoeSendClass: 'alarm', zoeHeldRelease: true });
     expect(await readQuietQueue()).toEqual([]);
   });
 
@@ -418,6 +418,96 @@ describe('releaseQuietQueue', () => {
     delete process.env.ZOE_QUIET;
     expect(await releaseQuietQueue({ send: c.send, now: MORNING, isBlocked: wasSendBlocked })).toEqual({ sent: 0, kept: 0 });
     expect(c.sent).toEqual([]);
+  });
+
+  describe('card 10414: a day whose cap is already spent', () => {
+    // The live case, VPS journal 2026-10-16: digests held overnight, the cap
+    // spent before the release ran, "released 0, kept 14" every five minutes and
+    // a fresh deferred copy of the first one each time.
+    const fullCapDay = async () => {
+      process.env.ZOE_DAILY_SEND_CAP = '2';
+      const calls: Array<[number, string, Record<string, unknown> | undefined]> = [];
+      const raw = async (chatId: number, text: string, opts?: Record<string, unknown>) => {
+        calls.push([chatId, text, opts]);
+        return { message_id: calls.length };
+      };
+      let clock = NIGHT;
+      const send = gateSend(raw, () => clock);
+      for (const n of [1, 2, 3]) {
+        await runWithSendClass('digest', () => send(GROUP, `held ${n}`, { message_thread_id: 7 }));
+      }
+      expect(calls).toEqual([]);
+      clock = MORNING;
+      // Spend the day's cap, then prove it is spent: the next digest defers.
+      await runWithSendClass('digest', () => send(GROUP, 'day 1'));
+      await runWithSendClass('digest', () => send(GROUP, 'day 2'));
+      const over = await runWithSendClass('digest', () => send(GROUP, 'day 3'));
+      expect(over).toEqual({ message_id: 0, zoeSendBudget: 'deferred' });
+      expect((await readDeferred()).map((d) => d.text)).toEqual(['day 3']);
+      calls.length = 0;
+      const release = () =>
+        releaseQuietQueue({ send: (cid, text, o) => send(cid as number, text, o), now: MORNING, isBlocked: wasSendBlocked });
+      return { calls, send, release };
+    };
+
+    it('the overnight queue drains in full, in order, with its options', async () => {
+      const d = await fullCapDay();
+      expect(await d.release()).toEqual({ sent: 3, kept: 0 });
+      expect(d.calls.map((c) => c[1])).toEqual(['held 1', 'held 2', 'held 3']);
+      expect(await readQuietQueue()).toEqual([]);
+    });
+
+    it('Telegram never sees the release hint or the class hint', async () => {
+      const d = await fullCapDay();
+      await d.release();
+      expect(d.calls).toHaveLength(3);
+      for (const [, , opts] of d.calls) expect(opts).toEqual({ message_thread_id: 7 });
+    });
+
+    it('no copy lands in the deferred batch, however many ticks run', async () => {
+      const d = await fullCapDay();
+      await d.release();
+      await d.release();
+      await d.release();
+      expect((await readDeferred()).map((x) => x.text)).toEqual(['day 3']);
+    });
+
+    it('the bypass is the release only: a fresh digest the same morning is still deferred', async () => {
+      const d = await fullCapDay();
+      await d.release();
+      const r = await runWithSendClass('digest', () => d.send(GROUP, 'day 4'));
+      expect(r).toEqual({ message_id: 0, zoeSendBudget: 'deferred' });
+      expect((await readDeferred()).map((x) => x.text)).toEqual(['day 3', 'day 4']);
+    });
+
+    it('a release does not spend the cap', async () => {
+      process.env.ZOE_DAILY_SEND_CAP = '1';
+      const calls: string[] = [];
+      let clock = NIGHT;
+      const send = gateSend(async (_c: number, text: string) => {
+        calls.push(text);
+        return { message_id: calls.length };
+      }, () => clock);
+      await runWithSendClass('digest', () => send(GROUP, 'held'));
+      clock = MORNING;
+      await releaseQuietQueue({ send: (cid, text, o) => send(cid as number, text, o), now: MORNING, isBlocked: wasSendBlocked });
+      // The one daily send is still available after the release.
+      const r = await runWithSendClass('digest', () => send(GROUP, 'first of the day'));
+      expect(wasSendBlocked(r)).toBe(false);
+      expect(calls).toEqual(['held', 'first of the day']);
+    });
+
+    it('a release is never held again, even inside the window', async () => {
+      const calls: string[] = [];
+      const send = gateSend(async (_c: number, text: string) => {
+        calls.push(text);
+        return { message_id: 1 };
+      }, () => NIGHT);
+      const r = await send(GROUP, 'late', { zoeSendClass: 'digest', zoeHeldRelease: true });
+      expect(wasSendBlocked(r)).toBe(false);
+      expect(calls).toEqual(['late']);
+      expect(await readQuietQueue()).toEqual([]);
+    });
   });
 
   it('end to end: held at night through the gate, released in the morning through the gate', async () => {

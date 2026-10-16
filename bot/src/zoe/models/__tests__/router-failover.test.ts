@@ -343,6 +343,11 @@ describe('free-tier models never receive this path\'s traffic', () => {
   it.each([
     ['nvidia/nemotron-3-super-120b-a12b:free', true],
     ['google/gemma-4-31b-it:FREE ', true],
+    ['a/b:free:online', true],
+    ['a/b:free:nitro', true],
+    ['a/b:nitro:free', true],
+    ['a/b:online', false],
+    ['a/b:freebie', false],
     ['deepseek/deepseek-chat', false],
     ['openai/gpt-5.5', false],
     ['vendor/free-model', false],

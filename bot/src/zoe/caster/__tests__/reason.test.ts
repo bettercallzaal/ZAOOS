@@ -62,3 +62,29 @@ describe('draftCast - ZABAL Bonfire graph memory', () => {
     expect(calls[0].messages[0].content).not.toContain('ZABAL Bonfire graph');
   });
 });
+
+describe('draftCast - free-tier models', () => {
+  it.each(['a/b:free', 'a/b:free:online'])(
+    'refuses %s before recall or any request, since the prompt carries Bonfire context',
+    async (model) => {
+      const calls = mockOpenRouter();
+      const recallFn = vi.fn(async (): Promise<RecallResult> => ({ kind: 'sdk_response', query: 'q', hits: 1, text: 'private' }));
+      const prev = process.env.OPENROUTER_MODEL;
+      process.env.OPENROUTER_MODEL = model;
+      try {
+        await expect(draftCast({ persona: 'You are ZOL', context: 'q', recallFn })).rejects.toThrow(/refusing free-tier model/);
+      } finally {
+        if (prev === undefined) delete process.env.OPENROUTER_MODEL;
+        else process.env.OPENROUTER_MODEL = prev;
+      }
+      expect(recallFn).not.toHaveBeenCalled();
+      expect(calls).toHaveLength(0);
+    },
+  );
+
+  it('refuses a free-tier opts.model override too', async () => {
+    const calls = mockOpenRouter();
+    await expect(draftCast({ persona: 'p', context: 'q', model: 'x/y:nitro:free', useGraphMemory: false })).rejects.toThrow(/refusing free-tier model/);
+    expect(calls).toHaveLength(0);
+  });
+});

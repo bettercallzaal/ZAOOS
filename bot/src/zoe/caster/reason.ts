@@ -17,6 +17,7 @@
  */
 
 import { recall, type RecallRequest, type RecallResult } from '../recall';
+import { assertNotFreeTier } from '../models/free-tier';
 
 const DEFAULT_BASE = 'https://openrouter.ai/api/v1';
 const DEFAULT_MODEL = 'anthropic/claude-sonnet-4.6';
@@ -55,6 +56,8 @@ export async function draftCast(opts: DraftCastOpts): Promise<DraftResult> {
   if (!apiKey) throw new Error('OPENROUTER_API_KEY not set');
   const base = (process.env.OPENROUTER_BASE_URL ?? DEFAULT_BASE).replace(/\/$/, '');
   const model = opts.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL;
+  // Checked before recall: the prompt carries Bonfire graph context.
+  assertNotFreeTier(model);
   const maxChars = opts.maxChars ?? 320;
 
   // Pull relevant knowledge from the ZABAL Bonfire graph so ZOL casts from ZAO's

@@ -14,6 +14,7 @@
  */
 
 import type { ClaudeCliResult } from '../../hermes/claude-cli';
+import { assertNotFreeTier } from './free-tier';
 import {
   prioritizeProviders,
   recordProviderSuccess,
@@ -299,15 +300,7 @@ async function callGpt(systemPrompt: string, userMessage: string): Promise<Claud
  */
 export const OPENROUTER_HIGH_MODEL = process.env.OPENROUTER_HIGH_MODEL ?? 'openai/gpt-5.5';
 
-/**
- * True for an OpenRouter free-tier model id (`vendor/model:free`). Free tiers
- * get public text only (.claude/rules/claude-usage.md): per-model provider
- * training on `:free` is not stated by OpenRouter, and this rung carries ZOE's
- * private traffic (DMs, board, vault context).
- */
-export function isFreeTierModel(modelId: string): boolean {
-  return /:free$/i.test(modelId.trim());
-}
+export { isFreeTierModel } from './free-tier';
 
 async function callOpenRouter(
   systemPrompt: string,
@@ -324,9 +317,7 @@ async function callOpenRouter(
   // pass modelOverride for a high-stakes escalation (OPENROUTER_HIGH_MODEL).
   const model = modelOverride ?? process.env.OPENROUTER_MODEL ?? 'deepseek/deepseek-chat';
   // Refuse before any request leaves the box; the ladder then tries the next rung.
-  if (isFreeTierModel(model)) {
-    throw new Error(`refusing free-tier model ${model}: this path carries private content`);
-  }
+  assertNotFreeTier(model);
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   const request: OpenAiRequest = {

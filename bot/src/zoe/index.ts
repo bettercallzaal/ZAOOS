@@ -46,6 +46,7 @@ import {
   type DeskCard,
   type XLink,
 } from './x-desk';
+import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
 import { captureTerminalTypedReply, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
@@ -3263,6 +3264,12 @@ const SECOND_NARRATION_MS = 28000;
 
 interface ProgressHandle {
   stop: () => void;
+  /**
+   * Put the final answer on screen through the thinking spinner. Resolves true
+   * when the spinner placeholder was edited into the answer; false when the
+   * caller must send it (spinner off, turn was fast, or answer too long).
+   */
+  deliver: (text: string) => Promise<boolean>;
 }
 
 /**
@@ -3270,34 +3277,72 @@ interface ProgressHandle {
  * one ack at ACK_THRESHOLD_MS, one "still on it" at SECOND_NARRATION_MS.
  * Returns a handle whose stop() clears the timers (call it once the reply is
  * sent). doc 872 progress narration; replaces the old single-ack pattern.
+ *
+ * With ZOE_THINKING_SPINNER=1 a slow turn also gets one in-chat "thinking |"
+ * line that cycles and is then edited into the answer (thinking-spinner.ts).
+ * The text acks are skipped while the spinner runs: an ack sent after the
+ * placeholder would sit BELOW it, and the answer would land above the ack.
  */
 function startProgressNarration(
   ctx: Context,
   chatId: number,
   messages: { first: string | null; second?: string },
 ): ProgressHandle {
-  ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-  const typingInterval = setInterval(() => {
-    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-  }, TYPING_REFRESH_MS);
+  // Thread the typing action into the forum topic the message came from. A bare
+  // sendChatAction(chatId) in a forum group shows "typing" in the General topic
+  // only, so a member asking in any other topic saw no sign of life at all.
+  const threadOpt = ctx.msg?.is_topic_message ? { message_thread_id: ctx.msg.message_thread_id } : {};
+  const sendTyping = (): void => {
+    ctx.api.sendChatAction(chatId, 'typing', threadOpt).catch(() => {});
+  };
+  sendTyping();
+  const typingInterval = setInterval(sendTyping, TYPING_REFRESH_MS);
+
+  const spinnerOn = thinkingSpinnerEnabled();
+  const replyTo = ctx.chat?.type !== 'private' && ctx.msg?.message_id ? { message_id: ctx.msg.message_id } : undefined;
+  const spinner = spinnerOn
+    ? startThinkingSpinner({
+        send: async (text) => {
+          const m = await ctx.reply(text, replyTo ? { reply_parameters: replyTo } : {});
+          return m.message_id;
+        },
+        edit: async (id, text) => {
+          await ctx.api.editMessageText(chatId, id, text);
+        },
+        remove: async (id) => {
+          await ctx.api.deleteMessage(chatId, id);
+        },
+      })
+    : NO_SPINNER;
+
   // Conversational turns pass first=null: no "working on it" filler (ack-theater).
   // The native typing indicator still runs; a genuinely long turn can still emit
   // the honest `second` ping. Work turns keep both. (zoe-conversational spec).
-  const firstAck = messages.first
-    ? setTimeout(() => {
-        ctx.reply(messages.first as string).catch(() => {});
-      }, ACK_THRESHOLD_MS)
-    : null;
-  const secondAck = messages.second
-    ? setTimeout(() => {
-        ctx.reply(messages.second as string).catch(() => {});
-      }, SECOND_NARRATION_MS)
-    : null;
+  const firstAck =
+    messages.first && !spinnerOn
+      ? setTimeout(() => {
+          ctx.reply(messages.first as string).catch(() => {});
+        }, ACK_THRESHOLD_MS)
+      : null;
+  const secondAck =
+    messages.second && !spinnerOn
+      ? setTimeout(() => {
+          ctx.reply(messages.second as string).catch(() => {});
+        }, SECOND_NARRATION_MS)
+      : null;
+  const clearNarration = (): void => {
+    clearInterval(typingInterval);
+    if (firstAck) clearTimeout(firstAck);
+    if (secondAck) clearTimeout(secondAck);
+  };
   return {
     stop: () => {
-      clearInterval(typingInterval);
-      if (firstAck) clearTimeout(firstAck);
-      if (secondAck) clearTimeout(secondAck);
+      clearNarration();
+      spinner.stop().catch(() => {});
+    },
+    deliver: async (text) => {
+      clearNarration();
+      return spinner.deliver(text).catch(() => false);
     },
   };
 }
@@ -3851,9 +3896,15 @@ async function dispatchConcierge(
       return;
     }
 
-    await replyChunked(ctx, safeReply, {
-      replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
-    });
+    // With the thinking spinner on, the placeholder becomes the answer in place;
+    // otherwise (or when the answer is too long for one message) send it fresh.
+    if (await progress.deliver(safeReply)) {
+      featureRan('thinking-spinner', `chat ${chatId}`);
+    } else {
+      await replyChunked(ctx, safeReply, {
+        replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
+      });
+    }
 
     // Inline research -> durable doc on main (closes the gap where research
     // answered inline, not via the worker dispatch, never landed a doc). A

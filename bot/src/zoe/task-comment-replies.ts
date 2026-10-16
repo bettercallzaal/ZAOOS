@@ -203,7 +203,11 @@ export async function answerMention(
       prompt: `Comment tagging you: ${comment.content}`,
       cwd: process.cwd(),
       appendSystemPrompt: system,
-      allowedTools: ['Read', 'Grep', 'Glob'],
+      // No tools: the comment is untrusted text from any board user, and the
+      // answer comes from the task context above. An empty allow list is
+      // talk-only (hermes/claude-cli.ts isTalkOnly). Was Read/Grep/Glob, which
+      // only ADDED rules on top of the host's own allow list.
+      allowedTools: [],
       timeoutMs: 90_000,
       maxBudgetUsd: 0.25,
     });

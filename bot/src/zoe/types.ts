@@ -165,6 +165,9 @@ export interface ConciergeOptions {
   /** Ask for a final `GAP:` line (capability-gaps.ts). Set ONLY by a caller that
    * takes that line off the reply before using it. */
   gapLog?: boolean;
+  /** 'none' runs the turn with every tool denied (member-dm.ts). Default: the
+   * concierge's usual read-only set. */
+  toolPolicy?: 'default' | 'none';
 }
 
 export interface ConciergeResult {

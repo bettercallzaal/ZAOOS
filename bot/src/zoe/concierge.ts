@@ -264,8 +264,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
           prompt: userPrompt,
           cwd: opts.context.workspace_dir,
           appendSystemPrompt: systemBlocks,
-          allowedTools: getDefaultTools(),
-          disallowedTools: getDefaultDisallowedTools(),
+          ...toolsFor(opts.toolPolicy),
           permissionMode: 'default',
           outputFormat: 'json',
           bare: false,
@@ -281,8 +280,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
         prompt: userPrompt,
         cwd: opts.context.workspace_dir,
         appendSystemPrompt: systemBlocks,
-        allowedTools: getDefaultTools(),
-        disallowedTools: getDefaultDisallowedTools(),
+        ...toolsFor(opts.toolPolicy),
         permissionMode: 'default',
         outputFormat: 'json',
         bare: false,
@@ -298,8 +296,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       prompt: userPrompt,
       cwd: opts.context.workspace_dir,
       appendSystemPrompt: systemBlocks,
-      allowedTools: getDefaultTools(),
-      disallowedTools: getDefaultDisallowedTools(),
+      ...toolsFor(opts.toolPolicy),
       permissionMode: 'default',
       outputFormat: 'json',
       bare: false,
@@ -346,6 +343,33 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     durationMs: result.durationMs,
   };
 }
+
+/**
+ * The tool flags for one turn. 'none' (member-dm.ts) allows nothing and denies
+ * every built-in tool plus the MCP servers the default set reaches, so a turn
+ * for someone who is not Zaal can only talk.
+ */
+export function toolsFor(policy: 'default' | 'none' = 'default'): { allowedTools: string[]; disallowedTools: string[] } {
+  if (policy === 'none') return { allowedTools: [], disallowedTools: NO_TOOLS_DENY };
+  return { allowedTools: getDefaultTools(), disallowedTools: getDefaultDisallowedTools() };
+}
+
+export const NO_TOOLS_DENY: string[] = [
+  'Read',
+  'Glob',
+  'Grep',
+  'Bash',
+  'Edit',
+  'Write',
+  'NotebookEdit',
+  'WebFetch',
+  'WebSearch',
+  'Task',
+  'Agent',
+  'TodoWrite',
+  'mcp__playwright',
+  'mcp__scout',
+];
 
 /**
  * Default allowed tools for concierge calls.

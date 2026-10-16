@@ -245,6 +245,14 @@ export interface BotCommand {
   args: Record<string, unknown> | null;
   status: string;
   created_at: string;
+  /** The board user who queued it, when the server sends it (zoe/board-trust.ts). */
+  created_by?: string | null;
+}
+
+/** Who queued a command, passed to the run_task / ask handlers. */
+export interface CommandMeta {
+  id: number;
+  createdBy: string | null;
 }
 
 /** Pull + atomically claim this bot's pending commands (its own queue). */
@@ -279,11 +287,12 @@ export function postCommandResult(
 export interface CommandHandlers {
   onPause?: () => void;
   onResume?: () => void;
-  onRunTask?: (args: Record<string, unknown>) => Promise<Record<string, unknown>>;
-  onAsk?: (args: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  onRunTask?: (args: Record<string, unknown>, meta: CommandMeta) => Promise<Record<string, unknown>>;
+  onAsk?: (args: Record<string, unknown>, meta: CommandMeta) => Promise<Record<string, unknown>>;
 }
 
 async function executeCommand(cmd: BotCommand, h: CommandHandlers): Promise<void> {
+  const meta: CommandMeta = { id: cmd.id, createdBy: cmd.created_by ?? null };
   try {
     switch (cmd.command) {
       case 'pause':
@@ -305,7 +314,7 @@ async function executeCommand(cmd: BotCommand, h: CommandHandlers): Promise<void
           await postCommandResult(cmd.id, 'error', { error: 'run_task not supported by this bot' });
           return;
         }
-        const result = await h.onRunTask(cmd.args ?? {});
+        const result = await h.onRunTask(cmd.args ?? {}, meta);
         await postCommandResult(cmd.id, 'done', result);
         return;
       }
@@ -314,7 +323,7 @@ async function executeCommand(cmd: BotCommand, h: CommandHandlers): Promise<void
           await postCommandResult(cmd.id, 'error', { error: 'ask not supported by this bot' });
           return;
         }
-        const result = await h.onAsk(cmd.args ?? {});
+        const result = await h.onAsk(cmd.args ?? {}, meta);
         await postCommandResult(cmd.id, 'done', result);
         return;
       }

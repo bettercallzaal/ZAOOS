@@ -36,6 +36,13 @@ import {
 } from './grill';
 import { featureRan } from './feature-ran';
 import { stripOpsOutsidePrivate, toolPolicyForScope } from './scope-lock';
+import {
+  BOARD_RUN_CALLBACK,
+  BOARD_UNTRUSTED_SCOPE,
+  isTrustedBoardCommand,
+  newRunTaskApprovals,
+  runTaskApprovalCard,
+} from './board-trust';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import {
   claimXLink,
@@ -1707,6 +1714,36 @@ bot.callbackQuery(/^dmb:yes:(.+)$/, async (ctx) => {
   }
   await ctx.answerCallbackQuery('Building').catch(() => {});
   await startDmBuild(chatId, task, 'you tapped Build it');
+});
+
+// Held board run_task (board-trust.ts): runs with tools only on Zaal's tap.
+const boardRunApprovals = newRunTaskApprovals();
+
+bot.callbackQuery(BOARD_RUN_CALLBACK, async (ctx) => {
+  if (!isFromZaal(ctx)) {
+    await ctx.answerCallbackQuery().catch(() => {});
+    return;
+  }
+  const [, action, key] = ctx.match ?? [];
+  const task = boardRunApprovals.take(String(key), Date.now());
+  if (!task) {
+    await ctx.answerCallbackQuery('Already handled or expired').catch(() => {});
+    return;
+  }
+  if (action === 'no') {
+    await ctx.answerCallbackQuery('Declined').catch(() => {});
+    await ctx.reply(`Declined the board task from ${task.createdBy ?? 'an unnamed board user'}. Nothing ran.`).catch(() => {});
+    return;
+  }
+  await ctx.answerCallbackQuery('Running').catch(() => {});
+  featureRan('board-run-approved', `command ${task.commandId}`);
+  try {
+    const out = await runBoardTask(task.instructions, task.todoId);
+    const reply = typeof out.reply === 'string' ? out.reply : '(no reply)';
+    await replyChunked(ctx, `Board task done:\n${reply}`);
+  } catch (e) {
+    await ctx.reply(`Board task failed: ${sanitizeErrorForUser(e)}`).catch(() => {});
+  }
 });
 
 bot.callbackQuery(/^dmb:no:(.+)$/, async (ctx) => {
@@ -4668,6 +4705,42 @@ bot.on('callback_query:data', async (ctx) => {
     .catch(() => {});
 });
 
+
+/** A board run_task, executed in Zaal's private scope with tools. Callers: a
+ *  trusted board command, or Zaal tapping Run on a held one (board-trust.ts). */
+async function runBoardTask(instructions: string, todoId: string): Promise<Record<string, unknown>> {
+  coworkTask = `run_task ${todoId}`.trim();
+  try {
+    const blocks = await buildMemoryBlocks('private');
+    const result = await runConciergeTurn({
+      message:
+        `You are executing an assigned task${todoId ? ` (cowork todo #${todoId})` : ''}. ` +
+        `Instructions: ${instructions || '(none provided)'}\n\n` +
+        `Do what you can from here and summarize the outcome concisely.`,
+      blocks,
+      senderLabel: 'Board',
+      toolPolicy: toolPolicyForScope('private'),
+      context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
+    });
+    if (result.task_ops.length > 0) {
+      const { added } = await applyTaskOps(result.task_ops);
+      if (added.length > 0)
+        await mirrorCapturesToTracker(added).catch((e) =>
+          console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
+        );
+    }
+    let todoMarked = false;
+    if (todoId) {
+      const r = await markDone(todoId, 'completed by ZOE via control plane');
+      todoMarked = r.ok;
+    }
+    return { reply: result.reply, todo_marked: todoMarked };
+  } finally {
+    coworkTask = 'idle (polling)';
+  }
+}
+
+
 async function main(): Promise<void> {
   await ensureZoeHome();
   await loadPending(); // restore any approval ZOE was waiting on before restart
@@ -4755,58 +4828,42 @@ async function main(): Promise<void> {
       coworkTask = 'idle (polling)';
       void reportEvent('resumed', 'resumed via control plane', { unit: 'zoe-bot' });
     },
-    onAsk: async (args) => {
+    onAsk: async (args, meta) => {
       const prompt = typeof args.prompt === 'string' ? args.prompt : '';
       if (!prompt) return { error: 'no prompt' };
       coworkTask = 'answering (ask)';
       void reportEvent('ask', prompt.slice(0, 200), { unit: 'zoe-bot' });
-      const blocks = await buildMemoryBlocks('private');
+      // board-trust.ts: only a named, trusted author gets Zaal's private scope
+      // and tools. Any other ask (including every ask with no author) talks only.
+      const trusted = isTrustedBoardCommand(meta.createdBy);
+      const scope = trusted ? 'private' : BOARD_UNTRUSTED_SCOPE;
+      const blocks = await buildMemoryBlocks(scope, trusted ? undefined : 'cowork board');
       const result = await runConciergeTurn({
         message: prompt,
         blocks,
-        senderLabel: 'Board',
-        // Board commands run as Zaal's private scope, as before this lock: the
-        // cowork board is the team's own control plane, not a chat. Named
-        // here so the choice is visible (scope-lock.ts).
-        toolPolicy: toolPolicyForScope('private'),
+        senderLabel: trusted ? 'Board' : `Board (${meta.createdBy ?? 'unknown author'})`,
+        toolPolicy: toolPolicyForScope(scope),
         context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
       });
       coworkTask = 'idle (polling)';
-      return { reply: result.reply };
+      return trusted ? { reply: result.reply } : { reply: result.reply, talk_only: true };
     },
-    onRunTask: async (args) => {
+    onRunTask: async (args, meta) => {
       const instructions = typeof args.instructions === 'string' ? args.instructions : '';
       const todoId = args.todo_id != null && args.todo_id !== '' ? String(args.todo_id) : '';
-      coworkTask = `run_task ${todoId}`.trim();
       void reportEvent('run_task', instructions.slice(0, 200), { unit: 'zoe-bot', todo_id: todoId });
-      const blocks = await buildMemoryBlocks('private');
-      const result = await runConciergeTurn({
-        message:
-          `You are executing an assigned task${todoId ? ` (cowork todo #${todoId})` : ''}. ` +
-          `Instructions: ${instructions || '(none provided)'}\n\n` +
-          `Do what you can from here and summarize the outcome concisely.`,
-        blocks,
-        senderLabel: 'Board',
-        // Board commands run as Zaal's private scope, as before this lock: the
-        // cowork board is the team's own control plane, not a chat. Named
-        // here so the choice is visible (scope-lock.ts).
-        toolPolicy: toolPolicyForScope('private'),
-        context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
-      });
-      if (result.task_ops.length > 0) {
-        const { added } = await applyTaskOps(result.task_ops);
-        if (added.length > 0)
-          await mirrorCapturesToTracker(added).catch((e) =>
-            console.warn('[zoe/index] capture->tracker mirror failed (nbd):', (e as Error).message),
-          );
+      if (!isTrustedBoardCommand(meta.createdBy)) {
+        // board-trust.ts: an untrusted run_task never runs on its own. Zaal
+        // gets one card; it runs with tools only on his tap.
+        const task = { commandId: meta.id, instructions, todoId, createdBy: meta.createdBy };
+        const key = boardRunApprovals.hold(task, Date.now());
+        const card = runTaskApprovalCard(task, key);
+        await bot.api
+          .sendMessage(zaalId, card.text, { reply_markup: card.keyboard, zoeSendClass: 'gated' } as never)
+          .catch((e) => console.error('[zoe/index] board run_task approval card failed:', (e as Error)?.message));
+        return { held: true, message: "held for Zaal's approval: it runs only when he taps Run" };
       }
-      let todoMarked = false;
-      if (todoId) {
-        const r = await markDone(todoId, 'completed by ZOE via control plane');
-        todoMarked = r.ok;
-      }
-      coworkTask = 'idle (polling)';
-      return { reply: result.reply, todo_marked: todoMarked };
+      return runBoardTask(instructions, todoId);
     },
   });
 

@@ -169,6 +169,7 @@ describe('startCommandPoller — executeCommand dispatch', () => {
     command: string,
     args: Record<string, unknown> | null,
     handlers: CommandHandlers,
+    extra: Record<string, unknown> = {},
   ) {
     const m = await loadActive();
     let postResultBody: unknown = null;
@@ -206,7 +207,7 @@ describe('startCommandPoller — executeCommand dispatch', () => {
         status: 200,
         text: async () =>
           JSON.stringify({
-            commands: [{ id: 101, bot: 'test-bot', command, args, status: 'pending', created_at: '' }],
+            commands: [{ id: 101, bot: 'test-bot', command, args, status: 'pending', created_at: '', ...extra }],
           }),
       })
       .mockImplementationOnce(async (_url: string, opts: RequestInit) => {
@@ -237,8 +238,20 @@ describe('startCommandPoller — executeCommand dispatch', () => {
   it('run_task with handler: posts done result with handler output', async () => {
     const onRunTask = vi.fn().mockResolvedValue({ output: 'finished' });
     const result = await runCommandTest('run_task', { task: 'something' }, { onRunTask });
-    expect(onRunTask).toHaveBeenCalledWith({ task: 'something' });
+    expect(onRunTask).toHaveBeenCalledWith({ task: 'something' }, { id: 101, createdBy: null });
     expect(result?.status).toBe('done');
+  });
+
+  it('passes the author to the handler when the board sends created_by (zoe/board-trust.ts)', async () => {
+    const onAsk = vi.fn().mockResolvedValue({ reply: 'hi' });
+    await runCommandTest('ask', { prompt: 'q' }, { onAsk }, { created_by: 'iman' });
+    expect(onAsk).toHaveBeenCalledWith({ prompt: 'q' }, { id: 101, createdBy: 'iman' });
+  });
+
+  it('a command with no created_by reaches the handler as createdBy null, never a guess', async () => {
+    const onAsk = vi.fn().mockResolvedValue({ reply: 'hi' });
+    await runCommandTest('ask', { prompt: 'q' }, { onAsk });
+    expect(onAsk).toHaveBeenCalledWith({ prompt: 'q' }, { id: 101, createdBy: null });
   });
 
   it('unknown command: posts error result', async () => {

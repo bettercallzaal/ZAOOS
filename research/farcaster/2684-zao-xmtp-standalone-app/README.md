@@ -11,6 +11,8 @@ tier: QUICK
 # 2684 - ZAO XMTP as its own app: what exists in ZAOOS, and a graduation plan
 
 > Waits on Zaal: four scope questions at the bottom. No repo is created until he answers; a new public repo is his call.
+>
+> **Update 2026-10-17:** Q1 to Q3 are decided and the app skeleton is built in `apps/zao-xmtp/`. See `q1-membership-respect-gate.md` and `plan-q1-q3-and-skeleton.md` in this folder. Q4 (the repo) is still Zaal's.
 
 ## Summary
 

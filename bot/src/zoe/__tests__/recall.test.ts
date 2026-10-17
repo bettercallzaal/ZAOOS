@@ -79,10 +79,18 @@ describe('recall() - a DM turn does not wait 10 s on a hung delve (2026-10-17)',
     expect(result.kind).toBe('manual_relay_needed');
   });
 
-  it('the turn budget defaults to 3 s and takes a positive env override only', async () => {
+  it('the turn budget defaults to 3 s, takes a finite positive override, never above 10 s', async () => {
     delete process.env.ZOE_RECALL_TURN_MS;
     expect((await import('../recall')).TURN_RECALL_TIMEOUT_MS).toBe(3_000);
-    for (const [raw, want] of [['5000', 5_000], ['abc', 3_000], ['0', 3_000], ['-1', 3_000]] as const) {
+    for (const [raw, want] of [
+      ['5000', 5_000],
+      ['abc', 3_000],
+      ['0', 3_000],
+      ['-1', 3_000],
+      ['Infinity', 3_000],
+      ['99999999', 10_000],
+      ['10001', 10_000],
+    ] as const) {
       vi.resetModules();
       process.env.ZOE_RECALL_TURN_MS = raw;
       expect((await import('../recall')).TURN_RECALL_TIMEOUT_MS, raw).toBe(want);

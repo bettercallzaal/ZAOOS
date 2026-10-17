@@ -33,7 +33,14 @@ const READ_TIMEOUT_MS = 10_000;
 // journal 2026-10-10 to 2026-10-17: 6 of 6 DM-turn delves logged "aborted due
 // to timeout", so each of those replies sat 10 s on a lookup that returned
 // nothing. The turn now gives recall this much and answers without it after.
-export const TURN_RECALL_TIMEOUT_MS = Number(process.env.ZOE_RECALL_TURN_MS) > 0 ? Number(process.env.ZOE_RECALL_TURN_MS) : 3_000;
+// ZOE_RECALL_TURN_MS overrides it, finite and positive only, and never above
+// READ_TIMEOUT_MS: Infinity or 99999999 would otherwise remove the cap.
+export function turnRecallTimeoutMs(raw: string | undefined): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return 3_000;
+  return Math.min(n, READ_TIMEOUT_MS);
+}
+export const TURN_RECALL_TIMEOUT_MS = turnRecallTimeoutMs(process.env.ZOE_RECALL_TURN_MS);
 const WRITE_TIMEOUT_MS = 15_000;
 // Per-episode chars injected into ZOE's <bonfire_recall> context. The old 500
 // truncated rich episodes (research docs + handoffs run 600-4000 chars) into

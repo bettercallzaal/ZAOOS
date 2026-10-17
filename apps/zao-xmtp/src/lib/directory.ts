@@ -41,14 +41,26 @@ export async function recordSignIn(member: {
 /** Thrown when another member already registered this XMTP address. */
 export class XmtpAddressTakenError extends Error {}
 
+/**
+ * Thrown when the member has no directory row, so there is nothing to update.
+ * Happens when the directory write at sign-in failed. An UPDATE that matches no
+ * row is not an error to Postgres, so without this check the save would report
+ * success and the member would stay unfindable.
+ */
+export class MemberNotInDirectoryError extends Error {}
+
 export async function setXmtpAddress(fid: number, xmtpAddress: string): Promise<void> {
-  const { error } = await db()
+  const { data, error } = await db()
     .from('members_seen')
     .update({ xmtp_address: xmtpAddress.toLowerCase() })
-    .eq('fid', fid);
+    .eq('fid', fid)
+    .select('fid');
   // 23505 = unique_violation on members_seen_xmtp_address_key (migration 0002).
   if (error?.code === '23505') throw new XmtpAddressTakenError('xmtp address already registered');
   if (error) throw new Error(`members_seen update failed: ${error.message}`);
+  if (!data || data.length === 0) {
+    throw new MemberNotInDirectoryError(`no members_seen row for fid ${fid}`);
+  }
 }
 
 export async function listMembers(limit = 500): Promise<DirectoryMember[]> {

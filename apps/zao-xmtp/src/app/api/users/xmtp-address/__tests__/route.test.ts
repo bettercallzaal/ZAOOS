@@ -10,10 +10,11 @@ const { requireMember, setXmtpAddress } = vi.hoisted(() => ({
 vi.mock('@/lib/membership', () => ({ requireMember }));
 vi.mock('@/lib/directory', async () => {
   class XmtpAddressTakenError extends Error {}
-  return { setXmtpAddress, XmtpAddressTakenError };
+  class MemberNotInDirectoryError extends Error {}
+  return { setXmtpAddress, XmtpAddressTakenError, MemberNotInDirectoryError };
 });
 
-import { XmtpAddressTakenError } from '@/lib/directory';
+import { MemberNotInDirectoryError, XmtpAddressTakenError } from '@/lib/directory';
 import { POST } from '../route';
 
 const FID = 42;
@@ -73,6 +74,12 @@ describe('POST /api/users/xmtp-address', () => {
     setXmtpAddress.mockRejectedValue(new XmtpAddressTakenError('taken'));
     const signature = await signWithLocalKey(key, addressClaimMessage(own, FID));
     expect((await POST(post({ xmtpAddress: own, signature }))).status).toBe(409);
+  });
+
+  it('404, not 200, when the member has no directory row to update', async () => {
+    setXmtpAddress.mockRejectedValue(new MemberNotInDirectoryError('no row'));
+    const signature = await signWithLocalKey(key, addressClaimMessage(own, FID));
+    expect((await POST(post({ xmtpAddress: own, signature }))).status).toBe(404);
   });
 
   it('429 after 10 writes a minute from one IP', async () => {

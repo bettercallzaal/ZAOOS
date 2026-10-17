@@ -57,3 +57,50 @@ describe('recall() - delve read-path injection guard (doc 1023)', () => {
     expect(result.text).not.toContain('UNVERIFIED');
   });
 });
+
+// A fetch that only ends when its signal aborts, like a delve that hangs.
+function mockHangingDelve() {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(
+    (_url, init) =>
+      new Promise((_resolve, reject) => {
+        const signal = (init as RequestInit | undefined)?.signal;
+        signal?.addEventListener('abort', () => reject(signal.reason));
+      }),
+  );
+}
+
+describe('recall() - a DM turn does not wait 10 s on a hung delve (2026-10-17)', () => {
+  it('gives up at the caller budget and falls back', async () => {
+    const { recall } = await import('../recall');
+    mockHangingDelve();
+    const started = Date.now();
+    const result = await recall({ query: 'what did we decide about the gap log', reason: 'unit test', expected_kind: 'mixed', timeoutMs: 50 });
+    expect(Date.now() - started).toBeLessThan(2_000);
+    expect(result.kind).toBe('manual_relay_needed');
+  });
+
+  it('the turn budget defaults to 3 s, takes a finite positive override, never above 10 s', async () => {
+    delete process.env.ZOE_RECALL_TURN_MS;
+    expect((await import('../recall')).TURN_RECALL_TIMEOUT_MS).toBe(3_000);
+    for (const [raw, want] of [
+      ['5000', 5_000],
+      ['abc', 3_000],
+      ['0', 3_000],
+      ['-1', 3_000],
+      ['Infinity', 3_000],
+      ['99999999', 10_000],
+      ['10001', 10_000],
+    ] as const) {
+      vi.resetModules();
+      process.env.ZOE_RECALL_TURN_MS = raw;
+      expect((await import('../recall')).TURN_RECALL_TIMEOUT_MS, raw).toBe(want);
+    }
+  });
+
+  it('wiring: the DM turn passes the turn budget to recall', async () => {
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync(new URL('../index.ts', import.meta.url), 'utf8');
+    const call = src.slice(src.indexOf("reason: 'concierge turn context'"), src.indexOf("reason: 'concierge turn context'") + 200);
+    expect(call).toContain('timeoutMs: TURN_RECALL_TIMEOUT_MS');
+  });
+});

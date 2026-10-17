@@ -29,6 +29,18 @@ const API_URL = process.env.BONFIRE_API_URL ?? 'https://tnt-v2.api.bonfires.ai';
 const API_KEY = process.env.BONFIRE_API_KEY ?? '';
 const BONFIRE_ID = process.env.BONFIRE_ID ?? '';
 const READ_TIMEOUT_MS = 10_000;
+// A Telegram DM waits on recall before ZOE can answer. Measured on the VPS
+// journal 2026-10-10 to 2026-10-17: 6 of 6 DM-turn delves logged "aborted due
+// to timeout", so each of those replies sat 10 s on a lookup that returned
+// nothing. The turn now gives recall this much and answers without it after.
+// ZOE_RECALL_TURN_MS overrides it, finite and positive only, and never above
+// READ_TIMEOUT_MS: Infinity or 99999999 would otherwise remove the cap.
+export function turnRecallTimeoutMs(raw: string | undefined): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return 3_000;
+  return Math.min(n, READ_TIMEOUT_MS);
+}
+export const TURN_RECALL_TIMEOUT_MS = turnRecallTimeoutMs(process.env.ZOE_RECALL_TURN_MS);
 const WRITE_TIMEOUT_MS = 15_000;
 // Per-episode chars injected into ZOE's <bonfire_recall> context. The old 500
 // truncated rich episodes (research docs + handoffs run 600-4000 chars) into
@@ -65,6 +77,8 @@ export interface RecallRequest {
   query: string;
   reason: string; // why ZOE needs the answer
   expected_kind: 'fact' | 'people' | 'event' | 'decision' | 'history' | 'mixed';
+  /** Read budget for this call; defaults to READ_TIMEOUT_MS. */
+  timeoutMs?: number;
 }
 
 export interface RecallResult {
@@ -154,6 +168,7 @@ interface DelveResponse {
 async function delveBonfire(
   query: string,
   limit = 5,
+  timeoutMs = READ_TIMEOUT_MS,
 ): Promise<{ ok: boolean; results: DelveEpisode[]; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/delve`, {
@@ -163,7 +178,7 @@ async function delveBonfire(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ bonfire_id: BONFIRE_ID, query }),
-      signal: AbortSignal.timeout(READ_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok) {
       return { ok: false, results: [], error: `HTTP ${res.status}` };
@@ -218,9 +233,11 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   if (!bonfireConfigured()) {
     return { kind: 'manual_relay_needed', query: req.query, relay: formatManualRelay(req) };
   }
-  const search = await delveBonfire(req.query, 12);
+  const started = Date.now();
+  const search = await delveBonfire(req.query, 12, req.timeoutMs);
+  const took = `${Date.now() - started}ms`;
   if (search.ok && search.results.length > 0) {
-    console.log(`[zoe/recall] delve: ${search.results.length} hit(s) for "${req.query.slice(0, 60)}"`);
+    console.log(`[zoe/recall] delve: ${search.results.length} hit(s) in ${took} for "${req.query.slice(0, 60)}"`);
     return {
       kind: 'sdk_response',
       query: req.query,
@@ -228,7 +245,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
       text: search.results.map(formatHit).join('\n'),
     };
   }
-  console.log(`[zoe/recall] delve: 0 hits${search.error ? ` (error: ${search.error})` : ''} for "${req.query.slice(0, 60)}" - manual-relay fallback`);
+  console.log(`[zoe/recall] delve: 0 hits in ${took}${search.error ? ` (error: ${search.error})` : ''} for "${req.query.slice(0, 60)}" - manual-relay fallback`);
   // delve ok-but-empty (or errored) => graceful manual-relay fallback.
   return {
     kind: 'manual_relay_needed',

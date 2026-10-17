@@ -130,7 +130,7 @@ import {
   NUDGE_CALLBACK,
 } from './nudges';
 import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
-import { mirrorTurn, recall } from './recall';
+import { mirrorTurn, recall, TURN_RECALL_TIMEOUT_MS } from './recall';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
 import { captureResume, looksLikeResume } from './resume';
@@ -3786,6 +3786,8 @@ async function dispatchConcierge(
           query: text,
           reason: 'concierge turn context',
           expected_kind: 'mixed',
+          // He is waiting on this reply; see TURN_RECALL_TIMEOUT_MS.
+          timeoutMs: TURN_RECALL_TIMEOUT_MS,
         });
         if (r.kind === 'sdk_response' && r.text) recallContext = r.text;
       } catch (err) {

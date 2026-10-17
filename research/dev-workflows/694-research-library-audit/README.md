@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-16
 related-docs: 693
 tier: DISPATCH
 ---
@@ -94,9 +94,22 @@ Full triage for every one of the 649 docs is in this folder:
 - Verdicts are a fast scan, not a deep re-read - a doc marked RE-RESEARCH might just need its frontmatter fixed; confirm per-doc before redoing.
 - The audit agents themselves did NOT re-fetch sources - they judged from each doc's own text. A FINE verdict means "looks solid", not "every cited URL re-verified live."
 
+## Updated 2026-10-16
+
+**Library has grown dramatically since this audit.** Internal check against current repo state (2026-10-16):
+
+- **Doc count:** 649 live docs (May 2026) → **2,436 live docs** (Oct 2026) — +1,787 docs in ~5 months, a 3.75× increase. The _archive folder holds 80 docs (unchanged from the audit's baseline).
+- **Metadata debt:** 685 README.md files (28%) still lack `last-validated:` frontmatter. However, 576 docs carry exactly the 2026-05-21 date, indicating a bulk refresh pass ran the day after this audit — the REVALIDATE recommendation (Decision #1) was at least partially executed.
+- **ARCHIVE moves (Decision #3):** _archive count is still 80 — unchanged. The 12 docs recommended for archiving appear not to have been moved yet, OR the count stayed the same by coincidence of new docs.
+- **Radar system built:** `research/_radar/` now contains 42 daily log files (2026-07-15 through 2026-10-14), showing the radar was built and has been running since July 2026 — directly applying the re-research principle from this audit's decisions.
+- **High-priority list status:** Unknown; individual doc validation required to confirm. The HIGH-priority list topics (farcaster, dev-workflows, community, music HIGH docs) were not re-checked in this pass — update if individual docs are hit by radar runs.
+- **Worst-folder ranking may have shifted** given the large growth in agents/ (was 3% re-research density; now hundreds of new docs added).
+
+The audit's core diagnosis — metadata debt >> content loss — remains valid directionally. The single biggest change is the scale jump: the library is now nearly 4× larger, making the REVALIDATE metadata automation (Decision #1) even more valuable.
+
 ## Sources
 
-This is an internal audit; sources are the 649 research docs themselves under `research/`. Method draws on [Doc 693](../693-zao-research-fetch-quality-audit/) (fetch-quality findings).
+This is an internal audit; sources are the 649 research docs themselves under `research/`. Method draws on [Doc 693](../693-zao-research-fetch-quality-audit/) (fetch-quality findings). 2026-10-16 update: internal repo check (`find research`, `grep last-validated:`) against current HEAD.
 
 ## Also See
 

@@ -275,6 +275,8 @@ export interface GateVerdict {
   classes: GateClass[];
   /** The option to proceed with, when there is one. */
   recommended?: string;
+  /** What is actually chosen: the option's text for a bare letter, else the recommendation. Set only when not gated. */
+  choice?: string;
   /** One line saying why, for the log. */
   reason: string;
 }
@@ -299,15 +301,79 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
       .flatMap((line) => parseItemOptions(line).options)
       .find((o) => o.letter === letter.toUpperCase());
     if (!found) return { gated: true, classes: [], recommended: card.recommended, reason: `option ${letter.toUpperCase()} is not shown on the card` };
+    // Round 4: the letter is only as safe as what it picks. Its option text must
+    // itself be an allowlisted reversible choice, or the card stays with Zaal.
+    if (!allowlistedChoice(found.text)) {
+      return { gated: true, classes: [], recommended: card.recommended, reason: `option ${letter.toUpperCase()} is not an allowlisted reversible choice` };
+    }
     optionText = found.text;
   }
   const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}\n${optionText}`;
   const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
   if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
-  return { gated: false, classes, recommended: card.recommended, reason: 'allowlisted reversible choice, no gated class' };
+  return { gated: false, classes, recommended: card.recommended, choice: optionText || card.recommended, reason: 'allowlisted reversible choice, no gated class' };
 }
 
 /** The line written for an auto-proceeded card, so Zaal can find and override it. */
 export function autoProceedLine(recommended: string): string {
   return `auto-proceeded: ${recommended}, override anytime`;
+}
+
+// ---------------------------------------------------------------------------
+// Auto-deferred cards (seat round 4 on #3984): a skip, defer, park, hold,
+// later, not now or wait choice parks a card. Every one is logged here and
+// listed in the daily needs-Zaal digest, so nothing urgent is parked silently.
+// ---------------------------------------------------------------------------
+
+const DEFER_SHAPES: RegExp[] = [ALLOW_SHAPES[5], ALLOW_SHAPES[6], ALLOW_SHAPES[7]];
+
+/** Pure. True when a choice parks the card rather than doing something. */
+export function isDeferChoice(choice: string): boolean {
+  const r = choice.trim().replace(/\s+/g, ' ').toLowerCase();
+  return DEFER_SHAPES.some((re) => re.test(r));
+}
+
+export interface AutoDeferred {
+  taskId: string;
+  title: string;
+  choice: string;
+  at: string;
+}
+
+export function autoDeferredPath(): string {
+  return process.env.ZOE_AUTO_DEFERRED_PATH || join(homedir(), '.zao/zoe/auto-deferred.jsonl');
+}
+
+/** Append deferred cards to the log. Returns false when the write failed, so the caller keeps the cards in front of Zaal. */
+export async function appendAutoDeferred(entries: AutoDeferred[], path: string = autoDeferredPath()): Promise<boolean> {
+  if (!entries.length) return true;
+  try {
+    await fs.mkdir(dirname(path), { recursive: true });
+    await fs.appendFile(path, entries.map((e) => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+    return true;
+  } catch (e) {
+    console.error('[zoe/grill-queue] could not log auto-deferred cards:', (e as Error)?.message);
+    return false;
+  }
+}
+
+/** Deferred cards logged at or after `sinceMs`. A missing log is an empty list; an unreadable line is skipped. */
+export async function readAutoDeferred(sinceMs: number, path: string = autoDeferredPath()): Promise<AutoDeferred[]> {
+  let raw = '';
+  try {
+    raw = await fs.readFile(path, 'utf8');
+  } catch {
+    return [];
+  }
+  const out: AutoDeferred[] = [];
+  for (const line of raw.split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      const e = JSON.parse(line) as AutoDeferred;
+      if (Date.parse(e.at) >= sinceMs) out.push(e);
+    } catch {
+      // one bad line does not hide the rest
+    }
+  }
+  return out;
 }

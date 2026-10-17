@@ -26,7 +26,7 @@ import { wasSendBlocked } from './send-budget';
 import { isGrillPaused, withStopRow } from './grill-pause';
 import { featureRan } from './feature-ran';
 import { inQuietWindow, quietEnabled } from './quiet-window';
-import { appendGrillQueue, autoProceedLine, classifyGate, gateSortEnabled } from './grill-queue';
+import { appendAutoDeferred, appendGrillQueue, autoProceedLine, classifyGate, gateSortEnabled, isDeferChoice } from './grill-queue';
 import { extractRecommendation } from './needs-zaal-digest';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
@@ -692,15 +692,16 @@ export async function sortOutAutoProceed(
   now: number,
   append: typeof appendGrillQueue = appendGrillQueue,
   write: (s: GrillState) => Promise<void> = writeGrillState,
+  logDeferred: typeof appendAutoDeferred = appendAutoDeferred,
 ): Promise<GrillItem[]> {
   const notesByKey = new Map<string, string | null>();
   for (const t of tasks) notesByKey.set(t.legacy_id ?? String(t.id), t.notes ?? null);
-  const auto: { item: GrillItem; recommended: string }[] = [];
+  const auto: { item: GrillItem; recommended: string; choice: string }[] = [];
   for (const item of queue) {
     if (state.items[item.key]) continue; // already asked, answered or handled: the rule does not re-sort it
     const notes = notesByKey.get(item.key) ?? item.context ?? null;
     const v = classifyGate({ kind: item.kind, title: item.title, notes, recommended: extractRecommendation(notes, null, item.title) });
-    if (!v.gated && v.recommended) auto.push({ item, recommended: v.recommended });
+    if (!v.gated && v.recommended) auto.push({ item, recommended: v.recommended, choice: v.choice ?? v.recommended });
   }
   if (!auto.length) return queue;
   const r = await append(
@@ -712,12 +713,18 @@ export async function sortOutAutoProceed(
     return queue;
   }
   const iso = new Date(now).toISOString();
-  for (const { item, recommended } of auto) {
+  // A deferring choice (skip, defer, park, hold, later) parks the card. Each is
+  // logged for the daily needs-Zaal digest; if that log cannot be written, the
+  // deferred cards are NOT marked handled and still reach Zaal (seat round 4).
+  const deferred = auto.filter((a) => isDeferChoice(a.choice));
+  const deferLogged = await logDeferred(deferred.map((a) => ({ taskId: a.item.key, title: a.item.title, choice: a.choice, at: iso })));
+  const done = deferLogged ? auto : auto.filter((a) => !isDeferChoice(a.choice));
+  for (const { item, recommended } of done) {
     state.items[item.key] = { askedAt: iso, firstAskedAt: iso, status: 'done', answer: autoProceedLine(recommended) };
   }
-  await write(state);
-  featureRan('grill-gate-sort', `${auto.length} auto-proceeded to the ${r.wrote}`);
-  const handled = new Set(auto.map((a) => a.item.key));
+  if (done.length) await write(state);
+  featureRan('grill-gate-sort', `${done.length} auto-proceeded to the ${r.wrote}, ${deferLogged ? deferred.length : 0} of them deferred`);
+  const handled = new Set(done.map((a) => a.item.key));
   return queue.filter((q) => !handled.has(q.key));
 }
 

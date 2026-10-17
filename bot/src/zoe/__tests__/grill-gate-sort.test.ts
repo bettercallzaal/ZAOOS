@@ -7,7 +7,11 @@
 import { describe, expect, it } from 'vitest';
 import type { CockpitTask } from '../../cockpit/types';
 import { type GrillItem, type GrillState, sortOutAutoProceed } from '../grill';
-import { allowlistedChoice, autoProceedLine, classifyGate, gateSortEnabled } from '../grill-queue';
+import { promises as fs } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { allowlistedChoice, appendAutoDeferred, autoProceedLine, classifyGate, gateSortEnabled, isDeferChoice, readAutoDeferred } from '../grill-queue';
+import { formatNeedsZaalDigest } from '../needs-zaal-digest';
 
 describe('classifyGate - what stays with Zaal', () => {
   it.each([
@@ -21,7 +25,7 @@ describe('classifyGate - what stays with Zaal', () => {
     ['settings', 'Turn on the inbox nudge flag', 'recommended: on'],
   ])('%s: %s', (cls, title, notes) => {
     // An allowlisted recommendation with its option shown, so the gated word list is what decides.
-    const v = classifyGate({ kind: 'decision', title: `${title}? A yes / B no`, notes, recommended: 'A' });
+    const v = classifyGate({ kind: 'decision', title: `${title}? A lint first / B wait`, notes, recommended: 'A' });
     expect(v.gated).toBe(true);
     expect(v.classes).toContain(cls);
   });
@@ -57,7 +61,7 @@ describe('classifyGate - fail closed on plain gated actions', () => {
     expect(classifyGate({ kind: 'decision', title: 'What next on this card', notes: null, recommended: phrase }).gated).toBe(true);
   });
   it.each(PROBES)('as the title with option A recommended: %s stays with Zaal', (phrase) => {
-    const v = classifyGate({ kind: 'decision', title: `Should we ${phrase}? A yes / B no`, notes: null, recommended: 'A' });
+    const v = classifyGate({ kind: 'decision', title: `Should we ${phrase}? A lint first / B wait`, notes: null, recommended: 'A' });
     expect(v.gated).toBe(true);
     expect(v.classes.length).toBeGreaterThan(0);
   });
@@ -71,7 +75,7 @@ describe('classifyGate - fail closed on plain gated actions', () => {
 describe('classifyGate - what is auto-proceeded (allowlist controls)', () => {
   it.each(['do lint first', 'option B', 'A'])('%s goes', (rec) => {
     expect(allowlistedChoice(rec)).toBe(true);
-    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint / B tests', notes: null, recommended: rec })).toMatchObject({
+    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint first / B tests first', notes: null, recommended: rec })).toMatchObject({
       gated: false,
       recommended: rec,
     });
@@ -179,7 +183,7 @@ describe('anchored allow shapes - an allowed word plus a dangerous verb stays ga
   });
   it('the new money words are gated by the word list too', () => {
     for (const w of ['wire it', 'move the money', 'release funds', 'pay cash', 'venmo him', 'zelle', 'paypal', 'stripe link', 'send $50']) {
-      const v = classifyGate({ kind: 'decision', title: `Should we ${w}? A yes / B no`, notes: null, recommended: 'A' });
+      const v = classifyGate({ kind: 'decision', title: `Should we ${w}? A lint first / B wait`, notes: null, recommended: 'A' });
       expect(v.classes).toContain('money');
     }
   });
@@ -231,7 +235,7 @@ describe('a bare option letter is checked against that option\'s own text', () =
   it('a dangerous option text in the notes keeps the card', () => {
     const v = classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: 'A wire the funds / B wait', recommended: 'A' });
     expect(v.gated).toBe(true);
-    expect(v.classes).toContain('money');
+    expect(v.reason).toBe('option A is not an allowlisted reversible choice');
   });
   it('a letter whose option is not on the card stays with Zaal', () => {
     expect(classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: null, recommended: 'B' })).toMatchObject({
@@ -240,6 +244,120 @@ describe('a bare option letter is checked against that option\'s own text', () =
     });
   });
   it('a safe option text still goes', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint / B tests', notes: null, recommended: 'B' }).gated).toBe(false);
+    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint first / B tests first', notes: null, recommended: 'B' }).gated).toBe(false);
+  });
+});
+
+// Seat round 4 on #3984: a bare letter is only as safe as the option it picks.
+const ROUND4 = [
+  'stake the treasury',
+  'sell the NFTs',
+  'execute the proposal',
+  'kill the VPS',
+  'overwrite main',
+  'hire Sam at 2k',
+  'bridge to Base',
+  'reset the database',
+  'unlock the account',
+  'fire Sam',
+];
+describe('a bare letter auto-proceeds only when its option text is itself an allowed shape', () => {
+  it.each(ROUND4)('A = %s stays with Zaal', (option) => {
+    const v = classifyGate({ kind: 'decision', title: `Next step? A ${option} / B wait`, notes: null, recommended: 'A' });
+    expect(v.gated).toBe(true);
+  });
+  it('a benign option letter still goes, and the choice is the option text', () => {
+    expect(classifyGate({ kind: 'decision', title: 'Next step? A lint first / B wait', notes: null, recommended: 'A' })).toMatchObject({
+      gated: false,
+      choice: 'lint first',
+    });
+  });
+});
+
+describe('auto-deferred cards are logged and listed in the digest', () => {
+  it('the defer shapes are exactly skip, defer/park/hold, later/not now/wait', () => {
+    for (const c of ['skip it', 'defer until monday', 'park it', 'hold', 'later', 'not now', 'wait']) expect(isDeferChoice(c)).toBe(true);
+    for (const c of ['lint first', 'tabs on top', 'clearer wording', 'A']) expect(isDeferChoice(c)).toBe(false);
+  });
+  it('the sort logs a deferred card and still marks it handled', async () => {
+    const logged: { taskId: string; choice: string }[] = [];
+    const state = fresh();
+    const out = await sortOutAutoProceed(
+      [item('d1', 'Tidy the tabs section'), item('d2', 'Which check runs first')],
+      [task('d1', 'Tidy the tabs section', 'recommended: later'), task('d2', 'Which check runs first', 'recommended: lint first')],
+      state,
+      Date.parse('2026-10-17T12:00:00Z'),
+      async (cards) => ({ wrote: 'spool', path: '/x', count: cards.length, numbers: [] }),
+      async () => {},
+      async (entries) => {
+        logged.push(...entries);
+        return true;
+      },
+    );
+    expect(out).toHaveLength(0);
+    expect(logged.map((l) => [l.taskId, l.choice])).toEqual([['d1', 'later']]);
+  });
+});
+
+describe('auto-deferred: fail closed, the log, and the digest', () => {
+  it('when the deferred log cannot be written, the deferred card is not marked and stays in the queue', async () => {
+    const state = fresh();
+    const out = await sortOutAutoProceed(
+      [item('d1', 'Tidy the tabs section'), item('d2', 'Which check runs first')],
+      [task('d1', 'Tidy the tabs section', 'recommended: later'), task('d2', 'Which check runs first', 'recommended: lint first')],
+      state,
+      Date.parse('2026-10-17T12:00:00Z'),
+      async (cards) => ({ wrote: 'spool', path: '/x', count: cards.length, numbers: [] }),
+      async () => {},
+      async () => false,
+    );
+    expect(out.map((q) => q.key)).toEqual(['d1']);
+    expect(state.items.d1).toBeUndefined();
+    expect(state.items.d2).toMatchObject({ status: 'done' });
+  });
+
+  it('the log round-trips and keeps only the last 24 hours', async () => {
+    const dir = await fs.mkdtemp(join(tmpdir(), 'autodef-'));
+    const path = join(dir, 'auto-deferred.jsonl');
+    try {
+      expect(await appendAutoDeferred([{ taskId: 'old', title: 'Old', choice: 'later', at: '2026-10-15T12:00:00Z' }], path)).toBe(true);
+      expect(await appendAutoDeferred([{ taskId: 'new', title: 'New', choice: 'park it', at: '2026-10-17T11:00:00Z' }], path)).toBe(true);
+      await fs.appendFile(path, 'not json\n');
+      const got = await readAutoDeferred(Date.parse('2026-10-16T12:00:00Z'), path);
+      expect(got.map((e) => e.taskId)).toEqual(['new']);
+      expect(await readAutoDeferred(0, join(dir, 'missing.jsonl'))).toEqual([]);
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  const deferredEntry = [{ taskId: 'd1', title: 'Tidy the tabs section', choice: 'later', at: '2026-10-17T11:00:00Z' }];
+  it('the digest lists every deferred card with its choice', () => {
+    const text = formatNeedsZaalDigest({
+      timeSlot: 'morning',
+      dueSoon: [],
+      laneAsks: [{ lane: 'zoe', text: 'Pick a name', file: 'x.md' } as never],
+      decisions: [],
+      autoDeferred: deferredEntry,
+    });
+    expect(text).toContain('AUTO-DEFERRED, last 24h (1)');
+    expect(text).toContain('Tidy the tabs section (choice: later)');
+  });
+  it('an otherwise clear digest still lists them', () => {
+    const text = formatNeedsZaalDigest({ timeSlot: 'evening', dueSoon: [], laneAsks: [], decisions: [], autoDeferred: deferredEntry });
+    expect(text).toContain('All clear');
+    expect(text).toContain('Tidy the tabs section (choice: later)');
+  });
+  it('a paused digest still lists them', () => {
+    const text = formatNeedsZaalDigest({
+      timeSlot: 'evening',
+      dueSoon: [],
+      laneAsks: [{ lane: 'zoe', text: 'Pick a name', file: 'x.md' } as never],
+      decisions: [],
+      grillPaused: true,
+      autoDeferred: deferredEntry,
+    });
+    expect(text).toContain('Grill paused');
+    expect(text).toContain('Tidy the tabs section (choice: later)');
   });
 });

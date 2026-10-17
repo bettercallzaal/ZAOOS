@@ -208,9 +208,10 @@ export async function appendGrillQueue(
 // undone, needs a fact only he has, or changes a setting. Everything else is
 // auto-proceeded on its recommended option, logged where he can override it.
 //
-// "When in doubt it IS gated." So a card is auto-proceeded only when BOTH hold:
-// it carries a recommended option to proceed with, and nothing in its title
-// or notes matches a gated class. Events and PR reviews always stay his.
+// "When in doubt it IS gated." Fail closed: a card is auto-proceeded only when
+// its recommended option is one of a short allowlist of reversible choice
+// shapes (ALLOW_SHAPES) AND nothing in its title, notes or recommendation
+// matches a gated class. Events and PR reviews always stay his.
 // ---------------------------------------------------------------------------
 
 export function gateSortEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -220,12 +221,32 @@ export function gateSortEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
 export type GateClass = 'money' | 'public' | 'irreversible' | 'his-fact' | 'settings';
 
 const GATE_WORDS: [GateClass, RegExp][] = [
-  ['money', /\$\s?\d|\b(usdc?|eth|sol|pay|paid|payment|payout|invoice|price|pricing|cost|spend|budget|fee|fees|buy|purchase|subscription|grant|donat\w*|sponsor\w*|wallet|token|mint|swap|transfer|refund|billing)\b/i],
-  ['public', /\b(post|posts|publish\w*|tweet|cast|announce\w*|send|email|e-mail|dm|newsletter|outreach|public|press|reply to|share with|invite)\b/i],
-  ['irreversible', /\b(delete|remove|archive|drop|rename|force|on-?chain|deploy|migrat\w*|rotate|revoke|sign|contract|cancel|close (?:the )?account|wipe|purge)\b/i],
+  ['money', /\$\s?\d|\b(usdc?|eth|sol|pay|paid|payments?|payouts?|invoices?|price|pricing|costs?|spend|budget|fees?|buy|purchase|subscriptions?|grants?|donat\w*|sponsor\w*|wallets?|tokens?|mint\w*|swap|transfers?|refunds?|billing|burn\w*)\b/i],
+  ['public', /\b(post|posts|publish\w*|tweet|cast|announce\w*|send|email|e-mail|dm|newsletter|outreach|public|press|reply to|share with|invite|tell|notify|message|broadcast\w*|upload\w*|go(?:ing)? live|livestream\w*|stream it|launch\w*|ship\w*|release)\b/i],
+  ['irreversible', /\b(delete|rm|remove|archive|drop|rename|force|on-?chain|deploy\w*|migrat\w*|rotate|revoke|sign|contract|cancel|close (?:the )?account|wipe|purge|merge\w*|push\w*|production|prod|commit\w*)\b/i],
   ['his-fact', /\b(only you|your call|do you|did you|are you|have you|which one do you|who is|whose|his|her)\b/i],
-  ['settings', /\b(setting|settings|flag|env|permission\w*|config\w*|vercel|dns|domain|password|api key|secret)\b/i],
+  ['settings', /\b(setting|settings|flag|env|permission\w*|config\w*|vercel|dns|domain|password|api key|keys?|secrets?|hooks?|webhooks?|cron)\b/i],
 ];
+
+/**
+ * The reversible choice shapes a recommendation may take for a card to be
+ * auto-proceeded (fail closed, seat review on #3984): a bare option letter,
+ * an ordering, tabs, layout, naming or wording, which file or doc first, or
+ * skip and defer. Any other recommendation keeps the card with Zaal; the
+ * gated word list above then runs as a second check over title, notes and
+ * the recommendation together.
+ */
+const ALLOW_SHAPES: RegExp[] = [
+  /^\s*(?:option\s+)?[A-D](?:\)|\.)?(?:\s*\((?:pick|rec\w*)\))?\s*$/i,
+  /\b(first|second|third|then|order|reorder|before|after|next)\b/i,
+  /\b(tabs?|layout|naming|name it|wording|phrasing|title it|label)\b/i,
+  /\b(skip|defer|later|wait|hold|park|not now)\b/i,
+];
+
+/** Pure. True when a recommendation is one of the allowlisted reversible choice shapes. */
+export function allowlistedChoice(recommended: string): boolean {
+  return ALLOW_SHAPES.some((re) => re.test(recommended));
+}
 
 export interface GateVerdict {
   gated: boolean;
@@ -242,11 +263,14 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
   if (card.kind !== 'decision' && card.kind !== 'blocked') {
     return { gated: true, classes: [], recommended: card.recommended, reason: `${card.kind} cards always stay with Zaal` };
   }
-  const text = `${card.title}\n${card.notes ?? ''}`;
+  if (!card.recommended) return { gated: true, classes: [], reason: 'no recommended option to proceed with' };
+  if (!allowlistedChoice(card.recommended)) {
+    return { gated: true, classes: [], recommended: card.recommended, reason: 'recommendation is not an allowlisted reversible choice' };
+  }
+  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}`;
   const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
   if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
-  if (!card.recommended) return { gated: true, classes, reason: 'no recommended option to proceed with' };
-  return { gated: false, classes, recommended: card.recommended, reason: 'no gated class, has a recommended option' };
+  return { gated: false, classes, recommended: card.recommended, reason: 'allowlisted reversible choice, no gated class' };
 }
 
 /** The line written for an auto-proceeded card, so Zaal can find and override it. */

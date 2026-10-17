@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CockpitTask } from '../../cockpit/types';
 import { type GrillItem, type GrillState, sortOutAutoProceed } from '../grill';
-import { autoProceedLine, classifyGate, gateSortEnabled } from '../grill-queue';
+import { allowlistedChoice, autoProceedLine, classifyGate, gateSortEnabled } from '../grill-queue';
 
 describe('classifyGate - what stays with Zaal', () => {
   it.each([
@@ -20,7 +20,8 @@ describe('classifyGate - what stays with Zaal', () => {
     ['his-fact', 'Which wallet is the operations wallet, do you know?', 'recommended: the first one'],
     ['settings', 'Turn on the inbox nudge flag', 'recommended: on'],
   ])('%s: %s', (cls, title, notes) => {
-    const v = classifyGate({ kind: 'decision', title, notes, recommended: 'x' });
+    // An allowlisted recommendation, so the gated word list is what decides.
+    const v = classifyGate({ kind: 'decision', title, notes, recommended: 'A' });
     expect(v.gated).toBe(true);
     expect(v.classes).toContain(cls);
   });
@@ -33,10 +34,51 @@ describe('classifyGate - what stays with Zaal', () => {
   });
 });
 
-describe('classifyGate - what is auto-proceeded', () => {
-  it('a reversible ordering choice with a recommended option goes', () => {
-    const v = classifyGate({ kind: 'decision', title: 'Which lane goes first tomorrow', notes: 'recommended: zao-app', recommended: 'zao-app' });
-    expect(v).toMatchObject({ gated: false, recommended: 'zao-app' });
+// Seat review on #3984: plain gated actions came back NOT gated under the
+// first, denylist-only version. Each phrase is probed two ways: as the
+// recommendation itself (the allowlist must refuse it) and as the card's title
+// with an allowlisted recommendation (the denylist must still catch it).
+const PROBES = [
+  'go live',
+  'ship it',
+  'rm the repo',
+  'push to production',
+  'launch the site',
+  'merge to main',
+  'burn tokens',
+  'upload the video',
+  'broadcast it',
+  'tell Joseph',
+  'commit the key',
+  'set the hook',
+];
+describe('classifyGate - fail closed on plain gated actions', () => {
+  it.each(PROBES)('as the recommendation: %s stays with Zaal', (phrase) => {
+    expect(classifyGate({ kind: 'decision', title: 'What next on this card', notes: null, recommended: phrase }).gated).toBe(true);
+  });
+  it.each(PROBES)('as the title with option A recommended: %s stays with Zaal', (phrase) => {
+    const v = classifyGate({ kind: 'decision', title: `Should we ${phrase}? A yes / B no`, notes: null, recommended: 'A' });
+    expect(v.gated).toBe(true);
+    expect(v.classes.length).toBeGreaterThan(0);
+  });
+  it('a recommendation outside the allowlist stays, even with nothing gated in it', () => {
+    expect(classifyGate({ kind: 'decision', title: 'Pick the lane', notes: null, recommended: 'zao-app' }).reason).toBe(
+      'recommendation is not an allowlisted reversible choice',
+    );
+  });
+});
+
+describe('classifyGate - what is auto-proceeded (allowlist controls)', () => {
+  it.each(['do lint first', 'option B', 'A'])('%s goes', (rec) => {
+    expect(allowlistedChoice(rec)).toBe(true);
+    expect(classifyGate({ kind: 'decision', title: 'Which lane goes first tomorrow', notes: null, recommended: rec })).toMatchObject({
+      gated: false,
+      recommended: rec,
+    });
+  });
+  it('tabs, wording and defer shapes are allowlisted; an action is not', () => {
+    for (const rec of ['keep the two tabs', 'shorter wording', 'defer to next week', 'skip it']) expect(allowlistedChoice(rec)).toBe(true);
+    for (const rec of ['zao-app', 'yes', 'approve']) expect(allowlistedChoice(rec)).toBe(false);
   });
   it('the logged line names the option and the override', () => {
     expect(autoProceedLine('zao-app')).toBe('auto-proceeded: zao-app, override anytime');
@@ -61,7 +103,7 @@ describe('sortOutAutoProceed - with injected IO', () => {
     item('evt:1', '10:00 AM - standup', 'event'),
   ];
   const tasks = [
-    task('t1', 'Which lane goes first tomorrow', 'recommended: zao-app'),
+    task('t1', 'Which lane goes first tomorrow', 'recommended: zao-app first'),
     task('t2', 'Pay the venue deposit', 'recommended: pay today'),
     task('t3', 'Pick the order of the recap sections', null),
   ];
@@ -78,9 +120,9 @@ describe('sortOutAutoProceed - with injected IO', () => {
       async () => {
         saved += 1;
       });
-    expect(written).toEqual([{ taskId: 't1', title: 'Which lane goes first tomorrow', why: 'auto-proceeded: zao-app, override anytime' }]);
+    expect(written).toEqual([{ taskId: 't1', title: 'Which lane goes first tomorrow', why: 'auto-proceeded: zao-app first, override anytime' }]);
     expect(out.map((q) => q.key)).toEqual(['t2', 't3', 'evt:1']);
-    expect(state.items.t1).toMatchObject({ status: 'done', answer: 'auto-proceeded: zao-app, override anytime' });
+    expect(state.items.t1).toMatchObject({ status: 'done', answer: 'auto-proceeded: zao-app first, override anytime' });
     expect(saved).toBe(1);
   });
 

@@ -177,7 +177,10 @@ export async function wasResearched(
 /**
  * Up to `limit` research doc paths (`<category>/<num>-<slug>`) whose README
  * passes `test`. Same walk as wasResearched, but it says WHICH docs matched,
- * so a caller can point Zaal at them. Fail-open: an unreadable tree is [].
+ * so a caller can point Zaal at them. Fail-open by default: an unreadable tree
+ * is []. With `failClosed`, an unreadable top level or category folder THROWS
+ * instead (a plain file at either level is still skipped), for a caller whose
+ * safe answer to "could not look" is "do nothing" rather than "looks new".
  */
 export async function findDocsMatching(
   researchDir: string,
@@ -185,6 +188,7 @@ export async function findDocsMatching(
   limit = 3,
   readFileImpl?: (path: string, encoding: string) => Promise<string>,
   readdirImpl?: (path: string) => Promise<string[]>,
+  failClosed = false,
 ): Promise<string[]> {
   const { promises: fs } = await import('node:fs');
   const readFile = readFileImpl || ((p: string) => fs.readFile(p, 'utf8'));
@@ -193,7 +197,8 @@ export async function findDocsMatching(
   let categories: string[] = [];
   try {
     categories = await readdir(researchDir);
-  } catch {
+  } catch (err: unknown) {
+    if (failClosed) throw err;
     return hits;
   }
   for (const category of categories) {
@@ -201,7 +206,9 @@ export async function findDocsMatching(
     let entries: string[] = [];
     try {
       entries = await readdir(`${researchDir}/${category}`);
-    } catch {
+    } catch (err: unknown) {
+      // research/README.md is a file, not a category: skipping it is right either way.
+      if (failClosed && (err as NodeJS.ErrnoException)?.code !== 'ENOTDIR') throw err;
       continue;
     }
     for (const entry of entries) {

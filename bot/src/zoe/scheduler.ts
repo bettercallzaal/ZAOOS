@@ -1614,10 +1614,11 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             search: (url) => searchRepos(url),
             queuedInputs: () => queuedWorkInputs('resource'),
             findDocs: async (link) => {
-              // findDocsMatching answers [] for an unreadable tree, which would
-              // make every repo look new. Prove the library is there first.
+              // An unreadable tree would make every repo look new. Prove the
+              // library is there, then walk it fail-closed so an unreadable
+              // category throws instead of being skipped.
               if ((await fs.readdir(researchDir)).length === 0) throw new Error('research library is empty');
-              return findDocsMatching(researchDir, repoMentionTest(link));
+              return findDocsMatching(researchDir, repoMentionTest(link), 3, undefined, undefined, true);
             },
             enqueue: (input) => enqueueScoutWork(input, undefined, 'resource'),
             deny: denyList(),

@@ -117,6 +117,27 @@ describe('findDocsMatching over a research tree', () => {
   it('stops at the limit', async () => {
     expect(await findDocsMatching(root, () => true, 1)).toHaveLength(1);
   });
+
+  it('fail-closed: an unreadable category throws instead of being skipped', async () => {
+    const readdir = async (p: string) => {
+      if (p === root) return ['agents', 'broken'];
+      if (p.endsWith('/broken')) throw Object.assign(new Error('EACCES'), { code: 'EACCES' });
+      return fs.readdir(p);
+    };
+    await expect(findDocsMatching(root, () => false, 3, undefined, readdir, true)).rejects.toThrow('EACCES');
+    // red control: the default stays fail-open, so the dedupe callers that want [] keep it.
+    expect(await findDocsMatching(root, () => false, 3, undefined, readdir)).toEqual([]);
+  });
+
+  it('fail-closed: a missing research dir throws', async () => {
+    await expect(findDocsMatching(join(root, 'nope'), () => true, 3, undefined, undefined, true)).rejects.toThrow();
+  });
+
+  it('fail-closed: a plain file beside the categories is still skipped', async () => {
+    await fs.writeFile(join(root, 'README.md'), 'index');
+    const docs = await findDocsMatching(root, repoMentionTest(link('https://github.com/obra/superpowers')), 3, undefined, undefined, true);
+    expect(docs).toEqual(['agents/2652-self-upgrade']);
+  });
 });
 
 describe('queuedInputs', () => {

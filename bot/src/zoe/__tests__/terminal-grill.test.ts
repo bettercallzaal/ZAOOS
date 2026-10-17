@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import { promises as fs, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -10,6 +10,7 @@ import {
   readTerminalGrillState,
   recordTerminalAnswer,
   maybeSendTailCard,
+  tailCardScopeAllowed,
   sendNextTerminalCard,
   tailCooldownMs,
   tailQuestionDue,
@@ -374,5 +375,55 @@ describe('maybeSendTailCard - the card after a reply', () => {
     const empty = async () => ({ text: PAGE.replace(/\| w1 .*\n/, '').replace(/\| w2 .*\n/, '') });
     expect(await maybeSendTailCard({ send, read: empty, now: day, env })).toBe('empty');
     expect(await maybeSendTailCard({ send, read, now: new Date('2026-10-16T16:05:00Z'), env })).toBe('sent');
+  });
+});
+
+// Seat follow-ups on #3982: the private-scope rule and the in-flight guard.
+describe('tailCardScopeAllowed - only Zaal\'s private DM gets the tail card', () => {
+  it('private: yes; any other scope: no', () => {
+    expect(tailCardScopeAllowed('private')).toBe(true);
+    for (const s of ['group', 'zaal-botz', 'discord', 'member', 'community', '']) expect(tailCardScopeAllowed(s)).toBe(false);
+  });
+  it('the one call site in index.ts is behind that rule', () => {
+    // Source-level, like scheduler-cron-guards.test.ts: index.ts boots the bot
+    // and must never be imported in a test. Red control: drop the guard and the
+    // maybeSendTailCard call no longer sits inside tailCardScopeAllowed(scope).
+    const src = readFileSync(join(__dirname, '..', 'index.ts'), 'utf8');
+    const calls = src.split('maybeSendTailCard({').length - 1;
+    expect(calls).toBe(1);
+    const at = src.indexOf('maybeSendTailCard({');
+    const guard = src.lastIndexOf('if (tailCardScopeAllowed(scope)) {', at);
+    expect(guard).toBeGreaterThan(-1);
+    // Nothing closes that if-block between the guard and the call.
+    expect(src.slice(guard, at).includes('\n    }\n')).toBe(false);
+  });
+});
+
+describe('maybeSendTailCard - two replies at once send one card', () => {
+  beforeEach(() => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+  });
+  afterEach(() => {
+    delete process.env.ZOE_GRILL_TERMINALS;
+  });
+  it('the second caller while the first is sending gets busy, not a second card', async () => {
+    const env = { ZOE_TAIL_QUESTION: '1' };
+    const now = new Date('2026-10-16T16:00:00Z');
+    const sent: string[] = [];
+    let release: () => void = () => {};
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    const slowSend = async (t: string) => {
+      await gate;
+      sent.push(t);
+    };
+    const read = async () => ({ text: PAGE });
+    const first = maybeSendTailCard({ send: slowSend, read, now, env });
+    const second = await maybeSendTailCard({ send: slowSend, read, now, env });
+    release();
+    expect(second).toBe('busy');
+    expect(await first).toBe('sent');
+    expect(sent).toHaveLength(1);
   });
 });

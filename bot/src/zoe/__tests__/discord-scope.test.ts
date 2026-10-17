@@ -1,7 +1,8 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, DISCORD_DEFAULT_PER_HOUR } from '../discord-scope';
+import { Client, MessageMentions } from 'discord.js';
+import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, DISCORD_DEFAULT_PER_HOUR, mentionsZoe } from '../discord-scope';
 import { newMemberDmLimiter } from '../member-dm';
 
 const OWNER = '111';
@@ -97,5 +98,40 @@ describe('discord.ts wiring (read as text; the module boots a client)', () => {
   });
   it('announces the first reply per boot (doc 2685 D3)', () => {
     expect(src).toContain("featureRan('discord-reply'");
+  });
+});
+
+// Real discord.js MessageMentions (14.14.0), no login: a client whose user
+// cache holds ZOE, and a message object carrying that client.
+describe('mentionsZoe (evaluator, #3998)', () => {
+  const BOT = '900000000000000001';
+  const client = new Client({ intents: [] });
+  // biome-ignore lint/suspicious/noExplicitAny: private cache API, test only
+  (client.users as any)._add({ id: BOT, username: 'ZOE', bot: true });
+  const mentions = (users: string[], everyone: boolean) =>
+    // The constructor is private in the typings; it is the class discord.js builds per message.
+    // biome-ignore lint/suspicious/noExplicitAny: private constructor and minimal message shape, test only
+    new (MessageMentions as any)({ client, guild: null }, users.map((id) => ({ id, username: 'u' })), [], everyone) as MessageMentions;
+
+  it('an @everyone message does NOT trigger ZOE', () => {
+    expect(mentionsZoe(mentions([], true), BOT)).toBe(false);
+  });
+  it('control: the bare has() the adapter used to call DOES treat @everyone as a mention', () => {
+    expect(mentions([], true).has(BOT)).toBe(true);
+  });
+  it('a direct @ZOE mention triggers, with or without @everyone in it', () => {
+    expect(mentionsZoe(mentions([BOT], false), BOT)).toBe(true);
+    expect(mentionsZoe(mentions([BOT], true), BOT)).toBe(true);
+  });
+  it('a mention of someone else does not trigger', () => {
+    expect(mentionsZoe(mentions(['222'], false), BOT)).toBe(false);
+  });
+  it('no bot id yet (client not ready) never triggers', () => {
+    expect(mentionsZoe(mentions([BOT], true), undefined)).toBe(false);
+  });
+  it('wiring: discord.ts triggers channel replies through mentionsZoe, not a bare has()', () => {
+    const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+    expect(src).toContain('mentionsZoe(message.mentions, client.user?.id)');
+    expect(src).not.toContain('mentions.has(');
   });
 });

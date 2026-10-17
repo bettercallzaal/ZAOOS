@@ -35,7 +35,7 @@ import {
 } from 'discord.js';
 import { runConciergeTurn } from './concierge';
 import { buildMemoryBlocks } from './memory';
-import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour } from './discord-scope';
+import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, mentionsZoe } from './discord-scope';
 import { featureRan } from './feature-ran';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
@@ -168,7 +168,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
         }
       }
 
-      if (message.channel.type === ChannelType.GuildText && message.mentions.has(client.user?.id ?? '')) {
+      if (message.channel.type === ChannelType.GuildText && mentionsZoe(message.mentions, client.user?.id)) {
         triggered = true;
       }
 

@@ -29,6 +29,22 @@ export function discordScopeFor(m: DiscordScopeInput): 'private' | string {
   return `discord:${m.channelId}`;
 }
 
+/** The one method of discord.js `MessageMentions` this needs. */
+export interface MentionsLike {
+  has(id: string, options?: { ignoreEveryone?: boolean; ignoreRoles?: boolean }): boolean;
+}
+
+/**
+ * True only when ZOE itself is @mentioned. discord.js `has()` defaults to
+ * ignoreEveryone=false and ignoreRoles=false (MessageMentions.js, 14.14.0), so
+ * the bare call answered every @everyone and @here, and any role ZOE holds,
+ * in every channel. Evaluator finding on #3998, 2026-10-17.
+ */
+export function mentionsZoe(mentions: MentionsLike, botId: string | undefined): boolean {
+  if (!botId) return false;
+  return mentions.has(botId, { ignoreEveryone: true, ignoreRoles: true });
+}
+
 /**
  * Turns per hour for anyone on Discord who is not Zaal. Every DM and every
  * @mention is a full model turn, and before 2026-10-17 nothing bounded them

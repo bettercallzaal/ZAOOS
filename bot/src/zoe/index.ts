@@ -57,7 +57,7 @@ import {
 } from './x-desk';
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
-import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
+import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, tailCardScopeAllowed, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
@@ -4027,7 +4027,8 @@ async function dispatchConcierge(
     // after answering Zaal in his DM, the first waiting seat item follows as its
     // own card, at most once per cooldown. Class `gated`, so the send budget
     // counts it as an ask, not as part of the reply. Never blocks the reply.
-    if (scope === 'private') {
+    // tailCardScopeAllowed is the private-scope rule, pinned by a test.
+    if (tailCardScopeAllowed(scope)) {
       runWithSendClass('gated', () =>
         maybeSendTailCard({
           send: (t, buttons) => bot.api.sendMessage(zaalId, t, { reply_markup: { inline_keyboard: toGrammyRows(buttons) } }),

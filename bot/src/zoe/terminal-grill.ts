@@ -217,7 +217,22 @@ async function readTailStamp(): Promise<string | null> {
   }
 }
 
-export type TailOutcome = 'off' | 'quiet' | 'cooldown' | SendCardOutcome;
+export type TailOutcome = 'off' | 'quiet' | 'cooldown' | 'busy' | SendCardOutcome;
+
+/**
+ * Pure. The tail card follows a reply only in Zaal's private DM. The one
+ * caller (index.ts dispatchConcierge) asks this before calling
+ * maybeSendTailCard, so the scope rule has a test (seat on #3982): a group,
+ * Discord or member scope never gets the card.
+ */
+export function tailCardScopeAllowed(scope: string): boolean {
+  return scope === 'private';
+}
+
+// In-process guard: two replies finishing in the same moment would both read
+// the old stamp and both send. One ZOE process polls at a time (agent-loops
+// rule 9), so a module flag is enough; the second caller returns 'busy'.
+let tailInFlight = false;
 
 /** After a DM reply: send the first seat card, if enabled, due, outside the quiet window. Never throws. */
 export async function maybeSendTailCard(deps: {
@@ -230,18 +245,24 @@ export async function maybeSendTailCard(deps: {
   if (!tailQuestionEnabled(env)) return 'off';
   const now = deps.now ?? new Date();
   if (inQuietWindow(now)) return 'quiet';
-  if (!tailQuestionDue(await readTailStamp(), now, tailCooldownMs(env))) return 'cooldown';
-  const r = await sendNextTerminalCard({ send: deps.send, read: deps.read });
-  if (r === 'sent') {
-    try {
-      await fs.mkdir(dir(), { recursive: true });
-      await fs.writeFile(tailPath(), JSON.stringify({ lastAt: now.toISOString() }));
-    } catch (e) {
-      // A lost stamp means at worst one extra card next reply; the card already went.
-      console.error('[zoe/terminal-grill] could not record the tail card time:', (e as Error)?.message);
+  if (tailInFlight) return 'busy';
+  tailInFlight = true;
+  try {
+    if (!tailQuestionDue(await readTailStamp(), now, tailCooldownMs(env))) return 'cooldown';
+    const r = await sendNextTerminalCard({ send: deps.send, read: deps.read });
+    if (r === 'sent') {
+      try {
+        await fs.mkdir(dir(), { recursive: true });
+        await fs.writeFile(tailPath(), JSON.stringify({ lastAt: now.toISOString() }));
+      } catch (e) {
+        // A lost stamp means at worst one extra card next reply; the card already went.
+        console.error('[zoe/terminal-grill] could not record the tail card time:', (e as Error)?.message);
+      }
     }
+    return r;
+  } finally {
+    tailInFlight = false;
   }
-  return r;
 }
 
 export type RecordOutcome = 'recorded' | 'already-answered' | 'stale' | 'invalid' | 'unknown-item';

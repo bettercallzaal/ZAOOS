@@ -248,18 +248,19 @@ export function formatNeedsZaalDigest(opts: {
   decisions: NeedsZaalTask[];
   /** Zaal tapped Stop grill: questions are counted, not shown, and no cards follow. */
   grillPaused?: boolean;
-  /** Cards the grill parked on its own in the last 24 hours (grill-queue.ts, ZOE_GRILL_GATE_SORT). Always listed. */
+  /** Cards the grill proceeded with or parked on its own in the last 24 hours (grill-queue.ts, ZOE_GRILL_GATE_SORT). Always listed. */
   autoDeferred?: AutoDeferred[];
 }): string {
   const slotLabel = opts.timeSlot === 'morning' ? '08:00 ET (Morning)' : '20:00 ET (Evening)';
   const total = opts.dueSoon.length + opts.laneAsks.length + opts.decisions.length;
 
   const deferred = opts.autoDeferred ?? [];
-  // Every auto-deferred card is named, even on an otherwise clear day, so
-  // nothing urgent is parked without him seeing it (seat round 4 on #3984).
+  // Every auto-handled card, proceeded or deferred, is named, even on an
+  // otherwise clear day, so nothing closes without him seeing it (seat rounds
+  // 4 and 8 on #3984).
   const deferredBlock = deferred.length
     ? [
-        `⏸️ **AUTO-DEFERRED, last 24h (${deferred.length}):** override any of these by replying`,
+        `⏸️ **AUTO-PROCEEDED OR DEFERRED, last 24h (${deferred.length}):** override any of these by replying`,
         ...deferred.map((d) => `• ${d.title} (choice: ${d.choice})`),
         '',
       ]

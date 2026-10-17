@@ -713,17 +713,20 @@ export async function sortOutAutoProceed(
     return queue;
   }
   const iso = new Date(now).toISOString();
-  // A deferring choice (skip, defer, park, hold, later) parks the card. Each is
-  // logged for the daily needs-Zaal digest; if that log cannot be written, the
-  // deferred cards are NOT marked handled and still reach Zaal (seat round 4).
-  const deferred = auto.filter((a) => isDeferChoice(a.choice));
-  const deferLogged = await logDeferred(deferred.map((a) => ({ taskId: a.item.key, title: a.item.title, choice: a.choice, at: iso })));
-  const done = deferLogged ? auto : auto.filter((a) => !isDeferChoice(a.choice));
+  // Every auto-handled card, proceeded or deferred, is logged for the daily
+  // needs-Zaal digest, so nothing closes without him seeing its title and
+  // choice (seat rounds 4 and 8 on #3984). If that log cannot be written, no
+  // card is marked handled and all of them still reach Zaal.
+  const logged = await logDeferred(
+    auto.map((a) => ({ taskId: a.item.key, title: a.item.title, choice: a.choice, at: iso, deferred: isDeferChoice(a.choice) })),
+  );
+  const done = logged ? auto : [];
   for (const { item, recommended } of done) {
     state.items[item.key] = { askedAt: iso, firstAskedAt: iso, status: 'done', answer: autoProceedLine(recommended) };
   }
   if (done.length) await write(state);
-  featureRan('grill-gate-sort', `${done.length} auto-proceeded to the ${r.wrote}, ${deferLogged ? deferred.length : 0} of them deferred`);
+  if (!logged) console.error(`[zoe/grill] gate sort: could not log ${auto.length} auto-handled card(s); none marked, they stay in the queue`);
+  featureRan('grill-gate-sort', `${done.length} auto-handled to the ${r.wrote}, ${done.filter((a) => isDeferChoice(a.choice)).length} of them deferred`);
   const handled = new Set(done.map((a) => a.item.key));
   return queue.filter((q) => !handled.has(q.key));
 }

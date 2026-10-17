@@ -339,11 +339,17 @@ export function isDeferChoice(choice: string): boolean {
   return DEFER_SHAPES.some((re) => re.test(r));
 }
 
+/**
+ * One auto-handled card in the digest log. The name predates round 8 on #3984,
+ * when proceeded cards joined deferred ones in the same log.
+ */
 export interface AutoDeferred {
   taskId: string;
   title: string;
   choice: string;
   at: string;
+  /** True for a deferring choice. Absent on lines written before round 8, which were all deferrals. */
+  deferred?: boolean;
 }
 
 export function autoDeferredPath(): string {

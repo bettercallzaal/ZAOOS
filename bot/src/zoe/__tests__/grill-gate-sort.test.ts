@@ -125,7 +125,8 @@ describe('sortOutAutoProceed - with injected IO', () => {
       },
       async () => {
         saved += 1;
-      });
+      },
+      async () => true);
     expect(written).toEqual([{ taskId: 't1', title: 'Which check runs first', why: 'auto-proceeded: lint first, override anytime' }]);
     expect(out.map((q) => q.key)).toEqual(['t2', 't3', 'evt:1']);
     expect(state.items.t1).toMatchObject({ status: 'done', answer: 'auto-proceeded: lint first, override anytime' });
@@ -139,7 +140,8 @@ describe('sortOutAutoProceed - with injected IO', () => {
       async () => ({ wrote: 'nothing', path: '/x', count: 0, numbers: [] }),
       async () => {
         saved += 1;
-      });
+      },
+      async () => true);
     expect(out).toHaveLength(4);
     expect(state.items).toEqual({});
     expect(saved).toBe(0);
@@ -154,7 +156,8 @@ describe('sortOutAutoProceed - with injected IO', () => {
         calls += cards.length;
         return { wrote: 'spool', path: '/x', count: cards.length, numbers: [] };
       },
-      async () => {});
+      async () => {},
+      async () => true);
     expect(calls).toBe(0);
     expect(out).toHaveLength(4);
   });
@@ -248,8 +251,8 @@ describe('auto-deferred cards are logged and listed in the digest', () => {
     for (const c of ['skip it', 'defer until monday', 'park it', 'hold', 'later', 'not now', 'wait']) expect(isDeferChoice(c)).toBe(true);
     for (const c of ['lint first', 'tabs on top', 'clearer wording', 'A']) expect(isDeferChoice(c)).toBe(false);
   });
-  it('the sort logs a deferred card and still marks it handled', async () => {
-    const logged: { taskId: string; choice: string }[] = [];
+  it('the sort logs every auto-handled card, proceeded and deferred, and marks them handled', async () => {
+    const logged: { taskId: string; choice: string; deferred?: boolean }[] = [];
     const state = fresh();
     const out = await sortOutAutoProceed(
       [item('d1', 'Tidy the tabs section'), item('d2', 'Which check runs first')],
@@ -264,12 +267,16 @@ describe('auto-deferred cards are logged and listed in the digest', () => {
       },
     );
     expect(out).toHaveLength(0);
-    expect(logged.map((l) => [l.taskId, l.choice])).toEqual([['d1', 'later']]);
+    expect(logged.map((l) => [l.taskId, l.choice, l.deferred])).toEqual([
+      ['d1', 'later', true],
+      ['d2', 'lint first', false],
+    ]);
+    expect(state.items.d2).toMatchObject({ status: 'done' });
   });
 });
 
 describe('auto-deferred: fail closed, the log, and the digest', () => {
-  it('when the deferred log cannot be written, the deferred card is not marked and stays in the queue', async () => {
+  it('when the log cannot be written, no card is marked, proceeded or deferred, and all stay in the queue', async () => {
     const state = fresh();
     const out = await sortOutAutoProceed(
       [item('d1', 'Tidy the tabs section'), item('d2', 'Which check runs first')],
@@ -280,9 +287,8 @@ describe('auto-deferred: fail closed, the log, and the digest', () => {
       async () => {},
       async () => false,
     );
-    expect(out.map((q) => q.key)).toEqual(['d1']);
-    expect(state.items.d1).toBeUndefined();
-    expect(state.items.d2).toMatchObject({ status: 'done' });
+    expect(out.map((q) => q.key)).toEqual(['d1', 'd2']);
+    expect(state.items).toEqual({});
   });
 
   it('the log round-trips and keeps only the last 24 hours', async () => {
@@ -309,8 +315,19 @@ describe('auto-deferred: fail closed, the log, and the digest', () => {
       decisions: [],
       autoDeferred: deferredEntry,
     });
-    expect(text).toContain('AUTO-DEFERRED, last 24h (1)');
+    expect(text).toContain('AUTO-PROCEEDED OR DEFERRED, last 24h (1)');
     expect(text).toContain('Tidy the tabs section (choice: later)');
+  });
+  it("a proceeded card is listed with its title and choice (seat round 8: 'Liquidate the treasury?' + 'lint first')", () => {
+    const text = formatNeedsZaalDigest({
+      timeSlot: 'morning',
+      dueSoon: [],
+      laneAsks: [],
+      decisions: [],
+      autoDeferred: [{ taskId: 'p1', title: 'Liquidate the treasury?', choice: 'lint first', at: '2026-10-17T11:00:00Z', deferred: false }],
+    });
+    expect(text).toContain('AUTO-PROCEEDED OR DEFERRED, last 24h (1)');
+    expect(text).toContain('Liquidate the treasury? (choice: lint first)');
   });
   it('an otherwise clear digest still lists them', () => {
     const text = formatNeedsZaalDigest({ timeSlot: 'evening', dueSoon: [], laneAsks: [], decisions: [], autoDeferred: deferredEntry });

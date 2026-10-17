@@ -34,7 +34,7 @@ Written Sat 17 Oct 2026, 19:2x to 19:4x UTC (clock from `date -u`), by the zoe l
 | Tools only in Zaal's own DM; every other scope only talks | `discord.ts:208` (`toolPolicyForScope`), and #3975 for the talk-only CLI path |
 | Community answers can wait for Zaal's Approve / Regen / Skip buttons in his Discord DM, and are held, not sent, if he cannot be reached | `discord.ts:215-246`, `:270-325`, `discord-scope.ts:35-37`; behind `DISCORD_COMMUNITY_ASKS_ENABLED=1` |
 | 2000-character chunking, typing indicator, error replies | `discord.ts:56-70`, `:170`, `:251-263` |
-| Status mirror by webhook, no bot needed | `discord-webhook.ts` (`postStatusToDiscord`), **built but not wired**: a grep for callers outside the module found 0 |
+| Morning brief mirrored by webhook, no bot needed | `discord-webhook.ts` (`postBriefToDiscord` calls `postStatusToDiscord`), **wired** from `scheduler.ts:112` and `:437` and a no-op until `DISCORD_WEBHOOK_STATUS` is set. **Corrected 2026-10-17:** this row first said "built but not wired, a grep for callers outside the module found 0". That grep looked for `postStatusToDiscord` and left out `discord-webhook.ts`, so it could not see the wrapper the scheduler calls (the evaluator lane, in its review comment on #3996). |
 
 A separate Discord bot, ZAI (`bot/src/zai/`, doc 1187), does voice capture under its own token (`DISCORD_CAPTURE_TOKEN` / `ZAI_DISCORD_TOKEN`, `zai/config.ts`). It is a different identity with a different job. This doc does not touch it, and the two must never share a token.
 
@@ -46,7 +46,7 @@ A separate Discord bot, ZAI (`bot/src/zai/`, doc 1187), does voice capture under
 | D2 | Privileged Message Content intent requested but not needed | Remove `GatewayIntentBits.MessageContent` from `discord.ts:128` and the doc comment at `:14-18` | 3 lines + a test on the intent list |
 | D3 | No live log line on success | The connect log at `discord.ts:134` exists. Add `featureRan('discord-reply', ...)` on the reply path so "it is live" can be measured (`state-claims.md`, "Silence is not evidence") | 1 line |
 | D4 | Owner gets text only, no buttons | On Telegram, Zaal answers by tapping. In his Discord DM the grill and waiting cards could carry the same A/B/C buttons. **Not first:** this is a second copy of the card UI, and doc 2432 caps interrupts at one surface. Recommended: keep his questions on Telegram, so Discord answers when asked and pushes nothing | after he has used it |
-| D5 | Status mirror not wired | Call `postStatusToDiscord` where the group status already goes, under `DISCORD_WEBHOOK_STATUS` (unset means no-op today) | small, after D1 to D3 |
+| D5 | Only the morning brief is mirrored | The brief already goes to the webhook (`scheduler.ts:437`). Mirroring other group status would be more `postStatusToDiscord` calls, under the same `DISCORD_WEBHOOK_STATUS` (unset means no-op today) | small, after D1 to D3, and only if he wants more than the brief |
 | D6 | Slash commands | `/ask` and `/task` as application commands (doc 1135 Stage 1). Mentions already cover asking, so this is polish | later |
 
 ## 3. The surface rule on Discord (mirrors the Telegram rule)

@@ -27,6 +27,7 @@ import * as http from 'node:http';
 import { startHeartbeat, startHeartbeatAs } from '../lib/cowork';
 import { installAgentMarkupGuard } from '../agent-markup';
 import { safeEqual, isValidDocPath } from './dispatch-auth';
+import { newTracker, pollStatus, startBeat, trackPolling } from './liveness';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
 const hermesToken = process.env.HERMES_BOT_TOKEN;
@@ -88,6 +89,10 @@ function buildBotNameFilter(holder: UsernameHolder) {
 
 const devz = new Bot<Context>(devzToken);
 const hermes = new Bot<Context>(hermesToken);
+const devzPoll = newTracker('devz');
+const hermesPoll = newTracker('hermes');
+trackPolling(devz, devzPoll);
+trackPolling(hermes, hermesPoll);
 
 // Strip agent-internal markup at the outbound boundary, on BOTH bots, before
 // any handler or narrator is wired. agent-markup.ts says to install this on
@@ -502,11 +507,23 @@ async function boot(): Promise<void> {
   // matching token are set). ZAO Devz reports under this process's COWORK_BOT_TOKEN;
   // Hermes runs in the same process but gets its own identity/token so it shows as
   // a separate row on the board.
-  startHeartbeat(60_000, () => 'up', { unit: 'zao-devz-stack', identity: 'zaodevz' });
-  startHeartbeatAs(process.env.COWORK_TOKEN_HERMES ?? '', 60_000, () => 'up', {
-    unit: 'zao-devz-stack',
-    identity: 'hermes',
-  });
+  // Status comes from the last answered getUpdates (liveness.ts), not a constant
+  // 'up', so a wedged poller shows as degraded on the board.
+  startHeartbeat(
+    60_000,
+    () => pollStatus(devzPoll, devz.isRunning(), Date.now()),
+    { unit: 'zao-devz-stack', identity: 'zaodevz' },
+  );
+  startHeartbeatAs(
+    process.env.COWORK_TOKEN_HERMES ?? '',
+    60_000,
+    () => pollStatus(hermesPoll, hermes.isRunning(), Date.now()),
+    { unit: 'zao-devz-stack', identity: 'hermes' },
+  );
+  startBeat([
+    { bot: devz, t: devzPoll },
+    { bot: hermes, t: hermesPoll },
+  ]);
 
   await Promise.all([
     devz.start({ drop_pending_updates: true, onStart: () => console.log('[devz] ZAODevzBot polling') }),

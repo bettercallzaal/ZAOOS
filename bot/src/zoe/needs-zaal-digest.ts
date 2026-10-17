@@ -138,7 +138,7 @@ export function parseLaneGrillSections(
   return items;
 }
 
-function extractRecommendation(notes?: string | null, metadata?: Record<string, unknown> | null, title?: string): string | undefined {
+export function extractRecommendation(notes?: string | null, metadata?: Record<string, unknown> | null, title?: string): string | undefined {
   if (metadata && typeof metadata.recommended === 'string' && metadata.recommended.trim()) {
     return metadata.recommended.trim();
   }

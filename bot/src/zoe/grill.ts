@@ -26,6 +26,8 @@ import { wasSendBlocked } from './send-budget';
 import { isGrillPaused, withStopRow } from './grill-pause';
 import { featureRan } from './feature-ran';
 import { inQuietWindow, quietEnabled } from './quiet-window';
+import { appendGrillQueue, autoProceedLine, classifyGate, gateSortEnabled } from './grill-queue';
+import { extractRecommendation } from './needs-zaal-digest';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -605,8 +607,17 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
     sourcesOk = false;
     return [] as GrillEvent[];
   });
-  const queue = toQueue(tasks, prs, events);
+  let queue = toQueue(tasks, prs, events);
   const state = await readGrillState();
+
+  // Gated or not (ZOE_GRILL_GATE_SORT=1, grill-queue.ts classifyGate): a card
+  // that names nothing gated and carries a recommended option is auto-proceeded
+  // on that option, written to the grill queue with an override line, and
+  // never reaches his DM. Marked handled only once that write succeeded, so a
+  // failed write leaves the card in his queue, never silently dropped.
+  if (gateSortEnabled()) {
+    queue = await sortOutAutoProceed(queue, tasks, state, now);
+  }
 
   if (grillExpireEnabled()) {
     // An empty task list is treated as a failed read, not as "everything is
@@ -667,6 +678,47 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.daySurfaced = { date: today, count: day.count + 1 };
   await writeGrillState(state);
   return { sent: true, item };
+}
+
+/**
+ * The gate sort, split out so it can be tested with injected IO. Returns the
+ * queue with the auto-proceeded cards removed. A card already handled in state
+ * is never written twice.
+ */
+export async function sortOutAutoProceed(
+  queue: GrillItem[],
+  tasks: CockpitTask[],
+  state: GrillState,
+  now: number,
+  append: typeof appendGrillQueue = appendGrillQueue,
+  write: (s: GrillState) => Promise<void> = writeGrillState,
+): Promise<GrillItem[]> {
+  const notesByKey = new Map<string, string | null>();
+  for (const t of tasks) notesByKey.set(t.legacy_id ?? String(t.id), t.notes ?? null);
+  const auto: { item: GrillItem; recommended: string }[] = [];
+  for (const item of queue) {
+    if (state.items[item.key]) continue; // already asked, answered or handled: the rule does not re-sort it
+    const notes = notesByKey.get(item.key) ?? item.context ?? null;
+    const v = classifyGate({ kind: item.kind, title: item.title, notes, recommended: extractRecommendation(notes, null, item.title) });
+    if (!v.gated && v.recommended) auto.push({ item, recommended: v.recommended });
+  }
+  if (!auto.length) return queue;
+  const r = await append(
+    auto.map(({ item, recommended }) => ({ taskId: item.key, title: item.title, why: autoProceedLine(recommended) })),
+    { now },
+  );
+  if (r.wrote === 'nothing') {
+    console.error(`[zoe/grill] gate sort: could not write ${auto.length} auto-proceeded card(s); they stay in the queue`);
+    return queue;
+  }
+  const iso = new Date(now).toISOString();
+  for (const { item, recommended } of auto) {
+    state.items[item.key] = { askedAt: iso, firstAskedAt: iso, status: 'done', answer: autoProceedLine(recommended) };
+  }
+  await write(state);
+  featureRan('grill-gate-sort', `${auto.length} auto-proceeded to the ${r.wrote}`);
+  const handled = new Set(auto.map((a) => a.item.key));
+  return queue.filter((q) => !handled.has(q.key));
 }
 
 /**

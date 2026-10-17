@@ -199,3 +199,57 @@ export async function appendGrillQueue(
     return { wrote: 'nothing', path: spool, count: 0, numbers: [] };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Gated or not (doc 2679 PR 2b; ZOE_GRILL_GATE_SORT=1, default off).
+//
+// The sorted-questions rule (adopted 2026-10-07; lane-autonomy.md): a question
+// reaches Zaal only when it is about money, goes public or outbound, cannot be
+// undone, needs a fact only he has, or changes a setting. Everything else is
+// auto-proceeded on its recommended option, logged where he can override it.
+//
+// "When in doubt it IS gated." So a card is auto-proceeded only when BOTH hold:
+// it carries a recommended option to proceed with, and nothing in its title
+// or notes matches a gated class. Events and PR reviews always stay his.
+// ---------------------------------------------------------------------------
+
+export function gateSortEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_GRILL_GATE_SORT === '1';
+}
+
+export type GateClass = 'money' | 'public' | 'irreversible' | 'his-fact' | 'settings';
+
+const GATE_WORDS: [GateClass, RegExp][] = [
+  ['money', /\$\s?\d|\b(usdc?|eth|sol|pay|paid|payment|payout|invoice|price|pricing|cost|spend|budget|fee|fees|buy|purchase|subscription|grant|donat\w*|sponsor\w*|wallet|token|mint|swap|transfer|refund|billing)\b/i],
+  ['public', /\b(post|posts|publish\w*|tweet|cast|announce\w*|send|email|e-mail|dm|newsletter|outreach|public|press|reply to|share with|invite)\b/i],
+  ['irreversible', /\b(delete|remove|archive|drop|rename|force|on-?chain|deploy|migrat\w*|rotate|revoke|sign|contract|cancel|close (?:the )?account|wipe|purge)\b/i],
+  ['his-fact', /\b(only you|your call|do you|did you|are you|have you|which one do you|who is|whose|his|her)\b/i],
+  ['settings', /\b(setting|settings|flag|env|permission\w*|config\w*|vercel|dns|domain|password|api key|secret)\b/i],
+];
+
+export interface GateVerdict {
+  gated: boolean;
+  /** Every gated class that matched; empty when none did. */
+  classes: GateClass[];
+  /** The option to proceed with, when there is one. */
+  recommended?: string;
+  /** One line saying why, for the log. */
+  reason: string;
+}
+
+/** Pure. Sort one card. `recommended` is the option the card itself names as the pick, if any. */
+export function classifyGate(card: { kind: string; title: string; notes?: string | null; recommended?: string }): GateVerdict {
+  if (card.kind !== 'decision' && card.kind !== 'blocked') {
+    return { gated: true, classes: [], recommended: card.recommended, reason: `${card.kind} cards always stay with Zaal` };
+  }
+  const text = `${card.title}\n${card.notes ?? ''}`;
+  const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
+  if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
+  if (!card.recommended) return { gated: true, classes, reason: 'no recommended option to proceed with' };
+  return { gated: false, classes, recommended: card.recommended, reason: 'no gated class, has a recommended option' };
+}
+
+/** The line written for an auto-proceeded card, so Zaal can find and override it. */
+export function autoProceedLine(recommended: string): string {
+  return `auto-proceeded: ${recommended}, override anytime`;
+}

@@ -43,6 +43,8 @@ export const MAX_WANT_CHARS = 160;
 export const MIN_ASKS_FOR_UPGRADE = 2;
 export const DIGEST_TOP = 5;
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+/** The log stops growing past this; the weekly digest only reads one week. */
+export const MAX_GAP_FILE_BYTES = 256 * 1024;
 
 /** How much two wants must share to count as the same gap. */
 const SAME_GAP = 0.5;
@@ -75,7 +77,19 @@ export interface GapExtract {
   gap: string | null;
 }
 
-const GAP_LINE = /^\s*GAP:\s*(.*)$/;
+/**
+ * A marker line, in the spellings a model plausibly writes (Evaluator, #3918):
+ * a space before the colon, wrapped in ** or __, after a list bullet or a
+ * quote mark. The word itself must be uppercase GAP, which is what the prompt
+ * asks for: "Gap:" and "gap:" start ordinary reply lines ("- Gap: 20 minutes
+ * between sets"), and matching them hid real content from Zaal and logged it
+ * as a want (Evaluator, #3980). Anchored to the start of the line, so the word
+ * inside a sentence is left alone.
+ */
+const GAP_LINE = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s*)*(?:\*\*|__)?\s*GAP\s*(?:\*\*|__)?\s*:\s*(?:\*\*|__)?(.*)$/;
+
+/** A code fence left with nothing inside once its GAP line is gone. */
+const EMPTY_FENCE = /```[^\n]*\n(?:[ \t]*\n)*[ \t]*```/g;
 
 /**
  * Take every `GAP:` line off a reply and return the first non-empty want.
@@ -83,20 +97,33 @@ const GAP_LINE = /^\s*GAP:\s*(.*)$/;
  * Zaal is never sent an empty message.
  */
 export function extractGap(reply: string): GapExtract {
+  const lines = reply.split(/\r?\n/);
   const kept: string[] = [];
   let gap: string | null = null;
-  for (const line of reply.split('\n')) {
+  for (const line of lines) {
     const m = GAP_LINE.exec(line);
     if (!m) {
       kept.push(line);
       continue;
     }
-    const want = cleanWant(m[1]);
+    const want = cleanWant(m[1].replace(/(?:\*\*|__)\s*$/, ''));
     if (gap === null && want) gap = want;
   }
-  if (kept.length === reply.split('\n').length) return { reply, gap: null };
-  const text = kept.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
+  if (kept.length === lines.length) return { reply, gap: null };
+  const text = kept.join('\n').replace(EMPTY_FENCE, '').replace(/\n{3,}/g, '\n\n').trimEnd();
   return { reply: text.trim() ? text : 'I cannot do that yet. I have noted it.', gap };
+}
+
+/**
+ * The week an upgrade check belongs to: the UTC date of the Sunday that starts
+ * it. One check per week, however many times the job runs (Evaluator, #3918:
+ * a failure after queueing released the only sentinel, so a re-run queued a
+ * second item).
+ */
+export function gapWeekKey(now: Date): string {
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return d.toISOString().slice(0, 10);
 }
 
 /** One line, redacted, bounded. Empty when nothing usable is left. */
@@ -209,13 +236,19 @@ Any project a build would borrow from: repo, author, licence as read from the LI
 For EXTEND or NEW: the files a build would touch and the flag it would sit behind (default OFF). Anything that sends, spends or posts is listed as "needs Zaal's ruling".`;
 }
 
-/** Append one gap. Returns false, and writes nothing, when the want is empty. */
+/** Append one gap. Returns false, and writes nothing, when the want is empty or the file is at its cap. */
 export async function appendGap(want: string, now: Date = new Date(), path: string = gapsPath()): Promise<boolean> {
   const clean = cleanWant(want);
   if (!clean) return false;
   const row: GapRow = { ts: now.toISOString(), want: clean };
   await fs.mkdir(join(path, '..'), { recursive: true });
-  await fs.appendFile(path, `${JSON.stringify(row)}\n`);
+  const size = await fs.stat(path).then((st) => st.size).catch(() => 0);
+  if (size >= MAX_GAP_FILE_BYTES) {
+    console.warn(`[zoe/gaps] ${path} is at ${size} bytes (cap ${MAX_GAP_FILE_BYTES}); gap not recorded`);
+    return false;
+  }
+  // Owner-only: the wants are short and redacted, but they are his.
+  await fs.appendFile(path, `${JSON.stringify(row)}\n`, { mode: 0o600 });
   return true;
 }
 

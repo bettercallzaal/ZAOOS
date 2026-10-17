@@ -69,6 +69,27 @@ const WEEK_MS = 7 * DAY_MS;
 /** Owners that are us. Our own repos are the inward scout's job (repo-improver.ts). */
 const OUR_OWNERS: ReadonlySet<string> = new Set(['bettercallzaal', 'zaodevz', 'zao-devz']);
 
+/**
+ * Licences we could take code from with credit (SPDX ids, GitHub's licence
+ * field). Copyleft (GPL, AGPL, LGPL, MPL) and no-reuse licences are left out:
+ * nobody chose this pick, so the door stays as narrow as the use. A repo Zaal
+ * sends by hand still gets a fit check whatever its licence. Changing this
+ * list is a PR.
+ */
+export const PERMISSIVE_LICENCES: ReadonlySet<string> = new Set([
+  'MIT',
+  'MIT-0',
+  'Apache-2.0',
+  'BSD-2-Clause',
+  'BSD-3-Clause',
+  'ISC',
+  '0BSD',
+  'Unlicense',
+  'Zlib',
+  'BSL-1.0',
+  'CC0-1.0',
+]);
+
 /** A list, a course or a book is not something to take code from. */
 const LIST_RE = /\b(awesome|tutorials?|courses?|books?|roadmap|interview|cheat-?sheet|curated)\b/i;
 
@@ -103,7 +124,7 @@ export interface RepoItem {
   fork: boolean;
   pushedAt: string;
   description: string;
-  /** GitHub's licence FIELD, a pre-filter only. The fit check reads the LICENSE file. */
+  /** GitHub's licence FIELD, a pre-filter only (PERMISSIVE_LICENCES). The fit check reads the LICENSE file. */
   licenceField: string;
 }
 
@@ -137,11 +158,16 @@ export function parseSearch(body: unknown): { items: RepoItem[]; malformed: numb
 
 export type DropReason = 'bad-name' | 'ours' | 'archived' | 'fork' | 'stale' | 'stars' | 'licence' | 'list' | 'denied';
 
-/** Extra owners or `owner/name` pairs to refuse, lowercased, from ZOE_SELF_SCOUT_DENY (comma separated). */
+/**
+ * Extra owners or `owner/name` pairs to refuse, lowercased, from
+ * ZOE_SELF_SCOUT_DENY. Commas, semicolons and whitespace all separate: a list
+ * typed with the wrong separator used to become one entry that matched
+ * nothing, so the deny list failed open.
+ */
 export function denyList(env: NodeJS.ProcessEnv = process.env): ReadonlySet<string> {
   return new Set(
     (env.ZOE_SELF_SCOUT_DENY ?? '')
-      .split(',')
+      .split(/[,;\s]+/)
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean),
   );
@@ -167,7 +193,7 @@ export function dropReason(item: RepoItem, now: Date, deny: ReadonlySet<string> 
   const pushed = Date.parse(item.pushedAt);
   if (!Number.isFinite(pushed) || now.getTime() - pushed > FRESH_DAYS * DAY_MS) return 'stale';
   if (!(item.stars >= MIN_STARS)) return 'stars';
-  if (!item.licenceField || item.licenceField === 'NOASSERTION') return 'licence';
+  if (!PERMISSIVE_LICENCES.has(item.licenceField)) return 'licence';
   if (LIST_RE.test(link.repo.replace(/[-_.]/g, ' ')) || LIST_RE.test(item.description)) return 'list';
   return null;
 }

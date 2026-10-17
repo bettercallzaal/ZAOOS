@@ -116,6 +116,11 @@ describe('dropReason', () => {
     ['a star count that is not a number', item('a/b', { stars: Number.NaN }), 'stars'],
     ['no licence field', item('a/b', { licenceField: '' }), 'licence'],
     ['a licence GitHub could not classify', item('a/b', { licenceField: 'NOASSERTION' }), 'licence'],
+    ['a copyleft licence (GPL)', item('a/b', { licenceField: 'GPL-3.0' }), 'licence'],
+    ['a network copyleft licence (AGPL)', item('a/b', { licenceField: 'AGPL-3.0' }), 'licence'],
+    ['a weak copyleft licence (MPL)', item('a/b', { licenceField: 'MPL-2.0' }), 'licence'],
+    ['a no-reuse licence', item('a/b', { licenceField: 'CC-BY-NC-4.0' }), 'licence'],
+    ['an SPDX id in the wrong case', item('a/b', { licenceField: 'mit' }), 'licence'],
     ['an awesome list by name', item('x/awesome-agent-tutorial'), 'list'],
     ['a book by name', item('x/ai-agent-book'), 'list'],
     ['a course by description', item('x/agents', { description: 'A free course on agents' }), 'list'],
@@ -125,6 +130,10 @@ describe('dropReason', () => {
     ['a reserved GitHub path', item('orgs/thing'), 'bad-name'],
   ])('drops %s', (_name, it_, why) => {
     expect(dropReason(it_ as RepoItem, NOW)).toBe(why);
+  });
+
+  it.each(['MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', 'Unlicense', '0BSD'])('keeps a permissive licence: %s', (lic) => {
+    expect(dropReason(item('a/b', { licenceField: lic }), NOW)).toBeNull();
   });
 
   it('does not treat a word that merely contains "book" as a list', () => {
@@ -138,6 +147,12 @@ describe('dropReason', () => {
     expect(dropReason(item('Other/Repo'), NOW, deny)).toBe('denied');
     expect(dropReason(item('other/else'), NOW, deny)).toBeNull();
     expect(denyList({}).size).toBe(0);
+  });
+
+  it('splits the deny list on semicolons and whitespace too, so a mistyped list does not fail open', () => {
+    expect([...denyList({ ZOE_SELF_SCOUT_DENY: 'one;two three\nfour/repo' })]).toEqual(['one', 'two', 'three', 'four/repo']);
+    // red control: under the old comma-only split this was ONE entry and denied nothing.
+    expect(dropReason(item('two/anything'), NOW, denyList({ ZOE_SELF_SCOUT_DENY: 'one; two' }))).toBe('denied');
   });
 });
 
@@ -312,7 +327,8 @@ describe('the wiring', () => {
 
   it('queues only resource items, proves the library is readable, and does not retry a failed week', () => {
     expect(block).toContain("enqueue: (input) => enqueueScoutWork(input, undefined, 'resource'),");
-    expect(block).toContain("if ((await fs.readdir(researchDir)).length === 0) throw new Error('research library is empty');");
+    expect(block).toContain("if ((await fs.readdir(researchDir)).length === 0) throw new Error('research library is empty');")
+    expect(block).toContain('findDocsMatching(researchDir, repoMentionTest(link), 3, undefined, undefined, true)');;
     expect(block).not.toContain('releaseFire');
     expect(block.match(/runSelfScout\(/g)).toHaveLength(1);
   });

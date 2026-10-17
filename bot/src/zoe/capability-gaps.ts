@@ -79,11 +79,14 @@ export interface GapExtract {
 
 /**
  * A marker line, in the spellings a model plausibly writes (Evaluator, #3918):
- * any case, a space before the colon, wrapped in ** or __, after a list bullet
- * or a quote mark. Anchored to the start of the line, so the word inside a
- * sentence is left alone.
+ * a space before the colon, wrapped in ** or __, after a list bullet or a
+ * quote mark. The word itself must be uppercase GAP, which is what the prompt
+ * asks for: "Gap:" and "gap:" start ordinary reply lines ("- Gap: 20 minutes
+ * between sets"), and matching them hid real content from Zaal and logged it
+ * as a want (Evaluator, #3980). Anchored to the start of the line, so the word
+ * inside a sentence is left alone.
  */
-const GAP_LINE = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s*)*(?:\*\*|__)?\s*gap\s*(?:\*\*|__)?\s*:\s*(?:\*\*|__)?(.*)$/i;
+const GAP_LINE = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s*)*(?:\*\*|__)?\s*GAP\s*(?:\*\*|__)?\s*:\s*(?:\*\*|__)?(.*)$/;
 
 /** A code fence left with nothing inside once its GAP line is gone. */
 const EMPTY_FENCE = /```[^\n]*\n(?:[ \t]*\n)*[ \t]*```/g;

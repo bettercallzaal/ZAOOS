@@ -226,8 +226,6 @@ describe('appendGap and readGaps', () => {
 
 describe('marker spellings a model plausibly writes (Evaluator, #3918)', () => {
   it.each([
-    ['gap: set a reminder at 3pm'],
-    ['Gap: set a reminder at 3pm'],
     ['GAP : set a reminder at 3pm'],
     ['**GAP:** set a reminder at 3pm'],
     ['**GAP: set a reminder at 3pm**'],
@@ -252,6 +250,16 @@ describe('marker spellings a model plausibly writes (Evaluator, #3918)', () => {
     const r = extractGap('Answer first.\n\n```\nGAP: speak the reply aloud\n```');
     expect(r.reply).toBe('Answer first.');
     expect(r.gap).toBe('speak the reply aloud');
+  });
+
+  // Verbatim from the #3980 Evaluator probe: each was eaten by a case-insensitive marker.
+  it.each([
+    ['Schedule:\n- Gap: 20 minutes between sets\n- Doors at 7'],
+    ['Plan:\n1. Gap: none, back to back'],
+    ['gap: the venue closes at 9, so we wrap early.'],
+    ['Gap: set a reminder at 3pm'],
+  ])('a lowercase or title-case "gap:" line is ordinary content: %j', (reply) => {
+    expect(extractGap(reply)).toEqual({ reply, gap: null });
   });
 
   it('the word inside a sentence is still left alone and not recorded', () => {

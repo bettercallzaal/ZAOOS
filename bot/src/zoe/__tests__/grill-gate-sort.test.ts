@@ -235,7 +235,7 @@ describe('a bare option letter is checked against that option\'s own text', () =
   it('a dangerous option text in the notes keeps the card', () => {
     const v = classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: 'A wire the funds / B wait', recommended: 'A' });
     expect(v.gated).toBe(true);
-    expect(v.reason).toBe('option A is not an allowlisted reversible choice');
+    expect(v.reason).toBe('an option on the card is not an allowlisted reversible choice');
   });
   it('a letter whose option is not on the card stays with Zaal', () => {
     expect(classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: null, recommended: 'B' })).toMatchObject({
@@ -359,5 +359,55 @@ describe('auto-deferred: fail closed, the log, and the digest', () => {
     });
     expect(text).toContain('Grill paused');
     expect(text).toContain('Tidy the tabs section (choice: later)');
+  });
+});
+
+// Seat round 5 on #3984: for a bare letter the whole card must be options only.
+describe('a bare letter: duplicates, unsafe siblings and stray notes stay with Zaal', () => {
+  it("the seat's case: a benign A in the title, a second A in the notes", () => {
+    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B docs', notes: 'A sell the NFTs', recommended: 'A' });
+    expect(v.gated).toBe(true);
+  });
+  it('a duplicate letter alone is enough, even when both copies look safe', () => {
+    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B wait', notes: 'A tests first / B later', recommended: 'A' });
+    expect(v).toMatchObject({ gated: true, reason: 'option A appears more than once on the card' });
+  });
+  it('an unsafe sibling option keeps the card, even when the picked one is safe', () => {
+    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B stake the treasury', notes: null, recommended: 'A' });
+    expect(v).toMatchObject({ gated: true, reason: 'an option on the card is not an allowlisted reversible choice' });
+  });
+  it('a plan written beside the options keeps the card', () => {
+    const v = classifyGate({
+      kind: 'decision',
+      title: 'Next step? A lint first / B wait',
+      notes: 'A lint first / B wait\nPlan: stake the treasury after',
+      recommended: 'A',
+    });
+    expect(v).toMatchObject({ gated: true, reason: 'option A appears more than once on the card' });
+    const w = classifyGate({ kind: 'decision', title: 'Next step? A lint first / B wait', notes: 'Plan: stake the treasury after', recommended: 'A' });
+    expect(w).toMatchObject({ gated: true, reason: 'the notes carry text beside the options' });
+  });
+  it('options only, plus the recommendation line, still goes', () => {
+    const v = classifyGate({ kind: 'decision', title: 'Next step? A lint first / B wait', notes: 'recommended: A', recommended: 'A' });
+    expect(v).toMatchObject({ gated: false, choice: 'lint first' });
+  });
+});
+
+describe('the auto-deferred log is capped', () => {
+  it('keeps the last 7 days and at most 1,000 lines', async () => {
+    const dir = await fs.mkdtemp(join(tmpdir(), 'autodef-cap-'));
+    const path = join(dir, 'auto-deferred.jsonl');
+    const now = Date.parse('2026-10-17T12:00:00Z');
+    try {
+      await appendAutoDeferred([{ taskId: 'old', title: 'Old', choice: 'later', at: '2026-10-01T12:00:00Z' }], path, now);
+      const many = Array.from({ length: 1005 }, (_, i) => ({ taskId: `t${i}`, title: `T${i}`, choice: 'park it', at: '2026-10-17T11:00:00Z' }));
+      expect(await appendAutoDeferred(many, path, now)).toBe(true);
+      const lines = (await fs.readFile(path, 'utf8')).split('\n').filter(Boolean);
+      expect(lines).toHaveLength(1000);
+      expect(lines.some((l) => l.includes('"old"'))).toBe(false);
+      expect(lines.at(-1)).toContain('"t1004"');
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
+    }
   });
 });

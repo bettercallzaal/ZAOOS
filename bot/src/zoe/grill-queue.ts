@@ -296,16 +296,24 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
   let optionText = '';
   const letter = /^(?:option )?([a-d])(?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/.exec(card.recommended.trim().toLowerCase())?.[1];
   if (letter) {
-    const found = [card.title, card.notes ?? '']
-      .flatMap((t) => t.split('\n'))
-      .flatMap((line) => parseItemOptions(line).options)
-      .find((o) => o.letter === letter.toUpperCase());
-    if (!found) return { gated: true, classes: [], recommended: card.recommended, reason: `option ${letter.toUpperCase()} is not shown on the card` };
-    // Round 4: the letter is only as safe as what it picks. Its option text must
-    // itself be an allowlisted reversible choice, or the card stays with Zaal.
-    if (!allowlistedChoice(found.text)) {
-      return { gated: true, classes: [], recommended: card.recommended, reason: `option ${letter.toUpperCase()} is not an allowlisted reversible choice` };
-    }
+    const L = letter.toUpperCase();
+    const gate = (reason: string): GateVerdict => ({ gated: true, classes: [], recommended: card.recommended, reason });
+    const lines = [card.title, card.notes ?? ''].flatMap((t) => t.split('\n'));
+    const options = lines.flatMap((line) => parseItemOptions(line).options);
+    // Round 5 (seat on #3984): a second "A" elsewhere on the card could fake a
+    // benign option, and a plan written beside the options could say what A
+    // really does. So for a bare letter the whole card must be options only:
+    // the letter appears once, every option is itself an allowed choice, and
+    // the notes hold nothing but option lines and the recommendation line.
+    if (options.filter((o) => o.letter === L).length > 1) return gate(`option ${L} appears more than once on the card`);
+    const found = options.find((o) => o.letter === L);
+    if (!found) return gate(`option ${L} is not shown on the card`);
+    if (options.some((o) => !allowlistedChoice(o.text))) return gate('an option on the card is not an allowlisted reversible choice');
+    const strayNote = (card.notes ?? '')
+      .split('\n')
+      .map((l) => l.trim())
+      .find((l) => l && !parseItemOptions(l).options.length && !/^(?:\(|\*\*)?(?:recommended|recommendation|recommends?|pick|rec):/i.test(l));
+    if (strayNote !== undefined) return gate('the notes carry text beside the options');
     optionText = found.text;
   }
   const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}\n${optionText}`;
@@ -344,17 +352,37 @@ export function autoDeferredPath(): string {
   return process.env.ZOE_AUTO_DEFERRED_PATH || join(homedir(), '.zao/zoe/auto-deferred.jsonl');
 }
 
-/** Append deferred cards to the log. Returns false when the write failed, so the caller keeps the cards in front of Zaal. */
-export async function appendAutoDeferred(entries: AutoDeferred[], path: string = autoDeferredPath()): Promise<boolean> {
+export const AUTO_DEFERRED_KEEP_DAYS = 7;
+export const AUTO_DEFERRED_KEEP_LINES = 1000;
+
+/**
+ * Append deferred cards to the log, then trim it to the last 7 days and at
+ * most 1,000 lines (the digest reads only 24 hours). Returns false when the
+ * append failed, so the caller keeps the cards in front of Zaal. A failed trim
+ * is logged and does not undo the append.
+ */
+export async function appendAutoDeferred(
+  entries: AutoDeferred[],
+  path: string = autoDeferredPath(),
+  now: number = Date.now(),
+): Promise<boolean> {
   if (!entries.length) return true;
   try {
     await fs.mkdir(dirname(path), { recursive: true });
     await fs.appendFile(path, entries.map((e) => JSON.stringify(e)).join('\n') + '\n', 'utf8');
-    return true;
   } catch (e) {
     console.error('[zoe/grill-queue] could not log auto-deferred cards:', (e as Error)?.message);
     return false;
   }
+  try {
+    const keep = (await readAutoDeferred(now - AUTO_DEFERRED_KEEP_DAYS * 24 * 3600 * 1000, path)).slice(-AUTO_DEFERRED_KEEP_LINES);
+    const tmp = `${path}.tmp`;
+    await fs.writeFile(tmp, keep.map((e) => JSON.stringify(e)).join('\n') + (keep.length ? '\n' : ''), 'utf8');
+    await fs.rename(tmp, path);
+  } catch (e) {
+    console.error('[zoe/grill-queue] could not trim the auto-deferred log (the append stands):', (e as Error)?.message);
+  }
+  return true;
 }
 
 /** Deferred cards logged at or after `sinceMs`. A missing log is an empty list; an unreadable line is skipped. */

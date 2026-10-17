@@ -1,6 +1,9 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { communityAskOutcome, discordScopeFor } from '../discord-scope';
+import { readFileSync } from 'node:fs';
+import { Client, MessageMentions } from 'discord.js';
+import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, DISCORD_DEFAULT_PER_HOUR, mentionsZoe } from '../discord-scope';
+import { newMemberDmLimiter } from '../member-dm';
 
 const OWNER = '111';
 
@@ -27,5 +30,108 @@ describe('communityAskOutcome', () => {
   });
   it('holds, does not send, when Zaal could not be reached', () => {
     expect(communityAskOutcome(false)).toBe('held');
+  });
+});
+
+// Doc 2685 D1: before 2026-10-17 any Discord user got unlimited model turns.
+describe('discordTurnAllowed', () => {
+  it('a non-owner gets perHour turns in an hour, then is refused', () => {
+    const lim = newMemberDmLimiter();
+    const t0 = 1_000_000;
+    for (let i = 0; i < 3; i++) expect(discordTurnAllowed(lim, '222', OWNER, t0 + i, 3)).toBe(true);
+    expect(discordTurnAllowed(lim, '222', OWNER, t0 + 10, 3)).toBe(false);
+  });
+  it('the window slides: an hour later the same user is allowed again', () => {
+    const lim = newMemberDmLimiter();
+    expect(discordTurnAllowed(lim, '222', OWNER, 0, 1)).toBe(true);
+    expect(discordTurnAllowed(lim, '222', OWNER, 1_000, 1)).toBe(false);
+    expect(discordTurnAllowed(lim, '222', OWNER, 60 * 60 * 1000 + 1, 1)).toBe(true);
+  });
+  it('users are counted separately', () => {
+    const lim = newMemberDmLimiter();
+    expect(discordTurnAllowed(lim, '222', OWNER, 0, 1)).toBe(true);
+    expect(discordTurnAllowed(lim, '333', OWNER, 0, 1)).toBe(true);
+  });
+  it('Zaal is never limited, and is not counted', () => {
+    const lim = newMemberDmLimiter();
+    for (let i = 0; i < 50; i++) expect(discordTurnAllowed(lim, OWNER, OWNER, i, 1)).toBe(true);
+    expect(lim.turns.size).toBe(0);
+  });
+  it('with no owner id configured, nobody is exempt', () => {
+    const lim = newMemberDmLimiter();
+    expect(discordTurnAllowed(lim, OWNER, undefined, 0, 1)).toBe(true);
+    expect(discordTurnAllowed(lim, OWNER, undefined, 1, 1)).toBe(false);
+  });
+  it('snowflake ids keep their full precision as string keys', () => {
+    const lim = newMemberDmLimiter();
+    // These differ only past 2^53, so as Numbers they would collide.
+    expect(discordTurnAllowed(lim, '1234567890123456789', OWNER, 0, 1)).toBe(true);
+    expect(discordTurnAllowed(lim, '1234567890123456788', OWNER, 0, 1)).toBe(true);
+  });
+});
+
+describe('discordTurnsPerHour', () => {
+  it.each([
+    [undefined, DISCORD_DEFAULT_PER_HOUR],
+    ['12', 12],
+    ['2.9', 2],
+    ['0', DISCORD_DEFAULT_PER_HOUR],
+    ['abc', DISCORD_DEFAULT_PER_HOUR],
+    ['Infinity', DISCORD_DEFAULT_PER_HOUR],
+  ])('%s -> %s', (raw, want) => {
+    expect(discordTurnsPerHour(raw === undefined ? {} : { DISCORD_TURNS_PER_HOUR: raw })).toBe(want);
+  });
+});
+
+describe('discord.ts wiring (read as text; the module boots a client)', () => {
+  const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+  const intents = src.slice(src.indexOf('intents: ['), src.indexOf(']', src.indexOf('intents: [')));
+  it('asks for no privileged Message Content intent (doc 2685 D2)', () => {
+    expect(intents).toContain('GatewayIntentBits.DirectMessages');
+    expect(intents).not.toContain('MessageContent');
+  });
+  it('checks the turn cap before any model work', () => {
+    const cap = src.indexOf('discordTurnAllowed(');
+    expect(cap).toBeGreaterThan(-1);
+    expect(cap).toBeLessThan(src.indexOf('runConciergeTurn({'));
+    expect(cap).toBeLessThan(src.indexOf('sendTyping()'));
+  });
+  it('announces the first reply per boot (doc 2685 D3)', () => {
+    expect(src).toContain("featureRan('discord-reply'");
+  });
+});
+
+// Real discord.js MessageMentions (14.14.0), no login: a client whose user
+// cache holds ZOE, and a message object carrying that client.
+describe('mentionsZoe (evaluator, #3998)', () => {
+  const BOT = '900000000000000001';
+  const client = new Client({ intents: [] });
+  // biome-ignore lint/suspicious/noExplicitAny: private cache API, test only
+  (client.users as any)._add({ id: BOT, username: 'ZOE', bot: true });
+  const mentions = (users: string[], everyone: boolean) =>
+    // The constructor is private in the typings; it is the class discord.js builds per message.
+    // biome-ignore lint/suspicious/noExplicitAny: private constructor and minimal message shape, test only
+    new (MessageMentions as any)({ client, guild: null }, users.map((id) => ({ id, username: 'u' })), [], everyone) as MessageMentions;
+
+  it('an @everyone message does NOT trigger ZOE', () => {
+    expect(mentionsZoe(mentions([], true), BOT)).toBe(false);
+  });
+  it('control: the bare has() the adapter used to call DOES treat @everyone as a mention', () => {
+    expect(mentions([], true).has(BOT)).toBe(true);
+  });
+  it('a direct @ZOE mention triggers, with or without @everyone in it', () => {
+    expect(mentionsZoe(mentions([BOT], false), BOT)).toBe(true);
+    expect(mentionsZoe(mentions([BOT], true), BOT)).toBe(true);
+  });
+  it('a mention of someone else does not trigger', () => {
+    expect(mentionsZoe(mentions(['222'], false), BOT)).toBe(false);
+  });
+  it('no bot id yet (client not ready) never triggers', () => {
+    expect(mentionsZoe(mentions([BOT], true), undefined)).toBe(false);
+  });
+  it('wiring: discord.ts triggers channel replies through mentionsZoe, not a bare has()', () => {
+    const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+    expect(src).toContain('mentionsZoe(message.mentions, client.user?.id)');
+    expect(src).not.toContain('mentions.has(');
   });
 });

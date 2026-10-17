@@ -53,7 +53,8 @@ export function memberDmScope(userId: number): string {
 }
 
 export interface MemberDmLimiter {
-  turns: Map<number, number[]>;
+  // Telegram ids are numbers; Discord ids are snowflake strings (discord.ts).
+  turns: Map<number | string, number[]>;
 }
 
 export function newMemberDmLimiter(): MemberDmLimiter {
@@ -61,7 +62,7 @@ export function newMemberDmLimiter(): MemberDmLimiter {
 }
 
 /** True when this member may have another turn now. Records the turn. */
-export function allowMemberTurn(state: MemberDmLimiter, userId: number, nowMs: number, perHour: number): boolean {
+export function allowMemberTurn(state: MemberDmLimiter, userId: number | string, nowMs: number, perHour: number): boolean {
   const recent = (state.turns.get(userId) ?? []).filter((t) => nowMs - t < MEMBER_DM_WINDOW_MS);
   if (recent.length >= perHour) {
     state.turns.set(userId, recent);

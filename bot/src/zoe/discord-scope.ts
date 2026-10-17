@@ -10,6 +10,8 @@
  * takes the same path. Pure so it can be tested without a Discord client.
  */
 
+import { allowMemberTurn, type MemberDmLimiter } from './member-dm';
+
 export interface DiscordScopeInput {
   isDM: boolean;
   authorId: string;
@@ -25,6 +27,46 @@ export function discordScopeFor(m: DiscordScopeInput): 'private' | string {
   if (m.isDM && m.ownerId && m.authorId === m.ownerId) return 'private';
   if (m.isDM) return `discord-dm:${m.authorId}`;
   return `discord:${m.channelId}`;
+}
+
+/** The one method of discord.js `MessageMentions` this needs. */
+export interface MentionsLike {
+  has(id: string, options?: { ignoreEveryone?: boolean; ignoreRoles?: boolean }): boolean;
+}
+
+/**
+ * True only when ZOE itself is @mentioned. discord.js `has()` defaults to
+ * ignoreEveryone=false and ignoreRoles=false (MessageMentions.js, 14.14.0), so
+ * the bare call answered every @everyone and @here, and any role ZOE holds,
+ * in every channel. Evaluator finding on #3998, 2026-10-17.
+ */
+export function mentionsZoe(mentions: MentionsLike, botId: string | undefined): boolean {
+  if (!botId) return false;
+  return mentions.has(botId, { ignoreEveryone: true, ignoreRoles: true });
+}
+
+/**
+ * Turns per hour for anyone on Discord who is not Zaal. Every DM and every
+ * @mention is a full model turn, and before 2026-10-17 nothing bounded them
+ * (doc 2685 D1). Same default as Telegram member DMs (member-dm.ts).
+ */
+export const DISCORD_DEFAULT_PER_HOUR = 6;
+
+export function discordTurnsPerHour(env: NodeJS.ProcessEnv = process.env): number {
+  const n = Number(env.DISCORD_TURNS_PER_HOUR);
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : DISCORD_DEFAULT_PER_HOUR;
+}
+
+/** Zaal is never limited; everyone else shares the per-user hourly window. */
+export function discordTurnAllowed(
+  limiter: MemberDmLimiter,
+  authorId: string,
+  ownerId: string | undefined,
+  nowMs: number,
+  perHour: number,
+): boolean {
+  if (ownerId && authorId === ownerId) return true;
+  return allowMemberTurn(limiter, authorId, nowMs, perHour);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
 import { z } from 'zod';
-import { setXmtpAddress, XmtpAddressTakenError } from '@/lib/directory';
+import { MemberNotInDirectoryError, setXmtpAddress, XmtpAddressTakenError } from '@/lib/directory';
 import { requireMember } from '@/lib/membership';
 import { clientIp, limits } from '@/lib/rate-limit';
 import { addressClaimMessage } from '@/lib/xmtp/address-claim';
@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
     } catch (error: unknown) {
       if (error instanceof XmtpAddressTakenError) {
         return NextResponse.json({ error: 'This address belongs to another member' }, { status: 409 });
+      }
+      if (error instanceof MemberNotInDirectoryError) {
+        console.error(`[xmtp-address POST] fid ${session.fid} has no directory row`);
+        return NextResponse.json(
+          { error: 'You are not in the member directory yet. Sign out and sign in again.' },
+          { status: 404 },
+        );
       }
       throw error;
     }

@@ -32,7 +32,7 @@ tier: QUICK
 
 ## Community signal
 
-The GitHub issue index was fetched, but no individual issue was read. It is therefore not evidence for a community claim. The local failure was measured directly: a deleted application path produced `MCP startup failed: No such file or directory`; removing the stale entry made `codex exec` start cleanly.
+One GitHub issue provides a concrete `codex exec --json` limitation: its author reports that context-compaction lifecycle events are omitted from the JSON stream, so an embedding application cannot log that event. An HN commenter describes using agent CLIs as a Linux utility for CI and PR review. These are user reports, not plan-limit measurements. The local failure was measured directly: a deleted application path produced `MCP startup failed: No such file or directory`; removing the stale entry made `codex exec` start cleanly.
 
 The requested seven-day PR inventory could not be obtained: GitHub's owner-repo pagination returned no rows on 2026-10-16. This is an instrument result, not evidence that there were zero PRs. Re-run it with authenticated REST pagination before assigning a percentage of lane work.
 
@@ -59,8 +59,8 @@ The requested seven-day PR inventory could not be obtained: GitHub's owner-repo 
 - [OpenAI Codex MCP](https://developers.openai.com/codex/mcp/) [FULL - fetched 2026-10-16]
 - [OpenAI Codex agents](https://developers.openai.com/codex/agents/) [FULL - fetched 2026-10-16]
 - [OpenAI ChatGPT pricing](https://openai.com/chatgpt/pricing/) [FULL - fetched 2026-10-16; no Zaal plan price recorded]
-- [openai/codex GitHub issues](https://github.com/openai/codex/issues) [PARTIAL - issue index fetched; individual issue sample not read; hold label keeps this out of auto-merge]
-- Reddit Codex plan reports [FAILED - no fetched thread before the research window closed; requires a fetched thread before this can become research-complete]
-- Hacker News Codex plan reports [FAILED - no fetched thread before the research window closed; requires a fetched thread before this can become research-complete]
+- [openai/codex #50593: `exec --json` context-compaction lifecycle](https://github.com/openai/codex/issues/50593) [FULL - issue body fetched 2026-10-17]
+- [HN 43708025: OpenAI Codex CLI](https://news.ycombinator.com/item?id=43708025) [FULL - thread and top comments fetched 2026-10-17]
+- Reddit Codex plan reports [FAILED - reddit.com returned a block page; Redlib mirrors at redlib.private.coffee, redlib.perennialte.ch, and redlib.tux.pizza failed or returned no result on 2026-10-17. Requires a fetched thread before this can become research-complete]
 - [Doc 2664](../2664-claude-working-style-ported-to-codex/) [FULL - local repository source]
 - [Doc 2675](../2675-claude-rate-limit-multi-tool-routing/) [FULL - local repository source]

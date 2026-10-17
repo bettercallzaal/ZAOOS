@@ -153,3 +153,39 @@ describe('sortOutAutoProceed - with injected IO', () => {
     expect(out).toHaveLength(4);
   });
 });
+
+// Seat re-review on #3984: an allowed keyword anywhere in the recommendation
+// let the rest of it through. Every shape is now anchored to the whole
+// recommendation, so an allowed word plus a dangerous verb is gated. The first
+// two are the seat's probes; the next ten are this lane's own.
+const COMBOS = [
+  'later: wire the money',
+  'hold off then wire funds',
+  'first delete the repo',
+  'skip review and merge',
+  'option A then deploy',
+  'defer and burn tokens',
+  'tabs then push to main',
+  'later post it',
+  'do lint first then ship',
+  'A: transfer the funds',
+  'shorter wording, then tell the sponsor',
+  'park it and publish',
+];
+describe('anchored allow shapes - an allowed word plus a dangerous verb stays gated', () => {
+  it.each(COMBOS)('%s is not an allowlisted choice, and the card stays with Zaal', (rec) => {
+    expect(allowlistedChoice(rec)).toBe(false);
+    expect(classifyGate({ kind: 'decision', title: 'Which lane goes first tomorrow', notes: null, recommended: rec }).gated).toBe(true);
+  });
+  it('the new money words are gated by the word list too', () => {
+    for (const w of ['wire it', 'move the money', 'release funds', 'pay cash', 'venmo him', 'zelle', 'paypal', 'stripe link', 'send $50']) {
+      const v = classifyGate({ kind: 'decision', title: `Should we ${w}? A yes / B no`, notes: null, recommended: 'A' });
+      expect(v.classes).toContain('money');
+    }
+  });
+  it('the allowed shapes still go when they are the whole recommendation', () => {
+    for (const rec of ['A', 'option B', 'C)', 'A (pick)', 'do lint first', 'lint before tests', 'tabs on top', 'clearer wording', 'skip the optional step', 'defer until monday', 'later']) {
+      expect(allowlistedChoice(rec)).toBe(true);
+    }
+  });
+});

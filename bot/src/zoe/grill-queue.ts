@@ -221,7 +221,7 @@ export function gateSortEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
 export type GateClass = 'money' | 'public' | 'irreversible' | 'his-fact' | 'settings';
 
 const GATE_WORDS: [GateClass, RegExp][] = [
-  ['money', /\$\s?\d|\b(usdc?|eth|sol|pay|paid|payments?|payouts?|invoices?|price|pricing|costs?|spend|budget|fees?|buy|purchase|subscriptions?|grants?|donat\w*|sponsor\w*|wallets?|tokens?|mint\w*|swap|transfers?|refunds?|billing|burn\w*)\b/i],
+  ['money', /\$\s?\d|send \$|\b(wire\w*|money|funds?|cash|venmo|zelle|paypal|stripe|usdc?|eth|sol|pay|paid|payments?|payouts?|invoices?|price|pricing|costs?|spend|budget|fees?|buy|purchase|subscriptions?|grants?|donat\w*|sponsor\w*|wallets?|tokens?|mint\w*|swap|transfers?|refunds?|billing|burn\w*)\b/i],
   ['public', /\b(post|posts|publish\w*|tweet|cast|announce\w*|send|email|e-mail|dm|newsletter|outreach|public|press|reply to|share with|invite|tell|notify|message|broadcast\w*|upload\w*|go(?:ing)? live|livestream\w*|stream it|launch\w*|ship\w*|release)\b/i],
   ['irreversible', /\b(delete|rm|remove|archive|drop|rename|force|on-?chain|deploy\w*|migrat\w*|rotate|revoke|sign|contract|cancel|close (?:the )?account|wipe|purge|merge\w*|push\w*|production|prod|commit\w*)\b/i],
   ['his-fact', /\b(only you|your call|do you|did you|are you|have you|which one do you|who is|whose|his|her)\b/i],
@@ -230,22 +230,37 @@ const GATE_WORDS: [GateClass, RegExp][] = [
 
 /**
  * The reversible choice shapes a recommendation may take for a card to be
- * auto-proceeded (fail closed, seat review on #3984): a bare option letter,
- * an ordering, tabs, layout, naming or wording, which file or doc first, or
- * skip and defer. Any other recommendation keeps the card with Zaal; the
+ * auto-proceeded (fail closed, seat reviews on #3984): a bare option letter,
+ * an ordering of one or two named things, tabs or wording, or a bare skip or
+ * defer. Each matches the WHOLE recommendation, never a keyword inside it. Any other recommendation keeps the card with Zaal; the
  * gated word list above then runs as a second check over title, notes and
  * the recommendation together.
  */
+const DAY = '(?:tomorrow|next week|next month|later|monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
 const ALLOW_SHAPES: RegExp[] = [
-  /^\s*(?:option\s+)?[A-D](?:\)|\.)?(?:\s*\((?:pick|rec\w*)\))?\s*$/i,
-  /\b(first|second|third|then|order|reorder|before|after|next)\b/i,
-  /\b(tabs?|layout|naming|name it|wording|phrasing|title it|label)\b/i,
-  /\b(skip|defer|later|wait|hold|park|not now)\b/i,
+  // a bare option letter: "A", "option B", "C)", "A (pick)"
+  /^(?:option )?[a-d](?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/,
+  // an ordering of one or two named things: "do lint first", "zao-app first", "lint before tests"
+  /^(?:do )?[\w-]+(?: [\w-]+)? (?:first|second|third|next|last)$/,
+  /^[\w-]+ (?:before|after|then) [\w-]+$/,
+  // tabs, layout, wording
+  /^(?:keep |use )?(?:the )?(?:one |two |three )?tabs?(?: on (?:top|bottom|the left|the right))?$/,
+  /^(?:shorter|longer|plainer|simpler|clearer) (?:wording|phrasing|title|label)$/,
+  // skip or defer, and nothing else
+  /^skip(?: it| this| the optional [\w-]+| optional [\w-]+)?$/,
+  new RegExp(`^(?:defer|park|hold)(?: it)?(?: (?:to|until) ${DAY})?$`),
+  /^(?:later|not now|wait)$/,
 ];
 
-/** Pure. True when a recommendation is one of the allowlisted reversible choice shapes. */
+/**
+ * Pure. True when the WHOLE recommendation is one of the allowlisted shapes.
+ * Each shape is anchored at both ends (seat re-review on #3984: an unanchored
+ * keyword let "later: wire the money" through), so any extra verb or object
+ * drops the card back to gated. Over-gating is the safe failure.
+ */
 export function allowlistedChoice(recommended: string): boolean {
-  return ALLOW_SHAPES.some((re) => re.test(recommended));
+  const r = recommended.trim().replace(/\s+/g, ' ').toLowerCase();
+  return ALLOW_SHAPES.some((re) => re.test(r));
 }
 
 export interface GateVerdict {

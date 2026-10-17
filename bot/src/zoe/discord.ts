@@ -11,10 +11,14 @@
  * - DISCORD_COMMUNITY_ASKS_ENABLED: set to "1" to enable Stage 1b approval flow
  *   (non-owner messages route through Zaal for button-approval before sending)
  *
- * Intents required:
- * - Message Content Intent
- * - Guild Messages
- * - Direct Messages
+ * Intents required (none privileged):
+ * - Guilds, Guild Messages, Direct Messages
+ * - NOT Message Content: ZOE reads only DMs and @mentions, and Discord sends
+ *   the content of those without it (doc 2685 D2). Asking for a privileged
+ *   intent the app does not use is more data and a Portal toggle for nothing.
+ *
+ * Other people's turns are capped per hour (DISCORD_TURNS_PER_HOUR, default 6;
+ * doc 2685 D1). Zaal's are not.
  */
 
 import { toolPolicyForScope } from './scope-lock';
@@ -31,7 +35,9 @@ import {
 } from 'discord.js';
 import { runConciergeTurn } from './concierge';
 import { buildMemoryBlocks } from './memory';
-import { communityAskOutcome, discordScopeFor } from './discord-scope';
+import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour } from './discord-scope';
+import { featureRan } from './feature-ran';
+import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
 
 loadEnv();
@@ -39,6 +45,8 @@ loadEnv();
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const DISCORD_ZAAL_ID = process.env.DISCORD_ZAAL_ID;
 const COMMUNITY_ASKS_ENABLED = process.env.DISCORD_COMMUNITY_ASKS_ENABLED === '1';
+
+const turnLimiter = newMemberDmLimiter();
 
 // Maximum message length for Discord (2000 chars).
 const DISCORD_MAX = 1990;
@@ -125,7 +133,6 @@ export async function bootDiscordClient(): Promise<Client | null> {
     intents: [
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessages,
-      GatewayIntentBits.MessageContent,
       GatewayIntentBits.DirectMessages,
     ],
   });
@@ -166,6 +173,11 @@ export async function bootDiscordClient(): Promise<Client | null> {
       }
 
       if (!triggered) return;
+
+      if (!discordTurnAllowed(turnLimiter, message.author.id, DISCORD_ZAAL_ID, Date.now(), discordTurnsPerHour())) {
+        await message.reply({ content: MEMBER_DM_LIMIT_LINE, allowedMentions: { repliedUser: false } });
+        return;
+      }
 
       await message.channel.sendTyping();
 
@@ -248,6 +260,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
         await message.reply({ content: chunk, allowedMentions: { repliedUser: false } });
       }
       console.log(`[zoe/discord] replied to ${senderLabel} in ${message.channel.isDMBased() ? 'DM' : 'channel'}`);
+      featureRan('discord-reply', message.channel.isDMBased() ? 'DM' : 'channel');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[zoe/discord] message handler error:', msg);

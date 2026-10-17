@@ -242,6 +242,29 @@ const GATE_WORDS: [GateClass, RegExp][] = [
 // from the card itself are deliberately not added: whoever writes a card could
 // plant them. Any other ordering comes to Zaal.
 const ORDER_NOUN = '(?:lint|tests?|typecheck|build|docs?|readme|review|spec|changelog)';
+// The only questions a bare-letter card may ask (seat round 6 on #3984: a
+// dangerous title over safe-looking options went through). The title minus
+// its option text must be one of these, lower-cased, trailing "?" or ":" off.
+const CHOICE_QUESTIONS: RegExp[] = [
+  /^(?:which|what) (?:one |check |step |doc |file |section )?(?:goes |comes |runs )?(?:first|next)$/,
+  /^what order$/,
+  /^(?:which|what) (?:layout|wording|tabs?)$/,
+  new RegExp(`^${ORDER_NOUN} or ${ORDER_NOUN}$`),
+];
+
+/**
+ * A recommendation line: what the notes may hold beside option lines, and the
+ * line whose value must be bare. One pattern for both, so no line can be
+ * allowed by one check and skipped by the other.
+ */
+const REC_LINE = /(?:^|[\s(*])(?:recommended|recommendation|recommends?|rec)\s*:\s*(.*)$/i;
+
+/** Pure. True when a question is one of the allowlisted choice questions. */
+export function allowlistedQuestion(question: string): boolean {
+  const q = question.trim().replace(/\s+/g, ' ').toLowerCase().replace(/[?:\s]+$/, '');
+  return CHOICE_QUESTIONS.some((re) => re.test(q));
+}
+
 const DAY = '(?:tomorrow|next week|next month|later|monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
 const ALLOW_SHAPES: RegExp[] = [
   // a bare option letter: "A", "option B", "C)", "A (pick)"
@@ -295,6 +318,18 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
   // letter cannot be checked, so the card stays with Zaal.
   let optionText = '';
   const letter = /^(?:option )?([a-d])(?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/.exec(card.recommended.trim().toLowerCase())?.[1];
+  // Round 6: a "recommended:" line must hold only the bare value. Otherwise
+  // "recommended: A. liquidate after" reads as A and the rest goes unread.
+  const recLine = REC_LINE;
+  for (const line of [card.title, card.notes ?? ''].flatMap((t) => t.split('\n'))) {
+    const m = recLine.exec(line);
+    if (!m) continue;
+    const value = m[1].replace(/^\*+|\*+$/g, '').replace(/[)\s.;*]+$/, '').trim().toLowerCase();
+    if (value !== card.recommended.trim().toLowerCase()) {
+      return { gated: true, classes: [], recommended: card.recommended, reason: 'the recommended line holds more than the bare value' };
+    }
+  }
+
   if (letter) {
     const L = letter.toUpperCase();
     const gate = (reason: string): GateVerdict => ({ gated: true, classes: [], recommended: card.recommended, reason });
@@ -312,8 +347,13 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
     const strayNote = (card.notes ?? '')
       .split('\n')
       .map((l) => l.trim())
-      .find((l) => l && !parseItemOptions(l).options.length && !/^(?:\(|\*\*)?(?:recommended|recommendation|recommends?|pick|rec):/i.test(l));
+      .find((l) => l && !parseItemOptions(l).options.length && !REC_LINE.test(l));
     if (strayNote !== undefined) return gate('the notes carry text beside the options');
+    // The question the options answer: the title with its option text taken off.
+    // parseItemOptions returns the whole title when it carries no options.
+    if (!allowlistedQuestion(parseItemOptions(card.title).question)) {
+      return gate('the title is not an allowlisted choice question');
+    }
     optionText = found.text;
   }
   const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}\n${optionText}`;

@@ -74,11 +74,12 @@ describe('classifyGate - fail closed on plain gated actions', () => {
 });
 
 describe('classifyGate - what is auto-proceeded (allowlist controls)', () => {
-  it.each(['do lint first', 'option B', 'A'])('%s goes', (rec) => {
+  it.each(['do lint first', 'lint before tests', 'tabs on top'])('%s goes', (rec) => {
     expect(allowlistedChoice(rec)).toBe(true);
-    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint first / B tests first', notes: null, recommended: rec })).toMatchObject({
+    expect(classifyGate({ kind: 'decision', title: 'Which check runs first?', notes: null, recommended: rec })).toMatchObject({
       gated: false,
       recommended: rec,
+      choice: rec,
     });
   });
   it('tabs, wording and defer shapes are allowlisted; an action is not', () => {
@@ -189,7 +190,7 @@ describe('anchored allow shapes - an allowed word plus a dangerous verb stays ga
     }
   });
   it('the allowed shapes still go when they are the whole recommendation', () => {
-    for (const rec of ['A', 'option B', 'C)', 'A (pick)', 'do lint first', 'lint before tests', 'tabs on top', 'clearer wording', 'skip the optional step', 'defer until monday', 'later']) {
+    for (const rec of ['do lint first', 'lint before tests', 'tabs on top', 'clearer wording', 'skip the optional step', 'defer until monday', 'later']) {
       expect(allowlistedChoice(rec)).toBe(true);
     }
   });
@@ -228,27 +229,6 @@ describe('ordering shapes take only the fixed nouns', () => {
   });
 });
 
-describe('a bare option letter is checked against that option\'s own text', () => {
-  // Options are only ever read from the title and notes, which the gate list
-  // already scans, so this case is also caught without the option check (red
-  // control, run). The check's own effect is the next test: a letter whose
-  // option the card does not show is refused.
-  it('a dangerous option text in the notes keeps the card', () => {
-    const v = classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: 'A wire the funds / B wait', recommended: 'A' });
-    expect(v.gated).toBe(true);
-    expect(v.reason).toBe('an option on the card is not an allowlisted reversible choice');
-  });
-  it('a letter whose option is not on the card stays with Zaal', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: null, recommended: 'B' })).toMatchObject({
-      gated: true,
-      reason: 'option B is not shown on the card',
-    });
-  });
-  it('a safe option text still goes', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint first / B tests first', notes: null, recommended: 'B' }).gated).toBe(false);
-  });
-});
-
 // Seat round 4 on #3984: a bare letter is only as safe as the option it picks.
 const ROUND4 = [
   'stake the treasury',
@@ -262,18 +242,6 @@ const ROUND4 = [
   'unlock the account',
   'fire Sam',
 ];
-describe('a bare letter auto-proceeds only when its option text is itself an allowed shape', () => {
-  it.each(ROUND4)('A = %s stays with Zaal', (option) => {
-    const v = classifyGate({ kind: 'decision', title: `Next step? A ${option} / B wait`, notes: null, recommended: 'A' });
-    expect(v.gated).toBe(true);
-  });
-  it('a benign option letter still goes, and the choice is the option text', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Which first? A lint first / B wait', notes: null, recommended: 'A' })).toMatchObject({
-      gated: false,
-      choice: 'lint first',
-    });
-  });
-});
 
 describe('auto-deferred cards are logged and listed in the digest', () => {
   it('the defer shapes are exactly skip, defer/park/hold, later/not now/wait', () => {
@@ -363,37 +331,6 @@ describe('auto-deferred: fail closed, the log, and the digest', () => {
   });
 });
 
-// Seat round 5 on #3984: for a bare letter the whole card must be options only.
-describe('a bare letter: duplicates, unsafe siblings and stray notes stay with Zaal', () => {
-  it("the seat's case: a benign A in the title, a second A in the notes", () => {
-    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B docs', notes: 'A sell the NFTs', recommended: 'A' });
-    expect(v.gated).toBe(true);
-  });
-  it('a duplicate letter alone is enough, even when both copies look safe', () => {
-    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B wait', notes: 'A tests first / B later', recommended: 'A' });
-    expect(v).toMatchObject({ gated: true, reason: 'option A appears more than once on the card' });
-  });
-  it('an unsafe sibling option keeps the card, even when the picked one is safe', () => {
-    const v = classifyGate({ kind: 'decision', title: 'Pick: A lint first / B stake the treasury', notes: null, recommended: 'A' });
-    expect(v).toMatchObject({ gated: true, reason: 'an option on the card is not an allowlisted reversible choice' });
-  });
-  it('a plan written beside the options keeps the card', () => {
-    const v = classifyGate({
-      kind: 'decision',
-      title: 'Next step? A lint first / B wait',
-      notes: 'A lint first / B wait\nPlan: stake the treasury after',
-      recommended: 'A',
-    });
-    expect(v).toMatchObject({ gated: true, reason: 'option A appears more than once on the card' });
-    const w = classifyGate({ kind: 'decision', title: 'Next step? A lint first / B wait', notes: 'Plan: stake the treasury after', recommended: 'A' });
-    expect(w).toMatchObject({ gated: true, reason: 'the notes carry text beside the options' });
-  });
-  it('options only, plus the recommendation line, still goes', () => {
-    const v = classifyGate({ kind: 'decision', title: 'Which first? A lint first / B wait', notes: 'recommended: A', recommended: 'A' });
-    expect(v).toMatchObject({ gated: false, choice: 'lint first' });
-  });
-});
-
 describe('the auto-deferred log is capped', () => {
   it('keeps the last 7 days and at most 1,000 lines', async () => {
     const dir = await fs.mkdtemp(join(tmpdir(), 'autodef-cap-'));
@@ -413,48 +350,76 @@ describe('the auto-deferred log is capped', () => {
   });
 });
 
-// Seat round 6 on #3984.
-describe('a bare letter: the title must be an allowlisted choice question', () => {
-  it("the seat's case: a dangerous title over safe options stays with Zaal", () => {
-    const v = classifyGate({ kind: 'decision', title: 'Sell the NFTs? A lint first / B docs before tests', notes: null, recommended: 'A' });
-    expect(v).toMatchObject({ gated: true, reason: 'the title is not an allowlisted choice question' });
+// Seat round 7 on #3984: six rounds of checks on what a letter stands for each
+// left a way to hide the real action, so a letter recommendation never
+// auto-proceeds. Every bare-letter probe from rounds 3 to 7 is kept here,
+// including the cards that used to go, and each must stay with Zaal.
+const LETTER = 'an option letter always goes to Zaal';
+const LETTER_PROBES: Array<[string, string, string | null, string]> = [
+  // round 3
+  ['round 3: dangerous option text in the notes', 'Next step for the lane', 'A wire the funds / B wait', 'A'],
+  ['round 3: a letter whose option is not on the card', 'Next step for the lane', null, 'B'],
+  ['round 3: a safe option text (used to go)', 'Which check runs first? A lint first / B tests first', null, 'B'],
+  // round 4
+  ...ROUND4.map((o): [string, string, string | null, string] => [`round 4: A = ${o}`, `Next step? A ${o} / B wait`, null, 'A']),
+  ['round 4: a benign option letter (used to go)', 'Which first? A lint first / B wait', null, 'A'],
+  // round 5
+  ["round 5: a benign A in the title, a second A in the notes", 'Pick: A lint first / B docs', 'A sell the NFTs', 'A'],
+  ['round 5: a duplicate letter, both copies safe', 'Pick: A lint first / B wait', 'A tests first / B later', 'A'],
+  ['round 5: an unsafe sibling option', 'Pick: A lint first / B stake the treasury', null, 'A'],
+  ['round 5: options repeated beside a plan', 'Next step? A lint first / B wait', 'A lint first / B wait\nPlan: stake the treasury after', 'A'],
+  ['round 5: a plan beside the options', 'Next step? A lint first / B wait', 'Plan: stake the treasury after', 'A'],
+  ['round 5: options plus the recommendation line (used to go)', 'Which first? A lint first / B wait', 'recommended: A', 'A'],
+  // round 6
+  ['round 6: a dangerous title over safe options', 'Sell the NFTs? A lint first / B docs before tests', null, 'A'],
+  ...['Liquidate the pool?', 'Next step?', 'Pick:', 'Go ahead?', 'Sell or hold?'].map((q): [string, string, string | null, string] => [
+    `round 6: title ${q}`,
+    `${q} A lint first / B wait`,
+    null,
+    'A',
+  ]),
+  ...['Which first?', 'What goes first?', 'Which check runs first?', 'What order?', 'Which layout?', 'Which wording?', 'Lint or tests?'].map(
+    (q): [string, string, string | null, string] => [`round 6: allowed title ${q} (used to go)`, `${q} A lint first / B wait`, null, 'A'],
+  ),
+  ['round 6: options only in the notes, dangerous title', 'Sell the NFTs', 'A lint first / B wait', 'A'],
+  ['round 6: options only in the notes (used to go)', 'Which first', 'A lint first / B wait', 'A'],
+  ["round 6: 'recommended: A. liquidate after'", 'Which first? A lint first / B wait', 'recommended: A. liquidate after', 'A'],
+  ["round 6: 'rec: A. liquidate after'", 'Which first? A lint first / B wait', 'rec: A. liquidate after', 'A'],
+  ...['recommended: A', '**recommended:** A', '(recommended: A)', 'recommended: A.'].map((n): [string, string, string | null, string] => [
+    `round 6: bare value ${n} (used to go)`,
+    'Which first? A lint first / B wait',
+    n,
+    'A',
+  ]),
+  // round 7
+  ['round 7: text before an option line', 'Which first?', 'liquidate the treasury. A lint first / B docs', 'A'],
+  ['round 7: text before a mid-line recommended:', 'Which first? A lint first / B docs', 'liquidate the treasury. recommended: A', 'A'],
+];
+describe('an option letter always goes to Zaal', () => {
+  it.each(LETTER_PROBES)('%s', (_name, title, notes, rec) => {
+    expect(classifyGate({ kind: 'decision', title, notes, recommended: rec })).toMatchObject({ gated: true, reason: LETTER });
   });
-  it.each(['Liquidate the pool?', 'Next step?', 'Pick:', 'Go ahead?', 'Sell or hold?'])('%s stays with Zaal', (q) => {
-    expect(classifyGate({ kind: 'decision', title: `${q} A lint first / B wait`, notes: null, recommended: 'A' }).gated).toBe(true);
+  it.each(['A', 'b', 'option B', 'C)', 'D.', 'A (pick)', 'A (recommended)', '  a  '])('every letter form: %s', (rec) => {
+    expect(classifyGate({ kind: 'decision', title: 'Which first?', notes: null, recommended: rec })).toMatchObject({ gated: true, reason: LETTER });
+    expect(allowlistedChoice(rec)).toBe(false);
   });
-  it.each(['Which first?', 'What goes first?', 'Which check runs first?', 'What order?', 'Which layout?', 'Which wording?', 'Lint or tests?'])(
-    '%s goes',
-    (q) => {
-      expect(classifyGate({ kind: 'decision', title: `${q} A lint first / B wait`, notes: null, recommended: 'A' }).gated).toBe(false);
-    },
-  );
-  it('options only in the notes: the whole title is the question', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Sell the NFTs', notes: 'A lint first / B wait', recommended: 'A' }).gated).toBe(true);
-    expect(classifyGate({ kind: 'decision', title: 'Which first', notes: 'A lint first / B wait', recommended: 'A' }).gated).toBe(false);
+  it('a phrase that starts with a letter is not mistaken for one', () => {
+    expect(classifyGate({ kind: 'decision', title: 'Which first?', notes: null, recommended: 'docs before tests' }).gated).toBe(false);
   });
 });
 
 describe('a recommended line must hold only the bare value', () => {
-  it("the seat's case: 'recommended: A. liquidate after' stays with Zaal", () => {
-    const v = classifyGate({ kind: 'decision', title: 'Which first? A lint first / B wait', notes: 'recommended: A. liquidate after', recommended: 'A' });
-    expect(v).toMatchObject({ gated: true, reason: 'the recommended line holds more than the bare value' });
-  });
-  it('the same for a non-letter recommendation', () => {
-    expect(classifyGate({ kind: 'decision', title: 'Which first', notes: 'recommended: lint first; then wire the funds', recommended: 'lint first' }).gated).toBe(
-      true,
-    );
-  });
-  it("a short 'rec:' line is held to the same rule", () => {
-    expect(classifyGate({ kind: 'decision', title: 'Which first? A lint first / B wait', notes: 'rec: A. liquidate after', recommended: 'A' }).gated).toBe(true);
-  });
-  it("'Pick:' in a title is part of the question, not a recommendation line", () => {
-    expect(classifyGate({ kind: 'decision', title: 'Pick: A lint first / B wait', notes: null, recommended: 'A' }).reason).toBe(
-      'the title is not an allowlisted choice question',
-    );
+  it('trailing text after a non-letter recommendation stays with Zaal', () => {
+    for (const notes of ['recommended: lint first; then wire the funds', 'recommended: lint first. liquidate after', 'rec: lint first. liquidate after']) {
+      expect(classifyGate({ kind: 'decision', title: 'Which first', notes, recommended: 'lint first' })).toMatchObject({
+        gated: true,
+        reason: 'the recommended line holds more than the bare value',
+      });
+    }
   });
   it('bare values in the usual wrappings still go', () => {
-    for (const notes of ['recommended: A', '**recommended:** A', '(recommended: A)', 'recommended: A.']) {
-      expect(classifyGate({ kind: 'decision', title: 'Which first? A lint first / B wait', notes, recommended: 'A' }).gated).toBe(false);
+    for (const notes of ['recommended: lint first', '**recommended:** lint first', '(recommended: lint first)', 'recommended: lint first.']) {
+      expect(classifyGate({ kind: 'decision', title: 'Which first', notes, recommended: 'lint first' }).gated).toBe(false);
     }
   });
 });

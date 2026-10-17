@@ -34,7 +34,6 @@
 import { promises as fs } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
-import { parseItemOptions } from './terminal-grill';
 
 export interface GrillQueueCard {
   taskId: string;
@@ -242,34 +241,26 @@ const GATE_WORDS: [GateClass, RegExp][] = [
 // from the card itself are deliberately not added: whoever writes a card could
 // plant them. Any other ordering comes to Zaal.
 const ORDER_NOUN = '(?:lint|tests?|typecheck|build|docs?|readme|review|spec|changelog)';
-// The only questions a bare-letter card may ask (seat round 6 on #3984: a
-// dangerous title over safe-looking options went through). The title minus
-// its option text must be one of these, lower-cased, trailing "?" or ":" off.
-const CHOICE_QUESTIONS: RegExp[] = [
-  /^(?:which|what) (?:one |check |step |doc |file |section )?(?:goes |comes |runs )?(?:first|next)$/,
-  /^what order$/,
-  /^(?:which|what) (?:layout|wording|tabs?)$/,
-  new RegExp(`^${ORDER_NOUN} or ${ORDER_NOUN}$`),
-];
 
 /**
- * A recommendation line: what the notes may hold beside option lines, and the
- * line whose value must be bare. One pattern for both, so no line can be
- * allowed by one check and skipped by the other.
+ * A recommendation that is only an option letter: "A", "option B", "C)",
+ * "A (pick)". Seat round 7 on #3984: six rounds of checks on what a letter
+ * stands for each left a way to hide the real action, so a letter never
+ * auto-proceeds. Any such card goes to Zaal.
+ */
+const OPTION_LETTER = /^(?:option )?[a-d](?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/;
+
+/**
+ * A recommendation line. Its value must be the bare recommendation, so
+ * "recommended: lint first. liquidate after" cannot read as "lint first" with
+ * the rest unread (seat round 6). This guards text recommendations, not
+ * letters, so it stays after round 7.
  */
 const REC_LINE = /(?:^|[\s(*])(?:recommended|recommendation|recommends?|rec)\s*:\s*(.*)$/i;
 
-/** Pure. True when a question is one of the allowlisted choice questions. */
-export function allowlistedQuestion(question: string): boolean {
-  const q = question.trim().replace(/\s+/g, ' ').toLowerCase().replace(/[?:\s]+$/, '');
-  return CHOICE_QUESTIONS.some((re) => re.test(q));
-}
-
 const DAY = '(?:tomorrow|next week|next month|later|monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
 const ALLOW_SHAPES: RegExp[] = [
-  // a bare option letter: "A", "option B", "C)", "A (pick)"
-  /^(?:option )?[a-d](?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/,
-  // an ordering of one of the fixed nouns below: "do lint first", "docs before tests"
+  // an ordering of one of the fixed nouns above: "do lint first", "docs before tests"
   new RegExp(`^(?:do |run )?(?:the )?${ORDER_NOUN} (?:first|second|third|next|last)$`),
   new RegExp(`^(?:the )?${ORDER_NOUN} (?:before|after|then) (?:the )?${ORDER_NOUN}$`),
   // tabs, layout, wording
@@ -281,6 +272,10 @@ const ALLOW_SHAPES: RegExp[] = [
   /^(?:later|not now|wait)$/,
 ];
 
+function norm(text: string): string {
+  return text.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
 /**
  * Pure. True when the WHOLE recommendation is one of the allowlisted shapes.
  * Each shape is anchored at both ends (seat re-review on #3984: an unanchored
@@ -288,7 +283,7 @@ const ALLOW_SHAPES: RegExp[] = [
  * drops the card back to gated. Over-gating is the safe failure.
  */
 export function allowlistedChoice(recommended: string): boolean {
-  const r = recommended.trim().replace(/\s+/g, ' ').toLowerCase();
+  const r = norm(recommended);
   return ALLOW_SHAPES.some((re) => re.test(r));
 }
 
@@ -298,7 +293,7 @@ export interface GateVerdict {
   classes: GateClass[];
   /** The option to proceed with, when there is one. */
   recommended?: string;
-  /** What is actually chosen: the option's text for a bare letter, else the recommendation. Set only when not gated. */
+  /** What is actually chosen. Set only when not gated. */
   choice?: string;
   /** One line saying why, for the log. */
   reason: string;
@@ -310,56 +305,19 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
     return { gated: true, classes: [], recommended: card.recommended, reason: `${card.kind} cards always stay with Zaal` };
   }
   if (!card.recommended) return { gated: true, classes: [], reason: 'no recommended option to proceed with' };
-  if (!allowlistedChoice(card.recommended)) {
-    return { gated: true, classes: [], recommended: card.recommended, reason: 'recommendation is not an allowlisted reversible choice' };
-  }
-  // A bare option letter says nothing by itself: the gate list must also read
-  // what that option IS (seat round 3). If the card shows no such option, the
-  // letter cannot be checked, so the card stays with Zaal.
-  let optionText = '';
-  const letter = /^(?:option )?([a-d])(?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/.exec(card.recommended.trim().toLowerCase())?.[1];
-  // Round 6: a "recommended:" line must hold only the bare value. Otherwise
-  // "recommended: A. liquidate after" reads as A and the rest goes unread.
-  const recLine = REC_LINE;
+  const gate = (reason: string): GateVerdict => ({ gated: true, classes: [], recommended: card.recommended, reason });
+  if (OPTION_LETTER.test(norm(card.recommended))) return gate('an option letter always goes to Zaal');
+  if (!allowlistedChoice(card.recommended)) return gate('recommendation is not an allowlisted reversible choice');
   for (const line of [card.title, card.notes ?? ''].flatMap((t) => t.split('\n'))) {
-    const m = recLine.exec(line);
+    const m = REC_LINE.exec(line);
     if (!m) continue;
     const value = m[1].replace(/^\*+|\*+$/g, '').replace(/[)\s.;*]+$/, '').trim().toLowerCase();
-    if (value !== card.recommended.trim().toLowerCase()) {
-      return { gated: true, classes: [], recommended: card.recommended, reason: 'the recommended line holds more than the bare value' };
-    }
+    if (value !== norm(card.recommended)) return gate('the recommended line holds more than the bare value');
   }
-
-  if (letter) {
-    const L = letter.toUpperCase();
-    const gate = (reason: string): GateVerdict => ({ gated: true, classes: [], recommended: card.recommended, reason });
-    const lines = [card.title, card.notes ?? ''].flatMap((t) => t.split('\n'));
-    const options = lines.flatMap((line) => parseItemOptions(line).options);
-    // Round 5 (seat on #3984): a second "A" elsewhere on the card could fake a
-    // benign option, and a plan written beside the options could say what A
-    // really does. So for a bare letter the whole card must be options only:
-    // the letter appears once, every option is itself an allowed choice, and
-    // the notes hold nothing but option lines and the recommendation line.
-    if (options.filter((o) => o.letter === L).length > 1) return gate(`option ${L} appears more than once on the card`);
-    const found = options.find((o) => o.letter === L);
-    if (!found) return gate(`option ${L} is not shown on the card`);
-    if (options.some((o) => !allowlistedChoice(o.text))) return gate('an option on the card is not an allowlisted reversible choice');
-    const strayNote = (card.notes ?? '')
-      .split('\n')
-      .map((l) => l.trim())
-      .find((l) => l && !parseItemOptions(l).options.length && !REC_LINE.test(l));
-    if (strayNote !== undefined) return gate('the notes carry text beside the options');
-    // The question the options answer: the title with its option text taken off.
-    // parseItemOptions returns the whole title when it carries no options.
-    if (!allowlistedQuestion(parseItemOptions(card.title).question)) {
-      return gate('the title is not an allowlisted choice question');
-    }
-    optionText = found.text;
-  }
-  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}\n${optionText}`;
+  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}`;
   const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
   if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
-  return { gated: false, classes, recommended: card.recommended, choice: optionText || card.recommended, reason: 'allowlisted reversible choice, no gated class' };
+  return { gated: false, classes, recommended: card.recommended, choice: card.recommended, reason: 'allowlisted reversible choice, no gated class' };
 }
 
 /** The line written for an auto-proceeded card, so Zaal can find and override it. */
@@ -373,7 +331,7 @@ export function autoProceedLine(recommended: string): string {
 // listed in the daily needs-Zaal digest, so nothing urgent is parked silently.
 // ---------------------------------------------------------------------------
 
-const DEFER_SHAPES: RegExp[] = [ALLOW_SHAPES[5], ALLOW_SHAPES[6], ALLOW_SHAPES[7]];
+const DEFER_SHAPES: RegExp[] = [ALLOW_SHAPES[4], ALLOW_SHAPES[5], ALLOW_SHAPES[6]];
 
 /** Pure. True when a choice parks the card rather than doing something. */
 export function isDeferChoice(choice: string): boolean {

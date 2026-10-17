@@ -18,6 +18,7 @@ import { VERDICTS, type VerdictKey, verdictButtons } from './backlog-grill';
 import { refreshVault, vaultFreshnessLine, type VaultFreshness } from './vault-freshness';
 import { wasSendBlocked } from './send-budget';
 import { RESUME_ROW, isGrillPaused } from './grill-pause';
+import { readAutoDeferred, type AutoDeferred } from './grill-queue';
 
 export interface LaneGrillItem {
   lane: string;
@@ -138,7 +139,7 @@ export function parseLaneGrillSections(
   return items;
 }
 
-function extractRecommendation(notes?: string | null, metadata?: Record<string, unknown> | null, title?: string): string | undefined {
+export function extractRecommendation(notes?: string | null, metadata?: Record<string, unknown> | null, title?: string): string | undefined {
   if (metadata && typeof metadata.recommended === 'string' && metadata.recommended.trim()) {
     return metadata.recommended.trim();
   }
@@ -247,12 +248,26 @@ export function formatNeedsZaalDigest(opts: {
   decisions: NeedsZaalTask[];
   /** Zaal tapped Stop grill: questions are counted, not shown, and no cards follow. */
   grillPaused?: boolean;
+  /** Cards the grill proceeded with or parked on its own in the last 24 hours (grill-queue.ts, ZOE_GRILL_GATE_SORT). Always listed. */
+  autoDeferred?: AutoDeferred[];
 }): string {
   const slotLabel = opts.timeSlot === 'morning' ? '08:00 ET (Morning)' : '20:00 ET (Evening)';
   const total = opts.dueSoon.length + opts.laneAsks.length + opts.decisions.length;
 
+  const deferred = opts.autoDeferred ?? [];
+  // Every auto-handled card, proceeded or deferred, is named, even on an
+  // otherwise clear day, so nothing closes without him seeing it (seat rounds
+  // 4 and 8 on #3984).
+  const deferredBlock = deferred.length
+    ? [
+        `⏸️ **AUTO-PROCEEDED OR DEFERRED, last 24h (${deferred.length}):** override any of these by replying`,
+        ...deferred.map((d) => `• ${d.title} (choice: ${d.choice})`),
+        '',
+      ]
+    : [];
   if (total === 0) {
-    return `📋 **Needs Zaal Digest — ${slotLabel}**\n\n✨ All clear! No items due <48h, no lane grill questions, and no open board decisions.`;
+    const clear = `📋 **Needs Zaal Digest — ${slotLabel}**\n\n✨ All clear! No items due <48h, no lane grill questions, and no open board decisions.`;
+    return deferredBlock.length ? `${clear}\n\n${deferredBlock.join('\n').trimEnd()}` : clear;
   }
 
   const lines: string[] = [
@@ -276,7 +291,8 @@ export function formatNeedsZaalDigest(opts: {
   if (opts.grillPaused) {
     const held = opts.laneAsks.length + opts.decisions.length;
     lines.push(`Grill paused: ${held} question${held === 1 ? '' : 's'} held (${opts.laneAsks.length} from lanes, ${opts.decisions.length} board decisions). Tap Resume grill to see them again.`);
-    return lines.join('\n');
+    if (deferredBlock.length) lines.push('', ...deferredBlock);
+    return lines.join('\n').trimEnd();
   }
 
   if (opts.laneAsks.length > 0) {
@@ -301,6 +317,7 @@ export function formatNeedsZaalDigest(opts: {
     lines.push('');
   }
 
+  lines.push(...deferredBlock);
   lines.push(`_Tap inline buttons on the cards below to rule instantly._`);
   return lines.join('\n');
 }
@@ -360,12 +377,14 @@ export async function runNeedsZaalDigest(opts: {
 
   const { dueSoon, decisions } = filterNeedsZaalTasks(adaptedTasks, now);
 
+  const autoDeferred = await readAutoDeferred(now.getTime() - 24 * 3600 * 1000);
   const digestText = formatNeedsZaalDigest({
     timeSlot: opts.timeSlot,
     dueSoon,
     laneAsks,
     decisions,
     grillPaused,
+    autoDeferred,
   });
 
   // First line, always: how old is the copy this was built from. Plain text, so it

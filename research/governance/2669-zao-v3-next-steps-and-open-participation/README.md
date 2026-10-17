@@ -2,7 +2,7 @@
 topic: governance
 type: decision
 status: research-complete
-last-validated: 2026-10-13
+last-validated: 2026-10-17
 related-docs: "2656, 2657, 2642, 2562, 2419, 1200, 1202, 1233, 1207, 981, 696, 059"
 original-query: "can we do deep research on next steps to build ZAO V3 and finish up what we need to get this to be friendly for everoyne to participate in"
 tier: DEEP
@@ -17,6 +17,8 @@ ZAO V3 here means the whole of The ZAO and the work of the past few months, take
 
 **How this doc was made.** Three read-only agents on 2026-10-13: one read the ZAOOS library, the private decision record and `bettercallzaal/zao-papers`; one fetched the live public surfaces and read the zingfisher and `zao-fractal-bot` code; one did outside research. The parent re-ran eight load-bearing checks directly (marked "re-checked" below). Everything else is the agents' reading and is cited to its source so it can be re-run.
 
+**Correction, 2026-10-17.** This doc blamed the `/member/join` 404 on Postgres and proposed pointing the Join button elsewhere. Both were wrong. The cause was the app's middleware: `apps/webapp/middleware.ts` rewrote any first path segment missing from `DOMAIN_BLACKLIST` to a space route, and `member` was not on that list. A second list, the route guard's public pages, also lacked `learn` and `member`. zingfisher PR #7 fixed both, without the database, and merged on 2026-10-13. Re-checked 2026-10-17 with curl: `/member/join` returns 200, `/learn` 200, and a made-up path 404. The rows below that this changes are marked "Corrected 2026-10-17". Later the same week: zingfisher PR #9 restored real wallet sign-in behind a switch (off in production), and PR #10 specified the database table for ZIDs and member profiles.
+
 **Loud caveats, before anything else.**
 - Reddit could not be read (the Reddit fetch script returned no credentials) and six Hacker News queries found no relevant thread. The community evidence here is governance forums and GitHub issues, not Reddit or HN.
 - Four surfaces could not be rendered: `zao.frapps.xyz` (empty React shell to curl), the `luma.com/zao` event list, `zaoos.com` past its title, and the target of the "Join the ZAO!" button on `thezao.com`.
@@ -26,7 +28,7 @@ ZAO V3 here means the whole of The ZAO and the work of the past few months, take
 
 | # | Decision | Why | Evidence |
 |---|----------|-----|----------|
-| 1 | FIX the join dead end before any new feature. `/learn` and the member gate both send people to `/member/join`, which is HTTP 404 on the live preview. Until Postgres is up and the route serves, point the button at the Discord invite and the Lu.ma calendar. | It is the main call to action and it leads nowhere. | Re-checked 2026-10-13: `curl https://zingfisher-webapp.vercel.app/member/join` returns 404; `/learn` returns 200. Code: `apps/webapp/components/zao/ZaoMemberGate.tsx:35-50`, `apps/webapp/pages/member/join.tsx`. |
+| 1 | DONE: the join dead end is fixed. `/learn` and the member gate both send people to `/member/join`, which was HTTP 404 on the live preview. Corrected 2026-10-17: the cause was middleware, not Postgres; zingfisher PR #7 fixed it and the page now serves, so the button stays where it is. | It is the main call to action, and it led nowhere until 2026-10-13. | Re-checked 2026-10-13: `curl https://zingfisher-webapp.vercel.app/member/join` returns 404; `/learn` returns 200. Code: `apps/webapp/components/zao/ZaoMemberGate.tsx:35-50`, `apps/webapp/pages/member/join.tsx`. |
 | 2 | TREAT three items as the Season 3 launch blockers, in this order: the manifesto capture session, the reviewer ask for the OG + ZOR wrapper, and applying the drafted amendment to `zips/zip-0000-season-3.md`. | The ZIP itself says the manifesto gates launch and that the season moves if no reviewer commits. Neither has started. The amendment is drafted and its blockers (zao-papers #14 and #15) merged on 2026-10-13. | `zao-papers` `zips/zip-0000-season-3.md` Open Items 1, 2, 5 and section 9. The amendment is drafted privately and not yet opened as a PR. |
 | 3 | USE the existing Snapshot space `zaal.eth` for ZIP votes, and SET its voting period and quorum. Do not build a vote in zingfisher. | The space already sums OG (18 decimals) and ZOR (token id 0, 0 decimals) on Optimism, which is the vote weight Zaal ruled on 2026-10-10. Its period, delay and quorum are all null. zingfisher's native vote weights by one ERC-20 and cannot add ZOR. | Re-checked 2026-10-13 via `hub.snapshot.org/graphql` for space `zaal.eth`. Code: `packages/lib/src/votes/getVotingPowerForVotes.ts:35`. Snapshot for ZIP votes is per a ruling by Zaal on 2026-10-10. |
 | 4 | TREAT CharmVerse upstream as unmaintained and keep the fork small: `/learn`, the member gate, ZID join, ZIP drafting and discussion. SKIP porting more of CharmVerse's proposal machinery. | `app.charmverse.io` no longer resolves and the repo's last commit is 2025-10-18. Nobody upstream will fix what we inherit. | Re-checked 2026-10-13: `dig app.charmverse.io @1.1.1.1` returns NXDOMAIN (control `snapshot.box` resolves). No shutdown announcement was found; the agent searched one web query and the repo's issues, not CharmVerse's X or Discord. |
@@ -97,11 +99,11 @@ Break types: MISSING (nothing exists), BROKEN (exists, fails), UNCLEAR (exists, 
 | 2 | Looks for how to join | same | UNCLEAR | `thezao.com` names no first action. `test.thezao.com` offers only "Join on Farcaster". Neither links `/learn`; `test.thezao.com/learn` and `/join` are 404 (re-checked). |
 | 3 | Learns what Respect is | `zaofractal.vercel.app` | UNCLEAR | A research library with v0.1 draft chapters. No beginner page, no meeting link. |
 | 4 | Finds the next session | `luma.com/zao` | UNKNOWN | The event list could not be read. Monday 18:00 Eastern is stated on two sites with no call link; Tuesday noon sessions now also run. |
-| 5 | Registers a ZID | `/member/join` | BROKEN | HTTP 404 live. In code it also needs a signed-in wallet, a handle, goals and a peer voucher (`pages/member/join.tsx:22-81`). |
+| 5 | Registers a ZID | `/member/join` | BROKEN | HTTP 404 live when this doc was written. Corrected 2026-10-17: the page serves (200) since zingfisher PR #7; claiming a ZID still needs real sign-in and the database. In code it also needs a signed-in wallet, a handle, goals and a peer voucher (`pages/member/join.tsx:22-81`). |
 | 6 | Attends and is ranked | Discord, v1 bot | HUMAN-DEPENDENT | A facilitator runs it. A session needs 4 people. Late joiners need an admin command. 3 of 11 people on 12 Oct were in no ranking. |
 | 7 | Is recognised as new | v2 CLI | HUMAN-DEPENDENT | Someone must run the newcomers script. Nothing greets the person. |
 | 8 | Respect is minted | OREC | BROKEN, HUMAN-DEPENDENT | v1's button lies; a person submits each room from one key; then 72 hours plus 72 hours; then a person executes. 18 awards recorded as missed. |
-| 9 | Uses Respect for access | zingfisher `/learn` | GATED, UNCLEAR | The gate shows no wallet-connect button; a zero-Respect wallet is sent to the 404. Login needs Postgres. |
+| 9 | Uses Respect for access | zingfisher `/learn` | GATED, UNCLEAR | The gate shows no wallet-connect button; a zero-Respect wallet is sent to the 404. Login needs Postgres. Corrected 2026-10-17: the join page now serves, and PR #9 adds a "Sign in with your wallet" button behind a switch that is off in production. |
 | 10 | Votes on a ZIP | Snapshot `zaal.eth` | MISSING | No ZIP has ever been put there. No period or quorum is set. |
 | 11 | Votes in OREC | `zao.frapps.xyz` | GATED | A ZOR-only holder (43 wallets) has no weight until the wrapper ships. |
 | 12 | Proposes | zingfisher, OREC | GATED | Drafting needs Respect above 0. Publishing needs endorsements from peers whose Respect sums to 1,000 (`packages/config/src/zao.ts:148`, "1000 peer Respect endorsements"). Whether that bar is easy or hard to reach is UNKNOWN: this doc did not read the distribution of Respect across holders. |
@@ -168,7 +170,7 @@ Ranked. "Lane" rows ship as ready PRs with no tap from Zaal beyond the merge. "Z
 
 | # | Action (done when) | Owner | Type | By When |
 |---|--------------------|-------|------|---------|
-| 1 | Point the "Join The ZAO" button at the Discord invite and Lu.ma calendar until `/member/join` serves (done when the button on the live `/learn` no longer reaches a 404) | zao-core lane | PR to zingfisher | 2026-10-15 |
+| 1 | DONE 2026-10-13, differently: `/member/join` itself was fixed (zingfisher PR #7), so the button was not repointed. Done when the button on the live `/learn` no longer reaches a 404: re-checked 2026-10-17, 200. | zao-core lane | PR to zingfisher | 2026-10-15 |
 | 2 | Apply the drafted amendment to `zips/zip-0000-season-3.md`: rolling 90 days in the abstract, Open Item 5 closed by the 2026-10-10 vote-weight ruling, 1 December stated (done when the PR is merged) | zao-core lane | PR to zao-papers | 2026-10-16 |
 | 3 | Write the ZIP path as one page: draft and discuss in zingfisher, vote in Snapshot `zaal.eth`, on-chain actions to OREC, with the proposed period and quorum (done when the PR is merged) | zao-core lane | PR to ZAOOS research | 2026-10-20 |
 | 4 | Measure how many holders it takes to reach 1,000 Respect of endorsements, from the current holder balances, and refresh `research/006`; propose a change to `packages/config/src/zao.ts:148` only if the measurement shows the bar is out of reach (done when the measurement is in a merged PR) | zao-core lane | PR to zingfisher | 2026-10-22 |
@@ -199,7 +201,7 @@ Status is FULL (content read), PARTIAL (what is missing) or FAILED (what was tri
 
 **Live surfaces of The ZAO**
 - [zingfisher /learn](https://zingfisher-webapp.vercel.app/learn) - FULL, curl + HTML strip; status re-checked (200)
-- [zingfisher /member/join](https://zingfisher-webapp.vercel.app/member/join) - FULL, curl; re-checked (404)
+- [zingfisher /member/join](https://zingfisher-webapp.vercel.app/member/join) - FULL, curl; re-checked (404 on 2026-10-13, 200 on 2026-10-17)
 - [thezao.com](https://www.thezao.com/) - PARTIAL, curl; button targets not extracted
 - [test.thezao.com](https://test.thezao.com) - FULL, curl; `/learn` and `/join` re-checked (404)
 - [zaofractal.vercel.app](https://zaofractal.vercel.app) and [/whitepaper](https://zaofractal.vercel.app/whitepaper) - FULL for the index, chapter bodies not read

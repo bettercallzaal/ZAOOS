@@ -34,6 +34,7 @@
 import { promises as fs } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
+import { parseItemOptions } from './terminal-grill';
 
 export interface GrillQueueCard {
   taskId: string;
@@ -236,13 +237,18 @@ const GATE_WORDS: [GateClass, RegExp][] = [
  * gated word list above then runs as a second check over title, notes and
  * the recommendation together.
  */
+// The only things an ordering may name (seat round 3 on #3984: an open word
+// let "withdraw first", "sell first", "restart first" through). Names read
+// from the card itself are deliberately not added: whoever writes a card could
+// plant them. Any other ordering comes to Zaal.
+const ORDER_NOUN = '(?:lint|tests?|typecheck|build|docs?|readme|review|spec|changelog)';
 const DAY = '(?:tomorrow|next week|next month|later|monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
 const ALLOW_SHAPES: RegExp[] = [
   // a bare option letter: "A", "option B", "C)", "A (pick)"
   /^(?:option )?[a-d](?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/,
-  // an ordering of one or two named things: "do lint first", "zao-app first", "lint before tests"
-  /^(?:do )?[\w-]+(?: [\w-]+)? (?:first|second|third|next|last)$/,
-  /^[\w-]+ (?:before|after|then) [\w-]+$/,
+  // an ordering of one of the fixed nouns below: "do lint first", "docs before tests"
+  new RegExp(`^(?:do |run )?(?:the )?${ORDER_NOUN} (?:first|second|third|next|last)$`),
+  new RegExp(`^(?:the )?${ORDER_NOUN} (?:before|after|then) (?:the )?${ORDER_NOUN}$`),
   // tabs, layout, wording
   /^(?:keep |use )?(?:the )?(?:one |two |three )?tabs?(?: on (?:top|bottom|the left|the right))?$/,
   /^(?:shorter|longer|plainer|simpler|clearer) (?:wording|phrasing|title|label)$/,
@@ -282,7 +288,20 @@ export function classifyGate(card: { kind: string; title: string; notes?: string
   if (!allowlistedChoice(card.recommended)) {
     return { gated: true, classes: [], recommended: card.recommended, reason: 'recommendation is not an allowlisted reversible choice' };
   }
-  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}`;
+  // A bare option letter says nothing by itself: the gate list must also read
+  // what that option IS (seat round 3). If the card shows no such option, the
+  // letter cannot be checked, so the card stays with Zaal.
+  let optionText = '';
+  const letter = /^(?:option )?([a-d])(?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/.exec(card.recommended.trim().toLowerCase())?.[1];
+  if (letter) {
+    const found = [card.title, card.notes ?? '']
+      .flatMap((t) => t.split('\n'))
+      .flatMap((line) => parseItemOptions(line).options)
+      .find((o) => o.letter === letter.toUpperCase());
+    if (!found) return { gated: true, classes: [], recommended: card.recommended, reason: `option ${letter.toUpperCase()} is not shown on the card` };
+    optionText = found.text;
+  }
+  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}\n${optionText}`;
   const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
   if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
   return { gated: false, classes, recommended: card.recommended, reason: 'allowlisted reversible choice, no gated class' };

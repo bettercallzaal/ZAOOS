@@ -20,8 +20,8 @@ describe('classifyGate - what stays with Zaal', () => {
     ['his-fact', 'Which wallet is the operations wallet, do you know?', 'recommended: the first one'],
     ['settings', 'Turn on the inbox nudge flag', 'recommended: on'],
   ])('%s: %s', (cls, title, notes) => {
-    // An allowlisted recommendation, so the gated word list is what decides.
-    const v = classifyGate({ kind: 'decision', title, notes, recommended: 'A' });
+    // An allowlisted recommendation with its option shown, so the gated word list is what decides.
+    const v = classifyGate({ kind: 'decision', title: `${title}? A yes / B no`, notes, recommended: 'A' });
     expect(v.gated).toBe(true);
     expect(v.classes).toContain(cls);
   });
@@ -71,7 +71,7 @@ describe('classifyGate - fail closed on plain gated actions', () => {
 describe('classifyGate - what is auto-proceeded (allowlist controls)', () => {
   it.each(['do lint first', 'option B', 'A'])('%s goes', (rec) => {
     expect(allowlistedChoice(rec)).toBe(true);
-    expect(classifyGate({ kind: 'decision', title: 'Which lane goes first tomorrow', notes: null, recommended: rec })).toMatchObject({
+    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint / B tests', notes: null, recommended: rec })).toMatchObject({
       gated: false,
       recommended: rec,
     });
@@ -97,13 +97,13 @@ const fresh = (): GrillState => ({ items: {}, activeKey: null } as GrillState);
 
 describe('sortOutAutoProceed - with injected IO', () => {
   const queue = [
-    item('t1', 'Which lane goes first tomorrow'),
+    item('t1', 'Which check runs first'),
     item('t2', 'Pay the venue deposit'),
     item('t3', 'Pick the order of the recap sections'),
     item('evt:1', '10:00 AM - standup', 'event'),
   ];
   const tasks = [
-    task('t1', 'Which lane goes first tomorrow', 'recommended: zao-app first'),
+    task('t1', 'Which check runs first', 'recommended: lint first'),
     task('t2', 'Pay the venue deposit', 'recommended: pay today'),
     task('t3', 'Pick the order of the recap sections', null),
   ];
@@ -120,9 +120,9 @@ describe('sortOutAutoProceed - with injected IO', () => {
       async () => {
         saved += 1;
       });
-    expect(written).toEqual([{ taskId: 't1', title: 'Which lane goes first tomorrow', why: 'auto-proceeded: zao-app first, override anytime' }]);
+    expect(written).toEqual([{ taskId: 't1', title: 'Which check runs first', why: 'auto-proceeded: lint first, override anytime' }]);
     expect(out.map((q) => q.key)).toEqual(['t2', 't3', 'evt:1']);
-    expect(state.items.t1).toMatchObject({ status: 'done', answer: 'auto-proceeded: zao-app first, override anytime' });
+    expect(state.items.t1).toMatchObject({ status: 'done', answer: 'auto-proceeded: lint first, override anytime' });
     expect(saved).toBe(1);
   });
 
@@ -187,5 +187,59 @@ describe('anchored allow shapes - an allowed word plus a dangerous verb stays ga
     for (const rec of ['A', 'option B', 'C)', 'A (pick)', 'do lint first', 'lint before tests', 'tabs on top', 'clearer wording', 'skip the optional step', 'defer until monday', 'later']) {
       expect(allowlistedChoice(rec)).toBe(true);
     }
+  });
+});
+
+// Seat round 3 on #3984: the open ordering shapes let any verb through. These
+// are the evaluator's 13 probes verbatim; each must be refused by the
+// allowlist and stay with Zaal. The shapes now accept only a fixed noun list.
+const ROUND3 = [
+  'withdraw first',
+  'sell first',
+  'stake first',
+  'approve first',
+  'execute first',
+  'kill first',
+  'overwrite first',
+  'hire first',
+  'bridge first',
+  'truncate first',
+  'unpublish first',
+  'reboot first',
+  'restart first',
+];
+describe('ordering shapes take only the fixed nouns', () => {
+  it.each(ROUND3)('%s stays with Zaal', (rec) => {
+    expect(allowlistedChoice(rec)).toBe(false);
+    expect(classifyGate({ kind: 'decision', title: 'What goes first?', notes: null, recommended: rec }).gated).toBe(true);
+  });
+  it('the same verbs in the before/after/then shape stay too', () => {
+    for (const rec of ['withdraw before review', 'lint then sell', 'restart after tests']) expect(allowlistedChoice(rec)).toBe(false);
+  });
+  it('the fixed nouns still go', () => {
+    for (const rec of ['do lint first', 'run the tests first', 'typecheck next', 'docs before tests', 'review then build', 'spec last']) {
+      expect(allowlistedChoice(rec)).toBe(true);
+    }
+  });
+});
+
+describe('a bare option letter is checked against that option\'s own text', () => {
+  // Options are only ever read from the title and notes, which the gate list
+  // already scans, so this case is also caught without the option check (red
+  // control, run). The check's own effect is the next test: a letter whose
+  // option the card does not show is refused.
+  it('a dangerous option text in the notes keeps the card', () => {
+    const v = classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: 'A wire the funds / B wait', recommended: 'A' });
+    expect(v.gated).toBe(true);
+    expect(v.classes).toContain('money');
+  });
+  it('a letter whose option is not on the card stays with Zaal', () => {
+    expect(classifyGate({ kind: 'decision', title: 'Next step for the lane', notes: null, recommended: 'B' })).toMatchObject({
+      gated: true,
+      reason: 'option B is not shown on the card',
+    });
+  });
+  it('a safe option text still goes', () => {
+    expect(classifyGate({ kind: 'decision', title: 'Which check runs first? A lint / B tests', notes: null, recommended: 'B' }).gated).toBe(false);
   });
 });

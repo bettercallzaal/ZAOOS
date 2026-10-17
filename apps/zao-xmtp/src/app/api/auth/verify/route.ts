@@ -4,8 +4,11 @@ import { z } from 'zod';
 import { recordSignIn } from '@/lib/directory';
 import { appDomain, hubUrl, optimismRpcUrl } from '@/lib/env';
 import { getProfile, getVerifiedEthAddresses } from '@/lib/hub';
+import { consumeNonce } from '@/lib/nonces';
+import { clientIp, limits } from '@/lib/rate-limit';
 import { checkRespect, optimismClient } from '@/lib/respect';
 import { getSession } from '@/lib/session';
+import { checkSiwfTimes } from '@/lib/siwf-time';
 
 const verifySchema = z.object({
   message: z.string().min(1).max(4000),
@@ -23,8 +26,17 @@ function appClient() {
 /**
  * POST - verify the SIWF signature, then the Respect gate, then start a session.
  * 401 bad signature, 403 no Respect, 503 could not check (never reported as "no Respect").
+ * The nonce must match this browser's cookie AND be consumed from the server
+ * store exactly once; the message must have been issued in the last 10 minutes.
  */
 export async function POST(req: NextRequest) {
+  const limited = limits.verify(`verify:${clientIp(req.headers)}`);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: 'Too many sign-in attempts. Please wait a minute.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfterSeconds) } },
+    );
+  }
   try {
     const parsed = verifySchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
@@ -37,6 +49,27 @@ export async function POST(req: NextRequest) {
     await session.save();
     if (!nonce) {
       return NextResponse.json({ error: 'Sign-in expired. Please try again.' }, { status: 400 });
+    }
+
+    let siwfTimes: ReturnType<typeof checkSiwfTimes>;
+    try {
+      siwfTimes = checkSiwfTimes(parsed.data.message);
+    } catch {
+      return NextResponse.json({ error: 'Invalid sign-in message' }, { status: 400 });
+    }
+    if (!siwfTimes.ok) {
+      return NextResponse.json({ error: 'Sign-in expired. Please try again.' }, { status: 400 });
+    }
+
+    let fresh: boolean;
+    try {
+      fresh = await consumeNonce(nonce);
+    } catch (error: unknown) {
+      console.error('[auth/verify] nonce store error:', error);
+      return NextResponse.json({ error: 'Could not verify sign-in. Please try again.' }, { status: 503 });
+    }
+    if (!fresh) {
+      return NextResponse.json({ error: 'Sign-in expired or already used. Please try again.' }, { status: 400 });
     }
 
     let result: Awaited<ReturnType<ReturnType<typeof createAppClient>['verifySignInMessage']>>;
@@ -86,6 +119,7 @@ export async function POST(req: NextRequest) {
 
     const profile = await getProfile(fid, { hubUrl: hubUrl() });
     session.fid = fid;
+    session.custody = custody;
     session.username = profile.username;
     session.displayName = profile.displayName;
     session.pfpUrl = profile.pfpUrl;

@@ -3,18 +3,21 @@ import { cookies } from 'next/headers';
 import { sessionSecret } from '@/lib/env';
 
 export interface SessionData {
-  /** Set by /api/auth/nonce, consumed by /api/auth/verify. */
+  /** Set by /api/auth/nonce. Must match the nonce in the signed message. */
   nonce?: string;
   fid?: number;
+  /** Farcaster custody address, re-checked for Respect with the verified addresses. */
+  custody?: string;
   username?: string | null;
   displayName?: string | null;
   pfpUrl?: string | null;
   /** True only after a successful Respect check. */
   isMember?: boolean;
+  /** Last time a Respect check was attempted and gave a definite answer. */
   respectCheckedAt?: string;
 }
 
-/** Re-check Respect when the session expires: 7 days. */
+/** The cookie lives 7 days; Respect is re-checked far more often (see membership.ts). */
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 export async function getSession(): Promise<IronSession<SessionData>> {
@@ -28,11 +31,4 @@ export async function getSession(): Promise<IronSession<SessionData>> {
       sameSite: 'lax',
     },
   });
-}
-
-/** The session, only if it belongs to a Respect holder. */
-export async function getMemberSession(): Promise<(IronSession<SessionData> & { fid: number }) | null> {
-  const session = await getSession();
-  if (!session.isMember || typeof session.fid !== 'number') return null;
-  return session as IronSession<SessionData> & { fid: number };
 }

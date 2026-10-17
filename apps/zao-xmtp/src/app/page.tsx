@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
 import { SignIn } from '@/components/SignIn';
-import { getMemberSession } from '@/lib/session';
+import { requireMember } from '@/lib/membership';
 
 export default async function Home() {
-  if (await getMemberSession()) redirect('/messages');
+  if (await requireMember({ persist: false })) redirect('/messages');
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 px-4 text-center">
       <h1 className="text-3xl font-bold text-[#f5a623]">ZAO XMTP</h1>

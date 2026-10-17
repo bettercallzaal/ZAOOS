@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { listMembers } from '@/lib/directory';
-import { getMemberSession } from '@/lib/session';
+import { requireMember } from '@/lib/membership';
 
 /**
  * GET - members who have signed in, in the shape the ported
@@ -9,7 +9,7 @@ import { getMemberSession } from '@/lib/session';
  */
 export async function GET() {
   try {
-    const session = await getMemberSession();
+    const session = await requireMember({ persist: true });
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const rows = await listMembers();

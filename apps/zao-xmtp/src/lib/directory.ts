@@ -4,8 +4,7 @@
  * Table: supabase/migrations/0001_members_seen.sql. Server-side only.
  */
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { supabaseServiceRoleKey, supabaseUrl } from '@/lib/env';
+import { db } from '@/lib/db';
 
 export interface DirectoryMember {
   fid: number;
@@ -17,16 +16,6 @@ export interface DirectoryMember {
 }
 
 const COLUMNS = 'fid, username, display_name, pfp_url, xmtp_address, last_login_at';
-
-let _client: SupabaseClient | null = null;
-function db(): SupabaseClient {
-  if (!_client) {
-    _client = createClient(supabaseUrl(), supabaseServiceRoleKey(), {
-      auth: { persistSession: false },
-    });
-  }
-  return _client;
-}
 
 export async function recordSignIn(member: {
   fid: number;
@@ -49,11 +38,16 @@ export async function recordSignIn(member: {
   if (error) throw new Error(`members_seen upsert failed: ${error.message}`);
 }
 
+/** Thrown when another member already registered this XMTP address. */
+export class XmtpAddressTakenError extends Error {}
+
 export async function setXmtpAddress(fid: number, xmtpAddress: string): Promise<void> {
   const { error } = await db()
     .from('members_seen')
     .update({ xmtp_address: xmtpAddress.toLowerCase() })
     .eq('fid', fid);
+  // 23505 = unique_violation on members_seen_xmtp_address_key (migration 0002).
+  if (error?.code === '23505') throw new XmtpAddressTakenError('xmtp address already registered');
   if (error) throw new Error(`members_seen update failed: ${error.message}`);
 }
 

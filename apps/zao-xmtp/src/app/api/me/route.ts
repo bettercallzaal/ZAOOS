@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getMemberSession } from '@/lib/session';
+import { requireMember } from '@/lib/membership';
 
 /** GET - the signed-in member, or `{ user: null }`. */
 export async function GET() {
   try {
-    const session = await getMemberSession();
+    const session = await requireMember({ persist: true });
     if (!session) return NextResponse.json({ user: null });
     return NextResponse.json({
       user: {

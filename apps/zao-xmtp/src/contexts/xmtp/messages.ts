@@ -1,6 +1,6 @@
 'use client';
 
-// Ported from ZAOOS src/contexts/xmtp/messages.ts (bettercallzaal/ZAOOS, MIT) on 2026-10-17. Code unchanged; comment em dashes became hyphens.
+// Ported from ZAOOS src/contexts/xmtp/messages.ts (bettercallzaal/ZAOOS, MIT) on 2026-10-17. Code unchanged; added a pin note above sendText; comment em dashes became hyphens.
 
 import type { DecodedMessage } from '@xmtp/browser-sdk';
 import { useCallback } from 'react';
@@ -259,6 +259,10 @@ export function useMessages(
       let msgId: string | undefined;
       try {
         // Step 1: Store locally (optimistic) - returns message ID
+        // PINNED SDK: this two-argument call compiles only on @xmtp/browser-sdk 7.0.0.
+        // 7.1.0 changed the second parameter to a SendOpts object, and tsc reports
+        // TS2559 "Type 'true' has no properties in common with type 'SendOpts'" here
+        // (measured 2026-10-17). package.json pins 7.0.0 exactly; port this call before upgrading.
         msgId = await conv.sendText(trimmed, true);
 
         // Show optimistic message in UI immediately

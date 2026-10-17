@@ -1,6 +1,7 @@
 'use client';
 
-// Ported from ZAOOS src/contexts/xmtp/connection.ts (bettercallzaal/ZAOOS, MIT) on 2026-10-17. Code unchanged; comment em dashes became hyphens.
+// Ported from ZAOOS src/contexts/xmtp/connection.ts (bettercallzaal/ZAOOS, MIT) on 2026-10-17. Changed: publishXmtpAddress
+// now proves control of the address with a signature (ZAO XMTP addition); comment em dashes became hyphens.
 
 import { useCallback } from 'react';
 import type { AnyClient, XMTPSharedRefs, XMTPSharedState } from '@/contexts/xmtp/types';
@@ -61,14 +62,20 @@ export function useConnection(
   /**
    * Save the XMTP address so other members can discover us. Non-fatal: a failure
    * is logged and shown as a toast, because the connection itself still works.
+   * ZAO XMTP: the server asks for a signature from the address itself, so the
+   * key behind it signs the server's message first (see lib/xmtp/address-claim.ts).
    */
   const publishXmtpAddress = useCallback(
-    async (address: string) => {
+    async (address: string, signMessage: (message: string) => Promise<string>) => {
       try {
+        const challenge = await fetch(`/api/users/xmtp-address?address=${encodeURIComponent(address)}`);
+        if (!challenge.ok) throw new Error(`xmtp-address challenge responded ${challenge.status}`);
+        const { message } = (await challenge.json()) as { message: string };
+        const signature = await signMessage(message);
         const res = await fetch('/api/users/xmtp-address', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ xmtpAddress: address }),
+          body: JSON.stringify({ xmtpAddress: address, signature }),
         });
         if (!res.ok) throw new Error(`xmtp-address responded ${res.status}`);
       } catch (err: unknown) {
@@ -121,7 +128,10 @@ export function useConnection(
         setConnectedWallets(Array.from(walletsRef.current.keys()));
 
         // Persist XMTP address to DB so other members can discover us
-        void publishXmtpAddress(address);
+        void publishXmtpAddress(address, async (message) => {
+          const { signWithLocalKey } = await import('@/lib/xmtp/address-claim');
+          return signWithLocalKey(privateKey, message);
+        });
 
         // Seed last message cache, load conversations, resolve members, then re-load to apply profiles
         await seedLastMessages();
@@ -196,7 +206,7 @@ export function useConnection(
         setConnectedWallets(Array.from(walletsRef.current.keys()));
 
         // Persist XMTP address to DB so other members can discover us
-        void publishXmtpAddress(normalized);
+        void publishXmtpAddress(normalized, signMessage);
 
         // Full initialization: seed, load, check members, re-load with profiles, start streams
         await seedLastMessages();

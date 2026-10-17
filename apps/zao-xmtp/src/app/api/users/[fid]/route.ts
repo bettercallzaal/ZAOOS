@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getMember } from '@/lib/directory';
-import { getMemberSession } from '@/lib/session';
+import { requireMember } from '@/lib/membership';
 
 const fidSchema = z.coerce.number().int().positive();
 
 /** GET - one member's profile, in the shape the ported NewConversationDialog reads. */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ fid: string }> }) {
   try {
-    const session = await getMemberSession();
+    const session = await requireMember({ persist: true });
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const parsed = fidSchema.safeParse((await params).fid);

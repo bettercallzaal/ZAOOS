@@ -57,7 +57,7 @@ import {
 } from './x-desk';
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
-import { captureTerminalTypedReply, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
+import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
 import { resolveTaskDecision, appendTaskContext } from '../cockpit/adapters';
@@ -4021,6 +4021,22 @@ async function dispatchConcierge(
       await replyChunked(ctx, safeReply, {
         replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
       });
+    }
+
+    // The tail question (terminal-grill.ts, ZOE_TAIL_QUESTION, doc 2679 PR 3):
+    // after answering Zaal in his DM, the first waiting seat item follows as its
+    // own card, at most once per cooldown. Class `gated`, so the send budget
+    // counts it as an ask, not as part of the reply. Never blocks the reply.
+    if (scope === 'private') {
+      runWithSendClass('gated', () =>
+        maybeSendTailCard({
+          send: (t, buttons) => bot.api.sendMessage(zaalId, t, { reply_markup: { inline_keyboard: toGrammyRows(buttons) } }),
+        }),
+      )
+        .then((r) => {
+          if (r === 'sent') featureRan('terminal-grill', 'tail card');
+        })
+        .catch((e) => console.error('[zoe/terminal-grill] tail card failed:', (e as Error)?.message));
     }
 
     // Inline research -> durable doc on main (closes the gap where research

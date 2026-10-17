@@ -26,6 +26,8 @@ import { wasSendBlocked } from './send-budget';
 import { isGrillPaused, withStopRow } from './grill-pause';
 import { featureRan } from './feature-ran';
 import { inQuietWindow, quietEnabled } from './quiet-window';
+import { appendAutoDeferred, appendGrillQueue, autoProceedLine, classifyGate, gateSortEnabled, isDeferChoice } from './grill-queue';
+import { extractRecommendation } from './needs-zaal-digest';
 
 export type GrillKind = 'decision' | 'review' | 'blocked' | 'event';
 
@@ -605,8 +607,17 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
     sourcesOk = false;
     return [] as GrillEvent[];
   });
-  const queue = toQueue(tasks, prs, events);
+  let queue = toQueue(tasks, prs, events);
   const state = await readGrillState();
+
+  // Gated or not (ZOE_GRILL_GATE_SORT=1, grill-queue.ts classifyGate): a card
+  // that names nothing gated and carries a recommended option is auto-proceeded
+  // on that option, written to the grill queue with an override line, and
+  // never reaches his DM. Marked handled only once that write succeeded, so a
+  // failed write leaves the card in his queue, never silently dropped.
+  if (gateSortEnabled()) {
+    queue = await sortOutAutoProceed(queue, tasks, state, now);
+  }
 
   if (grillExpireEnabled()) {
     // An empty task list is treated as a failed read, not as "everything is
@@ -667,6 +678,57 @@ export async function surfaceGrill(deps: SurfaceGrillDeps): Promise<{ sent: bool
   state.daySurfaced = { date: today, count: day.count + 1 };
   await writeGrillState(state);
   return { sent: true, item };
+}
+
+/**
+ * The gate sort, split out so it can be tested with injected IO. Returns the
+ * queue with the auto-proceeded cards removed. A card already handled in state
+ * is never written twice.
+ */
+export async function sortOutAutoProceed(
+  queue: GrillItem[],
+  tasks: CockpitTask[],
+  state: GrillState,
+  now: number,
+  append: typeof appendGrillQueue = appendGrillQueue,
+  write: (s: GrillState) => Promise<void> = writeGrillState,
+  logDeferred: typeof appendAutoDeferred = appendAutoDeferred,
+): Promise<GrillItem[]> {
+  const notesByKey = new Map<string, string | null>();
+  for (const t of tasks) notesByKey.set(t.legacy_id ?? String(t.id), t.notes ?? null);
+  const auto: { item: GrillItem; recommended: string; choice: string }[] = [];
+  for (const item of queue) {
+    if (state.items[item.key]) continue; // already asked, answered or handled: the rule does not re-sort it
+    const notes = notesByKey.get(item.key) ?? item.context ?? null;
+    const v = classifyGate({ kind: item.kind, title: item.title, notes, recommended: extractRecommendation(notes, null, item.title) });
+    if (!v.gated && v.recommended) auto.push({ item, recommended: v.recommended, choice: v.choice ?? v.recommended });
+  }
+  if (!auto.length) return queue;
+  const r = await append(
+    auto.map(({ item, recommended }) => ({ taskId: item.key, title: item.title, why: autoProceedLine(recommended) })),
+    { now },
+  );
+  if (r.wrote === 'nothing') {
+    console.error(`[zoe/grill] gate sort: could not write ${auto.length} auto-proceeded card(s); they stay in the queue`);
+    return queue;
+  }
+  const iso = new Date(now).toISOString();
+  // Every auto-handled card, proceeded or deferred, is logged for the daily
+  // needs-Zaal digest, so nothing closes without him seeing its title and
+  // choice (seat rounds 4 and 8 on #3984). If that log cannot be written, no
+  // card is marked handled and all of them still reach Zaal.
+  const logged = await logDeferred(
+    auto.map((a) => ({ taskId: a.item.key, title: a.item.title, choice: a.choice, at: iso, deferred: isDeferChoice(a.choice) })),
+  );
+  const done = logged ? auto : [];
+  for (const { item, recommended } of done) {
+    state.items[item.key] = { askedAt: iso, firstAskedAt: iso, status: 'done', answer: autoProceedLine(recommended) };
+  }
+  if (done.length) await write(state);
+  if (!logged) console.error(`[zoe/grill] gate sort: could not log ${auto.length} auto-handled card(s); none marked, they stay in the queue`);
+  featureRan('grill-gate-sort', `${done.length} auto-handled to the ${r.wrote}, ${done.filter((a) => isDeferChoice(a.choice)).length} of them deferred`);
+  const handled = new Set(done.map((a) => a.item.key));
+  return queue.filter((q) => !handled.has(q.key));
 }
 
 /**

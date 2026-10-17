@@ -67,8 +67,6 @@
       "Bash(~/bin/safe-git-push.sh:*)",
       "Bash(ssh root@187.77.3.104*)",
       "Bash(ssh root@31.97.148.88*)",
-      "Bash(scp * root@187.77.3.104:*)",
-      "Bash(scp * root@31.97.148.88:*)",
       "Bash(systemctl --user *)",
       "mcp__playwright__*",
       "mcp__context7__*",

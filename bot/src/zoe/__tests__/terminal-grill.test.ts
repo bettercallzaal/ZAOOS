@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import { promises as fs, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -9,7 +9,11 @@ import {
   parseItemOptions,
   readTerminalGrillState,
   recordTerminalAnswer,
+  maybeSendTailCard,
+  tailCardScopeAllowed,
   sendNextTerminalCard,
+  tailCooldownMs,
+  tailQuestionDue,
   stampKey,
   waitingPushCronAllowed,
   waitingPushEnabled,
@@ -312,5 +316,114 @@ describe('waitingPushEnabled / waitingPushCronAllowed - the flag and the once-a-
     expect(waitingPushCronAllowed('0 */2 * * *')).toBe(false);
     expect(waitingPushCronAllowed('15 5 * *')).toBe(false);
     expect(waitingPushCronAllowed('')).toBe(false);
+  });
+});
+
+// doc 2679 PR 3: the tail question after a DM reply.
+describe('tailQuestionDue / tailCooldownMs - once per cooldown', () => {
+  const now = new Date('2026-10-16T16:00:00Z');
+  it('never sent, or an unreadable stamp: due', () => {
+    expect(tailQuestionDue(null, now, 3_600_000)).toBe(true);
+    expect(tailQuestionDue('not a date', now, 3_600_000)).toBe(true);
+  });
+  it('inside the cooldown: not due; at or past it: due', () => {
+    expect(tailQuestionDue('2026-10-16T15:30:00Z', now, 3_600_000)).toBe(false);
+    expect(tailQuestionDue('2026-10-16T15:00:00Z', now, 3_600_000)).toBe(true);
+  });
+  it('cooldown defaults to 60 minutes and a bad value falls back', () => {
+    expect(tailCooldownMs({})).toBe(3_600_000);
+    expect(tailCooldownMs({ ZOE_TAIL_QUESTION_COOLDOWN_MIN: '15' })).toBe(900_000);
+    expect(tailCooldownMs({ ZOE_TAIL_QUESTION_COOLDOWN_MIN: 'soon' })).toBe(3_600_000);
+  });
+});
+
+describe('maybeSendTailCard - the card after a reply', () => {
+  const sent: string[] = [];
+  const send = async (text: string) => {
+    sent.push(text);
+  };
+  const read = async () => ({ text: PAGE });
+  // 16:00 UTC is 12:00 EDT, outside the quiet window; 02:00 UTC is 22:00 EDT, inside it.
+  const day = new Date('2026-10-16T16:00:00Z');
+  beforeEach(() => {
+    sent.length = 0;
+    process.env.ZOE_GRILL_TERMINALS = '1';
+  });
+  afterEach(() => {
+    delete process.env.ZOE_GRILL_TERMINALS;
+  });
+
+  it('flag off: nothing read, nothing sent', async () => {
+    expect(await maybeSendTailCard({ send, read, now: day, env: {} })).toBe('off');
+    expect(sent).toEqual([]);
+  });
+  it('inside the quiet window: nothing sent', async () => {
+    expect(await maybeSendTailCard({ send, read, now: new Date('2026-10-17T02:00:00Z'), env: { ZOE_TAIL_QUESTION: '1' } })).toBe('quiet');
+    expect(sent).toEqual([]);
+  });
+  it('first reply of the hour sends the first seat card; the next reply inside the hour does not', async () => {
+    const env = { ZOE_TAIL_QUESTION: '1' };
+    expect(await maybeSendTailCard({ send, read, now: day, env })).toBe('sent');
+    expect(sent[0]).toContain('w1 - waiting on you');
+    expect(await maybeSendTailCard({ send, read, now: new Date('2026-10-16T16:20:00Z'), env })).toBe('cooldown');
+    expect(sent).toHaveLength(1);
+    expect(await maybeSendTailCard({ send, read, now: new Date('2026-10-16T17:01:00Z'), env })).toBe('sent');
+    expect(sent).toHaveLength(2);
+  });
+  it('nothing waiting: no card, and the cooldown is not spent', async () => {
+    const env = { ZOE_TAIL_QUESTION: '1' };
+    const empty = async () => ({ text: PAGE.replace(/\| w1 .*\n/, '').replace(/\| w2 .*\n/, '') });
+    expect(await maybeSendTailCard({ send, read: empty, now: day, env })).toBe('empty');
+    expect(await maybeSendTailCard({ send, read, now: new Date('2026-10-16T16:05:00Z'), env })).toBe('sent');
+  });
+});
+
+// Seat follow-ups on #3982: the private-scope rule and the in-flight guard.
+describe('tailCardScopeAllowed - only Zaal\'s private DM gets the tail card', () => {
+  it('private: yes; any other scope: no', () => {
+    expect(tailCardScopeAllowed('private')).toBe(true);
+    for (const s of ['group', 'zaal-botz', 'discord', 'member', 'community', '']) expect(tailCardScopeAllowed(s)).toBe(false);
+  });
+  it('the one call site in index.ts is behind that rule', () => {
+    // Source-level, like scheduler-cron-guards.test.ts: index.ts boots the bot
+    // and must never be imported in a test. Red control: drop the guard and the
+    // maybeSendTailCard call no longer sits inside tailCardScopeAllowed(scope).
+    const src = readFileSync(join(__dirname, '..', 'index.ts'), 'utf8');
+    const calls = src.split('maybeSendTailCard({').length - 1;
+    expect(calls).toBe(1);
+    const at = src.indexOf('maybeSendTailCard({');
+    const guard = src.lastIndexOf('if (tailCardScopeAllowed(scope)) {', at);
+    expect(guard).toBeGreaterThan(-1);
+    // Nothing closes that if-block between the guard and the call.
+    expect(src.slice(guard, at).includes('\n    }\n')).toBe(false);
+  });
+});
+
+describe('maybeSendTailCard - two replies at once send one card', () => {
+  beforeEach(() => {
+    process.env.ZOE_GRILL_TERMINALS = '1';
+  });
+  afterEach(() => {
+    delete process.env.ZOE_GRILL_TERMINALS;
+  });
+  it('the second caller while the first is sending gets busy, not a second card', async () => {
+    const env = { ZOE_TAIL_QUESTION: '1' };
+    const now = new Date('2026-10-16T16:00:00Z');
+    const sent: string[] = [];
+    let release: () => void = () => {};
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    const slowSend = async (t: string) => {
+      await gate;
+      sent.push(t);
+    };
+    const read = async () => ({ text: PAGE });
+    const first = maybeSendTailCard({ send: slowSend, read, now, env });
+    const second = await maybeSendTailCard({ send: slowSend, read, now, env });
+    release();
+    expect(second).toBe('busy');
+    expect(await first).toBe('sent');
+    expect(sent).toHaveLength(1);
   });
 });

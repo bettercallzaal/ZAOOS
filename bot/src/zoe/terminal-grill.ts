@@ -29,6 +29,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { parseTerminalsPage, readTerminalsPage, vaultDir, type TerminalsPage } from './terminals-digest';
 import { isGrillPaused, withStopRow, type Button } from './grill-pause';
+import { inQuietWindow } from './quiet-window';
 
 export function terminalGrillEnabled(): boolean {
   return process.env.ZOE_GRILL_TERMINALS === '1';
@@ -178,6 +179,90 @@ export function waitingPushCronAllowed(expr: string): boolean {
   const oneMinute = /^[0-9]{1,2}$/.test(f[0]);
   const fixedHours = /^[0-9]{1,2}(,[0-9]{1,2})*$/.test(f[1]);
   return oneMinute && fixedHours;
+}
+
+/**
+ * The tail question (doc 2679 PR 3). Zaal, 2026-10-14: "grill me with a
+ * question at the bottom always so if we are waiting i can still add more
+ * context". With ZOE_TAIL_QUESTION=1, after ZOE answers him in his DM, the
+ * first unanswered seat item follows as its own card (the same card /grill
+ * and the waiting push send), at most once per cooldown
+ * (ZOE_TAIL_QUESTION_COOLDOWN_MIN, default 60), never inside the quiet
+ * window (20:30 to 04:45 Eastern by default), and only when the page has an
+ * item. A chat of ten quick replies gets one card, not ten.
+ */
+export function tailQuestionEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_TAIL_QUESTION === '1';
+}
+export const DEFAULT_TAIL_COOLDOWN_MIN = 60;
+export function tailCooldownMs(env: NodeJS.ProcessEnv = process.env): number {
+  const n = Number(env.ZOE_TAIL_QUESTION_COOLDOWN_MIN);
+  return (Number.isFinite(n) && n > 0 ? n : DEFAULT_TAIL_COOLDOWN_MIN) * 60_000;
+}
+
+/** Pure. True when no tail card went out within the cooldown. An unreadable stamp counts as never sent. */
+export function tailQuestionDue(lastAt: string | null, now: Date, cooldownMs: number): boolean {
+  const t = lastAt ? Date.parse(lastAt) : Number.NaN;
+  return !Number.isFinite(t) || now.getTime() - t >= cooldownMs;
+}
+
+const tailPath = () => join(dir(), 'tail-question.json');
+
+async function readTailStamp(): Promise<string | null> {
+  try {
+    const v = JSON.parse(await fs.readFile(tailPath(), 'utf8')) as { lastAt?: unknown };
+    return typeof v.lastAt === 'string' ? v.lastAt : null;
+  } catch {
+    return null;
+  }
+}
+
+export type TailOutcome = 'off' | 'quiet' | 'cooldown' | 'busy' | SendCardOutcome;
+
+/**
+ * Pure. The tail card follows a reply only in Zaal's private DM. The one
+ * caller (index.ts dispatchConcierge) asks this before calling
+ * maybeSendTailCard, so the scope rule has a test (seat on #3982): a group,
+ * Discord or member scope never gets the card.
+ */
+export function tailCardScopeAllowed(scope: string): boolean {
+  return scope === 'private';
+}
+
+// In-process guard: two replies finishing in the same moment would both read
+// the old stamp and both send. One ZOE process polls at a time (agent-loops
+// rule 9), so a module flag is enough; the second caller returns 'busy'.
+let tailInFlight = false;
+
+/** After a DM reply: send the first seat card, if enabled, due, outside the quiet window. Never throws. */
+export async function maybeSendTailCard(deps: {
+  send: (text: string, buttons: Button[][]) => Promise<unknown>;
+  read?: () => Promise<{ text: string }>;
+  now?: Date;
+  env?: NodeJS.ProcessEnv;
+}): Promise<TailOutcome> {
+  const env = deps.env ?? process.env;
+  if (!tailQuestionEnabled(env)) return 'off';
+  const now = deps.now ?? new Date();
+  if (inQuietWindow(now)) return 'quiet';
+  if (tailInFlight) return 'busy';
+  tailInFlight = true;
+  try {
+    if (!tailQuestionDue(await readTailStamp(), now, tailCooldownMs(env))) return 'cooldown';
+    const r = await sendNextTerminalCard({ send: deps.send, read: deps.read });
+    if (r === 'sent') {
+      try {
+        await fs.mkdir(dir(), { recursive: true });
+        await fs.writeFile(tailPath(), JSON.stringify({ lastAt: now.toISOString() }));
+      } catch (e) {
+        // A lost stamp means at worst one extra card next reply; the card already went.
+        console.error('[zoe/terminal-grill] could not record the tail card time:', (e as Error)?.message);
+      }
+    }
+    return r;
+  } finally {
+    tailInFlight = false;
+  }
 }
 
 export type RecordOutcome = 'recorded' | 'already-answered' | 'stale' | 'invalid' | 'unknown-item';

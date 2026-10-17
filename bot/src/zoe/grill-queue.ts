@@ -199,3 +199,213 @@ export async function appendGrillQueue(
     return { wrote: 'nothing', path: spool, count: 0, numbers: [] };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Gated or not (doc 2679 PR 2b; ZOE_GRILL_GATE_SORT=1, default off).
+//
+// The sorted-questions rule (adopted 2026-10-07; lane-autonomy.md): a question
+// reaches Zaal only when it is about money, goes public or outbound, cannot be
+// undone, needs a fact only he has, or changes a setting. Everything else is
+// auto-proceeded on its recommended option, logged where he can override it.
+//
+// "When in doubt it IS gated." Fail closed: a card is auto-proceeded only when
+// its recommended option is one of a short allowlist of reversible choice
+// shapes (ALLOW_SHAPES) AND nothing in its title, notes or recommendation
+// matches a gated class. Events and PR reviews always stay his.
+// ---------------------------------------------------------------------------
+
+export function gateSortEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_GRILL_GATE_SORT === '1';
+}
+
+export type GateClass = 'money' | 'public' | 'irreversible' | 'his-fact' | 'settings';
+
+const GATE_WORDS: [GateClass, RegExp][] = [
+  ['money', /\$\s?\d|send \$|\b(wire\w*|money|funds?|cash|venmo|zelle|paypal|stripe|usdc?|eth|sol|pay|paid|payments?|payouts?|invoices?|price|pricing|costs?|spend|budget|fees?|buy|purchase|subscriptions?|grants?|donat\w*|sponsor\w*|wallets?|tokens?|mint\w*|swap|transfers?|refunds?|billing|burn\w*)\b/i],
+  ['public', /\b(post|posts|publish\w*|tweet|cast|announce\w*|send|email|e-mail|dm|newsletter|outreach|public|press|reply to|share with|invite|tell|notify|message|broadcast\w*|upload\w*|go(?:ing)? live|livestream\w*|stream it|launch\w*|ship\w*|release)\b/i],
+  ['irreversible', /\b(delete|rm|remove|archive|drop|rename|force|on-?chain|deploy\w*|migrat\w*|rotate|revoke|sign|contract|cancel|close (?:the )?account|wipe|purge|merge\w*|push\w*|production|prod|commit\w*)\b/i],
+  ['his-fact', /\b(only you|your call|do you|did you|are you|have you|which one do you|who is|whose|his|her)\b/i],
+  ['settings', /\b(setting|settings|flag|env|permission\w*|config\w*|vercel|dns|domain|password|api key|keys?|secrets?|hooks?|webhooks?|cron)\b/i],
+];
+
+/**
+ * The reversible choice shapes a recommendation may take for a card to be
+ * auto-proceeded (fail closed, seat reviews on #3984): a bare option letter,
+ * an ordering of one or two named things, tabs or wording, or a bare skip or
+ * defer. Each matches the WHOLE recommendation, never a keyword inside it. Any other recommendation keeps the card with Zaal; the
+ * gated word list above then runs as a second check over title, notes and
+ * the recommendation together.
+ */
+// The only things an ordering may name (seat round 3 on #3984: an open word
+// let "withdraw first", "sell first", "restart first" through). Names read
+// from the card itself are deliberately not added: whoever writes a card could
+// plant them. Any other ordering comes to Zaal.
+const ORDER_NOUN = '(?:lint|tests?|typecheck|build|docs?|readme|review|spec|changelog)';
+
+/**
+ * A recommendation that is only an option letter: "A", "option B", "C)",
+ * "A (pick)". Seat round 7 on #3984: six rounds of checks on what a letter
+ * stands for each left a way to hide the real action, so a letter never
+ * auto-proceeds. Any such card goes to Zaal.
+ */
+const OPTION_LETTER = /^(?:option )?[a-d](?:\)|\.)?(?: \((?:pick|rec\w*)\))?$/;
+
+/**
+ * A recommendation line. Its value must be the bare recommendation, so
+ * "recommended: lint first. liquidate after" cannot read as "lint first" with
+ * the rest unread (seat round 6). This guards text recommendations, not
+ * letters, so it stays after round 7.
+ */
+const REC_LINE = /(?:^|[\s(*])(?:recommended|recommendation|recommends?|rec)\s*:\s*(.*)$/i;
+
+const DAY = '(?:tomorrow|next week|next month|later|monday|tuesday|wednesday|thursday|friday|saturday|sunday)';
+const ALLOW_SHAPES: RegExp[] = [
+  // an ordering of one of the fixed nouns above: "do lint first", "docs before tests"
+  new RegExp(`^(?:do |run )?(?:the )?${ORDER_NOUN} (?:first|second|third|next|last)$`),
+  new RegExp(`^(?:the )?${ORDER_NOUN} (?:before|after|then) (?:the )?${ORDER_NOUN}$`),
+  // tabs, layout, wording
+  /^(?:keep |use )?(?:the )?(?:one |two |three )?tabs?(?: on (?:top|bottom|the left|the right))?$/,
+  /^(?:shorter|longer|plainer|simpler|clearer) (?:wording|phrasing|title|label)$/,
+  // skip or defer, and nothing else
+  /^skip(?: it| this| the optional [\w-]+| optional [\w-]+)?$/,
+  new RegExp(`^(?:defer|park|hold)(?: it)?(?: (?:to|until) ${DAY})?$`),
+  /^(?:later|not now|wait)$/,
+];
+
+function norm(text: string): string {
+  return text.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+/**
+ * Pure. True when the WHOLE recommendation is one of the allowlisted shapes.
+ * Each shape is anchored at both ends (seat re-review on #3984: an unanchored
+ * keyword let "later: wire the money" through), so any extra verb or object
+ * drops the card back to gated. Over-gating is the safe failure.
+ */
+export function allowlistedChoice(recommended: string): boolean {
+  const r = norm(recommended);
+  return ALLOW_SHAPES.some((re) => re.test(r));
+}
+
+export interface GateVerdict {
+  gated: boolean;
+  /** Every gated class that matched; empty when none did. */
+  classes: GateClass[];
+  /** The option to proceed with, when there is one. */
+  recommended?: string;
+  /** What is actually chosen. Set only when not gated. */
+  choice?: string;
+  /** One line saying why, for the log. */
+  reason: string;
+}
+
+/** Pure. Sort one card. `recommended` is the option the card itself names as the pick, if any. */
+export function classifyGate(card: { kind: string; title: string; notes?: string | null; recommended?: string }): GateVerdict {
+  if (card.kind !== 'decision' && card.kind !== 'blocked') {
+    return { gated: true, classes: [], recommended: card.recommended, reason: `${card.kind} cards always stay with Zaal` };
+  }
+  if (!card.recommended) return { gated: true, classes: [], reason: 'no recommended option to proceed with' };
+  const gate = (reason: string): GateVerdict => ({ gated: true, classes: [], recommended: card.recommended, reason });
+  if (OPTION_LETTER.test(norm(card.recommended))) return gate('an option letter always goes to Zaal');
+  if (!allowlistedChoice(card.recommended)) return gate('recommendation is not an allowlisted reversible choice');
+  for (const line of [card.title, card.notes ?? ''].flatMap((t) => t.split('\n'))) {
+    const m = REC_LINE.exec(line);
+    if (!m) continue;
+    const value = m[1].replace(/^\*+|\*+$/g, '').replace(/[)\s.;*]+$/, '').trim().toLowerCase();
+    if (value !== norm(card.recommended)) return gate('the recommended line holds more than the bare value');
+  }
+  const text = `${card.title}\n${card.notes ?? ''}\n${card.recommended}`;
+  const classes = GATE_WORDS.filter(([, re]) => re.test(text)).map(([c]) => c);
+  if (classes.length) return { gated: true, classes, recommended: card.recommended, reason: `names ${classes.join(', ')}` };
+  return { gated: false, classes, recommended: card.recommended, choice: card.recommended, reason: 'allowlisted reversible choice, no gated class' };
+}
+
+/** The line written for an auto-proceeded card, so Zaal can find and override it. */
+export function autoProceedLine(recommended: string): string {
+  return `auto-proceeded: ${recommended}, override anytime`;
+}
+
+// ---------------------------------------------------------------------------
+// Auto-deferred cards (seat round 4 on #3984): a skip, defer, park, hold,
+// later, not now or wait choice parks a card. Every one is logged here and
+// listed in the daily needs-Zaal digest, so nothing urgent is parked silently.
+// ---------------------------------------------------------------------------
+
+const DEFER_SHAPES: RegExp[] = [ALLOW_SHAPES[4], ALLOW_SHAPES[5], ALLOW_SHAPES[6]];
+
+/** Pure. True when a choice parks the card rather than doing something. */
+export function isDeferChoice(choice: string): boolean {
+  const r = choice.trim().replace(/\s+/g, ' ').toLowerCase();
+  return DEFER_SHAPES.some((re) => re.test(r));
+}
+
+/**
+ * One auto-handled card in the digest log. The name predates round 8 on #3984,
+ * when proceeded cards joined deferred ones in the same log.
+ */
+export interface AutoDeferred {
+  taskId: string;
+  title: string;
+  choice: string;
+  at: string;
+  /** True for a deferring choice. Absent on lines written before round 8, which were all deferrals. */
+  deferred?: boolean;
+}
+
+export function autoDeferredPath(): string {
+  return process.env.ZOE_AUTO_DEFERRED_PATH || join(homedir(), '.zao/zoe/auto-deferred.jsonl');
+}
+
+export const AUTO_DEFERRED_KEEP_DAYS = 7;
+export const AUTO_DEFERRED_KEEP_LINES = 1000;
+
+/**
+ * Append deferred cards to the log, then trim it to the last 7 days and at
+ * most 1,000 lines (the digest reads only 24 hours). Returns false when the
+ * append failed, so the caller keeps the cards in front of Zaal. A failed trim
+ * is logged and does not undo the append.
+ */
+export async function appendAutoDeferred(
+  entries: AutoDeferred[],
+  path: string = autoDeferredPath(),
+  now: number = Date.now(),
+): Promise<boolean> {
+  if (!entries.length) return true;
+  try {
+    await fs.mkdir(dirname(path), { recursive: true });
+    await fs.appendFile(path, entries.map((e) => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+  } catch (e) {
+    console.error('[zoe/grill-queue] could not log auto-deferred cards:', (e as Error)?.message);
+    return false;
+  }
+  try {
+    const keep = (await readAutoDeferred(now - AUTO_DEFERRED_KEEP_DAYS * 24 * 3600 * 1000, path)).slice(-AUTO_DEFERRED_KEEP_LINES);
+    const tmp = `${path}.tmp`;
+    await fs.writeFile(tmp, keep.map((e) => JSON.stringify(e)).join('\n') + (keep.length ? '\n' : ''), 'utf8');
+    await fs.rename(tmp, path);
+  } catch (e) {
+    console.error('[zoe/grill-queue] could not trim the auto-deferred log (the append stands):', (e as Error)?.message);
+  }
+  return true;
+}
+
+/** Deferred cards logged at or after `sinceMs`. A missing log is an empty list; an unreadable line is skipped. */
+export async function readAutoDeferred(sinceMs: number, path: string = autoDeferredPath()): Promise<AutoDeferred[]> {
+  let raw = '';
+  try {
+    raw = await fs.readFile(path, 'utf8');
+  } catch {
+    return [];
+  }
+  const out: AutoDeferred[] = [];
+  for (const line of raw.split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      const e = JSON.parse(line) as AutoDeferred;
+      if (Date.parse(e.at) >= sinceMs) out.push(e);
+    } catch {
+      // one bad line does not hide the rest
+    }
+  }
+  return out;
+}

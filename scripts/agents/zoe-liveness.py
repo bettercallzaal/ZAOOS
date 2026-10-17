@@ -71,6 +71,14 @@ BEHAVIOUR_FLAGS = {
     'ZOE_USE_CLI': 'Claude CLI path for the concierge',
     'ZOE_NUDGE_LADDER': 'escalating nudge ladder',
     'ZOE_TASK_COMPLEXITY_ROUTING': 'complexity-based model routing',
+    # doc 2679 (ZOE as the always-forward agent) and the flags its flip leans on
+    'ZOE_GRILL_TERMINALS': 'seat Waiting-on-Zaal items as grill cards',
+    'ZOE_WAITING_PUSH': 'scheduled first waiting card',
+    'ZOE_INBOX_NUDGE': 'daily inbox totals until zero',
+    'ZOE_TAIL_QUESTION': 'next waiting card after a DM reply',
+    'ZOE_GRILL_GATE_SORT': 'auto-proceed non-gated grill cards',
+    'ZOE_QUIET': 'night quiet window',
+    'ZOE_ANSWER_LOOP': 'close the loop on an answer',
 }
 
 
@@ -98,14 +106,17 @@ def flag_sites():
         src = read(p)
         rel = p.replace(BOT_SRC + '/', '')
         for flag in BEHAVIOUR_FLAGS:
-            if f'process.env.{flag}' not in src:
+            # A flag is read either straight off process.env or off an `env`
+            # parameter that defaults to it (`env = process.env`), the shape the
+            # doc 2679 flags use so tests can inject one. Both count.
+            if not re.search(rf"\b(?:process\.)?env\.{flag}\b", src):
                 continue
             out[flag]['files'].append(rel)
             # A flag compared to a truthy literal is OFF unless set. One compared
             # with !== 'false' / ?? true is ON unless explicitly disabled - and
             # that distinction decides whether merging changed prod.
-            if re.search(rf"process\.env\.{flag}\s*!==\s*'false'", src) or \
-               re.search(rf"process\.env\.{flag}\s*\?\?\s*true", src):
+            if re.search(rf"\b(?:process\.)?env\.{flag}\b\s*!==\s*'false'", src) or \
+               re.search(rf"\b(?:process\.)?env\.{flag}\b\s*\?\?\s*true", src):
                 out[flag]['default_on'] = True
             elif out[flag]['default_on'] is None:
                 out[flag]['default_on'] = False
@@ -118,10 +129,10 @@ def flag_sites():
             # because it reads as done. The first version of this script reported
             # them all as `set`, which is the same failure it exists to catch,
             # one level down.
-            m = re.search(rf"process\.env\.{flag}\s*===\s*'([^']*)'", src)
+            m = re.search(rf"\b(?:process\.)?env\.{flag}\b\s*===\s*'([^']*)'", src)
             if m and not out[flag]['expects']:
                 out[flag]['expects'] = m.group(1)
-            m2 = re.search(rf"process\.env\.{flag}\s*!==\s*'([^']*)'", src)
+            m2 = re.search(rf"\b(?:process\.)?env\.{flag}\b\s*!==\s*'([^']*)'", src)
             if m2 and not out[flag]['expects']:
                 lit = m2.group(1)
                 # `!==` cuts BOTH ways and the direction is what matters.

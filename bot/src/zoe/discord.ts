@@ -35,6 +35,7 @@ import {
   ButtonStyle,
   ActionRowBuilder,
   MessageFlags,
+  type Message,
   type TextBasedChannel,
 } from 'discord.js';
 import { runConciergeTurn } from './concierge';
@@ -54,6 +55,14 @@ import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
 import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
+import {
+  type AdminEnv,
+  appendAdminLog,
+  discordAdminEnabled,
+  isDiscordOwner,
+  parseAdminCommand,
+  runAdminCommand,
+} from './discord-admin';
 import { config as loadEnv } from 'dotenv';
 
 loadEnv();
@@ -93,6 +102,59 @@ function chunkMessage(text: string, max = DISCORD_MAX): string[] {
   }
   if (remaining.length > 0) chunks.push(remaining);
   return chunks;
+}
+
+/**
+ * The guild operations discord-admin.ts runs, bound to the server and channel
+ * the command was sent in. Only reached for Zaal's own "admin:" messages.
+ */
+function discordAdminEnv(message: Message<true>): AdminEnv {
+  const guild = message.guild;
+  const fetchChannel = async (id: string) => {
+    const ch = await guild.channels.fetch(id).catch(() => null);
+    if (!ch) throw new Error('that channel is not in this server');
+    return ch;
+  };
+  return {
+    async findCategory(name) {
+      const c = guild.channels.cache.find(
+        (ch) => ch.type === ChannelType.GuildCategory && ch.name.toLowerCase() === name.toLowerCase(),
+      );
+      return c ? { id: c.id, name: c.name } : null;
+    },
+    async createCategory(name) {
+      const c = await guild.channels.create({ name, type: ChannelType.GuildCategory });
+      return { id: c.id, name: c.name };
+    },
+    async createTextChannel(name, parentId) {
+      const c = await guild.channels.create({ name, type: ChannelType.GuildText, parent: parentId });
+      return { id: c.id, name: c.name };
+    },
+    async channelName(id) {
+      const ch = await guild.channels.fetch(id).catch(() => null);
+      return ch ? ch.name : null;
+    },
+    async renameChannel(id, name) {
+      await (await fetchChannel(id)).setName(name);
+    },
+    async archiveChannel(id, archiveCategoryId) {
+      const ch = await fetchChannel(id);
+      if (ch.isThread()) throw new Error('a thread cannot be archived this way; it archives itself');
+      await ch.setParent(archiveCategoryId, { lockPermissions: false });
+      await ch.permissionOverwrites.edit(guild.roles.everyone, { SendMessages: false });
+    },
+    async createThread(name) {
+      if (message.channel.type !== ChannelType.GuildText) throw new Error('threads start from a text channel');
+      const th = await message.channel.threads.create({ name });
+      return { id: th.id, name: th.name };
+    },
+    async setPinned(channelId, messageId, pin) {
+      const ch = channelId ? await fetchChannel(channelId) : message.channel;
+      if (!ch.isTextBased()) throw new Error('that channel has no messages to pin');
+      const target = await ch.messages.fetch(messageId);
+      await (pin ? target.pin() : target.unpin());
+    },
+  };
 }
 
 /**
@@ -191,6 +253,33 @@ export async function bootDiscordClient(): Promise<Client | null> {
       if (!discordTurnAllowed(turnLimiter, message.author.id, DISCORD_ZAAL_ID, Date.now(), discordTurnsPerHour())) {
         await message.reply({ content: MEMBER_DM_LIMIT_LINE, allowedMentions: { repliedUser: false } });
         return;
+      }
+
+      // Admin commands (discord-admin.ts, ZOE_DISCORD_ADMIN=1, default off).
+      // Parsed by code, never by the model; run only for DISCORD_ZAAL_ID, and
+      // anyone else is refused before any turn. Logged either way.
+      if (discordAdminEnabled()) {
+        const adminText = message.content.replace(new RegExp(`<@!?${client.user?.id}>`, 'g'), '').trim();
+        const cmd = parseAdminCommand(adminText, message.reference?.messageId);
+        if (cmd) {
+          const by = message.author.id;
+          let reply: string;
+          if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {
+            reply = 'Only Zaal can run admin commands.';
+            await appendAdminLog({ action: cmd.kind, ok: false, by, guildId: message.guildId ?? undefined, refused: 'not owner' });
+          } else if (!message.inGuild()) {
+            reply = 'Run admin commands in the server, with an @mention.';
+            await appendAdminLog({ action: cmd.kind, ok: false, by, refused: 'not in a server' });
+          } else {
+            const result = await runAdminCommand(cmd, discordAdminEnv(message));
+            reply = result.reply;
+            await appendAdminLog({ action: result.action, ok: result.ok, target: result.target, by, guildId: message.guildId });
+            console.log(`[zoe/discord-admin] ${result.action} ${result.ok ? 'ok' : 'failed'} in guild ${message.guildId}`);
+            if (result.ok) featureRan('discord-admin', result.action);
+          }
+          await message.reply({ content: reply, allowedMentions: { parse: [], repliedUser: false } });
+          return;
+        }
       }
 
       await message.channel.sendTyping();

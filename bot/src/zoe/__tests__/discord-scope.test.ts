@@ -102,7 +102,7 @@ describe('discord.ts wiring (read as text; the module boots a client)', () => {
   });
   it('fetches channel context only for guild channels, and only when channel read is on', () => {
     expect(src).toContain('if (CHANNEL_READ && !message.channel.isDMBased())');
-    const fetchAt = src.indexOf('messages.fetch(');
+    const fetchAt = src.indexOf('message.channel.messages.fetch({');
     expect(fetchAt).toBeGreaterThan(src.indexOf('discordScopeFor({'));
     expect(fetchAt).toBeLessThan(src.indexOf('runConciergeTurn({'));
     expect(src).toContain('message: channelContext + messageText');

@@ -52,6 +52,7 @@ import {
 } from './discord-scope';
 import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
+import { peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
 
@@ -215,10 +216,32 @@ export async function bootDiscordClient(): Promise<Client | null> {
         timeZoneName: 'short',
       });
 
-      const senderLabel = isOwnerDM ? 'Zaal' : (message.author.username ?? message.author.displayName ?? 'User');
+      let senderLabel = isOwnerDM ? 'Zaal' : (message.author.username ?? message.author.displayName ?? 'User');
       const messageText = message.content
         .replace(new RegExp(`<@${client.user?.id}>`, 'g'), '')
         .trim();
+
+      // People list (people.ts, ZOE_PEOPLE_LOG=1, default off). Never Zaal.
+      // A reply that is only their name gets a thanks and no model turn.
+      let nameAsk = '';
+      if (peopleLogEnabled() && message.author.id !== DISCORD_ZAAL_ID) {
+        const seen = await recordPersonTurn({
+          platform: 'discord',
+          id: message.author.id,
+          handle: message.author.username ?? 'User',
+          text: messageText,
+        });
+        if (seen?.nameOnlyReply) {
+          await message.reply({ content: seen.nameOnlyReply, allowedMentions: { repliedUser: false } });
+          featureRan('people-log', 'discord name');
+          return;
+        }
+        if (seen) {
+          senderLabel = seen.label;
+          nameAsk = seen.askSuffix;
+          featureRan('people-log', 'discord');
+        }
+      }
 
       // Whole-channel read: an @mention in a guild channel sees that channel's
       // recent messages. Same channel only, same group scope as above. A failed
@@ -271,7 +294,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
         }
       }
 
-      const replyText = result.reply ?? 'I could not generate a response.';
+      const replyText = result.reply ? result.reply + nameAsk : 'I could not generate a response.';
 
       // Stage 1b: non-owner community messages go through approval if enabled.
       if (COMMUNITY_ASKS_ENABLED && !isOwnerDM) {

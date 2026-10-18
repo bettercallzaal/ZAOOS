@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-17
 related-docs: 693
 tier: DISPATCH
 ---
@@ -93,6 +93,14 @@ Full triage for every one of the 649 docs is in this folder:
 - `research/_archive/` (80 docs) was excluded by design.
 - Verdicts are a fast scan, not a deep re-read - a doc marked RE-RESEARCH might just need its frontmatter fixed; confirm per-doc before redoing.
 - The audit agents themselves did NOT re-fetch sources - they judged from each doc's own text. A FINE verdict means "looks solid", not "every cited URL re-verified live."
+
+## Updated 2026-10-17
+
+**Library has grown ~3.5x since this audit.** The 649-live-doc snapshot was accurate as of 2026-05-20; as of 2026-10-17 the live numbered-doc count is ~2332 (verified: `find research -mindepth 2 -maxdepth 2 -type d | grep -v _archive | grep "/[0-9]" | wc -l`), and the archive sits at ~79 docs (roughly stable). The audit's folder-by-folder triage tables in this folder remain directionally useful but the absolute counts are outdated.
+
+The REVALIDATE backlog has been materially addressed: ~1,689 docs now carry a `last-validated` date after 2026-05-20 (verified on main: `find research -mindepth 2 -maxdepth 2 -type d | grep -v _archive | grep -E "/[0-9]" | while read d; do f="$d/README.md"; date=$(grep "^last-validated:" "$f" 2>/dev/null | head -1 | sed 's/last-validated: //;s/"//g'); [[ -n "$date" && "$date" > "2026-05-20" ]] && echo 1; done | wc -l`), driven partly by the daily radar process running since July 2026. The HIGH-priority thin docs flagged in the audit have not been systematically verified as completed - individual items may have been updated but the batch status is unknown.
+
+**What did NOT change:** the structural defects the audit named (missing frontmatter, no Goal lines, no Sources sections in farcaster/ and identity/) are still the dominant defect class where they remain; the farcaster/ density diagnosis is structurally correct even if specific doc numbers are now stale.
 
 ## Sources
 

@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-10-18
 related-docs: 432, 609, 630, 649, 681, 682, 684
 tier: DEEP
 ---
@@ -145,6 +145,30 @@ If you need to point at something live: `zaoos.com` (the app), `zaostock.com` (t
 - **It is built in public** - streamed, logged, or cast as you go. That is the ZAO default and the event's anti-cheat.
 
 That is the context. Now go build something a creator would actually use.
+
+---
+
+## Updated 2026-10-18
+
+Both ZABAL Games Season 1 and ZAOstock 2026 have now concluded. Key new findings since last-validated 2026-05-20:
+
+**ZABAL Games Season 1 completed (ended 2026-08-30):**
+- The event ran on schedule: June workshops (31 sessions), July open build (build board closed 2026-08-16), August Finals.
+- Finals format: 6 finalists (2 per track), 3 head-to-head battles on WaveWarZ in the last week of August - NOT the "8 mentors each claim one builder" structure described in this prompt (that design was superseded). Tracks were artist / builder / creator, not the four brand tracks (ZAOstock, ZABAL, WaveWarZ, The ZAO) described in section 6.
+- Champions: **n3m** (artist track), **ghostmintops** (builder track), **uniquebeing404** (creator track).
+- Season stats: 31 workshops, 31 projects from 15 people. Every finalist was paid from the ~500 USDC pool.
+- Judging signals: open X poll from WaveWarZ account, live trading charts, and a judges panel. The repo notes the per-signal split was not retained; the "all three champions won on all three signals" claim should be treated as unverified.
+- Season 2 is named but has no dates, format, or theme set.
+- Sources: https://github.com/ZAODEVZ/zabalgames (FULL fetch 2026-10-18), https://github.com/ZAODEVZ/zabalgames/pull/663 (PARTIAL)
+
+**ZAOstock 2026 happened as planned (October 3, 2026, Ellsworth, Maine):**
+- Free, all ages, noon-6pm, Franklin Street closed to traffic. After-party at Black Moon. Part of the 9th Annual Art of Ellsworth / Maine Craft Weekend.
+- Full lineup (7 acts): The Crown Vics, OPEN X, Grass Rug, Michael Anderson, DCoop, LyonsDen Rez Muzik, Tom Fellenz. One act did not play (unnamed in sources). Partners: Star 97.7 and Heart of Ellsworth.
+- Site announced "ZAOstock 2026 is a wrap." Attendance/revenue figures not published as of 2026-10-18.
+- ZAOstock 2027 is referenced in ZAOOS PR #3718 as "the annual assembly of ZAO Ellsworth," suggesting the event becomes recurring.
+- Sources: https://github.com/bettercallzaal/ZAOOS/pull/3827 (FULL fetch 2026-10-18)
+
+**Maintainer note:** The prompt body (sections 1-11) still uses future tense for both ZABAL Games and ZAOstock. A future revision should reframe these as concluded events and update section 1 (ZABAL Games mechanics), section 6 (track structure), and section 9 (web map) with current state.
 
 ---
 

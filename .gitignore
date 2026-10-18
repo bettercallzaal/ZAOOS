@@ -97,6 +97,8 @@ scripts/.stock-codes-iman-*.txt
 *.contacts.json
 .claude/.private/
 .claude/private-queries/
+# /orchestrator skill ledger, per-session scratch
+.claude/orchestrator.md
 
 # estate-audit tokens (canonical home is ~/.zao/estate-tokens.env, off-repo).
 # Defensive guard in case a copy lands in the tree. See scripts/estate-audit/.

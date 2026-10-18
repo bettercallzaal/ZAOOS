@@ -52,7 +52,7 @@ import {
 } from './discord-scope';
 import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
-import { markAsked, peopleLogEnabled, recordPersonTurn } from './people';
+import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
 
@@ -224,7 +224,8 @@ export async function bootDiscordClient(): Promise<Client | null> {
 
       // People list (people.ts, ZOE_PEOPLE_LOG=1, default off). Never Zaal, and
       // nobody at all without DISCORD_ZAAL_ID, so an unset id cannot log him.
-      // A message that is only "call me X" gets a thanks and no model turn.
+      // A message that is only "call me X" gets a thanks and no model turn. In a
+      // guild channel the thanks does not say the name back.
       let nameAsk = '';
       if (peopleLogEnabled() && DISCORD_ZAAL_ID && message.author.id !== DISCORD_ZAAL_ID) {
         const seen = await recordPersonTurn({
@@ -234,7 +235,8 @@ export async function bootDiscordClient(): Promise<Client | null> {
           text: messageText,
         });
         if (seen?.nameOnlyReply) {
-          await message.reply({ content: seen.nameOnlyReply, allowedMentions: { repliedUser: false } });
+          const thanks = message.channel.isDMBased() ? seen.nameOnlyReply : NAME_SAVED_PUBLIC_LINE;
+          await message.reply({ content: thanks, allowedMentions: { repliedUser: false } });
           featureRan('people-log', 'discord name');
           return;
         }

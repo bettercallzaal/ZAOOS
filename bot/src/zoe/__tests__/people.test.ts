@@ -8,6 +8,7 @@ import {
   markAsked,
   MAX_PEOPLE,
   NAME_ASK_LINE,
+  NAME_SAVED_PUBLIC_LINE,
   notePersonTurn,
   parseNameAnswer,
   type People,
@@ -214,6 +215,17 @@ describe('wiring', () => {
     expect(d.indexOf('recordPersonTurn(')).toBeLessThan(d.indexOf('const result = await runConciergeTurn({'));
     expect(d.indexOf('recordPersonTurn(')).toBeGreaterThan(d.indexOf('if (!triggered) return;'));
     expect(d).toContain("const replyText = result.reply ? result.reply + nameAsk : 'I could not generate a response.';");
+  });
+
+  it('discord.ts: a guild-channel thanks never says the name back; a DM thanks does', () => {
+    const d = src('discord.ts');
+    expect(d).toContain('const thanks = message.channel.isDMBased() ? seen.nameOnlyReply : NAME_SAVED_PUBLIC_LINE;');
+    expect(d).toContain('await message.reply({ content: thanks, allowedMentions: { repliedUser: false } });');
+    expect(d).not.toContain('content: seen.nameOnlyReply');
+    expect(NAME_SAVED_PUBLIC_LINE).not.toMatch(/\$\{|Ilana/);
+    const t = notePersonTurn({}, { platform: 'discord', id: 'u1', handle: 'ilana_x', text: 'call me Ilana', now });
+    expect(t.nameOnlyReply).toContain('Ilana');
+    expect(NAME_SAVED_PUBLIC_LINE).not.toContain(t.person.name ?? '');
   });
 
   it('index.ts: only the member DM path records people, before its turn', () => {

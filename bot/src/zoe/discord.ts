@@ -35,6 +35,7 @@ import {
   ButtonStyle,
   ActionRowBuilder,
   MessageFlags,
+  PermissionFlagsBits,
   type Message,
   type TextBasedChannel,
 } from 'discord.js';
@@ -56,6 +57,7 @@ import { featureRan } from './feature-ran';
 import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import {
+  ADMIN_REFUSAL_LINE,
   type AdminEnv,
   appendAdminLog,
   discordAdminEnabled,
@@ -141,7 +143,22 @@ function discordAdminEnv(message: Message<true>): AdminEnv {
       const ch = await fetchChannel(id);
       if (ch.isThread()) throw new Error('a thread cannot be archived this way; it archives itself');
       await ch.setParent(archiveCategoryId, { lockPermissions: false });
-      await ch.permissionOverwrites.edit(guild.roles.everyone, { SendMessages: false });
+      await ch.permissionOverwrites.edit(guild.roles.everyone, {
+        SendMessages: false,
+        SendMessagesInThreads: false,
+        CreatePublicThreads: false,
+      });
+      // A role or member override that ALLOWS posting beats the @everyone deny,
+      // so clear those allows (set neutral, not deny). Evaluator note, #4022.
+      let cleared = 0;
+      for (const ow of ch.permissionOverwrites.cache.values()) {
+        if (ow.id === guild.roles.everyone.id) continue;
+        if (ow.allow.any([PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendMessagesInThreads, PermissionFlagsBits.CreatePublicThreads])) {
+          await ch.permissionOverwrites.edit(ow.id, { SendMessages: null, SendMessagesInThreads: null, CreatePublicThreads: null });
+          cleared++;
+        }
+      }
+      return { cleared };
     },
     async createThread(name) {
       if (message.channel.type !== ChannelType.GuildText) throw new Error('threads start from a text channel');
@@ -265,8 +282,11 @@ export async function bootDiscordClient(): Promise<Client | null> {
           const by = message.author.id;
           let reply: string;
           if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {
-            reply = 'Only Zaal can run admin commands.';
+            // Refused in private: a public refusal in a channel invites people to
+            // keep trying (Evaluator note, #4022). If their DMs are closed, nothing is sent.
             await appendAdminLog({ action: cmd.kind, ok: false, by, guildId: message.guildId ?? undefined, refused: 'not owner' });
+            await message.author.send({ content: ADMIN_REFUSAL_LINE, allowedMentions: { parse: [] } }).catch(() => undefined);
+            return;
           } else if (!message.inGuild()) {
             reply = 'Run admin commands in the server, with an @mention.';
             await appendAdminLog({ action: cmd.kind, ok: false, by, refused: 'not in a server' });

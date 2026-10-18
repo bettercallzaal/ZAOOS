@@ -1,8 +1,9 @@
-import { mkdtempSync, readFileSync, statSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  ADMIN_REFUSAL_LINE,
   type AdminEnv,
   appendAdminLog,
   ARCHIVE_CATEGORY,
@@ -94,7 +95,7 @@ describe('parseAdminCommand', () => {
   });
 });
 
-function fakeGuild() {
+function fakeGuild(archiveCleared = 0) {
   const calls: string[] = [];
   const cats = new Map<string, string>([['c1', 'ZAO Music']]);
   const chans = new Map<string, string>([['1234567', 'general']]);
@@ -125,6 +126,7 @@ function fakeGuild() {
     },
     async archiveChannel(id, catId) {
       calls.push(`archive ${id} ${catId}`);
+      return { cleared: archiveCleared };
     },
     async createThread(name) {
       calls.push(`thread ${name}`);
@@ -166,6 +168,14 @@ describe('runAdminCommand on a fake guild', () => {
     await runAdminCommand({ kind: 'archive', channelId: '1234567' }, g.env);
     expect(g.calls.filter((c) => c.startsWith('createCategory'))).toEqual([`createCategory ${ARCHIVE_CATEGORY}`]);
     expect(g.calls.filter((c) => c.startsWith('archive'))).toHaveLength(2);
+  });
+
+  it('the archive reply says read-only, counts cleared overrides, and names who can still post', async () => {
+    const none = await runAdminCommand({ kind: 'archive', channelId: '1234567' }, fakeGuild(0).env);
+    expect(none.reply).toBe('Archived <#1234567>: moved to "archive" and read-only. Server administrators can still post there.');
+    const two = await runAdminCommand({ kind: 'archive', channelId: '1234567' }, fakeGuild(2).env);
+    expect(two.reply).toContain('Cleared 2 role or member overrides that allowed posting.');
+    expect((await runAdminCommand({ kind: 'archive', channelId: '1234567' }, fakeGuild(1).env)).reply).toContain('Cleared 1 role or member override that');
   });
 
   it('a channel from another server is refused before anything changes', async () => {
@@ -216,6 +226,14 @@ describe('appendAdminLog', () => {
     ]);
     expect(statSync(path).mode & 0o777).toBe(0o600);
   });
+
+  it('a log file that already exists with wider permissions is narrowed to 0600 on the next write', async () => {
+    const path = join(mkdtempSync(join(tmpdir(), 'zoe-admin-')), 'discord-admin.jsonl');
+    writeFileSync(path, '');
+    chmodSync(path, 0o644);
+    await appendAdminLog({ action: 'help', ok: true, by: '42' }, new Date(), path);
+    expect(statSync(path).mode & 0o777).toBe(0o600);
+  });
 });
 
 describe('wiring in discord.ts', () => {
@@ -228,6 +246,22 @@ describe('wiring in discord.ts', () => {
     expect(gate).toBeLessThan(d.indexOf('await message.channel.sendTyping();'));
     expect(d).toContain('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {');
     expect(d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {')).toBeLessThan(d.indexOf('runAdminCommand(cmd, discordAdminEnv(message))'));
+  });
+
+  it('a non-owner is refused by DM, never in the channel, and nothing runs', () => {
+    const block = d.slice(d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {'), d.indexOf('} else if (!message.inGuild()) {'));
+    expect(block).toContain('await message.author.send({ content: ADMIN_REFUSAL_LINE, allowedMentions: { parse: [] } }).catch(() => undefined);');
+    expect(block).toContain('return;');
+    expect(block).not.toContain('message.reply(');
+    expect(block).not.toContain('runAdminCommand(');
+    expect(ADMIN_REFUSAL_LINE).toContain('Nothing was changed');
+  });
+
+  it('archive clears role and member overrides that allow posting, never @everyone', () => {
+    const env = d.slice(d.indexOf('async archiveChannel('), d.indexOf('async createThread('));
+    expect(env).toContain('if (ow.id === guild.roles.everyone.id) continue;');
+    expect(env).toContain('SendMessages: null, SendMessagesInThreads: null, CreatePublicThreads: null');
+    expect(env).toContain('return { cleared };');
   });
 
   it('every branch logs, and the reply can ping nobody', () => {

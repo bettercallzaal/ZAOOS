@@ -49,6 +49,8 @@ export type AdminCommand =
   | { kind: 'unknown'; text: string };
 
 export const ARCHIVE_CATEGORY = 'archive';
+/** Sent privately to anyone who is not Zaal. */
+export const ADMIN_REFUSAL_LINE = 'Only Zaal can run admin commands. Nothing was changed.';
 const MAX_NAME = 100;
 
 const PREFIX = /^admin:\s*/i;
@@ -142,7 +144,12 @@ export interface AdminEnv {
   createTextChannel(name: string, parentId?: string): Promise<{ id: string; name: string }>;
   channelName(id: string): Promise<string | null>;
   renameChannel(id: string, name: string): Promise<void>;
-  archiveChannel(id: string, archiveCategoryId: string): Promise<void>;
+  /**
+   * Move to the archive category and make it read-only: deny posting for
+   * @everyone and clear any role or member override that allows it. Returns
+   * how many overrides were cleared. Server administrators still post.
+   */
+  archiveChannel(id: string, archiveCategoryId: string): Promise<{ cleared: number }>;
   createThread(name: string): Promise<{ id: string; name: string }>;
   /** channelId undefined means the channel the command was sent in. */
   setPinned(channelId: string | undefined, messageId: string, pin: boolean): Promise<void>;
@@ -205,8 +212,14 @@ export async function runAdminCommand(cmd: AdminCommand, env: AdminEnv): Promise
           return { reply: 'I cannot find that channel in this server.', ok: false, action: cmd.kind, target: cmd.channelId };
         }
         const cat = (await env.findCategory(ARCHIVE_CATEGORY)) ?? (await env.createCategory(ARCHIVE_CATEGORY));
-        await env.archiveChannel(cmd.channelId, cat.id);
-        return { reply: `Archived <#${cmd.channelId}>: moved to "${cat.name}", and @everyone can no longer post there.`, ok: true, action: cmd.kind, target: cmd.channelId };
+        const { cleared } = await env.archiveChannel(cmd.channelId, cat.id);
+        const overrides = cleared ? ` Cleared ${cleared} role or member ${cleared === 1 ? 'override' : 'overrides'} that allowed posting.` : '';
+        return {
+          reply: `Archived <#${cmd.channelId}>: moved to "${cat.name}" and read-only.${overrides} Server administrators can still post there.`,
+          ok: true,
+          action: cmd.kind,
+          target: cmd.channelId,
+        };
       } catch (err) {
         return fail(cmd.channelId, err);
       }
@@ -238,6 +251,8 @@ export async function appendAdminLog(
   try {
     await fs.mkdir(join(path, '..'), { recursive: true });
     await fs.appendFile(path, `${JSON.stringify({ ts: now.toISOString(), ...row })}\n`, { mode: 0o600 });
+    // appendFile's mode applies only when it creates the file (Evaluator note, #4022).
+    await fs.chmod(path, 0o600);
   } catch (err) {
     console.error(`[zoe/discord-admin] could not write ${path}: ${err instanceof Error ? err.message : String(err)}`);
   }

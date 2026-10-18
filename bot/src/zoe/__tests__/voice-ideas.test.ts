@@ -53,8 +53,8 @@ describe('splitVoiceIdeas', () => {
   it('a stray short part joins the idea before it', () => {
     const t = 'a long thought about how the festival went for everyone. new idea. ok. another idea is a merch drop for the artists';
     expect(splitVoiceIdeas(t)).toEqual([
-      'a long thought about how the festival went for everyone. new idea. ok.',
-      'another idea is a merch drop for the artists',
+      'a long thought about how the festival went for everyone. new idea.',
+      'ok. another idea is a merch drop for the artists',
     ]);
   });
 
@@ -63,10 +63,35 @@ describe('splitVoiceIdeas', () => {
   });
 
   it('at most MAX_IDEAS parts; the rest stay in the last one', () => {
-    const t = Array.from({ length: MAX_IDEAS + 3 }, (_, i) => `new idea number ${i} about something`).join(' ');
+    const t = Array.from({ length: MAX_IDEAS + 3 }, (_, i) => `new idea number ${i} about something.`).join(' ');
     const parts = splitVoiceIdeas(t);
     expect(parts).toHaveLength(MAX_IDEAS);
     expect(parts[MAX_IDEAS - 1]).toContain(`number ${MAX_IDEAS + 2}`);
+  });
+
+  // Verbatim from the #4016 Evaluator probes: each was split and saved, and the
+  // question never answered.
+  it.each([
+    ['ZOE, what do you think of this new idea for the festival, should we book the parklet again in September?'],
+    ['I had a new idea yesterday about sponsors and how we pitch the bank for next year'],
+    ['we talked about the interesting part is the lineup and nothing else came up'],
+    ['So the festival went well. New idea: what if we do it twice a year?'],
+  ])('not split: %j', (t) => {
+    expect(splitVoiceIdeas(t)).toHaveLength(1);
+  });
+
+  it('a filler before a marker still starts a sentence', () => {
+    expect(splitVoiceIdeas('The recap is mostly done and sent to the team. So, new idea, a monthly artist spotlight post')).toEqual([
+      'The recap is mostly done and sent to the team.',
+      'So, new idea, a monthly artist spotlight post',
+    ]);
+  });
+
+  it('a short opening part ("um so.") joins the idea after it, never stands alone', () => {
+    expect(splitVoiceIdeas('Um so. New idea, a weekly ZOE digest for the team channel. Another idea is a merch drop for artists')).toEqual([
+      'Um so. New idea, a weekly ZOE digest for the team channel.',
+      'Another idea is a merch drop for artists',
+    ]);
   });
 
   it('each part is one line, as the voice-memo file needs', () => {

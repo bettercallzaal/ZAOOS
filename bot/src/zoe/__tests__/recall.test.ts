@@ -97,10 +97,12 @@ describe('recall() - a DM turn does not wait 10 s on a hung delve (2026-10-17)',
     }
   });
 
-  it('wiring: the DM turn passes the turn budget to recall', async () => {
+  it('wiring: the DM turn waits only the turn budget, and searches with the background budget', async () => {
     const { readFileSync } = await import('node:fs');
     const src = readFileSync(new URL('../index.ts', import.meta.url), 'utf8');
-    const call = src.slice(src.indexOf("reason: 'concierge turn context'"), src.indexOf("reason: 'concierge turn context'") + 200);
-    expect(call).toContain('timeoutMs: TURN_RECALL_TIMEOUT_MS');
+    // recall-carry.ts: the reply waits TURN_RECALL_TIMEOUT_MS; the delve itself may run BACKGROUND_RECALL_MS.
+    expect(src).toContain('{ turnMs: TURN_RECALL_TIMEOUT_MS, backgroundMs: BACKGROUND_RECALL_MS }');
+    expect(src.match(/reason: 'concierge turn context'/g)).toHaveLength(1);
+    expect(src).not.toMatch(/await recall\(\{\s*query: text,\s*reason: 'concierge turn context'/);
   });
 });

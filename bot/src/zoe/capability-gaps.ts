@@ -32,6 +32,14 @@
  * MAX_WANT_CHARS and passed through redactPii, with a timestamp. Never the
  * message text. The file lives beside ZOE's other state in ZOE_HOME.
  *
+ * DISCORD (doc 2685 D7, 2026-10-18). The same log hears the community: a
+ * Discord turn outside Zaal's own DM asks for the GAP line with
+ * GAP_PROMPT_BLOCK_COMMUNITY and its row is tagged `source: 'discord'`. The
+ * digest shows those counts, but they never queue an upgrade check by
+ * themselves: Zaal ruled 2026-10-17 that community asks are shown to him
+ * weekly and he approves what gets built. So pickUpgrade counts his own asks
+ * only.
+ *
  * Everything but appendGap and readGaps is pure.
  */
 import { promises as fs } from 'node:fs';
@@ -66,6 +74,16 @@ export const GAP_PROMPT_BLOCK: readonly string[] = [
   `When Zaal asks you to DO something and you have no tool or ability for it (for example: speak a reply aloud, set a reminder for a clock time, send an email, add a calendar event), answer him as you normally would, then end your reply with one final line in exactly this form:`,
   `GAP: <what he wanted, in 12 words or fewer, no names of people>`,
   `Only for a missing ability. Not when you refuse, not when you lack a fact, not when something errored, not when you did the thing. At most one GAP line per reply. He never sees this line; it is how you get better.`,
+  `</capability_gap>`,
+  ``,
+];
+
+/** The same ask for a turn that is not Zaal's: anyone in a Discord channel or DM. */
+export const GAP_PROMPT_BLOCK_COMMUNITY: readonly string[] = [
+  `<capability_gap>`,
+  `When the person you are answering asks you to DO something and you have no tool or ability for it, answer them as you normally would, then end your reply with one final line in exactly this form:`,
+  `GAP: <what they wanted, in 12 words or fewer, no names of people>`,
+  `Only for a missing ability. Not when you refuse, not when you lack a fact, not when something errored, not when you did the thing. At most one GAP line per reply. They never see this line.`,
   `</capability_gap>`,
   ``,
 ];
@@ -135,6 +153,8 @@ export function cleanWant(raw: string): string {
 export interface GapRow {
   ts: string;
   want: string;
+  /** Set for a community ask (Discord, not Zaal's own DM). Absent = Zaal. */
+  source?: 'discord';
 }
 
 const STOP = new Set([
@@ -165,6 +185,8 @@ export interface GapGroup {
   want: string;
   count: number;
   lastTs: string;
+  /** How many of `count` came from the community on Discord. */
+  community?: number;
 }
 
 /**
@@ -172,29 +194,36 @@ export interface GapGroup {
  * unreadable timestamp or no usable words are left out, never guessed at.
  */
 export function summarizeGaps(rows: GapRow[], now: Date, windowMs: number = WEEK_MS): GapGroup[] {
-  const groups: Array<GapGroup & { words: Set<string> }> = [];
+  const groups: Array<GapGroup & { community: number; words: Set<string> }> = [];
   for (const row of rows) {
     const t = Date.parse(row.ts);
     if (!Number.isFinite(t) || t > now.getTime() || now.getTime() - t > windowMs) continue;
     const words = gapWords(row.want);
     if (words.size === 0) continue;
+    const fromCommunity = row.source === 'discord' ? 1 : 0;
     const hit = groups.find((g) => overlap(g.words, words) >= SAME_GAP);
     if (hit) {
       hit.count++;
+      hit.community += fromCommunity;
       if (row.ts > hit.lastTs) hit.lastTs = row.ts;
     } else {
-      groups.push({ want: row.want, count: 1, lastTs: row.ts, words });
+      groups.push({ want: row.want, count: 1, lastTs: row.ts, community: fromCommunity, words });
     }
   }
   return groups
     .sort((a, b) => b.count - a.count || (a.lastTs < b.lastTs ? 1 : -1))
-    .map(({ want, count, lastTs }) => ({ want, count, lastTs }));
+    .map(({ want, count, lastTs, community }) => (community > 0 ? { want, count, lastTs, community } : { want, count, lastTs }));
 }
 
-/** The one gap worth an upgrade check this week, or null. */
+/**
+ * The one gap worth an upgrade check this week, or null. Counts Zaal's own
+ * asks only: community asks are shown in the digest and he picks from them.
+ */
 export function pickUpgrade(groups: GapGroup[], minAsks: number = MIN_ASKS_FOR_UPGRADE): GapGroup | null {
-  const top = groups[0];
-  return top && top.count >= minAsks ? top : null;
+  const own = (g: GapGroup) => g.count - (g.community ?? 0);
+  let best: GapGroup | null = null;
+  for (const g of groups) if (own(g) >= minAsks && (!best || own(g) > own(best))) best = g;
+  return best;
 }
 
 /** The weekly status message. Empty string when there is nothing to say. */
@@ -202,12 +231,18 @@ export function formatGapDigest(groups: GapGroup[], queued: GapGroup | null): st
   if (groups.length === 0) return '';
   const lines = groups
     .slice(0, DIGEST_TOP)
-    .map((g, i) => `${i + 1}. ${g.want} (${g.count === 1 ? 'once' : `${g.count} times`})`);
+    .map((g, i) => `${i + 1}. ${g.want} (${g.count === 1 ? 'once' : `${g.count} times`}${g.community ? `, ${g.community} on Discord` : ''})`);
   const more = groups.length > DIGEST_TOP ? `\nAnd ${groups.length - DIGEST_TOP} more.` : '';
+  // pickUpgrade counts Zaal's own asks only, so the queued gap is not always
+  // the top line (evaluator, #4008). Name it by its number, or by its words
+  // when it fell past the list.
+  const at = queued ? groups.indexOf(queued) : -1;
+  const which = at >= 0 && at < DIGEST_TOP ? `number ${at + 1}` : queued ? `"${queued.want}"` : '';
   const tail = queued
-    ? `\n\nI queued an upgrade check for number 1. It will read our code and say whether to extend something we have, build new, or skip. It writes no code.`
+    ? `\n\nI queued an upgrade check for ${which}. It will read our code and say whether to extend something we have, build new, or skip. It writes no code.`
     : '';
-  return `Things you asked me for this week that I could not do:\n${lines.join('\n')}${more}${tail}`;
+  const who = groups.some((g) => g.community) ? 'you and the Discord community asked' : 'you asked';
+  return `Things ${who} me for this week that I could not do:\n${lines.join('\n')}${more}${tail}`;
 }
 
 /**
@@ -237,10 +272,15 @@ For EXTEND or NEW: the files a build would touch and the flag it would sit behin
 }
 
 /** Append one gap. Returns false, and writes nothing, when the want is empty or the file is at its cap. */
-export async function appendGap(want: string, now: Date = new Date(), path: string = gapsPath()): Promise<boolean> {
+export async function appendGap(
+  want: string,
+  now: Date = new Date(),
+  path: string = gapsPath(),
+  source?: GapRow['source'],
+): Promise<boolean> {
   const clean = cleanWant(want);
   if (!clean) return false;
-  const row: GapRow = { ts: now.toISOString(), want: clean };
+  const row: GapRow = source ? { ts: now.toISOString(), want: clean, source } : { ts: now.toISOString(), want: clean };
   await fs.mkdir(join(path, '..'), { recursive: true });
   const size = await fs.stat(path).then((st) => st.size).catch(() => 0);
   if (size >= MAX_GAP_FILE_BYTES) {
@@ -270,7 +310,8 @@ export async function readGaps(path: string = gapsPath()): Promise<{ rows: GapRo
     if (!line.trim()) continue;
     try {
       const v = JSON.parse(line) as Partial<GapRow>;
-      if (typeof v.ts === 'string' && typeof v.want === 'string') rows.push({ ts: v.ts, want: v.want });
+      if (typeof v.ts === 'string' && typeof v.want === 'string')
+        rows.push(v.source === 'discord' ? { ts: v.ts, want: v.want, source: 'discord' } : { ts: v.ts, want: v.want });
       else skipped++;
     } catch {
       skipped++;

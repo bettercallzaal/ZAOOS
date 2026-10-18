@@ -1,8 +1,8 @@
 ---
 topic: farcaster
 type: decision
-status: proposal - waiting on Zaal's scope answers
-last-validated: 2026-10-17
+status: graduated - the app lives at github.com/bettercallzaal/zao-xmtp
+last-validated: 2026-10-18
 related-docs: "074, 2680, 2245"
 original-query: "can we make a new separate app that is just ZAO XMTP please (Zaal, relayed by the seat 2026-10-17)"
 tier: QUICK
@@ -13,6 +13,8 @@ tier: QUICK
 > Waits on Zaal: four scope questions at the bottom. No repo is created until he answers; a new public repo is his call.
 >
 > **Update 2026-10-17:** Q1 to Q3 are decided and the app skeleton is built in `apps/zao-xmtp/`. See `q1-membership-respect-gate.md` and `plan-q1-q3-and-skeleton.md` in this folder. Q4 (the repo) is still Zaal's.
+
+> **Graduated 2026-10-18:** Zaal created the public repo `bettercallzaal/zao-xmtp`. The app's history (#4000, #4002) was pushed there as its first commits, and `apps/zao-xmtp/` was deleted from ZAOOS (Monorepo as Lab: no drift). Mentions of `apps/zao-xmtp/` in this folder are history; the code now lives at https://github.com/bettercallzaal/zao-xmtp. This folder stays in ZAOOS as the research record.
 
 > **Update 2026-10-18:** whether XMTP fees apply today was re-checked against XMTP's own sources: UNKNOWN, no source newer than 2026-04-08 says mainnet launched. See `xmtp-fee-status.md`.
 

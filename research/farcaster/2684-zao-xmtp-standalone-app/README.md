@@ -14,6 +14,8 @@ tier: QUICK
 >
 > **Update 2026-10-17:** Q1 to Q3 are decided and the app skeleton is built in `apps/zao-xmtp/`. See `q1-membership-respect-gate.md` and `plan-q1-q3-and-skeleton.md` in this folder. Q4 (the repo) is still Zaal's.
 
+> **Update 2026-10-18:** whether XMTP fees apply today was re-checked against XMTP's own sources: UNKNOWN, no source newer than 2026-04-08 says mainnet launched. See `xmtp-fee-status.md`.
+
 ## Summary
 
 ZAOOS already has a full XMTP messaging surface: DMs and groups between ZAO members at `/messages`, using an app-generated burner key per FID that never leaves the browser. It is 4,858 lines (`wc -l`, 2026-10-17, tests excluded) across the lib module, the context modules, seven components, one hook, one route and the types file. Most of it can be copied into a standalone app as-is. What has to be rewritten is everything that touches the ZAOOS session and the ZAOOS Supabase tables, because membership today is a row in the ZAOOS `allowlist` table.
@@ -39,7 +41,7 @@ One thing is not a code question and decides the plan: a burner key lives in the
 | Address publish | `src/app/api/users/xmtp-address/route.ts`: session + Zod, writes `users.xmtp_address` for the session FID | BUILT, ZAOOS-only |
 | FID auto-connect | `src/lib/xmtp/auto-connect-flag.ts`: on only when `NEXT_PUBLIC_XMTP_AUTO_CONNECT` is exactly `true`; default OFF. Last change PR #3965, 2026-10-16 | BUILT, FLAGGED OFF by default |
 | Tests | `src/lib/xmtp/__tests__/client.test.ts`, `src/contexts/xmtp/__tests__/members.canmessage.test.ts`, `src/components/messages/__tests__/MessagesRoom.autoconnect.test.tsx`, two route tests under `src/app/api/users/xmtp-address/__tests__/` | `npx vitest run` on those paths, 2026-10-17, from the `feat/farcaster-visitor-role` checkout (not a fresh origin/main): 3 files, 32 tests passed |
-| Payer wallet / history sync | A grep of `origin/main:src` for `payer`, `gatewayHost`, `sendSyncRequest`, `historySync` found nothing | NOT BUILT. Doc 074 (2026-03-19) recommended both; whether XMTP fees apply today was not re-checked this run (UNVERIFIED) |
+| Payer wallet / history sync | A grep of `origin/main:src` for `payer`, `gatewayHost`, `sendSyncRequest`, `historySync` found nothing | NOT BUILT. Doc 074 (2026-03-19) recommended both; whether XMTP fees apply today: UNKNOWN as of 2026-10-18, see `xmtp-fee-status.md` |
 | Research | Doc 074 (XMTP v3 browser SDK, MLS), `_archive/013-chat-messaging`, doc 2680 (lists XMTP as reused for DMs in the Farcaster client), doc 2245 (surface map) | - |
 
 **What works in production: UNKNOWN.** I did not read the production value of `NEXT_PUBLIC_XMTP_AUTO_CONNECT` (Vercel is off-limits to lanes) and did not send a live message. "Works" above means built and unit-tested, nothing more.

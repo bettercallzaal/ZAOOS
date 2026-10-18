@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { MAX_IDEAS, splitVoiceIdeas, voiceIdeasEnabled, voiceIdeasReply } from '../voice-ideas';
+import { asksSomething, MAX_IDEAS, splitVoiceIdeas, voiceIdeasEnabled, voiceIdeasReply } from '../voice-ideas';
 
 describe('voiceIdeasEnabled', () => {
   it.each([
@@ -76,8 +76,23 @@ describe('splitVoiceIdeas', () => {
     ['I had a new idea yesterday about sponsors and how we pitch the bank for next year'],
     ['we talked about the interesting part is the lineup and nothing else came up'],
     ['So the festival went well. New idea: what if we do it twice a year?'],
+    // Whisper dropped the "?" (Evaluator note on #4016).
+    ['New idea, a weekly digest for the team channel. Another idea is a volunteer pass. What do you think'],
+    ['New idea, a weekly digest for the team. Another idea is a merch drop for artists. ZOE, should we do both'],
+    ['New idea, a weekly digest for the team. Another idea is a merch drop for artists. so, any thoughts'],
   ])('not split: %j', (t) => {
     expect(splitVoiceIdeas(t)).toHaveLength(1);
+  });
+
+  it('asksSomething: a "?" or a last sentence opening with a question word; nothing else', () => {
+    expect(asksSomething('is it done?')).toBe(true);
+    expect(asksSomething('New idea, a digest. How would that work')).toBe(true);
+    expect(asksSomething('New idea, a digest. Okay, which one first.')).toBe(true);
+    // A question word that is not the start of the last sentence does not count.
+    expect(asksSomething('What a day. New idea, a weekly digest for the team')).toBe(false);
+    expect(asksSomething('New idea, a digest about how we work')).toBe(false);
+    expect(asksSomething('New idea, a digest. Another idea is a showcase')).toBe(false);
+    expect(asksSomething('')).toBe(false);
   });
 
   it('a filler before a marker still starts a sentence', () => {

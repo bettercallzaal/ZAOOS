@@ -50,6 +50,7 @@ import {
   formatChannelContext,
   mentionsZoe,
 } from './discord-scope';
+import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
@@ -237,6 +238,10 @@ export async function bootDiscordClient(): Promise<Client | null> {
         }
       }
 
+      // Capability gaps (doc 2685 D7, ZOE_GAP_LOG=1): Zaal's own DM asks as in
+      // Telegram; everyone else gets the community wording and a 'discord' row.
+      const gapLog: boolean | 'community' = gapLogEnabled() ? (scope === 'private' ? true : 'community') : false;
+
       const result = await runConciergeTurn({
         message: channelContext + messageText,
         blocks,
@@ -248,7 +253,23 @@ export async function bootDiscordClient(): Promise<Client | null> {
         senderLabel,
         // scope-lock.ts: only Zaal's own DM gets tools; every other scope talks.
         toolPolicy: toolPolicyForScope(scope),
+        gapLog,
       });
+
+      // Take the GAP line off before the reply is queued or sent. A failed
+      // write must not cost the person their answer.
+      if (gapLog && result.reply) {
+        const extracted = extractGap(result.reply);
+        result.reply = extracted.reply;
+        if (extracted.gap) {
+          try {
+            const source = scope === 'private' ? undefined : 'discord';
+            if (await appendGap(extracted.gap, new Date(), undefined, source)) featureRan('discord-gap-log', scope === 'private' ? 'owner' : 'community');
+          } catch (err) {
+            console.error('[zoe/discord] capability gap not recorded:', (err as Error).message);
+          }
+        }
+      }
 
       const replyText = result.reply ?? 'I could not generate a response.';
 

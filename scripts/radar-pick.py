@@ -10,7 +10,10 @@ next run picks it again. Doc 694 was picked on 2026-10-15 (#3959, closed),
 The memory already exists: every run pushes a branch named
 ws/radar-<docnum>-<YYYY-MM-DD>, and closing a PR does not delete it. So a doc
 with a radar branch dated within --cooldown-days is skipped, and the next
-oldest is picked. A doc with no last-validated line is not a candidate (as
+oldest is picked. The skip is keyed by doc NUMBER, because that is all the
+branch name carries, and doc numbers are not unique (218 are shared on
+2026-10-18; 695 has three docs), so one radar run also holds back that
+number's other docs for the cooldown. A doc with no last-validated line is not a candidate (as
 before); the count is printed so it is not invisible.
 
 Usage (from the repo root):
@@ -64,11 +67,17 @@ def recent_radar_docs(branches, today: dt.date, cooldown_days: int):
     return recent
 
 
-def remote_branches(root: Path):
-    out = subprocess.run(
-        ["git", "ls-remote", "--heads", "origin", "refs/heads/ws/radar-*"],
-        cwd=root, capture_output=True, text=True, timeout=60,
-    )
+def remote_branches(root: Path, timeout: float = 60):
+    """Radar branch names on origin, or None when origin cannot be read: a non-zero
+    exit, a hang past the timeout, or no git at all (Evaluator note on #4020: a hang
+    used to raise instead of falling back)."""
+    try:
+        out = subprocess.run(
+            ["git", "ls-remote", "--heads", "origin", "refs/heads/ws/radar-*"],
+            cwd=root, capture_output=True, text=True, timeout=timeout,
+        )
+    except (subprocess.TimeoutExpired, OSError):
+        return None
     if out.returncode != 0:
         return None
     return [line.split("\t", 1)[1] for line in out.stdout.splitlines() if "\t" in line]
@@ -91,6 +100,7 @@ def main(argv=None) -> int:
     ap.add_argument("--today", default=None)
     ap.add_argument("--cooldown-days", type=int, default=14)
     ap.add_argument("--branches-file", default=None)
+    ap.add_argument("--ls-remote-timeout", type=float, default=60)
     a = ap.parse_args(argv)
 
     root = Path(a.root).resolve()
@@ -104,7 +114,7 @@ def main(argv=None) -> int:
     if a.branches_file:
         branches = Path(a.branches_file).read_text(encoding="utf-8").splitlines()
     else:
-        branches = remote_branches(root)
+        branches = remote_branches(root, a.ls_remote_timeout)
         if branches is None:
             print("WARNING: could not list origin radar branches; picking WITHOUT the cooldown", file=sys.stderr)
             branches = []

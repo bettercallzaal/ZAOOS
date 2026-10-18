@@ -28,6 +28,12 @@ export const MAX_PEOPLE = 5000;
 export const MAX_NAME_CHARS = 32;
 /** Asked once, appended to ZOE's first reply to someone new. */
 export const NAME_ASK_LINE = 'Quick one, so I get it right next time: what would you like me to call you? Reply "call me" and your name.';
+/**
+ * The thanks in a guild channel. It names nobody: the name is unreviewed text,
+ * and in a channel the whole server would read it (Evaluator note 6, #4014).
+ * A DM gets nameOnlyReply, which says the name back.
+ */
+export const NAME_SAVED_PUBLIC_LINE = 'Got it. I will use that name from now on.';
 
 export type Platform = 'discord' | 'telegram';
 

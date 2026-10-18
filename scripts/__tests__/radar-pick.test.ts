@@ -9,7 +9,7 @@
  * must still be picked, so the skip is caused by the branches and nothing else.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
@@ -92,6 +92,21 @@ describe('radar-pick.py', () => {
     git('push', '-q', 'origin', 'main:refs/heads/ws/radar-694-2026-10-16');
     const r = run(dir, null);
     expect(r.stdout.trim()).toMatch(/^695 /);
+  });
+
+  it('a hung ls-remote warns and falls back instead of crashing', () => {
+    const dir = tree(LIBRARY);
+    const bin = mkdtempSync(join(tmpdir(), 'radar-bin-'));
+    writeFileSync(join(bin, 'git'), '#!/bin/sh\nsleep 10\n');
+    chmodSync(join(bin, 'git'), 0o755);
+    const r = spawnSync('python3', [PICKER, '--root', dir, '--today', '2026-10-17', '--ls-remote-timeout', '1'], {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout.trim()).toMatch(/^694 /);
+    expect(r.stderr).toContain('WARNING: could not list origin radar branches');
+    expect(r.stderr).not.toContain('Traceback');
   });
 
   it('an unreadable origin warns and falls back to the plain oldest pick', () => {

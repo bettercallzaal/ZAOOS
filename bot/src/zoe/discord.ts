@@ -11,11 +11,15 @@
  * - DISCORD_COMMUNITY_ASKS_ENABLED: set to "1" to enable Stage 1b approval flow
  *   (non-owner messages route through Zaal for button-approval before sending)
  *
- * Intents required (none privileged):
- * - Guilds, Guild Messages, Direct Messages
- * - NOT Message Content: ZOE reads only DMs and @mentions, and Discord sends
- *   the content of those without it (doc 2685 D2). Asking for a privileged
- *   intent the app does not use is more data and a Portal toggle for nothing.
+ * - DISCORD_CHANNEL_READ: "0" turns whole-channel reading off (default on)
+ *
+ * Intents:
+ * - Guilds, Guild Messages, Direct Messages (not privileged)
+ * - Message Content (privileged), unless DISCORD_CHANNEL_READ=0. Zaal,
+ *   2026-10-18: ZOE helps in the ZAO Discords, so an @mention reply sees the
+ *   channel's recent messages. It still only REPLIES to DMs and @mentions.
+ *   The Portal toggle must match, or Discord closes the gateway with 4014.
+ *   Doc 2685 D2 had dropped this intent when ZOE read only DMs and @mentions.
  *
  * Other people's turns are capped per hour (DISCORD_TURNS_PER_HOUR, default 6;
  * doc 2685 D1). Zaal's are not.
@@ -35,7 +39,17 @@ import {
 } from 'discord.js';
 import { runConciergeTurn } from './concierge';
 import { buildMemoryBlocks } from './memory';
-import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, mentionsZoe } from './discord-scope';
+import {
+  communityAskOutcome,
+  DISCORD_CONTEXT_MESSAGES,
+  discordChannelRead,
+  discordScopeFor,
+  discordShouldReply,
+  discordTurnAllowed,
+  discordTurnsPerHour,
+  formatChannelContext,
+  mentionsZoe,
+} from './discord-scope';
 import { featureRan } from './feature-ran';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
@@ -45,6 +59,7 @@ loadEnv();
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const DISCORD_ZAAL_ID = process.env.DISCORD_ZAAL_ID;
 const COMMUNITY_ASKS_ENABLED = process.env.DISCORD_COMMUNITY_ASKS_ENABLED === '1';
+const CHANNEL_READ = discordChannelRead();
 
 const turnLimiter = newMemberDmLimiter();
 
@@ -134,13 +149,15 @@ export async function bootDiscordClient(): Promise<Client | null> {
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.DirectMessages,
+      ...(CHANNEL_READ ? [GatewayIntentBits.MessageContent] : []),
     ],
   });
 
   client.once('ready', () => {
     console.log(
       `[zoe/discord] connected as ${client.user?.username ?? 'unknown'}` +
-        (COMMUNITY_ASKS_ENABLED ? ' [community-asks: ON]' : ''),
+        (COMMUNITY_ASKS_ENABLED ? ' [community-asks: ON]' : '') +
+        (CHANNEL_READ ? ' [channel-read: ON]' : ''),
     );
   });
 
@@ -158,20 +175,14 @@ export async function bootDiscordClient(): Promise<Client | null> {
     try {
       if (message.author.bot || message.system) return;
 
-      let triggered = false;
-      let isOwnerDM = false;
+      const isOwnerDM = message.channel.isDMBased() && !!DISCORD_ZAAL_ID && message.author.id === DISCORD_ZAAL_ID;
 
-      if (message.channel.isDMBased()) {
-        triggered = true;
-        if (DISCORD_ZAAL_ID && message.author.id === DISCORD_ZAAL_ID) {
-          isOwnerDM = true;
-        }
-      }
-
-      if (message.channel.type === ChannelType.GuildText && mentionsZoe(message.mentions, client.user?.id)) {
-        triggered = true;
-      }
-
+      // Reading the channel never means speaking in it (discordShouldReply).
+      const triggered = discordShouldReply({
+        isDM: message.channel.isDMBased(),
+        isGuildText: message.channel.type === ChannelType.GuildText,
+        mentioned: mentionsZoe(message.mentions, client.user?.id),
+      });
       if (!triggered) return;
 
       if (!discordTurnAllowed(turnLimiter, message.author.id, DISCORD_ZAAL_ID, Date.now(), discordTurnsPerHour())) {
@@ -208,8 +219,26 @@ export async function bootDiscordClient(): Promise<Client | null> {
         .replace(new RegExp(`<@${client.user?.id}>`, 'g'), '')
         .trim();
 
+      // Whole-channel read: an @mention in a guild channel sees that channel's
+      // recent messages. Same channel only, same group scope as above. A failed
+      // fetch answers without context rather than not at all.
+      let channelContext = '';
+      if (CHANNEL_READ && !message.channel.isDMBased()) {
+        try {
+          const earlier = await message.channel.messages.fetch({ limit: DISCORD_CONTEXT_MESSAGES, before: message.id });
+          channelContext = formatChannelContext(
+            [...earlier.values()].reverse().map((m) => ({
+              author: m.author.id === client.user?.id ? 'ZOE' : (m.author.username ?? 'User'),
+              content: m.content,
+            })),
+          );
+        } catch (err) {
+          console.error('[zoe/discord] channel context fetch failed:', (err as Error).message);
+        }
+      }
+
       const result = await runConciergeTurn({
-        message: messageText,
+        message: channelContext + messageText,
         blocks,
         context: {
           zaal_tg_id: DISCORD_ZAAL_ID ? Number(DISCORD_ZAAL_ID) : 0,

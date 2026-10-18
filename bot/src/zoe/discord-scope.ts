@@ -29,6 +29,15 @@ export function discordScopeFor(m: DiscordScopeInput): 'private' | string {
   return `discord:${m.channelId}`;
 }
 
+/**
+ * Whether ZOE replies to a message at all. Reading a whole channel (Message
+ * Content) never makes ZOE speak in it: only a DM, or an @mention of ZOE in a
+ * guild text channel, gets a reply. Zaal, 2026-10-18, option A.
+ */
+export function discordShouldReply(m: { isDM: boolean; isGuildText: boolean; mentioned: boolean }): boolean {
+  return m.isDM || (m.isGuildText && m.mentioned);
+}
+
 /** The one method of discord.js `MessageMentions` this needs. */
 export interface MentionsLike {
   has(id: string, options?: { ignoreEveryone?: boolean; ignoreRoles?: boolean }): boolean;
@@ -76,4 +85,41 @@ export function discordTurnAllowed(
  */
 export function communityAskOutcome(zaalNotified: boolean): 'queued' | 'held' {
   return zaalNotified ? 'queued' : 'held';
+}
+
+/**
+ * Whether ZOE reads whole guild channels (the privileged Message Content
+ * intent). On unless DISCORD_CHANNEL_READ is "0". Zaal, 2026-10-18: ZOE helps
+ * in the ZAO Discords, which means reading channels, not only DMs and
+ * @mentions. With it on, the Developer Portal toggle must be on too, or Discord
+ * closes the gateway with code 4014. "0" drops the intent and goes back to
+ * DMs and @mentions only, with no Portal change needed.
+ */
+export function discordChannelRead(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.DISCORD_CHANNEL_READ !== '0';
+}
+
+/** How many earlier messages in the same channel an @mention reply sees. */
+export const DISCORD_CONTEXT_MESSAGES = 15;
+const DISCORD_CONTEXT_MAX_CHARS = 3000;
+
+export interface ChannelMessageLike {
+  author: string;
+  content: string;
+}
+
+/**
+ * The recent conversation in ONE channel, oldest first, as a block placed
+ * before the question. Only that channel's own messages: nothing from another
+ * channel, a DM or Zaal's private memory enters it, and the turn still runs
+ * under the channel's group scope (discordScopeFor). Empty messages are
+ * dropped; the oldest lines go first when the block is over the char cap.
+ */
+export function formatChannelContext(msgs: ChannelMessageLike[]): string {
+  const lines = msgs
+    .filter((m) => m.content.trim().length > 0)
+    .map((m) => `${m.author}: ${m.content.trim().replace(/\s+/g, ' ')}`);
+  while (lines.length > 0 && lines.join('\n').length > DISCORD_CONTEXT_MAX_CHARS) lines.shift();
+  if (lines.length === 0) return '';
+  return `Recent messages in this channel, oldest first:\n${lines.join('\n')}\n\nThe message to answer:\n`;
 }

@@ -106,6 +106,14 @@ export interface GapExtract {
  */
 const GAP_LINE = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s*)*(?:\*\*|__)?\s*GAP\s*(?:\*\*|__)?\s*:\s*(?:\*\*|__)?(.*)$/;
 
+/**
+ * The same marker in any case, used only by `anyCaseLastLine` (Discord). Zaal
+ * chose on 2026-10-18 to hide a lowercase marker from a public channel even
+ * though that can hide a real "Gap:" line, as long as it is the last line of a
+ * reply that has more than one line.
+ */
+const GAP_LINE_ANY_CASE = new RegExp(GAP_LINE.source, 'i');
+
 /** A code fence left with nothing inside once its GAP line is gone. */
 const EMPTY_FENCE = /```[^\n]*\n(?:[ \t]*\n)*[ \t]*```/g;
 
@@ -114,7 +122,7 @@ const EMPTY_FENCE = /```[^\n]*\n(?:[ \t]*\n)*[ \t]*```/g;
  * A reply that was nothing but a GAP line keeps a short honest sentence, so
  * Zaal is never sent an empty message.
  */
-export function extractGap(reply: string): GapExtract {
+export function extractGap(reply: string, opts: { anyCaseLastLine?: boolean } = {}): GapExtract {
   const lines = reply.split(/\r?\n/);
   const kept: string[] = [];
   let gap: string | null = null;
@@ -126,6 +134,14 @@ export function extractGap(reply: string): GapExtract {
     }
     const want = cleanWant(m[1].replace(/(?:\*\*|__)\s*$/, ''));
     if (gap === null && want) gap = want;
+  }
+  // Discord only: a last line that is a marker in any case comes off, unless it
+  // is the reply's only line. It is hidden, not recorded: a real "Gap: none"
+  // line would otherwise reach the digest as a want.
+  if (opts.anyCaseLastLine) {
+    const filled = kept.map((l, i) => (l.trim() ? i : -1)).filter((i) => i >= 0);
+    const last = filled[filled.length - 1];
+    if (filled.length > 1 && GAP_LINE_ANY_CASE.test(kept[last])) kept.splice(last, 1);
   }
   if (kept.length === lines.length) return { reply, gap: null };
   const text = kept.join('\n').replace(EMPTY_FENCE, '').replace(/\n{3,}/g, '\n\n').trimEnd();

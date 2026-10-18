@@ -267,6 +267,43 @@ describe('marker spellings a model plausibly writes (Evaluator, #3918)', () => {
     const r = extractGap('There is a gap: the venue closes at 9.');
     expect(r).toEqual({ reply: 'There is a gap: the venue closes at 9.', gap: null });
   });
+
+  describe('anyCaseLastLine (Discord, Zaal 2026-10-18)', () => {
+    const opts = { anyCaseLastLine: true };
+
+    it.each([
+      ['Sure, I can help with part of that.\ngap: send an email'],
+      ['Sure, I can help with part of that.\nGap: send an email\n'],
+      ['Sure, I can help with part of that.\n\n- **gap:** send an email'],
+    ])('a lowercase marker on the last line is hidden and not recorded: %j', (reply) => {
+      expect(extractGap(reply, opts)).toEqual({ reply: 'Sure, I can help with part of that.', gap: null });
+    });
+
+    it('an uppercase marker is still recorded', () => {
+      expect(extractGap('Here you go.\nGAP: send an email', opts)).toEqual({ reply: 'Here you go.', gap: 'send an email' });
+    });
+
+    // The #3980 probes again, under the Discord option. Kept: a one-line reply,
+    // and a "Gap:" line that is not last. Hidden: a real "Gap:" line that is
+    // last. That third row is the trade-off Zaal accepted.
+    it.each([
+      ['gap: the venue closes at 9, so we wrap early.'],
+      ['Gap: set a reminder at 3pm'],
+      ['Schedule:\n- Gap: 20 minutes between sets\n- Doors at 7'],
+      ['There is a gap: the venue closes at 9.\nSee you there.'],
+    ])('kept as content: %j', (reply) => {
+      expect(extractGap(reply, opts)).toEqual({ reply, gap: null });
+    });
+
+    it('the accepted cost: a real last "Gap:" line is hidden', () => {
+      expect(extractGap('Plan:\n1. Gap: none, back to back', opts)).toEqual({ reply: 'Plan:', gap: null });
+    });
+
+    it('without the option nothing lowercase comes off', () => {
+      const reply = 'Sure, I can help with part of that.\ngap: send an email';
+      expect(extractGap(reply)).toEqual({ reply, gap: null });
+    });
+  });
 });
 
 describe('gapWeekKey', () => {
@@ -331,6 +368,8 @@ describe('the wiring', () => {
       for (const t of calls) expect(t.slice(0, t.indexOf('});')), other).not.toMatch(/\bgapLog\b\s*[:,}\n]/);
     }
     expect(index.match(/extractGap\(/g)).toHaveLength(1);
+    // Telegram is Zaal's private DM: uppercase markers only, no any-case option.
+    expect(index).not.toContain('anyCaseLastLine');
     // concierge.ts adds the block from the option, never from the env flag.
     const concierge = src('concierge.ts');
     expect(concierge).toContain('...(isPrivate && gapLog === true ? GAP_PROMPT_BLOCK : []),');
@@ -447,6 +486,7 @@ describe('Discord community gaps (doc 2685 D7)', () => {
     expect(turns).toHaveLength(1);
     expect(turns[0].slice(0, turns[0].indexOf('});'))).toMatch(/\bgapLog,/);
     expect(d.match(/extractGap\(/g)).toHaveLength(1);
+    expect(d).toContain('extractGap(result.reply, { anyCaseLastLine: true })');
     const turn = d.indexOf('const result = await runConciergeTurn({');
     const strip = d.indexOf('result.reply = extracted.reply;');
     expect(strip).toBeGreaterThan(turn);

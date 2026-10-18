@@ -259,7 +259,8 @@ export async function bootDiscordClient(): Promise<Client | null> {
       // Take the GAP line off before the reply is queued or sent. A failed
       // write must not cost the person their answer.
       if (gapLog && result.reply) {
-        const extracted = extractGap(result.reply);
+        // Public surface: a lowercase marker on the last line comes off too (Zaal, 2026-10-18).
+        const extracted = extractGap(result.reply, { anyCaseLastLine: true });
         result.reply = extracted.reply;
         if (extracted.gap) {
           try {

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cleanPreferredName,
   loadPeople,
+  markAsked,
   MAX_PEOPLE,
   NAME_ASK_LINE,
   notePersonTurn,
@@ -52,34 +53,57 @@ describe('cleanPreferredName', () => {
     ['Ilana; drop table'],
     ['@everyone'],
     ['a'.repeat(33)],
-    ['one two three four five'],
+    ['one two three four'],
+    // Evaluator #4014 B3: these would pass as someone else in the prompt.
+    ['Zaal'],
+    ['zoe'],
+    ['ZOE AGENT'],
+    ['The ZAO'],
+    ['Admin'],
   ])('refused: %j', (raw) => {
     expect(cleanPreferredName(raw)).toBeNull();
   });
 });
 
 describe('parseNameAnswer', () => {
-  it('"call me X" and "my name is X" count at any time', () => {
-    expect(parseNameAnswer('call me Ilana', false)).toBe('Ilana');
-    expect(parseNameAnswer('hey, my name is Ilana, what is ZAO', false)).toBe('Ilana');
+  it.each([
+    ['call me Ilana', 'Ilana'],
+    ['Call me Ilana.', 'Ilana'],
+    ['my name is Ilana', 'Ilana'],
+    ["my name's Mary-Jane", 'Mary-Jane'],
+    ['I go by DJ 9!', 'DJ 9'],
+    ['please call me Tom', 'Tom'],
+  ])('the whole message is the phrase and a name: %j -> %j', (text, want) => {
+    expect(parseNameAnswer(text)).toBe(want);
   });
 
-  it('a short reply counts only right after ZOE asked', () => {
-    expect(parseNameAnswer('Ilana', true)).toBe('Ilana');
-    expect(parseNameAnswer("it's Ilana", true)).toBe('Ilana');
-    expect(parseNameAnswer('Ilana', false)).toBeNull();
+  // Verbatim from the #4014 Evaluator probes (B1, B2): each became a name.
+  it.each([
+    ['call me tomorrow about the gig'],
+    ['can you call me back'],
+    ['call me back later'],
+    ['call me later'],
+    ['call me when you can'],
+    ['call me tomorrow'],
+    ['hey, my name is Ilana, what is ZAO'],
+    ['sounds good'],
+    ['got it'],
+    ['will do'],
+    ['perfect'],
+    ['all good'],
+    ['Portland'],
+    ['more questions here please'],
+    ['Ilana'],
+    ['call me Zaal'],
+    ['call me Ilana?'],
+    ['call me Ilana\nand what is ZAO'],
+  ])('not a name: %j', (text) => {
+    expect(parseNameAnswer(text)).toBeNull();
   });
-
-  it.each([['ok thanks'], ['thank you'], ['yes'], ['what is ZAO?'], ['lol'], ['hi there']])(
-    'not a name, even right after asking: %j',
-    (text) => {
-      expect(parseNameAnswer(text, true)).toBeNull();
-    },
-  );
 });
 
 describe('notePersonTurn', () => {
-  it('a new person is recorded and asked once, under their handle', () => {
+  it('a new person is recorded and gets the question, under their handle; askedAt waits for delivery', () => {
     const t = turn({}, 'what is The ZAO');
     expect(t.label).toBe('ilana_x');
     expect(t.askSuffix).toBe(`\n\n${NAME_ASK_LINE}`);
@@ -88,16 +112,15 @@ describe('notePersonTurn', () => {
       platform: 'discord',
       id: '123',
       handle: 'ilana_x',
-      askedAt: now.toISOString(),
       firstSeen: now.toISOString(),
       lastSeen: now.toISOString(),
       turns: 1,
     });
   });
 
-  it('their answer sets the name, gets a thanks, and the name is used after', () => {
+  it('"call me X" alone sets the name, gets a thanks, and the name is used after', () => {
     const t1 = turn({}, 'hi');
-    const t2 = turn(t1.people, 'Ilana', later);
+    const t2 = turn(t1.people, 'call me Ilana', later);
     expect(t2.nameOnlyReply).toBe('Nice to meet you, Ilana. I will call you that from now on.');
     expect(t2.person).toMatchObject({ name: 'Ilana', turns: 2, lastSeen: later.toISOString(), firstSeen: now.toISOString() });
     const t3 = turn(t2.people, 'what is WaveWarZ?', later);
@@ -106,21 +129,26 @@ describe('notePersonTurn', () => {
     expect(t3.nameOnlyReply).toBeUndefined();
   });
 
-  it('never asks twice, even when they did not answer', () => {
-    const t1 = turn({}, 'hi');
-    const t2 = turn(t1.people, 'what is WaveWarZ?', later);
-    expect(t2.askSuffix).toBe('');
-    expect(t2.person.name).toBeUndefined();
-    const t3 = turn(t2.people, 'Ilana', later);
-    expect(t3.person.name).toBeUndefined();
+  it('a short reply after the question is answered, never taken as a name', () => {
+    const asked: People = { 'discord:123': { platform: 'discord', id: '123', handle: 'ilana_x', askedAt: now.toISOString(), firstSeen: now.toISOString(), lastSeen: now.toISOString(), turns: 1 } };
+    for (const text of ['sounds good', 'Portland', 'Ilana']) {
+      const t = turn(asked, text, later);
+      expect(t.person.name).toBeUndefined();
+      expect(t.nameOnlyReply).toBeUndefined();
+      expect(t.askSuffix).toBe('');
+    }
   });
 
-  it('a "call me X" inside a longer question sets the name and still runs the turn', () => {
-    const t = turn({}, 'call me Ilana, and can you tell me when the next WaveWarZ battle is and who is playing');
-    expect(t.person.name).toBe('Ilana');
+  it('once asked, never asked again', () => {
+    const asked: People = { 'discord:123': { platform: 'discord', id: '123', handle: 'ilana_x', askedAt: now.toISOString(), firstSeen: now.toISOString(), lastSeen: now.toISOString(), turns: 1 } };
+    expect(turn(asked, 'what is WaveWarZ?', later).askSuffix).toBe('');
+  });
+
+  it('a question containing "call me" is answered, and the name is not set', () => {
+    const t = turn({}, 'call me tomorrow about the gig');
+    expect(t.person.name).toBeUndefined();
     expect(t.nameOnlyReply).toBeUndefined();
-    expect(t.askSuffix).toBe('');
-    expect(t.label).toBe('Ilana');
+    expect(t.label).toBe('ilana_x');
   });
 
   it('the input table is not mutated', () => {
@@ -152,6 +180,18 @@ describe('recordPersonTurn (file)', () => {
     expect(people['telegram:42']).toMatchObject({ handle: 'Tom', turns: 1 });
   });
 
+  it('markAsked records the question once, after delivery', async () => {
+    const path = join(dir(), 'people.json');
+    await recordPersonTurn({ platform: 'discord', id: '7', handle: 'Tom', text: 'hi', now }, path);
+    expect((await loadPeople(path))['discord:7'].askedAt).toBeUndefined();
+    await markAsked('discord', '7', later, path);
+    expect((await loadPeople(path))['discord:7'].askedAt).toBe(later.toISOString());
+    await markAsked('discord', '7', new Date('2026-10-19T00:00:00Z'), path);
+    expect((await loadPeople(path))['discord:7'].askedAt).toBe(later.toISOString());
+    const t = await recordPersonTurn({ platform: 'discord', id: '7', handle: 'Tom', text: 'more', now: later }, path);
+    expect(t?.askSuffix).toBe('');
+  });
+
   it('a damaged file is not overwritten and the turn goes on without the list', async () => {
     const path = join(dir(), 'people.json');
     writeFileSync(path, '{not json');
@@ -165,7 +205,12 @@ describe('wiring', () => {
 
   it('discord.ts: off by default, never for Zaal, before the turn, and the ask rides on the reply', () => {
     const d = src('discord.ts');
-    expect(d).toContain("if (peopleLogEnabled() && message.author.id !== DISCORD_ZAAL_ID) {");
+    // Fails closed: no DISCORD_ZAAL_ID, nobody is recorded (Evaluator note, #4014).
+    expect(d).toContain('if (peopleLogEnabled() && DISCORD_ZAAL_ID && message.author.id !== DISCORD_ZAAL_ID) {');
+    // askedAt only after the question was sent: direct reply, and the approval send.
+    expect(d).toContain("if (nameAsk && result.reply) await markAsked('discord', message.author.id);");
+    expect(d).toContain("if (pending.askedId) await markAsked('discord', pending.askedId);");
+    expect(d.indexOf("if (pending.askedId) await markAsked")).toBeGreaterThan(d.indexOf('await pending.channel.send({ content: chunk });'));
     expect(d.indexOf('recordPersonTurn(')).toBeLessThan(d.indexOf('const result = await runConciergeTurn({'));
     expect(d.indexOf('recordPersonTurn(')).toBeGreaterThan(d.indexOf('if (!triggered) return;'));
     expect(d).toContain("const replyText = result.reply ? result.reply + nameAsk : 'I could not generate a response.';");
@@ -178,7 +223,8 @@ describe('wiring', () => {
     const rec = i.indexOf('recordPersonTurn(');
     expect(rec).toBeGreaterThan(member);
     expect(rec).toBeLessThan(i.indexOf('await runMemberDmTurn(', member));
-    expect(i).toContain('answer === MEMBER_DM_LIMIT_LINE || answer === MEMBER_DM_EMPTY_LINE ? answer : answer + nameAsk');
+    expect(i).toContain('const asks = !!nameAsk && answer !== MEMBER_DM_LIMIT_LINE && answer !== MEMBER_DM_EMPTY_LINE;');
+    expect(i).toContain("if (asks && ctx.from) await markAsked('telegram', ctx.from.id);");
   });
 
   it('nothing in people.ts sends anything or touches Bonfire', () => {

@@ -10,8 +10,10 @@
  * (a Discord DM or @mention, a Telegram member DM) updates one row:
  * platform, id, handle, preferred name, first seen, last seen, turn count.
  * The first time someone talks to ZOE she answers them and then asks, once,
- * what she should call them. A short reply to that question, or "call me X"
- * at any time, sets the name, and ZOE uses it from then on.
+ * what she should call them, and says how to answer. Only a message that is
+ * nothing but "call me X" or "my name is X" sets the name (Evaluator, #4014:
+ * guessing from short replies made "sounds good" and "Portland" into names, and
+ * "call me tomorrow about the gig" into "tomorrow about the gig").
  *
  * The file lives in ZOE's home (outside the repo), owner-only (0600), and is
  * capped at MAX_PEOPLE rows. Nothing here is sent anywhere.
@@ -25,7 +27,7 @@ import { ZOE_PATHS } from './memory';
 export const MAX_PEOPLE = 5000;
 export const MAX_NAME_CHARS = 32;
 /** Asked once, appended to ZOE's first reply to someone new. */
-export const NAME_ASK_LINE = 'Quick one, so I get it right next time: what would you like me to call you?';
+export const NAME_ASK_LINE = 'Quick one, so I get it right next time: what would you like me to call you? Reply "call me" and your name.';
 
 export type Platform = 'discord' | 'telegram';
 
@@ -36,7 +38,7 @@ export interface Person {
   handle: string;
   /** What they asked to be called. Absent until they say. */
   name?: string;
-  /** When ZOE asked for a name. Set once; she never asks twice. */
+  /** When the name question was delivered. Set once, after it was sent; she never asks twice. */
   askedAt?: string;
   firstSeen: string;
   lastSeen: string;
@@ -55,8 +57,10 @@ export const personKey = (platform: Platform, id: string | number): string => `$
 
 /**
  * A name a person may be called: letters (any script), digits, spaces and
- * . ' - only, at most four words. The name goes into the model's prompt as the
- * sender label, so anything that could carry an instruction is refused.
+ * . ' - only, at most three words, none of them a word no name is made of,
+ * and never a name that would pass as Zaal or ZOE. The name goes into the
+ * model's prompt as the sender label, so anything that could carry an
+ * instruction is refused.
  */
 export function cleanPreferredName(raw: string): string | null {
   const s = raw
@@ -66,34 +70,40 @@ export function cleanPreferredName(raw: string): string | null {
     .trim();
   if (!s || s.length > MAX_NAME_CHARS) return null;
   if (!/^[\p{L}\p{N}][\p{L}\p{N} .'-]*$/u.test(s)) return null;
-  if (s.split(' ').length > 4) return null;
+  const words = s.toLowerCase().split(' ');
+  if (words.length > 3) return null;
+  if (RESERVED_NAMES.has(s.toLowerCase())) return null;
+  // "call me back later", "call me tomorrow": a word no name is made of means
+  // the phrase was an ordinary request (Evaluator, #4014).
+  if (words.some((w) => NOT_NAME_WORDS.has(w))) return null;
   return s;
 }
 
-const CALL_ME = /\b(?:call me|my name is|my name's|i go by)\s+(.+)$/i;
-const SHORT_ANSWER_PREFIX = /^(?:it'?s|i'?m|im|just|you can call me|call me)\s+/i;
+const NOT_NAME_WORDS = new Set([
+  'a', 'an', 'the', 'about', 'after', 'again', 'at', 'back', 'before', 'by', 'for', 'if', 'in', 'later',
+  'maybe', 'me', 'now', 'on', 'please', 'pls', 'soon', 'then', 'to', 'today', 'tomorrow', 'tonight',
+  'when', 'whenever', 'with', 'you', 'asap', 'sometime', 'anytime', 'whatever', 'anything',
+]);
+
+/** Names that would pass as someone else in the prompt or on Zaal's approval card (Evaluator, #4014). */
+const RESERVED_NAMES = new Set([
+  'zaal', 'zaal panthaki', 'bettercallzaal', 'zoe', 'zoe agent', 'zao', 'the zao', 'admin', 'administrator',
+  'mod', 'moderator', 'owner', 'system', 'assistant', 'user', 'claude', 'everyone', 'here', 'bot',
+]);
+
+/** The whole message, and nothing else: "call me X", "my name is X", "I go by X". */
+const CALL_ME = /^\s*(?:please\s+)?(?:call me|my name is|my name's|i go by)\s+(.+?)\s*[.!]*\s*$/i;
 
 /**
- * The name in a message, if it gives one. "call me X" and "my name is X" count
- * at any time. Right after ZOE asked, a short reply on its own ("Ilana", "it's
- * Ilana") counts too. A question or a sentence never does.
+ * The name in a message, or null. Only a message that is nothing but the
+ * phrase and the name counts, so a question that happens to contain "call me"
+ * is answered, not mistaken for a name.
  */
-export function parseNameAnswer(text: string, justAsked: boolean): string | null {
-  const t = text.trim();
-  const explicit = CALL_ME.exec(t);
-  if (explicit) return cleanPreferredName(explicit[1].split(/[,;\n]/)[0]);
-  if (!justAsked || t.includes('?') || t.includes('\n')) return null;
-  const firstWord = t.toLowerCase().split(/[\s,.!]+/)[0];
-  if (NOT_A_NAME.has(firstWord)) return null;
-  return cleanPreferredName(t.replace(SHORT_ANSWER_PREFIX, ''));
+export function parseNameAnswer(text: string): string | null {
+  if (text.includes('\n') || text.includes('?')) return null;
+  const m = CALL_ME.exec(text);
+  return m ? cleanPreferredName(m[1]) : null;
 }
-
-/** Short replies that answer something else ("ok thanks") and are not names. */
-const NOT_A_NAME = new Set([
-  'ok', 'okay', 'k', 'thanks', 'thank', 'thx', 'ty', 'yes', 'yeah', 'yep', 'no', 'nope', 'nah',
-  'sure', 'cool', 'nice', 'great', 'lol', 'haha', 'hi', 'hello', 'hey', 'gm', 'gn', 'what', 'why',
-  'how', 'who', 'when', 'where', 'please', 'pls', 'later', 'idk', 'whatever', 'anything', 'none',
-]);
 
 export interface PeopleTurn {
   /** The table after this turn. Save it. */
@@ -103,7 +113,7 @@ export interface PeopleTurn {
   label: string;
   /** Set when the message was only their name: reply with this, no model turn. */
   nameOnlyReply?: string;
-  /** Append to ZOE's reply: the one-time name question. */
+  /** Append to ZOE's reply: the one-time name question. Call markAsked once it is sent. */
   askSuffix: string;
 }
 
@@ -124,23 +134,16 @@ export function notePersonTurn(
     ? { ...prev, handle: input.handle, lastSeen: ts, turns: prev.turns + 1 }
     : { platform: input.platform, id: String(input.id), handle: input.handle, firstSeen: ts, lastSeen: ts, turns: 1 };
 
+  // The message was nothing but their name, so it gets a short thanks instead of a model turn.
   let nameOnlyReply: string | undefined;
-  // "Just asked" means the question rode on ZOE's reply to their previous turn.
-  const justAsked = !!prev?.askedAt && prev.askedAt === prev.lastSeen && !prev.name;
-  const name = parseNameAnswer(input.text, justAsked);
+  const name = parseNameAnswer(input.text);
   if (name) {
     person.name = name;
-    // A reply that was nothing but the name gets a short thanks instead of a model turn.
-    if (!CALL_ME.test(input.text) || input.text.trim().split(/\s+/).length <= 6) {
-      nameOnlyReply = `Nice to meet you, ${name}. I will call you that from now on.`;
-    }
+    nameOnlyReply = `Nice to meet you, ${name}. I will call you that from now on.`;
   }
 
-  let askSuffix = '';
-  if (!person.name && !person.askedAt) {
-    person.askedAt = ts;
-    askSuffix = `\n\n${NAME_ASK_LINE}`;
-  }
+  // askedAt is set by markAsked, after the question was actually sent.
+  const askSuffix = !person.name && !person.askedAt ? `\n\n${NAME_ASK_LINE}` : '';
 
   return {
     people: { ...people, [key]: person },
@@ -193,5 +196,23 @@ export async function recordPersonTurn(
   } catch (err) {
     console.error('[zoe/people] person not recorded:', err instanceof Error ? err.message : String(err));
     return null;
+  }
+}
+
+/** Record that the name question reached them, so it is never asked again. Never throws. */
+export async function markAsked(
+  platform: Platform,
+  id: string | number,
+  now: Date = new Date(),
+  path: string = peoplePath(),
+): Promise<void> {
+  try {
+    const people = await loadPeople(path);
+    const key = personKey(platform, id);
+    const person = people[key];
+    if (!person || person.askedAt) return;
+    await savePeople({ ...people, [key]: { ...person, askedAt: now.toISOString() } }, path);
+  } catch (err) {
+    console.error('[zoe/people] ask not recorded:', err instanceof Error ? err.message : String(err));
   }
 }

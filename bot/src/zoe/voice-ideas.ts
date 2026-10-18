@@ -10,7 +10,7 @@
  * new part.
  *
  * With ZOE_VOICE_IDEAS=1 (default OFF), a DM voice note that contains at least
- * one marker AT THE START OF A SENTENCE, and asks ZOE nothing (no "?"), is
+ * one marker AT THE START OF A SENTENCE, and asks ZOE nothing (asksSomething), is
  * split before each marker. Mid-sentence markers do not count (Evaluator,
  * #4016: "what do you think of this new idea for the festival, should we book
  * the parklet again?" was split and saved, and the question never answered).
@@ -55,6 +55,26 @@ const MARKER_RE = new RegExp(
   'gi',
 );
 
+/**
+ * Whisper often drops the "?" from a spoken question, so a note also counts as
+ * asking when its last sentence opens with a question word (Evaluator note on
+ * #4016: "...Another idea is a volunteer pass. What do you think" was split and
+ * never answered). A statement that happens to open this way ("Should be easy")
+ * goes to ZOE as a normal turn, which loses nothing.
+ */
+const QUESTION_START = new RegExp(
+  `^(?:zoe[,.]?\\s+)?${FILLER}(?:what|how|why|who|where|when|which|should|could|would|can|do|does|did|is|are|will|any thoughts)\\b`,
+  'i',
+);
+
+/** True when the note asks ZOE something: a "?" anywhere, or a last sentence that opens with a question word. */
+export function asksSomething(transcript: string): boolean {
+  if (transcript.includes('?')) return true;
+  const sentences = transcript.split(/[.!\n]+/).map((t) => t.trim()).filter(Boolean);
+  const last = sentences[sentences.length - 1] ?? '';
+  return QUESTION_START.test(last);
+}
+
 /** A part shorter than this is a stray phrase, not an idea; it joins the part before it. */
 export const MIN_IDEA_WORDS = 4;
 /** At most this many ideas from one voice note; the rest stay in the last one. */
@@ -70,7 +90,7 @@ export function splitVoiceIdeas(transcript: string): string[] {
   const raw = transcript.trim();
   if (!raw) return [];
   const flat = (t: string): string => t.replace(/\s+/g, ' ').trim();
-  if (raw.includes('?')) return [flat(raw)];
+  if (asksSomething(raw)) return [flat(raw)];
   const cuts = [...raw.matchAll(MARKER_RE)].map((m) => m.index ?? 0).filter((i) => i > 0);
   const bounds = [0, ...cuts, raw.length];
   const parts: string[] = [];

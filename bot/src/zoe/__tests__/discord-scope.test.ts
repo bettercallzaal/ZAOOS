@@ -2,7 +2,17 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { Client, MessageMentions } from 'discord.js';
-import { communityAskOutcome, discordScopeFor, discordTurnAllowed, discordTurnsPerHour, DISCORD_DEFAULT_PER_HOUR, mentionsZoe } from '../discord-scope';
+import {
+  communityAskOutcome,
+  discordChannelRead,
+  discordScopeFor,
+  discordShouldReply,
+  discordTurnAllowed,
+  discordTurnsPerHour,
+  DISCORD_DEFAULT_PER_HOUR,
+  formatChannelContext,
+  mentionsZoe,
+} from '../discord-scope';
 import { newMemberDmLimiter } from '../member-dm';
 
 const OWNER = '111';
@@ -85,10 +95,21 @@ describe('discordTurnsPerHour', () => {
 
 describe('discord.ts wiring (read as text; the module boots a client)', () => {
   const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
-  const intents = src.slice(src.indexOf('intents: ['), src.indexOf(']', src.indexOf('intents: [')));
-  it('asks for no privileged Message Content intent (doc 2685 D2)', () => {
+  const intents = src.slice(src.indexOf('intents: ['), src.indexOf('],\n  });', src.indexOf('intents: [')));
+  it('asks for Message Content only behind the channel-read switch (Zaal, 2026-10-18)', () => {
     expect(intents).toContain('GatewayIntentBits.DirectMessages');
-    expect(intents).not.toContain('MessageContent');
+    expect(intents).toContain('...(CHANNEL_READ ? [GatewayIntentBits.MessageContent] : [])');
+  });
+  it('fetches channel context only for guild channels, and only when channel read is on', () => {
+    expect(src).toContain('if (CHANNEL_READ && !message.channel.isDMBased())');
+    const fetchAt = src.indexOf('messages.fetch(');
+    expect(fetchAt).toBeGreaterThan(src.indexOf('discordScopeFor({'));
+    expect(fetchAt).toBeLessThan(src.indexOf('runConciergeTurn({'));
+    expect(src).toContain('message: channelContext + messageText');
+  });
+  it('channel context does not change the memory scope: the turn still loads the channel scope', () => {
+    expect(src).toContain('const blocks = await buildMemoryBlocks(scope, chatTitle);');
+    expect(src).not.toMatch(/buildMemoryBlocks\('private'/);
   });
   it('checks the turn cap before any model work', () => {
     const cap = src.indexOf('discordTurnAllowed(');
@@ -133,5 +154,90 @@ describe('mentionsZoe (evaluator, #3998)', () => {
     const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
     expect(src).toContain('mentionsZoe(message.mentions, client.user?.id)');
     expect(src).not.toContain('mentions.has(');
+  });
+});
+
+describe('discordChannelRead', () => {
+  it.each([
+    [undefined, true],
+    ['1', true],
+    ['', true],
+    ['0', false],
+  ])('DISCORD_CHANNEL_READ=%s -> %s', (v, want) => {
+    expect(discordChannelRead(v === undefined ? {} : { DISCORD_CHANNEL_READ: v })).toBe(want);
+  });
+});
+
+describe('formatChannelContext', () => {
+  it('lists the channel oldest first, then marks the message to answer', () => {
+    const out = formatChannelContext([
+      { author: 'ana', content: 'when is the next fractal?' },
+      { author: 'ZOE', content: 'Monday' },
+    ]);
+    expect(out).toBe(
+      'Recent messages in this channel, oldest first:\nana: when is the next fractal?\nZOE: Monday\n\nThe message to answer:\n',
+    );
+  });
+  it('drops empty messages (attachments, embeds) and collapses whitespace', () => {
+    const out = formatChannelContext([
+      { author: 'a', content: '   ' },
+      { author: 'b', content: 'two\n\nlines' },
+    ]);
+    expect(out).toContain('b: two lines');
+    expect(out).not.toContain('a:');
+  });
+  it('nothing to show gives an empty string, so the question goes alone', () => {
+    expect(formatChannelContext([])).toBe('');
+    expect(formatChannelContext([{ author: 'a', content: '' }])).toBe('');
+  });
+  it('over the cap, the oldest lines go first and the newest stay', () => {
+    const msgs = Array.from({ length: 40 }, (_, i) => ({ author: `u${i}`, content: 'x'.repeat(200) }));
+    const out = formatChannelContext(msgs);
+    expect(out.length).toBeLessThan(3200);
+    expect(out).toContain('u39:');
+    expect(out).not.toContain('u0:');
+  });
+});
+
+describe('(a) reading a channel never makes ZOE reply in it (Zaal, 2026-10-18, option A)', () => {
+  it('a guild message with no @mention of ZOE gets no reply', () => {
+    expect(discordShouldReply({ isDM: false, isGuildText: true, mentioned: false })).toBe(false);
+  });
+  it('an @mention of ZOE in a guild text channel gets a reply', () => {
+    expect(discordShouldReply({ isDM: false, isGuildText: true, mentioned: true })).toBe(true);
+  });
+  it('a DM gets a reply', () => {
+    expect(discordShouldReply({ isDM: true, isGuildText: false, mentioned: false })).toBe(true);
+  });
+  it('a mention outside a guild text channel (thread, voice, forum) gets no reply', () => {
+    expect(discordShouldReply({ isDM: false, isGuildText: false, mentioned: true })).toBe(false);
+  });
+  it('wiring: nothing replies, types or fetches before the reply gate returns', () => {
+    const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+    const gate = src.indexOf('if (!triggered) return;');
+    expect(src.indexOf('const triggered = discordShouldReply({')).toBeGreaterThan(-1);
+    expect(gate).toBeGreaterThan(src.indexOf("client.on('messageCreate'"));
+    for (const effect of ['message.reply(', 'sendTyping()', 'messages.fetch(', 'runConciergeTurn({']) {
+      expect(src.indexOf(effect, src.indexOf("client.on('messageCreate'"))).toBeGreaterThan(gate);
+    }
+  });
+});
+
+describe('(b) no private memory reaches a guild reply', () => {
+  it('a guild message is never private scope, from anyone, Zaal included', () => {
+    for (const authorId of [OWNER, '999']) {
+      expect(discordScopeFor({ isDM: false, authorId, channelId: 'c1', ownerId: OWNER })).not.toBe('private');
+    }
+  });
+  it('wiring: memory is loaded only through that scope, never as a literal private', () => {
+    const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+    expect(src.match(/buildMemoryBlocks\(/g)).toHaveLength(1);
+    expect(src).toContain('const blocks = await buildMemoryBlocks(scope, chatTitle);');
+  });
+  it('the channel context block holds only that channel\'s own messages', () => {
+    const out = formatChannelContext([{ author: 'ana', content: 'hi' }]);
+    expect(out.split('\n').filter((l) => l.includes(':') && !l.startsWith('Recent') && !l.startsWith('The message'))).toEqual([
+      'ana: hi',
+    ]);
   });
 });

@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-10-13
+last-validated: 2026-10-17
 superseded-by:
 related-docs: "309, 489, 586, 587, 588, 643, 761, 1607, 2374, 2381, 2386, 2418"
 original-query: "Cassie's 12 Oct 2026 thread: Hypersnap hard fork at epoch 1, PoW, quantum-safe keys, two-way relay, private $SNAP, retro claims close 31 Oct, Neynar not engaging on the acquisition proposal. Protocol-layer deep dive (consensus, PoW, epochs, block production, quantum key migration, relay trust model, $SNAP privacy, spend limits, builder APIs, open questions), then what changes for ZAO OS, ZOE/ZOL, the Farcaster CRM and members, and Cassie's GitHub with licenses."
@@ -13,6 +13,8 @@ tier: DEEP
 
 > **Goal:** Read the actual proposal and code behind Cassie's 12 Oct 2026 thread,
 > separate what is specified from what is built, and say what ZAO should do.
+
+**Refreshed 2026-10-17 after the Network School deal:** see the [addendum](#addendum-2026-10-17-after-the-network-school-deal). All seven decisions stand; decision 2 gains a reason, and there is one new watch item (the mini app auth server).
 
 **This doc updates, and does not replace, doc 2418** (Hypersnap state, 2026-08-25)
 and doc 2386 (Snapchain hub economics). Those docs were right about the August
@@ -249,8 +251,86 @@ download repos (for example `back-degrin/Hypersnap`, pushed 2026-10-13). Those a
 a screenshot-tool namesake, and at least one is a download landing page. Only
 `farcasterorg/hypersnap` is the protocol.
 
+## Addendum 2026-10-17: after the Network School deal
+
+Written Sat 17 Oct 2026, 10:5x to 11:xx EDT (clock from `date`), by the "5 queue" lane on the seat's word. Everything below was fetched this run (Sources at the end of this section). The 13 Oct text above is left as it was written.
+
+### What changed between 13 and 17 Oct
+
+| # | Change | Source |
+|---|---|---|
+| A1 | **Network School is acquiring Farcaster.** "We're transferring the Farcaster app, the protocol repositories, and related products to Network School." Terms not disclosed. The detail is in [doc 2680](../2680-zao-farcaster-client-2026/). | Neynar CEO (FID 194), cast `0x5d4797540c`, 2026-10-15 17:47 UTC |
+| A2 | **The buyer was not Cassie's group.** Replying to a critic, the Neynar CEO paraphrased the critic's view as "I personally decide to fund cassie's proposal with $600k of the money our investors gave us" and answered "unfortunately doesn't work that way. I don't decide who gets funded." This is the first public figure attached to Cassie's proposal; it is his paraphrase, not a number from her. | FID 194, cast `0x87188ad554`, 2026-10-15 21:29 UTC |
+| A3 | **Cassie is opposed, and keeps building.** "Anyone applauding the Balaji takeover is a coward" (2026-10-16 11:27 UTC). She also says the DAU spike after the deal is "literally all airdrop farmers" (2026-10-17 01:45 UTC); that is her claim, not measured here. | FID 1325, casts `0xaf627f1f41`, `0x55c9ebb3c5` |
+| A4 | **Network School's own plan, now from a primary post.** Balaji: moderation by "both humans and AI", an appeals process, an onchain vote at `farcaster.xyz/~/vote`, a written "social smart contract", and a naming rule: "you can't use Farcaster, Warpcast, Neynar, Network State, or Network School-related names to launch any coin, token, or commercial project." He also says "the Farcaster protocol is already open" and points to `github.com/farcasterxyz/client`. Doc 2680 decision 7 marked moderation and the vote as single-sourced; this cast confirms both. The rename to "Network State Protocol" is still in no primary post read. | Balaji (FID 37), cast `0x83c734e198`, 2026-10-15 22:38 UTC |
+| A5 | **A $2,048 prize for a Snapchain read node plus client tutorial**, MIT code, entries within seven days of 2026-10-17 14:47 UTC. The node must run "with no API keys from anyone". Network School is funding the Snapchain self-host path, not Hypersnap. Entering is outbound, so it is Zaal's call. | FID 37, cast `0x50184b62b4` |
+| A6 | **New: a Quick Auth that needs no auth server.** Cassie published `@farcasterorg/quick-auth` 0.2.0 and `@farcasterorg/miniapp-sdk` 0.4.0 on 2026-10-14 (npm maintainer `cassie_q`, MIT). In her words: "a drop-in replacement. verifyJwt also accepts the new protocol tokens, checked against a hypersnap node, of your choosing, with no auth server ... sdk.quickAuth JWTs still work." The source repo `farcasterorg/miniapps` was created 2026-10-14; its LICENSE reads "Copyright (c) 2024-present Merkle Manufactory Inc.", and the package's `repository` field still names `farcasterxyz/miniapps`, so it reads as a copy of the official mini apps repo with her changes. She built it after reporting "the SIWF endpoint is down" on 2026-10-14 03:23 UTC (her report; not measured here). | npm registry JSON; `gh api` on the repo and LICENSE; FID 1325 casts `0x23c6920ec2`, `0x3d2b32437a`, `0x276dc6316b` |
+| A7 | **Neynar's API future is still unconfirmed.** The @neynar account, 2026-10-15 22:15 UTC: "the neynar apis/backend also seem likely to stay, but neither is explicitly confirmed in the public post rn ... that last part is still inference". Its newest cast in the fetch was 2026-10-16 00:39 UTC. | FID 6131, cast `0x61aa81d23e` |
+
+### What did NOT change (re-measured)
+
+| Check | 13 Oct | 17 Oct |
+|---|---|---|
+| `farcasterorg/hypersnap` `main` | 3dc7df1, 2026-08-28 | **2e8733d, 2026-10-17 03:43 UTC.** Four new commits on 17 Oct: feed generation, stats, "v20 support", live reply counts. API and indexer work, no fork machinery |
+| `git grep` on `main` for `PIVOT_HEIGHT`, `falcon` (case-insensitive), `hypersnap-relay`, `CustodyMigration`, `CUSTODY_MIGRATION`, `genesis_validator` | 0 hits | **0 hits each.** Control `snapchain`: 383 matching lines (counted with `git grep -c`, a per-line count, so not comparable with the 770 above) |
+| Branches `pow`, `reopen-proof-of-work`, `hyper-v1`, `hyper-api`, `retro-proposal`, `FIP-11` | | last commits 2026-01-10 to 2026-07-08; **none moved** |
+| FIP #19 (`farcasterorg/protocol` discussion 19) | body edited 2026-10-12 02:41 UTC | **same edit time**; 32 comments, newest 2026-10-12 13:04 UTC. Still no pivot date |
+| haatz `/v1/info` | version 0.13.5 | **0.13.5**, `nextEngineVersionTimestamp` 0. Still a Snapchain read node |
+| `api.hypria.app/api/snaps/19640` | about 12,226 | **200, `12226.505088`**; controls FID 0 and 999999999 return 404 |
+| Claim deadline | 31 Oct (Cassie's cast) | no new statement in her 37 casts from 2026-10-13 12:00 UTC to 2026-10-17 02:03 UTC; still 31 Oct |
+
+So the next-actions re-check due 2026-11-01 ran early and found nothing: **decision 4 stands.** It stays on the list for 11-01.
+
+### What it means for the seven decisions
+
+| # | Status | Note |
+|---|---|---|
+| 1 | Stands | No migration code exists (table above). |
+| 2 | **Stands, with a new reason** | ZAO's two read paths now sit on opposite sides of the split: Neynar moves to Network School (A1, API continuity unconfirmed, A7), and haatz is run by Quilibrium, Cassie's side (A3). A self-run Snapchain read node belongs to neither. Doc 2418 decision 3 ("run vanilla snapchain if ZAO ever self-hosts") is now the hedge, and A5 is paying someone to write the three-command tutorial for it. No build yet: read the winning tutorial first. |
+| 3 | Stands, unanswered | haatz is still on Snapchain today. |
+| 4 | Stands | Re-checked above. |
+| 5 | Stands | Nothing new on QCT3. |
+| 6 | Stands | 14 days left at the time of writing. The member note (Next Actions, due 2026-10-24) is still open as far as this lane can see; checked only this doc and its PR history, not Zaal's posts. |
+| 7 | **Stands, one addition** | `farcasterorg/miniapps` is MIT, so `@farcasterorg/quick-auth` may be used with credit. |
+
+### New watch item: the mini app sign-in depends on a Farcaster-run server
+
+ZAOOS's mini app auth calls `createClient()` from `@farcaster/quick-auth` (`src/app/api/miniapp/auth/route.ts:1`, `verifyJwt` at line 24; `package.json` pins `^0.0.8`). That package's default origin is `https://auth.farcaster.xyz` (`createConfig` in its `dist/esm/config.js`), and `verifyJwt` checks tokens against that server's keys. The server is one of the Farcaster "related products" moving to Network School (A1). On 2026-10-17 its `/.well-known/jwks.json` answered 200 with a key set.
+
+**Decision: no change now.** The replacement is three days old at version 0.2.0, and a new dependency is "ask first" in this repo. If `auth.farcaster.xyz` stops answering, the swap is the package rename its author describes (A6). That "drop-in" claim is hers, not tested here.
+
+### Open questions, updated
+
+10 to 13 above are still unanswered. Added:
+
+14. Does `auth.farcaster.xyz` (Quick Auth, SIWF) stay up under Network School?
+15. Does Network School keep Snapchain's validator set as it is (five of six Neynar's, per Cassie's 12 June workshop)? No source read says.
+
+### Next Actions added
+
+| Action | Owner | Type | By When |
+|---|---|---|---|
+| If `auth.farcaster.xyz/.well-known/jwks.json` stops returning a key set, propose the `@farcasterorg/quick-auth` swap for `src/app/api/miniapp/auth/route.ts` (new dependency: ask first). SHIPPED = a PR with a test, or a dated "still up" line here | ZOE lane | PR on trigger | checked at the 2026-11-01 re-check |
+| Read the winning Snapchain read-node tutorial from Balaji's prize (A5) before any self-host plan. SHIPPED = a dated note here, link included | lane | Re-research | after the prize closes, 2026-10-24 |
+
+### Sources for this addendum
+
+All fetched 2026-10-17, keyless, nothing signed or spent. Raw responses were saved to disk in the session scratchpad and quoted from there.
+
+- Casts, raw JSON from `https://haatz.quilibrium.com/v1/castsByFid?fid=<fid>&reverse=true&pageSize=100` - **[FULL, method: curl]**: FID 1325 (100 casts, 2026-09-30 to 2026-10-17 02:03 UTC), FID 194 (to 2026-10-16 07:25 UTC), FID 37 (to 2026-10-17 14:49 UTC), FID 3, FID 6131 (to 2026-10-16 00:39 UTC). Hashes cited in the table.
+- `https://haatz.quilibrium.com/v1/info` - **[FULL, method: curl, JSON]**
+- `https://registry.npmjs.org/@farcasterorg/quick-auth` and `.../@farcasterorg/miniapp-sdk` - **[FULL, method: curl, JSON]**
+- `farcasterorg/miniapps` and `farcasterorg/hypersnap-docs-web` repo metadata, `farcasterorg/miniapps` LICENSE - **[FULL, method: gh api]**
+- `farcasterorg/hypersnap` `main` at 2e8733d - **[FULL, method: git clone --depth 60, git grep]**; branches and commits since 2026-08-28 - **[FULL, method: gh api]**
+- FIP #19, `farcasterorg/protocol` discussion 19 - **[PARTIAL, method: GitHub GraphQL]**: title, edit and update times, comment count and the five newest comments; the body was not re-read because its edit time is unchanged
+- `https://api.hypria.app/api/snaps/{19640,0,999999999}` - **[FULL, method: curl]**
+- `https://auth.farcaster.xyz/.well-known/jwks.json` - **[FULL, method: curl, 200, 429 bytes]**
+- `@farcaster/quick-auth` 0.0.8 as installed in this repo, `dist/esm/config.js` - **[FULL, method: read from node_modules]**
+- ZAOOS code on origin/main - **[FULL, method: git grep]**
+
 ## Also See
 
+- [Doc 2680](../2680-zao-farcaster-client-2026/): the Network School deal and a ZAO client plan, 2026-10-15.
 - [Doc 2418](../2418-hypersnap-state-and-zao-feasibility/): its decisions 1 to 4 stand. Decision 3 ("run vanilla snapchain if ZAO ever self-hosts") now needs re-asking after the pivot, because "vanilla" will mean picking a side.
 - [Doc 2386](../2386-snapchain-hub-economics-governance-aug2026/), [Doc 2374](../2374-farcaster-operator-crisis-aug2026/): the operator crisis and hub economics in August.
 - [Doc 309](../309-snapchain-hypersnap-protocol-deep-dive/), [Doc 588](../588-cassie-heart-github-deep-profile/), [Doc 761](../../agents/761-zao-farcaster-multiagent-quilibrium-stack/), [Doc 1607](../1607-zol-zabal-channel-autopost-spec/)

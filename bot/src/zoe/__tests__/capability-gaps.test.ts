@@ -405,6 +405,30 @@ describe('Discord community gaps (doc 2685 D7)', () => {
     expect(pickUpgrade(groups)?.want).toBe('send an email');
   });
 
+  it('the digest names the queued gap by its own number when a community gap sits above it (evaluator, #4008)', () => {
+    const groups = summarizeGaps(
+      [...[1, 2, 3, 4, 5].map((d) => discordRow('speak aloud', d)), row('speak aloud', 6), row('send an email'), row('send email', 2), row('email it', 3)],
+      NOW,
+    );
+    expect(groups.map((g) => [g.want, g.count, g.community ?? 0])).toEqual([
+      ['speak aloud', 6, 5],
+      ['send an email', 3, 0],
+    ]);
+    const queued = pickUpgrade(groups);
+    expect(queued?.want).toBe('send an email');
+    const text = formatGapDigest(groups, queued);
+    expect(text).toContain('I queued an upgrade check for number 2.');
+    expect(text).not.toContain('for number 1.');
+  });
+
+  it('a queued gap past the listed top is named by its words', () => {
+    const groups = [
+      ...['alpha one', 'bravo two', 'charlie three', 'delta four', 'echo five'].map((want) => ({ want, count: 9, lastTs: daysAgo(1), community: 9 })),
+      { want: 'send an email', count: 2, lastTs: daysAgo(1) },
+    ];
+    expect(formatGapDigest(groups, groups[5])).toContain('I queued an upgrade check for "send an email".');
+  });
+
   it('a discord row round-trips through the file with its source; a plain row stays plain', async () => {
     const path = join(mkdtempSync(join(tmpdir(), 'zoe-gaps-')), 'capability-gaps.jsonl');
     await appendGap('speak aloud', NOW, path, 'discord');

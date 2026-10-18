@@ -233,8 +233,13 @@ export function formatGapDigest(groups: GapGroup[], queued: GapGroup | null): st
     .slice(0, DIGEST_TOP)
     .map((g, i) => `${i + 1}. ${g.want} (${g.count === 1 ? 'once' : `${g.count} times`}${g.community ? `, ${g.community} on Discord` : ''})`);
   const more = groups.length > DIGEST_TOP ? `\nAnd ${groups.length - DIGEST_TOP} more.` : '';
+  // pickUpgrade counts Zaal's own asks only, so the queued gap is not always
+  // the top line (evaluator, #4008). Name it by its number, or by its words
+  // when it fell past the list.
+  const at = queued ? groups.indexOf(queued) : -1;
+  const which = at >= 0 && at < DIGEST_TOP ? `number ${at + 1}` : queued ? `"${queued.want}"` : '';
   const tail = queued
-    ? `\n\nI queued an upgrade check for number 1. It will read our code and say whether to extend something we have, build new, or skip. It writes no code.`
+    ? `\n\nI queued an upgrade check for ${which}. It will read our code and say whether to extend something we have, build new, or skip. It writes no code.`
     : '';
   const who = groups.some((g) => g.community) ? 'you and the Discord community asked' : 'you asked';
   return `Things ${who} me for this week that I could not do:\n${lines.join('\n')}${more}${tail}`;

@@ -131,6 +131,7 @@ import {
 } from './nudges';
 import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
 import { mirrorTurn, recall, TURN_RECALL_TIMEOUT_MS } from './recall';
+import { backgroundRecallMs, newRecallCarry, turnRecall } from './recall-carry';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
 import { captureResume, looksLikeResume } from './resume';
@@ -2884,6 +2885,8 @@ bot.on(['message:photo', 'message:document'], async (ctx) => {
 });
 
 const memberDmLimiter = newMemberDmLimiter();
+const recallCarry = newRecallCarry();
+const BACKGROUND_RECALL_MS = backgroundRecallMs(process.env.ZOE_RECALL_BACKGROUND_MS);
 
 /**
  * A member's DM turn (member-dm.ts). Deliberately NOT dispatchConcierge: that
@@ -3779,17 +3782,24 @@ async function dispatchConcierge(
     // unconfigured or delve returns nothing; never blocks the turn.
     // EXCEPTION: skip recall if the message has a URL + research intent. Links
     // should be fetched + analyzed by research-worker, not answered from recall.
+    // recall-carry.ts: the reply waits TURN_RECALL_TIMEOUT_MS; a search still
+    // running after that keeps going in the background and its result is used
+    // on the next message in this chat (Bonfire delves measured ~14 s).
     let recallContext: string | undefined;
     if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
       try {
-        const r = await recall({
-          query: text,
-          reason: 'concierge turn context',
-          expected_kind: 'mixed',
-          // He is waiting on this reply; see TURN_RECALL_TIMEOUT_MS.
-          timeoutMs: TURN_RECALL_TIMEOUT_MS,
-        });
-        if (r.kind === 'sdk_response' && r.text) recallContext = r.text;
+        const r = await turnRecall(
+          recallCarry,
+          String(chatId),
+          text,
+          async (query, timeoutMs) => {
+            const res = await recall({ query, reason: 'concierge turn context', expected_kind: 'mixed', timeoutMs });
+            return res.kind === 'sdk_response' ? res.text : undefined;
+          },
+          { turnMs: TURN_RECALL_TIMEOUT_MS, backgroundMs: BACKGROUND_RECALL_MS },
+        );
+        recallContext = r.context;
+        if (r.context) featureRan('recall-context', r.outcome);
       } catch (err) {
         console.warn('[zoe/index] recall failed (nbd):', (err as Error).message);
       }

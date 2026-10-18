@@ -67,12 +67,33 @@ const QUESTION_START = new RegExp(
   'i',
 );
 
-/** True when the note asks ZOE something: a "?" anywhere, or a last sentence that opens with a question word. */
+const WH_WORDS = 'what|how|why|who|where|when|which|any thoughts';
+const HELPER_WORDS = 'should|could|would|can|do|does|did|is|are|will';
+
+/**
+ * A sentence ANYWHERE that names ZOE and then opens with a question word is a
+ * question to her, even mid-note (Evaluator note on #4018: "ZOE, how did the
+ * stream do. The interesting part is..." was split and never answered). Naming
+ * ZOE is what makes it safe to check every sentence: "how we work" mid-idea
+ * does not count, "ZOE, how do we" does.
+ */
+// A helper verb counts only after "ZOE," with the comma: "ZOE should send a
+// recap" is an idea about ZOE, "ZOE, should we send a recap" asks her
+// (Evaluator, #4025). A wh-word may follow with or without the comma.
+const ADDRESSED_QUESTION = new RegExp(
+  `^${FILLER}zoe(?:,\\s+${FILLER}(?:${WH_WORDS}|${HELPER_WORDS})|[.]?\\s+${FILLER}(?:${WH_WORDS}))\\b`,
+  'i',
+);
+
+/**
+ * True when the note asks ZOE something: a "?" anywhere, a last sentence that
+ * opens with a question word, or any sentence that starts "ZOE," plus one.
+ */
 export function asksSomething(transcript: string): boolean {
   if (transcript.includes('?')) return true;
   const sentences = transcript.split(/[.!\n]+/).map((t) => t.trim()).filter(Boolean);
   const last = sentences[sentences.length - 1] ?? '';
-  return QUESTION_START.test(last);
+  return QUESTION_START.test(last) || sentences.some((t) => ADDRESSED_QUESTION.test(t));
 }
 
 /** A part shorter than this is a stray phrase, not an idea; it joins the part before it. */

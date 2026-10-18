@@ -80,6 +80,9 @@ describe('splitVoiceIdeas', () => {
     ['New idea, a weekly digest for the team channel. Another idea is a volunteer pass. What do you think'],
     ['New idea, a weekly digest for the team. Another idea is a merch drop for artists. ZOE, should we do both'],
     ['New idea, a weekly digest for the team. Another idea is a merch drop for artists. so, any thoughts'],
+    // Evaluator note on #4018: "ZOE," plus a question word, not at the end.
+    ['ZOE, how did the stream do. The interesting part is the chat stayed for the whole set. Another idea is a weekly recap'],
+    ['New idea, a weekly digest for the team. Okay zoe, should we start it monday. Another idea is a merch drop for artists'],
   ])('not split: %j', (t) => {
     expect(splitVoiceIdeas(t)).toHaveLength(1);
   });
@@ -93,6 +96,24 @@ describe('splitVoiceIdeas', () => {
     expect(asksSomething('New idea, a digest about how we work')).toBe(false);
     expect(asksSomething('New idea, a digest. Another idea is a showcase')).toBe(false);
     expect(asksSomething('')).toBe(false);
+    // Naming ZOE is what lets a mid-note sentence count.
+    expect(asksSomething('ZOE, how did the stream do. New idea, a weekly recap')).toBe(true);
+    expect(asksSomething('How we book artists. New idea, a weekly recap')).toBe(false);
+    expect(asksSomething('New idea, ZOE is great at digests. Another idea is a recap')).toBe(false);
+    expect(asksSomething('New idea, a recap for zoe. what a show')).toBe(true);
+    // The comma decides for helper verbs; wh-words count either way.
+    expect(asksSomething('ZOE, should we send it. New idea, a recap')).toBe(true);
+    expect(asksSomething('ZOE should send it. New idea, a recap')).toBe(false);
+    expect(asksSomething('Zoe how did it go. New idea, a recap')).toBe(true);
+  });
+
+  // Evaluator, #4025: ZOE as the subject of an idea is not a question to her.
+  it.each([
+    ['ZOE should send a weekly recap to the team every friday. New idea: a merch drop for the artists'],
+    ['ZOE is going to love this one. New idea: a monthly artist spotlight post'],
+    ['Zoe can draft the newsletter from the recap notes. Another idea: a volunteer pass for next year'],
+  ])('ZOE as the subject still splits: %j', (t) => {
+    expect(splitVoiceIdeas(t).length).toBeGreaterThan(1);
   });
 
   it('a filler before a marker still starts a sentence', () => {

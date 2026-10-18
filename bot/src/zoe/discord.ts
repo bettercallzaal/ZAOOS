@@ -312,7 +312,10 @@ export async function bootDiscordClient(): Promise<Client | null> {
     if (!interaction.isButton()) return;
     if (!interaction.customId.startsWith('zask_')) return;
 
-    if (DISCORD_ZAAL_ID && interaction.user.id !== DISCORD_ZAAL_ID) {
+    // Fail closed: with no DISCORD_ZAAL_ID nobody is Zaal. The old check
+    // skipped itself when the id was unset, so anyone could press a button
+    // (unreachable today, since no approval card is sent without the id).
+    if (!DISCORD_ZAAL_ID || interaction.user.id !== DISCORD_ZAAL_ID) {
       await interaction.reply({ content: 'Only Zaal can approve community asks.', flags: MessageFlags.Ephemeral });
       return;
     }

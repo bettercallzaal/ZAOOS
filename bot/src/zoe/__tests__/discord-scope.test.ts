@@ -241,3 +241,14 @@ describe('(b) no private memory reaches a guild reply', () => {
     ]);
   });
 });
+
+describe('approval buttons fail closed', () => {
+  it('with no DISCORD_ZAAL_ID set, nobody may press Approve, Regen or Skip', () => {
+    const src = readFileSync(new URL('../discord.ts', import.meta.url), 'utf8');
+    const handler = src.slice(src.indexOf("client.on('interactionCreate'"));
+    expect(handler).toContain('if (!DISCORD_ZAAL_ID || interaction.user.id !== DISCORD_ZAAL_ID) {');
+    expect(handler).not.toContain('if (DISCORD_ZAAL_ID && interaction.user.id !== DISCORD_ZAAL_ID) {');
+    // The guard comes before any pending message is looked up or acted on.
+    expect(handler.indexOf('!DISCORD_ZAAL_ID ||')).toBeLessThan(handler.indexOf('pendingCommunityMessages.get('));
+  });
+});

@@ -101,6 +101,19 @@ describe('splitVoiceIdeas', () => {
     expect(asksSomething('How we book artists. New idea, a weekly recap')).toBe(false);
     expect(asksSomething('New idea, ZOE is great at digests. Another idea is a recap')).toBe(false);
     expect(asksSomething('New idea, a recap for zoe. what a show')).toBe(true);
+    // The comma decides for helper verbs; wh-words count either way.
+    expect(asksSomething('ZOE, should we send it. New idea, a recap')).toBe(true);
+    expect(asksSomething('ZOE should send it. New idea, a recap')).toBe(false);
+    expect(asksSomething('Zoe how did it go. New idea, a recap')).toBe(true);
+  });
+
+  // Evaluator, #4025: ZOE as the subject of an idea is not a question to her.
+  it.each([
+    ['ZOE should send a weekly recap to the team every friday. New idea: a merch drop for the artists'],
+    ['ZOE is going to love this one. New idea: a monthly artist spotlight post'],
+    ['Zoe can draft the newsletter from the recap notes. Another idea: a volunteer pass for next year'],
+  ])('ZOE as the subject still splits: %j', (t) => {
+    expect(splitVoiceIdeas(t).length).toBeGreaterThan(1);
   });
 
   it('a filler before a marker still starts a sentence', () => {

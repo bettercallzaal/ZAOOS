@@ -67,7 +67,8 @@ const QUESTION_START = new RegExp(
   'i',
 );
 
-const QUESTION_WORDS = 'what|how|why|who|where|when|which|should|could|would|can|do|does|did|is|are|will|any thoughts';
+const WH_WORDS = 'what|how|why|who|where|when|which|any thoughts';
+const HELPER_WORDS = 'should|could|would|can|do|does|did|is|are|will';
 
 /**
  * A sentence ANYWHERE that names ZOE and then opens with a question word is a
@@ -76,7 +77,13 @@ const QUESTION_WORDS = 'what|how|why|who|where|when|which|should|could|would|can
  * ZOE is what makes it safe to check every sentence: "how we work" mid-idea
  * does not count, "ZOE, how do we" does.
  */
-const ADDRESSED_QUESTION = new RegExp(`^${FILLER}zoe[,.]?\\s+${FILLER}(?:${QUESTION_WORDS})\\b`, 'i');
+// A helper verb counts only after "ZOE," with the comma: "ZOE should send a
+// recap" is an idea about ZOE, "ZOE, should we send a recap" asks her
+// (Evaluator, #4025). A wh-word may follow with or without the comma.
+const ADDRESSED_QUESTION = new RegExp(
+  `^${FILLER}zoe(?:,\\s+${FILLER}(?:${WH_WORDS}|${HELPER_WORDS})|[.]?\\s+${FILLER}(?:${WH_WORDS}))\\b`,
+  'i',
+);
 
 /**
  * True when the note asks ZOE something: a "?" anywhere, a last sentence that

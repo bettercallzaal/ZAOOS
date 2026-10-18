@@ -52,6 +52,7 @@ import {
 } from './discord-scope';
 import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
+import { markAsked, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import { config as loadEnv } from 'dotenv';
 
@@ -70,7 +71,8 @@ const DISCORD_MAX = 1990;
 /** Pending community messages awaiting Zaal approval. Keyed by approval-token. */
 const pendingCommunityMessages = new Map<
   string,
-  { reply: string; channel: TextBasedChannel; messageId: string; senderName: string }
+  // askedId: the person whose draft carries the one-time name question, marked asked once it is sent.
+  { reply: string; channel: TextBasedChannel; messageId: string; senderName: string; askedId?: string }
 >();
 
 /**
@@ -215,10 +217,33 @@ export async function bootDiscordClient(): Promise<Client | null> {
         timeZoneName: 'short',
       });
 
-      const senderLabel = isOwnerDM ? 'Zaal' : (message.author.username ?? message.author.displayName ?? 'User');
+      let senderLabel = isOwnerDM ? 'Zaal' : (message.author.username ?? message.author.displayName ?? 'User');
       const messageText = message.content
         .replace(new RegExp(`<@${client.user?.id}>`, 'g'), '')
         .trim();
+
+      // People list (people.ts, ZOE_PEOPLE_LOG=1, default off). Never Zaal, and
+      // nobody at all without DISCORD_ZAAL_ID, so an unset id cannot log him.
+      // A message that is only "call me X" gets a thanks and no model turn.
+      let nameAsk = '';
+      if (peopleLogEnabled() && DISCORD_ZAAL_ID && message.author.id !== DISCORD_ZAAL_ID) {
+        const seen = await recordPersonTurn({
+          platform: 'discord',
+          id: message.author.id,
+          handle: message.author.username ?? 'User',
+          text: messageText,
+        });
+        if (seen?.nameOnlyReply) {
+          await message.reply({ content: seen.nameOnlyReply, allowedMentions: { repliedUser: false } });
+          featureRan('people-log', 'discord name');
+          return;
+        }
+        if (seen) {
+          senderLabel = seen.label;
+          nameAsk = seen.askSuffix;
+          featureRan('people-log', 'discord');
+        }
+      }
 
       // Whole-channel read: an @mention in a guild channel sees that channel's
       // recent messages. Same channel only, same group scope as above. A failed
@@ -272,7 +297,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
         }
       }
 
-      const replyText = result.reply ?? 'I could not generate a response.';
+      const replyText = result.reply ? result.reply + nameAsk : 'I could not generate a response.';
 
       // Stage 1b: non-owner community messages go through approval if enabled.
       if (COMMUNITY_ASKS_ENABLED && !isOwnerDM) {
@@ -282,6 +307,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
           channel: message.channel as TextBasedChannel,
           messageId: message.id,
           senderName: senderLabel,
+          askedId: nameAsk && result.reply ? message.author.id : undefined,
         });
 
         const sent = await sendCommunityAskForApproval(client, token, senderLabel, messageText, replyText);
@@ -310,6 +336,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
       for (const chunk of chunks) {
         await message.reply({ content: chunk, allowedMentions: { repliedUser: false } });
       }
+      if (nameAsk && result.reply) await markAsked('discord', message.author.id);
       console.log(`[zoe/discord] replied to ${senderLabel} in ${message.channel.isDMBased() ? 'DM' : 'channel'}`);
       featureRan('discord-reply', message.channel.isDMBased() ? 'DM' : 'channel');
     } catch (err) {
@@ -363,6 +390,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
         for (const chunk of chunks) {
           await pending.channel.send({ content: chunk });
         }
+        if (pending.askedId) await markAsked('discord', pending.askedId);
         await interaction.reply({
           content: `Approved and sent to ${pending.senderName}.`,
           flags: MessageFlags.Ephemeral,

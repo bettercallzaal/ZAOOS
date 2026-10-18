@@ -35,7 +35,16 @@ import {
   multiKeyboard,
 } from './grill';
 import { featureRan } from './feature-ran';
-import { isZaoMember, memberDmEnabled, memberDmPerHour, newMemberDmLimiter, runMemberDmTurn } from './member-dm';
+import {
+  isZaoMember,
+  MEMBER_DM_EMPTY_LINE,
+  MEMBER_DM_LIMIT_LINE,
+  memberDmEnabled,
+  memberDmPerHour,
+  newMemberDmLimiter,
+  runMemberDmTurn,
+} from './member-dm';
+import { markAsked, peopleLogEnabled, recordPersonTurn } from './people';
 import { stripOpsOutsidePrivate, toolPolicyForScope } from './scope-lock';
 import {
   BOARD_RUN_CALLBACK,
@@ -2894,7 +2903,23 @@ const memberDmLimiter = newMemberDmLimiter();
 async function handleMemberDm(ctx: Context, text: string): Promise<void> {
   if (!ctx.chat || !ctx.from) return;
   const chatId = ctx.chat.id;
-  const name = ctx.from.first_name || ctx.from.username || 'a member';
+  let name = ctx.from.first_name || ctx.from.username || 'a member';
+  // People list (people.ts, ZOE_PEOPLE_LOG=1, default off). A message that is
+  // only "call me X" gets a thanks and no model turn.
+  let nameAsk = '';
+  if (peopleLogEnabled()) {
+    const seen = await recordPersonTurn({ platform: 'telegram', id: ctx.from.id, handle: name, text });
+    if (seen?.nameOnlyReply) {
+      await ctx.reply(seen.nameOnlyReply).catch(() => {});
+      featureRan('people-log', 'telegram name');
+      return;
+    }
+    if (seen) {
+      name = seen.label;
+      nameAsk = seen.askSuffix;
+      featureRan('people-log', 'telegram');
+    }
+  }
   const progress = startProgressNarration(ctx, chatId, { first: null });
   try {
     const outcome = await runMemberDmTurn(
@@ -2916,7 +2941,11 @@ async function handleMemberDm(ctx: Context, text: string): Promise<void> {
         },
         remember: (turn, scope) => pushRecent(turn, scope),
         reply: async (answer) => {
-          if (!(await progress.deliver(answer))) await replyChunked(ctx, answer);
+          // The name question rides on a real answer only, never on the limit or empty line.
+          const asks = !!nameAsk && answer !== MEMBER_DM_LIMIT_LINE && answer !== MEMBER_DM_EMPTY_LINE;
+          const out = asks ? answer + nameAsk : answer;
+          if (!(await progress.deliver(out))) await replyChunked(ctx, out);
+          if (asks && ctx.from) await markAsked('telegram', ctx.from.id);
         },
       },
       { userId: ctx.from.id, name, text, nowMs: Date.now(), limiter: memberDmLimiter, perHour: memberDmPerHour() },

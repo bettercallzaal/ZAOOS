@@ -158,6 +158,7 @@ import {
   type GroupMode,
 } from './groups';
 import {
+  appendVoiceMemo,
   handleVoiceMemo,
   handlePostCallback,
   loadDrafts as loadPostDrafts,
@@ -167,6 +168,7 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { parseVetoCallback, applyVeto } from './brief-veto';
+import { splitVoiceIdeas, voiceIdeasEnabled, voiceIdeasReply } from './voice-ideas';
 import {
   parseBuildCandidateCallback,
   applyBuildCandidate,
@@ -2794,6 +2796,22 @@ bot.on(['message:voice', 'message:audio'], async (ctx) => {
       .then((r) => ctx.reply(r))
       .catch((e) => console.error('[zoe/index] voice resume failed:', (e as Error)?.message));
     return;
+  }
+  // voice-ideas.ts (card 10465, ZOE_VOICE_IDEAS=1, default off): spoken markers
+  // ("this might be a different article") split a car-ride ramble into draft
+  // ideas for the post drafter. No marker, or a failed save: the normal turn.
+  if (voiceIdeasEnabled()) {
+    const ideas = splitVoiceIdeas(transcript);
+    if (ideas.length > 1) {
+      try {
+        for (const [i, idea] of ideas.entries()) await appendVoiceMemo(`idea ${i + 1}/${ideas.length} (voice): ${idea}`);
+        await ctx.reply(voiceIdeasReply(ideas)).catch(() => {});
+        featureRan('voice-ideas', `${ideas.length} ideas`);
+        return;
+      } catch (e) {
+        console.error('[zoe/index] voice ideas not saved, answering as a turn:', (e as Error)?.message);
+      }
+    }
   }
   enqueueTurn(chatId, () => handlePrivateMessage(ctx, transcript), {
     onDeferred: () => {

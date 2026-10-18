@@ -10,6 +10,7 @@ import {
   extractGap,
   formatGapDigest,
   GAP_PROMPT_BLOCK,
+  GAP_PROMPT_BLOCK_COMMUNITY,
   type GapRow,
   gapLogEnabled,
   gapUpgradeEnabled,
@@ -323,8 +324,9 @@ describe('the wiring', () => {
     // written `gapLog: true` would have passed (Evaluator, #3918).
     const asking = turns.filter((t) => /\bgapLog\b\s*[:,}\n]/.test(t.slice(0, t.indexOf('});'))));
     expect(asking).toHaveLength(1);
-    // And no other file that runs a concierge turn passes it at all.
-    for (const other of ['discord.ts', 'concierge.ts']) {
+    // concierge.ts runs no turn that asks for it. discord.ts asks from its one
+    // turn and strips it there (D7, checked in its own test below).
+    for (const other of ['concierge.ts']) {
       const calls = src(other).split('runConciergeTurn({').slice(1);
       for (const t of calls) expect(t.slice(0, t.indexOf('});')), other).not.toMatch(/\bgapLog\b\s*[:,}\n]/);
     }
@@ -332,6 +334,7 @@ describe('the wiring', () => {
     // concierge.ts adds the block from the option, never from the env flag.
     const concierge = src('concierge.ts');
     expect(concierge).toContain('...(isPrivate && gapLog === true ? GAP_PROMPT_BLOCK : []),');
+    expect(concierge).toContain("...(!isPrivate && gapLog === 'community' ? GAP_PROMPT_BLOCK_COMMUNITY : []),");
     expect(concierge).not.toContain('gapLogEnabled');
   });
 
@@ -359,5 +362,96 @@ describe('the wiring', () => {
     // The only release in the job is the digest's own; the upgrade claim stays.
     expect(block).not.toMatch(/releaseFire\(`capability-gaps-upgrade/);
     expect(block.match(/releaseFire\(/g)).toHaveLength(1);
+  });
+});
+
+describe('Discord community gaps (doc 2685 D7)', () => {
+  const discordRow = (want: string, days = 1): GapRow => ({ ts: daysAgo(days), want, source: 'discord' });
+
+  it('the community block asks the same thing, worded for anyone, never for Zaal', () => {
+    const text = GAP_PROMPT_BLOCK_COMMUNITY.join('\n');
+    expect(text).toContain('GAP: <what they wanted, in 12 words or fewer, no names of people>');
+    expect(text).toContain('At most one GAP line per reply');
+    expect(text).not.toContain('Zaal');
+  });
+
+  it('counts community asks inside a group and shows them in the digest', () => {
+    const groups = summarizeGaps([row('send an email', 1), discordRow('send email', 2), discordRow('speak aloud', 3)], NOW);
+    expect(groups[0]).toEqual({ want: 'send an email', count: 2, lastTs: daysAgo(1), community: 1 });
+    const text = formatGapDigest(groups, null);
+    expect(text).toContain('Things you and the Discord community asked me for this week that I could not do:');
+    expect(text).toContain('1. send an email (2 times, 1 on Discord)');
+    expect(text).toContain('2. speak aloud (once, 1 on Discord)');
+  });
+
+  it('a week with no community asks reads exactly as before', () => {
+    const groups = summarizeGaps([row('send an email'), row('send email', 2)], NOW);
+    expect(groups[0]).toEqual({ want: 'send an email', count: 2, lastTs: daysAgo(1) });
+    expect(formatGapDigest(groups, null).startsWith('Things you asked me')).toBe(true);
+  });
+
+  it('community asks alone never queue an upgrade check: Zaal picks from the digest', () => {
+    const groups = summarizeGaps([discordRow('send an email'), discordRow('send email', 2), discordRow('email out', 3)], NOW);
+    expect(groups[0].count).toBe(3);
+    expect(pickUpgrade(groups)).toBeNull();
+  });
+
+  it('the upgrade goes to the gap Zaal asked most, even when a community gap is bigger', () => {
+    const groups = summarizeGaps(
+      [discordRow('speak aloud'), discordRow('speak aloud', 2), discordRow('speak aloud', 3), row('send an email'), row('send email', 2)],
+      NOW,
+    );
+    expect(groups[0].want).toBe('speak aloud');
+    expect(pickUpgrade(groups)?.want).toBe('send an email');
+  });
+
+  it('the digest names the queued gap by its own number when a community gap sits above it (evaluator, #4008)', () => {
+    const groups = summarizeGaps(
+      [...[1, 2, 3, 4, 5].map((d) => discordRow('speak aloud', d)), row('speak aloud', 6), row('send an email'), row('send email', 2), row('email it', 3)],
+      NOW,
+    );
+    expect(groups.map((g) => [g.want, g.count, g.community ?? 0])).toEqual([
+      ['speak aloud', 6, 5],
+      ['send an email', 3, 0],
+    ]);
+    const queued = pickUpgrade(groups);
+    expect(queued?.want).toBe('send an email');
+    const text = formatGapDigest(groups, queued);
+    expect(text).toContain('I queued an upgrade check for number 2.');
+    expect(text).not.toContain('for number 1.');
+  });
+
+  it('a queued gap past the listed top is named by its words', () => {
+    const groups = [
+      ...['alpha one', 'bravo two', 'charlie three', 'delta four', 'echo five'].map((want) => ({ want, count: 9, lastTs: daysAgo(1), community: 9 })),
+      { want: 'send an email', count: 2, lastTs: daysAgo(1) },
+    ];
+    expect(formatGapDigest(groups, groups[5])).toContain('I queued an upgrade check for "send an email".');
+  });
+
+  it('a discord row round-trips through the file with its source; a plain row stays plain', async () => {
+    const path = join(mkdtempSync(join(tmpdir(), 'zoe-gaps-')), 'capability-gaps.jsonl');
+    await appendGap('speak aloud', NOW, path, 'discord');
+    await appendGap('send an email', NOW, path);
+    const { rows } = await readGaps(path);
+    expect(rows).toEqual([
+      { ts: NOW.toISOString(), want: 'speak aloud', source: 'discord' },
+      { ts: NOW.toISOString(), want: 'send an email' },
+    ]);
+  });
+
+  it('wiring: discord.ts asks from its one turn, only with the flag, and strips before any send', () => {
+    const d = readFileSync(join(__dirname, '..', 'discord.ts'), 'utf8');
+    expect(d).toContain("const gapLog: boolean | 'community' = gapLogEnabled() ? (scope === 'private' ? true : 'community') : false;");
+    const turns = d.split('runConciergeTurn({').slice(1);
+    expect(turns).toHaveLength(1);
+    expect(turns[0].slice(0, turns[0].indexOf('});'))).toMatch(/\bgapLog,/);
+    expect(d.match(/extractGap\(/g)).toHaveLength(1);
+    const turn = d.indexOf('const result = await runConciergeTurn({');
+    const strip = d.indexOf('result.reply = extracted.reply;');
+    expect(strip).toBeGreaterThan(turn);
+    expect(strip).toBeLessThan(d.indexOf('const replyText = result.reply'));
+    expect(d.slice(turn, d.indexOf('if (gapLog && result.reply) {'))).not.toMatch(/reply\(|sendCommunityAskForApproval|pendingCommunityMessages\.set/);
+    expect(d).toContain("const source = scope === 'private' ? undefined : 'discord';");
   });
 });

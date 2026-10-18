@@ -163,8 +163,9 @@ export interface ConciergeOptions {
   /** True for casual back-and-forth (short, no URLs, no work keywords). Skips task/quest/thread blocks. */
   conversational?: boolean;
   /** Ask for a final `GAP:` line (capability-gaps.ts). Set ONLY by a caller that
-   * takes that line off the reply before using it. */
-  gapLog?: boolean;
+   * takes that line off the reply before using it. 'community' asks a
+   * non-private turn (Discord) for the same line, worded for anyone. */
+  gapLog?: boolean | 'community';
   /** 'none' = talk only: no tools, no MCP, empty working dir (scope-lock.ts).
    * Default: the concierge's usual set. */
   toolPolicy?: 'default' | 'none';

@@ -22,6 +22,8 @@ tier: QUICK
 
 All figures were measured on 2026-10-19 between about 21:05 and 21:20 UTC. Every fetch was a raw `curl` to baserooms.io. Nothing was signed, connected, minted or paired by this lane.
 
+> **UPDATE 2026-10-19 evening: the connect path below does NOT work yet. Do not follow "How to connect".** Two things broke on first use. (1) Base Rooms' OAuth rejects Claude Code's redirect. (2) The server entry written by `claude mcp add` vanished twice from the Orca profile's `.claude.json`. See "2026-10-19 evening: what broke, and the setup that replaces it" below. Key Decisions 1 and 2 are SUPERSEDED by that section.
+
 ## Bottom line
 
 1. **Zaal needs no mint.** He already holds Buddy #0252 (doc 2648 tick 20). A Base Rooms agent key is issued per Buddy.
@@ -33,7 +35,7 @@ All figures were measured on 2026-10-19 between about 21:05 and 21:20 UTC. Every
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **CONNECT via OAuth (`claude mcp add` without a header, then `/mcp`, then Authenticate).** Fallback: a `brk_` key from Buddies, then Agent, added from a plain Terminal. | Base Rooms supports OAuth with dynamic client registration and PKCE S256. A browser approval replaces any copy-paste of a secret, and Claude Code holds the token. |
+| 1 | **SUPERSEDED 2026-10-19 evening (OAuth fails, see below).** ~~CONNECT via OAuth (`claude mcp add` without a header, then `/mcp`, then Authenticate).** Fallback: a `brk_` key from Buddies, then Agent, added from a plain Terminal. | Base Rooms supports OAuth with dynamic client registration and PKCE S256. A browser approval replaces any copy-paste of a secret, and Claude Code holds the token. |
 | 2 | **Scope `local`, never `project`, and not `user`.** | `project` writes `.mcp.json` into the repo, so a header key would be committed (ZAOOS is public). `user` loads it into every project on the profile. `local` limits it to this worktree. |
 | 3 | **Grant only the `tools` OAuth scope.** Leave `propose`, `alerts`, `memory`, `talk`, `status` and `approve` off. | `tools` covers the 31 read tools. Each scope left off removes a path in 2648's threat model: `talk` (inbox injection, T5), `memory` (data at rest and workspace tasks, T8 to T10) and `propose` (signing cards). |
 | 4 | **This supersedes doc 2648 Key Decision 2 ("SKIP the MCP pairing for now") on Zaal's word of 2026-10-19.** The sandbox-user part of 2648's mitigation 2 is NOT met. This runs in the normal Orca profile. | His instruction, 2026-10-19. The minimal-scope and no-hooks parts of 2648's mitigations are kept. The separate-macOS-user part is not, and that is recorded here rather than skipped silently. |
@@ -83,6 +85,66 @@ The authenticated `tools/list` is what actually counts. It is recorded in the se
 
 **The design holds up on one point that matters:** no tool can sign. Every money path ends in Zaal's own wallet prompt (2648 section 5, and `/agent.md`: "You can't sign or send transactions for the owner").
 
+## 2026-10-19 evening: what broke, and the setup that replaces it
+
+### 1. Base Rooms' OAuth rejects Claude Code
+
+Zaal ran path A. The browser page read "Can't connect this app. This redirect address isn't registered for this app." (his screenshot, 2026-10-19).
+
+Measured cause:
+
+- Claude Code identifies itself with a client-ID metadata document. `curl https://claude.ai/oauth/claude-code-client-metadata` returned `"redirect_uris":["http://localhost/callback","http://127.0.0.1/callback"]`, with no port.
+- The authorize URL that Claude Code built (from the `mcp__baserooms__authenticate` tool, 2026-10-19) carried `redirect_uri=http%3A%2F%2Flocalhost%3A52675%2Fcallback`, a random local port.
+- Base Rooms compares the two exactly, so the port makes them differ. RFC 8252 section 7.3 says an authorization server must allow any port on a loopback redirect. So this is a Base Rooms bug and only they can fix it.
+- The same URL requested `scope=status talk approve tools propose alerts memory`, which is every scope. Even with the redirect fixed, Zaal would have to untick all but `tools` on the consent screen.
+
+### 2. The `.claude.json` entry does not stay
+
+- Zaal's first `claude mcp add --scope local` printed `[project: .../baserooms-2]`. A read of the file showed the entry stored under the main repo key `projects["/Users/zaalpanthaki/Documents/ZAO OS V1"]`, not under the worktree. So "local" scope here reaches every ZAOOS worktree on the profile.
+- About 17:50 EDT `claude mcp get baserooms` returned `No MCP server named "baserooms"`.
+- Zaal re-added it at 17:53. orchestrator2's 17:59:17 EDT snapshot showed it gone again, under every key.
+- `pgrep -x claude` counted 20 processes on the Mac at 17:53.
+
+What removes it is UNVERIFIED. The working guess is that concurrent sessions sharing one profile write the whole file back, and the last writer wins. This is escalated to the orchestrator as an estate-wide problem, because any setting in that file could revert the same way.
+
+### 3. Do not paste keys into a Claude pane
+
+On 2026-10-19 a live `brk_` key was pasted into this lane's chat as part of a `claude mcp add ... --scope user` line. That key is treated as exposed and must be revoked in Buddies, then Agent, then **Disconnect (revoke key)**. Its value is not reproduced anywhere in this doc.
+
+### 4. The replacement setup (proposed, not yet run)
+
+Keep the server definition out of `.claude.json`, and keep the key out of every file.
+
+**Where the definition lives:** an UNTRACKED `.mcp.json` in the root of the one worktree that uses it. **Never commit it to ZAOOS.** The Claude Code MCP docs (`code.claude.com/docs/en/mcp.md`, fetched 2026-10-19) say project-scoped servers are loaded without the approval prompt in `claude -p` runs, Agent SDK sessions, and `bypassPermissions` sessions with `skipDangerousModePermissionPrompt`. A committed file would therefore wire a third-party server into this public repo's every headless and bypass session, ZOE's included. Even untracked, a `.mcp.json` reaches only the sessions started in that folder.
+
+**Where the key lives:** the macOS Keychain, read at connect time by `headersHelper`. The same docs say `headersHelper` "run[s] the command and merges its output into the connection headers", "must write a JSON object of string key-value pairs to stdout", runs fresh on each connection, and is not cached. It needs the folder to be trusted first.
+
+The docs also confirm that `.mcp.json` expands `${VAR}` in `url` and `headers` (their example: `"Authorization": "Bearer ${API_KEY}"`). Names outside Claude Code's protected credential set expand as written. An env var works, but on a Mac it ends up in a shell rc file, which is a file. The Keychain does not, so it is the recommendation.
+
+Zaal's steps (his hands; settings edits stay his):
+
+1. Revoke the exposed key, then make a NEW key on Buddy #0252 with only "baserooms.io tools: wallet, safety, prices" ticked.
+2. In a plain Mac Terminal, run `security add-generic-password -a "$USER" -s baserooms-brk -w`. It prompts for the value, so the key never enters shell history. Paste the key at the prompt.
+3. Create `.mcp.json` in the worktree root with:
+
+```json
+{
+  "mcpServers": {
+    "baserooms": {
+      "type": "http",
+      "url": "https://baserooms.io/mcp",
+      "headersHelper": "printf '{\"Authorization\":\"Bearer %s\"}' \"$(security find-generic-password -a \"$USER\" -s baserooms-brk -w)\""
+    }
+  }
+}
+```
+
+4. Start Claude in that folder and approve the `baserooms` project server when asked.
+
+Checked so far: the `headersHelper` string, taken from the JSON block above and run through `sh` with a stub `security` that prints `STUBKEY`, produced `{'Authorization': 'Bearer STUBKEY'}`, valid JSON. Not checked: the whole chain against Base Rooms. That needs Zaal's new key, and it is the first thing to run once he has done steps 1 to 4.
+
+**Simpler alternative if the OAuth bug gets fixed:** OAuth needs no key and no file. A note to Slava naming the redirect-port bug is the only outbound step, and it is Zaal's call.
+
 ## Authenticated tools/list (fill after connect)
 
 PENDING: Zaal has not connected yet as of this commit. When he has, this lane runs one `tools/list` and records the names and count here, with any difference from the 58-tool public catalog. It also records any server `instructions` field returned by `initialize`, because that text is server-authored context. It then calls one read-only tool as a smoke test (`gas`), and nothing that writes.
@@ -128,7 +190,10 @@ Not recommended: pairing ZOE or any loop to the MCP; the `memory` and workspace 
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Run connect path A (or B) from this doc; done when Zaal tells the baserooms lane "added" | Zaal | Setup | 2026-10-21 |
+| ~~Run connect path A (or B)~~ SUPERSEDED: revoke the pasted key; done when Buddies, then Agent, shows it disconnected | Zaal | Security | 2026-10-19 |
+| Run the Keychain + untracked `.mcp.json` setup (section 4 above); done when Zaal tells the baserooms lane "added" | Zaal | Setup | 2026-10-21 |
+| Decide whether to tell Slava about the OAuth redirect-port bug (RFC 8252 section 7.3); done when Zaal says yes or no | Zaal | Decision | 2026-10-22 |
+| Root-cause the vanishing `.claude.json` entries; done when the orchestrator names the writer or rules it out | orchestrator2 | Investigate | 2026-10-21 |
 | Record the authenticated `tools/list`, the `initialize` instructions and one `gas` smoke test in the PENDING section; done when that follow-up PR is open | baserooms lane | Re-research | same day as connect |
 | If the connection is not wanted after a week, `claude mcp remove baserooms -s local` and revoke the grant in Buddies, then Agent; done when both are gone | Zaal | Cleanup | 2026-10-26 |
 
@@ -148,4 +213,6 @@ All fetched 2026-10-19 with `curl` and a browser User-Agent. Raw text, no WebFet
 | https://baserooms.io/.well-known/oauth-authorization-server | curl | FULL: DCR at `/oauth/register`, PKCE S256, refresh tokens |
 | baserooms.io site bundle (177 `_next/static` chunks) | curl, then searched | FULL: the `setupFor` function holding the `claude mcp add` line; Buddy mint tiers |
 | https://baserooms.io/llms.txt, /docs, /.well-known/mcp.json, /robots.txt | curl | 404 each |
+| https://claude.ai/oauth/claude-code-client-metadata | curl | FULL: redirect_uris localhost and 127.0.0.1 `/callback`, no port |
+| https://code.claude.com/docs/en/mcp.md | curl (raw markdown, 122,889 bytes) | FULL: `${VAR}` expansion in url and headers, `headersHelper`, project-server approval rules |
 | https://api.fxtwitter.com/baserooms | curl | FAILED: `{"code":404,"message":"User not found"}`. 2648 read the same handle on 2026-10-08 (352 followers), so the account may have been renamed or removed. UNVERIFIED which. |

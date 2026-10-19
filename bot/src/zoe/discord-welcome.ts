@@ -19,6 +19,7 @@
  *
  * Pure helpers here; discord.ts does the Discord calls.
  */
+import { PermissionFlagsBits } from 'discord.js';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
@@ -49,6 +50,38 @@ export function welcomeChannelName(env: NodeJS.ProcessEnv = process.env): string
 export const ROLE_PICKER_TEXT = 'Pick the roles that fit you. Tap again to remove one.';
 export function welcomeText(memberMention: string): string {
   return `Welcome to ZM, ${memberMention}. This is The ZAO's music home. Pick the roles that fit you below, then say hi.`;
+}
+
+/**
+ * Permissions a self-picked role must never carry. One wrong name in the env
+ * var, or a staff role renamed to a listed name, would otherwise let any member
+ * grant themselves moderation (evaluator, #4035). Checked when the picker is
+ * built AND on every press.
+ */
+export const STAFF_PERMISSIONS: readonly bigint[] = [
+  PermissionFlagsBits.Administrator,
+  PermissionFlagsBits.ManageGuild,
+  PermissionFlagsBits.ManageRoles,
+  PermissionFlagsBits.ManageChannels,
+  PermissionFlagsBits.ManageMessages,
+  PermissionFlagsBits.ManageWebhooks,
+  PermissionFlagsBits.ManageNicknames,
+  PermissionFlagsBits.ManageEvents,
+  PermissionFlagsBits.ManageThreads,
+  PermissionFlagsBits.ManageGuildExpressions,
+  PermissionFlagsBits.BanMembers,
+  PermissionFlagsBits.KickMembers,
+  PermissionFlagsBits.ModerateMembers,
+  PermissionFlagsBits.MentionEveryone,
+  PermissionFlagsBits.ViewAuditLog,
+  PermissionFlagsBits.MoveMembers,
+  PermissionFlagsBits.MuteMembers,
+  PermissionFlagsBits.DeafenMembers,
+];
+
+/** True when a role carries none of STAFF_PERMISSIONS. */
+export function safeSelfRole(permissions: { any(bits: readonly bigint[]): boolean }): boolean {
+  return !permissions.any(STAFF_PERMISSIONS);
 }
 
 export const ROLE_BUTTON_PREFIX = 'zrole_';

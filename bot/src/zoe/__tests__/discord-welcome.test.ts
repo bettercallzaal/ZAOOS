@@ -1,6 +1,7 @@
 import { mkdtempSync, readFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { PermissionFlagsBits, PermissionsBitField } from 'discord.js';
 import { describe, expect, it } from 'vitest';
 import {
   appendJoinLog,
@@ -9,6 +10,8 @@ import {
   parseRoleButton,
   ROLE_PICKER_TEXT,
   roleButtonId,
+  safeSelfRole,
+  STAFF_PERMISSIONS,
   selfRoleNames,
   welcomeChannelName,
   welcomeEnabled,
@@ -61,6 +64,16 @@ describe('buttons', () => {
   });
 });
 
+describe('safeSelfRole', () => {
+  it('a plain member role is safe', () => {
+    expect(safeSelfRole(new PermissionsBitField([PermissionFlagsBits.SendMessages, PermissionFlagsBits.Connect]))).toBe(true);
+  });
+
+  it.each(STAFF_PERMISSIONS.map((b) => [new PermissionsBitField(b).toArray()[0], b] as const))('a role with %s is refused', (_name, bit) => {
+    expect(safeSelfRole(new PermissionsBitField([PermissionFlagsBits.SendMessages, bit]))).toBe(false);
+  });
+});
+
 describe('inviteUsed', () => {
   it('the one invite whose count went up, including a new one', () => {
     expect(inviteUsed(new Map([['a', 3], ['b', 1]]), new Map([['a', 4], ['b', 1]]))).toBe('a');
@@ -100,8 +113,8 @@ describe('wiring in discord.ts', () => {
   });
 
   it('only listed roles below ZOE are offered, and a press re-checks both', () => {
-    expect(rows).toContain('wanted.has(r.name.toLowerCase()) && r.editable && r.id !== guild.roles.everyone.id');
-    expect(button).toContain('if (!role || !allowed.has(role.name.toLowerCase()) || !role.editable) {');
+    expect(rows).toContain('wanted.has(r.name.toLowerCase()) && r.editable && safeSelfRole(r.permissions) && r.id !== guild.roles.everyone.id');
+    expect(button).toContain('if (!role || !allowed.has(role.name.toLowerCase()) || !role.editable || !safeSelfRole(role.permissions)) {');
     expect(button.indexOf('!role.editable')).toBeLessThan(button.indexOf('member.roles.add('));
   });
 

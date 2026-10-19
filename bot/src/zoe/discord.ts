@@ -74,6 +74,7 @@ import {
   ROLE_BUTTON_PREFIX,
   ROLE_PICKER_TEXT,
   roleButtonId,
+  safeSelfRole,
   selfRoleNames,
   welcomeChannelName,
   welcomeEnabled,
@@ -323,7 +324,7 @@ async function handleKickButton(i: ButtonInteraction): Promise<void> {
 function roleRows(guild: Guild): ActionRowData<ButtonComponentData>[] {
   const wanted = new Set(selfRoleNames().map((n) => n.toLowerCase()));
   const roles = [...guild.roles.cache.values()]
-    .filter((r) => wanted.has(r.name.toLowerCase()) && r.editable && r.id !== guild.roles.everyone.id)
+    .filter((r) => wanted.has(r.name.toLowerCase()) && r.editable && safeSelfRole(r.permissions) && r.id !== guild.roles.everyone.id)
     .sort((a, b) => b.position - a.position);
   return inRows(roles).map((row) => ({
     type: ComponentType.ActionRow,
@@ -358,7 +359,7 @@ async function handleRoleButton(i: ButtonInteraction): Promise<void> {
   }
   const role = i.guild.roles.cache.get(roleId);
   const allowed = new Set(selfRoleNames().map((n) => n.toLowerCase()));
-  if (!role || !allowed.has(role.name.toLowerCase()) || !role.editable) {
+  if (!role || !allowed.has(role.name.toLowerCase()) || !role.editable || !safeSelfRole(role.permissions)) {
     await i.reply({ content: 'That role is not one you can pick yourself any more.', flags: MessageFlags.Ephemeral });
     return;
   }

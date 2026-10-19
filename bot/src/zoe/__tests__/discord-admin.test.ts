@@ -14,6 +14,7 @@ import {
   cleanLabel,
   discordAdminEnabled,
   isDiscordOwner,
+  MAX_TIMEOUT_MINUTES,
   overridesToClear,
   parseAdminCommand,
   runAdminCommand,
@@ -104,6 +105,17 @@ function fakeGuild(archiveCleared = 0) {
   const cats = new Map<string, string>([['c1', 'ZAO Music']]);
   const chans = new Map<string, string>([['1234567', 'general']]);
   let n = 100;
+  const all = { manageable: true, moderatable: true, kickable: true };
+  const members = new Map([
+    ['m1', { name: 'Iman', ...all }],
+    ['zaal', { name: 'Zaal', ...all }],
+    ['zoe', { name: 'ZOE', ...all }],
+    ['mod', { name: 'Mod', manageable: false, moderatable: false, kickable: false }],
+  ]);
+  const roles = new Map([
+    ['r1', { name: 'Artist', editable: true }],
+    ['top', { name: 'Admin', editable: false }],
+  ]);
   const env: AdminEnv = {
     async findCategory(name) {
       for (const [id, nm] of cats) if (nm.toLowerCase() === name.toLowerCase()) return { id, name: nm };
@@ -138,6 +150,26 @@ function fakeGuild(archiveCleared = 0) {
     },
     async setPinned(channelId, messageId, pin) {
       calls.push(`${pin ? 'pin' : 'unpin'} ${channelId ?? 'here'} ${messageId}`);
+    },
+    ownerId: 'zaal',
+    selfId: 'zoe',
+    async member(userId) {
+      return members.get(userId) ?? null;
+    },
+    async role(roleId) {
+      return roles.get(roleId) ?? null;
+    },
+    async setRole(userId, roleId, give) {
+      calls.push(`${give ? 'add' : 'remove'}Role ${userId} ${roleId}`);
+    },
+    async setNick(userId, nick) {
+      calls.push(`nick ${userId} ${nick ?? 'null'}`);
+    },
+    async timeout(userId, ms) {
+      calls.push(`timeout ${userId} ${ms ?? 'null'}`);
+    },
+    async kick(userId, reason) {
+      calls.push(`kick ${userId} ${reason}`);
     },
   };
   return { env, calls };
@@ -252,6 +284,71 @@ describe('archive permissions', () => {
   });
 });
 
+describe('member commands on a fake guild', () => {
+  it('give and remove a role', async () => {
+    const g = fakeGuild();
+    expect((await runAdminCommand({ kind: 'role', give: true, userId: 'm1', roleId: 'r1' }, g.env)).reply).toBe('Gave Iman the "Artist" role.');
+    expect((await runAdminCommand({ kind: 'role', give: false, userId: 'm1', roleId: 'r1' }, g.env)).reply).toBe('Removed the "Artist" role from Iman.');
+    expect(g.calls).toEqual(['addRole m1 r1', 'removeRole m1 r1']);
+  });
+
+  it.each([
+    ['zaal', 'on Zaal'],
+    ['zoe', 'on myself'],
+    ['ghost', 'not in this server'],
+    ['mod', 'top role is not below mine'],
+  ])('refuses %s before anything changes', async (userId, why) => {
+    const g = fakeGuild();
+    const cmds = [
+      { kind: 'role', give: true, userId, roleId: 'r1' },
+      { kind: 'nick', userId, nick: 'x' },
+      { kind: 'timeout', userId, minutes: 5 },
+      { kind: 'kick', userId, confirmed: true },
+    ] as const;
+    for (const c of cmds) {
+      const r = await runAdminCommand(c, g.env);
+      expect(r.ok).toBe(false);
+      expect(r.reply).toContain(why);
+    }
+    expect(g.calls).toEqual([]);
+  });
+
+  it('a role at or above ZOE, or a missing one, is refused', async () => {
+    const g = fakeGuild();
+    expect((await runAdminCommand({ kind: 'role', give: true, userId: 'm1', roleId: 'top' }, g.env)).reply).toContain('at or above my top role');
+    expect((await runAdminCommand({ kind: 'role', give: true, userId: 'm1', roleId: 'nope' }, g.env)).ok).toBe(false);
+    expect(g.calls).toEqual([]);
+  });
+
+  it('nick sets a cleaned name and clears with an empty one', async () => {
+    const g = fakeGuild();
+    await runAdminCommand({ kind: 'nick', userId: 'm1', nick: '<@1> IMan' }, g.env);
+    await runAdminCommand({ kind: 'nick', userId: 'm1', nick: '' }, g.env);
+    expect(g.calls).toEqual(['nick m1 1 IMan', 'nick m1 null']);
+  });
+
+  it('timeout in minutes, 0 lifts, out of range is refused', async () => {
+    const g = fakeGuild();
+    expect((await runAdminCommand({ kind: 'timeout', userId: 'm1', minutes: 10 }, g.env)).reply).toBe('Timed out Iman for 10 minutes.');
+    expect((await runAdminCommand({ kind: 'timeout', userId: 'm1', minutes: 0 }, g.env)).reply).toBe("Lifted Iman's timeout.");
+    for (const minutes of [-1, 1.5, MAX_TIMEOUT_MINUTES + 1]) {
+      expect((await runAdminCommand({ kind: 'timeout', userId: 'm1', minutes }, g.env)).ok).toBe(false);
+    }
+    expect(g.calls).toEqual(['timeout m1 600000', 'timeout m1 null']);
+  });
+
+  it('kick asks first and kicks only when confirmed', async () => {
+    const g = fakeGuild();
+    const ask = await runAdminCommand({ kind: 'kick', userId: 'm1', confirmed: false }, g.env);
+    expect(ask).toMatchObject({ ok: true, confirmKick: 'm1' });
+    expect(ask.reply).toContain('Kick Iman');
+    expect(g.calls).toEqual([]);
+    await runAdminCommand({ kind: 'kick', userId: 'm1', confirmed: true, reason: 'spam links' }, g.env);
+    await runAdminCommand({ kind: 'kick', userId: 'm1', confirmed: true }, g.env);
+    expect(g.calls).toEqual(['kick m1 spam links', 'kick m1 Kicked by Zaal through ZOE']);
+  });
+});
+
 describe('appendAdminLog', () => {
   it('writes one owner-only JSON line per call', async () => {
     const path = join(mkdtempSync(join(tmpdir(), 'zoe-admin-')), 'discord-admin.jsonl');
@@ -283,11 +380,17 @@ describe('wiring in discord.ts', () => {
     expect(gate).toBeLessThan(d.indexOf('const result = await runConciergeTurn({'));
     expect(gate).toBeLessThan(d.indexOf('await message.channel.sendTyping();'));
     expect(d).toContain('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {');
-    expect(d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {')).toBeLessThan(d.indexOf('runAdminCommand(cmd, discordAdminEnv(message))'));
+    // The "admin:" text path inside messageCreate (the slash handler has its own owner check).
+    const textGate = d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {', d.indexOf('if (discordAdminEnabled()) {'));
+    expect(textGate).toBeGreaterThan(d.indexOf('if (discordAdminEnabled()) {'));
+    expect(textGate).toBeLessThan(d.indexOf('runAdminCommand(cmd, discordAdminEnv(message.guild, message.channel))'));
   });
 
   it('a non-owner is refused by DM, never in the channel, and nothing runs', () => {
-    const block = d.slice(d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {'), d.indexOf('} else if (!message.inGuild()) {'));
+    const block = d.slice(
+      d.indexOf('if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {', d.indexOf('if (discordAdminEnabled()) {')),
+      d.indexOf('} else if (!message.inGuild()) {'),
+    );
     expect(block).toContain('await message.author.send({ content: ADMIN_REFUSAL_LINE, allowedMentions: { parse: [] } }).catch(() => undefined);');
     expect(block).toContain('return;');
     expect(block).not.toContain('message.reply(');
@@ -310,8 +413,10 @@ describe('wiring in discord.ts', () => {
     expect(block).toContain('return;');
   });
 
-  it('nothing in the admin env deletes, bans or kicks', () => {
-    const env = d.slice(d.indexOf('function discordAdminEnv('), d.indexOf('function buildApprovalRow('));
-    expect(env).not.toMatch(/\.delete\(|\.ban\(|\.kick\(|bulkDelete/);
+  it('nothing in the admin env deletes or bans, and it kicks in one place only', () => {
+    const env = d.slice(d.indexOf('function discordAdminEnv('), d.indexOf('/** Reasons for kicks waiting'));
+    expect(env.length).toBeGreaterThan(1000);
+    expect(env).not.toMatch(/\.delete\(|\.ban\(|bulkDelete/);
+    expect(env.match(/\.kick\(/g)).toHaveLength(1);
   });
 });

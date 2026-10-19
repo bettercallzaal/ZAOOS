@@ -20,7 +20,11 @@
  *   admin: pin <message link>         or reply to a message with "admin: pin"
  *   admin: unpin <message link>
  *
- * Nothing here deletes, bans or kicks. Members and roles are the next PR.
+ * Members (also slash commands, see discord-slash.ts):
+ *   give or remove a role, set or clear a nickname, time out, kick
+ * ZOE never acts on Zaal, on itself, or on anyone whose top role is not below
+ * its own (Discord's own hierarchy check). A kick needs a second, confirming
+ * press. Nothing here deletes a channel or a message, or bans.
  *
  * parseAdminCommand and runAdminCommand are pure apart from the AdminEnv they
  * are handed, so the tests drive them with a fake guild.
@@ -46,10 +50,17 @@ export type AdminCommand =
   | { kind: 'archive'; channelId: string }
   | { kind: 'new-thread'; name: string }
   | { kind: 'pin'; pin: boolean; channelId?: string; messageId?: string }
+  | { kind: 'role'; give: boolean; userId: string; roleId: string }
+  | { kind: 'nick'; userId: string; nick: string }
+  | { kind: 'timeout'; userId: string; minutes: number }
+  | { kind: 'kick'; userId: string; reason?: string; confirmed: boolean }
   | { kind: 'unknown'; text: string };
 
+/** Discord's longest timeout: 28 days. 0 minutes lifts a timeout. */
+export const MAX_TIMEOUT_MINUTES = 28 * 24 * 60;
+
 export const ARCHIVE_CATEGORY = 'archive';
-/** Sent privately to anyone who is not Zaal. */
+
 /**
  * The posting permissions "archive" takes away. CreatePrivateThreads is here
  * too: without it a member could still open a private thread in an archived
@@ -91,12 +102,13 @@ export function overridesToClear<B>(
   return ids;
 }
 
+/** Sent privately to anyone who is not Zaal. */
 export const ADMIN_REFUSAL_LINE = 'Only Zaal can run admin commands. Nothing was changed.';
 const MAX_NAME = 100;
 
 const PREFIX = /^admin:\s*/i;
 const CHANNEL_MENTION = /^<#(\d{5,25})>$/;
-const MESSAGE_LINK = /^https:\/\/(?:ptb\.|canary\.)?discord(?:app)?\.com\/channels\/(?:\d+|@me)\/(\d{5,25})\/(\d{5,25})$/;
+export const MESSAGE_LINK = /^https:\/\/(?:ptb\.|canary\.)?discord(?:app)?\.com\/channels\/(?:\d+|@me)\/(\d{5,25})\/(\d{5,25})$/;
 
 /** Discord text-channel names: lower case, dashes for spaces, letters, digits, - and _. */
 export function cleanChannelName(raw: string): string {
@@ -176,6 +188,7 @@ export const ADMIN_HELP = [
   'admin: new thread <name>',
   'admin: pin <message link>  (or reply to a message with "admin: pin")',
   'admin: unpin <message link>',
+  'Members and roles: the /role, /nick, /timeout and /kick slash commands.',
 ].join('\n');
 
 /** What runAdminCommand needs from the guild. discord.ts builds it from discord.js. */
@@ -194,6 +207,22 @@ export interface AdminEnv {
   createThread(name: string): Promise<{ id: string; name: string }>;
   /** channelId undefined means the channel the command was sent in. */
   setPinned(channelId: string | undefined, messageId: string, pin: boolean): Promise<void>;
+  /** Zaal's id and ZOE's own: member commands never touch either. */
+  ownerId?: string;
+  selfId?: string;
+  /**
+   * A member of this server, with Discord's hierarchy answers for ZOE: can it
+   * change their roles and nickname, time them out, kick them. null if not here.
+   */
+  member(userId: string): Promise<{ name: string; manageable: boolean; moderatable: boolean; kickable: boolean } | null>;
+  /** A role of this server; editable is false when it is at or above ZOE's top role, or managed. */
+  role(roleId: string): Promise<{ name: string; editable: boolean } | null>;
+  setRole(userId: string, roleId: string, give: boolean): Promise<void>;
+  /** null clears the nickname. */
+  setNick(userId: string, nick: string | null): Promise<void>;
+  /** null lifts the timeout. */
+  timeout(userId: string, ms: number | null): Promise<void>;
+  kick(userId: string, reason: string): Promise<void>;
 }
 
 export interface AdminResult {
@@ -201,6 +230,25 @@ export interface AdminResult {
   ok: boolean;
   action: AdminCommand['kind'];
   target?: string;
+  /** Set on an unconfirmed kick: the caller shows a Confirm button for this user. */
+  confirmKick?: string;
+}
+
+/**
+ * The member a command may act on, or the reason it may not. Zaal and ZOE are
+ * never targets, and Discord's hierarchy answer for the action decides the rest.
+ */
+async function memberTarget(
+  env: AdminEnv,
+  userId: string,
+  need: 'manageable' | 'moderatable' | 'kickable',
+): Promise<{ name: string } | { refuse: string }> {
+  if (env.ownerId && userId === env.ownerId) return { refuse: 'I do not run member commands on Zaal.' };
+  if (env.selfId && userId === env.selfId) return { refuse: 'I do not run member commands on myself.' };
+  const m = await env.member(userId);
+  if (!m) return { refuse: 'That person is not in this server.' };
+  if (!m[need]) return { refuse: `I cannot do that to ${m.name}: their top role is not below mine. Move my role higher in Server Settings, Roles.` };
+  return { name: m.name };
 }
 
 /** Run one parsed command. Never throws: a Discord error becomes the reply. */
@@ -277,6 +325,64 @@ export async function runAdminCommand(cmd: AdminCommand, env: AdminEnv): Promise
         return { reply: cmd.pin ? 'Pinned.' : 'Unpinned.', ok: true, action: cmd.kind, target: cmd.messageId };
       } catch (err) {
         return fail(cmd.messageId, err);
+      }
+    case 'role':
+      try {
+        const t = await memberTarget(env, cmd.userId, 'manageable');
+        if ('refuse' in t) return { reply: t.refuse, ok: false, action: cmd.kind, target: cmd.userId };
+        const r = await env.role(cmd.roleId);
+        if (!r) return { reply: 'That role is not in this server.', ok: false, action: cmd.kind, target: cmd.userId };
+        if (!r.editable) {
+          return { reply: `I cannot hand out "${r.name}": it is at or above my top role, or Discord manages it.`, ok: false, action: cmd.kind, target: cmd.userId };
+        }
+        await env.setRole(cmd.userId, cmd.roleId, cmd.give);
+        return {
+          reply: cmd.give ? `Gave ${t.name} the "${r.name}" role.` : `Removed the "${r.name}" role from ${t.name}.`,
+          ok: true,
+          action: cmd.kind,
+          target: cmd.userId,
+        };
+      } catch (err) {
+        return fail(cmd.userId, err);
+      }
+    case 'nick':
+      try {
+        const t = await memberTarget(env, cmd.userId, 'manageable');
+        if ('refuse' in t) return { reply: t.refuse, ok: false, action: cmd.kind, target: cmd.userId };
+        const nick = cleanLabel(cmd.nick).slice(0, 32);
+        await env.setNick(cmd.userId, nick || null);
+        return { reply: nick ? `${t.name} is now "${nick}" here.` : `Cleared ${t.name}'s nickname.`, ok: true, action: cmd.kind, target: cmd.userId };
+      } catch (err) {
+        return fail(cmd.userId, err);
+      }
+    case 'timeout':
+      try {
+        if (!Number.isInteger(cmd.minutes) || cmd.minutes < 0 || cmd.minutes > MAX_TIMEOUT_MINUTES) {
+          return { reply: `Minutes must be a whole number from 0 (lift) to ${MAX_TIMEOUT_MINUTES} (28 days).`, ok: false, action: cmd.kind, target: cmd.userId };
+        }
+        const t = await memberTarget(env, cmd.userId, 'moderatable');
+        if ('refuse' in t) return { reply: t.refuse, ok: false, action: cmd.kind, target: cmd.userId };
+        await env.timeout(cmd.userId, cmd.minutes === 0 ? null : cmd.minutes * 60_000);
+        return {
+          reply: cmd.minutes === 0 ? `Lifted ${t.name}'s timeout.` : `Timed out ${t.name} for ${cmd.minutes} minute${cmd.minutes === 1 ? '' : 's'}.`,
+          ok: true,
+          action: cmd.kind,
+          target: cmd.userId,
+        };
+      } catch (err) {
+        return fail(cmd.userId, err);
+      }
+    case 'kick':
+      try {
+        const t = await memberTarget(env, cmd.userId, 'kickable');
+        if ('refuse' in t) return { reply: t.refuse, ok: false, action: cmd.kind, target: cmd.userId };
+        if (!cmd.confirmed) {
+          return { reply: `Kick ${t.name} from the server? They can rejoin with an invite.`, ok: true, action: cmd.kind, target: cmd.userId, confirmKick: cmd.userId };
+        }
+        await env.kick(cmd.userId, cleanLabel(cmd.reason ?? '') || 'Kicked by Zaal through ZOE');
+        return { reply: `Kicked ${t.name}.`, ok: true, action: cmd.kind, target: cmd.userId };
+      } catch (err) {
+        return fail(cmd.userId, err);
       }
   }
 }

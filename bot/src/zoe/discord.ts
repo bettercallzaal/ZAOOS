@@ -36,6 +36,14 @@ import {
   ActionRowBuilder,
   MessageFlags,
   PermissionFlagsBits,
+  type ActionRowData,
+  type ApplicationCommandDataResolvable,
+  type ButtonComponentData,
+  ComponentType,
+  type ButtonInteraction,
+  type ChatInputCommandInteraction,
+  type Guild,
+  type GuildTextBasedChannel,
   type Message,
   type TextBasedChannel,
 } from 'discord.js';
@@ -69,6 +77,7 @@ import {
   parseAdminCommand,
   runAdminCommand,
 } from './discord-admin';
+import { ADMIN_SLASH_COMMANDS, ADMIN_SLASH_NAMES, KICK_CONFIRM_PREFIX, slashToAdminCommand } from './discord-slash';
 import { config as loadEnv } from 'dotenv';
 
 loadEnv();
@@ -111,11 +120,12 @@ function chunkMessage(text: string, max = DISCORD_MAX): string[] {
 }
 
 /**
- * The guild operations discord-admin.ts runs, bound to the server and channel
- * the command was sent in. Only reached for Zaal's own "admin:" messages.
+ * The guild operations discord-admin.ts runs, bound to the server and the
+ * channel the command was sent in (null for a kick confirmation, which needs
+ * none). Only reached for Zaal's own "admin:" messages and slash commands.
  */
-function discordAdminEnv(message: Message<true>): AdminEnv {
-  const guild = message.guild;
+const ADMIN_AUDIT_REASON = 'ZOE admin command, run by Zaal';
+function discordAdminEnv(guild: Guild, here: GuildTextBasedChannel | null): AdminEnv {
   const fetchChannel = async (id: string) => {
     const ch = await guild.channels.fetch(id).catch(() => null);
     if (!ch) throw new Error('that channel is not in this server');
@@ -156,17 +166,149 @@ function discordAdminEnv(message: Message<true>): AdminEnv {
       return { cleared: toClear.length };
     },
     async createThread(name) {
-      if (message.channel.type !== ChannelType.GuildText) throw new Error('threads start from a text channel');
-      const th = await message.channel.threads.create({ name });
+      if (!here || here.type !== ChannelType.GuildText) throw new Error('threads start from a text channel');
+      const th = await here.threads.create({ name });
       return { id: th.id, name: th.name };
     },
     async setPinned(channelId, messageId, pin) {
-      const ch = channelId ? await fetchChannel(channelId) : message.channel;
-      if (!ch.isTextBased()) throw new Error('that channel has no messages to pin');
+      const ch = channelId ? await fetchChannel(channelId) : here;
+      if (!ch || !ch.isTextBased()) throw new Error('that channel has no messages to pin');
       const target = await ch.messages.fetch(messageId);
       await (pin ? target.pin() : target.unpin());
     },
+    ownerId: DISCORD_ZAAL_ID,
+    selfId: guild.client.user?.id,
+    // A single member fetch by id needs no privileged members intent.
+    async member(userId) {
+      const m = await guild.members.fetch(userId).catch(() => null);
+      return m ? { name: m.displayName, manageable: m.manageable, moderatable: m.moderatable, kickable: m.kickable } : null;
+    },
+    async role(roleId) {
+      const r = await guild.roles.fetch(roleId).catch(() => null);
+      return r ? { name: r.name, editable: r.editable } : null;
+    },
+    async setRole(userId, roleId, give) {
+      const m = await guild.members.fetch(userId);
+      await (give ? m.roles.add(roleId, ADMIN_AUDIT_REASON) : m.roles.remove(roleId, ADMIN_AUDIT_REASON));
+    },
+    async setNick(userId, nick) {
+      await (await guild.members.fetch(userId)).setNickname(nick, ADMIN_AUDIT_REASON);
+    },
+    async timeout(userId, ms) {
+      await (await guild.members.fetch(userId)).timeout(ms, ADMIN_AUDIT_REASON);
+    },
+    // Reached only from a confirmed kick (runAdminCommand's kick case).
+    async kick(userId, reason) {
+      await (await guild.members.fetch(userId)).kick(reason);
+    },
   };
+}
+
+/** Reasons for kicks waiting on Zaal's Confirm press, by user id. Ten minutes. */
+const pendingKicks = new Map<string, { reason?: string; at: number }>();
+const KICK_CONFIRM_MS = 10 * 60_000;
+
+// Plain component data rather than ButtonBuilder: the builders package here
+// types against a different discord-api-types than discord.js (buildApprovalRow
+// works around the same thing with a cast).
+function kickConfirmRow(userId: string): ActionRowData<ButtonComponentData> {
+  return {
+    type: ComponentType.ActionRow,
+    components: [
+      { type: ComponentType.Button, customId: `${KICK_CONFIRM_PREFIX}${userId}`, label: 'Confirm kick', style: ButtonStyle.Danger },
+      { type: ComponentType.Button, customId: `zadm_kickno_${userId}`, label: 'Cancel', style: ButtonStyle.Secondary },
+    ],
+  };
+}
+
+/**
+ * A slash command from discord-slash.ts. Same rules as "admin:" text: flag on,
+ * in a server, Zaal only, logged either way. Every reply is ephemeral, so only
+ * Zaal sees it, and pings nobody.
+ */
+async function handleAdminSlash(i: ChatInputCommandInteraction): Promise<void> {
+  const by = i.user.id;
+  if (!discordAdminEnabled()) {
+    await i.reply({ content: 'Admin commands are off right now.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+  if (!i.inCachedGuild()) {
+    await appendAdminLog({ action: `/${i.commandName}`, ok: false, by, refused: 'not in a server' });
+    await i.reply({ content: 'Run admin commands in the server.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+  if (!isDiscordOwner(by, DISCORD_ZAAL_ID)) {
+    await appendAdminLog({ action: `/${i.commandName}`, ok: false, by, guildId: i.guildId, refused: 'not owner' });
+    await i.reply({ content: ADMIN_REFUSAL_LINE, flags: MessageFlags.Ephemeral });
+    return;
+  }
+  const cmd = slashToAdminCommand(i.commandName, {
+    sub: i.options.getSubcommand(false),
+    string: (n) => i.options.getString(n),
+    integer: (n) => i.options.getInteger(n),
+    id: (n) => {
+      const v = i.options.get(n)?.value;
+      return typeof v === 'string' ? v : null;
+    },
+  });
+  if (!cmd) return;
+  await i.deferReply({ ephemeral: true });
+  const here = i.channel?.isTextBased() ? i.channel : null;
+  const result = await runAdminCommand(cmd, discordAdminEnv(i.guild, here));
+  const action = result.confirmKick ? 'kick-asked' : result.action;
+  await appendAdminLog({ action, ok: result.ok, target: result.target, by, guildId: i.guildId });
+  console.log(`[zoe/discord-admin] /${action} ${result.ok ? 'ok' : 'failed'} in guild ${i.guildId}`);
+  if (result.ok) featureRan('discord-admin', `/${action}`);
+  if (result.confirmKick && cmd.kind === 'kick') {
+    pendingKicks.set(result.confirmKick, { reason: cmd.reason, at: Date.now() });
+  }
+  await i.editReply({
+    content: result.reply,
+    allowedMentions: { parse: [] },
+    components: result.confirmKick ? [kickConfirmRow(result.confirmKick)] : [],
+  });
+}
+
+/** The Confirm or Cancel press under a /kick. Zaal only, and only within ten minutes. */
+async function handleKickButton(i: ButtonInteraction): Promise<void> {
+  const by = i.user.id;
+  const confirm = i.customId.startsWith(KICK_CONFIRM_PREFIX);
+  const userId = i.customId.slice(confirm ? KICK_CONFIRM_PREFIX.length : 'zadm_kickno_'.length);
+  if (!discordAdminEnabled() || !i.inCachedGuild() || !isDiscordOwner(by, DISCORD_ZAAL_ID)) {
+    await appendAdminLog({ action: 'kick', ok: false, by, target: userId, refused: 'button: not owner, no server, or flag off' });
+    await i.reply({ content: ADMIN_REFUSAL_LINE, flags: MessageFlags.Ephemeral });
+    return;
+  }
+  const pending = pendingKicks.get(userId);
+  pendingKicks.delete(userId);
+  if (!confirm) {
+    await i.update({ content: 'Not kicked.', components: [] });
+    return;
+  }
+  if (!pending || Date.now() - pending.at > KICK_CONFIRM_MS) {
+    await i.update({ content: 'That confirmation expired. Run /kick again.', components: [] });
+    return;
+  }
+  const result = await runAdminCommand({ kind: 'kick', userId, confirmed: true, reason: pending.reason }, discordAdminEnv(i.guild, null));
+  await appendAdminLog({ action: 'kick', ok: result.ok, target: userId, by, guildId: i.guildId });
+  console.log(`[zoe/discord-admin] kick ${result.ok ? 'ok' : 'failed'} in guild ${i.guildId}`);
+  if (result.ok) featureRan('discord-admin', 'kick');
+  await i.update({ content: result.reply, components: [], allowedMentions: { parse: [] } });
+}
+
+/** Register the admin slash commands in every server ZOE is in. Guild commands appear at once. */
+async function registerAdminSlash(client: Client): Promise<void> {
+  for (const guild of client.guilds.cache.values()) {
+    try {
+      // The JSON is what Discord takes; the cast is only the builders-versus-
+      // discord.js type mismatch noted at kickConfirmRow.
+      await guild.commands.set(ADMIN_SLASH_COMMANDS as unknown as ApplicationCommandDataResolvable[]);
+      console.log(`[zoe/discord-slash] registered ${ADMIN_SLASH_COMMANDS.length} admin commands in guild ${guild.id}`);
+      featureRan('discord-slash', guild.id);
+    } catch (err) {
+      console.error(`[zoe/discord-slash] could not register in guild ${guild.id}: ${(err as Error).message}`);
+    }
+  }
 }
 
 /**
@@ -236,6 +378,8 @@ export async function bootDiscordClient(): Promise<Client | null> {
         (COMMUNITY_ASKS_ENABLED ? ' [community-asks: ON]' : '') +
         (CHANNEL_READ ? ' [channel-read: ON]' : ''),
     );
+    // Slash commands only exist while admin is on (ZOE_DISCORD_ADMIN=1).
+    if (discordAdminEnabled()) void registerAdminSlash(client);
   });
 
   /**
@@ -286,7 +430,7 @@ export async function bootDiscordClient(): Promise<Client | null> {
             reply = 'Run admin commands in the server, with an @mention.';
             await appendAdminLog({ action: cmd.kind, ok: false, by, refused: 'not in a server' });
           } else {
-            const result = await runAdminCommand(cmd, discordAdminEnv(message));
+            const result = await runAdminCommand(cmd, discordAdminEnv(message.guild, message.channel));
             reply = result.reply;
             await appendAdminLog({ action: result.action, ok: result.ok, target: result.target, by, guildId: message.guildId });
             console.log(`[zoe/discord-admin] ${result.action} ${result.ok ? 'ok' : 'failed'} in guild ${message.guildId}`);
@@ -471,6 +615,21 @@ export async function bootDiscordClient(): Promise<Client | null> {
    * Only Zaal can approve/skip/regen. Other users get an ephemeral "not authorized".
    */
   client.on('interactionCreate', async (interaction) => {
+    // Admin slash commands and the kick confirmation come first; the zask_
+    // approval buttons below ignore everything else (first-handler-wins.md).
+    try {
+      if (interaction.isChatInputCommand() && ADMIN_SLASH_NAMES.has(interaction.commandName)) {
+        await handleAdminSlash(interaction);
+        return;
+      }
+      if (interaction.isButton() && interaction.customId.startsWith('zadm_kick')) {
+        await handleKickButton(interaction);
+        return;
+      }
+    } catch (err) {
+      console.error('[zoe/discord-admin] slash command failed:', (err as Error).message);
+      return;
+    }
     if (!interaction.isButton()) return;
     if (!interaction.customId.startsWith('zask_')) return;
 
